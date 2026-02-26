@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "99519924561",
+    "project_id": "maleva-4eefb",
+    "storage_bucket": "maleva-4eefb.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:99519924561:android:6cc6c0058a19077fc4ab70",
+        "android_client_info": {
+          "package_name": "com.kassapos.maleva"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC3O9i3QjcUTSpCI58RLjRp75I4jV9fwP4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
