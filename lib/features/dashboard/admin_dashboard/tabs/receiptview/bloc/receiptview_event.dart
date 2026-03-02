@@ -18,3 +18,4 @@ class SelectToDateEvent extends ReceiptEvent {
   final DateTime date;
   SelectToDateEvent(this.date);
 }
+

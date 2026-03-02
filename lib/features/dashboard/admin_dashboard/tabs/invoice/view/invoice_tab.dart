@@ -6,8 +6,6 @@ import 'package:maleva/core/utils/clsfunction.dart' as objfun;
 import 'package:maleva/core/colors/colors.dart' as colour;
 import 'package:maleva/features/dashboard/admin_dashboard/tabs/salesorder/bloc/salesorder_bloc.dart';
 import 'package:salomon_bottom_bar/salomon_bottom_bar.dart';
-
-
 import '../../../../../../core/colors/colors.dart';
 import '../bloc/invoice_bloc.dart';
 import '../bloc/invoice_event.dart';

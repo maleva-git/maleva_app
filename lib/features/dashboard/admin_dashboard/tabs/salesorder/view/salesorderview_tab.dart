@@ -8,7 +8,7 @@ import 'package:salomon_bottom_bar/salomon_bottom_bar.dart';
 import '../bloc/salesorder_bloc.dart';
 import '../bloc/salesorder_event.dart';
 import '../bloc/salesorder_state.dart';
-
+import '../../../../../../core/colors/colors.dart';
 
 
 class SalesOrderTab extends StatefulWidget {
@@ -81,7 +81,8 @@ class _SalesOrderTabState extends State<SalesOrderTab> {
                   padding: const EdgeInsets.all(16),
                   child: ListView(
                     children: [
-
+                      _buildTodayYesterdayChart(data),
+                      const SizedBox(height: 20),
                       /// RANGE TOGGLE
                       Row(
                         children: [
@@ -104,7 +105,7 @@ class _SalesOrderTabState extends State<SalesOrderTab> {
                       Container(
                         padding: const EdgeInsets.all(16),
                         decoration: BoxDecoration(
-                          color: const Color(0xFF5B9BD5),
+                          color: AppColors.appBarColor,
                           borderRadius: BorderRadius.circular(20),
                         ),
                         child: Text(
@@ -241,7 +242,7 @@ class _SalesOrderTabState extends State<SalesOrderTab> {
                   height: 70,
                   child: Card(
                     elevation: 6,
-                    color: colour.commonColorLight,
+                    color: colour.AppColors.appBarColor,
                     child: SalomonBottomBar(
                       duration: const Duration(seconds: 1),
                       currentIndex: state.selectedTabIndex,
@@ -250,33 +251,33 @@ class _SalesOrderTabState extends State<SalesOrderTab> {
                       },
                       items: [
                         SalomonBottomBarItem(
-                          icon: const Icon(Icons.receipt, color: colour.commonColor),
+                          icon: const Icon(Icons.receipt, color: colour.AppColors.whitecolor),
                           title: Text("All",
                             style: GoogleFonts.lato(
                               textStyle: TextStyle(
-                                color: colour.commonColor,
+                                color: colour.AppColors.whitecolor,
                                 fontSize: width <= 370 ? objfun.FontCardText + 2 : objfun.FontLow,
                               ),
                             ),
                           ),
                         ),
                         SalomonBottomBarItem(
-                          icon: const Icon(Icons.receipt_long, color: colour.commonColor),
+                          icon: const Icon(Icons.receipt_long, color: colour.AppColors.whitecolor),
                           title: Text("With",
                             style: GoogleFonts.lato(
                               textStyle: TextStyle(
-                                color: colour.commonColor,
+                                color: colour.AppColors.whitecolor,
                                 fontSize: width <= 370 ? objfun.FontCardText + 2 : objfun.FontLow,
                               ),
                             ),
                           ),
                         ),
                         SalomonBottomBarItem(
-                          icon: const Icon(Icons.receipt_long_outlined, color: colour.commonColor),
+                          icon: const Icon(Icons.receipt_long_outlined, color: colour.AppColors.whitecolor),
                           title: Text("Without",
                             style: GoogleFonts.lato(
                               textStyle: TextStyle(
-                                color: colour.commonColor,
+                                color: colour.AppColors.whitecolor,
                                 fontSize: width <= 370 ? objfun.FontCardText + 2 : objfun.FontLow,
                               ),
                             ),
@@ -489,10 +490,11 @@ Widget _rangeButton({
     child: Container(
       padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 8),
       decoration: BoxDecoration(
-        color: selected
-            ? const Color(0xFF5B9BD5)
-            : Colors.grey.shade300,
-        borderRadius: BorderRadius.circular(30),
+        color: selected ? AppColors.appBarColor : Colors.transparent, // ✅
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(
+          color: AppColors.appBarColor, // ✅
+        ),
       ),
       child: Text(
         text,
@@ -762,3 +764,188 @@ Widget _smallStatCard(
   );
 }
 
+Widget _buildTodayYesterdayChart(Map<String, dynamic> data) {
+  final today = double.tryParse(data["TodayAmount"].toString()) ?? 0;
+  final yesterday = double.tryParse(data["YesterdayAmount"].toString()) ?? 0;
+
+  return Container(
+    height: 200,
+    padding: const EdgeInsets.all(16),
+    decoration: BoxDecoration(
+      color: Colors.white,
+      borderRadius: BorderRadius.circular(20),
+      border: Border.all(color: AppColors.appBarColor, width: 1.5),
+      boxShadow: [
+        BoxShadow(
+          color: AppColors.appBarColor.withOpacity(0.1),
+          blurRadius: 12,
+          offset: const Offset(0, 4),
+        ),
+      ],
+    ),
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // ── Legend ──
+        Row(
+          children: [
+            const Text(
+              "Today vs Yesterday",
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                fontSize: 13,
+                color: Color(0xFF1A2E5A),
+              ),
+            ),
+            const Spacer(),
+            // Today legend
+            Container(width: 12, height: 3, color: AppColors.appBarColor),
+            const SizedBox(width: 4),
+            const Text("Today", style: TextStyle(fontSize: 11, color: Color(0xFF1A2E5A))),
+            const SizedBox(width: 12),
+            // Yesterday legend
+            Container(width: 12, height: 3, color: Colors.orange),
+            const SizedBox(width: 4),
+            const Text("Yesterday", style: TextStyle(fontSize: 11, color: Color(0xFF1A2E5A))),
+          ],
+        ),
+
+        const SizedBox(height: 10),
+
+        Expanded(
+          child: LineChart(
+            LineChartData(
+              gridData: FlGridData(
+                show: true,
+                drawVerticalLine: false,
+                getDrawingHorizontalLine: (value) => FlLine(
+                  color: Colors.grey.withOpacity(0.15),
+                  strokeWidth: 1,
+                ),
+              ),
+              borderData: FlBorderData(show: false),
+              titlesData: FlTitlesData(
+                leftTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                rightTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                topTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                bottomTitles: AxisTitles(
+                  sideTitles: SideTitles(
+                    showTitles: true,
+                    getTitlesWidget: (value, meta) {
+                      const labels = ['Start', 'Mid', 'End'];
+                      if (value.toInt() >= labels.length) return const SizedBox();
+                      return Padding(
+                        padding: const EdgeInsets.only(top: 6),
+                        child: Text(
+                          labels[value.toInt()],
+                          style: const TextStyle(
+                            fontSize: 10,
+                            color: Colors.grey,
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                ),
+              ),
+              lineTouchData: LineTouchData(
+                touchTooltipData: LineTouchTooltipData(
+                  tooltipBgColor: Colors.white, // ✅ black → white
+                  tooltipRoundedRadius: 8,
+                  tooltipBorder: BorderSide(
+                    color: AppColors.appBarColor,
+                    width: 1,
+                  ),
+                  getTooltipItems: (touchedSpots) {
+                    return touchedSpots.map((spot) {
+                      final label = spot.barIndex == 0 ? "Today" : "Yesterday";
+                      return LineTooltipItem(
+                        "$label\nRM ${spot.y.toStringAsFixed(0)}",
+                        TextStyle(
+                          color: spot.barIndex == 0
+                              ? AppColors.appBarColor
+                              : Colors.orange,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 11,
+                        ),
+                      );
+                    }).toList();
+                  },
+                ),
+              ),
+              lineBarsData: [
+                // ✅ Today Line — Blue
+                LineChartBarData(
+                  spots: [
+                    FlSpot(0, 0),
+                    FlSpot(1, today * 0.6),
+                    FlSpot(2, today),
+                  ],
+                  isCurved: true,
+                  color: AppColors.appBarColor,
+                  barWidth: 3,
+                  isStrokeCapRound: true,
+                  dotData: FlDotData(
+                    show: true,
+                    getDotPainter: (spot, percent, bar, index) =>
+                        FlDotCirclePainter(
+                          radius: 5,
+                          color: Colors.white,
+                          strokeWidth: 2,
+                          strokeColor: AppColors.appBarColor,
+                        ),
+                  ),
+                  belowBarData: BarAreaData(
+                    show: true,
+                    gradient: LinearGradient(
+                      colors: [
+                        AppColors.appBarColor.withOpacity(0.2),
+                        AppColors.appBarColor.withOpacity(0.0),
+                      ],
+                      begin: Alignment.topCenter,
+                      end: Alignment.bottomCenter,
+                    ),
+                  ),
+                ),
+
+                // ✅ Yesterday Line — Orange
+                LineChartBarData(
+                  spots: [
+                    FlSpot(0, 0),
+                    FlSpot(1, yesterday * 0.6),
+                    FlSpot(2, yesterday),
+                  ],
+                  isCurved: true,
+                  color: Colors.orange,
+                  barWidth: 3,
+                  isStrokeCapRound: true,
+                  dotData: FlDotData(
+                    show: true,
+                    getDotPainter: (spot, percent, bar, index) =>
+                        FlDotCirclePainter(
+                          radius: 5,
+                          color: Colors.white,
+                          strokeWidth: 2,
+                          strokeColor: Colors.orange,
+                        ),
+                  ),
+                  belowBarData: BarAreaData(
+                    show: true,
+                    gradient: LinearGradient(
+                      colors: [
+                        Colors.orange.withOpacity(0.2),
+                        Colors.orange.withOpacity(0.0),
+                      ],
+                      begin: Alignment.topCenter,
+                      end: Alignment.bottomCenter,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ],
+    ),
+  );
+}
