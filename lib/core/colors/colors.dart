@@ -46,12 +46,12 @@ const commonColor2 = Color(0xffffbc29);
 // const spinKitColor = Color(0xffd70e0e);
 
 const commonColorhighlight = Color(0xe2bf0f0f);
-const commonColor = Color(0xff0e387a);
+const commonColor = Color(0xff1a4d9e);
 const commonColorDisabled = Color(0x61959595);
 const topAppBarColor = Colors.white;
 const ButtonForeColor = Colors.white;
 const commonColorLight = Color(0xFF5B9BD5);
-const commonColorred = Color(0xffd70e0e);
+const commonColorred = Color(0xffb30c0c);
 const spinKitColor = Color(0xff0e387a);
 
 
