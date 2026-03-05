@@ -75,19 +75,26 @@ class ExpenseReportView extends StatelessWidget {
                 child: Card(
                   child: Row(
                     children: [
-                      // Expanded(
-                      //   flex: 2,
-                      //   child: _buildLabelColumn(
-                      //     labels: ['','Today', 'Yesterday', 'Weekly', 'Monthly'],
-                      //   ),
-                      // ),
-                      // Expanded(
-                      //     flex: 1,
-                      //     child: _buildDataColumn(
-                      //       headers: 'Total',
-                      //       values: state.
-                      //     )
-                      // )
+                      Expanded(
+                        flex: 2,
+                        child: _buildLabelColumn(
+                          labels: ['','Today', 'Yesterday', 'Weekly', 'Monthly'],
+                        ),
+                      ),
+                      Expanded(
+                          flex: 1,
+                          child: _buildDataColumn(
+                            header: 'Total',
+                            values: state.saleExpReport.isEmpty
+                              ? ['0','0','0','0']
+                              : [
+                              state.saleExpReport[0]["TodayCount"].toStringAsFixed(0),
+                              state.saleExpReport[0]["YesterdayCount"].toStringAsFixed(0),
+                              state.saleExpReport[0]["WeekCount"].toStringAsFixed(0),
+                              state.saleExpReport[0]["MonthCount"].toStringAsFixed(0),
+                            ],
+                          ),
+                      )
                     ],
                   ),
                 ),
@@ -99,4 +106,78 @@ class ExpenseReportView extends StatelessWidget {
       },
     );
   }
+}
+
+Widget _buildLabelColumn({
+  required List<String> labels,
+  double topPadding = 15,
+  double itemPadding = 5,
+}) {
+  return Column(
+    crossAxisAlignment: CrossAxisAlignment.center,
+    children: labels.map((label) {
+      final isFirst = labels.indexOf(label) == 0;
+      return Padding(
+        padding: EdgeInsets.only(
+          top: isFirst ? topPadding : itemPadding,
+          left: 5,
+          right: 5,
+          bottom: 5,
+        ),
+        child: Text(
+          label,
+          textAlign: TextAlign.left,
+          style: GoogleFonts.lato(
+            textStyle: TextStyle(
+              color: colour.commonColor,
+              fontWeight: FontWeight.bold,
+              fontSize: objfun.FontLow - 2,
+              letterSpacing: 0.3,
+            ),
+          ),
+        ),
+      );
+    }).toList(),
+  );
+}
+
+Widget _buildDataColumn({
+  required String header,
+  required List<String> values,
+  double topPadding = 15,
+  double itemPadding = 5,
+}) {
+  return Column(
+    children: [
+      if (header.isNotEmpty)
+        Padding(
+          padding: EdgeInsets.only(top: topPadding,left: 5,right: 5,bottom: 5),
+          child: Text(
+            header,
+            style: GoogleFonts.lato(
+              textStyle: TextStyle(
+                color: colour.commonColor,
+                fontWeight: FontWeight.bold,
+                fontSize: objfun.FontLow - 2,
+                letterSpacing: 0.3,
+              ),
+            ),
+          ),
+        ),
+      ...values.map((val) => Padding(
+   padding: EdgeInsets.only(top: itemPadding,bottom: 5),
+  child: Text(
+     val,
+     style: GoogleFonts.lato(
+       textStyle: TextStyle(
+         color: colour.commonColor,
+         fontWeight: FontWeight.bold,
+         fontSize: objfun.FontLow - 2,
+         letterSpacing: 0.3,
+       )
+     )),
+  ),
+  )
+    ],
+  );
 }

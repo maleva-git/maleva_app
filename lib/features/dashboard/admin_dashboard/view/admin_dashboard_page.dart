@@ -9,6 +9,7 @@ import '../../../common_updates/blocs/sales/sales_bloc.dart';
 import '../../../common_updates/blocs/truck/truck_bloc.dart';
 import '../bloc/admin_tab_bloc.dart';
 import '../bloc/admin_tab_event.dart';
+import '../tabs/ExpenseReport/view/expensereport_tab.dart';
 import '../tabs/forwardingreport/bloc/forwardingreport_bloc.dart';
 import '../tabs/forwardingreport/bloc/forwardingreport_event.dart';
 import '../tabs/forwardingreport/view/forwardingreport_tab.dart';
@@ -82,6 +83,14 @@ class _AdminDashboardState extends State<NewAdminDashboard> with SingleTickerPro
               toDate: DateFormat("yyyy-MM-dd").format(DateTime.now()),
             )),
           child: const ForwardingReportView(),
+        ),
+        BlocProvider(
+          create: (context) => ForwardingReportBloc(context)
+            ..add(LoadFWDataEvent(
+              fromDate: DateFormat("yyyy-MM-dd").format(DateTime.now()),
+              toDate: DateFormat("yyyy-MM-dd").format(DateTime.now()),
+            )),
+          child: const ExpenseReportPage(),
         ),
       ],
       child: Scaffold(

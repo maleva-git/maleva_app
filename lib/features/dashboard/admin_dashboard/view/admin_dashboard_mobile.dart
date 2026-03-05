@@ -14,6 +14,7 @@ import '../../../common_updates/blocs/truck/truck_bloc.dart';
 import '../../../common_updates/blocs/truck/truck_event.dart';
 import '../bloc/admin_tab_bloc.dart';
 import '../bloc/admin_tab_state.dart';
+import '../tabs/ExpenseReport/view/expensereport_tab.dart';
 import '../tabs/forwardingreport/view/forwardingreport_tab.dart';
 import '../tabs/receiptview/bloc/receiptview_bloc.dart';
 import '../tabs/receiptview/bloc/receiptview_event.dart';
@@ -191,7 +192,7 @@ class MobileDashboard extends StatelessWidget {
                   const ReceiptPage(),
                   const SalesOrderTab(),
                   const ForwardingReportPage(),
-                  const Tab5Content(),
+                  const ExpenseReportPage(),
                   const Tab6Content(),
 
                 ],
