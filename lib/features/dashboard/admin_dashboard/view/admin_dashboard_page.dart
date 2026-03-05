@@ -4,6 +4,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 import 'package:maleva/core/utils/clsfunction.dart' as objfun;
 import 'package:maleva/core/colors/colors.dart' as colour;
+import 'package:maleva/features/dashboard/admin_dashboard/tabs/ExpenseReport/bloc/expensereport_bloc.dart';
+import 'package:maleva/features/dashboard/admin_dashboard/tabs/ExpenseReport/bloc/expensereport_event.dart';
 import 'package:maleva/features/dashboard/admin_dashboard/tabs/salesorder/bloc/salesorder_bloc.dart';
 import '../../../common_updates/blocs/sales/sales_bloc.dart';
 import '../../../common_updates/blocs/truck/truck_bloc.dart';
@@ -85,12 +87,12 @@ class _AdminDashboardState extends State<NewAdminDashboard> with SingleTickerPro
           child: const ForwardingReportView(),
         ),
         BlocProvider(
-          create: (context) => ForwardingReportBloc(context)
-            ..add(LoadFWDataEvent(
+          create: (context) => ExpenseReportBloc(context)
+            ..add(LoadExpReportEvent(
               fromDate: DateFormat("yyyy-MM-dd").format(DateTime.now()),
               toDate: DateFormat("yyyy-MM-dd").format(DateTime.now()),
             )),
-          child: const ExpenseReportPage(),
+          child: const ExpenseReportView(),
         ),
       ],
       child: Scaffold(

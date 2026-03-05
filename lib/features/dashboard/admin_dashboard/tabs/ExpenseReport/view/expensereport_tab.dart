@@ -19,8 +19,8 @@ class ExpenseReportPage extends StatelessWidget {
     return BlocProvider(
         create: (_) => ExpenseReportBloc(context)
             ..add(LoadExpReportEvent(
-              fromDate: DateFormat("YYYY-MM-dd").format(DateTime.now()),
-              toDate: DateFormat("YYYY-MM-dd").format(DateTime.now()),
+              fromDate: DateFormat("yyyy-MM-dd").format(DateTime.now()),
+              toDate: DateFormat("yyyy-MM-dd").format(DateTime.now()),
             )),
       child: const ExpenseReportView(),
     );
@@ -84,24 +84,213 @@ class ExpenseReportView extends StatelessWidget {
                       Expanded(
                           flex: 1,
                           child: _buildDataColumn(
-                            header: 'Total',
+                            header: ' ',
                             values: state.saleExpReport.isEmpty
                               ? ['0','0','0','0']
                               : [
-                              state.saleExpReport[0]["TodayCount"].toStringAsFixed(0),
-                              state.saleExpReport[0]["YesterdayCount"].toStringAsFixed(0),
-                              state.saleExpReport[0]["WeekCount"].toStringAsFixed(0),
-                              state.saleExpReport[0]["MonthCount"].toStringAsFixed(0),
+                              (state.saleExpReport[0]["TodaySales"] ?? 0).toStringAsFixed(0),
+                              (state.saleExpReport[0]["YesterdaySales"] ?? 0).toStringAsFixed(0),
+                              (state.saleExpReport[0]["WeekSales"] ?? 0).toStringAsFixed(0),
+                              (state.saleExpReport[0]["MonthSales"] ?? 0).toStringAsFixed(0),
                             ],
                           ),
+                      ),
+                      Expanded(
+                        flex: 1,
+                        child: _buildDataColumn(
+                          header: ' ',
+                          values: state.saleExpReport.isEmpty
+                              ? ['0','0','0','0']
+                              : [
+                            (state.saleExpReport[0]["TodayAmount"] ?? 0).toStringAsFixed(0),
+                            (state.saleExpReport[0]["YesterdayAmount"] ?? 0).toStringAsFixed(0),
+                            (state.saleExpReport[0]["WeekAmount"] ?? 0).toStringAsFixed(0),
+                            (state.saleExpReport[0]["MonthAmount"] ?? 0).toStringAsFixed(0),
+                          ],
+                        ),
                       )
                     ],
                   ),
                 ),
-              )
+              ),
+              SizedBox(height: height * 0.03),
+              _DatePickerRow(),
 
+              SizedBox(
+                height: height * 0.55,
+                child: ListView.builder(
+                  physics: const NeverScrollableScrollPhysics(),
+                  itemCount: state.saleExpReport2.length,
+                  itemBuilder: (context, index) {
+                    final item = state.saleExpReport2[index];
+
+                    final expenseName = item["ExpenseName"] ?? "-";
+                    final expAmount = (item["ExpAmount"] ?? 0).toDouble();
+                    final expCount = (item["ExpCount"] ?? 0).toDouble();
+
+                    return InkWell(
+                      borderRadius: BorderRadius.circular(20),
+                      onTap: () => context.read<ExpenseReportBloc>().add(
+                        LoadExpReportEvent(
+                          fromDate: state.dtpFromDate,
+                          toDate: state.dtpToDate,
+                        ),
+                      ),
+                      child: Container(
+                        margin: const EdgeInsets.only(bottom: 12),
+                        padding: const EdgeInsets.all(16),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(20),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withOpacity(0.05),
+                              blurRadius: 8,
+                              offset: const Offset(0, 4),
+                            ),
+                          ],
+                        ),
+                        child: Row(
+                          children: [
+                            Expanded(
+                              flex: 1,
+                              child: Text(
+                                expenseName,
+                                style: const TextStyle(
+                                  color: colour.commonColor,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ),
+                            Expanded(
+                              flex: 1,
+                              child: Text(
+                                expCount.toStringAsFixed(0),
+                                textAlign: TextAlign.center,
+                                style: const TextStyle(fontWeight: FontWeight.bold, color: colour.commonColor),
+                              ),
+                            ),
+                            Expanded(
+                              flex: 1,
+                              child: Text(
+                                expAmount.toStringAsFixed(0),
+                                textAlign: TextAlign.end,
+                                style: const TextStyle(fontWeight: FontWeight.bold, color: colour.commonColor,),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    );
+                  },
+                ),
+              ),
             ],
           ),
+        );
+      },
+    );
+  }
+}
+
+
+class _DatePickerRow extends StatelessWidget {
+  @override
+
+  Widget build(BuildContext context) {
+    return BlocBuilder<ExpenseReportBloc,ExpReportState>(
+      builder: (context, state){
+        return Row(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          children: [
+            const Expanded(
+              flex: 1,
+              child: SizedBox()
+            ),
+            Expanded(
+              flex: 4,
+                child: Text(
+                  DateFormat("dd-MM-yy").format(DateTime.parse(state.dtpFromDate)),
+                  style: GoogleFonts.lato(
+                    textStyle: TextStyle(
+                      color: colour.commonColor,
+                      fontWeight: FontWeight.bold,
+                      fontSize: objfun.FontLow,
+                      letterSpacing: 0.3,
+                    )
+                  ),
+                ),
+            ),
+            Expanded(
+              flex: 2,
+              child: InkWell(
+                child: Container(
+                  height: 35,
+                  width: 35,
+                  decoration: BoxDecoration(
+                    image: DecorationImage(image: objfun.calendar),
+                  ),
+                ),
+                onTap: () async {
+                  final value = await showDatePicker(
+                    context: context,
+                    initialDate: DateTime.now(),
+                    firstDate: DateTime(1900),
+                    lastDate: DateTime(2050),
+                  );
+                  if (value != null) {
+                    final formatted = DateFormat("yyyy-MM-dd").format(value);
+                    context.read<ExpenseReportBloc>()
+                        .add(ChangeFromDateEvent(fromDate: formatted));
+                  }
+                },
+              ),
+            ),
+            const Expanded(flex: 1, child: SizedBox()),
+            Expanded(
+              flex: 4,
+              child: Text(
+                DateFormat("dd-MM-yy").format(DateTime.parse(state.dtpToDate)),
+                style: GoogleFonts.lato(
+                  textStyle: TextStyle(
+                    color: colour.commonColor,
+                    fontWeight: FontWeight.bold,
+                    fontSize: objfun.FontLow,
+                    letterSpacing: 0.3,
+                  ),
+                ),
+              ),
+            ),
+
+            // To Date Calendar Icon
+            Expanded(
+              flex: 2,
+              child: InkWell(
+                child: Container(
+                  height: 35,
+                  width: 35,
+                  decoration: BoxDecoration(
+                    image: DecorationImage(image: objfun.calendar),
+                  ),
+                ),
+                onTap: () async {
+                  final value = await showDatePicker(
+                    context: context,
+                    initialDate: DateTime.now(),
+                    firstDate: DateTime(1900),
+                    lastDate: DateTime(2050),
+                  );
+                  if (value != null) {
+                    final formatted = DateFormat("yyyy-MM-dd").format(value);
+                    context.read<ExpenseReportBloc>()
+                        .add(ChangeToDateEvent(toDate: formatted));
+                  }
+                },
+              ),
+            ),
+
+            const Expanded(flex: 1, child: SizedBox()),
+          ],
         );
       },
     );
@@ -113,7 +302,8 @@ Widget _buildLabelColumn({
   double topPadding = 15,
   double itemPadding = 5,
 }) {
-  return Column(
+  return Column
+    (
     crossAxisAlignment: CrossAxisAlignment.center,
     children: labels.map((label) {
       final isFirst = labels.indexOf(label) == 0;

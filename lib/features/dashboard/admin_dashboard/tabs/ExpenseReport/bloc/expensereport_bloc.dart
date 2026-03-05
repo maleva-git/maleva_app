@@ -12,6 +12,8 @@ class ExpenseReportBloc extends Bloc<ExpenseReportEvent, ExpReportState>{
   ExpenseReportBloc(this.context) : super(ExpReportState(
     dtpFromDate: DateFormat("yyyy-MM-dd").format(DateTime.now()),
     dtpToDate: DateFormat("yyyy-MM-dd").format(DateTime.now()),
+
+
   )) {
     on<LoadExpReportEvent>(_onLoadExpData);
     on<ChangeFromDateEvent>(_onChangeFromDate);

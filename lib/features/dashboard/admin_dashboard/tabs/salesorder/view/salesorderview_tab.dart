@@ -235,7 +235,7 @@ class _SalesOrderTabState extends State<SalesOrderTab> {
                 ),
               ),
 
-              // ✅ Tab — எப்பவும் கீழே fixed ஆ தெரியும்
+
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                 child: SizedBox(
