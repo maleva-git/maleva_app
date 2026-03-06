@@ -9,7 +9,7 @@ import '../bloc/forwardingreport_state.dart';
 import 'package:maleva/core/utils/clsfunction.dart' as objfun;
 import 'package:maleva/core/colors/colors.dart' as colour;
 
-// ── Brand Color ──────────────────────────────────────────────────────────────
+
 
 class ForwardingReportPage extends StatelessWidget {
   const ForwardingReportPage({super.key});
@@ -53,29 +53,25 @@ class ForwardingReportView extends StatelessWidget {
         }
 
         return Container(
-          color: const Color(0xFFF0F4FF), // light blue-tinted background
+          color: const Color(0xFFF0F4FF),
           child: Padding(
             padding: const EdgeInsets.only(top: 15.0, left: 12.0, right: 12.0),
             child: ListView(
               children: [
                 const SizedBox(height: 7),
 
-                // ── Title ─────────────────────────────────────────────────
                 _TitleBadge(),
 
                 const SizedBox(height: 16),
 
-                // ── Summary Card ──────────────────────────────────────────
                 _SummaryCard(state: state),
 
                 const SizedBox(height: 14),
 
-                // ── Date Picker Row ───────────────────────────────────────
                 _DatePickerRow(),
 
                 const SizedBox(height: 14),
 
-                // ── K1/K2/K3/K8 Card ─────────────────────────────────────
                 _KTypeCard(state: state),
 
                 const SizedBox(height: 20),
@@ -88,7 +84,6 @@ class ForwardingReportView extends StatelessWidget {
   }
 }
 
-// ── Title Badge ───────────────────────────────────────────────────────────────
 class _TitleBadge extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
@@ -126,7 +121,6 @@ class _TitleBadge extends StatelessWidget {
   }
 }
 
-// ── Summary Card ──────────────────────────────────────────────────────────────
 class _SummaryCard extends StatelessWidget {
   final dynamic state;
   const _SummaryCard({required this.state});
@@ -266,7 +260,7 @@ class _SummaryCard extends StatelessWidget {
   );
 }
 
-// ── Date Picker Row ───────────────────────────────────────────────────────────
+
 class _DatePickerRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
@@ -411,7 +405,6 @@ class _DateTile extends StatelessWidget {
   }
 }
 
-// ── K1/K2/K3/K8 Card ─────────────────────────────────────────────────────────
 class _KTypeCard extends StatelessWidget {
   final dynamic state;
   const _KTypeCard({required this.state});
