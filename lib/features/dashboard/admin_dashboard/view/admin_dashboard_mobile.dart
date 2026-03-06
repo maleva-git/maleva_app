@@ -23,6 +23,7 @@ import 'package:maleva/core/utils/clsfunction.dart' as objfun;
 import 'package:maleva/core/colors/colors.dart' as colour;
 import '../tabs/invoice/view/invoice_tab.dart';
 import '../tabs/salesorder/view/salesorderview_tab.dart';
+import '../tabs/vesselreport/view/vesselreportview_tab.dart';
 import 'admin_dashboard_page.dart';
 
 class MobileDashboard extends StatelessWidget {
@@ -193,7 +194,7 @@ class MobileDashboard extends StatelessWidget {
                   const SalesOrderTab(),
                   const ForwardingReportPage(),
                   const ExpenseReportPage(),
-                  const Tab6Content(),
+                  const VesselReportPage(),
 
                 ],
               ),

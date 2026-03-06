@@ -21,6 +21,9 @@ import '../tabs/receiptview/bloc/receiptview_bloc.dart';
 import '../tabs/receiptview/bloc/receiptview_event.dart';
 import '../tabs/receiptview/view/receiptview_tab.dart';
 import '../tabs/salesorder/view/salesorderview_tab.dart';
+import '../tabs/vesselreport/bloc/vesselreport_bloc.dart';
+import '../tabs/vesselreport/bloc/vesselreport_event.dart';
+import '../tabs/vesselreport/view/vesselreportview_tab.dart';
 import 'admin_dashboard_mobile.dart';
 
 class NewAdminDashboard extends StatefulWidget{
@@ -93,6 +96,13 @@ class _AdminDashboardState extends State<NewAdminDashboard> with SingleTickerPro
               toDate: DateFormat("yyyy-MM-dd").format(DateTime.now()),
             )),
           child: const ExpenseReportView(),
+        ),
+
+        BlocProvider(
+          create: (context) => VesselBloc(
+            context: context,  // ✅ pass real context here
+          )..add(const LoadVesselDataEvent(type: 0)),
+          child: const VesselReportPage(),
         ),
       ],
       child: Scaffold(

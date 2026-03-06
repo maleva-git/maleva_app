@@ -54,6 +54,11 @@ const commonColorLight = Color(0xFF5B9BD5);
 const commonColorred = Color(0xffb30c0c);
 const spinKitColor = Color(0xff0e387a);
 
+const Color kPrimary = Color(0xFF1555F3);
+const Color kPrimaryDark = Color(0xFF0D3DB5);
+const Color kPrimaryLight = Color(0xFF4D7EF7);
+const Color kAccent = Color(0xFFE8EEFF);
+const Color kWhite = Colors.white;
 
 class AppColors {
   static const LinearGradient primaryGradient = LinearGradient(

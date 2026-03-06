@@ -9,6 +9,8 @@ import '../bloc/forwardingreport_state.dart';
 import 'package:maleva/core/utils/clsfunction.dart' as objfun;
 import 'package:maleva/core/colors/colors.dart' as colour;
 
+// ── Brand Color ──────────────────────────────────────────────────────────────
+
 class ForwardingReportPage extends StatelessWidget {
   const ForwardingReportPage({super.key});
 
@@ -45,160 +47,302 @@ class ForwardingReportView extends StatelessWidget {
       },
       builder: (context, state) {
         if (state.status == FWStatus.loading) {
-          return const Center(child: CircularProgressIndicator());
+          return const Center(
+            child: CircularProgressIndicator(color: colour.kPrimary),
+          );
         }
 
-        return Padding(
-          padding: const EdgeInsets.only(top: 15.0, left: 10.0, right: 10.0),
-          child: ListView(
+        return Container(
+          color: const Color(0xFFF0F4FF), // light blue-tinted background
+          child: Padding(
+            padding: const EdgeInsets.only(top: 15.0, left: 12.0, right: 12.0),
+            child: ListView(
+              children: [
+                const SizedBox(height: 7),
+
+                // ── Title ─────────────────────────────────────────────────
+                _TitleBadge(),
+
+                const SizedBox(height: 16),
+
+                // ── Summary Card ──────────────────────────────────────────
+                _SummaryCard(state: state),
+
+                const SizedBox(height: 14),
+
+                // ── Date Picker Row ───────────────────────────────────────
+                _DatePickerRow(),
+
+                const SizedBox(height: 14),
+
+                // ── K1/K2/K3/K8 Card ─────────────────────────────────────
+                _KTypeCard(state: state),
+
+                const SizedBox(height: 20),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+}
+
+// ── Title Badge ───────────────────────────────────────────────────────────────
+class _TitleBadge extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
+        decoration: BoxDecoration(
+          gradient: const LinearGradient(
+            colors: [colour.kPrimary, colour.kPrimaryLight],
+            begin: Alignment.centerLeft,
+            end: Alignment.centerRight,
+          ),
+          borderRadius: BorderRadius.circular(30),
+          boxShadow: [
+            BoxShadow(
+              color: colour.kPrimary.withOpacity(0.35),
+              blurRadius: 12,
+              offset: const Offset(0, 4),
+            ),
+          ],
+        ),
+        child: Text(
+          'FORWARDING REPORT',
+          style: GoogleFonts.lato(
+            textStyle: const TextStyle(
+              color: colour.kWhite,
+              fontWeight: FontWeight.bold,
+              fontSize: 16,
+              letterSpacing: 1.5,
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+// ── Summary Card ──────────────────────────────────────────────────────────────
+class _SummaryCard extends StatelessWidget {
+  final dynamic state;
+  const _SummaryCard({required this.state});
+
+  @override
+  Widget build(BuildContext context) {
+    final rows = [
+      {'label': 'Today', 'countKey': 'TodayCount', 'withKey': 'TodayWithRelease', 'withoutKey': 'TodayRelease'},
+      {'label': 'Yesterday', 'countKey': 'YesterdayCount', 'withKey': 'YesterdayWithRelease', 'withoutKey': 'YesterdayRelease'},
+      {'label': 'Weekly', 'countKey': 'WeekCount', 'withKey': 'WeekWithRelease', 'withoutKey': 'WeekRelease'},
+      {'label': 'Monthly', 'countKey': 'MonthCount', 'withKey': 'MonthWithRelease', 'withoutKey': 'MonthRelease'},
+    ];
+
+    return Container(
+      decoration: BoxDecoration(
+        color: colour.kWhite,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: colour.kPrimary.withOpacity(0.10),
+            blurRadius: 16,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Column(
+        children: [
+          // Header
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+            decoration: const BoxDecoration(
+              gradient: LinearGradient(
+                colors: [colour.kPrimary, colour.kPrimaryLight],
+              ),
+              borderRadius: BorderRadius.only(
+                topLeft: Radius.circular(16),
+                topRight: Radius.circular(16),
+              ),
+            ),
+            child: Row(
+              children: [
+                Expanded(flex: 3, child: _headerText('')),
+                Expanded(flex: 2, child: _headerText('Total')),
+                Expanded(flex: 2, child: _headerText('With')),
+                Expanded(flex: 2, child: _headerText('Without')),
+              ],
+            ),
+          ),
+          // Rows
+          ...rows.asMap().entries.map((entry) {
+            final i = entry.key;
+            final row = entry.value;
+            final isEven = i % 2 == 0;
+            final data = state.saleFWReport;
+
+            return Container(
+              color: isEven ? colour.kAccent.withOpacity(0.4) : colour.kWhite,
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+              child: Row(
+                children: [
+                  Expanded(
+                    flex: 3,
+                    child: Text(
+                      row['label']!,
+                      style: GoogleFonts.lato(
+                        textStyle: TextStyle(
+                          color: colour.kPrimaryDark,
+                          fontWeight: FontWeight.bold,
+                          fontSize: objfun.FontLow - 1,
+                        ),
+                      ),
+                    ),
+                  ),
+                  Expanded(
+                    flex: 2,
+                    child: _valueChip(
+                      data.isEmpty ? '0' : data[0][row['countKey']]?.toStringAsFixed(0) ?? '0',
+                      colour.kPrimary,
+                    ),
+                  ),
+                  Expanded(
+                    flex: 2,
+                    child: _valueChip(
+                      data.isEmpty ? '0' : data[0][row['withKey']]?.toStringAsFixed(0) ?? '0',
+                      Colors.green.shade600,
+                    ),
+                  ),
+                  Expanded(
+                    flex: 2,
+                    child: _valueChip(
+                      data.isEmpty ? '0' : data[0][row['withoutKey']]?.toStringAsFixed(0) ?? '0',
+                      Colors.orange.shade700,
+                    ),
+                  ),
+                ],
+              ),
+            );
+          }),
+          const SizedBox(height: 6),
+        ],
+      ),
+    );
+  }
+
+  Widget _headerText(String text) => Text(
+    text,
+    textAlign: TextAlign.center,
+    style: GoogleFonts.lato(
+      textStyle: const TextStyle(
+        color: colour.kWhite,
+        fontWeight: FontWeight.bold,
+        fontSize: 13,
+        letterSpacing: 0.5,
+      ),
+    ),
+  );
+
+  Widget _valueChip(String value, Color color) => Center(
+    child: Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 3),
+      decoration: BoxDecoration(
+        color: color.withOpacity(0.10),
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: color.withOpacity(0.3)),
+      ),
+      child: Text(
+        value,
+        style: GoogleFonts.lato(
+          textStyle: TextStyle(
+            color: color,
+            fontWeight: FontWeight.bold,
+            fontSize: 13,
+          ),
+        ),
+      ),
+    ),
+  );
+}
+
+// ── Date Picker Row ───────────────────────────────────────────────────────────
+class _DatePickerRow extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return BlocBuilder<ForwardingReportBloc, ForwardingReportState>(
+      builder: (context, state) {
+        return Container(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+          decoration: BoxDecoration(
+            color: colour.kWhite,
+            borderRadius: BorderRadius.circular(14),
+            boxShadow: [
+              BoxShadow(
+                color: colour.kPrimary.withOpacity(0.08),
+                blurRadius: 12,
+                offset: const Offset(0, 3),
+              ),
+            ],
+          ),
+          child: Row(
             children: [
-              const SizedBox(height: 7),
-
-              // ── Title ──
-              Center(
-                child: Text(
-                  'FORWARDING REPORT',
-                  style: GoogleFonts.lato(
-                    textStyle: TextStyle(
-                      color: colour.commonColorred,
-                      fontWeight: FontWeight.bold,
-                      fontSize: objfun.FontLarge,
-                      letterSpacing: 0.3,
-                    ),
-                  ),
+              // From Date
+              Expanded(
+                child: _DateTile(
+                  label: 'From',
+                  date: DateFormat("dd MMM yyyy").format(DateTime.parse(state.dtpFromDate)),
+                  onTap: () async {
+                    final value = await showDatePicker(
+                      context: context,
+                      initialDate: DateTime.now(),
+                      firstDate: DateTime(1900),
+                      lastDate: DateTime(2050),
+                      builder: (context, child) => Theme(
+                        data: ThemeData.light().copyWith(
+                          colorScheme: const ColorScheme.light(primary: colour.kPrimary),
+                        ),
+                        child: child!,
+                      ),
+                    );
+                    if (value != null) {
+                      context.read<ForwardingReportBloc>().add(
+                        ChangFromDateEvent(fromDate: DateFormat("yyyy-MM-dd").format(value)),
+                      );
+                    }
+                  },
                 ),
               ),
-
-              // ── Summary Card (Today/Yesterday/Weekly/Monthly) ──
-              SizedBox(
-                height: height * 0.24,
-                child: Card(
-                  child: Row(
-                    children: [
-                      // Labels column
-                      Expanded(
-                        flex: 2,
-                        child: _buildLabelColumn(
-                          labels: ['', 'Today', 'Yesterday', 'Weekly', 'Monthly'],
-                        ),
-                      ),
-                      // Total column
-                      Expanded(
-                        flex: 1,
-                        child: _buildDataColumn(
-                          header: 'Total',
-                          values: state.saleFWReport.isEmpty
-                              ? ['0', '0', '0', '0']
-                              : [
-                            state.saleFWReport[0]["TodayCount"].toStringAsFixed(0),
-                            state.saleFWReport[0]["YesterdayCount"].toStringAsFixed(0),
-                            state.saleFWReport[0]["WeekCount"].toStringAsFixed(0),
-                            state.saleFWReport[0]["MonthCount"].toStringAsFixed(0),
-                          ],
-                        ),
-                      ),
-                      // With Release column
-                      Expanded(
-                        flex: 1,
-                        child: _buildDataColumn(
-                          header: 'With',
-                          values: state.saleFWReport.isEmpty
-                              ? ['0', '0', '0', '0']
-                              : [
-                            state.saleFWReport[0]["TodayWithRelease"].toStringAsFixed(0),
-                            state.saleFWReport[0]["YesterdayWithRelease"].toStringAsFixed(0),
-                            state.saleFWReport[0]["WeekWithRelease"].toStringAsFixed(0),
-                            state.saleFWReport[0]["MonthWithRelease"].toStringAsFixed(0),
-                          ],
-                        ),
-                      ),
-                      // Without Release column
-                      Expanded(
-                        flex: 2,
-                        child: _buildDataColumn(
-                          header: 'Without',
-                          values: state.saleFWReport.isEmpty
-                              ? ['0', '0', '0', '0']
-                              : [
-                            state.saleFWReport[0]["TodayRelease"].toStringAsFixed(0),
-                            state.saleFWReport[0]["YesterdayRelease"].toStringAsFixed(0),
-                            state.saleFWReport[0]["WeekRelease"].toStringAsFixed(0),
-                            state.saleFWReport[0]["MonthRelease"].toStringAsFixed(0),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
+              Container(
+                height: 40,
+                width: 1,
+                color: colour.kPrimary.withOpacity(0.2),
+                margin: const EdgeInsets.symmetric(horizontal: 10),
               ),
-
-              SizedBox(height: height * 0.03),
-
-              // ── Date Picker Row ──
-              _DatePickerRow(),
-
-              // ── K1/K2/K3/K8 Section ──
-              SizedBox(
-                height: height * 0.30,
-                child: Row(
-                  children: [
-                    Expanded(
-                      flex: 2,
-                      child: _buildLabelColumn(
-                        labels: ['K1', 'K2', 'K3', 'K8'],
-                        topPadding: 35,
-                        itemPadding: 25,
+              // To Date
+              Expanded(
+                child: _DateTile(
+                  label: 'To',
+                  date: DateFormat("dd MMM yyyy").format(DateTime.parse(state.dtpToDate)),
+                  onTap: () async {
+                    final value = await showDatePicker(
+                      context: context,
+                      initialDate: DateTime.now(),
+                      firstDate: DateTime(1900),
+                      lastDate: DateTime(2050),
+                      builder: (context, child) => Theme(
+                        data: ThemeData.light().copyWith(
+                          colorScheme: const ColorScheme.light(primary: colour.kPrimary),
+                        ),
+                        child: child!,
                       ),
-                    ),
-                    Expanded(
-                      flex: 1,
-                      child: _buildDataColumn(
-                        header: '',
-                        values: state.saleFWReport2.isEmpty
-                            ? ['0', '0', '0', '0']
-                            : [
-                          state.saleFWReport2[0]["K1Count"].toString(),
-                          state.saleFWReport2[0]["K2Count"].toString(),
-                          state.saleFWReport2[0]["K3Count"].toString(),
-                          state.saleFWReport2[0]["K8Count"].toString(),
-                        ],
-                        topPadding: 35,
-                        itemPadding: 25,
-                      ),
-                    ),
-                    Expanded(
-                      flex: 1,
-                      child: _buildDataColumn(
-                        header: '',
-                        values: state.saleFWReport2.isEmpty
-                            ? ['0', '0', '0', '0']
-                            : [
-                          state.saleFWReport2[0]["K1WithRelease"].toString(),
-                          state.saleFWReport2[0]["K2WithRelease"].toString(),
-                          state.saleFWReport2[0]["K3WithRelease"].toString(),
-                          state.saleFWReport2[0]["K8WithRelease"].toString(),
-                        ],
-                        topPadding: 35,
-                        itemPadding: 25,
-                      ),
-                    ),
-                    Expanded(
-                      flex: 2,
-                      child: _buildDataColumn(
-                        header: '',
-                        values: state.saleFWReport2.isEmpty
-                            ? ['0', '0', '0', '0']
-                            : [
-                          state.saleFWReport2[0]["K1Release"].toString(),
-                          state.saleFWReport2[0]["K2Release"].toString(),
-                          state.saleFWReport2[0]["K3Release"].toString(),
-                          state.saleFWReport2[0]["K8Release"].toString(),
-                        ],
-                        topPadding: 35,
-                        itemPadding: 25,
-                      ),
-                    ),
-                  ],
+                    );
+                    if (value != null) {
+                      context.read<ForwardingReportBloc>().add(
+                        ChangeToDateEvent(toDate: DateFormat("yyyy-MM-dd").format(value)),
+                      );
+                    }
+                  },
                 ),
               ),
             ],
@@ -207,187 +351,215 @@ class ForwardingReportView extends StatelessWidget {
       },
     );
   }
+}
 
-  // ── Helper: Label Column ──
-  Widget _buildLabelColumn({
-    required List<String> labels,
-    double topPadding = 15,
-    double itemPadding = 5,
-  }) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.center,
-      children: labels.map((label) {
-        final isFirst = labels.indexOf(label) == 0;
-        return Padding(
-          padding: EdgeInsets.only(
-            top: isFirst ? topPadding : itemPadding,
-            left: 5,
-            right: 5,
-            bottom: 5,
-          ),
-          child: Text(
-            label,
-            textAlign: TextAlign.left,
-            style: GoogleFonts.lato(
-              textStyle: TextStyle(
-                color: colour.commonColor,
-                fontWeight: FontWeight.bold,
-                fontSize: objfun.FontLow - 2,
-                letterSpacing: 0.3,
-              ),
+class _DateTile extends StatelessWidget {
+  final String label;
+  final String date;
+  final VoidCallback onTap;
+
+  const _DateTile({
+    required this.label,
+    required this.date,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(10),
+      child: Row(
+        children: [
+          Container(
+            padding: const EdgeInsets.all(7),
+            decoration: BoxDecoration(
+              color: colour.kAccent,
+              borderRadius: BorderRadius.circular(10),
             ),
+            child: const Icon(Icons.calendar_today_rounded, color: colour.kPrimary, size: 18),
           ),
-        );
-      }).toList(),
-    );
-  }
-
-  // ── Helper: Data Column ──
-  Widget _buildDataColumn({
-    required String header,
-    required List<String> values,
-    double topPadding = 15,
-    double itemPadding = 5,
-  }) {
-    return Column(
-      children: [
-        if (header.isNotEmpty)
-          Padding(
-            padding: EdgeInsets.only(top: topPadding, left: 5, right: 5, bottom: 5),
-            child: Text(
-              header,
-              style: GoogleFonts.lato(
-                textStyle: TextStyle(
-                  color: colour.commonColor,
-                  fontWeight: FontWeight.bold,
-                  fontSize: objfun.FontLow - 2,
-                  letterSpacing: 0.3,
+          const SizedBox(width: 8),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                label,
+                style: GoogleFonts.lato(
+                  textStyle: TextStyle(
+                    color: colour.kPrimary.withOpacity(0.6),
+                    fontSize: 11,
+                    fontWeight: FontWeight.w600,
+                  ),
                 ),
               ),
-            ),
-          ),
-        ...values.map((val) => Padding(
-          padding: EdgeInsets.only(top: itemPadding, bottom: 5),
-          child: Text(
-            val,
-            style: GoogleFonts.lato(
-              textStyle: TextStyle(
-                color: colour.commonColor,
-                fontWeight: FontWeight.bold,
-                fontSize: objfun.FontLow - 2,
-                letterSpacing: 0.3,
+              Text(
+                date,
+                style: GoogleFonts.lato(
+                  textStyle: const TextStyle(
+                    color: colour.kPrimaryDark,
+                    fontSize: 13,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
               ),
-            ),
+            ],
           ),
-        )),
-      ],
+        ],
+      ),
     );
   }
 }
 
-// ── Date Picker Row Widget ──
-class _DatePickerRow extends StatelessWidget {
+// ── K1/K2/K3/K8 Card ─────────────────────────────────────────────────────────
+class _KTypeCard extends StatelessWidget {
+  final dynamic state;
+  const _KTypeCard({required this.state});
+
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<ForwardingReportBloc, ForwardingReportState>(
-      builder: (context, state) {
-        return Row(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: [
-            const Expanded(flex: 1, child: SizedBox()),
+    final ktypes = [
+      {'label': 'K1', 'countKey': 'K1Count', 'withKey': 'K1WithRelease', 'withoutKey': 'K1Release'},
+      {'label': 'K2', 'countKey': 'K2Count', 'withKey': 'K2WithRelease', 'withoutKey': 'K2Release'},
+      {'label': 'K3', 'countKey': 'K3Count', 'withKey': 'K3WithRelease', 'withoutKey': 'K3Release'},
+      {'label': 'K8', 'countKey': 'K8Count', 'withKey': 'K8WithRelease', 'withoutKey': 'K8Release'},
+    ];
 
-            // From Date Text
-            Expanded(
-              flex: 4,
-              child: Text(
-                DateFormat("dd-MM-yy").format(DateTime.parse(state.dtpFromDate)),
-                style: GoogleFonts.lato(
-                  textStyle: TextStyle(
-                    color: colour.commonColor,
-                    fontWeight: FontWeight.bold,
-                    fontSize: objfun.FontLow,
-                    letterSpacing: 0.3,
-                  ),
-                ),
+    final data = state.saleFWReport2;
+
+    return Container(
+      decoration: BoxDecoration(
+        color: colour.kWhite,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: colour.kPrimary.withOpacity(0.10),
+            blurRadius: 16,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Column(
+        children: [
+          // Header
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+            decoration: const BoxDecoration(
+              gradient: LinearGradient(
+                colors: [colour.kPrimaryDark, colour.kPrimary],
+              ),
+              borderRadius: BorderRadius.only(
+                topLeft: Radius.circular(16),
+                topRight: Radius.circular(16),
               ),
             ),
-
-            // From Date Calendar Icon
-            Expanded(
-              flex: 2,
-              child: InkWell(
-                child: Container(
-                  height: 35,
-                  width: 35,
-                  decoration: BoxDecoration(
-                    image: DecorationImage(image: objfun.calendar),
-                  ),
-                ),
-                onTap: () async {
-                  final value = await showDatePicker(
-                    context: context,
-                    initialDate: DateTime.now(),
-                    firstDate: DateTime(1900),
-                    lastDate: DateTime(2050),
-                  );
-                  if (value != null) {
-                    final formatted = DateFormat("yyyy-MM-dd").format(value);
-                    context.read<ForwardingReportBloc>()
-                        .add(ChangFromDateEvent(fromDate: formatted));
-                  }
-                },
-              ),
+            child: Row(
+              children: [
+                Expanded(flex: 2, child: _headerText('Type')),
+                Expanded(flex: 2, child: _headerText('Total')),
+                Expanded(flex: 2, child: _headerText('With')),
+                Expanded(flex: 2, child: _headerText('Without')),
+              ],
             ),
+          ),
+          // K type rows
+          ...ktypes.asMap().entries.map((entry) {
+            final i = entry.key;
+            final k = entry.value;
+            final isEven = i % 2 == 0;
 
-            const Expanded(flex: 1, child: SizedBox()),
-
-            // To Date Text
-            Expanded(
-              flex: 4,
-              child: Text(
-                DateFormat("dd-MM-yy").format(DateTime.parse(state.dtpToDate)),
-                style: GoogleFonts.lato(
-                  textStyle: TextStyle(
-                    color: colour.commonColor,
-                    fontWeight: FontWeight.bold,
-                    fontSize: objfun.FontLow,
-                    letterSpacing: 0.3,
+            return Container(
+              color: isEven ? colour.kAccent.withOpacity(0.4) : colour.kWhite,
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+              child: Row(
+                children: [
+                  // K label badge
+                  Expanded(
+                    flex: 2,
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                      decoration: BoxDecoration(
+                        color: colour.kPrimary,
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Text(
+                        k['label']!,
+                        textAlign: TextAlign.center,
+                        style: GoogleFonts.lato(
+                          textStyle: const TextStyle(
+                            color: colour.kWhite,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 13,
+                          ),
+                        ),
+                      ),
+                    ),
                   ),
-                ),
-              ),
-            ),
-
-            // To Date Calendar Icon
-            Expanded(
-              flex: 2,
-              child: InkWell(
-                child: Container(
-                  height: 35,
-                  width: 35,
-                  decoration: BoxDecoration(
-                    image: DecorationImage(image: objfun.calendar),
+                  Expanded(
+                    flex: 2,
+                    child: Center(
+                      child: Text(
+                        data.isEmpty ? '0' : data[0][k['countKey']]?.toString() ?? '0',
+                        style: GoogleFonts.lato(
+                          textStyle: const TextStyle(
+                            color: colour.kPrimaryDark,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 14,
+                          ),
+                        ),
+                      ),
+                    ),
                   ),
-                ),
-                onTap: () async {
-                  final value = await showDatePicker(
-                    context: context,
-                    initialDate: DateTime.now(),
-                    firstDate: DateTime(1900),
-                    lastDate: DateTime(2050),
-                  );
-                  if (value != null) {
-                    final formatted = DateFormat("yyyy-MM-dd").format(value);
-                    context.read<ForwardingReportBloc>()
-                        .add(ChangeToDateEvent(toDate: formatted));
-                  }
-                },
+                  Expanded(
+                    flex: 2,
+                    child: Center(
+                      child: Text(
+                        data.isEmpty ? '0' : data[0][k['withKey']]?.toString() ?? '0',
+                        style: GoogleFonts.lato(
+                          textStyle: TextStyle(
+                            color: Colors.green.shade700,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 14,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                  Expanded(
+                    flex: 2,
+                    child: Center(
+                      child: Text(
+                        data.isEmpty ? '0' : data[0][k['withoutKey']]?.toString() ?? '0',
+                        style: GoogleFonts.lato(
+                          textStyle: TextStyle(
+                            color: Colors.orange.shade700,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 14,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
               ),
-            ),
-
-            const Expanded(flex: 1, child: SizedBox()),
-          ],
-        );
-      },
+            );
+          }),
+          const SizedBox(height: 6),
+        ],
+      ),
     );
   }
+
+  Widget _headerText(String text) => Text(
+    text,
+    textAlign: TextAlign.center,
+    style: GoogleFonts.lato(
+      textStyle: const TextStyle(
+        color: colour.kWhite,
+        fontWeight: FontWeight.bold,
+        fontSize: 13,
+        letterSpacing: 0.5,
+      ),
+    ),
+  );
 }
