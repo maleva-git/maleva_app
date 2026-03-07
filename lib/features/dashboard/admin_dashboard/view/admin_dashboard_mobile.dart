@@ -22,6 +22,7 @@ import 'package:maleva/core/colors/colors.dart' as colour;
 import '../tabs/invoice/view/invoice_tab.dart';
 import '../tabs/salesorder/view/salesorderview_tab.dart';
 import '../tabs/transport/view/transportview_tab.dart';
+import '../tabs/truck/view/truckview_tab.dart';
 import '../tabs/vesselreport/view/vesselreportview_tab.dart';
 
 class MobileDashboard extends StatelessWidget {
@@ -166,6 +167,7 @@ class MobileDashboard extends StatelessWidget {
                 Tab(text: 'EXP'),
                 Tab(text: 'VSL'),
                 Tab(text: 'TRANSPORT'),
+                Tab(text: 'Truck'),
 
               ],
             ),
@@ -195,6 +197,7 @@ class MobileDashboard extends StatelessWidget {
                   const ExpenseReportPage(),
                   const VesselReportPage(),
                   const TransportReportPage(),
+                  const TruckDetailsReportPage(),
 
                 ],
               ),

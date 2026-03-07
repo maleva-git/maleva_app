@@ -24,6 +24,8 @@ import '../tabs/salesorder/view/salesorderview_tab.dart';
 import '../tabs/transport/bloc/transport_bloc.dart';
 import '../tabs/transport/bloc/transport_event.dart';
 import '../tabs/transport/view/transportview_tab.dart';
+import '../tabs/truck/bloc/truck_bloc.dart';
+import '../tabs/truck/view/truckview_tab.dart';
 import '../tabs/vesselreport/bloc/vesselreport_bloc.dart';
 import '../tabs/vesselreport/bloc/vesselreport_event.dart';
 import '../tabs/vesselreport/view/vesselreportview_tab.dart';
@@ -42,7 +44,7 @@ class _AdminDashboardState extends State<NewAdminDashboard> with SingleTickerPro
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 7, vsync: this);
+    _tabController = TabController(length: 8, vsync: this);
     _tabController.addListener(_onTabChanged);
 
   }
@@ -113,6 +115,13 @@ class _AdminDashboardState extends State<NewAdminDashboard> with SingleTickerPro
           )..add(const LoadTransportDataEvent(type: 0)),
           child: const TransportReportPage(),
         ),
+        BlocProvider(
+          create: (context) => TruckDetailsBloc(
+            context: context,
+          )..add(const LoadTruckDetailsEvent()),
+          child: const TruckDetailsReportPage(),
+        ),
+
       ],
       child: Scaffold(
         body: MobileDashboard(
