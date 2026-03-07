@@ -16,15 +16,13 @@ import '../bloc/admin_tab_bloc.dart';
 import '../bloc/admin_tab_state.dart';
 import '../tabs/ExpenseReport/view/expensereport_tab.dart';
 import '../tabs/forwardingreport/view/forwardingreport_tab.dart';
-import '../tabs/receiptview/bloc/receiptview_bloc.dart';
-import '../tabs/receiptview/bloc/receiptview_event.dart';
 import '../tabs/receiptview/view/receiptview_tab.dart';
 import 'package:maleva/core/utils/clsfunction.dart' as objfun;
 import 'package:maleva/core/colors/colors.dart' as colour;
 import '../tabs/invoice/view/invoice_tab.dart';
 import '../tabs/salesorder/view/salesorderview_tab.dart';
+import '../tabs/transport/view/transportview_tab.dart';
 import '../tabs/vesselreport/view/vesselreportview_tab.dart';
-import 'admin_dashboard_page.dart';
 
 class MobileDashboard extends StatelessWidget {
   final TabController tabController;
@@ -167,6 +165,7 @@ class MobileDashboard extends StatelessWidget {
                 Tab(text: 'FW'),
                 Tab(text: 'EXP'),
                 Tab(text: 'VSL'),
+                Tab(text: 'TRANSPORT'),
 
               ],
             ),
@@ -195,6 +194,7 @@ class MobileDashboard extends StatelessWidget {
                   const ForwardingReportPage(),
                   const ExpenseReportPage(),
                   const VesselReportPage(),
+                  const TransportReportPage(),
 
                 ],
               ),

@@ -21,6 +21,9 @@ import '../tabs/receiptview/bloc/receiptview_bloc.dart';
 import '../tabs/receiptview/bloc/receiptview_event.dart';
 import '../tabs/receiptview/view/receiptview_tab.dart';
 import '../tabs/salesorder/view/salesorderview_tab.dart';
+import '../tabs/transport/bloc/transport_bloc.dart';
+import '../tabs/transport/bloc/transport_event.dart';
+import '../tabs/transport/view/transportview_tab.dart';
 import '../tabs/vesselreport/bloc/vesselreport_bloc.dart';
 import '../tabs/vesselreport/bloc/vesselreport_event.dart';
 import '../tabs/vesselreport/view/vesselreportview_tab.dart';
@@ -39,7 +42,7 @@ class _AdminDashboardState extends State<NewAdminDashboard> with SingleTickerPro
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 6, vsync: this);
+    _tabController = TabController(length: 7, vsync: this);
     _tabController.addListener(_onTabChanged);
 
   }
@@ -92,7 +95,7 @@ class _AdminDashboardState extends State<NewAdminDashboard> with SingleTickerPro
         BlocProvider(
           create: (context) => ExpenseReportBloc(context)
             ..add(LoadExpReportEvent(
-              fromDate: DateFormat("yyyy-MM-dd").format(DateTime.now()),
+              fromDate: DateFormat("yyyy-MM-dd").format(DateTime.now().subtract(Duration(days: 30))),
               toDate: DateFormat("yyyy-MM-dd").format(DateTime.now()),
             )),
           child: const ExpenseReportView(),
@@ -100,9 +103,15 @@ class _AdminDashboardState extends State<NewAdminDashboard> with SingleTickerPro
 
         BlocProvider(
           create: (context) => VesselBloc(
-            context: context,  // ✅ pass real context here
+            context: context,
           )..add(const LoadVesselDataEvent(type: 0)),
           child: const VesselReportPage(),
+        ),
+        BlocProvider(
+          create: (context) => TransportBloc(
+            context: context,
+          )..add(const LoadTransportDataEvent(type: 0)),
+          child: const TransportReportPage(),
         ),
       ],
       child: Scaffold(
@@ -115,57 +124,3 @@ class _AdminDashboardState extends State<NewAdminDashboard> with SingleTickerPro
 }
 
 
-
-class Tab2Content extends StatelessWidget {
-  const Tab2Content({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return const Center(child: Text('Tab 2 Content'));
-  }
-}
-
-class Tab3Content extends StatelessWidget {
-  const Tab3Content({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return const Center(child: Text('Tab 3 Content'));
-  }
-}
-
-class Tab4Content extends StatelessWidget {
-  const Tab4Content({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return const Center(child: Text('Tab 4 Content'));
-  }
-}
-
-class Tab5Content extends StatelessWidget {
-  const Tab5Content({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return const Center(child: Text('Tab 5 Content'));
-  }
-}
-
-class Tab6Content extends StatelessWidget {
-  const Tab6Content({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return const Center(child: Text('Tab 6 Content'));
-  }
-}
-
-class TruckTab extends StatelessWidget {
-  const TruckTab({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return const Center(child: Text('Truck Tab Content'));
-  }
-}

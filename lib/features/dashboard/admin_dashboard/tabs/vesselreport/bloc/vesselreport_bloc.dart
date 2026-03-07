@@ -20,7 +20,8 @@ class VesselBloc extends Bloc<VesselEvent, VesselState> {
   Future<void> _onLoadVesselData(
       LoadVesselDataEvent event,
       Emitter<VesselState> emit,
-      ) async {
+      )
+  async {
     String currentPort = '';
     String currentSearch = '';
     bool currentIsPlanToday = event.type == 0;
@@ -63,6 +64,17 @@ class VesselBloc extends Bloc<VesselEvent, VesselState> {
       // ✅ pass real context, same as old code
       final resultData = await objfun.apiAllinoneSelectArray(
           objfun.VESSELPLANINGDB, body, header, context);
+      if (resultData == null || resultData == "" || (resultData is List && resultData.isEmpty)) {
+        emit(VesselLoadedState(
+          vesselList: const [],
+          isPlanToday: currentIsPlanToday,
+          portName: currentPort,
+          searchText: currentSearch,
+        ));
+        return;
+      }
+      print('DEBUG resultData: $resultData');
+      print('DEBUG type: ${resultData.runtimeType}');
 
       if (resultData != null && resultData != "" && resultData.length != 0) {
         List<Map<String, dynamic>> list =
@@ -80,14 +92,9 @@ class VesselBloc extends Bloc<VesselEvent, VesselState> {
           portName: currentPort,
           searchText: currentSearch,
         ));
-      } else {
-        emit(VesselLoadedState(
-          vesselList: const [],
-          isPlanToday: currentIsPlanToday,
-          portName: currentPort,
-          searchText: currentSearch,
-        ));
+
       }
+
     } catch (error, stackTrace) {
       emit(VesselErrorState(errorMessage: '$error\n$stackTrace'));
     }
