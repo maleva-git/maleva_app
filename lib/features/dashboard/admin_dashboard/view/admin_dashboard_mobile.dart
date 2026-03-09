@@ -15,6 +15,7 @@ import '../../../common_updates/blocs/truck/truck_event.dart';
 import '../bloc/admin_tab_bloc.dart';
 import '../bloc/admin_tab_state.dart';
 import '../tabs/ExpenseReport/view/expensereport_tab.dart';
+import '../tabs/driver/view/driverdetails_tab.dart';
 import '../tabs/forwardingreport/view/forwardingreport_tab.dart';
 import '../tabs/receiptview/view/receiptview_tab.dart';
 import 'package:maleva/core/utils/clsfunction.dart' as objfun;
@@ -168,6 +169,7 @@ class MobileDashboard extends StatelessWidget {
                 Tab(text: 'VSL'),
                 Tab(text: 'TRANSPORT'),
                 Tab(text: 'Truck'),
+                Tab(text: 'Driver'),
 
               ],
             ),
@@ -198,6 +200,7 @@ class MobileDashboard extends StatelessWidget {
                   const VesselReportPage(),
                   const TransportReportPage(),
                   const TruckDetailsReportPage(),
+                  const DriverDetailsView(),
 
                 ],
               ),

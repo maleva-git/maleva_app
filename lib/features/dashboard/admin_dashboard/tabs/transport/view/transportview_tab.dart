@@ -3,7 +3,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:maleva/core/utils/clsfunction.dart' as objfun;
 import 'package:maleva/core/colors/colors.dart' as colour;
-
 import '../../../../../../Transaction/SaleOrder/SalesOrderAdd.dart';
 import '../bloc/transport_bloc.dart';
 import '../bloc/transport_event.dart';
@@ -129,7 +128,7 @@ class _TransportReportView extends StatelessWidget {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Dialog header
+              // Dialog header — fixed (scroll பண்ண வேண்டாம்)
               Row(
                 children: [
                   Container(
@@ -161,37 +160,50 @@ class _TransportReportView extends StatelessWidget {
               const Divider(color: Color(0xFFE8EEFF)),
               const SizedBox(height: 12),
 
-              // Detail rows — add more fields as needed
-              ...item.entries.map((e) => Padding(
-                padding: const EdgeInsets.only(bottom: 8),
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Expanded(
-                      flex: 2,
-                      child: Text(
-                        e.key,
-                        style: GoogleFonts.poppins(
-                          fontSize: 11,
-                          color: const Color(0xFF4D7EF7),
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                    ),
-                    Expanded(
-                      flex: 3,
-                      child: Text(
-                        e.value?.toString() ?? '-',
-                        style: GoogleFonts.poppins(
-                          fontSize: 11,
-                          fontWeight: FontWeight.w600,
-                          color: const Color(0xFF0D3DB5),
-                        ),
-                      ),
-                    ),
-                  ],
+              // ✅ Scrollable content
+              ConstrainedBox(
+                constraints: BoxConstraints(
+                  maxHeight: MediaQuery.of(context).size.height * 0.6,
                 ),
-              )),
+                child: SingleChildScrollView(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      ...item.entries.map((e) => Padding(
+                        padding: const EdgeInsets.only(bottom: 8),
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Expanded(
+                              flex: 2,
+                              child: Text(
+                                e.key,
+                                style: GoogleFonts.poppins(
+                                  fontSize: 11,
+                                  color: const Color(0xFF4D7EF7),
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                            ),
+                            Expanded(
+                              flex: 3,
+                              child: Text(
+                                e.value?.toString() ?? '-',
+                                style: GoogleFonts.poppins(
+                                  fontSize: 11,
+                                  fontWeight: FontWeight.w600,
+                                  color: const Color(0xFF0D3DB5),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      )),
+                    ],
+                  ),
+                ),
+              ),
             ],
           ),
         ),
