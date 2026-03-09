@@ -24,6 +24,8 @@ import '../tabs/receiptview/bloc/receiptview_bloc.dart';
 import '../tabs/receiptview/bloc/receiptview_event.dart';
 import '../tabs/receiptview/view/receiptview_tab.dart';
 import '../tabs/salesorder/view/salesorderview_tab.dart';
+import '../tabs/speedingreport/bloc/speeding_bloc.dart';
+import '../tabs/speedingreport/view/speedingreport_view.dart';
 import '../tabs/transport/bloc/transport_bloc.dart';
 import '../tabs/transport/bloc/transport_event.dart';
 import '../tabs/transport/view/transportview_tab.dart';
@@ -47,7 +49,7 @@ class _AdminDashboardState extends State<NewAdminDashboard> with SingleTickerPro
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 9, vsync: this);
+    _tabController = TabController(length: 10, vsync: this);
     _tabController.addListener(_onTabChanged);
 
   }
@@ -127,6 +129,10 @@ class _AdminDashboardState extends State<NewAdminDashboard> with SingleTickerPro
         BlocProvider(
           create: (context) => DriverBloc(context)..add(const LoadDriverEvent()),
           child: const DriverDetailsView(),
+        ),
+        BlocProvider(
+          create: (context) => SpeedingBloc(context)..add( LoadSpeedingReport()),
+          child: const SpeedingScreen(),
         ),
       ],
       child: Scaffold(

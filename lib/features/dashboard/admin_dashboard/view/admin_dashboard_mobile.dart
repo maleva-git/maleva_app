@@ -22,6 +22,7 @@ import 'package:maleva/core/utils/clsfunction.dart' as objfun;
 import 'package:maleva/core/colors/colors.dart' as colour;
 import '../tabs/invoice/view/invoice_tab.dart';
 import '../tabs/salesorder/view/salesorderview_tab.dart';
+import '../tabs/speedingreport/view/speedingreport_view.dart';
 import '../tabs/transport/view/transportview_tab.dart';
 import '../tabs/truck/view/truckview_tab.dart';
 import '../tabs/vesselreport/view/vesselreportview_tab.dart';
@@ -170,6 +171,7 @@ class MobileDashboard extends StatelessWidget {
                 Tab(text: 'TRANSPORT'),
                 Tab(text: 'Truck'),
                 Tab(text: 'Driver'),
+                Tab(text: 'SpeedingReport'),
 
               ],
             ),
@@ -201,6 +203,7 @@ class MobileDashboard extends StatelessWidget {
                   const TransportReportPage(),
                   const TruckDetailsReportPage(),
                   const DriverDetailsView(),
+                  const SpeedingScreen(),
 
                 ],
               ),
