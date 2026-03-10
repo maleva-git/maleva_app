@@ -1,30 +1,31 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
+
+import 'package:maleva/core/models/model.dart';
 import 'package:maleva/core/utils/clsfunction.dart' as objfun;
-import '../../../../../../core/models/model.dart';
-import '../bloc/speeding_bloc.dart';
 import 'package:maleva/core/colors/colors.dart' as colour;
+import '../bloc/enginehours_bloc.dart';
+import '../bloc/enginehours_event.dart';
+import '../bloc/enginehours_state.dart';
 
-import '../bloc/speeding_event.dart';
-import '../bloc/speeding_state.dart';
 
-
-class SpeedingScreen extends StatelessWidget {
-  const SpeedingScreen({super.key});
+// ── Entry Point ───────────────────────────────────────────────────────────────
+class EngineHoursPage extends StatelessWidget {
+  const EngineHoursPage({super.key});
 
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (_) => SpeedingBloc(context)..add(LoadSpeedingReport()),
-      child: const _SpeedingBody(),
+      create: (_) => EngineHoursBloc(context)..add(LoadEngineHoursReport()),
+      child: const _EngineHoursBody(),
     );
   }
 }
 
-
-class _SpeedingBody extends StatelessWidget {
-  const _SpeedingBody();
+// ── Body ──────────────────────────────────────────────────────────────────────
+class _EngineHoursBody extends StatelessWidget {
+  const _EngineHoursBody();
 
   @override
   Widget build(BuildContext context) {
@@ -33,7 +34,7 @@ class _SpeedingBody extends StatelessWidget {
       child: Column(
         children: [
           Text(
-            "Speeding Details",
+            "Engine Hours",
             style: GoogleFonts.lato(
               fontSize: objfun.FontLarge,
               fontWeight: FontWeight.bold,
@@ -42,15 +43,18 @@ class _SpeedingBody extends StatelessWidget {
           ),
           const SizedBox(height: 10),
           Expanded(
-            child: BlocBuilder<SpeedingBloc, SpeedingState>(
+            child: BlocBuilder<EngineHoursBloc, EngineHoursState>(
               builder: (context, state) {
-                if (state is SpeedingLoading) {
+
+                // ── Loading ──
+                if (state is EngineHoursLoading) {
                   return const Center(
                     child: CircularProgressIndicator(color: colour.kPrimary),
                   );
                 }
 
-                if (state is SpeedingError) {
+                // ── Error ──
+                if (state is EngineHoursError) {
                   return Center(
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
@@ -58,15 +62,17 @@ class _SpeedingBody extends StatelessWidget {
                         const Icon(Icons.error_outline,
                             color: Colors.red, size: 48),
                         const SizedBox(height: 12),
-                        Text(state.message,
-                            textAlign: TextAlign.center,
-                            style: GoogleFonts.lato(
-                                color: Colors.red, fontSize: 14)),
+                        Text(
+                          state.message,
+                          textAlign: TextAlign.center,
+                          style: GoogleFonts.lato(
+                              color: Colors.red, fontSize: 14),
+                        ),
                         const SizedBox(height: 16),
                         ElevatedButton.icon(
                           onPressed: () => context
-                              .read<SpeedingBloc>()
-                              .add(LoadSpeedingReport()),
+                              .read<EngineHoursBloc>()
+                              .add(LoadEngineHoursReport()),
                           icon: const Icon(Icons.refresh),
                           label: const Text("Retry"),
                           style: ElevatedButton.styleFrom(
@@ -77,20 +83,23 @@ class _SpeedingBody extends StatelessWidget {
                   );
                 }
 
-                if (state is SpeedingLoaded) {
-                  if (state.speedingRecords.isEmpty) {
+                // ── Loaded ──
+                if (state is EngineHoursLoaded) {
+                  if (state.engineHoursRecords.isEmpty) {
                     return Center(
-                      child: Text("No speeding records found.",
-                          style: GoogleFonts.lato(
-                              fontSize: 16, color: Colors.grey)),
+                      child: Text(
+                        "No engine hours records found.",
+                        style: GoogleFonts.lato(
+                            fontSize: 16, color: Colors.grey),
+                      ),
                     );
                   }
 
                   return ListView.builder(
-                    itemCount: state.speedingRecords.length,
+                    itemCount: state.engineHoursRecords.length,
                     itemBuilder: (context, index) {
-                      return _SpeedingCard(
-                          record: state.speedingRecords[index]);
+                      return _EngineHoursCard(
+                          record: state.engineHoursRecords[index]);
                     },
                   );
                 }
@@ -105,12 +114,10 @@ class _SpeedingBody extends StatelessWidget {
   }
 }
 
-// ─────────────────────────────────────────────
-//  Speeding Card  — Blue Palette Design
-// ─────────────────────────────────────────────
-class _SpeedingCard extends StatelessWidget {
-  final SpeedingView record;
-  const _SpeedingCard({required this.record});
+// ── Card ──────────────────────────────────────────────────────────────────────
+class _EngineHoursCard extends StatelessWidget {
+  final EngineHoursdata record;
+  const _EngineHoursCard({required this.record});
 
   @override
   Widget build(BuildContext context) {
@@ -132,7 +139,7 @@ class _SpeedingCard extends StatelessWidget {
         ),
         child: Row(
           children: [
-            // ── Left accent bar + icon ──
+            // ── Left Blue Panel ──
             Container(
               width: 70,
               padding: const EdgeInsets.symmetric(vertical: 20),
@@ -143,27 +150,24 @@ class _SpeedingCard extends StatelessWidget {
                   bottomLeft: Radius.circular(16),
                 ),
               ),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Container(
-                    width: 44,
-                    height: 44,
-                    decoration: BoxDecoration(
-                      color: colour.kPrimary,
-                      shape: BoxShape.circle,
-                    ),
-                    child: const Icon(
-                      Icons.local_shipping_rounded,
-                      color: colour.kWhite,
-                      size: 22,
-                    ),
+              child: Center(
+                child: Container(
+                  width: 44,
+                  height: 44,
+                  decoration: const BoxDecoration(
+                    color: colour.kPrimary,
+                    shape: BoxShape.circle,
                   ),
-                ],
+                  child: const Icon(
+                    Icons.timer_rounded,
+                    color: colour.kWhite,
+                    size: 22,
+                  ),
+                ),
               ),
             ),
 
-            // ── Main content ──
+            // ── Content ──
             Expanded(
               child: Padding(
                 padding: const EdgeInsets.symmetric(
@@ -172,7 +176,7 @@ class _SpeedingCard extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      record.vehicle ?? "-",
+                      record.TruckName ?? "-",
                       style: GoogleFonts.lato(
                         fontWeight: FontWeight.bold,
                         fontSize: 16,
@@ -182,38 +186,39 @@ class _SpeedingCard extends StatelessWidget {
                     const SizedBox(height: 6),
                     Row(
                       children: [
-                        const Icon(Icons.person_outline,
+                        const Icon(Icons.speed_rounded,
                             size: 14, color: colour.kPrimaryLight),
                         const SizedBox(width: 4),
                         Text(
-                          record.driver.isNotEmpty
-                              ? record.driver
-                              : "Not Available",
+                          "Mileage: ${record.mileage.isNotEmpty ? record.mileage : 'Not Available'}",
                           style: GoogleFonts.lato(
                               fontSize: 13, color: Colors.grey[600]),
                         ),
                       ],
                     ),
                     const SizedBox(height: 6),
-                    // Speed badge
                     Row(
                       children: [
-                        _MiniChip(
-                          icon: Icons.speed_rounded,
-                          label: record.filled.isNotEmpty
-                              ? "${record.filled} km/h"
-                              : "N/A",
-                          bgColor: colour.kPrimary.withOpacity(0.1),
-                          textColor: colour.kPrimary,
+                        Flexible(
+                          child: _MiniChip(
+                            icon: Icons.play_arrow_rounded,
+                            label: record.beginTime.isNotEmpty
+                                ? record.beginTime
+                                : "N/A",
+                            bgColor: colour.kPrimary.withOpacity(0.1),
+                            textColor: colour.kPrimary,
+                          ),
                         ),
                         const SizedBox(width: 8),
-                        _MiniChip(
-                          icon: Icons.warning_amber_rounded,
-                          label: record.count.isNotEmpty
-                              ? "Limit: ${record.count}"
-                              : "N/A",
-                          bgColor: Colors.orange.withOpacity(0.1),
-                          textColor: Colors.orange.shade700,
+                        Flexible(
+                          child: _MiniChip(
+                            icon: Icons.stop_rounded,
+                            label: record.endTime.isNotEmpty
+                                ? record.endTime
+                                : "N/A",
+                            bgColor: Colors.orange.withOpacity(0.1),
+                            textColor: Colors.orange.shade700,
+                          ),
                         ),
                       ],
                     ),
@@ -232,8 +237,11 @@ class _SpeedingCard extends StatelessWidget {
                   color: colour.kAccent,
                   borderRadius: BorderRadius.circular(8),
                 ),
-                child: const Icon(Icons.arrow_forward_ios_rounded,
-                    size: 14, color: colour.kPrimary),
+                child: const Icon(
+                  Icons.arrow_forward_ios_rounded,
+                  size: 14,
+                  color: colour.kPrimary,
+                ),
               ),
             ),
           ],
@@ -242,9 +250,7 @@ class _SpeedingCard extends StatelessWidget {
     );
   }
 
-  // ─────────────────────────────────────────────
-  //  Details Dialog  — Blue Palette
-  // ─────────────────────────────────────────────
+  // ── Details Dialog ────────────────────────────────────────────────────────
   void _showDetailsDialog(BuildContext context) {
     showGeneralDialog(
       context: context,
@@ -271,7 +277,7 @@ class _SpeedingCard extends StatelessWidget {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                // ── Dialog Header ──
+                // ── Header ──
                 Container(
                   width: double.infinity,
                   padding: const EdgeInsets.symmetric(
@@ -285,11 +291,11 @@ class _SpeedingCard extends StatelessWidget {
                   ),
                   child: Row(
                     children: [
-                      const Icon(Icons.local_shipping_rounded,
+                      const Icon(Icons.timer_rounded,
                           color: colour.kWhite, size: 26),
                       const SizedBox(width: 12),
                       Text(
-                        "Truck Info",
+                        "Engine Hours Details",
                         style: GoogleFonts.lato(
                           fontSize: 20,
                           fontWeight: FontWeight.bold,
@@ -300,41 +306,56 @@ class _SpeedingCard extends StatelessWidget {
                   ),
                 ),
 
-                // ── Dialog Body ──
+                // ── Body ──
                 Padding(
                   padding: const EdgeInsets.all(24),
                   child: Column(
                     children: [
                       _buildInfoRow(
-                          Icons.local_shipping_rounded,
-                          "Truck Name",
-                          record.vehicle),
+                        Icons.local_shipping_rounded,
+                        "Truck Name",
+                        record.TruckName,
+                      ),
                       _buildDivider(),
                       _buildInfoRow(
-                          Icons.warning_amber_rounded,
-                          "Speed Limit",
-                          record.count.isNotEmpty
-                              ? record.count
-                              : null),
+                        Icons.play_arrow_rounded,
+                        "Begin Time",
+                        record.beginTime.isNotEmpty ? record.beginTime : null,
+                      ),
                       _buildDivider(),
                       _buildInfoRow(
-                          Icons.speed_rounded,
-                          "Speed",
-                          record.filled.isNotEmpty
-                              ? record.filled
-                              : null),
+                        Icons.stop_rounded,
+                        "End Time",
+                        record.endTime.isNotEmpty ? record.endTime : null,
+                      ),
                       _buildDivider(),
                       _buildInfoRow(
-                          Icons.person_rounded,
-                          "Driver",
-                          record.driver.isNotEmpty
-                              ? record.driver
-                              : null),
+                        Icons.place_rounded,
+                        "Begin Location",
+                        record.beginLocation.isNotEmpty
+                            ? record.beginLocation
+                            : null,
+                      ),
                       _buildDivider(),
                       _buildInfoRow(
-                          Icons.access_time_rounded,
-                          "Time",
-                          record.time.isNotEmpty ? record.time : null),
+                        Icons.flag_rounded,
+                        "End Location",
+                        record.endLocation.isNotEmpty
+                            ? record.endLocation
+                            : null,
+                      ),
+                      _buildDivider(),
+                      _buildInfoRow(
+                        Icons.timer_rounded,
+                        "Total Time",
+                        record.totalTime.isNotEmpty ? record.totalTime : null,
+                      ),
+                      _buildDivider(),
+                      _buildInfoRow(
+                        Icons.pause_circle_rounded,
+                        "Idling",
+                        record.idling.isNotEmpty ? record.idling : null,
+                      ),
                       const SizedBox(height: 24),
 
                       // ── Close Button ──
@@ -343,8 +364,8 @@ class _SpeedingCard extends StatelessWidget {
                         child: ElevatedButton(
                           style: ElevatedButton.styleFrom(
                             backgroundColor: colour.kPrimary,
-                            padding: const EdgeInsets.symmetric(
-                                vertical: 14),
+                            padding:
+                            const EdgeInsets.symmetric(vertical: 14),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(12),
                             ),
@@ -423,9 +444,7 @@ class _SpeedingCard extends StatelessWidget {
   }
 }
 
-// ─────────────────────────────────────────────
-//  Mini Badge Chip
-// ─────────────────────────────────────────────
+// ── Mini Badge Chip ───────────────────────────────────────────────────────────
 class _MiniChip extends StatelessWidget {
   final IconData icon;
   final String label;
@@ -452,12 +471,16 @@ class _MiniChip extends StatelessWidget {
         children: [
           Icon(icon, size: 12, color: textColor),
           const SizedBox(width: 4),
-          Text(
-            label,
-            style: GoogleFonts.lato(
-              fontSize: 11,
-              fontWeight: FontWeight.bold,
-              color: textColor,
+          Flexible(
+            child: Text(
+              label,
+              overflow: TextOverflow.ellipsis,
+              maxLines: 1,
+              style: GoogleFonts.lato(
+                fontSize: 11,
+                fontWeight: FontWeight.bold,
+                color: textColor,
+              ),
             ),
           ),
         ],

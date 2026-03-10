@@ -12,12 +12,21 @@ import '../../../common_updates/blocs/truck/truck_bloc.dart';
 import '../bloc/admin_tab_bloc.dart';
 import '../bloc/admin_tab_event.dart';
 import '../tabs/ExpenseReport/view/expensereport_tab.dart';
+import '../tabs/bocheck/bloc/bocheck_bloc.dart';
+import '../tabs/bocheck/bloc/bocheck_event.dart';
+import '../tabs/bocheck/view/bocheck_tab.dart';
 import '../tabs/driver/bloc/driverdetails_bloc.dart';
 import '../tabs/driver/bloc/driverdetails_event.dart';
 import '../tabs/driver/view/driverdetails_tab.dart';
+import '../tabs/enginehours/bloc/enginehours_bloc.dart';
+import '../tabs/enginehours/bloc/enginehours_event.dart';
+import '../tabs/enginehours/view/enginehours_tab.dart';
 import '../tabs/forwardingreport/bloc/forwardingreport_bloc.dart';
 import '../tabs/forwardingreport/bloc/forwardingreport_event.dart';
 import '../tabs/forwardingreport/view/forwardingreport_tab.dart';
+import '../tabs/fuelfillings/bloc/fuelfillings_bloc.dart';
+import '../tabs/fuelfillings/bloc/fuelfillings_event.dart';
+import '../tabs/fuelfillings/view/fuelfillings_tab.dart';
 import '../tabs/invoice/bloc/invoice_bloc.dart';
 import '../tabs/invoice/view/invoice_tab.dart';
 import '../tabs/receiptview/bloc/receiptview_bloc.dart';
@@ -25,6 +34,7 @@ import '../tabs/receiptview/bloc/receiptview_event.dart';
 import '../tabs/receiptview/view/receiptview_tab.dart';
 import '../tabs/salesorder/view/salesorderview_tab.dart';
 import '../tabs/speedingreport/bloc/speeding_bloc.dart';
+import '../tabs/speedingreport/bloc/speeding_event.dart';
 import '../tabs/speedingreport/view/speedingreport_view.dart';
 import '../tabs/transport/bloc/transport_bloc.dart';
 import '../tabs/transport/bloc/transport_event.dart';
@@ -49,7 +59,7 @@ class _AdminDashboardState extends State<NewAdminDashboard> with SingleTickerPro
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 10, vsync: this);
+    _tabController = TabController(length: 13, vsync: this);
     _tabController.addListener(_onTabChanged);
 
   }
@@ -133,6 +143,18 @@ class _AdminDashboardState extends State<NewAdminDashboard> with SingleTickerPro
         BlocProvider(
           create: (context) => SpeedingBloc(context)..add( LoadSpeedingReport()),
           child: const SpeedingScreen(),
+        ),
+        BlocProvider(
+          create: (context) => FuelFillingBloc(context)..add( LoadFuelFillingReport()),
+          child: const FuelFillingPage(),
+        ),
+        BlocProvider(
+          create: (context) => EngineHoursBloc(context)..add( LoadEngineHoursReport()),
+          child: const EngineHoursPage(),
+        ),
+        BlocProvider(
+          create: (context) => BocBloc(context)..add( LoadBocReport()),
+          child: const BocPage(),
         ),
       ],
       child: Scaffold(

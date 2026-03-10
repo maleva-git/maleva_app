@@ -1,4 +1,4 @@
-part of 'speeding_bloc.dart';
+import 'package:maleva/core/models/model.dart';
 
 abstract class SpeedingState {}
 

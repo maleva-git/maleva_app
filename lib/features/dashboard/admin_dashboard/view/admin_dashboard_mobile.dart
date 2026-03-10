@@ -15,8 +15,11 @@ import '../../../common_updates/blocs/truck/truck_event.dart';
 import '../bloc/admin_tab_bloc.dart';
 import '../bloc/admin_tab_state.dart';
 import '../tabs/ExpenseReport/view/expensereport_tab.dart';
+import '../tabs/bocheck/view/bocheck_tab.dart';
 import '../tabs/driver/view/driverdetails_tab.dart';
+import '../tabs/enginehours/view/enginehours_tab.dart';
 import '../tabs/forwardingreport/view/forwardingreport_tab.dart';
+import '../tabs/fuelfillings/view/fuelfillings_tab.dart';
 import '../tabs/receiptview/view/receiptview_tab.dart';
 import 'package:maleva/core/utils/clsfunction.dart' as objfun;
 import 'package:maleva/core/colors/colors.dart' as colour;
@@ -172,6 +175,9 @@ class MobileDashboard extends StatelessWidget {
                 Tab(text: 'Truck'),
                 Tab(text: 'Driver'),
                 Tab(text: 'SpeedingReport'),
+                Tab(text: 'FuelFilling'),
+                Tab(text: 'EngineHours'),
+                Tab(text: 'BOCheck'),
 
               ],
             ),
@@ -204,6 +210,9 @@ class MobileDashboard extends StatelessWidget {
                   const TruckDetailsReportPage(),
                   const DriverDetailsView(),
                   const SpeedingScreen(),
+                  const FuelFillingPage(),
+                  const EngineHoursPage(),
+                  const BocPage(),
 
                 ],
               ),

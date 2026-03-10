@@ -1,26 +1,24 @@
-import 'package:flutter/Material.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
-import 'package:maleva/features/dashboard/admin_dashboard/tabs/speedingreport/bloc/speeding_event.dart';
-import 'package:maleva/features/dashboard/admin_dashboard/tabs/speedingreport/bloc/speeding_state.dart';
 
-import '../../../../../../core/models/model.dart';
-
+import 'package:maleva/core/models/model.dart';
 import 'package:maleva/core/utils/clsfunction.dart' as objfun;
+import 'enginehours_event.dart';
+import 'enginehours_state.dart';
 
-
-class SpeedingBloc extends Bloc<SpeedingEvent, SpeedingState> {
-
+class EngineHoursBloc extends Bloc<EngineHoursEvent, EngineHoursState> {
   final BuildContext context;
-  SpeedingBloc(this.context) : super(SpeedingInitial()) {
-    on<LoadSpeedingReport>(_onLoadSpeedingReport);
+
+  EngineHoursBloc(this.context) : super(EngineHoursInitial()) {
+    on<LoadEngineHoursReport>(_onLoadEngineHoursReport);
   }
 
-  Future<void> _onLoadSpeedingReport(
-      LoadSpeedingReport event,
-      Emitter<SpeedingState> emit,
+  Future<void> _onLoadEngineHoursReport(
+      LoadEngineHoursReport event,
+      Emitter<EngineHoursState> emit,
       ) async {
-    emit(SpeedingLoading());
+    emit(EngineHoursLoading());
 
     try {
       final DateTime today = DateTime.now();
@@ -41,22 +39,22 @@ class SpeedingBloc extends Bloc<SpeedingEvent, SpeedingState> {
       };
 
       final resultData = await objfun.apiAllinoneSelectArray(
-        objfun.apiSelectSpeedingReport,
+        objfun.apiSelectEangiehoursReport,
         requestBody,
         headers,
-        context
+        context,
       );
 
       if (resultData != null && resultData.isNotEmpty) {
-        final List<SpeedingView> records = (resultData as List)
-            .map<SpeedingView>((e) => SpeedingView.fromJson(e))
+        final List<EngineHoursdata> records = (resultData as List)
+            .map<EngineHoursdata>((e) => EngineHoursdata.fromJson(e))
             .toList();
-        emit(SpeedingLoaded(records));
+        emit(EngineHoursLoaded(records));
       } else {
-        emit(SpeedingLoaded([]));
+        emit(EngineHoursLoaded([]));
       }
     } catch (error) {
-      emit(SpeedingError(error.toString()));
+      emit(EngineHoursError(error.toString()));
     }
   }
 }
