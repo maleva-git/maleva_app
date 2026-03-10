@@ -17,9 +17,12 @@ import '../bloc/admin_tab_state.dart';
 import '../tabs/ExpenseReport/view/expensereport_tab.dart';
 import '../tabs/bocheck/view/bocheck_tab.dart';
 import '../tabs/driver/view/driverdetails_tab.dart';
+import '../tabs/emailinbox/view/emailinbox_tab.dart';
 import '../tabs/enginehours/view/enginehours_tab.dart';
 import '../tabs/forwardingreport/view/forwardingreport_tab.dart';
 import '../tabs/fuelfillings/view/fuelfillings_tab.dart';
+import '../tabs/googlereview/view/googlereview_grid.dart';
+import '../tabs/googlereview/view/googlereview_tab.dart';
 import '../tabs/receiptview/view/receiptview_tab.dart';
 import 'package:maleva/core/utils/clsfunction.dart' as objfun;
 import 'package:maleva/core/colors/colors.dart' as colour;
@@ -178,6 +181,8 @@ class MobileDashboard extends StatelessWidget {
                 Tab(text: 'FuelFilling'),
                 Tab(text: 'EngineHours'),
                 Tab(text: 'BOCheck'),
+                Tab(text: 'Email'),
+                Tab(text: 'GoogleReview'),
 
               ],
             ),
@@ -213,6 +218,8 @@ class MobileDashboard extends StatelessWidget {
                   const FuelFillingPage(),
                   const EngineHoursPage(),
                   const BocPage(),
+                  const EmailPage(),
+                  const ReviewEntryForm(),
 
                 ],
               ),

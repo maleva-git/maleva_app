@@ -18,6 +18,9 @@ import '../tabs/bocheck/view/bocheck_tab.dart';
 import '../tabs/driver/bloc/driverdetails_bloc.dart';
 import '../tabs/driver/bloc/driverdetails_event.dart';
 import '../tabs/driver/view/driverdetails_tab.dart';
+import '../tabs/emailinbox/bloc/emailinbox_bloc.dart';
+import '../tabs/emailinbox/bloc/emailinbox_event.dart';
+import '../tabs/emailinbox/view/emailinbox_tab.dart';
 import '../tabs/enginehours/bloc/enginehours_bloc.dart';
 import '../tabs/enginehours/bloc/enginehours_event.dart';
 import '../tabs/enginehours/view/enginehours_tab.dart';
@@ -27,6 +30,10 @@ import '../tabs/forwardingreport/view/forwardingreport_tab.dart';
 import '../tabs/fuelfillings/bloc/fuelfillings_bloc.dart';
 import '../tabs/fuelfillings/bloc/fuelfillings_event.dart';
 import '../tabs/fuelfillings/view/fuelfillings_tab.dart';
+import '../tabs/googlereview/bloc/googlereview_bloc.dart';
+import '../tabs/googlereview/bloc/googlereview_event.dart';
+import '../tabs/googlereview/view/googlereview_grid.dart';
+import '../tabs/googlereview/view/googlereview_tab.dart';
 import '../tabs/invoice/bloc/invoice_bloc.dart';
 import '../tabs/invoice/view/invoice_tab.dart';
 import '../tabs/receiptview/bloc/receiptview_bloc.dart';
@@ -59,7 +66,7 @@ class _AdminDashboardState extends State<NewAdminDashboard> with SingleTickerPro
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 13, vsync: this);
+    _tabController = TabController(length: 15, vsync: this);
     _tabController.addListener(_onTabChanged);
 
   }
@@ -155,6 +162,14 @@ class _AdminDashboardState extends State<NewAdminDashboard> with SingleTickerPro
         BlocProvider(
           create: (context) => BocBloc(context)..add( LoadBocReport()),
           child: const BocPage(),
+        ),
+        BlocProvider(
+          create: (context) => EmailBloc(context)..add(const LoadEmployeesEvent()),
+          child: const EmailPage(),
+        ),
+        BlocProvider(
+          create: (context) => ReviewBloc(context)..add(const LoadReviewsEvent()),
+          child: const ReviewEntryForm(),
         ),
       ],
       child: Scaffold(
