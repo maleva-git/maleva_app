@@ -7,6 +7,7 @@ import 'package:maleva/core/colors/colors.dart' as colour;
 import 'package:maleva/features/dashboard/admin_dashboard/tabs/ExpenseReport/bloc/expensereport_bloc.dart';
 import 'package:maleva/features/dashboard/admin_dashboard/tabs/ExpenseReport/bloc/expensereport_event.dart';
 import 'package:maleva/features/dashboard/admin_dashboard/tabs/salesorder/bloc/salesorder_bloc.dart';
+import '../../../../SummonEntry/SummonViewPage.dart';
 import '../../../common_updates/blocs/sales/sales_bloc.dart';
 import '../../../common_updates/blocs/truck/truck_bloc.dart';
 import '../bloc/admin_tab_bloc.dart';
@@ -52,6 +53,8 @@ import '../tabs/salesorder/view/salesorderview_tab.dart';
 import '../tabs/speedingreport/bloc/speeding_bloc.dart';
 import '../tabs/speedingreport/bloc/speeding_event.dart';
 import '../tabs/speedingreport/view/speedingreport_view.dart';
+import '../tabs/summonentry/bloc/summonentry_bloc.dart';
+import '../tabs/summonentry/view/summonentry_tab.dart';
 import '../tabs/transport/bloc/transport_bloc.dart';
 import '../tabs/transport/bloc/transport_event.dart';
 import '../tabs/transport/view/transportview_tab.dart';
@@ -75,7 +78,7 @@ class _AdminDashboardState extends State<NewAdminDashboard> with SingleTickerPro
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 18, vsync: this);
+    _tabController = TabController(length: 19, vsync: this);
     _tabController.addListener(_onTabChanged);
 
   }
@@ -191,6 +194,10 @@ class _AdminDashboardState extends State<NewAdminDashboard> with SingleTickerPro
         BlocProvider(
           create: (context) => PettyCashBloc(context)..add(const LoadPettyCashEvent()),
           child: const PettyCashPage(),
+        ),
+        BlocProvider(
+          create: (context) => SummonBloc.form(context),
+          child: const SummonEntryPage(),
         ),
       ],
       child: Scaffold(

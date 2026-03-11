@@ -23,15 +23,14 @@ import '../tabs/enginehours/view/enginehours_tab.dart';
 import '../tabs/forwardingreport/view/forwardingreport_tab.dart';
 import '../tabs/fuel/view/fuelreport_tab.dart';
 import '../tabs/fuelfillings/view/fuelfillings_tab.dart';
-import '../tabs/googlereview/view/googlereview_grid.dart';
 import '../tabs/googlereview/view/googlereview_tab.dart';
 import '../tabs/pettycash/view/pettycash_tab.dart';
 import '../tabs/receiptview/view/receiptview_tab.dart';
-import 'package:maleva/core/utils/clsfunction.dart' as objfun;
 import 'package:maleva/core/colors/colors.dart' as colour;
 import '../tabs/invoice/view/invoice_tab.dart';
 import '../tabs/salesorder/view/salesorderview_tab.dart';
 import '../tabs/speedingreport/view/speedingreport_view.dart';
+import '../tabs/summonentry/view/summonentry_tab.dart';
 import '../tabs/transport/view/transportview_tab.dart';
 import '../tabs/truck/view/truckview_tab.dart';
 import '../tabs/vesselreport/view/vesselreportview_tab.dart';
@@ -189,6 +188,7 @@ class MobileDashboard extends StatelessWidget {
                 Tab(text: 'Fuel'),
                 Tab(text: 'EmployeeView'),
                 Tab(text: 'PettyCash'),
+                Tab(text: 'SummonEntry'),
 
               ],
             ),
@@ -229,6 +229,7 @@ class MobileDashboard extends StatelessWidget {
                   const FuelDiffPage(),
                   const EmployeeViewPage(),
                   const PettyCashPage(),
+                  const SummonEntryPage(),
 
                 ],
               ),

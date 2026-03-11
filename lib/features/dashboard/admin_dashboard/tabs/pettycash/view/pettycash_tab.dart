@@ -11,7 +11,6 @@ import '../bloc/pettycash_state.dart';
 
 
 
-// ── Entry Point ───────────────────────────────────────────────────────────────
 class PettyCashPage extends StatelessWidget {
   const PettyCashPage({super.key});
 
@@ -24,7 +23,6 @@ class PettyCashPage extends StatelessWidget {
   }
 }
 
-// ── Body ──────────────────────────────────────────────────────────────────────
 class _PettyCashBody extends StatelessWidget {
   const _PettyCashBody();
 
@@ -41,7 +39,6 @@ class _PettyCashBody extends StatelessWidget {
           child: Column(
             children: [
 
-              // ── Title ──────────────────────────────────────────────────────
               Text(
                 "Petty Cash",
                 style: GoogleFonts.lato(
@@ -53,7 +50,6 @@ class _PettyCashBody extends StatelessWidget {
 
               const SizedBox(height: 10),
 
-              // ── Date Filter Bar ────────────────────────────────────────────
               Container(
                 padding: const EdgeInsets.symmetric(
                     horizontal: 12, vertical: 10),
@@ -188,7 +184,6 @@ class _PettyCashBody extends StatelessWidget {
 
               const SizedBox(height: 10),
 
-              // ── Content ────────────────────────────────────────────────────
               Expanded(child: _buildContent(context, state)),
             ],
           ),
@@ -282,7 +277,7 @@ class _PettyCashBody extends StatelessWidget {
   }
 }
 
-// ── Date Picker Button ────────────────────────────────────────────────────────
+
 class _DateBtn extends StatelessWidget {
   final VoidCallback onTap;
   const _DateBtn({required this.onTap});
@@ -305,7 +300,7 @@ class _DateBtn extends StatelessWidget {
   }
 }
 
-// ── Petty Cash Card ───────────────────────────────────────────────────────────
+
 class _PettyCashCard extends StatelessWidget {
   final PattycashMasterModel master;
   final List<PattyCashDetailsModel> details;
