@@ -25,6 +25,7 @@ import '../tabs/fuel/view/fuelreport_tab.dart';
 import '../tabs/fuelfillings/view/fuelfillings_tab.dart';
 import '../tabs/googlereview/view/googlereview_grid.dart';
 import '../tabs/googlereview/view/googlereview_tab.dart';
+import '../tabs/pettycash/view/pettycash_tab.dart';
 import '../tabs/receiptview/view/receiptview_tab.dart';
 import 'package:maleva/core/utils/clsfunction.dart' as objfun;
 import 'package:maleva/core/colors/colors.dart' as colour;
@@ -187,6 +188,7 @@ class MobileDashboard extends StatelessWidget {
                 Tab(text: 'GoogleReview'),
                 Tab(text: 'Fuel'),
                 Tab(text: 'EmployeeView'),
+                Tab(text: 'PettyCash'),
 
               ],
             ),
@@ -226,6 +228,7 @@ class MobileDashboard extends StatelessWidget {
                   const ReviewEntryPage(),
                   const FuelDiffPage(),
                   const EmployeeViewPage(),
+                  const PettyCashPage(),
 
                 ],
               ),

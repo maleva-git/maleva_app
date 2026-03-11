@@ -42,6 +42,9 @@ import '../tabs/googlereview/view/googlereview_grid.dart';
 import '../tabs/googlereview/view/googlereview_tab.dart';
 import '../tabs/invoice/bloc/invoice_bloc.dart';
 import '../tabs/invoice/view/invoice_tab.dart';
+import '../tabs/pettycash/bloc/pettycash_bloc.dart';
+import '../tabs/pettycash/bloc/pettycash_event.dart';
+import '../tabs/pettycash/view/pettycash_tab.dart';
 import '../tabs/receiptview/bloc/receiptview_bloc.dart';
 import '../tabs/receiptview/bloc/receiptview_event.dart';
 import '../tabs/receiptview/view/receiptview_tab.dart';
@@ -72,7 +75,7 @@ class _AdminDashboardState extends State<NewAdminDashboard> with SingleTickerPro
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 17, vsync: this);
+    _tabController = TabController(length: 18, vsync: this);
     _tabController.addListener(_onTabChanged);
 
   }
@@ -184,6 +187,10 @@ class _AdminDashboardState extends State<NewAdminDashboard> with SingleTickerPro
         BlocProvider(
           create: (context) => EmployeeMasterBloc.list(context),
           child: const EmployeeViewPage(),
+        ),
+        BlocProvider(
+          create: (context) => PettyCashBloc(context)..add(const LoadPettyCashEvent()),
+          child: const PettyCashPage(),
         ),
       ],
       child: Scaffold(
