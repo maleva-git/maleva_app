@@ -20,6 +20,7 @@ import '../tabs/driver/view/driverdetails_tab.dart';
 import '../tabs/emailinbox/view/emailinbox_tab.dart';
 import '../tabs/enginehours/view/enginehours_tab.dart';
 import '../tabs/forwardingreport/view/forwardingreport_tab.dart';
+import '../tabs/fuel/view/fuelreport_tab.dart';
 import '../tabs/fuelfillings/view/fuelfillings_tab.dart';
 import '../tabs/googlereview/view/googlereview_grid.dart';
 import '../tabs/googlereview/view/googlereview_tab.dart';
@@ -183,6 +184,7 @@ class MobileDashboard extends StatelessWidget {
                 Tab(text: 'BOCheck'),
                 Tab(text: 'Email'),
                 Tab(text: 'GoogleReview'),
+                Tab(text: 'Fuel'),
 
               ],
             ),
@@ -219,7 +221,8 @@ class MobileDashboard extends StatelessWidget {
                   const EngineHoursPage(),
                   const BocPage(),
                   const EmailPage(),
-                  const ReviewEntryForm(),
+                  const ReviewEntryPage(),
+                  const FuelDiffPage(),
 
                 ],
               ),
