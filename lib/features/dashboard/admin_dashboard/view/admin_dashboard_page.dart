@@ -21,6 +21,9 @@ import '../tabs/driver/view/driverdetails_tab.dart';
 import '../tabs/emailinbox/bloc/emailinbox_bloc.dart';
 import '../tabs/emailinbox/bloc/emailinbox_event.dart';
 import '../tabs/emailinbox/view/emailinbox_tab.dart';
+import '../tabs/employeemaster/bloc/employeemaster_bloc.dart';
+import '../tabs/employeemaster/bloc/employeemaster_event.dart';
+import '../tabs/employeemaster/view/employeemaster_tab.dart';
 import '../tabs/enginehours/bloc/enginehours_bloc.dart';
 import '../tabs/enginehours/bloc/enginehours_event.dart';
 import '../tabs/enginehours/view/enginehours_tab.dart';
@@ -69,7 +72,7 @@ class _AdminDashboardState extends State<NewAdminDashboard> with SingleTickerPro
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 16, vsync: this);
+    _tabController = TabController(length: 17, vsync: this);
     _tabController.addListener(_onTabChanged);
 
   }
@@ -177,6 +180,10 @@ class _AdminDashboardState extends State<NewAdminDashboard> with SingleTickerPro
         BlocProvider(
           create: (context) => FuelDiffBloc(context)..add(const LoadFuelDiffEvent()),
           child: const FuelDiffPage(),
+        ),
+        BlocProvider(
+          create: (context) => EmployeeMasterBloc.list(context),
+          child: const EmployeeViewPage(),
         ),
       ],
       child: Scaffold(
