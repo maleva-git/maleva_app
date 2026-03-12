@@ -38,6 +38,9 @@ import '../tabs/fuelfillings/view/fuelfillings_tab.dart';
 import '../tabs/googlereview/bloc/googlereview_bloc.dart';
 import '../tabs/googlereview/bloc/googlereview_event.dart';
 import '../tabs/googlereview/view/googlereview_tab.dart';
+import '../tabs/inventoryreport/bloc/inventoryreport_bloc.dart';
+import '../tabs/inventoryreport/bloc/inventoryreport_event.dart';
+import '../tabs/inventoryreport/view/inventoryview_tab.dart';
 import '../tabs/invoice/bloc/invoice_bloc.dart';
 import '../tabs/invoice/view/invoice_tab.dart';
 import '../tabs/paymentview/bloc/paymentview_bloc.dart';
@@ -83,7 +86,7 @@ class _AdminDashboardState extends State<NewAdminDashboard> with SingleTickerPro
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 22, vsync: this);
+    _tabController = TabController(length: 23, vsync: this);
     _tabController.addListener(_onTabChanged);
 
   }
@@ -215,6 +218,10 @@ class _AdminDashboardState extends State<NewAdminDashboard> with SingleTickerPro
         BlocProvider(
           create: (context) => SpotSaleBloc.form(context),
           child: const SpotSaleEntryPage(),
+        ),
+        BlocProvider(
+          create: (context) => InventoryBloc(context)..add(const LoadInventoryListsEvent()),
+          child: const InventoryPage(),
         ),
       ],
       child: Scaffold(

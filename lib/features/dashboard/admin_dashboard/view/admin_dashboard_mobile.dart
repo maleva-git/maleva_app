@@ -24,6 +24,7 @@ import '../tabs/forwardingreport/view/forwardingreport_tab.dart';
 import '../tabs/fuel/view/fuelreport_tab.dart';
 import '../tabs/fuelfillings/view/fuelfillings_tab.dart';
 import '../tabs/googlereview/view/googlereview_tab.dart';
+import '../tabs/inventoryreport/view/inventoryview_tab.dart';
 import '../tabs/paymentview/view/paymentview_tab.dart';
 import '../tabs/pettycash/view/pettycash_tab.dart';
 import '../tabs/receiptview/view/receiptview_tab.dart';
@@ -195,6 +196,7 @@ class MobileDashboard extends StatelessWidget {
                 Tab(text: 'SparePartsEntry'),
                 Tab(text: 'PaymentView'),
                 Tab(text: 'SpotsSaleOrder'),
+                Tab(text: 'InventoryReport'),
 
               ],
             ),
@@ -239,6 +241,7 @@ class MobileDashboard extends StatelessWidget {
                   const SparePartsEntryPage(),
                   const PaymentPendingPage(),
                   const SpotSaleEntryPage(),
+                  const InventoryPage(),
 
                 ],
               ),

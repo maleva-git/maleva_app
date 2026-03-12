@@ -285,7 +285,9 @@ class AdminDashboardState extends State<AdminDashboard> with TickerProviderState
   }
 
 
-  Future loadInventory({bool isDateSearch = false,int ?id} ) async {
+  Future
+
+  loadInventory({bool isDateSearch = false,int ?id} ) async {
     setState(() {
       progress = false;
     });
