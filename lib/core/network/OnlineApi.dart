@@ -395,6 +395,7 @@ Future MaxSaleOrderNo(context, String BillType) async {
           Colors.white,
           Colors.red,
           null,
+
           18.00 - objfun.reducesize,
           objfun.tll,
           objfun.tgc,

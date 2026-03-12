@@ -56,6 +56,8 @@ import '../tabs/spareparts/view/sparepartsadd.dart';
 import '../tabs/speedingreport/bloc/speeding_bloc.dart';
 import '../tabs/speedingreport/bloc/speeding_event.dart';
 import '../tabs/speedingreport/view/speedingreport_view.dart';
+import '../tabs/spotsaleorder/bloc/spotsaleorder_bloc.dart';
+import '../tabs/spotsaleorder/view/spotsaleorder_add.dart';
 import '../tabs/summonentry/bloc/summonentry_bloc.dart';
 import '../tabs/summonentry/view/summonentry_tab.dart';
 import '../tabs/transport/bloc/transport_bloc.dart';
@@ -81,7 +83,7 @@ class _AdminDashboardState extends State<NewAdminDashboard> with SingleTickerPro
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 21, vsync: this);
+    _tabController = TabController(length: 22, vsync: this);
     _tabController.addListener(_onTabChanged);
 
   }
@@ -209,6 +211,10 @@ class _AdminDashboardState extends State<NewAdminDashboard> with SingleTickerPro
         BlocProvider(
           create: (context) => PaymentPendingBloc(context)..add(const LoadPaymentPendingEvent()),
           child: const PaymentPendingPage(),
+        ),
+        BlocProvider(
+          create: (context) => SpotSaleBloc.form(context),
+          child: const SpotSaleEntryPage(),
         ),
       ],
       child: Scaffold(
