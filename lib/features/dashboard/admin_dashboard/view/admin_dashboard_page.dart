@@ -50,6 +50,9 @@ import '../tabs/receiptview/bloc/receiptview_bloc.dart';
 import '../tabs/receiptview/bloc/receiptview_event.dart';
 import '../tabs/receiptview/view/receiptview_tab.dart';
 import '../tabs/salesorder/view/salesorderview_tab.dart';
+import '../tabs/spareparts/bloc/spareparts_bloc.dart';
+import '../tabs/spareparts/bloc/spareparts_event.dart';
+import '../tabs/spareparts/view/sparepartsadd.dart';
 import '../tabs/speedingreport/bloc/speeding_bloc.dart';
 import '../tabs/speedingreport/bloc/speeding_event.dart';
 import '../tabs/speedingreport/view/speedingreport_view.dart';
@@ -78,7 +81,7 @@ class _AdminDashboardState extends State<NewAdminDashboard> with SingleTickerPro
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 19, vsync: this);
+    _tabController = TabController(length: 20, vsync: this);
     _tabController.addListener(_onTabChanged);
 
   }
@@ -198,6 +201,10 @@ class _AdminDashboardState extends State<NewAdminDashboard> with SingleTickerPro
         BlocProvider(
           create: (context) => SummonBloc.form(context),
           child: const SummonEntryPage(),
+        ),
+        BlocProvider(
+          create: (context) => SparePartsBloc.form(context)..add(const LoadSparePartsTrucksEvent()),
+          child: const SparePartsEntryPage(),
         ),
       ],
       child: Scaffold(
