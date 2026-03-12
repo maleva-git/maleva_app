@@ -24,6 +24,7 @@ import '../tabs/forwardingreport/view/forwardingreport_tab.dart';
 import '../tabs/fuel/view/fuelreport_tab.dart';
 import '../tabs/fuelfillings/view/fuelfillings_tab.dart';
 import '../tabs/googlereview/view/googlereview_tab.dart';
+import '../tabs/paymentview/view/paymentview_tab.dart';
 import '../tabs/pettycash/view/pettycash_tab.dart';
 import '../tabs/receiptview/view/receiptview_tab.dart';
 import 'package:maleva/core/colors/colors.dart' as colour;
@@ -191,6 +192,7 @@ class MobileDashboard extends StatelessWidget {
                 Tab(text: 'PettyCash'),
                 Tab(text: 'SummonEntry'),
                 Tab(text: 'SparePartsEntry'),
+                Tab(text: 'PaymentView'),
 
               ],
             ),
@@ -233,6 +235,7 @@ class MobileDashboard extends StatelessWidget {
                   const PettyCashPage(),
                   const SummonEntryPage(),
                   const SparePartsEntryPage(),
+                  const PaymentPendingPage(),
 
                 ],
               ),

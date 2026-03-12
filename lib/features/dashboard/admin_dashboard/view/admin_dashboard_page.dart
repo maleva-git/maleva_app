@@ -7,7 +7,6 @@ import 'package:maleva/core/colors/colors.dart' as colour;
 import 'package:maleva/features/dashboard/admin_dashboard/tabs/ExpenseReport/bloc/expensereport_bloc.dart';
 import 'package:maleva/features/dashboard/admin_dashboard/tabs/ExpenseReport/bloc/expensereport_event.dart';
 import 'package:maleva/features/dashboard/admin_dashboard/tabs/salesorder/bloc/salesorder_bloc.dart';
-import '../../../../SummonEntry/SummonViewPage.dart';
 import '../../../common_updates/blocs/sales/sales_bloc.dart';
 import '../../../common_updates/blocs/truck/truck_bloc.dart';
 import '../bloc/admin_tab_bloc.dart';
@@ -23,7 +22,6 @@ import '../tabs/emailinbox/bloc/emailinbox_bloc.dart';
 import '../tabs/emailinbox/bloc/emailinbox_event.dart';
 import '../tabs/emailinbox/view/emailinbox_tab.dart';
 import '../tabs/employeemaster/bloc/employeemaster_bloc.dart';
-import '../tabs/employeemaster/bloc/employeemaster_event.dart';
 import '../tabs/employeemaster/view/employeemaster_tab.dart';
 import '../tabs/enginehours/bloc/enginehours_bloc.dart';
 import '../tabs/enginehours/bloc/enginehours_event.dart';
@@ -39,10 +37,12 @@ import '../tabs/fuelfillings/bloc/fuelfillings_event.dart';
 import '../tabs/fuelfillings/view/fuelfillings_tab.dart';
 import '../tabs/googlereview/bloc/googlereview_bloc.dart';
 import '../tabs/googlereview/bloc/googlereview_event.dart';
-import '../tabs/googlereview/view/googlereview_grid.dart';
 import '../tabs/googlereview/view/googlereview_tab.dart';
 import '../tabs/invoice/bloc/invoice_bloc.dart';
 import '../tabs/invoice/view/invoice_tab.dart';
+import '../tabs/paymentview/bloc/paymentview_bloc.dart';
+import '../tabs/paymentview/bloc/paymentview_event.dart';
+import '../tabs/paymentview/view/paymentview_tab.dart';
 import '../tabs/pettycash/bloc/pettycash_bloc.dart';
 import '../tabs/pettycash/bloc/pettycash_event.dart';
 import '../tabs/pettycash/view/pettycash_tab.dart';
@@ -81,7 +81,7 @@ class _AdminDashboardState extends State<NewAdminDashboard> with SingleTickerPro
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 20, vsync: this);
+    _tabController = TabController(length: 21, vsync: this);
     _tabController.addListener(_onTabChanged);
 
   }
@@ -205,6 +205,10 @@ class _AdminDashboardState extends State<NewAdminDashboard> with SingleTickerPro
         BlocProvider(
           create: (context) => SparePartsBloc.form(context)..add(const LoadSparePartsTrucksEvent()),
           child: const SparePartsEntryPage(),
+        ),
+        BlocProvider(
+          create: (context) => PaymentPendingBloc(context)..add(const LoadPaymentPendingEvent()),
+          child: const PaymentPendingPage(),
         ),
       ],
       child: Scaffold(
