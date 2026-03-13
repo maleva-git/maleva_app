@@ -13,6 +13,8 @@ import 'package:maleva/core/firebase/firebase_options.dart';
 import 'package:maleva/splash/splashscreen.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:bluetooth_print_plus/bluetooth_print_plus.dart' as bpp;
+import 'package:flutter_native_splash/flutter_native_splash.dart';
+
 class MyHttpOverrides extends HttpOverrides {
   @override
   HttpClient createHttpClient(SecurityContext? context) {
@@ -36,7 +38,10 @@ Future cleanTemporaryfiles() async {
 }
 Future<void> main() async {
   HttpOverrides.global = MyHttpOverrides();
-  WidgetsFlutterBinding.ensureInitialized();
+  WidgetsBinding widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
+  FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
+
+
 
   try {
      await Firebase.initializeApp(
@@ -88,6 +93,8 @@ Future<void> main() async {
   // DatabaseHelper.instance;
   // final dbHelper = DatabaseHelper.instance;
   // await dbHelper.dropDataBase();
+  FlutterNativeSplash.remove();
+
   runApp(
     SafeArea(
       child: MyApp(),

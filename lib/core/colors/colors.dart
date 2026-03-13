@@ -39,12 +39,6 @@ const buyNowButtonBgColor = Colors.blue;
 const hoverButtonColor = Colors.blue;
 const commonColor2 = Color(0xffffbc29);
 
-// const commonColor = Color(0xff022b50);
-// const commonColor2 =  Color(0xffffbc29);
-// const commonColorLight =  Color(0xffffbc29);
-// const commonColorred =  Color(0xffd70e0e);
-// const spinKitColor = Color(0xffd70e0e);
-
 const commonColorhighlight = Color(0xe2bf0f0f);
 const commonColor = Color(0xff1a4d9e);
 const commonColorDisabled = Color(0x61959595);
@@ -59,6 +53,34 @@ const Color kPrimaryDark = Color(0xFF0D3DB5);
 const Color kPrimaryLight = Color(0xFF4D7EF7);
 const Color kAccent = Color(0xFFE8EEFF);
 const Color kWhite = Colors.white;
+const cBlue      = Color(0xFF1555F3);
+const cBlueDark  = Color(0xFF0D2A99);
+const cBlueLight = Color(0xFF3A7BFF);
+const cWhite     = Color(0xFFFFFFFF);
+const cSurface   = Color(0xFFF5F6FA);
+const cBorder    = Color(0xFFECEEF5);
+const cText      = Color(0xFF1A1D2E);
+const cSub       = Color(0xFFB0B4C8);
+const cRose      = Color(0xFFE11D48);
+
+enum Accent { blue, green, amber, purple, teal, rose }
+
+const accentBg = {
+  Accent.blue:   Color(0xFFEEF2FF),
+  Accent.green:  Color(0xFFEDFAF4),
+  Accent.amber:  Color(0xFFFFF8EC),
+  Accent.purple: Color(0xFFF5F0FF),
+  Accent.teal:   Color(0xFFEAFBF8),
+  Accent.rose:   Color(0xFFFFF1F2),
+};
+const accentFg = {
+  Accent.blue:   Color(0xFF1555F3),
+  Accent.green:  Color(0xFF16A85A),
+  Accent.amber:  Color(0xFFE07A20),
+  Accent.purple: Color(0xFF7B52D3),
+  Accent.teal:   Color(0xFF0FA58E),
+  Accent.rose:   Color(0xFFE11D48),
+};
 
 class AppColors {
   static const LinearGradient primaryGradient = LinearGradient(
@@ -73,3 +95,4 @@ class AppColors {
   static const Color appBarColor = Color(0xFF1555F3);
   static const Color whitecolor = Color(0xFFFFFFFF);
 }
+

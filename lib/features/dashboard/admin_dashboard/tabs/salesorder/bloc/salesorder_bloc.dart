@@ -26,7 +26,15 @@ class SalesOrderBloc extends Bloc<SalesOrderEvent, SalesOrderState> {
           header,
           context, // ✅ use global context if already defined
         );
-
+        String currentDate = DateFormat("yyyy-MM-dd").format(DateTime.now());
+        Map<String, dynamic> master = {
+          'Comid': objfun.storagenew.getInt('Comid') ?? 0,
+          'Todate': currentDate,
+        };
+        final waitingResult = await objfun.apiAllinoneSelectArray(
+          objfun.apiSelectSaleorderinvoicecheck,
+          master, header, context,
+        );
         if (resultData != "") {
           final saleDataAll = resultData["Data1"] ?? [];
           final saleMonthData = resultData["Data2"] ?? [];
@@ -36,7 +44,7 @@ class SalesOrderBloc extends Bloc<SalesOrderEvent, SalesOrderState> {
           emit(InvoiceLoaded(
             saleDataAll: saleDataAll,
             saleMonthData: saleMonthData,
-            waitingBilling: [],
+            waitingBilling: waitingResult ?? [],
             monthList: monthResult.$1,
             monthData: monthResult.$2,
             is6Months: true,
