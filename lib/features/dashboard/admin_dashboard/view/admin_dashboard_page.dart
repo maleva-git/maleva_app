@@ -46,12 +46,18 @@ import '../tabs/invoice/view/invoice_tab.dart';
 import '../tabs/paymentview/bloc/paymentview_bloc.dart';
 import '../tabs/paymentview/bloc/paymentview_event.dart';
 import '../tabs/paymentview/view/paymentview_tab.dart';
+import '../tabs/pdo/bloc/pdo_bloc.dart';
+import '../tabs/pdo/view/pdo_tab.dart';
 import '../tabs/pettycash/bloc/pettycash_bloc.dart';
 import '../tabs/pettycash/bloc/pettycash_event.dart';
 import '../tabs/pettycash/view/pettycash_tab.dart';
 import '../tabs/receiptview/bloc/receiptview_bloc.dart';
 import '../tabs/receiptview/bloc/receiptview_event.dart';
 import '../tabs/receiptview/view/receiptview_tab.dart';
+
+import '../tabs/rtiview/bloc/rtiview_bloc.dart';
+import '../tabs/rtiview/bloc/rtiview_event.dart';
+import '../tabs/rtiview/view/rtiview_tab.dart';
 import '../tabs/salesorder/view/salesorderview_tab.dart';
 import '../tabs/spareparts/bloc/spareparts_bloc.dart';
 import '../tabs/spareparts/bloc/spareparts_event.dart';
@@ -86,7 +92,7 @@ class _AdminDashboardState extends State<NewAdminDashboard> with SingleTickerPro
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 23, vsync: this);
+    _tabController = TabController(length: 25, vsync: this);
     _tabController.addListener(_onTabChanged);
 
   }
@@ -222,6 +228,25 @@ class _AdminDashboardState extends State<NewAdminDashboard> with SingleTickerPro
         BlocProvider(
           create: (context) => InventoryBloc(context)..add(const LoadInventoryListsEvent()),
           child: const InventoryPage(),
+        ),
+        BlocProvider(
+          create: (context) => PDOBloc(
+            context,
+            fromDate: DateFormat('yyyy-MM-dd')
+                .format(DateTime.now().subtract(const Duration(days: 30))),
+            toDate: DateFormat('yyyy-MM-dd')
+                .format(DateTime.now()),
+          ),
+          child: PDOViewPage(
+            fromDate: DateFormat('yyyy-MM-dd')
+                .format(DateTime.now().subtract(const Duration(days: 30))),
+            toDate: DateFormat('yyyy-MM-dd')
+                .format(DateTime.now()),
+          ),
+        ),
+        BlocProvider(
+          create: (context) => RTIDetailsBloc(context)..add(const LoadRTIDetailsEvent()),
+          child: const RTIDetailsPage(),
         ),
       ],
       child: Scaffold(

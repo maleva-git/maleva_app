@@ -1,6 +1,7 @@
 import 'package:flutter/Material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:intl/intl.dart';
 import 'package:maleva/core/utils/clsfunction.dart' as objfun;
 import 'package:maleva/core/colors/colors.dart' as colour;
 import '../../../../SaleOrderView/SaleOrderView.dart';
@@ -26,10 +27,12 @@ import '../tabs/fuelfillings/view/fuelfillings_tab.dart';
 import '../tabs/googlereview/view/googlereview_tab.dart';
 import '../tabs/inventoryreport/view/inventoryview_tab.dart';
 import '../tabs/paymentview/view/paymentview_tab.dart';
+import '../tabs/pdo/view/pdo_tab.dart';
 import '../tabs/pettycash/view/pettycash_tab.dart';
 import '../tabs/receiptview/view/receiptview_tab.dart';
 import 'package:maleva/core/colors/colors.dart' as colour;
 import '../tabs/invoice/view/invoice_tab.dart';
+import '../tabs/rtiview/view/rtiview_tab.dart';
 import '../tabs/salesorder/view/salesorderview_tab.dart';
 import '../tabs/spareparts/view/sparepartsadd.dart';
 import '../tabs/speedingreport/view/speedingreport_view.dart';
@@ -197,6 +200,8 @@ class MobileDashboard extends StatelessWidget {
                 Tab(text: 'PaymentView'),
                 Tab(text: 'SpotsSaleOrder'),
                 Tab(text: 'InventoryReport'),
+                Tab(text: 'PDO'),
+                Tab(text: 'RTI'),
 
               ],
             ),
@@ -242,6 +247,13 @@ class MobileDashboard extends StatelessWidget {
                   const PaymentPendingPage(),
                   const SpotSaleEntryPage(),
                   const InventoryPage(),
+                  PDOViewPage(
+                    fromDate: DateFormat('yyyy-MM-dd')
+                        .format(DateTime.now().subtract(const Duration(days: 30))),
+                    toDate: DateFormat('yyyy-MM-dd')
+                        .format(DateTime.now()),
+                  ),
+                 const RTIDetailsPage()
 
                 ],
               ),
