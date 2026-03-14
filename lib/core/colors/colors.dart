@@ -96,3 +96,12 @@ class AppColors {
   static const Color whitecolor = Color(0xFFFFFFFF);
 }
 
+//Login
+const kPrimaryD  = Color(0xFF0D2A99);
+const kPrimaryL  = Color(0xFF3A7BFF);
+const kBg        = Color(0xFFECEEF4);
+const kSurface   = Color(0xFFF5F6FA);
+const kBorder    = Color(0xFFECEEF5);
+const kText      = Color(0xFF1A1D2E);
+const kSubText   = Color(0xFFB0B4C8);
+const kFieldText = Color(0xFF6B7094);

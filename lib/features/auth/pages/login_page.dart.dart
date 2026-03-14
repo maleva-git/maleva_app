@@ -15,9 +15,7 @@ import '../../dashboard/admin_dashboard/view/admin_dashboard_page.dart';
 import '../bloc/auth_bloc.dart';
 import '../bloc/auth_event.dart';
 import '../bloc/auth_state.dart';
-part 'package:maleva/features/auth/pages/login_mobile.dart';
-part 'package:maleva/features/auth/pages/login_tablet.dart';
-
+part 'package:maleva/features/auth/pages/login_design.dart';
 
 class Appuserloginmobile extends StatelessWidget {
   const Appuserloginmobile ({super.key});
@@ -41,11 +39,11 @@ class Appuserloginmobile extends StatelessWidget {
       child: BlocBuilder<LoginBloc, LoginState>(
         builder: (context, state) {
 
-          /// 🔥 HERE state available
 
-          return state.deviceView == "1"
-              ?  mobiledesign()
-              :  tabletdesign();
+
+          return mobiledesign();
+
+
         },
       ),
     );
