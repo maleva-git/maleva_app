@@ -8,7 +8,6 @@ import '../bloc/bocheck_event.dart';
 import '../bloc/bocheck_state.dart';
 import 'package:maleva/core/colors/colors.dart' as colour;
 
-
 // ── Entry Point ───────────────────────────────────────────────────────────────
 class BocPage extends StatelessWidget {
   const BocPage({super.key});
@@ -19,8 +18,6 @@ class BocPage extends StatelessWidget {
       create: (_) => BocBloc(context),
       child: const _BocBody(),
     );
-
-
   }
 }
 
@@ -33,7 +30,8 @@ class _BocBody extends StatefulWidget {
 }
 
 class _BocBodyState extends State<_BocBody> {
-  final TextEditingController _searchController = TextEditingController();
+  final TextEditingController _searchController =
+  TextEditingController();
 
   @override
   void dispose() {
@@ -48,129 +46,175 @@ class _BocBodyState extends State<_BocBody> {
 
   @override
   Widget build(BuildContext context) {
+    final isTablet = MediaQuery.of(context).size.width >= 600;
+
+    return isTablet
+        ? _buildTabletLayout(context)
+        : _buildMobileLayout(context);
+  }
+
+  // ══════════════════════════════════════════════════════
+  // TABLET — Two Column
+  // ══════════════════════════════════════════════════════
+  Widget _buildTabletLayout(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.all(20),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+
+          // ── LEFT (300px) — Search + hint/status
+          SizedBox(
+            width: 300,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Title
+                Row(children: [
+                  Container(
+                    width: 4, height: 30,
+                    decoration: BoxDecoration(
+                      color: colour.kPrimary,
+                      borderRadius: BorderRadius.circular(4),
+                    ),
+                  ),
+                  const SizedBox(width: 10),
+                  Text('BOC CHECK',
+                      style: GoogleFonts.lato(
+                        fontSize:      20,
+                        fontWeight:    FontWeight.bold,
+                        color:         colour.kPrimaryDark,
+                        letterSpacing: 1.2,
+                      )),
+                ]),
+                const SizedBox(height: 6),
+                Padding(
+                  padding: const EdgeInsets.only(left: 14),
+                  child: Text('Search bills & invoices',
+                      style: GoogleFonts.lato(
+                        fontSize:   14,
+                        color:      colour.kPrimaryLight,
+                        fontWeight: FontWeight.w500,
+                      )),
+                ),
+                const SizedBox(height: 20),
+
+                // Search bar
+                _SearchBar(
+                    controller: _searchController,
+                    onSearch: _onSearch,
+                    isTablet: true),
+
+                const SizedBox(height: 20),
+
+                // State hints (initial/loading) in left panel
+                BlocBuilder<BocBloc, BocState>(
+                  builder: (context, state) {
+                    if (state is BocInitial) {
+                      return _InitialHint(isTablet: true);
+                    }
+                    if (state is BocLoading) {
+                      return const Center(
+                        child: CircularProgressIndicator(
+                            color: colour.kPrimary),
+                      );
+                    }
+                    if (state is BocError) {
+                      return _ErrorState(
+                          message: state.message,
+                          onRetry: _onSearch,
+                          isTablet: true);
+                    }
+                    if (state is BocLoaded) {
+                      // Results count badge
+                      return _ResultCountBadge(
+                          count: state.boDetails.length);
+                    }
+                    return const SizedBox.shrink();
+                  },
+                ),
+              ],
+            ),
+          ),
+
+          const SizedBox(width: 16),
+
+          // ── RIGHT — Results
+          Expanded(
+            child: BlocBuilder<BocBloc, BocState>(
+              builder: (context, state) {
+                if (state is BocInitial || state is BocLoading) {
+                  return const SizedBox.shrink();
+                }
+                if (state is BocError) {
+                  return const SizedBox.shrink();
+                }
+                if (state is BocEmpty) {
+                  return _EmptyState(isTablet: true);
+                }
+                if (state is BocLoaded) {
+                  return ListView.builder(
+                    itemCount: state.boDetails.length,
+                    itemBuilder: (context, index) =>
+                        _BocCard(
+                            data:     state.boDetails[index],
+                            isTablet: true),
+                  );
+                }
+                return const SizedBox.shrink();
+              },
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // ══════════════════════════════════════════════════════
+  // MOBILE — Single Column
+  // ══════════════════════════════════════════════════════
+  Widget _buildMobileLayout(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.all(12),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-
-          // ── Search Bar ──────────────────────────────────────────────────────
-          Container(
-            decoration: BoxDecoration(
-              color: colour.kAccent,
-              borderRadius: BorderRadius.circular(22),
-              border: Border.all(color: colour.kPrimaryLight.withOpacity(0.3)),
-            ),
-            child: TextField(
+          _SearchBar(
               controller: _searchController,
-              onSubmitted: (_) => _onSearch(),
-              decoration: InputDecoration(
-                hintText: "Search bills, invoices...",
-                hintStyle: GoogleFonts.lato(
-                  color: Colors.grey.shade500,
-                  fontSize: 16,
-                ),
-                prefixIcon: const Icon(Icons.search_rounded, color: colour.kPrimary),
-                suffixIcon: IconButton(
-                  icon: const Icon(Icons.arrow_forward_ios_rounded,
-                      color: colour.kPrimary),
-                  onPressed: _onSearch,
-                ),
-                filled: false,
-                contentPadding: const EdgeInsets.symmetric(
-                    horizontal: 20, vertical: 14),
-                border: InputBorder.none,
-              ),
-              style: GoogleFonts.lato(
-                color: Colors.black87,
-                fontSize: 17,
-              ),
-            ),
-          ),
-
+              onSearch: _onSearch,
+              isTablet: false),
           const SizedBox(height: 20),
 
-          // ── Results ─────────────────────────────────────────────────────────
           Expanded(
             child: BlocBuilder<BocBloc, BocState>(
               builder: (context, state) {
-
-                // ── Initial ──
                 if (state is BocInitial) {
-                  return Center(
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Icon(Icons.search_rounded,
-                            size: 64, color: colour.kAccent),
-                        const SizedBox(height: 12),
-                        Text(
-                          "Search bills or invoices above",
-                          style: GoogleFonts.lato(
-                              fontSize: 15, color: Colors.grey),
-                        ),
-                      ],
-                    ),
-                  );
+                  return _InitialHint(isTablet: false);
                 }
-
-                // ── Loading ──
                 if (state is BocLoading) {
                   return const Center(
-                    child: CircularProgressIndicator(color: colour.kPrimary),
+                    child: CircularProgressIndicator(
+                        color: colour.kPrimary),
                   );
                 }
-
-                // ── Error ──
                 if (state is BocError) {
-                  return Center(
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        const Icon(Icons.error_outline,
-                            color: Colors.red, size: 48),
-                        const SizedBox(height: 12),
-                        Text(
-                          state.message,
-                          textAlign: TextAlign.center,
-                          style: GoogleFonts.lato(
-                              color: Colors.red, fontSize: 14),
-                        ),
-                        const SizedBox(height: 16),
-                        ElevatedButton.icon(
-                          onPressed: _onSearch,
-                          icon: const Icon(Icons.refresh),
-                          label: const Text("Retry"),
-                          style: ElevatedButton.styleFrom(
-                              backgroundColor: colour.kPrimary),
-                        ),
-                      ],
-                    ),
-                  );
+                  return _ErrorState(
+                      message: state.message,
+                      onRetry: _onSearch,
+                      isTablet: false);
                 }
-
-                // ── Empty ──
                 if (state is BocEmpty) {
-                  return Center(
-                    child: Text(
-                      "No records found.",
-                      style: GoogleFonts.lato(
-                          fontSize: 16, color: Colors.grey),
-                    ),
-                  );
+                  return _EmptyState(isTablet: false);
                 }
-
-                // ── Loaded ──
                 if (state is BocLoaded) {
                   return ListView.builder(
                     itemCount: state.boDetails.length,
-                    itemBuilder: (context, index) {
-                      final data = state.boDetails[index];
-                      return _BocCard(data: data);
-                    },
+                    itemBuilder: (context, index) =>
+                        _BocCard(
+                            data:     state.boDetails[index],
+                            isTablet: false),
                   );
                 }
-
                 return const SizedBox.shrink();
               },
             ),
@@ -181,10 +225,216 @@ class _BocBodyState extends State<_BocBody> {
   }
 }
 
-// ── BOC Card ──────────────────────────────────────────────────────────────────
+// ─── Search Bar ───────────────────────────────────────────────────────────────
+class _SearchBar extends StatelessWidget {
+  final TextEditingController controller;
+  final VoidCallback onSearch;
+  final bool isTablet;
+  const _SearchBar({
+    required this.controller,
+    required this.onSearch,
+    required this.isTablet,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: BoxDecoration(
+        color: colour.kAccent,
+        borderRadius: BorderRadius.circular(isTablet ? 24 : 22),
+        border:
+        Border.all(color: colour.kPrimaryLight.withOpacity(0.3)),
+      ),
+      child: TextField(
+        controller: controller,
+        onSubmitted: (_) => onSearch(),
+        decoration: InputDecoration(
+          hintText:  "Search bills, invoices...",
+          hintStyle: GoogleFonts.lato(
+            color:    Colors.grey.shade500,
+            fontSize: isTablet ? 15 : 16,
+          ),
+          prefixIcon: Icon(Icons.search_rounded,
+              color: colour.kPrimary,
+              size:  isTablet ? 22 : 20),
+          suffixIcon: IconButton(
+            icon: Icon(Icons.arrow_forward_ios_rounded,
+                color: colour.kPrimary,
+                size:  isTablet ? 20 : 18),
+            onPressed: onSearch,
+          ),
+          filled:         false,
+          contentPadding: EdgeInsets.symmetric(
+            horizontal: isTablet ? 22 : 20,
+            vertical:   isTablet ? 16 : 14,
+          ),
+          border: InputBorder.none,
+        ),
+        style: GoogleFonts.lato(
+          color:    Colors.black87,
+          fontSize: isTablet ? 16 : 17,
+        ),
+      ),
+    );
+  }
+}
+
+// ─── Result Count Badge (Tablet left panel) ───────────────────────────────────
+class _ResultCountBadge extends StatelessWidget {
+  final int count;
+  const _ResultCountBadge({required this.count});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
+      decoration: BoxDecoration(
+        gradient: const LinearGradient(
+          colors: [colour.kPrimary, colour.kPrimaryDark],
+          begin: Alignment.topLeft,
+          end:   Alignment.bottomRight,
+        ),
+        borderRadius: BorderRadius.circular(20),
+        boxShadow: [
+          BoxShadow(
+            color:     colour.kPrimary.withOpacity(0.28),
+            blurRadius: 16,
+            offset:    const Offset(0, 6),
+          ),
+        ],
+      ),
+      child: Row(children: [
+        Container(
+          padding: const EdgeInsets.all(10),
+          decoration: BoxDecoration(
+            color: colour.kWhite.withOpacity(0.20),
+            shape: BoxShape.circle,
+          ),
+          child: const Icon(Icons.receipt_long_rounded,
+              color: colour.kWhite, size: 22),
+        ),
+        const SizedBox(width: 14),
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text('Results Found',
+                style: GoogleFonts.lato(
+                  fontSize:   12,
+                  color:      colour.kWhite.withOpacity(0.75),
+                  fontWeight: FontWeight.w500,
+                )),
+            Text('$count',
+                style: GoogleFonts.lato(
+                  fontSize:   28,
+                  color:      colour.kWhite,
+                  fontWeight: FontWeight.bold,
+                )),
+          ],
+        ),
+      ]),
+    );
+  }
+}
+
+// ─── Initial Hint ─────────────────────────────────────────────────────────────
+class _InitialHint extends StatelessWidget {
+  final bool isTablet;
+  const _InitialHint({required this.isTablet});
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(Icons.search_rounded,
+              size:  isTablet ? 72 : 64,
+              color: colour.kAccent),
+          const SizedBox(height: 12),
+          Text(
+            "Search bills or invoices above",
+            style: GoogleFonts.lato(
+                fontSize: isTablet ? 16 : 15,
+                color:    Colors.grey),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+// ─── Error State ──────────────────────────────────────────────────────────────
+class _ErrorState extends StatelessWidget {
+  final String message;
+  final VoidCallback onRetry;
+  final bool isTablet;
+  const _ErrorState({
+    required this.message,
+    required this.onRetry,
+    required this.isTablet,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(Icons.error_outline,
+              color: Colors.red,
+              size:  isTablet ? 60 : 48),
+          SizedBox(height: isTablet ? 16 : 12),
+          Text(message,
+              textAlign: TextAlign.center,
+              style: GoogleFonts.lato(
+                  color:    Colors.red,
+                  fontSize: isTablet ? 15 : 14)),
+          SizedBox(height: isTablet ? 20 : 16),
+          ElevatedButton.icon(
+            onPressed: onRetry,
+            icon:  Icon(Icons.refresh,
+                size: isTablet ? 20 : 18),
+            label: Text("Retry",
+                style: GoogleFonts.lato(
+                    fontSize: isTablet ? 15 : 14)),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: colour.kPrimary,
+              padding: EdgeInsets.symmetric(
+                horizontal: isTablet ? 28 : 20,
+                vertical:   isTablet ? 12 : 10,
+              ),
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12)),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+// ─── Empty State ──────────────────────────────────────────────────────────────
+class _EmptyState extends StatelessWidget {
+  final bool isTablet;
+  const _EmptyState({required this.isTablet});
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Text("No records found.",
+          style: GoogleFonts.lato(
+              fontSize: isTablet ? 18 : 16,
+              color:    Colors.grey)),
+    );
+  }
+}
+
+// ─── BOC Card ─────────────────────────────────────────────────────────────────
 class _BocCard extends StatelessWidget {
   final BoDetailResponse data;
-  const _BocCard({required this.data});
+  final bool isTablet;
+  const _BocCard({required this.data, required this.isTablet});
 
   @override
   Widget build(BuildContext context) {
@@ -194,16 +444,17 @@ class _BocCard extends StatelessWidget {
     return Column(
       children: masters.map<Widget>((master) {
         return Container(
-          margin: const EdgeInsets.symmetric(vertical: 10),
+          margin: EdgeInsets.symmetric(
+              vertical: isTablet ? 12 : 10),
           decoration: BoxDecoration(
-            color: colour.kWhite,
-            borderRadius: BorderRadius.circular(20),
+            color:         colour.kWhite,
+            borderRadius: BorderRadius.circular(isTablet ? 24 : 20),
             border: Border.all(color: colour.kAccent, width: 1.5),
             boxShadow: [
               BoxShadow(
-                color: colour.kPrimary.withOpacity(0.07),
+                color:     colour.kPrimary.withOpacity(0.07),
                 blurRadius: 12,
-                offset: const Offset(0, 5),
+                offset:    const Offset(0, 5),
               ),
             ],
           ),
@@ -211,71 +462,70 @@ class _BocCard extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
 
-              // ── Card Header ─────────────────────────────────────────────────
+              // Card Header
               Container(
-                padding: const EdgeInsets.symmetric(
-                    horizontal: 18, vertical: 16),
-                decoration: const BoxDecoration(
+                padding: EdgeInsets.symmetric(
+                  horizontal: isTablet ? 22 : 18,
+                  vertical:   isTablet ? 18 : 16,
+                ),
+                decoration: BoxDecoration(
                   color: colour.kPrimary,
                   borderRadius: BorderRadius.only(
-                    topLeft: Radius.circular(20),
-                    topRight: Radius.circular(20),
+                    topLeft:  Radius.circular(isTablet ? 24 : 20),
+                    topRight: Radius.circular(isTablet ? 24 : 20),
                   ),
                 ),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Row(
-                      children: [
-                        const Icon(Icons.receipt_long_rounded,
-                            color: colour.kWhite, size: 22),
-                        const SizedBox(width: 10),
-                        Text(
-                          master.billNoDisplay,
+                    Row(children: [
+                      Icon(Icons.receipt_long_rounded,
+                          color: colour.kWhite,
+                          size:  isTablet ? 24 : 22),
+                      const SizedBox(width: 10),
+                      Text(master.billNoDisplay,
                           style: GoogleFonts.lato(
-                            fontSize: 18,
+                            fontSize:   isTablet ? 20 : 18,
                             fontWeight: FontWeight.bold,
-                            color: colour.kWhite,
-                          ),
-                        ),
-                      ],
-                    ),
-                    // Status Badge
+                            color:      colour.kWhite,
+                          )),
+                    ]),
                     Container(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 12, vertical: 5),
+                      padding: EdgeInsets.symmetric(
+                        horizontal: isTablet ? 14 : 12,
+                        vertical:   isTablet ? 6  : 5,
+                      ),
                       decoration: BoxDecoration(
                         color: master.billStatus == "Open"
                             ? Colors.green.shade400
                             : Colors.red.shade400,
                         borderRadius: BorderRadius.circular(20),
                       ),
-                      child: Text(
-                        master.billStatus,
-                        style: GoogleFonts.lato(
-                          fontSize: 12,
-                          fontWeight: FontWeight.bold,
-                          color: colour.kWhite,
-                        ),
-                      ),
+                      child: Text(master.billStatus,
+                          style: GoogleFonts.lato(
+                            fontSize:   isTablet ? 13 : 12,
+                            fontWeight: FontWeight.bold,
+                            color:      colour.kWhite,
+                          )),
                     ),
                   ],
                 ),
               ),
 
-              // ── Card Body ───────────────────────────────────────────────────
+              // Card Body
               Padding(
-                padding: const EdgeInsets.all(18),
+                padding: EdgeInsets.all(isTablet ? 22 : 18),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-
-                    _buildInfoRow(Icons.store_rounded, "Supplier",
-                        master.supplierName),
+                    _buildInfoRow(Icons.store_rounded,
+                        "Supplier", master.supplierName,
+                        isTablet: isTablet),
                     _buildDivider(),
 
-                    _buildInfoRow(Icons.person_rounded, "Employee",
-                        master.employeeName),
+                    _buildInfoRow(Icons.person_rounded,
+                        "Employee", master.employeeName,
+                        isTablet: isTablet),
                     _buildDivider(),
 
                     // Invoice row
@@ -283,50 +533,49 @@ class _BocCard extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Container(
-                          width: 36,
-                          height: 36,
+                          width:  isTablet ? 40 : 36,
+                          height: isTablet ? 40 : 36,
                           decoration: BoxDecoration(
-                            color: colour.kAccent,
+                            color:         colour.kAccent,
                             borderRadius: BorderRadius.circular(8),
                           ),
-                          child: const Icon(Icons.description_rounded,
-                              color: colour.kPrimary, size: 18),
+                          child: Icon(Icons.description_rounded,
+                              color: colour.kPrimary,
+                              size:  isTablet ? 20 : 18),
                         ),
                         const SizedBox(width: 12),
                         Expanded(
                           child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
+                            crossAxisAlignment:
+                            CrossAxisAlignment.start,
                             children: [
-                              Text(
-                                "Invoice",
-                                style: GoogleFonts.lato(
-                                  fontSize: 12,
-                                  color: Colors.grey[500],
-                                  fontWeight: FontWeight.w600,
-                                  letterSpacing: 0.5,
-                                ),
-                              ),
+                              Text("Invoice",
+                                  style: GoogleFonts.lato(
+                                    fontSize:      isTablet ? 13 : 12,
+                                    color:         Colors.grey[500],
+                                    fontWeight:    FontWeight.w600,
+                                    letterSpacing: 0.5,
+                                  )),
                               const SizedBox(height: 2),
                               RichText(
-                                text: TextSpan(
-                                  children: [
-                                    TextSpan(
-                                      text: "${master.invoiceNo}  ",
-                                      style: GoogleFonts.lato(
-                                        fontSize: 15,
-                                        fontWeight: FontWeight.bold,
-                                        color: colour.kPrimaryDark,
-                                      ),
+                                text: TextSpan(children: [
+                                  TextSpan(
+                                    text: "${master.invoiceNo}  ",
+                                    style: GoogleFonts.lato(
+                                      fontSize:   isTablet ? 16 : 15,
+                                      fontWeight: FontWeight.bold,
+                                      color:      colour.kPrimaryDark,
                                     ),
-                                    TextSpan(
-                                      text: "(${master.invoiceDate})",
-                                      style: GoogleFonts.lato(
-                                        fontSize: 13,
-                                        color: Colors.grey[600],
-                                      ),
+                                  ),
+                                  TextSpan(
+                                    text:
+                                    "(${master.invoiceDate})",
+                                    style: GoogleFonts.lato(
+                                      fontSize: isTablet ? 14 : 13,
+                                      color:    Colors.grey[600],
                                     ),
-                                  ],
-                                ),
+                                  ),
+                                ]),
                               ),
                             ],
                           ),
@@ -335,50 +584,52 @@ class _BocCard extends StatelessWidget {
                     ),
                     _buildDivider(),
 
-                    // Net Amount — highlighted
+                    // Net Amount
                     Container(
                       width: double.infinity,
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 14, vertical: 10),
+                      padding: EdgeInsets.symmetric(
+                        horizontal: isTablet ? 16 : 14,
+                        vertical:   isTablet ? 12 : 10,
+                      ),
                       decoration: BoxDecoration(
-                        color: colour.kAccent,
+                        color:         colour.kAccent,
                         borderRadius: BorderRadius.circular(10),
                       ),
-                      child: Row(
-                        children: [
-                          const Icon(Icons.currency_rupee_rounded,
-                              color: colour.kPrimary, size: 20),
-                          const SizedBox(width: 8),
-                          Text(
-                            "Net Amount: ₹${master.netAmt.toStringAsFixed(2)}",
-                            style: GoogleFonts.lato(
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
-                              color: colour.kPrimaryDark,
-                            ),
+                      child: Row(children: [
+                        Icon(Icons.currency_rupee_rounded,
+                            color: colour.kPrimary,
+                            size:  isTablet ? 22 : 20),
+                        const SizedBox(width: 8),
+                        Text(
+                          "Net Amount: ₹${master.netAmt.toStringAsFixed(2)}",
+                          style: GoogleFonts.lato(
+                            fontSize:   isTablet ? 17 : 16,
+                            fontWeight: FontWeight.bold,
+                            color:      colour.kPrimaryDark,
                           ),
-                        ],
-                      ),
+                        ),
+                      ]),
                     ),
                     _buildDivider(),
 
-                    _buildInfoRow(Icons.notes_rounded, "Description",
-                        master.description),
+                    _buildInfoRow(Icons.notes_rounded,
+                        "Description", master.description,
+                        isTablet: isTablet),
 
-                    // ── Order Details ──────────────────────────────────────
+                    // Order Details
                     if (details.isNotEmpty) ...[
                       _buildDivider(),
-                      Text(
-                        "Order Details",
-                        style: GoogleFonts.lato(
-                          fontSize: 13,
-                          color: Colors.grey[500],
-                          fontWeight: FontWeight.w600,
-                          letterSpacing: 0.5,
-                        ),
-                      ),
+                      Text("Order Details",
+                          style: GoogleFonts.lato(
+                            fontSize:      isTablet ? 14 : 13,
+                            color:         Colors.grey[500],
+                            fontWeight:    FontWeight.w600,
+                            letterSpacing: 0.5,
+                          )),
                       const SizedBox(height: 10),
-                      ...details.map<Widget>((d) => _DetailItem(detail: d)),
+                      ...details.map<Widget>((d) =>
+                          _DetailItem(
+                              detail: d, isTablet: isTablet)),
                     ],
                   ],
                 ),
@@ -393,40 +644,42 @@ class _BocCard extends StatelessWidget {
   Widget _buildDivider() =>
       Divider(color: colour.kAccent, thickness: 1.5, height: 24);
 
-  Widget _buildInfoRow(IconData icon, String label, String value) {
+  Widget _buildInfoRow(
+      IconData icon, String label, String value,
+      {required bool isTablet}) {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Container(
-          width: 36,
-          height: 36,
+          width:  isTablet ? 40 : 36,
+          height: isTablet ? 40 : 36,
           decoration: BoxDecoration(
-            color: colour.kAccent,
+            color:         colour.kAccent,
             borderRadius: BorderRadius.circular(8),
           ),
-          child: Icon(icon, color: colour.kPrimary, size: 18),
+          child: Icon(icon,
+              color: colour.kPrimary,
+              size:  isTablet ? 20 : 18),
         ),
         const SizedBox(width: 12),
         Expanded(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(
-                label,
-                style: GoogleFonts.lato(
-                  fontSize: 12,
-                  color: Colors.grey[500],
-                  fontWeight: FontWeight.w600,
-                  letterSpacing: 0.5,
-                ),
-              ),
+              Text(label,
+                  style: GoogleFonts.lato(
+                    fontSize:      isTablet ? 13 : 12,
+                    color:         Colors.grey[500],
+                    fontWeight:    FontWeight.w600,
+                    letterSpacing: 0.5,
+                  )),
               const SizedBox(height: 2),
               Text(
                 value.isNotEmpty ? value : "Not Available",
                 style: GoogleFonts.lato(
-                  fontSize: 15,
+                  fontSize:   isTablet ? 16 : 15,
                   fontWeight: FontWeight.w700,
-                  color: colour.kPrimaryDark,
+                  color:      colour.kPrimaryDark,
                 ),
               ),
             ],
@@ -437,49 +690,52 @@ class _BocCard extends StatelessWidget {
   }
 }
 
-// ── Detail Item Card ──────────────────────────────────────────────────────────
+// ─── Detail Item ──────────────────────────────────────────────────────────────
 class _DetailItem extends StatelessWidget {
   final dynamic detail;
-  const _DetailItem({required this.detail});
+  final bool isTablet;
+  const _DetailItem(
+      {required this.detail, required this.isTablet});
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: const EdgeInsets.only(bottom: 10),
-      padding: const EdgeInsets.all(12),
+      margin: EdgeInsets.only(bottom: isTablet ? 12 : 10),
+      padding: EdgeInsets.all(isTablet ? 14 : 12),
       decoration: BoxDecoration(
-        color: colour.kAccent.withOpacity(0.6),
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: colour.kPrimaryLight.withOpacity(0.2)),
+        color:         colour.kAccent.withOpacity(0.6),
+        borderRadius: BorderRadius.circular(isTablet ? 14 : 12),
+        border: Border.all(
+            color: colour.kPrimaryLight.withOpacity(0.2)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
-            children: [
-              const Icon(Icons.inventory_2_rounded,
-                  color: colour.kPrimary, size: 16),
-              const SizedBox(width: 8),
-              Expanded(
-                child: Text(
-                  detail.productName,
-                  style: GoogleFonts.lato(
-                    fontSize: 15,
-                    fontWeight: FontWeight.w700,
-                    color: colour.kPrimaryDark,
-                  ),
+          Row(children: [
+            Icon(Icons.inventory_2_rounded,
+                color: colour.kPrimary,
+                size:  isTablet ? 18 : 16),
+            const SizedBox(width: 8),
+            Expanded(
+              child: Text(
+                detail.productName,
+                style: GoogleFonts.lato(
+                  fontSize:   isTablet ? 16 : 15,
+                  fontWeight: FontWeight.w700,
+                  color:      colour.kPrimaryDark,
                 ),
               ),
-            ],
-          ),
-          if (detail.RemarksD != null && detail.RemarksD!.isNotEmpty)
+            ),
+          ]),
+          if (detail.RemarksD != null &&
+              detail.RemarksD!.isNotEmpty)
             Padding(
               padding: const EdgeInsets.only(top: 6, left: 24),
               child: Text(
                 "Remarks: ${detail.RemarksD}",
                 style: GoogleFonts.lato(
-                  fontSize: 13,
-                  color: Colors.grey[600],
+                  fontSize:  isTablet ? 14 : 13,
+                  color:     Colors.grey[600],
                   fontStyle: FontStyle.italic,
                 ),
               ),

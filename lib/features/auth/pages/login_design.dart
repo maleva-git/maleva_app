@@ -2,7 +2,6 @@ part of 'package:maleva/features/auth/pages/login_page.dart.dart';
 
 // ─── Design tokens ─────────────────────────────────────────────────────────────
 
-
 // ─── Responsive shell ─────────────────────────────────────────────────────────
 class mobiledesign extends StatelessWidget {
   const mobiledesign({super.key});

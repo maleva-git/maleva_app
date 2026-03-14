@@ -44,221 +44,204 @@ import '../tabs/vesselreport/view/vesselreportview_tab.dart';
 
 class MobileDashboard extends StatelessWidget {
   final TabController tabController;
-
-  const MobileDashboard({required this.tabController, super.key});
+  final bool isTablet;
+  const MobileDashboard({required this.tabController, required this.isTablet, super.key});
 
   @override
   Widget build(BuildContext context) {
-    double height = MediaQuery
-        .of(context)
-        .size
-        .height;
 
     return Scaffold(
       resizeToAvoidBottomInset: false,
       backgroundColor: Colors.white,
-      appBar: AppBar(
-        backgroundColor: AppColors.appBarColor,
-        title: SizedBox(
-          height: height * 0.05,
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              Text('Dash Board',
-                  style: GoogleFonts.lato(textStyle: TextStyle(
-                    color: colour.topAppBarColor,
-                    fontWeight: FontWeight.bold,
-                    fontFamily: 'Alatsi',
-                    fontSize: objfun.FontLarge,
-                  ))),
-            ],
-          ),
-
-        ),
-        iconTheme: const IconThemeData(color: colour.topAppBarColor),
-        actions: <Widget>[
-
-          // IconButton(
-          //   icon: const Icon(
-          //     Icons.refresh,
-          //     size: 30.0,
-          //     color: colour.topAppBarColor,
-          //   ),
-          //   onPressed: () {
-          //     Navigator.push(context, MaterialPageRoute(builder: (context) => const AdminDashboard()));
-          //   },
-          // ),
-          IconButton(
-            icon: const Icon(
-              Icons.directions_boat_filled,
-              size: 25.0,
-              color: colour.topAppBarColor,
-            ),
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => Saleorderview()),
-              );
-            },
-          ),
-
-          IconButton(
-            icon: const Icon(
-              Icons.bluetooth_audio,
-              size: 25.0,
-              color: colour.topAppBarColor,
-            ),
-            onPressed: () {
-              Navigator.push(context, MaterialPageRoute(builder: (
-                  context) => Bluetoothpage()));
-            },
-          ),
-          IconButton(
-            icon: const Icon(
-              Icons.print,
-              size: 25.0,
-              color: colour.topAppBarColor,
-            ),
-            onPressed: ()async {
-
-              await objfun.printdata([BarcodePrintModel(
-                  "MALEVA", "SHIPNAME", "SHIPNAME", "B0005000", "2025-05-04",
-                  "WESTPORT", "WESTPORT","(1/3)")
-              ]);
-            },
-          ),
-          IconButton(
-            icon: const Icon(
-              Icons.exit_to_app,
-              size: 30.0,
-              color: colour.topAppBarColor,
-            ),
-            onPressed: () {
-              objfun.logout(context);
-            },
-          ),
-        ],
-
-      ),
+      appBar: _buildAppBar(context, isTablet),
       drawer: const Menulist(),
       body: Column(
         children: [
-          Container(
-            margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-            padding: const EdgeInsets.all(6),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(30),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withOpacity(0.05),
-                  blurRadius: 8,
-                  offset: const Offset(0, 4),
-                )
-              ],
-            ),
-            child: TabBar(
-              controller: tabController,
-              isScrollable: true,
-              indicator: BoxDecoration(
-                color: AppColors.appBarColor,
-                borderRadius: BorderRadius.circular(25),
-              ),
-              indicatorSize: TabBarIndicatorSize.tab,
-              labelColor: Colors.white,
-              unselectedLabelColor: const Color(0xFF1A2E5A),
-              labelStyle: const TextStyle(
-                fontWeight: FontWeight.w600,
-                fontSize: 13,
-              ),
-              unselectedLabelStyle: const TextStyle(
-                fontWeight: FontWeight.w500,
-                fontSize: 13,
-              ),
-              tabs: const [
-                Tab(text: 'Invoice'),
-                Tab(text: 'ReceiptView'),
-                Tab(text: 'SO'),
-                Tab(text: 'FW'),
-                Tab(text: 'EXP'),
-                Tab(text: 'VSL'),
-                Tab(text: 'TRANSPORT'),
-                Tab(text: 'Truck'),
-                Tab(text: 'Driver'),
-                Tab(text: 'SpeedingReport'),
-                Tab(text: 'FuelFilling'),
-                Tab(text: 'EngineHours'),
-                Tab(text: 'BOCheck'),
-                Tab(text: 'Email'),
-                Tab(text: 'GoogleReview'),
-                Tab(text: 'Fuel'),
-                Tab(text: 'EmployeeView'),
-                Tab(text: 'PettyCash'),
-                Tab(text: 'SummonEntry'),
-                Tab(text: 'SparePartsEntry'),
-                Tab(text: 'PaymentView'),
-                Tab(text: 'SpotsSaleOrder'),
-                Tab(text: 'InventoryReport'),
-                Tab(text: 'PDO'),
-                Tab(text: 'RTI'),
+          _buildTabBar(isTablet),
+          Expanded(child: _buildTabBarView(context)),
+        ],
+      ),
+    );
+  }
 
-              ],
-            ),
+  // ── AppBar ────────────────────────────────────────────────────────────
+  PreferredSizeWidget _buildAppBar(BuildContext context, bool isTablet) {
+    return AppBar(
+      backgroundColor: AppColors.appBarColor,
+      toolbarHeight: isTablet ? 64 : 56,
+      title: Text(
+        'Dash Board',
+        style: GoogleFonts.lato(
+          color: colour.topAppBarColor,
+          fontWeight: FontWeight.bold,
+          fontSize: isTablet ? 20 : objfun.FontLarge,
+        ),
+      ),
+      iconTheme: const IconThemeData(color: colour.topAppBarColor),
+      actions: [
+        IconButton(
+          icon: Icon(Icons.directions_boat_filled,
+              size: isTablet ? 28 : 25, color: colour.topAppBarColor),
+          onPressed: () => Navigator.push(context,
+              MaterialPageRoute(builder: (_) => Saleorderview())),
+        ),
+        IconButton(
+          icon: Icon(Icons.bluetooth_audio,
+              size: isTablet ? 28 : 25, color: colour.topAppBarColor),
+          onPressed: () => Navigator.push(context,
+              MaterialPageRoute(builder: (_) => Bluetoothpage())),
+        ),
+        IconButton(
+          icon: Icon(Icons.print,
+              size: isTablet ? 28 : 25, color: colour.topAppBarColor),
+          onPressed: () async {
+            await objfun.printdata([
+              BarcodePrintModel("MALEVA", "SHIPNAME", "SHIPNAME",
+                  "B0005000", "2025-05-04", "WESTPORT", "WESTPORT", "(1/3)")
+            ]);
+          },
+        ),
+        IconButton(
+          icon: Icon(Icons.exit_to_app,
+              size: isTablet ? 32 : 30, color: colour.topAppBarColor),
+          onPressed: () => objfun.logout(context),
+        ),
+        if (isTablet) const SizedBox(width: 8),
+      ],
+    );
+  }
+
+  // ── TabBar ────────────────────────────────────────────────────────────
+// ✅ Step 2: _buildTabBar() method-ல container size மாத்து
+  Widget _buildTabBar(bool isTablet) {
+    return Container(
+      margin: EdgeInsets.symmetric(
+        horizontal: isTablet ? 20 : 12,
+        vertical:   isTablet ? 12 : 10,
+      ),
+      padding: EdgeInsets.all(isTablet ? 8 : 6),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(isTablet ? 36 : 30),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.06),
+            blurRadius: isTablet ? 12 : 8,
+            offset: const Offset(0, 4),
           ),
+        ],
+      ),
+      child: TabBar(
+        controller: tabController,
+        isScrollable: true,
+        indicator: BoxDecoration(
+          color: AppColors.appBarColor,
+          borderRadius: BorderRadius.circular(isTablet ? 28 : 25),
+        ),
+        indicatorSize: TabBarIndicatorSize.tab,
+        labelColor: Colors.white,
+        unselectedLabelColor: const Color(0xFF1A2E5A),
+        labelStyle: TextStyle(
+          fontWeight: FontWeight.w600,
+          fontSize: isTablet ? 14 : 13,   // ← இங்கயும் மாத்து
+        ),
+        unselectedLabelStyle: TextStyle(
+          fontWeight: FontWeight.w500,
+          fontSize: isTablet ? 14 : 13,   // ← இங்கயும் மாத்து
+        ),
+        tabs: [
+          _tab('Invoice',         isTablet),  // ← isTablet pass பண்ணு
+          _tab('ReceiptView',     isTablet),
+          _tab('SO',              isTablet),
+          _tab('FW',              isTablet),
+          _tab('EXP',             isTablet),
+          _tab('VSL',             isTablet),
+          _tab('TRANSPORT',       isTablet),
+          _tab('Truck',           isTablet),
+          _tab('Driver',          isTablet),
+          _tab('SpeedingReport',  isTablet),
+          _tab('FuelFilling',     isTablet),
+          _tab('EngineHours',     isTablet),
+          _tab('BOCheck',         isTablet),
+          _tab('Email',           isTablet),
+          _tab('GoogleReview',    isTablet),
+          _tab('Fuel',            isTablet),
+          _tab('EmployeeView',    isTablet),
+          _tab('PettyCash',       isTablet),
+          _tab('SummonEntry',     isTablet),
+          _tab('SparePartsEntry', isTablet),
+          _tab('PaymentView',     isTablet),
+          _tab('SpotsSaleOrder',  isTablet),
+          _tab('InventoryReport', isTablet),
+          _tab('PDO',             isTablet),
+          _tab('RTI',             isTablet),
+        ],
+      ),
+    );
+  }
 
-          Expanded(
-            child: BlocListener<AdminTabBloc, AdminTabState>(
-              listener: (context, tabState) {
-                switch (tabState.index) {
-                  case 0:
-                    context.read<SalesBloc>().add(LoadSales(0));
-                    break;
-                  case 6:
-                    context.read<TruckBloc>().add(LoadTruckList());
-                    break;
-                }
-              },
-              child: TabBarView(
-
-
-                controller: tabController,
-                children: [
-                  const InvoiceTab(),
-                  const ReceiptPage(),
-                  const SalesOrderTab(),
-                  const ForwardingReportPage(),
-                  const ExpenseReportPage(),
-                  const VesselReportPage(),
-                  const TransportReportPage(),
-                  const TruckDetailsReportPage(),
-                  const DriverDetailsView(),
-                  const SpeedingScreen(),
-                  const FuelFillingPage(),
-                  const EngineHoursPage(),
-                  const BocPage(),
-                  const EmailPage(),
-                  const ReviewEntryPage(),
-                  const FuelDiffPage(),
-                  const EmployeeViewPage(),
-                  const PettyCashPage(),
-                  const SummonEntryPage(),
-                  const SparePartsEntryPage(),
-                  const PaymentPendingPage(),
-                  const SpotSaleEntryPage(),
-                  const InventoryPage(),
-                  PDOViewPage(
-                    fromDate: DateFormat('yyyy-MM-dd')
-                        .format(DateTime.now().subtract(const Duration(days: 30))),
-                    toDate: DateFormat('yyyy-MM-dd')
-                        .format(DateTime.now()),
-                  ),
-                 const RTIDetailsPage()
-
-                ],
-              ),
-            ),
+  // ── Tab item ──────────────────────────────────────────────────────────
+// ✅ Step 1: _tab() method-ல isTablet add பண்ணு
+  Tab _tab(String text, bool isTablet) => Tab(
+    height: isTablet ? 42 : null,
+    child: Padding(
+      padding: EdgeInsets.symmetric(
+        horizontal: isTablet ? 6 : 2,
+      ),
+      child: Text(
+        text,
+        style: TextStyle(
+          fontSize: isTablet ? 14 : 13,
+          fontWeight: FontWeight.w600,
+        ),
+      ),
+    ),
+  );
+  // ── TabBarView ────────────────────────────────────────────────────────
+  Widget _buildTabBarView(BuildContext context) {
+    return BlocListener<AdminTabBloc, AdminTabState>(
+      listener: (context, tabState) {
+        switch (tabState.index) {
+          case 0:
+            context.read<SalesBloc>().add(LoadSales(0));
+            break;
+          case 6:
+            context.read<TruckBloc>().add(LoadTruckList());
+            break;
+        }
+      },
+      child: TabBarView(
+        controller: tabController,
+        children: [
+          const InvoiceTab(),
+          const ReceiptPage(),
+          const SalesOrderTab(),
+          const ForwardingReportPage(),
+          const ExpenseReportPage(),
+          const VesselReportPage(),
+          const TransportReportPage(),
+          const TruckDetailsReportPage(),
+          const DriverDetailsView(),
+          const SpeedingScreen(),
+          const FuelFillingPage(),
+          const EngineHoursPage(),
+          const BocPage(),
+          const EmailPage(),
+          const ReviewEntryPage(),
+          const FuelDiffPage(),
+          const EmployeeViewPage(),
+          const PettyCashPage(),
+          const SummonEntryPage(),
+          const SparePartsEntryPage(),
+          const PaymentPendingPage(),
+          const SpotSaleEntryPage(),
+          const InventoryPage(),
+          PDOViewPage(
+            fromDate: DateFormat('yyyy-MM-dd')
+                .format(DateTime.now().subtract(const Duration(days: 30))),
+            toDate: DateFormat('yyyy-MM-dd').format(DateTime.now()),
           ),
+          const RTIDetailsPage(),
         ],
       ),
     );

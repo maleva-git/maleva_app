@@ -8,8 +8,6 @@ import 'package:maleva/features/dashboard/admin_dashboard/tabs/ExpenseReport/blo
 import 'package:maleva/core/utils/clsfunction.dart' as objfun;
 import 'package:maleva/core/colors/colors.dart' as colour;
 
-
-
 class ExpenseReportPage extends StatelessWidget {
   const ExpenseReportPage({super.key});
 
@@ -32,6 +30,8 @@ class ExpenseReportView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isTablet = MediaQuery.of(context).size.width >= 600;
+
     return BlocConsumer<ExpenseReportBloc, ExpReportState>(
       listener: (context, state) {
         if (state.status == ExpStatus.failure) {
@@ -56,49 +56,135 @@ class ExpenseReportView extends StatelessWidget {
 
         return Container(
           color: const Color(0xFFF4F6FF),
-          child: ListView(
-            padding: const EdgeInsets.fromLTRB(16, 20, 16, 24),
-            children: [
-              // ── Header ──────────────────────────────────────────────────────
-              _SectionHeader(title: 'Expense Report'),
-              const SizedBox(height: 16),
-
-              // ── Summary Card ─────────────────────────────────────────────────
-              _SummaryCard(saleExpReport: state.saleExpReport),
-              const SizedBox(height: 20),
-
-              // ── Date Picker Row ───────────────────────────────────────────────
-              _DatePickerCard(),
-              const SizedBox(height: 20),
-
-              // ── Detail List Header ────────────────────────────────────────────
-              _ListHeader(),
-              const SizedBox(height: 8),
-
-              // ── Detail Items ──────────────────────────────────────────────────
-              ...List.generate(state.saleExpReport2.length, (index) {
-                final item        = state.saleExpReport2[index];
-                final expenseName = item["ExpenseName"] ?? "-";
-                final expAmount   = (item["ExpAmount"] ?? 0).toDouble();
-                final expCount    = (item["ExpCount"]  ?? 0).toDouble();
-
-                return _ExpenseItemCard(
-                  name:   expenseName,
-                  count:  expCount.toStringAsFixed(0),
-                  amount: expAmount.toStringAsFixed(0),
-                  index:  index,
-                  onTap:  () => context.read<ExpenseReportBloc>().add(
-                    LoadExpReportEvent(
-                      fromDate: state.dtpFromDate,
-                      toDate:   state.dtpToDate,
-                    ),
-                  ),
-                );
-              }),
-            ],
-          ),
+          child: isTablet
+              ? _buildTabletLayout(context, state)
+              : _buildMobileLayout(context, state),
         );
       },
+    );
+  }
+
+  // ══════════════════════════════════════════════════════
+  // TABLET — Two Column
+  // ══════════════════════════════════════════════════════
+  Widget _buildTabletLayout(
+      BuildContext context, ExpReportState state) {
+    return Padding(
+      padding: const EdgeInsets.all(20),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+
+          // ── LEFT (50%) — Header + Summary + DatePicker
+          Expanded(
+            flex: 5,
+            child: SingleChildScrollView(
+              physics: const BouncingScrollPhysics(),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  _SectionHeader(title: 'Expense Report', isTablet: true),
+                  const SizedBox(height: 20),
+                  _SummaryCard(
+                      saleExpReport: state.saleExpReport,
+                      isTablet: true),
+                  const SizedBox(height: 20),
+                  _DatePickerCard(isTablet: true),
+                  const SizedBox(height: 20),
+                ],
+              ),
+            ),
+          ),
+
+          const SizedBox(width: 16),
+
+          // ── RIGHT (50%) — Expense List
+          Expanded(
+            flex: 5,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                _ListHeader(isTablet: true),
+                const SizedBox(height: 10),
+                Expanded(
+                  child: ListView.builder(
+                    physics: const BouncingScrollPhysics(),
+                    itemCount: state.saleExpReport2.length,
+                    itemBuilder: (context, index) {
+                      final item        = state.saleExpReport2[index];
+                      final expenseName = item["ExpenseName"] ?? "-";
+                      final expAmount   =
+                      (item["ExpAmount"] ?? 0).toDouble();
+                      final expCount    =
+                      (item["ExpCount"] ?? 0).toDouble();
+
+                      return _ExpenseItemCard(
+                        name:    expenseName,
+                        count:   expCount.toStringAsFixed(0),
+                        amount:  expAmount.toStringAsFixed(0),
+                        index:   index,
+                        isTablet: true,
+                        onTap: () =>
+                            context.read<ExpenseReportBloc>().add(
+                              LoadExpReportEvent(
+                                fromDate: state.dtpFromDate,
+                                toDate:   state.dtpToDate,
+                              ),
+                            ),
+                      );
+                    },
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // ══════════════════════════════════════════════════════
+  // MOBILE — Single Column
+  // ══════════════════════════════════════════════════════
+  Widget _buildMobileLayout(
+      BuildContext context, ExpReportState state) {
+    return ListView(
+      padding: const EdgeInsets.fromLTRB(16, 20, 16, 24),
+      children: [
+        _SectionHeader(title: 'Expense Report', isTablet: false),
+        const SizedBox(height: 16),
+
+        _SummaryCard(
+            saleExpReport: state.saleExpReport, isTablet: false),
+        const SizedBox(height: 20),
+
+        _DatePickerCard(isTablet: false),
+        const SizedBox(height: 20),
+
+        _ListHeader(isTablet: false),
+        const SizedBox(height: 8),
+
+        ...List.generate(state.saleExpReport2.length, (index) {
+          final item        = state.saleExpReport2[index];
+          final expenseName = item["ExpenseName"] ?? "-";
+          final expAmount   = (item["ExpAmount"] ?? 0).toDouble();
+          final expCount    = (item["ExpCount"]  ?? 0).toDouble();
+
+          return _ExpenseItemCard(
+            name:    expenseName,
+            count:   expCount.toStringAsFixed(0),
+            amount:  expAmount.toStringAsFixed(0),
+            index:   index,
+            isTablet: false,
+            onTap: () => context.read<ExpenseReportBloc>().add(
+              LoadExpReportEvent(
+                fromDate: state.dtpFromDate,
+                toDate:   state.dtpToDate,
+              ),
+            ),
+          );
+        }),
+      ],
     );
   }
 }
@@ -106,39 +192,41 @@ class ExpenseReportView extends StatelessWidget {
 // ─── Section Header ───────────────────────────────────────────────────────────
 class _SectionHeader extends StatelessWidget {
   final String title;
-  const _SectionHeader({required this.title});
+  final bool isTablet;
+  const _SectionHeader(
+      {required this.title, required this.isTablet});
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      children: [
-        Container(
-          width: 4,
-          height: 26,
-          decoration: BoxDecoration(
-            color: colour.kPrimary,
-            borderRadius: BorderRadius.circular(4),
-          ),
+    return Row(children: [
+      Container(
+        width: 4,
+        height: isTablet ? 30 : 26,
+        decoration: BoxDecoration(
+          color: colour.kPrimary,
+          borderRadius: BorderRadius.circular(4),
         ),
-        const SizedBox(width: 10),
-        Text(
-          title.toUpperCase(),
-          style: GoogleFonts.poppins(
-            fontSize: 17,
-            fontWeight: FontWeight.w700,
-            color: colour.kPrimaryDark,
-            letterSpacing: 1.2,
-          ),
+      ),
+      const SizedBox(width: 10),
+      Text(
+        title.toUpperCase(),
+        style: GoogleFonts.poppins(
+          fontSize: isTablet ? 20 : 17,
+          fontWeight: FontWeight.w700,
+          color: colour.kPrimaryDark,
+          letterSpacing: 1.2,
         ),
-      ],
-    );
+      ),
+    ]);
   }
 }
 
 // ─── Summary Card ─────────────────────────────────────────────────────────────
 class _SummaryCard extends StatelessWidget {
   final List<dynamic> saleExpReport;
-  const _SummaryCard({required this.saleExpReport});
+  final bool isTablet;
+  const _SummaryCard(
+      {required this.saleExpReport, required this.isTablet});
 
   String _val(String key) {
     if (saleExpReport.isEmpty) return '0';
@@ -161,7 +249,7 @@ class _SummaryCard extends StatelessWidget {
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(isTablet ? 24 : 20),
         boxShadow: [
           BoxShadow(
             color: colour.kPrimary.withOpacity(0.35),
@@ -171,54 +259,57 @@ class _SummaryCard extends StatelessWidget {
         ],
       ),
       child: ClipRRect(
-        borderRadius: BorderRadius.circular(20),
-        child: Column(
-          children: [
-            // Card title bar
-            Padding(
-              padding: const EdgeInsets.fromLTRB(20, 16, 20, 8),
-              child: Row(
-                children: [
-                  Expanded(
-                    flex: 3,
-                    child: Text('Period',
-                        style: GoogleFonts.poppins(
-                            color: colour.kWhite.withOpacity(0.75),
-                            fontSize: 12,
-                            fontWeight: FontWeight.w600)),
-                  ),
-                  Expanded(
-                    flex: 2,
-                    child: Text('Count',
-                        textAlign: TextAlign.center,
-                        style: GoogleFonts.poppins(
-                            color: colour.kWhite.withOpacity(0.75),
-                            fontSize: 12,
-                            fontWeight: FontWeight.w600)),
-                  ),
-                  Expanded(
-                    flex: 2,
-                    child: Text('Amount',
-                        textAlign: TextAlign.end,
-                        style: GoogleFonts.poppins(
-                            color: colour.kWhite.withOpacity(0.75),
-                            fontSize: 12,
-                            fontWeight: FontWeight.w600)),
-                  ),
-                ],
+        borderRadius: BorderRadius.circular(isTablet ? 24 : 20),
+        child: Column(children: [
+          // Column headers
+          Padding(
+            padding: EdgeInsets.fromLTRB(
+                isTablet ? 24 : 20,
+                isTablet ? 18 : 16,
+                isTablet ? 24 : 20,
+                8),
+            child: Row(children: [
+              Expanded(
+                flex: 3,
+                child: Text('Period',
+                    style: GoogleFonts.poppins(
+                        color: colour.kWhite.withOpacity(0.75),
+                        fontSize: isTablet ? 13 : 12,
+                        fontWeight: FontWeight.w600)),
               ),
-            ),
-            const Divider(color: Colors.white24, height: 1),
+              Expanded(
+                flex: 2,
+                child: Text('Count',
+                    textAlign: TextAlign.center,
+                    style: GoogleFonts.poppins(
+                        color: colour.kWhite.withOpacity(0.75),
+                        fontSize: isTablet ? 13 : 12,
+                        fontWeight: FontWeight.w600)),
+              ),
+              Expanded(
+                flex: 2,
+                child: Text('Amount',
+                    textAlign: TextAlign.end,
+                    style: GoogleFonts.poppins(
+                        color: colour.kWhite.withOpacity(0.75),
+                        fontSize: isTablet ? 13 : 12,
+                        fontWeight: FontWeight.w600)),
+              ),
+            ]),
+          ),
 
-            // Data rows
-            ...rows.map((row) => _SummaryRow(
-              label:  row['label']!,
-              count:  row['sales']!,
-              amount: row['amount']!,
-            )),
-            const SizedBox(height: 8),
-          ],
-        ),
+          const Divider(color: Colors.white24, height: 1),
+
+          // Data rows
+          ...rows.map((row) => _SummaryRow(
+            label:    row['label']!,
+            count:    row['sales']!,
+            amount:   row['amount']!,
+            isTablet: isTablet,
+          )),
+
+          const SizedBox(height: 8),
+        ]),
       ),
     );
   }
@@ -226,58 +317,70 @@ class _SummaryCard extends StatelessWidget {
 
 class _SummaryRow extends StatelessWidget {
   final String label, count, amount;
-  const _SummaryRow(
-      {required this.label, required this.count, required this.amount});
+  final bool isTablet;
+  const _SummaryRow({
+    required this.label,
+    required this.count,
+    required this.amount,
+    required this.isTablet,
+  });
 
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 9),
-      child: Row(
-        children: [
-          Expanded(
-            flex: 3,
-            child: Text(label,
-                style: GoogleFonts.poppins(
-                    color: colour.kWhite,
-                    fontSize: 13,
-                    fontWeight: FontWeight.w500)),
-          ),
-          Expanded(
-            flex: 2,
-            child: Text(count,
-                textAlign: TextAlign.center,
-                style: GoogleFonts.poppins(
-                    color: colour.kAccent,
-                    fontSize: 13,
-                    fontWeight: FontWeight.w600)),
-          ),
-          Expanded(
-            flex: 2,
-            child: Text(amount,
-                textAlign: TextAlign.end,
-                style: GoogleFonts.poppins(
-                    color: colour.kAccent,
-                    fontSize: 13,
-                    fontWeight: FontWeight.w600)),
-          ),
-        ],
+      padding: EdgeInsets.symmetric(
+        horizontal: isTablet ? 24 : 20,
+        vertical:   isTablet ? 11 : 9,
       ),
+      child: Row(children: [
+        Expanded(
+          flex: 3,
+          child: Text(label,
+              style: GoogleFonts.poppins(
+                  color: colour.kWhite,
+                  fontSize: isTablet ? 14 : 13,
+                  fontWeight: FontWeight.w500)),
+        ),
+        Expanded(
+          flex: 2,
+          child: Text(count,
+              textAlign: TextAlign.center,
+              style: GoogleFonts.poppins(
+                  color: colour.kAccent,
+                  fontSize: isTablet ? 14 : 13,
+                  fontWeight: FontWeight.w600)),
+        ),
+        Expanded(
+          flex: 2,
+          child: Text(amount,
+              textAlign: TextAlign.end,
+              style: GoogleFonts.poppins(
+                  color: colour.kAccent,
+                  fontSize: isTablet ? 14 : 13,
+                  fontWeight: FontWeight.w600)),
+        ),
+      ]),
     );
   }
 }
 
 // ─── Date Picker Card ─────────────────────────────────────────────────────────
 class _DatePickerCard extends StatelessWidget {
+  final bool isTablet;
+  const _DatePickerCard({required this.isTablet});
+
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<ExpenseReportBloc, ExpReportState>(
       builder: (context, state) {
         return Container(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+          padding: EdgeInsets.symmetric(
+            horizontal: isTablet ? 20 : 16,
+            vertical:   isTablet ? 16 : 14,
+          ),
           decoration: BoxDecoration(
             color: colour.kWhite,
-            borderRadius: BorderRadius.circular(16),
+            borderRadius: BorderRadius.circular(isTablet ? 20 : 16),
             border: Border.all(color: colour.kAccent, width: 1.5),
             boxShadow: [
               BoxShadow(
@@ -287,83 +390,86 @@ class _DatePickerCard extends StatelessWidget {
               ),
             ],
           ),
-          child: Row(
-            children: [
-              // From Date
-              Expanded(
-                child: _DateField(
-                  label: 'From',
-                  date: DateFormat("dd MMM yyyy")
-                      .format(DateTime.parse(state.dtpFromDate)),
-                  onTap: () async {
-                    final value = await showDatePicker(
-                      context: context,
-                      initialDate: DateTime.now(),
-                      firstDate: DateTime(1900),
-                      lastDate: DateTime(2050),
-                      builder: (ctx, child) => Theme(
-                        data: Theme.of(ctx).copyWith(
-                          colorScheme: const ColorScheme.light(
-                            primary: colour.kPrimary,
-                            onPrimary: colour.kWhite,
-                            surface: colour.kWhite,
-                          ),
+          child: Row(children: [
+            // From Date
+            Expanded(
+              child: _DateField(
+                label: 'From',
+                date: DateFormat("dd MMM yyyy")
+                    .format(DateTime.parse(state.dtpFromDate)),
+                isTablet: isTablet,
+                onTap: () async {
+                  final value = await showDatePicker(
+                    context: context,
+                    initialDate: DateTime.now(),
+                    firstDate: DateTime(1900),
+                    lastDate: DateTime(2050),
+                    builder: (ctx, child) => Theme(
+                      data: Theme.of(ctx).copyWith(
+                        colorScheme: const ColorScheme.light(
+                          primary: colour.kPrimary,
+                          onPrimary: colour.kWhite,
+                          surface: colour.kWhite,
                         ),
-                        child: child!,
+                      ),
+                      child: child!,
+                    ),
+                  );
+                  if (value != null) {
+                    context.read<ExpenseReportBloc>().add(
+                      ChangeFromDateEvent(
+                        fromDate:
+                        DateFormat("yyyy-MM-dd").format(value),
                       ),
                     );
-                    if (value != null) {
-                      context.read<ExpenseReportBloc>().add(
-                        ChangeFromDateEvent(
-                            fromDate: DateFormat("yyyy-MM-dd").format(value)),
-                      );
-                    }
-                  },
-                ),
+                  }
+                },
               ),
+            ),
 
-              // Divider
-              Container(
-                height: 36,
-                width: 1,
-                color: colour.kAccent,
-                margin: const EdgeInsets.symmetric(horizontal: 12),
-              ),
+            Container(
+              height: isTablet ? 44 : 36,
+              width: 1,
+              color: colour.kAccent,
+              margin: const EdgeInsets.symmetric(horizontal: 12),
+            ),
 
-              // To Date
-              Expanded(
-                child: _DateField(
-                  label: 'To',
-                  date: DateFormat("dd MMM yyyy")
-                      .format(DateTime.parse(state.dtpToDate)),
-                  onTap: () async {
-                    final value = await showDatePicker(
-                      context: context,
-                      initialDate: DateTime.now(),
-                      firstDate: DateTime(1900),
-                      lastDate: DateTime(2050),
-                      builder: (ctx, child) => Theme(
-                        data: Theme.of(ctx).copyWith(
-                          colorScheme: const ColorScheme.light(
-                            primary: colour.kPrimary,
-                            onPrimary: colour.kWhite,
-                            surface: colour.kWhite,
-                          ),
+            // To Date
+            Expanded(
+              child: _DateField(
+                label: 'To',
+                date: DateFormat("dd MMM yyyy")
+                    .format(DateTime.parse(state.dtpToDate)),
+                isTablet: isTablet,
+                onTap: () async {
+                  final value = await showDatePicker(
+                    context: context,
+                    initialDate: DateTime.now(),
+                    firstDate: DateTime(1900),
+                    lastDate: DateTime(2050),
+                    builder: (ctx, child) => Theme(
+                      data: Theme.of(ctx).copyWith(
+                        colorScheme: const ColorScheme.light(
+                          primary: colour.kPrimary,
+                          onPrimary: colour.kWhite,
+                          surface: colour.kWhite,
                         ),
-                        child: child!,
+                      ),
+                      child: child!,
+                    ),
+                  );
+                  if (value != null) {
+                    context.read<ExpenseReportBloc>().add(
+                      ChangeToDateEvent(
+                        toDate:
+                        DateFormat("yyyy-MM-dd").format(value),
                       ),
                     );
-                    if (value != null) {
-                      context.read<ExpenseReportBloc>().add(
-                        ChangeToDateEvent(
-                            toDate: DateFormat("yyyy-MM-dd").format(value)),
-                      );
-                    }
-                  },
-                ),
+                  }
+                },
               ),
-            ],
-          ),
+            ),
+          ]),
         );
       },
     );
@@ -374,8 +480,13 @@ class _DateField extends StatelessWidget {
   final String label;
   final String date;
   final VoidCallback onTap;
-  const _DateField(
-      {required this.label, required this.date, required this.onTap});
+  final bool isTablet;
+  const _DateField({
+    required this.label,
+    required this.date,
+    required this.onTap,
+    required this.isTablet,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -384,35 +495,34 @@ class _DateField extends StatelessWidget {
       borderRadius: BorderRadius.circular(10),
       child: Padding(
         padding: const EdgeInsets.symmetric(vertical: 4),
-        child: Row(
-          children: [
-            Container(
-              padding: const EdgeInsets.all(7),
-              decoration: BoxDecoration(
-                color: colour.kAccent,
-                borderRadius: BorderRadius.circular(10),
-              ),
-              child: const Icon(Icons.calendar_today_rounded,
-                  size: 16, color: colour.kPrimary),
+        child: Row(children: [
+          Container(
+            padding: EdgeInsets.all(isTablet ? 9 : 7),
+            decoration: BoxDecoration(
+              color: colour.kAccent,
+              borderRadius: BorderRadius.circular(10),
             ),
-            const SizedBox(width: 10),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(label,
-                    style: GoogleFonts.poppins(
-                        fontSize: 10,
-                        color: colour.kPrimaryLight,
-                        fontWeight: FontWeight.w500)),
-                Text(date,
-                    style: GoogleFonts.poppins(
-                        fontSize: 13,
-                        color: colour.kPrimaryDark,
-                        fontWeight: FontWeight.w600)),
-              ],
-            ),
-          ],
-        ),
+            child: Icon(Icons.calendar_today_rounded,
+                size: isTablet ? 20 : 16,
+                color: colour.kPrimary),
+          ),
+          const SizedBox(width: 10),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(label,
+                  style: GoogleFonts.poppins(
+                      fontSize: isTablet ? 11 : 10,
+                      color: colour.kPrimaryLight,
+                      fontWeight: FontWeight.w500)),
+              Text(date,
+                  style: GoogleFonts.poppins(
+                      fontSize: isTablet ? 14 : 13,
+                      color: colour.kPrimaryDark,
+                      fontWeight: FontWeight.w600)),
+            ],
+          ),
+        ]),
       ),
     );
   }
@@ -420,44 +530,48 @@ class _DateField extends StatelessWidget {
 
 // ─── List Header ──────────────────────────────────────────────────────────────
 class _ListHeader extends StatelessWidget {
+  final bool isTablet;
+  const _ListHeader({required this.isTablet});
+
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+      padding: EdgeInsets.symmetric(
+        horizontal: isTablet ? 20 : 16,
+        vertical:   isTablet ? 13 : 10,
+      ),
       decoration: BoxDecoration(
         color: colour.kAccent,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(isTablet ? 16 : 12),
       ),
-      child: Row(
-        children: [
-          Expanded(
-            flex: 3,
-            child: Text('Expense',
-                style: GoogleFonts.poppins(
-                    fontSize: 12,
-                    fontWeight: FontWeight.w700,
-                    color: colour.kPrimaryDark)),
-          ),
-          Expanded(
-            flex: 2,
-            child: Text('Count',
-                textAlign: TextAlign.center,
-                style: GoogleFonts.poppins(
-                    fontSize: 12,
-                    fontWeight: FontWeight.w700,
-                    color: colour.kPrimaryDark)),
-          ),
-          Expanded(
-            flex: 2,
-            child: Text('Amount',
-                textAlign: TextAlign.end,
-                style: GoogleFonts.poppins(
-                    fontSize: 12,
-                    fontWeight: FontWeight.w700,
-                    color: colour.kPrimaryDark)),
-          ),
-        ],
-      ),
+      child: Row(children: [
+        Expanded(
+          flex: 3,
+          child: Text('Expense',
+              style: GoogleFonts.poppins(
+                  fontSize: isTablet ? 13 : 12,
+                  fontWeight: FontWeight.w700,
+                  color: colour.kPrimaryDark)),
+        ),
+        Expanded(
+          flex: 2,
+          child: Text('Count',
+              textAlign: TextAlign.center,
+              style: GoogleFonts.poppins(
+                  fontSize: isTablet ? 13 : 12,
+                  fontWeight: FontWeight.w700,
+                  color: colour.kPrimaryDark)),
+        ),
+        Expanded(
+          flex: 2,
+          child: Text('Amount',
+              textAlign: TextAlign.end,
+              style: GoogleFonts.poppins(
+                  fontSize: isTablet ? 13 : 12,
+                  fontWeight: FontWeight.w700,
+                  color: colour.kPrimaryDark)),
+        ),
+      ]),
     );
   }
 }
@@ -466,6 +580,7 @@ class _ListHeader extends StatelessWidget {
 class _ExpenseItemCard extends StatelessWidget {
   final String name, count, amount;
   final int index;
+  final bool isTablet;
   final VoidCallback onTap;
 
   const _ExpenseItemCard({
@@ -473,24 +588,29 @@ class _ExpenseItemCard extends StatelessWidget {
     required this.count,
     required this.amount,
     required this.index,
+    required this.isTablet,
     required this.onTap,
   });
 
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.only(bottom: 10),
+      padding: EdgeInsets.only(bottom: isTablet ? 12 : 10),
       child: Material(
         color: colour.kWhite,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(isTablet ? 20 : 16),
         child: InkWell(
           onTap: onTap,
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(isTablet ? 20 : 16),
           splashColor: colour.kAccent,
           child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+            padding: EdgeInsets.symmetric(
+              horizontal: isTablet ? 20 : 16,
+              vertical:   isTablet ? 16 : 14,
+            ),
             decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(16),
+              borderRadius:
+              BorderRadius.circular(isTablet ? 20 : 16),
               border: Border.all(color: colour.kAccent, width: 1.2),
               boxShadow: [
                 BoxShadow(
@@ -500,63 +620,65 @@ class _ExpenseItemCard extends StatelessWidget {
                 ),
               ],
             ),
-            child: Row(
-              children: [
-                // Index badge
-                Container(
-                  width: 28,
-                  height: 28,
-                  margin: const EdgeInsets.only(right: 12),
+            child: Row(children: [
+              // Index badge
+              Container(
+                width:  isTablet ? 32 : 28,
+                height: isTablet ? 32 : 28,
+                margin: const EdgeInsets.only(right: 12),
+                decoration: BoxDecoration(
+                  color: colour.kAccent,
+                  borderRadius:
+                  BorderRadius.circular(isTablet ? 10 : 8),
+                ),
+                alignment: Alignment.center,
+                child: Text(
+                  '${index + 1}',
+                  style: GoogleFonts.poppins(
+                      fontSize: isTablet ? 12 : 11,
+                      fontWeight: FontWeight.w700,
+                      color: colour.kPrimary),
+                ),
+              ),
+
+              Expanded(
+                flex: 3,
+                child: Text(name,
+                    style: GoogleFonts.poppins(
+                        fontSize: isTablet ? 14 : 13,
+                        fontWeight: FontWeight.w600,
+                        color: colour.kPrimaryDark)),
+              ),
+              Expanded(
+                flex: 2,
+                child: Text(count,
+                    textAlign: TextAlign.center,
+                    style: GoogleFonts.poppins(
+                        fontSize: isTablet ? 14 : 13,
+                        fontWeight: FontWeight.w500,
+                        color: colour.kPrimaryLight)),
+              ),
+              Expanded(
+                flex: 2,
+                child: Container(
+                  padding: EdgeInsets.symmetric(
+                    horizontal: isTablet ? 10 : 8,
+                    vertical:   isTablet ? 5  : 4,
+                  ),
                   decoration: BoxDecoration(
                     color: colour.kAccent,
-                    borderRadius: BorderRadius.circular(8),
+                    borderRadius:
+                    BorderRadius.circular(isTablet ? 10 : 8),
                   ),
-                  alignment: Alignment.center,
-                  child: Text(
-                    '${index + 1}',
-                    style: GoogleFonts.poppins(
-                        fontSize: 11,
-                        fontWeight: FontWeight.w700,
-                        color: colour.kPrimary),
-                  ),
-                ),
-
-                Expanded(
-                  flex: 3,
-                  child: Text(name,
+                  child: Text(amount,
+                      textAlign: TextAlign.end,
                       style: GoogleFonts.poppins(
-                          fontSize: 13,
-                          fontWeight: FontWeight.w600,
-                          color: colour.kPrimaryDark)),
+                          fontSize: isTablet ? 14 : 13,
+                          fontWeight: FontWeight.w700,
+                          color: colour.kPrimary)),
                 ),
-                Expanded(
-                  flex: 2,
-                  child: Text(count,
-                      textAlign: TextAlign.center,
-                      style: GoogleFonts.poppins(
-                          fontSize: 13,
-                          fontWeight: FontWeight.w500,
-                          color: colour.kPrimaryLight)),
-                ),
-                Expanded(
-                  flex: 2,
-                  child: Container(
-                    padding:
-                    const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                    decoration: BoxDecoration(
-                      color: colour.kAccent,
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: Text(amount,
-                        textAlign: TextAlign.end,
-                        style: GoogleFonts.poppins(
-                            fontSize: 13,
-                            fontWeight: FontWeight.w700,
-                            color: colour.kPrimary)),
-                  ),
-                ),
-              ],
-            ),
+              ),
+            ]),
           ),
         ),
       ),

@@ -109,153 +109,161 @@ class _AdminDashboardState extends State<NewAdminDashboard> with SingleTickerPro
   }
   @override
   Widget build(BuildContext context) {
-    return MultiBlocProvider(
-      providers: [
-        BlocProvider<AdminTabBloc>(
-          create: (_) => AdminTabBloc(),
-        ),
-        BlocProvider<SalesBloc>(
-          create: (_) => SalesBloc(),
-        ),
-        BlocProvider<TruckBloc>(
-          create: (_) => TruckBloc(),
-        ),
-        BlocProvider(
-        create: (context) => InvoiceBloc(context),
-        child: const InvoiceTab(),
-        ),
-        BlocProvider(
-          create: (context) => SalesOrderBloc(context),
-          child: const SalesOrderTab(),
-        ),
-        BlocProvider(
-          create: (context) => ReceiptBloc(
-            context: context,
-          )..add(LoadReceiptEvent()),
-          child: const ReceiptPage(),
-        ),
-        BlocProvider(
-          create: (context) => ForwardingReportBloc(context)
-            ..add(LoadFWDataEvent(
-              fromDate: DateFormat("yyyy-MM-dd").format(DateTime.now()),
-              toDate: DateFormat("yyyy-MM-dd").format(DateTime.now()),
-            )),
-          child: const ForwardingReportView(),
-        ),
-        BlocProvider(
-          create: (context) => ExpenseReportBloc(context)
-            ..add(LoadExpReportEvent(
-              fromDate: DateFormat("yyyy-MM-dd").format(DateTime.now().subtract(Duration(days: 30))),
-              toDate: DateFormat("yyyy-MM-dd").format(DateTime.now()),
-            )),
-          child: const ExpenseReportView(),
-        ),
-
-        BlocProvider(
-          create: (context) => VesselBloc(
-            context: context,
-          )..add(const LoadVesselDataEvent(type: 0)),
-          child: const VesselReportPage(),
-        ),
-        BlocProvider(
-          create: (context) => TransportBloc(
-            context: context,
-          )..add(const LoadTransportDataEvent(type: 0)),
-          child: const TransportReportPage(),
-        ),
-        BlocProvider(
-          create: (context) => TruckDetailsBloc(
-            context: context,
-          )..add(const LoadTruckDetailsEvent()),
-          child: const TruckDetailsReportPage(),
-        ),
-        BlocProvider(
-          create: (context) => DriverBloc(context)..add(const LoadDriverEvent()),
-          child: const DriverDetailsView(),
-        ),
-        BlocProvider(
-          create: (context) => SpeedingBloc(context)..add( LoadSpeedingReport()),
-          child: const SpeedingScreen(),
-        ),
-        BlocProvider(
-          create: (context) => FuelFillingBloc(context)..add( LoadFuelFillingReport()),
-          child: const FuelFillingPage(),
-        ),
-        BlocProvider(
-          create: (context) => EngineHoursBloc(context)..add( LoadEngineHoursReport()),
-          child: const EngineHoursPage(),
-        ),
-        BlocProvider(
-          create: (context) => BocBloc(context)..add( LoadBocReport()),
-          child: const BocPage(),
-        ),
-        BlocProvider(
-          create: (context) => EmailBloc(context)..add(const LoadEmployeesEvent()),
-          child: const EmailPage(),
-        ),
-        BlocProvider(
-          create: (context) => ReviewBloc(context)..add(const LoadReviewsEvent()),
-          child: const ReviewEntryPage(),
-        ),
-        BlocProvider(
-          create: (context) => FuelDiffBloc(context)..add(const LoadFuelDiffEvent()),
-          child: const FuelDiffPage(),
-        ),
-        BlocProvider(
-          create: (context) => EmployeeMasterBloc.list(context),
-          child: const EmployeeViewPage(),
-        ),
-        BlocProvider(
-          create: (context) => PettyCashBloc(context)..add(const LoadPettyCashEvent()),
-          child: const PettyCashPage(),
-        ),
-        BlocProvider(
-          create: (context) => SummonBloc.form(context),
-          child: const SummonEntryPage(),
-        ),
-        BlocProvider(
-          create: (context) => SparePartsBloc.form(context)..add(const LoadSparePartsTrucksEvent()),
-          child: const SparePartsEntryPage(),
-        ),
-        BlocProvider(
-          create: (context) => PaymentPendingBloc(context)..add(const LoadPaymentPendingEvent()),
-          child: const PaymentPendingPage(),
-        ),
-        BlocProvider(
-          create: (context) => SpotSaleBloc.form(context),
-          child: const SpotSaleEntryPage(),
-        ),
-        BlocProvider(
-          create: (context) => InventoryBloc(context)..add(const LoadInventoryListsEvent()),
-          child: const InventoryPage(),
-        ),
-        BlocProvider(
-          create: (context) => PDOBloc(
-            context,
-            fromDate: DateFormat('yyyy-MM-dd')
-                .format(DateTime.now().subtract(const Duration(days: 30))),
-            toDate: DateFormat('yyyy-MM-dd')
-                .format(DateTime.now()),
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final isTablet = constraints.maxWidth >= 600;
+        return MultiBlocProvider(
+          providers: [
+            BlocProvider<AdminTabBloc>(
+              create: (_) => AdminTabBloc(),
+            ),
+            BlocProvider<SalesBloc>(
+              create: (_) => SalesBloc(),
+            ),
+            BlocProvider<TruckBloc>(
+              create: (_) => TruckBloc(),
+            ),
+            BlocProvider(
+              create: (context) => InvoiceBloc(context),
+              child: const InvoiceTab(),
+            ),
+            BlocProvider(
+              create: (context) => SalesOrderBloc(context),
+              child: const SalesOrderTab(),
+            ),
+            BlocProvider(
+              create: (context) => ReceiptBloc(
+                context: context,
+              )..add(LoadReceiptEvent()),
+              child: const ReceiptPage(),
+            ),
+            BlocProvider(
+              create: (context) => ForwardingReportBloc(context)
+                ..add(LoadFWDataEvent(
+                  fromDate: DateFormat("yyyy-MM-dd").format(DateTime.now()),
+                  toDate: DateFormat("yyyy-MM-dd").format(DateTime.now()),
+                )),
+              child: const ForwardingReportView(),
+            ),
+            BlocProvider(
+              create: (context) => ExpenseReportBloc(context)
+                ..add(LoadExpReportEvent(
+                  fromDate: DateFormat("yyyy-MM-dd")
+                      .format(DateTime.now().subtract(const Duration(days: 30))),
+                  toDate: DateFormat("yyyy-MM-dd").format(DateTime.now()),
+                )),
+              child: const ExpenseReportView(),
+            ),
+            BlocProvider(
+              create: (context) => VesselBloc(
+                context: context,
+              )..add(const LoadVesselDataEvent(type: 0)),
+              child: const VesselReportPage(),
+            ),
+            BlocProvider(
+              create: (context) => TransportBloc(
+                context: context,
+              )..add(const LoadTransportDataEvent(type: 0)),
+              child: const TransportReportPage(),
+            ),
+            BlocProvider(
+              create: (context) => TruckDetailsBloc(
+                context: context,
+              )..add(const LoadTruckDetailsEvent()),
+              child: const TruckDetailsReportPage(),
+            ),
+            BlocProvider(
+              create: (context) => DriverBloc(context)..add(const LoadDriverEvent()),
+              child: const DriverDetailsView(),
+            ),
+            BlocProvider(
+              create: (context) => SpeedingBloc(context)..add(LoadSpeedingReport()),
+              child: const SpeedingScreen(),
+            ),
+            BlocProvider(
+              create: (context) => FuelFillingBloc(context)..add(LoadFuelFillingReport()),
+              child: const FuelFillingPage(),
+            ),
+            BlocProvider(
+              create: (context) => EngineHoursBloc(context)..add(LoadEngineHoursReport()),
+              child: const EngineHoursPage(),
+            ),
+            BlocProvider(
+              create: (context) => BocBloc(context)..add(LoadBocReport()),
+              child: const BocPage(),
+            ),
+            BlocProvider(
+              create: (context) => EmailBloc(context)..add(const LoadEmployeesEvent()),
+              child: const EmailPage(),
+            ),
+            BlocProvider(
+              create: (context) => ReviewBloc(context)..add(const LoadReviewsEvent()),
+              child: const ReviewEntryPage(),
+            ),
+            BlocProvider(
+              create: (context) => FuelDiffBloc(context)..add(const LoadFuelDiffEvent()),
+              child: const FuelDiffPage(),
+            ),
+            BlocProvider(
+              create: (context) => EmployeeMasterBloc.list(context),
+              child: const EmployeeViewPage(),
+            ),
+            BlocProvider(
+              create: (context) => PettyCashBloc(context)..add(const LoadPettyCashEvent()),
+              child: const PettyCashPage(),
+            ),
+            BlocProvider(
+              create: (context) => SummonBloc.form(context),
+              child: const SummonEntryPage(),
+            ),
+            BlocProvider(
+              create: (context) => SparePartsBloc.form(context)
+                ..add(const LoadSparePartsTrucksEvent()),
+              child: const SparePartsEntryPage(),
+            ),
+            BlocProvider(
+              create: (context) => PaymentPendingBloc(context)
+                ..add(const LoadPaymentPendingEvent()),
+              child: const PaymentPendingPage(),
+            ),
+            BlocProvider(
+              create: (context) => SpotSaleBloc.form(context),
+              child: const SpotSaleEntryPage(),
+            ),
+            BlocProvider(
+              create: (context) => InventoryBloc(context)
+                ..add(const LoadInventoryListsEvent()),
+              child: const InventoryPage(),
+            ),
+            BlocProvider(
+              create: (context) => PDOBloc(
+                context,
+                fromDate: DateFormat('yyyy-MM-dd')
+                    .format(DateTime.now().subtract(const Duration(days: 30))),
+                toDate: DateFormat('yyyy-MM-dd').format(DateTime.now()),
+              ),
+              child: PDOViewPage(
+                fromDate: DateFormat('yyyy-MM-dd')
+                    .format(DateTime.now().subtract(const Duration(days: 30))),
+                toDate: DateFormat('yyyy-MM-dd').format(DateTime.now()),
+              ),
+            ),
+            BlocProvider(
+              create: (context) => RTIDetailsBloc(context)
+                ..add(const LoadRTIDetailsEvent()),
+              child: const RTIDetailsPage(),
+            ),
+          ],                                    // ← ] தான் close, } இல்ல
+          child: Scaffold(
+            body: MobileDashboard(
+              tabController: _tabController,
+              isTablet: isTablet,
+            ),
           ),
-          child: PDOViewPage(
-            fromDate: DateFormat('yyyy-MM-dd')
-                .format(DateTime.now().subtract(const Duration(days: 30))),
-            toDate: DateFormat('yyyy-MM-dd')
-                .format(DateTime.now()),
-          ),
-        ),
-        BlocProvider(
-          create: (context) => RTIDetailsBloc(context)..add(const LoadRTIDetailsEvent()),
-          child: const RTIDetailsPage(),
-        ),
-      ],
-      child: Scaffold(
-        body: MobileDashboard(
-          tabController: _tabController,
-        ),
-      ),
-    );
-  }
+        );                                      // ← MultiBlocProvider close
+      },                                        // ← LayoutBuilder builder close
+    );                                          // ← LayoutBuilder close
+  }                                             // ← build() close
 }
 
 

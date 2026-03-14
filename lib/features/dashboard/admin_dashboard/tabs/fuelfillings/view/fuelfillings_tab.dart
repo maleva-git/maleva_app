@@ -1,16 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
-
 import 'package:maleva/core/models/model.dart';
 import 'package:maleva/core/utils/clsfunction.dart' as objfun;
-
 import '../bloc/fuelfillings_bloc.dart';
 import '../bloc/fuelfillings_event.dart';
 import '../bloc/fuelfillings_state.dart';
-
 import 'package:maleva/core/colors/colors.dart' as colour;
-
 
 // ── Entry Point ───────────────────────────────────────────────────────────────
 class FuelFillingPage extends StatelessWidget {
@@ -19,7 +15,8 @@ class FuelFillingPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (_) => FuelFillingBloc(context)..add(LoadFuelFillingReport()),
+      create: (_) =>
+      FuelFillingBloc(context)..add(LoadFuelFillingReport()),
       child: const _FuelFillingBody(),
     );
   }
@@ -31,81 +28,105 @@ class _FuelFillingBody extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isTablet = MediaQuery.of(context).size.width >= 600;
+
+    return isTablet
+        ? _buildTabletLayout(context)
+        : _buildMobileLayout(context);
+  }
+
+  // ══════════════════════════════════════════════════════
+  // TABLET — Two Column
+  // ══════════════════════════════════════════════════════
+  Widget _buildTabletLayout(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.all(10),
-      child: Column(
+      padding: const EdgeInsets.all(20),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            "Fuel Filling",
-            style: GoogleFonts.lato(
-              fontSize: objfun.FontLarge,
-              fontWeight: FontWeight.bold,
-              color: colour.kPrimaryDark,
+
+          // ── LEFT (240px) — Title + Count badge
+          SizedBox(
+            width: 240,
+            child: BlocBuilder<FuelFillingBloc, FuelFillingState>(
+              builder: (context, state) {
+                final count = state is FuelFillingLoaded
+                    ? state.fuelFillingRecords.length
+                    : 0;
+                return Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Title
+                    Row(children: [
+                      Container(
+                        width: 4, height: 30,
+                        decoration: BoxDecoration(
+                          color: colour.kPrimary,
+                          borderRadius: BorderRadius.circular(4),
+                        ),
+                      ),
+                      const SizedBox(width: 10),
+                      Text(
+                        "FUEL",
+                        style: GoogleFonts.lato(
+                          fontSize:      20,
+                          fontWeight:    FontWeight.bold,
+                          color:         colour.kPrimaryDark,
+                          letterSpacing: 1.2,
+                        ),
+                      ),
+                    ]),
+                    const SizedBox(height: 6),
+                    Padding(
+                      padding: const EdgeInsets.only(left: 14),
+                      child: Text(
+                        "Filling Details",
+                        style: GoogleFonts.lato(
+                          fontSize:   14,
+                          color:      colour.kPrimaryLight,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+
+                    // Count badge
+                    _CountBadge(count: count),
+                  ],
+                );
+              },
             ),
           ),
-          const SizedBox(height: 10),
+
+          const SizedBox(width: 16),
+
+          // ── RIGHT — List
           Expanded(
             child: BlocBuilder<FuelFillingBloc, FuelFillingState>(
               builder: (context, state) {
-
-                // ── Loading ──
                 if (state is FuelFillingLoading) {
                   return const Center(
-                    child: CircularProgressIndicator(color: colour.kPrimary),
+                    child: CircularProgressIndicator(
+                        color: colour.kPrimary),
                   );
                 }
-
-                // ── Error ──
                 if (state is FuelFillingError) {
-                  return Center(
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        const Icon(Icons.error_outline,
-                            color: Colors.red, size: 48),
-                        const SizedBox(height: 12),
-                        Text(
-                          state.message,
-                          textAlign: TextAlign.center,
-                          style: GoogleFonts.lato(
-                              color: Colors.red, fontSize: 14),
-                        ),
-                        const SizedBox(height: 16),
-                        ElevatedButton.icon(
-                          onPressed: () => context
-                              .read<FuelFillingBloc>()
-                              .add(LoadFuelFillingReport()),
-                          icon: const Icon(Icons.refresh),
-                          label: const Text("Retry"),
-                          style: ElevatedButton.styleFrom(
-                              backgroundColor: colour.kPrimary),
-                        ),
-                      ],
-                    ),
-                  );
+                  return _ErrorState(
+                      message: state.message, isTablet: true);
                 }
-
-                // ── Loaded ──
                 if (state is FuelFillingLoaded) {
                   if (state.fuelFillingRecords.isEmpty) {
-                    return Center(
-                      child: Text(
-                        "No fuel filling records found.",
-                        style: GoogleFonts.lato(
-                            fontSize: 16, color: Colors.grey),
-                      ),
-                    );
+                    return _EmptyState(isTablet: true);
                   }
-
                   return ListView.builder(
                     itemCount: state.fuelFillingRecords.length,
-                    itemBuilder: (context, index) {
-                      return _FuelFillingCard(
-                          record: state.fuelFillingRecords[index]);
-                    },
+                    itemBuilder: (context, index) =>
+                        _FuelFillingCard(
+                          record:   state.fuelFillingRecords[index],
+                          isTablet: true,
+                        ),
                   );
                 }
-
                 return const SizedBox.shrink();
               },
             ),
@@ -114,265 +135,384 @@ class _FuelFillingBody extends StatelessWidget {
       ),
     );
   }
+
+  // ══════════════════════════════════════════════════════
+  // MOBILE — Single Column
+  // ══════════════════════════════════════════════════════
+  Widget _buildMobileLayout(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.all(10),
+      child: Column(children: [
+        Text(
+          "Fuel Filling",
+          style: GoogleFonts.lato(
+            fontSize:   objfun.FontLarge,
+            fontWeight: FontWeight.bold,
+            color:      colour.kPrimaryDark,
+          ),
+        ),
+        const SizedBox(height: 10),
+
+        Expanded(
+          child: BlocBuilder<FuelFillingBloc, FuelFillingState>(
+            builder: (context, state) {
+              if (state is FuelFillingLoading) {
+                return const Center(
+                  child: CircularProgressIndicator(
+                      color: colour.kPrimary),
+                );
+              }
+              if (state is FuelFillingError) {
+                return _ErrorState(
+                    message: state.message, isTablet: false);
+              }
+              if (state is FuelFillingLoaded) {
+                if (state.fuelFillingRecords.isEmpty) {
+                  return _EmptyState(isTablet: false);
+                }
+                return ListView.builder(
+                  itemCount: state.fuelFillingRecords.length,
+                  itemBuilder: (context, index) =>
+                      _FuelFillingCard(
+                        record:   state.fuelFillingRecords[index],
+                        isTablet: false,
+                      ),
+                );
+              }
+              return const SizedBox.shrink();
+            },
+          ),
+        ),
+      ]),
+    );
+  }
 }
 
-// ── Card ──────────────────────────────────────────────────────────────────────
+// ─── Count Badge ──────────────────────────────────────────────────────────────
+class _CountBadge extends StatelessWidget {
+  final int count;
+  const _CountBadge({required this.count});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
+      decoration: BoxDecoration(
+        gradient: const LinearGradient(
+          colors: [colour.kPrimary, colour.kPrimaryDark],
+          begin: Alignment.topLeft,
+          end:   Alignment.bottomRight,
+        ),
+        borderRadius: BorderRadius.circular(20),
+        boxShadow: [
+          BoxShadow(
+            color:     colour.kPrimary.withOpacity(0.30),
+            blurRadius: 16,
+            offset:    const Offset(0, 6),
+          ),
+        ],
+      ),
+      child: Row(children: [
+        Container(
+          padding: const EdgeInsets.all(10),
+          decoration: BoxDecoration(
+            color: colour.kWhite.withOpacity(0.20),
+            shape: BoxShape.circle,
+          ),
+          child: const Icon(Icons.local_gas_station_rounded,
+              color: colour.kWhite, size: 22),
+        ),
+        const SizedBox(width: 14),
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text('Total Records',
+                style: GoogleFonts.lato(
+                  fontSize:   12,
+                  color:      colour.kWhite.withOpacity(0.75),
+                  fontWeight: FontWeight.w500,
+                )),
+            Text('$count',
+                style: GoogleFonts.lato(
+                  fontSize:   28,
+                  color:      colour.kWhite,
+                  fontWeight: FontWeight.bold,
+                )),
+          ],
+        ),
+      ]),
+    );
+  }
+}
+
+// ─── Fuel Filling Card ────────────────────────────────────────────────────────
 class _FuelFillingCard extends StatelessWidget {
   final FuelFilling record;
-  const _FuelFillingCard({required this.record});
+  final bool isTablet;
+  const _FuelFillingCard(
+      {required this.record, required this.isTablet});
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () => _showDetailsDialog(context),
       child: Container(
-        margin: const EdgeInsets.symmetric(vertical: 8),
+        margin: EdgeInsets.symmetric(vertical: isTablet ? 6 : 8),
         decoration: BoxDecoration(
-          color: colour.kWhite,
-          borderRadius: BorderRadius.circular(16),
+          color:         colour.kWhite,
+          borderRadius: BorderRadius.circular(isTablet ? 18 : 16),
           border: Border.all(color: colour.kAccent, width: 1.5),
           boxShadow: [
             BoxShadow(
-              color: colour.kPrimary.withOpacity(0.08),
+              color:     colour.kPrimary.withOpacity(0.08),
               blurRadius: 10,
-              offset: const Offset(0, 4),
+              offset:    const Offset(0, 4),
             ),
           ],
         ),
-        child: Row(
-          children: [
-            // ── Left Blue Panel ──
-            Container(
-              width: 70,
-              padding: const EdgeInsets.symmetric(vertical: 20),
-              decoration: const BoxDecoration(
-                color: colour.kAccent,
-                borderRadius: BorderRadius.only(
-                  topLeft: Radius.circular(16),
-                  bottomLeft: Radius.circular(16),
-                ),
-              ),
-              child: Center(
-                child: Container(
-                  width: 44,
-                  height: 44,
-                  decoration: const BoxDecoration(
-                    color: colour.kPrimary,
-                    shape: BoxShape.circle,
-                  ),
-                  child: const Icon(
-                    Icons.local_gas_station_rounded,
-                    color: colour.kWhite,
-                    size: 22,
-                  ),
-                ),
+        child: Row(children: [
+          // ── Left panel
+          Container(
+            width: isTablet ? 80 : 70,
+            padding: EdgeInsets.symmetric(
+                vertical: isTablet ? 22 : 20),
+            decoration: const BoxDecoration(
+              color: colour.kAccent,
+              borderRadius: BorderRadius.only(
+                topLeft:    Radius.circular(16),
+                bottomLeft: Radius.circular(16),
               ),
             ),
+            child: Center(
+              child: Container(
+                width:  isTablet ? 50 : 44,
+                height: isTablet ? 50 : 44,
+                decoration: const BoxDecoration(
+                  color: colour.kPrimary,
+                  shape: BoxShape.circle,
+                ),
+                child: Icon(Icons.local_gas_station_rounded,
+                    color: colour.kWhite,
+                    size:  isTablet ? 26 : 22),
+              ),
+            ),
+          ),
 
-            // ── Content ──
-            Expanded(
-              child: Padding(
-                padding: const EdgeInsets.symmetric(
-                    horizontal: 14, vertical: 16),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      record.vehicle ?? "-",
-                      style: GoogleFonts.lato(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 16,
-                        color: colour.kPrimaryDark,
+          // ── Content
+          Expanded(
+            child: Padding(
+              padding: EdgeInsets.symmetric(
+                horizontal: isTablet ? 18 : 14,
+                vertical:   isTablet ? 18 : 16,
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    record.vehicle ?? "-",
+                    style: GoogleFonts.lato(
+                      fontWeight: FontWeight.bold,
+                      fontSize:   isTablet ? 17 : 16,
+                      color:      colour.kPrimaryDark,
+                    ),
+                  ),
+                  SizedBox(height: isTablet ? 8 : 6),
+                  Row(children: [
+                    Icon(Icons.person_outline,
+                        size:  isTablet ? 16 : 14,
+                        color: colour.kPrimaryLight),
+                    const SizedBox(width: 4),
+                    Flexible(
+                      child: Text(
+                        record.driver.isNotEmpty
+                            ? record.driver
+                            : "Not Available",
+                        overflow: TextOverflow.ellipsis,
+                        style: GoogleFonts.lato(
+                          fontSize: isTablet ? 14 : 13,
+                          color:    Colors.grey[600],
+                        ),
                       ),
                     ),
-                    const SizedBox(height: 6),
-                    Row(
-                      children: [
-                        const Icon(Icons.person_outline,
-                            size: 14, color: colour.kPrimaryLight),
-                        const SizedBox(width: 4),
-                        Text(
-                          record.driver.isNotEmpty
-                              ? record.driver
-                              : "Not Available",
-                          style: GoogleFonts.lato(
-                              fontSize: 13, color: Colors.grey[600]),
-                        ),
-                      ],
+                  ]),
+                  SizedBox(height: isTablet ? 8 : 6),
+                  Row(children: [
+                    Flexible(
+                      child: _MiniChip(
+                        icon:      Icons.local_gas_station_rounded,
+                        label:     record.filled.isNotEmpty
+                            ? "${record.filled} L"
+                            : "N/A",
+                        bgColor:   colour.kPrimary.withOpacity(0.1),
+                        textColor: colour.kPrimary,
+                        isTablet:  isTablet,
+                      ),
                     ),
-                    const SizedBox(height: 6),
-                    Row(
-                      children: [
-                        Flexible(
-                          child: _MiniChip(
-                            icon: Icons.local_gas_station_rounded,
-                            label: record.filled.isNotEmpty ? "${record.filled} L" : "N/A",
-                            bgColor: colour.kPrimary.withOpacity(0.1),
-                            textColor: colour.kPrimary,
-                          ),
-                        ),
-                        const SizedBox(width: 8),
-                        Flexible(
-                          child: _MiniChip(
-                            icon: Icons.place_rounded,
-                            label: record.location.isNotEmpty ? record.location : "N/A",
-                            bgColor: Colors.orange.withOpacity(0.1),
-                            textColor: Colors.orange.shade700,
-                          ),
-                        ),
-                      ],
-                    )
-                  ],
-                ),
+                    const SizedBox(width: 8),
+                    Flexible(
+                      child: _MiniChip(
+                        icon:      Icons.place_rounded,
+                        label:     record.location.isNotEmpty
+                            ? record.location
+                            : "N/A",
+                        bgColor:   Colors.orange.withOpacity(0.1),
+                        textColor: Colors.orange.shade700,
+                        isTablet:  isTablet,
+                      ),
+                    ),
+                  ]),
+                ],
               ),
             ),
+          ),
 
-            // ── Arrow ──
-            Padding(
-              padding: const EdgeInsets.only(right: 14),
-              child: Container(
-                width: 32,
-                height: 32,
-                decoration: BoxDecoration(
-                  color: colour.kAccent,
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: const Icon(
-                  Icons.arrow_forward_ios_rounded,
-                  size: 14,
-                  color: colour.kPrimary,
-                ),
+          // ── Arrow
+          Padding(
+            padding: EdgeInsets.only(right: isTablet ? 16 : 14),
+            child: Container(
+              width:  isTablet ? 36 : 32,
+              height: isTablet ? 36 : 32,
+              decoration: BoxDecoration(
+                color:         colour.kAccent,
+                borderRadius: BorderRadius.circular(8),
               ),
+              child: Icon(Icons.arrow_forward_ios_rounded,
+                  size:  isTablet ? 16 : 14,
+                  color: colour.kPrimary),
             ),
-          ],
-        ),
+          ),
+        ]),
       ),
     );
   }
 
-  // ── Details Dialog ────────────────────────────────────────────────────────
   void _showDetailsDialog(BuildContext context) {
+    final isTablet = MediaQuery.of(context).size.width >= 600;
+
     showGeneralDialog(
-      context: context,
+      context:            context,
       barrierDismissible: true,
-      barrierLabel: '',
-      barrierColor: Colors.black54,
+      barrierLabel:       '',
+      barrierColor:       Colors.black54,
       transitionDuration: const Duration(milliseconds: 280),
       pageBuilder: (_, __, ___) => Center(
         child: Material(
           color: Colors.transparent,
           child: Container(
-            width: MediaQuery.of(context).size.width * 0.88,
+            width: isTablet
+                ? 480
+                : MediaQuery.of(context).size.width * 0.88,
             decoration: BoxDecoration(
-              color: colour.kWhite,
+              color:         colour.kWhite,
               borderRadius: BorderRadius.circular(20),
               boxShadow: [
                 BoxShadow(
-                  color: colour.kPrimary.withOpacity(0.18),
+                  color:     colour.kPrimary.withOpacity(0.18),
                   blurRadius: 30,
-                  offset: const Offset(0, 10),
+                  offset:    const Offset(0, 10),
                 ),
               ],
             ),
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                // ── Header ──
+                // Header
                 Container(
                   width: double.infinity,
-                  padding: const EdgeInsets.symmetric(
-                      vertical: 20, horizontal: 24),
+                  padding: EdgeInsets.symmetric(
+                    vertical:   isTablet ? 22 : 20,
+                    horizontal: isTablet ? 28 : 24,
+                  ),
                   decoration: const BoxDecoration(
                     color: colour.kPrimary,
                     borderRadius: BorderRadius.only(
-                      topLeft: Radius.circular(20),
+                      topLeft:  Radius.circular(20),
                       topRight: Radius.circular(20),
                     ),
                   ),
-                  child: Row(
-                    children: [
-                      const Icon(Icons.local_gas_station_rounded,
-                          color: colour.kWhite, size: 26),
-                      const SizedBox(width: 12),
-                      Text(
-                        "Fuel Filling Details",
-                        style: GoogleFonts.lato(
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
-                          color: colour.kWhite,
-                        ),
+                  child: Row(children: [
+                    Icon(Icons.local_gas_station_rounded,
+                        color: colour.kWhite,
+                        size:  isTablet ? 28 : 26),
+                    const SizedBox(width: 12),
+                    Text(
+                      "Fuel Filling Details",
+                      style: GoogleFonts.lato(
+                        fontSize:   isTablet ? 22 : 20,
+                        fontWeight: FontWeight.bold,
+                        color:      colour.kWhite,
                       ),
-                    ],
-                  ),
+                    ),
+                  ]),
                 ),
 
-                // ── Body ──
+                // Body
                 Padding(
-                  padding: const EdgeInsets.all(24),
-                  child: Column(
-                    children: [
-                      _buildInfoRow(
-                        Icons.local_shipping_rounded,
-                        "Truck Name",
-                        record.vehicle,
-                      ),
-                      _buildDivider(),
-                      _buildInfoRow(
-                        Icons.place_rounded,
-                        "Location",
-                        record.location.isNotEmpty ? record.location : null,
-                      ),
-                      _buildDivider(),
-                      _buildInfoRow(
+                  padding: EdgeInsets.all(isTablet ? 28 : 24),
+                  child: Column(children: [
+                    _buildInfoRow(Icons.local_shipping_rounded,
+                        "Truck Name", record.vehicle,
+                        isTablet: isTablet),
+                    _buildDivider(),
+                    _buildInfoRow(Icons.place_rounded, "Location",
+                        record.location.isNotEmpty
+                            ? record.location
+                            : null,
+                        isTablet: isTablet),
+                    _buildDivider(),
+                    _buildInfoRow(
                         Icons.format_list_numbered_rounded,
                         "Count",
-                        record.count.isNotEmpty ? record.count : null,
-                      ),
-                      _buildDivider(),
-                      _buildInfoRow(
-                        Icons.local_gas_station_rounded,
+                        record.count.isNotEmpty
+                            ? record.count
+                            : null,
+                        isTablet: isTablet),
+                    _buildDivider(),
+                    _buildInfoRow(Icons.local_gas_station_rounded,
                         "Filled",
-                        record.filled.isNotEmpty ? record.filled : null,
-                      ),
-                      _buildDivider(),
-                      _buildInfoRow(
-                        Icons.person_rounded,
-                        "Driver",
-                        record.driver.isNotEmpty ? record.driver : null,
-                      ),
-                      _buildDivider(),
-                      _buildInfoRow(
-                        Icons.access_time_rounded,
-                        "Time",
+                        record.filled.isNotEmpty
+                            ? record.filled
+                            : null,
+                        isTablet: isTablet),
+                    _buildDivider(),
+                    _buildInfoRow(Icons.person_rounded, "Driver",
+                        record.driver.isNotEmpty
+                            ? record.driver
+                            : null,
+                        isTablet: isTablet),
+                    _buildDivider(),
+                    _buildInfoRow(Icons.access_time_rounded, "Time",
                         record.time.isNotEmpty ? record.time : null,
-                      ),
-                      const SizedBox(height: 24),
+                        isTablet: isTablet),
+                    SizedBox(height: isTablet ? 28 : 24),
 
-                      // ── Close Button ──
-                      SizedBox(
-                        width: double.infinity,
-                        child: ElevatedButton(
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: colour.kPrimary,
-                            padding: const EdgeInsets.symmetric(vertical: 14),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                            elevation: 0,
-                          ),
-                          onPressed: () => Navigator.of(context).pop(),
-                          child: Text(
-                            "Close",
-                            style: GoogleFonts.lato(
-                              color: colour.kWhite,
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
-                            ),
+                    // Close button
+                    SizedBox(
+                      width: double.infinity,
+                      child: ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: colour.kPrimary,
+                          padding: EdgeInsets.symmetric(
+                              vertical: isTablet ? 16 : 14),
+                          shape: RoundedRectangleBorder(
+                              borderRadius:
+                              BorderRadius.circular(12)),
+                          elevation: 0,
+                        ),
+                        onPressed: () =>
+                            Navigator.of(context).pop(),
+                        child: Text(
+                          "Close",
+                          style: GoogleFonts.lato(
+                            color:      colour.kWhite,
+                            fontSize:   isTablet ? 17 : 16,
+                            fontWeight: FontWeight.bold,
                           ),
                         ),
                       ),
-                    ],
-                  ),
+                    ),
+                  ]),
                 ),
               ],
             ),
@@ -380,7 +520,8 @@ class _FuelFillingCard extends StatelessWidget {
         ),
       ),
       transitionBuilder: (_, anim, __, child) => ScaleTransition(
-        scale: CurvedAnimation(parent: anim, curve: Curves.easeOutBack),
+        scale: CurvedAnimation(
+            parent: anim, curve: Curves.easeOutBack),
         child: FadeTransition(opacity: anim, child: child),
       ),
     );
@@ -389,40 +530,42 @@ class _FuelFillingCard extends StatelessWidget {
   Widget _buildDivider() =>
       Divider(color: colour.kAccent, thickness: 1.5, height: 24);
 
-  Widget _buildInfoRow(IconData icon, String label, String? value) {
+  Widget _buildInfoRow(
+      IconData icon, String label, String? value,
+      {required bool isTablet}) {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Container(
-          width: 36,
-          height: 36,
+          width:  isTablet ? 40 : 36,
+          height: isTablet ? 40 : 36,
           decoration: BoxDecoration(
-            color: colour.kAccent,
+            color:         colour.kAccent,
             borderRadius: BorderRadius.circular(8),
           ),
-          child: Icon(icon, color: colour.kPrimary, size: 18),
+          child: Icon(icon,
+              color: colour.kPrimary,
+              size:  isTablet ? 20 : 18),
         ),
         const SizedBox(width: 12),
         Expanded(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(
-                label,
-                style: GoogleFonts.lato(
-                  fontSize: 12,
-                  color: Colors.grey[500],
-                  fontWeight: FontWeight.w600,
-                  letterSpacing: 0.5,
-                ),
-              ),
+              Text(label,
+                  style: GoogleFonts.lato(
+                    fontSize:      isTablet ? 13 : 12,
+                    color:         Colors.grey[500],
+                    fontWeight:    FontWeight.w600,
+                    letterSpacing: 0.5,
+                  )),
               const SizedBox(height: 2),
               Text(
                 value?.isNotEmpty == true ? value! : "Not Available",
                 style: GoogleFonts.lato(
-                  fontSize: 15,
+                  fontSize:   isTablet ? 16 : 15,
                   fontWeight: FontWeight.w700,
-                  color: colour.kPrimaryDark,
+                  color:      colour.kPrimaryDark,
                 ),
               ),
             ],
@@ -433,32 +576,39 @@ class _FuelFillingCard extends StatelessWidget {
   }
 }
 
-// ── Mini Badge Chip ───────────────────────────────────────────────────────────
+// ─── Mini Chip ────────────────────────────────────────────────────────────────
 class _MiniChip extends StatelessWidget {
   final IconData icon;
-  final String label;
-  final Color bgColor;
-  final Color textColor;
+  final String   label;
+  final Color    bgColor;
+  final Color    textColor;
+  final bool     isTablet;
 
   const _MiniChip({
     required this.icon,
     required this.label,
     required this.bgColor,
     required this.textColor,
+    required this.isTablet,
   });
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      padding: EdgeInsets.symmetric(
+        horizontal: isTablet ? 10 : 8,
+        vertical:   isTablet ? 5  : 4,
+      ),
       decoration: BoxDecoration(
-        color: bgColor,
+        color:         bgColor,
         borderRadius: BorderRadius.circular(20),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(icon, size: 12, color: textColor),
+          Icon(icon,
+              size:  isTablet ? 14 : 12,
+              color: textColor),
           const SizedBox(width: 4),
           Flexible(
             child: Text(
@@ -466,13 +616,80 @@ class _MiniChip extends StatelessWidget {
               overflow: TextOverflow.ellipsis,
               maxLines: 1,
               style: GoogleFonts.lato(
-                fontSize: 11,
+                fontSize:   isTablet ? 12 : 11,
                 fontWeight: FontWeight.bold,
-                color: textColor,
+                color:      textColor,
               ),
             ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+// ─── Error State ──────────────────────────────────────────────────────────────
+class _ErrorState extends StatelessWidget {
+  final String message;
+  final bool   isTablet;
+  const _ErrorState(
+      {required this.message, required this.isTablet});
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(Icons.error_outline,
+              color: Colors.red,
+              size:  isTablet ? 60 : 48),
+          SizedBox(height: isTablet ? 16 : 12),
+          Text(message,
+              textAlign: TextAlign.center,
+              style: GoogleFonts.lato(
+                  color:    Colors.red,
+                  fontSize: isTablet ? 15 : 14)),
+          SizedBox(height: isTablet ? 20 : 16),
+          ElevatedButton.icon(
+            onPressed: () => context
+                .read<FuelFillingBloc>()
+                .add(LoadFuelFillingReport()),
+            icon:  Icon(Icons.refresh,
+                size: isTablet ? 20 : 18),
+            label: Text("Retry",
+                style: GoogleFonts.lato(
+                    fontSize: isTablet ? 15 : 14)),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: colour.kPrimary,
+              padding: EdgeInsets.symmetric(
+                horizontal: isTablet ? 28 : 20,
+                vertical:   isTablet ? 12 : 10,
+              ),
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12)),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+// ─── Empty State ──────────────────────────────────────────────────────────────
+class _EmptyState extends StatelessWidget {
+  final bool isTablet;
+  const _EmptyState({required this.isTablet});
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Text(
+        "No fuel filling records found.",
+        style: GoogleFonts.lato(
+          fontSize: isTablet ? 18 : 16,
+          color:    Colors.grey,
+        ),
       ),
     );
   }

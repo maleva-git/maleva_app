@@ -8,7 +8,6 @@ import '../bloc/emailinbox_event.dart';
 import '../bloc/emailinbox_state.dart';
 import 'package:maleva/core/colors/colors.dart' as colour;
 
-
 // ── Entry Point ───────────────────────────────────────────────────────────────
 class EmailPage extends StatelessWidget {
   const EmailPage({super.key});
@@ -16,7 +15,8 @@ class EmailPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (_) => EmailBloc(context)..add(const LoadEmployeesEvent()),
+      create: (_) =>
+      EmailBloc(context)..add(const LoadEmployeesEvent()),
       child: const _EmailBody(),
     );
   }
@@ -28,241 +28,396 @@ class _EmailBody extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isTablet = MediaQuery.of(context).size.width >= 600;
+
     return BlocConsumer<EmailBloc, EmailState>(
-      // ── Listener — side effects (dialogs, snackbars) ──
       listener: (context, state) async {
         if (state is EmailSaveSuccess) {
           await objfun.ConfirmationOK(
               'Updated Successfully:\n${state.message}', context);
-          // Reload emails after save
-          final bloc = context.read<EmailBloc>();
+          final bloc    = context.read<EmailBloc>();
           final current = bloc.state;
           if (current is EmployeesLoaded &&
               current.selectedEmployee != null) {
             bloc.add(LoadEmailsEvent(current.selectedEmployee!.Id));
           }
         }
-
         if (state is EmailError) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text(state.message),
-              backgroundColor: Colors.red,
-            ),
+                content:         Text(state.message),
+                backgroundColor: Colors.red),
           );
         }
       },
-
-      // ── Builder — UI ──────────────────────────────────
       builder: (context, state) {
-
-        // ── Employees Loading ──
         if (state is EmployeesLoading) {
           return const Center(
-            child: CircularProgressIndicator(color: colour.kPrimary),
+            child:
+            CircularProgressIndicator(color: colour.kPrimary),
           );
         }
 
-        // ── Error ──
         if (state is EmailError) {
-          return Center(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                const Icon(Icons.error_outline, color: Colors.red, size: 48),
-                const SizedBox(height: 12),
-                Text(state.message,
-                    textAlign: TextAlign.center,
-                    style: GoogleFonts.lato(color: Colors.red, fontSize: 14)),
-                const SizedBox(height: 16),
-                ElevatedButton.icon(
-                  onPressed: () => context
-                      .read<EmailBloc>()
-                      .add(const LoadEmployeesEvent()),
-                  icon: const Icon(Icons.refresh),
-                  label: const Text("Retry"),
-                  style:
-                  ElevatedButton.styleFrom(backgroundColor: colour.kPrimary),
-                ),
-              ],
-            ),
-          );
+          return _ErrorState(isTablet: isTablet);
         }
 
-        // ── Employees Loaded ──
         if (state is EmployeesLoaded) {
-          return Padding(
-            padding: const EdgeInsets.all(12),
-            child: Column(
-              children: [
-
-                // ── Employee Dropdown ──────────────────────────────────────
-                Container(
-                  decoration: BoxDecoration(
-                    color: colour.kAccent,
-                    borderRadius: BorderRadius.circular(12),
-                    border: Border.all(
-                        color: colour.kPrimaryLight.withOpacity(0.3)),
-                  ),
-                  padding: const EdgeInsets.symmetric(horizontal: 12),
-                  child: DropdownButtonHideUnderline(
-                    child: DropdownButton<EmployeeModel>(
-                      isExpanded: true,
-                      value: state.selectedEmployee,
-                      hint: Text("Select Employee",
-                          style: GoogleFonts.lato(color: Colors.grey)),
-                      icon: const Icon(Icons.keyboard_arrow_down_rounded,
-                          color: colour.kPrimary),
-                      items: state.employees.map((emp) {
-                        return DropdownMenuItem(
-                          value: emp,
-                          child: Text(
-                            emp.AccountName,
-                            overflow: TextOverflow.ellipsis,
-                            style: GoogleFonts.lato(
-                                color: colour.kPrimaryDark,
-                                fontWeight: FontWeight.w600),
-                          ),
-                        );
-                      }).toList(),
-                      onChanged: (value) {
-                        if (value != null) {
-                          context
-                              .read<EmailBloc>()
-                              .add(SelectEmployeeEvent(value));
-                        }
-                      },
-                    ),
-                  ),
-                ),
-
-                const SizedBox(height: 16),
-
-                // ── Emails List ────────────────────────────────────────────
-                Expanded(
-                  child: state.emailsLoading
-                      ? const Center(
-                    child:
-                    CircularProgressIndicator(color: colour.kPrimary),
-                  )
-                      : state.emails.isEmpty
-                      ? Center(
-                    child: Text(
-                      "No emails found.",
-                      style: GoogleFonts.lato(
-                          fontSize: 16, color: Colors.grey),
-                    ),
-                  )
-                      : ListView.builder(
-                    itemCount: state.emails.length,
-                    itemBuilder: (context, index) {
-                      final email = state.emails[index];
-                      return _EmailCard(
-                        email: email,
-                        index: index,
-                      );
-                    },
-                  ),
-                ),
-
-                const SizedBox(height: 8),
-
-                // ── Save Button ────────────────────────────────────────────
-                SizedBox(
-                  width: double.infinity,
-                  child: ElevatedButton.icon(
-                    icon: state.saving
-                        ? const SizedBox(
-                      width: 18,
-                      height: 18,
-                      child: CircularProgressIndicator(
-                          color: colour.kWhite, strokeWidth: 2),
-                    )
-                        : const Icon(Icons.save_rounded, color: colour.kWhite),
-                    label: Text(
-                      state.saving ? "Saving..." : "Save Emails",
-                      style: GoogleFonts.lato(
-                          color: colour.kWhite,
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold),
-                    ),
-                    onPressed: state.saving
-                        ? null
-                        : () async {
-                      final confirm =
-                      await objfun.ConfirmationMsgYesNo(
-                        context,
-                        "Do You Want to Update?",
-                      );
-                      if (!confirm) return;
-
-                      final toSave = state.emails
-                          .where((e) => e.isActive)
-                          .toList();
-                      if (toSave.isEmpty) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                            content: Text(
-                                "No active emails selected to save"),
-                          ),
-                        );
-                        return;
-                      }
-                      context
-                          .read<EmailBloc>()
-                          .add(const SaveEmailsEvent());
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: colour.kPrimary,
-                      padding: const EdgeInsets.symmetric(vertical: 14),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      elevation: 0,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          );
+          return isTablet
+              ? _buildTabletLayout(context, state)
+              : _buildMobileLayout(context, state);
         }
 
         return const SizedBox.shrink();
       },
     );
   }
+
+  // ══════════════════════════════════════════════════════
+  // TABLET — Two Column
+  // ══════════════════════════════════════════════════════
+  Widget _buildTabletLayout(
+      BuildContext context, EmployeesLoaded state) {
+    return Padding(
+      padding: const EdgeInsets.all(20),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+
+          // ── LEFT (280px) — Title + Dropdown + Save button
+          SizedBox(
+            width: 280,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Title
+                Row(children: [
+                  Container(
+                    width: 4, height: 30,
+                    decoration: BoxDecoration(
+                      color: colour.kPrimary,
+                      borderRadius: BorderRadius.circular(4),
+                    ),
+                  ),
+                  const SizedBox(width: 10),
+                  Text('EMAIL',
+                      style: GoogleFonts.lato(
+                        fontSize:      20,
+                        fontWeight:    FontWeight.bold,
+                        color:         colour.kPrimaryDark,
+                        letterSpacing: 1.2,
+                      )),
+                ]),
+                const SizedBox(height: 6),
+                Padding(
+                  padding: const EdgeInsets.only(left: 14),
+                  child: Text('Inbox Management',
+                      style: GoogleFonts.lato(
+                        fontSize:   14,
+                        color:      colour.kPrimaryLight,
+                        fontWeight: FontWeight.w500,
+                      )),
+                ),
+                const SizedBox(height: 20),
+
+                // Dropdown
+                _EmployeeDropdown(state: state, isTablet: true),
+                const SizedBox(height: 16),
+
+                // Email count badge (when loaded)
+                if (state.emails.isNotEmpty)
+                  _CountBadge(count: state.emails.length),
+
+                const Spacer(),
+
+                // Save button at bottom of left panel
+                _SaveButton(state: state, isTablet: true),
+                const SizedBox(height: 8),
+              ],
+            ),
+          ),
+
+          const SizedBox(width: 16),
+
+          // ── RIGHT — Email list
+          Expanded(
+            child: state.emailsLoading
+                ? const Center(
+                child: CircularProgressIndicator(
+                    color: colour.kPrimary))
+                : state.emails.isEmpty
+                ? _EmptyState(isTablet: true)
+                : ListView.builder(
+              itemCount: state.emails.length,
+              itemBuilder: (context, index) =>
+                  _EmailCard(
+                    email:    state.emails[index],
+                    index:    index,
+                    isTablet: true,
+                  ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // ══════════════════════════════════════════════════════
+  // MOBILE — Single Column
+  // ══════════════════════════════════════════════════════
+  Widget _buildMobileLayout(
+      BuildContext context, EmployeesLoaded state) {
+    return Padding(
+      padding: const EdgeInsets.all(12),
+      child: Column(children: [
+        _EmployeeDropdown(state: state, isTablet: false),
+        const SizedBox(height: 16),
+
+        Expanded(
+          child: state.emailsLoading
+              ? const Center(
+              child: CircularProgressIndicator(
+                  color: colour.kPrimary))
+              : state.emails.isEmpty
+              ? _EmptyState(isTablet: false)
+              : ListView.builder(
+            itemCount: state.emails.length,
+            itemBuilder: (context, index) =>
+                _EmailCard(
+                  email:    state.emails[index],
+                  index:    index,
+                  isTablet: false,
+                ),
+          ),
+        ),
+
+        const SizedBox(height: 8),
+        _SaveButton(state: state, isTablet: false),
+      ]),
+    );
+  }
 }
 
-// ── Email Card ────────────────────────────────────────────────────────────────
-class _EmailCard extends StatelessWidget {
-  final EmailModel email;
-  final int index;
-
-  const _EmailCard({required this.email, required this.index});
+// ─── Employee Dropdown ────────────────────────────────────────────────────────
+class _EmployeeDropdown extends StatelessWidget {
+  final EmployeesLoaded state;
+  final bool isTablet;
+  const _EmployeeDropdown(
+      {required this.state, required this.isTablet});
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: const EdgeInsets.symmetric(vertical: 8),
       decoration: BoxDecoration(
-        color: colour.kWhite,
-        borderRadius: BorderRadius.circular(16),
+        color:         colour.kAccent,
+        borderRadius: BorderRadius.circular(isTablet ? 14 : 12),
+        border: Border.all(
+            color: colour.kPrimaryLight.withOpacity(0.3)),
+      ),
+      padding: EdgeInsets.symmetric(
+          horizontal: isTablet ? 14 : 12),
+      child: DropdownButtonHideUnderline(
+        child: DropdownButton<EmployeeModel>(
+          isExpanded: true,
+          value:      state.selectedEmployee,
+          hint: Text("Select Employee",
+              style: GoogleFonts.lato(
+                color:    Colors.grey,
+                fontSize: isTablet ? 15 : 14,
+              )),
+          icon: Icon(Icons.keyboard_arrow_down_rounded,
+              color: colour.kPrimary,
+              size:  isTablet ? 24 : 22),
+          items: state.employees.map((emp) {
+            return DropdownMenuItem(
+              value: emp,
+              child: Text(
+                emp.AccountName,
+                overflow: TextOverflow.ellipsis,
+                style: GoogleFonts.lato(
+                  color:      colour.kPrimaryDark,
+                  fontWeight: FontWeight.w600,
+                  fontSize:   isTablet ? 15 : 14,
+                ),
+              ),
+            );
+          }).toList(),
+          onChanged: (value) {
+            if (value != null) {
+              context
+                  .read<EmailBloc>()
+                  .add(SelectEmployeeEvent(value));
+            }
+          },
+        ),
+      ),
+    );
+  }
+}
+
+// ─── Count Badge ──────────────────────────────────────────────────────────────
+class _CountBadge extends StatelessWidget {
+  final int count;
+  const _CountBadge({required this.count});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.symmetric(
+          horizontal: 20, vertical: 18),
+      decoration: BoxDecoration(
+        gradient: const LinearGradient(
+          colors: [colour.kPrimary, colour.kPrimaryDark],
+          begin: Alignment.topLeft,
+          end:   Alignment.bottomRight,
+        ),
+        borderRadius: BorderRadius.circular(20),
+        boxShadow: [
+          BoxShadow(
+            color:     colour.kPrimary.withOpacity(0.28),
+            blurRadius: 16,
+            offset:    const Offset(0, 6),
+          ),
+        ],
+      ),
+      child: Row(children: [
+        Container(
+          padding: const EdgeInsets.all(10),
+          decoration: BoxDecoration(
+            color: colour.kWhite.withOpacity(0.20),
+            shape: BoxShape.circle,
+          ),
+          child: const Icon(Icons.email_rounded,
+              color: colour.kWhite, size: 22),
+        ),
+        const SizedBox(width: 14),
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text('Total Emails',
+                style: GoogleFonts.lato(
+                  fontSize:   12,
+                  color:      colour.kWhite.withOpacity(0.75),
+                  fontWeight: FontWeight.w500,
+                )),
+            Text('$count',
+                style: GoogleFonts.lato(
+                  fontSize:   28,
+                  color:      colour.kWhite,
+                  fontWeight: FontWeight.bold,
+                )),
+          ],
+        ),
+      ]),
+    );
+  }
+}
+
+// ─── Save Button ──────────────────────────────────────────────────────────────
+class _SaveButton extends StatelessWidget {
+  final EmployeesLoaded state;
+  final bool isTablet;
+  const _SaveButton(
+      {required this.state, required this.isTablet});
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      width: double.infinity,
+      child: ElevatedButton.icon(
+        icon: state.saving
+            ? SizedBox(
+          width:  isTablet ? 20 : 18,
+          height: isTablet ? 20 : 18,
+          child: const CircularProgressIndicator(
+              color: colour.kWhite, strokeWidth: 2),
+        )
+            : Icon(Icons.save_rounded,
+            color: colour.kWhite,
+            size:  isTablet ? 22 : 20),
+        label: Text(
+          state.saving ? "Saving..." : "Save Emails",
+          style: GoogleFonts.lato(
+            color:      colour.kWhite,
+            fontSize:   isTablet ? 16 : 15,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        onPressed: state.saving
+            ? null
+            : () async {
+          final confirm =
+          await objfun.ConfirmationMsgYesNo(
+            context,
+            "Do You Want to Update?",
+          );
+          if (!confirm) return;
+
+          final toSave = state.emails
+              .where((e) => e.isActive)
+              .toList();
+          if (toSave.isEmpty) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text(
+                    "No active emails selected to save"),
+              ),
+            );
+            return;
+          }
+          context
+              .read<EmailBloc>()
+              .add(const SaveEmailsEvent());
+        },
+        style: ElevatedButton.styleFrom(
+          backgroundColor: colour.kPrimary,
+          padding: EdgeInsets.symmetric(
+              vertical: isTablet ? 16 : 14),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(isTablet ? 14 : 12),
+          ),
+          elevation: 0,
+        ),
+      ),
+    );
+  }
+}
+
+// ─── Email Card ───────────────────────────────────────────────────────────────
+class _EmailCard extends StatelessWidget {
+  final EmailModel email;
+  final int index;
+  final bool isTablet;
+
+  const _EmailCard({
+    required this.email,
+    required this.index,
+    required this.isTablet,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      margin: EdgeInsets.symmetric(vertical: isTablet ? 10 : 8),
+      decoration: BoxDecoration(
+        color:         colour.kWhite,
+        borderRadius: BorderRadius.circular(isTablet ? 20 : 16),
         border: Border.all(color: colour.kAccent, width: 1.5),
         boxShadow: [
           BoxShadow(
-            color: colour.kPrimary.withOpacity(0.07),
+            color:     colour.kPrimary.withOpacity(0.07),
             blurRadius: 10,
-            offset: const Offset(0, 4),
+            offset:    const Offset(0, 4),
           ),
         ],
       ),
       child: Padding(
-        padding: const EdgeInsets.all(16),
+        padding: EdgeInsets.all(isTablet ? 20 : 16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-
-            // ── Name + Date Row ──
+            // Name + Date row
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -272,8 +427,8 @@ class _EmailCard extends StatelessWidget {
                     overflow: TextOverflow.ellipsis,
                     style: GoogleFonts.lato(
                       fontWeight: FontWeight.bold,
-                      fontSize: 16,
-                      color: colour.kPrimaryDark,
+                      fontSize:   isTablet ? 17 : 16,
+                      color:      colour.kPrimaryDark,
                     ),
                   ),
                 ),
@@ -285,78 +440,88 @@ class _EmailCard extends StatelessWidget {
                       .split('.')
                       .first,
                   style: GoogleFonts.lato(
-                      color: Colors.grey[500], fontSize: 11),
+                    color:    Colors.grey[500],
+                    fontSize: isTablet ? 12 : 11,
+                  ),
                 ),
               ],
             ),
 
-            const SizedBox(height: 6),
+            SizedBox(height: isTablet ? 8 : 6),
 
-            // ── Subject ──
+            // Subject
             Text(
               email.subject,
               style: GoogleFonts.lato(
-                fontSize: 15,
+                fontSize:   isTablet ? 16 : 15,
                 fontWeight: FontWeight.w600,
-                color: Colors.black87,
+                color:      Colors.black87,
               ),
             ),
 
-            const SizedBox(height: 4),
+            SizedBox(height: isTablet ? 6 : 4),
 
-            // ── Sender ──
-            Row(
-              children: [
-                const Icon(Icons.email_outlined,
-                    size: 14, color: colour.kPrimaryLight),
-                const SizedBox(width: 4),
-                Expanded(
-                  child: Text(
-                    email.sender,
-                    overflow: TextOverflow.ellipsis,
-                    style: GoogleFonts.lato(
-                        color: Colors.grey[600], fontSize: 13),
+            // Sender
+            Row(children: [
+              Icon(Icons.email_outlined,
+                  size:  isTablet ? 16 : 14,
+                  color: colour.kPrimaryLight),
+              const SizedBox(width: 4),
+              Expanded(
+                child: Text(
+                  email.sender,
+                  overflow: TextOverflow.ellipsis,
+                  style: GoogleFonts.lato(
+                    color:    Colors.grey[600],
+                    fontSize: isTablet ? 14 : 13,
                   ),
                 ),
-              ],
-            ),
+              ),
+            ]),
 
-            const SizedBox(height: 12),
+            SizedBox(height: isTablet ? 14 : 12),
 
             Divider(color: colour.kAccent, thickness: 1, height: 1),
-            const SizedBox(height: 8),
 
-            // ── Checkboxes ──
+            SizedBox(height: isTablet ? 10 : 8),
+
+            // Checkboxes
             Wrap(
-              spacing: 12,
-              runSpacing: 4,
+              spacing:    isTablet ? 14 : 12,
+              runSpacing: isTablet ? 6  : 4,
               children: [
                 _CheckboxChip(
-                  label: "Active",
-                  value: email.isActive,
+                  label:       "Active",
+                  value:       email.isActive,
                   activeColor: colour.kPrimary,
-                  onChanged: (v) => context.read<EmailBloc>().add(
-                    ToggleEmailActiveEvent(
-                        index: index, value: v ?? false),
-                  ),
+                  isTablet:    isTablet,
+                  onChanged: (v) =>
+                      context.read<EmailBloc>().add(
+                        ToggleEmailActiveEvent(
+                            index: index, value: v ?? false),
+                      ),
                 ),
                 _CheckboxChip(
-                  label: "Read",
-                  value: email.isUnread,
+                  label:       "Read",
+                  value:       email.isUnread,
                   activeColor: colour.kPrimaryLight,
-                  onChanged: (v) => context.read<EmailBloc>().add(
-                    ToggleEmailUnreadEvent(
-                        index: index, value: v ?? false),
-                  ),
+                  isTablet:    isTablet,
+                  onChanged: (v) =>
+                      context.read<EmailBloc>().add(
+                        ToggleEmailUnreadEvent(
+                            index: index, value: v ?? false),
+                      ),
                 ),
                 _CheckboxChip(
-                  label: "Replied",
-                  value: email.isReplied,
+                  label:       "Replied",
+                  value:       email.isReplied,
                   activeColor: Colors.green,
-                  onChanged: (v) => context.read<EmailBloc>().add(
-                    ToggleEmailRepliedEvent(
-                        index: index, value: v ?? false),
-                  ),
+                  isTablet:    isTablet,
+                  onChanged: (v) =>
+                      context.read<EmailBloc>().add(
+                        ToggleEmailRepliedEvent(
+                            index: index, value: v ?? false),
+                      ),
                 ),
               ],
             ),
@@ -367,56 +532,128 @@ class _EmailCard extends StatelessWidget {
   }
 }
 
-// ── Checkbox Chip ─────────────────────────────────────────────────────────────
+// ─── Checkbox Chip ────────────────────────────────────────────────────────────
 class _CheckboxChip extends StatelessWidget {
   final String label;
   final bool value;
   final Color activeColor;
   final ValueChanged<bool?> onChanged;
+  final bool isTablet;
 
   const _CheckboxChip({
     required this.label,
     required this.value,
     required this.activeColor,
     required this.onChanged,
+    required this.isTablet,
   });
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+      padding: EdgeInsets.symmetric(
+        horizontal: isTablet ? 10 : 8,
+        vertical:   isTablet ? 3  : 2,
+      ),
       decoration: BoxDecoration(
-        color: value ? activeColor.withOpacity(0.1) : Colors.grey.shade50,
+        color: value
+            ? activeColor.withOpacity(0.1)
+            : Colors.grey.shade50,
         borderRadius: BorderRadius.circular(20),
         border: Border.all(
-          color: value ? activeColor.withOpacity(0.4) : Colors.grey.shade200,
+          color: value
+              ? activeColor.withOpacity(0.4)
+              : Colors.grey.shade200,
         ),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
           SizedBox(
-            width: 24,
-            height: 24,
+            width:  isTablet ? 26 : 24,
+            height: isTablet ? 26 : 24,
             child: Checkbox(
-              value: value,
-              onChanged: onChanged,
-              activeColor: activeColor,
-              materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+              value:                 value,
+              onChanged:             onChanged,
+              activeColor:           activeColor,
+              materialTapTargetSize:
+              MaterialTapTargetSize.shrinkWrap,
             ),
           ),
           const SizedBox(width: 4),
           Text(
             label,
             style: GoogleFonts.lato(
-              fontSize: 13,
+              fontSize:   isTablet ? 14 : 13,
               fontWeight: FontWeight.w600,
-              color: value ? activeColor : Colors.grey[600],
+              color:
+              value ? activeColor : Colors.grey[600],
             ),
           ),
           const SizedBox(width: 4),
         ],
       ),
+    );
+  }
+}
+
+// ─── Error State ──────────────────────────────────────────────────────────────
+class _ErrorState extends StatelessWidget {
+  final bool isTablet;
+  const _ErrorState({required this.isTablet});
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(Icons.error_outline,
+              color: Colors.red,
+              size:  isTablet ? 60 : 48),
+          SizedBox(height: isTablet ? 16 : 12),
+          Text("Something went wrong",
+              style: GoogleFonts.lato(
+                  color:    Colors.red,
+                  fontSize: isTablet ? 16 : 14)),
+          SizedBox(height: isTablet ? 20 : 16),
+          ElevatedButton.icon(
+            onPressed: () => context
+                .read<EmailBloc>()
+                .add(const LoadEmployeesEvent()),
+            icon:  Icon(Icons.refresh,
+                size: isTablet ? 20 : 18),
+            label: Text("Retry",
+                style: GoogleFonts.lato(
+                    fontSize: isTablet ? 15 : 14)),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: colour.kPrimary,
+              padding: EdgeInsets.symmetric(
+                horizontal: isTablet ? 28 : 20,
+                vertical:   isTablet ? 12 : 10,
+              ),
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12)),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+// ─── Empty State ──────────────────────────────────────────────────────────────
+class _EmptyState extends StatelessWidget {
+  final bool isTablet;
+  const _EmptyState({required this.isTablet});
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Text("No emails found.",
+          style: GoogleFonts.lato(
+              fontSize: isTablet ? 18 : 16,
+              color:    Colors.grey)),
     );
   }
 }

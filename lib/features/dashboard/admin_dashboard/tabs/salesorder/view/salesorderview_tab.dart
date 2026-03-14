@@ -10,7 +10,6 @@ import '../bloc/salesorder_event.dart';
 import '../bloc/salesorder_state.dart';
 import '../../../../../../core/colors/colors.dart';
 
-
 class SalesOrderTab extends StatefulWidget {
   const SalesOrderTab({super.key});
 
@@ -19,40 +18,28 @@ class SalesOrderTab extends StatefulWidget {
 }
 
 class _SalesOrderTabState extends State<SalesOrderTab> {
-  late TabController _tabController;
 
   @override
   void initState() {
     super.initState();
-
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      context.read<SalesOrderBloc>()
-          .add(LoadInvoiceByType(0));
+      context.read<SalesOrderBloc>().add(LoadInvoiceByType(0));
     });
-
   }
 
   @override
   Widget build(BuildContext context) {
-    final height = MediaQuery.of(context).size.height;
-    final width = MediaQuery.of(context).size.width;
+    final screenW = MediaQuery.of(context).size.width;
+    final isTablet = screenW >= 600;
 
     return Scaffold(
       backgroundColor: const Color(0xFFEEF2F7),
-
-      body:
-
-      BlocConsumer<SalesOrderBloc, SalesOrderState>(
+      body: BlocConsumer<SalesOrderBloc, SalesOrderState>(
         listener: (context, state) {
           if (state is InvoiceLoaded && state.showWaitingSheet) {
-            showBillingBottomSheet(
-              context,
-              state.waitingBilling,
-            );
+            showBillingBottomSheet(context, state.waitingBilling);
           }
-
-          if (state is InvoiceLoaded &&
-              state.employeeData != null) {
+          if (state is InvoiceLoaded && state.employeeData != null) {
             _showDialogEmpDetails(state.employeeData!);
           }
         },
@@ -60,412 +47,408 @@ class _SalesOrderTabState extends State<SalesOrderTab> {
           if (state is InvoiceLoading) {
             return const Center(child: CircularProgressIndicator());
           }
-
           if (state is InvoiceError) {
             return Center(child: Text(state.message));
           }
-
-          if (state is! InvoiceLoaded) {
-            return const SizedBox();
-          }
-
+          if (state is! InvoiceLoaded) return const SizedBox();
 
           final data =
           state.saleDataAll.isNotEmpty ? state.saleDataAll[0] : {};
 
-          return Column(
-            children: [
-              // ✅ ListView — Expanded la
-              Expanded(
-                child: Padding(
-                  padding: const EdgeInsets.all(16),
-                  child: ListView(
-                    children: [
-                      _buildTodayYesterdayChart(data),
-                      const SizedBox(height: 20),
-                      /// RANGE TOGGLE
-                      Row(
-                        children: [
-                          _rangeButton(
-                            text: "6 Months",
-                            selected: state.is6Months,
-                            onTap: () => context.read<SalesOrderBloc>().add(LoadMonthRange(6)),
-                          ),
-                          const SizedBox(width: 10),
-                          _rangeButton(
-                            text: "1 Year",
-                            selected: !state.is6Months,
-                            onTap: () => context.read<SalesOrderBloc>().add(LoadMonthRange(12)),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 20),
-
-                      /// BLUE HEADER CARD
-                      Container(
-                        padding: const EdgeInsets.all(16),
-                        decoration: BoxDecoration(
-                          color: AppColors.appBarColor,
-                          borderRadius: BorderRadius.circular(20),
-                        ),
-                        child: Text(
-                          "${state.currentMonthName} Sales",
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontWeight: FontWeight.bold,
-                            fontSize: 18,
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: 20),
-
-                      /// TOP SMALL STAT CARDS
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          _smallStatCard("Today", data["TodaySales"].toString(), data["TodayAmount"].toString(), true),
-                          _smallStatCard("Yesterday", data["YesterdaySales"].toString(), data["YesterdayAmount"].toString(), false),
-                          _smallStatCard("Weekly", data["WeekSales"].toString(), data["WeekAmount"].toString(), true),
-                          _smallStatCard("Monthly", data["MonthSales"].toString(), data["MonthAmount"].toString(), true),
-                        ],
-                      ),
-                      const SizedBox(height: 16),
-
-                      /// WAITING BILLING ROW
-                      Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(18),
-                          boxShadow: [
-                            BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 8, offset: const Offset(0, 4))
-                          ],
-                        ),
-                        child: Row(
-                          children: [
-                            Padding(
-                              padding: const EdgeInsets.all(5),
-                              child: InkWell(
-                                onTap: () => context.read<SalesOrderBloc>().add(LoadWaitingBills(0)),
-                                child: Text(
-                                  "Waiting for Billing ",
-                                  style: GoogleFonts.lato(
-                                    textStyle: const TextStyle(
-                                      color: Color(0xFF1A2E5A),
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 12,
-                                      letterSpacing: 0.3,
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ),
-                            Padding(
-                              padding: const EdgeInsets.only(top: 5, left: 5, right: 5, bottom: 15),
-                              child: InkWell(
-                                onTap: () => showBillingBottomSheet(context, state.waitingBilling),
-                                child: Text(
-                                  "${state.waitingBilling.length}",
-                                  style: GoogleFonts.lato(
-                                    textStyle: const TextStyle(
-                                      color: Color(0xFF1A2E5A),
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 12,
-                                      letterSpacing: 0.3,
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      const SizedBox(height: 20),
-
-                      /// MONTH LIST
-                      SizedBox(
-                        height: height * 0.55,
-                        child: ListView.builder(
-                          physics: const NeverScrollableScrollPhysics(), // 👈 இது முக்கியம்
-                          itemCount: state.monthList.length,
-                          itemBuilder: (context, index) {
-                            final month = state.monthList[index];
-                            final current = state.monthData[index]["SalesAmount"].toDouble();
-                            final prev = index == 0 ? current : state.monthData[index - 1]["SalesAmount"].toDouble();
-                            final diff = prev == 0 ? 0 : ((current - prev) / prev) * 100;
-                            final isGrowth = diff >= 0;
-
-                            return InkWell(
-                              borderRadius: BorderRadius.circular(20),
-                              onTap: () => context.read<SalesOrderBloc>().add(LoadEmployeeInvData(index + 3)),
-                              child: Container(
-                                margin: const EdgeInsets.only(bottom: 12),
-                                padding: const EdgeInsets.all(16),
-                                decoration: BoxDecoration(
-                                  color: Colors.white,
-                                  borderRadius: BorderRadius.circular(20),
-                                  boxShadow: [
-                                    BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 8, offset: const Offset(0, 4))
-                                  ],
-                                ),
-                                child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    Text(month, style: const TextStyle(color: Color(0xFF1A2E5A), fontWeight: FontWeight.bold)),
-                                    Text(current.toStringAsFixed(0), style: const TextStyle(fontWeight: FontWeight.bold)),
-                                    Row(
-                                      children: [
-                                        Icon(isGrowth ? Icons.arrow_upward : Icons.arrow_downward,
-                                            size: 16, color: isGrowth ? Colors.green : Colors.red),
-                                        const SizedBox(width: 4),
-                                        Text("${diff.abs().toStringAsFixed(1)}%",
-                                            style: TextStyle(color: isGrowth ? Colors.green : Colors.red)),
-                                      ],
-                                    )
-                                  ],
-                                ),
-                              ),
-                            );
-                          },
-                        ),
-                      ),
-
-                    ],
-                  ),
-                ),
-              ),
-
-
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                child: SizedBox(
-                  height: 70,
-                  child: Card(
-                    elevation: 6,
-                    color: colour.AppColors.appBarColor,
-                    child: SalomonBottomBar(
-                      duration: const Duration(seconds: 1),
-                      currentIndex: state.selectedTabIndex,
-                      onTap: (index) {
-                        context.read<SalesOrderBloc>().add(LoadInvoiceByType(index + 1));
-                      },
-                      items: [
-                        SalomonBottomBarItem(
-                          icon: const Icon(Icons.receipt, color: colour.AppColors.whitecolor),
-                          title: Text("All",
-                            style: GoogleFonts.lato(
-                              textStyle: TextStyle(
-                                color: colour.AppColors.whitecolor,
-                                fontSize: width <= 370 ? objfun.FontCardText + 2 : objfun.FontLow,
-                              ),
-                            ),
-                          ),
-                        ),
-                        SalomonBottomBarItem(
-                          icon: const Icon(Icons.receipt_long, color: colour.AppColors.whitecolor),
-                          title: Text("With",
-                            style: GoogleFonts.lato(
-                              textStyle: TextStyle(
-                                color: colour.AppColors.whitecolor,
-                                fontSize: width <= 370 ? objfun.FontCardText + 2 : objfun.FontLow,
-                              ),
-                            ),
-                          ),
-                        ),
-                        SalomonBottomBarItem(
-                          icon: const Icon(Icons.receipt_long_outlined, color: colour.AppColors.whitecolor),
-                          title: Text("Without",
-                            style: GoogleFonts.lato(
-                              textStyle: TextStyle(
-                                color: colour.AppColors.whitecolor,
-                                fontSize: width <= 370 ? objfun.FontCardText + 2 : objfun.FontLow,
-                              ),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ),
-
-            ],
-          );
-
+          return isTablet
+              ? _buildTabletLayout(context, state, data, screenW)
+              : _buildMobileLayout(context, state, data, screenW);
         },
       ),
     );
   }
 
-  void _showDialogEmpDetails(List<dynamic> data) {
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (context) {
-        return Dialog(
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(25),
-          ),
-          child: Container(
-            padding: const EdgeInsets.all(20),
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(25),
-              color: Colors.white,
-            ),
+  // ══════════════════════════════════════════════════════
+  // TABLET LAYOUT
+  // ══════════════════════════════════════════════════════
+  Widget _buildTabletLayout(BuildContext context, InvoiceLoaded state,
+      Map data, double screenW) {
+    return Padding(
+      padding: const EdgeInsets.all(20),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+
+          // ── LEFT (60%) — Chart + Stats + Waiting
+          Expanded(
+            flex: 6,
             child: Column(
-              mainAxisSize: MainAxisSize.min,
               children: [
+                Expanded(
+                  child: SingleChildScrollView(
+                    physics: const BouncingScrollPhysics(),
+                    child: Column(children: [
+                      _buildChartSized(data, height: 260),
+                      const SizedBox(height: 16),
 
-                /// 🔵 HEADER
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    const Text(
-                      "Employee Details",
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                        color: Color(0xFF1A2E5A),
-                      ),
-                    ),
-                    InkWell(
-                      onTap: () => Navigator.pop(context),
-                      child: const CircleAvatar(
-                        radius: 14,
-                        backgroundColor: Colors.red,
-                        child: Icon(Icons.close,
-                            size: 16, color: Colors.white),
-                      ),
-                    )
-                  ],
-                ),
-
-                const SizedBox(height: 15),
-
-                /// 🔵 EMPLOYEE LIST
-                SizedBox(
-                  height: 300,
-                  child: ListView.builder(
-                    itemCount: data.length,
-                    itemBuilder: (context, index) {
-                      final emp = data[index];
-
-                      return Container(
-                        margin: const EdgeInsets.only(bottom: 12),
-                        padding: const EdgeInsets.all(14),
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(18),
-                          color: Colors.grey.shade50,
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black.withOpacity(0.05),
-                              blurRadius: 6,
-                              offset: const Offset(0, 3),
-                            )
-                          ],
+                      // Range buttons
+                      Row(children: [
+                        _rangeButton(
+                          text: "6 Months",
+                          selected: state.is6Months,
+                          onTap: () => context
+                              .read<SalesOrderBloc>()
+                              .add(LoadMonthRange(6)),
                         ),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-
-                            /// 👤 Employee Name
-                            Row(
-                              children: [
-                                const Icon(Icons.person,
-                                    size: 18,
-                                    color: Color(0xFF5B9BD5)),
-                                const SizedBox(width: 6),
-                                Expanded(
-                                  child: Text(
-                                    emp["EmployeeName"].toString(),
-                                    style: const TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 14,
-                                      color: Color(0xFF1A2E5A),
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-
-                            const SizedBox(height: 8),
-
-                            /// 💰 Sales Details Row
-                            Row(
-                              mainAxisAlignment:
-                              MainAxisAlignment.spaceBetween,
-                              children: [
-
-                                /// Amount
-                                Row(
-                                  children: [
-                                    const Text(
-                                      "RM",
-                                      style: TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                        color: Colors.green,
-                                      ),
-                                    ),
-                                    const SizedBox(width: 4),
-                                    Text(
-                                      emp["Amount"].toString(),
-                                      style: const TextStyle(
-                                        fontWeight: FontWeight.w600,
-                                        color: Colors.green,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-
-
-                                /// Sales Count
-                                Row(
-                                  children: [
-                                    const Icon(Icons.shopping_cart,
-                                        size: 16,
-                                        color: Colors.orange),
-                                    const SizedBox(width: 4),
-                                    Text(
-                                      emp["SalesCount"].toString(),
-                                      style: const TextStyle(
-                                        fontWeight: FontWeight.w600,
-                                        color: Colors.orange,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ],
-                            )
-                          ],
+                        const SizedBox(width: 10),
+                        _rangeButton(
+                          text: "1 Year",
+                          selected: !state.is6Months,
+                          onTap: () => context
+                              .read<SalesOrderBloc>()
+                              .add(LoadMonthRange(12)),
                         ),
-                      );
-                    },
+                      ]),
+                      const SizedBox(height: 16),
+
+                      // Header
+                      _buildHeaderCard(state, fontSize: 20),
+                      const SizedBox(height: 16),
+
+                      // Stat cards
+                      _buildStatCards(data, isTablet: true),
+                      const SizedBox(height: 16),
+
+                      // Waiting row
+                      _buildWaitingRow(context, state, isTablet: true),
+                    ]),
                   ),
                 ),
 
-                const SizedBox(height: 10),
+                const SizedBox(height: 12),
 
-                /// 🔴 CLOSE BUTTON
-                SizedBox(
-                  width: double.infinity,
-                  child: ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFF5B9BD5),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(15),
-                      ),
-                      padding: const EdgeInsets.symmetric(vertical: 12),
-                    ),
-                    onPressed: () => Navigator.pop(context),
-                    child: const Text(
-                      "Back to Dashboard",
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white,
-                      ),
+                // ── Bottom tab bar (tablet-ல wider)
+                _buildTabBar(context, state, screenW, isTablet: true),
+              ],
+            ),
+          ),
+
+          const SizedBox(width: 16),
+
+          // ── RIGHT (40%) — Month List
+          Expanded(
+            flex: 4,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 12, left: 4),
+                  child: Text(
+                    'Monthly Breakdown',
+                    style: const TextStyle(
+                      fontSize: 15,
+                      fontWeight: FontWeight.bold,
+                      color: Color(0xFF1A2E5A),
                     ),
                   ),
-                )
+                ),
+                Expanded(
+                  child: _buildMonthList(context, state, isTablet: true),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // ══════════════════════════════════════════════════════
+  // MOBILE LAYOUT
+  // ══════════════════════════════════════════════════════
+  Widget _buildMobileLayout(BuildContext context, InvoiceLoaded state,
+      Map data, double screenW) {
+    final height = MediaQuery.of(context).size.height;
+    return Column(
+      children: [
+        Expanded(
+          child: Padding(
+            padding: const EdgeInsets.all(16),
+            child: ListView(children: [
+              _buildChartSized(data, height: 200),
+              const SizedBox(height: 20),
+
+              Row(children: [
+                _rangeButton(
+                  text: "6 Months",
+                  selected: state.is6Months,
+                  onTap: () => context
+                      .read<SalesOrderBloc>()
+                      .add(LoadMonthRange(6)),
+                ),
+                const SizedBox(width: 10),
+                _rangeButton(
+                  text: "1 Year",
+                  selected: !state.is6Months,
+                  onTap: () => context
+                      .read<SalesOrderBloc>()
+                      .add(LoadMonthRange(12)),
+                ),
+              ]),
+              const SizedBox(height: 20),
+
+              _buildHeaderCard(state, fontSize: 18),
+              const SizedBox(height: 20),
+
+              _buildStatCards(data, isTablet: false),
+              const SizedBox(height: 16),
+
+              _buildWaitingRow(context, state, isTablet: false),
+              const SizedBox(height: 20),
+
+              SizedBox(
+                height: height * 0.55,
+                child: _buildMonthList(
+                    context, state, isTablet: false),
+              ),
+            ]),
+          ),
+        ),
+
+        // Bottom tab bar
+        _buildTabBar(context, state, screenW, isTablet: false),
+      ],
+    );
+  }
+
+  // ══════════════════════════════════════════════════════
+  // SHARED WIDGETS
+  // ══════════════════════════════════════════════════════
+
+  Widget _rangeButton({
+    required String text,
+    required bool selected,
+    required VoidCallback onTap,
+  }) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 8),
+        decoration: BoxDecoration(
+          color: selected ? AppColors.appBarColor : Colors.transparent,
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(color: AppColors.appBarColor),
+        ),
+        child: Text(
+          text,
+          style: TextStyle(
+            color: selected ? Colors.white : Colors.black,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildHeaderCard(InvoiceLoaded state,
+      {required double fontSize}) {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: AppColors.appBarColor,
+        borderRadius: BorderRadius.circular(20),
+      ),
+      child: Text(
+        "${state.currentMonthName} Sales",
+        style: TextStyle(
+          color: Colors.white,
+          fontWeight: FontWeight.bold,
+          fontSize: fontSize,
+        ),
+      ),
+    );
+  }
+
+  Widget _buildStatCards(Map data, {required bool isTablet}) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        _smallStatCard("Today",
+            data["TodaySales"].toString(),
+            data["TodayAmount"].toString(),
+            true, isTablet: isTablet),
+        _smallStatCard("Yesterday",
+            data["YesterdaySales"].toString(),
+            data["YesterdayAmount"].toString(),
+            false, isTablet: isTablet),
+        _smallStatCard("Weekly",
+            data["WeekSales"].toString(),
+            data["WeekAmount"].toString(),
+            true, isTablet: isTablet),
+        _smallStatCard("Monthly",
+            data["MonthSales"].toString(),
+            data["MonthAmount"].toString(),
+            true, isTablet: isTablet),
+      ],
+    );
+  }
+
+  Widget _smallStatCard(
+      String title, String count, String amount, bool positive,
+      {bool isTablet = false}) {
+    return Expanded(
+      child: Container(
+        margin: EdgeInsets.symmetric(horizontal: isTablet ? 5 : 4),
+        padding: EdgeInsets.all(isTablet ? 16 : 12),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(isTablet ? 20 : 16),
+          boxShadow: [
+            BoxShadow(
+                color: Colors.black.withOpacity(0.05), blurRadius: 6)
+          ],
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(title,
+                style: TextStyle(
+                    fontSize: isTablet ? 13 : 12,
+                    color: const Color(0xFF1A2E5A))),
+            SizedBox(height: isTablet ? 8 : 6),
+            Text(count,
+                style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: isTablet ? 16 : 14)),
+            SizedBox(height: isTablet ? 5 : 4),
+            Text(amount,
+                style: TextStyle(
+                    fontSize: isTablet ? 13 : 12,
+                    color: positive ? Colors.green : Colors.red)),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildWaitingRow(
+      BuildContext context, InvoiceLoaded state,
+      {required bool isTablet}) {
+    return Container(
+      padding: EdgeInsets.symmetric(
+        horizontal: isTablet ? 20 : 16,
+        vertical: isTablet ? 16 : 14,
+      ),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(18),
+        boxShadow: [
+          BoxShadow(
+              color: Colors.black.withOpacity(0.05),
+              blurRadius: 8,
+              offset: const Offset(0, 4))
+        ],
+      ),
+      child: Row(children: [
+        Padding(
+          padding: const EdgeInsets.all(5),
+          child: InkWell(
+            onTap: () => context
+                .read<SalesOrderBloc>()
+                .add(LoadWaitingBills(0)),
+            child: Text(
+              "Waiting for Billing ",
+              style: GoogleFonts.lato(
+                textStyle: TextStyle(
+                  color: const Color(0xFF1A2E5A),
+                  fontWeight: FontWeight.bold,
+                  fontSize: isTablet ? 14 : 12,
+                  letterSpacing: 0.3,
+                ),
+              ),
+            ),
+          ),
+        ),
+        Padding(
+          padding: const EdgeInsets.only(
+              top: 5, left: 5, right: 5, bottom: 15),
+          child: InkWell(
+            onTap: () =>
+                showBillingBottomSheet(context, state.waitingBilling),
+            child: Text(
+              "${state.waitingBilling.length}",
+              style: GoogleFonts.lato(
+                textStyle: TextStyle(
+                  color: const Color(0xFF1A2E5A),
+                  fontWeight: FontWeight.bold,
+                  fontSize: isTablet ? 14 : 12,
+                  letterSpacing: 0.3,
+                ),
+              ),
+            ),
+          ),
+        ),
+      ]),
+    );
+  }
+
+  Widget _buildMonthList(
+      BuildContext context, InvoiceLoaded state,
+      {required bool isTablet}) {
+    return ListView.builder(
+      physics: isTablet
+          ? const BouncingScrollPhysics()
+          : const NeverScrollableScrollPhysics(),
+      itemCount: state.monthList.length,
+      itemBuilder: (context, index) {
+        final month = state.monthList[index];
+        final current =
+        state.monthData[index]["SalesAmount"].toDouble();
+        final prev = index == 0
+            ? current
+            : state.monthData[index - 1]["SalesAmount"].toDouble();
+        final diff =
+        prev == 0 ? 0 : ((current - prev) / prev) * 100;
+        final isGrowth = diff >= 0;
+
+        return InkWell(
+          borderRadius: BorderRadius.circular(20),
+          onTap: () => context
+              .read<SalesOrderBloc>()
+              .add(LoadEmployeeInvData(index + 3)),
+          child: Container(
+            margin: EdgeInsets.only(bottom: isTablet ? 10 : 12),
+            padding: EdgeInsets.all(isTablet ? 18 : 16),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(20),
+              boxShadow: [
+                BoxShadow(
+                    color: Colors.black.withOpacity(0.05),
+                    blurRadius: 8,
+                    offset: const Offset(0, 4))
+              ],
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(month,
+                    style: TextStyle(
+                        color: const Color(0xFF1A2E5A),
+                        fontWeight: FontWeight.bold,
+                        fontSize: isTablet ? 15 : 13)),
+                Text(current.toStringAsFixed(0),
+                    style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: isTablet ? 15 : 13)),
+                Row(children: [
+                  Icon(
+                      isGrowth
+                          ? Icons.arrow_upward
+                          : Icons.arrow_downward,
+                      size: isTablet ? 18 : 16,
+                      color: isGrowth ? Colors.green : Colors.red),
+                  const SizedBox(width: 4),
+                  Text("${diff.abs().toStringAsFixed(1)}%",
+                      style: TextStyle(
+                          color: isGrowth ? Colors.green : Colors.red,
+                          fontSize: isTablet ? 14 : 12)),
+                ]),
               ],
             ),
           ),
@@ -474,375 +457,165 @@ class _SalesOrderTabState extends State<SalesOrderTab> {
     );
   }
 
-
-}
-
-
-
-
-Widget _rangeButton({
-  required String text,
-  required bool selected,
-  required VoidCallback onTap,
-}) {
-  return GestureDetector(
-    onTap: onTap,
-    child: Container(
-      padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 8),
-      decoration: BoxDecoration(
-        color: selected ? AppColors.appBarColor : Colors.transparent, // ✅
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(
-          color: AppColors.appBarColor, // ✅
-        ),
+  // ── SalomonBottomBar ──────────────────────────────────────────────────
+  Widget _buildTabBar(BuildContext context, InvoiceLoaded state,
+      double screenW, {required bool isTablet}) {
+    return Padding(
+      padding: EdgeInsets.symmetric(
+        horizontal: isTablet ? 0 : 16,
+        vertical: 8,
       ),
-      child: Text(
-        text,
-        style: TextStyle(
-          color: selected ? Colors.white : Colors.black,
-          fontWeight: FontWeight.w600,
-        ),
-      ),
-    ),
-  );
-}
-void showBillingBottomSheet(BuildContext context, List<dynamic> billingData) {
-  showModalBottomSheet(
-    context: context,
-    isScrollControlled: true,
-    backgroundColor: Colors.white,
-    shape: const RoundedRectangleBorder(
-      borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-    ),
-    builder: (context) {
-      return DraggableScrollableSheet(
-        expand: false,
-        initialChildSize: 0.9,
-        maxChildSize: 0.95,
-        builder: (context, scrollController) {
-          return Column(
-            children: [
-              // Title + Close button
-              Padding(
-                padding: const EdgeInsets.all(12),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      "Waiting for Billing Details",
-                      style: GoogleFonts.lato(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
+      child: SizedBox(
+        height: isTablet ? 60 : 70,
+        child: Card(
+          elevation: 6,
+          color: colour.AppColors.appBarColor,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(isTablet ? 20 : 12),
+          ),
+          child: SalomonBottomBar(
+            duration: const Duration(seconds: 1),
+            currentIndex: state.selectedTabIndex,
+            onTap: (index) {
+              context
+                  .read<SalesOrderBloc>()
+                  .add(LoadInvoiceByType(index + 1));
+            },
+            items: [
+              SalomonBottomBarItem(
+                icon: const Icon(Icons.receipt,
+                    color: colour.AppColors.whitecolor),
+                title: Text("All",
+                    style: GoogleFonts.lato(
+                      textStyle: TextStyle(
+                        color: colour.AppColors.whitecolor,
+                        fontSize: isTablet
+                            ? 14
+                            : (screenW <= 370
+                            ? objfun.FontCardText + 2
+                            : objfun.FontLow),
                       ),
-                    ),
-                    IconButton(
-                      icon: const Icon(Icons.close),
-                      onPressed: () => Navigator.pop(context),
-                    ),
-                  ],
-                ),
+                    )),
               ),
-              const Divider(),
-
-              // Scrollable list with modern design
-              Expanded(
-                child: ListView.builder(
-                  controller: scrollController,
-                  itemCount: billingData.length,
-                  itemBuilder: (context, index) {
-                    final item = billingData[index];
-                    return Container(
-                      margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                      decoration: BoxDecoration(
-                        color: Color(0xFFFAD691),
-                        borderRadius: BorderRadius.circular(16),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.grey.withOpacity(0.2),
-                            blurRadius: 8,
-                            offset: const Offset(0, 4),
-                          ),
-                        ],
+              SalomonBottomBarItem(
+                icon: const Icon(Icons.receipt_long,
+                    color: colour.AppColors.whitecolor),
+                title: Text("With",
+                    style: GoogleFonts.lato(
+                      textStyle: TextStyle(
+                        color: colour.AppColors.whitecolor,
+                        fontSize: isTablet
+                            ? 14
+                            : (screenW <= 370
+                            ? objfun.FontCardText + 2
+                            : objfun.FontLow),
                       ),
-                      child: InkWell(
-                        borderRadius: BorderRadius.circular(16),
-                        onTap: () {
-                          // Open detailed dialog
-                          showDialog(
-                            context: context,
-                            builder: (context) {
-                              return Dialog(
-                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-                                child: Container(
-                                  padding: const EdgeInsets.all(16),
-                                  decoration: BoxDecoration(
-                                    color: Color(0xFFFAD691),
-                                    borderRadius: BorderRadius.circular(16),
-                                  ),
-                                  child: SingleChildScrollView(
-                                    child: Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
-                                      children: [
-                                        Row(
-                                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                          children: [
-                                            Text(
-                                              "Billing Details",
-                                              style: GoogleFonts.lato(
-                                                fontSize: 18,
-                                                fontWeight: FontWeight.bold,
-                                                color: Colors.black,
-                                              ),
-                                            ),
-                                            IconButton(
-                                              icon: const Icon(Icons.close, color: Colors.black),
-                                              onPressed: () => Navigator.pop(context),
-                                            )
-                                          ],
-                                        ),
-                                        const SizedBox(height: 12),
-
-                                        // Details
-                                        _buildDetailRow(Icons.confirmation_number, "Bill No", "${item['BillNoDisplay']}"),
-                                        _buildDetailRow(Icons.date_range, "Bill Date", "${item['BillDate']}"),
-                                        _buildDetailRow(Icons.access_time, "Bill Time", "${item['BillTime']}"),
-                                        _buildDetailRow(Icons.assignment, "Job Status", "${item['JobStatus']}"),
-                                        _buildDetailRow(Icons.person, "Customer", "${item['CustomerName']}"),
-                                        _buildDetailRow(Icons.badge, "Employee", "${item['EmployeeName']}"),
-                                        _buildDetailRow(Icons.local_shipping, "Vessel", "${item['Loadingvesselname']}"),
-                                        _buildDetailRow(Icons.anchor, "Port", "${item['SPort']}"),
-                                        _buildDetailRow(Icons.calendar_today, "Pickup Date", "${item['SPickupDate']}"),
-                                        _buildDetailRow(Icons.flight_takeoff, "ETA", "${item['ETA']}"),
-                                        _buildDetailRow(Icons.monetization_on, "Net Amount", "₹${item['NetAmt']}"),
-                                      ],
-                                    ),
-                                  ),
-                                ),
-                              );
-                            },
-                          );
-                        },
-                        child: Padding(
-                          padding: const EdgeInsets.all(14),
-                          child: Row(
-                            children: [
-                              // Left Icon inside circle
-                              Container(
-                                padding: const EdgeInsets.all(12),
-                                decoration: BoxDecoration(
-                                  color: Colors.white.withOpacity(0.9),
-                                  shape: BoxShape.circle,
-                                ),
-                                child: const Icon(Icons.receipt_long, color: Color(0xFFE67E22), size: 28),
-                              ),
-                              const SizedBox(width: 12),
-
-                              // Texts
-                              Expanded(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      "Bill No: ${item['BillNo'] ?? ''}",
-                                      style: GoogleFonts.lato(
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.bold,
-                                        color: Color(0xFF2C3E50), // Dark Navy for readability
-                                      ),
-                                    ),
-                                    const SizedBox(height: 4),
-                                    Text(
-                                      "Customer: ${item['CustomerName'] ?? ''}",
-                                      style: GoogleFonts.lato(
-                                        fontSize: 14,
-                                        fontWeight: FontWeight.bold, // 👈 makes text bold
-                                        color: Color(0xFF145A32),    // Dark green for readability
-                                      ),
-                                    ),
-
-                                    const SizedBox(height: 2),
-                                    Text(
-                                      "Amount: ₹${item['NetAmt'] ?? ''}",
-                                      style: GoogleFonts.lato(
-                                        fontSize: 14,
-                                        fontWeight: FontWeight.bold,
-                                        color: Color(0xFFE67E22), // Elegant orange highlight
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-
-                              // Trailing arrow inside box
-                              Container(
-                                padding: const EdgeInsets.all(6),
-                                decoration: BoxDecoration(
-                                  color: Colors.white.withOpacity(0.9),
-                                  borderRadius: BorderRadius.circular(8),
-                                ),
-                                child: const Icon(Icons.arrow_forward_ios, size: 16, color: Color(0xFFE67E22)),
-                              ),
-                            ],
-                          ),
-
-                        ),
+                    )),
+              ),
+              SalomonBottomBarItem(
+                icon: const Icon(Icons.receipt_long_outlined,
+                    color: colour.AppColors.whitecolor),
+                title: Text("Without",
+                    style: GoogleFonts.lato(
+                      textStyle: TextStyle(
+                        color: colour.AppColors.whitecolor,
+                        fontSize: isTablet
+                            ? 14
+                            : (screenW <= 370
+                            ? objfun.FontCardText + 2
+                            : objfun.FontLow),
                       ),
-                    );
-                  },
-                ),
+                    )),
               ),
             ],
-          );
-        },
-      );
-    },
-  );
-}
-Widget _buildDetailRow(IconData icon, String label, String value) {
-  return Padding(
-    padding: const EdgeInsets.symmetric(vertical: 6),
-    child: Row(
-      children: [
-        Icon(icon, color: const Color(0xFF6A994E), ),
-        const SizedBox(width: 8),
-        Text(
-          "$label:",
-          style: const TextStyle(
-            fontWeight: FontWeight.bold,
-            color: Color(0xFF3E2723),
           ),
         ),
-        const SizedBox(width: 8),
-        Expanded(
-          child: Text(
-            value,
-            style: const TextStyle(color:Color(0xFF2C3E50),),
-          ),
-        ),
-      ],
-    ),
-  );
-}
-Widget _smallStatCard(
-    String title, String count, String amount, bool positive) {
-  return Expanded(
-    child: Container(
-      margin: const EdgeInsets.symmetric(horizontal: 4),
-      padding: const EdgeInsets.all(12),
+      ),
+    );
+  }
+
+  // ── Chart sized wrapper ───────────────────────────────────────────────
+  Widget _buildChartSized(Map data, {required double height}) {
+    return SizedBox(
+      height: height,
+      child: _buildTodayYesterdayChart(
+          Map<String, dynamic>.from(data)),
+    );
+  }
+
+  Widget _buildTodayYesterdayChart(Map<String, dynamic> data) {
+    final today =
+        double.tryParse(data["TodayAmount"].toString()) ?? 0;
+    final yesterday =
+        double.tryParse(data["YesterdayAmount"].toString()) ?? 0;
+
+    return Container(
+      padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: AppColors.appBarColor, width: 1.5),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 6,
-          )
+              color: AppColors.appBarColor.withOpacity(0.1),
+              blurRadius: 12,
+              offset: const Offset(0, 4)),
         ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(title,
-              style: const TextStyle(
-                  fontSize: 12,
-                  color: Color(0xFF1A2E5A))),
-          const SizedBox(height: 6),
-          Text(count,
-              style: const TextStyle(
-                  fontWeight: FontWeight.bold)),
-          const SizedBox(height: 4),
-          Text(
-            amount,
-            style: TextStyle(
-              fontSize: 12,
-              color: positive ? Colors.green : Colors.red,
-            ),
-          )
-        ],
-      ),
-    ),
-  );
-}
-
-Widget _buildTodayYesterdayChart(Map<String, dynamic> data) {
-  final today = double.tryParse(data["TodayAmount"].toString()) ?? 0;
-  final yesterday = double.tryParse(data["YesterdayAmount"].toString()) ?? 0;
-
-  return Container(
-    height: 200,
-    padding: const EdgeInsets.all(16),
-    decoration: BoxDecoration(
-      color: Colors.white,
-      borderRadius: BorderRadius.circular(20),
-      border: Border.all(color: AppColors.appBarColor, width: 1.5),
-      boxShadow: [
-        BoxShadow(
-          color: AppColors.appBarColor.withOpacity(0.1),
-          blurRadius: 12,
-          offset: const Offset(0, 4),
-        ),
-      ],
-    ),
-    child: Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        // ── Legend ──
-        Row(
-          children: [
-            const Text(
-              "Today vs Yesterday",
-              style: TextStyle(
-                fontWeight: FontWeight.bold,
-                fontSize: 13,
-                color: Color(0xFF1A2E5A),
-              ),
-            ),
+          Row(children: [
+            const Text("Today vs Yesterday",
+                style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 13,
+                    color: Color(0xFF1A2E5A))),
             const Spacer(),
-            // Today legend
-            Container(width: 12, height: 3, color: AppColors.appBarColor),
+            Container(
+                width: 12, height: 3, color: AppColors.appBarColor),
             const SizedBox(width: 4),
-            const Text("Today", style: TextStyle(fontSize: 11, color: Color(0xFF1A2E5A))),
+            const Text("Today",
+                style: TextStyle(
+                    fontSize: 11, color: Color(0xFF1A2E5A))),
             const SizedBox(width: 12),
-            // Yesterday legend
             Container(width: 12, height: 3, color: Colors.orange),
             const SizedBox(width: 4),
-            const Text("Yesterday", style: TextStyle(fontSize: 11, color: Color(0xFF1A2E5A))),
-          ],
-        ),
-
-        const SizedBox(height: 10),
-
-        Expanded(
-          child: LineChart(
-            LineChartData(
+            const Text("Yesterday",
+                style: TextStyle(
+                    fontSize: 11, color: Color(0xFF1A2E5A))),
+          ]),
+          const SizedBox(height: 10),
+          Expanded(
+            child: LineChart(LineChartData(
               gridData: FlGridData(
                 show: true,
                 drawVerticalLine: false,
                 getDrawingHorizontalLine: (value) => FlLine(
-                  color: Colors.grey.withOpacity(0.15),
-                  strokeWidth: 1,
-                ),
+                    color: Colors.grey.withOpacity(0.15),
+                    strokeWidth: 1),
               ),
               borderData: FlBorderData(show: false),
               titlesData: FlTitlesData(
-                leftTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
-                rightTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
-                topTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                leftTitles: AxisTitles(
+                    sideTitles: SideTitles(showTitles: false)),
+                rightTitles: AxisTitles(
+                    sideTitles: SideTitles(showTitles: false)),
+                topTitles: AxisTitles(
+                    sideTitles: SideTitles(showTitles: false)),
                 bottomTitles: AxisTitles(
                   sideTitles: SideTitles(
                     showTitles: true,
                     getTitlesWidget: (value, meta) {
                       const labels = ['Start', 'Mid', 'End'];
-                      if (value.toInt() >= labels.length) return const SizedBox();
+                      if (value.toInt() >= labels.length)
+                        return const SizedBox();
                       return Padding(
                         padding: const EdgeInsets.only(top: 6),
-                        child: Text(
-                          labels[value.toInt()],
-                          style: const TextStyle(
-                            fontSize: 10,
-                            color: Colors.grey,
-                          ),
-                        ),
+                        child: Text(labels[value.toInt()],
+                            style: const TextStyle(
+                                fontSize: 10,
+                                color: Colors.grey)),
                       );
                     },
                   ),
@@ -850,15 +623,14 @@ Widget _buildTodayYesterdayChart(Map<String, dynamic> data) {
               ),
               lineTouchData: LineTouchData(
                 touchTooltipData: LineTouchTooltipData(
-                  tooltipBgColor: Colors.white, // ✅ black → white
+                  tooltipBgColor: Colors.white,
                   tooltipRoundedRadius: 8,
                   tooltipBorder: BorderSide(
-                    color: AppColors.appBarColor,
-                    width: 1,
-                  ),
+                      color: AppColors.appBarColor, width: 1),
                   getTooltipItems: (touchedSpots) {
                     return touchedSpots.map((spot) {
-                      final label = spot.barIndex == 0 ? "Today" : "Yesterday";
+                      final label =
+                      spot.barIndex == 0 ? "Today" : "Yesterday";
                       return LineTooltipItem(
                         "$label\nRM ${spot.y.toStringAsFixed(0)}",
                         TextStyle(
@@ -874,12 +646,11 @@ Widget _buildTodayYesterdayChart(Map<String, dynamic> data) {
                 ),
               ),
               lineBarsData: [
-                // ✅ Today Line — Blue
                 LineChartBarData(
                   spots: [
                     FlSpot(0, 0),
                     FlSpot(1, today * 0.6),
-                    FlSpot(2, today),
+                    FlSpot(2, today)
                   ],
                   isCurved: true,
                   color: AppColors.appBarColor,
@@ -887,13 +658,11 @@ Widget _buildTodayYesterdayChart(Map<String, dynamic> data) {
                   isStrokeCapRound: true,
                   dotData: FlDotData(
                     show: true,
-                    getDotPainter: (spot, percent, bar, index) =>
-                        FlDotCirclePainter(
-                          radius: 5,
-                          color: Colors.white,
-                          strokeWidth: 2,
-                          strokeColor: AppColors.appBarColor,
-                        ),
+                    getDotPainter: (s, p, b, i) => FlDotCirclePainter(
+                        radius: 5,
+                        color: Colors.white,
+                        strokeWidth: 2,
+                        strokeColor: AppColors.appBarColor),
                   ),
                   belowBarData: BarAreaData(
                     show: true,
@@ -907,13 +676,11 @@ Widget _buildTodayYesterdayChart(Map<String, dynamic> data) {
                     ),
                   ),
                 ),
-
-                // ✅ Yesterday Line — Orange
                 LineChartBarData(
                   spots: [
                     FlSpot(0, 0),
                     FlSpot(1, yesterday * 0.6),
-                    FlSpot(2, yesterday),
+                    FlSpot(2, yesterday)
                   ],
                   isCurved: true,
                   color: Colors.orange,
@@ -921,13 +688,11 @@ Widget _buildTodayYesterdayChart(Map<String, dynamic> data) {
                   isStrokeCapRound: true,
                   dotData: FlDotData(
                     show: true,
-                    getDotPainter: (spot, percent, bar, index) =>
-                        FlDotCirclePainter(
-                          radius: 5,
-                          color: Colors.white,
-                          strokeWidth: 2,
-                          strokeColor: Colors.orange,
-                        ),
+                    getDotPainter: (s, p, b, i) => FlDotCirclePainter(
+                        radius: 5,
+                        color: Colors.white,
+                        strokeWidth: 2,
+                        strokeColor: Colors.orange),
                   ),
                   belowBarData: BarAreaData(
                     show: true,
@@ -942,10 +707,356 @@ Widget _buildTodayYesterdayChart(Map<String, dynamic> data) {
                   ),
                 ),
               ],
+            )),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showDialogEmpDetails(List<dynamic> data) {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) {
+        return Dialog(
+          shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(25)),
+          child: Container(
+            padding: const EdgeInsets.all(20),
+            decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(25),
+                color: Colors.white),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    const Text("Employee Details",
+                        style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                            color: Color(0xFF1A2E5A))),
+                    InkWell(
+                      onTap: () => Navigator.pop(context),
+                      child: const CircleAvatar(
+                        radius: 14,
+                        backgroundColor: Colors.red,
+                        child: Icon(Icons.close,
+                            size: 16, color: Colors.white),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 15),
+                SizedBox(
+                  height: 300,
+                  child: ListView.builder(
+                    itemCount: data.length,
+                    itemBuilder: (context, index) {
+                      final emp = data[index];
+                      return Container(
+                        margin: const EdgeInsets.only(bottom: 12),
+                        padding: const EdgeInsets.all(14),
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(18),
+                          color: Colors.grey.shade50,
+                          boxShadow: [
+                            BoxShadow(
+                                color: Colors.black.withOpacity(0.05),
+                                blurRadius: 6,
+                                offset: const Offset(0, 3))
+                          ],
+                        ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(children: [
+                              const Icon(Icons.person,
+                                  size: 18, color: Color(0xFF5B9BD5)),
+                              const SizedBox(width: 6),
+                              Expanded(
+                                child: Text(
+                                  emp["EmployeeName"].toString(),
+                                  style: const TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 14,
+                                      color: Color(0xFF1A2E5A)),
+                                ),
+                              ),
+                            ]),
+                            const SizedBox(height: 8),
+                            Row(
+                              mainAxisAlignment:
+                              MainAxisAlignment.spaceBetween,
+                              children: [
+                                Row(children: [
+                                  const Text("RM",
+                                      style: TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.green)),
+                                  const SizedBox(width: 4),
+                                  Text(emp["Amount"].toString(),
+                                      style: const TextStyle(
+                                          fontWeight: FontWeight.w600,
+                                          color: Colors.green)),
+                                ]),
+                                Row(children: [
+                                  const Icon(Icons.shopping_cart,
+                                      size: 16, color: Colors.orange),
+                                  const SizedBox(width: 4),
+                                  Text(emp["SalesCount"].toString(),
+                                      style: const TextStyle(
+                                          fontWeight: FontWeight.w600,
+                                          color: Colors.orange)),
+                                ]),
+                              ],
+                            ),
+                          ],
+                        ),
+                      );
+                    },
+                  ),
+                ),
+                const SizedBox(height: 10),
+                SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFF5B9BD5),
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(15)),
+                      padding:
+                      const EdgeInsets.symmetric(vertical: 12),
+                    ),
+                    onPressed: () => Navigator.pop(context),
+                    child: const Text("Back to Dashboard",
+                        style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white)),
+                  ),
+                ),
+              ],
             ),
           ),
-        ),
-      ],
+        );
+      },
+    );
+  }
+}
+
+// ── Top-level functions (class வெளியே) ────────────────────────────────────────
+void showBillingBottomSheet(
+    BuildContext context, List<dynamic> billingData) {
+  showModalBottomSheet(
+    context: context,
+    isScrollControlled: true,
+    backgroundColor: Colors.white,
+    shape: const RoundedRectangleBorder(
+      borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
     ),
+    builder: (context) {
+      return DraggableScrollableSheet(
+        expand: false,
+        initialChildSize: 0.9,
+        maxChildSize: 0.95,
+        builder: (context, scrollController) {
+          return Column(children: [
+            Padding(
+              padding: const EdgeInsets.all(12),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text("Waiting for Billing Details",
+                      style: GoogleFonts.lato(
+                          fontSize: 18, fontWeight: FontWeight.bold)),
+                  IconButton(
+                    icon: const Icon(Icons.close),
+                    onPressed: () => Navigator.pop(context),
+                  ),
+                ],
+              ),
+            ),
+            const Divider(),
+            Expanded(
+              child: ListView.builder(
+                controller: scrollController,
+                itemCount: billingData.length,
+                itemBuilder: (context, index) {
+                  final item = billingData[index];
+                  return Container(
+                    margin: const EdgeInsets.symmetric(
+                        horizontal: 12, vertical: 8),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFFAD691),
+                      borderRadius: BorderRadius.circular(16),
+                      boxShadow: [
+                        BoxShadow(
+                            color: Colors.grey.withOpacity(0.2),
+                            blurRadius: 8,
+                            offset: const Offset(0, 4)),
+                      ],
+                    ),
+                    child: InkWell(
+                      borderRadius: BorderRadius.circular(16),
+                      onTap: () {
+                        showDialog(
+                          context: context,
+                          builder: (context) => Dialog(
+                            shape: RoundedRectangleBorder(
+                                borderRadius:
+                                BorderRadius.circular(16)),
+                            child: Container(
+                              padding: const EdgeInsets.all(16),
+                              decoration: BoxDecoration(
+                                  color: const Color(0xFFFAD691),
+                                  borderRadius:
+                                  BorderRadius.circular(16)),
+                              child: SingleChildScrollView(
+                                child: Column(
+                                  crossAxisAlignment:
+                                  CrossAxisAlignment.start,
+                                  children: [
+                                    Row(
+                                      mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        Text("Billing Details",
+                                            style: GoogleFonts.lato(
+                                                fontSize: 18,
+                                                fontWeight:
+                                                FontWeight.bold,
+                                                color: Colors.black)),
+                                        IconButton(
+                                          icon: const Icon(Icons.close,
+                                              color: Colors.black),
+                                          onPressed: () =>
+                                              Navigator.pop(context),
+                                        ),
+                                      ],
+                                    ),
+                                    const SizedBox(height: 12),
+                                    _buildDetailRow(
+                                        Icons.confirmation_number,
+                                        "Bill No",
+                                        "${item['BillNoDisplay']}"),
+                                    _buildDetailRow(Icons.date_range,
+                                        "Bill Date",
+                                        "${item['BillDate']}"),
+                                    _buildDetailRow(Icons.access_time,
+                                        "Bill Time",
+                                        "${item['BillTime']}"),
+                                    _buildDetailRow(Icons.assignment,
+                                        "Job Status",
+                                        "${item['JobStatus']}"),
+                                    _buildDetailRow(Icons.person,
+                                        "Customer",
+                                        "${item['CustomerName']}"),
+                                    _buildDetailRow(Icons.badge,
+                                        "Employee",
+                                        "${item['EmployeeName']}"),
+                                    _buildDetailRow(
+                                        Icons.local_shipping,
+                                        "Vessel",
+                                        "${item['Loadingvesselname']}"),
+                                    _buildDetailRow(Icons.anchor,
+                                        "Port", "${item['SPort']}"),
+                                    _buildDetailRow(
+                                        Icons.calendar_today,
+                                        "Pickup Date",
+                                        "${item['SPickupDate']}"),
+                                    _buildDetailRow(
+                                        Icons.flight_takeoff,
+                                        "ETA",
+                                        "${item['ETA']}"),
+                                    _buildDetailRow(
+                                        Icons.monetization_on,
+                                        "Net Amount",
+                                        "₹${item['NetAmt']}"),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ),
+                        );
+                      },
+                      child: Padding(
+                        padding: const EdgeInsets.all(14),
+                        child: Row(children: [
+                          Container(
+                            padding: const EdgeInsets.all(12),
+                            decoration: BoxDecoration(
+                                color: Colors.white.withOpacity(0.9),
+                                shape: BoxShape.circle),
+                            child: const Icon(Icons.receipt_long,
+                                color: Color(0xFFE67E22), size: 28),
+                          ),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment:
+                              CrossAxisAlignment.start,
+                              children: [
+                                Text("Bill No: ${item['BillNo'] ?? ''}",
+                                    style: GoogleFonts.lato(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.bold,
+                                        color: const Color(0xFF2C3E50))),
+                                const SizedBox(height: 4),
+                                Text(
+                                    "Customer: ${item['CustomerName'] ?? ''}",
+                                    style: GoogleFonts.lato(
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.bold,
+                                        color: const Color(0xFF145A32))),
+                                const SizedBox(height: 2),
+                                Text(
+                                    "Amount: ₹${item['NetAmt'] ?? ''}",
+                                    style: GoogleFonts.lato(
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.bold,
+                                        color: const Color(0xFFE67E22))),
+                              ],
+                            ),
+                          ),
+                          Container(
+                            padding: const EdgeInsets.all(6),
+                            decoration: BoxDecoration(
+                                color: Colors.white.withOpacity(0.9),
+                                borderRadius:
+                                BorderRadius.circular(8)),
+                            child: const Icon(Icons.arrow_forward_ios,
+                                size: 16, color: Color(0xFFE67E22)),
+                          ),
+                        ]),
+                      ),
+                    ),
+                  );
+                },
+              ),
+            ),
+          ]);
+        },
+      );
+    },
+  );
+}
+
+Widget _buildDetailRow(IconData icon, String label, String value) {
+  return Padding(
+    padding: const EdgeInsets.symmetric(vertical: 6),
+    child: Row(children: [
+      Icon(icon, color: const Color(0xFF6A994E)),
+      const SizedBox(width: 8),
+      Text("$label:",
+          style: const TextStyle(
+              fontWeight: FontWeight.bold,
+              color: Color(0xFF3E2723))),
+      const SizedBox(width: 8),
+      Expanded(
+          child: Text(value,
+              style: const TextStyle(color: Color(0xFF2C3E50)))),
+    ]),
   );
 }
