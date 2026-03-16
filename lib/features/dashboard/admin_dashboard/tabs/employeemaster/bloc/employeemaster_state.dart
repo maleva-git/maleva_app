@@ -16,27 +16,33 @@ class EmployeeListLoaded extends EmployeeState {
   final List<EmployeeDetailsModel> allRecords;
   final List<EmployeeDetailsModel> filteredRecords;
   final String searchQuery;
+  final EmployeeDetailsModel? selectedRecord;
 
   const EmployeeListLoaded({
     required this.allRecords,
     required this.filteredRecords,
     this.searchQuery = '',
+    this.selectedRecord,
   });
 
   EmployeeListLoaded copyWith({
     List<EmployeeDetailsModel>? allRecords,
     List<EmployeeDetailsModel>? filteredRecords,
     String? searchQuery,
+    EmployeeDetailsModel? selectedRecord, // ← add
+    bool clearSelected = false,           // ← add
   }) {
     return EmployeeListLoaded(
       allRecords: allRecords ?? this.allRecords,
       filteredRecords: filteredRecords ?? this.filteredRecords,
       searchQuery: searchQuery ?? this.searchQuery,
+      selectedRecord:   clearSelected ? null : (selectedRecord ?? this.selectedRecord),
+
     );
   }
 
   @override
-  List<Object?> get props => [allRecords, filteredRecords, searchQuery];
+  List<Object?> get props => [allRecords, filteredRecords, searchQuery, selectedRecord];
 }
 
 class EmployeeDeleteSuccess extends EmployeeState {

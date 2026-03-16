@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-
 import 'package:maleva/core/models/model.dart';
 import 'package:maleva/core/utils/clsfunction.dart' as objfun;
-
 import 'employeemaster_event.dart';
 import 'employeemaster_state.dart';
 
@@ -51,6 +49,7 @@ class EmployeeMasterBloc extends Bloc<EmployeeMasterEvent, EmployeeState> {
     on<NextStepEvent>(_onNextStep);
     on<PreviousStepEvent>(_onPreviousStep);
     on<SaveEmployeeMasterEvent>(_onSave);
+    on<SelectEmployeeRecordEvent>(_onSelectRecord);
   }
 
   // ════════════════════════════════════════════════════════════════════════════
@@ -64,7 +63,15 @@ class EmployeeMasterBloc extends Bloc<EmployeeMasterEvent, EmployeeState> {
     emit(const EmployeeListLoading());
     await _fetchEmployees(emit);
   }
-
+  void _onSelectRecord(
+      SelectEmployeeRecordEvent event,
+      Emitter<EmployeeState> emit,
+      ) {
+    if (state is EmployeeListLoaded) {
+      emit((state as EmployeeListLoaded)
+          .copyWith(selectedRecord: event.record));
+    }
+  }
   void _onSearch(SearchEmployeeMasterEvent event, Emitter<EmployeeState> emit) {
     if (state is! EmployeeListLoaded) return;
     final current = state as EmployeeListLoaded;

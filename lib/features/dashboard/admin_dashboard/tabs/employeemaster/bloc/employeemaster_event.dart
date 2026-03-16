@@ -1,3 +1,5 @@
+import '../../../../../../core/models/model.dart';
+
 abstract class EmployeeMasterEvent {
   const EmployeeMasterEvent();
 }
@@ -17,6 +19,10 @@ class DeleteEmployeeMasterEvent extends EmployeeMasterEvent {
   const DeleteEmployeeMasterEvent(this.id);
 }
 
+class SelectEmployeeRecordEvent extends EmployeeMasterEvent {
+  final EmployeeDetailsModel record;
+  const SelectEmployeeRecordEvent(this.record);
+}
 // ── Add/Edit Page Events ──────────────────────────────────────────────────────
 class InitAddEmployeeMasterEvent extends EmployeeMasterEvent {
   const InitAddEmployeeMasterEvent();
