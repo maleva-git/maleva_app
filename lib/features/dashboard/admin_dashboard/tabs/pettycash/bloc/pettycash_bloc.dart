@@ -20,6 +20,7 @@ class PettyCashBloc extends Bloc<PettyCashEvent, PettyCashState> {
     on<SelectFromDateEvent>(_onFromDate);
     on<SelectToDateEvent>(_onToDate);
     on<LoadPettyCashEvent>(_onLoad);
+    on<SelectPettyCashMasterEvent>(_onSelectMaster);
   }
 
   // ── From Date ───────────────────────────────────────────────────────────────
@@ -33,7 +34,15 @@ class PettyCashBloc extends Bloc<PettyCashEvent, PettyCashState> {
     final fromDate = _currentFromDate();
     emit(PettyCashInitial(fromDate: fromDate, toDate: event.date));
   }
-
+  void _onSelectMaster(
+      SelectPettyCashMasterEvent event,
+      Emitter<PettyCashState> emit,
+      ) {
+    if (state is PettyCashLoaded) {
+      emit((state as PettyCashLoaded)
+          .copyWith(selectedMaster: event.master));
+    }
+  }
   // ── Load Petty Cash ─────────────────────────────────────────────────────────
   Future<void> _onLoad(
       LoadPettyCashEvent event,

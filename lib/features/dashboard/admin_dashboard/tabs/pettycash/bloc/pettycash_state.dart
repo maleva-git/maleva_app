@@ -29,12 +29,13 @@ class PettyCashLoaded extends PettyCashState {
   final List<PattyCashDetailsModel> detailRecords;
   final DateTime fromDate;
   final DateTime toDate;
-
+  final PattycashMasterModel? selectedMaster;
   const PettyCashLoaded({
     required this.masterRecords,
     required this.detailRecords,
     required this.fromDate,
     required this.toDate,
+    this.selectedMaster,
   });
 
   PettyCashLoaded copyWith({
@@ -42,18 +43,23 @@ class PettyCashLoaded extends PettyCashState {
     List<PattyCashDetailsModel>? detailRecords,
     DateTime? fromDate,
     DateTime? toDate,
+    PattycashMasterModel? selectedMaster, // ← add
+    bool clearSelected = false,
   }) {
     return PettyCashLoaded(
       masterRecords: masterRecords ?? this.masterRecords,
       detailRecords: detailRecords ?? this.detailRecords,
       fromDate: fromDate ?? this.fromDate,
       toDate: toDate ?? this.toDate,
+      selectedMaster: clearSelected
+          ? null
+          : (selectedMaster ?? this.selectedMaster),
     );
   }
 
   @override
   List<Object?> get props =>
-      [masterRecords, detailRecords, fromDate, toDate];
+      [masterRecords, detailRecords, fromDate, toDate, selectedMaster];
 }
 
 class PettyCashError extends PettyCashState {

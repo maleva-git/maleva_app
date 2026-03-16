@@ -1,3 +1,5 @@
+import '../../../../../../core/models/model.dart';
+
 abstract class PettyCashEvent {
   const PettyCashEvent();
 }
@@ -14,4 +16,9 @@ class SelectToDateEvent extends PettyCashEvent {
 
 class LoadPettyCashEvent extends PettyCashEvent {
   const LoadPettyCashEvent();
+}
+
+class SelectPettyCashMasterEvent extends PettyCashEvent {
+  final PattycashMasterModel master;
+  const SelectPettyCashMasterEvent(this.master);
 }
