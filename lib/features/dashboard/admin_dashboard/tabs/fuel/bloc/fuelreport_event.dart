@@ -1,3 +1,5 @@
+import '../../../../../../core/models/model.dart';
+
 abstract class FuelDiffEvent {
   const FuelDiffEvent();
 }
@@ -14,4 +16,8 @@ class SelectToDateEvent extends FuelDiffEvent {
 
 class LoadFuelDiffEvent extends FuelDiffEvent {
   const LoadFuelDiffEvent();
+}
+class SelectFuelRecordEvent extends FuelDiffEvent {
+  final FuelselectModel record;
+  const SelectFuelRecordEvent(this.record);
 }

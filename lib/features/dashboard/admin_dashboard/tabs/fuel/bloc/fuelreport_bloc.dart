@@ -22,6 +22,7 @@ class FuelDiffBloc extends Bloc<FuelDiffEvent, FuelDiffState> {
     on<SelectFromDateEvent>(_onSelectFromDate);
     on<SelectToDateEvent>(_onSelectToDate);
     on<LoadFuelDiffEvent>(_onLoadFuelDiff);
+    on<SelectFuelRecordEvent>(_onSelectRecord);
   }
 
   // ── 1. From Date Select ─────────────────────────────────────────────────────
@@ -89,6 +90,17 @@ class FuelDiffBloc extends Bloc<FuelDiffEvent, FuelDiffState> {
       }
     } catch (e) {
       emit(FuelDiffError(e.toString()));
+    }
+
+  }
+  void _onSelectRecord(
+      SelectFuelRecordEvent event,
+      Emitter<FuelDiffState> emit,
+      ) {
+    if (state is FuelDiffLoaded) {
+      emit((state as FuelDiffLoaded).copyWith(
+        selectedRecord: event.record,
+      ));
     }
   }
 }
