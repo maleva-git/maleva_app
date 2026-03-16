@@ -48,6 +48,7 @@ class PaymentPendingLoaded extends PaymentPendingState {
   final String selectedPaidFilter;
   final DateTime fromDate;
   final DateTime toDate;
+  final PaymentPendingModel? selectedItem;
 
   const PaymentPendingLoaded({
     required this.masterList,
@@ -56,6 +57,7 @@ class PaymentPendingLoaded extends PaymentPendingState {
     required this.selectedPaidFilter,
     required this.fromDate,
     required this.toDate,
+    this.selectedItem,
   });
 
   // Computed: filtered master list
@@ -94,6 +96,8 @@ class PaymentPendingLoaded extends PaymentPendingState {
     String? selectedPaidFilter,
     DateTime? fromDate,
     DateTime? toDate,
+    PaymentPendingModel? selectedItem,
+    bool clearSelected = false,
   }) {
     return PaymentPendingLoaded(
       masterList: masterList ?? this.masterList,
@@ -102,6 +106,9 @@ class PaymentPendingLoaded extends PaymentPendingState {
       selectedPaidFilter: selectedPaidFilter ?? this.selectedPaidFilter,
       fromDate: fromDate ?? this.fromDate,
       toDate: toDate ?? this.toDate,
+      selectedItem: clearSelected
+          ? null
+          : (selectedItem ?? this.selectedItem),
     );
   }
 

@@ -1,3 +1,5 @@
+import '../../../../../../core/models/model.dart';
+
 abstract class PaymentPendingEvent {
   const PaymentPendingEvent();
 }
@@ -18,7 +20,10 @@ class SelectPaidFilterEvent extends PaymentPendingEvent {
   final String filter;
   const SelectPaidFilterEvent(this.filter);
 }
-
+class SelectPaymentItemEvent extends PaymentPendingEvent {
+  final PaymentPendingModel item;
+  const SelectPaymentItemEvent(this.item);
+}
 // ── Date Filter ───────────────────────────────────────────────────────────────
 class SelectFromDateEvent extends PaymentPendingEvent {
   final DateTime date;

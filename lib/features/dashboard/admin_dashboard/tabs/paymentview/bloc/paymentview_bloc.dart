@@ -26,7 +26,7 @@ class PaymentPendingBloc
     on<SelectFromDateEvent>(_onFromDate);
     on<SelectToDateEvent>(_onToDate);
     on<SearchByDateEvent>(_onSearchByDate);
-
+    on<SelectPaymentItemEvent>(_onSelectItem);
     // Auto-load on init
     add(const LoadPaymentPendingEvent());
   }
@@ -39,7 +39,15 @@ class PaymentPendingBloc
     if (s is PaymentPendingError) return s.selectedFilter;
     return 'All';
   }
-
+  void _onSelectItem(
+      SelectPaymentItemEvent event,
+      Emitter<PaymentPendingState> emit,
+      ) {
+    if (state is PaymentPendingLoaded) {
+      emit((state as PaymentPendingLoaded)
+          .copyWith(selectedItem: event.item));
+    }
+  }
   String _currentPaidFilter() {
     final s = state;
     if (s is PaymentPendingLoading) return s.selectedPaidFilter;

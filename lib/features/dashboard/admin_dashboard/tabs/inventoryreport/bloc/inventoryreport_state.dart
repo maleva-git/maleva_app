@@ -25,6 +25,7 @@ class InventoryLoaded extends InventoryState {
   final int status;                // 0 or 1
   final List<InventoryModel> records;
   final bool isLoading;
+  final InventoryModel? selectedItem;
 
   const InventoryLoaded({
     this.selectedPortId = 1,
@@ -35,6 +36,7 @@ class InventoryLoaded extends InventoryState {
     this.status = 0,
     this.records = const [],
     this.isLoading = false,
+    this.selectedItem,
   });
 
   InventoryLoaded copyWith({
@@ -47,6 +49,8 @@ class InventoryLoaded extends InventoryState {
     List<InventoryModel>? records,
     bool? isLoading,
     bool clearCustomer = false,
+    InventoryModel? selectedItem,
+    bool clearSelected = false
   }) {
     return InventoryLoaded(
       selectedPortId:    selectedPortId    ?? this.selectedPortId,
@@ -59,6 +63,9 @@ class InventoryLoaded extends InventoryState {
       status:            status            ?? this.status,
       records:           records           ?? this.records,
       isLoading:         isLoading         ?? this.isLoading,
+      selectedItem: clearSelected
+          ? null
+          : (selectedItem ?? this.selectedItem),
     );
   }
 }

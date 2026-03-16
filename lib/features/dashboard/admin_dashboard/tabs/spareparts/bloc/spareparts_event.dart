@@ -13,7 +13,10 @@ class SelectSparePartsTruckEvent extends SparePartsEvent {
   final String? truckId;
   const SelectSparePartsTruckEvent(this.truckId);
 }
-
+class SelectSparePartsRecordEvent extends SparePartsEvent {
+  final Map<String, dynamic> record;
+  const SelectSparePartsRecordEvent(this.record);
+}
 class SelectSparePartsDateEvent extends SparePartsEvent {
   final DateTime date;
   const SelectSparePartsDateEvent(this.date);

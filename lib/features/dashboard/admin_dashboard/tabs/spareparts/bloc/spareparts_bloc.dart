@@ -51,6 +51,7 @@ class SparePartsBloc extends Bloc<SparePartsEvent, SparePartsState> {
     on<SelectSparePartsFromDateEvent>(_onFromDate);
     on<SelectSparePartsToDateEvent>(_onToDate);
     on<LoadSparePartsViewEvent>(_onLoadView);
+    on<SelectSparePartsRecordEvent>(_onSelectRecord);
   }
 
   // ════════════════════════════════════════════════════════════════════════════
@@ -66,7 +67,15 @@ class SparePartsBloc extends Bloc<SparePartsEvent, SparePartsState> {
       emit((state as SparePartsEntryState).copyWith());
     }
   }
-
+  void _onSelectRecord(
+      SelectSparePartsRecordEvent event,
+      Emitter<SparePartsState> emit,
+      ) {
+    if (state is SparePartsViewState) {
+      emit((state as SparePartsViewState)
+          .copyWith(selectedRecord: event.record));
+    }
+  }
   void _onSelectTruck(
       SelectSparePartsTruckEvent e, Emitter<SparePartsState> emit) {
     if (state is! SparePartsEntryState) return;

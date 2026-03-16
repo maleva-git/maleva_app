@@ -1,3 +1,5 @@
+import '../../../../../../core/models/model.dart';
+
 abstract class InventoryEvent {
   const InventoryEvent();
 }
@@ -23,7 +25,10 @@ class SelectInventoryToDateEvent extends InventoryEvent {
   final DateTime date;
   const SelectInventoryToDateEvent(this.date);
 }
-
+class SelectInventoryItemEvent extends InventoryEvent {
+  final InventoryModel item;
+  const SelectInventoryItemEvent(this.item);
+}
 class SearchInventoryByDateEvent extends InventoryEvent {
   const SearchInventoryByDateEvent();
 }

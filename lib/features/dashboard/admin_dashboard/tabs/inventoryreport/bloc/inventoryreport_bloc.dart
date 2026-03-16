@@ -22,7 +22,7 @@ class InventoryBloc extends Bloc<InventoryEvent, InventoryState> {
     on<SearchInventoryByDateEvent>(_onSearchByDate);
     on<SelectInventoryCustomerEvent>(_onCustomer);
     on<ToggleInventoryStatusEvent>(_onToggle);
-
+    on<SelectInventoryItemEvent>(_onSelectItem);
     add(const LoadInventoryListsEvent());
   }
 
@@ -33,7 +33,15 @@ class InventoryBloc extends Bloc<InventoryEvent, InventoryState> {
     fromDate: DateTime.now(),
     toDate:   DateTime.now(),
   );
-
+  void _onSelectItem(
+      SelectInventoryItemEvent event,
+      Emitter<InventoryState> emit,
+      ) {
+    if (state is InventoryLoaded) {
+      emit((state as InventoryLoaded)
+          .copyWith(selectedItem: event.item));
+    }
+  }
   // ── Load Customer list ────────────────────────────────────────────────────
   Future<void> _onLoadLists(
       LoadInventoryListsEvent e, Emitter<InventoryState> emit) async {

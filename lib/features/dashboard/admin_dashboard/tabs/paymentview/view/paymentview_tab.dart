@@ -22,12 +22,14 @@ class PaymentPendingPage extends StatelessWidget {
   }
 }
 
-// ── Body (uses DefaultTabController for expense tabs) ─────────────────────────
+// ── Body ──────────────────────────────────────────────────────────────────────
 class _PaymentPendingBody extends StatelessWidget {
   const _PaymentPendingBody();
 
   @override
   Widget build(BuildContext context) {
+    final isTablet = MediaQuery.of(context).size.width >= 600;
+
     return BlocBuilder<PaymentPendingBloc, PaymentPendingState>(
       builder: (context, state) {
         final expFilter  = _expFilter(state);
@@ -36,8 +38,9 @@ class _PaymentPendingBody extends StatelessWidget {
         final toDate     = _toDate(state);
         final isLoading  = state is PaymentPendingLoading;
         final loaded     = state is PaymentPendingLoaded ? state : null;
-
-        final expIdx = kExpenseFilters.indexOf(expFilter).clamp(0, kExpenseFilters.length - 1);
+        final expIdx     = kExpenseFilters
+            .indexOf(expFilter)
+            .clamp(0, kExpenseFilters.length - 1);
 
         return DefaultTabController(
           length: kExpenseFilters.length,
@@ -46,9 +49,9 @@ class _PaymentPendingBody extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
 
-              // ════════════════════════════════════════════════════
-              // TAB BAR — Expense categories
-              // ════════════════════════════════════════════════════
+              // ════════════════════════════════════
+              // TAB BAR
+              // ════════════════════════════════════
               Container(
                 color: colour.kPrimary,
                 child: TabBar(
@@ -57,24 +60,27 @@ class _PaymentPendingBody extends StatelessWidget {
                   indicatorColor: colour.kWhite,
                   indicatorWeight: 3,
                   labelColor: colour.kWhite,
-                  unselectedLabelColor: colour.kWhite.withOpacity(0.55),
+                  unselectedLabelColor:
+                  colour.kWhite.withOpacity(0.55),
                   labelStyle: GoogleFonts.lato(
-                      fontWeight: FontWeight.bold, fontSize: 13),
+                      fontWeight: FontWeight.bold,
+                      fontSize: 13),
                   unselectedLabelStyle:
                   GoogleFonts.lato(fontSize: 13),
                   dividerColor: Colors.transparent,
                   onTap: (i) => context
                       .read<PaymentPendingBloc>()
-                      .add(SelectExpenseFilterEvent(kExpenseFilters[i])),
+                      .add(SelectExpenseFilterEvent(
+                      kExpenseFilters[i])),
                   tabs: kExpenseFilters
                       .map((f) => Tab(text: f))
                       .toList(),
                 ),
               ),
 
-              // ════════════════════════════════════════════════════
-              // PAID FILTER — segmented control style
-              // ════════════════════════════════════════════════════
+              // ════════════════════════════════════
+              // PAID FILTER
+              // ════════════════════════════════════
               Container(
                 color: colour.kPrimary.withOpacity(0.06),
                 padding: const EdgeInsets.symmetric(
@@ -88,7 +94,8 @@ class _PaymentPendingBody extends StatelessWidget {
                             .read<PaymentPendingBloc>()
                             .add(SelectPaidFilterEvent(f)),
                         child: AnimatedContainer(
-                          duration: const Duration(milliseconds: 180),
+                          duration:
+                          const Duration(milliseconds: 180),
                           margin: const EdgeInsets.symmetric(
                               horizontal: 3),
                           padding: const EdgeInsets.symmetric(
@@ -97,7 +104,8 @@ class _PaymentPendingBody extends StatelessWidget {
                             color: active
                                 ? colour.kPrimary
                                 : colour.kAccent,
-                            borderRadius: BorderRadius.circular(10),
+                            borderRadius:
+                            BorderRadius.circular(10),
                             border: Border.all(
                                 color: active
                                     ? colour.kPrimary
@@ -121,9 +129,9 @@ class _PaymentPendingBody extends StatelessWidget {
                 ),
               ),
 
-              // ════════════════════════════════════════════════════
+              // ════════════════════════════════════
               // DATE FILTER BAR
-              // ════════════════════════════════════════════════════
+              // ════════════════════════════════════
               Padding(
                 padding: const EdgeInsets.fromLTRB(10, 8, 10, 4),
                 child: Container(
@@ -133,28 +141,34 @@ class _PaymentPendingBody extends StatelessWidget {
                     color: colour.kAccent,
                     borderRadius: BorderRadius.circular(14),
                     border: Border.all(
-                        color: colour.kPrimaryLight.withOpacity(0.3)),
+                        color:
+                        colour.kPrimaryLight.withOpacity(0.3)),
                   ),
                   child: Row(children: [
                     Expanded(
                         child: _dateCell(
                           context: context,
                           label: "From",
-                          value: DateFormat('dd-MM-yy').format(fromDate),
+                          value:
+                          DateFormat('dd-MM-yy').format(fromDate),
                           onTap: () => _pickDate(
-                              context, fromDate,
+                              context,
+                              fromDate,
                                   (d) => context
                                   .read<PaymentPendingBloc>()
                                   .add(SelectFromDateEvent(d))),
                         )),
                     _calBtn(() => _pickDate(
-                        context, fromDate,
+                        context,
+                        fromDate,
                             (d) => context
                             .read<PaymentPendingBloc>()
                             .add(SelectFromDateEvent(d)))),
                     Container(
-                        width: 1, height: 28,
-                        color: colour.kPrimaryLight.withOpacity(0.3),
+                        width: 1,
+                        height: 28,
+                        color:
+                        colour.kPrimaryLight.withOpacity(0.3),
                         margin: const EdgeInsets.symmetric(
                             horizontal: 8)),
                     Expanded(
@@ -163,13 +177,15 @@ class _PaymentPendingBody extends StatelessWidget {
                           label: "To",
                           value: DateFormat('dd-MM-yy').format(toDate),
                           onTap: () => _pickDate(
-                              context, toDate,
+                              context,
+                              toDate,
                                   (d) => context
                                   .read<PaymentPendingBloc>()
                                   .add(SelectToDateEvent(d))),
                         )),
                     _calBtn(() => _pickDate(
-                        context, toDate,
+                        context,
+                        toDate,
                             (d) => context
                             .read<PaymentPendingBloc>()
                             .add(SelectToDateEvent(d)))),
@@ -185,7 +201,8 @@ class _PaymentPendingBody extends StatelessWidget {
                         padding: const EdgeInsets.symmetric(
                             horizontal: 14, vertical: 10),
                         shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(10)),
+                            borderRadius:
+                            BorderRadius.circular(10)),
                         elevation: 0,
                       ),
                       child: Text("Search",
@@ -198,9 +215,9 @@ class _PaymentPendingBody extends StatelessWidget {
                 ),
               ),
 
-              // ════════════════════════════════════════════════════
+              // ════════════════════════════════════
               // TOTAL SUMMARY STRIP
-              // ════════════════════════════════════════════════════
+              // ════════════════════════════════════
               Padding(
                 padding: const EdgeInsets.symmetric(
                     horizontal: 12, vertical: 4),
@@ -213,8 +230,10 @@ class _PaymentPendingBody extends StatelessWidget {
                       borderRadius: BorderRadius.circular(10),
                     ),
                     child: Row(children: [
-                      const Icon(Icons.account_balance_wallet_rounded,
-                          color: colour.kWhite, size: 16),
+                      const Icon(
+                          Icons.account_balance_wallet_rounded,
+                          color: colour.kWhite,
+                          size: 16),
                       const SizedBox(width: 6),
                       Text("Total: ",
                           style: GoogleFonts.lato(
@@ -233,9 +252,11 @@ class _PaymentPendingBody extends StatelessWidget {
                   const Spacer(),
                   if (isLoading)
                     const SizedBox(
-                      width: 18, height: 18,
+                      width: 18,
+                      height: 18,
                       child: CircularProgressIndicator(
-                          strokeWidth: 2, color: colour.kPrimary),
+                          strokeWidth: 2,
+                          color: colour.kPrimary),
                     ),
                   Text(
                     "${loaded?.filteredMaster.length ?? 0} records",
@@ -247,9 +268,9 @@ class _PaymentPendingBody extends StatelessWidget {
 
               const SizedBox(height: 4),
 
-              // ════════════════════════════════════════════════════
-              // GRID LIST
-              // ════════════════════════════════════════════════════
+              // ════════════════════════════════════
+              // CONTENT
+              // ════════════════════════════════════
               Expanded(
                 child: isLoading
                     ? const Center(
@@ -267,7 +288,8 @@ class _PaymentPendingBody extends StatelessWidget {
                           Icons
                               .receipt_long_outlined,
                           size: 60,
-                          color: Colors.grey.shade300),
+                          color:
+                          Colors.grey.shade300),
                       const SizedBox(height: 12),
                       Text("No Records Found",
                           style: GoogleFonts.lato(
@@ -276,30 +298,11 @@ class _PaymentPendingBody extends StatelessWidget {
                     ],
                   ),
                 )
-                    : GridView.builder(
-                  padding: const EdgeInsets.fromLTRB(
-                      10, 4, 10, 20),
-                  gridDelegate:
-                  const SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 2,
-                    crossAxisSpacing: 10,
-                    mainAxisSpacing: 10,
-                    childAspectRatio: 0.82,
-                  ),
-                  itemCount:
-                  loaded.filteredMaster.length,
-                  itemBuilder: (_, i) {
-                    final item =
-                    loaded.filteredMaster[i];
-                    return _PaymentGridCard(
-                      item: item,
-                      onTap: () => _showDetailSheet(
-                          context,
-                          item,
-                          loaded.relatedDetails(item)),
-                    );
-                  },
-                ),
+                    : isTablet
+                    ? _buildTabletLayout(
+                    context, loaded)
+                    : _buildMobileGrid(
+                    context, loaded),
               ),
             ],
           ),
@@ -308,7 +311,88 @@ class _PaymentPendingBody extends StatelessWidget {
     );
   }
 
-  // ── Date picker helper ──────────────────────────────────────────────────
+  // ══════════════════════════════════════════════════════
+  // TABLET — Grid (left) + Detail Panel (right)
+  // ══════════════════════════════════════════════════════
+  Widget _buildTabletLayout(
+      BuildContext context, PaymentPendingLoaded loaded) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // ── LEFT (58%) — Grid ──
+        Expanded(
+          flex: 58,
+          child: _buildGrid(context, loaded,
+              crossAxisCount: 3, isTablet: true),
+        ),
+
+        const SizedBox(width: 12),
+
+        // ── RIGHT (42%) — Detail Panel ──
+        Expanded(
+          flex: 42,
+          child: loaded.selectedItem != null
+              ? _PaymentDetailPanel(
+            master: loaded.selectedItem!,
+            related: loaded.relatedDetails(
+                loaded.selectedItem!),
+          )
+              : _EmptyDetailPanel(),
+        ),
+      ],
+    );
+  }
+
+  // ══════════════════════════════════════════════════════
+  // MOBILE — Grid only (2 columns, bottom sheet on tap)
+  // ══════════════════════════════════════════════════════
+  Widget _buildMobileGrid(
+      BuildContext context, PaymentPendingLoaded loaded) {
+    return _buildGrid(context, loaded,
+        crossAxisCount: 2, isTablet: false);
+  }
+
+  // ══════════════════════════════════════════════════════
+  // SHARED — Grid Builder
+  // ══════════════════════════════════════════════════════
+  Widget _buildGrid(
+      BuildContext context,
+      PaymentPendingLoaded loaded, {
+        required int crossAxisCount,
+        required bool isTablet,
+      }) {
+    return GridView.builder(
+      padding: const EdgeInsets.fromLTRB(10, 4, 10, 20),
+      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: crossAxisCount,
+        crossAxisSpacing: 10,
+        mainAxisSpacing: 10,
+        childAspectRatio: isTablet ? 0.9 : 0.82,
+      ),
+      itemCount: loaded.filteredMaster.length,
+      itemBuilder: (_, i) {
+        final item = loaded.filteredMaster[i];
+        final isSelected = isTablet &&
+            loaded.selectedItem?.id == item.id;
+
+        return _PaymentGridCard(
+          item: item,
+          isSelected: isSelected,
+          onTap: () {
+            if (isTablet) {
+              context.read<PaymentPendingBloc>().add(
+                  SelectPaymentItemEvent(item));
+            } else {
+              _showDetailSheet(context, item,
+                  loaded.relatedDetails(item));
+            }
+          },
+        );
+      },
+    );
+  }
+
+  // ── Date picker helper ────────────────────────────────
   Future<void> _pickDate(
       BuildContext context,
       DateTime initial,
@@ -320,15 +404,14 @@ class _PaymentPendingBody extends StatelessWidget {
       lastDate: DateTime(2035),
       builder: (ctx, child) => Theme(
         data: Theme.of(ctx).copyWith(
-            colorScheme:
-            const ColorScheme.light(primary: colour.kPrimary)),
+            colorScheme: const ColorScheme.light(
+                primary: colour.kPrimary)),
         child: child!,
       ),
     );
     if (picked != null) onPicked(picked);
   }
 
-  // ── Detail Bottom Sheet ─────────────────────────────────────────────────
   void _showDetailSheet(
       BuildContext context,
       PaymentPendingModel master,
@@ -337,15 +420,16 @@ class _PaymentPendingBody extends StatelessWidget {
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
-      builder: (_) => _DetailSheet(master: master, related: related),
+      builder: (_) =>
+          _DetailSheet(master: master, related: related),
     );
   }
 
-  // ── Error view ──────────────────────────────────────────────────────────
   Widget _errorView(BuildContext context, String msg) {
     return Center(
       child: Column(mainAxisSize: MainAxisSize.min, children: [
-        const Icon(Icons.error_outline, color: Colors.red, size: 48),
+        const Icon(Icons.error_outline,
+            color: Colors.red, size: 48),
         const SizedBox(height: 12),
         Text(msg,
             textAlign: TextAlign.center,
@@ -357,14 +441,14 @@ class _PaymentPendingBody extends StatelessWidget {
               .add(const LoadPaymentPendingEvent()),
           icon: const Icon(Icons.refresh),
           label: const Text("Retry"),
-          style:
-          ElevatedButton.styleFrom(backgroundColor: colour.kPrimary),
+          style: ElevatedButton.styleFrom(
+              backgroundColor: colour.kPrimary),
         ),
       ]),
     );
   }
 
-  // ── State helpers ───────────────────────────────────────────────────────
+  // ── State helpers ─────────────────────────────────────
   String _expFilter(PaymentPendingState s) {
     if (s is PaymentPendingLoading) return s.selectedFilter;
     if (s is PaymentPendingLoaded) return s.selectedFilter;
@@ -394,15 +478,20 @@ class _PaymentPendingBody extends StatelessWidget {
   }
 }
 
-// ── 2-Column Grid Card ────────────────────────────────────────────────────────
+// ── Grid Card ─────────────────────────────────────────────────────────────────
 class _PaymentGridCard extends StatelessWidget {
   final PaymentPendingModel item;
+  final bool isSelected;
   final VoidCallback onTap;
-  const _PaymentGridCard({required this.item, required this.onTap});
+
+  const _PaymentGridCard({
+    required this.item,
+    required this.isSelected,
+    required this.onTap,
+  });
 
   @override
   Widget build(BuildContext context) {
-    // Paid status colour
     final isPaid = item.Paiddate != null &&
         item.Paiddate!.isNotEmpty &&
         item.Paiddate != '-';
@@ -411,57 +500,58 @@ class _PaymentGridCard extends StatelessWidget {
 
     return GestureDetector(
       onTap: onTap,
-      child: Container(
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
         decoration: BoxDecoration(
           color: colour.kWhite,
           borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: colour.kAccent, width: 1.5),
+          border: Border.all(
+            color: isSelected ? colour.kPrimary : colour.kAccent,
+            width: isSelected ? 2.0 : 1.5,
+          ),
           boxShadow: [
             BoxShadow(
-                color: colour.kPrimary.withOpacity(0.07),
-                blurRadius: 8,
+                color: colour.kPrimary
+                    .withOpacity(isSelected ? 0.15 : 0.07),
+                blurRadius: isSelected ? 14 : 8,
                 offset: const Offset(0, 3)),
           ],
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-
-            // ── Top colour band ───────────────────────────────────
+            // Top band
             Container(
               width: double.infinity,
               padding: const EdgeInsets.symmetric(
                   horizontal: 12, vertical: 10),
               decoration: BoxDecoration(
-                color: colour.kPrimary,
+                color: isSelected
+                    ? colour.kPrimaryDark
+                    : colour.kPrimary,
                 borderRadius: const BorderRadius.only(
                     topLeft: Radius.circular(16),
                     topRight: Radius.circular(16)),
               ),
-              child: Row(children: [
-                Expanded(
-                  child: Text(
-                    item.ExpenseName ?? '-',
-                    style: GoogleFonts.lato(
-                        color: colour.kWhite,
-                        fontWeight: FontWeight.bold,
-                        fontSize: 13),
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ),
-              ]),
+              child: Text(
+                item.ExpenseName ?? '-',
+                style: GoogleFonts.lato(
+                    color: colour.kWhite,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 13),
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+              ),
             ),
 
-            // ── Body ─────────────────────────────────────────────
+            // Body
             Expanded(
               child: Padding(
-                padding: const EdgeInsets.fromLTRB(12, 10, 12, 8),
+                padding:
+                const EdgeInsets.fromLTRB(12, 10, 12, 8),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-
-                    // Amount
                     Container(
                       padding: const EdgeInsets.symmetric(
                           horizontal: 8, vertical: 5),
@@ -480,22 +570,16 @@ class _PaymentGridCard extends StatelessWidget {
 
                     const SizedBox(height: 8),
 
-                    // Bank
                     _gridRow(Icons.account_balance_rounded,
                         item.BankName ?? '-'),
                     const SizedBox(height: 4),
-
-                    // Sub expense
                     _gridRow(Icons.category_rounded,
                         item.SubExpenseName ?? '-'),
                     const SizedBox(height: 4),
-
-                    // Due date
                     _gridRow(Icons.event_rounded,
                         item.ExpenceDueDate?.toString() ?? '-'),
                     const Spacer(),
 
-                    // Status badge
                     Align(
                       alignment: Alignment.centerRight,
                       child: Container(
@@ -503,9 +587,11 @@ class _PaymentGridCard extends StatelessWidget {
                             horizontal: 10, vertical: 4),
                         decoration: BoxDecoration(
                           color: statusColor.withOpacity(0.12),
-                          borderRadius: BorderRadius.circular(20),
+                          borderRadius:
+                          BorderRadius.circular(20),
                           border: Border.all(
-                              color: statusColor.withOpacity(0.4)),
+                              color:
+                              statusColor.withOpacity(0.4)),
                         ),
                         child: Text(statusLabel,
                             style: GoogleFonts.lato(
@@ -525,17 +611,264 @@ class _PaymentGridCard extends StatelessWidget {
   }
 
   Widget _gridRow(IconData icon, String text) {
-    return Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-      Icon(icon, size: 13, color: colour.kPrimaryLight),
-      const SizedBox(width: 4),
-      Expanded(
-        child: Text(text,
-            style: GoogleFonts.lato(
-                fontSize: 11, color: Colors.black54),
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis),
+    return Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Icon(icon, size: 13, color: colour.kPrimaryLight),
+          const SizedBox(width: 4),
+          Expanded(
+            child: Text(text,
+                style: GoogleFonts.lato(
+                    fontSize: 11, color: Colors.black54),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis),
+          ),
+        ]);
+  }
+}
+
+// ── Empty Detail Panel ────────────────────────────────────────────────────────
+class _EmptyDetailPanel extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      margin: const EdgeInsets.only(right: 10, bottom: 20),
+      decoration: BoxDecoration(
+        color: colour.kWhite,
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: colour.kAccent, width: 1.5),
+        boxShadow: [
+          BoxShadow(
+              color: colour.kPrimary.withOpacity(0.05),
+              blurRadius: 12,
+              offset: const Offset(0, 4))
+        ],
       ),
-    ]);
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Container(
+            width: 64, height: 64,
+            decoration: const BoxDecoration(
+                color: colour.kAccent, shape: BoxShape.circle),
+            child: const Icon(Icons.touch_app_rounded,
+                color: colour.kPrimary, size: 32),
+          ),
+          const SizedBox(height: 16),
+          Text("Select a record",
+              style: GoogleFonts.lato(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                  color: colour.kPrimaryDark)),
+          const SizedBox(height: 6),
+          Text("Tap any card to view details",
+              style: GoogleFonts.lato(
+                  fontSize: 13, color: Colors.grey[500])),
+        ],
+      ),
+    );
+  }
+}
+
+// ── Detail Panel (tablet right column) ───────────────────────────────────────
+class _PaymentDetailPanel extends StatelessWidget {
+  final PaymentPendingModel master;
+  final List<PaymentPendingModel> related;
+
+  const _PaymentDetailPanel({
+    required this.master,
+    required this.related,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final isPaid = master.Paiddate != null &&
+        master.Paiddate!.isNotEmpty &&
+        master.Paiddate != '-';
+    final statusColor = isPaid ? Colors.green : Colors.orange;
+    final statusLabel = isPaid ? "Paid" : "Pending";
+
+    return Container(
+      margin: const EdgeInsets.only(right: 10, bottom: 20),
+      decoration: BoxDecoration(
+        color: colour.kWhite,
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: colour.kAccent, width: 1.5),
+        boxShadow: [
+          BoxShadow(
+              color: colour.kPrimary.withOpacity(0.07),
+              blurRadius: 16,
+              offset: const Offset(0, 5))
+        ],
+      ),
+      child: Column(
+        children: [
+          // ── Header ──
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.fromLTRB(20, 14, 20, 14),
+            decoration: const BoxDecoration(
+              color: colour.kPrimary,
+              borderRadius: BorderRadius.only(
+                topLeft:  Radius.circular(20),
+                topRight: Radius.circular(20),
+              ),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(children: [
+                  const Icon(Icons.receipt_long_rounded,
+                      color: colour.kWhite, size: 20),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      master.ExpenseName ?? '-',
+                      style: GoogleFonts.lato(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                          color: colour.kWhite),
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 8, vertical: 3),
+                    decoration: BoxDecoration(
+                      color: statusColor.withOpacity(0.2),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: Text(statusLabel,
+                        style: GoogleFonts.lato(
+                            fontSize: 11,
+                            fontWeight: FontWeight.bold,
+                            color: colour.kWhite)),
+                  ),
+                ]),
+                const SizedBox(height: 4),
+                Text("Bank: ${master.BankName ?? '-'}",
+                    style: GoogleFonts.lato(
+                        color: colour.kWhite.withOpacity(0.75),
+                        fontSize: 12)),
+              ],
+            ),
+          ),
+
+          // ── Summary chips ──
+          Padding(
+            padding: const EdgeInsets.fromLTRB(14, 12, 14, 4),
+            child: Row(children: [
+              _chip(Icons.event_rounded,
+                  "Due: ${master.ExpenceDueDate ?? '-'}"),
+              const SizedBox(width: 8),
+              _chip(Icons.payments_rounded,
+                  "RM ${(master.Amount ?? 0).toStringAsFixed(2)}"),
+            ]),
+          ),
+
+          Divider(
+              color: colour.kAccent,
+              thickness: 1.5,
+              height: 16),
+
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 14),
+            child: Align(
+              alignment: Alignment.centerLeft,
+              child: Text("Details",
+                  style: GoogleFonts.lato(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 14,
+                      color: colour.kPrimaryDark)),
+            ),
+          ),
+
+          const SizedBox(height: 8),
+
+          // ── Detail list — Scrollable ──
+          Expanded(
+            child: related.isEmpty
+                ? Center(
+                child: Text("No detail records",
+                    style: GoogleFonts.lato(
+                        color: Colors.grey)))
+                : ListView.builder(
+              padding: const EdgeInsets.symmetric(
+                  horizontal: 14, vertical: 4),
+              itemCount: related.length,
+              itemBuilder: (_, i) {
+                final d = related[i];
+                return Container(
+                  margin:
+                  const EdgeInsets.only(bottom: 10),
+                  padding: const EdgeInsets.all(14),
+                  decoration: BoxDecoration(
+                    color: colour.kAccent,
+                    borderRadius:
+                    BorderRadius.circular(14),
+                    border: Border.all(
+                        color: colour.kPrimaryLight
+                            .withOpacity(0.2)),
+                  ),
+                  child: Row(children: [
+                    Expanded(
+                      child: Column(
+                          crossAxisAlignment:
+                          CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                                d.SubExpenseName ?? '-',
+                                style: GoogleFonts.lato(
+                                    fontWeight:
+                                    FontWeight.w600,
+                                    color:
+                                    colour.kPrimaryDark,
+                                    fontSize: 14)),
+                            const SizedBox(height: 2),
+                            Text(
+                                "Due: ${d.DueDate ?? '-'}",
+                                style: GoogleFonts.lato(
+                                    color: Colors.grey[500],
+                                    fontSize: 12)),
+                          ]),
+                    ),
+                    Text(
+                      "RM ${(d.Amount ?? 0).toStringAsFixed(2)}",
+                      style: GoogleFonts.lato(
+                          fontWeight: FontWeight.bold,
+                          color: colour.kPrimary,
+                          fontSize: 15),
+                    ),
+                  ]),
+                );
+              },
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _chip(IconData icon, String label) {
+    return Container(
+      padding: const EdgeInsets.symmetric(
+          horizontal: 10, vertical: 6),
+      decoration: BoxDecoration(
+        color: colour.kAccent,
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(
+            color: colour.kPrimaryLight.withOpacity(0.3)),
+      ),
+      child: Row(mainAxisSize: MainAxisSize.min, children: [
+        Icon(icon, size: 13, color: colour.kPrimary),
+        const SizedBox(width: 5),
+        Text(label,
+            style: GoogleFonts.lato(
+                fontSize: 12,
+                color: colour.kPrimaryDark,
+                fontWeight: FontWeight.w600)),
+      ]),
+    );
   }
 }
 
@@ -563,26 +896,29 @@ Widget _dateCell({
 }) {
   return GestureDetector(
     onTap: onTap,
-    child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-      Text(label,
-          style: GoogleFonts.lato(
-              fontSize: 10,
-              color: Colors.grey[500],
-              fontWeight: FontWeight.w600)),
-      Text(value,
-          style: GoogleFonts.lato(
-              fontWeight: FontWeight.bold,
-              fontSize: 13,
-              color: colour.kPrimaryDark)),
-    ]),
+    child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(label,
+              style: GoogleFonts.lato(
+                  fontSize: 10,
+                  color: Colors.grey[500],
+                  fontWeight: FontWeight.w600)),
+          Text(value,
+              style: GoogleFonts.lato(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 13,
+                  color: colour.kPrimaryDark)),
+        ]),
   );
 }
 
-// ── Detail Bottom Sheet ───────────────────────────────────────────────────────
+// ── Detail Bottom Sheet (Mobile only) ─────────────────────────────────────────
 class _DetailSheet extends StatelessWidget {
   final PaymentPendingModel master;
   final List<PaymentPendingModel> related;
-  const _DetailSheet({required this.master, required this.related});
+  const _DetailSheet(
+      {required this.master, required this.related});
 
   @override
   Widget build(BuildContext context) {
@@ -598,8 +934,6 @@ class _DetailSheet extends StatelessWidget {
             BorderRadius.vertical(top: Radius.circular(28)),
           ),
           child: Column(children: [
-
-            // Handle
             Container(
               margin: const EdgeInsets.only(top: 12, bottom: 4),
               width: 50, height: 5,
@@ -607,15 +941,14 @@ class _DetailSheet extends StatelessWidget {
                   color: Colors.grey.shade300,
                   borderRadius: BorderRadius.circular(3)),
             ),
-
-            // Header
             Container(
               width: double.infinity,
-              padding: const EdgeInsets.fromLTRB(20, 10, 20, 16),
+              padding:
+              const EdgeInsets.fromLTRB(20, 10, 20, 16),
               decoration: const BoxDecoration(
                 color: colour.kPrimary,
-                borderRadius:
-                BorderRadius.vertical(top: Radius.circular(28)),
+                borderRadius: BorderRadius.vertical(
+                    top: Radius.circular(28)),
               ),
               child: Row(children: [
                 const Icon(Icons.receipt_long_rounded,
@@ -623,7 +956,8 @@ class _DetailSheet extends StatelessWidget {
                 const SizedBox(width: 10),
                 Expanded(
                   child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
+                      crossAxisAlignment:
+                      CrossAxisAlignment.start,
                       children: [
                         Text(master.ExpenseName ?? '',
                             style: GoogleFonts.lato(
@@ -631,9 +965,11 @@ class _DetailSheet extends StatelessWidget {
                                 fontWeight: FontWeight.bold,
                                 color: colour.kWhite),
                             overflow: TextOverflow.ellipsis),
-                        Text("Bank: ${master.BankName ?? '-'}",
+                        Text(
+                            "Bank: ${master.BankName ?? '-'}",
                             style: GoogleFonts.lato(
-                                color: colour.kWhite.withOpacity(0.75),
+                                color: colour.kWhite
+                                    .withOpacity(0.75),
                                 fontSize: 12)),
                       ]),
                 ),
@@ -642,31 +978,34 @@ class _DetailSheet extends StatelessWidget {
                   child: Container(
                     width: 30, height: 30,
                     decoration: BoxDecoration(
-                        color: colour.kWhite.withOpacity(0.2),
-                        borderRadius: BorderRadius.circular(15)),
+                        color:
+                        colour.kWhite.withOpacity(0.2),
+                        borderRadius:
+                        BorderRadius.circular(15)),
                     child: const Icon(Icons.close,
                         color: colour.kWhite, size: 16),
                   ),
                 ),
               ]),
             ),
-
-            // Master summary row
             Padding(
               padding: const EdgeInsets.fromLTRB(16, 12, 16, 4),
               child: Row(children: [
                 _summaryChip(Icons.event_rounded,
                     "Due: ${master.ExpenceDueDate ?? '-'}"),
                 const SizedBox(width: 8),
-                _summaryChip(Icons.payments_rounded,
+                _summaryChip(
+                    Icons.payments_rounded,
                     "RM ${(master.Amount ?? 0).toStringAsFixed(2)}"),
               ]),
             ),
-
-            Divider(color: colour.kAccent, thickness: 1.5, height: 16),
-
+            Divider(
+                color: colour.kAccent,
+                thickness: 1.5,
+                height: 16),
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
+              padding: const EdgeInsets.symmetric(
+                  horizontal: 16),
               child: Align(
                 alignment: Alignment.centerLeft,
                 child: Text("Details",
@@ -676,15 +1015,13 @@ class _DetailSheet extends StatelessWidget {
                         color: colour.kPrimaryDark)),
               ),
             ),
-
             const SizedBox(height: 8),
-
-            // Detail list
             Expanded(
               child: related.isEmpty
                   ? Center(
                   child: Text("No detail records",
-                      style: GoogleFonts.lato(color: Colors.grey)))
+                      style: GoogleFonts.lato(
+                          color: Colors.grey)))
                   : ListView.builder(
                 controller: controller,
                 padding: const EdgeInsets.symmetric(
@@ -693,11 +1030,13 @@ class _DetailSheet extends StatelessWidget {
                 itemBuilder: (_, i) {
                   final d = related[i];
                   return Container(
-                    margin: const EdgeInsets.only(bottom: 10),
+                    margin: const EdgeInsets.only(
+                        bottom: 10),
                     padding: const EdgeInsets.all(14),
                     decoration: BoxDecoration(
                       color: colour.kAccent,
-                      borderRadius: BorderRadius.circular(14),
+                      borderRadius:
+                      BorderRadius.circular(14),
                       border: Border.all(
                           color: colour.kPrimaryLight
                               .withOpacity(0.2)),
@@ -708,15 +1047,24 @@ class _DetailSheet extends StatelessWidget {
                             crossAxisAlignment:
                             CrossAxisAlignment.start,
                             children: [
-                              Text(d.SubExpenseName ?? '-',
-                                  style: GoogleFonts.lato(
-                                      fontWeight: FontWeight.w600,
-                                      color: colour.kPrimaryDark,
+                              Text(
+                                  d.SubExpenseName ??
+                                      '-',
+                                  style:
+                                  GoogleFonts.lato(
+                                      fontWeight:
+                                      FontWeight
+                                          .w600,
+                                      color: colour
+                                          .kPrimaryDark,
                                       fontSize: 14)),
                               const SizedBox(height: 2),
-                              Text("Due: ${d.DueDate ?? '-'}",
-                                  style: GoogleFonts.lato(
-                                      color: Colors.grey[500],
+                              Text(
+                                  "Due: ${d.DueDate ?? '-'}",
+                                  style:
+                                  GoogleFonts.lato(
+                                      color: Colors
+                                          .grey[500],
                                       fontSize: 12)),
                             ]),
                       ),
@@ -732,18 +1080,19 @@ class _DetailSheet extends StatelessWidget {
                 },
               ),
             ),
-
-            // Close button
             Padding(
-              padding: const EdgeInsets.fromLTRB(16, 4, 16, 20),
+              padding:
+              const EdgeInsets.fromLTRB(16, 4, 16, 20),
               child: SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
                   style: ElevatedButton.styleFrom(
                     backgroundColor: colour.kPrimary,
-                    padding: const EdgeInsets.symmetric(vertical: 14),
+                    padding: const EdgeInsets.symmetric(
+                        vertical: 14),
                     shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12)),
+                        borderRadius:
+                        BorderRadius.circular(12)),
                     elevation: 0,
                   ),
                   onPressed: () => Navigator.pop(context),
@@ -763,11 +1112,13 @@ class _DetailSheet extends StatelessWidget {
 
   Widget _summaryChip(IconData icon, String label) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+      padding: const EdgeInsets.symmetric(
+          horizontal: 10, vertical: 6),
       decoration: BoxDecoration(
         color: colour.kAccent,
         borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: colour.kPrimaryLight.withOpacity(0.3)),
+        border: Border.all(
+            color: colour.kPrimaryLight.withOpacity(0.3)),
       ),
       child: Row(mainAxisSize: MainAxisSize.min, children: [
         Icon(icon, size: 13, color: colour.kPrimary),
