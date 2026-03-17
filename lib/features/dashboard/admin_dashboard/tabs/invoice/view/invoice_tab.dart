@@ -2,12 +2,15 @@ import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:maleva/core/utils/clsfunction.dart' as objfun;
-import 'package:maleva/core/colors/colors.dart' as colour;
-import '../../../../../../core/colors/colors.dart';
+import 'package:maleva/core/colors/colors.dart';
 import '../bloc/invoice_bloc.dart';
 import '../bloc/invoice_event.dart';
 import '../bloc/invoice_state.dart';
+
+const _kShadow = Color(0x0D000000);
+const _kNavy   = Color(0xFF1A2E5A);
+const _kBlue   = Color(0xFF5B9BD5);
+const _kOrange = Color(0xFFE67E22);
 
 class InvoiceTab extends StatefulWidget {
   const InvoiceTab({super.key});
@@ -22,8 +25,16 @@ class _InvoiceTabState extends State<InvoiceTab> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
+      // Bloc-ல் already InvoiceLoaded-ஆ இருந்தா skip ஆகும் (cache)
       context.read<InvoiceBloc>().add(LoadInvoiceByType(0));
     });
+  }
+
+  Future<void> _onRefresh() async {
+    context.read<InvoiceBloc>().add(RefreshInvoice());
+    // Refresh complete ஆகும் வரை wait
+    await context.read<InvoiceBloc>().stream
+        .firstWhere((s) => s is InvoiceLoaded || s is InvoiceError);
   }
 
   @override
@@ -34,6 +45,21 @@ class _InvoiceTabState extends State<InvoiceTab> {
     return Scaffold(
       backgroundColor: const Color(0xFFEEF2F7),
       body: BlocConsumer<InvoiceBloc, InvoiceState>(
+        buildWhen: (prev, curr) {
+          if (prev is! InvoiceLoaded) return true;
+          if (curr is! InvoiceLoaded) return true;
+          return prev.is6Months != curr.is6Months ||
+              prev.currentMonthName != curr.currentMonthName ||
+              prev.monthList.length != curr.monthList.length ||
+              prev.saleDataAll.length != curr.saleDataAll.length ||
+              prev.monthData.length != curr.monthData.length;
+        },
+        listenWhen: (prev, curr) {
+          if (prev is InvoiceLoaded && curr is InvoiceLoaded) {
+            return curr.showWaitingSheet || curr.employeeData != null;
+          }
+          return false;
+        },
         listener: (context, state) {
           if (state is InvoiceLoaded && state.showWaitingSheet) {
             showBillingBottomSheet(context, state.waitingBilling);
@@ -47,55 +73,59 @@ class _InvoiceTabState extends State<InvoiceTab> {
             return const Center(child: CircularProgressIndicator());
           }
           if (state is InvoiceError) {
-            return Center(child: Text(state.message));
+            return Center(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(state.message),
+                  const SizedBox(height: 12),
+                  ElevatedButton(
+                    onPressed: () =>
+                        context.read<InvoiceBloc>().add(RefreshInvoice()),
+                    child: const Text("Retry"),
+                  ),
+                ],
+              ),
+            );
           }
           if (state is! InvoiceLoaded) return const SizedBox();
 
           final data = state.saleDataAll.isNotEmpty
-              ? state.saleDataAll[0]
-              : {};
+              ? Map<String, dynamic>.from(state.saleDataAll[0] as Map)
+              : <String, dynamic>{};
 
-          return isTablet
-              ? _buildTabletLayout(context, state, data)
-              : _buildMobileLayout(context, state, data);
+          return RefreshIndicator(
+            onRefresh: _onRefresh,
+            color: AppColors.appBarColor,
+            child: isTablet
+                ? _buildTabletLayout(context, state, data)
+                : _buildMobileLayout(context, state, data),
+          );
         },
       ),
     );
   }
 
-  // ══════════════════════════════════════════════════════
+  // ═══════════════════════════════════════════════════════
   // TABLET LAYOUT
-  // ══════════════════════════════════════════════════════
+  // ═══════════════════════════════════════════════════════
   Widget _buildTabletLayout(
-      BuildContext context, InvoiceLoaded state, Map data) {
+      BuildContext context, InvoiceLoaded state, Map<String, dynamic> data) {
     return Padding(
       padding: const EdgeInsets.all(20),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // ── LEFT (60%)
           Expanded(
             flex: 6,
             child: SingleChildScrollView(
-              physics: const BouncingScrollPhysics(),
+              physics: const AlwaysScrollableScrollPhysics(),
               child: Column(children: [
-                _buildTodayYesterdayChartSized(data, height: 260),
+                RepaintBoundary(
+                  child: _TodayYesterdayChart(data: data, height: 260),
+                ),
                 const SizedBox(height: 16),
-                Row(children: [
-                  _rangeButton(
-                    text: "6 Months",
-                    selected: state.is6Months,
-                    onTap: () =>
-                        context.read<InvoiceBloc>().add(LoadMonthRange(6)),
-                  ),
-                  const SizedBox(width: 10),
-                  _rangeButton(
-                    text: "1 Year",
-                    selected: !state.is6Months,
-                    onTap: () =>
-                        context.read<InvoiceBloc>().add(LoadMonthRange(12)),
-                  ),
-                ]),
+                _RangeButtons(is6Months: state.is6Months),
                 const SizedBox(height: 16),
                 _buildHeaderCard(state, fontSize: 20),
                 const SizedBox(height: 16),
@@ -105,23 +135,20 @@ class _InvoiceTabState extends State<InvoiceTab> {
               ]),
             ),
           ),
-
           const SizedBox(width: 16),
-
-          // ── RIGHT (40%)
           Expanded(
             flex: 4,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Padding(
-                  padding: const EdgeInsets.only(bottom: 12, left: 4),
+                const Padding(
+                  padding: EdgeInsets.only(bottom: 12, left: 4),
                   child: Text(
                     'Monthly Breakdown',
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 15,
                       fontWeight: FontWeight.bold,
-                      color: Color(0xFF1A2E5A),
+                      color: _kNavy,
                     ),
                   ),
                 ),
@@ -136,79 +163,65 @@ class _InvoiceTabState extends State<InvoiceTab> {
     );
   }
 
-  // ══════════════════════════════════════════════════════
-  // MOBILE LAYOUT
-  // ══════════════════════════════════════════════════════
+  // ═══════════════════════════════════════════════════════
+  // MOBILE LAYOUT — CustomScrollView + Slivers (no nested scroll)
+  // ═══════════════════════════════════════════════════════
   Widget _buildMobileLayout(
-      BuildContext context, InvoiceLoaded state, Map data) {
-    final height = MediaQuery.of(context).size.height;
-    return Padding(
-      padding: const EdgeInsets.all(16),
-      child: ListView(children: [
-        _buildTodayYesterdayChartSized(data, height: 200),
-        const SizedBox(height: 16),
-        Row(children: [
-          _rangeButton(
-            text: "6 Months",
-            selected: state.is6Months,
-            onTap: () =>
-                context.read<InvoiceBloc>().add(LoadMonthRange(6)),
+      BuildContext context, InvoiceLoaded state, Map<String, dynamic> data) {
+    return CustomScrollView(
+      physics: const AlwaysScrollableScrollPhysics(), // RefreshIndicator-க்கு வேணும்
+      slivers: [
+        SliverPadding(
+          padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
+          sliver: SliverList(
+            delegate: SliverChildListDelegate([
+              RepaintBoundary(
+                child: _TodayYesterdayChart(data: data, height: 200),
+              ),
+              const SizedBox(height: 16),
+              _RangeButtons(is6Months: state.is6Months),
+              const SizedBox(height: 20),
+              _buildHeaderCard(state, fontSize: 18),
+              const SizedBox(height: 20),
+              _buildStatCards(context, state, data, isTablet: false),
+              const SizedBox(height: 16),
+              _buildWaitingRow(context, state, isTablet: false),
+              const SizedBox(height: 20),
+              const Padding(
+                padding: EdgeInsets.only(left: 4, bottom: 8),
+                child: Text(
+                  'Monthly Breakdown',
+                  style: TextStyle(
+                    fontSize: 13,
+                    fontWeight: FontWeight.bold,
+                    color: _kNavy,
+                  ),
+                ),
+              ),
+            ]),
           ),
-          const SizedBox(width: 10),
-          _rangeButton(
-            text: "1 Year",
-            selected: !state.is6Months,
-            onTap: () =>
-                context.read<InvoiceBloc>().add(LoadMonthRange(12)),
-          ),
-        ]),
-        const SizedBox(height: 20),
-        _buildHeaderCard(state, fontSize: 18),
-        const SizedBox(height: 20),
-        _buildStatCards(context, state, data, isTablet: false),
-        const SizedBox(height: 16),
-        _buildWaitingRow(context, state, isTablet: false),
-        const SizedBox(height: 20),
-        SizedBox(
-          height: height * 0.55,
-          child: _buildMonthList(context, state, isTablet: false),
         ),
-      ]),
+        SliverPadding(
+          padding: const EdgeInsets.fromLTRB(16, 0, 16, 24),
+          sliver: SliverList(
+            delegate: SliverChildBuilderDelegate(
+                  (context, index) =>
+                  _buildMonthItem(context, state, index, isTablet: false),
+              childCount: state.monthList.length,
+            ),
+          ),
+        ),
+      ],
     );
   }
 
-  // ══════════════════════════════════════════════════════
+  // ═══════════════════════════════════════════════════════
   // SHARED WIDGETS
-  // ══════════════════════════════════════════════════════
+  // ═══════════════════════════════════════════════════════
 
-  Widget _rangeButton({
-    required String text,
-    required bool selected,
-    required VoidCallback onTap,
-  }) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 8),
-        decoration: BoxDecoration(
-          color: selected ? AppColors.appBarColor : Colors.transparent,
-          borderRadius: BorderRadius.circular(20),
-          border: Border.all(color: AppColors.appBarColor),
-        ),
-        child: Text(
-          text,
-          style: TextStyle(
-            color: selected ? Colors.white : Colors.black,
-            fontWeight: FontWeight.w600,
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildHeaderCard(InvoiceLoaded state,
-      {required double fontSize}) {
+  Widget _buildHeaderCard(InvoiceLoaded state, {required double fontSize}) {
     return Container(
+      width: double.infinity,
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: AppColors.appBarColor,
@@ -226,71 +239,41 @@ class _InvoiceTabState extends State<InvoiceTab> {
   }
 
   Widget _buildStatCards(
-      BuildContext context, InvoiceLoaded state, Map data,
+      BuildContext context,
+      InvoiceLoaded state,
+      Map<String, dynamic> data,
       {required bool isTablet}) {
     return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        _smallStatCard("Today",
-            data["TodaySales"].toString(),
-            data["TodayAmount"].toString(),
-            true, isTablet: isTablet),
-        _smallStatCard("Yesterday",
-            data["YesterdaySales"].toString(),
-            data["YesterdayAmount"].toString(),
-            false, isTablet: isTablet),
-        _smallStatCard("Weekly",
-            data["WeekSales"].toString(),
-            data["WeekAmount"].toString(),
-            true, isTablet: isTablet),
-        _smallStatCard("Monthly",
-            data["MonthSales"].toString(),
-            data["MonthAmount"].toString(),
-            true, isTablet: isTablet),
+        _SmallStatCard(
+          title: "Today",
+          count: data["TodaySales"]?.toString() ?? "0",
+          amount: data["TodayAmount"]?.toString() ?? "0",
+          positive: true,
+          isTablet: isTablet,
+        ),
+        _SmallStatCard(
+          title: "Yesterday",
+          count: data["YesterdaySales"]?.toString() ?? "0",
+          amount: data["YesterdayAmount"]?.toString() ?? "0",
+          positive: false,
+          isTablet: isTablet,
+        ),
+        _SmallStatCard(
+          title: "Weekly",
+          count: data["WeekSales"]?.toString() ?? "0",
+          amount: data["WeekAmount"]?.toString() ?? "0",
+          positive: true,
+          isTablet: isTablet,
+        ),
+        _SmallStatCard(
+          title: "Monthly",
+          count: data["MonthSales"]?.toString() ?? "0",
+          amount: data["MonthAmount"]?.toString() ?? "0",
+          positive: true,
+          isTablet: isTablet,
+        ),
       ],
-    );
-  }
-
-  Widget _smallStatCard(
-      String title, String count, String amount, bool positive,
-      {bool isTablet = false}) {
-    return Expanded(
-      child: Container(
-        margin: EdgeInsets.symmetric(horizontal: isTablet ? 5 : 4),
-        padding: EdgeInsets.all(isTablet ? 16 : 12),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(isTablet ? 20 : 16),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.05),
-              blurRadius: 6,
-            )
-          ],
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(title,
-                style: TextStyle(
-                  fontSize: isTablet ? 13 : 12,
-                  color: const Color(0xFF1A2E5A),
-                )),
-            SizedBox(height: isTablet ? 8 : 6),
-            Text(count,
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: isTablet ? 16 : 14,
-                )),
-            SizedBox(height: isTablet ? 5 : 4),
-            Text(amount,
-                style: TextStyle(
-                  fontSize: isTablet ? 13 : 12,
-                  color: positive ? Colors.green : Colors.red,
-                )),
-          ],
-        ),
-      ),
     );
   }
 
@@ -305,25 +288,20 @@ class _InvoiceTabState extends State<InvoiceTab> {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(18),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 8,
-            offset: const Offset(0, 4),
-          )
+        boxShadow: const [
+          BoxShadow(color: _kShadow, blurRadius: 8, offset: Offset(0, 4)),
         ],
       ),
       child: Row(children: [
-        Padding(
-          padding: const EdgeInsets.all(5),
-          child: InkWell(
-            onTap: () =>
-                context.read<InvoiceBloc>().add(LoadWaitingBills(0)),
+        InkWell(
+          onTap: () => context.read<InvoiceBloc>().add(LoadWaitingBills(0)),
+          child: Padding(
+            padding: const EdgeInsets.all(5),
             child: Text(
               "Waiting for Billing ",
               style: GoogleFonts.lato(
                 textStyle: TextStyle(
-                  color: const Color(0xFF1A2E5A),
+                  color: _kNavy,
                   fontWeight: FontWeight.bold,
                   fontSize: isTablet ? 14 : 12,
                   letterSpacing: 0.3,
@@ -332,17 +310,15 @@ class _InvoiceTabState extends State<InvoiceTab> {
             ),
           ),
         ),
-        Padding(
-          padding: const EdgeInsets.only(
-              top: 5, left: 5, right: 5, bottom: 15),
-          child: InkWell(
-            onTap: () =>
-                showBillingBottomSheet(context, state.waitingBilling),
+        InkWell(
+          onTap: () => showBillingBottomSheet(context, state.waitingBilling),
+          child: Padding(
+            padding: const EdgeInsets.only(top: 5, left: 5, right: 5, bottom: 15),
             child: Text(
               "${state.waitingBilling.length}",
               style: GoogleFonts.lato(
                 textStyle: TextStyle(
-                  color: const Color(0xFF1A2E5A),
+                  color: _kNavy,
                   fontWeight: FontWeight.bold,
                   fontSize: isTablet ? 14 : 12,
                   letterSpacing: 0.3,
@@ -361,261 +337,67 @@ class _InvoiceTabState extends State<InvoiceTab> {
     return ListView.builder(
       physics: const BouncingScrollPhysics(),
       itemCount: state.monthList.length,
-      itemBuilder: (context, index) {
-        final month = state.monthList[index];
-        final current =
-        state.monthData[index]["SalesAmount"].toDouble();
-        final prev = index == 0
-            ? current
-            : state.monthData[index - 1]["SalesAmount"].toDouble();
-        final diff =
-        prev == 0 ? 0 : ((current - prev) / prev) * 100;
-        final isGrowth = diff >= 0;
+      itemBuilder: (context, index) =>
+          _buildMonthItem(context, state, index, isTablet: isTablet),
+    );
+  }
 
-        return InkWell(
+  Widget _buildMonthItem(
+      BuildContext context, InvoiceLoaded state, int index,
+      {required bool isTablet}) {
+    final month = state.monthList[index];
+    final current = (state.monthData[index]["SalesAmount"] as num).toDouble();
+    final prev = index == 0
+        ? current
+        : (state.monthData[index - 1]["SalesAmount"] as num).toDouble();
+    final diff = prev == 0 ? 0.0 : ((current - prev) / prev) * 100;
+    final isGrowth = diff >= 0;
+
+    return InkWell(
+      borderRadius: BorderRadius.circular(20),
+      onTap: () =>
+          context.read<InvoiceBloc>().add(LoadEmployeeInvData(index + 3)),
+      child: Container(
+        margin: EdgeInsets.only(bottom: isTablet ? 10 : 12),
+        padding: EdgeInsets.all(isTablet ? 18 : 16),
+        decoration: BoxDecoration(
+          color: Colors.white,
           borderRadius: BorderRadius.circular(20),
-          onTap: () => context
-              .read<InvoiceBloc>()
-              .add(LoadEmployeeInvData(index + 3)),
-          child: Container(
-            margin: EdgeInsets.only(bottom: isTablet ? 10 : 12),
-            padding: EdgeInsets.all(isTablet ? 18 : 16),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(20),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withOpacity(0.05),
-                  blurRadius: 8,
-                  offset: const Offset(0, 4),
-                )
-              ],
-            ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(month,
-                    style: TextStyle(
-                      color: const Color(0xFF1A2E5A),
-                      fontWeight: FontWeight.bold,
-                      fontSize: isTablet ? 15 : 13,
-                    )),
-                Text(current.toStringAsFixed(0),
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: isTablet ? 15 : 13,
-                    )),
-                Row(children: [
-                  Icon(
-                    isGrowth
-                        ? Icons.arrow_upward
-                        : Icons.arrow_downward,
-                    size: isTablet ? 18 : 16,
-                    color: isGrowth ? Colors.green : Colors.red,
-                  ),
-                  const SizedBox(width: 4),
-                  Text(
-                    "${diff.abs().toStringAsFixed(1)}%",
-                    style: TextStyle(
-                      color: isGrowth ? Colors.green : Colors.red,
-                      fontSize: isTablet ? 14 : 12,
-                    ),
-                  ),
-                ]),
-              ],
-            ),
-          ),
-        );
-      },
-    );
-  }
-
-  Widget _buildTodayYesterdayChartSized(Map data, {required double height}) {
-    return SizedBox(
-      height: height,
-      child: _buildTodayYesterdayChart(
-        Map<String, dynamic>.from(data),
-      ),
-    );
-  }
-
-
-  Widget _buildTodayYesterdayChart(Map<String, dynamic> data) {
-    final today =
-        double.tryParse(data["TodayAmount"].toString()) ?? 0;
-    final yesterday =
-        double.tryParse(data["YesterdayAmount"].toString()) ?? 0;
-
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: AppColors.appBarColor, width: 1.5),
-        boxShadow: [
-          BoxShadow(
-            color: AppColors.appBarColor.withOpacity(0.1),
-            blurRadius: 12,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(children: [
-            const Text("Today vs Yesterday",
+          boxShadow: const [
+            BoxShadow(color: _kShadow, blurRadius: 8, offset: Offset(0, 4)),
+          ],
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(month,
                 style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 13,
-                    color: Color(0xFF1A2E5A))),
-            const Spacer(),
-            Container(
-                width: 12, height: 3, color: AppColors.appBarColor),
-            const SizedBox(width: 4),
-            const Text("Today",
+                  color: _kNavy,
+                  fontWeight: FontWeight.bold,
+                  fontSize: isTablet ? 15 : 13,
+                )),
+            Text(current.toStringAsFixed(0),
                 style: TextStyle(
-                    fontSize: 11, color: Color(0xFF1A2E5A))),
-            const SizedBox(width: 12),
-            Container(width: 12, height: 3, color: Colors.orange),
-            const SizedBox(width: 4),
-            const Text("Yesterday",
-                style: TextStyle(
-                    fontSize: 11, color: Color(0xFF1A2E5A))),
-          ]),
-          const SizedBox(height: 10),
-          Expanded(
-            child: LineChart(
-              LineChartData(
-                gridData: FlGridData(
-                  show: true,
-                  drawVerticalLine: false,
-                  getDrawingHorizontalLine: (value) => FlLine(
-                    color: Colors.grey.withOpacity(0.15),
-                    strokeWidth: 1,
-                  ),
-                ),
-                borderData: FlBorderData(show: false),
-                titlesData: FlTitlesData(
-                  leftTitles: AxisTitles(
-                      sideTitles: SideTitles(showTitles: false)),
-                  rightTitles: AxisTitles(
-                      sideTitles: SideTitles(showTitles: false)),
-                  topTitles: AxisTitles(
-                      sideTitles: SideTitles(showTitles: false)),
-                  bottomTitles: AxisTitles(
-                    sideTitles: SideTitles(
-                      showTitles: true,
-                      getTitlesWidget: (value, meta) {
-                        const labels = ['Start', 'Mid', 'End'];
-                        if (value.toInt() >= labels.length)
-                          return const SizedBox();
-                        return Padding(
-                          padding: const EdgeInsets.only(top: 6),
-                          child: Text(labels[value.toInt()],
-                              style: const TextStyle(
-                                  fontSize: 10,
-                                  color: Colors.grey)),
-                        );
-                      },
-                    ),
-                  ),
-                ),
-                lineTouchData: LineTouchData(
-                  touchTooltipData: LineTouchTooltipData(
-                    tooltipBgColor: Colors.white,
-                    tooltipRoundedRadius: 8,
-                    tooltipBorder: BorderSide(
-                        color: AppColors.appBarColor, width: 1),
-                    getTooltipItems: (touchedSpots) {
-                      return touchedSpots.map((spot) {
-                        final label = spot.barIndex == 0
-                            ? "Today"
-                            : "Yesterday";
-                        return LineTooltipItem(
-                          "$label\nRM ${spot.y.toStringAsFixed(0)}",
-                          TextStyle(
-                            color: spot.barIndex == 0
-                                ? AppColors.appBarColor
-                                : Colors.orange,
-                            fontWeight: FontWeight.bold,
-                            fontSize: 11,
-                          ),
-                        );
-                      }).toList();
-                    },
-                  ),
-                ),
-                lineBarsData: [
-                  LineChartBarData(
-                    spots: [
-                      FlSpot(0, 0),
-                      FlSpot(1, today * 0.6),
-                      FlSpot(2, today)
-                    ],
-                    isCurved: true,
-                    color: AppColors.appBarColor,
-                    barWidth: 3,
-                    isStrokeCapRound: true,
-                    dotData: FlDotData(
-                      show: true,
-                      getDotPainter: (spot, percent, bar, index) =>
-                          FlDotCirclePainter(
-                            radius: 5,
-                            color: Colors.white,
-                            strokeWidth: 2,
-                            strokeColor: AppColors.appBarColor,
-                          ),
-                    ),
-                    belowBarData: BarAreaData(
-                      show: true,
-                      gradient: LinearGradient(
-                        colors: [
-                          AppColors.appBarColor.withOpacity(0.2),
-                          AppColors.appBarColor.withOpacity(0.0),
-                        ],
-                        begin: Alignment.topCenter,
-                        end: Alignment.bottomCenter,
-                      ),
-                    ),
-                  ),
-                  LineChartBarData(
-                    spots: [
-                      FlSpot(0, 0),
-                      FlSpot(1, yesterday * 0.6),
-                      FlSpot(2, yesterday)
-                    ],
-                    isCurved: true,
-                    color: Colors.orange,
-                    barWidth: 3,
-                    isStrokeCapRound: true,
-                    dotData: FlDotData(
-                      show: true,
-                      getDotPainter: (spot, percent, bar, index) =>
-                          FlDotCirclePainter(
-                            radius: 5,
-                            color: Colors.white,
-                            strokeWidth: 2,
-                            strokeColor: Colors.orange,
-                          ),
-                    ),
-                    belowBarData: BarAreaData(
-                      show: true,
-                      gradient: LinearGradient(
-                        colors: [
-                          Colors.orange.withOpacity(0.2),
-                          Colors.orange.withOpacity(0.0),
-                        ],
-                        begin: Alignment.topCenter,
-                        end: Alignment.bottomCenter,
-                      ),
-                    ),
-                  ),
-                ],
+                  fontWeight: FontWeight.bold,
+                  fontSize: isTablet ? 15 : 13,
+                )),
+            Row(children: [
+              Icon(
+                isGrowth ? Icons.arrow_upward : Icons.arrow_downward,
+                size: isTablet ? 18 : 16,
+                color: isGrowth ? Colors.green : Colors.red,
               ),
-            ),
-          ),
-        ],
+              const SizedBox(width: 4),
+              Text(
+                "${diff.abs().toStringAsFixed(1)}%",
+                style: TextStyle(
+                  color: isGrowth ? Colors.green : Colors.red,
+                  fontSize: isTablet ? 14 : 12,
+                ),
+              ),
+            ]),
+          ],
+        ),
       ),
     );
   }
@@ -626,8 +408,8 @@ class _InvoiceTabState extends State<InvoiceTab> {
       barrierDismissible: false,
       builder: (context) {
         return Dialog(
-          shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(25)),
+          shape:
+          RoundedRectangleBorder(borderRadius: BorderRadius.circular(25)),
           child: Container(
             padding: const EdgeInsets.all(20),
             decoration: BoxDecoration(
@@ -644,15 +426,15 @@ class _InvoiceTabState extends State<InvoiceTab> {
                         style: TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
-                          color: Color(0xFF1A2E5A),
+                          color: _kNavy,
                         )),
                     InkWell(
                       onTap: () => Navigator.pop(context),
                       child: const CircleAvatar(
                         radius: 14,
                         backgroundColor: Colors.red,
-                        child: Icon(Icons.close,
-                            size: 16, color: Colors.white),
+                        child:
+                        Icon(Icons.close, size: 16, color: Colors.white),
                       ),
                     ),
                   ],
@@ -670,12 +452,11 @@ class _InvoiceTabState extends State<InvoiceTab> {
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(18),
                           color: Colors.grey.shade50,
-                          boxShadow: [
+                          boxShadow: const [
                             BoxShadow(
-                              color: Colors.black.withOpacity(0.05),
-                              blurRadius: 6,
-                              offset: const Offset(0, 3),
-                            )
+                                color: _kShadow,
+                                blurRadius: 6,
+                                offset: Offset(0, 3))
                           ],
                         ),
                         child: Column(
@@ -683,8 +464,7 @@ class _InvoiceTabState extends State<InvoiceTab> {
                           children: [
                             Row(children: [
                               const Icon(Icons.person,
-                                  size: 18,
-                                  color: Color(0xFF5B9BD5)),
+                                  size: 18, color: _kBlue),
                               const SizedBox(width: 6),
                               Expanded(
                                 child: Text(
@@ -692,7 +472,7 @@ class _InvoiceTabState extends State<InvoiceTab> {
                                   style: const TextStyle(
                                     fontWeight: FontWeight.bold,
                                     fontSize: 14,
-                                    color: Color(0xFF1A2E5A),
+                                    color: _kNavy,
                                   ),
                                 ),
                               ),
@@ -738,8 +518,7 @@ class _InvoiceTabState extends State<InvoiceTab> {
                       backgroundColor: AppColors.appBarColor,
                       shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(15)),
-                      padding:
-                      const EdgeInsets.symmetric(vertical: 12),
+                      padding: const EdgeInsets.symmetric(vertical: 12),
                     ),
                     onPressed: () => Navigator.pop(context),
                     child: const Text("Back to Dashboard",
@@ -755,12 +534,272 @@ class _InvoiceTabState extends State<InvoiceTab> {
       },
     );
   }
+}
 
-} // ← _InvoiceTabState closing brace
+// ═══════════════════════════════════════════════════════════
+// _RangeButtons
+// ═══════════════════════════════════════════════════════════
+class _RangeButtons extends StatelessWidget {
+  final bool is6Months;
+  const _RangeButtons({required this.is6Months});
 
-// ══════════════════════════════════════════════════════
-// TOP-LEVEL FUNCTIONS (class வெளியே — OK)
-// ══════════════════════════════════════════════════════
+  @override
+  Widget build(BuildContext context) {
+    return Row(children: [
+      _RangeButton(
+        text: "6 Months",
+        selected: is6Months,
+        onTap: () => context.read<InvoiceBloc>().add(LoadMonthRange(6)),
+      ),
+      const SizedBox(width: 10),
+      _RangeButton(
+        text: "1 Year",
+        selected: !is6Months,
+        onTap: () => context.read<InvoiceBloc>().add(LoadMonthRange(12)),
+      ),
+    ]);
+  }
+}
+
+class _RangeButton extends StatelessWidget {
+  final String text;
+  final bool selected;
+  final VoidCallback onTap;
+  const _RangeButton(
+      {required this.text, required this.selected, required this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 8),
+        decoration: BoxDecoration(
+          color: selected ? AppColors.appBarColor : Colors.transparent,
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(color: AppColors.appBarColor),
+        ),
+        child: Text(
+          text,
+          style: TextStyle(
+            color: selected ? Colors.white : Colors.black,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+// ═══════════════════════════════════════════════════════════
+// _SmallStatCard
+// ═══════════════════════════════════════════════════════════
+class _SmallStatCard extends StatelessWidget {
+  final String title;
+  final String count;
+  final String amount;
+  final bool positive;
+  final bool isTablet;
+
+  const _SmallStatCard({
+    required this.title,
+    required this.count,
+    required this.amount,
+    required this.positive,
+    required this.isTablet,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Expanded(
+      child: Container(
+        margin: EdgeInsets.symmetric(horizontal: isTablet ? 5 : 4),
+        padding: EdgeInsets.all(isTablet ? 16 : 12),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(isTablet ? 20 : 16),
+          boxShadow: const [BoxShadow(color: _kShadow, blurRadius: 6)],
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(title,
+                style: TextStyle(
+                    fontSize: isTablet ? 13 : 12, color: _kNavy)),
+            SizedBox(height: isTablet ? 8 : 6),
+            Text(count,
+                style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: isTablet ? 16 : 14)),
+            SizedBox(height: isTablet ? 5 : 4),
+            Text(amount,
+                style: TextStyle(
+                    fontSize: isTablet ? 13 : 12,
+                    color: positive ? Colors.green : Colors.red)),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+// ═══════════════════════════════════════════════════════════
+// _TodayYesterdayChart
+// ═══════════════════════════════════════════════════════════
+class _TodayYesterdayChart extends StatelessWidget {
+  final Map<String, dynamic> data;
+  final double height;
+
+  const _TodayYesterdayChart({required this.data, required this.height});
+
+  @override
+  Widget build(BuildContext context) {
+    final today =
+        double.tryParse(data["TodayAmount"]?.toString() ?? "0") ?? 0;
+    final yesterday =
+        double.tryParse(data["YesterdayAmount"]?.toString() ?? "0") ?? 0;
+
+    return SizedBox(
+      height: height,
+      child: Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(color: AppColors.appBarColor, width: 1.5),
+          boxShadow: [
+            BoxShadow(
+              color: AppColors.appBarColor.withOpacity(0.1),
+              blurRadius: 12,
+              offset: const Offset(0, 4),
+            ),
+          ],
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(children: [
+              const Text("Today vs Yesterday",
+                  style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 13,
+                      color: _kNavy)),
+              const Spacer(),
+              Container(width: 12, height: 3, color: AppColors.appBarColor),
+              const SizedBox(width: 4),
+              const Text("Today",
+                  style: TextStyle(fontSize: 11, color: _kNavy)),
+              const SizedBox(width: 12),
+              Container(width: 12, height: 3, color: Colors.orange),
+              const SizedBox(width: 4),
+              const Text("Yesterday",
+                  style: TextStyle(fontSize: 11, color: _kNavy)),
+            ]),
+            const SizedBox(height: 10),
+            Expanded(
+              child: LineChart(
+                LineChartData(
+                  gridData: FlGridData(
+                    show: true,
+                    drawVerticalLine: false,
+                    getDrawingHorizontalLine: (_) => const FlLine(
+                      color: Color(0x26808080),
+                      strokeWidth: 1,
+                    ),
+                  ),
+                  borderData: FlBorderData(show: false),
+                  titlesData: FlTitlesData(
+                    leftTitles: AxisTitles(
+                        sideTitles: SideTitles(showTitles: false)),
+                    rightTitles: AxisTitles(
+                        sideTitles: SideTitles(showTitles: false)),
+                    topTitles: AxisTitles(
+                        sideTitles: SideTitles(showTitles: false)),
+                    bottomTitles: AxisTitles(
+                      sideTitles: SideTitles(
+                        showTitles: true,
+                        getTitlesWidget: (value, meta) {
+                          const labels = ['Start', 'Mid', 'End'];
+                          final i = value.toInt();
+                          if (i < 0 || i >= labels.length) {
+                            return const SizedBox();
+                          }
+                          return Padding(
+                            padding: const EdgeInsets.only(top: 6),
+                            child: Text(labels[i],
+                                style: const TextStyle(
+                                    fontSize: 10, color: Colors.grey)),
+                          );
+                        },
+                      ),
+                    ),
+                  ),
+                  lineTouchData: LineTouchData(
+                    touchTooltipData: LineTouchTooltipData(
+                      tooltipBgColor: Colors.white,
+                      tooltipRoundedRadius: 8,
+                      tooltipBorder:
+                      BorderSide(color: AppColors.appBarColor, width: 1),
+                      getTooltipItems: (spots) => spots.map((spot) {
+                        final label =
+                        spot.barIndex == 0 ? "Today" : "Yesterday";
+                        return LineTooltipItem(
+                          "$label\nRM ${spot.y.toStringAsFixed(0)}",
+                          TextStyle(
+                            color: spot.barIndex == 0
+                                ? AppColors.appBarColor
+                                : Colors.orange,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 11,
+                          ),
+                        );
+                      }).toList(),
+                    ),
+                  ),
+                  lineBarsData: [
+                    _bar(today, AppColors.appBarColor),
+                    _bar(yesterday, Colors.orange),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  LineChartBarData _bar(double value, Color color) {
+    return LineChartBarData(
+      spots: [FlSpot(0, 0), FlSpot(1, value * 0.6), FlSpot(2, value)],
+      isCurved: true,
+      color: color,
+      barWidth: 3,
+      isStrokeCapRound: true,
+      dotData: FlDotData(
+        show: true,
+        getDotPainter: (_, __, ___, ____) => FlDotCirclePainter(
+          radius: 5,
+          color: Colors.white,
+          strokeWidth: 2,
+          strokeColor: color,
+        ),
+      ),
+      belowBarData: BarAreaData(
+        show: true,
+        gradient: LinearGradient(
+          colors: [color.withOpacity(0.2), color.withOpacity(0.0)],
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+        ),
+      ),
+    );
+  }
+}
+
+// ═══════════════════════════════════════════════════════════
+// showBillingBottomSheet
+// ═══════════════════════════════════════════════════════════
 void showBillingBottomSheet(
     BuildContext context, List<dynamic> billingData) {
   showModalBottomSheet(
@@ -784,8 +823,7 @@ void showBillingBottomSheet(
                 children: [
                   Text("Waiting for Billing Details",
                       style: GoogleFonts.lato(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold)),
+                          fontSize: 18, fontWeight: FontWeight.bold)),
                   IconButton(
                     icon: const Icon(Icons.close),
                     onPressed: () => Navigator.pop(context),
@@ -821,14 +859,12 @@ void showBillingBottomSheet(
                           context: context,
                           builder: (context) => Dialog(
                             shape: RoundedRectangleBorder(
-                                borderRadius:
-                                BorderRadius.circular(16)),
+                                borderRadius: BorderRadius.circular(16)),
                             child: Container(
                               padding: const EdgeInsets.all(16),
                               decoration: BoxDecoration(
                                 color: const Color(0xFFFAD691),
-                                borderRadius:
-                                BorderRadius.circular(16),
+                                borderRadius: BorderRadius.circular(16),
                               ),
                               child: SingleChildScrollView(
                                 child: Column(
@@ -837,19 +873,16 @@ void showBillingBottomSheet(
                                   children: [
                                     Row(
                                       mainAxisAlignment:
-                                      MainAxisAlignment
-                                          .spaceBetween,
+                                      MainAxisAlignment.spaceBetween,
                                       children: [
                                         Text("Billing Details",
                                             style: GoogleFonts.lato(
                                               fontSize: 18,
-                                              fontWeight:
-                                              FontWeight.bold,
+                                              fontWeight: FontWeight.bold,
                                               color: Colors.black,
                                             )),
                                         IconButton(
-                                          icon: const Icon(
-                                              Icons.close,
+                                          icon: const Icon(Icons.close,
                                               color: Colors.black),
                                           onPressed: () =>
                                               Navigator.pop(context),
@@ -862,38 +895,27 @@ void showBillingBottomSheet(
                                         "Bill No",
                                         "${item['BillNoDisplay']}"),
                                     _buildDetailRow(Icons.date_range,
-                                        "Bill Date",
-                                        "${item['BillDate']}"),
+                                        "Bill Date", "${item['BillDate']}"),
                                     _buildDetailRow(Icons.access_time,
-                                        "Bill Time",
-                                        "${item['BillTime']}"),
+                                        "Bill Time", "${item['BillTime']}"),
                                     _buildDetailRow(Icons.assignment,
-                                        "Job Status",
-                                        "${item['JobStatus']}"),
-                                    _buildDetailRow(Icons.person,
-                                        "Customer",
+                                        "Job Status", "${item['JobStatus']}"),
+                                    _buildDetailRow(Icons.person, "Customer",
                                         "${item['CustomerName']}"),
-                                    _buildDetailRow(Icons.badge,
-                                        "Employee",
+                                    _buildDetailRow(Icons.badge, "Employee",
                                         "${item['EmployeeName']}"),
-                                    _buildDetailRow(
-                                        Icons.local_shipping,
+                                    _buildDetailRow(Icons.local_shipping,
                                         "Vessel",
                                         "${item['Loadingvesselname']}"),
-                                    _buildDetailRow(Icons.anchor,
-                                        "Port", "${item['SPort']}"),
                                     _buildDetailRow(
-                                        Icons.calendar_today,
+                                        Icons.anchor, "Port", "${item['SPort']}"),
+                                    _buildDetailRow(Icons.calendar_today,
                                         "Pickup Date",
                                         "${item['SPickupDate']}"),
-                                    _buildDetailRow(
-                                        Icons.flight_takeoff,
-                                        "ETA",
-                                        "${item['ETA']}"),
-                                    _buildDetailRow(
-                                        Icons.monetization_on,
-                                        "Net Amount",
-                                        "₹${item['NetAmt']}"),
+                                    _buildDetailRow(Icons.flight_takeoff,
+                                        "ETA", "${item['ETA']}"),
+                                    _buildDetailRow(Icons.monetization_on,
+                                        "Net Amount", "₹${item['NetAmt']}"),
                                   ],
                                 ),
                               ),
@@ -911,40 +933,34 @@ void showBillingBottomSheet(
                               shape: BoxShape.circle,
                             ),
                             child: const Icon(Icons.receipt_long,
-                                color: Color(0xFFE67E22), size: 28),
+                                color: _kOrange, size: 28),
                           ),
                           const SizedBox(width: 12),
                           Expanded(
                             child: Column(
-                              crossAxisAlignment:
-                              CrossAxisAlignment.start,
+                              crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text(
-                                  "Bill No: ${item['BillNo'] ?? ''}",
-                                  style: GoogleFonts.lato(
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.bold,
-                                    color: const Color(0xFF2C3E50),
-                                  ),
-                                ),
+                                Text("Bill No: ${item['BillNo'] ?? ''}",
+                                    style: GoogleFonts.lato(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.bold,
+                                      color: const Color(0xFF2C3E50),
+                                    )),
                                 const SizedBox(height: 4),
                                 Text(
-                                  "Customer: ${item['CustomerName'] ?? ''}",
-                                  style: GoogleFonts.lato(
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.bold,
-                                    color: const Color(0xFF145A32),
-                                  ),
-                                ),
+                                    "Customer: ${item['CustomerName'] ?? ''}",
+                                    style: GoogleFonts.lato(
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.bold,
+                                      color: const Color(0xFF145A32),
+                                    )),
                                 const SizedBox(height: 2),
-                                Text(
-                                  "Amount: ₹${item['NetAmt'] ?? ''}",
-                                  style: GoogleFonts.lato(
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.bold,
-                                    color: const Color(0xFFE67E22),
-                                  ),
-                                ),
+                                Text("Amount: ₹${item['NetAmt'] ?? ''}",
+                                    style: GoogleFonts.lato(
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.bold,
+                                      color: _kOrange,
+                                    )),
                               ],
                             ),
                           ),
@@ -955,8 +971,7 @@ void showBillingBottomSheet(
                               borderRadius: BorderRadius.circular(8),
                             ),
                             child: const Icon(Icons.arrow_forward_ios,
-                                size: 16,
-                                color: Color(0xFFE67E22)),
+                                size: 16, color: _kOrange),
                           ),
                         ]),
                       ),
@@ -980,8 +995,7 @@ Widget _buildDetailRow(IconData icon, String label, String value) {
       const SizedBox(width: 8),
       Text("$label:",
           style: const TextStyle(
-              fontWeight: FontWeight.bold,
-              color: Color(0xFF3E2723))),
+              fontWeight: FontWeight.bold, color: Color(0xFF3E2723))),
       const SizedBox(width: 8),
       Expanded(
           child: Text(value,

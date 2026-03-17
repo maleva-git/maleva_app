@@ -8,185 +8,175 @@ import 'package:maleva/core/utils/clsfunction.dart' as objfun;
 
 class InvoiceBloc extends Bloc<InvoiceEvent, InvoiceState> {
   final BuildContext context;
+
   InvoiceBloc(this.context) : super(InvoiceInitial()) {
 
-    /// 🔹 LOAD SALES DATA
-    on<LoadInvoiceByType>((   LoadInvoiceByType event,
-        Emitter<InvoiceState> emit) async {
+    // ─────────────────────────────────────────────
+    // LOAD SALES DATA
+    // FIX: Already loaded-ஆ இருந்தா skip — re-mount-ல் API போகாது
+    // ─────────────────────────────────────────────
+    on<LoadInvoiceByType>((event, emit) async {
+      // Already loaded-ஆ இருந்தா API call வேண்டாம்
+      if (state is InvoiceLoaded) return;
+
       emit(InvoiceLoading());
-
       try {
-        Map<String, String> header = {
-          'Content-Type': 'application/json; charset=UTF-8',
-        };
-
-        final resultData = await objfun.apiAllinoneSelectArray(
-          "${objfun.apiGetSalesData}${objfun.Comid}&type=${event.type}",
-          null,
-          header,
-          context, // ✅ use global context if already defined
-        );
-        String currentDate = DateFormat("yyyy-MM-dd").format(DateTime.now());
-        Map<String, dynamic> master = {
+        final header = {'Content-Type': 'application/json; charset=UTF-8'};
+        final currentDate = DateFormat("yyyy-MM-dd").format(DateTime.now());
+        final master = {
           'Comid': objfun.storagenew.getInt('Comid') ?? 0,
           'Todate': currentDate,
         };
-        final waitingResult = await objfun.apiAllinoneSelectArray(
-          objfun.apiSelectSaleorderinvoicecheck,
-          master, header, context,
-        );
 
-        if (resultData != "") {
-          final saleDataAll = resultData["Data1"] ?? [];
-          final saleMonthData = resultData["Data2"] ?? [];
+        final results = await Future.wait([
+          objfun.apiAllinoneSelectArray(
+            "${objfun.apiGetSalesData}${objfun.Comid}&type=${event.type}",
+            null,
+            header,
+            context,
+          ),
+          objfun.apiAllinoneSelectArray(
+            objfun.apiSelectSaleorderinvoicecheck,
+            master,
+            header,
+            context,
+          ),
+        ]);
 
+        final resultData = results[0];
+        final waitingResult = results[1];
+
+        if (resultData != null && resultData != "") {
+          final saleMonthData = List<dynamic>.from(resultData["Data2"] ?? []);
           final monthResult = _buildMonthData(saleMonthData, 6);
 
           emit(InvoiceLoaded(
-            saleDataAll: saleDataAll,
+            saleDataAll: List<dynamic>.from(resultData["Data1"] ?? []),
             saleMonthData: saleMonthData,
-            waitingBilling: waitingResult ?? [],
+            waitingBilling: List<dynamic>.from(waitingResult ?? []),
             monthList: monthResult.$1,
             monthData: monthResult.$2,
             is6Months: true,
             currentMonthName: DateFormat('MMMM').format(DateTime.now()),
             showWaitingSheet: false,
-
+            employeeData: null,
           ));
+        } else {
+          emit(InvoiceError("No data returned"));
         }
       } catch (e) {
         emit(InvoiceError(e.toString()));
       }
     });
 
-    /// 🔹 MONTH RANGE
+    // ─────────────────────────────────────────────
+    // MONTH RANGE TOGGLE
+    // ─────────────────────────────────────────────
     on<LoadMonthRange>((event, emit) {
-      if (state is InvoiceLoaded) {
-        final s = state as InvoiceLoaded;
-        final monthResult =
-        _buildMonthData(s.saleMonthData, event.months);
+      if (state is! InvoiceLoaded) return;
+      final s = state as InvoiceLoaded;
 
-        emit(InvoiceLoaded(
-          saleDataAll: s.saleDataAll,
-          saleMonthData: s.saleMonthData,
-          waitingBilling: s.waitingBilling,
-          monthList: monthResult.$1,
-          monthData: monthResult.$2,
-          is6Months: event.months == 6,
-          currentMonthName: s.currentMonthName,
+      final alreadySelected =
+          (event.months == 6 && s.is6Months) ||
+              (event.months == 12 && !s.is6Months);
+      if (alreadySelected) return;
+
+      final monthResult = _buildMonthData(s.saleMonthData, event.months);
+
+      emit(s.copyWith(
+        monthList: monthResult.$1,
+        monthData: monthResult.$2,
+        is6Months: event.months == 6,
+        showWaitingSheet: false,
+        clearEmployeeData: true,
+      ));
+    });
+
+    // ─────────────────────────────────────────────
+    // WAITING BILLS
+    // ─────────────────────────────────────────────
+    on<LoadWaitingBills>((event, emit) async {
+      if (state is! InvoiceLoaded) return;
+      final current = state as InvoiceLoaded;
+
+      try {
+        final header = {'Content-Type': 'application/json; charset=UTF-8'};
+        final currentDate = DateFormat("yyyy-MM-dd").format(DateTime.now());
+        final master = {
+          'Comid': objfun.storagenew.getInt('Comid') ?? 0,
+          'Todate': currentDate,
+        };
+
+        final resultData = await objfun.apiAllinoneSelectArray(
+          objfun.apiSelectSaleorderinvoicecheck,
+          master,
+          header,
+          context,
+        );
+
+        emit(current.copyWith(
+          waitingBilling: List<dynamic>.from(resultData ?? []),
+          showWaitingSheet: true,
+          clearEmployeeData: true,
+        ));
+      } catch (_) {
+        emit(current.copyWith(showWaitingSheet: true, clearEmployeeData: true));
+      }
+    });
+
+    // ─────────────────────────────────────────────
+    // EMPLOYEE INVOICE DATA
+    // ─────────────────────────────────────────────
+    on<LoadEmployeeInvData>((event, emit) async {
+      if (state is! InvoiceLoaded) return;
+      final current = state as InvoiceLoaded;
+
+      try {
+        final header = {'Content-Type': 'application/json; charset=UTF-8'};
+
+        final resultData = await objfun.apiAllinoneSelectArray(
+          "${objfun.apiGetEmployeeInvData}${objfun.Comid}&type=${event.type}",
+          null,
+          header,
+          context,
+        );
+
+        final employeeData = List<dynamic>.from(resultData?["Data1"] ?? []);
+
+        emit(current.copyWith(
+          employeeData: employeeData,
           showWaitingSheet: false,
         ));
+      } catch (_) {
+        // Dashboard safe
       }
     });
 
-    //loadEmployeedata
-    on<LoadWaitingBills>((event, emit) async {
-      if (state is InvoiceLoaded) {
-        final current = state as InvoiceLoaded;
-
-        try {
-          Map<String, String> header = {
-            'Content-Type': 'application/json; charset=UTF-8',
-          };
-
-          String currentDate =
-          DateFormat("yyyy-MM-dd").format(DateTime.now());
-
-          Map<String, dynamic> master = {
-            'Comid': objfun.storagenew.getInt('Comid') ?? 0,
-            'Todate': currentDate,
-          };
-
-          final resultData = await objfun.apiAllinoneSelectArray(
-            objfun.apiSelectSaleorderinvoicecheck,
-            master,
-            header,
-            context,
-          );
-
-          final waitingList = resultData ?? [];
-
-          emit(InvoiceLoaded(
-            saleDataAll: current.saleDataAll,
-            saleMonthData: current.saleMonthData,
-            waitingBilling: waitingList,
-            monthList: current.monthList,
-            monthData: current.monthData,
-            is6Months: current.is6Months,
-            currentMonthName: current.currentMonthName,
-            showWaitingSheet: true,
-          ));
-
-        } catch (e) {
-          emit(current);
-        }
-      }
+    // ─────────────────────────────────────────────
+    // FORCE REFRESH — manual refresh தேவைப்பட்டா
+    // ─────────────────────────────────────────────
+    on<RefreshInvoice>((event, emit) async {
+      emit(InvoiceInitial());
+      add(LoadInvoiceByType(0));
     });
-
-
-    on<LoadEmployeeInvData>((event, emit) async {
-      if (state is InvoiceLoaded) {
-        final current = state as InvoiceLoaded;
-        Map<String, String> header = {
-          'Content-Type': 'application/json; charset=UTF-8',
-        };
-        try {
-          final resultData = await objfun.apiAllinoneSelectArray(
-            "${objfun.apiGetEmployeeInvData}${objfun.Comid}&type=${event.type}",
-            null,
-            header,
-            context,
-          );
-
-          final employeeData = resultData["Data1"] ?? [];
-
-          emit(InvoiceLoaded(
-            saleDataAll: current.saleDataAll,
-            saleMonthData: current.saleMonthData,
-            waitingBilling: current.waitingBilling,
-            monthList: current.monthList,
-            monthData: current.monthData,
-            is6Months: current.is6Months,
-            currentMonthName: current.currentMonthName,
-            showWaitingSheet: false,
-            employeeData: employeeData,  // 👈 pass here
-          ));
-
-        } catch (e) {
-          emit(current); // keep dashboard safe
-        }
-      }
-    });
-
-
   }
 
-  /// 🔹 monthdata logic
   (List<String>, List<dynamic>) _buildMonthData(
-      List<dynamic> saleMonthData, int index) {
-
-    List<String> loadMonthsList = [];
-    List<dynamic> listMonthData = [];
-
-    final monthNames = [
-      'Jan','Feb','Mar','Apr','May','Jun',
-      'Jul','Aug','Sep','Oct','Nov','Dec'
+      List<dynamic> saleMonthData, int count) {
+    const monthNames = [
+      'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+      'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec',
     ];
 
-    int monthIndex = DateTime.now().month;
+    final monthIndex = DateTime.now().month;
+    final monthList = <String>[];
 
-    for (int i = 0; i < index; i++) {
-      int currentIndex = ((monthIndex - 1) - i) % 12;
-      if (currentIndex < 0) currentIndex += 12;
-      loadMonthsList.add(monthNames[currentIndex]);
+    for (int i = 0; i < count; i++) {
+      int idx = ((monthIndex - 1) - i) % 12;
+      if (idx < 0) idx += 12;
+      monthList.add(monthNames[idx]);
     }
 
-    for (int i = 0; i < index && i < saleMonthData.length; i++) {
-      listMonthData.add(saleMonthData[i]);
-    }
-
-    return (loadMonthsList, listMonthData);
+    return (monthList, saleMonthData.take(count).toList());
   }
-
-
 }
