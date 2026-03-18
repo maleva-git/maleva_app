@@ -27,6 +27,7 @@ import '../Transport/LicenseUpdate.dart';
 import '../Transport/Maintenance.dart';
 import '../Transport/RTI/UpdateRTIDetails.dart';
 import 'package:maleva/core/colors/colors.dart' as colour;
+import '../features/transaction/salesorder/view/view/salesorderview_tab.dart';
 
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -650,8 +651,8 @@ class _MenuTileState extends State<_MenuTile>
           Navigator.push(ctx, _r(const BoardingStatusUpdate())); break;
         case "Maintenance":
           Navigator.push(ctx, _r(const Maintenance()));         break;
-        case "View":
-          Navigator.push(ctx, _r(const SaleOrderView()));       break;
+        // case "View":
+        //   Navigator.push(ctx, _r(const SaleOrderView()));       break;
         case "License Update":
           Navigator.push(ctx, _r(const LicenseUpdate()));       break;
         case "Update RTI Details":

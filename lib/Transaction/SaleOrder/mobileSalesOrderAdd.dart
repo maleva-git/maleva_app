@@ -1540,7 +1540,7 @@ mobiledesign(SalesOrderAddState state, BuildContext context) {
                     Navigator.push(
                         context,
                         MaterialPageRoute(
-                            builder: (context) => const SaleOrderView()));
+                            builder: (context) => const SaleOrderViews()));
                   },
                   child: Text(
                     'VIEW',

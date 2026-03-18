@@ -11,7 +11,7 @@ import '../../../DashBoard/CustomerService/CustDashboard.dart';
 import '../../../DashBoard/Driver/DriverDashboard.dart';
 import '../../../core/colors/colors.dart';
 import '../../dashboard/admin_dashboard/bloc/admin_tab_bloc.dart';
-import '../../dashboard/admin_dashboard/view/admin_dashboard_page.dart';
+import '../../dashboard/admin_dashboard/view/admin_dashboard.dart';
 import '../bloc/auth_bloc.dart';
 import '../bloc/auth_event.dart';
 import '../bloc/auth_state.dart';

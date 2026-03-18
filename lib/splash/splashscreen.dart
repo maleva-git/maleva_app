@@ -1,16 +1,10 @@
-import 'dart:convert';
-
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import "package:flutter_spinkit/flutter_spinkit.dart";
 import 'package:intl/intl.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:maleva/DashBoard/OperationAdmin/OperationAdminDashboard.dart';
 import 'package:maleva/core/utils/clsfunction.dart' as objfun;
 import 'package:maleva/core/colors/colors.dart' as colour;
-import 'package:maleva/core/models/model.dart';
-import '../DashBoard/Admin/AdminDashboard.dart';
 import '../DashBoard/AirFrieght/AirFrieghtDashboard.dart';
 import '../DashBoard/Boarding/BoardingDashboard.dart';
 import '../DashBoard/CustomerService/CustDashboard.dart';
@@ -25,9 +19,8 @@ import '../features/auth/bloc/auth_bloc.dart';
 import '../features/auth/pages/login_page.dart.dart';
 import '../DashBoard/User/UserDashboard.dart';
 import 'package:maleva/core/network/OnlineApi.dart' as OnlineApi;
-
 import '../features/dashboard/admin_dashboard/bloc/admin_tab_bloc.dart';
-import '../features/dashboard/admin_dashboard/view/admin_dashboard_page.dart';
+import '../features/dashboard/admin_dashboard/view/admin_dashboard.dart';
 
 // ─── Design tokens (splash only) ─────────────────────────────────────────────
 

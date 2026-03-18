@@ -23,7 +23,7 @@ import '../../DashBoard/TransportDB/TransportDashboard.dart';
 import '../../MasterSearch/Driver.dart';
 import '../../MasterSearch/Truck.dart';
 
-import '../../features/dashboard/admin_dashboard/view/admin_dashboard_page.dart';
+import '../../features/dashboard/admin_dashboard/view/admin_dashboard.dart';
 import 'UpdateRTIStatus.dart';
 part 'package:maleva/Transport/RTI/mobileUpdateRTIDetails.dart';
 part 'package:maleva/Transport/RTI/tabletUpdateRTIDetails.dart';
