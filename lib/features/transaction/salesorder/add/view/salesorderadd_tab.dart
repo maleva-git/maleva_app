@@ -350,27 +350,18 @@ class _SalesOrderAddBodyState extends State<_SalesOrderAddBody>
     final fp   = state.fieldPermission;
 
     return _tabScroll(children: [
-      // ── Job No + Date ─────────────────────────────
       _sectionCard(children: [
         Row(children: [
-          Expanded(
-            flex: 2,
-            child: _labelText('Job No'),
-          ),
-          Expanded(
-            flex: 3,
-            child: _readonlyBox(state.txtJobNo),
-          ),
+          Expanded(flex: 2, child: _labelText('Job No')),
+          Expanded(flex: 3, child: _readonlyBox(state.txtJobNo)),
           const SizedBox(width: 10),
           Expanded(
             flex: 4,
             child: _dateTapBox(
               date: width <= 370
-                  ? DateFormat("dd-MM-yy").format(
-                  DateTime.parse(state.dtpSaleOrderdate))
-                  : DateFormat("dd-MM-yyyy").format(
-                  DateTime.parse(state.dtpSaleOrderdate)),
-              onTap: null, // read-only date
+                  ? DateFormat("dd-MM-yy").format(DateTime.parse(state.dtpSaleOrderdate))
+                  : DateFormat("dd-MM-yyyy").format(DateTime.parse(state.dtpSaleOrderdate)),
+              onTap: null,
             ),
           ),
         ]),
@@ -378,7 +369,6 @@ class _SalesOrderAddBodyState extends State<_SalesOrderAddBody>
 
       const SizedBox(height: 10),
 
-      // ── Total Amount + Bill Type ──────────────────
       _sectionCard(children: [
         Row(children: [
           Expanded(
@@ -387,9 +377,7 @@ class _SalesOrderAddBodyState extends State<_SalesOrderAddBody>
               child: Text(
                 state.totalAmount.toString(),
                 style: GoogleFonts.poppins(
-                    color: _red,
-                    fontSize: 16,
-                    fontWeight: FontWeight.w800),
+                    color: _red, fontSize: 16, fontWeight: FontWeight.w800),
               ),
             ),
           ),
@@ -399,10 +387,8 @@ class _SalesOrderAddBodyState extends State<_SalesOrderAddBody>
             child: _styledDropdown<String>(
               value: state.dropdownValue,
               items: SalesOrderAddBloc.billType,
-              enabled: fp["cmbBillType"] == true &&
-                  !state.disabledBillType,
-              onChanged: (v) =>
-                  bloc.add(BillTypeChanged(v!)),
+              enabled: fp["cmbBillType"] == true && !state.disabledBillType,
+              onChanged: (v) => bloc.add(BillTypeChanged(v!)),
             ),
           ),
         ]),
@@ -410,7 +396,6 @@ class _SalesOrderAddBodyState extends State<_SalesOrderAddBody>
 
       const SizedBox(height: 10),
 
-      // ── Customer / JobType / JobStatus / Remarks ──
       _sectionCard(children: [
         _searchField(
           hint: "Customer Name",
@@ -418,15 +403,12 @@ class _SalesOrderAddBodyState extends State<_SalesOrderAddBody>
           enabled: fp["txtCustomer"] == true,
           onSearch: () async {
             final r = await Navigator.push(context,
-                MaterialPageRoute(
-                    builder: (_) => const Customer(
-                        Searchby: 1, SearchId: 0)));
+                MaterialPageRoute(builder: (_) => const Customer(Searchby: 1, SearchId: 0)));
             if (r != null) {
               bloc.add(CustomerSelected(
                   objfun.SelectCustomerList.AccountName,
                   objfun.SelectCustomerList.Id));
-              objfun.SelectCustomerList =
-                  CustomerModel.Empty();
+              objfun.SelectCustomerList = CustomerModel.Empty();
             }
           },
           onClear: () => bloc.add(CustomerSelected('', 0)),
@@ -438,15 +420,12 @@ class _SalesOrderAddBodyState extends State<_SalesOrderAddBody>
           enabled: fp["txtJobType"] == true,
           onSearch: () async {
             final r = await Navigator.push(context,
-                MaterialPageRoute(
-                    builder: (_) => const JobType(
-                        Searchby: 1, SearchId: 0)));
+                MaterialPageRoute(builder: (_) => const JobType(Searchby: 1, SearchId: 0)));
             if (r != null) {
               bloc.add(JobTypeSelected(
                   objfun.SelectJobTypeList.Name,
                   objfun.SelectJobTypeList.Id));
-              objfun.SelectJobTypeList =
-                  JobTypeModel.Empty();
+              objfun.SelectJobTypeList = JobTypeModel.Empty();
             }
           },
           onClear: () => bloc.add(JobTypeSelected('', 0)),
@@ -455,33 +434,27 @@ class _SalesOrderAddBodyState extends State<_SalesOrderAddBody>
         _searchField(
           hint: "Job Status",
           value: state.txtJobStatus,
-          enabled: fp["txtJobStatus"] == true &&
-              state.txtJobType.isNotEmpty,
+          enabled: fp["txtJobStatus"] == true && state.txtJobType.isNotEmpty,
           onSearch: () async {
             final r = await Navigator.push(context,
                 MaterialPageRoute(
                     builder: (_) => JobAllStatus(
-                        Searchby: 1,
-                        SearchId: 0,
-                        JobTypeId: state.jobTypeId)));
+                        Searchby: 1, SearchId: 0, JobTypeId: state.jobTypeId)));
             if (r != null) {
               bloc.add(JobStatusSelected(
                   objfun.SelectAllStatusList.StatusName,
                   objfun.SelectAllStatusList.Status));
-              objfun.SelectAllStatusList =
-                  JobAllStatusModel.Empty();
+              objfun.SelectAllStatusList = JobAllStatusModel.Empty();
             }
           },
-          onClear: () =>
-              bloc.add(JobStatusSelected('', 0)),
+          onClear: () => bloc.add(JobStatusSelected('', 0)),
         ),
         _gap(),
         _editField(
           hint: 'Remarks',
           value: state.txtRemarks,
           enabled: fp["txtRemarks"] == true,
-          onChanged: (v) =>
-              bloc.add(UpdateTextField('txtRemarks', v)),
+          onChanged: (v) => bloc.add(UpdateTextField('txtRemarks', v)),
           minLines: 2,
           maxLines: 4,
         ),
@@ -490,8 +463,7 @@ class _SalesOrderAddBodyState extends State<_SalesOrderAddBody>
           hint: 'DO Description',
           value: state.txtDoDescription,
           enabled: fp["txtDoDescription"] == true,
-          onChanged: (v) => bloc
-              .add(UpdateTextField('txtDoDescription', v)),
+          onChanged: (v) => bloc.add(UpdateTextField('txtDoDescription', v)),
           minLines: 3,
           maxLines: 5,
           keyboardType: TextInputType.multiline,
@@ -500,15 +472,13 @@ class _SalesOrderAddBodyState extends State<_SalesOrderAddBody>
 
       const SizedBox(height: 10),
 
-      // ── Product section ───────────────────────────
       Row(
         mainAxisAlignment: MainAxisAlignment.end,
         children: [
           _iconBtn(
             icon: Icons.library_add_sharp,
             enabled: fp["addProduct"] == true,
-            onTap: () =>
-                _showProductDialog(context, state, -1),
+            onTap: () => _showProductDialog(context, state, -1),
           ),
           const SizedBox(width: 8),
           _iconBtn(
@@ -529,8 +499,7 @@ class _SalesOrderAddBodyState extends State<_SalesOrderAddBody>
           ...state.productViewList
               .asMap()
               .entries
-              .map((e) => _productRow(
-              context, state, e.key, e.value, bloc))
+              .map((e) => _productRow(context, state, e.key, e.value, bloc))
               .toList(),
       ],
     ]);
@@ -551,51 +520,42 @@ class _SalesOrderAddBodyState extends State<_SalesOrderAddBody>
           value: state.txtCommodityType,
           enabled: fp["txtCommodityType"] == true,
           onSearch: () async {
-            final r = await Navigator.push(context,
-                MaterialPageRoute(
-                    builder: (_) => const CommodityType(
-                        Searchby: 1, SearchId: 0)));
-            if (r != null) {
-              bloc.add(CommoditySelected(
-                  objfun.SelectedCommodityName));
+            // ✅ FIX: await + isNotEmpty check (no r != null)
+            await Navigator.push(context, MaterialPageRoute(
+                builder: (_) => const CommodityType(Searchby: 1, SearchId: 0)));
+            print("DEBUG: returned - '${objfun.SelectedCommodityName}'");
+            if (objfun.SelectedCommodityName.isNotEmpty) {
+              bloc.add(CommoditySelected(objfun.SelectedCommodityName));
               objfun.SelectedCommodityName = "";
             }
           },
-          onClear: () =>
-              bloc.add(CommoditySelected('')),
+          onClear: () => bloc.add(CommoditySelected('')),
         ),
         _gap(),
         _editField(
           hint: 'Weight',
           value: state.txtWeight,
           enabled: fp["txtWeight"] == true,
-          onChanged: (v) =>
-              bloc.add(UpdateTextField('txtWeight', v)),
+          onChanged: (v) => bloc.add(UpdateTextField('txtWeight', v)),
         ),
         _gap(),
         _editField(
           hint: 'Quantity',
           value: state.txtQuantity,
           enabled: fp["txtQuantity"] == true,
-          onChanged: (v) => bloc
-              .add(UpdateTextField('txtQuantity', v)),
+          onChanged: (v) => bloc.add(UpdateTextField('txtQuantity', v)),
         ),
         _gap(),
-        // Truck Size
         if (!state.visibleGC)
           _editField(
             hint: 'Truck Size',
             value: state.txtTruckSize,
             enabled: fp["txtTruckSize"] == true,
-            onChanged: (v) => bloc
-                .add(UpdateTextField('txtTruckSize', v)),
+            onChanged: (v) => bloc.add(UpdateTextField('txtTruckSize', v)),
           )
         else
           Row(children: [
-            Expanded(
-              flex: 2,
-              child: _labelText('Truck Size'),
-            ),
+            Expanded(flex: 2, child: _labelText('Truck Size')),
             const SizedBox(width: 10),
             Expanded(
               flex: 5,
@@ -603,8 +563,7 @@ class _SalesOrderAddBodyState extends State<_SalesOrderAddBody>
                 value: state.dropdownValueTruckSize,
                 items: SalesOrderAddBloc.truckSizeList,
                 enabled: true,
-                onChanged: (v) => bloc.add(UpdateDropdown(
-                    'dropdownValueTruckSize', v)),
+                onChanged: (v) => bloc.add(UpdateDropdown('dropdownValueTruckSize', v)),
               ),
             ),
           ]),
@@ -614,8 +573,7 @@ class _SalesOrderAddBodyState extends State<_SalesOrderAddBody>
             hint: 'AWB NO',
             value: state.txtAWBNo,
             enabled: fp["txtAWBNo"] == true,
-            onChanged: (v) =>
-                bloc.add(UpdateTextField('txtAWBNo', v)),
+            onChanged: (v) => bloc.add(UpdateTextField('txtAWBNo', v)),
           ),
         ],
         if (state.visibleBLCopy) ...[
@@ -624,8 +582,7 @@ class _SalesOrderAddBodyState extends State<_SalesOrderAddBody>
             hint: 'BL Copy',
             value: state.txtBLCopy,
             enabled: fp["txtBLCopy"] == true,
-            onChanged: (v) =>
-                bloc.add(UpdateTextField('txtBLCopy', v)),
+            onChanged: (v) => bloc.add(UpdateTextField('txtBLCopy', v)),
           ),
         ],
         _gap(),
@@ -634,13 +591,11 @@ class _SalesOrderAddBodyState extends State<_SalesOrderAddBody>
           value: state.txtCargo,
           enabled: fp["txtCargo"] == true,
           onSearch: () async {
-            final r = await Navigator.push(context,
-                MaterialPageRoute(
-                    builder: (_) => const CargoStatus(
-                        Searchby: 1, SearchId: 0)));
-            if (r != null) {
-              bloc.add(CargoSelected(
-                  objfun.SelectedCargoName));
+            // ✅ FIX: await + isNotEmpty check
+            await Navigator.push(context, MaterialPageRoute(
+                builder: (_) => const CargoStatus(Searchby: 1, SearchId: 0)));
+            if (objfun.SelectedCargoName.isNotEmpty) {
+              bloc.add(CargoSelected(objfun.SelectedCargoName));
               objfun.SelectedCargoName = "";
             }
           },
@@ -651,8 +606,7 @@ class _SalesOrderAddBodyState extends State<_SalesOrderAddBody>
           hint: 'PTW No',
           value: state.txtPTWNo,
           enabled: fp["txtPTWNo"] == true,
-          onChanged: (v) =>
-              bloc.add(UpdateTextField('txtPTWNo', v)),
+          onChanged: (v) => bloc.add(UpdateTextField('txtPTWNo', v)),
         ),
       ]),
     ]);
@@ -728,19 +682,15 @@ class _SalesOrderAddBodyState extends State<_SalesOrderAddBody>
             enabled: fp["txtLAgentCompany"] == true,
             onSearch: () async {
               final r = await Navigator.push(context,
-                  MaterialPageRoute(
-                      builder: (_) => const AgentCompany(
-                          Searchby: 1, SearchId: 0)));
+                  MaterialPageRoute(builder: (_) => const AgentCompany(Searchby: 1, SearchId: 0)));
               if (r != null) {
                 bloc.add(LAgentCompanySelected(
                     objfun.SelectAgentCompanyList.Name,
                     objfun.SelectAgentCompanyList.Id));
-                objfun.SelectAgentCompanyList =
-                    AgentCompanyModel.Empty();
+                objfun.SelectAgentCompanyList = AgentCompanyModel.Empty();
               }
             },
-            onClear: () =>
-                bloc.add(LAgentCompanySelected('', 0)),
+            onClear: () => bloc.add(LAgentCompanySelected('', 0)),
           ),
           _gap(),
         ],
@@ -748,26 +698,20 @@ class _SalesOrderAddBodyState extends State<_SalesOrderAddBody>
           _searchField(
             hint: "Agent Name",
             value: state.txtLAgentName,
-            enabled: fp["txtLAgentName"] == true &&
-                state.txtLAgentCompany.isNotEmpty,
+            enabled: fp["txtLAgentName"] == true && state.txtLAgentCompany.isNotEmpty,
             onSearch: () async {
               final r = await Navigator.push(context,
                   MaterialPageRoute(
                       builder: (_) => Agent(
-                          Searchby: 1,
-                          SearchId: 0,
-                          AgentCompanyId:
-                          state.lAgentCompanyId)));
+                          Searchby: 1, SearchId: 0, AgentCompanyId: state.lAgentCompanyId)));
               if (r != null) {
                 bloc.add(LAgentSelected(
                     objfun.SelectAgentAllList.AgentName,
                     objfun.SelectAgentAllList.Id));
-                objfun.SelectAgentAllList =
-                    AgentModel.Empty();
+                objfun.SelectAgentAllList = AgentModel.Empty();
               }
             },
-            onClear: () =>
-                bloc.add(LAgentSelected('', 0)),
+            onClear: () => bloc.add(LAgentSelected('', 0)),
           ),
           _gap(),
         ],
@@ -776,8 +720,7 @@ class _SalesOrderAddBodyState extends State<_SalesOrderAddBody>
             hint: 'SCN',
             value: state.txtLSCN,
             enabled: fp["txtLSCN"] == true,
-            onChanged: (v) =>
-                bloc.add(UpdateTextField('txtLSCN', v)),
+            onChanged: (v) => bloc.add(UpdateTextField('txtLSCN', v)),
           ),
           _gap(),
         ],
@@ -786,8 +729,7 @@ class _SalesOrderAddBodyState extends State<_SalesOrderAddBody>
             hint: 'Loading Vessel Name',
             value: state.txtLoadingVessel,
             enabled: fp["txtLoadingVessel"] == true,
-            onChanged: (v) => bloc.add(
-                UpdateTextField('txtLoadingVessel', v)),
+            onChanged: (v) => bloc.add(UpdateTextField('txtLoadingVessel', v)),
           ),
           _gap(),
         ],
@@ -797,13 +739,11 @@ class _SalesOrderAddBodyState extends State<_SalesOrderAddBody>
             value: state.txtLPort,
             enabled: fp["txtLPort"] == true,
             onSearch: () async {
-              final r = await Navigator.push(context,
-                  MaterialPageRoute(
-                      builder: (_) => const Port(
-                          Searchby: 1, SearchId: 0)));
-              if (r != null) {
-                bloc.add(LPortSelected(
-                    objfun.SelectedPortName));
+              // ✅ FIX: await + isNotEmpty check
+              await Navigator.push(context, MaterialPageRoute(
+                  builder: (_) => const Port(Searchby: 1, SearchId: 0)));
+              if (objfun.SelectedPortName.isNotEmpty) {
+                bloc.add(LPortSelected(objfun.SelectedPortName));
                 objfun.SelectedPortName = "";
               }
             },
@@ -817,18 +757,15 @@ class _SalesOrderAddBodyState extends State<_SalesOrderAddBody>
             value: state.txtLVesselType,
             enabled: fp["txtLVesselType"] == true,
             onSearch: () async {
-              final r = await Navigator.push(context,
-                  MaterialPageRoute(
-                      builder: (_) => const VesselType(
-                          Searchby: 1, SearchId: 0)));
-              if (r != null) {
-                bloc.add(LVesselTypeSelected(
-                    objfun.SelectedVesselTypeName));
+              // ✅ FIX: await + isNotEmpty check
+              await Navigator.push(context, MaterialPageRoute(
+                  builder: (_) => const VesselType(Searchby: 1, SearchId: 0)));
+              if (objfun.SelectedVesselTypeName.isNotEmpty) {
+                bloc.add(LVesselTypeSelected(objfun.SelectedVesselTypeName));
                 objfun.SelectedVesselTypeName = "";
               }
             },
-            onClear: () =>
-                bloc.add(LVesselTypeSelected('')),
+            onClear: () => bloc.add(LVesselTypeSelected('')),
           ),
       ]),
     ]);
@@ -893,19 +830,15 @@ class _SalesOrderAddBodyState extends State<_SalesOrderAddBody>
             enabled: fp["txtOAgentCompany"] == true,
             onSearch: () async {
               final r = await Navigator.push(context,
-                  MaterialPageRoute(
-                      builder: (_) => const AgentCompany(
-                          Searchby: 1, SearchId: 0)));
+                  MaterialPageRoute(builder: (_) => const AgentCompany(Searchby: 1, SearchId: 0)));
               if (r != null) {
                 bloc.add(OAgentCompanySelected(
                     objfun.SelectAgentCompanyList.Name,
                     objfun.SelectAgentCompanyList.Id));
-                objfun.SelectAgentCompanyList =
-                    AgentCompanyModel.Empty();
+                objfun.SelectAgentCompanyList = AgentCompanyModel.Empty();
               }
             },
-            onClear: () =>
-                bloc.add(OAgentCompanySelected('', 0)),
+            onClear: () => bloc.add(OAgentCompanySelected('', 0)),
           ),
           _gap(),
         ],
@@ -913,26 +846,20 @@ class _SalesOrderAddBodyState extends State<_SalesOrderAddBody>
           _searchField(
             hint: "Agent Name",
             value: state.txtOAgentName,
-            enabled: fp["txtOAgentName"] == true &&
-                state.txtOAgentCompany.isNotEmpty,
+            enabled: fp["txtOAgentName"] == true && state.txtOAgentCompany.isNotEmpty,
             onSearch: () async {
               final r = await Navigator.push(context,
                   MaterialPageRoute(
                       builder: (_) => Agent(
-                          Searchby: 1,
-                          SearchId: 0,
-                          AgentCompanyId:
-                          state.oAgentCompanyId)));
+                          Searchby: 1, SearchId: 0, AgentCompanyId: state.oAgentCompanyId)));
               if (r != null) {
                 bloc.add(OAgentSelected(
                     objfun.SelectAgentAllList.AgentName,
                     objfun.SelectAgentAllList.Id));
-                objfun.SelectAgentAllList =
-                    AgentModel.Empty();
+                objfun.SelectAgentAllList = AgentModel.Empty();
               }
             },
-            onClear: () =>
-                bloc.add(OAgentSelected('', 0)),
+            onClear: () => bloc.add(OAgentSelected('', 0)),
           ),
           _gap(),
         ],
@@ -941,8 +868,7 @@ class _SalesOrderAddBodyState extends State<_SalesOrderAddBody>
             hint: 'SCN',
             value: state.txtOSCN,
             enabled: fp["txtOSCN"] == true,
-            onChanged: (v) =>
-                bloc.add(UpdateTextField('txtOSCN', v)),
+            onChanged: (v) => bloc.add(UpdateTextField('txtOSCN', v)),
           ),
           _gap(),
         ],
@@ -951,8 +877,7 @@ class _SalesOrderAddBodyState extends State<_SalesOrderAddBody>
             hint: 'Off Vessel Name',
             value: state.txtOffVessel,
             enabled: fp["txtOffVessel"] == true,
-            onChanged: (v) => bloc.add(
-                UpdateTextField('txtOffVessel', v)),
+            onChanged: (v) => bloc.add(UpdateTextField('txtOffVessel', v)),
           ),
           _gap(),
         ],
@@ -962,13 +887,11 @@ class _SalesOrderAddBodyState extends State<_SalesOrderAddBody>
             value: state.txtOPort,
             enabled: fp["txtOPort"] == true,
             onSearch: () async {
-              final r = await Navigator.push(context,
-                  MaterialPageRoute(
-                      builder: (_) => const Port(
-                          Searchby: 1, SearchId: 0)));
-              if (r != null) {
-                bloc.add(OPortSelected(
-                    objfun.SelectedPortName));
+              // ✅ FIX: await + isNotEmpty check
+              await Navigator.push(context, MaterialPageRoute(
+                  builder: (_) => const Port(Searchby: 1, SearchId: 0)));
+              if (objfun.SelectedPortName.isNotEmpty) {
+                bloc.add(OPortSelected(objfun.SelectedPortName));
                 objfun.SelectedPortName = "";
               }
             },
@@ -982,18 +905,15 @@ class _SalesOrderAddBodyState extends State<_SalesOrderAddBody>
             value: state.txtOVesselType,
             enabled: fp["txtOVesselType"] == true,
             onSearch: () async {
-              final r = await Navigator.push(context,
-                  MaterialPageRoute(
-                      builder: (_) => const VesselType(
-                          Searchby: 1, SearchId: 0)));
-              if (r != null) {
-                bloc.add(OVesselTypeSelected(
-                    objfun.SelectedVesselTypeName));
+              // ✅ FIX: await + isNotEmpty check
+              await Navigator.push(context, MaterialPageRoute(
+                  builder: (_) => const VesselType(Searchby: 1, SearchId: 0)));
+              if (objfun.SelectedVesselTypeName.isNotEmpty) {
+                bloc.add(OVesselTypeSelected(objfun.SelectedVesselTypeName));
                 objfun.SelectedVesselTypeName = "";
               }
             },
-            onClear: () =>
-                bloc.add(OVesselTypeSelected('')),
+            onClear: () => bloc.add(OVesselTypeSelected('')),
           ),
       ]),
     ]);
@@ -1060,7 +980,6 @@ class _SalesOrderAddBodyState extends State<_SalesOrderAddBody>
 
       const SizedBox(height: 10),
 
-      // Origin / Destination
       if (state.visibleOrigin || state.visibleDestination)
         _sectionCard(children: [
           if (state.visibleOrigin && !state.visibleGC) ...[
@@ -1068,19 +987,16 @@ class _SalesOrderAddBodyState extends State<_SalesOrderAddBody>
               hint: 'Origin',
               value: state.txtOrigin,
               enabled: fp["txtOrigin"] == true,
-              onChanged: (v) => bloc
-                  .add(UpdateTextField('txtOrigin', v)),
+              onChanged: (v) => bloc.add(UpdateTextField('txtOrigin', v)),
             ),
             _gap(),
           ],
-          if (state.visibleDestination &&
-              !state.visibleGC) ...[
+          if (state.visibleDestination && !state.visibleGC) ...[
             _editField(
               hint: 'Destination',
               value: state.txtDestination,
               enabled: fp["txtDestination"] == true,
-              onChanged: (v) => bloc.add(
-                  UpdateTextField('txtDestination', v)),
+              onChanged: (v) => bloc.add(UpdateTextField('txtDestination', v)),
             ),
             _gap(),
           ],
@@ -1091,19 +1007,15 @@ class _SalesOrderAddBodyState extends State<_SalesOrderAddBody>
               enabled: fp["txtOrigin"] == true,
               onSearch: () async {
                 final r = await Navigator.push(context,
-                    MaterialPageRoute(
-                        builder: (_) => const Location(
-                            Searchby: 1, SearchId: 0)));
+                    MaterialPageRoute(builder: (_) => const Location(Searchby: 1, SearchId: 0)));
                 if (r != null) {
                   bloc.add(OriginSelected(
                       objfun.SelectLocationList.Location,
                       objfun.SelectLocationList.Id));
-                  objfun.SelectLocationList =
-                      LocationModel.Empty();
+                  objfun.SelectLocationList = LocationModel.Empty();
                 }
               },
-              onClear: () =>
-                  bloc.add(OriginSelected('', 0)),
+              onClear: () => bloc.add(OriginSelected('', 0)),
             ),
             _gap(),
             _searchField(
@@ -1112,53 +1024,39 @@ class _SalesOrderAddBodyState extends State<_SalesOrderAddBody>
               enabled: fp["txtDestination"] == true,
               onSearch: () async {
                 final r = await Navigator.push(context,
-                    MaterialPageRoute(
-                        builder: (_) => const Location(
-                            Searchby: 1, SearchId: 0)));
+                    MaterialPageRoute(builder: (_) => const Location(Searchby: 1, SearchId: 0)));
                 if (r != null) {
                   bloc.add(DestinationSelected(
                       objfun.SelectLocationList.Location,
                       objfun.SelectLocationList.Id));
-                  objfun.SelectLocationList =
-                      LocationModel.Empty();
+                  objfun.SelectLocationList = LocationModel.Empty();
                 }
               },
-              onClear: () =>
-                  bloc.add(DestinationSelected('', 0)),
+              onClear: () => bloc.add(DestinationSelected('', 0)),
             ),
           ],
         ]),
 
       const SizedBox(height: 10),
 
-      // Pickup Address
       _addressCard(
         title: 'PickUp Address',
         addressValue: state.txtPickUpAddress,
         qtyValue: state.txtPickUpQuantity,
         addressEnabled: fp["txtPickUpAddress"] == true,
         qtyEnabled: fp["txtPickUpQuantity"] == true,
-        onAddressChanged: (v) => bloc
-            .add(UpdateTextField('txtPickUpAddress', v)),
-        onQtyChanged: (v) => bloc
-            .add(UpdateTextField('txtPickUpQuantity', v)),
+        onAddressChanged: (v) => bloc.add(UpdateTextField('txtPickUpAddress', v)),
+        onQtyChanged: (v) => bloc.add(UpdateTextField('txtPickUpQuantity', v)),
         onSearch: () async {
           final r = await Navigator.push(context,
-              MaterialPageRoute(
-                  builder: (_) => const AddressList(
-                      Searchby: 1, SearchId: 0)));
-          if (r != null &&
-              objfun.SelectAddressList.isNotEmpty) {
-            final enc = Uri.encodeComponent(
-                objfun.SelectAddressList);
-            await OnlineApi.SelectAddressDetails(
-                context, enc);
+              MaterialPageRoute(builder: (_) => const AddressList(Searchby: 1, SearchId: 0)));
+          if (r != null && objfun.SelectAddressList.isNotEmpty) {
+            final enc = Uri.encodeComponent(objfun.SelectAddressList);
+            await OnlineApi.SelectAddressDetails(context, enc);
             if (objfun.AddressDetailedList.isNotEmpty) {
               bloc.add(PickUpAddressSelected(
                   objfun.AddressDetailedList[0].Address +
-                      (objfun.AddressDetailedList[0]
-                          .Phone !=
-                          null
+                      (objfun.AddressDetailedList[0].Phone != null
                           ? " ${objfun.AddressDetailedList[0].Phone}"
                           : "")));
             }
@@ -1166,42 +1064,31 @@ class _SalesOrderAddBodyState extends State<_SalesOrderAddBody>
             objfun.AddressDetailedList = [];
           }
         },
-        onClear: () =>
-            bloc.add(PickUpAddressSelected('')),
+        onClear: () => bloc.add(PickUpAddressSelected('')),
         onList: () => _showPickUpList(context, state),
         onAdd: () => bloc.add(AddPickUpAddress()),
       ),
 
       const SizedBox(height: 10),
 
-      // Delivery Address
       _addressCard(
         title: 'Delivery Address',
         addressValue: state.txtDeliveryAddress,
         qtyValue: state.txtDeliveryQuantity,
         addressEnabled: fp["txtDeliveryAddress"] == true,
         qtyEnabled: fp["txtDeliveryQuantity"] == true,
-        onAddressChanged: (v) => bloc
-            .add(UpdateTextField('txtDeliveryAddress', v)),
-        onQtyChanged: (v) => bloc.add(
-            UpdateTextField('txtDeliveryQuantity', v)),
+        onAddressChanged: (v) => bloc.add(UpdateTextField('txtDeliveryAddress', v)),
+        onQtyChanged: (v) => bloc.add(UpdateTextField('txtDeliveryQuantity', v)),
         onSearch: () async {
           final r = await Navigator.push(context,
-              MaterialPageRoute(
-                  builder: (_) => const AddressList(
-                      Searchby: 1, SearchId: 0)));
-          if (r != null &&
-              objfun.SelectAddressList.isNotEmpty) {
-            final enc = Uri.encodeComponent(
-                objfun.SelectAddressList);
-            await OnlineApi.SelectAddressDetails(
-                context, enc);
+              MaterialPageRoute(builder: (_) => const AddressList(Searchby: 1, SearchId: 0)));
+          if (r != null && objfun.SelectAddressList.isNotEmpty) {
+            final enc = Uri.encodeComponent(objfun.SelectAddressList);
+            await OnlineApi.SelectAddressDetails(context, enc);
             if (objfun.AddressDetailedList.isNotEmpty) {
               bloc.add(DeliveryAddressSelected(
                   objfun.AddressDetailedList[0].Address +
-                      (objfun.AddressDetailedList[0]
-                          .Phone !=
-                          null
+                      (objfun.AddressDetailedList[0].Phone != null
                           ? " ${objfun.AddressDetailedList[0].Phone}"
                           : "")));
             }
@@ -1209,15 +1096,13 @@ class _SalesOrderAddBodyState extends State<_SalesOrderAddBody>
             objfun.AddressDetailedList = [];
           }
         },
-        onClear: () =>
-            bloc.add(DeliveryAddressSelected('')),
+        onClear: () => bloc.add(DeliveryAddressSelected('')),
         onList: () => _showDeliveryList(context, state),
         onAdd: () => bloc.add(AddDeliveryAddress()),
       ),
 
       const SizedBox(height: 10),
 
-      // Warehouse Address
       _sectionCard(children: [
         _sectionLabel('Warehouse Address'),
         _gap(),
@@ -1225,25 +1110,17 @@ class _SalesOrderAddBodyState extends State<_SalesOrderAddBody>
           hint: 'Warehouse Address',
           value: state.txtWarehouseAddress,
           enabled: fp["txtWarehouseAddress"] == true,
-          onChanged: (v) => bloc.add(
-              UpdateTextField('txtWarehouseAddress', v)),
+          onChanged: (v) => bloc.add(UpdateTextField('txtWarehouseAddress', v)),
           onSearch: () async {
             final r = await Navigator.push(context,
-                MaterialPageRoute(
-                    builder: (_) => const AddressList(
-                        Searchby: 1, SearchId: 0)));
-            if (r != null &&
-                objfun.SelectAddressList.isNotEmpty) {
-              final enc = Uri.encodeComponent(
-                  objfun.SelectAddressList);
-              await OnlineApi.SelectAddressDetails(
-                  context, enc);
+                MaterialPageRoute(builder: (_) => const AddressList(Searchby: 1, SearchId: 0)));
+            if (r != null && objfun.SelectAddressList.isNotEmpty) {
+              final enc = Uri.encodeComponent(objfun.SelectAddressList);
+              await OnlineApi.SelectAddressDetails(context, enc);
               if (objfun.AddressDetailedList.isNotEmpty) {
                 bloc.add(WarehouseAddressSelected(
                     objfun.AddressDetailedList[0].Address +
-                        (objfun.AddressDetailedList[0]
-                            .Phone !=
-                            null
+                        (objfun.AddressDetailedList[0].Phone != null
                             ? " ${objfun.AddressDetailedList[0].Phone}"
                             : "")));
               }
@@ -1251,8 +1128,7 @@ class _SalesOrderAddBodyState extends State<_SalesOrderAddBody>
               objfun.AddressDetailedList = [];
             }
           },
-          onClear: () =>
-              bloc.add(WarehouseAddressSelected('')),
+          onClear: () => bloc.add(WarehouseAddressSelected('')),
         ),
       ]),
     ]);
@@ -1291,8 +1167,7 @@ class _SalesOrderAddBodyState extends State<_SalesOrderAddBody>
             s2Key: 'txtForwarding1S2',
             toggleEvent: ToggleFW1(),
             sealEvent: (n, id) => SealEmp1Selected(n, id),
-            breakEvent: (n, id) =>
-                SealEmp1Selected(n, id, isBreak: true),
+            breakEvent: (n, id) => SealEmp1Selected(n, id, isBreak: true),
             width: width),
         const SizedBox(height: 10),
         _fwCard(context, bloc, state, fp,
@@ -1318,8 +1193,7 @@ class _SalesOrderAddBodyState extends State<_SalesOrderAddBody>
             s2Key: 'txtForwarding2S2',
             toggleEvent: ToggleFW2(),
             sealEvent: (n, id) => SealEmp2Selected(n, id),
-            breakEvent: (n, id) =>
-                SealEmp2Selected(n, id, isBreak: true),
+            breakEvent: (n, id) => SealEmp2Selected(n, id, isBreak: true),
             width: width),
         const SizedBox(height: 10),
         _fwCard(context, bloc, state, fp,
@@ -1345,8 +1219,7 @@ class _SalesOrderAddBodyState extends State<_SalesOrderAddBody>
             s2Key: 'txtForwarding3S2',
             toggleEvent: ToggleFW3(),
             sealEvent: (n, id) => SealEmp3Selected(n, id),
-            breakEvent: (n, id) =>
-                SealEmp3Selected(n, id, isBreak: true),
+            breakEvent: (n, id) => SealEmp3Selected(n, id, isBreak: true),
             width: width),
         const SizedBox(height: 10),
       ],
@@ -1358,7 +1231,6 @@ class _SalesOrderAddBodyState extends State<_SalesOrderAddBody>
         const SizedBox(height: 10),
       ],
 
-      // Boarding Officers
       _sectionCard(children: [
         _sectionLabel('Boarding Officer 1'),
         _gap(),
@@ -1367,38 +1239,32 @@ class _SalesOrderAddBodyState extends State<_SalesOrderAddBody>
           value: state.txtBoardingOfficer1,
           enabled: fp["txtBoardingOfficer1"] == true,
           onSearch: () async {
-            await OnlineApi.SelectEmployee(
-                context, '', 'Operation');
-            final r = await Navigator.push(context,
-                MaterialPageRoute(
-                    builder: (_) => const Employee(
-                        Searchby: 1, SearchId: 0)));
-            if (r != null) {
+            await OnlineApi.SelectEmployee(context, '', 'Operation');
+            // ✅ FIX: await + isNotEmpty check
+            await Navigator.push(context,
+                MaterialPageRoute(builder: (_) => const Employee(Searchby: 1, SearchId: 0)));
+            if (objfun.SelectEmployeeList.AccountName.isNotEmpty) {
               bloc.add(BoardingOfficer1Selected(
                   objfun.SelectEmployeeList.AccountName,
                   objfun.SelectEmployeeList.Id));
-              objfun.SelectEmployeeList =
-                  EmployeeModel.Empty();
+              objfun.SelectEmployeeList = EmployeeModel.Empty();
             }
           },
-          onClear: () =>
-              bloc.add(BoardingOfficer1Selected('', 0)),
+          onClear: () => bloc.add(BoardingOfficer1Selected('', 0)),
         ),
         _gap(),
         _editField(
           hint: 'Amount 1',
           value: state.txtAmount1,
           enabled: !state.disabledAmount1,
-          onChanged: (v) =>
-              bloc.add(UpdateTextField('txtAmount1', v)),
+          onChanged: (v) => bloc.add(UpdateTextField('txtAmount1', v)),
         ),
         _gap(),
         _editField(
           hint: 'Port Charges Ref',
           value: state.txtPortChargeRef1,
           enabled: fp["txtPortChargeRef1"] == true,
-          onChanged: (v) => bloc
-              .add(UpdateTextField('txtPortChargeRef1', v)),
+          onChanged: (v) => bloc.add(UpdateTextField('txtPortChargeRef1', v)),
         ),
         _gap(),
         _divider(),
@@ -1410,38 +1276,32 @@ class _SalesOrderAddBodyState extends State<_SalesOrderAddBody>
           value: state.txtBoardingOfficer2,
           enabled: fp["txtBoardingOfficer2"] == true,
           onSearch: () async {
-            await OnlineApi.SelectEmployee(
-                context, '', 'Operation');
-            final r = await Navigator.push(context,
-                MaterialPageRoute(
-                    builder: (_) => const Employee(
-                        Searchby: 1, SearchId: 0)));
-            if (r != null) {
+            await OnlineApi.SelectEmployee(context, '', 'Operation');
+            // ✅ FIX: await + isNotEmpty check
+            await Navigator.push(context,
+                MaterialPageRoute(builder: (_) => const Employee(Searchby: 1, SearchId: 0)));
+            if (objfun.SelectEmployeeList.AccountName.isNotEmpty) {
               bloc.add(BoardingOfficer2Selected(
                   objfun.SelectEmployeeList.AccountName,
                   objfun.SelectEmployeeList.Id));
-              objfun.SelectEmployeeList =
-                  EmployeeModel.Empty();
+              objfun.SelectEmployeeList = EmployeeModel.Empty();
             }
           },
-          onClear: () =>
-              bloc.add(BoardingOfficer2Selected('', 0)),
+          onClear: () => bloc.add(BoardingOfficer2Selected('', 0)),
         ),
         _gap(),
         _editField(
           hint: 'Amount 2',
           value: state.txtAmount2,
           enabled: !state.disabledAmount2,
-          onChanged: (v) =>
-              bloc.add(UpdateTextField('txtAmount2', v)),
+          onChanged: (v) => bloc.add(UpdateTextField('txtAmount2', v)),
         ),
         _gap(),
         _editField(
           hint: 'Port Charges',
           value: state.txtPortCharges,
           enabled: fp["txtPortCharges"] == true,
-          onChanged: (v) => bloc
-              .add(UpdateTextField('txtPortCharges', v)),
+          onChanged: (v) => bloc.add(UpdateTextField('txtPortCharges', v)),
         ),
       ]),
     ]);
@@ -1486,52 +1346,36 @@ class _SalesOrderAddBodyState extends State<_SalesOrderAddBody>
         borderRadius: BorderRadius.circular(16),
         border: Border.all(color: _border),
         boxShadow: const [
-          BoxShadow(
-              color: Color(0x0A1555F3),
-              blurRadius: 8,
-              offset: Offset(0, 2))
+          BoxShadow(color: Color(0x0A1555F3), blurRadius: 8, offset: Offset(0, 2))
         ],
       ),
       child: Column(children: [
-        // FW header row
         InkWell(
           onTap: () => bloc.add(toggleEvent),
-          borderRadius: const BorderRadius.vertical(
-              top: Radius.circular(16)),
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
           child: Container(
-            padding: const EdgeInsets.symmetric(
-                horizontal: 14, vertical: 12),
+            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
             decoration: BoxDecoration(
-              color: visible
-                  ? _brandLight
-                  : Colors.white,
-              borderRadius: const BorderRadius.vertical(
-                  top: Radius.circular(16)),
+              color: visible ? _brandLight : Colors.white,
+              borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
             ),
             child: Row(children: [
               AnimatedRotation(
                 turns: visible ? 0.25 : 0,
-                duration:
-                const Duration(milliseconds: 200),
-                child: Icon(
-                    Icons.arrow_right_rounded,
-                    color: _brand,
-                    size: 28),
+                duration: const Duration(milliseconds: 200),
+                child: Icon(Icons.arrow_right_rounded, color: _brand, size: 28),
               ),
               const SizedBox(width: 8),
               Text("FW $fwNum",
                   style: GoogleFonts.poppins(
-                      color: _brandDark,
-                      fontSize: 14,
-                      fontWeight: FontWeight.w700)),
+                      color: _brandDark, fontSize: 14, fontWeight: FontWeight.w700)),
               const SizedBox(width: 12),
               Expanded(
                 child: _styledDropdown<String>(
                   value: dropValue,
                   items: SalesOrderAddBloc.forwardingNo,
                   enabled: fp[dropKey] == true,
-                  onChanged: (v) => bloc
-                      .add(UpdateDropdown(dropKey, v)),
+                  onChanged: (v) => bloc.add(UpdateDropdown(dropKey, v)),
                 ),
               ),
             ]),
@@ -1542,7 +1386,6 @@ class _SalesOrderAddBodyState extends State<_SalesOrderAddBody>
           Padding(
             padding: const EdgeInsets.all(14),
             child: Column(children: [
-              // Date + checkbox
               _dateCheckRow(
                 context: context,
                 label: "Date",
@@ -1558,8 +1401,7 @@ class _SalesOrderAddBodyState extends State<_SalesOrderAddBody>
                 hint: 'SMK NO $fwNum',
                 value: smkValue,
                 enabled: fp[smkKey] == true,
-                onChanged: (v) =>
-                    bloc.add(UpdateTextField(smkKey, v)),
+                onChanged: (v) => bloc.add(UpdateTextField(smkKey, v)),
               ),
               _gap(),
               Row(children: [
@@ -1568,8 +1410,7 @@ class _SalesOrderAddBodyState extends State<_SalesOrderAddBody>
                     hint: 'R.No $fwNum',
                     value: enRef,
                     enabled: fp[enKey] == true,
-                    onChanged: (v) =>
-                        bloc.add(UpdateTextField(enKey, v)),
+                    onChanged: (v) => bloc.add(UpdateTextField(enKey, v)),
                   ),
                 ),
                 const SizedBox(width: 10),
@@ -1578,8 +1419,7 @@ class _SalesOrderAddBodyState extends State<_SalesOrderAddBody>
                     hint: 'EX.Ref $fwNum',
                     value: exRef,
                     enabled: fp[exKey] == true,
-                    onChanged: (v) =>
-                        bloc.add(UpdateTextField(exKey, v)),
+                    onChanged: (v) => bloc.add(UpdateTextField(exKey, v)),
                   ),
                 ),
               ]),
@@ -1587,22 +1427,17 @@ class _SalesOrderAddBodyState extends State<_SalesOrderAddBody>
               _searchField(
                 hint: "Seal By",
                 value: sealEmpValue,
-                enabled:
-                fp["txtSealByEmp$fwNum"] == true,
+                enabled: fp["txtSealByEmp$fwNum"] == true,
                 onSearch: () async {
-                  await OnlineApi.SelectEmployee(
-                      context, '', 'Operation');
-                  final r = await Navigator.push(context,
-                      MaterialPageRoute(
-                          builder: (_) => const Employee(
-                              Searchby: 1, SearchId: 0)));
-                  if (r != null) {
+                  await OnlineApi.SelectEmployee(context, '', 'Operation');
+                  // ✅ FIX: await + isNotEmpty check
+                  await Navigator.push(context,
+                      MaterialPageRoute(builder: (_) => const Employee(Searchby: 1, SearchId: 0)));
+                  if (objfun.SelectEmployeeList.AccountName.isNotEmpty) {
                     bloc.add(sealEvent(
-                        objfun
-                            .SelectEmployeeList.AccountName,
+                        objfun.SelectEmployeeList.AccountName,
                         objfun.SelectEmployeeList.Id));
-                    objfun.SelectEmployeeList =
-                        EmployeeModel.Empty();
+                    objfun.SelectEmployeeList = EmployeeModel.Empty();
                   }
                 },
                 onClear: () => bloc.add(sealEvent('', 0)),
@@ -1611,26 +1446,20 @@ class _SalesOrderAddBodyState extends State<_SalesOrderAddBody>
               _searchField(
                 hint: "B.Seal By",
                 value: breakEmpValue,
-                enabled:
-                fp["txtBreakByEmp$fwNum"] == true,
+                enabled: fp["txtBreakByEmp$fwNum"] == true,
                 onSearch: () async {
-                  await OnlineApi.SelectEmployee(
-                      context, '', 'Operation');
-                  final r = await Navigator.push(context,
-                      MaterialPageRoute(
-                          builder: (_) => const Employee(
-                              Searchby: 1, SearchId: 0)));
-                  if (r != null) {
+                  await OnlineApi.SelectEmployee(context, '', 'Operation');
+                  // ✅ FIX: await + isNotEmpty check
+                  await Navigator.push(context,
+                      MaterialPageRoute(builder: (_) => const Employee(Searchby: 1, SearchId: 0)));
+                  if (objfun.SelectEmployeeList.AccountName.isNotEmpty) {
                     bloc.add(breakEvent(
-                        objfun
-                            .SelectEmployeeList.AccountName,
+                        objfun.SelectEmployeeList.AccountName,
                         objfun.SelectEmployeeList.Id));
-                    objfun.SelectEmployeeList =
-                        EmployeeModel.Empty();
+                    objfun.SelectEmployeeList = EmployeeModel.Empty();
                   }
                 },
-                onClear: () =>
-                    bloc.add(breakEvent('', 0)),
+                onClear: () => bloc.add(breakEvent('', 0)),
               ),
               _gap(),
               Row(children: [
@@ -1639,8 +1468,7 @@ class _SalesOrderAddBodyState extends State<_SalesOrderAddBody>
                     hint: 'S1',
                     value: s1Value,
                     enabled: fp[s1Key] == true,
-                    onChanged: (v) =>
-                        bloc.add(UpdateTextField(s1Key, v)),
+                    onChanged: (v) => bloc.add(UpdateTextField(s1Key, v)),
                   ),
                 ),
                 const SizedBox(width: 10),
@@ -1649,8 +1477,7 @@ class _SalesOrderAddBodyState extends State<_SalesOrderAddBody>
                     hint: 'S2',
                     value: s2Value,
                     enabled: fp[s2Key] == true,
-                    onChanged: (v) =>
-                        bloc.add(UpdateTextField(s2Key, v)),
+                    onChanged: (v) => bloc.add(UpdateTextField(s2Key, v)),
                   ),
                 ),
               ]),
@@ -1664,28 +1491,24 @@ class _SalesOrderAddBodyState extends State<_SalesOrderAddBody>
   // ZB Card
   // ════════════════════════════════════════════════════
   Widget _zbCard(BuildContext context, SalesOrderAddBloc bloc,
-      SalesOrderAddLoaded state, Map<String, bool> fp,
-      int zbNum) {
-    final dropKey  = zbNum == 1 ? 'dropdownValueZB1' : 'dropdownValueZB2';
-    final refKey   = zbNum == 1 ? 'txtZBRef1' : 'txtZBRef2';
-    final dropVal  = zbNum == 1 ? state.dropdownValueZB1 : state.dropdownValueZB2;
-    final refVal   = zbNum == 1 ? state.txtZBRef1 : state.txtZBRef2;
+      SalesOrderAddLoaded state, Map<String, bool> fp, int zbNum) {
+    final dropKey = zbNum == 1 ? 'dropdownValueZB1' : 'dropdownValueZB2';
+    final refKey  = zbNum == 1 ? 'txtZBRef1' : 'txtZBRef2';
+    final dropVal = zbNum == 1 ? state.dropdownValueZB1 : state.dropdownValueZB2;
+    final refVal  = zbNum == 1 ? state.txtZBRef1 : state.txtZBRef2;
 
     return _sectionCard(children: [
       Row(children: [
         Text("ZB $zbNum",
             style: GoogleFonts.poppins(
-                color: _brandDark,
-                fontSize: 14,
-                fontWeight: FontWeight.w700)),
+                color: _brandDark, fontSize: 14, fontWeight: FontWeight.w700)),
         const SizedBox(width: 12),
         Expanded(
           child: _styledDropdown<String>(
             value: dropVal,
             items: SalesOrderAddBloc.zbNo,
             enabled: fp[dropKey] == true,
-            onChanged: (v) =>
-                bloc.add(UpdateDropdown(dropKey, v)),
+            onChanged: (v) => bloc.add(UpdateDropdown(dropKey, v)),
           ),
         ),
       ]),
@@ -1694,8 +1517,7 @@ class _SalesOrderAddBodyState extends State<_SalesOrderAddBody>
         hint: 'ZB Ref $zbNum',
         value: refVal,
         enabled: fp[refKey] == true,
-        onChanged: (v) =>
-            bloc.add(UpdateTextField(refKey, v)),
+        onChanged: (v) => bloc.add(UpdateTextField(refKey, v)),
       ),
     ]);
   }
@@ -1721,8 +1543,7 @@ class _SalesOrderAddBodyState extends State<_SalesOrderAddBody>
           Expanded(
             flex: 1,
             child: Column(
-                crossAxisAlignment:
-                CrossAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   _sectionLabel(title),
                   _gap(),
@@ -1755,17 +1576,9 @@ class _SalesOrderAddBodyState extends State<_SalesOrderAddBody>
             mainAxisAlignment: MainAxisAlignment.start,
             children: [
               const SizedBox(height: 24),
-              _iconBtn(
-                icon: Icons.list_rounded,
-                enabled: true,
-                onTap: onList,
-              ),
+              _iconBtn(icon: Icons.list_rounded, enabled: true, onTap: onList),
               const SizedBox(height: 4),
-              _iconBtn(
-                icon: Icons.add_box_rounded,
-                enabled: true,
-                onTap: onAdd,
-              ),
+              _iconBtn(icon: Icons.add_box_rounded, enabled: true, onTap: onAdd),
             ],
           ),
         ],
@@ -1787,14 +1600,12 @@ class _SalesOrderAddBodyState extends State<_SalesOrderAddBody>
       context: context,
       builder: (ctx) => BlocProvider.value(
         value: bloc,
-        child: _ProductDialog(
-            activeField: _activeNumpadField),
+        child: _ProductDialog(activeField: _activeNumpadField),
       ),
     );
   }
 
-  void _showPickUpList(
-      BuildContext context, SalesOrderAddLoaded state) {
+  void _showPickUpList(BuildContext context, SalesOrderAddLoaded state) {
     final bloc = context.read<SalesOrderAddBloc>();
     showDialog(
       barrierDismissible: false,
@@ -1805,18 +1616,15 @@ class _SalesOrderAddBodyState extends State<_SalesOrderAddBody>
           title: "PickUp Address & Qty List",
           addresses: state.pickUpAddressList,
           quantities: state.pickUpQuantityList,
-          onSelect: (i) =>
-              bloc.add(SelectPickUpFromList(i)),
-          onDelete: (i) =>
-              bloc.add(RemovePickUpAddress(i)),
+          onSelect: (i) => bloc.add(SelectPickUpFromList(i)),
+          onDelete: (i) => bloc.add(RemovePickUpAddress(i)),
           onClear: () => bloc.add(ClearProduct()),
         ),
       ),
     );
   }
 
-  void _showDeliveryList(
-      BuildContext context, SalesOrderAddLoaded state) {
+  void _showDeliveryList(BuildContext context, SalesOrderAddLoaded state) {
     final bloc = context.read<SalesOrderAddBloc>();
     showDialog(
       barrierDismissible: false,
@@ -1827,10 +1635,8 @@ class _SalesOrderAddBodyState extends State<_SalesOrderAddBody>
           title: "Delivery Address & Qty List",
           addresses: state.deliveryAddressList,
           quantities: state.deliveryQuantityList,
-          onSelect: (i) =>
-              bloc.add(SelectDeliveryFromList(i)),
-          onDelete: (i) =>
-              bloc.add(RemoveDeliveryAddress(i)),
+          onSelect: (i) => bloc.add(SelectDeliveryFromList(i)),
+          onDelete: (i) => bloc.add(RemoveDeliveryAddress(i)),
           onClear: () {},
         ),
       ),
@@ -1840,11 +1646,9 @@ class _SalesOrderAddBodyState extends State<_SalesOrderAddBody>
   // ── Product table ─────────────────────────────────
   Widget _productHeader() {
     return Container(
-      padding: const EdgeInsets.symmetric(
-          horizontal: 12, vertical: 8),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       decoration: BoxDecoration(
-        gradient: const LinearGradient(
-            colors: [_brand, _brandMid]),
+        gradient: const LinearGradient(colors: [_brand, _brandMid]),
         borderRadius: BorderRadius.circular(10),
       ),
       child: Row(children: [
@@ -1860,9 +1664,7 @@ class _SalesOrderAddBodyState extends State<_SalesOrderAddBody>
     );
   }
 
-  Widget _ph(String t,
-      {int flex = 1,
-        TextAlign align = TextAlign.left}) =>
+  Widget _ph(String t, {int flex = 1, TextAlign align = TextAlign.left}) =>
       Expanded(
         flex: flex,
         child: Text(t,
@@ -1878,14 +1680,12 @@ class _SalesOrderAddBodyState extends State<_SalesOrderAddBody>
     padding: const EdgeInsets.symmetric(vertical: 20),
     child: Center(
       child: Text('No products added',
-          style: GoogleFonts.poppins(
-              color: _textSub, fontSize: 13)),
+          style: GoogleFonts.poppins(color: _textSub, fontSize: 13)),
     ),
   );
 
-  Widget _productRow(BuildContext context,
-      SalesOrderAddLoaded state, int index,
-      dynamic p, SalesOrderAddBloc bloc) {
+  Widget _productRow(BuildContext context, SalesOrderAddLoaded state,
+      int index, dynamic p, SalesOrderAddBloc bloc) {
     return Container(
       margin: const EdgeInsets.only(bottom: 6),
       decoration: BoxDecoration(
@@ -1893,83 +1693,50 @@ class _SalesOrderAddBodyState extends State<_SalesOrderAddBody>
         borderRadius: BorderRadius.circular(10),
         border: Border.all(color: _border),
       ),
-      padding: const EdgeInsets.symmetric(
-          horizontal: 10, vertical: 8),
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
       child: Row(children: [
-        Expanded(
-            flex: 1,
+        Expanded(flex: 1,
             child: Text('${index + 1}',
-                style: GoogleFonts.poppins(
-                    color: _brand,
-                    fontSize: 11,
-                    fontWeight: FontWeight.w800))),
-        Expanded(
-            flex: 2,
+                style: GoogleFonts.poppins(color: _brand, fontSize: 11, fontWeight: FontWeight.w800))),
+        Expanded(flex: 2,
             child: Text(p.ProductCode.toString(),
-                style: GoogleFonts.poppins(
-                    color: _brand,
-                    fontSize: 11,
-                    fontWeight: FontWeight.w700),
+                style: GoogleFonts.poppins(color: _brand, fontSize: 11, fontWeight: FontWeight.w700),
                 overflow: TextOverflow.ellipsis)),
-        Expanded(
-            flex: 4,
+        Expanded(flex: 4,
             child: Text(p.ProductName.toString(),
-                style: GoogleFonts.poppins(
-                    color: _textMain,
-                    fontSize: 11,
-                    fontWeight: FontWeight.w600),
+                style: GoogleFonts.poppins(color: _textMain, fontSize: 11, fontWeight: FontWeight.w600),
                 overflow: TextOverflow.ellipsis)),
-        Expanded(
-            flex: 1,
+        Expanded(flex: 1,
             child: Text('${p.ItemQty}',
-                style: GoogleFonts.poppins(
-                    color: _textSub,
-                    fontSize: 11,
-                    fontWeight: FontWeight.w600))),
-        Expanded(
-            flex: 2,
+                style: GoogleFonts.poppins(color: _textSub, fontSize: 11, fontWeight: FontWeight.w600))),
+        Expanded(flex: 2,
             child: Text('${p.SalesRate}',
-                style: GoogleFonts.poppins(
-                    color: _textSub, fontSize: 11),
+                style: GoogleFonts.poppins(color: _textSub, fontSize: 11),
                 overflow: TextOverflow.ellipsis)),
-        Expanded(
-            flex: 2,
+        Expanded(flex: 2,
             child: Text('${p.TaxPercent}%',
-                style: GoogleFonts.poppins(
-                    color: _textSub, fontSize: 11))),
+                style: GoogleFonts.poppins(color: _textSub, fontSize: 11))),
         Expanded(
           flex: 2,
           child: Text('${p.Amount}',
               textAlign: TextAlign.right,
-              style: GoogleFonts.poppins(
-                  color: _brand,
-                  fontSize: 11,
-                  fontWeight: FontWeight.w800)),
+              style: GoogleFonts.poppins(color: _brand, fontSize: 11, fontWeight: FontWeight.w800)),
         ),
-        // edit + delete — overflow fix: no Expanded, use FittedBox
         Row(
           mainAxisSize: MainAxisSize.min,
           children: [
             GestureDetector(
-              onTap: () => _showProductDialog(
-                  context, state, index),
+              onTap: () => _showProductDialog(context, state, index),
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 2),
-                child: const Icon(
-                    Icons.edit_rounded,
-                    color: _brand,
-                    size: 18),
+                child: const Icon(Icons.edit_rounded, color: _brand, size: 18),
               ),
             ),
             GestureDetector(
-              onTap: () =>
-                  bloc.add(RemoveProduct(index)),
+              onTap: () => bloc.add(RemoveProduct(index)),
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 2),
-                child: Icon(
-                    Icons.delete_rounded,
-                    color: _red,
-                    size: 18),
+                child: Icon(Icons.delete_rounded, color: _red, size: 18),
               ),
             ),
           ],
@@ -1984,8 +1751,7 @@ class _SalesOrderAddBodyState extends State<_SalesOrderAddBody>
 
   Widget _tabScroll({required List<Widget> children}) =>
       ListView(
-        padding: const EdgeInsets.fromLTRB(
-            14, 14, 14, 100),
+        padding: const EdgeInsets.fromLTRB(14, 14, 14, 100),
         children: children,
       );
 
@@ -1997,10 +1763,7 @@ class _SalesOrderAddBodyState extends State<_SalesOrderAddBody>
           borderRadius: BorderRadius.circular(16),
           border: Border.all(color: _border),
           boxShadow: const [
-            BoxShadow(
-                color: Color(0x0A1555F3),
-                blurRadius: 8,
-                offset: Offset(0, 2))
+            BoxShadow(color: Color(0x0A1555F3), blurRadius: 8, offset: Offset(0, 2))
           ],
         ),
         child: Column(
@@ -2011,26 +1774,18 @@ class _SalesOrderAddBodyState extends State<_SalesOrderAddBody>
 
   Widget _sectionLabel(String t) => Text(t,
       style: GoogleFonts.poppins(
-          color: _textSub,
-          fontSize: 10,
-          fontWeight: FontWeight.w700,
-          letterSpacing: 0.6));
+          color: _textSub, fontSize: 10, fontWeight: FontWeight.w700, letterSpacing: 0.6));
 
   Widget _labelText(String t) => Text(t,
-      style: GoogleFonts.poppins(
-          color: _textMain,
-          fontSize: 13,
-          fontWeight: FontWeight.w600));
+      style: GoogleFonts.poppins(color: _textMain, fontSize: 13, fontWeight: FontWeight.w600));
 
   Widget _gap() => const SizedBox(height: 10);
-  Widget _divider() =>
-      Divider(color: _border, thickness: 1);
+  Widget _divider() => Divider(color: _border, thickness: 1);
 
   Widget _readonlyBox(String val) => Container(
     key: ValueKey('readonly_$val'),
     height: 44,
-    padding: const EdgeInsets.symmetric(
-        horizontal: 12),
+    padding: const EdgeInsets.symmetric(horizontal: 12),
     decoration: BoxDecoration(
       color: _brandLight,
       borderRadius: BorderRadius.circular(10),
@@ -2039,35 +1794,27 @@ class _SalesOrderAddBodyState extends State<_SalesOrderAddBody>
     alignment: Alignment.centerLeft,
     child: Text(val,
         style: GoogleFonts.poppins(
-            color: _brandDark,
-            fontSize: 13,
-            fontWeight: FontWeight.w700)),
+            color: _brandDark, fontSize: 13, fontWeight: FontWeight.w700)),
   );
 
-  Widget _dateTapBox(
-      {required String date,
-        required VoidCallback? onTap}) =>
+  Widget _dateTapBox({required String date, required VoidCallback? onTap}) =>
       GestureDetector(
         onTap: onTap,
         child: Container(
           height: 44,
-          padding: const EdgeInsets.symmetric(
-              horizontal: 12),
+          padding: const EdgeInsets.symmetric(horizontal: 12),
           decoration: BoxDecoration(
             color: _brandLight,
             borderRadius: BorderRadius.circular(10),
             border: Border.all(color: _border),
           ),
           child: Row(children: [
-            const Icon(Icons.calendar_today_rounded,
-                color: _brand, size: 15),
+            const Icon(Icons.calendar_today_rounded, color: _brand, size: 15),
             const SizedBox(width: 8),
             Flexible(
               child: Text(date,
                   style: GoogleFonts.poppins(
-                      color: _brandDark,
-                      fontSize: 13,
-                      fontWeight: FontWeight.w600)),
+                      color: _brandDark, fontSize: 13, fontWeight: FontWeight.w600)),
             ),
           ]),
         ),
@@ -2089,8 +1836,7 @@ class _SalesOrderAddBodyState extends State<_SalesOrderAddBody>
         decoration: BoxDecoration(
           color: enabled ? Colors.white : _surface,
           borderRadius: BorderRadius.circular(10),
-          border: Border.all(
-              color: enabled ? _border : _border.withOpacity(0.3)),
+          border: Border.all(color: enabled ? _border : _border.withOpacity(0.3)),
         ),
         child: Row(children: [
           const SizedBox(width: 12),
@@ -2098,25 +1844,17 @@ class _SalesOrderAddBodyState extends State<_SalesOrderAddBody>
             child: Text(
               value.isEmpty ? hint : value,
               style: GoogleFonts.poppins(
-                  color: value.isEmpty
-                      ? _textSub.withOpacity(0.45)
-                      : _textMain,
+                  color: value.isEmpty ? _textSub.withOpacity(0.45) : _textMain,
                   fontSize: 13,
-                  fontWeight: value.isEmpty
-                      ? FontWeight.w400
-                      : FontWeight.w600),
+                  fontWeight: value.isEmpty ? FontWeight.w400 : FontWeight.w600),
               overflow: TextOverflow.ellipsis,
             ),
           ),
           Padding(
             padding: const EdgeInsets.all(10),
             child: Icon(
-              value.isEmpty
-                  ? Icons.search_rounded
-                  : Icons.close_rounded,
-              color: enabled
-                  ? _brand
-                  : _textSub.withOpacity(0.25),
+              value.isEmpty ? Icons.search_rounded : Icons.close_rounded,
+              color: enabled ? _brand : _textSub.withOpacity(0.25),
               size: 20,
             ),
           ),
@@ -2144,33 +1882,25 @@ class _SalesOrderAddBodyState extends State<_SalesOrderAddBody>
         keyboardType: keyboardType,
         textCapitalization: TextCapitalization.characters,
         style: GoogleFonts.poppins(
-            color: _textMain,
-            fontSize: 13,
-            fontWeight: FontWeight.w600),
+            color: _textMain, fontSize: 13, fontWeight: FontWeight.w600),
         decoration: InputDecoration(
           hintText: hint,
           hintStyle: GoogleFonts.poppins(
-              color: _textSub.withOpacity(0.45),
-              fontSize: 13),
-          contentPadding: const EdgeInsets.symmetric(
-              horizontal: 12, vertical: 12),
+              color: _textSub.withOpacity(0.45), fontSize: 13),
+          contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
           filled: true,
-          fillColor:
-          enabled ? Colors.white : _surface,
+          fillColor: enabled ? Colors.white : _surface,
           enabledBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(10),
-            borderSide:
-            const BorderSide(color: _border),
+            borderSide: const BorderSide(color: _border),
           ),
           disabledBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(10),
-            borderSide: BorderSide(
-                color: _border.withOpacity(0.3)),
+            borderSide: BorderSide(color: _border.withOpacity(0.3)),
           ),
           focusedBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(10),
-            borderSide: const BorderSide(
-                color: _brand, width: 1.5),
+            borderSide: const BorderSide(color: _brand, width: 1.5),
           ),
         ),
       );
@@ -2184,8 +1914,7 @@ class _SalesOrderAddBodyState extends State<_SalesOrderAddBody>
     VoidCallback? onClear,
   }) =>
       Container(
-        constraints:
-        const BoxConstraints(minHeight: 80),
+        constraints: const BoxConstraints(minHeight: 80),
         decoration: BoxDecoration(
           color: enabled ? Colors.white : _surface,
           borderRadius: BorderRadius.circular(10),
@@ -2199,28 +1928,20 @@ class _SalesOrderAddBodyState extends State<_SalesOrderAddBody>
           minLines: 3,
           textCapitalization: TextCapitalization.characters,
           style: GoogleFonts.poppins(
-              color: _textMain,
-              fontSize: 13,
-              fontWeight: FontWeight.w600),
+              color: _textMain, fontSize: 13, fontWeight: FontWeight.w600),
           decoration: InputDecoration(
             hintText: hint,
             hintStyle: GoogleFonts.poppins(
-                color: _textSub.withOpacity(0.45),
-                fontSize: 13),
-            contentPadding: const EdgeInsets.symmetric(
-                horizontal: 12, vertical: 12),
+                color: _textSub.withOpacity(0.45), fontSize: 13),
+            contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
             border: InputBorder.none,
             suffixIcon: onSearch != null
                 ? GestureDetector(
-              onTap: value.isEmpty
-                  ? onSearch
-                  : onClear,
+              onTap: value.isEmpty ? onSearch : onClear,
               child: Padding(
                 padding: const EdgeInsets.all(8),
                 child: Icon(
-                  value.isEmpty
-                      ? Icons.search_rounded
-                      : Icons.close_rounded,
+                  value.isEmpty ? Icons.search_rounded : Icons.close_rounded,
                   color: _brand,
                   size: 20,
                 ),
@@ -2239,15 +1960,11 @@ class _SalesOrderAddBodyState extends State<_SalesOrderAddBody>
   }) =>
       Container(
         key: ValueKey('dropdown_${T}_$value'),
-        padding: const EdgeInsets.symmetric(
-            horizontal: 12),
+        padding: const EdgeInsets.symmetric(horizontal: 12),
         decoration: BoxDecoration(
           color: enabled ? Colors.white : _surface,
           borderRadius: BorderRadius.circular(10),
-          border: Border.all(
-              color: enabled
-                  ? _border
-                  : _border.withOpacity(0.3)),
+          border: Border.all(color: enabled ? _border : _border.withOpacity(0.3)),
         ),
         child: DropdownButtonHideUnderline(
           child: DropdownButton<T>(
@@ -2255,22 +1972,14 @@ class _SalesOrderAddBodyState extends State<_SalesOrderAddBody>
             value: value,
             onChanged: enabled ? onChanged : null,
             style: GoogleFonts.poppins(
-                color: _textMain,
-                fontSize: 13,
-                fontWeight: FontWeight.w600),
-            icon: const Icon(
-                Icons.keyboard_arrow_down_rounded,
-                color: _brand,
-                size: 20),
+                color: _textMain, fontSize: 13, fontWeight: FontWeight.w600),
+            icon: const Icon(Icons.keyboard_arrow_down_rounded, color: _brand, size: 20),
             items: items
                 .map((v) => DropdownMenuItem<T>(
                 value: v,
                 child: Text(v.toString(),
                     style: GoogleFonts.poppins(
-                        color: _textMain,
-                        fontSize: 13,
-                        fontWeight:
-                        FontWeight.w600))))
+                        color: _textMain, fontSize: 13, fontWeight: FontWeight.w600))))
                 .toList(),
           ),
         ),
@@ -2287,18 +1996,14 @@ class _SalesOrderAddBodyState extends State<_SalesOrderAddBody>
     required SalesOrderAddBloc bloc,
     bool showTime = false,
   }) {
-    final fmt = showTime
-        ? "dd-MM-yyyy HH:mm"
-        : "dd-MM-yyyy";
+    final fmt = showTime ? "dd-MM-yyyy HH:mm" : "dd-MM-yyyy";
 
     return Row(children: [
       SizedBox(
         width: 90,
         child: Text(label,
             style: GoogleFonts.poppins(
-                color: _textMain,
-                fontSize: 12,
-                fontWeight: FontWeight.w600)),
+                color: _textMain, fontSize: 12, fontWeight: FontWeight.w600)),
       ),
       Expanded(
         child: GestureDetector(
@@ -2326,51 +2031,36 @@ class _SalesOrderAddBodyState extends State<_SalesOrderAddBody>
                   context: context,
                   initialTime: TimeOfDay.now(),
                   builder: (ctx, child) => MediaQuery(
-                    data: MediaQuery.of(ctx).copyWith(
-                        alwaysUse24HourFormat: true),
+                    data: MediaQuery.of(ctx).copyWith(alwaysUse24HourFormat: true),
                     child: child!,
                   ),
                 );
-                final combined = DateTime(
-                    date.year, date.month, date.day,
+                final combined = DateTime(date.year, date.month, date.day,
                     time?.hour ?? 0, time?.minute ?? 0);
                 bloc.add(UpdateDate(dateKey,
-                    DateFormat("yyyy-MM-dd HH:mm:ss")
-                        .format(combined)));
+                    DateFormat("yyyy-MM-dd HH:mm:ss").format(combined)));
               } else {
-                bloc.add(UpdateDate(dateKey,
-                    DateFormat("yyyy-MM-dd")
-                        .format(date)));
+                bloc.add(UpdateDate(dateKey, DateFormat("yyyy-MM-dd").format(date)));
               }
             }
           },
           child: Container(
             height: 44,
-            padding: const EdgeInsets.symmetric(
-                horizontal: 12),
+            padding: const EdgeInsets.symmetric(horizontal: 12),
             decoration: BoxDecoration(
-              color: checkValue
-                  ? _brandLight
-                  : _surface,
+              color: checkValue ? _brandLight : _surface,
               borderRadius: BorderRadius.circular(10),
               border: Border.all(
-                  color: checkValue
-                      ? _border
-                      : _border.withOpacity(0.3)),
+                  color: checkValue ? _border : _border.withOpacity(0.3)),
             ),
             child: Row(children: [
-              const Icon(Icons.calendar_today_rounded,
-                  size: 14,
-                  color: _brand),
+              const Icon(Icons.calendar_today_rounded, size: 14, color: _brand),
               const SizedBox(width: 8),
               Expanded(
                 child: Text(
-                  DateFormat(fmt)
-                      .format(DateTime.parse(dateStr)),
+                  DateFormat(fmt).format(DateTime.parse(dateStr)),
                   style: GoogleFonts.poppins(
-                      color: checkValue
-                          ? _brandDark
-                          : _textSub,
+                      color: checkValue ? _brandDark : _textSub,
                       fontSize: 12,
                       fontWeight: FontWeight.w600),
                 ),
@@ -2385,14 +2075,10 @@ class _SalesOrderAddBodyState extends State<_SalesOrderAddBody>
         child: Checkbox(
           value: checkValue,
           activeColor: _brand,
-          side: BorderSide(
-              color: _border, width: 1.5),
-          shape: RoundedRectangleBorder(
-              borderRadius:
-              BorderRadius.circular(4)),
+          side: BorderSide(color: _border, width: 1.5),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
           onChanged: enabled
-              ? (v) =>
-              bloc.add(UpdateCheckbox(checkKey, v!))
+              ? (v) => bloc.add(UpdateCheckbox(checkKey, v!))
               : null,
         ),
       ),
@@ -2410,20 +2096,12 @@ class _SalesOrderAddBodyState extends State<_SalesOrderAddBody>
           width: 40,
           height: 40,
           decoration: BoxDecoration(
-            color: enabled
-                ? _brandLight
-                : _surface,
+            color: enabled ? _brandLight : _surface,
             borderRadius: BorderRadius.circular(10),
-            border: Border.all(
-                color: enabled
-                    ? _border
-                    : _border.withOpacity(0.3)),
+            border: Border.all(color: enabled ? _border : _border.withOpacity(0.3)),
           ),
           child: Icon(icon,
-              color: enabled
-                  ? _brand
-                  : _textSub.withOpacity(0.3),
-              size: 22),
+              color: enabled ? _brand : _textSub.withOpacity(0.3), size: 22),
         ),
       );
 }
@@ -2436,8 +2114,7 @@ class _ProductDialog extends StatefulWidget {
   const _ProductDialog({required this.activeField});
 
   @override
-  State<_ProductDialog> createState() =>
-      _ProductDialogState();
+  State<_ProductDialog> createState() => _ProductDialogState();
 }
 
 class _ProductDialogState extends State<_ProductDialog> {
@@ -2456,20 +2133,17 @@ class _ProductDialogState extends State<_ProductDialog> {
 
     return BlocBuilder<SalesOrderAddBloc, SalesOrderAddState>(
       builder: (context, state) {
-        if (state is! SalesOrderAddLoaded)
-          return const SizedBox();
+        if (state is! SalesOrderAddLoaded) return const SizedBox();
         final bloc = context.read<SalesOrderAddBloc>();
 
         return Dialog(
           backgroundColor: Colors.white,
-          shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(20)),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
           child: Container(
             width: width * 0.95,
             height: height * 0.92,
             padding: const EdgeInsets.all(16),
             child: Column(children: [
-              // Header
               Row(children: [
                 Container(
                   width: 36,
@@ -2478,38 +2152,27 @@ class _ProductDialogState extends State<_ProductDialog> {
                     color: _brandLight,
                     borderRadius: BorderRadius.circular(10),
                   ),
-                  child: const Icon(
-                      Icons.add_shopping_cart_rounded,
-                      color: _brand,
-                      size: 20),
+                  child: const Icon(Icons.add_shopping_cart_rounded, color: _brand, size: 20),
                 ),
                 const SizedBox(width: 10),
                 Text("Add Product",
                     style: GoogleFonts.poppins(
-                        color: _textMain,
-                        fontSize: 15,
-                        fontWeight: FontWeight.w700)),
+                        color: _textMain, fontSize: 15, fontWeight: FontWeight.w700)),
                 const Spacer(),
                 GestureDetector(
                   onTap: () {
                     bloc.add(ClearProduct());
-                    Navigator.of(context,
-                        rootNavigator: true)
-                        .pop();
+                    Navigator.of(context, rootNavigator: true).pop();
                   },
                   child: Container(
                     width: 32,
                     height: 32,
                     decoration: BoxDecoration(
                       color: _surface,
-                      borderRadius:
-                      BorderRadius.circular(8),
+                      borderRadius: BorderRadius.circular(8),
                       border: Border.all(color: _border),
                     ),
-                    child: const Icon(
-                        Icons.close_rounded,
-                        color: _textSub,
-                        size: 18),
+                    child: const Icon(Icons.close_rounded, color: _textSub, size: 18),
                   ),
                 ),
               ]),
@@ -2518,139 +2181,91 @@ class _ProductDialogState extends State<_ProductDialog> {
               Divider(color: _border),
               const SizedBox(height: 8),
 
-              // Product fields — scrollable to avoid overflow
               Expanded(
                 flex: 3,
                 child: SingleChildScrollView(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
-                      // Product Code (read only)
-                      _roField("Product Code",
-                          state.txtProductCode),
+                      _roField("Product Code", state.txtProductCode),
                       const SizedBox(height: 8),
-                      // Product Description + search
                       _searchableField(
                         hint: "Product Description",
-                        value:
-                        state.txtProductDescription,
+                        value: state.txtProductDescription,
                         onSearch: () async {
-                          final r = await Navigator.push(
-                              context,
+                          final r = await Navigator.push(context,
                               MaterialPageRoute(
-                                  builder: (_) =>
-                                  const Product(
-                                      Searchby: 1,
-                                      SearchId: 0)));
+                                  builder: (_) => const Product(Searchby: 1, SearchId: 0)));
                           if (r != null) {
                             bloc.add(ProductSelected(
-                                objfun.SelectProductList
-                                    .ProductName,
-                                objfun.SelectProductList
-                                    .Productcode,
-                                objfun.SelectProductList
-                                    .Id));
-                            objfun.SelectProductList =
-                                ProductModel.Empty();
-                            Navigator.of(context,
-                                rootNavigator: true)
-                                .pop();
+                                objfun.SelectProductList.ProductName,
+                                objfun.SelectProductList.Productcode,
+                                objfun.SelectProductList.Id));
+                            objfun.SelectProductList = ProductModel.Empty();
+                            Navigator.of(context, rootNavigator: true).pop();
                             showDialog(
                               context: context,
                               barrierDismissible: false,
-                              builder: (ctx) =>
-                                  BlocProvider.value(
-                                    value: bloc,
-                                    child: _ProductDialog(
-                                        activeField:
-                                        _activeField),
-                                  ),
+                              builder: (ctx) => BlocProvider.value(
+                                value: bloc,
+                                child: _ProductDialog(activeField: _activeField),
+                              ),
                             );
                           }
                         },
-                        onClear: () =>
-                            bloc.add(ClearProduct()),
+                        onClear: () => bloc.add(ClearProduct()),
                       ),
                       const SizedBox(height: 8),
-                      // Qty
-                      _numField("Qty",
-                          state.txtProductQty, 'qty'),
+                      _numField("Qty", state.txtProductQty, 'qty'),
                       const SizedBox(height: 6),
-                      _numField("Sale Rate",
-                          state.txtProductSaleRate,
-                          'saleRate'),
+                      _numField("Sale Rate", state.txtProductSaleRate, 'saleRate'),
                       const SizedBox(height: 6),
-                      _numField("GST",
-                          state.txtProductGst, 'gst'),
+                      _numField("GST", state.txtProductGst, 'gst'),
                       const SizedBox(height: 6),
-                      // Amount
                       Container(
                         height: 44,
-                        padding:
-                        const EdgeInsets.symmetric(
-                            horizontal: 12),
+                        padding: const EdgeInsets.symmetric(horizontal: 12),
                         decoration: BoxDecoration(
                           color: _brandLight,
-                          borderRadius:
-                          BorderRadius.circular(10),
-                          border: Border.all(
-                              color: _brand
-                                  .withOpacity(0.3)),
+                          borderRadius: BorderRadius.circular(10),
+                          border: Border.all(color: _brand.withOpacity(0.3)),
                         ),
                         child: Row(children: [
                           Text('Amount : ',
                               style: GoogleFonts.poppins(
-                                  color: _textSub,
-                                  fontSize: 12,
-                                  fontWeight:
-                                  FontWeight.w600)),
+                                  color: _textSub, fontSize: 12, fontWeight: FontWeight.w600)),
                           Text(state.txtProductAmount,
                               style: GoogleFonts.poppins(
-                                  color: _brand,
-                                  fontSize: 15,
-                                  fontWeight:
-                                  FontWeight.w800)),
+                                  color: _brand, fontSize: 15, fontWeight: FontWeight.w800)),
                         ]),
                       ),
-                    ],  // Column children end
-                  ), // Column end
-                ), // SingleChildScrollView end
-              ), // Expanded end
+                    ],
+                  ),
+                ),
+              ),
 
               const SizedBox(height: 10),
 
-              // Numpad
               Expanded(
                 flex: 4,
                 child: Container(
                   decoration: BoxDecoration(
                     color: _surface,
-                    borderRadius:
-                    BorderRadius.circular(14),
+                    borderRadius: BorderRadius.circular(14),
                     border: Border.all(color: _border),
                   ),
                   padding: const EdgeInsets.all(8),
                   child: Column(children: [
-                    _numRow(
-                        ['1', '2', '3'], bloc),
-                    _numRow(
-                        ['4', '5', '6'], bloc),
-                    _numRow(
-                        ['7', '8', '9'], bloc),
-                    _numRow(
-                        ['CLR', '0', 'C'], bloc),
+                    _numRow(['1', '2', '3'], bloc),
+                    _numRow(['4', '5', '6'], bloc),
+                    _numRow(['7', '8', '9'], bloc),
+                    _numRow(['CLR', '0', 'C'], bloc),
                     Row(children: [
                       _numBtn('Add', () {
                         bloc.add(AddProduct());
-                        Navigator.of(context,
-                            rootNavigator: true)
-                            .pop();
+                        Navigator.of(context, rootNavigator: true).pop();
                       }, isAction: true),
-                      _numBtn(
-                          'Reset',
-                              () =>
-                              bloc.add(ClearProduct()),
-                          isAction: true),
+                      _numBtn('Reset', () => bloc.add(ClearProduct()), isAction: true),
                     ]),
                   ]),
                 ),
@@ -2665,8 +2280,7 @@ class _ProductDialogState extends State<_ProductDialog> {
   Widget _roField(String hint, String value) =>
       Container(
         height: 44,
-        padding:
-        const EdgeInsets.symmetric(horizontal: 12),
+        padding: const EdgeInsets.symmetric(horizontal: 12),
         decoration: BoxDecoration(
           color: _surface,
           borderRadius: BorderRadius.circular(10),
@@ -2676,12 +2290,9 @@ class _ProductDialogState extends State<_ProductDialog> {
         child: Text(
           value.isEmpty ? hint : value,
           style: GoogleFonts.poppins(
-              color:
-              value.isEmpty ? _textSub : _textMain,
+              color: value.isEmpty ? _textSub : _textMain,
               fontSize: 13,
-              fontWeight: value.isEmpty
-                  ? FontWeight.w400
-                  : FontWeight.w600),
+              fontWeight: value.isEmpty ? FontWeight.w400 : FontWeight.w600),
         ),
       );
 
@@ -2704,13 +2315,9 @@ class _ProductDialogState extends State<_ProductDialog> {
             child: Text(
               value.isEmpty ? hint : value,
               style: GoogleFonts.poppins(
-                  color: value.isEmpty
-                      ? _textSub.withOpacity(0.45)
-                      : _textMain,
+                  color: value.isEmpty ? _textSub.withOpacity(0.45) : _textMain,
                   fontSize: 13,
-                  fontWeight: value.isEmpty
-                      ? FontWeight.w400
-                      : FontWeight.w600),
+                  fontWeight: value.isEmpty ? FontWeight.w400 : FontWeight.w600),
               overflow: TextOverflow.ellipsis,
             ),
           ),
@@ -2719,9 +2326,7 @@ class _ProductDialogState extends State<_ProductDialog> {
             child: Padding(
               padding: const EdgeInsets.all(10),
               child: Icon(
-                value.isEmpty
-                    ? Icons.search_rounded
-                    : Icons.close_rounded,
+                value.isEmpty ? Icons.search_rounded : Icons.close_rounded,
                 color: _brand,
                 size: 20,
               ),
@@ -2730,42 +2335,29 @@ class _ProductDialogState extends State<_ProductDialog> {
         ]),
       );
 
-  Widget _numField(
-      String hint, String value, String fieldKey) {
+  Widget _numField(String hint, String value, String fieldKey) {
     final active = _activeField == fieldKey;
     return GestureDetector(
       onTap: () => setState(() => _activeField = fieldKey),
       child: Container(
         height: 44,
-        padding:
-        const EdgeInsets.symmetric(horizontal: 12),
+        padding: const EdgeInsets.symmetric(horizontal: 12),
         decoration: BoxDecoration(
           color: active ? _brandLight : Colors.white,
           borderRadius: BorderRadius.circular(10),
-          border: Border.all(
-              color: active ? _brand : _border,
-              width: active ? 1.5 : 1),
+          border: Border.all(color: active ? _brand : _border, width: active ? 1.5 : 1),
         ),
         child: Row(children: [
           Expanded(
             child: Text(
               value.isEmpty ? hint : value,
               style: GoogleFonts.poppins(
-                  color: value.isEmpty
-                      ? _textSub.withOpacity(0.45)
-                      : _textMain,
+                  color: value.isEmpty ? _textSub.withOpacity(0.45) : _textMain,
                   fontSize: 13,
-                  fontWeight: value.isEmpty
-                      ? FontWeight.w400
-                      : FontWeight.w700),
+                  fontWeight: value.isEmpty ? FontWeight.w400 : FontWeight.w700),
             ),
           ),
-          if (active)
-            Container(
-              width: 2,
-              height: 18,
-              color: _brand,
-            ),
+          if (active) Container(width: 2, height: 18, color: _brand),
         ]),
       ),
     );
@@ -2775,16 +2367,12 @@ class _ProductDialogState extends State<_ProductDialog> {
       Expanded(
         child: Row(
           children: keys
-              .map((k) => _numBtn(
-              k,
-                  () => bloc
-                  .add(KeyPress(k, _activeField))))
+              .map((k) => _numBtn(k, () => bloc.add(KeyPress(k, _activeField))))
               .toList(),
         ),
       );
 
-  Widget _numBtn(String label, VoidCallback onPressed,
-      {bool isAction = false}) =>
+  Widget _numBtn(String label, VoidCallback onPressed, {bool isAction = false}) =>
       Expanded(
         child: Padding(
           padding: const EdgeInsets.all(3),
@@ -2794,15 +2382,10 @@ class _ProductDialogState extends State<_ProductDialog> {
               decoration: BoxDecoration(
                 color: isAction ? _brand : Colors.white,
                 borderRadius: BorderRadius.circular(10),
-                border: Border.all(
-                    color:
-                    isAction ? _brand : _border),
+                border: Border.all(color: isAction ? _brand : _border),
                 boxShadow: [
                   BoxShadow(
-                    color: isAction
-                        ? _brand.withOpacity(0.2)
-                        : Colors.black.withOpacity(
-                        0.04),
+                    color: isAction ? _brand.withOpacity(0.2) : Colors.black.withOpacity(0.04),
                     blurRadius: 4,
                     offset: const Offset(0, 2),
                   )
@@ -2811,11 +2394,8 @@ class _ProductDialogState extends State<_ProductDialog> {
               alignment: Alignment.center,
               child: Text(label,
                   style: GoogleFonts.poppins(
-                      color: isAction
-                          ? Colors.white
-                          : _textMain,
-                      fontSize:
-                      isAction ? 13 : 16,
+                      color: isAction ? Colors.white : _textMain,
+                      fontSize: isAction ? 13 : 16,
                       fontWeight: FontWeight.w700)),
             ),
           ),
@@ -2850,14 +2430,12 @@ class _AddressListDialog extends StatelessWidget {
 
     return Dialog(
       backgroundColor: Colors.white,
-      shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(20)),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
       child: Container(
         width: width * 0.9,
         height: height * 0.65,
         padding: const EdgeInsets.all(16),
         child: Column(children: [
-          // Header
           Row(children: [
             Container(
               width: 36,
@@ -2866,36 +2444,29 @@ class _AddressListDialog extends StatelessWidget {
                 color: _brandLight,
                 borderRadius: BorderRadius.circular(10),
               ),
-              child: const Icon(Icons.list_rounded,
-                  color: _brand, size: 20),
+              child: const Icon(Icons.list_rounded, color: _brand, size: 20),
             ),
             const SizedBox(width: 10),
             Expanded(
               child: Text(title,
                   style: GoogleFonts.poppins(
-                      color: _textMain,
-                      fontSize: 14,
-                      fontWeight: FontWeight.w700),
+                      color: _textMain, fontSize: 14, fontWeight: FontWeight.w700),
                   overflow: TextOverflow.ellipsis),
             ),
             GestureDetector(
               onTap: () {
                 onClear();
-                Navigator.of(context,
-                    rootNavigator: true)
-                    .pop();
+                Navigator.of(context, rootNavigator: true).pop();
               },
               child: Container(
                 width: 32,
                 height: 32,
                 decoration: BoxDecoration(
                   color: _surface,
-                  borderRadius:
-                  BorderRadius.circular(8),
+                  borderRadius: BorderRadius.circular(8),
                   border: Border.all(color: _border),
                 ),
-                child: const Icon(Icons.close_rounded,
-                    color: _textSub, size: 18),
+                child: const Icon(Icons.close_rounded, color: _textSub, size: 18),
               ),
             ),
           ]),
@@ -2904,100 +2475,60 @@ class _AddressListDialog extends StatelessWidget {
           Divider(color: _border),
           const SizedBox(height: 6),
 
-          // List
           Expanded(
             child: addresses.isEmpty
                 ? Center(
                 child: Text('No records',
-                    style: GoogleFonts.poppins(
-                        color: _textSub,
-                        fontSize: 13)))
+                    style: GoogleFonts.poppins(color: _textSub, fontSize: 13)))
                 : ListView.builder(
               itemCount: addresses.length,
-              itemBuilder: (ctx, index) =>
-                  InkWell(
-                    onLongPress: () async {
-                      final del =
-                      await objfun.ConfirmationMsgYesNo(
-                          context,
-                          "Are you sure to delete?");
-                      if (del == true)
-                        onDelete(index);
-                    },
-                    onTap: () {
-                      onSelect(index);
-                      Navigator.of(context,
-                          rootNavigator: true)
-                          .pop();
-                    },
-                    child: Container(
-                      margin: const EdgeInsets.only(
-                          bottom: 8),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius:
-                        BorderRadius.circular(12),
-                        border: Border.all(
-                            color: _border),
-                        boxShadow: const [
-                          BoxShadow(
-                              color:
-                              Color(0x0A1555F3),
-                              blurRadius: 6,
-                              offset: Offset(0, 2))
-                        ],
-                      ),
-                      padding:
-                      const EdgeInsets.all(12),
-                      child: Row(children: [
-                        Expanded(
-                          flex: 3,
-                          child: Text(
-                            addresses[index]
-                                .toString(),
-                            style: GoogleFonts.poppins(
-                                color: _textMain,
-                                fontSize: 12,
-                                fontWeight:
-                                FontWeight.w600),
-                          ),
-                        ),
-                        const SizedBox(width: 8),
-                        Expanded(
-                          child: Container(
-                            padding:
-                            const EdgeInsets.symmetric(
-                                horizontal: 8,
-                                vertical: 4),
-                            decoration:
-                            BoxDecoration(
-                              color: _brandLight,
-                              borderRadius:
-                              BorderRadius
-                                  .circular(8),
-                            ),
-                            child: Text(
-                              index <
-                                  quantities
-                                      .length
-                                  ? quantities[index]
-                                  .toString()
-                                  : '',
-                              textAlign:
-                              TextAlign.center,
-                              style: GoogleFonts
-                                  .poppins(
-                                  color: _brand,
-                                  fontSize: 12,
-                                  fontWeight:
-                                  FontWeight
-                                      .w700),
-                            ),
-                          ),
-                        ),
-                      ]),
-                    ),
+              itemBuilder: (ctx, index) => InkWell(
+                onLongPress: () async {
+                  final del = await objfun.ConfirmationMsgYesNo(
+                      context, "Are you sure to delete?");
+                  if (del == true) onDelete(index);
+                },
+                onTap: () {
+                  onSelect(index);
+                  Navigator.of(context, rootNavigator: true).pop();
+                },
+                child: Container(
+                  margin: const EdgeInsets.only(bottom: 8),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: _border),
+                    boxShadow: const [
+                      BoxShadow(color: Color(0x0A1555F3), blurRadius: 6, offset: Offset(0, 2))
+                    ],
                   ),
+                  padding: const EdgeInsets.all(12),
+                  child: Row(children: [
+                    Expanded(
+                      flex: 3,
+                      child: Text(addresses[index].toString(),
+                          style: GoogleFonts.poppins(
+                              color: _textMain, fontSize: 12, fontWeight: FontWeight.w600)),
+                    ),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                        decoration: BoxDecoration(
+                          color: _brandLight,
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: Text(
+                          index < quantities.length ? quantities[index].toString() : '',
+                          textAlign: TextAlign.center,
+                          style: GoogleFonts.poppins(
+                              color: _brand, fontSize: 12, fontWeight: FontWeight.w700),
+                        ),
+                      ),
+                    ),
+                  ]),
+                ),
+              ),
             ),
           ),
         ]),

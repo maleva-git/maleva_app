@@ -32,11 +32,13 @@ class _CommodityTypestate extends State<CommodityType> {
     startup();
     super.initState();
   }
+
   @override
   void dispose() {
     txtSearch.dispose();
     super.dispose();
   }
+
   Future startup() async {
     filtersearchlist = CommodityList;
     setState(() {
@@ -69,7 +71,7 @@ class _CommodityTypestate extends State<CommodityType> {
         title: Text(
           'Commodity Type',
           style: GoogleFonts.lato(
-            textStyle:  TextStyle(
+            textStyle: TextStyle(
                 color: colour.topAppBarColor,
                 fontWeight: FontWeight.bold,
                 fontSize: objfun.FontLarge,
@@ -94,19 +96,17 @@ class _CommodityTypestate extends State<CommodityType> {
             children: [
               Column(
                 children: [
-                  const SizedBox(
-                    height: 5,
-                  ),
+                  const SizedBox(height: 5),
                   Container(
                     height: height * 0.06,
                     alignment: Alignment.center,
                     margin: const EdgeInsets.all(3),
                     child: TextField(
-                      // autofocus: true,
                       controller: txtSearch,
                       keyboardType: TextInputType.text,
                       textInputAction: TextInputAction.next,
-                      textCapitalization: TextCapitalization.characters,
+                      textCapitalization:
+                      TextCapitalization.characters,
                       style: GoogleFonts.lato(
                         textStyle: TextStyle(
                             color: colour.commonColor,
@@ -119,13 +119,14 @@ class _CommodityTypestate extends State<CommodityType> {
                         enabledBorder: const OutlineInputBorder(
                           borderRadius:
                           BorderRadius.all(Radius.circular(10.0)),
-                          borderSide: BorderSide(color: colour.commonColor),
+                          borderSide:
+                          BorderSide(color: colour.commonColor),
                         ),
                         focusedBorder: const OutlineInputBorder(
                           borderRadius:
                           BorderRadius.all(Radius.circular(10.0)),
-                          borderSide:
-                          BorderSide(color: colour.commonColorred),
+                          borderSide: BorderSide(
+                              color: colour.commonColorred),
                         ),
                         hintText: 'Search Commodity Type',
                         hintStyle: GoogleFonts.lato(
@@ -137,10 +138,10 @@ class _CommodityTypestate extends State<CommodityType> {
                               fontFamily: 'Alatsi',
                             )),
                         labelStyle: GoogleFonts.lato(
-                          textStyle:  TextStyle(
+                          textStyle: TextStyle(
                               color: colour.commonColor,
                               fontWeight: FontWeight.bold,
-                              fontSize: objfun.FontLow -2 ,
+                              fontSize: objfun.FontLow - 2,
                               letterSpacing: 1.3),
                         ),
                       ),
@@ -156,38 +157,34 @@ class _CommodityTypestate extends State<CommodityType> {
                       },
                     ),
                   ),
-                  const SizedBox(
-                    height: 5,
-                  ),
+                  const SizedBox(height: 5),
                   const Divider(
                     color: colour.commonColor,
                     thickness: 1,
                     height: 1,
                   ),
-                  const SizedBox(
-                    height: 5,
-                  ),
+                  const SizedBox(height: 5),
                   if (filtersearchlist.isNotEmpty)
                     Container(
-                      // width: width - 20.0,
                         height: height * 0.82,
                         padding: const EdgeInsets.all(10),
                         child: ListView.builder(
                             itemCount: filtersearchlist.length,
-                            itemBuilder: (BuildContext context, int index) {
+                            itemBuilder:
+                                (BuildContext context, int index) {
                               return InkWell(
                                   onTap: () {
-                                    setState(() {
-                                      if (widget.Searchby == 1) {
-                                        objfun.SelectedCommodityName =
-                                            filtersearchlist[index]
-                                                .toString();
-
-                                        Navigator.of(context,
-                                            rootNavigator: true)
-                                            .pop(context);
-                                      }
-                                    });
+                                    // ✅ FIX: setState removed — page pop aaguthu, rebuild vendaam
+                                    if (widget.Searchby == 1) {
+                                      objfun.SelectedCommodityName =
+                                          filtersearchlist[index]
+                                              .toString();
+                                      Navigator.of(context,
+                                          rootNavigator: true)
+                                          .pop(filtersearchlist[index]
+                                          .toString());
+                                      print("DEBUG: popped with value");
+                                    }
                                   },
                                   child: SizedBox(
                                     height: 55,
@@ -202,10 +199,12 @@ class _CommodityTypestate extends State<CommodityType> {
                                         semanticContainer: true,
                                         shape: RoundedRectangleBorder(
                                           side: const BorderSide(
-                                              color: colour.commonColor,
+                                              color:
+                                              colour.commonColor,
                                               width: 1),
                                           borderRadius:
-                                          BorderRadius.circular(10),
+                                          BorderRadius.circular(
+                                              10),
                                         ),
                                         child: Column(
                                           children: [
@@ -225,7 +224,8 @@ class _CommodityTypestate extends State<CommodityType> {
                                                         padding:
                                                         const EdgeInsets
                                                             .only(
-                                                            left: 5),
+                                                            left:
+                                                            5),
                                                         child: Text(
                                                           filtersearchlist[
                                                           index]
@@ -239,16 +239,12 @@ class _CommodityTypestate extends State<CommodityType> {
                                                               .left,
                                                           style: GoogleFonts
                                                               .lato(
-                                                            textStyle:  TextStyle(
-                                                                color: colour
-                                                                    .commonColor,
-                                                                fontWeight:
-                                                                FontWeight
-                                                                    .bold,
-                                                                fontSize:
-                                                                objfun.FontCardText,
-                                                                letterSpacing:
-                                                                0.3),
+                                                            textStyle:
+                                                            TextStyle(
+                                                                color: colour.commonColor,
+                                                                fontWeight: FontWeight.bold,
+                                                                fontSize: objfun.FontCardText,
+                                                                letterSpacing: 0.3),
                                                           ),
                                                         ),
                                                       ),
@@ -283,10 +279,10 @@ class _CommodityTypestate extends State<CommodityType> {
         backgroundColor: colour.commonColor,
         centerTitle: false,
         title: Center(
-          child:Text(
+          child: Text(
             'Commodity Type',
             style: GoogleFonts.lato(
-              textStyle:  TextStyle(
+              textStyle: TextStyle(
                   color: colour.topAppBarColor,
                   fontWeight: FontWeight.bold,
                   fontSize: objfun.FontLarge,
@@ -307,26 +303,25 @@ class _CommodityTypestate extends State<CommodityType> {
       ),
       body: progress == true
           ? Container(
-          padding: const EdgeInsets.only(left: 100,right: 100,top: 50,bottom: 40),
-          child:Card(
+          padding: const EdgeInsets.only(
+              left: 100, right: 100, top: 50, bottom: 40),
+          child: Card(
             elevation: 12,
             child: ListView(
               children: [
                 Column(
                   children: [
-                    const SizedBox(
-                      height: 5,
-                    ),
+                    const SizedBox(height: 5),
                     Container(
                       height: height * 0.07,
                       alignment: Alignment.center,
                       margin: const EdgeInsets.all(10),
                       child: TextField(
-                        // autofocus: true,
                         controller: txtSearch,
                         keyboardType: TextInputType.text,
                         textInputAction: TextInputAction.next,
-                        textCapitalization: TextCapitalization.characters,
+                        textCapitalization:
+                        TextCapitalization.characters,
                         style: GoogleFonts.lato(
                           textStyle: TextStyle(
                               color: colour.commonColor,
@@ -337,15 +332,16 @@ class _CommodityTypestate extends State<CommodityType> {
                         decoration: InputDecoration(
                           fillColor: Colors.black,
                           enabledBorder: const OutlineInputBorder(
-                            borderRadius:
-                            BorderRadius.all(Radius.circular(10.0)),
-                            borderSide: BorderSide(color: colour.commonColor),
+                            borderRadius: BorderRadius.all(
+                                Radius.circular(10.0)),
+                            borderSide:
+                            BorderSide(color: colour.commonColor),
                           ),
                           focusedBorder: const OutlineInputBorder(
-                            borderRadius:
-                            BorderRadius.all(Radius.circular(10.0)),
-                            borderSide:
-                            BorderSide(color: colour.commonColorred),
+                            borderRadius: BorderRadius.all(
+                                Radius.circular(10.0)),
+                            borderSide: BorderSide(
+                                color: colour.commonColorred),
                           ),
                           hintText: 'Search Commodity Type',
                           hintStyle: GoogleFonts.lato(
@@ -357,10 +353,10 @@ class _CommodityTypestate extends State<CommodityType> {
                                 fontFamily: 'Alatsi',
                               )),
                           labelStyle: GoogleFonts.lato(
-                            textStyle:  TextStyle(
+                            textStyle: TextStyle(
                                 color: colour.commonColor,
                                 fontWeight: FontWeight.bold,
-                                fontSize: objfun.FontLow -2 ,
+                                fontSize: objfun.FontLow - 2,
                                 letterSpacing: 1.3),
                           ),
                         ),
@@ -376,43 +372,40 @@ class _CommodityTypestate extends State<CommodityType> {
                         },
                       ),
                     ),
-                    const SizedBox(
-                      height: 5,
-                    ),
+                    const SizedBox(height: 5),
                     const Divider(
                       color: colour.commonColor,
                       thickness: 1,
                       height: 1,
                     ),
-                    const SizedBox(
-                      height: 5,
-                    ),
+                    const SizedBox(height: 5),
                     if (filtersearchlist.isNotEmpty)
                       Container(
-                        // width: width - 20.0,
                           height: height * 0.82,
                           padding: const EdgeInsets.all(10),
                           child: ListView.builder(
                               itemCount: filtersearchlist.length,
-                              itemBuilder: (BuildContext context, int index) {
+                              itemBuilder:
+                                  (BuildContext context, int index) {
                                 return InkWell(
                                     onTap: () {
-                                      setState(() {
-                                        if (widget.Searchby == 1) {
-                                          objfun.SelectedCommodityName =
-                                              filtersearchlist[index]
-                                                  .toString();
-
-                                          Navigator.of(context,
-                                              rootNavigator: true)
-                                              .pop(context);
-                                        }
-                                      });
+                                      // ✅ FIX: setState removed — page pop aaguthu, rebuild vendaam
+                                      if (widget.Searchby == 1) {
+                                        objfun.SelectedCommodityName =
+                                            filtersearchlist[index]
+                                                .toString();
+                                        Navigator.of(context,
+                                            rootNavigator: true)
+                                            .pop(
+                                            filtersearchlist[index]
+                                                .toString());
+                                      }
                                     },
                                     child: SizedBox(
                                       height: 55,
                                       child: Card(
-                                          margin: const EdgeInsets.only(
+                                          margin:
+                                          const EdgeInsets.only(
                                               right: 5.0,
                                               left: 5.0,
                                               top: 1,
@@ -420,12 +413,15 @@ class _CommodityTypestate extends State<CommodityType> {
                                           elevation: 10.0,
                                           borderOnForeground: true,
                                           semanticContainer: true,
-                                          shape: RoundedRectangleBorder(
+                                          shape:
+                                          RoundedRectangleBorder(
                                             side: const BorderSide(
-                                                color: colour.commonColor,
+                                                color:
+                                                colour.commonColor,
                                                 width: 1),
                                             borderRadius:
-                                            BorderRadius.circular(10),
+                                            BorderRadius.circular(
+                                                10),
                                           ),
                                           child: Column(
                                             children: [
@@ -438,14 +434,16 @@ class _CommodityTypestate extends State<CommodityType> {
                                                     crossAxisAlignment:
                                                     CrossAxisAlignment
                                                         .center,
-                                                    children: <Widget>[
+                                                    children: <
+                                                        Widget>[
                                                       Expanded(
                                                         flex: 10,
-                                                        child: Container(
-                                                          padding:
-                                                          const EdgeInsets
+                                                        child:
+                                                        Container(
+                                                          padding: const EdgeInsets
                                                               .only(
-                                                              left: 5),
+                                                              left:
+                                                              5),
                                                           child: Text(
                                                             filtersearchlist[
                                                             index]
@@ -453,22 +451,24 @@ class _CommodityTypestate extends State<CommodityType> {
                                                             overflow:
                                                             TextOverflow
                                                                 .ellipsis,
-                                                            maxLines: 1,
+                                                            maxLines:
+                                                            1,
                                                             textAlign:
                                                             TextAlign
                                                                 .left,
                                                             style: GoogleFonts
                                                                 .lato(
-                                                              textStyle:  TextStyle(
-                                                                  color: colour
-                                                                      .commonColor,
-                                                                  fontWeight:
-                                                                  FontWeight
-                                                                      .bold,
-                                                                  fontSize:
-                                                                  objfun.FontCardText,
-                                                                  letterSpacing:
-                                                                  0.3),
+                                                              textStyle:
+                                                              TextStyle(
+                                                                color:
+                                                                colour.commonColor,
+                                                                fontWeight:
+                                                                FontWeight.bold,
+                                                                fontSize:
+                                                                objfun.FontCardText,
+                                                                letterSpacing:
+                                                                0.3,
+                                                              ),
                                                             ),
                                                           ),
                                                         ),
@@ -491,8 +491,7 @@ class _CommodityTypestate extends State<CommodityType> {
                 )
               ],
             ),
-          )
-      )
+          ))
           : const Center(
         child: SpinKitFoldingCube(
           color: colour.spinKitColor,
@@ -500,6 +499,5 @@ class _CommodityTypestate extends State<CommodityType> {
         ),
       ),
     );
-
   }
 }
