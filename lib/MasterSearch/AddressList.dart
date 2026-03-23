@@ -172,15 +172,13 @@ class _AddressListstate extends State<AddressList> {
                             itemBuilder: (BuildContext context, int index) {
                               return InkWell(
                                   onTap: () {
-                                    setState(() {
-                                      if (widget.Searchby == 1) {
-                                        objfun.SelectAddressList =
-                                            filtersearchlist[index]
-                                                .toString();
-                                        Navigator.pop(context);
-                                        // Navigator.of(context, rootNavigator: true).pop(context);
-                                      }
-                                    });
+
+                                    if (widget.Searchby == 1) {
+                                      objfun.SelectAddressList =
+                                          filtersearchlist[index].toString();
+                                      Navigator.of(context, rootNavigator: true)
+                                          .pop(filtersearchlist[index].toString());
+                                    }
                                   },
                                   child: SizedBox(
                                     height: 55,
