@@ -12,6 +12,16 @@ const _kNavy   = Color(0xFF1A2E5A);
 const _kBlue   = Color(0xFF5B9BD5);
 const _kOrange = Color(0xFFE67E22);
 
+// ── Screenshot color palette ──────────────────────────────
+const _kHeaderGradStart = Color(0xFF1A3A8F); // deep blue
+const _kHeaderGradEnd   = Color(0xFF4A6FD4); // lighter blue
+const _kCardBg          = Colors.white;
+const _kPageBg          = Color(0xFFF4F6FB);
+const _kPillBg          = Color(0x33FFFFFF); // translucent white pill
+const _kGreen           = Color(0xFF27AE60);
+const _kBlueAccent      = Color(0xFF2F80ED);
+const _kBarBlue         = Color(0xFF3563E9);
+
 class InvoiceTab extends StatefulWidget {
   const InvoiceTab({super.key});
 
@@ -25,14 +35,12 @@ class _InvoiceTabState extends State<InvoiceTab> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      // Bloc-ல் already InvoiceLoaded-ஆ இருந்தா skip ஆகும் (cache)
       context.read<InvoiceBloc>().add(LoadInvoiceByType(0));
     });
   }
 
   Future<void> _onRefresh() async {
     context.read<InvoiceBloc>().add(RefreshInvoice());
-    // Refresh complete ஆகும் வரை wait
     await context.read<InvoiceBloc>().stream
         .firstWhere((s) => s is InvoiceLoaded || s is InvoiceError);
   }
@@ -43,7 +51,7 @@ class _InvoiceTabState extends State<InvoiceTab> {
     final isTablet = screenW >= 600;
 
     return Scaffold(
-      backgroundColor: const Color(0xFFEEF2F7),
+      backgroundColor: _kPageBg,
       body: BlocConsumer<InvoiceBloc, InvoiceState>(
         buildWhen: (prev, curr) {
           if (prev is! InvoiceLoaded) return true;
@@ -96,7 +104,7 @@ class _InvoiceTabState extends State<InvoiceTab> {
 
           return RefreshIndicator(
             onRefresh: _onRefresh,
-            color: AppColors.appBarColor,
+            color: _kHeaderGradStart,
             child: isTablet
                 ? _buildTabletLayout(context, state, data)
                 : _buildMobileLayout(context, state, data),
@@ -111,49 +119,30 @@ class _InvoiceTabState extends State<InvoiceTab> {
   // ═══════════════════════════════════════════════════════
   Widget _buildTabletLayout(
       BuildContext context, InvoiceLoaded state, Map<String, dynamic> data) {
-    return Padding(
-      padding: const EdgeInsets.all(20),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
+    return SingleChildScrollView(
+      physics: const AlwaysScrollableScrollPhysics(),
+      child: Column(
         children: [
-          Expanded(
-            flex: 6,
-            child: SingleChildScrollView(
-              physics: const AlwaysScrollableScrollPhysics(),
-              child: Column(children: [
-                RepaintBoundary(
-                  child: _TodayYesterdayChart(data: data, height: 260),
-                ),
-                const SizedBox(height: 16),
-                _RangeButtons(is6Months: state.is6Months),
-                const SizedBox(height: 16),
-                _buildHeaderCard(state, fontSize: 20),
-                const SizedBox(height: 16),
-                _buildStatCards(context, state, data, isTablet: true),
-                const SizedBox(height: 16),
-                _buildWaitingRow(context, state, isTablet: true),
-              ]),
-            ),
-          ),
-          const SizedBox(width: 16),
-          Expanded(
-            flex: 4,
-            child: Column(
+          _HeroHeader(state: state, data: data),
+          Padding(
+            padding: const EdgeInsets.all(20),
+            child: Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Padding(
-                  padding: EdgeInsets.only(bottom: 12, left: 4),
-                  child: Text(
-                    'Monthly Breakdown',
-                    style: TextStyle(
-                      fontSize: 15,
-                      fontWeight: FontWeight.bold,
-                      color: _kNavy,
-                    ),
-                  ),
-                ),
                 Expanded(
-                  child: _buildMonthList(context, state, isTablet: true),
+                  flex: 6,
+                  child: Column(children: [
+                    _OverviewSection(state: state, data: data, isTablet: true),
+                    const SizedBox(height: 20),
+                    _MonthlyTrendSection(state: state, isTablet: true,
+                      onMonthTap: (i) => context.read<InvoiceBloc>().add(LoadEmployeeInvData(i + 3)),
+                    ),
+                  ]),
+                ),
+                const SizedBox(width: 16),
+                Expanded(
+                  flex: 4,
+                  child: _TodayYesterdayChartCard(data: data),
                 ),
               ],
             ),
@@ -164,241 +153,56 @@ class _InvoiceTabState extends State<InvoiceTab> {
   }
 
   // ═══════════════════════════════════════════════════════
-  // MOBILE LAYOUT — CustomScrollView + Slivers (no nested scroll)
+  // MOBILE LAYOUT
   // ═══════════════════════════════════════════════════════
   Widget _buildMobileLayout(
       BuildContext context, InvoiceLoaded state, Map<String, dynamic> data) {
     return CustomScrollView(
-      physics: const AlwaysScrollableScrollPhysics(), // RefreshIndicator-க்கு வேணும்
+      physics: const AlwaysScrollableScrollPhysics(),
       slivers: [
+        // ── Hero Header (gradient) ──
+        SliverToBoxAdapter(child: _HeroHeader(state: state, data: data)),
+
+        // ── Overview + Monthly Trend ──
         SliverPadding(
-          padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
+          padding: const EdgeInsets.fromLTRB(16, 20, 16, 0),
           sliver: SliverList(
             delegate: SliverChildListDelegate([
-              RepaintBoundary(
-                child: _TodayYesterdayChart(data: data, height: 200),
+              _OverviewSection(state: state, data: data, isTablet: false,
+                onWaitingTap: () => context.read<InvoiceBloc>().add(LoadWaitingBills(0)),
+                onWaitingCountTap: () => showBillingBottomSheet(context, state.waitingBilling),
               ),
-              const SizedBox(height: 16),
-              _RangeButtons(is6Months: state.is6Months),
-              const SizedBox(height: 20),
-              _buildHeaderCard(state, fontSize: 18),
-              const SizedBox(height: 20),
-              _buildStatCards(context, state, data, isTablet: false),
-              const SizedBox(height: 16),
-              _buildWaitingRow(context, state, isTablet: false),
-              const SizedBox(height: 20),
-              const Padding(
-                padding: EdgeInsets.only(left: 4, bottom: 8),
-                child: Text(
-                  'Monthly Breakdown',
-                  style: TextStyle(
-                    fontSize: 13,
-                    fontWeight: FontWeight.bold,
-                    color: _kNavy,
-                  ),
-                ),
-              ),
+              const SizedBox(height: 24),
+              _MonthlyTrendHeader(is6Months: state.is6Months),
+              const SizedBox(height: 12),
             ]),
           ),
         ),
+
+        // ── Monthly list items ──
         SliverPadding(
-          padding: const EdgeInsets.fromLTRB(16, 0, 16, 24),
+          padding: const EdgeInsets.fromLTRB(16, 0, 16, 32),
           sliver: SliverList(
             delegate: SliverChildBuilderDelegate(
-                  (context, index) =>
-                  _buildMonthItem(context, state, index, isTablet: false),
+                  (context, index) => _MonthBarItem(
+                month: state.monthList[index],
+                current: (state.monthData[index]["SalesAmount"] as num).toDouble(),
+                prev: index == 0
+                    ? (state.monthData[0]["SalesAmount"] as num).toDouble()
+                    : (state.monthData[index - 1]["SalesAmount"] as num).toDouble(),
+                count: state.monthData[index]["SalesCount"]?.toString() ?? "0",
+                amount: state.monthData[index]["SalesAmount"]?.toString() ?? "0",
+                maxAmount: state.monthData
+                    .map((e) => (e["SalesAmount"] as num).toDouble())
+                    .reduce((a, b) => a > b ? a : b),
+                isTablet: false,
+                onTap: () => context.read<InvoiceBloc>().add(LoadEmployeeInvData(index + 3)),
+              ),
               childCount: state.monthList.length,
             ),
           ),
         ),
       ],
-    );
-  }
-
-  // ═══════════════════════════════════════════════════════
-  // SHARED WIDGETS
-  // ═══════════════════════════════════════════════════════
-
-  Widget _buildHeaderCard(InvoiceLoaded state, {required double fontSize}) {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: AppColors.appBarColor,
-        borderRadius: BorderRadius.circular(20),
-      ),
-      child: Text(
-        "${state.currentMonthName} Sales",
-        style: TextStyle(
-          color: Colors.white,
-          fontWeight: FontWeight.bold,
-          fontSize: fontSize,
-        ),
-      ),
-    );
-  }
-
-  Widget _buildStatCards(
-      BuildContext context,
-      InvoiceLoaded state,
-      Map<String, dynamic> data,
-      {required bool isTablet}) {
-    return Row(
-      children: [
-        _SmallStatCard(
-          title: "Today",
-          count: data["TodaySales"]?.toString() ?? "0",
-          amount: data["TodayAmount"]?.toString() ?? "0",
-          positive: true,
-          isTablet: isTablet,
-        ),
-        _SmallStatCard(
-          title: "Yesterday",
-          count: data["YesterdaySales"]?.toString() ?? "0",
-          amount: data["YesterdayAmount"]?.toString() ?? "0",
-          positive: false,
-          isTablet: isTablet,
-        ),
-        _SmallStatCard(
-          title: "Weekly",
-          count: data["WeekSales"]?.toString() ?? "0",
-          amount: data["WeekAmount"]?.toString() ?? "0",
-          positive: true,
-          isTablet: isTablet,
-        ),
-        _SmallStatCard(
-          title: "Monthly",
-          count: data["MonthSales"]?.toString() ?? "0",
-          amount: data["MonthAmount"]?.toString() ?? "0",
-          positive: true,
-          isTablet: isTablet,
-        ),
-      ],
-    );
-  }
-
-  Widget _buildWaitingRow(
-      BuildContext context, InvoiceLoaded state,
-      {required bool isTablet}) {
-    return Container(
-      padding: EdgeInsets.symmetric(
-        horizontal: isTablet ? 20 : 16,
-        vertical: isTablet ? 16 : 14,
-      ),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(18),
-        boxShadow: const [
-          BoxShadow(color: _kShadow, blurRadius: 8, offset: Offset(0, 4)),
-        ],
-      ),
-      child: Row(children: [
-        InkWell(
-          onTap: () => context.read<InvoiceBloc>().add(LoadWaitingBills(0)),
-          child: Padding(
-            padding: const EdgeInsets.all(5),
-            child: Text(
-              "Waiting for Billing ",
-              style: GoogleFonts.lato(
-                textStyle: TextStyle(
-                  color: _kNavy,
-                  fontWeight: FontWeight.bold,
-                  fontSize: isTablet ? 14 : 12,
-                  letterSpacing: 0.3,
-                ),
-              ),
-            ),
-          ),
-        ),
-        InkWell(
-          onTap: () => showBillingBottomSheet(context, state.waitingBilling),
-          child: Padding(
-            padding: const EdgeInsets.only(top: 5, left: 5, right: 5, bottom: 15),
-            child: Text(
-              "${state.waitingBilling.length}",
-              style: GoogleFonts.lato(
-                textStyle: TextStyle(
-                  color: _kNavy,
-                  fontWeight: FontWeight.bold,
-                  fontSize: isTablet ? 14 : 12,
-                  letterSpacing: 0.3,
-                ),
-              ),
-            ),
-          ),
-        ),
-      ]),
-    );
-  }
-
-  Widget _buildMonthList(
-      BuildContext context, InvoiceLoaded state,
-      {required bool isTablet}) {
-    return ListView.builder(
-      physics: const BouncingScrollPhysics(),
-      itemCount: state.monthList.length,
-      itemBuilder: (context, index) =>
-          _buildMonthItem(context, state, index, isTablet: isTablet),
-    );
-  }
-
-  Widget _buildMonthItem(
-      BuildContext context, InvoiceLoaded state, int index,
-      {required bool isTablet}) {
-    final month = state.monthList[index];
-    final current = (state.monthData[index]["SalesAmount"] as num).toDouble();
-    final prev = index == 0
-        ? current
-        : (state.monthData[index - 1]["SalesAmount"] as num).toDouble();
-    final diff = prev == 0 ? 0.0 : ((current - prev) / prev) * 100;
-    final isGrowth = diff >= 0;
-
-    return InkWell(
-      borderRadius: BorderRadius.circular(20),
-      onTap: () =>
-          context.read<InvoiceBloc>().add(LoadEmployeeInvData(index + 3)),
-      child: Container(
-        margin: EdgeInsets.only(bottom: isTablet ? 10 : 12),
-        padding: EdgeInsets.all(isTablet ? 18 : 16),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(20),
-          boxShadow: const [
-            BoxShadow(color: _kShadow, blurRadius: 8, offset: Offset(0, 4)),
-          ],
-        ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Text(month,
-                style: TextStyle(
-                  color: _kNavy,
-                  fontWeight: FontWeight.bold,
-                  fontSize: isTablet ? 15 : 13,
-                )),
-            Text(current.toStringAsFixed(0),
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: isTablet ? 15 : 13,
-                )),
-            Row(children: [
-              Icon(
-                isGrowth ? Icons.arrow_upward : Icons.arrow_downward,
-                size: isTablet ? 18 : 16,
-                color: isGrowth ? Colors.green : Colors.red,
-              ),
-              const SizedBox(width: 4),
-              Text(
-                "${diff.abs().toStringAsFixed(1)}%",
-                style: TextStyle(
-                  color: isGrowth ? Colors.green : Colors.red,
-                  fontSize: isTablet ? 14 : 12,
-                ),
-              ),
-            ]),
-          ],
-        ),
-      ),
     );
   }
 
@@ -408,8 +212,7 @@ class _InvoiceTabState extends State<InvoiceTab> {
       barrierDismissible: false,
       builder: (context) {
         return Dialog(
-          shape:
-          RoundedRectangleBorder(borderRadius: BorderRadius.circular(25)),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(25)),
           child: Container(
             padding: const EdgeInsets.all(20),
             decoration: BoxDecoration(
@@ -424,17 +227,14 @@ class _InvoiceTabState extends State<InvoiceTab> {
                   children: [
                     const Text("Employee Details",
                         style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                          color: _kNavy,
+                          fontSize: 18, fontWeight: FontWeight.bold, color: _kNavy,
                         )),
                     InkWell(
                       onTap: () => Navigator.pop(context),
                       child: const CircleAvatar(
                         radius: 14,
                         backgroundColor: Colors.red,
-                        child:
-                        Icon(Icons.close, size: 16, color: Colors.white),
+                        child: Icon(Icons.close, size: 16, color: Colors.white),
                       ),
                     ),
                   ],
@@ -453,54 +253,36 @@ class _InvoiceTabState extends State<InvoiceTab> {
                           borderRadius: BorderRadius.circular(18),
                           color: Colors.grey.shade50,
                           boxShadow: const [
-                            BoxShadow(
-                                color: _kShadow,
-                                blurRadius: 6,
-                                offset: Offset(0, 3))
+                            BoxShadow(color: _kShadow, blurRadius: 6, offset: Offset(0, 3))
                           ],
                         ),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Row(children: [
-                              const Icon(Icons.person,
-                                  size: 18, color: _kBlue),
+                              const Icon(Icons.person, size: 18, color: _kBlue),
                               const SizedBox(width: 6),
                               Expanded(
-                                child: Text(
-                                  emp["EmployeeName"].toString(),
-                                  style: const TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 14,
-                                    color: _kNavy,
-                                  ),
-                                ),
+                                child: Text(emp["EmployeeName"].toString(),
+                                    style: const TextStyle(
+                                        fontWeight: FontWeight.bold, fontSize: 14, color: _kNavy)),
                               ),
                             ]),
                             const SizedBox(height: 8),
                             Row(
-                              mainAxisAlignment:
-                              MainAxisAlignment.spaceBetween,
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
                                 Row(children: [
-                                  const Text("RM",
-                                      style: TextStyle(
-                                          fontWeight: FontWeight.bold,
-                                          color: Colors.green)),
+                                  const Text("RM", style: TextStyle(fontWeight: FontWeight.bold, color: Colors.green)),
                                   const SizedBox(width: 4),
                                   Text(emp["Amount"].toString(),
-                                      style: const TextStyle(
-                                          fontWeight: FontWeight.w600,
-                                          color: Colors.green)),
+                                      style: const TextStyle(fontWeight: FontWeight.w600, color: Colors.green)),
                                 ]),
                                 Row(children: [
-                                  const Icon(Icons.shopping_cart,
-                                      size: 16, color: Colors.orange),
+                                  const Icon(Icons.shopping_cart, size: 16, color: Colors.orange),
                                   const SizedBox(width: 4),
                                   Text(emp["SalesCount"].toString(),
-                                      style: const TextStyle(
-                                          fontWeight: FontWeight.w600,
-                                          color: Colors.orange)),
+                                      style: const TextStyle(fontWeight: FontWeight.w600, color: Colors.orange)),
                                 ]),
                               ],
                             ),
@@ -515,16 +297,13 @@ class _InvoiceTabState extends State<InvoiceTab> {
                   width: double.infinity,
                   child: ElevatedButton(
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: AppColors.appBarColor,
-                      shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(15)),
+                      backgroundColor: _kHeaderGradStart,
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
                       padding: const EdgeInsets.symmetric(vertical: 12),
                     ),
                     onPressed: () => Navigator.pop(context),
                     child: const Text("Back to Dashboard",
-                        style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white)),
+                        style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white)),
                   ),
                 ),
               ],
@@ -537,53 +316,412 @@ class _InvoiceTabState extends State<InvoiceTab> {
 }
 
 // ═══════════════════════════════════════════════════════════
-// _RangeButtons
+// HERO HEADER  (gradient card — top section in screenshot)
 // ═══════════════════════════════════════════════════════════
-class _RangeButtons extends StatelessWidget {
-  final bool is6Months;
-  const _RangeButtons({required this.is6Months});
+class _HeroHeader extends StatelessWidget {
+  final InvoiceLoaded state;
+  final Map<String, dynamic> data;
+  const _HeroHeader({required this.state, required this.data});
 
   @override
   Widget build(BuildContext context) {
-    return Row(children: [
-      _RangeButton(
-        text: "6 Months",
-        selected: is6Months,
-        onTap: () => context.read<InvoiceBloc>().add(LoadMonthRange(6)),
+    final totalAmount = data["MonthAmount"]?.toString() ?? "0";
+    final totalCount  = data["MonthSales"]?.toString()  ?? "0";
+    final weekCount   = data["WeekSales"]?.toString()   ?? "0";
+    final waitingCount = state.waitingBilling.length;
+    final billedCount  = data["MonthSales"]?.toString() ?? "0"; // adjust key if needed
+
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.fromLTRB(20, 52, 20, 24),
+      decoration: const BoxDecoration(
+        gradient: LinearGradient(
+          colors: [_kHeaderGradStart, _kHeaderGradEnd],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        borderRadius: BorderRadius.vertical(bottom: Radius.circular(28)),
       ),
-      const SizedBox(width: 10),
-      _RangeButton(
-        text: "1 Year",
-        selected: !is6Months,
-        onTap: () => context.read<InvoiceBloc>().add(LoadMonthRange(12)),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            "${state.currentMonthName.toUpperCase()} SALES · INV",
+            style: GoogleFonts.lato(
+              color: Colors.white.withOpacity(0.80),
+              fontSize: 12,
+              fontWeight: FontWeight.w700,
+              letterSpacing: 1.2,
+            ),
+          ),
+          const SizedBox(height: 6),
+          Text(
+            "₹${_fmt(totalAmount)}",
+            style: GoogleFonts.lato(
+              color: Colors.white,
+              fontSize: 32,
+              fontWeight: FontWeight.w900,
+            ),
+          ),
+          const SizedBox(height: 2),
+          Text(
+            "$totalCount invoices this month",
+            style: GoogleFonts.lato(color: Colors.white.withOpacity(0.75), fontSize: 13),
+          ),
+          const SizedBox(height: 16),
+          // ── pill row ──
+          Wrap(
+            spacing: 8,
+            runSpacing: 8,
+            children: [
+              _Pill(icon: Icons.calendar_view_week, label: "$weekCount this week", iconColor: Colors.white),
+              _Pill(icon: Icons.hourglass_empty, label: "$waitingCount waiting", iconColor: Colors.white),
+              _Pill(icon: Icons.check_circle_outline, label: "$billedCount billed", iconColor: _kGreen, checkMark: true),
+            ],
+          ),
+        ],
       ),
-    ]);
+    );
+  }
+
+  String _fmt(String raw) {
+    final n = double.tryParse(raw) ?? 0;
+    // e.g. 549839 → 5,49,839
+    final s = n.toStringAsFixed(0);
+    if (s.length <= 3) return s;
+    final last3 = s.substring(s.length - 3);
+    final rest  = s.substring(0, s.length - 3);
+    final buf   = StringBuffer();
+    for (int i = 0; i < rest.length; i++) {
+      if (i != 0 && (rest.length - i) % 2 == 0) buf.write(',');
+      buf.write(rest[i]);
+    }
+    return "${buf.toString()},$last3";
   }
 }
 
-class _RangeButton extends StatelessWidget {
-  final String text;
-  final bool selected;
-  final VoidCallback onTap;
-  const _RangeButton(
-      {required this.text, required this.selected, required this.onTap});
+class _Pill extends StatelessWidget {
+  final IconData icon;
+  final String label;
+  final Color iconColor;
+  final bool checkMark;
+
+  const _Pill({
+    required this.icon,
+    required this.label,
+    required this.iconColor,
+    this.checkMark = false,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+      decoration: BoxDecoration(
+        color: _kPillBg,
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: Colors.white.withOpacity(0.25), width: 1),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, size: 13, color: iconColor),
+          const SizedBox(width: 5),
+          Text(label,
+              style: GoogleFonts.lato(
+                color: Colors.white,
+                fontSize: 12,
+                fontWeight: FontWeight.w600,
+              )),
+        ],
+      ),
+    );
+  }
+}
+
+// ═══════════════════════════════════════════════════════════
+// OVERVIEW SECTION  (2×2 grid + waiting + billed row)
+// ═══════════════════════════════════════════════════════════
+class _OverviewSection extends StatelessWidget {
+  final InvoiceLoaded state;
+  final Map<String, dynamic> data;
+  final bool isTablet;
+  final VoidCallback? onWaitingTap;
+  final VoidCallback? onWaitingCountTap;
+
+  const _OverviewSection({
+    required this.state,
+    required this.data,
+    required this.isTablet,
+    this.onWaitingTap,
+    this.onWaitingCountTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // ── Section header ──
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text("Overview",
+                style: GoogleFonts.lato(
+                    fontSize: 16, fontWeight: FontWeight.w800, color: _kNavy)),
+            TextButton(
+              onPressed: () {},
+              child: Text("See all →",
+                  style: GoogleFonts.lato(
+                      fontSize: 13, color: _kBlueAccent, fontWeight: FontWeight.w600)),
+            ),
+          ],
+        ),
+        const SizedBox(height: 10),
+
+        // ── 2-column grid ──
+        Row(children: [
+          Expanded(child: _OverviewCard(
+            label: "MONTHLY",
+            count: data["MonthSales"]?.toString() ?? "0",
+            amount: "₹${data["MonthAmount"] ?? "0"}",
+            badgeLabel: "Invoices",
+            badgeColor: _kOrange,
+            badgeIcon: Icons.circle,
+          )),
+          const SizedBox(width: 12),
+          Expanded(child: _OverviewCard(
+            label: "WEEKLY",
+            count: data["WeekSales"]?.toString() ?? "0",
+            amount: "₹${data["WeekAmount"] ?? "0"}",
+            badgeLabel: "This week",
+            badgeColor: _kBlueAccent,
+            badgeIcon: Icons.calendar_today,
+          )),
+        ]),
+        const SizedBox(height: 12),
+        Row(children: [
+          Expanded(child: _OverviewCard(
+            label: "YESTERDAY",
+            count: data["YesterdaySales"]?.toString() ?? "0",
+            amount: "₹${data["YesterdayAmount"] ?? "0"}",
+            badgeLabel: "Done",
+            badgeColor: _kGreen,
+            badgeIcon: Icons.check,
+          )),
+          const SizedBox(width: 12),
+          Expanded(child: _OverviewCard(
+            label: "TODAY",
+            count: data["TodaySales"]?.toString() ?? "0",
+            amount: data["TodaySales"] == "0" || data["TodaySales"] == null
+                ? "No entries yet"
+                : "₹${data["TodayAmount"] ?? "0"}",
+            badgeLabel: "Pending",
+            badgeColor: Colors.grey,
+            badgeIcon: Icons.remove,
+            isToday: true,
+          )),
+        ]),
+        const SizedBox(height: 12),
+
+        // ── Waiting + Billed row ──
+        Row(children: [
+          Expanded(child: _StatusCard(
+            icon: Icons.timer_outlined,
+            iconColor: Colors.amber.shade700,
+            bgColor: Colors.amber.shade50,
+            count: state.waitingBilling.length.toString(),
+            label: "WAITING BILLING",
+            onTap: onWaitingTap,
+          )),
+          const SizedBox(width: 12),
+          Expanded(child: _StatusCard(
+            icon: Icons.check_circle,
+            iconColor: _kGreen,
+            bgColor: const Color(0xFFEAF7EF),
+            count: data["MonthSales"]?.toString() ?? "0",
+            label: "BILLED MONTH",
+            onTap: onWaitingCountTap,
+          )),
+        ]),
+      ],
+    );
+  }
+}
+
+class _OverviewCard extends StatelessWidget {
+  final String label;
+  final String count;
+  final String amount;
+  final String badgeLabel;
+  final Color badgeColor;
+  final IconData badgeIcon;
+  final bool isToday;
+
+  const _OverviewCard({
+    required this.label,
+    required this.count,
+    required this.amount,
+    required this.badgeLabel,
+    required this.badgeColor,
+    required this.badgeIcon,
+    this.isToday = false,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: _kCardBg,
+        borderRadius: BorderRadius.circular(18),
+        boxShadow: const [BoxShadow(color: _kShadow, blurRadius: 8, offset: Offset(0, 3))],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(label,
+              style: GoogleFonts.lato(
+                  fontSize: 10,
+                  fontWeight: FontWeight.w700,
+                  color: Colors.grey.shade500,
+                  letterSpacing: 0.8)),
+          const SizedBox(height: 6),
+          Text(count,
+              style: GoogleFonts.lato(
+                  fontSize: 28, fontWeight: FontWeight.w900, color: _kNavy)),
+          const SizedBox(height: 4),
+          Text(amount,
+              style: GoogleFonts.lato(
+                  fontSize: 13,
+                  fontWeight: FontWeight.w600,
+                  color: isToday ? Colors.grey : _kNavy)),
+          const SizedBox(height: 10),
+          Row(children: [
+            Icon(badgeIcon, size: 12, color: badgeColor),
+            const SizedBox(width: 4),
+            Text(badgeLabel,
+                style: GoogleFonts.lato(
+                    fontSize: 11, color: badgeColor, fontWeight: FontWeight.w600)),
+          ]),
+        ],
+      ),
+    );
+  }
+}
+
+class _StatusCard extends StatelessWidget {
+  final IconData icon;
+  final Color iconColor;
+  final Color bgColor;
+  final String count;
+  final String label;
+  final VoidCallback? onTap;
+
+  const _StatusCard({
+    required this.icon,
+    required this.iconColor,
+    required this.bgColor,
+    required this.count,
+    required this.label,
+    this.onTap,
+  });
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 8),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
         decoration: BoxDecoration(
-          color: selected ? AppColors.appBarColor : Colors.transparent,
+          color: _kCardBg,
+          borderRadius: BorderRadius.circular(18),
+          boxShadow: const [BoxShadow(color: _kShadow, blurRadius: 8, offset: Offset(0, 3))],
+        ),
+        child: Row(children: [
+          Container(
+            padding: const EdgeInsets.all(8),
+            decoration: BoxDecoration(color: bgColor, borderRadius: BorderRadius.circular(10)),
+            child: Icon(icon, color: iconColor, size: 20),
+          ),
+          const SizedBox(width: 12),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(count,
+                  style: GoogleFonts.lato(
+                      fontSize: 20, fontWeight: FontWeight.w900, color: _kNavy)),
+              Text(label,
+                  style: GoogleFonts.lato(
+                      fontSize: 9,
+                      fontWeight: FontWeight.w700,
+                      color: Colors.grey.shade500,
+                      letterSpacing: 0.6)),
+            ],
+          ),
+        ]),
+      ),
+    );
+  }
+}
+
+// ═══════════════════════════════════════════════════════════
+// MONTHLY TREND HEADER  (title + 6M/1Y toggle)
+// ═══════════════════════════════════════════════════════════
+class _MonthlyTrendHeader extends StatelessWidget {
+  final bool is6Months;
+  const _MonthlyTrendHeader({required this.is6Months});
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Text("MONTHLY TREND",
+            style: GoogleFonts.lato(
+                fontSize: 13, fontWeight: FontWeight.w800,
+                color: _kNavy, letterSpacing: 0.6)),
+        Row(children: [
+          _ToggleBtn(
+            text: "6 Months",
+            selected: is6Months,
+            onTap: () => context.read<InvoiceBloc>().add(LoadMonthRange(6)),
+          ),
+          const SizedBox(width: 6),
+          _ToggleBtn(
+            text: "1 Year",
+            selected: !is6Months,
+            onTap: () => context.read<InvoiceBloc>().add(LoadMonthRange(12)),
+          ),
+        ]),
+      ],
+    );
+  }
+}
+
+class _ToggleBtn extends StatelessWidget {
+  final String text;
+  final bool selected;
+  final VoidCallback onTap;
+  const _ToggleBtn({required this.text, required this.selected, required this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 7),
+        decoration: BoxDecoration(
+          color: selected ? _kHeaderGradStart : Colors.transparent,
           borderRadius: BorderRadius.circular(20),
-          border: Border.all(color: AppColors.appBarColor),
         ),
         child: Text(
           text,
-          style: TextStyle(
-            color: selected ? Colors.white : Colors.black,
-            fontWeight: FontWeight.w600,
+          style: GoogleFonts.lato(
+            color: selected ? Colors.white : _kNavy,
+            fontWeight: FontWeight.w700,
+            fontSize: 12,
           ),
         ),
       ),
@@ -592,180 +730,258 @@ class _RangeButton extends StatelessWidget {
 }
 
 // ═══════════════════════════════════════════════════════════
-// _SmallStatCard
+// MONTHLY TREND SECTION  (for tablet)
 // ═══════════════════════════════════════════════════════════
-class _SmallStatCard extends StatelessWidget {
-  final String title;
-  final String count;
-  final String amount;
-  final bool positive;
+class _MonthlyTrendSection extends StatelessWidget {
+  final InvoiceLoaded state;
   final bool isTablet;
+  final void Function(int) onMonthTap;
 
-  const _SmallStatCard({
-    required this.title,
-    required this.count,
-    required this.amount,
-    required this.positive,
+  const _MonthlyTrendSection({
+    required this.state,
     required this.isTablet,
+    required this.onMonthTap,
   });
 
   @override
   Widget build(BuildContext context) {
-    return Expanded(
-      child: Container(
-        margin: EdgeInsets.symmetric(horizontal: isTablet ? 5 : 4),
-        padding: EdgeInsets.all(isTablet ? 16 : 12),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(isTablet ? 20 : 16),
-          boxShadow: const [BoxShadow(color: _kShadow, blurRadius: 6)],
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(title,
-                style: TextStyle(
-                    fontSize: isTablet ? 13 : 12, color: _kNavy)),
-            SizedBox(height: isTablet ? 8 : 6),
-            Text(count,
-                style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: isTablet ? 16 : 14)),
-            SizedBox(height: isTablet ? 5 : 4),
-            Text(amount,
-                style: TextStyle(
-                    fontSize: isTablet ? 13 : 12,
-                    color: positive ? Colors.green : Colors.red)),
-          ],
-        ),
-      ),
+    final maxAmount = state.monthData.isEmpty
+        ? 1.0
+        : state.monthData
+        .map((e) => (e["SalesAmount"] as num).toDouble())
+        .reduce((a, b) => a > b ? a : b);
+
+    return Column(
+      children: [
+        _MonthlyTrendHeader(is6Months: state.is6Months),
+        const SizedBox(height: 12),
+        ...List.generate(state.monthList.length, (i) {
+          final current = (state.monthData[i]["SalesAmount"] as num).toDouble();
+          final prev = i == 0
+              ? current
+              : (state.monthData[i - 1]["SalesAmount"] as num).toDouble();
+          return _MonthBarItem(
+            month: state.monthList[i],
+            current: current,
+            prev: prev,
+            count: state.monthData[i]["SalesCount"]?.toString() ?? "0",
+            amount: state.monthData[i]["SalesAmount"]?.toString() ?? "0",
+            maxAmount: maxAmount,
+            isTablet: isTablet,
+            onTap: () => onMonthTap(i),
+          );
+        }),
+      ],
     );
   }
 }
 
 // ═══════════════════════════════════════════════════════════
-// _TodayYesterdayChart
+// MONTH BAR ITEM  (screenshot style: dot · name · bar · count · amount)
 // ═══════════════════════════════════════════════════════════
-class _TodayYesterdayChart extends StatelessWidget {
-  final Map<String, dynamic> data;
-  final double height;
+class _MonthBarItem extends StatelessWidget {
+  final String month;
+  final double current;
+  final double prev;
+  final String count;
+  final String amount;
+  final double maxAmount;
+  final bool isTablet;
+  final VoidCallback onTap;
 
-  const _TodayYesterdayChart({required this.data, required this.height});
+  const _MonthBarItem({
+    required this.month,
+    required this.current,
+    required this.prev,
+    required this.count,
+    required this.amount,
+    required this.maxAmount,
+    required this.isTablet,
+    required this.onTap,
+  });
 
   @override
   Widget build(BuildContext context) {
-    final today =
-        double.tryParse(data["TodayAmount"]?.toString() ?? "0") ?? 0;
-    final yesterday =
-        double.tryParse(data["YesterdayAmount"]?.toString() ?? "0") ?? 0;
+    final ratio = maxAmount > 0 ? (current / maxAmount).clamp(0.0, 1.0) : 0.0;
+    final diff = prev == 0 ? 0.0 : ((current - prev) / prev) * 100;
+    final isGrowth = diff >= 0;
+    final amountLabel = _shortAmount(current);
 
-    return SizedBox(
-      height: height,
+    return GestureDetector(
+      onTap: onTap,
       child: Container(
-        padding: const EdgeInsets.all(16),
+        margin: EdgeInsets.only(bottom: isTablet ? 10 : 10),
+        padding: EdgeInsets.symmetric(
+            horizontal: isTablet ? 18 : 12, vertical: isTablet ? 14 : 12),
         decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(20),
-          border: Border.all(color: AppColors.appBarColor, width: 1.5),
-          boxShadow: [
-            BoxShadow(
-              color: AppColors.appBarColor.withOpacity(0.1),
-              blurRadius: 12,
-              offset: const Offset(0, 4),
-            ),
-          ],
+          color: _kCardBg,
+          borderRadius: BorderRadius.circular(16),
+          boxShadow: const [BoxShadow(color: _kShadow, blurRadius: 6, offset: Offset(0, 2))],
         ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+        child: Row(
           children: [
-            Row(children: [
-              const Text("Today vs Yesterday",
-                  style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 13,
+            // colored dot
+            Container(
+              width: 10, height: 10,
+              decoration: BoxDecoration(
+                color: isGrowth ? _kGreen : Colors.red,
+                shape: BoxShape.circle,
+              ),
+            ),
+            const SizedBox(width: 10),
+
+            // month name
+            SizedBox(
+              width: isTablet ? 80 : 72,
+              child: Text(month,
+                  style: GoogleFonts.lato(
+                      fontSize: isTablet ? 13 : 12,
+                      fontWeight: FontWeight.w700,
                       color: _kNavy)),
-              const Spacer(),
-              Container(width: 12, height: 3, color: AppColors.appBarColor),
-              const SizedBox(width: 4),
-              const Text("Today",
-                  style: TextStyle(fontSize: 11, color: _kNavy)),
-              const SizedBox(width: 12),
-              Container(width: 12, height: 3, color: Colors.orange),
-              const SizedBox(width: 4),
-              const Text("Yesterday",
-                  style: TextStyle(fontSize: 11, color: _kNavy)),
-            ]),
-            const SizedBox(height: 10),
+            ),
+
+            // horizontal bar
             Expanded(
-              child: LineChart(
-                LineChartData(
-                  gridData: FlGridData(
-                    show: true,
-                    drawVerticalLine: false,
-                    getDrawingHorizontalLine: (_) => const FlLine(
-                      color: Color(0x26808080),
-                      strokeWidth: 1,
-                    ),
-                  ),
-                  borderData: FlBorderData(show: false),
-                  titlesData: FlTitlesData(
-                    leftTitles: AxisTitles(
-                        sideTitles: SideTitles(showTitles: false)),
-                    rightTitles: AxisTitles(
-                        sideTitles: SideTitles(showTitles: false)),
-                    topTitles: AxisTitles(
-                        sideTitles: SideTitles(showTitles: false)),
-                    bottomTitles: AxisTitles(
-                      sideTitles: SideTitles(
-                        showTitles: true,
-                        getTitlesWidget: (value, meta) {
-                          const labels = ['Start', 'Mid', 'End'];
-                          final i = value.toInt();
-                          if (i < 0 || i >= labels.length) {
-                            return const SizedBox();
-                          }
-                          return Padding(
-                            padding: const EdgeInsets.only(top: 6),
-                            child: Text(labels[i],
-                                style: const TextStyle(
-                                    fontSize: 10, color: Colors.grey)),
-                          );
-                        },
-                      ),
-                    ),
-                  ),
-                  lineTouchData: LineTouchData(
-                    touchTooltipData: LineTouchTooltipData(
-                      tooltipBgColor: Colors.white,
-                      tooltipRoundedRadius: 8,
-                      tooltipBorder:
-                      BorderSide(color: AppColors.appBarColor, width: 1),
-                      getTooltipItems: (spots) => spots.map((spot) {
-                        final label =
-                        spot.barIndex == 0 ? "Today" : "Yesterday";
-                        return LineTooltipItem(
-                          "$label\nRM ${spot.y.toStringAsFixed(0)}",
-                          TextStyle(
-                            color: spot.barIndex == 0
-                                ? AppColors.appBarColor
-                                : Colors.orange,
-                            fontWeight: FontWeight.bold,
-                            fontSize: 11,
-                          ),
-                        );
-                      }).toList(),
-                    ),
-                  ),
-                  lineBarsData: [
-                    _bar(today, AppColors.appBarColor),
-                    _bar(yesterday, Colors.orange),
-                  ],
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(6),
+                child: LinearProgressIndicator(
+                  value: ratio,
+                  minHeight: isTablet ? 10 : 8,
+                  backgroundColor: const Color(0xFFE8ECF5),
+                  valueColor: const AlwaysStoppedAnimation<Color>(_kBarBlue),
                 ),
               ),
+            ),
+
+            const SizedBox(width: 12),
+
+            // count
+            SizedBox(
+              width: isTablet ? 40 : 34,
+              child: Text(count,
+                  textAlign: TextAlign.right,
+                  style: GoogleFonts.lato(
+                      fontSize: isTablet ? 13 : 12,
+                      fontWeight: FontWeight.w800,
+                      color: _kNavy)),
+            ),
+
+            const SizedBox(width: 10),
+
+            // amount label (e.g. ₹35.49L)
+            SizedBox(
+              width: isTablet ? 56 : 50,
+              child: Text(amountLabel,
+                  textAlign: TextAlign.right,
+                  style: GoogleFonts.lato(
+                      fontSize: isTablet ? 12 : 11,
+                      fontWeight: FontWeight.w600,
+                      color: Colors.grey.shade600)),
             ),
           ],
         ),
       ),
+    );
+  }
+
+  String _shortAmount(double val) {
+    if (val >= 10000000) return "₹${(val / 10000000).toStringAsFixed(2)}Cr";
+    if (val >= 100000)   return "₹${(val / 100000).toStringAsFixed(2)}L";
+    if (val >= 1000)     return "₹${(val / 1000).toStringAsFixed(1)}K";
+    return "₹${val.toStringAsFixed(0)}";
+  }
+}
+
+// ═══════════════════════════════════════════════════════════
+// TODAY vs YESTERDAY CHART CARD  (tablet right panel)
+// ═══════════════════════════════════════════════════════════
+class _TodayYesterdayChartCard extends StatelessWidget {
+  final Map<String, dynamic> data;
+  const _TodayYesterdayChartCard({required this.data});
+
+  @override
+  Widget build(BuildContext context) {
+    final today     = double.tryParse(data["TodayAmount"]?.toString()     ?? "0") ?? 0;
+    final yesterday = double.tryParse(data["YesterdayAmount"]?.toString() ?? "0") ?? 0;
+
+    return Container(
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: _kCardBg,
+        borderRadius: BorderRadius.circular(20),
+        boxShadow: const [BoxShadow(color: _kShadow, blurRadius: 10, offset: Offset(0, 4))],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text("Today vs Yesterday",
+              style: GoogleFonts.lato(
+                  fontSize: 13, fontWeight: FontWeight.w800, color: _kNavy)),
+          const SizedBox(height: 4),
+          Row(children: [
+            _LegendDot(color: _kHeaderGradStart, label: "Today"),
+            const SizedBox(width: 12),
+            _LegendDot(color: Colors.orange, label: "Yesterday"),
+          ]),
+          const SizedBox(height: 12),
+          SizedBox(
+            height: 180,
+            child: LineChart(_buildChart(today, yesterday)),
+          ),
+        ],
+      ),
+    );
+  }
+
+  LineChartData _buildChart(double today, double yesterday) {
+    return LineChartData(
+      gridData: FlGridData(
+        show: true,
+        drawVerticalLine: false,
+        getDrawingHorizontalLine: (_) => const FlLine(color: Color(0x20808080), strokeWidth: 1),
+      ),
+      borderData: FlBorderData(show: false),
+      titlesData: FlTitlesData(
+        leftTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
+        rightTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
+        topTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
+        bottomTitles: AxisTitles(
+          sideTitles: SideTitles(
+            showTitles: true,
+            getTitlesWidget: (v, _) {
+              const labels = ['Start', 'Mid', 'End'];
+              final i = v.toInt();
+              if (i < 0 || i >= labels.length) return const SizedBox();
+              return Padding(
+                padding: const EdgeInsets.only(top: 6),
+                child: Text(labels[i], style: const TextStyle(fontSize: 10, color: Colors.grey)),
+              );
+            },
+          ),
+        ),
+      ),
+      lineTouchData: LineTouchData(
+        touchTooltipData: LineTouchTooltipData(
+          tooltipBgColor: Colors.white,
+          tooltipRoundedRadius: 8,
+          tooltipBorder: const BorderSide(color: _kHeaderGradStart, width: 1),
+          getTooltipItems: (spots) => spots.map((spot) {
+            final label = spot.barIndex == 0 ? "Today" : "Yesterday";
+            return LineTooltipItem(
+              "$label\n₹${spot.y.toStringAsFixed(0)}",
+              TextStyle(
+                color: spot.barIndex == 0 ? _kHeaderGradStart : Colors.orange,
+                fontWeight: FontWeight.bold,
+                fontSize: 11,
+              ),
+            );
+          }).toList(),
+        ),
+      ),
+      lineBarsData: [
+        _bar(today, _kHeaderGradStart),
+        _bar(yesterday, Colors.orange),
+      ],
     );
   }
 
@@ -774,21 +990,17 @@ class _TodayYesterdayChart extends StatelessWidget {
       spots: [FlSpot(0, 0), FlSpot(1, value * 0.6), FlSpot(2, value)],
       isCurved: true,
       color: color,
-      barWidth: 3,
+      barWidth: 2.5,
       isStrokeCapRound: true,
       dotData: FlDotData(
         show: true,
-        getDotPainter: (_, __, ___, ____) => FlDotCirclePainter(
-          radius: 5,
-          color: Colors.white,
-          strokeWidth: 2,
-          strokeColor: color,
-        ),
+        getDotPainter: (_, __, ___, ____) =>
+            FlDotCirclePainter(radius: 4, color: Colors.white, strokeWidth: 2, strokeColor: color),
       ),
       belowBarData: BarAreaData(
         show: true,
         gradient: LinearGradient(
-          colors: [color.withOpacity(0.2), color.withOpacity(0.0)],
+          colors: [color.withOpacity(0.18), color.withOpacity(0.0)],
           begin: Alignment.topCenter,
           end: Alignment.bottomCenter,
         ),
@@ -797,11 +1009,25 @@ class _TodayYesterdayChart extends StatelessWidget {
   }
 }
 
+class _LegendDot extends StatelessWidget {
+  final Color color;
+  final String label;
+  const _LegendDot({required this.color, required this.label});
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(children: [
+      Container(width: 10, height: 3, color: color),
+      const SizedBox(width: 4),
+      Text(label, style: TextStyle(fontSize: 11, color: Colors.grey.shade600)),
+    ]);
+  }
+}
+
 // ═══════════════════════════════════════════════════════════
-// showBillingBottomSheet
+// showBillingBottomSheet  (unchanged functionality)
 // ═══════════════════════════════════════════════════════════
-void showBillingBottomSheet(
-    BuildContext context, List<dynamic> billingData) {
+void showBillingBottomSheet(BuildContext context, List<dynamic> billingData) {
   showModalBottomSheet(
     context: context,
     isScrollControlled: true,
@@ -822,8 +1048,7 @@ void showBillingBottomSheet(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text("Waiting for Billing Details",
-                      style: GoogleFonts.lato(
-                          fontSize: 18, fontWeight: FontWeight.bold)),
+                      style: GoogleFonts.lato(fontSize: 18, fontWeight: FontWeight.bold)),
                   IconButton(
                     icon: const Icon(Icons.close),
                     onPressed: () => Navigator.pop(context),
@@ -839,17 +1064,15 @@ void showBillingBottomSheet(
                 itemBuilder: (context, index) {
                   final item = billingData[index];
                   return Container(
-                    margin: const EdgeInsets.symmetric(
-                        horizontal: 12, vertical: 8),
+                    margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                     decoration: BoxDecoration(
                       color: const Color(0xFFFAD691),
                       borderRadius: BorderRadius.circular(16),
                       boxShadow: [
                         BoxShadow(
-                          color: Colors.grey.withOpacity(0.2),
-                          blurRadius: 8,
-                          offset: const Offset(0, 4),
-                        ),
+                            color: Colors.grey.withOpacity(0.2),
+                            blurRadius: 8,
+                            offset: const Offset(0, 4)),
                       ],
                     ),
                     child: InkWell(
@@ -858,66 +1081,40 @@ void showBillingBottomSheet(
                         showDialog(
                           context: context,
                           builder: (context) => Dialog(
-                            shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(16)),
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
                             child: Container(
                               padding: const EdgeInsets.all(16),
                               decoration: BoxDecoration(
-                                color: const Color(0xFFFAD691),
-                                borderRadius: BorderRadius.circular(16),
-                              ),
+                                  color: const Color(0xFFFAD691),
+                                  borderRadius: BorderRadius.circular(16)),
                               child: SingleChildScrollView(
-                                child: Column(
-                                  crossAxisAlignment:
-                                  CrossAxisAlignment.start,
-                                  children: [
-                                    Row(
-                                      mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                      children: [
-                                        Text("Billing Details",
-                                            style: GoogleFonts.lato(
+                                child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Text("Billing Details",
+                                          style: GoogleFonts.lato(
                                               fontSize: 18,
                                               fontWeight: FontWeight.bold,
-                                              color: Colors.black,
-                                            )),
-                                        IconButton(
-                                          icon: const Icon(Icons.close,
-                                              color: Colors.black),
-                                          onPressed: () =>
-                                              Navigator.pop(context),
-                                        ),
-                                      ],
-                                    ),
-                                    const SizedBox(height: 12),
-                                    _buildDetailRow(
-                                        Icons.confirmation_number,
-                                        "Bill No",
-                                        "${item['BillNoDisplay']}"),
-                                    _buildDetailRow(Icons.date_range,
-                                        "Bill Date", "${item['BillDate']}"),
-                                    _buildDetailRow(Icons.access_time,
-                                        "Bill Time", "${item['BillTime']}"),
-                                    _buildDetailRow(Icons.assignment,
-                                        "Job Status", "${item['JobStatus']}"),
-                                    _buildDetailRow(Icons.person, "Customer",
-                                        "${item['CustomerName']}"),
-                                    _buildDetailRow(Icons.badge, "Employee",
-                                        "${item['EmployeeName']}"),
-                                    _buildDetailRow(Icons.local_shipping,
-                                        "Vessel",
-                                        "${item['Loadingvesselname']}"),
-                                    _buildDetailRow(
-                                        Icons.anchor, "Port", "${item['SPort']}"),
-                                    _buildDetailRow(Icons.calendar_today,
-                                        "Pickup Date",
-                                        "${item['SPickupDate']}"),
-                                    _buildDetailRow(Icons.flight_takeoff,
-                                        "ETA", "${item['ETA']}"),
-                                    _buildDetailRow(Icons.monetization_on,
-                                        "Net Amount", "₹${item['NetAmt']}"),
-                                  ],
-                                ),
+                                              color: Colors.black)),
+                                      IconButton(
+                                          icon: const Icon(Icons.close, color: Colors.black),
+                                          onPressed: () => Navigator.pop(context)),
+                                    ],
+                                  ),
+                                  const SizedBox(height: 12),
+                                  _buildDetailRow(Icons.confirmation_number, "Bill No",   "${item['BillNoDisplay']}"),
+                                  _buildDetailRow(Icons.date_range,          "Bill Date", "${item['BillDate']}"),
+                                  _buildDetailRow(Icons.access_time,         "Bill Time", "${item['BillTime']}"),
+                                  _buildDetailRow(Icons.assignment,          "Job Status","${item['JobStatus']}"),
+                                  _buildDetailRow(Icons.person,              "Customer",  "${item['CustomerName']}"),
+                                  _buildDetailRow(Icons.badge,               "Employee",  "${item['EmployeeName']}"),
+                                  _buildDetailRow(Icons.local_shipping,      "Vessel",    "${item['Loadingvesselname']}"),
+                                  _buildDetailRow(Icons.anchor,              "Port",      "${item['SPort']}"),
+                                  _buildDetailRow(Icons.calendar_today,      "Pickup Date","${item['SPickupDate']}"),
+                                  _buildDetailRow(Icons.flight_takeoff,      "ETA",       "${item['ETA']}"),
+                                  _buildDetailRow(Icons.monetization_on,     "Net Amount","₹${item['NetAmt']}"),
+                                ]),
                               ),
                             ),
                           ),
@@ -929,49 +1126,38 @@ void showBillingBottomSheet(
                           Container(
                             padding: const EdgeInsets.all(12),
                             decoration: BoxDecoration(
-                              color: Colors.white.withOpacity(0.9),
-                              shape: BoxShape.circle,
-                            ),
-                            child: const Icon(Icons.receipt_long,
-                                color: _kOrange, size: 28),
+                                color: Colors.white.withOpacity(0.9),
+                                shape: BoxShape.circle),
+                            child: const Icon(Icons.receipt_long, color: _kOrange, size: 28),
                           ),
                           const SizedBox(width: 12),
                           Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text("Bill No: ${item['BillNo'] ?? ''}",
-                                    style: GoogleFonts.lato(
+                            child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                              Text("Bill No: ${item['BillNo'] ?? ''}",
+                                  style: GoogleFonts.lato(
                                       fontSize: 16,
                                       fontWeight: FontWeight.bold,
-                                      color: const Color(0xFF2C3E50),
-                                    )),
-                                const SizedBox(height: 4),
-                                Text(
-                                    "Customer: ${item['CustomerName'] ?? ''}",
-                                    style: GoogleFonts.lato(
+                                      color: const Color(0xFF2C3E50))),
+                              const SizedBox(height: 4),
+                              Text("Customer: ${item['CustomerName'] ?? ''}",
+                                  style: GoogleFonts.lato(
                                       fontSize: 14,
                                       fontWeight: FontWeight.bold,
-                                      color: const Color(0xFF145A32),
-                                    )),
-                                const SizedBox(height: 2),
-                                Text("Amount: ₹${item['NetAmt'] ?? ''}",
-                                    style: GoogleFonts.lato(
+                                      color: const Color(0xFF145A32))),
+                              const SizedBox(height: 2),
+                              Text("Amount: ₹${item['NetAmt'] ?? ''}",
+                                  style: GoogleFonts.lato(
                                       fontSize: 14,
                                       fontWeight: FontWeight.bold,
-                                      color: _kOrange,
-                                    )),
-                              ],
-                            ),
+                                      color: _kOrange)),
+                            ]),
                           ),
                           Container(
                             padding: const EdgeInsets.all(6),
                             decoration: BoxDecoration(
-                              color: Colors.white.withOpacity(0.9),
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                            child: const Icon(Icons.arrow_forward_ios,
-                                size: 16, color: _kOrange),
+                                color: Colors.white.withOpacity(0.9),
+                                borderRadius: BorderRadius.circular(8)),
+                            child: const Icon(Icons.arrow_forward_ios, size: 16, color: _kOrange),
                           ),
                         ]),
                       ),
@@ -994,12 +1180,9 @@ Widget _buildDetailRow(IconData icon, String label, String value) {
       Icon(icon, color: const Color(0xFF6A994E)),
       const SizedBox(width: 8),
       Text("$label:",
-          style: const TextStyle(
-              fontWeight: FontWeight.bold, color: Color(0xFF3E2723))),
+          style: const TextStyle(fontWeight: FontWeight.bold, color: Color(0xFF3E2723))),
       const SizedBox(width: 8),
-      Expanded(
-          child: Text(value,
-              style: const TextStyle(color: Color(0xFF2C3E50)))),
+      Expanded(child: Text(value, style: const TextStyle(color: Color(0xFF2C3E50)))),
     ]),
   );
 }
