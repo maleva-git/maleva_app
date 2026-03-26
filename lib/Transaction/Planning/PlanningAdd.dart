@@ -925,7 +925,7 @@ class _PlanningAddState extends State<PlanningAdd> {
                       Navigator.push(
                           context,
                           MaterialPageRoute(
-                              builder: (context) => const PlanningView()));
+                              builder: (context) => const PlanningOldView()));
                     },
                     child: Text(
                       'VIEW',
@@ -1008,7 +1008,7 @@ class _PlanningAddState extends State<PlanningAdd> {
                                 Navigator.push(
                                     context,
                                     MaterialPageRoute(
-                                        builder: (context) => const PlanningView()));
+                                        builder: (context) => const PlanningOldView()));
                               },
                               child: Text(
                                 'SORT',
@@ -1043,7 +1043,7 @@ class _PlanningAddState extends State<PlanningAdd> {
                                 Navigator.push(
                                     context,
                                     MaterialPageRoute(
-                                        builder: (context) => const PlanningView()));
+                                        builder: (context) => const PlanningOldView()));
                               },
                               child: Text(
                                 'PUSH TO RTI',

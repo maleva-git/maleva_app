@@ -27,6 +27,7 @@ import '../Transport/LicenseUpdate.dart';
 import '../Transport/Maintenance.dart';
 import '../Transport/RTI/UpdateRTIDetails.dart';
 import 'package:maleva/core/colors/colors.dart' as colour;
+import '../features/transaction/planning/view/planning_tab.dart';
 import '../features/transaction/salesorder/view/view/salesorderview_tab.dart';
 
 
