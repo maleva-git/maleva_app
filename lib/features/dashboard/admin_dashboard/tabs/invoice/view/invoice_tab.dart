@@ -2,25 +2,13 @@ import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:maleva/core/colors/colors.dart';
 import '../bloc/invoice_bloc.dart';
 import '../bloc/invoice_event.dart';
 import '../bloc/invoice_state.dart';
+import '../../../../../../core/colors/colors.dart' as colors;
 
-const _kShadow = Color(0x0D000000);
-const _kNavy   = Color(0xFF1A2E5A);
-const _kBlue   = Color(0xFF5B9BD5);
-const _kOrange = Color(0xFFE67E22);
 
-// ── Screenshot color palette ──────────────────────────────
-const _kHeaderGradStart = Color(0xFF1A3A8F); // deep blue
-const _kHeaderGradEnd   = Color(0xFF4A6FD4); // lighter blue
-const _kCardBg          = Colors.white;
-const _kPageBg          = Color(0xFFF4F6FB);
-const _kPillBg          = Color(0x33FFFFFF); // translucent white pill
-const _kGreen           = Color(0xFF27AE60);
-const _kBlueAccent      = Color(0xFF2F80ED);
-const _kBarBlue         = Color(0xFF3563E9);
+
 
 class InvoiceTab extends StatefulWidget {
   const InvoiceTab({super.key});
@@ -51,7 +39,7 @@ class _InvoiceTabState extends State<InvoiceTab> {
     final isTablet = screenW >= 600;
 
     return Scaffold(
-      backgroundColor: _kPageBg,
+      backgroundColor: colors.kPageBg,
       body: BlocConsumer<InvoiceBloc, InvoiceState>(
         buildWhen: (prev, curr) {
           if (prev is! InvoiceLoaded) return true;
@@ -104,7 +92,7 @@ class _InvoiceTabState extends State<InvoiceTab> {
 
           return RefreshIndicator(
             onRefresh: _onRefresh,
-            color: _kHeaderGradStart,
+            color: colors.kHeaderGradStart,
             child: isTablet
                 ? _buildTabletLayout(context, state, data)
                 : _buildMobileLayout(context, state, data),
@@ -227,7 +215,7 @@ class _InvoiceTabState extends State<InvoiceTab> {
                   children: [
                     const Text("Employee Details",
                         style: TextStyle(
-                          fontSize: 18, fontWeight: FontWeight.bold, color: _kNavy,
+                          fontSize: 18, fontWeight: FontWeight.bold, color: colors.kNavy,
                         )),
                     InkWell(
                       onTap: () => Navigator.pop(context),
@@ -253,19 +241,19 @@ class _InvoiceTabState extends State<InvoiceTab> {
                           borderRadius: BorderRadius.circular(18),
                           color: Colors.grey.shade50,
                           boxShadow: const [
-                            BoxShadow(color: _kShadow, blurRadius: 6, offset: Offset(0, 3))
+                            BoxShadow(color: colors.kShadow, blurRadius: 6, offset: Offset(0, 3))
                           ],
                         ),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Row(children: [
-                              const Icon(Icons.person, size: 18, color: _kBlue),
+                              const Icon(Icons.person, size: 18, color: colors.kBlue),
                               const SizedBox(width: 6),
                               Expanded(
                                 child: Text(emp["EmployeeName"].toString(),
                                     style: const TextStyle(
-                                        fontWeight: FontWeight.bold, fontSize: 14, color: _kNavy)),
+                                        fontWeight: FontWeight.bold, fontSize: 14, color: colors.kNavy)),
                               ),
                             ]),
                             const SizedBox(height: 8),
@@ -297,7 +285,7 @@ class _InvoiceTabState extends State<InvoiceTab> {
                   width: double.infinity,
                   child: ElevatedButton(
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: _kHeaderGradStart,
+                      backgroundColor: colors.kHeaderGradStart,
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
                       padding: const EdgeInsets.symmetric(vertical: 12),
                     ),
@@ -336,7 +324,7 @@ class _HeroHeader extends StatelessWidget {
       padding: const EdgeInsets.fromLTRB(20, 52, 20, 24),
       decoration: const BoxDecoration(
         gradient: LinearGradient(
-          colors: [_kHeaderGradStart, _kHeaderGradEnd],
+          colors: [colors.kHeaderGradStart, colors.kHeaderGradEnd],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
@@ -376,7 +364,7 @@ class _HeroHeader extends StatelessWidget {
             children: [
               _Pill(icon: Icons.calendar_view_week, label: "$weekCount this week", iconColor: Colors.white),
               _Pill(icon: Icons.hourglass_empty, label: "$waitingCount waiting", iconColor: Colors.white),
-              _Pill(icon: Icons.check_circle_outline, label: "$billedCount billed", iconColor: _kGreen, checkMark: true),
+              _Pill(icon: Icons.check_circle_outline, label: "$billedCount billed", iconColor: colors.kGreen, checkMark: true),
             ],
           ),
         ],
@@ -418,7 +406,7 @@ class _Pill extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
       decoration: BoxDecoration(
-        color: _kPillBg,
+        color: colors.kPillBg,
         borderRadius: BorderRadius.circular(20),
         border: Border.all(color: Colors.white.withOpacity(0.25), width: 1),
       ),
@@ -468,12 +456,12 @@ class _OverviewSection extends StatelessWidget {
           children: [
             Text("Overview",
                 style: GoogleFonts.lato(
-                    fontSize: 16, fontWeight: FontWeight.w800, color: _kNavy)),
+                    fontSize: 16, fontWeight: FontWeight.w800, color: colors.kNavy)),
             TextButton(
               onPressed: () {},
               child: Text("See all →",
                   style: GoogleFonts.lato(
-                      fontSize: 13, color: _kBlueAccent, fontWeight: FontWeight.w600)),
+                      fontSize: 13, color: colors.kBlueAccent, fontWeight: FontWeight.w600)),
             ),
           ],
         ),
@@ -486,7 +474,7 @@ class _OverviewSection extends StatelessWidget {
             count: data["MonthSales"]?.toString() ?? "0",
             amount: "₹${data["MonthAmount"] ?? "0"}",
             badgeLabel: "Invoices",
-            badgeColor: _kOrange,
+            badgeColor: colors.kOrange,
             badgeIcon: Icons.circle,
           )),
           const SizedBox(width: 12),
@@ -495,7 +483,7 @@ class _OverviewSection extends StatelessWidget {
             count: data["WeekSales"]?.toString() ?? "0",
             amount: "₹${data["WeekAmount"] ?? "0"}",
             badgeLabel: "This week",
-            badgeColor: _kBlueAccent,
+            badgeColor: colors.kBlueAccent,
             badgeIcon: Icons.calendar_today,
           )),
         ]),
@@ -506,7 +494,7 @@ class _OverviewSection extends StatelessWidget {
             count: data["YesterdaySales"]?.toString() ?? "0",
             amount: "₹${data["YesterdayAmount"] ?? "0"}",
             badgeLabel: "Done",
-            badgeColor: _kGreen,
+            badgeColor: colors.kGreen,
             badgeIcon: Icons.check,
           )),
           const SizedBox(width: 12),
@@ -537,7 +525,7 @@ class _OverviewSection extends StatelessWidget {
           const SizedBox(width: 12),
           Expanded(child: _StatusCard(
             icon: Icons.check_circle,
-            iconColor: _kGreen,
+            iconColor: colors.kGreen,
             bgColor: const Color(0xFFEAF7EF),
             count: data["MonthSales"]?.toString() ?? "0",
             label: "BILLED MONTH",
@@ -573,9 +561,9 @@ class _OverviewCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: _kCardBg,
+        color: colors.kCardBg,
         borderRadius: BorderRadius.circular(18),
-        boxShadow: const [BoxShadow(color: _kShadow, blurRadius: 8, offset: Offset(0, 3))],
+        boxShadow: const [BoxShadow(color: colors.kShadow, blurRadius: 8, offset: Offset(0, 3))],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -589,13 +577,13 @@ class _OverviewCard extends StatelessWidget {
           const SizedBox(height: 6),
           Text(count,
               style: GoogleFonts.lato(
-                  fontSize: 28, fontWeight: FontWeight.w900, color: _kNavy)),
+                  fontSize: 28, fontWeight: FontWeight.w900, color: colors.kNavy)),
           const SizedBox(height: 4),
           Text(amount,
               style: GoogleFonts.lato(
                   fontSize: 13,
                   fontWeight: FontWeight.w600,
-                  color: isToday ? Colors.grey : _kNavy)),
+                  color: isToday ? Colors.grey : colors.kNavy)),
           const SizedBox(height: 10),
           Row(children: [
             Icon(badgeIcon, size: 12, color: badgeColor),
@@ -634,9 +622,9 @@ class _StatusCard extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
         decoration: BoxDecoration(
-          color: _kCardBg,
+          color: colors.kCardBg,
           borderRadius: BorderRadius.circular(18),
-          boxShadow: const [BoxShadow(color: _kShadow, blurRadius: 8, offset: Offset(0, 3))],
+          boxShadow: const [BoxShadow(color: colors.kShadow, blurRadius: 8, offset: Offset(0, 3))],
         ),
         child: Row(children: [
           Container(
@@ -650,7 +638,7 @@ class _StatusCard extends StatelessWidget {
             children: [
               Text(count,
                   style: GoogleFonts.lato(
-                      fontSize: 20, fontWeight: FontWeight.w900, color: _kNavy)),
+                      fontSize: 20, fontWeight: FontWeight.w900, color: colors.kNavy)),
               Text(label,
                   style: GoogleFonts.lato(
                       fontSize: 9,
@@ -680,7 +668,7 @@ class _MonthlyTrendHeader extends StatelessWidget {
         Text("MONTHLY TREND",
             style: GoogleFonts.lato(
                 fontSize: 13, fontWeight: FontWeight.w800,
-                color: _kNavy, letterSpacing: 0.6)),
+                color: colors.kNavy, letterSpacing: 0.6)),
         Row(children: [
           _ToggleBtn(
             text: "6 Months",
@@ -713,13 +701,13 @@ class _ToggleBtn extends StatelessWidget {
         duration: const Duration(milliseconds: 200),
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 7),
         decoration: BoxDecoration(
-          color: selected ? _kHeaderGradStart : Colors.transparent,
+          color: selected ? colors.kHeaderGradStart : Colors.transparent,
           borderRadius: BorderRadius.circular(20),
         ),
         child: Text(
           text,
           style: GoogleFonts.lato(
-            color: selected ? Colors.white : _kNavy,
+            color: selected ? Colors.white : colors.kNavy,
             fontWeight: FontWeight.w700,
             fontSize: 12,
           ),
@@ -814,9 +802,9 @@ class _MonthBarItem extends StatelessWidget {
         padding: EdgeInsets.symmetric(
             horizontal: isTablet ? 18 : 12, vertical: isTablet ? 14 : 12),
         decoration: BoxDecoration(
-          color: _kCardBg,
+          color: colors.kCardBg,
           borderRadius: BorderRadius.circular(16),
-          boxShadow: const [BoxShadow(color: _kShadow, blurRadius: 6, offset: Offset(0, 2))],
+          boxShadow: const [BoxShadow(color: colors.kShadow, blurRadius: 6, offset: Offset(0, 2))],
         ),
         child: Row(
           children: [
@@ -824,7 +812,7 @@ class _MonthBarItem extends StatelessWidget {
             Container(
               width: 10, height: 10,
               decoration: BoxDecoration(
-                color: isGrowth ? _kGreen : Colors.red,
+                color: isGrowth ? colors.kGreen : Colors.red,
                 shape: BoxShape.circle,
               ),
             ),
@@ -837,7 +825,7 @@ class _MonthBarItem extends StatelessWidget {
                   style: GoogleFonts.lato(
                       fontSize: isTablet ? 13 : 12,
                       fontWeight: FontWeight.w700,
-                      color: _kNavy)),
+                      color: colors.kNavy)),
             ),
 
             // horizontal bar
@@ -848,7 +836,7 @@ class _MonthBarItem extends StatelessWidget {
                   value: ratio,
                   minHeight: isTablet ? 10 : 8,
                   backgroundColor: const Color(0xFFE8ECF5),
-                  valueColor: const AlwaysStoppedAnimation<Color>(_kBarBlue),
+                  valueColor: const AlwaysStoppedAnimation<Color>(colors.kBarBlue),
                 ),
               ),
             ),
@@ -863,7 +851,7 @@ class _MonthBarItem extends StatelessWidget {
                   style: GoogleFonts.lato(
                       fontSize: isTablet ? 13 : 12,
                       fontWeight: FontWeight.w800,
-                      color: _kNavy)),
+                      color: colors.kNavy)),
             ),
 
             const SizedBox(width: 10),
@@ -907,19 +895,19 @@ class _TodayYesterdayChartCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: _kCardBg,
+        color: colors.kCardBg,
         borderRadius: BorderRadius.circular(20),
-        boxShadow: const [BoxShadow(color: _kShadow, blurRadius: 10, offset: Offset(0, 4))],
+        boxShadow: const [BoxShadow(color: colors.kShadow, blurRadius: 10, offset: Offset(0, 4))],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text("Today vs Yesterday",
               style: GoogleFonts.lato(
-                  fontSize: 13, fontWeight: FontWeight.w800, color: _kNavy)),
+                  fontSize: 13, fontWeight: FontWeight.w800, color: colors.kNavy)),
           const SizedBox(height: 4),
           Row(children: [
-            _LegendDot(color: _kHeaderGradStart, label: "Today"),
+            _LegendDot(color: colors.kHeaderGradStart, label: "Today"),
             const SizedBox(width: 12),
             _LegendDot(color: Colors.orange, label: "Yesterday"),
           ]),
@@ -964,13 +952,13 @@ class _TodayYesterdayChartCard extends StatelessWidget {
         touchTooltipData: LineTouchTooltipData(
           tooltipBgColor: Colors.white,
           tooltipRoundedRadius: 8,
-          tooltipBorder: const BorderSide(color: _kHeaderGradStart, width: 1),
+          tooltipBorder: const BorderSide(color: colors.kHeaderGradStart, width: 1),
           getTooltipItems: (spots) => spots.map((spot) {
             final label = spot.barIndex == 0 ? "Today" : "Yesterday";
             return LineTooltipItem(
               "$label\n₹${spot.y.toStringAsFixed(0)}",
               TextStyle(
-                color: spot.barIndex == 0 ? _kHeaderGradStart : Colors.orange,
+                color: spot.barIndex == 0 ? colors.kHeaderGradStart : Colors.orange,
                 fontWeight: FontWeight.bold,
                 fontSize: 11,
               ),
@@ -979,7 +967,7 @@ class _TodayYesterdayChartCard extends StatelessWidget {
         ),
       ),
       lineBarsData: [
-        _bar(today, _kHeaderGradStart),
+        _bar(today, colors.kHeaderGradStart),
         _bar(yesterday, Colors.orange),
       ],
     );
@@ -1128,7 +1116,7 @@ void showBillingBottomSheet(BuildContext context, List<dynamic> billingData) {
                             decoration: BoxDecoration(
                                 color: Colors.white.withOpacity(0.9),
                                 shape: BoxShape.circle),
-                            child: const Icon(Icons.receipt_long, color: _kOrange, size: 28),
+                            child: const Icon(Icons.receipt_long, color: colors.kOrange, size: 28),
                           ),
                           const SizedBox(width: 12),
                           Expanded(
@@ -1149,7 +1137,7 @@ void showBillingBottomSheet(BuildContext context, List<dynamic> billingData) {
                                   style: GoogleFonts.lato(
                                       fontSize: 14,
                                       fontWeight: FontWeight.bold,
-                                      color: _kOrange)),
+                                      color: colors.kOrange)),
                             ]),
                           ),
                           Container(
@@ -1157,7 +1145,7 @@ void showBillingBottomSheet(BuildContext context, List<dynamic> billingData) {
                             decoration: BoxDecoration(
                                 color: Colors.white.withOpacity(0.9),
                                 borderRadius: BorderRadius.circular(8)),
-                            child: const Icon(Icons.arrow_forward_ios, size: 16, color: _kOrange),
+                            child: const Icon(Icons.arrow_forward_ios, size: 16, color: colors.kOrange),
                           ),
                         ]),
                       ),

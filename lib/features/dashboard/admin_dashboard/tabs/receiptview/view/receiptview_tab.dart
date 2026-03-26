@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
-
 import '../../../../../../core/colors/colors.dart';
 import '../bloc/receiptview_bloc.dart';
 import '../bloc/receiptview_event.dart';
@@ -95,8 +94,6 @@ class ReceiptPage extends StatelessWidget {
     );
   }
 }
-
-// ─── Filter Card ──────────────────────────────────────────────────────────────
 class _FilterCard extends StatelessWidget {
   final ReceiptState state;
   final bool isTablet;
@@ -180,7 +177,6 @@ class _FilterCard extends StatelessWidget {
     );
   }
 }
-
 class _DateButton extends StatelessWidget {
   final String label;
   final IconData icon;
@@ -236,8 +232,6 @@ class _DateButton extends StatelessWidget {
     );
   }
 }
-
-// ─── Summary Card ─────────────────────────────────────────────────────────────
 class _SummaryCard extends StatelessWidget {
   final ReceiptState state;
   final bool isTablet;
@@ -296,7 +290,6 @@ class _SummaryCard extends StatelessWidget {
     );
   }
 }
-
 class _SummaryTile extends StatelessWidget {
   final String label;
   final String value;
@@ -361,8 +354,6 @@ class _SummaryTile extends StatelessWidget {
     );
   }
 }
-
-// ─── Stats Panel (Tablet only — right column bottom) ─────────────────────────
 class _StatsPanel extends StatelessWidget {
   final ReceiptState state;
   const _StatsPanel({required this.state});
@@ -539,8 +530,6 @@ class _StatsPanel extends StatelessWidget {
     );
   }
 }
-
-// ─── Receipt List ─────────────────────────────────────────────────────────────
 class _ReceiptList extends StatelessWidget {
   final ReceiptState state;
   final bool isTablet;
@@ -583,8 +572,6 @@ class _ReceiptList extends StatelessWidget {
     );
   }
 }
-
-// ─── Receipt Card ─────────────────────────────────────────────────────────────
 class _ReceiptCard extends StatelessWidget {
   final Map<String, dynamic> data;
   final bool isTablet;
@@ -689,25 +676,25 @@ class _ReceiptCard extends StatelessWidget {
                   label: 'Total',
                   amount: 'RM ${billAmount.toStringAsFixed(2)}',
                   color: kPrimary,
-                  bgColor: kAccent,
+                  bgColor: RWhite,
                   isTablet: isTablet,
                 ),
                 _AmountChip(
                   label: 'Collected',
                   amount: 'RM ${collected.toStringAsFixed(2)}',
-                  color: const Color(0xFF059669),
-                  bgColor: const Color(0xFFD1FAE5),
+                  color: kPrimary,
+                  bgColor: RWhite,
                   isTablet: isTablet,
                 ),
                 _AmountChip(
                   label: 'Balance',
                   amount: 'RM ${balance.toStringAsFixed(2)}',
                   color: balance > 0
-                      ? const Color(0xFFEA580C)
+                      ? const Color(0xFF740000)
                       : kPrimary,
                   bgColor: balance > 0
-                      ? const Color(0xFFFEE2E2)
-                      : kAccent,
+                      ? RWhite
+                      : RWhite,
                   isTablet: isTablet,
                 ),
               ],
@@ -718,8 +705,6 @@ class _ReceiptCard extends StatelessWidget {
     );
   }
 }
-
-// ─── Amount Chip ──────────────────────────────────────────────────────────────
 class _AmountChip extends StatelessWidget {
   final String label;
   final String amount;

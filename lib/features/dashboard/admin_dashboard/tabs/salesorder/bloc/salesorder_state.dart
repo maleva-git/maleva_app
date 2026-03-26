@@ -9,8 +9,6 @@ class InvoiceInitial extends SalesOrderState {}
 
 class InvoiceLoading extends SalesOrderState {}
 
-// Tab switch-ல் full loading screen வேண்டாம்
-// isTabSwitching = true → spinner இல்லாம existing UI காட்டு
 class InvoiceTabSwitching extends SalesOrderState {
   final InvoiceLoaded previous;
   final int targetTabIndex;
@@ -21,7 +19,7 @@ class InvoiceTabSwitching extends SalesOrderState {
   });
 
   @override
-  List<Object?> get props => [previous, targetTabIndex];
+  List<Object?> get props => [targetTabIndex]; // ← previous List compare தேவையில்ல
 }
 
 class InvoiceLoaded extends SalesOrderState {
@@ -49,18 +47,18 @@ class InvoiceLoaded extends SalesOrderState {
     this.selectedTabIndex = 0,
   });
 
+  // ─────────────────────────────────────────────────────────
+  // FIX: List<dynamic> deep compare தேவையில்ல — slow ஆகும்
+  // Simple primitive fields மட்டும் props-ல வை
+  // List changes → identical() மூலம் buildWhen-ல check பண்ணுவோம்
+  // ─────────────────────────────────────────────────────────
   @override
   List<Object?> get props => [
-    saleDataAll,
-    saleMonthData,
-    waitingBilling,
-    monthList,
-    monthData,
-    is6Months,
-    currentMonthName,
-    showWaitingSheet,
-    employeeData,
-    selectedTabIndex,
+    selectedTabIndex,  // int
+    is6Months,         // bool
+    showWaitingSheet,  // bool
+    currentMonthName,  // String
+    employeeData,      // nullable — dialog trigger-க்கு மட்டும்
   ];
 
   InvoiceLoaded copyWith({

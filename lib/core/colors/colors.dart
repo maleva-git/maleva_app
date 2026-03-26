@@ -48,12 +48,13 @@ const commonColorLight = Color(0xFF5B9BD5);
 const commonColorred = Color(0xffb30c0c);
 const spinKitColor = Color(0xff0e387a);
 
-const Color kPrimary = Color(0xFF1555F3);
+const Color kPrimary = Color(0xFF1A3A8F);
 const Color kPrimaryDark = Color(0xFF0D3DB5);
 const Color kPrimaryLight = Color(0xFF4D7EF7);
 const Color kAccent = Color(0xFFE8EEFF);
 const Color kWhite = Colors.white;
 const cBlue      = Color(0xFF1555F3);
+const RWhite      = Color(0x54E1E1E1);
 const cBlueDark  = Color(0xFF0D2A99);
 const cBlueLight = Color(0xFF3A7BFF);
 const cWhite     = Color(0xFFFFFFFF);
@@ -62,6 +63,30 @@ const cBorder    = Color(0xFFECEEF5);
 const cText      = Color(0xFF1A1D2E);
 const cSub       = Color(0xFFB0B4C8);
 const cRose      = Color(0xFFE11D48);
+
+// ── Screenshot color palette ────────────────────────────── Invoice color
+const kHeaderGradStart = Color(0xFF1A3A8F); // deep blue
+const kHeaderGradEnd   = Color(0xFF4A6FD4); // lighter blue
+const kCardBg          = Colors.white;
+const kPageBg          = Color(0xFFF4F6FB);
+const kPillBg          = Color(0x33FFFFFF); // translucent white pill
+const kGreen           = Color(0xFF27AE60);
+const kBlueAccent      = Color(0xFF2F80ED);
+const kBarBlue         = Color(0xFF3563E9);
+
+
+const kShadow = Color(0x0D000000);
+const kNavy   = Color(0xFF1A2E5A);
+const kBlue   = Color(0xFF5B9BD5);
+const kOrange = Color(0xFFE67E22);
+
+
+//Transport
+
+const kBlueDark = Color(0xFF0D3DB5);
+const kBlueL    = Color(0xFF4D7EF7);
+const kBlueBg   = Color(0xFFE8EEFF);
+
 
 enum Accent { blue, green, amber, purple, teal, rose }
 
@@ -92,7 +117,7 @@ class AppColors {
     begin: Alignment.topLeft,
     end: Alignment.bottomRight,
   );
-  static const Color appBarColor = Color(0xFF1555F3);
+  static const Color appBarColor = Color(0xFF1A3A8F);
   static const Color whitecolor = Color(0xFFFFFFFF);
 }
 

@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
-
 import '../bloc/forwardingreport_bloc.dart';
 import '../bloc/forwardingreport_event.dart';
 import '../bloc/forwardingreport_state.dart';
@@ -160,14 +159,14 @@ class _TitleBadge extends StatelessWidget {
         ),
         decoration: BoxDecoration(
           gradient: const LinearGradient(
-            colors: [colour.kPrimary, colour.kPrimaryLight],
+            colors: [colour.kHeaderGradStart, colour.kHeaderGradEnd],
             begin: Alignment.centerLeft,
             end: Alignment.centerRight,
           ),
           borderRadius: BorderRadius.circular(30),
           boxShadow: [
             BoxShadow(
-              color: colour.kPrimary.withOpacity(0.35),
+              color: colour.kHeaderGradStart.withOpacity(0.35),
               blurRadius: 12,
               offset: const Offset(0, 4),
             ),
@@ -210,7 +209,7 @@ class _SummaryCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(isTablet ? 20 : 16),
         boxShadow: [
           BoxShadow(
-            color: colour.kPrimary.withOpacity(0.10),
+            color: colour.kHeaderGradStart.withOpacity(0.10),
             blurRadius: 16,
             offset: const Offset(0, 4),
           ),
@@ -225,7 +224,7 @@ class _SummaryCard extends StatelessWidget {
           ),
           decoration: BoxDecoration(
             gradient: const LinearGradient(
-              colors: [colour.kPrimary, colour.kPrimaryLight],
+              colors: [colour.kHeaderGradStart, colour.kHeaderGradEnd],
             ),
             borderRadius: BorderRadius.only(
               topLeft:  Radius.circular(isTablet ? 20 : 16),

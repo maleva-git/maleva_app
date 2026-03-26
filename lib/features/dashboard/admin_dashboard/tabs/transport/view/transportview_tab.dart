@@ -9,11 +9,7 @@ import '../bloc/transport_event.dart';
 import '../bloc/transport_state.dart';
 
 // ─── Constants ─────────────────────────────────────────────────────────────────
-const _kBlue     = Color(0xFF1555F3);
-const _kBlueDark = Color(0xFF0D3DB5);
-const _kBlueL    = Color(0xFF4D7EF7);
-const _kBlueBg   = Color(0xFFE8EEFF);
-const _kBg       = Color(0xFFF4F6FF);
+
 
 // ─── Page ───────────────────────────────────────────────────────────────────────
 class TransportReportPage extends StatelessWidget {
@@ -43,7 +39,7 @@ class _TransportReportView extends StatelessWidget {
           objfun.msgshow(
             state.errorMessage, '',
             Colors.white,
-            _kBlue,
+            colour.kBlue,
             null,
             18.00 - objfun.reducesize,
             objfun.tll, objfun.tgc,
@@ -69,7 +65,7 @@ class _TransportReportView extends StatelessWidget {
             : <Map<String, dynamic>>[];
 
         return Container(
-          color: _kBg,
+          color: colour.kBg,
           child: isTablet
               ? _buildTabletLayout(
               context, isLoading, isPlanToday, transportList)
@@ -142,7 +138,7 @@ class _TransportReportView extends StatelessWidget {
                   child: isLoading
                       ? const Center(
                       child: CircularProgressIndicator(
-                          color: _kBlue))
+                          color: colour.kBlue))
                       : transportList.isEmpty
                       ? const _EmptyState(isTablet: true)
                       : ListView.builder(
@@ -210,7 +206,7 @@ class _TransportReportView extends StatelessWidget {
           const Padding(
             padding: EdgeInsets.only(top: 40),
             child: Center(
-                child: CircularProgressIndicator(color: _kBlue)),
+                child: CircularProgressIndicator(color: colour.kBlue)),
           )
         else if (transportList.isEmpty)
           const _EmptyState(isTablet: false)
@@ -251,7 +247,7 @@ class _TransportReportView extends StatelessWidget {
                 Container(
                   width: 4, height: 22,
                   decoration: BoxDecoration(
-                    color: _kBlue,
+                    color: colour.kBlue,
                     borderRadius: BorderRadius.circular(4),
                   ),
                 ),
@@ -262,18 +258,18 @@ class _TransportReportView extends StatelessWidget {
                     style: GoogleFonts.poppins(
                       fontSize: 14,
                       fontWeight: FontWeight.w700,
-                      color: _kBlueDark,
+                      color: colour.kHeaderGradStart,
                     ),
                   ),
                 ),
                 IconButton(
                   icon: const Icon(Icons.close_rounded,
-                      color: _kBlueL, size: 20),
+                      color: colour.kHeaderGradStart, size: 20),
                   onPressed: () => Navigator.pop(context),
                 ),
               ]),
               const SizedBox(height: 12),
-              const Divider(color: _kBlueBg),
+              const Divider(color: colour.kBlueBg),
               const SizedBox(height: 12),
               ConstrainedBox(
                 constraints: BoxConstraints(
@@ -297,7 +293,7 @@ class _TransportReportView extends StatelessWidget {
                               child: Text(e.key,
                                   style: GoogleFonts.poppins(
                                     fontSize: 11,
-                                    color: _kBlueL,
+                                    color: colour.kHeaderGradStart,
                                     fontWeight: FontWeight.w500,
                                   )),
                             ),
@@ -308,7 +304,7 @@ class _TransportReportView extends StatelessWidget {
                                   style: GoogleFonts.poppins(
                                     fontSize: 11,
                                     fontWeight: FontWeight.w600,
-                                    color: _kBlueDark,
+                                    color: colour.kHeaderGradStart,
                                   )),
                             ),
                           ],
@@ -340,7 +336,7 @@ class _SectionHeader extends StatelessWidget {
         width: 4,
         height: isTablet ? 30 : 26,
         decoration: BoxDecoration(
-          color: _kBlue,
+          color: colour.kBlue,
           borderRadius: BorderRadius.circular(4),
         ),
       ),
@@ -350,7 +346,7 @@ class _SectionHeader extends StatelessWidget {
         style: GoogleFonts.poppins(
           fontSize:      isTablet ? 20 : 17,
           fontWeight:    FontWeight.w700,
-          color:         _kBlueDark,
+          color:         colour.kHeaderGradStart,
           letterSpacing: 1.2,
         ),
       ),
@@ -370,14 +366,14 @@ class _CountBadge extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
       decoration: BoxDecoration(
         gradient: const LinearGradient(
-          colors: [_kBlue, _kBlueDark],
+          colors: [colour.kBlue, colour.kHeaderGradStart],
           begin: Alignment.topLeft,
           end:   Alignment.bottomRight,
         ),
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color:     _kBlue.withOpacity(0.30),
+            color:     colour.kBlue.withOpacity(0.30),
             blurRadius: 16,
             offset:    const Offset(0, 6),
           ),
@@ -432,7 +428,7 @@ class _DayToggle extends StatelessWidget {
     return Container(
       height: isTablet ? 52 : 44,
       decoration: BoxDecoration(
-        color:         _kBlueBg,
+        color:         colour.kBlueBg,
         borderRadius: BorderRadius.circular(isTablet ? 16 : 14),
       ),
       child: Row(children: [
@@ -473,12 +469,12 @@ class _ToggleTab extends StatelessWidget {
           duration: const Duration(milliseconds: 200),
           margin:   const EdgeInsets.all(4),
           decoration: BoxDecoration(
-            color: isActive ? _kBlue : Colors.transparent,
+            color: isActive ? colour.kHeaderGradStart : Colors.transparent,
             borderRadius: BorderRadius.circular(10),
             boxShadow: isActive
                 ? [
               BoxShadow(
-                color:     _kBlue.withOpacity(0.3),
+                color:     colour.kHeaderGradStart.withOpacity(0.3),
                 blurRadius: 8,
                 offset:    const Offset(0, 3),
               )
@@ -491,7 +487,7 @@ class _ToggleTab extends StatelessWidget {
             style: GoogleFonts.poppins(
               fontSize:   isTablet ? 14 : 13,
               fontWeight: FontWeight.w600,
-              color:      isActive ? Colors.white : _kBlueL,
+              color:      isActive ? Colors.white : colour.kBlueL,
             ),
           ),
         ),
@@ -514,7 +510,7 @@ class _ListHeader extends StatelessWidget {
       ),
       decoration: BoxDecoration(
         gradient: const LinearGradient(
-          colors: [_kBlue, _kBlueDark],
+          colors: [colour.kHeaderGradStart, colour.kHeaderGradStart],
           begin: Alignment.centerLeft,
           end:   Alignment.centerRight,
         ),
@@ -567,13 +563,13 @@ class _TransportCard extends StatelessWidget {
     return Padding(
       padding: EdgeInsets.only(bottom: isTablet ? 10 : 8),
       child: Material(
-        color: isEven ? Colors.white : _kBlueBg,
+        color: isEven ? Colors.white : colour.kBlueBg,
         borderRadius: BorderRadius.circular(isTablet ? 16 : 14),
         child: InkWell(
           onTap:        onTap,
           onLongPress:  onLongPress,
           borderRadius: BorderRadius.circular(isTablet ? 16 : 14),
-          splashColor:  _kBlue.withOpacity(0.08),
+          splashColor:  colour.kBlue.withOpacity(0.08),
           child: Container(
             padding: EdgeInsets.symmetric(
               horizontal: isTablet ? 18 : 14,
@@ -584,14 +580,14 @@ class _TransportCard extends StatelessWidget {
               BorderRadius.circular(isTablet ? 16 : 14),
               border: Border.all(
                 color: isEven
-                    ? _kBlueBg
-                    : _kBlueL.withOpacity(0.3),
+                    ? colour.kBlueBg
+                    : colour.kBlueL.withOpacity(0.3),
                 width: 1.2,
               ),
               boxShadow: isEven
                   ? [
                 BoxShadow(
-                  color:     _kBlue.withOpacity(0.05),
+                  color:     colour.kBlue.withOpacity(0.05),
                   blurRadius: 6,
                   offset:    const Offset(0, 2),
                 )
@@ -605,8 +601,8 @@ class _TransportCard extends StatelessWidget {
                 height: isTablet ? 32 : 28,
                 decoration: BoxDecoration(
                   color: isEven
-                      ? _kBlueBg
-                      : _kBlue.withOpacity(0.12),
+                      ? colour.kBlueBg
+                      : colour.kBlue.withOpacity(0.12),
                   borderRadius:
                   BorderRadius.circular(isTablet ? 10 : 8),
                 ),
@@ -616,7 +612,7 @@ class _TransportCard extends StatelessWidget {
                   style: GoogleFonts.poppins(
                       fontSize:   isTablet ? 12 : 11,
                       fontWeight: FontWeight.w700,
-                      color:      _kBlue),
+                      color:      colour.kBlue),
                 ),
               ),
               const SizedBox(width: 10),
@@ -630,13 +626,13 @@ class _TransportCard extends StatelessWidget {
                   style: GoogleFonts.poppins(
                       fontSize:   isTablet ? 14 : 13,
                       fontWeight: FontWeight.w600,
-                      color:      _kBlueDark),
+                      color:      colour.kHeaderGradStart),
                 ),
               ),
 
               // Arrow
               Icon(Icons.chevron_right_rounded,
-                  color: _kBlueL,
+                  color: colour.kBlueL,
                   size:  isTablet ? 22 : 18),
             ]),
           ),
@@ -659,23 +655,23 @@ class _EmptyState extends StatelessWidget {
         Container(
           padding: EdgeInsets.all(isTablet ? 24 : 20),
           decoration: const BoxDecoration(
-              color: _kBlueBg, shape: BoxShape.circle),
+              color: colour.kBlueBg, shape: BoxShape.circle),
           child: Icon(Icons.local_shipping_outlined,
               size:  isTablet ? 48 : 40,
-              color: _kBlue),
+              color: colour.kBlue),
         ),
         SizedBox(height: isTablet ? 20 : 16),
         Text('No Transport Found',
             style: GoogleFonts.poppins(
               fontSize:   isTablet ? 17 : 15,
               fontWeight: FontWeight.w700,
-              color:      _kBlueDark,
+              color:      colour.kHeaderGradStart,
             )),
         SizedBox(height: isTablet ? 8 : 6),
         Text('No data available for the selected date.',
             style: GoogleFonts.poppins(
                 fontSize: isTablet ? 13 : 12,
-                color:    _kBlueL)),
+                color:    colour.kBlueL)),
       ]),
     );
   }
