@@ -132,3 +132,11 @@ const kSubText   = Color(0xFFB0B4C8);
 const kFieldText = Color(0xFF6B7094);
 
 
+//Planning
+const Color kSurface2  = Color(0xFFF1F5F9);
+const Color kGold      = Color(0xFFD97706);
+const Color kCobalt    = Color(0xFF3B82F6);
+const Color kSuccess   = Color(0xFF059669);
+const Color kDanger    = Color(0xFFDC2626);
+const Color kTextMuted = Color(0xFF475569);
+const Color kTextDim   = Color(0xFF94A3B8);

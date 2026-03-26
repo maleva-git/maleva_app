@@ -1,8 +1,3 @@
-// ════════════════════════════════════════════════════════════════════
-//  planning_view.dart  —  Maleva Logistics Elite UI
-//  BLoC pattern | Dark luxury theme
-// ════════════════════════════════════════════════════════════════════
-
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -13,7 +8,6 @@ import 'package:maleva/core/network/OnlineApi.dart' as OnlineApi;
 import 'package:maleva/MasterSearch/Employee.dart';
 import 'package:maleva/core/models/model.dart';
 import 'package:maleva/Transaction/Planning/PlanningDetails.dart';
-import 'package:maleva/DashBoard/Admin/AdminDashboard.dart';
 import 'package:maleva/DashBoard/CustomerService/CustDashboard.dart';
 import 'package:maleva/DashBoard/TransportDB/TransportDashboard.dart';
 import 'package:maleva/DashBoard/OperationAdmin/OperationAdminDashboard.dart';
@@ -22,30 +16,14 @@ import '../../../dashboard/admin_dashboard/view/admin_dashboard.dart';
 import '../bloc/planning_bloc.dart';
 import '../bloc/planning_event.dart';
 import '../bloc/planning_state.dart';
-
 import 'package:maleva/core/colors/colors.dart' as colour;
-const Color _kBg        = Color(0xFFF8FAFC); // Light greyish-white for main background
-const Color _kSurface   = Color(0xFFFFFFFF); // Pure white for cards, sheets, etc.
-const Color _kSurface2  = Color(0xFFF1F5F9); // Very light grey for secondary surfaces/hover
-const Color _kBorder    = Color(0xFFE2E8F0); // Soft grey for subtle borders
-
-// Accents & Status Colors (Kept vibrant for light theme)
-const Color _kGold      = Color(0xFFD97706); // Slightly darker gold for better readability on white
-const Color _kCobalt    = Color(0xFF3B82F6); // Standard blue accent
-const Color _kSuccess   = Color(0xFF059669); // Slightly darker green
-const Color _kDanger    = Color(0xFFDC2626); // Slightly darker red
-
-// Text Colors (Changed to Dark for White Background)
-const Color _kText      = Color(0xFF0F172A); // Very dark blue/grey for main text
-const Color _kTextMuted = Color(0xFF475569); // Medium grey for subtitles
-const Color _kTextDim   = Color(0xFF94A3B8);
 
 TextStyle _body(double size,
-    {Color color = _kText, FontWeight fw = FontWeight.normal}) =>
+    {Color color = colour.kText, FontWeight fw = FontWeight.normal}) =>
     GoogleFonts.dmSans(fontSize: size, color: color, fontWeight: fw);
 
 TextStyle _label(double size,
-    {Color color = _kTextDim, FontWeight fw = FontWeight.w600}) =>
+    {Color color = colour.kTextDim, FontWeight fw = FontWeight.w600}) =>
     GoogleFonts.dmSans(fontSize: size, color: color, fontWeight: fw);
 
 class PlanningView extends StatelessWidget {
@@ -109,7 +87,7 @@ class _PlanningScaffold extends StatelessWidget {
           return false;
         },
         child: Scaffold(
-          backgroundColor: _kBg,
+          backgroundColor: colour.kBg,
           appBar: _buildAppBar(context, userName),
           drawer: const Menulist(),
           body: BlocBuilder<PlanningBloc, PlanningState>(
@@ -149,11 +127,11 @@ class _PlanningScaffold extends StatelessWidget {
   PreferredSizeWidget _buildAppBar(
       BuildContext context, String userName) {
     return AppBar(
-      backgroundColor: _kSurface,
+      backgroundColor: colour.kSurface,
       elevation: 0,
       leading: IconButton(
         icon: const Icon(Icons.arrow_back_ios_new_rounded,
-            color: _kTextDim, size: 20),
+            color: colour.kTextDim, size: 20),
         onPressed: () => _onBackPressed(context),
       ),
       title: Column(
@@ -162,10 +140,10 @@ class _PlanningScaffold extends StatelessWidget {
           Text('Planning',
               style: GoogleFonts.dmSerifDisplay(
                   fontSize: 18,
-                  color: _kText,
+                  color: colour.kText,
                   fontWeight: FontWeight.bold)),
           Text(userName,
-              style: _label(11, color: _kTextMuted)),
+              style: _label(11, color: colour.kTextMuted)),
         ],
       ),
       bottom: PreferredSize(
@@ -175,7 +153,7 @@ class _PlanningScaffold extends StatelessWidget {
           decoration: BoxDecoration(
             gradient: LinearGradient(colors: [
               Colors.transparent,
-              _kGold.withOpacity(0.4),
+              colour.kGold.withOpacity(0.4),
               Colors.transparent,
             ]),
           ),
@@ -248,12 +226,12 @@ class _PlanningCard extends StatelessWidget {
     return Container(
       margin: EdgeInsets.only(bottom: isTablet ? 14 : 12),
       decoration: BoxDecoration(
-        color: _kSurface,
+        color: colour.kSurface,
         borderRadius: BorderRadius.circular(isTablet ? 22 : 18),
         border: Border.all(
           color: isExpanded
-              ? _kGold.withOpacity(0.4)
-              : _kBorder,
+              ? colour.kGold.withOpacity(0.4)
+              : colour.kBorder,
           width: 1,
         ),
         boxShadow: [
@@ -264,7 +242,7 @@ class _PlanningCard extends StatelessWidget {
           ),
           if (isExpanded)
             BoxShadow(
-              color: _kGold.withOpacity(0.06),
+              color: colour.kGold.withOpacity(0.06),
               blurRadius: 20,
             ),
         ],
@@ -283,8 +261,8 @@ class _PlanningCard extends StatelessWidget {
                     decoration: BoxDecoration(
                       gradient: LinearGradient(
                         colors: isExpanded
-                            ? [_kGold, _kGold.withOpacity(0.3)]
-                            : [_kCobalt, _kCobalt.withOpacity(0.2)],
+                            ? [colour.kGold, colour.kGold.withOpacity(0.3)]
+                            : [colour.kCobalt, colour.kCobalt.withOpacity(0.2)],
                         begin: Alignment.topCenter,
                         end: Alignment.bottomCenter,
                       ),
@@ -306,22 +284,22 @@ class _PlanningCard extends StatelessWidget {
                                   padding: const EdgeInsets.symmetric(
                                       horizontal: 10, vertical: 4),
                                   decoration: BoxDecoration(
-                                    color: _kCobalt.withOpacity(0.12),
+                                    color: colour.kCobalt.withOpacity(0.12),
                                     borderRadius: BorderRadius.circular(8),
                                     border: Border.all(
-                                        color: _kCobalt.withOpacity(0.3)),
+                                        color: colour.kCobalt.withOpacity(0.3)),
                                   ),
                                   child: Text(
                                     master.PLANINGNoDisplay,
                                     style: _body(isTablet ? 13 : 12,
-                                        color: _kCobalt,
+                                        color: colour.kCobalt,
                                         fw: FontWeight.w700),
                                   ),
                                 ),
                                 const SizedBox(width: 10),
                                 Row(children: [
                                   const Icon(Icons.calendar_today_rounded,
-                                      size: 12, color: _kTextMuted),
+                                      size: 12, color: colour.kTextMuted),
                                   const SizedBox(width: 5),
                                   Text(
                                     master.PLANINGDate.toString(),
@@ -335,7 +313,7 @@ class _PlanningCard extends StatelessWidget {
                               const SizedBox(height: 8),
                               Row(children: [
                                 const Icon(Icons.notes_rounded,
-                                    size: 12, color: _kTextMuted),
+                                    size: 12, color: colour.kTextMuted),
                                 const SizedBox(width: 5),
                                 Expanded(
                                   child: Text(
@@ -355,7 +333,7 @@ class _PlanningCard extends StatelessWidget {
                                     ? Icons.keyboard_arrow_up_rounded
                                     : Icons.keyboard_arrow_down_rounded,
                                 label: isExpanded ? 'Hide' : 'Details',
-                                color: isExpanded ? _kGold : _kCobalt,
+                                color: isExpanded ? colour.kGold : colour.kCobalt,
                                 onTap: () => context
                                     .read<PlanningBloc>()
                                     .add(TogglePlanningExpand(
@@ -368,7 +346,7 @@ class _PlanningCard extends StatelessWidget {
                               _ActionBtn(
                                 icon: Icons.picture_as_pdf_outlined,
                                 label: 'Export',
-                                color: _kDanger,
+                                color: colour.kDanger,
                                 onTap: () => context
                                     .read<PlanningBloc>()
                                     .add(SharePlanningPdfEvent(
@@ -385,7 +363,7 @@ class _PlanningCard extends StatelessWidget {
                                   height: 14,
                                   child: CircularProgressIndicator(
                                     strokeWidth: 2,
-                                    color: _kGold,
+                                    color: colour.kGold,
                                   ),
                                 ),
                               ]
@@ -401,7 +379,7 @@ class _PlanningCard extends StatelessWidget {
 
             // ── Expanded Details Section ──
             if (isExpanded) ...[
-              Container(height: 1, color: _kBorder),
+              Container(height: 1, color: colour.kBorder),
               _DetailsSection(
                   details: details, isTablet: isTablet),
             ],
@@ -452,13 +430,13 @@ class _DetailsSection extends StatelessWidget {
         padding: const EdgeInsets.all(20),
         child: Center(
           child: Text('No job records',
-              style: _label(13, color: _kTextMuted)),
+              style: _label(13, color: colour.kTextMuted)),
         ),
       );
     }
 
     return Container(
-      color: _kSurface2,
+      color: colour.kSurface2,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -470,26 +448,26 @@ class _DetailsSection extends StatelessWidget {
                 width: 3,
                 height: 14,
                 decoration: BoxDecoration(
-                  color: _kGold,
+                  color: colour.kGold,
                   borderRadius: BorderRadius.circular(4),
                 ),
               ),
               const SizedBox(width: 8),
               Text('Job Details',
                   style: _body(12,
-                      color: _kGold, fw: FontWeight.w700)),
+                      color: colour.kGold, fw: FontWeight.w700)),
               const SizedBox(width: 8),
               Container(
                 padding: const EdgeInsets.symmetric(
                     horizontal: 8, vertical: 2),
                 decoration: BoxDecoration(
-                  color: _kGold.withOpacity(0.1),
+                  color: colour.kGold.withOpacity(0.1),
                   borderRadius: BorderRadius.circular(10),
                   border:
-                  Border.all(color: _kGold.withOpacity(0.3)),
+                  Border.all(color: colour.kGold.withOpacity(0.3)),
                 ),
                 child: Text('${details.length}',
-                    style: _label(11, color: _kGold)),
+                    style: _label(11, color: colour.kGold)),
               ),
             ]),
           ),
@@ -501,19 +479,19 @@ class _DetailsSection extends StatelessWidget {
                   flex: 2,
                   child: Text('Job No',
                       style: _label(10,
-                          color: _kTextMuted,
+                          color: colour.kTextMuted,
                           fw: FontWeight.w700))),
               Expanded(
                   flex: 2,
                   child: Text('Job Date',
                       style: _label(10,
-                          color: _kTextMuted,
+                          color: colour.kTextMuted,
                           fw: FontWeight.w700))),
               Expanded(
                   flex: 2,
                   child: Text('Truck',
                       style: _label(10,
-                          color: _kTextMuted,
+                          color: colour.kTextMuted,
                           fw: FontWeight.w700))),
             ]),
           ),
@@ -538,9 +516,9 @@ class _DetailRow extends StatelessWidget {
       margin: const EdgeInsets.fromLTRB(12, 0, 12, 8),
       padding: EdgeInsets.all(isTablet ? 14 : 12),
       decoration: BoxDecoration(
-        color: _kSurface,
+        color: colour.kSurface,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: _kBorder),
+        border: Border.all(color: colour.kBorder),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -551,7 +529,7 @@ class _DetailRow extends StatelessWidget {
               child: Text(
                 '${item["JobNo"]}',
                 style: _body(isTablet ? 12 : 11,
-                    color: _kCobalt, fw: FontWeight.w700),
+                    color: colour.kCobalt, fw: FontWeight.w700),
                 overflow: TextOverflow.ellipsis,
               ),
             ),
@@ -568,7 +546,7 @@ class _DetailRow extends StatelessWidget {
               child: Text(
                 '${item["TruckName"]}',
                 style: _body(isTablet ? 12 : 11,
-                    color: _kSuccess, fw: FontWeight.w600),
+                    color: colour.kSuccess, fw: FontWeight.w600),
                 overflow: TextOverflow.ellipsis,
               ),
             ),
@@ -577,13 +555,13 @@ class _DetailRow extends StatelessWidget {
             const SizedBox(height: 6),
             Row(children: [
               const Icon(Icons.notes_rounded,
-                  size: 11, color: _kTextMuted),
+                  size: 11, color: colour.kTextMuted),
               const SizedBox(width: 4),
               Expanded(
                 child: Text(
                   '${item["Remarks"]}',
                   style: _label(isTablet ? 11 : 10,
-                      color: _kTextMuted),
+                      color: colour.kTextMuted),
                   overflow: TextOverflow.ellipsis,
                 ),
               ),
@@ -601,9 +579,9 @@ class _FilterFab extends StatelessWidget {
     return FloatingActionButton.extended(
       onPressed: () => _showFilterSheet(context),
       backgroundColor: colour.kHeaderGradStart,
-      icon: const Icon(Icons.tune_rounded, color: _kBg, size: 20),
+      icon: const Icon(Icons.tune_rounded, color: colour.kBg, size: 20),
       label: Text('Filter',
-          style: _body(13, color: _kBg, fw: FontWeight.w700)),
+          style: _body(13, color: colour.kBg, fw: FontWeight.w700)),
     );
   }
 
@@ -633,11 +611,11 @@ class _FilterFab extends StatelessWidget {
         builder: (_, setSheetState) {
           return Container(
             decoration: const BoxDecoration(
-              color: _kSurface,
+              color: colour.kSurface,
               borderRadius:
               BorderRadius.vertical(top: Radius.circular(28)),
               border: Border(
-                  top: BorderSide(color: _kBorder, width: 1)),
+                  top: BorderSide(color: colour.kBorder, width: 1)),
             ),
             padding: EdgeInsets.only(
               top: 20,
@@ -656,7 +634,7 @@ class _FilterFab extends StatelessWidget {
                       width: 40,
                       height: 4,
                       decoration: BoxDecoration(
-                        color: _kBorder,
+                        color: colour.kBorder,
                         borderRadius: BorderRadius.circular(4),
                       ),
                     ),
@@ -669,7 +647,7 @@ class _FilterFab extends StatelessWidget {
                       height: 18,
                       decoration: BoxDecoration(
                         gradient: const LinearGradient(
-                          colors: [colour.kHeaderGradStart, _kCobalt],
+                          colors: [colour.kHeaderGradStart, colour.kCobalt],
                           begin: Alignment.topCenter,
                           end: Alignment.bottomCenter,
                         ),
@@ -680,7 +658,7 @@ class _FilterFab extends StatelessWidget {
                     Text('Filter Planning',
                         style: GoogleFonts.dmSerifDisplay(
                             fontSize: 18,
-                            color: _kText)),
+                            color: colour.kText)),
                   ]),
 
                   const SizedBox(height: 20),
@@ -718,8 +696,8 @@ class _FilterFab extends StatelessWidget {
                           ? Icons.close_rounded
                           : Icons.search_rounded,
                       color: checkLoggedEmp
-                          ? _kTextMuted
-                          : _kCobalt,
+                          ? colour.kTextMuted
+                          : colour.kCobalt,
                     ),
                     onSuffixTap: checkLoggedEmp
                         ? null
@@ -770,9 +748,9 @@ class _FilterFab extends StatelessWidget {
                     padding: const EdgeInsets.symmetric(
                         horizontal: 14, vertical: 10),
                     decoration: BoxDecoration(
-                      color: _kSurface2,
+                      color: colour.kSurface2,
                       borderRadius: BorderRadius.circular(12),
-                      border: Border.all(color: _kBorder),
+                      border: Border.all(color: colour.kBorder),
                     ),
                     child: Row(children: [
                       SizedBox(
@@ -781,9 +759,9 @@ class _FilterFab extends StatelessWidget {
                         child: Checkbox(
                           value: checkLoggedEmp,
                           activeColor: colour.kHeaderGradStart,
-                          checkColor: _kBg,
+                          checkColor: colour.kBg,
                           side: const BorderSide(
-                              color: _kTextMuted, width: 1.5),
+                              color: colour.kTextMuted, width: 1.5),
                           shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(4)),
                           onChanged: (v) => setSheetState(
@@ -793,7 +771,7 @@ class _FilterFab extends StatelessWidget {
                       const SizedBox(width: 10),
                       Text('Logged-in Employee',
                           style: _body(13,
-                              color: _kTextDim,
+                              color: colour.kTextDim,
                               fw: FontWeight.w500)),
                     ]),
                   ),
@@ -827,7 +805,7 @@ class _FilterFab extends StatelessWidget {
                         ),
                         child: Text('View',
                             style: _body(14,
-                                color: _kBg,
+                                color: colour.kBg,
                                 fw: FontWeight.w700)),
                       ),
                     ),
@@ -836,8 +814,8 @@ class _FilterFab extends StatelessWidget {
                       child: OutlinedButton(
                         onPressed: () => Navigator.pop(sheetCtx),
                         style: OutlinedButton.styleFrom(
-                          foregroundColor: _kTextDim,
-                          side: const BorderSide(color: _kBorder),
+                          foregroundColor: colour.kTextDim,
+                          side: const BorderSide(color: colour.kBorder),
                           padding: const EdgeInsets.symmetric(
                               vertical: 14),
                           shape: RoundedRectangleBorder(
@@ -846,7 +824,7 @@ class _FilterFab extends StatelessWidget {
                         ),
                         child: Text('Close',
                             style: _body(14,
-                                color: _kTextDim,
+                                color: colour.kTextDim,
                                 fw: FontWeight.w600)),
                       ),
                     ),
@@ -883,7 +861,7 @@ class _PasswordDialogState extends State<_PasswordDialog> {
   @override
   Widget build(BuildContext context) {
     return Dialog(
-      backgroundColor: _kSurface,
+      backgroundColor: colour.kSurface,
       shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(20)),
       child: Padding(
@@ -906,10 +884,10 @@ class _PasswordDialogState extends State<_PasswordDialog> {
             const SizedBox(height: 16),
             Text('Edit Password',
                 style: GoogleFonts.dmSerifDisplay(
-                    fontSize: 18, color: _kText)),
+                    fontSize: 18, color: colour.kText)),
             const SizedBox(height: 4),
             Text('Enter password to edit this planning',
-                style: _label(12, color: _kTextMuted)),
+                style: _label(12, color: colour.kTextMuted)),
             const SizedBox(height: 20),
             // Password field
             TextField(
@@ -917,19 +895,19 @@ class _PasswordDialogState extends State<_PasswordDialog> {
               autofocus: true,
               obscureText: true,
               textCapitalization: TextCapitalization.characters,
-              style: _body(14, color: _kText, fw: FontWeight.w600),
+              style: _body(14, color: colour.kText, fw: FontWeight.w600),
               decoration: InputDecoration(
                 hintText: 'Enter password',
                 hintStyle: _label(13),
                 filled: true,
-                fillColor: _kSurface2,
+                fillColor: colour.kSurface2,
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12),
-                  borderSide: const BorderSide(color: _kBorder),
+                  borderSide: const BorderSide(color: colour.kBorder),
                 ),
                 enabledBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12),
-                  borderSide: const BorderSide(color: _kBorder),
+                  borderSide: const BorderSide(color: colour.kBorder),
                 ),
                 focusedBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12),
@@ -969,12 +947,12 @@ class _PasswordDialogState extends State<_PasswordDialog> {
                     height: 18,
                     child: CircularProgressIndicator(
                       strokeWidth: 2,
-                      color: _kBg,
+                      color: colour.kBg,
                     ),
                   )
                       : Text('Confirm',
                       style: _body(14,
-                          color: _kBg, fw: FontWeight.w700)),
+                          color: colour.kBg, fw: FontWeight.w700)),
                 ),
               ),
               const SizedBox(width: 10),
@@ -982,15 +960,15 @@ class _PasswordDialogState extends State<_PasswordDialog> {
                 child: OutlinedButton(
                   onPressed: () => Navigator.pop(context),
                   style: OutlinedButton.styleFrom(
-                    foregroundColor: _kTextDim,
-                    side: const BorderSide(color: _kBorder),
+                    foregroundColor: colour.kTextDim,
+                    side: const BorderSide(color: colour.kBorder),
                     padding: const EdgeInsets.symmetric(vertical: 13),
                     shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12)),
                   ),
                   child: Text('Cancel',
                       style: _body(14,
-                          color: _kTextDim,
+                          color: colour.kTextDim,
                           fw: FontWeight.w600)),
                 ),
               ),
@@ -1065,9 +1043,9 @@ class _SheetDateBtn extends StatelessWidget {
             data: ThemeData.dark().copyWith(
               colorScheme: const ColorScheme.dark(
                 primary: colour.kHeaderGradStart,
-                onPrimary: _kBg,
-                surface: _kSurface,
-                onSurface: _kText,
+                onPrimary: colour.kBg,
+                surface: colour.kSurface,
+                onSurface: colour.kText,
               ),
             ),
             child: child!,
@@ -1081,9 +1059,9 @@ class _SheetDateBtn extends StatelessWidget {
         padding: const EdgeInsets.symmetric(
             horizontal: 14, vertical: 12),
         decoration: BoxDecoration(
-          color: _kSurface2,
+          color: colour.kSurface2,
           borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: _kBorder),
+          border: Border.all(color: colour.kBorder),
         ),
         child: Row(children: [
           const Icon(Icons.calendar_today_rounded,
@@ -1092,10 +1070,10 @@ class _SheetDateBtn extends StatelessWidget {
           Column(crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(label,
-                    style: _label(9, color: _kTextMuted)),
+                    style: _label(9, color: colour.kTextMuted)),
                 Text(displayDate,
                     style: _body(12,
-                        color: _kText, fw: FontWeight.w600)),
+                        color: colour.kText, fw: FontWeight.w600)),
               ]),
         ]),
       ),
@@ -1126,24 +1104,24 @@ class _SheetTextField extends StatelessWidget {
       controller: controller,
       readOnly: readOnly,
       textCapitalization: textCapitalization,
-      style: _body(13, color: _kText, fw: FontWeight.w600),
+      style: _body(13, color: colour.kText, fw: FontWeight.w600),
       decoration: InputDecoration(
         hintText: hint,
         hintStyle: _label(13),
         filled: true,
-        fillColor: _kSurface2,
+        fillColor: colour.kSurface2,
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: const BorderSide(color: _kBorder),
+          borderSide: const BorderSide(color: colour.kBorder),
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: const BorderSide(color: _kBorder),
+          borderSide: const BorderSide(color: colour.kBorder),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
           borderSide:
-          const BorderSide(color: _kCobalt, width: 1.5),
+          const BorderSide(color: colour.kCobalt, width: 1.5),
         ),
         suffixIcon: suffixIcon != null
             ? GestureDetector(
@@ -1206,7 +1184,7 @@ class _FullScreenLoaderState extends State<_FullScreenLoader>
             ),
             const SizedBox(height: 16),
             Text('Loading Planning...',
-                style: _label(13, color: _kTextMuted)),
+                style: _label(13, color: colour.kTextMuted)),
           ],
         ),
       ),
@@ -1224,20 +1202,20 @@ class _EmptyView extends StatelessWidget {
         Container(
           padding: const EdgeInsets.all(20),
           decoration: BoxDecoration(
-            color: _kSurface,
+            color: colour.kSurface,
             shape: BoxShape.circle,
-            border: Border.all(color: _kBorder),
+            border: Border.all(color: colour.kBorder),
           ),
           child: const Icon(Icons.inbox_rounded,
-              color: _kTextMuted, size: 36),
+              color: colour.kTextMuted, size: 36),
         ),
         const SizedBox(height: 14),
         Text('No Planning Records',
             style:
-            GoogleFonts.dmSerifDisplay(fontSize: 18, color: _kText)),
+            GoogleFonts.dmSerifDisplay(fontSize: 18, color: colour.kText)),
         const SizedBox(height: 6),
         Text('Try adjusting your filter',
-            style: _label(13, color: _kTextMuted)),
+            style: _label(13, color: colour.kTextMuted)),
       ]),
     );
   }
@@ -1257,35 +1235,35 @@ class _ErrorView extends StatelessWidget {
           Container(
             padding: const EdgeInsets.all(18),
             decoration: BoxDecoration(
-              color: _kDanger.withOpacity(0.1),
+              color: colour.kDanger.withOpacity(0.1),
               shape: BoxShape.circle,
-              border: Border.all(color: _kDanger.withOpacity(0.3)),
+              border: Border.all(color: colour.kDanger.withOpacity(0.3)),
             ),
             child: const Icon(Icons.error_outline_rounded,
-                color: _kDanger, size: 32),
+                color: colour.kDanger, size: 32),
           ),
           const SizedBox(height: 14),
           Text('Something went wrong',
               style: GoogleFonts.dmSerifDisplay(
-                  fontSize: 18, color: _kText)),
+                  fontSize: 18, color: colour.kText)),
           const SizedBox(height: 8),
           Text(message,
-              style: _label(12, color: _kTextMuted),
+              style: _label(12, color: colour.kTextMuted),
               textAlign: TextAlign.center),
           const SizedBox(height: 20),
           ElevatedButton.icon(
             onPressed: onRetry,
             style: ElevatedButton.styleFrom(
-              backgroundColor: _kCobalt,
+              backgroundColor: colour.kCobalt,
               padding: const EdgeInsets.symmetric(
                   horizontal: 24, vertical: 12),
               shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12)),
             ),
             icon: const Icon(Icons.refresh_rounded,
-                color: _kText, size: 18),
+                color: colour.kText, size: 18),
             label: Text('Retry',
-                style: _body(14, color: _kText, fw: FontWeight.w600)),
+                style: _body(14, color: colour.kText, fw: FontWeight.w600)),
           ),
         ]),
       ),

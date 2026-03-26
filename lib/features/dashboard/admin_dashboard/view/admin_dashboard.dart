@@ -77,7 +77,7 @@ import '../tabs/truck/view/truckview_tab.dart';
 import '../tabs/vesselreport/bloc/vesselreport_bloc.dart';
 import '../tabs/vesselreport/bloc/vesselreport_event.dart';
 import '../tabs/vesselreport/view/vesselreportview_tab.dart';
-import 'admin_dashboard_uiI.dart';
+import 'admin_dashboard_ui.dart';
 
 class NewAdminDashboard extends StatefulWidget{
   const NewAdminDashboard({super.key});
