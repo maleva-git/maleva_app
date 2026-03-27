@@ -6,7 +6,9 @@ class SalesDashboardBloc extends Bloc<SalesDashboardEvent, SalesDashboardState> 
 
   SalesDashboardBloc() : super(SalesDashboardState(index: 0)) {
     on<TabChanged>((event, emit){
-      emit(SalesDashboardState(index: event.index));
+      if (state.index != event.index) {
+        emit(SalesDashboardState(index: event.index));
+      }
     });
   }
 

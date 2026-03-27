@@ -1,7 +1,6 @@
 import 'dart:io';
 import 'dart:ui';
 import 'package:firebase_core/firebase_core.dart';
-// import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -9,10 +8,8 @@ import 'package:maleva/core/theme/my_behaviour.dart';
 import 'package:maleva/core/firebase/local_notification_service.dart';
 import 'package:maleva/core/utils/clsfunction.dart' as objfun;
 import 'package:maleva/core/firebase/firebase_options.dart';
-// import 'package:karkuvelayyanar/dbhelper.dart';
 import 'package:maleva/splash/splashscreen.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:bluetooth_print_plus/bluetooth_print_plus.dart' as bpp;
 import 'package:flutter_native_splash/flutter_native_splash.dart';
 
 class MyHttpOverrides extends HttpOverrides {

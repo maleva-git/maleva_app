@@ -30,7 +30,6 @@ import '../tabs/paymentview/view/paymentview_tab.dart';
 import '../tabs/pdo/view/pdo_tab.dart';
 import '../tabs/pettycash/view/pettycash_tab.dart';
 import '../tabs/receiptview/view/receiptview_tab.dart';
-import 'package:maleva/core/colors/colors.dart' as colour;
 import '../tabs/invoice/view/invoice_tab.dart';
 import '../tabs/rtiview/view/rtiview_tab.dart';
 import '../tabs/salesorder/view/salesorderview_tab.dart';

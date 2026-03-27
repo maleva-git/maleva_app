@@ -11,6 +11,8 @@ import '../../../DashBoard/CustomerService/CustDashboard.dart';
 import '../../../DashBoard/Driver/DriverDashboard.dart';
 import '../../dashboard/admin_dashboard/bloc/admin_tab_bloc.dart';
 import '../../dashboard/admin_dashboard/view/admin_dashboard.dart';
+import '../../dashboard/airfrieght_dashboard/bloc/airfreight_bloc.dart';
+import '../../dashboard/airfrieght_dashboard/view/airfrieght_dashboard.dart';
 import '../bloc/auth_bloc.dart';
 import '../bloc/auth_event.dart';
 import '../bloc/auth_state.dart';
@@ -69,6 +71,18 @@ class Appuserloginmobile extends StatelessWidget {
         );
 
         break;
+      case "SALES":
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (_) => BlocProvider(
+              create: (_) => SalesDashboardBloc(),
+              child: const SalesDashboard(),
+            ),
+          ),
+        );
+
+        break;
 
       case "ADMIN2":
         Navigator.pushReplacement(
@@ -78,13 +92,13 @@ class Appuserloginmobile extends StatelessWidget {
         );
         break;
 
-      case "SALES":
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(
-              builder: (_) => const CustDashboard()),
-        );
-        break;
+      // case "SALES":
+      //   Navigator.pushReplacement(
+      //     context,
+      //     MaterialPageRoute(
+      //         builder: (_) => const CustDashboard()),
+      //   );
+      //   break;
 
       default:
         Navigator.pushReplacement(

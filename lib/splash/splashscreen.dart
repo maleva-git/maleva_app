@@ -21,6 +21,7 @@ import '../DashBoard/User/UserDashboard.dart';
 import 'package:maleva/core/network/OnlineApi.dart' as OnlineApi;
 import '../features/dashboard/admin_dashboard/bloc/admin_tab_bloc.dart';
 import '../features/dashboard/admin_dashboard/view/admin_dashboard.dart';
+import '../features/dashboard/airfrieght_dashboard/view/airfrieght_dashboard.dart';
 
 // ─── Design tokens (splash only) ─────────────────────────────────────────────
 
@@ -132,7 +133,8 @@ class _SplashScreenState extends State<SplashScreen>
         }
         else if(objfun.storagenew.getString('RulesType') == "SALES")
         {
-          Navigator.push(context, MaterialPageRoute(builder: (context) => const CustDashboard()));
+        //  Navigator.push(context, MaterialPageRoute(builder: (context) => const CustDashboard()));
+          Navigator.push(context, MaterialPageRoute(builder: (context) => const SalesDashboard()));
         }
         else if(objfun.storagenew.getString('RulesType') == "TRANSPORTATION")
         {

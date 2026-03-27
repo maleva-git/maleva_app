@@ -2,8 +2,6 @@ import 'package:flutter/Material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
-import 'package:maleva/core/utils/clsfunction.dart' as objfun;
-import 'package:maleva/core/colors/colors.dart' as colour;
 import 'package:maleva/features/dashboard/admin_dashboard/tabs/ExpenseReport/bloc/expensereport_bloc.dart';
 import 'package:maleva/features/dashboard/admin_dashboard/tabs/ExpenseReport/bloc/expensereport_event.dart';
 import 'package:maleva/features/dashboard/admin_dashboard/tabs/salesorder/bloc/salesorder_bloc.dart';
@@ -54,7 +52,6 @@ import '../tabs/pettycash/view/pettycash_tab.dart';
 import '../tabs/receiptview/bloc/receiptview_bloc.dart';
 import '../tabs/receiptview/bloc/receiptview_event.dart';
 import '../tabs/receiptview/view/receiptview_tab.dart';
-
 import '../tabs/rtiview/bloc/rtiview_bloc.dart';
 import '../tabs/rtiview/bloc/rtiview_event.dart';
 import '../tabs/rtiview/view/rtiview_tab.dart';
