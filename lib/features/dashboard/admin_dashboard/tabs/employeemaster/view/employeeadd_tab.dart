@@ -294,18 +294,28 @@ Widget _dropdown(
   return Padding(
     padding: const EdgeInsets.only(bottom: 14),
     child: DropdownButtonFormField<String>(
+      isExpanded: true, // <--- Add this line
       value: items.contains(value) ? value : null,
       decoration: InputDecoration(
         labelText: label,
         labelStyle: const TextStyle(color: colour.kPrimaryDark),
         border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
-        focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(10),
-            borderSide: const BorderSide(color: colour.kPrimary, width: 1.5)),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(10),
+          borderSide: const BorderSide(color: colour.kPrimary, width: 1.5),
+        ),
         filled: true,
         fillColor: Colors.grey[50],
         contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
       ),
-      items: items.map((i) => DropdownMenuItem(value: i, child: Text(i))).toList(),
+      // Also add overflow protection to the text items themselves
+      items: items.map((i) => DropdownMenuItem(
+        value: i,
+        child: Text(
+          i,
+          overflow: TextOverflow.ellipsis, // Prevents long text from pushing the arrow out
+        ),
+      )).toList(),
       onChanged: onChanged,
     ),
   );
