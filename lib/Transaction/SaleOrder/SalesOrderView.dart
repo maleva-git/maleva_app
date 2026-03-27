@@ -26,13 +26,13 @@ import '../../MasterSearch/Employee.dart';
 part 'package:maleva/Transaction/SaleOrder/mobileSalesOrderView.dart';
 part 'package:maleva/Transaction/SaleOrder/tabletSalesOrderView.dart';
 
-class SaleOrderView extends StatefulWidget {
-  const SaleOrderView({super.key});
+class SaleOrderViews extends StatefulWidget {
+  const SaleOrderViews({super.key});
   @override
   SaleOrderViewState createState() => SaleOrderViewState();
 }
 
-class SaleOrderViewState extends State<SaleOrderView> {
+class SaleOrderViewState extends State<SaleOrderViews> {
   bool progress = false;
   String cls = "3";
   String ETAVal = "0";

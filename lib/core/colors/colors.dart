@@ -39,21 +39,73 @@ const buyNowButtonBgColor = Colors.blue;
 const hoverButtonColor = Colors.blue;
 const commonColor2 = Color(0xffffbc29);
 
-// const commonColor = Color(0xff022b50);
-// const commonColor2 =  Color(0xffffbc29);
-// const commonColorLight =  Color(0xffffbc29);
-// const commonColorred =  Color(0xffd70e0e);
-// const spinKitColor = Color(0xffd70e0e);
-
 const commonColorhighlight = Color(0xe2bf0f0f);
-const commonColor = Color(0xff0e387a);
+const commonColor = Color(0xff1a4d9e);
 const commonColorDisabled = Color(0x61959595);
 const topAppBarColor = Colors.white;
 const ButtonForeColor = Colors.white;
 const commonColorLight = Color(0xFF5B9BD5);
-const commonColorred = Color(0xffd70e0e);
+const commonColorred = Color(0xffb30c0c);
 const spinKitColor = Color(0xff0e387a);
 
+const Color kPrimary = Color(0xFF1A3A8F);
+const Color kPrimaryDark = Color(0xFF0D3DB5);
+const Color kPrimaryLight = Color(0xFF4D7EF7);
+const Color kAccent = Color(0xFFE8EEFF);
+const Color kWhite = Colors.white;
+const cBlue      = Color(0xFF1555F3);
+const RWhite      = Color(0x54E1E1E1);
+const cBlueDark  = Color(0xFF0D2A99);
+const cBlueLight = Color(0xFF3A7BFF);
+const cWhite     = Color(0xFFFFFFFF);
+const cSurface   = Color(0xFFF5F6FA);
+const cBorder    = Color(0xFFECEEF5);
+const cText      = Color(0xFF1A1D2E);
+const cSub       = Color(0xFFB0B4C8);
+const cRose      = Color(0xFFE11D48);
+
+// ── Screenshot color palette ────────────────────────────── Invoice color
+const kHeaderGradStart = Color(0xFF1A3A8F); // deep blue
+const kHeaderGradEnd   = Color(0xFF4A6FD4); // lighter blue
+const kCardBg          = Colors.white;
+const kPageBg          = Color(0xFFF4F6FB);
+const kPillBg          = Color(0x33FFFFFF); // translucent white pill
+const kGreen           = Color(0xFF27AE60);
+const kBlueAccent      = Color(0xFF2F80ED);
+const kBarBlue         = Color(0xFF3563E9);
+
+
+const kShadow = Color(0x0D000000);
+const kNavy   = Color(0xFF1A2E5A);
+const kBlue   = Color(0xFF5B9BD5);
+const kOrange = Color(0xFFE67E22);
+
+
+//Transport
+
+const kBlueDark = Color(0xFF0D3DB5);
+const kBlueL    = Color(0xFF4D7EF7);
+const kBlueBg   = Color(0xFFE8EEFF);
+
+
+enum Accent { blue, green, amber, purple, teal, rose }
+
+const accentBg = {
+  Accent.blue:   Color(0xFFEEF2FF),
+  Accent.green:  Color(0xFFEDFAF4),
+  Accent.amber:  Color(0xFFFFF8EC),
+  Accent.purple: Color(0xFFF5F0FF),
+  Accent.teal:   Color(0xFFEAFBF8),
+  Accent.rose:   Color(0xFFFFF1F2),
+};
+const accentFg = {
+  Accent.blue:   Color(0xFF1555F3),
+  Accent.green:  Color(0xFF16A85A),
+  Accent.amber:  Color(0xFFE07A20),
+  Accent.purple: Color(0xFF7B52D3),
+  Accent.teal:   Color(0xFF0FA58E),
+  Accent.rose:   Color(0xFFE11D48),
+};
 
 class AppColors {
   static const LinearGradient primaryGradient = LinearGradient(
@@ -65,6 +117,26 @@ class AppColors {
     begin: Alignment.topLeft,
     end: Alignment.bottomRight,
   );
-  static const Color appBarColor = Color(0xFF1555F3);
+  static const Color appBarColor = Color(0xFF1A3A8F);
   static const Color whitecolor = Color(0xFFFFFFFF);
 }
+
+//Login
+const kPrimaryD  = Color(0xFF0D2A99);
+const kPrimaryL  = Color(0xFF3A7BFF);
+const kBg        = Color(0xFFECEEF4);
+const kSurface   = Color(0xFFF5F6FA);
+const kBorder    = Color(0xFFECEEF5);
+const kText      = Color(0xFF1A1D2E);
+const kSubText   = Color(0xFFB0B4C8);
+const kFieldText = Color(0xFF6B7094);
+
+
+//Planning
+const Color kSurface2  = Color(0xFFF1F5F9);
+const Color kGold      = Color(0xFFD97706);
+const Color kCobalt    = Color(0xFF3B82F6);
+const Color kSuccess   = Color(0xFF059669);
+const Color kDanger    = Color(0xFFDC2626);
+const Color kTextMuted = Color(0xFF475569);
+const Color kTextDim   = Color(0xFF94A3B8);

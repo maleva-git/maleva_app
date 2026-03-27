@@ -6,16 +6,19 @@ class LoadInvoiceByType extends InvoiceEvent {
 }
 
 class LoadMonthRange extends InvoiceEvent {
-  final int months; // 6 or 12
+  final int months;
   LoadMonthRange(this.months);
 }
-class LoadEmployeeInvData extends InvoiceEvent {
-  final int type;
-  LoadEmployeeInvData(this.type);
-}
+
 class LoadWaitingBills extends InvoiceEvent {
   final int type;
   LoadWaitingBills(this.type);
 }
 
-class ShowWaitingBilling extends InvoiceEvent {}
+class LoadEmployeeInvData extends InvoiceEvent {
+  final int type;
+  LoadEmployeeInvData(this.type);
+}
+
+// Manual refresh — tab-ல் pull to refresh பண்ணும்போது
+class RefreshInvoice extends InvoiceEvent {}

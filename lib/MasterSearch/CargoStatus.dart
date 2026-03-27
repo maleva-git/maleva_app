@@ -196,7 +196,7 @@ class _CargoStatusstate extends State<CargoStatus> {
 
                                           Navigator.of(context,
                                               rootNavigator: true)
-                                              .pop(context);
+                                              .pop();
                                         }
                                       });
                                     },

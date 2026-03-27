@@ -1,39 +1,21 @@
-import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_spinkit/flutter_spinkit.dart';
-// import 'package:fluttertoast/fluttertoast.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:intl/intl.dart';
 import 'package:maleva/DashBoard/Admin2/Admin2Dashboard.dart';
 import 'package:maleva/core/utils/clsfunction.dart' as objfun;
 import 'package:maleva/core/colors/colors.dart' as colour;
 import 'package:maleva/DashBoard/User/UserDashboard.dart';
-import 'package:maleva/core/models/model.dart';
 import 'package:maleva/core/network/OnlineApi.dart' as OnlineApi;
-import '../../../DashBoard/Admin/AdminDashboard.dart';
-import '../../../DashBoard/AirFrieght/AirFrieghtDashboard.dart';
-import '../../../DashBoard/Boarding/BoardingDashboard.dart';
 import '../../../DashBoard/CustomerService/CustDashboard.dart';
 import '../../../DashBoard/Driver/DriverDashboard.dart';
-import '../../../DashBoard/Forwarding/ForwardingDashboard.dart';
-import '../../../DashBoard/HR/HrDashboard.dart';
-import '../../../DashBoard/Maintenance/MaintenanceDashboard.dart';
-import '../../../DashBoard/OperationAdmin/OperationAdminDashboard.dart';
-import '../../../DashBoard/Payable/PayableDashbord.dart';
-import '../../../DashBoard/Receivable/ReceivableDashboard.dart';
-import '../../../DashBoard/TransportDB/TransportDashboard.dart';
-import '../../../DashBoard/WareHouse/WareHouseDashboard.dart';
 import '../../../core/colors/colors.dart';
 import '../../dashboard/admin_dashboard/bloc/admin_tab_bloc.dart';
-import '../../dashboard/admin_dashboard/view/admin_dashboard_page.dart';
+import '../../dashboard/admin_dashboard/view/admin_dashboard.dart';
 import '../bloc/auth_bloc.dart';
 import '../bloc/auth_event.dart';
 import '../bloc/auth_state.dart';
-part 'package:maleva/features/auth/pages/login_mobile.dart';
-part 'package:maleva/features/auth/pages/login_tablet.dart';
-
+part 'package:maleva/features/auth/pages/login_design.dart';
 
 class Appuserloginmobile extends StatelessWidget {
   const Appuserloginmobile ({super.key});
@@ -57,11 +39,11 @@ class Appuserloginmobile extends StatelessWidget {
       child: BlocBuilder<LoginBloc, LoginState>(
         builder: (context, state) {
 
-          /// 🔥 HERE state available
 
-          return state.deviceView == "1"
-              ?  mobiledesign()
-              :  tabletdesign();
+
+          return mobiledesign();
+
+
         },
       ),
     );

@@ -285,7 +285,9 @@ class AdminDashboardState extends State<AdminDashboard> with TickerProviderState
   }
 
 
-  Future loadInventory({bool isDateSearch = false,int ?id} ) async {
+  Future
+
+  loadInventory({bool isDateSearch = false,int ?id} ) async {
     setState(() {
       progress = false;
     });
@@ -3071,7 +3073,7 @@ class AdminDashboardState extends State<AdminDashboard> with TickerProviderState
                                 style: GoogleFonts.lato(
                                   fontSize: 16,
                                   fontWeight: FontWeight.bold,
-                                  color: Color(0xFF2C3E50), // Dark Navy for readability
+                                  color: Color(0xFF2C3E50),
                                 ),
                               ),
                               const SizedBox(height: 4),
@@ -3079,18 +3081,18 @@ class AdminDashboardState extends State<AdminDashboard> with TickerProviderState
                                 "Customer: ${item['CustomerName'] ?? ''}",
                                 style: GoogleFonts.lato(
                                   fontSize: 14,
-                                  fontWeight: FontWeight.bold, // 👈 makes text bold
-                                  color: Color(0xFF145A32),    // Dark green for readability
+                                  fontWeight: FontWeight.bold,
+                                  color: Color(0xFF145A32),
                                 ),
                               ),
 
                               const SizedBox(height: 2),
                               Text(
-                                "Amount: ₹${item['NetAmt'] ?? ''}",
+                                "Amount: ${item['NetAmt'] ?? ''}",
                                 style: GoogleFonts.lato(
                                   fontSize: 14,
                                   fontWeight: FontWeight.bold,
-                                  color: Color(0xFFE67E22), // Elegant orange highlight
+                                  color: Color(0xFFE67E22),
                                 ),
                               ),
                             ],

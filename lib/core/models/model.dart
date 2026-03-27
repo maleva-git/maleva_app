@@ -2824,6 +2824,52 @@ class RTIDetailsViewModel {
         imagePath = '',
         Active = 0,
         Verify = 0;
+
+  RTIDetailsViewModel copyWith({
+    int? Id,
+    int? SDId,
+    int? RTIMasterRefId,
+    int? StatusId,
+    int? SaleOrderMasterRefId,
+    int? CustomerMasterRefId,
+    String? JobNo,
+    String? JobDate,
+    String? CustomerName,
+    double? Salary,
+    String? PPIC,
+    String? DPIC,
+    int? PWDType,
+    int? Active,
+    int? Verify,
+    bool? isChecked,
+    bool? isVerified,
+    String? imagePath,
+    XFile? imageFile,
+  }) {
+    return RTIDetailsViewModel(
+      Id ?? this.Id,
+      SDId ?? this.SDId,
+      RTIMasterRefId ?? this.RTIMasterRefId,
+      StatusId ?? this.StatusId,
+      SaleOrderMasterRefId ?? this.SaleOrderMasterRefId,
+      CustomerMasterRefId ?? this.CustomerMasterRefId,
+      JobNo ?? this.JobNo,
+      JobDate ?? this.JobDate,
+      CustomerName ?? this.CustomerName,
+      Salary ?? this.Salary,
+      PPIC ?? this.PPIC,
+      DPIC ?? this.DPIC,
+      PWDType ?? this.PWDType,
+      Active ?? this.Active,
+      Verify ?? this.Verify,
+      imagePath ?? this.imagePath,
+      imageFile ?? this.imageFile,
+      isChecked: isChecked ?? this.isChecked,
+      isVerified: isVerified ?? this.isVerified,
+    );
+  }
+
+
 }
 class FuelEntryModel {
   int Id;

@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'dart:io';
-
 import 'package:maleva/DashBoard/OperationAdmin/OperationAdminDashboard.dart';
 import 'package:maleva/DashBoard/User/UserDashboard.dart';
 import 'package:flutter/material.dart';
@@ -17,18 +16,17 @@ import '../../DashBoard/CustomerService/CustDashboard.dart';
 import '../../DashBoard/TransportDB/TransportDashboard.dart';
 import '../../MasterSearch/Employee.dart';
 import 'PlanningDetails.dart';
-
 part 'package:maleva/Transaction/Planning/mobilePlanningView.dart';
 part 'package:maleva/Transaction/Planning/tabletPlanningView.dart';
 
-class PlanningView extends StatefulWidget {
-  const PlanningView({super.key});
+class PlanningOldView extends StatefulWidget {
+  const PlanningOldView({super.key});
 
   @override
   PlanningViewState createState() => PlanningViewState();
 }
 
-class PlanningViewState extends State<PlanningView> {
+class PlanningViewState extends State<PlanningOldView> {
   bool progress = false;
 
   int EmpId = 0;
