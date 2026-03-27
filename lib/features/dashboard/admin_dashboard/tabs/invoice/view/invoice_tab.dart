@@ -8,8 +8,6 @@ import '../bloc/invoice_state.dart';
 import '../../../../../../core/colors/colors.dart' as colors;
 
 
-
-
 class InvoiceTab extends StatefulWidget {
   const InvoiceTab({super.key});
 
@@ -622,7 +620,7 @@ class _StatusCard extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
         decoration: BoxDecoration(
-          color: colors.kCardBg,
+          color: colors.kCardBg, // Assuming 'colors' is your theme instance
           borderRadius: BorderRadius.circular(18),
           boxShadow: const [BoxShadow(color: colors.kShadow, blurRadius: 8, offset: Offset(0, 3))],
         ),
@@ -633,20 +631,38 @@ class _StatusCard extends StatelessWidget {
             child: Icon(icon, color: iconColor, size: 20),
           ),
           const SizedBox(width: 12),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(count,
+
+          // --- FIX APPLIED HERE ---
+          // Wrapped the Column in an Expanded widget
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min, // Good practice inside Rows
+              children: [
+                Text(
+                  count,
+                  overflow: TextOverflow.ellipsis, // Added overflow handling
                   style: GoogleFonts.lato(
-                      fontSize: 20, fontWeight: FontWeight.w900, color: colors.kNavy)),
-              Text(label,
+                    fontSize: 20,
+                    fontWeight: FontWeight.w900,
+                    color: colors.kNavy,
+                  ),
+                ),
+                Text(
+                  label,
+                  overflow: TextOverflow.ellipsis, // Added overflow handling
                   style: GoogleFonts.lato(
-                      fontSize: 9,
-                      fontWeight: FontWeight.w700,
-                      color: Colors.grey.shade500,
-                      letterSpacing: 0.6)),
-            ],
+                    fontSize: 9,
+                    fontWeight: FontWeight.w700,
+                    color: Colors.grey.shade500,
+                    letterSpacing: 0.6,
+                  ),
+                ),
+              ],
+            ),
           ),
+          // ------------------------
+
         ]),
       ),
     );

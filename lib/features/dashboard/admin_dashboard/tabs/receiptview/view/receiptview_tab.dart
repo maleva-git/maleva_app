@@ -670,35 +670,42 @@ class _ReceiptCard extends StatelessWidget {
 
             // ── Amount Chips
             Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                _AmountChip(
-                  label: 'Total',
-                  amount: 'RM ${billAmount.toStringAsFixed(2)}',
-                  color: kPrimary,
-                  bgColor: RWhite,
-                  isTablet: isTablet,
+                Expanded(
+                  child: _AmountChip(
+                    label: 'Total',
+                    amount: 'RM ${billAmount.toStringAsFixed(2)}',
+                    color: kPrimary,
+                    bgColor: RWhite,
+                    isTablet: isTablet,
+                  ),
                 ),
-                _AmountChip(
-                  label: 'Collected',
-                  amount: 'RM ${collected.toStringAsFixed(2)}',
-                  color: kPrimary,
-                  bgColor: RWhite,
-                  isTablet: isTablet,
+                const SizedBox(width: 8), // Gap between chip 1 and 2
+                Expanded(
+                  child: _AmountChip(
+                    label: 'Collected',
+                    amount: 'RM ${collected.toStringAsFixed(2)}',
+                    color: kPrimary,
+                    bgColor: RWhite,
+                    isTablet: isTablet,
+                  ),
                 ),
-                _AmountChip(
-                  label: 'Balance',
-                  amount: 'RM ${balance.toStringAsFixed(2)}',
-                  color: balance > 0
-                      ? const Color(0xFF740000)
-                      : kPrimary,
-                  bgColor: balance > 0
-                      ? RWhite
-                      : RWhite,
-                  isTablet: isTablet,
+                const SizedBox(width: 8), // Gap between chip 2 and 3
+                Expanded(
+                  child: _AmountChip(
+                    label: 'Balance',
+                    amount: 'RM ${balance.toStringAsFixed(2)}',
+                    color: balance > 0
+                        ? const Color(0xFF740000)
+                        : kPrimary,
+                    bgColor: balance > 0 // Note: Both conditions evaluate to RWhite here, you might want to check this!
+                        ? RWhite
+                        : RWhite,
+                    isTablet: isTablet,
+                  ),
                 ),
               ],
-            ),
+            )
           ],
         ),
       ),
@@ -732,20 +739,29 @@ class _AmountChip extends StatelessWidget {
         borderRadius: BorderRadius.circular(isTablet ? 14 : 12),
       ),
       child: Column(
+        mainAxisSize: MainAxisSize.min, // Good practice to prevent infinite height issues
         children: [
-          Text(label,
-              style: GoogleFonts.poppins(
-                fontSize: isTablet ? 11 : 10,
-                color: color.withOpacity(0.7),
-                fontWeight: FontWeight.w500,
-              )),
+          Text(
+            label,
+            maxLines: 1, // Restrict to one line
+            overflow: TextOverflow.ellipsis, // Add ellipsis if it shrinks
+            style: GoogleFonts.poppins(
+              fontSize: isTablet ? 11 : 10,
+              color: color.withOpacity(0.7),
+              fontWeight: FontWeight.w500,
+            ),
+          ),
           const SizedBox(height: 3),
-          Text(amount,
-              style: GoogleFonts.poppins(
-                fontSize: isTablet ? 13 : 12,
-                color: color,
-                fontWeight: FontWeight.w700,
-              )),
+          Text(
+            amount,
+            maxLines: 1, // Restrict to one line
+            overflow: TextOverflow.ellipsis, // Add ellipsis if it shrinks
+            style: GoogleFonts.poppins(
+              fontSize: isTablet ? 13 : 12,
+              color: color,
+              fontWeight: FontWeight.w700,
+            ),
+          ),
         ],
       ),
     );

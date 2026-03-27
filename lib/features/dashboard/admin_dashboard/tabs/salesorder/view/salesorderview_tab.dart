@@ -24,7 +24,6 @@ class _SalesOrderTabState extends State<SalesOrderTab> {
     });
 
   }
-
   Future<void> _onRefresh() async {
     context.read<SalesOrderBloc>().add(RefreshSalesOrder());
     await context
@@ -32,13 +31,11 @@ class _SalesOrderTabState extends State<SalesOrderTab> {
         .stream
         .firstWhere((s) => s is InvoiceLoaded || s is InvoiceError);
   }
-
   InvoiceLoaded? _resolveLoaded(SalesOrderState state) {
     if (state is InvoiceLoaded) return state;
     if (state is InvoiceTabSwitching) return state.previous;
     return null;
   }
-
   @override
   Widget build(BuildContext context) {
     final screenW = MediaQuery.of(context).size.width;
@@ -124,10 +121,6 @@ class _SalesOrderTabState extends State<SalesOrderTab> {
       ),
     );
   }
-
-  // ═══════════════════════════════════════════════════════
-  // TABLET LAYOUT
-  // ═══════════════════════════════════════════════════════
   Widget _buildTabletLayout(BuildContext context, InvoiceLoaded state,
       Map<String, dynamic> data, double screenW, int tabIndex) {
     return Padding(
@@ -175,10 +168,6 @@ class _SalesOrderTabState extends State<SalesOrderTab> {
       ),
     );
   }
-
-  // ═══════════════════════════════════════════════════════
-  // MOBILE LAYOUT
-  // ═══════════════════════════════════════════════════════
   Widget _buildMobileLayout(BuildContext context, InvoiceLoaded state,
       Map<String, dynamic> data, double screenW, int tabIndex) {
     return Column(
@@ -224,10 +213,6 @@ class _SalesOrderTabState extends State<SalesOrderTab> {
       ],
     );
   }
-
-  // ═══════════════════════════════════════════════════════
-  // OVERVIEW SECTION (mobile)
-  // ═══════════════════════════════════════════════════════
   Widget _buildOverviewSection(BuildContext context, InvoiceLoaded state,
       Map<String, dynamic> data) {
     return Column(
@@ -256,10 +241,6 @@ class _SalesOrderTabState extends State<SalesOrderTab> {
       ],
     );
   }
-
-  // ═══════════════════════════════════════════════════════
-  // 2×2 OVERVIEW GRID
-  // ═══════════════════════════════════════════════════════
   Widget _buildOverviewGrid(BuildContext context, InvoiceLoaded state,
       Map<String, dynamic> data,
       {required bool isTablet}) {
@@ -333,10 +314,6 @@ class _SalesOrderTabState extends State<SalesOrderTab> {
       ],
     );
   }
-
-  // ═══════════════════════════════════════════════════════
-  // STATUS ROW: Waiting Billing + Billed Month
-  // ═══════════════════════════════════════════════════════
   Widget _buildStatusRow(BuildContext context, InvoiceLoaded state,
       {required bool isTablet}) {
     return Row(
@@ -376,10 +353,6 @@ class _SalesOrderTabState extends State<SalesOrderTab> {
       ],
     );
   }
-
-  // ═══════════════════════════════════════════════════════
-  // TREND HEADER (title + range buttons)
-  // ═══════════════════════════════════════════════════════
   Widget _buildTrendHeader(InvoiceLoaded state, {required bool isTablet}) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -394,10 +367,6 @@ class _SalesOrderTabState extends State<SalesOrderTab> {
       ],
     );
   }
-
-  // ═══════════════════════════════════════════════════════
-  // MONTH LIST (tablet)
-  // ═══════════════════════════════════════════════════════
   Widget _buildMonthList(BuildContext context, InvoiceLoaded state,
       {required bool isTablet}) {
     return ListView.builder(
@@ -407,10 +376,6 @@ class _SalesOrderTabState extends State<SalesOrderTab> {
           _buildMonthItem(context, state, index, isTablet: isTablet),
     );
   }
-
-  // ═══════════════════════════════════════════════════════
-  // MONTH ITEM — horizontal bar style
-  // ═══════════════════════════════════════════════════════
   Widget _buildMonthItem(
       BuildContext context, InvoiceLoaded state, int index,
       {required bool isTablet}) {
@@ -513,10 +478,6 @@ class _SalesOrderTabState extends State<SalesOrderTab> {
       ),
     );
   }
-
-  // ═══════════════════════════════════════════════════════
-  // EMPLOYEE DETAILS DIALOG (unchanged layout, new style)
-  // ═══════════════════════════════════════════════════════
   void _showDialogEmpDetails(List<dynamic> data) {
     showDialog(
       context: context,
@@ -899,25 +860,43 @@ class _StatusCard extends StatelessWidget {
               child: Icon(icon, color: iconColor, size: 20),
             ),
             const SizedBox(width: 10),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                GestureDetector(
-                  onTap: onCountTap,
-                  child: Text(count,
+
+            // --- THE FIX IS HERE ---
+            // Wrapped the Column in an Expanded widget so it shrinks to fit
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min, // Keeps the column from expanding vertically
+                children: [
+                  GestureDetector(
+                    onTap: onCountTap,
+                    child: Text(
+                      count,
+                      maxLines: 1, // Restrict to one line
+                      overflow: TextOverflow.ellipsis, // Add '...' if it overflows
                       style: TextStyle(
-                          fontSize: isTablet ? 22 : 20,
-                          fontWeight: FontWeight.bold,
-                          color: const Color(0xFF1A2340))),
-                ),
-                Text(label,
+                        fontSize: isTablet ? 22 : 20,
+                        fontWeight: FontWeight.bold,
+                        color: const Color(0xFF1A2340),
+                      ),
+                    ),
+                  ),
+                  Text(
+                    label,
+                    maxLines: 1, // Restrict to one line
+                    overflow: TextOverflow.ellipsis, // Add '...' if it overflows
                     style: TextStyle(
-                        fontSize: isTablet ? 10 : 9,
-                        fontWeight: FontWeight.w700,
-                        letterSpacing: 0.7,
-                        color: const Color(0xFF8A94A6))),
-              ],
+                      fontSize: isTablet ? 10 : 9,
+                      fontWeight: FontWeight.w700,
+                      letterSpacing: 0.7,
+                      color: const Color(0xFF8A94A6),
+                    ),
+                  ),
+                ],
+              ),
             ),
+            // -----------------------
+
           ],
         ),
       ),

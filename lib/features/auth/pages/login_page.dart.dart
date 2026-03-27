@@ -9,7 +9,6 @@ import 'package:maleva/DashBoard/User/UserDashboard.dart';
 import 'package:maleva/core/network/OnlineApi.dart' as OnlineApi;
 import '../../../DashBoard/CustomerService/CustDashboard.dart';
 import '../../../DashBoard/Driver/DriverDashboard.dart';
-import '../../../core/colors/colors.dart';
 import '../../dashboard/admin_dashboard/bloc/admin_tab_bloc.dart';
 import '../../dashboard/admin_dashboard/view/admin_dashboard.dart';
 import '../bloc/auth_bloc.dart';
@@ -38,12 +37,7 @@ class Appuserloginmobile extends StatelessWidget {
       },
       child: BlocBuilder<LoginBloc, LoginState>(
         builder: (context, state) {
-
-
-
           return mobiledesign();
-
-
         },
       ),
     );

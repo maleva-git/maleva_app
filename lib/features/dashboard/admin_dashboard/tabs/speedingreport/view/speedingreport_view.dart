@@ -144,7 +144,9 @@ class _SpeedingBody extends StatelessWidget {
   Widget _buildMobileLayout(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.all(10),
-      child: Column(children: [
+      child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
         Text(
           "Speeding Details",
           style: GoogleFonts.lato(
@@ -346,7 +348,10 @@ class _SpeedingCard extends StatelessWidget {
                     ),
                   ]),
                   SizedBox(height: isTablet ? 8 : 6),
-                  Row(children: [
+                  Wrap(
+                      spacing: 8,      // Horizontal space between chips
+                      runSpacing: 8,   // Vertical space between lines if wrapped
+                      children: [
                     _MiniChip(
                       icon:      Icons.speed_rounded,
                       label:     record.filled.isNotEmpty
@@ -366,7 +371,8 @@ class _SpeedingCard extends StatelessWidget {
                       textColor: Colors.orange.shade700,
                       isTablet:  isTablet,
                     ),
-                  ]),
+                  ]
+                  ),
                 ],
               ),
             ),
