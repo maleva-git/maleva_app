@@ -617,16 +617,7 @@ Future<dynamic> apiAllinoneSelectArrayWithOutAuth(api, insertDetails,
 }
 // create teh  test  jsut write th e conmmand
 Future<dynamic> apiAllinoneSelectArray(api, insertDetails,
-    Map<String, String>? header, BuildContext context) async {
-  //returntype
-  //1 list
-  //2 status
-  //3 int
-  //4 string
-  //5 double
-  //rawbody
-  //0 OFF
-  //1 ON
+    Map<String, String>? header, BuildContext? context) async { // [!highlight]
 
   String apiname = api.toString().split('?')[0];
   apiname = "${apiname.replaceAll('$port/api/', '')}: ";
@@ -651,7 +642,9 @@ Future<dynamic> apiAllinoneSelectArray(api, insertDetails,
     if (body != '' && body != 'null') {
       debugPrint(body);
     }
+
     http.Response result = await http.post(Uri.parse(api), headers: header, body: body);
+
     if (result.statusCode == 200) {
       if (result.body == "") {
         return [];
@@ -659,50 +652,50 @@ Future<dynamic> apiAllinoneSelectArray(api, insertDetails,
         return jsonDecode(result.body);
       }
     } else if (result.statusCode == 401) {
-      ConfirmationOK("Authentication Failed !!!..ReLogin !!!", context);
-      ResponseViewModel? value =
-          ResponseViewModel.fromJson(jsonDecode(result.body));
-      msgshow(value.Message, "", Colors.white, Colors.green, null,
-          18.00 - reducesize, tll, tgc, context, 2);
+      if (context != null) { // [!highlight]
+        ConfirmationOK("Authentication Failed !!!..ReLogin !!!", context);
+        ResponseViewModel? value =
+        ResponseViewModel.fromJson(jsonDecode(result.body));
+        msgshow(value.Message, "", Colors.white, Colors.green, null,
+            18.00 - reducesize, tll, tgc, context, 2);
+      } // [!highlight]
       return [];
     } else if (result.statusCode == 406) {
-      ConfirmationOK(
-          "Already Login Another User.ReLogin or Change Password !!!", context);
       loginId = 0;
       loginname = '';
       storagenew.setString('Username', "");
       storagenew.setString('Password', "");
       storagenew.setString('OldUsername', "");
-
-      // ResponseViewModel? value = ResponseViewModel.fromJson(jsonDecode(result.body));
-      // msgshow(value.Message,"",Colors.white,Colors.green,null,18.00 - reducesize,tll,tgc,context,2);
+      if (context != null) { // [!highlight]
+        ConfirmationOK(
+            "Already Login Another User.ReLogin or Change Password !!!", context);
+      } // [!highlight]
       return [];
     } else if (result.statusCode == 404) {
-      ResponseViewModel? value =
-          ResponseViewModel.fromJson(jsonDecode(result.body));
-      msgshow(value.Message, "", Colors.white, Colors.green, null,
-          18.00 - reducesize, tll, tgc, context, 2);
+      if (context != null) { // [!highlight]
+        ResponseViewModel? value =
+        ResponseViewModel.fromJson(jsonDecode(result.body));
+        msgshow(value.Message, "", Colors.white, Colors.green, null,
+            18.00 - reducesize, tll, tgc, context, 2);
+      } // [!highlight]
       return [];
     } else if (result.statusCode == 500) {
-      ResponseViewModel? value =
-          ResponseViewModel.fromJson(jsonDecode(result.body));
-      msgshow(value.Message, "", Colors.white, Colors.green, null,
-          18.00 - reducesize, tll, tgc, context, 2);
+      if (context != null) { // [!highlight]
+        ResponseViewModel? value =
+        ResponseViewModel.fromJson(jsonDecode(result.body));
+        msgshow(value.Message, "", Colors.white, Colors.green, null,
+            18.00 - reducesize, tll, tgc, context, 2);
+      } // [!highlight]
       return [];
     } else {
       throw Exception('${result.statusCode} Unknown Error Occurred');
     }
   } on SocketException catch (_) {
     throw Exception('Check Your Network Connection');
-  }
-  // on Exception catch (ms) {
-  //   throw Exception(ms.toString());
-  // }
-  catch (error) {
-       throw Exception('$apiname$error');
+  } catch (error) {
+    throw Exception('$apiname$error');
   }
 }
-
 Future<dynamic> apiAllinone(api, insertDetails, Map<String, String>? header, BuildContext context) async {
   //returntype
   //1 list

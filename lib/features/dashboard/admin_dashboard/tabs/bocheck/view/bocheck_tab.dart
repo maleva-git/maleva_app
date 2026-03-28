@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:maleva/core/models/model.dart';
-import 'package:maleva/core/utils/clsfunction.dart' as objfun;
 import '../bloc/bocheck_bloc.dart';
 import '../bloc/bocheck_event.dart';
 import '../bloc/bocheck_state.dart';

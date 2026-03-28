@@ -14,6 +14,9 @@ import '../../../common_updates/blocs/sales/sales_bloc.dart';
 import '../../../common_updates/blocs/sales/sales_event.dart';
 import '../../../common_updates/blocs/truck/truck_bloc.dart';
 import '../../../common_updates/blocs/truck/truck_event.dart';
+import '../../admin_dashboard/tabs/airfreightsales/view/airfreightsales_tab.dart';
+import '../../admin_dashboard/tabs/fuel/view/fuelreport_tab.dart';
+import '../../admin_dashboard/tabs/paymentview/view/paymentview_tab.dart';
 import '../../admin_dashboard/tabs/transport/view/transportview_tab.dart';
 import '../../admin_dashboard/tabs/vesselreport/view/vesselreportview_tab.dart';
 class SalesDashboardView extends StatelessWidget {
@@ -121,8 +124,11 @@ class SalesDashboardView extends StatelessWidget {
           fontSize: isTablet ? 14 : 13,
         ),
         tabs: [
+          _tab('SALES', isTablet),
           _tab('VSL', isTablet),
           _tab('TRANSPORT', isTablet),
+          _tab('FUEL VIEW', isTablet),
+          _tab('PaymentView', isTablet),
         ],
       ),
     );
@@ -155,8 +161,12 @@ Tab _tab(String text, bool isTablet) => Tab(
         child: TabBarView(
           controller: tabController,
           children: [
+            const CustomerDashboardScreen(),
             const VesselReportPage(),
             const TransportReportPage(),
+            const FuelDiffPage(),
+            const PaymentPendingPage(),
+
           ],
         ),
     );

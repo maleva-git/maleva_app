@@ -92,13 +92,13 @@ class Appuserloginmobile extends StatelessWidget {
         );
         break;
 
-      // case "SALES":
-      //   Navigator.pushReplacement(
-      //     context,
-      //     MaterialPageRoute(
-      //         builder: (_) => const CustDashboard()),
-      //   );
-      //   break;
+       // case "SALES":
+       //   Navigator.pushReplacement(
+       //     context,
+       //     MaterialPageRoute(
+       //         builder: (_) => const CustDashboard()),
+       //   );
+       //   break;
 
       default:
         Navigator.pushReplacement(
