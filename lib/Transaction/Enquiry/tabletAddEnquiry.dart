@@ -1,6 +1,6 @@
 part of 'package:maleva/Transaction/Enquiry/AddEnquiry.dart';
 
-tabletdesign(AddEnquiryState state, BuildContext context) {
+tabletdesign(AddEnquiryStates state, BuildContext context) {
   double width = MediaQuery.of(context).size.width;
   double height = MediaQuery.of(context).size.height;
   return WillPopScope(

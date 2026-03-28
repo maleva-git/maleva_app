@@ -3,6 +3,9 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../admin_dashboard/tabs/airfreightsales/bloc/airfreightsales_bloc.dart';
 import '../../admin_dashboard/tabs/airfreightsales/bloc/airfreightsales_event.dart';
 import '../../admin_dashboard/tabs/airfreightsales/view/airfreightsales_tab.dart';
+import '../../admin_dashboard/tabs/enquiry/view/bloc/enquiry_bloc.dart';
+import '../../admin_dashboard/tabs/enquiry/view/bloc/enquiry_event.dart';
+import '../../admin_dashboard/tabs/enquiry/view/view/enquiry_tab.dart';
 import '../../admin_dashboard/tabs/fuel/bloc/fuelreport_bloc.dart';
 import '../../admin_dashboard/tabs/fuel/bloc/fuelreport_event.dart';
 import '../../admin_dashboard/tabs/fuel/view/fuelreport_tab.dart';
@@ -31,7 +34,7 @@ class _SalesDashboardState extends State<SalesDashboard> with SingleTickerProvid
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 5
+    _tabController = TabController(length: 6
 
         , vsync: this);
     _tabController.addListener(_onTabChanged);
@@ -66,6 +69,12 @@ class _SalesDashboardState extends State<SalesDashboard> with SingleTickerProvid
                     context: context,
                   )..add(const LoadTransportDataEvent(type: 0)),
                   child: const TransportReportPage(),
+                ),
+                BlocProvider(
+                  create: (_) => EnquiryBloc(
+
+                  )..add( LoadEnquiryEvent()),
+                  child: const EnquiryScreen(),
                 ),
                 BlocProvider(
                   create: (context) => FuelDiffBloc(context)..add(const LoadFuelDiffEvent()),

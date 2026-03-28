@@ -2,13 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
-
 import '../../../../../../core/colors/colors.dart' as colour;
-import '../../../../../../core/utils/clsfunction.dart' as objfun;
 import '../bloc/airfreightsales_bloc.dart';
 import '../bloc/airfreightsales_event.dart';
 import '../bloc/airfreightsales_state.dart';
-
 
 
 class CustomerDashboardScreen extends StatelessWidget {
@@ -53,7 +50,7 @@ class _CustomerDashboardView extends StatelessWidget {
                     Container(
                       width: 36, height: 36,
                       decoration: BoxDecoration(
-                        color: const Color(0xFF1555F3),
+                        color: colour.kHeaderGradStart,
                         borderRadius: BorderRadius.circular(10),
                       ),
                       child: const Icon(Icons.dashboard_rounded,
@@ -64,13 +61,13 @@ class _CustomerDashboardView extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text('Sales Dashboard',
-                            style: GoogleFonts.lato(
+                            style: GoogleFonts.poppins(
                                 fontSize: 17,
                                 fontWeight: FontWeight.w600,
                                 color: colour.commonColor)),
                         Text(
                           'Air Freight · ${DateFormat('MMMM yyyy').format(DateTime.now())}',
-                          style: GoogleFonts.lato(
+                          style: GoogleFonts.poppins(
                               fontSize: 12,
                               color: colour.commonColor.withOpacity(0.5)),
                         ),
@@ -96,7 +93,7 @@ class _CustomerDashboardView extends StatelessWidget {
                           ? null
                           : state.dropdownValueEmp,
                       hint: Text('Select Employee',
-                          style: GoogleFonts.lato(
+                          style: GoogleFonts.poppins(
                               fontSize: 13,
                               color: Colors.grey.shade500)),
                       icon: const Icon(Icons.keyboard_arrow_down_rounded,
@@ -108,7 +105,7 @@ class _CustomerDashboardView extends StatelessWidget {
                               .add(EmployeeChangedEvent(value));
                         }
                       },
-                      style: GoogleFonts.lato(
+                      style: GoogleFonts.poppins(
                         fontSize: 14,
                         fontWeight: FontWeight.w600,
                         color: colour.commonColor,
@@ -173,8 +170,8 @@ class _CustomerDashboardView extends StatelessWidget {
 
                 // ── Section Label ──
                 Text('STATUS BREAKDOWN',
-                    style: GoogleFonts.lato(
-                        fontSize: 11,
+                    style: GoogleFonts.poppins(
+                        fontSize: 12,
                         fontWeight: FontWeight.w600,
                         letterSpacing: 0.8,
                         color: colour.commonColor.withOpacity(0.5))),
@@ -218,9 +215,10 @@ class _CustomerDashboardView extends StatelessWidget {
                             Expanded(
                               child: Text(
                                 item['JobStatus'].toString(),
-                                style: GoogleFonts.lato(
+                                style: GoogleFonts.poppins(
                                     fontSize: 13,
-                                    color: colour.commonColor),
+                                    fontWeight: FontWeight.w600,
+                                    color: colour.kHeaderGradStart),
                               ),
                             ),
                             // Progress bar
@@ -240,15 +238,16 @@ class _CustomerDashboardView extends StatelessWidget {
                             // Day count
                             Text(
                               dayCount.toString(),
-                              style: GoogleFonts.lato(
-                                  fontSize: 13,
+                              style: GoogleFonts.poppins(
+                                  fontSize: 14,
                                   fontWeight: FontWeight.w600,
                                   color: colour.commonColor),
                             ),
                             const SizedBox(width: 4),
                             Text('days',
-                                style: GoogleFonts.lato(
-                                    fontSize: 11,
+                                style: GoogleFonts.poppins(
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.w600,
                                     color: colour.commonColor
                                         .withOpacity(0.4))),
                           ],
@@ -325,13 +324,13 @@ class _StatCard extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(label.toUpperCase(),
-                    style: GoogleFonts.lato(
+                    style: GoogleFonts.poppins(
                         fontSize: 10,
                         letterSpacing: 0.4,
                         color: Colors.grey.shade500)),
                 const SizedBox(height: 4),
                 Text(value,
-                    style: GoogleFonts.lato(
+                    style: GoogleFonts.poppins(
                         fontSize: 26,
                         fontWeight: FontWeight.w600,
                         color: colour.commonColor,
@@ -345,7 +344,7 @@ class _StatCard extends StatelessWidget {
                     borderRadius: BorderRadius.circular(20),
                   ),
                   child: Text(badge,
-                      style: GoogleFonts.lato(
+                      style: GoogleFonts.poppins(
                           fontSize: 10,
                           color: badgeTextColor,
                           fontWeight: FontWeight.w500)),

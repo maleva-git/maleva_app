@@ -7,11 +7,9 @@ import 'package:maleva/core/models/model.dart';
 import 'package:maleva/core/network/OnlineApi.dart' as OnlineApi;
 import 'package:maleva/core/utils/clsfunction.dart' as objfun;
 import 'package:maleva/core/colors/colors.dart' as colour;
-
 import '../../MasterSearch/Customer.dart';
 import '../../MasterSearch/JobType.dart';
 import '../../MasterSearch/Port.dart';
-
 part 'package:maleva/Transaction/Enquiry/mobileAddEnquiry.dart';
 part 'package:maleva/Transaction/Enquiry/tabletAddEnquiry.dart';
 
@@ -21,10 +19,10 @@ class AddEnquiry extends StatefulWidget {
   const AddEnquiry({super.key, this.SaleMaster});
 
   @override
-  AddEnquiryState createState() => AddEnquiryState();
+  AddEnquiryStates createState() => AddEnquiryStates();
 }
 
-class AddEnquiryState extends State<AddEnquiry> with TickerProviderStateMixin{
+class AddEnquiryStates extends State<AddEnquiry> with TickerProviderStateMixin{
   bool progress = false;
   late MenuMasterModel menuControl;
   String UserName = objfun.storagenew.getString('Username') ?? "";

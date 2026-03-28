@@ -12,9 +12,8 @@ import '../../../../core/models/model.dart';
 import '../../../../core/utils/clsfunction.dart' as objfun;
 import '../../../common_updates/blocs/sales/sales_bloc.dart';
 import '../../../common_updates/blocs/sales/sales_event.dart';
-import '../../../common_updates/blocs/truck/truck_bloc.dart';
-import '../../../common_updates/blocs/truck/truck_event.dart';
 import '../../admin_dashboard/tabs/airfreightsales/view/airfreightsales_tab.dart';
+import '../../admin_dashboard/tabs/enquiry/view/view/enquiry_tab.dart';
 import '../../admin_dashboard/tabs/fuel/view/fuelreport_tab.dart';
 import '../../admin_dashboard/tabs/paymentview/view/paymentview_tab.dart';
 import '../../admin_dashboard/tabs/transport/view/transportview_tab.dart';
@@ -127,6 +126,7 @@ class SalesDashboardView extends StatelessWidget {
           _tab('SALES', isTablet),
           _tab('VSL', isTablet),
           _tab('TRANSPORT', isTablet),
+          _tab('ENQUIRY', isTablet),
           _tab('FUEL VIEW', isTablet),
           _tab('PaymentView', isTablet),
         ],
@@ -164,6 +164,7 @@ Tab _tab(String text, bool isTablet) => Tab(
             const CustomerDashboardScreen(),
             const VesselReportPage(),
             const TransportReportPage(),
+            const EnquiryScreen(),
             const FuelDiffPage(),
             const PaymentPendingPage(),
 
