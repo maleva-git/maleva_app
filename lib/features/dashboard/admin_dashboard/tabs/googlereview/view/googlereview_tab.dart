@@ -9,14 +9,8 @@ import '../bloc/googlereview_event.dart';
 import '../bloc/googlereview_state.dart';
 import 'googlereview_grid.dart';
 
-// ── Color Palette ─────────────────────────────────────────────────────────────
-const Color kPrimary      = Color(0xFF1555F3);
-const Color kPrimaryDark  = Color(0xFF0D3DB5);
-const Color kPrimaryLight = Color(0xFF4D7EF7);
-const Color kAccent       = Color(0xFFE8EEFF);
-const Color kWhite        = Colors.white;
 
-// ── Entry Point ───────────────────────────────────────────────────────────────
+
 class ReviewEntryPage extends StatelessWidget {
   final Review? existingReview;
   const ReviewEntryPage({super.key, this.existingReview});
@@ -383,23 +377,26 @@ class _ReviewEntryFormState extends State<ReviewEntryForm> {
             ),
           ),
         ),
-        IconButton(
-          icon: Icon(Icons.edit_calendar_rounded,
-              color: kPrimary,
-              size:  isTablet ? 24 : 22),
-          onPressed: () async {
-            final picked = await showDatePicker(
-              context:     context,
-              initialDate: state.selectedDate,
-              firstDate:   DateTime(2020),
-              lastDate:    DateTime(2100),
-            );
-            if (picked != null) {
-              context
-                  .read<ReviewBloc>()
-                  .add(SelectDateEvent(picked));
-            }
-          },
+        Material(
+          color: Colors.transparent,
+          child: IconButton(
+            icon: Icon(Icons.edit_calendar_rounded,
+                color: kPrimary,
+                size:  isTablet ? 24 : 22),
+            onPressed: () async {
+              final picked = await showDatePicker(
+                context:     context,
+                initialDate: state.selectedDate,
+                firstDate:   DateTime(2020),
+                lastDate:    DateTime(2100),
+              );
+              if (picked != null) {
+                context
+                    .read<ReviewBloc>()
+                    .add(SelectDateEvent(picked));
+              }
+            },
+          ),
         ),
       ]),
     );

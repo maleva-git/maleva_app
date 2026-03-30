@@ -16,8 +16,6 @@ import '../Transaction/Enquiry/EnquiryView.dart';
 import '../Transaction/EnquiryTR/EnquiryTRView.dart';
 import '../Transaction/GetJobNoPage.dart';
 import '../Transaction/JobStatus/JobStatusUpdate.dart';
-import '../Transaction/Planning/PlanningView.dart';
-import '../Transaction/SaleOrder/SalesOrderView.dart';
 import '../Transaction/SpotSaleOrder/SpotSaleOrder.dart';
 import '../Transaction/Stock/StockInEntry.dart';
 import '../Transaction/Stock/StockTransferUpdate.dart';
@@ -26,12 +24,13 @@ import '../Transaction/VesselPlanning/VesselPlanningView.dart';
 import '../Transport/LicenseUpdate.dart';
 import '../Transport/Maintenance.dart';
 import '../Transport/RTI/UpdateRTIDetails.dart';
-import 'package:maleva/core/colors/colors.dart' as colour;
+import '../features/dashboard/admin_dashboard/tabs/emailinbox/view/emailinbox_tab.dart';
+import '../features/dashboard/admin_dashboard/tabs/googlereview/view/googlereview_tab.dart';
 import '../features/transaction/planning/view/planning_tab.dart';
 import '../features/transaction/salesorder/view/view/salesorderview_tab.dart';
+import '../../../../../../../core/colors/colors.dart' as colour;
 
 
-// ─────────────────────────────────────────────────────────────────────────────
 
 class Menulist extends StatefulWidget {
   const Menulist({super.key});
@@ -623,9 +622,47 @@ class _MenuTileState extends State<_MenuTile>
         case "PreAlertReport":
           Navigator.push(ctx, _r(const PreAlertreport()));      break;
         case "Email InBox":
-          Navigator.push(ctx, _r(const EmailScreen()));         break;
+          Navigator.push(
+            ctx,
+            _r(
+              Scaffold(
+                appBar: AppBar(
+                  title: Text(
+                    'Email InBox',
+                    style: GoogleFonts.poppins(
+                      fontWeight: FontWeight.w600,
+                      color: Colors.white,
+                    ),
+                  ),
+                  backgroundColor: colour.kHeaderGradStart,
+                  iconTheme: const IconThemeData(color: Colors.white),
+                ),
+                body: const EmailPage(),
+              ),
+            ),
+          );
+          break;
         case "Google Review":
-          Navigator.push(ctx, _r(const ReviewEntryScreen()));   break;
+          Navigator.push(
+            ctx,
+            _r(
+              Scaffold(
+                appBar: AppBar(
+                  title: Text(
+                    'Google Review',
+                    style: GoogleFonts.poppins(
+                      fontWeight: FontWeight.w600,
+                      color: Colors.white,
+                    ),
+                  ),
+                  backgroundColor: colour.kHeaderGradStart,
+                  iconTheme: const IconThemeData(color: Colors.white),
+                ),
+                body: const ReviewEntryPage(),
+              ),
+            ),
+          );
+          break;
         case "Update Air Frieght":
           Navigator.push(ctx, _r(const AirFrieghtUpdate()));    break;
         case "JobStatus Update":
