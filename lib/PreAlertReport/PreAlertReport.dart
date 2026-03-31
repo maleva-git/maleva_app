@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'dart:io';
-
 import 'package:maleva/DashBoard/OperationAdmin/OperationAdminDashboard.dart';
 import 'package:maleva/MasterSearch/Customer.dart';
 import 'package:maleva/MasterSearch/JobStatus.dart';
@@ -15,7 +14,6 @@ import 'package:maleva/menu/menulist.dart';
 import 'package:maleva/core/models/model.dart';
 import 'package:maleva/Transaction/SaleOrder/SalesOrderAdd.dart';
 import 'package:maleva/core/network/OnlineApi.dart' as OnlineApi;
-
 import '../../DashBoard/Admin/AdminDashboard.dart';
 import '../../DashBoard/AirFrieght/AirFrieghtDashboard.dart';
 import '../../DashBoard/Boarding/BoardingDashboard.dart';
@@ -28,13 +26,13 @@ import '../MasterSearch/Port.dart';
 part 'package:maleva/PreAlertReport/mobilePreAlertView.dart';
 part 'package:maleva/PreAlertReport/tabletPreAlertView.dart';
 
-class PreAlertreport extends StatefulWidget {
-  const PreAlertreport({super.key});
+class OldPreAlertreport extends StatefulWidget {
+  const OldPreAlertreport({super.key});
   @override
-  PreAlertreportState createState() => PreAlertreportState();
+  OldPreAlertreportState createState() => OldPreAlertreportState();
 }
 
-class PreAlertreportState extends State<PreAlertreport> {
+class OldPreAlertreportState extends State<OldPreAlertreport> {
   bool progress = false;
   String cls = "3";
   String ETAVal = "0";

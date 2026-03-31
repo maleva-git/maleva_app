@@ -27,6 +27,7 @@ import '../Transport/RTI/UpdateRTIDetails.dart';
 import '../features/dashboard/admin_dashboard/tabs/emailinbox/view/emailinbox_tab.dart';
 import '../features/dashboard/admin_dashboard/tabs/googlereview/view/googlereview_tab.dart';
 import '../features/transaction/planning/view/planning_tab.dart';
+import '../features/transaction/prealertview/view/prealertview_tab.dart';
 import '../features/transaction/salesorder/view/view/salesorderview_tab.dart';
 import '../../../../../../../core/colors/colors.dart' as colour;
 import '../features/transaction/vesselplanning/view/vesselplanning_tab.dart';
@@ -621,7 +622,7 @@ class _MenuTileState extends State<_MenuTile>
         case "SpotSaleOrder":
           Navigator.push(ctx, _r(const Spotsaleorder()));       break;
         case "PreAlertReport":
-          Navigator.push(ctx, _r(const PreAlertreport()));      break;
+          Navigator.push(ctx, _r(const PreAlertReport()));      break;
         case "Email InBox":
           Navigator.push(
             ctx,

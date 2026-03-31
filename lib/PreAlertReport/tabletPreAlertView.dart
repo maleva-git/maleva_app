@@ -1,6 +1,6 @@
 part of 'package:maleva/PreAlertReport/PreAlertReport.dart';
 
-tabletdesign(PreAlertreportState state, BuildContext context) {
+tabletdesign(OldPreAlertreportState state, BuildContext context) {
   double width = MediaQuery.of(context).size.width;
   double height = MediaQuery.of(context).size.height;
   Future<bool> onBackPressed() async {
