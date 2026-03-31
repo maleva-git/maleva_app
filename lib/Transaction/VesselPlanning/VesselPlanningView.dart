@@ -14,14 +14,14 @@ import '../../MasterSearch/Employee.dart';
 import 'VesselPlanningDetails.dart';
 part 'package:maleva/Transaction/VesselPlanning/mobileVesselPlanningView.dart';
 part 'package:maleva/Transaction/VesselPlanning/tabletVesselPlanningView.dart';
-class VesselPlanningView extends StatefulWidget {
-  const VesselPlanningView({super.key});
+class OldVesselPlanningView extends StatefulWidget {
+  const OldVesselPlanningView({super.key});
 
   @override
-  VesselPlanningViewState createState() => VesselPlanningViewState();
+  OldVesselPlanningViewState createState() => OldVesselPlanningViewState();
 }
 
-class VesselPlanningViewState extends State<VesselPlanningView> {
+class OldVesselPlanningViewState extends State<OldVesselPlanningView> {
   bool progress = false;
 
   int EmpId = 0;

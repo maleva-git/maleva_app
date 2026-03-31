@@ -14,9 +14,32 @@ import '../bloc/vesselplanning_bloc.dart';
 import '../bloc/vesselplanning_event.dart';
 import '../bloc/vesselplanning_state.dart';
 
+// ─── Design Tokens ────────────────────────────────────────────────────────────
+const kHeaderGradStart = Color(0xFF1A3A8F);
+const kHeaderGradEnd   = Color(0xFF4A6FD4);
+const kCardBorder      = Color(0xFFC5D0EE);
+const kCardBg          = Color(0xFFFFFFFF);
+const kPageBg          = Color(0xFFF4F6FB);
+const kTextDark        = Color(0xFF1E2D5E);
+const kTextMid         = Color(0xFF4A5A8A);
+const kTextMuted       = Color(0xFF8A96BF);
+const kAccentBar       = Color(0xFF4A6FD4);
+const kDetailBg        = Color(0xFFF0F4FF);
+const kChipBg          = Color(0xFFEEF2FF);
 
+const kGradient = LinearGradient(
+  colors: [kHeaderGradStart, kHeaderGradEnd],
+  begin: Alignment.topLeft,
+  end: Alignment.bottomRight,
+);
 
-// ─── Entry point ────────────────────────────────────────────────────────────────
+const kGradientVertical = LinearGradient(
+  colors: [kHeaderGradStart, Color(0xFF2D56C8)],
+  begin: Alignment.topCenter,
+  end: Alignment.bottomCenter,
+);
+
+// ─── Root Widget ──────────────────────────────────────────────────────────────
 class VesselPlanningView extends StatelessWidget {
   const VesselPlanningView({super.key});
 
@@ -29,14 +52,14 @@ class VesselPlanningView extends StatelessWidget {
   }
 }
 
-// ─── Page ────────────────────────────────────────────────────────────────────────
+// ─── Page ─────────────────────────────────────────────────────────────────────
 class _VesselPlanningPage extends StatelessWidget {
   const _VesselPlanningPage();
 
   @override
   Widget build(BuildContext context) {
     final isTablet = objfun.MalevaScreen != 1;
-    final userName = objfun.storagenew.getString('Username') ?? "";
+    final userName = objfun.storagenew.getString('Username') ?? '';
 
     return BlocListener<VesselPlanningBloc, VesselPlanningState>(
       listener: (context, state) {
@@ -48,20 +71,25 @@ class _VesselPlanningPage extends StatelessWidget {
         }
         if (state is VesselPlanningError) {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(state.message), backgroundColor: Colors.red),
+            SnackBar(
+              content: Text(state.message, style: GoogleFonts.lato(color: Colors.white)),
+              backgroundColor: const Color(0xFFB33040),
+              behavior: SnackBarBehavior.floating,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+            ),
           );
         }
       },
       child: Scaffold(
         resizeToAvoidBottomInset: false,
-        backgroundColor: Colors.white,
+        backgroundColor: kPageBg,
         appBar: _buildAppBar(context, userName, isTablet),
         drawer: const Menulist(),
         body: BlocBuilder<VesselPlanningBloc, VesselPlanningState>(
           builder: (context, state) {
             if (state is VesselPlanningLoading || state is VesselPlanningInitial) {
               return const Center(
-                child: SpinKitFoldingCube(color: colour.spinKitColor, size: 35.0),
+                child: SpinKitFoldingCube(color: kHeaderGradEnd, size: 35.0),
               );
             }
             if (state is VesselPlanningLoaded) {
@@ -70,79 +98,82 @@ class _VesselPlanningPage extends StatelessWidget {
             return const SizedBox.shrink();
           },
         ),
-        floatingActionButton: FloatingActionButton(
+        floatingActionButton: _VPFab(
           onPressed: () => _showFilterSheet(context),
-          tooltip: 'Open filter',
-          child: const Icon(Icons.filter_alt_outlined),
         ),
       ),
     );
   }
 
-  AppBar _buildAppBar(BuildContext context, String userName, bool isTablet) {
+  // ─── AppBar ────────────────────────────────────────────────────────────────
+  PreferredSizeWidget _buildAppBar(
+      BuildContext context, String userName, bool isTablet) {
     return AppBar(
-      automaticallyImplyLeading: true,
+      automaticallyImplyLeading: false,
+      elevation: 0,
+      toolbarHeight: isTablet ? 70 : 62,
+      flexibleSpace: Container(
+        decoration: const BoxDecoration(gradient: kGradient),
+      ),
       leading: IconButton(
-        icon: const Icon(Icons.arrow_back),
+        icon: const Icon(Icons.arrow_back_ios_new_rounded, size: 20),
+        color: Colors.white,
         onPressed: () => Navigator.pop(context),
       ),
       title: Column(
-        mainAxisAlignment: MainAxisAlignment.start,
+        mainAxisAlignment: MainAxisAlignment.center,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
             'Vessel Planning',
             style: GoogleFonts.lato(
-              color: colour.topAppBarColor,
-              fontWeight: FontWeight.bold,
+              color: Colors.white,
+              fontWeight: FontWeight.w700,
               fontSize: isTablet ? objfun.FontMedium + 2 : objfun.FontMedium,
+              letterSpacing: 0.3,
             ),
           ),
+          const SizedBox(height: 2),
           Text(
             userName,
             style: GoogleFonts.lato(
-              color: colour.commonColorLight,
-              fontWeight: FontWeight.bold,
-              fontSize: isTablet ? objfun.FontLow : objfun.FontLow - 2,
+              color: Colors.white.withOpacity(0.65),
+              fontWeight: FontWeight.w500,
+              fontSize: isTablet ? objfun.FontLow : objfun.FontLow - 1,
             ),
           ),
         ],
       ),
-      iconTheme: const IconThemeData(color: colour.topAppBarColor),
+      iconTheme: const IconThemeData(color: Colors.white),
     );
   }
 
-  // ─── Filter Bottom Sheet ──────────────────────────────────────────────────────
+  // ─── Filter Bottom Sheet ───────────────────────────────────────────────────
   void _showFilterSheet(BuildContext pageContext) {
     final bloc = pageContext.read<VesselPlanningBloc>();
     final currentState = bloc.state is VesselPlanningLoaded
         ? bloc.state as VesselPlanningLoaded
         : null;
 
-    String fromDate = currentState?.fromDate ?? DateFormat("yyyy-MM-dd").format(DateTime.now());
-    String toDate = currentState?.toDate ?? DateFormat("yyyy-MM-dd").format(DateTime.now());
+    String fromDate = currentState?.fromDate ??
+        DateFormat("yyyy-MM-dd").format(DateTime.now());
+    String toDate = currentState?.toDate ??
+        DateFormat("yyyy-MM-dd").format(DateTime.now());
     String planningNo = currentState?.planningNo ?? '';
     bool isLoggedInEmp = currentState?.isLoggedInEmp ?? true;
     int empId = currentState?.empId ?? 0;
     String empName = currentState?.empName ?? '';
 
     final txtPlanningNo = TextEditingController(text: planningNo);
-    final txtEmployee = TextEditingController(text: empName);
+    final txtEmployee   = TextEditingController(text: empName);
 
     showModalBottomSheet(
       context: pageContext,
       isScrollControlled: true,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
-      ),
+      backgroundColor: Colors.transparent,
       builder: (sheetContext) {
         return StatefulBuilder(builder: (ctx, setSheetState) {
           final isTablet = objfun.MalevaScreen != 1;
-          final labelStyle = GoogleFonts.lato(
-            color: colour.commonColor,
-            fontWeight: FontWeight.bold,
-            fontSize: isTablet ? objfun.FontLow + 1 : objfun.FontLow,
-          );
 
           Future<void> pickDate(bool isFrom) async {
             final picked = await showDatePicker(
@@ -150,154 +181,195 @@ class _VesselPlanningPage extends StatelessWidget {
               initialDate: DateTime.now(),
               firstDate: DateTime(1900),
               lastDate: DateTime(2050),
+              builder: (context, child) => Theme(
+                data: Theme.of(context).copyWith(
+                  colorScheme: const ColorScheme.light(
+                    primary: kHeaderGradStart,
+                    onPrimary: Colors.white,
+                    surface: Colors.white,
+                    onSurface: kTextDark,
+                  ),
+                ),
+                child: child!,
+              ),
             );
             if (picked != null) {
               final formatted = DateFormat("yyyy-MM-dd").format(picked);
               setSheetState(() {
-                if (isFrom) {
-                  fromDate = formatted;
-                } else {
-                  toDate = formatted;
-                }
+                if (isFrom) fromDate = formatted;
+                else toDate = formatted;
               });
             }
           }
 
-          return Padding(
+          return Container(
+            decoration: const BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+            ),
             padding: EdgeInsets.only(
-              top: 16,
+              top: 0,
               left: 16,
               right: 16,
-              bottom: MediaQuery.of(ctx).viewInsets.bottom + 16,
+              bottom: MediaQuery.of(ctx).viewInsets.bottom + 20,
             ),
             child: SingleChildScrollView(
               child: Column(
                 mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // ── Date row ──
+                  // Handle bar
+                  Center(
+                    child: Container(
+                      margin: const EdgeInsets.only(top: 12, bottom: 18),
+                      width: 40,
+                      height: 4,
+                      decoration: BoxDecoration(
+                        color: kCardBorder,
+                        borderRadius: BorderRadius.circular(2),
+                      ),
+                    ),
+                  ),
+
+                  // Sheet title
+                  Text(
+                    'Filter',
+                    style: GoogleFonts.lato(
+                      color: kHeaderGradStart,
+                      fontWeight: FontWeight.w700,
+                      fontSize: isTablet ? 16 : 15,
+                      letterSpacing: 0.2,
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+
+                  // ── Date row ────────────────────────────────────────────
                   Row(
                     children: [
                       Expanded(
-                        child: _DateTile(
+                        child: _SheetDateTile(
                           label: 'From',
                           date: fromDate,
                           onTap: () => pickDate(true),
-                          labelStyle: labelStyle,
                         ),
                       ),
-                      const SizedBox(width: 12),
+                      const SizedBox(width: 10),
                       Expanded(
-                        child: _DateTile(
+                        child: _SheetDateTile(
                           label: 'To',
                           date: toDate,
                           onTap: () => pickDate(false),
-                          labelStyle: labelStyle,
                         ),
                       ),
                     ],
                   ),
                   const SizedBox(height: 12),
 
-                  // ── Employee ──
-                  TextField(
+                  // ── Employee ─────────────────────────────────────────────
+                  _SheetTextField(
                     controller: txtEmployee,
+                    hint: 'Select Employee',
                     readOnly: true,
-                    style: labelStyle,
-                    decoration: InputDecoration(
-                      hintText: "Select Employee",
-                      hintStyle: GoogleFonts.lato(
-                        fontSize: objfun.FontLow,
-                        fontWeight: FontWeight.bold,
-                        color: colour.commonColorLight,
-                      ),
-                      suffixIcon: InkWell(
-                        onTap: () async {
-                          await OnlineApi.SelectEmployee(ctx, 'sales', 'admin');
-                          if (txtEmployee.text.isEmpty && !isLoggedInEmp) {
-                            Navigator.push(
-                              ctx,
-                              MaterialPageRoute(
-                                builder: (_) => const Employee(Searchby: 1, SearchId: 0),
-                              ),
-                            ).then((_) {
-                              setSheetState(() {
-                                txtEmployee.text = objfun.SelectEmployeeList.AccountName;
-                                empId = objfun.SelectEmployeeList.Id;
-                                empName = txtEmployee.text;
-                                objfun.SelectEmployeeList = EmployeeModel.Empty();
-                              });
-                            });
-                          } else {
+                    suffixIcon: InkWell(
+                      onTap: () async {
+                        if (isLoggedInEmp) return;
+                        await OnlineApi.SelectEmployee(ctx, 'sales', 'admin');
+                        if (txtEmployee.text.isEmpty) {
+                          Navigator.push(
+                            ctx,
+                            MaterialPageRoute(
+                              builder: (_) =>
+                              const Employee(Searchby: 1, SearchId: 0),
+                            ),
+                          ).then((_) {
                             setSheetState(() {
-                              txtEmployee.text = '';
-                              empId = 0;
-                              empName = '';
+                              txtEmployee.text =
+                                  objfun.SelectEmployeeList.AccountName;
+                              empId   = objfun.SelectEmployeeList.Id;
+                              empName = txtEmployee.text;
                               objfun.SelectEmployeeList = EmployeeModel.Empty();
                             });
-                          }
-                        },
-                        child: Icon(
-                          txtEmployee.text.isNotEmpty ? Icons.close : Icons.search_rounded,
-                          color: isLoggedInEmp ? colour.commonColorDisabled : colour.commonColorred,
-                        ),
+                          });
+                        } else {
+                          setSheetState(() {
+                            txtEmployee.text = '';
+                            empId   = 0;
+                            empName = '';
+                            objfun.SelectEmployeeList = EmployeeModel.Empty();
+                          });
+                        }
+                      },
+                      child: Icon(
+                        txtEmployee.text.isNotEmpty
+                            ? Icons.close_rounded
+                            : Icons.search_rounded,
+                        color: isLoggedInEmp
+                            ? kTextMuted
+                            : kHeaderGradEnd,
+                        size: 20,
                       ),
-                      enabledBorder: const OutlineInputBorder(
-                        borderRadius: BorderRadius.all(Radius.circular(10)),
-                        borderSide: BorderSide(color: colour.commonColor),
-                      ),
-                      focusedBorder: const OutlineInputBorder(
-                        borderRadius: BorderRadius.all(Radius.circular(10)),
-                        borderSide: BorderSide(color: colour.commonColorred),
-                      ),
-                      contentPadding: const EdgeInsets.only(left: 10, right: 20, top: 10),
                     ),
                   ),
                   const SizedBox(height: 10),
 
-                  // ── Planning No ──
-                  TextField(
+                  // ── Planning No ──────────────────────────────────────────
+                  _SheetTextField(
                     controller: txtPlanningNo,
+                    hint: 'Planning No',
                     textCapitalization: TextCapitalization.characters,
                     textInputAction: TextInputAction.done,
-                    style: labelStyle,
-                    decoration: InputDecoration(
-                      hintText: 'Planning No',
-                      hintStyle: GoogleFonts.lato(
-                        fontSize: objfun.FontLow,
-                        fontWeight: FontWeight.bold,
-                        color: colour.commonColorLight,
+                  ),
+                  const SizedBox(height: 10),
+
+                  // ── L.Emp checkbox ───────────────────────────────────────
+                  InkWell(
+                    onTap: () =>
+                        setSheetState(() => isLoggedInEmp = !isLoggedInEmp),
+                    borderRadius: BorderRadius.circular(8),
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(
+                          vertical: 4, horizontal: 2),
+                      child: Row(
+                        children: [
+                          AnimatedContainer(
+                            duration: const Duration(milliseconds: 180),
+                            width: 20,
+                            height: 20,
+                            decoration: BoxDecoration(
+                              gradient: isLoggedInEmp ? kGradient : null,
+                              border: isLoggedInEmp
+                                  ? null
+                                  : Border.all(color: kCardBorder, width: 1.5),
+                              borderRadius: BorderRadius.circular(5),
+                            ),
+                            child: isLoggedInEmp
+                                ? const Icon(Icons.check_rounded,
+                                size: 14, color: Colors.white)
+                                : null,
+                          ),
+                          const SizedBox(width: 10),
+                          Text(
+                            'Logged-in Employee',
+                            style: GoogleFonts.lato(
+                              color: kTextDark,
+                              fontWeight: FontWeight.w600,
+                              fontSize: isTablet
+                                  ? objfun.FontLow + 1
+                                  : objfun.FontLow,
+                            ),
+                          ),
+                        ],
                       ),
-                      enabledBorder: const OutlineInputBorder(
-                        borderRadius: BorderRadius.all(Radius.circular(10)),
-                        borderSide: BorderSide(color: colour.commonColor),
-                      ),
-                      focusedBorder: const OutlineInputBorder(
-                        borderRadius: BorderRadius.all(Radius.circular(10)),
-                        borderSide: BorderSide(color: colour.commonColorred),
-                      ),
-                      contentPadding: const EdgeInsets.only(left: 10, right: 20, top: 10),
                     ),
                   ),
-                  const SizedBox(height: 8),
+                  const SizedBox(height: 20),
 
-                  // ── L.Emp checkbox ──
-                  Row(
-                    children: [
-                      Checkbox(
-                        value: isLoggedInEmp,
-                        activeColor: colour.commonColorred,
-                        onChanged: (val) => setSheetState(() => isLoggedInEmp = val!),
-                      ),
-                      Text('L.Emp', style: labelStyle),
-                    ],
-                  ),
-                  const SizedBox(height: 8),
-
-                  // ── Buttons ──
+                  // ── Buttons ──────────────────────────────────────────────
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      ElevatedButton(
+                      _GradientButton(
+                        label: 'View',
                         onPressed: () {
                           pageContext.read<VesselPlanningBloc>().add(
                             VesselPlanningFilterChanged(
@@ -310,12 +382,11 @@ class _VesselPlanningPage extends StatelessWidget {
                           );
                           Navigator.pop(ctx);
                         },
-                        child: Text('View', style: GoogleFonts.lato(fontSize: objfun.FontMedium)),
                       ),
-                      const SizedBox(width: 10),
-                      ElevatedButton(
+                      const SizedBox(width: 12),
+                      _OutlineButton(
+                        label: 'Close',
                         onPressed: () => Navigator.pop(ctx),
-                        child: Text('Close', style: GoogleFonts.lato(fontSize: objfun.FontMedium)),
                       ),
                     ],
                   ),
@@ -329,7 +400,7 @@ class _VesselPlanningPage extends StatelessWidget {
   }
 }
 
-// ─── Body ────────────────────────────────────────────────────────────────────────
+// ─── Body ─────────────────────────────────────────────────────────────────────
 class _VesselPlanningBody extends StatelessWidget {
   final VesselPlanningLoaded state;
   final bool isTablet;
@@ -339,53 +410,47 @@ class _VesselPlanningBody extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final height = MediaQuery.of(context).size.height;
-    final width = MediaQuery.of(context).size.width;
+    final width  = MediaQuery.of(context).size.width;
 
-    return Padding(
-      padding: const EdgeInsets.all(5),
-      child: Column(
-        children: [
-          // ── Grid Header ──
-          Container(
-            height: isTablet ? height * 0.07 : height * 0.06,
-            color: colour.commonColor,
-            padding: const EdgeInsets.symmetric(horizontal: 5),
-            child: _GridHeader(isTablet: isTablet),
-          ),
+    return Column(
+      children: [
+        // ── Grid Header ────────────────────────────────────────────────────
+        Container(
+          height: isTablet ? height * 0.09 : height * 0.08,
+          decoration: const BoxDecoration(gradient: kGradientVertical),
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+          child: _GridHeader(isTablet: isTablet),
+        ),
 
-          // ── List ──
-          Expanded(
-            child: state.masterList.isEmpty
-                ? Center(
-              child: Text(
-                'No Record',
-                style: GoogleFonts.lato(fontSize: objfun.FontMedium),
-              ),
-            )
-                : ListView.builder(
-              itemCount: state.masterList.length,
-              itemBuilder: (ctx, index) {
-                final item = state.masterList[index];
-                final isExpanded = state.expandedIndex == index;
-                return _PlanningCard(
-                  item: item,
-                  index: index,
-                  isExpanded: isExpanded,
-                  selectedDetails: state.selectedDetails,
-                  isTablet: isTablet,
-                  height: height,
-                  width: width,
-                );
-              },
-            ),
+        // ── List ───────────────────────────────────────────────────────────
+        Expanded(
+          child: state.masterList.isEmpty
+              ? _EmptyState()
+              : ListView.builder(
+            padding:
+            const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+            itemCount: state.masterList.length,
+            itemBuilder: (ctx, index) {
+              final item = state.masterList[index];
+              final isExpanded = state.expandedIndex == index;
+              return _PlanningCard(
+                item: item,
+                index: index,
+                isExpanded: isExpanded,
+                selectedDetails: state.selectedDetails,
+                isTablet: isTablet,
+                height: height,
+                width: width,
+              );
+            },
           ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 }
 
-// ─── Grid Header ─────────────────────────────────────────────────────────────────
+// ─── Grid Header ──────────────────────────────────────────────────────────────
 class _GridHeader extends StatelessWidget {
   final bool isTablet;
   const _GridHeader({required this.isTablet});
@@ -393,35 +458,34 @@ class _GridHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final style = GoogleFonts.lato(
-      color: colour.ButtonForeColor,
-      fontWeight: FontWeight.bold,
-      fontSize: isTablet ? objfun.FontLow + 1 : objfun.FontLow,
+      color: Colors.white.withOpacity(0.85),
+      fontWeight: FontWeight.w600,
+      fontSize: isTablet ? 11 : 10,
+      letterSpacing: 0.6,
     );
     return Column(
+      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: [
-        Expanded(
-          child: Row(children: [
-            Expanded(flex: 3, child: Text("Planning No", style: style)),
-            Expanded(flex: 3, child: Text("Planning Date", style: style)),
-          ]),
-        ),
-        Expanded(
-          child: Row(children: [
-            Expanded(flex: 3, child: Text("Remarks", style: style)),
-          ]),
-        ),
-        Expanded(
-          child: Row(children: [
-            const Expanded(flex: 1, child: SizedBox()),
-            Expanded(flex: 1, child: Text("Export", textAlign: TextAlign.center, style: style)),
-          ]),
-        ),
+        Row(children: [
+          Expanded(flex: 3, child: Text('PLANNING NO', style: style)),
+          Expanded(flex: 3, child: Text('PLANNING DATE', style: style)),
+        ]),
+        Row(children: [
+          Expanded(flex: 3, child: Text('REMARKS', style: style)),
+        ]),
+        Row(children: [
+          const Expanded(flex: 3, child: SizedBox()),
+          Expanded(
+            flex: 2,
+            child: Text('EXPORT', textAlign: TextAlign.center, style: style),
+          ),
+        ]),
       ],
     );
   }
 }
 
-// ─── Planning Card ────────────────────────────────────────────────────────────────
+// ─── Planning Card ────────────────────────────────────────────────────────────
 class _PlanningCard extends StatelessWidget {
   final VesselPlanningMasterModel item;
   final int index;
@@ -443,93 +507,120 @@ class _PlanningCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final cardHeight = isExpanded
-        ? (isTablet ? height * 0.60 : height * 0.55)
-        : (isTablet ? height * 0.14 : height * 0.12);
-
-    final textStyle = GoogleFonts.lato(
-      color: colour.commonColor,
-      fontWeight: FontWeight.bold,
+    final valStyle = GoogleFonts.lato(
+      color: kTextDark,
+      fontWeight: FontWeight.w600,
       fontSize: isTablet ? objfun.FontCardText + 1 : objfun.FontCardText,
-      letterSpacing: 0.3,
+    );
+    final labelStyle = GoogleFonts.lato(
+      color: kTextMuted,
+      fontWeight: FontWeight.w600,
+      fontSize: isTablet ? 10 : 9,
+      letterSpacing: 0.4,
+    );
+    final remarkStyle = GoogleFonts.lato(
+      color: kTextMid,
+      fontWeight: FontWeight.w500,
+      fontSize: isTablet ? objfun.FontCardText : objfun.FontCardText - 1,
     );
 
-    return SizedBox(
-      height: cardHeight,
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 10),
       child: InkWell(
         onLongPress: () => _showPasswordDialog(context),
-        child: Card(
-          elevation: 10,
-          shape: RoundedRectangleBorder(
-            side: const BorderSide(color: colour.commonColor, width: 1),
-            borderRadius: BorderRadius.circular(10),
+        borderRadius: BorderRadius.circular(14),
+        child: Container(
+          decoration: BoxDecoration(
+            color: kCardBg,
+            borderRadius: BorderRadius.circular(14),
+            border: Border.all(color: kCardBorder, width: 0.5),
+            boxShadow: [
+              BoxShadow(
+                color: kHeaderGradStart.withOpacity(0.07),
+                blurRadius: 12,
+                offset: const Offset(0, 3),
+              ),
+            ],
           ),
-          child: Column(
-            children: [
-              // ── Row 1: Planning No + Date ──
-              Expanded(
-                flex: 1,
-                child: Row(
-                  children: [
-                    Expanded(
-                      flex: 3,
-                      child: Padding(
-                        padding: const EdgeInsets.all(1),
-                        child: Text(
-                          "   ${item.VESSELPLANINGNoDisplay}",
-                          overflow: TextOverflow.ellipsis,
-                          maxLines: 1,
-                          style: textStyle,
-                        ),
-                      ),
-                    ),
-                    Expanded(
-                      flex: 3,
-                      child: Padding(
-                        padding: const EdgeInsets.all(5),
-                        child: Text(
-                          item.VESSELPLANINGDate.toString(),
-                          overflow: TextOverflow.ellipsis,
-                          maxLines: 1,
-                          style: textStyle,
-                        ),
-                      ),
-                    ),
-                  ],
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(14),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // ── Top accent bar ────────────────────────────────────────
+                Container(
+                  height: 3,
+                  decoration: const BoxDecoration(gradient: kGradient),
                 ),
-              ),
 
-              // ── Row 2: Remarks ──
-              Expanded(
-                flex: 1,
-                child: Row(
-                  children: [
-                    Expanded(
-                      flex: 3,
-                      child: Padding(
-                        padding: const EdgeInsets.all(1),
-                        child: Text(
-                          "  ${item.Remarks}",
-                          overflow: TextOverflow.ellipsis,
-                          maxLines: 1,
-                          style: textStyle,
-                        ),
+                // ── Main card content ─────────────────────────────────────
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(14, 10, 14, 0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // Row 1: Planning No + Date
+                      Row(
+                        children: [
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text('PLANNING NO', style: labelStyle),
+                                const SizedBox(height: 2),
+                                Text(
+                                  item.VESSELPLANINGNoDisplay,
+                                  style: valStyle,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ],
+                            ),
+                          ),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text('DATE', style: labelStyle),
+                                const SizedBox(height: 2),
+                                Text(
+                                  item.VESSELPLANINGDate.toString(),
+                                  style: valStyle,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
                       ),
-                    ),
-                  ],
-                ),
-              ),
+                      const SizedBox(height: 8),
 
-              // ── Row 3: Expand + PDF ──
-              Expanded(
-                flex: 1,
-                child: Row(
-                  children: [
-                    Expanded(
-                      flex: 1,
-                      child: IconButton(
-                        icon: const Icon(Icons.expand_circle_down, color: colour.commonColor),
-                        onPressed: () {
+                      // Row 2: Remarks
+                      Text('REMARKS', style: labelStyle),
+                      const SizedBox(height: 2),
+                      Text(
+                        item.Remarks,
+                        style: remarkStyle,
+                        overflow: TextOverflow.ellipsis,
+                        maxLines: 1,
+                      ),
+                    ],
+                  ),
+                ),
+
+                // ── Action row ────────────────────────────────────────────
+                Padding(
+                  padding:
+                  const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                  child: Row(
+                    children: [
+                      _CardActionChip(
+                        icon: isExpanded
+                            ? Icons.keyboard_arrow_up_rounded
+                            : Icons.keyboard_arrow_down_rounded,
+                        label: isExpanded ? 'Collapse' : 'Details',
+                        onTap: () {
                           context.read<VesselPlanningBloc>().add(
                             VesselPlanningRowToggled(
                               index: index,
@@ -538,43 +629,41 @@ class _PlanningCard extends StatelessWidget {
                           );
                         },
                       ),
-                    ),
-                    Expanded(
-                      flex: 1,
-                      child: IconButton(
-                        icon: const Icon(Icons.picture_as_pdf_outlined, color: colour.commonColor),
-                        onPressed: () {
+                      const SizedBox(width: 8),
+                      _CardActionChip(
+                        icon: Icons.picture_as_pdf_outlined,
+                        label: 'Export PDF',
+                        onTap: () {
                           context.read<VesselPlanningBloc>().add(
                             VesselPlanningShareRequested(
                               id: item.Id,
-                              planningNoDisplay: item.VESSELPLANINGNoDisplay,
+                              planningNoDisplay:
+                              item.VESSELPLANINGNoDisplay,
                             ),
                           );
                         },
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
-              ),
 
-              // ── Expanded Details ──
-              if (isExpanded)
-                Expanded(
-                  flex: 8,
-                  child: _DetailsSection(
+                // ── Expanded Details ──────────────────────────────────────
+                if (isExpanded)
+                  _DetailsSection(
                     details: selectedDetails,
                     isTablet: isTablet,
                     height: height,
                     width: width,
                   ),
-                ),
-            ],
+              ],
+            ),
           ),
         ),
       ),
     );
   }
 
+  // ─── Password Dialog ───────────────────────────────────────────────────────
   void _showPasswordDialog(BuildContext context) {
     final txtPassword = TextEditingController();
     final bloc = context.read<VesselPlanningBloc>();
@@ -584,98 +673,135 @@ class _PlanningCard extends StatelessWidget {
       barrierDismissible: true,
       builder: (dialogCtx) {
         return Dialog(
-          elevation: 40,
-          child: SizedBox(
-            width: 200,
-            height: 220,
+          elevation: 0,
+          backgroundColor: Colors.transparent,
+          child: Container(
+            width: 300,
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(20),
+              boxShadow: [
+                BoxShadow(
+                  color: kHeaderGradStart.withOpacity(0.18),
+                  blurRadius: 30,
+                  offset: const Offset(0, 10),
+                ),
+              ],
+            ),
             child: Column(
+              mainAxisSize: MainAxisSize.min,
               children: [
-                ListView(shrinkWrap: true, children: [
-                  Container(
-                    width: 350,
-                    height: 150,
-                    margin: const EdgeInsets.all(10),
-                    decoration: BoxDecoration(image: DecorationImage(image: objfun.lockimg)),
-                    child: Padding(
-                      padding: const EdgeInsets.only(top: 85, left: 35, right: 35, bottom: 25),
-                      child: Container(
-                        decoration: BoxDecoration(
-                          borderRadius: const BorderRadius.all(Radius.circular(10)),
-                          color: colour.commonColorLight.withOpacity(1.0),
-                        ),
-                        child: TextField(
-                          controller: txtPassword,
-                          cursorColor: colour.commonColor,
-                          textCapitalization: TextCapitalization.characters,
-                          textInputAction: TextInputAction.done,
-                          decoration: InputDecoration(
-                            hintText: 'Edit Password',
-                            hintStyle: GoogleFonts.lato(
-                              fontSize: objfun.FontMedium,
-                              fontWeight: FontWeight.bold,
-                              color: colour.commonColor.withOpacity(0.6),
-                            ),
-                            enabledBorder: const OutlineInputBorder(
-                              borderRadius: BorderRadius.all(Radius.circular(10)),
-                              borderSide: BorderSide(color: colour.commonColor),
-                            ),
-                            focusedBorder: const OutlineInputBorder(
-                              borderRadius: BorderRadius.all(Radius.circular(10)),
-                            ),
-                            contentPadding: const EdgeInsets.only(left: 10, right: 20, top: 10),
-                          ),
-                          style: GoogleFonts.lato(
-                            color: colour.commonColor,
-                            fontWeight: FontWeight.bold,
-                            fontSize: objfun.FontLow,
-                            letterSpacing: 0.3,
-                          ),
-                        ),
-                      ),
-                    ),
+                // Header
+                Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 20, vertical: 16),
+                  decoration: const BoxDecoration(
+                    gradient: kGradient,
+                    borderRadius:
+                    BorderRadius.vertical(top: Radius.circular(20)),
                   ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
+                  child: Row(
                     children: [
-                      ElevatedButton(
-                        style: ElevatedButton.styleFrom(backgroundColor: colour.commonColor),
-                        onPressed: () async {
-                          if (txtPassword.text.isEmpty) {
-                            objfun.ConfirmationOK("Enter Password !!", dialogCtx);
-                            return;
-                          }
-                          await objfun
-                              .apiAllinoneSelectArray(
-                            "${objfun.apiEditPassword}${txtPassword.text}&type=EditPassword&Comid=${objfun.Comid}",
-                            null,
-                            null,
-                            dialogCtx,
-                          )
-                              .then((resultData) {
-                            if (resultData.length != 0 && resultData["IsSuccess"] == true) {
-                              txtPassword.text = '';
-                              Navigator.pop(dialogCtx);
-                              bloc.add(VesselPlanningEditRequested(
-                                id: item.Id,
-                                planningNo: item.VESSELPLANINGNo,
-                              ));
-                            } else {
-                              txtPassword.text = '';
-                              objfun.ConfirmationOK("Invalid Password !!!", dialogCtx);
-                            }
-                          });
-                        },
-                        child: Text(
-                          'Ok',
-                          style: GoogleFonts.lato(
-                            fontSize: objfun.FontMedium,
-                            color: colour.commonColorLight,
-                          ),
+                      const Icon(Icons.lock_outline_rounded,
+                          color: Colors.white, size: 20),
+                      const SizedBox(width: 10),
+                      Text(
+                        'Edit Password',
+                        style: GoogleFonts.lato(
+                          color: Colors.white,
+                          fontWeight: FontWeight.w700,
+                          fontSize: 15,
                         ),
                       ),
                     ],
                   ),
-                ]),
+                ),
+
+                // Body
+                Padding(
+                  padding: const EdgeInsets.all(20),
+                  child: Column(
+                    children: [
+                      Container(
+                        decoration: BoxDecoration(
+                          image: DecorationImage(image: objfun.lockimg),
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        height: 100,
+                        width: double.infinity,
+                      ),
+                      const SizedBox(height: 14),
+                      TextField(
+                        controller: txtPassword,
+                        cursorColor: kHeaderGradStart,
+                        textCapitalization: TextCapitalization.characters,
+                        textInputAction: TextInputAction.done,
+                        style: GoogleFonts.lato(
+                          color: kTextDark,
+                          fontWeight: FontWeight.w600,
+                          fontSize: objfun.FontLow,
+                        ),
+                        decoration: InputDecoration(
+                          hintText: 'Enter password',
+                          hintStyle: GoogleFonts.lato(
+                            color: kTextMuted,
+                            fontSize: objfun.FontLow,
+                          ),
+                          filled: true,
+                          fillColor: kDetailBg,
+                          contentPadding: const EdgeInsets.symmetric(
+                              horizontal: 14, vertical: 12),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(10),
+                            borderSide: BorderSide.none,
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(10),
+                            borderSide: const BorderSide(
+                                color: kHeaderGradEnd, width: 1.5),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+                      SizedBox(
+                        width: double.infinity,
+                        child: _GradientButton(
+                          label: 'Confirm',
+                          onPressed: () async {
+                            if (txtPassword.text.isEmpty) {
+                              objfun.ConfirmationOK(
+                                  'Enter Password !!', dialogCtx);
+                              return;
+                            }
+                            await objfun
+                                .apiAllinoneSelectArray(
+                              '${objfun.apiEditPassword}${txtPassword.text}&type=EditPassword&Comid=${objfun.Comid}',
+                              null,
+                              null,
+                              dialogCtx,
+                            )
+                                .then((resultData) {
+                              if (resultData.length != 0 &&
+                                  resultData['IsSuccess'] == true) {
+                                txtPassword.text = '';
+                                Navigator.pop(dialogCtx);
+                                bloc.add(VesselPlanningEditRequested(
+                                  id: item.Id,
+                                  planningNo: item.VESSELPLANINGNo,
+                                ));
+                              } else {
+                                txtPassword.text = '';
+                                objfun.ConfirmationOK(
+                                    'Invalid Password !!!', dialogCtx);
+                              }
+                            });
+                          },
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
               ],
             ),
           ),
@@ -685,7 +811,7 @@ class _PlanningCard extends StatelessWidget {
   }
 }
 
-// ─── Details Section ──────────────────────────────────────────────────────────────
+// ─── Details Section ──────────────────────────────────────────────────────────
 class _DetailsSection extends StatelessWidget {
   final List<dynamic> details;
   final bool isTablet;
@@ -702,79 +828,81 @@ class _DetailsSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final headerStyle = GoogleFonts.lato(
-      color: colour.ButtonForeColor,
-      fontWeight: FontWeight.bold,
-      fontSize: isTablet ? objfun.FontCardText + 1 : objfun.FontCardText,
-      letterSpacing: 0.3,
+      color: Colors.white.withOpacity(0.85),
+      fontWeight: FontWeight.w600,
+      fontSize: isTablet ? 10 : 9,
+      letterSpacing: 0.5,
     );
     final rowStyle = GoogleFonts.lato(
-      color: colour.commonColor,
-      fontWeight: FontWeight.bold,
-      fontSize: isTablet ? objfun.FontCardText + 1 : objfun.FontCardText,
-      letterSpacing: 0.3,
+      color: kTextDark,
+      fontWeight: FontWeight.w500,
+      fontSize: isTablet ? objfun.FontCardText : objfun.FontCardText - 1,
     );
 
-    return ListView(
+    return Column(
+      mainAxisSize: MainAxisSize.min,
       children: [
         // Detail header
         Container(
-          height: isTablet ? height * 0.05 : height * 0.04,
-          color: colour.commonColor,
-          margin: const EdgeInsets.symmetric(horizontal: 5),
-          padding: const EdgeInsets.symmetric(horizontal: 5),
+          height: isTablet ? 36 : 32,
+          decoration: const BoxDecoration(gradient: kGradientVertical),
+          padding: const EdgeInsets.symmetric(horizontal: 14),
           child: Row(
             children: [
-              Expanded(flex: 2, child: Text("Job No", style: headerStyle)),
-              Expanded(flex: 2, child: Text("Job Date", style: headerStyle)),
-              Expanded(flex: 3, child: Text("Remarks", style: headerStyle)),
+              Expanded(flex: 2, child: Text('JOB NO', style: headerStyle)),
+              Expanded(flex: 2, child: Text('JOB DATE', style: headerStyle)),
+              Expanded(flex: 3, child: Text('REMARKS', style: headerStyle)),
             ],
           ),
         ),
 
         // Detail rows
         SizedBox(
-          height: isTablet ? height * 0.38 : height * 0.32,
+          height: isTablet ? height * 0.28 : height * 0.24,
           child: details.isEmpty
-              ? Center(child: Text('No Record', style: GoogleFonts.lato(fontSize: objfun.FontMedium)))
+              ? Center(
+            child: Text(
+              'No records found',
+              style: GoogleFonts.lato(
+                  fontSize: objfun.FontLow, color: kTextMuted),
+            ),
+          )
               : ListView.builder(
+            shrinkWrap: true,
             itemCount: details.length,
             itemBuilder: (ctx, i) {
-              return SizedBox(
-                height: isTablet ? 50 : 45,
-                child: Card(
-                  elevation: 10,
-                  shape: RoundedRectangleBorder(
-                    side: const BorderSide(color: colour.commonColor, width: 1),
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  child: Row(
-                    children: [
-                      Expanded(
-                        flex: 2,
-                        child: Text(
-                          "  ${details[i]["JobNo"]}",
-                          style: rowStyle,
-                          overflow: TextOverflow.ellipsis,
-                        ),
+              final isOdd = i % 2 == 0;
+              return Container(
+                height: isTablet ? 42 : 38,
+                color: isOdd ? Colors.white : kDetailBg,
+                padding: const EdgeInsets.symmetric(horizontal: 14),
+                child: Row(
+                  children: [
+                    Expanded(
+                      flex: 2,
+                      child: Text(
+                        details[i]['JobNo'] ?? '',
+                        style: rowStyle,
+                        overflow: TextOverflow.ellipsis,
                       ),
-                      Expanded(
-                        flex: 2,
-                        child: Text(
-                          details[i]["JobDate"].toString(),
-                          style: rowStyle,
-                          overflow: TextOverflow.ellipsis,
-                        ),
+                    ),
+                    Expanded(
+                      flex: 2,
+                      child: Text(
+                        details[i]['JobDate'].toString(),
+                        style: rowStyle,
+                        overflow: TextOverflow.ellipsis,
                       ),
-                      Expanded(
-                        flex: 3,
-                        child: Text(
-                          details[i]["Remarks"].toString(),
-                          style: rowStyle,
-                          overflow: TextOverflow.ellipsis,
-                        ),
+                    ),
+                    Expanded(
+                      flex: 3,
+                      child: Text(
+                        details[i]['Remarks'].toString(),
+                        style: rowStyle.copyWith(color: kTextMid),
+                        overflow: TextOverflow.ellipsis,
                       ),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
               );
             },
@@ -785,35 +913,332 @@ class _DetailsSection extends StatelessWidget {
   }
 }
 
-// ─── Date Tile helper ─────────────────────────────────────────────────────────────
-class _DateTile extends StatelessWidget {
-  final String label;
-  final String date;
-  final VoidCallback onTap;
-  final TextStyle labelStyle;
+// ─── Empty State ──────────────────────────────────────────────────────────────
+class _EmptyState extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Container(
+            width: 64,
+            height: 64,
+            decoration: BoxDecoration(
+              color: kChipBg,
+              borderRadius: BorderRadius.circular(16),
+            ),
+            child: const Icon(
+              Icons.anchor_rounded,
+              size: 32,
+              color: kHeaderGradEnd,
+            ),
+          ),
+          const SizedBox(height: 14),
+          Text(
+            'No Records Found',
+            style: GoogleFonts.lato(
+              color: kTextDark,
+              fontWeight: FontWeight.w600,
+              fontSize: 15,
+            ),
+          ),
+          const SizedBox(height: 4),
+          Text(
+            'Try adjusting your filters',
+            style: GoogleFonts.lato(
+              color: kTextMuted,
+              fontSize: 12,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
 
-  const _DateTile({
+// ─── FAB ──────────────────────────────────────────────────────────────────────
+class _VPFab extends StatelessWidget {
+  final VoidCallback onPressed;
+  const _VPFab({required this.onPressed});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: 52,
+      height: 52,
+      decoration: BoxDecoration(
+        gradient: kGradient,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: kHeaderGradStart.withOpacity(0.4),
+            blurRadius: 16,
+            offset: const Offset(0, 6),
+          ),
+        ],
+      ),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: onPressed,
+          borderRadius: BorderRadius.circular(16),
+          child: const Icon(
+            Icons.filter_alt_outlined,
+            color: Colors.white,
+            size: 24,
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+// ─── Reusable: Card Action Chip ───────────────────────────────────────────────
+class _CardActionChip extends StatelessWidget {
+  final IconData icon;
+  final String label;
+  final VoidCallback onTap;
+
+  const _CardActionChip({
+    required this.icon,
     required this.label,
-    required this.date,
     required this.onTap,
-    required this.labelStyle,
   });
 
   @override
   Widget build(BuildContext context) {
-    final displayDate = DateFormat("dd-MM-yy").format(DateTime.parse(date));
-    return Row(
-      children: [
-        Text(displayDate, style: labelStyle),
-        const SizedBox(width: 4),
-        Material(
-          color: Colors.transparent,
-          child: IconButton(
-            icon: const Icon(Icons.calendar_month_outlined, size: 28, color: colour.commonColor),
-            onPressed: onTap,
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(20),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+        decoration: BoxDecoration(
+          color: kChipBg,
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(color: kCardBorder, width: 0.5),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(icon, size: 15, color: kHeaderGradStart),
+            const SizedBox(width: 4),
+            Text(
+              label,
+              style: GoogleFonts.lato(
+                color: kHeaderGradStart,
+                fontWeight: FontWeight.w600,
+                fontSize: 11,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+// ─── Reusable: Sheet Date Tile ────────────────────────────────────────────────
+class _SheetDateTile extends StatelessWidget {
+  final String label;
+  final String date;
+  final VoidCallback onTap;
+
+  const _SheetDateTile({
+    required this.label,
+    required this.date,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final displayDate =
+    DateFormat('dd-MM-yy').format(DateTime.parse(date));
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(10),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+        decoration: BoxDecoration(
+          color: kDetailBg,
+          borderRadius: BorderRadius.circular(10),
+          border: Border.all(color: kCardBorder, width: 0.5),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              label.toUpperCase(),
+              style: GoogleFonts.lato(
+                color: kTextMuted,
+                fontWeight: FontWeight.w700,
+                fontSize: 9,
+                letterSpacing: 0.6,
+              ),
+            ),
+            const SizedBox(height: 4),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  displayDate,
+                  style: GoogleFonts.lato(
+                    color: kTextDark,
+                    fontWeight: FontWeight.w700,
+                    fontSize: 13,
+                  ),
+                ),
+                const Icon(
+                  Icons.calendar_month_outlined,
+                  size: 18,
+                  color: kHeaderGradEnd,
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+// ─── Reusable: Sheet Text Field ───────────────────────────────────────────────
+class _SheetTextField extends StatelessWidget {
+  final TextEditingController controller;
+  final String hint;
+  final bool readOnly;
+  final Widget? suffixIcon;
+  final TextCapitalization textCapitalization;
+  final TextInputAction? textInputAction;
+
+  const _SheetTextField({
+    required this.controller,
+    required this.hint,
+    this.readOnly = false,
+    this.suffixIcon,
+    this.textCapitalization = TextCapitalization.none,
+    this.textInputAction,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return TextField(
+      controller: controller,
+      readOnly: readOnly,
+      textCapitalization: textCapitalization,
+      textInputAction: textInputAction,
+      style: GoogleFonts.lato(
+        color: kTextDark,
+        fontWeight: FontWeight.w600,
+        fontSize: objfun.FontLow,
+      ),
+      decoration: InputDecoration(
+        hintText: hint,
+        hintStyle: GoogleFonts.lato(
+          color: kTextMuted,
+          fontWeight: FontWeight.w500,
+          fontSize: objfun.FontLow,
+        ),
+        filled: true,
+        fillColor: kDetailBg,
+        suffixIcon: suffixIcon,
+        contentPadding:
+        const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(10),
+          borderSide: BorderSide.none,
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(10),
+          borderSide: const BorderSide(color: kCardBorder, width: 0.5),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(10),
+          borderSide: const BorderSide(color: kHeaderGradEnd, width: 1.5),
+        ),
+      ),
+    );
+  }
+}
+
+// ─── Reusable: Gradient Button ────────────────────────────────────────────────
+class _GradientButton extends StatelessWidget {
+  final String label;
+  final VoidCallback onPressed;
+
+  const _GradientButton({required this.label, required this.onPressed});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: BoxDecoration(
+        gradient: kGradient,
+        borderRadius: BorderRadius.circular(24),
+        boxShadow: [
+          BoxShadow(
+            color: kHeaderGradStart.withOpacity(0.35),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: onPressed,
+          borderRadius: BorderRadius.circular(24),
+          child: Padding(
+            padding:
+            const EdgeInsets.symmetric(horizontal: 28, vertical: 11),
+            child: Text(
+              label,
+              style: GoogleFonts.lato(
+                color: Colors.white,
+                fontWeight: FontWeight.w700,
+                fontSize: objfun.FontMedium,
+              ),
+            ),
           ),
         ),
-      ],
+      ),
+    );
+  }
+}
+
+// ─── Reusable: Outline Button ─────────────────────────────────────────────────
+class _OutlineButton extends StatelessWidget {
+  final String label;
+  final VoidCallback onPressed;
+
+  const _OutlineButton({required this.label, required this.onPressed});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: BoxDecoration(
+        color: kChipBg,
+        borderRadius: BorderRadius.circular(24),
+        border: Border.all(color: kCardBorder),
+      ),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: onPressed,
+          borderRadius: BorderRadius.circular(24),
+          child: Padding(
+            padding:
+            const EdgeInsets.symmetric(horizontal: 28, vertical: 11),
+            child: Text(
+              label,
+              style: GoogleFonts.lato(
+                color: kHeaderGradStart,
+                fontWeight: FontWeight.w700,
+                fontSize: objfun.FontMedium,
+              ),
+            ),
+          ),
+        ),
+      ),
     );
   }
 }
