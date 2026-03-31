@@ -27,6 +27,7 @@ import '../Transport/RTI/UpdateRTIDetails.dart';
 import '../features/dashboard/admin_dashboard/tabs/emailinbox/view/emailinbox_tab.dart';
 import '../features/dashboard/admin_dashboard/tabs/enquiry/view/view/enquiry_tab.dart';
 import '../features/dashboard/admin_dashboard/tabs/googlereview/view/googlereview_tab.dart';
+import '../features/transaction/enquirytrmaster/view/view/enquirytrview_tab.dart';
 import '../features/transaction/planning/view/planning_tab.dart';
 import '../features/transaction/prealertview/view/prealertview_tab.dart';
 import '../features/transaction/salesorder/view/view/salesorderview_tab.dart';
@@ -684,8 +685,6 @@ class _MenuTileState extends State<_MenuTile>
           Navigator.push(ctx, _r(const StockUpdate()));         break;
         case "Stock Transfer":
           Navigator.push(ctx, _r(const StockTransferUpdate())); break;
-
-
         case "Enquiry Master":
           Navigator.push(
             ctx,
@@ -713,8 +712,6 @@ class _MenuTileState extends State<_MenuTile>
           Navigator.push(ctx, _r(const BoardingStatusUpdate())); break;
         case "Maintenance":
           Navigator.push(ctx, _r(const Maintenance()));         break;
-        // case "View":
-        //   Navigator.push(ctx, _r(const SaleOrderView()));       break;
         case "License Update":
           Navigator.push(ctx, _r(const LicenseUpdate()));       break;
         case "Update RTI Details":

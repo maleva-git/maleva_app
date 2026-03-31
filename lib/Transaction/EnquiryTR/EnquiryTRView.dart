@@ -25,14 +25,14 @@ import 'AddEnquiryTR.dart';
 part 'package:maleva/Transaction/EnquiryTR/mobileEnquiryTRView.dart';
 part 'package:maleva/Transaction/EnquiryTR/tabletEnquiryTRView.dart';
 
-class EnquiryTRView extends StatefulWidget {
-  const EnquiryTRView({super.key});
+class OldEnquiryTRView extends StatefulWidget {
+  const OldEnquiryTRView({super.key});
 
   @override
-  EnquiryTRViewState createState() => EnquiryTRViewState();
+  OldEnquiryTRViewState createState() => OldEnquiryTRViewState();
 }
 
-class EnquiryTRViewState extends State<EnquiryTRView> {
+class OldEnquiryTRViewState extends State<OldEnquiryTRView> {
   bool progress = false;
 
   int EmpId = 0;
