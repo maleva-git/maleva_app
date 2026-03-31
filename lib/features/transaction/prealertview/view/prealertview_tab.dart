@@ -9,16 +9,17 @@ import 'package:maleva/core/models/model.dart';
 import 'package:maleva/menu/menulist.dart';
 import 'package:maleva/MasterSearch/Customer.dart';
 import 'package:maleva/Transaction/SaleOrder/SalesOrderAdd.dart';
-import 'package:maleva/DashBoard/Admin/AdminDashboard.dart';
 import 'package:maleva/DashBoard/AirFrieght/AirFrieghtDashboard.dart';
 import 'package:maleva/DashBoard/Boarding/BoardingDashboard.dart';
-import 'package:maleva/DashBoard/CustomerService/CustDashboard.dart';
 import 'package:maleva/DashBoard/Forwarding/ForwardingDashboard.dart';
 import 'package:maleva/DashBoard/OperationAdmin/OperationAdminDashboard.dart';
 import 'package:maleva/DashBoard/TransportDB/TransportDashboard.dart';
 import 'package:maleva/DashBoard/User/UserDashboard.dart';
 import '../../../../MasterSearch/JobType.dart';
+
 import '../../../../MasterSearch/Port.dart';
+import '../../../dashboard/admin_dashboard/view/admin_dashboard.dart';
+import '../../../dashboard/airfrieght_dashboard/view/airfrieght_dashboard.dart';
 import '../bloc/prealertview_bloc.dart';
 import '../bloc/prealertview_event.dart';
 import '../bloc/prealertview_state.dart';
@@ -132,10 +133,10 @@ class _PreAlertPage extends StatelessWidget {
     Widget dest;
     switch (role) {
       case 'ADMIN':
-        dest = const AdminDashboard();
+        dest = const NewAdminDashboard();
         break;
       case 'SALES':
-        dest = const CustDashboard();
+        dest = const SalesDashboard();
         break;
       case 'TRANSPORTATION':
         dest = const TransportDashboard();
@@ -409,12 +410,15 @@ class _FilterSheetState extends State<_FilterSheet> {
                       builder: (_) => const Port(Searchby: 1, SearchId: 0)),
                 ).then((_) {
                   final portName = objfun.SelectedPortName;
-                  final portId = objfun.SelectJobStatusList.Id;
-                  if (portId != 0) {
+
+                  if (portName.isNotEmpty) {
                     _emit(PreAlertPortChanged(
-                        portId: portId, portName: portName));
-                    setState(() => _local = _local.copyWith(
-                        portId: portId, portName: portName));
+                        portId: 0,
+                        portName: portName));
+
+                         setState(() => _local = _local.copyWith(
+                        portId: 0, portName: portName));
+
                     objfun.SelectJobStatusList = JobStatusModel.Empty();
                   }
                 });
@@ -992,7 +996,7 @@ class _DetailsSection extends StatelessWidget {
   Widget build(BuildContext context) {
     // Pull matching details from global list
     final details = objfun.SaleOrderDetailList
-        .where((d) => d.SaleOrderMasterRefId == item.Id)
+        .where((d) => d.SaleRefId == item.Id)
         .toList();
 
     final headerStyle = GoogleFonts.lato(
@@ -1029,9 +1033,9 @@ class _DetailsSection extends StatelessWidget {
           padding: const EdgeInsets.symmetric(horizontal: 14),
           child: Row(
             children: [
-              Expanded(flex: 2, child: Text('ITEM', style: headerStyle)),
-              Expanded(flex: 3, child: Text('DESCRIPTION', style: headerStyle)),
-              Expanded(flex: 2, child: Text('QTY', style: headerStyle)),
+              Expanded(flex: 2, child: Text('ProductCode', style: headerStyle)),
+              Expanded(flex: 3, child: Text('ProductName', style: headerStyle)),
+              Expanded(flex: 2, child: Text('ItemQty', style: headerStyle)),
             ],
           ),
         ),
@@ -1058,7 +1062,7 @@ class _DetailsSection extends StatelessWidget {
                     Expanded(
                       flex: 2,
                       child: Text(
-                        details[i].ItemName ?? '',
+                        details[i].ProductCode ?? '',
                         style: rowStyle,
                         overflow: TextOverflow.ellipsis,
                       ),
@@ -1066,7 +1070,7 @@ class _DetailsSection extends StatelessWidget {
                     Expanded(
                       flex: 3,
                       child: Text(
-                        details[i].Description ?? '',
+                        details[i].ProductName ?? '',
                         style: rowStyle.copyWith(color: kTextMid),
                         overflow: TextOverflow.ellipsis,
                       ),
@@ -1074,7 +1078,7 @@ class _DetailsSection extends StatelessWidget {
                     Expanded(
                       flex: 2,
                       child: Text(
-                        details[i].Qty?.toString() ?? '',
+                        details[i].ItemQty?.toString() ?? '',
                         style: rowStyle,
                         overflow: TextOverflow.ellipsis,
                       ),

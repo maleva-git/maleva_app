@@ -25,6 +25,7 @@ import '../Transport/LicenseUpdate.dart';
 import '../Transport/Maintenance.dart';
 import '../Transport/RTI/UpdateRTIDetails.dart';
 import '../features/dashboard/admin_dashboard/tabs/emailinbox/view/emailinbox_tab.dart';
+import '../features/dashboard/admin_dashboard/tabs/enquiry/view/view/enquiry_tab.dart';
 import '../features/dashboard/admin_dashboard/tabs/googlereview/view/googlereview_tab.dart';
 import '../features/transaction/planning/view/planning_tab.dart';
 import '../features/transaction/prealertview/view/prealertview_tab.dart';
@@ -683,8 +684,29 @@ class _MenuTileState extends State<_MenuTile>
           Navigator.push(ctx, _r(const StockUpdate()));         break;
         case "Stock Transfer":
           Navigator.push(ctx, _r(const StockTransferUpdate())); break;
+
+
         case "Enquiry Master":
-          Navigator.push(ctx, _r(const EnquiryView()));         break;
+          Navigator.push(
+            ctx,
+            _r(
+              Scaffold(
+                appBar: AppBar(
+                  title: Text(
+                    'Enquiry Screen',
+                    style: GoogleFonts.poppins(
+                      fontWeight: FontWeight.w600,
+                      color: Colors.white,
+                    ),
+                  ),
+                  backgroundColor: colour.kHeaderGradStart,
+                  iconTheme: const IconThemeData(color: Colors.white),
+                ),
+                body: const EnquiryScreen(),
+              ),
+            ),
+          );
+          break;
         case "EnquiryTR Master":
           Navigator.push(ctx, _r(const EnquiryTRView()));       break;
         case "Update Boarding Details":
