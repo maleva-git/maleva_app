@@ -1,25 +1,22 @@
 import 'package:flutter/Material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:google_fonts/google_fonts.dart';
-
 import 'package:maleva/core/models/model.dart';
 import 'package:maleva/core/network/OnlineApi.dart' as OnlineApi;
 import 'package:maleva/core/utils/clsfunction.dart' as objfun;
 import 'package:maleva/core/colors/colors.dart' as colour;
-
-
 import '../Transaction/SaleOrderDetails.dart';
 
 
-class GetJobNoPage extends StatefulWidget {
+class OldGetJobNoPage extends StatefulWidget {
 
-  const GetJobNoPage({super.key});
+  const OldGetJobNoPage({super.key});
 
   @override
-  _GetJobNoPageState createState() => _GetJobNoPageState();
+  _OldGetJobNoPageState createState() => _OldGetJobNoPageState();
 }
 
-class _GetJobNoPageState extends State<GetJobNoPage> {
+class _OldGetJobNoPageState extends State<OldGetJobNoPage> {
   bool progress = false;
   late MenuMasterModel menuControl;
   String UserName = objfun.storagenew.getString('Username') ?? "";
