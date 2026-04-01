@@ -362,7 +362,9 @@ class _LoginBodyState extends State<_LoginBody>
                 const SizedBox(height: 16),
                 _keypad(btnH: 58, btnFs: 20, radius: 14, rowSp: 12, colSp: 10),
                 const SizedBox(height: 14),
-                _loginButton(h: 58, fs: 15, radius: 15),
+                Flexible(
+                  child: _loginButton(h: 50, fs: 16, radius: 8),
+                )
               ]),
             ),
           ),
@@ -573,6 +575,7 @@ class _LoginBodyState extends State<_LoginBody>
         ),
         child: ElevatedButton(
           style: ElevatedButton.styleFrom(
+            padding: EdgeInsets.zero,
             backgroundColor: Colors.transparent, shadowColor: Colors.transparent,
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(radius)),
             elevation: 0,

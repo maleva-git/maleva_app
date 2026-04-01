@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:maleva/GoogleReview/ReviewEntryScreen.dart';
 import 'package:maleva/Transport/Fuel/FuelEntry.dart';
 import 'package:maleva/core/utils/clsfunction.dart' as objfun;
 import 'package:maleva/core/models/model.dart';
+import 'package:maleva/features/operations/forwarding/bloc/forwarding_event.dart';
 import 'package:maleva/features/transaction/viewsaleorder/view/viewsaleorder_tab.dart';
 import '../Boarding/BoardingStatusUpdate.dart';
 import '../MailInbox/MailInboxView.dart';
@@ -28,6 +30,8 @@ import '../Transport/RTI/UpdateRTIDetails.dart';
 import '../features/dashboard/admin_dashboard/tabs/emailinbox/view/emailinbox_tab.dart';
 import '../features/dashboard/admin_dashboard/tabs/enquiry/view/view/enquiry_tab.dart';
 import '../features/dashboard/admin_dashboard/tabs/googlereview/view/googlereview_tab.dart';
+import '../features/operations/forwarding/bloc/forwarding_bloc.dart';
+import '../features/operations/forwarding/view/forwarding_tab.dart';
 import '../features/transaction/enquirytrmaster/view/view/enquirytrview_tab.dart';
 import '../features/transaction/planning/view/planning_tab.dart';
 import '../features/transaction/prealertview/view/prealertview_tab.dart';
@@ -673,7 +677,16 @@ class _MenuTileState extends State<_MenuTile>
         case "JobStatus Update":
           Navigator.push(ctx, _r(const JobStatusUpdate()));     break;
         case "Forwarding Update":
-          Navigator.push(ctx, _r(const FWUpdate()));            break;
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => BlocProvider(
+                create: (context) => FWUpdateBloc()..add(FWUpdateStarted()),
+                child: const FWUpdatePage(),
+              ),
+            ),
+          );
+          break;
         case "Forwarding Exit Update":
           Navigator.push(ctx, _r(const FWUpdateBreakSeal()));   break;
         case "View Sale Order":
