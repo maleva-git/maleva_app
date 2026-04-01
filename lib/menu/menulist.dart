@@ -32,6 +32,7 @@ import '../features/dashboard/admin_dashboard/tabs/enquiry/view/view/enquiry_tab
 import '../features/dashboard/admin_dashboard/tabs/googlereview/view/googlereview_tab.dart';
 import '../features/operations/forwarding/bloc/forwarding_bloc.dart';
 import '../features/operations/forwarding/view/forwarding_tab.dart';
+import '../features/operations/forwardingsmk/view/forwardingsmk_tab.dart';
 import '../features/transaction/enquirytrmaster/view/view/enquirytrview_tab.dart';
 import '../features/transaction/planning/view/planning_tab.dart';
 import '../features/transaction/prealertview/view/prealertview_tab.dart';

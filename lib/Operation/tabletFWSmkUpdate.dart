@@ -1,7 +1,7 @@
 part of 'package:maleva/Operation/FWSmkUpdate.dart';
 
 
-tabletdesign(FWSmkUpdateState state, BuildContext context) {
+tabletdesign(OldFWSmkUpdateState state, BuildContext context) {
   double width = MediaQuery.of(context).size.width;
   double height = MediaQuery.of(context).size.height;
   return WillPopScope(
@@ -397,7 +397,7 @@ tabletdesign(FWSmkUpdateState state, BuildContext context) {
                                         objfun.FontMedium,
                                         letterSpacing: 0.3),
                                   ),
-                                  items: FWSmkUpdateState.ForwardingNo.map<
+                                  items: OldFWSmkUpdateState.ForwardingNo.map<
                                       DropdownMenuItem<
                                           String>>(
                                           (String value) {
@@ -899,7 +899,7 @@ tabletdesign(FWSmkUpdateState state, BuildContext context) {
                                         objfun.FontMedium,
                                         letterSpacing: 0.3),
                                   ),
-                                  items: FWSmkUpdateState.ForwardingNo.map<
+                                  items: OldFWSmkUpdateState.ForwardingNo.map<
                                       DropdownMenuItem<
                                           String>>(
                                           (String value) {
@@ -1401,7 +1401,7 @@ tabletdesign(FWSmkUpdateState state, BuildContext context) {
                                         objfun.FontMedium,
                                         letterSpacing: 0.3),
                                   ),
-                                  items: FWSmkUpdateState.ForwardingNo.map<
+                                  items: OldFWSmkUpdateState.ForwardingNo.map<
                                       DropdownMenuItem<
                                           String>>(
                                           (String value) {

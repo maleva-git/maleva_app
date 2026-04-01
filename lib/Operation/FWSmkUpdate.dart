@@ -12,15 +12,15 @@ import 'package:maleva/core/colors/colors.dart' as colour;
 part 'package:maleva/Operation/mobileFWSmkUpdate.dart';
 part 'package:maleva/Operation/tabletFWSmkUpdate.dart';
 
-class FWSmkUpdate extends StatefulWidget {
+class OldFWSmkUpdate extends StatefulWidget {
 
-  const FWSmkUpdate({super.key});
+  const OldFWSmkUpdate({super.key});
 
   @override
-  FWSmkUpdateState createState() => FWSmkUpdateState();
+  OldFWSmkUpdateState createState() => OldFWSmkUpdateState();
 }
 
-class FWSmkUpdateState extends State<FWSmkUpdate> with TickerProviderStateMixin{
+class OldFWSmkUpdateState extends State<OldFWSmkUpdate> with TickerProviderStateMixin{
   bool progress = false;
   late MenuMasterModel menuControl;
   String UserName = objfun.storagenew.getString('Username') ?? "";
