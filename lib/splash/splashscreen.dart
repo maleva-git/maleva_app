@@ -22,6 +22,8 @@ import 'package:maleva/core/network/OnlineApi.dart' as OnlineApi;
 import '../features/dashboard/admin_dashboard/bloc/admin_tab_bloc.dart';
 import '../features/dashboard/admin_dashboard/view/admin_dashboard.dart';
 import '../features/dashboard/airfrieght_dashboard/view/airfrieght_dashboard.dart';
+import '../features/dashboard/subadmin_dashboard/bloc/subadmin_dashboard_bloc.dart';
+import '../features/dashboard/subadmin_dashboard/view/subadmin_dashboard.dart';
 
 // ─── Design tokens (splash only) ─────────────────────────────────────────────
 
@@ -127,6 +129,18 @@ class _SplashScreenState extends State<SplashScreen>
               builder: (_) => BlocProvider(
                 create: (_) => AdminTabBloc(),
                 child: const NewAdminDashboard(),
+              ),
+            ),
+          );
+        }
+        else if(objfun.storagenew.getString('RulesType') == "ADMIN2")
+        {
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+              builder: (_) => BlocProvider(
+                create: (_) => SubAdminTabBloc(),
+                child: const SubAdminDashboard(),
               ),
             ),
           );

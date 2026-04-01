@@ -21,6 +21,7 @@ import '../../admin_dashboard/tabs/driver/view/driverdetails_tab.dart';
 import '../../admin_dashboard/tabs/emailinbox/view/emailinbox_tab.dart';
 import '../../admin_dashboard/tabs/employeemaster/view/employeemaster_tab.dart';
 import '../../admin_dashboard/tabs/enginehours/view/enginehours_tab.dart';
+import '../../admin_dashboard/tabs/enquiry/view/view/enquiry_tab.dart';
 import '../../admin_dashboard/tabs/forwardingreport/view/forwardingreport_tab.dart';
 import '../../admin_dashboard/tabs/fuel/view/fuelreport_tab.dart';
 import '../../admin_dashboard/tabs/fuelfillings/view/fuelfillings_tab.dart';
@@ -40,6 +41,8 @@ import '../../admin_dashboard/tabs/summonentry/view/summonentry_tab.dart';
 import '../../admin_dashboard/tabs/transport/view/transportview_tab.dart';
 import '../../admin_dashboard/tabs/truck/view/truckview_tab.dart';
 import '../../admin_dashboard/tabs/vesselreport/view/vesselreportview_tab.dart';
+import '../bloc/subadmin_dashboard_bloc.dart';
+import '../bloc/subadmin_dashboard_state.dart';
 
 
 class MobileDashboard extends StatelessWidget {
@@ -151,30 +154,15 @@ class MobileDashboard extends StatelessWidget {
         ),
         tabs: [
           _tab('Invoice',         isTablet),  // ← isTablet pass பண்ணு
-          _tab('ReceiptView',     isTablet),
           _tab('SO',              isTablet),
-          _tab('FW',              isTablet),
-          _tab('EXP',             isTablet),
           _tab('VSL',             isTablet),
           _tab('TRANSPORT',       isTablet),
-          _tab('Truck',           isTablet),
-          _tab('Driver',          isTablet),
-          _tab('SpeedingReport',  isTablet),
-          _tab('FuelFilling',     isTablet),
-          _tab('EngineHours',     isTablet),
-          _tab('BOCheck',         isTablet),
+          _tab('ENQUIRY',         isTablet),
           _tab('Email',           isTablet),
           _tab('GoogleReview',    isTablet),
-          _tab('Fuel',            isTablet),
           _tab('EmployeeView',    isTablet),
-          _tab('PettyCash',       isTablet),
-          _tab('SummonEntry',     isTablet),
-          _tab('SparePartsEntry', isTablet),
-          _tab('PaymentView',     isTablet),
           _tab('SpotsSaleOrder',  isTablet),
           _tab('InventoryReport', isTablet),
-          _tab('PDO',             isTablet),
-          _tab('RTI',             isTablet),
         ],
       ),
     );
@@ -199,7 +187,7 @@ class MobileDashboard extends StatelessWidget {
   );
   // ── TabBarView ────────────────────────────────────────────────────────
   Widget _buildTabBarView(BuildContext context) {
-    return BlocListener<AdminTabBloc, AdminTabState>(
+    return BlocListener<SubAdminTabBloc, SubAdminTabState>(
       listener: (context, tabState) {
         switch (tabState.index) {
           case 0:
@@ -214,34 +202,16 @@ class MobileDashboard extends StatelessWidget {
         controller: tabController,
         children: [
           const InvoiceTab(),
-          const ReceiptPage(),
           const SalesOrderTab(),
-          const ForwardingReportPage(),
-          const ExpenseReportPage(),
           const VesselReportPage(),
           const TransportReportPage(),
-          const TruckDetailsReportPage(),
-          const DriverDetailsView(),
-          const SpeedingScreen(),
-          const FuelFillingPage(),
-          const EngineHoursPage(),
-          const BocPage(),
+          const EnquiryScreen(),
           const EmailPage(),
           const ReviewEntryPage(),
-          const FuelDiffPage(),
           const EmployeeViewPage(),
-          const PettyCashPage(),
-          const SummonEntryPage(),
-          const SparePartsEntryPage(),
-          const PaymentPendingPage(),
           const SpotSaleEntryPage(),
           const InventoryPage(),
-          PDOViewPage(
-            fromDate: DateFormat('yyyy-MM-dd')
-                .format(DateTime.now().subtract(const Duration(days: 30))),
-            toDate: DateFormat('yyyy-MM-dd').format(DateTime.now()),
-          ),
-          const RTIDetailsPage(),
+
         ],
       ),
     );

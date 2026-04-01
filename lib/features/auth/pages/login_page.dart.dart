@@ -13,6 +13,7 @@ import '../../dashboard/admin_dashboard/bloc/admin_tab_bloc.dart';
 import '../../dashboard/admin_dashboard/view/admin_dashboard.dart';
 import '../../dashboard/airfrieght_dashboard/bloc/airfreight_bloc.dart';
 import '../../dashboard/airfrieght_dashboard/view/airfrieght_dashboard.dart';
+import '../../dashboard/subadmin_dashboard/bloc/subadmin_dashboard_bloc.dart';
 import '../../dashboard/subadmin_dashboard/view/subadmin_dashboard.dart';
 import '../bloc/auth_bloc.dart';
 import '../bloc/auth_event.dart';
@@ -89,7 +90,11 @@ class Appuserloginmobile extends StatelessWidget {
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(
-              builder: (_) => const SubAdminDashboard()),
+            builder: (_) => BlocProvider(
+              create: (_) => SubAdminTabBloc(),
+              child: const SubAdminDashboard(),
+            ),
+          ),
         );
         break;
 

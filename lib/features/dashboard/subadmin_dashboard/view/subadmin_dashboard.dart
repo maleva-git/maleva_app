@@ -22,6 +22,9 @@ import '../../admin_dashboard/tabs/employeemaster/view/employeemaster_tab.dart';
 import '../../admin_dashboard/tabs/enginehours/bloc/enginehours_bloc.dart';
 import '../../admin_dashboard/tabs/enginehours/bloc/enginehours_event.dart';
 import '../../admin_dashboard/tabs/enginehours/view/enginehours_tab.dart';
+import '../../admin_dashboard/tabs/enquiry/view/bloc/enquiry_bloc.dart';
+import '../../admin_dashboard/tabs/enquiry/view/bloc/enquiry_event.dart';
+import '../../admin_dashboard/tabs/enquiry/view/view/enquiry_tab.dart';
 import '../../admin_dashboard/tabs/forwardingreport/bloc/forwardingreport_bloc.dart';
 import '../../admin_dashboard/tabs/forwardingreport/bloc/forwardingreport_event.dart';
 import '../../admin_dashboard/tabs/forwardingreport/view/forwardingreport_tab.dart';
@@ -88,7 +91,7 @@ class _AdminDashboardState extends State<SubAdminDashboard> with SingleTickerPro
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 25, vsync: this);
+    _tabController = TabController(length: 10, vsync: this);
     _tabController.addListener(_onTabChanged);
 
   }
@@ -127,29 +130,7 @@ class _AdminDashboardState extends State<SubAdminDashboard> with SingleTickerPro
               create: (context) => SalesOrderBloc(context),
               child: const SalesOrderTab(),
             ),
-            BlocProvider(
-              create: (context) => ReceiptBloc(
-                context: context,
-              )..add(LoadReceiptEvent()),
-              child: const ReceiptPage(),
-            ),
-            BlocProvider(
-              create: (context) => ForwardingReportBloc(context)
-                ..add(LoadFWDataEvent(
-                  fromDate: DateFormat("yyyy-MM-dd").format(DateTime.now()),
-                  toDate: DateFormat("yyyy-MM-dd").format(DateTime.now()),
-                )),
-              child: const ForwardingReportView(),
-            ),
-            BlocProvider(
-              create: (context) => ExpenseReportBloc(context)
-                ..add(LoadExpReportEvent(
-                  fromDate: DateFormat("yyyy-MM-dd")
-                      .format(DateTime.now().subtract(const Duration(days: 30))),
-                  toDate: DateFormat("yyyy-MM-dd").format(DateTime.now()),
-                )),
-              child: const ExpenseReportView(),
-            ),
+
             BlocProvider(
               create: (context) => VesselBloc(
                 context: context,
@@ -162,32 +143,14 @@ class _AdminDashboardState extends State<SubAdminDashboard> with SingleTickerPro
               )..add(const LoadTransportDataEvent(type: 0)),
               child: const TransportReportPage(),
             ),
+
             BlocProvider(
-              create: (context) => TruckDetailsBloc(
-                context: context,
-              )..add(const LoadTruckDetailsEvent()),
-              child: const TruckDetailsReportPage(),
+              create: (_) => EnquiryBloc(
+
+              )..add( LoadEnquiryEvent()),
+              child: const EnquiryScreen(),
             ),
-            BlocProvider(
-              create: (context) => DriverBloc(context)..add(const LoadDriverEvent()),
-              child: const DriverDetailsView(),
-            ),
-            BlocProvider(
-              create: (context) => SpeedingBloc(context)..add(LoadSpeedingReport()),
-              child: const SpeedingScreen(),
-            ),
-            BlocProvider(
-              create: (context) => FuelFillingBloc(context)..add(LoadFuelFillingReport()),
-              child: const FuelFillingPage(),
-            ),
-            BlocProvider(
-              create: (context) => EngineHoursBloc(context)..add(LoadEngineHoursReport()),
-              child: const EngineHoursPage(),
-            ),
-            BlocProvider(
-              create: (context) => BocBloc(context)..add(LoadBocReport()),
-              child: const BocPage(),
-            ),
+
             BlocProvider(
               create: (context) => EmailBloc(context)..add(const LoadEmployeesEvent()),
               child: const EmailPage(),
@@ -196,32 +159,13 @@ class _AdminDashboardState extends State<SubAdminDashboard> with SingleTickerPro
               create: (context) => ReviewBloc(context)..add(const LoadReviewsEvent()),
               child: const ReviewEntryPage(),
             ),
-            BlocProvider(
-              create: (context) => FuelDiffBloc(context)..add(const LoadFuelDiffEvent()),
-              child: const FuelDiffPage(),
-            ),
+
             BlocProvider(
               create: (context) => EmployeeMasterBloc.list(context),
               child: const EmployeeViewPage(),
             ),
-            BlocProvider(
-              create: (context) => PettyCashBloc(context)..add(const LoadPettyCashEvent()),
-              child: const PettyCashPage(),
-            ),
-            BlocProvider(
-              create: (context) => SummonBloc.form(context),
-              child: const SummonEntryPage(),
-            ),
-            BlocProvider(
-              create: (context) => SparePartsBloc.form(context)
-                ..add(const LoadSparePartsTrucksEvent()),
-              child: const SparePartsEntryPage(),
-            ),
-            BlocProvider(
-              create: (context) => PaymentPendingBloc(context)
-                ..add(const LoadPaymentPendingEvent()),
-              child: const PaymentPendingPage(),
-            ),
+
+
             BlocProvider(
               create: (context) => SpotSaleBloc.form(context),
               child: const SpotSaleEntryPage(),
@@ -231,24 +175,8 @@ class _AdminDashboardState extends State<SubAdminDashboard> with SingleTickerPro
                 ..add(const LoadInventoryListsEvent()),
               child: const InventoryPage(),
             ),
-            BlocProvider(
-              create: (context) => PDOBloc(
-                context,
-                fromDate: DateFormat('yyyy-MM-dd')
-                    .format(DateTime.now().subtract(const Duration(days: 30))),
-                toDate: DateFormat('yyyy-MM-dd').format(DateTime.now()),
-              ),
-              child: PDOViewPage(
-                fromDate: DateFormat('yyyy-MM-dd')
-                    .format(DateTime.now().subtract(const Duration(days: 30))),
-                toDate: DateFormat('yyyy-MM-dd').format(DateTime.now()),
-              ),
-            ),
-            BlocProvider(
-              create: (context) => RTIDetailsBloc(context)
-                ..add(const LoadRTIDetailsEvent()),
-              child: const RTIDetailsPage(),
-            ),
+
+
           ],                                    // ← ] தான் close, } இல்ல
           child: Scaffold(
             body: MobileDashboard(
