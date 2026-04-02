@@ -1,7 +1,7 @@
 part of 'package:maleva/DashBoard/OperationAdmin/OperationAdminDashboard.dart';
 
 
-mobiledesign(OperationAdminDashboardState state, BuildContext context) {
+mobiledesign(OldOperationAdminDashboardState state, BuildContext context) {
   int breakdownCount = 0;
   double breakdownAmount = 0.0;
 

@@ -2,7 +2,7 @@
 
 part of 'package:maleva/DashBoard/OperationAdmin/OperationAdminDashboard.dart';
 
-tabletdesign(OperationAdminDashboardState state, BuildContext context) {
+tabletdesign(OldOperationAdminDashboardState state, BuildContext context) {
   double width = MediaQuery.of(context).size.width;
   double height = MediaQuery.of(context).size.height;
   if (width < 700) {
@@ -782,7 +782,7 @@ tabletdesign(OperationAdminDashboardState state, BuildContext context) {
                     color: colour.topAppBarColor,
                   ),
                   onPressed: () {
-                    Navigator.push(context, MaterialPageRoute(builder: (context) => const OperationAdminDashboard()));
+                    Navigator.push(context, MaterialPageRoute(builder: (context) => const OldOperationAdminDashboard()));
                   },
                 ),
                 IconButton(

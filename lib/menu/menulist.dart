@@ -32,6 +32,9 @@ import '../features/dashboard/admin_dashboard/tabs/enquiry/view/view/enquiry_tab
 import '../features/dashboard/admin_dashboard/tabs/googlereview/view/googlereview_tab.dart';
 import '../features/operations/forwarding/bloc/forwarding_bloc.dart';
 import '../features/operations/forwarding/view/forwarding_tab.dart';
+import '../features/operations/forwardingsalary/bloc/forwardingsalary_bloc.dart';
+import '../features/operations/forwardingsalary/bloc/forwardingsalary_event.dart';
+import '../features/operations/forwardingsalary/view/forwardingsalary_tab.dart';
 import '../features/operations/forwardingsmk/view/forwardingsmk_tab.dart';
 import '../features/transaction/enquirytrmaster/view/view/enquirytrview_tab.dart';
 import '../features/transaction/planning/view/planning_tab.dart';
@@ -692,8 +695,19 @@ class _MenuTileState extends State<_MenuTile>
           Navigator.push(ctx, _r(const FWUpdateBreakSeal()));   break;
         case "View Sale Order":
           Navigator.push(ctx, _r(const GetJobNoPage()));        break;
+
         case "Forwarding Salary":
-          Navigator.push(ctx, _r(const ForwardingSalaryUpdate())); break;
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => BlocProvider(
+                create: (context) => ForwardingSalaryBloc()..add(ForwardingSalaryStarted()),
+                child: const ForwardingSalaryUpdate(),
+              ),
+            ),
+          );
+          break;
+
         case "Stock In Entry":
           Navigator.push(ctx, _r(const Stockinentry()));        break;
         case "Stock Update":

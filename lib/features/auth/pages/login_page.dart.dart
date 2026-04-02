@@ -9,10 +9,13 @@ import 'package:maleva/DashBoard/User/UserDashboard.dart';
 import 'package:maleva/core/network/OnlineApi.dart' as OnlineApi;
 import '../../../DashBoard/CustomerService/CustDashboard.dart';
 import '../../../DashBoard/Driver/DriverDashboard.dart';
+import '../../../DashBoard/OperationAdmin/OperationAdminDashboard.dart';
 import '../../dashboard/admin_dashboard/bloc/admin_tab_bloc.dart';
 import '../../dashboard/admin_dashboard/view/admin_dashboard.dart';
 import '../../dashboard/airfrieght_dashboard/bloc/airfreight_bloc.dart';
 import '../../dashboard/airfrieght_dashboard/view/airfrieght_dashboard.dart';
+import '../../dashboard/operationadmin_dashboard/bloc/operationadmin_dashboard_bloc.dart';
+import '../../dashboard/operationadmin_dashboard/view/operationadmin_dashboard.dart';
 import '../../dashboard/subadmin_dashboard/bloc/subadmin_dashboard_bloc.dart';
 import '../../dashboard/subadmin_dashboard/view/subadmin_dashboard.dart';
 import '../bloc/auth_bloc.dart';
@@ -97,7 +100,17 @@ class Appuserloginmobile extends StatelessWidget {
           ),
         );
         break;
-
+      case "OPERATIONADMIN":
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (_) => BlocProvider(
+              create: (_) => OperationAdminTabBloc(),
+              child: const OperationAdminDashboard(),
+            ),
+          ),
+        );
+        break;
        // case "SALES":
        //   Navigator.pushReplacement(
        //     context,

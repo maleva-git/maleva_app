@@ -28,16 +28,16 @@ import '../Boarding/SpotSaleEntryView.dart';
 
 
 
-class OperationAdminDashboard extends StatefulWidget {
+class OldOperationAdminDashboard extends StatefulWidget {
   final int? editId;
-  const OperationAdminDashboard({super.key,this.editId});
+  const OldOperationAdminDashboard({super.key,this.editId});
 
 
   @override
-  OperationAdminDashboardState createState() => OperationAdminDashboardState();
+  OldOperationAdminDashboardState createState() => OldOperationAdminDashboardState();
 }
 
-class OperationAdminDashboardState extends State<OperationAdminDashboard> with TickerProviderStateMixin {
+class OldOperationAdminDashboardState extends State<OldOperationAdminDashboard> with TickerProviderStateMixin {
   bool progress = false;
   late MenuMasterModel menuControl;
   bool Is6Months = true;

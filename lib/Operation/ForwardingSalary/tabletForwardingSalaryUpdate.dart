@@ -2,7 +2,7 @@ part of 'package:maleva/Operation/ForwardingSalary/ForwardingSalaryUpdate.dart';
 
 
 
-Widget tabletdesign(ForwardingSalaryUpdateState state, BuildContext context) {
+Widget tabletdesign(OldForwardingSalaryUpdateState state, BuildContext context) {
   double width = MediaQuery.of(context).size.width;
   double height = MediaQuery.of(context).size.height;
 

@@ -14,12 +14,12 @@ part 'package:maleva/Operation/ForwardingSalary/mobileForwardingSalaryUpdate.dar
 part 'package:maleva/Operation/ForwardingSalary/tabletForwardingSalaryUpdate.dart';
 
 
-class ForwardingSalaryUpdate extends StatefulWidget {
+class OldForwardingSalaryUpdate extends StatefulWidget {
 
-  const ForwardingSalaryUpdate({super.key});
+  const OldForwardingSalaryUpdate({super.key});
 
   @override
-  ForwardingSalaryUpdateState createState() => ForwardingSalaryUpdateState();
+  OldForwardingSalaryUpdateState createState() => OldForwardingSalaryUpdateState();
 }
 
 GlobalKey appBarKey = GlobalKey();
@@ -36,7 +36,7 @@ void clearOverlay() {
 
 
 
-class ForwardingSalaryUpdateState extends State<ForwardingSalaryUpdate> with TickerProviderStateMixin {
+class OldForwardingSalaryUpdateState extends State<OldForwardingSalaryUpdate> with TickerProviderStateMixin {
   String BillType = "0";
   int SealEmpId1 = 0;
   int EditId = 0;

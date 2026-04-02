@@ -7,7 +7,6 @@ import 'package:maleva/core/utils/clsfunction.dart' as objfun;
 import 'package:maleva/core/colors/colors.dart' as colour;
 import '../DashBoard/AirFrieght/AirFrieghtDashboard.dart';
 import '../DashBoard/Boarding/BoardingDashboard.dart';
-import '../DashBoard/CustomerService/CustDashboard.dart';
 import '../DashBoard/Driver/DriverDashboard.dart';
 import '../DashBoard/Forwarding/ForwardingDashboard.dart';
 import '../DashBoard/HR/HrDashboard.dart';
@@ -22,6 +21,8 @@ import 'package:maleva/core/network/OnlineApi.dart' as OnlineApi;
 import '../features/dashboard/admin_dashboard/bloc/admin_tab_bloc.dart';
 import '../features/dashboard/admin_dashboard/view/admin_dashboard.dart';
 import '../features/dashboard/airfrieght_dashboard/view/airfrieght_dashboard.dart';
+import '../features/dashboard/operationadmin_dashboard/bloc/operationadmin_dashboard_bloc.dart';
+import '../features/dashboard/operationadmin_dashboard/view/operationadmin_dashboard.dart';
 import '../features/dashboard/subadmin_dashboard/bloc/subadmin_dashboard_bloc.dart';
 import '../features/dashboard/subadmin_dashboard/view/subadmin_dashboard.dart';
 
@@ -156,8 +157,17 @@ class _SplashScreenState extends State<SplashScreen>
         }
         else if(objfun.storagenew.getString('RulesType') == "OPERATIONADMIN")
         {
-          Navigator.push(context, MaterialPageRoute(builder: (context) => const OperationAdminDashboard()));
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+              builder: (_) => BlocProvider(
+                create: (_) => OperationAdminTabBloc(),
+                child: const OperationAdminDashboard(),
+              ),
+            ),
+          );
         }
+
         else if(objfun.storagenew.getString('RulesType') == "AIR FRIEGHT")
         {
           Navigator.push(context, MaterialPageRoute(builder: (context) => const AirFrieghtDashboard()));
