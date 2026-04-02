@@ -2,7 +2,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 import 'package:maleva/core/utils/clsfunction.dart' as objfun;
 import 'package:maleva/core/models/model.dart';
-
 import 'maintenance_event.dart';
 import 'maintenance_state.dart';
 
@@ -14,82 +13,125 @@ class MaintenanceBloc extends Bloc<MaintenanceEvent, MaintenanceState> {
     on<MaintenanceSummaryRequested>(_onSummaryRequested);
   }
 
-  // ── Month names ────────────────────────────────────────────────────────────
-  static const _monthNames = [
+  static const List<String> _monthNames = [
     'January', 'February', 'March',    'April',
-    'May',     'June',     'July',     'August',
-    'September','October', 'November', 'December',
+    'May',      'June',     'July',     'August',
+    'September','October',  'November', 'December',
   ];
 
-  // ── Startup — load header stats + pending list ─────────────────────────────
+  // ── Default empty stats ────────────────────────────────────────────────────
+  MaintenanceLoaded _emptyLoaded(String monthName) => MaintenanceLoaded(
+    currentMonthName: monthName,
+    breakdownCount:   0,
+    breakdownAmount:  0.0,
+    repairCount:      0,
+    repairAmount:     0.0,
+    serviceCount:     0,
+    serviceAmount:    0.0,
+    sparePartsCount:  0,
+    sparePartsAmount: 0.0,
+    is6Months:        true,
+    pendingList:      [],
+    summaryList:      [],
+  );
+
+  Map<String, dynamic> _parseStats(List<dynamic> data) {
+    int    breakdownCount   = 0;
+    double breakdownAmount  = 0.0;
+    int    repairCount      = 0;
+    double repairAmount     = 0.0;
+    int    serviceCount     = 0;
+    double serviceAmount    = 0.0;
+    int    sparePartsCount  = 0;
+    double sparePartsAmount = 0.0;
+
+    for (final item in data) {
+      switch (item.Description.toString().toUpperCase()) {
+        case 'BREAKDOWN':
+          breakdownCount  = int.tryParse(item.PStatus.toString())  ?? 0;
+          breakdownAmount = double.tryParse(item.Amount.toString()) ?? 0.0;
+          break;
+        case 'REPAIR':
+          repairCount  = int.tryParse(item.PStatus.toString())  ?? 0;
+          repairAmount = double.tryParse(item.Amount.toString()) ?? 0.0;
+          break;
+        case 'SERVICE':
+          serviceCount  = int.tryParse(item.PStatus.toString())  ?? 0;
+          serviceAmount = double.tryParse(item.Amount.toString()) ?? 0.0;
+          break;
+        case 'SPARE PARTS':
+          sparePartsCount  = int.tryParse(item.PStatus.toString())  ?? 0;
+          sparePartsAmount = double.tryParse(item.Amount.toString()) ?? 0.0;
+          break;
+      }
+    }
+
+    return {
+      'breakdownCount':   breakdownCount,
+      'breakdownAmount':  breakdownAmount,
+      'repairCount':      repairCount,
+      'repairAmount':     repairAmount,
+      'serviceCount':     serviceCount,
+      'serviceAmount':    serviceAmount,
+      'sparePartsCount':  sparePartsCount,
+      'sparePartsAmount': sparePartsAmount,
+    };
+  }
+
+  // ── Startup ────────────────────────────────────────────────────────────────
   Future<void> _onStarted(
-      MaintenanceStarted event,
-      Emitter<MaintenanceState> emit) async {
+      MaintenanceStarted event, Emitter<MaintenanceState> emit) async {
     emit(MaintenanceLoading());
     try {
-      final header = {'Content-Type': 'application/json; charset=UTF-8'};
-      final monthName =
-      _monthNames[DateTime.now().month - 1];
+      final now        = DateTime.now();
+      final monthName  = _monthNames[now.month - 1];
+      final fromDate   = DateFormat('yyyy-MM-dd')
+          .format(DateTime(now.year, now.month, 1));
+      final toDate     = DateFormat('yyyy-MM-dd').format(now);
 
-      // ── Load month summary stats ──────────────────────────────────────────
-      // Reuse the pending endpoint to also get the header stats;
-      // adjust apiGetMaintenance to whichever endpoint returns the stat rows.
+      final header = {'Content-Type': 'application/json; charset=UTF-8'};
+
       final statsResult = await objfun.apiAllinoneSelectArray(
+          '${objfun.apiGetMaintenance2}${objfun.Comid}'
+              '&Fromdate=$fromDate&Todate=$toDate',
+          null,
+          header,
+          null);
+
+      List<dynamic> statsData = [];
+      if (statsResult != '' && statsResult.length != 0) {
+        statsData = (statsResult as List)
+            .map((e) => MaintenanceModel.fromJson(e))
+            .toList();
+      }
+      final stats = _parseStats(statsData);
+
+      // Load default Pending list (6 months)
+      final pendingResult = await objfun.apiAllinoneSelectArray(
           '${objfun.apiGetMaintenance}${objfun.Comid}',
           null,
           header,
           null);
 
-      List<MaintenanceModel> pendingList = [];
-      int    breakdownCount   = 0;
-      double breakdownAmount  = 0;
-      int    repairCount      = 0;
-      double repairAmount     = 0;
-      int    serviceCount     = 0;
-      double serviceAmount    = 0;
-      int    sparePartsCount  = 0;
-      double sparePartsAmount = 0;
-
-      if (statsResult != '' && statsResult.length != 0) {
-        pendingList = (statsResult as List)
+      List<dynamic> pendingData = [];
+      if (pendingResult != '' && pendingResult.length != 0) {
+        pendingData = (pendingResult as List)
             .map((e) => MaintenanceModel.fromJson(e))
             .toList();
-
-        // ── Compute header stats from pending list ────────────────────────
-        for (final m in pendingList) {
-          switch ((m.Description ?? '').toUpperCase()) {
-            case 'BREAKDOWN':
-              breakdownCount++;
-              breakdownAmount += m.Amount ?? 0;
-              break;
-            case 'REPAIR':
-              repairCount++;
-              repairAmount += m.Amount ?? 0;
-              break;
-            case 'SERVICE':
-              serviceCount++;
-              serviceAmount += m.Amount ?? 0;
-              break;
-            case 'SPARE PARTS':
-              sparePartsCount++;
-              sparePartsAmount += m.Amount ?? 0;
-              break;
-          }
-        }
       }
 
       emit(MaintenanceLoaded(
         currentMonthName: monthName,
-        breakdownCount:   breakdownCount,
-        breakdownAmount:  breakdownAmount,
-        repairCount:      repairCount,
-        repairAmount:     repairAmount,
-        serviceCount:     serviceCount,
-        serviceAmount:    serviceAmount,
-        sparePartsCount:  sparePartsCount,
-        sparePartsAmount: sparePartsAmount,
+        breakdownCount:   stats['breakdownCount'],
+        breakdownAmount:  stats['breakdownAmount'],
+        repairCount:      stats['repairCount'],
+        repairAmount:     stats['repairAmount'],
+        serviceCount:     stats['serviceCount'],
+        serviceAmount:    stats['serviceAmount'],
+        sparePartsCount:  stats['sparePartsCount'],
+        sparePartsAmount: stats['sparePartsAmount'],
         is6Months:        true,
-        pendingList:      pendingList,
+        pendingList:      pendingData,
         summaryList:      [],
       ));
     } catch (e) {
@@ -113,17 +155,13 @@ class MaintenanceBloc extends Bloc<MaintenanceEvent, MaintenanceState> {
           header,
           null);
 
-      List<MaintenanceModel> pendingList = [];
+      List<dynamic> data = [];
       if (result != '' && result.length != 0) {
-        pendingList = (result as List)
+        data = (result as List)
             .map((e) => MaintenanceModel.fromJson(e))
             .toList();
       }
-
-      emit(s.copyWith(
-        is6Months:   true,
-        pendingList: pendingList,
-      ));
+      emit(s.copyWith(is6Months: true, pendingList: data));
     } catch (e) {
       emit(MaintenanceError(e.toString()));
     }
@@ -138,10 +176,10 @@ class MaintenanceBloc extends Bloc<MaintenanceEvent, MaintenanceState> {
 
     emit(MaintenanceLoading());
     try {
+      final now      = DateTime.now();
       final fromDate = DateFormat('yyyy-MM-dd')
-          .format(DateTime.now().subtract(const Duration(days: 365)));
-      final toDate =
-      DateFormat('yyyy-MM-dd').format(DateTime.now());
+          .format(now.subtract(const Duration(days: 365)));
+      final toDate   = DateFormat('yyyy-MM-dd').format(now);
 
       final header = {'Content-Type': 'application/json; charset=UTF-8'};
       final result = await objfun.apiAllinoneSelectArray(
@@ -151,17 +189,13 @@ class MaintenanceBloc extends Bloc<MaintenanceEvent, MaintenanceState> {
           header,
           null);
 
-      List<MaintenanceModel> summaryList = [];
+      List<dynamic> data = [];
       if (result != '' && result.length != 0) {
-        summaryList = (result as List)
+        data = (result as List)
             .map((e) => MaintenanceModel.fromJson(e))
             .toList();
       }
-
-      emit(s.copyWith(
-        is6Months:   false,
-        summaryList: summaryList,
-      ));
+      emit(s.copyWith(is6Months: false, summaryList: data));
     } catch (e) {
       emit(MaintenanceError(e.toString()));
     }

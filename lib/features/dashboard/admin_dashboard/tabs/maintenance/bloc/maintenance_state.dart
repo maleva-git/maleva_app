@@ -1,7 +1,5 @@
 
 
-import '../../../../../../core/models/model.dart';
-
 abstract class MaintenanceState {}
 
 class MaintenanceInitial extends MaintenanceState {}
@@ -9,7 +7,7 @@ class MaintenanceInitial extends MaintenanceState {}
 class MaintenanceLoading extends MaintenanceState {}
 
 class MaintenanceLoaded extends MaintenanceState {
-  // ── Month summary header ──────────────────────────────────────────────────
+  // ── Current-month summary stats ───────────────────────────────────────────
   final String currentMonthName;
   final int    breakdownCount;
   final double breakdownAmount;
@@ -21,11 +19,11 @@ class MaintenanceLoaded extends MaintenanceState {
   final double sparePartsAmount;
 
   // ── List toggle ───────────────────────────────────────────────────────────
-  final bool is6Months; // true = Pending list, false = Summary list
+  final bool is6Months; // true = Pending (6-month), false = Summary (1-year)
 
   // ── List data ─────────────────────────────────────────────────────────────
-  final List<MaintenanceModel> pendingList;   // 6-month pending
-  final List<MaintenanceModel> summaryList;   // 1-year summary
+  final List<dynamic> pendingList;  // MaintenanceModel items for Pending
+  final List<dynamic> summaryList;  // MaintenanceModel items for Summary
 
    MaintenanceLoaded({
     required this.currentMonthName,
@@ -43,18 +41,18 @@ class MaintenanceLoaded extends MaintenanceState {
   });
 
   MaintenanceLoaded copyWith({
-    String?                 currentMonthName,
-    int?                    breakdownCount,
-    double?                 breakdownAmount,
-    int?                    repairCount,
-    double?                 repairAmount,
-    int?                    serviceCount,
-    double?                 serviceAmount,
-    int?                    sparePartsCount,
-    double?                 sparePartsAmount,
-    bool?                   is6Months,
-    List<MaintenanceModel>? pendingList,
-    List<MaintenanceModel>? summaryList,
+    String? currentMonthName,
+    int?    breakdownCount,
+    double? breakdownAmount,
+    int?    repairCount,
+    double? repairAmount,
+    int?    serviceCount,
+    double? serviceAmount,
+    int?    sparePartsCount,
+    double? sparePartsAmount,
+    bool?   is6Months,
+    List<dynamic>? pendingList,
+    List<dynamic>? summaryList,
   }) {
     return MaintenanceLoaded(
       currentMonthName: currentMonthName ?? this.currentMonthName,

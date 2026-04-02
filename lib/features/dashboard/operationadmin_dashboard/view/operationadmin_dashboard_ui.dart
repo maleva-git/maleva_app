@@ -191,7 +191,7 @@ class MobileDashboard extends StatelessWidget {
         controller: tabController,
         children: [
 
-          const MaintenanceDashboard(),
+          const MaintenanceDashboardWidget(),
           const VesselReportPage(),
           const TruckDetailsReportPage(),
           const DriverDetailsView(),
