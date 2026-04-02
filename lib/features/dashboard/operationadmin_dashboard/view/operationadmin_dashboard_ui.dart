@@ -13,29 +13,17 @@ import '../../../common_updates/blocs/sales/sales_bloc.dart';
 import '../../../common_updates/blocs/sales/sales_event.dart';
 import '../../../common_updates/blocs/truck/truck_bloc.dart';
 import '../../../common_updates/blocs/truck/truck_event.dart';
-import '../../admin_dashboard/tabs/ExpenseReport/view/expensereport_tab.dart';
-import '../../admin_dashboard/tabs/bocheck/view/bocheck_tab.dart';
 import '../../admin_dashboard/tabs/driver/view/driverdetails_tab.dart';
-import '../../admin_dashboard/tabs/emailinbox/view/emailinbox_tab.dart';
-import '../../admin_dashboard/tabs/employeemaster/view/employeemaster_tab.dart';
 import '../../admin_dashboard/tabs/enginehours/view/enginehours_tab.dart';
-import '../../admin_dashboard/tabs/forwardingreport/view/forwardingreport_tab.dart';
 import '../../admin_dashboard/tabs/fuel/view/fuelreport_tab.dart';
 import '../../admin_dashboard/tabs/fuelfillings/view/fuelfillings_tab.dart';
-import '../../admin_dashboard/tabs/googlereview/view/googlereview_tab.dart';
 import '../../admin_dashboard/tabs/inventoryreport/view/inventoryview_tab.dart';
-import '../../admin_dashboard/tabs/invoice/view/invoice_tab.dart';
-import '../../admin_dashboard/tabs/paymentview/view/paymentview_tab.dart';
+import '../../admin_dashboard/tabs/maintenance/view/maintenance_tab.dart';
 import '../../admin_dashboard/tabs/pdo/view/pdo_tab.dart';
-import '../../admin_dashboard/tabs/pettycash/view/pettycash_tab.dart';
-import '../../admin_dashboard/tabs/receiptview/view/receiptview_tab.dart';
 import '../../admin_dashboard/tabs/rtiview/view/rtiview_tab.dart';
-import '../../admin_dashboard/tabs/salesorder/view/salesorderview_tab.dart';
 import '../../admin_dashboard/tabs/spareparts/view/sparepartsadd.dart';
 import '../../admin_dashboard/tabs/speedingreport/view/speedingreport_view.dart';
 import '../../admin_dashboard/tabs/spotsaleorder/view/spotsaleorder_add.dart';
-import '../../admin_dashboard/tabs/summonentry/view/summonentry_tab.dart';
-import '../../admin_dashboard/tabs/transport/view/transportview_tab.dart';
 import '../../admin_dashboard/tabs/truck/view/truckview_tab.dart';
 import '../../admin_dashboard/tabs/vesselreport/view/vesselreportview_tab.dart';
 import '../bloc/operationadmin_dashboard_bloc.dart';
@@ -152,8 +140,7 @@ class MobileDashboard extends StatelessWidget {
         tabs: [
 
           _tab('VSL',             isTablet),
-
-
+          _tab('Maintenance',     isTablet),
           _tab('Truck',           isTablet),
           _tab('Driver',          isTablet),
           _tab('SpeedingReport',  isTablet),
@@ -162,7 +149,6 @@ class MobileDashboard extends StatelessWidget {
           _tab('Fuel',            isTablet),
           _tab('SparePartsEntry', isTablet),
           _tab('SpotsSaleOrder',  isTablet),
-
           _tab('InventoryReport', isTablet),
           _tab('PDO',             isTablet),
           _tab('RTI',             isTablet),
@@ -205,6 +191,7 @@ class MobileDashboard extends StatelessWidget {
         controller: tabController,
         children: [
 
+          const MaintenanceDashboard(),
           const VesselReportPage(),
           const TruckDetailsReportPage(),
           const DriverDetailsView(),

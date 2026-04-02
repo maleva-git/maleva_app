@@ -4,6 +4,7 @@ import 'package:intl/intl.dart';
 import 'package:maleva/features/dashboard/admin_dashboard/tabs/ExpenseReport/bloc/expensereport_bloc.dart';
 import 'package:maleva/features/dashboard/admin_dashboard/tabs/ExpenseReport/bloc/expensereport_event.dart';
 import 'package:maleva/features/dashboard/admin_dashboard/tabs/salesorder/bloc/salesorder_bloc.dart';
+import '../../../../DashBoard/Maintenance/MaintenanceDashboard.dart';
 import '../../../common_updates/blocs/sales/sales_bloc.dart';
 import '../../../common_updates/blocs/truck/truck_bloc.dart';
 import '../../admin_dashboard/tabs/ExpenseReport/view/expensereport_tab.dart';
@@ -38,6 +39,8 @@ import '../../admin_dashboard/tabs/inventoryreport/bloc/inventoryreport_event.da
 import '../../admin_dashboard/tabs/inventoryreport/view/inventoryview_tab.dart';
 import '../../admin_dashboard/tabs/invoice/bloc/invoice_bloc.dart';
 import '../../admin_dashboard/tabs/invoice/view/invoice_tab.dart';
+import '../../admin_dashboard/tabs/maintenance/bloc/maintenance_bloc.dart';
+import '../../admin_dashboard/tabs/maintenance/bloc/maintenance_event.dart';
 import '../../admin_dashboard/tabs/paymentview/bloc/paymentview_bloc.dart';
 import '../../admin_dashboard/tabs/paymentview/bloc/paymentview_event.dart';
 import '../../admin_dashboard/tabs/paymentview/view/paymentview_tab.dart';
@@ -118,6 +121,11 @@ class _AdminDashboardState extends State<OperationAdminDashboard> with SingleTic
             ),
             BlocProvider<TruckBloc>(
               create: (_) => TruckBloc(),
+            ),
+
+            BlocProvider(
+              create: (_) => MaintenanceBloc()..add( MaintenanceStarted()),
+              child: const MaintenanceDashboard(),
             ),
 
             BlocProvider(
