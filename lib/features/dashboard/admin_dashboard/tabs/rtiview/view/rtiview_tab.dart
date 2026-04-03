@@ -4,6 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:maleva/core/models/model.dart';
 import 'package:maleva/core/colors/colors.dart' as colour;
+import '../../../../../../core/theme/tokens.dart';
 import '../bloc/rtiview_bloc.dart';
 import '../bloc/rtiview_event.dart';
 import '../bloc/rtiview_state.dart';
@@ -45,10 +46,10 @@ class _RTIDetailsBody extends StatelessWidget {
               padding: const EdgeInsets.symmetric(
                   horizontal: 10, vertical: 8),
               decoration: BoxDecoration(
-                color: colour.kAccent,
+                color: AppTokens.brandLight,
                 borderRadius: BorderRadius.circular(14),
                 border: Border.all(
-                    color: colour.kPrimaryLight.withOpacity(0.3)),
+                    color: AppTokens.brandMid.withOpacity(0.3)),
               ),
               child: Row(children: [
 
@@ -72,7 +73,7 @@ class _RTIDetailsBody extends StatelessWidget {
                 // Divider
                 Container(
                     width: 1, height: 30,
-                    color: colour.kPrimaryLight.withOpacity(0.3),
+                    color: AppTokens.brandMid.withOpacity(0.3),
                     margin:
                     const EdgeInsets.symmetric(horizontal: 8)),
 
@@ -103,7 +104,7 @@ class _RTIDetailsBody extends StatelessWidget {
                       .read<RTIDetailsBloc>()
                       .add(const SearchRTIDetailsEvent()),
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: colour.kPrimary,
+                    backgroundColor: AppTokens.brandGradientStart,
                     padding: const EdgeInsets.symmetric(
                         horizontal: 14, vertical: 12),
                     shape: RoundedRectangleBorder(
@@ -130,11 +131,11 @@ class _RTIDetailsBody extends StatelessWidget {
                     padding: const EdgeInsets.symmetric(
                         horizontal: 10, vertical: 4),
                     decoration: BoxDecoration(
-                        color: colour.kAccent,
+                        color: AppTokens.brandLight,
                         borderRadius: BorderRadius.circular(8)),
                     child: Text("${s!.masters.length} records",
                         style: GoogleFonts.lato(
-                            color: colour.kPrimary,
+                            color: AppTokens.brandGradientStart,
                             fontWeight: FontWeight.bold,
                             fontSize: 12)),
                   ),
@@ -148,7 +149,7 @@ class _RTIDetailsBody extends StatelessWidget {
               child: isLoading
                   ? const Center(
                   child: CircularProgressIndicator(
-                      color: colour.kPrimary))
+                      color: AppTokens.brandGradientStart))
                   : state is RTIDetailsError
                   ? _errorView(context, state.message)
                   : (s == null || s.masters.isEmpty)
@@ -198,7 +199,7 @@ class _RTIDetailsBody extends StatelessWidget {
       builder: (ctx, child) => Theme(
         data: Theme.of(ctx).copyWith(
             colorScheme:
-            const ColorScheme.light(primary: colour.kPrimary)),
+            const ColorScheme.light(primary: AppTokens.brandGradientStart)),
         child: child!,
       ),
     );
@@ -221,7 +222,7 @@ class _RTIDetailsBody extends StatelessWidget {
           icon: const Icon(Icons.refresh),
           label: const Text("Retry"),
           style: ElevatedButton.styleFrom(
-              backgroundColor: colour.kPrimary),
+              backgroundColor: AppTokens.brandGradientStart),
         ),
       ]),
     );
@@ -257,10 +258,10 @@ class _RTIDetailsCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: colour.kWhite,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: colour.kAccent, width: 1.5),
+        border: Border.all(color: AppTokens.brandLight, width: 1.5),
         boxShadow: [
           BoxShadow(
-              color: colour.kPrimary.withOpacity(0.06),
+              color: AppTokens.brandGradientStart.withOpacity(0.06),
               blurRadius: 8,
               offset: const Offset(0, 3)),
         ],
@@ -277,7 +278,7 @@ class _RTIDetailsCard extends StatelessWidget {
             title: Container(
               padding: const EdgeInsets.symmetric(
                   horizontal: 14, vertical: 12),
-              decoration: const BoxDecoration(color: colour.kPrimary),
+              decoration: const BoxDecoration(color: AppTokens.brandGradientStart),
               child: Row(children: [
 
                 // Driver icon
@@ -360,15 +361,15 @@ class _RTIDetailsCard extends StatelessWidget {
     return SingleChildScrollView(
       scrollDirection: Axis.horizontal,
       child: DataTable(
-        headingRowColor: MaterialStateProperty.all(colour.kAccent),
+        headingRowColor: MaterialStateProperty.all(AppTokens.brandLight),
         headingTextStyle: GoogleFonts.lato(
             fontWeight: FontWeight.bold,
-            color: colour.kPrimaryDark,
+            color: AppTokens.brandDark,
             fontSize: 13),
         dataTextStyle:
-        GoogleFonts.lato(fontSize: 13, color: colour.kPrimaryDark),
+        GoogleFonts.lato(fontSize: 13, color: AppTokens.brandDark),
         border: TableBorder.all(
-          color: colour.kPrimaryLight.withOpacity(0.2),
+          color: AppTokens.brandMid.withOpacity(0.2),
           borderRadius: BorderRadius.circular(10),
         ),
         columns: const [
@@ -402,7 +403,7 @@ class _DateTile extends StatelessWidget {
   Widget build(BuildContext context) {
     return Row(children: [
       const Icon(Icons.calendar_today_rounded,
-          color: colour.kPrimary, size: 16),
+          color: AppTokens.brandGradientStart, size: 16),
       const SizedBox(width: 6),
       Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         Text(label,
@@ -414,7 +415,7 @@ class _DateTile extends StatelessWidget {
             style: GoogleFonts.lato(
                 fontSize: 13,
                 fontWeight: FontWeight.bold,
-                color: colour.kPrimaryDark)),
+                color: AppTokens.brandDark)),
       ]),
     ]);
   }

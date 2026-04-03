@@ -72,7 +72,7 @@ class _FuelFillingBody extends StatelessWidget {
                         style: GoogleFonts.lato(
                           fontSize:      20,
                           fontWeight:    FontWeight.bold,
-                          color:         colour.kPrimaryDark,
+                          color:         AppTokens.brandDark,
                           letterSpacing: 1.2,
                         ),
                       ),
@@ -84,7 +84,7 @@ class _FuelFillingBody extends StatelessWidget {
                         "Filling Details",
                         style: GoogleFonts.lato(
                           fontSize:   14,
-                          color:      colour.kPrimaryLight,
+                          color:      AppTokens.brandMid,
                           fontWeight: FontWeight.w500,
                         ),
                       ),
@@ -201,7 +201,7 @@ class _CountBadge extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
       decoration: BoxDecoration(
         gradient: const LinearGradient(
-          colors: [AppTokens.brandGradientStart, colour.kPrimaryDark],
+          colors: [AppTokens.brandGradientStart, AppTokens.brandDark],
           begin: Alignment.topLeft,
           end:   Alignment.bottomRight,
         ),
@@ -315,14 +315,14 @@ class _FuelFillingCard extends StatelessWidget {
                     style: GoogleFonts.lato(
                       fontWeight: FontWeight.bold,
                       fontSize:   isTablet ? 17 : 16,
-                      color:      colour.kPrimaryDark,
+                      color:      AppTokens.brandDark,
                     ),
                   ),
                   SizedBox(height: isTablet ? 8 : 6),
                   Row(children: [
                     Icon(Icons.person_outline,
                         size:  isTablet ? 16 : 14,
-                        color: colour.kPrimaryLight),
+                        color: AppTokens.brandMid),
                     const SizedBox(width: 4),
                     Flexible(
                       child: Text(
@@ -566,7 +566,7 @@ class _FuelFillingCard extends StatelessWidget {
                 style: GoogleFonts.lato(
                   fontSize:   isTablet ? 16 : 15,
                   fontWeight: FontWeight.w700,
-                  color:      colour.kPrimaryDark,
+                  color:      AppTokens.brandDark,
                 ),
               ),
             ],

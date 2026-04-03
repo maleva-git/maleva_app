@@ -5,6 +5,7 @@ import 'package:maleva/core/utils/clsfunction.dart' as objfun;
 import 'package:maleva/core/models/model.dart';
 import 'package:maleva/core/colors/colors.dart' as colour;
 import 'package:maleva/features/dashboard/admin_dashboard/tabs/spotsaleorder/view/spotsaleorder_view.dart';
+import '../../../../../../core/theme/tokens.dart';
 import '../bloc/spotsaleorder_bloc.dart';
 import '../bloc/spotsaleorder_event.dart';
 import '../bloc/spotsaleorder_state.dart';
@@ -157,7 +158,7 @@ class _SpotSaleEntryBody extends StatelessWidget {
               child: Text('Entry Form',
                   style: GoogleFonts.lato(
                     fontSize: 14,
-                    color: colour.kPrimaryLight,
+                    color: AppTokens.brandMid,
                     fontWeight: FontWeight.w500,
                   )),
             ),
@@ -990,7 +991,7 @@ class _SelectPageScaffold extends StatelessWidget {
               horizontal: 16, vertical: 10),
           child: Row(children: [
             Icon(icon,
-                color: colour.kPrimaryLight, size: 16),
+                color: AppTokens.brandMid, size: 16),
             const SizedBox(width: 6),
             Text("$count items found",
                 style: GoogleFonts.lato(
@@ -1074,7 +1075,7 @@ class _SelectListTile extends StatelessWidget {
                     color: colour.kPrimaryDark)),
           ),
           const Icon(Icons.chevron_right_rounded,
-              color: colour.kPrimaryLight),
+              color: AppTokens.brandMid),
         ]),
       ),
     );
@@ -1174,7 +1175,7 @@ class _SelectTile extends StatelessWidget {
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
             color: hasValue
-                ? colour.kPrimaryLight.withOpacity(0.4)
+                ? AppTokens.brandMid.withOpacity(0.4)
                 : Colors.grey.shade300,
           ),
         ),
@@ -1235,7 +1236,7 @@ InputDecoration _decor(String label, IconData icon) {
     enabledBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(10),
         borderSide: BorderSide(
-            color: colour.kPrimaryLight.withOpacity(0.35))),
+            color: AppTokens.brandMid.withOpacity(0.35))),
     filled: true,
     fillColor: Colors.grey.shade50,
     contentPadding: const EdgeInsets.symmetric(

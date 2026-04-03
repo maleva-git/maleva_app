@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:maleva/core/utils/clsfunction.dart' as objfun;
 import '../../../../../../MasterSearch/Port.dart';
+import '../../../../../../core/theme/tokens.dart';
 import '../bloc/vesselreport_bloc.dart';
 import '../bloc/vesselreport_event.dart';
 import '../bloc/vesselreport_state.dart';
@@ -279,7 +280,7 @@ class _SectionHeader extends StatelessWidget {
         style: GoogleFonts.poppins(
           fontSize:      isTablet ? 20 : 17,
           fontWeight:    FontWeight.w700,
-          color:         colour.kPrimaryDark,
+          color:         AppTokens.brandDark,
           letterSpacing: 1.2,
         ),
       ),
@@ -441,13 +442,13 @@ class _StyledTextField extends StatelessWidget {
       style: GoogleFonts.poppins(
         fontSize:   isTablet ? 14 : 13,
         fontWeight: FontWeight.w600,
-        color:      colour.kPrimaryDark,
+        color:      AppTokens.brandDark,
       ),
       decoration: InputDecoration(
         hintText: hint,
         hintStyle: GoogleFonts.poppins(
           fontSize: isTablet ? 14 : 13,
-          color:    colour.kPrimaryLight.withOpacity(0.6),
+          color:    AppTokens.brandMid.withOpacity(0.6),
         ),
         suffixIcon: suffixIcon != null
             ? Padding(
@@ -598,7 +599,7 @@ class _ToggleTab extends StatelessWidget {
             style: GoogleFonts.poppins(
               fontSize:   isTablet ? 14 : 13,
               fontWeight: FontWeight.w600,
-              color:      isActive ? colour.kWhite : colour.kPrimaryLight,
+              color:      isActive ? colour.kWhite : AppTokens.brandMid,
             ),
           ),
         ),
@@ -621,7 +622,7 @@ class _ListHeader extends StatelessWidget {
       ),
       decoration: BoxDecoration(
         gradient: const LinearGradient(
-          colors: [colour.kPrimary, colour.kPrimaryDark],
+          colors: [colour.kPrimary, AppTokens.brandDark],
           begin: Alignment.centerLeft,
           end:   Alignment.centerRight,
         ),
@@ -697,7 +698,7 @@ class _VesselCard extends StatelessWidget {
               border: Border.all(
                 color: isEven
                     ? colour.kAccent
-                    : colour.kPrimaryLight.withOpacity(0.3),
+                    : AppTokens.brandMid.withOpacity(0.3),
                 width: 1.2,
               ),
               boxShadow: isEven
@@ -742,7 +743,7 @@ class _VesselCard extends StatelessWidget {
                   style: GoogleFonts.poppins(
                       fontSize:   isTablet ? 14 : 13,
                       fontWeight: FontWeight.w600,
-                      color:      colour.kPrimaryDark),
+                      color:      AppTokens.brandDark),
                 ),
               ),
 
@@ -756,7 +757,7 @@ class _VesselCard extends StatelessWidget {
                   color: colour.kPrimary.withOpacity(0.08),
                   borderRadius: BorderRadius.circular(20),
                   border: Border.all(
-                      color: colour.kPrimaryLight.withOpacity(0.3),
+                      color: AppTokens.brandMid.withOpacity(0.3),
                       width: 1),
                 ),
                 child: Text(
@@ -800,13 +801,13 @@ class _EmptyState extends StatelessWidget {
             style: GoogleFonts.poppins(
               fontSize:   isTablet ? 17 : 15,
               fontWeight: FontWeight.w600,
-              color:      colour.kPrimaryDark,
+              color:      AppTokens.brandDark,
             )),
         SizedBox(height: isTablet ? 8 : 6),
         Text('Try adjusting your search or date filter',
             style: GoogleFonts.poppins(
               fontSize: isTablet ? 13 : 12,
-              color:    colour.kPrimaryLight,
+              color:    AppTokens.brandMid,
             )),
       ]),
     );

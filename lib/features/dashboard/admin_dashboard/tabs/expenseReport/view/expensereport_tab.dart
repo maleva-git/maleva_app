@@ -8,6 +8,8 @@ import 'package:maleva/features/dashboard/admin_dashboard/tabs/ExpenseReport/blo
 import 'package:maleva/core/utils/clsfunction.dart' as objfun;
 import 'package:maleva/core/colors/colors.dart' as colour;
 
+import '../../../../../../core/theme/tokens.dart';
+
 class ExpenseReportPage extends StatelessWidget {
   const ExpenseReportPage({super.key});
 
@@ -213,7 +215,7 @@ class _SectionHeader extends StatelessWidget {
         style: GoogleFonts.poppins(
           fontSize: isTablet ? 20 : 17,
           fontWeight: FontWeight.w700,
-          color: colour.kPrimaryDark,
+          color: AppTokens.brandDark,
           letterSpacing: 1.2,
         ),
       ),
@@ -245,7 +247,7 @@ class _SummaryCard extends StatelessWidget {
     return Container(
       decoration: BoxDecoration(
         gradient: const LinearGradient(
-          colors: [colour.kPrimary, colour.kPrimaryDark],
+          colors: [colour.kPrimary, AppTokens.brandDark],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
@@ -518,7 +520,7 @@ class _DateField extends StatelessWidget {
               Text(date,
                   style: GoogleFonts.poppins(
                       fontSize: isTablet ? 14 : 13,
-                      color: colour.kPrimaryDark,
+                      color: AppTokens.brandDark,
                       fontWeight: FontWeight.w600)),
             ],
           ),
@@ -551,7 +553,7 @@ class _ListHeader extends StatelessWidget {
               style: GoogleFonts.poppins(
                   fontSize: isTablet ? 13 : 12,
                   fontWeight: FontWeight.w700,
-                  color: colour.kPrimaryDark)),
+                  color: AppTokens.brandDark)),
         ),
         Expanded(
           flex: 2,
@@ -560,7 +562,7 @@ class _ListHeader extends StatelessWidget {
               style: GoogleFonts.poppins(
                   fontSize: isTablet ? 13 : 12,
                   fontWeight: FontWeight.w700,
-                  color: colour.kPrimaryDark)),
+                  color: AppTokens.brandDark)),
         ),
         Expanded(
           flex: 2,
@@ -569,7 +571,7 @@ class _ListHeader extends StatelessWidget {
               style: GoogleFonts.poppins(
                   fontSize: isTablet ? 13 : 12,
                   fontWeight: FontWeight.w700,
-                  color: colour.kPrimaryDark)),
+                  color: AppTokens.brandDark)),
         ),
       ]),
     );
@@ -614,7 +616,7 @@ class _ExpenseItemCard extends StatelessWidget {
               border: Border.all(color: colour.kAccent, width: 1.2),
               boxShadow: [
                 BoxShadow(
-                  color: colour.kPrimary.withOpacity(0.06),
+                  color: AppTokens.brandGradientStart.withOpacity(0.06),
                   blurRadius: 8,
                   offset: const Offset(0, 3),
                 ),
@@ -637,7 +639,7 @@ class _ExpenseItemCard extends StatelessWidget {
                   style: GoogleFonts.poppins(
                       fontSize: isTablet ? 12 : 11,
                       fontWeight: FontWeight.w700,
-                      color: colour.kPrimary),
+                      color: AppTokens.brandGradientStart),
                 ),
               ),
 
@@ -647,7 +649,7 @@ class _ExpenseItemCard extends StatelessWidget {
                     style: GoogleFonts.poppins(
                         fontSize: isTablet ? 14 : 13,
                         fontWeight: FontWeight.w600,
-                        color: colour.kPrimaryDark)),
+                        color: AppTokens.brandDark)),
               ),
               Expanded(
                 flex: 2,
@@ -666,7 +668,7 @@ class _ExpenseItemCard extends StatelessWidget {
                     vertical:   isTablet ? 5  : 4,
                   ),
                   decoration: BoxDecoration(
-                    color: colour.kAccent,
+                    color: AppTokens.brandLight,
                     borderRadius:
                     BorderRadius.circular(isTablet ? 10 : 8),
                   ),
@@ -675,7 +677,7 @@ class _ExpenseItemCard extends StatelessWidget {
                       style: GoogleFonts.poppins(
                           fontSize: isTablet ? 14 : 13,
                           fontWeight: FontWeight.w700,
-                          color: colour.kPrimary)),
+                          color: AppTokens.brandGradientStart)),
                 ),
               ),
             ]),

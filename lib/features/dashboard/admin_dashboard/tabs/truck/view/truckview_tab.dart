@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:maleva/core/utils/clsfunction.dart' as objfun;
 import '../../../../../../core/models/model.dart';
+import '../../../../../../core/theme/tokens.dart';
 import '../bloc/truck_bloc.dart';
 import '../bloc/truck_state.dart';
 import 'package:maleva/core/colors/colors.dart' as colour;
@@ -32,7 +33,7 @@ class _TruckReportView extends StatelessWidget {
         if (state is TruckErrorState) {
           objfun.msgshow(
             state.errorMessage, '',
-            colour.kWhite, colour.kPrimary, null,
+            colour.kWhite, AppTokens.brandGradientStart, null,
             18.00 - objfun.reducesize,
             objfun.tll, objfun.tgc, context, 2,
           );
@@ -93,7 +94,7 @@ class _TruckReportView extends StatelessWidget {
             child: isLoading
                 ? const Center(
                 child: CircularProgressIndicator(
-                    color: colour.kPrimary))
+                    color: AppTokens.brandGradientStart))
                 : truckList.isEmpty
                 ? const _EmptyState(isTablet: true)
                 : GridView.builder(
@@ -136,7 +137,7 @@ class _TruckReportView extends StatelessWidget {
           child: isLoading
               ? const Center(
               child: CircularProgressIndicator(
-                  color: colour.kPrimary))
+                  color: AppTokens.brandGradientStart))
               : truckList.isEmpty
               ? const _EmptyState(isTablet: false)
               : ListView.builder(
@@ -177,7 +178,7 @@ class _Header extends StatelessWidget {
           width: 4,
           height: isTablet ? 30 : 26,
           decoration: BoxDecoration(
-            color: colour.kPrimary,
+            color: AppTokens.brandGradientStart,
             borderRadius: BorderRadius.circular(4),
           ),
         ),
@@ -187,7 +188,7 @@ class _Header extends StatelessWidget {
           style: GoogleFonts.poppins(
             fontSize:      isTablet ? 20 : 17,
             fontWeight:    FontWeight.w700,
-            color:         colour.kPrimaryDark,
+            color:         AppTokens.brandDark,
             letterSpacing: 1.2,
           ),
         ),
@@ -207,14 +208,14 @@ class _CountBadge extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
       decoration: BoxDecoration(
         gradient: const LinearGradient(
-          colors: [colour.kPrimary, colour.kPrimaryDark],
+          colors: [AppTokens.brandGradientStart, AppTokens.brandDark],
           begin: Alignment.topLeft,
           end:   Alignment.bottomRight,
         ),
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color:     colour.kPrimary.withOpacity(0.30),
+            color:     AppTokens.brandGradientStart.withOpacity(0.30),
             blurRadius: 16,
             offset:    const Offset(0, 6),
           ),
@@ -276,7 +277,7 @@ class _TruckCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(isTablet ? 16 : 16),
         child: InkWell(
           borderRadius: BorderRadius.circular(isTablet ? 16 : 16),
-          splashColor: colour.kPrimary.withOpacity(0.08),
+          splashColor: AppTokens.brandGradientStart.withOpacity(0.08),
           onTap: () => _showTruckDialog(context, truck, isTablet),
           child: Container(
             padding: EdgeInsets.symmetric(
@@ -288,13 +289,13 @@ class _TruckCard extends StatelessWidget {
               border: Border.all(
                 color: isEven
                     ? colour.kAccent
-                    : colour.kPrimaryLight.withOpacity(0.3),
+                    : AppTokens.brandMid.withOpacity(0.3),
                 width: 1.2,
               ),
               boxShadow: isEven
                   ? [
                 BoxShadow(
-                  color:     colour.kPrimary.withOpacity(0.05),
+                  color:     AppTokens.brandGradientStart.withOpacity(0.05),
                   blurRadius: 8,
                   offset:    const Offset(0, 3),
                 )
@@ -309,11 +310,11 @@ class _TruckCard extends StatelessWidget {
                 decoration: BoxDecoration(
                   color: isEven
                       ? colour.kAccent
-                      : colour.kPrimary.withOpacity(0.12),
+                      : AppTokens.brandGradientStart.withOpacity(0.12),
                   borderRadius: BorderRadius.circular(isTablet ? 10 : 12),
                 ),
                 child: Icon(Icons.local_shipping_rounded,
-                    color: colour.kPrimary,
+                    color: AppTokens.brandGradientStart,
                     size: isTablet ? 18 : 22),
               ),
               const SizedBox(width: 10),
@@ -332,7 +333,7 @@ class _TruckCard extends StatelessWidget {
                       style: GoogleFonts.poppins(
                         fontSize:   isTablet ? 13 : 14,
                         fontWeight: FontWeight.w700,
-                        color:      colour.kPrimaryDark,
+                        color:      AppTokens.brandDark,
                       ),
                     ),
                     if (!isTablet) ...[
@@ -342,7 +343,7 @@ class _TruckCard extends StatelessWidget {
                         style: GoogleFonts.poppins(
                           fontSize: 11,
                           color:
-                          colour.kPrimaryLight.withOpacity(0.7),
+                          AppTokens.brandMid.withOpacity(0.7),
                         ),
                       ),
                     ],
@@ -356,11 +357,11 @@ class _TruckCard extends StatelessWidget {
                 decoration: BoxDecoration(
                   color: isEven
                       ? colour.kAccent
-                      : colour.kPrimary.withOpacity(0.12),
+                      : AppTokens.brandGradientStart.withOpacity(0.12),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Icon(Icons.chevron_right_rounded,
-                    color: colour.kPrimary,
+                    color: AppTokens.brandGradientStart,
                     size: isTablet ? 16 : 18),
               ),
             ]),
@@ -400,7 +401,7 @@ class _TruckCard extends StatelessWidget {
                 padding: EdgeInsets.all(isTablet ? 18 : 16),
                 decoration: BoxDecoration(
                   gradient: const LinearGradient(
-                    colors: [colour.kPrimary, colour.kPrimaryDark],
+                    colors: [AppTokens.brandGradientStart, AppTokens.brandDark],
                     begin: Alignment.topLeft,
                     end:   Alignment.bottomRight,
                   ),
@@ -458,7 +459,7 @@ class _TruckCard extends StatelessWidget {
                 child: ElevatedButton(
                   onPressed: () => Navigator.of(context).pop(),
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: colour.kPrimary,
+                    backgroundColor: AppTokens.brandGradientStart,
                     shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12)),
                     padding: EdgeInsets.symmetric(
@@ -510,7 +511,7 @@ class _ExpiryRow extends StatelessWidget {
           child: Text(label,
               style: GoogleFonts.poppins(
                 fontSize:   isTablet ? 13 : 12,
-                color:      colour.kPrimaryDark,
+                color:      AppTokens.brandDark,
                 fontWeight: FontWeight.w500,
               )),
         ),
@@ -552,20 +553,20 @@ class _EmptyState extends StatelessWidget {
               color: colour.kAccent, shape: BoxShape.circle),
           child: Icon(Icons.local_shipping_outlined,
               size:  isTablet ? 52 : 44,
-              color: colour.kPrimary),
+              color: AppTokens.brandGradientStart),
         ),
         SizedBox(height: isTablet ? 20 : 16),
         Text('No Trucks Found',
             style: GoogleFonts.poppins(
               fontSize:   isTablet ? 17 : 15,
               fontWeight: FontWeight.w700,
-              color:      colour.kPrimaryDark,
+              color:      AppTokens.brandDark,
             )),
         SizedBox(height: isTablet ? 8 : 6),
         Text('No truck data available at the moment.',
             style: GoogleFonts.poppins(
                 fontSize: isTablet ? 13 : 12,
-                color:    colour.kPrimaryLight)),
+                color:    AppTokens.brandMid)),
       ],
     );
   }

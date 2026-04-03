@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:maleva/core/utils/clsfunction.dart' as objfun;
 import '../../../../../../core/models/model.dart';
+import '../../../../../../core/theme/tokens.dart';
 import '../bloc/speeding_bloc.dart';
 import '../bloc/speeding_event.dart';
 import '../bloc/speeding_state.dart';
@@ -68,7 +69,7 @@ class _SpeedingBody extends StatelessWidget {
                         style: GoogleFonts.lato(
                           fontSize: 20,
                           fontWeight: FontWeight.bold,
-                          color: colour.kPrimaryDark,
+                          color: AppTokens.brandDark,
                           letterSpacing: 1.2,
                         ),
                       ),
@@ -80,7 +81,7 @@ class _SpeedingBody extends StatelessWidget {
                         "Details",
                         style: GoogleFonts.lato(
                           fontSize: 14,
-                          color: colour.kPrimaryLight,
+                          color: AppTokens.brandMid,
                           fontWeight: FontWeight.w500,
                         ),
                       ),
@@ -152,7 +153,7 @@ class _SpeedingBody extends StatelessWidget {
           style: GoogleFonts.lato(
             fontSize:   objfun.FontLarge,
             fontWeight: FontWeight.bold,
-            color:      colour.kPrimaryDark,
+            color:      AppTokens.brandDark,
           ),
         ),
         const SizedBox(height: 10),
@@ -209,7 +210,7 @@ class _CountBadge extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
       decoration: BoxDecoration(
         gradient: const LinearGradient(
-          colors: [colour.kPrimary, colour.kPrimaryDark],
+          colors: [colour.kPrimary, AppTokens.brandDark],
           begin: Alignment.topLeft,
           end:   Alignment.bottomRight,
         ),
@@ -325,14 +326,14 @@ class _SpeedingCard extends StatelessWidget {
                     style: GoogleFonts.lato(
                       fontWeight: FontWeight.bold,
                       fontSize:   isTablet ? 17 : 16,
-                      color:      colour.kPrimaryDark,
+                      color:      AppTokens.brandDark,
                     ),
                   ),
                   SizedBox(height: isTablet ? 8 : 6),
                   Row(children: [
                     Icon(Icons.person_outline,
                         size:  isTablet ? 16 : 14,
-                        color: colour.kPrimaryLight),
+                        color: AppTokens.brandMid),
                     const SizedBox(width: 4),
                     Flexible(
                       child: Text(
@@ -566,7 +567,7 @@ class _SpeedingCard extends StatelessWidget {
                 style: GoogleFonts.lato(
                   fontSize:   isTablet ? 16 : 15,
                   fontWeight: FontWeight.w700,
-                  color:      colour.kPrimaryDark,
+                  color:      AppTokens.brandDark,
                 ),
               ),
             ],

@@ -1,5 +1,4 @@
 import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -8,15 +7,12 @@ import 'package:path_provider/path_provider.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:http/http.dart' as http;
 import 'package:maleva/core/utils/clsfunction.dart' as objfun;
+import '../../../../../../core/theme/palette.dart';
+import '../../../../../../core/theme/tokens.dart';
 import '../bloc/spareparts_bloc.dart';
 import '../bloc/spareparts_event.dart';
 import '../bloc/spareparts_state.dart';
 
-const Color kPrimary      = Color(0xFF1555F3);
-const Color kPrimaryDark  = Color(0xFF0D3DB5);
-const Color kPrimaryLight = Color(0xFF4D7EF7);
-const Color kAccent       = Color(0xFFE8EEFF);
-const Color kWhite        = Colors.white;
 
 // ── Entry Point ───────────────────────────────────────────────────────────────
 class SparePartsView extends StatelessWidget {
@@ -45,12 +41,12 @@ class _SparePartsViewBody extends StatelessWidget {
     return Scaffold(
       backgroundColor: Colors.grey.shade50,
       appBar: AppBar(
-        backgroundColor: kPrimary,
-        foregroundColor: kWhite,
+        backgroundColor: AppTokens.brandGradientStart,
+        foregroundColor: Palette.kWhite,
         elevation: 0,
         title: Text("Spare Parts Entries",
             style: GoogleFonts.lato(
-                fontWeight: FontWeight.bold, color: kWhite)),
+                fontWeight: FontWeight.bold, color: Palette.kWhite)),
         centerTitle: true,
       ),
       body: BlocConsumer<SparePartsBloc, SparePartsState>(
@@ -153,7 +149,7 @@ class _SparePartsViewBody extends StatelessWidget {
       }) {
     if (isLoading) {
       return const Center(
-          child: CircularProgressIndicator(color: kPrimary));
+          child: CircularProgressIndicator(color: AppTokens.brandGradientStart));
     }
     if (records.isEmpty) {
       return Center(
@@ -234,9 +230,9 @@ class _DateFilterBar extends StatelessWidget {
     return Container(
       padding: EdgeInsets.all(isTablet ? 14 : 12),
       decoration: BoxDecoration(
-        color: kAccent,
+        color: AppTokens.brandLight,
         borderRadius: BorderRadius.circular(isTablet ? 16 : 12),
-        border: Border.all(color: kPrimaryLight.withOpacity(0.3)),
+        border: Border.all(color: AppTokens.brandMid.withOpacity(0.3)),
       ),
       child: Column(children: [
         Row(children: [
@@ -254,7 +250,7 @@ class _DateFilterBar extends StatelessWidget {
                   builder: (ctx, child) => Theme(
                     data: Theme.of(ctx).copyWith(
                         colorScheme: const ColorScheme.light(
-                            primary: kPrimary)),
+                            primary: AppTokens.brandGradientStart)),
                     child: child!,
                   ),
                 );
@@ -280,7 +276,7 @@ class _DateFilterBar extends StatelessWidget {
                   builder: (ctx, child) => Theme(
                     data: Theme.of(ctx).copyWith(
                         colorScheme: const ColorScheme.light(
-                            primary: kPrimary)),
+                            primary: AppTokens.brandGradientStart)),
                     child: child!,
                   ),
                 );
@@ -306,7 +302,7 @@ class _DateFilterBar extends StatelessWidget {
             style: ElevatedButton.styleFrom(
               padding: EdgeInsets.symmetric(
                   vertical: isTablet ? 16 : 14),
-              backgroundColor: kPrimary,
+              backgroundColor: AppTokens.brandGradientStart,
               shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(10)),
               elevation: 0,
@@ -315,7 +311,7 @@ class _DateFilterBar extends StatelessWidget {
                 style: GoogleFonts.lato(
                     fontSize: isTablet ? 17 : 16,
                     fontWeight: FontWeight.bold,
-                    color: kWhite)),
+                    color: Palette.kWhite)),
           ),
         ),
       ]),
@@ -348,16 +344,16 @@ class _SparePartsCard extends StatelessWidget {
         duration: const Duration(milliseconds: 200),
         margin: EdgeInsets.only(bottom: isTablet ? 10 : 14),
         decoration: BoxDecoration(
-          color: kWhite,
+          color: Palette.kWhite,
           borderRadius:
           BorderRadius.circular(isTablet ? 12 : 16),
           border: Border.all(
-            color: isSelected ? kPrimary : kAccent,
+            color: isSelected ? AppTokens.brandGradientStart : AppTokens.brandLight,
             width: isSelected ? 2.0 : 1.5,
           ),
           boxShadow: [
             BoxShadow(
-              color: kPrimary
+              color: AppTokens.brandGradientStart
                   .withOpacity(isSelected ? 0.15 : 0.06),
               blurRadius: isSelected ? 14 : 10,
               offset: const Offset(0, 3),
@@ -380,9 +376,9 @@ class _SparePartsCard extends StatelessWidget {
       Container(
         width: 38, height: 38,
         decoration: const BoxDecoration(
-            color: kAccent, shape: BoxShape.circle),
+            color: AppTokens.brandLight, shape: BoxShape.circle),
         child: const Icon(Icons.local_shipping_rounded,
-            color: kPrimary, size: 20),
+            color: AppTokens.brandGradientStart, size: 20),
       ),
       const SizedBox(width: 10),
       Expanded(
@@ -393,7 +389,7 @@ class _SparePartsCard extends StatelessWidget {
                 style: GoogleFonts.lato(
                     fontSize: 14,
                     fontWeight: FontWeight.bold,
-                    color: kPrimaryDark),
+                    color: AppTokens.brandDark),
                 overflow: TextOverflow.ellipsis),
             Text("${item['EntryDate'] ?? '-'}",
                 style: GoogleFonts.lato(
@@ -406,12 +402,12 @@ class _SparePartsCard extends StatelessWidget {
         padding: const EdgeInsets.symmetric(
             horizontal: 8, vertical: 4),
         decoration: BoxDecoration(
-            color: kAccent,
+            color: AppTokens.brandLight,
             borderRadius: BorderRadius.circular(8)),
         child: Text("₹${item['Amount'] ?? '-'}",
             style: GoogleFonts.lato(
                 fontWeight: FontWeight.bold,
-                color: kPrimary,
+                color: AppTokens.brandGradientStart,
                 fontSize: 13)),
       ),
     ]);
@@ -427,9 +423,9 @@ class _SparePartsCard extends StatelessWidget {
           Container(
             width: 44, height: 44,
             decoration: const BoxDecoration(
-                color: kAccent, shape: BoxShape.circle),
+                color: AppTokens.brandLight, shape: BoxShape.circle),
             child: const Icon(Icons.local_shipping_rounded,
-                color: kPrimary, size: 22),
+                color: AppTokens.brandGradientStart, size: 22),
           ),
           const SizedBox(width: 12),
           Expanded(
@@ -440,7 +436,7 @@ class _SparePartsCard extends StatelessWidget {
                       style: GoogleFonts.lato(
                           fontSize: 16,
                           fontWeight: FontWeight.bold,
-                          color: kPrimaryDark)),
+                          color: AppTokens.brandDark)),
                   Text("${item['EntryDate'] ?? '-'}",
                       style: GoogleFonts.lato(
                           fontSize: 13,
@@ -451,29 +447,29 @@ class _SparePartsCard extends StatelessWidget {
             padding: const EdgeInsets.symmetric(
                 horizontal: 12, vertical: 6),
             decoration: BoxDecoration(
-                color: kAccent,
+                color: AppTokens.brandLight,
                 borderRadius: BorderRadius.circular(10)),
             child: Text("₹${item['Amount'] ?? '-'}",
                 style: GoogleFonts.lato(
                     fontWeight: FontWeight.bold,
-                    color: kPrimary,
+                    color: AppTokens.brandGradientStart,
                     fontSize: 14)),
           ),
         ]),
 
-        Divider(color: kAccent, thickness: 1.5, height: 20),
+        Divider(color: AppTokens.brandLight, thickness: 1.5, height: 20),
 
         Row(crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const Icon(Icons.build_rounded,
-                  color: kPrimaryLight, size: 16),
+                  color: AppTokens.brandMid, size: 16),
               const SizedBox(width: 8),
               Expanded(
                 child: Text(
                   item['SpareParts'] ?? '-',
                   style: GoogleFonts.lato(
                       fontSize: 14,
-                      color: kPrimaryDark,
+                      color: AppTokens.brandDark,
                       height: 1.4),
                 ),
               ),
@@ -497,10 +493,10 @@ class _SparePartsCard extends StatelessWidget {
                 fit: BoxFit.cover,
                 errorBuilder: (_, __, ___) => Container(
                   height: 80,
-                  color: kAccent,
+                  color: AppTokens.brandLight,
                   child: const Center(
                       child: Icon(Icons.broken_image_rounded,
-                          color: kPrimaryLight)),
+                          color: AppTokens.brandMid)),
                 ),
               ),
             ),
@@ -518,12 +514,12 @@ class _EmptyDetailPanel extends StatelessWidget {
     return Container(
       width: double.infinity,
       decoration: BoxDecoration(
-        color: kWhite,
+        color: Palette.kWhite,
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: kAccent, width: 1.5),
+        border: Border.all(color: AppTokens.brandLight, width: 1.5),
         boxShadow: [
           BoxShadow(
-              color: kPrimary.withOpacity(0.05),
+              color: AppTokens.brandGradientStart.withOpacity(0.05),
               blurRadius: 12,
               offset: const Offset(0, 4))
         ],
@@ -534,16 +530,16 @@ class _EmptyDetailPanel extends StatelessWidget {
           Container(
             width: 64, height: 64,
             decoration: const BoxDecoration(
-                color: kAccent, shape: BoxShape.circle),
+                color: AppTokens.brandLight, shape: BoxShape.circle),
             child: const Icon(Icons.touch_app_rounded,
-                color: kPrimary, size: 32),
+                color: AppTokens.brandGradientStart, size: 32),
           ),
           const SizedBox(height: 16),
           Text("Select a record",
               style: GoogleFonts.lato(
                   fontSize: 16,
                   fontWeight: FontWeight.bold,
-                  color: kPrimaryDark)),
+                  color: AppTokens.brandDark)),
           const SizedBox(height: 6),
           Text("Tap any card to view details",
               style: GoogleFonts.lato(
@@ -567,12 +563,12 @@ class _SparePartsDetailPanel extends StatelessWidget {
     return Container(
       width: double.infinity,
       decoration: BoxDecoration(
-        color: kWhite,
+        color: Palette.kWhite,
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: kAccent, width: 1.5),
+        border: Border.all(color: AppTokens.brandLight, width: 1.5),
         boxShadow: [
           BoxShadow(
-              color: kPrimary.withOpacity(0.07),
+              color: AppTokens.brandGradientStart.withOpacity(0.07),
               blurRadius: 16,
               offset: const Offset(0, 5))
         ],
@@ -585,7 +581,7 @@ class _SparePartsDetailPanel extends StatelessWidget {
             padding: const EdgeInsets.symmetric(
                 vertical: 16, horizontal: 20),
             decoration: const BoxDecoration(
-              color: kPrimary,
+              color: AppTokens.brandGradientStart,
               borderRadius: BorderRadius.only(
                 topLeft:  Radius.circular(20),
                 topRight: Radius.circular(20),
@@ -593,7 +589,7 @@ class _SparePartsDetailPanel extends StatelessWidget {
             ),
             child: Row(children: [
               const Icon(Icons.local_shipping_rounded,
-                  color: kWhite, size: 22),
+                  color: Palette.kWhite, size: 22),
               const SizedBox(width: 10),
               Expanded(
                 child: Text(
@@ -601,7 +597,7 @@ class _SparePartsDetailPanel extends StatelessWidget {
                   style: GoogleFonts.lato(
                       fontSize: 17,
                       fontWeight: FontWeight.bold,
-                      color: kWhite),
+                      color: Palette.kWhite),
                   overflow: TextOverflow.ellipsis,
                 ),
               ),
@@ -651,11 +647,11 @@ class _SparePartsDetailPanel extends StatelessWidget {
                           errorBuilder: (_, __, ___) =>
                               Container(
                                 height: 80,
-                                color: kAccent,
+                                color: AppTokens.brandLight,
                                 child: const Center(
                                     child: Icon(
                                         Icons.broken_image_rounded,
-                                        color: kPrimaryLight)),
+                                        color: AppTokens.brandMid)),
                               ),
                         ),
                       ),
@@ -677,9 +673,9 @@ class _SparePartsDetailPanel extends StatelessWidget {
         Container(
           width: 32, height: 32,
           decoration: BoxDecoration(
-              color: kAccent,
+              color: AppTokens.brandLight,
               borderRadius: BorderRadius.circular(8)),
-          child: Icon(icon, color: kPrimary, size: 15),
+          child: Icon(icon, color: AppTokens.brandGradientStart, size: 15),
         ),
         const SizedBox(width: 10),
         Expanded(
@@ -695,7 +691,7 @@ class _SparePartsDetailPanel extends StatelessWidget {
                   style: GoogleFonts.lato(
                       fontSize: 14,
                       fontWeight: FontWeight.w700,
-                      color: kPrimaryDark)),
+                      color: AppTokens.brandDark)),
             ],
           ),
         ),
@@ -704,7 +700,7 @@ class _SparePartsDetailPanel extends StatelessWidget {
   }
 
   Widget _divider() =>
-      Divider(color: kAccent, thickness: 1.5, height: 20);
+      Divider(color: AppTokens.brandLight, thickness: 1.5, height: 20);
 }
 
 // ── Image Preview Dialog ──────────────────────────────────────────────────────
@@ -730,16 +726,16 @@ class _ImagePreviewDialog extends StatelessWidget {
                   color: Colors.black54,
                   borderRadius: BorderRadius.circular(20)),
               child: const Icon(Icons.close,
-                  color: kWhite, size: 20),
+                  color: Palette.kWhite, size: 20),
             ),
           ),
         ),
         Positioned(
           bottom: 20, right: 20,
           child: FloatingActionButton(
-            backgroundColor: kWhite,
+            backgroundColor: Palette.kWhite,
             child:
-            const Icon(Icons.share, color: kPrimaryDark),
+            const Icon(Icons.share, color: AppTokens.brandDark),
             onPressed: () => _shareImage(imageUrl, context),
           ),
         ),
@@ -788,14 +784,14 @@ class _DateTile extends StatelessWidget {
           vertical:   isTablet ? 14 : 12,
         ),
         decoration: BoxDecoration(
-          color: kWhite,
+          color: Palette.kWhite,
           borderRadius: BorderRadius.circular(10),
           border: Border.all(
-              color: kPrimaryLight.withOpacity(0.35)),
+              color: AppTokens.brandMid.withOpacity(0.35)),
         ),
         child: Row(children: [
           const Icon(Icons.date_range_rounded,
-              color: kPrimary, size: 18),
+              color: AppTokens.brandGradientStart, size: 18),
           const SizedBox(width: 8),
           Expanded(
             child: Column(
@@ -808,7 +804,7 @@ class _DateTile extends StatelessWidget {
                   Text(value,
                       style: GoogleFonts.lato(
                           fontSize: isTablet ? 14 : 13,
-                          color: kPrimaryDark,
+                          color: AppTokens.brandDark,
                           fontWeight: FontWeight.w600)),
                 ]),
           ),

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:maleva/core/models/model.dart';
+import '../../../../../../core/theme/tokens.dart';
 import '../bloc/bocheck_bloc.dart';
 import '../bloc/bocheck_event.dart';
 import '../bloc/bocheck_state.dart';
@@ -82,7 +83,7 @@ class _BocBodyState extends State<_BocBody> {
                       style: GoogleFonts.lato(
                         fontSize:      20,
                         fontWeight:    FontWeight.bold,
-                        color:         colour.kPrimaryDark,
+                        color:         AppTokens.brandDark,
                         letterSpacing: 1.2,
                       )),
                 ]),
@@ -92,7 +93,7 @@ class _BocBodyState extends State<_BocBody> {
                   child: Text('Search bills & invoices',
                       style: GoogleFonts.lato(
                         fontSize:   14,
-                        color:      colour.kPrimaryLight,
+                        color:      AppTokens.brandMid,
                         fontWeight: FontWeight.w500,
                       )),
                 ),
@@ -242,7 +243,7 @@ class _SearchBar extends StatelessWidget {
         color: colour.kAccent,
         borderRadius: BorderRadius.circular(isTablet ? 24 : 22),
         border:
-        Border.all(color: colour.kPrimaryLight.withOpacity(0.3)),
+        Border.all(color: AppTokens.brandMid.withOpacity(0.3)),
       ),
       child: TextField(
         controller: controller,
@@ -290,7 +291,7 @@ class _ResultCountBadge extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
       decoration: BoxDecoration(
         gradient: const LinearGradient(
-          colors: [colour.kPrimary, colour.kPrimaryDark],
+          colors: [colour.kPrimary, AppTokens.brandDark],
           begin: Alignment.topLeft,
           end:   Alignment.bottomRight,
         ),
@@ -563,7 +564,7 @@ class _BocCard extends StatelessWidget {
                                     style: GoogleFonts.lato(
                                       fontSize:   isTablet ? 16 : 15,
                                       fontWeight: FontWeight.bold,
-                                      color:      colour.kPrimaryDark,
+                                      color:      AppTokens.brandDark,
                                     ),
                                   ),
                                   TextSpan(
@@ -604,7 +605,7 @@ class _BocCard extends StatelessWidget {
                           style: GoogleFonts.lato(
                             fontSize:   isTablet ? 17 : 16,
                             fontWeight: FontWeight.bold,
-                            color:      colour.kPrimaryDark,
+                            color:      AppTokens.brandDark,
                           ),
                         ),
                       ]),
@@ -678,7 +679,7 @@ class _BocCard extends StatelessWidget {
                 style: GoogleFonts.lato(
                   fontSize:   isTablet ? 16 : 15,
                   fontWeight: FontWeight.w700,
-                  color:      colour.kPrimaryDark,
+                  color:      AppTokens.brandDark,
                 ),
               ),
             ],
@@ -705,7 +706,7 @@ class _DetailItem extends StatelessWidget {
         color:         colour.kAccent.withOpacity(0.6),
         borderRadius: BorderRadius.circular(isTablet ? 14 : 12),
         border: Border.all(
-            color: colour.kPrimaryLight.withOpacity(0.2)),
+            color: AppTokens.brandMid.withOpacity(0.2)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -721,9 +722,10 @@ class _DetailItem extends StatelessWidget {
                 style: GoogleFonts.lato(
                   fontSize:   isTablet ? 16 : 15,
                   fontWeight: FontWeight.w700,
-                  color:      colour.kPrimaryDark,
+                  color:      AppTokens.brandDark,
                 ),
               ),
+
             ),
           ]),
           if (detail.RemarksD != null &&

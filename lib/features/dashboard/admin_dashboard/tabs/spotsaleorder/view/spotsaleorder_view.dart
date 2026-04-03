@@ -8,6 +8,7 @@ import 'package:share_plus/share_plus.dart';
 import 'package:http/http.dart' as http;
 import 'package:maleva/core/utils/clsfunction.dart' as objfun;
 import 'package:maleva/core/colors/colors.dart' as colour;
+import '../../../../../../core/theme/tokens.dart';
 import '../bloc/spotsaleorder_bloc.dart';
 import '../bloc/spotsaleorder_event.dart';
 import '../bloc/spotsaleorder_state.dart';
@@ -73,7 +74,7 @@ class _SpotSaleViewBody extends StatelessWidget {
                   color: colour.kAccent,
                   borderRadius: BorderRadius.circular(12),
                   border: Border.all(
-                      color: colour.kPrimaryLight.withOpacity(0.3)),
+                      color: AppTokens.brandMid.withOpacity(0.3)),
                 ),
                 child: Column(children: [
                   Row(children: [
@@ -341,7 +342,7 @@ class _SpotSaleCard extends StatelessWidget {
 
   Widget _infoCell(IconData icon, String label, String value) {
     return Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-      Icon(icon, size: 14, color: colour.kPrimaryLight),
+      Icon(icon, size: 14, color: AppTokens.brandMid),
       const SizedBox(width: 6),
       Expanded(
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
@@ -395,7 +396,7 @@ class _DateTile extends StatelessWidget {
           color: colour.kWhite,
           borderRadius: BorderRadius.circular(10),
           border:
-          Border.all(color: colour.kPrimaryLight.withOpacity(0.35)),
+          Border.all(color: AppTokens.brandMid.withOpacity(0.35)),
         ),
         child: Row(children: [
           const Icon(Icons.date_range_rounded,

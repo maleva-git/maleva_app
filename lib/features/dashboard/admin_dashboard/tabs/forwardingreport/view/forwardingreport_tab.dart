@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
+import '../../../../../../core/theme/tokens.dart';
 import '../bloc/forwardingreport_bloc.dart';
 import '../bloc/forwardingreport_event.dart';
 import '../bloc/forwardingreport_state.dart';
@@ -45,7 +46,7 @@ class ForwardingReportView extends StatelessWidget {
       builder: (context, state) {
         if (state.status == FWStatus.loading) {
           return const Center(
-            child: CircularProgressIndicator(color: colour.kPrimary),
+            child: CircularProgressIndicator(color: AppTokens.brandGradientStart),
           );
         }
 
@@ -105,7 +106,7 @@ class ForwardingReportView extends StatelessWidget {
                         textStyle: const TextStyle(
                           fontSize: 15,
                           fontWeight: FontWeight.bold,
-                          color: colour.kPrimaryDark,
+                          color: AppTokens.brandDark,
                           letterSpacing: 0.5,
                         ),
                       ),
@@ -159,14 +160,14 @@ class _TitleBadge extends StatelessWidget {
         ),
         decoration: BoxDecoration(
           gradient: const LinearGradient(
-            colors: [colour.kHeaderGradStart, colour.kHeaderGradEnd],
+            colors: [AppTokens.invoiceHeaderStart, AppTokens.invoiceHeaderEnd],
             begin: Alignment.centerLeft,
             end: Alignment.centerRight,
           ),
           borderRadius: BorderRadius.circular(30),
           boxShadow: [
             BoxShadow(
-              color: colour.kHeaderGradStart.withOpacity(0.35),
+              color: AppTokens.invoiceHeaderStart.withOpacity(0.35),
               blurRadius: 12,
               offset: const Offset(0, 4),
             ),
@@ -209,7 +210,7 @@ class _SummaryCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(isTablet ? 20 : 16),
         boxShadow: [
           BoxShadow(
-            color: colour.kHeaderGradStart.withOpacity(0.10),
+            color: AppTokens.invoiceHeaderStart.withOpacity(0.10),
             blurRadius: 16,
             offset: const Offset(0, 4),
           ),
@@ -224,7 +225,7 @@ class _SummaryCard extends StatelessWidget {
           ),
           decoration: BoxDecoration(
             gradient: const LinearGradient(
-              colors: [colour.kHeaderGradStart, colour.kHeaderGradEnd],
+              colors: [AppTokens.invoiceHeaderStart, AppTokens.invoiceHeaderEnd],
             ),
             borderRadius: BorderRadius.only(
               topLeft:  Radius.circular(isTablet ? 20 : 16),
@@ -261,7 +262,7 @@ class _SummaryCard extends StatelessWidget {
                   row['label']!,
                   style: GoogleFonts.lato(
                     textStyle: TextStyle(
-                      color: colour.kPrimaryDark,
+                      color: AppTokens.brandDark,
                       fontWeight: FontWeight.bold,
                       fontSize: isTablet
                           ? objfun.FontLow + 1
@@ -278,7 +279,7 @@ class _SummaryCard extends StatelessWidget {
                       : data[0][row['countKey']]
                       ?.toStringAsFixed(0) ??
                       '0',
-                  colour.kPrimary,
+                  AppTokens.brandGradientStart,
                   isTablet,
                 ),
               ),
@@ -373,7 +374,7 @@ class _DatePickerRow extends StatelessWidget {
             borderRadius: BorderRadius.circular(isTablet ? 18 : 14),
             boxShadow: [
               BoxShadow(
-                color: colour.kPrimary.withOpacity(0.08),
+                color: AppTokens.brandGradientStart.withOpacity(0.08),
                 blurRadius: 12,
                 offset: const Offset(0, 3),
               ),
@@ -396,7 +397,7 @@ class _DatePickerRow extends StatelessWidget {
                     builder: (context, child) => Theme(
                       data: ThemeData.light().copyWith(
                         colorScheme: const ColorScheme.light(
-                            primary: colour.kPrimary),
+                            primary: AppTokens.brandGradientStart),
                       ),
                       child: child!,
                     ),
@@ -416,7 +417,7 @@ class _DatePickerRow extends StatelessWidget {
             Container(
               height: isTablet ? 50 : 40,
               width: 1,
-              color: colour.kPrimary.withOpacity(0.2),
+              color: AppTokens.brandGradientStart.withOpacity(0.2),
               margin: const EdgeInsets.symmetric(horizontal: 10),
             ),
 
@@ -436,7 +437,7 @@ class _DatePickerRow extends StatelessWidget {
                     builder: (context, child) => Theme(
                       data: ThemeData.light().copyWith(
                         colorScheme: const ColorScheme.light(
-                            primary: colour.kPrimary),
+                            primary: AppTokens.brandGradientStart),
                       ),
                       child: child!,
                     ),
@@ -485,7 +486,7 @@ class _DateTile extends StatelessWidget {
             borderRadius: BorderRadius.circular(10),
           ),
           child: Icon(Icons.calendar_today_rounded,
-              color: colour.kPrimary,
+              color: AppTokens.brandGradientStart,
               size: isTablet ? 22 : 18),
         ),
         const SizedBox(width: 8),
@@ -496,7 +497,7 @@ class _DateTile extends StatelessWidget {
               label,
               style: GoogleFonts.lato(
                 textStyle: TextStyle(
-                  color: colour.kPrimary.withOpacity(0.6),
+                  color: AppTokens.brandGradientStart.withOpacity(0.6),
                   fontSize: isTablet ? 12 : 11,
                   fontWeight: FontWeight.w600,
                 ),
@@ -506,7 +507,7 @@ class _DateTile extends StatelessWidget {
               date,
               style: GoogleFonts.lato(
                 textStyle: TextStyle(
-                  color: colour.kPrimaryDark,
+                  color: AppTokens.brandDark,
                   fontSize: isTablet ? 14 : 13,
                   fontWeight: FontWeight.bold,
                 ),
@@ -542,7 +543,7 @@ class _KTypeCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(isTablet ? 20 : 16),
         boxShadow: [
           BoxShadow(
-            color: colour.kPrimary.withOpacity(0.10),
+            color: AppTokens.brandGradientStart.withOpacity(0.10),
             blurRadius: 16,
             offset: const Offset(0, 4),
           ),
@@ -557,7 +558,7 @@ class _KTypeCard extends StatelessWidget {
           ),
           decoration: BoxDecoration(
             gradient: const LinearGradient(
-              colors: [colour.kPrimaryDark, colour.kPrimary],
+              colors: [AppTokens.brandDark, AppTokens.brandGradientStart],
             ),
             borderRadius: BorderRadius.only(
               topLeft:  Radius.circular(isTablet ? 20 : 16),
@@ -596,7 +597,7 @@ class _KTypeCard extends StatelessWidget {
                     vertical:   isTablet ? 6  : 4,
                   ),
                   decoration: BoxDecoration(
-                    color: colour.kPrimary,
+                    color: AppTokens.brandGradientStart,
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Text(
@@ -622,7 +623,7 @@ class _KTypeCard extends StatelessWidget {
                         : data[0][k['countKey']]?.toString() ?? '0',
                     style: GoogleFonts.lato(
                       textStyle: TextStyle(
-                        color: colour.kPrimaryDark,
+                        color: AppTokens.brandDark,
                         fontWeight: FontWeight.bold,
                         fontSize: isTablet ? 15 : 14,
                       ),

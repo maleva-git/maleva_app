@@ -6,7 +6,7 @@ import 'package:maleva/core/models/model.dart';
 import 'package:maleva/core/utils/clsfunction.dart' as objfun;
 import 'package:maleva/core/colors/colors.dart' as colour;
 import 'package:maleva/features/dashboard/admin_dashboard/tabs/spareparts/view/sparepartsview.dart';
-import '../../../../../../SparePartsEntry/SparePartsViewPage.dart';
+import '../../../../../../core/theme/tokens.dart';
 import '../bloc/spareparts_bloc.dart';
 import '../bloc/spareparts_event.dart';
 import '../bloc/spareparts_state.dart';
@@ -133,7 +133,7 @@ class _SparePartsEntryBody extends StatelessWidget {
               Container(
                 width: 4, height: 30,
                 decoration: BoxDecoration(
-                  color: colour.kPrimary,
+                  color: AppTokens.brandGradientStart,
                   borderRadius: BorderRadius.circular(4),
                 ),
               ),
@@ -142,7 +142,7 @@ class _SparePartsEntryBody extends StatelessWidget {
                   style: GoogleFonts.lato(
                     fontSize: 20,
                     fontWeight: FontWeight.bold,
-                    color: colour.kPrimaryDark,
+                    color:AppTokens.brandDark,
                     letterSpacing: 1.2,
                   )),
             ]),
@@ -152,7 +152,7 @@ class _SparePartsEntryBody extends StatelessWidget {
               child: Text('Entry Form',
                   style: GoogleFonts.lato(
                     fontSize: 14,
-                    color: colour.kPrimaryLight,
+                    color: AppTokens.brandMid,
                     fontWeight: FontWeight.w500,
                   )),
             ),
@@ -198,7 +198,7 @@ class _SparePartsEntryBody extends StatelessWidget {
                     builder: (ctx, child) => Theme(
                       data: Theme.of(ctx).copyWith(
                           colorScheme: const ColorScheme.light(
-                              primary: colour.kPrimary)),
+                              primary: AppTokens.brandGradientStart)),
                       child: child!,
                     ),
                   );
@@ -267,11 +267,11 @@ class _SparePartsEntryBody extends StatelessWidget {
                 child: ElevatedButton.icon(
                   style: ElevatedButton.styleFrom(
                     backgroundColor: colour.kAccent,
-                    foregroundColor: colour.kPrimary,
+                    foregroundColor: AppTokens.brandGradientStart,
                     shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12),
                         side: const BorderSide(
-                            color: colour.kPrimary)),
+                            color: AppTokens.brandGradientStart)),
                     elevation: 0,
                   ),
                   onPressed: () => bloc.pickDocument(),
@@ -304,7 +304,7 @@ class _SparePartsEntryBody extends StatelessWidget {
                     color: colour.kAccent,
                     borderRadius: BorderRadius.circular(10),
                     border: Border.all(
-                        color: colour.kPrimary.withOpacity(0.2)),
+                        color: AppTokens.brandGradientStart.withOpacity(0.2)),
                   ),
                   child: Row(children: [
                     const Icon(Icons.picture_as_pdf,
@@ -367,7 +367,7 @@ class _SparePartsEntryBody extends StatelessWidget {
                 style: ElevatedButton.styleFrom(
                   minimumSize: Size(double.infinity,
                       isTablet ? 58 : 55),
-                  backgroundColor: colour.kPrimary,
+                  backgroundColor: AppTokens.brandGradientStart,
                   shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(
                           isTablet ? 16 : 14)),
@@ -415,7 +415,7 @@ class _SparePartsPreviewPanel extends StatelessWidget {
         border: Border.all(color: colour.kAccent, width: 1.5),
         boxShadow: [
           BoxShadow(
-            color: colour.kPrimary.withOpacity(0.07),
+            color: AppTokens.brandGradientStart.withOpacity(0.07),
             blurRadius: 16,
             offset: const Offset(0, 5),
           ),
@@ -431,7 +431,7 @@ class _SparePartsPreviewPanel extends StatelessWidget {
               Container(
                 width: 4, height: 22,
                 decoration: BoxDecoration(
-                  color: colour.kPrimary,
+                  color: AppTokens.brandGradientStart,
                   borderRadius: BorderRadius.circular(4),
                 ),
               ),
@@ -440,7 +440,7 @@ class _SparePartsPreviewPanel extends StatelessWidget {
                   style: GoogleFonts.lato(
                     fontSize: 15,
                     fontWeight: FontWeight.bold,
-                    color: colour.kPrimaryDark,
+                    color:AppTokens.brandDark,
                   )),
             ]),
 
@@ -452,7 +452,7 @@ class _SparePartsPreviewPanel extends StatelessWidget {
               padding: const EdgeInsets.symmetric(
                   horizontal: 16, vertical: 14),
               decoration: BoxDecoration(
-                color: colour.kPrimary,
+                color: AppTokens.brandGradientStart,
                 borderRadius: BorderRadius.circular(16),
               ),
               child: Column(
@@ -500,7 +500,7 @@ class _SparePartsPreviewPanel extends StatelessWidget {
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: const Icon(Icons.build_rounded,
-                      color: colour.kPrimary, size: 17),
+                      color: AppTokens.brandGradientStart, size: 17),
                 ),
                 const SizedBox(width: 10),
                 Expanded(
@@ -521,7 +521,7 @@ class _SparePartsPreviewPanel extends StatelessWidget {
                         style: GoogleFonts.lato(
                           fontSize: 13,
                           fontWeight: FontWeight.w600,
-                          color: colour.kPrimaryDark,
+                          color:AppTokens.brandDark,
                           height: 1.4,
                         ),
                         maxLines: 4,
@@ -547,13 +547,13 @@ class _SparePartsPreviewPanel extends StatelessWidget {
                 children: [
                   Row(children: [
                     const Icon(Icons.attach_file_rounded,
-                        color: colour.kPrimary, size: 16),
+                        color: AppTokens.brandGradientStart, size: 16),
                     const SizedBox(width: 6),
                     Text('Document',
                         style: GoogleFonts.lato(
                           fontSize: 12,
                           fontWeight: FontWeight.bold,
-                          color: colour.kPrimaryDark,
+                          color:AppTokens.brandDark,
                         )),
                   ]),
                   const SizedBox(height: 8),
@@ -610,13 +610,13 @@ class _SparePartsPreviewPanel extends StatelessWidget {
                 children: [
                   Row(children: [
                     const Icon(Icons.lightbulb_rounded,
-                        color: colour.kPrimary, size: 16),
+                        color: AppTokens.brandGradientStart, size: 16),
                     const SizedBox(width: 6),
                     Text('Tips',
                         style: GoogleFonts.lato(
                           fontSize: 12,
                           fontWeight: FontWeight.bold,
-                          color: colour.kPrimaryDark,
+                          color:AppTokens.brandDark,
                         )),
                   ]),
                   const SizedBox(height: 8),
@@ -643,7 +643,7 @@ class _SparePartsPreviewPanel extends StatelessWidget {
             color: colour.kAccent,
             borderRadius: BorderRadius.circular(8),
           ),
-          child: Icon(icon, color: colour.kPrimary, size: 17),
+          child: Icon(icon, color: AppTokens.brandGradientStart, size: 17),
         ),
         const SizedBox(width: 10),
         Expanded(
@@ -661,7 +661,7 @@ class _SparePartsPreviewPanel extends StatelessWidget {
                   style: GoogleFonts.lato(
                     fontSize: 14,
                     fontWeight: FontWeight.w700,
-                    color: colour.kPrimaryDark,
+                    color:AppTokens.brandDark,
                   )),
             ],
           ),
@@ -675,7 +675,7 @@ class _SparePartsPreviewPanel extends StatelessWidget {
       padding: const EdgeInsets.only(bottom: 4),
       child: Row(children: [
         const Icon(Icons.check_circle_rounded,
-            color: colour.kPrimary, size: 13),
+            color: AppTokens.brandGradientStart, size: 13),
         const SizedBox(width: 6),
         Expanded(
           child: Text(text,
@@ -728,7 +728,7 @@ class _SparePartsTruckSelectPageState
     return Scaffold(
       backgroundColor: Colors.grey.shade50,
       appBar: AppBar(
-        backgroundColor: colour.kPrimary,
+        backgroundColor: AppTokens.brandGradientStart,
         foregroundColor: colour.kWhite,
         elevation: 0,
         leading: GestureDetector(
@@ -746,20 +746,20 @@ class _SparePartsTruckSelectPageState
       body: Column(
         children: [
           Container(
-            color: colour.kPrimary,
+            color: AppTokens.brandGradientStart,
             padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
             child: TextField(
               controller: _searchCtrl,
               textCapitalization: TextCapitalization.characters,
               onChanged: _search,
               style: GoogleFonts.lato(
-                  color: colour.kPrimaryDark,
+                  color:AppTokens.brandDark,
                   fontWeight: FontWeight.w600),
               decoration: InputDecoration(
                 hintText: 'Search Truck No...',
                 hintStyle: GoogleFonts.lato(color: Colors.grey),
                 prefixIcon: const Icon(Icons.search,
-                    color: colour.kPrimary),
+                    color: AppTokens.brandGradientStart),
                 border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
                     borderSide: BorderSide.none),
@@ -825,7 +825,7 @@ class _SparePartsTruckSelectPageState
                           width: 1.5),
                       boxShadow: [
                         BoxShadow(
-                            color: colour.kPrimary
+                            color: AppTokens.brandGradientStart
                                 .withOpacity(0.05),
                             blurRadius: 6,
                             offset: const Offset(0, 2)),
@@ -839,7 +839,7 @@ class _SparePartsTruckSelectPageState
                             shape: BoxShape.circle),
                         child: const Icon(
                             Icons.local_shipping_outlined,
-                            color: colour.kPrimary,
+                            color: AppTokens.brandGradientStart,
                             size: 20),
                       ),
                       const SizedBox(width: 14),
@@ -849,12 +849,12 @@ class _SparePartsTruckSelectPageState
                           style: GoogleFonts.lato(
                               fontSize: 15,
                               fontWeight: FontWeight.w600,
-                              color: colour.kPrimaryDark),
+                              color:AppTokens.brandDark),
                         ),
                       ),
                       const Icon(
                           Icons.chevron_right_rounded,
-                          color: colour.kPrimaryLight),
+                          color: AppTokens.brandMid),
                     ]),
                   ),
                 );
@@ -900,7 +900,7 @@ class _SectionCard extends StatelessWidget {
                   color: colour.kAccent,
                   shape: BoxShape.circle),
               child: Icon(icon,
-                  color: colour.kPrimary,
+                  color: AppTokens.brandGradientStart,
                   size: isTablet ? 16 : 15),
             ),
             const SizedBox(width: 8),
@@ -908,7 +908,7 @@ class _SectionCard extends StatelessWidget {
                 style: GoogleFonts.lato(
                     fontSize: isTablet ? 14 : 13,
                     fontWeight: FontWeight.bold,
-                    color: colour.kPrimaryDark)),
+                    color:AppTokens.brandDark)),
           ]),
           const SizedBox(height: 8),
           Container(
@@ -922,7 +922,7 @@ class _SectionCard extends StatelessWidget {
               Border.all(color: colour.kAccent, width: 1.5),
               boxShadow: [
                 BoxShadow(
-                    color: colour.kPrimary.withOpacity(0.05),
+                    color: AppTokens.brandGradientStart.withOpacity(0.05),
                     blurRadius: 10,
                     offset: const Offset(0, 3)),
               ],
@@ -965,13 +965,13 @@ class _SelectTile extends StatelessWidget {
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
             color: hasValue
-                ? colour.kPrimaryLight.withOpacity(0.4)
+                ? AppTokens.brandMid.withOpacity(0.4)
                 : Colors.grey.shade300,
           ),
         ),
         child: Row(children: [
           Icon(icon,
-              color: hasValue ? colour.kPrimary : Colors.grey,
+              color: hasValue ? AppTokens.brandGradientStart : Colors.grey,
               size: 20),
           const SizedBox(width: 12),
           Expanded(
@@ -982,7 +982,7 @@ class _SelectTile extends StatelessWidget {
                       style: GoogleFonts.lato(
                           fontSize: 11,
                           color: hasValue
-                              ? colour.kPrimary
+                              ? AppTokens.brandGradientStart
                               : Colors.grey,
                           fontWeight: FontWeight.w600)),
                   const SizedBox(height: 2),
@@ -991,7 +991,7 @@ class _SelectTile extends StatelessWidget {
                     style: GoogleFonts.lato(
                         fontSize: 14,
                         color: hasValue
-                            ? colour.kPrimaryDark
+                            ?AppTokens.brandDark
                             : Colors.grey.shade400,
                         fontWeight: hasValue
                             ? FontWeight.bold
@@ -1001,7 +1001,7 @@ class _SelectTile extends StatelessWidget {
           ),
           Icon(Icons.chevron_right_rounded,
               color: hasValue
-                  ? colour.kPrimary
+                  ? AppTokens.brandGradientStart
                   : Colors.grey.shade400),
         ]),
       ),
@@ -1013,18 +1013,18 @@ class _SelectTile extends StatelessWidget {
 InputDecoration _decor(String label, IconData icon) {
   return InputDecoration(
     labelText: label,
-    labelStyle: const TextStyle(color: colour.kPrimaryDark),
-    prefixIcon: Icon(icon, color: colour.kPrimary, size: 20),
+    labelStyle: const TextStyle(color:AppTokens.brandDark),
+    prefixIcon: Icon(icon, color: AppTokens.brandGradientStart, size: 20),
     border:
     OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
     focusedBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(10),
         borderSide: const BorderSide(
-            color: colour.kPrimary, width: 1.5)),
+            color: AppTokens.brandGradientStart, width: 1.5)),
     enabledBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(10),
         borderSide: BorderSide(
-            color: colour.kPrimaryLight.withOpacity(0.35))),
+            color: AppTokens.brandMid.withOpacity(0.35))),
     filled: true,
     fillColor: Colors.grey.shade50,
     contentPadding: const EdgeInsets.symmetric(

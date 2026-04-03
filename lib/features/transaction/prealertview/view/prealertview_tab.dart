@@ -16,6 +16,7 @@ import 'package:maleva/DashBoard/TransportDB/TransportDashboard.dart';
 import 'package:maleva/DashBoard/User/UserDashboard.dart';
 import '../../../../MasterSearch/JobType.dart';
 import '../../../../MasterSearch/Port.dart';
+import '../../../../core/theme/tokens.dart';
 import '../../../dashboard/admin_dashboard/view/admin_dashboard.dart';
 import '../../../dashboard/airfrieght_dashboard/view/airfrieght_dashboard.dart';
 import '../../../dashboard/operationadmin_dashboard/view/operationadmin_dashboard.dart';
@@ -87,7 +88,7 @@ class _PreAlertPage extends StatelessWidget {
             builder: (context, state) {
               if (state is PreAlertInitial || state is PreAlertLoading) {
                 return const Center(
-                  child: SpinKitFoldingCube(color: colour.kHeaderGradEnd, size: 35),
+                  child: SpinKitFoldingCube(color:AppTokens.invoiceHeaderEnd, size: 35),
                 );
               }
               if (state is PreAlertLoaded) {
@@ -916,7 +917,7 @@ class _SaleOrderCard extends StatelessWidget {
                         focusedBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(10),
                           borderSide: const BorderSide(
-                              color: colour.kHeaderGradEnd, width: 1.5),
+                              color:AppTokens.invoiceHeaderEnd, width: 1.5),
                         ),
                       ),
                     ),
@@ -1091,7 +1092,7 @@ class _EmptyState extends StatelessWidget {
               borderRadius: BorderRadius.circular(16),
             ),
             child: const Icon(Icons.description_outlined,
-                size: 32, color: colour.kHeaderGradEnd),
+                size: 32, color:AppTokens.invoiceHeaderEnd),
           ),
           const SizedBox(height: 14),
           Text(
@@ -1260,7 +1261,7 @@ class _ETARadioRow extends StatelessWidget {
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
                         border: Border.all(
-                          color: selected ? colour.kHeaderGradEnd : colour.kCardBorder,
+                          color: selected ?AppTokens.invoiceHeaderEnd : colour.kCardBorder,
                           width: 1.5,
                         ),
                         gradient: selected ? colour.kGradient : null,
@@ -1332,7 +1333,7 @@ class _SheetDateTile extends StatelessWidget {
                         fontWeight: FontWeight.w700,
                         fontSize: 13)),
                 const Icon(Icons.calendar_month_outlined,
-                    size: 18, color: colour.kHeaderGradEnd),
+                    size: 18, color:AppTokens.invoiceHeaderEnd),
               ],
             ),
           ],
@@ -1385,7 +1386,7 @@ class _PASearchField extends StatelessWidget {
             Icon(
               value.isNotEmpty ? Icons.close_rounded : Icons.search_rounded,
               size: 20,
-              color: disabled ? colour.kTextMuted : colour.kHeaderGradEnd,
+              color: disabled ? colour.kTextMuted :AppTokens.invoiceHeaderEnd,
             ),
           ],
         ),
@@ -1433,7 +1434,7 @@ class _PATextField extends StatelessWidget {
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(10),
-          borderSide: const BorderSide(color: colour.kHeaderGradEnd, width: 1.5),
+          borderSide: const BorderSide(color:AppTokens.invoiceHeaderEnd, width: 1.5),
         ),
       ),
     );

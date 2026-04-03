@@ -154,7 +154,7 @@ class _FilterCard extends StatelessWidget {
               padding: EdgeInsets.all(isTablet ? 15 : 13),
               decoration: BoxDecoration(
                 gradient: const LinearGradient(
-                  colors: [AppTokens.brandGradientStart, kPrimaryDark],
+                  colors: [AppTokens.brandGradientStart, AppTokens.brandDark],
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
                 ),
@@ -220,7 +220,7 @@ class _DateButton extends StatelessWidget {
                 style: GoogleFonts.poppins(
                   fontSize: isTablet ? 12 : 11,
                   fontWeight: FontWeight.w600,
-                  color: kPrimaryDark,
+                  color: AppTokens.brandDark,
                 ),
                 overflow: TextOverflow.ellipsis,
               ),
@@ -248,7 +248,7 @@ class _SummaryCard extends StatelessWidget {
       padding: EdgeInsets.all(isTablet ? 24 : 20),
       decoration: BoxDecoration(
         gradient: const LinearGradient(
-          colors: [AppTokens.brandGradientStart, kPrimaryDark],
+          colors: [AppTokens.brandGradientStart, AppTokens.brandDark],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
@@ -399,7 +399,7 @@ class _StatsPanel extends StatelessWidget {
                 style: GoogleFonts.poppins(
                   fontSize: 15,
                   fontWeight: FontWeight.w700,
-                  color: kPrimaryDark,
+                  color: AppTokens.brandDark,
                 )),
           ]),
 
@@ -460,7 +460,7 @@ class _StatsPanel extends StatelessWidget {
           Text(label,
               style: GoogleFonts.poppins(
                 fontSize: 13,
-                color: kPrimaryDark,
+                color: AppTokens.brandDark,
                 fontWeight: FontWeight.w500,
               )),
         ]),
@@ -481,7 +481,7 @@ class _StatsPanel extends StatelessWidget {
         Text(label,
             style: GoogleFonts.poppins(
               fontSize: 12,
-              color: kPrimaryDark.withOpacity(0.6),
+              color: AppTokens.brandDark.withOpacity(0.6),
               fontWeight: FontWeight.w500,
             )),
         Text(value,
@@ -505,7 +505,7 @@ class _StatsPanel extends StatelessWidget {
             Text('Collection Progress',
                 style: GoogleFonts.poppins(
                   fontSize: 11,
-                  color: kPrimaryDark.withOpacity(0.6),
+                  color: AppTokens.brandDark.withOpacity(0.6),
                 )),
             Text('${(percent * 100).toStringAsFixed(1)}%',
                 style: GoogleFonts.poppins(
@@ -560,7 +560,7 @@ class _ReceiptList extends StatelessWidget {
               style: GoogleFonts.poppins(
                 fontSize: isTablet ? 16 : 15,
                 fontWeight: FontWeight.w700,
-                color: kPrimaryDark,
+                color: AppTokens.brandDark,
               ),
             ),
           ]),
@@ -617,7 +617,7 @@ class _ReceiptCard extends StatelessWidget {
                         style: GoogleFonts.poppins(
                           fontSize: isTablet ? 15 : 14,
                           fontWeight: FontWeight.w700,
-                          color: kPrimaryDark,
+                          color: AppTokens.brandDark,
                         ),
                         overflow: TextOverflow.ellipsis,
                       ),

@@ -4,6 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:maleva/core/models/model.dart';
 import 'package:maleva/core/utils/clsfunction.dart' as objfun;
 import 'package:maleva/core/colors/colors.dart' as colour;
+import '../../../../../../core/theme/tokens.dart';
 import '../bloc/enginehours_bloc.dart';
 import '../bloc/enginehours_event.dart';
 import '../bloc/enginehours_state.dart';
@@ -68,7 +69,7 @@ class _EngineHoursBody extends StatelessWidget {
                           style: GoogleFonts.lato(
                             fontSize:      20,
                             fontWeight:    FontWeight.bold,
-                            color:         colour.kPrimaryDark,
+                            color:         AppTokens.brandDark,
                             letterSpacing: 1.2,
                           )),
                     ]),
@@ -78,7 +79,7 @@ class _EngineHoursBody extends StatelessWidget {
                       child: Text("Hours Details",
                           style: GoogleFonts.lato(
                             fontSize:   14,
-                            color:      colour.kPrimaryLight,
+                            color:      AppTokens.brandMid,
                             fontWeight: FontWeight.w500,
                           )),
                     ),
@@ -138,7 +139,7 @@ class _EngineHoursBody extends StatelessWidget {
             style: GoogleFonts.lato(
               fontSize:   objfun.FontLarge,
               fontWeight: FontWeight.bold,
-              color:      colour.kPrimaryDark,
+              color:      AppTokens.brandDark,
             )),
         const SizedBox(height: 10),
         Expanded(
@@ -188,7 +189,7 @@ class _CountBadge extends StatelessWidget {
           horizontal: 20, vertical: 18),
       decoration: BoxDecoration(
         gradient: const LinearGradient(
-          colors: [colour.kPrimary, colour.kPrimaryDark],
+          colors: [colour.kPrimary, AppTokens.brandDark],
           begin: Alignment.topLeft,
           end:   Alignment.bottomRight,
         ),
@@ -302,14 +303,14 @@ class _EngineHoursCard extends StatelessWidget {
                     style: GoogleFonts.lato(
                       fontWeight: FontWeight.bold,
                       fontSize:   isTablet ? 17 : 16,
-                      color:      colour.kPrimaryDark,
+                      color:      AppTokens.brandDark,
                     ),
                   ),
                   SizedBox(height: isTablet ? 8 : 6),
                   Row(children: [
                     Icon(Icons.speed_rounded,
                         size:  isTablet ? 16 : 14,
-                        color: colour.kPrimaryLight),
+                        color: AppTokens.brandMid),
                     const SizedBox(width: 4),
                     Flexible(
                       child: Text(
@@ -559,7 +560,7 @@ class _EngineHoursCard extends StatelessWidget {
                 style: GoogleFonts.lato(
                   fontSize:   isTablet ? 16 : 15,
                   fontWeight: FontWeight.w700,
-                  color:      colour.kPrimaryDark,
+                  color:      AppTokens.brandDark,
                 ),
               ),
             ],

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:maleva/core/colors/colors.dart' as colour;
+import '../../../../../../core/theme/tokens.dart';
 import '../bloc/driverdetails_bloc.dart';
 import '../bloc/driverdetails_event.dart';
 import '../bloc/driverdetails_state.dart';
@@ -76,7 +77,7 @@ class DriverDetailsView extends StatelessWidget {
               if (state is DriverLoading) {
                 return const Center(
                   child: CircularProgressIndicator(
-                      color: colour.kPrimary),
+                      color: AppTokens.brandGradientStart),
                 );
               }
 
@@ -132,7 +133,7 @@ class DriverDetailsView extends StatelessWidget {
               if (state is DriverLoading) {
                 return const Center(
                   child: CircularProgressIndicator(
-                      color: colour.kPrimary),
+                      color: AppTokens.brandGradientStart),
                 );
               }
 
@@ -186,7 +187,7 @@ class _GradientHeader extends StatelessWidget {
       ),
       decoration: BoxDecoration(
         gradient: const LinearGradient(
-          colors: [colour.kPrimary, colour.kPrimaryDark],
+          colors: [AppTokens.brandGradientStart, AppTokens.brandDark],
           begin: Alignment.topLeft,
           end:   Alignment.bottomRight,
         ),
@@ -266,14 +267,14 @@ class _CountBadge extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
       decoration: BoxDecoration(
         gradient: const LinearGradient(
-          colors: [colour.kPrimary, colour.kPrimaryDark],
+          colors: [AppTokens.brandGradientStart, AppTokens.brandDark],
           begin: Alignment.topLeft,
           end:   Alignment.bottomRight,
         ),
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color:     colour.kPrimary.withOpacity(0.30),
+            color:     AppTokens.brandGradientStart.withOpacity(0.30),
             blurRadius: 16,
             offset:    const Offset(0, 6),
           ),
@@ -354,7 +355,7 @@ class _DriverCard extends StatelessWidget {
             height: isTablet ? 40 : 48,
             decoration: BoxDecoration(
               gradient: const LinearGradient(
-                colors: [colour.kPrimaryLight, colour.kPrimary],
+                colors: [AppTokens.brandGradientStartLight, AppTokens.brandGradientStart],
                 begin: Alignment.topLeft,
                 end:   Alignment.bottomRight,
               ),
@@ -420,7 +421,7 @@ class _DriverCard extends StatelessWidget {
             child: Icon(
               Icons.arrow_forward_ios_rounded,
               size:  isTablet ? 12 : 14,
-              color: colour.kPrimary,
+              color: AppTokens.brandGradientStart,
             ),
           ),
         ]),
@@ -483,7 +484,7 @@ class _ErrorState extends StatelessWidget {
                       fontWeight: FontWeight.w600,
                       fontSize:   isTablet ? 14 : 13)),
               style: ElevatedButton.styleFrom(
-                backgroundColor: colour.kPrimary,
+                backgroundColor: AppTokens.brandGradientStart,
                 foregroundColor: colour.kWhite,
                 padding: EdgeInsets.symmetric(
                   horizontal: isTablet ? 36 : 28,
@@ -519,7 +520,7 @@ class _EmptyState extends StatelessWidget {
               shape: BoxShape.circle,
             ),
             child: Icon(Icons.person_off_rounded,
-                color: colour.kPrimary,
+                color: AppTokens.brandGradientStart,
                 size:  isTablet ? 52 : 44),
           ),
           SizedBox(height: isTablet ? 20 : 16),

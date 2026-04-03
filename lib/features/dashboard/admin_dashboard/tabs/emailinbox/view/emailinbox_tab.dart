@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:maleva/core/models/model.dart';
 import 'package:maleva/core/utils/clsfunction.dart' as objfun;
+import '../../../../../../core/theme/tokens.dart';
 import '../bloc/emailinbox_bloc.dart';
 import '../bloc/emailinbox_event.dart';
 import '../bloc/emailinbox_state.dart';
@@ -114,7 +115,7 @@ class _EmailBody extends StatelessWidget {
                   child: Text('Inbox Management',
                       style: GoogleFonts.lato(
                         fontSize:   14,
-                        color:      colour.kPrimaryLight,
+                        color:      AppTokens.brandMid,
                         fontWeight: FontWeight.w500,
                       )),
                 ),
@@ -212,7 +213,7 @@ class _EmployeeDropdown extends StatelessWidget {
         color:         colour.kAccent,
         borderRadius: BorderRadius.circular(isTablet ? 14 : 12),
         border: Border.all(
-            color: colour.kPrimaryLight.withOpacity(0.3)),
+            color: AppTokens.brandMid.withOpacity(0.3)),
       ),
       padding: EdgeInsets.symmetric(
           horizontal: isTablet ? 14 : 12),
@@ -465,7 +466,7 @@ class _EmailCard extends StatelessWidget {
             Row(children: [
               Icon(Icons.email_outlined,
                   size:  isTablet ? 16 : 14,
-                  color: colour.kPrimaryLight),
+                  color: AppTokens.brandMid),
               const SizedBox(width: 4),
               Expanded(
                 child: Text(
@@ -504,7 +505,7 @@ class _EmailCard extends StatelessWidget {
                 _CheckboxChip(
                   label:       "Read",
                   value:       email.isUnread,
-                  activeColor: colour.kPrimaryLight,
+                  activeColor: AppTokens.brandMid,
                   isTablet:    isTablet,
                   onChanged: (v) =>
                       context.read<EmailBloc>().add(

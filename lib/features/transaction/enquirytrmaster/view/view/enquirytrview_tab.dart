@@ -14,6 +14,7 @@ import 'package:maleva/Transaction/SaleOrder/SalesOrderAdd.dart';
 import 'package:maleva/DashBoard/CustomerService/CustDashboard.dart';
 import 'package:maleva/DashBoard/TransportDB/TransportDashboard.dart';
 import 'package:maleva/DashBoard/User/UserDashboard.dart';
+import '../../../../../core/theme/tokens.dart';
 import '../../../../dashboard/admin_dashboard/view/admin_dashboard.dart';
 import '../../../../dashboard/operationadmin_dashboard/view/operationadmin_dashboard.dart';
 import '../../add/view/enquirytradd_tab.dart';
@@ -26,7 +27,7 @@ import 'package:maleva/core/colors/colors.dart' as colour;
 
 
 const kGradient = LinearGradient(
-  colors: [colour.kHeaderGradStart, colour.kHeaderGradEnd],
+  colors: [AppTokens.invoiceHeaderStart, AppTokens.invoiceHeaderEnd],
   begin: Alignment.topLeft,
   end: Alignment.bottomRight,
 );
@@ -104,7 +105,7 @@ class _EnquiryViewPage extends StatelessWidget {
             builder: (context, state) {
               if (state is EnquiryViewInitial || state is EnquiryViewLoading) {
                 return const Center(
-                  child: SpinKitFoldingCube(color: colour.kHeaderGradEnd, size: 35),
+                  child: SpinKitFoldingCube(color: AppTokens.invoiceHeaderEnd, size: 35),
                 );
               }
               if (state is EnquiryViewLoaded) {
@@ -156,7 +157,7 @@ class _EnquiryViewPage extends StatelessWidget {
       elevation: 0,
       toolbarHeight: isTablet ? 70 : 62,
       flexibleSpace: Container(
-          decoration: const BoxDecoration(gradient: kGradient)),
+          decoration: const BoxDecoration(gradient: AppTokens.headerGradient)),
       leading: IconButton(
         icon: const Icon(Icons.arrow_back_ios_new_rounded, size: 20),
         color: Colors.white,
@@ -238,7 +239,7 @@ class _EnquiryViewPage extends StatelessWidget {
             borderRadius: BorderRadius.circular(20),
             boxShadow: [
               BoxShadow(
-                color: colour.kHeaderGradStart.withOpacity(0.15),
+                color: AppTokens.invoiceHeaderStart.withOpacity(0.15),
                 blurRadius: 30,
                 offset: const Offset(0, 10),
               ),
@@ -253,7 +254,7 @@ class _EnquiryViewPage extends StatelessWidget {
                 padding: const EdgeInsets.symmetric(
                     horizontal: 20, vertical: 16),
                 decoration: const BoxDecoration(
-                  gradient: kGradient,
+                  gradient: AppTokens.headerGradient,
                   borderRadius:
                   BorderRadius.vertical(top: Radius.circular(20)),
                 ),
@@ -316,14 +317,14 @@ class _DetailRow extends StatelessWidget {
             width: 120,
             child: Text(label,
                 style: GoogleFonts.lato(
-                    color: colour.kTextMuted,
+                    color: AppTokens.planTextMuted,
                     fontWeight: FontWeight.w600,
                     fontSize: 12)),
           ),
           Expanded(
             child: Text(value.isEmpty ? '-' : value,
                 style: GoogleFonts.lato(
-                    color: colour.kTextDark,
+                    color: AppTokens.maintTextDark,
                     fontWeight: FontWeight.w600,
                     fontSize: 12)),
           ),
@@ -351,7 +352,7 @@ class _EnquiryViewBody extends StatelessWidget {
           height: isTablet ? height * 0.07 : height * 0.06,
           decoration: const BoxDecoration(
             gradient: LinearGradient(
-              colors: [colour.kHeaderGradStart, Color(0xFF2D56C8)],
+              colors: [AppTokens.invoiceHeaderStart, Color(0xFF2D56C8)],
               begin: Alignment.topCenter,
               end: Alignment.bottomCenter,
             ),
@@ -420,7 +421,7 @@ class _EnquiryCard extends StatelessWidget {
   });
 
   Color _cardColor() {
-    if (item['ForwardingDate'] == null) return colour.kCardBg;
+    if (item['ForwardingDate'] == null) return AppTokens.invoiceCardBg;
     final now     = DateTime.now();
     final today   = DateFormat('yyyy-MM-dd').format(now);
     final tomorrow = DateFormat('yyyy-MM-dd').format(now.add(const Duration(days: 1)));
@@ -433,11 +434,11 @@ class _EnquiryCard extends StatelessWidget {
     } else if (notify == tomorrow) {
       return const Color(0xFFFFF9C4);
     }
-    return colour.kCardBg;
+    return AppTokens.invoiceCardBg;
   }
 
   Color _dotColor() {
-    if (item['ForwardingDate'] == null) return colour.kTextMuted;
+    if (item['ForwardingDate'] == null) return AppTokens.planTextMuted;
     final now     = DateTime.now();
     final today   = DateFormat('yyyy-MM-dd').format(now);
     final tomorrow = DateFormat('yyyy-MM-dd').format(now.add(const Duration(days: 1)));
@@ -456,12 +457,12 @@ class _EnquiryCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final valStyle = GoogleFonts.lato(
-      color: colour.kTextDark,
+      color: AppTokens.maintTextDark,
       fontWeight: FontWeight.w600,
       fontSize: isTablet ? objfun.FontCardText + 1 : objfun.FontCardText,
     );
     final labelStyle = GoogleFonts.lato(
-      color: colour.kTextMuted,
+      color: AppTokens.planTextMuted,
       fontWeight: FontWeight.w600,
       fontSize: isTablet ? 10 : 9,
       letterSpacing: 0.4,
@@ -481,10 +482,10 @@ class _EnquiryCard extends StatelessWidget {
           decoration: BoxDecoration(
             color: _cardColor(),
             borderRadius: BorderRadius.circular(14),
-            border: Border.all(color: colour.kCardBorder, width: 0.5),
+            border: Border.all(color: AppTokens.maintCardBorder, width: 0.5),
             boxShadow: [
               BoxShadow(
-                color: colour.kHeaderGradStart.withOpacity(0.07),
+                color: AppTokens.invoiceHeaderStart.withOpacity(0.07),
                 blurRadius: 12,
                 offset: const Offset(0, 3),
               ),
@@ -499,7 +500,8 @@ class _EnquiryCard extends StatelessWidget {
                 Container(
                     height: 3,
                     decoration:
-                    const BoxDecoration(gradient: kGradient)),
+                    const BoxDecoration(gradient:
+AppTokens.headerGradient)),
 
                 Padding(
                   padding: const EdgeInsets.fromLTRB(14, 10, 14, 0),
@@ -632,10 +634,10 @@ class _FilterSheetState extends State<_FilterSheet> {
       builder: (ctx, child) => Theme(
         data: Theme.of(ctx).copyWith(
           colorScheme: const ColorScheme.light(
-            primary: colour.kHeaderGradStart,
+            primary: AppTokens.invoiceHeaderStart,
             onPrimary: Colors.white,
             surface: Colors.white,
-            onSurface: colour.kTextDark,
+            onSurface: AppTokens.maintTextDark,
           ),
         ),
         child: child!,
@@ -679,13 +681,13 @@ class _FilterSheetState extends State<_FilterSheet> {
                 width: 40,
                 height: 4,
                 decoration: BoxDecoration(
-                    color: colour.kCardBorder,
+                    color: AppTokens.maintCardBorder,
                     borderRadius: BorderRadius.circular(2)),
               ),
             ),
             Text('Filter',
                 style: GoogleFonts.lato(
-                    color: colour.kHeaderGradStart,
+                    color: AppTokens.invoiceHeaderStart,
                     fontWeight: FontWeight.w700,
                     fontSize: isTablet ? 16 : 15)),
             const SizedBox(height: 16),
@@ -868,19 +870,19 @@ class _EmptyState extends StatelessWidget {
             width: 64,
             height: 64,
             decoration: BoxDecoration(
-              color: colour.kChipBg,
+              color: AppTokens.maintChipBg,
               borderRadius: BorderRadius.circular(16),
             ),
             child: const Icon(Icons.assignment_outlined,
-                size: 32, color: colour.kHeaderGradEnd),
+                size: 32, color: AppTokens.invoiceHeaderEnd),
           ),
           const SizedBox(height: 14),
           Text('No Records Found',
               style: GoogleFonts.lato(
-                  color: colour.kTextDark, fontWeight: FontWeight.w600, fontSize: 15)),
+                  color: AppTokens.maintTextDark, fontWeight: FontWeight.w600, fontSize: 15)),
           const SizedBox(height: 4),
           Text('Try adjusting your filters',
-              style: GoogleFonts.lato(color: colour.kTextMuted, fontSize: 12)),
+              style: GoogleFonts.lato(color: AppTokens.planTextMuted, fontSize: 12)),
         ],
       ),
     );
@@ -898,11 +900,11 @@ class _EFab extends StatelessWidget {
       width: 52,
       height: 52,
       decoration: BoxDecoration(
-        gradient: kGradient,
+        gradient: AppTokens.headerGradient,
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-              color: colour.kHeaderGradStart.withOpacity(0.4),
+              color: AppTokens.invoiceHeaderStart.withOpacity(0.4),
               blurRadius: 16,
               offset: const Offset(0, 6))
         ],
@@ -968,7 +970,7 @@ class _CardChip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final c = color ?? colour.kHeaderGradStart;
+    final c = color ?? AppTokens.invoiceHeaderStart;
     return InkWell(
       onTap: onTap,
       borderRadius: BorderRadius.circular(20),
@@ -977,12 +979,12 @@ class _CardChip extends StatelessWidget {
         decoration: BoxDecoration(
           color: color != null
               ? color!.withOpacity(0.08)
-              : colour.kChipBg,
+              : AppTokens.maintChipBg,
           borderRadius: BorderRadius.circular(20),
           border: Border.all(
               color: color != null
                   ? color!.withOpacity(0.3)
-                  : colour.kCardBorder,
+                  : AppTokens.maintCardBorder,
               width: 0.5),
         ),
         child: Row(
@@ -1021,12 +1023,12 @@ class _SheetDateTile extends StatelessWidget {
         decoration: BoxDecoration(
           color: colour.kDetailBg,
           borderRadius: BorderRadius.circular(10),
-          border: Border.all(color: colour.kCardBorder, width: 0.5),
+          border: Border.all(color: AppTokens.maintCardBorder, width: 0.5),
         ),
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
           Text(label.toUpperCase(),
               style: GoogleFonts.lato(
-                  color: colour.kTextMuted,
+                  color: AppTokens.planTextMuted,
                   fontWeight: FontWeight.w700,
                   fontSize: 9,
                   letterSpacing: 0.6)),
@@ -1036,11 +1038,11 @@ class _SheetDateTile extends StatelessWidget {
             children: [
               Text(d,
                   style: GoogleFonts.lato(
-                      color: colour.kTextDark,
+                      color: AppTokens.maintTextDark,
                       fontWeight: FontWeight.w700,
                       fontSize: 13)),
               const Icon(Icons.calendar_month_outlined,
-                  size: 18, color: colour.kHeaderGradEnd),
+                  size: 18, color: AppTokens.invoiceHeaderEnd),
             ],
           ),
         ]),
@@ -1074,7 +1076,7 @@ class _ESearchField extends StatelessWidget {
         decoration: BoxDecoration(
           color: disabled ? const Color(0xFFF5F5F5) : colour.kDetailBg,
           borderRadius: BorderRadius.circular(10),
-          border: Border.all(color: colour.kCardBorder, width: 0.5),
+          border: Border.all(color: AppTokens.maintCardBorder, width: 0.5),
         ),
         child: Row(
           children: [
@@ -1082,7 +1084,7 @@ class _ESearchField extends StatelessWidget {
               child: Text(
                 value.isEmpty ? hint : value,
                 style: GoogleFonts.lato(
-                  color: value.isEmpty ? colour.kTextMuted : colour.kTextDark,
+                  color: value.isEmpty ? AppTokens.planTextMuted : AppTokens.maintTextDark,
                   fontWeight:
                   value.isEmpty ? FontWeight.w500 : FontWeight.w600,
                   fontSize: objfun.FontLow,
@@ -1093,7 +1095,7 @@ class _ESearchField extends StatelessWidget {
             Icon(
               value.isNotEmpty ? Icons.close_rounded : Icons.search_rounded,
               size: 20,
-              color: disabled ? colour.kTextMuted : colour.kHeaderGradEnd,
+              color: disabled ? AppTokens.planTextMuted : AppTokens.invoiceHeaderEnd,
             ),
           ],
         ),
@@ -1126,10 +1128,10 @@ class _AnimatedCheckbox extends StatelessWidget {
               width: 18,
               height: 18,
               decoration: BoxDecoration(
-                gradient: value ? kGradient : null,
+                gradient: value ? AppTokens.headerGradient : null,
                 border: value
                     ? null
-                    : Border.all(color: colour.kCardBorder, width: 1.5),
+                    : Border.all(color: AppTokens.maintCardBorder, width: 1.5),
                 borderRadius: BorderRadius.circular(5),
               ),
               child: value
@@ -1140,7 +1142,7 @@ class _AnimatedCheckbox extends StatelessWidget {
             const SizedBox(width: 6),
             Text(label,
                 style: GoogleFonts.lato(
-                    color: colour.kTextDark,
+                    color: AppTokens.maintTextDark,
                     fontWeight: FontWeight.w600,
                     fontSize: isTablet
                         ? objfun.FontLow + 1
@@ -1161,11 +1163,11 @@ class _GradientButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        gradient: kGradient,
+        gradient: AppTokens.headerGradient,
         borderRadius: BorderRadius.circular(24),
         boxShadow: [
           BoxShadow(
-              color: colour.kHeaderGradStart.withOpacity(0.35),
+              color: AppTokens.invoiceHeaderStart.withOpacity(0.35),
               blurRadius: 10,
               offset: const Offset(0, 4))
         ],
@@ -1199,9 +1201,9 @@ class _OutlineButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        color: colour.kChipBg,
+        color: AppTokens.maintChipBg,
         borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: colour.kCardBorder),
+        border: Border.all(color: AppTokens.maintCardBorder),
       ),
       child: Material(
         color: Colors.transparent,
@@ -1213,7 +1215,7 @@ class _OutlineButton extends StatelessWidget {
             const EdgeInsets.symmetric(horizontal: 28, vertical: 11),
             child: Text(label,
                 style: GoogleFonts.lato(
-                    color: colour.kHeaderGradStart,
+                    color: AppTokens.invoiceHeaderStart,
                     fontWeight: FontWeight.w700,
                     fontSize: objfun.FontMedium)),
           ),
