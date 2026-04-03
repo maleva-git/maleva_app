@@ -4,16 +4,18 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:maleva/core/models/model.dart';
 import 'package:maleva/core/utils/clsfunction.dart' as objfun;
+import '../../../../../../core/colors/colors.dart';
+import '../../../../../../core/theme/tokens.dart';
 import '../bloc/googlereview_bloc.dart';
 import '../bloc/googlereview_event.dart';
 import '../bloc/googlereview_state.dart';
 
 // ── Color Palette ─────────────────────────────────────────────────────────────
-const Color kPrimary      = Color(0xFF1555F3);
-const Color kPrimaryDark  = Color(0xFF0D3DB5);
-const Color kPrimaryLight = Color(0xFF4D7EF7);
-const Color kAccent       = Color(0xFFE8EEFF);
-const Color kWhite        = Colors.white;
+// const Color AppTokens.brandGradientStart      = Color(0xFF1555F3);
+// const Color kPrimaryDark  = Color(0xFF0D3DB5);
+// const Color kPrimaryLight = Color(0xFF4D7EF7);
+// const Color AppTokens.brandLight       = Color(0xFFE8EEFF);
+// const Color kWhite        = Colors.white;
 
 // ── Entry Point ───────────────────────────────────────────────────────────────
 class ReviewGridPage extends StatelessWidget {
@@ -39,7 +41,7 @@ class _ReviewGridBody extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: kPrimary,
+        backgroundColor: AppTokens.brandGradientStart,
         toolbarHeight: isTablet ? 64 : 56,
         title: Text('Google Reviews',
             style: GoogleFonts.lato(
@@ -62,7 +64,7 @@ class _ReviewGridBody extends StatelessWidget {
         builder: (context, state) {
           if (state is! ReviewGridState) {
             return const Center(
-                child: CircularProgressIndicator(color: kPrimary));
+                child: CircularProgressIndicator(color: AppTokens.brandGradientStart));
           }
 
           return isTablet
@@ -71,7 +73,7 @@ class _ReviewGridBody extends StatelessWidget {
         },
       ),
       floatingActionButton: FloatingActionButton(
-        backgroundColor: kPrimary,
+        backgroundColor: AppTokens.brandGradientStart,
         child: const Icon(Icons.add, color: kWhite),
         onPressed: () => Navigator.pop(context, true),
       ),
@@ -100,7 +102,7 @@ class _ReviewGridBody extends StatelessWidget {
                   Container(
                     width: 4, height: 28,
                     decoration: BoxDecoration(
-                      color:         kPrimary,
+                      color:         AppTokens.brandGradientStart,
                       borderRadius: BorderRadius.circular(4),
                     ),
                   ),
@@ -109,7 +111,7 @@ class _ReviewGridBody extends StatelessWidget {
                       style: GoogleFonts.lato(
                         fontSize:      18,
                         fontWeight:    FontWeight.bold,
-                        color:         kPrimaryDark,
+                        color:         AppTokens.brandDark,
                         letterSpacing: 1.2,
                       )),
                 ]),
@@ -160,7 +162,7 @@ class _ReviewGridBody extends StatelessWidget {
       }) {
     if (state.loading) {
       return const Center(
-          child: CircularProgressIndicator(color: kPrimary));
+          child: CircularProgressIndicator(color: AppTokens.brandGradientStart));
     }
 
     if (state.selectedEmpId == null ||
@@ -172,7 +174,7 @@ class _ReviewGridBody extends StatelessWidget {
           children: [
             Icon(Icons.filter_list_rounded,
                 size:  isTablet ? 72 : 64,
-                color: kAccent),
+                color: AppTokens.brandLight),
             SizedBox(height: isTablet ? 16 : 12),
             Text(
               'Select employee and date range',
@@ -230,7 +232,7 @@ class _FilterCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      color: isTablet ? Colors.transparent : kAccent,
+      color: isTablet ? Colors.transparent : AppTokens.brandLight,
       padding: EdgeInsets.symmetric(
         horizontal: isTablet ? 0 : 12,
         vertical:   isTablet ? 0 : 8,
@@ -254,14 +256,14 @@ class _FilterCard extends StatelessWidget {
             padding: const EdgeInsets.symmetric(
                 horizontal: 16, vertical: 14),
             decoration: BoxDecoration(
-              color:         kAccent,
+              color:         AppTokens.brandLight,
               borderRadius: BorderRadius.circular(14),
               border: Border.all(
                   color: kPrimaryLight.withOpacity(0.3)),
             ),
             child: Row(children: [
               const Icon(Icons.date_range_rounded,
-                  color: kPrimary, size: 22),
+                  color: AppTokens.brandGradientStart, size: 22),
               const SizedBox(width: 12),
               Expanded(
                 child: Text(
@@ -271,7 +273,7 @@ class _FilterCard extends StatelessWidget {
                   style: GoogleFonts.lato(
                     fontSize:   14,
                     color:      state.fromDate != null
-                        ? kPrimaryDark
+                        ? AppTokens.brandDark
                         : Colors.grey,
                     fontWeight: FontWeight.w600,
                   ),
@@ -311,7 +313,7 @@ class _FilterCard extends StatelessWidget {
   Widget _mobileFilter(BuildContext context) {
     return Row(children: [
       IconButton(
-        icon: const Icon(Icons.date_range_rounded, color: kPrimary),
+        icon: const Icon(Icons.date_range_rounded, color: AppTokens.brandGradientStart),
         onPressed: () => _pickDateRange(context),
       ),
 
@@ -320,7 +322,7 @@ class _FilterCard extends StatelessWidget {
           '${DateFormat('dd/MM').format(state.fromDate!)} - ${DateFormat('dd/MM').format(state.toDate!)}',
           style: GoogleFonts.lato(
             fontSize:   12,
-            color:      kPrimaryDark,
+            color:      AppTokens.brandDark,
             fontWeight: FontWeight.w600,
           ),
         ),
@@ -352,14 +354,14 @@ class _FilterCard extends StatelessWidget {
             style: GoogleFonts.lato(
                 color: Colors.grey, fontSize: fontSize)),
         icon: const Icon(Icons.keyboard_arrow_down_rounded,
-            color: kPrimary),
+            color: AppTokens.brandGradientStart),
         items: state.employees
             .map((e) => DropdownMenuItem(
           value: e.Id,
           child: Text(e.AccountName,
               overflow: TextOverflow.ellipsis,
               style: GoogleFonts.lato(
-                  color:    kPrimaryDark,
+                  color:    AppTokens.brandDark,
                   fontSize: fontSize)),
         ))
             .toList(),
@@ -382,7 +384,7 @@ class _FilterCard extends StatelessWidget {
       builder: (context, child) => Theme(
         data: Theme.of(context).copyWith(
           colorScheme:
-          const ColorScheme.light(primary: kPrimary),
+          const ColorScheme.light(primary: AppTokens.brandGradientStart),
         ),
         child: child!,
       ),
@@ -411,14 +413,14 @@ class _CountBadge extends StatelessWidget {
           horizontal: 20, vertical: 18),
       decoration: BoxDecoration(
         gradient: const LinearGradient(
-          colors: [kPrimary, kPrimaryDark],
+          colors: [AppTokens.brandGradientStart, AppTokens.brandDark],
           begin: Alignment.topLeft,
           end:   Alignment.bottomRight,
         ),
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color:     kPrimary.withOpacity(0.28),
+            color:     AppTokens.brandGradientStart.withOpacity(0.28),
             blurRadius: 16,
             offset:    const Offset(0, 6),
           ),
@@ -475,10 +477,10 @@ class _ReviewCard extends StatelessWidget {
       decoration: BoxDecoration(
         color:         kWhite,
         borderRadius: BorderRadius.circular(isTablet ? 18 : 14),
-        border: Border.all(color: kAccent, width: 1.5),
+        border: Border.all(color: AppTokens.brandLight, width: 1.5),
         boxShadow: [
           BoxShadow(
-            color:     kPrimary.withOpacity(0.07),
+            color:     AppTokens.brandGradientStart.withOpacity(0.07),
             blurRadius: 8,
             offset:    const Offset(0, 3),
           ),
@@ -493,9 +495,9 @@ class _ReviewCard extends StatelessWidget {
           width:  isTablet ? 48 : 42,
           height: isTablet ? 48 : 42,
           decoration: const BoxDecoration(
-              color: kAccent, shape: BoxShape.circle),
+              color: AppTokens.brandLight, shape: BoxShape.circle),
           child: Icon(Icons.star_rounded,
-              color: kPrimary,
+              color: AppTokens.brandGradientStart,
               size:  isTablet ? 26 : 22),
         ),
         title: Text(
@@ -503,7 +505,7 @@ class _ReviewCard extends StatelessWidget {
           style: GoogleFonts.lato(
             fontWeight: FontWeight.bold,
             fontSize:   isTablet ? 16 : 15,
-            color:      kPrimaryDark,
+            color:      AppTokens.brandDark,
           ),
         ),
         subtitle: Text(
@@ -517,7 +519,7 @@ class _ReviewCard extends StatelessWidget {
           width:  isTablet ? 38 : 34,
           height: isTablet ? 38 : 34,
           decoration: BoxDecoration(
-            color:         kAccent,
+            color:         AppTokens.brandLight,
             borderRadius: BorderRadius.circular(8),
           ),
           child: IconButton(

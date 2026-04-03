@@ -13,19 +13,10 @@ import 'package:maleva/MasterSearch/Location.dart';
 import '../bloc/enquirytradd_bloc.dart';
 import '../bloc/enquirytradd_event.dart';
 import '../bloc/enquirytradd_state.dart';
-
-const kHeaderGradStart = Color(0xFF1A3A8F);
-const kHeaderGradEnd   = Color(0xFF4A6FD4);
-const kCardBorder      = Color(0xFFC5D0EE);
-const kPageBg          = Color(0xFFF4F6FB);
-const kTextDark        = Color(0xFF1E2D5E);
-const kTextMid         = Color(0xFF4A5A8A);
-const kTextMuted       = Color(0xFF8A96BF);
-const kDetailBg        = Color(0xFFF0F4FF);
-const kChipBg          = Color(0xFFEEF2FF);
+import 'package:maleva/core/colors/colors.dart' as colour;
 
 const kGradient = LinearGradient(
-  colors: [kHeaderGradStart, kHeaderGradEnd],
+  colors: [colour.kHeaderGradStart, colour.kHeaderGradEnd],
   begin: Alignment.topLeft,
   end: Alignment.bottomRight,
 );
@@ -82,7 +73,7 @@ class _AddEnquiryPage extends StatelessWidget {
         },
         child: Scaffold(
           resizeToAvoidBottomInset: true,
-          backgroundColor: kPageBg,
+          backgroundColor: colour.kPageBg,
           appBar: _buildAppBar(context, userName, isTablet),
           drawer: const Menulist(),
           body: BlocBuilder<EnquiryAddBloc, EnquiryAddState>(
@@ -90,7 +81,7 @@ class _AddEnquiryPage extends StatelessWidget {
               if (state is EnquiryAddInitial || state is EnquiryAddLoading) {
                 return const Center(
                   child:
-                  SpinKitFoldingCube(color: kHeaderGradEnd, size: 35),
+                  SpinKitFoldingCube(color: colour.kHeaderGradEnd, size: 35),
                 );
               }
               if (state is EnquiryAddLoaded) {
@@ -429,10 +420,10 @@ class _AddEnquiryBody extends StatelessWidget {
   Widget _datepickerTheme(BuildContext ctx, Widget? child) => Theme(
     data: Theme.of(ctx).copyWith(
       colorScheme: const ColorScheme.light(
-        primary: kHeaderGradStart,
+        primary: colour.kHeaderGradStart,
         onPrimary: Colors.white,
         surface: Colors.white,
-        onSurface: kTextDark,
+        onSurface: colour.kTextDark,
       ),
     ),
     child: child!,
@@ -450,7 +441,7 @@ class _SectionLabel extends StatelessWidget {
     return Text(
       text,
       style: GoogleFonts.lato(
-        color: kTextMid,
+        color: colour.kTextMid,
         fontWeight: FontWeight.w600,
         fontSize: isTablet ? objfun.FontLow + 1 : objfun.FontLow,
         letterSpacing: 0.2,
@@ -490,9 +481,9 @@ class _DateTimeField extends StatelessWidget {
         padding:
         const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
         decoration: BoxDecoration(
-          color: kDetailBg,
+          color: colour.kDetailBg,
           borderRadius: BorderRadius.circular(10),
-          border: Border.all(color: kCardBorder, width: 0.5),
+          border: Border.all(color: colour.kCardBorder, width: 0.5),
         ),
         child: Row(
           children: [
@@ -500,14 +491,14 @@ class _DateTimeField extends StatelessWidget {
               child: Text(
                 display,
                 style: GoogleFonts.lato(
-                  color: enabled ? kTextDark : kTextMuted,
+                  color: enabled ? colour.kTextDark : colour.kTextMuted,
                   fontWeight: FontWeight.w600,
                   fontSize: objfun.FontLow,
                 ),
               ),
             ),
             const Icon(Icons.calendar_month_outlined,
-                size: 20, color: kHeaderGradEnd),
+                size: 20, color: colour.kHeaderGradEnd),
           ],
         ),
       ),
@@ -551,7 +542,7 @@ class _DateTimeRow extends StatelessWidget {
           child: Text(
             label,
             style: GoogleFonts.lato(
-              color: kTextMid,
+              color: colour.kTextMid,
               fontWeight: FontWeight.w600,
               fontSize: isTablet ? objfun.FontLow + 1 : objfun.FontLow,
             ),
@@ -569,9 +560,9 @@ class _DateTimeRow extends StatelessWidget {
               padding: const EdgeInsets.symmetric(
                   horizontal: 12, vertical: 12),
               decoration: BoxDecoration(
-                color: kDetailBg,
+                color: colour.kDetailBg,
                 borderRadius: BorderRadius.circular(10),
-                border: Border.all(color: kCardBorder, width: 0.5),
+                border: Border.all(color: colour.kCardBorder, width: 0.5),
               ),
               child: Row(
                 children: [
@@ -579,7 +570,7 @@ class _DateTimeRow extends StatelessWidget {
                     child: Text(
                       display,
                       style: GoogleFonts.lato(
-                        color: enabled ? kTextDark : kTextMuted,
+                        color: enabled ? colour.kTextDark : colour.kTextMuted,
                         fontWeight: FontWeight.w600,
                         fontSize: isTablet
                             ? objfun.FontLow + 1
@@ -590,7 +581,7 @@ class _DateTimeRow extends StatelessWidget {
                   Icon(
                     Icons.calendar_month_outlined,
                     size: 18,
-                    color: enabled ? kHeaderGradEnd : kTextMuted,
+                    color: enabled ? colour.kHeaderGradEnd : colour.kTextMuted,
                   ),
                 ],
               ),
@@ -611,7 +602,7 @@ class _DateTimeRow extends StatelessWidget {
               gradient: enabled ? kGradient : null,
               border: enabled
                   ? null
-                  : Border.all(color: kCardBorder, width: 1.5),
+                  : Border.all(color: colour.kCardBorder, width: 1.5),
               borderRadius: BorderRadius.circular(6),
             ),
             child: enabled
@@ -649,9 +640,9 @@ class _AddSearchField extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
         decoration: BoxDecoration(
-          color: disabled ? const Color(0xFFF5F5F5) : kDetailBg,
+          color: disabled ? const Color(0xFFF5F5F5) : colour.kDetailBg,
           borderRadius: BorderRadius.circular(10),
-          border: Border.all(color: kCardBorder, width: 0.5),
+          border: Border.all(color: colour.kCardBorder, width: 0.5),
         ),
         child: Row(
           children: [
@@ -659,7 +650,7 @@ class _AddSearchField extends StatelessWidget {
               child: Text(
                 value.isEmpty ? hint : value,
                 style: GoogleFonts.lato(
-                  color: value.isEmpty ? kTextMuted : kTextDark,
+                  color: value.isEmpty ? colour.kTextMuted : colour.kTextDark,
                   fontWeight:
                   value.isEmpty ? FontWeight.w500 : FontWeight.w600,
                   fontSize: objfun.FontLow,
@@ -670,7 +661,7 @@ class _AddSearchField extends StatelessWidget {
             Icon(
               value.isNotEmpty ? Icons.close_rounded : Icons.search_rounded,
               size: 20,
-              color: disabled ? kTextMuted : kHeaderGradEnd,
+              color: disabled ? colour.kTextMuted : colour.kHeaderGradEnd,
             ),
           ],
         ),
@@ -700,16 +691,16 @@ class _AddTextField extends StatelessWidget {
       textInputAction: TextInputAction.done,
       onChanged: onChanged,
       style: GoogleFonts.lato(
-        color: kTextDark,
+        color: colour.kTextDark,
         fontWeight: FontWeight.w600,
         fontSize: objfun.FontLow,
       ),
       decoration: InputDecoration(
         hintText: hint,
         hintStyle:
-        GoogleFonts.lato(color: kTextMuted, fontSize: objfun.FontLow),
+        GoogleFonts.lato(color: colour.kTextMuted, fontSize: objfun.FontLow),
         filled: true,
-        fillColor: kDetailBg,
+        fillColor: colour.kDetailBg,
         contentPadding:
         const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
         border: OutlineInputBorder(
@@ -718,12 +709,12 @@ class _AddTextField extends StatelessWidget {
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(10),
-          borderSide: const BorderSide(color: kCardBorder, width: 0.5),
+          borderSide: const BorderSide(color: colour.kCardBorder, width: 0.5),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(10),
           borderSide:
-          const BorderSide(color: kHeaderGradEnd, width: 1.5),
+          const BorderSide(color: colour.kHeaderGradEnd, width: 1.5),
         ),
       ),
     );

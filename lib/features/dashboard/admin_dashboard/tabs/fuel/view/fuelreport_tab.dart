@@ -4,6 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:maleva/core/models/model.dart';
 import 'package:maleva/core/utils/clsfunction.dart' as objfun;
+import '../../../../../../core/theme/tokens.dart';
 import '../bloc/fuelreport_bloc.dart';
 import '../bloc/fuelreport_event.dart';
 import '../bloc/fuelreport_state.dart';
@@ -46,7 +47,7 @@ class _FuelDiffBody extends StatelessWidget {
         // ── Loading ──
         if (state is FuelDiffLoading) {
           return const Center(
-              child: CircularProgressIndicator(color: colour.kPrimary));
+              child: CircularProgressIndicator(color: AppTokens.brandGradientStart));
         }
 
         // ── Error ──
@@ -69,7 +70,7 @@ class _FuelDiffBody extends StatelessWidget {
                   icon: const Icon(Icons.refresh),
                   label: const Text("Retry"),
                   style: ElevatedButton.styleFrom(
-                      backgroundColor: colour.kPrimary),
+                      backgroundColor: AppTokens.brandGradientStart),
                 ),
               ],
             ),
@@ -88,7 +89,7 @@ class _FuelDiffBody extends StatelessWidget {
                   style: GoogleFonts.lato(
                     fontSize: objfun.FontLarge,
                     fontWeight: FontWeight.bold,
-                    color: colour.kPrimaryDark,
+                    color: AppTokens.brandGradientStartDark,
                   ),
                 ),
 
@@ -219,7 +220,7 @@ class _DateFilterBar extends StatelessWidget {
         color: colour.kAccent,
         borderRadius: BorderRadius.circular(isTablet ? 16 : 14),
         border: Border.all(
-            color: colour.kPrimaryLight.withOpacity(0.3)),
+            color: AppTokens.brandGradientStartLight.withOpacity(0.3)),
       ),
       child: Row(
         children: [
@@ -240,7 +241,7 @@ class _DateFilterBar extends StatelessWidget {
                   style: GoogleFonts.lato(
                       fontWeight: FontWeight.bold,
                       fontSize: objfun.FontLow,
-                      color: colour.kPrimaryDark),
+                      color: AppTokens.brandGradientStartDark),
                 ),
               ],
             ),
@@ -255,7 +256,7 @@ class _DateFilterBar extends StatelessWidget {
           Container(
             width: 1,
             height: 30,
-            color: colour.kPrimaryLight.withOpacity(0.3),
+            color: AppTokens.brandGradientStartLight.withOpacity(0.3),
             margin: const EdgeInsets.symmetric(horizontal: 8),
           ),
 
@@ -276,7 +277,7 @@ class _DateFilterBar extends StatelessWidget {
                   style: GoogleFonts.lato(
                       fontWeight: FontWeight.bold,
                       fontSize: objfun.FontLow,
-                      color: colour.kPrimaryDark),
+                      color: AppTokens.brandGradientStartDark),
                 ),
               ],
             ),
@@ -295,7 +296,7 @@ class _DateFilterBar extends StatelessWidget {
                 .read<FuelDiffBloc>()
                 .add(const LoadFuelDiffEvent()),
             style: ElevatedButton.styleFrom(
-              backgroundColor: colour.kPrimary,
+              backgroundColor: AppTokens.brandGradientStart,
               padding: EdgeInsets.symmetric(
                 horizontal: isTablet ? 18 : 14,
                 vertical:   isTablet ? 12 : 10,
@@ -333,7 +334,7 @@ class _DatePickerButton extends StatelessWidget {
           builder: (context, child) => Theme(
             data: Theme.of(context).copyWith(
               colorScheme: const ColorScheme.light(
-                  primary: colour.kPrimary),
+                  primary: AppTokens.brandGradientStart),
             ),
             child: child!,
           ),
@@ -347,7 +348,7 @@ class _DatePickerButton extends StatelessWidget {
         width: 34,
         height: 34,
         decoration: BoxDecoration(
-          color: colour.kPrimary,
+          color: AppTokens.brandGradientStart,
           borderRadius: BorderRadius.circular(8),
         ),
         child: const Icon(Icons.calendar_month_outlined,
@@ -407,13 +408,13 @@ class _FuelDiffCard extends StatelessWidget {
           borderRadius: BorderRadius.circular(isTablet ? 14 : 16),
           border: Border.all(
             color: isSelected
-                ? colour.kPrimary
+                ? AppTokens.brandGradientStart
                 : colour.kAccent,
             width: isSelected ? 2.0 : 1.5,
           ),
           boxShadow: [
             BoxShadow(
-              color: (isSelected ? colour.kPrimary : colour.kPrimary)
+              color: (isSelected ? AppTokens.brandGradientStart : AppTokens.brandGradientStart)
                   .withOpacity(isSelected ? 0.15 : 0.07),
               blurRadius: isSelected ? 14 : 10,
               offset: const Offset(0, 4),
@@ -449,7 +450,7 @@ class _FuelDiffCard extends StatelessWidget {
           decoration: const BoxDecoration(
               color: colour.kAccent, shape: BoxShape.circle),
           child: const Icon(Icons.local_shipping_rounded,
-              color: colour.kPrimary, size: 20),
+              color: AppTokens.brandGradientStart, size: 20),
         ),
         const SizedBox(width: 10),
         Expanded(
@@ -460,7 +461,7 @@ class _FuelDiffCard extends StatelessWidget {
                   style: GoogleFonts.lato(
                       fontSize: 14,
                       fontWeight: FontWeight.bold,
-                      color: colour.kPrimaryDark),
+                      color: AppTokens.brandGradientStartDark),
                   overflow: TextOverflow.ellipsis),
               Text(truckName,
                   style: GoogleFonts.lato(
@@ -518,7 +519,7 @@ class _FuelDiffCard extends StatelessWidget {
               decoration: const BoxDecoration(
                   color: colour.kAccent, shape: BoxShape.circle),
               child: const Icon(Icons.local_shipping_rounded,
-                  color: colour.kPrimary, size: 24),
+                  color: AppTokens.brandGradientStart, size: 24),
             ),
             const SizedBox(width: 12),
             Expanded(
@@ -529,7 +530,7 @@ class _FuelDiffCard extends StatelessWidget {
                       style: GoogleFonts.lato(
                           fontSize: 16,
                           fontWeight: FontWeight.bold,
-                          color: colour.kPrimaryDark)),
+                          color: AppTokens.brandGradientStartDark)),
                   Text(truckName,
                       style: GoogleFonts.lato(
                           fontSize: 13,
@@ -545,9 +546,9 @@ class _FuelDiffCard extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             _infoTile("A Amount",
-                "RM ${aAmount.toStringAsFixed(2)}", colour.kPrimary),
+                "RM ${aAmount.toStringAsFixed(2)}", AppTokens.brandGradientStart),
             _infoTile("G Amount",
-                "RM ${gAmount.toStringAsFixed(2)}", colour.kPrimaryLight),
+                "RM ${gAmount.toStringAsFixed(2)}", AppTokens.brandGradientStartLight),
           ],
         ),
         const SizedBox(height: 6),
@@ -555,9 +556,9 @@ class _FuelDiffCard extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             _infoTile("A Liter",
-                "${aliter.toStringAsFixed(2)} L", colour.kPrimary),
+                "${aliter.toStringAsFixed(2)} L", AppTokens.brandGradientStart),
             _infoTile("G Liter",
-                "${gliter.toStringAsFixed(2)} L", colour.kPrimaryLight),
+                "${gliter.toStringAsFixed(2)} L", AppTokens.brandGradientStartLight),
           ],
         ),
         const SizedBox(height: 10),
@@ -618,7 +619,7 @@ class _EmptyDetailPanel extends StatelessWidget {
         border: Border.all(color: colour.kAccent, width: 1.5),
         boxShadow: [
           BoxShadow(
-            color: colour.kPrimary.withOpacity(0.05),
+            color: AppTokens.brandGradientStart.withOpacity(0.05),
             blurRadius: 12,
             offset: const Offset(0, 4),
           ),
@@ -633,14 +634,14 @@ class _EmptyDetailPanel extends StatelessWidget {
             decoration: const BoxDecoration(
                 color: colour.kAccent, shape: BoxShape.circle),
             child: const Icon(Icons.touch_app_rounded,
-                color: colour.kPrimary, size: 32),
+                color: AppTokens.brandGradientStart, size: 32),
           ),
           const SizedBox(height: 16),
           Text("Select a record",
               style: GoogleFonts.lato(
                   fontSize: 16,
                   fontWeight: FontWeight.bold,
-                  color: colour.kPrimaryDark)),
+                  color: AppTokens.brandGradientStartDark)),
           const SizedBox(height: 6),
           Text("Tap any card to view details",
               style: GoogleFonts.lato(
@@ -685,7 +686,7 @@ class _DetailPanel extends StatelessWidget {
         border: Border.all(color: colour.kAccent, width: 1.5),
         boxShadow: [
           BoxShadow(
-            color: colour.kPrimary.withOpacity(0.07),
+            color: AppTokens.brandGradientStart.withOpacity(0.07),
             blurRadius: 16,
             offset: const Offset(0, 5),
           ),
@@ -699,7 +700,7 @@ class _DetailPanel extends StatelessWidget {
             padding: const EdgeInsets.symmetric(
                 vertical: 16, horizontal: 20),
             decoration: const BoxDecoration(
-              color: colour.kPrimary,
+              color: AppTokens.brandGradientStart,
               borderRadius: BorderRadius.only(
                 topLeft:  Radius.circular(20),
                 topRight: Radius.circular(20),
@@ -821,7 +822,7 @@ class _DetailPanel extends StatelessWidget {
           decoration: BoxDecoration(
               color: colour.kAccent,
               borderRadius: BorderRadius.circular(8)),
-          child: Icon(icon, color: colour.kPrimary, size: 15),
+          child: Icon(icon, color: AppTokens.brandGradientStart, size: 15),
         ),
         const SizedBox(width: 10),
         Expanded(
@@ -838,7 +839,7 @@ class _DetailPanel extends StatelessWidget {
                 style: GoogleFonts.lato(
                     fontSize: 14,
                     fontWeight: FontWeight.w700,
-                    color: colour.kPrimaryDark),
+                    color: AppTokens.brandGradientStartDark),
               ),
             ],
           ),
@@ -881,7 +882,7 @@ class _FuelDetailsDialog extends StatelessWidget {
                 padding: const EdgeInsets.symmetric(
                     vertical: 20, horizontal: 24),
                 decoration: const BoxDecoration(
-                  color: colour.kPrimary,
+                  color: AppTokens.brandGradientStart,
                   borderRadius: BorderRadius.only(
                     topLeft:  Radius.circular(20),
                     topRight: Radius.circular(20),
@@ -970,7 +971,7 @@ class _FuelDetailsDialog extends StatelessWidget {
                         width: double.infinity,
                         child: ElevatedButton(
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: colour.kPrimary,
+                            backgroundColor: AppTokens.brandGradientStart,
                             padding: const EdgeInsets.symmetric(
                                 vertical: 14),
                             shape: RoundedRectangleBorder(
@@ -1013,7 +1014,7 @@ class _FuelDetailsDialog extends StatelessWidget {
           decoration: BoxDecoration(
               color: colour.kAccent,
               borderRadius: BorderRadius.circular(8)),
-          child: Icon(icon, color: colour.kPrimary, size: 16),
+          child: Icon(icon, color: AppTokens.brandGradientStart, size: 16),
         ),
         const SizedBox(width: 12),
         Expanded(
@@ -1030,7 +1031,7 @@ class _FuelDetailsDialog extends StatelessWidget {
                 style: GoogleFonts.lato(
                     fontSize: 14,
                     fontWeight: FontWeight.w700,
-                    color: colour.kPrimaryDark),
+                    color: AppTokens.brandGradientStartDark),
               ),
             ],
           ),

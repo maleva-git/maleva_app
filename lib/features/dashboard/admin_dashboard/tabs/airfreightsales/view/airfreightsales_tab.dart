@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import '../../../../../../core/colors/colors.dart' as colour;
+import '../../../../../../core/theme/tokens.dart';
 import '../bloc/airfreightsales_bloc.dart';
 import '../bloc/airfreightsales_event.dart';
 import '../bloc/airfreightsales_state.dart';
@@ -50,7 +51,7 @@ class _CustomerDashboardView extends StatelessWidget {
                     Container(
                       width: 36, height: 36,
                       decoration: BoxDecoration(
-                        color: colour.kHeaderGradStart,
+                        color: AppTokens.invoiceHeaderStart,
                         borderRadius: BorderRadius.circular(10),
                       ),
                       child: const Icon(Icons.dashboard_rounded,
@@ -218,7 +219,7 @@ class _CustomerDashboardView extends StatelessWidget {
                                 style: GoogleFonts.poppins(
                                     fontSize: 13,
                                     fontWeight: FontWeight.w600,
-                                    color: colour.kHeaderGradStart),
+                                    color: AppTokens.invoiceHeaderStart),
                               ),
                             ),
                             // Progress bar

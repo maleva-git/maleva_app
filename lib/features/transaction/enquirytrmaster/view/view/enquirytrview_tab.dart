@@ -11,9 +11,7 @@ import 'package:maleva/MasterSearch/Customer.dart';
 import 'package:maleva/MasterSearch/Employee.dart';
 import 'package:maleva/MasterSearch/JobType.dart';
 import 'package:maleva/Transaction/SaleOrder/SalesOrderAdd.dart';
-import 'package:maleva/DashBoard/Admin/AdminDashboard.dart';
 import 'package:maleva/DashBoard/CustomerService/CustDashboard.dart';
-import 'package:maleva/DashBoard/OperationAdmin/OperationAdminDashboard.dart';
 import 'package:maleva/DashBoard/TransportDB/TransportDashboard.dart';
 import 'package:maleva/DashBoard/User/UserDashboard.dart';
 import '../../../../dashboard/admin_dashboard/view/admin_dashboard.dart';
@@ -22,22 +20,13 @@ import '../../add/view/enquirytradd_tab.dart';
 import '../bloc/enquirytrview_bloc.dart';
 import '../bloc/enquirytrview_event.dart';
 import '../bloc/enquirytrview_state.dart';
-
+import 'package:maleva/core/colors/colors.dart' as colour;
 
 // ─── Design Tokens ────────────────────────────────────────────────────────────
-const kHeaderGradStart = Color(0xFF1A3A8F);
-const kHeaderGradEnd   = Color(0xFF4A6FD4);
-const kCardBorder      = Color(0xFFC5D0EE);
-const kCardBg          = Color(0xFFFFFFFF);
-const kPageBg          = Color(0xFFF4F6FB);
-const kTextDark        = Color(0xFF1E2D5E);
-const kTextMid         = Color(0xFF4A5A8A);
-const kTextMuted       = Color(0xFF8A96BF);
-const kDetailBg        = Color(0xFFF0F4FF);
-const kChipBg          = Color(0xFFEEF2FF);
+
 
 const kGradient = LinearGradient(
-  colors: [kHeaderGradStart, kHeaderGradEnd],
+  colors: [colour.kHeaderGradStart, colour.kHeaderGradEnd],
   begin: Alignment.topLeft,
   end: Alignment.bottomRight,
 );
@@ -108,14 +97,14 @@ class _EnquiryViewPage extends StatelessWidget {
         },
         child: Scaffold(
           resizeToAvoidBottomInset: false,
-          backgroundColor: kPageBg,
+          backgroundColor: colour.kPageBg,
           appBar: _buildAppBar(context, userName, isTablet),
           drawer: const Menulist(),
           body: BlocBuilder<EnquiryViewBloc, EnquiryViewState>(
             builder: (context, state) {
               if (state is EnquiryViewInitial || state is EnquiryViewLoading) {
                 return const Center(
-                  child: SpinKitFoldingCube(color: kHeaderGradEnd, size: 35),
+                  child: SpinKitFoldingCube(color: colour.kHeaderGradEnd, size: 35),
                 );
               }
               if (state is EnquiryViewLoaded) {
@@ -249,7 +238,7 @@ class _EnquiryViewPage extends StatelessWidget {
             borderRadius: BorderRadius.circular(20),
             boxShadow: [
               BoxShadow(
-                color: kHeaderGradStart.withOpacity(0.15),
+                color: colour.kHeaderGradStart.withOpacity(0.15),
                 blurRadius: 30,
                 offset: const Offset(0, 10),
               ),
@@ -327,14 +316,14 @@ class _DetailRow extends StatelessWidget {
             width: 120,
             child: Text(label,
                 style: GoogleFonts.lato(
-                    color: kTextMuted,
+                    color: colour.kTextMuted,
                     fontWeight: FontWeight.w600,
                     fontSize: 12)),
           ),
           Expanded(
             child: Text(value.isEmpty ? '-' : value,
                 style: GoogleFonts.lato(
-                    color: kTextDark,
+                    color: colour.kTextDark,
                     fontWeight: FontWeight.w600,
                     fontSize: 12)),
           ),
@@ -362,7 +351,7 @@ class _EnquiryViewBody extends StatelessWidget {
           height: isTablet ? height * 0.07 : height * 0.06,
           decoration: const BoxDecoration(
             gradient: LinearGradient(
-              colors: [kHeaderGradStart, Color(0xFF2D56C8)],
+              colors: [colour.kHeaderGradStart, Color(0xFF2D56C8)],
               begin: Alignment.topCenter,
               end: Alignment.bottomCenter,
             ),
@@ -431,7 +420,7 @@ class _EnquiryCard extends StatelessWidget {
   });
 
   Color _cardColor() {
-    if (item['ForwardingDate'] == null) return kCardBg;
+    if (item['ForwardingDate'] == null) return colour.kCardBg;
     final now     = DateTime.now();
     final today   = DateFormat('yyyy-MM-dd').format(now);
     final tomorrow = DateFormat('yyyy-MM-dd').format(now.add(const Duration(days: 1)));
@@ -444,11 +433,11 @@ class _EnquiryCard extends StatelessWidget {
     } else if (notify == tomorrow) {
       return const Color(0xFFFFF9C4);
     }
-    return kCardBg;
+    return colour.kCardBg;
   }
 
   Color _dotColor() {
-    if (item['ForwardingDate'] == null) return kTextMuted;
+    if (item['ForwardingDate'] == null) return colour.kTextMuted;
     final now     = DateTime.now();
     final today   = DateFormat('yyyy-MM-dd').format(now);
     final tomorrow = DateFormat('yyyy-MM-dd').format(now.add(const Duration(days: 1)));
@@ -467,12 +456,12 @@ class _EnquiryCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final valStyle = GoogleFonts.lato(
-      color: kTextDark,
+      color: colour.kTextDark,
       fontWeight: FontWeight.w600,
       fontSize: isTablet ? objfun.FontCardText + 1 : objfun.FontCardText,
     );
     final labelStyle = GoogleFonts.lato(
-      color: kTextMuted,
+      color: colour.kTextMuted,
       fontWeight: FontWeight.w600,
       fontSize: isTablet ? 10 : 9,
       letterSpacing: 0.4,
@@ -492,10 +481,10 @@ class _EnquiryCard extends StatelessWidget {
           decoration: BoxDecoration(
             color: _cardColor(),
             borderRadius: BorderRadius.circular(14),
-            border: Border.all(color: kCardBorder, width: 0.5),
+            border: Border.all(color: colour.kCardBorder, width: 0.5),
             boxShadow: [
               BoxShadow(
-                color: kHeaderGradStart.withOpacity(0.07),
+                color: colour.kHeaderGradStart.withOpacity(0.07),
                 blurRadius: 12,
                 offset: const Offset(0, 3),
               ),
@@ -643,10 +632,10 @@ class _FilterSheetState extends State<_FilterSheet> {
       builder: (ctx, child) => Theme(
         data: Theme.of(ctx).copyWith(
           colorScheme: const ColorScheme.light(
-            primary: kHeaderGradStart,
+            primary: colour.kHeaderGradStart,
             onPrimary: Colors.white,
             surface: Colors.white,
-            onSurface: kTextDark,
+            onSurface: colour.kTextDark,
           ),
         ),
         child: child!,
@@ -690,13 +679,13 @@ class _FilterSheetState extends State<_FilterSheet> {
                 width: 40,
                 height: 4,
                 decoration: BoxDecoration(
-                    color: kCardBorder,
+                    color: colour.kCardBorder,
                     borderRadius: BorderRadius.circular(2)),
               ),
             ),
             Text('Filter',
                 style: GoogleFonts.lato(
-                    color: kHeaderGradStart,
+                    color: colour.kHeaderGradStart,
                     fontWeight: FontWeight.w700,
                     fontSize: isTablet ? 16 : 15)),
             const SizedBox(height: 16),
@@ -879,19 +868,19 @@ class _EmptyState extends StatelessWidget {
             width: 64,
             height: 64,
             decoration: BoxDecoration(
-              color: kChipBg,
+              color: colour.kChipBg,
               borderRadius: BorderRadius.circular(16),
             ),
             child: const Icon(Icons.assignment_outlined,
-                size: 32, color: kHeaderGradEnd),
+                size: 32, color: colour.kHeaderGradEnd),
           ),
           const SizedBox(height: 14),
           Text('No Records Found',
               style: GoogleFonts.lato(
-                  color: kTextDark, fontWeight: FontWeight.w600, fontSize: 15)),
+                  color: colour.kTextDark, fontWeight: FontWeight.w600, fontSize: 15)),
           const SizedBox(height: 4),
           Text('Try adjusting your filters',
-              style: GoogleFonts.lato(color: kTextMuted, fontSize: 12)),
+              style: GoogleFonts.lato(color: colour.kTextMuted, fontSize: 12)),
         ],
       ),
     );
@@ -913,7 +902,7 @@ class _EFab extends StatelessWidget {
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-              color: kHeaderGradStart.withOpacity(0.4),
+              color: colour.kHeaderGradStart.withOpacity(0.4),
               blurRadius: 16,
               offset: const Offset(0, 6))
         ],
@@ -979,7 +968,7 @@ class _CardChip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final c = color ?? kHeaderGradStart;
+    final c = color ?? colour.kHeaderGradStart;
     return InkWell(
       onTap: onTap,
       borderRadius: BorderRadius.circular(20),
@@ -988,12 +977,12 @@ class _CardChip extends StatelessWidget {
         decoration: BoxDecoration(
           color: color != null
               ? color!.withOpacity(0.08)
-              : kChipBg,
+              : colour.kChipBg,
           borderRadius: BorderRadius.circular(20),
           border: Border.all(
               color: color != null
                   ? color!.withOpacity(0.3)
-                  : kCardBorder,
+                  : colour.kCardBorder,
               width: 0.5),
         ),
         child: Row(
@@ -1030,14 +1019,14 @@ class _SheetDateTile extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
         decoration: BoxDecoration(
-          color: kDetailBg,
+          color: colour.kDetailBg,
           borderRadius: BorderRadius.circular(10),
-          border: Border.all(color: kCardBorder, width: 0.5),
+          border: Border.all(color: colour.kCardBorder, width: 0.5),
         ),
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
           Text(label.toUpperCase(),
               style: GoogleFonts.lato(
-                  color: kTextMuted,
+                  color: colour.kTextMuted,
                   fontWeight: FontWeight.w700,
                   fontSize: 9,
                   letterSpacing: 0.6)),
@@ -1047,11 +1036,11 @@ class _SheetDateTile extends StatelessWidget {
             children: [
               Text(d,
                   style: GoogleFonts.lato(
-                      color: kTextDark,
+                      color: colour.kTextDark,
                       fontWeight: FontWeight.w700,
                       fontSize: 13)),
               const Icon(Icons.calendar_month_outlined,
-                  size: 18, color: kHeaderGradEnd),
+                  size: 18, color: colour.kHeaderGradEnd),
             ],
           ),
         ]),
@@ -1083,9 +1072,9 @@ class _ESearchField extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
         decoration: BoxDecoration(
-          color: disabled ? const Color(0xFFF5F5F5) : kDetailBg,
+          color: disabled ? const Color(0xFFF5F5F5) : colour.kDetailBg,
           borderRadius: BorderRadius.circular(10),
-          border: Border.all(color: kCardBorder, width: 0.5),
+          border: Border.all(color: colour.kCardBorder, width: 0.5),
         ),
         child: Row(
           children: [
@@ -1093,7 +1082,7 @@ class _ESearchField extends StatelessWidget {
               child: Text(
                 value.isEmpty ? hint : value,
                 style: GoogleFonts.lato(
-                  color: value.isEmpty ? kTextMuted : kTextDark,
+                  color: value.isEmpty ? colour.kTextMuted : colour.kTextDark,
                   fontWeight:
                   value.isEmpty ? FontWeight.w500 : FontWeight.w600,
                   fontSize: objfun.FontLow,
@@ -1104,7 +1093,7 @@ class _ESearchField extends StatelessWidget {
             Icon(
               value.isNotEmpty ? Icons.close_rounded : Icons.search_rounded,
               size: 20,
-              color: disabled ? kTextMuted : kHeaderGradEnd,
+              color: disabled ? colour.kTextMuted : colour.kHeaderGradEnd,
             ),
           ],
         ),
@@ -1140,7 +1129,7 @@ class _AnimatedCheckbox extends StatelessWidget {
                 gradient: value ? kGradient : null,
                 border: value
                     ? null
-                    : Border.all(color: kCardBorder, width: 1.5),
+                    : Border.all(color: colour.kCardBorder, width: 1.5),
                 borderRadius: BorderRadius.circular(5),
               ),
               child: value
@@ -1151,7 +1140,7 @@ class _AnimatedCheckbox extends StatelessWidget {
             const SizedBox(width: 6),
             Text(label,
                 style: GoogleFonts.lato(
-                    color: kTextDark,
+                    color: colour.kTextDark,
                     fontWeight: FontWeight.w600,
                     fontSize: isTablet
                         ? objfun.FontLow + 1
@@ -1176,7 +1165,7 @@ class _GradientButton extends StatelessWidget {
         borderRadius: BorderRadius.circular(24),
         boxShadow: [
           BoxShadow(
-              color: kHeaderGradStart.withOpacity(0.35),
+              color: colour.kHeaderGradStart.withOpacity(0.35),
               blurRadius: 10,
               offset: const Offset(0, 4))
         ],
@@ -1210,9 +1199,9 @@ class _OutlineButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        color: kChipBg,
+        color: colour.kChipBg,
         borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: kCardBorder),
+        border: Border.all(color: colour.kCardBorder),
       ),
       child: Material(
         color: Colors.transparent,
@@ -1224,7 +1213,7 @@ class _OutlineButton extends StatelessWidget {
             const EdgeInsets.symmetric(horizontal: 28, vertical: 11),
             child: Text(label,
                 style: GoogleFonts.lato(
-                    color: kHeaderGradStart,
+                    color: colour.kHeaderGradStart,
                     fontWeight: FontWeight.w700,
                     fontSize: objfun.FontMedium)),
           ),

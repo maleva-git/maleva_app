@@ -3,28 +3,13 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:maleva/core/utils/clsfunction.dart' as objfun;
+import '../../../../../../core/theme/tokens.dart';
 import '../bloc/maintenance_bloc.dart';
 import '../bloc/maintenance_event.dart';
 import '../bloc/maintenance_state.dart';
+import 'package:maleva/core/colors/colors.dart' as colour;
 
 
-// ─── Design Tokens ────────────────────────────────────────────────────────────
-const kHeaderGradStart = Color(0xFF1A3A8F);
-const kHeaderGradEnd   = Color(0xFF4A6FD4);
-const kCardBorder      = Color(0xFFC5D0EE);
-const kPageBg          = Color(0xFFF4F6FB);
-const kTextDark        = Color(0xFF1E2D5E);
-const kTextMid         = Color(0xFF4A5A8A);
-const kTextMuted       = Color(0xFF8A96BF);
-const kDetailBg        = Color(0xFFF0F4FF);
-const kChipBg          = Color(0xFFEEF2FF);
-const kAccentRed       = Color(0xFFB33040);
-
-const kGradient = LinearGradient(
-  colors: [kHeaderGradStart, kHeaderGradEnd],
-  begin: Alignment.topLeft,
-  end: Alignment.bottomRight,
-);
 
 const double kTabletBreak = 600;
 
@@ -51,7 +36,7 @@ class _MaintenanceView extends StatelessWidget {
       builder: (context, state) {
         if (state is MaintenanceInitial || state is MaintenanceLoading) {
           return const Center(
-            child: SpinKitFoldingCube(color: kHeaderGradEnd, size: 35),
+            child: SpinKitFoldingCube(color: AppTokens.invoiceHeaderEnd, size: 35),
           );
         }
         if (state is MaintenanceLoaded) {
@@ -66,7 +51,7 @@ class _MaintenanceView extends StatelessWidget {
         if (state is MaintenanceError) {
           return Center(
             child: Text(state.message,
-                style: GoogleFonts.lato(color: kAccentRed, fontSize: 13)),
+                style: GoogleFonts.lato(color: colour.kAccentRed, fontSize: 13)),
           );
         }
         return const SizedBox.shrink();
@@ -104,7 +89,7 @@ class _MaintenanceBody extends StatelessWidget {
             child: Text(
               '${state.currentMonthName} Sales',
               style: GoogleFonts.lato(
-                color: kAccentRed,
+                color: colour.kAccentRed,
                 fontWeight: FontWeight.w700,
                 fontSize: objfun.FontLarge,
                 letterSpacing: 0.3,
@@ -235,10 +220,10 @@ class _MaintenanceStatRow extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: kCardBorder, width: 0.5),
+        border: Border.all(color: AppTokens.maintCardBorder, width: 0.5),
         boxShadow: [
           BoxShadow(
-            color: kHeaderGradStart.withOpacity(0.05),
+            color: AppTokens.invoiceHeaderStart.withOpacity(0.05),
             blurRadius: 6,
             offset: const Offset(0, 2),
           ),
@@ -251,17 +236,19 @@ class _MaintenanceStatRow extends StatelessWidget {
             width: 3,
             height: 28,
             decoration: BoxDecoration(
-              gradient: kGradient,
+              gradient: AppTokens.headerGradient,
               borderRadius: BorderRadius.circular(2),
             ),
           ),
           const SizedBox(width: 10),
+
+
           Expanded(
             flex: 5,
             child: Text(
               title,
               style: GoogleFonts.lato(
-                color: kTextDark,
+                color: colour.kTextDark,
                 fontWeight: FontWeight.w700,
                 fontSize: objfun.FontLow,
                 letterSpacing: 0.3,
@@ -274,14 +261,14 @@ class _MaintenanceStatRow extends StatelessWidget {
               padding:
               const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
               decoration: BoxDecoration(
-                color: kChipBg,
+                color: colour.kChipBg,
                 borderRadius: BorderRadius.circular(6),
               ),
               child: Text(
                 '$count',
                 textAlign: TextAlign.center,
                 style: GoogleFonts.lato(
-                  color: kHeaderGradStart,
+                  color: AppTokens.invoiceHeaderStart,
                   fontWeight: FontWeight.w700,
                   fontSize: objfun.FontLow,
                 ),
@@ -295,7 +282,7 @@ class _MaintenanceStatRow extends StatelessWidget {
               amount.toStringAsFixed(2),
               textAlign: TextAlign.right,
               style: GoogleFonts.lato(
-                color: kTextMid,
+                color: AppTokens.maintTextMid,
                 fontWeight: FontWeight.w600,
                 fontSize: objfun.FontLow,
               ),
@@ -326,10 +313,10 @@ class _MaintenanceStatCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: kCardBorder, width: 0.5),
+        border: Border.all(color: AppTokens.maintCardBorder, width: 0.5),
         boxShadow: [
           BoxShadow(
-            color: kHeaderGradStart.withOpacity(0.05),
+            color: AppTokens.invoiceHeaderStart.withOpacity(0.05),
             blurRadius: 6,
             offset: const Offset(0, 2),
           ),
@@ -340,7 +327,7 @@ class _MaintenanceStatCard extends StatelessWidget {
           Container(
             width: 3,
             decoration: BoxDecoration(
-              gradient: kGradient,
+              gradient: AppTokens.headerGradient,
               borderRadius: BorderRadius.circular(2),
             ),
           ),
@@ -349,7 +336,7 @@ class _MaintenanceStatCard extends StatelessWidget {
             child: Text(
               title,
               style: GoogleFonts.lato(
-                color: kTextDark,
+                color: colour.kTextDark,
                 fontWeight: FontWeight.w700,
                 fontSize: objfun.FontLow,
               ),
@@ -360,13 +347,13 @@ class _MaintenanceStatCard extends StatelessWidget {
             padding:
             const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
             decoration: BoxDecoration(
-              color: kChipBg,
+              color: colour.kChipBg,
               borderRadius: BorderRadius.circular(6),
             ),
             child: Text(
               '$count',
               style: GoogleFonts.lato(
-                color: kHeaderGradStart,
+                color: AppTokens.invoiceHeaderStart,
                 fontWeight: FontWeight.w700,
                 fontSize: objfun.FontLow,
               ),
@@ -376,7 +363,7 @@ class _MaintenanceStatCard extends StatelessWidget {
           Text(
             amount.toStringAsFixed(2),
             style: GoogleFonts.lato(
-              color: kTextMid,
+              color: AppTokens.maintTextMid,
               fontWeight: FontWeight.w600,
               fontSize: objfun.FontLow,
             ),
@@ -409,16 +396,16 @@ class _MaintenanceList extends StatelessWidget {
               width: 56,
               height: 56,
               decoration: BoxDecoration(
-                color: kChipBg,
+                color: colour.kChipBg,
                 borderRadius: BorderRadius.circular(14),
               ),
               child: const Icon(Icons.build_outlined,
-                  size: 28, color: kHeaderGradEnd),
+                  size: 28, color: AppTokens.invoiceHeaderEnd),
             ),
             const SizedBox(height: 12),
             Text('No Records Found',
                 style: GoogleFonts.lato(
-                    color: kTextDark,
+                    color: AppTokens.maintTextDark,
                     fontWeight: FontWeight.w600,
                     fontSize: 14)),
           ],
@@ -476,10 +463,10 @@ class _MaintenanceCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: kCardBorder, width: 0.5),
+        border: Border.all(color: AppTokens.maintCardBorder, width: 0.5),
         boxShadow: [
           BoxShadow(
-            color: kHeaderGradStart.withOpacity(0.06),
+            color: AppTokens.invoiceHeaderStart.withOpacity(0.06),
             blurRadius: 8,
             offset: const Offset(0, 2),
           ),
@@ -491,7 +478,7 @@ class _MaintenanceCard extends StatelessWidget {
           children: [
             Container(
               width: 4,
-              decoration: const BoxDecoration(gradient: kGradient),
+              decoration: const BoxDecoration(gradient: AppTokens.headerGradient),
             ),
             Expanded(
               child: Padding(
@@ -506,7 +493,7 @@ class _MaintenanceCard extends StatelessWidget {
                           Text(
                             title,
                             style: GoogleFonts.lato(
-                              color: kTextDark,
+                              color: AppTokens.maintTextDark,
                               fontWeight: FontWeight.w700,
                               // Fallback value for font size
                               fontSize: objfun.FontCardText ?? 14.0,
@@ -518,12 +505,12 @@ class _MaintenanceCard extends StatelessWidget {
                             Row(
                               children: [
                                 const Icon(Icons.calendar_today_outlined,
-                                    size: 11, color: kTextMuted),
+                                    size: 11, color: AppTokens.planTextMuted),
                                 const SizedBox(width: 4),
                                 Text(
                                   'Due: $dueDate',
                                   style: GoogleFonts.lato(
-                                    color: kTextMuted,
+                                    color: AppTokens.planTextMuted,
                                     fontSize: 11,
                                     fontWeight: FontWeight.w500,
                                   ),
@@ -537,14 +524,14 @@ class _MaintenanceCard extends StatelessWidget {
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                       decoration: BoxDecoration(
-                        color: kDetailBg,
+                        color: colour.kDetailBg,
                         borderRadius: BorderRadius.circular(8),
-                        border: Border.all(color: kCardBorder, width: 0.5),
+                        border: Border.all(color: AppTokens.maintCardBorder, width: 0.5),
                       ),
                       child: Text(
                         'RM ${amount.toStringAsFixed(2)}', // Ippo ithu safe
                         style: GoogleFonts.lato(
-                          color: kHeaderGradStart,
+                          color: AppTokens.invoiceHeaderStart,
                           fontWeight: FontWeight.w700,
                           fontSize: objfun.FontCardText ?? 14.0,
                         ),
@@ -578,17 +565,17 @@ class _ToggleButton extends StatelessWidget {
     return AnimatedContainer(
       duration: const Duration(milliseconds: 180),
       decoration: BoxDecoration(
-        gradient: active ? kGradient : null,
+        gradient: active ? AppTokens.headerGradient : null,
         color: active ? null : Colors.white,
         borderRadius: BorderRadius.circular(20),
         border: Border.all(
-          color: active ? kHeaderGradStart : kHeaderGradEnd,
+          color: active ? AppTokens.invoiceHeaderStart : AppTokens.invoiceHeaderEnd,
           width: active ? 0 : 1,
         ),
         boxShadow: active
             ? [
           BoxShadow(
-            color: kHeaderGradStart,
+            color: AppTokens.invoiceHeaderStart,
             blurRadius: 8,
             offset: const Offset(0, 3),
           )
@@ -606,7 +593,7 @@ class _ToggleButton extends StatelessWidget {
             child: Text(
               label,
               style: GoogleFonts.lato(
-                color: active ? Colors.white : kTextMid,
+                color: active ? Colors.white : AppTokens.maintTextMid,
                 fontWeight: FontWeight.w700,
                 fontSize: objfun.FontMedium,
               ),

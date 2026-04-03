@@ -1,11 +1,11 @@
 import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:maleva/core/models/model.dart';
 import 'package:maleva/core/utils/clsfunction.dart' as objfun;
 import 'package:maleva/core/colors/colors.dart' as colour;
+import '../../../../../../core/theme/tokens.dart';
 import '../bloc/pdo_bloc.dart';
 import '../bloc/pdo_event.dart';
 import '../bloc/pdo_state.dart';
@@ -96,7 +96,7 @@ class _PDOViewBody extends StatelessWidget {
                           .add(const ResetPDOSaveStatusEvent());
                     },
                     child: Text("OK",
-                        style: GoogleFonts.lato(color: colour.kPrimary)),
+                        style: GoogleFonts.lato(color: AppTokens.brandGradientStart)),
                   ),
                 ],
               ),
@@ -108,7 +108,7 @@ class _PDOViewBody extends StatelessWidget {
 
         if (state is PDOViewLoading) {
           return const Center(
-              child: CircularProgressIndicator(color: colour.kPrimary));
+              child: CircularProgressIndicator(color: AppTokens.brandGradientStart));
         }
 
 
@@ -130,7 +130,7 @@ class _PDOViewBody extends StatelessWidget {
                 icon: const Icon(Icons.refresh),
                 label: const Text("Retry"),
                 style: ElevatedButton.styleFrom(
-                    backgroundColor: colour.kPrimary),
+                    backgroundColor: AppTokens.brandGradientStart),
               ),
             ]),
           );
@@ -150,27 +150,27 @@ class _PDOViewBody extends StatelessWidget {
                   Container(
                     width: 32, height: 32,
                     decoration: const BoxDecoration(
-                        color: colour.kAccent, shape: BoxShape.circle),
+                        color: AppTokens.brandLight, shape: BoxShape.circle),
                     child: const Icon(Icons.receipt_long_rounded,
-                        color: colour.kPrimary, size: 16),
+                        color: AppTokens.brandGradientStart, size: 16),
                   ),
                   const SizedBox(width: 8),
                   Text("RTI Details",
                       style: GoogleFonts.lato(
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
-                          color: colour.kPrimaryDark)),
+                          color: AppTokens.brandGradientStartDark)),
                   const Spacer(),
                   if (s.filteredMasters.isNotEmpty)
                     Container(
                       padding: const EdgeInsets.symmetric(
                           horizontal: 10, vertical: 4),
                       decoration: BoxDecoration(
-                          color: colour.kAccent,
+                          color: AppTokens.brandLight,
                           borderRadius: BorderRadius.circular(8)),
                       child: Text("${s.filteredMasters.length} records",
                           style: GoogleFonts.lato(
-                              color: colour.kPrimary,
+                              color: AppTokens.brandGradientStart,
                               fontWeight: FontWeight.bold,
                               fontSize: 12)),
                     ),
@@ -182,22 +182,22 @@ class _PDOViewBody extends StatelessWidget {
                 TextField(
                   onChanged: (v) =>
                       context.read<PDOBloc>().add(SearchPDOEvent(v)),
-                  style: GoogleFonts.lato(color: colour.kPrimaryDark),
+                  style: GoogleFonts.lato(color: AppTokens.brandDark),
                   decoration: InputDecoration(
                     hintText: "Search RTI No / Driver / Truck",
                     hintStyle: GoogleFonts.lato(color: Colors.grey),
-                    prefixIcon: const Icon(Icons.search, color: colour.kPrimary),
+                    prefixIcon: const Icon(Icons.search, color: AppTokens.brandGradientStart),
                     contentPadding: const EdgeInsets.symmetric(
                         vertical: 12, horizontal: 14),
                     filled: true,
-                    fillColor: colour.kAccent,
+                    fillColor: AppTokens.brandLight,
                     border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(12),
                         borderSide: BorderSide.none),
                     focusedBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(12),
                         borderSide: const BorderSide(
-                            color: colour.kPrimary, width: 1.5)),
+                            color: AppTokens.brandGradientStart, width: 1.5)),
                   ),
                 ),
 
@@ -263,10 +263,10 @@ class _RTIMasterCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: colour.kWhite,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: colour.kAccent, width: 1.5),
+        border: Border.all(color: AppTokens.brandLight, width: 1.5),
         boxShadow: [
           BoxShadow(
-              color: colour.kPrimary.withOpacity(0.06),
+              color: AppTokens.brandGradientStart.withOpacity(0.06),
               blurRadius: 8,
               offset: const Offset(0, 3)),
         ],
@@ -285,7 +285,7 @@ class _RTIMasterCard extends StatelessWidget {
               padding: const EdgeInsets.symmetric(
                   horizontal: 14, vertical: 12),
               decoration: const BoxDecoration(
-                color: colour.kPrimary,
+                color: AppTokens.brandGradientStart,
               ),
               child: Row(children: [
                 // RTI No
@@ -330,7 +330,7 @@ class _RTIMasterCard extends StatelessWidget {
                 margin: const EdgeInsets.fromLTRB(12, 8, 12, 4),
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: colour.kAccent,
+                  color: AppTokens.brandLight,
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Column(
@@ -409,10 +409,10 @@ class _RTIDetailRow extends StatelessWidget {
         color: colour.kWhite,
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
-            color: colour.kPrimaryLight.withOpacity(0.25), width: 1.2),
+            color: AppTokens.brandMid.withOpacity(0.25), width: 1.2),
         boxShadow: [
           BoxShadow(
-              color: colour.kPrimary.withOpacity(0.04),
+              color: AppTokens.brandGradientStart.withOpacity(0.04),
               blurRadius: 4,
               offset: const Offset(0, 2)),
         ],
@@ -426,7 +426,7 @@ class _RTIDetailRow extends StatelessWidget {
                 style: GoogleFonts.lato(
                     fontWeight: FontWeight.bold,
                     fontSize: 14,
-                    color: colour.kPrimaryDark)),
+                    color: AppTokens.brandDark)),
           ),
           // Verify checkbox as icon toggle
           GestureDetector(
@@ -440,7 +440,7 @@ class _RTIDetailRow extends StatelessWidget {
               decoration: BoxDecoration(
                 color: detail.isVerified
                     ? Colors.green.shade600
-                    : colour.kAccent,
+                    : AppTokens.brandLight,
                 borderRadius: BorderRadius.circular(8),
               ),
               child: Row(mainAxisSize: MainAxisSize.min, children: [
@@ -450,7 +450,7 @@ class _RTIDetailRow extends StatelessWidget {
                       : Icons.circle_outlined,
                   color: detail.isVerified
                       ? colour.kWhite
-                      : colour.kPrimary,
+                      : AppTokens.brandGradientStart,
                   size: 16,
                 ),
                 const SizedBox(width: 4),
@@ -461,7 +461,7 @@ class _RTIDetailRow extends StatelessWidget {
                       fontWeight: FontWeight.bold,
                       color: detail.isVerified
                           ? colour.kWhite
-                          : colour.kPrimary),
+                          : AppTokens.brandGradientStart),
                 ),
               ]),
             ),
@@ -516,7 +516,7 @@ Widget _buildImageThumbnail(BuildContext context, String? path) {
         width: 90, height: 90,
         decoration: BoxDecoration(
           border: Border.all(
-              color: colour.kPrimaryLight.withOpacity(0.3)),
+              color: AppTokens.brandMid.withOpacity(0.3)),
           borderRadius: BorderRadius.circular(8),
         ),
         child: imageWidget,
@@ -571,7 +571,7 @@ Widget _infoRow(String label, String? value) {
       Expanded(
         child: Text(value,
             style: GoogleFonts.lato(
-                fontSize: 13, color: colour.kPrimaryDark)),
+                fontSize: 13, color: AppTokens.brandDark)),
       ),
     ]),
   );
@@ -592,7 +592,7 @@ class _SuccessDialog extends StatelessWidget {
         const SizedBox(width: 10),
         Text("Success",
             style: GoogleFonts.lato(
-                fontWeight: FontWeight.bold, color: colour.kPrimaryDark)),
+                fontWeight: FontWeight.bold, color: AppTokens.brandDark)),
       ]),
       content: Text("Saved successfully!",
           style: GoogleFonts.lato(fontSize: 14)),
@@ -600,7 +600,7 @@ class _SuccessDialog extends StatelessWidget {
         ElevatedButton(
           onPressed: onOk,
           style: ElevatedButton.styleFrom(
-              backgroundColor: colour.kPrimary,
+              backgroundColor: AppTokens.brandGradientStart,
               shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(8))),
           child: Text("OK",

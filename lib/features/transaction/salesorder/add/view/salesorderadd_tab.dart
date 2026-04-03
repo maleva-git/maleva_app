@@ -25,21 +25,9 @@ import '../../view/view/salesorderview_tab.dart';
 import '../bloc/salesorderadd_bloc.dart';
 import '../bloc/salesorderadd_event.dart';
 import '../bloc/salesorderadd_state.dart';
+import 'package:maleva/core/colors/colors.dart' as colour;
 
-// ── Brand palette (same as SaleOrderView) ────────────────
-const _brand      = Color(0xFF1555F3);
-const _brandDark  = Color(0xFF0D3DB8);
-const _brandLight = Color(0xFFE8EFFE);
-const _brandMid   = Color(0xFF4B7BF5);
-const _surface    = Color(0xFFF4F7FF);
-const _textMain   = Color(0xFF0D1B4B);
-const _textSub    = Color(0xFF5A6A9A);
-const _border     = Color(0x261555F3);
-const _red        = Color(0xFFE53935);
 
-// ════════════════════════════════════════════════════════
-// Entry widget
-// ════════════════════════════════════════════════════════
 class SalesOrdersAdd extends StatelessWidget {
   final List<SaleEditDetailModel>? SaleDetails;
   final List<dynamic>? SaleMaster;
@@ -121,26 +109,26 @@ class _SalesOrderAddBodyState extends State<_SalesOrderAddBody>
         if (state is SalesOrderAddLoading ||
             state is SalesOrderAddInitial) {
           return const Scaffold(
-            backgroundColor: _surface,
+            backgroundColor: colour.surface,
             body: Center(
-              child: SpinKitFoldingCube(color: _brand, size: 35),
+              child: SpinKitFoldingCube(color: colour.brand, size: 35),
             ),
           );
         }
 
         if (state is SalesOrderAddError) {
           return Scaffold(
-            backgroundColor: _surface,
+            backgroundColor: colour.surface,
             body: Center(
               child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     const Icon(Icons.error_outline,
-                        color: _red, size: 48),
+                        color: colour.red, size: 48),
                     const SizedBox(height: 12),
                     Text(state.message,
                         style: GoogleFonts.poppins(
-                            color: _textSub, fontSize: 14)),
+                            color: colour.textSub, fontSize: 14)),
                   ]),
             ),
           );
@@ -158,13 +146,13 @@ class _SalesOrderAddBodyState extends State<_SalesOrderAddBody>
           },
           child: Scaffold(
             resizeToAvoidBottomInset: true,
-            backgroundColor: _surface,
+            backgroundColor: colour.surface,
             appBar: _buildAppBar(context, state),
             drawer: const Menulist(),
             body: state.progress == false
                 ? const Center(
                 child: SpinKitFoldingCube(
-                    color: _brand, size: 35))
+                    color: colour.brand, size: 35))
                 : _buildTabBody(
                 context, state, width, height),
             bottomNavigationBar:
@@ -184,7 +172,7 @@ class _SalesOrderAddBodyState extends State<_SalesOrderAddBody>
       flexibleSpace: Container(
         decoration: const BoxDecoration(
           gradient: LinearGradient(
-            colors: [_brand, _brandMid],
+            colors: [colour.brand, colour.brandMid],
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
           ),
@@ -316,25 +304,25 @@ class _SalesOrderAddBodyState extends State<_SalesOrderAddBody>
         color: Colors.white,
         boxShadow: [
           BoxShadow(
-            color: _brand.withOpacity(0.1),
+            color: colour.brand.withOpacity(0.1),
             blurRadius: 12,
             offset: const Offset(0, -3),
           )
         ],
         border: Border(
-            top: BorderSide(color: _border, width: 1)),
+            top: BorderSide(color: colour.border, width: 1)),
       ),
       child: SalomonBottomBar(
         duration: const Duration(milliseconds: 300),
         currentIndex: _tabController.index,
         onTap: (i) => setState(() => _tabController.index = i),
-        selectedItemColor: _brand,
-        unselectedItemColor: _textSub,
+        selectedItemColor: colour.brand,
+        unselectedItemColor: colour.textSub,
         items: navIcons
             .map((icon) => SalomonBottomBarItem(
           icon: Icon(icon, size: 22),
           title: const SizedBox.shrink(),
-          selectedColor: _brand,
+          selectedColor: colour.brand,
         ))
             .toList(),
       ),
@@ -377,7 +365,7 @@ class _SalesOrderAddBodyState extends State<_SalesOrderAddBody>
               child: Text(
                 state.totalAmount.toString(),
                 style: GoogleFonts.poppins(
-                    color: _red, fontSize: 16, fontWeight: FontWeight.w800),
+                    color: colour.red, fontSize: 16, fontWeight: FontWeight.w800),
               ),
             ),
           ),
@@ -1344,7 +1332,7 @@ class _SalesOrderAddBodyState extends State<_SalesOrderAddBody>
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: _border),
+        border: Border.all(color: colour.border),
         boxShadow: const [
           BoxShadow(color: Color(0x0A1555F3), blurRadius: 8, offset: Offset(0, 2))
         ],
@@ -1356,19 +1344,19 @@ class _SalesOrderAddBodyState extends State<_SalesOrderAddBody>
           child: Container(
             padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
             decoration: BoxDecoration(
-              color: visible ? _brandLight : Colors.white,
+              color: visible ? colour.brandLight : Colors.white,
               borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
             ),
             child: Row(children: [
               AnimatedRotation(
                 turns: visible ? 0.25 : 0,
                 duration: const Duration(milliseconds: 200),
-                child: Icon(Icons.arrow_right_rounded, color: _brand, size: 28),
+                child: Icon(Icons.arrow_right_rounded, color: colour.brand, size: 28),
               ),
               const SizedBox(width: 8),
               Text("FW $fwNum",
                   style: GoogleFonts.poppins(
-                      color: _brandDark, fontSize: 14, fontWeight: FontWeight.w700)),
+                      color: colour.brandDark, fontSize: 14, fontWeight: FontWeight.w700)),
               const SizedBox(width: 12),
               Expanded(
                 child: _styledDropdown<String>(
@@ -1501,7 +1489,7 @@ class _SalesOrderAddBodyState extends State<_SalesOrderAddBody>
       Row(children: [
         Text("ZB $zbNum",
             style: GoogleFonts.poppins(
-                color: _brandDark, fontSize: 14, fontWeight: FontWeight.w700)),
+                color: colour.brandDark, fontSize: 14, fontWeight: FontWeight.w700)),
         const SizedBox(width: 12),
         Expanded(
           child: _styledDropdown<String>(
@@ -1648,7 +1636,7 @@ class _SalesOrderAddBodyState extends State<_SalesOrderAddBody>
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       decoration: BoxDecoration(
-        gradient: const LinearGradient(colors: [_brand, _brandMid]),
+        gradient: const LinearGradient(colors: [colour.brand, colour.brandMid]),
         borderRadius: BorderRadius.circular(10),
       ),
       child: Row(children: [
@@ -1680,7 +1668,7 @@ class _SalesOrderAddBodyState extends State<_SalesOrderAddBody>
     padding: const EdgeInsets.symmetric(vertical: 20),
     child: Center(
       child: Text('No products added',
-          style: GoogleFonts.poppins(color: _textSub, fontSize: 13)),
+          style: GoogleFonts.poppins(color: colour.textSub, fontSize: 13)),
     ),
   );
 
@@ -1691,36 +1679,36 @@ class _SalesOrderAddBodyState extends State<_SalesOrderAddBody>
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: _border),
+        border: Border.all(color: colour.border),
       ),
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
       child: Row(children: [
         Expanded(flex: 1,
             child: Text('${index + 1}',
-                style: GoogleFonts.poppins(color: _brand, fontSize: 11, fontWeight: FontWeight.w800))),
+                style: GoogleFonts.poppins(color: colour.brand, fontSize: 11, fontWeight: FontWeight.w800))),
         Expanded(flex: 2,
             child: Text(p.ProductCode.toString(),
-                style: GoogleFonts.poppins(color: _brand, fontSize: 11, fontWeight: FontWeight.w700),
+                style: GoogleFonts.poppins(color: colour.brand, fontSize: 11, fontWeight: FontWeight.w700),
                 overflow: TextOverflow.ellipsis)),
         Expanded(flex: 4,
             child: Text(p.ProductName.toString(),
-                style: GoogleFonts.poppins(color: _textMain, fontSize: 11, fontWeight: FontWeight.w600),
+                style: GoogleFonts.poppins(color: colour.textMain, fontSize: 11, fontWeight: FontWeight.w600),
                 overflow: TextOverflow.ellipsis)),
         Expanded(flex: 1,
             child: Text('${p.ItemQty}',
-                style: GoogleFonts.poppins(color: _textSub, fontSize: 11, fontWeight: FontWeight.w600))),
+                style: GoogleFonts.poppins(color: colour.textSub, fontSize: 11, fontWeight: FontWeight.w600))),
         Expanded(flex: 2,
             child: Text('${p.SalesRate}',
-                style: GoogleFonts.poppins(color: _textSub, fontSize: 11),
+                style: GoogleFonts.poppins(color: colour.textSub, fontSize: 11),
                 overflow: TextOverflow.ellipsis)),
         Expanded(flex: 2,
             child: Text('${p.TaxPercent}%',
-                style: GoogleFonts.poppins(color: _textSub, fontSize: 11))),
+                style: GoogleFonts.poppins(color: colour.textSub, fontSize: 11))),
         Expanded(
           flex: 2,
           child: Text('${p.Amount}',
               textAlign: TextAlign.right,
-              style: GoogleFonts.poppins(color: _brand, fontSize: 11, fontWeight: FontWeight.w800)),
+              style: GoogleFonts.poppins(color: colour.brand, fontSize: 11, fontWeight: FontWeight.w800)),
         ),
         Row(
           mainAxisSize: MainAxisSize.min,
@@ -1729,14 +1717,14 @@ class _SalesOrderAddBodyState extends State<_SalesOrderAddBody>
               onTap: () => _showProductDialog(context, state, index),
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 2),
-                child: const Icon(Icons.edit_rounded, color: _brand, size: 18),
+                child: const Icon(Icons.edit_rounded, color: colour.brand, size: 18),
               ),
             ),
             GestureDetector(
               onTap: () => bloc.add(RemoveProduct(index)),
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 2),
-                child: Icon(Icons.delete_rounded, color: _red, size: 18),
+                child: Icon(Icons.delete_rounded, color: colour.red, size: 18),
               ),
             ),
           ],
@@ -1761,7 +1749,7 @@ class _SalesOrderAddBodyState extends State<_SalesOrderAddBody>
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: _border),
+          border: Border.all(color: colour.border),
           boxShadow: const [
             BoxShadow(color: Color(0x0A1555F3), blurRadius: 8, offset: Offset(0, 2))
           ],
@@ -1774,27 +1762,27 @@ class _SalesOrderAddBodyState extends State<_SalesOrderAddBody>
 
   Widget _sectionLabel(String t) => Text(t,
       style: GoogleFonts.poppins(
-          color: _textSub, fontSize: 10, fontWeight: FontWeight.w700, letterSpacing: 0.6));
+          color: colour.textSub, fontSize: 10, fontWeight: FontWeight.w700, letterSpacing: 0.6));
 
   Widget _labelText(String t) => Text(t,
-      style: GoogleFonts.poppins(color: _textMain, fontSize: 13, fontWeight: FontWeight.w600));
+      style: GoogleFonts.poppins(color: colour.textMain, fontSize: 13, fontWeight: FontWeight.w600));
 
   Widget _gap() => const SizedBox(height: 10);
-  Widget _divider() => Divider(color: _border, thickness: 1);
+  Widget _divider() => Divider(color: colour.border, thickness: 1);
 
   Widget _readonlyBox(String val) => Container(
     key: ValueKey('readonly_$val'),
     height: 44,
     padding: const EdgeInsets.symmetric(horizontal: 12),
     decoration: BoxDecoration(
-      color: _brandLight,
+      color: colour.brandLight,
       borderRadius: BorderRadius.circular(10),
-      border: Border.all(color: _border),
+      border: Border.all(color: colour.border),
     ),
     alignment: Alignment.centerLeft,
     child: Text(val,
         style: GoogleFonts.poppins(
-            color: _brandDark, fontSize: 13, fontWeight: FontWeight.w700)),
+            color: colour.brandDark, fontSize: 13, fontWeight: FontWeight.w700)),
   );
 
   Widget _dateTapBox({required String date, required VoidCallback? onTap}) =>
@@ -1804,17 +1792,17 @@ class _SalesOrderAddBodyState extends State<_SalesOrderAddBody>
           height: 44,
           padding: const EdgeInsets.symmetric(horizontal: 12),
           decoration: BoxDecoration(
-            color: _brandLight,
+            color: colour.brandLight,
             borderRadius: BorderRadius.circular(10),
-            border: Border.all(color: _border),
+            border: Border.all(color: colour.border),
           ),
           child: Row(children: [
-            const Icon(Icons.calendar_today_rounded, color: _brand, size: 15),
+            const Icon(Icons.calendar_today_rounded, color: colour.brand, size: 15),
             const SizedBox(width: 8),
             Flexible(
               child: Text(date,
                   style: GoogleFonts.poppins(
-                      color: _brandDark, fontSize: 13, fontWeight: FontWeight.w600)),
+                      color: colour.brandDark, fontSize: 13, fontWeight: FontWeight.w600)),
             ),
           ]),
         ),
@@ -1834,9 +1822,9 @@ class _SalesOrderAddBodyState extends State<_SalesOrderAddBody>
       child: Container(
         height: 46,
         decoration: BoxDecoration(
-          color: enabled ? Colors.white : _surface,
+          color: enabled ? Colors.white : colour.surface,
           borderRadius: BorderRadius.circular(10),
-          border: Border.all(color: enabled ? _border : _border.withOpacity(0.3)),
+          border: Border.all(color: enabled ? colour.border : colour.border.withOpacity(0.3)),
         ),
         child: Row(children: [
           const SizedBox(width: 12),
@@ -1844,7 +1832,7 @@ class _SalesOrderAddBodyState extends State<_SalesOrderAddBody>
             child: Text(
               value.isEmpty ? hint : value,
               style: GoogleFonts.poppins(
-                  color: value.isEmpty ? _textSub.withOpacity(0.45) : _textMain,
+                  color: value.isEmpty ? colour.textSub.withOpacity(0.45) : colour.textMain,
                   fontSize: 13,
                   fontWeight: value.isEmpty ? FontWeight.w400 : FontWeight.w600),
               overflow: TextOverflow.ellipsis,
@@ -1854,7 +1842,7 @@ class _SalesOrderAddBodyState extends State<_SalesOrderAddBody>
             padding: const EdgeInsets.all(10),
             child: Icon(
               value.isEmpty ? Icons.search_rounded : Icons.close_rounded,
-              color: enabled ? _brand : _textSub.withOpacity(0.25),
+              color: enabled ? colour.brand : colour.textSub.withOpacity(0.25),
               size: 20,
             ),
           ),
@@ -1882,25 +1870,25 @@ class _SalesOrderAddBodyState extends State<_SalesOrderAddBody>
         keyboardType: keyboardType,
         textCapitalization: TextCapitalization.characters,
         style: GoogleFonts.poppins(
-            color: _textMain, fontSize: 13, fontWeight: FontWeight.w600),
+            color: colour.textMain, fontSize: 13, fontWeight: FontWeight.w600),
         decoration: InputDecoration(
           hintText: hint,
           hintStyle: GoogleFonts.poppins(
-              color: _textSub.withOpacity(0.45), fontSize: 13),
+              color: colour.textSub.withOpacity(0.45), fontSize: 13),
           contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
           filled: true,
-          fillColor: enabled ? Colors.white : _surface,
+          fillColor: enabled ? Colors.white : colour.surface,
           enabledBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(10),
-            borderSide: const BorderSide(color: _border),
+            borderSide: const BorderSide(color: colour.border),
           ),
           disabledBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(10),
-            borderSide: BorderSide(color: _border.withOpacity(0.3)),
+            borderSide: BorderSide(color: colour.border.withOpacity(0.3)),
           ),
           focusedBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(10),
-            borderSide: const BorderSide(color: _brand, width: 1.5),
+            borderSide: const BorderSide(color: colour.brand, width: 1.5),
           ),
         ),
       );
@@ -1916,9 +1904,9 @@ class _SalesOrderAddBodyState extends State<_SalesOrderAddBody>
       Container(
         constraints: const BoxConstraints(minHeight: 80),
         decoration: BoxDecoration(
-          color: enabled ? Colors.white : _surface,
+          color: enabled ? Colors.white : colour.surface,
           borderRadius: BorderRadius.circular(10),
-          border: Border.all(color: _border),
+          border: Border.all(color: colour.border),
         ),
         child: TextField(
           controller: TextEditingController(text: value),
@@ -1928,11 +1916,11 @@ class _SalesOrderAddBodyState extends State<_SalesOrderAddBody>
           minLines: 3,
           textCapitalization: TextCapitalization.characters,
           style: GoogleFonts.poppins(
-              color: _textMain, fontSize: 13, fontWeight: FontWeight.w600),
+              color: colour.textMain, fontSize: 13, fontWeight: FontWeight.w600),
           decoration: InputDecoration(
             hintText: hint,
             hintStyle: GoogleFonts.poppins(
-                color: _textSub.withOpacity(0.45), fontSize: 13),
+                color: colour.textSub.withOpacity(0.45), fontSize: 13),
             contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
             border: InputBorder.none,
             suffixIcon: onSearch != null
@@ -1942,7 +1930,7 @@ class _SalesOrderAddBodyState extends State<_SalesOrderAddBody>
                 padding: const EdgeInsets.all(8),
                 child: Icon(
                   value.isEmpty ? Icons.search_rounded : Icons.close_rounded,
-                  color: _brand,
+                  color: colour.brand,
                   size: 20,
                 ),
               ),
@@ -1962,9 +1950,9 @@ class _SalesOrderAddBodyState extends State<_SalesOrderAddBody>
         key: ValueKey('dropdown_${T}_$value'),
         padding: const EdgeInsets.symmetric(horizontal: 12),
         decoration: BoxDecoration(
-          color: enabled ? Colors.white : _surface,
+          color: enabled ? Colors.white : colour.surface,
           borderRadius: BorderRadius.circular(10),
-          border: Border.all(color: enabled ? _border : _border.withOpacity(0.3)),
+          border: Border.all(color: enabled ? colour.border : colour.border.withOpacity(0.3)),
         ),
         child: DropdownButtonHideUnderline(
           child: DropdownButton<T>(
@@ -1972,14 +1960,14 @@ class _SalesOrderAddBodyState extends State<_SalesOrderAddBody>
             value: value,
             onChanged: enabled ? onChanged : null,
             style: GoogleFonts.poppins(
-                color: _textMain, fontSize: 13, fontWeight: FontWeight.w600),
-            icon: const Icon(Icons.keyboard_arrow_down_rounded, color: _brand, size: 20),
+                color: colour.textMain, fontSize: 13, fontWeight: FontWeight.w600),
+            icon: const Icon(Icons.keyboard_arrow_down_rounded, color: colour.brand, size: 20),
             items: items
                 .map((v) => DropdownMenuItem<T>(
                 value: v,
                 child: Text(v.toString(),
                     style: GoogleFonts.poppins(
-                        color: _textMain, fontSize: 13, fontWeight: FontWeight.w600))))
+                        color: colour.textMain, fontSize: 13, fontWeight: FontWeight.w600))))
                 .toList(),
           ),
         ),
@@ -2003,7 +1991,7 @@ class _SalesOrderAddBodyState extends State<_SalesOrderAddBody>
         width: 90,
         child: Text(label,
             style: GoogleFonts.poppins(
-                color: _textMain, fontSize: 12, fontWeight: FontWeight.w600)),
+                color: colour.textMain, fontSize: 12, fontWeight: FontWeight.w600)),
       ),
       Expanded(
         child: GestureDetector(
@@ -2017,9 +2005,9 @@ class _SalesOrderAddBodyState extends State<_SalesOrderAddBody>
               builder: (ctx, child) => Theme(
                 data: Theme.of(ctx).copyWith(
                   colorScheme: const ColorScheme.light(
-                    primary: _brand,
+                    primary: colour.brand,
                     onPrimary: Colors.white,
-                    onSurface: _textMain,
+                    onSurface: colour.textMain,
                   ),
                 ),
                 child: child!,
@@ -2048,19 +2036,19 @@ class _SalesOrderAddBodyState extends State<_SalesOrderAddBody>
             height: 44,
             padding: const EdgeInsets.symmetric(horizontal: 12),
             decoration: BoxDecoration(
-              color: checkValue ? _brandLight : _surface,
+              color: checkValue ? colour.brandLight : colour.surface,
               borderRadius: BorderRadius.circular(10),
               border: Border.all(
-                  color: checkValue ? _border : _border.withOpacity(0.3)),
+                  color: checkValue ? colour.border : colour.border.withOpacity(0.3)),
             ),
             child: Row(children: [
-              const Icon(Icons.calendar_today_rounded, size: 14, color: _brand),
+              const Icon(Icons.calendar_today_rounded, size: 14, color: colour.brand),
               const SizedBox(width: 8),
               Expanded(
                 child: Text(
                   DateFormat(fmt).format(DateTime.parse(dateStr)),
                   style: GoogleFonts.poppins(
-                      color: checkValue ? _brandDark : _textSub,
+                      color: checkValue ? colour.brandDark : colour.textSub,
                       fontSize: 12,
                       fontWeight: FontWeight.w600),
                 ),
@@ -2074,8 +2062,8 @@ class _SalesOrderAddBodyState extends State<_SalesOrderAddBody>
         scale: 1.1,
         child: Checkbox(
           value: checkValue,
-          activeColor: _brand,
-          side: BorderSide(color: _border, width: 1.5),
+          activeColor: colour.brand,
+          side: BorderSide(color: colour.border, width: 1.5),
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
           onChanged: enabled
               ? (v) => bloc.add(UpdateCheckbox(checkKey, v!))
@@ -2096,12 +2084,12 @@ class _SalesOrderAddBodyState extends State<_SalesOrderAddBody>
           width: 40,
           height: 40,
           decoration: BoxDecoration(
-            color: enabled ? _brandLight : _surface,
+            color: enabled ? colour.brandLight : colour.surface,
             borderRadius: BorderRadius.circular(10),
-            border: Border.all(color: enabled ? _border : _border.withOpacity(0.3)),
+            border: Border.all(color: enabled ? colour.border : colour.border.withOpacity(0.3)),
           ),
           child: Icon(icon,
-              color: enabled ? _brand : _textSub.withOpacity(0.3), size: 22),
+              color: enabled ? colour.brand : colour.textSub.withOpacity(0.3), size: 22),
         ),
       );
 }
@@ -2149,15 +2137,15 @@ class _ProductDialogState extends State<_ProductDialog> {
                   width: 36,
                   height: 36,
                   decoration: BoxDecoration(
-                    color: _brandLight,
+                    color: colour.brandLight,
                     borderRadius: BorderRadius.circular(10),
                   ),
-                  child: const Icon(Icons.add_shopping_cart_rounded, color: _brand, size: 20),
+                  child: const Icon(Icons.add_shopping_cart_rounded, color: colour.brand, size: 20),
                 ),
                 const SizedBox(width: 10),
                 Text("Add Product",
                     style: GoogleFonts.poppins(
-                        color: _textMain, fontSize: 15, fontWeight: FontWeight.w700)),
+                        color: colour.textMain, fontSize: 15, fontWeight: FontWeight.w700)),
                 const Spacer(),
                 GestureDetector(
                   onTap: () {
@@ -2168,17 +2156,17 @@ class _ProductDialogState extends State<_ProductDialog> {
                     width: 32,
                     height: 32,
                     decoration: BoxDecoration(
-                      color: _surface,
+                      color: colour.surface,
                       borderRadius: BorderRadius.circular(8),
-                      border: Border.all(color: _border),
+                      border: Border.all(color: colour.border),
                     ),
-                    child: const Icon(Icons.close_rounded, color: _textSub, size: 18),
+                    child: const Icon(Icons.close_rounded, color: colour.textSub, size: 18),
                   ),
                 ),
               ]),
 
               const SizedBox(height: 12),
-              Divider(color: _border),
+              Divider(color: colour.border),
               const SizedBox(height: 8),
 
               Expanded(
@@ -2226,17 +2214,17 @@ class _ProductDialogState extends State<_ProductDialog> {
                         height: 44,
                         padding: const EdgeInsets.symmetric(horizontal: 12),
                         decoration: BoxDecoration(
-                          color: _brandLight,
+                          color: colour.brandLight,
                           borderRadius: BorderRadius.circular(10),
-                          border: Border.all(color: _brand.withOpacity(0.3)),
+                          border: Border.all(color: colour.brand.withOpacity(0.3)),
                         ),
                         child: Row(children: [
                           Text('Amount : ',
                               style: GoogleFonts.poppins(
-                                  color: _textSub, fontSize: 12, fontWeight: FontWeight.w600)),
+                                  color: colour.textSub, fontSize: 12, fontWeight: FontWeight.w600)),
                           Text(state.txtProductAmount,
                               style: GoogleFonts.poppins(
-                                  color: _brand, fontSize: 15, fontWeight: FontWeight.w800)),
+                                  color: colour.brand, fontSize: 15, fontWeight: FontWeight.w800)),
                         ]),
                       ),
                     ],
@@ -2250,9 +2238,9 @@ class _ProductDialogState extends State<_ProductDialog> {
                 flex: 4,
                 child: Container(
                   decoration: BoxDecoration(
-                    color: _surface,
+                    color: colour.surface,
                     borderRadius: BorderRadius.circular(14),
-                    border: Border.all(color: _border),
+                    border: Border.all(color: colour.border),
                   ),
                   padding: const EdgeInsets.all(8),
                   child: Column(children: [
@@ -2282,15 +2270,15 @@ class _ProductDialogState extends State<_ProductDialog> {
         height: 44,
         padding: const EdgeInsets.symmetric(horizontal: 12),
         decoration: BoxDecoration(
-          color: _surface,
+          color: colour.surface,
           borderRadius: BorderRadius.circular(10),
-          border: Border.all(color: _border),
+          border: Border.all(color: colour.border),
         ),
         alignment: Alignment.centerLeft,
         child: Text(
           value.isEmpty ? hint : value,
           style: GoogleFonts.poppins(
-              color: value.isEmpty ? _textSub : _textMain,
+              color: value.isEmpty ? colour.textSub : colour.textMain,
               fontSize: 13,
               fontWeight: value.isEmpty ? FontWeight.w400 : FontWeight.w600),
         ),
@@ -2307,7 +2295,7 @@ class _ProductDialogState extends State<_ProductDialog> {
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(10),
-          border: Border.all(color: _border),
+          border: Border.all(color: colour.border),
         ),
         child: Row(children: [
           const SizedBox(width: 12),
@@ -2315,7 +2303,7 @@ class _ProductDialogState extends State<_ProductDialog> {
             child: Text(
               value.isEmpty ? hint : value,
               style: GoogleFonts.poppins(
-                  color: value.isEmpty ? _textSub.withOpacity(0.45) : _textMain,
+                  color: value.isEmpty ? colour.textSub.withOpacity(0.45) : colour.textMain,
                   fontSize: 13,
                   fontWeight: value.isEmpty ? FontWeight.w400 : FontWeight.w600),
               overflow: TextOverflow.ellipsis,
@@ -2327,7 +2315,7 @@ class _ProductDialogState extends State<_ProductDialog> {
               padding: const EdgeInsets.all(10),
               child: Icon(
                 value.isEmpty ? Icons.search_rounded : Icons.close_rounded,
-                color: _brand,
+                color: colour.brand,
                 size: 20,
               ),
             ),
@@ -2343,21 +2331,21 @@ class _ProductDialogState extends State<_ProductDialog> {
         height: 44,
         padding: const EdgeInsets.symmetric(horizontal: 12),
         decoration: BoxDecoration(
-          color: active ? _brandLight : Colors.white,
+          color: active ? colour.brandLight : Colors.white,
           borderRadius: BorderRadius.circular(10),
-          border: Border.all(color: active ? _brand : _border, width: active ? 1.5 : 1),
+          border: Border.all(color: active ? colour.brand : colour.border, width: active ? 1.5 : 1),
         ),
         child: Row(children: [
           Expanded(
             child: Text(
               value.isEmpty ? hint : value,
               style: GoogleFonts.poppins(
-                  color: value.isEmpty ? _textSub.withOpacity(0.45) : _textMain,
+                  color: value.isEmpty ? colour.textSub.withOpacity(0.45) : colour.textMain,
                   fontSize: 13,
                   fontWeight: value.isEmpty ? FontWeight.w400 : FontWeight.w700),
             ),
           ),
-          if (active) Container(width: 2, height: 18, color: _brand),
+          if (active) Container(width: 2, height: 18, color: colour.brand),
         ]),
       ),
     );
@@ -2380,12 +2368,12 @@ class _ProductDialogState extends State<_ProductDialog> {
             onTap: onPressed,
             child: Container(
               decoration: BoxDecoration(
-                color: isAction ? _brand : Colors.white,
+                color: isAction ? colour.brand : Colors.white,
                 borderRadius: BorderRadius.circular(10),
-                border: Border.all(color: isAction ? _brand : _border),
+                border: Border.all(color: isAction ? colour.brand : colour.border),
                 boxShadow: [
                   BoxShadow(
-                    color: isAction ? _brand.withOpacity(0.2) : Colors.black.withOpacity(0.04),
+                    color: isAction ? colour.brand.withOpacity(0.2) : Colors.black.withOpacity(0.04),
                     blurRadius: 4,
                     offset: const Offset(0, 2),
                   )
@@ -2394,7 +2382,7 @@ class _ProductDialogState extends State<_ProductDialog> {
               alignment: Alignment.center,
               child: Text(label,
                   style: GoogleFonts.poppins(
-                      color: isAction ? Colors.white : _textMain,
+                      color: isAction ? Colors.white : colour.textMain,
                       fontSize: isAction ? 13 : 16,
                       fontWeight: FontWeight.w700)),
             ),
@@ -2441,16 +2429,16 @@ class _AddressListDialog extends StatelessWidget {
               width: 36,
               height: 36,
               decoration: BoxDecoration(
-                color: _brandLight,
+                color: colour.brandLight,
                 borderRadius: BorderRadius.circular(10),
               ),
-              child: const Icon(Icons.list_rounded, color: _brand, size: 20),
+              child: const Icon(Icons.list_rounded, color: colour.brand, size: 20),
             ),
             const SizedBox(width: 10),
             Expanded(
               child: Text(title,
                   style: GoogleFonts.poppins(
-                      color: _textMain, fontSize: 14, fontWeight: FontWeight.w700),
+                      color: colour.textMain, fontSize: 14, fontWeight: FontWeight.w700),
                   overflow: TextOverflow.ellipsis),
             ),
             GestureDetector(
@@ -2462,24 +2450,24 @@ class _AddressListDialog extends StatelessWidget {
                 width: 32,
                 height: 32,
                 decoration: BoxDecoration(
-                  color: _surface,
+                  color: colour.surface,
                   borderRadius: BorderRadius.circular(8),
-                  border: Border.all(color: _border),
+                  border: Border.all(color: colour.border),
                 ),
-                child: const Icon(Icons.close_rounded, color: _textSub, size: 18),
+                child: const Icon(Icons.close_rounded, color: colour.textSub, size: 18),
               ),
             ),
           ]),
 
           const SizedBox(height: 10),
-          Divider(color: _border),
+          Divider(color: colour.border),
           const SizedBox(height: 6),
 
           Expanded(
             child: addresses.isEmpty
                 ? Center(
                 child: Text('No records',
-                    style: GoogleFonts.poppins(color: _textSub, fontSize: 13)))
+                    style: GoogleFonts.poppins(color: colour.textSub, fontSize: 13)))
                 : ListView.builder(
               itemCount: addresses.length,
               itemBuilder: (ctx, index) => InkWell(
@@ -2497,7 +2485,7 @@ class _AddressListDialog extends StatelessWidget {
                   decoration: BoxDecoration(
                     color: Colors.white,
                     borderRadius: BorderRadius.circular(12),
-                    border: Border.all(color: _border),
+                    border: Border.all(color: colour.border),
                     boxShadow: const [
                       BoxShadow(color: Color(0x0A1555F3), blurRadius: 6, offset: Offset(0, 2))
                     ],
@@ -2508,21 +2496,21 @@ class _AddressListDialog extends StatelessWidget {
                       flex: 3,
                       child: Text(addresses[index].toString(),
                           style: GoogleFonts.poppins(
-                              color: _textMain, fontSize: 12, fontWeight: FontWeight.w600)),
+                              color: colour.textMain, fontSize: 12, fontWeight: FontWeight.w600)),
                     ),
                     const SizedBox(width: 8),
                     Expanded(
                       child: Container(
                         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                         decoration: BoxDecoration(
-                          color: _brandLight,
+                          color: colour.brandLight,
                           borderRadius: BorderRadius.circular(8),
                         ),
                         child: Text(
                           index < quantities.length ? quantities[index].toString() : '',
                           textAlign: TextAlign.center,
                           style: GoogleFonts.poppins(
-                              color: _brand, fontSize: 12, fontWeight: FontWeight.w700),
+                              color: colour.brand, fontSize: 12, fontWeight: FontWeight.w700),
                         ),
                       ),
                     ),

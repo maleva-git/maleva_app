@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import '../../../../../../core/colors/colors.dart';
+import '../../../../../../core/theme/tokens.dart';
 import '../bloc/receiptview_bloc.dart';
 import '../bloc/receiptview_event.dart';
 import '../bloc/receiptview_state.dart';
@@ -46,7 +47,7 @@ class ReceiptPage extends StatelessWidget {
                 Expanded(
                   child: !state.progress
                       ? const Center(
-                    child: CircularProgressIndicator(color: kPrimary),
+                    child: CircularProgressIndicator(color: AppTokens.brandGradientStart),
                   )
                       : _ReceiptList(state: state, isTablet: true),
                 ),
@@ -75,9 +76,7 @@ class ReceiptPage extends StatelessWidget {
     );
   }
 
-  // ══════════════════════════════════════════════════════
-  // MOBILE — Single Column
-  // ══════════════════════════════════════════════════════
+
   Widget _buildMobileLayout(BuildContext context, ReceiptState state) {
     return Column(
       children: [
@@ -86,7 +85,7 @@ class ReceiptPage extends StatelessWidget {
         Expanded(
           child: !state.progress
               ? const Center(
-            child: CircularProgressIndicator(color: kPrimary),
+            child: CircularProgressIndicator(color: AppTokens.brandGradientStart),
           )
               : _ReceiptList(state: state, isTablet: false),
         ),
@@ -115,7 +114,7 @@ class _FilterCard extends StatelessWidget {
         border: Border.all(color: kAccent, width: 1.5),
         boxShadow: [
           BoxShadow(
-            color: kPrimary.withOpacity(0.08),
+            color: AppTokens.brandGradientStart.withOpacity(0.08),
             blurRadius: 20,
             offset: const Offset(0, 4),
           ),
@@ -155,14 +154,14 @@ class _FilterCard extends StatelessWidget {
               padding: EdgeInsets.all(isTablet ? 15 : 13),
               decoration: BoxDecoration(
                 gradient: const LinearGradient(
-                  colors: [kPrimary, kPrimaryDark],
+                  colors: [AppTokens.brandGradientStart, kPrimaryDark],
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
                 ),
                 borderRadius: BorderRadius.circular(isTablet ? 16 : 14),
                 boxShadow: [
                   BoxShadow(
-                    color: kPrimary.withOpacity(0.35),
+                    color: AppTokens.brandGradientStart.withOpacity(0.35),
                     blurRadius: 12,
                     offset: const Offset(0, 4),
                   ),
@@ -209,10 +208,10 @@ class _DateButton extends StatelessWidget {
             Container(
               padding: EdgeInsets.all(isTablet ? 6 : 5),
               decoration: BoxDecoration(
-                color: kPrimary.withOpacity(0.12),
+                color: AppTokens.brandGradientStart.withOpacity(0.12),
                 borderRadius: BorderRadius.circular(7),
               ),
-              child: Icon(icon, size: isTablet ? 15 : 13, color: kPrimary),
+              child: Icon(icon, size: isTablet ? 15 : 13, color: AppTokens.brandGradientStart),
             ),
             const SizedBox(width: 8),
             Flexible(
@@ -249,14 +248,14 @@ class _SummaryCard extends StatelessWidget {
       padding: EdgeInsets.all(isTablet ? 24 : 20),
       decoration: BoxDecoration(
         gradient: const LinearGradient(
-          colors: [kPrimary, kPrimaryDark],
+          colors: [AppTokens.brandGradientStart, kPrimaryDark],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
         borderRadius: BorderRadius.circular(isTablet ? 28 : 24),
         boxShadow: [
           BoxShadow(
-            color: kPrimary.withOpacity(0.4),
+            color: AppTokens.brandGradientStart.withOpacity(0.4),
             blurRadius: 24,
             offset: const Offset(0, 8),
           ),
@@ -377,7 +376,7 @@ class _StatsPanel extends StatelessWidget {
         border: Border.all(color: kAccent, width: 1.5),
         boxShadow: [
           BoxShadow(
-            color: kPrimary.withOpacity(0.07),
+            color: AppTokens.brandGradientStart.withOpacity(0.07),
             blurRadius: 16,
             offset: const Offset(0, 4),
           ),
@@ -391,7 +390,7 @@ class _StatsPanel extends StatelessWidget {
             Container(
               width: 4, height: 20,
               decoration: BoxDecoration(
-                color: kPrimary,
+                color: AppTokens.brandGradientStart,
                 borderRadius: BorderRadius.circular(4),
               ),
             ),
@@ -410,7 +409,7 @@ class _StatsPanel extends StatelessWidget {
           _statRow('Total Bills',
               '${state.receiptMaster.length}',
               Icons.receipt_long_rounded,
-              kPrimary),
+              AppTokens.brandGradientStart),
           const SizedBox(height: 10),
           _statRow('Paid',
               '$paidCount',
@@ -511,7 +510,7 @@ class _StatsPanel extends StatelessWidget {
             Text('${(percent * 100).toStringAsFixed(1)}%',
                 style: GoogleFonts.poppins(
                   fontSize: 11,
-                  color: kPrimary,
+                  color: AppTokens.brandGradientStart,
                   fontWeight: FontWeight.w700,
                 )),
           ],
@@ -523,7 +522,7 @@ class _StatsPanel extends StatelessWidget {
             value: percent,
             minHeight: 8,
             backgroundColor: kAccent,
-            valueColor: const AlwaysStoppedAnimation<Color>(kPrimary),
+            valueColor: const AlwaysStoppedAnimation<Color>(AppTokens.brandGradientStart),
           ),
         ),
       ],
@@ -551,7 +550,7 @@ class _ReceiptList extends StatelessWidget {
             Container(
               width: 4, height: 20,
               decoration: BoxDecoration(
-                color: kPrimary,
+                color: AppTokens.brandGradientStart,
                 borderRadius: BorderRadius.circular(4),
               ),
             ),
@@ -594,7 +593,7 @@ class _ReceiptCard extends StatelessWidget {
         border: Border.all(color: kAccent, width: 1.2),
         boxShadow: [
           BoxShadow(
-            color: kPrimary.withOpacity(0.07),
+            color: AppTokens.brandGradientStart.withOpacity(0.07),
             blurRadius: 16,
             offset: const Offset(0, 4),
           ),
@@ -657,7 +656,7 @@ class _ReceiptCard extends StatelessWidget {
                       fontWeight: FontWeight.w700,
                       color: isPaid
                           ? const Color(0xFF0F766E)
-                          : kPrimary,
+                          : AppTokens.brandGradientStart,
                     ),
                   ),
                 ),
@@ -675,7 +674,7 @@ class _ReceiptCard extends StatelessWidget {
                   child: _AmountChip(
                     label: 'Total',
                     amount: 'RM ${billAmount.toStringAsFixed(2)}',
-                    color: kPrimary,
+                    color: AppTokens.brandGradientStart,
                     bgColor: RWhite,
                     isTablet: isTablet,
                   ),
@@ -685,7 +684,7 @@ class _ReceiptCard extends StatelessWidget {
                   child: _AmountChip(
                     label: 'Collected',
                     amount: 'RM ${collected.toStringAsFixed(2)}',
-                    color: kPrimary,
+                    color: AppTokens.brandGradientStart,
                     bgColor: RWhite,
                     isTablet: isTablet,
                   ),
@@ -697,7 +696,7 @@ class _ReceiptCard extends StatelessWidget {
                     amount: 'RM ${balance.toStringAsFixed(2)}',
                     color: balance > 0
                         ? const Color(0xFF740000)
-                        : kPrimary,
+                        : AppTokens.brandGradientStart,
                     bgColor: balance > 0 // Note: Both conditions evaluate to RWhite here, you might want to check this!
                         ? RWhite
                         : RWhite,

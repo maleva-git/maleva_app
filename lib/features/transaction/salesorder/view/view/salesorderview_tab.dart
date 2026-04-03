@@ -10,28 +10,14 @@ import 'package:maleva/menu/menulist.dart';
 import 'package:maleva/MasterSearch/Customer.dart';
 import 'package:maleva/MasterSearch/Employee.dart';
 import 'package:maleva/MasterSearch/JobStatus.dart';
-
-
+import 'package:maleva/core/colors/colors.dart' as colour;
 import '../../add/view/salesorderadd_tab.dart';
 import '../bloc/salesorderview_bloc.dart';
 import '../bloc/salesorderview_event.dart';
 import '../bloc/salesorderview_state.dart';
 
 
-// ── Brand palette ─────────────────────────────────────────
-const _brand      = Color(0xFF1555F3);
-const _brandDark  = Color(0xFF0D3DB8);
-const _brandDeep  = Color(0xFF0A2D8A);
-const _brandLight = Color(0xFFE8EFFE);
-const _brandMid   = Color(0xFF4B7BF5);
-const _brandGlow  = Color(0x1F1555F3);
-const _surface    = Color(0xFFF4F7FF);
-const _textMain   = Color(0xFF0D1B4B);
-const _textSub    = Color(0xFF5A6A9A);
-const _border     = Color(0x261555F3);
-const _red        = Color(0xFFE53935);
-const _yellow     = Color(0xFFF9A825);
-const _green      = Color(0xFF2E7D32);
+
 
 // ── Breakpoint: <= 600 → mobile, > 600 → tablet ──────────
 bool _isMobile(double width) => width <= 600;
@@ -65,21 +51,21 @@ class _SaleOrderViewBody extends StatelessWidget {
         if (state is SalesOrderViewLoading ||
             state is SalesOrderViewInitial) {
           return const Scaffold(
-            backgroundColor: _surface,
+            backgroundColor: colour.surface,
             body: Center(
-                child: SpinKitFoldingCube(color: _brand, size: 35)),
+                child: SpinKitFoldingCube(color: colour.brand, size: 35)),
           );
         }
         if (state is SalesOrderViewError) {
           return Scaffold(
-            backgroundColor: _surface,
+            backgroundColor: colour.surface,
             body: Center(
               child: Column(mainAxisSize: MainAxisSize.min, children: [
-                const Icon(Icons.error_outline, color: _red, size: 48),
+                const Icon(Icons.error_outline, color: colour.red, size: 48),
                 const SizedBox(height: 12),
                 Text(state.message,
                     style: GoogleFonts.poppins(
-                        color: _textSub, fontSize: 14)),
+                        color: colour.textSub, fontSize: 14)),
               ]),
             ),
           );
@@ -92,12 +78,12 @@ class _SaleOrderViewBody extends StatelessWidget {
             return false;
           },
           child: Scaffold(
-            backgroundColor: _surface,
+            backgroundColor: colour.surface,
             appBar: _SaleAppBar(state: state),
             drawer: const Menulist(),
             body: state.progress == false
                 ? const Center(
-                child: SpinKitFoldingCube(color: _brand, size: 35))
+                child: SpinKitFoldingCube(color: colour.brand, size: 35))
                 : LayoutBuilder(
               builder: (ctx, constraints) =>
               _isMobile(constraints.maxWidth)
@@ -131,7 +117,7 @@ class _SaleAppBar extends StatelessWidget
       flexibleSpace: Container(
         decoration: const BoxDecoration(
           gradient: LinearGradient(
-              colors: [_brand, _brandMid],
+              colors: [colour.brand, colour.brandMid],
               begin: Alignment.topLeft,
               end: Alignment.bottomRight),
           boxShadow: [
@@ -218,7 +204,7 @@ class _MobileColHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      color: _brandDeep,
+      color: colour.brandDeep,
       padding:
       const EdgeInsets.symmetric(horizontal: 16, vertical: 9),
       child: Column(children: [
@@ -269,10 +255,10 @@ class _MobileCard extends StatelessWidget {
     final hasPickup = model.SPickupDate.toString().isNotEmpty;
     final hasETA    = model.SETA.toString().isNotEmpty;
     final hasOETA   = model.SOETA.toString().isNotEmpty;
-    if (!hasPickup && !hasETA && !hasOETA) return _red;
-    if (!hasPickup) return _yellow;
-    if (hasETA || hasOETA) return _green;
-    return model.JobMasterRefId == 10 ? _brand : _green;
+    if (!hasPickup && !hasETA && !hasOETA) return colour.red;
+    if (!hasPickup) return colour.yellow;
+    if (hasETA || hasOETA) return colour.green;
+    return model.JobMasterRefId == 10 ? colour.brand : colour.green;
   }
 
   bool get _expanded => state.expandedIndex == index;
@@ -287,7 +273,7 @@ class _MobileCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: _border, width: 1),
+        border: Border.all(color: colour.border, width: 1),
         boxShadow: [
           BoxShadow(
               color: strip.withOpacity(0.08),
@@ -394,13 +380,13 @@ class _MobileCard extends StatelessWidget {
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           Icon(Icons.person_outline_rounded,
-                              size: 13, color: _textSub),
+                              size: 13, color: colour.textSub),
                           const SizedBox(width: 3),
                           Flexible(
                             child: Text(
                               model.EmployeeName.toString(),
                               style: GoogleFonts.poppins(
-                                  color: _textSub,
+                                  color: colour.textSub,
                                   fontSize: 11,
                                   fontWeight:
                                   FontWeight.w600),
@@ -419,7 +405,7 @@ class _MobileCard extends StatelessWidget {
                   height: 1,
                   margin: const EdgeInsets.symmetric(
                       horizontal: 14),
-                  color: _brandLight),
+                  color: colour.brandLight),
 
               // ── Vessel / ETA info grid ────────────────
               Padding(
@@ -470,20 +456,20 @@ class _MobileCard extends StatelessWidget {
                     end: Alignment.centerRight,
                   ),
                   borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: _border),
+                  border: Border.all(color: colour.border),
                 ),
                 child: Row(children: [
                   Container(
                     width: 28,
                     height: 28,
                     decoration: BoxDecoration(
-                      color: _brand.withOpacity(0.12),
+                      color: colour.brand.withOpacity(0.12),
                       borderRadius:
                       BorderRadius.circular(8),
                     ),
                     child: const Icon(
                         Icons.business_rounded,
-                        color: _brand,
+                        color: colour.brand,
                         size: 16),
                   ),
                   const SizedBox(width: 10),
@@ -491,7 +477,7 @@ class _MobileCard extends StatelessWidget {
                     child: Text(
                       model.CustomerName.toString(),
                       style: GoogleFonts.poppins(
-                          color: _brandDark,
+                          color: colour.brandDark,
                           fontSize: 12,
                           fontWeight: FontWeight.w700),
                       overflow: TextOverflow.ellipsis,
@@ -506,12 +492,12 @@ class _MobileCard extends StatelessWidget {
                       borderRadius:
                       BorderRadius.circular(8),
                       border: Border.all(
-                          color: _brand.withOpacity(0.25)),
+                          color: colour.brand.withOpacity(0.25)),
                     ),
                     child: Text(
                       model.BillNoDisplay.toString(),
                       style: GoogleFonts.poppins(
-                          color: _brand,
+                          color: colour.brand,
                           fontSize: 10,
                           fontWeight: FontWeight.w800,
                           letterSpacing: 0.3),
@@ -532,7 +518,7 @@ class _MobileCard extends StatelessWidget {
                         padding: const EdgeInsets.symmetric(
                             horizontal: 8, vertical: 3),
                         decoration: BoxDecoration(
-                          color: _brandLight,
+                          color: colour.brandLight,
                           borderRadius:
                           BorderRadius.circular(6),
                         ),
@@ -540,11 +526,11 @@ class _MobileCard extends StatelessWidget {
                           mainAxisSize: MainAxisSize.min,
                           children: [
                             const Icon(Icons.anchor_rounded,
-                                color: _brandMid, size: 12),
+                                color: colour.brandMid, size: 12),
                             const SizedBox(width: 4),
                             Text(model.SPort.toString(),
                                 style: GoogleFonts.poppins(
-                                    color: _brandDark,
+                                    color: colour.brandDark,
                                     fontSize: 10,
                                     fontWeight:
                                     FontWeight.w700)),
@@ -556,13 +542,13 @@ class _MobileCard extends StatelessWidget {
                         .isNotEmpty) ...[
                       const SizedBox(width: 8),
                       const Icon(Icons.flight_rounded,
-                          color: _brandMid, size: 12),
+                          color: colour.brandMid, size: 12),
                       const SizedBox(width: 4),
                       Expanded(
                         child: Text(
                           model.FlighTime.toString(),
                           style: GoogleFonts.poppins(
-                              color: _textSub,
+                              color: colour.textSub,
                               fontSize: 10,
                               fontWeight: FontWeight.w500),
                           overflow: TextOverflow.ellipsis,
@@ -589,7 +575,7 @@ class _MobileCard extends StatelessWidget {
                           borderRadius:
                           BorderRadius.circular(10),
                           border:
-                          Border.all(color: _border),
+                          Border.all(color: colour.border),
                         ),
                         child: Row(
                           mainAxisAlignment:
@@ -602,13 +588,13 @@ class _MobileCard extends StatelessWidget {
                                   : Icons
                                   .keyboard_arrow_down_rounded,
                               size: 18,
-                              color: _brand,
+                              color: colour.brand,
                             ),
                             const SizedBox(width: 4),
                             Text(
                               _expanded ? 'Close' : 'Details',
                               style: GoogleFonts.poppins(
-                                  color: _brand,
+                                  color: colour.brand,
                                   fontSize: 12,
                                   fontWeight:
                                   FontWeight.w700),
@@ -686,7 +672,7 @@ class _MobileCard extends StatelessWidget {
           children: [
             Text(label,
                 style: GoogleFonts.poppins(
-                    color: _textSub,
+                    color: colour.textSub,
                     fontSize: 9,
                     fontWeight: FontWeight.w600,
                     letterSpacing: 0.5)),
@@ -696,7 +682,7 @@ class _MobileCard extends StatelessWidget {
               style: GoogleFonts.poppins(
                   color: val.isEmpty
                       ? const Color(0xFFCBD5E1)
-                      : _textMain,
+                      : colour.textMain,
                   fontSize: 11,
                   fontWeight: val.isEmpty
                       ? FontWeight.w400
@@ -728,15 +714,15 @@ class _MobileCard extends StatelessWidget {
               width: 60,
               height: 60,
               decoration: BoxDecoration(
-                  color: _brandLight,
+                  color: colour.brandLight,
                   borderRadius: BorderRadius.circular(30)),
               child: const Icon(Icons.lock_rounded,
-                  color: _brand, size: 28),
+                  color: colour.brand, size: 28),
             ),
             const SizedBox(height: 14),
             Text(title,
                 style: GoogleFonts.poppins(
-                    color: _textMain,
+                    color: colour.textMain,
                     fontSize: 16,
                     fontWeight: FontWeight.w700)),
             const SizedBox(height: 14),
@@ -747,9 +733,9 @@ class _MobileCard extends StatelessWidget {
               decoration: InputDecoration(
                 hintText: 'Enter password',
                 hintStyle: GoogleFonts.poppins(
-                    color: _textSub, fontSize: 13),
+                    color: colour.textSub, fontSize: 13),
                 filled: true,
-                fillColor: _brandLight,
+                fillColor: colour.brandLight,
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12),
                   borderSide: BorderSide.none,
@@ -757,10 +743,10 @@ class _MobileCard extends StatelessWidget {
                 focusedBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12),
                   borderSide: const BorderSide(
-                      color: _brand, width: 1.5),
+                      color: colour.brand, width: 1.5),
                 ),
                 prefixIcon: const Icon(Icons.vpn_key_rounded,
-                    color: _brand),
+                    color: colour.brand),
               ),
             ),
             const SizedBox(height: 16),
@@ -769,7 +755,7 @@ class _MobileCard extends StatelessWidget {
                 child: OutlinedButton(
                   onPressed: () => Navigator.of(ctx).pop(),
                   style: OutlinedButton.styleFrom(
-                    side: const BorderSide(color: _border),
+                    side: const BorderSide(color: colour.border),
                     shape: RoundedRectangleBorder(
                         borderRadius:
                         BorderRadius.circular(12)),
@@ -778,7 +764,7 @@ class _MobileCard extends StatelessWidget {
                   ),
                   child: Text('Cancel',
                       style: GoogleFonts.poppins(
-                          color: _textSub,
+                          color: colour.textSub,
                           fontWeight: FontWeight.w600)),
                 ),
               ),
@@ -786,7 +772,7 @@ class _MobileCard extends StatelessWidget {
               Expanded(
                 child: ElevatedButton(
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: _brand,
+                    backgroundColor: colour.brand,
                     shape: RoundedRectangleBorder(
                         borderRadius:
                         BorderRadius.circular(12)),
@@ -852,7 +838,7 @@ class _TabletBody extends StatelessWidget {
     return Column(children: [
       // Tablet header — all columns one row
       Container(
-        color: _brandDeep,
+        color: colour.brandDeep,
         padding: const EdgeInsets.symmetric(
             horizontal: 16, vertical: 11),
         child: Row(children: [
@@ -916,10 +902,10 @@ class _TabletRow extends StatelessWidget {
     final hasPickup = model.SPickupDate.toString().isNotEmpty;
     final hasETA    = model.SETA.toString().isNotEmpty;
     final hasOETA   = model.SOETA.toString().isNotEmpty;
-    if (!hasPickup && !hasETA && !hasOETA) return _red;
-    if (!hasPickup) return _yellow;
-    if (hasETA || hasOETA) return _green;
-    return model.JobMasterRefId == 10 ? _brand : _green;
+    if (!hasPickup && !hasETA && !hasOETA) return colour.red;
+    if (!hasPickup) return colour.yellow;
+    if (hasETA || hasOETA) return colour.green;
+    return model.JobMasterRefId == 10 ? colour.brand : colour.green;
   }
 
   bool get _expanded => state.expandedIndex == index;
@@ -1010,13 +996,13 @@ class _TabletRow extends StatelessWidget {
                   children: [
                     Text(model.CustomerName.toString(),
                         style: GoogleFonts.poppins(
-                            color: _brandDark,
+                            color: colour.brandDark,
                             fontSize: 11,
                             fontWeight: FontWeight.w700),
                         overflow: TextOverflow.ellipsis),
                     Text(model.SPort.toString(),
                         style: GoogleFonts.poppins(
-                            color: _textSub,
+                            color: colour.textSub,
                             fontSize: 10),
                         overflow: TextOverflow.ellipsis),
                   ],
@@ -1027,7 +1013,7 @@ class _TabletRow extends StatelessWidget {
                 child: Text(
                   model.BillNoDisplay.toString(),
                   style: GoogleFonts.poppins(
-                      color: _brand,
+                      color: colour.brand,
                       fontSize: 11,
                       fontWeight: FontWeight.w700),
                   overflow: TextOverflow.ellipsis,
@@ -1044,7 +1030,7 @@ class _TabletRow extends StatelessWidget {
                       icon: _expanded
                           ? Icons.keyboard_arrow_up_rounded
                           : Icons.expand_more_rounded,
-                      color: _brand,
+                      color: colour.brand,
                       onTap: () =>
                           bloc.add(ExpandRow(index)),
                     ),
@@ -1074,7 +1060,7 @@ class _TabletRow extends StatelessWidget {
       style: GoogleFonts.poppins(
           color: val.isEmpty
               ? const Color(0xFFCBD5E1)
-              : _textMain,
+              : colour.textMain,
           fontSize: 11,
           fontWeight: val.isEmpty
               ? FontWeight.w400
@@ -1124,15 +1110,15 @@ class _TabletRow extends StatelessWidget {
                 width: 64,
                 height: 64,
                 decoration: BoxDecoration(
-                    color: _brandLight,
+                    color: colour.brandLight,
                     borderRadius: BorderRadius.circular(32)),
                 child: const Icon(Icons.lock_rounded,
-                    color: _brand, size: 30),
+                    color: colour.brand, size: 30),
               ),
               const SizedBox(height: 16),
               Text(title,
                   style: GoogleFonts.poppins(
-                      color: _textMain,
+                      color: colour.textMain,
                       fontSize: 18,
                       fontWeight: FontWeight.w700)),
               const SizedBox(height: 16),
@@ -1143,7 +1129,7 @@ class _TabletRow extends StatelessWidget {
                 decoration: InputDecoration(
                   hintText: 'Enter password',
                   filled: true,
-                  fillColor: _brandLight,
+                  fillColor: colour.brandLight,
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
                     borderSide: BorderSide.none,
@@ -1151,11 +1137,11 @@ class _TabletRow extends StatelessWidget {
                   focusedBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
                     borderSide: const BorderSide(
-                        color: _brand, width: 1.5),
+                        color: colour.brand, width: 1.5),
                   ),
                   prefixIcon: const Icon(
                       Icons.vpn_key_rounded,
-                      color: _brand),
+                      color: colour.brand),
                 ),
               ),
               const SizedBox(height: 20),
@@ -1164,7 +1150,7 @@ class _TabletRow extends StatelessWidget {
                   child: OutlinedButton(
                     onPressed: () => Navigator.of(ctx).pop(),
                     style: OutlinedButton.styleFrom(
-                      side: const BorderSide(color: _border),
+                      side: const BorderSide(color: colour.border),
                       shape: RoundedRectangleBorder(
                           borderRadius:
                           BorderRadius.circular(12)),
@@ -1173,7 +1159,7 @@ class _TabletRow extends StatelessWidget {
                     ),
                     child: Text('Cancel',
                         style: GoogleFonts.poppins(
-                            color: _textSub,
+                            color: colour.textSub,
                             fontWeight: FontWeight.w600,
                             fontSize: 14)),
                   ),
@@ -1182,7 +1168,7 @@ class _TabletRow extends StatelessWidget {
                 Expanded(
                   child: ElevatedButton(
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: _brand,
+                      backgroundColor: colour.brand,
                       shape: RoundedRectangleBorder(
                           borderRadius:
                           BorderRadius.circular(12)),
@@ -1251,8 +1237,8 @@ class _DetailPanel extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        color: _surface,
-        border: Border(top: BorderSide(color: _border)),
+        color: colour.surface,
+        border: Border(top: BorderSide(color: colour.border)),
       ),
       padding: const EdgeInsets.all(12),
       child: Column(
@@ -1288,7 +1274,7 @@ class _DetailPanel extends StatelessWidget {
               child: Center(
                 child: Text('No items',
                     style: GoogleFonts.poppins(
-                        color: _textSub, fontSize: 13)),
+                        color: colour.textSub, fontSize: 13)),
               ),
             )
           else
@@ -1336,7 +1322,7 @@ class _DetailRow extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: _border),
+        border: Border.all(color: colour.border),
       ),
       padding: const EdgeInsets.symmetric(
           horizontal: 12, vertical: 10),
@@ -1352,7 +1338,7 @@ class _DetailRow extends StatelessWidget {
             flex: 3,
             child: Text(d.ProductCode.toString(),
                 style: GoogleFonts.poppins(
-                    color: _brand,
+                    color: colour.brand,
                     fontSize: 11,
                     fontWeight: FontWeight.w700),
                 overflow: TextOverflow.ellipsis)),
@@ -1360,7 +1346,7 @@ class _DetailRow extends StatelessWidget {
             flex: 5,
             child: Text(d.ProductName.toString(),
                 style: GoogleFonts.poppins(
-                    color: _textMain,
+                    color: colour.textMain,
                     fontSize: 12,
                     fontWeight: FontWeight.w600),
                 overflow: TextOverflow.ellipsis)),
@@ -1368,20 +1354,20 @@ class _DetailRow extends StatelessWidget {
             flex: 2,
             child: Text('×${d.ItemQty}',
                 style: GoogleFonts.poppins(
-                    color: _textSub,
+                    color: colour.textSub,
                     fontSize: 11,
                     fontWeight: FontWeight.w600))),
         Expanded(
             flex: 3,
             child: Text('${d.SaleRate}',
                 style: GoogleFonts.poppins(
-                    color: _textSub, fontSize: 11),
+                    color: colour.textSub, fontSize: 11),
                 overflow: TextOverflow.ellipsis)),
         Expanded(
             flex: 2,
             child: Text('${d.TaxPercent}%',
                 style: GoogleFonts.poppins(
-                    color: _textSub, fontSize: 11))),
+                    color: colour.textSub, fontSize: 11))),
         Expanded(
           flex: 3,
           child: Text('₹${d.SAmount}',
@@ -1408,21 +1394,21 @@ class _EmptyState extends StatelessWidget {
           width: 80,
           height: 80,
           decoration: BoxDecoration(
-              color: _brandLight,
+              color: colour.brandLight,
               borderRadius: BorderRadius.circular(40)),
           child: const Icon(Icons.inbox_rounded,
-              color: _brand, size: 40),
+              color: colour.brand, size: 40),
         ),
         const SizedBox(height: 16),
         Text('No Records Found',
             style: GoogleFonts.poppins(
-                color: _textSub,
+                color: colour.textSub,
                 fontSize: 16,
                 fontWeight: FontWeight.w700)),
         const SizedBox(height: 4),
         Text('Adjust your filter to see results',
             style: GoogleFonts.poppins(
-                color: _textSub.withOpacity(0.6),
+                color: colour.textSub.withOpacity(0.6),
                 fontSize: 12)),
       ]),
     );
@@ -1440,7 +1426,7 @@ class _FilterFab extends StatelessWidget {
   Widget build(BuildContext context) {
     return FloatingActionButton(
       onPressed: () => _open(context),
-      backgroundColor: _brand,
+      backgroundColor: colour.brand,
       elevation: 6,
       shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(16)),
@@ -1530,7 +1516,7 @@ class _FilterSheetState extends State<_FilterSheet> {
                     width: 40,
                     height: 4,
                     decoration: BoxDecoration(
-                        color: _border,
+                        color: colour.border,
                         borderRadius:
                         BorderRadius.circular(2)),
                   ),
@@ -1542,7 +1528,7 @@ class _FilterSheetState extends State<_FilterSheet> {
                       horizontal: 16, vertical: 12),
                   decoration: BoxDecoration(
                     gradient: const LinearGradient(
-                        colors: [_brand, _brandMid]),
+                        colors: [colour.brand, colour.brandMid]),
                     borderRadius:
                     BorderRadius.circular(14),
                   ),
@@ -1867,13 +1853,13 @@ class _FilterSheetState extends State<_FilterSheet> {
           flex: 2,
           child: ElevatedButton(
             style: ElevatedButton.styleFrom(
-              backgroundColor: _brand,
+              backgroundColor: colour.brand,
               padding:
               const EdgeInsets.symmetric(vertical: 14),
               shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(14)),
               elevation: 3,
-              shadowColor: _brandGlow,
+              shadowColor: colour.brandGlow,
             ),
             onPressed: () {
               bloc
@@ -1898,14 +1884,14 @@ class _FilterSheetState extends State<_FilterSheet> {
             style: OutlinedButton.styleFrom(
               padding:
               const EdgeInsets.symmetric(vertical: 14),
-              side: const BorderSide(color: _border),
+              side: const BorderSide(color: colour.border),
               shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(14)),
             ),
             onPressed: () => Navigator.of(context).pop(),
             child: Text('Close',
                 style: GoogleFonts.poppins(
-                    color: _brand,
+                    color: colour.brand,
                     fontSize: 14,
                     fontWeight: FontWeight.w600)),
           ),
@@ -1917,7 +1903,7 @@ class _FilterSheetState extends State<_FilterSheet> {
     padding: const EdgeInsets.only(bottom: 6),
     child: Text(t,
         style: GoogleFonts.poppins(
-            color: _textSub,
+            color: colour.textSub,
             fontSize: 10,
             fontWeight: FontWeight.w700,
             letterSpacing: 0.6)),
@@ -1931,18 +1917,18 @@ class _FilterSheetState extends State<_FilterSheet> {
           padding:
           const EdgeInsets.symmetric(horizontal: 12),
           decoration: BoxDecoration(
-            color: _brandLight,
+            color: colour.brandLight,
             borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: _border),
+            border: Border.all(color: colour.border),
           ),
           child: Row(children: [
             const Icon(Icons.calendar_today_rounded,
-                color: _brand, size: 15),
+                color: colour.brand, size: 15),
             const SizedBox(width: 8),
             Flexible(
               child: Text(date,
                   style: GoogleFonts.poppins(
-                      color: _brandDark,
+                      color: colour.brandDark,
                       fontSize: 13,
                       fontWeight: FontWeight.w700)),
             ),
@@ -1963,9 +1949,9 @@ class _FilterSheetState extends State<_FilterSheet> {
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
               color: enabled
-                  ? _border
-                  : _border.withOpacity(0.3)),
-          color: enabled ? Colors.white : _surface,
+                  ? colour.border
+                  : colour.border.withOpacity(0.3)),
+          color: enabled ? Colors.white : colour.surface,
         ),
         child: Row(children: [
           const SizedBox(width: 12),
@@ -1974,8 +1960,8 @@ class _FilterSheetState extends State<_FilterSheet> {
               value.isEmpty ? hint : value,
               style: GoogleFonts.poppins(
                   color: value.isEmpty
-                      ? _textSub.withOpacity(0.45)
-                      : _textMain,
+                      ? colour.textSub.withOpacity(0.45)
+                      : colour.textMain,
                   fontSize: 13,
                   fontWeight: value.isEmpty
                       ? FontWeight.w400
@@ -1994,8 +1980,8 @@ class _FilterSheetState extends State<_FilterSheet> {
                     ? Icons.search_rounded
                     : Icons.close_rounded,
                 color: enabled
-                    ? _brand
-                    : _textSub.withOpacity(0.25),
+                    ? colour.brand
+                    : colour.textSub.withOpacity(0.25),
                 size: 20,
               ),
             ),
@@ -2013,13 +1999,13 @@ class _FilterSheetState extends State<_FilterSheet> {
         onChanged: onChanged,
         textCapitalization: TextCapitalization.characters,
         style: GoogleFonts.poppins(
-            color: _textMain,
+            color: colour.textMain,
             fontSize: 13,
             fontWeight: FontWeight.w600),
         decoration: InputDecoration(
           hintText: hint,
           hintStyle: GoogleFonts.poppins(
-              color: _textSub.withOpacity(0.45),
+              color: colour.textSub.withOpacity(0.45),
               fontSize: 13),
           contentPadding: const EdgeInsets.symmetric(
               horizontal: 14, vertical: 12),
@@ -2027,12 +2013,12 @@ class _FilterSheetState extends State<_FilterSheet> {
           fillColor: Colors.white,
           enabledBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(12),
-            borderSide: const BorderSide(color: _border),
+            borderSide: const BorderSide(color: colour.border),
           ),
           focusedBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(12),
             borderSide:
-            const BorderSide(color: _brand, width: 1.5),
+            const BorderSide(color: colour.brand, width: 1.5),
           ),
         ),
       );
@@ -2046,10 +2032,10 @@ class _FilterSheetState extends State<_FilterSheet> {
           padding: const EdgeInsets.symmetric(
               horizontal: 14, vertical: 8),
           decoration: BoxDecoration(
-            color: checked ? _brand : Colors.white,
+            color: checked ? colour.brand : Colors.white,
             borderRadius: BorderRadius.circular(20),
             border: Border.all(
-                color: checked ? _brand : _border),
+                color: checked ? colour.brand : colour.border),
           ),
           child:
           Row(mainAxisSize: MainAxisSize.min, children: [
@@ -2057,14 +2043,14 @@ class _FilterSheetState extends State<_FilterSheet> {
               checked
                   ? Icons.check_circle_rounded
                   : Icons.radio_button_unchecked_rounded,
-              color: checked ? Colors.white : _textSub,
+              color: checked ? Colors.white : colour.textSub,
               size: 16,
             ),
             const SizedBox(width: 6),
             Text(lbl,
                 style: GoogleFonts.poppins(
                     color:
-                    checked ? Colors.white : _textSub,
+                    checked ? Colors.white : colour.textSub,
                     fontSize: 12,
                     fontWeight: FontWeight.w700)),
           ]),
@@ -2087,16 +2073,16 @@ class _FilterSheetState extends State<_FilterSheet> {
               padding: const EdgeInsets.symmetric(
                   horizontal: 16, vertical: 7),
               decoration: BoxDecoration(
-                color: active ? _brand : Colors.white,
+                color: active ? colour.brand : Colors.white,
                 borderRadius: BorderRadius.circular(20),
                 border: Border.all(
-                    color: active ? _brand : _border),
+                    color: active ? colour.brand : colour.border),
               ),
               child: Text(items[i],
                   style: GoogleFonts.poppins(
                       color: active
                           ? Colors.white
-                          : _textSub,
+                          : colour.textSub,
                       fontSize: 12,
                       fontWeight: FontWeight.w700)),
             ),
@@ -2113,9 +2099,9 @@ class _FilterSheetState extends State<_FilterSheet> {
         builder: (ctx, child) => Theme(
           data: Theme.of(ctx).copyWith(
             colorScheme: const ColorScheme.light(
-              primary: _brand,
+              primary: colour.brand,
               onPrimary: Colors.white,
-              onSurface: _textMain,
+              onSurface: colour.textMain,
             ),
           ),
           child: child!,

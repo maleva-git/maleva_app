@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:maleva/core/models/model.dart';
 import 'package:maleva/core/utils/clsfunction.dart' as objfun;
+import '../../../../../../core/theme/tokens.dart';
 import '../bloc/fuelfillings_bloc.dart';
 import '../bloc/fuelfillings_event.dart';
 import '../bloc/fuelfillings_state.dart';
@@ -61,7 +62,7 @@ class _FuelFillingBody extends StatelessWidget {
                       Container(
                         width: 4, height: 30,
                         decoration: BoxDecoration(
-                          color: colour.kPrimary,
+                          color: AppTokens.brandGradientStart,
                           borderRadius: BorderRadius.circular(4),
                         ),
                       ),
@@ -107,7 +108,7 @@ class _FuelFillingBody extends StatelessWidget {
                 if (state is FuelFillingLoading) {
                   return const Center(
                     child: CircularProgressIndicator(
-                        color: colour.kPrimary),
+                        color: AppTokens.brandGradientStart),
                   );
                 }
                 if (state is FuelFillingError) {
@@ -148,7 +149,7 @@ class _FuelFillingBody extends StatelessWidget {
           style: GoogleFonts.lato(
             fontSize:   objfun.FontLarge,
             fontWeight: FontWeight.bold,
-            color:      colour.kPrimaryDark,
+            color:      AppTokens.brandGradientStartDark,
           ),
         ),
         const SizedBox(height: 10),
@@ -159,7 +160,7 @@ class _FuelFillingBody extends StatelessWidget {
               if (state is FuelFillingLoading) {
                 return const Center(
                   child: CircularProgressIndicator(
-                      color: colour.kPrimary),
+                      color: AppTokens.brandGradientStart),
                 );
               }
               if (state is FuelFillingError) {
@@ -200,14 +201,14 @@ class _CountBadge extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
       decoration: BoxDecoration(
         gradient: const LinearGradient(
-          colors: [colour.kPrimary, colour.kPrimaryDark],
+          colors: [AppTokens.brandGradientStart, colour.kPrimaryDark],
           begin: Alignment.topLeft,
           end:   Alignment.bottomRight,
         ),
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color:     colour.kPrimary.withOpacity(0.30),
+            color:     AppTokens.brandGradientStart.withOpacity(0.30),
             blurRadius: 16,
             offset:    const Offset(0, 6),
           ),
@@ -265,7 +266,7 @@ class _FuelFillingCard extends StatelessWidget {
           border: Border.all(color: colour.kAccent, width: 1.5),
           boxShadow: [
             BoxShadow(
-              color:     colour.kPrimary.withOpacity(0.08),
+              color:     AppTokens.brandGradientStart.withOpacity(0.08),
               blurRadius: 10,
               offset:    const Offset(0, 4),
             ),
@@ -289,7 +290,7 @@ class _FuelFillingCard extends StatelessWidget {
                 width:  isTablet ? 50 : 44,
                 height: isTablet ? 50 : 44,
                 decoration: const BoxDecoration(
-                  color: colour.kPrimary,
+                  color: AppTokens.brandGradientStart,
                   shape: BoxShape.circle,
                 ),
                 child: Icon(Icons.local_gas_station_rounded,
@@ -344,8 +345,8 @@ class _FuelFillingCard extends StatelessWidget {
                         label:     record.filled.isNotEmpty
                             ? "${record.filled} L"
                             : "N/A",
-                        bgColor:   colour.kPrimary.withOpacity(0.1),
-                        textColor: colour.kPrimary,
+                        bgColor:   AppTokens.brandGradientStart.withOpacity(0.1),
+                        textColor: AppTokens.brandGradientStart,
                         isTablet:  isTablet,
                       ),
                     ),
@@ -379,7 +380,7 @@ class _FuelFillingCard extends StatelessWidget {
               ),
               child: Icon(Icons.arrow_forward_ios_rounded,
                   size:  isTablet ? 16 : 14,
-                  color: colour.kPrimary),
+                  color: AppTokens.brandGradientStart),
             ),
           ),
         ]),
@@ -408,7 +409,7 @@ class _FuelFillingCard extends StatelessWidget {
               borderRadius: BorderRadius.circular(20),
               boxShadow: [
                 BoxShadow(
-                  color:     colour.kPrimary.withOpacity(0.18),
+                  color:     AppTokens.brandGradientStart.withOpacity(0.18),
                   blurRadius: 30,
                   offset:    const Offset(0, 10),
                 ),
@@ -425,7 +426,7 @@ class _FuelFillingCard extends StatelessWidget {
                     horizontal: isTablet ? 28 : 24,
                   ),
                   decoration: const BoxDecoration(
-                    color: colour.kPrimary,
+                    color: AppTokens.brandGradientStart,
                     borderRadius: BorderRadius.only(
                       topLeft:  Radius.circular(20),
                       topRight: Radius.circular(20),
@@ -492,7 +493,7 @@ class _FuelFillingCard extends StatelessWidget {
                       width: double.infinity,
                       child: ElevatedButton(
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: colour.kPrimary,
+                          backgroundColor: AppTokens.brandGradientStart,
                           padding: EdgeInsets.symmetric(
                               vertical: isTablet ? 16 : 14),
                           shape: RoundedRectangleBorder(
@@ -544,7 +545,7 @@ class _FuelFillingCard extends StatelessWidget {
             borderRadius: BorderRadius.circular(8),
           ),
           child: Icon(icon,
-              color: colour.kPrimary,
+              color: AppTokens.brandGradientStart,
               size:  isTablet ? 20 : 18),
         ),
         const SizedBox(width: 12),
@@ -661,7 +662,7 @@ class _ErrorState extends StatelessWidget {
                 style: GoogleFonts.lato(
                     fontSize: isTablet ? 15 : 14)),
             style: ElevatedButton.styleFrom(
-              backgroundColor: colour.kPrimary,
+              backgroundColor: AppTokens.brandGradientStart,
               padding: EdgeInsets.symmetric(
                 horizontal: isTablet ? 28 : 20,
                 vertical:   isTablet ? 12 : 10,

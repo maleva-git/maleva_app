@@ -14,27 +14,16 @@ import '../bloc/vesselplanning_bloc.dart';
 import '../bloc/vesselplanning_event.dart';
 import '../bloc/vesselplanning_state.dart';
 
-// ─── Design Tokens ────────────────────────────────────────────────────────────
-const kHeaderGradStart = Color(0xFF1A3A8F);
-const kHeaderGradEnd   = Color(0xFF4A6FD4);
-const kCardBorder      = Color(0xFFC5D0EE);
-const kCardBg          = Color(0xFFFFFFFF);
-const kPageBg          = Color(0xFFF4F6FB);
-const kTextDark        = Color(0xFF1E2D5E);
-const kTextMid         = Color(0xFF4A5A8A);
-const kTextMuted       = Color(0xFF8A96BF);
-const kAccentBar       = Color(0xFF4A6FD4);
-const kDetailBg        = Color(0xFFF0F4FF);
-const kChipBg          = Color(0xFFEEF2FF);
+
 
 const kGradient = LinearGradient(
-  colors: [kHeaderGradStart, kHeaderGradEnd],
+  colors: [colour.kHeaderGradStart, colour.kHeaderGradEnd],
   begin: Alignment.topLeft,
   end: Alignment.bottomRight,
 );
 
 const kGradientVertical = LinearGradient(
-  colors: [kHeaderGradStart, Color(0xFF2D56C8)],
+  colors: [colour.kHeaderGradStart, Color(0xFF2D56C8)],
   begin: Alignment.topCenter,
   end: Alignment.bottomCenter,
 );
@@ -82,14 +71,14 @@ class _VesselPlanningPage extends StatelessWidget {
       },
       child: Scaffold(
         resizeToAvoidBottomInset: false,
-        backgroundColor: kPageBg,
+        backgroundColor: colour.kPageBg,
         appBar: _buildAppBar(context, userName, isTablet),
         drawer: const Menulist(),
         body: BlocBuilder<VesselPlanningBloc, VesselPlanningState>(
           builder: (context, state) {
             if (state is VesselPlanningLoading || state is VesselPlanningInitial) {
               return const Center(
-                child: SpinKitFoldingCube(color: kHeaderGradEnd, size: 35.0),
+                child: SpinKitFoldingCube(color: colour.kHeaderGradEnd, size: 35.0),
               );
             }
             if (state is VesselPlanningLoaded) {
@@ -184,10 +173,10 @@ class _VesselPlanningPage extends StatelessWidget {
               builder: (context, child) => Theme(
                 data: Theme.of(context).copyWith(
                   colorScheme: const ColorScheme.light(
-                    primary: kHeaderGradStart,
+                    primary: colour.kHeaderGradStart,
                     onPrimary: Colors.white,
                     surface: Colors.white,
-                    onSurface: kTextDark,
+                    onSurface: colour.kTextDark,
                   ),
                 ),
                 child: child!,
@@ -225,7 +214,7 @@ class _VesselPlanningPage extends StatelessWidget {
                       width: 40,
                       height: 4,
                       decoration: BoxDecoration(
-                        color: kCardBorder,
+                        color: colour.kCardBorder,
                         borderRadius: BorderRadius.circular(2),
                       ),
                     ),
@@ -235,7 +224,7 @@ class _VesselPlanningPage extends StatelessWidget {
                   Text(
                     'Filter',
                     style: GoogleFonts.lato(
-                      color: kHeaderGradStart,
+                      color: colour.kHeaderGradStart,
                       fontWeight: FontWeight.w700,
                       fontSize: isTablet ? 16 : 15,
                       letterSpacing: 0.2,
@@ -304,8 +293,8 @@ class _VesselPlanningPage extends StatelessWidget {
                             ? Icons.close_rounded
                             : Icons.search_rounded,
                         color: isLoggedInEmp
-                            ? kTextMuted
-                            : kHeaderGradEnd,
+                            ? colour.kTextMuted
+                            : colour.kHeaderGradEnd,
                         size: 20,
                       ),
                     ),
@@ -339,7 +328,7 @@ class _VesselPlanningPage extends StatelessWidget {
                               gradient: isLoggedInEmp ? kGradient : null,
                               border: isLoggedInEmp
                                   ? null
-                                  : Border.all(color: kCardBorder, width: 1.5),
+                                  : Border.all(color: colour.kCardBorder, width: 1.5),
                               borderRadius: BorderRadius.circular(5),
                             ),
                             child: isLoggedInEmp
@@ -351,7 +340,7 @@ class _VesselPlanningPage extends StatelessWidget {
                           Text(
                             'Logged-in Employee',
                             style: GoogleFonts.lato(
-                              color: kTextDark,
+                              color: colour.kTextDark,
                               fontWeight: FontWeight.w600,
                               fontSize: isTablet
                                   ? objfun.FontLow + 1
@@ -508,18 +497,18 @@ class _PlanningCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final valStyle = GoogleFonts.lato(
-      color: kTextDark,
+      color: colour.kTextDark,
       fontWeight: FontWeight.w600,
       fontSize: isTablet ? objfun.FontCardText + 1 : objfun.FontCardText,
     );
     final labelStyle = GoogleFonts.lato(
-      color: kTextMuted,
+      color: colour.kTextMuted,
       fontWeight: FontWeight.w600,
       fontSize: isTablet ? 10 : 9,
       letterSpacing: 0.4,
     );
     final remarkStyle = GoogleFonts.lato(
-      color: kTextMid,
+      color: colour.kTextMid,
       fontWeight: FontWeight.w500,
       fontSize: isTablet ? objfun.FontCardText : objfun.FontCardText - 1,
     );
@@ -531,12 +520,12 @@ class _PlanningCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(14),
         child: Container(
           decoration: BoxDecoration(
-            color: kCardBg,
+            color: colour.kCardBg,
             borderRadius: BorderRadius.circular(14),
-            border: Border.all(color: kCardBorder, width: 0.5),
+            border: Border.all(color: colour.kCardBorder, width: 0.5),
             boxShadow: [
               BoxShadow(
-                color: kHeaderGradStart.withOpacity(0.07),
+                color: colour.kHeaderGradStart.withOpacity(0.07),
                 blurRadius: 12,
                 offset: const Offset(0, 3),
               ),
@@ -682,7 +671,7 @@ class _PlanningCard extends StatelessWidget {
               borderRadius: BorderRadius.circular(20),
               boxShadow: [
                 BoxShadow(
-                  color: kHeaderGradStart.withOpacity(0.18),
+                  color: colour.kHeaderGradStart.withOpacity(0.18),
                   blurRadius: 30,
                   offset: const Offset(0, 10),
                 ),
@@ -734,22 +723,22 @@ class _PlanningCard extends StatelessWidget {
                       const SizedBox(height: 14),
                       TextField(
                         controller: txtPassword,
-                        cursorColor: kHeaderGradStart,
+                        cursorColor: colour.kHeaderGradStart,
                         textCapitalization: TextCapitalization.characters,
                         textInputAction: TextInputAction.done,
                         style: GoogleFonts.lato(
-                          color: kTextDark,
+                          color: colour.kTextDark,
                           fontWeight: FontWeight.w600,
                           fontSize: objfun.FontLow,
                         ),
                         decoration: InputDecoration(
                           hintText: 'Enter password',
                           hintStyle: GoogleFonts.lato(
-                            color: kTextMuted,
+                            color: colour.kTextMuted,
                             fontSize: objfun.FontLow,
                           ),
                           filled: true,
-                          fillColor: kDetailBg,
+                          fillColor: colour.kDetailBg,
                           contentPadding: const EdgeInsets.symmetric(
                               horizontal: 14, vertical: 12),
                           border: OutlineInputBorder(
@@ -759,7 +748,7 @@ class _PlanningCard extends StatelessWidget {
                           focusedBorder: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(10),
                             borderSide: const BorderSide(
-                                color: kHeaderGradEnd, width: 1.5),
+                                color: colour.kHeaderGradEnd, width: 1.5),
                           ),
                         ),
                       ),
@@ -834,7 +823,7 @@ class _DetailsSection extends StatelessWidget {
       letterSpacing: 0.5,
     );
     final rowStyle = GoogleFonts.lato(
-      color: kTextDark,
+      color: colour.kTextDark,
       fontWeight: FontWeight.w500,
       fontSize: isTablet ? objfun.FontCardText : objfun.FontCardText - 1,
     );
@@ -864,7 +853,7 @@ class _DetailsSection extends StatelessWidget {
             child: Text(
               'No records found',
               style: GoogleFonts.lato(
-                  fontSize: objfun.FontLow, color: kTextMuted),
+                  fontSize: objfun.FontLow, color: colour.kTextMuted),
             ),
           )
               : ListView.builder(
@@ -874,7 +863,7 @@ class _DetailsSection extends StatelessWidget {
               final isOdd = i % 2 == 0;
               return Container(
                 height: isTablet ? 42 : 38,
-                color: isOdd ? Colors.white : kDetailBg,
+                color: isOdd ? Colors.white : colour.kDetailBg,
                 padding: const EdgeInsets.symmetric(horizontal: 14),
                 child: Row(
                   children: [
@@ -898,7 +887,7 @@ class _DetailsSection extends StatelessWidget {
                       flex: 3,
                       child: Text(
                         details[i]['Remarks'].toString(),
-                        style: rowStyle.copyWith(color: kTextMid),
+                        style: rowStyle.copyWith(color: colour.kTextMid),
                         overflow: TextOverflow.ellipsis,
                       ),
                     ),
@@ -925,20 +914,20 @@ class _EmptyState extends StatelessWidget {
             width: 64,
             height: 64,
             decoration: BoxDecoration(
-              color: kChipBg,
+              color: colour.kChipBg,
               borderRadius: BorderRadius.circular(16),
             ),
             child: const Icon(
               Icons.anchor_rounded,
               size: 32,
-              color: kHeaderGradEnd,
+              color: colour.kHeaderGradEnd,
             ),
           ),
           const SizedBox(height: 14),
           Text(
             'No Records Found',
             style: GoogleFonts.lato(
-              color: kTextDark,
+              color: colour.kTextDark,
               fontWeight: FontWeight.w600,
               fontSize: 15,
             ),
@@ -947,7 +936,7 @@ class _EmptyState extends StatelessWidget {
           Text(
             'Try adjusting your filters',
             style: GoogleFonts.lato(
-              color: kTextMuted,
+              color: colour.kTextMuted,
               fontSize: 12,
             ),
           ),
@@ -972,7 +961,7 @@ class _VPFab extends StatelessWidget {
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: kHeaderGradStart.withOpacity(0.4),
+            color: colour.kHeaderGradStart.withOpacity(0.4),
             blurRadius: 16,
             offset: const Offset(0, 6),
           ),
@@ -1014,19 +1003,19 @@ class _CardActionChip extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
         decoration: BoxDecoration(
-          color: kChipBg,
+          color: colour.kChipBg,
           borderRadius: BorderRadius.circular(20),
-          border: Border.all(color: kCardBorder, width: 0.5),
+          border: Border.all(color: colour.kCardBorder, width: 0.5),
         ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(icon, size: 15, color: kHeaderGradStart),
+            Icon(icon, size: 15, color: colour.kHeaderGradStart),
             const SizedBox(width: 4),
             Text(
               label,
               style: GoogleFonts.lato(
-                color: kHeaderGradStart,
+                color: colour.kHeaderGradStart,
                 fontWeight: FontWeight.w600,
                 fontSize: 11,
               ),
@@ -1060,9 +1049,9 @@ class _SheetDateTile extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
         decoration: BoxDecoration(
-          color: kDetailBg,
+          color: colour.kDetailBg,
           borderRadius: BorderRadius.circular(10),
-          border: Border.all(color: kCardBorder, width: 0.5),
+          border: Border.all(color: colour.kCardBorder, width: 0.5),
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -1070,7 +1059,7 @@ class _SheetDateTile extends StatelessWidget {
             Text(
               label.toUpperCase(),
               style: GoogleFonts.lato(
-                color: kTextMuted,
+                color: colour.kTextMuted,
                 fontWeight: FontWeight.w700,
                 fontSize: 9,
                 letterSpacing: 0.6,
@@ -1083,7 +1072,7 @@ class _SheetDateTile extends StatelessWidget {
                 Text(
                   displayDate,
                   style: GoogleFonts.lato(
-                    color: kTextDark,
+                    color: colour.kTextDark,
                     fontWeight: FontWeight.w700,
                     fontSize: 13,
                   ),
@@ -1091,7 +1080,7 @@ class _SheetDateTile extends StatelessWidget {
                 const Icon(
                   Icons.calendar_month_outlined,
                   size: 18,
-                  color: kHeaderGradEnd,
+                  color: colour.kHeaderGradEnd,
                 ),
               ],
             ),
@@ -1128,19 +1117,19 @@ class _SheetTextField extends StatelessWidget {
       textCapitalization: textCapitalization,
       textInputAction: textInputAction,
       style: GoogleFonts.lato(
-        color: kTextDark,
+        color: colour.kTextDark,
         fontWeight: FontWeight.w600,
         fontSize: objfun.FontLow,
       ),
       decoration: InputDecoration(
         hintText: hint,
         hintStyle: GoogleFonts.lato(
-          color: kTextMuted,
+          color: colour.kTextMuted,
           fontWeight: FontWeight.w500,
           fontSize: objfun.FontLow,
         ),
         filled: true,
-        fillColor: kDetailBg,
+        fillColor: colour.kDetailBg,
         suffixIcon: suffixIcon,
         contentPadding:
         const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
@@ -1150,11 +1139,11 @@ class _SheetTextField extends StatelessWidget {
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(10),
-          borderSide: const BorderSide(color: kCardBorder, width: 0.5),
+          borderSide: const BorderSide(color: colour.kCardBorder, width: 0.5),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(10),
-          borderSide: const BorderSide(color: kHeaderGradEnd, width: 1.5),
+          borderSide: const BorderSide(color: colour.kHeaderGradEnd, width: 1.5),
         ),
       ),
     );
@@ -1176,7 +1165,7 @@ class _GradientButton extends StatelessWidget {
         borderRadius: BorderRadius.circular(24),
         boxShadow: [
           BoxShadow(
-            color: kHeaderGradStart.withOpacity(0.35),
+            color: colour.kHeaderGradStart.withOpacity(0.35),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
@@ -1216,9 +1205,9 @@ class _OutlineButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        color: kChipBg,
+        color: colour.kChipBg,
         borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: kCardBorder),
+        border: Border.all(color: colour.kCardBorder),
       ),
       child: Material(
         color: Colors.transparent,
@@ -1231,7 +1220,7 @@ class _OutlineButton extends StatelessWidget {
             child: Text(
               label,
               style: GoogleFonts.lato(
-                color: kHeaderGradStart,
+                color: colour.kHeaderGradStart,
                 fontWeight: FontWeight.w700,
                 fontSize: objfun.FontMedium,
               ),

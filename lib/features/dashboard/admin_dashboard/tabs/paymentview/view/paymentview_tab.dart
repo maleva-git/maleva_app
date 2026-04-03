@@ -5,6 +5,7 @@ import 'package:intl/intl.dart';
 import 'package:maleva/core/models/model.dart';
 import 'package:maleva/core/utils/clsfunction.dart' as objfun;
 import 'package:maleva/core/colors/colors.dart' as colour;
+import '../../../../../../core/theme/tokens.dart';
 import '../bloc/paymentview_bloc.dart';
 import '../bloc/paymentview_event.dart';
 import '../bloc/paymentview_state.dart';
@@ -53,7 +54,7 @@ class _PaymentPendingBody extends StatelessWidget {
               // TAB BAR
               // ════════════════════════════════════
               Container(
-                color: colour.kPrimary,
+                color: AppTokens.brandGradientStart,
                 child: TabBar(
                   isScrollable: true,
                   tabAlignment: TabAlignment.start,
@@ -82,7 +83,7 @@ class _PaymentPendingBody extends StatelessWidget {
               // PAID FILTER
               // ════════════════════════════════════
               Container(
-                color: colour.kPrimary.withOpacity(0.06),
+                color: AppTokens.brandGradientStart.withOpacity(0.06),
                 padding: const EdgeInsets.symmetric(
                     horizontal: 12, vertical: 8),
                 child: Row(
@@ -102,14 +103,14 @@ class _PaymentPendingBody extends StatelessWidget {
                               vertical: 9),
                           decoration: BoxDecoration(
                             color: active
-                                ? colour.kPrimary
-                                : colour.kAccent,
+                                ? AppTokens.brandGradientStart
+                                : AppTokens.brandLight,
                             borderRadius:
                             BorderRadius.circular(10),
                             border: Border.all(
                                 color: active
-                                    ? colour.kPrimary
-                                    : colour.kPrimaryLight
+                                    ? AppTokens.brandGradientStart
+                                    : AppTokens.brandMid
                                     .withOpacity(0.25)),
                           ),
                           child: Text(f,
@@ -121,7 +122,7 @@ class _PaymentPendingBody extends StatelessWidget {
                                       : FontWeight.normal,
                                   color: active
                                       ? colour.kWhite
-                                      : colour.kPrimaryDark)),
+                                      : AppTokens.brandDark)),
                         ),
                       ),
                     );
@@ -138,11 +139,11 @@ class _PaymentPendingBody extends StatelessWidget {
                   padding: const EdgeInsets.symmetric(
                       horizontal: 12, vertical: 9),
                   decoration: BoxDecoration(
-                    color: colour.kAccent,
+                    color: AppTokens.brandLight,
                     borderRadius: BorderRadius.circular(14),
                     border: Border.all(
                         color:
-                        colour.kPrimaryLight.withOpacity(0.3)),
+                        AppTokens.brandMid.withOpacity(0.3)),
                   ),
                   child: Row(children: [
                     Expanded(
@@ -168,7 +169,7 @@ class _PaymentPendingBody extends StatelessWidget {
                         width: 1,
                         height: 28,
                         color:
-                        colour.kPrimaryLight.withOpacity(0.3),
+                        AppTokens.brandMid.withOpacity(0.3),
                         margin: const EdgeInsets.symmetric(
                             horizontal: 8)),
                     Expanded(
@@ -197,7 +198,7 @@ class _PaymentPendingBody extends StatelessWidget {
                           .read<PaymentPendingBloc>()
                           .add(const SearchByDateEvent()),
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: colour.kPrimary,
+                        backgroundColor: AppTokens.brandGradientStart,
                         padding: const EdgeInsets.symmetric(
                             horizontal: 14, vertical: 10),
                         shape: RoundedRectangleBorder(
@@ -226,7 +227,7 @@ class _PaymentPendingBody extends StatelessWidget {
                     padding: const EdgeInsets.symmetric(
                         horizontal: 14, vertical: 8),
                     decoration: BoxDecoration(
-                      color: colour.kPrimary,
+                      color: AppTokens.brandGradientStart,
                       borderRadius: BorderRadius.circular(10),
                     ),
                     child: Row(children: [
@@ -256,7 +257,7 @@ class _PaymentPendingBody extends StatelessWidget {
                       height: 18,
                       child: CircularProgressIndicator(
                           strokeWidth: 2,
-                          color: colour.kPrimary),
+                          color: AppTokens.brandGradientStart),
                     ),
                   Text(
                     "${loaded?.filteredMaster.length ?? 0} records",
@@ -275,7 +276,7 @@ class _PaymentPendingBody extends StatelessWidget {
                 child: isLoading
                     ? const Center(
                     child: CircularProgressIndicator(
-                        color: colour.kPrimary))
+                        color: AppTokens.brandGradientStart))
                     : state is PaymentPendingError
                     ? _errorView(context, state.message)
                     : loaded == null ||
@@ -405,7 +406,7 @@ class _PaymentPendingBody extends StatelessWidget {
       builder: (ctx, child) => Theme(
         data: Theme.of(ctx).copyWith(
             colorScheme: const ColorScheme.light(
-                primary: colour.kPrimary)),
+                primary: AppTokens.brandGradientStart)),
         child: child!,
       ),
     );
@@ -442,7 +443,7 @@ class _PaymentPendingBody extends StatelessWidget {
           icon: const Icon(Icons.refresh),
           label: const Text("Retry"),
           style: ElevatedButton.styleFrom(
-              backgroundColor: colour.kPrimary),
+              backgroundColor: AppTokens.brandGradientStart),
         ),
       ]),
     );
@@ -506,12 +507,12 @@ class _PaymentGridCard extends StatelessWidget {
           color: colour.kWhite,
           borderRadius: BorderRadius.circular(16),
           border: Border.all(
-            color: isSelected ? colour.kPrimary : colour.kAccent,
+            color: isSelected ? AppTokens.brandGradientStart : AppTokens.brandLight,
             width: isSelected ? 2.0 : 1.5,
           ),
           boxShadow: [
             BoxShadow(
-                color: colour.kPrimary
+                color: AppTokens.brandGradientStart
                     .withOpacity(isSelected ? 0.15 : 0.07),
                 blurRadius: isSelected ? 14 : 8,
                 offset: const Offset(0, 3)),
@@ -527,8 +528,8 @@ class _PaymentGridCard extends StatelessWidget {
                   horizontal: 12, vertical: 10),
               decoration: BoxDecoration(
                 color: isSelected
-                    ? colour.kPrimaryDark
-                    : colour.kPrimary,
+                    ? AppTokens.brandDark
+                    : AppTokens.brandGradientStart,
                 borderRadius: const BorderRadius.only(
                     topLeft: Radius.circular(16),
                     topRight: Radius.circular(16)),
@@ -556,13 +557,13 @@ class _PaymentGridCard extends StatelessWidget {
                       padding: const EdgeInsets.symmetric(
                           horizontal: 8, vertical: 5),
                       decoration: BoxDecoration(
-                        color: colour.kAccent,
+                        color: AppTokens.brandLight,
                         borderRadius: BorderRadius.circular(8),
                       ),
                       child: Text(
                         "RM ${(item.Amount ?? 0).toStringAsFixed(2)}",
                         style: GoogleFonts.lato(
-                            color: colour.kPrimary,
+                            color: AppTokens.brandGradientStart,
                             fontWeight: FontWeight.bold,
                             fontSize: 14),
                       ),
@@ -614,7 +615,7 @@ class _PaymentGridCard extends StatelessWidget {
     return Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Icon(icon, size: 13, color: colour.kPrimaryLight),
+          Icon(icon, size: 13, color: AppTokens.brandMid),
           const SizedBox(width: 4),
           Expanded(
             child: Text(text,
@@ -636,10 +637,10 @@ class _EmptyDetailPanel extends StatelessWidget {
       decoration: BoxDecoration(
         color: colour.kWhite,
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: colour.kAccent, width: 1.5),
+        border: Border.all(color: AppTokens.brandLight, width: 1.5),
         boxShadow: [
           BoxShadow(
-              color: colour.kPrimary.withOpacity(0.05),
+              color: AppTokens.brandGradientStart.withOpacity(0.05),
               blurRadius: 12,
               offset: const Offset(0, 4))
         ],
@@ -650,16 +651,16 @@ class _EmptyDetailPanel extends StatelessWidget {
           Container(
             width: 64, height: 64,
             decoration: const BoxDecoration(
-                color: colour.kAccent, shape: BoxShape.circle),
+                color: AppTokens.brandLight, shape: BoxShape.circle),
             child: const Icon(Icons.touch_app_rounded,
-                color: colour.kPrimary, size: 32),
+                color: AppTokens.brandGradientStart, size: 32),
           ),
           const SizedBox(height: 16),
           Text("Select a record",
               style: GoogleFonts.lato(
                   fontSize: 16,
                   fontWeight: FontWeight.bold,
-                  color: colour.kPrimaryDark)),
+                  color: AppTokens.brandDark)),
           const SizedBox(height: 6),
           Text("Tap any card to view details",
               style: GoogleFonts.lato(
@@ -693,10 +694,10 @@ class _PaymentDetailPanel extends StatelessWidget {
       decoration: BoxDecoration(
         color: colour.kWhite,
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: colour.kAccent, width: 1.5),
+        border: Border.all(color: AppTokens.brandLight, width: 1.5),
         boxShadow: [
           BoxShadow(
-              color: colour.kPrimary.withOpacity(0.07),
+              color: AppTokens.brandGradientStart.withOpacity(0.07),
               blurRadius: 16,
               offset: const Offset(0, 5))
         ],
@@ -708,7 +709,7 @@ class _PaymentDetailPanel extends StatelessWidget {
             width: double.infinity,
             padding: const EdgeInsets.fromLTRB(20, 14, 20, 14),
             decoration: const BoxDecoration(
-              color: colour.kPrimary,
+              color: AppTokens.brandGradientStart,
               borderRadius: BorderRadius.only(
                 topLeft:  Radius.circular(20),
                 topRight: Radius.circular(20),
@@ -767,7 +768,7 @@ class _PaymentDetailPanel extends StatelessWidget {
           ),
 
           Divider(
-              color: colour.kAccent,
+              color: AppTokens.brandLight,
               thickness: 1.5,
               height: 16),
 
@@ -779,7 +780,7 @@ class _PaymentDetailPanel extends StatelessWidget {
                   style: GoogleFonts.lato(
                       fontWeight: FontWeight.bold,
                       fontSize: 14,
-                      color: colour.kPrimaryDark)),
+                      color: AppTokens.brandDark)),
             ),
           ),
 
@@ -803,11 +804,11 @@ class _PaymentDetailPanel extends StatelessWidget {
                   const EdgeInsets.only(bottom: 10),
                   padding: const EdgeInsets.all(14),
                   decoration: BoxDecoration(
-                    color: colour.kAccent,
+                    color: AppTokens.brandLight,
                     borderRadius:
                     BorderRadius.circular(14),
                     border: Border.all(
-                        color: colour.kPrimaryLight
+                        color: AppTokens.brandMid
                             .withOpacity(0.2)),
                   ),
                   child: Row(children: [
@@ -822,7 +823,7 @@ class _PaymentDetailPanel extends StatelessWidget {
                                     fontWeight:
                                     FontWeight.w600,
                                     color:
-                                    colour.kPrimaryDark,
+                                    AppTokens.brandDark,
                                     fontSize: 14)),
                             const SizedBox(height: 2),
                             Text(
@@ -836,7 +837,7 @@ class _PaymentDetailPanel extends StatelessWidget {
                       "RM ${(d.Amount ?? 0).toStringAsFixed(2)}",
                       style: GoogleFonts.lato(
                           fontWeight: FontWeight.bold,
-                          color: colour.kPrimary,
+                          color: AppTokens.brandGradientStart,
                           fontSize: 15),
                     ),
                   ]),
@@ -854,18 +855,18 @@ class _PaymentDetailPanel extends StatelessWidget {
       padding: const EdgeInsets.symmetric(
           horizontal: 10, vertical: 6),
       decoration: BoxDecoration(
-        color: colour.kAccent,
+        color: AppTokens.brandLight,
         borderRadius: BorderRadius.circular(10),
         border: Border.all(
-            color: colour.kPrimaryLight.withOpacity(0.3)),
+            color: AppTokens.brandMid.withOpacity(0.3)),
       ),
       child: Row(mainAxisSize: MainAxisSize.min, children: [
-        Icon(icon, size: 13, color: colour.kPrimary),
+        Icon(icon, size: 13, color: AppTokens.brandGradientStart),
         const SizedBox(width: 5),
         Text(label,
             style: GoogleFonts.lato(
                 fontSize: 12,
-                color: colour.kPrimaryDark,
+                color: AppTokens.brandDark,
                 fontWeight: FontWeight.w600)),
       ]),
     );
@@ -879,7 +880,7 @@ Widget _calBtn(VoidCallback onTap) {
     child: Container(
       width: 34, height: 34,
       decoration: BoxDecoration(
-          color: colour.kPrimary,
+          color: AppTokens.brandGradientStart,
           borderRadius: BorderRadius.circular(8)),
       child: const Icon(Icons.calendar_month_outlined,
           color: colour.kWhite, size: 18),
@@ -908,7 +909,7 @@ Widget _dateCell({
               style: GoogleFonts.lato(
                   fontWeight: FontWeight.bold,
                   fontSize: 13,
-                  color: colour.kPrimaryDark)),
+                  color: AppTokens.brandDark)),
         ]),
   );
 }
@@ -946,7 +947,7 @@ class _DetailSheet extends StatelessWidget {
               padding:
               const EdgeInsets.fromLTRB(20, 10, 20, 16),
               decoration: const BoxDecoration(
-                color: colour.kPrimary,
+                color: AppTokens.brandGradientStart,
                 borderRadius: BorderRadius.vertical(
                     top: Radius.circular(28)),
               ),
@@ -1000,7 +1001,7 @@ class _DetailSheet extends StatelessWidget {
               ]),
             ),
             Divider(
-                color: colour.kAccent,
+                color: AppTokens.brandLight,
                 thickness: 1.5,
                 height: 16),
             Padding(
@@ -1012,7 +1013,7 @@ class _DetailSheet extends StatelessWidget {
                     style: GoogleFonts.lato(
                         fontWeight: FontWeight.bold,
                         fontSize: 14,
-                        color: colour.kPrimaryDark)),
+                        color: AppTokens.brandDark)),
               ),
             ),
             const SizedBox(height: 8),
@@ -1034,11 +1035,11 @@ class _DetailSheet extends StatelessWidget {
                         bottom: 10),
                     padding: const EdgeInsets.all(14),
                     decoration: BoxDecoration(
-                      color: colour.kAccent,
+                      color: AppTokens.brandLight,
                       borderRadius:
                       BorderRadius.circular(14),
                       border: Border.all(
-                          color: colour.kPrimaryLight
+                          color: AppTokens.brandMid
                               .withOpacity(0.2)),
                     ),
                     child: Row(children: [
@@ -1055,8 +1056,7 @@ class _DetailSheet extends StatelessWidget {
                                       fontWeight:
                                       FontWeight
                                           .w600,
-                                      color: colour
-                                          .kPrimaryDark,
+                                      color: AppTokens.brandDark,
                                       fontSize: 14)),
                               const SizedBox(height: 2),
                               Text(
@@ -1072,7 +1072,7 @@ class _DetailSheet extends StatelessWidget {
                         "RM ${(d.Amount ?? 0).toStringAsFixed(2)}",
                         style: GoogleFonts.lato(
                             fontWeight: FontWeight.bold,
-                            color: colour.kPrimary,
+                            color: AppTokens.brandGradientStart,
                             fontSize: 15),
                       ),
                     ]),
@@ -1087,7 +1087,7 @@ class _DetailSheet extends StatelessWidget {
                 width: double.infinity,
                 child: ElevatedButton(
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: colour.kPrimary,
+                    backgroundColor: AppTokens.brandGradientStart,
                     padding: const EdgeInsets.symmetric(
                         vertical: 14),
                     shape: RoundedRectangleBorder(
@@ -1115,18 +1115,18 @@ class _DetailSheet extends StatelessWidget {
       padding: const EdgeInsets.symmetric(
           horizontal: 10, vertical: 6),
       decoration: BoxDecoration(
-        color: colour.kAccent,
+        color: AppTokens.brandLight,
         borderRadius: BorderRadius.circular(10),
         border: Border.all(
-            color: colour.kPrimaryLight.withOpacity(0.3)),
+            color: AppTokens.brandMid.withOpacity(0.3)),
       ),
       child: Row(mainAxisSize: MainAxisSize.min, children: [
-        Icon(icon, size: 13, color: colour.kPrimary),
+        Icon(icon, size: 13, color: AppTokens.brandGradientStart),
         const SizedBox(width: 5),
         Text(label,
             style: GoogleFonts.lato(
                 fontSize: 12,
-                color: colour.kPrimaryDark,
+                color: AppTokens.brandDark,
                 fontWeight: FontWeight.w600)),
       ]),
     );

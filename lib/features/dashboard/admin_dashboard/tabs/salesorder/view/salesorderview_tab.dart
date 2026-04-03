@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:maleva/core/utils/clsfunction.dart' as objfun;
 import 'package:salomon_bottom_bar/salomon_bottom_bar.dart';
+import '../../../../../../core/theme/tokens.dart';
 import '../bloc/salesorder_bloc.dart';
 import '../bloc/salesorder_event.dart';
 import '../bloc/salesorder_state.dart';
@@ -640,7 +641,7 @@ class _HeroHeaderCard extends StatelessWidget {
       margin: const EdgeInsets.fromLTRB(0, 0, 0, 0),
       decoration: const BoxDecoration(
         gradient: LinearGradient(
-          colors: [colors.kHeaderGradStart,colors.kHeaderGradEnd],
+          colors: [AppTokens.invoiceHeaderStart,colors.kHeaderGradEnd],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
@@ -946,7 +947,7 @@ class _RangeBtn extends StatelessWidget {
         padding:
         const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
         decoration: BoxDecoration(
-          color: selected ? colors.kHeaderGradStart : Colors.transparent,
+          color: selected ? AppTokens.invoiceHeaderStart : Colors.transparent,
           borderRadius: BorderRadius.circular(18),
         ),
         child: Text(text,

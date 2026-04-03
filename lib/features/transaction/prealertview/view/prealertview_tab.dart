@@ -12,7 +12,6 @@ import 'package:maleva/Transaction/SaleOrder/SalesOrderAdd.dart';
 import 'package:maleva/DashBoard/AirFrieght/AirFrieghtDashboard.dart';
 import 'package:maleva/DashBoard/Boarding/BoardingDashboard.dart';
 import 'package:maleva/DashBoard/Forwarding/ForwardingDashboard.dart';
-import 'package:maleva/DashBoard/OperationAdmin/OperationAdminDashboard.dart';
 import 'package:maleva/DashBoard/TransportDB/TransportDashboard.dart';
 import 'package:maleva/DashBoard/User/UserDashboard.dart';
 import '../../../../MasterSearch/JobType.dart';
@@ -23,25 +22,7 @@ import '../../../dashboard/operationadmin_dashboard/view/operationadmin_dashboar
 import '../bloc/prealertview_bloc.dart';
 import '../bloc/prealertview_event.dart';
 import '../bloc/prealertview_state.dart';
-
-
-// ─── Design Tokens (same as VesselPlanningView) ───────────────────────────────
-const kHeaderGradStart = Color(0xFF1A3A8F);
-const kHeaderGradEnd   = Color(0xFF4A6FD4);
-const kCardBorder      = Color(0xFFC5D0EE);
-const kCardBg          = Color(0xFFFFFFFF);
-const kPageBg          = Color(0xFFF4F6FB);
-const kTextDark        = Color(0xFF1E2D5E);
-const kTextMid         = Color(0xFF4A5A8A);
-const kTextMuted       = Color(0xFF8A96BF);
-const kDetailBg        = Color(0xFFF0F4FF);
-const kChipBg          = Color(0xFFEEF2FF);
-
-const kGradient = LinearGradient(
-  colors: [kHeaderGradStart, kHeaderGradEnd],
-  begin: Alignment.topLeft,
-  end: Alignment.bottomRight,
-);
+import 'package:maleva/core/colors/colors.dart' as colour;
 
 // ─── Root ─────────────────────────────────────────────────────────────────────
 class PreAlertReport extends StatelessWidget {
@@ -99,14 +80,14 @@ class _PreAlertPage extends StatelessWidget {
         },
         child: Scaffold(
           resizeToAvoidBottomInset: false,
-          backgroundColor: kPageBg,
+          backgroundColor: colour.kPageBg,
           appBar: _buildAppBar(context, userName, isTablet),
           drawer: const Menulist(),
           body: BlocBuilder<PreAlertBloc, PreAlertState>(
             builder: (context, state) {
               if (state is PreAlertInitial || state is PreAlertLoading) {
                 return const Center(
-                  child: SpinKitFoldingCube(color: kHeaderGradEnd, size: 35),
+                  child: SpinKitFoldingCube(color: colour.kHeaderGradEnd, size: 35),
                 );
               }
               if (state is PreAlertLoaded) {
@@ -168,7 +149,7 @@ class _PreAlertPage extends StatelessWidget {
       elevation: 0,
       toolbarHeight: isTablet ? 70 : 62,
       flexibleSpace: Container(
-        decoration: const BoxDecoration(gradient: kGradient),
+        decoration: const BoxDecoration(gradient: colour.kGradient),
       ),
       leading: IconButton(
         icon: const Icon(Icons.arrow_back_ios_new_rounded, size: 20),
@@ -247,10 +228,10 @@ class _FilterSheetState extends State<_FilterSheet> {
       builder: (ctx, child) => Theme(
         data: Theme.of(ctx).copyWith(
           colorScheme: const ColorScheme.light(
-            primary: kHeaderGradStart,
+            primary: colour.kHeaderGradStart,
             onPrimary: Colors.white,
             surface: Colors.white,
-            onSurface: kTextDark,
+            onSurface: colour.kTextDark,
           ),
         ),
         child: child!,
@@ -274,7 +255,7 @@ class _FilterSheetState extends State<_FilterSheet> {
     final isTablet = objfun.MalevaScreen != 1;
 
     final labelStyle = GoogleFonts.lato(
-      color: kTextDark,
+      color: colour.kTextDark,
       fontWeight: FontWeight.w600,
       fontSize: isTablet ? objfun.FontLow + 1 : objfun.FontLow,
     );
@@ -302,7 +283,7 @@ class _FilterSheetState extends State<_FilterSheet> {
                 width: 40,
                 height: 4,
                 decoration: BoxDecoration(
-                  color: kCardBorder,
+                  color: colour.kCardBorder,
                   borderRadius: BorderRadius.circular(2),
                 ),
               ),
@@ -311,7 +292,7 @@ class _FilterSheetState extends State<_FilterSheet> {
             Text(
               'Filter',
               style: GoogleFonts.lato(
-                color: kHeaderGradStart,
+                color: colour.kHeaderGradStart,
                 fontWeight: FontWeight.w700,
                 fontSize: isTablet ? 16 : 15,
               ),
@@ -528,7 +509,7 @@ class _PreAlertBody extends StatelessWidget {
           height: isTablet ? height * 0.08 : height * 0.07,
           decoration: const BoxDecoration(
             gradient: LinearGradient(
-              colors: [kHeaderGradStart, Color(0xFF2D56C8)],
+              colors: [colour.kHeaderGradStart, Color(0xFF2D56C8)],
               begin: Alignment.topCenter,
               end: Alignment.bottomCenter,
             ),
@@ -620,7 +601,7 @@ class _SaleOrderCard extends StatelessWidget {
 
     if (!hasPickup && !hasETA) return const Color(0xFFFFCDD2); // red tint
     if (!hasPickup) return const Color(0xFFFFF9C4);            // yellow tint
-    if (item.JobMasterRefId == 10) return kDetailBg;           // neutral
+    if (item.JobMasterRefId == 10) return colour.kDetailBg;           // neutral
     return const Color(0xFFDCEDC8);                            // green tint
   }
 
@@ -631,19 +612,19 @@ class _SaleOrderCard extends StatelessWidget {
 
     if (!hasPickup && !hasETA) return const Color(0xFFE53935);
     if (!hasPickup) return const Color(0xFFF9A825);
-    if (item.JobMasterRefId == 10) return kTextMuted;
+    if (item.JobMasterRefId == 10) return colour.kTextMuted;
     return const Color(0xFF388E3C);
   }
 
   @override
   Widget build(BuildContext context) {
     final valStyle = GoogleFonts.lato(
-      color: kTextDark,
+      color: colour.kTextDark,
       fontWeight: FontWeight.w600,
       fontSize: isTablet ? objfun.FontCardText + 1 : objfun.FontCardText,
     );
     final labelStyle = GoogleFonts.lato(
-      color: kTextMuted,
+      color: colour.kTextMuted,
       fontWeight: FontWeight.w600,
       fontSize: isTablet ? 10 : 9,
       letterSpacing: 0.4,
@@ -658,10 +639,10 @@ class _SaleOrderCard extends StatelessWidget {
           decoration: BoxDecoration(
             color: _statusColor(),
             borderRadius: BorderRadius.circular(14),
-            border: Border.all(color: kCardBorder, width: 0.5),
+            border: Border.all(color: colour.kCardBorder, width: 0.5),
             boxShadow: [
               BoxShadow(
-                color: kHeaderGradStart.withOpacity(0.07),
+                color: colour.kHeaderGradStart.withOpacity(0.07),
                 blurRadius: 12,
                 offset: const Offset(0, 3),
               ),
@@ -675,7 +656,7 @@ class _SaleOrderCard extends StatelessWidget {
                 // Accent bar
                 Container(
                   height: 3,
-                  decoration: const BoxDecoration(gradient: kGradient),
+                  decoration: const BoxDecoration(gradient: colour.kGradient),
                 ),
 
                 Padding(
@@ -735,7 +716,7 @@ class _SaleOrderCard extends StatelessWidget {
                                 Text('VESSEL', style: labelStyle),
                                 const SizedBox(height: 2),
                                 Text(item.Offvesselname ?? '-',
-                                    style: valStyle.copyWith(color: kTextMid),
+                                    style: valStyle.copyWith(color: colour.kTextMid),
                                     overflow: TextOverflow.ellipsis),
                               ],
                             ),
@@ -748,7 +729,7 @@ class _SaleOrderCard extends StatelessWidget {
                                 Text('ETA', style: labelStyle),
                                 const SizedBox(height: 2),
                                 Text(item.SETA?.toString() ?? '-',
-                                    style: valStyle.copyWith(color: kTextMid),
+                                    style: valStyle.copyWith(color: colour.kTextMid),
                                     overflow: TextOverflow.ellipsis),
                               ],
                             ),
@@ -761,7 +742,7 @@ class _SaleOrderCard extends StatelessWidget {
                                 Text('PICKUP', style: labelStyle),
                                 const SizedBox(height: 2),
                                 Text(item.SPickupDate?.toString() ?? '-',
-                                    style: valStyle.copyWith(color: kTextMid),
+                                    style: valStyle.copyWith(color: colour.kTextMid),
                                     overflow: TextOverflow.ellipsis),
                               ],
                             ),
@@ -858,7 +839,7 @@ class _SaleOrderCard extends StatelessWidget {
             borderRadius: BorderRadius.circular(20),
             boxShadow: [
               BoxShadow(
-                color: kHeaderGradStart.withOpacity(0.18),
+                color: colour.kHeaderGradStart.withOpacity(0.18),
                 blurRadius: 30,
                 offset: const Offset(0, 10),
               ),
@@ -873,7 +854,7 @@ class _SaleOrderCard extends StatelessWidget {
                 padding: const EdgeInsets.symmetric(
                     horizontal: 20, vertical: 16),
                 decoration: const BoxDecoration(
-                  gradient: kGradient,
+                  gradient: colour.kGradient,
                   borderRadius:
                   BorderRadius.vertical(top: Radius.circular(20)),
                 ),
@@ -911,21 +892,21 @@ class _SaleOrderCard extends StatelessWidget {
                     // Password field
                     TextField(
                       controller: txtPassword,
-                      cursorColor: kHeaderGradStart,
+                      cursorColor: colour.kHeaderGradStart,
                       textCapitalization: TextCapitalization.characters,
                       textInputAction: TextInputAction.done,
                       keyboardType: TextInputType.number,
                       style: GoogleFonts.lato(
-                        color: kTextDark,
+                        color: colour.kTextDark,
                         fontWeight: FontWeight.w600,
                         fontSize: objfun.FontLow,
                       ),
                       decoration: InputDecoration(
                         hintText: 'Enter password',
                         hintStyle: GoogleFonts.lato(
-                            color: kTextMuted, fontSize: objfun.FontLow),
+                            color: colour.kTextMuted, fontSize: objfun.FontLow),
                         filled: true,
-                        fillColor: kDetailBg,
+                        fillColor: colour.kDetailBg,
                         contentPadding: const EdgeInsets.symmetric(
                             horizontal: 14, vertical: 12),
                         border: OutlineInputBorder(
@@ -935,7 +916,7 @@ class _SaleOrderCard extends StatelessWidget {
                         focusedBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(10),
                           borderSide: const BorderSide(
-                              color: kHeaderGradEnd, width: 1.5),
+                              color: colour.kHeaderGradEnd, width: 1.5),
                         ),
                       ),
                     ),
@@ -1006,7 +987,7 @@ class _DetailsSection extends StatelessWidget {
       letterSpacing: 0.5,
     );
     final rowStyle = GoogleFonts.lato(
-      color: kTextDark,
+      color: colour.kTextDark,
       fontWeight: FontWeight.w500,
       fontSize: isTablet ? objfun.FontCardText : objfun.FontCardText - 1,
     );
@@ -1025,7 +1006,7 @@ class _DetailsSection extends StatelessWidget {
           height: headerHeight,
           decoration: const BoxDecoration(
             gradient: LinearGradient(
-              colors: [kHeaderGradStart, Color(0xFF2D56C8)],
+              colors: [colour.kHeaderGradStart, Color(0xFF2D56C8)],
               begin: Alignment.topCenter,
               end: Alignment.bottomCenter,
             ),
@@ -1046,7 +1027,7 @@ class _DetailsSection extends StatelessWidget {
               ? Center(
             child: Text('No details',
                 style: GoogleFonts.lato(
-                    fontSize: objfun.FontLow, color: kTextMuted)),
+                    fontSize: objfun.FontLow, color: colour.kTextMuted)),
           )
               : ListView.builder(
             physics: const NeverScrollableScrollPhysics(),
@@ -1054,7 +1035,7 @@ class _DetailsSection extends StatelessWidget {
             itemBuilder: (ctx, i) {
               return Container(
                 height: rowHeight,
-                color: i % 2 == 0 ? Colors.white : kDetailBg,
+                color: i % 2 == 0 ? Colors.white : colour.kDetailBg,
                 padding:
                 const EdgeInsets.symmetric(horizontal: 14),
                 child: Row(
@@ -1071,7 +1052,7 @@ class _DetailsSection extends StatelessWidget {
                       flex: 3,
                       child: Text(
                         details[i].ProductName ?? '',
-                        style: rowStyle.copyWith(color: kTextMid),
+                        style: rowStyle.copyWith(color: colour.kTextMid),
                         overflow: TextOverflow.ellipsis,
                       ),
                     ),
@@ -1106,22 +1087,22 @@ class _EmptyState extends StatelessWidget {
             width: 64,
             height: 64,
             decoration: BoxDecoration(
-              color: kChipBg,
+              color: colour.kChipBg,
               borderRadius: BorderRadius.circular(16),
             ),
             child: const Icon(Icons.description_outlined,
-                size: 32, color: kHeaderGradEnd),
+                size: 32, color: colour.kHeaderGradEnd),
           ),
           const SizedBox(height: 14),
           Text(
             'No Records Found',
             style: GoogleFonts.lato(
-                color: kTextDark, fontWeight: FontWeight.w600, fontSize: 15),
+                color: colour.kTextDark, fontWeight: FontWeight.w600, fontSize: 15),
           ),
           const SizedBox(height: 4),
           Text(
             'Use the filter to load data',
-            style: GoogleFonts.lato(color: kTextMuted, fontSize: 12),
+            style: GoogleFonts.lato(color: colour.kTextMuted, fontSize: 12),
           ),
         ],
       ),
@@ -1140,11 +1121,11 @@ class _PAFab extends StatelessWidget {
       width: 52,
       height: 52,
       decoration: BoxDecoration(
-        gradient: kGradient,
+        gradient: colour.kGradient,
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: kHeaderGradStart.withOpacity(0.4),
+            color: colour.kHeaderGradStart.withOpacity(0.4),
             blurRadius: 16,
             offset: const Offset(0, 6),
           ),
@@ -1200,10 +1181,10 @@ class _CheckboxGrid extends StatelessWidget {
                     width: 18,
                     height: 18,
                     decoration: BoxDecoration(
-                      gradient: item.$3 ? kGradient : null,
+                      gradient: item.$3 ? colour.kGradient : null,
                       border: item.$3
                           ? null
-                          : Border.all(color: kCardBorder, width: 1.5),
+                          : Border.all(color: colour.kCardBorder, width: 1.5),
                       borderRadius: BorderRadius.circular(5),
                     ),
                     child: item.$3
@@ -1215,7 +1196,7 @@ class _CheckboxGrid extends StatelessWidget {
                   Text(
                     item.$2,
                     style: GoogleFonts.lato(
-                      color: kTextDark,
+                      color: colour.kTextDark,
                       fontWeight: FontWeight.w600,
                       fontSize: isTablet
                           ? objfun.FontLow + 1
@@ -1243,7 +1224,7 @@ class _ETARadioRow extends StatelessWidget {
   Widget build(BuildContext context) {
     final isTablet = objfun.MalevaScreen != 1;
     final style = GoogleFonts.lato(
-      color: kTextDark,
+      color: colour.kTextDark,
       fontWeight: FontWeight.w600,
       fontSize: isTablet ? objfun.FontLow + 1 : objfun.FontLow,
     );
@@ -1257,9 +1238,9 @@ class _ETARadioRow extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 8),
       decoration: BoxDecoration(
-        color: kDetailBg,
+        color: colour.kDetailBg,
         borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: kCardBorder, width: 0.5),
+        border: Border.all(color: colour.kCardBorder, width: 0.5),
       ),
       child: Row(
         children: options.map((opt) {
@@ -1279,10 +1260,10 @@ class _ETARadioRow extends StatelessWidget {
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
                         border: Border.all(
-                          color: selected ? kHeaderGradEnd : kCardBorder,
+                          color: selected ? colour.kHeaderGradEnd : colour.kCardBorder,
                           width: 1.5,
                         ),
-                        gradient: selected ? kGradient : null,
+                        gradient: selected ? colour.kGradient : null,
                       ),
                       child: selected
                           ? const Icon(Icons.circle,
@@ -1325,9 +1306,9 @@ class _SheetDateTile extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
         decoration: BoxDecoration(
-          color: kDetailBg,
+          color: colour.kDetailBg,
           borderRadius: BorderRadius.circular(10),
-          border: Border.all(color: kCardBorder, width: 0.5),
+          border: Border.all(color: colour.kCardBorder, width: 0.5),
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -1335,7 +1316,7 @@ class _SheetDateTile extends StatelessWidget {
             Text(
               label.toUpperCase(),
               style: GoogleFonts.lato(
-                color: kTextMuted,
+                color: colour.kTextMuted,
                 fontWeight: FontWeight.w700,
                 fontSize: 9,
                 letterSpacing: 0.6,
@@ -1347,11 +1328,11 @@ class _SheetDateTile extends StatelessWidget {
               children: [
                 Text(displayDate,
                     style: GoogleFonts.lato(
-                        color: kTextDark,
+                        color: colour.kTextDark,
                         fontWeight: FontWeight.w700,
                         fontSize: 13)),
                 const Icon(Icons.calendar_month_outlined,
-                    size: 18, color: kHeaderGradEnd),
+                    size: 18, color: colour.kHeaderGradEnd),
               ],
             ),
           ],
@@ -1384,9 +1365,9 @@ class _PASearchField extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
         decoration: BoxDecoration(
-          color: disabled ? const Color(0xFFF5F5F5) : kDetailBg,
+          color: disabled ? const Color(0xFFF5F5F5) : colour.kDetailBg,
           borderRadius: BorderRadius.circular(10),
-          border: Border.all(color: kCardBorder, width: 0.5),
+          border: Border.all(color: colour.kCardBorder, width: 0.5),
         ),
         child: Row(
           children: [
@@ -1394,7 +1375,7 @@ class _PASearchField extends StatelessWidget {
               child: Text(
                 value.isEmpty ? hint : value,
                 style: GoogleFonts.lato(
-                  color: value.isEmpty ? kTextMuted : kTextDark,
+                  color: value.isEmpty ? colour.kTextMuted : colour.kTextDark,
                   fontWeight: value.isEmpty ? FontWeight.w500 : FontWeight.w600,
                   fontSize: objfun.FontLow,
                 ),
@@ -1404,7 +1385,7 @@ class _PASearchField extends StatelessWidget {
             Icon(
               value.isNotEmpty ? Icons.close_rounded : Icons.search_rounded,
               size: 20,
-              color: disabled ? kTextMuted : kHeaderGradEnd,
+              color: disabled ? colour.kTextMuted : colour.kHeaderGradEnd,
             ),
           ],
         ),
@@ -1431,15 +1412,15 @@ class _PATextField extends StatelessWidget {
       textInputAction: TextInputAction.done,
       onChanged: onChanged,
       style: GoogleFonts.lato(
-        color: kTextDark,
+        color: colour.kTextDark,
         fontWeight: FontWeight.w600,
         fontSize: objfun.FontLow,
       ),
       decoration: InputDecoration(
         hintText: hint,
-        hintStyle: GoogleFonts.lato(color: kTextMuted, fontSize: objfun.FontLow),
+        hintStyle: GoogleFonts.lato(color: colour.kTextMuted, fontSize: objfun.FontLow),
         filled: true,
-        fillColor: kDetailBg,
+        fillColor: colour.kDetailBg,
         contentPadding:
         const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
         border: OutlineInputBorder(
@@ -1448,11 +1429,11 @@ class _PATextField extends StatelessWidget {
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(10),
-          borderSide: const BorderSide(color: kCardBorder, width: 0.5),
+          borderSide: const BorderSide(color: colour.kCardBorder, width: 0.5),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(10),
-          borderSide: const BorderSide(color: kHeaderGradEnd, width: 1.5),
+          borderSide: const BorderSide(color: colour.kHeaderGradEnd, width: 1.5),
         ),
       ),
     );
@@ -1475,19 +1456,19 @@ class _CardActionChip extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
         decoration: BoxDecoration(
-          color: kChipBg,
+          color: colour.kChipBg,
           borderRadius: BorderRadius.circular(20),
-          border: Border.all(color: kCardBorder, width: 0.5),
+          border: Border.all(color: colour.kCardBorder, width: 0.5),
         ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(icon, size: 14, color: kHeaderGradStart),
+            Icon(icon, size: 14, color: colour.kHeaderGradStart),
             const SizedBox(width: 4),
             Text(
               label,
               style: GoogleFonts.lato(
-                color: kHeaderGradStart,
+                color: colour.kHeaderGradStart,
                 fontWeight: FontWeight.w600,
                 fontSize: 11,
               ),
@@ -1509,11 +1490,11 @@ class _GradientButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        gradient: kGradient,
+        gradient: colour.kGradient,
         borderRadius: BorderRadius.circular(24),
         boxShadow: [
           BoxShadow(
-            color: kHeaderGradStart.withOpacity(0.35),
+            color: colour.kHeaderGradStart.withOpacity(0.35),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
@@ -1552,9 +1533,9 @@ class _OutlineButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        color: kChipBg,
+        color: colour.kChipBg,
         borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: kCardBorder),
+        border: Border.all(color: colour.kCardBorder),
       ),
       child: Material(
         color: Colors.transparent,
@@ -1567,7 +1548,7 @@ class _OutlineButton extends StatelessWidget {
             child: Text(
               label,
               style: GoogleFonts.lato(
-                color: kHeaderGradStart,
+                color: colour.kHeaderGradStart,
                 fontWeight: FontWeight.w700,
                 fontSize: objfun.FontMedium,
               ),

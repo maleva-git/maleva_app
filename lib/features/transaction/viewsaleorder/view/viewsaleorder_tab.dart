@@ -8,21 +8,12 @@ import 'package:maleva/Transaction/SaleOrderDetails.dart';
 import '../bloc/viewsaleorder_bloc.dart';
 import '../bloc/viewsaleorder_event.dart';
 import '../bloc/viewsaleorder_state.dart';
+import 'package:maleva/core/colors/colors.dart' as colour;
 
 
-// ─── Design Tokens ────────────────────────────────────────────────────────────
-const kHeaderGradStart = Color(0xFF1A3A8F);
-const kHeaderGradEnd   = Color(0xFF4A6FD4);
-const kCardBorder      = Color(0xFFC5D0EE);
-const kPageBg          = Color(0xFFF4F6FB);
-const kTextDark        = Color(0xFF1E2D5E);
-const kTextMid         = Color(0xFF4A5A8A);
-const kTextMuted       = Color(0xFF8A96BF);
-const kDetailBg        = Color(0xFFF0F4FF);
-const kChipBg          = Color(0xFFEEF2FF);
 
 const kGradient = LinearGradient(
-  colors: [kHeaderGradStart, kHeaderGradEnd],
+  colors: [colour.kHeaderGradStart, colour.kHeaderGradEnd],
   begin: Alignment.topLeft,
   end: Alignment.bottomRight,
 );
@@ -89,13 +80,13 @@ class _GetJobNoPageView extends StatelessWidget {
         },
         child: Scaffold(
           resizeToAvoidBottomInset: true,
-          backgroundColor: kPageBg,
+          backgroundColor: colour.kPageBg,
           appBar: _buildAppBar(context),
           body: BlocBuilder<GetJobNoBloc, GetJobNoState>(
             builder: (context, state) {
               if (state is GetJobNoInitial || state is GetJobNoLoading) {
                 return const Center(
-                  child: SpinKitFoldingCube(color: kHeaderGradEnd, size: 35),
+                  child: SpinKitFoldingCube(color: colour.kHeaderGradEnd, size: 35),
                 );
               }
               if (state is GetJobNoLoaded) {
@@ -183,10 +174,10 @@ class _JobNoCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: kCardBorder, width: 0.5),
+        border: Border.all(color: colour.kCardBorder, width: 0.5),
         boxShadow: [
           BoxShadow(
-            color: kHeaderGradStart.withOpacity(0.10),
+            color: colour.kHeaderGradStart.withOpacity(0.10),
             blurRadius: 24,
             offset: const Offset(0, 8),
           ),
@@ -259,7 +250,7 @@ class _BillTypeRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final labelStyle = GoogleFonts.lato(
-      color: kTextDark,
+      color: colour.kTextDark,
       fontWeight: FontWeight.w600,
       fontSize: isTablet ? objfun.FontMedium + 1 : objfun.FontMedium,
     );
@@ -267,9 +258,9 @@ class _BillTypeRow extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 8),
       decoration: BoxDecoration(
-        color: kDetailBg,
+        color: colour.kDetailBg,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: kCardBorder, width: 0.5),
+        border: Border.all(color: colour.kCardBorder, width: 0.5),
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -335,7 +326,7 @@ class _RadioOption extends StatelessWidget {
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
                 border: Border.all(
-                  color: selected ? kHeaderGradEnd : kCardBorder,
+                  color: selected ? colour.kHeaderGradEnd : colour.kCardBorder,
                   width: selected ? 0 : 1.5,
                 ),
                 gradient: selected ? kGradient : null,
@@ -349,7 +340,7 @@ class _RadioOption extends StatelessWidget {
             Text(
               label,
               style: GoogleFonts.lato(
-                color: selected ? kHeaderGradStart : kTextMid,
+                color: selected ? colour.kHeaderGradStart : colour.kTextMid,
                 fontWeight: FontWeight.w700,
                 fontSize: isTablet ? objfun.FontMedium + 1 : objfun.FontMedium,
               ),
@@ -404,7 +395,7 @@ class _JobNoFieldState extends State<_JobNoField> {
         Text(
           'Job No',
           style: GoogleFonts.lato(
-            color: kTextMid,
+            color: colour.kTextMid,
             fontWeight: FontWeight.w600,
             fontSize: isTablet ? objfun.FontLow + 1 : objfun.FontLow,
           ),
@@ -418,23 +409,23 @@ class _JobNoFieldState extends State<_JobNoField> {
           textInputAction: TextInputAction.done,
           textCapitalization: TextCapitalization.characters,
           style: GoogleFonts.lato(
-            color: kTextDark,
+            color: colour.kTextDark,
             fontWeight: FontWeight.w600,
             fontSize: isTablet ? objfun.FontLow + 1 : objfun.FontLow,
           ),
           decoration: InputDecoration(
             hintText: 'Enter Job No',
             hintStyle: GoogleFonts.lato(
-                color: kTextMuted,
+                color: colour.kTextMuted,
                 fontSize: isTablet ? objfun.FontLow + 1 : objfun.FontLow),
             filled: true,
-            fillColor: kDetailBg,
+            fillColor: colour.kDetailBg,
             prefixIcon: const Icon(Icons.tag_rounded,
-                color: kHeaderGradEnd, size: 20),
+                color: colour.kHeaderGradEnd, size: 20),
             suffixIcon: _controller.text.isNotEmpty
                 ? IconButton(
               icon: const Icon(Icons.close_rounded,
-                  color: kTextMuted, size: 18),
+                  color: colour.kTextMuted, size: 18),
               onPressed: () {
                 _controller.clear();
                 context
@@ -451,12 +442,12 @@ class _JobNoFieldState extends State<_JobNoField> {
             ),
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
-              borderSide: const BorderSide(color: kCardBorder, width: 0.5),
+              borderSide: const BorderSide(color: colour.kCardBorder, width: 0.5),
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
               borderSide:
-              const BorderSide(color: kHeaderGradEnd, width: 1.5),
+              const BorderSide(color: colour.kHeaderGradEnd, width: 1.5),
             ),
           ),
           onChanged: (v) {
@@ -472,10 +463,10 @@ class _JobNoFieldState extends State<_JobNoField> {
             decoration: BoxDecoration(
               color: Colors.white,
               borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: kCardBorder, width: 0.5),
+              border: Border.all(color: colour.kCardBorder, width: 0.5),
               boxShadow: [
                 BoxShadow(
-                  color: kHeaderGradStart.withOpacity(0.10),
+                  color: colour.kHeaderGradStart.withOpacity(0.10),
                   blurRadius: 12,
                   offset: const Offset(0, 4),
                 ),
@@ -486,7 +477,7 @@ class _JobNoFieldState extends State<_JobNoField> {
               padding: EdgeInsets.zero,
               itemCount: suggestions.length,
               separatorBuilder: (_, __) => const Divider(
-                  height: 1, color: kDetailBg, indent: 14, endIndent: 14),
+                  height: 1, color: colour.kDetailBg, indent: 14, endIndent: 14),
               itemBuilder: (ctx, i) {
                 final item = suggestions[i];
                 final jobNo = item['CNumber'].toString();
@@ -511,12 +502,12 @@ class _JobNoFieldState extends State<_JobNoField> {
                     child: Row(
                       children: [
                         const Icon(Icons.work_outline_rounded,
-                            size: 16, color: kHeaderGradEnd),
+                            size: 16, color: colour.kHeaderGradEnd),
                         const SizedBox(width: 10),
                         Text(
                           jobNo,
                           style: GoogleFonts.lato(
-                            color: kTextDark,
+                            color: colour.kTextDark,
                             fontWeight: FontWeight.w600,
                             fontSize: isTablet
                                 ? objfun.FontLow + 1
@@ -540,12 +531,12 @@ class _JobNoFieldState extends State<_JobNoField> {
             child: Row(
               children: [
                 const Icon(Icons.info_outline_rounded,
-                    size: 14, color: kTextMuted),
+                    size: 14, color: colour.kTextMuted),
                 const SizedBox(width: 6),
                 Text(
                   'No matching job numbers found',
                   style: GoogleFonts.lato(
-                      color: kTextMuted, fontSize: 12),
+                      color: colour.kTextMuted, fontSize: 12),
                 ),
               ],
             ),
@@ -636,7 +627,7 @@ class _GradientButton extends StatelessWidget {
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
-            color: kHeaderGradStart.withOpacity(0.35),
+            color: colour.kHeaderGradStart.withOpacity(0.35),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
@@ -695,9 +686,9 @@ class _OutlineButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        color: kChipBg,
+        color: colour.kChipBg,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: kCardBorder),
+        border: Border.all(color: colour.kCardBorder),
       ),
       child: Material(
         color: Colors.transparent,
@@ -715,7 +706,7 @@ class _OutlineButton extends StatelessWidget {
                 Text(
                   label,
                   style: GoogleFonts.lato(
-                    color: kHeaderGradStart,
+                    color: colour.kHeaderGradStart,
                     fontWeight: FontWeight.w700,
                     fontSize:
                     isTablet ? objfun.FontMedium + 1 : objfun.FontMedium,
@@ -723,7 +714,7 @@ class _OutlineButton extends StatelessWidget {
                 ),
                 const SizedBox(width: 8),
                 Icon(icon,
-                    color: kHeaderGradStart,
+                    color: colour.kHeaderGradStart,
                     size: isTablet ? 22 : 18),
               ],
             ),

@@ -140,3 +140,42 @@ const Color kSuccess   = Color(0xFF059669);
 const Color kDanger    = Color(0xFFDC2626);
 const Color kTextMuted = Color(0xFF475569);
 const Color kTextDim   = Color(0xFF94A3B8);
+
+
+//maintenance
+
+
+const kCardBorder      = Color(0xFFC5D0EE);
+const kTextDark        = Color(0xFF1E2D5E);
+const kTextMid         = Color(0xFF4A5A8A);
+const kDetailBg        = Color(0xFFF0F4FF);
+const kChipBg          = Color(0xFFEEF2FF);
+const kAccentRed       = Color(0xFFB33040);
+
+const kGradient = LinearGradient(
+  colors: [kHeaderGradStart, kHeaderGradEnd],
+  begin: Alignment.topLeft,
+  end: Alignment.bottomRight,
+);
+
+const double kTabletBreak = 600;
+
+
+//saleorder view
+// ── Brand palette ─────────────────────────────────────────
+const brand      = Color(0xFF1555F3);
+const brandDark  = Color(0xFF0D3DB8);
+const brandDeep  = Color(0xFF0A2D8A);
+const brandLight = Color(0xFFE8EFFE);
+const brandMid   = Color(0xFF4B7BF5);
+const brandGlow  = Color(0x1F1555F3);
+const surface    = Color(0xFFF4F7FF);
+const textMain   = Color(0xFF0D1B4B);
+const textSub    = Color(0xFF5A6A9A);
+const border     = Color(0x261555F3);
+const red        = Color(0xFFE53935);
+const yellow     = Color(0xFFF9A825);
+const green      = Color(0xFF2E7D32);
+
+
+

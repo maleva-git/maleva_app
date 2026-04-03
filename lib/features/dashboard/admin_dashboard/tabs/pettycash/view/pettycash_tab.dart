@@ -5,6 +5,7 @@ import 'package:intl/intl.dart';
 import 'package:maleva/core/models/model.dart';
 import 'package:maleva/core/utils/clsfunction.dart' as objfun;
 import '../../../../../../core/colors/colors.dart';
+import '../../../../../../core/theme/tokens.dart';
 import '../bloc/pettycash_bloc.dart';
 import '../bloc/pettycash_event.dart';
 import '../bloc/pettycash_state.dart';
@@ -45,7 +46,7 @@ class _PettyCashBody extends StatelessWidget {
                 style: GoogleFonts.lato(
                   fontSize: objfun.FontLarge,
                   fontWeight: FontWeight.bold,
-                  color: kPrimaryDark,
+                  color: AppTokens.brandDark,
                 ),
               ),
 
@@ -119,7 +120,7 @@ class _PettyCashBody extends StatelessWidget {
       }) {
     if (state is PettyCashLoading) {
       return const Center(
-          child: CircularProgressIndicator(color: kPrimary));
+          child: CircularProgressIndicator(color: AppTokens.brandGradientStart));
     }
 
     if (state is PettyCashError) {
@@ -142,7 +143,7 @@ class _PettyCashBody extends StatelessWidget {
               icon: const Icon(Icons.refresh),
               label: const Text("Retry"),
               style: ElevatedButton.styleFrom(
-                  backgroundColor: kPrimary),
+                  backgroundColor: AppTokens.brandGradientStart),
             ),
           ],
         ),
@@ -251,10 +252,10 @@ class _DateFilterBar extends StatelessWidget {
         vertical:   isTablet ? 12 : 10,
       ),
       decoration: BoxDecoration(
-        color: kAccent,
+        color: AppTokens.brandLight,
         borderRadius: BorderRadius.circular(isTablet ? 16 : 14),
         border:
-        Border.all(color: kPrimaryLight.withOpacity(0.3)),
+        Border.all(color: AppTokens.brandMid.withOpacity(0.3)),
       ),
       child: Row(
         children: [
@@ -274,7 +275,7 @@ class _DateFilterBar extends StatelessWidget {
                   style: GoogleFonts.lato(
                       fontWeight: FontWeight.bold,
                       fontSize: objfun.FontLow,
-                      color: kPrimaryDark),
+                      color: AppTokens.brandDark),
                 ),
               ],
             ),
@@ -289,7 +290,7 @@ class _DateFilterBar extends StatelessWidget {
               builder: (ctx, child) => Theme(
                 data: Theme.of(ctx).copyWith(
                     colorScheme: const ColorScheme.light(
-                        primary: kPrimary)),
+                        primary: AppTokens.brandGradientStart)),
                 child: child!,
               ),
             );
@@ -302,7 +303,7 @@ class _DateFilterBar extends StatelessWidget {
 
           Container(
             width: 1, height: 30,
-            color: kPrimaryLight.withOpacity(0.3),
+            color: AppTokens.brandMid.withOpacity(0.3),
             margin: const EdgeInsets.symmetric(horizontal: 8),
           ),
 
@@ -322,7 +323,7 @@ class _DateFilterBar extends StatelessWidget {
                   style: GoogleFonts.lato(
                       fontWeight: FontWeight.bold,
                       fontSize: objfun.FontLow,
-                      color: kPrimaryDark),
+                      color: AppTokens.brandDark),
                 ),
               ],
             ),
@@ -337,7 +338,7 @@ class _DateFilterBar extends StatelessWidget {
               builder: (ctx, child) => Theme(
                 data: Theme.of(ctx).copyWith(
                     colorScheme: const ColorScheme.light(
-                        primary: kPrimary)),
+                        primary: AppTokens.brandGradientStart)),
                 child: child!,
               ),
             );
@@ -357,7 +358,7 @@ class _DateFilterBar extends StatelessWidget {
                 .read<PettyCashBloc>()
                 .add(const LoadPettyCashEvent()),
             style: ElevatedButton.styleFrom(
-              backgroundColor: kPrimary,
+              backgroundColor: AppTokens.brandGradientStart,
               padding: EdgeInsets.symmetric(
                 horizontal: isTablet ? 18 : 14,
                 vertical:   isTablet ? 12 : 10,
@@ -390,7 +391,7 @@ class _DateBtn extends StatelessWidget {
       child: Container(
         width: 34, height: 34,
         decoration: BoxDecoration(
-            color: kPrimary,
+            color: AppTokens.brandGradientStart,
             borderRadius: BorderRadius.circular(8)),
         child: const Icon(Icons.calendar_month_outlined,
             color: kWhite, size: 18),
@@ -430,12 +431,12 @@ class _PettyCashCard extends StatelessWidget {
           borderRadius:
           BorderRadius.circular(isTablet ? 12 : 16),
           border: Border.all(
-            color: isSelected ? kPrimary : kAccent,
+            color: isSelected ? AppTokens.brandGradientStart : AppTokens.brandLight,
             width: isSelected ? 2.0 : 1.5,
           ),
           boxShadow: [
             BoxShadow(
-              color: kPrimary
+              color: AppTokens.brandGradientStart
                   .withOpacity(isSelected ? 0.15 : 0.07),
               blurRadius: isSelected ? 14 : 10,
               offset: const Offset(0, 4),
@@ -450,10 +451,10 @@ class _PettyCashCard extends StatelessWidget {
                 width: isTablet ? 38 : 46,
                 height: isTablet ? 38 : 46,
                 decoration: const BoxDecoration(
-                    color: kAccent, shape: BoxShape.circle),
+                    color: AppTokens.brandLight, shape: BoxShape.circle),
                 child: Icon(
                     Icons.account_balance_wallet_rounded,
-                    color: kPrimary,
+                    color: AppTokens.brandGradientStart,
                     size: isTablet ? 20 : 22),
               ),
               const SizedBox(width: 12),
@@ -467,7 +468,7 @@ class _PettyCashCard extends StatelessWidget {
                       style: GoogleFonts.lato(
                           fontSize: isTablet ? 14 : 16,
                           fontWeight: FontWeight.bold,
-                          color: kPrimaryDark),
+                          color: AppTokens.brandDark),
                       overflow: TextOverflow.ellipsis,
                     ),
                     Text(
@@ -494,7 +495,7 @@ class _PettyCashCard extends StatelessWidget {
                   vertical:   isTablet ? 4 : 6,
                 ),
                 decoration: BoxDecoration(
-                    color: kAccent,
+                    color: AppTokens.brandLight,
                     borderRadius:
                     BorderRadius.circular(10)),
                 child: Text(
@@ -502,7 +503,7 @@ class _PettyCashCard extends StatelessWidget {
                   style: GoogleFonts.lato(
                       fontSize: isTablet ? 13 : 14,
                       fontWeight: FontWeight.bold,
-                      color: kPrimary),
+                      color: AppTokens.brandGradientStart),
                 ),
               ),
             ],
@@ -522,10 +523,10 @@ class _EmptyDetailPanel extends StatelessWidget {
       decoration: BoxDecoration(
         color: kWhite,
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: kAccent, width: 1.5),
+        border: Border.all(color: AppTokens.brandLight, width: 1.5),
         boxShadow: [
           BoxShadow(
-              color: kPrimary.withOpacity(0.05),
+              color: AppTokens.brandGradientStart.withOpacity(0.05),
               blurRadius: 12,
               offset: const Offset(0, 4))
         ],
@@ -536,16 +537,16 @@ class _EmptyDetailPanel extends StatelessWidget {
           Container(
             width: 64, height: 64,
             decoration: const BoxDecoration(
-                color: kAccent, shape: BoxShape.circle),
+                color: AppTokens.brandLight, shape: BoxShape.circle),
             child: const Icon(Icons.touch_app_rounded,
-                color: kPrimary, size: 32),
+                color: AppTokens.brandGradientStart, size: 32),
           ),
           const SizedBox(height: 16),
           Text("Select a record",
               style: GoogleFonts.lato(
                   fontSize: 16,
                   fontWeight: FontWeight.bold,
-                  color: kPrimaryDark)),
+                  color: AppTokens.brandDark)),
           const SizedBox(height: 6),
           Text("Tap any card to view details",
               style: GoogleFonts.lato(
@@ -573,10 +574,10 @@ class _PettyCashDetailPanel extends StatelessWidget {
       decoration: BoxDecoration(
         color: kWhite,
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: kAccent, width: 1.5),
+        border: Border.all(color: AppTokens.brandLight, width: 1.5),
         boxShadow: [
           BoxShadow(
-              color: kPrimary.withOpacity(0.07),
+              color: AppTokens.brandGradientStart.withOpacity(0.07),
               blurRadius: 16,
               offset: const Offset(0, 5))
         ],
@@ -589,7 +590,7 @@ class _PettyCashDetailPanel extends StatelessWidget {
             padding: const EdgeInsets.symmetric(
                 vertical: 16, horizontal: 20),
             decoration: const BoxDecoration(
-              color: kPrimary,
+              color: AppTokens.brandGradientStart,
               borderRadius: BorderRadius.only(
                 topLeft:  Radius.circular(20),
                 topRight: Radius.circular(20),
@@ -644,14 +645,14 @@ class _PettyCashDetailPanel extends StatelessWidget {
                         style: GoogleFonts.lato(
                             fontSize: 15,
                             fontWeight: FontWeight.bold,
-                            color: kPrimaryDark)),
+                            color: AppTokens.brandDark)),
                     const SizedBox(height: 8),
                     ...details.map((d) => Container(
                       margin: const EdgeInsets.only(
                           bottom: 10),
                       padding: const EdgeInsets.all(12),
                       decoration: BoxDecoration(
-                        color: kAccent,
+                        color: AppTokens.brandLight,
                         borderRadius:
                         BorderRadius.circular(10),
                       ),
@@ -664,7 +665,7 @@ class _PettyCashDetailPanel extends StatelessWidget {
                               style: GoogleFonts.lato(
                                   fontWeight:
                                   FontWeight.w600,
-                                  color: kPrimaryDark)),
+                                  color: AppTokens.brandDark)),
                           Text(
                               "Notes: ${d.notes ?? '-'}",
                               style: GoogleFonts.lato(
@@ -675,7 +676,7 @@ class _PettyCashDetailPanel extends StatelessWidget {
                               style: GoogleFonts.lato(
                                   fontWeight:
                                   FontWeight.bold,
-                                  color: kPrimary)),
+                                  color: AppTokens.brandGradientStart)),
                         ],
                       ),
                     )),
@@ -696,9 +697,9 @@ class _PettyCashDetailPanel extends StatelessWidget {
         Container(
           width: 32, height: 32,
           decoration: BoxDecoration(
-              color: kAccent,
+              color: AppTokens.brandLight,
               borderRadius: BorderRadius.circular(8)),
-          child: Icon(icon, color: kPrimary, size: 15),
+          child: Icon(icon, color: AppTokens.brandGradientStart, size: 15),
         ),
         const SizedBox(width: 10),
         Expanded(
@@ -714,7 +715,7 @@ class _PettyCashDetailPanel extends StatelessWidget {
                   style: GoogleFonts.lato(
                       fontSize: 14,
                       fontWeight: FontWeight.w700,
-                      color: kPrimaryDark)),
+                      color: AppTokens.brandDark)),
             ],
           ),
         ),
@@ -723,7 +724,7 @@ class _PettyCashDetailPanel extends StatelessWidget {
   }
 
   Widget _divider() =>
-      Divider(color: kAccent, thickness: 1.5, height: 20);
+      Divider(color: AppTokens.brandLight, thickness: 1.5, height: 20);
 }
 
 // ── Dialog (Mobile only) ──────────────────────────────────────────────────────
@@ -758,7 +759,7 @@ class _PettyCashDialog extends StatelessWidget {
                 padding: const EdgeInsets.symmetric(
                     vertical: 20, horizontal: 24),
                 decoration: const BoxDecoration(
-                  color: kPrimary,
+                  color: AppTokens.brandGradientStart,
                   borderRadius: BorderRadius.only(
                       topLeft: Radius.circular(20),
                       topRight: Radius.circular(20)),
@@ -816,7 +817,7 @@ class _PettyCashDialog extends StatelessWidget {
                             style: GoogleFonts.lato(
                                 fontSize: 16,
                                 fontWeight: FontWeight.bold,
-                                color: kPrimaryDark)),
+                                color: AppTokens.brandDark)),
                         const SizedBox(height: 8),
                         ...details.map((d) => Container(
                           margin: const EdgeInsets.only(
@@ -824,7 +825,7 @@ class _PettyCashDialog extends StatelessWidget {
                           padding:
                           const EdgeInsets.all(12),
                           decoration: BoxDecoration(
-                            color: kAccent,
+                            color: AppTokens.brandLight,
                             borderRadius:
                             BorderRadius.circular(10),
                           ),
@@ -837,7 +838,7 @@ class _PettyCashDialog extends StatelessWidget {
                                   style: GoogleFonts.lato(
                                       fontWeight:
                                       FontWeight.w600,
-                                      color: kPrimaryDark)),
+                                      color: AppTokens.brandDark)),
                               Text(
                                   "Notes: ${d.notes ?? '-'}",
                                   style: GoogleFonts.lato(
@@ -848,7 +849,7 @@ class _PettyCashDialog extends StatelessWidget {
                                   style: GoogleFonts.lato(
                                       fontWeight:
                                       FontWeight.bold,
-                                      color: kPrimary)),
+                                      color: AppTokens.brandGradientStart)),
                             ],
                           ),
                         )),
@@ -859,7 +860,7 @@ class _PettyCashDialog extends StatelessWidget {
                         width: double.infinity,
                         child: ElevatedButton(
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: kPrimary,
+                            backgroundColor: AppTokens.brandGradientStart,
                             padding:
                             const EdgeInsets.symmetric(
                                 vertical: 14),
@@ -896,9 +897,9 @@ class _PettyCashDialog extends StatelessWidget {
         Container(
           width: 34, height: 34,
           decoration: BoxDecoration(
-              color: kAccent,
+              color: AppTokens.brandLight,
               borderRadius: BorderRadius.circular(8)),
-          child: Icon(icon, color: kPrimary, size: 16),
+          child: Icon(icon, color: AppTokens.brandGradientStart, size: 16),
         ),
         const SizedBox(width: 12),
         Expanded(
@@ -914,7 +915,7 @@ class _PettyCashDialog extends StatelessWidget {
                   style: GoogleFonts.lato(
                       fontSize: 14,
                       fontWeight: FontWeight.w700,
-                      color: kPrimaryDark)),
+                      color: AppTokens.brandDark)),
             ],
           ),
         ),
@@ -923,5 +924,5 @@ class _PettyCashDialog extends StatelessWidget {
   }
 
   Widget _divider() =>
-      Divider(color: kAccent, thickness: 1.5, height: 20);
+      Divider(color: AppTokens.brandLight, thickness: 1.5, height: 20);
 }

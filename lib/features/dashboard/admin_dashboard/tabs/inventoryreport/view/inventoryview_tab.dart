@@ -5,6 +5,7 @@ import 'package:intl/intl.dart';
 import 'package:maleva/core/models/model.dart';
 import 'package:maleva/core/utils/clsfunction.dart' as objfun;
 import 'package:maleva/core/colors/colors.dart' as colour;
+import '../../../../../../core/theme/tokens.dart';
 import '../bloc/inventoryreport_bloc.dart';
 import '../bloc/inventoryreport_event.dart';
 import '../bloc/inventoryreport_state.dart';
@@ -74,7 +75,7 @@ class _InventoryBody extends StatelessWidget {
                 Border.all(color: colour.kAccent, width: 1.5),
                 boxShadow: [
                   BoxShadow(
-                      color: colour.kPrimary.withOpacity(0.05),
+                      color: AppTokens.brandGradientStart.withOpacity(0.05),
                       blurRadius: 8,
                       offset: const Offset(0, 3)),
                 ],
@@ -89,7 +90,7 @@ class _InventoryBody extends StatelessWidget {
                             color: colour.kAccent,
                             shape: BoxShape.circle),
                         child: const Icon(Icons.anchor_rounded,
-                            color: colour.kPrimary, size: 13),
+                            color: AppTokens.brandGradientStart, size: 13),
                       ),
                       const SizedBox(width: 6),
                       Text("Port Filter",
@@ -122,19 +123,19 @@ class _InventoryBody extends StatelessWidget {
                               width: 70,
                               decoration: BoxDecoration(
                                 color: isActive
-                                    ? colour.kPrimary
+                                    ? AppTokens.brandGradientStart
                                     : colour.kAccent,
                                 borderRadius:
                                 BorderRadius.circular(14),
                                 border: Border.all(
                                     color: isActive
-                                        ? colour.kPrimary
-                                        : colour.kPrimaryLight
+                                        ? AppTokens.brandGradientStart
+                                        : AppTokens.brandMid
                                         .withOpacity(0.3)),
                                 boxShadow: isActive
                                     ? [
                                   BoxShadow(
-                                      color: colour.kPrimary
+                                      color: AppTokens.brandGradientStart
                                           .withOpacity(0.3),
                                       blurRadius: 6,
                                       offset: const Offset(
@@ -150,7 +151,7 @@ class _InventoryBody extends StatelessWidget {
                                       size: 22,
                                       color: isActive
                                           ? colour.kWhite
-                                          : colour.kPrimary),
+                                          : AppTokens.brandGradientStart),
                                   const SizedBox(height: 5),
                                   Text(f['name'] as String,
                                       style: GoogleFonts.lato(
@@ -190,7 +191,7 @@ class _InventoryBody extends StatelessWidget {
                 Border.all(color: colour.kAccent, width: 1.5),
                 boxShadow: [
                   BoxShadow(
-                      color: colour.kPrimary.withOpacity(0.05),
+                      color: AppTokens.brandGradientStart.withOpacity(0.05),
                       blurRadius: 8,
                       offset: const Offset(0, 3)),
                 ],
@@ -205,7 +206,7 @@ class _InventoryBody extends StatelessWidget {
                             color: colour.kAccent,
                             shape: BoxShape.circle),
                         child: const Icon(Icons.person_rounded,
-                            color: colour.kPrimary, size: 13),
+                            color: AppTokens.brandGradientStart, size: 13),
                       ),
                       const SizedBox(width: 6),
                       Text("Customer & Status",
@@ -241,7 +242,7 @@ class _InventoryBody extends StatelessWidget {
                               BorderRadius.circular(12),
                               border: Border.all(
                                 color: custName.isNotEmpty
-                                    ? colour.kPrimaryLight
+                                    ? AppTokens.brandMid
                                     .withOpacity(0.4)
                                     : Colors.grey.shade300,
                               ),
@@ -249,7 +250,7 @@ class _InventoryBody extends StatelessWidget {
                             child: Row(children: [
                               Icon(Icons.person_rounded,
                                   color: custName.isNotEmpty
-                                      ? colour.kPrimary
+                                      ? AppTokens.brandGradientStart
                                       : Colors.grey,
                                   size: 18),
                               const SizedBox(width: 8),
@@ -263,7 +264,7 @@ class _InventoryBody extends StatelessWidget {
                                               fontSize: 10,
                                               color: custName
                                                   .isNotEmpty
-                                                  ? colour.kPrimary
+                                                  ? AppTokens.brandGradientStart
                                                   : Colors.grey,
                                               fontWeight:
                                               FontWeight.w600)),
@@ -289,7 +290,7 @@ class _InventoryBody extends StatelessWidget {
                               ),
                               Icon(Icons.chevron_right_rounded,
                                   color: custName.isNotEmpty
-                                      ? colour.kPrimary
+                                      ? AppTokens.brandGradientStart
                                       : Colors.grey.shade400,
                                   size: 18),
                             ]),
@@ -309,14 +310,14 @@ class _InventoryBody extends StatelessWidget {
                               horizontal: 12, vertical: 11),
                           decoration: BoxDecoration(
                             color: (s?.isChecked ?? false)
-                                ? colour.kPrimary
+                                ? AppTokens.brandGradientStart
                                 : colour.kAccent,
                             borderRadius:
                             BorderRadius.circular(12),
                             border: Border.all(
                                 color: (s?.isChecked ?? false)
-                                    ? colour.kPrimary
-                                    : colour.kPrimaryLight
+                                    ? AppTokens.brandGradientStart
+                                    : AppTokens.brandMid
                                     .withOpacity(0.3)),
                           ),
                           child: Row(
@@ -329,7 +330,7 @@ class _InventoryBody extends StatelessWidget {
                                       .check_box_outline_blank_rounded,
                                   color: (s?.isChecked ?? false)
                                       ? colour.kWhite
-                                      : colour.kPrimary,
+                                      : AppTokens.brandGradientStart,
                                   size: 20,
                                 ),
                                 const SizedBox(width: 6),
@@ -365,7 +366,7 @@ class _InventoryBody extends StatelessWidget {
                   borderRadius: BorderRadius.circular(14),
                   border: Border.all(
                       color:
-                      colour.kPrimaryLight.withOpacity(0.3)),
+                      AppTokens.brandMid.withOpacity(0.3)),
                 ),
                 child: Row(children: [
                   Expanded(
@@ -392,7 +393,7 @@ class _InventoryBody extends StatelessWidget {
                       width: 1,
                       height: 28,
                       color:
-                      colour.kPrimaryLight.withOpacity(0.3),
+                      AppTokens.brandMid.withOpacity(0.3),
                       margin: const EdgeInsets.symmetric(
                           horizontal: 8)),
                   Expanded(
@@ -423,7 +424,7 @@ class _InventoryBody extends StatelessWidget {
                         .read<InventoryBloc>()
                         .add(const SearchInventoryByDateEvent()),
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: colour.kPrimary,
+                      backgroundColor: AppTokens.brandGradientStart,
                       padding: const EdgeInsets.symmetric(
                           horizontal: 14, vertical: 10),
                       shape: RoundedRectangleBorder(
@@ -458,7 +459,7 @@ class _InventoryBody extends StatelessWidget {
                     child: Text(
                         "${s!.records.length} records",
                         style: GoogleFonts.lato(
-                            color: colour.kPrimary,
+                            color: AppTokens.brandGradientStart,
                             fontWeight: FontWeight.bold,
                             fontSize: 12)),
                   ),
@@ -477,7 +478,7 @@ class _InventoryBody extends StatelessWidget {
               child: isLoading
                   ? const Center(
                   child: CircularProgressIndicator(
-                      color: colour.kPrimary))
+                      color: AppTokens.brandGradientStart))
                   : state is InventoryError
                   ? _errorView(context, state.message)
                   : (s == null || s.records.isEmpty)
@@ -595,7 +596,7 @@ class _InventoryBody extends StatelessWidget {
       builder: (ctx, child) => Theme(
         data: Theme.of(ctx).copyWith(
             colorScheme: const ColorScheme.light(
-                primary: colour.kPrimary)),
+                primary: AppTokens.brandGradientStart)),
         child: child!,
       ),
     );
@@ -619,7 +620,7 @@ class _InventoryBody extends StatelessWidget {
           icon: const Icon(Icons.refresh),
           label: const Text("Retry"),
           style: ElevatedButton.styleFrom(
-              backgroundColor: colour.kPrimary),
+              backgroundColor: AppTokens.brandGradientStart),
         ),
       ]),
     );
@@ -648,12 +649,12 @@ class _InventoryGridCard extends StatelessWidget {
           color: colour.kWhite,
           borderRadius: BorderRadius.circular(16),
           border: Border.all(
-            color: isSelected ? colour.kPrimary : colour.kAccent,
+            color: isSelected ? AppTokens.brandGradientStart : colour.kAccent,
             width: isSelected ? 2.0 : 1.5,
           ),
           boxShadow: [
             BoxShadow(
-                color: colour.kPrimary
+                color: AppTokens.brandGradientStart
                     .withOpacity(isSelected ? 0.15 : 0.06),
                 blurRadius: isSelected ? 14 : 8,
                 offset: const Offset(0, 3)),
@@ -669,7 +670,7 @@ class _InventoryGridCard extends StatelessWidget {
             decoration: BoxDecoration(
               color: isSelected
                   ? colour.kPrimaryDark
-                  : colour.kPrimary,
+                  : AppTokens.brandGradientStart,
               borderRadius: const BorderRadius.vertical(
                   top: Radius.circular(16)),
             ),
@@ -760,7 +761,7 @@ class _InventoryGridCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(6),
       ),
       child: Row(mainAxisSize: MainAxisSize.min, children: [
-        Icon(icon, size: 11, color: colour.kPrimary),
+        Icon(icon, size: 11, color: AppTokens.brandGradientStart),
         const SizedBox(width: 3),
         Text(val ?? '-',
             style: GoogleFonts.lato(
@@ -775,7 +776,7 @@ class _InventoryGridCard extends StatelessWidget {
     return Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Icon(icon, size: 12, color: colour.kPrimaryLight),
+          Icon(icon, size: 12, color: AppTokens.brandMid),
           const SizedBox(width: 5),
           Expanded(
             child: Text(val ?? '-',
@@ -804,7 +805,7 @@ class _EmptyDetailPanel extends StatelessWidget {
         border: Border.all(color: colour.kAccent, width: 1.5),
         boxShadow: [
           BoxShadow(
-              color: colour.kPrimary.withOpacity(0.05),
+              color: AppTokens.brandGradientStart.withOpacity(0.05),
               blurRadius: 12,
               offset: const Offset(0, 4))
         ],
@@ -817,7 +818,7 @@ class _EmptyDetailPanel extends StatelessWidget {
             decoration: const BoxDecoration(
                 color: colour.kAccent, shape: BoxShape.circle),
             child: const Icon(Icons.touch_app_rounded,
-                color: colour.kPrimary, size: 32),
+                color: AppTokens.brandGradientStart, size: 32),
           ),
           const SizedBox(height: 16),
           Text("Select a record",
@@ -850,7 +851,7 @@ class _InventoryDetailPanel extends StatelessWidget {
         border: Border.all(color: colour.kAccent, width: 1.5),
         boxShadow: [
           BoxShadow(
-              color: colour.kPrimary.withOpacity(0.07),
+              color: AppTokens.brandGradientStart.withOpacity(0.07),
               blurRadius: 16,
               offset: const Offset(0, 5))
         ],
@@ -862,7 +863,7 @@ class _InventoryDetailPanel extends StatelessWidget {
             width: double.infinity,
             padding: const EdgeInsets.fromLTRB(16, 14, 16, 14),
             decoration: const BoxDecoration(
-              color: colour.kPrimary,
+              color: AppTokens.brandGradientStart,
               borderRadius: BorderRadius.only(
                 topLeft:  Radius.circular(20),
                 topRight: Radius.circular(20),
@@ -965,7 +966,7 @@ class _InventoryDetailPanel extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Row(children: [
-              Icon(icon, size: 12, color: colour.kPrimary),
+              Icon(icon, size: 12, color: AppTokens.brandGradientStart),
               const SizedBox(width: 4),
               Text(label,
                   style: GoogleFonts.lato(
@@ -995,7 +996,7 @@ class _InventoryDetailPanel extends StatelessWidget {
           decoration: BoxDecoration(
               color: colour.kAccent,
               borderRadius: BorderRadius.circular(8)),
-          child: Icon(icon, color: colour.kPrimary, size: 14),
+          child: Icon(icon, color: AppTokens.brandGradientStart, size: 14),
         ),
         const SizedBox(width: 10),
         Expanded(
@@ -1062,7 +1063,7 @@ class _InventoryCustomerSelectPageState
     return Scaffold(
       backgroundColor: Colors.grey.shade50,
       appBar: AppBar(
-        backgroundColor: colour.kPrimary,
+        backgroundColor: AppTokens.brandGradientStart,
         foregroundColor: colour.kWhite,
         elevation: 0,
         leading: GestureDetector(
@@ -1079,7 +1080,7 @@ class _InventoryCustomerSelectPageState
       ),
       body: Column(children: [
         Container(
-          color: colour.kPrimary,
+          color: AppTokens.brandGradientStart,
           padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
           child: TextField(
             controller: _searchCtrl,
@@ -1091,7 +1092,7 @@ class _InventoryCustomerSelectPageState
               hintText: 'Search Customer...',
               hintStyle: GoogleFonts.lato(color: Colors.grey),
               prefixIcon: const Icon(Icons.search,
-                  color: colour.kPrimary),
+                  color: AppTokens.brandGradientStart),
               border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12),
                   borderSide: BorderSide.none),
@@ -1107,7 +1108,7 @@ class _InventoryCustomerSelectPageState
               horizontal: 16, vertical: 10),
           child: Row(children: [
             Icon(Icons.person_rounded,
-                color: colour.kPrimaryLight, size: 16),
+                color: AppTokens.brandMid, size: 16),
             const SizedBox(width: 6),
             Text("${_filtered.length} customers",
                 style: GoogleFonts.lato(
@@ -1157,7 +1158,7 @@ class _InventoryCustomerSelectPageState
                         width: 1.5),
                     boxShadow: [
                       BoxShadow(
-                          color: colour.kPrimary
+                          color: AppTokens.brandGradientStart
                               .withOpacity(0.05),
                           blurRadius: 6,
                           offset: const Offset(0, 2)),
@@ -1171,7 +1172,7 @@ class _InventoryCustomerSelectPageState
                           shape: BoxShape.circle),
                       child: const Icon(
                           Icons.person_rounded,
-                          color: colour.kPrimary,
+                          color: AppTokens.brandGradientStart,
                           size: 18),
                     ),
                     const SizedBox(width: 12),
@@ -1181,11 +1182,11 @@ class _InventoryCustomerSelectPageState
                               fontSize: 14,
                               fontWeight: FontWeight.w600,
                               color:
-                              colour.kPrimaryDark)),
+                              AppTokens.brandDark)),
                     ),
                     const Icon(
                         Icons.chevron_right_rounded,
-                        color: colour.kPrimaryLight),
+                        color: AppTokens.brandMid),
                   ]),
                 ),
               );
@@ -1210,7 +1211,7 @@ Widget _calBtn(VoidCallback onTap) {
     child: Container(
       width: 34, height: 34,
       decoration: BoxDecoration(
-          color: colour.kPrimary,
+          color: AppTokens.brandGradientStart,
           borderRadius: BorderRadius.circular(8)),
       child: const Icon(Icons.calendar_month_outlined,
           color: colour.kWhite, size: 18),
@@ -1245,7 +1246,7 @@ class _DateCell extends StatelessWidget {
                 style: GoogleFonts.lato(
                     fontWeight: FontWeight.bold,
                     fontSize: 13,
-                    color: colour.kPrimaryDark)),
+                    color: AppTokens.brandDark)),
           ]),
     );
   }

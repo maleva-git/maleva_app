@@ -4,6 +4,8 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:maleva/core/models/model.dart';
 import 'package:maleva/core/utils/clsfunction.dart' as objfun;
+import '../../../../../../core/colors/colors.dart';
+import '../../../../../../core/theme/tokens.dart';
 import '../bloc/googlereview_bloc.dart';
 import '../bloc/googlereview_event.dart';
 import '../bloc/googlereview_state.dart';
@@ -82,7 +84,7 @@ class _ReviewEntryFormState extends State<ReviewEntryForm> {
       builder: (context, state) {
         if (state is ReviewEmployeesLoading) {
           return const Center(
-              child: CircularProgressIndicator(color: kPrimary));
+              child: CircularProgressIndicator(color: AppTokens.brandGradientStart));
         }
         if (state is! ReviewFormState) return const SizedBox.shrink();
 
@@ -122,7 +124,7 @@ class _ReviewEntryFormState extends State<ReviewEntryForm> {
                       Container(
                         width: 4, height: 30,
                         decoration: BoxDecoration(
-                          color: kPrimary,
+                          color: AppTokens.brandGradientStart,
                           borderRadius: BorderRadius.circular(4),
                         ),
                       ),
@@ -131,7 +133,7 @@ class _ReviewEntryFormState extends State<ReviewEntryForm> {
                           style: GoogleFonts.lato(
                             fontSize:      20,
                             fontWeight:    FontWeight.bold,
-                            color:         kPrimaryDark,
+                            color:         AppTokens.brandDark,
                             letterSpacing: 1.2,
                           )),
                     ]),
@@ -141,7 +143,7 @@ class _ReviewEntryFormState extends State<ReviewEntryForm> {
                       child: Text('Entry Form',
                           style: GoogleFonts.lato(
                             fontSize:   14,
-                            color:      kPrimaryLight,
+                            color:      AppTokens.brandMid,
                             fontWeight: FontWeight.w500,
                           )),
                     ),
@@ -292,14 +294,14 @@ class _ReviewEntryFormState extends State<ReviewEntryForm> {
         value:      state.selectedReview,
         isExpanded: true,
         icon: const Icon(Icons.keyboard_arrow_down_rounded,
-            color: kPrimary),
+            color: AppTokens.brandGradientStart),
         items: List.generate(5, (i) => i + 1)
             .map((val) => DropdownMenuItem(
           value: val,
           child: Text(
             '⭐' * val + '  ($val)',
             style: GoogleFonts.lato(
-                color:      kPrimaryDark,
+                color:      AppTokens.brandDark,
                 fontWeight: FontWeight.w600),
           ),
         ))
@@ -325,7 +327,7 @@ class _ReviewEntryFormState extends State<ReviewEntryForm> {
         hint: Text('Select Employee',
             style: GoogleFonts.lato(color: Colors.grey)),
         icon: const Icon(Icons.keyboard_arrow_down_rounded,
-            color: kPrimary),
+            color: AppTokens.brandGradientStart),
         items: state.employees
             .map((e) => DropdownMenuItem(
           value: e.Id,
@@ -333,7 +335,7 @@ class _ReviewEntryFormState extends State<ReviewEntryForm> {
             e.AccountName,
             overflow: TextOverflow.ellipsis,
             style: GoogleFonts.lato(
-                color:      kPrimaryDark,
+                color:      AppTokens.brandDark,
                 fontWeight: FontWeight.w600),
           ),
         ))
@@ -358,20 +360,20 @@ class _ReviewEntryFormState extends State<ReviewEntryForm> {
         vertical:   isTablet ? 14 : 12,
       ),
       decoration: BoxDecoration(
-        color:         kAccent,
+        color:         AppTokens.brandLight,
         borderRadius: BorderRadius.circular(isTablet ? 14 : 12),
-        border: Border.all(color: kPrimaryLight.withOpacity(0.3)),
+        border: Border.all(color: AppTokens.brandMid.withOpacity(0.3)),
       ),
       child: Row(children: [
         Icon(Icons.calendar_today_rounded,
-            color: kPrimary,
+            color: AppTokens.brandGradientStart,
             size:  isTablet ? 22 : 20),
         const SizedBox(width: 12),
         Expanded(
           child: Text(
             'Date: ${DateFormat('yyyy-MM-dd').format(state.selectedDate)}',
             style: GoogleFonts.lato(
-              color:      kPrimaryDark,
+              color:      AppTokens.brandDark,
               fontWeight: FontWeight.w600,
               fontSize:   isTablet ? 15 : 14,
             ),
@@ -381,7 +383,7 @@ class _ReviewEntryFormState extends State<ReviewEntryForm> {
           color: Colors.transparent,
           child: IconButton(
             icon: Icon(Icons.edit_calendar_rounded,
-                color: kPrimary,
+                color: AppTokens.brandGradientStart,
                 size:  isTablet ? 24 : 22),
             onPressed: () async {
               final picked = await showDatePicker(
@@ -442,7 +444,7 @@ class _ReviewEntryFormState extends State<ReviewEntryForm> {
             }
           },
           style: ElevatedButton.styleFrom(
-            backgroundColor: kPrimary,
+            backgroundColor: AppTokens.brandGradientStart,
             padding: EdgeInsets.symmetric(
                 vertical: isTablet ? 16 : 14),
             shape: RoundedRectangleBorder(
@@ -458,11 +460,11 @@ class _ReviewEntryFormState extends State<ReviewEntryForm> {
       Expanded(
         child: ElevatedButton.icon(
           icon: Icon(Icons.grid_view_rounded,
-              color: kPrimary,
+              color: AppTokens.brandGradientStart,
               size:  isTablet ? 22 : 20),
           label: Text("View",
               style: GoogleFonts.lato(
-                color:      kPrimary,
+                color:      AppTokens.brandGradientStart,
                 fontWeight: FontWeight.bold,
                 fontSize:   isTablet ? 15 : 14,
               )),
@@ -479,7 +481,7 @@ class _ReviewEntryFormState extends State<ReviewEntryForm> {
             }
           },
           style: ElevatedButton.styleFrom(
-            backgroundColor: kAccent,
+            backgroundColor: AppTokens.brandLight,
             padding: EdgeInsets.symmetric(
                 vertical: isTablet ? 16 : 14),
             shape: RoundedRectangleBorder(
@@ -505,7 +507,7 @@ class _ReviewEntryFormState extends State<ReviewEntryForm> {
       keyboardType: keyboardType,
       maxLines:     maxLines,
       style: GoogleFonts.lato(
-          color:    kPrimaryDark,
+          color:    AppTokens.brandDark,
           fontSize: isTablet ? 15 : 14),
       decoration: InputDecoration(
         labelText:  label,
@@ -513,7 +515,7 @@ class _ReviewEntryFormState extends State<ReviewEntryForm> {
             color:    Colors.grey[600],
             fontSize: isTablet ? 14 : 13),
         filled:    true,
-        fillColor: kAccent,
+        fillColor: AppTokens.brandLight,
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(isTablet ? 14 : 12),
           borderSide:   BorderSide.none,
@@ -521,7 +523,7 @@ class _ReviewEntryFormState extends State<ReviewEntryForm> {
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(isTablet ? 14 : 12),
           borderSide:
-          const BorderSide(color: kPrimary, width: 1.5),
+          const BorderSide(color: AppTokens.brandGradientStart, width: 1.5),
         ),
         contentPadding: EdgeInsets.symmetric(
           horizontal: isTablet ? 18 : 16,
@@ -550,10 +552,10 @@ class _ReviewEntryFormState extends State<ReviewEntryForm> {
           padding: EdgeInsets.symmetric(
               horizontal: isTablet ? 14 : 12),
           decoration: BoxDecoration(
-            color:         kAccent,
+            color:         AppTokens.brandLight,
             borderRadius: BorderRadius.circular(isTablet ? 14 : 12),
             border: Border.all(
-                color: kPrimaryLight.withOpacity(0.3)),
+                color: AppTokens.brandMid.withOpacity(0.3)),
           ),
           child: child,
         ),
@@ -583,10 +585,10 @@ class _InfoPanel extends StatelessWidget {
       decoration: BoxDecoration(
         color:         Colors.white,
         borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: kAccent, width: 1.5),
+        border: Border.all(color: AppTokens.brandLight, width: 1.5),
         boxShadow: [
           BoxShadow(
-            color:     kPrimary.withOpacity(0.07),
+            color:     AppTokens.brandGradientStart.withOpacity(0.07),
             blurRadius: 16,
             offset:    const Offset(0, 5),
           ),
@@ -600,7 +602,7 @@ class _InfoPanel extends StatelessWidget {
             Container(
               width: 4, height: 22,
               decoration: BoxDecoration(
-                color:         kPrimary,
+                color:         AppTokens.brandGradientStart,
                 borderRadius: BorderRadius.circular(4),
               ),
             ),
@@ -609,7 +611,7 @@ class _InfoPanel extends StatelessWidget {
                 style: GoogleFonts.lato(
                   fontSize:   15,
                   fontWeight: FontWeight.bold,
-                  color:      kPrimaryDark,
+                  color:      AppTokens.brandDark,
                 )),
           ]),
 
@@ -622,7 +624,7 @@ class _InfoPanel extends StatelessWidget {
                 horizontal: 16, vertical: 14),
             decoration: BoxDecoration(
               gradient: const LinearGradient(
-                colors: [kPrimary, kPrimaryDark],
+                colors: [AppTokens.brandGradientStart, AppTokens.brandDark],
                 begin: Alignment.topLeft,
                 end:   Alignment.bottomRight,
               ),
@@ -666,7 +668,7 @@ class _InfoPanel extends StatelessWidget {
           Container(
             padding: const EdgeInsets.all(14),
             decoration: BoxDecoration(
-              color:         kAccent,
+              color:         AppTokens.brandLight,
               borderRadius: BorderRadius.circular(12),
             ),
             child: Column(
@@ -674,13 +676,13 @@ class _InfoPanel extends StatelessWidget {
               children: [
                 Row(children: [
                   const Icon(Icons.lightbulb_rounded,
-                      color: kPrimary, size: 16),
+                      color: AppTokens.brandGradientStart, size: 16),
                   const SizedBox(width: 6),
                   Text('Tips',
                       style: GoogleFonts.lato(
                         fontSize:   12,
                         fontWeight: FontWeight.bold,
-                        color:      kPrimaryDark,
+                        color:      AppTokens.brandDark,
                       )),
                 ]),
                 const SizedBox(height: 8),
@@ -702,10 +704,10 @@ class _InfoPanel extends StatelessWidget {
         Container(
           width: 34, height: 34,
           decoration: BoxDecoration(
-            color:         kAccent,
+            color:         AppTokens.brandLight,
             borderRadius: BorderRadius.circular(8),
           ),
-          child: Icon(icon, color: kPrimary, size: 17),
+          child: Icon(icon, color: AppTokens.brandGradientStart, size: 17),
         ),
         const SizedBox(width: 10),
         Expanded(
@@ -723,7 +725,7 @@ class _InfoPanel extends StatelessWidget {
                   style: GoogleFonts.lato(
                     fontSize:   14,
                     fontWeight: FontWeight.w700,
-                    color:      kPrimaryDark,
+                    color:      AppTokens.brandDark,
                   )),
             ],
           ),
@@ -737,7 +739,7 @@ class _InfoPanel extends StatelessWidget {
       padding: const EdgeInsets.only(bottom: 4),
       child: Row(children: [
         const Icon(Icons.check_circle_rounded,
-            color: kPrimary, size: 13),
+            color: AppTokens.brandGradientStart, size: 13),
         const SizedBox(width: 6),
         Expanded(
           child: Text(text,
