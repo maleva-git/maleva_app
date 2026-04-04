@@ -27,6 +27,9 @@ import '../Transaction/VesselPlanning/VesselPlanningView.dart';
 import '../Transport/LicenseUpdate.dart';
 import '../Transport/Maintenance.dart';
 import '../Transport/RTI/UpdateRTIDetails.dart';
+import '../features/boarding/updateboardingdetails/bloc/updateboardingdetails_bloc.dart';
+import '../features/boarding/updateboardingdetails/bloc/updateboardingdetails_event.dart';
+import '../features/boarding/updateboardingdetails/view/updateboardingdetails_tab.dart';
 import '../features/dashboard/admin_dashboard/tabs/emailinbox/view/emailinbox_tab.dart';
 import '../features/dashboard/admin_dashboard/tabs/enquiry/view/view/enquiry_tab.dart';
 import '../features/dashboard/admin_dashboard/tabs/googlereview/view/googlereview_tab.dart';
@@ -707,6 +710,18 @@ class _MenuTileState extends State<_MenuTile>
             ),
           );
           break;
+        case "Update Boarding Details":
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => BlocProvider(
+                create: (context) => BoardingStatusBloc()..add(BoardingStatusStarted()),
+                child: const BoardingStatusUpdate(),
+              ),
+            ),
+          );
+          break;
+
 
         case "Stock In Entry":
           Navigator.push(ctx, _r(const Stockinentry()));        break;
@@ -737,8 +752,7 @@ class _MenuTileState extends State<_MenuTile>
           break;
         case "EnquiryTR Master":
           Navigator.push(ctx, _r(const EnquiryTRView()));       break;
-        case "Update Boarding Details":
-          Navigator.push(ctx, _r(const BoardingStatusUpdate())); break;
+
         case "Maintenance":
           Navigator.push(ctx, _r(const Maintenance()));         break;
         case "License Update":

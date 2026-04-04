@@ -1,7 +1,7 @@
 part of 'package:maleva/Boarding/BoardingStatusUpdate.dart';
 
 
-mobiledesign(BoardingStatusUpdateState state, BuildContext context) {
+mobiledesign(OldBoardingStatusUpdateState state, BuildContext context) {
   double width = MediaQuery.of(context).size.width;
   double height = MediaQuery.of(context).size.height;
   return WillPopScope(

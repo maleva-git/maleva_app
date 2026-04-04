@@ -18,16 +18,16 @@ import '../Transaction/SaleOrderDetails.dart';
 part 'package:maleva/Boarding/mobileBoardingStatusUpdate.dart';
 part 'package:maleva/Boarding/tabletBoardingStatusUpdate.dart';
 
-class BoardingStatusUpdate extends StatefulWidget {
+class OldBoardingStatusUpdate extends StatefulWidget {
   final String? JobNo;
   final int? JobId;
-  const BoardingStatusUpdate({super.key, this.JobNo, this.JobId});
+  const OldBoardingStatusUpdate({super.key, this.JobNo, this.JobId});
 
   @override
-  BoardingStatusUpdateState createState() => BoardingStatusUpdateState();
+  OldBoardingStatusUpdateState createState() => OldBoardingStatusUpdateState();
 }
 //test
-class BoardingStatusUpdateState extends State<BoardingStatusUpdate> {
+class OldBoardingStatusUpdateState extends State<OldBoardingStatusUpdate> {
   bool progress = false;
   late MenuMasterModel menuControl;
   String UserName = objfun.storagenew.getString('Username') ?? "";
@@ -188,7 +188,7 @@ txtJobNo.dispose();
           await objfun.ConfirmationOK('Updated Successfully ', context);
           Navigator.pushReplacement(
             context,
-            MaterialPageRoute(builder: (context) => const BoardingStatusUpdate()),
+            MaterialPageRoute(builder: (context) => const OldBoardingStatusUpdate()),
           );
           setState(() {
             progress = true;
