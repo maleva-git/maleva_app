@@ -51,7 +51,7 @@ class _MaintenanceView extends StatelessWidget {
         if (state is MaintenanceError) {
           return Center(
             child: Text(state.message,
-                style: GoogleFonts.lato(color: colour.kAccentRed, fontSize: 13)),
+                style: GoogleFonts.lato(color: AppTokens.maintAccentRed, fontSize: 13)),
           );
         }
         return const SizedBox.shrink();
@@ -89,7 +89,7 @@ class _MaintenanceBody extends StatelessWidget {
             child: Text(
               '${state.currentMonthName} Sales',
               style: GoogleFonts.lato(
-                color: colour.kAccentRed,
+                color: AppTokens.maintAccentRed,
                 fontWeight: FontWeight.w700,
                 fontSize: objfun.FontLarge,
                 letterSpacing: 0.3,

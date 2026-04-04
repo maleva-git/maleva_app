@@ -263,7 +263,7 @@ class _FuelFillingCard extends StatelessWidget {
         decoration: BoxDecoration(
           color:         colour.kWhite,
           borderRadius: BorderRadius.circular(isTablet ? 18 : 16),
-          border: Border.all(color: colour.kAccent, width: 1.5),
+          border: Border.all(color: AppTokens.brandLight, width: 1.5),
           boxShadow: [
             BoxShadow(
               color:     AppTokens.brandGradientStart.withOpacity(0.08),
@@ -279,7 +279,7 @@ class _FuelFillingCard extends StatelessWidget {
             padding: EdgeInsets.symmetric(
                 vertical: isTablet ? 22 : 20),
             decoration: const BoxDecoration(
-              color: colour.kAccent,
+              color: AppTokens.brandLight,
               borderRadius: BorderRadius.only(
                 topLeft:    Radius.circular(16),
                 bottomLeft: Radius.circular(16),
@@ -375,7 +375,7 @@ class _FuelFillingCard extends StatelessWidget {
               width:  isTablet ? 36 : 32,
               height: isTablet ? 36 : 32,
               decoration: BoxDecoration(
-                color:         colour.kAccent,
+                color:         AppTokens.brandLight,
                 borderRadius: BorderRadius.circular(8),
               ),
               child: Icon(Icons.arrow_forward_ios_rounded,
@@ -529,7 +529,7 @@ class _FuelFillingCard extends StatelessWidget {
   }
 
   Widget _buildDivider() =>
-      Divider(color: colour.kAccent, thickness: 1.5, height: 24);
+      Divider(color: AppTokens.brandLight, thickness: 1.5, height: 24);
 
   Widget _buildInfoRow(
       IconData icon, String label, String? value,
@@ -541,7 +541,7 @@ class _FuelFillingCard extends StatelessWidget {
           width:  isTablet ? 40 : 36,
           height: isTablet ? 40 : 36,
           decoration: BoxDecoration(
-            color:         colour.kAccent,
+            color:         AppTokens.brandLight,
             borderRadius: BorderRadius.circular(8),
           ),
           child: Icon(icon,

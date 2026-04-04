@@ -415,7 +415,7 @@ class _DriverCard extends StatelessWidget {
             width:  isTablet ? 28 : 34,
             height: isTablet ? 28 : 34,
             decoration: BoxDecoration(
-              color:         colour.kAccent,
+              color:         AppTokens.brandLight,
               borderRadius: BorderRadius.circular(isTablet ? 8 : 10),
             ),
             child: Icon(
@@ -516,7 +516,7 @@ class _EmptyState extends StatelessWidget {
           Container(
             padding: EdgeInsets.all(isTablet ? 28 : 24),
             decoration: const BoxDecoration(
-              color: colour.kAccent,
+              color: AppTokens.brandLight,
               shape: BoxShape.circle,
             ),
             child: Icon(Icons.person_off_rounded,

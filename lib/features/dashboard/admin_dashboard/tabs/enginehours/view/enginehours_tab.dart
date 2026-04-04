@@ -60,7 +60,7 @@ class _EngineHoursBody extends StatelessWidget {
                       Container(
                         width: 4, height: 30,
                         decoration: BoxDecoration(
-                          color: colour.kPrimary,
+                          color: AppTokens.brandGradientStart,
                           borderRadius: BorderRadius.circular(4),
                         ),
                       ),
@@ -100,7 +100,7 @@ class _EngineHoursBody extends StatelessWidget {
                 if (state is EngineHoursLoading) {
                   return const Center(
                       child: CircularProgressIndicator(
-                          color: colour.kPrimary));
+                          color: AppTokens.brandGradientStart));
                 }
                 if (state is EngineHoursError) {
                   return _ErrorState(
@@ -148,7 +148,7 @@ class _EngineHoursBody extends StatelessWidget {
               if (state is EngineHoursLoading) {
                 return const Center(
                     child: CircularProgressIndicator(
-                        color: colour.kPrimary));
+                        color: AppTokens.brandGradientStart));
               }
               if (state is EngineHoursError) {
                 return _ErrorState(
@@ -189,14 +189,14 @@ class _CountBadge extends StatelessWidget {
           horizontal: 20, vertical: 18),
       decoration: BoxDecoration(
         gradient: const LinearGradient(
-          colors: [colour.kPrimary, AppTokens.brandDark],
+          colors: [AppTokens.brandGradientStart, AppTokens.brandDark],
           begin: Alignment.topLeft,
           end:   Alignment.bottomRight,
         ),
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color:     colour.kPrimary.withOpacity(0.30),
+            color:     AppTokens.brandGradientStart.withOpacity(0.30),
             blurRadius: 16,
             offset:    const Offset(0, 6),
           ),
@@ -251,10 +251,10 @@ class _EngineHoursCard extends StatelessWidget {
         decoration: BoxDecoration(
           color:         colour.kWhite,
           borderRadius: BorderRadius.circular(isTablet ? 18 : 16),
-          border: Border.all(color: colour.kAccent, width: 1.5),
+          border: Border.all(color: AppTokens.brandLight, width: 1.5),
           boxShadow: [
             BoxShadow(
-              color:     colour.kPrimary.withOpacity(0.08),
+              color:     AppTokens.brandGradientStart.withOpacity(0.08),
               blurRadius: 10,
               offset:    const Offset(0, 4),
             ),
@@ -267,7 +267,7 @@ class _EngineHoursCard extends StatelessWidget {
             padding: EdgeInsets.symmetric(
                 vertical: isTablet ? 22 : 20),
             decoration: const BoxDecoration(
-              color: colour.kAccent,
+              color: AppTokens.brandLight,
               borderRadius: BorderRadius.only(
                 topLeft:    Radius.circular(16),
                 bottomLeft: Radius.circular(16),
@@ -278,7 +278,7 @@ class _EngineHoursCard extends StatelessWidget {
                 width:  isTablet ? 50 : 44,
                 height: isTablet ? 50 : 44,
                 decoration: const BoxDecoration(
-                  color: colour.kPrimary,
+                  color: AppTokens.brandGradientStart,
                   shape: BoxShape.circle,
                 ),
                 child: Icon(Icons.timer_rounded,
@@ -331,8 +331,8 @@ class _EngineHoursCard extends StatelessWidget {
                         label:     record.beginTime.isNotEmpty
                             ? record.beginTime
                             : "N/A",
-                        bgColor:   colour.kPrimary.withOpacity(0.1),
-                        textColor: colour.kPrimary,
+                        bgColor:   AppTokens.brandGradientStart.withOpacity(0.1),
+                        textColor: AppTokens.brandGradientStart,
                         isTablet:  isTablet,
                       ),
                     ),
@@ -361,12 +361,12 @@ class _EngineHoursCard extends StatelessWidget {
               width:  isTablet ? 36 : 32,
               height: isTablet ? 36 : 32,
               decoration: BoxDecoration(
-                color:         colour.kAccent,
+                color:         AppTokens.brandLight,
                 borderRadius: BorderRadius.circular(8),
               ),
               child: Icon(Icons.arrow_forward_ios_rounded,
                   size:  isTablet ? 16 : 14,
-                  color: colour.kPrimary),
+                  color: AppTokens.brandGradientStart),
             ),
           ),
         ]),
@@ -395,7 +395,7 @@ class _EngineHoursCard extends StatelessWidget {
               borderRadius: BorderRadius.circular(20),
               boxShadow: [
                 BoxShadow(
-                  color:     colour.kPrimary.withOpacity(0.18),
+                  color:     AppTokens.brandGradientStart.withOpacity(0.18),
                   blurRadius: 30,
                   offset:    const Offset(0, 10),
                 ),
@@ -412,7 +412,7 @@ class _EngineHoursCard extends StatelessWidget {
                     horizontal: isTablet ? 28 : 24,
                   ),
                   decoration: const BoxDecoration(
-                    color: colour.kPrimary,
+                    color: AppTokens.brandGradientStart,
                     borderRadius: BorderRadius.only(
                       topLeft:  Radius.circular(20),
                       topRight: Radius.circular(20),
@@ -487,7 +487,7 @@ class _EngineHoursCard extends StatelessWidget {
                       width: double.infinity,
                       child: ElevatedButton(
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: colour.kPrimary,
+                          backgroundColor: AppTokens.brandGradientStart,
                           padding: EdgeInsets.symmetric(
                               vertical: isTablet ? 16 : 14),
                           shape: RoundedRectangleBorder(
@@ -521,7 +521,7 @@ class _EngineHoursCard extends StatelessWidget {
   }
 
   Widget _buildDivider() =>
-      Divider(color: colour.kAccent, thickness: 1.5, height: 24);
+      Divider(color: AppTokens.brandLight, thickness: 1.5, height: 24);
 
   Widget _buildInfoRow(
       IconData icon, String label, String? value,
@@ -533,11 +533,11 @@ class _EngineHoursCard extends StatelessWidget {
           width:  isTablet ? 40 : 36,
           height: isTablet ? 40 : 36,
           decoration: BoxDecoration(
-            color:         colour.kAccent,
+            color:         AppTokens.brandLight,
             borderRadius: BorderRadius.circular(8),
           ),
           child: Icon(icon,
-              color: colour.kPrimary,
+              color: AppTokens.brandGradientStart,
               size:  isTablet ? 20 : 18),
         ),
         const SizedBox(width: 12),
@@ -656,7 +656,7 @@ class _ErrorState extends StatelessWidget {
                 style: GoogleFonts.lato(
                     fontSize: isTablet ? 15 : 14)),
             style: ElevatedButton.styleFrom(
-              backgroundColor: colour.kPrimary,
+              backgroundColor: AppTokens.brandGradientStart,
               padding: EdgeInsets.symmetric(
                 horizontal: isTablet ? 28 : 20,
                 vertical:   isTablet ? 12 : 10,

@@ -74,7 +74,7 @@ class _BocBodyState extends State<_BocBody> {
                   Container(
                     width: 4, height: 30,
                     decoration: BoxDecoration(
-                      color: colour.kPrimary,
+                      color: AppTokens.brandGradientStart,
                       borderRadius: BorderRadius.circular(4),
                     ),
                   ),
@@ -116,7 +116,7 @@ class _BocBodyState extends State<_BocBody> {
                     if (state is BocLoading) {
                       return const Center(
                         child: CircularProgressIndicator(
-                            color: colour.kPrimary),
+                            color: AppTokens.brandGradientStart),
                       );
                     }
                     if (state is BocError) {
@@ -194,7 +194,7 @@ class _BocBodyState extends State<_BocBody> {
                 if (state is BocLoading) {
                   return const Center(
                     child: CircularProgressIndicator(
-                        color: colour.kPrimary),
+                        color: AppTokens.brandGradientStart),
                   );
                 }
                 if (state is BocError) {
@@ -240,7 +240,7 @@ class _SearchBar extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        color: colour.kAccent,
+        color: AppTokens.brandLight,
         borderRadius: BorderRadius.circular(isTablet ? 24 : 22),
         border:
         Border.all(color: AppTokens.brandMid.withOpacity(0.3)),
@@ -255,11 +255,11 @@ class _SearchBar extends StatelessWidget {
             fontSize: isTablet ? 15 : 16,
           ),
           prefixIcon: Icon(Icons.search_rounded,
-              color: colour.kPrimary,
+              color: AppTokens.brandGradientStart,
               size:  isTablet ? 22 : 20),
           suffixIcon: IconButton(
             icon: Icon(Icons.arrow_forward_ios_rounded,
-                color: colour.kPrimary,
+                color: AppTokens.brandGradientStart,
                 size:  isTablet ? 20 : 18),
             onPressed: onSearch,
           ),
@@ -291,14 +291,14 @@ class _ResultCountBadge extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
       decoration: BoxDecoration(
         gradient: const LinearGradient(
-          colors: [colour.kPrimary, AppTokens.brandDark],
+          colors: [AppTokens.brandGradientStart, AppTokens.brandDark],
           begin: Alignment.topLeft,
           end:   Alignment.bottomRight,
         ),
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color:     colour.kPrimary.withOpacity(0.28),
+            color:     AppTokens.brandGradientStart.withOpacity(0.28),
             blurRadius: 16,
             offset:    const Offset(0, 6),
           ),
@@ -350,7 +350,7 @@ class _InitialHint extends StatelessWidget {
         children: [
           Icon(Icons.search_rounded,
               size:  isTablet ? 72 : 64,
-              color: colour.kAccent),
+              color: AppTokens.brandLight),
           const SizedBox(height: 12),
           Text(
             "Search bills or invoices above",
@@ -399,7 +399,7 @@ class _ErrorState extends StatelessWidget {
                 style: GoogleFonts.lato(
                     fontSize: isTablet ? 15 : 14)),
             style: ElevatedButton.styleFrom(
-              backgroundColor: colour.kPrimary,
+              backgroundColor: AppTokens.brandGradientStart,
               padding: EdgeInsets.symmetric(
                 horizontal: isTablet ? 28 : 20,
                 vertical:   isTablet ? 12 : 10,
@@ -449,10 +449,10 @@ class _BocCard extends StatelessWidget {
           decoration: BoxDecoration(
             color:         colour.kWhite,
             borderRadius: BorderRadius.circular(isTablet ? 24 : 20),
-            border: Border.all(color: colour.kAccent, width: 1.5),
+            border: Border.all(color: AppTokens.brandLight, width: 1.5),
             boxShadow: [
               BoxShadow(
-                color:     colour.kPrimary.withOpacity(0.07),
+                color:     AppTokens.brandGradientStart.withOpacity(0.07),
                 blurRadius: 12,
                 offset:    const Offset(0, 5),
               ),
@@ -469,7 +469,7 @@ class _BocCard extends StatelessWidget {
                   vertical:   isTablet ? 18 : 16,
                 ),
                 decoration: BoxDecoration(
-                  color: colour.kPrimary,
+                  color: AppTokens.brandGradientStart,
                   borderRadius: BorderRadius.only(
                     topLeft:  Radius.circular(isTablet ? 24 : 20),
                     topRight: Radius.circular(isTablet ? 24 : 20),
@@ -536,11 +536,11 @@ class _BocCard extends StatelessWidget {
                           width:  isTablet ? 40 : 36,
                           height: isTablet ? 40 : 36,
                           decoration: BoxDecoration(
-                            color:         colour.kAccent,
+                            color:         AppTokens.brandLight,
                             borderRadius: BorderRadius.circular(8),
                           ),
                           child: Icon(Icons.description_rounded,
-                              color: colour.kPrimary,
+                              color: AppTokens.brandGradientStart,
                               size:  isTablet ? 20 : 18),
                         ),
                         const SizedBox(width: 12),
@@ -592,12 +592,12 @@ class _BocCard extends StatelessWidget {
                         vertical:   isTablet ? 12 : 10,
                       ),
                       decoration: BoxDecoration(
-                        color:         colour.kAccent,
+                        color:         AppTokens.brandLight,
                         borderRadius: BorderRadius.circular(10),
                       ),
                       child: Row(children: [
                         Icon(Icons.currency_rupee_rounded,
-                            color: colour.kPrimary,
+                            color: AppTokens.brandGradientStart,
                             size:  isTablet ? 22 : 20),
                         const SizedBox(width: 8),
                         Text(
@@ -642,7 +642,7 @@ class _BocCard extends StatelessWidget {
   }
 
   Widget _buildDivider() =>
-      Divider(color: colour.kAccent, thickness: 1.5, height: 24);
+      Divider(color: AppTokens.brandLight, thickness: 1.5, height: 24);
 
   Widget _buildInfoRow(
       IconData icon, String label, String value,
@@ -654,11 +654,11 @@ class _BocCard extends StatelessWidget {
           width:  isTablet ? 40 : 36,
           height: isTablet ? 40 : 36,
           decoration: BoxDecoration(
-            color:         colour.kAccent,
+            color:         AppTokens.brandLight,
             borderRadius: BorderRadius.circular(8),
           ),
           child: Icon(icon,
-              color: colour.kPrimary,
+              color: AppTokens.brandGradientStart,
               size:  isTablet ? 20 : 18),
         ),
         const SizedBox(width: 12),
@@ -703,7 +703,7 @@ class _DetailItem extends StatelessWidget {
       margin: EdgeInsets.only(bottom: isTablet ? 12 : 10),
       padding: EdgeInsets.all(isTablet ? 14 : 12),
       decoration: BoxDecoration(
-        color:         colour.kAccent.withOpacity(0.6),
+        color:         AppTokens.brandLight.withOpacity(0.6),
         borderRadius: BorderRadius.circular(isTablet ? 14 : 12),
         border: Border.all(
             color: AppTokens.brandMid.withOpacity(0.2)),
@@ -713,7 +713,7 @@ class _DetailItem extends StatelessWidget {
         children: [
           Row(children: [
             Icon(Icons.inventory_2_rounded,
-                color: colour.kPrimary,
+                color: AppTokens.brandGradientStart,
                 size:  isTablet ? 18 : 16),
             const SizedBox(width: 8),
             Expanded(

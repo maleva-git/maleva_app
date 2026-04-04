@@ -180,8 +180,8 @@ class _LoginBodyState extends State<_LoginBody>
           decoration: BoxDecoration(
             shape: BoxShape.circle,
             gradient: RadialGradient(colors: [
-              colour.kPrimary.withOpacity(0.18),
-              colour.kPrimary.withOpacity(0.0),
+              AppTokens.brandGradientStart.withOpacity(0.18),
+              AppTokens.brandGradientStart.withOpacity(0.0),
             ]),
           ),
         ),
@@ -192,9 +192,9 @@ class _LoginBodyState extends State<_LoginBody>
           decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.circular(logoSize * 0.32),
-            border: Border.all(color: colour.kPrimary.withOpacity(0.14), width: 1.5),
+            border: Border.all(color: AppTokens.brandGradientStart.withOpacity(0.14), width: 1.5),
             boxShadow: [
-              BoxShadow(color: colour.kPrimary.withOpacity(0.26), blurRadius: 24, offset: const Offset(0, 8)),
+              BoxShadow(color: AppTokens.brandGradientStart.withOpacity(0.26), blurRadius: 24, offset: const Offset(0, 8)),
               BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 6, offset: const Offset(0, 2)),
             ],
           ),
@@ -212,7 +212,7 @@ class _LoginBodyState extends State<_LoginBody>
 
       ShaderMask(
         shaderCallback: (b) =>
-            const LinearGradient(colors: [AppTokens.brandDark, colour.kPrimary]).createShader(b),
+            const LinearGradient(colors: [AppTokens.brandDark, AppTokens.brandGradientStart]).createShader(b),
         child: Text('Maleva',
             style: GoogleFonts.playfairDisplay(
               fontSize:   titleFontSize,
@@ -385,8 +385,8 @@ class _LoginBodyState extends State<_LoginBody>
         borderRadius: BorderRadius.circular(28),
         border: Border.all(color: Colors.white.withOpacity(0.9), width: 1.5),
         boxShadow: [
-          BoxShadow(color: colour.kPrimary.withOpacity(0.07), blurRadius: 8, offset: const Offset(0, 2)),
-          BoxShadow(color: colour.kPrimary.withOpacity(0.11), blurRadius: 55, offset: const Offset(0, 22)),
+          BoxShadow(color: AppTokens.brandGradientStart.withOpacity(0.07), blurRadius: 8, offset: const Offset(0, 2)),
+          BoxShadow(color: AppTokens.brandGradientStart.withOpacity(0.11), blurRadius: 55, offset: const Offset(0, 22)),
         ],
       ),
       padding: padH > 0
@@ -412,14 +412,14 @@ class _LoginBodyState extends State<_LoginBody>
       Container(
         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
         decoration: BoxDecoration(
-          color: colour.kPrimary.withOpacity(0.08),
+          color: AppTokens.brandGradientStart.withOpacity(0.08),
           borderRadius: BorderRadius.circular(20),
-          border: Border.all(color: colour.kPrimary.withOpacity(0.15), width: 1),
+          border: Border.all(color: AppTokens.brandGradientStart.withOpacity(0.15), width: 1),
         ),
         child: Text('v2.0',
             style: GoogleFonts.dmSans(
                 fontSize: 10, fontWeight: FontWeight.w600,
-                color: colour.kPrimary, letterSpacing: 0.5)),
+                color: AppTokens.brandGradientStart, letterSpacing: 0.5)),
       ),
     ]);
   }
@@ -456,7 +456,7 @@ class _LoginBodyState extends State<_LoginBody>
         contentPadding: EdgeInsets.symmetric(horizontal: radius + 4, vertical: radius),
         border:        OutlineInputBorder(borderRadius: BorderRadius.circular(radius), borderSide: const BorderSide(color: Color(0xFFECEEF5), width: 1.5)),
         enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(radius), borderSide: const BorderSide(color: Color(0xFFECEEF5), width: 1.5)),
-        focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(radius), borderSide: const BorderSide(color: colour.kPrimary, width: 1.5)),
+        focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(radius), borderSide: const BorderSide(color: AppTokens.brandGradientStart, width: 1.5)),
         suffixIcon: icon != null
             ? GestureDetector(
             onTap: onIconTap,
@@ -474,10 +474,10 @@ class _LoginBodyState extends State<_LoginBody>
         duration: const Duration(milliseconds: 200),
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 11),
         decoration: BoxDecoration(
-          color: on ? colour.kPrimary.withOpacity(0.07) : colour.kSurface,
+          color: on ? AppTokens.brandGradientStart.withOpacity(0.07) : colour.kSurface,
           borderRadius: BorderRadius.circular(13),
           border: Border.all(
-              color: on ? colour.kPrimary.withOpacity(0.30) : colour.kBorder, width: 1.5),
+              color: on ? AppTokens.brandGradientStart.withOpacity(0.30) : colour.kBorder, width: 1.5),
         ),
         child: Row(children: [
           AnimatedContainer(
@@ -485,10 +485,10 @@ class _LoginBodyState extends State<_LoginBody>
             width:  toggleSize * 2.7,
             height: toggleSize * 1.6,
             decoration: BoxDecoration(
-              color: on ? colour.kPrimary : const Color(0xFFDDE0EE),
+              color: on ? AppTokens.brandGradientStart : const Color(0xFFDDE0EE),
               borderRadius: BorderRadius.circular(toggleSize),
               boxShadow: on
-                  ? [BoxShadow(color: colour.kPrimary.withOpacity(0.35), blurRadius: 8, offset: const Offset(0, 3))]
+                  ? [BoxShadow(color: AppTokens.brandGradientStart.withOpacity(0.35), blurRadius: 8, offset: const Offset(0, 3))]
                   : [],
             ),
             child: AnimatedAlign(
@@ -510,9 +510,9 @@ class _LoginBodyState extends State<_LoginBody>
             child: Text('Driver Login',
                 style: GoogleFonts.dmSans(
                     fontSize: toggleSize, fontWeight: FontWeight.w500,
-                    color: on ? colour.kPrimary : const Color(0xFF505578))),
+                    color: on ? AppTokens.brandGradientStart : const Color(0xFF505578))),
           ),
-          if (on) Icon(Icons.check_circle_rounded, color: colour.kPrimary, size: toggleSize * 1.35),
+          if (on) Icon(Icons.check_circle_rounded, color: AppTokens.brandGradientStart, size: toggleSize * 1.35),
         ]),
       ),
     );

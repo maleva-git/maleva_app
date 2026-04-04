@@ -3,21 +3,17 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
+import 'package:maleva/core/theme/palette.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:http/http.dart' as http;
 import 'package:maleva/core/utils/clsfunction.dart' as objfun;
+import '../../../../../../core/theme/tokens.dart';
 import '../bloc/summonentry_bloc.dart';
 import '../bloc/summonentry_event.dart';
 import '../bloc/summonentry_state.dart';
 
 
-// ── Color Palette ─────────────────────────────────────────────────────────────
-const Color kPrimary      = Color(0xFF1555F3);
-const Color kPrimaryDark  = Color(0xFF0D3DB5);
-const Color kPrimaryLight = Color(0xFF4D7EF7);
-const Color kAccent       = Color(0xFFE8EEFF);
-const Color kWhite        = Colors.white;
 
 // ── Entry Point ───────────────────────────────────────────────────────────────
 class SummonView extends StatelessWidget {
@@ -45,12 +41,12 @@ class _SummonViewBody extends StatelessWidget {
     return Scaffold(
       backgroundColor: Colors.grey.shade50,
       appBar: AppBar(
-        backgroundColor: kPrimary,
-        foregroundColor: kWhite,
+        backgroundColor: AppTokens.brandGradientStart,
+        foregroundColor: Palette.kWhite,
         elevation: 0,
         title: Text("Saved Summon Entries",
             style: GoogleFonts.lato(
-                fontWeight: FontWeight.bold, color: kWhite)),
+                fontWeight: FontWeight.bold, color: Palette.kWhite)),
         centerTitle: true,
       ),
       body: BlocConsumer<SummonBloc, SummonState>(
@@ -66,7 +62,7 @@ class _SummonViewBody extends StatelessWidget {
         builder: (context, state) {
           if (state is! SummonViewState && state is! SummonViewError) {
             return const Center(
-                child: CircularProgressIndicator(color: kPrimary));
+                child: CircularProgressIndicator(color: AppTokens.brandGradientStart));
           }
 
           final fromDate = state is SummonViewState
@@ -89,10 +85,10 @@ class _SummonViewBody extends StatelessWidget {
                 Container(
                   padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
-                    color: kAccent,
+                    color: AppTokens.brandLight,
                     borderRadius: BorderRadius.circular(12),
                     border: Border.all(
-                        color: kPrimaryLight.withOpacity(0.3)),
+                        color: AppTokens.brandMid.withOpacity(0.3)),
                   ),
                   child: Column(
                     children: [
@@ -114,7 +110,7 @@ class _SummonViewBody extends StatelessWidget {
                                     data: Theme.of(ctx).copyWith(
                                         colorScheme:
                                         const ColorScheme.light(
-                                            primary: kPrimary)),
+                                            primary: AppTokens.brandGradientStart)),
                                     child: child!,
                                   ),
                                 );
@@ -141,7 +137,7 @@ class _SummonViewBody extends StatelessWidget {
                                     data: Theme.of(ctx).copyWith(
                                         colorScheme:
                                         const ColorScheme.light(
-                                            primary: kPrimary)),
+                                            primary: AppTokens.brandGradientStart)),
                                     child: child!,
                                   ),
                                 );
@@ -168,7 +164,7 @@ class _SummonViewBody extends StatelessWidget {
                               .add(const LoadSummonViewEvent()),
                           style: ElevatedButton.styleFrom(
                             padding: const EdgeInsets.symmetric(vertical: 14),
-                            backgroundColor: kPrimary,
+                            backgroundColor: AppTokens.brandGradientStart,
                             shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(10)),
                             elevation: 0,
@@ -177,7 +173,7 @@ class _SummonViewBody extends StatelessWidget {
                               style: GoogleFonts.lato(
                                   fontSize: 16,
                                   fontWeight: FontWeight.bold,
-                                  color: kWhite)),
+                                  color: Palette.kWhite)),
                         ),
                       ),
                     ],
@@ -199,7 +195,7 @@ class _SummonViewBody extends StatelessWidget {
   Widget _buildList(bool isLoading, List<dynamic> records) {
     if (isLoading) {
       return const Center(
-          child: CircularProgressIndicator(color: kPrimary));
+          child: CircularProgressIndicator(color: AppTokens.brandGradientStart));
     }
     if (records.isEmpty) {
       return Center(
@@ -234,12 +230,12 @@ class _SummonCard extends StatelessWidget {
     return Container(
       margin: const EdgeInsets.only(bottom: 14),
       decoration: BoxDecoration(
-        color: kWhite,
+        color: Palette.kWhite,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: kAccent, width: 1.5),
+        border: Border.all(color: AppTokens.brandLight, width: 1.5),
         boxShadow: [
           BoxShadow(
-              color: kPrimary.withOpacity(0.07),
+              color: AppTokens.brandGradientStart.withOpacity(0.07),
               blurRadius: 10,
               offset: const Offset(0, 3))
         ],
@@ -256,9 +252,9 @@ class _SummonCard extends StatelessWidget {
                   width: 44,
                   height: 44,
                   decoration: const BoxDecoration(
-                      color: kAccent, shape: BoxShape.circle),
+                      color: AppTokens.brandLight, shape: BoxShape.circle),
                   child: const Icon(Icons.local_shipping_rounded,
-                      color: kPrimary, size: 22),
+                      color: AppTokens.brandGradientStart, size: 22),
                 ),
                 const SizedBox(width: 12),
                 Expanded(
@@ -269,7 +265,7 @@ class _SummonCard extends StatelessWidget {
                           style: GoogleFonts.lato(
                               fontSize: 16,
                               fontWeight: FontWeight.bold,
-                              color: kPrimaryDark)),
+                              color: AppTokens.brandDark)),
                       Text("Country: ${item['Country'] ?? '-'}",
                           style: GoogleFonts.lato(
                               fontSize: 13, color: Colors.grey[600])),
@@ -280,19 +276,19 @@ class _SummonCard extends StatelessWidget {
                   padding: const EdgeInsets.symmetric(
                       horizontal: 10, vertical: 4),
                   decoration: BoxDecoration(
-                      color: kAccent,
+                      color: AppTokens.brandLight,
                       borderRadius: BorderRadius.circular(10)),
                   child: Text("RM ${item['Amount'] ?? '-'}",
                       style: GoogleFonts.lato(
                           fontWeight: FontWeight.bold,
-                          color: kPrimary,
+                          color: AppTokens.brandGradientStart,
                           fontSize: 14)),
                 ),
               ],
             ),
 
             const SizedBox(height: 10),
-            Divider(color: kAccent, thickness: 1),
+            Divider(color: AppTokens.brandLight, thickness: 1),
 
             // Info rows
             _infoRow("Summon", item['Summon']),
@@ -319,10 +315,10 @@ class _SummonCard extends StatelessWidget {
                     fit: BoxFit.cover,
                     errorBuilder: (_, __, ___) => Container(
                       height: 80,
-                      color: kAccent,
+                      color: AppTokens.brandLight,
                       child: const Center(
                           child: Icon(Icons.broken_image_rounded,
-                              color: kPrimaryLight)),
+                              color: AppTokens.brandMid)),
                     ),
                   ),
                 ),
@@ -348,7 +344,7 @@ class _SummonCard extends StatelessWidget {
             child: Text(value?.toString() ?? '-',
                 style: GoogleFonts.lato(
                     fontSize: 13,
-                    color: kPrimaryDark,
+                    color: AppTokens.brandDark,
                     fontWeight: FontWeight.w700)),
           ),
         ],
@@ -384,7 +380,7 @@ class _ImagePreviewDialog extends StatelessWidget {
                 decoration: BoxDecoration(
                     color: Colors.black54,
                     borderRadius: BorderRadius.circular(20)),
-                child: const Icon(Icons.close, color: kWhite, size: 20),
+                child: const Icon(Icons.close, color: Palette.kWhite, size: 20),
               ),
             ),
           ),
@@ -393,8 +389,8 @@ class _ImagePreviewDialog extends StatelessWidget {
             bottom: 20,
             right: 20,
             child: FloatingActionButton(
-              backgroundColor: kWhite,
-              child: const Icon(Icons.share, color: kPrimaryDark),
+              backgroundColor: Palette.kWhite,
+              child: const Icon(Icons.share, color: AppTokens.brandDark),
               onPressed: () => _shareImage(imageUrl, context),
             ),
           ),
@@ -430,13 +426,13 @@ Widget _dateField({
     child: Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
       decoration: BoxDecoration(
-        color: kWhite,
+        color: Palette.kWhite,
         borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: kPrimaryLight.withOpacity(0.4)),
+        border: Border.all(color: AppTokens.brandMid.withOpacity(0.4)),
       ),
       child: Row(
         children: [
-          const Icon(Icons.date_range_rounded, color: kPrimary, size: 18),
+          const Icon(Icons.date_range_rounded, color: AppTokens.brandGradientStart, size: 18),
           const SizedBox(width: 8),
           Expanded(
             child: Column(
@@ -448,7 +444,7 @@ Widget _dateField({
                 Text(value,
                     style: GoogleFonts.lato(
                         fontSize: 13,
-                        color: kPrimaryDark,
+                        color: AppTokens.brandDark,
                         fontWeight: FontWeight.w600)),
               ],
             ),

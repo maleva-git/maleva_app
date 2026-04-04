@@ -139,7 +139,7 @@ class _SpotSaleEntryBody extends StatelessWidget {
               Container(
                 width: 4, height: 30,
                 decoration: BoxDecoration(
-                  color: colour.kPrimary,
+                  color: AppTokens.brandGradientStart,
                   borderRadius: BorderRadius.circular(4),
                 ),
               ),
@@ -148,7 +148,7 @@ class _SpotSaleEntryBody extends StatelessWidget {
                   style: GoogleFonts.lato(
                     fontSize: 20,
                     fontWeight: FontWeight.bold,
-                    color: colour.kPrimaryDark,
+                    color: AppTokens.brandDark,
                     letterSpacing: 1.2,
                   )),
             ]),
@@ -302,12 +302,12 @@ class _SpotSaleEntryBody extends StatelessWidget {
                 height: 52,
                 child: ElevatedButton.icon(
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: colour.kAccent,
-                    foregroundColor: colour.kPrimary,
+                    backgroundColor: AppTokens.brandLight,
+                    foregroundColor: AppTokens.brandGradientStart,
                     shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12),
                         side: const BorderSide(
-                            color: colour.kPrimary)),
+                            color: AppTokens.brandGradientStart)),
                     elevation: 0,
                   ),
                   onPressed: () => bloc.pickDocument(),
@@ -337,11 +337,11 @@ class _SpotSaleEntryBody extends StatelessWidget {
                 Container(
                   padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
-                    color: colour.kAccent,
+                    color: AppTokens.brandLight,
                     borderRadius: BorderRadius.circular(10),
                     border: Border.all(
                         color:
-                        colour.kPrimary.withOpacity(0.2)),
+                        AppTokens.brandGradientStart.withOpacity(0.2)),
                   ),
                   child: Row(children: [
                     const Icon(Icons.picture_as_pdf,
@@ -424,7 +424,7 @@ class _SpotSaleEntryBody extends StatelessWidget {
                 style: ElevatedButton.styleFrom(
                   minimumSize: Size(double.infinity,
                       isTablet ? 58 : 55),
-                  backgroundColor: colour.kPrimary,
+                  backgroundColor: AppTokens.brandGradientStart,
                   shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(
                           isTablet ? 16 : 14)),
@@ -476,10 +476,10 @@ class _SpotSalePreviewPanel extends StatelessWidget {
       decoration: BoxDecoration(
         color: colour.kWhite,
         borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: colour.kAccent, width: 1.5),
+        border: Border.all(color: AppTokens.brandLight, width: 1.5),
         boxShadow: [
           BoxShadow(
-            color: colour.kPrimary.withOpacity(0.07),
+            color: AppTokens.brandGradientStart.withOpacity(0.07),
             blurRadius: 16,
             offset: const Offset(0, 5),
           ),
@@ -496,7 +496,7 @@ class _SpotSalePreviewPanel extends StatelessWidget {
               Container(
                 width: 4, height: 22,
                 decoration: BoxDecoration(
-                  color: colour.kPrimary,
+                  color: AppTokens.brandGradientStart,
                   borderRadius: BorderRadius.circular(4),
                 ),
               ),
@@ -505,7 +505,7 @@ class _SpotSalePreviewPanel extends StatelessWidget {
                   style: GoogleFonts.lato(
                     fontSize: 15,
                     fontWeight: FontWeight.bold,
-                    color: colour.kPrimaryDark,
+                    color: AppTokens.brandDark,
                   )),
             ]),
 
@@ -517,7 +517,7 @@ class _SpotSalePreviewPanel extends StatelessWidget {
               padding: const EdgeInsets.symmetric(
                   horizontal: 16, vertical: 14),
               decoration: BoxDecoration(
-                color: colour.kPrimary,
+                color: AppTokens.brandGradientStart,
                 borderRadius: BorderRadius.circular(16),
               ),
               child: Column(
@@ -579,7 +579,7 @@ class _SpotSalePreviewPanel extends StatelessWidget {
             Container(
               padding: const EdgeInsets.all(14),
               decoration: BoxDecoration(
-                color: colour.kAccent,
+                color: AppTokens.brandLight,
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Column(
@@ -587,13 +587,13 @@ class _SpotSalePreviewPanel extends StatelessWidget {
                 children: [
                   Row(children: [
                     const Icon(Icons.attach_file_rounded,
-                        color: colour.kPrimary, size: 16),
+                        color: AppTokens.brandGradientStart, size: 16),
                     const SizedBox(width: 6),
                     Text('Document',
                         style: GoogleFonts.lato(
                           fontSize: 12,
                           fontWeight: FontWeight.bold,
-                          color: colour.kPrimaryDark,
+                          color: AppTokens.brandDark,
                         )),
                   ]),
                   const SizedBox(height: 8),
@@ -655,7 +655,7 @@ class _SpotSalePreviewPanel extends StatelessWidget {
             Container(
               padding: const EdgeInsets.all(14),
               decoration: BoxDecoration(
-                color: colour.kAccent,
+                color: AppTokens.brandLight,
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Column(
@@ -663,13 +663,13 @@ class _SpotSalePreviewPanel extends StatelessWidget {
                 children: [
                   Row(children: [
                     const Icon(Icons.lightbulb_rounded,
-                        color: colour.kPrimary, size: 16),
+                        color: AppTokens.brandGradientStart, size: 16),
                     const SizedBox(width: 6),
                     Text('Tips',
                         style: GoogleFonts.lato(
                           fontSize: 12,
                           fontWeight: FontWeight.bold,
-                          color: colour.kPrimaryDark,
+                          color: AppTokens.brandDark,
                         )),
                   ]),
                   const SizedBox(height: 8),
@@ -693,10 +693,10 @@ class _SpotSalePreviewPanel extends StatelessWidget {
         Container(
           width: 34, height: 34,
           decoration: BoxDecoration(
-            color: colour.kAccent,
+            color: AppTokens.brandLight,
             borderRadius: BorderRadius.circular(8),
           ),
-          child: Icon(icon, color: colour.kPrimary, size: 17),
+          child: Icon(icon, color: AppTokens.brandGradientStart, size: 17),
         ),
         const SizedBox(width: 10),
         Expanded(
@@ -714,7 +714,7 @@ class _SpotSalePreviewPanel extends StatelessWidget {
                   style: GoogleFonts.lato(
                     fontSize: 14,
                     fontWeight: FontWeight.w700,
-                    color: colour.kPrimaryDark,
+                    color: AppTokens.brandDark,
                   ),
                   overflow: TextOverflow.ellipsis),
             ],
@@ -729,7 +729,7 @@ class _SpotSalePreviewPanel extends StatelessWidget {
       padding: const EdgeInsets.only(bottom: 4),
       child: Row(children: [
         const Icon(Icons.check_circle_rounded,
-            color: colour.kPrimary, size: 13),
+            color: AppTokens.brandGradientStart, size: 13),
         const SizedBox(width: 6),
         Expanded(
           child: Text(text,
@@ -946,7 +946,7 @@ class _SelectPageScaffold extends StatelessWidget {
     return Scaffold(
       backgroundColor: Colors.grey.shade50,
       appBar: AppBar(
-        backgroundColor: colour.kPrimary,
+        backgroundColor: AppTokens.brandGradientStart,
         foregroundColor: colour.kWhite,
         elevation: 0,
         leading: GestureDetector(
@@ -963,19 +963,19 @@ class _SelectPageScaffold extends StatelessWidget {
       ),
       body: Column(children: [
         Container(
-          color: colour.kPrimary,
+          color: AppTokens.brandGradientStart,
           padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
           child: TextField(
             controller: searchCtrl,
             onChanged: onSearch,
             style: GoogleFonts.lato(
-                color: colour.kPrimaryDark,
+                color: AppTokens.brandDark,
                 fontWeight: FontWeight.w600),
             decoration: InputDecoration(
               hintText: 'Search $title...',
               hintStyle: GoogleFonts.lato(color: Colors.grey),
               prefixIcon: const Icon(Icons.search,
-                  color: colour.kPrimary),
+                  color: AppTokens.brandGradientStart),
               border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12),
                   borderSide: BorderSide.none),
@@ -1047,10 +1047,10 @@ class _SelectListTile extends StatelessWidget {
           color: colour.kWhite,
           borderRadius: BorderRadius.circular(14),
           border:
-          Border.all(color: colour.kAccent, width: 1.5),
+          Border.all(color: AppTokens.brandLight, width: 1.5),
           boxShadow: [
             BoxShadow(
-                color: colour.kPrimary.withOpacity(0.05),
+                color: AppTokens.brandGradientStart.withOpacity(0.05),
                 blurRadius: 6,
                 offset: const Offset(0, 2)),
           ],
@@ -1059,11 +1059,11 @@ class _SelectListTile extends StatelessWidget {
           Container(
             width: 38, height: 38,
             decoration: const BoxDecoration(
-                color: colour.kAccent,
+                color: AppTokens.brandLight,
                 shape: BoxShape.circle),
             child: const Icon(
                 Icons.check_circle_outline_rounded,
-                color: colour.kPrimary,
+                color: AppTokens.brandGradientStart,
                 size: 18),
           ),
           const SizedBox(width: 14),
@@ -1072,7 +1072,7 @@ class _SelectListTile extends StatelessWidget {
                 style: GoogleFonts.lato(
                     fontSize: 15,
                     fontWeight: FontWeight.w600,
-                    color: colour.kPrimaryDark)),
+                    color: AppTokens.brandDark)),
           ),
           const Icon(Icons.chevron_right_rounded,
               color: AppTokens.brandMid),
@@ -1106,10 +1106,10 @@ class _SectionCard extends StatelessWidget {
               width: isTablet ? 30 : 28,
               height: isTablet ? 30 : 28,
               decoration: const BoxDecoration(
-                  color: colour.kAccent,
+                  color: AppTokens.brandLight,
                   shape: BoxShape.circle),
               child: Icon(icon,
-                  color: colour.kPrimary,
+                  color: AppTokens.brandGradientStart,
                   size: isTablet ? 16 : 15),
             ),
             const SizedBox(width: 8),
@@ -1117,7 +1117,7 @@ class _SectionCard extends StatelessWidget {
                 style: GoogleFonts.lato(
                     fontSize: isTablet ? 14 : 13,
                     fontWeight: FontWeight.bold,
-                    color: colour.kPrimaryDark)),
+                    color: AppTokens.brandDark)),
           ]),
           const SizedBox(height: 8),
           Container(
@@ -1128,10 +1128,10 @@ class _SectionCard extends StatelessWidget {
               borderRadius:
               BorderRadius.circular(isTablet ? 18 : 16),
               border: Border.all(
-                  color: colour.kAccent, width: 1.5),
+                  color: AppTokens.brandLight, width: 1.5),
               boxShadow: [
                 BoxShadow(
-                    color: colour.kPrimary.withOpacity(0.05),
+                    color: AppTokens.brandGradientStart.withOpacity(0.05),
                     blurRadius: 10,
                     offset: const Offset(0, 3)),
               ],
@@ -1170,7 +1170,7 @@ class _SelectTile extends StatelessWidget {
             horizontal: 14, vertical: 14),
         decoration: BoxDecoration(
           color: hasValue
-              ? colour.kAccent
+              ? AppTokens.brandLight
               : Colors.grey.shade50,
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
@@ -1181,7 +1181,7 @@ class _SelectTile extends StatelessWidget {
         ),
         child: Row(children: [
           Icon(icon,
-              color: hasValue ? colour.kPrimary : Colors.grey,
+              color: hasValue ? AppTokens.brandGradientStart : Colors.grey,
               size: 20),
           const SizedBox(width: 12),
           Expanded(
@@ -1192,7 +1192,7 @@ class _SelectTile extends StatelessWidget {
                       style: GoogleFonts.lato(
                           fontSize: 11,
                           color: hasValue
-                              ? colour.kPrimary
+                              ? AppTokens.brandGradientStart
                               : Colors.grey,
                           fontWeight: FontWeight.w600)),
                   const SizedBox(height: 2),
@@ -1201,7 +1201,7 @@ class _SelectTile extends StatelessWidget {
                     style: GoogleFonts.lato(
                         fontSize: 14,
                         color: hasValue
-                            ? colour.kPrimaryDark
+                            ? AppTokens.brandDark
                             : Colors.grey.shade400,
                         fontWeight: hasValue
                             ? FontWeight.bold
@@ -1212,7 +1212,7 @@ class _SelectTile extends StatelessWidget {
           ),
           Icon(Icons.chevron_right_rounded,
               color: hasValue
-                  ? colour.kPrimary
+                  ? AppTokens.brandGradientStart
                   : Colors.grey.shade400),
         ]),
       ),
@@ -1225,14 +1225,14 @@ InputDecoration _decor(String label, IconData icon) {
   return InputDecoration(
     labelText: label,
     labelStyle:
-    const TextStyle(color: colour.kPrimaryDark),
-    prefixIcon: Icon(icon, color: colour.kPrimary, size: 20),
+    const TextStyle(color: AppTokens.brandDark),
+    prefixIcon: Icon(icon, color: AppTokens.brandGradientStart, size: 20),
     border: OutlineInputBorder(
         borderRadius: BorderRadius.circular(10)),
     focusedBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(10),
         borderSide: const BorderSide(
-            color: colour.kPrimary, width: 1.5)),
+            color: AppTokens.brandGradientStart, width: 1.5)),
     enabledBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(10),
         borderSide: BorderSide(

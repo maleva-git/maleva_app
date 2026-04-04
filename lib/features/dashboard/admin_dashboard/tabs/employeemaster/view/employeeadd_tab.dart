@@ -5,6 +5,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:maleva/core/models/model.dart';
 import 'package:maleva/core/utils/clsfunction.dart' as objfun;
 
+import '../../../../../../core/theme/tokens.dart';
 import '../bloc/employeemaster_bloc.dart';
 import '../bloc/employeemaster_event.dart';
 import '../bloc/employeemaster_state.dart';
@@ -70,7 +71,7 @@ class _EmployeeAddBody extends StatelessWidget {
       builder: (context, state) {
         if (state is! EmployeeFormState) {
           return const Scaffold(
-            body: Center(child: CircularProgressIndicator(color: colour.kPrimary)),
+            body: Center(child: CircularProgressIndicator(color: AppTokens.brandGradientStart)),
           );
         }
 
@@ -81,7 +82,7 @@ class _EmployeeAddBody extends StatelessWidget {
         return Scaffold(
           backgroundColor: Colors.grey.shade50,
           appBar: AppBar(
-            backgroundColor: colour.kPrimary,
+            backgroundColor: AppTokens.brandGradientStart,
             foregroundColor: colour.kWhite,
             elevation: 0,
             title: Text(isEdit ? "Edit Employee" : "Add Employee",
@@ -109,7 +110,7 @@ class _EmployeeAddBody extends StatelessWidget {
                         ElevatedButton.icon(
                           icon: const Icon(Icons.check, size: 18),
                           label: const Text("Yes, Save"),
-                          style: ElevatedButton.styleFrom(backgroundColor: colour.kPrimary,
+                          style: ElevatedButton.styleFrom(backgroundColor: AppTokens.brandGradientStart,
                               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8))),
                           onPressed: () => Navigator.pop(context, true),
                         ),
@@ -127,7 +128,7 @@ class _EmployeeAddBody extends StatelessWidget {
                 return Row(children: [
                   ElevatedButton(
                     onPressed: s.isSaving ? null : details.onStepContinue,
-                    style: ElevatedButton.styleFrom(backgroundColor: colour.kPrimary,
+                    style: ElevatedButton.styleFrom(backgroundColor: AppTokens.brandGradientStart,
                         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
                         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10))),
                     child: s.isSaving
@@ -141,9 +142,9 @@ class _EmployeeAddBody extends StatelessWidget {
                     onPressed: details.onStepCancel,
                     style: OutlinedButton.styleFrom(
                         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-                        side: const BorderSide(color: colour.kPrimary),
+                        side: const BorderSide(color: AppTokens.brandGradientStart),
                         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10))),
-                    child: const Text("Back", style: TextStyle(color: colour.kPrimaryDark)),
+                    child: const Text("Back", style: TextStyle(color: AppTokens.brandDark)),
                   ),
                 ]);
               },
@@ -151,7 +152,7 @@ class _EmployeeAddBody extends StatelessWidget {
                 // ── Step 1: Basic Info ──
                 Step(
                   title: Text("Basic Info", style: GoogleFonts.lato(
-                      fontWeight: FontWeight.bold, color: colour.kPrimaryDark)),
+                      fontWeight: FontWeight.bold, color: AppTokens.brandDark)),
                   content: _section([
                     _field("Employee Name", s.employee.EmployeeName,
                             (v) => bloc.add(UpdateFieldEvent('EmployeeName', v))),
@@ -173,7 +174,7 @@ class _EmployeeAddBody extends StatelessWidget {
                 // ── Step 2: Address Info ──
                 Step(
                   title: Text("Address Info", style: GoogleFonts.lato(
-                      fontWeight: FontWeight.bold, color: colour.kPrimaryDark)),
+                      fontWeight: FontWeight.bold, color: AppTokens.brandDark)),
                   content: _section([
                     _field("Address 1", s.employee.Address1,
                             (v) => bloc.add(UpdateFieldEvent('Address1', v))),
@@ -196,7 +197,7 @@ class _EmployeeAddBody extends StatelessWidget {
                 // ── Step 3: Job Info ──
                 Step(
                   title: Text("Job Info", style: GoogleFonts.lato(
-                      fontWeight: FontWeight.bold, color: colour.kPrimaryDark)),
+                      fontWeight: FontWeight.bold, color: AppTokens.brandDark)),
                   content: _section([
                     _field("User Name", s.employee.UserName,
                             (v) => bloc.add(UpdateFieldEvent('UserName', v))),
@@ -221,7 +222,7 @@ class _EmployeeAddBody extends StatelessWidget {
                 // ── Step 4: Bank Info ──
                 Step(
                   title: Text("Bank Details", style: GoogleFonts.lato(
-                      fontWeight: FontWeight.bold, color: colour.kPrimaryDark)),
+                      fontWeight: FontWeight.bold, color: AppTokens.brandDark)),
                   content: _section([
                     _field("Bank Name", s.employee.BankName,
                             (v) => bloc.add(UpdateFieldEvent('BankName', v))),
@@ -249,8 +250,8 @@ Widget _section(List<Widget> children) {
     decoration: BoxDecoration(
       color: colour.kWhite,
       borderRadius: BorderRadius.circular(12),
-      border: Border.all(color: colour.kAccent),
-      boxShadow: [BoxShadow(color: colour.kPrimary.withOpacity(0.05),
+      border: Border.all(color: AppTokens.brandLight),
+      boxShadow: [BoxShadow(color: AppTokens.brandGradientStart.withOpacity(0.05),
           blurRadius: 8, offset: const Offset(0, 2))],
     ),
     child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: children),
@@ -273,10 +274,10 @@ Widget _field(
       onChanged: onChanged,
       decoration: InputDecoration(
         labelText: label,
-        labelStyle: const TextStyle(color: colour.kPrimaryDark),
+        labelStyle: const TextStyle(color: AppTokens.brandDark),
         border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
         focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(10),
-            borderSide: const BorderSide(color: colour.kPrimary, width: 1.5)),
+            borderSide: const BorderSide(color: AppTokens.brandGradientStart, width: 1.5)),
         filled: true,
         fillColor: Colors.grey[50],
         contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
@@ -298,11 +299,11 @@ Widget _dropdown(
       value: items.contains(value) ? value : null,
       decoration: InputDecoration(
         labelText: label,
-        labelStyle: const TextStyle(color: colour.kPrimaryDark),
+        labelStyle: const TextStyle(color: AppTokens.brandDark),
         border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(10),
-          borderSide: const BorderSide(color: colour.kPrimary, width: 1.5),
+          borderSide: const BorderSide(color: AppTokens.brandGradientStart, width: 1.5),
         ),
         filled: true,
         fillColor: Colors.grey[50],
@@ -341,7 +342,7 @@ Widget _datePicker(
           lastDate: DateTime(2100),
           builder: (ctx, child) => Theme(
             data: Theme.of(ctx).copyWith(
-                colorScheme: const ColorScheme.light(primary: colour.kPrimary)),
+                colorScheme: const ColorScheme.light(primary: AppTokens.brandGradientStart)),
             child: child!,
           ),
         );
@@ -359,7 +360,7 @@ Widget _datePicker(
           border: Border.all(color: Colors.grey.shade400),
         ),
         child: Row(children: [
-          const Icon(Icons.calendar_today_rounded, color: colour.kPrimary, size: 18),
+          const Icon(Icons.calendar_today_rounded, color: AppTokens.brandGradientStart, size: 18),
           const SizedBox(width: 10),
           Expanded(
             child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
@@ -368,7 +369,7 @@ Widget _datePicker(
               Text(
                 value.isNotEmpty ? value : 'Select Date',
                 style: GoogleFonts.lato(fontSize: 14,
-                    color: value.isNotEmpty ? colour.kPrimaryDark : Colors.grey,
+                    color: value.isNotEmpty ? AppTokens.brandDark : Colors.grey,
                     fontWeight: FontWeight.w600),
               ),
             ]),

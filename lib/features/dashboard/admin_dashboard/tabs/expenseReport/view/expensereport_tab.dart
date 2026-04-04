@@ -52,7 +52,7 @@ class ExpenseReportView extends StatelessWidget {
       builder: (context, state) {
         if (state.status == ExpStatus.loading) {
           return const Center(
-            child: CircularProgressIndicator(color: colour.kPrimary),
+            child: CircularProgressIndicator(color: AppTokens.brandGradientStart),
           );
         }
 
@@ -205,7 +205,7 @@ class _SectionHeader extends StatelessWidget {
         width: 4,
         height: isTablet ? 30 : 26,
         decoration: BoxDecoration(
-          color: colour.kPrimary,
+          color: AppTokens.brandGradientStart,
           borderRadius: BorderRadius.circular(4),
         ),
       ),
@@ -247,14 +247,14 @@ class _SummaryCard extends StatelessWidget {
     return Container(
       decoration: BoxDecoration(
         gradient: const LinearGradient(
-          colors: [colour.kPrimary, AppTokens.brandDark],
+          colors: [AppTokens.brandGradientStart, AppTokens.brandDark],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
         borderRadius: BorderRadius.circular(isTablet ? 24 : 20),
         boxShadow: [
           BoxShadow(
-            color: colour.kPrimary.withOpacity(0.35),
+            color: AppTokens.brandGradientStart.withOpacity(0.35),
             blurRadius: 20,
             offset: const Offset(0, 8),
           ),
@@ -348,7 +348,7 @@ class _SummaryRow extends StatelessWidget {
           child: Text(count,
               textAlign: TextAlign.center,
               style: GoogleFonts.poppins(
-                  color: colour.kAccent,
+                  color: AppTokens.brandLight,
                   fontSize: isTablet ? 14 : 13,
                   fontWeight: FontWeight.w600)),
         ),
@@ -357,7 +357,7 @@ class _SummaryRow extends StatelessWidget {
           child: Text(amount,
               textAlign: TextAlign.end,
               style: GoogleFonts.poppins(
-                  color: colour.kAccent,
+                  color: AppTokens.brandLight,
                   fontSize: isTablet ? 14 : 13,
                   fontWeight: FontWeight.w600)),
         ),
@@ -383,10 +383,10 @@ class _DatePickerCard extends StatelessWidget {
           decoration: BoxDecoration(
             color: colour.kWhite,
             borderRadius: BorderRadius.circular(isTablet ? 20 : 16),
-            border: Border.all(color: colour.kAccent, width: 1.5),
+            border: Border.all(color: AppTokens.brandLight, width: 1.5),
             boxShadow: [
               BoxShadow(
-                color: colour.kPrimary.withOpacity(0.08),
+                color: AppTokens.brandGradientStart.withOpacity(0.08),
                 blurRadius: 12,
                 offset: const Offset(0, 4),
               ),
@@ -409,7 +409,7 @@ class _DatePickerCard extends StatelessWidget {
                     builder: (ctx, child) => Theme(
                       data: Theme.of(ctx).copyWith(
                         colorScheme: const ColorScheme.light(
-                          primary: colour.kPrimary,
+                          primary: AppTokens.brandGradientStart,
                           onPrimary: colour.kWhite,
                           surface: colour.kWhite,
                         ),
@@ -432,7 +432,7 @@ class _DatePickerCard extends StatelessWidget {
             Container(
               height: isTablet ? 44 : 36,
               width: 1,
-              color: colour.kAccent,
+              color: AppTokens.brandLight,
               margin: const EdgeInsets.symmetric(horizontal: 12),
             ),
 
@@ -452,7 +452,7 @@ class _DatePickerCard extends StatelessWidget {
                     builder: (ctx, child) => Theme(
                       data: Theme.of(ctx).copyWith(
                         colorScheme: const ColorScheme.light(
-                          primary: colour.kPrimary,
+                          primary: AppTokens.brandGradientStart,
                           onPrimary: colour.kWhite,
                           surface: colour.kWhite,
                         ),
@@ -501,12 +501,12 @@ class _DateField extends StatelessWidget {
           Container(
             padding: EdgeInsets.all(isTablet ? 9 : 7),
             decoration: BoxDecoration(
-              color: colour.kAccent,
+              color: AppTokens.brandLight,
               borderRadius: BorderRadius.circular(10),
             ),
             child: Icon(Icons.calendar_today_rounded,
                 size: isTablet ? 20 : 16,
-                color: colour.kPrimary),
+                color: AppTokens.brandGradientStart),
           ),
           const SizedBox(width: 10),
           Column(
@@ -515,7 +515,7 @@ class _DateField extends StatelessWidget {
               Text(label,
                   style: GoogleFonts.poppins(
                       fontSize: isTablet ? 11 : 10,
-                      color: colour.kPrimaryLight,
+                      color: AppTokens.brandMid,
                       fontWeight: FontWeight.w500)),
               Text(date,
                   style: GoogleFonts.poppins(
@@ -543,7 +543,7 @@ class _ListHeader extends StatelessWidget {
         vertical:   isTablet ? 13 : 10,
       ),
       decoration: BoxDecoration(
-        color: colour.kAccent,
+        color: AppTokens.brandLight,
         borderRadius: BorderRadius.circular(isTablet ? 16 : 12),
       ),
       child: Row(children: [
@@ -604,7 +604,7 @@ class _ExpenseItemCard extends StatelessWidget {
         child: InkWell(
           onTap: onTap,
           borderRadius: BorderRadius.circular(isTablet ? 20 : 16),
-          splashColor: colour.kAccent,
+          splashColor: AppTokens.brandLight,
           child: Container(
             padding: EdgeInsets.symmetric(
               horizontal: isTablet ? 20 : 16,
@@ -613,7 +613,7 @@ class _ExpenseItemCard extends StatelessWidget {
             decoration: BoxDecoration(
               borderRadius:
               BorderRadius.circular(isTablet ? 20 : 16),
-              border: Border.all(color: colour.kAccent, width: 1.2),
+              border: Border.all(color: AppTokens.brandLight, width: 1.2),
               boxShadow: [
                 BoxShadow(
                   color: AppTokens.brandGradientStart.withOpacity(0.06),
@@ -629,7 +629,7 @@ class _ExpenseItemCard extends StatelessWidget {
                 height: isTablet ? 32 : 28,
                 margin: const EdgeInsets.only(right: 12),
                 decoration: BoxDecoration(
-                  color: colour.kAccent,
+                  color: AppTokens.brandLight,
                   borderRadius:
                   BorderRadius.circular(isTablet ? 10 : 8),
                 ),
@@ -658,7 +658,7 @@ class _ExpenseItemCard extends StatelessWidget {
                     style: GoogleFonts.poppins(
                         fontSize: isTablet ? 14 : 13,
                         fontWeight: FontWeight.w500,
-                        color: colour.kPrimaryLight)),
+                        color: AppTokens.brandGradientStartLight)),
               ),
               Expanded(
                 flex: 2,

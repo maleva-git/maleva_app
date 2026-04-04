@@ -55,7 +55,7 @@ class _EmailBody extends StatelessWidget {
         if (state is EmployeesLoading) {
           return const Center(
             child:
-            CircularProgressIndicator(color: colour.kPrimary),
+            CircularProgressIndicator(color: AppTokens.brandGradientStart),
           );
         }
 
@@ -96,7 +96,7 @@ class _EmailBody extends StatelessWidget {
                   Container(
                     width: 4, height: 30,
                     decoration: BoxDecoration(
-                      color: colour.kPrimary,
+                      color: AppTokens.brandGradientStart,
                       borderRadius: BorderRadius.circular(4),
                     ),
                   ),
@@ -105,7 +105,7 @@ class _EmailBody extends StatelessWidget {
                       style: GoogleFonts.lato(
                         fontSize:      20,
                         fontWeight:    FontWeight.bold,
-                        color:         colour.kPrimaryDark,
+                        color:         AppTokens.brandDark,
                         letterSpacing: 1.2,
                       )),
                 ]),
@@ -145,7 +145,7 @@ class _EmailBody extends StatelessWidget {
             child: state.emailsLoading
                 ? const Center(
                 child: CircularProgressIndicator(
-                    color: colour.kPrimary))
+                    color: AppTokens.brandGradientStart))
                 : state.emails.isEmpty
                 ? _EmptyState(isTablet: true)
                 : ListView.builder(
@@ -178,7 +178,7 @@ class _EmailBody extends StatelessWidget {
           child: state.emailsLoading
               ? const Center(
               child: CircularProgressIndicator(
-                  color: colour.kPrimary))
+                  color: AppTokens.brandGradientStart))
               : state.emails.isEmpty
               ? _EmptyState(isTablet: false)
               : ListView.builder(
@@ -210,7 +210,7 @@ class _EmployeeDropdown extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        color:         colour.kAccent,
+        color:         AppTokens.brandLight,
         borderRadius: BorderRadius.circular(isTablet ? 14 : 12),
         border: Border.all(
             color: AppTokens.brandMid.withOpacity(0.3)),
@@ -227,7 +227,7 @@ class _EmployeeDropdown extends StatelessWidget {
                 fontSize: isTablet ? 15 : 14,
               )),
           icon: Icon(Icons.keyboard_arrow_down_rounded,
-              color: colour.kPrimary,
+              color: AppTokens.brandGradientStart,
               size:  isTablet ? 24 : 22),
           items: state.employees.map((emp) {
             return DropdownMenuItem(
@@ -236,7 +236,7 @@ class _EmployeeDropdown extends StatelessWidget {
                 emp.AccountName,
                 overflow: TextOverflow.ellipsis,
                 style: GoogleFonts.lato(
-                  color:      colour.kPrimaryDark,
+                  color:      AppTokens.brandDark,
                   fontWeight: FontWeight.w600,
                   fontSize:   isTablet ? 15 : 14,
                 ),
@@ -269,14 +269,14 @@ class _CountBadge extends StatelessWidget {
           horizontal: 20, vertical: 18),
       decoration: BoxDecoration(
         gradient: const LinearGradient(
-          colors: [colour.kPrimary, colour.kPrimaryDark],
+          colors: [AppTokens.brandGradientStart, AppTokens.brandDark],
           begin: Alignment.topLeft,
           end:   Alignment.bottomRight,
         ),
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color:     colour.kPrimary.withOpacity(0.28),
+            color:     AppTokens.brandGradientStart.withOpacity(0.28),
             blurRadius: 16,
             offset:    const Offset(0, 6),
           ),
@@ -372,7 +372,7 @@ class _SaveButton extends StatelessWidget {
               .add(const SaveEmailsEvent());
         },
         style: ElevatedButton.styleFrom(
-          backgroundColor: colour.kPrimary,
+          backgroundColor: AppTokens.brandGradientStart,
           padding: EdgeInsets.symmetric(
               vertical: isTablet ? 16 : 14),
           shape: RoundedRectangleBorder(
@@ -404,10 +404,10 @@ class _EmailCard extends StatelessWidget {
       decoration: BoxDecoration(
         color:         colour.kWhite,
         borderRadius: BorderRadius.circular(isTablet ? 20 : 16),
-        border: Border.all(color: colour.kAccent, width: 1.5),
+        border: Border.all(color: AppTokens.brandLight, width: 1.5),
         boxShadow: [
           BoxShadow(
-            color:     colour.kPrimary.withOpacity(0.07),
+            color:     AppTokens.brandGradientStart.withOpacity(0.07),
             blurRadius: 10,
             offset:    const Offset(0, 4),
           ),
@@ -429,7 +429,7 @@ class _EmailCard extends StatelessWidget {
                     style: GoogleFonts.lato(
                       fontWeight: FontWeight.bold,
                       fontSize:   isTablet ? 17 : 16,
-                      color:      colour.kPrimaryDark,
+                      color:      AppTokens.brandDark,
                     ),
                   ),
                 ),
@@ -482,7 +482,7 @@ class _EmailCard extends StatelessWidget {
 
             SizedBox(height: isTablet ? 14 : 12),
 
-            Divider(color: colour.kAccent, thickness: 1, height: 1),
+            Divider(color: AppTokens.brandLight, thickness: 1, height: 1),
 
             SizedBox(height: isTablet ? 10 : 8),
 
@@ -494,7 +494,7 @@ class _EmailCard extends StatelessWidget {
                 _CheckboxChip(
                   label:       "Active",
                   value:       email.isActive,
-                  activeColor: colour.kPrimary,
+                  activeColor: AppTokens.brandGradientStart,
                   isTablet:    isTablet,
                   onChanged: (v) =>
                       context.read<EmailBloc>().add(
@@ -628,7 +628,7 @@ class _ErrorState extends StatelessWidget {
                 style: GoogleFonts.lato(
                     fontSize: isTablet ? 15 : 14)),
             style: ElevatedButton.styleFrom(
-              backgroundColor: colour.kPrimary,
+              backgroundColor: AppTokens.brandGradientStart,
               padding: EdgeInsets.symmetric(
                 horizontal: isTablet ? 28 : 20,
                 vertical:   isTablet ? 12 : 10,

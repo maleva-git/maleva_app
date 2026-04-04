@@ -273,7 +273,7 @@ class _TruckCard extends StatelessWidget {
     return Padding(
       padding: EdgeInsets.only(bottom: isTablet ? 0 : 10),
       child: Material(
-        color: isEven ? colour.kWhite : colour.kAccent,
+        color: isEven ? colour.kWhite : AppTokens.brandLight,
         borderRadius: BorderRadius.circular(isTablet ? 16 : 16),
         child: InkWell(
           borderRadius: BorderRadius.circular(isTablet ? 16 : 16),
@@ -288,7 +288,7 @@ class _TruckCard extends StatelessWidget {
               borderRadius: BorderRadius.circular(16),
               border: Border.all(
                 color: isEven
-                    ? colour.kAccent
+                    ? AppTokens.brandLight
                     : AppTokens.brandMid.withOpacity(0.3),
                 width: 1.2,
               ),
@@ -309,7 +309,7 @@ class _TruckCard extends StatelessWidget {
                 height: isTablet ? 36 : 42,
                 decoration: BoxDecoration(
                   color: isEven
-                      ? colour.kAccent
+                      ? AppTokens.brandLight
                       : AppTokens.brandGradientStart.withOpacity(0.12),
                   borderRadius: BorderRadius.circular(isTablet ? 10 : 12),
                 ),
@@ -356,7 +356,7 @@ class _TruckCard extends StatelessWidget {
                 padding: const EdgeInsets.all(6),
                 decoration: BoxDecoration(
                   color: isEven
-                      ? colour.kAccent
+                      ? AppTokens.brandLight
                       : AppTokens.brandGradientStart.withOpacity(0.12),
                   borderRadius: BorderRadius.circular(8),
                 ),
@@ -550,7 +550,7 @@ class _EmptyState extends StatelessWidget {
         Container(
           padding: EdgeInsets.all(isTablet ? 26 : 22),
           decoration: const BoxDecoration(
-              color: colour.kAccent, shape: BoxShape.circle),
+              color: AppTokens.brandLight, shape: BoxShape.circle),
           child: Icon(Icons.local_shipping_outlined,
               size:  isTablet ? 52 : 44,
               color: AppTokens.brandGradientStart),

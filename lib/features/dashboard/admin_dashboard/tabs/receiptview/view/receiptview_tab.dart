@@ -201,7 +201,7 @@ class _DateButton extends StatelessWidget {
         decoration: BoxDecoration(
           color: kAccent,
           borderRadius: BorderRadius.circular(isTablet ? 14 : 12),
-          border: Border.all(color: kPrimaryLight.withOpacity(0.4)),
+          border: Border.all(color: AppTokens.brandMid.withOpacity(0.4)),
         ),
         child: Row(
           children: [
@@ -626,7 +626,7 @@ class _ReceiptCard extends StatelessWidget {
                         '${data["BillNo"]} • ${data["BillDate"]}',
                         style: GoogleFonts.poppins(
                           fontSize: isTablet ? 12 : 11,
-                          color: kPrimaryLight.withOpacity(0.7),
+                          color: AppTokens.brandMid.withOpacity(0.7),
                         ),
                       ),
                     ],
@@ -646,7 +646,7 @@ class _ReceiptCard extends StatelessWidget {
                     border: Border.all(
                       color: isPaid
                           ? const Color(0xFF0F766E).withOpacity(0.3)
-                          : kPrimaryLight.withOpacity(0.4),
+                          : AppTokens.brandMid.withOpacity(0.4),
                     ),
                   ),
                   child: Text(

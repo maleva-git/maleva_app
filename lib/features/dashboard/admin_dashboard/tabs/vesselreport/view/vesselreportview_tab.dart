@@ -164,7 +164,7 @@ class _VesselReportViewState extends State<_VesselReportView> {
                   child: isLoading
                       ? const Center(
                     child: CircularProgressIndicator(
-                        color: colour.kPrimary),
+                        color: AppTokens.brandGradientStart),
                   )
                       : vesselList.isEmpty
                       ? _EmptyState()
@@ -237,7 +237,7 @@ class _VesselReportViewState extends State<_VesselReportView> {
             padding: EdgeInsets.only(top: 40),
             child: Center(
                 child: CircularProgressIndicator(
-                    color: colour.kPrimary)),
+                    color: AppTokens.brandGradientStart)),
           )
         else if (vesselList.isEmpty)
           _EmptyState()
@@ -270,7 +270,7 @@ class _SectionHeader extends StatelessWidget {
         width: 4,
         height: isTablet ? 30 : 26,
         decoration: BoxDecoration(
-          color: colour.kPrimary,
+          color: AppTokens.brandGradientStart,
           borderRadius: BorderRadius.circular(4),
         ),
       ),
@@ -311,10 +311,10 @@ class _SearchCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: colour.kWhite,
         borderRadius: BorderRadius.circular(isTablet ? 24 : 20),
-        border: Border.all(color: colour.kAccent, width: 1.5),
+        border: Border.all(color: AppTokens.brandLight, width: 1.5),
         boxShadow: [
           BoxShadow(
-            color: colour.kPrimary.withOpacity(0.08),
+            color: AppTokens.brandGradientStart.withOpacity(0.08),
             blurRadius: 14,
             offset: const Offset(0, 5),
           ),
@@ -353,14 +353,14 @@ class _SearchCard extends StatelessWidget {
                 child: Container(
                   padding: const EdgeInsets.all(6),
                   decoration: BoxDecoration(
-                    color: colour.kAccent,
+                    color: AppTokens.brandLight,
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Icon(
                     txtPort.text.isNotEmpty
                         ? Icons.close_rounded
                         : Icons.search_rounded,
-                    color: colour.kPrimary,
+                    color: AppTokens.brandGradientStart,
                     size: isTablet ? 20 : 18,
                   ),
                 ),
@@ -459,19 +459,19 @@ class _StyledTextField extends StatelessWidget {
         suffixIconConstraints:
         const BoxConstraints(minWidth: 36, minHeight: 36),
         filled:         true,
-        fillColor:      colour.kAccent,
+        fillColor:      AppTokens.brandLight,
         contentPadding: EdgeInsets.symmetric(
           horizontal: isTablet ? 16 : 14,
           vertical:   isTablet ? 14 : 12,
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(isTablet ? 14 : 12),
-          borderSide: BorderSide(color: colour.kAccent),
+          borderSide: BorderSide(color: AppTokens.brandLight),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(isTablet ? 14 : 12),
           borderSide:
-          const BorderSide(color: colour.kPrimary, width: 1.5),
+          const BorderSide(color: AppTokens.brandGradientStart, width: 1.5),
         ),
       ),
     );
@@ -496,10 +496,10 @@ class _ActionIconButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final color = isDestructive ? Colors.redAccent : colour.kPrimary;
+    final color = isDestructive ? Colors.redAccent : AppTokens.brandGradientStart;
     final bg    = isDestructive
         ? Colors.red.withOpacity(0.08)
-        : colour.kAccent;
+        : AppTokens.brandLight;
     final size  = isTablet ? 44.0 : 38.0;
 
     return Tooltip(
@@ -540,7 +540,7 @@ class _DayToggle extends StatelessWidget {
     return Container(
       height: isTablet ? 52 : 44,
       decoration: BoxDecoration(
-        color:         colour.kAccent,
+        color:         AppTokens.brandLight,
         borderRadius: BorderRadius.circular(isTablet ? 16 : 14),
       ),
       child: Row(children: [
@@ -581,12 +581,12 @@ class _ToggleTab extends StatelessWidget {
           duration: const Duration(milliseconds: 200),
           margin: const EdgeInsets.all(4),
           decoration: BoxDecoration(
-            color: isActive ? colour.kPrimary : Colors.transparent,
+            color: isActive ? AppTokens.brandGradientStart : Colors.transparent,
             borderRadius: BorderRadius.circular(10),
             boxShadow: isActive
                 ? [
               BoxShadow(
-                color:  colour.kPrimary.withOpacity(0.3),
+                color:  AppTokens.brandGradientStart.withOpacity(0.3),
                 blurRadius: 8,
                 offset: const Offset(0, 3),
               )
@@ -622,7 +622,7 @@ class _ListHeader extends StatelessWidget {
       ),
       decoration: BoxDecoration(
         gradient: const LinearGradient(
-          colors: [colour.kPrimary, AppTokens.brandDark],
+          colors: [AppTokens.brandGradientStart, AppTokens.brandDark],
           begin: Alignment.centerLeft,
           end:   Alignment.centerRight,
         ),
@@ -681,12 +681,12 @@ class _VesselCard extends StatelessWidget {
     return Padding(
       padding: EdgeInsets.only(bottom: isTablet ? 10 : 8),
       child: Material(
-        color: isEven ? colour.kWhite : colour.kAccent,
+        color: isEven ? colour.kWhite : AppTokens.brandLight,
         borderRadius: BorderRadius.circular(isTablet ? 16 : 14),
         child: InkWell(
           onTap: () {},
           borderRadius: BorderRadius.circular(isTablet ? 16 : 14),
-          splashColor: colour.kPrimary.withOpacity(0.08),
+          splashColor: AppTokens.brandGradientStart.withOpacity(0.08),
           child: Container(
             padding: EdgeInsets.symmetric(
               horizontal: isTablet ? 18 : 14,
@@ -697,14 +697,14 @@ class _VesselCard extends StatelessWidget {
               BorderRadius.circular(isTablet ? 16 : 14),
               border: Border.all(
                 color: isEven
-                    ? colour.kAccent
+                    ? AppTokens.brandLight
                     : AppTokens.brandMid.withOpacity(0.3),
                 width: 1.2,
               ),
               boxShadow: isEven
                   ? [
                 BoxShadow(
-                  color:  colour.kPrimary.withOpacity(0.05),
+                  color:  AppTokens.brandGradientStart.withOpacity(0.05),
                   blurRadius: 6,
                   offset: const Offset(0, 2),
                 )
@@ -718,8 +718,8 @@ class _VesselCard extends StatelessWidget {
                 height: isTablet ? 32 : 28,
                 decoration: BoxDecoration(
                   color: isEven
-                      ? colour.kAccent
-                      : colour.kPrimary.withOpacity(0.12),
+                      ? AppTokens.brandLight
+                      : AppTokens.brandGradientStart.withOpacity(0.12),
                   borderRadius: BorderRadius.circular(isTablet ? 10 : 8),
                 ),
                 alignment: Alignment.center,
@@ -728,7 +728,7 @@ class _VesselCard extends StatelessWidget {
                   style: GoogleFonts.poppins(
                       fontSize:   isTablet ? 12 : 11,
                       fontWeight: FontWeight.w700,
-                      color:      colour.kPrimary),
+                      color:      AppTokens.brandGradientStart),
                 ),
               ),
               const SizedBox(width: 10),
@@ -754,7 +754,7 @@ class _VesselCard extends StatelessWidget {
                   vertical:   isTablet ? 6  : 4,
                 ),
                 decoration: BoxDecoration(
-                  color: colour.kPrimary.withOpacity(0.08),
+                  color: AppTokens.brandGradientStart.withOpacity(0.08),
                   borderRadius: BorderRadius.circular(20),
                   border: Border.all(
                       color: AppTokens.brandMid.withOpacity(0.3),
@@ -767,7 +767,7 @@ class _VesselCard extends StatelessWidget {
                   style: GoogleFonts.poppins(
                       fontSize:   isTablet ? 12 : 11,
                       fontWeight: FontWeight.w600,
-                      color:      colour.kPrimary),
+                      color:      AppTokens.brandGradientStart),
                 ),
               ),
             ]),
@@ -789,12 +789,12 @@ class _EmptyState extends StatelessWidget {
         Container(
           padding: EdgeInsets.all(isTablet ? 24 : 20),
           decoration: BoxDecoration(
-            color: colour.kAccent,
+            color: AppTokens.brandLight,
             shape: BoxShape.circle,
           ),
           child: Icon(Icons.directions_boat_outlined,
               size: isTablet ? 48 : 40,
-              color: colour.kPrimary),
+              color: AppTokens.brandGradientStart),
         ),
         SizedBox(height: isTablet ? 20 : 16),
         Text('No vessels found',

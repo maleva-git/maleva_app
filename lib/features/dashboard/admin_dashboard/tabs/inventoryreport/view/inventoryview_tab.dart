@@ -72,7 +72,7 @@ class _InventoryBody extends StatelessWidget {
                 color: colour.kWhite,
                 borderRadius: BorderRadius.circular(16),
                 border:
-                Border.all(color: colour.kAccent, width: 1.5),
+                Border.all(color: AppTokens.brandLight, width: 1.5),
                 boxShadow: [
                   BoxShadow(
                       color: AppTokens.brandGradientStart.withOpacity(0.05),
@@ -87,7 +87,7 @@ class _InventoryBody extends StatelessWidget {
                       Container(
                         width: 24, height: 24,
                         decoration: const BoxDecoration(
-                            color: colour.kAccent,
+                            color: AppTokens.brandLight,
                             shape: BoxShape.circle),
                         child: const Icon(Icons.anchor_rounded,
                             color: AppTokens.brandGradientStart, size: 13),
@@ -97,7 +97,7 @@ class _InventoryBody extends StatelessWidget {
                           style: GoogleFonts.lato(
                               fontSize: 12,
                               fontWeight: FontWeight.bold,
-                              color: colour.kPrimaryDark)),
+                              color: AppTokens.brandDark)),
                     ]),
                     const SizedBox(height: 10),
                     SizedBox(
@@ -124,7 +124,7 @@ class _InventoryBody extends StatelessWidget {
                               decoration: BoxDecoration(
                                 color: isActive
                                     ? AppTokens.brandGradientStart
-                                    : colour.kAccent,
+                                    : AppTokens.brandLight,
                                 borderRadius:
                                 BorderRadius.circular(14),
                                 border: Border.all(
@@ -161,7 +161,7 @@ class _InventoryBody extends StatelessWidget {
                                               : FontWeight.w500,
                                           color: isActive
                                               ? colour.kWhite
-                                              : colour.kPrimaryDark),
+                                              : AppTokens.brandDark),
                                       textAlign: TextAlign.center,
                                       maxLines: 1,
                                       overflow:
@@ -188,7 +188,7 @@ class _InventoryBody extends StatelessWidget {
                 color: colour.kWhite,
                 borderRadius: BorderRadius.circular(16),
                 border:
-                Border.all(color: colour.kAccent, width: 1.5),
+                Border.all(color: AppTokens.brandLight, width: 1.5),
                 boxShadow: [
                   BoxShadow(
                       color: AppTokens.brandGradientStart.withOpacity(0.05),
@@ -203,7 +203,7 @@ class _InventoryBody extends StatelessWidget {
                       Container(
                         width: 24, height: 24,
                         decoration: const BoxDecoration(
-                            color: colour.kAccent,
+                            color: AppTokens.brandLight,
                             shape: BoxShape.circle),
                         child: const Icon(Icons.person_rounded,
                             color: AppTokens.brandGradientStart, size: 13),
@@ -213,7 +213,7 @@ class _InventoryBody extends StatelessWidget {
                           style: GoogleFonts.lato(
                               fontSize: 12,
                               fontWeight: FontWeight.bold,
-                              color: colour.kPrimaryDark)),
+                              color: AppTokens.brandDark)),
                     ]),
                     const SizedBox(height: 10),
                     Row(children: [
@@ -236,7 +236,7 @@ class _InventoryBody extends StatelessWidget {
                                 horizontal: 12, vertical: 11),
                             decoration: BoxDecoration(
                               color: custName.isNotEmpty
-                                  ? colour.kAccent
+                                  ? AppTokens.brandLight
                                   : Colors.grey.shade50,
                               borderRadius:
                               BorderRadius.circular(12),
@@ -276,7 +276,7 @@ class _InventoryBody extends StatelessWidget {
                                             fontSize: 12,
                                             color: custName
                                                 .isNotEmpty
-                                                ? colour.kPrimaryDark
+                                                ? AppTokens.brandDark
                                                 : Colors
                                                 .grey.shade400,
                                             fontWeight: custName
@@ -311,7 +311,7 @@ class _InventoryBody extends StatelessWidget {
                           decoration: BoxDecoration(
                             color: (s?.isChecked ?? false)
                                 ? AppTokens.brandGradientStart
-                                : colour.kAccent,
+                                : AppTokens.brandLight,
                             borderRadius:
                             BorderRadius.circular(12),
                             border: Border.all(
@@ -362,7 +362,7 @@ class _InventoryBody extends StatelessWidget {
                 padding: const EdgeInsets.symmetric(
                     horizontal: 12, vertical: 9),
                 decoration: BoxDecoration(
-                  color: colour.kAccent,
+                  color: AppTokens.brandLight,
                   borderRadius: BorderRadius.circular(14),
                   border: Border.all(
                       color:
@@ -454,7 +454,7 @@ class _InventoryBody extends StatelessWidget {
                     padding: const EdgeInsets.symmetric(
                         horizontal: 10, vertical: 4),
                     decoration: BoxDecoration(
-                        color: colour.kAccent,
+                        color: AppTokens.brandLight,
                         borderRadius: BorderRadius.circular(8)),
                     child: Text(
                         "${s!.records.length} records",
@@ -467,7 +467,7 @@ class _InventoryBody extends StatelessWidget {
               ),
 
             Divider(
-                color: colour.kAccent,
+                color: AppTokens.brandLight,
                 thickness: 1.5,
                 height: 10),
 
@@ -649,7 +649,7 @@ class _InventoryGridCard extends StatelessWidget {
           color: colour.kWhite,
           borderRadius: BorderRadius.circular(16),
           border: Border.all(
-            color: isSelected ? AppTokens.brandGradientStart : colour.kAccent,
+            color: isSelected ? AppTokens.brandGradientStart : AppTokens.brandLight,
             width: isSelected ? 2.0 : 1.5,
           ),
           boxShadow: [
@@ -669,7 +669,7 @@ class _InventoryGridCard extends StatelessWidget {
                 horizontal: 10, vertical: 10),
             decoration: BoxDecoration(
               color: isSelected
-                  ? colour.kPrimaryDark
+                  ? AppTokens.brandDark
                   : AppTokens.brandGradientStart,
               borderRadius: const BorderRadius.vertical(
                   top: Radius.circular(16)),
@@ -730,7 +730,7 @@ class _InventoryGridCard extends StatelessWidget {
                         Icons.access_time_rounded, item.eta),
                     const Spacer(),
                     Divider(
-                        color: colour.kAccent,
+                        color: AppTokens.brandLight,
                         height: 10,
                         thickness: 1),
                     Row(
@@ -757,7 +757,7 @@ class _InventoryGridCard extends StatelessWidget {
       padding: const EdgeInsets.symmetric(
           horizontal: 7, vertical: 3),
       decoration: BoxDecoration(
-        color: colour.kAccent,
+        color: AppTokens.brandLight,
         borderRadius: BorderRadius.circular(6),
       ),
       child: Row(mainAxisSize: MainAxisSize.min, children: [
@@ -766,7 +766,7 @@ class _InventoryGridCard extends StatelessWidget {
         Text(val ?? '-',
             style: GoogleFonts.lato(
                 fontSize: 11,
-                color: colour.kPrimaryDark,
+                color: AppTokens.brandDark,
                 fontWeight: FontWeight.w600)),
       ]),
     );
@@ -781,7 +781,7 @@ class _InventoryGridCard extends StatelessWidget {
           Expanded(
             child: Text(val ?? '-',
                 style: GoogleFonts.lato(
-                    fontSize: 11, color: colour.kPrimaryDark),
+                    fontSize: 11, color: AppTokens.brandDark),
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis),
           ),
@@ -802,7 +802,7 @@ class _EmptyDetailPanel extends StatelessWidget {
       decoration: BoxDecoration(
         color: colour.kWhite,
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: colour.kAccent, width: 1.5),
+        border: Border.all(color: AppTokens.brandLight, width: 1.5),
         boxShadow: [
           BoxShadow(
               color: AppTokens.brandGradientStart.withOpacity(0.05),
@@ -816,7 +816,7 @@ class _EmptyDetailPanel extends StatelessWidget {
           Container(
             width: 64, height: 64,
             decoration: const BoxDecoration(
-                color: colour.kAccent, shape: BoxShape.circle),
+                color: AppTokens.brandLight, shape: BoxShape.circle),
             child: const Icon(Icons.touch_app_rounded,
                 color: AppTokens.brandGradientStart, size: 32),
           ),
@@ -825,7 +825,7 @@ class _EmptyDetailPanel extends StatelessWidget {
               style: GoogleFonts.lato(
                   fontSize: 16,
                   fontWeight: FontWeight.bold,
-                  color: colour.kPrimaryDark)),
+                  color: AppTokens.brandDark)),
           const SizedBox(height: 6),
           Text("Tap any card to view details",
               style: GoogleFonts.lato(
@@ -848,7 +848,7 @@ class _InventoryDetailPanel extends StatelessWidget {
       decoration: BoxDecoration(
         color: colour.kWhite,
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: colour.kAccent, width: 1.5),
+        border: Border.all(color: AppTokens.brandLight, width: 1.5),
         boxShadow: [
           BoxShadow(
               color: AppTokens.brandGradientStart.withOpacity(0.07),
@@ -959,7 +959,7 @@ class _InventoryDetailPanel extends StatelessWidget {
         padding: const EdgeInsets.symmetric(
             horizontal: 10, vertical: 8),
         decoration: BoxDecoration(
-          color: colour.kAccent,
+          color: AppTokens.brandLight,
           borderRadius: BorderRadius.circular(10),
         ),
         child: Column(
@@ -979,7 +979,7 @@ class _InventoryDetailPanel extends StatelessWidget {
                 style: GoogleFonts.lato(
                     fontSize: 14,
                     fontWeight: FontWeight.bold,
-                    color: colour.kPrimaryDark)),
+                    color: AppTokens.brandDark)),
           ],
         ),
       ),
@@ -994,7 +994,7 @@ class _InventoryDetailPanel extends StatelessWidget {
         Container(
           width: 30, height: 30,
           decoration: BoxDecoration(
-              color: colour.kAccent,
+              color: AppTokens.brandLight,
               borderRadius: BorderRadius.circular(8)),
           child: Icon(icon, color: AppTokens.brandGradientStart, size: 14),
         ),
@@ -1012,7 +1012,7 @@ class _InventoryDetailPanel extends StatelessWidget {
                   style: GoogleFonts.lato(
                       fontSize: 13,
                       fontWeight: FontWeight.w700,
-                      color: colour.kPrimaryDark)),
+                      color: AppTokens.brandDark)),
             ],
           ),
         ),
@@ -1021,7 +1021,7 @@ class _InventoryDetailPanel extends StatelessWidget {
   }
 
   Widget _divider() =>
-      Divider(color: colour.kAccent, thickness: 1, height: 14);
+      Divider(color: AppTokens.brandLight, thickness: 1, height: 14);
 }
 
 // ── Customer Select Page (unchanged) ─────────────────────────────────────────
@@ -1086,7 +1086,7 @@ class _InventoryCustomerSelectPageState
             controller: _searchCtrl,
             onChanged: _search,
             style: GoogleFonts.lato(
-                color: colour.kPrimaryDark,
+                color: AppTokens.brandDark,
                 fontWeight: FontWeight.w600),
             decoration: InputDecoration(
               hintText: 'Search Customer...',
@@ -1154,7 +1154,7 @@ class _InventoryCustomerSelectPageState
                     borderRadius:
                     BorderRadius.circular(14),
                     border: Border.all(
-                        color: colour.kAccent,
+                        color: AppTokens.brandLight,
                         width: 1.5),
                     boxShadow: [
                       BoxShadow(
@@ -1168,7 +1168,7 @@ class _InventoryCustomerSelectPageState
                     Container(
                       width: 38, height: 38,
                       decoration: const BoxDecoration(
-                          color: colour.kAccent,
+                          color: AppTokens.brandLight,
                           shape: BoxShape.circle),
                       child: const Icon(
                           Icons.person_rounded,

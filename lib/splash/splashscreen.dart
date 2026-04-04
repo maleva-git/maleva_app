@@ -14,6 +14,7 @@ import '../DashBoard/Maintenance/MaintenanceDashboard.dart';
 import '../DashBoard/Payable/PayableDashbord.dart';
 import '../DashBoard/Receivable/ReceivableDashboard.dart';
 import '../DashBoard/TransportDB/TransportDashboard.dart';
+import '../core/theme/tokens.dart';
 import '../features/auth/bloc/auth_bloc.dart';
 import '../features/auth/pages/login_page.dart.dart';
 import '../DashBoard/User/UserDashboard.dart';
@@ -236,7 +237,7 @@ class _SplashScreenState extends State<SplashScreen>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: colour.kPrimary,
+      backgroundColor: AppTokens.brandGradientStart,
       body: Stack(
         fit: StackFit.expand,
         children: [

@@ -4,16 +4,13 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:maleva/core/models/model.dart';
 import 'package:maleva/core/utils/clsfunction.dart' as objfun;
+import '../../../../../../core/theme/palette.dart';
+import '../../../../../../core/theme/tokens.dart';
 import '../bloc/employeemaster_bloc.dart';
 import '../bloc/employeemaster_event.dart';
 import '../bloc/employeemaster_state.dart';
 import 'employeeadd_tab.dart';
 
-const Color kPrimary      = Color(0xFF1555F3);
-const Color kPrimaryDark  = Color(0xFF0D3DB5);
-const Color kPrimaryLight = Color(0xFF4D7EF7);
-const Color kAccent       = Color(0xFFE8EEFF);
-const Color kWhite        = Colors.white;
 
 
 class EmployeeViewPage extends StatelessWidget {
@@ -52,7 +49,7 @@ class _EmployeeListBody extends StatelessWidget {
       builder: (context, state) {
         if (state is EmployeeListLoading) {
           return const Center(
-              child: CircularProgressIndicator(color: kPrimary));
+              child: CircularProgressIndicator(color: AppTokens.brandGradientStart));
         }
 
         if (state is EmployeeError) {
@@ -74,7 +71,7 @@ class _EmployeeListBody extends StatelessWidget {
                   icon: const Icon(Icons.refresh),
                   label: const Text("Retry"),
                   style: ElevatedButton.styleFrom(
-                      backgroundColor: kPrimary),
+                      backgroundColor: AppTokens.brandGradientStart),
                 ),
               ],
             ),
@@ -172,14 +169,14 @@ class _EmployeeListBody extends StatelessWidget {
       {required bool isTablet}) {
     return Container(
       decoration: BoxDecoration(
-        color: kWhite,
+        color: Palette.kWhite,
         borderRadius:
         BorderRadius.circular(isTablet ? 14 : 12),
         border:
-        Border.all(color: kPrimaryLight.withOpacity(0.3)),
+        Border.all(color: AppTokens.brandMid.withOpacity(0.3)),
         boxShadow: [
           BoxShadow(
-              color: kPrimary.withOpacity(0.06),
+              color: AppTokens.brandGradientStart.withOpacity(0.06),
               blurRadius: 8,
               offset: const Offset(0, 2))
         ],
@@ -190,7 +187,7 @@ class _EmployeeListBody extends StatelessWidget {
             .add(SearchEmployeeMasterEvent(q)),
         decoration: InputDecoration(
           prefixIcon:
-          const Icon(Icons.search, color: kPrimary),
+          const Icon(Icons.search, color: AppTokens.brandGradientStart),
           hintText: 'Search Employee...',
           hintStyle: GoogleFonts.lato(color: Colors.grey),
           border: InputBorder.none,
@@ -212,7 +209,7 @@ class _EmployeeListBody extends StatelessWidget {
             style: GoogleFonts.lato(
                 fontSize: isTablet ? 20 : 18,
                 fontWeight: FontWeight.bold,
-                color: kPrimaryDark)),
+                color: AppTokens.brandDark)),
         GestureDetector(
           onTap: () async {
             await Navigator.push(
@@ -227,10 +224,10 @@ class _EmployeeListBody extends StatelessWidget {
             width: 36,
             height: 36,
             decoration: BoxDecoration(
-                color: kAccent,
+                color: AppTokens.brandLight,
                 borderRadius: BorderRadius.circular(10)),
             child: const Icon(Icons.add_rounded,
-                color: kPrimary, size: 22),
+                color: AppTokens.brandGradientStart, size: 22),
           ),
         ),
       ],
@@ -306,7 +303,7 @@ class _EmployeeListBody extends StatelessWidget {
                 backgroundColor: Colors.red),
             onPressed: () => Navigator.pop(context, true),
             child: const Text("Delete",
-                style: TextStyle(color: kWhite)),
+                style: TextStyle(color: Palette.kWhite)),
           ),
         ],
       ),
@@ -365,16 +362,16 @@ class _EmployeeCard extends StatelessWidget {
         duration: const Duration(milliseconds: 200),
         margin: EdgeInsets.only(bottom: isTablet ? 10 : 14),
         decoration: BoxDecoration(
-          color: kWhite,
+          color: Palette.kWhite,
           borderRadius:
           BorderRadius.circular(isTablet ? 14 : 18),
           border: Border.all(
-            color: isSelected ? kPrimary : kAccent,
+            color: isSelected ? AppTokens.brandGradientStart : AppTokens.brandLight,
             width: isSelected ? 2.0 : 1.5,
           ),
           boxShadow: [
             BoxShadow(
-              color: kPrimary.withOpacity(
+              color: AppTokens.brandGradientStart.withOpacity(
                   isSelected ? 0.15 : 0.07),
               blurRadius: isSelected ? 14 : 10,
               offset: const Offset(0, 3),
@@ -398,9 +395,9 @@ class _EmployeeCard extends StatelessWidget {
         Container(
           width: 38, height: 38,
           decoration: const BoxDecoration(
-              color: kAccent, shape: BoxShape.circle),
+              color: AppTokens.brandLight, shape: BoxShape.circle),
           child: const Icon(Icons.person_rounded,
-              color: kPrimary, size: 20),
+              color: AppTokens.brandGradientStart, size: 20),
         ),
         const SizedBox(width: 10),
         Expanded(
@@ -411,7 +408,7 @@ class _EmployeeCard extends StatelessWidget {
                   style: GoogleFonts.lato(
                       fontSize: 14,
                       fontWeight: FontWeight.bold,
-                      color: kPrimaryDark),
+                      color: AppTokens.brandDark),
                   overflow: TextOverflow.ellipsis),
               Text(record.MobileNo ?? 'No phone',
                   style: GoogleFonts.lato(
@@ -457,9 +454,9 @@ class _EmployeeCard extends StatelessWidget {
             Container(
               width: 46, height: 46,
               decoration: const BoxDecoration(
-                  color: kAccent, shape: BoxShape.circle),
+                  color: AppTokens.brandLight, shape: BoxShape.circle),
               child: const Icon(Icons.person_rounded,
-                  color: kPrimary, size: 24),
+                  color: AppTokens.brandGradientStart, size: 24),
             ),
             const SizedBox(width: 12),
             Expanded(
@@ -470,7 +467,7 @@ class _EmployeeCard extends StatelessWidget {
                       style: GoogleFonts.lato(
                           fontSize: 16,
                           fontWeight: FontWeight.bold,
-                          color: kPrimaryDark)),
+                          color: AppTokens.brandDark)),
                   Text(record.MobileNo ?? 'No phone',
                       style: GoogleFonts.lato(
                           fontSize: 13,
@@ -504,7 +501,7 @@ class _EmployeeCard extends StatelessWidget {
           ],
         ),
         const SizedBox(height: 10),
-        Divider(color: kAccent, thickness: 1),
+        Divider(color: AppTokens.brandLight, thickness: 1),
         Wrap(spacing: 8, runSpacing: 8, children: [
           _chip(Icons.calendar_today_rounded, "Joining",
               _fmt(record.JoiningDate)),
@@ -518,8 +515,8 @@ class _EmployeeCard extends StatelessWidget {
             _actionBtn(
               icon: Icons.edit_rounded,
               label: "Edit",
-              color: kPrimary,
-              bg: kAccent,
+              color: AppTokens.brandGradientStart,
+              bg: AppTokens.brandLight,
               onTap: onEdit,
             ),
             const SizedBox(width: 8),
@@ -541,15 +538,15 @@ class _EmployeeCard extends StatelessWidget {
       padding: const EdgeInsets.symmetric(
           horizontal: 10, vertical: 6),
       decoration: BoxDecoration(
-          color: kAccent,
+          color: AppTokens.brandLight,
           borderRadius: BorderRadius.circular(20)),
       child: Row(mainAxisSize: MainAxisSize.min, children: [
-        Icon(icon, size: 13, color: kPrimary),
+        Icon(icon, size: 13, color: AppTokens.brandGradientStart),
         const SizedBox(width: 4),
         Text("$label: $value",
             style: GoogleFonts.lato(
                 fontSize: 12,
-                color: kPrimaryDark,
+                color: AppTokens.brandDark,
                 fontWeight: FontWeight.w600)),
       ]),
     );
@@ -591,12 +588,12 @@ class _EmptyDetailPanel extends StatelessWidget {
     return Container(
       width: double.infinity,
       decoration: BoxDecoration(
-        color: kWhite,
+        color: Palette.kWhite,
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: kAccent, width: 1.5),
+        border: Border.all(color: AppTokens.brandLight, width: 1.5),
         boxShadow: [
           BoxShadow(
-              color: kPrimary.withOpacity(0.05),
+              color: AppTokens.brandGradientStart.withOpacity(0.05),
               blurRadius: 12,
               offset: const Offset(0, 4))
         ],
@@ -607,16 +604,16 @@ class _EmptyDetailPanel extends StatelessWidget {
           Container(
             width: 64, height: 64,
             decoration: const BoxDecoration(
-                color: kAccent, shape: BoxShape.circle),
+                color: AppTokens.brandLight, shape: BoxShape.circle),
             child: const Icon(Icons.touch_app_rounded,
-                color: kPrimary, size: 32),
+                color: AppTokens.brandGradientStart, size: 32),
           ),
           const SizedBox(height: 16),
           Text("Select an employee",
               style: GoogleFonts.lato(
                   fontSize: 16,
                   fontWeight: FontWeight.bold,
-                  color: kPrimaryDark)),
+                  color: AppTokens.brandDark)),
           const SizedBox(height: 6),
           Text("Tap any card to view details",
               style: GoogleFonts.lato(
@@ -657,12 +654,12 @@ class _EmployeeDetailPanel extends StatelessWidget {
     return Container(
       width: double.infinity,
       decoration: BoxDecoration(
-        color: kWhite,
+        color: Palette.kWhite,
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: kAccent, width: 1.5),
+        border: Border.all(color: AppTokens.brandLight, width: 1.5),
         boxShadow: [
           BoxShadow(
-              color: kPrimary.withOpacity(0.07),
+              color: AppTokens.brandGradientStart.withOpacity(0.07),
               blurRadius: 16,
               offset: const Offset(0, 5))
         ],
@@ -675,7 +672,7 @@ class _EmployeeDetailPanel extends StatelessWidget {
             padding: const EdgeInsets.symmetric(
                 vertical: 16, horizontal: 20),
             decoration: const BoxDecoration(
-              color: kPrimary,
+              color: AppTokens.brandGradientStart,
               borderRadius: BorderRadius.only(
                 topLeft: Radius.circular(20),
                 topRight: Radius.circular(20),
@@ -683,7 +680,7 @@ class _EmployeeDetailPanel extends StatelessWidget {
             ),
             child: Row(children: [
               const Icon(Icons.person_rounded,
-                  color: kWhite, size: 22),
+                  color: Palette.kWhite, size: 22),
               const SizedBox(width: 10),
               Expanded(
                 child: Text(
@@ -691,7 +688,7 @@ class _EmployeeDetailPanel extends StatelessWidget {
                   style: GoogleFonts.lato(
                       fontSize: 17,
                       fontWeight: FontWeight.bold,
-                      color: kWhite),
+                      color: Palette.kWhite),
                   overflow: TextOverflow.ellipsis,
                 ),
               ),
@@ -700,12 +697,12 @@ class _EmployeeDetailPanel extends StatelessWidget {
                 padding: const EdgeInsets.symmetric(
                     horizontal: 8, vertical: 4),
                 decoration: BoxDecoration(
-                    color: kWhite.withOpacity(0.2),
+                    color: Palette.kWhite.withOpacity(0.2),
                     borderRadius: BorderRadius.circular(12)),
                 child: Text(
                   isActive ? 'Active' : 'Inactive',
                   style: GoogleFonts.lato(
-                      color: kWhite,
+                      color: Palette.kWhite,
                       fontWeight: FontWeight.w600,
                       fontSize: 12),
                 ),
@@ -722,13 +719,13 @@ class _EmployeeDetailPanel extends StatelessWidget {
                 child: ElevatedButton.icon(
                   onPressed: onEdit,
                   icon: const Icon(Icons.edit_rounded,
-                      color: kPrimary, size: 16),
+                      color: AppTokens.brandGradientStart, size: 16),
                   label: Text("Edit",
                       style: GoogleFonts.lato(
-                          color: kPrimary,
+                          color: AppTokens.brandGradientStart,
                           fontWeight: FontWeight.bold)),
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: kAccent,
+                    backgroundColor: AppTokens.brandLight,
                     elevation: 0,
                     shape: RoundedRectangleBorder(
                         borderRadius:
@@ -741,10 +738,10 @@ class _EmployeeDetailPanel extends StatelessWidget {
                 child: ElevatedButton.icon(
                   onPressed: onDelete,
                   icon: const Icon(Icons.delete_rounded,
-                      color: kWhite, size: 16),
+                      color: Palette.kWhite, size: 16),
                   label: Text("Delete",
                       style: GoogleFonts.lato(
-                          color: kWhite,
+                          color: Palette.kWhite,
                           fontWeight: FontWeight.bold)),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.red,
@@ -799,10 +796,10 @@ class _EmployeeDetailPanel extends StatelessWidget {
             Container(
               width: 32, height: 32,
               decoration: BoxDecoration(
-                  color: kAccent,
+                  color: AppTokens.brandLight,
                   borderRadius: BorderRadius.circular(8)),
               child: const Icon(Icons.info_outline_rounded,
-                  color: kPrimary, size: 15),
+                  color: AppTokens.brandGradientStart, size: 15),
             ),
             const SizedBox(width: 10),
             Expanded(
@@ -819,7 +816,7 @@ class _EmployeeDetailPanel extends StatelessWidget {
                       style: GoogleFonts.lato(
                           fontSize: 14,
                           fontWeight: FontWeight.w700,
-                          color: kPrimaryDark),
+                          color: AppTokens.brandDark),
                     ),
                   ]),
             ),
@@ -853,7 +850,7 @@ class _EmployeeDetailsDialog extends StatelessWidget {
             MediaQuery.of(context).size.height * 0.85),
         child: Container(
           decoration: BoxDecoration(
-              color: kWhite,
+              color: Palette.kWhite,
               borderRadius: BorderRadius.circular(20)),
           child: Column(
             mainAxisSize: MainAxisSize.min,
@@ -864,13 +861,13 @@ class _EmployeeDetailsDialog extends StatelessWidget {
                 padding: const EdgeInsets.symmetric(
                     vertical: 20, horizontal: 24),
                 decoration: const BoxDecoration(
-                    color: kPrimary,
+                    color: AppTokens.brandGradientStart,
                     borderRadius: BorderRadius.only(
                         topLeft: Radius.circular(20),
                         topRight: Radius.circular(20))),
                 child: Row(children: [
                   const Icon(Icons.person_rounded,
-                      color: kWhite, size: 24),
+                      color: Palette.kWhite, size: 24),
                   const SizedBox(width: 12),
                   Expanded(
                     child: Text(
@@ -879,7 +876,7 @@ class _EmployeeDetailsDialog extends StatelessWidget {
                       style: GoogleFonts.lato(
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
-                          color: kWhite),
+                          color: Palette.kWhite),
                       overflow: TextOverflow.ellipsis,
                     ),
                   ),
@@ -919,7 +916,7 @@ class _EmployeeDetailsDialog extends StatelessWidget {
                       width: double.infinity,
                       child: ElevatedButton(
                         style: ElevatedButton.styleFrom(
-                            backgroundColor: kPrimary,
+                            backgroundColor: AppTokens.brandGradientStart,
                             padding:
                             const EdgeInsets.symmetric(
                                 vertical: 14),
@@ -932,7 +929,7 @@ class _EmployeeDetailsDialog extends StatelessWidget {
                             Navigator.pop(context),
                         child: Text("Close",
                             style: GoogleFonts.lato(
-                                color: kWhite,
+                                color: Palette.kWhite,
                                 fontSize: 16,
                                 fontWeight:
                                 FontWeight.bold)),
@@ -957,10 +954,10 @@ class _EmployeeDetailsDialog extends StatelessWidget {
             Container(
               width: 32, height: 32,
               decoration: BoxDecoration(
-                  color: kAccent,
+                  color: AppTokens.brandLight,
                   borderRadius: BorderRadius.circular(8)),
               child: const Icon(Icons.info_outline_rounded,
-                  color: kPrimary, size: 15),
+                  color: AppTokens.brandGradientStart, size: 15),
             ),
             const SizedBox(width: 10),
             Expanded(
@@ -980,7 +977,7 @@ class _EmployeeDetailsDialog extends StatelessWidget {
                       style: GoogleFonts.lato(
                           fontSize: 14,
                           fontWeight: FontWeight.w700,
-                          color: kPrimaryDark),
+                          color: AppTokens.brandDark),
                     ),
                   ]),
             ),

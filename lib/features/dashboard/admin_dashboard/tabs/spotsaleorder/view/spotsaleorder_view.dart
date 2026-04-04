@@ -40,7 +40,7 @@ class _SpotSaleViewBody extends StatelessWidget {
     return Scaffold(
       backgroundColor: Colors.grey.shade50,
       appBar: AppBar(
-        backgroundColor: colour.kPrimary,
+        backgroundColor: AppTokens.brandGradientStart,
         foregroundColor: colour.kWhite,
         elevation: 0,
         title: Text("Spot Sale Entries",
@@ -71,7 +71,7 @@ class _SpotSaleViewBody extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: colour.kAccent,
+                  color: AppTokens.brandLight,
                   borderRadius: BorderRadius.circular(12),
                   border: Border.all(
                       color: AppTokens.brandMid.withOpacity(0.3)),
@@ -119,7 +119,7 @@ class _SpotSaleViewBody extends StatelessWidget {
                           .add(const LoadSpotSaleViewEvent()),
                       style: ElevatedButton.styleFrom(
                         padding: const EdgeInsets.symmetric(vertical: 14),
-                        backgroundColor: colour.kPrimary,
+                        backgroundColor: AppTokens.brandGradientStart,
                         shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(10)),
                         elevation: 0,
@@ -145,12 +145,12 @@ class _SpotSaleViewBody extends StatelessWidget {
                       padding: const EdgeInsets.symmetric(
                           horizontal: 12, vertical: 6),
                       decoration: BoxDecoration(
-                        color: colour.kAccent,
+                        color: AppTokens.brandLight,
                         borderRadius: BorderRadius.circular(8),
                       ),
                       child: Text("${records.length} records",
                           style: GoogleFonts.lato(
-                              color: colour.kPrimary,
+                              color: AppTokens.brandGradientStart,
                               fontWeight: FontWeight.bold,
                               fontSize: 13)),
                     ),
@@ -170,7 +170,7 @@ class _SpotSaleViewBody extends StatelessWidget {
       BuildContext context, bool isLoading, List<dynamic> records) {
     if (isLoading) {
       return const Center(
-          child: CircularProgressIndicator(color: colour.kPrimary));
+          child: CircularProgressIndicator(color: AppTokens.brandGradientStart));
     }
     if (records.isEmpty) {
       return Center(
@@ -201,7 +201,7 @@ class _SpotSaleViewBody extends StatelessWidget {
       builder: (ctx, child) => Theme(
         data: Theme.of(ctx).copyWith(
             colorScheme:
-            const ColorScheme.light(primary: colour.kPrimary)),
+            const ColorScheme.light(primary: AppTokens.brandGradientStart)),
         child: child!,
       ),
     );
@@ -238,10 +238,10 @@ class _SpotSaleCard extends StatelessWidget {
         decoration: BoxDecoration(
           color: colour.kWhite,
           borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: colour.kAccent, width: 1.5),
+          border: Border.all(color: AppTokens.brandLight, width: 1.5),
           boxShadow: [
             BoxShadow(
-                color: colour.kPrimary.withOpacity(0.06),
+                color: AppTokens.brandGradientStart.withOpacity(0.06),
                 blurRadius: 10,
                 offset: const Offset(0, 3)),
           ],
@@ -254,7 +254,7 @@ class _SpotSaleCard extends StatelessWidget {
             padding:
             const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
             decoration: const BoxDecoration(
-              color: colour.kPrimary,
+              color: AppTokens.brandGradientStart,
               borderRadius:
               BorderRadius.vertical(top: Radius.circular(16)),
             ),
@@ -351,7 +351,7 @@ class _SpotSaleCard extends StatelessWidget {
           Text(value,
               style: GoogleFonts.lato(
                   fontSize: 13,
-                  color: colour.kPrimaryDark,
+                  color: AppTokens.brandDark,
                   fontWeight: FontWeight.w600),
               overflow: TextOverflow.ellipsis),
         ]),
@@ -400,7 +400,7 @@ class _DateTile extends StatelessWidget {
         ),
         child: Row(children: [
           const Icon(Icons.date_range_rounded,
-              color: colour.kPrimary, size: 18),
+              color: AppTokens.brandGradientStart, size: 18),
           const SizedBox(width: 8),
           Expanded(
             child: Column(
@@ -412,7 +412,7 @@ class _DateTile extends StatelessWidget {
                   Text(value,
                       style: GoogleFonts.lato(
                           fontSize: 13,
-                          color: colour.kPrimaryDark,
+                          color: AppTokens.brandDark,
                           fontWeight: FontWeight.w600)),
                 ]),
           ),
@@ -452,7 +452,7 @@ class _ImagePreviewDialog extends StatelessWidget {
           bottom: 20, right: 20,
           child: FloatingActionButton(
             backgroundColor: colour.kWhite,
-            child: const Icon(Icons.share, color: colour.kPrimaryDark),
+            child: const Icon(Icons.share, color: AppTokens.brandDark),
             onPressed: () => _shareImage(imageUrl, context),
           ),
         ),

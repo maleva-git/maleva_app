@@ -10,14 +10,7 @@ import '../bloc/googlereview_bloc.dart';
 import '../bloc/googlereview_event.dart';
 import '../bloc/googlereview_state.dart';
 
-// ── Color Palette ─────────────────────────────────────────────────────────────
-// const Color AppTokens.brandGradientStart      = Color(0xFF1555F3);
-// const Color kPrimaryDark  = Color(0xFF0D3DB5);
-// const Color kPrimaryLight = Color(0xFF4D7EF7);
-// const Color AppTokens.brandLight       = Color(0xFFE8EEFF);
-// const Color kWhite        = Colors.white;
 
-// ── Entry Point ───────────────────────────────────────────────────────────────
 class ReviewGridPage extends StatelessWidget {
   const ReviewGridPage({super.key});
 
@@ -259,7 +252,7 @@ class _FilterCard extends StatelessWidget {
               color:         AppTokens.brandLight,
               borderRadius: BorderRadius.circular(14),
               border: Border.all(
-                  color: kPrimaryLight.withOpacity(0.3)),
+                  color: AppTokens.brandMid.withOpacity(0.3)),
             ),
             child: Row(children: [
               const Icon(Icons.date_range_rounded,
@@ -280,7 +273,7 @@ class _FilterCard extends StatelessWidget {
                 ),
               ),
               const Icon(Icons.chevron_right_rounded,
-                  color: kPrimaryLight, size: 20),
+                  color: AppTokens.brandMid, size: 20),
             ]),
           ),
         ),
@@ -301,7 +294,7 @@ class _FilterCard extends StatelessWidget {
             color:         kWhite,
             borderRadius: BorderRadius.circular(12),
             border: Border.all(
-                color: kPrimaryLight.withOpacity(0.3)),
+                color: AppTokens.brandMid.withOpacity(0.3)),
           ),
           child: _employeeDropdown(context, fontSize: 14),
         ),
@@ -336,7 +329,7 @@ class _FilterCard extends StatelessWidget {
             color:         kWhite,
             borderRadius: BorderRadius.circular(10),
             border: Border.all(
-                color: kPrimaryLight.withOpacity(0.3)),
+                color: AppTokens.brandMid.withOpacity(0.3)),
           ),
           child: _employeeDropdown(context, fontSize: 13),
         ),

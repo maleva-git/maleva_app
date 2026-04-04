@@ -5,6 +5,8 @@ import 'package:intl/intl.dart';
 import 'package:maleva/core/models/model.dart';
 import 'package:maleva/core/utils/clsfunction.dart' as objfun;
 import 'package:maleva/features/dashboard/admin_dashboard/tabs/summonentry/view/summonview_tab.dart';
+import '../../../../../../core/theme/palette.dart';
+import '../../../../../../core/theme/tokens.dart';
 import '../bloc/summonentry_bloc.dart';
 import '../bloc/summonentry_event.dart';
 import '../bloc/summonentry_state.dart';
@@ -12,12 +14,7 @@ import '../bloc/summonentry_state.dart';
 const List<String> kMalaysiaList  = ['Parking', 'Traffic', 'Summon', 'Compound', 'Others'];
 const List<String> kSingaporeList = ['ERP', 'Parking', 'Traffic', 'Summon', 'Others'];
 
-// Color constants (உன் existing ones-ஐ use பண்றோம்)
-const Color kPrimary      = Color(0xFF1555F3);
-const Color kPrimaryDark  = Color(0xFF0D3DB5);
-const Color kPrimaryLight = Color(0xFF4D7EF7);
-const Color kAccent       = Color(0xFFE8EEFF);
-const Color kWhite        = Colors.white;
+
 
 // ── Entry Point ───────────────────────────────────────────────────────────────
 class SummonEntryPage extends StatelessWidget {
@@ -47,7 +44,7 @@ class _SummonEntryBody extends StatelessWidget {
         if (state is SummonSubmitSuccess) {
           ScaffoldMessenger.of(context).showSnackBar(SnackBar(
             content: Text("Submitted successfully ✅",
-                style: GoogleFonts.lato(color: kWhite)),
+                style: GoogleFonts.lato(color: Palette.kWhite)),
             backgroundColor: Colors.green,
             behavior: SnackBarBehavior.floating,
             shape: RoundedRectangleBorder(
@@ -142,7 +139,7 @@ class _SummonEntryBody extends StatelessWidget {
               Container(
                 width: 4, height: 30,
                 decoration: BoxDecoration(
-                  color: kPrimary,
+                  color: AppTokens.brandGradientStart,
                   borderRadius: BorderRadius.circular(4),
                 ),
               ),
@@ -151,7 +148,7 @@ class _SummonEntryBody extends StatelessWidget {
                   style: GoogleFonts.lato(
                     fontSize: 20,
                     fontWeight: FontWeight.bold,
-                    color: kPrimaryDark,
+                    color: AppTokens.brandDark,
                     letterSpacing: 1.2,
                   )),
             ]),
@@ -161,7 +158,7 @@ class _SummonEntryBody extends StatelessWidget {
               child: Text('Entry Form',
                   style: GoogleFonts.lato(
                     fontSize: 14,
-                    color: kPrimaryLight,
+                    color: AppTokens.brandMid,
                     fontWeight: FontWeight.w500,
                   )),
             ),
@@ -200,7 +197,7 @@ class _SummonEntryBody extends StatelessWidget {
                     builder: (ctx, child) => Theme(
                       data: Theme.of(ctx).copyWith(
                           colorScheme: const ColorScheme.light(
-                              primary: kPrimary)),
+                              primary: AppTokens.brandGradientStart)),
                       child: child!,
                     ),
                   );
@@ -236,12 +233,12 @@ class _SummonEntryBody extends StatelessWidget {
                         ),
                         padding: const EdgeInsets.symmetric(vertical: 13),
                         decoration: BoxDecoration(
-                          color: active ? kPrimary : kAccent,
+                          color: active ? AppTokens.brandGradientStart : AppTokens.brandLight,
                           borderRadius: BorderRadius.circular(10),
                           border: Border.all(
                             color: active
-                                ? kPrimary
-                                : kPrimaryLight.withOpacity(0.3),
+                                ? AppTokens.brandGradientStart
+                                : AppTokens.brandMid.withOpacity(0.3),
                             width: 1.5,
                           ),
                         ),
@@ -252,13 +249,13 @@ class _SummonEntryBody extends StatelessWidget {
                               active
                                   ? Icons.radio_button_checked
                                   : Icons.radio_button_off,
-                              color: active ? kWhite : kPrimaryLight,
+                              color: active ? Palette.kWhite : AppTokens.brandMid,
                               size: 17,
                             ),
                             const SizedBox(width: 6),
                             Text(country,
                                 style: GoogleFonts.lato(
-                                    color: active ? kWhite : kPrimaryDark,
+                                    color: active ? Palette.kWhite : AppTokens.brandDark,
                                     fontWeight: FontWeight.bold,
                                     fontSize: 14)),
                           ],
@@ -342,11 +339,11 @@ class _SummonEntryBody extends StatelessWidget {
                 height: 52,
                 child: ElevatedButton.icon(
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: kAccent,
-                    foregroundColor: kPrimary,
+                    backgroundColor: AppTokens.brandLight,
+                    foregroundColor: AppTokens.brandGradientStart,
                     shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12),
-                        side: const BorderSide(color: kPrimary)),
+                        side: const BorderSide(color: AppTokens.brandGradientStart)),
                     elevation: 0,
                   ),
                   onPressed: () =>
@@ -375,10 +372,10 @@ class _SummonEntryBody extends StatelessWidget {
                 Container(
                   padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
-                    color: kAccent,
+                    color: AppTokens.brandLight,
                     borderRadius: BorderRadius.circular(10),
                     border: Border.all(
-                        color: kPrimary.withOpacity(0.2)),
+                        color: AppTokens.brandGradientStart.withOpacity(0.2)),
                   ),
                   child: Row(children: [
                     const Icon(Icons.picture_as_pdf,
@@ -430,12 +427,12 @@ class _SummonEntryBody extends StatelessWidget {
                     width: 22,
                     height: 22,
                     child: CircularProgressIndicator(
-                        color: kWhite, strokeWidth: 2))
+                        color: Palette.kWhite, strokeWidth: 2))
                     : Text("Submit",
                     style: GoogleFonts.lato(
                         fontSize: isTablet ? 17 : 18,
                         fontWeight: FontWeight.bold,
-                        color: kWhite)),
+                        color: Palette.kWhite)),
               ),
             ),
             const SizedBox(width: 12),
@@ -444,7 +441,7 @@ class _SummonEntryBody extends StatelessWidget {
                 style: ElevatedButton.styleFrom(
                   minimumSize: Size(double.infinity,
                       isTablet ? 58 : 55),
-                  backgroundColor: kPrimary,
+                  backgroundColor: AppTokens.brandGradientStart,
                   shape: RoundedRectangleBorder(
                       borderRadius:
                       BorderRadius.circular(isTablet ? 16 : 14)),
@@ -458,7 +455,7 @@ class _SummonEntryBody extends StatelessWidget {
                     style: GoogleFonts.lato(
                         fontSize: isTablet ? 17 : 18,
                         fontWeight: FontWeight.bold,
-                        color: kWhite)),
+                        color: Palette.kWhite)),
               ),
             ),
           ]),
@@ -487,12 +484,12 @@ class _SummonPreviewPanel extends StatelessWidget {
       width: double.infinity,
       padding: const EdgeInsets.all(22),
       decoration: BoxDecoration(
-        color: kWhite,
+        color: Palette.kWhite,
         borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: kAccent, width: 1.5),
+        border: Border.all(color: AppTokens.brandLight, width: 1.5),
         boxShadow: [
           BoxShadow(
-            color: kPrimary.withOpacity(0.07),
+            color: AppTokens.brandGradientStart.withOpacity(0.07),
             blurRadius: 16,
             offset: const Offset(0, 5),
           ),
@@ -508,7 +505,7 @@ class _SummonPreviewPanel extends StatelessWidget {
               Container(
                 width: 4, height: 22,
                 decoration: BoxDecoration(
-                  color: kPrimary,
+                  color: AppTokens.brandGradientStart,
                   borderRadius: BorderRadius.circular(4),
                 ),
               ),
@@ -517,7 +514,7 @@ class _SummonPreviewPanel extends StatelessWidget {
                   style: GoogleFonts.lato(
                     fontSize: 15,
                     fontWeight: FontWeight.bold,
-                    color: kPrimaryDark,
+                    color: AppTokens.brandDark,
                   )),
             ]),
         
@@ -530,7 +527,7 @@ class _SummonPreviewPanel extends StatelessWidget {
                   horizontal: 16, vertical: 14),
               decoration: BoxDecoration(
                 gradient: const LinearGradient(
-                  colors: [kPrimary, kPrimaryDark],
+                  colors: [AppTokens.brandGradientStart, AppTokens.brandDark],
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
                 ),
@@ -542,7 +539,7 @@ class _SummonPreviewPanel extends StatelessWidget {
                   Text('Country',
                       style: GoogleFonts.lato(
                         fontSize: 11,
-                        color: kWhite.withOpacity(0.75),
+                        color: Palette.kWhite.withOpacity(0.75),
                       )),
                   const SizedBox(height: 4),
                   Text(
@@ -550,7 +547,7 @@ class _SummonPreviewPanel extends StatelessWidget {
                     style: GoogleFonts.lato(
                       fontSize: 20,
                       fontWeight: FontWeight.bold,
-                      color: kWhite,
+                      color: Palette.kWhite,
                     ),
                   ),
                 ],
@@ -590,7 +587,7 @@ class _SummonPreviewPanel extends StatelessWidget {
             Container(
               padding: const EdgeInsets.all(14),
               decoration: BoxDecoration(
-                color: kAccent,
+                color: AppTokens.brandLight,
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Column(
@@ -598,13 +595,13 @@ class _SummonPreviewPanel extends StatelessWidget {
                 children: [
                   Row(children: [
                     const Icon(Icons.attach_file_rounded,
-                        color: kPrimary, size: 16),
+                        color: AppTokens.brandGradientStart, size: 16),
                     const SizedBox(width: 6),
                     Text('Document',
                         style: GoogleFonts.lato(
                           fontSize: 12,
                           fontWeight: FontWeight.bold,
-                          color: kPrimaryDark,
+                          color: AppTokens.brandDark,
                         )),
                   ]),
                   const SizedBox(height: 8),
@@ -643,7 +640,7 @@ class _SummonPreviewPanel extends StatelessWidget {
             Container(
               padding: const EdgeInsets.all(14),
               decoration: BoxDecoration(
-                color: kAccent,
+                color: AppTokens.brandLight,
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Column(
@@ -651,13 +648,13 @@ class _SummonPreviewPanel extends StatelessWidget {
                 children: [
                   Row(children: [
                     const Icon(Icons.lightbulb_rounded,
-                        color: kPrimary, size: 16),
+                        color: AppTokens.brandGradientStart, size: 16),
                     const SizedBox(width: 6),
                     Text('Tips',
                         style: GoogleFonts.lato(
                           fontSize: 12,
                           fontWeight: FontWeight.bold,
-                          color: kPrimaryDark,
+                          color: AppTokens.brandDark,
                         )),
                   ]),
                   const SizedBox(height: 8),
@@ -680,10 +677,10 @@ class _SummonPreviewPanel extends StatelessWidget {
         Container(
           width: 34, height: 34,
           decoration: BoxDecoration(
-            color: kAccent,
+            color: AppTokens.brandLight,
             borderRadius: BorderRadius.circular(8),
           ),
-          child: Icon(icon, color: kPrimary, size: 17),
+          child: Icon(icon, color: AppTokens.brandGradientStart, size: 17),
         ),
         const SizedBox(width: 10),
         Expanded(
@@ -701,7 +698,7 @@ class _SummonPreviewPanel extends StatelessWidget {
                   style: GoogleFonts.lato(
                     fontSize: 14,
                     fontWeight: FontWeight.w700,
-                    color: kPrimaryDark,
+                    color: AppTokens.brandDark,
                   )),
             ],
           ),
@@ -715,7 +712,7 @@ class _SummonPreviewPanel extends StatelessWidget {
       padding: const EdgeInsets.only(bottom: 4),
       child: Row(children: [
         const Icon(Icons.check_circle_rounded,
-            color: kPrimary, size: 13),
+            color: AppTokens.brandGradientStart, size: 13),
         const SizedBox(width: 6),
         Expanded(
           child: Text(text,
@@ -773,42 +770,42 @@ class _TruckSelectPageState extends State<_TruckSelectPage> {
     return Scaffold(
       backgroundColor: Colors.grey.shade50,
       appBar: AppBar(
-        backgroundColor: kPrimary,
-        foregroundColor: kWhite,
+        backgroundColor: AppTokens.brandGradientStart,
+        foregroundColor: Palette.kWhite,
         elevation: 0,
         leading: GestureDetector(
           onTap: () => Navigator.pop(context),
           child: const Icon(Icons.arrow_back_ios_new_rounded,
-              color: kWhite, size: 20),
+              color: Palette.kWhite, size: 20),
         ),
         title: Text("Select Truck",
             style: GoogleFonts.lato(
                 fontWeight: FontWeight.bold,
                 fontSize: 18,
-                color: kWhite)),
+                color: Palette.kWhite)),
         centerTitle: true,
       ),
       body: Column(
         children: [
           Container(
-            color: kPrimary,
+            color: AppTokens.brandGradientStart,
             padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
             child: TextField(
               controller: _searchCtrl,
               textCapitalization: TextCapitalization.characters,
               onChanged: _search,
               style: GoogleFonts.lato(
-                  color: kPrimaryDark, fontWeight: FontWeight.w600),
+                  color: AppTokens.brandDark, fontWeight: FontWeight.w600),
               decoration: InputDecoration(
                 hintText: 'Search Truck No...',
                 hintStyle: GoogleFonts.lato(color: Colors.grey),
                 prefixIcon:
-                const Icon(Icons.search, color: kPrimary),
+                const Icon(Icons.search, color: AppTokens.brandGradientStart),
                 border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
                     borderSide: BorderSide.none),
                 filled: true,
-                fillColor: kWhite,
+                fillColor: Palette.kWhite,
                 contentPadding: const EdgeInsets.symmetric(
                     horizontal: 14, vertical: 14),
               ),
@@ -857,13 +854,13 @@ class _TruckSelectPageState extends State<_TruckSelectPage> {
                     padding: const EdgeInsets.symmetric(
                         horizontal: 16, vertical: 16),
                     decoration: BoxDecoration(
-                      color: kWhite,
+                      color: Palette.kWhite,
                       borderRadius: BorderRadius.circular(14),
                       border: Border.all(
-                          color: kAccent, width: 1.5),
+                          color: AppTokens.brandLight, width: 1.5),
                       boxShadow: [
                         BoxShadow(
-                            color: kPrimary.withOpacity(0.05),
+                            color: AppTokens.brandGradientStart.withOpacity(0.05),
                             blurRadius: 6,
                             offset: const Offset(0, 2)),
                       ],
@@ -872,11 +869,11 @@ class _TruckSelectPageState extends State<_TruckSelectPage> {
                       Container(
                         width: 40, height: 40,
                         decoration: const BoxDecoration(
-                            color: kAccent,
+                            color: AppTokens.brandLight,
                             shape: BoxShape.circle),
                         child: const Icon(
                             Icons.local_shipping_outlined,
-                            color: kPrimary, size: 20),
+                            color: AppTokens.brandGradientStart, size: 20),
                       ),
                       const SizedBox(width: 14),
                       Expanded(
@@ -885,11 +882,11 @@ class _TruckSelectPageState extends State<_TruckSelectPage> {
                           style: GoogleFonts.lato(
                               fontSize: 15,
                               fontWeight: FontWeight.w600,
-                              color: kPrimaryDark),
+                              color: AppTokens.brandDark),
                         ),
                       ),
                       const Icon(Icons.chevron_right_rounded,
-                          color: kPrimaryLight),
+                          color: AppTokens.brandMid),
                     ]),
                   ),
                 );
@@ -932,8 +929,8 @@ class _SectionCard extends StatelessWidget {
             width: isTablet ? 30 : 28,
             height: isTablet ? 30 : 28,
             decoration: const BoxDecoration(
-                color: kAccent, shape: BoxShape.circle),
-            child: Icon(icon, color: kPrimary,
+                color: AppTokens.brandLight, shape: BoxShape.circle),
+            child: Icon(icon, color: AppTokens.brandGradientStart,
                 size: isTablet ? 16 : 15),
           ),
           const SizedBox(width: 8),
@@ -941,7 +938,7 @@ class _SectionCard extends StatelessWidget {
               style: GoogleFonts.lato(
                   fontSize: isTablet ? 14 : 13,
                   fontWeight: FontWeight.bold,
-                  color: kPrimaryDark,
+                  color: AppTokens.brandDark,
                   letterSpacing: 0.3)),
         ]),
         const SizedBox(height: 8),
@@ -949,13 +946,13 @@ class _SectionCard extends StatelessWidget {
           width: double.infinity,
           padding: EdgeInsets.all(isTablet ? 18 : 16),
           decoration: BoxDecoration(
-            color: kWhite,
+            color: Palette.kWhite,
             borderRadius:
             BorderRadius.circular(isTablet ? 18 : 16),
-            border: Border.all(color: kAccent, width: 1.5),
+            border: Border.all(color: AppTokens.brandLight, width: 1.5),
             boxShadow: [
               BoxShadow(
-                  color: kPrimary.withOpacity(0.05),
+                  color: AppTokens.brandGradientStart.withOpacity(0.05),
                   blurRadius: 10,
                   offset: const Offset(0, 3)),
             ],
@@ -994,18 +991,18 @@ class _SelectTile extends StatelessWidget {
         padding: const EdgeInsets.symmetric(
             horizontal: 14, vertical: 14),
         decoration: BoxDecoration(
-          color: hasValue ? kAccent : Colors.grey.shade50,
+          color: hasValue ? AppTokens.brandLight : Colors.grey.shade50,
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
             color: hasValue
-                ? kPrimaryLight.withOpacity(0.4)
+                ? AppTokens.brandMid.withOpacity(0.4)
                 : Colors.grey.shade300,
             width: 1.2,
           ),
         ),
         child: Row(children: [
           Icon(icon,
-              color: hasValue ? kPrimary : Colors.grey,
+              color: hasValue ? AppTokens.brandGradientStart : Colors.grey,
               size: 20),
           const SizedBox(width: 12),
           Expanded(
@@ -1015,7 +1012,7 @@ class _SelectTile extends StatelessWidget {
                 Text(label,
                     style: GoogleFonts.lato(
                         fontSize: 11,
-                        color: hasValue ? kPrimary : Colors.grey,
+                        color: hasValue ? AppTokens.brandGradientStart : Colors.grey,
                         fontWeight: FontWeight.w600)),
                 const SizedBox(height: 2),
                 Text(
@@ -1023,7 +1020,7 @@ class _SelectTile extends StatelessWidget {
                   style: GoogleFonts.lato(
                       fontSize: 14,
                       color: hasValue
-                          ? kPrimaryDark
+                          ? AppTokens.brandDark
                           : Colors.grey.shade400,
                       fontWeight: hasValue
                           ? FontWeight.bold
@@ -1033,7 +1030,7 @@ class _SelectTile extends StatelessWidget {
             ),
           ),
           Icon(Icons.chevron_right_rounded,
-              color: hasValue ? kPrimary : Colors.grey.shade400),
+              color: hasValue ? AppTokens.brandGradientStart : Colors.grey.shade400),
         ]),
       ),
     );
@@ -1061,18 +1058,18 @@ Widget _field(
 InputDecoration _decor(String label, IconData icon) {
   return InputDecoration(
     labelText: label,
-    labelStyle: const TextStyle(color: kPrimaryDark),
-    prefixIcon: Icon(icon, color: kPrimary, size: 20),
+    labelStyle: const TextStyle(color: AppTokens.brandDark),
+    prefixIcon: Icon(icon, color: AppTokens.brandGradientStart, size: 20),
     border: OutlineInputBorder(
         borderRadius: BorderRadius.circular(10)),
     focusedBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(10),
         borderSide:
-        const BorderSide(color: kPrimary, width: 1.5)),
+        const BorderSide(color: AppTokens.brandGradientStart, width: 1.5)),
     enabledBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(10),
         borderSide: BorderSide(
-            color: kPrimaryLight.withOpacity(0.35))),
+            color: AppTokens.brandMid.withOpacity(0.35))),
     filled: true,
     fillColor: Colors.grey.shade50,
     contentPadding: const EdgeInsets.symmetric(
