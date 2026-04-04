@@ -10,6 +10,7 @@ import 'package:maleva/menu/menulist.dart';
 import 'package:maleva/MasterSearch/Employee.dart';
 import 'package:maleva/core/models/model.dart';
 import 'package:maleva/Transaction/VesselPlanning/VesselPlanningDetails.dart';
+import '../../../../core/theme/tokens.dart';
 import '../bloc/vesselplanning_bloc.dart';
 import '../bloc/vesselplanning_event.dart';
 import '../bloc/vesselplanning_state.dart';
@@ -17,13 +18,13 @@ import '../bloc/vesselplanning_state.dart';
 
 
 const kGradient = LinearGradient(
-  colors: [colour.kHeaderGradStart, colour.kHeaderGradEnd],
+  colors: [AppTokens.invoiceHeaderStart, colour.kHeaderGradEnd],
   begin: Alignment.topLeft,
   end: Alignment.bottomRight,
 );
 
 const kGradientVertical = LinearGradient(
-  colors: [colour.kHeaderGradStart, Color(0xFF2D56C8)],
+  colors: [AppTokens.invoiceHeaderStart, Color(0xFF2D56C8)],
   begin: Alignment.topCenter,
   end: Alignment.bottomCenter,
 );
@@ -173,7 +174,7 @@ class _VesselPlanningPage extends StatelessWidget {
               builder: (context, child) => Theme(
                 data: Theme.of(context).copyWith(
                   colorScheme: const ColorScheme.light(
-                    primary: colour.kHeaderGradStart,
+                    primary: AppTokens.invoiceHeaderStart,
                     onPrimary: Colors.white,
                     surface: Colors.white,
                     onSurface: colour.kTextDark,
@@ -214,7 +215,7 @@ class _VesselPlanningPage extends StatelessWidget {
                       width: 40,
                       height: 4,
                       decoration: BoxDecoration(
-                        color: colour.kCardBorder,
+                        color: AppTokens.maintCardBorder,
                         borderRadius: BorderRadius.circular(2),
                       ),
                     ),
@@ -224,7 +225,7 @@ class _VesselPlanningPage extends StatelessWidget {
                   Text(
                     'Filter',
                     style: GoogleFonts.lato(
-                      color: colour.kHeaderGradStart,
+                      color: AppTokens.invoiceHeaderStart,
                       fontWeight: FontWeight.w700,
                       fontSize: isTablet ? 16 : 15,
                       letterSpacing: 0.2,
@@ -293,7 +294,7 @@ class _VesselPlanningPage extends StatelessWidget {
                             ? Icons.close_rounded
                             : Icons.search_rounded,
                         color: isLoggedInEmp
-                            ? colour.kTextMuted
+                            ? AppTokens.planTextMuted
                             : colour.kHeaderGradEnd,
                         size: 20,
                       ),
@@ -328,7 +329,7 @@ class _VesselPlanningPage extends StatelessWidget {
                               gradient: isLoggedInEmp ? kGradient : null,
                               border: isLoggedInEmp
                                   ? null
-                                  : Border.all(color: colour.kCardBorder, width: 1.5),
+                                  : Border.all(color: AppTokens.maintCardBorder, width: 1.5),
                               borderRadius: BorderRadius.circular(5),
                             ),
                             child: isLoggedInEmp
@@ -502,7 +503,7 @@ class _PlanningCard extends StatelessWidget {
       fontSize: isTablet ? objfun.FontCardText + 1 : objfun.FontCardText,
     );
     final labelStyle = GoogleFonts.lato(
-      color: colour.kTextMuted,
+      color: AppTokens.planTextMuted,
       fontWeight: FontWeight.w600,
       fontSize: isTablet ? 10 : 9,
       letterSpacing: 0.4,
@@ -522,10 +523,10 @@ class _PlanningCard extends StatelessWidget {
           decoration: BoxDecoration(
             color: colour.kCardBg,
             borderRadius: BorderRadius.circular(14),
-            border: Border.all(color: colour.kCardBorder, width: 0.5),
+            border: Border.all(color: AppTokens.maintCardBorder, width: 0.5),
             boxShadow: [
               BoxShadow(
-                color: colour.kHeaderGradStart.withOpacity(0.07),
+                color: AppTokens.invoiceHeaderStart.withOpacity(0.07),
                 blurRadius: 12,
                 offset: const Offset(0, 3),
               ),
@@ -671,7 +672,7 @@ class _PlanningCard extends StatelessWidget {
               borderRadius: BorderRadius.circular(20),
               boxShadow: [
                 BoxShadow(
-                  color: colour.kHeaderGradStart.withOpacity(0.18),
+                  color: AppTokens.invoiceHeaderStart.withOpacity(0.18),
                   blurRadius: 30,
                   offset: const Offset(0, 10),
                 ),
@@ -723,7 +724,7 @@ class _PlanningCard extends StatelessWidget {
                       const SizedBox(height: 14),
                       TextField(
                         controller: txtPassword,
-                        cursorColor: colour.kHeaderGradStart,
+                        cursorColor: AppTokens.invoiceHeaderStart,
                         textCapitalization: TextCapitalization.characters,
                         textInputAction: TextInputAction.done,
                         style: GoogleFonts.lato(
@@ -734,7 +735,7 @@ class _PlanningCard extends StatelessWidget {
                         decoration: InputDecoration(
                           hintText: 'Enter password',
                           hintStyle: GoogleFonts.lato(
-                            color: colour.kTextMuted,
+                            color: AppTokens.planTextMuted,
                             fontSize: objfun.FontLow,
                           ),
                           filled: true,
@@ -853,7 +854,7 @@ class _DetailsSection extends StatelessWidget {
             child: Text(
               'No records found',
               style: GoogleFonts.lato(
-                  fontSize: objfun.FontLow, color: colour.kTextMuted),
+                  fontSize: objfun.FontLow, color: AppTokens.planTextMuted),
             ),
           )
               : ListView.builder(
@@ -936,7 +937,7 @@ class _EmptyState extends StatelessWidget {
           Text(
             'Try adjusting your filters',
             style: GoogleFonts.lato(
-              color: colour.kTextMuted,
+              color: AppTokens.planTextMuted,
               fontSize: 12,
             ),
           ),
@@ -961,7 +962,7 @@ class _VPFab extends StatelessWidget {
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: colour.kHeaderGradStart.withOpacity(0.4),
+            color: AppTokens.invoiceHeaderStart.withOpacity(0.4),
             blurRadius: 16,
             offset: const Offset(0, 6),
           ),
@@ -1005,17 +1006,17 @@ class _CardActionChip extends StatelessWidget {
         decoration: BoxDecoration(
           color: colour.kChipBg,
           borderRadius: BorderRadius.circular(20),
-          border: Border.all(color: colour.kCardBorder, width: 0.5),
+          border: Border.all(color: AppTokens.maintCardBorder, width: 0.5),
         ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(icon, size: 15, color: colour.kHeaderGradStart),
+            Icon(icon, size: 15, color: AppTokens.invoiceHeaderStart),
             const SizedBox(width: 4),
             Text(
               label,
               style: GoogleFonts.lato(
-                color: colour.kHeaderGradStart,
+                color: AppTokens.invoiceHeaderStart,
                 fontWeight: FontWeight.w600,
                 fontSize: 11,
               ),
@@ -1051,7 +1052,7 @@ class _SheetDateTile extends StatelessWidget {
         decoration: BoxDecoration(
           color: colour.kDetailBg,
           borderRadius: BorderRadius.circular(10),
-          border: Border.all(color: colour.kCardBorder, width: 0.5),
+          border: Border.all(color: AppTokens.maintCardBorder, width: 0.5),
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -1059,7 +1060,7 @@ class _SheetDateTile extends StatelessWidget {
             Text(
               label.toUpperCase(),
               style: GoogleFonts.lato(
-                color: colour.kTextMuted,
+                color: AppTokens.planTextMuted,
                 fontWeight: FontWeight.w700,
                 fontSize: 9,
                 letterSpacing: 0.6,
@@ -1124,7 +1125,7 @@ class _SheetTextField extends StatelessWidget {
       decoration: InputDecoration(
         hintText: hint,
         hintStyle: GoogleFonts.lato(
-          color: colour.kTextMuted,
+          color: AppTokens.planTextMuted,
           fontWeight: FontWeight.w500,
           fontSize: objfun.FontLow,
         ),
@@ -1139,7 +1140,7 @@ class _SheetTextField extends StatelessWidget {
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(10),
-          borderSide: const BorderSide(color: colour.kCardBorder, width: 0.5),
+          borderSide: const BorderSide(color: AppTokens.maintCardBorder, width: 0.5),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(10),
@@ -1165,7 +1166,7 @@ class _GradientButton extends StatelessWidget {
         borderRadius: BorderRadius.circular(24),
         boxShadow: [
           BoxShadow(
-            color: colour.kHeaderGradStart.withOpacity(0.35),
+            color: AppTokens.invoiceHeaderStart.withOpacity(0.35),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
@@ -1207,7 +1208,7 @@ class _OutlineButton extends StatelessWidget {
       decoration: BoxDecoration(
         color: colour.kChipBg,
         borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: colour.kCardBorder),
+        border: Border.all(color: AppTokens.maintCardBorder),
       ),
       child: Material(
         color: Colors.transparent,
@@ -1220,7 +1221,7 @@ class _OutlineButton extends StatelessWidget {
             child: Text(
               label,
               style: GoogleFonts.lato(
-                color: colour.kHeaderGradStart,
+                color: AppTokens.invoiceHeaderStart,
                 fontWeight: FontWeight.w700,
                 fontSize: objfun.FontMedium,
               ),

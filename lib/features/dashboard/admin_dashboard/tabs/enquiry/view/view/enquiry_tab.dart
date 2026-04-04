@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../../../../../Transaction/SaleOrder/SalesOrderAdd.dart';
 import '../../../../../../../core/colors/colors.dart' as colour;
+import '../../../../../../../core/theme/tokens.dart';
 import '../../../../../../../core/utils/clsfunction.dart' as objfun;
 import '../../add/view/enquiryadd.dart';
 import '../bloc/enquiry_bloc.dart';
@@ -64,7 +65,7 @@ class _EnquiryView extends StatelessWidget {
                     const SizedBox(width: 5),
             ElevatedButton(
               style: ElevatedButton.styleFrom(
-                backgroundColor: colour.kHeaderGradStart,
+                backgroundColor: AppTokens.invoiceHeaderStart,
                 side: const BorderSide(
                   color: colour.cWhite,
                   width: 1,

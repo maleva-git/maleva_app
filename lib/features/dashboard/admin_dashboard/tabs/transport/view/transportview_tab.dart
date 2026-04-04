@@ -4,6 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:maleva/core/utils/clsfunction.dart' as objfun;
 import 'package:maleva/core/colors/colors.dart' as colour;
 import '../../../../../../Transaction/SaleOrder/SalesOrderAdd.dart';
+import '../../../../../../core/theme/tokens.dart';
 import '../bloc/transport_bloc.dart';
 import '../bloc/transport_event.dart';
 import '../bloc/transport_state.dart';
@@ -258,13 +259,13 @@ class _TransportReportView extends StatelessWidget {
                     style: GoogleFonts.poppins(
                       fontSize: 14,
                       fontWeight: FontWeight.w700,
-                      color: colour.kHeaderGradStart,
+                      color: AppTokens.invoiceHeaderStart,
                     ),
                   ),
                 ),
                 IconButton(
                   icon: const Icon(Icons.close_rounded,
-                      color: colour.kHeaderGradStart, size: 20),
+                      color: AppTokens.invoiceHeaderStart, size: 20),
                   onPressed: () => Navigator.pop(context),
                 ),
               ]),
@@ -293,7 +294,7 @@ class _TransportReportView extends StatelessWidget {
                               child: Text(e.key,
                                   style: GoogleFonts.poppins(
                                     fontSize: 11,
-                                    color: colour.kHeaderGradStart,
+                                    color: AppTokens.invoiceHeaderStart,
                                     fontWeight: FontWeight.w500,
                                   )),
                             ),
@@ -304,7 +305,7 @@ class _TransportReportView extends StatelessWidget {
                                   style: GoogleFonts.poppins(
                                     fontSize: 11,
                                     fontWeight: FontWeight.w600,
-                                    color: colour.kHeaderGradStart,
+                                    color: AppTokens.invoiceHeaderStart,
                                   )),
                             ),
                           ],
@@ -346,7 +347,7 @@ class _SectionHeader extends StatelessWidget {
         style: GoogleFonts.poppins(
           fontSize:      isTablet ? 20 : 17,
           fontWeight:    FontWeight.w700,
-          color:         colour.kHeaderGradStart,
+          color:         AppTokens.invoiceHeaderStart,
           letterSpacing: 1.2,
         ),
       ),
@@ -366,7 +367,7 @@ class _CountBadge extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
       decoration: BoxDecoration(
         gradient: const LinearGradient(
-          colors: [colour.kBlue, colour.kHeaderGradStart],
+          colors: [colour.kBlue, AppTokens.invoiceHeaderStart],
           begin: Alignment.topLeft,
           end:   Alignment.bottomRight,
         ),
@@ -469,12 +470,12 @@ class _ToggleTab extends StatelessWidget {
           duration: const Duration(milliseconds: 200),
           margin:   const EdgeInsets.all(4),
           decoration: BoxDecoration(
-            color: isActive ? colour.kHeaderGradStart : Colors.transparent,
+            color: isActive ? AppTokens.invoiceHeaderStart : Colors.transparent,
             borderRadius: BorderRadius.circular(10),
             boxShadow: isActive
                 ? [
               BoxShadow(
-                color:     colour.kHeaderGradStart.withOpacity(0.3),
+                color:     AppTokens.invoiceHeaderStart.withOpacity(0.3),
                 blurRadius: 8,
                 offset:    const Offset(0, 3),
               )
@@ -487,7 +488,7 @@ class _ToggleTab extends StatelessWidget {
             style: GoogleFonts.poppins(
               fontSize:   isTablet ? 14 : 13,
               fontWeight: FontWeight.w600,
-              color:      isActive ? Colors.white : colour.kBlueL,
+              color:      isActive ? Colors.white : AppTokens.transBlueLight,
             ),
           ),
         ),
@@ -510,7 +511,7 @@ class _ListHeader extends StatelessWidget {
       ),
       decoration: BoxDecoration(
         gradient: const LinearGradient(
-          colors: [colour.kHeaderGradStart, colour.kHeaderGradStart],
+          colors: [AppTokens.invoiceHeaderStart, AppTokens.invoiceHeaderStart],
           begin: Alignment.centerLeft,
           end:   Alignment.centerRight,
         ),
@@ -581,7 +582,7 @@ class _TransportCard extends StatelessWidget {
               border: Border.all(
                 color: isEven
                     ? colour.kBlueBg
-                    : colour.kBlueL.withOpacity(0.3),
+                    : AppTokens.transBlueLight.withOpacity(0.3),
                 width: 1.2,
               ),
               boxShadow: isEven
@@ -626,13 +627,13 @@ class _TransportCard extends StatelessWidget {
                   style: GoogleFonts.poppins(
                       fontSize:   isTablet ? 14 : 13,
                       fontWeight: FontWeight.w600,
-                      color:      colour.kHeaderGradStart),
+                      color:      AppTokens.invoiceHeaderStart),
                 ),
               ),
 
               // Arrow
               Icon(Icons.chevron_right_rounded,
-                  color: colour.kBlueL,
+                  color: AppTokens.transBlueLight,
                   size:  isTablet ? 22 : 18),
             ]),
           ),
@@ -665,13 +666,13 @@ class _EmptyState extends StatelessWidget {
             style: GoogleFonts.poppins(
               fontSize:   isTablet ? 17 : 15,
               fontWeight: FontWeight.w700,
-              color:      colour.kHeaderGradStart,
+              color:      AppTokens.invoiceHeaderStart,
             )),
         SizedBox(height: isTablet ? 8 : 6),
         Text('No data available for the selected date.',
             style: GoogleFonts.poppins(
                 fontSize: isTablet ? 13 : 12,
-                color:    colour.kBlueL)),
+                color:    AppTokens.transBlueLight)),
       ]),
     );
   }

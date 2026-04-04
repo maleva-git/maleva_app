@@ -5,6 +5,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:maleva/core/utils/clsfunction.dart' as objfun;
 import 'package:maleva/core/network/OnlineApi.dart' as OnlineApi;
 import 'package:maleva/Transaction/SaleOrderDetails.dart';
+import '../../../../core/theme/tokens.dart';
 import '../bloc/viewsaleorder_bloc.dart';
 import '../bloc/viewsaleorder_event.dart';
 import '../bloc/viewsaleorder_state.dart';
@@ -13,7 +14,7 @@ import 'package:maleva/core/colors/colors.dart' as colour;
 
 
 const kGradient = LinearGradient(
-  colors: [colour.kHeaderGradStart, colour.kHeaderGradEnd],
+  colors: [AppTokens.invoiceHeaderStart, colour.kHeaderGradEnd],
   begin: Alignment.topLeft,
   end: Alignment.bottomRight,
 );
@@ -174,10 +175,10 @@ class _JobNoCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: colour.kCardBorder, width: 0.5),
+        border: Border.all(color: AppTokens.maintCardBorder, width: 0.5),
         boxShadow: [
           BoxShadow(
-            color: colour.kHeaderGradStart.withOpacity(0.10),
+            color: AppTokens.invoiceHeaderStart.withOpacity(0.10),
             blurRadius: 24,
             offset: const Offset(0, 8),
           ),
@@ -260,7 +261,7 @@ class _BillTypeRow extends StatelessWidget {
       decoration: BoxDecoration(
         color: colour.kDetailBg,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: colour.kCardBorder, width: 0.5),
+        border: Border.all(color: AppTokens.maintCardBorder, width: 0.5),
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -326,7 +327,7 @@ class _RadioOption extends StatelessWidget {
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
                 border: Border.all(
-                  color: selected ? colour.kHeaderGradEnd : colour.kCardBorder,
+                  color: selected ? colour.kHeaderGradEnd : AppTokens.maintCardBorder,
                   width: selected ? 0 : 1.5,
                 ),
                 gradient: selected ? kGradient : null,
@@ -340,7 +341,7 @@ class _RadioOption extends StatelessWidget {
             Text(
               label,
               style: GoogleFonts.lato(
-                color: selected ? colour.kHeaderGradStart : colour.kTextMid,
+                color: selected ? AppTokens.invoiceHeaderStart : colour.kTextMid,
                 fontWeight: FontWeight.w700,
                 fontSize: isTablet ? objfun.FontMedium + 1 : objfun.FontMedium,
               ),
@@ -416,7 +417,7 @@ class _JobNoFieldState extends State<_JobNoField> {
           decoration: InputDecoration(
             hintText: 'Enter Job No',
             hintStyle: GoogleFonts.lato(
-                color: colour.kTextMuted,
+                color: AppTokens.planTextMuted,
                 fontSize: isTablet ? objfun.FontLow + 1 : objfun.FontLow),
             filled: true,
             fillColor: colour.kDetailBg,
@@ -425,7 +426,7 @@ class _JobNoFieldState extends State<_JobNoField> {
             suffixIcon: _controller.text.isNotEmpty
                 ? IconButton(
               icon: const Icon(Icons.close_rounded,
-                  color: colour.kTextMuted, size: 18),
+                  color: AppTokens.planTextMuted, size: 18),
               onPressed: () {
                 _controller.clear();
                 context
@@ -442,7 +443,7 @@ class _JobNoFieldState extends State<_JobNoField> {
             ),
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
-              borderSide: const BorderSide(color: colour.kCardBorder, width: 0.5),
+              borderSide: const BorderSide(color: AppTokens.maintCardBorder, width: 0.5),
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
@@ -463,10 +464,10 @@ class _JobNoFieldState extends State<_JobNoField> {
             decoration: BoxDecoration(
               color: Colors.white,
               borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: colour.kCardBorder, width: 0.5),
+              border: Border.all(color: AppTokens.maintCardBorder, width: 0.5),
               boxShadow: [
                 BoxShadow(
-                  color: colour.kHeaderGradStart.withOpacity(0.10),
+                  color: AppTokens.invoiceHeaderStart.withOpacity(0.10),
                   blurRadius: 12,
                   offset: const Offset(0, 4),
                 ),
@@ -531,12 +532,12 @@ class _JobNoFieldState extends State<_JobNoField> {
             child: Row(
               children: [
                 const Icon(Icons.info_outline_rounded,
-                    size: 14, color: colour.kTextMuted),
+                    size: 14, color: AppTokens.planTextMuted),
                 const SizedBox(width: 6),
                 Text(
                   'No matching job numbers found',
                   style: GoogleFonts.lato(
-                      color: colour.kTextMuted, fontSize: 12),
+                      color: AppTokens.planTextMuted, fontSize: 12),
                 ),
               ],
             ),
@@ -627,7 +628,7 @@ class _GradientButton extends StatelessWidget {
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
-            color: colour.kHeaderGradStart.withOpacity(0.35),
+            color: AppTokens.invoiceHeaderStart.withOpacity(0.35),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
@@ -688,7 +689,7 @@ class _OutlineButton extends StatelessWidget {
       decoration: BoxDecoration(
         color: colour.kChipBg,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: colour.kCardBorder),
+        border: Border.all(color: AppTokens.maintCardBorder),
       ),
       child: Material(
         color: Colors.transparent,
@@ -706,7 +707,7 @@ class _OutlineButton extends StatelessWidget {
                 Text(
                   label,
                   style: GoogleFonts.lato(
-                    color: colour.kHeaderGradStart,
+                    color: AppTokens.invoiceHeaderStart,
                     fontWeight: FontWeight.w700,
                     fontSize:
                     isTablet ? objfun.FontMedium + 1 : objfun.FontMedium,
@@ -714,7 +715,7 @@ class _OutlineButton extends StatelessWidget {
                 ),
                 const SizedBox(width: 8),
                 Icon(icon,
-                    color: colour.kHeaderGradStart,
+                    color: AppTokens.invoiceHeaderStart,
                     size: isTablet ? 22 : 18),
               ],
             ),

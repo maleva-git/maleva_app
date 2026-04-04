@@ -10,13 +10,14 @@ import 'package:maleva/menu/menulist.dart';
 import 'package:maleva/MasterSearch/Customer.dart';
 import 'package:maleva/MasterSearch/JobType.dart';
 import 'package:maleva/MasterSearch/Location.dart';
+import '../../../../../core/theme/tokens.dart';
 import '../bloc/enquirytradd_bloc.dart';
 import '../bloc/enquirytradd_event.dart';
 import '../bloc/enquirytradd_state.dart';
 import 'package:maleva/core/colors/colors.dart' as colour;
 
 const kGradient = LinearGradient(
-  colors: [colour.kHeaderGradStart, colour.kHeaderGradEnd],
+  colors: [AppTokens.invoiceHeaderStart, colour.kHeaderGradEnd],
   begin: Alignment.topLeft,
   end: Alignment.bottomRight,
 );
@@ -420,7 +421,7 @@ class _AddEnquiryBody extends StatelessWidget {
   Widget _datepickerTheme(BuildContext ctx, Widget? child) => Theme(
     data: Theme.of(ctx).copyWith(
       colorScheme: const ColorScheme.light(
-        primary: colour.kHeaderGradStart,
+        primary: AppTokens.invoiceHeaderStart,
         onPrimary: Colors.white,
         surface: Colors.white,
         onSurface: colour.kTextDark,
@@ -483,7 +484,7 @@ class _DateTimeField extends StatelessWidget {
         decoration: BoxDecoration(
           color: colour.kDetailBg,
           borderRadius: BorderRadius.circular(10),
-          border: Border.all(color: colour.kCardBorder, width: 0.5),
+          border: Border.all(color: AppTokens.maintCardBorder, width: 0.5),
         ),
         child: Row(
           children: [
@@ -491,7 +492,7 @@ class _DateTimeField extends StatelessWidget {
               child: Text(
                 display,
                 style: GoogleFonts.lato(
-                  color: enabled ? colour.kTextDark : colour.kTextMuted,
+                  color: enabled ? colour.kTextDark : AppTokens.planTextMuted,
                   fontWeight: FontWeight.w600,
                   fontSize: objfun.FontLow,
                 ),
@@ -562,7 +563,7 @@ class _DateTimeRow extends StatelessWidget {
               decoration: BoxDecoration(
                 color: colour.kDetailBg,
                 borderRadius: BorderRadius.circular(10),
-                border: Border.all(color: colour.kCardBorder, width: 0.5),
+                border: Border.all(color: AppTokens.maintCardBorder, width: 0.5),
               ),
               child: Row(
                 children: [
@@ -570,7 +571,7 @@ class _DateTimeRow extends StatelessWidget {
                     child: Text(
                       display,
                       style: GoogleFonts.lato(
-                        color: enabled ? colour.kTextDark : colour.kTextMuted,
+                        color: enabled ? colour.kTextDark : AppTokens.planTextMuted,
                         fontWeight: FontWeight.w600,
                         fontSize: isTablet
                             ? objfun.FontLow + 1
@@ -581,7 +582,7 @@ class _DateTimeRow extends StatelessWidget {
                   Icon(
                     Icons.calendar_month_outlined,
                     size: 18,
-                    color: enabled ? colour.kHeaderGradEnd : colour.kTextMuted,
+                    color: enabled ? colour.kHeaderGradEnd : AppTokens.planTextMuted,
                   ),
                 ],
               ),
@@ -602,7 +603,7 @@ class _DateTimeRow extends StatelessWidget {
               gradient: enabled ? kGradient : null,
               border: enabled
                   ? null
-                  : Border.all(color: colour.kCardBorder, width: 1.5),
+                  : Border.all(color: AppTokens.maintCardBorder, width: 1.5),
               borderRadius: BorderRadius.circular(6),
             ),
             child: enabled
@@ -642,7 +643,7 @@ class _AddSearchField extends StatelessWidget {
         decoration: BoxDecoration(
           color: disabled ? const Color(0xFFF5F5F5) : colour.kDetailBg,
           borderRadius: BorderRadius.circular(10),
-          border: Border.all(color: colour.kCardBorder, width: 0.5),
+          border: Border.all(color: AppTokens.maintCardBorder, width: 0.5),
         ),
         child: Row(
           children: [
@@ -650,7 +651,7 @@ class _AddSearchField extends StatelessWidget {
               child: Text(
                 value.isEmpty ? hint : value,
                 style: GoogleFonts.lato(
-                  color: value.isEmpty ? colour.kTextMuted : colour.kTextDark,
+                  color: value.isEmpty ? AppTokens.planTextMuted : colour.kTextDark,
                   fontWeight:
                   value.isEmpty ? FontWeight.w500 : FontWeight.w600,
                   fontSize: objfun.FontLow,
@@ -661,7 +662,7 @@ class _AddSearchField extends StatelessWidget {
             Icon(
               value.isNotEmpty ? Icons.close_rounded : Icons.search_rounded,
               size: 20,
-              color: disabled ? colour.kTextMuted : colour.kHeaderGradEnd,
+              color: disabled ? AppTokens.planTextMuted : colour.kHeaderGradEnd,
             ),
           ],
         ),
@@ -698,7 +699,7 @@ class _AddTextField extends StatelessWidget {
       decoration: InputDecoration(
         hintText: hint,
         hintStyle:
-        GoogleFonts.lato(color: colour.kTextMuted, fontSize: objfun.FontLow),
+        GoogleFonts.lato(color: AppTokens.planTextMuted, fontSize: objfun.FontLow),
         filled: true,
         fillColor: colour.kDetailBg,
         contentPadding:
@@ -709,7 +710,7 @@ class _AddTextField extends StatelessWidget {
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(10),
-          borderSide: const BorderSide(color: colour.kCardBorder, width: 0.5),
+          borderSide: const BorderSide(color: AppTokens.maintCardBorder, width: 0.5),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(10),

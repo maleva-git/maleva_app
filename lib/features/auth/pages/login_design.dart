@@ -212,7 +212,7 @@ class _LoginBodyState extends State<_LoginBody>
 
       ShaderMask(
         shaderCallback: (b) =>
-            const LinearGradient(colors: [colour.kPrimaryD, colour.kPrimary]).createShader(b),
+            const LinearGradient(colors: [AppTokens.brandDark, colour.kPrimary]).createShader(b),
         child: Text('Maleva',
             style: GoogleFonts.playfairDisplay(
               fontSize:   titleFontSize,
@@ -567,11 +567,11 @@ class _LoginBodyState extends State<_LoginBody>
         decoration: BoxDecoration(
           gradient: const LinearGradient(
             begin: Alignment.centerLeft, end: Alignment.centerRight,
-            colors: [colour.kPrimaryD, colour.kPrimary, colour.kPrimaryL],
+            colors: [AppTokens.brandDark, AppTokens.brandGradientStart, AppTokens.brandMid],
             stops: [0.0, 0.45, 1.0],
           ),
           borderRadius: BorderRadius.circular(radius),
-          boxShadow: [BoxShadow(color: colour.kPrimary.withOpacity(0.40), blurRadius: 20, offset: const Offset(0, 8))],
+          boxShadow: [BoxShadow(color: AppTokens.brandGradientStart.withOpacity(0.40), blurRadius: 20, offset: const Offset(0, 8))],
         ),
         child: ElevatedButton(
           style: ElevatedButton.styleFrom(
@@ -618,8 +618,8 @@ class _LoginBodyState extends State<_LoginBody>
     height: 1,
     decoration: BoxDecoration(
       gradient: LinearGradient(colors: [
-        colour.kPrimary.withOpacity(0.25),
-        colour.kPrimary.withOpacity(0.0),
+        AppTokens.brandGradientStart.withOpacity(0.25),
+        AppTokens.brandGradientStart.withOpacity(0.0),
       ]),
     ),
   );
@@ -627,9 +627,9 @@ class _LoginBodyState extends State<_LoginBody>
     Container(
       width: 18, height: 5,
       decoration: BoxDecoration(
-        color: colour.kPrimary,
+        color: AppTokens.brandGradientStart,
         borderRadius: BorderRadius.circular(3),
-        boxShadow: [BoxShadow(color: colour.kPrimary.withOpacity(0.4), blurRadius: 6, offset: const Offset(0, 2))],
+        boxShadow: [BoxShadow(color: AppTokens.brandGradientStart.withOpacity(0.4), blurRadius: 6, offset: const Offset(0, 2))],
       ),
     ),
     const SizedBox(width: 5),
@@ -649,12 +649,12 @@ class _LoginBodyState extends State<_LoginBody>
           color: colour.cWhite,
           borderRadius: BorderRadius.circular(20),
           boxShadow: [
-            BoxShadow(color: colour.kPrimary.withOpacity(0.15), blurRadius: 30),
+            BoxShadow(color: AppTokens.brandGradientStart.withOpacity(0.15), blurRadius: 30),
             BoxShadow(color: Colors.black.withOpacity(0.10), blurRadius: 12),
           ],
         ),
         child: const Center(
-          child: CircularProgressIndicator(color: colour.kPrimary, strokeWidth: 2.5),
+          child: CircularProgressIndicator(color: AppTokens.brandGradientStart, strokeWidth: 2.5),
         ),
       ),
     ),
@@ -708,13 +708,13 @@ class _KeypadButtonState extends State<_KeypadButton>
           decoration: BoxDecoration(
             gradient: widget.isAction
                 ? LinearGradient(begin: Alignment.topLeft, end: Alignment.bottomRight,
-                colors: [colour.kPrimaryD, colour.kPrimaryD.withOpacity(0.82)])
+                colors: [AppTokens.brandDark, AppTokens.brandDark.withOpacity(0.82)])
                 : const LinearGradient(begin: Alignment.topLeft, end: Alignment.bottomRight,
-                colors: [colour.kPrimary, colour.kPrimaryL]),
+                colors: [AppTokens.brandGradientStart, AppTokens.brandMid]),
             borderRadius: BorderRadius.circular(widget.radius),
             boxShadow: [
               BoxShadow(
-                color: (widget.isAction ? colour.kPrimaryD : colour.kPrimary).withOpacity(0.28),
+                color: (widget.isAction ? AppTokens.brandDark : AppTokens.brandGradientStart).withOpacity(0.28),
                 blurRadius: 10, offset: const Offset(0, 5),
               ),
             ],

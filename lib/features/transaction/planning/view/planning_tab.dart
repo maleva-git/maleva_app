@@ -11,6 +11,7 @@ import 'package:maleva/Transaction/Planning/PlanningDetails.dart';
 import 'package:maleva/DashBoard/CustomerService/CustDashboard.dart';
 import 'package:maleva/DashBoard/TransportDB/TransportDashboard.dart';
 import 'package:maleva/DashBoard/User/UserDashboard.dart';
+import '../../../../core/theme/tokens.dart';
 import '../../../dashboard/admin_dashboard/view/admin_dashboard.dart';
 import '../../../dashboard/operationadmin_dashboard/view/operationadmin_dashboard.dart';
 import '../bloc/planning_bloc.dart';
@@ -143,7 +144,7 @@ class _PlanningScaffold extends StatelessWidget {
                   color: colour.kText,
                   fontWeight: FontWeight.bold)),
           Text(userName,
-              style: _label(11, color: colour.kTextMuted)),
+              style: _label(11, color: AppTokens.planTextMuted)),
         ],
       ),
       bottom: PreferredSize(
@@ -299,7 +300,7 @@ class _PlanningCard extends StatelessWidget {
                                 const SizedBox(width: 10),
                                 Row(children: [
                                   const Icon(Icons.calendar_today_rounded,
-                                      size: 12, color: colour.kTextMuted),
+                                      size: 12, color: AppTokens.planTextMuted),
                                   const SizedBox(width: 5),
                                   Text(
                                     master.PLANINGDate.toString(),
@@ -313,7 +314,7 @@ class _PlanningCard extends StatelessWidget {
                               const SizedBox(height: 8),
                               Row(children: [
                                 const Icon(Icons.notes_rounded,
-                                    size: 12, color: colour.kTextMuted),
+                                    size: 12, color: AppTokens.planTextMuted),
                                 const SizedBox(width: 5),
                                 Expanded(
                                   child: Text(
@@ -430,7 +431,7 @@ class _DetailsSection extends StatelessWidget {
         padding: const EdgeInsets.all(20),
         child: Center(
           child: Text('No job records',
-              style: _label(13, color: colour.kTextMuted)),
+              style: _label(13, color: AppTokens.planTextMuted)),
         ),
       );
     }
@@ -479,19 +480,19 @@ class _DetailsSection extends StatelessWidget {
                   flex: 2,
                   child: Text('Job No',
                       style: _label(10,
-                          color: colour.kTextMuted,
+                          color: AppTokens.planTextMuted,
                           fw: FontWeight.w700))),
               Expanded(
                   flex: 2,
                   child: Text('Job Date',
                       style: _label(10,
-                          color: colour.kTextMuted,
+                          color: AppTokens.planTextMuted,
                           fw: FontWeight.w700))),
               Expanded(
                   flex: 2,
                   child: Text('Truck',
                       style: _label(10,
-                          color: colour.kTextMuted,
+                          color: AppTokens.planTextMuted,
                           fw: FontWeight.w700))),
             ]),
           ),
@@ -555,13 +556,13 @@ class _DetailRow extends StatelessWidget {
             const SizedBox(height: 6),
             Row(children: [
               const Icon(Icons.notes_rounded,
-                  size: 11, color: colour.kTextMuted),
+                  size: 11, color: AppTokens.planTextMuted),
               const SizedBox(width: 4),
               Expanded(
                 child: Text(
                   '${item["Remarks"]}',
                   style: _label(isTablet ? 11 : 10,
-                      color: colour.kTextMuted),
+                      color: AppTokens.planTextMuted),
                   overflow: TextOverflow.ellipsis,
                 ),
               ),
@@ -578,7 +579,7 @@ class _FilterFab extends StatelessWidget {
   Widget build(BuildContext context) {
     return FloatingActionButton.extended(
       onPressed: () => _showFilterSheet(context),
-      backgroundColor: colour.kHeaderGradStart,
+      backgroundColor: AppTokens.invoiceHeaderStart,
       icon: const Icon(Icons.tune_rounded, color: colour.kBg, size: 20),
       label: Text('Filter',
           style: _body(13, color: colour.kBg, fw: FontWeight.w700)),
@@ -647,7 +648,7 @@ class _FilterFab extends StatelessWidget {
                       height: 18,
                       decoration: BoxDecoration(
                         gradient: const LinearGradient(
-                          colors: [colour.kHeaderGradStart, colour.kCobalt],
+                          colors: [AppTokens.invoiceHeaderStart, colour.kCobalt],
                           begin: Alignment.topCenter,
                           end: Alignment.bottomCenter,
                         ),
@@ -696,7 +697,7 @@ class _FilterFab extends StatelessWidget {
                           ? Icons.close_rounded
                           : Icons.search_rounded,
                       color: checkLoggedEmp
-                          ? colour.kTextMuted
+                          ? AppTokens.planTextMuted
                           : colour.kCobalt,
                     ),
                     onSuffixTap: checkLoggedEmp
@@ -758,10 +759,10 @@ class _FilterFab extends StatelessWidget {
                         height: 22,
                         child: Checkbox(
                           value: checkLoggedEmp,
-                          activeColor: colour.kHeaderGradStart,
+                          activeColor: AppTokens.invoiceHeaderStart,
                           checkColor: colour.kBg,
                           side: const BorderSide(
-                              color: colour.kTextMuted, width: 1.5),
+                              color: AppTokens.planTextMuted, width: 1.5),
                           shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(4)),
                           onChanged: (v) => setSheetState(
@@ -795,7 +796,7 @@ class _FilterFab extends StatelessWidget {
                           ));
                         },
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: colour.kHeaderGradStart,
+                          backgroundColor: AppTokens.invoiceHeaderStart,
                           padding: const EdgeInsets.symmetric(
                               vertical: 14),
                           shape: RoundedRectangleBorder(
@@ -873,13 +874,13 @@ class _PasswordDialogState extends State<_PasswordDialog> {
             Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
-                color: colour.kHeaderGradStart.withOpacity(0.1),
+                color: AppTokens.invoiceHeaderStart.withOpacity(0.1),
                 shape: BoxShape.circle,
                 border: Border.all(
-                    color: colour.kHeaderGradStart.withOpacity(0.3)),
+                    color: AppTokens.invoiceHeaderStart.withOpacity(0.3)),
               ),
               child: const Icon(Icons.lock_outline_rounded,
-                  color: colour.kHeaderGradStart, size: 28),
+                  color: AppTokens.invoiceHeaderStart, size: 28),
             ),
             const SizedBox(height: 16),
             Text('Edit Password',
@@ -887,7 +888,7 @@ class _PasswordDialogState extends State<_PasswordDialog> {
                     fontSize: 18, color: colour.kText)),
             const SizedBox(height: 4),
             Text('Enter password to edit this planning',
-                style: _label(12, color: colour.kTextMuted)),
+                style: _label(12, color: AppTokens.planTextMuted)),
             const SizedBox(height: 20),
             // Password field
             TextField(
@@ -912,10 +913,10 @@ class _PasswordDialogState extends State<_PasswordDialog> {
                 focusedBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12),
                   borderSide:
-                  const BorderSide(color: colour.kHeaderGradStart, width: 1.5),
+                  const BorderSide(color: AppTokens.invoiceHeaderStart, width: 1.5),
                 ),
                 prefixIcon: const Icon(Icons.key_rounded,
-                    color: colour.kHeaderGradStart, size: 18),
+                    color: AppTokens.invoiceHeaderStart, size: 18),
               ),
             ),
             const SizedBox(height: 20),
@@ -935,7 +936,7 @@ class _PasswordDialogState extends State<_PasswordDialog> {
                     setState(() => _loading = false);
                   },
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: colour.kHeaderGradStart,
+                    backgroundColor: AppTokens.invoiceHeaderStart,
                     padding:
                     const EdgeInsets.symmetric(vertical: 13),
                     shape: RoundedRectangleBorder(
@@ -1042,7 +1043,7 @@ class _SheetDateBtn extends StatelessWidget {
           builder: (_, child) => Theme(
             data: ThemeData.dark().copyWith(
               colorScheme: const ColorScheme.dark(
-                primary: colour.kHeaderGradStart,
+                primary: AppTokens.invoiceHeaderStart,
                 onPrimary: colour.kBg,
                 surface: colour.kSurface,
                 onSurface: colour.kText,
@@ -1065,12 +1066,12 @@ class _SheetDateBtn extends StatelessWidget {
         ),
         child: Row(children: [
           const Icon(Icons.calendar_today_rounded,
-              size: 13, color: colour.kHeaderGradStart),
+              size: 13, color: AppTokens.invoiceHeaderStart),
           const SizedBox(width: 8),
           Column(crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(label,
-                    style: _label(9, color: colour.kTextMuted)),
+                    style: _label(9, color: AppTokens.planTextMuted)),
                 Text(displayDate,
                     style: _body(12,
                         color: colour.kText, fw: FontWeight.w600)),
@@ -1175,16 +1176,16 @@ class _FullScreenLoaderState extends State<_FullScreenLoader>
               height: 60,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: colour.kHeaderGradStart.withOpacity(_anim.value * 0.15),
+                color: AppTokens.invoiceHeaderStart.withOpacity(_anim.value * 0.15),
                 border: Border.all(
-                    color: colour.kHeaderGradStart.withOpacity(_anim.value), width: 2),
+                    color: AppTokens.invoiceHeaderStart.withOpacity(_anim.value), width: 2),
               ),
               child: Icon(Icons.local_shipping_rounded,
-                  color: colour.kHeaderGradStart.withOpacity(_anim.value), size: 28),
+                  color: AppTokens.invoiceHeaderStart.withOpacity(_anim.value), size: 28),
             ),
             const SizedBox(height: 16),
             Text('Loading Planning...',
-                style: _label(13, color: colour.kTextMuted)),
+                style: _label(13, color: AppTokens.planTextMuted)),
           ],
         ),
       ),
@@ -1207,7 +1208,7 @@ class _EmptyView extends StatelessWidget {
             border: Border.all(color: colour.kBorder),
           ),
           child: const Icon(Icons.inbox_rounded,
-              color: colour.kTextMuted, size: 36),
+              color: AppTokens.planTextMuted, size: 36),
         ),
         const SizedBox(height: 14),
         Text('No Planning Records',
@@ -1215,7 +1216,7 @@ class _EmptyView extends StatelessWidget {
             GoogleFonts.dmSerifDisplay(fontSize: 18, color: colour.kText)),
         const SizedBox(height: 6),
         Text('Try adjusting your filter',
-            style: _label(13, color: colour.kTextMuted)),
+            style: _label(13, color: AppTokens.planTextMuted)),
       ]),
     );
   }
@@ -1248,7 +1249,7 @@ class _ErrorView extends StatelessWidget {
                   fontSize: 18, color: colour.kText)),
           const SizedBox(height: 8),
           Text(message,
-              style: _label(12, color: colour.kTextMuted),
+              style: _label(12, color: AppTokens.planTextMuted),
               textAlign: TextAlign.center),
           const SizedBox(height: 20),
           ElevatedButton.icon(

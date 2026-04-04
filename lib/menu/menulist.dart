@@ -27,6 +27,7 @@ import '../Transaction/VesselPlanning/VesselPlanningView.dart';
 import '../Transport/LicenseUpdate.dart';
 import '../Transport/Maintenance.dart';
 import '../Transport/RTI/UpdateRTIDetails.dart';
+import '../core/theme/tokens.dart';
 import '../features/boarding/updateboardingdetails/bloc/updateboardingdetails_bloc.dart';
 import '../features/boarding/updateboardingdetails/bloc/updateboardingdetails_event.dart';
 import '../features/boarding/updateboardingdetails/view/updateboardingdetails_tab.dart';
@@ -650,7 +651,7 @@ class _MenuTileState extends State<_MenuTile>
                       color: Colors.white,
                     ),
                   ),
-                  backgroundColor: colour.kHeaderGradStart,
+                  backgroundColor: AppTokens.invoiceHeaderStart,
                   iconTheme: const IconThemeData(color: Colors.white),
                 ),
                 body: const EmailPage(),
@@ -671,7 +672,7 @@ class _MenuTileState extends State<_MenuTile>
                       color: Colors.white,
                     ),
                   ),
-                  backgroundColor: colour.kHeaderGradStart,
+                  backgroundColor: AppTokens.invoiceHeaderStart,
                   iconTheme: const IconThemeData(color: Colors.white),
                 ),
                 body: const ReviewEntryPage(),
@@ -742,7 +743,7 @@ class _MenuTileState extends State<_MenuTile>
                       color: Colors.white,
                     ),
                   ),
-                  backgroundColor: colour.kHeaderGradStart,
+                  backgroundColor: AppTokens.invoiceHeaderStart,
                   iconTheme: const IconThemeData(color: Colors.white),
                 ),
                 body: const EnquiryScreen(),

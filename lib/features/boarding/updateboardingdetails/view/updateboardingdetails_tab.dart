@@ -14,23 +14,23 @@ import 'package:maleva/MasterSearch/JobAllStatus.dart';
 import 'package:maleva/Transaction/SaleOrderDetails.dart';
 
 
+import '../../../../core/theme/tokens.dart';
 import '../bloc/updateboardingdetails_bloc.dart';
 import '../bloc/updateboardingdetails_event.dart';
 import '../bloc/updateboardingdetails_state.dart';
 
 // ─── Design Tokens ────────────────────────────────────────────────────────────
-const kHeaderGradStart = Color(0xFF1A3A8F);
-const kHeaderGradEnd   = Color(0xFF4A6FD4);
-const kCardBorder      = Color(0xFFC5D0EE);
-const kPageBg          = Color(0xFFF4F6FB);
-const kTextDark        = Color(0xFF1E2D5E);
-const kTextMid         = Color(0xFF4A5A8A);
-const kTextMuted       = Color(0xFF8A96BF);
-const kDetailBg        = Color(0xFFF0F4FF);
-const kChipBg          = Color(0xFFEEF2FF);
+
+// const kCardBorder      = Color(0xFFC5D0EE);
+// const kPageBg          = Color(0xFFF4F6FB);
+
+// const kTextMid         = Color(0xFF4A5A8A);
+// const kTextMuted       = Color(0xFF8A96BF);
+// const kDetailBg        = Color(0xFFF0F4FF);
+// const kChipBg          = Color(0xFFEEF2FF);
 
 const kGradient = LinearGradient(
-  colors: [kHeaderGradStart, kHeaderGradEnd],
+  colors: [AppTokens.invoiceHeaderStart, AppTokens.invoiceHeaderEnd],
   begin: Alignment.topLeft,
   end: Alignment.bottomRight,
 );
@@ -122,7 +122,7 @@ class _BoardingStatusPageState extends State<_BoardingStatusPage> {
         },
         child: Scaffold(
           resizeToAvoidBottomInset: true,
-          backgroundColor: kPageBg,
+          backgroundColor: AppTokens.invoicePageBg,
           appBar: _buildAppBar(context, userName),
           drawer: const Menulist(),
           body: BlocBuilder<BoardingStatusBloc, BoardingStatusState>(
@@ -130,7 +130,7 @@ class _BoardingStatusPageState extends State<_BoardingStatusPage> {
               if (state is BoardingStatusInitial ||
                   state is BoardingStatusLoading) {
                 return const Center(
-                  child: SpinKitFoldingCube(color: kHeaderGradEnd, size: 35),
+                  child: SpinKitFoldingCube(color: AppTokens.invoiceHeaderEnd, size: 35),
                 );
               }
               if (state is BoardingStatusLoaded) {
@@ -359,10 +359,10 @@ class _BoardingStatusBody extends StatelessWidget {
       builder: (ctx, child) => Theme(
         data: Theme.of(ctx).copyWith(
           colorScheme: const ColorScheme.light(
-            primary: kHeaderGradStart,
+            primary: AppTokens.invoiceHeaderStart,
             onPrimary: Colors.white,
             surface: Colors.white,
-            onSurface: kTextDark,
+            onSurface: AppTokens.maintTextDark,
           ),
         ),
         child: child!,
@@ -408,9 +408,9 @@ class _BillTypeRow extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 10),
       decoration: BoxDecoration(
-        color: kDetailBg,
+        color: AppTokens.maintDetailBg,
         borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: kCardBorder, width: 0.5),
+        border: Border.all(color: AppTokens.maintCardBorder, width: 0.5),
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -474,7 +474,7 @@ class _RadioOption extends StatelessWidget {
                 shape:    BoxShape.circle,
                 gradient: selected ? kGradient : null,
                 border:   Border.all(
-                  color: selected ? kHeaderGradEnd : kCardBorder,
+                  color: selected ? AppTokens.invoiceHeaderEnd : AppTokens.maintCardBorder,
                   width: selected ? 0 : 1.5,
                 ),
               ),
@@ -485,7 +485,7 @@ class _RadioOption extends StatelessWidget {
             SizedBox(width: isTablet ? 8 : 6),
             Text(label,
                 style: GoogleFonts.lato(
-                  color:      selected ? kHeaderGradStart : kTextMid,
+                  color:      selected ? AppTokens.invoiceHeaderStart : AppTokens.maintTextMid,
                   fontWeight: FontWeight.w700,
                   fontSize: isTablet
                       ? objfun.FontMedium + 1
@@ -555,7 +555,7 @@ class _JobNoRowState extends State<_JobNoRow> {
                 textCapitalization: TextCapitalization.characters,
                 textInputAction: TextInputAction.done,
                 style: GoogleFonts.lato(
-                    color: kTextDark,
+                    color: AppTokens.maintTextDark,
                     fontWeight: FontWeight.w600,
                     fontSize: isTablet
                         ? objfun.FontLow + 1
@@ -566,14 +566,14 @@ class _JobNoRowState extends State<_JobNoRow> {
                 decoration: InputDecoration(
                   hintText: 'Job No',
                   hintStyle: GoogleFonts.lato(
-                      color: kTextMuted,
+                      color: AppTokens.planTextMuted,
                       fontSize: isTablet
                           ? objfun.FontLow + 1
                           : objfun.FontLow),
                   filled: true,
-                  fillColor: kDetailBg,
+                  fillColor: AppTokens.maintDetailBg,
                   prefixIcon: const Icon(Icons.tag_rounded,
-                      color: kHeaderGradEnd, size: 20),
+                      color: AppTokens.invoiceHeaderEnd, size: 20),
                   contentPadding: const EdgeInsets.symmetric(
                       horizontal: 14, vertical: 13),
                   border: OutlineInputBorder(
@@ -582,12 +582,12 @@ class _JobNoRowState extends State<_JobNoRow> {
                   enabledBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
                     borderSide: const BorderSide(
-                        color: kCardBorder, width: 0.5),
+                        color: AppTokens.maintCardBorder, width: 0.5),
                   ),
                   focusedBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
                     borderSide: const BorderSide(
-                        color: kHeaderGradEnd, width: 1.5),
+                        color: AppTokens.invoiceHeaderEnd, width: 1.5),
                   ),
                 ),
               ),
@@ -633,10 +633,10 @@ class _JobNoRowState extends State<_JobNoRow> {
             decoration: BoxDecoration(
               color: Colors.white,
               borderRadius: BorderRadius.circular(10),
-              border: Border.all(color: kCardBorder, width: 0.5),
+              border: Border.all(color: AppTokens.maintCardBorder, width: 0.5),
               boxShadow: [
                 BoxShadow(
-                  color: kHeaderGradStart.withOpacity(0.10),
+                  color: AppTokens.invoiceHeaderStart.withOpacity(0.10),
                   blurRadius: 10,
                   offset: const Offset(0, 4),
                 ),
@@ -647,7 +647,7 @@ class _JobNoRowState extends State<_JobNoRow> {
               padding: EdgeInsets.zero,
               itemCount: s.jobNoSuggestions.length,
               separatorBuilder: (_, __) =>
-              const Divider(height: 1, color: kDetailBg),
+              const Divider(height: 1, color: AppTokens.maintDetailBg),
               itemBuilder: (ctx, i) {
                 final item = s.jobNoSuggestions[i];
                 final cnum = item['CNumber'].toString();
@@ -662,11 +662,11 @@ class _JobNoRowState extends State<_JobNoRow> {
                     child: Row(
                       children: [
                         const Icon(Icons.work_outline_rounded,
-                            size: 16, color: kHeaderGradEnd),
+                            size: 16, color: AppTokens.invoiceHeaderEnd),
                         const SizedBox(width: 10),
                         Text(cnum,
                             style: GoogleFonts.lato(
-                                color: kTextDark,
+                                color: AppTokens.maintTextDark,
                                 fontWeight: FontWeight.w600,
                                 fontSize: isTablet
                                     ? objfun.FontLow + 1
@@ -728,9 +728,9 @@ class _StatusField extends StatelessWidget {
         padding:
         const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
         decoration: BoxDecoration(
-          color: kDetailBg,
+          color: AppTokens.maintDetailBg,
           borderRadius: BorderRadius.circular(10),
-          border: Border.all(color: kCardBorder, width: 0.5),
+          border: Border.all(color: AppTokens.maintCardBorder, width: 0.5),
         ),
         child: Row(
           children: [
@@ -740,7 +740,7 @@ class _StatusField extends StatelessWidget {
                     ? 'Select Status'
                     : state.statusName,
                 style: GoogleFonts.lato(
-                  color: state.statusName.isEmpty ? kTextMuted : kTextDark,
+                  color: state.statusName.isEmpty ? AppTokens.planTextMuted : AppTokens.maintTextDark,
                   fontWeight: state.statusName.isEmpty
                       ? FontWeight.w500
                       : FontWeight.w600,
@@ -755,7 +755,7 @@ class _StatusField extends StatelessWidget {
                   ? Icons.close_rounded
                   : Icons.search_rounded,
               size: 20,
-              color: kHeaderGradEnd,
+              color: AppTokens.invoiceHeaderEnd,
             ),
           ],
         ),
@@ -799,7 +799,7 @@ class _DateTimeRow extends StatelessWidget {
           child: Text(
             label,
             style: GoogleFonts.lato(
-              color: kTextMid,
+              color: AppTokens.maintTextMid,
               fontWeight: FontWeight.w600,
               fontSize: isTablet ? objfun.FontMedium + 1 : objfun.FontMedium,
             ),
@@ -817,9 +817,9 @@ class _DateTimeRow extends StatelessWidget {
               padding: const EdgeInsets.symmetric(
                   horizontal: 12, vertical: 12),
               decoration: BoxDecoration(
-                color: enabled ? kDetailBg : const Color(0xFFEEEEEE),
+                color: enabled ? AppTokens.maintDetailBg : const Color(0xFFEEEEEE),
                 borderRadius: BorderRadius.circular(10),
-                border: Border.all(color: kCardBorder, width: 0.5),
+                border: Border.all(color: AppTokens.maintCardBorder, width: 0.5),
               ),
               child: Row(
                 children: [
@@ -827,7 +827,7 @@ class _DateTimeRow extends StatelessWidget {
                     child: Text(
                       display,
                       style: GoogleFonts.lato(
-                        color: enabled ? kTextDark : kTextMuted,
+                        color: enabled ? AppTokens.maintTextDark : AppTokens.planTextMuted,
                         fontWeight: FontWeight.w600,
                         fontSize: isTablet
                             ? objfun.FontLow
@@ -837,7 +837,7 @@ class _DateTimeRow extends StatelessWidget {
                   ),
                   Icon(Icons.calendar_month_outlined,
                       size: 18,
-                      color: enabled ? kHeaderGradEnd : kTextMuted),
+                      color: enabled ? AppTokens.invoiceHeaderEnd : AppTokens.planTextMuted),
                 ],
               ),
             ),
@@ -856,7 +856,7 @@ class _DateTimeRow extends StatelessWidget {
               gradient: enabled ? kGradient : null,
               border: enabled
                   ? null
-                  : Border.all(color: kCardBorder, width: 1.5),
+                  : Border.all(color: AppTokens.maintCardBorder, width: 1.5),
               borderRadius: BorderRadius.circular(6),
             ),
             child: enabled
@@ -888,9 +888,9 @@ class _ImageUploadRow extends StatelessWidget {
       padding:
       const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       decoration: BoxDecoration(
-        color: kDetailBg,
+        color: AppTokens.maintDetailBg,
         borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: kCardBorder, width: 0.5),
+        border: Border.all(color: AppTokens.maintCardBorder, width: 0.5),
       ),
       child: Row(
         children: [
@@ -907,7 +907,7 @@ class _ImageUploadRow extends StatelessWidget {
                 gradient: state.imageUploadEnabled ? kGradient : null,
                 border: state.imageUploadEnabled
                     ? null
-                    : Border.all(color: kCardBorder, width: 1.5),
+                    : Border.all(color: AppTokens.maintCardBorder, width: 1.5),
                 borderRadius: BorderRadius.circular(5),
               ),
               child: state.imageUploadEnabled
@@ -919,7 +919,7 @@ class _ImageUploadRow extends StatelessWidget {
           const SizedBox(width: 10),
           Text('Upload Image',
               style: GoogleFonts.lato(
-                  color: kTextDark,
+                  color: AppTokens.maintTextDark,
                   fontWeight: FontWeight.w600,
                   fontSize: isTablet
                       ? objfun.FontMedium + 1
@@ -966,13 +966,13 @@ class _ImagePickBtn extends StatelessWidget {
         padding: const EdgeInsets.all(6),
         decoration: BoxDecoration(
           color: enabled
-              ? kHeaderGradStart.withOpacity(0.08)
+              ? AppTokens.invoiceHeaderStart.withOpacity(0.08)
               : Colors.transparent,
           borderRadius: BorderRadius.circular(8),
         ),
         child: Icon(icon,
             size:  isTablet ? 28 : 24,
-            color: enabled ? kHeaderGradStart : kTextMuted),
+            color: enabled ? AppTokens.invoiceHeaderStart : AppTokens.planTextMuted),
       ),
     );
   }
@@ -995,7 +995,7 @@ class _ImageGrid extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: kCardBorder, width: 0.5),
+        border: Border.all(color: AppTokens.maintCardBorder, width: 0.5),
       ),
       child: state.images.isEmpty
           ? Center(
@@ -1003,11 +1003,11 @@ class _ImageGrid extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Icon(Icons.image_outlined,
-                size: isTablet ? 48 : 36, color: kTextMuted),
+                size: isTablet ? 48 : 36, color: AppTokens.planTextMuted),
             const SizedBox(height: 8),
             Text('No images uploaded',
                 style: GoogleFonts.lato(
-                    color: kTextMuted, fontSize: 13)),
+                    color: AppTokens.planTextMuted, fontSize: 13)),
           ],
         ),
       )
@@ -1042,21 +1042,21 @@ class _ImageGrid extends StatelessWidget {
                   imageUrl: url,
                   fit: BoxFit.cover,
                   placeholder: (_, __) => Container(
-                    color: kDetailBg,
+                    color: AppTokens.maintDetailBg,
                     child: const Center(
                       child: SizedBox(
                         width: 20,
                         height: 20,
                         child: CircularProgressIndicator(
-                            color: kHeaderGradEnd,
+                            color: AppTokens.invoiceHeaderEnd,
                             strokeWidth: 2),
                       ),
                     ),
                   ),
                   errorWidget: (_, __, ___) => Container(
-                    color: kDetailBg,
+                    color: AppTokens.maintDetailBg,
                     child: const Icon(Icons.image_not_supported_outlined,
-                        color: kHeaderGradEnd),
+                        color: AppTokens.invoiceHeaderEnd),
                   ),
                 ),
               ),
@@ -1081,7 +1081,7 @@ class _ImageGrid extends StatelessWidget {
               child: CachedNetworkImage(
                 imageUrl: url,
                 placeholder: (_, __) => const CircularProgressIndicator(
-                    color: kHeaderGradEnd),
+                    color: AppTokens.invoiceHeaderEnd),
               ),
             ),
             const SizedBox(height: 12),
@@ -1090,7 +1090,7 @@ class _ImageGrid extends StatelessWidget {
               child: IconButton(
                 onPressed: () => Navigator.pop(context),
                 icon: const Icon(Icons.close_rounded,
-                    color: kHeaderGradStart),
+                    color: AppTokens.invoiceHeaderStart),
               ),
             ),
           ],
@@ -1110,7 +1110,7 @@ class _FieldLabel extends StatelessWidget {
   Widget build(BuildContext context) {
     return Text(text,
         style: GoogleFonts.lato(
-            color: kTextMid,
+            color: AppTokens.maintTextMid,
             fontWeight: FontWeight.w600,
             fontSize:
             isTablet ? objfun.FontLow + 1 : objfun.FontLow));
@@ -1138,7 +1138,7 @@ class _GradientButton extends StatelessWidget {
         borderRadius: BorderRadius.circular(10),
         boxShadow: [
           BoxShadow(
-            color: kHeaderGradStart.withOpacity(0.30),
+            color: AppTokens.invoiceHeaderStart.withOpacity(0.30),
             blurRadius: 8,
             offset: const Offset(0, 3),
           ),
