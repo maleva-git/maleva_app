@@ -12,15 +12,15 @@ import '../MasterSearch/Truck.dart';
 part 'package:maleva/Transport/mobileMaintenance.dart';
 part 'package:maleva/Transport/tabletMaintenance.dart';
 
-class Maintenance extends StatefulWidget {
+class OldMaintenance extends StatefulWidget {
 
-  const Maintenance({super.key});
+  const OldMaintenance({super.key});
 
   @override
-  MaintenanceState createState() => MaintenanceState();
+  OldMaintenanceState createState() => OldMaintenanceState();
 }
 
-class MaintenanceState extends State<Maintenance> {
+class OldMaintenanceState extends State<OldMaintenance> {
   bool progress = false;
   late MenuMasterModel menuControl;
   String UserName = objfun.storagenew.getString('Username') ?? "";

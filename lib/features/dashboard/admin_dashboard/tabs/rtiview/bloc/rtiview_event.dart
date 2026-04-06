@@ -22,3 +22,13 @@ class SelectRTIDetailsToDateEvent extends RTIDetailsEvent {
 class SearchRTIDetailsEvent extends RTIDetailsEvent {
   const SearchRTIDetailsEvent();
 }
+
+class RTIViewEvent extends RTIDetailsEvent {
+  final int id;
+  final String rtiNo;
+
+  const RTIViewEvent({
+    required this.id,
+    required this.rtiNo,
+  });
+}

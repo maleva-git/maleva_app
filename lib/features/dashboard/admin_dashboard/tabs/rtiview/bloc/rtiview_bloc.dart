@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
-
 import 'package:maleva/core/models/model.dart';
 import 'package:maleva/core/utils/clsfunction.dart' as objfun;
 import 'package:maleva/features/dashboard/admin_dashboard/tabs/rtiview/bloc/rtiview_event.dart';
@@ -21,6 +20,7 @@ class RTIDetailsBloc extends Bloc<RTIDetailsEvent, RTIDetailsState> {
     on<SelectRTIDetailsFromDateEvent>(_onFromDate);
     on<SelectRTIDetailsToDateEvent>(_onToDate);
     on<SearchRTIDetailsEvent>(_onSearch);
+    on<RTIViewEvent>(onRTIView);
 
     add(const LoadRTIDetailsEvent()); // auto-load on init
   }
@@ -64,6 +64,64 @@ class RTIDetailsBloc extends Bloc<RTIDetailsEvent, RTIDetailsState> {
   // ════════════════════════════════════════════════════════════════════════════
   // FETCH
   // ════════════════════════════════════════════════════════════════════════════
+
+// Inside your RTIDetailsBloc class:
+
+  Future<void> onRTIView(RTIViewEvent event, Emitter<RTIDetailsState> emit) async {
+    // 1. Emit loading state if current state is RTIDetailsLoaded
+    if (state is RTIDetailsLoaded) {
+      emit((state as RTIDetailsLoaded).copyWith(isLoading: true));
+    }
+
+    // 2. Safely handle the RTINo
+    String currentRtiNo = event.rtiNo;
+    if (currentRtiNo.isEmpty) {
+      currentRtiNo = "DriverRTI";
+    }
+
+    // 3. Prepare API payload
+    Map<String, dynamic> master = {
+      'SoId': event.id,
+      'Comid': objfun.Comid,
+    };
+
+    Map<String, String> header = {
+      'Content-Type': 'application/json; charset=UTF-8',
+    };
+
+    // 4. Make the API Call
+    try {
+      // Note: 'context' is usually not available directly inside a standard BLoC.
+      // If objfun requires context, you may need to pass it in the event or handle UI side-effects in the UI layer.
+      final resultData = await objfun.apiAllinoneSelectArray(
+          "${objfun.apiViewRTIPdf}$currentRtiNo", master, header, context
+      );
+
+      if (resultData != "") {
+        ResponseViewModel? value = ResponseViewModel.fromJson(resultData);
+        if (value.IsSuccess == true) {
+          objfun.launchInBrowser(value.data1);
+        }
+      }
+    } catch (error, stackTrace) {
+      objfun.msgshow(
+          error.toString(),
+          stackTrace.toString(),
+          Colors.white,
+          Colors.red,
+          null,
+          18.00 - objfun.reducesize,
+          objfun.tll,
+          objfun.tgc,
+          context,
+          2);
+    } finally {
+      // 5. Turn off loading state
+      if (state is RTIDetailsLoaded) {
+        emit((state as RTIDetailsLoaded).copyWith(isLoading: false));
+      }
+    }
+  }
   Future<void> _fetch(
       Emitter<RTIDetailsState> emit, RTIDetailsLoaded s) async {
     emit(s.copyWith(isLoading: true));

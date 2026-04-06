@@ -1,7 +1,7 @@
 part of 'package:maleva/Transport/Maintenance.dart';
 
 
-tabletdesign(MaintenanceState state, BuildContext context) {
+tabletdesign(OldMaintenanceState state, BuildContext context) {
   double width = MediaQuery.of(context).size.width;
   double height = MediaQuery.of(context).size.height;
   return WillPopScope(

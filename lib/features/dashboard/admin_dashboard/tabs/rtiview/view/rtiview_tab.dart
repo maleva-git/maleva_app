@@ -306,6 +306,21 @@ class _RTIDetailsCard extends StatelessWidget {
                                 color: colour.kWhite),
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis),
+                        IconButton(
+                          onPressed: () {
+                            // Trigger the BLoC Event
+                            context.read<RTIDetailsBloc>().add(
+                              RTIViewEvent(
+                                id: master.Id,
+                                rtiNo: master.RTINoDisplay ?? "", // Provide a fallback if null
+                              ),
+                            );
+                          },
+                          icon: const Icon(
+                            Icons.picture_as_pdf_outlined,
+                            color: Colors.red,
+                          ),
+                        ),
                         const SizedBox(height: 2),
                         Text(master.RTINoDisplay,
                             style: GoogleFonts.lato(

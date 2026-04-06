@@ -46,6 +46,7 @@ import '../features/transaction/prealertview/view/prealertview_tab.dart';
 import '../features/transaction/salesorder/view/view/salesorderview_tab.dart';
 import '../../../../../../../core/colors/colors.dart' as colour;
 import '../features/transaction/vesselplanning/view/vesselplanning_tab.dart';
+import '../features/transport/maintenance/view/maintenance_tab.dart';
 
 
 

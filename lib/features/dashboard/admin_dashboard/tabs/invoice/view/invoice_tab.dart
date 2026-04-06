@@ -344,7 +344,7 @@ class _HeroHeader extends StatelessWidget {
           ),
           const SizedBox(height: 6),
           Text(
-            "₹${_fmt(totalAmount)}",
+            "${_fmt(totalAmount)}",
             style: GoogleFonts.lato(
               color: Colors.white,
               fontSize: 32,
@@ -472,7 +472,7 @@ class _OverviewSection extends StatelessWidget {
           Expanded(child: _OverviewCard(
             label: "MONTHLY",
             count: data["MonthSales"]?.toString() ?? "0",
-            amount: "₹${data["MonthAmount"] ?? "0"}",
+            amount: "${data["MonthAmount"] ?? "0"}",
             badgeLabel: "Invoices",
             badgeColor: colors.kOrange,
             badgeIcon: Icons.circle,
@@ -481,7 +481,7 @@ class _OverviewSection extends StatelessWidget {
           Expanded(child: _OverviewCard(
             label: "WEEKLY",
             count: data["WeekSales"]?.toString() ?? "0",
-            amount: "₹${data["WeekAmount"] ?? "0"}",
+            amount: "${data["WeekAmount"] ?? "0"}",
             badgeLabel: "This week",
             badgeColor: AppTokens.planCobalt,
             badgeIcon: Icons.calendar_today,
@@ -492,7 +492,7 @@ class _OverviewSection extends StatelessWidget {
           Expanded(child: _OverviewCard(
             label: "YESTERDAY",
             count: data["YesterdaySales"]?.toString() ?? "0",
-            amount: "₹${data["YesterdayAmount"] ?? "0"}",
+            amount: "${data["YesterdayAmount"] ?? "0"}",
             badgeLabel: "Done",
             badgeColor: AppTokens.statusSuccess,
             badgeIcon: Icons.check,
@@ -503,7 +503,7 @@ class _OverviewSection extends StatelessWidget {
             count: data["TodaySales"]?.toString() ?? "0",
             amount: data["TodaySales"] == "0" || data["TodaySales"] == null
                 ? "No entries yet"
-                : "₹${data["TodayAmount"] ?? "0"}",
+                : "${data["TodayAmount"] ?? "0"}",
             badgeLabel: "Pending",
             badgeColor: Colors.grey,
             badgeIcon: Icons.remove,

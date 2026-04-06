@@ -53,3 +53,14 @@ class RTIDetailsError extends RTIDetailsState {
     required this.toDate,
   });
 }
+
+class RTIPdfState  extends RTIDetailsState {
+  final bool isLoading;
+  const RTIPdfState({this.isLoading = false});
+
+  RTIPdfState copywith({bool? isLoading}) {
+    return RTIPdfState(
+      isLoading: isLoading ?? this.isLoading,
+    );
+  }
+}
