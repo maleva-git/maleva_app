@@ -141,6 +141,8 @@ class AppTokens {
   static const highlight         = Palette.highlight;
   static const accentGold        = Palette.gold2;
 
+  static const kExpiredRed      = Color(0xFFD32F2F);
+
   // ── Gradients ─────────────────────────────────────────────
   static const LinearGradient primaryGradient = LinearGradient(
     colors: [Palette.blueDeep, Palette.blueMid],
