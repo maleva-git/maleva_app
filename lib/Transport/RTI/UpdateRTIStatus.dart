@@ -312,7 +312,7 @@ class RTIStatusState extends State<RTIStatus> {
               await objfun.ConfirmationOK('Updated Successfully ', context);
               Navigator.pushReplacement(
                 context,
-                MaterialPageRoute(builder: (context) => const UpdateRTI()),
+                MaterialPageRoute(builder: (context) => const OldUpdateRTI()),
               );
               setState(() {
                 progress = true;

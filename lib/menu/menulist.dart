@@ -47,6 +47,9 @@ import '../features/transaction/salesorder/view/view/salesorderview_tab.dart';
 import '../../../../../../../core/colors/colors.dart' as colour;
 import '../features/transaction/vesselplanning/view/vesselplanning_tab.dart';
 import '../features/transport/maintenance/view/maintenance_tab.dart';
+import '../features/transport/updatertidetails/bloc/updatertidetails_bloc.dart';
+import '../features/transport/updatertidetails/bloc/updatertidetails_event.dart';
+import '../features/transport/updatertidetails/view/updatertidetails_tab.dart';
 
 
 
@@ -752,6 +755,18 @@ class _MenuTileState extends State<_MenuTile>
             ),
           );
           break;
+        case "Update RTI Details":
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => BlocProvider(
+                create: (context) => UpdateRTIBloc()..add(UpdateRTIStarted()),
+                child: const UpdateRTI(),
+              ),
+            ),
+          );
+          break;
+
         case "EnquiryTR Master":
           Navigator.push(ctx, _r(const EnquiryTRView()));       break;
 

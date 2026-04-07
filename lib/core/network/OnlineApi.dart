@@ -1107,7 +1107,7 @@ Future SelectRTIViewList(context,String Fromdate,String Todate,int DId, int TId,
     var Comid = objfun.storagenew.getInt('Comid') ?? 0;
     await objfun
         .apiAllinoneSelect(
-        "${objfun.apiSelectRTIView}$Comid&Fromdate=$Fromdate&Todate=$Todate&DId=$DId&TId=$TId&Employeeid=$Employeeid&Search$Search", null, null, context)
+        "${objfun.apiSelectRTIView}$Comid&Fromdate=$Fromdate&Todate=$Todate&DId=$DId&TId=$TId&Employeeid=$Employeeid&Search=$Search", null, null, context)
         .then((resultData) {
       if (resultData.isNotEmpty) {
         objfun.RTIViewMasterList = resultData[0]["salemaster"]

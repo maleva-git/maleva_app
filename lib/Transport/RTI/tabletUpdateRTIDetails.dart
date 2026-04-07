@@ -1,7 +1,7 @@
 part of 'package:maleva/Transport/RTI/UpdateRTIDetails.dart';
 
 
-tabletdesign(UpdateRTIState state, BuildContext context) {
+tabletdesign(OldUpdateRTIState state, BuildContext context) {
   double width = MediaQuery
       .of(context)
       .size

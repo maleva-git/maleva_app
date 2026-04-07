@@ -29,14 +29,14 @@ import 'UpdateRTIStatus.dart';
 part 'package:maleva/Transport/RTI/mobileUpdateRTIDetails.dart';
 part 'package:maleva/Transport/RTI/tabletUpdateRTIDetails.dart';
 
-class UpdateRTI extends StatefulWidget {
-  const UpdateRTI({super.key});
+class OldUpdateRTI extends StatefulWidget {
+  const OldUpdateRTI({super.key});
 
   @override
-  UpdateRTIState createState() => UpdateRTIState();
+  OldUpdateRTIState createState() => OldUpdateRTIState();
 }
 
-class UpdateRTIState extends State<UpdateRTI> {
+class OldUpdateRTIState extends State<OldUpdateRTI> {
   bool progress = false;
   String cls = "3";
   String ETAVal = "0";
