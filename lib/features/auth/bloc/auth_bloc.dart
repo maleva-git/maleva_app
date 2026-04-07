@@ -1,5 +1,7 @@
+import 'package:flutter/Material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:maleva/core/utils/clsfunction.dart' as objfun;
+import '../../../core/network/api_services/auth_api.dart';
 import 'auth_event.dart';
 import 'auth_state.dart';
 import 'package:maleva/core/network/OnlineApi.dart' as OnlineApi;
@@ -46,34 +48,39 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
 
     /// 🔥 REAL LOGIN LOGIC HERE
     on<SubmitLogin>((event, emit) async {
+      // 1. Loading state & clear old errors
+      emit(state.copyWith(loading: true, errorMessage: ""));
 
-      emit(state.copyWith(loading: true));
+      String oldUserName = objfun.storagenew.getString('OldUsername') ?? state.username;
 
-      String oldUserName= objfun.storagenew.getString('OldUsername') ?? state.username;
-
-      bool result = await OnlineApi.Login(
+      try {
+        // 2. Try block kulla API-a call pannanum
+        bool result = await AuthApi.loginUser(
           state.username,
           state.password,
           oldUserName,
           state.driverLogin ? 1 : 0,
-          event.context
-      );
+        );
 
-      if (result) {
-        objfun.storagenew.setString('OldUsername', state.username);
-        String role =
-            objfun.storagenew.getString('RulesType') ?? "";
+        if (result) {
+          objfun.storagenew.setString('OldUsername', state.username);
+          String role = objfun.storagenew.getString('RulesType') ?? "";
+
+          emit(state.copyWith(
+            loading: false,
+            loginSuccess: true,
+            role: role,
+          ));
+        }
+      } catch (error) {
+        // 3. API 'rethrow' pandra error inga thaan catch aagum!
+
 
         emit(state.copyWith(
           loading: false,
-          loginSuccess: true,
-          role: role,
-        ));
-
-      } else {
-        emit(state.copyWith(
-          loading: false,
-          errorMessage: "Invalid Username or Password",
+          loginSuccess: false,
+          // API-la irunthu vara "Invalid Username" or "No Internet" inga set aagum
+          errorMessage: error.toString().replaceAll("Exception: ", ""),
         ));
       }
     });

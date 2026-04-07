@@ -529,7 +529,7 @@ Future<List<dynamic>> apiAllinoneSelectWithOutAuth(api, insertDetails,
 }
 
 Future<dynamic> apiAllinoneSelectArrayWithOutAuth(api, insertDetails,
-    Map<String, String>? header, BuildContext context) async {
+    Map<String, String>? header, BuildContext ?context) async {
   //returntype
   //1 list
   //2 status
@@ -2069,6 +2069,8 @@ getDeviceToken() async {
   // fcm.subscribeToTopic('puppies');
   // fcm.unsubscribeFromTopic('puppies');
 }
+
+
 void print_(dynamic msg) {
   if (kDebugMode) {
     print(msg);

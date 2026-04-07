@@ -47,6 +47,7 @@ class Appuserloginmobile extends StatelessWidget {
         builder: (context, state) {
           return mobiledesign();
         },
+
       ),
     );
   }

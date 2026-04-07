@@ -968,10 +968,6 @@ Future<void> GetRTINoForwarding(BuildContext ?context, int billId) async {
     );
   }
 }
-
-
-
-
 Future SelectTruckList(context,String? Type) async {
   try {
     objfun.GetTruckList.clear();

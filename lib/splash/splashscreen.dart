@@ -14,7 +14,9 @@ import '../DashBoard/Maintenance/MaintenanceDashboard.dart';
 import '../DashBoard/Payable/PayableDashbord.dart';
 import '../DashBoard/Receivable/ReceivableDashboard.dart';
 import '../DashBoard/TransportDB/TransportDashboard.dart';
+import '../core/network/api_services/firebase_service.dart';
 import '../core/theme/tokens.dart';
+import '../core/utils/app_preferences.dart';
 import '../features/auth/bloc/auth_bloc.dart';
 import '../features/auth/pages/login_page.dart.dart';
 import '../DashBoard/User/UserDashboard.dart';
@@ -110,6 +112,10 @@ class _SplashScreenState extends State<SplashScreen>
     await objfun.localstoragecall();
     await Future.delayed(const Duration(seconds: 3));
     await objfun.getDeviceToken();
+
+    await AppPreferences.init();
+    await FirebaseService.getDeviceToken();
+
     String UserName = objfun.storagenew.getString('Username') ?? "";
     String Password = objfun.storagenew.getString('Password') ?? "";
     String OldUserName = objfun.storagenew.getString('OldUsername') ?? "";
