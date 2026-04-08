@@ -48,18 +48,18 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
 
     /// 🔥 REAL LOGIN LOGIC HERE
     on<SubmitLogin>((event, emit) async {
-      // 1. Loading state & clear old errors
+
       emit(state.copyWith(loading: true, errorMessage: ""));
 
       String oldUserName = objfun.storagenew.getString('OldUsername') ?? state.username;
 
       try {
-        // 2. Try block kulla API-a call pannanum
+
         bool result = await AuthApi.loginUser(
-          state.username,
-          state.password,
-          oldUserName,
-          state.driverLogin ? 1 : 0,
+          username: state.username,
+          password: state.password,
+          oldUsername: oldUserName,
+          driverId: state.driverLogin ? 1 : 0,
         );
 
         if (result) {
@@ -73,13 +73,10 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
           ));
         }
       } catch (error) {
-        // 3. API 'rethrow' pandra error inga thaan catch aagum!
-
-
         emit(state.copyWith(
           loading: false,
           loginSuccess: false,
-          // API-la irunthu vara "Invalid Username" or "No Internet" inga set aagum
+
           errorMessage: error.toString().replaceAll("Exception: ", ""),
         ));
       }
