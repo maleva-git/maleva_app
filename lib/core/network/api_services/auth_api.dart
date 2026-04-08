@@ -25,7 +25,6 @@ class AuthApi {
     final url = '${ApiConstants.apiLoginSuccess}$username'
         '&Pwd=$password&olduserid=$oldUsername&DriverId=$driverId';
 
-    // skipAuth: true — token illama login call panrom
     final result = await ApiClient.postRequest(
       url,
       null,
