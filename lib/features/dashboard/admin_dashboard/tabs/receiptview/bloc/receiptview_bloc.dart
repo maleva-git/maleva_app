@@ -5,32 +5,30 @@ import 'package:maleva/features/dashboard/admin_dashboard/tabs/receiptview/bloc/
 import 'package:maleva/features/dashboard/admin_dashboard/tabs/receiptview/bloc/receiptview_state.dart';
 import 'package:maleva/core/utils/clsfunction.dart' as objfun;
 
+import '../../../../../../core/network/api_services/auth_api.dart';
+import '../../../../../../core/network/api_services/reports_api.dart';
+
 class ReceiptBloc extends Bloc<ReceiptEvent, ReceiptState> {
 
-  final BuildContext context;
-
-  ReceiptBloc({ required this.context})
+  ReceiptBloc()
       : super(const ReceiptState()) {
     on<SelectFromDateEvent>(_onSelectFromDate);
     on<SelectToDateEvent>(_onSelectToDate);
     on<LoadReceiptEvent>(_onLoadReceipt);
   }
 
-  /// From Date select ஆனா
   void _onSelectFromDate(
       SelectFromDateEvent event, Emitter<ReceiptState> emit) {
     emit(state.copyWith(fromDate: event.date));
   }
 
-  /// To Date select ஆனா
   void _onSelectToDate(SelectToDateEvent event, Emitter<ReceiptState> emit) {
     emit(state.copyWith(toDate: event.date));
   }
 
-  /// API call பண்ணி receipt load பண்ண
   Future<void> _onLoadReceipt(
       LoadReceiptEvent event, Emitter<ReceiptState> emit) async {
-    // Loading start — progress false
+
     emit(state.copyWith(progress: false));
 
     Map<String, String> header = {
@@ -59,12 +57,14 @@ class ReceiptBloc extends Bloc<ReceiptEvent, ReceiptState> {
     };
 
     try {
-      var resultData = await objfun.apiAllinoneSelectArray(
-        "${objfun.apiSelectReceipt}",
-        master,
-        header,
-        context,
-      );
+      // var resultData = await objfun.apiAllinoneSelectArray(
+      //   "${objfun.apiSelectReceipt}",
+      //   master,
+      //   header,
+      //   null,
+      // );
+
+      var resultData = await ReportsApi.getCustomerBalance(master, header);
 
       if (resultData != null && resultData.isNotEmpty) {
         List<Map<String, dynamic>> masterList = [];
@@ -82,7 +82,6 @@ class ReceiptBloc extends Bloc<ReceiptEvent, ReceiptState> {
           List<Map<String, dynamic>>.from(resultData["Data2"]);
         }
 
-        // Total calculate பண்ணு
         double totalAmount = 0;
         double totalBalance = 0;
 
@@ -109,23 +108,7 @@ class ReceiptBloc extends Bloc<ReceiptEvent, ReceiptState> {
       } else {
         emit(state.copyWith(progress: true));
       }
-    } catch (error, stackTrace) {
-      print("🔥 ERROR OCCURRED:");
-      print(error);
-      print(stackTrace);
-
-      objfun.msgshow(
-        error.toString(),
-        stackTrace.toString(),
-        Colors.white,
-        Colors.red,
-        null,
-        18.00 - objfun.reducesize,
-        objfun.tll,
-        objfun.tgc,
-        context,
-        2,
-      );
+    } catch (error) {
 
       emit(state.copyWith(
         progress: true,
@@ -134,7 +117,6 @@ class ReceiptBloc extends Bloc<ReceiptEvent, ReceiptState> {
     }
   }
 
-  /// Date picker — from or to
   Future<void> pickDate(BuildContext context, bool isFrom) async {
     final DateTime? picked = await showDatePicker(
       context: context,

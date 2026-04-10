@@ -1041,8 +1041,9 @@ class _SOTabBar extends StatelessWidget {
     );
   }
 }
-void showBillingBottomSheet(
-    BuildContext context, List<dynamic> billingData) {
+
+
+void showBillingBottomSheet(BuildContext context, List<dynamic> billingData) {
   showModalBottomSheet(
     context: context,
     isScrollControlled: true,
@@ -1063,11 +1064,11 @@ void showBillingBottomSheet(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text("Waiting for Billing Details",
-                      style: GoogleFonts.lato(
-                          fontSize: 18, fontWeight: FontWeight.bold)),
+                      style: GoogleFonts.lato(fontSize: 18, fontWeight: FontWeight.bold)),
                   IconButton(
-                      icon: const Icon(Icons.close),
-                      onPressed: () => Navigator.pop(context)),
+                    icon: const Icon(Icons.close),
+                    onPressed: () => Navigator.pop(context),
+                  ),
                 ],
               ),
             ),
@@ -1079,10 +1080,9 @@ void showBillingBottomSheet(
                 itemBuilder: (context, index) {
                   final item = billingData[index];
                   return Container(
-                    margin: const EdgeInsets.symmetric(
-                        horizontal: 12, vertical: 8),
+                    margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                     decoration: BoxDecoration(
-                      color: const Color(0xFFFAD691),
+                      color: Colors.white,
                       borderRadius: BorderRadius.circular(16),
                       boxShadow: [
                         BoxShadow(
@@ -1093,24 +1093,20 @@ void showBillingBottomSheet(
                     ),
                     child: InkWell(
                       borderRadius: BorderRadius.circular(16),
-                      onTap: () => showDialog(
-                        context: context,
-                        builder: (context) => Dialog(
-                          shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(16)),
-                          child: Container(
-                            padding: const EdgeInsets.all(16),
-                            decoration: BoxDecoration(
-                                color: const Color(0xFFFAD691),
-                                borderRadius: BorderRadius.circular(16)),
-                            child: SingleChildScrollView(
-                              child: Column(
-                                crossAxisAlignment:
-                                CrossAxisAlignment.start,
-                                children: [
+                      onTap: () {
+                        showDialog(
+                          context: context,
+                          builder: (context) => Dialog(
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                            child: Container(
+                              padding: const EdgeInsets.all(16),
+                              decoration: BoxDecoration(
+                                  color:  Colors.white,
+                                  borderRadius: BorderRadius.circular(16)),
+                              child: SingleChildScrollView(
+                                child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                                   Row(
-                                    mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                     children: [
                                       Text("Billing Details",
                                           style: GoogleFonts.lato(
@@ -1118,49 +1114,28 @@ void showBillingBottomSheet(
                                               fontWeight: FontWeight.bold,
                                               color: Colors.black)),
                                       IconButton(
-                                          icon: const Icon(Icons.close,
-                                              color: Colors.black),
-                                          onPressed: () =>
-                                              Navigator.pop(context)),
+                                          icon: const Icon(Icons.close, color: Colors.black),
+                                          onPressed: () => Navigator.pop(context)),
                                     ],
                                   ),
                                   const SizedBox(height: 12),
-                                  _buildDetailRow(
-                                      Icons.confirmation_number,
-                                      "Bill No",
-                                      "${item['BillNoDisplay']}"),
-                                  _buildDetailRow(Icons.date_range,
-                                      "Bill Date", "${item['BillDate']}"),
-                                  _buildDetailRow(Icons.access_time,
-                                      "Bill Time", "${item['BillTime']}"),
-                                  _buildDetailRow(Icons.assignment,
-                                      "Job Status",
-                                      "${item['JobStatus']}"),
-                                  _buildDetailRow(Icons.person,
-                                      "Customer",
-                                      "${item['CustomerName']}"),
-                                  _buildDetailRow(Icons.badge,
-                                      "Employee",
-                                      "${item['EmployeeName']}"),
-                                  _buildDetailRow(Icons.local_shipping,
-                                      "Vessel",
-                                      "${item['Loadingvesselname']}"),
-                                  _buildDetailRow(Icons.anchor, "Port",
-                                      "${item['SPort']}"),
-                                  _buildDetailRow(Icons.calendar_today,
-                                      "Pickup Date",
-                                      "${item['SPickupDate']}"),
-                                  _buildDetailRow(Icons.flight_takeoff,
-                                      "ETA", "${item['ETA']}"),
-                                  _buildDetailRow(Icons.monetization_on,
-                                      "Net Amount",
-                                      "₹${item['NetAmt']}"),
-                                ],
+                                  _buildDetailRow(Icons.confirmation_number, "Bill No",   "${item['BillNoDisplay']}"),
+                                  _buildDetailRow(Icons.date_range,          "Bill Date", "${item['BillDate']}"),
+                                  _buildDetailRow(Icons.access_time,         "Bill Time", "${item['BillTime']}"),
+                                  _buildDetailRow(Icons.assignment,          "Job Status","${item['JobStatus']}"),
+                                  _buildDetailRow(Icons.person,              "Customer",  "${item['CustomerName']}"),
+                                  _buildDetailRow(Icons.badge,               "Employee",  "${item['EmployeeName']}"),
+                                  _buildDetailRow(Icons.local_shipping,      "Vessel",    "${item['Loadingvesselname']}"),
+                                  _buildDetailRow(Icons.anchor,              "Port",      "${item['SPort']}"),
+                                  _buildDetailRow(Icons.calendar_today,      "Pickup Date","${item['SPickupDate']}"),
+                                  _buildDetailRow(Icons.flight_takeoff,      "ETA",       "${item['ETA']}"),
+                                  _buildDetailRow(Icons.monetization_on,     "Net Amount","₹${item['NetAmt']}"),
+                                ]),
                               ),
                             ),
                           ),
-                        ),
-                      ),
+                        );
+                      },
                       child: Padding(
                         padding: const EdgeInsets.all(14),
                         child: Row(children: [
@@ -1169,46 +1144,37 @@ void showBillingBottomSheet(
                             decoration: BoxDecoration(
                                 color: Colors.white.withOpacity(0.9),
                                 shape: BoxShape.circle),
-                            child: const Icon(Icons.receipt_long,
-                                color: colors.kOrange, size: 28),
+                            child: const Icon(Icons.receipt_long, color: AppTokens.invoiceHeaderStart, size: 28),
                           ),
                           const SizedBox(width: 12),
                           Expanded(
-                            child: Column(
-                              crossAxisAlignment:
-                              CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                    "Bill No: ${item['BillNo'] ?? ''}",
-                                    style: GoogleFonts.lato(
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.bold,
-                                        color: const Color(0xFF2C3E50))),
-                                const SizedBox(height: 4),
-                                Text(
-                                    "Customer: ${item['CustomerName'] ?? ''}",
-                                    style: GoogleFonts.lato(
-                                        fontSize: 14,
-                                        fontWeight: FontWeight.bold,
-                                        color: const Color(0xFF145A32))),
-                                const SizedBox(height: 2),
-                                Text(
-                                    "Amount: ₹${item['NetAmt'] ?? ''}",
-                                    style: GoogleFonts.lato(
-                                        fontSize: 14,
-                                        fontWeight: FontWeight.bold,
-                                        color: colors.kOrange)),
-                              ],
-                            ),
+
+                            child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                              Text("Bill No: ${item['BillNo'] ?? ''}",
+                                  style: GoogleFonts.lato(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.bold,
+                                      color: AppTokens.invoiceHeaderStart)),
+                              const SizedBox(height: 4),
+                              Text("Customer: ${item['CustomerName'] ?? ''}",
+                                  style: GoogleFonts.lato(
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.bold,
+                                      color: const Color(0xFF145A32))),
+                              const SizedBox(height: 2),
+                              Text("Amount: ₹${item['NetAmt'] ?? ''}",
+                                  style: GoogleFonts.lato(
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.bold,
+                                      color: colors.kOrange)),
+                            ]),
                           ),
                           Container(
                             padding: const EdgeInsets.all(6),
                             decoration: BoxDecoration(
                                 color: Colors.white.withOpacity(0.9),
-                                borderRadius:
-                                BorderRadius.circular(8)),
-                            child: const Icon(Icons.arrow_forward_ios,
-                                size: 16, color: colors.kOrange),
+                                borderRadius: BorderRadius.circular(8)),
+                            child: const Icon(Icons.arrow_forward_ios, size: 16, color: colors.kOrange),
                           ),
                         ]),
                       ),
@@ -1223,6 +1189,8 @@ void showBillingBottomSheet(
     },
   );
 }
+
+
 Widget _buildDetailRow(IconData icon, String label, String value) {
   return Padding(
     padding: const EdgeInsets.symmetric(vertical: 6),

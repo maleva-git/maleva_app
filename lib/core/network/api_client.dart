@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
+import 'package:flutter/Material.dart';
 import 'package:http/http.dart' as http;
 import 'package:path/path.dart';
 import 'package:http_parser/http_parser.dart';
@@ -36,17 +37,32 @@ class ApiClient {
           ? (headers ?? {'Content-Type': 'application/json; charset=UTF-8'})
           : _buildHeaders(extra: headers);
 
-      final body     = bodyData != null ? json.encode(bodyData) : null;
+      final body = bodyData != null ? json.encode(bodyData) : null;
+
+      // 🔥 REQUEST LOG
+      debugPrint("🚀 API REQUEST");
+      debugPrint("➡️ URL: $url");
+      debugPrint("➡️ Headers: $finalHeaders");
+      debugPrint("➡️ Body: $body");
+
       final response = await http.post(
         Uri.parse(url),
         headers: finalHeaders,
         body: body,
       );
 
+      // 🔥 RESPONSE LOG
+      debugPrint("✅ API RESPONSE");
+      debugPrint("⬅️ Status Code: ${response.statusCode}");
+      debugPrint("⬅️ Body: ${response.body}");
+
       return _handleResponse(response);
+
     } on SocketException {
+      debugPrint("❌ No Internet Connection");
       throw Exception('No internet connection. Check your network.');
     } catch (e) {
+      debugPrint("❌ API ERROR: $e");
       rethrow;
     }
   }

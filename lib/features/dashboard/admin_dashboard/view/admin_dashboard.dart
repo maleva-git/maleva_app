@@ -129,8 +129,7 @@ class _AdminDashboardState extends State<NewAdminDashboard> with SingleTickerPro
               child: const SalesOrderTab(),
             ),
             BlocProvider(
-              create: (context) => ReceiptBloc(
-                context: context,
+              create: (_) => ReceiptBloc(
               )..add(LoadReceiptEvent()),
               child: const ReceiptPage(),
             ),

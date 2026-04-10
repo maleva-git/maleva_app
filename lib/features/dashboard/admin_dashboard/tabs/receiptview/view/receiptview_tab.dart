@@ -15,15 +15,28 @@ class ReceiptPage extends StatelessWidget {
   Widget build(BuildContext context) {
     final isTablet = MediaQuery.of(context).size.width >= 600;
 
-    return BlocBuilder<ReceiptBloc, ReceiptState>(
-      builder: (context, state) {
-        return Container(
-          color: const Color(0xFFF4F6FF),
-          child: isTablet
-              ? _buildTabletLayout(context, state)
-              : _buildMobileLayout(context, state),
-        );
+    return BlocListener<ReceiptBloc, ReceiptState>(
+      listenWhen: (prev, curr) => prev.errorMessage != curr.errorMessage,
+      listener: (context, state) {
+        if (state.errorMessage != null) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(state.errorMessage!),
+              backgroundColor: Colors.red,
+            ),
+          );
+        }
       },
+      child: BlocBuilder<ReceiptBloc, ReceiptState>(
+        builder: (context, state) {
+          return Container(
+            color: const Color(0xFFF4F6FF),
+            child: isTablet
+                ? _buildTabletLayout(context, state)
+                : _buildMobileLayout(context, state),
+          );
+        },
+      ),
     );
   }
 

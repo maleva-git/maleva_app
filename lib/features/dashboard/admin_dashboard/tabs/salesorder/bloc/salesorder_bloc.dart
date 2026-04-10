@@ -113,11 +113,11 @@ class SalesOrderBloc extends Bloc<SalesOrderEvent, SalesOrderState> {
             emit(InvoiceError(e.toString()));
           }
         } finally {
-          // Always release — stuck ஆகாம இருக்கும்
+
           _isLoadingInvoice = false;
         }
       },
-      transformer: droppable(), // concurrent duplicate events drop ஆகும்
+      transformer: droppable(),
     );
 
     // ─────────────────────────────────────────────

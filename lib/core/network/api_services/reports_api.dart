@@ -125,8 +125,16 @@ class ReportsApi {
   }
 
   // ─── Customer Balance ─────────────────────────────────────────────────────
-  static Future<List<dynamic>> getCustomerBalance(Map<String, dynamic> filter) async {
-    final result = await ApiClient.postRequest(ApiConstants.apiSelectReceipt, filter);
-    return result as List;
+  static Future<Map<String, dynamic>> getCustomerBalance(
+      Map<String, dynamic> master,
+      Map<String, String> header) async {
+
+    final result = await ApiClient.postRequest(
+      ApiConstants.apiSelectReceipt,
+      master,
+      headers: header,
+    );
+
+    return Map<String, dynamic>.from(result);
   }
 }
