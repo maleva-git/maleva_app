@@ -22,9 +22,9 @@ class _InvoiceTabState extends State<InvoiceTab> {
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
+
       context.read<InvoiceBloc>().add(LoadInvoiceByType(0));
-    });
+
   }
 
   Future<void> _onRefresh() async {
@@ -148,16 +148,24 @@ class _InvoiceTabState extends State<InvoiceTab> {
     return CustomScrollView(
       physics: const AlwaysScrollableScrollPhysics(),
       slivers: [
-        // ── Hero Header (gradient) ──
+
         SliverToBoxAdapter(child: _HeroHeader(state: state, data: data)),
 
-        // ── Overview + Monthly Trend ──
+
         SliverPadding(
           padding: const EdgeInsets.fromLTRB(16, 20, 16, 0),
           sliver: SliverList(
             delegate: SliverChildListDelegate([
               _OverviewSection(state: state, data: data, isTablet: false,
-                onWaitingTap: () => context.read<InvoiceBloc>().add(LoadWaitingBills(0)),
+                onWaitingTap: () {
+                  if (state.waitingBilling.isEmpty) {
+
+                    context.read<InvoiceBloc>().add(LoadWaitingBills(0));
+                  } else {
+
+                    showBillingBottomSheet(context, state.waitingBilling);
+                  }
+                },
                 onWaitingCountTap: () => showBillingBottomSheet(context, state.waitingBilling),
               ),
               const SizedBox(height: 24),
@@ -1072,7 +1080,7 @@ void showBillingBottomSheet(BuildContext context, List<dynamic> billingData) {
                   return Container(
                     margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                     decoration: BoxDecoration(
-                      color: const Color(0xFFFAD691),
+                      color: Colors.white,
                       borderRadius: BorderRadius.circular(16),
                       boxShadow: [
                         BoxShadow(
@@ -1091,7 +1099,7 @@ void showBillingBottomSheet(BuildContext context, List<dynamic> billingData) {
                             child: Container(
                               padding: const EdgeInsets.all(16),
                               decoration: BoxDecoration(
-                                  color: const Color(0xFFFAD691),
+                                  color:  Colors.white,
                                   borderRadius: BorderRadius.circular(16)),
                               child: SingleChildScrollView(
                                 child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
@@ -1134,16 +1142,17 @@ void showBillingBottomSheet(BuildContext context, List<dynamic> billingData) {
                             decoration: BoxDecoration(
                                 color: Colors.white.withOpacity(0.9),
                                 shape: BoxShape.circle),
-                            child: const Icon(Icons.receipt_long, color: colors.kOrange, size: 28),
+                            child: const Icon(Icons.receipt_long, color: AppTokens.invoiceHeaderStart, size: 28),
                           ),
                           const SizedBox(width: 12),
                           Expanded(
+
                             child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                               Text("Bill No: ${item['BillNo'] ?? ''}",
                                   style: GoogleFonts.lato(
                                       fontSize: 16,
                                       fontWeight: FontWeight.bold,
-                                      color: const Color(0xFF2C3E50))),
+                                      color: AppTokens.invoiceHeaderStart)),
                               const SizedBox(height: 4),
                               Text("Customer: ${item['CustomerName'] ?? ''}",
                                   style: GoogleFonts.lato(

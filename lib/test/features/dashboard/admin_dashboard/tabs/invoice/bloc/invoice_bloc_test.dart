@@ -14,7 +14,7 @@ void main() {
 
   setUp(() {
     context = MockBuildContext();
-    bloc = InvoiceBloc(context);
+    bloc = InvoiceBloc();
   });
 
   // ✅ Initial state test

@@ -1,6 +1,3 @@
-// core/network/api_services/auth_api.dart
-// Login, User Select, Password Edit — ella auth related calls inga
-
 import 'dart:convert';
 import 'package:maleva/core/models/model.dart';
 import 'package:maleva/core/network/api_client.dart';
@@ -12,8 +9,7 @@ class AuthApi {
   AuthApi._();
 
   // ─── Login ────────────────────────────────────────────────────────────────
-  // Returns true on success, throws Exception on failure
-  // BLoC catch pannum — context illai
+
   static Future<bool> loginUser({
     required String username,
     required String password,
@@ -121,15 +117,28 @@ class AuthApi {
   }
 
   // ─── Sales data (dashboard) ───────────────────────────────────────────────
-  static Future<dynamic> getSalesData() async {
-    final comid  = AppPreferences.getComid();
+  static Future<dynamic> getSalesData(int type) async {
+    final comid = AppPreferences.getComid();
+
     final result = await ApiClient.postRequest(
-      '${ApiConstants.apiGetSalesData}$comid',
+      '${ApiConstants.apiGetSalesData}$comid&type=$type',
       null,
     );
+
     return result;
   }
 
+
+  static Future<dynamic> getSalesInvoiceCheck(
+      Map<String, dynamic> master) async {
+
+    final result = await ApiClient.postRequest(
+      ApiConstants.apiSelectSaleorderinvoicecheck,
+      master,
+    );
+
+    return result;
+  }
   static Future<dynamic> getEmployeeSalesData() async {
     final comid  = AppPreferences.getComid();
     final result = await ApiClient.postRequest(

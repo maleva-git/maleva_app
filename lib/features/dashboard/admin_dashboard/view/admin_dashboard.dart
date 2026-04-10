@@ -121,11 +121,11 @@ class _AdminDashboardState extends State<NewAdminDashboard> with SingleTickerPro
               create: (_) => TruckBloc(),
             ),
             BlocProvider(
-              create: (context) => InvoiceBloc(context),
+              create: (_) => InvoiceBloc(),
               child: const InvoiceTab(),
             ),
             BlocProvider(
-              create: (context) => SalesOrderBloc(context),
+              create: (_) => SalesOrderBloc(),
               child: const SalesOrderTab(),
             ),
             BlocProvider(

@@ -3,28 +3,24 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:bloc_concurrency/bloc_concurrency.dart';
 import 'package:intl/intl.dart';
 
+import '../../../../../../core/network/api_client.dart';
+import '../../../../../../core/network/api_services/auth_api.dart';
 import 'salesorder_event.dart';
 import 'salesorder_state.dart';
 import 'package:maleva/core/utils/clsfunction.dart' as objfun;
 
 class SalesOrderBloc extends Bloc<SalesOrderEvent, SalesOrderState> {
-  final BuildContext context;
 
-  // ─────────────────────────────────────────────
-  // Guard flag — in-flight API call இருந்தா duplicate block பண்ணும்
-  // ─────────────────────────────────────────────
   bool _isLoadingInvoice = false;
 
-  SalesOrderBloc(this.context) : super(InvoiceInitial()) {
+  SalesOrderBloc() : super(InvoiceInitial()) {
 
-    // ─────────────────────────────────────────────
-    // LOAD SALES DATA
-    // Fix 1: _isLoadingInvoice guard → duplicate API call block
-    // Fix 2: InvoiceTabSwitching state-லயும் same-tab check
-    // Fix 3: transformer droppable() → concurrent events drop
-    // ─────────────────────────────────────────────
+
     on<LoadInvoiceByType>(
           (event, emit) async {
+
+            final sw = Stopwatch()..start();
+
         final newTabIndex = event.type == 0 ? 0 : event.type - 1;
 
         // ── Same tab guard — InvoiceLoaded state-ல ──
@@ -59,6 +55,9 @@ class SalesOrderBloc extends Bloc<SalesOrderEvent, SalesOrderState> {
         }
 
         try {
+          final t1 = sw.elapsedMilliseconds;
+          print('⏱ Before API call: ${t1}ms');
+
           final header = {'Content-Type': 'application/json; charset=UTF-8'};
           final currentDate = DateFormat("yyyy-MM-dd").format(DateTime.now());
           final master = {
@@ -66,17 +65,14 @@ class SalesOrderBloc extends Bloc<SalesOrderEvent, SalesOrderState> {
             'Todate': currentDate,
           };
 
-          // Parallel API calls
+
           final results = await Future.wait([
-            objfun.apiAllinoneSelectArray(
-              "${objfun.apiGetSalesData}${objfun.Comid}&type=${event.type}",
-              null, header, context,
-            ),
-            objfun.apiAllinoneSelectArray(
-              objfun.apiSelectSaleorderinvoicecheck,
-              master, header, context,
-            ),
+            AuthApi.getSalesData(event.type),
+            AuthApi.getSalesInvoiceCheck(master),
           ]);
+
+          final t2 = sw.elapsedMilliseconds;
+          print('⏱ After API response: ${t2}ms  (API took: ${t2 - t1}ms)');
 
           final resultData = results[0];
           final waitingResult = results[1];
@@ -98,10 +94,19 @@ class SalesOrderBloc extends Bloc<SalesOrderEvent, SalesOrderState> {
               selectedTabIndex: newTabIndex,
               employeeData: null,
             ));
+
+            final t3 = sw.elapsedMilliseconds;
+            print('⏱ After emit: ${t3}ms  (Processing took: ${t3 - t2}ms)');
+            print('⏱ TOTAL: ${t3}ms');
+
+
           } else {
             emit(InvoiceError("No data returned"));
           }
         } catch (e) {
+
+          print('❌ Error at: ${sw.elapsedMilliseconds}ms — $e');
+
           if (state is InvoiceTabSwitching) {
             emit((state as InvoiceTabSwitching).previous);
           } else {
@@ -144,7 +149,13 @@ class SalesOrderBloc extends Bloc<SalesOrderEvent, SalesOrderState> {
           (event, emit) async {
         if (state is! InvoiceLoaded) return;
         final current = state as InvoiceLoaded;
-
+        if (current.waitingBilling.isNotEmpty) {
+          emit(current.copyWith(
+            showWaitingSheet:  true,
+            clearEmployeeData: true,
+          ));
+          return;
+        }
         try {
           final header = {'Content-Type': 'application/json; charset=UTF-8'};
           final currentDate = DateFormat("yyyy-MM-dd").format(DateTime.now());
@@ -153,9 +164,9 @@ class SalesOrderBloc extends Bloc<SalesOrderEvent, SalesOrderState> {
             'Todate': currentDate,
           };
 
-          final resultData = await objfun.apiAllinoneSelectArray(
+          final resultData = await ApiClient.postRequest(
             objfun.apiSelectSaleorderinvoicecheck,
-            master, header, context,
+            master,
           );
 
           emit(current.copyWith(
@@ -182,11 +193,10 @@ class SalesOrderBloc extends Bloc<SalesOrderEvent, SalesOrderState> {
         try {
           final header = {'Content-Type': 'application/json; charset=UTF-8'};
 
-          final resultData = await objfun.apiAllinoneSelectArray(
+          final resultData = await ApiClient.postRequest(
             "${objfun.apiGetEmployeeInvData}${objfun.Comid}&type=${event.type}",
-            null, header, context,
+            null,
           );
-
           emit(current.copyWith(
             employeeData: List<dynamic>.from(resultData?["Data1"] ?? []),
             showWaitingSheet: false,
@@ -215,11 +225,26 @@ class SalesOrderBloc extends Bloc<SalesOrderEvent, SalesOrderState> {
     // Fix: InvoiceInitial emit பண்ணா initState re-trigger ஆகும்
     //      InvoiceLoading emit பண்றோம் + guard release
     // ─────────────────────────────────────────────
+// salesorder_bloc.dart
     on<RefreshSalesOrder>((event, emit) async {
-      _isLoadingInvoice = false; // stuck guard release
-      emit(InvoiceLoading());
-      add(LoadInvoiceByType(0));
-    });
+      _isLoadingInvoice = false; // guard release
+
+      // ✅ பழைய state இருந்தா அதையே காட்டு — blank screen வேண்டாம்
+      final previousLoaded = switch (state) {
+        InvoiceLoaded s      => s,
+        InvoiceTabSwitching s => s.previous,
+        _                    => null,
+      };
+
+      if (previousLoaded != null) {
+        add(LoadInvoiceByType(previousLoaded.selectedTabIndex + 1 == 1
+            ? 0
+            : previousLoaded.selectedTabIndex + 1));
+      } else {
+        emit(InvoiceLoading());
+        add(LoadInvoiceByType(0));
+      }
+    });;
   }
 
   (List<String>, List<dynamic>) _buildMonthData(

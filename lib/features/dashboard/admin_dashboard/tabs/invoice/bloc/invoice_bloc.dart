@@ -2,26 +2,23 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 
+import '../../../../../../core/network/api_client.dart';
+import '../../../../../../core/network/api_services/auth_api.dart';
 import 'invoice_event.dart';
 import 'invoice_state.dart';
 import 'package:maleva/core/utils/clsfunction.dart' as objfun;
 
 class InvoiceBloc extends Bloc<InvoiceEvent, InvoiceState> {
-  final BuildContext context;
 
-  InvoiceBloc(this.context) : super(InvoiceInitial()) {
+  InvoiceBloc() : super(InvoiceInitial()) {
 
-    // ─────────────────────────────────────────────
-    // LOAD SALES DATA
-    // FIX: Already loaded-ஆ இருந்தா skip — re-mount-ல் API போகாது
-    // ─────────────────────────────────────────────
     on<LoadInvoiceByType>((event, emit) async {
-      // Already loaded-ஆ இருந்தா API call வேண்டாம்
+
       if (state is InvoiceLoaded) return;
 
       emit(InvoiceLoading());
       try {
-        final header = {'Content-Type': 'application/json; charset=UTF-8'};
+
         final currentDate = DateFormat("yyyy-MM-dd").format(DateTime.now());
         final master = {
           'Comid': objfun.storagenew.getInt('Comid') ?? 0,
@@ -29,18 +26,8 @@ class InvoiceBloc extends Bloc<InvoiceEvent, InvoiceState> {
         };
 
         final results = await Future.wait([
-          objfun.apiAllinoneSelectArray(
-            "${objfun.apiGetSalesData}${objfun.Comid}&type=${event.type}",
-            null,
-            header,
-            context,
-          ),
-          objfun.apiAllinoneSelectArray(
-            objfun.apiSelectSaleorderinvoicecheck,
-            master,
-            header,
-            context,
-          ),
+          AuthApi.getSalesData(event.type),
+          AuthApi.getSalesInvoiceCheck(master),
         ]);
 
         final resultData = results[0];
@@ -69,9 +56,6 @@ class InvoiceBloc extends Bloc<InvoiceEvent, InvoiceState> {
       }
     });
 
-    // ─────────────────────────────────────────────
-    // MONTH RANGE TOGGLE
-    // ─────────────────────────────────────────────
     on<LoadMonthRange>((event, emit) {
       if (state is! InvoiceLoaded) return;
       final s = state as InvoiceLoaded;
@@ -100,18 +84,16 @@ class InvoiceBloc extends Bloc<InvoiceEvent, InvoiceState> {
       final current = state as InvoiceLoaded;
 
       try {
-        final header = {'Content-Type': 'application/json; charset=UTF-8'};
+
         final currentDate = DateFormat("yyyy-MM-dd").format(DateTime.now());
         final master = {
           'Comid': objfun.storagenew.getInt('Comid') ?? 0,
           'Todate': currentDate,
         };
 
-        final resultData = await objfun.apiAllinoneSelectArray(
+        final resultData = await ApiClient.postRequest(
           objfun.apiSelectSaleorderinvoicecheck,
           master,
-          header,
-          context,
         );
 
         emit(current.copyWith(
@@ -132,14 +114,12 @@ class InvoiceBloc extends Bloc<InvoiceEvent, InvoiceState> {
       final current = state as InvoiceLoaded;
 
       try {
-        final header = {'Content-Type': 'application/json; charset=UTF-8'};
 
-        final resultData = await objfun.apiAllinoneSelectArray(
+        final resultData = await ApiClient.postRequest(
           "${objfun.apiGetEmployeeInvData}${objfun.Comid}&type=${event.type}",
           null,
-          header,
-          context,
         );
+
 
         final employeeData = List<dynamic>.from(resultData?["Data1"] ?? []);
 
@@ -152,9 +132,6 @@ class InvoiceBloc extends Bloc<InvoiceEvent, InvoiceState> {
       }
     });
 
-    // ─────────────────────────────────────────────
-    // FORCE REFRESH — manual refresh தேவைப்பட்டா
-    // ─────────────────────────────────────────────
     on<RefreshInvoice>((event, emit) async {
       emit(InvoiceInitial());
       add(LoadInvoiceByType(0));

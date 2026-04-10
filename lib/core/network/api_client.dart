@@ -1,12 +1,6 @@
-// core/network/api_client.dart
-// Inga ELLA API call pakkum oru centralized client
-// BuildContext illai — errors as Exception throw panrom
-// BLoC catch pannum, UI la show pannum
-
 import 'dart:convert';
 import 'dart:io';
 import 'package:http/http.dart' as http;
-import 'package:http/http.dart';
 import 'package:path/path.dart';
 import 'package:http_parser/http_parser.dart';
 import '../utils/app_preferences.dart';
@@ -35,7 +29,7 @@ class ApiClient {
       String url,
       dynamic bodyData, {
         Map<String, String>? headers,
-        bool skipAuth = false,         // login call la skipAuth: true pass pannu
+        bool skipAuth = false,
       }) async {
     try {
       final finalHeaders = skipAuth
