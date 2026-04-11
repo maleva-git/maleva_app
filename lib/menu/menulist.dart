@@ -46,6 +46,9 @@ import '../features/transaction/prealertview/view/prealertview_tab.dart';
 import '../features/transaction/salesorder/view/view/salesorderview_tab.dart';
 import '../../../../../../../core/colors/colors.dart' as colour;
 import '../features/transaction/vesselplanning/view/vesselplanning_tab.dart';
+import '../features/transport/licenseupdate/bloc/licenseupdate_bloc.dart';
+import '../features/transport/licenseupdate/bloc/licenseupdate_event.dart';
+import '../features/transport/licenseupdate/view/licenseupdate_tab.dart';
 import '../features/transport/maintenance/view/maintenance_tab.dart';
 import '../features/transport/updatertidetails/bloc/updatertidetails_bloc.dart';
 import '../features/transport/updatertidetails/bloc/updatertidetails_event.dart';
@@ -767,13 +770,27 @@ class _MenuTileState extends State<_MenuTile>
           );
           break;
 
+
+        case "License Update":
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => BlocProvider(
+                create: (context) => LicenseUpdateBloc()..add(LicenseUpdateStarted()),
+                child: const LicenseUpdate(),
+              ),
+            ),
+          );
+          break;
+
+
         case "EnquiryTR Master":
           Navigator.push(ctx, _r(const EnquiryTRView()));       break;
 
         case "Maintenance":
           Navigator.push(ctx, _r(const Maintenance()));         break;
-        case "License Update":
-          Navigator.push(ctx, _r(const LicenseUpdate()));       break;
+        // case "License Update":
+        //   Navigator.push(ctx, _r(const LicenseUpdate()));       break;
         case "Update RTI Details":
           Navigator.push(ctx, _r(const UpdateRTI()));           break;
         case "Forwarding SMK Update":

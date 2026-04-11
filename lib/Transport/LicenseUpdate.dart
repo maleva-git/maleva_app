@@ -11,15 +11,15 @@ import 'package:maleva/core/colors/colors.dart' as colour;
 import '../MasterSearch/Truck.dart';
 part 'package:maleva/Transport/mobileLicenseUpdate.dart';
 part 'package:maleva/Transport/tabletLicenseUpdate.dart';
-class LicenseUpdate extends StatefulWidget {
+class OldLicenseUpdate extends StatefulWidget {
 
-  const LicenseUpdate({super.key});
+  const OldLicenseUpdate({super.key});
 
   @override
-  LicenseUpdateState createState() => LicenseUpdateState();
+  OldLicenseUpdateState createState() => OldLicenseUpdateState();
 }
 
-class LicenseUpdateState extends State<LicenseUpdate> {
+class OldLicenseUpdateState extends State<OldLicenseUpdate> {
   bool progress = false;
   late MenuMasterModel menuControl;
   String UserName = objfun.storagenew.getString('Username') ?? "";

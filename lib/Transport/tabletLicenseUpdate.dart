@@ -1,7 +1,7 @@
 part of 'package:maleva/Transport/LicenseUpdate.dart';
 
 
-tabletdesign(LicenseUpdateState state, BuildContext context) {
+tabletdesign(OldLicenseUpdateState state, BuildContext context) {
   double width = MediaQuery
       .of(context)
       .size
