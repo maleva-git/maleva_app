@@ -3,6 +3,7 @@ import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:maleva/Transport/Fuel/FuelEntryView.dart';
+import 'package:maleva/features/transport/fuelentry/view/view/fuelentryview_tab.dart';
 
 import 'package:maleva/menu/menulist.dart';
 import 'package:maleva/core/models/model.dart';
@@ -12,15 +13,15 @@ import 'package:maleva/core/colors/colors.dart' as colour;
 part 'package:maleva/Transport/Fuel/mobileFuelEntry.dart';
 part 'package:maleva/Transport/Fuel/tabletFuelEntry.dart';
 
-class FuelEntry extends StatefulWidget {
+class OldFuelEntry extends StatefulWidget {
 
-  const FuelEntry({super.key});
+  const OldFuelEntry({super.key});
 
   @override
-  FuelEntryState createState() => FuelEntryState();
+  OldFuelEntryState createState() => OldFuelEntryState();
 }
 
-class FuelEntryState extends State<FuelEntry> with TickerProviderStateMixin {
+class OldFuelEntryState extends State<OldFuelEntry> with TickerProviderStateMixin {
   bool progress = false;
   late MenuMasterModel menuControl;
   String UserName = objfun.storagenew.getString('Username') ?? "";

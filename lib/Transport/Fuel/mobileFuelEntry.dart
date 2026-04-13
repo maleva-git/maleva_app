@@ -1,7 +1,7 @@
 part of 'package:maleva/Transport/Fuel/FuelEntry.dart';
 
 
-mobiledesign(FuelEntryState state, BuildContext context) {
+mobiledesign(OldFuelEntryState state, BuildContext context) {
   double width = MediaQuery
       .of(context)
       .size

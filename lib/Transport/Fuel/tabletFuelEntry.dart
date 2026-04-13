@@ -1,7 +1,7 @@
 part of 'package:maleva/Transport/Fuel/FuelEntry.dart';
 
 
-tabletdesign(FuelEntryState state, BuildContext context) {
+tabletdesign(OldFuelEntryState state, BuildContext context) {
   double width = MediaQuery
       .of(context)
       .size
@@ -77,7 +77,7 @@ tabletdesign(FuelEntryState state, BuildContext context) {
                   onPressed: () {
                     Navigator.push(
                       context,
-                      MaterialPageRoute(builder: (context) => const FuelEntryView()),
+                      MaterialPageRoute(builder: (context) => const OldFuelEntryView()),
                     ).then((dynamic value) {
 
                     });

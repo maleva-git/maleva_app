@@ -12,15 +12,15 @@ part 'package:maleva/Transport/Fuel/mobileFuelEntryView.dart';
 part 'package:maleva/Transport/Fuel/tabletFuelEntryView.dart';
 
 
-class FuelEntryView extends StatefulWidget {
+class OldFuelEntryView extends StatefulWidget {
 
-  const FuelEntryView({super.key});
+  const OldFuelEntryView({super.key});
 
   @override
-  FuelEntryViewState createState() => FuelEntryViewState();
+  OldFuelEntryViewState createState() => OldFuelEntryViewState();
 }
 
-class FuelEntryViewState extends State<FuelEntryView> with TickerProviderStateMixin {
+class OldFuelEntryViewState extends State<OldFuelEntryView> with TickerProviderStateMixin {
   bool progress = false;
   late MenuMasterModel menuControl;
   String UserName = objfun.storagenew.getString('Username') ?? "";

@@ -46,6 +46,10 @@ import '../features/transaction/prealertview/view/prealertview_tab.dart';
 import '../features/transaction/salesorder/view/view/salesorderview_tab.dart';
 import '../../../../../../../core/colors/colors.dart' as colour;
 import '../features/transaction/vesselplanning/view/vesselplanning_tab.dart';
+import '../features/transport/fuelentry/add/bloc/fuelentry_bloc.dart';
+import '../features/transport/fuelentry/add/bloc/fuelentry_event.dart';
+import '../features/transport/fuelentry/add/view/fuelentry_tab.dart';
+
 import '../features/transport/licenseupdate/bloc/licenseupdate_bloc.dart';
 import '../features/transport/licenseupdate/bloc/licenseupdate_event.dart';
 import '../features/transport/licenseupdate/view/licenseupdate_tab.dart';
@@ -784,6 +788,22 @@ class _MenuTileState extends State<_MenuTile>
           break;
 
 
+        case "Fuel Entry":
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => BlocProvider(
+                create: (context) => FuelEntryBloc()..add(FuelEntryStarted()),
+                child: const FuelEntry(),
+              ),
+            ),
+          );
+          break;
+ /*
+        case "Fuel Entry":
+          Navigator.push(ctx, _r(const FuelEntry()));           break;*/
+
+
         case "EnquiryTR Master":
           Navigator.push(ctx, _r(const EnquiryTRView()));       break;
 
@@ -795,8 +815,7 @@ class _MenuTileState extends State<_MenuTile>
           Navigator.push(ctx, _r(const UpdateRTI()));           break;
         case "Forwarding SMK Update":
           Navigator.push(ctx, _r(const FWSmkUpdate()));         break;
-        case "Fuel Entry":
-          Navigator.push(ctx, _r(const FuelEntry()));           break;
+
         case "Vessel Planning":
           Navigator.push(ctx, _r(const VesselPlanningView()));  break;
         case "Logout":
