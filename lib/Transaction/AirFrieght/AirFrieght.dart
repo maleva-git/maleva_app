@@ -15,16 +15,16 @@ import '../SaleOrderDetails.dart';
 part 'package:maleva/Transaction/AirFrieght/mobileAirFrieght.dart';
 part 'package:maleva/Transaction/AirFrieght/tabletAirFrieght.dart';
 
-class AirFrieghtUpdate extends StatefulWidget {
+class OldAirFrieghtUpdate extends StatefulWidget {
   final String? JobNo;
   final int? JobId;
-  const AirFrieghtUpdate({super.key, this.JobNo, this.JobId});
+  const OldAirFrieghtUpdate({super.key, this.JobNo, this.JobId});
 
   @override
-  AirFrieghtUpdateState createState() => AirFrieghtUpdateState();
+  OldAirFrieghtUpdateState createState() => OldAirFrieghtUpdateState();
 }
 
-class AirFrieghtUpdateState extends State<AirFrieghtUpdate> {
+class OldAirFrieghtUpdateState extends State<OldAirFrieghtUpdate> {
   bool progress = false;
   late MenuMasterModel menuControl;
   String UserName = objfun.storagenew.getString('Username') ?? "";

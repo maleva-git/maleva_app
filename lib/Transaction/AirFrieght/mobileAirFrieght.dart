@@ -1,7 +1,7 @@
 part of 'package:maleva/Transaction/AirFrieght/AirFrieght.dart';
 
 
-mobiledesign(AirFrieghtUpdateState state, BuildContext context) {
+mobiledesign(OldAirFrieghtUpdateState state, BuildContext context) {
   double width = MediaQuery.of(context).size.width;
   double height = MediaQuery.of(context).size.height;
 

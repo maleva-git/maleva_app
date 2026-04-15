@@ -28,6 +28,9 @@ import '../Transport/LicenseUpdate.dart';
 import '../Transport/Maintenance.dart';
 import '../Transport/RTI/UpdateRTIDetails.dart';
 import '../core/theme/tokens.dart';
+import '../features/airfreight/updateairfreight/bloc/airfreight_bloc.dart';
+import '../features/airfreight/updateairfreight/bloc/airfreight_event.dart';
+import '../features/airfreight/updateairfreight/view/airfreight_tab.dart';
 import '../features/boarding/updateboardingdetails/bloc/updateboardingdetails_bloc.dart';
 import '../features/boarding/updateboardingdetails/bloc/updateboardingdetails_event.dart';
 import '../features/boarding/updateboardingdetails/view/updateboardingdetails_tab.dart';
@@ -691,8 +694,21 @@ class _MenuTileState extends State<_MenuTile>
             ),
           );
           break;
+
         case "Update Air Frieght":
-          Navigator.push(ctx, _r(const AirFrieghtUpdate()));    break;
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => BlocProvider(
+                create: (context) => AirFreightBloc()..add(AirFreightStarted()),
+                child: const AirFrieghtUpdate(),
+              ),
+            ),
+          );
+          break;
+
+        // case "Update Air Frieght":
+        //   Navigator.push(ctx, _r(const AirFrieghtUpdate()));    break;
         case "JobStatus Update":
           Navigator.push(ctx, _r(const JobStatusUpdate()));     break;
         case "Forwarding Update":

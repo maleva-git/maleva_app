@@ -81,7 +81,7 @@ tabletdesign(StockinentryState state, BuildContext context) {
                   onPressed: () {
                     if(objfun.storagenew.getString('RulesType') == "AIR FRIEGHT"){
                       Navigator.push(context, MaterialPageRoute(builder: (
-                          context) => AirFrieghtUpdate(JobNo:state.widget.JobNo ,JobId: state.widget.JobId,)));
+                          context) => OldAirFrieghtUpdate(JobNo:state.widget.JobNo ,JobId: state.widget.JobId,)));
                     }
                     // else if(objfun.storagenew.getString('RulesType') == "BOARDING" || objfun.storagenew.getString('RulesType') == "FORWARDING" || objfun.storagenew.getString('RulesType') == "OPERATION")
                     // {
