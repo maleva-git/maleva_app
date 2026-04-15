@@ -20,14 +20,14 @@ import '../../SummonEntry/SummonViewPage.dart';
 part 'package:maleva/DashBoard/Driver/mobileDriverDashboard.dart';
 part 'package:maleva/DashBoard/Driver/tabletDriverDashboard.dart';
 
-class DriverDashboard extends StatefulWidget {
-  const DriverDashboard({super.key});
+class OldDriverDashboard extends StatefulWidget {
+  const OldDriverDashboard({super.key});
 
   @override
-  DriverDashboardState createState() => DriverDashboardState();
+  OldDriverDashboardState createState() => OldDriverDashboardState();
 }
 
-class DriverDashboardState extends State<DriverDashboard> with TickerProviderStateMixin {
+class OldDriverDashboardState extends State<OldDriverDashboard> with TickerProviderStateMixin {
   bool progress = false;
   late MenuMasterModel menuControl;
   bool Is6Months = true;

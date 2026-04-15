@@ -1,6 +1,6 @@
 part of 'package:maleva/DashBoard/Driver/DriverDashboard.dart';
 
-tabletdesign(DriverDashboardState state, BuildContext context) {
+tabletdesign(OldDriverDashboardState state, BuildContext context) {
   double width = MediaQuery.of(context).size.width;
   double height = MediaQuery.of(context).size.height;
 

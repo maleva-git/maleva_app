@@ -24,6 +24,8 @@ import 'package:maleva/core/network/OnlineApi.dart' as OnlineApi;
 import '../features/dashboard/admin_dashboard/bloc/admin_tab_bloc.dart';
 import '../features/dashboard/admin_dashboard/view/admin_dashboard.dart';
 import '../features/dashboard/airfrieght_dashboard/view/airfrieght_dashboard.dart';
+import '../features/dashboard/driver_dashboard/bloc/driver_bloc.dart';
+import '../features/dashboard/driver_dashboard/view/driver_dashboard.dart';
 import '../features/dashboard/operationadmin_dashboard/bloc/operationadmin_dashboard_bloc.dart';
 import '../features/dashboard/operationadmin_dashboard/view/operationadmin_dashboard.dart';
 import '../features/dashboard/subadmin_dashboard/bloc/subadmin_dashboard_bloc.dart';
@@ -127,7 +129,19 @@ class _SplashScreenState extends State<SplashScreen>
 
         if(objfun.DriverLogin == 1)
         {
-          Navigator.push(context, MaterialPageRoute(builder: (context) => const DriverDashboard()));
+          // Navigator.push(context, MaterialPageRoute(builder: (context) => const DriverDashboard()));
+
+
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+              builder: (_) => BlocProvider(
+                create: (_) => DriverDashboardBloc(),
+                child: const DriverDashboard(),
+              ),
+            ),
+          );
+
         }
         else if(objfun.storagenew.getString('RulesType') == "ADMIN")
         {

@@ -47,9 +47,9 @@ class SalesDashboardView extends StatelessWidget {
       title: Text(
         'Sales',
         style: GoogleFonts.lato(
-          color: colour.topAppBarBgColor,
-          fontWeight: FontWeight.bold,
-          fontSize: isTablet ? 20 : objfun.FontLarge,
+          color: colour.topAppBarColor,
+          fontWeight: FontWeight.w900,
+          fontSize: isTablet ? 24 : 22,
         ),
       ),
       iconTheme: const IconThemeData(color: colour.topAppBarColor),

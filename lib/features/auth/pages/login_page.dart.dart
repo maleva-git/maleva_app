@@ -2,19 +2,17 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:maleva/DashBoard/Admin2/Admin2Dashboard.dart';
 import 'package:maleva/core/utils/clsfunction.dart' as objfun;
 import 'package:maleva/core/colors/colors.dart' as colour;
 import 'package:maleva/DashBoard/User/UserDashboard.dart';
 import 'package:maleva/core/network/OnlineApi.dart' as OnlineApi;
-import '../../../DashBoard/CustomerService/CustDashboard.dart';
-import '../../../DashBoard/Driver/DriverDashboard.dart';
-import '../../../DashBoard/OperationAdmin/OperationAdminDashboard.dart';
 import '../../../core/theme/tokens.dart';
 import '../../dashboard/admin_dashboard/bloc/admin_tab_bloc.dart';
 import '../../dashboard/admin_dashboard/view/admin_dashboard.dart';
 import '../../dashboard/airfrieght_dashboard/bloc/airfreight_bloc.dart';
 import '../../dashboard/airfrieght_dashboard/view/airfrieght_dashboard.dart';
+import '../../dashboard/driver_dashboard/bloc/driver_bloc.dart';
+import '../../dashboard/driver_dashboard/view/driver_dashboard.dart';
 import '../../dashboard/operationadmin_dashboard/bloc/operationadmin_dashboard_bloc.dart';
 import '../../dashboard/operationadmin_dashboard/view/operationadmin_dashboard.dart';
 import '../../dashboard/subadmin_dashboard/bloc/subadmin_dashboard_bloc.dart';
@@ -57,10 +55,20 @@ class Appuserloginmobile extends StatelessWidget {
       BuildContext context, LoginState state) {
 
     if (state.driverLogin) {
+      // Navigator.pushReplacement(
+      //   context,
+      //   MaterialPageRoute(
+      //       builder: (_) => const DriverDashboard()),
+      // );
+
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(
-            builder: (_) => const DriverDashboard()),
+          builder: (_) => BlocProvider(
+            create: (_) => DriverDashboardBloc(),
+            child: const DriverDashboard(),
+          ),
+        ),
       );
       return;
     }

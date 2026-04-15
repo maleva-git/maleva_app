@@ -24,6 +24,7 @@ import '../../MasterSearch/Driver.dart';
 import '../../MasterSearch/Truck.dart';
 
 import '../../features/dashboard/admin_dashboard/view/admin_dashboard.dart';
+import '../../features/dashboard/driver_dashboard/view/driver_dashboard.dart';
 import '../../features/dashboard/operationadmin_dashboard/view/operationadmin_dashboard.dart';
 import 'UpdateRTIStatus.dart';
 part 'package:maleva/Transport/RTI/mobileUpdateRTIDetails.dart';

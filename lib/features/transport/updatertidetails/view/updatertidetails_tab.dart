@@ -17,6 +17,7 @@ import 'package:maleva/DashBoard/Forwarding/ForwardingDashboard.dart';
 import 'package:maleva/DashBoard/TransportDB/TransportDashboard.dart';
 import 'package:maleva/DashBoard/User/UserDashboard.dart';
 import 'package:maleva/features/dashboard/admin_dashboard/view/admin_dashboard.dart';
+import '../../../dashboard/driver_dashboard/view/driver_dashboard.dart';
 import '../../../dashboard/operationadmin_dashboard/view/operationadmin_dashboard.dart';
 import '../bloc/updatertidetails_bloc.dart';
 import '../bloc/updatertidetails_event.dart';
