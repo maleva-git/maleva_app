@@ -5,7 +5,6 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:maleva/menu/menulist.dart';
 import 'package:maleva/core/models/model.dart';
-import 'package:maleva/core/network/OnlineApi.dart' as OnlineApi;
 import 'package:maleva/core/utils/clsfunction.dart' as objfun;
 import 'package:maleva/core/colors/colors.dart' as colour;
 
@@ -32,7 +31,6 @@ class PayableDashbordState extends State<PayableDashbord> {
   List<TruckDetailsModel> TruckViewRecords = [];
   List<BillViewModel> BillorderViewRecords = [];
   List<PettyCashMasterModel> PettyCashRecords = [];
-
   List<FuelselectModel> fulerecord = [];
   DateTime? selectedFromDate;
   DateTime? selectedToDate;

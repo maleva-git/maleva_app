@@ -138,9 +138,9 @@ class MobileDashboard extends StatelessWidget {
           fontSize: isTablet ? 14 : 13,   // ← இங்கயும் மாத்து
         ),
         tabs: [
-
-          _tab('VSL',             isTablet),
           _tab('Maintenance',     isTablet),
+          _tab('TodayPickup',             isTablet),
+
           _tab('Truck',           isTablet),
           _tab('Driver',          isTablet),
           _tab('SpeedingReport',  isTablet),

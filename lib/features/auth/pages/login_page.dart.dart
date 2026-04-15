@@ -98,6 +98,10 @@ class Appuserloginmobile extends StatelessWidget {
         );
 
         break;
+    // else if( objfun.storagenew.getString('RulesType') == "ACCOUNTS")
+    // {
+    // Navigator.push(context, MaterialPageRoute(builder: (context) => const PayableDashbord()));
+    // }
 
       case "ADMIN2":
         Navigator.pushReplacement(
