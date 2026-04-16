@@ -10,6 +10,7 @@ import '../../../../core/utils/clsfunction.dart' as objfun;
 import '../../../../menu/menulist.dart';
 import '../../../common_updates/blocs/sales/sales_bloc.dart';
 import '../../../common_updates/blocs/sales/sales_event.dart';
+import '../../admin_dashboard/tabs/drivermaintenance/view/drivermaintenance_tab.dart';
 import '../../admin_dashboard/tabs/maintenance/view/maintenance_tab.dart';
 import '../../admin_dashboard/tabs/pdo/view/pdo_tab.dart';
 import '../../admin_dashboard/tabs/summonentry/view/summonentry_tab.dart';
@@ -158,7 +159,7 @@ class DriverDashboardView extends StatelessWidget {
         children: [
 
           const TransportReportPage(),
-          const MaintenanceDashboardWidget(),
+          const TruckMaintenanceDashboardWidget(),
           const SummonEntryPage(),
           PDOViewPage(
             fromDate: DateFormat('yyyy-MM-dd')
