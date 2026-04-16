@@ -12,6 +12,7 @@ import '../../../common_updates/blocs/sales/sales_bloc.dart';
 import '../../../common_updates/blocs/sales/sales_event.dart';
 import '../../admin_dashboard/tabs/driverlicense/view/driverlicense_tab.dart';
 import '../../admin_dashboard/tabs/drivermaintenance/view/drivermaintenance_tab.dart';
+import '../../admin_dashboard/tabs/driversalary/view/driversalary_tab.dart';
 import '../../admin_dashboard/tabs/maintenance/view/maintenance_tab.dart';
 import '../../admin_dashboard/tabs/pdo/view/pdo_tab.dart';
 import '../../admin_dashboard/tabs/summonentry/view/summonentry_tab.dart';
@@ -123,9 +124,10 @@ class DriverDashboardView extends StatelessWidget {
 
           _tab('TRANSPORT', isTablet),
           _tab('Maintenance', isTablet),
-          _tab('SummonEntry',     isTablet),
-          _tab('TruckLicense',     isTablet),
-          _tab('PDO',             isTablet),
+          _tab('SummonEntry',  isTablet),
+          _tab('TruckLicense',   isTablet),
+          _tab('Salary',   isTablet),
+          _tab('PDO',       isTablet),
 
         ],
       ),
@@ -164,6 +166,7 @@ class DriverDashboardView extends StatelessWidget {
           const TruckMaintenanceDashboardWidget(),
           const SummonEntryPage(),
           const DriverLicenseExpiryWidget(),
+          const DriverSalaryWidget(),
           PDOViewPage(
             fromDate: DateFormat('yyyy-MM-dd')
                 .format(DateTime.now().subtract(const Duration(days: 30))),

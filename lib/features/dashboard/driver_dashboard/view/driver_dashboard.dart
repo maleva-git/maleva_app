@@ -5,6 +5,8 @@ import '../../admin_dashboard/tabs/driverlicense/bloc/driverlicense_bloc.dart';
 import '../../admin_dashboard/tabs/driverlicense/view/driverlicense_tab.dart';
 import '../../admin_dashboard/tabs/drivermaintenance/bloc/drivermaintenance_bloc.dart';
 import '../../admin_dashboard/tabs/drivermaintenance/view/drivermaintenance_tab.dart';
+import '../../admin_dashboard/tabs/driversalary/bloc/driversalary_bloc.dart';
+import '../../admin_dashboard/tabs/driversalary/view/driversalary_tab.dart';
 import '../../admin_dashboard/tabs/pdo/bloc/pdo_bloc.dart';
 import '../../admin_dashboard/tabs/pdo/view/pdo_tab.dart';
 import '../../admin_dashboard/tabs/summonentry/bloc/summonentry_bloc.dart';
@@ -27,7 +29,7 @@ class _DriverDashboardState extends State<DriverDashboard> with SingleTickerProv
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 5, vsync: this);
+    _tabController = TabController(length: 6, vsync: this);
     _tabController.addListener(_onTabChanged);
   }
   void _onTabChanged(){
@@ -60,6 +62,10 @@ class _DriverDashboardState extends State<DriverDashboard> with SingleTickerProv
                 BlocProvider(
                   create: (context) => DriverLicenseExpiryBloc(),
                   child: const DriverLicenseExpiryWidget(),
+                ),
+                BlocProvider(
+                  create: (context) => DriverSalaryBloc(),
+                  child: const DriverSalaryWidget(),
                 ),
 
                 BlocProvider(
