@@ -1,10 +1,10 @@
 import 'package:flutter/Material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
+import '../../admin_dashboard/tabs/driverlicense/bloc/driverlicense_bloc.dart';
+import '../../admin_dashboard/tabs/driverlicense/view/driverlicense_tab.dart';
 import '../../admin_dashboard/tabs/drivermaintenance/bloc/drivermaintenance_bloc.dart';
 import '../../admin_dashboard/tabs/drivermaintenance/view/drivermaintenance_tab.dart';
-import '../../admin_dashboard/tabs/maintenance/bloc/maintenance_bloc.dart';
-import '../../admin_dashboard/tabs/maintenance/view/maintenance_tab.dart';
 import '../../admin_dashboard/tabs/pdo/bloc/pdo_bloc.dart';
 import '../../admin_dashboard/tabs/pdo/view/pdo_tab.dart';
 import '../../admin_dashboard/tabs/summonentry/bloc/summonentry_bloc.dart';
@@ -27,7 +27,7 @@ class _DriverDashboardState extends State<DriverDashboard> with SingleTickerProv
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 4, vsync: this);
+    _tabController = TabController(length: 5, vsync: this);
     _tabController.addListener(_onTabChanged);
   }
   void _onTabChanged(){
@@ -56,6 +56,10 @@ class _DriverDashboardState extends State<DriverDashboard> with SingleTickerProv
                 BlocProvider(
                   create: (context) => TruckMaintDashBloc(),
                   child: const TruckMaintenanceDashboardWidget(),
+                ),
+                BlocProvider(
+                  create: (context) => DriverLicenseExpiryBloc(),
+                  child: const DriverLicenseExpiryWidget(),
                 ),
 
                 BlocProvider(
