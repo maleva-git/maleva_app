@@ -1,32 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:maleva/GoogleReview/ReviewEntryScreen.dart';
-import 'package:maleva/Transport/Fuel/FuelEntry.dart';
 import 'package:maleva/core/utils/clsfunction.dart' as objfun;
 import 'package:maleva/core/models/model.dart';
 import 'package:maleva/features/operations/forwarding/bloc/forwarding_event.dart';
 import 'package:maleva/features/transaction/viewsaleorder/view/viewsaleorder_tab.dart';
-import '../Boarding/BoardingStatusUpdate.dart';
-import '../MailInbox/MailInboxView.dart';
 import '../Operation/FWBreakSealUpdate.dart';
-import '../Operation/FWSmkUpdate.dart';
-import '../Operation/FWUpdate.dart';
-import '../Operation/ForwardingSalary/ForwardingSalaryUpdate.dart';
-import '../PreAlertReport/PreAlertReport.dart';
-import '../Transaction/AirFrieght/AirFrieght.dart';
-import '../Transaction/Enquiry/EnquiryView.dart';
-import '../Transaction/EnquiryTR/EnquiryTRView.dart';
-import '../Transaction/GetJobNoPage.dart';
 import '../Transaction/JobStatus/JobStatusUpdate.dart';
 import '../Transaction/SpotSaleOrder/SpotSaleOrder.dart';
 import '../Transaction/Stock/StockInEntry.dart';
 import '../Transaction/Stock/StockTransferUpdate.dart';
 import '../Transaction/Stock/StockUpdate.dart';
-import '../Transaction/VesselPlanning/VesselPlanningView.dart';
-import '../Transport/LicenseUpdate.dart';
-import '../Transport/Maintenance.dart';
-import '../Transport/RTI/UpdateRTIDetails.dart';
 import '../core/theme/tokens.dart';
 import '../features/airfreight/updateairfreight/bloc/airfreight_bloc.dart';
 import '../features/airfreight/updateairfreight/bloc/airfreight_event.dart';
@@ -37,6 +21,9 @@ import '../features/boarding/updateboardingdetails/view/updateboardingdetails_ta
 import '../features/dashboard/admin_dashboard/tabs/emailinbox/view/emailinbox_tab.dart';
 import '../features/dashboard/admin_dashboard/tabs/enquiry/view/view/enquiry_tab.dart';
 import '../features/dashboard/admin_dashboard/tabs/googlereview/view/googlereview_tab.dart';
+import '../features/dashboard/admin_dashboard/tabs/stockinentry/bloc/stock_in_entry_bloc.dart';
+import '../features/dashboard/admin_dashboard/tabs/stockinentry/bloc/stock_in_entry_event.dart';
+import '../features/dashboard/admin_dashboard/tabs/stockinentry/view/stock_in_entry_ui.dart';
 import '../features/operations/forwarding/bloc/forwarding_bloc.dart';
 import '../features/operations/forwarding/view/forwarding_tab.dart';
 import '../features/operations/forwardingsalary/bloc/forwardingsalary_bloc.dart';
@@ -52,7 +39,6 @@ import '../features/transaction/vesselplanning/view/vesselplanning_tab.dart';
 import '../features/transport/fuelentry/add/bloc/fuelentry_bloc.dart';
 import '../features/transport/fuelentry/add/bloc/fuelentry_event.dart';
 import '../features/transport/fuelentry/add/view/fuelentry_tab.dart';
-
 import '../features/transport/licenseupdate/bloc/licenseupdate_bloc.dart';
 import '../features/transport/licenseupdate/bloc/licenseupdate_event.dart';
 import '../features/transport/licenseupdate/view/licenseupdate_tab.dart';
@@ -750,9 +736,22 @@ class _MenuTileState extends State<_MenuTile>
           );
           break;
 
-
         case "Stock In Entry":
-          Navigator.push(ctx, _r(const Stockinentry()));        break;
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => BlocProvider(
+                create: (context) => StockInEntryBloc()..add(StockInEntryStarted()),
+                child: const StockInEntryPage(),
+              ),
+            ),
+          );
+          break;
+
+
+        // case "Stock In Entry":
+        //   Navigator.push(ctx, _r(const Stockinentry()));        break;
+
         case "Stock Update":
           Navigator.push(ctx, _r(const StockUpdate()));         break;
         case "Stock Transfer":

@@ -27,6 +27,7 @@ Future<void> backgroundHandler(RemoteMessage message) async {
 Future cleanTemporaryfiles() async {
   try {
     final dir = await getTemporaryDirectory();
+
     dir.deleteSync();
   }
   catch (e) {
@@ -37,8 +38,6 @@ Future<void> main() async {
   HttpOverrides.global = MyHttpOverrides();
   WidgetsBinding widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
   FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
-
-
 
   try {
      await Firebase.initializeApp(
@@ -138,7 +137,7 @@ class MyApp extends StatelessWidget {
         useMaterial3: false,
         primarySwatch: blue900Swatch,
         primaryColor: blue900Swatch,
-        primaryColorLight: blue900Swatch, //Cart items and bannel colors
+        primaryColorLight: blue900Swatch,
       ),
       home: const MyHomePage(),
       debugShowCheckedModeBanner: false,

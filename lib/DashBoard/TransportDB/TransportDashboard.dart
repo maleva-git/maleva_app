@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -13,7 +12,6 @@ import 'package:maleva/core/utils/clsfunction.dart' as objfun;
 import 'package:maleva/core/colors/colors.dart' as colour;
 import 'package:maleva/menu/menulist.dart';
 import 'package:maleva/core/models/model.dart';
-import 'package:salomon_bottom_bar/salomon_bottom_bar.dart';
 import 'package:maleva/core/network/OnlineApi.dart' as OnlineApi;
 import 'package:http/http.dart' as http;
 import '../../Transaction/SaleOrder/SalesOrderAdd.dart';
