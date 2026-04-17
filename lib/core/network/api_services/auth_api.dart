@@ -7,8 +7,33 @@ import 'package:maleva/core/utils/clsfunction.dart' as objfun;
 
 class AuthApi {
   AuthApi._();
-
+  static final AuthApi instance = AuthApi._();
   // ─── Login ────────────────────────────────────────────────────────────────
+  Future<dynamic> loginUserRaw({
+    required String username,
+    required String password,
+    required String oldUsername,
+    required int driverId,
+    required String fcmToken,
+  }) async {
+    final url = '${ApiConstants.apiLoginSuccess}$username'
+        '&Pwd=$password&olduserid=$oldUsername&DriverId=$driverId';
+
+    final result = await ApiClient.postRequest(
+      url,
+      null,
+      headers: {'Content-Type': 'application/json; charset=UTF-8', 'Token': fcmToken},
+      skipAuth: true,
+    );
+
+    if (result == null) throw Exception('No response from server');
+
+    if (result is! Map<String, dynamic>) {
+      throw Exception('Unexpected response format');
+    }
+
+    return result;
+  }
 
   static Future<bool> loginUser({
     required String username,

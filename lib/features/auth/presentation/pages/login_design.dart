@@ -1,8 +1,19 @@
-part of 'package:maleva/features/auth/pages/login_page.dart.dart';
+
 
 // ─── Design tokens ─────────────────────────────────────────────────────────────
 
 // ─── Responsive shell ─────────────────────────────────────────────────────────
+import 'package:flutter/Material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:google_fonts/google_fonts.dart';
+
+import '../../../../core/colors/colors.dart' as colour;
+import '../../../../core/theme/tokens.dart';
+import '../../../../core/utils/clsfunction.dart' as objfun;
+import '../bloc/auth_bloc.dart';
+import '../bloc/auth_event.dart';
+import '../bloc/auth_state.dart';
+
 class mobiledesign extends StatelessWidget {
   const mobiledesign({super.key});
 

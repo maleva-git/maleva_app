@@ -1,26 +1,23 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:maleva/core/utils/clsfunction.dart' as objfun;
 import 'package:maleva/core/colors/colors.dart' as colour;
-import 'package:maleva/DashBoard/User/UserDashboard.dart';
-import 'package:maleva/core/network/OnlineApi.dart' as OnlineApi;
-import '../../../core/theme/tokens.dart';
-import '../../dashboard/admin_dashboard/bloc/admin_tab_bloc.dart';
-import '../../dashboard/admin_dashboard/view/admin_dashboard.dart';
-import '../../dashboard/airfrieght_dashboard/bloc/airfreight_bloc.dart';
-import '../../dashboard/airfrieght_dashboard/view/airfrieght_dashboard.dart';
-import '../../dashboard/driver_dashboard/bloc/driver_bloc.dart';
-import '../../dashboard/driver_dashboard/view/driver_dashboard.dart';
-import '../../dashboard/operationadmin_dashboard/bloc/operationadmin_dashboard_bloc.dart';
-import '../../dashboard/operationadmin_dashboard/view/operationadmin_dashboard.dart';
-import '../../dashboard/subadmin_dashboard/bloc/subadmin_dashboard_bloc.dart';
-import '../../dashboard/subadmin_dashboard/view/subadmin_dashboard.dart';
+
+import '../../../dashboard/admin_dashboard/bloc/admin_tab_bloc.dart';
+import '../../../dashboard/admin_dashboard/view/admin_dashboard.dart';
+import '../../../dashboard/airfrieght_dashboard/bloc/airfreight_bloc.dart';
+import '../../../dashboard/airfrieght_dashboard/view/airfrieght_dashboard.dart';
+import '../../../dashboard/driver_dashboard/bloc/driver_bloc.dart';
+import '../../../dashboard/driver_dashboard/view/driver_dashboard.dart';
+import '../../../dashboard/operationadmin_dashboard/bloc/operationadmin_dashboard_bloc.dart';
+import '../../../dashboard/operationadmin_dashboard/view/operationadmin_dashboard.dart';
+import '../../../dashboard/subadmin_dashboard/bloc/subadmin_dashboard_bloc.dart';
+import '../../../dashboard/subadmin_dashboard/view/subadmin_dashboard.dart';
 import '../bloc/auth_bloc.dart';
-import '../bloc/auth_event.dart';
 import '../bloc/auth_state.dart';
-part 'package:maleva/features/auth/pages/login_design.dart';
+import 'login_design.dart';
+
 
 class Appuserloginmobile extends StatelessWidget {
   const Appuserloginmobile ({super.key});
@@ -177,8 +174,17 @@ class Appuserloginmobile extends StatelessWidget {
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(
-              builder: (_) => const Homemobile()),
+            builder: (_) => BlocProvider(
+              create: (_) => SubAdminTabBloc(),
+              child: const SubAdminDashboard(),
+            ),
+          ),
         );
+        // Navigator.pushReplacement(
+        //   context,
+        //   MaterialPageRoute(
+        //       builder: (_) => const Homemobile()),
+        // );
     }
   }
 }

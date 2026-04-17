@@ -31,9 +31,12 @@ import 'package:maleva/core/network/OnlineApi.dart' as OnlineApi;
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:path_provider/path_provider.dart';
 import '../../MasterSearch/Employee.dart';
-import '../../features/auth/bloc/auth_bloc.dart';
-import '../../features/auth/pages/login_page.dart.dart';
 import 'package:url_launcher/url_launcher.dart';
+
+import '../../features/auth/data/repositories/auth_repository.dart';
+import '../../features/auth/presentation/bloc/auth_bloc.dart';
+import '../../features/auth/presentation/pages/login_page.dart.dart';
+import '../network/api_services/auth_api.dart';
 String appversion="1.1.10+97";
 bool homepagecall = false;
 AssetImage logo = const AssetImage('assets/company/logo.png');
@@ -1700,7 +1703,11 @@ Future logout(context) async {
     context,
     MaterialPageRoute(
       builder: (_) => BlocProvider(
-        create: (_) => LoginBloc(),
+        create: (_) => LoginBloc(
+          authRepository: AuthRepository(
+            authApi: AuthApi.instance,
+          ),
+        ),
         child: const Appuserloginmobile(),
       ),
     ),

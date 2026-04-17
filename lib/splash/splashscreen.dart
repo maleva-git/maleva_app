@@ -14,13 +14,16 @@ import '../DashBoard/Maintenance/MaintenanceDashboard.dart';
 import '../DashBoard/Payable/PayableDashbord.dart';
 import '../DashBoard/Receivable/ReceivableDashboard.dart';
 import '../DashBoard/TransportDB/TransportDashboard.dart';
+import '../core/network/api_services/auth_api.dart';
 import '../core/network/api_services/firebase_service.dart';
 import '../core/theme/tokens.dart';
 import '../core/utils/app_preferences.dart';
-import '../features/auth/bloc/auth_bloc.dart';
-import '../features/auth/pages/login_page.dart.dart';
+
 import '../DashBoard/User/UserDashboard.dart';
 import 'package:maleva/core/network/OnlineApi.dart' as OnlineApi;
+import '../features/auth/data/repositories/auth_repository.dart';
+import '../features/auth/presentation/bloc/auth_bloc.dart';
+import '../features/auth/presentation/pages/login_page.dart.dart';
 import '../features/dashboard/admin_dashboard/bloc/admin_tab_bloc.dart';
 import '../features/dashboard/admin_dashboard/view/admin_dashboard.dart';
 import '../features/dashboard/airfrieght_dashboard/view/airfrieght_dashboard.dart';
@@ -227,7 +230,11 @@ class _SplashScreenState extends State<SplashScreen>
           context,
           MaterialPageRoute(
             builder: (_) => BlocProvider(
-              create: (_) => LoginBloc(),
+              create: (_) => LoginBloc(
+                authRepository: AuthRepository(
+                  authApi: AuthApi.instance,
+                ),
+              ),
               child: const Appuserloginmobile(),
             ),
           ),
@@ -238,7 +245,11 @@ class _SplashScreenState extends State<SplashScreen>
         context,
         MaterialPageRoute(
           builder: (_) => BlocProvider(
-            create: (_) => LoginBloc(),
+            create: (_) => LoginBloc(
+              authRepository: AuthRepository(
+                authApi: AuthApi.instance,
+              ),
+            ),
             child: const Appuserloginmobile(),
           ),
         ),

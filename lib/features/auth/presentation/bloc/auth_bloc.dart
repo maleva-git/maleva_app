@@ -1,12 +1,14 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:maleva/core/utils/clsfunction.dart' as objfun;
-import '../../../core/network/api_services/auth_api.dart';
+import '../../data/repositories/auth_repository.dart';
 import 'auth_event.dart';
 import 'auth_state.dart';
-import 'package:maleva/core/network/OnlineApi.dart' as OnlineApi;
 
 class LoginBloc extends Bloc<LoginEvent, LoginState> {
-  LoginBloc() : super(LoginState()) {
+  final AuthRepository authRepository;
+
+
+  LoginBloc({required this.authRepository}) : super(LoginState()) {
 
     on<UsernameChanged>((event, emit) {
       emit(state.copyWith(username: event.value));
@@ -45,16 +47,15 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
       }
     });
 
-    /// 🔥 REAL LOGIN LOGIC HERE
-    on<SubmitLogin>((event, emit) async {
 
+    on<SubmitLogin>((event, emit) async {
       emit(state.copyWith(loading: true, errorMessage: ""));
 
       String oldUserName = objfun.storagenew.getString('OldUsername') ?? state.username;
 
       try {
 
-        bool result = await AuthApi.loginUser(
+        bool result = await authRepository.loginUser(
           username: state.username,
           password: state.password,
           oldUsername: oldUserName,
@@ -75,14 +76,9 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
         emit(state.copyWith(
           loading: false,
           loginSuccess: false,
-
           errorMessage: error.toString().replaceAll("Exception: ", ""),
         ));
       }
     });
-
-
   }
 }
-
-
