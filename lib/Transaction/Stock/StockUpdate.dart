@@ -19,15 +19,15 @@ import '../SaleOrderDetails.dart';
 part 'package:maleva/Transaction/Stock/mobileStockUpdate.dart';
 part 'package:maleva/Transaction/Stock/tabletStockUpdate.dart';
 
-class StockUpdate extends StatefulWidget {
+class OldStockUpdate extends StatefulWidget {
 
-  const StockUpdate({super.key});
+  const OldStockUpdate({super.key});
 
   @override
-  StockUpdateState createState() => StockUpdateState();
+  OldStockUpdateState createState() => OldStockUpdateState();
 }
 //test
-class StockUpdateState extends State<StockUpdate> {
+class OldStockUpdateState extends State<OldStockUpdate> {
   bool progress = false;
   late MenuMasterModel menuControl;
   String UserName = objfun.storagenew.getString('Username') ?? "";
@@ -116,7 +116,7 @@ class StockUpdateState extends State<StockUpdate> {
 
           Navigator.pushReplacement(
             context,
-            MaterialPageRoute(builder: (context) => const StockUpdate()),
+            MaterialPageRoute(builder: (context) => const OldStockUpdate()),
           );
           setState(() {
             progress = true;

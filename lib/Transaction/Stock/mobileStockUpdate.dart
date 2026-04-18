@@ -1,7 +1,7 @@
 part of 'package:maleva/Transaction/Stock/StockUpdate.dart';
 
 
-mobiledesign(StockUpdateState state, BuildContext context) {
+mobiledesign(OldStockUpdateState state, BuildContext context) {
   double width = MediaQuery.of(context).size.width;
   double height = MediaQuery.of(context).size.height;
   return WillPopScope(

@@ -8,7 +8,6 @@ import 'package:maleva/features/transaction/viewsaleorder/view/viewsaleorder_tab
 import '../Operation/FWBreakSealUpdate.dart';
 import '../Transaction/JobStatus/JobStatusUpdate.dart';
 import '../Transaction/SpotSaleOrder/SpotSaleOrder.dart';
-import '../Transaction/Stock/StockInEntry.dart';
 import '../Transaction/Stock/StockTransferUpdate.dart';
 import '../Transaction/Stock/StockUpdate.dart';
 import '../core/theme/tokens.dart';
@@ -24,6 +23,9 @@ import '../features/dashboard/admin_dashboard/tabs/googlereview/view/googlerevie
 import '../features/dashboard/admin_dashboard/tabs/stockinentry/bloc/stock_in_entry_bloc.dart';
 import '../features/dashboard/admin_dashboard/tabs/stockinentry/bloc/stock_in_entry_event.dart';
 import '../features/dashboard/admin_dashboard/tabs/stockinentry/view/stock_in_entry_ui.dart';
+import '../features/dashboard/admin_dashboard/tabs/stockupdate/bloc/stock_update_bloc.dart';
+import '../features/dashboard/admin_dashboard/tabs/stockupdate/bloc/stock_update_event.dart';
+import '../features/dashboard/admin_dashboard/tabs/stockupdate/view/stock_update_tab.dart' show StockUpdate;
 import '../features/operations/forwarding/bloc/forwarding_bloc.dart';
 import '../features/operations/forwarding/view/forwarding_tab.dart';
 import '../features/operations/forwardingsalary/bloc/forwardingsalary_bloc.dart';
@@ -748,6 +750,18 @@ class _MenuTileState extends State<_MenuTile>
           );
           break;
 
+
+        case "Stock Update":
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => BlocProvider(
+                create: (context) => StockUpdateBloc()..add(StockUpdateStarted()),
+                child: const StockUpdate(),
+              ),
+            ),
+          );
+          break;
 
         // case "Stock In Entry":
         //   Navigator.push(ctx, _r(const Stockinentry()));        break;

@@ -521,7 +521,7 @@ mobiledesign(BoardingDashboardState state, BuildContext context) {
                                           Navigator.of(context).push(
                                               MaterialPageRoute(
                                                   builder: (context) =>
-                                                      StockUpdate()));
+                                                      OldStockUpdate()));
 
                                         },
                                         child: Card(
