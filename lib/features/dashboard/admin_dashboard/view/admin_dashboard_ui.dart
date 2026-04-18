@@ -16,6 +16,8 @@ import '../../../common_updates/blocs/truck/truck_event.dart';
 import '../bloc/admin_tab_bloc.dart';
 import '../bloc/admin_tab_state.dart';
 import '../tabs/ExpenseReport/view/expensereport_tab.dart';
+import '../tabs/adinvoice/presentation/widgets/ai_sales_forecast_chart.dart';
+import '../tabs/aienginehours/presentation/widgets/ai_maintenance_health_card.dart';
 import '../tabs/bocheck/view/bocheck_tab.dart';
 import '../tabs/driver/view/driverdetails_tab.dart';
 import '../tabs/emailinbox/view/emailinbox_tab.dart';
@@ -142,14 +144,14 @@ class MobileDashboard extends StatelessWidget {
         unselectedLabelColor: const Color(0xFF1A2E5A),
         labelStyle: TextStyle(
           fontWeight: FontWeight.w600,
-          fontSize: isTablet ? 14 : 13,   // ← இங்கயும் மாத்து
+          fontSize: isTablet ? 14 : 13,
         ),
         unselectedLabelStyle: TextStyle(
           fontWeight: FontWeight.w500,
-          fontSize: isTablet ? 14 : 13,   // ← இங்கயும் மாத்து
+          fontSize: isTablet ? 14 : 13,
         ),
         tabs: [
-          _tab('Invoice',         isTablet),  // ← isTablet pass பண்ணு
+          _tab('Invoice',         isTablet),
           _tab('ReceiptView',     isTablet),
           _tab('SO',              isTablet),
           _tab('FW',              isTablet),
@@ -174,6 +176,8 @@ class MobileDashboard extends StatelessWidget {
           _tab('InventoryReport', isTablet),
           _tab('PDO',             isTablet),
           _tab('RTI',             isTablet),
+          _tab('AIPredict',       isTablet),
+          _tab('AIMaintenance',   isTablet),
         ],
       ),
     );
@@ -241,6 +245,8 @@ class MobileDashboard extends StatelessWidget {
             toDate: DateFormat('yyyy-MM-dd').format(DateTime.now()),
           ),
           const RTIDetailsPage(),
+          const AISalesForecastWidget(),
+          const AIMaintenanceHealthCard(),
         ],
       ),
     );

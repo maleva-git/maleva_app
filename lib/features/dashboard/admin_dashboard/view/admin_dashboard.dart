@@ -10,6 +10,12 @@ import '../../../common_updates/blocs/truck/truck_bloc.dart';
 import '../bloc/admin_tab_bloc.dart';
 import '../bloc/admin_tab_event.dart';
 import '../tabs/ExpenseReport/view/expensereport_tab.dart';
+import '../tabs/adinvoice/bloc/forecast/forecast_bloc.dart';
+import '../tabs/adinvoice/data/repositories/sales_forecast_repository.dart';
+import '../tabs/adinvoice/presentation/widgets/ai_sales_forecast_chart.dart';
+import '../tabs/aienginehours/bloc/ai_maintenance_bloc.dart';
+import '../tabs/aienginehours/data/repositories/maintenance_ai_repository.dart';
+import '../tabs/aienginehours/presentation/widgets/ai_maintenance_health_card.dart';
 import '../tabs/bocheck/bloc/bocheck_bloc.dart';
 import '../tabs/bocheck/bloc/bocheck_event.dart';
 import '../tabs/bocheck/view/bocheck_tab.dart';
@@ -89,7 +95,7 @@ class _AdminDashboardState extends State<NewAdminDashboard> with SingleTickerPro
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 25, vsync: this);
+    _tabController = TabController(length: 27, vsync: this);
     _tabController.addListener(_onTabChanged);
 
   }
@@ -249,6 +255,18 @@ class _AdminDashboardState extends State<NewAdminDashboard> with SingleTickerPro
                 ..add(const LoadRTIDetailsEvent()),
               child: const RTIDetailsPage(),
             ),
+            BlocProvider(
+              create: (context) => ForecastBloc(
+                repository: SalesForecastRepository(),
+              )..add(LoadSalesForecast(0)), // 0 means default type
+              child: const AISalesForecastWidget(),
+            ),
+            BlocProvider(
+              create: (context) => AIMaintenanceBloc(
+                repository: MaintenanceAIRepository(),
+              )..add(LoadAIMaintenanceRisks()),
+              child: const AIMaintenanceHealthCard(),
+            )
           ],                                    // ← ] தான் close, } இல்ல
           child: Scaffold(
             body: MobileDashboard(

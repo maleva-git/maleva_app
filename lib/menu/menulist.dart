@@ -8,8 +8,6 @@ import 'package:maleva/features/transaction/viewsaleorder/view/viewsaleorder_tab
 import '../Operation/FWBreakSealUpdate.dart';
 import '../Transaction/JobStatus/JobStatusUpdate.dart';
 import '../Transaction/SpotSaleOrder/SpotSaleOrder.dart';
-import '../Transaction/Stock/StockTransferUpdate.dart';
-import '../Transaction/Stock/StockUpdate.dart';
 import '../core/theme/tokens.dart';
 import '../features/airfreight/updateairfreight/bloc/airfreight_bloc.dart';
 import '../features/airfreight/updateairfreight/bloc/airfreight_event.dart';
