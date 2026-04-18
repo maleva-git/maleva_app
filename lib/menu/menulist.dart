@@ -23,6 +23,8 @@ import '../features/dashboard/admin_dashboard/tabs/googlereview/view/googlerevie
 import '../features/dashboard/admin_dashboard/tabs/stockinentry/bloc/stock_in_entry_bloc.dart';
 import '../features/dashboard/admin_dashboard/tabs/stockinentry/bloc/stock_in_entry_event.dart';
 import '../features/dashboard/admin_dashboard/tabs/stockinentry/view/stock_in_entry_ui.dart';
+import '../features/dashboard/admin_dashboard/tabs/stocktransfer/bloc/stock_transfer_bloc.dart';
+import '../features/dashboard/admin_dashboard/tabs/stocktransfer/view/stcoktranfer_page.dart';
 import '../features/dashboard/admin_dashboard/tabs/stockupdate/bloc/stock_update_bloc.dart';
 import '../features/dashboard/admin_dashboard/tabs/stockupdate/bloc/stock_update_event.dart';
 import '../features/dashboard/admin_dashboard/tabs/stockupdate/view/stock_update_tab.dart' show StockUpdate;
@@ -763,13 +765,31 @@ class _MenuTileState extends State<_MenuTile>
           );
           break;
 
-        // case "Stock In Entry":
+
+        case "Stock Transfer":
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => BlocProvider(
+                create: (context) => StockTransferBloc()..add(StockTransferInitialized()),
+                child: const StockTransferPage(),
+              ),
+            ),
+          );
+          break;
+
+
+      // case "Stock In Entry":
         //   Navigator.push(ctx, _r(const Stockinentry()));        break;
 
-        case "Stock Update":
-          Navigator.push(ctx, _r(const StockUpdate()));         break;
-        case "Stock Transfer":
-          Navigator.push(ctx, _r(const StockTransferUpdate())); break;
+        // case "Stock Update":
+        //   Navigator.push(ctx, _r(const StockUpdate()));         break;
+
+
+/*        case "Stock Transfer":
+          Navigator.push(ctx, _r(const StockTransferUpdate())); break;*/
+
+
         case "Enquiry Master":
           Navigator.push(
             ctx,
