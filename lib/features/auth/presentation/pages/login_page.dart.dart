@@ -1,9 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:google_fonts/google_fonts.dart';
-import 'package:maleva/core/utils/clsfunction.dart' as objfun;
-import 'package:maleva/core/colors/colors.dart' as colour;
-
 import '../../../dashboard/admin_dashboard/bloc/admin_tab_bloc.dart';
 import '../../../dashboard/admin_dashboard/view/admin_dashboard.dart';
 import '../../../dashboard/airfrieght_dashboard/bloc/airfreight_bloc.dart';
@@ -12,6 +8,9 @@ import '../../../dashboard/driver_dashboard/bloc/driver_bloc.dart';
 import '../../../dashboard/driver_dashboard/view/driver_dashboard.dart';
 import '../../../dashboard/operationadmin_dashboard/bloc/operationadmin_dashboard_bloc.dart';
 import '../../../dashboard/operationadmin_dashboard/view/operationadmin_dashboard.dart';
+import '../../../dashboard/payable_dashboard/bloc/payable_dasboard_bloc.dart';
+import '../../../dashboard/payable_dashboard/view/payable_dashboard.dart';
+import '../../../dashboard/payable_dashboard/view/payable_dashboard_ui.dart';
 import '../../../dashboard/subadmin_dashboard/bloc/subadmin_dashboard_bloc.dart';
 import '../../../dashboard/subadmin_dashboard/view/subadmin_dashboard.dart';
 import '../bloc/auth_bloc.dart';
@@ -100,7 +99,17 @@ class Appuserloginmobile extends StatelessWidget {
     // Navigator.push(context, MaterialPageRoute(builder: (context) => const PayableDashbord()));
     // }
 
-
+      case "ACCOUNTS":
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (_) => BlocProvider(
+              create: (_) => PayableTabBloc(),
+              child: const PayableDashboard(),
+            ),
+          ),
+        );
+        break;
 
       case "ADMIN2":
         Navigator.pushReplacement(

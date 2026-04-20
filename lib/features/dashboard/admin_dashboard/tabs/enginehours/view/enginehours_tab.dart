@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:intl/intl.dart';
 import 'package:maleva/core/models/model.dart';
 import 'package:maleva/core/utils/clsfunction.dart' as objfun;
 import 'package:maleva/core/colors/colors.dart' as colour;
@@ -22,10 +23,54 @@ class EngineHoursPage extends StatelessWidget {
     );
   }
 }
+class _EngineHoursBody extends StatefulWidget {
+  const _EngineHoursBody();
+
+  @override
+  State<_EngineHoursBody> createState() => _EngineHoursBodyState();
+}
 
 // ── Body ──────────────────────────────────────────────────────────────────────
-class _EngineHoursBody extends StatelessWidget {
-  const _EngineHoursBody();
+class _EngineHoursBodyState extends State<_EngineHoursBody> {
+  DateTime _fromDate = DateTime(DateTime.now().year, DateTime.now().month, 1);
+  DateTime _toDate   = DateTime(DateTime.now().year, DateTime.now().month + 1, 0);
+
+  void _pickDate({required bool isFrom}) async {
+    final DateTime? picked = await showDatePicker(
+      context:     context,
+      initialDate: isFrom ? _fromDate : _toDate,
+      firstDate:   DateTime(2020),
+      lastDate:    DateTime(2100),
+      builder: (context, child) => Theme(
+        data: Theme.of(context).copyWith(
+          colorScheme: const ColorScheme.light(
+            primary:   AppTokens.brandGradientStart,
+            onPrimary: Colors.white,
+            surface:   Colors.white,
+          ),
+        ),
+        child: child!,
+      ),
+    );
+
+    if (picked == null) return;
+
+    setState(() {
+      if (isFrom) {
+        _fromDate = picked;
+        if (_toDate.isBefore(_fromDate)) _toDate = _fromDate;
+      } else {
+        _toDate = picked;
+        if (_fromDate.isAfter(_toDate)) _fromDate = _toDate;
+      }
+    });
+
+    if (mounted) {
+      context.read<EngineHoursBloc>().add(
+        LoadEngineHoursReport(fromDate: _fromDate, toDate: _toDate),
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -85,6 +130,16 @@ class _EngineHoursBody extends StatelessWidget {
                     ),
                     const SizedBox(height: 20),
                     _CountBadge(count: count),
+                    const SizedBox(height: 20),
+
+                    // ── Date filter — tablet left panel
+                    _DateFilterBar(
+                      fromDate:  _fromDate,
+                      toDate:    _toDate,
+                      isTablet:  true,
+                      onFromTap: () => _pickDate(isFrom: true),
+                      onToTap:   () => _pickDate(isFrom: false),
+                    ),
                   ],
                 );
               },
@@ -103,8 +158,7 @@ class _EngineHoursBody extends StatelessWidget {
                           color: AppTokens.brandGradientStart));
                 }
                 if (state is EngineHoursError) {
-                  return _ErrorState(
-                      message: state.message, isTablet: true);
+                  return _ErrorState(message: state.message, isTablet: true);
                 }
                 if (state is EngineHoursLoaded) {
                   if (state.engineHoursRecords.isEmpty) {
@@ -112,11 +166,10 @@ class _EngineHoursBody extends StatelessWidget {
                   }
                   return ListView.builder(
                     itemCount: state.engineHoursRecords.length,
-                    itemBuilder: (context, index) =>
-                        _EngineHoursCard(
-                          record:   state.engineHoursRecords[index],
-                          isTablet: true,
-                        ),
+                    itemBuilder: (context, index) => _EngineHoursCard(
+                      record:   state.engineHoursRecords[index],
+                      isTablet: true,
+                    ),
                   );
                 }
                 return const SizedBox.shrink();
@@ -142,6 +195,17 @@ class _EngineHoursBody extends StatelessWidget {
               color:      AppTokens.brandDark,
             )),
         const SizedBox(height: 10),
+
+        // ── Date filter — mobile top row
+        _DateFilterBar(
+          fromDate:  _fromDate,
+          toDate:    _toDate,
+          isTablet:  false,
+          onFromTap: () => _pickDate(isFrom: true),
+          onToTap:   () => _pickDate(isFrom: false),
+        ),
+        const SizedBox(height: 10),
+
         Expanded(
           child: BlocBuilder<EngineHoursBloc, EngineHoursState>(
             builder: (context, state) {
@@ -151,8 +215,7 @@ class _EngineHoursBody extends StatelessWidget {
                         color: AppTokens.brandGradientStart));
               }
               if (state is EngineHoursError) {
-                return _ErrorState(
-                    message: state.message, isTablet: false);
+                return _ErrorState(message: state.message, isTablet: false);
               }
               if (state is EngineHoursLoaded) {
                 if (state.engineHoursRecords.isEmpty) {
@@ -160,11 +223,10 @@ class _EngineHoursBody extends StatelessWidget {
                 }
                 return ListView.builder(
                   itemCount: state.engineHoursRecords.length,
-                  itemBuilder: (context, index) =>
-                      _EngineHoursCard(
-                        record:   state.engineHoursRecords[index],
-                        isTablet: false,
-                      ),
+                  itemBuilder: (context, index) => _EngineHoursCard(
+                    record:   state.engineHoursRecords[index],
+                    isTablet: false,
+                  ),
                 );
               }
               return const SizedBox.shrink();
@@ -175,6 +237,145 @@ class _EngineHoursBody extends StatelessWidget {
     );
   }
 }
+
+// ─── Date Filter Bar ──────────────────────────────────────────────────────────
+class _DateFilterBar extends StatelessWidget {
+  final DateTime     fromDate;
+  final DateTime     toDate;
+  final bool         isTablet;
+  final VoidCallback onFromTap;
+  final VoidCallback onToTap;
+
+  const _DateFilterBar({
+    required this.fromDate,
+    required this.toDate,
+    required this.isTablet,
+    required this.onFromTap,
+    required this.onToTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final fmt = DateFormat('dd MMM yyyy');
+
+    if (isTablet) {
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          _DateButton(
+            label:    'From',
+            value:    fmt.format(fromDate),
+            onTap:    onFromTap,
+            isTablet: isTablet,
+          ),
+          const SizedBox(height: 10),
+          _DateButton(
+            label:    'To',
+            value:    fmt.format(toDate),
+            onTap:    onToTap,
+            isTablet: isTablet,
+          ),
+        ],
+      );
+    }
+
+    return Row(children: [
+      Expanded(
+        child: _DateButton(
+          label:    'From',
+          value:    fmt.format(fromDate),
+          onTap:    onFromTap,
+          isTablet: isTablet,
+        ),
+      ),
+      const SizedBox(width: 10),
+      Expanded(
+        child: _DateButton(
+          label:    'To',
+          value:    fmt.format(toDate),
+          onTap:    onToTap,
+          isTablet: isTablet,
+        ),
+      ),
+    ]);
+  }
+}
+
+// ─── Date Button ──────────────────────────────────────────────────────────────
+class _DateButton extends StatelessWidget {
+  final String       label;
+  final String       value;
+  final VoidCallback onTap;
+  final bool         isTablet;
+
+  const _DateButton({
+    required this.label,
+    required this.value,
+    required this.onTap,
+    required this.isTablet,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: EdgeInsets.symmetric(
+          horizontal: isTablet ? 14 : 12,
+          vertical:   isTablet ? 12 : 10,
+        ),
+        decoration: BoxDecoration(
+          color:         colour.kWhite,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(
+              color: AppTokens.brandGradientStart.withOpacity(0.4),
+              width: 1.5),
+          boxShadow: [
+            BoxShadow(
+              color:      AppTokens.brandGradientStart.withOpacity(0.07),
+              blurRadius: 8,
+              offset:     const Offset(0, 3),
+            ),
+          ],
+        ),
+        child: Row(children: [
+          Icon(Icons.calendar_today_rounded,
+              size:  isTablet ? 16 : 14,
+              color: AppTokens.brandGradientStart),
+          const SizedBox(width: 8),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  label,
+                  style: GoogleFonts.lato(
+                    fontSize:      isTablet ? 11 : 10,
+                    color:         Colors.grey[500],
+                    fontWeight:    FontWeight.w600,
+                    letterSpacing: 0.5,
+                  ),
+                ),
+                Text(
+                  value,
+                  style: GoogleFonts.lato(
+                    fontSize:   isTablet ? 13 : 12,
+                    fontWeight: FontWeight.bold,
+                    color:      AppTokens.brandDark,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          Icon(Icons.arrow_drop_down_rounded,
+              color: AppTokens.brandGradientStart,
+              size:  isTablet ? 20 : 18),
+        ]),
+      ),
+    );
+  }
+}
+
 
 // ─── Count Badge ──────────────────────────────────────────────────────────────
 class _CountBadge extends StatelessWidget {

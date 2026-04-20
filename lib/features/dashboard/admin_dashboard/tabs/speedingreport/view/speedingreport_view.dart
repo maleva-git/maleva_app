@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:intl/intl.dart';
 import 'package:maleva/core/utils/clsfunction.dart' as objfun;
 import '../../../../../../core/models/model.dart';
 import '../../../../../../core/theme/tokens.dart';
@@ -21,13 +22,57 @@ class SpeedingScreen extends StatelessWidget {
   }
 }
 
-class _SpeedingBody extends StatelessWidget {
+class _SpeedingBody extends StatefulWidget {
   const _SpeedingBody();
+
+  @override
+  State<_SpeedingBody> createState() => _SpeedingBodyState();
+}
+
+class _SpeedingBodyState extends State<_SpeedingBody> {
+  DateTime _fromDate = DateTime(DateTime.now().year, DateTime.now().month, 1);
+  DateTime _toDate   = DateTime(DateTime.now().year, DateTime.now().month + 1, 0);
+
+  void _pickDate({required bool isFrom}) async {
+    final DateTime? picked = await showDatePicker(
+      context:     context,
+      initialDate: isFrom ? _fromDate : _toDate,
+      firstDate:   DateTime(2020),
+      lastDate:    DateTime(2100),
+      builder: (context, child) => Theme(
+        data: Theme.of(context).copyWith(
+          colorScheme: const ColorScheme.light(
+            primary:   AppTokens.brandGradientStart,
+            onPrimary: Colors.white,
+            surface:   Colors.white,
+          ),
+        ),
+        child: child!,
+      ),
+    );
+
+    if (picked == null) return;
+
+    setState(() {
+      if (isFrom) {
+        _fromDate = picked;
+        if (_toDate.isBefore(_fromDate)) _toDate = _fromDate;
+      } else {
+        _toDate = picked;
+        if (_fromDate.isAfter(_toDate)) _fromDate = _toDate;
+      }
+    });
+
+    if (mounted) {
+      context.read<SpeedingBloc>().add(
+        LoadSpeedingReport(fromDate: _fromDate, toDate: _toDate),
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     final isTablet = MediaQuery.of(context).size.width >= 600;
-
     return isTablet
         ? _buildTabletLayout(context)
         : _buildMobileLayout(context);
@@ -43,7 +88,7 @@ class _SpeedingBody extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
 
-          // ── LEFT (28%) — Title + Count badge
+          // ── LEFT (240px)
           SizedBox(
             width: 240,
             child: BlocBuilder<SpeedingBloc, SpeedingState>(
@@ -54,7 +99,6 @@ class _SpeedingBody extends StatelessWidget {
                 return Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // Title
                     Row(children: [
                       Container(
                         width: 4, height: 30,
@@ -67,9 +111,9 @@ class _SpeedingBody extends StatelessWidget {
                       Text(
                         "SPEEDING",
                         style: GoogleFonts.lato(
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
-                          color: AppTokens.brandDark,
+                          fontSize:      20,
+                          fontWeight:    FontWeight.bold,
+                          color:         AppTokens.brandDark,
                           letterSpacing: 1.2,
                         ),
                       ),
@@ -80,16 +124,24 @@ class _SpeedingBody extends StatelessWidget {
                       child: Text(
                         "Details",
                         style: GoogleFonts.lato(
-                          fontSize: 14,
-                          color: AppTokens.brandMid,
+                          fontSize:   14,
+                          color:      AppTokens.brandMid,
                           fontWeight: FontWeight.w500,
                         ),
                       ),
                     ),
                     const SizedBox(height: 20),
-
-                    // Count badge
                     _CountBadge(count: count),
+                    const SizedBox(height: 20),
+
+                    // ── Date filter — tablet left panel
+                    _DateFilterBar(
+                      fromDate:  _fromDate,
+                      toDate:    _toDate,
+                      isTablet:  true,
+                      onFromTap: () => _pickDate(isFrom: true),
+                      onToTap:   () => _pickDate(isFrom: false),
+                    ),
                   ],
                 );
               },
@@ -98,7 +150,7 @@ class _SpeedingBody extends StatelessWidget {
 
           const SizedBox(width: 16),
 
-          // ── RIGHT (72%) — List
+          // ── RIGHT — List
           Expanded(
             child: BlocBuilder<SpeedingBloc, SpeedingState>(
               builder: (context, state) {
@@ -108,28 +160,21 @@ class _SpeedingBody extends StatelessWidget {
                         color: AppTokens.brandGradientStart),
                   );
                 }
-
                 if (state is SpeedingError) {
-                  return _ErrorState(
-                      message: state.message, isTablet: true);
+                  return _ErrorState(message: state.message, isTablet: true);
                 }
-
                 if (state is SpeedingLoaded) {
                   if (state.speedingRecords.isEmpty) {
                     return _EmptyState(isTablet: true);
                   }
-
                   return ListView.builder(
                     itemCount: state.speedingRecords.length,
-                    itemBuilder: (context, index) {
-                      return _SpeedingCard(
-                        record:   state.speedingRecords[index],
-                        isTablet: true,
-                      );
-                    },
+                    itemBuilder: (context, index) => _SpeedingCard(
+                      record:   state.speedingRecords[index],
+                      isTablet: true,
+                    ),
                   );
                 }
-
                 return const SizedBox.shrink();
               },
             ),
@@ -146,54 +191,196 @@ class _SpeedingBody extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.all(10),
       child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-        Text(
-          "Speeding Details",
-          style: GoogleFonts.lato(
-            fontSize:   objfun.FontLarge,
-            fontWeight: FontWeight.bold,
-            color:      AppTokens.brandDark,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            "Speeding Details",
+            style: GoogleFonts.lato(
+              fontSize:   objfun.FontLarge,
+              fontWeight: FontWeight.bold,
+              color:      AppTokens.brandDark,
+            ),
           ),
-        ),
-        const SizedBox(height: 10),
+          const SizedBox(height: 10),
 
-        Expanded(
-          child: BlocBuilder<SpeedingBloc, SpeedingState>(
-            builder: (context, state) {
-              if (state is SpeedingLoading) {
-                return const Center(
-                  child: CircularProgressIndicator(
-                      color: AppTokens.brandGradientStart),
-                );
-              }
+          // ── Date filter — mobile top row
+          _DateFilterBar(
+            fromDate:  _fromDate,
+            toDate:    _toDate,
+            isTablet:  false,
+            onFromTap: () => _pickDate(isFrom: true),
+            onToTap:   () => _pickDate(isFrom: false),
+          ),
+          const SizedBox(height: 10),
 
-              if (state is SpeedingError) {
-                return _ErrorState(
-                    message: state.message, isTablet: false);
-              }
-
-              if (state is SpeedingLoaded) {
-                if (state.speedingRecords.isEmpty) {
-                  return _EmptyState(isTablet: false);
+          Expanded(
+            child: BlocBuilder<SpeedingBloc, SpeedingState>(
+              builder: (context, state) {
+                if (state is SpeedingLoading) {
+                  return const Center(
+                    child: CircularProgressIndicator(
+                        color: AppTokens.brandGradientStart),
+                  );
                 }
-
-                return ListView.builder(
-                  itemCount: state.speedingRecords.length,
-                  itemBuilder: (context, index) {
-                    return _SpeedingCard(
+                if (state is SpeedingError) {
+                  return _ErrorState(message: state.message, isTablet: false);
+                }
+                if (state is SpeedingLoaded) {
+                  if (state.speedingRecords.isEmpty) {
+                    return _EmptyState(isTablet: false);
+                  }
+                  return ListView.builder(
+                    itemCount: state.speedingRecords.length,
+                    itemBuilder: (context, index) => _SpeedingCard(
                       record:   state.speedingRecords[index],
                       isTablet: false,
-                    );
-                  },
-                );
-              }
-
-              return const SizedBox.shrink();
-            },
+                    ),
+                  );
+                }
+                return const SizedBox.shrink();
+              },
+            ),
           ),
+        ],
+      ),
+    );
+  }
+}
+
+// ─── Date Filter Bar ──────────────────────────────────────────────────────────
+class _DateFilterBar extends StatelessWidget {
+  final DateTime     fromDate;
+  final DateTime     toDate;
+  final bool         isTablet;
+  final VoidCallback onFromTap;
+  final VoidCallback onToTap;
+
+  const _DateFilterBar({
+    required this.fromDate,
+    required this.toDate,
+    required this.isTablet,
+    required this.onFromTap,
+    required this.onToTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final fmt = DateFormat('dd MMM yyyy');
+
+    if (isTablet) {
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          _DateButton(
+            label:    'From',
+            value:    fmt.format(fromDate),
+            onTap:    onFromTap,
+            isTablet: isTablet,
+          ),
+          const SizedBox(height: 10),
+          _DateButton(
+            label:    'To',
+            value:    fmt.format(toDate),
+            onTap:    onToTap,
+            isTablet: isTablet,
+          ),
+        ],
+      );
+    }
+
+    return Row(children: [
+      Expanded(
+        child: _DateButton(
+          label:    'From',
+          value:    fmt.format(fromDate),
+          onTap:    onFromTap,
+          isTablet: isTablet,
         ),
-      ]),
+      ),
+      const SizedBox(width: 10),
+      Expanded(
+        child: _DateButton(
+          label:    'To',
+          value:    fmt.format(toDate),
+          onTap:    onToTap,
+          isTablet: isTablet,
+        ),
+      ),
+    ]);
+  }
+}
+
+// ─── Date Button ──────────────────────────────────────────────────────────────
+class _DateButton extends StatelessWidget {
+  final String       label;
+  final String       value;
+  final VoidCallback onTap;
+  final bool         isTablet;
+
+  const _DateButton({
+    required this.label,
+    required this.value,
+    required this.onTap,
+    required this.isTablet,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: EdgeInsets.symmetric(
+          horizontal: isTablet ? 14 : 12,
+          vertical:   isTablet ? 12 : 10,
+        ),
+        decoration: BoxDecoration(
+          color:         colour.kWhite,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(
+              color: AppTokens.brandGradientStart.withOpacity(0.4),
+              width: 1.5),
+          boxShadow: [
+            BoxShadow(
+              color:      AppTokens.brandGradientStart.withOpacity(0.07),
+              blurRadius: 8,
+              offset:     const Offset(0, 3),
+            ),
+          ],
+        ),
+        child: Row(children: [
+          Icon(Icons.calendar_today_rounded,
+              size:  isTablet ? 16 : 14,
+              color: AppTokens.brandGradientStart),
+          const SizedBox(width: 8),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  label,
+                  style: GoogleFonts.lato(
+                    fontSize:      isTablet ? 11 : 10,
+                    color:         Colors.grey[500],
+                    fontWeight:    FontWeight.w600,
+                    letterSpacing: 0.5,
+                  ),
+                ),
+                Text(
+                  value,
+                  style: GoogleFonts.lato(
+                    fontSize:   isTablet ? 13 : 12,
+                    fontWeight: FontWeight.bold,
+                    color:      AppTokens.brandDark,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          Icon(Icons.arrow_drop_down_rounded,
+              color: AppTokens.brandGradientStart,
+              size:  isTablet ? 20 : 18),
+        ]),
+      ),
     );
   }
 }

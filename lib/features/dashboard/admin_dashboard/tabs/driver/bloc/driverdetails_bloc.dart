@@ -34,7 +34,7 @@ class DriverBloc extends Bloc<DriverEvent, DriverState> {
         objfun.apiSelectDriverDetails,
         master,
         header,
-        context, // context not needed in BLoC
+        context,
       );
 
       if (resultData != null && resultData != "" && resultData.length != 0) {

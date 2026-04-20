@@ -8,8 +8,6 @@ import 'package:maleva/core/utils/clsfunction.dart' as objfun;
 import 'fuelfillings_event.dart';
 import 'fuelfillings_state.dart';
 
-
-
 class FuelFillingBloc extends Bloc<FuelFillingEvent, FuelFillingState> {
   final BuildContext context;
 
@@ -24,17 +22,13 @@ class FuelFillingBloc extends Bloc<FuelFillingEvent, FuelFillingState> {
     emit(FuelFillingLoading());
 
     try {
-      final DateTime today = DateTime.now();
-      final DateTime startOfMonth = DateTime(today.year, today.month, 1);
-      final DateTime endOfMonth = DateTime(today.year, today.month + 1, 0);
-
-      final String fromDate = DateFormat('MM/dd/yyyy').format(startOfMonth);
-      final String toDate = DateFormat('MM/dd/yyyy').format(endOfMonth);
+      final String fromDate = DateFormat('MM/dd/yyyy').format(event.fromDate);
+      final String toDate   = DateFormat('MM/dd/yyyy').format(event.toDate);
 
       final Map<String, dynamic> requestBody = {
-        'Todate': toDate,
+        'Todate':   toDate,
         'Fromdate': fromDate,
-        'Comid': objfun.Comid,
+        'Comid':    objfun.Comid,
       };
 
       final Map<String, String> headers = {

@@ -19,10 +19,31 @@ class DriverDetailsScreen extends StatelessWidget {
     );
   }
 }
-
-class DriverDetailsView extends StatelessWidget {
+// ── View ──────────────────────────────────────────────────────────────────────
+class DriverDetailsView extends StatefulWidget {
   const DriverDetailsView({super.key});
 
+  @override
+  State<DriverDetailsView> createState() => _DriverDetailsViewState();
+}
+
+class _DriverDetailsViewState extends State<DriverDetailsView> {
+  final TextEditingController _searchController = TextEditingController();
+  String _searchQuery = '';
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
+  // Filter helper
+  List<dynamic> _filtered(List<dynamic> all) {
+    if (_searchQuery.isEmpty) return all;
+    final q = _searchQuery.toLowerCase();
+    return all
+        .where((d) =>
+        (d.DriverName ?? '').toLowerCase().contains(q))
+        .toList();
+  }
   @override
   Widget build(BuildContext context) {
     final isTablet = MediaQuery.of(context).size.width >= 600;
@@ -37,30 +58,24 @@ class DriverDetailsView extends StatelessWidget {
     );
   }
 
-  // ══════════════════════════════════════════════════════
-  // TABLET — Two Column
-  // ══════════════════════════════════════════════════════
   Widget _buildTabletLayout(BuildContext context) {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
 
-        // ── LEFT (30%) — Header + Count Badge
+        // ── LEFT (260px)
         SizedBox(
           width: 260,
           child: Column(
             children: [
-              // Gradient header — full left panel
               _GradientHeader(isTablet: true),
               const SizedBox(height: 20),
-
-              // Count badge
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16),
                 child: BlocBuilder<DriverBloc, DriverState>(
                   builder: (context, state) {
                     final count = state is DriverLoaded
-                        ? state.driverData.length
+                        ? _filtered(state.driverData).length
                         : 0;
                     return _CountBadge(count: count);
                   },
@@ -70,7 +85,7 @@ class DriverDetailsView extends StatelessWidget {
           ),
         ),
 
-        // ── RIGHT (70%) — Driver Grid
+        // ── RIGHT
         Expanded(
           child: BlocBuilder<DriverBloc, DriverState>(
             builder: (context, state) {
@@ -80,37 +95,51 @@ class DriverDetailsView extends StatelessWidget {
                       color: AppTokens.brandGradientStart),
                 );
               }
-
               if (state is DriverError) {
                 return _ErrorState(
                     message: state.errorMessage, isTablet: true);
               }
-
               if (state is DriverLoaded) {
-                if (state.driverData.isEmpty) {
-                  return _EmptyState(isTablet: true);
-                }
-
-                return GridView.builder(
-                  padding: const EdgeInsets.fromLTRB(16, 20, 16, 20),
-                  gridDelegate:
-                  const SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount:   2,
-                    crossAxisSpacing: 12,
-                    mainAxisSpacing:  12,
-                    childAspectRatio: 3.0,
-                  ),
-                  itemCount: state.driverData.length,
-                  itemBuilder: (context, index) {
-                    return _DriverCard(
-                      driver:   state.driverData[index],
-                      index:    index,
-                      isTablet: true,
-                    );
-                  },
+                final list = _filtered(state.driverData);
+                return Column(
+                  children: [
+                    // Search bar
+                    Padding(
+                      padding:
+                      const EdgeInsets.fromLTRB(16, 20, 16, 12),
+                      child: _SearchBar(
+                        controller: _searchController,
+                        onChanged: (v) =>
+                            setState(() => _searchQuery = v),
+                        isTablet: true,
+                      ),
+                    ),
+                    // List
+                    Expanded(
+                      child: list.isEmpty
+                          ? _EmptyState(isTablet: true)
+                          : GridView.builder(
+                        padding: const EdgeInsets.fromLTRB(
+                            16, 0, 16, 20),
+                        gridDelegate:
+                        const SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount:   2,
+                          crossAxisSpacing: 12,
+                          mainAxisSpacing:  12,
+                          childAspectRatio: 3.0,
+                        ),
+                        itemCount: list.length,
+                        itemBuilder: (context, index) =>
+                            _DriverCard(
+                              driver:   list[index],
+                              index:    index,
+                              isTablet: true,
+                            ),
+                      ),
+                    ),
+                  ],
                 );
               }
-
               return const SizedBox.shrink();
             },
           ),
@@ -136,36 +165,120 @@ class DriverDetailsView extends StatelessWidget {
                       color: AppTokens.brandGradientStart),
                 );
               }
-
               if (state is DriverError) {
                 return _ErrorState(
                     message: state.errorMessage, isTablet: false);
               }
-
               if (state is DriverLoaded) {
-                if (state.driverData.isEmpty) {
-                  return _EmptyState(isTablet: false);
-                }
-
-                return ListView.builder(
-                  padding:
-                  const EdgeInsets.fromLTRB(16, 20, 16, 20),
-                  itemCount: state.driverData.length,
-                  itemBuilder: (context, index) {
-                    return _DriverCard(
-                      driver:   state.driverData[index],
-                      index:    index,
-                      isTablet: false,
-                    );
-                  },
+                final list = _filtered(state.driverData);
+                return Column(
+                  children: [
+                    // Search bar
+                    Padding(
+                      padding:
+                      const EdgeInsets.fromLTRB(16, 16, 16, 8),
+                      child: _SearchBar(
+                        controller: _searchController,
+                        onChanged: (v) =>
+                            setState(() => _searchQuery = v),
+                        isTablet: false,
+                      ),
+                    ),
+                    // List
+                    Expanded(
+                      child: list.isEmpty
+                          ? _EmptyState(isTablet: false)
+                          : ListView.builder(
+                        padding: const EdgeInsets.fromLTRB(
+                            16, 8, 16, 20),
+                        itemCount: list.length,
+                        itemBuilder: (context, index) =>
+                            _DriverCard(
+                              driver:   list[index],
+                              index:    index,
+                              isTablet: false,
+                            ),
+                      ),
+                    ),
+                  ],
                 );
               }
-
               return const SizedBox.shrink();
             },
           ),
         ),
       ],
+    );
+  }
+}
+
+// ─── Search Bar ───────────────────────────────────────────────────────────────
+class _SearchBar extends StatelessWidget {
+  final TextEditingController controller;
+  final ValueChanged<String>  onChanged;
+  final bool                  isTablet;
+
+  const _SearchBar({
+    required this.controller,
+    required this.onChanged,
+    required this.isTablet,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: BoxDecoration(
+        color:         colour.kWhite,
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(
+            color: AppTokens.brandGradientStart.withOpacity(0.3),
+            width: 1.5),
+        boxShadow: [
+          BoxShadow(
+            color:      AppTokens.brandGradientStart.withOpacity(0.07),
+            blurRadius: 10,
+            offset:     const Offset(0, 3),
+          ),
+        ],
+      ),
+      child: TextField(
+        controller:  controller,
+        onChanged:   onChanged,
+        style: GoogleFonts.poppins(
+          fontSize:   isTablet ? 14 : 13,
+          color:      AppTokens.brandDark,
+          fontWeight: FontWeight.w500,
+        ),
+        decoration: InputDecoration(
+          hintText: "Search driver...",
+          hintStyle: GoogleFonts.poppins(
+            fontSize:   isTablet ? 14 : 13,
+            color:      Colors.grey.shade400,
+            fontWeight: FontWeight.w400,
+          ),
+          prefixIcon: Icon(
+            Icons.search_rounded,
+            color: AppTokens.brandGradientStart,
+            size:  isTablet ? 22 : 20,
+          ),
+          suffixIcon: controller.text.isNotEmpty
+              ? IconButton(
+            icon: Icon(Icons.close_rounded,
+                color: Colors.grey.shade400,
+                size:  isTablet ? 20 : 18),
+            onPressed: () {
+              controller.clear();
+              onChanged('');
+            },
+          )
+              : null,
+          border:         InputBorder.none,
+          contentPadding: EdgeInsets.symmetric(
+            vertical:   isTablet ? 14 : 12,
+            horizontal: 16,
+          ),
+        ),
+      ),
     );
   }
 }
@@ -193,8 +306,7 @@ class _GradientHeader extends StatelessWidget {
         ),
         borderRadius: isTablet
             ? const BorderRadius.only(
-          bottomRight: Radius.circular(28),
-        )
+            bottomRight: Radius.circular(28))
             : const BorderRadius.only(
           bottomLeft:  Radius.circular(28),
           bottomRight: Radius.circular(28),
@@ -229,9 +341,9 @@ class _GradientHeader extends StatelessWidget {
                 "Driver Details",
                 overflow: TextOverflow.ellipsis,
                 style: GoogleFonts.poppins(
-                  fontSize:   isTablet ? 26 : 22,
-                  fontWeight: FontWeight.w700,
-                  color:      colour.kWhite,
+                  fontSize:      isTablet ? 26 : 22,
+                  fontWeight:    FontWeight.w700,
+                  color:         colour.kWhite,
                   letterSpacing: 0.3,
                 ),
               ),

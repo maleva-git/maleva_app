@@ -20,9 +20,30 @@ class TruckDetailsReportPage extends StatelessWidget {
     );
   }
 }
-
-class _TruckReportView extends StatelessWidget {
+class _TruckReportView extends StatefulWidget {
   const _TruckReportView();
+
+  @override
+  State<_TruckReportView> createState() => _TruckReportViewState();
+}
+
+class _TruckReportViewState extends State<_TruckReportView> {
+
+  final TextEditingController _searchController = TextEditingController();
+  String _searchQuery = '';
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
+  // Filter by truck number
+  List<TruckDetailsModel> _filtered(List<TruckDetailsModel> all) {
+    if (_searchQuery.isEmpty) return all;
+    final q = _searchQuery.toLowerCase();
+    return all
+        .where((t) => t.TruckNumber.toLowerCase().contains(q))
+        .toList();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -40,15 +61,16 @@ class _TruckReportView extends StatelessWidget {
         }
       },
       builder: (context, state) {
-        final isLoading = state is TruckLoadingState;
-        final truckList = state is TruckLoadedState
+        final isLoading  = state is TruckLoadingState;
+        final allTrucks  = state is TruckLoadedState
             ? state.truckData
             : <TruckDetailsModel>[];
+        final truckList  = _filtered(allTrucks);
 
         return Container(
           color: const Color(0xFFF4F6FF),
           child: isTablet
-              ? _buildTabletLayout(context, isLoading, truckList)
+              ? _buildTabletLayout(context, isLoading, allTrucks, truckList)
               : _buildMobileLayout(context, isLoading, truckList),
         );
       },
@@ -61,6 +83,7 @@ class _TruckReportView extends StatelessWidget {
   Widget _buildTabletLayout(
       BuildContext context,
       bool isLoading,
+      List<TruckDetailsModel> allTrucks,
       List<TruckDetailsModel> truckList,
       ) {
     return Padding(
@@ -69,7 +92,7 @@ class _TruckReportView extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
 
-          // ── LEFT (30%) — Header + Count Badge
+          // ── LEFT (30%)
           Expanded(
             flex: 30,
             child: SingleChildScrollView(
@@ -77,8 +100,9 @@ class _TruckReportView extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  _Header(isTablet: true),
+                  const _Header(isTablet: true),
                   const SizedBox(height: 20),
+                  // Count badge shows filtered count
                   _CountBadge(count: truckList.length),
                   const SizedBox(height: 20),
                 ],
@@ -88,32 +112,49 @@ class _TruckReportView extends StatelessWidget {
 
           const SizedBox(width: 16),
 
-          // ── RIGHT (70%) — Truck Grid
+          // ── RIGHT (70%)
           Expanded(
             flex: 70,
             child: isLoading
                 ? const Center(
                 child: CircularProgressIndicator(
                     color: AppTokens.brandGradientStart))
-                : truckList.isEmpty
-                ? const _EmptyState(isTablet: true)
-                : GridView.builder(
-              padding: const EdgeInsets.only(bottom: 24),
-              gridDelegate:
-              const SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount:   2,
-                crossAxisSpacing: 12,
-                mainAxisSpacing:  12,
-                childAspectRatio: 3.2,
-              ),
-              itemCount: truckList.length,
-              itemBuilder: (context, index) {
-                return _TruckCard(
-                  truck:    truckList[index],
-                  index:    index,
-                  isTablet: true,
-                );
-              },
+                : Column(
+              children: [
+                // Search bar
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 14),
+                  child: _SearchBar(
+                    controller: _searchController,
+                    onChanged: (v) =>
+                        setState(() => _searchQuery = v),
+                    isTablet: true,
+                  ),
+                ),
+                // Grid
+                Expanded(
+                  child: truckList.isEmpty
+                      ? const _EmptyState(isTablet: true)
+                      : GridView.builder(
+                    padding:
+                    const EdgeInsets.only(bottom: 24),
+                    gridDelegate:
+                    const SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount:   2,
+                      crossAxisSpacing: 12,
+                      mainAxisSpacing:  12,
+                      childAspectRatio: 3.2,
+                    ),
+                    itemCount: truckList.length,
+                    itemBuilder: (context, index) =>
+                        _TruckCard(
+                          truck:    truckList[index],
+                          index:    index,
+                          isTablet: true,
+                        ),
+                  ),
+                ),
+              ],
             ),
           ),
         ],
@@ -131,29 +172,118 @@ class _TruckReportView extends StatelessWidget {
       ) {
     return Column(
       children: [
-        _Header(isTablet: false),
+        const _Header(isTablet: false),
         const SizedBox(height: 4),
+
         Expanded(
           child: isLoading
               ? const Center(
               child: CircularProgressIndicator(
                   color: AppTokens.brandGradientStart))
-              : truckList.isEmpty
-              ? const _EmptyState(isTablet: false)
-              : ListView.builder(
-            padding:
-            const EdgeInsets.fromLTRB(16, 8, 16, 24),
-            itemCount: truckList.length,
-            itemBuilder: (context, index) {
-              return _TruckCard(
-                truck:    truckList[index],
-                index:    index,
-                isTablet: false,
-              );
-            },
+              : Column(
+            children: [
+              // Search bar
+              Padding(
+                padding:
+                const EdgeInsets.fromLTRB(16, 8, 16, 4),
+                child: _SearchBar(
+                  controller: _searchController,
+                  onChanged: (v) =>
+                      setState(() => _searchQuery = v),
+                  isTablet: false,
+                ),
+              ),
+              // List
+              Expanded(
+                child: truckList.isEmpty
+                    ? const _EmptyState(isTablet: false)
+                    : ListView.builder(
+                  padding: const EdgeInsets.fromLTRB(
+                      16, 8, 16, 24),
+                  itemCount: truckList.length,
+                  itemBuilder: (context, index) =>
+                      _TruckCard(
+                        truck:    truckList[index],
+                        index:    index,
+                        isTablet: false,
+                      ),
+                ),
+              ),
+            ],
           ),
         ),
       ],
+    );
+  }
+}
+
+// ─── Search Bar ───────────────────────────────────────────────────────────────
+class _SearchBar extends StatelessWidget {
+  final TextEditingController controller;
+  final ValueChanged<String>  onChanged;
+  final bool                  isTablet;
+
+  const _SearchBar({
+    required this.controller,
+    required this.onChanged,
+    required this.isTablet,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: BoxDecoration(
+        color:         colour.kWhite,
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(
+            color: AppTokens.brandGradientStart.withOpacity(0.3),
+            width: 1.5),
+        boxShadow: [
+          BoxShadow(
+            color:      AppTokens.brandGradientStart.withOpacity(0.07),
+            blurRadius: 10,
+            offset:     const Offset(0, 3),
+          ),
+        ],
+      ),
+      child: TextField(
+        controller: controller,
+        onChanged:  onChanged,
+        style: GoogleFonts.poppins(
+          fontSize:   isTablet ? 14 : 13,
+          color:      AppTokens.brandDark,
+          fontWeight: FontWeight.w500,
+        ),
+        decoration: InputDecoration(
+          hintText: "Search truck number...",
+          hintStyle: GoogleFonts.poppins(
+            fontSize:   isTablet ? 14 : 13,
+            color:      Colors.grey.shade400,
+            fontWeight: FontWeight.w400,
+          ),
+          prefixIcon: Icon(
+            Icons.search_rounded,
+            color: AppTokens.brandGradientStart,
+            size:  isTablet ? 22 : 20,
+          ),
+          suffixIcon: controller.text.isNotEmpty
+              ? IconButton(
+            icon: Icon(Icons.close_rounded,
+                color: Colors.grey.shade400,
+                size:  isTablet ? 20 : 18),
+            onPressed: () {
+              controller.clear();
+              onChanged('');
+            },
+          )
+              : null,
+          border:         InputBorder.none,
+          contentPadding: EdgeInsets.symmetric(
+            vertical:   isTablet ? 14 : 12,
+            horizontal: 16,
+          ),
+        ),
+      ),
     );
   }
 }

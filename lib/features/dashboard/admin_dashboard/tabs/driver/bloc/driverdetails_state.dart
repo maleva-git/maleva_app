@@ -1,5 +1,3 @@
-
-
 import '../../../../../../core/models/model.dart';
 
 abstract class DriverState  {

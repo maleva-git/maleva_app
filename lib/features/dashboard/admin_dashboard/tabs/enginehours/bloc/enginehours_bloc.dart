@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
-
 import 'package:maleva/core/models/model.dart';
 import 'package:maleva/core/utils/clsfunction.dart' as objfun;
 import 'enginehours_event.dart';
@@ -10,7 +9,7 @@ import 'enginehours_state.dart';
 class EngineHoursBloc extends Bloc<EngineHoursEvent, EngineHoursState> {
   final BuildContext context;
 
-  EngineHoursBloc(this.context) : super(EngineHoursInitial()) {
+  EngineHoursBloc(this.context) : super(const EngineHoursInitial()) {
     on<LoadEngineHoursReport>(_onLoadEngineHoursReport);
   }
 
@@ -18,20 +17,16 @@ class EngineHoursBloc extends Bloc<EngineHoursEvent, EngineHoursState> {
       LoadEngineHoursReport event,
       Emitter<EngineHoursState> emit,
       ) async {
-    emit(EngineHoursLoading());
+    emit(const EngineHoursLoading());
 
     try {
-      final DateTime today = DateTime.now();
-      final DateTime startOfMonth = DateTime(today.year, today.month, 1);
-      final DateTime endOfMonth = DateTime(today.year, today.month + 1, 0);
-
-      final String fromDate = DateFormat('MM/dd/yyyy').format(startOfMonth);
-      final String toDate = DateFormat('MM/dd/yyyy').format(endOfMonth);
+      final String fromDate = DateFormat('MM/dd/yyyy').format(event.fromDate);
+      final String toDate   = DateFormat('MM/dd/yyyy').format(event.toDate);
 
       final Map<String, dynamic> requestBody = {
-        'Todate': toDate,
+        'Todate':   toDate,
         'Fromdate': fromDate,
-        'Comid': objfun.Comid,
+        'Comid':    objfun.Comid,
       };
 
       final Map<String, String> headers = {
@@ -51,7 +46,7 @@ class EngineHoursBloc extends Bloc<EngineHoursEvent, EngineHoursState> {
             .toList();
         emit(EngineHoursLoaded(records));
       } else {
-        emit(EngineHoursLoaded([]));
+        emit(const EngineHoursLoaded([]));
       }
     } catch (error) {
       emit(EngineHoursError(error.toString()));
