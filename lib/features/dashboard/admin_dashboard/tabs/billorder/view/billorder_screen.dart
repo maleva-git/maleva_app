@@ -718,7 +718,7 @@ class _BillCard extends StatelessWidget {
         child: Material(
           color: Colors.transparent,
           child: Container(
-            width: isTablet
+             width: isTablet
                 ? 480
                 : MediaQuery.of(context).size.width * 0.90,
             constraints: BoxConstraints(
