@@ -12,8 +12,8 @@ import '../../../common_updates/blocs/sales/sales_bloc.dart';
 import '../../../common_updates/blocs/sales/sales_event.dart';
 import '../../../common_updates/blocs/truck/truck_bloc.dart';
 import '../../../common_updates/blocs/truck/truck_event.dart';
-import '../../admin_dashboard/tabs/adinvoice/presentation/widgets/ai_sales_forecast_chart.dart';
 import '../../admin_dashboard/tabs/aienginehours/presentation/widgets/ai_maintenance_health_card.dart';
+import '../../admin_dashboard/tabs/billorder/view/billorder_screen.dart';
 import '../../admin_dashboard/tabs/driver/view/driverdetails_tab.dart';
 import '../../admin_dashboard/tabs/enginehours/view/enginehours_tab.dart';
 import '../../admin_dashboard/tabs/fuel/view/fuelreport_tab.dart';
@@ -137,6 +137,7 @@ class PayableMobileDashboard extends StatelessWidget {
           _tab('EngineHours',     isTablet),
           _tab('Fuel',            isTablet),
           _tab('Driver',          isTablet),
+          _tab('BillOrder',          isTablet),
 
           _tab('Truck',           isTablet),
 
@@ -186,6 +187,7 @@ class PayableMobileDashboard extends StatelessWidget {
           const EngineHoursPage(),
           const FuelDiffPage(),
           const DriverDetailsView(),
+          const BillOrderScreen(),
 
           const TruckDetailsReportPage(),
           const PettyCashPage(),

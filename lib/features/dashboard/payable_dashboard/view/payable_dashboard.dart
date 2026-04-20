@@ -7,6 +7,8 @@ import '../../admin_dashboard/tabs/adinvoice/presentation/widgets/ai_sales_forec
 import '../../admin_dashboard/tabs/aienginehours/bloc/ai_maintenance_bloc.dart';
 import '../../admin_dashboard/tabs/aienginehours/data/repositories/maintenance_ai_repository.dart';
 import '../../admin_dashboard/tabs/aienginehours/presentation/widgets/ai_maintenance_health_card.dart';
+import '../../admin_dashboard/tabs/billorder/bloc/billorder_bloc.dart';
+import '../../admin_dashboard/tabs/billorder/view/billorder_screen.dart';
 import '../../admin_dashboard/tabs/driver/bloc/driverdetails_bloc.dart';
 import '../../admin_dashboard/tabs/driver/bloc/driverdetails_event.dart';
 import '../../admin_dashboard/tabs/driver/view/driverdetails_tab.dart';
@@ -45,7 +47,7 @@ class _PayableDashboardState extends State<PayableDashboard> with SingleTickerPr
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 8, vsync: this);
+    _tabController = TabController(length: 9, vsync: this);
     _tabController.addListener(_onTabChanged);
 
   }
@@ -94,7 +96,10 @@ class _PayableDashboardState extends State<PayableDashboard> with SingleTickerPr
               create: (context) => FuelDiffBloc(context)..add(const LoadFuelDiffEvent()),
               child: const FuelDiffPage(),
             ),
-
+            BlocProvider(
+              create: (context) => BillOrderBloc(context),
+              child: const BillOrderScreen(),
+            ),
             BlocProvider(
               create: (context) => PettyCashBloc(context)..add(const LoadPettyCashEvent()),
               child: const PettyCashPage(),
