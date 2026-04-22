@@ -8,7 +8,6 @@ import '../bloc/airfreightsales_bloc.dart';
 import '../bloc/airfreightsales_event.dart';
 import '../bloc/airfreightsales_state.dart';
 
-
 class CustomerDashboardScreen extends StatelessWidget {
   const CustomerDashboardScreen({super.key});
 
@@ -25,11 +24,8 @@ class _CustomerDashboardView extends StatelessWidget {
   const _CustomerDashboardView();
 
   @override
-  // _CustomerDashboardView — replace your existing build method content
-
-  @override
   Widget build(BuildContext context) {
-    final double height = MediaQuery.of(context).size.height;
+    // final double height = MediaQuery.of(context).size.height; // Retained if you need it later
 
     return BlocBuilder<CustomerDashboardBloc, CustomerDashboardState>(
       builder: (context, state) {
@@ -42,50 +38,64 @@ class _CustomerDashboardView extends StatelessWidget {
           backgroundColor: const Color(0xFFF5F5F0),
           body: SafeArea(
             child: ListView(
-              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 16),
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
               children: [
-
-                // ── Header ──
+                // ── Modern Header ──
                 Row(
                   children: [
                     Container(
-                      width: 36, height: 36,
+                      width: 42,
+                      height: 42,
                       decoration: BoxDecoration(
                         color: AppTokens.invoiceHeaderStart,
-                        borderRadius: BorderRadius.circular(10),
+                        borderRadius: BorderRadius.circular(12),
+                        boxShadow: [
+                          BoxShadow(
+                            color: AppTokens.invoiceHeaderStart.withOpacity(0.3),
+                            blurRadius: 8,
+                            offset: const Offset(0, 4),
+                          ),
+                        ],
                       ),
                       child: const Icon(Icons.dashboard_rounded,
-                          color: Colors.white, size: 18),
+                          color: Colors.white, size: 22),
                     ),
-                    const SizedBox(width: 10),
+                    const SizedBox(width: 12),
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text('Sales Dashboard',
                             style: GoogleFonts.poppins(
-                                fontSize: 17,
+                                fontSize: 18,
                                 fontWeight: FontWeight.w600,
                                 color: colour.commonColor)),
                         Text(
                           'Air Freight · ${DateFormat('MMMM yyyy').format(DateTime.now())}',
                           style: GoogleFonts.poppins(
-                              fontSize: 12,
+                              fontSize: 13,
+                              fontWeight: FontWeight.w500,
                               color: colour.commonColor.withOpacity(0.5)),
                         ),
                       ],
                     ),
                   ],
                 ),
-                const SizedBox(height: 16),
+                const SizedBox(height: 20),
 
                 // ── Employee Dropdown ──
                 Container(
-                  padding: const EdgeInsets.symmetric(
-                      horizontal: 14, vertical: 10),
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
                   decoration: BoxDecoration(
                     color: Colors.white,
-                    borderRadius: BorderRadius.circular(12),
-                    border: Border.all(color: Colors.grey.shade200),
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(color: Colors.grey.shade100),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.03),
+                        blurRadius: 10,
+                        offset: const Offset(0, 4),
+                      ),
+                    ],
                   ),
                   child: DropdownButtonHideUnderline(
                     child: DropdownButton<String>(
@@ -95,7 +105,7 @@ class _CustomerDashboardView extends StatelessWidget {
                           : state.dropdownValueEmp,
                       hint: Text('Select Employee',
                           style: GoogleFonts.poppins(
-                              fontSize: 13,
+                              fontSize: 14,
                               color: Colors.grey.shade500)),
                       icon: const Icon(Icons.keyboard_arrow_down_rounded,
                           color: Colors.grey),
@@ -122,16 +132,16 @@ class _CustomerDashboardView extends StatelessWidget {
                     ),
                   ),
                 ),
-                const SizedBox(height: 14),
+                const SizedBox(height: 20),
 
                 // ── Stats Grid ──
                 GridView.count(
                   crossAxisCount: 2,
                   shrinkWrap: true,
                   physics: const NeverScrollableScrollPhysics(),
-                  crossAxisSpacing: 10,
-                  mainAxisSpacing: 10,
-                  childAspectRatio: 1.5,
+                  crossAxisSpacing: 12,
+                  mainAxisSpacing: 12,
+                  childAspectRatio: 1.45,
                   children: [
                     _StatCard(
                       label: 'Total Orders',
@@ -167,96 +177,122 @@ class _CustomerDashboardView extends StatelessWidget {
                     ),
                   ],
                 ),
-                const SizedBox(height: 16),
+                const SizedBox(height: 24),
 
                 // ── Section Label ──
-                Text('STATUS BREAKDOWN',
-                    style: GoogleFonts.poppins(
-                        fontSize: 12,
-                        fontWeight: FontWeight.w600,
-                        letterSpacing: 0.8,
-                        color: colour.commonColor.withOpacity(0.5))),
-                const SizedBox(height: 8),
+                Padding(
+                  padding: const EdgeInsets.only(left: 4),
+                  child: Text('STATUS BREAKDOWN',
+                      style: GoogleFonts.poppins(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w700,
+                          letterSpacing: 1.0,
+                          color: colour.commonColor.withOpacity(0.4))),
+                ),
+                const SizedBox(height: 10),
 
                 // ── Status List ──
                 Container(
                   decoration: BoxDecoration(
                     color: Colors.white,
-                    borderRadius: BorderRadius.circular(12),
-                    border: Border.all(color: Colors.grey.shade200),
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(color: Colors.grey.shade100),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.02),
+                        blurRadius: 12,
+                        offset: const Offset(0, 5),
+                      ),
+                    ],
                   ),
-                  child: ListView.separated(
-                    shrinkWrap: true,
-                    physics: const NeverScrollableScrollPhysics(),
-                    itemCount: state.salesReport.length,
-                    separatorBuilder: (_, __) => Divider(
-                        height: 1, color: Colors.grey.shade100),
-                    itemBuilder: (context, index) {
-                      final item = state.salesReport[index];
-                      final int dayCount =
-                          int.tryParse(item['DayCount'].toString()) ?? 0;
-                      final double progress =
-                      (dayCount / 100).clamp(0.0, 1.0);
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(16),
+                    child: ListView.separated(
+                      shrinkWrap: true,
+                      physics: const NeverScrollableScrollPhysics(),
+                      itemCount: state.salesReport.length,
+                      separatorBuilder: (_, __) =>
+                          Divider(height: 1, color: Colors.grey.shade100),
+                      itemBuilder: (context, index) {
+                        final item = state.salesReport[index];
+                        final int dayCount =
+                            int.tryParse(item['DayCount'].toString()) ?? 0;
+                        final double progress =
+                        (dayCount / 100).clamp(0.0, 1.0);
 
-                      return Padding(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 14, vertical: 11),
-                        child: Row(
-                          children: [
-                            // Status dot
-                            Container(
-                              width: 8, height: 8,
-                              decoration: BoxDecoration(
-                                color: _statusColor(index),
-                                shape: BoxShape.circle,
-                              ),
-                            ),
-                            const SizedBox(width: 10),
-                            // Status name
-                            Expanded(
-                              child: Text(
-                                item['JobStatus'].toString(),
-                                style: GoogleFonts.poppins(
-                                    fontSize: 13,
-                                    fontWeight: FontWeight.w600,
-                                    color: AppTokens.invoiceHeaderStart),
-                              ),
-                            ),
-                            // Progress bar
-                            SizedBox(
-                              width: 60,
-                              child: ClipRRect(
-                                borderRadius: BorderRadius.circular(2),
-                                child: LinearProgressIndicator(
-                                  value: progress,
-                                  backgroundColor: Colors.grey.shade100,
+                        return Padding(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 16, vertical: 14),
+                          child: Row(
+                            children: [
+                              // Status dot
+                              Container(
+                                width: 10,
+                                height: 10,
+                                decoration: BoxDecoration(
                                   color: _statusColor(index),
-                                  minHeight: 4,
+                                  shape: BoxShape.circle,
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: _statusColor(index).withOpacity(0.4),
+                                      blurRadius: 4,
+                                      offset: const Offset(0, 2),
+                                    ),
+                                  ],
                                 ),
                               ),
-                            ),
-                            const SizedBox(width: 8),
-                            // Day count
-                            Text(
-                              dayCount.toString(),
-                              style: GoogleFonts.poppins(
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.w600,
-                                  color: colour.commonColor),
-                            ),
-                            const SizedBox(width: 4),
-                            Text('days',
-                                style: GoogleFonts.poppins(
-                                    fontSize: 12,
-                                    fontWeight: FontWeight.w600,
-                                    color: colour.commonColor
-                                        .withOpacity(0.4))),
-                          ],
-                        ),
-                      );
-                    },
+                              const SizedBox(width: 12),
+                              // Status name
+                              Expanded(
+                                child: Text(
+                                  item['JobStatus'].toString(),
+                                  style: GoogleFonts.poppins(
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.w600,
+                                      color: colour.commonColor),
+                                ),
+                              ),
+                              // Progress bar
+                              SizedBox(
+                                width: 70,
+                                child: ClipRRect(
+                                  borderRadius: BorderRadius.circular(4),
+                                  child: LinearProgressIndicator(
+                                    value: progress,
+                                    backgroundColor: Colors.grey.shade100,
+                                    color: _statusColor(index),
+                                    minHeight: 6,
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(width: 12),
+                              // Day count
+                              SizedBox(
+                                width: 30, // Fixed width for alignment
+                                child: Text(
+                                  dayCount.toString(),
+                                  textAlign: TextAlign.right,
+                                  style: GoogleFonts.poppins(
+                                      fontSize: 15,
+                                      fontWeight: FontWeight.w700,
+                                      color: colour.commonColor),
+                                ),
+                              ),
+                              const SizedBox(width: 4),
+                              Text('days',
+                                  style: GoogleFonts.poppins(
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.w500,
+                                      color: colour.commonColor
+                                          .withOpacity(0.4))),
+                            ],
+                          ),
+                        );
+                      },
+                    ),
                   ),
                 ),
+                const SizedBox(height: 20),
               ],
             ),
           ),
@@ -275,11 +311,9 @@ class _CustomerDashboardView extends StatelessWidget {
     ];
     return colors[index % colors.length];
   }
-
-
 }
-// ── Stat Card Widget — file bottom la add panu ──
 
+// ── Refined Stat Card Widget ──
 class _StatCard extends StatelessWidget {
   final String label;
   final String value;
@@ -302,55 +336,66 @@ class _StatCard extends StatelessWidget {
     return Container(
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.grey.shade200),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: Colors.grey.shade100),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.03),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           // Accent top bar
           Container(
-            height: 3,
+            height: 4,
             decoration: BoxDecoration(
               color: accentColor,
               borderRadius: const BorderRadius.only(
-                topLeft: Radius.circular(12),
-                topRight: Radius.circular(12),
+                topLeft: Radius.circular(16),
+                topRight: Radius.circular(16),
               ),
             ),
           ),
-          Padding(
-            padding: const EdgeInsets.fromLTRB(12, 10, 12, 10),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(label.toUpperCase(),
-                    style: GoogleFonts.poppins(
-                        fontSize: 10,
-                        letterSpacing: 0.4,
-                        color: Colors.grey.shade500)),
-                const SizedBox(height: 4),
-                Text(value,
-                    style: GoogleFonts.poppins(
-                        fontSize: 26,
-                        fontWeight: FontWeight.w600,
-                        color: colour.commonColor,
-                        height: 1)),
-                const SizedBox(height: 6),
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                      horizontal: 7, vertical: 2),
-                  decoration: BoxDecoration(
-                    color: badgeColor,
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  child: Text(badge,
+          Expanded(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(label.toUpperCase(),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
                       style: GoogleFonts.poppins(
                           fontSize: 10,
-                          color: badgeTextColor,
-                          fontWeight: FontWeight.w500)),
-                ),
-              ],
+                          fontWeight: FontWeight.w600,
+                          letterSpacing: 0.5,
+                          color: Colors.grey.shade500)),
+                  Text(value,
+                      style: GoogleFonts.poppins(
+                          fontSize: 28,
+                          fontWeight: FontWeight.w700,
+                          color: colour.commonColor,
+                          height: 1)),
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 8, vertical: 3),
+                    decoration: BoxDecoration(
+                      color: badgeColor,
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    child: Text(badge,
+                        style: GoogleFonts.poppins(
+                            fontSize: 9.5,
+                            color: badgeTextColor,
+                            fontWeight: FontWeight.w600)),
+                  ),
+                ],
+              ),
             ),
           ),
         ],
