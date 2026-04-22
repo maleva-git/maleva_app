@@ -1,5 +1,7 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/Material.dart';
 import 'package:http/http.dart' as http;
 import 'package:path/path.dart';
@@ -8,6 +10,10 @@ import '../utils/app_preferences.dart';
 
 class ApiClient {
   ApiClient._();
+
+  // ─── Timeout config ───────────────────────────────────────────────────────
+  static const Duration _kTimeout = Duration(seconds: 30);
+  static const Duration _kUploadTimeout = Duration(seconds: 60);
 
   // ─── Auth headers build ───────────────────────────────────────────────────
   static Map<String, String> _buildHeaders({Map<String, String>? extra}) {
@@ -39,30 +45,37 @@ class ApiClient {
 
       final body = bodyData != null ? json.encode(bodyData) : null;
 
-      // 🔥 REQUEST LOG
-      debugPrint("🚀 API REQUEST");
-      debugPrint("➡️ URL: $url");
-      debugPrint("➡️ Headers: $finalHeaders");
-      debugPrint("➡️ Body: $body");
+      if (kDebugMode) {
+        debugPrint("🚀 API REQUEST");
+        debugPrint("➡️ URL: $url");
+        debugPrint("➡️ Headers: $finalHeaders");
+        debugPrint("➡️ Body: $body");
+      }
 
-      final response = await http.post(
+      final response = await http
+          .post(
         Uri.parse(url),
         headers: finalHeaders,
         body: body,
-      );
+      )
+          .timeout(_kTimeout);
 
-      // 🔥 RESPONSE LOG
-      debugPrint("✅ API RESPONSE");
-      debugPrint("⬅️ Status Code: ${response.statusCode}");
-      debugPrint("⬅️ Body: ${response.body}");
+      if (kDebugMode) {
+        debugPrint("✅ API RESPONSE");
+        debugPrint("⬅️ Status Code: ${response.statusCode}");
+        debugPrint("⬅️ Body: ${response.body}");
+      }
 
       return _handleResponse(response);
 
     } on SocketException {
-      debugPrint("❌ No Internet Connection");
+      if (kDebugMode) debugPrint("❌ No Internet Connection");
       throw Exception('No internet connection. Check your network.');
+    } on TimeoutException {
+      if (kDebugMode) debugPrint("❌ Request timed out: $url");
+      throw Exception('Request timed out. Please try again.');
     } catch (e) {
-      debugPrint("❌ API ERROR: $e");
+      if (kDebugMode) debugPrint("❌ API ERROR: $e");
       rethrow;
     }
   }
@@ -70,13 +83,15 @@ class ApiClient {
   // ─── GET ──────────────────────────────────────────────────────────────────
   static Future<String> getString(String url) async {
     try {
-      final response = await http.post(Uri.parse(url));
+      final response = await http.post(Uri.parse(url)).timeout(_kTimeout);
       if (response.statusCode == 200) {
         return jsonDecode(response.body).toString();
       }
       throw Exception('Failed to get string from $url');
     } on SocketException {
       throw Exception('No internet connection.');
+    } on TimeoutException {
+      throw Exception('Request timed out.');
     }
   }
 
@@ -107,7 +122,9 @@ class ApiClient {
         'FileName':      fileName,
         'SubFolderName': subFolderName,
       });
-      final response = await http.Response.fromStream(await request.send());
+      final response = await http.Response.fromStream(
+        await request.send().timeout(_kUploadTimeout),
+      );
       if (response.statusCode == 200) {
         String name = response.body;
         if (name.startsWith('"')) name = name.substring(1);
@@ -115,6 +132,8 @@ class ApiClient {
         return name;
       }
       return '';
+    } on TimeoutException {
+      throw Exception('Image upload timed out.');
     } catch (e) {
       throw Exception('Image upload failed: $e');
     }
@@ -146,7 +165,9 @@ class ApiClient {
         'FileName':      fileName,
         'SubFolderName': subFolderName,
       });
-      final response = await http.Response.fromStream(await request.send());
+      final response = await http.Response.fromStream(
+        await request.send().timeout(_kUploadTimeout),
+      );
       if (response.statusCode == 200) {
         String name = response.body;
         if (name.startsWith('"')) name = name.substring(1);
@@ -154,6 +175,8 @@ class ApiClient {
         return name;
       }
       return '';
+    } on TimeoutException {
+      throw Exception('File upload timed out.');
     } catch (e) {
       throw Exception('File upload failed: $e');
     }
