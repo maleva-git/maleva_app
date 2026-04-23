@@ -12,6 +12,8 @@ import 'package:maleva/splash/splashscreen.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
 
+import 'core/di/injection.dart';
+
 class MyHttpOverrides extends HttpOverrides {
   @override
   HttpClient createHttpClient(SecurityContext? context) {
@@ -51,6 +53,8 @@ Future<void> main() async {
       rethrow; // Re-throw unexpected errors
     }
   }
+  // ── DI setup — ONE call wires everything ──────────────────
+  await setupDependencies();
 
   FirebaseMessaging.onBackgroundMessage(backgroundHandler);
   if (Platform.isIOS) {
