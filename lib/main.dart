@@ -13,6 +13,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
 
 import 'core/di/injection.dart';
+import 'core/utils/app_preferences.dart';
 
 class MyHttpOverrides extends HttpOverrides {
   @override
@@ -53,6 +54,7 @@ Future<void> main() async {
       rethrow; // Re-throw unexpected errors
     }
   }
+  await AppPreferences.init();
   // ── DI setup — ONE call wires everything ──────────────────
   await setupDependencies();
 

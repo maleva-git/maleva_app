@@ -19,6 +19,8 @@ import '../../admin_dashboard/tabs/inventoryreport/bloc/inventoryreport_bloc.dar
 import '../../admin_dashboard/tabs/inventoryreport/bloc/inventoryreport_event.dart';
 import '../../admin_dashboard/tabs/inventoryreport/view/inventoryview_tab.dart';
 import '../../admin_dashboard/tabs/invoice/bloc/invoice_bloc.dart';
+import '../../admin_dashboard/tabs/invoice/bloc/invoice_event.dart';
+import '../../admin_dashboard/tabs/invoice/data/invoice_repository.dart';
 import '../../admin_dashboard/tabs/invoice/view/invoice_tab.dart';
 import '../../admin_dashboard/tabs/salesorder/view/salesorderview_tab.dart';
 import '../../admin_dashboard/tabs/spotsaleorder/bloc/spotsaleorder_bloc.dart';
@@ -77,7 +79,9 @@ class _AdminDashboardState extends State<SubAdminDashboard> with SingleTickerPro
               create: (_) => TruckBloc(),
             ),
             BlocProvider(
-              create: (context) => InvoiceBloc(),
+              create: (_) => InvoiceBloc(
+                invoiceRepo: InvoiceRepositoryImpl(),
+              )..add( LoadInvoiceByType(0)),
               child: const InvoiceTab(),
             ),
             BlocProvider(

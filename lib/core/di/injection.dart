@@ -1,156 +1,147 @@
 // lib/core/di/injection.dart
-//
-// SINGLE place where everything is wired.
-// Inga register pannitu, everywhere sl<T>() call pannuvom.
-//
-// Usage:
-//   await setupDependencies();   ← main.dart-la oru thadava
-//   sl<LoginBloc>()              ← anywhere instantiate
 
 import 'package:get_it/get_it.dart';
+
+// Core
 import 'package:maleva/core/network/api_services/auth_api.dart';
-import 'package:maleva/core/network/api_services/master_api.dart';
-import 'package:maleva/core/network/api_services/sales_api.dart';
-import 'package:maleva/core/network/api_services/operations_api.dart';
-import 'package:maleva/core/network/api_services/reports_api.dart';
 import 'package:maleva/core/utils/app_preferences.dart';
 
-// Features
+// ── Auth ──────────────────────────────────────────────────────────────────────
 import 'package:maleva/features/auth/data/repositories/auth_repository.dart';
 import 'package:maleva/features/auth/presentation/bloc/auth_bloc.dart';
 
-import 'package:maleva/features/transaction/planning/bloc/planning_bloc.dart';
-import 'package:maleva/features/transaction/salesorder/add/bloc/salesorderadd_bloc.dart';
-import 'package:maleva/features/transaction/salesorder/view/bloc/salesorderview_bloc.dart';
-import 'package:maleva/features/transaction/vesselplanning/bloc/vesselplanning_bloc.dart';
-import 'package:maleva/features/transaction/prealertview/bloc/prealertview_bloc.dart';
+// ── Admin tab ─────────────────────────────────────────────────────────────────
+import 'package:maleva/features/dashboard/admin_dashboard/bloc/admin_tab_bloc.dart';
 
-import 'package:maleva/features/transport/fuelentry/add/bloc/fuelentry_bloc.dart';
-import 'package:maleva/features/transport/fuelentry/view/bloc/fuelentryview_bloc.dart';
-import 'package:maleva/features/transport/maintenance/bloc/maintenance_bloc.dart';
-import 'package:maleva/features/transport/licenseupdate/bloc/licenseupdate_bloc.dart';
-import 'package:maleva/features/transport/updatertidetails/bloc/updatertidetails_bloc.dart';
+// ── Invoice tab ───────────────────────────────────────────────────────────────
+import 'package:maleva/features/dashboard/admin_dashboard/tabs/invoice/data/invoice_repository.dart';
+import 'package:maleva/features/dashboard/admin_dashboard/tabs/invoice/bloc/invoice_bloc.dart';
 
-import 'package:maleva/features/operations/forwarding/bloc/forwarding_bloc.dart';
-import 'package:maleva/features/operations/forwardingsalary/bloc/forwardingsalary_bloc.dart';
+// ── AI Invoice forecast ───────────────────────────────────────────────────────
+import 'package:maleva/features/dashboard/admin_dashboard/tabs/adinvoice/data/repositories/sales_forecast_repository.dart';
+import 'package:maleva/features/dashboard/admin_dashboard/tabs/adinvoice/bloc/forecast/forecast_bloc.dart';
 
-import 'package:maleva/features/stock/stockinentry/bloc/stockinentry_bloc.dart';
-import 'package:maleva/features/stock/stocktransfer/bloc/stocktransfer_bloc.dart';
-import 'package:maleva/features/stock/stockupdate/bloc/stockupdate_bloc.dart';
+// ── AI Engine hours / maintenance ─────────────────────────────────────────────
+import 'package:maleva/features/dashboard/admin_dashboard/tabs/aienginehours/data/repositories/maintenance_ai_repository.dart';
+import 'package:maleva/features/dashboard/admin_dashboard/tabs/aienginehours/bloc/ai_maintenance_bloc.dart';
 
+// ── No-dep dashboard tabs ─────────────────────────────────────────────────────
 import 'package:maleva/features/dashboard/admin_dashboard/tabs/salesorder/bloc/salesorder_bloc.dart';
-import 'package:maleva/features/dashboard/admin_dashboard/tabs/maintenance/bloc/maintenance_bloc.dart'
-as dash_maint;
-import 'package:maleva/features/dashboard/admin_dashboard/tabs/fuel/bloc/fuelreport_bloc.dart';
-import 'package:maleva/features/dashboard/admin_dashboard/tabs/truck/bloc/truck_bloc.dart';
-import 'package:maleva/features/dashboard/admin_dashboard/tabs/driver/bloc/driverdetails_bloc.dart';
+import 'package:maleva/features/dashboard/admin_dashboard/tabs/maintenance/bloc/maintenance_bloc.dart';
+import 'package:maleva/features/dashboard/admin_dashboard/tabs/driverlicense/bloc/driverlicense_bloc.dart';
+import 'package:maleva/features/dashboard/admin_dashboard/tabs/drivermaintenance/bloc/drivermaintenance_bloc.dart';
+import 'package:maleva/features/dashboard/admin_dashboard/tabs/driversalary/bloc/driversalary_bloc.dart';
+import 'package:maleva/features/dashboard/admin_dashboard/tabs/receiptview/bloc/receiptview_bloc.dart';
+import 'package:maleva/features/dashboard/admin_dashboard/tabs/airfreightsales/bloc/airfreightsales_bloc.dart';
+import 'package:maleva/features/dashboard/admin_dashboard/tabs/stockinentry/bloc/stock_in_entry_bloc.dart';
+import 'package:maleva/features/dashboard/admin_dashboard/tabs/stocktransfer/bloc/stock_transfer_bloc.dart';
+import 'package:maleva/features/dashboard/admin_dashboard/tabs/stockupdate/bloc/stock_update_bloc.dart';
 
-// sl = service locator (short alias)
 final sl = GetIt.instance;
 
 Future<void> setupDependencies() async {
-  // ─────────────────────────────────────────────────────────
-  // 0.  Foundation — AppPreferences (init pannitu register)
-  // ─────────────────────────────────────────────────────────
+  // ════════════════════════════════════════════════════════════════
+  // 0. FOUNDATION
+  // ════════════════════════════════════════════════════════════════
+
   await AppPreferences.init();
-  // sl.registerSingleton<AppPreferences>(AppPreferences.instance);
+  sl.registerSingleton<AppPreferences>(AppPreferences.instance);
 
-  // ─────────────────────────────────────────────────────────
-  // 1.  API Services  →  registerLazySingleton
-  //     App life-la oru thadava create, cache pannitu use pannuvom
-  // ─────────────────────────────────────────────────────────
+  // ════════════════════════════════════════════════════════════════
+  // 1. API SERVICES  —  lazySingleton
+  //    App life-la oru thadava create, everywhere reuse
+  // ════════════════════════════════════════════════════════════════
+
   sl.registerLazySingleton<AuthApi>(() => AuthApi.instance);
-  // sl.registerLazySingleton<MasterApi>(() => MasterApi());
-  // sl.registerLazySingleton<SalesApi>(() => SalesApi());
-  // sl.registerLazySingleton<OperationsApi>(() => OperationsApi());
-  // sl.registerLazySingleton<ReportsApi>(() => ReportsApi());
 
-  // ─────────────────────────────────────────────────────────
-  // 2.  Repositories  →  registerLazySingleton
-  //     API service inject pannuvom — manual new panna vendaam
-  // ─────────────────────────────────────────────────────────
+  // ════════════════════════════════════════════════════════════════
+  // 2. REPOSITORIES  —  lazySingleton
+  //    API inject panni create, cache pannivom
+  // ════════════════════════════════════════════════════════════════
+
+  // Auth
   sl.registerLazySingleton<AuthRepository>(
         () => AuthRepository(authApi: sl<AuthApi>()),
   );
 
-  // (Future: SalesRepository, TransportRepository, etc.)
+  // Invoice  ← NEW (our refactored repo)
+  sl.registerLazySingleton<InvoiceRepository>(
+        () => InvoiceRepositoryImpl(),
+  );
 
-  // ─────────────────────────────────────────────────────────
-  // 3.  BLoCs  →  registerFactory
-  //     Every BlocProvider.create() call-ku fresh instance vennum
-  //     Factory = new instance every time sl<XBloc>() call
-  // ─────────────────────────────────────────────────────────
+  // AI Invoice forecast
+  sl.registerLazySingleton<SalesForecastRepository>(
+        () => SalesForecastRepository(),
+  );
 
-  // Auth
+  // AI Maintenance
+  sl.registerLazySingleton<MaintenanceAIRepository>(
+        () => MaintenanceAIRepository(),
+  );
+
+  // ════════════════════════════════════════════════════════════════
+  // 3. BLOCS  —  registerFactory
+  //    Every BlocProvider.create() call-ku fresh instance
+  // ════════════════════════════════════════════════════════════════
+
+  // ── Auth ────────────────────────────────────────────────────────
   sl.registerFactory<LoginBloc>(
         () => LoginBloc(authRepository: sl<AuthRepository>()),
   );
 
-  // Transaction
-  // sl.registerFactory<PlanningBloc>(
-  //       () => PlanningBloc(),  // context dep removed — see planning_bloc.dart fix below
-  // );
-  // sl.registerFactory<SalesOrderAddBloc>(
-  //       () => SalesOrderAddBloc(salesApi: sl<SalesApi>(), masterApi: sl<MasterApi>()),
-  // );
-  // sl.registerFactory<SalesOrderViewBloc>(
-  //       () => SalesOrderViewBloc(salesApi: sl<SalesApi>()),
-  // );
-  sl.registerFactory<VesselPlanningBloc>(
-        () => VesselPlanningBloc(),
+  // ── Admin tab (pure UI state, no deps) ──────────────────────────
+  sl.registerFactory<AdminTabBloc>(() => AdminTabBloc());
+
+  // ── Invoice (refactored — repo injected) ────────────────────────
+  sl.registerFactory<InvoiceBloc>(
+        () => InvoiceBloc(invoiceRepo: sl<InvoiceRepository>()),
   );
-  // sl.registerFactory<PreAlertViewBloc>(
-  //       () => PreAlertViewBloc(reportsApi: sl<ReportsApi>()),
-  // );
 
-  // Transport
-  // sl.registerFactory<FuelEntryBloc>(
-  //       () => FuelEntryBloc(operationsApi: sl<OperationsApi>()),
-  // );
-  // sl.registerFactory<FuelEntryViewBloc>(
-  //       () => FuelEntryViewBloc(operationsApi: sl<OperationsApi>()),
-  // );
-  // sl.registerFactory<MaintenanceBloc>(
-  //       () => MaintenanceBloc(masterApi: sl<MasterApi>()),
-  // );
-  sl.registerFactory<LicenseUpdateBloc>(
-        () => LicenseUpdateBloc(),
+  // ── AI Invoice forecast ─────────────────────────────────────────
+  sl.registerFactory<ForecastBloc>(
+        () => ForecastBloc(repository: sl<SalesForecastRepository>()),
   );
-  // sl.registerFactory<UpdateRtiDetailsBloc>(
-  //       () => UpdateRtiDetailsBloc(masterApi: sl<MasterApi>()),
-  // );
 
-  // Operations
-  // sl.registerFactory<ForwardingBloc>(
-  //       () => ForwardingBloc(operationsApi: sl<OperationsApi>()),
-  // );
-  // sl.registerFactory<ForwardingSalaryBloc>(
-  //       () => ForwardingSalaryBloc(operationsApi: sl<OperationsApi>()),
-  // );
+  // ── AI Maintenance ──────────────────────────────────────────────
+  sl.registerFactory<AIMaintenanceBloc>(
+        () => AIMaintenanceBloc(repository: sl<MaintenanceAIRepository>()),
+  );
 
-  // Stock
-  // sl.registerFactory<StockInEntryBloc>(
-  //       () => StockInEntryBloc(masterApi: sl<MasterApi>()),
-  // );
-  // sl.registerFactory<StockTransferBloc>(
-  //       () => StockTransferBloc(masterApi: sl<MasterApi>()),
-  // );
-  // sl.registerFactory<StockUpdateBloc>(
-  //       () => StockUpdateBloc(masterApi: sl<MasterApi>()),
-  // );
-
-  // Dashboard tabs
+  // ── No-dep dashboard tabs (no-arg constructors) ─────────────────
   sl.registerFactory<SalesOrderBloc>(() => SalesOrderBloc());
-  // sl.registerFactory<dash_maint.MaintenanceBloc>(
-  //       () => dash_maint.MaintenanceBloc(masterApi: sl<MasterApi>()),
-  // );
-  // sl.registerFactory<FuelReportBloc>(
-  //       () => FuelReportBloc(reportsApi: sl<ReportsApi>()),
-  // );
-  // sl.registerFactory<TruckBloc>(
-  //       () => TruckBloc(masterApi: sl<MasterApi>()),
-  // );
-  // sl.registerFactory<DriverDetailsBloc>(
-  //       () => DriverDetailsBloc(masterApi: sl<MasterApi>()),
-  // );
+  sl.registerFactory<MaintenanceBloc>(() => MaintenanceBloc());
+  sl.registerFactory<DriverLicenseExpiryBloc>(() => DriverLicenseExpiryBloc());
+  sl.registerFactory<TruckMaintDashBloc>(() => TruckMaintDashBloc());
+  sl.registerFactory<DriverSalaryBloc>(() => DriverSalaryBloc());
+  sl.registerFactory<ReceiptBloc>(() => ReceiptBloc());
+  sl.registerFactory<CustomerDashboardBloc>(() => CustomerDashboardBloc());
+  sl.registerFactory<StockInEntryBloc>(() => StockInEntryBloc());
+  sl.registerFactory<StockTransferBloc>(() => StockTransferBloc());
+  sl.registerFactory<StockUpdateBloc>(() => StockUpdateBloc());
+
+  // ════════════════════════════════════════════════════════════════
+  // 4. CONTEXT-DEP BLOCS  —  NOT registered here
+  //    These still take BuildContext in constructor.
+  //    Refactor pannும்போது inga add pannuvom.
+  //
+  //    BillOrderBloc(context)        — billorder tab
+  //    BocBloc(context)              — bocheck tab
+  //    DriverBloc(context)           — driver tab
+  //    EmailBloc(context)            — emailinbox tab
+  //    EngineHoursBloc(context)      — enginehours tab
+  //    ExpenseReportBloc(context)    — expenseReport tab
+  //    ForwardingReportBloc(context) — forwardingreport tab
+  //    FuelDiffBloc(context)         — fuel tab
+  //    FuelFillingBloc(context)      — fuelfillings tab
+  //    ReviewBloc(context)           — googlereview tab
+  //    InventoryBloc(context)        — inventoryreport tab
+  //    PaymentPendingBloc(context)   — paymentview tab
+  //    PettyCashBloc(context)        — pettycash tab
+  //    RTIDetailsBloc(context)       — rtiview tab
+  //    SpeedingBloc(context)         — speedingreport tab
+  //    TransportBloc(context)        — transport tab
+  //    TruckDetailsBloc(context)     — truck tab
+  //    VesselBloc(context)           — vesselreport tab
+  //    PDOBloc(context, ...)         — pdo tab
+  // ════════════════════════════════════════════════════════════════
 }

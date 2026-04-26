@@ -1,155 +1,227 @@
+// lib/features/dashboard/admin_dashboard/tabs/invoice/bloc/invoice_bloc.dart
+//
+// ── What changed from original ─────────────────────────────────────
+//  BEFORE                              AFTER
+//  InvoiceBloc()                       InvoiceBloc({required this._invoiceRepo})
+//  objfun.storagenew.getInt('Comid')   AppPreferences.getComid()
+//  ApiClient.postRequest(objfun.url)   _invoiceRepo.getWaitingBills()
+//  no transformers                     droppable() on all async events
+//  RefreshInvoice → blank screen       RefreshInvoice → InvoiceRefreshing (keeps data)
+//  no Equatable on state               sealed + Equatable — no extra rebuilds
+// ───────────────────────────────────────────────────────────────────
+
+import 'package:bloc_concurrency/bloc_concurrency.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
-import '../../../../../../core/network/api_client.dart';
-import '../../../../../../core/network/api_services/auth_api.dart';
+import 'package:maleva/core/utils/app_preferences.dart';
+
+import '../data/invoice_repository.dart';
 import 'invoice_event.dart';
 import 'invoice_state.dart';
-import 'package:maleva/core/utils/clsfunction.dart' as objfun;
 
 class InvoiceBloc extends Bloc<InvoiceEvent, InvoiceState> {
+  final InvoiceRepository _invoiceRepo;
 
-  InvoiceBloc() : super(InvoiceInitial()) {
+  // ✅ Injected — no objfun, no ApiClient direct call
+  InvoiceBloc({required InvoiceRepository invoiceRepo})
+      : _invoiceRepo = invoiceRepo,
+        super(InvoiceInitial()) {
 
-    on<LoadInvoiceByType>((event, emit) async {
+    // ── Load initial data ──────────────────────────────────────
+    // droppable(): if user triggers twice quickly, second is dropped
+    on<LoadInvoiceByType>(_onLoad, transformer: droppable());
 
-      if (state is InvoiceLoaded) return;
+    // ── Month range toggle (local, no API) ─────────────────────
+    on<LoadMonthRange>(_onMonthRange);
 
+    // ── Waiting bills (lazy load then cache) ───────────────────
+    on<LoadWaitingBills>(_onLoadWaiting, transformer: droppable());
+
+    // ── Employee breakdown per month ───────────────────────────
+    // droppable(): rapid month taps — only last one matters
+    on<LoadEmployeeInvData>(_onLoadEmployee, transformer: droppable());
+
+    // ── Pull-to-refresh ────────────────────────────────────────
+    // restartable(): new refresh cancels in-flight one
+    on<RefreshInvoice>(_onRefresh, transformer: restartable());
+
+    // ── Dismiss waiting sheet ──────────────────────────────────
+    on<DismissWaitingSheet>(_onDismissWaiting);
+  }
+
+  // ─────────────────────────────────────────────────────────────
+  // LOAD
+  // ─────────────────────────────────────────────────────────────
+  Future<void> _onLoad(
+      LoadInvoiceByType event,
+      Emitter<InvoiceState> emit,
+      ) async {
+    // Guard: already loaded with same type — skip
+    if (state is InvoiceLoaded) return;
+
+    emit(InvoiceLoading());
+    await _fetchAndEmit(event.type, emit);
+  }
+
+  // ─────────────────────────────────────────────────────────────
+  // REFRESH — no blank screen, shows stale data + spinner
+  // ─────────────────────────────────────────────────────────────
+  Future<void> _onRefresh(
+      RefreshInvoice event,
+      Emitter<InvoiceState> emit,
+      ) async {
+    final current = state;
+
+    // Keep old data visible while refreshing
+    if (current is InvoiceLoaded) {
+      emit(InvoiceRefreshing(current));
+    } else {
       emit(InvoiceLoading());
-      try {
+    }
 
-        final currentDate = DateFormat("yyyy-MM-dd").format(DateTime.now());
-        final master = {
-          'Comid': objfun.storagenew.getInt('Comid') ?? 0,
-          'Todate': currentDate,
-        };
+    await _fetchAndEmit(0, emit);
+  }
 
-        final results = await Future.wait([
-          AuthApi.getSalesData(event.type),
-          AuthApi.getSalesInvoiceCheck(master),
-        ]);
+  // ─────────────────────────────────────────────────────────────
+  // MONTH RANGE — pure local, no API
+  // ─────────────────────────────────────────────────────────────
+  void _onMonthRange(LoadMonthRange event, Emitter<InvoiceState> emit) {
+    final s = _loadedState;
+    if (s == null) return;
 
-        final resultData = results[0];
-        final waitingResult = results[1];
+    final alreadySelected =
+        (event.months == 6 && s.is6Months) ||
+            (event.months == 12 && !s.is6Months);
+    if (alreadySelected) return;
 
-        if (resultData != null && resultData != "") {
-          final saleMonthData = List<dynamic>.from(resultData["Data2"] ?? []);
-          final monthResult = _buildMonthData(saleMonthData, 6);
+    final (monthList, monthData) = _buildMonthData(s.saleMonthData, event.months);
 
-          emit(InvoiceLoaded(
-            saleDataAll: List<dynamic>.from(resultData["Data1"] ?? []),
-            saleMonthData: saleMonthData,
-            waitingBilling: List<dynamic>.from(waitingResult ?? []),
-            monthList: monthResult.$1,
-            monthData: monthResult.$2,
-            is6Months: true,
-            currentMonthName: DateFormat('MMMM').format(DateTime.now()),
-            showWaitingSheet: false,
-            employeeData: null,
-          ));
-        } else {
-          emit(InvoiceError("No data returned"));
-        }
-      } catch (e) {
-        emit(InvoiceError(e.toString()));
-      }
-    });
+    emit(s.copyWith(
+      monthList:        monthList,
+      monthData:        monthData,
+      is6Months:        event.months == 6,
+      showWaitingSheet: false,
+      clearEmployeeData: true,
+    ));
+  }
 
-    on<LoadMonthRange>((event, emit) {
-      if (state is! InvoiceLoaded) return;
-      final s = state as InvoiceLoaded;
+  // ─────────────────────────────────────────────────────────────
+  // WAITING BILLS — lazy load, then cache
+  // ─────────────────────────────────────────────────────────────
+  Future<void> _onLoadWaiting(
+      LoadWaitingBills event,
+      Emitter<InvoiceState> emit,
+      ) async {
+    final s = _loadedState;
+    if (s == null) return;
 
-      final alreadySelected =
-          (event.months == 6 && s.is6Months) ||
-              (event.months == 12 && !s.is6Months);
-      if (alreadySelected) return;
+    // Already cached — just show the sheet
+    if (s.waitingBilling.isNotEmpty) {
+      emit(s.copyWith(showWaitingSheet: true, clearEmployeeData: true));
+      return;
+    }
 
-      final monthResult = _buildMonthData(s.saleMonthData, event.months);
-
+    try {
+      final bills = await _invoiceRepo.getWaitingBills();
       emit(s.copyWith(
-        monthList: monthResult.$1,
-        monthData: monthResult.$2,
-        is6Months: event.months == 6,
-        showWaitingSheet: false,
+        waitingBilling:   bills,
+        showWaitingSheet: true,
         clearEmployeeData: true,
       ));
-    });
+    } catch (_) {
+      // Sheet still opens — just without data
+      emit(s.copyWith(showWaitingSheet: true, clearEmployeeData: true));
+    }
+  }
 
-    // ─────────────────────────────────────────────
-    // WAITING BILLS
-    // ─────────────────────────────────────────────
-    on<LoadWaitingBills>((event, emit) async {
-      if (state is! InvoiceLoaded) return;
-      final current = state as InvoiceLoaded;
+  // ─────────────────────────────────────────────────────────────
+  // EMPLOYEE DATA per month
+  // ─────────────────────────────────────────────────────────────
+  Future<void> _onLoadEmployee(
+      LoadEmployeeInvData event,
+      Emitter<InvoiceState> emit,
+      ) async {
+    final s = _loadedState;
+    if (s == null) return;
 
-      try {
+    try {
+      final data = await _invoiceRepo.getEmployeeInvData(type: event.type);
+      emit(s.copyWith(
+        employeeData:    data,
+        showWaitingSheet: false,
+      ));
+    } catch (_) {
+      // Silent — dashboard should not crash on secondary data load
+    }
+  }
 
-        final currentDate = DateFormat("yyyy-MM-dd").format(DateTime.now());
-        final master = {
-          'Comid': objfun.storagenew.getInt('Comid') ?? 0,
-          'Todate': currentDate,
-        };
+  // ─────────────────────────────────────────────────────────────
+  // DISMISS WAITING SHEET
+  // ─────────────────────────────────────────────────────────────
+  void _onDismissWaiting(
+      DismissWaitingSheet event,
+      Emitter<InvoiceState> emit,
+      ) {
+    final s = _loadedState;
+    if (s == null) return;
+    emit(s.copyWith(showWaitingSheet: false));
+  }
 
-        final resultData = await ApiClient.postRequest(
-          objfun.apiSelectSaleorderinvoicecheck,
-          master,
-        );
+  // ─────────────────────────────────────────────────────────────
+  // HELPERS
+  // ─────────────────────────────────────────────────────────────
 
-        emit(current.copyWith(
-          waitingBilling: List<dynamic>.from(resultData ?? []),
-          showWaitingSheet: true,
-          clearEmployeeData: true,
-        ));
-      } catch (_) {
-        emit(current.copyWith(showWaitingSheet: true, clearEmployeeData: true));
+  /// Safe cast — returns loaded state from any variant
+  InvoiceLoaded? get _loadedState => switch (state) {
+    InvoiceLoaded s      => s,
+    InvoiceRefreshing s  => s.previous,
+    _                    => null,
+  };
+
+  Future<void> _fetchAndEmit(int type, Emitter<InvoiceState> emit) async {
+    try {
+      final (salesData, waitingBills) = await _invoiceRepo.loadDashboard(type: type);
+
+      if (salesData == null) {
+        emit( InvoiceError('No data returned from server'));
+        return;
       }
-    });
 
-    // ─────────────────────────────────────────────
-    // EMPLOYEE INVOICE DATA
-    // ─────────────────────────────────────────────
-    on<LoadEmployeeInvData>((event, emit) async {
-      if (state is! InvoiceLoaded) return;
-      final current = state as InvoiceLoaded;
+      final saleMonthData = List<dynamic>.from(salesData['Data2'] ?? []);
+      final (monthList, monthData) = _buildMonthData(saleMonthData, 6);
 
-      try {
-
-        final resultData = await ApiClient.postRequest(
-          "${objfun.apiGetEmployeeInvData}${objfun.Comid}&type=${event.type}",
-          null,
-        );
-
-
-        final employeeData = List<dynamic>.from(resultData?["Data1"] ?? []);
-
-        emit(current.copyWith(
-          employeeData: employeeData,
-          showWaitingSheet: false,
-        ));
-      } catch (_) {
-        // Dashboard safe
-      }
-    });
-
-    on<RefreshInvoice>((event, emit) async {
-      emit(InvoiceInitial());
-      add(LoadInvoiceByType(0));
-    });
+      emit(InvoiceLoaded(
+        saleDataAll:      List<dynamic>.from(salesData['Data1'] ?? []),
+        saleMonthData:    saleMonthData,
+        waitingBilling:   waitingBills,
+        monthList:        monthList,
+        monthData:        monthData,
+        is6Months:        true,
+        currentMonthName: DateFormat('MMMM').format(DateTime.now()),
+        showWaitingSheet: false,
+        employeeData:     null,
+      ));
+    } catch (e) {
+      final msg = e.toString().replaceAll('Exception: ', '');
+      emit(InvoiceError(msg));
+    }
   }
 
   (List<String>, List<dynamic>) _buildMonthData(
-      List<dynamic> saleMonthData, int count) {
+      List<dynamic> saleMonthData,
+      int count,
+      ) {
     const monthNames = [
       'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
       'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec',
     ];
 
-    final monthIndex = DateTime.now().month;
+    final now = DateTime.now();
     final monthList = <String>[];
 
-    for (int i = 0; i < count; i++) {
-      int idx = ((monthIndex - 1) - i) % 12;
-      if (idx < 0) idx += 12;
-      monthList.add(monthNames[idx]);
+    for (var i = 0; i < count; i++) {
+      final idx = ((now.month - 1) - i) % 12;
+      monthList.add(monthNames[idx < 0 ? idx + 12 : idx]);
     }
 
     return (monthList, saleMonthData.take(count).toList());

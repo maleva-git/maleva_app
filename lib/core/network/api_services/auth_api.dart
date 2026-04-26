@@ -181,4 +181,12 @@ class AuthApi {
     );
     return result;
   }
+  static Future<dynamic> getEmployeeInvData({required int type}) async {
+    final comid = AppPreferences.getComid();
+    final result = await ApiClient.postRequest(
+      '${ApiConstants.apiGetEmployeeInvData}$comid&type=$type',
+      null,
+    );
+    return result;
+  }
 }
