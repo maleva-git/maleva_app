@@ -44,8 +44,8 @@ Future<void> setupDependencies() async {
   // 0. FOUNDATION
   // ════════════════════════════════════════════════════════════════
 
+  // AppPreferences is all-static — just init() is enough, no registration needed
   await AppPreferences.init();
-  sl.registerSingleton<AppPreferences>(AppPreferences.instance);
 
   // ════════════════════════════════════════════════════════════════
   // 1. API SERVICES  —  lazySingleton
