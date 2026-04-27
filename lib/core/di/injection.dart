@@ -108,6 +108,9 @@ Future<void> setupDependencies() async {
   sl.registerFactory<AIMaintenanceBloc>(
         () => AIMaintenanceBloc(repository: sl<MaintenanceAIRepository>()),
   );
+  sl.registerLazySingleton<ReceiptRepository>(
+        () => ReceiptRepositoryImpl(),
+  );
   sl.registerFactory<ReceiptBloc>(
         () => ReceiptBloc(receiptRepo: sl<ReceiptRepository>()),
   );
