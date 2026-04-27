@@ -1,15 +1,63 @@
+// lib/features/dashboard/admin_dashboard/tabs/receiptview/view/receiptview_tab.dart
+//
+// ── Changes from original ──────────────────────────────────────────────────────
+//  BEFORE                                    AFTER
+//  context.read<ReceiptBloc>().pickDate()    showDatePicker in view directly
+//  ListView with .map() — full list in RAM   ListView.builder — lazy, efficient
+//  RWhite — undefined color (bug)            kWhite — correct color
+//  progress bool check (!state.progress)     state.isLoading — readable
+//  BlocBuilder wraps everything              buildWhen — only rebuild on status/data change
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
-import '../../../../../../core/colors/colors.dart';
-import '../../../../../../core/theme/tokens.dart';
+import 'package:maleva/core/colors/colors.dart';
+import 'package:maleva/core/di/injection.dart';
+import 'package:maleva/core/theme/tokens.dart';
 import '../bloc/receiptview_bloc.dart';
 import '../bloc/receiptview_event.dart';
 import '../bloc/receiptview_state.dart';
 
+
+// ══════════════════════════════════════════════════════════════
+// ENTRY — wires DI, triggers initial load
+// ══════════════════════════════════════════════════════════════
+class ReceiptTab extends StatelessWidget {
+  const ReceiptTab({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocProvider(
+      create: (_) => sl<ReceiptBloc>()
+        ..add( LoadReceiptEvent()),
+      child: const ReceiptPage(),
+    );
+  }
+}
+
+// ══════════════════════════════════════════════════════════════
+// PAGE
+// ══════════════════════════════════════════════════════════════
 class ReceiptPage extends StatelessWidget {
   const ReceiptPage({super.key});
+
+  // Date picker now in VIEW — not in BLoC
+  Future<void> _pickDate(BuildContext context, bool isFrom) async {
+    final picked = await showDatePicker(
+      context: context,
+      initialDate: DateTime.now(),
+      firstDate: DateTime(2000),
+      lastDate: DateTime(2100),
+    );
+    if (picked == null || !context.mounted) return;
+
+    if (isFrom) {
+      context.read<ReceiptBloc>().add(SelectFromDateEvent(picked));
+    } else {
+      context.read<ReceiptBloc>().add(SelectToDateEvent(picked));
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -28,6 +76,11 @@ class ReceiptPage extends StatelessWidget {
         }
       },
       child: BlocBuilder<ReceiptBloc, ReceiptState>(
+        // Only rebuild when status or data changes — not on date selection alone
+        buildWhen: (prev, curr) =>
+        prev.status != curr.status ||
+            prev.receiptMaster.length != curr.receiptMaster.length ||
+            prev.totalAmount != curr.totalAmount,
         builder: (context, state) {
           return Container(
             color: const Color(0xFFF4F6FF),
@@ -40,48 +93,44 @@ class ReceiptPage extends StatelessWidget {
     );
   }
 
-  // ══════════════════════════════════════════════════════
-  // TABLET — Two Column
-  // ══════════════════════════════════════════════════════
+  // ── TABLET ──────────────────────────────────────────────────
   Widget _buildTabletLayout(BuildContext context, ReceiptState state) {
     return Padding(
       padding: const EdgeInsets.all(20),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-
-          // ── LEFT (60%) — Filter + List
           Expanded(
             flex: 6,
-            child: Column(
-              children: [
-                _FilterCard(state: state, isTablet: true),
-                const SizedBox(height: 12),
-                Expanded(
-                  child: !state.progress
-                      ? const Center(
-                    child: CircularProgressIndicator(color: AppTokens.brandGradientStart),
-                  )
-                      : _ReceiptList(state: state, isTablet: true),
-                ),
-              ],
-            ),
+            child: Column(children: [
+              _FilterCard(
+                state: state,
+                isTablet: true,
+                onFromTap: () => _pickDate(context, true),
+                onToTap:   () => _pickDate(context, false),
+              ),
+              const SizedBox(height: 12),
+              Expanded(
+                child: state.isLoading
+                    ? const Center(
+                  child: CircularProgressIndicator(
+                    color: AppTokens.brandGradientStart,
+                  ),
+                )
+                    : _ReceiptList(state: state, isTablet: true),
+              ),
+            ]),
           ),
-
           const SizedBox(width: 16),
-
-          // ── RIGHT (40%) — Summary + Stats
           Expanded(
             flex: 4,
             child: SingleChildScrollView(
               physics: const BouncingScrollPhysics(),
-              child: Column(
-                children: [
-                  _SummaryCard(state: state, isTablet: true),
-                  const SizedBox(height: 16),
-                  _StatsPanel(state: state),
-                ],
-              ),
+              child: Column(children: [
+                _SummaryCard(state: state, isTablet: true),
+                const SizedBox(height: 16),
+                _StatsPanel(state: state),
+              ]),
             ),
           ),
         ],
@@ -89,27 +138,44 @@ class ReceiptPage extends StatelessWidget {
     );
   }
 
-
+  // ── MOBILE ──────────────────────────────────────────────────
   Widget _buildMobileLayout(BuildContext context, ReceiptState state) {
-    return Column(
-      children: [
-        _FilterCard(state: state, isTablet: false),
-        _SummaryCard(state: state, isTablet: false),
-        Expanded(
-          child: !state.progress
-              ? const Center(
-            child: CircularProgressIndicator(color: AppTokens.brandGradientStart),
-          )
-              : _ReceiptList(state: state, isTablet: false),
-        ),
-      ],
-    );
+    return Column(children: [
+      _FilterCard(
+        state: state,
+        isTablet: false,
+        onFromTap: () => _pickDate(context, true),
+        onToTap:   () => _pickDate(context, false),
+      ),
+      _SummaryCard(state: state, isTablet: false),
+      Expanded(
+        child: state.isLoading
+            ? const Center(
+          child: CircularProgressIndicator(
+            color: AppTokens.brandGradientStart,
+          ),
+        )
+            : _ReceiptList(state: state, isTablet: false),
+      ),
+    ]);
   }
 }
+
+// ══════════════════════════════════════════════════════════════
+// FILTER CARD
+// ══════════════════════════════════════════════════════════════
 class _FilterCard extends StatelessWidget {
   final ReceiptState state;
   final bool isTablet;
-  const _FilterCard({required this.state, required this.isTablet});
+  final VoidCallback onFromTap;
+  final VoidCallback onToTap;
+
+  const _FilterCard({
+    required this.state,
+    required this.isTablet,
+    required this.onFromTap,
+    required this.onToTap,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -133,62 +199,62 @@ class _FilterCard extends StatelessWidget {
           ),
         ],
       ),
-      child: Row(
-        children: [
-          Expanded(
-            child: _DateButton(
-              label: state.fromDate == null
-                  ? 'From Date'
-                  : DateFormat('dd MMM yyyy').format(state.fromDate!),
-              icon: Icons.calendar_today_rounded,
-              isTablet: isTablet,
-              onTap: () =>
-                  context.read<ReceiptBloc>().pickDate(context, true),
-            ),
+      child: Row(children: [
+        Expanded(
+          child: _DateButton(
+            label: state.fromDate == null
+                ? 'From Date'
+                : DateFormat('dd MMM yyyy').format(state.fromDate!),
+            icon: Icons.calendar_today_rounded,
+            isTablet: isTablet,
+            onTap: onFromTap,   // ✅ callback from view — no context in BLoC
           ),
-          const SizedBox(width: 10),
-          Expanded(
-            child: _DateButton(
-              label: state.toDate == null
-                  ? 'To Date'
-                  : DateFormat('dd MMM yyyy').format(state.toDate!),
-              icon: Icons.event_rounded,
-              isTablet: isTablet,
-              onTap: () =>
-                  context.read<ReceiptBloc>().pickDate(context, false),
-            ),
+        ),
+        const SizedBox(width: 10),
+        Expanded(
+          child: _DateButton(
+            label: state.toDate == null
+                ? 'To Date'
+                : DateFormat('dd MMM yyyy').format(state.toDate!),
+            icon: Icons.event_rounded,
+            isTablet: isTablet,
+            onTap: onToTap,     // ✅ callback from view
           ),
-          const SizedBox(width: 10),
-          GestureDetector(
-            onTap: () => context
-                .read<ReceiptBloc>()
-                .add(LoadReceiptEvent(isDateSearch: true)),
-            child: Container(
-              padding: EdgeInsets.all(isTablet ? 15 : 13),
-              decoration: BoxDecoration(
-                gradient: const LinearGradient(
-                  colors: [AppTokens.brandGradientStart, AppTokens.brandDark],
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                ),
-                borderRadius: BorderRadius.circular(isTablet ? 16 : 14),
-                boxShadow: [
-                  BoxShadow(
-                    color: AppTokens.brandGradientStart.withOpacity(0.35),
-                    blurRadius: 12,
-                    offset: const Offset(0, 4),
-                  ),
-                ],
+        ),
+        const SizedBox(width: 10),
+        GestureDetector(
+          onTap: () => context
+              .read<ReceiptBloc>()
+              .add( LoadReceiptEvent(isDateSearch: true)),
+          child: Container(
+            padding: EdgeInsets.all(isTablet ? 15 : 13),
+            decoration: BoxDecoration(
+              gradient: const LinearGradient(
+                colors: [AppTokens.brandGradientStart, AppTokens.brandDark],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
               ),
-              child: Icon(Icons.search_rounded,
-                  color: kWhite, size: isTablet ? 24 : 22),
+              borderRadius: BorderRadius.circular(isTablet ? 16 : 14),
+              boxShadow: [
+                BoxShadow(
+                  color: AppTokens.brandGradientStart.withOpacity(0.35),
+                  blurRadius: 12,
+                  offset: const Offset(0, 4),
+                ),
+              ],
             ),
+            child: Icon(Icons.search_rounded,
+                color: kWhite, size: isTablet ? 24 : 22),
           ),
-        ],
-      ),
+        ),
+      ]),
     );
   }
 }
+
+// ══════════════════════════════════════════════════════════════
+// DATE BUTTON
+// ══════════════════════════════════════════════════════════════
 class _DateButton extends StatelessWidget {
   final String label;
   final IconData icon;
@@ -216,34 +282,38 @@ class _DateButton extends StatelessWidget {
           borderRadius: BorderRadius.circular(isTablet ? 14 : 12),
           border: Border.all(color: AppTokens.brandMid.withOpacity(0.4)),
         ),
-        child: Row(
-          children: [
-            Container(
-              padding: EdgeInsets.all(isTablet ? 6 : 5),
-              decoration: BoxDecoration(
-                color: AppTokens.brandGradientStart.withOpacity(0.12),
-                borderRadius: BorderRadius.circular(7),
-              ),
-              child: Icon(icon, size: isTablet ? 15 : 13, color: AppTokens.brandGradientStart),
+        child: Row(children: [
+          Container(
+            padding: EdgeInsets.all(isTablet ? 6 : 5),
+            decoration: BoxDecoration(
+              color: AppTokens.brandGradientStart.withOpacity(0.12),
+              borderRadius: BorderRadius.circular(7),
             ),
-            const SizedBox(width: 8),
-            Flexible(
-              child: Text(
-                label,
-                style: GoogleFonts.poppins(
-                  fontSize: isTablet ? 12 : 11,
-                  fontWeight: FontWeight.w600,
-                  color: AppTokens.brandDark,
-                ),
-                overflow: TextOverflow.ellipsis,
+            child: Icon(icon,
+                size: isTablet ? 15 : 13,
+                color: AppTokens.brandGradientStart),
+          ),
+          const SizedBox(width: 8),
+          Flexible(
+            child: Text(
+              label,
+              style: GoogleFonts.poppins(
+                fontSize: isTablet ? 12 : 11,
+                fontWeight: FontWeight.w600,
+                color: AppTokens.brandDark,
               ),
+              overflow: TextOverflow.ellipsis,
             ),
-          ],
-        ),
+          ),
+        ]),
       ),
     );
   }
 }
+
+// ══════════════════════════════════════════════════════════════
+// SUMMARY CARD
+// ══════════════════════════════════════════════════════════════
 class _SummaryCard extends StatelessWidget {
   final ReceiptState state;
   final bool isTablet;
@@ -253,10 +323,7 @@ class _SummaryCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       margin: EdgeInsets.fromLTRB(
-        isTablet ? 0 : 16,
-        isTablet ? 0 : 0,
-        isTablet ? 0 : 16,
-        isTablet ? 0 : 8,
+        isTablet ? 0 : 16, 0, isTablet ? 0 : 16, isTablet ? 0 : 8,
       ),
       padding: EdgeInsets.all(isTablet ? 24 : 20),
       decoration: BoxDecoration(
@@ -284,11 +351,8 @@ class _SummaryCard extends StatelessWidget {
             iconBg: kWhite.withOpacity(0.2),
             isTablet: isTablet,
           ),
-          Container(
-            width: 1,
-            height: isTablet ? 60 : 50,
-            color: kWhite.withOpacity(0.2),
-          ),
+          Container(width: 1, height: isTablet ? 60 : 50,
+              color: kWhite.withOpacity(0.2)),
           _SummaryTile(
             label: 'Outstanding',
             value: 'RM ${state.totalBalance.toStringAsFixed(2)}',
@@ -302,12 +366,12 @@ class _SummaryCard extends StatelessWidget {
     );
   }
 }
+
 class _SummaryTile extends StatelessWidget {
   final String label;
   final String value;
   final IconData icon;
   final Color iconBg;
-  final Color valueColor;
   final bool alignEnd;
   final bool isTablet;
 
@@ -317,7 +381,6 @@ class _SummaryTile extends StatelessWidget {
     required this.icon,
     required this.iconBg,
     required this.isTablet,
-    this.valueColor = kWhite,
     this.alignEnd = false,
   });
 
@@ -327,45 +390,45 @@ class _SummaryTile extends StatelessWidget {
       crossAxisAlignment:
       alignEnd ? CrossAxisAlignment.end : CrossAxisAlignment.start,
       children: [
-        Row(
-          children: [
-            if (!alignEnd) ...[
-              Container(
-                padding: EdgeInsets.all(isTablet ? 8 : 6),
-                decoration: BoxDecoration(
-                    color: iconBg,
-                    borderRadius: BorderRadius.circular(8)),
-                child: Icon(icon, color: kWhite, size: isTablet ? 16 : 14),
-              ),
-              const SizedBox(width: 8),
-            ],
-            Text(label,
-                style: GoogleFonts.poppins(
-                    color: kWhite.withOpacity(0.7),
-                    fontSize: isTablet ? 12 : 11,
-                    fontWeight: FontWeight.w500)),
-            if (alignEnd) ...[
-              const SizedBox(width: 8),
-              Container(
-                padding: EdgeInsets.all(isTablet ? 8 : 6),
-                decoration: BoxDecoration(
-                    color: iconBg,
-                    borderRadius: BorderRadius.circular(8)),
-                child: Icon(icon, color: kWhite, size: isTablet ? 16 : 14),
-              ),
-            ],
+        Row(children: [
+          if (!alignEnd) ...[
+            Container(
+              padding: EdgeInsets.all(isTablet ? 8 : 6),
+              decoration: BoxDecoration(
+                  color: iconBg, borderRadius: BorderRadius.circular(8)),
+              child: Icon(icon, color: kWhite, size: isTablet ? 16 : 14),
+            ),
+            const SizedBox(width: 8),
           ],
-        ),
+          Text(label,
+              style: GoogleFonts.poppins(
+                  color: kWhite.withOpacity(0.7),
+                  fontSize: isTablet ? 12 : 11,
+                  fontWeight: FontWeight.w500)),
+          if (alignEnd) ...[
+            const SizedBox(width: 8),
+            Container(
+              padding: EdgeInsets.all(isTablet ? 8 : 6),
+              decoration: BoxDecoration(
+                  color: iconBg, borderRadius: BorderRadius.circular(8)),
+              child: Icon(icon, color: kWhite, size: isTablet ? 16 : 14),
+            ),
+          ],
+        ]),
         const SizedBox(height: 4),
         Text(value,
             style: GoogleFonts.poppins(
-                color: valueColor,
+                color: kWhite,
                 fontSize: isTablet ? 18 : 15,
                 fontWeight: FontWeight.bold)),
       ],
     );
   }
 }
+
+// ══════════════════════════════════════════════════════════════
+// STATS PANEL
+// ══════════════════════════════════════════════════════════════
 class _StatsPanel extends StatelessWidget {
   final ReceiptState state;
   const _StatsPanel({required this.state});
@@ -376,10 +439,10 @@ class _StatsPanel extends StatelessWidget {
     final balance   = state.totalBalance;
     final collected = total - balance;
     final paidCount = state.receiptMaster
-        .where((m) =>
-    (double.tryParse(m["Balance"].toString()) ?? 0) <= 0)
+        .where((m) => (double.tryParse(m['Balance'].toString()) ?? 0) <= 0)
         .length;
     final pendingCount = state.receiptMaster.length - paidCount;
+    final percent = total == 0 ? 0.0 : (collected / total).clamp(0.0, 1.0);
 
     return Container(
       padding: const EdgeInsets.all(20),
@@ -398,7 +461,6 @@ class _StatsPanel extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Header
           Row(children: [
             Container(
               width: 4, height: 20,
@@ -410,47 +472,51 @@ class _StatsPanel extends StatelessWidget {
             const SizedBox(width: 8),
             Text('Summary',
                 style: GoogleFonts.poppins(
-                  fontSize: 15,
-                  fontWeight: FontWeight.w700,
-                  color: AppTokens.brandDark,
-                )),
+                    fontSize: 15,
+                    fontWeight: FontWeight.w700,
+                    color: AppTokens.brandDark)),
           ]),
-
           const SizedBox(height: 16),
-
-          // Stat rows
-          _statRow('Total Bills',
-              '${state.receiptMaster.length}',
-              Icons.receipt_long_rounded,
-              AppTokens.brandGradientStart),
+          _statRow('Total Bills',    '${state.receiptMaster.length}',
+              Icons.receipt_long_rounded,  AppTokens.brandGradientStart),
           const SizedBox(height: 10),
-          _statRow('Paid',
-              '$paidCount',
-              Icons.check_circle_rounded,
-              const Color(0xFF059669)),
+          _statRow('Paid',           '$paidCount',
+              Icons.check_circle_rounded,  const Color(0xFF059669)),
           const SizedBox(height: 10),
-          _statRow('Pending',
-              '$pendingCount',
-              Icons.pending_rounded,
-              const Color(0xFFEA580C)),
-
+          _statRow('Pending',        '$pendingCount',
+              Icons.pending_rounded,       const Color(0xFFEA580C)),
           const SizedBox(height: 16),
           Divider(color: kAccent, height: 1),
           const SizedBox(height: 16),
-
-          // Amount rows
-          _amountRow('Collected',
-              'RM ${collected.toStringAsFixed(2)}',
+          _amountRow('Collected',  'RM ${collected.toStringAsFixed(2)}',
               const Color(0xFF059669)),
           const SizedBox(height: 10),
-          _amountRow('Outstanding',
-              'RM ${balance.toStringAsFixed(2)}',
+          _amountRow('Outstanding','RM ${balance.toStringAsFixed(2)}',
               const Color(0xFFEA580C)),
-
           const SizedBox(height: 16),
-
           // Progress bar
-          _buildProgressBar(collected, total),
+          Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
+            Text('Collection Progress',
+                style: GoogleFonts.poppins(
+                    fontSize: 11,
+                    color: AppTokens.brandDark.withOpacity(0.6))),
+            Text('${(percent * 100).toStringAsFixed(1)}%',
+                style: GoogleFonts.poppins(
+                    fontSize: 11,
+                    color: AppTokens.brandGradientStart,
+                    fontWeight: FontWeight.w700)),
+          ]),
+          const SizedBox(height: 8),
+          ClipRRect(
+            borderRadius: BorderRadius.circular(10),
+            child: LinearProgressIndicator(
+              value: percent,
+              minHeight: 8,
+              backgroundColor: kAccent,
+              valueColor: const AlwaysStoppedAnimation<Color>(
+                  AppTokens.brandGradientStart),
+            ),
+          ),
         ],
       ),
     );
@@ -472,17 +538,13 @@ class _StatsPanel extends StatelessWidget {
           const SizedBox(width: 10),
           Text(label,
               style: GoogleFonts.poppins(
-                fontSize: 13,
-                color: AppTokens.brandDark,
-                fontWeight: FontWeight.w500,
-              )),
+                  fontSize: 13,
+                  color: AppTokens.brandDark,
+                  fontWeight: FontWeight.w500)),
         ]),
         Text(value,
             style: GoogleFonts.poppins(
-              fontSize: 14,
-              color: color,
-              fontWeight: FontWeight.w700,
-            )),
+                fontSize: 14, color: color, fontWeight: FontWeight.w700)),
       ],
     );
   }
@@ -493,55 +555,20 @@ class _StatsPanel extends StatelessWidget {
       children: [
         Text(label,
             style: GoogleFonts.poppins(
-              fontSize: 12,
-              color: AppTokens.brandDark.withOpacity(0.6),
-              fontWeight: FontWeight.w500,
-            )),
+                fontSize: 12,
+                color: AppTokens.brandDark.withOpacity(0.6),
+                fontWeight: FontWeight.w500)),
         Text(value,
             style: GoogleFonts.poppins(
-              fontSize: 13,
-              color: color,
-              fontWeight: FontWeight.w700,
-            )),
-      ],
-    );
-  }
-
-  Widget _buildProgressBar(double collected, double total) {
-    final percent = total == 0 ? 0.0 : (collected / total).clamp(0.0, 1.0);
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Text('Collection Progress',
-                style: GoogleFonts.poppins(
-                  fontSize: 11,
-                  color: AppTokens.brandDark.withOpacity(0.6),
-                )),
-            Text('${(percent * 100).toStringAsFixed(1)}%',
-                style: GoogleFonts.poppins(
-                  fontSize: 11,
-                  color: AppTokens.brandGradientStart,
-                  fontWeight: FontWeight.w700,
-                )),
-          ],
-        ),
-        const SizedBox(height: 8),
-        ClipRRect(
-          borderRadius: BorderRadius.circular(10),
-          child: LinearProgressIndicator(
-            value: percent,
-            minHeight: 8,
-            backgroundColor: kAccent,
-            valueColor: const AlwaysStoppedAnimation<Color>(AppTokens.brandGradientStart),
-          ),
-        ),
+                fontSize: 13, color: color, fontWeight: FontWeight.w700)),
       ],
     );
   }
 }
+
+// ══════════════════════════════════════════════════════════════
+// RECEIPT LIST — ListView.builder (was ListView + .map())
+// ══════════════════════════════════════════════════════════════
 class _ReceiptList extends StatelessWidget {
   final ReceiptState state;
   final bool isTablet;
@@ -549,41 +576,61 @@ class _ReceiptList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ListView(
-      padding: EdgeInsets.fromLTRB(
-        isTablet ? 0 : 16,
-        4,
-        isTablet ? 0 : 16,
-        16,
-      ),
-      children: [
-        Padding(
-          padding: const EdgeInsets.symmetric(vertical: 8),
-          child: Row(children: [
-            Container(
-              width: 4, height: 20,
-              decoration: BoxDecoration(
-                color: AppTokens.brandGradientStart,
-                borderRadius: BorderRadius.circular(4),
-              ),
-            ),
-            const SizedBox(width: 8),
-            Text(
-              'Receipts (${state.receiptMaster.length})',
-              style: GoogleFonts.poppins(
-                fontSize: isTablet ? 16 : 15,
-                fontWeight: FontWeight.w700,
-                color: AppTokens.brandDark,
-              ),
-            ),
-          ]),
+    if (state.receiptMaster.isEmpty) {
+      return Center(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(Icons.receipt_long_outlined, size: 48, color: Colors.grey.shade400),
+            const SizedBox(height: 12),
+            Text('No receipts found',
+                style: GoogleFonts.poppins(color: Colors.grey)),
+          ],
         ),
-        ...state.receiptMaster
-            .map((m) => _ReceiptCard(data: m, isTablet: isTablet)),
-      ],
+      );
+    }
+
+    return ListView.builder(
+      // ✅ builder — only visible items rendered, memory efficient
+      padding: EdgeInsets.fromLTRB(
+          isTablet ? 0 : 16, 4, isTablet ? 0 : 16, 16),
+      itemCount: state.receiptMaster.length + 1, // +1 for header
+      itemBuilder: (context, index) {
+        if (index == 0) {
+          return Padding(
+            padding: const EdgeInsets.symmetric(vertical: 8),
+            child: Row(children: [
+              Container(
+                width: 4, height: 20,
+                decoration: BoxDecoration(
+                  color: AppTokens.brandGradientStart,
+                  borderRadius: BorderRadius.circular(4),
+                ),
+              ),
+              const SizedBox(width: 8),
+              Text(
+                'Receipts (${state.receiptMaster.length})',
+                style: GoogleFonts.poppins(
+                  fontSize: isTablet ? 16 : 15,
+                  fontWeight: FontWeight.w700,
+                  color: AppTokens.brandDark,
+                ),
+              ),
+            ]),
+          );
+        }
+        return _ReceiptCard(
+          data: state.receiptMaster[index - 1],
+          isTablet: isTablet,
+        );
+      },
     );
   }
 }
+
+// ══════════════════════════════════════════════════════════════
+// RECEIPT CARD
+// ══════════════════════════════════════════════════════════════
 class _ReceiptCard extends StatelessWidget {
   final Map<String, dynamic> data;
   final bool isTablet;
@@ -591,12 +638,10 @@ class _ReceiptCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    double billAmount =
-        double.tryParse(data["BillAmount"].toString()) ?? 0;
-    double balance   =
-        double.tryParse(data["Balance"].toString()) ?? 0;
-    double collected = billAmount - balance;
-    bool isPaid      = balance <= 0;
+    final billAmount = double.tryParse(data['BillAmount'].toString()) ?? 0;
+    final balance    = double.tryParse(data['Balance'].toString())    ?? 0;
+    final collected  = billAmount - balance;
+    final isPaid     = balance <= 0;
 
     return Container(
       margin: EdgeInsets.only(bottom: isTablet ? 14 : 12),
@@ -617,7 +662,7 @@ class _ReceiptCard extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // ── Top Row
+            // Top row
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -625,36 +670,29 @@ class _ReceiptCard extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
-                        data["CustomerName"] ?? '',
-                        style: GoogleFonts.poppins(
-                          fontSize: isTablet ? 15 : 14,
-                          fontWeight: FontWeight.w700,
-                          color: AppTokens.brandDark,
-                        ),
-                        overflow: TextOverflow.ellipsis,
-                      ),
+                      Text(data['CustomerName'] ?? '',
+                          style: GoogleFonts.poppins(
+                            fontSize: isTablet ? 15 : 14,
+                            fontWeight: FontWeight.w700,
+                            color: AppTokens.brandDark,
+                          ),
+                          overflow: TextOverflow.ellipsis),
                       const SizedBox(height: 3),
-                      Text(
-                        '${data["BillNo"]} • ${data["BillDate"]}',
-                        style: GoogleFonts.poppins(
-                          fontSize: isTablet ? 12 : 11,
-                          color: AppTokens.brandMid.withOpacity(0.7),
-                        ),
-                      ),
+                      Text('${data['BillNo']} • ${data['BillDate']}',
+                          style: GoogleFonts.poppins(
+                            fontSize: isTablet ? 12 : 11,
+                            color: AppTokens.brandMid.withOpacity(0.7),
+                          )),
                     ],
                   ),
                 ),
-                // Status Badge
                 Container(
                   padding: EdgeInsets.symmetric(
                     horizontal: isTablet ? 14 : 10,
-                    vertical: isTablet ? 7 : 5,
+                    vertical:   isTablet ? 7  : 5,
                   ),
                   decoration: BoxDecoration(
-                    color: isPaid
-                        ? const Color(0xFFD1FAE5)
-                        : kAccent,
+                    color: isPaid ? const Color(0xFFD1FAE5) : kAccent,
                     borderRadius: BorderRadius.circular(20),
                     border: Border.all(
                       color: isPaid
@@ -680,62 +718,57 @@ class _ReceiptCard extends StatelessWidget {
             Divider(color: kAccent, height: 1),
             SizedBox(height: isTablet ? 14 : 12),
 
-            // ── Amount Chips
-            Row(
-              children: [
-                Expanded(
-                  child: _AmountChip(
-                    label: 'Total',
-                    amount: 'RM ${billAmount.toStringAsFixed(2)}',
-                    color: AppTokens.brandGradientStart,
-                    bgColor: RWhite,
-                    isTablet: isTablet,
-                  ),
+            // Amount chips
+            Row(children: [
+              Expanded(
+                child: _AmountChip(
+                  label: 'Total',
+                  amount: 'RM ${billAmount.toStringAsFixed(2)}',
+                  color: AppTokens.brandGradientStart,
+                  isTablet: isTablet,
                 ),
-                const SizedBox(width: 8), // Gap between chip 1 and 2
-                Expanded(
-                  child: _AmountChip(
-                    label: 'Collected',
-                    amount: 'RM ${collected.toStringAsFixed(2)}',
-                    color: AppTokens.brandGradientStart,
-                    bgColor: RWhite,
-                    isTablet: isTablet,
-                  ),
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: _AmountChip(
+                  label: 'Collected',
+                  amount: 'RM ${collected.toStringAsFixed(2)}',
+                  color: AppTokens.brandGradientStart,
+                  isTablet: isTablet,
                 ),
-                const SizedBox(width: 8), // Gap between chip 2 and 3
-                Expanded(
-                  child: _AmountChip(
-                    label: 'Balance',
-                    amount: 'RM ${balance.toStringAsFixed(2)}',
-                    color: balance > 0
-                        ? const Color(0xFF740000)
-                        : AppTokens.brandGradientStart,
-                    bgColor: balance > 0 // Note: Both conditions evaluate to RWhite here, you might want to check this!
-                        ? RWhite
-                        : RWhite,
-                    isTablet: isTablet,
-                  ),
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: _AmountChip(
+                  label: 'Balance',
+                  amount: 'RM ${balance.toStringAsFixed(2)}',
+                  color: balance > 0
+                      ? const Color(0xFF740000)
+                      : AppTokens.brandGradientStart,
+                  isTablet: isTablet,
                 ),
-              ],
-            )
+              ),
+            ]),
           ],
         ),
       ),
     );
   }
 }
+
+// ══════════════════════════════════════════════════════════════
+// AMOUNT CHIP — fixed RWhite bug → kWhite
+// ══════════════════════════════════════════════════════════════
 class _AmountChip extends StatelessWidget {
   final String label;
   final String amount;
   final Color color;
-  final Color bgColor;
   final bool isTablet;
 
   const _AmountChip({
     required this.label,
     required this.amount,
     required this.color,
-    required this.bgColor,
     required this.isTablet,
   });
 
@@ -744,36 +777,32 @@ class _AmountChip extends StatelessWidget {
     return Container(
       padding: EdgeInsets.symmetric(
         horizontal: isTablet ? 16 : 12,
-        vertical: isTablet ? 10 : 8,
+        vertical:   isTablet ? 10 : 8,
       ),
       decoration: BoxDecoration(
-        color: bgColor,
+        color: kWhite,  // ✅ fixed: was RWhite (undefined)
         borderRadius: BorderRadius.circular(isTablet ? 14 : 12),
       ),
       child: Column(
-        mainAxisSize: MainAxisSize.min, // Good practice to prevent infinite height issues
+        mainAxisSize: MainAxisSize.min,
         children: [
-          Text(
-            label,
-            maxLines: 1, // Restrict to one line
-            overflow: TextOverflow.ellipsis, // Add ellipsis if it shrinks
-            style: GoogleFonts.poppins(
-              fontSize: isTablet ? 11 : 10,
-              color: color.withOpacity(0.7),
-              fontWeight: FontWeight.w500,
-            ),
-          ),
+          Text(label,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: GoogleFonts.poppins(
+                fontSize: isTablet ? 11 : 10,
+                color: color.withOpacity(0.7),
+                fontWeight: FontWeight.w500,
+              )),
           const SizedBox(height: 3),
-          Text(
-            amount,
-            maxLines: 1, // Restrict to one line
-            overflow: TextOverflow.ellipsis, // Add ellipsis if it shrinks
-            style: GoogleFonts.poppins(
-              fontSize: isTablet ? 13 : 12,
-              color: color,
-              fontWeight: FontWeight.w700,
-            ),
-          ),
+          Text(amount,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: GoogleFonts.poppins(
+                fontSize: isTablet ? 13 : 12,
+                color: color,
+                fontWeight: FontWeight.w700,
+              )),
         ],
       ),
     );

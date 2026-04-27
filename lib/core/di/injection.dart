@@ -37,6 +37,8 @@ import 'package:maleva/features/dashboard/admin_dashboard/tabs/stockinentry/bloc
 import 'package:maleva/features/dashboard/admin_dashboard/tabs/stocktransfer/bloc/stock_transfer_bloc.dart';
 import 'package:maleva/features/dashboard/admin_dashboard/tabs/stockupdate/bloc/stock_update_bloc.dart';
 
+import '../../features/dashboard/admin_dashboard/tabs/receiptview/data/receipt_repository.dart';
+
 final sl = GetIt.instance;
 
 Future<void> setupDependencies() async {
@@ -106,14 +108,16 @@ Future<void> setupDependencies() async {
   sl.registerFactory<AIMaintenanceBloc>(
         () => AIMaintenanceBloc(repository: sl<MaintenanceAIRepository>()),
   );
-
+  sl.registerFactory<ReceiptBloc>(
+        () => ReceiptBloc(receiptRepo: sl<ReceiptRepository>()),
+  );
   // ── No-dep dashboard tabs (no-arg constructors) ─────────────────
   sl.registerFactory<SalesOrderBloc>(() => SalesOrderBloc());
   sl.registerFactory<MaintenanceBloc>(() => MaintenanceBloc());
   sl.registerFactory<DriverLicenseExpiryBloc>(() => DriverLicenseExpiryBloc());
   sl.registerFactory<TruckMaintDashBloc>(() => TruckMaintDashBloc());
   sl.registerFactory<DriverSalaryBloc>(() => DriverSalaryBloc());
-  sl.registerFactory<ReceiptBloc>(() => ReceiptBloc());
+  // sl.registerFactory<ReceiptBloc>(() => ReceiptBloc());
   sl.registerFactory<CustomerDashboardBloc>(() => CustomerDashboardBloc());
   sl.registerFactory<StockInEntryBloc>(() => StockInEntryBloc());
   sl.registerFactory<StockTransferBloc>(() => StockTransferBloc());

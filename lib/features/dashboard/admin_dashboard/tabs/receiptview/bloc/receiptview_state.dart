@@ -1,6 +1,14 @@
+// lib/features/dashboard/admin_dashboard/tabs/receiptview/bloc/receiptview_state.dart
 
-class ReceiptState {
-  final bool progress;
+import 'package:equatable/equatable.dart';
+
+// ── Status enum — replaces the confusing `progress` bool ──────────────────────
+// BEFORE: progress=false means loading, progress=true means done — inverted!
+// AFTER:  explicit enum — clear, readable
+enum ReceiptStatus { initial, loading, loaded, error }
+
+class ReceiptState extends Equatable {
+  final ReceiptStatus status;
   final DateTime? fromDate;
   final DateTime? toDate;
   final List<Map<String, dynamic>> receiptMaster;
@@ -10,18 +18,23 @@ class ReceiptState {
   final String? errorMessage;
 
   const ReceiptState({
-   this.progress = true,
-   this.fromDate,
-   this.toDate,
-   this.receiptMaster = const [],
-   this.receiptDetails = const [],
-   this.totalAmount = 0.0,
-   this.totalBalance = 0.0,
-   this.errorMessage,
-});
+    this.status = ReceiptStatus.initial,
+    this.fromDate,
+    this.toDate,
+    this.receiptMaster = const [],
+    this.receiptDetails = const [],
+    this.totalAmount = 0.0,
+    this.totalBalance = 0.0,
+    this.errorMessage,
+  });
 
-  ReceiptState copyWith ({
-    bool? progress,
+  // Convenience getters for view
+  bool get isLoading => status == ReceiptStatus.loading;
+  bool get isLoaded  => status == ReceiptStatus.loaded;
+  bool get hasError  => status == ReceiptStatus.error;
+
+  ReceiptState copyWith({
+    ReceiptStatus? status,
     DateTime? fromDate,
     DateTime? toDate,
     List<Map<String, dynamic>>? receiptMaster,
@@ -29,17 +42,28 @@ class ReceiptState {
     double? totalAmount,
     double? totalBalance,
     String? errorMessage,
-}) {
+    bool clearError = false,
+  }) {
     return ReceiptState(
-      progress: progress ?? this.progress,
-      fromDate: fromDate ?? this.fromDate,
-      toDate: toDate ?? this.toDate,
-      receiptMaster: receiptMaster ?? this.receiptMaster,
+      status:         status         ?? this.status,
+      fromDate:       fromDate       ?? this.fromDate,
+      toDate:         toDate         ?? this.toDate,
+      receiptMaster:  receiptMaster  ?? this.receiptMaster,
       receiptDetails: receiptDetails ?? this.receiptDetails,
-      totalAmount: totalAmount ?? this.totalAmount,
-      totalBalance: totalBalance ?? this.totalBalance,
-      errorMessage: errorMessage ?? this.errorMessage,
+      totalAmount:    totalAmount    ?? this.totalAmount,
+      totalBalance:   totalBalance   ?? this.totalBalance,
+      errorMessage:   clearError ? null : (errorMessage ?? this.errorMessage),
     );
   }
 
+  @override
+  List<Object?> get props => [
+    status,
+    fromDate,
+    toDate,
+    receiptMaster.length,
+    totalAmount,
+    totalBalance,
+    errorMessage,
+  ];
 }

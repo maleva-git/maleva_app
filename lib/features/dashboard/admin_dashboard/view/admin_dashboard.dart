@@ -5,6 +5,7 @@ import 'package:intl/intl.dart';
 import 'package:maleva/features/dashboard/admin_dashboard/tabs/ExpenseReport/bloc/expensereport_bloc.dart';
 import 'package:maleva/features/dashboard/admin_dashboard/tabs/ExpenseReport/bloc/expensereport_event.dart';
 import 'package:maleva/features/dashboard/admin_dashboard/tabs/salesorder/bloc/salesorder_bloc.dart';
+import '../../../../core/di/injection.dart';
 import '../../../common_updates/blocs/sales/sales_bloc.dart';
 import '../../../common_updates/blocs/truck/truck_bloc.dart';
 import '../bloc/admin_tab_bloc.dart';
@@ -59,6 +60,7 @@ import '../tabs/pettycash/bloc/pettycash_event.dart';
 import '../tabs/pettycash/view/pettycash_tab.dart';
 import '../tabs/receiptview/bloc/receiptview_bloc.dart';
 import '../tabs/receiptview/bloc/receiptview_event.dart';
+import '../tabs/receiptview/data/receipt_repository.dart';
 import '../tabs/receiptview/view/receiptview_tab.dart';
 import '../tabs/rtiview/bloc/rtiview_bloc.dart';
 import '../tabs/rtiview/bloc/rtiview_event.dart';
@@ -139,8 +141,7 @@ class _AdminDashboardState extends State<NewAdminDashboard> with SingleTickerPro
               child: const SalesOrderTab(),
             ),
             BlocProvider(
-              create: (_) => ReceiptBloc(
-              )..add(LoadReceiptEvent()),
+              create: (_) => sl<ReceiptBloc>()..add(LoadReceiptEvent()),
               child: const ReceiptPage(),
             ),
             BlocProvider(

@@ -61,7 +61,7 @@ dependencies:
   fl_chart: ^0.66.0
   equatable: ^2.0.5
   bloc_concurrency: ^0.2.0
-
+  get_it: ^8.0.2
 #  file_picker: ^6.1.1
 
 dev_dependencies:
