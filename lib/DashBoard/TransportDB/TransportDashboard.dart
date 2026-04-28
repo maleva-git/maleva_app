@@ -18,16 +18,16 @@ import '../../Transaction/SaleOrder/SalesOrderAdd.dart';
 part 'package:maleva/DashBoard/TransportDB/mobileTransportDashboard.dart';
 part 'package:maleva/DashBoard/TransportDB/tabletTransportDashboard.dart';
 
-class TransportDashboard extends StatefulWidget {
+class OldTransportDashboard extends StatefulWidget {
   final Review? existingReview;
   final int initialTabIndex;
-  const TransportDashboard({super.key,this.existingReview, this.initialTabIndex = 0});
+  const OldTransportDashboard({super.key,this.existingReview, this.initialTabIndex = 0});
 
   @override
-  TransportDashboardState createState() => TransportDashboardState();
+  OldTransportDashboardState createState() => OldTransportDashboardState();
 }
 
-class TransportDashboardState extends State<TransportDashboard> with TickerProviderStateMixin {
+class OldTransportDashboardState extends State<OldTransportDashboard> with TickerProviderStateMixin {
   bool progress = false;
   late MenuMasterModel menuControl;
   bool Is6Months = true;

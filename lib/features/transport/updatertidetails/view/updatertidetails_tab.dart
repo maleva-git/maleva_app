@@ -122,7 +122,7 @@ class _UpdateRTIPage extends StatelessWidget {
           dest = const NewAdminDashboard();
           break;
         case 'TRANSPORTATION':
-          dest = const TransportDashboard();
+          dest = const OldTransportDashboard();
           break;
         case 'OPERATIONADMIN':
           dest = const OperationAdminDashboard();

@@ -138,7 +138,7 @@ class _EnquiryViewPage extends StatelessWidget {
         dest = const CustDashboard();
         break;
       case 'TRANSPORTATION':
-        dest = const TransportDashboard();
+        dest = const OldTransportDashboard();
         break;
       case 'OPERATIONADMIN':
         dest = const OperationAdminDashboard();

@@ -32,6 +32,8 @@ import '../features/dashboard/payable_dashboard/bloc/payable_dasboard_bloc.dart'
 import '../features/dashboard/payable_dashboard/view/payable_dashboard.dart';
 import '../features/dashboard/subadmin_dashboard/bloc/subadmin_dashboard_bloc.dart';
 import '../features/dashboard/subadmin_dashboard/view/subadmin_dashboard.dart';
+import '../features/dashboard/transport_dashboard/bloc/transport_bloc.dart';
+import '../features/dashboard/transport_dashboard/view/transport_dashboard.dart';
 
 // ─── Design tokens (splash only) ─────────────────────────────────────────────
 
@@ -176,7 +178,7 @@ class _SplashScreenState extends State<SplashScreen>
         }
         else if(objfun.storagenew.getString('RulesType') == "TRANSPORTATION")
         {
-          Navigator.push(context, MaterialPageRoute(builder: (context) => const TransportDashboard()));
+          Navigator.push(context, MaterialPageRoute(builder: (context) => const OldTransportDashboard()));
         }
         else if(objfun.storagenew.getString('RulesType') == "OPERATIONADMIN")
         {
@@ -202,6 +204,22 @@ class _SplashScreenState extends State<SplashScreen>
             ),
           );
         }
+
+
+        else if(objfun.storagenew.getString('RulesType') == "TRANSPORTATION")
+        {
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+              builder: (_) => BlocProvider(
+                create: (_) => TransportTabBloc(),
+                child: const TransportDashboard(),
+              ),
+            ),
+          );
+        }
+
+
         else if(objfun.storagenew.getString('RulesType') == "AIR FRIEGHT")
         {
           Navigator.push(context, MaterialPageRoute(builder: (context) => const AirFrieghtDashboard()));

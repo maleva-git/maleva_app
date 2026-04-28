@@ -121,7 +121,7 @@ class _PreAlertPage extends StatelessWidget {
         dest = const SalesDashboard();
         break;
       case 'TRANSPORTATION':
-        dest = const TransportDashboard();
+        dest = const OldTransportDashboard();
         break;
       case 'OPERATIONADMIN':
         dest = const OperationAdminDashboard();

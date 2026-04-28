@@ -56,7 +56,7 @@ class _PlanningScaffold extends StatelessWidget {
     final Widget dest = switch (role) {
       'ADMIN'          => const NewAdminDashboard(),
       'SALES'          => const CustDashboard(),
-      'TRANSPORTATION' => const TransportDashboard(),
+      'TRANSPORTATION' => const OldTransportDashboard(),
       'OPERATIONADMIN' => const OperationAdminDashboard(),
       _                => const Homemobile(),
     };

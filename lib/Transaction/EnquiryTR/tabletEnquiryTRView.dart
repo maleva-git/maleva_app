@@ -487,7 +487,7 @@ tabletdesign(OldEnquiryTRViewState state, BuildContext context) {
     }
     else if(objfun.storagenew.getString('RulesType') == "TRANSPORTATION")
     {
-      Navigator.push(context, MaterialPageRoute(builder: (context) => const TransportDashboard()));
+      Navigator.push(context, MaterialPageRoute(builder: (context) => const OldTransportDashboard()));
     }
     else if(objfun.storagenew.getString('RulesType') == "OPERATIONADMIN")
     {

@@ -1,6 +1,6 @@
 part of 'package:maleva/DashBoard/TransportDB/TransportDashboard.dart';
 
-mobiledesign(TransportDashboardState state, BuildContext context) {
+mobiledesign(OldTransportDashboardState state, BuildContext context) {
   double width = MediaQuery.of(context).size.width;
   double height = MediaQuery.of(context).size.height;
 
@@ -123,10 +123,7 @@ mobiledesign(TransportDashboardState state, BuildContext context) {
               bottom: TabBar(
                 isScrollable: true,
                 tabs: const [
-                  Tab(
-                    text: 'SALES',
-                  ),
-
+                  Tab(text: 'SALES'),
                   Tab(text: 'TRANSPORT'),
                   Tab(text: 'ENQ'),
                   Tab(text: 'EmailInbox'),
@@ -199,7 +196,7 @@ mobiledesign(TransportDashboardState state, BuildContext context) {
                           child: DropdownButtonHideUnderline(
                             child: DropdownButton<String>(
                               isExpanded: true,
-                              value: TransportDashboardState.RulesTypeEmployee.any(
+                              value: OldTransportDashboardState.RulesTypeEmployee.any(
                                       (e) => e['Id'].toString() == state.dropdownValueEMp)
                                   ? state.dropdownValueEMp
                                   : null,
@@ -211,7 +208,7 @@ mobiledesign(TransportDashboardState state, BuildContext context) {
                                 });
                                 state.loadSalesdata();
                               },
-                              items: TransportDashboardState.RulesTypeEmployee.map<DropdownMenuItem<String>>(
+                              items: OldTransportDashboardState.RulesTypeEmployee.map<DropdownMenuItem<String>>(
                                     (Map<String, dynamic> item) {
                                   return DropdownMenuItem<String>(
                                     value: item['Id'].toString(),

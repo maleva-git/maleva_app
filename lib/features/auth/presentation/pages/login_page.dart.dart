@@ -10,9 +10,10 @@ import '../../../dashboard/operationadmin_dashboard/bloc/operationadmin_dashboar
 import '../../../dashboard/operationadmin_dashboard/view/operationadmin_dashboard.dart';
 import '../../../dashboard/payable_dashboard/bloc/payable_dasboard_bloc.dart';
 import '../../../dashboard/payable_dashboard/view/payable_dashboard.dart';
-import '../../../dashboard/payable_dashboard/view/payable_dashboard_ui.dart';
 import '../../../dashboard/subadmin_dashboard/bloc/subadmin_dashboard_bloc.dart';
 import '../../../dashboard/subadmin_dashboard/view/subadmin_dashboard.dart';
+import '../../../dashboard/transport_dashboard/bloc/transport_bloc.dart';
+import '../../../dashboard/transport_dashboard/view/transport_dashboard.dart';
 import '../bloc/auth_bloc.dart';
 import '../bloc/auth_state.dart';
 import 'login_design.dart';
@@ -99,7 +100,10 @@ class Appuserloginmobile extends StatelessWidget {
     // Navigator.push(context, MaterialPageRoute(builder: (context) => const PayableDashbord()));
     // }
 
-      case "ACCOUNTS":
+      case
+
+
+      "ACCOUNTS":
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(
@@ -122,7 +126,17 @@ class Appuserloginmobile extends StatelessWidget {
           ),
         );
         break;
-
+      case "TRANSPORTATION":
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (_) => BlocProvider(
+              create: (_) => TransportTabBloc(),
+              child: const TransportDashboard(),
+            ),
+          ),
+        );
+        break;
     // else if(objfun.storagenew.getString('RulesType') == "TRANSPORTATION")
     // {
     // Navigator.push(context, MaterialPageRoute(builder: (context) => const TransportDashboard()));
