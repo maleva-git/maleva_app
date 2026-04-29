@@ -34,6 +34,8 @@ import '../features/dashboard/subadmin_dashboard/bloc/subadmin_dashboard_bloc.da
 import '../features/dashboard/subadmin_dashboard/view/subadmin_dashboard.dart';
 import '../features/dashboard/transport_dashboard/bloc/transport_bloc.dart';
 import '../features/dashboard/transport_dashboard/view/transport_dashboard.dart';
+import '../features/dashboard/warehouse_dashboard/bloc/warehouse_bloc.dart';
+import '../features/dashboard/warehouse_dashboard/view/warehouse_dashboard.dart';
 
 // ─── Design tokens (splash only) ─────────────────────────────────────────────
 
@@ -219,6 +221,18 @@ class _SplashScreenState extends State<SplashScreen>
           );
         }
 
+        else if(objfun.storagenew.getString('RulesType') == "WAREHOUSE")
+        {
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+              builder: (_) => BlocProvider(
+                create: (_) => WareHouseTabBloc(),
+                child: const WareHouseDashboard(),
+              ),
+            ),
+          );
+        }
 
         else if(objfun.storagenew.getString('RulesType') == "AIR FRIEGHT")
         {

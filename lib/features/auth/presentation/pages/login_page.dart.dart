@@ -14,6 +14,8 @@ import '../../../dashboard/subadmin_dashboard/bloc/subadmin_dashboard_bloc.dart'
 import '../../../dashboard/subadmin_dashboard/view/subadmin_dashboard.dart';
 import '../../../dashboard/transport_dashboard/bloc/transport_bloc.dart';
 import '../../../dashboard/transport_dashboard/view/transport_dashboard.dart';
+import '../../../dashboard/warehouse_dashboard/bloc/warehouse_bloc.dart';
+import '../../../dashboard/warehouse_dashboard/view/warehouse_dashboard.dart';
 import '../bloc/auth_bloc.dart';
 import '../bloc/auth_state.dart';
 import 'login_design.dart';
@@ -185,6 +187,20 @@ class Appuserloginmobile extends StatelessWidget {
           ),
         );
         break;
+
+      case "WAREHOUSE":
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (_) => BlocProvider(
+              create: (_) => WareHouseTabBloc(),
+              child: const WareHouseDashboard(),
+            ),
+          ),
+        );
+        break;
+
+
        // case "SALES":
        //   Navigator.pushReplacement(
        //     context,
