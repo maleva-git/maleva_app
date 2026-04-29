@@ -10,6 +10,8 @@ import '../../../dashboard/operationadmin_dashboard/bloc/operationadmin_dashboar
 import '../../../dashboard/operationadmin_dashboard/view/operationadmin_dashboard.dart';
 import '../../../dashboard/payable_dashboard/bloc/payable_dasboard_bloc.dart';
 import '../../../dashboard/payable_dashboard/view/payable_dashboard.dart';
+import '../../../dashboard/receivable_dashboard/bloc/receivable_bloc.dart';
+import '../../../dashboard/receivable_dashboard/view/receivable_dashboard.dart';
 import '../../../dashboard/subadmin_dashboard/bloc/subadmin_dashboard_bloc.dart';
 import '../../../dashboard/subadmin_dashboard/view/subadmin_dashboard.dart';
 import '../../../dashboard/transport_dashboard/bloc/transport_bloc.dart';
@@ -200,6 +202,17 @@ class Appuserloginmobile extends StatelessWidget {
         );
         break;
 
+      case "RECEIVABLE":
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (_) => BlocProvider(
+              create: (_) => ReceivableTabBloc(),
+              child: const ReceivableDashboard(),
+            ),
+          ),
+        );
+        break;
 
        // case "SALES":
        //   Navigator.pushReplacement(

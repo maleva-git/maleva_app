@@ -46,7 +46,7 @@ class WareHouseMobileDashboard extends StatelessWidget {
       backgroundColor: AppColors.appBarColor,
       toolbarHeight: isTablet ? 64 : 56,
       title: Text(
-        'Dash Board',
+        'WareHouse',
         style: GoogleFonts.lato(
           color: colour.topAppBarColor,
           fontWeight: FontWeight.bold,

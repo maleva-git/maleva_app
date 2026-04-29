@@ -30,6 +30,7 @@ import '../features/dashboard/operationadmin_dashboard/bloc/operationadmin_dashb
 import '../features/dashboard/operationadmin_dashboard/view/operationadmin_dashboard.dart';
 import '../features/dashboard/payable_dashboard/bloc/payable_dasboard_bloc.dart';
 import '../features/dashboard/payable_dashboard/view/payable_dashboard.dart';
+import '../features/dashboard/receivable_dashboard/bloc/receivable_bloc.dart';
 import '../features/dashboard/subadmin_dashboard/bloc/subadmin_dashboard_bloc.dart';
 import '../features/dashboard/subadmin_dashboard/view/subadmin_dashboard.dart';
 import '../features/dashboard/transport_dashboard/bloc/transport_bloc.dart';
@@ -234,6 +235,20 @@ class _SplashScreenState extends State<SplashScreen>
           );
         }
 
+
+        else if(objfun.storagenew.getString('RulesType') == "RECEIVABLE")
+        {
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+              builder: (_) => BlocProvider(
+                create: (_) => ReceivableTabBloc(),
+                child: const ReceivableDashboard(),
+              ),
+            ),
+          );
+        }
+
         else if(objfun.storagenew.getString('RulesType') == "AIR FRIEGHT")
         {
           Navigator.push(context, MaterialPageRoute(builder: (context) => const AirFrieghtDashboard()));
@@ -254,10 +269,10 @@ class _SplashScreenState extends State<SplashScreen>
         {
           Navigator.push(context, MaterialPageRoute(builder: (context) => const MaintenanceDashboard()));
         }
-        else if( objfun.storagenew.getString('RulesType') == "RECEIVABLE" )
-        {
-          Navigator.push(context, MaterialPageRoute(builder: (context) => const ReceivableDashboard()));
-        }
+        // else if( objfun.storagenew.getString('RulesType') == "RECEIVABLE" )
+        // {
+        //   Navigator.push(context, MaterialPageRoute(builder: (context) => const ReceivableDashboard()));
+        // }
         // else if( objfun.storagenew.getString('RulesType') == "ACCOUNTS")
         // {
         //   Navigator.push(context, MaterialPageRoute(builder: (context) => const PayableDashbord()));
