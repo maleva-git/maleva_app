@@ -179,10 +179,10 @@ class _SplashScreenState extends State<SplashScreen>
         //  Navigator.push(context, MaterialPageRoute(builder: (context) => const CustDashboard()));
           Navigator.push(context, MaterialPageRoute(builder: (context) => const SalesDashboard()));
         }
-        else if(objfun.storagenew.getString('RulesType') == "TRANSPORTATION")
-        {
-          Navigator.push(context, MaterialPageRoute(builder: (context) => const OldTransportDashboard()));
-        }
+        // else if(objfun.storagenew.getString('RulesType') == "TRANSPORTATION")
+        // {
+        //   Navigator.push(context, MaterialPageRoute(builder: (context) => const OldTransportDashboard()));
+        // }
         else if(objfun.storagenew.getString('RulesType') == "OPERATIONADMIN")
         {
           Navigator.pushReplacement(
@@ -247,6 +247,7 @@ class _SplashScreenState extends State<SplashScreen>
               ),
             ),
           );
+
         }
 
         else if(objfun.storagenew.getString('RulesType') == "AIR FRIEGHT")

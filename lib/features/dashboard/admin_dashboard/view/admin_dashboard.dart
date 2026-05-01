@@ -145,11 +145,9 @@ class _AdminDashboardState extends State<NewAdminDashboard> with SingleTickerPro
               child: const ReceiptPage(),
             ),
             BlocProvider(
-              create: (context) => ForwardingReportBloc(context)
-                ..add(LoadFWDataEvent(
-                  fromDate: DateFormat("yyyy-MM-dd").format(DateTime.now()),
-                  toDate: DateFormat("yyyy-MM-dd").format(DateTime.now()),
-                )),
+              // Use sl (GetIt) to create the Bloc. It automatically injects the required repository.
+              create: (_) => sl<ForwardingReportBloc>()
+                ..add(const LoadForwardingReportEvent()),
               child: const ForwardingReportView(),
             ),
             BlocProvider(
@@ -284,5 +282,7 @@ class _AdminDashboardState extends State<NewAdminDashboard> with SingleTickerPro
     );                                          // ← LayoutBuilder close
   }                                             // ← build() close
 }
+
+
 
 

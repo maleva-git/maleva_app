@@ -1,71 +1,82 @@
-import 'package:flutter/Material.dart';
+import 'package:bloc_concurrency/bloc_concurrency.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
-import 'package:maleva/features/dashboard/admin_dashboard/tabs/forwardingreport/bloc/forwardingreport_event.dart';
-import 'package:maleva/core/utils/clsfunction.dart' as objfun;
+
+import '../data/forwardingreport_repository.dart';
+import 'forwardingreport_event.dart';
 import 'forwardingreport_state.dart';
 
-class ForwardingReportBloc
-    extends Bloc<ForwardingReportEvent, ForwardingReportState> {
- // your utility class
-  final BuildContext context;
-  ForwardingReportBloc(this.context)
-      : super(ForwardingReportState(
-    dtpFromDate: DateFormat("yyyy-MM-dd").format(DateTime.now()),
-    dtpToDate: DateFormat("yyyy-MM-dd").format(DateTime.now()),
-  )) {
-    on<LoadFWDataEvent>(_onLoadFWData);
-    on<ChangFromDateEvent>(_onChangeFromDate);
-    on<ChangeToDateEvent>(_onChangeToDate);
+class ForwardingReportBloc extends Bloc<ForwardingReportEvent, ForwardingReportState> {
+  final ForwardingReportRepository _repository;
+
+  ForwardingReportBloc({required ForwardingReportRepository repository})
+      : _repository = repository,
+        super(const ForwardingReportState()) {
+
+    // droppable() stops users from spamming the load button / triggering multiple concurrent API calls
+    on<LoadForwardingReportEvent>(_onLoadForwardingReport, transformer: droppable());
+    on<SelectFromDateEvent>(_onSelectFromDate);
+    on<SelectToDateEvent>(_onSelectToDate);
   }
 
-  Future<void> _onLoadFWData(
-      LoadFWDataEvent event,
+  void _onSelectFromDate(SelectFromDateEvent event, Emitter<ForwardingReportState> emit) {
+    emit(state.copyWith(fromDate: event.date, clearError: true));
+    // If you want to auto-load data when date is selected, uncomment the line below:
+    add(const LoadForwardingReportEvent(isDateSearch: true));
+  }
+
+  void _onSelectToDate(SelectToDateEvent event, Emitter<ForwardingReportState> emit) {
+    emit(state.copyWith(toDate: event.date, clearError: true));
+    // If you want to auto-load data when date is selected, uncomment the line below:
+     add(const LoadForwardingReportEvent(isDateSearch: true));
+  }
+
+  Future<void> _onLoadForwardingReport(
+      LoadForwardingReportEvent event,
       Emitter<ForwardingReportState> emit,
       ) async {
-    emit(state.copyWith(status: FWStatus.loading));
+    emit(state.copyWith(status: ForwardingReportStatus.loading, clearError: true));
+
+    String fromDateStr = '';
+    String toDateStr = '';
+
+    // Date formatting Logic
+    if (event.isDateSearch && state.fromDate != null && state.toDate != null) {
+      fromDateStr = DateFormat('yyyy-MM-dd').format(state.fromDate!);
+      toDateStr = DateFormat('yyyy-MM-dd').format(state.toDate!);
+    } else {
+      final now = DateTime.now();
+      fromDateStr = DateFormat('yyyy-MM-dd').format(now);
+      toDateStr = DateFormat('yyyy-MM-dd').format(now);
+
+      // Update state with default dates if they are null
+      if (state.fromDate == null || state.toDate == null) {
+        emit(state.copyWith(fromDate: now, toDate: now));
+      }
+    }
 
     try {
-      Map<String, String> header = {
-        'Content-Type': 'application/json; charset=UTF-8',
-      };
-
-      final resultData = await objfun.apiAllinoneSelectArray(
-        "${objfun.apiGetFWData}${objfun.Comid}&startDate=${event.fromDate}&endDate=${event.toDate}",
-        null,
-        header,context
+      final result = await _repository.getForwardingReport(
+        fromDate: fromDateStr,
+        toDate: toDateStr,
       );
 
-      if (resultData != "" && resultData.length != 0) {
-        emit(state.copyWith(
-          status: FWStatus.success,
-          saleFWReport: resultData["Data1"],
-          saleFWReport2: resultData["Data2"],
-        ));
-      } else {
-        emit(state.copyWith(status: FWStatus.success));
+      if (result == null) {
+        // Return loaded with empty lists if no data found
+        emit(state.copyWith(status: ForwardingReportStatus.loaded));
+        return;
       }
-    } catch (error, stackTrace) {
+
       emit(state.copyWith(
-        status: FWStatus.failure,
-        errorMessage: error.toString(),
+        status: ForwardingReportStatus.loaded,
+        saleFWReport: result.data1,
+        saleFWReport2: result.data2,
+      ));
+    } catch (e) {
+      emit(state.copyWith(
+        status: ForwardingReportStatus.error,
+        errorMessage: e.toString().replaceAll('Exception: ', ''),
       ));
     }
-  }
-
-  void _onChangeFromDate(
-      ChangFromDateEvent event,
-      Emitter<ForwardingReportState> emit,
-      ) {
-    emit(state.copyWith(dtpFromDate: event.fromDate));
-    add(LoadFWDataEvent(fromDate: event.fromDate, toDate: state.dtpToDate));
-  }
-
-  void _onChangeToDate(
-      ChangeToDateEvent event,
-      Emitter<ForwardingReportState> emit,
-      ) {
-    emit(state.copyWith(dtpToDate: event.toDate));
-    add(LoadFWDataEvent(fromDate: state.dtpFromDate, toDate: event.toDate));
   }
 }

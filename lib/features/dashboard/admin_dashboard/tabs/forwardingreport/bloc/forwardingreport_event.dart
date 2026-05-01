@@ -1,32 +1,32 @@
-abstract class ForwardingReportEvent {
+import 'package:equatable/equatable.dart';
+
+sealed class ForwardingReportEvent extends Equatable {
   const ForwardingReportEvent();
 
   @override
-  List<Object> get props => [];
+  List<Object?> get props => [];
 }
 
-class LoadFWDataEvent extends ForwardingReportEvent {
-  final String fromDate;
-  final String toDate;
-
-  const LoadFWDataEvent({required this.fromDate, required this.toDate});
+class LoadForwardingReportEvent extends ForwardingReportEvent {
+  final bool isDateSearch;
+  const LoadForwardingReportEvent({this.isDateSearch = false});
 
   @override
-  List<Object> get props => [fromDate, toDate];
+  List<Object?> get props => [isDateSearch];
 }
 
-class ChangFromDateEvent extends ForwardingReportEvent {
-  final String fromDate;
-  const ChangFromDateEvent({required this.fromDate});
+class SelectFromDateEvent extends ForwardingReportEvent {
+  final DateTime date;
+  const SelectFromDateEvent(this.date);
 
   @override
-  List<Object> get props => [fromDate];
+  List<Object?> get props => [date];
 }
 
-class ChangeToDateEvent extends ForwardingReportEvent {
-  final String toDate;
-  const ChangeToDateEvent({required this.toDate});
+class SelectToDateEvent extends ForwardingReportEvent {
+  final DateTime date;
+  const SelectToDateEvent(this.date);
 
   @override
-  List<Object> get props => [toDate];
+  List<Object?> get props => [date];
 }

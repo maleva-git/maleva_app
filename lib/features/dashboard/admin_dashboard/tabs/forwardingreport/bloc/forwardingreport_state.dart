@@ -1,47 +1,51 @@
-enum FWStatus { initial, loading, success, failure }
+import 'package:equatable/equatable.dart';
 
-class ForwardingReportState  {
-  final FWStatus status;
-  final List<dynamic> saleFWReport;
-  final List<dynamic> saleFWReport2;
-  final String dtpFromDate;
-  final String dtpToDate;
+enum ForwardingReportStatus { initial, loading, loaded, error }
+
+class ForwardingReportState extends Equatable {
+  final ForwardingReportStatus status;
+  final List<Map<String, dynamic>> saleFWReport;
+  final List<Map<String, dynamic>> saleFWReport2;
+  // Use DateTime instead of String for easier UI DatePicker management
+  final DateTime? fromDate;
+  final DateTime? toDate;
   final String errorMessage;
 
   const ForwardingReportState({
-    this.status = FWStatus.initial,
+    this.status = ForwardingReportStatus.initial,
     this.saleFWReport = const [],
     this.saleFWReport2 = const [],
-    this.dtpFromDate = '',
-    this.dtpToDate = '',
+    this.fromDate,
+    this.toDate,
     this.errorMessage = '',
   });
 
   ForwardingReportState copyWith({
-    FWStatus? status,
-    List<dynamic>? saleFWReport,
-    List<dynamic>? saleFWReport2,
-    String? dtpFromDate,
-    String? dtpToDate,
+    ForwardingReportStatus? status,
+    List<Map<String, dynamic>>? saleFWReport,
+    List<Map<String, dynamic>>? saleFWReport2,
+    DateTime? fromDate,
+    DateTime? toDate,
     String? errorMessage,
+    bool clearError = false,
   }) {
     return ForwardingReportState(
       status: status ?? this.status,
       saleFWReport: saleFWReport ?? this.saleFWReport,
       saleFWReport2: saleFWReport2 ?? this.saleFWReport2,
-      dtpFromDate: dtpFromDate ?? this.dtpFromDate,
-      dtpToDate: dtpToDate ?? this.dtpToDate,
-      errorMessage: errorMessage ?? this.errorMessage,
+      fromDate: fromDate ?? this.fromDate,
+      toDate: toDate ?? this.toDate,
+      errorMessage: clearError ? '' : (errorMessage ?? this.errorMessage),
     );
   }
 
   @override
-  List<Object> get props => [
+  List<Object?> get props => [
     status,
     saleFWReport,
     saleFWReport2,
-    dtpFromDate,
-    dtpToDate,
+    fromDate,
+    toDate,
     errorMessage,
   ];
 }

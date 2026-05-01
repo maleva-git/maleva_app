@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
+import '../../../../../../core/di/injection.dart';
 import '../../../../../../core/theme/tokens.dart';
 import '../bloc/forwardingreport_bloc.dart';
 import '../bloc/forwardingreport_event.dart';
@@ -14,14 +15,13 @@ class ForwardingReportPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (_) => ForwardingReportBloc(context)
-        ..add(LoadFWDataEvent(
-          fromDate: DateFormat("yyyy-MM-dd").format(DateTime.now()),
-          toDate: DateFormat("yyyy-MM-dd").format(DateTime.now()),
-        )),
-      child: const ForwardingReportView(),
-    );
+    return
+      BlocProvider(
+        // Use sl (GetIt) to create the Bloc. It will automatically inject the repository.
+        create: (_) => sl<ForwardingReportBloc>()
+          ..add(const LoadForwardingReportEvent()),
+        child: const ForwardingReportView(),
+      );
   }
 }
 
@@ -34,7 +34,7 @@ class ForwardingReportView extends StatelessWidget {
 
     return BlocConsumer<ForwardingReportBloc, ForwardingReportState>(
       listener: (context, state) {
-        if (state.status == FWStatus.failure) {
+        if (state.status == ForwardingReportStatus.error) { // ✅ Use new enum name and value
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text(state.errorMessage),
@@ -44,12 +44,11 @@ class ForwardingReportView extends StatelessWidget {
         }
       },
       builder: (context, state) {
-        if (state.status == FWStatus.loading) {
+        if (state.status == ForwardingReportStatus.loading) { // ✅ Use new enum name
           return const Center(
             child: CircularProgressIndicator(color: AppTokens.brandGradientStart),
           );
         }
-
         return Container(
           color: const Color(0xFFF0F4FF),
           child: isTablet
@@ -386,7 +385,7 @@ class _DatePickerRow extends StatelessWidget {
               child: _DateTile(
                 label: 'From',
                 date: DateFormat("dd MMM yyyy")
-                    .format(DateTime.parse(state.dtpFromDate)),
+                    .format(state.fromDate ?? DateTime.now()), // ✅ Use fromDate directly
                 isTablet: isTablet,
                 onTap: () async {
                   final value = await showDatePicker(
@@ -404,10 +403,7 @@ class _DatePickerRow extends StatelessWidget {
                   );
                   if (value != null) {
                     context.read<ForwardingReportBloc>().add(
-                      ChangFromDateEvent(
-                        fromDate: DateFormat("yyyy-MM-dd")
-                            .format(value),
-                      ),
+                      SelectToDateEvent(value), // New event name, takes DateTime directly
                     );
                   }
                 },
@@ -426,7 +422,7 @@ class _DatePickerRow extends StatelessWidget {
               child: _DateTile(
                 label: 'To',
                 date: DateFormat("dd MMM yyyy")
-                    .format(DateTime.parse(state.dtpToDate)),
+                    .format(state.toDate ?? DateTime.now()), // ✅ Use toDate directly
                 isTablet: isTablet,
                 onTap: () async {
                   final value = await showDatePicker(
@@ -444,10 +440,7 @@ class _DatePickerRow extends StatelessWidget {
                   );
                   if (value != null) {
                     context.read<ForwardingReportBloc>().add(
-                      ChangeToDateEvent(
-                        toDate: DateFormat("yyyy-MM-dd")
-                            .format(value),
-                      ),
+                      SelectToDateEvent(value), // ✅ New event name, takes DateTime directly
                     );
                   }
                 },
