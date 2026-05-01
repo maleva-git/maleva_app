@@ -403,9 +403,10 @@ class _DatePickerRow extends StatelessWidget {
                   );
                   if (value != null) {
                     context.read<ForwardingReportBloc>().add(
-                      SelectToDateEvent(value), // New event name, takes DateTime directly
+                      SelectFromDateEvent(value),// New event name, takes DateTime directly
                     );
                   }
+
                 },
               ),
             ),
