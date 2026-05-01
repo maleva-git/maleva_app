@@ -37,7 +37,7 @@ import 'package:maleva/features/dashboard/admin_dashboard/tabs/stockinentry/bloc
 import 'package:maleva/features/dashboard/admin_dashboard/tabs/stocktransfer/bloc/stock_transfer_bloc.dart';
 import 'package:maleva/features/dashboard/admin_dashboard/tabs/stockupdate/bloc/stock_update_bloc.dart';
 
-import '../../features/dashboard/admin_dashboard/tabs/ExpenseReport/bloc/expensereport_bloc.dart';
+import '../../features/dashboard/admin_dashboard/tabs/expenseReport/bloc/expensereport_bloc.dart';
 import '../../features/dashboard/admin_dashboard/tabs/expenseReport/data/expensereport_repository.dart';
 import '../../features/dashboard/admin_dashboard/tabs/forwardingreport/bloc/forwardingreport_bloc.dart';
 import '../../features/dashboard/admin_dashboard/tabs/forwardingreport/data/forwardingreport_repository.dart';
@@ -154,6 +154,8 @@ Future<void> setupDependencies() async {
   sl.registerFactory<StockInEntryBloc>(() => StockInEntryBloc());
   sl.registerFactory<StockTransferBloc>(() => StockTransferBloc());
   sl.registerFactory<StockUpdateBloc>(() => StockUpdateBloc());
+
+
 
   // ════════════════════════════════════════════════════════════════
   // 4. CONTEXT-DEP BLOCS  —  NOT registered here
