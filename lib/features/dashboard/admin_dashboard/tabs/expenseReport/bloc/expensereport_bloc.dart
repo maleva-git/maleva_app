@@ -1,72 +1,82 @@
-
-
-import 'package:flutter/cupertino.dart';
+import 'package:bloc_concurrency/bloc_concurrency.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
-import 'package:maleva/features/dashboard/admin_dashboard/tabs/ExpenseReport/bloc/expensereport_event.dart';
-import 'package:maleva/core/utils/clsfunction.dart' as objfun;
+
+import '../data/expensereport_repository.dart';
+import 'expensereport_event.dart';
 import 'expensereport_state.dart';
 
-class ExpenseReportBloc extends Bloc<ExpenseReportEvent, ExpReportState>{
-  final BuildContext context;
-  ExpenseReportBloc(this.context) : super(ExpReportState(
-    dtpFromDate: DateFormat("yyyy-MM-dd").format(DateTime.now()),
-    dtpToDate: DateFormat("yyyy-MM-dd").format(DateTime.now()),
+class ExpenseReportBloc extends Bloc<ExpenseReportEvent, ExpenseReportState> {
+  final ExpenseReportRepository _repository;
 
+  ExpenseReportBloc({required ExpenseReportRepository repository})
+      : _repository = repository,
+        super(const ExpenseReportState()) {
 
-  )) {
-    on<LoadExpReportEvent>(_onLoadExpData);
-    on<ChangeFromDateEvent>(_onChangeFromDate);
-    on<ChangeToDateEvent>(_onChangeToDate);
+    // droppable() stops users from spamming the load button / triggering multiple concurrent API calls
+    on<LoadExpenseReportEvent>(_onLoadExpenseReport, transformer: droppable());
+    on<SelectFromDateEvent>(_onSelectFromDate);
+    on<SelectToDateEvent>(_onSelectToDate);
   }
 
-  Future<void> _onLoadExpData (
-      LoadExpReportEvent event,
-      Emitter<ExpReportState> emit,
+  void _onSelectFromDate(SelectFromDateEvent event, Emitter<ExpenseReportState> emit) {
+    emit(state.copyWith(fromDate: event.date, clearError: true));
+    // Automatically trigger fetch when date changes
+    add(const LoadExpenseReportEvent(isDateSearch: true));
+  }
+
+  void _onSelectToDate(SelectToDateEvent event, Emitter<ExpenseReportState> emit) {
+    emit(state.copyWith(toDate: event.date, clearError: true));
+    // Automatically trigger fetch when date changes
+    add(const LoadExpenseReportEvent(isDateSearch: true));
+  }
+
+  Future<void> _onLoadExpenseReport(
+      LoadExpenseReportEvent event,
+      Emitter<ExpenseReportState> emit,
       ) async {
-    emit(state.copyWith(status: ExpStatus.loading));
+    emit(state.copyWith(status: ExpenseReportStatus.loading, clearError: true));
+
+    String fromDateStr = '';
+    String toDateStr = '';
+
+    // Date formatting Logic
+    if (event.isDateSearch && state.fromDate != null && state.toDate != null) {
+      fromDateStr = DateFormat('yyyy-MM-dd').format(state.fromDate!);
+      toDateStr = DateFormat('yyyy-MM-dd').format(state.toDate!);
+    } else {
+      final now = DateTime.now();
+      fromDateStr = DateFormat('yyyy-MM-dd').format(now);
+      toDateStr = DateFormat('yyyy-MM-dd').format(now);
+
+      // Update state with default dates if they are null
+      if (state.fromDate == null || state.toDate == null) {
+        emit(state.copyWith(fromDate: now, toDate: now));
+      }
+    }
 
     try {
-      Map<String, String> header = {
-        'Content-Type' : 'application/json; charset=UTF-8',
-      };
-
-    final resultData = await objfun.apiAllinoneSelectArray (
-        "${objfun.apiGetExpData}${objfun.Comid}&startDate=${event.fromDate}&endDate=${event.toDate}",
-         null,
-         header, context
+      final result = await _repository.getExpenseReport(
+        fromDate: fromDateStr,
+        toDate: toDateStr,
       );
 
-    if(resultData != "" && resultData.length != 0) {
-      emit(state.copyWith(
-        status: ExpStatus.success,
-        saleExpReport: resultData["Data1"],
-        saleExpReport2: resultData["Data2"],
-      ));
-    } else {
-      emit(state.copyWith(status: ExpStatus.success));
-    }
-    } catch (error, stackTrace) {
-      emit(state.copyWith(
-        status: ExpStatus.failure,
-        errorMessage: error.toString(),
-      ));
-    }
-   }
+      if (result == null) {
+        // Return loaded with empty lists if no data found
+        emit(state.copyWith(status: ExpenseReportStatus.loaded));
+        return;
+      }
 
-   void _onChangeFromDate(
-       ChangeFromDateEvent event,
-       Emitter<ExpReportState> emit,
-       ) {
-     emit(state.copyWith(dtpFromDate: event.fromDate));
-    add(LoadExpReportEvent(fromDate: event.fromDate, toDate: state.dtpToDate));
-   }
-
-  void _onChangeToDate(
-      ChangeToDateEvent event,
-      Emitter<ExpReportState> emit,
-      ) {
-    emit(state.copyWith(dtpToDate: event.toDate));
-    add(LoadExpReportEvent(fromDate: state.dtpFromDate, toDate: event.toDate));
+      emit(state.copyWith(
+        status: ExpenseReportStatus.loaded,
+        saleExpReport: result.data1,
+        saleExpReport2: result.data2,
+      ));
+    } catch (e) {
+      emit(state.copyWith(
+        status: ExpenseReportStatus.error,
+        errorMessage: e.toString().replaceAll('Exception: ', ''),
+      ));
+    }
   }
 }

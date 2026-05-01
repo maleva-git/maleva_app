@@ -1,34 +1,32 @@
-abstract class ExpenseReportEvent {
+import 'package:equatable/equatable.dart';
+
+sealed class ExpenseReportEvent extends Equatable {
   const ExpenseReportEvent();
 
   @override
-  List<Object> get props => [];
-
+  List<Object?> get props => [];
 }
 
-class LoadExpReportEvent extends ExpenseReportEvent{
-  final String fromDate;
-  final String toDate;
-
-  const LoadExpReportEvent({required this.fromDate, required this.toDate});
+class LoadExpenseReportEvent extends ExpenseReportEvent {
+  final bool isDateSearch;
+  const LoadExpenseReportEvent({this.isDateSearch = false});
 
   @override
-  List<Object> get props => [fromDate, toDate];
+  List<Object?> get props => [isDateSearch];
 }
 
-class ChangeFromDateEvent extends ExpenseReportEvent {
-  final String fromDate;
-  const ChangeFromDateEvent({required this.fromDate});
+class SelectFromDateEvent extends ExpenseReportEvent {
+  final DateTime date;
+  const SelectFromDateEvent(this.date);
 
   @override
-  List<Object> get props => [fromDate];
-
+  List<Object?> get props => [date];
 }
 
-class ChangeToDateEvent extends ExpenseReportEvent{
-  final String toDate;
-  const ChangeToDateEvent({required this.toDate});
+class SelectToDateEvent extends ExpenseReportEvent {
+  final DateTime date;
+  const SelectToDateEvent(this.date);
 
   @override
-  List<Object> get props => [toDate];
+  List<Object?> get props => [date];
 }

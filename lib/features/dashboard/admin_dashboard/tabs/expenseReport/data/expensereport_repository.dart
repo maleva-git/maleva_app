@@ -1,0 +1,42 @@
+import 'package:maleva/core/utils/app_preferences.dart';
+import 'package:maleva/core/utils/clsfunction.dart' as objfun;
+
+class ExpenseReportResult {
+  final List<Map<String, dynamic>> data1;
+  final List<Map<String, dynamic>> data2;
+
+  ExpenseReportResult({required this.data1, required this.data2});
+}
+
+class ExpenseReportRepository {
+  Future<ExpenseReportResult?> getExpenseReport({
+    required String fromDate,
+    required String toDate,
+  }) async {
+    try {
+      final String comId = (await AppPreferences.getComid()).toString();
+
+      Map<String, String> header = {
+        'Content-Type': 'application/json; charset=UTF-8',
+      };
+
+      // Ensure your apiAllinoneSelectArray is updated to handle context optionally
+      final resultData = await objfun.apiAllinoneSelectArray(
+        "${objfun.apiGetExpData}$comId&startDate=$fromDate&endDate=$toDate",
+        null,
+        header,
+        null, // Pass null for context
+      );
+
+      if (resultData != null && resultData is Map && resultData.isNotEmpty) {
+        return ExpenseReportResult(
+          data1: List<Map<String, dynamic>>.from(resultData["Data1"] ?? []),
+          data2: List<Map<String, dynamic>>.from(resultData["Data2"] ?? []),
+        );
+      }
+      return null;
+    } catch (e) {
+      throw Exception('Failed to load expense report: $e');
+    }
+  }
+}

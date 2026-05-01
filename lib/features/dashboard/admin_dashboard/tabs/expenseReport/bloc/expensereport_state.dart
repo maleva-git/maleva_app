@@ -1,37 +1,51 @@
-enum ExpStatus { initial , loading , success, failure}
+import 'package:equatable/equatable.dart';
 
-class ExpReportState {
-  final ExpStatus status;
-  final List<dynamic> saleExpReport;
-  final List<dynamic> saleExpReport2;
-  final String dtpFromDate;
-  final String dtpToDate;
+enum ExpenseReportStatus { initial, loading, loaded, error }
+
+class ExpenseReportState extends Equatable {
+  final ExpenseReportStatus status;
+  final List<Map<String, dynamic>> saleExpReport;
+  final List<Map<String, dynamic>> saleExpReport2;
+  // Use DateTime instead of String for easier UI DatePicker management
+  final DateTime? fromDate;
+  final DateTime? toDate;
   final String errorMessage;
 
-  const ExpReportState ({
-    this.status = ExpStatus.initial,
+  const ExpenseReportState({
+    this.status = ExpenseReportStatus.initial,
     this.saleExpReport = const [],
     this.saleExpReport2 = const [],
-    this.dtpFromDate = '',
-    this.dtpToDate = '',
+    this.fromDate,
+    this.toDate,
     this.errorMessage = '',
-});
+  });
 
-  ExpReportState copyWith({
-    ExpStatus? status,
-    List<dynamic>? saleExpReport,
-    List<dynamic>? saleExpReport2,
-    String? dtpFromDate,
-    String? dtpToDate,
+  ExpenseReportState copyWith({
+    ExpenseReportStatus? status,
+    List<Map<String, dynamic>>? saleExpReport,
+    List<Map<String, dynamic>>? saleExpReport2,
+    DateTime? fromDate,
+    DateTime? toDate,
     String? errorMessage,
-}) {
-    return ExpReportState(
+    bool clearError = false,
+  }) {
+    return ExpenseReportState(
       status: status ?? this.status,
       saleExpReport: saleExpReport ?? this.saleExpReport,
       saleExpReport2: saleExpReport2 ?? this.saleExpReport2,
-      dtpFromDate: dtpFromDate ?? this.dtpFromDate,
-      dtpToDate: dtpToDate ?? this.dtpToDate,
-      errorMessage: errorMessage ?? this.errorMessage,
+      fromDate: fromDate ?? this.fromDate,
+      toDate: toDate ?? this.toDate,
+      errorMessage: clearError ? '' : (errorMessage ?? this.errorMessage),
     );
   }
+
+  @override
+  List<Object?> get props => [
+    status,
+    saleExpReport,
+    saleExpReport2,
+    fromDate,
+    toDate,
+    errorMessage,
+  ];
 }

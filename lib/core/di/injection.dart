@@ -37,6 +37,8 @@ import 'package:maleva/features/dashboard/admin_dashboard/tabs/stockinentry/bloc
 import 'package:maleva/features/dashboard/admin_dashboard/tabs/stocktransfer/bloc/stock_transfer_bloc.dart';
 import 'package:maleva/features/dashboard/admin_dashboard/tabs/stockupdate/bloc/stock_update_bloc.dart';
 
+import '../../features/dashboard/admin_dashboard/tabs/ExpenseReport/bloc/expensereport_bloc.dart';
+import '../../features/dashboard/admin_dashboard/tabs/expenseReport/data/expensereport_repository.dart';
 import '../../features/dashboard/admin_dashboard/tabs/forwardingreport/bloc/forwardingreport_bloc.dart';
 import '../../features/dashboard/admin_dashboard/tabs/forwardingreport/data/forwardingreport_repository.dart';
 import '../../features/dashboard/admin_dashboard/tabs/receiptview/data/receipt_repository.dart';
@@ -127,6 +129,19 @@ Future<void> setupDependencies() async {
   );
   sl.registerFactory<ReceiptBloc>(
         () => ReceiptBloc(receiptRepo: sl<ReceiptRepository>()),
+  );
+  // ── REPOSITORIES ──────────────────────────────────────────────────────────
+
+  // Add this near your other repositories
+  sl.registerLazySingleton<ExpenseReportRepository>(
+        () => ExpenseReportRepository(),
+  );
+
+  // ── BLOCS ─────────────────────────────────────────────────────────────────
+
+  // Add this near your other blocs
+  sl.registerFactory<ExpenseReportBloc>(
+        () => ExpenseReportBloc(repository: sl<ExpenseReportRepository>()),
   );
   // ── No-dep dashboard tabs (no-arg constructors) ─────────────────
   sl.registerFactory<SalesOrderBloc>(() => SalesOrderBloc());
