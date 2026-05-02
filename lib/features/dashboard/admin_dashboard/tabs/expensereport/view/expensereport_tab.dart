@@ -2,13 +2,17 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
-import 'package:maleva/features/dashboard/admin_dashboard/tabs/ExpenseReport/bloc/expensereport_bloc.dart';
-import 'package:maleva/features/dashboard/admin_dashboard/tabs/ExpenseReport/bloc/expensereport_event.dart';
-import 'package:maleva/features/dashboard/admin_dashboard/tabs/ExpenseReport/bloc/expensereport_state.dart';
+
+// Make sure this path is correct for your project's injection file
+import '../../../../../../core/di/injection.dart';
+import '../../../../../../core/theme/tokens.dart';
+
 import 'package:maleva/core/utils/clsfunction.dart' as objfun;
 import 'package:maleva/core/colors/colors.dart' as colour;
 
-import '../../../../../../core/theme/tokens.dart';
+import 'package:maleva/features/dashboard/admin_dashboard/tabs/expensereport/bloc/expensereport_bloc.dart';
+import 'package:maleva/features/dashboard/admin_dashboard/tabs/expensereport/bloc/expensereport_event.dart';
+import 'package:maleva/features/dashboard/admin_dashboard/tabs/expensereport/bloc/expensereport_state.dart';
 
 class ExpenseReportPage extends StatelessWidget {
   const ExpenseReportPage({super.key});
@@ -16,11 +20,9 @@ class ExpenseReportPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (_) => ExpenseReportBloc(context)
-        ..add(LoadExpReportEvent(
-          fromDate: DateFormat("yyyy-MM-dd").format(DateTime.now()),
-          toDate:   DateFormat("yyyy-MM-dd").format(DateTime.now()),
-        )),
+      // ✅ Use sl (GetIt) to create the Bloc. It automatically injects the repository.
+      create: (_) => sl<ExpenseReportBloc>()
+        ..add(const LoadExpenseReportEvent()), // ✅ New Event Name (Handles default dates internally)
       child: const ExpenseReportView(),
     );
   }
@@ -34,9 +36,9 @@ class ExpenseReportView extends StatelessWidget {
   Widget build(BuildContext context) {
     final isTablet = MediaQuery.of(context).size.width >= 600;
 
-    return BlocConsumer<ExpenseReportBloc, ExpReportState>(
+    return BlocConsumer<ExpenseReportBloc, ExpenseReportState>( // ✅ New State Name
       listener: (context, state) {
-        if (state.status == ExpStatus.failure) {
+        if (state.status == ExpenseReportStatus.error) { // ✅ New Enum Name
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text(state.errorMessage,
@@ -50,7 +52,7 @@ class ExpenseReportView extends StatelessWidget {
         }
       },
       builder: (context, state) {
-        if (state.status == ExpStatus.loading) {
+        if (state.status == ExpenseReportStatus.loading) { // ✅ New Enum Name
           return const Center(
             child: CircularProgressIndicator(color: AppTokens.brandGradientStart),
           );
@@ -70,7 +72,7 @@ class ExpenseReportView extends StatelessWidget {
   // TABLET — Two Column
   // ══════════════════════════════════════════════════════
   Widget _buildTabletLayout(
-      BuildContext context, ExpReportState state) {
+      BuildContext context, ExpenseReportState state) { // ✅ New State Name
     return Padding(
       padding: const EdgeInsets.all(20),
       child: Row(
@@ -128,10 +130,7 @@ class ExpenseReportView extends StatelessWidget {
                         isTablet: true,
                         onTap: () =>
                             context.read<ExpenseReportBloc>().add(
-                              LoadExpReportEvent(
-                                fromDate: state.dtpFromDate,
-                                toDate:   state.dtpToDate,
-                              ),
+                              const LoadExpenseReportEvent(isDateSearch: true), // ✅ Refactored Event
                             ),
                       );
                     },
@@ -149,7 +148,7 @@ class ExpenseReportView extends StatelessWidget {
   // MOBILE — Single Column
   // ══════════════════════════════════════════════════════
   Widget _buildMobileLayout(
-      BuildContext context, ExpReportState state) {
+      BuildContext context, ExpenseReportState state) { // ✅ New State Name
     return ListView(
       padding: const EdgeInsets.fromLTRB(16, 20, 16, 24),
       children: [
@@ -179,10 +178,7 @@ class ExpenseReportView extends StatelessWidget {
             index:   index,
             isTablet: false,
             onTap: () => context.read<ExpenseReportBloc>().add(
-              LoadExpReportEvent(
-                fromDate: state.dtpFromDate,
-                toDate:   state.dtpToDate,
-              ),
+              const LoadExpenseReportEvent(isDateSearch: true), // ✅ Refactored Event
             ),
           );
         }),
@@ -373,7 +369,7 @@ class _DatePickerCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<ExpenseReportBloc, ExpReportState>(
+    return BlocBuilder<ExpenseReportBloc, ExpenseReportState>( // ✅ New State Name
       builder: (context, state) {
         return Container(
           padding: EdgeInsets.symmetric(
@@ -397,13 +393,14 @@ class _DatePickerCard extends StatelessWidget {
             Expanded(
               child: _DateField(
                 label: 'From',
+                // ✅ Replaced DateTime.parse with direct state.fromDate usage
                 date: DateFormat("dd MMM yyyy")
-                    .format(DateTime.parse(state.dtpFromDate)),
+                    .format(state.fromDate ?? DateTime.now()),
                 isTablet: isTablet,
                 onTap: () async {
                   final value = await showDatePicker(
                     context: context,
-                    initialDate: DateTime.now(),
+                    initialDate: state.fromDate ?? DateTime.now(), // ✅ Smarter initial date
                     firstDate: DateTime(1900),
                     lastDate: DateTime(2050),
                     builder: (ctx, child) => Theme(
@@ -419,10 +416,7 @@ class _DatePickerCard extends StatelessWidget {
                   );
                   if (value != null) {
                     context.read<ExpenseReportBloc>().add(
-                      ChangeFromDateEvent(
-                        fromDate:
-                        DateFormat("yyyy-MM-dd").format(value),
-                      ),
+                      SelectFromDateEvent(value), // ✅ New Event takes DateTime directly
                     );
                   }
                 },
@@ -440,13 +434,14 @@ class _DatePickerCard extends StatelessWidget {
             Expanded(
               child: _DateField(
                 label: 'To',
+                // ✅ Replaced DateTime.parse with direct state.toDate usage
                 date: DateFormat("dd MMM yyyy")
-                    .format(DateTime.parse(state.dtpToDate)),
+                    .format(state.toDate ?? DateTime.now()),
                 isTablet: isTablet,
                 onTap: () async {
                   final value = await showDatePicker(
                     context: context,
-                    initialDate: DateTime.now(),
+                    initialDate: state.toDate ?? DateTime.now(), // ✅ Smarter initial date
                     firstDate: DateTime(1900),
                     lastDate: DateTime(2050),
                     builder: (ctx, child) => Theme(
@@ -462,10 +457,7 @@ class _DatePickerCard extends StatelessWidget {
                   );
                   if (value != null) {
                     context.read<ExpenseReportBloc>().add(
-                      ChangeToDateEvent(
-                        toDate:
-                        DateFormat("yyyy-MM-dd").format(value),
-                      ),
+                      SelectToDateEvent(value), // ✅ New Event takes DateTime directly
                     );
                   }
                 },

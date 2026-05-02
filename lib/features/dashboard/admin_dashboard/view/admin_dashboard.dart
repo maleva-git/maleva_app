@@ -2,15 +2,12 @@ import 'package:flutter/Material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
-import 'package:maleva/features/dashboard/admin_dashboard/tabs/ExpenseReport/bloc/expensereport_bloc.dart';
-import 'package:maleva/features/dashboard/admin_dashboard/tabs/ExpenseReport/bloc/expensereport_event.dart';
 import 'package:maleva/features/dashboard/admin_dashboard/tabs/salesorder/bloc/salesorder_bloc.dart';
 import '../../../../core/di/injection.dart';
 import '../../../common_updates/blocs/sales/sales_bloc.dart';
 import '../../../common_updates/blocs/truck/truck_bloc.dart';
 import '../bloc/admin_tab_bloc.dart';
 import '../bloc/admin_tab_event.dart';
-import '../tabs/ExpenseReport/view/expensereport_tab.dart';
 import '../tabs/adinvoice/bloc/forecast/forecast_bloc.dart';
 import '../tabs/adinvoice/data/repositories/sales_forecast_repository.dart';
 import '../tabs/adinvoice/presentation/widgets/ai_sales_forecast_chart.dart';
@@ -31,6 +28,9 @@ import '../tabs/employeemaster/view/employeemaster_tab.dart';
 import '../tabs/enginehours/bloc/enginehours_bloc.dart';
 import '../tabs/enginehours/bloc/enginehours_event.dart';
 import '../tabs/enginehours/view/enginehours_tab.dart';
+import '../tabs/expenseReport/bloc/expensereport_bloc.dart';
+import '../tabs/expenseReport/bloc/expensereport_event.dart';
+import '../tabs/expenseReport/view/expensereport_tab.dart';
 import '../tabs/forwardingreport/bloc/forwardingreport_bloc.dart';
 import '../tabs/forwardingreport/bloc/forwardingreport_event.dart';
 import '../tabs/forwardingreport/view/forwardingreport_tab.dart';
@@ -60,7 +60,6 @@ import '../tabs/pettycash/bloc/pettycash_event.dart';
 import '../tabs/pettycash/view/pettycash_tab.dart';
 import '../tabs/receiptview/bloc/receiptview_bloc.dart';
 import '../tabs/receiptview/bloc/receiptview_event.dart';
-import '../tabs/receiptview/data/receipt_repository.dart';
 import '../tabs/receiptview/view/receiptview_tab.dart';
 import '../tabs/rtiview/bloc/rtiview_bloc.dart';
 import '../tabs/rtiview/bloc/rtiview_event.dart';
@@ -144,6 +143,7 @@ class _AdminDashboardState extends State<NewAdminDashboard> with SingleTickerPro
               create: (_) => sl<ReceiptBloc>()..add(LoadReceiptEvent()),
               child: const ReceiptPage(),
             ),
+
             BlocProvider(
               // Use sl (GetIt) to create the Bloc. It automatically injects the required repository.
               create: (_) => sl<ForwardingReportBloc>()
@@ -151,12 +151,8 @@ class _AdminDashboardState extends State<NewAdminDashboard> with SingleTickerPro
               child: const ForwardingReportView(),
             ),
             BlocProvider(
-              create: (context) => ExpenseReportBloc(context)
-                ..add(LoadExpReportEvent(
-                  fromDate: DateFormat("yyyy-MM-dd")
-                      .format(DateTime.now().subtract(const Duration(days: 30))),
-                  toDate: DateFormat("yyyy-MM-dd").format(DateTime.now()),
-                )),
+              create: (_) => sl<ExpenseReportBloc>()
+                ..add(const LoadExpenseReportEvent()),
               child: const ExpenseReportView(),
             ),
             BlocProvider(
