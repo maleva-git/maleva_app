@@ -138,34 +138,47 @@ class _LoginBodyState extends State<_LoginBody>
         absorbing: _s.loading,
         child: FadeTransition(
           opacity: _fadeAnim,
-          child: SafeArea(
-            child: SingleChildScrollView(
-              physics: const BouncingScrollPhysics(),
-              padding: EdgeInsets.symmetric(
-                horizontal: _isTablet ? 32 : 20,
-                vertical:   _isTablet ? 28 : (compact ? 14 : 22),
-              ),
-              child: Center(
-                child: ConstrainedBox(
-                  constraints: BoxConstraints(
-                    maxWidth: _isTablet ? 860 : 420,
+          child:
+          // AFTER ✅
+          SafeArea(
+            child: Column(                             // ← outer Column (fixed)
+              children: [
+                // Brand strip — fixed, scroll ஆகாது
+                Padding(
+                  padding: EdgeInsets.symmetric(
+                    horizontal: _isTablet ? 32 : 20,
+                    vertical:   _isTablet ? 28 : (compact ? 14 : 22),
                   ),
-                  child: Column(children: [
-                    // Brand strip
-                    _buildBrandStrip(compact),
-                    SizedBox(height: _isTablet ? 28 : (compact ? 14 : 20)),
-
-                    // Card — tablet=two-col, mobile=single-col
-                    _isTablet
-                        ? _buildTabletCard()
-                        : _buildMobileCard(compact),
-
-                    SizedBox(height: _isTablet ? 20 : 12),
-                    _buildDots(),
-                    const SizedBox(height: 8),
-                  ]),
+                  child: _buildBrandStrip(compact),
                 ),
-              ),
+
+                SizedBox(height: _isTablet ? 28 : (compact ? 14 : 20)),
+
+                // Card மட்டும் scroll ஆகும்
+                Expanded(
+                  child: SingleChildScrollView(
+                    physics: const BouncingScrollPhysics(),
+                    padding: EdgeInsets.symmetric(
+                      horizontal: _isTablet ? 32 : 20,
+                    ),
+                    child: Center(
+                      child: ConstrainedBox(
+                        constraints: BoxConstraints(
+                          maxWidth: _isTablet ? 860 : 420,
+                        ),
+                        child: Column(children: [
+                          _isTablet
+                              ? _buildTabletCard()
+                              : _buildMobileCard(compact),
+                          SizedBox(height: _isTablet ? 20 : 12),
+                          _buildDots(),
+                          const SizedBox(height: 8),
+                        ]),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
             ),
           ),
         ),
