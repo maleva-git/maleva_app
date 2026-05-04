@@ -262,7 +262,7 @@ class _SalesOrderTabState extends State<SalesOrderTab> {
               child: _OverviewCard(
                 label: 'MONTHLY',
                 count: monthly,
-                sub: '₹$monthAmt',
+                sub: 'RM$monthAmt',
                 subLabel: 'Invoices',
                 subColor: Colors.blue,
                 subIcon: Icons.receipt,
@@ -274,7 +274,7 @@ class _SalesOrderTabState extends State<SalesOrderTab> {
               child: _OverviewCard(
                 label: 'WEEKLY',
                 count: weekly,
-                sub: '₹$weekAmt',
+                sub: 'RM$weekAmt',
                 subLabel: 'This week',
                 subColor: Colors.purple,
                 subIcon: Icons.calendar_today,
@@ -290,7 +290,7 @@ class _SalesOrderTabState extends State<SalesOrderTab> {
               child: _OverviewCard(
                 label: 'YESTERDAY',
                 count: yesterday,
-                sub: '₹$yestAmt',
+                sub: 'RM$yestAmt',
                 subLabel: 'Done',
                 subColor: Colors.green,
                 subIcon: Icons.check_circle,
@@ -302,7 +302,7 @@ class _SalesOrderTabState extends State<SalesOrderTab> {
               child: _OverviewCard(
                 label: 'TODAY',
                 count: today,
-                sub: todayAmt == '0' ? 'No entries yet' : '₹$todayAmt',
+                sub: todayAmt == '0' ? 'No entries yet' : 'RM$todayAmt',
                 subLabel: 'Pending',
                 subColor: Colors.orange,
                 subIcon: null,
@@ -406,11 +406,11 @@ class _SalesOrderTabState extends State<SalesOrderTab> {
     ];
     final dotColor = dotColors[index % dotColors.length];
 
-    // format amount compactly e.g. ₹5.49L
+    // format amount compactly e.g. RM5.49L
     String fmtAmount(double v) {
-      if (v >= 100000) return '₹${(v / 100000).toStringAsFixed(2)}L';
-      if (v >= 1000) return '₹${(v / 1000).toStringAsFixed(1)}K';
-      return '₹${v.toStringAsFixed(0)}';
+      if (v >= 100000) return 'RM${(v / 100000).toStringAsFixed(2)}L';
+      if (v >= 1000) return 'RM${(v / 1000).toStringAsFixed(1)}K';
+      return 'RM${v.toStringAsFixed(0)}';
     }
 
     return InkWell(
@@ -619,14 +619,14 @@ class _HeroHeaderCard extends StatelessWidget {
 
     String fmtLarge(double v) {
       if (v >= 100000)
-        return '₹${(v / 100000).toStringAsFixed(2).replaceAllMapped(RegExp(r'\B(?=(\d{2})+(?!\d))'), (m) => ',')}L';
-      return '₹${v.toStringAsFixed(0)}';
+        return 'RM${(v / 100000).toStringAsFixed(2).replaceAllMapped(RegExp(r'\B(?=(\d{2})+(?!\d))'), (m) => ',')}L';
+      return 'RM${v.toStringAsFixed(0)}';
     }
 
-    // formatted as ₹5,49,839
+    // formatted as RM5,49,839
     String fmtIndian(double v) {
       final s = v.toStringAsFixed(0);
-      if (s.length <= 3) return '₹$s';
+      if (s.length <= 3) return 'RM$s';
       final last3 = s.substring(s.length - 3);
       final rest = s.substring(0, s.length - 3);
       final buf = StringBuffer();
@@ -634,7 +634,7 @@ class _HeroHeaderCard extends StatelessWidget {
         if (i > 0 && (rest.length - i) % 2 == 0) buf.write(',');
         buf.write(rest[i]);
       }
-      return '₹${buf.toString()},$last3';
+      return 'RM${buf.toString()},$last3';
     }
 
     return Container(
@@ -1129,7 +1129,7 @@ void showBillingBottomSheet(BuildContext context, List<dynamic> billingData) {
                                   _buildDetailRow(Icons.anchor,              "Port",      "${item['SPort']}"),
                                   _buildDetailRow(Icons.calendar_today,      "Pickup Date","${item['SPickupDate']}"),
                                   _buildDetailRow(Icons.flight_takeoff,      "ETA",       "${item['ETA']}"),
-                                  _buildDetailRow(Icons.monetization_on,     "Net Amount","₹${item['NetAmt']}"),
+                                  _buildDetailRow(Icons.monetization_on,     "Net Amount","RM${item['NetAmt']}"),
                                 ]),
                               ),
                             ),
@@ -1162,7 +1162,7 @@ void showBillingBottomSheet(BuildContext context, List<dynamic> billingData) {
                                       fontWeight: FontWeight.bold,
                                       color: const Color(0xFF145A32))),
                               const SizedBox(height: 2),
-                              Text("Amount: ₹${item['NetAmt'] ?? ''}",
+                              Text("Amount: RM${item['NetAmt'] ?? ''}",
                                   style: GoogleFonts.lato(
                                       fontSize: 14,
                                       fontWeight: FontWeight.bold,

@@ -42,13 +42,15 @@ class InvoiceRepositoryImpl implements InvoiceRepository {
   }) async {
     final comid = AppPreferences.getComid();
     final today = DateFormat('yyyy-MM-dd').format(DateTime.now());
-
+    final fromdate = DateFormat('yyyy-MM-dd')
+        .format(DateTime(DateTime.now().year, DateTime.now().month, 1));
     // Exact same as original bloc — parallel Future.wait
     final results = await Future.wait([
       AuthApi.getSalesData(type),          // existing static method ✅
       AuthApi.getSalesInvoiceCheck({       // existing static method ✅
         'Comid': comid,
         'Todate': today,
+        'Fromdate': fromdate,
       }),
     ]);
 
@@ -62,12 +64,15 @@ class InvoiceRepositoryImpl implements InvoiceRepository {
   Future<List<dynamic>> getWaitingBills() async {
     final comid = AppPreferences.getComid();
     final today = DateFormat('yyyy-MM-dd').format(DateTime.now());
+    final fromdate = DateFormat('yyyy-MM-dd')
+        .format(DateTime(DateTime.now().year, DateTime.now().month, 1));
 
     // Same as original LoadWaitingBills handler
     // Original used: ApiClient.postRequest(objfun.apiSelectSaleorderinvoicecheck, master)
     final result = await AuthApi.getSalesInvoiceCheck({
       'Comid': comid,
       'Todate': today,
+      'Fromdate': fromdate,
     });
 
     return List<dynamic>.from(result ?? []);

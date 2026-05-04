@@ -58,9 +58,12 @@ class SalesOrderBloc extends Bloc<SalesOrderEvent, SalesOrderState> {
 
           final header = {'Content-Type': 'application/json; charset=UTF-8'};
           final currentDate = DateFormat("yyyy-MM-dd").format(DateTime.now());
+          final fromdate = DateFormat('yyyy-MM-dd')
+              .format(DateTime(DateTime.now().year, DateTime.now().month, 1));
           final master = {
             'Comid': objfun.storagenew.getInt('Comid') ?? 0,
             'Todate': currentDate,
+            'Fromdate': fromdate,
           };
 
 
@@ -157,9 +160,12 @@ class SalesOrderBloc extends Bloc<SalesOrderEvent, SalesOrderState> {
         try {
           final header = {'Content-Type': 'application/json; charset=UTF-8'};
           final currentDate = DateFormat("yyyy-MM-dd").format(DateTime.now());
+          final fromdate = DateFormat('yyyy-MM-dd')
+              .format(DateTime(DateTime.now().year, DateTime.now().month, 1));
           final master = {
             'Comid': objfun.storagenew.getInt('Comid') ?? 0,
             'Todate': currentDate,
+            'Fromdate': fromdate,
           };
 
           final resultData = await ApiClient.postRequest(
