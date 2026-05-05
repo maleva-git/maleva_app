@@ -41,6 +41,15 @@ class TransportErrorState extends TransportState {
 }
 
 // ── Navigate to edit screen (carries fetched sale data) ───────────────────────
+
+// Keep your other states the same, just replace the navigate state:
+
+// ── Navigate to edit screen (carries fetched sale data) ───────────────────────
 class TransportNavigateToEditState extends TransportState {
-  const TransportNavigateToEditState();
+  final int id; // ✅ Added ID so the UI knows which item to edit
+
+  const TransportNavigateToEditState({required this.id});
+
+  @override
+  List<Object?> get props => [id];
 }

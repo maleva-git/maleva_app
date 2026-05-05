@@ -2,6 +2,7 @@ import 'package:flutter/Material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 import 'package:maleva/features/dashboard/transport_dashboard/view/transport_dashboard_ui.dart';
+import '../../../../core/di/injection.dart';
 import '../../admin_dashboard/tabs/emailinbox/bloc/emailinbox_bloc.dart';
 import '../../admin_dashboard/tabs/emailinbox/bloc/emailinbox_event.dart';
 import '../../admin_dashboard/tabs/emailinbox/view/emailinbox_tab.dart';
@@ -60,12 +61,10 @@ class _TransportDashboardState extends State<TransportDashboard> with SingleTick
 
 
             BlocProvider(
-              create: (context) => TransportBloc(
-                context: context,
-              )..add(const LoadTransportDataEvent(type: 0)),
+              create: (context) => sl<TransportBloc>()
+                ..add(const LoadTransportDataEvent(type: 0)),
               child: const TransportReportPage(),
             ),
-
             BlocProvider(
               create: (context) => EmailBloc(context)..add(const LoadEmployeesEvent()),
               child: const EmailPage(),

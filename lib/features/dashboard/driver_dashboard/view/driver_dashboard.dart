@@ -1,6 +1,7 @@
 import 'package:flutter/Material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
+import '../../../../core/di/injection.dart';
 import '../../admin_dashboard/tabs/driverlicense/bloc/driverlicense_bloc.dart';
 import '../../admin_dashboard/tabs/driverlicense/view/driverlicense_tab.dart';
 import '../../admin_dashboard/tabs/drivermaintenance/bloc/drivermaintenance_bloc.dart';
@@ -45,9 +46,8 @@ class _DriverDashboardState extends State<DriverDashboard> with SingleTickerProv
           return MultiBlocProvider(
               providers: [
                 BlocProvider(
-                  create: (context) => TransportBloc(
-                    context: context,
-                  )..add(const LoadTransportDataEvent(type: 0)),
+                  create: (context) => sl<TransportBloc>()
+                    ..add(const LoadTransportDataEvent(type: 0)),
                   child: const TransportReportPage(),
                 ),
                 BlocProvider(

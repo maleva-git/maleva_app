@@ -4,6 +4,8 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:maleva/core/utils/clsfunction.dart' as objfun;
 import 'package:maleva/core/colors/colors.dart' as colour;
 import '../../../../../../Transaction/SaleOrder/SalesOrderAdd.dart';
+import '../../../../../../core/di/injection.dart';
+import '../../../../../../core/network/OnlineApi.dart' as OnlineApi;
 import '../../../../../../core/theme/tokens.dart';
 import '../bloc/transport_bloc.dart';
 import '../bloc/transport_event.dart';
@@ -18,11 +20,30 @@ class TransportReportPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (context) => TransportBloc(context: context)
-        ..add(const LoadTransportDataEvent(type: 0)),
-      child: const _TransportReportView(),
-    );
+    return
+      // Inside your Widget tree:
+      BlocProvider(
+        create: (context) => sl<TransportBloc>()..add(const LoadTransportDataEvent(type: 0)),
+        child: BlocListener<TransportBloc, TransportState>(
+          listener: (context, state) {
+
+            // ✅ Handle Errors
+            if (state is TransportErrorState) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(content: Text(state.errorMessage), backgroundColor: Colors.red),
+              );
+            }
+
+            // ✅ Handle Navigation / Edit (Using the UI's context!)
+            if (state is TransportNavigateToEditState) {
+              // We moved this out of the BLoC so it can safely use the UI context
+              OnlineApi.EditSalesOrder(context, state.id, 0);
+            }
+
+          },
+          child: const _TransportReportView(), // Your actual UI
+        ),
+      );
   }
 }
 

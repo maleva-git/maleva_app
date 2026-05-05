@@ -59,13 +59,13 @@ class _SalesDashboardState extends State<SalesDashboard> with SingleTickerProvid
                 ),
                 BlocProvider(
                   create: (context) => sl<VesselBloc>()
-                    ..add(const LoadVesselDataEvent(type: 0)),
+                    ..add(const LoadVesselDataEvent(type: 0)
+                    ),
                   child: const VesselReportPage(),
                 ),
                 BlocProvider(
-                  create: (context) => TransportBloc(
-                    context: context,
-                  )..add(const LoadTransportDataEvent(type: 0)),
+                  create: (context) => sl<TransportBloc>()
+                    ..add(const LoadTransportDataEvent(type: 0)),
                   child: const TransportReportPage(),
                 ),
                 BlocProvider(
