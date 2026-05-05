@@ -154,7 +154,7 @@ class _LoginBodyState extends State<_LoginBody>
 
                 SizedBox(height: _isTablet ? 28 : (compact ? 14 : 20)),
 
-                // Card மட்டும் scroll ஆகும்
+
                 Expanded(
                   child: SingleChildScrollView(
                     physics: const BouncingScrollPhysics(),
@@ -174,6 +174,7 @@ class _LoginBodyState extends State<_LoginBody>
                           _buildDots(),
                           const SizedBox(height: 8),
                         ]),
+
                       ),
                     ),
                   ),

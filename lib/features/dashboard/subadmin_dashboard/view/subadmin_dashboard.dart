@@ -2,6 +2,7 @@ import 'package:flutter/Material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:maleva/features/dashboard/admin_dashboard/tabs/salesorder/bloc/salesorder_bloc.dart';
 import 'package:maleva/features/dashboard/subadmin_dashboard/view/subadmin_dashboard_ui.dart';
+import '../../../../core/di/injection.dart';
 import '../../../common_updates/blocs/sales/sales_bloc.dart';
 import '../../../common_updates/blocs/truck/truck_bloc.dart';
 import '../../admin_dashboard/tabs/emailinbox/bloc/emailinbox_bloc.dart';
@@ -85,7 +86,7 @@ class _AdminDashboardState extends State<SubAdminDashboard> with SingleTickerPro
               child: const InvoiceTab(),
             ),
             BlocProvider(
-              create: (context) => SalesOrderBloc(),
+              create: (context) => sl<SalesOrderBloc>(),
               child: const SalesOrderTab(),
             ),
 

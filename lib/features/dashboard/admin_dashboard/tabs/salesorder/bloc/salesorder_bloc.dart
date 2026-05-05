@@ -1,23 +1,23 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:bloc_concurrency/bloc_concurrency.dart';
 import 'package:intl/intl.dart';
-import '../../../../../../core/network/api_client.dart';
-import '../../../../../../core/network/api_services/auth_api.dart';
-import 'salesorder_event.dart';
-import 'salesorder_state.dart';
 import 'package:maleva/core/utils/clsfunction.dart' as objfun;
 
-class SalesOrderBloc extends Bloc<SalesOrderEvent, SalesOrderState> {
+// Make sure to adjust this import path to match your folder structure
 
+import '../data/salesorder_repository.dart';
+import 'salesorder_event.dart';
+import 'salesorder_state.dart';
+
+class SalesOrderBloc extends Bloc<SalesOrderEvent, SalesOrderState> {
+  final SalesOrderRepository repository;
   bool _isLoadingInvoice = false;
 
-  SalesOrderBloc() : super(InvoiceInitial()) {
-
+  SalesOrderBloc({required this.repository}) : super(InvoiceInitial()) {
 
     on<LoadInvoiceByType>(
           (event, emit) async {
-
-            final sw = Stopwatch()..start();
+        final sw = Stopwatch()..start();
 
         final newTabIndex = event.type == 0 ? 0 : event.type - 1;
 
@@ -56,7 +56,6 @@ class SalesOrderBloc extends Bloc<SalesOrderEvent, SalesOrderState> {
           final t1 = sw.elapsedMilliseconds;
           print('⏱ Before API call: ${t1}ms');
 
-          final header = {'Content-Type': 'application/json; charset=UTF-8'};
           final currentDate = DateFormat("yyyy-MM-dd").format(DateTime.now());
           final fromdate = DateFormat('yyyy-MM-dd')
               .format(DateTime(DateTime.now().year, DateTime.now().month, 1));
@@ -66,10 +65,10 @@ class SalesOrderBloc extends Bloc<SalesOrderEvent, SalesOrderState> {
             'Fromdate': fromdate,
           };
 
-
+          // ✅ REFACTORED: Using the injected repository
           final results = await Future.wait([
-            AuthApi.getSalesData(event.type),
-            AuthApi.getSalesInvoiceCheck(master),
+            repository.fetchSalesData(event.type),
+            repository.fetchSalesInvoiceCheck(master),
           ]);
 
           final t2 = sw.elapsedMilliseconds;
@@ -99,13 +98,10 @@ class SalesOrderBloc extends Bloc<SalesOrderEvent, SalesOrderState> {
             final t3 = sw.elapsedMilliseconds;
             print('⏱ After emit: ${t3}ms  (Processing took: ${t3 - t2}ms)');
             print('⏱ TOTAL: ${t3}ms');
-
-
           } else {
             emit(InvoiceError("No data returned"));
           }
         } catch (e) {
-
           print('❌ Error at: ${sw.elapsedMilliseconds}ms — $e');
 
           if (state is InvoiceTabSwitching) {
@@ -114,7 +110,6 @@ class SalesOrderBloc extends Bloc<SalesOrderEvent, SalesOrderState> {
             emit(InvoiceError(e.toString()));
           }
         } finally {
-
           _isLoadingInvoice = false;
         }
       },
@@ -152,13 +147,12 @@ class SalesOrderBloc extends Bloc<SalesOrderEvent, SalesOrderState> {
         final current = state as InvoiceLoaded;
         if (current.waitingBilling.isNotEmpty) {
           emit(current.copyWith(
-            showWaitingSheet:  true,
+            showWaitingSheet: true,
             clearEmployeeData: true,
           ));
           return;
         }
         try {
-          final header = {'Content-Type': 'application/json; charset=UTF-8'};
           final currentDate = DateFormat("yyyy-MM-dd").format(DateTime.now());
           final fromdate = DateFormat('yyyy-MM-dd')
               .format(DateTime(DateTime.now().year, DateTime.now().month, 1));
@@ -168,10 +162,8 @@ class SalesOrderBloc extends Bloc<SalesOrderEvent, SalesOrderState> {
             'Fromdate': fromdate,
           };
 
-          final resultData = await ApiClient.postRequest(
-            objfun.apiSelectSaleorderinvoicecheck,
-            master,
-          );
+          // ✅ REFACTORED: Using the injected repository
+          final resultData = await repository.fetchWaitingBills(master);
 
           emit(current.copyWith(
             waitingBilling: List<dynamic>.from(resultData ?? []),
@@ -195,12 +187,12 @@ class SalesOrderBloc extends Bloc<SalesOrderEvent, SalesOrderState> {
         final current = state as InvoiceLoaded;
 
         try {
-          final header = {'Content-Type': 'application/json; charset=UTF-8'};
-
-          final resultData = await ApiClient.postRequest(
-            "${objfun.apiGetEmployeeInvData}${objfun.Comid}&type=${event.type}",
-            null,
+          // ✅ REFACTORED: Using the injected repository
+          final resultData = await repository.fetchEmployeeInvData(
+              event.type,
+              objfun.Comid
           );
+
           emit(current.copyWith(
             employeeData: List<dynamic>.from(resultData?["Data1"] ?? []),
             showWaitingSheet: false,
@@ -226,18 +218,14 @@ class SalesOrderBloc extends Bloc<SalesOrderEvent, SalesOrderState> {
 
     // ─────────────────────────────────────────────
     // FORCE REFRESH
-    // Fix: InvoiceInitial emit பண்ணா initState re-trigger ஆகும்
-    //      InvoiceLoading emit பண்றோம் + guard release
     // ─────────────────────────────────────────────
-// salesorder_bloc.dart
     on<RefreshSalesOrder>((event, emit) async {
       _isLoadingInvoice = false; // guard release
 
-      // ✅ பழைய state இருந்தா அதையே காட்டு — blank screen வேண்டாம்
       final previousLoaded = switch (state) {
-        InvoiceLoaded s      => s,
+        InvoiceLoaded s => s,
         InvoiceTabSwitching s => s.previous,
-        _                    => null,
+        _ => null,
       };
 
       if (previousLoaded != null) {
@@ -248,7 +236,7 @@ class SalesOrderBloc extends Bloc<SalesOrderEvent, SalesOrderState> {
         emit(InvoiceLoading());
         add(LoadInvoiceByType(0));
       }
-    });;
+    });
   }
 
   (List<String>, List<dynamic>) _buildMonthData(

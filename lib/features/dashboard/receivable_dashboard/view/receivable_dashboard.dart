@@ -3,6 +3,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:maleva/features/dashboard/admin_dashboard/tabs/salesorder/bloc/salesorder_bloc.dart';
 import 'package:maleva/features/dashboard/receivable_dashboard/view/receivable_dashboard_ui.dart';
+import '../../../../core/di/injection.dart';
 import '../../admin_dashboard/tabs/invoice/bloc/invoice_bloc.dart';
 import '../../admin_dashboard/tabs/invoice/bloc/invoice_event.dart';
 import '../../admin_dashboard/tabs/invoice/data/invoice_repository.dart';
@@ -54,7 +55,7 @@ class _AdminDashboardState extends State<ReceivableDashboard> with SingleTickerP
               child: const InvoiceTab(),
             ),
             BlocProvider(
-              create: (_) => SalesOrderBloc(),
+              create: (_) => sl<SalesOrderBloc>(),
               child: const SalesOrderTab(),
             ),
 

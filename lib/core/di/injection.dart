@@ -43,6 +43,7 @@ import '../../features/dashboard/admin_dashboard/tabs/expensereport/data/expense
 import '../../features/dashboard/admin_dashboard/tabs/forwardingreport/bloc/forwardingreport_bloc.dart';
 import '../../features/dashboard/admin_dashboard/tabs/forwardingreport/data/forwardingreport_repository.dart';
 import '../../features/dashboard/admin_dashboard/tabs/receiptview/data/receipt_repository.dart';
+import '../../features/dashboard/admin_dashboard/tabs/salesorder/data/salesorder_repository.dart';
 
 final sl = GetIt.instance;
 
@@ -137,15 +138,20 @@ Future<void> setupDependencies() async {
   sl.registerLazySingleton<ExpenseReportRepository>(
         () => ExpenseReportRepository(),
   );
-
+  sl.registerLazySingleton<SalesOrderRepository>(
+        () => SalesOrderRepository(),
+  );
   // ── BLOCS ─────────────────────────────────────────────────────────────────
 
   // Add this near your other blocs
   sl.registerFactory<ExpenseReportBloc>(
         () => ExpenseReportBloc(repository: sl<ExpenseReportRepository>()),
   );
+  sl.registerFactory<SalesOrderBloc>(
+        () => SalesOrderBloc(repository: sl<SalesOrderRepository>()),
+  );
   // ── No-dep dashboard tabs (no-arg constructors) ─────────────────
-  sl.registerFactory<SalesOrderBloc>(() => SalesOrderBloc());
+
   sl.registerFactory<MaintenanceBloc>(() => MaintenanceBloc());
   sl.registerFactory<DriverLicenseExpiryBloc>(() => DriverLicenseExpiryBloc());
   sl.registerFactory<TruckMaintDashBloc>(() => TruckMaintDashBloc());
