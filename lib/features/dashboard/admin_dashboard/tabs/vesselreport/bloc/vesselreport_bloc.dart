@@ -1,15 +1,16 @@
-import 'package:flutter/Material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
-import 'package:maleva/features/dashboard/admin_dashboard/tabs/vesselreport/bloc/vesselreport_event.dart';
-import 'package:maleva/features/dashboard/admin_dashboard/tabs/vesselreport/bloc/vesselreport_state.dart';
 import 'package:maleva/core/utils/clsfunction.dart' as objfun;
-import '../../../../../../core/utils/clsfunction.dart';
+
+import '../data/vessel_report_repository.dart';
+import 'vesselreport_event.dart';
+import 'vesselreport_state.dart';
 
 class VesselBloc extends Bloc<VesselEvent, VesselState> {
-  final BuildContext context;  // pass real context
+  // ❌ REMOVED: final BuildContext context;
+  final VesselReportRepository repository;
 
-  VesselBloc({required this.context}) : super(const VesselInitial()) {
+  VesselBloc({required this.repository}) : super(const VesselInitial()) {
     on<LoadVesselDataEvent>(_onLoadVesselData);
     on<UpdatePortEvent>(_onUpdatePort);
     on<ClearPortEvent>(_onClearPort);
@@ -20,8 +21,7 @@ class VesselBloc extends Bloc<VesselEvent, VesselState> {
   Future<void> _onLoadVesselData(
       LoadVesselDataEvent event,
       Emitter<VesselState> emit,
-      )
-  async {
+      ) async {
     String currentPort = '';
     String currentSearch = '';
     bool currentIsPlanToday = event.type == 0;
@@ -39,10 +39,6 @@ class VesselBloc extends Bloc<VesselEvent, VesselState> {
     emit(const VesselLoadingState());
 
     try {
-      final Map<String, String> header = {
-        'Content-Type': 'application/json; charset=UTF-8',
-      };
-
       DateTime now = DateTime.now();
       DateTime newDate = now.add(Duration(days: event.type));
       String fromDate = DateFormat('yyyy-MM-dd').format(newDate);
@@ -61,9 +57,11 @@ class VesselBloc extends Bloc<VesselEvent, VesselState> {
         'ETAType': 0,
       };
 
-      // ✅ pass real context, same as old code
-      final resultData = await objfun.apiAllinoneSelectArray(
-          objfun.VESSELPLANINGDB, body, header, context);
+      // ✅ REFACTORED: Calling repo without context
+      final resultData = await repository.fetchVesselPlanningData(
+        body: body,
+      );
+
       if (resultData == null || resultData == "" || (resultData is List && resultData.isEmpty)) {
         emit(VesselLoadedState(
           vesselList: const [],
@@ -73,8 +71,6 @@ class VesselBloc extends Bloc<VesselEvent, VesselState> {
         ));
         return;
       }
-      print('DEBUG resultData: $resultData');
-      print('DEBUG type: ${resultData.runtimeType}');
 
       if (resultData != null && resultData != "" && resultData.length != 0) {
         List<Map<String, dynamic>> list =
@@ -92,63 +88,33 @@ class VesselBloc extends Bloc<VesselEvent, VesselState> {
           portName: currentPort,
           searchText: currentSearch,
         ));
-
       }
-
-    } catch (error, stackTrace) {
-      emit(VesselErrorState(errorMessage: '$error\n$stackTrace'));
+    } catch (error) {
+      // ApiClient throws clear exceptions, we emit them directly to the UI
+      emit(VesselErrorState(errorMessage: error.toString()));
     }
   }
 
-  void _onUpdatePort(
-      UpdatePortEvent event,
-      Emitter<VesselState> emit,
-      ) {
+  void _onUpdatePort(UpdatePortEvent event, Emitter<VesselState> emit) {
     String currentSearch = _getCurrentSearch();
-    emit(VesselFieldUpdatedState(
-      portName: event.portName,
-      searchText: currentSearch,
-    ));
-  }
-  void _onClearPort(
-      ClearPortEvent event,
-      Emitter<VesselState> emit,
-      ) {
-    String currentSearch = _getCurrentSearch();
-    emit(VesselFieldUpdatedState(
-      portName: '',
-      searchText: currentSearch,
-    ));
+    emit(VesselFieldUpdatedState(portName: event.portName, searchText: currentSearch));
   }
 
-  Future<void> _onAddPortToSearch(
-      AddPortToSearchEvent event,
-      Emitter<VesselState> emit,
-      ) async {
-    // Append port to search
+  void _onClearPort(ClearPortEvent event, Emitter<VesselState> emit) {
+    String currentSearch = _getCurrentSearch();
+    emit(VesselFieldUpdatedState(portName: '', searchText: currentSearch));
+  }
+
+  Future<void> _onAddPortToSearch(AddPortToSearchEvent event, Emitter<VesselState> emit) async {
     String newSearch = event.currentSearch.isEmpty
         ? event.portName
         : '${event.currentSearch},${event.portName}';
-
-    // Emit field update (clears port field, updates search)
-    emit(VesselFieldUpdatedState(
-      portName: '',
-      searchText: newSearch,
-    ));
-
-    // NOTE: After this, UI should dispatch LoadVesselDataEvent
-    // (or you can call _onLoadVesselData directly here if preferred)
+    emit(VesselFieldUpdatedState(portName: '', searchText: newSearch));
   }
 
-  void _onClearSearch(
-      ClearSearchEvent event,
-      Emitter<VesselState> emit,
-      ) {
+  void _onClearSearch(ClearSearchEvent event, Emitter<VesselState> emit) {
     String currentPort = _getCurrentPort();
-    emit(VesselFieldUpdatedState(
-      portName: currentPort,
-      searchText: '',
-    ));
+    emit(VesselFieldUpdatedState(portName: currentPort, searchText: ''));
   }
 
   String _getCurrentSearch() {
@@ -162,5 +128,4 @@ class VesselBloc extends Bloc<VesselEvent, VesselState> {
     if (state is VesselFieldUpdatedState) return (state as VesselFieldUpdatedState).portName;
     return '';
   }
-
 }

@@ -89,11 +89,9 @@ class _AdminDashboardState extends State<SubAdminDashboard> with SingleTickerPro
               create: (context) => sl<SalesOrderBloc>(),
               child: const SalesOrderTab(),
             ),
-
             BlocProvider(
-              create: (context) => VesselBloc(
-                context: context,
-              )..add(const LoadVesselDataEvent(type: 0)),
+              create: (context) => sl<VesselBloc>()
+                ..add(const LoadVesselDataEvent(type: 0)),
               child: const VesselReportPage(),
             ),
             BlocProvider(

@@ -1,5 +1,6 @@
 // lib/core/di/injection.dart
 
+import 'package:flutter/Material.dart';
 import 'package:get_it/get_it.dart';
 
 // Core
@@ -44,6 +45,8 @@ import '../../features/dashboard/admin_dashboard/tabs/forwardingreport/bloc/forw
 import '../../features/dashboard/admin_dashboard/tabs/forwardingreport/data/forwardingreport_repository.dart';
 import '../../features/dashboard/admin_dashboard/tabs/receiptview/data/receipt_repository.dart';
 import '../../features/dashboard/admin_dashboard/tabs/salesorder/data/salesorder_repository.dart';
+import '../../features/dashboard/admin_dashboard/tabs/vesselreport/bloc/vesselreport_bloc.dart';
+import '../../features/dashboard/admin_dashboard/tabs/vesselreport/data/vessel_report_repository.dart';
 
 final sl = GetIt.instance;
 
@@ -151,7 +154,15 @@ Future<void> setupDependencies() async {
         () => SalesOrderBloc(repository: sl<SalesOrderRepository>()),
   );
   // ── No-dep dashboard tabs (no-arg constructors) ─────────────────
+// Inside your DI setup function
+  sl.registerLazySingleton<VesselReportRepository>(
+        () => VesselReportRepository(),
+  );
 
+// ✅ Standard factory, no context needed!
+  sl.registerFactory<VesselBloc>(
+        () => VesselBloc(repository: sl<VesselReportRepository>()),
+  );
   sl.registerFactory<MaintenanceBloc>(() => MaintenanceBloc());
   sl.registerFactory<DriverLicenseExpiryBloc>(() => DriverLicenseExpiryBloc());
   sl.registerFactory<TruckMaintDashBloc>(() => TruckMaintDashBloc());

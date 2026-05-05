@@ -46,7 +46,13 @@ class ExpenseReportBloc extends Bloc<ExpenseReportEvent, ExpenseReportState> {
       toDateStr = DateFormat('yyyy-MM-dd').format(state.toDate!);
     } else {
       final now = DateTime.now();
-      fromDateStr = DateFormat('yyyy-MM-dd').format(now);
+     // fromDateStr = DateFormat('yyyy-MM-dd').format(now);
+
+      DateTime fromDateStr = DateTime(
+        now.year,
+        now.month - 1,
+        now.day,
+      );
       toDateStr = DateFormat('yyyy-MM-dd').format(now);
 
       // Update state with default dates if they are null

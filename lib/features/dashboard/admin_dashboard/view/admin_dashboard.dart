@@ -156,10 +156,9 @@ class _AdminDashboardState extends State<NewAdminDashboard> with SingleTickerPro
               child: const ExpenseReportView(),
             ),
             BlocProvider(
-              create: (context) => VesselBloc(
-                context: context,
-              )..add(const LoadVesselDataEvent(type: 0)),
-              child: const VesselReportPage(),
+              // Pass the context into sl() using param1
+              create: (context) => sl<VesselBloc>(param1: context),
+              child: VesselReportPage(),
             ),
             BlocProvider(
               create: (context) => TransportBloc(

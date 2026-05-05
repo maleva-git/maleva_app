@@ -2,6 +2,7 @@ import 'package:flutter/Material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 import '../../../../DashBoard/Maintenance/MaintenanceDashboard.dart';
+import '../../../../core/di/injection.dart';
 import '../../../common_updates/blocs/sales/sales_bloc.dart';
 import '../../../common_updates/blocs/truck/truck_bloc.dart';
 import '../../admin_dashboard/tabs/driver/bloc/driverdetails_bloc.dart';
@@ -95,9 +96,8 @@ class _AdminDashboardState extends State<OperationAdminDashboard> with SingleTic
             ),
 
             BlocProvider(
-              create: (context) => VesselBloc(
-                context: context,
-              )..add(const LoadVesselDataEvent(type: 0)),
+              create: (context) => sl<VesselBloc>()
+                ..add(const LoadVesselDataEvent(type: 0)),
               child: const VesselReportPage(),
             ),
 

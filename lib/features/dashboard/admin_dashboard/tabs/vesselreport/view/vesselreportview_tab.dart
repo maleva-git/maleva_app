@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:maleva/core/utils/clsfunction.dart' as objfun;
 import '../../../../../../MasterSearch/Port.dart';
+import '../../../../../../core/di/injection.dart';
 import '../../../../../../core/theme/tokens.dart';
 import '../bloc/vesselreport_bloc.dart';
 import '../bloc/vesselreport_event.dart';
@@ -15,11 +16,24 @@ class VesselReportPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (context) => VesselBloc(context: context)
-        ..add(const LoadVesselDataEvent(type: 0)),
-      child: const _VesselReportView(),
-    );
+    return
+      BlocProvider(
+        create: (context) => sl<VesselBloc>(), // ✅ Clean initialization
+        child: BlocListener<VesselBloc, VesselState>(
+          listener: (context, state) {
+            // ✅ The UI handles showing the error, not the BLoC!
+            if (state is VesselErrorState) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text(state.errorMessage),
+                  backgroundColor: Colors.red,
+                ),
+              );
+            }
+          },
+          child: const _VesselReportView(), // Your actual UI widget
+        ),
+      );
   }
 }
 

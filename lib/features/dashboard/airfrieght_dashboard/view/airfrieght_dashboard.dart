@@ -1,5 +1,6 @@
 import 'package:flutter/Material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import '../../../../core/di/injection.dart';
 import '../../admin_dashboard/tabs/airfreightsales/bloc/airfreightsales_bloc.dart';
 import '../../admin_dashboard/tabs/airfreightsales/bloc/airfreightsales_event.dart';
 import '../../admin_dashboard/tabs/airfreightsales/view/airfreightsales_tab.dart';
@@ -34,9 +35,7 @@ class _SalesDashboardState extends State<SalesDashboard> with SingleTickerProvid
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 6
-
-        , vsync: this);
+    _tabController = TabController(length: 6, vsync: this);
     _tabController.addListener(_onTabChanged);
   }
 
@@ -59,9 +58,8 @@ class _SalesDashboardState extends State<SalesDashboard> with SingleTickerProvid
                   child:  const CustomerDashboardScreen(),
                 ),
                 BlocProvider(
-                    create: (context) => VesselBloc(
-                        context: context,
-                    )..add(const LoadVesselDataEvent(type: 0)),
+                  create: (context) => sl<VesselBloc>()
+                    ..add(const LoadVesselDataEvent(type: 0)),
                   child: const VesselReportPage(),
                 ),
                 BlocProvider(
