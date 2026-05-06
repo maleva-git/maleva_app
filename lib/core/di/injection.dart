@@ -63,8 +63,12 @@ import '../../features/dashboard/admin_dashboard/tabs/pettycash/bloc/pettycash_b
 import '../../features/dashboard/admin_dashboard/tabs/pettycash/data/pettycash_repository.dart';
 import '../../features/dashboard/admin_dashboard/tabs/receiptview/data/receipt_repository.dart';
 import '../../features/dashboard/admin_dashboard/tabs/salesorder/data/salesorder_repository.dart';
+import '../../features/dashboard/admin_dashboard/tabs/spareparts/bloc/spareparts_bloc.dart';
+import '../../features/dashboard/admin_dashboard/tabs/spareparts/data/spareparts_repository.dart';
 import '../../features/dashboard/admin_dashboard/tabs/speedingreport/bloc/speeding_bloc.dart';
 import '../../features/dashboard/admin_dashboard/tabs/speedingreport/data/speeding_repository.dart';
+import '../../features/dashboard/admin_dashboard/tabs/summonentry/bloc/summonentry_bloc.dart';
+import '../../features/dashboard/admin_dashboard/tabs/summonentry/data/summonentry_repository.dart';
 import '../../features/dashboard/admin_dashboard/tabs/transport/bloc/transport_bloc.dart';
 import '../../features/dashboard/admin_dashboard/tabs/transport/data/transport_repository.dart';
 import '../../features/dashboard/admin_dashboard/tabs/truck/bloc/truck_bloc.dart';
@@ -286,7 +290,22 @@ Future<void> setupDependencies() async {
   sl.registerFactory<PettyCashBloc>(
         () => PettyCashBloc(repository: sl<PettyCashRepository>()),
   );
+  sl.registerLazySingleton<SummonRepository>(
+        () => SummonRepository(),
+  );
 
+  // 2. Register the View BLoC as the default factory
+  sl.registerFactory<SummonBloc>(
+        () => SummonBloc.view(repository: sl<SummonRepository>()),
+  );
+  sl.registerLazySingleton<SparePartsRepository>(
+        () => SparePartsRepository(),
+  );
+
+  // 2. Register the View BLoC as the default factory
+  sl.registerFactory<SparePartsBloc>(
+        () => SparePartsBloc.view(repository: sl<SparePartsRepository>()),
+  );
   sl.registerFactory<MaintenanceBloc>(() => MaintenanceBloc());
   sl.registerFactory<DriverLicenseExpiryBloc>(() => DriverLicenseExpiryBloc());
   sl.registerFactory<TruckMaintDashBloc>(() => TruckMaintDashBloc());

@@ -11,7 +11,7 @@ class PettyCashRepository {
     // Construct the URL with query parameters
     final url = "${objfun.apiGetpettycash}$comId"
         "&Fromdate=$fromDate"
-        "&Todate=$toDate"
+        "&Todate=$toDate" 
         "&Employeeid=0&Search=&PaymentStatus=&PaymentTo";
 
     // ApiClient seamlessly handles the request

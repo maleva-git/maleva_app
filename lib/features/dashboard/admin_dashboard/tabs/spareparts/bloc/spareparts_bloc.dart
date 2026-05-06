@@ -1,40 +1,37 @@
 import 'dart:convert';
 import 'dart:io';
-
-import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
-import 'package:http/http.dart' as http;
-
 import 'package:maleva/core/utils/clsfunction.dart' as objfun;
-import 'package:maleva/core/network/OnlineApi.dart' as OnlineApi;
-import 'package:maleva/features/dashboard/admin_dashboard/tabs/spareparts/bloc/spareparts_event.dart';
-import 'package:maleva/features/dashboard/admin_dashboard/tabs/spareparts/bloc/spareparts_state.dart';
 
-
+import '../data/spareparts_repository.dart';
+import 'spareparts_event.dart';
+import 'spareparts_state.dart';
 
 class SparePartsBloc extends Bloc<SparePartsEvent, SparePartsState> {
-  final BuildContext context;
-  final ImagePicker _picker = ImagePicker();
+  // ❌ REMOVED: final BuildContext context;
+  // ❌ REMOVED: final ImagePicker _picker = ImagePicker(); (Moved to UI)
+  final SparePartsRepository repository; // ✅ Injected Repository
 
   // ── Entry Page ────────────────────────────────────────────────────────────
-  SparePartsBloc.form(this.context)
+  SparePartsBloc.form({required this.repository})
       : super(const SparePartsEntryState()) {
     _registerHandlers();
     add(const LoadSparePartsTrucksEvent());
   }
 
   // ── View Page ─────────────────────────────────────────────────────────────
-  SparePartsBloc.view(this.context, {DateTime? fromDate, DateTime? toDate})
-      : super(SparePartsViewState(
-    fromDate: fromDate ?? DateTime.now(),
+  SparePartsBloc.view({
+    required this.repository,
+    DateTime? fromDate,
+    DateTime? toDate
+  }) : super(SparePartsViewState(
+    // ✅ Defaults to 30 days ago
+    fromDate: fromDate ?? DateTime.now().subtract(const Duration(days: 30)),
     toDate: toDate ?? DateTime.now(),
   )) {
     _registerHandlers();
-    if (fromDate != null && toDate != null) {
-      add(const LoadSparePartsViewEvent());
-    }
+    add(const LoadSparePartsViewEvent()); // Auto-load since we have defaults
   }
 
   void _registerHandlers() {
@@ -47,6 +44,7 @@ class SparePartsBloc extends Bloc<SparePartsEvent, SparePartsState> {
     on<PickSparePartsDocumentEvent>(_onPickDocument);
     on<SubmitSparePartsEvent>(_onSubmit);
     on<ResetSparePartsFormEvent>(_onReset);
+
     // View
     on<SelectSparePartsFromDateEvent>(_onFromDate);
     on<SelectSparePartsToDateEvent>(_onToDate);
@@ -61,12 +59,13 @@ class SparePartsBloc extends Bloc<SparePartsEvent, SparePartsState> {
   Future<void> _onLoadTrucks(
       LoadSparePartsTrucksEvent e, Emitter<SparePartsState> emit) async {
     if (objfun.GetTruckList.isEmpty) {
-      await OnlineApi.SelectTruckList(context, null);
+      await repository.fetchTrucks();
     }
     if (state is SparePartsEntryState) {
       emit((state as SparePartsEntryState).copyWith());
     }
   }
+
   void _onSelectRecord(
       SelectSparePartsRecordEvent event,
       Emitter<SparePartsState> emit,
@@ -76,6 +75,7 @@ class SparePartsBloc extends Bloc<SparePartsEvent, SparePartsState> {
           .copyWith(selectedRecord: event.record));
     }
   }
+
   void _onSelectTruck(
       SelectSparePartsTruckEvent e, Emitter<SparePartsState> emit) {
     if (state is! SparePartsEntryState) return;
@@ -119,11 +119,11 @@ class SparePartsBloc extends Bloc<SparePartsEvent, SparePartsState> {
     emit(s.copyWith(isSubmitting: true));
 
     try {
-      final comid = objfun.storagenew.getInt('Comid') ?? 0;
+      final comId = objfun.storagenew.getInt('Comid') ?? 0;
 
       final List<Map<String, dynamic>> body = [
         {
-          "Comid": comid,
+          "Comid": comId,
           "Id": 0,
           "TruckName": s.selectedTruck ?? '',
           "DriverName": '',
@@ -136,27 +136,19 @@ class SparePartsBloc extends Bloc<SparePartsEvent, SparePartsState> {
         }
       ];
 
-      final uri = Uri.parse("${objfun.apiInsertSpareParts}?Comid=$comid");
-      final request = http.MultipartRequest("POST", uri);
-      request.fields["details"] = jsonEncode(body);
-      request.fields["Comid"] = comid.toString();
+      // ✅ REFACTORED: Using the injected repository
+      final isSuccess = await repository.submitSpareParts(
+        body: body,
+        comId: comId,
+        image: s.pickedImage,
+        pdf: s.pickedPDF,
+      );
 
-      if (s.pickedImage != null) {
-        request.files.add(
-            await http.MultipartFile.fromPath("Files", s.pickedImage!.path));
-      }
-      if (s.pickedPDF != null) {
-        request.files.add(
-            await http.MultipartFile.fromPath("Files", s.pickedPDF!.path));
-      }
-
-      final response = await request.send();
-
-      if (response.statusCode == 200) {
+      if (isSuccess) {
         emit(const SparePartsSubmitSuccess());
       } else {
         emit(s.copyWith(isSubmitting: false));
-        emit(SparePartsEntryError("Server error: ${response.statusCode}"));
+        emit(const SparePartsEntryError("Server error: Failed to submit"));
       }
     } catch (err) {
       emit(s.copyWith(isSubmitting: false));
@@ -166,7 +158,7 @@ class SparePartsBloc extends Bloc<SparePartsEvent, SparePartsState> {
 
   void _onReset(ResetSparePartsFormEvent e, Emitter<SparePartsState> emit) {
     emit(const SparePartsEntryState());
-    add(const LoadSparePartsTrucksEvent()); // truck list keep பண்ணு
+    add(const LoadSparePartsTrucksEvent()); // keep truck list
   }
 
   // ════════════════════════════════════════════════════════════════════════════
@@ -195,15 +187,16 @@ class SparePartsBloc extends Bloc<SparePartsEvent, SparePartsState> {
     try {
       final from = DateFormat('yyyy-MM-dd').format(s.fromDate);
       final to   = DateFormat('yyyy-MM-dd').format(s.toDate);
+      final comId = objfun.storagenew.getInt('Comid') ?? 0;
 
-      final resultData = await objfun.apiAllinoneSelectArray(
-        "${objfun.apiGetSpareParts}${objfun.Comid}&Fromdate=$from&Todate=$to",
-        null,
-        {'Content-Type': 'application/json; charset=UTF-8'},
-        context,
+      // ✅ REFACTORED: Using the injected repository
+      final resultData = await repository.fetchSparePartsRecords(
+          comId: comId,
+          fromDate: from,
+          toDate: to
       );
 
-      final records = resultData != null
+      final records = resultData != null && resultData is List
           ? List<Map<String, dynamic>>.from(resultData)
           : <Map<String, dynamic>>[];
 
@@ -214,20 +207,6 @@ class SparePartsBloc extends Bloc<SparePartsEvent, SparePartsState> {
         fromDate: s.fromDate,
         toDate: s.toDate,
       ));
-    }
-  }
-
-  // ── Image Picker helper ───────────────────────────────────────────────────
-  Future<void> pickDocument() async {
-    final XFile? picked =
-    await _picker.pickImage(source: ImageSource.gallery);
-    if (picked != null) {
-      final path = picked.path.toLowerCase();
-      if (path.endsWith('.pdf')) {
-        add(PickSparePartsDocumentEvent(pdf: File(picked.path)));
-      } else {
-        add(PickSparePartsDocumentEvent(image: File(picked.path)));
-      }
     }
   }
 }

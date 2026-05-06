@@ -1,36 +1,35 @@
 import 'dart:convert';
 import 'dart:io';
-import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
-import 'package:http/http.dart' as http;
-import 'package:maleva/core/network/OnlineApi.dart' as OnlineApi;
 import 'package:maleva/core/utils/clsfunction.dart' as objfun;
-import 'package:maleva/features/dashboard/admin_dashboard/tabs/summonentry/bloc/summonentry_event.dart';
-import 'package:maleva/features/dashboard/admin_dashboard/tabs/summonentry/bloc/summonentry_state.dart';
 
-
+import '../data/summonentry_repository.dart';
+import 'summonentry_event.dart';
+import 'summonentry_state.dart';
 
 class SummonBloc extends Bloc<SummonEvent, SummonState> {
-  final BuildContext context;
-  final ImagePicker _picker = ImagePicker();
+  // ❌ REMOVED: final BuildContext context;
+  // ❌ REMOVED: final ImagePicker _picker = ImagePicker(); (Moved to UI)
+  final SummonRepository repository; // ✅ Injected Repository
 
-  // ── Entry Page init ───────────────────────────────────────────────────────
-  SummonBloc.form(this.context) : super(const SummonEntryState()) {
+  // ── Entry Page init ─────────────────────────────────────────────────────────
+  SummonBloc.form({required this.repository}) : super(const SummonEntryState()) {
     _registerHandlers();
   }
 
-  // ── View Page init ────────────────────────────────────────────────────────
-  SummonBloc.view(this.context, {DateTime? fromDate, DateTime? toDate})
-      : super(SummonViewState(
-    fromDate: fromDate ?? DateTime.now(),
+  // ── View Page init ──────────────────────────────────────────────────────────
+  SummonBloc.view({
+    required this.repository,
+    DateTime? fromDate,
+    DateTime? toDate
+  }) : super(SummonViewState(
+    // ✅ Defaults to 30 days ago
+    fromDate: fromDate ?? DateTime.now().subtract(const Duration(days: 30)),
     toDate: toDate ?? DateTime.now(),
   )) {
     _registerHandlers();
-    if (fromDate != null && toDate != null) {
-      add(const LoadSummonViewEvent());
-    }
+    add(const LoadSummonViewEvent()); // Auto-load since we have default dates
   }
 
   void _registerHandlers() {
@@ -60,11 +59,14 @@ class SummonBloc extends Bloc<SummonEvent, SummonState> {
   // ════════════════════════════════════════════════════════════════════════════
   Future<void> _loadTrucks() async {
     if (objfun.GetTruckList.isEmpty) {
-      await OnlineApi.SelectTruckList(context, null);
-      // Truck load ஆனதும் UI rebuild ஆகணும்னு emit பண்ணு
-      emit(state as SummonEntryState); // same state re-emit → rebuild
+      await repository.fetchTrucks();
+
+      if (state is SummonEntryState) {
+        emit((state as SummonEntryState).copyWith()); // trigger rebuild
+      }
     }
   }
+
   void _onSelectTruck(SelectTruckEvent e, Emitter<SummonState> emit) {
     if (state is! SummonEntryState) return;
     emit((state as SummonEntryState).copyWith(selectedTruck: e.truckId));
@@ -77,13 +79,11 @@ class SummonBloc extends Bloc<SummonEvent, SummonState> {
 
   void _onSelectCountry(SelectCountryEvent e, Emitter<SummonState> emit) {
     if (state is! SummonEntryState) return;
-    // Reset summon when country changes
     emit((state as SummonEntryState)
         .copyWith(selectedCountry: e.country, clearSummon: true));
   }
 
-  void _onSelectSummonType(
-      SelectSummonTypeEvent e, Emitter<SummonState> emit) {
+  void _onSelectSummonType(SelectSummonTypeEvent e, Emitter<SummonState> emit) {
     if (state is! SummonEntryState) return;
     emit((state as SummonEntryState).copyWith(selectedSummon: e.summonType));
   }
@@ -98,8 +98,7 @@ class SummonBloc extends Bloc<SummonEvent, SummonState> {
     emit((state as SummonEntryState).copyWith(portPass: e.value));
   }
 
-  void _onUpdateTruckLcnMnt(
-      UpdateTruckLcnMntEvent e, Emitter<SummonState> emit) {
+  void _onUpdateTruckLcnMnt(UpdateTruckLcnMntEvent e, Emitter<SummonState> emit) {
     if (state is! SummonEntryState) return;
     emit((state as SummonEntryState).copyWith(truckLcnMnt: e.value));
   }
@@ -114,8 +113,7 @@ class SummonBloc extends Bloc<SummonEvent, SummonState> {
     emit((state as SummonEntryState).copyWith(fuel: e.value));
   }
 
-  Future<void> _onPickDocument(
-      PickDocumentEvent e, Emitter<SummonState> emit) async {
+  Future<void> _onPickDocument(PickDocumentEvent e, Emitter<SummonState> emit) async {
     if (state is! SummonEntryState) return;
     final s = state as SummonEntryState;
 
@@ -126,8 +124,7 @@ class SummonBloc extends Bloc<SummonEvent, SummonState> {
     }
   }
 
-  Future<void> _onSubmit(
-      SubmitSummonEvent e, Emitter<SummonState> emit) async {
+  Future<void> _onSubmit(SubmitSummonEvent e, Emitter<SummonState> emit) async {
     if (state is! SummonEntryState) return;
     final s = state as SummonEntryState;
 
@@ -156,27 +153,19 @@ class SummonBloc extends Bloc<SummonEvent, SummonState> {
         }
       ];
 
-      final uri = Uri.parse("${objfun.apiInsertSummonParts}?Comid=$comid");
-      final request = http.MultipartRequest("POST", uri);
-      request.fields["details"] = jsonEncode(body);
-      request.fields["Comid"] = comid.toString();
+      // ✅ REFACTORED: Using the injected repository
+      final isSuccess = await repository.submitSummon(
+        body: body,
+        comId: comid,
+        image: s.pickedImage,
+        pdf: s.pickedPDF,
+      );
 
-      if (s.pickedImage != null) {
-        request.files.add(
-            await http.MultipartFile.fromPath("Files", s.pickedImage!.path));
-      }
-      if (s.pickedPDF != null) {
-        request.files.add(
-            await http.MultipartFile.fromPath("Files", s.pickedPDF!.path));
-      }
-
-      final response = await request.send();
-
-      if (response.statusCode == 200) {
+      if (isSuccess) {
         emit(const SummonSubmitSuccess());
       } else {
         emit(s.copyWith(isSubmitting: false));
-        emit(SummonEntryError("Server error: ${response.statusCode}"));
+        emit(const SummonEntryError("Server error: Failed to submit"));
       }
     } catch (err) {
       emit(s.copyWith(isSubmitting: false));
@@ -192,8 +181,7 @@ class SummonBloc extends Bloc<SummonEvent, SummonState> {
   // VIEW HANDLERS
   // ════════════════════════════════════════════════════════════════════════════
 
-  void _onViewFromDate(
-      SelectViewFromDateEvent e, Emitter<SummonState> emit) {
+  void _onViewFromDate(SelectViewFromDateEvent e, Emitter<SummonState> emit) {
     if (state is! SummonViewState) return;
     emit((state as SummonViewState).copyWith(fromDate: e.date));
   }
@@ -203,8 +191,7 @@ class SummonBloc extends Bloc<SummonEvent, SummonState> {
     emit((state as SummonViewState).copyWith(toDate: e.date));
   }
 
-  Future<void> _onLoadView(
-      LoadSummonViewEvent e, Emitter<SummonState> emit) async {
+  Future<void> _onLoadView(LoadSummonViewEvent e, Emitter<SummonState> emit) async {
     if (state is! SummonViewState) return;
     final s = state as SummonViewState;
 
@@ -213,15 +200,16 @@ class SummonBloc extends Bloc<SummonEvent, SummonState> {
     try {
       final String from = DateFormat('yyyy-MM-dd').format(s.fromDate);
       final String to = DateFormat('yyyy-MM-dd').format(s.toDate);
+      final comId = objfun.storagenew.getInt('Comid') ?? 0;
 
-      final resultData = await objfun.apiAllinoneSelectArray(
-        "${objfun.apiGetSummonParts}${objfun.Comid}&Fromdate=$from&Todate=$to",
-        null,
-        {'Content-Type': 'application/json; charset=UTF-8'},
-        context,
+      // ✅ REFACTORED: Using the injected repository
+      final resultData = await repository.fetchSummonRecords(
+          comId: comId,
+          fromDate: from,
+          toDate: to
       );
 
-      final records = resultData != null
+      final records = resultData != null && resultData is List
           ? List<Map<String, dynamic>>.from(resultData)
           : <Map<String, dynamic>>[];
 
@@ -232,20 +220,6 @@ class SummonBloc extends Bloc<SummonEvent, SummonState> {
         fromDate: s.fromDate,
         toDate: s.toDate,
       ));
-    }
-  }
-
-  // ── Image Picker helper (called from UI via PickDocumentEvent) ─────────────
-  Future<void> pickDocument(BuildContext ctx) async {
-    final XFile? picked =
-    await _picker.pickImage(source: ImageSource.gallery);
-    if (picked != null) {
-      final path = picked.path.toLowerCase();
-      if (path.endsWith('.pdf')) {
-        add(PickDocumentEvent(pdf: File(picked.path)));
-      } else {
-        add(PickDocumentEvent(image: File(picked.path)));
-      }
     }
   }
 }

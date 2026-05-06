@@ -8,6 +8,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:http/http.dart' as http;
 import 'package:maleva/core/utils/clsfunction.dart' as objfun;
+import '../../../../../../core/di/injection.dart';
 import '../../../../../../core/theme/tokens.dart';
 import '../bloc/summonentry_bloc.dart';
 import '../bloc/summonentry_event.dart';
@@ -24,9 +25,14 @@ class SummonView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (_) => SummonBloc.view(context,
-          fromDate: fromDate, toDate: toDate),
+    return
+    //   BlocProvider(
+    //   create: (_) => SummonBloc.view(context,
+    //       fromDate: fromDate, toDate: toDate),
+    //   child: const _SummonViewBody(),
+    // );
+    BlocProvider(
+      create: (context) => sl<SummonBloc>(),
       child: const _SummonViewBody(),
     );
   }

@@ -1,15 +1,20 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:maleva/core/models/model.dart';
 import 'package:maleva/core/utils/clsfunction.dart' as objfun;
 import 'package:maleva/features/dashboard/admin_dashboard/tabs/summonentry/view/summonview_tab.dart';
+import '../../../../../../core/di/injection.dart';
 import '../../../../../../core/theme/palette.dart';
 import '../../../../../../core/theme/tokens.dart';
 import '../bloc/summonentry_bloc.dart';
 import '../bloc/summonentry_event.dart';
 import '../bloc/summonentry_state.dart';
+import '../data/summonentry_repository.dart';
 
 const List<String> kMalaysiaList  = ['Parking', 'Traffic', 'Summon', 'Compound', 'Others'];
 const List<String> kSingaporeList = ['ERP', 'Parking', 'Traffic', 'Summon', 'Others'];
@@ -22,10 +27,15 @@ class SummonEntryPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (_) => SummonBloc.form(context),
-      child: const _SummonEntryBody(),
-    );
+    return
+      BlocProvider(
+        // ✅ Removed 'context' and injected the repository instead
+        create: (_) => SummonBloc.form(
+          repository: sl<SummonRepository>(),
+        ),
+        child: const _SummonEntryBody(),
+      );
+
   }
 }
 
@@ -346,8 +356,23 @@ class _SummonEntryBody extends StatelessWidget {
                         side: const BorderSide(color: AppTokens.brandGradientStart)),
                     elevation: 0,
                   ),
-                  onPressed: () =>
-                      context.read<SummonBloc>().pickDocument(context),
+                  onPressed: () async {
+                    final picker = ImagePicker();
+                    // Open the gallery
+                    final picked = await picker.pickImage(source: ImageSource.gallery);
+
+                    // Check if the user actually picked a file and the widget is still on screen
+                    if (picked != null && context.mounted) {
+                      final path = picked.path.toLowerCase();
+
+                      // Send the correct event to the BLoC based on file type
+                      if (path.endsWith('.pdf')) {
+                        context.read<SummonBloc>().add(PickDocumentEvent(pdf: File(picked.path)));
+                      } else {
+                        context.read<SummonBloc>().add(PickDocumentEvent(image: File(picked.path)));
+                      }
+                    }
+                  },
                   icon: const Icon(Icons.cloud_upload_rounded),
                   label: Text(
                     (s.pickedImage == null && s.pickedPDF == null)

@@ -11,6 +11,7 @@ import '../../admin_dashboard/tabs/driversalary/view/driversalary_tab.dart';
 import '../../admin_dashboard/tabs/pdo/bloc/pdo_bloc.dart';
 import '../../admin_dashboard/tabs/pdo/view/pdo_tab.dart';
 import '../../admin_dashboard/tabs/summonentry/bloc/summonentry_bloc.dart';
+import '../../admin_dashboard/tabs/summonentry/data/summonentry_repository.dart';
 import '../../admin_dashboard/tabs/summonentry/view/summonentry_tab.dart';
 import '../../admin_dashboard/tabs/transport/bloc/transport_bloc.dart';
 import '../../admin_dashboard/tabs/transport/bloc/transport_event.dart';
@@ -51,10 +52,12 @@ class _DriverDashboardState extends State<DriverDashboard> with SingleTickerProv
                   child: const TransportReportPage(),
                 ),
                 BlocProvider(
-                  create: (context) => SummonBloc.form(context),
+                  // ✅ Removed 'context', added named 'repository' parameter
+                  create: (_) => SummonBloc.form(
+                    repository: sl<SummonRepository>(),
+                  ),
                   child: const SummonEntryPage(),
                 ),
-
                 BlocProvider(
                   create: (context) => TruckMaintDashBloc(),
                   child: const TruckMaintenanceDashboardWidget(),

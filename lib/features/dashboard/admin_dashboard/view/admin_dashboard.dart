@@ -67,6 +67,7 @@ import '../tabs/rtiview/view/rtiview_tab.dart';
 import '../tabs/salesorder/view/salesorderview_tab.dart';
 import '../tabs/spareparts/bloc/spareparts_bloc.dart';
 import '../tabs/spareparts/bloc/spareparts_event.dart';
+import '../tabs/spareparts/data/spareparts_repository.dart';
 import '../tabs/spareparts/view/sparepartsadd.dart';
 import '../tabs/speedingreport/bloc/speeding_bloc.dart';
 import '../tabs/speedingreport/bloc/speeding_event.dart';
@@ -74,6 +75,7 @@ import '../tabs/speedingreport/view/speedingreport_view.dart';
 import '../tabs/spotsaleorder/bloc/spotsaleorder_bloc.dart';
 import '../tabs/spotsaleorder/view/spotsaleorder_add.dart';
 import '../tabs/summonentry/bloc/summonentry_bloc.dart';
+import '../tabs/summonentry/data/summonentry_repository.dart';
 import '../tabs/summonentry/view/summonentry_tab.dart';
 import '../tabs/transport/bloc/transport_bloc.dart';
 import '../tabs/transport/bloc/transport_event.dart';
@@ -213,12 +215,17 @@ class _AdminDashboardState extends State<NewAdminDashboard> with SingleTickerPro
               child: const PettyCashPage(),
             ),
             BlocProvider(
-              create: (context) => SummonBloc.form(context),
+              // ✅ Removed 'context', added named 'repository' parameter
+              create: (_) => SummonBloc.form(
+                repository: sl<SummonRepository>(),
+              ),
               child: const SummonEntryPage(),
             ),
             BlocProvider(
-              create: (context) => SparePartsBloc.form(context)
-                ..add(const LoadSparePartsTrucksEvent()),
+              // ✅ Removed 'context', added named 'repository', and removed the redundant ..add() cascade
+              create: (_) => SparePartsBloc.form(
+                repository: sl<SparePartsRepository>(),
+              ),
               child: const SparePartsEntryPage(),
             ),
             BlocProvider(

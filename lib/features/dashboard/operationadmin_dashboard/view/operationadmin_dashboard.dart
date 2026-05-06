@@ -30,6 +30,7 @@ import '../../admin_dashboard/tabs/rtiview/bloc/rtiview_event.dart';
 import '../../admin_dashboard/tabs/rtiview/view/rtiview_tab.dart';
 import '../../admin_dashboard/tabs/spareparts/bloc/spareparts_bloc.dart';
 import '../../admin_dashboard/tabs/spareparts/bloc/spareparts_event.dart';
+import '../../admin_dashboard/tabs/spareparts/data/spareparts_repository.dart';
 import '../../admin_dashboard/tabs/spareparts/view/sparepartsadd.dart';
 import '../../admin_dashboard/tabs/speedingreport/bloc/speeding_bloc.dart';
 import '../../admin_dashboard/tabs/speedingreport/bloc/speeding_event.dart';
@@ -126,10 +127,11 @@ class _AdminDashboardState extends State<OperationAdminDashboard> with SingleTic
               create: (context) => sl<FuelDiffBloc>()..add(const LoadFuelDiffEvent()),
               child: const FuelDiffPage(), // Remember to add BlocListener here if you want to show SnackBars for FuelDiffError!
             ),
-
             BlocProvider(
-              create: (context) => SparePartsBloc.form(context)
-                ..add(const LoadSparePartsTrucksEvent()),
+              // ✅ Removed 'context', added named 'repository', and removed the redundant ..add() cascade
+              create: (_) => SparePartsBloc.form(
+                repository: sl<SparePartsRepository>(),
+              ),
               child: const SparePartsEntryPage(),
             ),
             BlocProvider(

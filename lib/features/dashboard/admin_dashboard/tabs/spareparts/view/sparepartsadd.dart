@@ -1,26 +1,32 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:maleva/core/models/model.dart';
 import 'package:maleva/core/utils/clsfunction.dart' as objfun;
 import 'package:maleva/core/colors/colors.dart' as colour;
 import 'package:maleva/features/dashboard/admin_dashboard/tabs/spareparts/view/sparepartsview.dart';
+import '../../../../../../core/di/injection.dart';
 import '../../../../../../core/theme/tokens.dart';
 import '../bloc/spareparts_bloc.dart';
 import '../bloc/spareparts_event.dart';
 import '../bloc/spareparts_state.dart';
-
+import '../data/spareparts_repository.dart';
 // ── Entry Point ───────────────────────────────────────────────────────────────
 class SparePartsEntryPage extends StatelessWidget {
   const SparePartsEntryPage({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (_) => SparePartsBloc.form(context),
-      child: const _SparePartsEntryBody(),
-    );
+    return
+      BlocProvider(
+        create: (context) => sl<SparePartsBloc>(),
+        child: const _SparePartsEntryBody(),
+      );
+
   }
 }
 
@@ -274,7 +280,23 @@ class _SparePartsEntryBody extends StatelessWidget {
                             color: AppTokens.brandGradientStart)),
                     elevation: 0,
                   ),
-                  onPressed: () => bloc.pickDocument(),
+                  onPressed: () async {
+                    final picker = ImagePicker();
+                    // Open the gallery
+                    final picked = await picker.pickImage(source: ImageSource.gallery);
+
+                    // Check if the user actually picked a file and the widget is still on screen
+                    if (picked != null && context.mounted) {
+                      final path = picked.path.toLowerCase();
+
+                      // Send the correct event to the BLoC based on file type
+                      if (path.endsWith('.pdf')) {
+                        context.read<SparePartsBloc>().add(PickSparePartsDocumentEvent(pdf: File(picked.path)));
+                      } else {
+                        context.read<SparePartsBloc>().add(PickSparePartsDocumentEvent(image: File(picked.path)));
+                      }
+                    }
+                  },
                   icon: const Icon(Icons.cloud_upload_rounded),
                   label: Text(
                     (s.pickedImage == null && s.pickedPDF == null)

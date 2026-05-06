@@ -7,12 +7,14 @@ import 'package:path_provider/path_provider.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:http/http.dart' as http;
 import 'package:maleva/core/utils/clsfunction.dart' as objfun;
+import '../../../../../../core/di/injection.dart';
 import '../../../../../../core/theme/palette.dart';
 import '../../../../../../core/theme/tokens.dart';
 import '../bloc/spareparts_bloc.dart';
 import '../bloc/spareparts_event.dart';
 import '../bloc/spareparts_state.dart';
-
+import '../data/spareparts_repository.dart';
+import '../data/spareparts_repository.dart';
 
 // ── Entry Point ───────────────────────────────────────────────────────────────
 class SparePartsView extends StatelessWidget {
@@ -22,11 +24,14 @@ class SparePartsView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (_) => SparePartsBloc.view(context,
-          fromDate: fromDate, toDate: toDate),
-      child: const _SparePartsViewBody(),
-    );
+    return
+      BlocProvider(
+        // ✅ Explicitly load the .form constructor using the injected repository
+        create: (_) => SparePartsBloc.form(
+          repository: sl<SparePartsRepository>(),
+        ),
+        child: const _SparePartsViewBody(),
+      );
   }
 }
 
