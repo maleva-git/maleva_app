@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:maleva/core/utils/clsfunction.dart' as objfun;
+import '../../../../../../core/di/injection.dart';
 import '../../../../../../core/models/model.dart';
 import '../../../../../../core/theme/tokens.dart';
 import '../bloc/speeding_bloc.dart';
@@ -15,9 +16,10 @@ class SpeedingScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (_) => SpeedingBloc(context)..add(LoadSpeedingReport()),
-      child: const _SpeedingBody(),
+    return
+    BlocProvider(
+      create: (context) => sl<SpeedingBloc>()..add(LoadSpeedingReport()),
+      child: const _SpeedingBody(), // Add a BlocListener here to show SnackBars for SpeedingError if needed!
     );
   }
 }

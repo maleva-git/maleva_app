@@ -38,6 +38,8 @@ import 'package:maleva/features/dashboard/admin_dashboard/tabs/stockinentry/bloc
 import 'package:maleva/features/dashboard/admin_dashboard/tabs/stocktransfer/bloc/stock_transfer_bloc.dart';
 import 'package:maleva/features/dashboard/admin_dashboard/tabs/stockupdate/bloc/stock_update_bloc.dart';
 
+import '../../features/dashboard/admin_dashboard/tabs/driver/bloc/driverdetails_bloc.dart';
+import '../../features/dashboard/admin_dashboard/tabs/driver/data/driver_repository.dart';
 import '../../features/dashboard/admin_dashboard/tabs/expensereport/bloc/expensereport_bloc.dart';
 import '../../features/dashboard/admin_dashboard/tabs/expensereport/data/expensereport_repository.dart';
 
@@ -45,6 +47,8 @@ import '../../features/dashboard/admin_dashboard/tabs/forwardingreport/bloc/forw
 import '../../features/dashboard/admin_dashboard/tabs/forwardingreport/data/forwardingreport_repository.dart';
 import '../../features/dashboard/admin_dashboard/tabs/receiptview/data/receipt_repository.dart';
 import '../../features/dashboard/admin_dashboard/tabs/salesorder/data/salesorder_repository.dart';
+import '../../features/dashboard/admin_dashboard/tabs/speedingreport/bloc/speeding_bloc.dart';
+import '../../features/dashboard/admin_dashboard/tabs/speedingreport/data/speeding_repository.dart';
 import '../../features/dashboard/admin_dashboard/tabs/transport/bloc/transport_bloc.dart';
 import '../../features/dashboard/admin_dashboard/tabs/transport/data/transport_repository.dart';
 import '../../features/dashboard/admin_dashboard/tabs/truck/bloc/truck_bloc.dart';
@@ -183,6 +187,22 @@ Future<void> setupDependencies() async {
   // 2. Register the BLoC (No context needed!)
   sl.registerFactory<TruckDetailsBloc>(
         () => TruckDetailsBloc(repository: sl<TruckRepository>()),
+  );
+  sl.registerLazySingleton<DriverRepository>(
+        () => DriverRepository(),
+  );
+
+  // 2. Register the BLoC (No context needed!)
+  sl.registerFactory<DriverBloc>(
+        () => DriverBloc(repository: sl<DriverRepository>()),
+  );
+  sl.registerLazySingleton<SpeedingRepository>(
+        () => SpeedingRepository(),
+  );
+
+  // 2. Register the BLoC (No context needed!)
+  sl.registerFactory<SpeedingBloc>(
+        () => SpeedingBloc(repository: sl<SpeedingRepository>()),
   );
   sl.registerFactory<MaintenanceBloc>(() => MaintenanceBloc());
   sl.registerFactory<DriverLicenseExpiryBloc>(() => DriverLicenseExpiryBloc());

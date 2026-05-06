@@ -1,14 +1,16 @@
-import 'package:flutter/Material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import '../../../../../../core/models/model.dart';
-import 'driverdetails_event.dart';
-import 'driverdetails_state.dart';
 import 'package:maleva/core/utils/clsfunction.dart' as objfun;
 
-class DriverBloc extends Bloc<DriverEvent, DriverState> {
-  final BuildContext context;
+import '../../../../../../core/models/model.dart';
+import '../data/driver_repository.dart';
+import 'driverdetails_event.dart';
+import 'driverdetails_state.dart';
 
-  DriverBloc(this.context) : super(const DriverInitial()) {
+class DriverBloc extends Bloc<DriverEvent, DriverState> {
+  // ❌ REMOVED: final BuildContext context;
+  final DriverRepository repository; // ✅ Injected Repository
+
+  DriverBloc({required this.repository}) : super(const DriverInitial()) {
     on<LoadDriverEvent>(_onLoadDriver);
   }
 
@@ -26,28 +28,25 @@ class DriverBloc extends Bloc<DriverEvent, DriverState> {
         'Comid': objfun.Comid,
       };
 
-      final Map<String, String> header = {
-        'Content-Type': 'application/json; charset=UTF-8',
-      };
+      // ✅ REFACTORED: Using the injected repository
+      final resultData = await repository.fetchDriverDetails(body: master);
 
-      final resultData = await objfun.apiAllinoneSelectArray(
-        objfun.apiSelectDriverDetails,
-        master,
-        header,
-        context,
-      );
-
-      if (resultData != null && resultData != "" && resultData.length != 0) {
-        final List<DriverDetailsModel> driverList = (resultData as List)
-            .map((element) => DriverDetailsModel.fromJson(element))
-            .toList()
-            .cast<DriverDetailsModel>();
-
-        emit(DriverLoaded(driverData: driverList));
-      } else {
+      // No data check
+      if (resultData == null || resultData == "" || (resultData is List && resultData.isEmpty)) {
         emit(const DriverLoaded(driverData: []));
+        return;
       }
-    } catch (error, stackTrace) {
+
+      // Has data -> map to model
+      final List<DriverDetailsModel> driverList = (resultData as List)
+          .map((element) => DriverDetailsModel.fromJson(element))
+          .toList()
+          .cast<DriverDetailsModel>();
+
+      emit(DriverLoaded(driverData: driverList));
+
+    } catch (error) {
+      // ApiClient handles standardizing the exceptions
       emit(DriverError(errorMessage: error.toString()));
     }
   }

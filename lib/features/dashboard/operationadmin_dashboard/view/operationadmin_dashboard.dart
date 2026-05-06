@@ -106,12 +106,12 @@ class _AdminDashboardState extends State<OperationAdminDashboard> with SingleTic
               child: const TruckDetailsReportPage(), // Make sure to add a BlocListener inside here if you want to show snackbars for TruckErrorState!
             ),
             BlocProvider(
-              create: (context) => DriverBloc(context)..add(const LoadDriverEvent()),
-              child: const DriverDetailsView(),
+            create: (context) => sl<DriverBloc>()..add(const LoadDriverEvent()),
+            child: const DriverDetailsView(), // Remember to add a BlocListener here if you want to show errors to the user!
             ),
             BlocProvider(
-              create: (context) => SpeedingBloc(context)..add(LoadSpeedingReport()),
-              child: const SpeedingScreen(),
+              create: (context) => sl<SpeedingBloc>()..add(LoadSpeedingReport()),
+              child: const SpeedingScreen(), // Add a BlocListener here to show SnackBars for SpeedingError if needed!
             ),
             BlocProvider(
               create: (context) => FuelFillingBloc(context)..add(LoadFuelFillingReport()),

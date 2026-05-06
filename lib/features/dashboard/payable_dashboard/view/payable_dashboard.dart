@@ -74,13 +74,13 @@ class _PayableDashboardState extends State<PayableDashboard> with SingleTickerPr
               create: (context) => sl<TruckDetailsBloc>()..add(const LoadTruckDetailsEvent()),
               child: const TruckDetailsReportPage(), // Make sure to add a BlocListener inside here if you want to show snackbars for TruckErrorState!
             ),
+              BlocProvider(
+              create: (context) => sl<DriverBloc>()..add(const LoadDriverEvent()),
+              child: const DriverDetailsView(), // Remember to add a BlocListener here if you want to show errors to the user!
+              ),
             BlocProvider(
-              create: (context) => DriverBloc(context)..add(const LoadDriverEvent()),
-              child: const DriverDetailsView(),
-            ),
-            BlocProvider(
-              create: (context) => SpeedingBloc(context)..add(LoadSpeedingReport()),
-              child: const SpeedingScreen(),
+              create: (context) => sl<SpeedingBloc>()..add(LoadSpeedingReport()),
+              child: const SpeedingScreen(), // Add a BlocListener here to show SnackBars for SpeedingError if needed!
             ),
             BlocProvider(
               create: (context) => FuelFillingBloc(context)..add(LoadFuelFillingReport()),

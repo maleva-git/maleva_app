@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:maleva/core/colors/colors.dart' as colour;
+import '../../../../../../core/di/injection.dart';
 import '../../../../../../core/theme/tokens.dart';
 import '../bloc/driverdetails_bloc.dart';
 import '../bloc/driverdetails_event.dart';
@@ -12,11 +13,11 @@ class DriverDetailsScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (context) => DriverBloc(context)
-        ..add(const LoadDriverEvent()),
-      child: const DriverDetailsView(),
-    );
+    return
+      BlocProvider(
+        create: (context) => sl<DriverBloc>()..add(const LoadDriverEvent()),
+        child: const DriverDetailsView(), // Remember to add a BlocListener here if you want to show errors to the user!
+      );
   }
 }
 // ── View ──────────────────────────────────────────────────────────────────────
