@@ -23,7 +23,6 @@ class SparePartsEntryPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return
       BlocProvider(
-        // ✅ FIX: Explicitly call .form and inject the repository here
         create: (_) => SparePartsBloc.form(
           repository: sl<SparePartsRepository>(),
         ),
@@ -187,7 +186,6 @@ class _SparePartsEntryBody extends StatelessWidget {
                           SparePartsTruckSelectPage(bloc: bloc)),
                 ),
               ),
-
               const SizedBox(height: 12),
 
               _SelectTile(
