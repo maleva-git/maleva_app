@@ -23,10 +23,12 @@ class SparePartsEntryPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return
       BlocProvider(
-        create: (context) => sl<SparePartsBloc>(),
+        // ✅ FIX: Explicitly call .form and inject the repository here
+        create: (_) => SparePartsBloc.form(
+          repository: sl<SparePartsRepository>(),
+        ),
         child: const _SparePartsEntryBody(),
       );
-
   }
 }
 
