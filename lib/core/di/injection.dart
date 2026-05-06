@@ -47,6 +47,8 @@ import '../../features/dashboard/admin_dashboard/tabs/receiptview/data/receipt_r
 import '../../features/dashboard/admin_dashboard/tabs/salesorder/data/salesorder_repository.dart';
 import '../../features/dashboard/admin_dashboard/tabs/transport/bloc/transport_bloc.dart';
 import '../../features/dashboard/admin_dashboard/tabs/transport/data/transport_repository.dart';
+import '../../features/dashboard/admin_dashboard/tabs/truck/bloc/truck_bloc.dart';
+import '../../features/dashboard/admin_dashboard/tabs/truck/data/truck_repository.dart';
 import '../../features/dashboard/admin_dashboard/tabs/vesselreport/bloc/vesselreport_bloc.dart';
 import '../../features/dashboard/admin_dashboard/tabs/vesselreport/data/vessel_report_repository.dart';
 
@@ -174,7 +176,14 @@ Future<void> setupDependencies() async {
   sl.registerFactory<TransportBloc>(
         () => TransportBloc(repository: sl<TransportRepository>()),
   );
+  sl.registerLazySingleton<TruckRepository>(
+        () => TruckRepository(),
+  );
 
+  // 2. Register the BLoC (No context needed!)
+  sl.registerFactory<TruckDetailsBloc>(
+        () => TruckDetailsBloc(repository: sl<TruckRepository>()),
+  );
   sl.registerFactory<MaintenanceBloc>(() => MaintenanceBloc());
   sl.registerFactory<DriverLicenseExpiryBloc>(() => DriverLicenseExpiryBloc());
   sl.registerFactory<TruckMaintDashBloc>(() => TruckMaintDashBloc());

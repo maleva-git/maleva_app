@@ -1,23 +1,27 @@
-
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 import 'package:maleva/core/utils/clsfunction.dart' as objfun;
 import 'package:maleva/features/dashboard/admin_dashboard/tabs/truck/bloc/truck_state.dart';
+
 import '../../../../../../core/models/model.dart';
+import '../data/truck_repository.dart';
+
 part 'truck_event.dart';
 
 
 class TruckDetailsBloc extends Bloc<TruckDetailsEvent, TruckDetailsState> {
-  final BuildContext context;
+  // ❌ REMOVED: final BuildContext context;
+  final TruckRepository repository; // ✅ Injected Repository
 
-  TruckDetailsBloc({required this.context}) : super(const TruckInitial()) {
-    on<TruckDetailsEvent>(_onLoadTruck);
+  TruckDetailsBloc({required this.repository}) : super(const TruckInitial()) {
+    // Tighter event binding
+    on<LoadTruckDetailsEvent>(_onLoadTruck);
   }
 
   // ── Load Truck Data ──────────────────────────────────────────────────────────
   Future<void> _onLoadTruck(
-      TruckDetailsEvent event,
+      LoadTruckDetailsEvent event,
       Emitter<TruckDetailsState> emit,
       ) async {
     emit(const TruckLoadingState());
@@ -36,12 +40,8 @@ class TruckDetailsBloc extends Bloc<TruckDetailsEvent, TruckDetailsState> {
         'AccountId':                  0,
       };
 
-      final Map<String, String> header = {
-        'Content-Type': 'application/json; charset=UTF-8',
-      };
-
-      final resultData = await objfun.apiAllinoneSelectArray(
-          objfun.apiSelectTruckDetails, body, header, context);
+      // ✅ REFACTORED: Using the injected repository (no context needed!)
+      final resultData = await repository.fetchTruckDetails(body: body);
 
       // No data
       if (resultData == null ||
@@ -58,8 +58,10 @@ class TruckDetailsBloc extends Bloc<TruckDetailsEvent, TruckDetailsState> {
           .cast<TruckDetailsModel>();
 
       emit(TruckLoadedState(truckData: truckList));
-    } catch (error, stackTrace) {
-      emit(TruckErrorState(errorMessage: '$error\n$stackTrace'));
+
+    } catch (error) {
+      // ApiClient throws clean exceptions, we pass them to the UI
+      emit(TruckErrorState(errorMessage: error.toString()));
     }
   }
 

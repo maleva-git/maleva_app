@@ -1,6 +1,7 @@
 import 'package:flutter/Material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:maleva/features/dashboard/payable_dashboard/view/payable_dashboard_ui.dart';
+import '../../../../core/di/injection.dart';
 import '../../admin_dashboard/tabs/adinvoice/bloc/forecast/forecast_bloc.dart';
 import '../../admin_dashboard/tabs/adinvoice/data/repositories/sales_forecast_repository.dart';
 import '../../admin_dashboard/tabs/adinvoice/presentation/widgets/ai_sales_forecast_chart.dart';
@@ -70,10 +71,8 @@ class _PayableDashboardState extends State<PayableDashboard> with SingleTickerPr
           providers: [
 
             BlocProvider(
-              create: (context) => TruckDetailsBloc(
-                context: context,
-              )..add(const LoadTruckDetailsEvent()),
-              child: const TruckDetailsReportPage(),
+              create: (context) => sl<TruckDetailsBloc>()..add(const LoadTruckDetailsEvent()),
+              child: const TruckDetailsReportPage(), // Make sure to add a BlocListener inside here if you want to show snackbars for TruckErrorState!
             ),
             BlocProvider(
               create: (context) => DriverBloc(context)..add(const LoadDriverEvent()),

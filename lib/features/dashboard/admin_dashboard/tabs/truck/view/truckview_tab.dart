@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:maleva/core/utils/clsfunction.dart' as objfun;
+import '../../../../../../core/di/injection.dart';
 import '../../../../../../core/models/model.dart';
 import '../../../../../../core/theme/tokens.dart';
 import '../bloc/truck_bloc.dart';
@@ -13,11 +14,12 @@ class TruckDetailsReportPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (ctx) => TruckDetailsBloc(context: ctx)
-        ..add(const LoadTruckDetailsEvent()),
-      child: const _TruckReportView(),
-    );
+    return
+      BlocProvider(
+        create: (context) => sl<TruckDetailsBloc>()
+          ..add(const LoadTruckDetailsEvent()),
+        child: const _TruckReportView(), // Or wrap with BlocListener if you need to handle errors!
+      );
   }
 }
 class _TruckReportView extends StatefulWidget {

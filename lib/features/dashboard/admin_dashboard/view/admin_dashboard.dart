@@ -166,10 +166,8 @@ class _AdminDashboardState extends State<NewAdminDashboard> with SingleTickerPro
               child: const TransportReportPage(),
             ),
             BlocProvider(
-              create: (context) => TruckDetailsBloc(
-                context: context,
-              )..add(const LoadTruckDetailsEvent()),
-              child: const TruckDetailsReportPage(),
+              create: (context) => sl<TruckDetailsBloc>()..add(const LoadTruckDetailsEvent()),
+              child: const TruckDetailsReportPage(), // Make sure to add a BlocListener inside here if you want to show snackbars for TruckErrorState!
             ),
             BlocProvider(
               create: (context) => DriverBloc(context)..add(const LoadDriverEvent()),
