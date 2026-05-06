@@ -1,20 +1,20 @@
-import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
-
 import 'package:maleva/core/models/model.dart';
 import 'package:maleva/core/utils/clsfunction.dart' as objfun;
-import 'package:maleva/features/dashboard/admin_dashboard/tabs/pettycash/bloc/pettycash_event.dart';
-import 'package:maleva/features/dashboard/admin_dashboard/tabs/pettycash/bloc/pettycash_state.dart';
 
-
+import '../data/pettycash_repository.dart';
+import 'pettycash_event.dart';
+import 'pettycash_state.dart';
 
 class PettyCashBloc extends Bloc<PettyCashEvent, PettyCashState> {
-  final BuildContext context;
+  // ❌ REMOVED: final BuildContext context;
+  final PettyCashRepository repository; // ✅ Injected Repository
 
-  PettyCashBloc(this.context)
+  PettyCashBloc({required this.repository})
       : super(PettyCashInitial(
-    fromDate: DateTime.now(),
+    // ✅ Sets the default fromDate to 30 days ago!
+    fromDate: DateTime.now().subtract(const Duration(days: 30)),
     toDate: DateTime.now(),
   )) {
     on<SelectFromDateEvent>(_onFromDate);
@@ -34,6 +34,8 @@ class PettyCashBloc extends Bloc<PettyCashEvent, PettyCashState> {
     final fromDate = _currentFromDate();
     emit(PettyCashInitial(fromDate: fromDate, toDate: event.date));
   }
+
+  // ── Select Master ───────────────────────────────────────────────────────────
   void _onSelectMaster(
       SelectPettyCashMasterEvent event,
       Emitter<PettyCashState> emit,
@@ -43,6 +45,7 @@ class PettyCashBloc extends Bloc<PettyCashEvent, PettyCashState> {
           .copyWith(selectedMaster: event.master));
     }
   }
+
   // ── Load Petty Cash ─────────────────────────────────────────────────────────
   Future<void> _onLoad(
       LoadPettyCashEvent event,
@@ -57,34 +60,27 @@ class PettyCashBloc extends Bloc<PettyCashEvent, PettyCashState> {
       final String fromStr = DateFormat('yyyy-MM-dd').format(fromDate);
       final String toStr = DateFormat('yyyy-MM-dd').format(toDate);
 
-      final Map<String, String> header = {
-        'Content-Type': 'application/json; charset=UTF-8',
-      };
-
-      final resultData = await objfun.apiAllinoneSelectArray(
-        "${objfun.apiGetpettycash}${objfun.Comid}"
-            "&Fromdate=$fromStr"
-            "&Todate=$toStr"
-            "&Employeeid=0&Search=&PaymentStatus=&PaymentTo",
-        null,
-        header,
-        context,
+      // ✅ REFACTORED: Using the injected repository without context
+      final resultData = await repository.fetchPettyCashData(
+        comId: objfun.storagenew.getInt('Comid') ?? 0,
+        fromDate: fromStr,
+        toDate: toStr,
       );
 
       List<PattycashMasterModel> masters = [];
       List<PattyCashDetailsModel> details = [];
 
-      if (resultData != null && resultData.isNotEmpty) {
+      if (resultData != null && resultData is List && resultData.isNotEmpty) {
         final data = resultData[0];
-        if (data != null) {
+        if (data != null && data is Map) {
           if (data['PattycashMasterModel'] != null) {
             masters = (data['PattycashMasterModel'] as List)
-                .map((e) => PattycashMasterModel.fromJson(e))
+                .map((e) => PattycashMasterModel.fromJson(e as Map<String, dynamic>))
                 .toList();
           }
           if (data['PattyCashDetailsModel'] != null) {
             details = (data['PattyCashDetailsModel'] as List)
-                .map((e) => PattyCashDetailsModel.fromJson(e))
+                .map((e) => PattyCashDetailsModel.fromJson(e as Map<String, dynamic>))
                 .toList();
           }
         }
@@ -112,7 +108,7 @@ class PettyCashBloc extends Bloc<PettyCashEvent, PettyCashState> {
     if (s is PettyCashLoading) return s.fromDate;
     if (s is PettyCashLoaded) return s.fromDate;
     if (s is PettyCashError) return s.fromDate;
-    return DateTime.now();
+    return DateTime.now().subtract(const Duration(days: 30));
   }
 
   DateTime _currentToDate() {

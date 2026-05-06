@@ -5,6 +5,7 @@ import 'package:intl/intl.dart';
 import 'package:maleva/core/models/model.dart';
 import 'package:maleva/core/utils/clsfunction.dart' as objfun;
 import '../../../../../../core/colors/colors.dart';
+import '../../../../../../core/di/injection.dart';
 import '../../../../../../core/theme/tokens.dart';
 import '../bloc/googlereview_bloc.dart';
 import '../bloc/googlereview_event.dart';
@@ -16,10 +17,11 @@ class ReviewGridPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (_) =>
-      ReviewBloc(context)..add(const LoadGridEmployeesEvent()),
-      child: const _ReviewGridBody(),
+    return
+
+    BlocProvider(
+      create: (context) => sl<ReviewBloc>()..add(const LoadEmployeeEvent()),
+      child: const _ReviewGridBody(), // Add BlocListener here to listen for ReviewSaveSuccess and ReviewError!
     );
   }
 }

@@ -1,18 +1,16 @@
-import 'dart:convert';
-
-import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-
 import 'package:maleva/core/models/model.dart';
 import 'package:maleva/core/utils/clsfunction.dart' as objfun;
 
+import '../data/emailinbox_repository.dart';
 import 'emailinbox_event.dart';
 import 'emailinbox_state.dart';
 
 class EmailBloc extends Bloc<EmailEvent, EmailState> {
-  final BuildContext context;
+  // ❌ REMOVED: final BuildContext context;
+  final EmailInboxRepository repository; // ✅ Injected Repository
 
-  EmailBloc(this.context) : super(const EmailInitial()) {
+  EmailBloc({required this.repository}) : super(const EmailInitial()) {
     on<LoadEmployeesEvent>(_onLoadEmployees);
     on<SelectEmployeeEvent>(_onSelectEmployee);
     on<LoadEmailsEvent>(_onLoadEmails);
@@ -32,15 +30,11 @@ class EmailBloc extends Bloc<EmailEvent, EmailState> {
     try {
       final comId = objfun.storagenew.getInt('Comid') ?? 0;
 
-      final resultData = await objfun.apiAllinoneSelect(
-        "${objfun.apiSelectEmployee}$comId&type=&type1=",
-        null,
-        null,
-        context,
-      );
+      // ✅ REFACTORED: Call repository
+      final resultData = await repository.fetchEmployees(comId: comId);
 
-      if (resultData != null && resultData.isNotEmpty) {
-        final List<EmployeeModel> employees = (resultData as List)
+      if (resultData != null && resultData is List && resultData.isNotEmpty) {
+        final List<EmployeeModel> employees = resultData
             .map<EmployeeModel>((e) => EmployeeModel.fromJson(e))
             .toList();
 
@@ -88,24 +82,14 @@ class EmailBloc extends Bloc<EmailEvent, EmailState> {
       emit(current.copyWith(emailsLoading: true));
 
       try {
-        final header = {
-          'Content-Type': 'application/json; charset=UTF-8',
-          'Comid': (objfun.storagenew.getInt('Comid') ?? 0).toString(),
-        };
-
         final master = [
           {"Id": event.empId}
         ];
 
-        final rawResult = await objfun.apiAllinoneMapSelect(
-          objfun.apiSelectEmailData,
-          master,
-          header,
-          context,
-        );
+        // ✅ REFACTORED: Call repository. ApiClient automatically handles JSON decoding!
+        final result = await repository.fetchEmails(body: master);
 
         List<EmailModel> emails = [];
-        final result = jsonDecode(rawResult);
 
         if (result is Map<String, dynamic> &&
             result["unread_unreplied_emails"] is List) {
@@ -126,43 +110,31 @@ class EmailBloc extends Bloc<EmailEvent, EmailState> {
   }
 
   // ── 4. Toggle Active ────────────────────────────────────────────────────────
-  void _onToggleActive(
-      ToggleEmailActiveEvent event,
-      Emitter<EmailState> emit,
-      ) {
+  void _onToggleActive(ToggleEmailActiveEvent event, Emitter<EmailState> emit) {
     if (state is EmployeesLoaded) {
       final current = state as EmployeesLoaded;
       final updated = List<EmailModel>.from(current.emails);
-      updated[event.index] =
-          updated[event.index].copyWith(isActive: event.value);
+      updated[event.index] = updated[event.index].copyWith(isActive: event.value);
       emit(current.copyWith(emails: updated));
     }
   }
 
   // ── 5. Toggle Unread ────────────────────────────────────────────────────────
-  void _onToggleUnread(
-      ToggleEmailUnreadEvent event,
-      Emitter<EmailState> emit,
-      ) {
+  void _onToggleUnread(ToggleEmailUnreadEvent event, Emitter<EmailState> emit) {
     if (state is EmployeesLoaded) {
       final current = state as EmployeesLoaded;
       final updated = List<EmailModel>.from(current.emails);
-      updated[event.index] =
-          updated[event.index].copyWith(isUnread: event.value);
+      updated[event.index] = updated[event.index].copyWith(isUnread: event.value);
       emit(current.copyWith(emails: updated));
     }
   }
 
   // ── 6. Toggle Replied ───────────────────────────────────────────────────────
-  void _onToggleReplied(
-      ToggleEmailRepliedEvent event,
-      Emitter<EmailState> emit,
-      ) {
+  void _onToggleReplied(ToggleEmailRepliedEvent event, Emitter<EmailState> emit) {
     if (state is EmployeesLoaded) {
       final current = state as EmployeesLoaded;
       final updated = List<EmailModel>.from(current.emails);
-      updated[event.index] =
-          updated[event.index].copyWith(isReplied: event.value);
+      updated[event.index] = updated[event.index].copyWith(isReplied: event.value);
       emit(current.copyWith(emails: updated));
     }
   }
@@ -181,11 +153,6 @@ class EmailBloc extends Bloc<EmailEvent, EmailState> {
     emit(current.copyWith(saving: true));
 
     try {
-      final header = {
-        'Content-Type': 'application/json; charset=UTF-8',
-        'Comid': (objfun.storagenew.getInt('Comid') ?? 0).toString(),
-      };
-
       final payload = toSave
           .map((e) => {
         'Id': 0,
@@ -202,19 +169,15 @@ class EmailBloc extends Bloc<EmailEvent, EmailState> {
       })
           .toList();
 
-      final result = await objfun.apiAllinoneMapSelect(
-        objfun.apiInsertMailMaster,
-        payload,
-        header,
-        context,
-      );
+      // ✅ REFACTORED: Call repository
+      final result = await repository.saveEmails(body: payload);
 
       emit(current.copyWith(saving: false));
 
-      if (result is String && result.isNotEmpty) {
-        emit(EmailSaveSuccess(result));
+      if (result != null && result.toString().isNotEmpty) {
+        emit(EmailSaveSuccess(result.toString()));
       } else {
-        emit(EmailError("Failed to save emails"));
+        emit(const EmailError("Failed to save emails"));
       }
     } catch (e) {
       emit(current.copyWith(saving: false));

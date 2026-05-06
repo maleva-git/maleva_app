@@ -4,13 +4,14 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:maleva/core/models/model.dart';
 import 'package:maleva/core/utils/clsfunction.dart' as objfun;
+import '../../../../../../core/di/injection.dart';
 import '../../../../../../core/theme/palette.dart';
 import '../../../../../../core/theme/tokens.dart';
 import '../bloc/employeemaster_bloc.dart';
 import '../bloc/employeemaster_event.dart';
 import '../bloc/employeemaster_state.dart';
 import 'employeeadd_tab.dart';
-
+import '../data/employee_repository.dart'; // Add this line
 
 
 class EmployeeViewPage extends StatelessWidget {
@@ -18,8 +19,9 @@ class EmployeeViewPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (ctx) => EmployeeMasterBloc.list(ctx),
+    return
+    BlocProvider(
+      create: (context) => sl<EmployeeMasterBloc>(),
       child: const _EmployeeListBody(),
     );
   }
@@ -213,12 +215,22 @@ class _EmployeeListBody extends StatelessWidget {
         GestureDetector(
           onTap: () async {
             await Navigator.push(
-                context,
-                MaterialPageRoute(
-                    builder: (_) => const EmployeeAddPage()));
-            context
-                .read<EmployeeMasterBloc>()
-                .add(const LoadEmployeesmasterEvent());
+              context,
+              MaterialPageRoute(
+                builder: (_) => BlocProvider(
+                  // ✅ Inject the .form BLoC for a NEW employee
+                  create: (context) => EmployeeMasterBloc.form(
+                    repository: sl<EmployeeRepository>(),
+                  ),
+                  child: const EmployeeAddPage(),
+                ),
+              ),
+            );
+
+            // ✅ Always check if context is mounted after an await!
+            if (context.mounted) {
+              context.read<EmployeeMasterBloc>().add(const LoadEmployeesmasterEvent());
+            }
           },
           child: Container(
             width: 36,
@@ -276,15 +288,24 @@ class _EmployeeListBody extends StatelessWidget {
   Future<void> _navigateToEdit(
       BuildContext context, EmployeeDetailsModel record) async {
     await Navigator.push(
-        context,
-        MaterialPageRoute(
-            builder: (_) =>
-                EmployeeAddPage(existingEmployee: record)));
-    context
-        .read<EmployeeMasterBloc>()
-        .add(const LoadEmployeesmasterEvent());
-  }
+      context,
+      MaterialPageRoute(
+        builder: (_) => BlocProvider(
+          // ✅ Inject the .form BLoC and pass the EXISTING record
+          create: (context) => EmployeeMasterBloc.form(
+            repository: sl<EmployeeRepository>(),
+            existing: record,
+          ),
+          child: EmployeeAddPage(existingEmployee: record),
+        ),
+      ),
+    );
 
+    // ✅ Refresh the list when returning
+    if (context.mounted) {
+      context.read<EmployeeMasterBloc>().add(const LoadEmployeesmasterEvent());
+    }
+  }
   Future<void> _confirmDelete(
       BuildContext context, EmployeeDetailsModel record) async {
     final confirm = await showDialog<bool>(

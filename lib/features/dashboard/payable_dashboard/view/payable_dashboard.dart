@@ -83,27 +83,27 @@ class _PayableDashboardState extends State<PayableDashboard> with SingleTickerPr
               child: const SpeedingScreen(), // Add a BlocListener here to show SnackBars for SpeedingError if needed!
             ),
             BlocProvider(
-              create: (context) => FuelFillingBloc(context)..add(LoadFuelFillingReport()),
-              child: const FuelFillingPage(),
+              create: (context) => sl<FuelFillingBloc>()..add(LoadFuelFillingReport()),
+              child: const FuelFillingPage(), // Add a BlocListener here to show SnackBars for FuelFillingError if needed!
             ),
             BlocProvider(
-              create: (context) => EngineHoursBloc(context)..add(LoadEngineHoursReport()),
-              child: const EngineHoursPage(),
+              create: (context) => sl<EngineHoursBloc>()..add(LoadEngineHoursReport()),
+              child: const EngineHoursPage(), // Add a BlocListener here to show SnackBars for EngineHoursError if needed!
             ),
 
             BlocProvider(
-              create: (context) => FuelDiffBloc(context)..add(const LoadFuelDiffEvent()),
-              child: const FuelDiffPage(),
+              create: (context) => sl<FuelDiffBloc>()..add(const LoadFuelDiffEvent()),
+              child: const FuelDiffPage(), // Remember to add BlocListener here if you want to show SnackBars for FuelDiffError!
             ),
+
             BlocProvider(
               create: (context) => BillOrderBloc(context),
               child: const BillOrderScreen(),
             ),
             BlocProvider(
-              create: (context) => PettyCashBloc(context)..add(const LoadPettyCashEvent()),
+              create: (context) => sl<PettyCashBloc>()..add(const LoadPettyCashEvent()),
               child: const PettyCashPage(),
             ),
-
             BlocProvider(
               create: (context) => AIMaintenanceBloc(
                 repository: MaintenanceAIRepository(),

@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:maleva/core/models/model.dart';
 import 'package:maleva/core/utils/clsfunction.dart' as objfun;
+import '../../../../../../core/di/injection.dart';
 import '../../../../../../core/theme/tokens.dart';
 import '../bloc/emailinbox_bloc.dart';
 import '../bloc/emailinbox_event.dart';
@@ -15,10 +16,11 @@ class EmailPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (_) =>
-      EmailBloc(context)..add(const LoadEmployeesEvent()),
-      child: const _EmailBody(),
+    return
+
+    BlocProvider(
+      create: (context) => sl<EmailBloc>()..add(const LoadEmployeesEvent()),
+      child: const _EmailBody(), // Remember to add BlocListener here if you want SnackBars for EmailError or EmailSaveSuccess!
     );
   }
 }

@@ -66,15 +66,13 @@ class _TransportDashboardState extends State<TransportDashboard> with SingleTick
               child: const TransportReportPage(),
             ),
             BlocProvider(
-              create: (context) => EmailBloc(context)..add(const LoadEmployeesEvent()),
-              child: const EmailPage(),
+              create: (context) => sl<EmailBloc>()..add(const LoadEmployeesEvent()),
+              child: const EmailPage(), // Remember to add BlocListener here if you want SnackBars for EmailError or EmailSaveSuccess!
             ),
-
             BlocProvider(
-              create: (context) => ReviewBloc(context)..add(const LoadReviewsEvent()),
-              child: const ReviewEntryPage(),
+              create: (context) => sl<ReviewBloc>()..add(const LoadEmployeeEvent()),
+              child: const ReviewEntryPage(), // Add BlocListener here to listen for ReviewSaveSuccess and ReviewError!
             ),
-
             BlocProvider(
               create: (_) => EnquiryBloc(
               )..add( LoadEnquiryEvent()),

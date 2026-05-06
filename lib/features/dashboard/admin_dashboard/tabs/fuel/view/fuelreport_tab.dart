@@ -4,6 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:maleva/core/models/model.dart';
 import 'package:maleva/core/utils/clsfunction.dart' as objfun;
+import '../../../../../../core/di/injection.dart';
 import '../../../../../../core/theme/tokens.dart';
 import '../bloc/fuelreport_bloc.dart';
 import '../bloc/fuelreport_event.dart';
@@ -17,9 +18,10 @@ class FuelDiffPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (_) => FuelDiffBloc(context),
-      child: const _FuelDiffBody(),
+    return
+    BlocProvider(
+      create: (context) => sl<FuelDiffBloc>()..add(const LoadFuelDiffEvent()),
+      child: const _FuelDiffBody(), // Remember to add BlocListener here if you want to show SnackBars for FuelDiffError!
     );
   }
 }

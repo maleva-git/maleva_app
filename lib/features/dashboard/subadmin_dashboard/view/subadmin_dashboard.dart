@@ -106,22 +106,23 @@ class _AdminDashboardState extends State<SubAdminDashboard> with SingleTickerPro
               )..add( LoadEnquiryEvent()),
               child: const EnquiryScreen(),
             ),
-
             BlocProvider(
-              create: (context) => EmailBloc(context)..add(const LoadEmployeesEvent()),
-              child: const EmailPage(),
+              create: (context) => sl<EmailBloc>()..add(const LoadEmployeesEvent()),
+              child: const EmailPage(), // Remember to add BlocListener here if you want SnackBars for EmailError or EmailSaveSuccess!
             ),
             BlocProvider(
-              create: (context) => ReviewBloc(context)..add(const LoadReviewsEvent()),
-              child: const ReviewEntryPage(),
+              create: (context) => sl<ReviewBloc>()..add(const LoadEmployeeEvent()),
+              child: const ReviewEntryPage(), // Add BlocListener here to listen for ReviewSaveSuccess and ReviewError!
             ),
+            // BlocProvider(
+            //   create: (context) => EmployeeMasterBloc.list(context),
+            //   child: const EmployeeViewPage(),
+            // ),
 
             BlocProvider(
-              create: (context) => EmployeeMasterBloc.list(context),
+              create: (context) => sl<EmployeeMasterBloc>(),
               child: const EmployeeViewPage(),
             ),
-
-
             BlocProvider(
               create: (context) => SpotSaleBloc.form(context),
               child: const SpotSaleEntryPage(),

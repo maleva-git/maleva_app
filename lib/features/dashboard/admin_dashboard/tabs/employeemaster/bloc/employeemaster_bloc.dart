@@ -1,24 +1,26 @@
-import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:maleva/core/models/model.dart';
 import 'package:maleva/core/utils/clsfunction.dart' as objfun;
+
+import '../data/employee_repository.dart';
 import 'employeemaster_event.dart';
 import 'employeemaster_state.dart';
 
-
-
 class EmployeeMasterBloc extends Bloc<EmployeeMasterEvent, EmployeeState> {
-  final BuildContext context;
+  // ❌ REMOVED: final BuildContext context;
+  final EmployeeRepository repository; // ✅ Injected Repository
 
-  // ── List page-க்கு init ──────────────────────────────────────────────────
-  EmployeeMasterBloc.list(this.context) : super(const EmployeeListLoading()) {
+  // ── List page init ──────────────────────────────────────────────────────────
+  EmployeeMasterBloc.list({required this.repository}) : super(const EmployeeListLoading()) {
     _registerHandlers();
     add(const LoadEmployeesmasterEvent());
   }
 
-  // ── Add/Edit page-க்கு init ──────────────────────────────────────────────
-  EmployeeMasterBloc.form(this.context, {EmployeeDetailsModel? existing})
-      : super(EmployeeFormState(
+  // ── Add/Edit page init ──────────────────────────────────────────────────────
+  EmployeeMasterBloc.form({
+    required this.repository,
+    EmployeeDetailsModel? existing,
+  }) : super(EmployeeFormState(
     employee: existing ?? EmployeeDetailsModel.Empty(),
     selectedCurrency: existing?.Employeecurrency?.isNotEmpty == true
         ? existing!.Employeecurrency
@@ -63,15 +65,16 @@ class EmployeeMasterBloc extends Bloc<EmployeeMasterEvent, EmployeeState> {
     emit(const EmployeeListLoading());
     await _fetchEmployees(emit);
   }
+
   void _onSelectRecord(
       SelectEmployeeRecordEvent event,
       Emitter<EmployeeState> emit,
       ) {
     if (state is EmployeeListLoaded) {
-      emit((state as EmployeeListLoaded)
-          .copyWith(selectedRecord: event.record));
+      emit((state as EmployeeListLoaded).copyWith(selectedRecord: event.record));
     }
   }
+
   void _onSearch(SearchEmployeeMasterEvent event, Emitter<EmployeeState> emit) {
     if (state is! EmployeeListLoaded) return;
     final current = state as EmployeeListLoaded;
@@ -94,18 +97,12 @@ class EmployeeMasterBloc extends Bloc<EmployeeMasterEvent, EmployeeState> {
     final previous = state;
     try {
       final comid = objfun.storagenew.getInt('Comid') ?? 0;
-      final apiUrl =
-          "${objfun.apiDeleteEmployeeType}${event.id}&Comid=$comid";
 
-      final resultData = await objfun.apiAllinoneSelectArray(
-        apiUrl,
-        '',
-        {'Content-Type': 'application/json; charset=UTF-8'},
-        context,
-      );
+      // ✅ REFACTORED: Use repository
+      final resultData = await repository.deleteEmployee(id: event.id, comId: comid);
 
       String message = 'Employee deleted successfully';
-      if (resultData is String && resultData.contains('Deleted')) {
+      if (resultData != null && resultData is String && resultData.contains('Deleted')) {
         message = resultData;
       }
 
@@ -120,23 +117,15 @@ class EmployeeMasterBloc extends Bloc<EmployeeMasterEvent, EmployeeState> {
   Future<void> _fetchEmployees(Emitter<EmployeeState> emit) async {
     try {
       final comid = objfun.storagenew.getInt('Comid') ?? 0;
-      final apiUrl =
-          "${objfun.apiSelectEmployeeDetails}$comid&Startindex=0&PageCount=100&keyword=&Column=All&type=";
 
-      final resultData = await objfun.apiAllinoneSelectArray(
-        apiUrl,
-        '',
-        {'Content-Type': 'application/json; charset=UTF-8'},
-        context,
-      );
+      // ✅ REFACTORED: Use repository
+      final resultData = await repository.fetchEmployees(comId: comid);
 
-      if (resultData is List && resultData.isNotEmpty) {
+      if (resultData != null && resultData is List && resultData.isNotEmpty) {
         final records = resultData
-            .map((e) =>
-            EmployeeDetailsModel.fromJson(e as Map<String, dynamic>))
+            .map((e) => EmployeeDetailsModel.fromJson(e as Map<String, dynamic>))
             .toList();
-        emit(EmployeeListLoaded(
-            allRecords: records, filteredRecords: records));
+        emit(EmployeeListLoaded(allRecords: records, filteredRecords: records));
       } else {
         emit(const EmployeeListLoaded(allRecords: [], filteredRecords: []));
       }
@@ -146,7 +135,7 @@ class EmployeeMasterBloc extends Bloc<EmployeeMasterEvent, EmployeeState> {
   }
 
   // ════════════════════════════════════════════════════════════════════════════
-  // FORM HANDLERS
+  // FORM HANDLERS (No API changes needed here, just logic)
   // ════════════════════════════════════════════════════════════════════════════
 
   void _onUpdateField(UpdateFieldEvent event, Emitter<EmployeeState> emit) {
@@ -177,40 +166,35 @@ class EmployeeMasterBloc extends Bloc<EmployeeMasterEvent, EmployeeState> {
     emit(s.copyWith(employee: emp));
   }
 
-  void _onSelectCurrency(
-      SelectCurrencyEvent event, Emitter<EmployeeState> emit) {
+  void _onSelectCurrency(SelectCurrencyEvent event, Emitter<EmployeeState> emit) {
     if (state is! EmployeeFormState) return;
     final s = state as EmployeeFormState;
     s.employee.Employeecurrency = event.currency ?? '';
     emit(s.copyWith(selectedCurrency: event.currency));
   }
 
-  void _onSelectEmployeeType(
-      SelectEmployeeTypeEvent event, Emitter<EmployeeState> emit) {
+  void _onSelectEmployeeType(SelectEmployeeTypeEvent event, Emitter<EmployeeState> emit) {
     if (state is! EmployeeFormState) return;
     final s = state as EmployeeFormState;
     s.employee.EmployeeType = event.employeeType ?? '';
     emit(s.copyWith(selectedEmployeeType: event.employeeType));
   }
 
-  void _onSelectRulesType(
-      SelectRulesTypeEvent event, Emitter<EmployeeState> emit) {
+  void _onSelectRulesType(SelectRulesTypeEvent event, Emitter<EmployeeState> emit) {
     if (state is! EmployeeFormState) return;
     final s = state as EmployeeFormState;
     s.employee.RulesType = event.rulesType ?? '';
     emit(s.copyWith(selectedRulesType: event.rulesType));
   }
 
-  void _onSelectJoiningDate(
-      SelectJoiningDateEvent event, Emitter<EmployeeState> emit) {
+  void _onSelectJoiningDate(SelectJoiningDateEvent event, Emitter<EmployeeState> emit) {
     if (state is! EmployeeFormState) return;
     final s = state as EmployeeFormState;
     s.employee.JoiningDate = event.date;
     emit(s.copyWith(employee: s.employee));
   }
 
-  void _onSelectLeavingDate(
-      SelectLeavingDateEvent event, Emitter<EmployeeState> emit) {
+  void _onSelectLeavingDate(SelectLeavingDateEvent event, Emitter<EmployeeState> emit) {
     if (state is! EmployeeFormState) return;
     final s = state as EmployeeFormState;
     s.employee.LeavingDate = event.date;
@@ -229,30 +213,24 @@ class EmployeeMasterBloc extends Bloc<EmployeeMasterEvent, EmployeeState> {
     if (s.currentStep > 0) emit(s.copyWith(currentStep: s.currentStep - 1));
   }
 
-  Future<void> _onSave(
-      SaveEmployeeMasterEvent event, Emitter<EmployeeState> emit) async {
+  Future<void> _onSave(SaveEmployeeMasterEvent event, Emitter<EmployeeState> emit) async {
     if (state is! EmployeeFormState) return;
     final s = state as EmployeeFormState;
     emit(s.copyWith(isSaving: true));
 
     try {
       final comid = objfun.storagenew.getInt('Comid') ?? 0;
-      final resultData = await objfun.apiAllinoneSelectArray(
-        objfun.apiInsertEmployeeDetails,
-        [s.employee.toJson()],
-        {
-          'Content-Type': 'application/json; charset=UTF-8',
-          'Comid': comid.toString(),
-        },
-        context,
+
+      // ✅ REFACTORED: Use repository
+      final resultData = await repository.saveEmployee(
+        body: [s.employee.toJson()],
+        comId: comid,
       );
 
-      if (resultData is Map) {
+      if (resultData != null && resultData is Map) {
         final bool ok = resultData['ok'] ?? false;
         final String msg = resultData['message'] ?? 'Something went wrong';
-        ok
-            ? emit(EmployeeSaveSuccess(msg))
-            : emit(EmployeeError(msg));
+        ok ? emit(EmployeeSaveSuccess(msg)) : emit(EmployeeError(msg));
       } else {
         final int id = int.tryParse(resultData.toString()) ?? 0;
         id > 0

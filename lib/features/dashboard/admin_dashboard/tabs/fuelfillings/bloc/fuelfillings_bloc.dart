@@ -1,17 +1,17 @@
-import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
-
-import 'package:maleva/core/models/model.dart';
 import 'package:maleva/core/utils/clsfunction.dart' as objfun;
 
+import '../../../../../../core/models/model.dart';
+import '../data/fuelfillings_repository.dart';
 import 'fuelfillings_event.dart';
 import 'fuelfillings_state.dart';
 
 class FuelFillingBloc extends Bloc<FuelFillingEvent, FuelFillingState> {
-  final BuildContext context;
+  // ❌ REMOVED: final BuildContext context;
+  final FuelFillingsRepository repository; // ✅ Injected Repository
 
-  FuelFillingBloc(this.context) : super(FuelFillingInitial()) {
+  FuelFillingBloc({required this.repository}) : super(FuelFillingInitial()) {
     on<LoadFuelFillingReport>(_onLoadFuelFillingReport);
   }
 
@@ -31,19 +31,11 @@ class FuelFillingBloc extends Bloc<FuelFillingEvent, FuelFillingState> {
         'Comid':    objfun.Comid,
       };
 
-      final Map<String, String> headers = {
-        'Content-Type': 'application/json; charset=UTF-8',
-      };
+      // ✅ REFACTORED: Using the injected repository without context
+      final resultData = await repository.fetchFuelFillingReport(body: requestBody);
 
-      final resultData = await objfun.apiAllinoneSelectArray(
-        objfun.apiSelectFuelFillingReport,
-        requestBody,
-        headers,
-        context,
-      );
-
-      if (resultData != null && resultData.isNotEmpty) {
-        final List<FuelFilling> records = (resultData as List)
+      if (resultData != null && resultData is List && resultData.isNotEmpty) {
+        final List<FuelFilling> records = resultData
             .map<FuelFilling>((e) => FuelFilling.fromJson(e))
             .toList();
         emit(FuelFillingLoaded(records));

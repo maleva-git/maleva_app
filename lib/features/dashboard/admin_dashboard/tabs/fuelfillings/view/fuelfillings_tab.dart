@@ -4,6 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:maleva/core/models/model.dart';
 import 'package:maleva/core/utils/clsfunction.dart' as objfun;
+import '../../../../../../core/di/injection.dart';
 import '../../../../../../core/theme/tokens.dart';
 import '../bloc/fuelfillings_bloc.dart';
 import '../bloc/fuelfillings_event.dart';
@@ -16,11 +17,11 @@ class FuelFillingPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (_) =>
-      FuelFillingBloc(context)..add(LoadFuelFillingReport()),
-      child: const _FuelFillingBody(),
-    );
+    return
+      BlocProvider(
+        create: (context) => sl<FuelFillingBloc>()..add(LoadFuelFillingReport()),
+        child: const _FuelFillingBody(), // Add a BlocListener here to show SnackBars for FuelFillingError if needed!
+      );
   }
 }
 class _FuelFillingBody extends StatefulWidget {

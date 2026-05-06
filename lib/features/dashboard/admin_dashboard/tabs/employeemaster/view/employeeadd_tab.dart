@@ -5,6 +5,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:maleva/core/models/model.dart';
 import 'package:maleva/core/utils/clsfunction.dart' as objfun;
 
+import '../../../../../../core/di/injection.dart';
 import '../../../../../../core/theme/tokens.dart';
 import '../bloc/employeemaster_bloc.dart';
 import '../bloc/employeemaster_event.dart';
@@ -12,7 +13,7 @@ import '../bloc/employeemaster_state.dart';
 import 'package:maleva/core/colors/colors.dart' as colour;
 
 
-
+import '../data/employee_repository.dart';
 
 
 // ── Dropdown Data ─────────────────────────────────────────────────────────────
@@ -38,8 +39,13 @@ class EmployeeAddPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (ctx) => EmployeeMasterBloc.form(ctx, existing: existingEmployee),
+    return
+    BlocProvider(
+      // ✅ FIX: Explicitly call the .form constructor and pass the repository + existing data
+      create: (context) => EmployeeMasterBloc.form(
+        repository: sl<EmployeeRepository>(),
+        existing: existingEmployee,
+      ),
       child: const _EmployeeAddBody(),
     );
   }

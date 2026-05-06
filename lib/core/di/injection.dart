@@ -38,13 +38,29 @@ import 'package:maleva/features/dashboard/admin_dashboard/tabs/stockinentry/bloc
 import 'package:maleva/features/dashboard/admin_dashboard/tabs/stocktransfer/bloc/stock_transfer_bloc.dart';
 import 'package:maleva/features/dashboard/admin_dashboard/tabs/stockupdate/bloc/stock_update_bloc.dart';
 
+import '../../features/dashboard/admin_dashboard/tabs/bocheck/bloc/bocheck_bloc.dart';
+import '../../features/dashboard/admin_dashboard/tabs/bocheck/data/bocheck_repository.dart';
 import '../../features/dashboard/admin_dashboard/tabs/driver/bloc/driverdetails_bloc.dart';
 import '../../features/dashboard/admin_dashboard/tabs/driver/data/driver_repository.dart';
+import '../../features/dashboard/admin_dashboard/tabs/emailinbox/bloc/emailinbox_bloc.dart';
+import '../../features/dashboard/admin_dashboard/tabs/emailinbox/data/emailinbox_repository.dart';
+import '../../features/dashboard/admin_dashboard/tabs/employeemaster/bloc/employeemaster_bloc.dart';
+import '../../features/dashboard/admin_dashboard/tabs/employeemaster/data/employee_repository.dart';
+import '../../features/dashboard/admin_dashboard/tabs/enginehours/bloc/enginehours_bloc.dart';
+import '../../features/dashboard/admin_dashboard/tabs/enginehours/tab/enginehours_repository.dart';
 import '../../features/dashboard/admin_dashboard/tabs/expensereport/bloc/expensereport_bloc.dart';
 import '../../features/dashboard/admin_dashboard/tabs/expensereport/data/expensereport_repository.dart';
 
 import '../../features/dashboard/admin_dashboard/tabs/forwardingreport/bloc/forwardingreport_bloc.dart';
 import '../../features/dashboard/admin_dashboard/tabs/forwardingreport/data/forwardingreport_repository.dart';
+import '../../features/dashboard/admin_dashboard/tabs/fuel/bloc/fuelreport_bloc.dart';
+import '../../features/dashboard/admin_dashboard/tabs/fuel/data/fuel_repository.dart';
+import '../../features/dashboard/admin_dashboard/tabs/fuelfillings/bloc/fuelfillings_bloc.dart';
+import '../../features/dashboard/admin_dashboard/tabs/fuelfillings/data/fuelfillings_repository.dart';
+import '../../features/dashboard/admin_dashboard/tabs/googlereview/bloc/googlereview_bloc.dart';
+import '../../features/dashboard/admin_dashboard/tabs/googlereview/data/googlereview_repository.dart';
+import '../../features/dashboard/admin_dashboard/tabs/pettycash/bloc/pettycash_bloc.dart';
+import '../../features/dashboard/admin_dashboard/tabs/pettycash/data/pettycash_repository.dart';
 import '../../features/dashboard/admin_dashboard/tabs/receiptview/data/receipt_repository.dart';
 import '../../features/dashboard/admin_dashboard/tabs/salesorder/data/salesorder_repository.dart';
 import '../../features/dashboard/admin_dashboard/tabs/speedingreport/bloc/speeding_bloc.dart';
@@ -204,6 +220,73 @@ Future<void> setupDependencies() async {
   sl.registerFactory<SpeedingBloc>(
         () => SpeedingBloc(repository: sl<SpeedingRepository>()),
   );
+
+  sl.registerLazySingleton<FuelFillingsRepository>(
+        () => FuelFillingsRepository(),
+  );
+
+  // 2. Register the BLoC (No context needed!)
+  sl.registerFactory<FuelFillingBloc>(
+        () => FuelFillingBloc(repository: sl<FuelFillingsRepository>()),
+  );
+  sl.registerLazySingleton<EngineHoursRepository>(
+        () => EngineHoursRepository(),
+  );
+
+  // 2. Register the BLoC (No context needed!)
+  sl.registerFactory<EngineHoursBloc>(
+        () => EngineHoursBloc(repository: sl<EngineHoursRepository>()),
+  );
+  sl.registerLazySingleton<BoCheckRepository>(
+        () => BoCheckRepository(),
+  );
+
+  // 2. Register the BLoC (No context needed!)
+  sl.registerFactory<BocBloc>(
+        () => BocBloc(repository: sl<BoCheckRepository>()),
+  );
+  sl.registerLazySingleton<EmailInboxRepository>(
+        () => EmailInboxRepository(),
+  );
+
+  // 2. Register the BLoC (No context needed!)
+  sl.registerFactory<EmailBloc>(
+        () => EmailBloc(repository: sl<EmailInboxRepository>()),
+  );
+  sl.registerLazySingleton<GoogleReviewRepository>(
+        () => GoogleReviewRepository(),
+  );
+
+  // 2. Register the BLoC (No context needed!)
+  sl.registerFactory<ReviewBloc>(
+        () => ReviewBloc(repository: sl<GoogleReviewRepository>()),
+  );
+  sl.registerLazySingleton<FuelRepository>(
+        () => FuelRepository(),
+  );
+
+  // 2. Register the BLoC (No context needed!)
+  sl.registerFactory<FuelDiffBloc>(
+        () => FuelDiffBloc(repository: sl<FuelRepository>()),
+  );
+  sl.registerLazySingleton<EmployeeRepository>(
+        () => EmployeeRepository(),
+  );
+
+  // 2. Register the List BLoC as the default factory
+  sl.registerFactory<EmployeeMasterBloc>(
+        () => EmployeeMasterBloc.list(repository: sl<EmployeeRepository>()),
+  );
+
+  sl.registerLazySingleton<PettyCashRepository>(
+        () => PettyCashRepository(),
+  );
+
+  // 2. Register the BLoC (No context needed!)
+  sl.registerFactory<PettyCashBloc>(
+        () => PettyCashBloc(repository: sl<PettyCashRepository>()),
+  );
+
   sl.registerFactory<MaintenanceBloc>(() => MaintenanceBloc());
   sl.registerFactory<DriverLicenseExpiryBloc>(() => DriverLicenseExpiryBloc());
   sl.registerFactory<TruckMaintDashBloc>(() => TruckMaintDashBloc());

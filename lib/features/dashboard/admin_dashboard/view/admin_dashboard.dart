@@ -177,36 +177,39 @@ class _AdminDashboardState extends State<NewAdminDashboard> with SingleTickerPro
             create: (context) => sl<SpeedingBloc>()..add(LoadSpeedingReport()),
             child: const SpeedingScreen(), // Add a BlocListener here to show SnackBars for SpeedingError if needed!
             ),
+
             BlocProvider(
-              create: (context) => FuelFillingBloc(context)..add(LoadFuelFillingReport()),
-              child: const FuelFillingPage(),
+            create: (context) => sl<FuelFillingBloc>()..add(LoadFuelFillingReport()),
+            child: const FuelFillingPage(), // Add a BlocListener here to show SnackBars for FuelFillingError if needed!
+            ),
+
+            BlocProvider(
+            create: (context) => sl<EngineHoursBloc>()..add(LoadEngineHoursReport()),
+            child: const EngineHoursPage(), // Add a BlocListener here to show SnackBars for EngineHoursError if needed!
             ),
             BlocProvider(
-              create: (context) => EngineHoursBloc(context)..add(LoadEngineHoursReport()),
-              child: const EngineHoursPage(),
+            create: (context) => sl<BocBloc>()..add(LoadBocReport()),
+            child: const BocPage(), // Remember to add a BlocListener here to show SnackBars for BocError if needed!
             ),
             BlocProvider(
-              create: (context) => BocBloc(context)..add(LoadBocReport()),
-              child: const BocPage(),
+              create: (context) => sl<EmailBloc>()..add(const LoadEmployeesEvent()),
+              child: const EmailPage(), // Remember to add BlocListener here if you want SnackBars for EmailError or EmailSaveSuccess!
             ),
             BlocProvider(
-              create: (context) => EmailBloc(context)..add(const LoadEmployeesEvent()),
-              child: const EmailPage(),
+              create: (context) => sl<ReviewBloc>()..add(const LoadEmployeeEvent()),
+              child: const ReviewEntryPage(), // Add BlocListener here to listen for ReviewSaveSuccess and ReviewError!
             ),
+
             BlocProvider(
-              create: (context) => ReviewBloc(context)..add(const LoadReviewsEvent()),
-              child: const ReviewEntryPage(),
+              create: (context) => sl<FuelDiffBloc>()..add(const LoadFuelDiffEvent()),
+              child: const FuelDiffPage(), // Remember to add BlocListener here if you want to show SnackBars for FuelDiffError!
             ),
+        BlocProvider(
+        create: (context) => sl<EmployeeMasterBloc>(),
+        child: const EmployeeViewPage(),
+        ),
             BlocProvider(
-              create: (context) => FuelDiffBloc(context)..add(const LoadFuelDiffEvent()),
-              child: const FuelDiffPage(),
-            ),
-            BlocProvider(
-              create: (context) => EmployeeMasterBloc.list(context),
-              child: const EmployeeViewPage(),
-            ),
-            BlocProvider(
-              create: (context) => PettyCashBloc(context)..add(const LoadPettyCashEvent()),
+              create: (context) => sl<PettyCashBloc>()..add(const LoadPettyCashEvent()),
               child: const PettyCashPage(),
             ),
             BlocProvider(

@@ -5,6 +5,7 @@ import 'package:intl/intl.dart';
 import 'package:maleva/core/models/model.dart';
 import 'package:maleva/core/utils/clsfunction.dart' as objfun;
 import 'package:maleva/core/colors/colors.dart' as colour;
+import '../../../../../../core/di/injection.dart';
 import '../../../../../../core/theme/tokens.dart';
 import '../bloc/enginehours_bloc.dart';
 import '../bloc/enginehours_event.dart';
@@ -16,10 +17,10 @@ class EngineHoursPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (_) =>
-      EngineHoursBloc(context)..add(LoadEngineHoursReport()),
-      child: const _EngineHoursBody(),
+    return
+    BlocProvider(
+      create: (context) => sl<EngineHoursBloc>()..add(LoadEngineHoursReport()),
+      child: const _EngineHoursBody(), // Add a BlocListener here to show SnackBars for EngineHoursError if needed!
     );
   }
 }

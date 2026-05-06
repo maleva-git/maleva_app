@@ -5,6 +5,7 @@ import 'package:intl/intl.dart';
 import 'package:maleva/core/models/model.dart';
 import 'package:maleva/core/utils/clsfunction.dart' as objfun;
 import '../../../../../../core/colors/colors.dart';
+import '../../../../../../core/di/injection.dart';
 import '../../../../../../core/theme/tokens.dart';
 import '../bloc/pettycash_bloc.dart';
 import '../bloc/pettycash_event.dart';
@@ -16,8 +17,9 @@ class PettyCashPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (_) => PettyCashBloc(context),
+    return
+    BlocProvider(
+      create: (context) => sl<PettyCashBloc>()..add(const LoadPettyCashEvent()),
       child: const _PettyCashBody(),
     );
   }

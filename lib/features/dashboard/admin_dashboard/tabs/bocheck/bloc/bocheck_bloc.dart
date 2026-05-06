@@ -1,17 +1,16 @@
-import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-
-import 'package:maleva/core/models/model.dart';
 import 'package:maleva/core/utils/clsfunction.dart' as objfun;
 
-
+import '../../../../../../core/models/model.dart';
+import '../data/bocheck_repository.dart';
 import 'bocheck_event.dart';
 import 'bocheck_state.dart';
 
 class BocBloc extends Bloc<BocEvent, BocState> {
-  final BuildContext context;
+  // ❌ REMOVED: final BuildContext context;
+  final BoCheckRepository repository; // ✅ Injected Repository
 
-  BocBloc(this.context) : super(BocInitial()) {
+  BocBloc({required this.repository}) : super(BocInitial()) {
     on<LoadBocReport>(_onLoadBocReport);
   }
 
@@ -36,16 +35,8 @@ class BocBloc extends Bloc<BocEvent, BocState> {
         "Offvesselname": "",
       };
 
-      final Map<String, String> headers = {
-        'Content-Type': 'application/json; charset=UTF-8',
-      };
-
-      final resultData = await objfun.apiAllinoneSelectArray(
-        objfun.apiselectBillordercheck,
-        requestBody,
-        headers,
-        context,
-      );
+      // ✅ REFACTORED: Using the injected repository without context
+      final resultData = await repository.fetchBocData(body: requestBody);
 
       if (resultData != null && resultData.isNotEmpty) {
         final data1 = resultData['Data1'] as List?;

@@ -1,18 +1,17 @@
-import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
-
 import 'package:maleva/core/models/model.dart';
 import 'package:maleva/core/utils/clsfunction.dart' as objfun;
 
+import '../data/googlereview_repository.dart';
 import 'googlereview_event.dart';
 import 'googlereview_state.dart';
 
-
 class ReviewBloc extends Bloc<ReviewEvent, ReviewState> {
-  final BuildContext context;
+  // ❌ REMOVED: final BuildContext context;
+  final GoogleReviewRepository repository; // ✅ Injected Repository
 
-  ReviewBloc(this.context) : super(const ReviewInitial()) {
+  ReviewBloc({required this.repository}) : super(const ReviewInitial()) {
     on<LoadEmployeeEvent>(_onLoadEmployees);
     on<SelectReviewEvent>(_onSelectReview);
     on<SelectEmployeesEvent>(_onSelectEmployee);
@@ -34,15 +33,10 @@ class ReviewBloc extends Bloc<ReviewEvent, ReviewState> {
     emit(const ReviewEmployeesLoading());
     try {
       final comId = objfun.storagenew.getInt('Comid') ?? 0;
-      final resultData = await objfun.apiAllinoneSelect(
-        "${objfun.apiSelectEmployee}$comId&type=&type1=",
-        null,
-        null,
-        context,
-      );
+      final resultData = await repository.fetchEmployees(comId: comId);
 
-      if (resultData != null && resultData.isNotEmpty) {
-        final List<EmployeeModel> employees = (resultData as List)
+      if (resultData != null && resultData is List && resultData.isNotEmpty) {
+        final List<EmployeeModel> employees = resultData
             .map<EmployeeModel>((e) => EmployeeModel.fromJson(e))
             .toList();
 
@@ -51,10 +45,7 @@ class ReviewBloc extends Bloc<ReviewEvent, ReviewState> {
           selectedDate: DateTime.now(),
         ));
       } else {
-        emit(ReviewFormState(
-          employees: [],
-          selectedDate: DateTime.now(),
-        ));
+        emit(ReviewFormState(employees: [], selectedDate: DateTime.now()));
       }
     } catch (e) {
       emit(ReviewError(e.toString()));
@@ -62,30 +53,21 @@ class ReviewBloc extends Bloc<ReviewEvent, ReviewState> {
   }
 
   // ── 2. Select Review Rating ─────────────────────────────────────────────────
-  void _onSelectReview(
-      SelectReviewEvent event,
-      Emitter<ReviewState> emit,
-      ) {
+  void _onSelectReview(SelectReviewEvent event, Emitter<ReviewState> emit) {
     if (state is ReviewFormState) {
       emit((state as ReviewFormState).copyWith(selectedReview: event.value));
     }
   }
 
   // ── 3. Select Employee ──────────────────────────────────────────────────────
-  void _onSelectEmployee(
-      SelectEmployeesEvent event,
-      Emitter<ReviewState> emit,
-      ) {
+  void _onSelectEmployee(SelectEmployeesEvent event, Emitter<ReviewState> emit) {
     if (state is ReviewFormState) {
       emit((state as ReviewFormState).copyWith(selectedEmpId: event.empId));
     }
   }
 
   // ── 4. Select Date ──────────────────────────────────────────────────────────
-  void _onSelectDate(
-      SelectDateEvent event,
-      Emitter<ReviewState> emit,
-      ) {
+  void _onSelectDate(SelectDateEvent event, Emitter<ReviewState> emit) {
     if (state is ReviewFormState) {
       emit((state as ReviewFormState).copyWith(selectedDate: event.date));
     }
@@ -114,16 +96,7 @@ class ReviewBloc extends Bloc<ReviewEvent, ReviewState> {
         }
       ];
 
-      final Map<String, String> header = {
-        'Content-Type': 'application/json; charset=UTF-8',
-      };
-
-      final resultData = await objfun.apiAllinoneSelectArray(
-        objfun.apiGoogleReviewInsert,
-        master,
-        header,
-        context,
-      );
+      final resultData = await repository.saveReview(body: master);
 
       emit(current.copyWith(saving: false));
 
@@ -147,10 +120,7 @@ class ReviewBloc extends Bloc<ReviewEvent, ReviewState> {
   }
 
   // ── 6. Reset Form ───────────────────────────────────────────────────────────
-  void _onResetForm(
-      ResetFormEvent event,
-      Emitter<ReviewState> emit,
-      ) {
+  void _onResetForm(ResetFormEvent event, Emitter<ReviewState> emit) {
     if (state is ReviewFormState) {
       final current = state as ReviewFormState;
       emit(current.copyWith(
@@ -168,15 +138,10 @@ class ReviewBloc extends Bloc<ReviewEvent, ReviewState> {
       ) async {
     try {
       final comId = objfun.storagenew.getInt('Comid') ?? 0;
-      final resultData = await objfun.apiAllinoneSelect(
-        "${objfun.apiSelectEmployee}$comId&type=&type1=",
-        null,
-        null,
-        context,
-      );
+      final resultData = await repository.fetchEmployees(comId: comId);
 
-      if (resultData != null && resultData.isNotEmpty) {
-        final List<EmployeeModel> employees = (resultData as List)
+      if (resultData != null && resultData is List && resultData.isNotEmpty) {
+        final List<EmployeeModel> employees = resultData
             .map<EmployeeModel>((e) => EmployeeModel.fromJson(e))
             .toList();
 
@@ -190,17 +155,11 @@ class ReviewBloc extends Bloc<ReviewEvent, ReviewState> {
   }
 
   // ── 8. Select Grid Employee ─────────────────────────────────────────────────
-  void _onSelectGridEmployee(
-      SelectGridEmployeeEvent event,
-      Emitter<ReviewState> emit,
-      ) {
+  void _onSelectGridEmployee(SelectGridEmployeeEvent event, Emitter<ReviewState> emit) {
     if (state is ReviewGridState) {
       final current = state as ReviewGridState;
-      emit(current.copyWith(
-        selectedEmpId: event.empId,
-        reviews: [],
-      ));
-      // Auto load if dates already selected
+      emit(current.copyWith(selectedEmpId: event.empId, reviews: []));
+
       if (current.fromDate != null && current.toDate != null) {
         add(const LoadReviewsEvent());
       }
@@ -208,16 +167,11 @@ class ReviewBloc extends Bloc<ReviewEvent, ReviewState> {
   }
 
   // ── 9. Select Date Range ────────────────────────────────────────────────────
-  void _onSelectDateRange(
-      SelectDateRangeEvent event,
-      Emitter<ReviewState> emit,
-      ) {
+  void _onSelectDateRange(SelectDateRangeEvent event, Emitter<ReviewState> emit) {
     if (state is ReviewGridState) {
       final current = state as ReviewGridState;
-      emit(current.copyWith(
-        fromDate: event.fromDate,
-        toDate: event.toDate,
-      ));
+      emit(current.copyWith(fromDate: event.fromDate, toDate: event.toDate));
+
       if (current.selectedEmpId != null) {
         add(const LoadReviewsEvent());
       }
@@ -241,22 +195,16 @@ class ReviewBloc extends Bloc<ReviewEvent, ReviewState> {
     try {
       final from = DateFormat('yyyy-MM-dd').format(current.fromDate!);
       final to = DateFormat('yyyy-MM-dd').format(current.toDate!);
-      final header = {'Content-Type': 'application/json; charset=UTF-8'};
 
-      final url = Uri.parse(objfun.apiSelectGoogleReview).replace(
-        queryParameters: {
-          'Comid': objfun.Comid.toString(),
-          'fromdate': from,
-          'todate': to,
-          'Empid': current.selectedEmpId.toString(),
-        },
-      ).toString();
+      final resultData = await repository.fetchReviews(
+        comId: objfun.Comid,
+        fromDate: from,
+        toDate: to,
+        empId: current.selectedEmpId!,
+      );
 
-      final resultData = await objfun.apiAllinoneSelectArray(
-          url, null, header, context);
-
-      if (resultData != null && resultData.isNotEmpty) {
-        final List<Review> reviews = (resultData as List)
+      if (resultData != null && resultData is List && resultData.isNotEmpty) {
+        final List<Review> reviews = resultData
             .map<Review>((e) => Review.fromJson(e))
             .toList();
         emit(current.copyWith(reviews: reviews, loading: false));
@@ -280,12 +228,7 @@ class ReviewBloc extends Bloc<ReviewEvent, ReviewState> {
     emit(current.copyWith(loading: true));
 
     try {
-      final header = {'Content-Type': 'application/json; charset=UTF-8'};
-      final url = Uri.parse(objfun.apiDeleteGoogleReview).replace(
-        queryParameters: {'Id': event.id.toString()},
-      ).toString();
-
-      await objfun.apiAllinoneSelectArray(url, null, header, context);
+      await repository.deleteReview(id: event.id);
 
       emit(current.copyWith(loading: false));
       add(const LoadReviewsEvent());
