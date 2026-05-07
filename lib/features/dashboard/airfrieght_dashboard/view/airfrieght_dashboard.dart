@@ -79,10 +79,9 @@ class _SalesDashboardState extends State<SalesDashboard> with SingleTickerProvid
                   child: const FuelDiffPage(), // Remember to add BlocListener here if you want to show SnackBars for FuelDiffError!
                 ),
                 BlocProvider(
-                  create: (context) => PaymentPendingBloc(context)
-                    ..add(const LoadPaymentPendingEvent()),
+                  create: (_) => sl<PaymentPendingBloc>(),
                   child: const PaymentPendingPage(),
-                ),
+                )
               ],
               child: Builder(
                 builder: (context) {

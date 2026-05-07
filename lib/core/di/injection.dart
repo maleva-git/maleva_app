@@ -59,6 +59,8 @@ import '../../features/dashboard/admin_dashboard/tabs/fuelfillings/bloc/fuelfill
 import '../../features/dashboard/admin_dashboard/tabs/fuelfillings/data/fuelfillings_repository.dart';
 import '../../features/dashboard/admin_dashboard/tabs/googlereview/bloc/googlereview_bloc.dart';
 import '../../features/dashboard/admin_dashboard/tabs/googlereview/data/googlereview_repository.dart';
+import '../../features/dashboard/admin_dashboard/tabs/paymentview/bloc/paymentview_bloc.dart';
+import '../../features/dashboard/admin_dashboard/tabs/paymentview/data/paymentview_repository.dart';
 import '../../features/dashboard/admin_dashboard/tabs/pettycash/bloc/pettycash_bloc.dart';
 import '../../features/dashboard/admin_dashboard/tabs/pettycash/data/pettycash_repository.dart';
 import '../../features/dashboard/admin_dashboard/tabs/receiptview/data/receipt_repository.dart';
@@ -306,6 +308,16 @@ Future<void> setupDependencies() async {
   sl.registerFactory<SparePartsBloc>(
         () => SparePartsBloc.view(repository: sl<SparePartsRepository>()),
   );
+
+  sl.registerLazySingleton<PaymentViewRepository>(
+        () => PaymentViewRepository(),
+  );
+
+  // 2. Register the BLoC as a factory
+  sl.registerFactory<PaymentPendingBloc>(
+        () => PaymentPendingBloc(repository: sl<PaymentViewRepository>()),
+  );
+
   sl.registerFactory<MaintenanceBloc>(() => MaintenanceBloc());
   sl.registerFactory<DriverLicenseExpiryBloc>(() => DriverLicenseExpiryBloc());
   sl.registerFactory<TruckMaintDashBloc>(() => TruckMaintDashBloc());

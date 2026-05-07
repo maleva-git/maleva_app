@@ -229,8 +229,7 @@ class _AdminDashboardState extends State<NewAdminDashboard> with SingleTickerPro
               child: const SparePartsEntryPage(),
             ),
             BlocProvider(
-              create: (context) => PaymentPendingBloc(context)
-                ..add(const LoadPaymentPendingEvent()),
+              create: (_) => sl<PaymentPendingBloc>(),
               child: const PaymentPendingPage(),
             ),
             BlocProvider(

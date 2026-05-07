@@ -1,19 +1,18 @@
-import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 
 import 'package:maleva/core/models/model.dart';
 import 'package:maleva/core/utils/clsfunction.dart' as objfun;
-import 'package:maleva/features/dashboard/admin_dashboard/tabs/paymentview/bloc/paymentview_event.dart';
-import 'package:maleva/features/dashboard/admin_dashboard/tabs/paymentview/bloc/paymentview_state.dart';
 
+import '../data/paymentview_repository.dart';
+import 'paymentview_event.dart';
+import 'paymentview_state.dart';
 
+class PaymentPendingBloc extends Bloc<PaymentPendingEvent, PaymentPendingState> {
+  // ❌ REMOVED: final BuildContext context;
+  final PaymentViewRepository repository; // ✅ Injected Repository
 
-class PaymentPendingBloc
-    extends Bloc<PaymentPendingEvent, PaymentPendingState> {
-  final BuildContext context;
-
-  PaymentPendingBloc(this.context)
+  PaymentPendingBloc({required this.repository})
       : super(PaymentPendingLoading(
     selectedFilter: 'All',
     selectedPaidFilter: 'All Payments',
@@ -27,6 +26,7 @@ class PaymentPendingBloc
     on<SelectToDateEvent>(_onToDate);
     on<SearchByDateEvent>(_onSearchByDate);
     on<SelectPaymentItemEvent>(_onSelectItem);
+
     // Auto-load on init
     add(const LoadPaymentPendingEvent());
   }
@@ -39,15 +39,13 @@ class PaymentPendingBloc
     if (s is PaymentPendingError) return s.selectedFilter;
     return 'All';
   }
-  void _onSelectItem(
-      SelectPaymentItemEvent event,
-      Emitter<PaymentPendingState> emit,
-      ) {
+
+  void _onSelectItem(SelectPaymentItemEvent event, Emitter<PaymentPendingState> emit) {
     if (state is PaymentPendingLoaded) {
-      emit((state as PaymentPendingLoaded)
-          .copyWith(selectedItem: event.item));
+      emit((state as PaymentPendingLoaded).copyWith(selectedItem: event.item));
     }
   }
+
   String _currentPaidFilter() {
     final s = state;
     if (s is PaymentPendingLoading) return s.selectedPaidFilter;
@@ -73,8 +71,7 @@ class PaymentPendingBloc
   }
 
   // ── Load ──────────────────────────────────────────────────────────────────
-  Future<void> _onLoad(
-      LoadPaymentPendingEvent e, Emitter<PaymentPendingState> emit) async {
+  Future<void> _onLoad(LoadPaymentPendingEvent e, Emitter<PaymentPendingState> emit) async {
     final expFilter  = _currentExpenseFilter();
     final paidFilter = _currentPaidFilter();
     final fromDate   = _currentFromDate();
@@ -91,9 +88,7 @@ class PaymentPendingBloc
   }
 
   // ── Expense Filter chip tap ───────────────────────────────────────────────
-  Future<void> _onExpenseFilter(
-      SelectExpenseFilterEvent e,
-      Emitter<PaymentPendingState> emit) async {
+  Future<void> _onExpenseFilter(SelectExpenseFilterEvent e, Emitter<PaymentPendingState> emit) async {
     final paidFilter = _currentPaidFilter();
     final fromDate   = _currentFromDate();
     final toDate     = _currentToDate();
@@ -109,9 +104,7 @@ class PaymentPendingBloc
   }
 
   // ── Paid Filter chip tap ──────────────────────────────────────────────────
-  Future<void> _onPaidFilter(
-      SelectPaidFilterEvent e,
-      Emitter<PaymentPendingState> emit) async {
+  Future<void> _onPaidFilter(SelectPaidFilterEvent e, Emitter<PaymentPendingState> emit) async {
     final expFilter = _currentExpenseFilter();
     final fromDate  = _currentFromDate();
     final toDate    = _currentToDate();
@@ -127,12 +120,10 @@ class PaymentPendingBloc
   }
 
   // ── Date pickers (just update state, no reload) ───────────────────────────
-  void _onFromDate(
-      SelectFromDateEvent e, Emitter<PaymentPendingState> emit) {
+  void _onFromDate(SelectFromDateEvent e, Emitter<PaymentPendingState> emit) {
     if (state is PaymentPendingLoaded) {
       emit((state as PaymentPendingLoaded).copyWith(fromDate: e.date));
     } else {
-      // Re-emit loading with new date
       emit(PaymentPendingLoading(
         selectedFilter: _currentExpenseFilter(),
         selectedPaidFilter: _currentPaidFilter(),
@@ -142,8 +133,7 @@ class PaymentPendingBloc
     }
   }
 
-  void _onToDate(
-      SelectToDateEvent e, Emitter<PaymentPendingState> emit) {
+  void _onToDate(SelectToDateEvent e, Emitter<PaymentPendingState> emit) {
     if (state is PaymentPendingLoaded) {
       emit((state as PaymentPendingLoaded).copyWith(toDate: e.date));
     } else {
@@ -157,8 +147,7 @@ class PaymentPendingBloc
   }
 
   // ── Search button tap ─────────────────────────────────────────────────────
-  Future<void> _onSearchByDate(
-      SearchByDateEvent e, Emitter<PaymentPendingState> emit) async {
+  Future<void> _onSearchByDate(SearchByDateEvent e, Emitter<PaymentPendingState> emit) async {
     final expFilter  = _currentExpenseFilter();
     final paidFilter = _currentPaidFilter();
     final fromDate   = _currentFromDate();
@@ -171,8 +160,7 @@ class PaymentPendingBloc
       toDate: toDate,
     ));
 
-    await _fetch(emit, expFilter, paidFilter, fromDate, toDate,
-        isDateSearch: true);
+    await _fetch(emit, expFilter, paidFilter, fromDate, toDate, isDateSearch: true);
   }
 
   // ── API Call ──────────────────────────────────────────────────────────────
@@ -206,35 +194,31 @@ class PaymentPendingBloc
         'SupplierId1': paidFilterToSid(paidFilter),
       };
 
-      final result = await objfun.apiAllinoneSelectArray(
-        "${objfun.apiSelectPaymentPending}?Startindex=0&PageCount=400",
-        body,
-        {'Content-Type': 'application/json; charset=UTF-8'},
-        context,
-      );
+      // ✅ REFACTORED: Call the injected repository
+      final result = await repository.fetchPaymentPendingData(body);
 
       List<PaymentPendingModel> masters  = [];
       List<PaymentPendingModel> details  = [];
 
-      if (result != null && result.isNotEmpty) {
+      if (result != null && result is List && result.isNotEmpty) {
         final first = result[0];
         if (first is Map &&
             (first.containsKey('ExpenseReportModel') ||
                 first.containsKey('ExpenseReportDetailsModel'))) {
           final mJson = (first['ExpenseReportModel'] ?? []) as List;
           final dJson = (first['ExpenseReportDetailsModel'] ?? []) as List;
-          masters = mJson.map((e) => PaymentPendingModel.fromJson(e)).toList();
-          details = dJson.map((e) => PaymentPendingModel.fromJson(e)).toList();
+          masters = mJson.map((e) => PaymentPendingModel.fromJson(e as Map<String, dynamic>)).toList();
+          details = dJson.map((e) => PaymentPendingModel.fromJson(e as Map<String, dynamic>)).toList();
         } else if (result.length >= 2 && result[1] is List) {
           masters = (result[0] as List)
-              .map((e) => PaymentPendingModel.fromJson(e))
+              .map((e) => PaymentPendingModel.fromJson(e as Map<String, dynamic>))
               .toList();
           details = (result[1] as List)
-              .map((e) => PaymentPendingModel.fromJson(e))
+              .map((e) => PaymentPendingModel.fromJson(e as Map<String, dynamic>))
               .toList();
         } else {
-          masters = (result as List)
-              .map((e) => PaymentPendingModel.fromJson(e))
+          masters = (result)
+              .map((e) => PaymentPendingModel.fromJson(e as Map<String, dynamic>))
               .toList();
         }
       }

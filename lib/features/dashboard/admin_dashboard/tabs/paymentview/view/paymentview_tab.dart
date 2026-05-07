@@ -5,6 +5,7 @@ import 'package:intl/intl.dart';
 import 'package:maleva/core/models/model.dart';
 import 'package:maleva/core/utils/clsfunction.dart' as objfun;
 import 'package:maleva/core/colors/colors.dart' as colour;
+import '../../../../../../core/di/injection.dart';
 import '../../../../../../core/theme/tokens.dart';
 import '../bloc/paymentview_bloc.dart';
 import '../bloc/paymentview_event.dart';
@@ -16,8 +17,9 @@ class PaymentPendingPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (_) => PaymentPendingBloc(context),
+    return
+    BlocProvider(
+      create: (_) => sl<PaymentPendingBloc>(),
       child: const _PaymentPendingBody(),
     );
   }
