@@ -45,6 +45,7 @@ import '../tabs/googlereview/bloc/googlereview_event.dart';
 import '../tabs/googlereview/view/googlereview_tab.dart';
 import '../tabs/inventoryreport/bloc/inventoryreport_bloc.dart';
 import '../tabs/inventoryreport/bloc/inventoryreport_event.dart';
+import '../tabs/inventoryreport/data/inventoryreport_repository.dart';
 import '../tabs/inventoryreport/view/inventoryview_tab.dart';
 import '../tabs/invoice/bloc/invoice_bloc.dart';
 import '../tabs/invoice/bloc/invoice_event.dart';
@@ -54,6 +55,7 @@ import '../tabs/paymentview/bloc/paymentview_bloc.dart';
 import '../tabs/paymentview/bloc/paymentview_event.dart';
 import '../tabs/paymentview/view/paymentview_tab.dart';
 import '../tabs/pdo/bloc/pdo_bloc.dart';
+import '../tabs/pdo/data/pdo_repository.dart';
 import '../tabs/pdo/view/pdo_tab.dart';
 import '../tabs/pettycash/bloc/pettycash_bloc.dart';
 import '../tabs/pettycash/bloc/pettycash_event.dart';
@@ -73,6 +75,7 @@ import '../tabs/speedingreport/bloc/speeding_bloc.dart';
 import '../tabs/speedingreport/bloc/speeding_event.dart';
 import '../tabs/speedingreport/view/speedingreport_view.dart';
 import '../tabs/spotsaleorder/bloc/spotsaleorder_bloc.dart';
+import '../tabs/spotsaleorder/data/spotsale_repository.dart';
 import '../tabs/spotsaleorder/view/spotsaleorder_add.dart';
 import '../tabs/summonentry/bloc/summonentry_bloc.dart';
 import '../tabs/summonentry/data/summonentry_repository.dart';
@@ -233,30 +236,33 @@ class _AdminDashboardState extends State<NewAdminDashboard> with SingleTickerPro
               child: const PaymentPendingPage(),
             ),
             BlocProvider(
-              create: (context) => SpotSaleBloc.form(context),
+              // ✅ Removed 'context', added named 'repository' parameter
+              create: (_) => SpotSaleBloc.form(
+                repository: sl<SpotSaleRepository>(),
+              ),
               child: const SpotSaleEntryPage(),
             ),
             BlocProvider(
-              create: (context) => InventoryBloc(context)
-                ..add(const LoadInventoryListsEvent()),
+              // ✅ Removed 'context', added named 'repository', and removed the redundant ..add() cascade
+              create: (_) => InventoryBloc(
+                repository: sl<InventoryReportRepository>(),
+              ),
               child: const InventoryPage(),
             ),
             BlocProvider(
-              create: (context) => PDOBloc(
-                context,
-                fromDate: DateFormat('yyyy-MM-dd')
-                    .format(DateTime.now().subtract(const Duration(days: 30))),
+              create: (_) => PDOBloc(
+                repository: sl<PDORepository>(),
+                fromDate: DateFormat('yyyy-MM-dd').format(DateTime.now().subtract(const Duration(days: 30))),
                 toDate: DateFormat('yyyy-MM-dd').format(DateTime.now()),
               ),
               child: PDOViewPage(
-                fromDate: DateFormat('yyyy-MM-dd')
-                    .format(DateTime.now().subtract(const Duration(days: 30))),
+                fromDate: DateFormat('yyyy-MM-dd').format(DateTime.now().subtract(const Duration(days: 30))),
                 toDate: DateFormat('yyyy-MM-dd').format(DateTime.now()),
               ),
             ),
             BlocProvider(
-              create: (context) => RTIDetailsBloc(context)
-                ..add(const LoadRTIDetailsEvent()),
+              // ✅ Removed 'context', removed the redundant ..add(), and used our Service Locator!
+              create: (_) => sl<RTIDetailsBloc>(),
               child: const RTIDetailsPage(),
             ),
             BlocProvider(

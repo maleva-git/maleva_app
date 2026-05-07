@@ -18,6 +18,7 @@ import '../../admin_dashboard/tabs/googlereview/bloc/googlereview_event.dart';
 import '../../admin_dashboard/tabs/googlereview/view/googlereview_tab.dart';
 import '../../admin_dashboard/tabs/inventoryreport/bloc/inventoryreport_bloc.dart';
 import '../../admin_dashboard/tabs/inventoryreport/bloc/inventoryreport_event.dart';
+import '../../admin_dashboard/tabs/inventoryreport/data/inventoryreport_repository.dart';
 import '../../admin_dashboard/tabs/inventoryreport/view/inventoryview_tab.dart';
 import '../../admin_dashboard/tabs/invoice/bloc/invoice_bloc.dart';
 import '../../admin_dashboard/tabs/invoice/bloc/invoice_event.dart';
@@ -25,6 +26,7 @@ import '../../admin_dashboard/tabs/invoice/data/invoice_repository.dart';
 import '../../admin_dashboard/tabs/invoice/view/invoice_tab.dart';
 import '../../admin_dashboard/tabs/salesorder/view/salesorderview_tab.dart';
 import '../../admin_dashboard/tabs/spotsaleorder/bloc/spotsaleorder_bloc.dart';
+import '../../admin_dashboard/tabs/spotsaleorder/data/spotsale_repository.dart';
 import '../../admin_dashboard/tabs/spotsaleorder/view/spotsaleorder_add.dart';
 import '../../admin_dashboard/tabs/transport/bloc/transport_bloc.dart';
 import '../../admin_dashboard/tabs/transport/bloc/transport_event.dart';
@@ -124,12 +126,17 @@ class _AdminDashboardState extends State<SubAdminDashboard> with SingleTickerPro
               child: const EmployeeViewPage(),
             ),
             BlocProvider(
-              create: (context) => SpotSaleBloc.form(context),
+              // ✅ Removed 'context', added named 'repository' parameter
+              create: (_) => SpotSaleBloc.form(
+                repository: sl<SpotSaleRepository>(),
+              ),
               child: const SpotSaleEntryPage(),
             ),
             BlocProvider(
-              create: (context) => InventoryBloc(context)
-                ..add(const LoadInventoryListsEvent()),
+              // ✅ Removed 'context', added named 'repository', and removed the redundant ..add() cascade
+              create: (_) => InventoryBloc(
+                repository: sl<InventoryReportRepository>(),
+              ),
               child: const InventoryPage(),
             ),
 

@@ -5,11 +5,14 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:maleva/core/models/model.dart';
 import 'package:maleva/core/utils/clsfunction.dart' as objfun;
 import 'package:maleva/core/colors/colors.dart' as colour;
+import '../../../../../../core/di/injection.dart';
 import '../../../../../../core/theme/tokens.dart';
 import '../bloc/pdo_bloc.dart';
 import '../bloc/pdo_event.dart';
 import '../bloc/pdo_state.dart';
+import '../data/pdo_repository.dart';
 
+// ── Entry Point ───────────────────────────────────────────────────────────────
 // ── Entry Point ───────────────────────────────────────────────────────────────
 class PDOViewPage extends StatelessWidget {
   final String fromDate;
@@ -32,8 +35,9 @@ class PDOViewPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
+      // ✅ Inject the PDORepository and pass the runtime parameters safely!
       create: (_) => PDOBloc(
-        context,
+        repository: sl<PDORepository>(),
         fromDate: fromDate,
         toDate: toDate,
         driverId: driverId,

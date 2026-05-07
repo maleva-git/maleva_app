@@ -8,10 +8,12 @@ import 'package:share_plus/share_plus.dart';
 import 'package:http/http.dart' as http;
 import 'package:maleva/core/utils/clsfunction.dart' as objfun;
 import 'package:maleva/core/colors/colors.dart' as colour;
+import '../../../../../../core/di/injection.dart';
 import '../../../../../../core/theme/tokens.dart';
 import '../bloc/spotsaleorder_bloc.dart';
 import '../bloc/spotsaleorder_event.dart';
 import '../bloc/spotsaleorder_state.dart';
+import '../data/spotsale_repository.dart';
 
 
 
@@ -23,11 +25,16 @@ class SpotSaleViewPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (_) =>
-          SpotSaleBloc.view(context, fromDate: fromDate, toDate: toDate),
-      child: const _SpotSaleViewBody(),
-    );
+    return
+      BlocProvider(
+        // ✅ Removed 'context', added named 'repository' parameter
+        create: (_) => SpotSaleBloc.view(
+          repository: sl<SpotSaleRepository>(),
+          fromDate: fromDate,
+          toDate: toDate,
+        ),
+        child: const _SpotSaleViewBody(),
+      );
   }
 }
 

@@ -2,10 +2,13 @@ import 'package:flutter/Material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:maleva/features/dashboard/warehouse_dashboard/view/warehouse_dashboard_ui.dart';
+import '../../../../core/di/injection.dart';
 import '../../admin_dashboard/tabs/inventoryreport/bloc/inventoryreport_bloc.dart';
 import '../../admin_dashboard/tabs/inventoryreport/bloc/inventoryreport_event.dart';
+import '../../admin_dashboard/tabs/inventoryreport/data/inventoryreport_repository.dart';
 import '../../admin_dashboard/tabs/inventoryreport/view/inventoryview_tab.dart';
 import '../../admin_dashboard/tabs/spotsaleorder/bloc/spotsaleorder_bloc.dart';
+import '../../admin_dashboard/tabs/spotsaleorder/data/spotsale_repository.dart';
 import '../../admin_dashboard/tabs/spotsaleorder/view/spotsaleorder_add.dart';
 import '../bloc/warehouse_bloc.dart';
 import '../bloc/warehouse_event.dart';
@@ -47,12 +50,17 @@ class _WareHouseDashboardState extends State<WareHouseDashboard> with SingleTick
         return MultiBlocProvider(
           providers: [
             BlocProvider(
-              create: (context) => SpotSaleBloc.form(context),
+              // ✅ Removed 'context', added named 'repository' parameter
+              create: (_) => SpotSaleBloc.form(
+                repository: sl<SpotSaleRepository>(),
+              ),
               child: const SpotSaleEntryPage(),
             ),
             BlocProvider(
-              create: (context) => InventoryBloc(context)
-                ..add(const LoadInventoryListsEvent()),
+              // ✅ Removed 'context', added named 'repository', and removed the redundant ..add() cascade
+              create: (_) => InventoryBloc(
+                repository: sl<InventoryReportRepository>(),
+              ),
               child: const InventoryPage(),
             ),
           ],

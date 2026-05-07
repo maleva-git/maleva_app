@@ -1,19 +1,25 @@
-import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 
 import 'package:maleva/core/models/model.dart';
 import 'package:maleva/core/utils/clsfunction.dart' as objfun;
+
+import '../data/inventoryreport_repository.dart';
 import 'inventoryreport_event.dart';
 import 'inventoryreport_state.dart';
 
 class InventoryBloc extends Bloc<InventoryEvent, InventoryState> {
-  final BuildContext context;
+  // ❌ REMOVED: final BuildContext context;
+  final InventoryReportRepository repository; // ✅ Injected Repository
 
-  InventoryBloc(this.context)
-      : super(InventoryLoaded(
-    fromDate: DateTime.now().add(const Duration(days: 6)),
-    toDate:   DateTime.now().add(const Duration(days: 6)),
+  InventoryBloc({
+    required this.repository,
+    DateTime? fromDate,
+    DateTime? toDate,
+  }) : super(InventoryLoaded(
+    // ✅ Defaults applied seamlessly
+    fromDate: fromDate ?? DateTime.now(),
+    toDate: toDate ?? DateTime.now().add(const Duration(days: 6)),
   )) {
     on<LoadInventoryListsEvent>(_onLoadLists);
     on<SelectPortFilterEvent>(_onPortFilter);
@@ -23,6 +29,8 @@ class InventoryBloc extends Bloc<InventoryEvent, InventoryState> {
     on<SelectInventoryCustomerEvent>(_onCustomer);
     on<ToggleInventoryStatusEvent>(_onToggle);
     on<SelectInventoryItemEvent>(_onSelectItem);
+
+    // Auto-load on init
     add(const LoadInventoryListsEvent());
   }
 
@@ -31,28 +39,30 @@ class InventoryBloc extends Bloc<InventoryEvent, InventoryState> {
       ? state as InventoryLoaded
       : InventoryLoaded(
     fromDate: DateTime.now(),
-    toDate:   DateTime.now(),
+    toDate: DateTime.now(),
   );
+
   void _onSelectItem(
       SelectInventoryItemEvent event,
       Emitter<InventoryState> emit,
       ) {
     if (state is InventoryLoaded) {
-      emit((state as InventoryLoaded)
-          .copyWith(selectedItem: event.item));
+      emit((state as InventoryLoaded).copyWith(selectedItem: event.item));
     }
   }
+
   // ── Load Customer list ────────────────────────────────────────────────────
   Future<void> _onLoadLists(
       LoadInventoryListsEvent e, Emitter<InventoryState> emit) async {
     if (objfun.CustomerList.isEmpty) {
       try {
-        final comid = objfun.storagenew.getInt('Comid') ?? 0;
-        final result = await objfun.apiAllinoneSelect(
-            "${objfun.apiSelectCustomer}$comid", null, null, context);
-        if (result.isNotEmpty) {
+        final comId = objfun.storagenew.getInt('Comid') ?? 0;
+
+        // ✅ REFACTORED: Using the injected repository
+        final result = await repository.fetchCustomers(comId);
+        if (result != null && result is List && result.isNotEmpty) {
           objfun.CustomerList =
-              result.map((e) => CustomerModel.fromJson(e)).toList();
+              result.map((e) => CustomerModel.fromJson(e as Map<String, dynamic>)).toList();
         }
       } catch (_) {}
     }
@@ -69,13 +79,11 @@ class InventoryBloc extends Bloc<InventoryEvent, InventoryState> {
   }
 
   // ── Date pickers (just update, no reload) ─────────────────────────────────
-  void _onFromDate(
-      SelectInventoryFromDateEvent e, Emitter<InventoryState> emit) {
+  void _onFromDate(SelectInventoryFromDateEvent e, Emitter<InventoryState> emit) {
     emit(_s.copyWith(fromDate: e.date));
   }
 
-  void _onToDate(
-      SelectInventoryToDateEvent e, Emitter<InventoryState> emit) {
+  void _onToDate(SelectInventoryToDateEvent e, Emitter<InventoryState> emit) {
     emit(_s.copyWith(toDate: e.date));
   }
 
@@ -88,17 +96,15 @@ class InventoryBloc extends Bloc<InventoryEvent, InventoryState> {
   }
 
   // ── Customer select ───────────────────────────────────────────────────────
-  void _onCustomer(
-      SelectInventoryCustomerEvent e, Emitter<InventoryState> emit) {
-    emit(_s.copyWith(selectedCustomerId: e.customerId));
+  void _onCustomer(SelectInventoryCustomerEvent e, Emitter<InventoryState> emit) {
+    emit(_s.copyWith(selectedCustomerId: e.customerId, clearCustomer: e.customerId == null));
   }
 
   // ── Checkbox toggle ───────────────────────────────────────────────────────
-  void _onToggle(
-      ToggleInventoryStatusEvent e, Emitter<InventoryState> emit) {
+  void _onToggle(ToggleInventoryStatusEvent e, Emitter<InventoryState> emit) {
     emit(_s.copyWith(
       isChecked: e.isChecked,
-      status:    e.isChecked ? 1 : 0,
+      status: e.isChecked ? 1 : 0,
     ));
   }
 
@@ -132,15 +138,11 @@ class InventoryBloc extends Bloc<InventoryEvent, InventoryState> {
         'Status':     s.status,
       };
 
-      final result = await objfun.apiAllinoneSelectArray(
-        objfun.apiSelectAllInventory,
-        body,
-        {'Content-Type': 'application/json; charset=UTF-8'},
-        context,
-      );
+      // ✅ REFACTORED: Using the injected repository
+      final result = await repository.fetchInventoryReport(body);
 
-      final records = (result != null && result.isNotEmpty)
-          ? result.map<InventoryModel>((e) => InventoryModel.fromJson(e)).toList()
+      final records = (result != null && result is List && result.isNotEmpty)
+          ? result.map<InventoryModel>((e) => InventoryModel.fromJson(e as Map<String, dynamic>)).toList()
           : <InventoryModel>[];
 
       emit(s.copyWith(records: records, isLoading: false));

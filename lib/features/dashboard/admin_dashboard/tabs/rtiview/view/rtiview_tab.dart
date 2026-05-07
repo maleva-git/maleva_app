@@ -4,6 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:maleva/core/models/model.dart';
 import 'package:maleva/core/colors/colors.dart' as colour;
+import '../../../../../../core/di/injection.dart';
 import '../../../../../../core/theme/tokens.dart';
 import '../bloc/rtiview_bloc.dart';
 import '../bloc/rtiview_event.dart';
@@ -15,8 +16,9 @@ class RTIDetailsPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (_) => RTIDetailsBloc(context),
+    return
+    BlocProvider(
+      create: (_) => sl<RTIDetailsBloc>(),
       child: const _RTIDetailsBody(),
     );
   }
@@ -136,13 +138,13 @@ class _RTIDetailsBody extends StatelessWidget {
 
   DateTime _getFrom(RTIDetailsState s) {
     if (s is RTIDetailsLoaded) return s.fromDate;
-    if (s is RTIDetailsError)  return s.fromDate;
+    if (s is RTIDetailsError)  return s.fromDate ?? DateTime(DateTime.now().year, 1, 1);
     return DateTime(DateTime.now().year, 1, 1);
   }
 
   DateTime _getTo(RTIDetailsState s) {
     if (s is RTIDetailsLoaded) return s.toDate;
-    if (s is RTIDetailsError)  return s.toDate;
+    if (s is RTIDetailsError)  return s.toDate ?? DateTime(DateTime.now().year, 12, 31);
     return DateTime(DateTime.now().year, 12, 31);
   }
 }
@@ -284,6 +286,7 @@ class _PageHeader extends StatelessWidget {
 }
 
 // ── Date Picker Card ──────────────────────────────────────────────────────────
+// ── Date Picker Card ──────────────────────────────────────────────────────────
 class _DatePickerCard extends StatelessWidget {
   final String label;
   final String value;
@@ -308,19 +311,26 @@ class _DatePickerCard extends StatelessWidget {
               color: AppTokens.brandGradientStart, size: 13),
         ),
         const SizedBox(width: 7),
-        Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          Text(label,
-              style: GoogleFonts.lato(
-                  fontSize: 10,
-                  color: Colors.grey.shade500,
-                  fontWeight: FontWeight.w600)),
-          const SizedBox(height: 1),
-          Text(value,
-              style: GoogleFonts.lato(
-                  fontSize: 13,
-                  fontWeight: FontWeight.bold,
-                  color: AppTokens.brandDark)),
-        ]),
+        // ✅ Fix: Wrapped in Expanded so it doesn't push past the card boundaries
+        Expanded(
+          child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(label,
+                    style: GoogleFonts.lato(
+                        fontSize: 10,
+                        color: Colors.grey.shade500,
+                        fontWeight: FontWeight.w600)),
+                const SizedBox(height: 1),
+                Text(value,
+                    // ✅ Fix: Adds "..." if the date is too wide for tiny screens
+                    overflow: TextOverflow.ellipsis,
+                    style: GoogleFonts.lato(
+                        fontSize: 13,
+                        fontWeight: FontWeight.bold,
+                        color: AppTokens.brandDark)),
+              ]),
+        ),
       ]),
     );
   }
@@ -558,6 +568,7 @@ class _CardHeader extends StatelessWidget {
         const SizedBox(width: 10),
 
         // Driver name + RTI No
+        // Driver name + RTI No
         Expanded(
           child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -570,14 +581,22 @@ class _CardHeader extends StatelessWidget {
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis),
                 const SizedBox(height: 3),
+
+                // ✅ FIX HERE — Wrap Row children with Flexible
                 Row(children: [
                   Icon(Icons.tag_rounded,
                       size: 11, color: colour.kWhite.withOpacity(0.7)),
                   const SizedBox(width: 3),
-                  Text(master.RTINoDisplay,
+                  Flexible(                          // ← Add Flexible
+                    child: Text(
+                      master.RTINoDisplay,
+                      overflow: TextOverflow.ellipsis, // ← Add ellipsis
+                      maxLines: 1,
                       style: GoogleFonts.lato(
                           fontSize: 12,
-                          color: colour.kWhite.withOpacity(0.85))),
+                          color: colour.kWhite.withOpacity(0.85)),
+                    ),
+                  ),
                 ]),
               ]),
         ),
@@ -638,7 +657,6 @@ class _CardHeader extends StatelessWidget {
   }
 }
 
-// ── Details Table ─────────────────────────────────────────────────────────────
 class _DetailsTable extends StatelessWidget {
   final List<RTIDetailsViewModel> details;
   const _DetailsTable({required this.details});
@@ -658,8 +676,7 @@ class _DetailsTable extends StatelessWidget {
     return Container(
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(
-            color: AppTokens.brandLight, width: 1.3),
+        border: Border.all(color: AppTokens.brandLight, width: 1.3),
       ),
       child: ClipRRect(
         borderRadius: BorderRadius.circular(12),
@@ -670,8 +687,9 @@ class _DetailsTable extends StatelessWidget {
             headingRowHeight: 38,
             dataRowMinHeight: 42,
             dataRowMaxHeight: 48,
-            horizontalMargin: 14,
-            columnSpacing: 24,
+            horizontalMargin: 12,
+            columnSpacing: 16,
+            // ✅ headingTextStyle handles all header styling — no custom widget needed
             headingTextStyle: GoogleFonts.lato(
                 fontWeight: FontWeight.bold,
                 color: AppTokens.brandGradientStartDark,
@@ -682,17 +700,12 @@ class _DetailsTable extends StatelessWidget {
               horizontalInside: BorderSide(
                   color: AppTokens.brandLight, width: 1),
             ),
-            columns: [
-              DataColumn(
-                  label: _colLabel(Icons.work_outline_rounded, "Job No")),
-              DataColumn(
-                  label: _colLabel(Icons.calendar_month_outlined, "Job Date")),
-              DataColumn(
-                  label: _colLabel(Icons.person_outline_rounded, "Customer")),
-              DataColumn(
-                label: _colLabel(Icons.attach_money_rounded, "Salary"),
-                numeric: true,
-              ),
+            // ✅ Plain Text only — no Row, no Icon, no ConstrainedBox
+            columns: const [
+              DataColumn(label: Text("Job No")),
+              DataColumn(label: Text("Job Date")),
+              DataColumn(label: Text("Customer")),
+              DataColumn(label: Text("Salary"), numeric: true),
             ],
             rows: details.asMap().entries.map((entry) {
               final idx = entry.key;
@@ -722,12 +735,5 @@ class _DetailsTable extends StatelessWidget {
       ),
     );
   }
-
-  Widget _colLabel(IconData icon, String label) {
-    return Row(mainAxisSize: MainAxisSize.min, children: [
-      Icon(icon, size: 13, color: AppTokens.brandGradientStart),
-      const SizedBox(width: 5),
-      Text(label),
-    ]);
-  }
+// ✅ _colLabel method completely removed — was the root cause
 }

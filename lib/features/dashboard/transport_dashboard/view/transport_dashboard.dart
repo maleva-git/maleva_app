@@ -13,6 +13,7 @@ import '../../admin_dashboard/tabs/googlereview/bloc/googlereview_bloc.dart';
 import '../../admin_dashboard/tabs/googlereview/bloc/googlereview_event.dart';
 import '../../admin_dashboard/tabs/googlereview/view/googlereview_tab.dart';
 import '../../admin_dashboard/tabs/pdo/bloc/pdo_bloc.dart';
+import '../../admin_dashboard/tabs/pdo/data/pdo_repository.dart';
 import '../../admin_dashboard/tabs/pdo/view/pdo_tab.dart';
 import '../../admin_dashboard/tabs/transport/bloc/transport_bloc.dart';
 import '../../admin_dashboard/tabs/transport/bloc/transport_event.dart';
@@ -58,8 +59,6 @@ class _TransportDashboardState extends State<TransportDashboard> with SingleTick
         final isTablet = constraints.maxWidth >= 600;
         return MultiBlocProvider(
           providers: [
-
-
             BlocProvider(
               create: (context) => sl<TransportBloc>()
                 ..add(const LoadTransportDataEvent(type: 0)),
@@ -84,27 +83,25 @@ class _TransportDashboardState extends State<TransportDashboard> with SingleTick
               child: const TransportSalesTab(), // Or _TransportSalesTabView() depending on where this is placed
             ),
             BlocProvider(
-              create: (context) => PDOBloc(
-                context,
-                fromDate: DateFormat('yyyy-MM-dd')
-                    .format(DateTime.now().subtract(const Duration(days: 30))),
+              create: (_) => PDOBloc(
+                repository: sl<PDORepository>(),
+                fromDate: DateFormat('yyyy-MM-dd').format(DateTime.now().subtract(const Duration(days: 30))),
                 toDate: DateFormat('yyyy-MM-dd').format(DateTime.now()),
               ),
               child: PDOViewPage(
-                fromDate: DateFormat('yyyy-MM-dd')
-                    .format(DateTime.now().subtract(const Duration(days: 30))),
+                fromDate: DateFormat('yyyy-MM-dd').format(DateTime.now().subtract(const Duration(days: 30))),
                 toDate: DateFormat('yyyy-MM-dd').format(DateTime.now()),
               ),
             ),
 
-          ],                                    // ← ] தான் close, } இல்ல
+          ],
           child: Scaffold(
             body: TransportMobileDashboard(
               tabController: _tabController,
               isTablet: isTablet,
             ),
           ),
-        );                                      // ← MultiBlocProvider close
+        );
       },                                        // ← LayoutBuilder builder close
     );                                          // ← LayoutBuilder close
   }

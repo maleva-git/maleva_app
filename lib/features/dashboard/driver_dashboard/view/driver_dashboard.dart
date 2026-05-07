@@ -9,6 +9,7 @@ import '../../admin_dashboard/tabs/drivermaintenance/view/drivermaintenance_tab.
 import '../../admin_dashboard/tabs/driversalary/bloc/driversalary_bloc.dart';
 import '../../admin_dashboard/tabs/driversalary/view/driversalary_tab.dart';
 import '../../admin_dashboard/tabs/pdo/bloc/pdo_bloc.dart';
+import '../../admin_dashboard/tabs/pdo/data/pdo_repository.dart';
 import '../../admin_dashboard/tabs/pdo/view/pdo_tab.dart';
 import '../../admin_dashboard/tabs/summonentry/bloc/summonentry_bloc.dart';
 import '../../admin_dashboard/tabs/summonentry/data/summonentry_repository.dart';
@@ -72,15 +73,13 @@ class _DriverDashboardState extends State<DriverDashboard> with SingleTickerProv
                 ),
 
                 BlocProvider(
-                  create: (context) => PDOBloc(
-                    context,
-                    fromDate: DateFormat('yyyy-MM-dd')
-                        .format(DateTime.now().subtract(const Duration(days: 30))),
+                  create: (_) => PDOBloc(
+                    repository: sl<PDORepository>(), // ✅ Repository injected here!
+                    fromDate: DateFormat('yyyy-MM-dd').format(DateTime.now().subtract(const Duration(days: 30))),
                     toDate: DateFormat('yyyy-MM-dd').format(DateTime.now()),
                   ),
                   child: PDOViewPage(
-                    fromDate: DateFormat('yyyy-MM-dd')
-                        .format(DateTime.now().subtract(const Duration(days: 30))),
+                    fromDate: DateFormat('yyyy-MM-dd').format(DateTime.now().subtract(const Duration(days: 30))),
                     toDate: DateFormat('yyyy-MM-dd').format(DateTime.now()),
                   ),
                 ),

@@ -4,7 +4,6 @@ abstract class RTIDetailsState {
   const RTIDetailsState();
 }
 
-// ── Loaded (single state — copyWith pattern) ──────────────────────────────────
 class RTIDetailsLoaded extends RTIDetailsState {
   final DateTime fromDate;
   final DateTime toDate;
@@ -20,7 +19,6 @@ class RTIDetailsLoaded extends RTIDetailsState {
     this.isLoading = false,
   });
 
-  // ── Helper: details for a specific master ─────────────────────────────────
   List<RTIDetailsViewModel> detailsFor(int masterId) =>
       details.where((d) => d.RTIMasterRefId == masterId).toList();
 
@@ -41,26 +39,22 @@ class RTIDetailsLoaded extends RTIDetailsState {
   }
 }
 
-// ── Error ─────────────────────────────────────────────────────────────────────
 class RTIDetailsError extends RTIDetailsState {
   final String message;
-  final DateTime fromDate;
-  final DateTime toDate;
+  final DateTime? fromDate;
+  final DateTime? toDate;
 
-  const RTIDetailsError({
-    required this.message,
-    required this.fromDate,
-    required this.toDate,
-  });
+  const RTIDetailsError({required this.message, this.fromDate, this.toDate});
 }
 
-class RTIPdfState  extends RTIDetailsState {
-  final bool isLoading;
-  const RTIPdfState({this.isLoading = false});
+// ✅ NEW: Tells UI to open the browser
+class RTIPdfLaunchSuccess extends RTIDetailsState {
+  final String url;
+  const RTIPdfLaunchSuccess(this.url);
+}
 
-  RTIPdfState copywith({bool? isLoading}) {
-    return RTIPdfState(
-      isLoading: isLoading ?? this.isLoading,
-    );
-  }
+// ✅ NEW: Tells UI a specific action failed (like PDF fetch)
+class RTIActionError extends RTIDetailsState {
+  final String message;
+  const RTIActionError(this.message);
 }

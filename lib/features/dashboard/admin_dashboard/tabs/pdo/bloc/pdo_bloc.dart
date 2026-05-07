@@ -1,14 +1,13 @@
-import 'dart:convert';
-import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:http/http.dart' as http;
 import 'package:maleva/core/models/model.dart';
 import 'package:maleva/core/utils/clsfunction.dart' as objfun;
+
+import '../data/pdo_repository.dart';
 import 'pdo_event.dart';
 import 'pdo_state.dart';
 
 class PDOBloc extends Bloc<PDOViewEvent, PDOViewState> {
-  final BuildContext context;
+  final PDORepository repository; // ✅ Injected Repository
 
   // ── Params passed from parent page ───────────────────────────────────────
   final String fromDate;
@@ -18,15 +17,15 @@ class PDOBloc extends Bloc<PDOViewEvent, PDOViewState> {
   final int employeeId;
   final String search;
 
-  PDOBloc(
-      this.context, {
-        required this.fromDate,
-        required this.toDate,
-        this.driverId = 0,
-        this.truckId = 0,
-        this.employeeId = 0,
-        this.search = '',
-      }) : super(const PDOViewLoading()) {
+  PDOBloc({
+    required this.repository,
+    required this.fromDate,
+    required this.toDate,
+    this.driverId = 0,
+    this.truckId = 0,
+    this.employeeId = 0,
+    this.search = '',
+  }) : super(const PDOViewLoading()) {
     on<LoadPDOViewEvent>(_onLoad);
     on<SearchPDOEvent>(_onSearch);
     on<TogglePDOVerifyEvent>(_onToggle);
@@ -42,31 +41,31 @@ class PDOBloc extends Bloc<PDOViewEvent, PDOViewState> {
   // ════════════════════════════════════════════════════════════════════════════
   // LOAD
   // ════════════════════════════════════════════════════════════════════════════
-  Future<void> _onLoad(
-      LoadPDOViewEvent e, Emitter<PDOViewState> emit) async {
+  Future<void> _onLoad(LoadPDOViewEvent e, Emitter<PDOViewState> emit) async {
     emit(const PDOViewLoading());
     try {
-      final comid = objfun.storagenew.getInt('Comid') ?? 0;
+      final comId = objfun.storagenew.getInt('Comid') ?? 0;
 
-      final result = await objfun.apiAllinoneSelect(
-        "${objfun.apiSelectRTIView}$comid"
-            "&Fromdate=$fromDate&Todate=$toDate"
-            "&DId=$driverId&TId=$truckId&Employeeid=$employeeId"
-            "&Search=$search",
-        null,
-        null,
-        context,
+      // ✅ REFACTORED: Using the injected repository
+      final result = await repository.fetchPDORecords(
+        comId: comId,
+        fromDate: fromDate,
+        toDate: toDate,
+        driverId: driverId,
+        truckId: truckId,
+        employeeId: employeeId,
+        search: search,
       );
 
       List<RTIMasterViewModel> masters = [];
       List<RTIDetailsViewModel> details = [];
 
-      if (result != null && result.isNotEmpty) {
+      if (result != null && result is List && result.isNotEmpty) {
         masters = (result[0]["salemaster"] as List)
-            .map((e) => RTIMasterViewModel.fromJson(e))
+            .map((e) => RTIMasterViewModel.fromJson(e as Map<String, dynamic>))
             .toList();
         details = (result[0]["saledetails"] as List)
-            .map((e) => RTIDetailsViewModel.fromJson(e))
+            .map((e) => RTIDetailsViewModel.fromJson(e as Map<String, dynamic>))
             .toList();
       }
 
@@ -81,7 +80,7 @@ class PDOBloc extends Bloc<PDOViewEvent, PDOViewState> {
   }
 
   // ════════════════════════════════════════════════════════════════════════════
-  // SEARCH — filter masters by RTINo / DriverName / TruckName
+  // SEARCH
   // ════════════════════════════════════════════════════════════════════════════
   void _onSearch(SearchPDOEvent e, Emitter<PDOViewState> emit) {
     if (state is! PDOViewLoaded) return;
@@ -107,7 +106,6 @@ class PDOBloc extends Bloc<PDOViewEvent, PDOViewState> {
   void _onToggle(TogglePDOVerifyEvent e, Emitter<PDOViewState> emit) {
     if (state is! PDOViewLoaded) return;
 
-    // Immutable update — new list with updated item
     final updated = _s.details.map((d) {
       if (d.Id == e.detailId) {
         return d.copyWith(
@@ -124,24 +122,23 @@ class PDOBloc extends Bloc<PDOViewEvent, PDOViewState> {
   // ════════════════════════════════════════════════════════════════════════════
   // SAVE (Verify button)
   // ════════════════════════════════════════════════════════════════════════════
-  Future<void> _onSave(
-      SavePDOEvent e, Emitter<PDOViewState> emit) async {
+  Future<void> _onSave(SavePDOEvent e, Emitter<PDOViewState> emit) async {
     if (state is! PDOViewLoaded) return;
 
     emit(_s.copyWith(isSaving: true));
 
     try {
-      final comid  = objfun.storagenew.getInt('Comid') ?? 0;
+      final comId  = objfun.storagenew.getInt('Comid') ?? 0;
       final master = _s.allMasters.firstWhere((m) => m.Id == e.masterId);
 
-      // Build payload — only checked details for this master
+      // Extract checked details for payload
       final checkedDetails = _s.details
           .where((d) => d.RTIMasterRefId == e.masterId && d.isChecked)
           .toList();
 
       final payload = checkedDetails.map((x) => {
         "Id":                      x.StatusId,
-        "CompanyRefId":            comid,
+        "CompanyRefId":            comId,
         "RTIMasterRefId":          master.Id,
         "RTIDetailsRefId":         x.Id,
         "RTICNumberDisplay":       master.RTINoDisplay,
@@ -156,28 +153,14 @@ class PDOBloc extends Bloc<PDOViewEvent, PDOViewState> {
         "ImagePath":               x.imagePath,
       }).toList();
 
-      final uri     = Uri.parse("${objfun.apiRTIDetailsInsert}$comid");
-      final request = http.MultipartRequest("POST", uri);
+      // ✅ REFACTORED: Using the injected repository
+      final isSuccess = await repository.submitPDOVerification(
+          comId: comId,
+          payload: payload,
+          checkedDetails: checkedDetails
+      );
 
-      request.fields["objReceipt"] = jsonEncode(payload);
-      request.fields["Comid"]      = comid.toString();
-
-      // Attach image files
-      for (final d in checkedDetails) {
-        if (d.imageFile != null) {
-          request.files.add(
-            await http.MultipartFile.fromPath(
-              "Files_${d.Id}",
-              d.imageFile!.path,
-              filename: d.imageFile!.name,
-            ),
-          );
-        }
-      }
-
-      final response = await request.send();
-
-      if (response.statusCode == 200) {
+      if (isSuccess) {
         emit(_s.copyWith(
           isSaving:            false,
           saveSuccessMasterId: e.masterId,
@@ -185,7 +168,7 @@ class PDOBloc extends Bloc<PDOViewEvent, PDOViewState> {
       } else {
         emit(_s.copyWith(
           isSaving:  false,
-          saveError: "Failed to save (${response.statusCode})",
+          saveError: "Failed to save data. Please try again.",
         ));
       }
     } catch (err) {
@@ -197,10 +180,9 @@ class PDOBloc extends Bloc<PDOViewEvent, PDOViewState> {
   }
 
   // ════════════════════════════════════════════════════════════════════════════
-  // RESET SAVE STATUS — after dialog is dismissed
+  // RESET SAVE STATUS
   // ════════════════════════════════════════════════════════════════════════════
-  void _onResetStatus(
-      ResetPDOSaveStatusEvent e, Emitter<PDOViewState> emit) {
+  void _onResetStatus(ResetPDOSaveStatusEvent e, Emitter<PDOViewState> emit) {
     if (state is! PDOViewLoaded) return;
     emit(_s.copyWith(clearSuccess: true, clearError: true));
   }

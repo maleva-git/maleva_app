@@ -5,6 +5,7 @@ import 'package:intl/intl.dart';
 import 'package:maleva/core/models/model.dart';
 import 'package:maleva/core/utils/clsfunction.dart' as objfun;
 import 'package:maleva/core/colors/colors.dart' as colour;
+import '../../../../../../core/di/injection.dart';
 import '../../../../../../core/theme/tokens.dart';
 import '../bloc/inventoryreport_bloc.dart';
 import '../bloc/inventoryreport_event.dart';
@@ -25,10 +26,12 @@ class InventoryPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (_) => InventoryBloc(context),
-      child: const _InventoryBody(),
-    );
+    return
+      BlocProvider(
+        // ✅ Removed 'context' and used our Service Locator (sl) to inject the BLoC and Repository automatically
+        create: (_) => sl<InventoryBloc>(),
+        child: const _InventoryBody(),
+      );
   }
 }
 

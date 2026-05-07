@@ -59,16 +59,23 @@ import '../../features/dashboard/admin_dashboard/tabs/fuelfillings/bloc/fuelfill
 import '../../features/dashboard/admin_dashboard/tabs/fuelfillings/data/fuelfillings_repository.dart';
 import '../../features/dashboard/admin_dashboard/tabs/googlereview/bloc/googlereview_bloc.dart';
 import '../../features/dashboard/admin_dashboard/tabs/googlereview/data/googlereview_repository.dart';
+import '../../features/dashboard/admin_dashboard/tabs/inventoryreport/bloc/inventoryreport_bloc.dart';
+import '../../features/dashboard/admin_dashboard/tabs/inventoryreport/data/inventoryreport_repository.dart';
 import '../../features/dashboard/admin_dashboard/tabs/paymentview/bloc/paymentview_bloc.dart';
 import '../../features/dashboard/admin_dashboard/tabs/paymentview/data/paymentview_repository.dart';
+import '../../features/dashboard/admin_dashboard/tabs/pdo/data/pdo_repository.dart';
 import '../../features/dashboard/admin_dashboard/tabs/pettycash/bloc/pettycash_bloc.dart';
 import '../../features/dashboard/admin_dashboard/tabs/pettycash/data/pettycash_repository.dart';
 import '../../features/dashboard/admin_dashboard/tabs/receiptview/data/receipt_repository.dart';
+import '../../features/dashboard/admin_dashboard/tabs/rtiview/bloc/rtiview_bloc.dart';
+import '../../features/dashboard/admin_dashboard/tabs/rtiview/data/rtiview_repository.dart';
 import '../../features/dashboard/admin_dashboard/tabs/salesorder/data/salesorder_repository.dart';
 import '../../features/dashboard/admin_dashboard/tabs/spareparts/bloc/spareparts_bloc.dart';
 import '../../features/dashboard/admin_dashboard/tabs/spareparts/data/spareparts_repository.dart';
 import '../../features/dashboard/admin_dashboard/tabs/speedingreport/bloc/speeding_bloc.dart';
 import '../../features/dashboard/admin_dashboard/tabs/speedingreport/data/speeding_repository.dart';
+import '../../features/dashboard/admin_dashboard/tabs/spotsaleorder/bloc/spotsaleorder_bloc.dart';
+import '../../features/dashboard/admin_dashboard/tabs/spotsaleorder/data/spotsale_repository.dart';
 import '../../features/dashboard/admin_dashboard/tabs/summonentry/bloc/summonentry_bloc.dart';
 import '../../features/dashboard/admin_dashboard/tabs/summonentry/data/summonentry_repository.dart';
 import '../../features/dashboard/admin_dashboard/tabs/transport/bloc/transport_bloc.dart';
@@ -317,7 +324,32 @@ Future<void> setupDependencies() async {
   sl.registerFactory<PaymentPendingBloc>(
         () => PaymentPendingBloc(repository: sl<PaymentViewRepository>()),
   );
+  sl.registerLazySingleton<SpotSaleRepository>(
+        () => SpotSaleRepository(),
+  );
 
+  // 2. Register the View BLoC as the default factory
+  sl.registerFactory<SpotSaleBloc>(
+        () => SpotSaleBloc.view(repository: sl<SpotSaleRepository>()),
+  );
+  sl.registerLazySingleton<InventoryReportRepository>(
+        () => InventoryReportRepository(),
+  );
+
+  // 2. Register the BLoC
+  sl.registerFactory<InventoryBloc>(
+        () => InventoryBloc(repository: sl<InventoryReportRepository>()),
+  );
+  sl.registerLazySingleton<PDORepository>(
+        () => PDORepository(),
+  );
+  sl.registerLazySingleton<RTIViewRepository>(
+        () => RTIViewRepository(),
+  );
+
+  sl.registerFactory<RTIDetailsBloc>(
+        () => RTIDetailsBloc(repository: sl<RTIViewRepository>()),
+  );
   sl.registerFactory<MaintenanceBloc>(() => MaintenanceBloc());
   sl.registerFactory<DriverLicenseExpiryBloc>(() => DriverLicenseExpiryBloc());
   sl.registerFactory<TruckMaintDashBloc>(() => TruckMaintDashBloc());

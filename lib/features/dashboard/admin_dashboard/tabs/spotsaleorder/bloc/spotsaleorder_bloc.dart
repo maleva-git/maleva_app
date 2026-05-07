@@ -1,42 +1,38 @@
 import 'dart:convert';
 import 'dart:io';
-
-import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
-import 'package:http/http.dart' as http;
 
 import 'package:maleva/core/utils/clsfunction.dart' as objfun;
 import 'package:maleva/core/models/model.dart';
-import 'package:maleva/features/dashboard/admin_dashboard/tabs/spotsaleorder/bloc/spotsaleorder_event.dart';
-import 'package:maleva/features/dashboard/admin_dashboard/tabs/spotsaleorder/bloc/spotsaleorder_state.dart';
-
-
+import '../data/spotsale_repository.dart';
+import 'spotsaleorder_event.dart';
+import 'spotsaleorder_state.dart';
 
 class SpotSaleBloc extends Bloc<SpotSaleEvent, SpotSaleState> {
-  final BuildContext context;
+  final SpotSaleRepository repository; // ✅ Injected Repository
   final int editId;
-  final ImagePicker _picker = ImagePicker();
 
   // ── Entry ─────────────────────────────────────────────────────────────────
-  SpotSaleBloc.form(this.context, {this.editId = 0})
+  SpotSaleBloc.form({required this.repository, this.editId = 0})
       : super(const SpotSaleEntryState()) {
     _register();
     add(const LoadSpotSaleListsEvent());
   }
 
   // ── View ──────────────────────────────────────────────────────────────────
-  SpotSaleBloc.view(this.context, {DateTime? fromDate, DateTime? toDate})
-      : editId = 0,
+  SpotSaleBloc.view({
+    required this.repository,
+    DateTime? fromDate,
+    DateTime? toDate
+  })  : editId = 0,
         super(SpotSaleViewState(
-        fromDate: fromDate ?? DateTime.now(),
+        // ✅ Defaults to 30 days ago
+        fromDate: fromDate ?? DateTime.now().subtract(const Duration(days: 30)),
         toDate:   toDate   ?? DateTime.now(),
       )) {
     _register();
-    if (fromDate != null && toDate != null) {
-      add(const LoadSpotSaleViewEvent());
-    }
+    add(const LoadSpotSaleViewEvent()); // Auto-load since we have defaults
   }
 
   void _register() {
@@ -51,6 +47,8 @@ class SpotSaleBloc extends Bloc<SpotSaleEvent, SpotSaleState> {
     on<PickSpotSaleDocumentEvent>(_onPickDoc);
     on<SubmitSpotSaleEvent>(_onSubmit);
     on<ResetSpotSaleFormEvent>(_onReset);
+
+    // View
     on<SelectViewFromDateEvent>(_onViewFrom);
     on<SelectViewToDateEvent>(_onViewTo);
     on<LoadSpotSaleViewEvent>(_onLoadView);
@@ -64,15 +62,15 @@ class SpotSaleBloc extends Bloc<SpotSaleEvent, SpotSaleState> {
       LoadSpotSaleListsEvent e, Emitter<SpotSaleState> emit) async {
     if (state is! SpotSaleEntryState) return;
 
+    final comId = objfun.storagenew.getInt('Comid') ?? 0;
+
     // Load JobType
     if (objfun.JobTypeList.isEmpty) {
       try {
-        final comid = objfun.storagenew.getInt('Comid') ?? 0;
-        final result = await objfun.apiAllinoneSelect(
-            "${objfun.apiSelectJobType}$comid", null, null, context);
-        if (result.isNotEmpty) {
+        final result = await repository.fetchJobTypes(comId);
+        if (result != null && result is List && result.isNotEmpty) {
           objfun.JobTypeList =
-              result.map((e) => JobTypeModel.fromJson(e)).toList();
+              result.map((e) => JobTypeModel.fromJson(e as Map<String, dynamic>)).toList();
         }
       } catch (_) {}
     }
@@ -80,12 +78,10 @@ class SpotSaleBloc extends Bloc<SpotSaleEvent, SpotSaleState> {
     // Load JobStatus
     if (objfun.JobStatusList.isEmpty) {
       try {
-        final comid = objfun.storagenew.getInt('Comid') ?? 0;
-        final result = await objfun.apiAllinoneSelect(
-            "${objfun.apiSelectJobStatus}$comid", null, null, context);
-        if (result.isNotEmpty) {
+        final result = await repository.fetchJobStatus(comId);
+        if (result != null && result is List && result.isNotEmpty) {
           objfun.JobStatusList =
-              result.map((e) => JobStatusModel.fromJson(e)).toList();
+              result.map((e) => JobStatusModel.fromJson(e as Map<String, dynamic>)).toList();
         }
       } catch (_) {}
     }
@@ -148,13 +144,13 @@ class SpotSaleBloc extends Bloc<SpotSaleEvent, SpotSaleState> {
     emit(s.copyWith(isSubmitting: true));
 
     try {
-      final comid      = objfun.storagenew.getInt('Comid') ?? 0;
+      final comId = objfun.storagenew.getInt('Comid') ?? 0;
       final employeeId = int.tryParse(
           objfun.storagenew.getString('OldUsername') ?? '0') ?? 0;
 
       final body = [
         {
-          "CompanyRefId":  comid,
+          "CompanyRefId":  comId,
           "Id":            editId,
           "EmployeeRefId": employeeId,
           "JobMasterRefId": s.selectedJobType ?? '',
@@ -169,27 +165,19 @@ class SpotSaleBloc extends Bloc<SpotSaleEvent, SpotSaleState> {
         }
       ];
 
-      final uri     = Uri.parse("${objfun.apiInsertSpotSaleEntry}?Comid=$comid");
-      final request = http.MultipartRequest("POST", uri);
-      request.fields["details"] = jsonEncode(body);
-      request.fields["Comid"]   = comid.toString();
+      // ✅ REFACTORED: Using the injected repository
+      final isSuccess = await repository.submitSpotSaleEntry(
+        body: body,
+        comId: comId,
+        image: s.pickedImage,
+        pdf: s.pickedPDF,
+      );
 
-      if (s.pickedImage != null) {
-        request.files
-            .add(await http.MultipartFile.fromPath("Files", s.pickedImage!.path));
-      }
-      if (s.pickedPDF != null) {
-        request.files
-            .add(await http.MultipartFile.fromPath("Files", s.pickedPDF!.path));
-      }
-
-      final response = await request.send();
-
-      if (response.statusCode == 200) {
+      if (isSuccess) {
         emit(const SpotSaleSubmitSuccess());
       } else {
         emit(s.copyWith(isSubmitting: false));
-        emit(SpotSaleEntryError("Server error: ${response.statusCode}"));
+        emit(const SpotSaleEntryError("Server error: Failed to submit"));
       }
     } catch (err) {
       emit(s.copyWith(isSubmitting: false));
@@ -225,15 +213,16 @@ class SpotSaleBloc extends Bloc<SpotSaleEvent, SpotSaleState> {
     try {
       final from = DateFormat('yyyy-MM-dd').format(s.fromDate);
       final to   = DateFormat('yyyy-MM-dd').format(s.toDate);
+      final comId = objfun.storagenew.getInt('Comid') ?? 0;
 
-      final result = await objfun.apiAllinoneSelectArray(
-        "${objfun.apiGetSpotSaleEntry}${objfun.Comid}&Fromdate=$from&Todate=$to&Id=0",
-        null,
-        {'Content-Type': 'application/json; charset=UTF-8'},
-        context,
+      // ✅ REFACTORED: Using the injected repository
+      final result = await repository.fetchSpotSaleRecords(
+          comId: comId,
+          fromDate: from,
+          toDate: to
       );
 
-      final records = result != null
+      final records = result != null && result is List
           ? List<Map<String, dynamic>>.from(result)
           : <Map<String, dynamic>>[];
 
@@ -244,19 +233,6 @@ class SpotSaleBloc extends Bloc<SpotSaleEvent, SpotSaleState> {
         fromDate: s.fromDate,
         toDate:   s.toDate,
       ));
-    }
-  }
-
-  // ── Image picker helper ───────────────────────────────────────────────────
-  Future<void> pickDocument() async {
-    final XFile? picked = await _picker.pickImage(source: ImageSource.gallery);
-    if (picked != null) {
-      final path = picked.path.toLowerCase();
-      if (path.endsWith('.pdf')) {
-        add(PickSpotSaleDocumentEvent(pdf: File(picked.path)));
-      } else {
-        add(PickSpotSaleDocumentEvent(image: File(picked.path)));
-      }
     }
   }
 }

@@ -19,11 +19,13 @@ import '../../admin_dashboard/tabs/fuelfillings/bloc/fuelfillings_event.dart';
 import '../../admin_dashboard/tabs/fuelfillings/view/fuelfillings_tab.dart';
 import '../../admin_dashboard/tabs/inventoryreport/bloc/inventoryreport_bloc.dart';
 import '../../admin_dashboard/tabs/inventoryreport/bloc/inventoryreport_event.dart';
+import '../../admin_dashboard/tabs/inventoryreport/data/inventoryreport_repository.dart';
 import '../../admin_dashboard/tabs/inventoryreport/view/inventoryview_tab.dart';
 import '../../admin_dashboard/tabs/maintenance/bloc/maintenance_bloc.dart';
 import '../../admin_dashboard/tabs/maintenance/bloc/maintenance_event.dart';
 import '../../admin_dashboard/tabs/maintenance/view/maintenance_tab.dart';
 import '../../admin_dashboard/tabs/pdo/bloc/pdo_bloc.dart';
+import '../../admin_dashboard/tabs/pdo/data/pdo_repository.dart';
 import '../../admin_dashboard/tabs/pdo/view/pdo_tab.dart';
 import '../../admin_dashboard/tabs/rtiview/bloc/rtiview_bloc.dart';
 import '../../admin_dashboard/tabs/rtiview/bloc/rtiview_event.dart';
@@ -36,6 +38,7 @@ import '../../admin_dashboard/tabs/speedingreport/bloc/speeding_bloc.dart';
 import '../../admin_dashboard/tabs/speedingreport/bloc/speeding_event.dart';
 import '../../admin_dashboard/tabs/speedingreport/view/speedingreport_view.dart';
 import '../../admin_dashboard/tabs/spotsaleorder/bloc/spotsaleorder_bloc.dart';
+import '../../admin_dashboard/tabs/spotsaleorder/data/spotsale_repository.dart';
 import '../../admin_dashboard/tabs/spotsaleorder/view/spotsaleorder_add.dart';
 import '../../admin_dashboard/tabs/truck/bloc/truck_bloc.dart';
 import '../../admin_dashboard/tabs/truck/view/truckview_tab.dart';
@@ -135,32 +138,34 @@ class _AdminDashboardState extends State<OperationAdminDashboard> with SingleTic
               child: const SparePartsEntryPage(),
             ),
             BlocProvider(
-              create: (context) => SpotSaleBloc.form(context),
+              // ✅ Removed 'context', added named 'repository' parameter
+              create: (_) => SpotSaleBloc.form(
+                repository: sl<SpotSaleRepository>(),
+              ),
               child: const SpotSaleEntryPage(),
             ),
             BlocProvider(
-              create: (context) => InventoryBloc(context)
-                ..add(const LoadInventoryListsEvent()),
+              // ✅ Removed 'context', added named 'repository', and removed the redundant ..add() cascade
+              create: (_) => InventoryBloc(
+                repository: sl<InventoryReportRepository>(),
+              ),
               child: const InventoryPage(),
             ),
             BlocProvider(
-              create: (context) => PDOBloc(
-                context,
-                fromDate: DateFormat('yyyy-MM-dd')
-                    .format(DateTime.now().subtract(const Duration(days: 30))),
+              create: (_) => PDOBloc(
+                repository: sl<PDORepository>(), // ✅ Repository injected here!
+                fromDate: DateFormat('yyyy-MM-dd').format(DateTime.now().subtract(const Duration(days: 30))),
                 toDate: DateFormat('yyyy-MM-dd').format(DateTime.now()),
               ),
               child: PDOViewPage(
-                fromDate: DateFormat('yyyy-MM-dd')
-                    .format(DateTime.now().subtract(const Duration(days: 30))),
+                fromDate: DateFormat('yyyy-MM-dd').format(DateTime.now().subtract(const Duration(days: 30))),
                 toDate: DateFormat('yyyy-MM-dd').format(DateTime.now()),
               ),
             ),
             BlocProvider(
-              create: (context) => RTIDetailsBloc(context)
-                ..add(const LoadRTIDetailsEvent()),
+              create: (_) => sl<RTIDetailsBloc>(),
               child: const RTIDetailsPage(),
-            ),
+            )
           ],
           child: Scaffold(
             body: MobileDashboard(

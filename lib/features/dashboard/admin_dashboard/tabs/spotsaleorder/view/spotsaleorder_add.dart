@@ -1,14 +1,19 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:maleva/core/utils/clsfunction.dart' as objfun;
 import 'package:maleva/core/models/model.dart';
 import 'package:maleva/core/colors/colors.dart' as colour;
 import 'package:maleva/features/dashboard/admin_dashboard/tabs/spotsaleorder/view/spotsaleorder_view.dart';
+import '../../../../../../core/di/injection.dart';
 import '../../../../../../core/theme/tokens.dart';
 import '../bloc/spotsaleorder_bloc.dart';
 import '../bloc/spotsaleorder_event.dart';
 import '../bloc/spotsaleorder_state.dart';
+import '../data/spotsale_repository.dart';
 
 // ── Entry Point ───────────────────────────────────────────────────────────────
 class SpotSaleEntryPage extends StatelessWidget {
@@ -17,10 +22,15 @@ class SpotSaleEntryPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (_) => SpotSaleBloc.form(context, editId: editId),
-      child: const _SpotSaleEntryBody(),
-    );
+    return
+      BlocProvider(
+        create: (_) => SpotSaleBloc.form(
+          repository: sl<SpotSaleRepository>(), // ✅ 1. Inject the repository
+          editId: editId,                       // ✅ 2. Pass your editId here!
+        ),
+        child: const _SpotSaleEntryBody(),
+      );
+
   }
 }
 
@@ -310,7 +320,19 @@ class _SpotSaleEntryBody extends StatelessWidget {
                             color: AppTokens.brandGradientStart)),
                     elevation: 0,
                   ),
-                  onPressed: () => bloc.pickDocument(),
+                  onPressed: () async {
+                    final picker = ImagePicker();
+                    final picked = await picker.pickImage(source: ImageSource.gallery);
+
+                    if (picked != null && context.mounted) {
+                      final path = picked.path.toLowerCase();
+                      if (path.endsWith('.pdf')) {
+                        context.read<SpotSaleBloc>().add(PickSpotSaleDocumentEvent(pdf: File(picked.path)));
+                      } else {
+                        context.read<SpotSaleBloc>().add(PickSpotSaleDocumentEvent(image: File(picked.path)));
+                      }
+                    }
+                  },
                   icon: const Icon(Icons.cloud_upload_rounded),
                   label: Text(
                     (s.pickedImage == null && s.pickedPDF == null)
