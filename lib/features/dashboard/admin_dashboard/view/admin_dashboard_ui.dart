@@ -27,6 +27,7 @@ import '../tabs/forwardingreport/view/forwardingreport_tab.dart';
 import '../tabs/fuel/view/fuelreport_tab.dart';
 import '../tabs/fuelfillings/view/fuelfillings_tab.dart';
 import '../tabs/googlereview/view/googlereview_tab.dart';
+import '../tabs/gpstruckmap/view/gpstruckmap_tab.dart';
 import '../tabs/inventoryreport/view/inventoryview_tab.dart';
 import '../tabs/paymentview/view/paymentview_tab.dart';
 import '../tabs/pdo/view/pdo_tab.dart';
@@ -178,6 +179,7 @@ class MobileDashboard extends StatelessWidget {
           _tab('RTI',             isTablet),
           _tab('AIPredict',       isTablet),
           _tab('AIMaintenance',   isTablet),
+          _tab('LiveMap', isTablet),
         ],
       ),
     );
@@ -247,6 +249,7 @@ class MobileDashboard extends StatelessWidget {
           const RTIDetailsPage(),
           const AISalesForecastWidget(),
           const AIMaintenanceHealthCard(),
+          const GpsTruckMapPage(),
         ],
       ),
     );

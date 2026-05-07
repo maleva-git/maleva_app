@@ -59,6 +59,7 @@ import '../../features/dashboard/admin_dashboard/tabs/fuelfillings/bloc/fuelfill
 import '../../features/dashboard/admin_dashboard/tabs/fuelfillings/data/fuelfillings_repository.dart';
 import '../../features/dashboard/admin_dashboard/tabs/googlereview/bloc/googlereview_bloc.dart';
 import '../../features/dashboard/admin_dashboard/tabs/googlereview/data/googlereview_repository.dart';
+import '../../features/dashboard/admin_dashboard/tabs/gpstruckmap/bloc/gpstruckmap_bloc.dart';
 import '../../features/dashboard/admin_dashboard/tabs/inventoryreport/bloc/inventoryreport_bloc.dart';
 import '../../features/dashboard/admin_dashboard/tabs/inventoryreport/data/inventoryreport_repository.dart';
 import '../../features/dashboard/admin_dashboard/tabs/paymentview/bloc/paymentview_bloc.dart';
@@ -350,6 +351,11 @@ Future<void> setupDependencies() async {
   sl.registerFactory<RTIDetailsBloc>(
         () => RTIDetailsBloc(repository: sl<RTIViewRepository>()),
   );
+
+  sl.registerFactory<GpsTruckMapBloc>(
+        () => GpsTruckMapBloc(),
+  );
+
   sl.registerFactory<MaintenanceBloc>(() => MaintenanceBloc());
   sl.registerFactory<DriverLicenseExpiryBloc>(() => DriverLicenseExpiryBloc());
   sl.registerFactory<TruckMaintDashBloc>(() => TruckMaintDashBloc());
