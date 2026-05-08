@@ -10,17 +10,17 @@ abstract class GpsTruckMapEvent extends Equatable {
   List<Object?> get props => [];
 }
 
-/// Fired once when the tab opens — logs in to Wialon and loads all units
+/// Opens the tab — login + fetch all truck live positions
 class LoadTruckPositions extends GpsTruckMapEvent {
   const LoadTruckPositions();
 }
 
-/// Fired by the 30-second polling timer to refresh positions
+/// 30-second poll timer — refresh live positions
 class RefreshTruckPositions extends GpsTruckMapEvent {
   const RefreshTruckPositions();
 }
 
-/// User tapped a truck marker — load that truck's active sale-order jobs
+/// User tapped a truck marker — show bottom sheet
 class SelectTruck extends GpsTruckMapEvent {
   final TruckPosition truck;
   const SelectTruck(this.truck);
@@ -28,7 +28,15 @@ class SelectTruck extends GpsTruckMapEvent {
   List<Object?> get props => [truck];
 }
 
-/// User dismissed the bottom sheet
+/// User tapped "View Path" — fetch today's route for selected truck
+class LoadTruckPath extends GpsTruckMapEvent {
+  final TruckPosition truck;
+  const LoadTruckPath(this.truck);
+  @override
+  List<Object?> get props => [truck];
+}
+
+/// User dismissed bottom sheet or tapped close on path view
 class ClearSelection extends GpsTruckMapEvent {
   const ClearSelection();
 }
