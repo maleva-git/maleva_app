@@ -5,13 +5,12 @@ import '../../admin_dashboard/tabs/airfreightsales/bloc/airfreightsales_bloc.dar
 import '../../admin_dashboard/tabs/airfreightsales/bloc/airfreightsales_event.dart';
 import '../../admin_dashboard/tabs/airfreightsales/view/airfreightsales_tab.dart';
 import '../../admin_dashboard/tabs/enquiry/view/bloc/enquiry_bloc.dart';
-import '../../admin_dashboard/tabs/enquiry/view/bloc/enquiry_event.dart';
+import '../../admin_dashboard/tabs/enquiry/view/data/enquiry_repository.dart';
 import '../../admin_dashboard/tabs/enquiry/view/view/enquiry_tab.dart';
 import '../../admin_dashboard/tabs/fuel/bloc/fuelreport_bloc.dart';
 import '../../admin_dashboard/tabs/fuel/bloc/fuelreport_event.dart';
 import '../../admin_dashboard/tabs/fuel/view/fuelreport_tab.dart';
 import '../../admin_dashboard/tabs/paymentview/bloc/paymentview_bloc.dart';
-import '../../admin_dashboard/tabs/paymentview/bloc/paymentview_event.dart';
 import '../../admin_dashboard/tabs/paymentview/view/paymentview_tab.dart';
 import '../../admin_dashboard/tabs/transport/bloc/transport_bloc.dart';
 import '../../admin_dashboard/tabs/transport/bloc/transport_event.dart';
@@ -70,8 +69,8 @@ class _SalesDashboardState extends State<SalesDashboard> with SingleTickerProvid
                 ),
                 BlocProvider(
                   create: (_) => EnquiryBloc(
-
-                  )..add( LoadEnquiryEvent()),
+                    repository: sl<EnquiryRepository>(),
+                  ),
                   child: const EnquiryScreen(),
                 ),
                 BlocProvider(

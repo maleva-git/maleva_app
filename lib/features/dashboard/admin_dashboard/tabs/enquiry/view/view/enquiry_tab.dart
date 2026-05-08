@@ -3,22 +3,27 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../../../../../Transaction/SaleOrder/SalesOrderAdd.dart';
 import '../../../../../../../core/colors/colors.dart' as colour;
+import '../../../../../../../core/di/injection.dart';
 import '../../../../../../../core/theme/tokens.dart';
 import '../../../../../../../core/utils/clsfunction.dart' as objfun;
 import '../../add/view/enquiryadd.dart';
 import '../bloc/enquiry_bloc.dart';
 import '../bloc/enquiry_event.dart';
 import '../bloc/enquiry_state.dart';
+import '../data/enquiry_repository.dart';
 
 class EnquiryScreen extends StatelessWidget {
   const EnquiryScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (_) => EnquiryBloc()..add(LoadEnquiryEvent()),
-      child: const _EnquiryView(),
-    );
+    return
+      BlocProvider(
+        create: (_) => EnquiryBloc(
+          repository: sl<EnquiryRepository>(),
+        ),
+        child: const _EnquiryView(),
+      );
   }
 }
 

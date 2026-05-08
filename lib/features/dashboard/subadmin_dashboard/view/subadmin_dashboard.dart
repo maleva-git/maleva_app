@@ -12,6 +12,7 @@ import '../../admin_dashboard/tabs/employeemaster/bloc/employeemaster_bloc.dart'
 import '../../admin_dashboard/tabs/employeemaster/view/employeemaster_tab.dart';
 import '../../admin_dashboard/tabs/enquiry/view/bloc/enquiry_bloc.dart';
 import '../../admin_dashboard/tabs/enquiry/view/bloc/enquiry_event.dart';
+import '../../admin_dashboard/tabs/enquiry/view/data/enquiry_repository.dart';
 import '../../admin_dashboard/tabs/enquiry/view/view/enquiry_tab.dart';
 import '../../admin_dashboard/tabs/googlereview/bloc/googlereview_bloc.dart';
 import '../../admin_dashboard/tabs/googlereview/bloc/googlereview_event.dart';
@@ -101,11 +102,10 @@ class _AdminDashboardState extends State<SubAdminDashboard> with SingleTickerPro
                 ..add(const LoadTransportDataEvent(type: 0)),
               child: const TransportReportPage(),
             ),
-
             BlocProvider(
               create: (_) => EnquiryBloc(
-
-              )..add( LoadEnquiryEvent()),
+                repository: sl<EnquiryRepository>(),
+              ),
               child: const EnquiryScreen(),
             ),
             BlocProvider(

@@ -48,6 +48,8 @@ import '../../features/dashboard/admin_dashboard/tabs/employeemaster/bloc/employ
 import '../../features/dashboard/admin_dashboard/tabs/employeemaster/data/employee_repository.dart';
 import '../../features/dashboard/admin_dashboard/tabs/enginehours/bloc/enginehours_bloc.dart';
 import '../../features/dashboard/admin_dashboard/tabs/enginehours/tab/enginehours_repository.dart';
+import '../../features/dashboard/admin_dashboard/tabs/enquiry/view/bloc/enquiry_bloc.dart';
+import '../../features/dashboard/admin_dashboard/tabs/enquiry/view/data/enquiry_repository.dart';
 import '../../features/dashboard/admin_dashboard/tabs/expensereport/bloc/expensereport_bloc.dart';
 import '../../features/dashboard/admin_dashboard/tabs/expensereport/data/expensereport_repository.dart';
 
@@ -363,6 +365,13 @@ Future<void> setupDependencies() async {
 
   sl.registerFactory<TransportSalesBloc>(
         () => TransportSalesBloc(repository: sl<TransportSalesRepository>()),
+  );
+  sl.registerLazySingleton<EnquiryRepository>(
+        () => EnquiryRepository(),
+  );
+
+  sl.registerFactory<EnquiryBloc>(
+        () => EnquiryBloc(repository: sl<EnquiryRepository>()),
   );
   sl.registerFactory<MaintenanceBloc>(() => MaintenanceBloc());
   sl.registerFactory<DriverLicenseExpiryBloc>(() => DriverLicenseExpiryBloc());

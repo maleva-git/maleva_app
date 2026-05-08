@@ -8,6 +8,7 @@ import '../../admin_dashboard/tabs/emailinbox/bloc/emailinbox_event.dart';
 import '../../admin_dashboard/tabs/emailinbox/view/emailinbox_tab.dart';
 import '../../admin_dashboard/tabs/enquiry/view/bloc/enquiry_bloc.dart';
 import '../../admin_dashboard/tabs/enquiry/view/bloc/enquiry_event.dart';
+import '../../admin_dashboard/tabs/enquiry/view/data/enquiry_repository.dart';
 import '../../admin_dashboard/tabs/enquiry/view/view/enquiry_tab.dart';
 import '../../admin_dashboard/tabs/googlereview/bloc/googlereview_bloc.dart';
 import '../../admin_dashboard/tabs/googlereview/bloc/googlereview_event.dart';
@@ -75,7 +76,8 @@ class _TransportDashboardState extends State<TransportDashboard> with SingleTick
             ),
             BlocProvider(
               create: (_) => EnquiryBloc(
-              )..add( LoadEnquiryEvent()),
+                repository: sl<EnquiryRepository>(),
+              ),
               child: const EnquiryScreen(),
             ),
             BlocProvider(

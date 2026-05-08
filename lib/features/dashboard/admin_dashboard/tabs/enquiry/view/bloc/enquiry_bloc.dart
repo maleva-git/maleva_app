@@ -1,14 +1,20 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
-import '../../../../../../../core/utils/clsfunction.dart' as objfun;
+import 'package:maleva/core/utils/clsfunction.dart' as objfun;
+
+import '../data/enquiry_repository.dart';
 import 'enquiry_event.dart';
 import 'enquiry_state.dart';
 
-
 class EnquiryBloc extends Bloc<EnquiryEvent, EnquiryState> {
-  EnquiryBloc() : super(const EnquiryState()) {
+  final EnquiryRepository repository; // ✅ Injected Repository
+
+  EnquiryBloc({required this.repository}) : super(const EnquiryState()) {
     on<LoadEnquiryEvent>(_onLoadEnquiry);
     on<CancelEnquiryEvent>(_onCancelEnquiry);
+
+    // ✅ Auto-load data when the BLoC is created!
+    add(LoadEnquiryEvent());
   }
 
   Future<void> _onLoadEnquiry(
@@ -16,10 +22,6 @@ class EnquiryBloc extends Bloc<EnquiryEvent, EnquiryState> {
       Emitter<EnquiryState> emit,
       ) async {
     emit(state.copyWith(isLoading: true));
-
-    final Map<String, String> header = {
-      'Content-Type': 'application/json; charset=UTF-8',
-    };
 
     final Map<String, dynamic> master = {
       'Comid': objfun.storagenew.getInt('Comid') ?? 0,
@@ -33,17 +35,13 @@ class EnquiryBloc extends Bloc<EnquiryEvent, EnquiryState> {
     };
 
     try {
-      final resultData = await objfun.apiAllinoneSelectArray(
-        objfun.apiSelectEnquiryMaster,
-        master,
-        header,
-        null,
-      );
+      // ✅ Call the repository
+      final resultData = await repository.fetchEnquiries(master);
 
-      if (resultData != '' && resultData.length != 0) {
+      if (resultData != null && resultData is List && resultData.isNotEmpty) {
         final List<dynamic> list = List<dynamic>.from(resultData);
 
-        // Date format பண்ணுறோம்
+        // Date Format
         for (var i = 0; i < list.length; i++) {
           if (list[i]['ForwardingDate'] == null) {
             list[i]['SForwardingDate'] = '';
@@ -77,20 +75,14 @@ class EnquiryBloc extends Bloc<EnquiryEvent, EnquiryState> {
     final int comId = objfun.storagenew.getInt('Comid') ?? 0;
     const String status = 'CANCEL';
 
-    final Map<String, String> header = {
-      'Content-Type': 'application/json; charset=UTF-8',
-    };
-
     try {
-      final resultData = await objfun.apiAllinoneSelectArray(
-        '${objfun.apiUpdateEnquiryMaster}${event.id}&Comid=$comId&StatusName=$status',
-        null,   // ← original la null தான்
-        header,
-        null,
-      );
+      // ✅ Call the repository
+      final resultData = await repository.cancelEnquiry(event.id, comId, status);
 
-      if (resultData != '') {
-        add(LoadEnquiryEvent()); // reload
+      if (resultData != null && resultData.toString().isNotEmpty) {
+        add(LoadEnquiryEvent()); // reload on success
+      } else {
+        emit(state.copyWith(isLoading: false, errorMessage: "Failed to cancel."));
       }
     } catch (error) {
       emit(state.copyWith(
