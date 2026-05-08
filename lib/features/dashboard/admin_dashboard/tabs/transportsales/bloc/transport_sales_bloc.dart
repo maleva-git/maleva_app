@@ -2,43 +2,40 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 import 'package:maleva/core/utils/clsfunction.dart' as objfun;
 
+import '../data/transport_sales_repository.dart';
 import 'transport_sales_event.dart';
 import 'transport_sales_state.dart';
 
 class TransportSalesBloc extends Bloc<TransportSalesEvent, TransportSalesState> {
-  TransportSalesBloc() : super(const TransportSalesState()) {
+  final TransportSalesRepository repository; // ✅ Injected Repository
+
+  TransportSalesBloc({required this.repository}) : super(const TransportSalesState()) {
     on<InitTransportSalesEvent>(_onInit);
     on<ChangeEmployeeEvent>(_onChangeEmployee);
     on<LoadSalesDataEvent>(_onLoadSalesData);
+
+    // Auto-trigger initialization when created
+    add(const InitTransportSalesEvent());
   }
 
   Future<void> _onInit(
       InitTransportSalesEvent event, Emitter<TransportSalesState> emit) async {
     emit(state.copyWith(status: TransportSalesStatus.loading));
 
-    Map<String, String> header = {
-      'Content-Type': 'application/json; charset=UTF-8',
-    };
-
-    Map<String, dynamic> master = {
-      'Comid': objfun.storagenew.getInt('Comid') ?? 0,
-      "Employeeid": objfun.EmpRefId,
-    };
+    final comId = objfun.storagenew.getInt('Comid') ?? 0;
+    final empId = objfun.EmpRefId;
 
     try {
-      final resultData = await objfun.apiAllinoneSelectArray(
-          objfun.LoadRulesType, master, header, event.context);
+      // ✅ Call Repository
+      final resultData = await repository.fetchRules(comId, empId);
 
-      if (resultData != "" && resultData != null) {
-        List<Map<String, dynamic>> rules = [];
-        for (var item in resultData) {
-          rules.add(item as Map<String, dynamic>);
-        }
+      if (resultData != null && resultData is List) {
+        List<Map<String, dynamic>> rules = resultData.map((e) => e as Map<String, dynamic>).toList();
 
         String? defaultEmpId;
         final ids = rules.map((e) => e['Id'].toString()).toList();
-        if (ids.contains(objfun.EmpRefId.toString())) {
-          defaultEmpId = objfun.EmpRefId.toString();
+        if (ids.contains(empId.toString())) {
+          defaultEmpId = empId.toString();
         }
 
         emit(state.copyWith(
@@ -47,7 +44,7 @@ class TransportSalesBloc extends Bloc<TransportSalesEvent, TransportSalesState> 
         ));
 
         // Load data initially right after setting up the employee
-        add(LoadSalesDataEvent(event.context));
+        add(const LoadSalesDataEvent());
       }
     } catch (e) {
       emit(state.copyWith(
@@ -59,16 +56,12 @@ class TransportSalesBloc extends Bloc<TransportSalesEvent, TransportSalesState> 
       ChangeEmployeeEvent event, Emitter<TransportSalesState> emit) async {
     emit(state.copyWith(
         selectedEmpId: event.empId, status: TransportSalesStatus.loading));
-    add(LoadSalesDataEvent(event.context));
+    add(const LoadSalesDataEvent());
   }
 
   Future<void> _onLoadSalesData(
       LoadSalesDataEvent event, Emitter<TransportSalesState> emit) async {
     emit(state.copyWith(status: TransportSalesStatus.loading));
-
-    Map<String, String> header = {
-      'Content-Type': 'application/json; charset=UTF-8',
-    };
 
     DateTime now = DateTime.now();
     DateTime firstDayOfMonth = DateTime(now.year, now.month, 1);
@@ -79,92 +72,39 @@ class TransportSalesBloc extends Bloc<TransportSalesEvent, TransportSalesState> 
     int comId = objfun.storagenew.getInt('Comid') ?? 0;
 
     try {
-      // 1. Without Invoice Count
-      var withoutInvoiceResult = await objfun.apiAllinoneSelectArray(
-          objfun.SaleInvoiceCountDB,
-          {
-            'Comid': comId,
-            'Fromdate': "2024-10-01",
-            'Todate': toDate,
-            "Statusid": 0,
-            "Employeeid": empId,
-            "Remarks": 2,
-            "Search": "0",
-            "completestatusnotshow": false,
-            "Invoice": false,
-          },
-          header,
-          event.context);
+      // ✅ Parallel API Calls using the Repository
+      final responses = await Future.wait([
+        repository.fetchInvoiceCount({
+          'Comid': comId, 'Fromdate': "2024-10-01", 'Todate': toDate, "Statusid": 0,
+          "Employeeid": empId, "Remarks": 2, "Search": "0", "completestatusnotshow": false, "Invoice": false,
+        }),
+        repository.fetchInvoiceCount({
+          'Comid': comId, 'Fromdate': fromDate, 'Todate': toDate, "Statusid": 0,
+          "Employeeid": empId, "Remarks": 0, "Search": "0", "completestatusnotshow": false, "Invoice": false,
+        }),
+        repository.fetchInvoiceCount({
+          'Comid': comId, 'Fromdate': fromDate, 'Todate': toDate, "Statusid": 0,
+          "Employeeid": empId, "Remarks": 1, "Search": "0", "completestatusnotshow": false, "Invoice": false,
+        }),
+        repository.fetchInvoiceCount({
+          'Comid': comId, 'Fromdate': fromDate, 'Todate': toDate, "Statusid": 0,
+          "Employeeid": empId, "Remarks": 2, "Search": "0", "completestatusnotshow": false, "Invoice": false,
+        }),
+        repository.fetchOrderStatus(comId, empId),
+      ]);
 
-      // 2. Total Count
-      var totalResult = await objfun.apiAllinoneSelectArray(
-          objfun.SaleInvoiceCountDB,
-          {
-            'Comid': comId,
-            'Fromdate': fromDate,
-            'Todate': toDate,
-            "Statusid": 0,
-            "Employeeid": empId,
-            "Remarks": 0,
-            "Search": "0",
-            "completestatusnotshow": false,
-            "Invoice": false,
-          },
-          header,
-          event.context);
-
-      // 3. Billed Count
-      var billedResult = await objfun.apiAllinoneSelectArray(
-          objfun.SaleInvoiceCountDB,
-          {
-            'Comid': comId,
-            'Fromdate': fromDate,
-            'Todate': toDate,
-            "Statusid": 0,
-            "Employeeid": empId,
-            "Remarks": 1,
-            "Search": "0",
-            "completestatusnotshow": false,
-            "Invoice": false,
-          },
-          header,
-          event.context);
-
-      // 4. UnBilled Count
-      var unbilledResult = await objfun.apiAllinoneSelectArray(
-          objfun.SaleInvoiceCountDB,
-          {
-            'Comid': comId,
-            'Fromdate': fromDate,
-            'Todate': toDate,
-            "Statusid": 0,
-            "Employeeid": empId,
-            "Remarks": 2,
-            "Search": "0",
-            "completestatusnotshow": false,
-            "Invoice": false,
-          },
-          header,
-          event.context);
-
-      // 5. Sales Report Data
-      var salesReportResult = await objfun.apiAllinoneSelectArray(
-          objfun.SelectSalesOrderStatus,
-          {
-            'Comid': comId,
-            "Employeeid": empId,
-          },
-          header,
-          event.context);
+      final withoutInvoiceResult = responses[0];
+      final totalResult = responses[1];
+      final billedResult = responses[2];
+      final unbilledResult = responses[3];
+      final salesReportResult = responses[4];
 
       emit(state.copyWith(
         status: TransportSalesStatus.success,
-        withoutInvoiceCount:
-        (withoutInvoiceResult is List) ? withoutInvoiceResult.length : 0,
+        withoutInvoiceCount: (withoutInvoiceResult is List) ? withoutInvoiceResult.length : 0,
         totalCount: (totalResult is List) ? totalResult.length : 0,
         totalBilledCount: (billedResult is List) ? billedResult.length : 0,
-        totalUnBilledCount:
-        (unbilledResult is List) ? unbilledResult.length : 0,
+        totalUnBilledCount: (unbilledResult is List) ? unbilledResult.length : 0,
         salesReport: salesReportResult is List ? salesReportResult : [],
       ));
     } catch (e) {

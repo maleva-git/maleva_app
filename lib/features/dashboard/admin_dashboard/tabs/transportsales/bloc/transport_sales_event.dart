@@ -1,5 +1,4 @@
 import 'package:equatable/equatable.dart';
-import 'package:flutter/material.dart';
 
 abstract class TransportSalesEvent extends Equatable {
   const TransportSalesEvent();
@@ -9,26 +8,17 @@ abstract class TransportSalesEvent extends Equatable {
 }
 
 class InitTransportSalesEvent extends TransportSalesEvent {
-  final BuildContext context;
-  const InitTransportSalesEvent(this.context);
-
-  @override
-  List<Object?> get props => [context];
+  const InitTransportSalesEvent();
 }
 
 class ChangeEmployeeEvent extends TransportSalesEvent {
-  final BuildContext context;
   final String empId;
-  const ChangeEmployeeEvent(this.context, this.empId);
+  const ChangeEmployeeEvent(this.empId);
 
   @override
-  List<Object?> get props => [context, empId];
+  List<Object?> get props => [empId];
 }
 
 class LoadSalesDataEvent extends TransportSalesEvent {
-  final BuildContext context;
-  const LoadSalesDataEvent(this.context);
-
-  @override
-  List<Object?> get props => [context];
+  const LoadSalesDataEvent();
 }

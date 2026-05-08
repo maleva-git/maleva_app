@@ -20,6 +20,7 @@ import '../../admin_dashboard/tabs/transport/bloc/transport_event.dart';
 import '../../admin_dashboard/tabs/transport/view/transportview_tab.dart';
 import '../../admin_dashboard/tabs/transportsales/bloc/transport_sales_bloc.dart';
 import '../../admin_dashboard/tabs/transportsales/bloc/transport_sales_event.dart';
+import '../../admin_dashboard/tabs/transportsales/data/transport_sales_repository.dart';
 import '../../admin_dashboard/tabs/transportsales/view/transport_sales_tab.dart';
 import '../bloc/transport_bloc.dart';
 import '../bloc/transport_event.dart';
@@ -78,9 +79,10 @@ class _TransportDashboardState extends State<TransportDashboard> with SingleTick
               child: const EnquiryScreen(),
             ),
             BlocProvider(
-              create: (context) => TransportSalesBloc()
-                ..add(InitTransportSalesEvent(context)), // Passed 'context' here
-              child: const TransportSalesTab(), // Or _TransportSalesTabView() depending on where this is placed
+              create: (_) => TransportSalesBloc(
+                repository: sl<TransportSalesRepository>(),
+              ),
+              child: const TransportSalesTab(),
             ),
             BlocProvider(
               create: (_) => PDOBloc(

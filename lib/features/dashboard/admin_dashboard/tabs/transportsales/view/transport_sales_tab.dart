@@ -5,9 +5,11 @@ import 'package:intl/intl.dart';
 import 'package:maleva/core/colors/colors.dart' as colour;
 import 'package:maleva/core/theme/tokens.dart';
 
+import '../../../../../../core/di/injection.dart';
 import '../bloc/transport_sales_bloc.dart';
 import '../bloc/transport_sales_event.dart';
-import '../bloc/transport_sales_state.dart'; // Make sure this import matches your project structure
+import '../bloc/transport_sales_state.dart';
+import '../data/transport_sales_repository.dart'; // Make sure this import matches your project structure
 
 
 class TransportSalesTab extends StatelessWidget {
@@ -15,11 +17,13 @@ class TransportSalesTab extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (context) =>
-      TransportSalesBloc()..add(InitTransportSalesEvent(context)),
-      child: const _TransportSalesTabView(),
-    );
+    return
+      BlocProvider(
+        create: (_) => TransportSalesBloc(
+          repository: sl<TransportSalesRepository>(),
+        ),
+        child: const _TransportSalesTabView(),
+      );
   }
 }
 
@@ -119,7 +123,8 @@ class _TransportSalesTabView extends StatelessWidget {
                             if (value != null) {
                               context
                                   .read<TransportSalesBloc>()
-                                  .add(ChangeEmployeeEvent(context, value));
+                              // ✅ Removed 'context' - just pass the string!
+                                  .add(ChangeEmployeeEvent(value));
                             }
                           },
                           style: GoogleFonts.poppins(

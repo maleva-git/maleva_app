@@ -81,6 +81,8 @@ import '../../features/dashboard/admin_dashboard/tabs/summonentry/bloc/summonent
 import '../../features/dashboard/admin_dashboard/tabs/summonentry/data/summonentry_repository.dart';
 import '../../features/dashboard/admin_dashboard/tabs/transport/bloc/transport_bloc.dart';
 import '../../features/dashboard/admin_dashboard/tabs/transport/data/transport_repository.dart';
+import '../../features/dashboard/admin_dashboard/tabs/transportsales/bloc/transport_sales_bloc.dart';
+import '../../features/dashboard/admin_dashboard/tabs/transportsales/data/transport_sales_repository.dart';
 import '../../features/dashboard/admin_dashboard/tabs/truck/bloc/truck_bloc.dart';
 import '../../features/dashboard/admin_dashboard/tabs/truck/data/truck_repository.dart';
 import '../../features/dashboard/admin_dashboard/tabs/vesselreport/bloc/vesselreport_bloc.dart';
@@ -355,7 +357,13 @@ Future<void> setupDependencies() async {
   sl.registerFactory<GpsTruckMapBloc>(
         () => GpsTruckMapBloc(),
   );
+  sl.registerLazySingleton<TransportSalesRepository>(
+        () => TransportSalesRepository(),
+  );
 
+  sl.registerFactory<TransportSalesBloc>(
+        () => TransportSalesBloc(repository: sl<TransportSalesRepository>()),
+  );
   sl.registerFactory<MaintenanceBloc>(() => MaintenanceBloc());
   sl.registerFactory<DriverLicenseExpiryBloc>(() => DriverLicenseExpiryBloc());
   sl.registerFactory<TruckMaintDashBloc>(() => TruckMaintDashBloc());
