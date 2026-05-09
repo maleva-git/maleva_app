@@ -29,6 +29,9 @@ import '../../admin_dashboard/tabs/salesorder/view/salesorderview_tab.dart';
 import '../../admin_dashboard/tabs/spotsaleorder/bloc/spotsaleorder_bloc.dart';
 import '../../admin_dashboard/tabs/spotsaleorder/data/spotsale_repository.dart';
 import '../../admin_dashboard/tabs/spotsaleorder/view/spotsaleorder_add.dart';
+import '../../admin_dashboard/tabs/subadminsale/bloc/salesreport bloc.dart';
+import '../../admin_dashboard/tabs/subadminsale/bloc/salesreport event.dart';
+import '../../admin_dashboard/tabs/subadminsale/view/salesreport view.dart';
 import '../../admin_dashboard/tabs/transport/bloc/transport_bloc.dart';
 import '../../admin_dashboard/tabs/transport/bloc/transport_event.dart';
 import '../../admin_dashboard/tabs/transport/view/transportview_tab.dart';
@@ -51,7 +54,7 @@ class _AdminDashboardState extends State<SubAdminDashboard> with SingleTickerPro
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 10, vsync: this);
+    _tabController = TabController(length: 11, vsync: this);
     _tabController.addListener(_onTabChanged);
 
   }
@@ -112,6 +115,11 @@ class _AdminDashboardState extends State<SubAdminDashboard> with SingleTickerPro
               create: (context) => sl<EmailBloc>()..add(const LoadEmployeesEvent()),
               child: const EmailPage(), // Remember to add BlocListener here if you want SnackBars for EmailError or EmailSaveSuccess!
             ),
+            BlocProvider(
+              create: (context) => sl<SalesReportBloc>()..add(const LoadSalesReportEvent()),
+              child: const SalesReportPage(), // Remember to add BlocListener here if you want SnackBars for EmailError or EmailSaveSuccess!
+            ),
+
             BlocProvider(
               create: (context) => sl<ReviewBloc>()..add(const LoadEmployeeEvent()),
               child: const ReviewEntryPage(), // Add BlocListener here to listen for ReviewSaveSuccess and ReviewError!

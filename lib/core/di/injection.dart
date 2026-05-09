@@ -38,6 +38,7 @@ import 'package:maleva/features/dashboard/admin_dashboard/tabs/stockinentry/bloc
 import 'package:maleva/features/dashboard/admin_dashboard/tabs/stocktransfer/bloc/stock_transfer_bloc.dart';
 import 'package:maleva/features/dashboard/admin_dashboard/tabs/stockupdate/bloc/stock_update_bloc.dart';
 
+import '../../features/dashboard/admin_dashboard/tabs/airfreightsales/data/airfreight_repository.dart';
 import '../../features/dashboard/admin_dashboard/tabs/bocheck/bloc/bocheck_bloc.dart';
 import '../../features/dashboard/admin_dashboard/tabs/bocheck/data/bocheck_repository.dart';
 import '../../features/dashboard/admin_dashboard/tabs/driver/bloc/driverdetails_bloc.dart';
@@ -79,6 +80,8 @@ import '../../features/dashboard/admin_dashboard/tabs/speedingreport/bloc/speedi
 import '../../features/dashboard/admin_dashboard/tabs/speedingreport/data/speeding_repository.dart';
 import '../../features/dashboard/admin_dashboard/tabs/spotsaleorder/bloc/spotsaleorder_bloc.dart';
 import '../../features/dashboard/admin_dashboard/tabs/spotsaleorder/data/spotsale_repository.dart';
+import '../../features/dashboard/admin_dashboard/tabs/subadminsale/bloc/salesreport bloc.dart';
+import '../../features/dashboard/admin_dashboard/tabs/subadminsale/data/salesreport_repository.dart';
 import '../../features/dashboard/admin_dashboard/tabs/summonentry/bloc/summonentry_bloc.dart';
 import '../../features/dashboard/admin_dashboard/tabs/summonentry/data/summonentry_repository.dart';
 import '../../features/dashboard/admin_dashboard/tabs/transport/bloc/transport_bloc.dart';
@@ -373,12 +376,27 @@ Future<void> setupDependencies() async {
   sl.registerFactory<EnquiryBloc>(
         () => EnquiryBloc(repository: sl<EnquiryRepository>()),
   );
+  sl.registerLazySingleton<SalesReportRepository>(
+        () => SalesReportRepository(),
+  );
+
+  sl.registerFactory<SalesReportBloc>(
+        () => SalesReportBloc(repository: sl<SalesReportRepository>()),
+  );
+  sl.registerLazySingleton<AirfreightRepository>(
+        () => AirfreightRepository(),
+  );
+
+  sl.registerFactory<AirfreightBloc>(
+        () => AirfreightBloc(repository: sl<AirfreightRepository>()),
+  );
+
   sl.registerFactory<MaintenanceBloc>(() => MaintenanceBloc());
   sl.registerFactory<DriverLicenseExpiryBloc>(() => DriverLicenseExpiryBloc());
   sl.registerFactory<TruckMaintDashBloc>(() => TruckMaintDashBloc());
   sl.registerFactory<DriverSalaryBloc>(() => DriverSalaryBloc());
   // sl.registerFactory<ReceiptBloc>(() => ReceiptBloc());
-  sl.registerFactory<CustomerDashboardBloc>(() => CustomerDashboardBloc());
+  // sl.registerFactory<CustomerDashboardBloc>(() => CustomerDashboardBloc());
   sl.registerFactory<StockInEntryBloc>(() => StockInEntryBloc());
   sl.registerFactory<StockTransferBloc>(() => StockTransferBloc());
   sl.registerFactory<StockUpdateBloc>(() => StockUpdateBloc());

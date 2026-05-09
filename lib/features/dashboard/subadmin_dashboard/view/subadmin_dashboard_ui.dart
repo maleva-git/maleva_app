@@ -1,7 +1,6 @@
 import 'package:flutter/Material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:intl/intl.dart';
 import 'package:maleva/core/utils/clsfunction.dart' as objfun;
 import 'package:maleva/core/colors/colors.dart' as colour;
 import '../../../../SaleOrderView/SaleOrderView.dart';
@@ -13,33 +12,16 @@ import '../../../common_updates/blocs/sales/sales_bloc.dart';
 import '../../../common_updates/blocs/sales/sales_event.dart';
 import '../../../common_updates/blocs/truck/truck_bloc.dart';
 import '../../../common_updates/blocs/truck/truck_event.dart';
-import '../../admin_dashboard/bloc/admin_tab_bloc.dart';
-import '../../admin_dashboard/bloc/admin_tab_state.dart';
-import '../../admin_dashboard/tabs/ExpenseReport/view/expensereport_tab.dart';
-import '../../admin_dashboard/tabs/bocheck/view/bocheck_tab.dart';
-import '../../admin_dashboard/tabs/driver/view/driverdetails_tab.dart';
 import '../../admin_dashboard/tabs/emailinbox/view/emailinbox_tab.dart';
 import '../../admin_dashboard/tabs/employeemaster/view/employeemaster_tab.dart';
-import '../../admin_dashboard/tabs/enginehours/view/enginehours_tab.dart';
 import '../../admin_dashboard/tabs/enquiry/view/view/enquiry_tab.dart';
-import '../../admin_dashboard/tabs/forwardingreport/view/forwardingreport_tab.dart';
-import '../../admin_dashboard/tabs/fuel/view/fuelreport_tab.dart';
-import '../../admin_dashboard/tabs/fuelfillings/view/fuelfillings_tab.dart';
 import '../../admin_dashboard/tabs/googlereview/view/googlereview_tab.dart';
 import '../../admin_dashboard/tabs/inventoryreport/view/inventoryview_tab.dart';
 import '../../admin_dashboard/tabs/invoice/view/invoice_tab.dart';
-import '../../admin_dashboard/tabs/paymentview/view/paymentview_tab.dart';
-import '../../admin_dashboard/tabs/pdo/view/pdo_tab.dart';
-import '../../admin_dashboard/tabs/pettycash/view/pettycash_tab.dart';
-import '../../admin_dashboard/tabs/receiptview/view/receiptview_tab.dart';
-import '../../admin_dashboard/tabs/rtiview/view/rtiview_tab.dart';
 import '../../admin_dashboard/tabs/salesorder/view/salesorderview_tab.dart';
-import '../../admin_dashboard/tabs/spareparts/view/sparepartsadd.dart';
-import '../../admin_dashboard/tabs/speedingreport/view/speedingreport_view.dart';
 import '../../admin_dashboard/tabs/spotsaleorder/view/spotsaleorder_add.dart';
-import '../../admin_dashboard/tabs/summonentry/view/summonentry_tab.dart';
+import '../../admin_dashboard/tabs/subadminsale/view/salesreport view.dart';
 import '../../admin_dashboard/tabs/transport/view/transportview_tab.dart';
-import '../../admin_dashboard/tabs/truck/view/truckview_tab.dart';
 import '../../admin_dashboard/tabs/vesselreport/view/vesselreportview_tab.dart';
 import '../bloc/subadmin_dashboard_bloc.dart';
 import '../bloc/subadmin_dashboard_state.dart';
@@ -73,7 +55,7 @@ class MobileDashboard extends StatelessWidget {
       backgroundColor: AppColors.appBarColor,
       toolbarHeight: isTablet ? 64 : 56,
       title: Text(
-        'Dash Board',
+        'Sub-Admin',
         style: GoogleFonts.lato(
           color: colour.topAppBarColor,
           fontWeight: FontWeight.bold,
@@ -155,6 +137,7 @@ class MobileDashboard extends StatelessWidget {
         tabs: [
           _tab('Invoice',         isTablet),  // ← isTablet pass பண்ணு
           _tab('SO',              isTablet),
+          _tab('Sales',              isTablet),
           _tab('VSL',             isTablet),
           _tab('TRANSPORT',       isTablet),
           _tab('ENQUIRY',         isTablet),
@@ -203,6 +186,7 @@ class MobileDashboard extends StatelessWidget {
         children: [
           const InvoiceTab(),
           const SalesOrderTab(),
+          const SalesReportPage(),
           const VesselReportPage(),
           const TransportReportPage(),
           const EnquiryScreen(),
@@ -211,6 +195,7 @@ class MobileDashboard extends StatelessWidget {
           const EmployeeViewPage(),
           const SpotSaleEntryPage(),
           const InventoryPage(),
+
 
         ],
       ),

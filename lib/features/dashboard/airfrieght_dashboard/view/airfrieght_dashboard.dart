@@ -52,9 +52,9 @@ class _SalesDashboardState extends State<SalesDashboard> with SingleTickerProvid
               providers: [
                 BlocProvider(create: (context) => SalesDashboardBloc()),
                 BlocProvider(
-                  create: (_) => CustomerDashboardBloc(
-                  )..add( LoadSalesDataEvent(0)),
-                  child:  const CustomerDashboardScreen(),
+                  // ✅ No ..add() cascade needed, and GetIt injects the repository automatically!
+                  create: (_) => sl<AirfreightBloc>(),
+                  child: const AirfreightSales(),
                 ),
                 BlocProvider(
                   create: (context) => sl<VesselBloc>()

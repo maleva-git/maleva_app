@@ -1,6 +1,6 @@
 
 
-class CustomerDashboardState {
+class AirfreightState {
   final bool isLoading;
   final List<Map<String, dynamic>> rulesTypeEmployee;
   final String dropdownValueEmp;
@@ -12,7 +12,7 @@ class CustomerDashboardState {
   final int totalUnBilledCount;
   final List<dynamic> salesReport;
 
-  const CustomerDashboardState({
+  const AirfreightState({
     this.isLoading = false,
     this.rulesTypeEmployee = const [],
     this.dropdownValueEmp = '',
@@ -24,7 +24,7 @@ class CustomerDashboardState {
     this.salesReport = const [],
   });
 
-  CustomerDashboardState copyWith({
+  AirfreightState copyWith({
     bool? isLoading,
     List<Map<String, dynamic>>? rulesTypeEmployee,
     String? dropdownValueEmp,
@@ -35,7 +35,7 @@ class CustomerDashboardState {
     int? totalUnBilledCount,
     List<dynamic>? salesReport,
   }) {
-    return CustomerDashboardState(
+    return AirfreightState(
       isLoading: isLoading ?? this.isLoading,
       rulesTypeEmployee: rulesTypeEmployee ?? this.rulesTypeEmployee,
       dropdownValueEmp: dropdownValueEmp ?? this.dropdownValueEmp,

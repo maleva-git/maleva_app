@@ -20,7 +20,7 @@ class ReviewGridPage extends StatelessWidget {
     return
 
     BlocProvider(
-      create: (context) => sl<ReviewBloc>()..add(const LoadEmployeeEvent()),
+      create: (context) => sl<ReviewBloc>()..add(const LoadGridEmployeesEvent()),
       child: const _ReviewGridBody(), // Add BlocListener here to listen for ReviewSaveSuccess and ReviewError!
     );
   }

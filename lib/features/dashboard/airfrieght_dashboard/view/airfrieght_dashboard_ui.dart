@@ -161,7 +161,7 @@ Tab _tab(String text, bool isTablet) => Tab(
         child: TabBarView(
           controller: tabController,
           children: [
-            const CustomerDashboardScreen(),
+            const AirfreightSales(),
             const VesselReportPage(),
             const TransportReportPage(),
             const EnquiryScreen(),
