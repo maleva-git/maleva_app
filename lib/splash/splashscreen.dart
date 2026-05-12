@@ -26,6 +26,8 @@ import '../features/dashboard/admin_dashboard/view/admin_dashboard.dart';
 import '../features/dashboard/airfrieght_dashboard/view/airfrieght_dashboard.dart';
 import '../features/dashboard/driver_dashboard/bloc/driver_bloc.dart';
 import '../features/dashboard/driver_dashboard/view/driver_dashboard.dart';
+import '../features/dashboard/hradmin_dashboard/bloc/hradmin_bloc.dart';
+import '../features/dashboard/hradmin_dashboard/view/hradmin_dashboard.dart';
 import '../features/dashboard/operationadmin_dashboard/bloc/operationadmin_dashboard_bloc.dart';
 import '../features/dashboard/operationadmin_dashboard/view/operationadmin_dashboard.dart';
 import '../features/dashboard/payable_dashboard/bloc/payable_dasboard_bloc.dart';
@@ -249,7 +251,30 @@ class _SplashScreenState extends State<SplashScreen>
           );
 
         }
+    // case "HRADMIN":
+    // Navigator.pushReplacement(
+    // context,
+    // MaterialPageRoute(
+    // builder: (_) => BlocProvider(
+    // create: (_) => HrAdminTabBloc(),
+    // child: const HrAdminDashboard(),
+    // ),
+    // ),
+    // );
+    // break;
+        else if(objfun.storagenew.getString('RulesType') == "HRADMIN")
+        {
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+              builder: (_) => BlocProvider(
+                create: (_) => HrAdminTabBloc(),
+                child: const HrAdminDashboard(),
+              ),
+            ),
+          );
 
+        }
         else if(objfun.storagenew.getString('RulesType') == "AIR FRIEGHT")
         {
           Navigator.push(context, MaterialPageRoute(builder: (context) => const AirFrieghtDashboard()));

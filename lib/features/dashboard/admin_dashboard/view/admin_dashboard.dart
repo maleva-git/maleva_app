@@ -209,10 +209,10 @@ class _AdminDashboardState extends State<NewAdminDashboard> with SingleTickerPro
               create: (context) => sl<FuelDiffBloc>()..add(const LoadFuelDiffEvent()),
               child: const FuelDiffPage(), // Remember to add BlocListener here if you want to show SnackBars for FuelDiffError!
             ),
-        BlocProvider(
-        create: (context) => sl<EmployeeMasterBloc>(),
-        child: const EmployeeViewPage(),
-        ),
+            BlocProvider(
+            create: (context) => sl<EmployeeMasterBloc>(),
+            child: const EmployeeViewPage(),
+            ),
             BlocProvider(
               create: (context) => sl<PettyCashBloc>()..add(const LoadPettyCashEvent()),
               child: const PettyCashPage(),

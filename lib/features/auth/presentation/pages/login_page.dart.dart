@@ -6,6 +6,8 @@ import '../../../dashboard/airfrieght_dashboard/bloc/airfreight_bloc.dart';
 import '../../../dashboard/airfrieght_dashboard/view/airfrieght_dashboard.dart';
 import '../../../dashboard/driver_dashboard/bloc/driver_bloc.dart';
 import '../../../dashboard/driver_dashboard/view/driver_dashboard.dart';
+import '../../../dashboard/hradmin_dashboard/bloc/hradmin_bloc.dart';
+import '../../../dashboard/hradmin_dashboard/view/hradmin_dashboard.dart';
 import '../../../dashboard/operationadmin_dashboard/bloc/operationadmin_dashboard_bloc.dart';
 import '../../../dashboard/operationadmin_dashboard/view/operationadmin_dashboard.dart';
 import '../../../dashboard/payable_dashboard/bloc/payable_dasboard_bloc.dart';
@@ -141,6 +143,18 @@ class Appuserloginmobile extends StatelessWidget {
           ),
         );
         break;
+      case "HRADMIN":
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (_) => BlocProvider(
+              create: (_) => HrAdminTabBloc(),
+              child: const HrAdminDashboard(),
+            ),
+          ),
+        );
+        break;
+
     // else if(objfun.storagenew.getString('RulesType') == "TRANSPORTATION")
     // {
     // Navigator.push(context, MaterialPageRoute(builder: (context) => const TransportDashboard()));
