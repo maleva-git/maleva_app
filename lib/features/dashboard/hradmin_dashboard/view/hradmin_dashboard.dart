@@ -8,8 +8,6 @@ import '../../../common_updates/blocs/truck/truck_bloc.dart';
 import '../../admin_dashboard/tabs/driver/bloc/driverdetails_bloc.dart';
 import '../../admin_dashboard/tabs/driver/bloc/driverdetails_event.dart';
 import '../../admin_dashboard/tabs/driver/view/driverdetails_tab.dart';
-import '../../admin_dashboard/tabs/driversalary/bloc/driversalary_bloc.dart';
-import '../../admin_dashboard/tabs/driversalary/view/driversalary_tab.dart';
 import '../../admin_dashboard/tabs/emailinbox/bloc/emailinbox_bloc.dart';
 import '../../admin_dashboard/tabs/emailinbox/bloc/emailinbox_event.dart';
 import '../../admin_dashboard/tabs/emailinbox/view/emailinbox_tab.dart';
@@ -37,6 +35,8 @@ import '../../admin_dashboard/tabs/invoice/bloc/invoice_bloc.dart';
 import '../../admin_dashboard/tabs/invoice/bloc/invoice_event.dart';
 import '../../admin_dashboard/tabs/invoice/data/invoice_repository.dart';
 import '../../admin_dashboard/tabs/invoice/view/invoice_tab.dart';
+import '../../admin_dashboard/tabs/license/bloc/license_bloc.dart';
+import '../../admin_dashboard/tabs/license/bloc/license_event.dart';
 import '../../admin_dashboard/tabs/salesorder/view/salesorderview_tab.dart';
 import '../../admin_dashboard/tabs/spareparts/bloc/spareparts_bloc.dart';
 import '../../admin_dashboard/tabs/spareparts/data/spareparts_repository.dart';
@@ -140,8 +140,8 @@ class _HrAdminDashboardState extends State<HrAdminDashboard> with SingleTickerPr
               child: const SparePartsEntryPage(),
             ),
             BlocProvider(
-              create: (context) => DriverSalaryBloc(),
-              child: const DriverSalaryWidget(),
+              create: (context) => sl<LicenseBloc>()..add(const LoadLicenseEvent()),
+              child: const LicensePage(), // Make sure to add a BlocListener inside here if you want to show snackbars for TruckErrorState!
             ),
 
           ],

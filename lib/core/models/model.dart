@@ -3412,52 +3412,149 @@ class BillViewModel {
         Remarks = null,
         NetAmt = 0.0;
 }
+// class LicenseViewModel {
+//   String LicenseName;
+//   String Category;
+//   String ExpiryDate;
+//   String LDate;
+//   int Active;
+//
+//   // ✅ Constructor
+//   LicenseViewModel(
+//       this.LicenseName,
+//       this.Category,
+//       this.ExpiryDate,
+//       this.LDate,
+//       this.Active,
+//       );
+//
+//   // ✅ fromJson factory constructor
+//   factory LicenseViewModel.fromJson(Map<String, dynamic> json) {
+//     return LicenseViewModel(
+//       json['LicenseName'] ?? "",
+//       json['Category'] ?? "",
+//       json['ExpiryDate'] ?? "",
+//       json['LDate'] ?? "",
+//       json['Active'] ?? 0,
+//     );
+//   }
+//
+//   // ✅ toJson method
+//   Map<String, dynamic> toJson() {
+//     return {
+//       'LicenseName': LicenseName,
+//       'Category': Category,
+//       'ExpiryDate': ExpiryDate,
+//       'LDate': LDate,
+//       'Active': Active,
+//     };
+//   }
+//
+//   // ✅ Empty constructor for default initialization
+//   LicenseViewModel.Empty()
+//       : LicenseName = "",
+//         Category = "",
+//         ExpiryDate = "",
+//         LDate = "",
+//         Active = 0;
+// }
+
 class LicenseViewModel {
+  // ── Old fields (existing) ──────────────────────────
   String LicenseName;
   String Category;
   String ExpiryDate;
   String LDate;
   int Active;
 
-  // ✅ Constructor
+  // ── New fields (API response) ──────────────────────
+  int Id;
+  String DriverName;
+  String licenseNo;
+  String? licenseExp;
+  String AccountCode;
+  String? JoiningDate;
+  String? GDLNo;
+  String? GDLExp;
+  String MobileNo;
+  String Email;
+
   LicenseViewModel(
       this.LicenseName,
       this.Category,
       this.ExpiryDate,
       this.LDate,
-      this.Active,
-      );
+      this.Active, {
+        this.Id = 0,
+        this.DriverName = "",
+        this.licenseNo = "",
+        this.licenseExp,
+        this.AccountCode = "",
+        this.JoiningDate,
+        this.GDLNo,
+        this.GDLExp,
+        this.MobileNo = "",
+        this.Email = "",
+      });
 
-  // ✅ fromJson factory constructor
   factory LicenseViewModel.fromJson(Map<String, dynamic> json) {
     return LicenseViewModel(
-      json['LicenseName'] ?? "",
-      json['Category'] ?? "",
-      json['ExpiryDate'] ?? "",
-      json['LDate'] ?? "",
+      // Old fields — mapped from API
+      json['DriverName'] ?? "",       // LicenseName
+      json['AccountCode'] ?? "",      // Category
+      json['licenseExp'] ?? "",       // ExpiryDate
+      json['JoiningDate'] ?? "",      // LDate
       json['Active'] ?? 0,
+      // New fields
+      Id: json['Id'] ?? 0,
+      DriverName: json['DriverName'] ?? "",
+      licenseNo: json['licenseNo'] ?? "",
+      licenseExp: json['licenseExp']?.toString(),
+      AccountCode: json['AccountCode'] ?? "",
+      JoiningDate: json['JoiningDate']?.toString(),
+      GDLNo: json['GDLNo']?.toString(),
+      GDLExp: json['GDLExp']?.toString(),
+      MobileNo: json['MobileNo'] ?? "",
+      Email: json['Email'] ?? "",
     );
   }
 
-  // ✅ toJson method
-  Map<String, dynamic> toJson() {
-    return {
-      'LicenseName': LicenseName,
-      'Category': Category,
-      'ExpiryDate': ExpiryDate,
-      'LDate': LDate,
-      'Active': Active,
-    };
-  }
+  Map<String, dynamic> toJson() => {
+    'LicenseName': LicenseName,
+    'Category': Category,
+    'ExpiryDate': ExpiryDate,
+    'LDate': LDate,
+    'Active': Active,
+    'Id': Id,
+    'DriverName': DriverName,
+    'licenseNo': licenseNo,
+    'licenseExp': licenseExp,
+    'AccountCode': AccountCode,
+    'JoiningDate': JoiningDate,
+    'GDLNo': GDLNo,
+    'GDLExp': GDLExp,
+    'MobileNo': MobileNo,
+    'Email': Email,
+  };
 
-  // ✅ Empty constructor for default initialization
   LicenseViewModel.Empty()
       : LicenseName = "",
         Category = "",
         ExpiryDate = "",
         LDate = "",
-        Active = 0;
+        Active = 0,
+        Id = 0,
+        DriverName = "",
+        licenseNo = "",
+        licenseExp = null,
+        AccountCode = "",
+        JoiningDate = null,
+        GDLNo = null,
+        GDLExp = null,
+        MobileNo = "",
+        Email = "";
 }
+
 class BarcodePrintModel {
   String CompanyName_Data;
   String ShipName_Data;

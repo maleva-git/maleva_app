@@ -13,7 +13,6 @@ import '../../../common_updates/blocs/sales/sales_event.dart';
 import '../../../common_updates/blocs/truck/truck_bloc.dart';
 import '../../../common_updates/blocs/truck/truck_event.dart';
 import '../../admin_dashboard/tabs/driver/view/driverdetails_tab.dart';
-import '../../admin_dashboard/tabs/driverlicense/view/driverlicense_tab.dart';
 import '../../admin_dashboard/tabs/emailinbox/view/emailinbox_tab.dart';
 import '../../admin_dashboard/tabs/employeemaster/view/employeemaster_tab.dart';
 import '../../admin_dashboard/tabs/enginehours/view/enginehours_tab.dart';
@@ -23,6 +22,7 @@ import '../../admin_dashboard/tabs/fuelfillings/view/fuelfillings_tab.dart';
 import '../../admin_dashboard/tabs/googlereview/view/googlereview_tab.dart';
 import '../../admin_dashboard/tabs/inventoryreport/view/inventoryview_tab.dart';
 import '../../admin_dashboard/tabs/invoice/view/invoice_tab.dart';
+import '../../admin_dashboard/tabs/license/view/license_view.dart';
 import '../../admin_dashboard/tabs/salesorder/view/salesorderview_tab.dart';
 import '../../admin_dashboard/tabs/spareparts/view/sparepartsadd.dart';
 import '../../admin_dashboard/tabs/speedingreport/view/speedingreport_view.dart';
@@ -151,10 +151,10 @@ class HrAMobileDashboard extends StatelessWidget {
           _tab('EngineHours',     isTablet),
           _tab('Fuel',            isTablet),
           _tab('Driver',          isTablet),
-          _tab('License',          isTablet),
           _tab('EmployeeView',    isTablet),
           _tab('Truck',           isTablet),
           _tab('SparePartsEntry', isTablet),
+          _tab('License', isTablet),
         ],
       ),
     );
@@ -198,10 +198,10 @@ class HrAMobileDashboard extends StatelessWidget {
           const EngineHoursPage(),
           const FuelDiffPage(),
           const DriverDetailsView(),
-          const DriverLicenseExpiryWidget(),
           const EmployeeViewPage(),
           const TruckDetailsReportPage(),
           const SparePartsEntryPage(),
+          const DriverLicensePage(),
 
         ],
       ),
