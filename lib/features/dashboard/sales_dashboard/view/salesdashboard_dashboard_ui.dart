@@ -3,8 +3,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:maleva/core/colors/colors.dart' as colour;
-import 'package:maleva/features/dashboard/airfrieght_dashboard/bloc/airfreight_bloc.dart';
-import 'package:maleva/features/dashboard/airfrieght_dashboard/bloc/airfreight_state.dart';
 import 'package:maleva/menu/menulist.dart';
 import '../../../../SaleOrderView/SaleOrderView.dart';
 import '../../../../core/bluetooth/bluetoothmanager.dart';
@@ -18,6 +16,8 @@ import '../../admin_dashboard/tabs/fuel/view/fuelreport_tab.dart';
 import '../../admin_dashboard/tabs/paymentview/view/paymentview_tab.dart';
 import '../../admin_dashboard/tabs/transport/view/transportview_tab.dart';
 import '../../admin_dashboard/tabs/vesselreport/view/vesselreportview_tab.dart';
+import '../bloc/sales_bloc.dart';
+import '../bloc/sales_state.dart';
 class SalesDashboardView extends StatelessWidget {
   final TabController tabController;
   final bool isTablet;

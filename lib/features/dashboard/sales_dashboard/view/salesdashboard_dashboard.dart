@@ -18,8 +18,8 @@ import '../../admin_dashboard/tabs/transport/view/transportview_tab.dart';
 import '../../admin_dashboard/tabs/vesselreport/bloc/vesselreport_bloc.dart';
 import '../../admin_dashboard/tabs/vesselreport/bloc/vesselreport_event.dart';
 import '../../admin_dashboard/tabs/vesselreport/view/vesselreportview_tab.dart';
-import '../bloc/airfreight_bloc.dart';
-import 'airfrieght_dashboard_ui.dart';
+import '../bloc/sales_bloc.dart';
+import 'salesdashboard_dashboard_ui.dart';
 
 class SalesDashboard extends StatefulWidget {
   const SalesDashboard({super.key});

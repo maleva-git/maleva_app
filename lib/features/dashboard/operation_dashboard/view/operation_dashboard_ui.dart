@@ -16,14 +16,14 @@ import '../../admin_dashboard/tabs/inventoryreport/view/inventoryview_tab.dart';
 import '../../admin_dashboard/tabs/salary/view/salary_tab.dart';
 import '../../admin_dashboard/tabs/spotsaleorder/view/spotsaleorder_add.dart';
 import '../../admin_dashboard/tabs/vesselreport/view/vesselreportview_tab.dart';
-import '../bloc/boarding_bloc.dart';
-import '../bloc/boarding_state.dart';
+import '../bloc/operation_bloc.dart';
+import '../bloc/operation_state.dart';
 
 
-class BoardingMobileDashboard extends StatelessWidget {
+class OperationMobileDashboard extends StatelessWidget {
   final TabController tabController;
   final bool isTablet;
-  const BoardingMobileDashboard({required this.tabController, required this.isTablet, super.key});
+  const OperationMobileDashboard({required this.tabController, required this.isTablet, super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -48,7 +48,7 @@ class BoardingMobileDashboard extends StatelessWidget {
       backgroundColor: AppColors.appBarColor,
       toolbarHeight: isTablet ? 64 : 56,
       title: Text(
-        'Boarding',
+        'Operation',
         style: GoogleFonts.lato(
           color: colour.topAppBarColor,
           fontWeight: FontWeight.bold,
@@ -158,7 +158,7 @@ class BoardingMobileDashboard extends StatelessWidget {
   );
   // ── TabBarView ────────────────────────────────────────────────────────
   Widget _buildTabBarView(BuildContext context) {
-    return BlocListener<BoardingTabBloc, BoardingTabState>(
+    return BlocListener<OperationTabBloc, OperationTabState>(
       listener: (context, tabState) {
         switch (tabState.index) {
           case 0:

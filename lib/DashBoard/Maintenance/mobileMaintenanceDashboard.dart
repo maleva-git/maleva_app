@@ -150,7 +150,7 @@ mobiledesign(MaintenanceDashboardState state, BuildContext context) {
               bottom: TabBar(
                   isScrollable: true,
                   tabs: const [
-                    Tab(text: 'Maintenance',),
+                      Tab(text: 'Maintenance',),
                     Tab(text: 'Today Pickup'),
                     Tab(text: 'Vessel'),
                     Tab(text: 'Truck'),

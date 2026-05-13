@@ -2,18 +2,25 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../dashboard/admin_dashboard/bloc/admin_tab_bloc.dart';
 import '../../../dashboard/admin_dashboard/view/admin_dashboard.dart';
-import '../../../dashboard/airfrieght_dashboard/bloc/airfreight_bloc.dart';
-import '../../../dashboard/airfrieght_dashboard/view/airfrieght_dashboard.dart';
+import '../../../dashboard/boarding_dashboard/bloc/boarding_bloc.dart';
+import '../../../dashboard/boarding_dashboard/view/boarding_dashboard.dart';
+import '../../../dashboard/boarding_dashboard/view/boarding_dashboard_ui.dart';
 import '../../../dashboard/driver_dashboard/bloc/driver_bloc.dart';
 import '../../../dashboard/driver_dashboard/view/driver_dashboard.dart';
 import '../../../dashboard/hradmin_dashboard/bloc/hradmin_bloc.dart';
 import '../../../dashboard/hradmin_dashboard/view/hradmin_dashboard.dart';
+import '../../../dashboard/maintenance_dashboard/bloc/maintenance_bloc.dart';
+import '../../../dashboard/maintenance_dashboard/view/maintenance_dashboard.dart';
+import '../../../dashboard/operation_dashboard/bloc/operation_bloc.dart';
+import '../../../dashboard/operation_dashboard/view/operation_dashboard.dart';
 import '../../../dashboard/operationadmin_dashboard/bloc/operationadmin_dashboard_bloc.dart';
 import '../../../dashboard/operationadmin_dashboard/view/operationadmin_dashboard.dart';
 import '../../../dashboard/payable_dashboard/bloc/payable_dasboard_bloc.dart';
 import '../../../dashboard/payable_dashboard/view/payable_dashboard.dart';
 import '../../../dashboard/receivable_dashboard/bloc/receivable_bloc.dart';
 import '../../../dashboard/receivable_dashboard/view/receivable_dashboard.dart';
+import '../../../dashboard/sales_dashboard/bloc/sales_bloc.dart';
+import '../../../dashboard/sales_dashboard/view/salesdashboard_dashboard.dart';
 import '../../../dashboard/subadmin_dashboard/bloc/subadmin_dashboard_bloc.dart';
 import '../../../dashboard/subadmin_dashboard/view/subadmin_dashboard.dart';
 import '../../../dashboard/transport_dashboard/bloc/transport_bloc.dart';
@@ -48,7 +55,6 @@ class Appuserloginmobile extends StatelessWidget {
         builder: (context, state) {
           return mobiledesign();
         },
-
       ),
     );
   }
@@ -154,7 +160,50 @@ class Appuserloginmobile extends StatelessWidget {
           ),
         );
         break;
-
+      case "HR":
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (_) => BlocProvider(
+              create: (_) => MaintenanceTabBloc(),
+              child: const MaintenanceDashboard(),
+            ),
+          ),
+        );
+        break;
+      case "OPERATION":
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (_) => BlocProvider(
+              create: (_) => OperationTabBloc(),
+              child: const OperationDashboard(),
+            ),
+          ),
+        );
+        break;
+      case "BOARDING":
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (_) => BlocProvider(
+              create: (_) => BoardingTabBloc(),
+              child: const BoardingDashboard(),
+            ),
+          ),
+        );
+        break;
+      case "AIR FRIEGHT":
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (_) => BlocProvider(
+              create: (_) => SalesDashboardBloc(),
+              child: const SalesDashboard(),
+            ),
+          ),
+        );
+        break;
     // else if(objfun.storagenew.getString('RulesType') == "TRANSPORTATION")
     // {
     // Navigator.push(context, MaterialPageRoute(builder: (context) => const TransportDashboard()));

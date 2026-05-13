@@ -21,18 +21,18 @@ import '../../admin_dashboard/tabs/transport/bloc/transport_event.dart';
 import '../../admin_dashboard/tabs/transport/view/transportview_tab.dart';
 import '../../admin_dashboard/tabs/vesselreport/bloc/vesselreport_bloc.dart';
 import '../../admin_dashboard/tabs/vesselreport/view/vesselreportview_tab.dart';
-import '../bloc/boarding_bloc.dart';
-import '../bloc/boarding_event.dart';
-import 'boarding_dashboard_ui.dart';
+import '../bloc/operation_bloc.dart';
+import '../bloc/operation_event.dart';
+import 'operation_dashboard_ui.dart';
 
 
-class BoardingDashboard extends StatefulWidget{
-  const BoardingDashboard({super.key});
+class OperationDashboard extends StatefulWidget{
+  const OperationDashboard({super.key});
 
   @override
-  State<BoardingDashboard> createState() => _AdminDashboardState();
+  State<OperationDashboard> createState() => _AdminDashboardState();
 }
-class _AdminDashboardState extends State<BoardingDashboard> with SingleTickerProviderStateMixin {
+class _AdminDashboardState extends State<OperationDashboard> with SingleTickerProviderStateMixin {
 
   late TabController _tabController;
 
@@ -46,7 +46,7 @@ class _AdminDashboardState extends State<BoardingDashboard> with SingleTickerPro
 
   void _onTabChanged(){
     final index = _tabController.index;
-    context.read<BoardingTabBloc>().add(BoardingTabChanged(index));
+    context.read<OperationTabBloc>().add(OperationTabChanged(index));
   }
   @override
   void dispose() {
@@ -102,7 +102,7 @@ class _AdminDashboardState extends State<BoardingDashboard> with SingleTickerPro
             ),
           ],                                    // ← ] தான் close, } இல்ல
           child: Scaffold(
-            body: BoardingMobileDashboard(
+            body: OperationMobileDashboard(
               tabController: _tabController,
               isTablet: isTablet,
             ),

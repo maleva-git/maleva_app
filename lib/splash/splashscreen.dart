@@ -5,10 +5,8 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:maleva/core/utils/clsfunction.dart' as objfun;
 import 'package:maleva/core/colors/colors.dart' as colour;
 import '../DashBoard/AirFrieght/AirFrieghtDashboard.dart';
-import '../DashBoard/Boarding/BoardingDashboard.dart';
 import '../DashBoard/Forwarding/ForwardingDashboard.dart';
 import '../DashBoard/HR/HrDashboard.dart';
-import '../DashBoard/Maintenance/MaintenanceDashboard.dart';
 import '../DashBoard/Payable/PayableDashbord.dart';
 import '../DashBoard/Receivable/ReceivableDashboard.dart';
 import '../DashBoard/TransportDB/TransportDashboard.dart';
@@ -23,16 +21,22 @@ import '../features/auth/presentation/bloc/auth_bloc.dart';
 import '../features/auth/presentation/pages/login_page.dart.dart';
 import '../features/dashboard/admin_dashboard/bloc/admin_tab_bloc.dart';
 import '../features/dashboard/admin_dashboard/view/admin_dashboard.dart';
-import '../features/dashboard/airfrieght_dashboard/view/airfrieght_dashboard.dart';
+import '../features/dashboard/boarding_dashboard/bloc/boarding_bloc.dart';
+import '../features/dashboard/boarding_dashboard/view/boarding_dashboard.dart';
 import '../features/dashboard/driver_dashboard/bloc/driver_bloc.dart';
 import '../features/dashboard/driver_dashboard/view/driver_dashboard.dart';
 import '../features/dashboard/hradmin_dashboard/bloc/hradmin_bloc.dart';
 import '../features/dashboard/hradmin_dashboard/view/hradmin_dashboard.dart';
+import '../features/dashboard/maintenance_dashboard/bloc/maintenance_bloc.dart';
+import '../features/dashboard/maintenance_dashboard/view/maintenance_dashboard.dart';
+import '../features/dashboard/operation_dashboard/bloc/operation_bloc.dart';
+import '../features/dashboard/operation_dashboard/view/operation_dashboard.dart';
 import '../features/dashboard/operationadmin_dashboard/bloc/operationadmin_dashboard_bloc.dart';
 import '../features/dashboard/operationadmin_dashboard/view/operationadmin_dashboard.dart';
 import '../features/dashboard/payable_dashboard/bloc/payable_dasboard_bloc.dart';
 import '../features/dashboard/payable_dashboard/view/payable_dashboard.dart';
 import '../features/dashboard/receivable_dashboard/bloc/receivable_bloc.dart';
+import '../features/dashboard/sales_dashboard/view/salesdashboard_dashboard.dart';
 import '../features/dashboard/subadmin_dashboard/bloc/subadmin_dashboard_bloc.dart';
 import '../features/dashboard/subadmin_dashboard/view/subadmin_dashboard.dart';
 import '../features/dashboard/transport_dashboard/bloc/transport_bloc.dart';
@@ -251,6 +255,48 @@ class _SplashScreenState extends State<SplashScreen>
           );
 
         }
+
+
+        else if(objfun.storagenew.getString('RulesType') == "HR")
+        {
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+              builder: (_) => BlocProvider(
+                create: (_) => MaintenanceTabBloc(),
+                child: const MaintenanceDashboard(),
+              ),
+            ),
+          );
+
+        }
+
+
+        else if(objfun.storagenew.getString('RulesType') == "OPERATION")
+        {
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+              builder: (_) => BlocProvider(
+                create: (_) => OperationTabBloc(),
+                child: const OperationDashboard(),
+              ),
+            ),
+          );
+
+        }
+        else if(objfun.storagenew.getString('RulesType') == "BOARDING")
+        {
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+              builder: (_) => BlocProvider(
+                create: (_) => BoardingTabBloc(),
+                child: const BoardingDashboard(),
+              ),
+            ),
+          );
+        }
     // case "HRADMIN":
     // Navigator.pushReplacement(
     // context,
@@ -279,10 +325,10 @@ class _SplashScreenState extends State<SplashScreen>
         {
           Navigator.push(context, MaterialPageRoute(builder: (context) => const AirFrieghtDashboard()));
         }
-        else if(objfun.storagenew.getString('RulesType') == "BOARDING" || objfun.storagenew.getString('RulesType') == "OPERATION")
-        {
-          Navigator.push(context, MaterialPageRoute(builder: (context) => const BoardingDashboard()));
-        }
+        // else if(objfun.storagenew.getString('RulesType') == "BOARDING" || objfun.storagenew.getString('RulesType') == "OPERATION")
+        // {
+        //   Navigator.push(context, MaterialPageRoute(builder: (context) => const BoardingDashboard()));
+        // }
         else if( objfun.storagenew.getString('RulesType') == "FORWARDING" )
         {
           Navigator.push(context, MaterialPageRoute(builder: (context) => const ForwardingDashboard()));
@@ -291,10 +337,10 @@ class _SplashScreenState extends State<SplashScreen>
         {
           Navigator.push(context, MaterialPageRoute(builder: (context) => const HrDashboard()));
         }
-        else if(objfun.storagenew.getString('RulesType') == "HR")
-        {
-          Navigator.push(context, MaterialPageRoute(builder: (context) => const MaintenanceDashboard()));
-        }
+        // else if(objfun.storagenew.getString('RulesType') == "HR")
+        // {
+        //   Navigator.push(context, MaterialPageRoute(builder: (context) => const MaintenanceDashboard()));
+        // }
         // else if( objfun.storagenew.getString('RulesType') == "RECEIVABLE" )
         // {
         //   Navigator.push(context, MaterialPageRoute(builder: (context) => const ReceivableDashboard()));

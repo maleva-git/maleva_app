@@ -1,0 +1,222 @@
+import 'package:flutter/Material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:intl/intl.dart';
+import 'package:maleva/core/utils/clsfunction.dart' as objfun;
+import 'package:maleva/core/colors/colors.dart' as colour;
+import '../../../../SaleOrderView/SaleOrderView.dart';
+import '../../../../core/bluetooth/bluetoothmanager.dart';
+import '../../../../core/colors/colors.dart';
+import '../../../../core/models/model.dart';
+import '../../../../menu/menulist.dart';
+import '../../../common_updates/blocs/sales/sales_bloc.dart';
+import '../../../common_updates/blocs/sales/sales_event.dart';
+import '../../../common_updates/blocs/truck/truck_bloc.dart';
+import '../../../common_updates/blocs/truck/truck_event.dart';
+import '../../admin_dashboard/bloc/admin_tab_bloc.dart';
+import '../../admin_dashboard/bloc/admin_tab_state.dart';
+import '../../admin_dashboard/tabs/ExpenseReport/view/expensereport_tab.dart';
+import '../../admin_dashboard/tabs/adinvoice/presentation/widgets/ai_sales_forecast_chart.dart';
+import '../../admin_dashboard/tabs/aienginehours/presentation/widgets/ai_maintenance_health_card.dart';
+import '../../admin_dashboard/tabs/bocheck/view/bocheck_tab.dart';
+import '../../admin_dashboard/tabs/driver/view/driverdetails_tab.dart';
+import '../../admin_dashboard/tabs/emailinbox/view/emailinbox_tab.dart';
+import '../../admin_dashboard/tabs/employeemaster/view/employeemaster_tab.dart';
+import '../../admin_dashboard/tabs/enginehours/view/enginehours_tab.dart';
+import '../../admin_dashboard/tabs/forwardingreport/view/forwardingreport_tab.dart';
+import '../../admin_dashboard/tabs/fuel/view/fuelreport_tab.dart';
+import '../../admin_dashboard/tabs/fuelfillings/view/fuelfillings_tab.dart';
+import '../../admin_dashboard/tabs/googlereview/view/googlereview_tab.dart';
+import '../../admin_dashboard/tabs/gpstruckmap/view/gpstruckmap_tab.dart';
+import '../../admin_dashboard/tabs/inventoryreport/view/inventoryview_tab.dart';
+import '../../admin_dashboard/tabs/invoice/view/invoice_tab.dart';
+import '../../admin_dashboard/tabs/maintenance/view/maintenance_tab.dart';
+import '../../admin_dashboard/tabs/paymentview/view/paymentview_tab.dart';
+import '../../admin_dashboard/tabs/pdo/view/pdo_tab.dart';
+import '../../admin_dashboard/tabs/pettycash/view/pettycash_tab.dart';
+import '../../admin_dashboard/tabs/receiptview/view/receiptview_tab.dart';
+import '../../admin_dashboard/tabs/rtiview/view/rtiview_tab.dart';
+import '../../admin_dashboard/tabs/salesorder/view/salesorderview_tab.dart';
+import '../../admin_dashboard/tabs/spareparts/view/sparepartsadd.dart';
+import '../../admin_dashboard/tabs/speedingreport/view/speedingreport_view.dart';
+import '../../admin_dashboard/tabs/spotsaleorder/view/spotsaleorder_add.dart';
+import '../../admin_dashboard/tabs/summonentry/view/summonentry_tab.dart';
+import '../../admin_dashboard/tabs/transport/view/transportview_tab.dart';
+import '../../admin_dashboard/tabs/truck/view/truckview_tab.dart';
+import '../../admin_dashboard/tabs/vesselreport/view/vesselreportview_tab.dart';
+
+
+class MaintenanceMobileDashboard extends StatelessWidget {
+  final TabController tabController;
+  final bool isTablet;
+  const MaintenanceMobileDashboard({required this.tabController, required this.isTablet, super.key});
+
+  @override
+  Widget build(BuildContext context) {
+
+    return Scaffold(
+      resizeToAvoidBottomInset: false,
+      backgroundColor: Colors.white,
+      appBar: _buildAppBar(context, isTablet),
+      drawer: const Menulist(),
+      body: Column(
+        children: [
+          _buildTabBar(isTablet),
+          Expanded(child: _buildTabBarView(context)),
+        ],
+      ),
+    );
+  }
+
+  // ── AppBar ────────────────────────────────────────────────────────────
+  PreferredSizeWidget _buildAppBar(BuildContext context, bool isTablet) {
+    return AppBar(
+      backgroundColor: AppColors.appBarColor,
+      toolbarHeight: isTablet ? 64 : 56,
+      title: Text(
+        'Maintenance',
+        style: GoogleFonts.lato(
+          color: colour.topAppBarColor,
+          fontWeight: FontWeight.bold,
+          fontSize: isTablet ? 20 : objfun.FontLarge,
+        ),
+      ),
+      iconTheme: const IconThemeData(color: colour.topAppBarColor),
+      actions: [
+        IconButton(
+          icon: Icon(Icons.directions_boat_filled,
+              size: isTablet ? 28 : 25, color: colour.topAppBarColor),
+          onPressed: () => Navigator.push(context,
+              MaterialPageRoute(builder: (_) => Saleorderview())),
+        ),
+        IconButton(
+          icon: Icon(Icons.bluetooth_audio,
+              size: isTablet ? 28 : 25, color: colour.topAppBarColor),
+          onPressed: () => Navigator.push(context,
+              MaterialPageRoute(builder: (_) => Bluetoothpage())),
+        ),
+        IconButton(
+          icon: Icon(Icons.print,
+              size: isTablet ? 28 : 25, color: colour.topAppBarColor),
+          onPressed: () async {
+            await objfun.printdata([
+              BarcodePrintModel("MALEVA", "SHIPNAME", "SHIPNAME",
+                  "B0005000", "2025-05-04", "WESTPORT", "WESTPORT", "(1/3)")
+            ]);
+          },
+        ),
+        IconButton(
+          icon: Icon(Icons.exit_to_app,
+              size: isTablet ? 32 : 30, color: colour.topAppBarColor),
+          onPressed: () => objfun.logout(context),
+        ),
+        if (isTablet) const SizedBox(width: 8),
+      ],
+    );
+  }
+
+  // ── TabBar ────────────────────────────────────────────────────────────
+// ✅ Step 2: _buildTabBar() method-ல container size மாத்து
+  Widget _buildTabBar(bool isTablet) {
+    return Container(
+      margin: EdgeInsets.symmetric(
+        horizontal: isTablet ? 20 : 12,
+        vertical:   isTablet ? 12 : 10,
+      ),
+      padding: EdgeInsets.all(isTablet ? 8 : 6),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(isTablet ? 36 : 30),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.06),
+            blurRadius: isTablet ? 12 : 8,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: TabBar(
+        controller: tabController,
+        isScrollable: true,
+        indicator: BoxDecoration(
+          color: AppColors.appBarColor,
+          borderRadius: BorderRadius.circular(isTablet ? 28 : 25),
+        ),
+        indicatorSize: TabBarIndicatorSize.tab,
+        labelColor: Colors.white,
+        unselectedLabelColor: const Color(0xFF1A2E5A),
+        labelStyle: TextStyle(
+          fontWeight: FontWeight.w600,
+          fontSize: isTablet ? 14 : 13,
+        ),
+        unselectedLabelStyle: TextStyle(
+          fontWeight: FontWeight.w500,
+          fontSize: isTablet ? 14 : 13,
+        ),
+        tabs: [
+          _tab('Maintenance',             isTablet),   // 1
+          _tab('Today Pickup',             isTablet),   // 1
+          _tab('Vessel',       isTablet),    //2
+          _tab('Truck',           isTablet),   //3
+          _tab('Driver',          isTablet),   //4
+          _tab('Speeding',  isTablet),  //5
+          _tab('FuelFilling',     isTablet),  //6
+          _tab('EngineHours',     isTablet),   // 7
+          _tab('Fuel',            isTablet),   //8
+          _tab('SparePartsEntry', isTablet),   //9
+
+        ],
+      ),
+    );
+  }
+
+  // ── Tab item ──────────────────────────────────────────────────────────
+// ✅ Step 1: _tab() method-ல isTablet add பண்ணு
+  Tab _tab(String text, bool isTablet) => Tab(
+    height: isTablet ? 42 : null,
+    child: Padding(
+      padding: EdgeInsets.symmetric(
+        horizontal: isTablet ? 6 : 2,
+      ),
+      child: Text(
+        text,
+        style: TextStyle(
+          fontSize: isTablet ? 14 : 13,
+          fontWeight: FontWeight.w600,
+        ),
+      ),
+    ),
+  );
+  // ── TabBarView ────────────────────────────────────────────────────────
+  Widget _buildTabBarView(BuildContext context) {
+    return BlocListener<AdminTabBloc, AdminTabState>(
+      listener: (context, tabState) {
+        switch (tabState.index) {
+          case 0:
+            context.read<SalesBloc>().add(LoadSales(0));
+            break;
+          case 6:
+            context.read<TruckBloc>().add(LoadTruckList());
+            break;
+        }
+      },
+      child: TabBarView(
+        controller: tabController,
+        children: [
+
+          const MaintenanceDashboardWidget(),  //1
+          const VesselReportPage(),  //1
+          const TransportReportPage(), //2
+          const TruckDetailsReportPage(), //3
+          const DriverDetailsView(),  //4
+          const SpeedingScreen(),  //5
+          const FuelFillingPage(),  //6
+          const EngineHoursPage(),  //7
+          const FuelDiffPage(),   //8
+          const SparePartsEntryPage(),  //9
+
+        ],
+      ),
+    );
+  }
+}
