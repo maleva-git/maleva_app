@@ -129,10 +129,14 @@ class _SplashScreenState extends State<SplashScreen>
   Future startup() async {
     await objfun.localstoragecall();
     await Future.delayed(const Duration(seconds: 3));
-    await objfun.getDeviceToken();
 
-    await AppPreferences.init();
-    await FirebaseService.getDeviceToken();
+
+    //await AppPreferences.init();
+    await FirebaseService.getDeviceToken()
+        .timeout(const Duration(seconds: 5), onTimeout: () {
+      debugPrint('⚠️ FCM token fetch timed out — proceeding without token');
+    });
+    objfun.mobiletoken = AppPreferences.getFcmToken();
 
     String UserName = objfun.storagenew.getString('Username') ?? "";
     String Password = objfun.storagenew.getString('Password') ?? "";

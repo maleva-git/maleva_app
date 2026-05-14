@@ -18,8 +18,17 @@ class AuthRepository {
     required int driverId,
   }) async {
     try {
-      // 1. Get Token
-      final fcmToken = AppPreferences.getFcmToken();
+      // 1. Get FCM Token — wait for it if not yet available (first-launch race condition)
+      String fcmToken = AppPreferences.getFcmToken();
+      if (fcmToken.isEmpty) {
+        try {
+          await objfun.getDeviceToken()
+              .timeout(const Duration(seconds: 5), onTimeout: () {});
+          fcmToken = AppPreferences.getFcmToken(); // retry after fetch
+        } catch (_) {
+          // FCM unavailable — proceed with empty token, server handles it
+        }
+      }
 
       // 2. Fetch raw data from API
       final rawData = await authApi.loginUserRaw(

@@ -37,6 +37,7 @@ import '../../features/auth/data/repositories/auth_repository.dart';
 import '../../features/auth/presentation/bloc/auth_bloc.dart';
 import '../../features/auth/presentation/pages/login_page.dart.dart';
 import '../network/api_services/auth_api.dart';
+import 'app_preferences.dart';
 String appversion="1.1.10+97";
 bool homepagecall = false;
 AssetImage logo = const AssetImage('assets/company/logo.png');
@@ -2069,6 +2070,7 @@ getDeviceToken() async {
   String? fcmToken = await fcm.getToken();
   if (fcmToken != null) {
     mobiletoken = fcmToken;
+    await AppPreferences.setFcmToken(fcmToken);
     print_(mobiletoken);
   }
 
