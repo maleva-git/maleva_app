@@ -5,7 +5,6 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:maleva/core/utils/clsfunction.dart' as objfun;
 import 'package:maleva/core/colors/colors.dart' as colour;
 import '../DashBoard/AirFrieght/AirFrieghtDashboard.dart';
-import '../DashBoard/Forwarding/ForwardingDashboard.dart';
 import '../DashBoard/HR/HrDashboard.dart';
 import '../DashBoard/Payable/PayableDashbord.dart';
 import '../DashBoard/Receivable/ReceivableDashboard.dart';
@@ -21,10 +20,14 @@ import '../features/auth/presentation/bloc/auth_bloc.dart';
 import '../features/auth/presentation/pages/login_page.dart.dart';
 import '../features/dashboard/admin_dashboard/bloc/admin_tab_bloc.dart';
 import '../features/dashboard/admin_dashboard/view/admin_dashboard.dart';
+import '../features/dashboard/airfreight_dashboard/bloc/airfreight_bloc.dart';
+import '../features/dashboard/airfreight_dashboard/view/airfreight_dashboard.dart';
 import '../features/dashboard/boarding_dashboard/bloc/boarding_bloc.dart';
 import '../features/dashboard/boarding_dashboard/view/boarding_dashboard.dart';
 import '../features/dashboard/driver_dashboard/bloc/driver_bloc.dart';
 import '../features/dashboard/driver_dashboard/view/driver_dashboard.dart';
+import '../features/dashboard/forwarding_dashboard/bloc/forwarding_bloc.dart';
+import '../features/dashboard/forwarding_dashboard/view/forwarding_dashboard.dart';
 import '../features/dashboard/hradmin_dashboard/bloc/hradmin_bloc.dart';
 import '../features/dashboard/hradmin_dashboard/view/hradmin_dashboard.dart';
 import '../features/dashboard/maintenance_dashboard/bloc/maintenance_bloc.dart';
@@ -180,11 +183,11 @@ class _SplashScreenState extends State<SplashScreen>
             ),
           );
         }
-        else if(objfun.storagenew.getString('RulesType') == "SALES")
-        {
-        //  Navigator.push(context, MaterialPageRoute(builder: (context) => const CustDashboard()));
-          Navigator.push(context, MaterialPageRoute(builder: (context) => const SalesDashboard()));
-        }
+        // else if(objfun.storagenew.getString('RulesType') == "SALES")
+        // {
+        // //  Navigator.push(context, MaterialPageRoute(builder: (context) => const CustDashboard()));
+        //   Navigator.push(context, MaterialPageRoute(builder: (context) => const SalesDashboard()));
+        // }
         // else if(objfun.storagenew.getString('RulesType') == "TRANSPORTATION")
         // {
         //   Navigator.push(context, MaterialPageRoute(builder: (context) => const OldTransportDashboard()));
@@ -323,20 +326,46 @@ class _SplashScreenState extends State<SplashScreen>
         }
         else if(objfun.storagenew.getString('RulesType') == "AIR FRIEGHT")
         {
-          Navigator.push(context, MaterialPageRoute(builder: (context) => const AirFrieghtDashboard()));
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+              builder: (_) => BlocProvider(
+                create: (_) => AirfreightTabBloc(),
+                child: const AirfreightDashboard(),
+              ),
+            ),
+          );
+
         }
+        else if(objfun.storagenew.getString('RulesType') == "FORWARDING")
+        {
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+              builder: (_) => BlocProvider(
+                create: (_) => ForwardingTabBloc(),
+                child: const ForwardingDashboard(),
+              ),
+            ),
+          );
+
+        }
+        // else if(objfun.storagenew.getString('RulesType') == "AIR FRIEGHT")
+        // {
+        //   Navigator.push(context, MaterialPageRoute(builder: (context) => const AirFrieghtDashboard()));
+        // }
         // else if(objfun.storagenew.getString('RulesType') == "BOARDING" || objfun.storagenew.getString('RulesType') == "OPERATION")
         // {
         //   Navigator.push(context, MaterialPageRoute(builder: (context) => const BoardingDashboard()));
         // }
-        else if( objfun.storagenew.getString('RulesType') == "FORWARDING" )
-        {
-          Navigator.push(context, MaterialPageRoute(builder: (context) => const ForwardingDashboard()));
-        }
-        else if( objfun.storagenew.getString('RulesType') == "HRADMIN")
-        {
-          Navigator.push(context, MaterialPageRoute(builder: (context) => const HrDashboard()));
-        }
+        // else if( objfun.storagenew.getString('RulesType') == "FORWARDING" )
+        // {
+        //   Navigator.push(context, MaterialPageRoute(builder: (context) => const ForwardingDashboard()));
+        // }
+        // else if( objfun.storagenew.getString('RulesType') == "HRADMIN")
+        // {
+        //   Navigator.push(context, MaterialPageRoute(builder: (context) => const HrDashboard()));
+        // }
         // else if(objfun.storagenew.getString('RulesType') == "HR")
         // {
         //   Navigator.push(context, MaterialPageRoute(builder: (context) => const MaintenanceDashboard()));
@@ -349,10 +378,10 @@ class _SplashScreenState extends State<SplashScreen>
         // {
         //   Navigator.push(context, MaterialPageRoute(builder: (context) => const PayableDashbord()));
         // }
-        else
-        {
-          Navigator.push(context, MaterialPageRoute(builder: (context) => const Homemobile()));
-        }
+        // else
+        // {
+        //   Navigator.push(context, MaterialPageRoute(builder: (context) => const Homemobile()));
+        // }
       }
       else {
         Navigator.push(

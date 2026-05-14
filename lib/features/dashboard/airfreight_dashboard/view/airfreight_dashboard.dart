@@ -21,9 +21,10 @@ import '../../admin_dashboard/tabs/transport/bloc/transport_event.dart';
 import '../../admin_dashboard/tabs/transport/view/transportview_tab.dart';
 import '../../admin_dashboard/tabs/vesselreport/bloc/vesselreport_bloc.dart';
 import '../../admin_dashboard/tabs/vesselreport/view/vesselreportview_tab.dart';
-import '../bloc/boarding_bloc.dart';
-import '../bloc/boarding_event.dart';
-import 'boarding_dashboard_ui.dart';
+import '../bloc/airfreight_bloc.dart';
+import '../bloc/airfreight_event.dart';
+import 'airfreight_dashboard_ui.dart';
+
 
 
 class AirfreightDashboard extends StatefulWidget{
@@ -39,14 +40,14 @@ class _AirfreightDashboardState extends State<AirfreightDashboard> with SingleTi
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 4, vsync: this);
+    _tabController = TabController(length: 3, vsync: this);
     _tabController.addListener(_onTabChanged);
 
   }
 
   void _onTabChanged(){
     final index = _tabController.index;
-    context.read<BoardingTabBloc>().add(BoardingTabChanged(index));
+    context.read<AirfreightTabBloc>().add(AirfreightTabChanged(index));
   }
   @override
   void dispose() {
@@ -96,11 +97,8 @@ class _AirfreightDashboardState extends State<AirfreightDashboard> with SingleTi
               ),
               child: const SpotSaleEntryPage(),
             ),
-            BlocProvider(
-              create: (_) => sl<SalaryBloc>(),
-              child: const SalaryTab(),
-            ),
-          ],                                    // ← ] தான் close, } இல்ல
+
+          ],                                    // ← ] தான் close, }
           child: Scaffold(
             body: AirfreightMobileDashboard(
               tabController: _tabController,

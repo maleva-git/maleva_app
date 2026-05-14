@@ -12,3 +12,4 @@ class BoardingTabBloc extends Bloc<BoardingTabEvent, BoardingTabState> {
     });
   }
 }
+
