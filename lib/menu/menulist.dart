@@ -16,6 +16,7 @@ import '../features/dashboard/admin_dashboard/tabs/emailinbox/view/emailinbox_ta
 import '../features/dashboard/admin_dashboard/tabs/enquiry/view/view/enquiry_tab.dart';
 import '../features/dashboard/admin_dashboard/tabs/fwbreakseal/view/fwbreakseal_tab.dart';
 import '../features/dashboard/admin_dashboard/tabs/googlereview/view/googlereview_tab.dart';
+import '../features/dashboard/admin_dashboard/tabs/jobstatusupdate/view/jobstatusupdate_tab.dart';
 import '../features/dashboard/admin_dashboard/tabs/spotsaleorder/view/spotsaleorder_view.dart';
 import '../features/dashboard/admin_dashboard/tabs/stockinentry/bloc/stock_in_entry_bloc.dart';
 import '../features/dashboard/admin_dashboard/tabs/stockinentry/bloc/stock_in_entry_event.dart';

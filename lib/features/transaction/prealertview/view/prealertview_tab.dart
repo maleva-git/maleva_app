@@ -6,6 +6,7 @@ import 'package:intl/intl.dart';
 import 'package:maleva/core/utils/clsfunction.dart' as objfun;
 import 'package:maleva/core/network/OnlineApi.dart' as OnlineApi;
 import 'package:maleva/core/models/model.dart';
+import 'package:maleva/features/dashboard/airfreight_dashboard/view/airfreight_dashboard.dart';
 import 'package:maleva/features/dashboard/sales_dashboard/view/salesdashboard_dashboard.dart';
 import 'package:maleva/menu/menulist.dart';
 import '../../../../core/theme/tokens.dart';
@@ -125,7 +126,7 @@ class _PreAlertPage extends StatelessWidget {
         dest = const OperationAdminDashboard();
         break;
       case 'AIR FRIEGHT':
-        dest = const AirFrieghtDashboard();
+        dest = const AirfreightDashboard();
         break;
       case 'BOARDING':
       case 'OPERATION':
