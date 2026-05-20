@@ -8,9 +8,9 @@ import 'package:image_picker/image_picker.dart';
 import 'package:maleva/core/utils/clsfunction.dart' as objfun;
 import 'package:maleva/core/models/model.dart';
 import 'package:maleva/menu/menulist.dart';
-import 'package:maleva/MasterSearch/JobAllStatus.dart';
-import 'package:maleva/MasterSearch/WareHouseList.dart';
 
+import '../../../../../mastersearch/JobAllStatus.dart';
+import '../../../../../mastersearch/WareHouseList.dart';
 import '../bloc/stock_update_bloc.dart';
 import '../bloc/stock_update_event.dart';
 import '../bloc/stock_update_state.dart';

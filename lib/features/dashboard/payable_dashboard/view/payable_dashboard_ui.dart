@@ -3,7 +3,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:maleva/core/utils/clsfunction.dart' as objfun;
 import 'package:maleva/core/colors/colors.dart' as colour;
-import '../../../../SaleOrderView/SaleOrderView.dart';
 import '../../../../core/bluetooth/bluetoothmanager.dart';
 import '../../../../core/colors/colors.dart';
 import '../../../../core/models/model.dart';
@@ -12,13 +11,13 @@ import '../../../common_updates/blocs/sales/sales_bloc.dart';
 import '../../../common_updates/blocs/sales/sales_event.dart';
 import '../../../common_updates/blocs/truck/truck_bloc.dart';
 import '../../../common_updates/blocs/truck/truck_event.dart';
-import '../../admin_dashboard/tabs/aienginehours/presentation/widgets/ai_maintenance_health_card.dart';
 import '../../admin_dashboard/tabs/billorder/view/billorder_screen.dart';
 import '../../admin_dashboard/tabs/driver/view/driverdetails_tab.dart';
 import '../../admin_dashboard/tabs/enginehours/view/enginehours_tab.dart';
 import '../../admin_dashboard/tabs/fuel/view/fuelreport_tab.dart';
 import '../../admin_dashboard/tabs/fuelfillings/view/fuelfillings_tab.dart';
 import '../../admin_dashboard/tabs/pettycash/view/pettycash_tab.dart';
+import '../../admin_dashboard/tabs/saleorderview/view/saleorderview_tab.dart';
 import '../../admin_dashboard/tabs/speedingreport/view/speedingreport_view.dart';
 import '../../admin_dashboard/tabs/truck/view/truckview_tab.dart';
 import '../bloc/payable_dasboard_bloc.dart';
@@ -142,8 +141,7 @@ class PayableMobileDashboard extends StatelessWidget {
           _tab('Truck',           isTablet),
 
           _tab('PettyCash',       isTablet),
-          _tab('AIPredict',       isTablet),
-          _tab('AIMaintenance',   isTablet),
+
         ],
       ),
     );
@@ -191,7 +189,7 @@ class PayableMobileDashboard extends StatelessWidget {
 
           const TruckDetailsReportPage(),
           const PettyCashPage(),
-          const AIMaintenanceHealthCard(),
+
         ],
       ),
     );

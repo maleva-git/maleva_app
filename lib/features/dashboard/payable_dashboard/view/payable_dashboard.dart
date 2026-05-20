@@ -48,7 +48,7 @@ class _PayableDashboardState extends State<PayableDashboard> with SingleTickerPr
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 10, vsync: this);
+    _tabController = TabController(length: 8, vsync: this);
     _tabController.addListener(_onTabChanged);
 
   }

@@ -12,8 +12,6 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:http/http.dart';
 import 'package:intl/intl.dart';
-import 'package:maleva/DashBoard/User/UserDashboard.dart';
-// import 'package:flutter_barcode_scanner/flutter_barcode_scanner.dart';
 import 'package:flutter_barcode_scanner_plus/flutter_barcode_scanner_plus.dart';
 import 'package:flutter/material.dart' as col;
 import 'package:google_fonts/google_fonts.dart';
@@ -30,12 +28,13 @@ import 'package:maleva/core/models/model.dart';
 import 'package:maleva/core/network/OnlineApi.dart' as OnlineApi;
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:path_provider/path_provider.dart';
-import '../../MasterSearch/Employee.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../features/auth/data/repositories/auth_repository.dart';
 import '../../features/auth/presentation/bloc/auth_bloc.dart';
 import '../../features/auth/presentation/pages/login_page.dart.dart';
+import '../../features/home/view/home_tab.dart';
+import '../../features/mastersearch/Employee.dart';
 import '../network/api_services/auth_api.dart';
 import 'app_preferences.dart';
 String appversion="1.1.10+97";
@@ -2065,7 +2064,7 @@ String channelName = "MALEVA channel"; //Required for Android 8.0 or after
 String channelDescription = "this is our MALEVA channel";
 String mobiletoken="";
 getDeviceToken() async {
-  await Firebase.initializeApp();
+
   FirebaseMessaging fcm = FirebaseMessaging.instance;
   String? fcmToken = await fcm.getToken();
   if (fcmToken != null) {

@@ -4,7 +4,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:maleva/core/colors/colors.dart' as colour;
 import 'package:maleva/menu/menulist.dart';
-import '../../../../SaleOrderView/SaleOrderView.dart';
 import '../../../../core/bluetooth/bluetoothmanager.dart';
 import '../../../../core/models/model.dart';
 import '../../../../core/utils/clsfunction.dart' as objfun;
@@ -14,6 +13,7 @@ import '../../admin_dashboard/tabs/airfreightsales/view/airfreightsales_tab.dart
 import '../../admin_dashboard/tabs/enquiry/view/view/enquiry_tab.dart';
 import '../../admin_dashboard/tabs/fuel/view/fuelreport_tab.dart';
 import '../../admin_dashboard/tabs/paymentview/view/paymentview_tab.dart';
+import '../../admin_dashboard/tabs/saleorderview/view/saleorderview_tab.dart';
 import '../../admin_dashboard/tabs/transport/view/transportview_tab.dart';
 import '../../admin_dashboard/tabs/vesselreport/view/vesselreportview_tab.dart';
 import '../bloc/sales_bloc.dart';

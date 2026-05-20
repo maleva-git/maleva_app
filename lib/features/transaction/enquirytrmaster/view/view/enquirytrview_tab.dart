@@ -7,16 +7,15 @@ import 'package:maleva/core/utils/clsfunction.dart' as objfun;
 import 'package:maleva/core/network/OnlineApi.dart' as OnlineApi;
 import 'package:maleva/core/models/model.dart';
 import 'package:maleva/menu/menulist.dart';
-import 'package:maleva/MasterSearch/Customer.dart';
-import 'package:maleva/MasterSearch/Employee.dart';
-import 'package:maleva/MasterSearch/JobType.dart';
-import 'package:maleva/Transaction/SaleOrder/SalesOrderAdd.dart';
-import 'package:maleva/DashBoard/CustomerService/CustDashboard.dart';
-import 'package:maleva/DashBoard/TransportDB/TransportDashboard.dart';
-import 'package:maleva/DashBoard/User/UserDashboard.dart';
 import '../../../../../core/theme/tokens.dart';
+import '../../../../dashboard/admin_dashboard/tabs/custdashboard/view/custdashboard_tab.dart';
+import '../../../../dashboard/admin_dashboard/tabs/transportDB/view/transportdb_tab.dart';
 import '../../../../dashboard/admin_dashboard/view/admin_dashboard.dart';
 import '../../../../dashboard/operationadmin_dashboard/view/operationadmin_dashboard.dart';
+import '../../../../home/view/home_tab.dart';
+import '../../../../mastersearch/Customer.dart';
+import '../../../../mastersearch/Employee.dart';
+import '../../../../mastersearch/JobType.dart';
 import '../../add/view/enquirytradd_tab.dart';
 import '../bloc/enquirytrview_bloc.dart';
 import '../bloc/enquirytrview_event.dart';
@@ -138,7 +137,7 @@ class _EnquiryViewPage extends StatelessWidget {
         dest = const CustDashboard();
         break;
       case 'TRANSPORTATION':
-        dest = const OldTransportDashboard();
+        dest = const TransportDashboard();
         break;
       case 'OPERATIONADMIN':
         dest = const OperationAdminDashboard();

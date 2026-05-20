@@ -53,9 +53,9 @@ class ListItem {
   int id;
   String name;
   ListItem(
-    this.id,
-    this.name,
-  );
+      this.id,
+      this.name,
+      );
 }
 class MaintenanceModel {
   int Id;
@@ -94,7 +94,7 @@ class MaintenanceModel {
 
   MaintenanceModel.Empty()
       : Id = 0,
-         PStatus = 0,
+        PStatus = 0,
         SupplierName = '',
         TruckNumber = '',
         DriverName = '',
@@ -426,7 +426,7 @@ class EmployeeModel {
   EmployeeModel(this.Id, this.AccountName, this.Password);
 
   EmployeeModel.fromJson(Map<String, dynamic> json)
-      : Id = int.parse(json['Id'].toString()),
+      : Id = int.tryParse(json['Id']?.toString() ?? '') ?? 0,
         AccountName = json['AccountName'].toString(),
         Password = json['Password'].toString();
   Map<String, dynamic> toJson() {
@@ -452,8 +452,8 @@ class ForwardingModel {
   ForwardingModel(this.Id, this.CNumber,this.ForwardingEnterRef, this.ForwardingEnterRef2, this.ForwardingEnterRef3);
 
   ForwardingModel.fromJson(Map<String, dynamic> json)
-      : Id = int.parse(json['Id'].toString()),
-        CNumber = int.parse(json['CNumber'].toString()),
+      : Id = int.tryParse(json['Id']?.toString() ?? '') ?? 0,
+        CNumber = int.tryParse(json['CNumber']?.toString() ?? '') ?? 0,
         ForwardingEnterRef = json['ForwardingEnterRef'].toString(),
         ForwardingEnterRef2 = json['ForwardingEnterRef2'].toString(),
         ForwardingEnterRef3 = json['ForwardingEnterRef3'].toString();
@@ -797,8 +797,8 @@ class PattycashMasterModel {
       amount: json['Amount'],
       pattyCashDetails: json['PattyCashDetails'] != null
           ? (json['PattyCashDetails'] as List<dynamic>)
-              .map((e) => PattyCashDetailsModel.fromJson(e))
-              .toList()
+          .map((e) => PattyCashDetailsModel.fromJson(e))
+          .toList()
           : [],
     );
   }
@@ -963,7 +963,7 @@ class UserLoginModel {
   UserLoginModel(this.Id, this.UserName);
 
   UserLoginModel.fromJson(Map<String, dynamic> json)
-      : Id = int.parse(json['Id'].toString()),
+      : Id = int.tryParse(json['Id']?.toString() ?? '') ?? 0,
         UserName = json['UserName'].toString();
   Map<String, dynamic> toJson() {
     return {
@@ -980,7 +980,7 @@ class CustomerModel {
   CustomerModel(this.Id, this.AccountName, this.Password);
 
   CustomerModel.fromJson(Map<String, dynamic> json)
-      : Id = int.parse(json['Id'].toString()),
+      : Id = int.tryParse(json['Id']?.toString() ?? '') ?? 0,
         AccountName = json['AccountName'].toString(),
         Password = json['Password'] == null ? '' : json['Password'].toString();
   Map<String, dynamic> toJson() {
@@ -1026,10 +1026,10 @@ class LocationModel {
   LocationModel(this.Id,this.CompanyRefId, this.Location, this.Active);
 
   LocationModel.fromJson(Map<String, dynamic> json)
-      : Id = int.parse(json['Id'].toString()),
-        CompanyRefId = int.parse(json['CompanyRefId'].toString()),
+      : Id = int.tryParse(json['Id']?.toString() ?? '') ?? 0,
+        CompanyRefId = int.tryParse(json['CompanyRefId']?.toString() ?? '') ?? 0,
         Location = json['Location'].toString(),
-        Active = int.parse(json['Active'].toString());
+        Active = int.tryParse(json['Active']?.toString() ?? '') ?? 0;
   Map<String, dynamic> toJson() {
     return {
       'Id': Id,
@@ -1052,9 +1052,9 @@ class WareHouseModel {
   WareHouseModel(this.Id,this.PortName);
 
   WareHouseModel.fromJson(Map<String, dynamic> json)
-      : Id = int.parse(json['Id'].toString()),
+      : Id = int.tryParse(json['Id']?.toString() ?? '') ?? 0,
         PortName = json['PortName'].toString();
-        Map<String, dynamic> toJson() {
+  Map<String, dynamic> toJson() {
     return {
       'Id': Id,
       'PortName': PortName,
@@ -1072,7 +1072,7 @@ class GetTruckModel {
   GetTruckModel(this.Id, this.AccountName, this.Password);
 
   GetTruckModel.fromJson(Map<String, dynamic> json)
-      : Id = int.parse(json['Id'].toString()),
+      : Id = int.tryParse(json['Id']?.toString() ?? '') ?? 0,
         AccountName = json['AccountName'].toString(),
         Password = json['Password'] == null ? '' : json['Password'].toString();
   Map<String, dynamic> toJson() {
@@ -1102,14 +1102,14 @@ class JobTypeDetailsModel {
       this.JobName, this.StatusName, this.Active, this.Mandatory, this.Status);
 
   JobTypeDetailsModel.fromJson(Map<String, dynamic> json)
-      : ID = int.parse(json['ID'].toString()),
-        JobMasterRefId = int.parse(json['JobMasterRefId'].toString()),
+      : ID = int.tryParse(json['ID']?.toString() ?? '') ?? 0,
+        JobMasterRefId = int.tryParse(json['JobMasterRefId']?.toString() ?? '') ?? 0,
         Description = json['Description'].toString(),
         JobName = json['JobName'].toString(),
         StatusName = json['StatusName'].toString(),
-        Active = int.parse(json['Active'].toString()),
-        Mandatory = int.parse(json['Mandatory'].toString()),
-        Status = int.parse(json['Status'].toString());
+        Active = int.tryParse(json['Active']?.toString() ?? '') ?? 0,
+        Mandatory = int.tryParse(json['Mandatory']?.toString() ?? '') ?? 0,
+        Status = int.tryParse(json['Status']?.toString() ?? '') ?? 0;
   Map<String, dynamic> toJson() {
     return {
       'ID': ID,
@@ -1143,11 +1143,11 @@ class JobStatusModel {
   JobStatusModel(this.Id, this.Name, this.DFlag, this.Svalue, this.Active);
 
   JobStatusModel.fromJson(Map<String, dynamic> json)
-      : Id = int.parse(json['Id'].toString()),
+      : Id = int.tryParse(json['Id']?.toString() ?? '') ?? 0,
         Name = json['Name'].toString(),
-        DFlag = int.parse(json['DFlag'].toString()),
-        Svalue = int.parse(json['Svalue'].toString()),
-        Active = int.parse(json['Active'].toString());
+        DFlag = int.tryParse(json['DFlag']?.toString() ?? '') ?? 0,
+        Svalue = int.tryParse(json['Svalue']?.toString() ?? '') ?? 0,
+        Active = int.tryParse(json['Active']?.toString() ?? '') ?? 0;
   Map<String, dynamic> toJson() {
     return {
       'Id': Id,
@@ -1174,10 +1174,10 @@ class JobTypeModel {
   JobTypeModel(this.Id, this.Name, this.DFlag, this.Active);
 
   JobTypeModel.fromJson(Map<String, dynamic> json)
-      : Id = int.parse(json['Id'].toString()),
+      : Id = int.tryParse(json['Id']?.toString() ?? '') ?? 0,
         Name = json['Name'].toString(),
-        DFlag = int.parse(json['DFlag'].toString()),
-        Active = int.parse(json['Active'].toString());
+        DFlag = int.tryParse(json['DFlag']?.toString() ?? '') ?? 0,
+        Active = int.tryParse(json['Active']?.toString() ?? '') ?? 0;
   Map<String, dynamic> toJson() {
     return {
       'Id': Id,
@@ -1206,13 +1206,13 @@ class JobAllStatusModel {
       this.MinStatusName, this.MinStatus, this.Sort);
 
   JobAllStatusModel.fromJson(Map<String, dynamic> json)
-      : ID = int.parse(json['ID'].toString()),
-        JobMasterRefId = int.parse(json['JobMasterRefId'].toString()),
-        Status = int.parse(json['Status'].toString()),
+      : ID = int.tryParse(json['ID']?.toString() ?? '') ?? 0,
+        JobMasterRefId = int.tryParse(json['JobMasterRefId']?.toString() ?? '') ?? 0,
+        Status = int.tryParse(json['Status']?.toString() ?? '') ?? 0,
         StatusName = json['StatusName'].toString(),
         MinStatusName = json['MinStatusName'].toString(),
-        MinStatus = int.parse(json['MinStatus'].toString()),
-        Sort = int.parse(json['Sort'].toString());
+        MinStatus = int.tryParse(json['MinStatus']?.toString() ?? '') ?? 0,
+        Sort = int.tryParse(json['Sort']?.toString() ?? '') ?? 0;
   Map<String, dynamic> toJson() {
     return {
       'ID': ID,
@@ -1243,10 +1243,10 @@ class AgentCompanyModel {
   AgentCompanyModel(this.Id, this.Name, this.DFlag, this.Active);
 
   AgentCompanyModel.fromJson(Map<String, dynamic> json)
-      : Id = int.parse(json['Id'].toString()),
+      : Id = int.tryParse(json['Id']?.toString() ?? '') ?? 0,
         Name = json['Name'].toString(),
-        DFlag = int.parse(json['DFlag'].toString()),
-        Active = int.parse(json['Active'].toString());
+        DFlag = int.tryParse(json['DFlag']?.toString() ?? '') ?? 0,
+        Active = int.tryParse(json['Active']?.toString() ?? '') ?? 0;
   Map<String, dynamic> toJson() {
     return {
       'Id': Id,
@@ -1301,20 +1301,20 @@ class AgentModel {
       this.Modified_By);
 
   AgentModel.fromJson(Map<String, dynamic> json)
-      : Id = int.parse(json['Id'].toString()),
-        CompanyRefId = int.parse(json['CompanyRefId'].toString()),
+      : Id = int.tryParse(json['Id']?.toString() ?? '') ?? 0,
+        CompanyRefId = int.tryParse(json['CompanyRefId']?.toString() ?? '') ?? 0,
         CNumberDisplay = json['CNumberDisplay'].toString(),
-        CNumber = int.parse(json['CNumber'].toString()),
+        CNumber = int.tryParse(json['CNumber']?.toString() ?? '') ?? 0,
         AgentName = json['AgentName'].toString(),
         Address1 = json['Address1'].toString(),
-        AgentCompanyRefId = int.parse(json['AgentCompanyRefId'].toString()),
+        AgentCompanyRefId = int.tryParse(json['AgentCompanyRefId']?.toString() ?? '') ?? 0,
         Email = json['Email'].toString(),
         MobileNo = json['MobileNo'].toString(),
         UserName = json['UserName'].toString(),
         Password = json['Password'].toString(),
         TokenId = json['TokenId'].toString(),
         SName = json['SName'].toString(),
-        Active = int.parse(json['Active'].toString()),
+        Active = int.tryParse(json['Active']?.toString() ?? '') ?? 0,
         Created_Date = json['Created_Date'].toString(),
         Modified_Date = json['Modified_Date'].toString(),
         Modified_By = json['Modified_By'].toString();
@@ -1395,8 +1395,8 @@ class ProductModel {
         PurRate = double.parse(json['PurRate'].toString()),
         MRP = double.parse(json['MRP'].toString()),
         GST = double.parse(json['GST'].toString()),
-        Id = int.parse(json['Id'].toString()),
-        CategoryId = int.parse(json['CategoryId'].toString()),
+        Id = int.tryParse(json['Id']?.toString() ?? '') ?? 0,
+        CategoryId = int.tryParse(json['CategoryId']?.toString() ?? '') ?? 0,
         Imagepath = json['Imagepath'].toString();
 
   Map<String, dynamic> toJson() {
@@ -1442,7 +1442,7 @@ class ProductViewModel {
         Productcode = json['Productcode'].toString(),
         SaleRate = double.parse(json['SaleRate'].toString()),
         GST = double.parse(json['GST'].toString()),
-        Qty = int.parse(json['Qty'].toString()),
+        Qty = int.tryParse(json['Qty']?.toString() ?? '') ?? 0,
         Amount = double.parse(json['Amount'].toString());
 
   Map<String, dynamic> toJson() {
@@ -1544,21 +1544,21 @@ class TruckDetailsModel {
       );
 
   TruckDetailsModel.fromJson(Map<String, dynamic> json)
-      : Id = int.parse(json['Id'].toString()),
-        flag = json['flag'] == null ? 0 :int.parse(json['flag'].toString()),
+      : Id = int.tryParse(json['Id']?.toString() ?? '') ?? 0,
+        flag = json['flag'] == null ? 0 :int.tryParse(json['flag']?.toString() ?? '') ?? 0,
         ExpDate = json['ExpDate']== null ? "" :json['ExpDate'].toString(),
         ExpApadBonam = json['ExpApadBonam']== null ? "" :json['ExpApadBonam'].toString(),
         FromDate = json['FromDate'] == null ? "" : json['FromDate'].toString(),
-        CompanyRefId = int.parse(json['CompanyRefId'].toString()),
+        CompanyRefId = int.tryParse(json['CompanyRefId']?.toString() ?? '') ?? 0,
         CNumberDisplay = json['CNumberDisplay'].toString(),
-        CNumber = json['CNumber'] == null ? 0 : int.parse(json['CNumber'].toString()),
+        CNumber = json['CNumber'] == null ? 0 : int.tryParse(json['CNumber']?.toString() ?? '') ?? 0,
         TruckName = json['TruckName'] == null ? "" : json['TruckName'].toString(),
         TruckNumber = json['TruckNumber'].toString(),
         TruckNumber1 = json['TruckNumber1'].toString(),
         TruckType = json['TruckType'] == null ? "" : json['TruckType'].toString(),
         Latitude = json['Latitude'] == null ? "" : json['Latitude'].toString(),
         longitude = json['longitude'] == null ? "" : json['longitude'].toString(),
-        Active = int.parse(json['Active'].toString()),
+        Active = int.tryParse(json['Active']?.toString() ?? '') ?? 0,
         Created_Date = json['Created_Date'].toString(),
         Modified_Date = json['Modified_Date'].toString(),
         Modified_By = json['Modified_By'] == null ? "" : json['Modified_By'].toString(),
@@ -1580,7 +1580,7 @@ class TruckDetailsModel {
         ServiceLast = json['ServiceLast'].toString() ,
         GearOilExp = json['GearOilExp'].toString() ,
         PTPStickerExp = json['PTPStickerExp'].toString() ,
-  SIDExp = json['SIDExp'].toString() ;
+        SIDExp = json['SIDExp'].toString() ;
 
 
   Map<String, dynamic> toJson() {
@@ -1664,7 +1664,7 @@ class TruckDetailsModel {
         ServiceLast = '',
         GearOilExp = '',
         PTPStickerExp = '',
-  SIDExp = '';
+        SIDExp = '';
 }
 class PaymentPendingModel {
   final String? SubExpenseName;
@@ -1832,14 +1832,14 @@ class ReviewModel {
       this.Id);
 
   ReviewModel.fromJson(Map<String, dynamic> json)
-      : TicketNo = int.parse(json['TicketNo'].toString()),
+      : TicketNo = int.tryParse(json['TicketNo']?.toString() ?? '') ?? 0,
         ShopName = json['ShopName'].toString(),
         ShopNumper = json['ShopNumper'].toString(),
         EngRemarks = json['EngRemarks'].toString(),
         Remarks = json['Remarks'].toString(),
         ReviewRemarks = json['Remarks'].toString(),
         Issue = json['Issue'].toString(),
-        Id = int.parse(json['Id'].toString()),
+        Id = int.tryParse(json['Id']?.toString() ?? '') ?? 0,
         Support_Date = json['Support_Date'].toString();
   Map<String, dynamic> toJson() {
     return {
@@ -1939,8 +1939,8 @@ class AppuserModel {
   AppuserModel(
       this.Id, this.CompanyRefid, this.Username, this.Password, this.Priv);
   AppuserModel.fromJson(Map<String, dynamic> json)
-      : Id = int.parse(json['Id'].toString()),
-        CompanyRefid = int.parse(json['CompanyRefid'].toString()),
+      : Id = int.tryParse(json['Id']?.toString() ?? '') ?? 0,
+        CompanyRefid = int.tryParse(json['CompanyRefid']?.toString() ?? '') ?? 0,
         Priv = json['Priv'] ?? '',
         Username = json['Username'] ?? '',
         Password = json['Password'] ?? '';
@@ -1967,10 +1967,10 @@ class MainsettingModel {
   MainsettingModel(
       this.Id, this.CompanyRefid, this.VariableName, this.SValue, this.Status);
   MainsettingModel.fromJson(Map<String, dynamic> json)
-      : Id = int.parse(json['Id'].toString()),
-        CompanyRefid = int.parse(json['CompanyRefid'].toString()),
+      : Id = int.tryParse(json['Id']?.toString() ?? '') ?? 0,
+        CompanyRefid = int.tryParse(json['CompanyRefid']?.toString() ?? '') ?? 0,
         Status = (json['Status'].toString() == "1" ||
-                json['Status'].toString() == "true")
+            json['Status'].toString() == "true")
             ? 1
             : 0,
         VariableName = json['VariableName'] ?? '',
@@ -2001,13 +2001,13 @@ class MenuMasterModel {
 
   MenuMasterModel.fromJson(Map<String, dynamic> json)
       : FormText = json['FormText'] ?? '',
-        Id = int.parse(json['Id'].toString()),
-        CompanyRefid = int.parse(json['CompanyRefid'].toString()),
-        ParentId = int.parse(json['ParentId'].toString()),
-        PageAdd = int.parse(json['PageAdd'].toString()),
-        PageEdit = int.parse(json['PageEdit'].toString()),
-        PageDelete = int.parse(json['PageDelete'].toString()),
-        PageView = int.parse(json['PageView'].toString());
+        Id = int.tryParse(json['Id']?.toString() ?? '') ?? 0,
+        CompanyRefid = int.tryParse(json['CompanyRefid']?.toString() ?? '') ?? 0,
+        ParentId = int.tryParse(json['ParentId']?.toString() ?? '') ?? 0,
+        PageAdd = int.tryParse(json['PageAdd']?.toString() ?? '') ?? 0,
+        PageEdit = int.tryParse(json['PageEdit']?.toString() ?? '') ?? 0,
+        PageDelete = int.tryParse(json['PageDelete']?.toString() ?? '') ?? 0,
+        PageView = int.tryParse(json['PageView']?.toString() ?? '') ?? 0;
 
   // method
   Map<String, dynamic> toJson() {
@@ -2094,17 +2094,15 @@ class CompanyModel {
       this.screentype);
 
   CompanyModel.fromJson(Map<String, dynamic> json)
-      : Id = int.parse(json['Id'].toString()),
-        ParentId = int.parse(json['ParentId'].toString() == 'null'
-            ? '0'
-            : json['ParentId'].toString()),
-        CCode = int.parse(json['CCode'].toString()),
+      : Id = int.tryParse(json['Id']?.toString() ?? '') ?? 0,
+        ParentId = int.tryParse(json['ParentId']?.toString() ?? '') ?? 0,
+        CCode = int.tryParse(json['CCode']?.toString() ?? '') ?? 0,
         CompanyName = json['CompanyName'] ?? '',
         CStatus = (json['CStatus'].toString() == "1" ||
-                json['CStatus'].toString() == "true")
+            json['CStatus'].toString() == "true")
             ? 1
             : 0,
-        Active = int.parse(json['Active'].toString()),
+        Active = int.tryParse(json['Active']?.toString() ?? '') ?? 0,
         Address1 = json['Address1'] ?? '',
         Address2 = json['Address2'] ?? '',
         City = json['City'] ?? '',
@@ -2125,7 +2123,7 @@ class CompanyModel {
         TAddress1 = json['TAddress1'] ?? '',
         TAddress2 = json['TAddress2'] ?? '',
         TCity = json['TCity'] ?? '',
-        productauto = int.parse(json['productauto'].toString()),
+        productauto = int.tryParse(json['productauto']?.toString() ?? '') ?? 0,
         screentype = json['screentype'] ?? '';
   // method
   Map<String, dynamic> toJson() {
@@ -2176,10 +2174,10 @@ class BluetoothModel {
       this.devicename, this.printmodel, this.name1, this.address1);
 
   BluetoothModel.fromJson(Map<String, dynamic> json)
-      : Id = int.parse(json['Id'].toString()),
+      : Id = int.tryParse(json['Id']?.toString() ?? '') ?? 0,
         name = json['name'].toString(),
         address = json['address'].toString(),
-        type = int.parse(json['type'].toString()),
+        type = int.tryParse(json['type']?.toString() ?? '') ?? 0,
         connected = (json['connected'].toString() == '1' ||
             json['connected'].toString() == 'true')
             ? true
@@ -2236,13 +2234,13 @@ class DashboardModel {
       this.MonthSales,
       this.MonthAmount,);
   DashboardModel.fromJson(Map<String, dynamic> json)
-      : TodaySales = int.parse(json['TodaySales'].toString()),
+      : TodaySales = int.tryParse(json['TodaySales']?.toString() ?? '') ?? 0,
         TodayAmount = double.parse(json['TodayAmount'].toString()),
-        YesterdaySales = int.parse(json['YesterdaySales'].toString()),
+        YesterdaySales = int.tryParse(json['YesterdaySales']?.toString() ?? '') ?? 0,
         YesterdayAmount = double.parse(json['YesterdayAmount'].toString()),
-        WeekSales = int.parse(json['WeekSales'].toString()),
+        WeekSales = int.tryParse(json['WeekSales']?.toString() ?? '') ?? 0,
         WeekAmount = double.parse(json['WeekAmount'].toString()),
-        MonthSales = int.parse(json['MonthSales'].toString()),
+        MonthSales = int.tryParse(json['MonthSales']?.toString() ?? '') ?? 0,
         MonthAmount = double.parse(json['MonthAmount'].toString());
 }
 class SaleOrderModel {
@@ -2294,41 +2292,41 @@ class SaleOrderMasterModel {
   double NetAmt;
 
   SaleOrderMasterModel(
-    this.Id,
-    this.CompanyRefId,
-    this.BillNoDisplay,
-    this.JobStatus,
-    this.BillNo,
-    this.BillDate,
-    this.BillTime,
-    this.SaleType,
-    this.CustomerName,
-    this.EmployeeName,
-    this.CashierName,
-    this.Remarks,
-    this.Origin,
-    this.Destination,
-    this.SPickupDate,
-    this.ETA,
-    this.SETA,
-    this.SETB,
-    this.SOETA,
-    this.SOETB,
-    this.SPort,
-    this.FlighTime,
-    this.Offvesselname,
-    this.Loadingvesselname,
-    this.JobMasterRefId,
-    this.NetAmt,
-  {this.isETASelected = false}
-  );
+      this.Id,
+      this.CompanyRefId,
+      this.BillNoDisplay,
+      this.JobStatus,
+      this.BillNo,
+      this.BillDate,
+      this.BillTime,
+      this.SaleType,
+      this.CustomerName,
+      this.EmployeeName,
+      this.CashierName,
+      this.Remarks,
+      this.Origin,
+      this.Destination,
+      this.SPickupDate,
+      this.ETA,
+      this.SETA,
+      this.SETB,
+      this.SOETA,
+      this.SOETB,
+      this.SPort,
+      this.FlighTime,
+      this.Offvesselname,
+      this.Loadingvesselname,
+      this.JobMasterRefId,
+      this.NetAmt,
+      {this.isETASelected = false}
+      );
 
   SaleOrderMasterModel.fromJson(Map<String, dynamic> json)
-      : Id = int.parse(json['Id'].toString()),
-        CompanyRefId = int.parse(json['CompanyRefId'].toString()),
+      : Id = int.tryParse(json['Id']?.toString() ?? '') ?? 0,
+        CompanyRefId = int.tryParse(json['CompanyRefId']?.toString() ?? '') ?? 0,
         BillNoDisplay = json['BillNoDisplay'] ?? '',
         JobStatus = json['JobStatus'] ?? '',
-        BillNo = int.parse(json['BillNo'].toString()),
+        BillNo = int.tryParse(json['BillNo']?.toString() ?? '') ?? 0,
         BillDate = json['BillDate'] ?? '',
         BillTime = json['BillTime'] ?? '',
         SaleType = json['SaleType'] ?? '',
@@ -2348,9 +2346,9 @@ class SaleOrderMasterModel {
         FlighTime = json['FlighTime'] ?? '',
         Offvesselname = json['Offvesselname'] ?? '',
         Loadingvesselname = json['Loadingvesselname'] ?? '',
-        JobMasterRefId = int.parse(json['JobMasterRefId'].toString()),
-       isETASelected = false,
-      NetAmt = double.parse(json['NetAmt'].toString());
+        JobMasterRefId = int.tryParse(json['JobMasterRefId']?.toString() ?? '') ?? 0,
+        isETASelected = false,
+        NetAmt = double.parse(json['NetAmt'].toString());
   // method
   Map<String, dynamic> toJson() {
     return {
@@ -2440,8 +2438,8 @@ class SaleOrderDetailModel {
       this.SAmount);
 
   SaleOrderDetailModel.fromJson(Map<String, dynamic> json)
-      : Id = int.parse(json['Id'].toString()),
-        SaleRefId = int.parse(json['SaleRefId'].toString()),
+      : Id = int.tryParse(json['Id']?.toString() ?? '') ?? 0,
+        SaleRefId = int.tryParse(json['SaleRefId']?.toString() ?? '') ?? 0,
         ProductCode = json['ProductCode'] ?? '',
         ProductName = json['ProductName'] ?? '',
         MRP = double.parse(json['MRP'].toString()),
@@ -2499,8 +2497,8 @@ class PlanningMasterModel {
       this.Remarks,
       );
   PlanningMasterModel.fromJson(Map<String, dynamic> json)
-      : Id = int.parse(json['Id'].toString()),
-        PLANINGNo = int.parse(json['PLANINGNo'].toString()),
+      : Id = int.tryParse(json['Id']?.toString() ?? '') ?? 0,
+        PLANINGNo = int.tryParse(json['PLANINGNo']?.toString() ?? '') ?? 0,
         PLANINGNoDisplay = json['PLANINGNoDisplay'] ?? '',
         PLANINGDate = json['PLANINGDate'] ?? '',
         Remarks = json['Remarks'] ?? '';
@@ -2536,8 +2534,8 @@ class VesselPlanningMasterModel {
       this.Remarks,
       );
   VesselPlanningMasterModel.fromJson(Map<String, dynamic> json)
-      : Id = int.parse(json['Id'].toString()),
-        VESSELPLANINGNo = int.parse(json['VESSELPLANINGNo'].toString()),
+      : Id = int.tryParse(json['Id']?.toString() ?? '') ?? 0,
+        VESSELPLANINGNo = int.tryParse(json['VESSELPLANINGNo']?.toString() ?? '') ?? 0,
         VESSELPLANINGNoDisplay = json['VESSELPLANINGNoDisplay'] ?? '',
         VESSELPLANINGDate = json['VESSELPLANINGDate'] ?? '',
         Remarks = json['Remarks'] ?? '';
@@ -2604,11 +2602,11 @@ class SaleEditDetailModel {
       this.CurrencyValue);
 
   SaleEditDetailModel.fromJson(Map<String, dynamic> json)
-      : Id = int.parse(json['Id'].toString()),
-        SDId = int.parse(json['SDId'].toString()),
+      : Id = int.tryParse(json['Id']?.toString() ?? '') ?? 0,
+        SDId = int.tryParse(json['SDId']?.toString() ?? '') ?? 0,
         SaleOrderMasterRefId =
-            int.parse(json['SaleOrderMasterRefId'].toString()),
-        ItemMasterRefId = int.parse(json['ItemMasterRefId'].toString()),
+            int.tryParse(json['SaleOrderMasterRefId']?.toString() ?? '') ?? 0,
+        ItemMasterRefId = int.tryParse(json['ItemMasterRefId']?.toString() ?? '') ?? 0,
         MRP = double.parse(json['MRP'].toString()),
         PurchaseRate = double.parse(json['PurchaseRate'].toString()),
         ItemQty = double.parse(json['ItemQty'].toString()),
@@ -2685,11 +2683,11 @@ class AddressDetailsModel {
       this.Id, this.Name, this.Address, this.Phone, this.Active);
 
   AddressDetailsModel.fromJson(Map<String, dynamic> json)
-      : Id = int.parse(json['Id'].toString()),
+      : Id = int.tryParse(json['Id']?.toString() ?? '') ?? 0,
         Name = json['Name'] ?? '',
         Address = json['Address'] ?? '',
         Phone = json['Phone'] ?? '',
-        Active = int.parse(json['Active'].toString());
+        Active = int.tryParse(json['Active']?.toString() ?? '') ?? 0;
   // method
   Map<String, dynamic> toJson() {
     return {
@@ -2723,9 +2721,9 @@ class RTIMasterViewModel {
       this.Id, this.RTINo,this.TruckMasterRefId,this.RTINoDisplay, this.RTIDate, this.DriverName, this.TruckName, this.Remarks, this.Amount);
 
   RTIMasterViewModel.fromJson(Map<String, dynamic> json)
-      : Id = int.parse(json['Id'].toString()),
-        RTINo = int.parse(json['RTINo'].toString()),
-        TruckMasterRefId = int.parse(json['TruckMasterRefId'].toString()),
+      : Id = int.tryParse(json['Id']?.toString() ?? '') ?? 0,
+        RTINo = int.tryParse(json['RTINo']?.toString() ?? '') ?? 0,
+        TruckMasterRefId = int.tryParse(json['TruckMasterRefId']?.toString() ?? '') ?? 0,
         RTINoDisplay = json['RTINoDisplay'] ?? '',
         RTIDate = json['RTIDate'] ?? '',
         DriverName = json['DriverName'] ?? '',
@@ -2784,23 +2782,23 @@ class RTIDetailsViewModel {
       this.Id, this.SDId,this.RTIMasterRefId,this.StatusId, this.SaleOrderMasterRefId,this.CustomerMasterRefId, this.JobNo, this.JobDate, this.CustomerName, this.Salary, this.PPIC, this.DPIC, this.PWDType,this.Active, this.Verify,this.imagePath,this.imageFile,{ this.isChecked = false , this.isVerified = false});
 
   RTIDetailsViewModel.fromJson(Map<String, dynamic> json)
-      : Id = int.parse(json['Id'].toString()),
-        SDId = int.parse(json['SDId'].toString()),
-        RTIMasterRefId = int.parse(json['RTIMasterRefId'].toString()),
-        StatusId = int.parse(json['StatusId'].toString()),
-        SaleOrderMasterRefId = int.parse(json['SaleOrderMasterRefId'].toString()),
-        CustomerMasterRefId = int.parse(json['CustomerMasterRefId'].toString()),
+      : Id = int.tryParse(json['Id']?.toString() ?? '') ?? 0,
+        SDId = int.tryParse(json['SDId']?.toString() ?? '') ?? 0,
+        RTIMasterRefId = int.tryParse(json['RTIMasterRefId']?.toString() ?? '') ?? 0,
+        StatusId = int.tryParse(json['StatusId']?.toString() ?? '') ?? 0,
+        SaleOrderMasterRefId = int.tryParse(json['SaleOrderMasterRefId']?.toString() ?? '') ?? 0,
+        CustomerMasterRefId = int.tryParse(json['CustomerMasterRefId']?.toString() ?? '') ?? 0,
         JobNo = json['JobNo'] ?? '',
         JobDate = json['JobDate'] ?? '',
         CustomerName = json['CustomerName'] ?? '',
         Salary = double.parse(json['Salary'].toString()),
         PPIC = json['PPIC'] ?? '',
         DPIC = json['DPIC'] ?? '',
-        PWDType = int.parse(json['PWDType'].toString()),
-        Active = int.parse(json['Active'].toString()),
+        PWDType = int.tryParse(json['PWDType']?.toString() ?? '') ?? 0,
+        Active = int.tryParse(json['Active']?.toString() ?? '') ?? 0,
         Verify = int.tryParse(json['Verify']?.toString() ?? '') ?? 0,
         imagePath = json['ImagePath'] ?? '',
-        isChecked = int.parse(json['Active'].toString()) == 1,
+        isChecked = (int.tryParse(json['Active']?.toString() ?? '') ?? 0) == 1,
         isVerified =
             (int.tryParse(json['Verify']?.toString() ?? '') ?? 0) == 1;
   // method
@@ -2907,8 +2905,8 @@ class FuelEntryModel {
       this.SSaleDate,);
 
   FuelEntryModel.fromJson(Map<String, dynamic> json)
-      : Id = int.parse(json['Id'].toString()),
-        CompanyRefId = int.parse(json['CompanyRefId'].toString()),
+      : Id = int.tryParse(json['Id']?.toString() ?? '') ?? 0,
+        CompanyRefId = int.tryParse(json['CompanyRefId']?.toString() ?? '') ?? 0,
         AAmount = double.parse(json['AAmount'].toString()),
         Aliter = double.parse(json['Aliter'].toString()),
         SSaleDate=json['SSaleDate'].toString();
@@ -3747,4 +3745,3 @@ class PettyCashDetailsModel {
         Items = '',
         Amount = '0.00';
 }
-

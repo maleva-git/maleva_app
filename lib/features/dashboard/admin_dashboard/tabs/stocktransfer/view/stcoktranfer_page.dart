@@ -2,11 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:maleva/MasterSearch/WareHouseList.dart';
 import 'package:maleva/core/models/model.dart';
 import 'package:maleva/core/utils/clsfunction.dart' as objfun;
 import 'package:maleva/menu/menulist.dart';
 
+import '../../../../../mastersearch/WareHouseList.dart';
 import '../bloc/stock_transfer_bloc.dart';
 
 

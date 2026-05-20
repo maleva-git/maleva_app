@@ -3,7 +3,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:maleva/core/utils/clsfunction.dart' as objfun;
 import 'package:maleva/core/colors/colors.dart' as colour;
-import '../../../../../../Transaction/SaleOrder/SalesOrderAdd.dart';
 import '../../../../../../core/di/injection.dart';
 import '../../../../../../core/network/OnlineApi.dart' as OnlineApi;
 import '../../../../../../core/theme/tokens.dart';

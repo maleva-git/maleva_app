@@ -70,11 +70,6 @@ class Appuserloginmobile extends StatelessWidget {
       BuildContext context, LoginState state) {
 
     if (state.driverLogin) {
-      // Navigator.pushReplacement(
-      //   context,
-      //   MaterialPageRoute(
-      //       builder: (_) => const DriverDashboard()),
-      // );
 
       Navigator.pushReplacement(
         context,
@@ -113,10 +108,6 @@ class Appuserloginmobile extends StatelessWidget {
         );
 
         break;
-    // else if( objfun.storagenew.getString('RulesType') == "ACCOUNTS")
-    // {
-    // Navigator.push(context, MaterialPageRoute(builder: (context) => const PayableDashbord()));
-    // }
 
       case
 
@@ -199,17 +190,6 @@ class Appuserloginmobile extends StatelessWidget {
           ),
         );
         break;
-      // case "AIR FRIEGHT":
-      //   Navigator.pushReplacement(
-      //     context,
-      //     MaterialPageRoute(
-      //       builder: (_) => BlocProvider(
-      //         create: (_) => SalesDashboardBloc(),
-      //         child: const SalesDashboard(),
-      //       ),
-      //     ),
-      //   );
-        break;
       case "AIR FRIEGHT":
         Navigator.pushReplacement(
           context,
@@ -233,46 +213,6 @@ class Appuserloginmobile extends StatelessWidget {
           ),
         );
         break;
-
-
-    // else if(objfun.storagenew.getString('RulesType') == "OPERATIONADMIN")
-
-    // else if(objfun.storagenew.getString('RulesType') == "TRANSPORTATION")
-    // {
-    // Navigator.push(context, MaterialPageRoute(builder: (context) => const TransportDashboard()));
-    // }
-    // else if(objfun.storagenew.getString('RulesType') == "OPERATIONADMIN")
-    // {
-    // Navigator.push(context, MaterialPageRoute(builder: (context) => const OperationAdminDashboard()));
-    // }
-    // else if(objfun.storagenew.getString('RulesType') == "HR")
-    // {
-    // Navigator.push(context, MaterialPageRoute(builder: (context) => const MaintenanceDashboard()));
-    // }
-    // else if(objfun.storagenew.getString('RulesType') == "AIR FRIEGHT")
-    // {
-    // Navigator.push(context, MaterialPageRoute(builder: (context) => const AirFrieghtDashboard()));
-    // }
-    // else if(objfun.storagenew.getString('RulesType') == "BOARDING"  || objfun.storagenew.getString('RulesType') == "OPERATION")
-    // {
-    // Navigator.push(context, MaterialPageRoute(builder: (context) => const BoardingDashboard()));
-    // }
-    // else if( objfun.storagenew.getString('RulesType') == "FORWARDING" )
-    // {
-    // Navigator.push(context, MaterialPageRoute(builder: (context) => const ForwardingDashboard()));
-    // }
-    // else if( objfun.storagenew.getString('RulesType') == "RECEIVABLE" )
-    // {
-    // Navigator.push(context, MaterialPageRoute(builder: (context) => const ReceivableDashboard()));
-    // }
-    // else if( objfun.storagenew.getString('RulesType') == "HRADMIN")
-    // {
-    // Navigator.push(context, MaterialPageRoute(builder: (context) => const HrDashboard()));
-    // }
-    // else if( objfun.storagenew.getString('RulesType') == "WAREHOUSE")
-    // {
-    // Navigator.push(context, MaterialPageRoute(builder: (context) => const Warehousedashboard()));
-    // }
 
       case "OPERATIONADMIN":
         Navigator.pushReplacement(
@@ -310,13 +250,7 @@ class Appuserloginmobile extends StatelessWidget {
         );
         break;
 
-       // case "SALES":
-       //   Navigator.pushReplacement(
-       //     context,
-       //     MaterialPageRoute(
-       //         builder: (_) => const CustDashboard()),
-       //   );
-       //   break;
+
 
       default:
         Navigator.pushReplacement(

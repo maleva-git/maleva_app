@@ -6,7 +6,7 @@ import 'package:intl/intl.dart';
 import 'package:maleva/core/utils/clsfunction.dart' as objfun;
 import 'package:maleva/core/models/model.dart';
 import 'package:maleva/menu/menulist.dart';
-import 'package:maleva/MasterSearch/Truck.dart';
+import '../../../mastersearch/Truck.dart';
 import '../bloc/licenseupdate_bloc.dart';
 import '../bloc/licenseupdate_event.dart';
 import '../bloc/licenseupdate_state.dart';

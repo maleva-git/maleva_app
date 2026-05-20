@@ -10,11 +10,8 @@ import 'package:maleva/core/utils/clsfunction.dart' as objfun;
 import 'package:maleva/core/network/OnlineApi.dart' as OnlineApi;
 import 'package:maleva/core/models/model.dart';
 import 'package:maleva/menu/menulist.dart';
-import 'package:maleva/MasterSearch/JobAllStatus.dart';
-import 'package:maleva/Transaction/SaleOrderDetails.dart';
-
-
 import '../../../../core/theme/tokens.dart';
+import '../../../mastersearch/JobAllStatus.dart';
 import '../bloc/updateboardingdetails_bloc.dart';
 import '../bloc/updateboardingdetails_event.dart';
 import '../bloc/updateboardingdetails_state.dart';

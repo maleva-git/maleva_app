@@ -194,8 +194,12 @@ class ApiClient {
         throw Exception('Already logged in on another device. Re-login or change password.');
       case 404:
       case 500:
-        final body = jsonDecode(response.body);
-        throw Exception(body['Message'] ?? 'Server error occurred.');
+        try {
+          final body = jsonDecode(response.body);
+          throw Exception(body is Map ? (body['Message'] ?? 'Server error occurred.') : 'Server error occurred.');
+        } catch (_) {
+          throw Exception('Server error occurred. (${response.statusCode})');
+        }
       default:
         throw Exception('${response.statusCode} Unknown error occurred.');
     }

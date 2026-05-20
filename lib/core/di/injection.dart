@@ -73,6 +73,8 @@ import '../../features/dashboard/admin_dashboard/tabs/pettycash/data/pettycash_r
 import '../../features/dashboard/admin_dashboard/tabs/receiptview/data/receipt_repository.dart';
 import '../../features/dashboard/admin_dashboard/tabs/rtiview/bloc/rtiview_bloc.dart';
 import '../../features/dashboard/admin_dashboard/tabs/rtiview/data/rtiview_repository.dart';
+import '../../features/dashboard/admin_dashboard/tabs/saleorderview/bloc/saleorderview_bloc.dart';
+import '../../features/dashboard/admin_dashboard/tabs/saleorderview/data/saleorderrepository.dart';
 import '../../features/dashboard/admin_dashboard/tabs/salesorder/data/salesorder_repository.dart';
 import '../../features/dashboard/admin_dashboard/tabs/spareparts/bloc/spareparts_bloc.dart';
 import '../../features/dashboard/admin_dashboard/tabs/spareparts/data/spareparts_repository.dart';
@@ -390,7 +392,15 @@ Future<void> setupDependencies() async {
   sl.registerFactory<AirfreightBloc>(
         () => AirfreightBloc(repository: sl<AirfreightRepository>()),
   );
-
+  sl.registerFactory<SaleOrderBloc>(
+        () => SaleOrderBloc(
+      // sl() automatically finds the registered SaleOrderRepository
+      repository: sl<SaleOrderRepository>(),
+    ),
+  );
+  sl.registerLazySingleton<SaleOrderRepository>(
+        () => SaleOrderRepository(),
+  );
   sl.registerFactory<MaintenanceBloc>(() => MaintenanceBloc());
   sl.registerFactory<DriverLicenseExpiryBloc>(() => DriverLicenseExpiryBloc());
   sl.registerFactory<TruckMaintDashBloc>(() => TruckMaintDashBloc());

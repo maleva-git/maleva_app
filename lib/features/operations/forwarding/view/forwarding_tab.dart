@@ -9,7 +9,7 @@ import 'package:maleva/core/utils/clsfunction.dart' as objfun;
 import 'package:maleva/core/network/OnlineApi.dart' as OnlineApi;
 import 'package:maleva/core/models/model.dart';
 import 'package:maleva/menu/menulist.dart';
-import 'package:maleva/MasterSearch/Employee.dart';
+import '../../../mastersearch/Employee.dart';
 import '../bloc/forwarding_bloc.dart';
 import '../bloc/forwarding_event.dart';
 import '../bloc/forwarding_state.dart';

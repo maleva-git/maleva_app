@@ -8,18 +8,16 @@ import 'package:maleva/core/network/OnlineApi.dart' as OnlineApi;
 import 'package:maleva/core/models/model.dart';
 import 'package:maleva/features/dashboard/sales_dashboard/view/salesdashboard_dashboard.dart';
 import 'package:maleva/menu/menulist.dart';
-import 'package:maleva/MasterSearch/Customer.dart';
-import 'package:maleva/Transaction/SaleOrder/SalesOrderAdd.dart';
-import 'package:maleva/DashBoard/AirFrieght/AirFrieghtDashboard.dart';
-import 'package:maleva/DashBoard/Boarding/BoardingDashboard.dart';
-import 'package:maleva/DashBoard/Forwarding/ForwardingDashboard.dart';
-import 'package:maleva/DashBoard/TransportDB/TransportDashboard.dart';
-import 'package:maleva/DashBoard/User/UserDashboard.dart';
-import '../../../../MasterSearch/JobType.dart';
-import '../../../../MasterSearch/Port.dart';
 import '../../../../core/theme/tokens.dart';
+import '../../../dashboard/admin_dashboard/tabs/transportDB/view/transportdb_tab.dart';
 import '../../../dashboard/admin_dashboard/view/admin_dashboard.dart';
+import '../../../dashboard/boarding_dashboard/view/boarding_dashboard.dart';
+import '../../../dashboard/forwarding_dashboard/view/forwarding_dashboard.dart';
 import '../../../dashboard/operationadmin_dashboard/view/operationadmin_dashboard.dart';
+import '../../../home/view/home_tab.dart';
+import '../../../mastersearch/Customer.dart';
+import '../../../mastersearch/JobType.dart';
+import '../../../mastersearch/Port.dart';
 import '../bloc/prealertview_bloc.dart';
 import '../bloc/prealertview_event.dart';
 import '../bloc/prealertview_state.dart';
@@ -121,7 +119,7 @@ class _PreAlertPage extends StatelessWidget {
         dest = const SalesDashboard();
         break;
       case 'TRANSPORTATION':
-        dest = const OldTransportDashboard();
+        dest = const TransportDashboard();
         break;
       case 'OPERATIONADMIN':
         dest = const OperationAdminDashboard();
