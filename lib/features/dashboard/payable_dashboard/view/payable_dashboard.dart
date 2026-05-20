@@ -2,12 +2,8 @@ import 'package:flutter/Material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:maleva/features/dashboard/payable_dashboard/view/payable_dashboard_ui.dart';
 import '../../../../core/di/injection.dart';
-import '../../admin_dashboard/tabs/adinvoice/bloc/forecast/forecast_bloc.dart';
-import '../../admin_dashboard/tabs/adinvoice/data/repositories/sales_forecast_repository.dart';
-import '../../admin_dashboard/tabs/adinvoice/presentation/widgets/ai_sales_forecast_chart.dart';
-import '../../admin_dashboard/tabs/aienginehours/bloc/ai_maintenance_bloc.dart';
-import '../../admin_dashboard/tabs/aienginehours/data/repositories/maintenance_ai_repository.dart';
-import '../../admin_dashboard/tabs/aienginehours/presentation/widgets/ai_maintenance_health_card.dart';
+
+
 import '../../admin_dashboard/tabs/billorder/bloc/billorder_bloc.dart';
 import '../../admin_dashboard/tabs/billorder/view/billorder_screen.dart';
 import '../../admin_dashboard/tabs/driver/bloc/driverdetails_bloc.dart';
@@ -104,12 +100,7 @@ class _PayableDashboardState extends State<PayableDashboard> with SingleTickerPr
               create: (context) => sl<PettyCashBloc>()..add(const LoadPettyCashEvent()),
               child: const PettyCashPage(),
             ),
-            BlocProvider(
-              create: (context) => AIMaintenanceBloc(
-                repository: MaintenanceAIRepository(),
-              )..add(LoadAIMaintenanceRisks()),
-              child: const AIMaintenanceHealthCard(),
-            )
+
           ],                                    // ← ] தான் close, } இல்ல
           child: Scaffold(
             body: PayableMobileDashboard(

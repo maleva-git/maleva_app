@@ -23,7 +23,7 @@ import '../../admin_dashboard/tabs/vesselreport/bloc/vesselreport_bloc.dart';
 import '../../admin_dashboard/tabs/vesselreport/view/vesselreportview_tab.dart';
 import '../bloc/airfreight_bloc.dart';
 import '../bloc/airfreight_event.dart';
-import 'airfreight_dashboard_ui.dart';
+//import 'airfreight_dashboard_ui.dart';
 
 
 
@@ -100,10 +100,10 @@ class _AirfreightDashboardState extends State<AirfreightDashboard> with SingleTi
 
           ],                                    // ← ] தான் close, }
           child: Scaffold(
-            body: AirfreightMobileDashboard(
-              tabController: _tabController,
-              isTablet: isTablet,
-            ),
+            //  body: (
+            //    tabController: _tabController,
+            //   isTablet: isTablet,
+            // ),
           ),
         );                                      // ← MultiBlocProvider close
       },                                        // ← LayoutBuilder builder close

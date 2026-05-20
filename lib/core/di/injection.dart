@@ -18,13 +18,9 @@ import 'package:maleva/features/dashboard/admin_dashboard/bloc/admin_tab_bloc.da
 import 'package:maleva/features/dashboard/admin_dashboard/tabs/invoice/data/invoice_repository.dart';
 import 'package:maleva/features/dashboard/admin_dashboard/tabs/invoice/bloc/invoice_bloc.dart';
 
-// ── AI Invoice forecast ───────────────────────────────────────────────────────
-import 'package:maleva/features/dashboard/admin_dashboard/tabs/adinvoice/data/repositories/sales_forecast_repository.dart';
-import 'package:maleva/features/dashboard/admin_dashboard/tabs/adinvoice/bloc/forecast/forecast_bloc.dart';
 
-// ── AI Engine hours / maintenance ─────────────────────────────────────────────
-import 'package:maleva/features/dashboard/admin_dashboard/tabs/aienginehours/data/repositories/maintenance_ai_repository.dart';
-import 'package:maleva/features/dashboard/admin_dashboard/tabs/aienginehours/bloc/ai_maintenance_bloc.dart';
+
+
 
 // ── No-dep dashboard tabs ─────────────────────────────────────────────────────
 import 'package:maleva/features/dashboard/admin_dashboard/tabs/salesorder/bloc/salesorder_bloc.dart';
@@ -62,7 +58,6 @@ import '../../features/dashboard/admin_dashboard/tabs/fuelfillings/bloc/fuelfill
 import '../../features/dashboard/admin_dashboard/tabs/fuelfillings/data/fuelfillings_repository.dart';
 import '../../features/dashboard/admin_dashboard/tabs/googlereview/bloc/googlereview_bloc.dart';
 import '../../features/dashboard/admin_dashboard/tabs/googlereview/data/googlereview_repository.dart';
-import '../../features/dashboard/admin_dashboard/tabs/gpstruckmap/bloc/gpstruckmap_bloc.dart';
 import '../../features/dashboard/admin_dashboard/tabs/inventoryreport/bloc/inventoryreport_bloc.dart';
 import '../../features/dashboard/admin_dashboard/tabs/inventoryreport/data/inventoryreport_repository.dart';
 import '../../features/dashboard/admin_dashboard/tabs/paymentview/bloc/paymentview_bloc.dart';
@@ -125,15 +120,10 @@ Future<void> setupDependencies() async {
         () => InvoiceRepositoryImpl(),
   );
 
-  // AI Invoice forecast
-  sl.registerLazySingleton<SalesForecastRepository>(
-        () => SalesForecastRepository(),
-  );
 
-  // AI Maintenance
-  sl.registerLazySingleton<MaintenanceAIRepository>(
-        () => MaintenanceAIRepository(),
-  );
+
+
+
 // ── REPOSITORIES ──────────────────────────────────────────────────────────
 
   // Existing Repositories...
@@ -165,15 +155,10 @@ Future<void> setupDependencies() async {
         () => InvoiceBloc(invoiceRepo: sl<InvoiceRepository>()),
   );
 
-  // ── AI Invoice forecast ─────────────────────────────────────────
-  sl.registerFactory<ForecastBloc>(
-        () => ForecastBloc(repository: sl<SalesForecastRepository>()),
-  );
 
-  // ── AI Maintenance ──────────────────────────────────────────────
-  sl.registerFactory<AIMaintenanceBloc>(
-        () => AIMaintenanceBloc(repository: sl<MaintenanceAIRepository>()),
-  );
+
+
+
   sl.registerLazySingleton<ReceiptRepository>(
         () => ReceiptRepositoryImpl(),
   );
@@ -359,9 +344,7 @@ Future<void> setupDependencies() async {
         () => RTIDetailsBloc(repository: sl<RTIViewRepository>()),
   );
 
-  sl.registerFactory<GpsTruckMapBloc>(
-        () => GpsTruckMapBloc(),
-  );
+
   sl.registerLazySingleton<TransportSalesRepository>(
         () => TransportSalesRepository(),
   );
@@ -395,37 +378,12 @@ Future<void> setupDependencies() async {
   sl.registerFactory<DriverLicenseExpiryBloc>(() => DriverLicenseExpiryBloc());
   sl.registerFactory<TruckMaintDashBloc>(() => TruckMaintDashBloc());
   sl.registerFactory<DriverSalaryBloc>(() => DriverSalaryBloc());
-  // sl.registerFactory<ReceiptBloc>(() => ReceiptBloc());
-  // sl.registerFactory<CustomerDashboardBloc>(() => CustomerDashboardBloc());
+
   sl.registerFactory<StockInEntryBloc>(() => StockInEntryBloc());
   sl.registerFactory<StockTransferBloc>(() => StockTransferBloc());
   sl.registerFactory<StockUpdateBloc>(() => StockUpdateBloc());
 
 
 
-  // ════════════════════════════════════════════════════════════════
-  // 4. CONTEXT-DEP BLOCS  —  NOT registered here
-  //    These still take BuildContext in constructor.
-  //    Refactor pannும்போது inga add pannuvom.
-  //
-  //    BillOrderBloc(context)        — billorder tab
-  //    BocBloc(context)              — bocheck tab
-  //    DriverBloc(context)           — driver tab
-  //    EmailBloc(context)            — emailinbox tab
-  //    EngineHoursBloc(context)      — enginehours tab
-  //    ExpenseReportBloc(context)    — expenseReport tab
-  //    ForwardingReportBloc(context) — forwardingreport tab
-  //    FuelDiffBloc(context)         — fuel tab
-  //    FuelFillingBloc(context)      — fuelfillings tab
-  //    ReviewBloc(context)           — googlereview tab
-  //    InventoryBloc(context)        — inventoryreport tab
-  //    PaymentPendingBloc(context)   — paymentview tab
-  //    PettyCashBloc(context)        — pettycash tab
-  //    RTIDetailsBloc(context)       — rtiview tab
-  //    SpeedingBloc(context)         — speedingreport tab
-  //    TransportBloc(context)        — transport tab
-  //    TruckDetailsBloc(context)     — truck tab
-  //    VesselBloc(context)           — vesselreport tab
-  //    PDOBloc(context, ...)         — pdo tab
-  // ════════════════════════════════════════════════════════════════
+
 }

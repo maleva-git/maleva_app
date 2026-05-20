@@ -16,8 +16,6 @@ import '../../../common_updates/blocs/truck/truck_event.dart';
 import '../../admin_dashboard/bloc/admin_tab_bloc.dart';
 import '../../admin_dashboard/bloc/admin_tab_state.dart';
 import '../../admin_dashboard/tabs/ExpenseReport/view/expensereport_tab.dart';
-import '../../admin_dashboard/tabs/adinvoice/presentation/widgets/ai_sales_forecast_chart.dart';
-import '../../admin_dashboard/tabs/aienginehours/presentation/widgets/ai_maintenance_health_card.dart';
 import '../../admin_dashboard/tabs/bocheck/view/bocheck_tab.dart';
 import '../../admin_dashboard/tabs/driver/view/driverdetails_tab.dart';
 import '../../admin_dashboard/tabs/emailinbox/view/emailinbox_tab.dart';
@@ -27,7 +25,6 @@ import '../../admin_dashboard/tabs/forwardingreport/view/forwardingreport_tab.da
 import '../../admin_dashboard/tabs/fuel/view/fuelreport_tab.dart';
 import '../../admin_dashboard/tabs/fuelfillings/view/fuelfillings_tab.dart';
 import '../../admin_dashboard/tabs/googlereview/view/googlereview_tab.dart';
-import '../../admin_dashboard/tabs/gpstruckmap/view/gpstruckmap_tab.dart';
 import '../../admin_dashboard/tabs/inventoryreport/view/inventoryview_tab.dart';
 import '../../admin_dashboard/tabs/invoice/view/invoice_tab.dart';
 import '../../admin_dashboard/tabs/maintenance/view/maintenance_tab.dart';

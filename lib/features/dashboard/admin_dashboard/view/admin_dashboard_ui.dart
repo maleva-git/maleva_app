@@ -16,8 +16,6 @@ import '../../../common_updates/blocs/truck/truck_event.dart';
 import '../bloc/admin_tab_bloc.dart';
 import '../bloc/admin_tab_state.dart';
 import '../tabs/ExpenseReport/view/expensereport_tab.dart';
-import '../tabs/adinvoice/presentation/widgets/ai_sales_forecast_chart.dart';
-import '../tabs/aienginehours/presentation/widgets/ai_maintenance_health_card.dart';
 import '../tabs/bocheck/view/bocheck_tab.dart';
 import '../tabs/driver/view/driverdetails_tab.dart';
 import '../tabs/emailinbox/view/emailinbox_tab.dart';
@@ -27,7 +25,6 @@ import '../tabs/forwardingreport/view/forwardingreport_tab.dart';
 import '../tabs/fuel/view/fuelreport_tab.dart';
 import '../tabs/fuelfillings/view/fuelfillings_tab.dart';
 import '../tabs/googlereview/view/googlereview_tab.dart';
-import '../tabs/gpstruckmap/view/gpstruckmap_tab.dart';
 import '../tabs/inventoryreport/view/inventoryview_tab.dart';
 import '../tabs/paymentview/view/paymentview_tab.dart';
 import '../tabs/pdo/view/pdo_tab.dart';
@@ -83,19 +80,19 @@ class MobileDashboard extends StatelessWidget {
       actions: [
         IconButton(
           icon: Icon(Icons.directions_boat_filled,
-              size: isTablet ? 28 : 25, color: colour.topAppBarColor),
+              size: isTablet ? 25 : 25, color: colour.topAppBarColor),
           onPressed: () => Navigator.push(context,
               MaterialPageRoute(builder: (_) => Saleorderview())),
         ),
         IconButton(
           icon: Icon(Icons.bluetooth_audio,
-              size: isTablet ? 28 : 25, color: colour.topAppBarColor),
+              size: isTablet ? 25 : 25, color: colour.topAppBarColor),
           onPressed: () => Navigator.push(context,
               MaterialPageRoute(builder: (_) => Bluetoothpage())),
         ),
         IconButton(
           icon: Icon(Icons.print,
-              size: isTablet ? 28 : 25, color: colour.topAppBarColor),
+              size: isTablet ? 25 : 25, color: colour.topAppBarColor),
           onPressed: () async {
             await objfun.printdata([
               BarcodePrintModel("MALEVA", "SHIPNAME", "SHIPNAME",
@@ -138,7 +135,7 @@ class MobileDashboard extends StatelessWidget {
         isScrollable: true,
         indicator: BoxDecoration(
           color: AppColors.appBarColor,
-          borderRadius: BorderRadius.circular(isTablet ? 28 : 25),
+          borderRadius: BorderRadius.circular(isTablet ? 25 : 25),
         ),
         indicatorSize: TabBarIndicatorSize.tab,
         labelColor: Colors.white,
@@ -177,9 +174,7 @@ class MobileDashboard extends StatelessWidget {
           _tab('InventoryReport', isTablet),
           _tab('PDO',             isTablet),
           _tab('RTI',             isTablet),
-          _tab('AIPredict',       isTablet),
-          _tab('AIMaintenance',   isTablet),
-          _tab('LiveMap', isTablet),
+
         ],
       ),
     );
@@ -247,9 +242,8 @@ class MobileDashboard extends StatelessWidget {
             toDate: DateFormat('yyyy-MM-dd').format(DateTime.now()),
           ),
           const RTIDetailsPage(),
-          const AISalesForecastWidget(),
-          const AIMaintenanceHealthCard(),
-          const GpsTruckMapPage(),
+
+
         ],
       ),
     );

@@ -3477,8 +3477,8 @@ class AdminDashboardState extends State<AdminDashboard> with TickerProviderState
     );
 
     if (pickedFile != null) {
-      detail.imageFile = pickedFile;        // ✅ IMPORTANT
-      detail.imagePath = pickedFile.path;   // ✅ OPTIONAL (preview/json)
+      detail.imageFile = pickedFile;
+      detail.imagePath = pickedFile.path;
     }
   }
 
