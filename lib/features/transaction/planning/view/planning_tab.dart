@@ -8,6 +8,7 @@ import 'package:maleva/core/network/OnlineApi.dart' as OnlineApi;
 import 'package:maleva/core/models/model.dart';
 import '../../../../core/theme/tokens.dart';
 import '../../../dashboard/admin_dashboard/tabs/custdashboard/view/custdashboard_tab.dart';
+import '../../../dashboard/admin_dashboard/tabs/planningdetailsview/view/planningdetails_tab.dart';
 import '../../../dashboard/admin_dashboard/tabs/transportDB/view/transportdb_tab.dart';
 import '../../../dashboard/admin_dashboard/view/admin_dashboard.dart';
 import '../../../dashboard/operationadmin_dashboard/view/operationadmin_dashboard.dart';
