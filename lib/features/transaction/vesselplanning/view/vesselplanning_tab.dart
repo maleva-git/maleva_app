@@ -9,6 +9,7 @@ import 'package:maleva/core/network/OnlineApi.dart' as OnlineApi;
 import 'package:maleva/menu/menulist.dart';
 import 'package:maleva/core/models/model.dart';
 import '../../../../core/theme/tokens.dart';
+import '../../../dashboard/admin_dashboard/tabs/vesselplanningdetails/view/vesselplanningdetails_tab.dart';
 import '../../../mastersearch/Employee.dart';
 import '../bloc/vesselplanning_bloc.dart';
 import '../bloc/vesselplanning_event.dart';

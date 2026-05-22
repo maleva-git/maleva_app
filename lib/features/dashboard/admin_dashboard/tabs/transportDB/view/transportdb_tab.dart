@@ -14,6 +14,7 @@ import 'package:maleva/menu/menulist.dart';
 import 'package:maleva/core/network/OnlineApi.dart' as OnlineApi;
 
 import '../../../../../transaction/enquirytrmaster/add/view/enquirytradd_tab.dart';
+import '../../saleorderadd/view/saleorderadd_tab.dart';
 import '../../spotsaleorder/view/spotsaleorder_view.dart';
 import '../bloc/transportdb_bloc.dart';
 import '../bloc/transportdb_event.dart';
@@ -442,8 +443,8 @@ class _TransportTab extends StatelessWidget {
                             context,
                             MaterialPageRoute(
                               builder: (_) => SalesOrderAdd(
-                                SaleDetails: objfun.SaleEditDetailList,
-                                SaleMaster: objfun.SaleEditMasterList,
+                                saleDetails: objfun.SaleEditDetailList,
+                                saleMaster: objfun.SaleEditMasterList,
                               ),
                             ),
                           );
@@ -755,8 +756,8 @@ class _EnquiryTab extends StatelessWidget {
                                             MaterialPageRoute(
                                               builder: (_) =>
                                                   SalesOrderAdd(
-                                                    SaleDetails: null,
-                                                    SaleMaster: [item],
+                                                    saleDetails: null,
+                                                    saleMaster: [item],
                                                   ),
                                             ),
                                           );

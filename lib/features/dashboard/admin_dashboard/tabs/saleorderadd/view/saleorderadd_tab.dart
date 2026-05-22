@@ -3,20 +3,31 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
-
 import 'package:maleva/core/models/model.dart';
 import 'package:maleva/core/utils/clsfunction.dart' as objfun;
 import 'package:maleva/core/colors/colors.dart' as colour;
+import 'package:maleva/features/mastersearch/JobAllStatus.dart';
 import 'package:maleva/menu/menulist.dart';
+
+import '../../../../../mastersearch/Agent.dart';
+import '../../../../../mastersearch/AgentCompany.dart';
+import '../../../../../mastersearch/Customer.dart';
+import '../../../../../mastersearch/Employee.dart';
+import '../../../../../mastersearch/JobType.dart';
+import '../../../../../mastersearch/Location.dart';
+import '../../saleorderview/view/saleorderview_tab.dart';
+import '../bloc/saleorderadd_bloc.dart';
+import '../bloc/saleorderadd_event.dart';
+import '../bloc/saleorderadd_state.dart';
 
 
 // ─── Entry point ─────────────────────────────────────────────────────────────
 
-class SalesOrderAddPage extends StatelessWidget {
+class SalesOrderAdd extends StatelessWidget {
   final List<SaleEditDetailModel>? saleDetails;
   final List<dynamic>? saleMaster;
 
-  const SalesOrderAddPage({super.key, this.saleDetails, this.saleMaster});
+  const SalesOrderAdd({super.key, this.saleDetails, this.saleMaster});
 
   @override
   Widget build(BuildContext context) {
@@ -287,7 +298,7 @@ class _SalesOrderViewState extends State<_SalesOrderView>
           await objfun.ConfirmationOK(state.successMessage!, context);
           Navigator.pushReplacement(
             context,
-            MaterialPageRoute(builder: (_) => const SalesOrderAddPage()),
+            MaterialPageRoute(builder: (_) => const SalesOrderAdd()),
           );
         }
 
@@ -394,7 +405,7 @@ class _SalesOrderViewState extends State<_SalesOrderView>
               label: 'View',
               onPressed: () => Navigator.push(
                 context,
-                MaterialPageRoute(builder: (_) => const SalesOrderView()),
+                MaterialPageRoute(builder: (_) => const Saleorderview()),
               ),
               isTablet: isTablet,
             ),
@@ -615,7 +626,7 @@ class _SalesOrderViewState extends State<_SalesOrderView>
                 context,
                 MaterialPageRoute(
                     builder: (_) =>
-                    const JobAllStatus(Searchby: 1, SearchId: 0)),
+                    const JobAllStatus(Searchby: 1, SearchId: 0,JobTypeId: 0,)),
               ).then((_) {
                 if (objfun.SelectAllStatusList.Status != 0) {
                   bloc.add(SalesOrderJobStatusSelected(
@@ -707,9 +718,11 @@ class _SalesOrderViewState extends State<_SalesOrderView>
                 if (objfun.SelectLocationList.Id != 0) {
                   bloc.add(SalesOrderOriginSelected(
                     id: objfun.SelectLocationList.Id,
-                    name: objfun.SelectLocationList.Name,
+                    name: objfun.SelectLocationList.Location,
+                    //name: objfun.SelectLocationList.Name,
                   ));
-                  txtOrigin.text = objfun.SelectLocationList.Name;
+                  //txtOrigin.text = objfun.SelectLocationList.Name;
+                  txtOrigin.text = objfun.SelectLocationList.Location;
                   objfun.SelectLocationList = LocationModel.Empty();
                 }
               }),
@@ -729,9 +742,11 @@ class _SalesOrderViewState extends State<_SalesOrderView>
                 if (objfun.SelectLocationList.Id != 0) {
                   bloc.add(SalesOrderDestinationSelected(
                     id: objfun.SelectLocationList.Id,
-                    name: objfun.SelectLocationList.Name,
+                    name: objfun.SelectLocationList.Location,
+                    //name: objfun.SelectLocationList.Name,
                   ));
-                  txtDestination.text = objfun.SelectLocationList.Name;
+                  //txtDestination.text = objfun.SelectLocationList.Name;
+                  txtDestination.text = objfun.SelectLocationList.Location;
                   objfun.SelectLocationList = LocationModel.Empty();
                 }
               }),
@@ -885,7 +900,7 @@ class _SalesOrderViewState extends State<_SalesOrderView>
               onSearch: () => Navigator.push(
                 context,
                 MaterialPageRoute(
-                    builder: (_) => const Agent(Searchby: 1, SearchId: 0)),
+                    builder: (_) => const Agent(Searchby: 1, SearchId: 0,AgentCompanyId: 0)),
               ).then((_) {
                 if (objfun.SelectAgentAllList.Id != 0) {
                   bloc.add(SalesOrderLAgentSelected(
@@ -1012,7 +1027,7 @@ class _SalesOrderViewState extends State<_SalesOrderView>
               onSearch: () => Navigator.push(
                 context,
                 MaterialPageRoute(
-                    builder: (_) => const Agent(Searchby: 1, SearchId: 0)),
+                    builder: (_) => const Agent(Searchby: 1, SearchId: 0,AgentCompanyId: 0)),
               ).then((_) {
                 if (objfun.SelectAgentAllList.Id != 0) {
                   bloc.add(SalesOrderOAgentSelected(
@@ -1445,7 +1460,7 @@ class _SalesOrderViewState extends State<_SalesOrderView>
                 return Card(
                   margin: const EdgeInsets.only(bottom: 8),
                   child: ListTile(
-                    title: Text(p.Description,
+                    title: Text(p.ProductName,
                         style: GoogleFonts.lato(
                             fontWeight: FontWeight.bold,
                             color: colour.commonColor,
@@ -1453,7 +1468,7 @@ class _SalesOrderViewState extends State<_SalesOrderView>
                                 ? objfun.FontMedium.toDouble()
                                 : objfun.FontCardText.toDouble())),
                     subtitle: Text(
-                        'Qty: ${p.Qty}  Rate: ${p.SaleRate}  Amt: ${p.Amount.toStringAsFixed(2)}',
+                        'Qty: ${p.ItemQty}  Rate: ${p.SalesRate}  Amt: ${p.Amount.toStringAsFixed(2)}',
                         style: GoogleFonts.lato(
                             color: colour.commonColor,
                             fontSize: isTablet ? 14.0 : 12.0)),
@@ -1496,16 +1511,16 @@ class _SalesOrderViewState extends State<_SalesOrderView>
         SaleEditDetailModel? existing,
       }) {
     if (existing != null) {
-      txtProductDescription.text = existing.Description;
-      txtProductCode.text = existing.ItemCode;
-      txtProductQty.text = existing.Qty.toString();
-      txtProductSaleRate.text = existing.SaleRate.toString();
-      txtProductGst.text = existing.TaxPer.toString();
+      txtProductDescription.text = existing.ProductName;
+      txtProductCode.text = existing.ProductCode;
+      txtProductQty.text = existing.ItemQty.toString();
+      txtProductSaleRate.text = existing.SalesRate.toString();
+      txtProductGst.text = existing.TaxPercent.toString();
       txtProductAmount.text = existing.Amount.toString();
       txtProductUOM.text = existing.UOM;
       txtProductId.text = existing.Id.toString();
       txtProductSDId.text = existing.SDId.toString();
-      txtItemMasterRefId.text = existing.ItemId.toString();
+      txtItemMasterRefId.text = existing.ItemMasterRefId.toString();
     } else {
       for (final c in [
         txtProductDescription, txtProductCode, txtProductQty,

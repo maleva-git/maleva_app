@@ -9,6 +9,7 @@ import 'package:maleva/core/models/model.dart';
 import 'package:maleva/menu/menulist.dart';
 import '../../../../../core/theme/tokens.dart';
 import '../../../../dashboard/admin_dashboard/tabs/custdashboard/view/custdashboard_tab.dart';
+import '../../../../dashboard/admin_dashboard/tabs/saleorderadd/view/saleorderadd_tab.dart';
 import '../../../../dashboard/admin_dashboard/tabs/transportDB/view/transportdb_tab.dart';
 import '../../../../dashboard/admin_dashboard/view/admin_dashboard.dart';
 import '../../../../dashboard/operationadmin_dashboard/view/operationadmin_dashboard.dart';
@@ -68,8 +69,8 @@ class _EnquiryViewPage extends StatelessWidget {
             context,
             MaterialPageRoute(
               builder: (_) => SalesOrderAdd(
-                SaleDetails: null,
-                SaleMaster: state.enquiryList,
+                saleDetails: null,
+                saleMaster: state.enquiryList,
               ),
             ),
           );

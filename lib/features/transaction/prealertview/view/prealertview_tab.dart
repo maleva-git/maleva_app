@@ -10,6 +10,7 @@ import 'package:maleva/features/dashboard/airfreight_dashboard/view/airfreight_d
 import 'package:maleva/features/dashboard/sales_dashboard/view/salesdashboard_dashboard.dart';
 import 'package:maleva/menu/menulist.dart';
 import '../../../../core/theme/tokens.dart';
+import '../../../dashboard/admin_dashboard/tabs/saleorderadd/view/saleorderadd_tab.dart';
 import '../../../dashboard/admin_dashboard/tabs/transportDB/view/transportdb_tab.dart';
 import '../../../dashboard/admin_dashboard/view/admin_dashboard.dart';
 import '../../../dashboard/boarding_dashboard/view/boarding_dashboard.dart';
@@ -54,8 +55,8 @@ class _PreAlertPage extends StatelessWidget {
             context,
             MaterialPageRoute(
               builder: (_) => SalesOrderAdd(
-                SaleDetails: objfun.SaleEditDetailList,
-                SaleMaster: objfun.SaleEditMasterList,
+                saleDetails: objfun.SaleEditDetailList,
+                saleMaster: objfun.SaleEditMasterList,
               ),
             ),
           );

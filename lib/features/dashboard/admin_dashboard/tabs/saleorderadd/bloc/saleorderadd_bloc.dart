@@ -1,13 +1,9 @@
-import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
-
 import 'package:maleva/core/models/model.dart';
 import 'package:maleva/core/network/OnlineApi.dart' as OnlineApi;
 import 'package:maleva/core/utils/clsfunction.dart' as objfun;
 import 'package:maleva/features/dashboard/admin_dashboard/tabs/saleorderadd/bloc/saleorderadd_state.dart';
-
-import '../../../../../../core/utils/clsfunction.dart';
 import 'saleorderadd_event.dart';
 
 
@@ -625,7 +621,7 @@ class SalesOrderBloc extends Bloc<SalesOrderEvent, SalesOrderState> {
     emit(state.copyWith(status: SalesOrderStatus.loading));
 
     await OnlineApi.MaxSaleOrderNo(null, state.billType);
-    await OnlineApi.SelectAddressList(null);
+    await OnlineApi.selectAddressList();
     await OnlineApi.SelectAgentCompany(null);
     await OnlineApi.SelectEmployee(null, '', 'Operation');
 

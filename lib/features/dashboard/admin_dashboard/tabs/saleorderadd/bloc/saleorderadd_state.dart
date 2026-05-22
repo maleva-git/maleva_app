@@ -1,4 +1,9 @@
 
+import 'package:equatable/equatable.dart';
+import 'package:intl/intl.dart';
+
+import '../../../../../../core/models/model.dart';
+
 enum SalesOrderStatus { initial, loading, success, failure }
 
 // ─── Visibility flags packed into a dedicated class to keep state slim ────────
