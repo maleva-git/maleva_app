@@ -5,12 +5,6 @@ import 'package:maleva/core/models/model.dart';
 import 'driverlicense_event.dart';
 import 'driverlicense_state.dart';
 
-
-
-
-
-
-
 class DriverLicenseExpiryBloc
     extends Bloc<DriverLicenseExpiryEvent, DriverLicenseExpiryState> {
   DriverLicenseExpiryBloc() : super(DriverLicenseExpiryInitial()) {

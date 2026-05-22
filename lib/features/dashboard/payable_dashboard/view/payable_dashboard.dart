@@ -95,9 +95,8 @@ class _PayableDashboardState extends State<PayableDashboard> with SingleTickerPr
               create: (context) => sl<FuelDiffBloc>()..add(const LoadFuelDiffEvent()),
               child: const FuelDiffPage(), // Remember to add BlocListener here if you want to show SnackBars for FuelDiffError!
             ),
-
             BlocProvider(
-              create: (context) => BillOrderBloc(context),
+              create: (context) => sl<BillOrderBloc>(),
               child: const BillOrderScreen(),
             ),
             BlocProvider(

@@ -13,6 +13,7 @@ import 'package:maleva/features/auth/presentation/bloc/auth_bloc.dart';
 
 // ── Admin tab ─────────────────────────────────────────────────────────────────
 import 'package:maleva/features/dashboard/admin_dashboard/bloc/admin_tab_bloc.dart';
+import 'package:maleva/features/dashboard/admin_dashboard/tabs/billorder/bloc/billorder_bloc.dart';
 
 // ── Invoice tab ───────────────────────────────────────────────────────────────
 import 'package:maleva/features/dashboard/admin_dashboard/tabs/invoice/data/invoice_repository.dart';
@@ -39,6 +40,7 @@ import 'package:maleva/features/dashboard/admin_dashboard/tabs/stocktransfer/blo
 import 'package:maleva/features/dashboard/admin_dashboard/tabs/stockupdate/bloc/stock_update_bloc.dart';
 
 import '../../features/dashboard/admin_dashboard/tabs/airfreightsales/data/airfreight_repository.dart';
+import '../../features/dashboard/admin_dashboard/tabs/billorder/data/billorder_repository.dart';
 import '../../features/dashboard/admin_dashboard/tabs/bocheck/bloc/bocheck_bloc.dart';
 import '../../features/dashboard/admin_dashboard/tabs/bocheck/data/bocheck_repository.dart';
 import '../../features/dashboard/admin_dashboard/tabs/driver/bloc/driverdetails_bloc.dart';
@@ -400,6 +402,15 @@ Future<void> setupDependencies() async {
   );
   sl.registerLazySingleton<SaleOrderRepository>(
         () => SaleOrderRepository(),
+  );
+  // In injection.dart:
+
+// 1. Register the Repository (Super clean now!)
+  sl.registerLazySingleton<BillOrderRepository>(() => BillOrderRepository());
+
+// 2. Register the BLoC
+  sl.registerFactory<BillOrderBloc>(
+        () => BillOrderBloc(repository: sl<BillOrderRepository>()),
   );
   sl.registerFactory<MaintenanceBloc>(() => MaintenanceBloc());
   sl.registerFactory<DriverLicenseExpiryBloc>(() => DriverLicenseExpiryBloc());

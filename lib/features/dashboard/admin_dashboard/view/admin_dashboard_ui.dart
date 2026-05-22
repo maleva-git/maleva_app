@@ -4,7 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:maleva/core/utils/clsfunction.dart' as objfun;
 import 'package:maleva/core/colors/colors.dart' as colour;
-import '../../../../core/bluetooth/bluetoothmanager.dart';
+import '../../../../core/bluetooth/view/Bluetooth_tab.dart';
 import '../../../../core/colors/colors.dart';
 import '../../../../core/models/model.dart';
 import '../../../../menu/menulist.dart';
@@ -72,7 +72,7 @@ class MobileDashboard extends StatelessWidget {
       backgroundColor: AppColors.appBarColor,
       toolbarHeight: isTablet ? 64 : 56,
       title: Text(
-        'Dash Board',
+        'ADMIN',
         style: GoogleFonts.lato(
           color: colour.topAppBarColor,
           fontWeight: FontWeight.bold,
@@ -91,7 +91,7 @@ class MobileDashboard extends StatelessWidget {
           icon: Icon(Icons.bluetooth_audio,
               size: isTablet ? 28 : 25, color: colour.topAppBarColor),
           onPressed: () => Navigator.push(context,
-              MaterialPageRoute(builder: (_) => Bluetoothpage())),
+              MaterialPageRoute(builder: (_) => BluetoothPage())),
         ),
         IconButton(
           icon: Icon(Icons.print,
