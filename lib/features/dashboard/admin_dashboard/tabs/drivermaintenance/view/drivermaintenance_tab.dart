@@ -6,6 +6,7 @@ import 'package:intl/intl.dart';
 import 'package:maleva/core/utils/clsfunction.dart' as objfun;
 import 'package:maleva/core/models/model.dart';
 
+import '../../../../../../core/di/injection.dart';
 import '../bloc/drivermaintenance_bloc.dart';
 import '../bloc/drivermaintenance_event.dart';
 import '../bloc/drivermaintenance_state.dart';
@@ -38,11 +39,12 @@ class TruckMaintenanceDashboardWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (_) =>
-      TruckMaintDashBloc()..add(TruckMaintDashStarted()),
-      child: const _TruckMaintDashView(),
-    );
+    return
+      BlocProvider(
+        create: (context) => sl<TruckMaintDashBloc>()
+          ..add(TruckMaintDashStarted()),
+        child: const _TruckMaintDashView(),
+      );
   }
 }
 

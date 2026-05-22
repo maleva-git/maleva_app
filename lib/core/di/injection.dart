@@ -1,6 +1,4 @@
-// lib/core/di/injection.dart
 
-import 'package:flutter/Material.dart';
 import 'package:get_it/get_it.dart';
 
 // Core
@@ -45,17 +43,19 @@ import '../../features/dashboard/admin_dashboard/tabs/bocheck/bloc/bocheck_bloc.
 import '../../features/dashboard/admin_dashboard/tabs/bocheck/data/bocheck_repository.dart';
 import '../../features/dashboard/admin_dashboard/tabs/driver/bloc/driverdetails_bloc.dart';
 import '../../features/dashboard/admin_dashboard/tabs/driver/data/driver_repository.dart';
+import '../../features/dashboard/admin_dashboard/tabs/driverlicense/data/driverlicense_repository.dart';
+import '../../features/dashboard/admin_dashboard/tabs/drivermaintenance/data/drivermaintenance_repository.dart';
+import '../../features/dashboard/admin_dashboard/tabs/driversalary/data/driversalary_repository.dart';
 import '../../features/dashboard/admin_dashboard/tabs/emailinbox/bloc/emailinbox_bloc.dart';
 import '../../features/dashboard/admin_dashboard/tabs/emailinbox/data/emailinbox_repository.dart';
 import '../../features/dashboard/admin_dashboard/tabs/employeemaster/bloc/employeemaster_bloc.dart';
 import '../../features/dashboard/admin_dashboard/tabs/employeemaster/data/employee_repository.dart';
 import '../../features/dashboard/admin_dashboard/tabs/enginehours/bloc/enginehours_bloc.dart';
-import '../../features/dashboard/admin_dashboard/tabs/enginehours/tab/enginehours_repository.dart';
+import '../../features/dashboard/admin_dashboard/tabs/enginehours/data/enginehours_repository.dart';
 import '../../features/dashboard/admin_dashboard/tabs/enquiry/view/bloc/enquiry_bloc.dart';
 import '../../features/dashboard/admin_dashboard/tabs/enquiry/view/data/enquiry_repository.dart';
 import '../../features/dashboard/admin_dashboard/tabs/expensereport/bloc/expensereport_bloc.dart';
 import '../../features/dashboard/admin_dashboard/tabs/expensereport/data/expensereport_repository.dart';
-
 import '../../features/dashboard/admin_dashboard/tabs/forwardingreport/bloc/forwardingreport_bloc.dart';
 import '../../features/dashboard/admin_dashboard/tabs/forwardingreport/data/forwardingreport_repository.dart';
 import '../../features/dashboard/admin_dashboard/tabs/fuel/bloc/fuelreport_bloc.dart';
@@ -100,26 +100,14 @@ import '../../features/dashboard/admin_dashboard/tabs/vesselreport/data/vessel_r
 final sl = GetIt.instance;
 
 Future<void> setupDependencies() async {
-  // ════════════════════════════════════════════════════════════════
-  // 0. FOUNDATION
-  // ════════════════════════════════════════════════════════════════
 
-  // AppPreferences is all-static — just init() is enough, no registration needed
   await AppPreferences.init();
 
-  // ════════════════════════════════════════════════════════════════
-  // 1. API SERVICES  —  lazySingleton
-  //    App life-la oru thadava create, everywhere reuse
-  // ════════════════════════════════════════════════════════════════
+
 
   sl.registerLazySingleton<AuthApi>(() => AuthApi.instance);
 
-  // ════════════════════════════════════════════════════════════════
-  // 2. REPOSITORIES  —  lazySingleton
-  //    API inject panni create, cache pannivom
-  // ════════════════════════════════════════════════════════════════
 
-  // Auth
   sl.registerLazySingleton<AuthRepository>(
         () => AuthRepository(authApi: sl<AuthApi>()),
   );
@@ -129,34 +117,23 @@ Future<void> setupDependencies() async {
         () => InvoiceRepositoryImpl(),
   );
 
-  // AI Invoice forecast
   sl.registerLazySingleton<SalesForecastRepository>(
         () => SalesForecastRepository(),
   );
 
-  // AI Maintenance
   sl.registerLazySingleton<MaintenanceAIRepository>(
         () => MaintenanceAIRepository(),
   );
-// ── REPOSITORIES ──────────────────────────────────────────────────────────
 
-  // Existing Repositories...
   sl.registerLazySingleton<ForwardingReportRepository>(
         () => ForwardingReportRepository(),
   );
 
-  // ── BLOCS ─────────────────────────────────────────────────────────────────
 
-  // Existing Blocs...
   sl.registerFactory<ForwardingReportBloc>(
         () => ForwardingReportBloc(repository: sl<ForwardingReportRepository>()),
   );
-  // ════════════════════════════════════════════════════════════════
-  // 3. BLOCS  —  registerFactory
-  //    Every BlocProvider.create() call-ku fresh instance
-  // ════════════════════════════════════════════════════════════════
 
-  // ── Auth ────────────────────────────────────────────────────────
   sl.registerFactory<LoginBloc>(
         () => LoginBloc(authRepository: sl<AuthRepository>()),
   );
@@ -412,41 +389,30 @@ Future<void> setupDependencies() async {
   sl.registerFactory<BillOrderBloc>(
         () => BillOrderBloc(repository: sl<BillOrderRepository>()),
   );
+  // Inside injection.dart
+  sl.registerLazySingleton<DriverLicenseRepository>(() => DriverLicenseRepository());
+
+  sl.registerFactory<DriverLicenseExpiryBloc>(
+        () => DriverLicenseExpiryBloc(repository: sl<DriverLicenseRepository>()),
+  );
   sl.registerFactory<MaintenanceBloc>(() => MaintenanceBloc());
-  sl.registerFactory<DriverLicenseExpiryBloc>(() => DriverLicenseExpiryBloc());
-  sl.registerFactory<TruckMaintDashBloc>(() => TruckMaintDashBloc());
-  sl.registerFactory<DriverSalaryBloc>(() => DriverSalaryBloc());
-  // sl.registerFactory<ReceiptBloc>(() => ReceiptBloc());
-  // sl.registerFactory<CustomerDashboardBloc>(() => CustomerDashboardBloc());
+
+  // In injection.dart
+  sl.registerLazySingleton<TruckMaintenanceRepository>(() => TruckMaintenanceRepository());
+
+  sl.registerFactory<TruckMaintDashBloc>(
+        () => TruckMaintDashBloc(repository: sl<TruckMaintenanceRepository>()),
+  );
+
+  sl.registerLazySingleton<DriverSalaryRepository>(() => DriverSalaryRepository());
+
+  sl.registerFactory<DriverSalaryBloc>(
+        () => DriverSalaryBloc(repository: sl<DriverSalaryRepository>()),
+  );
+
+
   sl.registerFactory<StockInEntryBloc>(() => StockInEntryBloc());
   sl.registerFactory<StockTransferBloc>(() => StockTransferBloc());
   sl.registerFactory<StockUpdateBloc>(() => StockUpdateBloc());
 
-
-
-  // ════════════════════════════════════════════════════════════════
-  // 4. CONTEXT-DEP BLOCS  —  NOT registered here
-  //    These still take BuildContext in constructor.
-  //    Refactor pannும்போது inga add pannuvom.
-  //
-  //    BillOrderBloc(context)        — billorder tab
-  //    BocBloc(context)              — bocheck tab
-  //    DriverBloc(context)           — driver tab
-  //    EmailBloc(context)            — emailinbox tab
-  //    EngineHoursBloc(context)      — enginehours tab
-  //    ExpenseReportBloc(context)    — expenseReport tab
-  //    ForwardingReportBloc(context) — forwardingreport tab
-  //    FuelDiffBloc(context)         — fuel tab
-  //    FuelFillingBloc(context)      — fuelfillings tab
-  //    ReviewBloc(context)           — googlereview tab
-  //    InventoryBloc(context)        — inventoryreport tab
-  //    PaymentPendingBloc(context)   — paymentview tab
-  //    PettyCashBloc(context)        — pettycash tab
-  //    RTIDetailsBloc(context)       — rtiview tab
-  //    SpeedingBloc(context)         — speedingreport tab
-  //    TransportBloc(context)        — transport tab
-  //    TruckDetailsBloc(context)     — truck tab
-  //    VesselBloc(context)           — vesselreport tab
-  //    PDOBloc(context, ...)         — pdo tab
-  // ════════════════════════════════════════════════════════════════
 }
