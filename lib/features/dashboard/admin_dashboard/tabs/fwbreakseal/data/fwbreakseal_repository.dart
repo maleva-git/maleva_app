@@ -1,0 +1,58 @@
+import 'package:maleva/core/models/model.dart';
+import 'package:maleva/core/network/api_client.dart';
+import 'package:maleva/core/utils/app_preferences.dart';
+import 'package:maleva/core/utils/clsfunction.dart' as objfun;
+
+class FWBreakSealRepository {
+
+  // 1. Fetch the Job List
+  Future<List<Map<String, dynamic>>> fetchJobs(int type) async {
+    final comid = AppPreferences.getComid();
+
+    // MATCHED: String apiGetJobNo = "$port/api/SaleOrderApp/GetJobNo?Comid=";
+    final String url = "${objfun.apiGetJobNo}$comid&Type=$type";
+
+    final response = await ApiClient.postRequest(url, null);
+
+    if (response != null && response is List) {
+      return List<Map<String, dynamic>>.from(response);
+    }
+    return [];
+  }
+
+  // 2. Fetch Sales Order Details
+  Future<Map<String, dynamic>> fetchSalesOrderDetails(int id, int cNumber) async {
+    // MATCHED: String apiEditSalesOrder = "$port/api/SaleOrderApp/EditSaleOrder?Id=";
+    final String url = "${objfun.apiEditSalesOrder}$id&CNumber=$cNumber";
+
+    final response = await ApiClient.postRequest(url, null);
+
+    if (response != null && response is List && response.isNotEmpty) {
+      return response[0] as Map<String, dynamic>;
+    }
+    return {};
+  }
+
+  // 3. Fetch Employees
+  Future<List<dynamic>> fetchEmployees() async {
+    final comid = AppPreferences.getComid();
+
+    // MATCHED: String apiSelectEmployee = "$port/api/EmployeeApp/GetEmployee?Comid=";
+    final String url = "${objfun.apiSelectEmployee}$comid&AccountName=&Type=Operation";
+
+    final response = await ApiClient.postRequest(url, null);
+    return response is List ? response : [];
+  }
+
+  // 4. Update Forwarding
+  Future<ResponseViewModel?> updateForwarding(Map<String, dynamic> master) async {
+    // MATCHED: String apiUpdateForwarding = "$port/api/SaleOrderApp/UpdateForwarding";
+    // This API does NOT have URL parameters, so we pass the master map as the JSON body.
+    final response = await ApiClient.postRequest(objfun.apiUpdateForwarding, master);
+
+    if (response != null) {
+      return ResponseViewModel.fromJson(response);
+    }
+    return null;
+  }
+}

@@ -8,6 +8,7 @@ import 'package:intl/intl.dart';
 import 'package:maleva/core/theme/tokens.dart';
 import 'package:maleva/core/utils/clsfunction.dart' as objfun;
 
+import '../../../../../../core/di/injection.dart';
 import '../../../../../../core/theme/palette.dart';
 import '../bloc/license_bloc.dart';
 import '../bloc/license_event.dart';
@@ -20,10 +21,12 @@ class DriverLicensePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (ctx) => LicenseBloc(ctx)..add(const LoadLicenseEvent()),
-      child: const LicenseView(),
-    );
+    return
+      BlocProvider(
+        create: (context) => sl<LicenseBloc>()
+          ..add(const LoadLicenseEvent()),
+        child: const LicenseView(),
+      );
   }
 }
 

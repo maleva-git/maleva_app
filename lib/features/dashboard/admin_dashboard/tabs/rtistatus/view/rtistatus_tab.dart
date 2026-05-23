@@ -9,6 +9,7 @@ import 'package:maleva/core/utils/clsfunction.dart' as objfun;
 import 'package:maleva/core/colors/colors.dart' as colour;
 import 'package:maleva/menu/menulist.dart';
 
+import '../../../../../../core/di/injection.dart';
 import '../../../../../transport/updatertidetails/view/updatertidetails_tab.dart';
 import '../bloc/rtistatus_bloc.dart';
 import '../bloc/rtistatus_event.dart';
@@ -25,11 +26,12 @@ class RTIStatusPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (_) => RTIStatusBloc()
-        ..add(RTIStatusInitialized(rtiDetails: rtiDetails)),
-      child: const _RTIStatusView(),
-    );
+    return
+      BlocProvider(
+        create: (context) => sl<RTIStatusBloc>()
+          ..add(RTIStatusInitialized(rtiDetails: rtiDetails)),
+        child: const _RTIStatusView(),
+      );
   }
 }
 

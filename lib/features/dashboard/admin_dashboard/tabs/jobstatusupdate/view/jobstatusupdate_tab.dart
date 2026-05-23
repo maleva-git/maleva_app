@@ -13,6 +13,7 @@ import 'package:maleva/core/network/OnlineApi.dart' as OnlineApi;
 import 'package:maleva/core/utils/clsfunction.dart' as objfun;
 import 'package:maleva/menu/menulist.dart';
 
+import '../../../../../../core/di/injection.dart';
 import '../../../../../mastersearch/JobAllStatus.dart';
 import '../../saleorderdetails/view/saleorderdetails_tab.dart';
 import '../bloc/jobstatusupdate_bloc.dart';
@@ -27,11 +28,12 @@ class JobStatusUpdate extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (_) =>
-      JobStatusUpdateBloc()..add(const JobStatusUpdateStarted()),
-      child: const _JobStatusUpdateView(),
-    );
+    return
+      BlocProvider(
+        create: (context) => sl<JobStatusUpdateBloc>()
+          ..add(const JobStatusUpdateStarted()),
+        child: const _JobStatusUpdateView(),
+      );
   }
 }
 

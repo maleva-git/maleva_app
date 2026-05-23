@@ -279,7 +279,7 @@ class _AdminDashboardState extends State<MaintenanceDashboard> with SingleTicker
               child: const AIMaintenanceHealthCard(),
             ),
             BlocProvider(
-              create: (_) => MaintenanceBloc()..add( MaintenanceStarted()),
+              create: (_) => sl<MaintenanceBloc>()..add(MaintenanceStarted()),
               child: const MaintenanceDashboardWidget(),
             ),
 

@@ -7,6 +7,7 @@ import 'package:maleva/core/theme/palette.dart';
 import 'package:maleva/core/utils/clsfunction.dart' as objfun;
 import 'package:maleva/menu/menulist.dart';
 
+import '../../../../../../core/di/injection.dart';
 import '../../../../../../core/theme/tokens.dart';
 import '../bloc/planningdetails_bloc.dart';
 import '../bloc/planningdetails_event.dart';
@@ -22,11 +23,12 @@ class PlanningDetailsView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (_) => PlanningDetailsBloc()
-        ..add(const PlanningDetailsStartupRequested()),
-      child: const _PlanningDetailsView(),
-    );
+    return
+      BlocProvider(
+        create: (context) => sl<PlanningDetailsBloc>()
+          ..add(const PlanningDetailsStartupRequested()),
+        child: const _PlanningDetailsView(),
+      );
   }
 }
 

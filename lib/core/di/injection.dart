@@ -62,17 +62,25 @@ import '../../features/dashboard/admin_dashboard/tabs/fuel/bloc/fuelreport_bloc.
 import '../../features/dashboard/admin_dashboard/tabs/fuel/data/fuel_repository.dart';
 import '../../features/dashboard/admin_dashboard/tabs/fuelfillings/bloc/fuelfillings_bloc.dart';
 import '../../features/dashboard/admin_dashboard/tabs/fuelfillings/data/fuelfillings_repository.dart';
+import '../../features/dashboard/admin_dashboard/tabs/fwbreakseal/bloc/fwbreakseal_bloc.dart';
+import '../../features/dashboard/admin_dashboard/tabs/fwbreakseal/data/fwbreakseal_repository.dart';
 import '../../features/dashboard/admin_dashboard/tabs/googlereview/bloc/googlereview_bloc.dart';
 import '../../features/dashboard/admin_dashboard/tabs/googlereview/data/googlereview_repository.dart';
 import '../../features/dashboard/admin_dashboard/tabs/gpstruckmap/bloc/gpstruckmap_bloc.dart';
 import '../../features/dashboard/admin_dashboard/tabs/inventoryreport/bloc/inventoryreport_bloc.dart';
 import '../../features/dashboard/admin_dashboard/tabs/inventoryreport/data/inventoryreport_repository.dart';
+import '../../features/dashboard/admin_dashboard/tabs/license/bloc/license_bloc.dart';
+import '../../features/dashboard/admin_dashboard/tabs/license/data/license_repository.dart';
 import '../../features/dashboard/admin_dashboard/tabs/paymentview/bloc/paymentview_bloc.dart';
 import '../../features/dashboard/admin_dashboard/tabs/paymentview/data/paymentview_repository.dart';
 import '../../features/dashboard/admin_dashboard/tabs/pdo/data/pdo_repository.dart';
 import '../../features/dashboard/admin_dashboard/tabs/pettycash/bloc/pettycash_bloc.dart';
 import '../../features/dashboard/admin_dashboard/tabs/pettycash/data/pettycash_repository.dart';
+import '../../features/dashboard/admin_dashboard/tabs/planningdetailsview/bloc/planningdetails_bloc.dart';
+import '../../features/dashboard/admin_dashboard/tabs/planningdetailsview/data/planning_details_repository.dart';
 import '../../features/dashboard/admin_dashboard/tabs/receiptview/data/receipt_repository.dart';
+import '../../features/dashboard/admin_dashboard/tabs/rtistatus/bloc/rtistatus_bloc.dart';
+import '../../features/dashboard/admin_dashboard/tabs/rtistatus/data/rti_status_repository.dart';
 import '../../features/dashboard/admin_dashboard/tabs/rtiview/bloc/rtiview_bloc.dart';
 import '../../features/dashboard/admin_dashboard/tabs/rtiview/data/rtiview_repository.dart';
 import '../../features/dashboard/admin_dashboard/tabs/saleorderview/bloc/saleorderview_bloc.dart';
@@ -395,7 +403,7 @@ Future<void> setupDependencies() async {
   sl.registerFactory<DriverLicenseExpiryBloc>(
         () => DriverLicenseExpiryBloc(repository: sl<DriverLicenseRepository>()),
   );
-  sl.registerFactory<MaintenanceBloc>(() => MaintenanceBloc());
+  //sl.registerFactory<MaintenanceBloc>(() => MaintenanceBloc());
 
   // In injection.dart
   sl.registerLazySingleton<TruckMaintenanceRepository>(() => TruckMaintenanceRepository());
@@ -410,6 +418,31 @@ Future<void> setupDependencies() async {
         () => DriverSalaryBloc(repository: sl<DriverSalaryRepository>()),
   );
 
+// 1. Register the Repository
+  sl.registerLazySingleton<FWBreakSealRepository>(() => FWBreakSealRepository());
+
+// 2. Register the BLoC
+  sl.registerFactory<FWBreakSealBloc>(
+        () => FWBreakSealBloc(repository: sl<FWBreakSealRepository>()),
+  );
+
+  // Register the Repository
+  sl.registerLazySingleton<LicenseRepository>(() => LicenseRepository());
+
+// Register the BLoC
+  sl.registerFactory<LicenseBloc>(
+        () => LicenseBloc(repository: sl<LicenseRepository>()),
+  );
+
+  // 1. Register the Repository
+  sl.registerLazySingleton<PlanningDetailsRepository>(() => PlanningDetailsRepository());
+
+// 2. Register the BLoC
+  sl.registerFactory<PlanningDetailsBloc>(
+        () => PlanningDetailsBloc(repository: sl<PlanningDetailsRepository>()),
+  );
+  sl.registerLazySingleton<RTIStatusRepository>(() => RTIStatusRepository());
+  sl.registerFactory<RTIStatusBloc>(() => RTIStatusBloc(repository: sl<RTIStatusRepository>()));
 
   sl.registerFactory<StockInEntryBloc>(() => StockInEntryBloc());
   sl.registerFactory<StockTransferBloc>(() => StockTransferBloc());

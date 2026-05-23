@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:maleva/core/utils/clsfunction.dart' as objfun;
+import '../../../../../../core/di/injection.dart';
 import '../../../../../../core/theme/tokens.dart';
 import '../bloc/maintenance_bloc.dart';
 import '../bloc/maintenance_event.dart';
@@ -19,10 +20,11 @@ class MaintenanceDashboardWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (_) => MaintenanceBloc()..add(MaintenanceStarted()),
-      child: const _MaintenanceView(),
-    );
+    return
+      BlocProvider(
+        create: (_) => sl<MaintenanceBloc>()..add(MaintenanceStarted()),
+        child: const _MaintenanceView(),
+      );
   }
 }
 

@@ -8,6 +8,7 @@ import 'package:maleva/core/network/OnlineApi.dart' as OnlineApi;
 import 'package:maleva/core/utils/clsfunction.dart' as objfun;
 import 'package:maleva/core/models/model.dart';
 
+import '../../../../../../core/di/injection.dart';
 import '../../../../../../core/theme/palette.dart';
 import '../../../../../../core/theme/tokens.dart';
 import '../../../../../mastersearch/Employee.dart';
@@ -26,11 +27,12 @@ class FWUpdateBreakSeal extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (_) =>
-      FWBreakSealBloc(context: context)..add(const FWBreakSealInitialised()),
-      child: const _FWBreakSealView(),
-    );
+    return
+      BlocProvider(
+        create: (_) => sl<FWBreakSealBloc>()
+          ..add(const FWBreakSealInitialised()),
+        child: const _FWBreakSealView(),
+      );
   }
 }
 
