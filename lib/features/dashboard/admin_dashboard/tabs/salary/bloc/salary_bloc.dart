@@ -2,16 +2,14 @@ import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-
 import 'package:maleva/core/utils/clsfunction.dart' as objfun;
-
-import '../../../../../../core/models/model.dart'; // library prefix
+import '../../../../../../core/models/model.dart';
 
 part 'salary_event.dart';
 part 'salary_state.dart';
 
 class SalaryBloc extends Bloc<SalaryEvent, SalaryState> {
-  // No objfun instance needed — accessed directly via the library prefix.
+
   final BuildContext context;
 
   SalaryBloc({required this.context}) : super(SalaryState(
@@ -25,9 +23,6 @@ class SalaryBloc extends Bloc<SalaryEvent, SalaryState> {
     on<UpdateToDate>(_onUpdateToDate);
   }
 
-  // ─────────────────────────────────────────────────────────
-  // Initial load — uses the default date range in state
-  // ─────────────────────────────────────────────────────────
   Future<void> _onInitialLoad(
       SalaryInitialLoad event,
       Emitter<SalaryState> emit,
@@ -35,9 +30,6 @@ class SalaryBloc extends Bloc<SalaryEvent, SalaryState> {
     add(LoadSalaryData(fromDate: state.fromDate, toDate: state.toDate));
   }
 
-  // ─────────────────────────────────────────────────────────
-  // Fetch salary list from API
-  // ─────────────────────────────────────────────────────────
   Future<void> _onLoadSalaryData(
       LoadSalaryData event,
       Emitter<SalaryState> emit,
