@@ -177,9 +177,7 @@ class MobileDashboard extends StatelessWidget {
           _tab('InventoryReport', isTablet),
           _tab('PDO',             isTablet),
           _tab('RTI',             isTablet),
-          _tab('AIPredict',       isTablet),
-          _tab('AIMaintenance',   isTablet),
-          _tab('LiveMap', isTablet),
+
         ],
       ),
     );
@@ -247,9 +245,7 @@ class MobileDashboard extends StatelessWidget {
             toDate: DateFormat('yyyy-MM-dd').format(DateTime.now()),
           ),
           const RTIDetailsPage(),
-          const AISalesForecastWidget(),
-          const AIMaintenanceHealthCard(),
-          const GpsTruckMapPage(),
+
         ],
       ),
     );
