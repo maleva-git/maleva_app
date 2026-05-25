@@ -12,7 +12,7 @@ class StockInEntryRepository {
     final stockJobRes = await ApiClient.postRequest("${objfun.apiSelectStockJob}$comid", null);
 
     // Equivalent to OnlineApi.GetJobNoForwarding(null, billType)
-    final jobNoRes = await ApiClient.postRequest("${objfun.apiGetJobNo}$comid&Type=$billType", null);
+    final jobNoRes = await ApiClient.postRequest("${objfun.apiGetJobNo}$comid&JobType=$billType", null);
 
     String maxNum = '';
     if (maxStockRes != null && maxStockRes is List && maxStockRes.isNotEmpty) {

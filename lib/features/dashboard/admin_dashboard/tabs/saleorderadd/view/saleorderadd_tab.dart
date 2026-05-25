@@ -10,6 +10,8 @@ import 'package:maleva/features/mastersearch/JobAllStatus.dart';
 import 'package:maleva/menu/menulist.dart';
 
 import '../../../../../../core/di/injection.dart';
+import '../../../../../../core/network/OnlineApi.dart' as OnlineApi;
+import '../../../../../mastersearch/AddressList.dart';
 import '../../../../../mastersearch/Agent.dart';
 import '../../../../../mastersearch/AgentCompany.dart';
 import '../../../../../mastersearch/Customer.dart';
@@ -789,10 +791,35 @@ class _SalesOrderViewState extends State<_SalesOrderView>
           const SizedBox(height: 8),
 
           // Pickup address
-          _styledField(
-              controller: txtPickUpAddress,
-              hint: 'Pickup Address',
-              isTablet: isTablet),
+          _searchField(
+            controller: txtPickUpAddress,
+            hint: 'Pickup Address',
+            hasValue: txtPickUpAddress.text.isNotEmpty,
+            enabled: state.isAllowed('txtPickUpAddress'),
+            isTablet: isTablet,
+            onSearch: () async {
+              //await OnlineApi.selectAddressList();
+              if (!context.mounted) return;
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (_) => const AddressList(Searchby: 1, SearchId: 0)),
+              ).then((_) {
+                if (objfun.SelectAddressList.isNotEmpty) {
+                  txtPickUpAddress.text = objfun.SelectAddressList;
+                  bloc.add(SalesOrderPickupAddressListUpdated(
+                    list: state.pickupAddressList,
+                    displayText: objfun.SelectAddressList,
+                  ));
+                  objfun.SelectAddressList = '';
+                }
+              });
+            },
+            onClear: () {
+              txtPickUpAddress.clear();
+              bloc.add(const SalesOrderPickupAddressListUpdated(list: [], displayText: ''));
+            },
+          ),
           const SizedBox(height: 8),
 
           _styledField(
@@ -802,10 +829,35 @@ class _SalesOrderViewState extends State<_SalesOrderView>
           const SizedBox(height: 8),
 
           // Delivery address
-          _styledField(
-              controller: txtDeliveryAddress,
-              hint: 'Delivery Address',
-              isTablet: isTablet),
+          _searchField(
+            controller: txtDeliveryAddress,
+            hint: 'Delivery Address',
+            hasValue: txtDeliveryAddress.text.isNotEmpty,
+            enabled: state.isAllowed('txtDeliveryAddress'),
+            isTablet: isTablet,
+            onSearch: () async {
+              await OnlineApi.selectAddressList();
+              if (!context.mounted) return;
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (_) => const AddressList(Searchby: 1, SearchId: 0)),
+              ).then((_) {
+                if (objfun.SelectAddressList.isNotEmpty) {
+                  txtDeliveryAddress.text = objfun.SelectAddressList;
+                  bloc.add(SalesOrderDeliveryAddressListUpdated(
+                    list: state.deliveryAddressList,
+                    displayText: objfun.SelectAddressList,
+                  ));
+                  objfun.SelectAddressList = '';
+                }
+              });
+            },
+            onClear: () {
+              txtDeliveryAddress.clear();
+              bloc.add(const SalesOrderDeliveryAddressListUpdated(list: [], displayText: ''));
+            },
+          ),
           const SizedBox(height: 8),
 
           _styledField(
@@ -815,10 +867,28 @@ class _SalesOrderViewState extends State<_SalesOrderView>
           const SizedBox(height: 8),
 
           // Warehouse
-          _styledField(
-              controller: txtWarehouseAddress,
-              hint: 'Warehouse Address',
-              isTablet: isTablet),
+          _searchField(
+            controller: txtWarehouseAddress,
+            hint: 'Warehouse Address',
+            hasValue: txtWarehouseAddress.text.isNotEmpty,
+            enabled: state.isAllowed('txtWarehouseAddress'),
+            isTablet: isTablet,
+            onSearch: () async {
+              await OnlineApi.selectAddressList();
+              if (!context.mounted) return;
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (_) => const AddressList(Searchby: 1, SearchId: 0)),
+              ).then((_) {
+                if (objfun.SelectAddressList.isNotEmpty) {
+                  txtWarehouseAddress.text = objfun.SelectAddressList;
+                  objfun.SelectAddressList = '';
+                }
+              });
+            },
+            onClear: () => txtWarehouseAddress.clear(),
+          ),
 
           // WH Entry / Exit
           if (state.isAllowed('chkWareHouseEntry'))

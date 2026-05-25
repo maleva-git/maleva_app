@@ -2,12 +2,6 @@ import 'package:flutter/Material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:maleva/features/dashboard/payable_dashboard/view/payable_dashboard_ui.dart';
 import '../../../../core/di/injection.dart';
-import '../../admin_dashboard/tabs/adinvoice/bloc/forecast/forecast_bloc.dart';
-import '../../admin_dashboard/tabs/adinvoice/data/repositories/sales_forecast_repository.dart';
-import '../../admin_dashboard/tabs/adinvoice/presentation/widgets/ai_sales_forecast_chart.dart';
-import '../../admin_dashboard/tabs/aienginehours/bloc/ai_maintenance_bloc.dart';
-import '../../admin_dashboard/tabs/aienginehours/data/repositories/maintenance_ai_repository.dart';
-import '../../admin_dashboard/tabs/aienginehours/presentation/widgets/ai_maintenance_health_card.dart';
 import '../../admin_dashboard/tabs/billorder/bloc/billorder_bloc.dart';
 import '../../admin_dashboard/tabs/billorder/view/billorder_screen.dart';
 import '../../admin_dashboard/tabs/driver/bloc/driverdetails_bloc.dart';
@@ -72,28 +66,28 @@ class _PayableDashboardState extends State<PayableDashboard> with SingleTickerPr
 
             BlocProvider(
               create: (context) => sl<TruckDetailsBloc>()..add(const LoadTruckDetailsEvent()),
-              child: const TruckDetailsReportPage(), // Make sure to add a BlocListener inside here if you want to show snackbars for TruckErrorState!
+              child: const TruckDetailsReportPage(),
             ),
               BlocProvider(
               create: (context) => sl<DriverBloc>()..add(const LoadDriverEvent()),
-              child: const DriverDetailsView(), // Remember to add a BlocListener here if you want to show errors to the user!
+              child: const DriverDetailsView(),
               ),
             BlocProvider(
               create: (context) => sl<SpeedingBloc>()..add(LoadSpeedingReport()),
-              child: const SpeedingScreen(), // Add a BlocListener here to show SnackBars for SpeedingError if needed!
+              child: const SpeedingScreen(),
             ),
             BlocProvider(
               create: (context) => sl<FuelFillingBloc>()..add(LoadFuelFillingReport()),
-              child: const FuelFillingPage(), // Add a BlocListener here to show SnackBars for FuelFillingError if needed!
+              child: const FuelFillingPage(),
             ),
             BlocProvider(
               create: (context) => sl<EngineHoursBloc>()..add(LoadEngineHoursReport()),
-              child: const EngineHoursPage(), // Add a BlocListener here to show SnackBars for EngineHoursError if needed!
+              child: const EngineHoursPage(),
             ),
 
             BlocProvider(
               create: (context) => sl<FuelDiffBloc>()..add(const LoadFuelDiffEvent()),
-              child: const FuelDiffPage(), // Remember to add BlocListener here if you want to show SnackBars for FuelDiffError!
+              child: const FuelDiffPage(),
             ),
             BlocProvider(
               create: (context) => sl<BillOrderBloc>(),
@@ -103,13 +97,8 @@ class _PayableDashboardState extends State<PayableDashboard> with SingleTickerPr
               create: (context) => sl<PettyCashBloc>()..add(const LoadPettyCashEvent()),
               child: const PettyCashPage(),
             ),
-            BlocProvider(
-              create: (context) => AIMaintenanceBloc(
-                repository: MaintenanceAIRepository(),
-              )..add(LoadAIMaintenanceRisks()),
-              child: const AIMaintenanceHealthCard(),
-            )
-          ],                                    // ← ] தான் close, } இல்ல
+
+          ],
           child: Scaffold(
             body: PayableMobileDashboard(
               tabController: _tabController,
@@ -118,7 +107,7 @@ class _PayableDashboardState extends State<PayableDashboard> with SingleTickerPr
           ),
         );                                      // ← MultiBlocProvider close
       },                                        // ← LayoutBuilder builder close
-    );                                          // ← LayoutBuilder close
+    );
   }
 
 }

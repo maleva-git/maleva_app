@@ -4,6 +4,8 @@ import 'package:maleva/core/utils/clsfunction.dart' as objfun;
 import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 
+import '../../core/network/OnlineApi.dart' as OnlineApi;
+
 class AddressList extends StatefulWidget {
   final int Searchby;
   final int SearchId;
@@ -34,10 +36,18 @@ class _AddressListstate extends State<AddressList> {
   }
 
   Future startup() async {
-    filtersearchlist = AddressList;
+
+    await OnlineApi.selectAddressList();
+    if (!mounted) return;
+
+    final loaded = List<dynamic>.from(objfun.AddressList);
+
     setState(() {
+      AddressList = loaded;
+      filtersearchlist = List<dynamic>.from(loaded);
       progress = true;
     });
+
   }
 
   void search(value) {

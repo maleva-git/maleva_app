@@ -45,7 +45,6 @@ class PayableMobileDashboard extends StatelessWidget {
     );
   }
 
-  // ── AppBar ────────────────────────────────────────────────────────────
   PreferredSizeWidget _buildAppBar(BuildContext context, bool isTablet) {
     return AppBar(
       backgroundColor: AppColors.appBarColor,
@@ -91,9 +90,6 @@ class PayableMobileDashboard extends StatelessWidget {
       ],
     );
   }
-
-  // ── TabBar ────────────────────────────────────────────────────────────
-// ✅ Step 2: _buildTabBar() method-ல container size மாத்து
   Widget _buildTabBar(bool isTablet) {
     return Container(
       margin: EdgeInsets.symmetric(
@@ -137,9 +133,7 @@ class PayableMobileDashboard extends StatelessWidget {
           _tab('Fuel',            isTablet),
           _tab('Driver',          isTablet),
           _tab('BillOrder',          isTablet),
-
           _tab('Truck',           isTablet),
-
           _tab('PettyCash',       isTablet),
 
         ],
@@ -147,8 +141,6 @@ class PayableMobileDashboard extends StatelessWidget {
     );
   }
 
-  // ── Tab item ──────────────────────────────────────────────────────────
-// ✅ Step 1: _tab() method-ல isTablet add பண்ணு
   Tab _tab(String text, bool isTablet) => Tab(
     height: isTablet ? 42 : null,
     child: Padding(
@@ -164,7 +156,7 @@ class PayableMobileDashboard extends StatelessWidget {
       ),
     ),
   );
-  // ── TabBarView ────────────────────────────────────────────────────────
+
   Widget _buildTabBarView(BuildContext context) {
     return BlocListener<PayableTabBloc, PayableTabState>(
       listener: (context, tabState) {
@@ -186,7 +178,6 @@ class PayableMobileDashboard extends StatelessWidget {
           const FuelDiffPage(),
           const DriverDetailsView(),
           const BillOrderScreen(),
-
           const TruckDetailsReportPage(),
           const PettyCashPage(),
 

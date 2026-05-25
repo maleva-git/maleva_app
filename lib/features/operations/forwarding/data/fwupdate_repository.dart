@@ -8,7 +8,7 @@ class FWUpdateRepository {
   final int empRefId = AppPreferences.getEmpRefId();
 
   Future<List<dynamic>> fetchJobNoList() async {
-    final result = await ApiClient.postRequest("${objfun.apiGetJobNo}$comid&Type=3", null);
+    final result = await ApiClient.postRequest("${objfun.apiGetJobNo}$comid&JobType=3", null);
     return result is List ? result : [];
   }
 

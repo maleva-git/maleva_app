@@ -10,7 +10,7 @@ class FWBreakSealRepository {
     final comid = AppPreferences.getComid();
 
     // MATCHED: String apiGetJobNo = "$port/api/SaleOrderApp/GetJobNo?Comid=";
-    final String url = "${objfun.apiGetJobNo}$comid&Type=$type";
+    final String url = "${objfun.apiGetJobNo}$comid&JobType=$type";
 
     final response = await ApiClient.postRequest(url, null);
 
@@ -37,17 +37,14 @@ class FWBreakSealRepository {
   Future<List<dynamic>> fetchEmployees() async {
     final comid = AppPreferences.getComid();
 
-    // MATCHED: String apiSelectEmployee = "$port/api/EmployeeApp/GetEmployee?Comid=";
     final String url = "${objfun.apiSelectEmployee}$comid&AccountName=&Type=Operation";
 
     final response = await ApiClient.postRequest(url, null);
     return response is List ? response : [];
   }
 
-  // 4. Update Forwarding
   Future<ResponseViewModel?> updateForwarding(Map<String, dynamic> master) async {
-    // MATCHED: String apiUpdateForwarding = "$port/api/SaleOrderApp/UpdateForwarding";
-    // This API does NOT have URL parameters, so we pass the master map as the JSON body.
+
     final response = await ApiClient.postRequest(objfun.apiUpdateForwarding, master);
 
     if (response != null) {

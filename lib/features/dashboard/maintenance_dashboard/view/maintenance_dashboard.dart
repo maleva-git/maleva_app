@@ -8,12 +8,6 @@ import '../../../common_updates/blocs/sales/sales_bloc.dart';
 import '../../../common_updates/blocs/truck/truck_bloc.dart';
 import '../../admin_dashboard/bloc/admin_tab_bloc.dart';
 import '../../admin_dashboard/tabs/ExpenseReport/view/expensereport_tab.dart';
-import '../../admin_dashboard/tabs/adinvoice/bloc/forecast/forecast_bloc.dart';
-import '../../admin_dashboard/tabs/adinvoice/data/repositories/sales_forecast_repository.dart';
-import '../../admin_dashboard/tabs/adinvoice/presentation/widgets/ai_sales_forecast_chart.dart';
-import '../../admin_dashboard/tabs/aienginehours/bloc/ai_maintenance_bloc.dart';
-import '../../admin_dashboard/tabs/aienginehours/data/repositories/maintenance_ai_repository.dart';
-import '../../admin_dashboard/tabs/aienginehours/presentation/widgets/ai_maintenance_health_card.dart';
 import '../../admin_dashboard/tabs/bocheck/bloc/bocheck_bloc.dart';
 import '../../admin_dashboard/tabs/bocheck/bloc/bocheck_event.dart';
 import '../../admin_dashboard/tabs/bocheck/view/bocheck_tab.dart';
@@ -266,18 +260,7 @@ class _AdminDashboardState extends State<MaintenanceDashboard> with SingleTicker
               create: (_) => sl<RTIDetailsBloc>(),
               child: const RTIDetailsPage(),
             ),
-            BlocProvider(
-              create: (context) => ForecastBloc(
-                repository: SalesForecastRepository(),
-              )..add(LoadSalesForecast(0)), // 0 means default type
-              child: const AISalesForecastWidget(),
-            ),
-            BlocProvider(
-              create: (context) => AIMaintenanceBloc(
-                repository: MaintenanceAIRepository(),
-              )..add(LoadAIMaintenanceRisks()),
-              child: const AIMaintenanceHealthCard(),
-            ),
+
             BlocProvider(
               create: (_) => sl<MaintenanceBloc>()..add(MaintenanceStarted()),
               child: const MaintenanceDashboardWidget(),

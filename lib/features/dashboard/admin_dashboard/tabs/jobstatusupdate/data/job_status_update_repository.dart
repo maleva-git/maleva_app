@@ -8,7 +8,7 @@ class JobStatusUpdateRepository {
   // 1. Fetch Job Numbers
   Future<List<Map<String, dynamic>>> fetchJobs(int type) async {
     final comid = AppPreferences.getComid();
-    final String url = "${objfun.apiGetJobNo}$comid&Type=$type";
+    final String url = "${objfun.apiGetJobNo}$comid&JobType=$type";
 
     final response = await ApiClient.postRequest(url, null);
     if (response != null && response is List) {

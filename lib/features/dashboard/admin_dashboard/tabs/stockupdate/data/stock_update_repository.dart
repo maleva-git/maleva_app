@@ -11,7 +11,7 @@ class StockUpdateRepository {
   // ─── Initialize ────────────────────────────────────────────────────────────
   Future<void> prefetchJobData() async {
     // Replaces OnlineApi.GetJobNoForwarding(null, 0)
-    await ApiClient.postRequest("${objfun.apiGetJobNo}$comid&Type=0", null);
+    await ApiClient.postRequest("${objfun.apiGetJobNo}$comid&JobType=0", null);
   }
 
   // ─── Scan Barcode ──────────────────────────────────────────────────────────
