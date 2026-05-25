@@ -5,38 +5,28 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:maleva/core/theme/palette.dart';
 import 'package:maleva/core/utils/clsfunction.dart' as objfun;
 import 'package:maleva/menu/menulist.dart';
-
+import '../../../../../../core/di/injection.dart';
 import '../../../../../../core/theme/tokens.dart';
 import '../bloc/vesselplanningdetails_bloc.dart';
 import '../bloc/vesselplanningdetails_event.dart';
 import '../bloc/vesselplanningdetails_state.dart';
-
-
-// ─────────────────────────────────────────────────────────────────────────────
-// Entry point
-// ─────────────────────────────────────────────────────────────────────────────
 
 class VesselPlanningDetailsView extends StatelessWidget {
   const VesselPlanningDetailsView({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (_) => VesselPlanningDetailsBloc()
-        ..add(const VesselPlanningDetailsStartupRequested()),
-      child: const _VesselPlanningDetailsView(),
-    );
+    return
+      BlocProvider(
+        create: (_) => sl<VesselPlanningDetailsBloc>()
+          ..add(const VesselPlanningDetailsStartupRequested()),
+        child: const _VesselPlanningDetailsView(), // Ensure this matches your actual View class name
+      );
   }
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// View — stateless; no controllers or local state needed
-// ─────────────────────────────────────────────────────────────────────────────
-
 class _VesselPlanningDetailsView extends StatelessWidget {
   const _VesselPlanningDetailsView();
-
-  // ── Build ──────────────────────────────────────────────────────────────────
 
   @override
   Widget build(BuildContext context) {
@@ -68,9 +58,6 @@ class _VesselPlanningDetailsView extends StatelessWidget {
       },
     );
   }
-
-  // ── Scaffold ───────────────────────────────────────────────────────────────
-
   Widget _buildScaffold(BuildContext ctx,
       VesselPlanningDetailsState state, bool isTablet) {
     return Scaffold(
@@ -92,9 +79,6 @@ class _VesselPlanningDetailsView extends StatelessWidget {
           : _buildBody(ctx, state, isTablet),
     );
   }
-
-  // ── AppBar ─────────────────────────────────────────────────────────────────
-
   PreferredSizeWidget _buildAppBar(
       BuildContext ctx, bool isTablet) {
     final String userName =
@@ -146,26 +130,19 @@ class _VesselPlanningDetailsView extends StatelessWidget {
       ],
     );
   }
-
-  // ── Body ───────────────────────────────────────────────────────────────────
-
   Widget _buildBody(BuildContext ctx,
       VesselPlanningDetailsState state, bool isTablet) {
     return Padding(
       padding: EdgeInsets.all(isTablet ? 10 : 5),
       child: Column(
         children: [
-          // ── Column header ──────────────────────────────────────────────
+
           _ColumnHeaderCard(isTablet: isTablet),
-
           const SizedBox(height: 6),
-
-          // ── Summary pill ───────────────────────────────────────────────
           _SummaryPill(count: state.vesselPlanningList.length),
 
           const SizedBox(height: 4),
 
-          // ── List ───────────────────────────────────────────────────────
           Expanded(
             child: state.isEmpty
                 ? const _EmptyWidget()
@@ -201,10 +178,6 @@ class _VesselPlanningDetailsView extends StatelessWidget {
   }
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// Column header card
-// Mirrors the original 5-row header structure with the same flex values
-// ─────────────────────────────────────────────────────────────────────────────
 
 class _ColumnHeaderCard extends StatelessWidget {
   const _ColumnHeaderCard({required this.isTablet});
@@ -287,9 +260,6 @@ class _ColumnHeaderCard extends StatelessWidget {
       );
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// Summary pill
-// ─────────────────────────────────────────────────────────────────────────────
 
 class _SummaryPill extends StatelessWidget {
   const _SummaryPill({required this.count});
@@ -320,11 +290,6 @@ class _SummaryPill extends StatelessWidget {
     );
   }
 }
-
-// ─────────────────────────────────────────────────────────────────────────────
-// Vessel planning card
-// Mirrors the original 5-row card layout with matching flex values
-// ─────────────────────────────────────────────────────────────────────────────
 
 class _VesselCard extends StatelessWidget {
   const _VesselCard({

@@ -98,18 +98,29 @@ import '../../features/dashboard/admin_dashboard/tabs/spotsaleorder/bloc/spotsal
 import '../../features/dashboard/admin_dashboard/tabs/spotsaleorder/data/spotsale_repository.dart';
 import '../../features/dashboard/admin_dashboard/tabs/stockinentry/data/stock_in_entry_repository.dart';
 import '../../features/dashboard/admin_dashboard/tabs/stocktransfer/data/stock_transfer_repository.dart';
+import '../../features/dashboard/admin_dashboard/tabs/stockupdate/data/stock_update_repository.dart';
 import '../../features/dashboard/admin_dashboard/tabs/subadminsale/bloc/salesreport bloc.dart';
 import '../../features/dashboard/admin_dashboard/tabs/subadminsale/data/salesreport_repository.dart';
 import '../../features/dashboard/admin_dashboard/tabs/summonentry/bloc/summonentry_bloc.dart';
 import '../../features/dashboard/admin_dashboard/tabs/summonentry/data/summonentry_repository.dart';
 import '../../features/dashboard/admin_dashboard/tabs/transport/bloc/transport_bloc.dart';
 import '../../features/dashboard/admin_dashboard/tabs/transport/data/transport_repository.dart';
+import '../../features/dashboard/admin_dashboard/tabs/transportDB/bloc/transportdb_bloc.dart';
+import '../../features/dashboard/admin_dashboard/tabs/transportDB/data/transportdb_repository.dart';
 import '../../features/dashboard/admin_dashboard/tabs/transportsales/bloc/transport_sales_bloc.dart';
 import '../../features/dashboard/admin_dashboard/tabs/transportsales/data/transport_sales_repository.dart';
 import '../../features/dashboard/admin_dashboard/tabs/truck/bloc/truck_bloc.dart';
 import '../../features/dashboard/admin_dashboard/tabs/truck/data/truck_repository.dart';
+import '../../features/dashboard/admin_dashboard/tabs/unrelease/bloc/unrelease_bloc.dart';
+import '../../features/dashboard/admin_dashboard/tabs/unrelease/data/unrelease_repository.dart';
+import '../../features/dashboard/admin_dashboard/tabs/unreleasesmk/bloc/unreleasesmk_bloc.dart';
+import '../../features/dashboard/admin_dashboard/tabs/unreleasesmk/data/unreleasesmk_repository.dart';
+import '../../features/dashboard/admin_dashboard/tabs/vesselplanningdetails/bloc/vesselplanningdetails_bloc.dart';
+import '../../features/dashboard/admin_dashboard/tabs/vesselplanningdetails/data/vesselplanningdetails_repository.dart';
 import '../../features/dashboard/admin_dashboard/tabs/vesselreport/bloc/vesselreport_bloc.dart';
 import '../../features/dashboard/admin_dashboard/tabs/vesselreport/data/vessel_report_repository.dart';
+import '../../features/operations/forwarding/bloc/forwarding_bloc.dart';
+import '../../features/operations/forwarding/data/fwupdate_repository.dart';
 
 final sl = GetIt.instance;
 
@@ -465,7 +476,41 @@ Future<void> setupDependencies() async {
         () => StockTransferBloc(repository: sl<StockTransferRepository>()),
   );
 
-  sl.registerFactory<StockUpdateBloc>(() => StockUpdateBloc());
+  sl.registerFactory<StockUpdateBloc>(
+        () => StockUpdateBloc(repository: sl<StockUpdateRepository>()),
+  );
 
+  sl.registerLazySingleton<TransportDashboardRepository>(() => TransportDashboardRepository());
 
+  sl.registerFactory<TransportDashboardBloc>(
+        () => TransportDashboardBloc(repository: sl<TransportDashboardRepository>()),
+  );
+
+  sl.registerFactory<UnReleaseBloc>(
+        () => UnReleaseBloc(repository: sl<UnReleaseRepository>()),
+  );
+// 1. Register the Repository
+  sl.registerLazySingleton<UnReleaseSMKRepository>(() => UnReleaseSMKRepository());
+
+// 2. Register the BLoC
+  sl.registerFactory<UnReleaseSMKBloc>(
+        () => UnReleaseSMKBloc(repository: sl<UnReleaseSMKRepository>()),
+  );
+  // 1. Register the Repository
+  sl.registerLazySingleton<VesselPlanningDetailsRepository>(() => VesselPlanningDetailsRepository());
+
+// 2. Register the BLoC
+  sl.registerFactory<VesselPlanningDetailsBloc>(
+        () => VesselPlanningDetailsBloc(repository: sl<VesselPlanningDetailsRepository>()),
+  );
+
+  sl.registerLazySingleton<FWUpdateRepository>(() => FWUpdateRepository());
+
+  sl.registerFactory<FWUpdateBloc>(
+        () => FWUpdateBloc(repository: sl<FWUpdateRepository>()),
+  );
+
+  sl.registerFactory<FWUpdateBloc>(
+        () => FWUpdateBloc(repository: sl<FWUpdateRepository>()),
+  );
 }

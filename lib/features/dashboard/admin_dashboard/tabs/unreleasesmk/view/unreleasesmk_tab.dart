@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
-
+import '../../../../../../core/di/injection.dart';
 import '../../../../../../core/theme/palette.dart';
 import '../../../../../../core/theme/tokens.dart';
 import '../bloc/unreleasesmk_bloc.dart';
@@ -9,27 +9,19 @@ import '../bloc/unreleasesmk_event.dart';
 import '../bloc/unreleasesmk_state.dart';
 
 
-// ─────────────────────────────────────────────────────────────────────────────
-// Entry point
-// ─────────────────────────────────────────────────────────────────────────────
-
 class UnReleaseSMKPage extends StatelessWidget {
   const UnReleaseSMKPage({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (_) =>
-      UnReleaseSMKBloc()..add(const UnReleaseSMKDataRequested()),
-      child: const _UnReleaseSMKView(),
-    );
+    return
+      BlocProvider(
+        create: (_) => sl<UnReleaseSMKBloc>()
+          ..add(const UnReleaseSMKDataRequested()),
+        child: const _UnReleaseSMKView(),
+      );
   }
 }
-
-// ─────────────────────────────────────────────────────────────────────────────
-// Internal view
-// ─────────────────────────────────────────────────────────────────────────────
-
 class _UnReleaseSMKView extends StatelessWidget {
   const _UnReleaseSMKView();
 
@@ -70,8 +62,6 @@ class _UnReleaseSMKView extends StatelessWidget {
     );
   }
 
-  // ── AppBar ─────────────────────────────────────────────────
-
   PreferredSizeWidget _buildAppBar(BuildContext context) {
     return AppBar(
       flexibleSpace: Container(
@@ -102,8 +92,6 @@ class _UnReleaseSMKView extends StatelessWidget {
       ],
     );
   }
-
-  // ── Body ───────────────────────────────────────────────────
 
   Widget _buildBody(BuildContext context, UnReleaseSMKState state) {
     return LayoutBuilder(
@@ -153,11 +141,6 @@ class _UnReleaseSMKView extends StatelessWidget {
   }
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// Sub-widgets
-// ─────────────────────────────────────────────────────────────────────────────
-
-/// Summary pill
 class _SummaryBadge extends StatelessWidget {
   const _SummaryBadge({required this.count});
 
@@ -201,7 +184,6 @@ class _SummaryBadge extends StatelessWidget {
   }
 }
 
-/// Header row — 4 columns: #  |  Bill No  |  Days  |  Remarks
 class _ColumnHeader extends StatelessWidget {
   const _ColumnHeader({required this.isTablet});
 
@@ -301,7 +283,6 @@ class _UnReleaseSMKCard extends StatelessWidget {
                   ),
                 ),
 
-                // ── Bill No ───────────────────────────────
                 Expanded(
                   flex: 3,
                   child: _cell(
@@ -312,7 +293,6 @@ class _UnReleaseSMKCard extends StatelessWidget {
                   ),
                 ),
 
-                // ── Day Count badge ───────────────────────
                 Expanded(
                   flex: 2,
                   child: Align(
@@ -345,7 +325,6 @@ class _UnReleaseSMKCard extends StatelessWidget {
                   ),
                 ),
 
-                // ── Remarks ───────────────────────────────
                 Expanded(
                   flex: 3,
                   child: _cell(
@@ -384,10 +363,6 @@ class _UnReleaseSMKCard extends StatelessWidget {
         ),
       );
 }
-
-// ─────────────────────────────────────────────────────────────────────────────
-// State placeholder widgets
-// ─────────────────────────────────────────────────────────────────────────────
 
 class _LoadingWidget extends StatelessWidget {
   @override

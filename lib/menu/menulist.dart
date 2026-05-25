@@ -705,7 +705,7 @@ class _MenuTileState extends State<_MenuTile>
             context,
             MaterialPageRoute(
               builder: (context) => BlocProvider(
-                create: (context) => FWUpdateBloc()..add(FWUpdateStarted()),
+                create: (context) => sl<FWUpdateBloc>()..add(FWUpdateStarted()),
                 child: const FWUpdatePage(),
               ),
             ),
@@ -755,15 +755,14 @@ class _MenuTileState extends State<_MenuTile>
         case "Stock Update":
           Navigator.push(
             context,
-            MaterialPageRoute(
-              builder: (context) => BlocProvider(
-                create: (context) => StockUpdateBloc()..add(StockUpdateStarted()),
-                child: const StockUpdate(),
-              ),
-            ),
+              MaterialPageRoute(
+                builder: (context) => BlocProvider(
+                  create: (context) => sl<StockUpdateBloc>()..add( StockUpdateStarted()),
+                  child: const StockUpdate(),
+                ),
+              )
           );
           break;
-
 
         case "Stock Transfer":
           Navigator.push(
@@ -776,19 +775,6 @@ class _MenuTileState extends State<_MenuTile>
             ),
           );
           break;
-
-
-      // case "Stock In Entry":
-        //   Navigator.push(ctx, _r(const Stockinentry()));        break;
-
-        // case "Stock Update":
-        //   Navigator.push(ctx, _r(const StockUpdate()));         break;
-
-
-/*        case "Stock Transfer":
-          Navigator.push(ctx, _r(const StockTransferUpdate())); break;*/
-
-
         case "Enquiry Master":
           Navigator.push(
             ctx,

@@ -9,6 +9,7 @@ import 'package:maleva/core/utils/clsfunction.dart' as objfun;
 import 'package:maleva/core/network/OnlineApi.dart' as OnlineApi;
 import 'package:maleva/core/models/model.dart';
 import 'package:maleva/menu/menulist.dart';
+import '../../../../core/di/injection.dart';
 import '../../../mastersearch/Employee.dart';
 import '../bloc/forwarding_bloc.dart';
 import '../bloc/forwarding_event.dart';
@@ -40,10 +41,11 @@ class FWUpdate extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (_) => FWUpdateBloc()..add(FWUpdateStarted()),
-      child: const FWUpdatePage(),
-    );
+    return
+      BlocProvider(
+        create: (_) => sl<FWUpdateBloc>()..add(FWUpdateStarted()),
+        child: const FWUpdatePage(),
+      );
   }
 }
 

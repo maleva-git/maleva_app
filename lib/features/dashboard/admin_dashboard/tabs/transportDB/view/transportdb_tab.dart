@@ -1,18 +1,15 @@
 import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
-
 import 'package:maleva/core/models/model.dart';
 import 'package:maleva/core/utils/clsfunction.dart' as objfun;
 import 'package:maleva/core/colors/colors.dart' as colour;
 import 'package:maleva/menu/menulist.dart';
-
 import 'package:maleva/core/network/OnlineApi.dart' as OnlineApi;
-
+import '../../../../../../core/di/injection.dart';
 import '../../../../../transaction/enquirytrmaster/add/view/enquirytradd_tab.dart';
 import '../../saleorderadd/view/saleorderadd_tab.dart';
 import '../../spotsaleorder/view/spotsaleorder_view.dart';
@@ -21,10 +18,6 @@ import '../bloc/transportdb_event.dart';
 import '../bloc/transportdb_state.dart';
 
 
-
-
-
-// ─── Entry Point Widget ───────────────────────────────────────────────────────
 
 class TransportDashboard extends StatelessWidget {
   final Review? existingReview;
@@ -38,21 +31,20 @@ class TransportDashboard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (_) => TransportDashboardBloc()
-        ..add(TransportDashboardInitialized(
-          initialTabIndex: initialTabIndex,
+    return
+      BlocProvider(
+        create: (_) => sl<TransportDashboardBloc>()
+          ..add(TransportDashboardInitialized(
+            initialTabIndex: initialTabIndex,
+            existingReview: existingReview,
+          )),
+        child: _TransportDashboardView(
           existingReview: existingReview,
-        )),
-      child: _TransportDashboardView(
-        existingReview: existingReview,
-        initialTabIndex: initialTabIndex,
-      ),
-    );
+          initialTabIndex: initialTabIndex,
+        ),
+      );
   }
 }
-
-// ─── Internal Stateful View (holds TabControllers) ───────────────────────────
 
 class _TransportDashboardView extends StatefulWidget {
   final Review? existingReview;
@@ -72,8 +64,6 @@ class _TransportDashboardViewState extends State<_TransportDashboardView>
     with TickerProviderStateMixin {
   late TabController _tabMainController;
   late TabController _tabSubController;
-
-  // Text controllers — kept here (UI layer only)
   final TextEditingController _shopCtrl = TextEditingController();
   final TextEditingController _mobileCtrl = TextEditingController();
   final TextEditingController _reviewMsgCtrl = TextEditingController();
@@ -201,10 +191,6 @@ class _TransportDashboardViewState extends State<_TransportDashboardView>
     );
   }
 }
-
-// ─────────────────────────────────────────────────────────────────────────────
-// TAB 1: SALES
-// ─────────────────────────────────────────────────────────────────────────────
 
 class _SalesTab extends StatelessWidget {
   final bool isTablet;
@@ -571,11 +557,6 @@ class _TransportTab extends StatelessWidget {
     );
   }
 }
-
-// ─────────────────────────────────────────────────────────────────────────────
-// TAB 3: ENQUIRY
-// ─────────────────────────────────────────────────────────────────────────────
-
 class _EnquiryTab extends StatelessWidget {
   final bool isTablet;
   const _EnquiryTab({required this.isTablet});
@@ -1032,11 +1013,6 @@ class _EmailInboxTab extends StatelessWidget {
     );
   }
 }
-
-// ─────────────────────────────────────────────────────────────────────────────
-// TAB 5: GOOGLE REVIEW
-// ─────────────────────────────────────────────────────────────────────────────
-
 class _GoogleReviewTab extends StatelessWidget {
   final bool isTablet;
   final TextEditingController shopCtrl;
@@ -1219,10 +1195,6 @@ class _GoogleReviewTab extends StatelessWidget {
     );
   }
 }
-
-// ─────────────────────────────────────────────────────────────────────────────
-// TAB 6: PDO (RTI)
-// ─────────────────────────────────────────────────────────────────────────────
 
 class _PDOTab extends StatelessWidget {
   final bool isTablet;
