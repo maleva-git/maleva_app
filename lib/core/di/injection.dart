@@ -83,6 +83,10 @@ import '../../features/dashboard/admin_dashboard/tabs/rtistatus/bloc/rtistatus_b
 import '../../features/dashboard/admin_dashboard/tabs/rtistatus/data/rti_status_repository.dart';
 import '../../features/dashboard/admin_dashboard/tabs/rtiview/bloc/rtiview_bloc.dart';
 import '../../features/dashboard/admin_dashboard/tabs/rtiview/data/rtiview_repository.dart';
+import '../../features/dashboard/admin_dashboard/tabs/salary/bloc/salary_bloc.dart';
+import '../../features/dashboard/admin_dashboard/tabs/salary/data/salary_repository.dart';
+import '../../features/dashboard/admin_dashboard/tabs/saleorderdetails/bloc/saleorderdetails_bloc.dart';
+import '../../features/dashboard/admin_dashboard/tabs/saleorderdetails/data/sale_order_details_repository.dart';
 import '../../features/dashboard/admin_dashboard/tabs/saleorderview/bloc/saleorderview_bloc.dart';
 import '../../features/dashboard/admin_dashboard/tabs/saleorderview/data/saleorderrepository.dart';
 import '../../features/dashboard/admin_dashboard/tabs/salesorder/data/salesorder_repository.dart';
@@ -92,6 +96,8 @@ import '../../features/dashboard/admin_dashboard/tabs/speedingreport/bloc/speedi
 import '../../features/dashboard/admin_dashboard/tabs/speedingreport/data/speeding_repository.dart';
 import '../../features/dashboard/admin_dashboard/tabs/spotsaleorder/bloc/spotsaleorder_bloc.dart';
 import '../../features/dashboard/admin_dashboard/tabs/spotsaleorder/data/spotsale_repository.dart';
+import '../../features/dashboard/admin_dashboard/tabs/stockinentry/data/stock_in_entry_repository.dart';
+import '../../features/dashboard/admin_dashboard/tabs/stocktransfer/data/stock_transfer_repository.dart';
 import '../../features/dashboard/admin_dashboard/tabs/subadminsale/bloc/salesreport bloc.dart';
 import '../../features/dashboard/admin_dashboard/tabs/subadminsale/data/salesreport_repository.dart';
 import '../../features/dashboard/admin_dashboard/tabs/summonentry/bloc/summonentry_bloc.dart';
@@ -417,35 +423,49 @@ Future<void> setupDependencies() async {
   sl.registerFactory<DriverSalaryBloc>(
         () => DriverSalaryBloc(repository: sl<DriverSalaryRepository>()),
   );
-
-// 1. Register the Repository
   sl.registerLazySingleton<FWBreakSealRepository>(() => FWBreakSealRepository());
-
-// 2. Register the BLoC
   sl.registerFactory<FWBreakSealBloc>(
         () => FWBreakSealBloc(repository: sl<FWBreakSealRepository>()),
   );
-
-  // Register the Repository
   sl.registerLazySingleton<LicenseRepository>(() => LicenseRepository());
-
-// Register the BLoC
   sl.registerFactory<LicenseBloc>(
         () => LicenseBloc(repository: sl<LicenseRepository>()),
   );
-
-  // 1. Register the Repository
   sl.registerLazySingleton<PlanningDetailsRepository>(() => PlanningDetailsRepository());
-
-// 2. Register the BLoC
   sl.registerFactory<PlanningDetailsBloc>(
         () => PlanningDetailsBloc(repository: sl<PlanningDetailsRepository>()),
   );
   sl.registerLazySingleton<RTIStatusRepository>(() => RTIStatusRepository());
   sl.registerFactory<RTIStatusBloc>(() => RTIStatusBloc(repository: sl<RTIStatusRepository>()));
+  sl.registerLazySingleton<SalaryRepository>(() => SalaryRepository());
 
-  sl.registerFactory<StockInEntryBloc>(() => StockInEntryBloc());
-  sl.registerFactory<StockTransferBloc>(() => StockTransferBloc());
+  sl.registerFactory<SalaryBloc>(
+        () => SalaryBloc(repository: sl<SalaryRepository>()),
+  );
+
+  sl.registerLazySingleton<SalesOrderRepository>(() => SalesOrderRepository());
+  sl.registerFactory<SalesOrderBloc>(() => SalesOrderBloc(repository: sl<SalesOrderRepository>()));
+
+  sl.registerLazySingleton<SalesOrderRepository>(() => SalesOrderRepository());
+
+  sl.registerFactory<SalesOrderBloc>(
+        () => SalesOrderBloc(repository: sl<SalesOrderRepository>()),
+  );
+
+  sl.registerLazySingleton<SaleOrderDetailsRepository>(() => SaleOrderDetailsRepository());
+
+  sl.registerFactory<SaleOrderDetailsBloc>(
+        () => SaleOrderDetailsBloc(repository: sl<SaleOrderDetailsRepository>()),
+  );
+  sl.registerLazySingleton<StockInEntryRepository>(() => StockInEntryRepository());
+  sl.registerFactory<StockInEntryBloc>(
+        () => StockInEntryBloc(repository: sl<StockInEntryRepository>()),
+  );
+  sl.registerFactory<StockTransferBloc>(
+        () => StockTransferBloc(repository: sl<StockTransferRepository>()),
+  );
+
   sl.registerFactory<StockUpdateBloc>(() => StockUpdateBloc());
+
 
 }

@@ -5,6 +5,7 @@ import 'package:maleva/core/utils/clsfunction.dart' as objfun;
 import 'package:maleva/core/models/model.dart';
 import 'package:maleva/features/operations/forwarding/bloc/forwarding_event.dart';
 import 'package:maleva/features/transaction/viewsaleorder/view/viewsaleorder_tab.dart';
+import '../core/di/injection.dart';
 import '../core/theme/tokens.dart';
 import '../features/airfreight/updateairfreight/bloc/airfreight_bloc.dart';
 import '../features/airfreight/updateairfreight/bloc/airfreight_event.dart';
@@ -743,7 +744,7 @@ class _MenuTileState extends State<_MenuTile>
             context,
             MaterialPageRoute(
               builder: (context) => BlocProvider(
-                create: (context) => StockInEntryBloc()..add(StockInEntryStarted()),
+                create: (context) => sl<StockInEntryBloc>()..add(StockInEntryStarted()),
                 child: const StockInEntryPage(),
               ),
             ),
@@ -769,7 +770,7 @@ class _MenuTileState extends State<_MenuTile>
             context,
             MaterialPageRoute(
               builder: (context) => BlocProvider(
-                create: (context) => StockTransferBloc()..add(StockTransferInitialized()),
+                create: (context) => sl<StockTransferBloc>()..add(const StockTransferInitialized()),
                 child: const StockTransferPage(),
               ),
             ),

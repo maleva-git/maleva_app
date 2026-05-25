@@ -10,6 +10,7 @@ import 'package:maleva/core/utils/clsfunction.dart' as objfun;
 import 'package:maleva/core/network/OnlineApi.dart' as OnlineApi;
 import 'package:maleva/core/models/model.dart';
 import 'package:maleva/menu/menulist.dart';
+import '../../../../../../core/di/injection.dart';
 import '../../../../../mastersearch/JobAllStatus.dart';
 import '../../saleorderdetails/view/saleorderdetails_tab.dart';
 import '../bloc/stock_in_entry_bloc.dart';
@@ -45,11 +46,16 @@ class Stockinentry extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (_) => StockInEntryBloc()
-        ..add(StockInEntryStarted(jobNo: JobNo, jobId: JobId)),
-      child: const StockInEntryPage(),
-    );
+    return
+      BlocProvider(
+
+        create: (context) => sl<StockInEntryBloc>()
+
+          ..add(StockInEntryStarted(jobId: JobId, jobNo: JobNo)),
+
+        child: const StockInEntryPage(),
+
+      );
   }
 }
 

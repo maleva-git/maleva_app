@@ -9,6 +9,7 @@ import 'package:maleva/core/colors/colors.dart' as colour;
 import 'package:maleva/features/mastersearch/JobAllStatus.dart';
 import 'package:maleva/menu/menulist.dart';
 
+import '../../../../../../core/di/injection.dart';
 import '../../../../../mastersearch/Agent.dart';
 import '../../../../../mastersearch/AgentCompany.dart';
 import '../../../../../mastersearch/Customer.dart';
@@ -31,14 +32,15 @@ class SalesOrderAdd extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (_) => SalesOrderBloc()
-        ..add(SalesOrderInitialized(
-          saleDetails: saleDetails,
-          saleMaster: saleMaster,
-        )),
-      child: const _SalesOrderView(),
-    );
+    return
+      BlocProvider(
+        create: (_) => sl<SalesOrderBloc>()
+          ..add(SalesOrderInitialized(
+            saleDetails: saleDetails,
+            saleMaster: saleMaster,
+          )),
+        child: const _SalesOrderView(),
+      );
   }
 }
 
