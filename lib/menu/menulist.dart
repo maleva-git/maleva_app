@@ -721,7 +721,7 @@ class _MenuTileState extends State<_MenuTile>
             context,
             MaterialPageRoute(
               builder: (context) => BlocProvider(
-                create: (context) => ForwardingSalaryBloc()..add(ForwardingSalaryStarted()),
+                create: (context) => sl<ForwardingSalaryBloc>()..add(ForwardingSalaryStarted()),
                 child: const ForwardingSalaryUpdate(),
               ),
             ),

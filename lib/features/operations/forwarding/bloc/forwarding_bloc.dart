@@ -1,13 +1,11 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
-
-import '../data/fwupdate_repository.dart'; // Adjust path if needed
+import '../data/fwupdate_repository.dart';
 import 'forwarding_event.dart';
 import 'forwarding_state.dart';
 
 class FWUpdateBloc extends Bloc<FWUpdateEvent, FWUpdateState> {
   final FWUpdateRepository repository;
 
-  // Local caching to replace objfun globals
   List<dynamic> _jobNoList = [];
   List<dynamic> _employeeList = [];
 
@@ -28,7 +26,6 @@ class FWUpdateBloc extends Bloc<FWUpdateEvent, FWUpdateState> {
     on<FWUpdateSaveRequested>(_onSaveRequested);
   }
 
-  // ── Default loaded state ────────────────────────────────────────────────────
   FWUpdateLoaded _defaultLoaded() => FWUpdateLoaded(
     currentTab: 0, saleOrderId: 0,
     tab1: FWTabData(smkText: '', exRef: '', sealEmpId: 0, sealEmpName: '', breakEmpId: 0, breakEmpName: '', imageUploadEnabled: false, images: [], suggestions: []),
@@ -36,7 +33,6 @@ class FWUpdateBloc extends Bloc<FWUpdateEvent, FWUpdateState> {
     tab3: FWTabData(smkText: '', exRef: '', sealEmpId: 0, sealEmpName: '', breakEmpId: 0, breakEmpName: '', imageUploadEnabled: false, images: [], suggestions: []),
   );
 
-  // ── Startup ─────────────────────────────────────────────────────────────────
   Future<void> _onStarted(FWUpdateStarted event, Emitter<FWUpdateState> emit) async {
     emit(FWUpdateLoading());
     try {
@@ -47,12 +43,10 @@ class FWUpdateBloc extends Bloc<FWUpdateEvent, FWUpdateState> {
     }
   }
 
-  // ── Tab ──────────────────────────────────────────────────────────────────────
   void _onTabChanged(FWUpdateTabChanged event, Emitter<FWUpdateState> emit) {
     if (state is FWUpdateLoaded) emit((state as FWUpdateLoaded).copyWith(currentTab: event.tabIndex));
   }
 
-  // ── SMK autocomplete ─────────────────────────────────────────────────────────
   void _onSmkTextChanged(FWUpdateSmkTextChanged event, Emitter<FWUpdateState> emit) {
     if (state is! FWUpdateLoaded) return;
     final s = state as FWUpdateLoaded;
@@ -68,7 +62,6 @@ class FWUpdateBloc extends Bloc<FWUpdateEvent, FWUpdateState> {
     emit(s.withTab(event.type, updated));
   }
 
-  // ── SMK suggestion selected ───────────────────────────────────────────────────
   Future<void> _onSmkSuggestionSelected(FWUpdateSmkSuggestionSelected event, Emitter<FWUpdateState> emit) async {
     if (state is! FWUpdateLoaded) return;
     final s = state as FWUpdateLoaded;
@@ -81,7 +74,6 @@ class FWUpdateBloc extends Bloc<FWUpdateEvent, FWUpdateState> {
 
       int newSaleOrderId = event.saleOrderId;
 
-      // Helper to build tab data from the master record
       FWTabData buildTabFromMaster(int type, FWTabData existing) {
         if (master == null) return existing;
 
@@ -137,7 +129,6 @@ class FWUpdateBloc extends Bloc<FWUpdateEvent, FWUpdateState> {
       var newState = s.copyWith(saleOrderId: newSaleOrderId);
       newState = newState.withTab(event.type, updatedTab);
 
-      // Populate other tabs with the master data
       for (int t = 1; t <= 3; t++) {
         if (t != event.type) newState = newState.withTab(t, buildTabFromMaster(t, newState.tabByType(t)));
       }
@@ -148,7 +139,6 @@ class FWUpdateBloc extends Bloc<FWUpdateEvent, FWUpdateState> {
     }
   }
 
-  // ── Overlay dismissed ────────────────────────────────────────────────────────
   void _onOverlayDismissed(FWUpdateOverlayDismissed event, Emitter<FWUpdateState> emit) {
     if (state is! FWUpdateLoaded) return;
     final s = state as FWUpdateLoaded;
@@ -161,7 +151,6 @@ class FWUpdateBloc extends Bloc<FWUpdateEvent, FWUpdateState> {
     }
   }
 
-  // ── Employee and Form Handlers ────────────────────────────────────────────────
   void _onSealEmpChanged(FWUpdateSealEmpChanged event, Emitter<FWUpdateState> emit) {
     if (state is FWUpdateLoaded) emit((state as FWUpdateLoaded).withTab(event.type, (state as FWUpdateLoaded).tabByType(event.type).copyWith(sealEmpId: event.empId, sealEmpName: event.empName)));
   }
@@ -178,7 +167,6 @@ class FWUpdateBloc extends Bloc<FWUpdateEvent, FWUpdateState> {
     if (state is FWUpdateLoaded) emit((state as FWUpdateLoaded).withTab(event.type, (state as FWUpdateLoaded).tabByType(event.type).copyWith(exRef: event.value)));
   }
 
-  // ── Image Handlers ───────────────────────────────────────────────────────────
   void _onImageUploadToggled(FWUpdateImageUploadToggled event, Emitter<FWUpdateState> emit) {
     if (state is FWUpdateLoaded) emit((state as FWUpdateLoaded).withTab(event.type, (state as FWUpdateLoaded).tabByType(event.type).copyWith(imageUploadEnabled: event.value)));
   }
@@ -210,7 +198,6 @@ class FWUpdateBloc extends Bloc<FWUpdateEvent, FWUpdateState> {
     }
   }
 
-  // ── Save / Update ─────────────────────────────────────────────────────────────
   Future<void> _onSaveRequested(FWUpdateSaveRequested event, Emitter<FWUpdateState> emit) async {
     if (state is! FWUpdateLoaded) return;
     final s = state as FWUpdateLoaded;
@@ -247,7 +234,7 @@ class FWUpdateBloc extends Bloc<FWUpdateEvent, FWUpdateState> {
 
       if (result?.IsSuccess == true) {
         emit(FWUpdateSaveSuccess());
-        emit(_defaultLoaded()); // reset after success
+        emit(_defaultLoaded());
       } else {
         emit(s); // revert
       }

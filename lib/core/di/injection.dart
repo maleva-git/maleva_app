@@ -121,6 +121,8 @@ import '../../features/dashboard/admin_dashboard/tabs/vesselreport/bloc/vesselre
 import '../../features/dashboard/admin_dashboard/tabs/vesselreport/data/vessel_report_repository.dart';
 import '../../features/operations/forwarding/bloc/forwarding_bloc.dart';
 import '../../features/operations/forwarding/data/fwupdate_repository.dart';
+import '../../features/operations/forwardingsalary/bloc/forwardingsalary_bloc.dart';
+import '../../features/operations/forwardingsalary/data/forwardingsalary_repository.dart';
 
 final sl = GetIt.instance;
 
@@ -512,5 +514,13 @@ Future<void> setupDependencies() async {
 
   sl.registerFactory<FWUpdateBloc>(
         () => FWUpdateBloc(repository: sl<FWUpdateRepository>()),
+  );
+
+  // 1. Register the Repository
+  sl.registerLazySingleton<ForwardingSalaryRepository>(() => ForwardingSalaryRepository());
+
+// 2. Register the BLoC
+  sl.registerFactory<ForwardingSalaryBloc>(
+        () => ForwardingSalaryBloc(repository: sl<ForwardingSalaryRepository>()),
   );
 }
