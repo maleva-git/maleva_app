@@ -1,9 +1,6 @@
 import 'package:equatable/equatable.dart';
 import 'package:maleva/core/models/model.dart';
 
-// ═══════════════════════════════════════════════════════
-// STATE
-// ═══════════════════════════════════════════════════════
 abstract class SalesOrderAddState extends Equatable {
   @override
   List<Object?> get props => [];
@@ -14,11 +11,10 @@ class SalesOrderAddInitial extends SalesOrderAddState {}
 class SalesOrderAddLoading extends SalesOrderAddState {}
 
 class SalesOrderAddLoaded extends SalesOrderAddState {
-  // ── Progress / UI flags ──────────────────────────────
+
   final bool progress;
   final bool showSearch;
 
-  // ── Product list ─────────────────────────────────────
   final List<SaleEditDetailModel> productViewList;
   final int? productUpdateIndex;
 
