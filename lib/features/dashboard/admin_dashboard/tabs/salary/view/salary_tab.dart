@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
+import '../../../../../../core/di/injection.dart';
 import '../../../../../../core/theme/palette.dart';
 import '../../../../../../core/theme/tokens.dart';
 import '../bloc/salary_bloc.dart';
@@ -18,17 +19,14 @@ class SalaryTab extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      // Bloc is created internally — just use const SalaryTab() with no params.
-      create: (_) => SalaryBloc(context: context)..add(const SalaryInitialLoad()),
-      child: _SalaryView(onRowTap: onRowTap),
-    );
+    return
+      BlocProvider(
+        create: (_) => sl<SalaryBloc>()..add(const SalaryInitialLoad()),
+        child: _SalaryView(onRowTap: onRowTap),
+      );
   }
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// Responsive wrapper
-// ─────────────────────────────────────────────────────────────────────────────
 class _SalaryView extends StatelessWidget {
   final void Function(Map<String, dynamic>)? onRowTap;
 
@@ -51,9 +49,6 @@ class _SalaryView extends StatelessWidget {
   }
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// Phone layout — single column, full-screen list
-// ─────────────────────────────────────────────────────────────────────────────
 class _PhoneLayout extends StatelessWidget {
   final SalaryState state;
   final void Function(Map<String, dynamic>)? onRowTap;
@@ -82,9 +77,6 @@ class _PhoneLayout extends StatelessWidget {
   }
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// Tablet layout — header + date row on left, list on right
-// ─────────────────────────────────────────────────────────────────────────────
 class _TabletLayout extends StatelessWidget {
   final SalaryState state;
   final void Function(Map<String, dynamic>)? onRowTap;
@@ -148,11 +140,6 @@ class _TabletLayout extends StatelessWidget {
   }
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// Shared widgets
-// ─────────────────────────────────────────────────────────────────────────────
-
-/// "SALARY  - RM 1,234.56" headline
 class _SalaryHeader extends StatelessWidget {
   final SalaryState state;
 
@@ -224,7 +211,6 @@ class _DateRangeRow extends StatelessWidget {
   }
 }
 
-/// Phone-style inline date picker row (date label + calendar icon).
 class _InlineDatePicker extends StatelessWidget {
   final String date;
   final ValueChanged<DateTime> onPicked;
@@ -285,7 +271,6 @@ class _InlineDatePicker extends StatelessWidget {
   }
 }
 
-/// Tablet-style card date picker with a label above.
 class _DatePickerCard extends StatelessWidget {
   final String label;
   final String date;

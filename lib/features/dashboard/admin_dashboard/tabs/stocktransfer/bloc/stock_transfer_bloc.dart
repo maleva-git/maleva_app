@@ -1,14 +1,18 @@
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:maleva/core/models/model.dart';
-import 'package:maleva/core/network/OnlineApi.dart' as OnlineApi;
-import 'package:maleva/core/utils/clsfunction.dart' as objfun;
+
+import '../data/stock_transfer_repository.dart';
 
 part 'stock_transfer_event.dart';
 part 'stock_transfer_state.dart';
 
 class StockTransferBloc extends Bloc<StockTransferEvent, StockTransferState> {
-  StockTransferBloc() : super(const StockTransferInitialLoading()) {
+  final StockTransferRepository repository;
+
+  // Local cache to replace objfun.WareHouseList
+  List<dynamic> _wareHouseList = [];
+
+  StockTransferBloc({required this.repository}) : super(const StockTransferInitialLoading()) {
     on<StockTransferInitialized>(_onInitialized);
     on<StockTransferBarcodeScanned>(_onBarcodeScanned);
     on<StockTransferLoadStockData>(_onLoadStockData);
@@ -23,37 +27,27 @@ class StockTransferBloc extends Bloc<StockTransferEvent, StockTransferState> {
 
   StockTransferLoaded get _loaded => state as StockTransferLoaded;
 
-  StockTransferLoaded _withMsg(
-      StockTransferLoaded s,
-      String text,
-      MessageType type,
-      ) =>
+  StockTransferLoaded _withMsg(StockTransferLoaded s, String text, MessageType type) =>
       s.copyWith(message: StockTransferMessage(text, type), isBusy: false);
 
   // ───────────────────────────────────────────────────────────────────────────
 
-  Future<void> _onInitialized(
-      StockTransferInitialized _,
-      Emitter<StockTransferState> emit,
-      ) async {
+  Future<void> _onInitialized(StockTransferInitialized _, Emitter<StockTransferState> emit) async {
     emit(const StockTransferInitialLoading());
     try {
-      await OnlineApi.SelectWareHouse(null);
+      _wareHouseList = await repository.fetchWarehouses();
       emit(StockTransferLoaded(data: const StockTransferData()));
     } catch (e) {
       emit(StockTransferInitError(e.toString()));
     }
   }
 
-  Future<void> _onBarcodeScanned(
-      StockTransferBarcodeScanned _,
-      Emitter<StockTransferState> emit,
-      ) async {
+  Future<void> _onBarcodeScanned(StockTransferBarcodeScanned _, Emitter<StockTransferState> emit) async {
     if (state is! StockTransferLoaded) return;
     try {
-      await objfun.barcodeScanning();
-      if (objfun.barcodeerror == true) return;
-      final barcodeString = objfun.barcodestring as String;
+      final barcodeString = await repository.scanBarcode();
+      if (barcodeString == null || barcodeString.isEmpty) return;
+
       if (_loaded.data.stockNoList.isEmpty) {
         add(StockTransferLoadStockData(barcodeString.split('-')[0]));
         add(StockTransferAddScannedItem(barcodeString));
@@ -65,42 +59,25 @@ class StockTransferBloc extends Bloc<StockTransferEvent, StockTransferState> {
     }
   }
 
-  Future<void> _onLoadStockData(
-      StockTransferLoadStockData event,
-      Emitter<StockTransferState> emit,
-      ) async {
+  Future<void> _onLoadStockData(StockTransferLoadStockData event, Emitter<StockTransferState> emit) async {
     if (state is! StockTransferLoaded) return;
     final current = _loaded;
     emit(current.copyWith(isBusy: true));
+
     try {
-      final comid = objfun.storagenew.getInt('Comid') ?? 0;
-      final header = {'Content-Type': 'application/json; charset=UTF-8'};
-      final resultData = await objfun.apiAllinoneSelectArray(
-        "${objfun.apiEditStockIn}0&barcodeLabel=${event.barcodeLabel}&Comid=$comid",
-        null, header, null,
-      );
-      if (resultData == '') {
-        emit(_withMsg(current, 'No data returned', MessageType.error));
-        return;
-      }
-      final value = ResponseViewModel.fromJson(resultData);
-      if (value.IsSuccess != true) {
-        emit(_withMsg(current, value.Message ?? 'Error', MessageType.info));
-        return;
-      }
-      final row = value.data1[0];
+      final row = await repository.fetchStockData(event.barcodeLabel);
+
       final int numPkg = row['NumberOfPackages'];
       final String barcodeDisplay = row['BarcodeLabelDisplay'];
       final int portMasterRefId = row['PortMasterRefId'];
-      final checkList = List.generate(
-        numPkg,
-            (i) => '$barcodeDisplay-${i + 1}/$numPkg',
-      );
+
+      final checkList = List.generate(numPkg, (i) => '$barcodeDisplay-${i + 1}/$numPkg');
+
+      // Look up Port Name from local list
       String portName = '';
       try {
-        portName = objfun.WareHouseList
-            .firstWhere((w) => w.Id == portMasterRefId)
-            .PortName ?? '';
+        final match = _wareHouseList.firstWhere((w) => w['Id'] == portMasterRefId, orElse: () => null);
+        if (match != null) portName = match['PortName'] ?? '';
       } catch (_) {}
 
       emit(current.copyWith(
@@ -114,113 +91,76 @@ class StockTransferBloc extends Bloc<StockTransferEvent, StockTransferState> {
         ),
       ));
     } catch (e, st) {
-      emit(_withMsg(current, '$e\n$st', MessageType.error));
+      emit(_withMsg(current, e.toString(), MessageType.error));
     }
   }
 
-  void _onAddScannedItem(
-      StockTransferAddScannedItem event,
-      Emitter<StockTransferState> emit,
-      ) {
+  void _onAddScannedItem(StockTransferAddScannedItem event, Emitter<StockTransferState> emit) {
     if (state is! StockTransferLoaded) return;
     final current = _loaded;
     final data = current.data;
+
     final isValid = data.checkStockNoList.contains(event.barcodeString);
     final isDuplicate = data.stockNoList.contains(event.barcodeString);
+
     if (!isValid || isDuplicate) {
       emit(_withMsg(current, 'Invalid / duplicate barcode!', MessageType.info));
       return;
     }
+
     final newList = List<String>.from(data.stockNoList)..add(event.barcodeString);
-    emit(current.copyWith(
-      data: data.copyWith(stockNoList: newList, scnPkg: newList.length),
-    ));
+    emit(current.copyWith(data: data.copyWith(stockNoList: newList, scnPkg: newList.length)));
   }
 
-  void _onWareHouseSelected(
-      StockTransferWareHouseSelected event,
-      Emitter<StockTransferState> emit,
-      ) {
+  void _onWareHouseSelected(StockTransferWareHouseSelected event, Emitter<StockTransferState> emit) {
     if (state is! StockTransferLoaded) return;
     emit(_loaded.copyWith(
-      data: _loaded.data.copyWith(
-        selectedWareHouseId: event.wareHouseId,
-        selectedWareHouseName: event.portName,
-      ),
+      data: _loaded.data.copyWith(selectedWareHouseId: event.wareHouseId, selectedWareHouseName: event.portName),
     ));
   }
 
-  void _onWareHouseCleared(
-      StockTransferWareHouseCleared _,
-      Emitter<StockTransferState> emit,
-      ) {
+  void _onWareHouseCleared(StockTransferWareHouseCleared _, Emitter<StockTransferState> emit) {
     if (state is! StockTransferLoaded) return;
     emit(_loaded.copyWith(
-      data: _loaded.data.copyWith(
-        selectedWareHouseId: 0,
-        selectedWareHouseName: '',
-      ),
+      data: _loaded.data.copyWith(selectedWareHouseId: 0, selectedWareHouseName: ''),
     ));
   }
 
-  void _onItemRemoved(
-      StockTransferItemRemoved event,
-      Emitter<StockTransferState> emit,
-      ) {
+  void _onItemRemoved(StockTransferItemRemoved event, Emitter<StockTransferState> emit) {
     if (state is! StockTransferLoaded) return;
     final data = _loaded.data;
     final newList = List<String>.from(data.stockNoList)..removeAt(event.index);
+
     if (newList.isEmpty) {
       emit(StockTransferLoaded(data: const StockTransferData()));
       return;
     }
-    emit(_loaded.copyWith(
-      data: data.copyWith(stockNoList: newList, scnPkg: newList.length),
-    ));
+    emit(_loaded.copyWith(data: data.copyWith(stockNoList: newList, scnPkg: newList.length)));
   }
 
-  Future<void> _onUpdateRequested(
-      StockTransferUpdateRequested _,
-      Emitter<StockTransferState> emit,
-      ) async {
+  Future<void> _onUpdateRequested(StockTransferUpdateRequested _, Emitter<StockTransferState> emit) async {
     if (state is! StockTransferLoaded) return;
     final current = _loaded;
     final data = current.data;
-    if (data.selectedWareHouseId == 0) {
-      emit(_withMsg(current, 'Select WareHouse', MessageType.info));
-      return;
-    }
-    if (data.totalPkg == 0 || data.totalPkg != data.scnPkg) {
-      emit(_withMsg(current, 'Stock count mismatch', MessageType.info));
-      return;
-    }
-    if (data.stockId == 0) {
-      emit(_withMsg(current, 'Invalid stock details', MessageType.info));
-      return;
-    }
+
+    if (data.selectedWareHouseId == 0) { emit(_withMsg(current, 'Select WareHouse', MessageType.info)); return; }
+    if (data.totalPkg == 0 || data.totalPkg != data.scnPkg) { emit(_withMsg(current, 'Stock count mismatch', MessageType.info)); return; }
+    if (data.stockId == 0) { emit(_withMsg(current, 'Invalid stock details', MessageType.info)); return; }
+
     emit(current.copyWith(isBusy: true));
     try {
-      final comid = objfun.storagenew.getInt('Comid') ?? 0;
-      final header = {'Content-Type': 'application/json; charset=UTF-8'};
-      final resultData = await objfun.apiAllinoneSelectArray(
-        "${objfun.apiUpdateStockTransfer}${data.stockId}&PortId=${data.selectedWareHouseId}&Comid=$comid",
-        <String, dynamic>{}, header, null,
-      );
-      if (resultData == '') {
-        emit(_withMsg(current, 'No response from server', MessageType.error));
-        return;
-      }
-      final value = ResponseViewModel.fromJson(resultData);
-      if (value.IsSuccess == true) {
+      final result = await repository.updateStockTransfer(data.stockId, data.selectedWareHouseId);
+
+      if (result?.IsSuccess == true) {
         emit(StockTransferLoaded(
           data: const StockTransferData(),
           message: const StockTransferMessage('Updated Successfully', MessageType.success),
         ));
       } else {
-        emit(_withMsg(current, value.Message ?? 'Update failed', MessageType.error));
+        emit(_withMsg(current, result?.Message ?? 'Update failed', MessageType.error));
       }
     } catch (e, st) {
-      emit(_withMsg(current, '$e\n$st', MessageType.error));
+      emit(_withMsg(current, e.toString(), MessageType.error));
     }
   }
 
@@ -228,10 +168,7 @@ class StockTransferBloc extends Bloc<StockTransferEvent, StockTransferState> {
     emit(StockTransferLoaded(data: const StockTransferData()));
   }
 
-  void _onMessageDismissed(
-      StockTransferMessageDismissed _,
-      Emitter<StockTransferState> emit,
-      ) {
+  void _onMessageDismissed(StockTransferMessageDismissed _, Emitter<StockTransferState> emit) {
     if (state is! StockTransferLoaded) return;
     emit(_loaded.copyWith(clearMessage: true));
   }

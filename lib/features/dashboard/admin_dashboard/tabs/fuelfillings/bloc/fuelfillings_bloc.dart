@@ -1,15 +1,14 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 import 'package:maleva/core/utils/clsfunction.dart' as objfun;
-
 import '../../../../../../core/models/model.dart';
 import '../data/fuelfillings_repository.dart';
 import 'fuelfillings_event.dart';
 import 'fuelfillings_state.dart';
 
 class FuelFillingBloc extends Bloc<FuelFillingEvent, FuelFillingState> {
-  // ❌ REMOVED: final BuildContext context;
-  final FuelFillingsRepository repository; // ✅ Injected Repository
+
+  final FuelFillingsRepository repository;
 
   FuelFillingBloc({required this.repository}) : super(FuelFillingInitial()) {
     on<LoadFuelFillingReport>(_onLoadFuelFillingReport);
@@ -31,7 +30,6 @@ class FuelFillingBloc extends Bloc<FuelFillingEvent, FuelFillingState> {
         'Comid':    objfun.Comid,
       };
 
-      // ✅ REFACTORED: Using the injected repository without context
       final resultData = await repository.fetchFuelFillingReport(body: requestBody);
 
       if (resultData != null && resultData is List && resultData.isNotEmpty) {

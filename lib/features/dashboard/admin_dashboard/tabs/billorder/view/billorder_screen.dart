@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:maleva/core/models/model.dart';
+import '../../../../../../core/di/injection.dart';
 import '../../../../../../core/theme/tokens.dart';
 import '../bloc/billorder_bloc.dart';
 import '../bloc/billorder_event.dart';
@@ -19,11 +20,12 @@ class BillOrderScreen extends StatelessWidget {
         final now  = DateTime.now();
         final from = DateTime(now.year, now.month, 1);
         final to   = DateTime(now.year, now.month + 1, 0);
-        return BillOrderBloc(context)
-          ..add(LoadBillOrderEvent(
-            fromDate: DateFormat('MM/dd/yyyy').format(from),
-            toDate:   DateFormat('MM/dd/yyyy').format(to),
-          ));
+        return
+          sl<BillOrderBloc>()
+            ..add(LoadBillOrderEvent(
+              fromDate: DateFormat('MM/dd/yyyy').format(from),
+              toDate:   DateFormat('MM/dd/yyyy').format(to),
+            ));
       },
       child: const _BillOrderBody(),
     );

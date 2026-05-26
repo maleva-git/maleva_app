@@ -4,7 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:maleva/core/colors/colors.dart' as colour;
 import 'package:maleva/menu/menulist.dart';
-import '../../../../core/bluetooth/bluetoothmanager.dart';
+import '../../../../core/bluetooth/view/Bluetooth_tab.dart';
 import '../../../../core/models/model.dart';
 import '../../../../core/utils/clsfunction.dart' as objfun;
 import '../../../common_updates/blocs/sales/sales_bloc.dart';
@@ -64,7 +64,7 @@ class SalesDashboardView extends StatelessWidget {
           icon: Icon(Icons.bluetooth_audio,
               size: isTablet ? 28 : 25, color: colour.topAppBarColor),
           onPressed: () => Navigator.push(context,
-              MaterialPageRoute(builder: (_) => Bluetoothpage())),
+              MaterialPageRoute(builder: (_) => BluetoothPage())),
         ),
         IconButton(
           icon: Icon(Icons.print,

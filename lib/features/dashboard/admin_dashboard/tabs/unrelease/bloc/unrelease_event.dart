@@ -1,4 +1,6 @@
-part of 'unrelease_bloc.dart';
+
+
+import 'package:equatable/equatable.dart';
 
 abstract class UnReleaseEvent extends Equatable {
   const UnReleaseEvent();

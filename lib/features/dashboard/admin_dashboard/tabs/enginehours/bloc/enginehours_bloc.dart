@@ -1,16 +1,14 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 import 'package:maleva/core/utils/clsfunction.dart' as objfun;
-
 import '../../../../../../core/models/model.dart';
-
-import '../tab/enginehours_repository.dart';
+import '../data/enginehours_repository.dart';
 import 'enginehours_event.dart';
 import 'enginehours_state.dart';
 
 class EngineHoursBloc extends Bloc<EngineHoursEvent, EngineHoursState> {
-  // ❌ REMOVED: final BuildContext context;
-  final EngineHoursRepository repository; // ✅ Injected Repository
+
+  final EngineHoursRepository repository;
 
   EngineHoursBloc({required this.repository}) : super(const EngineHoursInitial()) {
     on<LoadEngineHoursReport>(_onLoadEngineHoursReport);

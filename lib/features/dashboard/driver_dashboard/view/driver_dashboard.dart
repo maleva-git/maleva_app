@@ -3,10 +3,13 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 import '../../../../core/di/injection.dart';
 import '../../admin_dashboard/tabs/driverlicense/bloc/driverlicense_bloc.dart';
+import '../../admin_dashboard/tabs/driverlicense/bloc/driverlicense_event.dart';
 import '../../admin_dashboard/tabs/driverlicense/view/driverlicense_tab.dart';
 import '../../admin_dashboard/tabs/drivermaintenance/bloc/drivermaintenance_bloc.dart';
+import '../../admin_dashboard/tabs/drivermaintenance/bloc/drivermaintenance_event.dart';
 import '../../admin_dashboard/tabs/drivermaintenance/view/drivermaintenance_tab.dart';
 import '../../admin_dashboard/tabs/driversalary/bloc/driversalary_bloc.dart';
+import '../../admin_dashboard/tabs/driversalary/bloc/driversalary_event.dart';
 import '../../admin_dashboard/tabs/driversalary/view/driversalary_tab.dart';
 import '../../admin_dashboard/tabs/pdo/bloc/pdo_bloc.dart';
 import '../../admin_dashboard/tabs/pdo/data/pdo_repository.dart';
@@ -60,18 +63,20 @@ class _DriverDashboardState extends State<DriverDashboard> with SingleTickerProv
                   child: const SummonEntryPage(),
                 ),
                 BlocProvider(
-                  create: (context) => TruckMaintDashBloc(),
+                  create: (context) => sl<TruckMaintDashBloc>()
+                    ..add(TruckMaintDashStarted()),
                   child: const TruckMaintenanceDashboardWidget(),
                 ),
                 BlocProvider(
-                  create: (context) => DriverLicenseExpiryBloc(),
+                  create: (context) => sl<DriverLicenseExpiryBloc>()
+                    ..add(DriverLicenseExpiryStarted()),
                   child: const DriverLicenseExpiryWidget(),
                 ),
                 BlocProvider(
-                  create: (context) => DriverSalaryBloc(),
+                  create: (context) => sl<DriverSalaryBloc>()
+                    ..add(DriverSalaryStarted()),
                   child: const DriverSalaryWidget(),
                 ),
-
                 BlocProvider(
                   create: (_) => PDOBloc(
                     repository: sl<PDORepository>(), // ✅ Repository injected here!

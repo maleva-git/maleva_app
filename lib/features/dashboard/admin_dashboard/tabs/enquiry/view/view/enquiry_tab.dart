@@ -5,6 +5,7 @@ import '../../../../../../../core/colors/colors.dart' as colour;
 import '../../../../../../../core/di/injection.dart';
 import '../../../../../../../core/theme/tokens.dart';
 import '../../../../../../../core/utils/clsfunction.dart' as objfun;
+import '../../../saleorderadd/view/saleorderadd_tab.dart';
 import '../../add/view/enquiryadd.dart';
 import '../bloc/enquiry_bloc.dart';
 import '../bloc/enquiry_event.dart';
@@ -298,8 +299,8 @@ class _EnquiryCard extends StatelessWidget {
                           Navigator.of(context).push(
                             MaterialPageRoute(
                               builder: (_) => SalesOrderAdd(
-                                SaleDetails: null,
-                                SaleMaster: enquiryList,
+                                saleDetails: null,
+                                saleMaster: enquiryList,
                               ),
                             ),
                           );

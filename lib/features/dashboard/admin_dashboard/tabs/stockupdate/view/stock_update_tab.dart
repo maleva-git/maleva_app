@@ -9,6 +9,7 @@ import 'package:maleva/core/utils/clsfunction.dart' as objfun;
 import 'package:maleva/core/models/model.dart';
 import 'package:maleva/menu/menulist.dart';
 
+import '../../../../../../core/di/injection.dart';
 import '../../../../../mastersearch/JobAllStatus.dart';
 import '../../../../../mastersearch/WareHouseList.dart';
 import '../bloc/stock_update_bloc.dart';
@@ -42,11 +43,11 @@ class StockUpdate extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (_) =>
-      StockUpdateBloc()..add(StockUpdateStarted()),
-      child: const _StockUpdatePage(),
-    );
+    return
+      BlocProvider(
+        create: (context) => sl<StockUpdateBloc>()..add( StockUpdateStarted()),
+        child: const _StockUpdatePage(), // <--- Update this to match your actual class name
+      );
   }
 }
 

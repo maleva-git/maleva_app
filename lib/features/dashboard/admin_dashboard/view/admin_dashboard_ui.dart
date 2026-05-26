@@ -4,7 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:maleva/core/utils/clsfunction.dart' as objfun;
 import 'package:maleva/core/colors/colors.dart' as colour;
-import '../../../../core/bluetooth/bluetoothmanager.dart';
+import '../../../../core/bluetooth/view/Bluetooth_tab.dart';
 import '../../../../core/colors/colors.dart';
 import '../../../../core/models/model.dart';
 import '../../../../menu/menulist.dart';
@@ -69,7 +69,7 @@ class MobileDashboard extends StatelessWidget {
       backgroundColor: AppColors.appBarColor,
       toolbarHeight: isTablet ? 64 : 56,
       title: Text(
-        'Dash Board',
+        'ADMIN',
         style: GoogleFonts.lato(
           color: colour.topAppBarColor,
           fontWeight: FontWeight.bold,
@@ -80,19 +80,19 @@ class MobileDashboard extends StatelessWidget {
       actions: [
         IconButton(
           icon: Icon(Icons.directions_boat_filled,
-              size: isTablet ? 25 : 25, color: colour.topAppBarColor),
+              size: isTablet ? 28 : 25, color: colour.topAppBarColor),
           onPressed: () => Navigator.push(context,
               MaterialPageRoute(builder: (_) => Saleorderview())),
         ),
         IconButton(
           icon: Icon(Icons.bluetooth_audio,
-              size: isTablet ? 25 : 25, color: colour.topAppBarColor),
+              size: isTablet ? 28 : 25, color: colour.topAppBarColor),
           onPressed: () => Navigator.push(context,
-              MaterialPageRoute(builder: (_) => Bluetoothpage())),
+              MaterialPageRoute(builder: (_) => BluetoothPage())),
         ),
         IconButton(
           icon: Icon(Icons.print,
-              size: isTablet ? 25 : 25, color: colour.topAppBarColor),
+              size: isTablet ? 28 : 25, color: colour.topAppBarColor),
           onPressed: () async {
             await objfun.printdata([
               BarcodePrintModel("MALEVA", "SHIPNAME", "SHIPNAME",
@@ -135,7 +135,7 @@ class MobileDashboard extends StatelessWidget {
         isScrollable: true,
         indicator: BoxDecoration(
           color: AppColors.appBarColor,
-          borderRadius: BorderRadius.circular(isTablet ? 25 : 25),
+          borderRadius: BorderRadius.circular(isTablet ? 28 : 25),
         ),
         indicatorSize: TabBarIndicatorSize.tab,
         labelColor: Colors.white,
@@ -242,7 +242,6 @@ class MobileDashboard extends StatelessWidget {
             toDate: DateFormat('yyyy-MM-dd').format(DateTime.now()),
           ),
           const RTIDetailsPage(),
-
 
         ],
       ),

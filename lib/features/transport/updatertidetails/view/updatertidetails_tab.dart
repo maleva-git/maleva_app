@@ -5,10 +5,13 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:maleva/core/utils/clsfunction.dart' as objfun;
 import 'package:maleva/core/network/OnlineApi.dart' as OnlineApi;
+import 'package:maleva/features/dashboard/airfreight_dashboard/view/airfreight_dashboard.dart';
 import 'package:maleva/core/models/model.dart';
 import 'package:maleva/menu/menulist.dart';
 import 'package:maleva/features/dashboard/admin_dashboard/view/admin_dashboard.dart';
+import '../../../dashboard/admin_dashboard/tabs/rtistatus/view/rtistatus_tab.dart';
 import '../../../dashboard/admin_dashboard/tabs/transportDB/view/transportdb_tab.dart';
+import '../../../dashboard/airfreight_dashboard/view/airfreight_dashboard.dart';
 import '../../../dashboard/boarding_dashboard/view/boarding_dashboard.dart';
 import '../../../dashboard/driver_dashboard/view/driver_dashboard.dart';
 import '../../../dashboard/forwarding_dashboard/view/forwarding_dashboard.dart';
@@ -125,7 +128,7 @@ class _UpdateRTIPage extends StatelessWidget {
           dest = const OperationAdminDashboard();
           break;
         case 'AIR FRIEGHT':
-          dest = const AirFrieghtDashboard();
+          dest = const AirfreightDashboard(); // ← lowercase 'f', correct spelling
           break;
         case 'BOARDING':
         case 'OPERATION':
@@ -599,8 +602,8 @@ class _DetailsSection extends StatelessWidget {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                        builder: (_) =>
-                            RTIStatus(RTIDetails: rtiDetails)),
+
+                        builder: (_) => RTIStatusPage(rtiDetails: rtiDetails)),
                   );
                 },
                 child: Container(

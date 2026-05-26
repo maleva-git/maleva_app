@@ -8,7 +8,6 @@ import 'package:maleva/core/utils/clsfunction.dart' as objfun;
 import 'package:maleva/core/models/model.dart';
 import 'package:maleva/core/network/OnlineApi.dart' as OnlineApi;
 import 'package:maleva/menu/menulist.dart';
-
 import '../../../../mastersearch/AddressList.dart';
 import '../../../../mastersearch/Agent.dart';
 import '../../../../mastersearch/AgentCompany.dart';
@@ -1601,13 +1600,9 @@ class _SalesOrderAddBodyState extends State<_SalesOrderAddBody>
       context: context,
       builder: (ctx) => BlocProvider.value(
         value: bloc,
-        child: _AddressListDialog(
+        child: const _AddressListDialog(
           title: "PickUp Address & Qty List",
-          addresses: state.pickUpAddressList,
-          quantities: state.pickUpQuantityList,
-          onSelect: (i) => bloc.add(SelectPickUpFromList(i)),
-          onDelete: (i) => bloc.add(RemovePickUpAddress(i)),
-          onClear: () => bloc.add(ClearProduct()),
+          isPickUp: true,
         ),
       ),
     );
@@ -1620,13 +1615,9 @@ class _SalesOrderAddBodyState extends State<_SalesOrderAddBody>
       context: context,
       builder: (ctx) => BlocProvider.value(
         value: bloc,
-        child: _AddressListDialog(
+        child: const _AddressListDialog(
           title: "Delivery Address & Qty List",
-          addresses: state.deliveryAddressList,
-          quantities: state.deliveryQuantityList,
-          onSelect: (i) => bloc.add(SelectDeliveryFromList(i)),
-          onDelete: (i) => bloc.add(RemoveDeliveryAddress(i)),
-          onClear: () {},
+          isPickUp: false,
         ),
       ),
     );
@@ -2392,24 +2383,14 @@ class _ProductDialogState extends State<_ProductDialog> {
       );
 }
 
-// ════════════════════════════════════════════════════
-// Address List Dialog
-// ════════════════════════════════════════════════════
+
 class _AddressListDialog extends StatelessWidget {
   final String title;
-  final List<dynamic> addresses;
-  final List<dynamic> quantities;
-  final ValueChanged<int> onSelect;
-  final ValueChanged<int> onDelete;
-  final VoidCallback onClear;
+  final bool isPickUp;
 
   const _AddressListDialog({
     required this.title,
-    required this.addresses,
-    required this.quantities,
-    required this.onSelect,
-    required this.onDelete,
-    required this.onClear,
+    required this.isPickUp,
   });
 
   @override
@@ -2424,103 +2405,173 @@ class _AddressListDialog extends StatelessWidget {
         width: width * 0.9,
         height: height * 0.65,
         padding: const EdgeInsets.all(16),
-        child: Column(children: [
-          Row(children: [
-            Container(
-              width: 36,
-              height: 36,
-              decoration: BoxDecoration(
-                color: colour.brandLight,
-                borderRadius: BorderRadius.circular(10),
-              ),
-              child: const Icon(Icons.list_rounded, color: colour.brand, size: 20),
-            ),
-            const SizedBox(width: 10),
-            Expanded(
-              child: Text(title,
-                  style: GoogleFonts.poppins(
-                      color: colour.textMain, fontSize: 14, fontWeight: FontWeight.w700),
-                  overflow: TextOverflow.ellipsis),
-            ),
-            GestureDetector(
-              onTap: () {
-                onClear();
-                Navigator.of(context, rootNavigator: true).pop();
-              },
-              child: Container(
-                width: 32,
-                height: 32,
-                decoration: BoxDecoration(
-                  color: colour.surface,
-                  borderRadius: BorderRadius.circular(8),
-                  border: Border.all(color: colour.border),
-                ),
-                child: const Icon(Icons.close_rounded, color: colour.textSub, size: 18),
-              ),
-            ),
-          ]),
 
-          const SizedBox(height: 10),
-          Divider(color: colour.border),
-          const SizedBox(height: 6),
+        child: BlocBuilder<SalesOrderAddBloc, SalesOrderAddState>(
+          builder: (context, state) {
+            if (state is! SalesOrderAddLoaded) return const SizedBox();
+            final bloc = context.read<SalesOrderAddBloc>();
 
-          Expanded(
-            child: addresses.isEmpty
-                ? Center(
-                child: Text('No records',
-                    style: GoogleFonts.poppins(color: colour.textSub, fontSize: 13)))
-                : ListView.builder(
-              itemCount: addresses.length,
-              itemBuilder: (ctx, index) => InkWell(
-                onLongPress: () async {
-                  final del = await objfun.ConfirmationMsgYesNo(
-                      context, "Are you sure to delete?");
-                  if (del == true) onDelete(index);
-                },
-                onTap: () {
-                  onSelect(index);
-                  Navigator.of(context, rootNavigator: true).pop();
-                },
-                child: Container(
-                  margin: const EdgeInsets.only(bottom: 8),
+            final addresses = isPickUp
+                ? state.pickUpAddressList
+                : state.deliveryAddressList;
+            final quantities = isPickUp
+                ? state.pickUpQuantityList
+                : state.deliveryQuantityList;
+
+            return Column(children: [
+
+              Row(children: [
+                Container(
+                  width: 36,
+                  height: 36,
                   decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(12),
-                    border: Border.all(color: colour.border),
-                    boxShadow: const [
-                      BoxShadow(color: Color(0x0A1555F3), blurRadius: 6, offset: Offset(0, 2))
-                    ],
+                    color: colour.brandLight,
+                    borderRadius: BorderRadius.circular(10),
                   ),
-                  padding: const EdgeInsets.all(12),
-                  child: Row(children: [
-                    Expanded(
-                      flex: 3,
-                      child: Text(addresses[index].toString(),
-                          style: GoogleFonts.poppins(
-                              color: colour.textMain, fontSize: 12, fontWeight: FontWeight.w600)),
+                  child: const Icon(Icons.list_rounded, color: colour.brand, size: 20),
+                ),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: Text(
+                    title,
+                    style: GoogleFonts.poppins(
+                        color: colour.textMain,
+                        fontSize: 14,
+                        fontWeight: FontWeight.w700),
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+                GestureDetector(
+                  onTap: () => Navigator.of(context, rootNavigator: true).pop(),
+                  child: Container(
+                    width: 32,
+                    height: 32,
+                    decoration: BoxDecoration(
+                      color: colour.surface,
+                      borderRadius: BorderRadius.circular(8),
+                      border: Border.all(color: colour.border),
                     ),
-                    const SizedBox(width: 8),
-                    Expanded(
+                    child: const Icon(Icons.close_rounded,
+                        color: colour.textSub, size: 18),
+                  ),
+                ),
+              ]),
+
+              const SizedBox(height: 10),
+              Divider(color: colour.border),
+              const SizedBox(height: 6),
+
+              // ── List ─────────────────────────────────────
+              Expanded(
+                child: addresses.isEmpty
+                    ? Center(
+                  child: Text(
+                    'No records',
+                    style: GoogleFonts.poppins(
+                        color: colour.textSub, fontSize: 13),
+                  ),
+                )
+                    : ListView.builder(
+                  itemCount: addresses.length,
+                  itemBuilder: (ctx, index) {
+                    return InkWell(
+                      onLongPress: () async {
+                        // ✅ FIX: Delete from live bloc, dialog auto-rebuilds
+                        final del = await objfun.ConfirmationMsgYesNo(
+                            context, "Are you sure to delete?");
+                        if (del == true) {
+                          if (isPickUp) {
+                            bloc.add(RemovePickUpAddress(index));
+                          } else {
+                            bloc.add(RemoveDeliveryAddress(index));
+                          }
+                          // No manual setState needed — BlocBuilder handles it
+                        }
+                      },
+                      onTap: () {
+                        if (isPickUp) {
+                          bloc.add(SelectPickUpFromList(index));
+                        } else {
+                          bloc.add(SelectDeliveryFromList(index));
+                        }
+                        Navigator.of(context, rootNavigator: true).pop();
+                      },
                       child: Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                        margin: const EdgeInsets.only(bottom: 8),
                         decoration: BoxDecoration(
-                          color: colour.brandLight,
-                          borderRadius: BorderRadius.circular(8),
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(color: colour.border),
+                          boxShadow: const [
+                            BoxShadow(
+                                color: Color(0x0A1555F3),
+                                blurRadius: 6,
+                                offset: Offset(0, 2))
+                          ],
                         ),
-                        child: Text(
-                          index < quantities.length ? quantities[index].toString() : '',
-                          textAlign: TextAlign.center,
-                          style: GoogleFonts.poppins(
-                              color: colour.brand, fontSize: 12, fontWeight: FontWeight.w700),
-                        ),
+                        padding: const EdgeInsets.all(12),
+                        child: Row(children: [
+                          // Address text
+                          Expanded(
+                            flex: 3,
+                            child: Text(
+                              addresses[index].toString(),
+                              style: GoogleFonts.poppins(
+                                  color: colour.textMain,
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w600),
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                          // ✅ FIX: Quantity now reads from live state
+                          Expanded(
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 8, vertical: 4),
+                              decoration: BoxDecoration(
+                                color: colour.brandLight,
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              child: Text(
+                                index < quantities.length
+                                    ? quantities[index].toString()
+                                    : '',
+                                textAlign: TextAlign.center,
+                                style: GoogleFonts.poppins(
+                                    color: colour.brand,
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.w700),
+                              ),
+                            ),
+                          ),
+                          // Delete icon for discoverability (in addition to long-press)
+                          const SizedBox(width: 8),
+                          GestureDetector(
+                            onTap: () async {
+                              final del =
+                              await objfun.ConfirmationMsgYesNo(
+                                  context,
+                                  "Are you sure to delete?");
+                              if (del == true) {
+                                if (isPickUp) {
+                                  bloc.add(RemovePickUpAddress(index));
+                                } else {
+                                  bloc.add(RemoveDeliveryAddress(index));
+                                }
+                              }
+                            },
+                            child: const Icon(Icons.delete_rounded,
+                                color: colour.red, size: 18),
+                          ),
+                        ]),
                       ),
-                    ),
-                  ]),
+                    );
+                  },
                 ),
               ),
-            ),
-          ),
-        ]),
+            ]);
+          },
+        ),
       ),
     );
   }

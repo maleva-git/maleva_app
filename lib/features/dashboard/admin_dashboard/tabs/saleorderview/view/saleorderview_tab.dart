@@ -6,8 +6,8 @@ import 'package:intl/intl.dart';
 import 'package:maleva/core/models/model.dart';
 import 'package:maleva/core/utils/clsfunction.dart' as objfun;
 import 'package:maleva/core/theme/palette.dart';
-import 'package:maleva/core/bluetooth/bluetoothmanager.dart';
 import 'package:maleva/menu/menulist.dart';
+import '../../../../../../core/bluetooth/view/Bluetooth_tab.dart';
 import '../../../../../../core/theme/tokens.dart';
 import '../../../../../mastersearch/Customer.dart';
 import '../../../../../mastersearch/Employee.dart';
@@ -269,7 +269,7 @@ class _SaleOrderViewState extends State<_SaleOrderView> {
           icon: const Icon(Icons.bluetooth_audio, size: 24),
           tooltip: 'Bluetooth',
           onPressed: () => Navigator.push(context,
-              MaterialPageRoute(builder: (_) => Bluetoothpage())),
+              MaterialPageRoute(builder: (_) => BluetoothPage())),
         ),
         IconButton(
           icon: const Icon(Icons.print, size: 24),

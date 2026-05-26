@@ -11,6 +11,7 @@ import 'package:maleva/core/network/OnlineApi.dart' as OnlineApi;
 import 'package:maleva/core/models/model.dart';
 import 'package:maleva/menu/menulist.dart';
 import '../../../../core/theme/tokens.dart';
+import '../../../dashboard/admin_dashboard/tabs/saleorderdetails/view/saleorderdetails_tab.dart';
 import '../../../mastersearch/JobAllStatus.dart';
 import '../bloc/updateboardingdetails_bloc.dart';
 import '../bloc/updateboardingdetails_event.dart';
@@ -92,8 +93,8 @@ class _BoardingStatusPageState extends State<_BoardingStatusPage> {
               context,
               MaterialPageRoute(
                 builder: (_) => SaleOrderDetails(
-                  SaleDetails: null,
-                  SaleMaster: objfun.SaleEditMasterList,
+                  saleDetails: null,
+                  saleMaster: objfun.SaleEditMasterList,
                 ),
               ),
             );
@@ -611,8 +612,8 @@ class _JobNoRowState extends State<_JobNoRow> {
                     context,
                     MaterialPageRoute(
                       builder: (_) => SaleOrderDetails(
-                        SaleDetails: null,
-                        SaleMaster: objfun.SaleEditMasterList,
+                        saleDetails: null,
+                        saleMaster: objfun.SaleEditMasterList,
                       ),
                     ),
                   );

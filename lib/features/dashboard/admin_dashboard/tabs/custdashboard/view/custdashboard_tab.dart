@@ -12,6 +12,8 @@ import 'package:maleva/menu/menulist.dart';
 import 'package:maleva/core/network/OnlineApi.dart' as OnlineApi;
 
 import '../../../../../mastersearch/Port.dart';
+import '../../enquiry/add/view/enquiryadd.dart';
+import '../../saleorderadd/view/saleorderadd_tab.dart';
 import '../bloc/custdashboard_bloc.dart';
 import '../bloc/custdashboard_event.dart';
 import '../bloc/custdashboard_state.dart';
@@ -395,8 +397,8 @@ class _CustDashboardViewState extends State<_CustDashboardView>
                             context, row['Id'] as int, 0);
                         Navigator.of(context).push(MaterialPageRoute(
                             builder: (_) => SalesOrderAdd(
-                              SaleDetails: objfun.SaleEditDetailList,
-                              SaleMaster: objfun.SaleEditMasterList,
+                              saleDetails: objfun.SaleEditDetailList,
+                              saleMaster: objfun.SaleEditMasterList,
                             )));
                       },
                     ),
@@ -1006,7 +1008,7 @@ class _EnquiryTab extends StatelessWidget {
                       borderRadius: BorderRadius.circular(10)),
                 ),
                 onPressed: () => Navigator.push(context,
-                    MaterialPageRoute(builder: (_) => const AddEnquiry())),
+                    MaterialPageRoute(builder: (_) => const AddEnquiryScreen())),
                 child:
                 const Icon(Icons.add, color: colour.commonColor),
               ),
@@ -1056,8 +1058,9 @@ class _EnquiryTab extends StatelessWidget {
                     onLongPress: () => Navigator.push(
                         context,
                         MaterialPageRoute(
+                          // FIXED: Cast the map to Map<String, dynamic> here
                             builder: (_) =>
-                                AddEnquiry(SaleMaster: enq))),
+                                AddEnquiryScreen(saleMaster: Map<String, dynamic>.from(enq)))),
                     child: Card(
                       color: cardColor(enq),
                       elevation: 10,
@@ -1080,7 +1083,8 @@ class _EnquiryTab extends StatelessWidget {
                                       textStyle: TextStyle(
                                           color: colour.commonColor,
                                           fontWeight: FontWeight.bold,
-                                          fontSize: objfun.FontCardText)),
+                                          // FIXED: Added .toDouble()
+                                          fontSize: objfun.FontCardText.toDouble())),
                                 ),
                               ),
                               Expanded(
@@ -1092,7 +1096,8 @@ class _EnquiryTab extends StatelessWidget {
                                       textStyle: TextStyle(
                                           color: colour.commonColor,
                                           fontWeight: FontWeight.bold,
-                                          fontSize: objfun.FontCardText)),
+                                          // FIXED: Added .toDouble()
+                                          fontSize: objfun.FontCardText.toDouble())),
                                 ),
                               ),
                             ],
@@ -1113,10 +1118,11 @@ class _EnquiryTab extends StatelessWidget {
                                       Navigator.of(context).push(
                                           MaterialPageRoute(
                                               builder: (_) =>
-                                                  SalesOrderAdd(
-                                                    SaleDetails: null,
-                                                    SaleMaster: [enq],
-                                                  )));
+                                              // Note: Ensure this matches your class name (SalesOrderAdd vs SalesOrderAddPage)
+                                              SalesOrderAdd(
+                                                saleDetails: null,
+                                                saleMaster: [enq],
+                                              )));
                                     }
                                   },
                                   child: const Icon(

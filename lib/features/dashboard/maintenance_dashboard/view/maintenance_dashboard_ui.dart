@@ -1,10 +1,9 @@
 import 'package:flutter/Material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:intl/intl.dart';
 import 'package:maleva/core/utils/clsfunction.dart' as objfun;
 import 'package:maleva/core/colors/colors.dart' as colour;
-import '../../../../core/bluetooth/bluetoothmanager.dart';
+import '../../../../core/bluetooth/view/Bluetooth_tab.dart';
 import '../../../../core/colors/colors.dart';
 import '../../../../core/models/model.dart';
 import '../../../../menu/menulist.dart';
@@ -15,28 +14,13 @@ import '../../../common_updates/blocs/truck/truck_event.dart';
 import '../../admin_dashboard/bloc/admin_tab_bloc.dart';
 import '../../admin_dashboard/bloc/admin_tab_state.dart';
 import '../../admin_dashboard/tabs/driver/view/driverdetails_tab.dart';
-import '../../admin_dashboard/tabs/emailinbox/view/emailinbox_tab.dart';
-import '../../admin_dashboard/tabs/employeemaster/view/employeemaster_tab.dart';
 import '../../admin_dashboard/tabs/enginehours/view/enginehours_tab.dart';
-import '../../admin_dashboard/tabs/forwardingreport/view/forwardingreport_tab.dart';
 import '../../admin_dashboard/tabs/fuel/view/fuelreport_tab.dart';
 import '../../admin_dashboard/tabs/fuelfillings/view/fuelfillings_tab.dart';
-import '../../admin_dashboard/tabs/googlereview/view/googlereview_tab.dart';
-import '../../admin_dashboard/tabs/gpstruckmap/view/gpstruckmap_tab.dart';
-import '../../admin_dashboard/tabs/inventoryreport/view/inventoryview_tab.dart';
-import '../../admin_dashboard/tabs/invoice/view/invoice_tab.dart';
 import '../../admin_dashboard/tabs/maintenance/view/maintenance_tab.dart';
-import '../../admin_dashboard/tabs/paymentview/view/paymentview_tab.dart';
-import '../../admin_dashboard/tabs/pdo/view/pdo_tab.dart';
-import '../../admin_dashboard/tabs/pettycash/view/pettycash_tab.dart';
-import '../../admin_dashboard/tabs/receiptview/view/receiptview_tab.dart';
-import '../../admin_dashboard/tabs/rtiview/view/rtiview_tab.dart';
 import '../../admin_dashboard/tabs/saleorderview/view/saleorderview_tab.dart';
-import '../../admin_dashboard/tabs/salesorder/view/salesorderview_tab.dart';
 import '../../admin_dashboard/tabs/spareparts/view/sparepartsadd.dart';
 import '../../admin_dashboard/tabs/speedingreport/view/speedingreport_view.dart';
-import '../../admin_dashboard/tabs/spotsaleorder/view/spotsaleorder_add.dart';
-import '../../admin_dashboard/tabs/summonentry/view/summonentry_tab.dart';
 import '../../admin_dashboard/tabs/transport/view/transportview_tab.dart';
 import '../../admin_dashboard/tabs/truck/view/truckview_tab.dart';
 import '../../admin_dashboard/tabs/vesselreport/view/vesselreportview_tab.dart';
@@ -89,7 +73,7 @@ class MaintenanceMobileDashboard extends StatelessWidget {
           icon: Icon(Icons.bluetooth_audio,
               size: isTablet ? 28 : 25, color: colour.topAppBarColor),
           onPressed: () => Navigator.push(context,
-              MaterialPageRoute(builder: (_) => Bluetoothpage())),
+              MaterialPageRoute(builder: (_) => BluetoothPage())),
         ),
         IconButton(
           icon: Icon(Icons.print,

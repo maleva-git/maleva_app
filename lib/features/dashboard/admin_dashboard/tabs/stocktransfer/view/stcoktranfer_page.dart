@@ -6,6 +6,7 @@ import 'package:maleva/core/models/model.dart';
 import 'package:maleva/core/utils/clsfunction.dart' as objfun;
 import 'package:maleva/menu/menulist.dart';
 
+import '../../../../../../core/di/injection.dart';
 import '../../../../../mastersearch/WareHouseList.dart';
 import '../bloc/stock_transfer_bloc.dart';
 
@@ -33,10 +34,11 @@ class StockTransferPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (_) => StockTransferBloc()..add(const StockTransferInitialized()),
-      child: const _StockTransferView(),
-    );
+    return
+      BlocProvider(
+        create: (context) => sl<StockTransferBloc>()..add(const StockTransferInitialized()),
+        child: const _StockTransferView(),
+      );
   }
 }
 

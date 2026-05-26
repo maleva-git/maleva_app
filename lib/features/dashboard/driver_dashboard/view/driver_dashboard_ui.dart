@@ -2,7 +2,7 @@ import 'package:flutter/Material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
-import '../../../../core/bluetooth/bluetoothmanager.dart';
+import '../../../../core/bluetooth/view/Bluetooth_tab.dart';
 import '../../../../core/colors/colors.dart' as colour;
 import '../../../../core/models/model.dart';
 import '../../../../core/utils/clsfunction.dart' as objfun;
@@ -12,7 +12,6 @@ import '../../../common_updates/blocs/sales/sales_event.dart';
 import '../../admin_dashboard/tabs/driverlicense/view/driverlicense_tab.dart';
 import '../../admin_dashboard/tabs/drivermaintenance/view/drivermaintenance_tab.dart';
 import '../../admin_dashboard/tabs/driversalary/view/driversalary_tab.dart';
-import '../../admin_dashboard/tabs/maintenance/view/maintenance_tab.dart';
 import '../../admin_dashboard/tabs/pdo/view/pdo_tab.dart';
 import '../../admin_dashboard/tabs/saleorderview/view/saleorderview_tab.dart';
 import '../../admin_dashboard/tabs/summonentry/view/summonentry_tab.dart';
@@ -63,7 +62,7 @@ class DriverDashboardView extends StatelessWidget {
           icon: Icon(Icons.bluetooth_audio,
               size: isTablet ? 28 : 25, color: colour.topAppBarColor),
           onPressed: () => Navigator.push(context,
-              MaterialPageRoute(builder: (_) => Bluetoothpage())),
+              MaterialPageRoute(builder: (_) => BluetoothPage())),
         ),
         IconButton(
           icon: Icon(Icons.print,

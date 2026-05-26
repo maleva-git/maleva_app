@@ -6,6 +6,7 @@ import 'package:maleva/core/colors/colors.dart' as colour;
 import '../../../../../../core/di/injection.dart';
 import '../../../../../../core/network/OnlineApi.dart' as OnlineApi;
 import '../../../../../../core/theme/tokens.dart';
+import '../../saleorderadd/view/saleorderadd_tab.dart';
 import '../bloc/transport_bloc.dart';
 import '../bloc/transport_event.dart';
 import '../bloc/transport_state.dart';
@@ -70,8 +71,8 @@ class _TransportReportView extends StatelessWidget {
         if (state is TransportNavigateToEditState) {
           Navigator.of(context).push(MaterialPageRoute(
             builder: (_) => SalesOrderAdd(
-              SaleDetails: objfun.SaleEditDetailList,
-              SaleMaster:  objfun.SaleEditMasterList,
+              saleDetails: objfun.SaleEditDetailList,
+              saleMaster:  objfun.SaleEditMasterList,
             ),
           ));
         }

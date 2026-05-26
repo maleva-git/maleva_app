@@ -1,9 +1,6 @@
 import 'package:equatable/equatable.dart';
 import 'package:maleva/core/models/model.dart';
 
-// ═══════════════════════════════════════════════════════
-// STATE
-// ═══════════════════════════════════════════════════════
 abstract class SalesOrderAddState extends Equatable {
   @override
   List<Object?> get props => [];
@@ -14,11 +11,10 @@ class SalesOrderAddInitial extends SalesOrderAddState {}
 class SalesOrderAddLoading extends SalesOrderAddState {}
 
 class SalesOrderAddLoaded extends SalesOrderAddState {
-  // ── Progress / UI flags ──────────────────────────────
+
   final bool progress;
   final bool showSearch;
 
-  // ── Product list ─────────────────────────────────────
   final List<SaleEditDetailModel> productViewList;
   final int? productUpdateIndex;
 
@@ -458,7 +454,6 @@ class SalesOrderAddLoaded extends SalesOrderAddState {
     txtJobStatus,
     txtOrigin,
     txtDestination,
-    // ✅ FIX: இந்த fields எல்லாம் props-ல இல்லாததால் UI rebuild ஆகல — இப்போ சேர்த்தோம்
     txtCommodityType,
     txtCargo,
     txtLPort,
@@ -478,7 +473,9 @@ class SalesOrderAddLoaded extends SalesOrderAddState {
     txtBreakByEmp2,
     txtBreakByEmp3,
     txtPickUpAddress,
+    txtPickUpQuantity,
     txtDeliveryAddress,
+    txtDeliveryQuantity,
     txtWarehouseAddress,
     txtWeight,
     txtQuantity,

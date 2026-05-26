@@ -4,6 +4,7 @@ import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:maleva/core/utils/clsfunction.dart' as objfun;
 
+import '../../../../../../core/di/injection.dart';
 import '../bloc/driverlicense_bloc.dart';
 import '../bloc/driverlicense_event.dart';
 import '../bloc/driverlicense_state.dart';
@@ -51,11 +52,12 @@ class DriverLicenseExpiryWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (_) => DriverLicenseExpiryBloc()
-        ..add(DriverLicenseExpiryStarted()),
-      child: const _DriverLicenseExpiryView(),
-    );
+    return
+      BlocProvider(
+        create: (_) => sl<DriverLicenseExpiryBloc>()
+          ..add(DriverLicenseExpiryStarted()),
+        child: const _DriverLicenseExpiryView(),
+      );
   }
 }
 

@@ -4,7 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:maleva/core/utils/clsfunction.dart' as objfun;
 import 'package:maleva/core/colors/colors.dart' as colour;
-import '../../../../core/bluetooth/bluetoothmanager.dart';
+import '../../../../core/bluetooth/view/Bluetooth_tab.dart';
 import '../../../../core/colors/colors.dart';
 import '../../../../core/models/model.dart';
 import '../../../../menu/menulist.dart';
@@ -70,7 +70,7 @@ class TransportMobileDashboard extends StatelessWidget {
           icon: Icon(Icons.bluetooth_audio,
               size: isTablet ? 28 : 25, color: colour.topAppBarColor),
           onPressed: () => Navigator.push(context,
-              MaterialPageRoute(builder: (_) => Bluetoothpage())),
+              MaterialPageRoute(builder: (_) => BluetoothPage())),
         ),
         IconButton(
           icon: Icon(Icons.print,
@@ -92,8 +92,7 @@ class TransportMobileDashboard extends StatelessWidget {
     );
   }
 
-  // ── TabBar ────────────────────────────────────────────────────────────
-// ✅ Step 2: _buildTabBar() method-ல container size மாத்து
+
   Widget _buildTabBar(bool isTablet) {
     return Container(
       margin: EdgeInsets.symmetric(

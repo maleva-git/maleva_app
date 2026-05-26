@@ -21,6 +21,8 @@ class AppPreferences {
   static int    getDriverId()    => _prefs.getInt('DriverId')    ?? 0;
   static int    getEmpRefId()    => _prefs.getInt('EmpRefId')    ?? 0;
   static int    getDeviceView()  => _prefs.getInt('DeviceView')  ?? 1;
+  static int    getDriverLogin() => _prefs.getInt('DriverLogin') ?? 0;
+
   static String getUsername()    => _prefs.getString('Username') ?? '';
   static String getPassword()    => _prefs.getString('Password') ?? '';
   static String getOldUsername() => _prefs.getString('OldUsername') ?? '';
@@ -37,6 +39,8 @@ class AppPreferences {
   static Future<void> setMComid(int v)       => _prefs.setInt('MComid', v);
   static Future<void> setDriverId(int v)     => _prefs.setInt('DriverId', v);
   static Future<void> setEmpRefId(int v)     => _prefs.setInt('EmpRefId', v);
+  static Future<void> setDriverLogin(int v)  => _prefs.setInt('DriverLogin', v);
+
   static Future<void> setUsername(String v)  => _prefs.setString('Username', v);
   static Future<void> setPassword(String v)  => _prefs.setString('Password', v);
   static Future<void> setOldUsername(String v) => _prefs.setString('OldUsername', v);
@@ -52,6 +56,7 @@ class AppPreferences {
     await _prefs.setString('Password', '');
     await _prefs.setString('OldUsername', '');
     await _prefs.setInt('EmpRefId', 0);
+    await _prefs.setInt('DriverLogin', 0);
   }
 
   // Raw SharedPreferences access (legacy clsfunction.dart use panna vendiruntha)

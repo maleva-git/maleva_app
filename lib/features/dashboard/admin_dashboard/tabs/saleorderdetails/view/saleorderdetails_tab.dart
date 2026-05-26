@@ -9,6 +9,7 @@ import 'package:maleva/core/models/model.dart';
 import 'package:maleva/core/utils/clsfunction.dart' as objfun;
 import 'package:maleva/menu/menulist.dart';
 
+import '../../../../../../core/di/injection.dart';
 import '../bloc/saleorderdetails_bloc.dart';
 import '../bloc/saleorderdetails_event.dart';
 import '../bloc/saleorderdetails_state.dart';
@@ -49,20 +50,26 @@ class SaleOrderDetails extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (_) {
-        final bloc = SaleOrderDetailsBloc();
-        bloc.add(const SaleOrderStartupEvent(billType: 'MY'));
-        if (saleMaster != null && saleMaster!.isNotEmpty) {
-          bloc.add(SaleOrderLoadMasterEvent(
-            saleMaster: saleMaster!,
-            saleDetails: saleDetails ?? [],
-          ));
-        }
-        return bloc;
-      },
-      child: const _SaleOrderDetailsView(),
-    );
+    return
+      BlocProvider(
+        create: (_) {
+          // 1. Retrieve the BLoC from the service locator
+          final bloc = sl<SaleOrderDetailsBloc>();
+
+          // 2. Dispatch the startup event
+          bloc.add(const SaleOrderStartupEvent(billType: 'MY'));
+
+          // 3. Dispatch master load if data exists
+          if (saleMaster != null && saleMaster!.isNotEmpty) {
+            bloc.add(SaleOrderLoadMasterEvent(
+              saleMaster: saleMaster!,
+              saleDetails: saleDetails ?? [],
+            ));
+          }
+          return bloc;
+        },
+        child: const _SaleOrderDetailsView(),
+      );
   }
 }
 

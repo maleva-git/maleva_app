@@ -94,10 +94,9 @@ class _AdminDashboardState extends State<OperationAdminDashboard> with SingleTic
             ),
 
             BlocProvider(
-              create: (_) => MaintenanceBloc()..add( MaintenanceStarted()),
+              create: (_) => sl<MaintenanceBloc>()..add(MaintenanceStarted()),
               child: const MaintenanceDashboardWidget(),
             ),
-
             BlocProvider(
               create: (context) => sl<VesselBloc>()
                 ..add(const LoadVesselDataEvent(type: 0)),

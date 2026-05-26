@@ -2,35 +2,27 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+import '../../../../../../core/di/injection.dart';
 import '../../../../../../core/theme/palette.dart';
 import '../../../../../../core/theme/tokens.dart';
 import '../bloc/unrelease_bloc.dart';
-
-
-// ─────────────────────────────────────────────────────────────────────────────
-// Entry point – wraps the page in its own BLoC provider
-// ─────────────────────────────────────────────────────────────────────────────
+import '../bloc/unrelease_event.dart';
+import '../bloc/unrelease_state.dart';
 
 class UnReleasePage extends StatelessWidget {
   const UnReleasePage({super.key, this.type = 0});
-
-  /// 0 = K1/K2/K3 list  |  1 = K8 list
   final int type;
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (_) =>
-      UnReleaseBloc()..add(UnReleaseDataRequested(type: type)),
-      child: _UnReleaseView(type: type),
-    );
+    return
+      BlocProvider(
+        create: (_) => sl<UnReleaseBloc>()
+          ..add(UnReleaseDataRequested(type: type)),
+        child: _UnReleaseView(type: type),
+      );
   }
 }
-
-// ─────────────────────────────────────────────────────────────────────────────
-// Internal view
-// ─────────────────────────────────────────────────────────────────────────────
-
 class _UnReleaseView extends StatelessWidget {
   const _UnReleaseView({required this.type});
 
@@ -395,11 +387,6 @@ class _UnReleaseCard extends StatelessWidget {
     );
   }
 }
-
-// ─────────────────────────────────────────────────────────────────────────────
-// State placeholder widgets
-// ─────────────────────────────────────────────────────────────────────────────
-
 class _LoadingWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {

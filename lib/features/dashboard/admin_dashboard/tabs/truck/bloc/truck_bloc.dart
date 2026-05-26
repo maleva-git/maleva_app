@@ -3,23 +3,18 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 import 'package:maleva/core/utils/clsfunction.dart' as objfun;
 import 'package:maleva/features/dashboard/admin_dashboard/tabs/truck/bloc/truck_state.dart';
-
 import '../../../../../../core/models/model.dart';
 import '../data/truck_repository.dart';
-
 part 'truck_event.dart';
 
 
 class TruckDetailsBloc extends Bloc<TruckDetailsEvent, TruckDetailsState> {
-  // ❌ REMOVED: final BuildContext context;
-  final TruckRepository repository; // ✅ Injected Repository
+  final TruckRepository repository;
 
   TruckDetailsBloc({required this.repository}) : super(const TruckInitial()) {
-    // Tighter event binding
     on<LoadTruckDetailsEvent>(_onLoadTruck);
   }
 
-  // ── Load Truck Data ──────────────────────────────────────────────────────────
   Future<void> _onLoadTruck(
       LoadTruckDetailsEvent event,
       Emitter<TruckDetailsState> emit,
@@ -40,10 +35,8 @@ class TruckDetailsBloc extends Bloc<TruckDetailsEvent, TruckDetailsState> {
         'AccountId':                  0,
       };
 
-      // ✅ REFACTORED: Using the injected repository (no context needed!)
       final resultData = await repository.fetchTruckDetails(body: body);
 
-      // No data
       if (resultData == null ||
           resultData == "" ||
           (resultData is List && resultData.isEmpty)) {
@@ -51,7 +44,6 @@ class TruckDetailsBloc extends Bloc<TruckDetailsEvent, TruckDetailsState> {
         return;
       }
 
-      // Has data → map to model
       final List<TruckDetailsModel> truckList = (resultData as List)
           .map((e) => TruckDetailsModel.fromJson(e))
           .toList()
@@ -60,12 +52,11 @@ class TruckDetailsBloc extends Bloc<TruckDetailsEvent, TruckDetailsState> {
       emit(TruckLoadedState(truckData: truckList));
 
     } catch (error) {
-      // ApiClient throws clean exceptions, we pass them to the UI
+
       emit(TruckErrorState(errorMessage: error.toString()));
     }
   }
 
-  // ── Helper: format date ──────────────────────────────────────────────────────
   static String formatTruckDate(String? rawDate) {
     if (rawDate == null || rawDate.isEmpty) return '-';
     try {
@@ -77,7 +68,6 @@ class TruckDetailsBloc extends Bloc<TruckDetailsEvent, TruckDetailsState> {
     }
   }
 
-  // ── Helper: expiry row color logic ───────────────────────────────────────────
   static Color expiryColor(String? rawDate) {
     if (rawDate == null || rawDate.isEmpty) return Colors.grey;
     try {

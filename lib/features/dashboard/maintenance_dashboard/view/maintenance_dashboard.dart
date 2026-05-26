@@ -8,8 +8,6 @@ import '../../../common_updates/blocs/sales/sales_bloc.dart';
 import '../../../common_updates/blocs/truck/truck_bloc.dart';
 import '../../admin_dashboard/bloc/admin_tab_bloc.dart';
 import '../../admin_dashboard/tabs/ExpenseReport/view/expensereport_tab.dart';
-
-
 import '../../admin_dashboard/tabs/bocheck/bloc/bocheck_bloc.dart';
 import '../../admin_dashboard/tabs/bocheck/bloc/bocheck_event.dart';
 import '../../admin_dashboard/tabs/bocheck/view/bocheck_tab.dart';
@@ -263,9 +261,8 @@ class _AdminDashboardState extends State<MaintenanceDashboard> with SingleTicker
               child: const RTIDetailsPage(),
             ),
 
-
             BlocProvider(
-              create: (_) => MaintenanceBloc()..add( MaintenanceStarted()),
+              create: (_) => sl<MaintenanceBloc>()..add(MaintenanceStarted()),
               child: const MaintenanceDashboardWidget(),
             ),
 

@@ -5,6 +5,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:maleva/core/utils/clsfunction.dart' as objfun;
 
+import '../../../../../../core/di/injection.dart';
 import '../bloc/driversalary_bloc.dart';
 import '../bloc/driversalary_event.dart';
 import '../bloc/driversalary_state.dart';
@@ -37,11 +38,12 @@ class DriverSalaryWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (_) =>
-      DriverSalaryBloc()..add(DriverSalaryStarted()),
-      child: const _DriverSalaryView(),
-    );
+    return
+      BlocProvider(
+        create: (context) => sl<DriverSalaryBloc>()
+          ..add(DriverSalaryStarted()),
+        child: const _DriverSalaryView(),
+      );
   }
 }
 

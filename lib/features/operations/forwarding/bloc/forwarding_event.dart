@@ -4,20 +4,17 @@ abstract class FWUpdateEvent {}
 // Startup
 class FWUpdateStarted extends FWUpdateEvent {}
 
-// Tab change
 class FWUpdateTabChanged extends FWUpdateEvent {
   final int tabIndex;
   FWUpdateTabChanged(this.tabIndex);
 }
 
-// SMK autocomplete text changed (type: 1,2,3)
 class FWUpdateSmkTextChanged extends FWUpdateEvent {
   final int type;
   final String text;
   FWUpdateSmkTextChanged({required this.type, required this.text});
 }
 
-// Suggestion selected from autocomplete
 class FWUpdateSmkSuggestionSelected extends FWUpdateEvent {
   final int type;
   final int saleOrderId;
@@ -29,10 +26,8 @@ class FWUpdateSmkSuggestionSelected extends FWUpdateEvent {
   });
 }
 
-// Autocomplete overlay dismissed
 class FWUpdateOverlayDismissed extends FWUpdateEvent {}
 
-// Employee (Seal By) changed
 class FWUpdateSealEmpChanged extends FWUpdateEvent {
   final int type; // 1,2,3
   final int empId;

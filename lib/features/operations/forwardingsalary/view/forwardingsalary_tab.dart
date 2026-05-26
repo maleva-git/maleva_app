@@ -6,6 +6,7 @@ import 'package:maleva/core/utils/clsfunction.dart' as objfun;
 import 'package:maleva/core/network/OnlineApi.dart' as OnlineApi;
 import 'package:maleva/core/models/model.dart';
 import 'package:maleva/menu/menulist.dart';
+import '../../../../core/di/injection.dart';
 import '../../../mastersearch/Employee.dart';
 import '../bloc/forwardingsalary_bloc.dart';
 import '../bloc/forwardingsalary_event.dart';
@@ -37,11 +38,11 @@ class ForwardingSalaryUpdate extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (_) =>
-      ForwardingSalaryBloc()..add(ForwardingSalaryStarted()),
-      child: const _ForwardingSalaryPage(),
-    );
+    return
+      BlocProvider(
+        create: (_) => sl<ForwardingSalaryBloc>()..add(ForwardingSalaryStarted()),
+        child: const _ForwardingSalaryPage(),
+      );
   }
 }
 

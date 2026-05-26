@@ -3,7 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:maleva/core/utils/clsfunction.dart' as objfun;
 import 'package:maleva/core/colors/colors.dart' as colour;
-import '../../../../core/bluetooth/bluetoothmanager.dart';
+import '../../../../core/bluetooth/view/Bluetooth_tab.dart';
 import '../../../../core/colors/colors.dart';
 import '../../../../core/models/model.dart';
 import '../../../../menu/menulist.dart';
@@ -45,7 +45,6 @@ class PayableMobileDashboard extends StatelessWidget {
     );
   }
 
-  // ── AppBar ────────────────────────────────────────────────────────────
   PreferredSizeWidget _buildAppBar(BuildContext context, bool isTablet) {
     return AppBar(
       backgroundColor: AppColors.appBarColor,
@@ -70,7 +69,7 @@ class PayableMobileDashboard extends StatelessWidget {
           icon: Icon(Icons.bluetooth_audio,
               size: isTablet ? 28 : 25, color: colour.topAppBarColor),
           onPressed: () => Navigator.push(context,
-              MaterialPageRoute(builder: (_) => Bluetoothpage())),
+              MaterialPageRoute(builder: (_) => BluetoothPage())),
         ),
         IconButton(
           icon: Icon(Icons.print,
@@ -91,9 +90,6 @@ class PayableMobileDashboard extends StatelessWidget {
       ],
     );
   }
-
-  // ── TabBar ────────────────────────────────────────────────────────────
-// ✅ Step 2: _buildTabBar() method-ல container size மாத்து
   Widget _buildTabBar(bool isTablet) {
     return Container(
       margin: EdgeInsets.symmetric(
@@ -137,9 +133,7 @@ class PayableMobileDashboard extends StatelessWidget {
           _tab('Fuel',            isTablet),
           _tab('Driver',          isTablet),
           _tab('BillOrder',          isTablet),
-
           _tab('Truck',           isTablet),
-
           _tab('PettyCash',       isTablet),
 
         ],
@@ -147,8 +141,6 @@ class PayableMobileDashboard extends StatelessWidget {
     );
   }
 
-  // ── Tab item ──────────────────────────────────────────────────────────
-// ✅ Step 1: _tab() method-ல isTablet add பண்ணு
   Tab _tab(String text, bool isTablet) => Tab(
     height: isTablet ? 42 : null,
     child: Padding(
@@ -164,7 +156,7 @@ class PayableMobileDashboard extends StatelessWidget {
       ),
     ),
   );
-  // ── TabBarView ────────────────────────────────────────────────────────
+
   Widget _buildTabBarView(BuildContext context) {
     return BlocListener<PayableTabBloc, PayableTabState>(
       listener: (context, tabState) {
@@ -186,7 +178,6 @@ class PayableMobileDashboard extends StatelessWidget {
           const FuelDiffPage(),
           const DriverDetailsView(),
           const BillOrderScreen(),
-
           const TruckDetailsReportPage(),
           const PettyCashPage(),
 

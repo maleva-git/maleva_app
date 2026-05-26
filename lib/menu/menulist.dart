@@ -5,6 +5,7 @@ import 'package:maleva/core/utils/clsfunction.dart' as objfun;
 import 'package:maleva/core/models/model.dart';
 import 'package:maleva/features/operations/forwarding/bloc/forwarding_event.dart';
 import 'package:maleva/features/transaction/viewsaleorder/view/viewsaleorder_tab.dart';
+import '../core/di/injection.dart';
 import '../core/theme/tokens.dart';
 import '../features/airfreight/updateairfreight/bloc/airfreight_bloc.dart';
 import '../features/airfreight/updateairfreight/bloc/airfreight_event.dart';
@@ -16,6 +17,7 @@ import '../features/dashboard/admin_dashboard/tabs/emailinbox/view/emailinbox_ta
 import '../features/dashboard/admin_dashboard/tabs/enquiry/view/view/enquiry_tab.dart';
 import '../features/dashboard/admin_dashboard/tabs/fwbreakseal/view/fwbreakseal_tab.dart';
 import '../features/dashboard/admin_dashboard/tabs/googlereview/view/googlereview_tab.dart';
+import '../features/dashboard/admin_dashboard/tabs/jobstatusupdate/view/jobstatusupdate_tab.dart';
 import '../features/dashboard/admin_dashboard/tabs/spotsaleorder/view/spotsaleorder_view.dart';
 import '../features/dashboard/admin_dashboard/tabs/stockinentry/bloc/stock_in_entry_bloc.dart';
 import '../features/dashboard/admin_dashboard/tabs/stockinentry/bloc/stock_in_entry_event.dart';
@@ -684,7 +686,7 @@ class _MenuTileState extends State<_MenuTile>
 
         case "Update Air Frieght":
           Navigator.push(
-            context,
+            ctx,
             MaterialPageRoute(
               builder: (context) => BlocProvider(
                 create: (context) => AirFreightBloc()..add(AirFreightStarted()),
@@ -700,10 +702,10 @@ class _MenuTileState extends State<_MenuTile>
           Navigator.push(ctx, _r(const JobStatusUpdate()));     break;
         case "Forwarding Update":
           Navigator.push(
-            context,
+            ctx,
             MaterialPageRoute(
               builder: (context) => BlocProvider(
-                create: (context) => FWUpdateBloc()..add(FWUpdateStarted()),
+                create: (context) => sl<FWUpdateBloc>()..add(FWUpdateStarted()),
                 child: const FWUpdatePage(),
               ),
             ),
@@ -716,10 +718,10 @@ class _MenuTileState extends State<_MenuTile>
 
         case "Forwarding Salary":
           Navigator.push(
-            context,
+            ctx,
             MaterialPageRoute(
               builder: (context) => BlocProvider(
-                create: (context) => ForwardingSalaryBloc()..add(ForwardingSalaryStarted()),
+                create: (context) => sl<ForwardingSalaryBloc>()..add(ForwardingSalaryStarted()),
                 child: const ForwardingSalaryUpdate(),
               ),
             ),
@@ -727,7 +729,7 @@ class _MenuTileState extends State<_MenuTile>
           break;
         case "Update Boarding Details":
           Navigator.push(
-            context,
+            ctx,
             MaterialPageRoute(
               builder: (context) => BlocProvider(
                 create: (context) => BoardingStatusBloc()..add(BoardingStatusStarted()),
@@ -739,10 +741,10 @@ class _MenuTileState extends State<_MenuTile>
 
         case "Stock In Entry":
           Navigator.push(
-            context,
+            ctx,
             MaterialPageRoute(
               builder: (context) => BlocProvider(
-                create: (context) => StockInEntryBloc()..add(StockInEntryStarted()),
+                create: (context) => sl<StockInEntryBloc>()..add(StockInEntryStarted()),
                 child: const StockInEntryPage(),
               ),
             ),
@@ -752,41 +754,27 @@ class _MenuTileState extends State<_MenuTile>
 
         case "Stock Update":
           Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => BlocProvider(
-                create: (context) => StockUpdateBloc()..add(StockUpdateStarted()),
-                child: const StockUpdate(),
-              ),
-            ),
+              ctx,
+              MaterialPageRoute(
+                builder: (context) => BlocProvider(
+                  create: (context) => sl<StockUpdateBloc>()..add( StockUpdateStarted()),
+                  child: const StockUpdate(),
+                ),
+              )
           );
           break;
 
-
         case "Stock Transfer":
           Navigator.push(
-            context,
+            ctx,
             MaterialPageRoute(
               builder: (context) => BlocProvider(
-                create: (context) => StockTransferBloc()..add(StockTransferInitialized()),
+                create: (context) => sl<StockTransferBloc>()..add(const StockTransferInitialized()),
                 child: const StockTransferPage(),
               ),
             ),
           );
           break;
-
-
-      // case "Stock In Entry":
-        //   Navigator.push(ctx, _r(const Stockinentry()));        break;
-
-        // case "Stock Update":
-        //   Navigator.push(ctx, _r(const StockUpdate()));         break;
-
-
-/*        case "Stock Transfer":
-          Navigator.push(ctx, _r(const StockTransferUpdate())); break;*/
-
-
         case "Enquiry Master":
           Navigator.push(
             ctx,
@@ -810,7 +798,7 @@ class _MenuTileState extends State<_MenuTile>
           break;
         case "Update RTI Details":
           Navigator.push(
-            context,
+            ctx,
             MaterialPageRoute(
               builder: (context) => BlocProvider(
                 create: (context) => UpdateRTIBloc()..add(UpdateRTIStarted()),
@@ -823,7 +811,7 @@ class _MenuTileState extends State<_MenuTile>
 
         case "License Update":
           Navigator.push(
-            context,
+            ctx,
             MaterialPageRoute(
               builder: (context) => BlocProvider(
                 create: (context) => LicenseUpdateBloc()..add(LicenseUpdateStarted()),
@@ -836,7 +824,7 @@ class _MenuTileState extends State<_MenuTile>
 
         case "Fuel Entry":
           Navigator.push(
-            context,
+            ctx,
             MaterialPageRoute(
               builder: (context) => BlocProvider(
                 create: (context) => FuelEntryBloc()..add(FuelEntryStarted()),
