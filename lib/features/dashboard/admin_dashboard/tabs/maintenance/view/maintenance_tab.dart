@@ -14,7 +14,6 @@ import 'package:maleva/core/colors/colors.dart' as colour;
 
 const double kTabletBreak = 600;
 
-// ─── Root — can be embedded inside a dashboard tab or used standalone ─────────
 class MaintenanceDashboardWidget extends StatelessWidget {
   const MaintenanceDashboardWidget({super.key});
 

@@ -458,7 +458,6 @@ class SalesOrderAddLoaded extends SalesOrderAddState {
     txtJobStatus,
     txtOrigin,
     txtDestination,
-    // ✅ FIX: இந்த fields எல்லாம் props-ல இல்லாததால் UI rebuild ஆகல — இப்போ சேர்த்தோம்
     txtCommodityType,
     txtCargo,
     txtLPort,
@@ -478,7 +477,9 @@ class SalesOrderAddLoaded extends SalesOrderAddState {
     txtBreakByEmp2,
     txtBreakByEmp3,
     txtPickUpAddress,
+    txtPickUpQuantity,
     txtDeliveryAddress,
+    txtDeliveryQuantity,
     txtWarehouseAddress,
     txtWeight,
     txtQuantity,

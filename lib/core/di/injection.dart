@@ -49,6 +49,8 @@ import '../../features/dashboard/admin_dashboard/tabs/inventoryreport/bloc/inven
 import '../../features/dashboard/admin_dashboard/tabs/inventoryreport/data/inventoryreport_repository.dart';
 import '../../features/dashboard/admin_dashboard/tabs/license/bloc/license_bloc.dart';
 import '../../features/dashboard/admin_dashboard/tabs/license/data/license_repository.dart';
+import '../../features/dashboard/admin_dashboard/tabs/maintenance/bloc/maintenance_bloc.dart';
+import '../../features/dashboard/admin_dashboard/tabs/maintenance/data/maintenance_repository.dart';
 import '../../features/dashboard/admin_dashboard/tabs/paymentview/bloc/paymentview_bloc.dart';
 import '../../features/dashboard/admin_dashboard/tabs/paymentview/data/paymentview_repository.dart';
 import '../../features/dashboard/admin_dashboard/tabs/pdo/data/pdo_repository.dart';
@@ -436,17 +438,24 @@ Future<void> setupDependencies() async {
         () => ForwardingReportBloc(repository: sl<ForwardingReportRepository>()),
   );
 
-  // ── FW Update (Forwarding Operations) ────────────────────────────────────
   sl.registerLazySingleton<FWUpdateRepository>(() => FWUpdateRepository());
   sl.registerFactory<FWUpdateBloc>(
         () => FWUpdateBloc(repository: sl<FWUpdateRepository>()),
   );
 
-  // ── Forwarding Salary ─────────────────────────────────────────────────────
   sl.registerLazySingleton<ForwardingSalaryRepository>(
         () => ForwardingSalaryRepository(),
   );
   sl.registerFactory<ForwardingSalaryBloc>(
         () => ForwardingSalaryBloc(repository: sl<ForwardingSalaryRepository>()),
+  );
+
+  sl.registerFactory<MaintenanceBloc>(
+        () => MaintenanceBloc(repository: sl()),
+  );
+
+// Register repository only if not already registered
+  sl.registerLazySingleton<MaintenanceRepository>(
+        () => MaintenanceRepository(), // pass any dependencies sl() needs here
   );
 }

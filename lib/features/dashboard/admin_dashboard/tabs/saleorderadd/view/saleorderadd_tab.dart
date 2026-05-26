@@ -10,7 +10,6 @@ import 'package:maleva/features/mastersearch/JobAllStatus.dart';
 import 'package:maleva/menu/menulist.dart';
 
 import '../../../../../../core/di/injection.dart';
-import '../../../../../../core/network/OnlineApi.dart' as OnlineApi;
 import '../../../../../mastersearch/AddressList.dart';
 import '../../../../../mastersearch/Agent.dart';
 import '../../../../../mastersearch/AgentCompany.dart';
@@ -23,8 +22,7 @@ import '../bloc/saleorderadd_bloc.dart';
 import '../bloc/saleorderadd_event.dart';
 import '../bloc/saleorderadd_state.dart';
 
-
-// ─── Entry point ─────────────────────────────────────────────────────────────
+// ─── Entry point ──────────────────────────────────────────────────────────────
 
 class SalesOrderAdd extends StatelessWidget {
   final List<SaleEditDetailModel>? saleDetails;
@@ -34,19 +32,18 @@ class SalesOrderAdd extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return
-      BlocProvider(
-        create: (_) => sl<SalesOrderBloc>()
-          ..add(SalesOrderInitialized(
-            saleDetails: saleDetails,
-            saleMaster: saleMaster,
-          )),
-        child: const _SalesOrderView(),
-      );
+    return BlocProvider(
+      create: (_) => sl<SalesOrderBloc>()
+        ..add(SalesOrderInitialized(
+          saleDetails: saleDetails,
+          saleMaster: saleMaster,
+        )),
+      child: const _SalesOrderView(),
+    );
   }
 }
 
-// ─── Internal stateful view (holds TabController + all TextEditingControllers) ─
+// ─── Internal stateful view ───────────────────────────────────────────────────
 
 class _SalesOrderView extends StatefulWidget {
   const _SalesOrderView();
@@ -59,7 +56,7 @@ class _SalesOrderViewState extends State<_SalesOrderView>
     with TickerProviderStateMixin {
   late TabController _tabController;
 
-  // ─── Text controllers (UI-only; values pushed to BLoC on save) ────────────
+  // ─── Text controllers ──────────────────────────────────────────────────────
   final txtRemarks = TextEditingController();
   final txtDoDescription = TextEditingController();
   final txtJobNo = TextEditingController();
@@ -107,6 +104,7 @@ class _SalesOrderViewState extends State<_SalesOrderView>
   final txtDeliveryQuantity = TextEditingController();
   final txtOrigin = TextEditingController();
   final txtDestination = TextEditingController();
+
   // Product fields
   final txtProductCode = TextEditingController();
   final txtProductDescription = TextEditingController();
@@ -129,26 +127,6 @@ class _SalesOrderViewState extends State<_SalesOrderView>
   final txtProductDiscAmount = TextEditingController();
   final txtProductLandingCost = TextEditingController();
 
-  final GlobalKey appBarKey = GlobalKey();
-  OverlayEntry? _overlayEntry;
-
-  @override
-  void initState() {
-    super.initState();
-    _tabController = TabController(length: 6, vsync: this);
-  }
-
-  @override
-  void dispose() {
-    _tabController.dispose();
-    _clearOverlay();
-    // Dispose all controllers
-    for (final c in _allControllers) {
-      c.dispose();
-    }
-    super.dispose();
-  }
-
   List<TextEditingController> get _allControllers => [
     txtRemarks, txtDoDescription, txtJobNo, txtOffVessel, txtLoadingVessel,
     txtLPort, txtOPort, txtLVesselType, txtOVesselType, txtCommodityType,
@@ -168,12 +146,23 @@ class _SalesOrderViewState extends State<_SalesOrderView>
     txtProductDiscAmount, txtProductLandingCost,
   ];
 
-  void _clearOverlay() {
-    _overlayEntry?.remove();
-    _overlayEntry = null;
+  @override
+  void initState() {
+    super.initState();
+    _tabController = TabController(length: 6, vsync: this);
   }
 
-  /// Sync state → text controllers when state loads master data.
+  @override
+  void dispose() {
+    _tabController.dispose();
+    for (final c in _allControllers) {
+      c.dispose();
+    }
+    super.dispose();
+  }
+
+  // ─── Sync state → controllers ─────────────────────────────────────────────
+
   void _syncControllersFromState(SalesOrderState state) {
     txtJobNo.text = state.jobNo;
     txtRemarks.text = state.remarks;
@@ -223,15 +212,11 @@ class _SalesOrderViewState extends State<_SalesOrderView>
     txtOrigin.text = state.originName;
     txtDestination.text = state.destinationName;
     txtProductCurrencyValue.text = state.currencyValue.toString();
-    txtProductGSTAmount.text =
-        state.productCalc.gstAmount.toStringAsFixed(2);
-    txtProductAmount.text =
-        state.productCalc.amount.toStringAsFixed(2);
-    txtProductActualAmount.text =
-        state.productCalc.actualAmount.toStringAsFixed(2);
+    txtProductGSTAmount.text = state.productCalc.gstAmount.toStringAsFixed(2);
+    txtProductAmount.text = state.productCalc.amount.toStringAsFixed(2);
+    txtProductActualAmount.text = state.productCalc.actualAmount.toStringAsFixed(2);
   }
 
-  /// Collects current text-controller values into a map for the save event.
   Map<String, String> _collectFields() => {
     'remarks': txtRemarks.text,
     'doDescription': txtDoDescription.text,
@@ -281,6 +266,8 @@ class _SalesOrderViewState extends State<_SalesOrderView>
     'destinationName': txtDestination.text,
   };
 
+  // ─── Build ────────────────────────────────────────────────────────────────
+
   @override
   Widget build(BuildContext context) {
     final isTablet = objfun.MalevaScreen != 1;
@@ -292,12 +279,9 @@ class _SalesOrderViewState extends State<_SalesOrderView>
           curr.errorMessage != prev.errorMessage ||
           curr.jobNo != prev.jobNo,
       listener: (context, state) async {
-        // Sync controllers when data is loaded
         if (state.status == SalesOrderStatus.success) {
           _syncControllersFromState(state);
         }
-
-        // Success dialog → navigate to fresh form
         if (state.successMessage != null) {
           await objfun.ConfirmationOK(state.successMessage!, context);
           Navigator.pushReplacement(
@@ -305,20 +289,10 @@ class _SalesOrderViewState extends State<_SalesOrderView>
             MaterialPageRoute(builder: (_) => const SalesOrderAdd()),
           );
         }
-
-        // Error banner
         if (state.errorMessage != null) {
           objfun.msgshow(
-            state.errorMessage!,
-            '',
-            Colors.white,
-            Colors.red,
-            null,
-            18.0 - objfun.reducesize,
-            objfun.tll,
-            objfun.tgc,
-            context,
-            2,
+            state.errorMessage!, '', Colors.white, Colors.red, null,
+            18.0 - objfun.reducesize, objfun.tll, objfun.tgc, context, 2,
           );
         }
       },
@@ -327,10 +301,6 @@ class _SalesOrderViewState extends State<_SalesOrderView>
 
         return WillPopScope(
           onWillPop: () async {
-            if (_overlayEntry != null) {
-              _clearOverlay();
-              return false;
-            }
             Navigator.of(context).pop();
             return true;
           },
@@ -368,14 +338,10 @@ class _SalesOrderViewState extends State<_SalesOrderView>
     isTablet ? objfun.FontLow.toDouble() : (objfun.FontLow - 2).toDouble();
 
     return AppBar(
-      key: appBarKey,
       automaticallyImplyLeading: true,
       leading: IconButton(
         icon: const Icon(Icons.arrow_back),
-        onPressed: () {
-          _clearOverlay();
-          Navigator.pop(context);
-        },
+        onPressed: () => Navigator.pop(context),
       ),
       title: SizedBox(
         height: h * 0.05,
@@ -401,20 +367,16 @@ class _SalesOrderViewState extends State<_SalesOrderView>
       ),
       iconTheme: const IconThemeData(color: colour.topAppBarColor),
       actions: [
-        // VIEW button
         if (state.isAllowed('VIEW'))
           Padding(
             padding: const EdgeInsets.only(top: 7, bottom: 7, left: 7),
             child: _appBarBtn(
               label: 'View',
-              onPressed: () => Navigator.push(
-                context,
-                MaterialPageRoute(builder: (_) => const Saleorderview()),
-              ),
+              onPressed: () => Navigator.push(context,
+                  MaterialPageRoute(builder: (_) => const Saleorderview())),
               isTablet: isTablet,
             ),
           ),
-        // SAVE button
         if (state.isAllowed('SAVE'))
           Padding(
             padding: const EdgeInsets.only(top: 7, bottom: 7, left: 7),
@@ -448,16 +410,13 @@ class _SalesOrderViewState extends State<_SalesOrderView>
           backgroundColor: colour.commonColorLight,
           side: const BorderSide(color: colour.commonColor, width: 1),
           elevation: 20,
-          shape:
-          RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
           padding: const EdgeInsets.all(4),
         ),
         onPressed: onPressed,
         child: Text(label,
             style: GoogleFonts.lato(
-                fontSize: isTablet
-                    ? objfun.FontMedium.toDouble()
-                    : objfun.FontMedium.toDouble(),
+                fontSize: objfun.FontMedium.toDouble(),
                 fontWeight: FontWeight.bold,
                 color: colour.commonColor)),
       ),
@@ -486,7 +445,8 @@ class _SalesOrderViewState extends State<_SalesOrderView>
       backgroundColor: colour.commonColorLight,
       currentIndex: state.currentTabIndex,
       unselectedItemColor: colour.commonHeadingColor.withOpacity(0.5),
-      selectedFontSize: isTablet ? objfun.FontLow.toDouble() : objfun.FontCardText.toDouble(),
+      selectedFontSize:
+      isTablet ? objfun.FontLow.toDouble() : objfun.FontCardText.toDouble(),
       unselectedFontSize: isTablet ? objfun.FontCardText.toDouble() : 10,
       type: BottomNavigationBarType.fixed,
       onTap: (i) {
@@ -537,21 +497,18 @@ class _SalesOrderViewState extends State<_SalesOrderView>
       padding: EdgeInsets.all(isTablet ? 20 : 15),
       child: ListView(
         children: [
-          // Job No (read-only)
           _styledField(
-            controller: txtJobNo,
-            hint: 'Job No',
-            readOnly: true,
-            isTablet: isTablet,
-          ),
+              controller: txtJobNo,
+              hint: 'Job No',
+              readOnly: true,
+              isTablet: isTablet),
           const SizedBox(height: 8),
-
-          // Bill type dropdown
           _styledDropdown<String>(
             value: state.billType,
             items: ['MY', 'TR'],
             label: 'Bill Type',
-            enabled: !state.disabledBillType && state.isAllowed('cmbBillType'),
+            enabled:
+            !state.disabledBillType && state.isAllowed('cmbBillType'),
             onChanged: (v) {
               if (v != null) bloc.add(SalesOrderBillTypeChanged(value: v));
             },
@@ -565,15 +522,11 @@ class _SalesOrderViewState extends State<_SalesOrderView>
             hint: 'Customer Name',
             hasValue: state.custName.isNotEmpty,
             enabled: state.isAllowed('txtCustomer'),
-            onSearch: () async {
-              await objfun.apiAllinoneSelect(
-                  '${objfun.apiSelectCustomer}${objfun.Comid}',
-                  null, null, context);
+            onSearch: () {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                    builder: (_) =>
-                    const Customer(Searchby: 1, SearchId: 0)),
+                    builder: (_) => const Customer(Searchby: 1, SearchId: 0)),
               ).then((_) {
                 if (objfun.SelectCustomerList.Id != 0) {
                   bloc.add(SalesOrderCustomerSelected(
@@ -595,15 +548,11 @@ class _SalesOrderViewState extends State<_SalesOrderView>
             hint: 'Job Type',
             hasValue: state.jobTypeName.isNotEmpty,
             enabled: state.isAllowed('txtJobType'),
-            onSearch: () async {
-              await objfun.apiAllinoneSelect(
-                  '${objfun.apiSelectJobType}${objfun.Comid}',
-                  null, null, context);
+            onSearch: () {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                    builder: (_) =>
-                    const JobType(Searchby: 1, SearchId: 0)),
+                    builder: (_) => const JobType(Searchby: 1, SearchId: 0)),
               ).then((_) {
                 if (objfun.SelectJobTypeList.Id != 0) {
                   bloc.add(SalesOrderJobTypeSelected(
@@ -629,8 +578,8 @@ class _SalesOrderViewState extends State<_SalesOrderView>
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                    builder: (_) =>
-                    const JobAllStatus(Searchby: 1, SearchId: 0,JobTypeId: 0,)),
+                    builder: (_) => const JobAllStatus(
+                        Searchby: 1, SearchId: 0, JobTypeId: 0)),
               ).then((_) {
                 if (objfun.SelectAllStatusList.Status != 0) {
                   bloc.add(SalesOrderJobStatusSelected(
@@ -645,7 +594,7 @@ class _SalesOrderViewState extends State<_SalesOrderView>
           ),
           const SizedBox(height: 8),
 
-          // Sale Date picker
+          // Sale Date
           _datePicker(
             context: context,
             label: 'Sale Date',
@@ -659,55 +608,55 @@ class _SalesOrderViewState extends State<_SalesOrderView>
           // Truck Size
           _styledDropdown<String>(
             value: state.truckSizeDropdown,
-            items: ['1 Tonner', '3 Tonner', '5 Tonner', '10 Tonner', '40 FT Truck'],
+            items: [
+              '1 Tonner', '3 Tonner', '5 Tonner',
+              '10 Tonner', '40 FT Truck'
+            ],
             label: 'Truck Size',
             enabled: state.isAllowed('txtTruckSize'),
-            onChanged: (v) => bloc.add(SalesOrderTruckSizeChanged(value: v)),
+            onChanged: (v) =>
+                bloc.add(SalesOrderTruckSizeChanged(value: v)),
             isTablet: isTablet,
           ),
           const SizedBox(height: 8),
 
-          // Weight
           _styledField(
-              controller: txtWeight, hint: 'Total Weight', isTablet: isTablet),
+              controller: txtWeight,
+              hint: 'Total Weight',
+              isTablet: isTablet),
           const SizedBox(height: 8),
 
-          // Quantity
           _styledField(
-              controller: txtQuantity, hint: 'Quantity', isTablet: isTablet),
+              controller: txtQuantity,
+              hint: 'Quantity',
+              isTablet: isTablet),
           const SizedBox(height: 8),
 
-          // Remarks
           _styledField(
               controller: txtRemarks, hint: 'Remarks', isTablet: isTablet),
           const SizedBox(height: 8),
 
-          // DO Description
           _styledField(
               controller: txtDoDescription,
               hint: 'DO Description',
               isTablet: isTablet),
           const SizedBox(height: 8),
 
-          // Commodity type
-          if (state.visibility.awbNo || true)
-            _styledField(
-                controller: txtCommodityType,
-                hint: 'Commodity Type',
-                isTablet: isTablet),
+          _styledField(
+              controller: txtCommodityType,
+              hint: 'Commodity Type',
+              isTablet: isTablet),
           const SizedBox(height: 8),
 
-          // AWB No
           if (state.visibility.awbNo)
             _styledField(
                 controller: txtAWBNo, hint: 'AWB No', isTablet: isTablet),
 
-          // BL Copy
           if (state.visibility.blCopy)
             _styledField(
                 controller: txtBLCopy, hint: 'BL Copy', isTablet: isTablet),
 
-          // Origin/Destination
+          // Origin
           if (state.visibility.origin)
             _searchField(
               controller: txtOrigin,
@@ -717,21 +666,22 @@ class _SalesOrderViewState extends State<_SalesOrderView>
               onSearch: () => Navigator.push(
                 context,
                 MaterialPageRoute(
-                    builder: (_) => const Location(Searchby: 1, SearchId: 0)),
+                    builder: (_) =>
+                    const Location(Searchby: 1, SearchId: 0)),
               ).then((_) {
                 if (objfun.SelectLocationList.Id != 0) {
                   bloc.add(SalesOrderOriginSelected(
                     id: objfun.SelectLocationList.Id,
                     name: objfun.SelectLocationList.Location,
-                    //name: objfun.SelectLocationList.Name,
                   ));
-                  //txtOrigin.text = objfun.SelectLocationList.Name;
                   txtOrigin.text = objfun.SelectLocationList.Location;
                   objfun.SelectLocationList = LocationModel.Empty();
                 }
               }),
               isTablet: isTablet,
             ),
+
+          // Destination
           if (state.visibility.destination)
             _searchField(
               controller: txtDestination,
@@ -741,15 +691,14 @@ class _SalesOrderViewState extends State<_SalesOrderView>
               onSearch: () => Navigator.push(
                 context,
                 MaterialPageRoute(
-                    builder: (_) => const Location(Searchby: 1, SearchId: 0)),
+                    builder: (_) =>
+                    const Location(Searchby: 1, SearchId: 0)),
               ).then((_) {
                 if (objfun.SelectLocationList.Id != 0) {
                   bloc.add(SalesOrderDestinationSelected(
                     id: objfun.SelectLocationList.Id,
                     name: objfun.SelectLocationList.Location,
-                    //name: objfun.SelectLocationList.Name,
                   ));
-                  //txtDestination.text = objfun.SelectLocationList.Name;
                   txtDestination.text = objfun.SelectLocationList.Location;
                   objfun.SelectLocationList = LocationModel.Empty();
                 }
@@ -764,12 +713,11 @@ class _SalesOrderViewState extends State<_SalesOrderView>
               label: 'Pickup Date',
               checked: state.chkPickUp,
               dateStr: state.dtpPickUpDate,
-              onToggle: (v) => bloc.add(
-                  SalesOrderDateTimeToggled(field: 'PickUp', value: v ?? false)),
+              onToggle: (v) => bloc.add(SalesOrderDateTimeToggled(
+                  field: 'PickUp', value: v ?? false)),
               onDatePicked: (d) => bloc.add(SalesOrderDateTimeChanged(
                   field: 'PickUp',
-                  dateTime:
-                  DateFormat('yyyy-MM-dd HH:mm:ss').format(d))),
+                  dateTime: DateFormat('yyyy-MM-dd HH:mm:ss').format(d))),
               isTablet: isTablet,
             ),
 
@@ -784,26 +732,26 @@ class _SalesOrderViewState extends State<_SalesOrderView>
                   field: 'Delivery', value: v ?? false)),
               onDatePicked: (d) => bloc.add(SalesOrderDateTimeChanged(
                   field: 'Delivery',
-                  dateTime:
-                  DateFormat('yyyy-MM-dd HH:mm:ss').format(d))),
+                  dateTime: DateFormat('yyyy-MM-dd HH:mm:ss').format(d))),
               isTablet: isTablet,
             ),
           const SizedBox(height: 8),
 
-          // Pickup address
+          // ── Pickup Address ── FIX: removed pre-fetch; AddressList fetches itself
           _searchField(
             controller: txtPickUpAddress,
             hint: 'Pickup Address',
             hasValue: txtPickUpAddress.text.isNotEmpty,
             enabled: state.isAllowed('txtPickUpAddress'),
             isTablet: isTablet,
-            onSearch: () async {
-              //await OnlineApi.selectAddressList();
-              if (!context.mounted) return;
+            onSearch: () {
+              // Do NOT call OnlineApi.selectAddressList() here.
+              // AddressList widget handles its own fetch in initState.
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                    builder: (_) => const AddressList(Searchby: 1, SearchId: 0)),
+                    builder: (_) =>
+                    const AddressList(Searchby: 1, SearchId: 0)),
               ).then((_) {
                 if (objfun.SelectAddressList.isNotEmpty) {
                   txtPickUpAddress.text = objfun.SelectAddressList;
@@ -817,7 +765,8 @@ class _SalesOrderViewState extends State<_SalesOrderView>
             },
             onClear: () {
               txtPickUpAddress.clear();
-              bloc.add(const SalesOrderPickupAddressListUpdated(list: [], displayText: ''));
+              bloc.add(const SalesOrderPickupAddressListUpdated(
+                  list: [], displayText: ''));
             },
           ),
           const SizedBox(height: 8),
@@ -828,20 +777,19 @@ class _SalesOrderViewState extends State<_SalesOrderView>
               isTablet: isTablet),
           const SizedBox(height: 8),
 
-          // Delivery address
+          // ── Delivery Address ── FIX: removed pre-fetch
           _searchField(
             controller: txtDeliveryAddress,
             hint: 'Delivery Address',
             hasValue: txtDeliveryAddress.text.isNotEmpty,
             enabled: state.isAllowed('txtDeliveryAddress'),
             isTablet: isTablet,
-            onSearch: () async {
-              await OnlineApi.selectAddressList();
-              if (!context.mounted) return;
+            onSearch: () {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                    builder: (_) => const AddressList(Searchby: 1, SearchId: 0)),
+                    builder: (_) =>
+                    const AddressList(Searchby: 1, SearchId: 0)),
               ).then((_) {
                 if (objfun.SelectAddressList.isNotEmpty) {
                   txtDeliveryAddress.text = objfun.SelectAddressList;
@@ -855,7 +803,8 @@ class _SalesOrderViewState extends State<_SalesOrderView>
             },
             onClear: () {
               txtDeliveryAddress.clear();
-              bloc.add(const SalesOrderDeliveryAddressListUpdated(list: [], displayText: ''));
+              bloc.add(const SalesOrderDeliveryAddressListUpdated(
+                  list: [], displayText: ''));
             },
           ),
           const SizedBox(height: 8),
@@ -866,20 +815,19 @@ class _SalesOrderViewState extends State<_SalesOrderView>
               isTablet: isTablet),
           const SizedBox(height: 8),
 
-          // Warehouse
+          // ── Warehouse Address ── FIX: removed pre-fetch
           _searchField(
             controller: txtWarehouseAddress,
             hint: 'Warehouse Address',
             hasValue: txtWarehouseAddress.text.isNotEmpty,
             enabled: state.isAllowed('txtWarehouseAddress'),
             isTablet: isTablet,
-            onSearch: () async {
-              await OnlineApi.selectAddressList();
-              if (!context.mounted) return;
+            onSearch: () {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                    builder: (_) => const AddressList(Searchby: 1, SearchId: 0)),
+                    builder: (_) =>
+                    const AddressList(Searchby: 1, SearchId: 0)),
               ).then((_) {
                 if (objfun.SelectAddressList.isNotEmpty) {
                   txtWarehouseAddress.text = objfun.SelectAddressList;
@@ -890,7 +838,7 @@ class _SalesOrderViewState extends State<_SalesOrderView>
             onClear: () => txtWarehouseAddress.clear(),
           ),
 
-          // WH Entry / Exit
+          // WH Entry
           if (state.isAllowed('chkWareHouseEntry'))
             _checkboxDateRow(
               context: context,
@@ -901,10 +849,11 @@ class _SalesOrderViewState extends State<_SalesOrderView>
                   field: 'WHEntry', value: v ?? false)),
               onDatePicked: (d) => bloc.add(SalesOrderDateTimeChanged(
                   field: 'WHEntry',
-                  dateTime:
-                  DateFormat('yyyy-MM-dd HH:mm:ss').format(d))),
+                  dateTime: DateFormat('yyyy-MM-dd HH:mm:ss').format(d))),
               isTablet: isTablet,
             ),
+
+          // WH Exit
           if (state.isAllowed('chkWareHouseExit'))
             _checkboxDateRow(
               context: context,
@@ -915,8 +864,7 @@ class _SalesOrderViewState extends State<_SalesOrderView>
                   field: 'WHExit', value: v ?? false)),
               onDatePicked: (d) => bloc.add(SalesOrderDateTimeChanged(
                   field: 'WHExit',
-                  dateTime:
-                  DateFormat('yyyy-MM-dd HH:mm:ss').format(d))),
+                  dateTime: DateFormat('yyyy-MM-dd HH:mm:ss').format(d))),
               isTablet: isTablet,
             ),
         ],
@@ -944,7 +892,8 @@ class _SalesOrderViewState extends State<_SalesOrderView>
                 isTablet: isTablet),
           if (v.lShippingAgent)
             _searchField(
-              controller: TextEditingController(text: state.lAgentCompanyName),
+              controller:
+              TextEditingController(text: state.lAgentCompanyName),
               hint: 'L Agent Company',
               hasValue: state.lAgentCompanyName.isNotEmpty,
               enabled: state.isAllowed('txtLAgentCompany'),
@@ -972,7 +921,8 @@ class _SalesOrderViewState extends State<_SalesOrderView>
               onSearch: () => Navigator.push(
                 context,
                 MaterialPageRoute(
-                    builder: (_) => const Agent(Searchby: 1, SearchId: 0,AgentCompanyId: 0)),
+                    builder: (_) =>
+                    const Agent(Searchby: 1, SearchId: 0, AgentCompanyId: 0)),
               ).then((_) {
                 if (objfun.SelectAgentAllList.Id != 0) {
                   bloc.add(SalesOrderLAgentSelected(
@@ -1000,8 +950,8 @@ class _SalesOrderViewState extends State<_SalesOrderView>
               label: 'L ETA',
               checked: state.chkLETA,
               dateStr: state.dtpLETAdate,
-              onToggle: (v) => bloc.add(
-                  SalesOrderDateTimeToggled(field: 'LETA', value: v ?? false)),
+              onToggle: (v) => bloc.add(SalesOrderDateTimeToggled(
+                  field: 'LETA', value: v ?? false)),
               onDatePicked: (d) => bloc.add(SalesOrderDateTimeChanged(
                   field: 'LETA',
                   dateTime: DateFormat('yyyy-MM-dd HH:mm:ss').format(d))),
@@ -1026,8 +976,8 @@ class _SalesOrderViewState extends State<_SalesOrderView>
               label: 'L ETB',
               checked: state.chkLETB,
               dateStr: state.dtpLETBdate,
-              onToggle: (v) => bloc.add(
-                  SalesOrderDateTimeToggled(field: 'LETB', value: v ?? false)),
+              onToggle: (v) => bloc.add(SalesOrderDateTimeToggled(
+                  field: 'LETB', value: v ?? false)),
               onDatePicked: (d) => bloc.add(SalesOrderDateTimeChanged(
                   field: 'LETB',
                   dateTime: DateFormat('yyyy-MM-dd HH:mm:ss').format(d))),
@@ -1039,8 +989,8 @@ class _SalesOrderViewState extends State<_SalesOrderView>
               label: 'L ETD',
               checked: state.chkLETD,
               dateStr: state.dtpLETDdate,
-              onToggle: (v) => bloc.add(
-                  SalesOrderDateTimeToggled(field: 'LETD', value: v ?? false)),
+              onToggle: (v) => bloc.add(SalesOrderDateTimeToggled(
+                  field: 'LETD', value: v ?? false)),
               onDatePicked: (d) => bloc.add(SalesOrderDateTimeChanged(
                   field: 'LETD',
                   dateTime: DateFormat('yyyy-MM-dd HH:mm:ss').format(d))),
@@ -1071,7 +1021,8 @@ class _SalesOrderViewState extends State<_SalesOrderView>
                 isTablet: isTablet),
           if (v.oShippingAgent)
             _searchField(
-              controller: TextEditingController(text: state.oAgentCompanyName),
+              controller:
+              TextEditingController(text: state.oAgentCompanyName),
               hint: 'O Agent Company',
               hasValue: state.oAgentCompanyName.isNotEmpty,
               enabled: state.isAllowed('txtOAgentCompany'),
@@ -1099,7 +1050,8 @@ class _SalesOrderViewState extends State<_SalesOrderView>
               onSearch: () => Navigator.push(
                 context,
                 MaterialPageRoute(
-                    builder: (_) => const Agent(Searchby: 1, SearchId: 0,AgentCompanyId: 0)),
+                    builder: (_) =>
+                    const Agent(Searchby: 1, SearchId: 0, AgentCompanyId: 0)),
               ).then((_) {
                 if (objfun.SelectAgentAllList.Id != 0) {
                   bloc.add(SalesOrderOAgentSelected(
@@ -1127,8 +1079,8 @@ class _SalesOrderViewState extends State<_SalesOrderView>
               label: 'O ETA',
               checked: state.chkOETA,
               dateStr: state.dtpOETAdate,
-              onToggle: (v) => bloc.add(
-                  SalesOrderDateTimeToggled(field: 'OETA', value: v ?? false)),
+              onToggle: (v) => bloc.add(SalesOrderDateTimeToggled(
+                  field: 'OETA', value: v ?? false)),
               onDatePicked: (d) => bloc.add(SalesOrderDateTimeChanged(
                   field: 'OETA',
                   dateTime: DateFormat('yyyy-MM-dd HH:mm:ss').format(d))),
@@ -1140,8 +1092,8 @@ class _SalesOrderViewState extends State<_SalesOrderView>
               label: 'O ETB',
               checked: state.chkOETB,
               dateStr: state.dtpOETBdate,
-              onToggle: (v) => bloc.add(
-                  SalesOrderDateTimeToggled(field: 'OETB', value: v ?? false)),
+              onToggle: (v) => bloc.add(SalesOrderDateTimeToggled(
+                  field: 'OETB', value: v ?? false)),
               onDatePicked: (d) => bloc.add(SalesOrderDateTimeChanged(
                   field: 'OETB',
                   dateTime: DateFormat('yyyy-MM-dd HH:mm:ss').format(d))),
@@ -1153,8 +1105,8 @@ class _SalesOrderViewState extends State<_SalesOrderView>
               label: 'O ETD',
               checked: state.chkOETD,
               dateStr: state.dtpOETDdate,
-              onToggle: (v) => bloc.add(
-                  SalesOrderDateTimeToggled(field: 'OETD', value: v ?? false)),
+              onToggle: (v) => bloc.add(SalesOrderDateTimeToggled(
+                  field: 'OETD', value: v ?? false)),
               onDatePicked: (d) => bloc.add(SalesOrderDateTimeChanged(
                   field: 'OETD',
                   dateTime: DateFormat('yyyy-MM-dd HH:mm:ss').format(d))),
@@ -1195,8 +1147,8 @@ class _SalesOrderViewState extends State<_SalesOrderView>
               label: 'FW1 Date',
               checked: state.chkFW1,
               dateStr: state.dtpFW1date,
-              onToggle: (v) => bloc.add(
-                  SalesOrderDateTimeToggled(field: 'FW1', value: v ?? false)),
+              onToggle: (v) => bloc.add(SalesOrderDateTimeToggled(
+                  field: 'FW1', value: v ?? false)),
               onDatePicked: (d) => bloc.add(SalesOrderDateTimeChanged(
                   field: 'FW1',
                   dateTime: DateFormat('yyyy-MM-dd HH:mm:ss').format(d))),
@@ -1208,7 +1160,6 @@ class _SalesOrderViewState extends State<_SalesOrderView>
               controller: txtENRef1, hint: 'EN Ref 1', isTablet: isTablet),
           _styledField(
               controller: txtExRef1, hint: 'EX Ref 1', isTablet: isTablet),
-          // Seal / Break Seal 1
           if (state.visibility.sealBy)
             _searchField(
               controller: TextEditingController(text: state.sealEmpName1),
@@ -1232,23 +1183,13 @@ class _SalesOrderViewState extends State<_SalesOrderView>
               isTablet: isTablet,
             ),
           _autocompleteField(
-            context: context,
-            controller: txtForwarding1S1,
-            hint: 'Forwarding 1 S1',
-            type: 1,
-            bloc: bloc,
-            state: state,
-            isTablet: isTablet,
-          ),
+              context: context, controller: txtForwarding1S1,
+              hint: 'Forwarding 1 S1', type: 1, bloc: bloc,
+              state: state, isTablet: isTablet),
           _autocompleteField(
-            context: context,
-            controller: txtForwarding1S2,
-            hint: 'Forwarding 1 S2',
-            type: 2,
-            bloc: bloc,
-            state: state,
-            isTablet: isTablet,
-          ),
+              context: context, controller: txtForwarding1S2,
+              hint: 'Forwarding 1 S2', type: 2, bloc: bloc,
+              state: state, isTablet: isTablet),
           const Divider(),
 
           // FW 2
@@ -1266,8 +1207,8 @@ class _SalesOrderViewState extends State<_SalesOrderView>
               label: 'FW2 Date',
               checked: state.chkFW2,
               dateStr: state.dtpFW2date,
-              onToggle: (v) => bloc.add(
-                  SalesOrderDateTimeToggled(field: 'FW2', value: v ?? false)),
+              onToggle: (v) => bloc.add(SalesOrderDateTimeToggled(
+                  field: 'FW2', value: v ?? false)),
               onDatePicked: (d) => bloc.add(SalesOrderDateTimeChanged(
                   field: 'FW2',
                   dateTime: DateFormat('yyyy-MM-dd HH:mm:ss').format(d))),
@@ -1327,8 +1268,8 @@ class _SalesOrderViewState extends State<_SalesOrderView>
               label: 'FW3 Date',
               checked: state.chkFW3,
               dateStr: state.dtpFW3date,
-              onToggle: (v) => bloc.add(
-                  SalesOrderDateTimeToggled(field: 'FW3', value: v ?? false)),
+              onToggle: (v) => bloc.add(SalesOrderDateTimeToggled(
+                  field: 'FW3', value: v ?? false)),
               onDatePicked: (d) => bloc.add(SalesOrderDateTimeChanged(
                   field: 'FW3',
                   dateTime: DateFormat('yyyy-MM-dd HH:mm:ss').format(d))),
@@ -1382,7 +1323,9 @@ class _SalesOrderViewState extends State<_SalesOrderView>
               isTablet: isTablet,
             ),
             _styledField(
-                controller: txtZBRef1, hint: 'ZB Ref 1', isTablet: isTablet),
+                controller: txtZBRef1,
+                hint: 'ZB Ref 1',
+                isTablet: isTablet),
             _styledDropdown<String>(
               value: state.zb2Dropdown,
               items: const ['ZB1', 'ZB2'],
@@ -1391,10 +1334,11 @@ class _SalesOrderViewState extends State<_SalesOrderView>
               isTablet: isTablet,
             ),
             _styledField(
-                controller: txtZBRef2, hint: 'ZB Ref 2', isTablet: isTablet),
+                controller: txtZBRef2,
+                hint: 'ZB Ref 2',
+                isTablet: isTablet),
           ],
 
-          // Port charges
           _styledField(
               controller: txtPortChargeRef1,
               hint: 'Port Charge Ref',
@@ -1403,8 +1347,6 @@ class _SalesOrderViewState extends State<_SalesOrderView>
               controller: txtPortCharges,
               hint: 'Port Charges',
               isTablet: isTablet),
-
-          // PTW
           _styledField(
               controller: txtPTWNo, hint: 'PTW No', isTablet: isTablet),
         ],
@@ -1425,7 +1367,8 @@ class _SalesOrderViewState extends State<_SalesOrderView>
       child: ListView(
         children: [
           _searchField(
-            controller: TextEditingController(text: state.boardingOfficerName1),
+            controller:
+            TextEditingController(text: state.boardingOfficerName1),
             hint: 'Boarding Officer 1',
             hasValue: state.boardingOfficerName1.isNotEmpty,
             enabled: state.isAllowed('txtBoardingOfficer1'),
@@ -1438,12 +1381,14 @@ class _SalesOrderViewState extends State<_SalesOrderView>
           _styledField(
             controller: txtAmount1,
             hint: 'Amount 1',
-            enabled: state.isAllowed('txtAmount1') && !state.disabledAmount1,
+            enabled:
+            state.isAllowed('txtAmount1') && !state.disabledAmount1,
             isTablet: isTablet,
           ),
           const SizedBox(height: 8),
           _searchField(
-            controller: TextEditingController(text: state.boardingOfficerName2),
+            controller:
+            TextEditingController(text: state.boardingOfficerName2),
             hint: 'Boarding Officer 2',
             hasValue: state.boardingOfficerName2.isNotEmpty,
             enabled: state.isAllowed('txtBoardingOfficer2'),
@@ -1456,7 +1401,8 @@ class _SalesOrderViewState extends State<_SalesOrderView>
           _styledField(
             controller: txtAmount2,
             hint: 'Amount 2',
-            enabled: state.isAllowed('txtAmount2') && !state.disabledAmount2,
+            enabled:
+            state.isAllowed('txtAmount2') && !state.disabledAmount2,
             isTablet: isTablet,
           ),
         ],
@@ -1476,7 +1422,6 @@ class _SalesOrderViewState extends State<_SalesOrderView>
       padding: EdgeInsets.all(isTablet ? 20 : 15),
       child: Column(
         children: [
-          // Add product button
           if (state.isAllowed('addProduct'))
             Align(
               alignment: Alignment.centerRight,
@@ -1487,14 +1432,16 @@ class _SalesOrderViewState extends State<_SalesOrderView>
                   backgroundColor: colour.commonColorLight,
                   side: const BorderSide(color: colour.commonColor),
                 ),
-                onPressed: () => _showAddProductDialog(context, state, bloc, isTablet),
+                onPressed: () => _showAddProductDialog(
+                    context, state, bloc, isTablet),
               ),
             ),
           const SizedBox(height: 8),
 
           // Totals row
           Container(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+            padding:
+            const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
             decoration: BoxDecoration(
               color: colour.commonColorLight,
               borderRadius: BorderRadius.circular(8),
@@ -1507,7 +1454,9 @@ class _SalesOrderViewState extends State<_SalesOrderView>
                   style: GoogleFonts.lato(
                     color: colour.commonColor,
                     fontWeight: FontWeight.bold,
-                    fontSize: isTablet ? objfun.FontMedium.toDouble() : objfun.FontLow.toDouble(),
+                    fontSize: isTablet
+                        ? objfun.FontMedium.toDouble()
+                        : objfun.FontLow.toDouble(),
                   ),
                 ),
                 Text(
@@ -1515,7 +1464,9 @@ class _SalesOrderViewState extends State<_SalesOrderView>
                   style: GoogleFonts.lato(
                     color: colour.commonColor,
                     fontWeight: FontWeight.bold,
-                    fontSize: isTablet ? objfun.FontMedium.toDouble() : objfun.FontLow.toDouble(),
+                    fontSize: isTablet
+                        ? objfun.FontMedium.toDouble()
+                        : objfun.FontLow.toDouble(),
                   ),
                 ),
               ],
@@ -1557,8 +1508,8 @@ class _SalesOrderViewState extends State<_SalesOrderView>
                         IconButton(
                           icon: const Icon(Icons.delete,
                               color: colour.commonColorred),
-                          onPressed: () => bloc.add(
-                              SalesOrderProductRemoved(index: index)),
+                          onPressed: () => bloc
+                              .add(SalesOrderProductRemoved(index: index)),
                         ),
                       ],
                     ),
@@ -1612,7 +1563,8 @@ class _SalesOrderViewState extends State<_SalesOrderView>
       builder: (_) => AlertDialog(
         title: Text(editIndex != null ? 'Edit Product' : 'Add Product',
             style: GoogleFonts.lato(
-                color: colour.commonColor, fontWeight: FontWeight.bold)),
+                color: colour.commonColor,
+                fontWeight: FontWeight.bold)),
         content: SizedBox(
           width: isTablet ? 500 : double.maxFinite,
           child: ListView(
@@ -1715,25 +1667,27 @@ class _SalesOrderViewState extends State<_SalesOrderView>
               bloc.add(SalesOrderProductAdded(
                   product: product, updateIndex: editIndex));
             },
-            child:
-            Text('Save', style: GoogleFonts.lato(color: Colors.white)),
+            child: Text('Save',
+                style: GoogleFonts.lato(color: Colors.white)),
           ),
         ],
       ),
     );
   }
 
-  // ─── Employee picker helper ───────────────────────────────────────────────
+  // ─── Employee picker ──────────────────────────────────────────────────────
 
   Future<void> _pickEmployee(
       BuildContext context,
       SalesOrderBloc bloc,
-      String type, // 'seal' | 'break' | 'boarding'
+      String type,
       int slot,
       ) async {
     await objfun.apiAllinoneSelect(
         '${objfun.apiSelectEmployee}${objfun.Comid}&type=&type1=Operation',
         null, null, context);
+
+    if (!context.mounted) return;
 
     Navigator.push(
       context,
@@ -1757,7 +1711,7 @@ class _SalesOrderViewState extends State<_SalesOrderView>
     });
   }
 
-  // ─── Reusable field widgets ───────────────────────────────────────────────
+  // ─── Reusable widgets ─────────────────────────────────────────────────────
 
   Widget _styledField({
     required TextEditingController controller,
@@ -1780,7 +1734,9 @@ class _SalesOrderViewState extends State<_SalesOrderView>
         style: GoogleFonts.lato(
             color: colour.commonColor,
             fontWeight: FontWeight.bold,
-            fontSize: isTablet ? objfun.FontLow + 2.0 : objfun.FontLow.toDouble(),
+            fontSize: isTablet
+                ? objfun.FontLow + 2.0
+                : objfun.FontLow.toDouble(),
             letterSpacing: 0.3),
         decoration: InputDecoration(
           hintText: hint,
@@ -1829,7 +1785,9 @@ class _SalesOrderViewState extends State<_SalesOrderView>
         style: GoogleFonts.lato(
             color: colour.commonColor,
             fontWeight: FontWeight.bold,
-            fontSize: isTablet ? objfun.FontLow + 2.0 : objfun.FontLow.toDouble()),
+            fontSize: isTablet
+                ? objfun.FontLow + 2.0
+                : objfun.FontLow.toDouble()),
         decoration: InputDecoration(
           hintText: hint,
           hintStyle: GoogleFonts.lato(
@@ -1937,20 +1895,24 @@ class _SalesOrderViewState extends State<_SalesOrderView>
             onTap: () async {
               final picked = await showDatePicker(
                 context: context,
-                initialDate: DateTime.tryParse(dateStr) ?? DateTime.now(),
+                initialDate:
+                DateTime.tryParse(dateStr) ?? DateTime.now(),
                 firstDate: DateTime(2020),
                 lastDate: DateTime(2100),
               );
               if (picked != null) onDatePicked(picked);
             },
             child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+              padding: const EdgeInsets.symmetric(
+                  horizontal: 12, vertical: 6),
               decoration: BoxDecoration(
                 border: Border.all(color: colour.commonColor),
                 borderRadius: BorderRadius.circular(8),
               ),
               child: Text(
-                dateStr.length >= 10 ? dateStr.substring(0, 16) : dateStr,
+                dateStr.length >= 10
+                    ? dateStr.substring(0, 16)
+                    : dateStr,
                 style: GoogleFonts.lato(
                     color: colour.commonColor,
                     fontWeight: FontWeight.bold,
@@ -1988,7 +1950,8 @@ class _SalesOrderViewState extends State<_SalesOrderView>
           onPressed: () async {
             final picked = await showDatePicker(
               context: context,
-              initialDate: DateTime.tryParse(dateStr) ?? DateTime.now(),
+              initialDate:
+              DateTime.tryParse(dateStr) ?? DateTime.now(),
               firstDate: DateTime(2020),
               lastDate: DateTime(2100),
             );
@@ -2015,7 +1978,6 @@ class _SalesOrderViewState extends State<_SalesOrderView>
           hint: hint,
           isTablet: isTablet,
         ),
-        // Inline suggestion list when overlay active for this type
         if (state.showOverlay && state.overlayType == type)
           Container(
             constraints: const BoxConstraints(maxHeight: 200),
