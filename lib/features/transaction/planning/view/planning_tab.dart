@@ -5,15 +5,14 @@ import 'package:intl/intl.dart';
 import 'package:maleva/core/utils/clsfunction.dart' as objfun;
 import 'package:maleva/menu/menulist.dart';
 import 'package:maleva/core/network/OnlineApi.dart' as OnlineApi;
-import 'package:maleva/MasterSearch/Employee.dart';
 import 'package:maleva/core/models/model.dart';
-import 'package:maleva/Transaction/Planning/PlanningDetails.dart';
-import 'package:maleva/DashBoard/CustomerService/CustDashboard.dart';
-import 'package:maleva/DashBoard/TransportDB/TransportDashboard.dart';
-import 'package:maleva/DashBoard/User/UserDashboard.dart';
 import '../../../../core/theme/tokens.dart';
+import '../../../dashboard/admin_dashboard/tabs/custdashboard/view/custdashboard_tab.dart';
+import '../../../dashboard/admin_dashboard/tabs/transportDB/view/transportdb_tab.dart';
 import '../../../dashboard/admin_dashboard/view/admin_dashboard.dart';
 import '../../../dashboard/operationadmin_dashboard/view/operationadmin_dashboard.dart';
+import '../../../home/view/home_tab.dart';
+import '../../../mastersearch/Employee.dart';
 import '../bloc/planning_bloc.dart';
 import '../bloc/planning_event.dart';
 import '../bloc/planning_state.dart';
@@ -56,7 +55,7 @@ class _PlanningScaffold extends StatelessWidget {
     final Widget dest = switch (role) {
       'ADMIN'          => const NewAdminDashboard(),
       'SALES'          => const CustDashboard(),
-      'TRANSPORTATION' => const OldTransportDashboard(),
+      'TRANSPORTATION' => const TransportDashboard(),
       'OPERATIONADMIN' => const OperationAdminDashboard(),
       _                => const Homemobile(),
     };

@@ -6,6 +6,7 @@ import 'package:maleva/core/utils/clsfunction.dart' as objfun;
 import 'package:maleva/core/models/model.dart';
 
 import '../utils/clsfunction.dart';
+import 'api_client.dart';
 
 Future<bool> Login(String Username, String Password, String OldUsername,int DriverId, context) async {
   try {
@@ -603,36 +604,71 @@ Future SelectProductList(context) async {
   }
 }
 
-Future<void> SelectAddressList(BuildContext context) async {
+
+
+// Context illa clean code!
+Future<List<dynamic>?> selectAddressList() async {
   try {
     objfun.AddressList.clear();
-
     final int comId = objfun.storagenew.getInt('Comid') ?? 0;
 
-    final resultData = await objfun
-        .apiAllinoneSelect(
+    // Call ApiClient.postRequest and pass null for the body
+    final resultData = await ApiClient.postRequest(
       "${objfun.apiSelectAddressList}$comId",
       null,
-      null,
-      context,
-    )
-        .timeout(const Duration(seconds: 15)); // ✅ VERY IMPORTANT
+    );
 
-    if (resultData != null && resultData.isNotEmpty) {
-      objfun.AddressList = resultData;
+    // ApiClient decodes the response automatically.
+    // We just ensure it's returned as a List safely.
+    if (resultData is List) {
+      return resultData;
+    } else if (resultData != null) {
+      return [resultData]; // Wrap in list if a map is returned
     }
 
+    return [];
+
   } on TimeoutException {
-    _showError(context, "Server timeout. Please try again.");
+    throw Exception("Server timeout. Please try again.");
   } on SocketException {
-    _showError(context, "No internet connection.");
-  } on HttpException {
-    _showError(context, "Server error occurred.");
-  } catch (error, stackTrace) {
-    _showError(context, error.toString());
-    debugPrint(stackTrace.toString());
+    throw Exception("No internet connection.");
+  } catch (error) {
+    // ApiClient already gives clean error messages,
+    // so we can just pass them along smoothly.
+    throw Exception(error.toString().replaceAll('Exception: ', ''));
   }
 }
+
+// Future<void> SelectAddressList(BuildContext context) async {
+//   try {
+//     objfun.AddressList.clear();
+//
+//     final int comId = objfun.storagenew.getInt('Comid') ?? 0;
+//
+//     final resultData = await objfun
+//         .apiAllinoneSelect(
+//       "${objfun.apiSelectAddressList}$comId",
+//       null,
+//       null,
+//       context,
+//     )
+//         .timeout(const Duration(seconds: 15));
+//
+//     if (resultData != null && resultData.isNotEmpty) {
+//       objfun.AddressList = resultData;
+//     }
+//
+//   } on TimeoutException {
+//     _showError(context, "Server timeout. Please try again.");
+//   } on SocketException {
+//     _showError(context, "No internet connection.");
+//   } on HttpException {
+//     _showError(context, "Server error occurred.");
+//   } catch (error, stackTrace) {
+//     _showError(context, error.toString());
+//     debugPrint(stackTrace.toString());
+//   }
+// }
 
 
 void _showError(BuildContext context, String message) {

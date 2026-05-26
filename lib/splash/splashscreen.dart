@@ -4,16 +4,10 @@ import 'package:intl/intl.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:maleva/core/utils/clsfunction.dart' as objfun;
 import 'package:maleva/core/colors/colors.dart' as colour;
-import '../DashBoard/AirFrieght/AirFrieghtDashboard.dart';
-import '../DashBoard/HR/HrDashboard.dart';
-import '../DashBoard/Payable/PayableDashbord.dart';
-import '../DashBoard/Receivable/ReceivableDashboard.dart';
-import '../DashBoard/TransportDB/TransportDashboard.dart';
 import '../core/network/api_services/auth_api.dart';
 import '../core/network/api_services/firebase_service.dart';
 import '../core/theme/tokens.dart';
 import '../core/utils/app_preferences.dart';
-import '../DashBoard/User/UserDashboard.dart';
 import 'package:maleva/core/network/OnlineApi.dart' as OnlineApi;
 import '../features/auth/data/repositories/auth_repository.dart';
 import '../features/auth/presentation/bloc/auth_bloc.dart';
@@ -39,6 +33,7 @@ import '../features/dashboard/operationadmin_dashboard/view/operationadmin_dashb
 import '../features/dashboard/payable_dashboard/bloc/payable_dasboard_bloc.dart';
 import '../features/dashboard/payable_dashboard/view/payable_dashboard.dart';
 import '../features/dashboard/receivable_dashboard/bloc/receivable_bloc.dart';
+import '../features/dashboard/receivable_dashboard/view/receivable_dashboard.dart';
 import '../features/dashboard/sales_dashboard/view/salesdashboard_dashboard.dart';
 import '../features/dashboard/subadmin_dashboard/bloc/subadmin_dashboard_bloc.dart';
 import '../features/dashboard/subadmin_dashboard/view/subadmin_dashboard.dart';
@@ -130,12 +125,7 @@ class _SplashScreenState extends State<SplashScreen>
     await objfun.localstoragecall();
     await Future.delayed(const Duration(seconds: 3));
 
-
-    //await AppPreferences.init();
-    await FirebaseService.getDeviceToken()
-        .timeout(const Duration(seconds: 5), onTimeout: () {
-      debugPrint('⚠️ FCM token fetch timed out — proceeding without token');
-    });
+    await objfun.getDeviceToken();
     objfun.mobiletoken = AppPreferences.getFcmToken();
 
     String UserName = objfun.storagenew.getString('Username') ?? "";

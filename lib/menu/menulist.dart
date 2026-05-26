@@ -5,9 +5,6 @@ import 'package:maleva/core/utils/clsfunction.dart' as objfun;
 import 'package:maleva/core/models/model.dart';
 import 'package:maleva/features/operations/forwarding/bloc/forwarding_event.dart';
 import 'package:maleva/features/transaction/viewsaleorder/view/viewsaleorder_tab.dart';
-import '../Operation/FWBreakSealUpdate.dart';
-import '../Transaction/JobStatus/JobStatusUpdate.dart';
-import '../Transaction/SpotSaleOrder/SpotSaleOrder.dart';
 import '../core/theme/tokens.dart';
 import '../features/airfreight/updateairfreight/bloc/airfreight_bloc.dart';
 import '../features/airfreight/updateairfreight/bloc/airfreight_event.dart';
@@ -17,7 +14,9 @@ import '../features/boarding/updateboardingdetails/bloc/updateboardingdetails_ev
 import '../features/boarding/updateboardingdetails/view/updateboardingdetails_tab.dart';
 import '../features/dashboard/admin_dashboard/tabs/emailinbox/view/emailinbox_tab.dart';
 import '../features/dashboard/admin_dashboard/tabs/enquiry/view/view/enquiry_tab.dart';
+import '../features/dashboard/admin_dashboard/tabs/fwbreakseal/view/fwbreakseal_tab.dart';
 import '../features/dashboard/admin_dashboard/tabs/googlereview/view/googlereview_tab.dart';
+import '../features/dashboard/admin_dashboard/tabs/spotsaleorder/view/spotsaleorder_view.dart';
 import '../features/dashboard/admin_dashboard/tabs/stockinentry/bloc/stock_in_entry_bloc.dart';
 import '../features/dashboard/admin_dashboard/tabs/stockinentry/bloc/stock_in_entry_event.dart';
 import '../features/dashboard/admin_dashboard/tabs/stockinentry/view/stock_in_entry_ui.dart';
@@ -637,7 +636,7 @@ class _MenuTileState extends State<_MenuTile>
         case "Planning":
           Navigator.push(ctx, _r(const PlanningView()));        break;
         case "SpotSaleOrder":
-          Navigator.push(ctx, _r(const Spotsaleorder()));       break;
+          Navigator.push(ctx, _r(const SpotSaleViewPage()));       break;
         case "PreAlertReport":
           Navigator.push(ctx, _r(const PreAlertReport()));      break;
         case "Email InBox":

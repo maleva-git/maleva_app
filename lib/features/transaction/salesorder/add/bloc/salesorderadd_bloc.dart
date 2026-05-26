@@ -36,7 +36,7 @@ class SalesOrderAddBloc extends Bloc<SalesOrderAddEvent, SalesOrderAddState> {
         final today = DateFormat("yyyy-MM-dd").format(DateTime.now());
 
         await OnlineApi.MaxSaleOrderNo(context, 'MY');
-        await OnlineApi.SelectAddressList(context);
+        await OnlineApi.selectAddressList();
         await OnlineApi.SelectAgentCompany(context);
         await OnlineApi.SelectEmployee(context, '', 'Operation');
 

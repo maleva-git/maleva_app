@@ -7,18 +7,15 @@ import 'package:maleva/core/utils/clsfunction.dart' as objfun;
 import 'package:maleva/core/network/OnlineApi.dart' as OnlineApi;
 import 'package:maleva/core/models/model.dart';
 import 'package:maleva/menu/menulist.dart';
-import 'package:maleva/MasterSearch/Driver.dart';
-import 'package:maleva/MasterSearch/Truck.dart';
-import 'package:maleva/Transport/RTI/UpdateRTIStatus.dart';
-import 'package:maleva/DashBoard/AirFrieght/AirFrieghtDashboard.dart';
-import 'package:maleva/DashBoard/Boarding/BoardingDashboard.dart';
-import 'package:maleva/DashBoard/Driver/DriverDashboard.dart';
-import 'package:maleva/DashBoard/Forwarding/ForwardingDashboard.dart';
-import 'package:maleva/DashBoard/TransportDB/TransportDashboard.dart';
-import 'package:maleva/DashBoard/User/UserDashboard.dart';
 import 'package:maleva/features/dashboard/admin_dashboard/view/admin_dashboard.dart';
+import '../../../dashboard/admin_dashboard/tabs/transportDB/view/transportdb_tab.dart';
+import '../../../dashboard/boarding_dashboard/view/boarding_dashboard.dart';
 import '../../../dashboard/driver_dashboard/view/driver_dashboard.dart';
+import '../../../dashboard/forwarding_dashboard/view/forwarding_dashboard.dart';
 import '../../../dashboard/operationadmin_dashboard/view/operationadmin_dashboard.dart';
+import '../../../home/view/home_tab.dart';
+import '../../../mastersearch/Driver.dart';
+import '../../../mastersearch/Truck.dart';
 import '../bloc/updatertidetails_bloc.dart';
 import '../bloc/updatertidetails_event.dart';
 import '../bloc/updatertidetails_state.dart';
@@ -122,7 +119,7 @@ class _UpdateRTIPage extends StatelessWidget {
           dest = const NewAdminDashboard();
           break;
         case 'TRANSPORTATION':
-          dest = const OldTransportDashboard();
+          dest = const TransportDashboard();
           break;
         case 'OPERATIONADMIN':
           dest = const OperationAdminDashboard();

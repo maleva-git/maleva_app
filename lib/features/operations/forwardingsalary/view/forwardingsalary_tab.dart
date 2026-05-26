@@ -6,8 +6,7 @@ import 'package:maleva/core/utils/clsfunction.dart' as objfun;
 import 'package:maleva/core/network/OnlineApi.dart' as OnlineApi;
 import 'package:maleva/core/models/model.dart';
 import 'package:maleva/menu/menulist.dart';
-import 'package:maleva/MasterSearch/Employee.dart';
-
+import '../../../mastersearch/Employee.dart';
 import '../bloc/forwardingsalary_bloc.dart';
 import '../bloc/forwardingsalary_event.dart';
 import '../bloc/forwardingsalary_state.dart';

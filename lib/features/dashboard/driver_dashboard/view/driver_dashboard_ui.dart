@@ -2,7 +2,6 @@ import 'package:flutter/Material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
-import '../../../../SaleOrderView/SaleOrderView.dart';
 import '../../../../core/bluetooth/bluetoothmanager.dart';
 import '../../../../core/colors/colors.dart' as colour;
 import '../../../../core/models/model.dart';
@@ -15,6 +14,7 @@ import '../../admin_dashboard/tabs/drivermaintenance/view/drivermaintenance_tab.
 import '../../admin_dashboard/tabs/driversalary/view/driversalary_tab.dart';
 import '../../admin_dashboard/tabs/maintenance/view/maintenance_tab.dart';
 import '../../admin_dashboard/tabs/pdo/view/pdo_tab.dart';
+import '../../admin_dashboard/tabs/saleorderview/view/saleorderview_tab.dart';
 import '../../admin_dashboard/tabs/summonentry/view/summonentry_tab.dart';
 import '../../admin_dashboard/tabs/transport/view/transportview_tab.dart';
 import '../bloc/driver_bloc.dart';

@@ -43,7 +43,7 @@ Future<void> main() async {
   FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
 
   try {
-     await Firebase.initializeApp(
+    await Firebase.initializeApp(
       options: DefaultFirebaseOptions.currentPlatform,
     );
   } on FirebaseException catch (e) {
@@ -108,10 +108,9 @@ class MyApp extends StatelessWidget {
   MyApp({super.key});
 
   hexColor(String colorhexcode) {
-    String colornew = '0xff$colorhexcode';
-    colornew = colornew.replaceAll('#', '');
-    int colorint = int.parse(colornew);
-    return colorint;
+    // FIX: int.parse crashes if colorhexcode is null/malformed → use tryParse with fallback
+    String colornew = '0xff${colorhexcode.replaceAll('#', '')}';
+    return int.tryParse(colornew) ?? 0xFF022B50;
   }
 
   final Map<int, Color> _yellow700Map = {

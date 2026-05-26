@@ -9,9 +9,8 @@ import 'package:maleva/core/utils/clsfunction.dart' as objfun;
 import 'package:maleva/core/network/OnlineApi.dart' as OnlineApi;
 import 'package:maleva/core/models/model.dart';
 import 'package:maleva/menu/menulist.dart';
-import 'package:maleva/MasterSearch/JobAllStatus.dart';
-import 'package:maleva/Transaction/SaleOrderDetails.dart';
-
+import '../../../dashboard/admin_dashboard/tabs/saleorderdetails/view/saleorderdetails_tab.dart';
+import '../../../mastersearch/JobAllStatus.dart';
 import '../bloc/airfreight_bloc.dart';
 import '../bloc/airfreight_event.dart';
 import '../bloc/airfreight_state.dart';
@@ -422,8 +421,8 @@ class _JobNoRowState extends State<_JobNoRow> {
                     context,
                     MaterialPageRoute(
                       builder: (_) => SaleOrderDetails(
-                        SaleDetails: null,
-                        SaleMaster:
+                        saleDetails: null,
+                        saleMaster:
                         objfun.SaleEditMasterList,
                       ),
                     ),
