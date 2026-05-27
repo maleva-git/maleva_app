@@ -1,18 +1,18 @@
 abstract class SalesOrderEvent {}
 
-class LoadInvoiceByType extends SalesOrderEvent {
+class LoadInvoiceByTypes extends SalesOrderEvent {
   final int type;
-  LoadInvoiceByType(this.type);
+  LoadInvoiceByTypes(this.type);
 }
 
-class LoadMonthRange extends SalesOrderEvent {
+class LoadMonthRanges extends SalesOrderEvent {
   final int months;
-  LoadMonthRange(this.months);
+  LoadMonthRanges(this.months);
 }
 
-class LoadEmployeeInvData extends SalesOrderEvent {
+class LoadEmployeeInvDatas extends SalesOrderEvent {
   final int type;
-  LoadEmployeeInvData(this.type);
+  LoadEmployeeInvDatas(this.type);
 }
 
 class LoadWaitingBills extends SalesOrderEvent {

@@ -1,9 +1,13 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
 import 'package:maleva/core/models/model.dart';
 import 'package:maleva/core/colors/colors.dart' as colour;
+import 'package:open_file/open_file.dart';
+import 'package:path_provider/path_provider.dart';
 import '../../../../../../core/di/injection.dart';
 import '../../../../../../core/theme/tokens.dart';
 import '../bloc/rtiview_bloc.dart';
@@ -16,8 +20,7 @@ class RTIDetailsPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return
-    BlocProvider(
+    return BlocProvider(
       create: (_) => sl<RTIDetailsBloc>(),
       child: const _RTIDetailsBody(),
     );
@@ -30,7 +33,34 @@ class _RTIDetailsBody extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<RTIDetailsBloc, RTIDetailsState>(
+
+    return BlocConsumer<RTIDetailsBloc, RTIDetailsState>(
+
+
+      listenWhen: (prev, curr) =>
+      curr is RTIPdfLaunchSuccess || curr is RTIActionError,
+
+      listener: (context, state) async  {
+        if (state is RTIPdfLaunchSuccess) {
+          debugPrint('Launch PDF: ${state.url}');
+          await _openPdf(context, state.url);
+        } else if (state is RTIActionError) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(state.message,
+                  style: GoogleFonts.lato(color: colour.kWhite)),
+              backgroundColor: Colors.red.shade600,
+              behavior: SnackBarBehavior.floating,
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10)),
+            ),
+          );
+        }
+      },
+
+      buildWhen: (prev, curr) =>
+      curr is RTIDetailsLoaded || curr is RTIDetailsError,
+
       builder: (context, state) {
         final s         = state is RTIDetailsLoaded ? state : null;
         final isLoading = s?.isLoading ?? false;
@@ -46,11 +76,13 @@ class _RTIDetailsBody extends StatelessWidget {
             isLoading: isLoading,
             onFromTap: () => _pickDate(
               context, fromDate,
-                  (d) => context.read<RTIDetailsBloc>().add(SelectRTIDetailsFromDateEvent(d)),
+                  (d) => context.read<RTIDetailsBloc>().add(
+                  SelectRTIDetailsFromDateEvent(d)),
             ),
             onToTap: () => _pickDate(
               context, toDate,
-                  (d) => context.read<RTIDetailsBloc>().add(SelectRTIDetailsToDateEvent(d)),
+                  (d) => context.read<RTIDetailsBloc>().add(
+                  SelectRTIDetailsToDateEvent(d)),
             ),
             onSearch: () =>
                 context.read<RTIDetailsBloc>().add(const SearchRTIDetailsEvent()),
@@ -98,8 +130,7 @@ class _RTIDetailsBody extends StatelessWidget {
                 : (s == null || s.masters.isEmpty)
                 ? _EmptyState()
                 : ListView.builder(
-              padding:
-              const EdgeInsets.fromLTRB(14, 4, 14, 20),
+              padding: const EdgeInsets.fromLTRB(14, 4, 14, 20),
               itemCount: s.masters.length,
               itemBuilder: (context, index) {
                 final master  = s.masters[index];
@@ -146,6 +177,87 @@ class _RTIDetailsBody extends StatelessWidget {
     if (s is RTIDetailsLoaded) return s.toDate;
     if (s is RTIDetailsError)  return s.toDate ?? DateTime(DateTime.now().year, 12, 31);
     return DateTime(DateTime.now().year, 12, 31);
+  }
+
+  // ── Download PDF to temp file then open with device viewer ──────────────────
+  Future<void> _openPdf(BuildContext context, String url) async {
+    // Show loading dialog
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (_) => Dialog(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        child: Container(
+          padding: const EdgeInsets.all(24),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(16),
+          ),
+          child: Column(mainAxisSize: MainAxisSize.min, children: [
+            CircularProgressIndicator(color: AppTokens.brandGradientStart),
+            const SizedBox(height: 16),
+            Text("Loading PDF…",
+                style: GoogleFonts.lato(
+                    fontSize: 14, color: AppTokens.brandDark)),
+          ]),
+        ),
+      ),
+    );
+
+    try {
+      // Download PDF bytes
+      final response = await http.get(Uri.parse(url));
+
+      if (response.statusCode != 200) {
+        if (context.mounted) Navigator.of(context).pop();
+        if (context.mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+            content: Text("Failed to download PDF (${response.statusCode})",
+                style: GoogleFonts.lato(color: Colors.white)),
+            backgroundColor: Colors.red.shade600,
+            behavior: SnackBarBehavior.floating,
+            shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10)),
+          ));
+        }
+        return;
+      }
+
+      // Save to temp directory
+      final dir  = await getTemporaryDirectory();
+      final file = File('${dir.path}/rti_${DateTime.now().millisecondsSinceEpoch}.pdf');
+      await file.writeAsBytes(response.bodyBytes);
+
+      // Dismiss loading dialog
+      if (context.mounted) Navigator.of(context).pop();
+
+      // Open with device PDF viewer
+      final result = await OpenFile.open(file.path);
+
+      if (result.type != ResultType.done && context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content: Text("Could not open PDF: ${result.message}",
+              style: GoogleFonts.lato(color: Colors.white)),
+          backgroundColor: Colors.red.shade600,
+          behavior: SnackBarBehavior.floating,
+          shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(10)),
+        ));
+      }
+    } catch (e) {
+      if (context.mounted) Navigator.of(context).pop();
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content: Text("Error: ${e.toString()}",
+              style: GoogleFonts.lato(color: Colors.white)),
+          backgroundColor: Colors.red.shade600,
+          behavior: SnackBarBehavior.floating,
+          shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(10)),
+        ));
+      }
+    }
   }
 }
 
@@ -286,7 +398,6 @@ class _PageHeader extends StatelessWidget {
 }
 
 // ── Date Picker Card ──────────────────────────────────────────────────────────
-// ── Date Picker Card ──────────────────────────────────────────────────────────
 class _DatePickerCard extends StatelessWidget {
   final String label;
   final String value;
@@ -311,7 +422,6 @@ class _DatePickerCard extends StatelessWidget {
               color: AppTokens.brandGradientStart, size: 13),
         ),
         const SizedBox(width: 7),
-        // ✅ Fix: Wrapped in Expanded so it doesn't push past the card boundaries
         Expanded(
           child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -323,7 +433,6 @@ class _DatePickerCard extends StatelessWidget {
                         fontWeight: FontWeight.w600)),
                 const SizedBox(height: 1),
                 Text(value,
-                    // ✅ Fix: Adds "..." if the date is too wide for tiny screens
                     overflow: TextOverflow.ellipsis,
                     style: GoogleFonts.lato(
                         fontSize: 13,
@@ -391,8 +500,7 @@ class _ErrorView extends StatelessWidget {
             onPressed: onRetry,
             icon: const Icon(Icons.refresh_rounded, size: 18),
             label: Text("Try Again",
-                style:
-                GoogleFonts.lato(fontWeight: FontWeight.bold)),
+                style: GoogleFonts.lato(fontWeight: FontWeight.bold)),
             style: ElevatedButton.styleFrom(
               backgroundColor: AppTokens.brandGradientStart,
               foregroundColor: colour.kWhite,
@@ -439,7 +547,9 @@ class _EmptyState extends StatelessWidget {
 }
 
 // ── Master Expansion Card ─────────────────────────────────────────────────────
-class _RTIDetailsCard extends StatelessWidget {
+// Uses StatefulWidget + AnimatedCrossFade instead of ExpansionTile so we have
+// full tap control — no ExpansionTile interference on the PDF button.
+class _RTIDetailsCard extends StatefulWidget {
   final RTIMasterViewModel master;
   final List<RTIDetailsViewModel> details;
 
@@ -447,6 +557,13 @@ class _RTIDetailsCard extends StatelessWidget {
     required this.master,
     required this.details,
   });
+
+  @override
+  State<_RTIDetailsCard> createState() => _RTIDetailsCardState();
+}
+
+class _RTIDetailsCardState extends State<_RTIDetailsCard> {
+  bool _expanded = false;
 
   @override
   Widget build(BuildContext context) {
@@ -470,19 +587,171 @@ class _RTIDetailsCard extends StatelessWidget {
       ),
       child: ClipRRect(
         borderRadius: BorderRadius.circular(18),
-        child: Theme(
-          data: Theme.of(context)
-              .copyWith(dividerColor: Colors.transparent),
-          child: ExpansionTile(
-            tilePadding: EdgeInsets.zero,
-            childrenPadding: EdgeInsets.zero,
+        child: Column(children: [
 
-            // ── Header ───────────────────────────────────────
-            title: _CardHeader(master: master),
+          // ── Header row ──────────────────────────────────────────────────
+          Container(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: [
+                  AppTokens.brandGradientStart,
+                  AppTokens.brandGradientStart.withBlue(
+                      (AppTokens.brandGradientStart.blue + 30).clamp(0, 255)),
+                ],
+                begin: Alignment.centerLeft,
+                end: Alignment.centerRight,
+              ),
+            ),
+            child: Row(children: [
 
-            // ── Expanded — Details Table ──────────────────────
-            children: [
-              // Gradient divider line
+              // Left: avatar + name + RTI no — tap to expand/collapse
+              Expanded(
+                child: GestureDetector(
+                  behavior: HitTestBehavior.opaque,
+                  onTap: () => setState(() => _expanded = !_expanded),
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 16, vertical: 14),
+                    child: Row(children: [
+
+                      // Avatar circle
+                      Container(
+                        width: 40,
+                        height: 40,
+                        decoration: BoxDecoration(
+                            color: colour.kWhite.withOpacity(0.15),
+                            shape: BoxShape.circle),
+                        child: const Icon(Icons.person_rounded,
+                            color: colour.kWhite, size: 20),
+                      ),
+
+                      const SizedBox(width: 10),
+
+                      // Driver name + RTI No
+                      Expanded(
+                        child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(widget.master.DriverName ?? '-',
+                                  style: GoogleFonts.lato(
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 14,
+                                      color: colour.kWhite),
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis),
+                              const SizedBox(height: 3),
+                              Row(children: [
+                                Icon(Icons.tag_rounded,
+                                    size: 11,
+                                    color: colour.kWhite.withOpacity(0.7)),
+                                const SizedBox(width: 3),
+                                Flexible(
+                                  child: Text(
+                                    widget.master.RTINoDisplay,
+                                    overflow: TextOverflow.ellipsis,
+                                    maxLines: 1,
+                                    style: GoogleFonts.lato(
+                                        fontSize: 12,
+                                        color:
+                                        colour.kWhite.withOpacity(0.85)),
+                                  ),
+                                ),
+                              ]),
+                            ]),
+                      ),
+                    ]),
+                  ),
+                ),
+              ),
+
+              // Right: PDF button + date badge + chevron
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 10),
+                child: Row(mainAxisSize: MainAxisSize.min, children: [
+
+                  // ✅ PDF button — own GestureDetector, fully independent
+                  GestureDetector(
+                    behavior: HitTestBehavior.opaque,
+                    onTap: () => context.read<RTIDetailsBloc>().add(
+                      RTIViewEvent(
+                        id: widget.master.Id,
+                        rtiNo: widget.master.RTINoDisplay ?? "",
+                      ),
+                    ),
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 10, vertical: 6),
+                      decoration: BoxDecoration(
+                        color: colour.kWhite.withOpacity(0.15),
+                        borderRadius: BorderRadius.circular(8),
+                        border: Border.all(
+                            color: colour.kWhite.withOpacity(0.25), width: 1),
+                      ),
+                      child: Row(mainAxisSize: MainAxisSize.min, children: [
+                        Icon(Icons.picture_as_pdf_outlined,
+                            color: Colors.red.shade300, size: 16),
+                        const SizedBox(width: 4),
+                        Text("PDF",
+                            style: GoogleFonts.lato(
+                                color: colour.kWhite,
+                                fontSize: 11,
+                                fontWeight: FontWeight.bold)),
+                      ]),
+                    ),
+                  ),
+
+                  const SizedBox(width: 8),
+
+                  // Date badge
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 10, vertical: 5),
+                    decoration: BoxDecoration(
+                      color: colour.kWhite.withOpacity(0.18),
+                      borderRadius: BorderRadius.circular(20),
+                      border: Border.all(
+                          color: colour.kWhite.withOpacity(0.25), width: 1),
+                    ),
+                    child: Row(mainAxisSize: MainAxisSize.min, children: [
+                      Icon(Icons.calendar_today_rounded,
+                          size: 10, color: colour.kWhite.withOpacity(0.75)),
+                      const SizedBox(width: 4),
+                      Text(widget.master.RTIDate.toString(),
+                          style: GoogleFonts.lato(
+                              color: colour.kWhite,
+                              fontSize: 11,
+                              fontWeight: FontWeight.w600)),
+                    ]),
+                  ),
+
+                  const SizedBox(width: 8),
+
+                  // Chevron — tapping also toggles expand
+                  GestureDetector(
+                    behavior: HitTestBehavior.opaque,
+                    onTap: () => setState(() => _expanded = !_expanded),
+                    child: AnimatedRotation(
+                      turns: _expanded ? 0.5 : 0.0,
+                      duration: const Duration(milliseconds: 200),
+                      child: Icon(Icons.keyboard_arrow_down_rounded,
+                          color: colour.kWhite.withOpacity(0.9), size: 22),
+                    ),
+                  ),
+                ]),
+              ),
+            ]),
+          ),
+
+          // ── Expandable body ─────────────────────────────────────────────
+          AnimatedCrossFade(
+            duration: const Duration(milliseconds: 200),
+            crossFadeState: _expanded
+                ? CrossFadeState.showSecond
+                : CrossFadeState.showFirst,
+            firstChild: const SizedBox.shrink(),
+            secondChild: Column(children: [
+
+              // Gradient divider
               Container(
                 height: 1,
                 decoration: BoxDecoration(
@@ -522,141 +791,17 @@ class _RTIDetailsCard extends StatelessWidget {
 
               Padding(
                 padding: const EdgeInsets.fromLTRB(10, 0, 10, 14),
-                child: _DetailsTable(details: details),
+                child: _DetailsTable(details: widget.details),
               ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-// ── Card Header ───────────────────────────────────────────────────────────────
-class _CardHeader extends StatelessWidget {
-  final RTIMasterViewModel master;
-  const _CardHeader({required this.master});
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: [
-            AppTokens.brandGradientStart,
-            AppTokens.brandGradientStart.withBlue(
-                (AppTokens.brandGradientStart.blue + 30).clamp(0, 255)),
-          ],
-          begin: Alignment.centerLeft,
-          end: Alignment.centerRight,
-        ),
-      ),
-      child: Row(children: [
-
-        // Driver avatar circle
-        Container(
-          width: 40,
-          height: 40,
-          decoration: BoxDecoration(
-              color: colour.kWhite.withOpacity(0.15),
-              shape: BoxShape.circle),
-          child: const Icon(Icons.person_rounded,
-              color: colour.kWhite, size: 20),
-        ),
-
-        const SizedBox(width: 10),
-
-        // Driver name + RTI No
-        // Driver name + RTI No
-        Expanded(
-          child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(master.DriverName ?? '-',
-                    style: GoogleFonts.lato(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 14,
-                        color: colour.kWhite),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis),
-                const SizedBox(height: 3),
-
-                // ✅ FIX HERE — Wrap Row children with Flexible
-                Row(children: [
-                  Icon(Icons.tag_rounded,
-                      size: 11, color: colour.kWhite.withOpacity(0.7)),
-                  const SizedBox(width: 3),
-                  Flexible(                          // ← Add Flexible
-                    child: Text(
-                      master.RTINoDisplay,
-                      overflow: TextOverflow.ellipsis, // ← Add ellipsis
-                      maxLines: 1,
-                      style: GoogleFonts.lato(
-                          fontSize: 12,
-                          color: colour.kWhite.withOpacity(0.85)),
-                    ),
-                  ),
-                ]),
-              ]),
-        ),
-
-        // PDF button
-        GestureDetector(
-          onTap: () => context.read<RTIDetailsBloc>().add(
-            RTIViewEvent(
-              id: master.Id,
-              rtiNo: master.RTINoDisplay ?? "",
-            ),
-          ),
-          child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-            decoration: BoxDecoration(
-              color: colour.kWhite.withOpacity(0.15),
-              borderRadius: BorderRadius.circular(8),
-              border: Border.all(
-                  color: colour.kWhite.withOpacity(0.25), width: 1),
-            ),
-            child: Row(mainAxisSize: MainAxisSize.min, children: [
-              Icon(Icons.picture_as_pdf_outlined,
-                  color: Colors.red.shade300, size: 16),
-              const SizedBox(width: 4),
-              Text("PDF",
-                  style: GoogleFonts.lato(
-                      color: colour.kWhite,
-                      fontSize: 11,
-                      fontWeight: FontWeight.bold)),
             ]),
           ),
-        ),
-
-        const SizedBox(width: 8),
-
-        // Date badge
-        Container(
-          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-          decoration: BoxDecoration(
-            color: colour.kWhite.withOpacity(0.18),
-            borderRadius: BorderRadius.circular(20),
-            border: Border.all(
-                color: colour.kWhite.withOpacity(0.25), width: 1),
-          ),
-          child: Row(mainAxisSize: MainAxisSize.min, children: [
-            Icon(Icons.calendar_today_rounded,
-                size: 10, color: colour.kWhite.withOpacity(0.75)),
-            const SizedBox(width: 4),
-            Text(master.RTIDate.toString(),
-                style: GoogleFonts.lato(
-                    color: colour.kWhite,
-                    fontSize: 11,
-                    fontWeight: FontWeight.w600)),
-          ]),
-        ),
-      ]),
+        ]),
+      ),
     );
   }
 }
 
+// ── Details Table ─────────────────────────────────────────────────────────────
 class _DetailsTable extends StatelessWidget {
   final List<RTIDetailsViewModel> details;
   const _DetailsTable({required this.details});
@@ -689,7 +834,6 @@ class _DetailsTable extends StatelessWidget {
             dataRowMaxHeight: 48,
             horizontalMargin: 12,
             columnSpacing: 16,
-            // ✅ headingTextStyle handles all header styling — no custom widget needed
             headingTextStyle: GoogleFonts.lato(
                 fontWeight: FontWeight.bold,
                 color: AppTokens.brandGradientStartDark,
@@ -700,7 +844,6 @@ class _DetailsTable extends StatelessWidget {
               horizontalInside: BorderSide(
                   color: AppTokens.brandLight, width: 1),
             ),
-            // ✅ Plain Text only — no Row, no Icon, no ConstrainedBox
             columns: const [
               DataColumn(label: Text("Job No")),
               DataColumn(label: Text("Job Date")),
@@ -735,5 +878,4 @@ class _DetailsTable extends StatelessWidget {
       ),
     );
   }
-// ✅ _colLabel method completely removed — was the root cause
 }

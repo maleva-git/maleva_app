@@ -10,6 +10,21 @@ import '../bloc/salesorder_state.dart';
 import '../../../../../../core/colors/colors.dart' as colors;
 
 
+/// Indian comma-separated number format e.g. 5,46,789
+String _indFmt(dynamic raw) {
+  final n = double.tryParse(raw?.toString() ?? '0') ?? 0;
+  final s = n.toStringAsFixed(0);
+  if (s.length <= 3) return s;
+  final last3 = s.substring(s.length - 3);
+  final rest = s.substring(0, s.length - 3);
+  final buf = StringBuffer();
+  for (int i = 0; i < rest.length; i++) {
+    if (i > 0 && (rest.length - i) % 2 == 0) buf.write(',');
+    buf.write(rest[i]);
+  }
+  return '${buf.toString()},$last3';
+}
+
 class SalesOrderTab extends StatefulWidget {
   const SalesOrderTab({super.key});
 
@@ -20,10 +35,6 @@ class _SalesOrderTabState extends State<SalesOrderTab> {
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      context.read<SalesOrderBloc>().add(LoadInvoiceByType(0));
-    });
-
   }
   Future<void> _onRefresh() async {
     context.read<SalesOrderBloc>().add(RefreshSalesOrder());
@@ -262,7 +273,7 @@ class _SalesOrderTabState extends State<SalesOrderTab> {
               child: _OverviewCard(
                 label: 'MONTHLY',
                 count: monthly,
-                sub: '$monthAmt',
+                sub: _indFmt(monthAmt),
                 subLabel: 'Invoices',
                 subColor: Colors.blue,
                 subIcon: Icons.receipt,
@@ -274,7 +285,7 @@ class _SalesOrderTabState extends State<SalesOrderTab> {
               child: _OverviewCard(
                 label: 'WEEKLY',
                 count: weekly,
-                sub: '$weekAmt',
+                sub: _indFmt(weekAmt),
                 subLabel: 'This week',
                 subColor: Colors.purple,
                 subIcon: Icons.calendar_today,
@@ -290,7 +301,7 @@ class _SalesOrderTabState extends State<SalesOrderTab> {
               child: _OverviewCard(
                 label: 'YESTERDAY',
                 count: yesterday,
-                sub: '$yestAmt',
+                sub: _indFmt(yestAmt),
                 subLabel: 'Done',
                 subColor: Colors.green,
                 subIcon: Icons.check_circle,
@@ -302,7 +313,7 @@ class _SalesOrderTabState extends State<SalesOrderTab> {
               child: _OverviewCard(
                 label: 'TODAY',
                 count: today,
-                sub: todayAmt == '0' ? 'No entries yet' : '$todayAmt',
+                sub: todayAmt == '0' ? 'No entries yet' : _indFmt(todayAmt),
                 subLabel: 'Pending',
                 subColor: Colors.orange,
                 subIcon: null,
@@ -406,17 +417,24 @@ class _SalesOrderTabState extends State<SalesOrderTab> {
     ];
     final dotColor = dotColors[index % dotColors.length];
 
-    // format amount compactly e.g. RM5.49L
+    // format amount with plain comma-separated numbers e.g. 1,00,000
     String fmtAmount(double v) {
-      if (v >= 100000) return '${(v / 100000).toStringAsFixed(2)}L';
-      if (v >= 1000) return '${(v / 1000).toStringAsFixed(1)}K';
-      return '${v.toStringAsFixed(0)}';
+      final s = v.toStringAsFixed(0);
+      if (s.length <= 3) return s;
+      final last3 = s.substring(s.length - 3);
+      final rest = s.substring(0, s.length - 3);
+      final buf = StringBuffer();
+      for (int i = 0; i < rest.length; i++) {
+        if (i > 0 && (rest.length - i) % 2 == 0) buf.write(',');
+        buf.write(rest[i]);
+      }
+      return '${buf.toString()},$last3';
     }
 
     return InkWell(
       borderRadius: BorderRadius.circular(14),
       onTap: () =>
-          context.read<SalesOrderBloc>().add(LoadEmployeeInvData(index + 3)),
+          context.read<SalesOrderBloc>().add(LoadEmployeeInvDatas(index + 3)),
       child: Container(
         margin: EdgeInsets.only(bottom: isTablet ? 10 : 10),
         padding: EdgeInsets.symmetric(
@@ -440,7 +458,7 @@ class _SalesOrderTabState extends State<SalesOrderTab> {
             ),
             const SizedBox(width: 10),
             SizedBox(
-              width: isTablet ? 72 : 60,
+              width: isTablet ? 72 : 56,
               child: Text(month,
                   style: TextStyle(
                       color: const Color(0xFF1A2340),
@@ -461,17 +479,22 @@ class _SalesOrderTabState extends State<SalesOrderTab> {
             ),
             const SizedBox(width: 12),
             Row(
+              mainAxisSize: MainAxisSize.min,
               children: [
-                Text(fmtAmount(current),
-                    style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: isTablet ? 13 : 12,
-                        color: const Color(0xFF1A2340))),
-                const SizedBox(width: 6),
+                Text(
+                  fmtAmount(current),
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: isTablet ? 12 : 11,
+                    color: const Color(0xFF1A2340),
+                  ),
+                ),
+                const SizedBox(width: 4),
                 Icon(
-                    isGrowth ? Icons.arrow_upward : Icons.arrow_downward,
-                    size: isTablet ? 14 : 12,
-                    color: isGrowth ? Colors.green : Colors.red),
+                  isGrowth ? Icons.arrow_upward : Icons.arrow_downward,
+                  size: isTablet ? 13 : 11,
+                  color: isGrowth ? Colors.green : Colors.red,
+                ),
               ],
             ),
           ],
@@ -921,12 +944,12 @@ class _RangeButtons extends StatelessWidget {
             text: "6 Months",
             selected: is6Months,
             onTap: () =>
-                context.read<SalesOrderBloc>().add(LoadMonthRange(6))),
+                context.read<SalesOrderBloc>().add(LoadMonthRanges(6))),
         _RangeBtn(
             text: "1 Year",
             selected: !is6Months,
             onTap: () =>
-                context.read<SalesOrderBloc>().add(LoadMonthRange(12))),
+                context.read<SalesOrderBloc>().add(LoadMonthRanges(12))),
       ]),
     );
   }
@@ -991,7 +1014,7 @@ class _SOTabBar extends StatelessWidget {
                 if (index == selectedIndex) return;
                 context
                     .read<SalesOrderBloc>()
-                    .add(LoadInvoiceByType(index + 1));
+                    .add(LoadInvoiceByTypes(index == 0 ? 0 : index + 1));
               },
               items: [
                 SalomonBottomBarItem(

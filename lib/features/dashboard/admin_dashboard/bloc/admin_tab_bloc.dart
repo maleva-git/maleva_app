@@ -5,7 +5,7 @@ import 'admin_tab_state.dart';
 
 class AdminTabBloc extends Bloc<AdminTabEvent, AdminTabState> {
   AdminTabBloc() : super(AdminTabState(index: 0)) {
-    on<TabChanged>((event, emit) {
+    on<AdminTabChanged>((event, emit) {
       emit(AdminTabState(index: event.index));
     });
   }

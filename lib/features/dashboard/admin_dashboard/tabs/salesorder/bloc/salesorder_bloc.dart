@@ -2,9 +2,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:bloc_concurrency/bloc_concurrency.dart';
 import 'package:intl/intl.dart';
 import 'package:maleva/core/utils/clsfunction.dart' as objfun;
-
-// Make sure to adjust this import path to match your folder structure
-
 import '../data/salesorder_repository.dart';
 import 'salesorder_event.dart';
 import 'salesorder_state.dart';
@@ -14,30 +11,25 @@ class SalesOrderBloc extends Bloc<SalesOrderEvent, SalesOrderState> {
   bool _isLoadingInvoice = false;
 
   SalesOrderBloc({required this.repository}) : super(InvoiceInitial()) {
-
-    on<LoadInvoiceByType>(
+    on<LoadInvoiceByTypes>(
           (event, emit) async {
         final sw = Stopwatch()..start();
 
         final newTabIndex = event.type == 0 ? 0 : event.type - 1;
 
-        // ── Same tab guard — InvoiceLoaded state-ல ──
         if (state is InvoiceLoaded) {
           final current = state as InvoiceLoaded;
           if (current.selectedTabIndex == newTabIndex) return;
         }
 
-        // ── Same tab guard — InvoiceTabSwitching state-லயும் ──
         if (state is InvoiceTabSwitching) {
           final switching = state as InvoiceTabSwitching;
           if (switching.targetTabIndex == newTabIndex) return;
         }
 
-        // ── In-flight guard — already API running-ஆ? ──
         if (_isLoadingInvoice) return;
         _isLoadingInvoice = true;
 
-        // ── Loading state emit ──
         if (state is InvoiceLoaded) {
           emit(InvoiceTabSwitching(
             previous: state as InvoiceLoaded,
@@ -113,13 +105,10 @@ class SalesOrderBloc extends Bloc<SalesOrderEvent, SalesOrderState> {
           _isLoadingInvoice = false;
         }
       },
-      transformer: droppable(),
+      transformer: sequential(),
     );
 
-    // ─────────────────────────────────────────────
-    // MONTH RANGE — local only, no API
-    // ─────────────────────────────────────────────
-    on<LoadMonthRange>((event, emit) {
+    on<LoadMonthRanges>((event, emit) {
       if (state is! InvoiceLoaded) return;
       final s = state as InvoiceLoaded;
 
@@ -138,9 +127,6 @@ class SalesOrderBloc extends Bloc<SalesOrderEvent, SalesOrderState> {
       ));
     });
 
-    // ─────────────────────────────────────────────
-    // WAITING BILLS
-    // ─────────────────────────────────────────────
     on<LoadWaitingBills>(
           (event, emit) async {
         if (state is! InvoiceLoaded) return;
@@ -162,7 +148,6 @@ class SalesOrderBloc extends Bloc<SalesOrderEvent, SalesOrderState> {
             'Fromdate': fromdate,
           };
 
-          // ✅ REFACTORED: Using the injected repository
           final resultData = await repository.fetchWaitingBills(master);
 
           emit(current.copyWith(
@@ -178,16 +163,13 @@ class SalesOrderBloc extends Bloc<SalesOrderEvent, SalesOrderState> {
       transformer: droppable(),
     );
 
-    // ─────────────────────────────────────────────
-    // EMPLOYEE DATA
-    // ─────────────────────────────────────────────
-    on<LoadEmployeeInvData>(
+    on<LoadEmployeeInvDatas>(
           (event, emit) async {
         if (state is! InvoiceLoaded) return;
         final current = state as InvoiceLoaded;
 
         try {
-          // ✅ REFACTORED: Using the injected repository
+
           final resultData = await repository.fetchEmployeeInvData(
               event.type,
               objfun.Comid
@@ -202,9 +184,6 @@ class SalesOrderBloc extends Bloc<SalesOrderEvent, SalesOrderState> {
       transformer: droppable(),
     );
 
-    // ─────────────────────────────────────────────
-    // TAB CHANGED (local only)
-    // ─────────────────────────────────────────────
     on<TabChanged>((event, emit) {
       if (state is! InvoiceLoaded) return;
       final current = state as InvoiceLoaded;
@@ -216,9 +195,6 @@ class SalesOrderBloc extends Bloc<SalesOrderEvent, SalesOrderState> {
       ));
     });
 
-    // ─────────────────────────────────────────────
-    // FORCE REFRESH
-    // ─────────────────────────────────────────────
     on<RefreshSalesOrder>((event, emit) async {
       _isLoadingInvoice = false; // guard release
 
@@ -229,14 +205,15 @@ class SalesOrderBloc extends Bloc<SalesOrderEvent, SalesOrderState> {
       };
 
       if (previousLoaded != null) {
-        add(LoadInvoiceByType(previousLoaded.selectedTabIndex + 1 == 1
+        add(LoadInvoiceByTypes(previousLoaded.selectedTabIndex + 1 == 1
             ? 0
             : previousLoaded.selectedTabIndex + 1));
       } else {
         emit(InvoiceLoading());
-        add(LoadInvoiceByType(0));
+        add(LoadInvoiceByTypes(0));
       }
     });
+
   }
 
   (List<String>, List<dynamic>) _buildMonthData(

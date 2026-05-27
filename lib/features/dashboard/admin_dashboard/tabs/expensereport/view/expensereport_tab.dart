@@ -2,14 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
-
-// Make sure this path is correct for your project's injection file
 import '../../../../../../core/di/injection.dart';
 import '../../../../../../core/theme/tokens.dart';
-
-import 'package:maleva/core/utils/clsfunction.dart' as objfun;
 import 'package:maleva/core/colors/colors.dart' as colour;
-
 import 'package:maleva/features/dashboard/admin_dashboard/tabs/expensereport/bloc/expensereport_bloc.dart';
 import 'package:maleva/features/dashboard/admin_dashboard/tabs/expensereport/bloc/expensereport_event.dart';
 import 'package:maleva/features/dashboard/admin_dashboard/tabs/expensereport/bloc/expensereport_state.dart';
@@ -20,9 +15,8 @@ class ExpenseReportPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      // ✅ Use sl (GetIt) to create the Bloc. It automatically injects the repository.
       create: (_) => sl<ExpenseReportBloc>()
-        ..add(const LoadExpenseReportEvent()), // ✅ New Event Name (Handles default dates internally)
+        ..add(const LoadExpenseReportEvent()),
       child: const ExpenseReportView(),
     );
   }
@@ -36,9 +30,9 @@ class ExpenseReportView extends StatelessWidget {
   Widget build(BuildContext context) {
     final isTablet = MediaQuery.of(context).size.width >= 600;
 
-    return BlocConsumer<ExpenseReportBloc, ExpenseReportState>( // ✅ New State Name
+    return BlocConsumer<ExpenseReportBloc, ExpenseReportState>(
       listener: (context, state) {
-        if (state.status == ExpenseReportStatus.error) { // ✅ New Enum Name
+        if (state.status == ExpenseReportStatus.error) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text(state.errorMessage,

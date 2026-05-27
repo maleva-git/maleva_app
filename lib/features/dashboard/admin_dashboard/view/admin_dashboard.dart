@@ -3,6 +3,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 import 'package:maleva/features/dashboard/admin_dashboard/tabs/salesorder/bloc/salesorder_bloc.dart';
+import 'package:maleva/features/dashboard/admin_dashboard/tabs/salesorder/bloc/salesorder_event.dart';
 import '../../../../core/di/injection.dart';
 import '../../../common_updates/blocs/sales/sales_bloc.dart';
 import '../../../common_updates/blocs/truck/truck_bloc.dart';
@@ -104,7 +105,7 @@ class _AdminDashboardState extends State<NewAdminDashboard> with SingleTickerPro
 
   void _onTabChanged(){
     final index = _tabController.index;
-    context.read<AdminTabBloc>().add(TabChanged(index));
+    context.read<AdminTabBloc>().add(AdminTabChanged(index));
   }
   @override
   void dispose() {
@@ -135,7 +136,8 @@ class _AdminDashboardState extends State<NewAdminDashboard> with SingleTickerPro
               child: const InvoiceTab(),
             ),
             BlocProvider(
-              create: (_) =>sl<SalesOrderBloc>(),
+              create: (_) => sl<SalesOrderBloc>()
+                ..add(LoadInvoiceByTypes(1)), // ✅ fires on page open
               child: const SalesOrderTab(),
             ),
             BlocProvider(
@@ -155,8 +157,8 @@ class _AdminDashboardState extends State<NewAdminDashboard> with SingleTickerPro
               child: const ExpenseReportView(),
             ),
             BlocProvider(
-              // Pass the context into sl() using param1
-              create: (context) => sl<VesselBloc>(param1: context),
+              create: (context) => sl<VesselBloc>()
+                ..add(const LoadVesselDataEvent(type: 0)),
               child: VesselReportPage(),
             ),
             BlocProvider(
@@ -166,29 +168,29 @@ class _AdminDashboardState extends State<NewAdminDashboard> with SingleTickerPro
             ),
             BlocProvider(
               create: (context) => sl<TruckDetailsBloc>()..add(const LoadTruckDetailsEvent()),
-              child: const TruckDetailsReportPage(), // Make sure to add a BlocListener inside here if you want to show snackbars for TruckErrorState!
+              child: const TruckDetailsReportPage(),
             ),
             BlocProvider(
             create: (context) => sl<DriverBloc>()..add(const LoadDriverEvent()),
-            child: const DriverDetailsView(), // Remember to add a BlocListener here if you want to show errors to the user!
+            child: const DriverDetailsView(),
             ),
             BlocProvider(
             create: (context) => sl<SpeedingBloc>()..add(LoadSpeedingReport()),
-            child: const SpeedingScreen(), // Add a BlocListener here to show SnackBars for SpeedingError if needed!
+            child: const SpeedingScreen(),
             ),
 
             BlocProvider(
             create: (context) => sl<FuelFillingBloc>()..add(LoadFuelFillingReport()),
-            child: const FuelFillingPage(), // Add a BlocListener here to show SnackBars for FuelFillingError if needed!
+            child: const FuelFillingPage(),
             ),
 
             BlocProvider(
             create: (context) => sl<EngineHoursBloc>()..add(LoadEngineHoursReport()),
-            child: const EngineHoursPage(), // Add a BlocListener here to show SnackBars for EngineHoursError if needed!
+            child: const EngineHoursPage(),
             ),
             BlocProvider(
             create: (context) => sl<BocBloc>()..add(LoadBocReport()),
-            child: const BocPage(), // Remember to add a BlocListener here to show SnackBars for BocError if needed!
+            child: const BocPage(),
             ),
             BlocProvider(
               create: (context) => sl<EmailBloc>()..add(const LoadEmployeesEvent()),

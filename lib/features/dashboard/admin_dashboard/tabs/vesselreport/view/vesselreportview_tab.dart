@@ -10,30 +10,25 @@ import '../bloc/vesselreport_event.dart';
 import '../bloc/vesselreport_state.dart';
 import 'package:maleva/core/colors/colors.dart' as colour;
 
-// ─── Page ──────────────────────────────────────────────────────────────────────
+// VesselReportPage — REMOVE BlocProvider from here
 class VesselReportPage extends StatelessWidget {
   const VesselReportPage({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return
-      BlocProvider(
-        create: (context) => sl<VesselBloc>(), // ✅ Clean initialization
-        child: BlocListener<VesselBloc, VesselState>(
-          listener: (context, state) {
-            // ✅ The UI handles showing the error, not the BLoC!
-            if (state is VesselErrorState) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text(state.errorMessage),
-                  backgroundColor: Colors.red,
-                ),
-              );
-            }
-          },
-          child: const _VesselReportView(), // Your actual UI widget
-        ),
-      );
+    return BlocListener<VesselBloc, VesselState>( // ✅ No BlocProvider here
+      listener: (context, state) {
+        if (state is VesselErrorState) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(state.errorMessage),
+              backgroundColor: Colors.red,
+            ),
+          );
+        }
+      },
+      child: const _VesselReportView(),
+    );
   }
 }
 

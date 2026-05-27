@@ -7,7 +7,6 @@ import 'vesselreport_event.dart';
 import 'vesselreport_state.dart';
 
 class VesselBloc extends Bloc<VesselEvent, VesselState> {
-  // ❌ REMOVED: final BuildContext context;
   final VesselReportRepository repository;
 
   VesselBloc({required this.repository}) : super(const VesselInitial()) {

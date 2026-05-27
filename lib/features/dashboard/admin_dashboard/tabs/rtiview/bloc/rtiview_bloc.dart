@@ -8,7 +8,7 @@ import 'rtiview_event.dart';
 import 'rtiview_state.dart';
 
 class RTIDetailsBloc extends Bloc<RTIDetailsEvent, RTIDetailsState> {
-  final RTIViewRepository repository; // ✅ Injected Repository
+  final RTIViewRepository repository;
 
   RTIDetailsBloc({required this.repository})
       : super(RTIDetailsLoaded(
@@ -48,16 +48,14 @@ class RTIDetailsBloc extends Bloc<RTIDetailsEvent, RTIDetailsState> {
 
   Future<void> _onRTIView(RTIViewEvent event, Emitter<RTIDetailsState> emit) async {
     if (state is! RTIDetailsLoaded) return;
-    final currentState = _s;
+    final currentState = _s; // snapshot before any emit
 
-    emit(currentState.copyWith(isLoading: true));
-
-    String currentRtiNo = event.rtiNo.isEmpty ? "DriverRTI" : event.rtiNo;
+    final String currentRtiNo =
+    event.rtiNo.isEmpty ? "DriverRTI" : event.rtiNo;
 
     try {
       final comId = objfun.storagenew.getInt('Comid') ?? 0;
 
-      // ✅ REFACTORED: Call the repository
       final pdfUrl = await repository.fetchRTIPdfUrl(
         soId: event.id,
         rtiNo: currentRtiNo,
@@ -65,7 +63,7 @@ class RTIDetailsBloc extends Bloc<RTIDetailsEvent, RTIDetailsState> {
       );
 
       if (pdfUrl != null && pdfUrl.isNotEmpty) {
-        // Tell UI to launch it
+        // ✅ Emit success — listener in UI will open the PDF
         emit(RTIPdfLaunchSuccess(pdfUrl));
       } else {
         emit(const RTIActionError("Failed to load PDF."));
@@ -73,8 +71,9 @@ class RTIDetailsBloc extends Bloc<RTIDetailsEvent, RTIDetailsState> {
     } catch (err) {
       emit(RTIActionError(err.toString()));
     } finally {
-      // Re-emit the loaded list so the UI restores itself!
-      emit(currentState.copyWith(isLoading: false));
+      // ✅ Always restore the loaded list state so UI stays intact.
+      // No isLoading wrapping — the loading dialog in _openPdf handles feedback.
+      emit(currentState);
     }
   }
 
@@ -84,30 +83,36 @@ class RTIDetailsBloc extends Bloc<RTIDetailsEvent, RTIDetailsState> {
     try {
       final comId = objfun.storagenew.getInt('Comid') ?? 0;
       final fromStr = DateFormat('yyyy-MM-dd').format(s.fromDate);
-      final toStr = DateFormat('yyyy-MM-dd').format(s.toDate);
+      final toStr   = DateFormat('yyyy-MM-dd').format(s.toDate);
 
-      // ✅ REFACTORED: Call the repository
       final resultData = await repository.fetchRTIRecords(
-          comId: comId,
-          fromDate: fromStr,
-          toDate: toStr
+        comId:    comId,
+        fromDate: fromStr,
+        toDate:   toStr,
       );
 
-      List<RTIMasterViewModel> masters = [];
+      List<RTIMasterViewModel>  masters = [];
       List<RTIDetailsViewModel> details = [];
 
-      if (resultData != null && resultData is List && resultData.isNotEmpty && resultData[0] != null) {
+      if (resultData != null &&
+          resultData is List &&
+          resultData.isNotEmpty &&
+          resultData[0] != null) {
         final data = resultData[0];
-        masters = (data["salemaster"] as List).map((e) => RTIMasterViewModel.fromJson(e as Map<String, dynamic>)).toList();
-        details = (data["saledetails"] as List).map((e) => RTIDetailsViewModel.fromJson(e as Map<String, dynamic>)).toList();
+        masters = (data["salemaster"] as List)
+            .map((e) => RTIMasterViewModel.fromJson(e as Map<String, dynamic>))
+            .toList();
+        details = (data["saledetails"] as List)
+            .map((e) => RTIDetailsViewModel.fromJson(e as Map<String, dynamic>))
+            .toList();
       }
 
       emit(s.copyWith(masters: masters, details: details, isLoading: false));
     } catch (err) {
       emit(RTIDetailsError(
-        message: err.toString(),
+        message:  err.toString(),
         fromDate: s.fromDate,
-        toDate: s.toDate,
+        toDate:   s.toDate,
       ));
     }
   }
