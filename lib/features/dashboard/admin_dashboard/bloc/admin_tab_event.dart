@@ -1,7 +1,7 @@
 // admin_tab_event.dart
 abstract class AdminTabEvent {}
 
-class TabChanged extends AdminTabEvent {
+class AdminTabChanged extends AdminTabEvent {
   final int index;
-  TabChanged(this.index);
+  AdminTabChanged(this.index);
 }

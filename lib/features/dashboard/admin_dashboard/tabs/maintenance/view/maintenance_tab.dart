@@ -10,8 +10,6 @@ import '../bloc/maintenance_event.dart';
 import '../bloc/maintenance_state.dart';
 import 'package:maleva/core/colors/colors.dart' as colour;
 
-
-
 const double kTabletBreak = 600;
 
 class MaintenanceDashboardWidget extends StatelessWidget {
@@ -27,7 +25,6 @@ class MaintenanceDashboardWidget extends StatelessWidget {
   }
 }
 
-// ─── View ─────────────────────────────────────────────────────────────────────
 class _MaintenanceView extends StatelessWidget {
   const _MaintenanceView();
 
@@ -61,7 +58,6 @@ class _MaintenanceView extends StatelessWidget {
   }
 }
 
-// ─── Body ─────────────────────────────────────────────────────────────────────
 class _MaintenanceBody extends StatelessWidget {
   final MaintenanceLoaded state;
   final bool isTablet;
@@ -85,7 +81,6 @@ class _MaintenanceBody extends StatelessWidget {
         children: [
           const SizedBox(height: 7),
 
-          // ── Month title ─────────────────────────────────────────────
           Center(
             child: Text(
               '${state.currentMonthName} Sales',

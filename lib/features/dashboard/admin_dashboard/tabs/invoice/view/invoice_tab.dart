@@ -27,6 +27,21 @@ import '../bloc/invoice_state.dart';
 // ══════════════════════════════════════════════════════════════
 // ENTRY — just wires DI, no business logic here
 // ══════════════════════════════════════════════════════════════
+/// Indian comma-separated number format e.g. 5,46,789
+String _indFmt(dynamic raw) {
+  final n = double.tryParse(raw?.toString() ?? '0') ?? 0;
+  final s = n.toStringAsFixed(0);
+  if (s.length <= 3) return s;
+  final last3 = s.substring(s.length - 3);
+  final rest = s.substring(0, s.length - 3);
+  final buf = StringBuffer();
+  for (int i = 0; i < rest.length; i++) {
+    if (i > 0 && (rest.length - i) % 2 == 0) buf.write(',');
+    buf.write(rest[i]);
+  }
+  return '${buf.toString()},$last3';
+}
+
 class InvoiceTab extends StatelessWidget {
   const InvoiceTab({super.key});
 
@@ -780,7 +795,7 @@ class _OverviewSection extends StatelessWidget {
             child: _OverviewCard(
               label: 'MONTHLY',
               count: data['MonthSales']?.toString() ?? '0',
-              amount: '${data['MonthAmount'] ?? '0'}',
+              amount: _indFmt(data['MonthAmount']),
               badgeLabel: 'Invoices',
               badgeColor: colors.kOrange,
               badgeIcon: Icons.circle,
@@ -790,7 +805,7 @@ class _OverviewSection extends StatelessWidget {
             child: _OverviewCard(
               label: 'WEEKLY',
               count: data['WeekSales']?.toString() ?? '0',
-              amount: '${data['WeekAmount'] ?? '0'}',
+              amount: _indFmt(data['WeekAmount']),
               badgeLabel: 'This week',
               badgeColor: AppTokens.planCobalt,
               badgeIcon: Icons.calendar_today,
@@ -802,7 +817,7 @@ class _OverviewSection extends StatelessWidget {
             child: _OverviewCard(
               label: 'YESTERDAY',
               count: data['YesterdaySales']?.toString() ?? '0',
-              amount: '${data['YesterdayAmount'] ?? '0'}',
+              amount: _indFmt(data['YesterdayAmount']),
               badgeLabel: 'Done',
               badgeColor: AppTokens.statusSuccess,
               badgeIcon: Icons.check,
@@ -814,7 +829,7 @@ class _OverviewSection extends StatelessWidget {
               count: data['TodaySales']?.toString() ?? '0',
               amount: data['TodaySales'] == '0' || data['TodaySales'] == null
                   ? 'No entries yet'
-                  : '${data['TodayAmount'] ?? '0'}',
+                  : _indFmt(data['TodayAmount']),
               badgeLabel: 'Pending',
               badgeColor: Colors.grey,
               badgeIcon: Icons.remove,
@@ -1152,24 +1167,24 @@ class _MonthBarItem extends StatelessWidget {
             ),
           ),
           const SizedBox(width: 12),
-          SizedBox(
-            width: isTablet ? 40 : 34,
-            child: Text(count,
-                textAlign: TextAlign.right,
-                style: GoogleFonts.lato(
-                    fontSize: isTablet ? 13 : 12,
-                    fontWeight: FontWeight.w800,
-                    color: AppTokens.textNavy)),
-          ),
-          const SizedBox(width: 10),
-          SizedBox(
-            width: isTablet ? 56 : 50,
-            child: Text(_shortAmount(current),
-                textAlign: TextAlign.right,
-                style: GoogleFonts.lato(
-                    fontSize: isTablet ? 12 : 11,
-                    fontWeight: FontWeight.w600,
-                    color: Colors.grey.shade600)),
+          // count + amount in same row, aligned right
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.end,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(_shortAmount(current),
+                  textAlign: TextAlign.right,
+                  style: GoogleFonts.lato(
+                      fontSize: isTablet ? 12 : 11,
+                      fontWeight: FontWeight.w700,
+                      color: AppTokens.textNavy)),
+              Text('$count orders',
+                  textAlign: TextAlign.right,
+                  style: GoogleFonts.lato(
+                      fontSize: isTablet ? 10 : 9,
+                      fontWeight: FontWeight.w500,
+                      color: Colors.grey.shade500)),
+            ],
           ),
         ]),
       ),
@@ -1177,10 +1192,17 @@ class _MonthBarItem extends StatelessWidget {
   }
 
   String _shortAmount(double val) {
-    if (val >= 10000000) return 'RM${(val / 10000000).toStringAsFixed(2)}Cr';
-    if (val >= 100000)   return 'RM${(val / 100000).toStringAsFixed(2)}L';
-    if (val >= 1000)     return 'RM${(val / 1000).toStringAsFixed(1)}K';
-    return 'RM${val.toStringAsFixed(0)}';
+    // Plain number with Indian comma format e.g. 1,40,000
+    final s = val.toStringAsFixed(0);
+    if (s.length <= 3) return s;
+    final last3 = s.substring(s.length - 3);
+    final rest = s.substring(0, s.length - 3);
+    final buf = StringBuffer();
+    for (int i = 0; i < rest.length; i++) {
+      if (i > 0 && (rest.length - i) % 2 == 0) buf.write(',');
+      buf.write(rest[i]);
+    }
+    return '${buf.toString()},$last3';
   }
 }
 
