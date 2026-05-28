@@ -143,7 +143,7 @@ class InvoiceBloc extends Bloc<InvoiceEvent, InvoiceState> {
       ) async {
     final s = _loadedState;
     if (s == null) return;
-
+    emit(s.copyWith(clearEmployeeData: true));
     try {
       final data = await _invoiceRepo.getEmployeeInvData(type: event.type);
       emit(s.copyWith(

@@ -9,8 +9,6 @@ import '../bloc/salesorder_event.dart';
 import '../bloc/salesorder_state.dart';
 import '../../../../../../core/colors/colors.dart' as colors;
 
-
-/// Indian comma-separated number format e.g. 5,46,789
 String _indFmt(dynamic raw) {
   final n = double.tryParse(raw?.toString() ?? '0') ?? 0;
   final s = n.toStringAsFixed(0);
@@ -31,11 +29,8 @@ class SalesOrderTab extends StatefulWidget {
   @override
   State<SalesOrderTab> createState() => _SalesOrderTabState();
 }
+
 class _SalesOrderTabState extends State<SalesOrderTab> {
-  @override
-  void initState() {
-    super.initState();
-  }
   Future<void> _onRefresh() async {
     context.read<SalesOrderBloc>().add(RefreshSalesOrder());
     await context
@@ -43,11 +38,13 @@ class _SalesOrderTabState extends State<SalesOrderTab> {
         .stream
         .firstWhere((s) => s is InvoiceLoaded || s is InvoiceError);
   }
+
   InvoiceLoaded? _resolveLoaded(SalesOrderState state) {
     if (state is InvoiceLoaded) return state;
     if (state is InvoiceTabSwitching) return state.previous;
     return null;
   }
+
   @override
   Widget build(BuildContext context) {
     final screenW = MediaQuery.of(context).size.width;
@@ -61,20 +58,34 @@ class _SalesOrderTabState extends State<SalesOrderTab> {
           if (prev is InvoiceTabSwitching && curr is InvoiceLoaded) return true;
           return prev != curr;
         },
+
+        // ✅ FIX: null→nonNull transition only — not "!= null on every build"
         listenWhen: (prev, curr) {
-          if (curr is InvoiceLoaded) {
-            return curr.showWaitingSheet || curr.employeeData != null;
-          }
-          return false;
+          if (curr is! InvoiceLoaded) return false;
+          if (prev is! InvoiceLoaded) return false;
+
+          // Sheet: false→true only
+          final sheetOpened = !prev.showWaitingSheet && curr.showWaitingSheet;
+
+          // Dialog: null→nonNull only (bloc always clears to null before fetch)
+          final employeeArrived =
+              prev.employeeData == null && curr.employeeData != null;
+
+          return sheetOpened || employeeArrived;
         },
+
         listener: (context, state) {
-          if (state is InvoiceLoaded && state.showWaitingSheet) {
+          if (state is! InvoiceLoaded) return;
+
+          if (state.showWaitingSheet) {
             showBillingBottomSheet(context, state.waitingBilling);
           }
-          if (state is InvoiceLoaded && state.employeeData != null) {
+
+          if (state.employeeData != null) {
             _showDialogEmpDetails(state.employeeData!);
           }
         },
+
         builder: (context, state) {
           if (state is InvoiceLoading) {
             return const Center(child: CircularProgressIndicator());
@@ -88,8 +99,9 @@ class _SalesOrderTabState extends State<SalesOrderTab> {
                   Text(state.message),
                   const SizedBox(height: 12),
                   ElevatedButton(
-                    onPressed: () =>
-                        context.read<SalesOrderBloc>().add(RefreshSalesOrder()),
+                    onPressed: () => context
+                        .read<SalesOrderBloc>()
+                        .add(RefreshSalesOrder()),
                     child: const Text("Retry"),
                   ),
                 ],
@@ -133,6 +145,7 @@ class _SalesOrderTabState extends State<SalesOrderTab> {
       ),
     );
   }
+
   Widget _buildTabletLayout(BuildContext context, InvoiceLoaded state,
       Map<String, dynamic> data, double screenW, int tabIndex) {
     return Padding(
@@ -158,7 +171,9 @@ class _SalesOrderTabState extends State<SalesOrderTab> {
                 ),
                 const SizedBox(height: 12),
                 _SOTabBar(
-                    selectedIndex: tabIndex, screenW: screenW, isTablet: true),
+                    selectedIndex: tabIndex,
+                    screenW: screenW,
+                    isTablet: true),
               ],
             ),
           ),
@@ -180,6 +195,7 @@ class _SalesOrderTabState extends State<SalesOrderTab> {
       ),
     );
   }
+
   Widget _buildMobileLayout(BuildContext context, InvoiceLoaded state,
       Map<String, dynamic> data, double screenW, int tabIndex) {
     return Column(
@@ -225,6 +241,7 @@ class _SalesOrderTabState extends State<SalesOrderTab> {
       ],
     );
   }
+
   Widget _buildOverviewSection(BuildContext context, InvoiceLoaded state,
       Map<String, dynamic> data) {
     return Column(
@@ -253,17 +270,18 @@ class _SalesOrderTabState extends State<SalesOrderTab> {
       ],
     );
   }
+
   Widget _buildOverviewGrid(BuildContext context, InvoiceLoaded state,
       Map<String, dynamic> data,
       {required bool isTablet}) {
-    final monthly = data["MonthSales"]?.toString() ?? "0";
-    final monthAmt = data["MonthAmount"]?.toString() ?? "0";
-    final weekly = data["WeekSales"]?.toString() ?? "0";
-    final weekAmt = data["WeekAmount"]?.toString() ?? "0";
+    final monthly   = data["MonthSales"]?.toString()     ?? "0";
+    final monthAmt  = data["MonthAmount"]?.toString()    ?? "0";
+    final weekly    = data["WeekSales"]?.toString()      ?? "0";
+    final weekAmt   = data["WeekAmount"]?.toString()     ?? "0";
     final yesterday = data["YesterdaySales"]?.toString() ?? "0";
-    final yestAmt = data["YesterdayAmount"]?.toString() ?? "0";
-    final today = data["TodaySales"]?.toString() ?? "0";
-    final todayAmt = data["TodayAmount"]?.toString() ?? "0";
+    final yestAmt   = data["YesterdayAmount"]?.toString() ?? "0";
+    final today     = data["TodaySales"]?.toString()     ?? "0";
+    final todayAmt  = data["TodayAmount"]?.toString()    ?? "0";
 
     return Column(
       children: [
@@ -278,6 +296,10 @@ class _SalesOrderTabState extends State<SalesOrderTab> {
                 subColor: Colors.blue,
                 subIcon: Icons.receipt,
                 isTablet: isTablet,
+                // ✅ Monthly → type 3
+                onTap: () => context
+                    .read<SalesOrderBloc>()
+                    .add(LoadEmployeeSalesData(3)),
               ),
             ),
             const SizedBox(width: 10),
@@ -290,6 +312,10 @@ class _SalesOrderTabState extends State<SalesOrderTab> {
                 subColor: Colors.purple,
                 subIcon: Icons.calendar_today,
                 isTablet: isTablet,
+                // ✅ Weekly → type 2
+                onTap: () => context
+                    .read<SalesOrderBloc>()
+                    .add(LoadEmployeeSalesData(2)),
               ),
             ),
           ],
@@ -306,6 +332,10 @@ class _SalesOrderTabState extends State<SalesOrderTab> {
                 subColor: Colors.green,
                 subIcon: Icons.check_circle,
                 isTablet: isTablet,
+                // ✅ Yesterday → type 1
+                onTap: () => context
+                    .read<SalesOrderBloc>()
+                    .add(LoadEmployeeSalesData(1)),
               ),
             ),
             const SizedBox(width: 10),
@@ -319,6 +349,10 @@ class _SalesOrderTabState extends State<SalesOrderTab> {
                 subIcon: null,
                 isTablet: isTablet,
                 isToday: true,
+                // ✅ Today → type 0
+                onTap: () => context
+                    .read<SalesOrderBloc>()
+                    .add(LoadEmployeeSalesData(0)),
               ),
             ),
           ],
@@ -326,6 +360,7 @@ class _SalesOrderTabState extends State<SalesOrderTab> {
       ],
     );
   }
+
   Widget _buildStatusRow(BuildContext context, InvoiceLoaded state,
       {required bool isTablet}) {
     return Row(
@@ -349,10 +384,9 @@ class _SalesOrderTabState extends State<SalesOrderTab> {
           child: _StatusCard(
             icon: Icons.check_box,
             iconColor: Colors.green,
-            count: (Map<String, dynamic>.from(
-                state.saleDataAll.isNotEmpty
-                    ? state.saleDataAll[0] as Map
-                    : {}))["MonthSales"]
+            count: (Map<String, dynamic>.from(state.saleDataAll.isNotEmpty
+                ? state.saleDataAll[0] as Map
+                : {}))["MonthSales"]
                 ?.toString() ??
                 "0",
             label: 'BILLED MONTH',
@@ -365,6 +399,7 @@ class _SalesOrderTabState extends State<SalesOrderTab> {
       ],
     );
   }
+
   Widget _buildTrendHeader(InvoiceLoaded state, {required bool isTablet}) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -379,6 +414,7 @@ class _SalesOrderTabState extends State<SalesOrderTab> {
       ],
     );
   }
+
   Widget _buildMonthList(BuildContext context, InvoiceLoaded state,
       {required bool isTablet}) {
     return ListView.builder(
@@ -388,42 +424,36 @@ class _SalesOrderTabState extends State<SalesOrderTab> {
           _buildMonthItem(context, state, index, isTablet: isTablet),
     );
   }
+
   Widget _buildMonthItem(
       BuildContext context, InvoiceLoaded state, int index,
       {required bool isTablet}) {
-    final month = state.monthList[index];
-    final current =
-    (state.monthData[index]["SalesAmount"] as num).toDouble();
-    final prev = index == 0
+    final month   = state.monthList[index];
+    final current = (state.monthData[index]["SalesAmount"] as num).toDouble();
+    final prev    = index == 0
         ? current
         : (state.monthData[index - 1]["SalesAmount"] as num).toDouble();
-    final diff = prev == 0 ? 0.0 : ((current - prev) / prev) * 100;
+    final diff     = prev == 0 ? 0.0 : ((current - prev) / prev) * 100;
     final isGrowth = diff >= 0;
 
-    // find max for bar width normalisation
     final maxVal = state.monthData
         .map((e) => (e["SalesAmount"] as num).toDouble())
         .fold(0.0, (a, b) => a > b ? a : b);
-    final barFraction = maxVal == 0 ? 0.0 : (current / maxVal).clamp(0.0, 1.0);
+    final barFraction =
+    maxVal == 0 ? 0.0 : (current / maxVal).clamp(0.0, 1.0);
 
-    // dot color cycling
     const dotColors = [
-      Color(0xFF4A6FE3),
-      Color(0xFF7B61FF),
-      Color(0xFF00C9A7),
-      Color(0xFFFF6B6B),
-      Color(0xFFFFB300),
-      Color(0xFF26C6DA),
+      Color(0xFF4A6FE3), Color(0xFF7B61FF), Color(0xFF00C9A7),
+      Color(0xFFFF6B6B), Color(0xFFFFB300), Color(0xFF26C6DA),
     ];
     final dotColor = dotColors[index % dotColors.length];
 
-    // format amount with plain comma-separated numbers e.g. 1,00,000
     String fmtAmount(double v) {
       final s = v.toStringAsFixed(0);
       if (s.length <= 3) return s;
       final last3 = s.substring(s.length - 3);
-      final rest = s.substring(0, s.length - 3);
-      final buf = StringBuffer();
+      final rest  = s.substring(0, s.length - 3);
+      final buf   = StringBuffer();
       for (int i = 0; i < rest.length; i++) {
         if (i > 0 && (rest.length - i) % 2 == 0) buf.write(',');
         buf.write(rest[i]);
@@ -433,12 +463,14 @@ class _SalesOrderTabState extends State<SalesOrderTab> {
 
     return InkWell(
       borderRadius: BorderRadius.circular(14),
-      onTap: () =>
-          context.read<SalesOrderBloc>().add(LoadEmployeeInvDatas(index + 3)),
+      onTap: () => context
+          .read<SalesOrderBloc>()
+          .add(LoadEmployeeInvDatas(index + 3)),
       child: Container(
-        margin: EdgeInsets.only(bottom: isTablet ? 10 : 10),
+        margin: const EdgeInsets.only(bottom: 10),
         padding: EdgeInsets.symmetric(
-            horizontal: isTablet ? 16 : 14, vertical: isTablet ? 14 : 12),
+            horizontal: isTablet ? 16 : 14,
+            vertical: isTablet ? 14 : 12),
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(14),
@@ -454,7 +486,8 @@ class _SalesOrderTabState extends State<SalesOrderTab> {
             Container(
               width: 8,
               height: 8,
-              decoration: BoxDecoration(color: dotColor, shape: BoxShape.circle),
+              decoration:
+              BoxDecoration(color: dotColor, shape: BoxShape.circle),
             ),
             const SizedBox(width: 10),
             SizedBox(
@@ -481,14 +514,11 @@ class _SalesOrderTabState extends State<SalesOrderTab> {
             Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Text(
-                  fmtAmount(current),
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: isTablet ? 12 : 11,
-                    color: const Color(0xFF1A2340),
-                  ),
-                ),
+                Text(fmtAmount(current),
+                    style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: isTablet ? 12 : 11,
+                        color: const Color(0xFF1A2340))),
                 const SizedBox(width: 4),
                 Icon(
                   isGrowth ? Icons.arrow_upward : Icons.arrow_downward,
@@ -502,16 +532,19 @@ class _SalesOrderTabState extends State<SalesOrderTab> {
       ),
     );
   }
+
   void _showDialogEmpDetails(List<dynamic> data) {
     showDialog(
       context: context,
       barrierDismissible: false,
       builder: (context) => Dialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        shape:
+        RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
         child: Container(
           padding: const EdgeInsets.all(20),
           decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(20), color: Colors.white),
+              borderRadius: BorderRadius.circular(20),
+              color: Colors.white),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
@@ -562,7 +595,8 @@ class _SalesOrderTabState extends State<SalesOrderTab> {
                                 size: 18, color: Color(0xFF4A6FE3)),
                             const SizedBox(width: 6),
                             Expanded(
-                              child: Text(emp["EmployeeName"].toString(),
+                              child: Text(
+                                  emp["EmployeeName"].toString(),
                                   style: const TextStyle(
                                       fontWeight: FontWeight.bold,
                                       fontSize: 14,
@@ -575,10 +609,6 @@ class _SalesOrderTabState extends State<SalesOrderTab> {
                             MainAxisAlignment.spaceBetween,
                             children: [
                               Row(children: [
-                                const Text("",
-                                    style: TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                        color: Colors.green)),
                                 const SizedBox(width: 4),
                                 Text(emp["Amount"].toString(),
                                     style: const TextStyle(
@@ -626,10 +656,97 @@ class _SalesOrderTabState extends State<SalesOrderTab> {
     );
   }
 }
+
+// ══════════════════════════════════════════════════════════════
+// OVERVIEW CARD  ← onTap added
+// ══════════════════════════════════════════════════════════════
+class _OverviewCard extends StatelessWidget {
+  final String label;
+  final String count;
+  final String sub;
+  final String subLabel;
+  final Color subColor;
+  final IconData? subIcon;
+  final bool isTablet;
+  final bool isToday;
+  final VoidCallback? onTap; // ✅ NEW
+
+  const _OverviewCard({
+    required this.label,
+    required this.count,
+    required this.sub,
+    required this.subLabel,
+    required this.subColor,
+    required this.subIcon,
+    required this.isTablet,
+    this.isToday = false,
+    this.onTap,             // ✅ NEW
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector( // ✅ NEW wrapper
+      onTap: onTap,
+      child: Container(
+        padding: EdgeInsets.all(isTablet ? 16 : 14),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(16),
+          boxShadow: const [
+            BoxShadow(
+                color: Color(0x0A000000),
+                blurRadius: 8,
+                offset: Offset(0, 2))
+          ],
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(label,
+                style: TextStyle(
+                    fontSize: isTablet ? 11 : 10,
+                    fontWeight: FontWeight.w700,
+                    letterSpacing: 0.8,
+                    color: const Color(0xFF8A94A6))),
+            SizedBox(height: isTablet ? 10 : 8),
+            Text(count,
+                style: TextStyle(
+                    fontSize: isTablet ? 28 : 26,
+                    fontWeight: FontWeight.bold,
+                    color: const Color(0xFF1A2340))),
+            SizedBox(height: isTablet ? 6 : 5),
+            Text(sub,
+                style: TextStyle(
+                    fontSize: isTablet ? 12 : 11,
+                    color: isToday && count == '0'
+                        ? const Color(0xFF8A94A6)
+                        : subColor,
+                    fontWeight: FontWeight.w500)),
+            const SizedBox(height: 4),
+            Row(children: [
+              if (subIcon != null) ...[
+                Icon(subIcon, size: 12, color: subColor),
+                const SizedBox(width: 4),
+              ],
+              Text(subLabel,
+                  style: TextStyle(
+                      fontSize: 11,
+                      color: subColor,
+                      fontWeight: FontWeight.w500)),
+            ]),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+// ══════════════════════════════════════════════════════════════
+// REMAINING WIDGETS — unchanged
+// ══════════════════════════════════════════════════════════════
 class _HeroHeaderCard extends StatelessWidget {
   final InvoiceLoaded state;
   final Map<String, dynamic> data;
-
   const _HeroHeaderCard({required this.state, required this.data});
 
   @override
@@ -637,22 +754,15 @@ class _HeroHeaderCard extends StatelessWidget {
     final monthAmt =
         double.tryParse(data["MonthAmount"]?.toString() ?? "0") ?? 0;
     final monthSales = data["MonthSales"]?.toString() ?? "0";
-    final weekSales = data["WeekSales"]?.toString() ?? "0";
-    final waiting = state.waitingBilling.length;
+    final weekSales  = data["WeekSales"]?.toString()  ?? "0";
+    final waiting    = state.waitingBilling.length;
 
-    String fmtLarge(double v) {
-      if (v >= 100000)
-        return '${(v / 100000).toStringAsFixed(2).replaceAllMapped(RegExp(r'\B(?=(\d{2})+(?!\d))'), (m) => ',')}L';
-      return '${v.toStringAsFixed(0)}';
-    }
-
-    // formatted as RM5,49,839
     String fmtIndian(double v) {
       final s = v.toStringAsFixed(0);
-      if (s.length <= 3) return '$s';
+      if (s.length <= 3) return s;
       final last3 = s.substring(s.length - 3);
-      final rest = s.substring(0, s.length - 3);
-      final buf = StringBuffer();
+      final rest  = s.substring(0, s.length - 3);
+      final buf   = StringBuffer();
       for (int i = 0; i < rest.length; i++) {
         if (i > 0 && (rest.length - i) % 2 == 0) buf.write(',');
         buf.write(rest[i]);
@@ -661,34 +771,28 @@ class _HeroHeaderCard extends StatelessWidget {
     }
 
     return Container(
-      margin: const EdgeInsets.fromLTRB(0, 0, 0, 0),
       decoration: const BoxDecoration(
         gradient: LinearGradient(
-          colors: [AppTokens.invoiceHeaderStart,colors.kHeaderGradEnd],
+          colors: [AppTokens.invoiceHeaderStart, colors.kHeaderGradEnd],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
       ),
       child: Stack(
         children: [
-          // decorative circles
           Positioned(
-            right: -30,
-            top: -30,
+            right: -30, top: -30,
             child: Container(
-              width: 140,
-              height: 140,
+              width: 140, height: 140,
               decoration: BoxDecoration(
                   color: Colors.white.withOpacity(0.07),
                   shape: BoxShape.circle),
             ),
           ),
           Positioned(
-            right: 40,
-            bottom: -20,
+            right: 40, bottom: -20,
             child: Container(
-              width: 80,
-              height: 80,
+              width: 80, height: 80,
               decoration: BoxDecoration(
                   color: Colors.white.withOpacity(0.05),
                   shape: BoxShape.circle),
@@ -717,24 +821,20 @@ class _HeroHeaderCard extends StatelessWidget {
                     style: const TextStyle(
                         color: Colors.white70, fontSize: 12)),
                 const SizedBox(height: 14),
-                Wrap(
-                  spacing: 8,
-                  runSpacing: 8,
-                  children: [
-                    _HeaderChip(
-                        icon: Icons.receipt_long,
-                        label: '$weekSales this week',
-                        color: Colors.white.withOpacity(0.18)),
-                    _HeaderChip(
-                        icon: Icons.hourglass_empty,
-                        label: '$waiting waiting',
-                        color: Colors.white.withOpacity(0.18)),
-                    _HeaderChip(
-                        icon: Icons.check_circle_outline,
-                        label: '$monthSales billed',
-                        color: Colors.green.withOpacity(0.35)),
-                  ],
-                ),
+                Wrap(spacing: 8, runSpacing: 8, children: [
+                  _HeaderChip(
+                      icon: Icons.receipt_long,
+                      label: '$weekSales this week',
+                      color: Colors.white.withOpacity(0.18)),
+                  _HeaderChip(
+                      icon: Icons.hourglass_empty,
+                      label: '$waiting waiting',
+                      color: Colors.white.withOpacity(0.18)),
+                  _HeaderChip(
+                      icon: Icons.check_circle_outline,
+                      label: '$monthSales billed',
+                      color: Colors.green.withOpacity(0.35)),
+                ]),
               ],
             ),
           ),
@@ -743,6 +843,7 @@ class _HeroHeaderCard extends StatelessWidget {
     );
   }
 }
+
 class _HeaderChip extends StatelessWidget {
   final IconData icon;
   final String label;
@@ -754,96 +855,21 @@ class _HeaderChip extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-      decoration: BoxDecoration(
-          color: color, borderRadius: BorderRadius.circular(20)),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(icon, size: 13, color: Colors.white),
-          const SizedBox(width: 5),
-          Text(label,
-              style: const TextStyle(
-                  color: Colors.white,
-                  fontSize: 11,
-                  fontWeight: FontWeight.w600)),
-        ],
-      ),
+      decoration:
+      BoxDecoration(color: color, borderRadius: BorderRadius.circular(20)),
+      child: Row(mainAxisSize: MainAxisSize.min, children: [
+        Icon(icon, size: 13, color: Colors.white),
+        const SizedBox(width: 5),
+        Text(label,
+            style: const TextStyle(
+                color: Colors.white,
+                fontSize: 11,
+                fontWeight: FontWeight.w600)),
+      ]),
     );
   }
 }
-class _OverviewCard extends StatelessWidget {
-  final String label;
-  final String count;
-  final String sub;
-  final String subLabel;
-  final Color subColor;
-  final IconData? subIcon;
-  final bool isTablet;
-  final bool isToday;
 
-  const _OverviewCard({
-    required this.label,
-    required this.count,
-    required this.sub,
-    required this.subLabel,
-    required this.subColor,
-    required this.subIcon,
-    required this.isTablet,
-    this.isToday = false,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: EdgeInsets.all(isTablet ? 16 : 14),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: const [
-          BoxShadow(
-              color: Color(0x0A000000), blurRadius: 8, offset: Offset(0, 2))
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(label,
-              style: TextStyle(
-                  fontSize: isTablet ? 11 : 10,
-                  fontWeight: FontWeight.w700,
-                  letterSpacing: 0.8,
-                  color: const Color(0xFF8A94A6))),
-          SizedBox(height: isTablet ? 10 : 8),
-          Text(count,
-              style: TextStyle(
-                  fontSize: isTablet ? 28 : 26,
-                  fontWeight: FontWeight.bold,
-                  color: const Color(0xFF1A2340))),
-          SizedBox(height: isTablet ? 6 : 5),
-          Text(sub,
-              style: TextStyle(
-                  fontSize: isTablet ? 12 : 11,
-                  color: isToday && count == '0'
-                      ? const Color(0xFF8A94A6)
-                      : subColor,
-                  fontWeight: FontWeight.w500)),
-          const SizedBox(height: 4),
-          Row(children: [
-            if (subIcon != null) ...[
-              Icon(subIcon, size: 12, color: subColor),
-              const SizedBox(width: 4),
-            ],
-            Text(subLabel,
-                style: TextStyle(
-                    fontSize: 11,
-                    color: subColor,
-                    fontWeight: FontWeight.w500)),
-          ]),
-        ],
-      ),
-    );
-  }
-}
 class _StatusCard extends StatelessWidget {
   final IconData icon;
   final Color iconColor;
@@ -872,61 +898,50 @@ class _StatusCard extends StatelessWidget {
       child: Container(
         padding: EdgeInsets.all(isTablet ? 16 : 14),
         decoration: BoxDecoration(
-          color: bgColor,
-          borderRadius: BorderRadius.circular(16),
-        ),
+            color: bgColor, borderRadius: BorderRadius.circular(16)),
         child: Row(
           children: [
             Container(
               padding: const EdgeInsets.all(8),
               decoration: BoxDecoration(
-                  color: Colors.white, borderRadius: BorderRadius.circular(10)),
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(10)),
               child: Icon(icon, color: iconColor, size: 20),
             ),
             const SizedBox(width: 10),
-
-            // --- THE FIX IS HERE ---
-            // Wrapped the Column in an Expanded widget so it shrinks to fit
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisSize: MainAxisSize.min, // Keeps the column from expanding vertically
+                mainAxisSize: MainAxisSize.min,
                 children: [
                   GestureDetector(
                     onTap: onCountTap,
-                    child: Text(
-                      count,
-                      maxLines: 1, // Restrict to one line
-                      overflow: TextOverflow.ellipsis, // Add '...' if it overflows
+                    child: Text(count,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(
+                            fontSize: isTablet ? 22 : 20,
+                            fontWeight: FontWeight.bold,
+                            color: const Color(0xFF1A2340))),
+                  ),
+                  Text(label,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
                       style: TextStyle(
-                        fontSize: isTablet ? 22 : 20,
-                        fontWeight: FontWeight.bold,
-                        color: const Color(0xFF1A2340),
-                      ),
-                    ),
-                  ),
-                  Text(
-                    label,
-                    maxLines: 1, // Restrict to one line
-                    overflow: TextOverflow.ellipsis, // Add '...' if it overflows
-                    style: TextStyle(
-                      fontSize: isTablet ? 10 : 9,
-                      fontWeight: FontWeight.w700,
-                      letterSpacing: 0.7,
-                      color: const Color(0xFF8A94A6),
-                    ),
-                  ),
+                          fontSize: isTablet ? 10 : 9,
+                          fontWeight: FontWeight.w700,
+                          letterSpacing: 0.7,
+                          color: const Color(0xFF8A94A6))),
                 ],
               ),
             ),
-            // -----------------------
-
           ],
         ),
       ),
     );
   }
 }
+
 class _RangeButtons extends StatelessWidget {
   final bool is6Months;
   const _RangeButtons({required this.is6Months});
@@ -936,9 +951,8 @@ class _RangeButtons extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(3),
       decoration: BoxDecoration(
-        color: const Color(0xFFEEF2F7),
-        borderRadius: BorderRadius.circular(20),
-      ),
+          color: const Color(0xFFEEF2F7),
+          borderRadius: BorderRadius.circular(20)),
       child: Row(mainAxisSize: MainAxisSize.min, children: [
         _RangeBtn(
             text: "6 Months",
@@ -954,6 +968,7 @@ class _RangeButtons extends StatelessWidget {
     );
   }
 }
+
 class _RangeBtn extends StatelessWidget {
   final String text;
   final bool selected;
@@ -967,21 +982,24 @@ class _RangeBtn extends StatelessWidget {
       onTap: onTap,
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 200),
-        padding:
-        const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
         decoration: BoxDecoration(
-          color: selected ? AppTokens.invoiceHeaderStart : Colors.transparent,
+          color: selected
+              ? AppTokens.invoiceHeaderStart
+              : Colors.transparent,
           borderRadius: BorderRadius.circular(18),
         ),
         child: Text(text,
             style: TextStyle(
-                color: selected ? Colors.white : const Color(0xFF8A94A6),
+                color:
+                selected ? Colors.white : const Color(0xFF8A94A6),
                 fontWeight: FontWeight.w700,
                 fontSize: 12)),
       ),
     );
   }
 }
+
 class _SOTabBar extends StatelessWidget {
   final int selectedIndex;
   final double screenW;
@@ -1005,16 +1023,15 @@ class _SOTabBar extends StatelessWidget {
             elevation: 6,
             color: colors.AppColors.appBarColor,
             shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(isTablet ? 20 : 12)),
+                borderRadius:
+                BorderRadius.circular(isTablet ? 20 : 12)),
             child: SalomonBottomBar(
               duration: const Duration(milliseconds: 300),
               currentIndex: selectedIndex,
               onTap: (index) {
-                // ── Guard: ignore tap on already-selected tab ──
                 if (index == selectedIndex) return;
-                context
-                    .read<SalesOrderBloc>()
-                    .add(LoadInvoiceByTypes(index == 0 ? 0 : index + 1));
+                context.read<SalesOrderBloc>().add(
+                    LoadInvoiceByTypes(index + 1));
               },
               items: [
                 SalomonBottomBarItem(
@@ -1065,8 +1082,8 @@ class _SOTabBar extends StatelessWidget {
   }
 }
 
-
-void showBillingBottomSheet(BuildContext context, List<dynamic> billingData) {
+void showBillingBottomSheet(
+    BuildContext context, List<dynamic> billingData) {
   showModalBottomSheet(
     context: context,
     isScrollControlled: true,
@@ -1087,11 +1104,11 @@ void showBillingBottomSheet(BuildContext context, List<dynamic> billingData) {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text("Waiting for Billing Details",
-                      style: GoogleFonts.lato(fontSize: 18, fontWeight: FontWeight.bold)),
+                      style: GoogleFonts.lato(
+                          fontSize: 18, fontWeight: FontWeight.bold)),
                   IconButton(
-                    icon: const Icon(Icons.close),
-                    onPressed: () => Navigator.pop(context),
-                  ),
+                      icon: const Icon(Icons.close),
+                      onPressed: () => Navigator.pop(context)),
                 ],
               ),
             ),
@@ -1103,7 +1120,8 @@ void showBillingBottomSheet(BuildContext context, List<dynamic> billingData) {
                 itemBuilder: (context, index) {
                   final item = billingData[index];
                   return Container(
-                    margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                    margin: const EdgeInsets.symmetric(
+                        horizontal: 12, vertical: 8),
                     decoration: BoxDecoration(
                       color: Colors.white,
                       borderRadius: BorderRadius.circular(16),
@@ -1111,7 +1129,7 @@ void showBillingBottomSheet(BuildContext context, List<dynamic> billingData) {
                         BoxShadow(
                             color: Colors.grey.withOpacity(0.2),
                             blurRadius: 8,
-                            offset: const Offset(0, 4)),
+                            offset: const Offset(0, 4))
                       ],
                     ),
                     child: InkWell(
@@ -1120,40 +1138,50 @@ void showBillingBottomSheet(BuildContext context, List<dynamic> billingData) {
                         showDialog(
                           context: context,
                           builder: (context) => Dialog(
-                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                            shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(16)),
                             child: Container(
                               padding: const EdgeInsets.all(16),
                               decoration: BoxDecoration(
-                                  color:  Colors.white,
-                                  borderRadius: BorderRadius.circular(16)),
+                                  color: Colors.white,
+                                  borderRadius:
+                                  BorderRadius.circular(16)),
                               child: SingleChildScrollView(
-                                child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                                  Row(
-                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                child: Column(
+                                    crossAxisAlignment:
+                                    CrossAxisAlignment.start,
                                     children: [
-                                      Text("Billing Details",
-                                          style: GoogleFonts.lato(
-                                              fontSize: 18,
-                                              fontWeight: FontWeight.bold,
-                                              color: Colors.black)),
-                                      IconButton(
-                                          icon: const Icon(Icons.close, color: Colors.black),
-                                          onPressed: () => Navigator.pop(context)),
-                                    ],
-                                  ),
-                                  const SizedBox(height: 12),
-                                  _buildDetailRow(Icons.confirmation_number, "Bill No",   "${item['BillNoDisplay']}"),
-                                  _buildDetailRow(Icons.date_range,          "Bill Date", "${item['BillDate']}"),
-                                  _buildDetailRow(Icons.access_time,         "Bill Time", "${item['BillTime']}"),
-                                  _buildDetailRow(Icons.assignment,          "Job Status","${item['JobStatus']}"),
-                                  _buildDetailRow(Icons.person,              "Customer",  "${item['CustomerName']}"),
-                                  _buildDetailRow(Icons.badge,               "Employee",  "${item['EmployeeName']}"),
-                                  _buildDetailRow(Icons.local_shipping,      "Vessel",    "${item['Loadingvesselname']}"),
-                                  _buildDetailRow(Icons.anchor,              "Port",      "${item['SPort']}"),
-                                  _buildDetailRow(Icons.calendar_today,      "Pickup Date","${item['SPickupDate']}"),
-                                  _buildDetailRow(Icons.flight_takeoff,      "ETA",       "${item['ETA']}"),
-                                  _buildDetailRow(Icons.monetization_on,     "Net Amount","${item['NetAmt']}"),
-                                ]),
+                                      Row(
+                                        mainAxisAlignment:
+                                        MainAxisAlignment
+                                            .spaceBetween,
+                                        children: [
+                                          Text("Billing Details",
+                                              style: GoogleFonts.lato(
+                                                  fontSize: 18,
+                                                  fontWeight:
+                                                  FontWeight.bold)),
+                                          IconButton(
+                                              icon: const Icon(
+                                                  Icons.close),
+                                              onPressed: () =>
+                                                  Navigator.pop(
+                                                      context)),
+                                        ],
+                                      ),
+                                      const SizedBox(height: 12),
+                                      _buildDetailRow(Icons.confirmation_number, "Bill No",     "${item['BillNoDisplay']}"),
+                                      _buildDetailRow(Icons.date_range,          "Bill Date",   "${item['BillDate']}"),
+                                      _buildDetailRow(Icons.access_time,         "Bill Time",   "${item['BillTime']}"),
+                                      _buildDetailRow(Icons.assignment,          "Job Status",  "${item['JobStatus']}"),
+                                      _buildDetailRow(Icons.person,              "Customer",    "${item['CustomerName']}"),
+                                      _buildDetailRow(Icons.badge,               "Employee",    "${item['EmployeeName']}"),
+                                      _buildDetailRow(Icons.local_shipping,      "Vessel",      "${item['Loadingvesselname']}"),
+                                      _buildDetailRow(Icons.anchor,              "Port",        "${item['SPort']}"),
+                                      _buildDetailRow(Icons.calendar_today,      "Pickup Date", "${item['SPickupDate']}"),
+                                      _buildDetailRow(Icons.flight_takeoff,      "ETA",         "${item['ETA']}"),
+                                      _buildDetailRow(Icons.monetization_on,     "Net Amount",  "${item['NetAmt']}"),
+                                    ]),
                               ),
                             ),
                           ),
@@ -1167,37 +1195,48 @@ void showBillingBottomSheet(BuildContext context, List<dynamic> billingData) {
                             decoration: BoxDecoration(
                                 color: Colors.white.withOpacity(0.9),
                                 shape: BoxShape.circle),
-                            child: const Icon(Icons.receipt_long, color: AppTokens.invoiceHeaderStart, size: 28),
+                            child: const Icon(Icons.receipt_long,
+                                color: AppTokens.invoiceHeaderStart,
+                                size: 28),
                           ),
                           const SizedBox(width: 12),
                           Expanded(
-
-                            child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                              Text("Bill No: ${item['BillNo'] ?? ''}",
-                                  style: GoogleFonts.lato(
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.bold,
-                                      color: AppTokens.invoiceHeaderStart)),
-                              const SizedBox(height: 4),
-                              Text("Customer: ${item['CustomerName'] ?? ''}",
-                                  style: GoogleFonts.lato(
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.bold,
-                                      color: const Color(0xFF145A32))),
-                              const SizedBox(height: 2),
-                              Text("Amount: ${item['NetAmt'] ?? ''}",
-                                  style: GoogleFonts.lato(
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.bold,
-                                      color: colors.kOrange)),
-                            ]),
+                            child: Column(
+                                crossAxisAlignment:
+                                CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                      "Bill No: ${item['BillNo'] ?? ''}",
+                                      style: GoogleFonts.lato(
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.bold,
+                                          color: AppTokens
+                                              .invoiceHeaderStart)),
+                                  const SizedBox(height: 4),
+                                  Text(
+                                      "Customer: ${item['CustomerName'] ?? ''}",
+                                      style: GoogleFonts.lato(
+                                          fontSize: 14,
+                                          fontWeight: FontWeight.bold,
+                                          color:
+                                          const Color(0xFF145A32))),
+                                  const SizedBox(height: 2),
+                                  Text(
+                                      "Amount: ${item['NetAmt'] ?? ''}",
+                                      style: GoogleFonts.lato(
+                                          fontSize: 14,
+                                          fontWeight: FontWeight.bold,
+                                          color: colors.kOrange)),
+                                ]),
                           ),
                           Container(
                             padding: const EdgeInsets.all(6),
                             decoration: BoxDecoration(
                                 color: Colors.white.withOpacity(0.9),
-                                borderRadius: BorderRadius.circular(8)),
-                            child: const Icon(Icons.arrow_forward_ios, size: 16, color: colors.kOrange),
+                                borderRadius:
+                                BorderRadius.circular(8)),
+                            child: const Icon(Icons.arrow_forward_ios,
+                                size: 16, color: colors.kOrange),
                           ),
                         ]),
                       ),
@@ -1212,7 +1251,6 @@ void showBillingBottomSheet(BuildContext context, List<dynamic> billingData) {
     },
   );
 }
-
 
 Widget _buildDetailRow(IconData icon, String label, String value) {
   return Padding(

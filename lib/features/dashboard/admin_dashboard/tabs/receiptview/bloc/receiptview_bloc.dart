@@ -49,9 +49,10 @@ class ReceiptBloc extends Bloc<ReceiptEvent, ReceiptState> {
     final String fromDateStr;
     final String toDateStr;
 
-    if (event.isDateSearch && state.fromDate != null && state.toDate != null) {
+    if (event.isDateSearch && state.fromDate != null) {
       fromDateStr = DateFormat('yyyy-MM-dd').format(state.fromDate!);
-      toDateStr   = DateFormat('yyyy-MM-dd').format(state.toDate!);
+      toDateStr   = DateFormat('yyyy-MM-dd').format(state.toDate ?? DateTime.now());
+     // toDateStr   = DateFormat('yyyy-MM-dd').format(state.toDate!);
     } else {
       final now     = DateTime.now();
       final before  = now.subtract(const Duration(days: 900));

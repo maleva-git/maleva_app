@@ -19,10 +19,6 @@ import '../bloc/receiptview_bloc.dart';
 import '../bloc/receiptview_event.dart';
 import '../bloc/receiptview_state.dart';
 
-
-// ══════════════════════════════════════════════════════════════
-// ENTRY — wires DI, triggers initial load
-// ══════════════════════════════════════════════════════════════
 class ReceiptTab extends StatelessWidget {
   const ReceiptTab({super.key});
 
@@ -36,13 +32,9 @@ class ReceiptTab extends StatelessWidget {
   }
 }
 
-// ══════════════════════════════════════════════════════════════
-// PAGE
-// ══════════════════════════════════════════════════════════════
 class ReceiptPage extends StatelessWidget {
   const ReceiptPage({super.key});
 
-  // Date picker now in VIEW — not in BLoC
   Future<void> _pickDate(BuildContext context, bool isFrom) async {
     final picked = await showDatePicker(
       context: context,

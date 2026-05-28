@@ -164,10 +164,10 @@ class AuthApi {
 
     return result;
   }
-  static Future<dynamic> getEmployeeSalesData() async {
+  static Future<dynamic> getEmployeeSalesData({required int type}) async {
     final comid  = AppPreferences.getComid();
     final result = await ApiClient.postRequest(
-      '${ApiConstants.apiGetEmployeeSalesData}$comid',
+      '${ApiConstants.apiGetEmployeeSalesData}$comid&type=$type',
       null,
     );
     return result;
