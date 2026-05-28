@@ -15,6 +15,10 @@ class LoadEmployeeInvDatas extends SalesOrderEvent {
   LoadEmployeeInvDatas(this.type);
 }
 
+class LoadEmployeeSalesData extends SalesOrderEvent {
+  final int type;
+   LoadEmployeeSalesData(this.type);
+}
 class LoadWaitingBills extends SalesOrderEvent {
   final int type;
   LoadWaitingBills(this.type);

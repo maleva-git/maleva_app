@@ -7,6 +7,8 @@
 //  _showDialogEmpDetails in state class  Moved to _InvoiceView (correct place)
 //  RefreshInvoice = blank flash          InvoiceRefreshing keeps stale data visible
 //  showBillingBottomSheet in listener    listener calls then dismisses via event
+//  _OverviewCard had no onTap           onTap added + GestureDetector wrapper
+//  Today/Yesterday/Weekly/Monthly cards  Now dispatch LoadEmployeeInvData(0/1/2/4)
 //
 // *bug: listenWhen was true when employeeData != null on EVERY build
 //       Now: listen only when employeeData transitions null→nonNull
@@ -24,10 +26,7 @@ import '../bloc/invoice_bloc.dart';
 import '../bloc/invoice_event.dart';
 import '../bloc/invoice_state.dart';
 
-// ══════════════════════════════════════════════════════════════
-// ENTRY — just wires DI, no business logic here
-// ══════════════════════════════════════════════════════════════
-/// Indian comma-separated number format e.g. 5,46,789
+
 String _indFmt(dynamic raw) {
   final n = double.tryParse(raw?.toString() ?? '0') ?? 0;
   final s = n.toStringAsFixed(0);
@@ -48,8 +47,7 @@ class InvoiceTab extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      // sl<InvoiceBloc>() — get_it gives fresh instance with repo injected
-      create: (_) => sl<InvoiceBloc>()..add( LoadInvoiceByType(0)),
+      create: (_) => sl<InvoiceBloc>()..add(LoadInvoiceByType(0)),
       child: const _InvoiceView(),
     );
   }
@@ -61,9 +59,8 @@ class InvoiceTab extends StatelessWidget {
 class _InvoiceView extends StatelessWidget {
   const _InvoiceView();
 
-  // Pull-to-refresh waits for loaded/error state
   Future<void> _onRefresh(BuildContext context) async {
-    context.read<InvoiceBloc>().add( RefreshInvoice());
+    context.read<InvoiceBloc>().add(RefreshInvoice());
     await context.read<InvoiceBloc>().stream.firstWhere(
           (s) => s is InvoiceLoaded || s is InvoiceError,
     );
@@ -77,46 +74,29 @@ class _InvoiceView extends StatelessWidget {
     return Scaffold(
       backgroundColor: AppTokens.invoicePageBg,
       body: BlocConsumer<InvoiceBloc, InvoiceState>(
-
-        // ── buildWhen — only structural changes rebuild the whole tree ──
-        // Small state changes (showWaitingSheet, employeeData) handled
-        // in listener below — no full tree rebuild needed.
         buildWhen: (prev, curr) {
-          // Always rebuild on state TYPE change
           if (prev.runtimeType != curr.runtimeType) return true;
           if (curr is! InvoiceLoaded || prev is! InvoiceLoaded) return true;
-
-          // Rebuild only when chart/list data changes
           return prev.is6Months != curr.is6Months ||
               prev.monthList.length != curr.monthList.length ||
               prev.saleDataAll.length != curr.saleDataAll.length ||
               prev.monthData.length != curr.monthData.length;
         },
-
-        // ── listenWhen — only for side-effects (dialogs, sheets) ────────
         listenWhen: (prev, curr) {
           if (curr is! InvoiceLoaded) return false;
           if (prev is! InvoiceLoaded) return false;
-
-          // Sheet: false→true transition only
-          final sheetOpened =
-              !prev.showWaitingSheet && curr.showWaitingSheet;
-
-          // Dialog: null→nonNull transition only (not every rebuild)
+          final sheetOpened = !prev.showWaitingSheet && curr.showWaitingSheet;
           final employeeArrived =
               prev.employeeData == null && curr.employeeData != null;
-
           return sheetOpened || employeeArrived;
         },
-
         listener: (context, state) {
           if (state is! InvoiceLoaded) return;
 
           if (state.showWaitingSheet) {
             _showWaitingSheet(context, state.waitingBilling).then((_) {
-              // Dismiss event — BLoC clears the flag cleanly
               if (context.mounted) {
-                context.read<InvoiceBloc>().add( DismissWaitingSheet());
+                context.read<InvoiceBloc>().add(DismissWaitingSheet());
               }
             });
           }
@@ -125,19 +105,15 @@ class _InvoiceView extends StatelessWidget {
             _showEmployeeDialog(context, state.employeeData!);
           }
         },
-
         builder: (context, state) {
-          // ── Loading ──────────────────────────────────────────────
           if (state is InvoiceLoading) {
             return const Center(child: CircularProgressIndicator());
           }
 
-          // ── Error ────────────────────────────────────────────────
           if (state is InvoiceError) {
             return _ErrorBody(message: state.message);
           }
 
-          // ── Refreshing — show previous data + subtle top indicator ─
           InvoiceLoaded loaded;
           bool isRefreshing = false;
 
@@ -163,10 +139,11 @@ class _InvoiceView extends StatelessWidget {
                     ? _TabletBody(state: loaded, data: data)
                     : _MobileBody(state: loaded, data: data),
               ),
-              // Thin top bar while refreshing — no blank screen
               if (isRefreshing)
                 const Positioned(
-                  top: 0, left: 0, right: 0,
+                  top: 0,
+                  left: 0,
+                  right: 0,
                   child: LinearProgressIndicator(
                     backgroundColor: Colors.transparent,
                     color: colors.kHeaderGradStart,
@@ -202,7 +179,7 @@ class _ErrorBody extends StatelessWidget {
           const SizedBox(height: 16),
           ElevatedButton.icon(
             onPressed: () =>
-                context.read<InvoiceBloc>().add( RefreshInvoice()),
+                context.read<InvoiceBloc>().add(RefreshInvoice()),
             icon: const Icon(Icons.refresh),
             label: const Text('Retry'),
           ),
@@ -289,9 +266,9 @@ class _MobileBody extends StatelessWidget {
                 data: data,
                 isTablet: false,
                 onWaitingTap: () =>
-                    context.read<InvoiceBloc>().add( LoadWaitingBills()),
+                    context.read<InvoiceBloc>().add(LoadWaitingBills()),
                 onWaitingCountTap: () =>
-                    context.read<InvoiceBloc>().add( LoadWaitingBills()),
+                    context.read<InvoiceBloc>().add(LoadWaitingBills()),
               ),
               const SizedBox(height: 24),
               _MonthlyTrendHeader(is6Months: state.is6Months),
@@ -305,12 +282,16 @@ class _MobileBody extends StatelessWidget {
             delegate: SliverChildBuilderDelegate(
                   (context, index) => _MonthBarItem(
                 month: state.monthList[index],
-                current: (state.monthData[index]['SalesAmount'] as num).toDouble(),
+                current:
+                (state.monthData[index]['SalesAmount'] as num).toDouble(),
                 prev: index == 0
                     ? (state.monthData[0]['SalesAmount'] as num).toDouble()
-                    : (state.monthData[index - 1]['SalesAmount'] as num).toDouble(),
-                count: state.monthData[index]['SalesCount']?.toString() ?? '0',
-                amount: state.monthData[index]['SalesAmount']?.toString() ?? '0',
+                    : (state.monthData[index - 1]['SalesAmount'] as num)
+                    .toDouble(),
+                count:
+                state.monthData[index]['SalesCount']?.toString() ?? '0',
+                amount:
+                state.monthData[index]['SalesAmount']?.toString() ?? '0',
                 maxAmount: maxAmount,
                 isTablet: false,
                 onTap: () => context
@@ -327,9 +308,8 @@ class _MobileBody extends StatelessWidget {
 }
 
 // ══════════════════════════════════════════════════════════════
-// DIALOGS & SHEETS — extracted from _InvoiceTabState
+// DIALOGS & SHEETS
 // ══════════════════════════════════════════════════════════════
-
 Future<void> _showWaitingSheet(
     BuildContext context,
     List<dynamic> billingData,
@@ -523,8 +503,7 @@ class _BillingCard extends StatelessWidget {
         child: Container(
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(16)),
+              color: Colors.white, borderRadius: BorderRadius.circular(16)),
           child: SingleChildScrollView(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -541,17 +520,26 @@ class _BillingCard extends StatelessWidget {
                   ],
                 ),
                 const SizedBox(height: 12),
-                _DetailRow(Icons.confirmation_number, 'Bill No',    '${item['BillNoDisplay']}'),
-                _DetailRow(Icons.date_range,          'Bill Date',  '${item['BillDate']}'),
-                _DetailRow(Icons.access_time,         'Bill Time',  '${item['BillTime']}'),
-                _DetailRow(Icons.assignment,          'Job Status', '${item['JobStatus']}'),
-                _DetailRow(Icons.person,              'Customer',   '${item['CustomerName']}'),
-                _DetailRow(Icons.badge,               'Employee',   '${item['EmployeeName']}'),
-                _DetailRow(Icons.local_shipping,      'Vessel',     '${item['Loadingvesselname']}'),
-                _DetailRow(Icons.anchor,              'Port',       '${item['SPort']}'),
-                _DetailRow(Icons.calendar_today,      'Pickup',     '${item['SPickupDate']}'),
-                _DetailRow(Icons.flight_takeoff,      'ETA',        '${item['ETA']}'),
-                _DetailRow(Icons.monetization_on,     'Net Amount', 'RM${item['NetAmt']}'),
+                _DetailRow(Icons.confirmation_number, 'Bill No',
+                    '${item['BillNoDisplay']}'),
+                _DetailRow(
+                    Icons.date_range, 'Bill Date', '${item['BillDate']}'),
+                _DetailRow(
+                    Icons.access_time, 'Bill Time', '${item['BillTime']}'),
+                _DetailRow(Icons.assignment, 'Job Status',
+                    '${item['JobStatus']}'),
+                _DetailRow(
+                    Icons.person, 'Customer', '${item['CustomerName']}'),
+                _DetailRow(
+                    Icons.badge, 'Employee', '${item['EmployeeName']}'),
+                _DetailRow(Icons.local_shipping, 'Vessel',
+                    '${item['Loadingvesselname']}'),
+                _DetailRow(Icons.anchor, 'Port', '${item['SPort']}'),
+                _DetailRow(Icons.calendar_today, 'Pickup',
+                    '${item['SPickupDate']}'),
+                _DetailRow(Icons.flight_takeoff, 'ETA', '${item['ETA']}'),
+                _DetailRow(Icons.monetization_on, 'Net Amount',
+                    'RM${item['NetAmt']}'),
               ],
             ),
           ),
@@ -619,8 +607,8 @@ class _EmployeeCard extends StatelessWidget {
         Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
           Row(children: [
             const Text('RM',
-                style: TextStyle(
-                    fontWeight: FontWeight.bold, color: Colors.green)),
+                style:
+                TextStyle(fontWeight: FontWeight.bold, color: Colors.green)),
             const SizedBox(width: 4),
             Text(emp['Amount'].toString(),
                 style: const TextStyle(
@@ -640,9 +628,8 @@ class _EmployeeCard extends StatelessWidget {
 }
 
 // ══════════════════════════════════════════════════════════════
-// ALL EXISTING WIDGETS — unchanged, just properly const-ified
+// HERO HEADER
 // ══════════════════════════════════════════════════════════════
-
 class _HeroHeader extends StatelessWidget {
   final InvoiceLoaded state;
   final Map<String, dynamic> data;
@@ -650,11 +637,11 @@ class _HeroHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final totalAmount  = data['MonthAmount']?.toString()  ?? '0';
-    final totalCount   = data['MonthSales']?.toString()   ?? '0';
-    final weekCount    = data['WeekSales']?.toString()    ?? '0';
+    final totalAmount = data['MonthAmount']?.toString() ?? '0';
+    final totalCount = data['MonthSales']?.toString() ?? '0';
+    final weekCount = data['WeekSales']?.toString() ?? '0';
     final waitingCount = state.waitingBilling.length;
-    final billedCount  = data['MonthSales']?.toString()   ?? '0';
+    final billedCount = data['MonthSales']?.toString() ?? '0';
 
     return Container(
       width: double.infinity,
@@ -740,8 +727,7 @@ class _Pill extends StatelessWidget {
       decoration: BoxDecoration(
         color: colors.kPillBg,
         borderRadius: BorderRadius.circular(20),
-        border:
-        Border.all(color: Colors.white.withOpacity(0.25), width: 1),
+        border: Border.all(color: Colors.white.withOpacity(0.25), width: 1),
       ),
       child: Row(mainAxisSize: MainAxisSize.min, children: [
         Icon(icon, size: 13, color: iconColor),
@@ -756,6 +742,9 @@ class _Pill extends StatelessWidget {
   }
 }
 
+// ══════════════════════════════════════════════════════════════
+// OVERVIEW SECTION
+// ══════════════════════════════════════════════════════════════
 class _OverviewSection extends StatelessWidget {
   final InvoiceLoaded state;
   final Map<String, dynamic> data;
@@ -790,6 +779,8 @@ class _OverviewSection extends StatelessWidget {
         ),
       ]),
       const SizedBox(height: 10),
+
+      // ── Row 1: Monthly + Weekly ──────────────────────────────
       Row(children: [
         Expanded(
             child: _OverviewCard(
@@ -799,6 +790,10 @@ class _OverviewSection extends StatelessWidget {
               badgeLabel: 'Invoices',
               badgeColor: colors.kOrange,
               badgeIcon: Icons.circle,
+              // ✅ Monthly → type 4
+              onTap: () => context
+                  .read<InvoiceBloc>()
+                  .add(LoadEmployeeInvData(4)),
             )),
         const SizedBox(width: 12),
         Expanded(
@@ -809,9 +804,15 @@ class _OverviewSection extends StatelessWidget {
               badgeLabel: 'This week',
               badgeColor: AppTokens.planCobalt,
               badgeIcon: Icons.calendar_today,
+              // ✅ Weekly → type 2
+              onTap: () => context
+                  .read<InvoiceBloc>()
+                  .add(LoadEmployeeInvData(2)),
             )),
       ]),
       const SizedBox(height: 12),
+
+      // ── Row 2: Yesterday + Today ─────────────────────────────
       Row(children: [
         Expanded(
             child: _OverviewCard(
@@ -821,6 +822,10 @@ class _OverviewSection extends StatelessWidget {
               badgeLabel: 'Done',
               badgeColor: AppTokens.statusSuccess,
               badgeIcon: Icons.check,
+              // ✅ Yesterday → type 1
+              onTap: () => context
+                  .read<InvoiceBloc>()
+                  .add(LoadEmployeeInvData(1)),
             )),
         const SizedBox(width: 12),
         Expanded(
@@ -834,9 +839,15 @@ class _OverviewSection extends StatelessWidget {
               badgeColor: Colors.grey,
               badgeIcon: Icons.remove,
               isToday: true,
+              // ✅ Today → type 0
+              onTap: () => context
+                  .read<InvoiceBloc>()
+                  .add(LoadEmployeeInvData(0)),
             )),
       ]),
       const SizedBox(height: 12),
+
+      // ── Row 3: Waiting + Billed status cards ─────────────────
       Row(children: [
         Expanded(
             child: _StatusCard(
@@ -862,11 +873,15 @@ class _OverviewSection extends StatelessWidget {
   }
 }
 
+// ══════════════════════════════════════════════════════════════
+// OVERVIEW CARD  ← onTap added
+// ══════════════════════════════════════════════════════════════
 class _OverviewCard extends StatelessWidget {
   final String label, count, amount, badgeLabel;
   final Color badgeColor;
   final IconData badgeIcon;
   final bool isToday;
+  final VoidCallback? onTap; // ✅ NEW
 
   const _OverviewCard({
     required this.label,
@@ -876,54 +891,61 @@ class _OverviewCard extends StatelessWidget {
     required this.badgeColor,
     required this.badgeIcon,
     this.isToday = false,
+    this.onTap, // ✅ NEW
   });
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: colors.kCardBg,
-        borderRadius: BorderRadius.circular(18),
-        boxShadow: const [
-          BoxShadow(
-              color: Palette.grey200, blurRadius: 8, offset: Offset(0, 3))
-        ],
-      ),
-      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        Text(label,
-            style: GoogleFonts.lato(
-                fontSize: 10,
-                fontWeight: FontWeight.w700,
-                color: Colors.grey.shade500,
-                letterSpacing: 0.8)),
-        const SizedBox(height: 6),
-        Text(count,
-            style: GoogleFonts.lato(
-                fontSize: 28,
-                fontWeight: FontWeight.w900,
-                color: AppTokens.textNavy)),
-        const SizedBox(height: 4),
-        Text(amount,
-            style: GoogleFonts.lato(
-                fontSize: 13,
-                fontWeight: FontWeight.w600,
-                color: isToday ? Colors.grey : AppTokens.textNavy)),
-        const SizedBox(height: 10),
-        Row(children: [
-          Icon(badgeIcon, size: 12, color: badgeColor),
-          const SizedBox(width: 4),
-          Text(badgeLabel,
+    return GestureDetector( // ✅ NEW wrapper
+      onTap: onTap,          // ✅ NEW
+      child: Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: colors.kCardBg,
+          borderRadius: BorderRadius.circular(18),
+          boxShadow: const [
+            BoxShadow(
+                color: Palette.grey200, blurRadius: 8, offset: Offset(0, 3))
+          ],
+        ),
+        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          Text(label,
               style: GoogleFonts.lato(
-                  fontSize: 11,
-                  color: badgeColor,
-                  fontWeight: FontWeight.w600)),
+                  fontSize: 10,
+                  fontWeight: FontWeight.w700,
+                  color: Colors.grey.shade500,
+                  letterSpacing: 0.8)),
+          const SizedBox(height: 6),
+          Text(count,
+              style: GoogleFonts.lato(
+                  fontSize: 28,
+                  fontWeight: FontWeight.w900,
+                  color: AppTokens.textNavy)),
+          const SizedBox(height: 4),
+          Text(amount,
+              style: GoogleFonts.lato(
+                  fontSize: 13,
+                  fontWeight: FontWeight.w600,
+                  color: isToday ? Colors.grey : AppTokens.textNavy)),
+          const SizedBox(height: 10),
+          Row(children: [
+            Icon(badgeIcon, size: 12, color: badgeColor),
+            const SizedBox(width: 4),
+            Text(badgeLabel,
+                style: GoogleFonts.lato(
+                    fontSize: 11,
+                    color: badgeColor,
+                    fontWeight: FontWeight.w600)),
+          ]),
         ]),
-      ]),
+      ),
     );
   }
 }
 
+// ══════════════════════════════════════════════════════════════
+// STATUS CARD
+// ══════════════════════════════════════════════════════════════
 class _StatusCard extends StatelessWidget {
   final IconData icon;
   final Color iconColor, bgColor;
@@ -987,39 +1009,38 @@ class _StatusCard extends StatelessWidget {
   }
 }
 
+// ══════════════════════════════════════════════════════════════
+// MONTHLY TREND
+// ══════════════════════════════════════════════════════════════
 class _MonthlyTrendHeader extends StatelessWidget {
   final bool is6Months;
   const _MonthlyTrendHeader({required this.is6Months});
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Text('MONTHLY TREND',
-              style: GoogleFonts.lato(
-                  fontSize: 13,
-                  fontWeight: FontWeight.w800,
-                  color: AppTokens.textNavy,
-                  letterSpacing: 0.6)),
-          Row(children: [
-            _ToggleBtn(
-              text: '6 Months',
-              selected: is6Months,
-              onTap: () => context
-                  .read<InvoiceBloc>()
-                  .add( LoadMonthRange(6)),
-            ),
-            const SizedBox(width: 6),
-            _ToggleBtn(
-              text: '1 Year',
-              selected: !is6Months,
-              onTap: () => context
-                  .read<InvoiceBloc>()
-                  .add( LoadMonthRange(12)),
-            ),
-          ]),
-        ]);
+    return Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
+      Text('MONTHLY TREND',
+          style: GoogleFonts.lato(
+              fontSize: 13,
+              fontWeight: FontWeight.w800,
+              color: AppTokens.textNavy,
+              letterSpacing: 0.6)),
+      Row(children: [
+        _ToggleBtn(
+          text: '6 Months',
+          selected: is6Months,
+          onTap: () =>
+              context.read<InvoiceBloc>().add(LoadMonthRange(6)),
+        ),
+        const SizedBox(width: 6),
+        _ToggleBtn(
+          text: '1 Year',
+          selected: !is6Months,
+          onTap: () =>
+              context.read<InvoiceBloc>().add(LoadMonthRange(12)),
+        ),
+      ]),
+    ]);
   }
 }
 
@@ -1036,10 +1057,10 @@ class _ToggleBtn extends StatelessWidget {
       onTap: onTap,
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 200),
-        padding:
-        const EdgeInsets.symmetric(horizontal: 14, vertical: 7),
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 7),
         decoration: BoxDecoration(
-          color: selected ? AppTokens.invoiceHeaderStart : Colors.transparent,
+          color:
+          selected ? AppTokens.invoiceHeaderStart : Colors.transparent,
           borderRadius: BorderRadius.circular(20),
         ),
         child: Text(text,
@@ -1075,8 +1096,7 @@ class _MonthlyTrendSection extends StatelessWidget {
       _MonthlyTrendHeader(is6Months: state.is6Months),
       const SizedBox(height: 12),
       ...List.generate(state.monthList.length, (i) {
-        final current =
-        (state.monthData[i]['SalesAmount'] as num).toDouble();
+        final current = (state.monthData[i]['SalesAmount'] as num).toDouble();
         final prev = i == 0
             ? current
             : (state.monthData[i - 1]['SalesAmount'] as num).toDouble();
@@ -1124,8 +1144,7 @@ class _MonthBarItem extends StatelessWidget {
       child: Container(
         margin: const EdgeInsets.only(bottom: 10),
         padding: EdgeInsets.symmetric(
-            horizontal: isTablet ? 18 : 12,
-            vertical: isTablet ? 14 : 12),
+            horizontal: isTablet ? 18 : 12, vertical: isTablet ? 14 : 12),
         decoration: BoxDecoration(
           color: colors.kCardBg,
           borderRadius: BorderRadius.circular(16),
@@ -1161,13 +1180,12 @@ class _MonthBarItem extends StatelessWidget {
                 value: ratio,
                 minHeight: isTablet ? 10 : 8,
                 backgroundColor: const Color(0xFFE8ECF5),
-                valueColor: const AlwaysStoppedAnimation<Color>(
-                    colors.kBarBlue),
+                valueColor:
+                const AlwaysStoppedAnimation<Color>(colors.kBarBlue),
               ),
             ),
           ),
           const SizedBox(width: 12),
-          // count + amount in same row, aligned right
           Column(
             crossAxisAlignment: CrossAxisAlignment.end,
             mainAxisSize: MainAxisSize.min,
@@ -1192,7 +1210,6 @@ class _MonthBarItem extends StatelessWidget {
   }
 
   String _shortAmount(double val) {
-    // Plain number with Indian comma format e.g. 1,40,000
     final s = val.toStringAsFixed(0);
     if (s.length <= 3) return s;
     final last3 = s.substring(s.length - 3);
@@ -1206,6 +1223,9 @@ class _MonthBarItem extends StatelessWidget {
   }
 }
 
+// ══════════════════════════════════════════════════════════════
+// TODAY vs YESTERDAY CHART
+// ══════════════════════════════════════════════════════════════
 class _TodayYesterdayChartCard extends StatelessWidget {
   final Map<String, dynamic> data;
   const _TodayYesterdayChartCard({required this.data});
@@ -1258,12 +1278,9 @@ class _TodayYesterdayChartCard extends StatelessWidget {
       ),
       borderData: FlBorderData(show: false),
       titlesData: FlTitlesData(
-        leftTitles:
-        AxisTitles(sideTitles: SideTitles(showTitles: false)),
-        rightTitles:
-        AxisTitles(sideTitles: SideTitles(showTitles: false)),
-        topTitles:
-        AxisTitles(sideTitles: SideTitles(showTitles: false)),
+        leftTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
+        rightTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
+        topTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
         bottomTitles: AxisTitles(
           sideTitles: SideTitles(
             showTitles: true,
@@ -1274,8 +1291,8 @@ class _TodayYesterdayChartCard extends StatelessWidget {
               return Padding(
                 padding: const EdgeInsets.only(top: 6),
                 child: Text(labels[i],
-                    style: const TextStyle(
-                        fontSize: 10, color: Colors.grey)),
+                    style:
+                    const TextStyle(fontSize: 10, color: Colors.grey)),
               );
             },
           ),
@@ -1288,8 +1305,7 @@ class _TodayYesterdayChartCard extends StatelessWidget {
           tooltipBorder: const BorderSide(
               color: AppTokens.invoiceHeaderStart, width: 1),
           getTooltipItems: (spots) => spots.map((spot) {
-            final label =
-            spot.barIndex == 0 ? 'Today' : 'Yesterday';
+            final label = spot.barIndex == 0 ? 'Today' : 'Yesterday';
             return LineTooltipItem(
               '$label\nRM${spot.y.toStringAsFixed(0)}',
               TextStyle(
@@ -1348,8 +1364,7 @@ class _LegendDot extends StatelessWidget {
       Container(width: 10, height: 3, color: color),
       const SizedBox(width: 4),
       Text(label,
-          style:
-          TextStyle(fontSize: 11, color: Colors.grey.shade600)),
+          style: TextStyle(fontSize: 11, color: Colors.grey.shade600)),
     ]);
   }
 }

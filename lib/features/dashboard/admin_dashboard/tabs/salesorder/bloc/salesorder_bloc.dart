@@ -57,7 +57,6 @@ class SalesOrderBloc extends Bloc<SalesOrderEvent, SalesOrderState> {
             'Fromdate': fromdate,
           };
 
-          // ✅ REFACTORED: Using the injected repository
           final results = await Future.wait([
             repository.fetchSalesData(event.type),
             repository.fetchSalesInvoiceCheck(master),
@@ -167,6 +166,7 @@ class SalesOrderBloc extends Bloc<SalesOrderEvent, SalesOrderState> {
           (event, emit) async {
         if (state is! InvoiceLoaded) return;
         final current = state as InvoiceLoaded;
+        emit(current.copyWith(clearEmployeeData: true));
 
         try {
 
@@ -183,7 +183,26 @@ class SalesOrderBloc extends Bloc<SalesOrderEvent, SalesOrderState> {
       },
       transformer: droppable(),
     );
+    on<LoadEmployeeSalesData>(
+          (event, emit) async {
+        if (state is! InvoiceLoaded) return;
+        final current = state as InvoiceLoaded;
 
+        // ✅ Clear first — fixes "second tap doesn't open" bug
+        emit(current.copyWith(clearEmployeeData: true));
+
+        try {
+          final resultData = await repository.fetchEmployeeSalesData(
+            event.type, // 0=Today, 1=Yesterday, 2=Weekly, 3=Monthly
+          );
+          emit(current.copyWith(
+            employeeData:    List<dynamic>.from(resultData?["Data1"] ?? []),
+            showWaitingSheet: false,
+          ));
+        } catch (_) {}
+      },
+      transformer: droppable(),
+    );
     on<TabChanged>((event, emit) {
       if (state is! InvoiceLoaded) return;
       final current = state as InvoiceLoaded;
