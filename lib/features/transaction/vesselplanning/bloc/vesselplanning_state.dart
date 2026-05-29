@@ -66,4 +66,12 @@ class VesselPlanningError extends VesselPlanningState {
 }
 
 // Navigate to edit page after password + API done
-class VesselPlanningNavigateToEdit extends VesselPlanningState {}
+class VesselPlanningNavigateToEdit extends VesselPlanningState {
+  final int id; // ✅ Add this line
+  final String planningNo; // (or int, depending on how you defined it)
+
+   VesselPlanningNavigateToEdit({required this.id, required this.planningNo});
+
+  @override
+  List<Object?> get props => [id, planningNo];
+}

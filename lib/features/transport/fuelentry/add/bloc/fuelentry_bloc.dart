@@ -1,12 +1,10 @@
+import 'dart:convert';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:maleva/core/utils/clsfunction.dart' as objfun;
 import 'package:maleva/core/models/model.dart';
 
 import 'fuelentry_event.dart';
 import 'fuelentry_state.dart';
-
-
-
 
 class FuelEntryBloc extends Bloc<FuelEntryEvent, FuelEntryState> {
   FuelEntryBloc() : super(FuelEntryInitial()) {
@@ -56,7 +54,6 @@ class FuelEntryBloc extends Bloc<FuelEntryEvent, FuelEntryState> {
       emit((state as FuelEntryLoaded).copyWith(amount: event.value));
     }
   }
-
   // ── Save ──────────────────────────────────────────────────────────────────────
   Future<void> _onSaveRequested(
       FuelEntrySaveRequested event,
@@ -64,23 +61,32 @@ class FuelEntryBloc extends Bloc<FuelEntryEvent, FuelEntryState> {
     if (state is! FuelEntryLoaded) return;
     final s = state as FuelEntryLoaded;
 
+    // 🚨 Prevent saving if no truck is assigned
+    if (objfun.DriverTruckRefId == 0) {
+      emit(FuelEntryError("No Truck Assigned! Please select or assign a truck first."));
+      emit(s);
+      return;
+    }
+
     emit(FuelEntryLoading());
     try {
       final master = [
         {
           'SaleDate':       DateTime.parse(s.date).toIso8601String(),
-          'CNumberDisplay': '0',
+          'CNumberDisplay': '0',  // Reverted back to '0'
           'CNumber':        0,
           'Id':             0,
           'CompanyRefId':   objfun.Comid,
-          'UserRefId':      null,
-          'EmployeeRefId':  null,
-          'TruckRefid':     objfun.DriverTruckRefId,
+          'UserRefId':      null, // Reverted to null to prevent User Table FK Error
+          'EmployeeRefId':  null, // Reverted to null
+          'TruckRefid':     objfun.DriverTruckRefId, // Reverted to lowercase 'i'
           'DriverRefId':    objfun.EmpRefId,
           'FilePath':       '',
           'Remarks':        '',
-          'Aliter':         s.liter,
-          'AAmount':        s.amount,
+
+          // Reverted to lowercase 'l' for strict C# Model Binding
+          'Aliter':         double.tryParse(s.liter) ?? 0,
+          'AAmount':        double.tryParse(s.amount) ?? 0,
           'Pliter':         0,
           'PRate':          0,
           'PAmount':        0,
@@ -99,26 +105,49 @@ class FuelEntryBloc extends Bloc<FuelEntryEvent, FuelEntryState> {
         'Comid': objfun.Comid.toString(),
       };
 
-      final result = await objfun.apiAllinoneSelectArray(
+      final resultData = await objfun.apiAllinoneSelectArray(
           objfun.apiInsertFuelEntry, master, header, null);
 
-      if (result != '') {
-        final value = ResponseViewModel.fromJson(result);
-        if (value.IsSuccess == true) {
-          // Reload with new fuelNo
-          final newFuelNo = await _fetchMaxFuelNo();
-          emit(FuelEntrySaveSuccess());
-          emit(FuelEntryLoaded.empty(fuelNo: newFuelNo));
-          return;
+      if (resultData != null && resultData.toString().isNotEmpty) {
+        try {
+          Map<String, dynamic> responseMap = {};
+
+          if (resultData is List) {
+            if (resultData.isNotEmpty && resultData.first is Map) {
+              responseMap = Map<String, dynamic>.from(resultData.first);
+            }
+          } else if (resultData is Map) {
+            responseMap = Map<String, dynamic>.from(resultData);
+          } else if (resultData is String) {
+            var decoded = jsonDecode(resultData);
+            if (decoded is List && decoded.isNotEmpty && decoded.first is Map) {
+              responseMap = Map<String, dynamic>.from(decoded.first);
+            } else if (decoded is Map) {
+              responseMap = Map<String, dynamic>.from(decoded);
+            }
+          }
+
+          final value = ResponseViewModel.fromJson(responseMap);
+          if (value.IsSuccess == true) {
+            final newFuelNo = await _fetchMaxFuelNo();
+            emit(FuelEntrySaveSuccess());
+            emit(FuelEntryLoaded.empty(fuelNo: newFuelNo));
+          } else {
+            emit(FuelEntryError(value.Message ?? "Save Failed. Backend rejected the data format."));
+            emit(s);
+          }
+        } catch (jsonErr) {
+          emit(FuelEntryError('Data Parse Error: ${jsonErr.toString()}'));
+          emit(s);
         }
+      } else {
+        emit(s);
       }
-      // revert on failure
-      emit(s);
     } catch (e) {
       emit(FuelEntryError(e.toString()));
+      emit(s);
     }
   }
-
   // ── Helper: fetch max fuel no ─────────────────────────────────────────────────
   Future<String> _fetchMaxFuelNo() async {
     try {
