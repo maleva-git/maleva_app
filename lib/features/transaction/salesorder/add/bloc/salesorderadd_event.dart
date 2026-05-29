@@ -1,5 +1,4 @@
 import '../../../../../core/models/model.dart';
-
 abstract class SalesOrderAddEvent {}
 
 class StartupSalesOrderAdd extends SalesOrderAddEvent {

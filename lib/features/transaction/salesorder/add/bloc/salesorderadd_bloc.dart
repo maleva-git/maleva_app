@@ -8,12 +8,13 @@ import 'package:maleva/core/utils/clsfunction.dart' as objfun;
 import 'package:maleva/core/network/OnlineApi.dart' as OnlineApi;
 import 'package:maleva/features/transaction/salesorder/add/bloc/salesorderadd_event.dart';
 import 'package:maleva/features/transaction/salesorder/add/bloc/salesorderadd_state.dart';
-
+import 'dart:developer' as developer;
 
 class SalesOrderAddBloc extends Bloc<SalesOrderAddEvent, SalesOrderAddState> {
   final BuildContext context;
 
   static const List<String> _billType = ['MY', 'TR'];
+
   static const List<String> _forwardingNo = ['K1', 'K2', 'K3', 'K8'];
   static const List<String> _truckSizeList = ['1 Tonner', '3 Tonner', '5 Tonner', '10 Tonner', '40 FT Truck'];
   static const List<String> _zbNo = ['ZB1', 'ZB2'];
@@ -281,7 +282,43 @@ class SalesOrderAddBloc extends Bloc<SalesOrderAddEvent, SalesOrderAddState> {
       emit(s.copyWith(progress: false));
 
       try {
-        final master = [_buildMasterPayload(s)];
+        final masterPayload = _buildMasterPayload(s);
+
+        final saleDetailsJson = s.productViewList.asMap().entries.map((entry) {
+          final idx = entry.key;
+          final jsonMap = Map<String, dynamic>.from(entry.value.toJson());
+          final hardId = s.productIds.length > idx ? s.productIds[idx] : 0;
+
+          String? exactItemKey;
+          String? exactCompKey;
+
+          for (String key in jsonMap.keys) {
+            final lower = key.toLowerCase();
+            if (lower == 'itemmasterrefid' || lower == 'itemmasterid' || lower == 'productid') exactItemKey = key;
+            if (lower == 'companyrefid') exactCompKey = key;
+          }
+
+          if (exactItemKey != null) {
+            jsonMap[exactItemKey] = hardId;
+          } else {
+            jsonMap['ItemMasterRefId'] = hardId;
+            jsonMap['ItemMasterRefid'] = hardId;
+          }
+
+          if (exactCompKey != null) {
+            jsonMap[exactCompKey] = objfun.Comid;
+          } else {
+            jsonMap['CompanyRefId'] = objfun.Comid;
+          }
+
+          return jsonMap;
+        }).toList();
+
+        masterPayload['SaleDetails'] = saleDetailsJson;
+        final master = [masterPayload];
+
+        developer.log("🚨 SALE DETAILS JSON: ${jsonEncode(saleDetailsJson)}", name: "API_DEBUG");
+
         final header = {'Content-Type': 'application/json; charset=UTF-8'};
 
         final resultData = await objfun.apiAllinoneSelectArray(
@@ -291,15 +328,21 @@ class SalesOrderAddBloc extends Bloc<SalesOrderAddEvent, SalesOrderAddState> {
 
         if (resultData != null && resultData.toString().isNotEmpty) {
           try {
-            var decoded = jsonDecode(resultData.toString());
             Map<String, dynamic> responseMap = {};
 
-            if (decoded is List) {
-              if (decoded.isNotEmpty && decoded.first is Map) {
-                responseMap = Map<String, dynamic>.from(decoded.first);
+            if (resultData is List) {
+              if (resultData.isNotEmpty && resultData.first is Map) {
+                responseMap = Map<String, dynamic>.from(resultData.first);
               }
-            } else if (decoded is Map) {
-              responseMap = Map<String, dynamic>.from(decoded);
+            } else if (resultData is Map) {
+              responseMap = Map<String, dynamic>.from(resultData);
+            } else if (resultData is String) {
+              var decoded = jsonDecode(resultData);
+              if (decoded is List && decoded.isNotEmpty && decoded.first is Map) {
+                responseMap = Map<String, dynamic>.from(decoded.first);
+              } else if (decoded is Map) {
+                responseMap = Map<String, dynamic>.from(decoded);
+              }
             }
 
             final value = ResponseViewModel.fromJson(responseMap);
@@ -310,13 +353,25 @@ class SalesOrderAddBloc extends Bloc<SalesOrderAddEvent, SalesOrderAddState> {
               emit(s.copyWith(progress: true, savedMessage: value.Message ?? "Save Failed. Database Rejected data."));
             }
           } catch (jsonErr) {
-            emit(s.copyWith(progress: true, savedMessage: 'Server Response Error: ${resultData.toString()}'));
+            emit(s.copyWith(progress: true, savedMessage: 'Data Parse Error: ${jsonErr.toString()}'));
           }
         }
       } catch (e) {
         emit(s.copyWith(progress: true, savedMessage: 'Network Error: ${e.toString()}'));
       }
     });
+  }
+
+  // ════════════════════════════════════════════════════
+  // HELPERS
+  // ════════════════════════════════════════════════════
+
+  // ✅ FIX 4: Safe, case-insensitive mapping for Address/Quantity lists
+  dynamic _getVal(Map map, String key) {
+    for (var k in map.keys) {
+      if (k.toString().toLowerCase() == key.toLowerCase()) return map[k];
+    }
+    return null;
   }
 
   Map<String, bool> _buildPermissions() {
@@ -329,7 +384,8 @@ class SalesOrderAddBloc extends Bloc<SalesOrderAddEvent, SalesOrderAddState> {
       "txtBreakByEmp1", "txtForwarding1S1", "txtForwarding1S2", "dropdownValueFW2", "dtpFW2date", "txtENRef2", "txtExRef2", "txtSealByEmp2", "txtBreakByEmp2",
       "txtForwarding2S1", "txtForwarding2S2", "dropdownValueFW3", "dtpFW3date", "txtSmk3", "txtENRef3", "txtSealByEmp3", "txtBreakByEmp3", "txtForwarding3S2",
       "dropdownValueZB1", "txtZBRef1", "dropdownValueZB2", "txtZBRef2", "txtBoardingOfficer1", "txtBoardingOfficer2", "txtAmount1", "txtAmount2",
-      "txtPortCharges", "chkLETA", "chkOETA", "chkLETB", "chkOETB", "chkLETD", "chkOETD", "chkPickup", "chkDelivery", "chkWareHouseEntry", "chkWareHouseExit",
+      // ✅ FIX 2: Added missing permission allowing user to type in PortCharges Ref
+      "txtPortCharges", "txtPortChargeRef1", "chkLETA", "chkOETA", "chkLETB", "chkOETB", "chkLETD", "chkOETD", "chkPickup", "chkDelivery", "chkWareHouseEntry", "chkWareHouseExit",
       "chkFlightTime", "SAVE", "VIEW", "addProduct", "dropdownValueFW1", "checkBoxValueFW2", "txtSmk2", "checkBoxValueFW1", "checkBoxValueFW3",
     ];
     const restrictedIds = [138, 50, 127, 35, 75, 38, 68, 128, 100, 117, 121];
@@ -521,7 +577,19 @@ class SalesOrderAddBloc extends Bloc<SalesOrderAddEvent, SalesOrderAddState> {
 
     await OnlineApi.SelectCustomer(context); await OnlineApi.SelectJobType(context);
     if (m["JobMasterRefId"] != null) await OnlineApi.SelectAllJobStatus(context, m["JobMasterRefId"]);
-    if (m["AgentCompanyRefId"] != null) await OnlineApi.SelectAgentAll(context, m["AgentCompanyRefId"]);
+
+    // ✅ FIX 3: Safe Sequential Edit Agent Name Loading to avoid overwriting API state memory
+    String lAgentName = '';
+    if (m["AgentCompanyRefId"] != null && m["AgentCompanyRefId"] > 0) {
+      await OnlineApi.SelectAgentAll(context, m["AgentCompanyRefId"]);
+      lAgentName = _getFromAgentAll(m["AgentMasterRefId"]);
+    }
+    String oAgentName = '';
+    if (m["OAgentCompanyRefId"] != null && m["OAgentCompanyRefId"] > 0) {
+      await OnlineApi.SelectAgentAll(context, m["OAgentCompanyRefId"]);
+      oAgentName = _getFromAgentAll(m["OAgentMasterRefId"]);
+    }
+
     await OnlineApi.loadCustomerCurrency(context, m["CustomerRefId"]);
 
     String _safeStr(String? v) => v ?? ''; String _safeNum(dynamic v) => v != null ? v.toString() : '';
@@ -565,8 +633,11 @@ class SalesOrderAddBloc extends Bloc<SalesOrderAddEvent, SalesOrderAddState> {
       txtJobStatus: _getFromStatusList(m["JStatus"]), txtSealByEmp1: _getEmpName(m["SealbyRefid"]), txtSealByEmp2: _getEmpName(m["SealbyRefid2"]),
       txtSealByEmp3: _getEmpName(m["SealbyRefid3"]), txtBreakByEmp1: _getEmpName(m["SealbreakbyRefid"]), txtBreakByEmp2: _getEmpName(m["SealbreakbyRefid2"]),
       txtBreakByEmp3: _getEmpName(m["SealbreakbyRefid3"]), txtBoardingOfficer1: _getEmpName(m["BoardingOfficerRefid"]), txtBoardingOfficer2: _getEmpName(m["BoardingOfficer1Refid"]),
-      txtLAgentCompany: _getFromAgentCompany(m["AgentCompanyRefId"]), txtLAgentName: _getFromAgentAll(m["AgentMasterRefId"]), txtOAgentCompany: _getFromAgentCompany(m["OAgentCompanyRefId"]),
-      txtOAgentName: _getFromAgentAll(m["OAgentMasterRefId"]), txtDoDescription: _safeStr(m["DODescription"]), txtTruckSize: _safeNum(m["TruckSize"]),
+
+      // ✅ FIX 3: Safe binding using sequentially loaded names
+      txtLAgentCompany: _getFromAgentCompany(m["AgentCompanyRefId"]), txtLAgentName: lAgentName, txtOAgentCompany: _getFromAgentCompany(m["OAgentCompanyRefId"]), txtOAgentName: oAgentName,
+
+      txtDoDescription: _safeStr(m["DODescription"]), txtTruckSize: _safeNum(m["TruckSize"]),
       txtRemarks: _safeStr(m["Remarks"]), txtOffVessel: _safeStr(m["Offvesselname"]), txtLoadingVessel: _safeStr(m["Loadingvesselname"]), txtLPort: _safeStr(m["SPort"]),
       txtOPort: _safeStr(m["OPort"]), txtSmk1: _safeStr(m["ForwardingSMKNo"]), txtSmk2: _safeStr(m["ForwardingSMKNo2"]), txtSmk3: _safeStr(m["ForwardingSMKNo3"]),
       txtAWBNo: _safeStr(m["AWBNo"]), txtBLCopy: _safeStr(m["BLCopy"]), txtOSCN: _safeStr(m["SCN"]), txtLSCN: _safeStr(m["LSCN"]), txtLVesselType: _safeStr(m["Vessel"]),
@@ -578,9 +649,11 @@ class SalesOrderAddBloc extends Bloc<SalesOrderAddEvent, SalesOrderAddState> {
       txtAmount2: _safeNum(m["BoardingAmount1"]), txtZBRef1: _safeStr(m["ZbRef"]), txtZBRef2: _safeStr(m["ZbRef2"]), txtWarehouseAddress: _safeStr(m["WareHouseAddress"]),
       txtForwarding1S1: _safeStr(m["Forwarding1S1"]), txtForwarding1S2: _safeStr(m["Forwarding1S2"]), txtForwarding2S1: _safeStr(m["Forwarding2S1"]),
       txtForwarding2S2: _safeStr(m["Forwarding2S2"]), txtForwarding3S1: _safeStr(m["Forwarding3S1"]), txtForwarding3S2: _safeStr(m["Forwarding3S2"]),
-      pickUpAddressList: _splitAddress(m["PickupAddress"]), pickUpQuantityList: _splitAddress(m["pickupQuantityList"]),
-      deliveryAddressList: _splitAddress(m["DeliveryAddress"]), deliveryQuantityList: _splitAddress(m["DeliveryQuantityList"]),
-      txtPickUpAddress: _firstAddress(m["PickupAddress"]), txtDeliveryAddress: _firstAddress(m["DeliveryAddress"]),
+
+      // ✅ FIX 4: Safe, case-insensitive extraction for quantities mapping
+      pickUpAddressList: _splitAddress(_getVal(m, "PickupAddress")), pickUpQuantityList: _splitAddress(_getVal(m, "PickupQuantityList")),
+      deliveryAddressList: _splitAddress(_getVal(m, "DeliveryAddress")), deliveryQuantityList: _splitAddress(_getVal(m, "DeliveryQuantityList")),
+      txtPickUpAddress: _firstAddress(_getVal(m, "PickupAddress")), txtDeliveryAddress: _firstAddress(_getVal(m, "DeliveryAddress")),
     );
     return _applyVisibility(result);
   }
@@ -624,15 +697,32 @@ class SalesOrderAddBloc extends Bloc<SalesOrderAddEvent, SalesOrderAddState> {
       'ForwardingDate': s.checkBoxValueFW1 ? DateTime.parse(s.dtpFW1date).toIso8601String() : null, 'Forwarding2Date': s.checkBoxValueFW2 ? DateTime.parse(s.dtpFW2date).toIso8601String() : null,
       'Forwarding3Date': s.checkBoxValueFW3 ? DateTime.parse(s.dtpFW3date).toIso8601String() : null,
 
-      // ✅ GUARANTEED: Explicitly mapped from the parallel productIds list
       'SaleDetails': s.productViewList.asMap().entries.map((entry) {
         final idx = entry.key;
         final jsonMap = Map<String, dynamic>.from(entry.value.toJson());
         final hardId = s.productIds.length > idx ? s.productIds[idx] : 0;
 
-        jsonMap['ItemMasterRefId'] = hardId;
-        jsonMap['ItemMasterRefid'] = hardId; // Catch all backend casing variations
-        jsonMap['CompanyRefId'] = objfun.Comid;
+        String? exactItemKey;
+        String? exactCompKey;
+
+        for (String key in jsonMap.keys) {
+          final lower = key.toLowerCase();
+          if (lower == 'itemmasterrefid' || lower == 'itemmasterid' || lower == 'productid') exactItemKey = key;
+          if (lower == 'companyrefid') exactCompKey = key;
+        }
+
+        if (exactItemKey != null) {
+          jsonMap[exactItemKey] = hardId;
+        } else {
+          jsonMap['ItemMasterRefId'] = hardId;
+          jsonMap['ItemMasterRefid'] = hardId;
+        }
+
+        if (exactCompKey != null) {
+          jsonMap[exactCompKey] = objfun.Comid;
+        } else {
+          jsonMap['CompanyRefId'] = objfun.Comid;
+        }
 
         return jsonMap;
       }).toList(),

@@ -21,7 +21,7 @@ class SalesOrderAddLoaded extends SalesOrderAddState {
   final bool showSearch;
 
   final List<SaleEditDetailModel> productViewList;
-  final List<int> productIds; // ✅ GUARANTEES ITEM MASTER ID IS SAVED
+  final List<int> productIds;
   final int? productUpdateIndex;
   final int productId;
 
@@ -242,6 +242,7 @@ class SalesOrderAddLoaded extends SalesOrderAddState {
     this.txtProductSaleRate = '', this.txtProductGst = '', this.txtProductAmount = '', this.fieldPermission = const {}, this.savedMessage, this.isSaved = false,
   });
 
+  // ✅ CRITICAL BUG FIX 1: Absolutely EVERY text field is now aggressively tracked in Equatable to prevent fading
   @override
   List<Object?> get props => [
     progress, showSearch, productViewList.length, productIds, productUpdateIndex, productId, totalAmount, taxAmount, currencyValue, actualAmount, coinage,
@@ -251,12 +252,17 @@ class SalesOrderAddLoaded extends SalesOrderAddState {
     checkBoxValuePickUp, checkBoxValueDelivery, checkBoxValueWHEntry, checkBoxValueWHExit, checkBoxValueFW1, checkBoxValueFW2, checkBoxValueFW3,
     visibleOffVessel, visibleLoadingVessel, visibleGC, visibleFORWARDING, visibleProductview, visibleFW1, visibleFW2, visibleFW3, disabledBillType,
     dropdownValue, dropdownValueTruckSize, dropdownValueFW1, dropdownValueFW2, dropdownValueFW3, dropdownValueZB1, dropdownValueZB2,
-    pickUpAddressList.length, deliveryAddressList.length, txtJobNo, txtCustomer, txtJobType, txtJobStatus, txtOrigin, txtDestination,
-    txtCommodityType, txtCargo, txtLPort, txtOPort, txtLVesselType, txtOVesselType, txtLAgentCompany, txtLAgentName, txtOAgentCompany,
-    txtOAgentName, txtBoardingOfficer1, txtBoardingOfficer2, txtSealByEmp1, txtSealByEmp2, txtSealByEmp3, txtBreakByEmp1, txtBreakByEmp2,
-    txtBreakByEmp3, txtPickUpAddress, txtPickUpQuantity, txtDeliveryAddress, txtDeliveryQuantity, txtWarehouseAddress, txtWeight, txtQuantity,
-    txtTruckSize, txtAWBNo, txtBLCopy, txtPTWNo, txtOffVessel, txtLoadingVessel, txtAmount1, txtAmount2, txtPortCharges, txtRemarks, txtDoDescription,
-    txtProductDescription, txtProductQty, txtProductSaleRate, txtProductGst, txtProductAmount, savedMessage, isSaved,
+    pickUpAddressList.length, deliveryAddressList.length,
+    // ALL TEXT FIELDS
+    txtJobNo, txtCustomer, txtJobType, txtJobStatus, txtRemarks, txtDoDescription, txtWeight, txtQuantity, txtTruckSize,
+    txtAWBNo, txtBLCopy, txtPTWNo, txtCommodityType, txtCargo, txtLAgentCompany, txtLAgentName, txtLSCN, txtLoadingVessel,
+    txtLPort, txtLVesselType, txtOAgentCompany, txtOAgentName, txtOSCN, txtOffVessel, txtOPort, txtOVesselType, txtPickUpAddress,
+    txtPickUpQuantity, txtDeliveryAddress, txtDeliveryQuantity, txtWarehouseAddress, txtOrigin, txtDestination, txtSmk1, txtSmk2,
+    txtSmk3, txtENRef1, txtENRef2, txtENRef3, txtExRef1, txtExRef2, txtExRef3, txtSealByEmp1, txtSealByEmp2, txtSealByEmp3,
+    txtBreakByEmp1, txtBreakByEmp2, txtBreakByEmp3, txtZBRef1, txtZBRef2, txtBoardingOfficer1, txtBoardingOfficer2, txtAmount1,
+    txtAmount2, txtPortChargeRef1, txtPortCharges, txtForwarding1S1, txtForwarding1S2, txtForwarding2S1, txtForwarding2S2,
+    txtForwarding3S1, txtForwarding3S2, txtProductCode, txtProductDescription, txtProductQty, txtProductSaleRate, txtProductGst,
+    txtProductAmount, fieldPermission, savedMessage, isSaved,
   ];
 
   SalesOrderAddLoaded copyWith({
