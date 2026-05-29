@@ -91,6 +91,7 @@ class NewAdminDashboard extends StatefulWidget{
   @override
   State<NewAdminDashboard> createState() => _AdminDashboardState();
 }
+
 class _AdminDashboardState extends State<NewAdminDashboard> with SingleTickerProviderStateMixin {
 
   late TabController _tabController;
@@ -100,182 +101,75 @@ class _AdminDashboardState extends State<NewAdminDashboard> with SingleTickerPro
     super.initState();
     _tabController = TabController(length: 25, vsync: this);
     _tabController.addListener(_onTabChanged);
-
   }
 
   void _onTabChanged(){
     final index = _tabController.index;
     context.read<AdminTabBloc>().add(AdminTabChanged(index));
   }
+
   @override
   void dispose() {
     _tabController.removeListener(_onTabChanged);
     _tabController.dispose();
     super.dispose();
   }
+
   @override
   Widget build(BuildContext context) {
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        final isTablet = constraints.maxWidth >= 600;
-        return MultiBlocProvider(
-          providers: [
-            BlocProvider<AdminTabBloc>(
-              create: (_) => AdminTabBloc(),
-            ),
-            BlocProvider<SalesBloc>(
-              create: (_) => SalesBloc(),
-            ),
-            BlocProvider<TruckBloc>(
-              create: (_) => TruckBloc(),
-            ),
-            BlocProvider(
-              create: (_) => InvoiceBloc(
-                invoiceRepo: InvoiceRepositoryImpl(),
-              )..add( LoadInvoiceByType(0)),
-              child: const InvoiceTab(),
-            ),
-            BlocProvider(
-              create: (_) => sl<SalesOrderBloc>()
-                ..add(LoadInvoiceByTypes(1)), // ✅ fires on page open
-              child: const SalesOrderTab(),
-            ),
-            BlocProvider(
-              create: (_) => sl<ReceiptBloc>()..add(LoadReceiptEvent()),
-              child: const ReceiptPage(),
-            ),
-
-            BlocProvider(
-              // Use sl (GetIt) to create the Bloc. It automatically injects the required repository.
-              create: (_) => sl<ForwardingReportBloc>()
-                ..add(const LoadForwardingReportEvent()),
-              child: const ForwardingReportView(),
-            ),
-            BlocProvider(
-              create: (_) => sl<ExpenseReportBloc>()
-                ..add(const LoadExpenseReportEvent()),
-              child: const ExpenseReportView(),
-            ),
-            BlocProvider(
-              create: (context) => sl<VesselBloc>()
-                ..add(const LoadVesselDataEvent(type: 0)),
-              child: VesselReportPage(),
-            ),
-            BlocProvider(
-              create: (context) => sl<TransportBloc>()
-                ..add(const LoadTransportDataEvent(type: 0)),
-              child: const TransportReportPage(),
-            ),
-            BlocProvider(
-              create: (context) => sl<TruckDetailsBloc>()..add(const LoadTruckDetailsEvent()),
-              child: const TruckDetailsReportPage(),
-            ),
-            BlocProvider(
-            create: (context) => sl<DriverBloc>()..add(const LoadDriverEvent()),
-            child: const DriverDetailsView(),
-            ),
-            BlocProvider(
-            create: (context) => sl<SpeedingBloc>()..add(LoadSpeedingReport()),
-            child: const SpeedingScreen(),
-            ),
-
-            BlocProvider(
-            create: (context) => sl<FuelFillingBloc>()..add(LoadFuelFillingReport()),
-            child: const FuelFillingPage(),
-            ),
-
-            BlocProvider(
-            create: (context) => sl<EngineHoursBloc>()..add(LoadEngineHoursReport()),
-            child: const EngineHoursPage(),
-            ),
-            BlocProvider(
-            create: (context) => sl<BocBloc>()..add(LoadBocReport()),
-            child: const BocPage(),
-            ),
-            BlocProvider(
-              create: (context) => sl<EmailBloc>()..add(const LoadEmployeesEvent()),
-              child: const EmailPage(), // Remember to add BlocListener here if you want SnackBars for EmailError or EmailSaveSuccess!
-            ),
-            BlocProvider(
-              create: (context) => sl<ReviewBloc>()..add(const LoadEmployeeEvent()),
-              child: const ReviewEntryPage(), // Add BlocListener here to listen for ReviewSaveSuccess and ReviewError!
-            ),
-
-            BlocProvider(
-              create: (context) => sl<FuelDiffBloc>()..add(const LoadFuelDiffEvent()),
-              child: const FuelDiffPage(), // Remember to add BlocListener here if you want to show SnackBars for FuelDiffError!
-            ),
-            BlocProvider(
-            create: (context) => sl<EmployeeMasterBloc>(),
-            child: const EmployeeViewPage(),
-            ),
-            BlocProvider(
-              create: (context) => sl<PettyCashBloc>()..add(const LoadPettyCashEvent()),
-              child: const PettyCashPage(),
-            ),
-            BlocProvider(
-              // ✅ Removed 'context', added named 'repository' parameter
-              create: (_) => SummonBloc.form(
-                repository: sl<SummonRepository>(),
-              ),
-              child: const SummonEntryPage(),
-            ),
-            BlocProvider(
-              // ✅ Removed 'context', added named 'repository', and removed the redundant ..add() cascade
-              create: (_) => SparePartsBloc.form(
-                repository: sl<SparePartsRepository>(),
-              ),
-              child: const SparePartsEntryPage(),
-            ),
-            BlocProvider(
-              create: (_) => sl<PaymentPendingBloc>(),
-              child: const PaymentPendingPage(),
-            ),
-            BlocProvider(
-              // ✅ Removed 'context', added named 'repository' parameter
-              create: (_) => SpotSaleBloc.form(
-                repository: sl<SpotSaleRepository>(),
-              ),
-              child: const SpotSaleEntryPage(),
-            ),
-            BlocProvider(
-              // ✅ Removed 'context', added named 'repository', and removed the redundant ..add() cascade
-              create: (_) => InventoryBloc(
-                repository: sl<InventoryReportRepository>(),
-              ),
-              child: const InventoryPage(),
-            ),
-            BlocProvider(
-              create: (_) => PDOBloc(
-                repository: sl<PDORepository>(),
-                fromDate: DateFormat('yyyy-MM-dd').format(DateTime.now().subtract(const Duration(days: 30))),
-                toDate: DateFormat('yyyy-MM-dd').format(DateTime.now()),
-              ),
-              child: PDOViewPage(
-                fromDate: DateFormat('yyyy-MM-dd').format(DateTime.now().subtract(const Duration(days: 30))),
-                toDate: DateFormat('yyyy-MM-dd').format(DateTime.now()),
-              ),
-            ),
-            BlocProvider(
-              // ✅ Removed 'context', removed the redundant ..add(), and used our Service Locator!
-              create: (_) => sl<RTIDetailsBloc>(),
-              child: const RTIDetailsPage(),
-            ),
-
-
-          ],                                    // ← ] தான் close, } இல்ல
-          child: Scaffold(
+    // ✅ FIX 1: MultiBlocProvider is now the top-level widget
+    return MultiBlocProvider(
+      providers: [
+        // ✅ FIX 2: Removed all invalid 'child:' arguments
+        BlocProvider<AdminTabBloc>(create: (_) => AdminTabBloc()),
+        BlocProvider<SalesBloc>(create: (_) => SalesBloc()),
+        BlocProvider<TruckBloc>(create: (_) => TruckBloc()),
+        BlocProvider<InvoiceBloc>(
+          create: (_) => InvoiceBloc(invoiceRepo: InvoiceRepositoryImpl())..add(LoadInvoiceByType(0)),
+        ),
+        BlocProvider<SalesOrderBloc>(create: (_) => sl<SalesOrderBloc>()..add(LoadInvoiceByTypes(1))),
+        BlocProvider<ReceiptBloc>(create: (_) => sl<ReceiptBloc>()..add(LoadReceiptEvent())),
+        BlocProvider<ForwardingReportBloc>(create: (_) => sl<ForwardingReportBloc>()..add(const LoadForwardingReportEvent())),
+        BlocProvider<ExpenseReportBloc>(create: (_) => sl<ExpenseReportBloc>()..add(const LoadExpenseReportEvent())),
+        BlocProvider<VesselBloc>(create: (context) => sl<VesselBloc>()..add(const LoadVesselDataEvent(type: 0))),
+        BlocProvider<TransportBloc>(create: (context) => sl<TransportBloc>()..add(const LoadTransportDataEvent(type: 0))),
+        BlocProvider<TruckDetailsBloc>(create: (context) => sl<TruckDetailsBloc>()..add(const LoadTruckDetailsEvent())),
+        BlocProvider<DriverBloc>(create: (context) => sl<DriverBloc>()..add(const LoadDriverEvent())),
+        BlocProvider<SpeedingBloc>(create: (context) => sl<SpeedingBloc>()..add(LoadSpeedingReport())),
+        BlocProvider<FuelFillingBloc>(create: (context) => sl<FuelFillingBloc>()..add(LoadFuelFillingReport())),
+        BlocProvider<EngineHoursBloc>(create: (context) => sl<EngineHoursBloc>()..add(LoadEngineHoursReport())),
+        BlocProvider<BocBloc>(create: (context) => sl<BocBloc>()..add(LoadBocReport())),
+        BlocProvider<EmailBloc>(create: (context) => sl<EmailBloc>()..add(const LoadEmployeesEvent())),
+        BlocProvider<ReviewBloc>(create: (context) => sl<ReviewBloc>()..add(const LoadEmployeeEvent())),
+        BlocProvider<FuelDiffBloc>(create: (context) => sl<FuelDiffBloc>()..add(const LoadFuelDiffEvent())),
+        BlocProvider<EmployeeMasterBloc>(create: (context) => sl<EmployeeMasterBloc>()),
+        BlocProvider<PettyCashBloc>(create: (context) => sl<PettyCashBloc>()..add(const LoadPettyCashEvent())),
+        BlocProvider<SummonBloc>(create: (_) => SummonBloc.form(repository: sl<SummonRepository>())),
+        BlocProvider<SparePartsBloc>(create: (_) => SparePartsBloc.form(repository: sl<SparePartsRepository>())),
+        BlocProvider<PaymentPendingBloc>(create: (_) => sl<PaymentPendingBloc>()),
+        BlocProvider<SpotSaleBloc>(create: (_) => SpotSaleBloc.form(repository: sl<SpotSaleRepository>())),
+        BlocProvider<InventoryBloc>(create: (_) => InventoryBloc(repository: sl<InventoryReportRepository>())),
+        BlocProvider<PDOBloc>(
+          create: (_) => PDOBloc(
+            repository: sl<PDORepository>(),
+            fromDate: DateFormat('yyyy-MM-dd').format(DateTime.now().subtract(const Duration(days: 30))),
+            toDate: DateFormat('yyyy-MM-dd').format(DateTime.now()),
+          ),
+        ),
+        BlocProvider<RTIDetailsBloc>(create: (_) => sl<RTIDetailsBloc>()),
+      ],
+      // ✅ FIX 3: LayoutBuilder is inside. Now, opening the drawer only redraws the UI, not the APIs!
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          final isTablet = constraints.maxWidth >= 600;
+          return Scaffold(
             body: MobileDashboard(
               tabController: _tabController,
               isTablet: isTablet,
             ),
-          ),
-        );                                      // ← MultiBlocProvider close
-      },                                        // ← LayoutBuilder builder close
-    );                                          // ← LayoutBuilder close
-  }                                             // ← build() close
+          );
+        },
+      ),
+    );
+  }
 }
-
-
-
-
