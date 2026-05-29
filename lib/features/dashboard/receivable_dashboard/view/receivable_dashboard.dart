@@ -57,18 +57,17 @@ class _AdminDashboardState extends State<ReceivableDashboard> with SingleTickerP
             ),
             BlocProvider(
               create: (_) => sl<SalesOrderBloc>()
-                ..add(LoadInvoiceByTypes(1)), // ✅ fires on page open
+                ..add(LoadInvoiceByTypes(1)),
               child: const SalesOrderTab(),
             ),
-
-          ],                                    // ← ] தான் close, } இல்ல
+          ],
           child: Scaffold(
             body: ReceivableMobileDashboard(
               tabController: _tabController,
               isTablet: isTablet,
             ),
           ),
-        );                                      // ← MultiBlocProvider close
+        );
       },                                        // ← LayoutBuilder builder close
     );                                          // ← LayoutBuilder close
   }                                             // ← build() close

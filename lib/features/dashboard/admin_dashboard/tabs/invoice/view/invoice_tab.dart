@@ -41,21 +41,31 @@ String _indFmt(dynamic raw) {
   return '${buf.toString()},$last3';
 }
 
-class InvoiceTab extends StatelessWidget {
+class InvoiceTab extends StatefulWidget {
   const InvoiceTab({super.key});
 
   @override
+  State<InvoiceTab> createState() => _InvoiceTabState();
+}
+
+class _InvoiceTabState extends State<InvoiceTab> {
+  late final InvoiceBloc _bloc;
+
+  @override
+  void initState() {
+    super.initState();
+    _bloc = sl<InvoiceBloc>()..add(LoadInvoiceByType(0));
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (_) => sl<InvoiceBloc>()..add(LoadInvoiceByType(0)),
+    return BlocProvider.value(
+      value: _bloc,
       child: const _InvoiceView(),
     );
   }
 }
 
-// ══════════════════════════════════════════════════════════════
-// VIEW — all UI logic here, reads from BLoC via context
-// ══════════════════════════════════════════════════════════════
 class _InvoiceView extends StatelessWidget {
   const _InvoiceView();
 
@@ -158,9 +168,6 @@ class _InvoiceView extends StatelessWidget {
   }
 }
 
-// ══════════════════════════════════════════════════════════════
-// ERROR BODY
-// ══════════════════════════════════════════════════════════════
 class _ErrorBody extends StatelessWidget {
   final String message;
   const _ErrorBody({required this.message});
@@ -189,9 +196,6 @@ class _ErrorBody extends StatelessWidget {
   }
 }
 
-// ══════════════════════════════════════════════════════════════
-// TABLET LAYOUT
-// ══════════════════════════════════════════════════════════════
 class _TabletBody extends StatelessWidget {
   final InvoiceLoaded state;
   final Map<String, dynamic> data;
@@ -237,9 +241,6 @@ class _TabletBody extends StatelessWidget {
   }
 }
 
-// ══════════════════════════════════════════════════════════════
-// MOBILE LAYOUT
-// ══════════════════════════════════════════════════════════════
 class _MobileBody extends StatelessWidget {
   final InvoiceLoaded state;
   final Map<String, dynamic> data;
@@ -307,9 +308,6 @@ class _MobileBody extends StatelessWidget {
   }
 }
 
-// ══════════════════════════════════════════════════════════════
-// DIALOGS & SHEETS
-// ══════════════════════════════════════════════════════════════
 Future<void> _showWaitingSheet(
     BuildContext context,
     List<dynamic> billingData,
@@ -420,10 +418,6 @@ void _showEmployeeDialog(BuildContext context, List<dynamic> data) {
     ),
   );
 }
-
-// ══════════════════════════════════════════════════════════════
-// SMALL EXTRACTED WIDGETS
-// ══════════════════════════════════════════════════════════════
 
 class _BillingCard extends StatelessWidget {
   final dynamic item;
