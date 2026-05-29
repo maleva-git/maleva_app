@@ -25,6 +25,7 @@ import '../../admin_dashboard/tabs/invoice/bloc/invoice_bloc.dart';
 import '../../admin_dashboard/tabs/invoice/bloc/invoice_event.dart';
 import '../../admin_dashboard/tabs/invoice/data/invoice_repository.dart';
 import '../../admin_dashboard/tabs/invoice/view/invoice_tab.dart';
+import '../../admin_dashboard/tabs/salesorder/bloc/salesorder_event.dart';
 import '../../admin_dashboard/tabs/salesorder/view/salesorderview_tab.dart';
 import '../../admin_dashboard/tabs/spotsaleorder/bloc/spotsaleorder_bloc.dart';
 import '../../admin_dashboard/tabs/spotsaleorder/data/spotsale_repository.dart';
@@ -61,7 +62,7 @@ class _AdminDashboardState extends State<SubAdminDashboard> with SingleTickerPro
 
   void _onTabChanged(){
     final index = _tabController.index;
-    context.read<SubAdminTabBloc>().add(TabChanged(index));
+    context.read<SubAdminTabBloc>().add(SATabChanged(index));
   }
   @override
   void dispose() {
@@ -92,7 +93,8 @@ class _AdminDashboardState extends State<SubAdminDashboard> with SingleTickerPro
               child: const InvoiceTab(),
             ),
             BlocProvider(
-              create: (context) => sl<SalesOrderBloc>(),
+              create: (_) => sl<SalesOrderBloc>()
+                ..add(LoadInvoiceByTypes(1)), // ✅ fires on page open
               child: const SalesOrderTab(),
             ),
             BlocProvider(

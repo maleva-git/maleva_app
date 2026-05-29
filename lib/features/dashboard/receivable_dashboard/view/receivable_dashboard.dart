@@ -8,6 +8,7 @@ import '../../admin_dashboard/tabs/invoice/bloc/invoice_bloc.dart';
 import '../../admin_dashboard/tabs/invoice/bloc/invoice_event.dart';
 import '../../admin_dashboard/tabs/invoice/data/invoice_repository.dart';
 import '../../admin_dashboard/tabs/invoice/view/invoice_tab.dart';
+import '../../admin_dashboard/tabs/salesorder/bloc/salesorder_event.dart';
 import '../../admin_dashboard/tabs/salesorder/view/salesorderview_tab.dart';
 import '../bloc/receivable_bloc.dart';
 import '../bloc/receivable_event.dart';
@@ -55,7 +56,8 @@ class _AdminDashboardState extends State<ReceivableDashboard> with SingleTickerP
               child: const InvoiceTab(),
             ),
             BlocProvider(
-              create: (_) => sl<SalesOrderBloc>(),
+              create: (_) => sl<SalesOrderBloc>()
+                ..add(LoadInvoiceByTypes(1)), // ✅ fires on page open
               child: const SalesOrderTab(),
             ),
 
