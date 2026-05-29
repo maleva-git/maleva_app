@@ -50,8 +50,6 @@ import '../features/transport/updatertidetails/bloc/updatertidetails_bloc.dart';
 import '../features/transport/updatertidetails/bloc/updatertidetails_event.dart';
 import '../features/transport/updatertidetails/view/updatertidetails_tab.dart';
 
-
-
 class Menulist extends StatefulWidget {
   const Menulist({super.key});
   @override
@@ -360,8 +358,9 @@ class _MenuTileState extends State<_MenuTile>
   late final AnimationController _expandCtrl;
   late final Animation<double>   _expandAnim;
 
+  // 🚨 CRITICAL FIX: The "&& e.Id != widget.entry.Id" prevents an Infinite Loop ANR
   List<MenuMasterModel> get _children => objfun.objMenuMaster
-      .where((e) => e.ParentId == widget.entry.Id)
+      .where((e) => e.ParentId == widget.entry.Id && e.Id != widget.entry.Id)
       .toList();
 
   bool get _hasChildren => _children.isNotEmpty;
@@ -696,8 +695,6 @@ class _MenuTileState extends State<_MenuTile>
           );
           break;
 
-        // case "Update Air Frieght":
-        //   Navigator.push(ctx, _r(const AirFrieghtUpdate()));    break;
         case "JobStatus Update":
           Navigator.push(ctx, _r(const JobStatusUpdate()));     break;
         case "Forwarding Update":
@@ -833,18 +830,12 @@ class _MenuTileState extends State<_MenuTile>
             ),
           );
           break;
- /*
-        case "Fuel Entry":
-          Navigator.push(ctx, _r(const FuelEntry()));           break;*/
-
 
         case "EnquiryTR Master":
           Navigator.push(ctx, _r(const EnquiryTRView()));       break;
 
         case "Maintenance":
           Navigator.push(ctx, _r(const Maintenance()));         break;
-        // case "License Update":
-        //   Navigator.push(ctx, _r(const LicenseUpdate()));       break;
         case "Update RTI Details":
           Navigator.push(ctx, _r(const UpdateRTI()));           break;
         case "Forwarding SMK Update":

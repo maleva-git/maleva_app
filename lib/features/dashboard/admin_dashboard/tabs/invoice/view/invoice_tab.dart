@@ -1218,7 +1218,7 @@ class _MonthBarItem extends StatelessWidget {
 }
 
 // ══════════════════════════════════════════════════════════════
-// TODAY vs YESTERDAY CHART
+// TODAY vs YESTERDAY CHART (CRASH FIX APPLIED)
 // ══════════════════════════════════════════════════════════════
 class _TodayYesterdayChartCard extends StatelessWidget {
   final Map<String, dynamic> data;
@@ -1263,7 +1263,15 @@ class _TodayYesterdayChartCard extends StatelessWidget {
   }
 
   LineChartData _buildChart(double today, double yesterday) {
+    // 🚨 CRITICAL FIX: Prevent FlChart Infinite Loop Crash 🚨
+    // If both values are 0, FlChart divides by zero when drawing grids.
+    // We force a minimum scale of 100 to prevent the screen from freezing.
+    double maxVal = today > yesterday ? today : yesterday;
+    if (maxVal == 0) maxVal = 100;
+
     return LineChartData(
+      minY: 0,
+      maxY: maxVal * 1.2, // Adds 20% breathing room at the top
       gridData: FlGridData(
         show: true,
         drawVerticalLine: false,
@@ -1362,3 +1370,19 @@ class _LegendDot extends StatelessWidget {
     ]);
   }
 }
+
+// class _LegendDot extends StatelessWidget {
+//   final Color color;
+//   final String label;
+//   const _LegendDot({required this.color, required this.label});
+//
+//   @override
+//   Widget build(BuildContext context) {
+//     return Row(children: [
+//       Container(width: 10, height: 3, color: color),
+//       const SizedBox(width: 4),
+//       Text(label,
+//           style: TextStyle(fontSize: 11, color: Colors.grey.shade600)),
+//     ]);
+//   }
+// }
