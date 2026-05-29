@@ -6,7 +6,7 @@ import 'package:maleva/features/dashboard/subadmin_dashboard/bloc/subadmin_dashb
 
 class SubAdminTabBloc extends Bloc<SubAdminTabEvent, SubAdminTabState> {
   SubAdminTabBloc() : super(SubAdminTabState(index: 0)) {
-    on<TabChanged>((event, emit) {
+    on<SATabChanged>((event, emit) {
       emit(SubAdminTabState(index: event.index));
     });
   }

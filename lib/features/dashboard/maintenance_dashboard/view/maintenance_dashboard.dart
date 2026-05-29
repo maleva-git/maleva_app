@@ -59,6 +59,7 @@ import '../../admin_dashboard/tabs/receiptview/bloc/receiptview_event.dart';
 import '../../admin_dashboard/tabs/receiptview/view/receiptview_tab.dart';
 import '../../admin_dashboard/tabs/rtiview/bloc/rtiview_bloc.dart';
 import '../../admin_dashboard/tabs/rtiview/view/rtiview_tab.dart';
+import '../../admin_dashboard/tabs/salesorder/bloc/salesorder_event.dart';
 import '../../admin_dashboard/tabs/salesorder/view/salesorderview_tab.dart';
 import '../../admin_dashboard/tabs/spareparts/bloc/spareparts_bloc.dart';
 import '../../admin_dashboard/tabs/spareparts/data/spareparts_repository.dart';
@@ -136,7 +137,8 @@ class _AdminDashboardState extends State<MaintenanceDashboard> with SingleTicker
               child: const InvoiceTab(),
             ),
             BlocProvider(
-              create: (_) =>sl<SalesOrderBloc>(),
+              create: (_) => sl<SalesOrderBloc>()
+                ..add(LoadInvoiceByTypes(1)), // ✅ fires on page open
               child: const SalesOrderTab(),
             ),
             BlocProvider(
