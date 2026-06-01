@@ -255,14 +255,7 @@ class _SalesOrderTabState extends State<SalesOrderTab> {
                     fontSize: 15,
                     fontWeight: FontWeight.bold,
                     color: Color(0xFF1A2340))),
-            GestureDetector(
-              onTap: () {},
-              child: const Text('See all →',
-                  style: TextStyle(
-                      fontSize: 12,
-                      color: Color(0xFF4A6FE3),
-                      fontWeight: FontWeight.w600)),
-            ),
+
           ],
         ),
         const SizedBox(height: 10),
@@ -435,12 +428,7 @@ class _SalesOrderTabState extends State<SalesOrderTab> {
         : (state.monthData[index - 1]["SalesAmount"] as num).toDouble();
     final diff     = prev == 0 ? 0.0 : ((current - prev) / prev) * 100;
     final isGrowth = diff >= 0;
-
-    final maxVal = state.monthData
-        .map((e) => (e["SalesAmount"] as num).toDouble())
-        .fold(0.0, (a, b) => a > b ? a : b);
-    final barFraction =
-    maxVal == 0 ? 0.0 : (current / maxVal).clamp(0.0, 1.0);
+    final count = state.monthData[index]["SalesCount"]?.toString() ?? "0";
 
     const dotColors = [
       Color(0xFF4A6FE3), Color(0xFF7B61FF), Color(0xFF00C9A7),
@@ -483,49 +471,68 @@ class _SalesOrderTabState extends State<SalesOrderTab> {
         ),
         child: Row(
           children: [
-            Container(
-              width: 8,
-              height: 8,
-              decoration:
-              BoxDecoration(color: dotColor, shape: BoxShape.circle),
-            ),
-            const SizedBox(width: 10),
-            SizedBox(
-              width: isTablet ? 72 : 56,
-              child: Text(month,
-                  style: TextStyle(
+            // --- LEFT COLUMN ---
+            Expanded(
+              flex: 3, // Gives 30% of space to the left
+              child: Row(
+                children: [
+                  Container(
+                    width: 8,
+                    height: 8,
+                    decoration: BoxDecoration(
+                        color: dotColor,
+                        shape: BoxShape.circle
+                    ),
+                  ),
+                  const SizedBox(width: 10),
+                  Text(
+                    month,
+                    style: TextStyle(
                       color: const Color(0xFF1A2340),
                       fontWeight: FontWeight.w600,
-                      fontSize: isTablet ? 13 : 12)),
+                      fontSize: isTablet ? 15 : 14, // ✅ INCREASED (was 13/12)
+                    ),
+                  ),
+                ],
+              ),
             ),
-            const SizedBox(width: 8),
+
+            // --- MIDDLE COLUMN ---
             Expanded(
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(4),
-                child: LinearProgressIndicator(
-                  value: barFraction,
-                  minHeight: isTablet ? 8 : 7,
-                  backgroundColor: const Color(0xFFEEF2F7),
-                  valueColor: AlwaysStoppedAnimation<Color>(dotColor),
+              flex: 4, // Gives 40% of space to the middle
+              child: Text(
+                "$count Invoices",
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  color: const Color(0xFF1A2340),
+                  fontSize: isTablet ? 14 : 13, // ✅ INCREASED (was 12/11)
+                  fontWeight: FontWeight.bold,
                 ),
               ),
             ),
-            const SizedBox(width: 12),
-            Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(fmtAmount(current),
+
+            // --- RIGHT COLUMN ---
+            Expanded(
+              flex: 4, // Gives 40% of space to the right
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  Text(
+                    fmtAmount(current),
                     style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: isTablet ? 12 : 11,
-                        color: const Color(0xFF1A2340))),
-                const SizedBox(width: 4),
-                Icon(
-                  isGrowth ? Icons.arrow_upward : Icons.arrow_downward,
-                  size: isTablet ? 13 : 11,
-                  color: isGrowth ? Colors.green : Colors.red,
-                ),
-              ],
+                      fontWeight: FontWeight.bold,
+                      fontSize: isTablet ? 14 : 13, // ✅ INCREASED (was 12/11)
+                      color: const Color(0xFF1A2340),
+                    ),
+                  ),
+                  const SizedBox(width: 4),
+                  Icon(
+                    isGrowth ? Icons.arrow_upward : Icons.arrow_downward,
+                    size: isTablet ? 15 : 13, // ✅ INCREASED icon size to match text
+                    color: isGrowth ? Colors.green : Colors.red,
+                  ),
+                ],
+              ),
             ),
           ],
         ),
