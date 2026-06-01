@@ -780,7 +780,7 @@ class _OverviewSection extends StatelessWidget {
               // ✅ Monthly → type 4
               onTap: () => context
                   .read<InvoiceBloc>()
-                  .add(LoadEmployeeInvData(4)),
+                  .add(LoadEmployeeInvData(3)),
             )),
         const SizedBox(width: 12),
         Expanded(
