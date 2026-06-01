@@ -12,21 +12,23 @@ import '../bloc/vesselplanningdetails_event.dart';
 import '../bloc/vesselplanningdetails_state.dart';
 
 class VesselPlanningDetailsView extends StatelessWidget {
-  const VesselPlanningDetailsView({super.key});
+  final int masterId; // ✅ 1. Add the ID here
+  const VesselPlanningDetailsView({super.key, required this.masterId});
 
   @override
   Widget build(BuildContext context) {
-    return
-      BlocProvider(
-        create: (_) => sl<VesselPlanningDetailsBloc>()
-          ..add(const VesselPlanningDetailsStartupRequested()),
-        child: const _VesselPlanningDetailsView(), // Ensure this matches your actual View class name
-      );
+    return BlocProvider(
+      create: (_) => sl<VesselPlanningDetailsBloc>()
+      // ✅ 2. Pass the ID to the Startup event
+        ..add(VesselPlanningDetailsStartupRequested(masterId)),
+      child: _VesselPlanningDetailsView(masterId: masterId), // ✅ 3. Pass it to the inner view
+    );
   }
 }
 
 class _VesselPlanningDetailsView extends StatelessWidget {
-  const _VesselPlanningDetailsView();
+  final int masterId; // ✅ 4. Add the ID here
+  const _VesselPlanningDetailsView({required this.masterId});
 
   @override
   Widget build(BuildContext context) {
@@ -58,6 +60,7 @@ class _VesselPlanningDetailsView extends StatelessWidget {
       },
     );
   }
+
   Widget _buildScaffold(BuildContext ctx,
       VesselPlanningDetailsState state, bool isTablet) {
     return Scaffold(
@@ -72,13 +75,15 @@ class _VesselPlanningDetailsView extends StatelessWidget {
           : state.status == VesselPlanningDetailsStatus.failure
           ? _ErrorWidget(
         message: state.errorMessage,
+        // ✅ 5. FIX: Pass the masterId to the Retry event
         onRetry: () => ctx
             .read<VesselPlanningDetailsBloc>()
-            .add(const VesselPlanningDetailsStartupRequested()),
+            .add(VesselPlanningDetailsStartupRequested(masterId)),
       )
           : _buildBody(ctx, state, isTablet),
     );
   }
+
   PreferredSizeWidget _buildAppBar(
       BuildContext ctx, bool isTablet) {
     final String userName =
@@ -120,16 +125,17 @@ class _VesselPlanningDetailsView extends StatelessWidget {
       ),
       actions: [
         IconButton(
-          icon: const Icon(Icons.refresh_rounded,
-              color: AppTokens.appBarIcon),
+          icon: const Icon(Icons.refresh_rounded, color: AppTokens.appBarIcon),
           tooltip: 'Refresh',
+          // ✅ Passed ID here
           onPressed: () => ctx
               .read<VesselPlanningDetailsBloc>()
-              .add(const VesselPlanningDetailsRefreshRequested()),
+              .add(VesselPlanningDetailsRefreshRequested(masterId)),
         ),
       ],
     );
   }
+
   Widget _buildBody(BuildContext ctx,
       VesselPlanningDetailsState state, bool isTablet) {
     return Padding(
@@ -149,10 +155,10 @@ class _VesselPlanningDetailsView extends StatelessWidget {
                 : RefreshIndicator(
               color: AppTokens.brandPrimary,
               onRefresh: () async {
+                // ✅ Passed ID here
                 ctx.read<VesselPlanningDetailsBloc>().add(
-                    const VesselPlanningDetailsRefreshRequested());
-                await Future.delayed(
-                    const Duration(milliseconds: 600));
+                    VesselPlanningDetailsRefreshRequested(masterId));
+                await Future.delayed(const Duration(milliseconds: 600));
               },
               child: ListView.builder(
                 physics:

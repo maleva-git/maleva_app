@@ -163,7 +163,7 @@ class _SalesOrderTabState extends State<SalesOrderTab> {
                     child: Column(children: [
                       _HeroHeaderCard(state: state, data: data),
                       const SizedBox(height: 16),
-                      _buildOverviewGrid(context, state, data, isTablet: true),
+                      _buildOverviewGrid(context, state, data, isTablet: true, tabIndex: tabIndex),
                       const SizedBox(height: 16),
                       _buildStatusRow(context, state, isTablet: true),
                     ]),
@@ -186,7 +186,7 @@ class _SalesOrderTabState extends State<SalesOrderTab> {
                 _buildTrendHeader(state, isTablet: true),
                 const SizedBox(height: 12),
                 Expanded(
-                  child: _buildMonthList(context, state, isTablet: true),
+                  child: _buildMonthList(context, state, isTablet: true, tabIndex: tabIndex),
                 ),
               ],
             ),
@@ -213,7 +213,7 @@ class _SalesOrderTabState extends State<SalesOrderTab> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      _buildOverviewSection(context, state, data),
+                      _buildOverviewSection(context, state, data,tabIndex: tabIndex),
                       const SizedBox(height: 14),
                       _buildStatusRow(context, state, isTablet: false),
                       const SizedBox(height: 20),
@@ -228,7 +228,7 @@ class _SalesOrderTabState extends State<SalesOrderTab> {
                 sliver: SliverList(
                   delegate: SliverChildBuilderDelegate(
                         (context, index) =>
-                        _buildMonthItem(context, state, index, isTablet: false),
+                        _buildMonthItem(context, state, index, isTablet: false,tabIndex: tabIndex),
                     childCount: state.monthList.length,
                   ),
                 ),
@@ -242,8 +242,7 @@ class _SalesOrderTabState extends State<SalesOrderTab> {
     );
   }
 
-  Widget _buildOverviewSection(BuildContext context, InvoiceLoaded state,
-      Map<String, dynamic> data) {
+  Widget _buildOverviewSection(BuildContext context, InvoiceLoaded state, Map<String, dynamic> data, {required int tabIndex}){
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -255,25 +254,18 @@ class _SalesOrderTabState extends State<SalesOrderTab> {
                     fontSize: 15,
                     fontWeight: FontWeight.bold,
                     color: Color(0xFF1A2340))),
-            GestureDetector(
-              onTap: () {},
-              child: const Text('See all →',
-                  style: TextStyle(
-                      fontSize: 12,
-                      color: Color(0xFF4A6FE3),
-                      fontWeight: FontWeight.w600)),
-            ),
+
           ],
         ),
         const SizedBox(height: 10),
-        _buildOverviewGrid(context, state, data, isTablet: false),
+        _buildOverviewGrid(context, state, data, isTablet: true, tabIndex: tabIndex),
       ],
     );
   }
 
   Widget _buildOverviewGrid(BuildContext context, InvoiceLoaded state,
       Map<String, dynamic> data,
-      {required bool isTablet}) {
+      {required bool isTablet, required int tabIndex}) {
     final monthly   = data["MonthSales"]?.toString()     ?? "0";
     final monthAmt  = data["MonthAmount"]?.toString()    ?? "0";
     final weekly    = data["WeekSales"]?.toString()      ?? "0";
@@ -282,6 +274,9 @@ class _SalesOrderTabState extends State<SalesOrderTab> {
     final yestAmt   = data["YesterdayAmount"]?.toString() ?? "0";
     final today     = data["TodaySales"]?.toString()     ?? "0";
     final todayAmt  = data["TodayAmount"]?.toString()    ?? "0";
+
+    // ✅ Calculate the base offset based on the selected tab (0, 15, or 30)
+    final int baseOffset = tabIndex * 15;
 
     return Column(
       children: [
@@ -292,14 +287,13 @@ class _SalesOrderTabState extends State<SalesOrderTab> {
                 label: 'MONTHLY',
                 count: monthly,
                 sub: _indFmt(monthAmt),
-                subLabel: 'Invoices',
-                subColor: Colors.blue,
-                subIcon: Icons.receipt,
-                isTablet: isTablet,
-                // ✅ Monthly → type 3
+                subLabel: 'Invoices',              // ✅ Added required parameter
+                subColor: Colors.blue,             // ✅ Added required parameter
+                subIcon: Icons.receipt,            // ✅ Added required parameter
+                isTablet: isTablet,                // ✅ Added required parameter
                 onTap: () => context
                     .read<SalesOrderBloc>()
-                    .add(LoadEmployeeSalesData(3)),
+                    .add(LoadEmployeeSalesData(baseOffset + 3)),
               ),
             ),
             const SizedBox(width: 10),
@@ -308,14 +302,13 @@ class _SalesOrderTabState extends State<SalesOrderTab> {
                 label: 'WEEKLY',
                 count: weekly,
                 sub: _indFmt(weekAmt),
-                subLabel: 'This week',
-                subColor: Colors.purple,
-                subIcon: Icons.calendar_today,
-                isTablet: isTablet,
-                // ✅ Weekly → type 2
+                subLabel: 'This week',      // ✅ Required parameter
+                subColor: Colors.purple,    // ✅ Required parameter
+                subIcon: Icons.calendar_today, // ✅ Required parameter
+                isTablet: isTablet,         // ✅ Required parameter (pass the boolean variable from your build method)
                 onTap: () => context
                     .read<SalesOrderBloc>()
-                    .add(LoadEmployeeSalesData(2)),
+                    .add(LoadEmployeeSalesData(baseOffset + 2)),
               ),
             ),
           ],
@@ -332,10 +325,9 @@ class _SalesOrderTabState extends State<SalesOrderTab> {
                 subColor: Colors.green,
                 subIcon: Icons.check_circle,
                 isTablet: isTablet,
-                // ✅ Yesterday → type 1
                 onTap: () => context
                     .read<SalesOrderBloc>()
-                    .add(LoadEmployeeSalesData(1)),
+                    .add(LoadEmployeeSalesData(baseOffset + 1)),
               ),
             ),
             const SizedBox(width: 10),
@@ -344,15 +336,14 @@ class _SalesOrderTabState extends State<SalesOrderTab> {
                 label: 'TODAY',
                 count: today,
                 sub: todayAmt == '0' ? 'No entries yet' : _indFmt(todayAmt),
-                subLabel: 'Pending',
-                subColor: Colors.orange,
-                subIcon: null,
-                isTablet: isTablet,
+                subLabel: 'Pending',             // ✅ Added required parameter
+                subColor: Colors.orange,         // ✅ Added required parameter
+                subIcon: null,                   // ✅ Added required parameter (Icons are nullable)
+                isTablet: isTablet,              // ✅ Added required parameter
                 isToday: true,
-                // ✅ Today → type 0
                 onTap: () => context
                     .read<SalesOrderBloc>()
-                    .add(LoadEmployeeSalesData(0)),
+                    .add(LoadEmployeeSalesData(baseOffset + 0)),
               ),
             ),
           ],
@@ -416,18 +407,17 @@ class _SalesOrderTabState extends State<SalesOrderTab> {
   }
 
   Widget _buildMonthList(BuildContext context, InvoiceLoaded state,
-      {required bool isTablet}) {
+      {required bool isTablet, required int tabIndex}) { // ✅ Added tabIndex here
     return ListView.builder(
       physics: const BouncingScrollPhysics(),
       itemCount: state.monthList.length,
       itemBuilder: (context, index) =>
-          _buildMonthItem(context, state, index, isTablet: isTablet),
+          _buildMonthItem(context, state, index, isTablet: isTablet, tabIndex: tabIndex), // ✅ Passed it here
     );
   }
-
   Widget _buildMonthItem(
       BuildContext context, InvoiceLoaded state, int index,
-      {required bool isTablet}) {
+      {required bool isTablet, required int tabIndex}) {
     final month   = state.monthList[index];
     final current = (state.monthData[index]["SalesAmount"] as num).toDouble();
     final prev    = index == 0
@@ -435,13 +425,8 @@ class _SalesOrderTabState extends State<SalesOrderTab> {
         : (state.monthData[index - 1]["SalesAmount"] as num).toDouble();
     final diff     = prev == 0 ? 0.0 : ((current - prev) / prev) * 100;
     final isGrowth = diff >= 0;
-
-    final maxVal = state.monthData
-        .map((e) => (e["SalesAmount"] as num).toDouble())
-        .fold(0.0, (a, b) => a > b ? a : b);
-    final barFraction =
-    maxVal == 0 ? 0.0 : (current / maxVal).clamp(0.0, 1.0);
-
+    final count = state.monthData[index]["SalesCount"]?.toString() ?? "0";
+    final int baseOffset = tabIndex * 15;
     const dotColors = [
       Color(0xFF4A6FE3), Color(0xFF7B61FF), Color(0xFF00C9A7),
       Color(0xFFFF6B6B), Color(0xFFFFB300), Color(0xFF26C6DA),
@@ -465,7 +450,7 @@ class _SalesOrderTabState extends State<SalesOrderTab> {
       borderRadius: BorderRadius.circular(14),
       onTap: () => context
           .read<SalesOrderBloc>()
-          .add(LoadEmployeeInvDatas(index + 3)),
+          .add(LoadEmployeeSalesData(baseOffset + index + 3)),
       child: Container(
         margin: const EdgeInsets.only(bottom: 10),
         padding: EdgeInsets.symmetric(
@@ -483,49 +468,68 @@ class _SalesOrderTabState extends State<SalesOrderTab> {
         ),
         child: Row(
           children: [
-            Container(
-              width: 8,
-              height: 8,
-              decoration:
-              BoxDecoration(color: dotColor, shape: BoxShape.circle),
-            ),
-            const SizedBox(width: 10),
-            SizedBox(
-              width: isTablet ? 72 : 56,
-              child: Text(month,
-                  style: TextStyle(
+            // --- LEFT COLUMN ---
+            Expanded(
+              flex: 3, // Gives 30% of space to the left
+              child: Row(
+                children: [
+                  Container(
+                    width: 8,
+                    height: 8,
+                    decoration: BoxDecoration(
+                        color: dotColor,
+                        shape: BoxShape.circle
+                    ),
+                  ),
+                  const SizedBox(width: 10),
+                  Text(
+                    month,
+                    style: TextStyle(
                       color: const Color(0xFF1A2340),
                       fontWeight: FontWeight.w600,
-                      fontSize: isTablet ? 13 : 12)),
+                      fontSize: isTablet ? 15 : 14, // ✅ INCREASED (was 13/12)
+                    ),
+                  ),
+                ],
+              ),
             ),
-            const SizedBox(width: 8),
+
+            // --- MIDDLE COLUMN ---
             Expanded(
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(4),
-                child: LinearProgressIndicator(
-                  value: barFraction,
-                  minHeight: isTablet ? 8 : 7,
-                  backgroundColor: const Color(0xFFEEF2F7),
-                  valueColor: AlwaysStoppedAnimation<Color>(dotColor),
+              flex: 4, // Gives 40% of space to the middle
+              child: Text(
+                "$count Invoices",
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  color: const Color(0xFF1A2340),
+                  fontSize: isTablet ? 14 : 13, // ✅ INCREASED (was 12/11)
+                  fontWeight: FontWeight.bold,
                 ),
               ),
             ),
-            const SizedBox(width: 12),
-            Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(fmtAmount(current),
+
+            // --- RIGHT COLUMN ---
+            Expanded(
+              flex: 4, // Gives 40% of space to the right
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  Text(
+                    fmtAmount(current),
                     style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: isTablet ? 12 : 11,
-                        color: const Color(0xFF1A2340))),
-                const SizedBox(width: 4),
-                Icon(
-                  isGrowth ? Icons.arrow_upward : Icons.arrow_downward,
-                  size: isTablet ? 13 : 11,
-                  color: isGrowth ? Colors.green : Colors.red,
-                ),
-              ],
+                      fontWeight: FontWeight.bold,
+                      fontSize: isTablet ? 14 : 13, // ✅ INCREASED (was 12/11)
+                      color: const Color(0xFF1A2340),
+                    ),
+                  ),
+                  const SizedBox(width: 4),
+                  Icon(
+                    isGrowth ? Icons.arrow_upward : Icons.arrow_downward,
+                    size: isTablet ? 15 : 13, // ✅ INCREASED icon size to match text
+                    color: isGrowth ? Colors.green : Colors.red,
+                  ),
+                ],
+              ),
             ),
           ],
         ),

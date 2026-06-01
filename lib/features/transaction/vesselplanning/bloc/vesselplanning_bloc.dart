@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 import 'package:maleva/core/models/model.dart';
@@ -118,27 +118,28 @@ class VesselPlanningBloc extends Bloc<VesselPlanningEvent, VesselPlanningState> 
     // Re-emit same loaded state (no change needed)
     emit(s.copyWith());
   }
-
-  // ─── Edit Requested (after password verified) ────────────────────────────────
   Future<void> _onEditRequested(
       VesselPlanningEditRequested event,
-      Emitter<VesselPlanningState> emit,
-      ) async {
-    if (state is! VesselPlanningLoaded) return;
-    final s = state as VesselPlanningLoaded;
+      Emitter<VesselPlanningState> emit) async {
+
+    // 1. Show a loading spinner
+    emit(VesselPlanningLoading());
 
     try {
+      // 2. ✅ NO .toString() HERE. The API needs the raw integer.
       await OnlineApi.EditVesselPlanning(null, event.id, event.planningNo);
-      emit(VesselPlanningNavigateToEdit());
-      // Restore loaded state so UI doesn't break on back navigation
-      emit(s.copyWith());
+
+      // 3. ✅ KEEP .toString() HERE. The State needs the text version.
+      emit(VesselPlanningNavigateToEdit(
+        id: event.id,
+        planningNo: event.planningNo.toString(),
+      ));
+
     } catch (e) {
-      emit(VesselPlanningError(e.toString()));
-      emit(s.copyWith());
+      // 4. Catch any network errors
+      emit(VesselPlanningError("Failed to edit vessel planning: ${e.toString()}"));
     }
   }
-
-  // ─── Employee Selected ───────────────────────────────────────────────────────
   void _onEmployeeSelected(
       VesselPlanningEmployeeSelected event,
       Emitter<VesselPlanningState> emit,

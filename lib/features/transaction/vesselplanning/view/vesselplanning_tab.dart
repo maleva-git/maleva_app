@@ -56,7 +56,10 @@ class _VesselPlanningPage extends StatelessWidget {
         if (state is VesselPlanningNavigateToEdit) {
           Navigator.push(
             context,
-            MaterialPageRoute(builder: (_) => const VesselPlanningDetailsView()),
+            MaterialPageRoute(
+              // ✅ Pass the ID from the state into the Details View
+              builder: (_) => VesselPlanningDetailsView(masterId: state.id),
+            ),
           );
         }
         if (state is VesselPlanningError) {

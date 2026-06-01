@@ -763,14 +763,7 @@ class _OverviewSection extends StatelessWidget {
                 fontSize: 16,
                 fontWeight: FontWeight.w800,
                 color: AppTokens.textNavy)),
-        TextButton(
-          onPressed: () {},
-          child: Text('See all →',
-              style: GoogleFonts.lato(
-                  fontSize: 13,
-                  color: AppTokens.planCobalt,
-                  fontWeight: FontWeight.w600)),
-        ),
+
       ]),
       const SizedBox(height: 10),
 
@@ -787,7 +780,7 @@ class _OverviewSection extends StatelessWidget {
               // ✅ Monthly → type 4
               onTap: () => context
                   .read<InvoiceBloc>()
-                  .add(LoadEmployeeInvData(4)),
+                  .add(LoadEmployeeInvData(3)),
             )),
         const SizedBox(width: 12),
         Expanded(
@@ -1128,8 +1121,7 @@ class _MonthBarItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ratio =
-    maxAmount > 0 ? (current / maxAmount).clamp(0.0, 1.0) : 0.0;
+    // We only need diff for the arrow direction now, ratio is removed.
     final diff = prev == 0 ? 0.0 : ((current - prev) / prev) * 100;
     final isGrowth = diff >= 0;
 
@@ -1149,56 +1141,73 @@ class _MonthBarItem extends StatelessWidget {
                 offset: Offset(0, 2))
           ],
         ),
-        child: Row(children: [
-          Container(
-            width: 10,
-            height: 10,
-            decoration: BoxDecoration(
-              color: isGrowth ? AppTokens.statusSuccess : Colors.red,
-              shape: BoxShape.circle,
-            ),
-          ),
-          const SizedBox(width: 10),
-          SizedBox(
-            width: isTablet ? 80 : 72,
-            child: Text(month,
-                style: GoogleFonts.lato(
-                    fontSize: isTablet ? 13 : 12,
-                    fontWeight: FontWeight.w700,
-                    color: AppTokens.textNavy)),
-          ),
-          Expanded(
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(6),
-              child: LinearProgressIndicator(
-                value: ratio,
-                minHeight: isTablet ? 10 : 8,
-                backgroundColor: const Color(0xFFE8ECF5),
-                valueColor:
-                const AlwaysStoppedAnimation<Color>(colors.kBarBlue),
+        child: Row(
+          children: [
+            // --- LEFT COLUMN ---
+            Expanded(
+              flex: 3,
+              child: Row(
+                children: [
+                  Container(
+                    width: 10,
+                    height: 10,
+                    decoration: BoxDecoration(
+                      color: isGrowth ? AppTokens.statusSuccess : Colors.red,
+                      shape: BoxShape.circle,
+                    ),
+                  ),
+                  const SizedBox(width: 10),
+                  Text(
+                    month,
+                    style: GoogleFonts.lato(
+                      fontSize: isTablet ? 15 : 14,
+                      fontWeight: FontWeight.w700,
+                      color: AppTokens.textNavy,
+                    ),
+                  ),
+                ],
               ),
             ),
-          ),
-          const SizedBox(width: 12),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.end,
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text(_shortAmount(current),
-                  textAlign: TextAlign.right,
-                  style: GoogleFonts.lato(
-                      fontSize: isTablet ? 12 : 11,
-                      fontWeight: FontWeight.w700,
-                      color: AppTokens.textNavy)),
-              Text('$count orders',
-                  textAlign: TextAlign.right,
-                  style: GoogleFonts.lato(
-                      fontSize: isTablet ? 10 : 9,
-                      fontWeight: FontWeight.w500,
-                      color: Colors.grey.shade500)),
-            ],
-          ),
-        ]),
+
+            // --- MIDDLE COLUMN ---
+            Expanded(
+              flex: 4,
+              child: Text(
+                "$count Invoices",
+                textAlign: TextAlign.center,
+                style: GoogleFonts.lato(
+                  color: AppTokens.textNavy,
+                  fontSize: isTablet ? 14 : 13,
+                  fontWeight: FontWeight.w900,
+                ),
+              ),
+            ),
+
+            // --- RIGHT COLUMN ---
+            Expanded(
+              flex: 4,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  Text(
+                    _shortAmount(current),
+                    style: GoogleFonts.lato(
+                      fontWeight: FontWeight.w800,
+                      fontSize: isTablet ? 14 : 13,
+                      color: AppTokens.textNavy,
+                    ),
+                  ),
+                  const SizedBox(width: 4),
+                  Icon(
+                    isGrowth ? Icons.arrow_upward : Icons.arrow_downward,
+                    size: isTablet ? 15 : 13,
+                    color: isGrowth ? AppTokens.statusSuccess : Colors.red,
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -1217,9 +1226,6 @@ class _MonthBarItem extends StatelessWidget {
   }
 }
 
-// ══════════════════════════════════════════════════════════════
-// TODAY vs YESTERDAY CHART (CRASH FIX APPLIED)
-// ══════════════════════════════════════════════════════════════
 class _TodayYesterdayChartCard extends StatelessWidget {
   final Map<String, dynamic> data;
   const _TodayYesterdayChartCard({required this.data});
