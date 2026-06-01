@@ -621,9 +621,6 @@ class _EmployeeCard extends StatelessWidget {
   }
 }
 
-// ══════════════════════════════════════════════════════════════
-// HERO HEADER
-// ══════════════════════════════════════════════════════════════
 class _HeroHeader extends StatelessWidget {
   final InvoiceLoaded state;
   final Map<String, dynamic> data;
@@ -736,9 +733,6 @@ class _Pill extends StatelessWidget {
   }
 }
 
-// ══════════════════════════════════════════════════════════════
-// OVERVIEW SECTION
-// ══════════════════════════════════════════════════════════════
 class _OverviewSection extends StatelessWidget {
   final InvoiceLoaded state;
   final Map<String, dynamic> data;
