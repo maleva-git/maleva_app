@@ -34,12 +34,18 @@ class SharePlanningPdfEvent extends PlanningEvent {
 }
 
 // ── Password verified → edit planning ──
-class EditPlanningEvent extends PlanningEvent {
+// ── Password verified → edit planning ──
+class VerifyEditPasswordEvent extends PlanningEvent {
+  final String password;
   final int id;
   final int planningNo;
-  EditPlanningEvent({required this.id, required this.planningNo});
-}
 
+  VerifyEditPasswordEvent({
+    required this.password,
+    required this.id,
+    required this.planningNo
+  });
+}
 // ── Employee selected in filter ──
 class SelectEmployeeEvent extends PlanningEvent {
   final int empId;

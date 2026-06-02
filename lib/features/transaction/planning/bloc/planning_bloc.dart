@@ -188,14 +188,35 @@ class PlanningBloc extends Bloc<PlanningEvent, PlanningState> {
     // ────────────────────────────────────────────────────
     // EDIT PLANNING (after password verified)
     // ────────────────────────────────────────────────────
-    on<EditPlanningEvent>((event, emit) async {
+// ────────────────────────────────────────────────────
+    // VERIFY PASSWORD & EDIT PLANNING
+    // ────────────────────────────────────────────────────
+    on<VerifyEditPasswordEvent>((event, emit) async {
+      if (state is! PlanningLoaded) return;
+      final s = state as PlanningLoaded;
+
+      // Optional: You can emit a loading state here if you want a spinner,
+      // but the dialog usually handles its own local loading state.
+
       try {
-        await OnlineApi.EditPlanning(context, event.id, event.planningNo);
-        emit(PlanningNavigateToEdit(
-            id: event.id, planningNo: event.planningNo));
-        // Restore previous state so listener fires only once
-        if (state is PlanningLoaded) {
-          emit(state as PlanningLoaded);
+        // 1. Verify Password via API
+        final resultData = await objfun.apiAllinoneSelectArray(
+          "${objfun.apiEditPassword}${event.password}&type=EditPassword&Comid=${objfun.Comid}",
+          null, null, context,
+        );
+
+        if (resultData != null && resultData.isNotEmpty && resultData["IsSuccess"] == true) {
+          // 2. Password Valid -> Call Edit API
+          await OnlineApi.EditPlanning(context, event.id, event.planningNo);
+
+          // 3. Trigger Navigation
+          emit(PlanningNavigateToEdit(id: event.id, planningNo: event.planningNo));
+
+          // 4. Restore state so the UI stays intact behind the new screen
+          emit(s);
+        } else {
+          // Password Invalid
+          objfun.ConfirmationOK("Invalid Password !!!", context);
         }
       } catch (e, st) {
         objfun.msgshow(

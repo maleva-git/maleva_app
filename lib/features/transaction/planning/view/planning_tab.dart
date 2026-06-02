@@ -397,25 +397,18 @@ class _PlanningCard extends StatelessWidget {
       builder: (dContext) => _PasswordDialog(
         onConfirm: (pwd) async {
           Navigator.pop(dContext);
-          // Verify password
-          final resultData = await objfun.apiAllinoneSelectArray(
-            "${objfun.apiEditPassword}$pwd&type=EditPassword&Comid=${objfun.Comid}",
-            null, null, context,
-          );
-          if (resultData != null &&
-              resultData.isNotEmpty &&
-              resultData["IsSuccess"] == true) {
-            context.read<PlanningBloc>().add(EditPlanningEvent(
-              id: master.Id,
-              planningNo: master.PLANINGNo,
-            ));
-          } else {
-            objfun.ConfirmationOK("Invalid Password !!!", context);
-          }
+
+          context.read<PlanningBloc>().add(VerifyEditPasswordEvent(
+            password: pwd,
+            id: master.Id,
+            planningNo: master.PLANINGNo,
+          ));
         },
       ),
     );
   }
+
+
 }
 
 class _DetailsSection extends StatelessWidget {
