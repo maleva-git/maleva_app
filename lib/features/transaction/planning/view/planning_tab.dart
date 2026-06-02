@@ -398,7 +398,6 @@ class _PlanningCard extends StatelessWidget {
         onConfirm: (pwd) async {
           Navigator.pop(dContext);
 
-          // ✅ Clean Architecture: The UI just tells the BLoC what the user typed.
           context.read<PlanningBloc>().add(VerifyEditPasswordEvent(
             password: pwd,
             id: master.Id,

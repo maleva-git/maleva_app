@@ -498,7 +498,7 @@ class _SalesOrderTabState extends State<SalesOrderTab> {
             Expanded(
               flex: 4, // Gives 40% of space to the middle
               child: Text(
-                "$count Invoices",
+                "$count SO",
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   color: const Color(0xFF1A2340),
