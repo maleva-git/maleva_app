@@ -468,9 +468,8 @@ class _SalesOrderTabState extends State<SalesOrderTab> {
         ),
         child: Row(
           children: [
-            // --- LEFT COLUMN ---
             Expanded(
-              flex: 3, // Gives 30% of space to the left
+              flex: 3,
               child: Row(
                 children: [
                   Container(
@@ -487,31 +486,29 @@ class _SalesOrderTabState extends State<SalesOrderTab> {
                     style: TextStyle(
                       color: const Color(0xFF1A2340),
                       fontWeight: FontWeight.w600,
-                      fontSize: isTablet ? 15 : 14, // ✅ INCREASED (was 13/12)
+                      fontSize: isTablet ? 15 : 14,
                     ),
                   ),
                 ],
               ),
             ),
 
-            // --- MIDDLE COLUMN ---
             Expanded(
-              flex: 4, // Gives 40% of space to the middle
+              flex: 4,
               child: Text.rich(
                 TextSpan(
                   text: "$count ",
-                  // Default style applied to "$count " and inherited by children
                   style: TextStyle(
                     color: const Color(0xFF1A2340),
-                    fontSize: isTablet ? 14 : 13, // ✅ INCREASED (was 12/11)
+                    fontSize: isTablet ? 14 : 13,
                     fontWeight: FontWeight.bold,
                   ),
                   children: [
                     TextSpan(
                       text: "so",
                       style: TextStyle(
-                        color: Colors.blue[900], // 🔵 CHANGE THIS to your desired color for "SO"
-                        // You only need to define the color here; it inherits size and weight from the parent TextSpan
+                        color: Colors.blue[900],
+
                       ),
                     ),
                   ],
@@ -520,9 +517,8 @@ class _SalesOrderTabState extends State<SalesOrderTab> {
               ),
             ),
 
-            // --- RIGHT COLUMN ---
             Expanded(
-              flex: 4, // Gives 40% of space to the right
+              flex: 4,
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
@@ -530,14 +526,14 @@ class _SalesOrderTabState extends State<SalesOrderTab> {
                     fmtAmount(current),
                     style: TextStyle(
                       fontWeight: FontWeight.bold,
-                      fontSize: isTablet ? 14 : 13, // ✅ INCREASED (was 12/11)
+                      fontSize: isTablet ? 14 : 13,
                       color: const Color(0xFF1A2340),
                     ),
                   ),
                   const SizedBox(width: 4),
                   Icon(
                     isGrowth ? Icons.arrow_upward : Icons.arrow_downward,
-                    size: isTablet ? 15 : 13, // ✅ INCREASED icon size to match text
+                    size: isTablet ? 15 : 13,
                     color: isGrowth ? Colors.green : Colors.red,
                   ),
                 ],

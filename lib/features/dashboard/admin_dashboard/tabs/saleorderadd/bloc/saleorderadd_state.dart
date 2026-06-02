@@ -1,4 +1,3 @@
-
 import 'package:equatable/equatable.dart';
 import 'package:intl/intl.dart';
 
@@ -341,6 +340,8 @@ class SalesOrderState extends Equatable {
   final List<dynamic> pickupQuantityList;
   final List<dynamic> deliveryAddressList;
   final List<dynamic> deliveryQuantityList;
+  final List<dynamic> pickupWeightList;
+  final List<dynamic> deliveryWeightList;
 
   // ─── Visibility ───────────────────────────────────────────────────────────
   final SalesOrderVisibility visibility;
@@ -503,6 +504,8 @@ class SalesOrderState extends Equatable {
     this.pickupQuantityList = const [],
     this.deliveryAddressList = const [],
     this.deliveryQuantityList = const [],
+    this.pickupWeightList = const [],    // ADDED HERE
+    this.deliveryWeightList = const [],  // ADDED HERE
     // Visibility
     this.visibility = const SalesOrderVisibility(),
     // Permissions
@@ -687,6 +690,8 @@ class SalesOrderState extends Equatable {
     List<dynamic>? pickupQuantityList,
     List<dynamic>? deliveryAddressList,
     List<dynamic>? deliveryQuantityList,
+    List<dynamic>? pickupWeightList,    // ADDED HERE
+    List<dynamic>? deliveryWeightList,  // ADDED HERE
     SalesOrderVisibility? visibility,
     Map<String, bool>? fieldPermission,
     bool? disabledBillType,
@@ -834,6 +839,8 @@ class SalesOrderState extends Equatable {
       pickupQuantityList: pickupQuantityList ?? this.pickupQuantityList,
       deliveryAddressList: deliveryAddressList ?? this.deliveryAddressList,
       deliveryQuantityList: deliveryQuantityList ?? this.deliveryQuantityList,
+      pickupWeightList: pickupWeightList ?? this.pickupWeightList,     // ADDED HERE
+      deliveryWeightList: deliveryWeightList ?? this.deliveryWeightList, // ADDED HERE
       visibility: visibility ?? this.visibility,
       fieldPermission: fieldPermission ?? this.fieldPermission,
       disabledBillType: disabledBillType ?? this.disabledBillType,
@@ -887,6 +894,7 @@ class SalesOrderState extends Equatable {
     productCalc, productList, productUpdateIndex,
     pickupAddressList, pickupQuantityList,
     deliveryAddressList, deliveryQuantityList,
+    pickupWeightList, deliveryWeightList, // ADDED HERE
     visibility, fieldPermission,
     disabledBillType, disabledAmount1, disabledAmount2,
     showOverlay, overlaySuggestions, overlayType,

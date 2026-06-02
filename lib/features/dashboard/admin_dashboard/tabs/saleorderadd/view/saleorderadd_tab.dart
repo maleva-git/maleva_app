@@ -8,7 +8,6 @@ import 'package:maleva/core/utils/clsfunction.dart' as objfun;
 import 'package:maleva/core/colors/colors.dart' as colour;
 import 'package:maleva/features/mastersearch/JobAllStatus.dart';
 import 'package:maleva/menu/menulist.dart';
-
 import '../../../../../../core/di/injection.dart';
 import '../../../../../mastersearch/AddressList.dart';
 import '../../../../../mastersearch/Agent.dart';
@@ -22,7 +21,7 @@ import '../bloc/saleorderadd_bloc.dart';
 import '../bloc/saleorderadd_event.dart';
 import '../bloc/saleorderadd_state.dart';
 
-// ─── Entry point ──────────────────────────────────────────────────────────────
+
 
 class SalesOrderAdd extends StatelessWidget {
   final List<SaleEditDetailModel>? saleDetails;
@@ -43,7 +42,6 @@ class SalesOrderAdd extends StatelessWidget {
   }
 }
 
-// ─── Internal stateful view ───────────────────────────────────────────────────
 
 class _SalesOrderView extends StatefulWidget {
   const _SalesOrderView();
@@ -104,7 +102,8 @@ class _SalesOrderViewState extends State<_SalesOrderView>
   final txtDeliveryQuantity = TextEditingController();
   final txtOrigin = TextEditingController();
   final txtDestination = TextEditingController();
-
+  final txtPickUpWeight = TextEditingController();
+  final txtDeliveryWeight = TextEditingController();
   // Product fields
   final txtProductCode = TextEditingController();
   final txtProductDescription = TextEditingController();
@@ -777,6 +776,12 @@ class _SalesOrderViewState extends State<_SalesOrderView>
               isTablet: isTablet),
           const SizedBox(height: 8),
 
+          _styledField(
+              controller: txtPickUpWeight, // Pudhu controller create pannunga
+              hint: 'Pickup Weight',
+              keyboardType: TextInputType.number,
+              isTablet: isTablet),
+          const SizedBox(height: 8),
           // ── Delivery Address ── FIX: removed pre-fetch
           _searchField(
             controller: txtDeliveryAddress,
@@ -815,6 +820,11 @@ class _SalesOrderViewState extends State<_SalesOrderView>
               isTablet: isTablet),
           const SizedBox(height: 8),
 
+          _styledField(
+              controller: txtDeliveryWeight, // Pudhu controller create pannunga
+              hint: 'Delivery Weight',
+              keyboardType: TextInputType.number,
+              isTablet: isTablet),
           // ── Warehouse Address ── FIX: removed pre-fetch
           _searchField(
             controller: txtWarehouseAddress,
