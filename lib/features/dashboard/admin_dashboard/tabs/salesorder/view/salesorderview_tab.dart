@@ -497,14 +497,26 @@ class _SalesOrderTabState extends State<SalesOrderTab> {
             // --- MIDDLE COLUMN ---
             Expanded(
               flex: 4, // Gives 40% of space to the middle
-              child: Text(
-                "$count SO",
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  color: const Color(0xFF1A2340),
-                  fontSize: isTablet ? 14 : 13, // ✅ INCREASED (was 12/11)
-                  fontWeight: FontWeight.bold,
+              child: Text.rich(
+                TextSpan(
+                  text: "$count ",
+                  // Default style applied to "$count " and inherited by children
+                  style: TextStyle(
+                    color: const Color(0xFF1A2340),
+                    fontSize: isTablet ? 14 : 13, // ✅ INCREASED (was 12/11)
+                    fontWeight: FontWeight.bold,
+                  ),
+                  children: [
+                    TextSpan(
+                      text: "so",
+                      style: TextStyle(
+                        color: Colors.blue[900], // 🔵 CHANGE THIS to your desired color for "SO"
+                        // You only need to define the color here; it inherits size and weight from the parent TextSpan
+                      ),
+                    ),
+                  ],
                 ),
+                textAlign: TextAlign.center,
               ),
             ),
 
