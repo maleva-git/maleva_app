@@ -43,14 +43,14 @@ class TruckMaintenanceDashboardWidget extends StatelessWidget {
       BlocProvider(
         create: (context) => sl<TruckMaintDashBloc>()
           ..add(TruckMaintDashStarted()),
-        child: const _TruckMaintDashView(),
+        child: const TruckMaintDashView(),
       );
   }
 }
 
 // ─── View ─────────────────────────────────────────────────────────────────────
-class _TruckMaintDashView extends StatelessWidget {
-  const _TruckMaintDashView();
+class TruckMaintDashView extends StatelessWidget {
+  const TruckMaintDashView();
 
   @override
   Widget build(BuildContext context) {

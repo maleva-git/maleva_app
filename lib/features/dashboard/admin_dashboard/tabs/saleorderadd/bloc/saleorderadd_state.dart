@@ -276,8 +276,10 @@ class SalesOrderState extends Equatable {
   final String warehouseAddress;
   final String pickupAddress;
   final String pickupQuantity;
+  final String pickupWeight;
   final String deliveryAddress;
   final String deliveryQuantity;
+  final String deliveryWeight;
 
   // ─── Date/time strings ───────────────────────────────────────────────────
   final String dtpSaleOrderDate;
@@ -448,8 +450,10 @@ class SalesOrderState extends Equatable {
     this.warehouseAddress = '',
     this.pickupAddress = '',
     this.pickupQuantity = '',
+    this.pickupWeight = '',
     this.deliveryAddress = '',
     this.deliveryQuantity = '',
+    this.deliveryWeight = '',
     // Dates
     this.dtpSaleOrderDate = '',
     this.dtpLETAdate = '',

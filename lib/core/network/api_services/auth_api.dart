@@ -71,7 +71,6 @@ class AuthApi {
     }
   }
 
-  // ─── Save login data to preferences ──────────────────────────────────────
   static Future<void> _saveLoginData(
       ResponseViewModel value,
       String username,

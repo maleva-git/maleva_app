@@ -11,7 +11,6 @@ import 'saleorderadd_state.dart';
 class SalesOrderBloc extends Bloc<SalesOrderEvent, SalesOrderState> {
   final SalesOrderRepository repository;
 
-  // Local caches — never rely on objfun globals inside the BLoC
   List<dynamic> _jobTypeDetailsList = [];
   List<dynamic> _agentCompanyList = [];
   List<dynamic> _agentAllList = [];
@@ -715,7 +714,7 @@ class SalesOrderBloc extends Bloc<SalesOrderEvent, SalesOrderState> {
     if (_f('pickupAddress').isNotEmpty) {
       dynamicPickups.add({
         "PickupAddress": _f('pickupAddress'),
-        "PickupWeaight": _f('weight'),
+        "PickupWeight": _f('pickupWeight'),
         "PickupQuantity": _f('pickupQuantity'),
       });
     }
@@ -724,7 +723,7 @@ class SalesOrderBloc extends Bloc<SalesOrderEvent, SalesOrderState> {
     if (_f('deliveryAddress').isNotEmpty) {
       dynamicDeliveries.add({
         "DeliveryAddress": _f('deliveryAddress'),
-        "DeliveryWeight": _f('weight'),
+        "DeliveryWeight": _f('deliveryWeight'),
         "DeliveryQuantity": _f('deliveryQuantity'),
       });
     }

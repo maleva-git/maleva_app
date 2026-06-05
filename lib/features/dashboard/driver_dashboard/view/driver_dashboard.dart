@@ -56,7 +56,6 @@ class _DriverDashboardState extends State<DriverDashboard> with SingleTickerProv
                   child: const TransportReportPage(),
                 ),
                 BlocProvider(
-                  // ✅ Removed 'context', added named 'repository' parameter
                   create: (_) => SummonBloc.form(
                     repository: sl<SummonRepository>(),
                   ),
@@ -65,7 +64,7 @@ class _DriverDashboardState extends State<DriverDashboard> with SingleTickerProv
                 BlocProvider(
                   create: (context) => sl<TruckMaintDashBloc>()
                     ..add(TruckMaintDashStarted()),
-                  child: const TruckMaintenanceDashboardWidget(),
+                  child: const TruckMaintDashView(),
                 ),
                 BlocProvider(
                   create: (context) => sl<DriverLicenseExpiryBloc>()

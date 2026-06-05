@@ -258,9 +258,11 @@ class _SalesOrderViewState extends State<_SalesOrderView>
     'forwarding3S2': txtForwarding3S2.text,
     'warehouseAddress': txtWarehouseAddress.text,
     'pickupAddress': txtPickUpAddress.text,
+    'pickupWeight': txtPickUpWeight.text,
     'pickupQuantity': txtPickUpQuantity.text,
     'deliveryAddress': txtDeliveryAddress.text,
     'deliveryQuantity': txtDeliveryQuantity.text,
+    'deliveryWeight': txtDeliveryWeight.text,
     'originName': txtOrigin.text,
     'destinationName': txtDestination.text,
   };
@@ -474,7 +476,7 @@ class _SalesOrderViewState extends State<_SalesOrderView>
       controller: _tabController,
       physics: const NeverScrollableScrollPhysics(),
       children: [
-        _buildTab0_JobInfo(context, state, bloc, isTablet),
+          _buildTab0_JobInfo(context, state, bloc, isTablet),
         _buildTab1_LoadingVessel(context, state, bloc, isTablet),
         _buildTab2_OffVessel(context, state, bloc, isTablet),
         _buildTab3_Forwarding(context, state, bloc, isTablet),

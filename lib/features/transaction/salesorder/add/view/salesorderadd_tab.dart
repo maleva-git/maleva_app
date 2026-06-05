@@ -601,11 +601,18 @@ class _SalesOrderAddBodyState extends State<_SalesOrderAddBody> with TickerProvi
       const SizedBox(height: 10),
       _addressCard(
         title: 'PickUp Address',
-        addressValue: state.txtPickUpAddress, qtyValue: state.txtPickUpQuantity,
-        addressEnabled: fp["txtPickUpAddress"] == true, qtyEnabled: fp["txtPickUpQuantity"] == true,
-        addressUniqueId: 'addr_pickup', qtyUniqueId: 'qty_pickup',
+        addressValue: state.txtPickUpAddress,
+        qtyValue: state.txtPickUpQuantity,
+        weightValue: state.txtPickUpWeight, // <-- PUDHU STATE VALUE
+        addressEnabled: fp["txtPickUpAddress"] == true,
+        qtyEnabled: fp["txtPickUpQuantity"] == true,
+        weightEnabled: true, // Enable weight by default or use fp["txtPickUpWeight"]
+        addressUniqueId: 'addr_pickup',
+        qtyUniqueId: 'qty_pickup',
+        weightUniqueId: 'wt_pickup', // <-- PUDHU ID
         onAddressChanged: (v) => bloc.add(UpdateTextField('txtPickUpAddress', v)),
         onQtyChanged: (v) => bloc.add(UpdateTextField('txtPickUpQuantity', v)),
+        onWeightChanged: (v) => bloc.add(UpdateTextField('txtPickUpWeight', v)),
         onSearch: () async {
           final r = await Navigator.push(context, MaterialPageRoute(builder: (_) => const AddressList(Searchby: 1, SearchId: 0)));
           if (r != null && objfun.SelectAddressList.isNotEmpty) {
@@ -625,11 +632,18 @@ class _SalesOrderAddBodyState extends State<_SalesOrderAddBody> with TickerProvi
       const SizedBox(height: 10),
       _addressCard(
         title: 'Delivery Address',
-        addressValue: state.txtDeliveryAddress, qtyValue: state.txtDeliveryQuantity,
-        addressEnabled: fp["txtDeliveryAddress"] == true, qtyEnabled: fp["txtDeliveryQuantity"] == true,
-        addressUniqueId: 'addr_delivery', qtyUniqueId: 'qty_delivery',
+        addressValue: state.txtDeliveryAddress,
+        qtyValue: state.txtDeliveryQuantity,
+        weightValue: state.txtDeliveryWeight,
+        addressEnabled: fp["txtDeliveryAddress"] == true,
+        qtyEnabled: fp["txtDeliveryQuantity"] == true,
+        weightEnabled: true,
+        addressUniqueId: 'addr_delivery',
+        qtyUniqueId: 'qty_delivery',
+        weightUniqueId: 'wt_delivery',
         onAddressChanged: (v) => bloc.add(UpdateTextField('txtDeliveryAddress', v)),
         onQtyChanged: (v) => bloc.add(UpdateTextField('txtDeliveryQuantity', v)),
+        onWeightChanged: (v) => bloc.add(UpdateTextField('txtDeliveryWeight', v)),
         onSearch: () async {
           final r = await Navigator.push(context, MaterialPageRoute(builder: (_) => const AddressList(Searchby: 1, SearchId: 0)));
           if (r != null && objfun.SelectAddressList.isNotEmpty) {
@@ -810,16 +824,29 @@ class _SalesOrderAddBodyState extends State<_SalesOrderAddBody> with TickerProvi
   }
 
   Widget _addressCard({
-    required String title, required String addressValue, required String qtyValue,
-    required bool addressEnabled, required bool qtyEnabled,
-    required String addressUniqueId, required String qtyUniqueId,
-    required ValueChanged<String> onAddressChanged, required ValueChanged<String> onQtyChanged,
-    required VoidCallback onSearch, required VoidCallback onClear, required VoidCallback onList, required VoidCallback onAdd,
+    required String title,
+    required String addressValue,
+    required String qtyValue,
+    required String weightValue, // ---> NEW PARAMETER FOR WEIGHT
+    required bool addressEnabled,
+    required bool qtyEnabled,
+    required bool weightEnabled, // ---> NEW PARAMETER FOR WEIGHT ENABLE
+    required String addressUniqueId,
+    required String qtyUniqueId,
+    required String weightUniqueId, // ---> NEW PARAMETER FOR WEIGHT ID
+    required ValueChanged<String> onAddressChanged,
+    required ValueChanged<String> onQtyChanged,
+    required ValueChanged<String> onWeightChanged, // ---> NEW PARAMETER FOR WEIGHT CALLBACK
+    required VoidCallback onSearch,
+    required VoidCallback onClear,
+    required VoidCallback onList,
+    required VoidCallback onAdd,
   }) {
     return _sectionCard(children: [
       Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          // --- 1. Address Field (Takes remaining space) ---
           Expanded(
             flex: 1,
             child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
@@ -828,14 +855,38 @@ class _SalesOrderAddBodyState extends State<_SalesOrderAddBody> with TickerProvi
             ]),
           ),
           const SizedBox(width: 10),
+
+          // --- 2. Qty Field (Fixed Width) ---
           SizedBox(
-            width: 80,
+            width: 70, // Slightly reduced to fit Weight
             child: Column(children: [
               _sectionLabel('Qty'), _gap(),
               _editField(uniqueId: qtyUniqueId, hint: 'Qty', value: qtyValue, enabled: qtyEnabled, onChanged: onQtyChanged),
             ]),
           ),
           const SizedBox(width: 8),
+
+          // ==========================================
+          // --- 3. WEIGHT FIELD (Fixed Width) ---
+          // ==========================================
+          SizedBox(
+            width: 70,
+            child: Column(children: [
+              _sectionLabel('Wt'), _gap(),
+              _editField(
+                  uniqueId: weightUniqueId,
+                  hint: 'Wt',
+                  value: weightValue,
+                  enabled: weightEnabled,
+                  keyboardType: TextInputType.number, // Number keyboard for weight
+                  onChanged: onWeightChanged
+              ),
+            ]),
+          ),
+          const SizedBox(width: 8),
+          // ==========================================
+
+          // --- 4. Action Buttons ---
           Column(mainAxisAlignment: MainAxisAlignment.start, children: [
             const SizedBox(height: 24), _iconBtn(icon: Icons.list_rounded, enabled: true, onTap: onList),
             const SizedBox(height: 4), _iconBtn(icon: Icons.add_box_rounded, enabled: true, onTap: onAdd),
@@ -844,7 +895,6 @@ class _SalesOrderAddBodyState extends State<_SalesOrderAddBody> with TickerProvi
       ),
     ]);
   }
-
   // ════════════════════════════════════════════════════
   // Base UI Helpers
   // ════════════════════════════════════════════════════
@@ -1052,51 +1102,97 @@ class _ProductDialogState extends State<_ProductDialog> {
   Widget _numRow(List<String> keys, SalesOrderAddBloc bloc) => Expanded(child: Row(children: keys.map((k) => _numBtn(k, () => bloc.add(KeyPress(k, _activeField)))).toList()));
   Widget _numBtn(String label, VoidCallback onPressed, {bool isAction = false}) => Expanded(child: Padding(padding: const EdgeInsets.all(3), child: GestureDetector(onTap: onPressed, child: Container(decoration: BoxDecoration(color: isAction ? colour.brand : Colors.white, borderRadius: BorderRadius.circular(10), border: Border.all(color: isAction ? colour.brand : colour.border), boxShadow: [BoxShadow(color: isAction ? colour.brand.withOpacity(0.2) : Colors.black.withOpacity(0.04), blurRadius: 4, offset: const Offset(0, 2))]), alignment: Alignment.center, child: Text(label, style: GoogleFonts.poppins(color: isAction ? Colors.white : colour.textMain, fontSize: isAction ? 13 : 16, fontWeight: FontWeight.w700))))));
 }
-
 class _AddressListDialog extends StatelessWidget {
   final String title;
   final bool isPickUp;
   const _AddressListDialog({required this.title, required this.isPickUp});
-  @override Widget build(BuildContext context) {
+
+  @override
+  Widget build(BuildContext context) {
     final double width = MediaQuery.of(context).size.width;
     final double height = MediaQuery.of(context).size.height;
     return Dialog(
-      backgroundColor: Colors.white, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+      backgroundColor: Colors.white,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
       child: Container(
-        width: width * 0.9, height: height * 0.65, padding: const EdgeInsets.all(16),
+        width: width * 0.95, // Konjam width adhigam aakkirukken Wt ulla vara
+        height: height * 0.65,
+        padding: const EdgeInsets.all(16),
         child: BlocBuilder<SalesOrderAddBloc, SalesOrderAddState>(builder: (context, state) {
           if (state is! SalesOrderAddLoaded) return const SizedBox();
           final bloc = context.read<SalesOrderAddBloc>();
+
           final addresses = isPickUp ? state.pickUpAddressList : state.deliveryAddressList;
           final quantities = isPickUp ? state.pickUpQuantityList : state.deliveryQuantityList;
+          // ==========================================
+          // PUDHUSA WEIGHT LIST-A EDUKkurom
+          // ==========================================
+          final weights = isPickUp ? state.pickUpWeightList : state.deliveryWeightList;
+
           return Column(children: [
             Row(children: [
               Container(width: 36, height: 36, decoration: BoxDecoration(color: colour.brandLight, borderRadius: BorderRadius.circular(10)), child: const Icon(Icons.list_rounded, color: colour.brand, size: 20)),
-              const SizedBox(width: 10), Expanded(child: Text(title, style: GoogleFonts.poppins(color: colour.textMain, fontSize: 14, fontWeight: FontWeight.w700), overflow: TextOverflow.ellipsis)),
+              const SizedBox(width: 10),
+              Expanded(child: Text(title, style: GoogleFonts.poppins(color: colour.textMain, fontSize: 14, fontWeight: FontWeight.w700), overflow: TextOverflow.ellipsis)),
               GestureDetector(onTap: () => Navigator.of(context, rootNavigator: true).pop(), child: Container(width: 32, height: 32, decoration: BoxDecoration(color: colour.surface, borderRadius: BorderRadius.circular(8), border: Border.all(color: colour.border)), child: const Icon(Icons.close_rounded, color: colour.textSub, size: 18))),
             ]),
-            const SizedBox(height: 10), Divider(color: colour.border), const SizedBox(height: 6),
-            Expanded(child: addresses.isEmpty ? Center(child: Text('No records', style: GoogleFonts.poppins(color: colour.textSub, fontSize: 13))) : ListView.builder(itemCount: addresses.length, itemBuilder: (ctx, index) {
-              return InkWell(
-                onLongPress: () async {
-                  final del = await objfun.ConfirmationMsgYesNo(context, "Are you sure to delete?");
-                  if (del == true) { if (isPickUp) { bloc.add(RemovePickUpAddress(index)); } else { bloc.add(RemoveDeliveryAddress(index)); } }
-                },
-                onTap: () {
-                  if (isPickUp) { bloc.add(SelectPickUpFromList(index)); } else { bloc.add(SelectDeliveryFromList(index)); }
-                  Navigator.of(context, rootNavigator: true).pop();
-                },
-                child: Container(
-                  margin: const EdgeInsets.only(bottom: 8), padding: const EdgeInsets.all(12),
-                  decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(12), border: Border.all(color: colour.border), boxShadow: const [BoxShadow(color: Color(0x0A1555F3), blurRadius: 6, offset: Offset(0, 2))]),
-                  child: Row(children: [
-                    Expanded(flex: 3, child: Text(addresses[index].toString(), style: GoogleFonts.poppins(color: colour.textMain, fontSize: 12, fontWeight: FontWeight.w600))),
-                    const SizedBox(width: 8), Expanded(child: Container(padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4), decoration: BoxDecoration(color: colour.brandLight, borderRadius: BorderRadius.circular(8)), child: Text(index < quantities.length ? quantities[index].toString() : '', textAlign: TextAlign.center, style: GoogleFonts.poppins(color: colour.brand, fontSize: 12, fontWeight: FontWeight.w700)))),
-                    const SizedBox(width: 8), GestureDetector(onTap: () async { final del = await objfun.ConfirmationMsgYesNo(context, "Are you sure to delete?"); if (del == true) { if (isPickUp) { bloc.add(RemovePickUpAddress(index)); } else { bloc.add(RemoveDeliveryAddress(index)); } } }, child: const Icon(Icons.delete_rounded, color: colour.red, size: 18)),
-                  ]),
-                ),
-              );
-            })),
+            const SizedBox(height: 10),
+            Divider(color: colour.border),
+            const SizedBox(height: 6),
+
+            // --- PUDHU HEADER ROW (Theliva irukka) ---
+            Row(
+              children: [
+                Expanded(flex: 3, child: Text('Address', style: GoogleFonts.poppins(color: colour.textSub, fontSize: 12, fontWeight: FontWeight.w600))),
+                const SizedBox(width: 8),
+                Expanded(flex: 1, child: Text('Qty', textAlign: TextAlign.center, style: GoogleFonts.poppins(color: colour.textSub, fontSize: 12, fontWeight: FontWeight.w600))),
+                const SizedBox(width: 8),
+                Expanded(flex: 1, child: Text('Wt', textAlign: TextAlign.center, style: GoogleFonts.poppins(color: colour.textSub, fontSize: 12, fontWeight: FontWeight.w600))),
+                const SizedBox(width: 26), // Spacer for delete icon
+              ],
+            ),
+            const SizedBox(height: 6),
+
+            Expanded(
+                child: addresses.isEmpty
+                    ? Center(child: Text('No records', style: GoogleFonts.poppins(color: colour.textSub, fontSize: 13)))
+                    : ListView.builder(
+                    itemCount: addresses.length,
+                    itemBuilder: (ctx, index) {
+                      return InkWell(
+                        onLongPress: () async {
+                          final del = await objfun.ConfirmationMsgYesNo(context, "Are you sure to delete?");
+                          if (del == true) { if (isPickUp) { bloc.add(RemovePickUpAddress(index)); } else { bloc.add(RemoveDeliveryAddress(index)); } }
+                        },
+                        onTap: () {
+                          if (isPickUp) { bloc.add(SelectPickUpFromList(index)); } else { bloc.add(SelectDeliveryFromList(index)); }
+                          Navigator.of(context, rootNavigator: true).pop();
+                        },
+                        child: Container(
+                          margin: const EdgeInsets.only(bottom: 8),
+                          padding: const EdgeInsets.all(12),
+                          decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(12), border: Border.all(color: colour.border), boxShadow: const [BoxShadow(color: Color(0x0A1555F3), blurRadius: 6, offset: Offset(0, 2))]),
+                          child: Row(children: [
+                            // 1. Address
+                            Expanded(flex: 3, child: Text(addresses[index].toString(), style: GoogleFonts.poppins(color: colour.textMain, fontSize: 12, fontWeight: FontWeight.w600))),
+                            const SizedBox(width: 8),
+
+                            // 2. Quantity
+                            Expanded(flex: 1, child: Container(padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 4), decoration: BoxDecoration(color: colour.brandLight, borderRadius: BorderRadius.circular(8)), child: Text(index < quantities.length ? quantities[index].toString() : '', textAlign: TextAlign.center, style: GoogleFonts.poppins(color: colour.brand, fontSize: 12, fontWeight: FontWeight.w700)))),
+                            const SizedBox(width: 8),
+
+                            // 3. Weight (PUDHUSA ADD PANNADHU)
+                            Expanded(flex: 1, child: Container(padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 4), decoration: BoxDecoration(color: colour.brandLight, borderRadius: BorderRadius.circular(8)), child: Text(index < weights.length ? weights[index].toString() : '', textAlign: TextAlign.center, style: GoogleFonts.poppins(color: colour.brand, fontSize: 12, fontWeight: FontWeight.w700)))),
+                            const SizedBox(width: 8),
+
+                            // 4. Delete Icon
+                            GestureDetector(onTap: () async { final del = await objfun.ConfirmationMsgYesNo(context, "Are you sure to delete?"); if (del == true) { if (isPickUp) { bloc.add(RemovePickUpAddress(index)); } else { bloc.add(RemoveDeliveryAddress(index)); } } }, child: const Icon(Icons.delete_rounded, color: colour.red, size: 18)),
+                          ]),
+                        ),
+                      );
+                    }
+                )
+            ),
           ]);
         }),
       ),
