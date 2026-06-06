@@ -11,7 +11,6 @@ import '../bloc/drivermaintenance_bloc.dart';
 import '../bloc/drivermaintenance_event.dart';
 import '../bloc/drivermaintenance_state.dart';
 
-// ─── Design Tokens ────────────────────────────────────────────────────────────
 const kHeaderGradStart = Color(0xFF1A3A8F);
 const kHeaderGradEnd   = Color(0xFF4A6FD4);
 const kCardBorder      = Color(0xFFC5D0EE);
@@ -31,95 +30,106 @@ const kGradient = LinearGradient(
 
 const double kTabletBreak = 600;
 
-// ─── Embeddable Dashboard Widget ─────────────────────────────────────────────
-// Usage inside dashboard tab:
-//   child: const TruckMaintenanceDashboardWidget()
 class TruckMaintenanceDashboardWidget extends StatelessWidget {
   const TruckMaintenanceDashboardWidget({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return
-      BlocProvider(
-        create: (context) => sl<TruckMaintDashBloc>()
-          ..add(TruckMaintDashStarted()),
-        child: const TruckMaintDashView(),
-      );
+    return BlocProvider(
+      create: (context) => sl<TruckMaintDashBloc>()..add(TruckMaintDashStarted()),
+      child: const TruckMaintDashView(),
+    );
   }
 }
 
-// ─── View ─────────────────────────────────────────────────────────────────────
 class TruckMaintDashView extends StatelessWidget {
-  const TruckMaintDashView();
+  const TruckMaintDashView({super.key});
 
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<TruckMaintDashBloc, TruckMaintDashState>(
       builder: (context, state) {
-        if (state is TruckMaintDashInitial ||
-            state is TruckMaintDashLoading) {
+
+        // Use this to debug if the state is getting stuck
+        debugPrint("Current TruckMaintDashState: $state");
+
+        if (state is TruckMaintDashInitial || state is TruckMaintDashLoading) {
           return const Center(
-            child: SpinKitFoldingCube(
-                color: kHeaderGradEnd, size: 35),
+            child: Padding(
+              padding: EdgeInsets.all(20.0),
+              child: SpinKitFoldingCube(color: kHeaderGradEnd, size: 35),
+            ),
           );
         }
-        if (state is TruckMaintDashLoaded) {
+        else if (state is TruckMaintDashLoaded) {
           return LayoutBuilder(
             builder: (context, constraints) {
               final isTablet = constraints.maxWidth > kTabletBreak;
-              return _TruckMaintDashBody(
-                  state: state, isTablet: isTablet);
+              return _TruckMaintDashBody(state: state, isTablet: isTablet);
             },
           );
         }
-        if (state is TruckMaintDashError) {
+        else if (state is TruckMaintDashError) {
           return Center(
-            child: Text(state.message,
-                style: GoogleFonts.lato(
-                    color: kExpiredRed, fontSize: 13)),
+            child: Padding(
+              padding: const EdgeInsets.all(20.0),
+              child: Text(
+                state.message,
+                style: GoogleFonts.lato(color: kExpiredRed, fontSize: 13),
+              ),
+            ),
           );
         }
-        return const SizedBox.shrink();
+
+        // Catch-all Fallback
+        return Container(
+          width: double.infinity,
+          padding: const EdgeInsets.all(20),
+          margin: const EdgeInsets.all(10),
+          decoration: BoxDecoration(
+            color: Colors.red.shade50,
+            borderRadius: BorderRadius.circular(10),
+            border: Border.all(color: Colors.red),
+          ),
+          child: Text(
+            'Unhandled State Error: $state\nPlease check your Bloc logic.',
+            style: const TextStyle(color: Colors.red, fontWeight: FontWeight.bold),
+            textAlign: TextAlign.center,
+          ),
+        );
       },
     );
   }
 }
 
-// ─── Body ─────────────────────────────────────────────────────────────────────
 class _TruckMaintDashBody extends StatelessWidget {
   final TruckMaintDashLoaded state;
   final bool isTablet;
 
-  const _TruckMaintDashBody(
-      {required this.state, required this.isTablet});
+  const _TruckMaintDashBody({required this.state, required this.isTablet});
 
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: EdgeInsets.fromLTRB(
-          isTablet ? 20 : 10, 15, isTablet ? 20 : 10, 0),
+      padding: EdgeInsets.fromLTRB(isTablet ? 20 : 10, 15, isTablet ? 20 : 10, 0),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           const SizedBox(height: 7),
 
-          // ── Title ────────────────────────────────────────
           Center(
             child: Text(
               'TRUCK MAINTENANCE',
               style: GoogleFonts.lato(
                 color: kExpiredRed,
                 fontWeight: FontWeight.w700,
-                fontSize: isTablet
-                    ? objfun.FontLarge + 2
-                    : objfun.FontLarge,
+                fontSize: isTablet ? objfun.FontLarge + 2 : objfun.FontLarge,
                 letterSpacing: 0.3,
               ),
             ),
           ),
           const SizedBox(height: 14),
 
-          // ── List / Grid ───────────────────────────────────
           Expanded(
             child: state.truckDetails.isEmpty
                 ? _EmptyState(isTablet: isTablet)
@@ -133,7 +143,6 @@ class _TruckMaintDashBody extends StatelessWidget {
   }
 }
 
-// ─── Mobile: single column ListView ──────────────────────────────────────────
 class _MobileCardList extends StatelessWidget {
   final TruckMaintDashLoaded state;
   const _MobileCardList({required this.state});
@@ -141,17 +150,17 @@ class _MobileCardList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ListView.builder(
+
       itemCount: state.truckDetails.length,
       itemBuilder: (ctx, i) => _TruckDashCard(
-        item:     state.truckDetails[i],
-        state:    state,
+        item: state.truckDetails[i],
+        state: state,
         isTablet: false,
       ),
     );
   }
 }
 
-// ─── Tablet: 2-column GridView ────────────────────────────────────────────────
 class _TabletCardGrid extends StatelessWidget {
   final TruckMaintDashLoaded state;
   const _TabletCardGrid({required this.state});
@@ -159,27 +168,28 @@ class _TabletCardGrid extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GridView.builder(
+
       gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount:   2,
+        crossAxisCount: 2,
         crossAxisSpacing: 12,
-        mainAxisSpacing:  12,
+        mainAxisSpacing: 12,
         childAspectRatio: 0.65,
       ),
       itemCount: state.truckDetails.length,
       itemBuilder: (ctx, i) => _TruckDashCard(
-        item:     state.truckDetails[i],
-        state:    state,
+        item: state.truckDetails[i],
+        state: state,
         isTablet: true,
       ),
     );
   }
 }
 
-// ─── Single Truck Card ────────────────────────────────────────────────────────
+
 class _TruckDashCard extends StatelessWidget {
-  final TruckDetailsModel      item;
-  final TruckMaintDashLoaded   state;
-  final bool                   isTablet;
+  final TruckDetailsModel item;
+  final TruckMaintDashLoaded state;
+  final bool isTablet;
 
   const _TruckDashCard({
     required this.item,
@@ -187,7 +197,6 @@ class _TruckDashCard extends StatelessWidget {
     required this.isTablet,
   });
 
-  // ── Expiry color helpers ──────────────────────────────────────────────────
   Color _expColor(String date) =>
       _isExpired(date, state.expDate) ? kExpiredRed : kTextDark;
 
@@ -195,28 +204,20 @@ class _TruckDashCard extends StatelessWidget {
       _isExpired(date, state.expApadBonam) ? kExpiredRed : kTextDark;
 
   Color _serviceAlignGreeceColor(String date) =>
-      _isExpired(date, state.expServiceAlignGreece)
-          ? kExpiredRed
-          : kTextDark;
+      _isExpired(date, state.expServiceAlignGreece) ? kExpiredRed : kTextDark;
 
   bool _isExpired(String licenseDate, String threshold) {
-    if (threshold.isEmpty ||
-        licenseDate == 'null' ||
-        licenseDate.isEmpty) return false;
+    if (threshold.isEmpty || licenseDate == 'null' || licenseDate.isEmpty) return false;
     try {
-      final lic =
-      DateFormat('yyyy/MM/dd').parse(licenseDate);
-      final thr =
-      DateFormat('yyyy-MM-dd').parse(threshold);
-      return lic.isBefore(thr) ||
-          lic.isAtSameMomentAs(thr);
+      final lic = DateFormat('yyyy/MM/dd').parse(licenseDate);
+      final thr = DateFormat('yyyy-MM-dd').parse(threshold);
+      return lic.isBefore(thr) || lic.isAtSameMomentAs(thr);
     } catch (_) {
       return false;
     }
   }
 
-  String _safe(String v) =>
-      (v == 'null' || v.isEmpty) ? '' : v;
+  String _safe(String v) => (v == 'null' || v.isEmpty) ? '' : v;
 
   @override
   Widget build(BuildContext context) {
@@ -245,20 +246,12 @@ class _TruckDashCard extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            // ── Top gradient accent ─────────────────────
-            Container(
-                height: 3,
-                decoration:
-                const BoxDecoration(gradient: kGradient)),
-
-            // ── Expiry note ─────────────────────────────
+            Container(height: 3, decoration: const BoxDecoration(gradient: kGradient)),
             Padding(
-              padding: const EdgeInsets.symmetric(
-                  horizontal: 12, vertical: 6),
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
               child: Row(
                 children: [
-                  const Icon(Icons.info_outline_rounded,
-                      size: 13, color: kTextMuted),
+                  const Icon(Icons.info_outline_rounded, size: 13, color: kTextMuted),
                   const SizedBox(width: 5),
                   Expanded(
                     child: Text(
@@ -273,39 +266,26 @@ class _TruckDashCard extends StatelessWidget {
               ),
             ),
             const Divider(height: 1, color: kDetailBg),
-
-            // ── Truck 1 header ──────────────────────────
-            _SectionHeader(
-                label: 'Truck 1',
-                value: item.TruckNumber,
-                isTablet: isTablet),
-
-            _FieldRow('RotexMy Exp',  _safe(item.RotexMyExp),   _expColor(item.RotexMyExp),   labelStyle),
-            _FieldRow('RotexSG Exp',  _safe(item.RotexSGExp),   _expColor(item.RotexSGExp),   labelStyle),
-            _FieldRow('PushpaCom',    _safe(item.PuspacomExp),  _expColor(item.PuspacomExp),  labelStyle),
-            _FieldRow('Insurance',    _safe(item.InsuratnceExp),_expColor(item.InsuratnceExp),labelStyle),
-            _FieldRow('Bonam Exp',    _safe(item.BonamExp),     _apadBonamColor(item.BonamExp), labelStyle),
-            _FieldRow('Apad Exp',     _safe(item.ApadExp),      _apadBonamColor(item.ApadExp),  labelStyle),
-
-            // ── Truck 2 header ──────────────────────────
-            _SectionHeader(
-                label: 'Truck 2',
-                value: _safe(item.TruckNumber1),
-                isTablet: isTablet),
-
-            _FieldRow('RotexMy1',     _safe(item.RotexMyExp1),  _expColor(item.RotexMyExp1),  labelStyle),
-            _FieldRow('RotexSG1',     _safe(item.RotexSGExp1),  _expColor(item.RotexSGExp1),  labelStyle),
-            _FieldRow('PushpaCom1',   _safe(item.PuspacomExp1), _expColor(item.PuspacomExp1), labelStyle),
-            _FieldRow('Service Exp',  _safe(item.ServiceExp),   _serviceAlignGreeceColor(item.ServiceExp),  labelStyle),
-            _FieldRow('Service Last', _safe(item.ServiceLast),  kTextDark, labelStyle),
+            _SectionHeader(label: 'Truck 1', value: item.TruckNumber, isTablet: isTablet),
+            _FieldRow('RotexMy Exp', _safe(item.RotexMyExp), _expColor(item.RotexMyExp), labelStyle),
+            _FieldRow('RotexSG Exp', _safe(item.RotexSGExp), _expColor(item.RotexSGExp), labelStyle),
+            _FieldRow('PushpaCom', _safe(item.PuspacomExp), _expColor(item.PuspacomExp), labelStyle),
+            _FieldRow('Insurance', _safe(item.InsuratnceExp), _expColor(item.InsuratnceExp), labelStyle),
+            _FieldRow('Bonam Exp', _safe(item.BonamExp), _apadBonamColor(item.BonamExp), labelStyle),
+            _FieldRow('Apad Exp', _safe(item.ApadExp), _apadBonamColor(item.ApadExp), labelStyle),
+            _SectionHeader(label: 'Truck 2', value: _safe(item.TruckNumber1), isTablet: isTablet),
+            _FieldRow('RotexMy1', _safe(item.RotexMyExp1), _expColor(item.RotexMyExp1), labelStyle),
+            _FieldRow('RotexSG1', _safe(item.RotexSGExp1), _expColor(item.RotexSGExp1), labelStyle),
+            _FieldRow('PushpaCom1', _safe(item.PuspacomExp1), _expColor(item.PuspacomExp1), labelStyle),
+            _FieldRow('Service Exp', _safe(item.ServiceExp), _serviceAlignGreeceColor(item.ServiceExp), labelStyle),
+            _FieldRow('Service Last', _safe(item.ServiceLast), kTextDark, labelStyle),
             _FieldRow('AlignmentExp', _safe(item.AlignmentExp), _serviceAlignGreeceColor(item.AlignmentExp), labelStyle),
-            _FieldRow('AlignmentLast',_safe(item.AlignmentLast),kTextDark, labelStyle),
-            _FieldRow('Greece Exp',   _safe(item.GreeceExp),    _serviceAlignGreeceColor(item.GreeceExp),   labelStyle),
-            _FieldRow('Greece Last',  _safe(item.GreeceLast),   kTextDark, labelStyle),
-            _FieldRow('GearOil Exp',  _safe(item.GearOilExp),   _serviceAlignGreeceColor(item.GearOilExp),  labelStyle),
-            _FieldRow('GearOil Last', _safe(item.GearOilLast),  kTextDark, labelStyle),
-            _FieldRow('PTPSticker',   _safe(item.PTPStickerExp),_serviceAlignGreeceColor(item.PTPStickerExp), labelStyle),
-
+            _FieldRow('AlignmentLast', _safe(item.AlignmentLast), kTextDark, labelStyle),
+            _FieldRow('Greece Exp', _safe(item.GreeceExp), _serviceAlignGreeceColor(item.GreeceExp), labelStyle),
+            _FieldRow('Greece Last', _safe(item.GreeceLast), kTextDark, labelStyle),
+            _FieldRow('GearOil Exp', _safe(item.GearOilExp), _serviceAlignGreeceColor(item.GearOilExp), labelStyle),
+            _FieldRow('GearOil Last', _safe(item.GearOilLast), kTextDark, labelStyle),
+            _FieldRow('PTPSticker', _safe(item.PTPStickerExp), _serviceAlignGreeceColor(item.PTPStickerExp), labelStyle),
             const SizedBox(height: 8),
           ],
         ),
@@ -314,25 +294,18 @@ class _TruckDashCard extends StatelessWidget {
   }
 }
 
-// ─── Section Header (Truck 1 / Truck 2) ──────────────────────────────────────
 class _SectionHeader extends StatelessWidget {
   final String label;
   final String value;
-  final bool   isTablet;
+  final bool isTablet;
 
-  const _SectionHeader({
-    required this.label,
-    required this.value,
-    required this.isTablet,
-  });
+  const _SectionHeader({required this.label, required this.value, required this.isTablet});
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(
-          horizontal: 12, vertical: 8),
-      decoration:
-      const BoxDecoration(gradient: kGradient),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      decoration: const BoxDecoration(gradient: kGradient),
       child: Row(
         children: [
           Expanded(
@@ -342,9 +315,7 @@ class _SectionHeader extends StatelessWidget {
               style: GoogleFonts.lato(
                 color: Colors.white,
                 fontWeight: FontWeight.w700,
-                fontSize: isTablet
-                    ? objfun.FontLow + 1
-                    : objfun.FontLow,
+                fontSize: isTablet ? objfun.FontLow + 1 : objfun.FontLow,
               ),
             ),
           ),
@@ -355,9 +326,7 @@ class _SectionHeader extends StatelessWidget {
               style: GoogleFonts.lato(
                 color: Colors.white,
                 fontWeight: FontWeight.w700,
-                fontSize: isTablet
-                    ? objfun.FontLow + 1
-                    : objfun.FontLow,
+                fontSize: isTablet ? objfun.FontLow + 1 : objfun.FontLow,
               ),
               overflow: TextOverflow.ellipsis,
             ),
@@ -368,33 +337,26 @@ class _SectionHeader extends StatelessWidget {
   }
 }
 
-// ─── Single Field Row ─────────────────────────────────────────────────────────
 class _FieldRow extends StatelessWidget {
-  final String    label;
-  final String    value;
-  final Color     valueColor;
+  final String label;
+  final String value;
+  final Color valueColor;
   final TextStyle labelStyle;
 
-  const _FieldRow(
-      this.label, this.value, this.valueColor, this.labelStyle);
+  const _FieldRow(this.label, this.value, this.valueColor, this.labelStyle);
 
   @override
   Widget build(BuildContext context) {
     final isExpired = valueColor == kExpiredRed;
 
     return Container(
-      padding: const EdgeInsets.symmetric(
-          horizontal: 12, vertical: 5),
-      color: isExpired
-          ? kExpiredRed.withOpacity(0.06)
-          : Colors.transparent,
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
+      color: isExpired ? kExpiredRed.withOpacity(0.06) : Colors.transparent,
       child: Row(
         children: [
           Expanded(
             flex: 2,
-            child: Text(label,
-                style: labelStyle,
-                overflow: TextOverflow.ellipsis),
+            child: Text(label, style: labelStyle, overflow: TextOverflow.ellipsis),
           ),
           Expanded(
             flex: 3,
@@ -404,10 +366,7 @@ class _FieldRow extends StatelessWidget {
                   Container(
                     width: 6,
                     height: 6,
-                    decoration: const BoxDecoration(
-                      color: kExpiredRed,
-                      shape: BoxShape.circle,
-                    ),
+                    decoration: const BoxDecoration(color: kExpiredRed, shape: BoxShape.circle),
                   ),
                   const SizedBox(width: 5),
                 ],
@@ -431,34 +390,27 @@ class _FieldRow extends StatelessWidget {
   }
 }
 
-// ─── Empty State ──────────────────────────────────────────────────────────────
 class _EmptyState extends StatelessWidget {
   final bool isTablet;
   const _EmptyState({required this.isTablet});
 
   @override
   Widget build(BuildContext context) {
-    return Center(
+    return Container(
+      padding: const EdgeInsets.symmetric(vertical: 40),
+      alignment: Alignment.center,
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Container(
             width: 64,
             height: 64,
-            decoration: BoxDecoration(
-                color: kChipBg,
-                borderRadius: BorderRadius.circular(16)),
-            child: const Icon(
-                Icons.local_shipping_outlined,
-                size: 32,
-                color: kHeaderGradEnd),
+            decoration: BoxDecoration(color: kChipBg, borderRadius: BorderRadius.circular(16)),
+            child: const Icon(Icons.local_shipping_outlined, size: 32, color: kHeaderGradEnd),
           ),
           const SizedBox(height: 14),
           Text('No Truck Data',
-              style: GoogleFonts.lato(
-                  color: kTextDark,
-                  fontWeight: FontWeight.w600,
-                  fontSize: 15)),
+              style: GoogleFonts.lato(color: kTextDark, fontWeight: FontWeight.w600, fontSize: 15)),
         ],
       ),
     );

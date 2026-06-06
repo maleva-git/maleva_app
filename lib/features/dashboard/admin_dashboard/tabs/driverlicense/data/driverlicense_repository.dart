@@ -1,51 +1,47 @@
+import 'package:flutter/foundation.dart';
 import 'package:maleva/core/models/model.dart';
 import 'package:maleva/core/network/api_client.dart';
-import 'package:maleva/core/utils/app_preferences.dart';
 import 'package:maleva/core/utils/clsfunction.dart' as objfun;
 
 class DriverLicenseRepository {
   Future<Map<String, dynamic>> fetchLicenseData() async {
-    try {
-      final comId = AppPreferences.getComid();
+    final currentCommonExpDate = objfun.currentdate(objfun.commonexpirydays);
 
-      // 1. Fetch Driver Details
+    try {
+
       final driverMaster = {
-        'ExpDate':   '',
-        'Id':        AppPreferences.getEmpRefId(),
+        'ExpDate': "",
+        'Id': objfun.EmpRefId,
         'SFromDate': null,
-        'Comid':     comId,
+        'Comid': objfun.Comid,
       };
+
+      if (kDebugMode) debugPrint("➡️ Driver License Payload: $driverMaster");
 
       final driverResult = await ApiClient.postRequest(
           objfun.apiSelectDriverDetails,
           driverMaster
       );
 
-      // 2. Fetch Truck Details
-      final truckMaster = {
-        'Expdate':                  null,
-        'ExpApadBonam':             objfun.currentdate(objfun.apadbonamexpirydays),
-        'ExpServiceAligmentGreece': objfun.currentdate(objfun.ExpServiceAligmentGreecedays),
-        'Id':                       AppPreferences.getDriverId(), // Assuming this maps to DriverTruckRefId
-        'SFromDate':                null,
-        'Comid':                    comId,
-      };
-
-      final truckResult = await ApiClient.postRequest(
-          objfun.apiSelectTruckDetails,
-          truckMaster
-      );
-
       return {
         'driverList': driverResult is List ? driverResult : [],
-        'truckList':  truckResult is List
-            ? (truckResult).map((e) => TruckDetailsModel.fromJson(e)).toList()
-            : <TruckDetailsModel>[],
-        'expApadBonam': truckMaster['ExpApadBonam'],
-        'expServiceAlignGreece': truckMaster['ExpServiceAligmentGreece'],
-        'expDate': objfun.currentdate(objfun.commonexpirydays),
+        'truckList':  <TruckDetailsModel>[],
+        'expApadBonam': '',
+        'expServiceAlignGreece': '',
+        'expDate': currentCommonExpDate,
       };
     } catch (e) {
+
+      if (e.toString().contains('500')) {
+        debugPrint("Backend sent 500. Handling gracefully.");
+        return {
+          'driverList': [],
+          'truckList': <TruckDetailsModel>[],
+          'expApadBonam': '',
+          'expServiceAlignGreece': '',
+          'expDate': currentCommonExpDate,
+        };
+      }
       throw Exception('Failed to load license data: $e');
     }
   }
