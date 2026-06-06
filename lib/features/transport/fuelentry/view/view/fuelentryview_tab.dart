@@ -222,7 +222,7 @@ class _DateFilterBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    String _fmt(String d) {
+    String fmt(String d) {
       try {
         return DateFormat('dd-MM-yy')
             .format(DateTime.parse(d));
@@ -238,14 +238,14 @@ class _DateFilterBar extends StatelessWidget {
           ? Row(children: [
         _DateTile(
           label: 'From',
-          display: _fmt(state.fromDate),
+          display: fmt(state.fromDate),
           isTablet: isTablet,
           onTap: () => _pick(context, true),
         ),
         const SizedBox(width: 12),
         _DateTile(
           label: 'To',
-          display: _fmt(state.toDate),
+          display: fmt(state.toDate),
           isTablet: isTablet,
           onTap: () => _pick(context, false),
         ),
@@ -258,7 +258,7 @@ class _DateFilterBar extends StatelessWidget {
             Expanded(
               child: _DateTile(
                 label: 'From',
-                display: _fmt(state.fromDate),
+                display: fmt(state.fromDate),
                 isTablet: isTablet,
                 onTap: () => _pick(context, true),
               ),
@@ -267,7 +267,7 @@ class _DateFilterBar extends StatelessWidget {
             Expanded(
               child: _DateTile(
                 label: 'To',
-                display: _fmt(state.toDate),
+                display: fmt(state.toDate),
                 isTablet: isTablet,
                 onTap: () => _pick(context, false),
               ),
@@ -451,7 +451,6 @@ class _FuelList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Tablet: 2-column grid; Mobile: single column list
     if (isTablet) {
       return GridView.builder(
         padding: EdgeInsets.symmetric(
@@ -541,86 +540,90 @@ class _FuelRow extends StatelessWidget {
       ),
       child: ClipRRect(
         borderRadius: BorderRadius.circular(12),
-        child: Row(
-          children: [
-            // Left gradient accent
-            Container(
-              width: 4,
-              height: double.infinity,
-              decoration:
-              const BoxDecoration(gradient: kGradient),
-            ),
-            Expanded(
-              child: Padding(
-                padding: const EdgeInsets.symmetric(
-                    horizontal: 10, vertical: 10),
-                child: Row(
-                  children: [
-                    // SNo
-                    Expanded(
-                      flex: 1,
-                      child: Container(
-                        width: 26,
-                        height: 26,
-                        decoration: BoxDecoration(
-                          color: kChipBg,
-                          borderRadius:
-                          BorderRadius.circular(6),
-                        ),
-                        child: Center(
-                          child: Text(
-                            '${index + 1}',
-                            style: GoogleFonts.lato(
-                              color: kHeaderGradStart,
-                              fontWeight: FontWeight.w700,
-                              fontSize: isTablet ? 11 : 10,
+        // ✅ FIX: IntrinsicHeight lets the accent bar stretch to
+        //    match sibling height without needing double.infinity,
+        //    which crashes layout inside an unbounded ListView item.
+        child: IntrinsicHeight(
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              // Left gradient accent — no explicit height needed
+              Container(
+                width: 4,
+                decoration: const BoxDecoration(gradient: kGradient),
+              ),
+              Expanded(
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 10, vertical: 10),
+                  child: Row(
+                    children: [
+                      // SNo
+                      Expanded(
+                        flex: 1,
+                        child: Container(
+                          width: 26,
+                          height: 26,
+                          decoration: BoxDecoration(
+                            color: kChipBg,
+                            borderRadius:
+                            BorderRadius.circular(6),
+                          ),
+                          child: Center(
+                            child: Text(
+                              '${index + 1}',
+                              style: GoogleFonts.lato(
+                                color: kHeaderGradStart,
+                                fontWeight: FontWeight.w700,
+                                fontSize: isTablet ? 11 : 10,
+                              ),
                             ),
                           ),
                         ),
                       ),
-                    ),
-                    // Date
-                    Expanded(
-                      flex: 3,
-                      child: Text(date,
-                          textAlign: TextAlign.center,
-                          style: valStyle,
-                          overflow: TextOverflow.ellipsis),
-                    ),
-                    // Liter
-                    Expanded(
-                      flex: 3,
-                      child: Text(liter,
-                          textAlign: TextAlign.right,
-                          style: valStyle,
-                          overflow: TextOverflow.ellipsis),
-                    ),
-                    // Amount
-                    Expanded(
-                      flex: 3,
-                      child: Text(amount,
-                          textAlign: TextAlign.right,
-                          style: valStyle,
-                          overflow: TextOverflow.ellipsis),
-                    ),
-                    // Delete
-                    Expanded(
-                      flex: 1,
-                      child: IconButton(
-                        padding: EdgeInsets.zero,
-                        constraints: const BoxConstraints(),
-                        onPressed: () => onDelete(item),
-                        icon: const Icon(
-                            Icons.delete_outline_rounded,
-                            size: 20,
-                            color: kAccentRed),
+                      // Date
+                      Expanded(
+                        flex: 3,
+                        child: Text(date,
+                            textAlign: TextAlign.center,
+                            style: valStyle,
+                            overflow: TextOverflow.ellipsis),
                       ),
-                    ),
-                  ],
+                      // Liter
+                      Expanded(
+                        flex: 3,
+                        child: Text(liter,
+                            textAlign: TextAlign.right,
+                            style: valStyle,
+                            overflow: TextOverflow.ellipsis),
+                      ),
+                      // Amount
+                      Expanded(
+                        flex: 3,
+                        child: Text(amount,
+                            textAlign: TextAlign.right,
+                            style: valStyle,
+                            overflow: TextOverflow.ellipsis),
+                      ),
+                      // Delete
+                      Expanded(
+                        flex: 1,
+                        child: IconButton(
+                          padding: EdgeInsets.zero,
+                          constraints: const BoxConstraints(),
+                          onPressed: () => onDelete(item),
+                          icon: const Icon(
+                              Icons.delete_outline_rounded,
+                              size: 20,
+                              color: kAccentRed),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
