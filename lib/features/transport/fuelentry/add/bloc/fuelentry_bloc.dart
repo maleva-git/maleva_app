@@ -73,18 +73,16 @@ class FuelEntryBloc extends Bloc<FuelEntryEvent, FuelEntryState> {
       final master = [
         {
           'SaleDate':       DateTime.parse(s.date).toIso8601String(),
-          'CNumberDisplay': '0',  // Reverted back to '0'
+          'CNumberDisplay': '0',
           'CNumber':        0,
           'Id':             0,
           'CompanyRefId':   objfun.Comid,
-          'UserRefId':      null, // Reverted to null to prevent User Table FK Error
-          'EmployeeRefId':  null, // Reverted to null
-          'TruckRefid':     objfun.DriverTruckRefId, // Reverted to lowercase 'i'
+          'UserRefId':      null,
+          'EmployeeRefId':  null,
+          'TruckRefid':     objfun.DriverTruckRefId,
           'DriverRefId':    objfun.EmpRefId,
           'FilePath':       '',
           'Remarks':        '',
-
-          // Reverted to lowercase 'l' for strict C# Model Binding
           'Aliter':         double.tryParse(s.liter) ?? 0,
           'AAmount':        double.tryParse(s.amount) ?? 0,
           'Pliter':         0,

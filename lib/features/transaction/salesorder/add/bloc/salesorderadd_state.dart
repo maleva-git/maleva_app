@@ -1,5 +1,4 @@
 import 'package:equatable/equatable.dart';
-
 import '../../../../../core/models/model.dart';
 
 const Object _sentinel = Object();
@@ -127,8 +126,10 @@ class SalesOrderAddLoaded extends SalesOrderAddState {
 
   final List<dynamic> pickUpAddressList;
   final List<dynamic> pickUpQuantityList;
+  final List<dynamic> pickUpWeightList; // PUDHUSA ADD PANNADHU
   final List<dynamic> deliveryAddressList;
   final List<dynamic> deliveryQuantityList;
+  final List<dynamic> deliveryWeightList; // PUDHUSA ADD PANNADHU
 
   final String txtJobNo;
   final String txtCustomer;
@@ -158,8 +159,10 @@ class SalesOrderAddLoaded extends SalesOrderAddState {
   final String txtOVesselType;
   final String txtPickUpAddress;
   final String txtPickUpQuantity;
+  final String txtPickUpWeight; // PUDHUSA ADD PANNADHU
   final String txtDeliveryAddress;
   final String txtDeliveryQuantity;
+  final String txtDeliveryWeight; // PUDHUSA ADD PANNADHU
   final String txtWarehouseAddress;
   final String txtOrigin;
   final String txtDestination;
@@ -227,12 +230,14 @@ class SalesOrderAddLoaded extends SalesOrderAddState {
     this.visibleFW3 = false, this.visibleGC = false, this.disabledBillType = false, this.disabledAmount1 = false, this.disabledAmount2 = false,
     this.dropdownValue = 'MY', this.dropdownValueTruckSize, this.dropdownValueFW1, this.dropdownValueFW2, this.dropdownValueFW3,
     this.dropdownValueZB1, this.dropdownValueZB2, this.pickUpAddressList = const [], this.pickUpQuantityList = const [],
-    this.deliveryAddressList = const [], this.deliveryQuantityList = const [], this.txtJobNo = '', this.txtCustomer = '', this.txtJobType = '',
+    this.pickUpWeightList = const [], this.deliveryAddressList = const [], this.deliveryQuantityList = const [],
+    this.deliveryWeightList = const [], this.txtJobNo = '', this.txtCustomer = '', this.txtJobType = '',
     this.txtJobStatus = '', this.txtRemarks = '', this.txtDoDescription = '', this.txtWeight = '', this.txtQuantity = '', this.txtTruckSize = '',
     this.txtAWBNo = '', this.txtBLCopy = '', this.txtPTWNo = '', this.txtCommodityType = '', this.txtCargo = '', this.txtLAgentCompany = '',
     this.txtLAgentName = '', this.txtLSCN = '', this.txtLoadingVessel = '', this.txtLPort = '', this.txtLVesselType = '', this.txtOAgentCompany = '',
     this.txtOAgentName = '', this.txtOSCN = '', this.txtOffVessel = '', this.txtOPort = '', this.txtOVesselType = '', this.txtPickUpAddress = '',
-    this.txtPickUpQuantity = '', this.txtDeliveryAddress = '', this.txtDeliveryQuantity = '', this.txtWarehouseAddress = '', this.txtOrigin = '',
+    this.txtPickUpQuantity = '', this.txtPickUpWeight = '', this.txtDeliveryAddress = '', this.txtDeliveryQuantity = '',
+    this.txtDeliveryWeight = '', this.txtWarehouseAddress = '', this.txtOrigin = '',
     this.txtDestination = '', this.txtSmk1 = '', this.txtSmk2 = '', this.txtSmk3 = '', this.txtENRef1 = '', this.txtENRef2 = '', this.txtENRef3 = '',
     this.txtExRef1 = '', this.txtExRef2 = '', this.txtExRef3 = '', this.txtSealByEmp1 = '', this.txtSealByEmp2 = '', this.txtSealByEmp3 = '',
     this.txtBreakByEmp1 = '', this.txtBreakByEmp2 = '', this.txtBreakByEmp3 = '', this.txtZBRef1 = '', this.txtZBRef2 = '',
@@ -242,7 +247,6 @@ class SalesOrderAddLoaded extends SalesOrderAddState {
     this.txtProductSaleRate = '', this.txtProductGst = '', this.txtProductAmount = '', this.fieldPermission = const {}, this.savedMessage, this.isSaved = false,
   });
 
-  // ✅ CRITICAL BUG FIX 1: Absolutely EVERY text field is now aggressively tracked in Equatable to prevent fading
   @override
   List<Object?> get props => [
     progress, showSearch, productViewList.length, productIds, productUpdateIndex, productId, totalAmount, taxAmount, currencyValue, actualAmount, coinage,
@@ -252,12 +256,11 @@ class SalesOrderAddLoaded extends SalesOrderAddState {
     checkBoxValuePickUp, checkBoxValueDelivery, checkBoxValueWHEntry, checkBoxValueWHExit, checkBoxValueFW1, checkBoxValueFW2, checkBoxValueFW3,
     visibleOffVessel, visibleLoadingVessel, visibleGC, visibleFORWARDING, visibleProductview, visibleFW1, visibleFW2, visibleFW3, disabledBillType,
     dropdownValue, dropdownValueTruckSize, dropdownValueFW1, dropdownValueFW2, dropdownValueFW3, dropdownValueZB1, dropdownValueZB2,
-    pickUpAddressList.length, deliveryAddressList.length,
-    // ALL TEXT FIELDS
+    pickUpAddressList.length, pickUpQuantityList.length, pickUpWeightList.length, deliveryAddressList.length, deliveryQuantityList.length, deliveryWeightList.length,
     txtJobNo, txtCustomer, txtJobType, txtJobStatus, txtRemarks, txtDoDescription, txtWeight, txtQuantity, txtTruckSize,
     txtAWBNo, txtBLCopy, txtPTWNo, txtCommodityType, txtCargo, txtLAgentCompany, txtLAgentName, txtLSCN, txtLoadingVessel,
     txtLPort, txtLVesselType, txtOAgentCompany, txtOAgentName, txtOSCN, txtOffVessel, txtOPort, txtOVesselType, txtPickUpAddress,
-    txtPickUpQuantity, txtDeliveryAddress, txtDeliveryQuantity, txtWarehouseAddress, txtOrigin, txtDestination, txtSmk1, txtSmk2,
+    txtPickUpQuantity, txtPickUpWeight, txtDeliveryAddress, txtDeliveryQuantity, txtDeliveryWeight, txtWarehouseAddress, txtOrigin, txtDestination, txtSmk1, txtSmk2,
     txtSmk3, txtENRef1, txtENRef2, txtENRef3, txtExRef1, txtExRef2, txtExRef3, txtSealByEmp1, txtSealByEmp2, txtSealByEmp3,
     txtBreakByEmp1, txtBreakByEmp2, txtBreakByEmp3, txtZBRef1, txtZBRef2, txtBoardingOfficer1, txtBoardingOfficer2, txtAmount1,
     txtAmount2, txtPortChargeRef1, txtPortCharges, txtForwarding1S1, txtForwarding1S2, txtForwarding2S1, txtForwarding2S2,
@@ -286,14 +289,14 @@ class SalesOrderAddLoaded extends SalesOrderAddState {
     bool? visibleFW2, bool? visibleFW3, bool? visibleGC, bool? disabledBillType, bool? disabledAmount1, bool? disabledAmount2,
     String? dropdownValue, Object? dropdownValueTruckSize = _sentinel, Object? dropdownValueFW1 = _sentinel,
     Object? dropdownValueFW2 = _sentinel, Object? dropdownValueFW3 = _sentinel, Object? dropdownValueZB1 = _sentinel,
-    Object? dropdownValueZB2 = _sentinel, List<dynamic>? pickUpAddressList, List<dynamic>? pickUpQuantityList,
-    List<dynamic>? deliveryAddressList, List<dynamic>? deliveryQuantityList, String? txtJobNo, String? txtCustomer,
+    Object? dropdownValueZB2 = _sentinel, List<dynamic>? pickUpAddressList, List<dynamic>? pickUpQuantityList, List<dynamic>? pickUpWeightList,
+    List<dynamic>? deliveryAddressList, List<dynamic>? deliveryQuantityList, List<dynamic>? deliveryWeightList, String? txtJobNo, String? txtCustomer,
     String? txtJobType, String? txtJobStatus, String? txtRemarks, String? txtDoDescription, String? txtWeight,
     String? txtQuantity, String? txtTruckSize, String? txtAWBNo, String? txtBLCopy, String? txtPTWNo,
     String? txtCommodityType, String? txtCargo, String? txtLAgentCompany, String? txtLAgentName, String? txtLSCN,
     String? txtLoadingVessel, String? txtLPort, String? txtLVesselType, String? txtOAgentCompany, String? txtOAgentName,
     String? txtOSCN, String? txtOffVessel, String? txtOPort, String? txtOVesselType, String? txtPickUpAddress,
-    String? txtPickUpQuantity, String? txtDeliveryAddress, String? txtDeliveryQuantity, String? txtWarehouseAddress,
+    String? txtPickUpQuantity, String? txtPickUpWeight, String? txtDeliveryAddress, String? txtDeliveryQuantity, String? txtDeliveryWeight, String? txtWarehouseAddress,
     String? txtOrigin, String? txtDestination, String? txtSmk1, String? txtSmk2, String? txtSmk3, String? txtENRef1,
     String? txtENRef2, String? txtENRef3, String? txtExRef1, String? txtExRef2, String? txtExRef3, String? txtSealByEmp1,
     String? txtSealByEmp2, String? txtSealByEmp3, String? txtBreakByEmp1, String? txtBreakByEmp2, String? txtBreakByEmp3,
@@ -351,35 +354,24 @@ class SalesOrderAddLoaded extends SalesOrderAddState {
       dropdownValueZB1: identical(dropdownValueZB1, _sentinel) ? this.dropdownValueZB1 : dropdownValueZB1 as String?,
       dropdownValueZB2: identical(dropdownValueZB2, _sentinel) ? this.dropdownValueZB2 : dropdownValueZB2 as String?,
       pickUpAddressList: pickUpAddressList ?? this.pickUpAddressList, pickUpQuantityList: pickUpQuantityList ?? this.pickUpQuantityList,
-      deliveryAddressList: deliveryAddressList ?? this.deliveryAddressList, deliveryQuantityList: deliveryQuantityList ?? this.deliveryQuantityList,
-      txtJobNo: txtJobNo ?? this.txtJobNo, txtCustomer: txtCustomer ?? this.txtCustomer, txtJobType: txtJobType ?? this.txtJobType,
-      txtJobStatus: txtJobStatus ?? this.txtJobStatus, txtRemarks: txtRemarks ?? this.txtRemarks, txtDoDescription: txtDoDescription ?? this.txtDoDescription,
+      pickUpWeightList: pickUpWeightList ?? this.pickUpWeightList, deliveryAddressList: deliveryAddressList ?? this.deliveryAddressList,
+      deliveryQuantityList: deliveryQuantityList ?? this.deliveryQuantityList, deliveryWeightList: deliveryWeightList ?? this.deliveryWeightList,
+      txtJobNo: txtJobNo ?? this.txtJobNo, txtCustomer: txtCustomer ?? this.txtCustomer,
+      txtJobType: txtJobType ?? this.txtJobType, txtJobStatus: txtJobStatus ?? this.txtJobStatus, txtRemarks: txtRemarks ?? this.txtRemarks, txtDoDescription: txtDoDescription ?? this.txtDoDescription,
       txtWeight: txtWeight ?? this.txtWeight, txtQuantity: txtQuantity ?? this.txtQuantity, txtTruckSize: txtTruckSize ?? this.txtTruckSize,
       txtAWBNo: txtAWBNo ?? this.txtAWBNo, txtBLCopy: txtBLCopy ?? this.txtBLCopy, txtPTWNo: txtPTWNo ?? this.txtPTWNo,
-      txtCommodityType: txtCommodityType ?? this.txtCommodityType, txtCargo: txtCargo ?? this.txtCargo,
-      txtLAgentCompany: txtLAgentCompany ?? this.txtLAgentCompany, txtLAgentName: txtLAgentName ?? this.txtLAgentName,
-      txtLSCN: txtLSCN ?? this.txtLSCN, txtLoadingVessel: txtLoadingVessel ?? this.txtLoadingVessel, txtLPort: txtLPort ?? this.txtLPort,
-      txtLVesselType: txtLVesselType ?? this.txtLVesselType, txtOAgentCompany: txtOAgentCompany ?? this.txtOAgentCompany,
-      txtOAgentName: txtOAgentName ?? this.txtOAgentName, txtOSCN: txtOSCN ?? this.txtOSCN, txtOffVessel: txtOffVessel ?? this.txtOffVessel,
-      txtOPort: txtOPort ?? this.txtOPort, txtOVesselType: txtOVesselType ?? this.txtOVesselType, txtPickUpAddress: txtPickUpAddress ?? this.txtPickUpAddress,
-      txtPickUpQuantity: txtPickUpQuantity ?? this.txtPickUpQuantity, txtDeliveryAddress: txtDeliveryAddress ?? this.txtDeliveryAddress,
-      txtDeliveryQuantity: txtDeliveryQuantity ?? this.txtDeliveryQuantity, txtWarehouseAddress: txtWarehouseAddress ?? this.txtWarehouseAddress,
-      txtOrigin: txtOrigin ?? this.txtOrigin, txtDestination: txtDestination ?? this.txtDestination, txtSmk1: txtSmk1 ?? this.txtSmk1,
-      txtSmk2: txtSmk2 ?? this.txtSmk2, txtSmk3: txtSmk3 ?? this.txtSmk3, txtENRef1: txtENRef1 ?? this.txtENRef1, txtENRef2: txtENRef2 ?? this.txtENRef2,
-      txtENRef3: txtENRef3 ?? this.txtENRef3, txtExRef1: txtExRef1 ?? this.txtExRef1, txtExRef2: txtExRef2 ?? this.txtExRef2,
-      txtExRef3: txtExRef3 ?? this.txtExRef3, txtSealByEmp1: txtSealByEmp1 ?? this.txtSealByEmp1, txtSealByEmp2: txtSealByEmp2 ?? this.txtSealByEmp2,
-      txtSealByEmp3: txtSealByEmp3 ?? this.txtSealByEmp3, txtBreakByEmp1: txtBreakByEmp1 ?? this.txtBreakByEmp1,
-      txtBreakByEmp2: txtBreakByEmp2 ?? this.txtBreakByEmp2, txtBreakByEmp3: txtBreakByEmp3 ?? this.txtBreakByEmp3,
-      txtZBRef1: txtZBRef1 ?? this.txtZBRef1, txtZBRef2: txtZBRef2 ?? this.txtZBRef2, txtBoardingOfficer1: txtBoardingOfficer1 ?? this.txtBoardingOfficer1,
-      txtBoardingOfficer2: txtBoardingOfficer2 ?? this.txtBoardingOfficer2, txtAmount1: txtAmount1 ?? this.txtAmount1,
-      txtAmount2: txtAmount2 ?? this.txtAmount2, txtPortChargeRef1: txtPortChargeRef1 ?? this.txtPortChargeRef1,
-      txtPortCharges: txtPortCharges ?? this.txtPortCharges, txtForwarding1S1: txtForwarding1S1 ?? this.txtForwarding1S1,
-      txtForwarding1S2: txtForwarding1S2 ?? this.txtForwarding1S2, txtForwarding2S1: txtForwarding2S1 ?? this.txtForwarding2S1,
-      txtForwarding2S2: txtForwarding2S2 ?? this.txtForwarding2S2, txtForwarding3S1: txtForwarding3S1 ?? this.txtForwarding3S1,
-      txtForwarding3S2: txtForwarding3S2 ?? this.txtForwarding3S2, txtProductCode: txtProductCode ?? this.txtProductCode,
-      txtProductDescription: txtProductDescription ?? this.txtProductDescription, txtProductQty: txtProductQty ?? this.txtProductQty,
-      txtProductSaleRate: txtProductSaleRate ?? this.txtProductSaleRate, txtProductGst: txtProductGst ?? this.txtProductGst,
-      txtProductAmount: txtProductAmount ?? this.txtProductAmount, fieldPermission: fieldPermission ?? this.fieldPermission,
+      txtCommodityType: txtCommodityType ?? this.txtCommodityType, txtCargo: txtCargo ?? this.txtCargo, txtLAgentCompany: txtLAgentCompany ?? this.txtLAgentCompany, txtLAgentName: txtLAgentName ?? this.txtLAgentName, txtLSCN: txtLSCN ?? this.txtLSCN,
+      txtLoadingVessel: txtLoadingVessel ?? this.txtLoadingVessel, txtLPort: txtLPort ?? this.txtLPort, txtLVesselType: txtLVesselType ?? this.txtLVesselType, txtOAgentCompany: txtOAgentCompany ?? this.txtOAgentCompany, txtOAgentName: txtOAgentName ?? this.txtOAgentName,
+      txtOSCN: txtOSCN ?? this.txtOSCN, txtOffVessel: txtOffVessel ?? this.txtOffVessel, txtOPort: txtOPort ?? this.txtOPort, txtOVesselType: txtOVesselType ?? this.txtOVesselType, txtPickUpAddress: txtPickUpAddress ?? this.txtPickUpAddress,
+      txtPickUpQuantity: txtPickUpQuantity ?? this.txtPickUpQuantity, txtPickUpWeight: txtPickUpWeight ?? this.txtPickUpWeight, txtDeliveryAddress: txtDeliveryAddress ?? this.txtDeliveryAddress, txtDeliveryQuantity: txtDeliveryQuantity ?? this.txtDeliveryQuantity, txtDeliveryWeight: txtDeliveryWeight ?? this.txtDeliveryWeight, txtWarehouseAddress: txtWarehouseAddress ?? this.txtWarehouseAddress,
+      txtOrigin: txtOrigin ?? this.txtOrigin, txtDestination: txtDestination ?? this.txtDestination, txtSmk1: txtSmk1 ?? this.txtSmk1, txtSmk2: txtSmk2 ?? this.txtSmk2, txtSmk3: txtSmk3 ?? this.txtSmk3, txtENRef1: txtENRef1 ?? this.txtENRef1,
+      txtENRef2: txtENRef2 ?? this.txtENRef2, txtENRef3: txtENRef3 ?? this.txtENRef3, txtExRef1: txtExRef1 ?? this.txtExRef1, txtExRef2: txtExRef2 ?? this.txtExRef2, txtExRef3: txtExRef3 ?? this.txtExRef3, txtSealByEmp1: txtSealByEmp1 ?? this.txtSealByEmp1,
+      txtSealByEmp2: txtSealByEmp2 ?? this.txtSealByEmp2, txtSealByEmp3: txtSealByEmp3 ?? this.txtSealByEmp3, txtBreakByEmp1: txtBreakByEmp1 ?? this.txtBreakByEmp1, txtBreakByEmp2: txtBreakByEmp2 ?? this.txtBreakByEmp2, txtBreakByEmp3: txtBreakByEmp3 ?? this.txtBreakByEmp3,
+      txtZBRef1: txtZBRef1 ?? this.txtZBRef1, txtZBRef2: txtZBRef2 ?? this.txtZBRef2, txtBoardingOfficer1: txtBoardingOfficer1 ?? this.txtBoardingOfficer1, txtBoardingOfficer2: txtBoardingOfficer2 ?? this.txtBoardingOfficer2, txtAmount1: txtAmount1 ?? this.txtAmount1,
+      txtAmount2: txtAmount2 ?? this.txtAmount2, txtPortChargeRef1: txtPortChargeRef1 ?? this.txtPortChargeRef1, txtPortCharges: txtPortCharges ?? this.txtPortCharges, txtForwarding1S1: txtForwarding1S1 ?? this.txtForwarding1S1, txtForwarding1S2: txtForwarding1S2 ?? this.txtForwarding1S2,
+      txtForwarding2S1: txtForwarding2S1 ?? this.txtForwarding2S1, txtForwarding2S2: txtForwarding2S2 ?? this.txtForwarding2S2, txtForwarding3S1: txtForwarding3S1 ?? this.txtForwarding3S1, txtForwarding3S2: txtForwarding3S2 ?? this.txtForwarding3S2,
+      txtProductCode: txtProductCode ?? this.txtProductCode, txtProductDescription: txtProductDescription ?? this.txtProductDescription, txtProductQty: txtProductQty ?? this.txtProductQty, txtProductSaleRate: txtProductSaleRate ?? this.txtProductSaleRate,
+      txtProductGst: txtProductGst ?? this.txtProductGst, txtProductAmount: txtProductAmount ?? this.txtProductAmount, fieldPermission: fieldPermission ?? this.fieldPermission,
       savedMessage: identical(savedMessage, _sentinel) ? this.savedMessage : savedMessage as String?, isSaved: isSaved ?? this.isSaved,
     );
   }

@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:maleva/core/models/model.dart';
 import 'package:maleva/core/network/api_client.dart';
 import 'package:maleva/core/utils/app_preferences.dart';
@@ -5,19 +6,22 @@ import 'package:maleva/core/utils/clsfunction.dart' as objfun;
 
 class TruckMaintenanceRepository {
   Future<Map<String, dynamic>> fetchTruckData() async {
+    final expDate = objfun.currentdate(objfun.commonexpirydays);
+    final expApadBonam = objfun.currentdate(objfun.apadbonamexpirydays);
+    final expServiceAlignGreece = objfun.currentdate(objfun.ExpServiceAligmentGreecedays);
+
     try {
-      final expDate = objfun.currentdate(objfun.commonexpirydays);
-      final expApadBonam = objfun.currentdate(objfun.apadbonamexpirydays);
-      final expServiceAlignGreece = objfun.currentdate(objfun.ExpServiceAligmentGreecedays);
 
       final master = {
         'Expdate': null,
         'ExpApadBonam': expApadBonam,
         'ExpServiceAligmentGreece': expServiceAlignGreece,
-        'Id': AppPreferences.getDriverId(), // Using your new centralized pref
+        'Id': objfun.DriverTruckRefId,
         'SFromDate': null,
         'Comid': AppPreferences.getComid(),
       };
+
+      if (kDebugMode) debugPrint("➡️ Truck Payload: $master");
 
       final resultData = await ApiClient.postRequest(
         objfun.apiSelectTruckDetails,
@@ -26,7 +30,7 @@ class TruckMaintenanceRepository {
 
       List<TruckDetailsModel> details = [];
       if (resultData != null && resultData is List) {
-        details = (resultData)
+        details = resultData
             .map((e) => TruckDetailsModel.fromJson(e as Map<String, dynamic>))
             .toList();
       }
@@ -38,6 +42,14 @@ class TruckMaintenanceRepository {
         'expServiceAlignGreece': expServiceAlignGreece,
       };
     } catch (e) {
+      if (e.toString().contains('500')) {
+        return {
+          'truckDetails': <TruckDetailsModel>[],
+          'expDate': expDate,
+          'expApadBonam': expApadBonam,
+          'expServiceAlignGreece': expServiceAlignGreece,
+        };
+      }
       throw Exception('Failed to load truck maintenance: $e');
     }
   }

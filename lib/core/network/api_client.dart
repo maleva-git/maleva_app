@@ -49,7 +49,7 @@ class ApiClient {
         debugPrint("🚀 API REQUEST");
         debugPrint("➡️ URL: $url");
         debugPrint("➡️ Headers: $finalHeaders");
-       // debugPrint("➡️ Body: $body");
+        debugPrint("➡️ Body: $body");
       }
 
       final response = await http

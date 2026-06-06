@@ -1,5 +1,4 @@
 import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
@@ -219,7 +218,8 @@ class SalesOrderAddBloc extends Bloc<SalesOrderAddEvent, SalesOrderAddState> {
       if (s.txtPickUpAddress.isEmpty) return;
       final addrList = List<dynamic>.from(s.pickUpAddressList)..add(s.txtPickUpAddress);
       final qtyList = List<dynamic>.from(s.pickUpQuantityList)..add(s.txtPickUpQuantity);
-      emit(s.copyWith(pickUpAddressList: addrList, pickUpQuantityList: qtyList, txtPickUpAddress: '', txtPickUpQuantity: ''));
+      final wtList = List<dynamic>.from(s.pickUpWeightList)..add(s.txtPickUpWeight); // ADDED
+      emit(s.copyWith(pickUpAddressList: addrList, pickUpQuantityList: qtyList, pickUpWeightList: wtList, txtPickUpAddress: '', txtPickUpQuantity: '', txtPickUpWeight: ''));
     });
 
     on<AddDeliveryAddress>((event, emit) {
@@ -228,7 +228,8 @@ class SalesOrderAddBloc extends Bloc<SalesOrderAddEvent, SalesOrderAddState> {
       if (s.txtDeliveryAddress.isEmpty) return;
       final addrList = List<dynamic>.from(s.deliveryAddressList)..add(s.txtDeliveryAddress);
       final qtyList = List<dynamic>.from(s.deliveryQuantityList)..add(s.txtDeliveryQuantity);
-      emit(s.copyWith(deliveryAddressList: addrList, deliveryQuantityList: qtyList, txtDeliveryAddress: '', txtDeliveryQuantity: ''));
+      final wtList = List<dynamic>.from(s.deliveryWeightList)..add(s.txtDeliveryWeight); // ADDED
+      emit(s.copyWith(deliveryAddressList: addrList, deliveryQuantityList: qtyList, deliveryWeightList: wtList, txtDeliveryAddress: '', txtDeliveryQuantity: '', txtDeliveryWeight: ''));
     });
 
     on<RemovePickUpAddress>((event, emit) {
@@ -236,7 +237,8 @@ class SalesOrderAddBloc extends Bloc<SalesOrderAddEvent, SalesOrderAddState> {
       final s = state as SalesOrderAddLoaded;
       final addrList = List<dynamic>.from(s.pickUpAddressList)..removeAt(event.index);
       final qtyList = List<dynamic>.from(s.pickUpQuantityList)..removeAt(event.index);
-      emit(s.copyWith(pickUpAddressList: addrList, pickUpQuantityList: qtyList));
+      final wtList = List<dynamic>.from(s.pickUpWeightList)..removeAt(event.index); // ADDED
+      emit(s.copyWith(pickUpAddressList: addrList, pickUpQuantityList: qtyList, pickUpWeightList: wtList));
     });
 
     on<RemoveDeliveryAddress>((event, emit) {
@@ -244,21 +246,29 @@ class SalesOrderAddBloc extends Bloc<SalesOrderAddEvent, SalesOrderAddState> {
       final s = state as SalesOrderAddLoaded;
       final addrList = List<dynamic>.from(s.deliveryAddressList)..removeAt(event.index);
       final qtyList = List<dynamic>.from(s.deliveryQuantityList)..removeAt(event.index);
-      emit(s.copyWith(deliveryAddressList: addrList, deliveryQuantityList: qtyList));
+      final wtList = List<dynamic>.from(s.deliveryWeightList)..removeAt(event.index); // ADDED
+      emit(s.copyWith(deliveryAddressList: addrList, deliveryQuantityList: qtyList, deliveryWeightList: wtList));
     });
 
     on<SelectPickUpFromList>((event, emit) {
       if (state is! SalesOrderAddLoaded) return;
       final s = state as SalesOrderAddLoaded;
-      emit(s.copyWith(txtPickUpAddress: s.pickUpAddressList[event.index].toString(), txtPickUpQuantity: s.pickUpQuantityList[event.index].toString()));
+      emit(s.copyWith(
+          txtPickUpAddress: s.pickUpAddressList[event.index].toString(),
+          txtPickUpQuantity: s.pickUpQuantityList[event.index].toString(),
+          txtPickUpWeight: s.pickUpWeightList.length > event.index ? s.pickUpWeightList[event.index].toString() : ''
+      ));
     });
 
     on<SelectDeliveryFromList>((event, emit) {
       if (state is! SalesOrderAddLoaded) return;
       final s = state as SalesOrderAddLoaded;
-      emit(s.copyWith(txtDeliveryAddress: s.deliveryAddressList[event.index].toString(), txtDeliveryQuantity: s.deliveryQuantityList[event.index].toString()));
+      emit(s.copyWith(
+          txtDeliveryAddress: s.deliveryAddressList[event.index].toString(),
+          txtDeliveryQuantity: s.deliveryQuantityList[event.index].toString(),
+          txtDeliveryWeight: s.deliveryWeightList.length > event.index ? s.deliveryWeightList[event.index].toString() : ''
+      ));
     });
-
     on<ToggleProductView>((event, emit) { if (state is SalesOrderAddLoaded) emit((state as SalesOrderAddLoaded).copyWith(visibleProductview: !(state as SalesOrderAddLoaded).visibleProductview)); });
     on<ToggleFW1>((event, emit) { if (state is SalesOrderAddLoaded) emit((state as SalesOrderAddLoaded).copyWith(visibleFW1: !(state as SalesOrderAddLoaded).visibleFW1)); });
     on<ToggleFW2>((event, emit) { if (state is SalesOrderAddLoaded) emit((state as SalesOrderAddLoaded).copyWith(visibleFW2: !(state as SalesOrderAddLoaded).visibleFW2)); });
@@ -506,17 +516,27 @@ class SalesOrderAddBloc extends Bloc<SalesOrderAddEvent, SalesOrderAddState> {
       case 'txtProductQty': return _recalculate(s.copyWith(txtProductQty: value));
       case 'txtProductSaleRate': return _recalculate(s.copyWith(txtProductSaleRate: value));
       case 'txtProductGst': return _recalculate(s.copyWith(txtProductGst: value));
+
+    // ==========================================================
+    // PICKUP FIELDS
+    // ==========================================================
       case 'txtPickUpAddress': return s.copyWith(txtPickUpAddress: value);
       case 'txtPickUpQuantity': return s.copyWith(txtPickUpQuantity: value);
+      case 'txtPickUpWeight': return s.copyWith(txtPickUpWeight: value); // <--- ADDED
+
+    // ==========================================================
+    // DELIVERY FIELDS
+    // ==========================================================
       case 'txtDeliveryAddress': return s.copyWith(txtDeliveryAddress: value);
       case 'txtDeliveryQuantity': return s.copyWith(txtDeliveryQuantity: value);
+      case 'txtDeliveryWeight': return s.copyWith(txtDeliveryWeight: value); // <--- ADDED
+
       case 'txtWarehouseAddress': return s.copyWith(txtWarehouseAddress: value);
       case 'txtOrigin': return s.copyWith(txtOrigin: value);
       case 'txtDestination': return s.copyWith(txtDestination: value);
       default: return s;
     }
   }
-
   SalesOrderAddLoaded _updateDropdown(SalesOrderAddLoaded s, String field, String? value) {
     switch (field) {
       case 'dropdownValueFW1': return s.copyWith(dropdownValueFW1: value);
@@ -578,7 +598,6 @@ class SalesOrderAddBloc extends Bloc<SalesOrderAddEvent, SalesOrderAddState> {
     await OnlineApi.SelectCustomer(context); await OnlineApi.SelectJobType(context);
     if (m["JobMasterRefId"] != null) await OnlineApi.SelectAllJobStatus(context, m["JobMasterRefId"]);
 
-    // ✅ FIX 3: Safe Sequential Edit Agent Name Loading to avoid overwriting API state memory
     String lAgentName = '';
     if (m["AgentCompanyRefId"] != null && m["AgentCompanyRefId"] > 0) {
       await OnlineApi.SelectAgentAll(context, m["AgentCompanyRefId"]);
@@ -602,6 +621,42 @@ class SalesOrderAddBloc extends Bloc<SalesOrderAddEvent, SalesOrderAddState> {
         return (map['ItemMasterRefId'] ?? map['ItemMasterRefid'] ?? map['ItemMasterID'] ?? 0) as int;
       }).toList();
     }
+
+    // =========================================================================
+    // ✅ NEW LOGIC: Extract Arrays directly from PickupsList & DeliveriesList
+    // =========================================================================
+    List<dynamic> parsedPickupAddresses = [];
+    List<dynamic> parsedPickupQuantities = [];
+    List<dynamic> parsedPickupWeights = [];
+
+    if (m['PickupsList'] != null && m['PickupsList'] is List && (m['PickupsList'] as List).isNotEmpty) {
+      for (var item in m['PickupsList']) {
+        parsedPickupAddresses.add(item['PickupAddress'] ?? '');
+        parsedPickupQuantities.add(item['PickupQuantity'] ?? '');
+        parsedPickupWeights.add(item['PickupWeight'] ?? '');
+      }
+    } else {
+      parsedPickupAddresses = _splitAddress(_getVal(m, "PickupAddress"));
+      parsedPickupQuantities = _splitAddress(_getVal(m, "pickupQuantitylist"));
+      parsedPickupWeights = List.filled(parsedPickupAddresses.length, "");
+    }
+
+    List<dynamic> parsedDeliveryAddresses = [];
+    List<dynamic> parsedDeliveryQuantities = [];
+    List<dynamic> parsedDeliveryWeights = [];
+
+    if (m['DeliveriesList'] != null && m['DeliveriesList'] is List && (m['DeliveriesList'] as List).isNotEmpty) {
+      for (var item in m['DeliveriesList']) {
+        parsedDeliveryAddresses.add(item['DeliveryAddress'] ?? '');
+        parsedDeliveryQuantities.add(item['DeliveryQuantity'] ?? '');
+        parsedDeliveryWeights.add(item['DeliveryWeight'] ?? '');
+      }
+    } else {
+      parsedDeliveryAddresses = _splitAddress(_getVal(m, "DeliveryAddress"));
+      parsedDeliveryQuantities = _splitAddress(_getVal(m, "DeliveryQuantitylist"));
+      parsedDeliveryWeights = List.filled(parsedDeliveryAddresses.length, "");
+    }
+    // =========================================================================
 
     var result = base.copyWith(
       editId: isEnquiry ? 0 : (m["Id"] ?? 0), enquiryId: isEnquiry ? (m["Id"] ?? 0) : 0, productViewList: details ?? [],
@@ -634,7 +689,6 @@ class SalesOrderAddBloc extends Bloc<SalesOrderAddEvent, SalesOrderAddState> {
       txtSealByEmp3: _getEmpName(m["SealbyRefid3"]), txtBreakByEmp1: _getEmpName(m["SealbreakbyRefid"]), txtBreakByEmp2: _getEmpName(m["SealbreakbyRefid2"]),
       txtBreakByEmp3: _getEmpName(m["SealbreakbyRefid3"]), txtBoardingOfficer1: _getEmpName(m["BoardingOfficerRefid"]), txtBoardingOfficer2: _getEmpName(m["BoardingOfficer1Refid"]),
 
-      // ✅ FIX 3: Safe binding using sequentially loaded names
       txtLAgentCompany: _getFromAgentCompany(m["AgentCompanyRefId"]), txtLAgentName: lAgentName, txtOAgentCompany: _getFromAgentCompany(m["OAgentCompanyRefId"]), txtOAgentName: oAgentName,
 
       txtDoDescription: _safeStr(m["DODescription"]), txtTruckSize: _safeNum(m["TruckSize"]),
@@ -650,14 +704,22 @@ class SalesOrderAddBloc extends Bloc<SalesOrderAddEvent, SalesOrderAddState> {
       txtForwarding1S1: _safeStr(m["Forwarding1S1"]), txtForwarding1S2: _safeStr(m["Forwarding1S2"]), txtForwarding2S1: _safeStr(m["Forwarding2S1"]),
       txtForwarding2S2: _safeStr(m["Forwarding2S2"]), txtForwarding3S1: _safeStr(m["Forwarding3S1"]), txtForwarding3S2: _safeStr(m["Forwarding3S2"]),
 
-      // ✅ FIX 4: Safe, case-insensitive extraction for quantities mapping
-      pickUpAddressList: _splitAddress(_getVal(m, "PickupAddress")), pickUpQuantityList: _splitAddress(_getVal(m, "PickupQuantityList")),
-      deliveryAddressList: _splitAddress(_getVal(m, "DeliveryAddress")), deliveryQuantityList: _splitAddress(_getVal(m, "DeliveryQuantityList")),
-      txtPickUpAddress: _firstAddress(_getVal(m, "PickupAddress")), txtDeliveryAddress: _firstAddress(_getVal(m, "DeliveryAddress")),
+      // MAP NEW ARRAYS TO STATE
+      pickUpAddressList: parsedPickupAddresses,
+      pickUpQuantityList: parsedPickupQuantities,
+      pickUpWeightList: parsedPickupWeights,
+      deliveryAddressList: parsedDeliveryAddresses,
+      deliveryQuantityList: parsedDeliveryQuantities,
+      deliveryWeightList: parsedDeliveryWeights,
+      txtPickUpAddress: parsedPickupAddresses.isNotEmpty ? parsedPickupAddresses[0] : '',
+      txtPickUpQuantity: parsedPickupQuantities.isNotEmpty ? parsedPickupQuantities[0] : '',
+      txtPickUpWeight: parsedPickupWeights.isNotEmpty ? parsedPickupWeights[0] : '',
+      txtDeliveryAddress: parsedDeliveryAddresses.isNotEmpty ? parsedDeliveryAddresses[0] : '',
+      txtDeliveryQuantity: parsedDeliveryQuantities.isNotEmpty ? parsedDeliveryQuantities[0] : '',
+      txtDeliveryWeight: parsedDeliveryWeights.isNotEmpty ? parsedDeliveryWeights[0] : '',
     );
     return _applyVisibility(result);
   }
-
   String _getFromList<T>(List<T> list, dynamic id, String Function(T) getName) { if (id == null || id == 0) return ''; try { return getName((list as List).firstWhere((e) => (e as dynamic).Id == id) as T); } catch (_) { return ''; } }
   String _getFromStatusList(dynamic id) { if (id == null || id == 0) return ''; try { return objfun.JobAllStatusList.firstWhere((e) => e.Status == id).StatusName; } catch (_) { return ''; } }
   String _getEmpName(dynamic id) { if (id == null || id == 0) return ''; try { return objfun.EmployeeList.firstWhere((e) => e.Id == id).AccountName; } catch (_) { return ''; } }
@@ -667,6 +729,53 @@ class SalesOrderAddBloc extends Bloc<SalesOrderAddEvent, SalesOrderAddState> {
   String _firstAddress(dynamic val) { if (val == null || val.toString().isEmpty) return ''; final str = val.toString(); return str.contains('{@}') ? str.split('{@}').first : str; }
 
   Map<String, dynamic> _buildMasterPayload(SalesOrderAddLoaded s) {
+
+    // =========================================================================
+    // ✅ BUILD PICKUPS & DELIVERIES ARRAYS
+    // =========================================================================
+    List<Map<String, dynamic>> dynamicPickups = [];
+    int pLen = s.pickUpAddressList.isNotEmpty ? s.pickUpAddressList.length : (s.txtPickUpAddress.isNotEmpty ? 1 : 0);
+
+    if (pLen > 0 && s.pickUpAddressList.isEmpty) {
+      dynamicPickups.add({
+        "PickupAddress": s.txtPickUpAddress,
+        "PickupQuantity": s.txtPickUpQuantity,
+        "PickupWeight": s.txtPickUpWeight,
+        "PickupTime": null
+      });
+    } else {
+      for (int i = 0; i < s.pickUpAddressList.length; i++) {
+        dynamicPickups.add({
+          "PickupAddress": s.pickUpAddressList[i],
+          "PickupQuantity": i < s.pickUpQuantityList.length ? s.pickUpQuantityList[i] : "",
+          "PickupWeight": i < s.pickUpWeightList.length ? s.pickUpWeightList[i] : "",
+          "PickupTime": null
+        });
+      }
+    }
+
+    List<Map<String, dynamic>> dynamicDeliveries = [];
+    int dLen = s.deliveryAddressList.isNotEmpty ? s.deliveryAddressList.length : (s.txtDeliveryAddress.isNotEmpty ? 1 : 0);
+
+    if (dLen > 0 && s.deliveryAddressList.isEmpty) {
+      dynamicDeliveries.add({
+        "DeliveryAddress": s.txtDeliveryAddress,
+        "DeliveryQuantity": s.txtDeliveryQuantity,
+        "DeliveryWeight": s.txtDeliveryWeight,
+        "DeliveryTime": null
+      });
+    } else {
+      for (int i = 0; i < s.deliveryAddressList.length; i++) {
+        dynamicDeliveries.add({
+          "DeliveryAddress": s.deliveryAddressList[i],
+          "DeliveryQuantity": i < s.deliveryQuantityList.length ? s.deliveryQuantityList[i] : "",
+          "DeliveryWeight": i < s.deliveryWeightList.length ? s.deliveryWeightList[i] : "",
+          "DeliveryTime": null
+        });
+      }
+    }
+    // =========================================================================
+
     return {
       'Id': s.editId, 'CompanyRefId': objfun.Comid, 'EmployeeRefId': objfun.EmpRefId == 0 ? null : objfun.EmpRefId, 'AgentCompanyRefId': s.lAgentCompanyId == 0 ? null : s.lAgentCompanyId,
       'AgentMasterRefId': s.lAgentId == 0 ? null : s.lAgentId, 'OAgentCompanyRefId': s.oAgentCompanyId == 0 ? null : s.oAgentCompanyId, 'OAgentMasterRefId': s.oAgentId == 0 ? null : s.oAgentId,
@@ -686,10 +795,12 @@ class SalesOrderAddBloc extends Bloc<SalesOrderAddEvent, SalesOrderAddState> {
       'PortCharges': s.txtPortCharges, 'OriginRefId': s.originId, 'DestinationRefId': s.destinationId,
       'PickupDate': s.checkBoxValuePickUp ? DateTime.parse(s.dtpPickUpdate).toIso8601String() : null, 'DeliveryDate': s.checkBoxValueDelivery ? DateTime.parse(s.dtpDeliverydate).toIso8601String() : null,
       'WareHouseEnterDate': s.checkBoxValueWHEntry ? DateTime.parse(s.dtpWHEntrydate).toIso8601String() : null, 'WareHouseExitDate': s.checkBoxValueWHExit ? DateTime.parse(s.dtpWHExitdate).toIso8601String() : null,
-      'WareHouseAddress': s.txtWarehouseAddress, 'PickupAddress': s.pickUpAddressList.length <= 1 ? s.txtPickUpAddress : s.pickUpAddressList.join('{@}'),
-      'pickupQuantitylist': s.pickUpQuantityList.length <= 1 ? s.txtPickUpQuantity : s.pickUpQuantityList.join('{@}'),
-      'DeliveryAddress': s.deliveryAddressList.length <= 1 ? s.txtDeliveryAddress : s.deliveryAddressList.join('{@}'),
-      'DeliveryQuantitylist': s.deliveryQuantityList.length <= 1 ? s.txtDeliveryQuantity : s.deliveryQuantityList.join('{@}'),
+      'WareHouseAddress': s.txtWarehouseAddress,
+
+      // ✅ ADDED ARRAYS TO PAYLOAD
+      'PickupsList': dynamicPickups,
+      'DeliveriesList': dynamicDeliveries,
+
       'Forwarding': s.dropdownValueFW1, 'Forwarding2': s.dropdownValueFW2, 'Forwarding3': s.dropdownValueFW3, 'Origin': s.txtOrigin, 'Destination': s.txtDestination,
       'SCN': s.txtOSCN, 'LSCN': s.txtLSCN, 'Zb': s.dropdownValueZB1, 'PTW': s.txtPTWNo, 'Zb2': s.dropdownValueZB2, 'ZbRef': s.txtZBRef1, 'ZbRef2': s.txtZBRef2,
       'Forwarding1S1': s.txtForwarding1S1, 'Forwarding1S2': s.txtForwarding1S2, 'Forwarding2S1': s.txtForwarding2S1, 'Forwarding2S2': s.txtForwarding2S2,
@@ -698,6 +809,7 @@ class SalesOrderAddBloc extends Bloc<SalesOrderAddEvent, SalesOrderAddState> {
       'Forwarding3Date': s.checkBoxValueFW3 ? DateTime.parse(s.dtpFW3date).toIso8601String() : null,
 
       'SaleDetails': s.productViewList.asMap().entries.map((entry) {
+        // ... pazhaya code ...
         final idx = entry.key;
         final jsonMap = Map<String, dynamic>.from(entry.value.toJson());
         final hardId = s.productIds.length > idx ? s.productIds[idx] : 0;

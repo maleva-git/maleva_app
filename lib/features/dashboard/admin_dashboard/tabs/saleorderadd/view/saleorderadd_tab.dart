@@ -8,7 +8,6 @@ import 'package:maleva/core/utils/clsfunction.dart' as objfun;
 import 'package:maleva/core/colors/colors.dart' as colour;
 import 'package:maleva/features/mastersearch/JobAllStatus.dart';
 import 'package:maleva/menu/menulist.dart';
-
 import '../../../../../../core/di/injection.dart';
 import '../../../../../mastersearch/AddressList.dart';
 import '../../../../../mastersearch/Agent.dart';
@@ -22,7 +21,7 @@ import '../bloc/saleorderadd_bloc.dart';
 import '../bloc/saleorderadd_event.dart';
 import '../bloc/saleorderadd_state.dart';
 
-// ─── Entry point ──────────────────────────────────────────────────────────────
+
 
 class SalesOrderAdd extends StatelessWidget {
   final List<SaleEditDetailModel>? saleDetails;
@@ -43,7 +42,6 @@ class SalesOrderAdd extends StatelessWidget {
   }
 }
 
-// ─── Internal stateful view ───────────────────────────────────────────────────
 
 class _SalesOrderView extends StatefulWidget {
   const _SalesOrderView();
@@ -104,7 +102,8 @@ class _SalesOrderViewState extends State<_SalesOrderView>
   final txtDeliveryQuantity = TextEditingController();
   final txtOrigin = TextEditingController();
   final txtDestination = TextEditingController();
-
+  final txtPickUpWeight = TextEditingController();
+  final txtDeliveryWeight = TextEditingController();
   // Product fields
   final txtProductCode = TextEditingController();
   final txtProductDescription = TextEditingController();
@@ -259,9 +258,11 @@ class _SalesOrderViewState extends State<_SalesOrderView>
     'forwarding3S2': txtForwarding3S2.text,
     'warehouseAddress': txtWarehouseAddress.text,
     'pickupAddress': txtPickUpAddress.text,
+    'pickupWeight': txtPickUpWeight.text,
     'pickupQuantity': txtPickUpQuantity.text,
     'deliveryAddress': txtDeliveryAddress.text,
     'deliveryQuantity': txtDeliveryQuantity.text,
+    'deliveryWeight': txtDeliveryWeight.text,
     'originName': txtOrigin.text,
     'destinationName': txtDestination.text,
   };
@@ -475,7 +476,7 @@ class _SalesOrderViewState extends State<_SalesOrderView>
       controller: _tabController,
       physics: const NeverScrollableScrollPhysics(),
       children: [
-        _buildTab0_JobInfo(context, state, bloc, isTablet),
+          _buildTab0_JobInfo(context, state, bloc, isTablet),
         _buildTab1_LoadingVessel(context, state, bloc, isTablet),
         _buildTab2_OffVessel(context, state, bloc, isTablet),
         _buildTab3_Forwarding(context, state, bloc, isTablet),
@@ -777,6 +778,12 @@ class _SalesOrderViewState extends State<_SalesOrderView>
               isTablet: isTablet),
           const SizedBox(height: 8),
 
+          _styledField(
+              controller: txtPickUpWeight, // Pudhu controller create pannunga
+              hint: 'Pickup Weight',
+              keyboardType: TextInputType.number,
+              isTablet: isTablet),
+          const SizedBox(height: 8),
           // ── Delivery Address ── FIX: removed pre-fetch
           _searchField(
             controller: txtDeliveryAddress,
@@ -815,6 +822,11 @@ class _SalesOrderViewState extends State<_SalesOrderView>
               isTablet: isTablet),
           const SizedBox(height: 8),
 
+          _styledField(
+              controller: txtDeliveryWeight, // Pudhu controller create pannunga
+              hint: 'Delivery Weight',
+              keyboardType: TextInputType.number,
+              isTablet: isTablet),
           // ── Warehouse Address ── FIX: removed pre-fetch
           _searchField(
             controller: txtWarehouseAddress,

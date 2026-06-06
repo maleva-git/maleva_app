@@ -11,7 +11,6 @@ import 'saleorderadd_state.dart';
 class SalesOrderBloc extends Bloc<SalesOrderEvent, SalesOrderState> {
   final SalesOrderRepository repository;
 
-  // Local caches — never rely on objfun globals inside the BLoC
   List<dynamic> _jobTypeDetailsList = [];
   List<dynamic> _agentCompanyList = [];
   List<dynamic> _agentAllList = [];
@@ -390,6 +389,38 @@ class SalesOrderBloc extends Bloc<SalesOrderEvent, SalesOrderState> {
         .format(DateTime.parse(m['SaleDate'].toString()))
         : _today();
 
+    // ==========================================
+    // LOAD FROM LIST FOR MOBILE TEXTBOXES
+    // ==========================================
+    String pAddress = '';
+    String pQty = '';
+    String pWeight = '';
+    if (m['PickupsList'] != null && (m['PickupsList'] as List).isNotEmpty) {
+      pAddress = m['PickupsList'][0]['PickupAddress']?.toString() ?? '';
+      pQty = m['PickupsList'][0]['PickupQuantity']?.toString() ?? '';
+      pWeight = m['PickupsList'][0]['PickupWeaight']?.toString() ?? '';
+    } else {
+      pAddress = m['PickUpAddress']?.toString() ?? '';
+      pQty = m['PickUpQuantity']?.toString() ?? '';
+    }
+
+    String dAddress = '';
+    String dQty = '';
+    String dWeight = '';
+    if (m['DeliveriesList'] != null && (m['DeliveriesList'] as List).isNotEmpty) {
+      dAddress = m['DeliveriesList'][0]['DeliveryAddress']?.toString() ?? '';
+      dQty = m['DeliveriesList'][0]['DeliveryQuantity']?.toString() ?? '';
+      dWeight = m['DeliveriesList'][0]['DeliveryWeight']?.toString() ?? '';
+    } else {
+      dAddress = m['DeliveryAddress']?.toString() ?? '';
+      dQty = m['DeliveryQuantity']?.toString() ?? '';
+    }
+
+    // Set common weight text field from the API lists if existing common Weight is empty
+    String finalWeight = m['Weight']?.toString() ?? '';
+    if (finalWeight.isEmpty && pWeight.isNotEmpty) finalWeight = pWeight;
+    if (finalWeight.isEmpty && dWeight.isNotEmpty) finalWeight = dWeight;
+
     return s.copyWith(
       status: SalesOrderStatus.success,
       editId: isEnquiry ? 0 : (m['Id'] ?? 0),
@@ -418,7 +449,7 @@ class SalesOrderBloc extends Bloc<SalesOrderEvent, SalesOrderState> {
       blCopy: m['BLCopy']?.toString() ?? '',
       oScn: m['OSCN']?.toString() ?? '',
       lScn: m['LSCN']?.toString() ?? '',
-      weight: m['Weight']?.toString() ?? '',
+      weight: finalWeight, // Reused existing common weight UI field!
       quantity: m['Quantity']?.toString() ?? '',
       truckSize: m['TruckSize']?.toString() ?? '',
       truckSizeDropdown: m['TruckSize']?.toString(),
@@ -445,10 +476,6 @@ class SalesOrderBloc extends Bloc<SalesOrderEvent, SalesOrderState> {
       forwarding3S1: m['Forwarding3S1']?.toString() ?? '',
       forwarding3S2: m['Forwarding3S2']?.toString() ?? '',
       warehouseAddress: m['WarehouseAddress']?.toString() ?? '',
-      pickupAddress: m['PickUpAddress']?.toString() ?? '',
-      pickupQuantity: m['PickUpQuantity']?.toString() ?? '',
-      deliveryAddress: m['DeliveryAddress']?.toString() ?? '',
-      deliveryQuantity: m['DeliveryQuantity']?.toString() ?? '',
       originId: m['OriginRefId'] ?? 0,
       originName: m['OriginName']?.toString() ?? '',
       destinationId: m['DestinationRefId'] ?? 0,
@@ -510,6 +537,11 @@ class SalesOrderBloc extends Bloc<SalesOrderEvent, SalesOrderState> {
       fw3Dropdown: m['FW3']?.toString(),
       zb1Dropdown: m['ZB1']?.toString(),
       zb2Dropdown: m['ZB2']?.toString(),
+
+      pickupAddress: pAddress,
+      pickupQuantity: pQty,
+      deliveryAddress: dAddress,
+      deliveryQuantity: dQty,
       visibility: _buildVisibility(jobTypeName),
     );
   }
@@ -677,6 +709,25 @@ class SalesOrderBloc extends Bloc<SalesOrderEvent, SalesOrderState> {
 
     String _f(String key) => event.fields[key] ?? '';
 
+    // Pickups and Deliveries logic cleanly parsing UI fields
+    List<Map<String, dynamic>> dynamicPickups = [];
+    if (_f('pickupAddress').isNotEmpty) {
+      dynamicPickups.add({
+        "PickupAddress": _f('pickupAddress'),
+        "PickupWeight": _f('pickupWeight'),
+        "PickupQuantity": _f('pickupQuantity'),
+      });
+    }
+
+    List<Map<String, dynamic>> dynamicDeliveries = [];
+    if (_f('deliveryAddress').isNotEmpty) {
+      dynamicDeliveries.add({
+        "DeliveryAddress": _f('deliveryAddress'),
+        "DeliveryWeight": _f('deliveryWeight'),
+        "DeliveryQuantity": _f('deliveryQuantity'),
+      });
+    }
+
     final master = [
       {
         'Id': state.editId,
@@ -730,10 +781,17 @@ class SalesOrderBloc extends Bloc<SalesOrderEvent, SalesOrderState> {
         'Forwarding3S1': _f('forwarding3S1'),
         'Forwarding3S2': _f('forwarding3S2'),
         'WarehouseAddress': _f('warehouseAddress'),
-        'PickUpAddress': _f('pickupAddress'),
-        'PickUpQuantity': _f('pickupQuantity'),
-        'DeliveryAddress': _f('deliveryAddress'),
-        'DeliveryQuantity': _f('deliveryQuantity'),
+
+        // Map list arrays
+        'PickupsList': dynamicPickups,
+        'DeliveriesList': dynamicDeliveries,
+
+        // Clearing obsolete flat keys
+        'PickUpAddress': '',
+        'PickUpQuantity': '',
+        'DeliveryAddress': '',
+        'DeliveryQuantity': '',
+
         'OriginRefId': state.originId,
         'OriginName': _f('originName'),
         'DestinationRefId': state.destinationId,
@@ -790,6 +848,7 @@ class SalesOrderBloc extends Bloc<SalesOrderEvent, SalesOrderState> {
         'CurrencyValue': state.currencyValue,
         'EnquiryId': state.enquiryId,
         'SaleDetails': state.productList
+
             .map((p) => {
           'Id': p.Id,
           'SDId': p.SDId,

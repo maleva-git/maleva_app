@@ -1,14 +1,11 @@
-// core/network/api_constants.dart
-// OnlineApi.dart la irundha ELLA URL-um inga move pannanum
-// String port = "https://maleva.my"; — live server
 
 class ApiConstants {
-  ApiConstants._(); // instantiate pannakoodadu
+  ApiConstants._();
 
   static const String port = "https://maleva.my";
   // Demo servers:
   // static const String port = "http://103.215.139.121:9001/";
-  // static const String port = "http://103.215.139.8:8001/";
+   //static const String port = "http://103.215.139.8:8001/";
 
   // ─── Image / File Upload ──────────────────────────────────────────────────
   static const String apiPostImage        = "$port/api/CommonApp/UploadFile/";
