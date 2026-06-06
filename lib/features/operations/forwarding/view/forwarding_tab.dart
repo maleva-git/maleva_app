@@ -16,7 +16,6 @@ import '../bloc/forwarding_event.dart';
 import '../bloc/forwarding_state.dart';
 
 
-// ─── Design Tokens ────────────────────────────────────────────────────────────
 const kHeaderGradStart = Color(0xFF1A3A8F);
 const kHeaderGradEnd   = Color(0xFF4A6FD4);
 const kCardBorder      = Color(0xFFC5D0EE);
