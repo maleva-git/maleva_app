@@ -5,6 +5,8 @@ import 'package:maleva/core/network/api_client.dart';
 import 'package:maleva/core/utils/clsfunction.dart' as objfun;
 import 'package:maleva/core/network/OnlineApi.dart' as OnlineApi;
 
+import '../../../../../../core/network/api_constants.dart';
+
 class SummonRepository {
   /// Loads the global truck list
   Future<void> fetchTrucks() async {
@@ -29,7 +31,7 @@ class SummonRepository {
     File? image,
     File? pdf,
   }) async {
-    final uri = Uri.parse("${objfun.apiInsertSummonParts}?Comid=$comId");
+    final uri = Uri.parse("${ApiConstants.apiInsertSummonParts}?Comid=$comId");
     final request = http.MultipartRequest("POST", uri);
 
     request.fields["details"] = jsonEncode(body);

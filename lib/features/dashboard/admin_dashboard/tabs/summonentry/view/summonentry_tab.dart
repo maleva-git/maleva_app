@@ -19,31 +19,48 @@ import '../data/summonentry_repository.dart';
 const List<String> kMalaysiaList  = ['Parking', 'Traffic', 'Summon', 'Compound', 'Others'];
 const List<String> kSingaporeList = ['ERP', 'Parking', 'Traffic', 'Summon', 'Others'];
 
-
-
 // ── Entry Point ───────────────────────────────────────────────────────────────
 class SummonEntryPage extends StatelessWidget {
   const SummonEntryPage({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return
-      BlocProvider(
-        // ✅ Removed 'context' and injected the repository instead
-        create: (_) => SummonBloc.form(
-          repository: sl<SummonRepository>(),
-        ),
-        child: const _SummonEntryBody(),
-      );
-
+    return BlocProvider(
+      create: (_) => SummonBloc.form(
+        repository: sl<SummonRepository>(),
+      ),
+      child: const _SummonEntryBody(),
+    );
   }
 }
 
 // ── Body ──────────────────────────────────────────────────────────────────────
-class _SummonEntryBody extends StatelessWidget {
+class _SummonEntryBody extends StatefulWidget {
   const _SummonEntryBody();
 
+  @override
+  State<_SummonEntryBody> createState() => _SummonEntryBodyState();
+}
+
+class _SummonEntryBodyState extends State<_SummonEntryBody> {
   static final _formKey = GlobalKey<FormState>();
+
+  // Text Fields-க்காக Controllers
+  final _amountCtrl = TextEditingController();
+  final _portPassCtrl = TextEditingController();
+  final _truckLcnMntCtrl = TextEditingController();
+  final _levyCtrl = TextEditingController();
+  final _fuelCtrl = TextEditingController();
+
+  @override
+  void dispose() {
+    _amountCtrl.dispose();
+    _portPassCtrl.dispose();
+    _truckLcnMntCtrl.dispose();
+    _levyCtrl.dispose();
+    _fuelCtrl.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -52,6 +69,14 @@ class _SummonEntryBody extends StatelessWidget {
     return BlocConsumer<SummonBloc, SummonState>(
       listener: (context, state) {
         if (state is SummonSubmitSuccess) {
+          // Entry Successful ஆனதும் எல்லா Controllers-ஐயும் Clear செய்யவும்
+          _amountCtrl.clear();
+          _portPassCtrl.clear();
+          _truckLcnMntCtrl.clear();
+          _levyCtrl.clear();
+          _fuelCtrl.clear();
+          _formKey.currentState?.reset();
+
           ScaffoldMessenger.of(context).showSnackBar(SnackBar(
             content: Text("Submitted successfully ✅",
                 style: GoogleFonts.lato(color: Palette.kWhite)),
@@ -69,6 +94,23 @@ class _SummonEntryBody extends StatelessWidget {
             behavior: SnackBarBehavior.floating,
           ));
         }
+        if (state is SummonEntryState) {
+          if (_amountCtrl.text != state.amount) {
+            _amountCtrl.text = state.amount;
+          }
+          if (_portPassCtrl.text != state.portPass) {
+            _portPassCtrl.text = state.portPass;
+          }
+          if (_truckLcnMntCtrl.text != state.truckLcnMnt) {
+            _truckLcnMntCtrl.text = state.truckLcnMnt;
+          }
+          if (_levyCtrl.text != state.levy) {
+            _levyCtrl.text = state.levy;
+          }
+          if (_fuelCtrl.text != state.fuel) {
+            _fuelCtrl.text = state.fuel;
+          }
+        }
       },
       builder: (context, state) {
         if (state is! SummonEntryState) return const SizedBox.shrink();
@@ -83,8 +125,7 @@ class _SummonEntryBody extends StatelessWidget {
   // ══════════════════════════════════════════════════════
   // TABLET — Two Column
   // ══════════════════════════════════════════════════════
-  Widget _buildTabletLayout(
-      BuildContext context, SummonEntryState s) {
+  Widget _buildTabletLayout(BuildContext context, SummonEntryState s) {
     return Padding(
       padding: const EdgeInsets.all(20),
       child: Row(
@@ -98,9 +139,7 @@ class _SummonEntryBody extends StatelessWidget {
               child: _buildFormContent(context, s, isTablet: true),
             ),
           ),
-
           const SizedBox(width: 20),
-
           // ── RIGHT (45%) — Preview Panel ──
           Expanded(
             flex: 45,
@@ -114,8 +153,7 @@ class _SummonEntryBody extends StatelessWidget {
   // ══════════════════════════════════════════════════════
   // MOBILE — Single Column
   // ══════════════════════════════════════════════════════
-  Widget _buildMobileLayout(
-      BuildContext context, SummonEntryState s) {
+  Widget _buildMobileLayout(BuildContext context, SummonEntryState s) {
     return SingleChildScrollView(
       padding: const EdgeInsets.fromLTRB(16, 16, 16, 30),
       child: _buildFormContent(context, s, isTablet: false),
@@ -125,8 +163,7 @@ class _SummonEntryBody extends StatelessWidget {
   // ══════════════════════════════════════════════════════
   // SHARED — Form Content
   // ══════════════════════════════════════════════════════
-  Widget _buildFormContent(
-      BuildContext context, SummonEntryState s,
+  Widget _buildFormContent(BuildContext context, SummonEntryState s,
       {required bool isTablet}) {
     final bloc = context.read<SummonBloc>();
     final summonList = s.selectedCountry == 'Malaysia'
@@ -142,7 +179,6 @@ class _SummonEntryBody extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-
           // ── Title (tablet-ல மட்டும்) ──
           if (isTablet) ...[
             Row(children: [
@@ -284,11 +320,9 @@ class _SummonEntryBody extends StatelessWidget {
                 decoration: _decor("Summon Type",
                     Icons.warning_amber_rounded),
                 items: summonList
-                    .map((e) =>
-                    DropdownMenuItem(value: e, child: Text(e)))
+                    .map((e) => DropdownMenuItem(value: e, child: Text(e)))
                     .toList(),
-                onChanged: (v) =>
-                    bloc.add(SelectSummonTypeEvent(v)),
+                onChanged: (v) => bloc.add(SelectSummonTypeEvent(v)),
                 validator: (v) => (v == null || v.isEmpty)
                     ? "Please select summon type"
                     : null,
@@ -306,7 +340,7 @@ class _SummonEntryBody extends StatelessWidget {
             title: "Charges",
             isTablet: isTablet,
             children: [
-              _field("Amount", s.amount,
+              _field("Amount", _amountCtrl,
                       (v) => bloc.add(UpdateAmountEvent(v)),
                   icon: Icons.currency_rupee_rounded,
                   keyboard: TextInputType.number,
@@ -314,20 +348,20 @@ class _SummonEntryBody extends StatelessWidget {
                       ? "Enter amount"
                       : null),
               const SizedBox(height: 12),
-              _field("PortPass", s.portPass,
+              _field("PortPass", _portPassCtrl,
                       (v) => bloc.add(UpdatePortPassEvent(v)),
                   icon: Icons.door_front_door_rounded),
               const SizedBox(height: 12),
-              _field("TruckLcnMnt", s.truckLcnMnt,
+              _field("TruckLcnMnt", _truckLcnMntCtrl,
                       (v) => bloc.add(UpdateTruckLcnMntEvent(v)),
                   icon: Icons.assignment_rounded),
               const SizedBox(height: 12),
-              _field("Levy", s.levy,
+              _field("Levy", _levyCtrl,
                       (v) => bloc.add(UpdateLevyEvent(v)),
                   icon: Icons.price_change_rounded,
                   keyboard: TextInputType.number),
               const SizedBox(height: 12),
-              _field("Fuel", s.fuel,
+              _field("Fuel", _fuelCtrl,
                       (v) => bloc.add(UpdateFuelEvent(v)),
                   icon: Icons.local_gas_station_rounded,
                   keyboard: TextInputType.number),
@@ -358,14 +392,10 @@ class _SummonEntryBody extends StatelessWidget {
                   ),
                   onPressed: () async {
                     final picker = ImagePicker();
-                    // Open the gallery
                     final picked = await picker.pickImage(source: ImageSource.gallery);
 
-                    // Check if the user actually picked a file and the widget is still on screen
                     if (picked != null && context.mounted) {
                       final path = picked.path.toLowerCase();
-
-                      // Send the correct event to the BLoC based on file type
                       if (path.endsWith('.pdf')) {
                         context.read<SummonBloc>().add(PickDocumentEvent(pdf: File(picked.path)));
                       } else {
@@ -430,21 +460,17 @@ class _SummonEntryBody extends StatelessWidget {
             Expanded(
               child: ElevatedButton(
                 style: ElevatedButton.styleFrom(
-                  minimumSize: Size(double.infinity,
-                      isTablet ? 58 : 55),
+                  minimumSize: Size(double.infinity, isTablet ? 58 : 55),
                   backgroundColor: Colors.green,
                   shape: RoundedRectangleBorder(
-                      borderRadius:
-                      BorderRadius.circular(isTablet ? 16 : 14)),
+                      borderRadius: BorderRadius.circular(isTablet ? 16 : 14)),
                   elevation: 0,
                 ),
                 onPressed: s.isSubmitting
                     ? null
                     : () {
                   if (_formKey.currentState!.validate()) {
-                    context
-                        .read<SummonBloc>()
-                        .add(const SubmitSummonEvent());
+                    context.read<SummonBloc>().add(const SubmitSummonEvent());
                   }
                 },
                 child: s.isSubmitting
@@ -464,12 +490,10 @@ class _SummonEntryBody extends StatelessWidget {
             Expanded(
               child: ElevatedButton(
                 style: ElevatedButton.styleFrom(
-                  minimumSize: Size(double.infinity,
-                      isTablet ? 58 : 55),
+                  minimumSize: Size(double.infinity, isTablet ? 58 : 55),
                   backgroundColor: AppTokens.brandGradientStart,
                   shape: RoundedRectangleBorder(
-                      borderRadius:
-                      BorderRadius.circular(isTablet ? 16 : 14)),
+                      borderRadius: BorderRadius.circular(isTablet ? 16 : 14)),
                   elevation: 0,
                 ),
                 onPressed: () => Navigator.push(
@@ -542,9 +566,9 @@ class _SummonPreviewPanel extends StatelessWidget {
                     color: AppTokens.brandDark,
                   )),
             ]),
-        
+
             const SizedBox(height: 20),
-        
+
             // Country badge
             Container(
               width: double.infinity,
@@ -578,36 +602,36 @@ class _SummonPreviewPanel extends StatelessWidget {
                 ],
               ),
             ),
-        
+
             const SizedBox(height: 16),
-        
+
             _previewRow(Icons.local_shipping_rounded,
                 'Truck', truckName),
             const SizedBox(height: 12),
-        
+
             _previewRow(Icons.calendar_today_rounded, 'Date',
                 s.selectedDate != null
                     ? DateFormat('dd MMM yyyy').format(s.selectedDate!)
                     : 'Not selected'),
             const SizedBox(height: 12),
-        
+
             _previewRow(Icons.warning_amber_rounded, 'Summon Type',
                 s.selectedSummon ?? 'Not selected'),
             const SizedBox(height: 12),
-        
+
             _previewRow(Icons.currency_rupee_rounded, 'Amount',
                 s.amount.isNotEmpty ? 'RM ${s.amount}' : '-'),
             const SizedBox(height: 12),
-        
+
             _previewRow(Icons.local_gas_station_rounded, 'Fuel',
                 s.fuel.isNotEmpty ? s.fuel : '-'),
             const SizedBox(height: 12),
-        
+
             _previewRow(Icons.price_change_rounded, 'Levy',
                 s.levy.isNotEmpty ? s.levy : '-'),
-        
+
             const SizedBox(height: 16),
-        
+
             // Document status
             Container(
               padding: const EdgeInsets.all(14),
@@ -658,9 +682,9 @@ class _SummonPreviewPanel extends StatelessWidget {
                 ],
               ),
             ),
-        
+
             const SizedBox(height: 16),
-        
+
             // Tips
             Container(
               padding: const EdgeInsets.all(14),
@@ -1065,14 +1089,14 @@ class _SelectTile extends StatelessWidget {
 // ── Reusable form field ───────────────────────────────────────────────────────
 Widget _field(
     String label,
-    String initial,
+    TextEditingController controller,
     ValueChanged<String> onChanged, {
       required IconData icon,
       TextInputType keyboard = TextInputType.text,
       FormFieldValidator<String>? validator,
     }) {
   return TextFormField(
-    initialValue: initial,
+    controller: controller,
     keyboardType: keyboard,
     onChanged: onChanged,
     validator: validator,

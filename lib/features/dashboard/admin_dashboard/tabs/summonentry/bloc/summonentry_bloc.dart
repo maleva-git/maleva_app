@@ -9,27 +9,25 @@ import 'summonentry_event.dart';
 import 'summonentry_state.dart';
 
 class SummonBloc extends Bloc<SummonEvent, SummonState> {
-  // ❌ REMOVED: final BuildContext context;
-  // ❌ REMOVED: final ImagePicker _picker = ImagePicker(); (Moved to UI)
-  final SummonRepository repository; // ✅ Injected Repository
 
-  // ── Entry Page init ─────────────────────────────────────────────────────────
+  final SummonRepository repository;
+
+
   SummonBloc.form({required this.repository}) : super(const SummonEntryState()) {
     _registerHandlers();
   }
 
-  // ── View Page init ──────────────────────────────────────────────────────────
+
   SummonBloc.view({
     required this.repository,
     DateTime? fromDate,
     DateTime? toDate
   }) : super(SummonViewState(
-    // ✅ Defaults to 30 days ago
     fromDate: fromDate ?? DateTime.now().subtract(const Duration(days: 30)),
     toDate: toDate ?? DateTime.now(),
   )) {
     _registerHandlers();
-    add(const LoadSummonViewEvent()); // Auto-load since we have default dates
+    add(const LoadSummonViewEvent());
   }
 
   void _registerHandlers() {
@@ -54,15 +52,12 @@ class SummonBloc extends Bloc<SummonEvent, SummonState> {
     _loadTrucks();
   }
 
-  // ════════════════════════════════════════════════════════════════════════════
-  // ENTRY HANDLERS
-  // ════════════════════════════════════════════════════════════════════════════
   Future<void> _loadTrucks() async {
     if (objfun.GetTruckList.isEmpty) {
       await repository.fetchTrucks();
 
       if (state is SummonEntryState) {
-        emit((state as SummonEntryState).copyWith()); // trigger rebuild
+        emit((state as SummonEntryState).copyWith());
       }
     }
   }
@@ -153,7 +148,6 @@ class SummonBloc extends Bloc<SummonEvent, SummonState> {
         }
       ];
 
-      // ✅ REFACTORED: Using the injected repository
       final isSuccess = await repository.submitSummon(
         body: body,
         comId: comid,
@@ -177,9 +171,7 @@ class SummonBloc extends Bloc<SummonEvent, SummonState> {
     emit(const SummonEntryState());
   }
 
-  // ════════════════════════════════════════════════════════════════════════════
-  // VIEW HANDLERS
-  // ════════════════════════════════════════════════════════════════════════════
+
 
   void _onViewFromDate(SelectViewFromDateEvent e, Emitter<SummonState> emit) {
     if (state is! SummonViewState) return;
@@ -202,7 +194,6 @@ class SummonBloc extends Bloc<SummonEvent, SummonState> {
       final String to = DateFormat('yyyy-MM-dd').format(s.toDate);
       final comId = objfun.storagenew.getInt('Comid') ?? 0;
 
-      // ✅ REFACTORED: Using the injected repository
       final resultData = await repository.fetchSummonRecords(
           comId: comId,
           fromDate: from,

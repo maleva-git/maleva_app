@@ -47,6 +47,9 @@ class FWUpdateBloc extends Bloc<FWUpdateEvent, FWUpdateState> {
     if (state is FWUpdateLoaded) emit((state as FWUpdateLoaded).copyWith(currentTab: event.tabIndex));
   }
 
+  // ---------------------------------------------------------
+  // FIXED METHOD: SMK Text Changed
+  // ---------------------------------------------------------
   void _onSmkTextChanged(FWUpdateSmkTextChanged event, Emitter<FWUpdateState> emit) {
     if (state is! FWUpdateLoaded) return;
     final s = state as FWUpdateLoaded;
@@ -55,10 +58,16 @@ class FWUpdateBloc extends Bloc<FWUpdateEvent, FWUpdateState> {
     List<dynamic> filtered = [];
     if (query.isNotEmpty) {
       final smkKey = event.type == 1 ? 'ForwardingSMKNo' : event.type == 2 ? 'ForwardingSMKNo2' : 'ForwardingSMKNo3';
-      filtered = _jobNoList.where((e) => e[smkKey].toString().contains(query)).toList();
+
+      filtered = _jobNoList.where((e) {
+        // Safe string conversion for numbers/nulls
+        final smkValue = (e[smkKey] ?? '').toString();
+        return smkValue.contains(query);
+      }).toList();
     }
 
-    final updated = s.tabByType(event.type).copyWith(smkText: query, suggestions: filtered);
+    // Using event.text instead of query to avoid cursor jumping issues
+    final updated = s.tabByType(event.type).copyWith(smkText: event.text, suggestions: filtered);
     emit(s.withTab(event.type, updated));
   }
 
