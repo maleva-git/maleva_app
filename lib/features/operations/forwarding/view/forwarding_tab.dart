@@ -10,45 +10,38 @@ import 'package:maleva/core/network/OnlineApi.dart' as OnlineApi;
 import 'package:maleva/core/models/model.dart';
 import 'package:maleva/menu/menulist.dart';
 import '../../../../core/di/injection.dart';
+import '../../../../core/theme/palette.dart';
 import '../../../mastersearch/Employee.dart';
 import '../bloc/forwarding_bloc.dart';
 import '../bloc/forwarding_event.dart';
 import '../bloc/forwarding_state.dart';
 
 
-const kHeaderGradStart = Color(0xFF1A3A8F);
-const kHeaderGradEnd   = Color(0xFF4A6FD4);
-const kCardBorder      = Color(0xFFC5D0EE);
-const kPageBg          = Color(0xFFF4F6FB);
-const kTextDark        = Color(0xFF1E2D5E);
-const kTextMid         = Color(0xFF4A5A8A);
-const kTextMuted       = Color(0xFF8A96BF);
-const kDetailBg        = Color(0xFFF0F4FF);
-const kChipBg          = Color(0xFFEEF2FF);
-
 const kGradient = LinearGradient(
-  colors: [kHeaderGradStart, kHeaderGradEnd],
+  colors: [Palette.blue700, Palette.blue400],
   begin: Alignment.topLeft,
   end: Alignment.bottomRight,
 );
 
 const double kTabletBreak = 600;
 
-// ─── Root ─────────────────────────────────────────────────────────────────────
+
+// =========================================================================
+// UI: FWUpdate Page & Widgets
+// =========================================================================
+
 class FWUpdate extends StatelessWidget {
   const FWUpdate({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return
-      BlocProvider(
-        create: (_) => sl<FWUpdateBloc>()..add(FWUpdateStarted()),
-        child: const FWUpdatePage(),
-      );
+    return BlocProvider(
+      create: (_) => sl<FWUpdateBloc>()..add(FWUpdateStarted()),
+      child: const FWUpdatePage(),
+    );
   }
 }
 
-// ─── Page ─────────────────────────────────────────────────────────────────────
 class FWUpdatePage extends StatefulWidget {
   const FWUpdatePage();
 
@@ -56,20 +49,20 @@ class FWUpdatePage extends StatefulWidget {
   State<FWUpdatePage> createState() => FWUpdatePageState();
 }
 
-class FWUpdatePageState extends State<FWUpdatePage>
-    with SingleTickerProviderStateMixin {
+class FWUpdatePageState extends State<FWUpdatePage> with SingleTickerProviderStateMixin {
   late TabController _tabController;
   final _pickers = [ImagePicker(), ImagePicker(), ImagePicker()];
 
   @override
   void initState() {
     super.initState();
+    // Fixed: Initializing the Global JobNoList
+    OnlineApi.GetJobNoForwarding(context, 3);
+
     _tabController = TabController(length: 3, vsync: this);
     _tabController.addListener(() {
       if (!_tabController.indexIsChanging) {
-        context
-            .read<FWUpdateBloc>()
-            .add(FWUpdateTabChanged(_tabController.index));
+        context.read<FWUpdateBloc>().add(FWUpdateTabChanged(_tabController.index));
       }
     });
   }
@@ -80,8 +73,7 @@ class FWUpdatePageState extends State<FWUpdatePage>
     super.dispose();
   }
 
-  Future<void> _pickImage(
-      BuildContext context, ImageSource source, int type, String smkText) async {
+  Future<void> _pickImage(BuildContext context, ImageSource source, int type, String smkText) async {
     if (smkText.isEmpty) {
       objfun.toastMsg('Enter SMK No $type', '', context);
       return;
@@ -93,10 +85,10 @@ class FWUpdatePageState extends State<FWUpdatePage>
     final file = await picker.pickImage(source: source);
     if (file == null) return;
 
-    final url = await objfun.upload(
-        File(file.path), objfun.apiPostimage, s.saleOrderId, 'SalesOrder', smkText);
-    context.read<FWUpdateBloc>().add(
-        FWUpdateImagePicked(type: type, imageUrl: url));
+    final url = await objfun.upload(File(file.path), objfun.apiPostimage, s.saleOrderId, 'SalesOrder', smkText);
+    if (url != null && url.isNotEmpty) {
+      context.read<FWUpdateBloc>().add(FWUpdateImagePicked(type: type, imageUrl: url));
+    }
   }
 
   @override
@@ -111,12 +103,10 @@ class FWUpdatePageState extends State<FWUpdatePage>
         if (state is FWUpdateError) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text(state.message,
-                  style: GoogleFonts.lato(color: Colors.white)),
+              content: Text(state.message, style: GoogleFonts.lato(color: Colors.white)),
               backgroundColor: const Color(0xFFB33040),
               behavior: SnackBarBehavior.floating,
-              shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10)),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
             ),
           );
         }
@@ -126,36 +116,31 @@ class FWUpdatePageState extends State<FWUpdatePage>
       },
       child: WillPopScope(
         onWillPop: () async {
+          context.read<FWUpdateBloc>().add(FWUpdateOverlayDismissed());
           Navigator.pop(context);
           return false;
         },
         child: Scaffold(
           resizeToAvoidBottomInset: true,
-          backgroundColor: kPageBg,
+          backgroundColor: Palette.grey100,
           appBar: _buildAppBar(context, userName),
           drawer: const Menulist(),
           body: BlocBuilder<FWUpdateBloc, FWUpdateState>(
             builder: (context, state) {
               if (state is FWUpdateInitial || state is FWUpdateLoading) {
                 return const Center(
-                  child: SpinKitFoldingCube(color: kHeaderGradEnd, size: 35),
+                  child: SpinKitFoldingCube(color: Palette.blue400, size: 35),
                 );
               }
               if (state is FWUpdateLoaded) {
-                // Sync tab controller
                 if (_tabController.index != state.currentTab) {
                   _tabController.animateTo(state.currentTab);
                 }
-                return GestureDetector(
-                  onTap: () => context
-                      .read<FWUpdateBloc>()
-                      .add(FWUpdateOverlayDismissed()),
-                  child: _FWUpdateBody(
-                    state: state,
-                    tabController: _tabController,
-                    onPickImage: (source, type, smk) =>
-                        _pickImage(context, source, type, smk),
-                  ),
+                // Fixed: Removed GestureDetector wrapper that was killing the overlay focus
+                return _FWUpdateBody(
+                  state: state,
+                  tabController: _tabController,
+                  onPickImage: (source, type, smk) => _pickImage(context, source, type, smk),
                 );
               }
               return const SizedBox.shrink();
@@ -167,6 +152,7 @@ class FWUpdatePageState extends State<FWUpdatePage>
               return _FWBottomNav(
                 currentIndex: idx,
                 onTap: (i) {
+                  context.read<FWUpdateBloc>().add(FWUpdateOverlayDismissed());
                   _tabController.animateTo(i);
                   context.read<FWUpdateBloc>().add(FWUpdateTabChanged(i));
                 },
@@ -183,29 +169,24 @@ class FWUpdatePageState extends State<FWUpdatePage>
       automaticallyImplyLeading: false,
       elevation: 0,
       toolbarHeight: 62,
-      flexibleSpace: Container(
-          decoration: const BoxDecoration(gradient: kGradient)),
+      flexibleSpace: Container(decoration: const BoxDecoration(gradient: kGradient)),
       leading: IconButton(
         icon: const Icon(Icons.arrow_back_ios_new_rounded, size: 20),
         color: Colors.white,
-        onPressed: () => Navigator.pop(context),
+        onPressed: () {
+          context.read<FWUpdateBloc>().add(FWUpdateOverlayDismissed());
+          Navigator.pop(context);
+        },
       ),
       title: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text('FW Entry Update',
-              style: GoogleFonts.lato(
-                  color: Colors.white,
-                  fontWeight: FontWeight.w700,
-                  fontSize: 17,
-                  letterSpacing: 0.3)),
+              style: GoogleFonts.lato(color: Colors.white, fontWeight: FontWeight.w700, fontSize: 17, letterSpacing: 0.3)),
           const SizedBox(height: 2),
           Text(userName,
-              style: GoogleFonts.lato(
-                  color: Colors.white.withOpacity(0.65),
-                  fontWeight: FontWeight.w500,
-                  fontSize: 12)),
+              style: GoogleFonts.lato(color: Colors.white.withOpacity(0.65), fontWeight: FontWeight.w500, fontSize: 12)),
         ],
       ),
       actions: [
@@ -214,6 +195,9 @@ class FWUpdatePageState extends State<FWUpdatePage>
           child: _AppBarButton(
             label: 'Update',
             onPressed: () {
+              FocusScope.of(context).unfocus();
+              context.read<FWUpdateBloc>().add(FWUpdateOverlayDismissed());
+
               final state = context.read<FWUpdateBloc>().state;
               if (state is FWUpdateLoaded) {
                 final smk1 = state.tab1.smkText.isNotEmpty;
@@ -228,13 +212,9 @@ class FWUpdatePageState extends State<FWUpdatePage>
                   objfun.toastMsg('Enter Proper Entry Details', '', context);
                   return;
                 }
-                objfun
-                    .ConfirmationMsgYesNo(context, 'Are you sure to Update ?')
-                    .then((confirmed) {
+                objfun.ConfirmationMsgYesNo(context, 'Are you sure to Update ?').then((confirmed) {
                   if (confirmed == true) {
-                    context
-                        .read<FWUpdateBloc>()
-                        .add(FWUpdateSaveRequested());
+                    context.read<FWUpdateBloc>().add(FWUpdateSaveRequested());
                   }
                 });
               }
@@ -259,8 +239,7 @@ class FWUpdatePageState extends State<FWUpdatePage>
               borderRadius: BorderRadius.circular(12),
               child: CachedNetworkImage(
                 imageUrl: imageUrl,
-                placeholder: (_, __) =>
-                const CircularProgressIndicator(color: kHeaderGradEnd),
+                placeholder: (_, __) => const CircularProgressIndicator(color: Palette.blue400),
               ),
             ),
             const SizedBox(height: 12),
@@ -268,7 +247,7 @@ class FWUpdatePageState extends State<FWUpdatePage>
               backgroundColor: Colors.white,
               child: IconButton(
                 onPressed: () => Navigator.pop(context),
-                icon: const Icon(Icons.close_rounded, color: kHeaderGradStart),
+                icon: const Icon(Icons.close_rounded, color: Palette.blue700),
               ),
             ),
           ],
@@ -278,24 +257,18 @@ class FWUpdatePageState extends State<FWUpdatePage>
   }
 }
 
-// ─── Body ─────────────────────────────────────────────────────────────────────
 class _FWUpdateBody extends StatelessWidget {
   final FWUpdateLoaded state;
   final TabController tabController;
   final Future<void> Function(ImageSource, int, String) onPickImage;
 
-  const _FWUpdateBody({
-    required this.state,
-    required this.tabController,
-    required this.onPickImage,
-  });
+  const _FWUpdateBody({required this.state, required this.tabController, required this.onPickImage});
 
   @override
   Widget build(BuildContext context) {
     return LayoutBuilder(
       builder: (context, constraints) {
         final isTablet = constraints.maxWidth > kTabletBreak;
-        // Tablet: add horizontal padding so content is not edge-to-edge
         final hPad = isTablet ? constraints.maxWidth * 0.06 : 0.0;
 
         return Padding(
@@ -304,27 +277,9 @@ class _FWUpdateBody extends StatelessWidget {
             controller: tabController,
             physics: const NeverScrollableScrollPhysics(),
             children: [
-              _FWTabContent(
-                type: 1,
-                tab: state.tab1,
-                saleOrderId: state.saleOrderId,
-                isTablet: isTablet,
-                onPickImage: onPickImage,
-              ),
-              _FWTabContent(
-                type: 2,
-                tab: state.tab2,
-                saleOrderId: state.saleOrderId,
-                isTablet: isTablet,
-                onPickImage: onPickImage,
-              ),
-              _FWTabContent(
-                type: 3,
-                tab: state.tab3,
-                saleOrderId: state.saleOrderId,
-                isTablet: isTablet,
-                onPickImage: onPickImage,
-              ),
+              _FWTabContent(type: 1, tab: state.tab1, saleOrderId: state.saleOrderId, isTablet: isTablet, onPickImage: onPickImage),
+              _FWTabContent(type: 2, tab: state.tab2, saleOrderId: state.saleOrderId, isTablet: isTablet, onPickImage: onPickImage),
+              _FWTabContent(type: 3, tab: state.tab3, saleOrderId: state.saleOrderId, isTablet: isTablet, onPickImage: onPickImage),
             ],
           ),
         );
@@ -333,7 +288,6 @@ class _FWUpdateBody extends StatelessWidget {
   }
 }
 
-// ─── Single Tab Content ───────────────────────────────────────────────────────
 class _FWTabContent extends StatefulWidget {
   final int type;
   final FWTabData tab;
@@ -355,33 +309,45 @@ class _FWTabContent extends StatefulWidget {
 
 class _FWTabContentState extends State<_FWTabContent> {
   late TextEditingController _smkController;
+  late TextEditingController _enRefController;
   late TextEditingController _exRefController;
 
   @override
   void initState() {
     super.initState();
     _smkController = TextEditingController(text: widget.tab.smkText);
+    _enRefController = TextEditingController(text: widget.tab.enRef);
     _exRefController = TextEditingController(text: widget.tab.exRef);
   }
 
   @override
   void didUpdateWidget(_FWTabContent old) {
     super.didUpdateWidget(old);
+    // Safe text updating without killing cursor
     if (widget.tab.smkText != _smkController.text) {
-      _smkController.text = widget.tab.smkText;
-      _smkController.selection =
-          TextSelection.collapsed(offset: widget.tab.smkText.length);
+      _smkController.value = TextEditingValue(
+        text: widget.tab.smkText,
+        selection: TextSelection.collapsed(offset: widget.tab.smkText.length),
+      );
+    }
+    if (widget.tab.enRef != _enRefController.text) {
+      _enRefController.value = TextEditingValue(
+        text: widget.tab.enRef,
+        selection: TextSelection.collapsed(offset: widget.tab.enRef.length),
+      );
     }
     if (widget.tab.exRef != _exRefController.text) {
-      _exRefController.text = widget.tab.exRef;
-      _exRefController.selection =
-          TextSelection.collapsed(offset: widget.tab.exRef.length);
+      _exRefController.value = TextEditingValue(
+        text: widget.tab.exRef,
+        selection: TextSelection.collapsed(offset: widget.tab.exRef.length),
+      );
     }
   }
 
   @override
   void dispose() {
     _smkController.dispose();
+    _enRefController.dispose();
     _exRefController.dispose();
     super.dispose();
   }
@@ -397,7 +363,6 @@ class _FWTabContentState extends State<_FWTabContent> {
     return ListView(
       padding: EdgeInsets.fromLTRB(14, 16, 14, isTablet ? 24 : 16),
       children: [
-        // ── SMK Field + autocomplete ─────────────────────────────────
         _FieldLabel('SMK No $t', isTablet),
         const SizedBox(height: 6),
         _SmkField(
@@ -406,38 +371,24 @@ class _FWTabContentState extends State<_FWTabContent> {
           suggestions: tab.suggestions,
           isTablet: isTablet,
           onChanged: (v) => _emit(FWUpdateSmkTextChanged(type: t, text: v)),
-          onSuggestionTap: (id, smk) => _emit(FWUpdateSmkSuggestionSelected(
-              type: t, saleOrderId: id, smkText: smk)),
-        ),
-        SizedBox(height: isTablet ? 16 : 12),
-
-        // ── Seal By ──────────────────────────────────────────────────
-        _FieldLabel('Seal By', isTablet),
-        const SizedBox(height: 6),
-        _EmployeeSearchField(
-          hint: 'Seal By',
-          value: tab.sealEmpName,
-          isTablet: isTablet,
-          onSearch: () async {
-            await OnlineApi.SelectEmployee(context, '', 'Operation');
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                  builder: (_) => const Employee(Searchby: 1, SearchId: 0)),
-            ).then((_) {
-              final sel = objfun.SelectEmployeeList;
-              if (sel.Id != 0) {
-                _emit(FWUpdateSealEmpChanged(
-                    type: t, empId: sel.Id, empName: sel.AccountName));
-                objfun.SelectEmployeeList = EmployeeModel.Empty();
-              }
-            });
+          onSuggestionTap: (id, smk) {
+            FocusScope.of(context).unfocus();
+            // Inga context-a pass panrom
+            _emit(FWUpdateSmkSuggestionSelected(context: context, type: t, saleOrderId: id, smkText: smk));
           },
-          onClear: () => _emit(FWUpdateSealEmpCleared(t)),
         ),
         SizedBox(height: isTablet ? 16 : 12),
 
-        // ── EX Ref ───────────────────────────────────────────────────
+        _FieldLabel('EN Ref $t', isTablet),
+        const SizedBox(height: 6),
+        _FWTextField(
+          controller: _enRefController,
+          hint: 'EN.Ref $t',
+          isTablet: isTablet,
+          onChanged: (v) => _emit(FWUpdateEnRefChanged(type: t, value: v)),
+        ),
+        SizedBox(height: isTablet ? 16 : 12),
+
         _FieldLabel('EX Ref $t', isTablet),
         const SizedBox(height: 6),
         _FWTextField(
@@ -448,7 +399,30 @@ class _FWTabContentState extends State<_FWTabContent> {
         ),
         SizedBox(height: isTablet ? 16 : 12),
 
-        // ── Break Seal By ────────────────────────────────────────────
+        _FieldLabel('Seal By', isTablet),
+        const SizedBox(height: 6),
+        _EmployeeSearchField(
+          hint: 'Seal By',
+          value: tab.sealEmpName,
+          isTablet: isTablet,
+          onSearch: () async {
+            context.read<FWUpdateBloc>().add(FWUpdateOverlayDismissed());
+            await OnlineApi.SelectEmployee(context, '', 'Operation');
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => const Employee(Searchby: 1, SearchId: 0)),
+            ).then((_) {
+              final sel = objfun.SelectEmployeeList;
+              if (sel.Id != 0) {
+                _emit(FWUpdateSealEmpChanged(type: t, empId: sel.Id, empName: sel.AccountName));
+                objfun.SelectEmployeeList = EmployeeModel.Empty();
+              }
+            });
+          },
+          onClear: () => _emit(FWUpdateSealEmpCleared(t)),
+        ),
+        SizedBox(height: isTablet ? 16 : 12),
+
         _FieldLabel('Break Seal By', isTablet),
         const SizedBox(height: 6),
         _EmployeeSearchField(
@@ -456,16 +430,15 @@ class _FWTabContentState extends State<_FWTabContent> {
           value: tab.breakEmpName,
           isTablet: isTablet,
           onSearch: () async {
+            context.read<FWUpdateBloc>().add(FWUpdateOverlayDismissed());
             await OnlineApi.SelectEmployee(context, '', 'Operation');
             Navigator.push(
               context,
-              MaterialPageRoute(
-                  builder: (_) => const Employee(Searchby: 1, SearchId: 0)),
+              MaterialPageRoute(builder: (_) => const Employee(Searchby: 1, SearchId: 0)),
             ).then((_) {
               final sel = objfun.SelectEmployeeList;
               if (sel.Id != 0) {
-                _emit(FWUpdateBreakEmpChanged(
-                    type: t, empId: sel.Id, empName: sel.AccountName));
+                _emit(FWUpdateBreakEmpChanged(type: t, empId: sel.Id, empName: sel.AccountName));
                 objfun.SelectEmployeeList = EmployeeModel.Empty();
               }
             });
@@ -474,7 +447,6 @@ class _FWTabContentState extends State<_FWTabContent> {
         ),
         SizedBox(height: isTablet ? 20 : 14),
 
-        // ── Image upload section ─────────────────────────────────────
         _ImageUploadSection(
           type: t,
           tab: tab,
@@ -487,8 +459,8 @@ class _FWTabContentState extends State<_FWTabContent> {
   }
 }
 
-// ─── SMK Field with inline autocomplete dropdown ──────────────────────────────
-class _SmkField extends StatelessWidget {
+// ─── SmkField WITH OVERLAY ──────────────────────────────────────────
+class _SmkField extends StatefulWidget {
   final int type;
   final TextEditingController controller;
   final List<dynamic> suggestions;
@@ -506,107 +478,147 @@ class _SmkField extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
-    return Column(
-      children: [
-        TextField(
-          controller: controller,
-          keyboardType: TextInputType.number,
-          textInputAction: TextInputAction.done,
-          textCapitalization: TextCapitalization.characters,
-          style: GoogleFonts.lato(
-            color: kTextDark,
-            fontWeight: FontWeight.w600,
-            fontSize: isTablet ? objfun.FontLow + 1 : objfun.FontLow,
-          ),
-          onChanged: onChanged,
-          decoration: InputDecoration(
-            hintText: 'SMK No $type',
-            hintStyle: GoogleFonts.lato(
-                color: kTextMuted,
-                fontSize: isTablet ? objfun.FontLow + 1 : objfun.FontLow),
-            filled: true,
-            fillColor: kDetailBg,
-            prefixIcon:
-            const Icon(Icons.tag_rounded, color: kHeaderGradEnd, size: 20),
-            contentPadding:
-            const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
-              borderSide: BorderSide.none,
-            ),
-            enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
-              borderSide: const BorderSide(color: kCardBorder, width: 0.5),
-            ),
-            focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
-              borderSide:
-              const BorderSide(color: kHeaderGradEnd, width: 1.5),
+  State<_SmkField> createState() => _SmkFieldState();
+}
+
+class _SmkFieldState extends State<_SmkField> {
+  final FocusNode _focusNode = FocusNode();
+  final LayerLink _layerLink = LayerLink();
+  OverlayEntry? _overlayEntry;
+
+  @override
+  void initState() {
+    super.initState();
+    _focusNode.addListener(() {
+      if (!_focusNode.hasFocus) {
+        _removeOverlay();
+      } else if (widget.suggestions.isNotEmpty) {
+        _showOverlay();
+      }
+    });
+  }
+
+  @override
+  void didUpdateWidget(covariant _SmkField oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      if (widget.suggestions.isNotEmpty && _focusNode.hasFocus) {
+        _showOverlay();
+      } else {
+        _removeOverlay();
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _removeOverlay();
+    _focusNode.dispose();
+    super.dispose();
+  }
+
+  void _showOverlay() {
+    if (_overlayEntry != null) {
+      _overlayEntry!.markNeedsBuild();
+      return;
+    }
+
+    RenderBox? renderBox = context.findRenderObject() as RenderBox?;
+    var size = renderBox?.size ?? const Size(0, 0);
+
+    _overlayEntry = OverlayEntry(
+      builder: (context) => Positioned(
+        width: size.width,
+        child: CompositedTransformFollower(
+          link: _layerLink,
+          showWhenUnlinked: false,
+          offset: Offset(0.0, size.height + 5.0),
+          child: Material(
+            elevation: 8.0,
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(12),
+            child: Container(
+              constraints: const BoxConstraints(maxHeight: 250),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: Palette.cardBorder, width: 0.5),
+              ),
+              child: ListView.separated(
+                shrinkWrap: true,
+                padding: EdgeInsets.zero,
+                itemCount: widget.suggestions.length,
+                separatorBuilder: (_, __) => const Divider(height: 1, color: Palette.grey200p),
+                itemBuilder: (ctx, i) {
+                  final item = widget.suggestions[i];
+                  final smkKey = widget.type == 1 ? 'ForwardingSMKNo' : widget.type == 2 ? 'ForwardingSMKNo2' : 'ForwardingSMKNo3';
+                  final smkVal = item[smkKey]?.toString() ?? '';
+
+                  return InkWell(
+                    onTap: () {
+                      _removeOverlay();
+                      _focusNode.unfocus();
+                      widget.onSuggestionTap(item['Id'], smkVal);
+                    },
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                      child: Row(
+                        children: [
+                          const Icon(Icons.local_shipping_outlined, size: 16, color: Palette.blue400),
+                          const SizedBox(width: 10),
+                          Text(smkVal, style: GoogleFonts.lato(color: Palette.textDark2, fontWeight: FontWeight.w600, fontSize: widget.isTablet ? objfun.FontLow + 1 : objfun.FontLow)),
+                        ],
+                      ),
+                    ),
+                  );
+                },
+              ),
             ),
           ),
         ),
-        // Inline dropdown
-        if (suggestions.isNotEmpty)
-          Container(
-            margin: const EdgeInsets.only(top: 4),
-            constraints: const BoxConstraints(maxHeight: 200),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: kCardBorder, width: 0.5),
-              boxShadow: [
-                BoxShadow(
-                  color: kHeaderGradStart.withOpacity(0.10),
-                  blurRadius: 10,
-                  offset: const Offset(0, 4),
-                ),
-              ],
-            ),
-            child: ListView.separated(
-              shrinkWrap: true,
-              padding: EdgeInsets.zero,
-              itemCount: suggestions.length,
-              separatorBuilder: (_, __) =>
-              const Divider(height: 1, color: kDetailBg),
-              itemBuilder: (ctx, i) {
-                final item = suggestions[i];
-                final smkKey = type == 1
-                    ? 'ForwardingSMKNo'
-                    : type == 2
-                    ? 'ForwardingSMKNo2'
-                    : 'ForwardingSMKNo3';
-                final smkVal = item[smkKey].toString();
-                return InkWell(
-                  onTap: () => onSuggestionTap(item['Id'], smkVal),
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 16, vertical: 12),
-                    child: Row(
-                      children: [
-                        const Icon(Icons.local_shipping_outlined,
-                            size: 16, color: kHeaderGradEnd),
-                        const SizedBox(width: 10),
-                        Text(smkVal,
-                            style: GoogleFonts.lato(
-                                color: kTextDark,
-                                fontWeight: FontWeight.w600,
-                                fontSize: isTablet
-                                    ? objfun.FontLow + 1
-                                    : objfun.FontLow)),
-                      ],
-                    ),
-                  ),
-                );
-              },
-            ),
-          ),
-      ],
+      ),
+    );
+
+    Overlay.of(context, rootOverlay: true).insert(_overlayEntry!);
+  }
+
+  void _removeOverlay() {
+    _overlayEntry?.remove();
+    _overlayEntry = null;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return CompositedTransformTarget(
+      link: _layerLink,
+      child: TextField(
+        controller: widget.controller,
+        focusNode: _focusNode,
+        keyboardType: TextInputType.number,
+        textInputAction: TextInputAction.done,
+        textCapitalization: TextCapitalization.characters,
+        style: GoogleFonts.lato(
+          color: Palette.textDark2,
+          fontWeight: FontWeight.w600,
+          fontSize: widget.isTablet ? objfun.FontLow + 1 : objfun.FontLow,
+        ),
+        onChanged: widget.onChanged,
+        decoration: InputDecoration(
+          hintText: 'SMK No ${widget.type}',
+          hintStyle: GoogleFonts.lato(color: Palette.kTextMuted, fontSize: widget.isTablet ? objfun.FontLow + 1 : objfun.FontLow),
+          filled: true,
+          fillColor: Palette.grey200p,
+          prefixIcon: const Icon(Icons.tag_rounded, color: Palette.blue400, size: 20),
+          contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
+          border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
+          enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: Palette.cardBorder, width: 0.5)),
+          focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: Palette.blue400, width: 1.5)),
+        ),
+      ),
     );
   }
 }
 
-// ─── Image Upload Section ─────────────────────────────────────────────────────
 class _ImageUploadSection extends StatelessWidget {
   final int type;
   final FWTabData tab;
@@ -630,89 +642,60 @@ class _ImageUploadSection extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // ── Upload toggle row ──────────────────────────────────────────
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
           decoration: BoxDecoration(
-            color: kDetailBg,
+            color: Palette.grey200p,
             borderRadius: BorderRadius.circular(10),
-            border: Border.all(color: kCardBorder, width: 0.5),
+            border: Border.all(color: Palette.cardBorder, width: 0.5),
           ),
           child: Row(
             children: [
-              // Animated checkbox
               InkWell(
-                onTap: () => context.read<FWUpdateBloc>().add(
-                    FWUpdateImageUploadToggled(
-                        type: type, value: !tab.imageUploadEnabled)),
+                onTap: () {
+                  FocusScope.of(context).unfocus();
+                  context.read<FWUpdateBloc>().add(
+                      FWUpdateImageUploadToggled(type: type, value: !tab.imageUploadEnabled));
+                },
                 child: AnimatedContainer(
                   duration: const Duration(milliseconds: 180),
                   width: isTablet ? 22 : 18,
                   height: isTablet ? 22 : 18,
                   decoration: BoxDecoration(
-                    gradient:
-                    tab.imageUploadEnabled ? kGradient : null,
-                    border: tab.imageUploadEnabled
-                        ? null
-                        : Border.all(color: kCardBorder, width: 1.5),
+                    gradient: tab.imageUploadEnabled ? kGradient : null,
+                    border: tab.imageUploadEnabled ? null : Border.all(color: Palette.cardBorder, width: 1.5),
                     borderRadius: BorderRadius.circular(5),
                   ),
-                  child: tab.imageUploadEnabled
-                      ? const Icon(Icons.check_rounded,
-                      size: 12, color: Colors.white)
-                      : null,
+                  child: tab.imageUploadEnabled ? const Icon(Icons.check_rounded, size: 12, color: Colors.white) : null,
                 ),
               ),
               const SizedBox(width: 10),
-              Text(
-                'Upload Image',
-                style: GoogleFonts.lato(
-                  color: kTextDark,
-                  fontWeight: FontWeight.w600,
-                  fontSize: isTablet ? objfun.FontMedium + 1 : objfun.FontMedium,
-                ),
+              Text('Upload Image',
+                style: GoogleFonts.lato(color: Palette.textDark2, fontWeight: FontWeight.w600, fontSize: isTablet ? objfun.FontMedium + 1 : objfun.FontMedium),
               ),
               const Spacer(),
-              // Gallery
-              _ImagePickBtn(
-                icon: Icons.photo_outlined,
-                enabled: tab.imageUploadEnabled,
-                isTablet: isTablet,
-                onTap: () => onPickImage(ImageSource.gallery, type, tab.smkText),
-              ),
+              _ImagePickBtn(icon: Icons.photo_outlined, enabled: tab.imageUploadEnabled, isTablet: isTablet, onTap: () => onPickImage(ImageSource.gallery, type, tab.smkText)),
               const SizedBox(width: 4),
-              // Camera
-              _ImagePickBtn(
-                icon: Icons.camera_alt_outlined,
-                enabled: tab.imageUploadEnabled,
-                isTablet: isTablet,
-                onTap: () => onPickImage(ImageSource.camera, type, tab.smkText),
-              ),
+              _ImagePickBtn(icon: Icons.camera_alt_outlined, enabled: tab.imageUploadEnabled, isTablet: isTablet, onTap: () => onPickImage(ImageSource.camera, type, tab.smkText)),
             ],
           ),
         ),
         const SizedBox(height: 12),
-
-        // ── Image grid ────────────────────────────────────────────────
         Container(
           height: imgGridHeight,
           decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: kCardBorder, width: 0.5),
+            border: Border.all(color: Palette.cardBorder, width: 0.5),
           ),
           child: tab.images.isEmpty
               ? Center(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Icon(Icons.image_outlined,
-                    size: isTablet ? 48 : 36,
-                    color: kTextMuted),
+                Icon(Icons.image_outlined, size: isTablet ? 48 : 36, color: Palette.kTextMuted),
                 const SizedBox(height: 8),
-                Text('No images uploaded',
-                    style: GoogleFonts.lato(
-                        color: kTextMuted, fontSize: 13)),
+                Text('No images uploaded', style: GoogleFonts.lato(color: Palette.kTextMuted, fontSize: 13)),
               ],
             ),
           )
@@ -720,28 +703,15 @@ class _ImageUploadSection extends StatelessWidget {
             borderRadius: BorderRadius.circular(12),
             child: GridView.builder(
               padding: const EdgeInsets.all(8),
-              gridDelegate:
-              SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: gridCols,
-                crossAxisSpacing: 6,
-                mainAxisSpacing: 6,
-              ),
+              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: gridCols, crossAxisSpacing: 6, mainAxisSpacing: 6),
               itemCount: tab.images.length,
               itemBuilder: (ctx, index) {
-                final smkText = type == 1
-                    ? tab.smkText
-                    : tab.smkText;
-                final imageUrl =
-                    '${objfun.imagepath}SalesOrder/$saleOrderId/$smkText/${tab.images[index]}';
-
+                final imageUrl = '${objfun.imagepath}SalesOrder/$saleOrderId/${tab.smkText}/${tab.images[index]}';
                 return InkWell(
                   onLongPress: () async {
-                    final ok = await objfun.ConfirmationMsgYesNo(
-                        ctx, 'Are you sure to Delete ?');
+                    final ok = await objfun.ConfirmationMsgYesNo(ctx, 'Are you sure to Delete ?');
                     if (ok == true) {
-                      context.read<FWUpdateBloc>().add(
-                          FWUpdateImageDeleted(
-                              type: type, index: index));
+                      context.read<FWUpdateBloc>().add(FWUpdateImageDeleted(type: type, index: index));
                     }
                   },
                   onTap: () => objfun.launchInBrowser(imageUrl),
@@ -751,23 +721,8 @@ class _ImageUploadSection extends StatelessWidget {
                     child: CachedNetworkImage(
                       imageUrl: imageUrl,
                       fit: BoxFit.cover,
-                      placeholder: (_, __) => Container(
-                        color: kDetailBg,
-                        child: const Center(
-                          child: SizedBox(
-                            width: 20,
-                            height: 20,
-                            child: CircularProgressIndicator(
-                                color: kHeaderGradEnd,
-                                strokeWidth: 2),
-                          ),
-                        ),
-                      ),
-                      errorWidget: (_, __, ___) => Container(
-                        color: kDetailBg,
-                        child: const Icon(Icons.file_copy_outlined,
-                            color: kHeaderGradEnd),
-                      ),
+                      placeholder: (_, __) => Container(color: Palette.grey200p, child: const Center(child: SizedBox(width: 20, height: 20, child: CircularProgressIndicator(color: Palette.blue400, strokeWidth: 2)))),
+                      errorWidget: (_, __, ___) => Container(color: Palette.grey200p, child: const Icon(Icons.file_copy_outlined, color: Palette.blue400)),
                     ),
                   ),
                 );
@@ -780,44 +735,28 @@ class _ImageUploadSection extends StatelessWidget {
   }
 }
 
-// ─── Image pick icon button ───────────────────────────────────────────────────
 class _ImagePickBtn extends StatelessWidget {
   final IconData icon;
   final bool enabled;
   final bool isTablet;
   final VoidCallback onTap;
 
-  const _ImagePickBtn({
-    required this.icon,
-    required this.enabled,
-    required this.isTablet,
-    required this.onTap,
-  });
+  const _ImagePickBtn({required this.icon, required this.enabled, required this.isTablet, required this.onTap});
 
   @override
   Widget build(BuildContext context) {
     return InkWell(
-      onTap: enabled ? onTap : null,
+      onTap: enabled ? () { FocusScope.of(context).unfocus(); onTap(); } : null,
       borderRadius: BorderRadius.circular(8),
       child: Container(
         padding: const EdgeInsets.all(6),
-        decoration: BoxDecoration(
-          color: enabled
-              ? kHeaderGradStart.withOpacity(0.08)
-              : Colors.transparent,
-          borderRadius: BorderRadius.circular(8),
-        ),
-        child: Icon(
-          icon,
-          size: isTablet ? 28 : 24,
-          color: enabled ? kHeaderGradStart : kTextMuted,
-        ),
+        decoration: BoxDecoration(color: enabled ? Palette.blue700.withOpacity(0.08) : Colors.transparent, borderRadius: BorderRadius.circular(8)),
+        child: Icon(icon, size: isTablet ? 28 : 24, color: enabled ? Palette.blue700 : Palette.kTextMuted),
       ),
     );
   }
 }
 
-// ─── Bottom Navigation ────────────────────────────────────────────────────────
 class _FWBottomNav extends StatelessWidget {
   final int currentIndex;
   final void Function(int) onTap;
@@ -827,33 +766,24 @@ class _FWBottomNav extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      decoration: const BoxDecoration(
-        border: Border(top: BorderSide(color: kCardBorder, width: 0.5)),
-      ),
+      decoration: const BoxDecoration(border: Border(top: BorderSide(color: Palette.cardBorder, width: 0.5))),
       child: BottomNavigationBar(
         backgroundColor: Colors.white,
         currentIndex: currentIndex,
-        selectedItemColor: kHeaderGradStart,
-        unselectedItemColor: kTextMuted,
-        selectedLabelStyle: GoogleFonts.lato(
-            fontWeight: FontWeight.w700, fontSize: objfun.FontLow),
-        unselectedLabelStyle: GoogleFonts.lato(
-            fontWeight: FontWeight.w500, fontSize: objfun.FontCardText),
+        selectedItemColor: Palette.blue700,
+        unselectedItemColor: Palette.kTextMuted,
+        selectedLabelStyle: GoogleFonts.lato(fontWeight: FontWeight.w700, fontSize: objfun.FontLow),
+        unselectedLabelStyle: GoogleFonts.lato(fontWeight: FontWeight.w500, fontSize: objfun.FontCardText),
         onTap: onTap,
         items: const [
-          BottomNavigationBarItem(
-              icon: Icon(Icons.local_shipping_outlined), label: 'FW 1'),
-          BottomNavigationBarItem(
-              icon: Icon(Icons.local_shipping_outlined), label: 'FW 2'),
-          BottomNavigationBarItem(
-              icon: Icon(Icons.local_shipping_outlined), label: 'FW 3'),
+          BottomNavigationBarItem(icon: Icon(Icons.local_shipping_outlined), label: 'FW 1'),
+          BottomNavigationBarItem(icon: Icon(Icons.local_shipping_outlined), label: 'FW 2'),
+          BottomNavigationBarItem(icon: Icon(Icons.local_shipping_outlined), label: 'FW 3'),
         ],
       ),
     );
   }
 }
-
-// ─── Shared Reusable Widgets ──────────────────────────────────────────────────
 
 class _FieldLabel extends StatelessWidget {
   final String text;
@@ -862,14 +792,7 @@ class _FieldLabel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Text(
-      text,
-      style: GoogleFonts.lato(
-        color: kTextMid,
-        fontWeight: FontWeight.w600,
-        fontSize: isTablet ? objfun.FontLow + 1 : objfun.FontLow,
-      ),
-    );
+    return Text(text, style: GoogleFonts.lato(color: Palette.textMid, fontWeight: FontWeight.w600, fontSize: isTablet ? objfun.FontLow + 1 : objfun.FontLow));
   }
 }
 
@@ -880,45 +803,23 @@ class _EmployeeSearchField extends StatelessWidget {
   final VoidCallback onSearch;
   final VoidCallback onClear;
 
-  const _EmployeeSearchField({
-    required this.hint,
-    required this.value,
-    required this.isTablet,
-    required this.onSearch,
-    required this.onClear,
-  });
+  const _EmployeeSearchField({required this.hint, required this.value, required this.isTablet, required this.onSearch, required this.onClear});
 
   @override
   Widget build(BuildContext context) {
     return InkWell(
-      onTap: value.isEmpty ? onSearch : onClear,
+      onTap: () {
+        FocusScope.of(context).unfocus();
+        value.isEmpty ? onSearch() : onClear();
+      },
       borderRadius: BorderRadius.circular(10),
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
-        decoration: BoxDecoration(
-          color: kDetailBg,
-          borderRadius: BorderRadius.circular(10),
-          border: Border.all(color: kCardBorder, width: 0.5),
-        ),
+        decoration: BoxDecoration(color: Palette.grey200p, borderRadius: BorderRadius.circular(10), border: Border.all(color: Palette.cardBorder, width: 0.5)),
         child: Row(
           children: [
-            Expanded(
-              child: Text(
-                value.isEmpty ? hint : value,
-                style: GoogleFonts.lato(
-                  color: value.isEmpty ? kTextMuted : kTextDark,
-                  fontWeight:
-                  value.isEmpty ? FontWeight.w500 : FontWeight.w600,
-                  fontSize: isTablet ? objfun.FontLow + 1 : objfun.FontLow,
-                ),
-                overflow: TextOverflow.ellipsis,
-              ),
-            ),
-            Icon(
-              value.isNotEmpty ? Icons.close_rounded : Icons.search_rounded,
-              size: 20,
-              color: kHeaderGradEnd,
-            ),
+            Expanded(child: Text(value.isEmpty ? hint : value, style: GoogleFonts.lato(color: value.isEmpty ? Palette.kTextMuted : Palette.textDark2, fontWeight: value.isEmpty ? FontWeight.w500 : FontWeight.w600, fontSize: isTablet ? objfun.FontLow + 1 : objfun.FontLow), overflow: TextOverflow.ellipsis)),
+            Icon(value.isNotEmpty ? Icons.close_rounded : Icons.search_rounded, size: 20, color: Palette.blue400),
           ],
         ),
       ),
@@ -932,12 +833,7 @@ class _FWTextField extends StatelessWidget {
   final bool isTablet;
   final void Function(String) onChanged;
 
-  const _FWTextField({
-    required this.controller,
-    required this.hint,
-    required this.isTablet,
-    required this.onChanged,
-  });
+  const _FWTextField({required this.controller, required this.hint, required this.isTablet, required this.onChanged});
 
   @override
   Widget build(BuildContext context) {
@@ -946,32 +842,16 @@ class _FWTextField extends StatelessWidget {
       textCapitalization: TextCapitalization.characters,
       textInputAction: TextInputAction.done,
       onChanged: onChanged,
-      style: GoogleFonts.lato(
-        color: kTextDark,
-        fontWeight: FontWeight.w600,
-        fontSize: isTablet ? objfun.FontLow + 1 : objfun.FontLow,
-      ),
+      style: GoogleFonts.lato(color: Palette.textDark2, fontWeight: FontWeight.w600, fontSize: isTablet ? objfun.FontLow + 1 : objfun.FontLow),
       decoration: InputDecoration(
         hintText: hint,
-        hintStyle: GoogleFonts.lato(
-            color: kTextMuted,
-            fontSize: isTablet ? objfun.FontLow + 1 : objfun.FontLow),
+        hintStyle: GoogleFonts.lato(color: Palette.kTextMuted, fontSize: isTablet ? objfun.FontLow + 1 : objfun.FontLow),
         filled: true,
-        fillColor: kDetailBg,
-        contentPadding:
-        const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(10),
-          borderSide: BorderSide.none,
-        ),
-        enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(10),
-          borderSide: const BorderSide(color: kCardBorder, width: 0.5),
-        ),
-        focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(10),
-          borderSide: const BorderSide(color: kHeaderGradEnd, width: 1.5),
-        ),
+        fillColor: Palette.grey200p,
+        contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
+        border: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: BorderSide.none),
+        enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: const BorderSide(color: Palette.cardBorder, width: 0.5)),
+        focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: const BorderSide(color: Palette.blue400, width: 1.5)),
       ),
     );
   }
@@ -985,26 +865,13 @@ class _AppBarButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.15),
-        borderRadius: BorderRadius.circular(8),
-        border:
-        Border.all(color: Colors.white.withOpacity(0.4), width: 0.5),
-      ),
+      decoration: BoxDecoration(color: Colors.white.withOpacity(0.15), borderRadius: BorderRadius.circular(8), border: Border.all(color: Colors.white.withOpacity(0.4), width: 0.5)),
       child: Material(
         color: Colors.transparent,
         child: InkWell(
           onTap: onPressed,
           borderRadius: BorderRadius.circular(8),
-          child: Padding(
-            padding:
-            const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-            child: Text(label,
-                style: GoogleFonts.lato(
-                    color: Colors.white,
-                    fontWeight: FontWeight.w700,
-                    fontSize: objfun.FontMedium)),
-          ),
+          child: Padding(padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6), child: Text(label, style: GoogleFonts.lato(color: Colors.white, fontWeight: FontWeight.w700, fontSize: objfun.FontMedium))),
         ),
       ),
     );

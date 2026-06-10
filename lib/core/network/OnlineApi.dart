@@ -686,41 +686,28 @@ void _showError(BuildContext context, String message) {
   );
 }
 
-
-Future EditSalesOrder(context, int Id, int SaleNo) async {
+Future EditSalesOrder(int Id, int SaleNo, {BuildContext? context}) async {
   try {
     var Comid = objfun.storagenew.getInt('Comid') ?? 0;
-    await objfun
-        .apiAllinoneSelect(
-            "${objfun.apiEditSalesOrder}$Id&SaleorderNo=$SaleNo&Comid=$Comid",
-            null,
-            null,
-            context)
-        .then((resultData) {
-      if (resultData.isNotEmpty) {
-        objfun.SaleEditMasterList = resultData;
-        objfun.SaleEditDetailList = resultData[0]["SaleDetails"]
-            .map((element) => SaleEditDetailModel.fromJson(element))
-            .toList()
-            .cast<SaleEditDetailModel>();
-      }
-    }).onError((error, stackTrace) {
-      objfun.msgshow(
-          error.toString(),
-          stackTrace.toString(),
-          Colors.white,
-          Colors.red,
-          null,
-          18.00 - objfun.reducesize,
-          objfun.tll,
-          objfun.tgc,
-          context,
-          2);
-    });
+    var resultData = await objfun.apiAllinoneSelect(
+        "${objfun.apiEditSalesOrder}$Id&SaleorderNo=$SaleNo&Comid=$Comid",
+        null, null, context);
+
+    if (resultData != null && resultData.isNotEmpty) {
+      objfun.SaleEditMasterList = resultData;
+      objfun.SaleEditDetailList = resultData[0]["SaleDetails"]
+          .map((element) => SaleEditDetailModel.fromJson(element))
+          .toList()
+          .cast<SaleEditDetailModel>();
+    } else {
+      throw Exception("Data empty ah iruku");
+    }
   } catch (error) {
-    if (error.toString() == "") {}
+    throw Exception("Sales Order failed: $error");
   }
 }
+
+
 Future loadCustomerCurrency(context, int CustomerId) async {
   try {
 objfun.CustomerCurrencyValue = 0.0;

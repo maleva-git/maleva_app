@@ -98,7 +98,7 @@ class FWSmkBloc extends Bloc<FWSmkEvent, FWSmkState> {
 
     emit(FWSmkLoading());
     try {
-      await OnlineApi.EditSalesOrder(null, event.saleOrderId, 0);
+      await OnlineApi.EditSalesOrder(event.saleOrderId, 0);
       await OnlineApi.SelectEmployee(null, '', 'Operation');
 
       final m = objfun.SaleEditMasterList;

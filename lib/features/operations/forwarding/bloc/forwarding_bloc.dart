@@ -1,12 +1,13 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
+import '../../../../core/network/OnlineApi.dart' as OnlineApi;
+import '../../../../core/utils/clsfunction.dart' as objfun;
 import '../data/fwupdate_repository.dart';
 import 'forwarding_event.dart';
 import 'forwarding_state.dart';
 
 class FWUpdateBloc extends Bloc<FWUpdateEvent, FWUpdateState> {
-  final FWUpdateRepository repository;
+  final FWUpdateRepository repository; // Pass your repo interface
 
-  List<dynamic> _jobNoList = [];
   List<dynamic> _employeeList = [];
 
   FWUpdateBloc({required this.repository}) : super(FWUpdateInitial()) {
@@ -19,6 +20,7 @@ class FWUpdateBloc extends Bloc<FWUpdateEvent, FWUpdateState> {
     on<FWUpdateSealEmpCleared>(_onSealEmpCleared);
     on<FWUpdateBreakEmpChanged>(_onBreakEmpChanged);
     on<FWUpdateBreakEmpCleared>(_onBreakEmpCleared);
+    on<FWUpdateEnRefChanged>(_onEnRefChanged);
     on<FWUpdateExRefChanged>(_onExRefChanged);
     on<FWUpdateImageUploadToggled>(_onImageUploadToggled);
     on<FWUpdateImagePicked>(_onImagePicked);
@@ -28,15 +30,12 @@ class FWUpdateBloc extends Bloc<FWUpdateEvent, FWUpdateState> {
 
   FWUpdateLoaded _defaultLoaded() => FWUpdateLoaded(
     currentTab: 0, saleOrderId: 0,
-    tab1: FWTabData(smkText: '', exRef: '', sealEmpId: 0, sealEmpName: '', breakEmpId: 0, breakEmpName: '', imageUploadEnabled: false, images: [], suggestions: []),
-    tab2: FWTabData(smkText: '', exRef: '', sealEmpId: 0, sealEmpName: '', breakEmpId: 0, breakEmpName: '', imageUploadEnabled: false, images: [], suggestions: []),
-    tab3: FWTabData(smkText: '', exRef: '', sealEmpId: 0, sealEmpName: '', breakEmpId: 0, breakEmpName: '', imageUploadEnabled: false, images: [], suggestions: []),
+    tab1: FWTabData.empty(), tab2: FWTabData.empty(), tab3: FWTabData.empty(),
   );
 
   Future<void> _onStarted(FWUpdateStarted event, Emitter<FWUpdateState> emit) async {
     emit(FWUpdateLoading());
     try {
-      _jobNoList = await repository.fetchJobNoList();
       emit(_defaultLoaded());
     } catch (e) {
       emit(FWUpdateError(e.toString()));
@@ -47,26 +46,22 @@ class FWUpdateBloc extends Bloc<FWUpdateEvent, FWUpdateState> {
     if (state is FWUpdateLoaded) emit((state as FWUpdateLoaded).copyWith(currentTab: event.tabIndex));
   }
 
-  // ---------------------------------------------------------
-  // FIXED METHOD: SMK Text Changed
-  // ---------------------------------------------------------
   void _onSmkTextChanged(FWUpdateSmkTextChanged event, Emitter<FWUpdateState> emit) {
     if (state is! FWUpdateLoaded) return;
     final s = state as FWUpdateLoaded;
-    final query = event.text.trim();
+
+    // Fixed: Search using global job no list loaded in InitState
+    final query = event.text.trim().replaceAll(" ", "+");
 
     List<dynamic> filtered = [];
     if (query.isNotEmpty) {
       final smkKey = event.type == 1 ? 'ForwardingSMKNo' : event.type == 2 ? 'ForwardingSMKNo2' : 'ForwardingSMKNo3';
-
-      filtered = _jobNoList.where((e) {
-        // Safe string conversion for numbers/nulls
+      filtered = objfun.JobNoList.where((e) {
         final smkValue = (e[smkKey] ?? '').toString();
         return smkValue.contains(query);
       }).toList();
     }
 
-    // Using event.text instead of query to avoid cursor jumping issues
     final updated = s.tabByType(event.type).copyWith(smkText: event.text, suggestions: filtered);
     emit(s.withTab(event.type, updated));
   }
@@ -76,78 +71,102 @@ class FWUpdateBloc extends Bloc<FWUpdateEvent, FWUpdateState> {
     final s = state as FWUpdateLoaded;
 
     emit(FWUpdateLoading());
+
+    int newSaleOrderId = event.saleOrderId;
+    List<String> fetchedImages = [];
+
+    // 1. Exact Old Code API Calls (Direct-a OnlineApi use panrom)
     try {
-      final data = await repository.fetchJobDetailsAndEmployees(event.saleOrderId);
-      final master = data['master'];
-      _employeeList = data['employees'];
+      await OnlineApi.EditSalesOrder(event.saleOrderId, 0);
+      await OnlineApi.SelectEmployee(event.context, '', 'Operation');
+    } catch (e) {
+      print("Master/Employee API Error (Ignored): $e");
+    }
 
-      int newSaleOrderId = event.saleOrderId;
+    // 2. Exact Old Code Image Fetching Logic
+    try {
+      String imgDir = "/Upload/${objfun.Comid}/SalesOrder/${event.saleOrderId}/${event.smkText}/";
+      Map<String, String> header = {'Content-Type': 'application/json; charset=UTF-8'};
 
-      FWTabData buildTabFromMaster(int type, FWTabData existing) {
-        if (master == null) return existing;
+      var resultData = await objfun.apiAllinoneSelectArray(
+          "${objfun.apiGetimage}$imgDir", null, header, event.context
+      );
 
-        String exRef = '';
-        int sealId = 0;
-        int breakId = 0;
-
-        if (type == 1) {
-          exRef = master['ForwardingExitRef'] ?? '';
-          sealId = master['SealbyRefid'] ?? 0;
-          breakId = master['SealbreakbyRefid'] ?? 0;
-        } else if (type == 2) {
-          exRef = master['ForwardingExitRef2'] ?? '';
-          sealId = master['SealbyRefid2'] ?? 0;
-          breakId = master['SealbreakbyRefid2'] ?? 0;
-        } else {
-          exRef = master['ForwardingExitRef3'] ?? '';
-          sealId = master['SealbyRefid3'] ?? 0;
-          breakId = master['SealbreakbyRefid3'] ?? 0;
+      if (resultData != "" && resultData != null && resultData is List) {
+        for(var i=0; i < resultData.length; i++) {
+          fetchedImages.add(resultData[i].toString());
         }
+      }
+    } catch (e) {
+      print("Image API Error (Ignored 404): $e");
+    }
 
-        String sealName = '';
-        String breakName = '';
-
-        if (sealId != 0) {
-          final emp = _employeeList.where((e) => e['Id'] == sealId).toList();
-          if (emp.isNotEmpty) sealName = emp[0]['AccountName'] ?? '';
-        }
-        if (breakId != 0) {
-          final emp = _employeeList.where((e) => e['Id'] == breakId).toList();
-          if (emp.isNotEmpty) breakName = emp[0]['AccountName'] ?? '';
-        }
-
+    // 3. Extract Data from objfun globals
+    FWTabData buildTabFromMaster(int type, FWTabData existing) {
+      // Check pannrom data iruka illaya nu
+      if (objfun.SaleEditMasterList.isEmpty) {
         return existing.copyWith(
           smkText: event.type == type ? event.smkText : existing.smkText,
-          exRef: exRef,
-          sealEmpId: sealId,
-          sealEmpName: sealName,
-          breakEmpId: breakId,
-          breakEmpName: breakName,
           suggestions: [],
         );
       }
 
-      final fetchedImages = await repository.fetchImages(event.saleOrderId, event.smkText);
+      var master = objfun.SaleEditMasterList[0];
 
-      final updatedTab = buildTabFromMaster(event.type, s.tabByType(event.type)).copyWith(
-        smkText: event.smkText,
-        suggestions: [],
-        images: fetchedImages,
-      );
+      String enRef = '';
+      String exRef = '';
+      int sealId = 0;
+      int breakId = 0;
 
-      var newState = s.copyWith(saleOrderId: newSaleOrderId);
-      newState = newState.withTab(event.type, updatedTab);
-
-      for (int t = 1; t <= 3; t++) {
-        if (t != event.type) newState = newState.withTab(t, buildTabFromMaster(t, newState.tabByType(t)));
+      if (type == 1) {
+        enRef = master['ForwardingEnterRef']?.toString() ?? '';
+        exRef = master['ForwardingExitRef']?.toString() ?? '';
+        sealId = int.tryParse(master['SealbyRefid']?.toString() ?? '0') ?? 0;
+        breakId = int.tryParse(master['SealbreakbyRefid']?.toString() ?? '0') ?? 0;
+      } else if (type == 2) {
+        enRef = master['ForwardingEnterRef2']?.toString() ?? '';
+        exRef = master['ForwardingExitRef2']?.toString() ?? '';
+        sealId = int.tryParse(master['SealbyRefid2']?.toString() ?? '0') ?? 0;
+        breakId = int.tryParse(master['SealbreakbyRefid2']?.toString() ?? '0') ?? 0;
+      } else {
+        enRef = master['ForwardingEnterRef3']?.toString() ?? '';
+        exRef = master['ForwardingExitRef3']?.toString() ?? '';
+        sealId = int.tryParse(master['SealbyRefid3']?.toString() ?? '0') ?? 0;
+        breakId = int.tryParse(master['SealbreakbyRefid3']?.toString() ?? '0') ?? 0;
       }
 
-      emit(newState);
-    } catch (e) {
-      emit(FWUpdateError(e.toString()));
-    }
-  }
+      String sealName = '';
+      String breakName = '';
 
+      // Employee Object access using .Id and .AccountName (Fix for Map vs Object issue)
+      if (sealId != 0 && objfun.EmployeeList.isNotEmpty) {
+        var emp = objfun.EmployeeList.where((item) => item.Id == sealId).toList();
+        if (emp.isNotEmpty) sealName = emp[0].AccountName ?? '';
+      }
+      if (breakId != 0 && objfun.EmployeeList.isNotEmpty) {
+        var emp = objfun.EmployeeList.where((item) => item.Id == breakId).toList();
+        if (emp.isNotEmpty) breakName = emp[0].AccountName ?? '';
+      }
+
+      return existing.copyWith(
+        smkText: event.type == type ? event.smkText : existing.smkText,
+        enRef: enRef,
+        exRef: exRef,
+        sealEmpId: sealId,
+        sealEmpName: sealName,
+        breakEmpId: breakId,
+        breakEmpName: breakName,
+        suggestions: [], // Clear suggestions
+      );
+    }
+
+    final updatedTab = buildTabFromMaster(event.type, s.tabByType(event.type)).copyWith(
+      images: fetchedImages,
+    );
+
+    final newState = s.copyWith(saleOrderId: newSaleOrderId).withTab(event.type, updatedTab);
+    emit(newState);
+  }
   void _onOverlayDismissed(FWUpdateOverlayDismissed event, Emitter<FWUpdateState> emit) {
     if (state is! FWUpdateLoaded) return;
     final s = state as FWUpdateLoaded;
@@ -171,6 +190,9 @@ class FWUpdateBloc extends Bloc<FWUpdateEvent, FWUpdateState> {
   }
   void _onBreakEmpCleared(FWUpdateBreakEmpCleared event, Emitter<FWUpdateState> emit) {
     if (state is FWUpdateLoaded) emit((state as FWUpdateLoaded).withTab(event.type, (state as FWUpdateLoaded).tabByType(event.type).copyWith(breakEmpId: 0, breakEmpName: '')));
+  }
+  void _onEnRefChanged(FWUpdateEnRefChanged event, Emitter<FWUpdateState> emit) {
+    if (state is FWUpdateLoaded) emit((state as FWUpdateLoaded).withTab(event.type, (state as FWUpdateLoaded).tabByType(event.type).copyWith(enRef: event.value)));
   }
   void _onExRefChanged(FWUpdateExRefChanged event, Emitter<FWUpdateState> emit) {
     if (state is FWUpdateLoaded) emit((state as FWUpdateLoaded).withTab(event.type, (state as FWUpdateLoaded).tabByType(event.type).copyWith(exRef: event.value)));
@@ -200,7 +222,7 @@ class FWUpdateBloc extends Bloc<FWUpdateEvent, FWUpdateState> {
         final newImages = List<String>.from(tab.images)..removeAt(event.index);
         emit(s.withTab(event.type, tab.copyWith(images: newImages)));
       } else {
-        emit(s); // revert on fail
+        emit(s);
       }
     } catch (e) {
       emit(FWUpdateError(e.toString()));
@@ -211,31 +233,24 @@ class FWUpdateBloc extends Bloc<FWUpdateEvent, FWUpdateState> {
     if (state is! FWUpdateLoaded) return;
     final s = state as FWUpdateLoaded;
 
-    final smk1 = s.tab1.smkText.isNotEmpty;
-    final smk2 = s.tab2.smkText.isNotEmpty;
-    final smk3 = s.tab3.smkText.isNotEmpty;
-
-    if (!smk1 && !smk2 && !smk3) return;
-    if ((smk1 && smk2) || (smk1 && smk3) || (smk2 && smk3)) return;
-
     emit(FWUpdateLoading());
     try {
       final master = {
         'Id': s.saleOrderId,
-        'Comid': repository.comid,
+        'Comid': objfun.Comid,
         'Jobid': 0,
-        'EmployeeRefId': repository.empRefId == 0 ? null : repository.empRefId,
+        'EmployeeRefId': objfun.EmpRefId == 0 ? null : objfun.EmpRefId,
         'SealbyRefid': s.tab1.sealEmpId,
         'SealbreakbyRefid': s.tab1.breakEmpId,
         'SealbyRefid2': s.tab2.sealEmpId,
         'SealbreakbyRefid2': s.tab2.breakEmpId,
         'SealbyRefid3': s.tab3.sealEmpId,
         'SealbreakbyRefid3': s.tab3.breakEmpId,
-        'ForwardingEnterRef': '',
+        'ForwardingEnterRef': s.tab1.enRef,
         'ForwardingExitRef': s.tab1.exRef,
-        'ForwardingEnterRef2': '',
+        'ForwardingEnterRef2': s.tab2.enRef,
         'ForwardingExitRef2': s.tab2.exRef,
-        'ForwardingEnterRef3': '',
+        'ForwardingEnterRef3': s.tab3.enRef,
         'ForwardingExitRef3': s.tab3.exRef,
       };
 
@@ -243,9 +258,9 @@ class FWUpdateBloc extends Bloc<FWUpdateEvent, FWUpdateState> {
 
       if (result?.IsSuccess == true) {
         emit(FWUpdateSaveSuccess());
-        emit(_defaultLoaded());
+        emit(_defaultLoaded()); // Form clears automatically
       } else {
-        emit(s); // revert
+        emit(s);
       }
     } catch (e) {
       emit(FWUpdateError(e.toString()));

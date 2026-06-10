@@ -50,7 +50,7 @@ class _PreAlertPage extends StatelessWidget {
     return BlocListener<PreAlertBloc, PreAlertState>(
       listener: (context, state) async {
         if (state is PreAlertNavigateToEdit) {
-          await OnlineApi.EditSalesOrder(context, state.id, state.saleOrderNo);
+          await OnlineApi.EditSalesOrder(state.id, state.saleOrderNo);
           Navigator.push(
             context,
             MaterialPageRoute(

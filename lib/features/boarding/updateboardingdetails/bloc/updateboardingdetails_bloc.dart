@@ -68,7 +68,7 @@ class BoardingStatusBloc
     required Emitter<BoardingStatusState> emit,
   }) async {
     try {
-      await OnlineApi.EditSalesOrder(null, saleOrderId, int.tryParse(jobNo) ?? 0);
+      await OnlineApi.EditSalesOrder( saleOrderId, int.tryParse(jobNo) ?? 0);
       await OnlineApi.SelectAllJobStatus(
           null, objfun.SaleEditMasterList[0]['JobMasterRefId']);
 

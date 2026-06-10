@@ -795,7 +795,7 @@ class _MobileCard extends StatelessWidget {
                         result['IsSuccess'] == true) {
                       ctrl.clear();
                       await OnlineApi.EditSalesOrder(
-                          context, id, saleNo);
+                           id, saleNo);
                       Navigator.of(ctx).pop();
                       Navigator.of(context)
                           .push(MaterialPageRoute(
@@ -1191,7 +1191,7 @@ class _TabletRow extends StatelessWidget {
                           result['IsSuccess'] == true) {
                         ctrl.clear();
                         await OnlineApi.EditSalesOrder(
-                            context, id, saleNo);
+                             id, saleNo);
                         Navigator.of(ctx).pop();
                         Navigator.of(context)
                             .push(MaterialPageRoute(

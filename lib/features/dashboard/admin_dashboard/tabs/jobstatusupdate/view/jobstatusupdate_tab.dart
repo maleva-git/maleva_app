@@ -390,7 +390,7 @@ class _JobStatusUpdateViewState extends State<_JobStatusUpdateView> {
                 return;
               }
               await OnlineApi.EditSalesOrder(
-                  context, state.saleOrderId, int.tryParse(state.jobNo) ?? 0);
+                   state.saleOrderId, int.tryParse(state.jobNo) ?? 0);
               Navigator.of(context).push(MaterialPageRoute(
                   builder: (_) => SaleOrderDetails(
                     saleDetails: null,
@@ -411,7 +411,7 @@ class _JobStatusUpdateViewState extends State<_JobStatusUpdateView> {
               }
               if (state.statusName.isEmpty && state.jobNo.isNotEmpty) {
                 await OnlineApi.EditSalesOrder(
-                    context,
+
                     state.saleOrderId,
                     int.tryParse(state.jobNo) ?? 0);
                 await OnlineApi.SelectAllJobStatus(

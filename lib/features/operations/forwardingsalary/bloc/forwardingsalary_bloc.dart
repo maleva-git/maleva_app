@@ -94,40 +94,48 @@ class ForwardingSalaryBloc extends Bloc<ForwardingSalaryEvent, ForwardingSalaryS
       int editId = 0;
 
       if (data != null) {
-        editId = data['Id'] ?? 0;
-        salary1 = data['Salary1']?.toString() ?? '';
-        salary2 = data['Salary2']?.toString() ?? '';
+        editId   = data['Id'] ?? 0;
+        salary1  = data['Salary1']?.toString() ?? '';
+        salary2  = data['Salary2']?.toString() ?? '';
 
-        sealEmpId = data['EmployeeMasterRefId'] ?? 0;
+        sealEmpId  = data['EmployeeMasterRefId'] ?? 0;
+        breakEmpId = data['EmployeeMasterRefId1'] ?? 0;
+
+        // ✅ API-ல null வருது — so local list-ல தேடு
         if (sealEmpId != 0) {
           final emp = _employeeList.firstWhere(
                 (e) => e.Id == sealEmpId,
             orElse: () => EmployeeModel.Empty(),
           );
           sealName = emp.AccountName;
+          print('✅ SealEmp found: $sealName for id $sealEmpId');
         }
 
-        breakEmpId = data['EmployeeMasterRefId1'] ?? 0;
         if (breakEmpId != 0) {
           final emp = _employeeList.firstWhere(
                 (e) => e.Id == breakEmpId,
             orElse: () => EmployeeModel.Empty(),
           );
           breakName = emp.AccountName;
+          print('✅ BreakEmp found: $breakName for id $breakEmpId');
         }
       }
 
+      // 🔍 Debug — இந்த print output என்ன வருதுன்னு சொல்லுங்க
+      print('📋 _employeeList length: ${_employeeList.length}');
+      print('🔍 sealEmpId: $sealEmpId | breakEmpId: $breakEmpId');
+
       emit(s.copyWith(
-        rtiText: event.rtiNo,
-        saleOrderId: event.saleOrderId,
-        editId: editId,
+        rtiText:      event.rtiNo,
+        saleOrderId:  event.saleOrderId,
+        editId:       editId,
         rtiSuggestions: [],
-        sealEmpId: sealEmpId,
-        sealEmpName: sealName,
-        breakEmpId: breakEmpId,
+        sealEmpId:    sealEmpId,
+        sealEmpName:  sealName,
+        breakEmpId:   breakEmpId,
         breakEmpName: breakName,
-        salary1: salary1,
-        salary2: salary2,
+        salary1:      salary1,
+        salary2:      salary2,
       ));
     } catch (e) {
       emit(ForwardingSalaryError(e.toString()));
