@@ -257,7 +257,7 @@ class AirFreightBloc
         : AirFreightLoaded.empty();
     try {
       await OnlineApi.EditSalesOrder(
-          null, saleOrderId, int.tryParse(jobNo) ?? 0);
+           saleOrderId, int.tryParse(jobNo) ?? 0);
       await OnlineApi.SelectJobType(null);
       await OnlineApi.SelectAllJobStatus(
           null,

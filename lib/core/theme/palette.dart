@@ -70,6 +70,7 @@ class Palette {
   static const gold2      = Color(0xFFFFBC29);  // whiteText / commonColor2
   static const cardBorder = Color(0xFFC5D0EE);  // kCardBorder
   static const chipBg     = Color(0xFFEEF2FF);  // kChipBg
+  static const kTextMuted     = Color(0xFF8A96BF);  // kChipBg
   static const kWhite = Colors.white;
 
 }

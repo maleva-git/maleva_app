@@ -414,7 +414,7 @@ class _JobNoRowState extends State<_JobNoRow> {
                     return;
                   }
                   await OnlineApi.EditSalesOrder(
-                      context,
+
                       s.saleOrderId,
                       int.tryParse(s.jobNoText) ?? 0);
                   Navigator.push(
@@ -522,7 +522,7 @@ class _StatusField extends StatelessWidget {
           return;
         }
         await OnlineApi.EditSalesOrder(
-            context,
+
             state.saleOrderId,
             int.tryParse(state.jobNoText) ?? 0);
         await OnlineApi.SelectAllJobStatus(

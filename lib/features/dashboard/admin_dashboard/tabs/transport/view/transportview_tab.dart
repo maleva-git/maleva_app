@@ -37,7 +37,7 @@ class TransportReportPage extends StatelessWidget {
             // ✅ Handle Navigation / Edit (Using the UI's context!)
             if (state is TransportNavigateToEditState) {
               // We moved this out of the BLoC so it can safely use the UI context
-              OnlineApi.EditSalesOrder(context, state.id, 0);
+              OnlineApi.EditSalesOrder(state.id, 0);
             }
 
           },

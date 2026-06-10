@@ -3,6 +3,8 @@ import 'package:maleva/core/network/api_client.dart';
 import 'package:maleva/core/utils/app_preferences.dart';
 import 'package:maleva/core/utils/clsfunction.dart' as objfun;
 
+import '../../../../core/network/api_constants.dart';
+
 class FWUpdateRepository {
   final int comid = AppPreferences.getComid();
   final int empRefId = AppPreferences.getEmpRefId();
@@ -48,7 +50,7 @@ class FWUpdateRepository {
   }
 
   Future<ResponseViewModel?> updateForwarding(Map<String, dynamic> payload) async {
-    final result = await ApiClient.postRequest(objfun.apiUpdateForwarding, payload);
+    final result = await ApiClient.postRequest(ApiConstants.apiUpdateForwarding, payload);
     return result != null ? ResponseViewModel.fromJson(result) : null;
   }
 }

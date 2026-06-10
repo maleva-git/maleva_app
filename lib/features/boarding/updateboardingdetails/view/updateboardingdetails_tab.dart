@@ -88,7 +88,7 @@ class _BoardingStatusPageState extends State<_BoardingStatusPage> {
           final s = context.read<BoardingStatusBloc>().state;
           if (s is BoardingStatusLoaded && s.jobNoText.isNotEmpty) {
             await OnlineApi.EditSalesOrder(
-                context, s.saleOrderId, int.tryParse(s.jobNoText) ?? 0);
+                 s.saleOrderId, int.tryParse(s.jobNoText) ?? 0);
             Navigator.push(
               context,
               MaterialPageRoute(
@@ -605,7 +605,7 @@ class _JobNoRowState extends State<_JobNoRow> {
                     return;
                   }
                   await OnlineApi.EditSalesOrder(
-                      context,
+
                       s.saleOrderId,
                       int.tryParse(s.jobNoText) ?? 0);
                   Navigator.push(
@@ -702,7 +702,7 @@ class _StatusField extends StatelessWidget {
           return;
         }
         await OnlineApi.EditSalesOrder(
-            context, state.saleOrderId, int.tryParse(state.jobNoText) ?? 0);
+             state.saleOrderId, int.tryParse(state.jobNoText) ?? 0);
         await OnlineApi.SelectAllJobStatus(
             context,
             objfun.SaleEditMasterList[0]['JobMasterRefId']);

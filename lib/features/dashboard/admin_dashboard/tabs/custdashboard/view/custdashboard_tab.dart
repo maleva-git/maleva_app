@@ -394,7 +394,7 @@ class _CustDashboardViewState extends State<_CustDashboardView>
                       onCardTap: (row) => _showTransportDialog(context, row),
                       onCardLongPress: (row) async {
                         await OnlineApi.EditSalesOrder(
-                            context, row['Id'] as int, 0);
+                             row['Id'] as int, 0);
                         Navigator.of(context).push(MaterialPageRoute(
                             builder: (_) => SalesOrderAdd(
                               saleDetails: objfun.SaleEditDetailList,
