@@ -13,7 +13,7 @@ class AirFreightLoaded extends AirFreightState {
   final List<dynamic> jobNoSuggestions;
 
   // ── Loaded fields ─────────────────────────────────────────────────────────
-  final String jobType;    // read-only, filled after loaddata
+  final String jobType;
   final int    statusId;
   final String statusName;
   final String awbNo;

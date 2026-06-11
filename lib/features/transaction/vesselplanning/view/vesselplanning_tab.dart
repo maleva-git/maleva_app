@@ -29,6 +29,7 @@ const kGradientVertical = LinearGradient(
   end: Alignment.bottomCenter,
 );
 
+
 // ─── Root Widget ──────────────────────────────────────────────────────────────
 class VesselPlanningView extends StatelessWidget {
   const VesselPlanningView({super.key});
@@ -36,13 +37,26 @@ class VesselPlanningView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (_) => VesselPlanningBloc()..add(VesselPlanningStarted()),
+      create: (_) {
+
+        final today = DateFormat("yyyy-MM-dd").format(DateTime.now());
+
+        return VesselPlanningBloc()
+          ..add(VesselPlanningStarted())
+
+          ..add(VesselPlanningFilterChanged(
+            fromDate: today,
+            toDate: today,
+            planningNo: '',
+            empId: 0,
+            isLoggedInEmp: false,
+          ));
+      },
       child: const _VesselPlanningPage(),
     );
   }
 }
 
-// ─── Page ─────────────────────────────────────────────────────────────────────
 class _VesselPlanningPage extends StatelessWidget {
   const _VesselPlanningPage();
 

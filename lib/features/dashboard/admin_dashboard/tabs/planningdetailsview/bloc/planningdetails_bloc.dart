@@ -1,14 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import '../data/planning_details_repository.dart'; // Adjust path based on your folder structure
+// Itha marakkama import pannunga
+import 'package:maleva/core/utils/clsfunction.dart' as objfun;
+
 import 'planningdetails_event.dart';
 import 'planningdetails_state.dart';
 
 class PlanningDetailsBloc extends Bloc<PlanningDetailsEvent, PlanningDetailsState> {
-  final PlanningDetailsRepository repository;
 
-  PlanningDetailsBloc({required this.repository}) : super(const PlanningDetailsState()) {
+  // Note: Repository thevai illa, aana unga DI setup break aagama irukka
+  // atha appadiye vachiruken. Future-la theva illana remove pannidalam.
+  PlanningDetailsBloc() : super(const PlanningDetailsState()) {
     on<PlanningDetailsStartupRequested>(_onStartup);
     on<PlanningDetailsRefreshRequested>(_onRefresh);
     on<PlanningDetailsSearchChanged>(_onSearchChanged);
@@ -43,10 +46,11 @@ class PlanningDetailsBloc extends Bloc<PlanningDetailsEvent, PlanningDetailsStat
     ));
   }
 
-  // ── Core API fetch ────────────────────────────────────────────────────────
+  // ── Core Data Fetch (Global List la irunthu) ──────────────────────────────
   Future<void> _fetchData(Emitter<PlanningDetailsState> emit) async {
     try {
-      final list = await repository.fetchPlanningDetails();
+      // 💥 MAIN FIX: Global list-la irunthu data edukkurom!
+      final list = List<dynamic>.from(objfun.PlanningEditList);
 
       emit(state.copyWith(
         status: PlanningDetailsStatus.success,

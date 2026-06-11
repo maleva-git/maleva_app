@@ -2,10 +2,10 @@
 class ApiConstants {
   ApiConstants._();
 
-  //static const String port = "https://maleva.my";
+  static const String port = "https://maleva.my";
   // Demo servers:
   // static const String port = "http://103.215.139.121:9001/";
-  static const String port = "http://103.215.139.8:8001/";
+  //static const String port = "http://103.215.139.8:8001/";
 
   // ─── Image / File Upload ──────────────────────────────────────────────────
   static const String apiPostImage        = "$port/api/CommonApp/UploadFile/";

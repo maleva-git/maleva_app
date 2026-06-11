@@ -382,10 +382,10 @@ Future<void> setupDependencies() async {
   sl.registerLazySingleton<PlanningDetailsRepository>(
         () => PlanningDetailsRepository(),
   );
-  sl.registerFactory<PlanningDetailsBloc>(
-        () => PlanningDetailsBloc(repository: sl<PlanningDetailsRepository>()),
-  );
-
+  // sl.registerFactory<PlanningDetailsBloc>(
+  //       () => PlanningDetailsBloc(repository: sl<PlanningDetailsRepository>()),
+  // );
+  sl.registerFactory(() => PlanningDetailsBloc());
   // ── Salary ────────────────────────────────────────────────────────────────
   sl.registerLazySingleton<SalaryRepository>(() => SalaryRepository());
   sl.registerFactory<SalaryBloc>(
