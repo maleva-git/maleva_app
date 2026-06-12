@@ -38,17 +38,16 @@ class VesselPlanningView extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocProvider(
       create: (_) {
-
         final today = DateFormat("yyyy-MM-dd").format(DateTime.now());
 
         return VesselPlanningBloc()
           ..add(VesselPlanningStarted())
-
           ..add(VesselPlanningFilterChanged(
             fromDate: today,
             toDate: today,
             planningNo: '',
             empId: 0,
+            empName: '', // 💥 Itha add pannunga
             isLoggedInEmp: false,
           ));
       },
@@ -371,7 +370,6 @@ class _VesselPlanningPage extends StatelessWidget {
                   ),
                   const SizedBox(height: 20),
 
-                  // ── Buttons ──────────────────────────────────────────────
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
@@ -384,6 +382,7 @@ class _VesselPlanningPage extends StatelessWidget {
                               toDate: toDate,
                               planningNo: txtPlanningNo.text,
                               empId: empId,
+                              empName: txtEmployee.text, // 💥 TextBox-la enna name irukko atha pass pandrom
                               isLoggedInEmp: isLoggedInEmp,
                             ),
                           );

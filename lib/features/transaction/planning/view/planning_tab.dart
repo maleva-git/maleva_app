@@ -49,7 +49,6 @@ class PlanningView extends StatelessWidget {
     );
   }
 }
-
 class _PlanningScaffold extends StatelessWidget {
   const _PlanningScaffold();
 
@@ -728,46 +727,15 @@ class _SheetTextField extends StatelessWidget {
   final bool readOnly;
   final Widget? suffixIcon;
   final VoidCallback? onSuffixTap;
-  final VoidCallback? onTap; // 💥 Puthusa add pannirukom
   final TextCapitalization textCapitalization;
 
-  const _SheetTextField({
-    required this.controller,
-    required this.hint,
-    this.readOnly = false,
-    this.suffixIcon,
-    this.onSuffixTap,
-    this.onTap, // 💥 Puthusa add pannirukom
-    this.textCapitalization = TextCapitalization.none,
-  });
+  const _SheetTextField({required this.controller, required this.hint, this.readOnly = false, this.suffixIcon, this.onSuffixTap, this.textCapitalization = TextCapitalization.none});
 
   @override
   Widget build(BuildContext context) {
     return TextField(
-      controller: controller,
-      readOnly: readOnly,
-      onTap: onTap, // 💥 Itha TextField-la connect pandrom
-      textCapitalization: textCapitalization,
-      style: _body(13, color: colour.kText, fw: FontWeight.w600),
-      decoration: InputDecoration(
-        hintText: hint,
-        hintStyle: _label(13),
-        filled: true,
-        fillColor: colour.kSurface2,
-        border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(12),
-            borderSide: const BorderSide(color: colour.kBorder)),
-        enabledBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(12),
-            borderSide: const BorderSide(color: colour.kBorder)),
-        focusedBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(12),
-            borderSide: const BorderSide(color: colour.kCobalt, width: 1.5)),
-        suffixIcon: suffixIcon != null
-            ? GestureDetector(onTap: onSuffixTap, child: suffixIcon)
-            : null,
-        contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-      ),
+      controller: controller, readOnly: readOnly, textCapitalization: textCapitalization, style: _body(13, color: colour.kText, fw: FontWeight.w600),
+      decoration: InputDecoration(hintText: hint, hintStyle: _label(13), filled: true, fillColor: colour.kSurface2, border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: colour.kBorder)), enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: colour.kBorder)), focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: colour.kCobalt, width: 1.5)), suffixIcon: suffixIcon != null ? GestureDetector(onTap: onSuffixTap, child: suffixIcon) : null, contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12)),
     );
   }
 }

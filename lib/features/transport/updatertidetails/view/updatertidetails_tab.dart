@@ -11,7 +11,6 @@ import 'package:maleva/menu/menulist.dart';
 import 'package:maleva/features/dashboard/admin_dashboard/view/admin_dashboard.dart';
 import '../../../dashboard/admin_dashboard/tabs/rtistatus/view/rtistatus_tab.dart';
 import '../../../dashboard/admin_dashboard/tabs/transportDB/view/transportdb_tab.dart';
-import '../../../dashboard/airfreight_dashboard/view/airfreight_dashboard.dart';
 import '../../../dashboard/boarding_dashboard/view/boarding_dashboard.dart';
 import '../../../dashboard/driver_dashboard/view/driver_dashboard.dart';
 import '../../../dashboard/forwarding_dashboard/view/forwarding_dashboard.dart';
@@ -80,7 +79,7 @@ class _UpdateRTIPage extends StatelessWidget {
       },
       child: WillPopScope(
         onWillPop: () async {
-          _navigateBack(context);
+          Navigator.pop(context);
           return false;
         },
         child: Scaffold(
@@ -137,6 +136,7 @@ class _UpdateRTIPage extends StatelessWidget {
         case 'FORWARDING':
           dest = const ForwardingDashboard();
           break;
+
         default:
           dest = const Homemobile();
       }
@@ -155,7 +155,7 @@ class _UpdateRTIPage extends StatelessWidget {
       leading: IconButton(
         icon: const Icon(Icons.arrow_back_ios_new_rounded, size: 20),
         color: Colors.white,
-        onPressed: () => _navigateBack(context),
+        onPressed: () => Navigator.pop(context),
       ),
       title: Column(
         mainAxisAlignment: MainAxisAlignment.center,
