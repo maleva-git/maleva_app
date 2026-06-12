@@ -6,11 +6,13 @@ abstract class VesselPlanningEvent {}
 class VesselPlanningStarted extends VesselPlanningEvent {}
 
 // Filter / search
+// Filter / search
 class VesselPlanningFilterChanged extends VesselPlanningEvent {
   final String fromDate;
   final String toDate;
   final String planningNo;
   final int empId;
+  final String empName; // 💥 Puthusa itha add panni irukkom
   final bool isLoggedInEmp;
 
   VesselPlanningFilterChanged({
@@ -18,10 +20,10 @@ class VesselPlanningFilterChanged extends VesselPlanningEvent {
     required this.toDate,
     required this.planningNo,
     required this.empId,
+    required this.empName, // 💥 Puthusa itha add panni irukkom
     required this.isLoggedInEmp,
   });
 }
-
 // Expand / collapse card
 class VesselPlanningRowToggled extends VesselPlanningEvent {
   final int index;

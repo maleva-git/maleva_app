@@ -1,7 +1,7 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:maleva/core/models/model.dart';
 import 'package:maleva/core/utils/clsfunction.dart' as objfun;
-
+import 'dart:convert';
 import '../data/emailinbox_repository.dart';
 import 'emailinbox_event.dart';
 import 'emailinbox_state.dart';
@@ -73,6 +73,7 @@ class EmailBloc extends Bloc<EmailEvent, EmailState> {
   }
 
   // ── 3. Load Emails ──────────────────────────────────────────────────────────
+  // ── 3. Load Emails ──────────────────────────────────────────────────────────
   Future<void> _onLoadEmails(
       LoadEmailsEvent event,
       Emitter<EmailState> emit,
@@ -86,17 +87,31 @@ class EmailBloc extends Bloc<EmailEvent, EmailState> {
           {"Id": event.empId}
         ];
 
-        // ✅ REFACTORED: Call repository. ApiClient automatically handles JSON decoding!
         final result = await repository.fetchEmails(body: master);
-
         List<EmailModel> emails = [];
 
-        if (result is Map<String, dynamic> &&
-            result["unread_unreplied_emails"] is List) {
-          final emailsJson = result["unread_unreplied_emails"] as List;
-          emails = emailsJson
-              .map((e) => EmailModel.fromJson(e as Map<String, dynamic>))
-              .toList();
+        // ✅ FIX: result null illama irukka nu check pandrom
+        if (result != null) {
+          Map<String, dynamic> parsedData;
+
+          // ✅ FIX: String-a vantha atha Map-ku decode pandrom
+          if (result is String) {
+            parsedData = jsonDecode(result);
+          } else if (result is Map<String, dynamic>) {
+            parsedData = result;
+          } else {
+            throw Exception("Unknown API response format");
+          }
+
+          // List extract pandrom
+          if (parsedData["unread_unreplied_emails"] != null &&
+              parsedData["unread_unreplied_emails"] is List) {
+
+            final emailsJson = parsedData["unread_unreplied_emails"] as List;
+            emails = emailsJson
+                .map((e) => EmailModel.fromJson(e as Map<String, dynamic>))
+                .toList();
+          }
         }
 
         emit(current.copyWith(
@@ -104,11 +119,11 @@ class EmailBloc extends Bloc<EmailEvent, EmailState> {
           emailsLoading: false,
         ));
       } catch (e) {
+        print("Parsing Error: $e"); // Debugging-ku use aagum
         emit(current.copyWith(emails: [], emailsLoading: false));
       }
     }
   }
-
   // ── 4. Toggle Active ────────────────────────────────────────────────────────
   void _onToggleActive(ToggleEmailActiveEvent event, Emitter<EmailState> emit) {
     if (state is EmployeesLoaded) {

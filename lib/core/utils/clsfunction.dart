@@ -49,8 +49,8 @@ AssetImage lockimg = const AssetImage('assets/common/lockImg.png');
 //String port = "http://103.215.139.8:8001/";
 // String port = "http://192.168.1.101:8003/";
 //String port = "http://103.215.139.121:9001/"; //Demos
-String port = "http://103.215.139.8:8001/"; //Demolatest
-//String port = "https://maleva.my"; //Live
+//String port = "http://103.215.139.8:8001/"; //Demolatest
+String port = "https://maleva.my"; //Live
 
 //String razorpaykey = "rzp_live_GmuWNB2PVXAnLt";
 
@@ -1055,130 +1055,136 @@ void msgshow1(
   }
 }
 
-Future<bool> ConfirmationMsgYesNo(context, String Msg) async {
-  return await showDialog(
+Future<bool> ConfirmationMsgYesNo(BuildContext context, String msg) async {
+  return await showDialog<bool>(
     context: context,
+    barrierDismissible: false, // Veliya click panna close aagakudathu
     builder: (BuildContext context) {
-      // return object of type Dialog
-      return AlertDialog(
-        titlePadding: EdgeInsets.zero,
-        title: Container(
-          height: MalevaScreen == 1
-              ? 35 : 45,
-          padding: const EdgeInsets.all(5),
+
+      // Message-la "logout" irukka nu check panni color & icon mathikka
+      final bool isLogout = msg.toLowerCase().contains('logout');
+
+      return Dialog(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(24.0),
+        ),
+        elevation: 0,
+        backgroundColor: Colors.transparent,
+        child: Container(
+          padding: const EdgeInsets.all(24.0),
           decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(0.0),
-            color: colour.commonColor,
-            border: Border.all(
-              color: colour.commonColorLight,
-            ),
-            // side: const BorderSide(color: colour.commonColorLight, width: 1, style: BorderStyle.solid),
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(24.0),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.12),
+                blurRadius: 24,
+                offset: const Offset(0, 8),
+              ),
+            ],
           ),
-          child: Text(
-            "Maleva",
-            style: GoogleFonts.lato(
-              textStyle:  TextStyle(
-                  color: colour.whiteText,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              // ── Icon Header ──
+              Container(
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: isLogout
+                      ? const Color(0xFFFFF1F2) // Soft Rose for Logout
+                      : const Color(0xFFF0F4FF), // Soft Blue for general
+                  shape: BoxShape.circle,
+                ),
+                child: Icon(
+                  isLogout ? Icons.logout_rounded : Icons.help_outline_rounded,
+                  size: 32,
+                  color: isLogout ? const Color(0xFFE11D48) : const Color(0xFF1555F3),
+                ),
+              ),
+              const SizedBox(height: 20),
+
+              // ── Title ──
+              Text(
+                isLogout ? "Logout" : "Confirm",
+                style: GoogleFonts.dmSans(
+                  fontSize: 20,
                   fontWeight: FontWeight.bold,
-                  fontSize: FontLarge,
-                  letterSpacing: 0.3),
-            ),
+                  color: const Color(0xFF1E293B),
+                ),
+              ),
+              const SizedBox(height: 12),
+
+              // ── Message ──
+              Text(
+                msg,
+                textAlign: TextAlign.center,
+                style: GoogleFonts.dmSans(
+                  fontSize: 15,
+                  fontWeight: FontWeight.w500,
+                  color: const Color(0xFF64748B),
+                  height: 1.4,
+                ),
+              ),
+              const SizedBox(height: 28),
+
+              // ── Buttons ──
+              Row(
+                children: [
+                  // Cancel / No Button
+                  Expanded(
+                    child: TextButton(
+                      onPressed: () => Navigator.pop(context, false),
+                      style: TextButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(vertical: 14),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(14),
+                        ),
+                        backgroundColor: const Color(0xFFF1F5F9), // Light Grey
+                      ),
+                      child: Text(
+                        'No',
+                        style: GoogleFonts.dmSans(
+                          fontSize: 15,
+                          fontWeight: FontWeight.w600,
+                          color: const Color(0xFF475569),
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+
+                  // Yes / Confirm Button
+                  Expanded(
+                    child: ElevatedButton(
+                      onPressed: () => Navigator.pop(context, true),
+                      style: ElevatedButton.styleFrom(
+                        elevation: 0,
+                        padding: const EdgeInsets.symmetric(vertical: 14),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(14),
+                        ),
+                        backgroundColor: isLogout
+                            ? const Color(0xFFE11D48) // Danger Red for Logout
+                            : const Color(0xFF1555F3), // Primary Blue
+                      ),
+                      child: Text(
+                        'Yes',
+                        style: GoogleFonts.dmSans(
+                          fontSize: 15,
+                          fontWeight: FontWeight.w700,
+                          color: Colors.white,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ],
           ),
         ),
-        content: SizedBox(
-        width: MalevaScreen == 1
-            ?150: 300.0, // Adjust width as needed
-        height: MalevaScreen == 1
-            ?50 :70.0, // Adjust height as needed
-      child: Row(
-
-          children: [
-          //   const Expanded(flex:2,child:Icon(
-          //   Icons.question_mark_outlined,
-          //   color: colour.commonColor,
-          //   // size: 35.0,
-          // ),),
-          Expanded(
-              flex: 10,
-              child: Text(
-                Msg,
-                style: GoogleFonts.lato(
-                  textStyle:  TextStyle(
-                      color: colour.commonColor,
-                      fontWeight: FontWeight.bold,
-                      fontSize: FontMedium,
-                      letterSpacing: 0.3),
-                ),
-              )),
-        ]),),
-        actions: <Widget>[
-          // usually buttons at the bottom of the dialog
-          ElevatedButton(
-            style: ElevatedButton.styleFrom(
-              backgroundColor: colour.commonColor,
-              side: const BorderSide(
-                  color: colour.commonColorLight,
-                  width: 1,
-                  style: BorderStyle.solid),
-              textStyle: const TextStyle(color: Colors.black),
-              elevation: 20.0,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(5.0),
-              ),
-              padding: const EdgeInsets.all(4.0),
-            ),
-            onPressed: () {
-              Navigator.pop(context, false);
-            },
-            child: Text(
-              'No',
-              style: GoogleFonts.lato(
-                  fontSize:MalevaScreen == 1
-                      ? FontMedium - 2 : FontMedium,
-                  // height: 1.45,
-                  fontWeight: FontWeight.bold,
-                  color: colour.commonColorLight),
-            ),
-          ),
-          ElevatedButton(
-            style: ElevatedButton.styleFrom(
-              backgroundColor: colour.commonColor,
-              side: const BorderSide(
-                  color: colour.commonColorLight,
-                  width: 1,
-                  style: BorderStyle.solid),
-              textStyle: const TextStyle(color: Colors.black),
-              elevation: 20.0,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(5.0),
-              ),
-              padding: const EdgeInsets.all(4.0),
-            ),
-            onPressed: () {
-              Navigator.pop(context, true);
-            },
-            child: Text(
-              'Yes',
-              style: GoogleFonts.lato(
-                  fontSize: MalevaScreen == 1
-                      ? FontMedium - 2 : FontMedium,
-                  // height: 1.45,
-                  fontWeight: FontWeight.bold,
-                  color: colour.commonColorLight),
-            ),
-          ),
-        ],
       );
     },
-  ).then((exit) {
-    if (exit == null) return false;
-    if (exit) {
-      return true;
-    } else {
-      // user pressed No button
-      return false;
-    }
-  });
+  ).then((value) => value ?? false); // Default to false if dismissed
 }
 
 Future<bool> ConfirmationOK(String Msg, context) async {
@@ -1688,18 +1694,26 @@ try {
 
 
 
+Future<void> logout(BuildContext context) async {
+  bool result = await ConfirmationMsgYesNo(context, "Are you sure you want to logout?");
 
-Future logout(context) async {
-  bool result =
-      await ConfirmationMsgYesNo(context, "Are you sure to logout ?? ");
-  if (result == false) {
+  if (!result) {
     return;
   }
+
+  // Clear Session Variables
   loginId = 0;
   loginname = '';
   DriverLogin = 0;
   DriverTruckRefId = 0;
-  Navigator.push(
+
+  storagenew.setString('Username', "");
+  storagenew.setString('Password', "");
+  storagenew.setString('OldUsername', "");
+
+  // 🚨 CRITICAL FIX: pushAndRemoveUntil thaan use pannanum.
+  // Appo thaan back amukkuna palaiya screen-ku pogathu.
+  Navigator.pushAndRemoveUntil(
     context,
     MaterialPageRoute(
       builder: (_) => BlocProvider(
@@ -1711,13 +1725,11 @@ Future logout(context) async {
         child: const Appuserloginmobile(),
       ),
     ),
+        (Route<dynamic> route) => false, // Clears the entire route history
   );
-
-
-  storagenew.setString('Username', "");
-  storagenew.setString('Password', "");
-  storagenew.setString('OldUsername', "");
 }
+
+
 String barcodestring = '';
 bool barcodeerror = false;
 Future barcodeScanning() async {

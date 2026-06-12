@@ -85,12 +85,15 @@ class _MenulistState extends State<Menulist>
   }
 
   List<MenuMasterModel> get _rootItems => objfun.parentclass.where((e) {
+    if (e.FormText.trim().isEmpty) return false;
+
     if (_query.isEmpty) return true;
     return e.FormText.toLowerCase().contains(_query) ||
         objfun.objMenuMaster
             .where((c) => c.ParentId == e.Id)
             .any((c) => c.FormText.toLowerCase().contains(_query));
   }).toList();
+
 
   @override
   Widget build(BuildContext context) {
@@ -358,9 +361,9 @@ class _MenuTileState extends State<_MenuTile>
   late final AnimationController _expandCtrl;
   late final Animation<double>   _expandAnim;
 
-  // 🚨 CRITICAL FIX: The "&& e.Id != widget.entry.Id" prevents an Infinite Loop ANR
+
   List<MenuMasterModel> get _children => objfun.objMenuMaster
-      .where((e) => e.ParentId == widget.entry.Id && e.Id != widget.entry.Id)
+      .where((e) => e.ParentId == widget.entry.Id && e.Id != widget.entry.Id && e.FormText.trim().isNotEmpty)
       .toList();
 
   bool get _hasChildren => _children.isNotEmpty;
@@ -628,6 +631,10 @@ class _MenuTileState extends State<_MenuTile>
 
   // ── Navigation ─────────────────────────────────────────────────────────────
   void _navigate() {
+    if (widget.entry.FormText == "Logout") {
+      objfun.logout(widget.drawerContext);
+      return;
+    }
     Navigator.pop(widget.drawerContext);
     Future.delayed(const Duration(milliseconds: 80), () {
       final ctx = widget.drawerContext;

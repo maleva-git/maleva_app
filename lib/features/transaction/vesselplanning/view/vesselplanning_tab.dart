@@ -29,6 +29,7 @@ const kGradientVertical = LinearGradient(
   end: Alignment.bottomCenter,
 );
 
+
 // ─── Root Widget ──────────────────────────────────────────────────────────────
 class VesselPlanningView extends StatelessWidget {
   const VesselPlanningView({super.key});
@@ -36,13 +37,25 @@ class VesselPlanningView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (_) => VesselPlanningBloc()..add(VesselPlanningStarted()),
+      create: (_) {
+        final today = DateFormat("yyyy-MM-dd").format(DateTime.now());
+
+        return VesselPlanningBloc()
+          ..add(VesselPlanningStarted())
+          ..add(VesselPlanningFilterChanged(
+            fromDate: today,
+            toDate: today,
+            planningNo: '',
+            empId: 0,
+            empName: '', // 💥 Itha add pannunga
+            isLoggedInEmp: false,
+          ));
+      },
       child: const _VesselPlanningPage(),
     );
   }
 }
 
-// ─── Page ─────────────────────────────────────────────────────────────────────
 class _VesselPlanningPage extends StatelessWidget {
   const _VesselPlanningPage();
 
@@ -357,7 +370,6 @@ class _VesselPlanningPage extends StatelessWidget {
                   ),
                   const SizedBox(height: 20),
 
-                  // ── Buttons ──────────────────────────────────────────────
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
@@ -370,6 +382,7 @@ class _VesselPlanningPage extends StatelessWidget {
                               toDate: toDate,
                               planningNo: txtPlanningNo.text,
                               empId: empId,
+                              empName: txtEmployee.text, // 💥 TextBox-la enna name irukko atha pass pandrom
                               isLoggedInEmp: isLoggedInEmp,
                             ),
                           );

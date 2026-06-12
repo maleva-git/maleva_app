@@ -1,14 +1,14 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:maleva/core/models/model.dart';
 
-import '../data/forwardingsalary_repository.dart'; // Adjust path
+import '../data/forwardingsalary_repository.dart';
 import 'forwardingsalary_event.dart';
 import 'forwardingsalary_state.dart';
 
 class ForwardingSalaryBloc extends Bloc<ForwardingSalaryEvent, ForwardingSalaryState> {
   final ForwardingSalaryRepository repository;
 
-  // Local caching to replace direct objfun global accesses
+
   List<dynamic> _jobNoList = [];
   List<EmployeeModel> _employeeList = [];
 
@@ -121,9 +121,7 @@ class ForwardingSalaryBloc extends Bloc<ForwardingSalaryEvent, ForwardingSalaryS
         }
       }
 
-      // 🔍 Debug — இந்த print output என்ன வருதுன்னு சொல்லுங்க
-      print('📋 _employeeList length: ${_employeeList.length}');
-      print('🔍 sealEmpId: $sealEmpId | breakEmpId: $breakEmpId');
+
 
       emit(s.copyWith(
         rtiText:      event.rtiNo,

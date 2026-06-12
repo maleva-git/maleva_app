@@ -18,20 +18,20 @@ import '../bloc/planning_bloc.dart';
 import '../bloc/planning_event.dart';
 import '../bloc/planning_state.dart';
 import 'package:maleva/core/colors/colors.dart' as colour;
-
-TextStyle _body(double size,
-    {Color color = colour.kText, FontWeight fw = FontWeight.normal}) =>
+TextStyle _body(double size, {Color color = colour.kText, FontWeight fw = FontWeight.normal}) =>
     GoogleFonts.dmSans(fontSize: size, color: color, fontWeight: fw);
 
-TextStyle _label(double size,
-    {Color color = colour.kTextDim, FontWeight fw = FontWeight.w600}) =>
+TextStyle _label(double size, {Color color = colour.kTextDim, FontWeight fw = FontWeight.w600}) =>
     GoogleFonts.dmSans(fontSize: size, color: color, fontWeight: fw);
+
+// ════════════════════════════════════════════════════════════════════
+//  UI VIEW (PlanningView)
+// ════════════════════════════════════════════════════════════════════
 
 class PlanningView extends StatelessWidget {
   const PlanningView({super.key});
 
-  static String get _today =>
-      DateFormat("yyyy-MM-dd").format(DateTime.now());
+  static String get _today => DateFormat("yyyy-MM-dd").format(DateTime.now());
 
   @override
   Widget build(BuildContext context) {
@@ -40,14 +40,15 @@ class PlanningView extends StatelessWidget {
         ..add(LoadPlanningEvent(
           fromDate: _today,
           toDate: _today,
-          employeeId: objfun.EmpRefId,
+          employeeId: 0,            // 💥 FIX 1: Default ID 0
+          employeeName: '',
           planningNo: '',
+          checkLoggedEmp: false,    // 💥 FIX 1: L.Emp default-a uncheck pannidrom
         )),
       child: const _PlanningScaffold(),
     );
   }
 }
-
 class _PlanningScaffold extends StatelessWidget {
   const _PlanningScaffold();
 
@@ -60,25 +61,21 @@ class _PlanningScaffold extends StatelessWidget {
       'OPERATIONADMIN' => const OperationAdminDashboard(),
       _                => const Homemobile(),
     };
-    Navigator.pushReplacement(
-        context, MaterialPageRoute(builder: (_) => dest));
+    Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => dest));
   }
 
   @override
   Widget build(BuildContext context) {
-    final userName =
-        objfun.storagenew.getString('Username') ?? '';
+    final userName = objfun.storagenew.getString('Username') ?? '';
     final isTablet = MediaQuery.of(context).size.width >= 600;
 
     return BlocListener<PlanningBloc, PlanningState>(
-      // Navigate to edit page when password verified
       listenWhen: (_, curr) => curr is PlanningNavigateToEdit,
       listener: (context, state) {
         if (state is PlanningNavigateToEdit) {
           Navigator.push(
             context,
-            MaterialPageRoute(
-                builder: (_) => const PlanningDetailsView()),
+            MaterialPageRoute(builder: (_) => const PlanningDetailsView()),
           );
         }
       },
@@ -92,6 +89,8 @@ class _PlanningScaffold extends StatelessWidget {
           appBar: _buildAppBar(context, userName),
           drawer: const Menulist(),
           body: BlocBuilder<PlanningBloc, PlanningState>(
+            // FIX 1: Prevent UI flicker when navigating
+            buildWhen: (previous, current) => current is! PlanningNavigateToEdit,
             builder: (context, state) {
               if (state is PlanningLoading) {
                 return const _FullScreenLoader();
@@ -101,12 +100,12 @@ class _PlanningScaffold extends StatelessWidget {
                   message: state.message,
                   onRetry: () => context.read<PlanningBloc>().add(
                     LoadPlanningEvent(
-                      fromDate:
-                      DateFormat("yyyy-MM-dd").format(DateTime.now()),
-                      toDate:
-                      DateFormat("yyyy-MM-dd").format(DateTime.now()),
+                      fromDate: DateFormat("yyyy-MM-dd").format(DateTime.now()),
+                      toDate: DateFormat("yyyy-MM-dd").format(DateTime.now()),
                       employeeId: objfun.EmpRefId,
+                      employeeName: '',
                       planningNo: '',
+                      checkLoggedEmp: true,
                     ),
                   ),
                 );
@@ -125,14 +124,12 @@ class _PlanningScaffold extends StatelessWidget {
     );
   }
 
-  PreferredSizeWidget _buildAppBar(
-      BuildContext context, String userName) {
+  PreferredSizeWidget _buildAppBar(BuildContext context, String userName) {
     return AppBar(
       backgroundColor: colour.kSurface,
       elevation: 0,
       leading: IconButton(
-        icon: const Icon(Icons.arrow_back_ios_new_rounded,
-            color: colour.kTextDim, size: 20),
+        icon: const Icon(Icons.arrow_back_ios_new_rounded, color: colour.kTextDim, size: 20),
         onPressed: () => _onBackPressed(context),
       ),
       title: Column(
@@ -140,11 +137,8 @@ class _PlanningScaffold extends StatelessWidget {
         children: [
           Text('Planning',
               style: GoogleFonts.dmSerifDisplay(
-                  fontSize: 18,
-                  color: colour.kText,
-                  fontWeight: FontWeight.bold)),
-          Text(userName,
-              style: _label(11, color: AppTokens.planTextMuted)),
+                  fontSize: 18, color: colour.kText, fontWeight: FontWeight.bold)),
+          Text(userName, style: _label(11, color: AppTokens.planTextMuted)),
         ],
       ),
       bottom: PreferredSize(
@@ -230,9 +224,7 @@ class _PlanningCard extends StatelessWidget {
         color: colour.kSurface,
         borderRadius: BorderRadius.circular(isTablet ? 22 : 18),
         border: Border.all(
-          color: isExpanded
-              ? colour.kGold.withOpacity(0.4)
-              : colour.kBorder,
+          color: isExpanded ? colour.kGold.withOpacity(0.4) : colour.kBorder,
           width: 1,
         ),
         boxShadow: [
@@ -242,21 +234,16 @@ class _PlanningCard extends StatelessWidget {
             offset: const Offset(0, 4),
           ),
           if (isExpanded)
-            BoxShadow(
-              color: colour.kGold.withOpacity(0.06),
-              blurRadius: 20,
-            ),
+            BoxShadow(color: colour.kGold.withOpacity(0.06), blurRadius: 20),
         ],
       ),
       child: ClipRRect(
         borderRadius: BorderRadius.circular(isTablet ? 22 : 18),
         child: Column(
           children: [
-            // ── Left accent bar + main content ──
             IntrinsicHeight(
               child: Row(
                 children: [
-                  // Gold accent bar
                   Container(
                     width: 3,
                     decoration: BoxDecoration(
@@ -277,44 +264,32 @@ class _PlanningCard extends StatelessWidget {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            // Row 1: Planning No + Date
                             Row(
                               children: [
-                                // Planning No chip
                                 Container(
-                                  padding: const EdgeInsets.symmetric(
-                                      horizontal: 10, vertical: 4),
+                                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                                   decoration: BoxDecoration(
                                     color: colour.kCobalt.withOpacity(0.12),
                                     borderRadius: BorderRadius.circular(8),
-                                    border: Border.all(
-                                        color: colour.kCobalt.withOpacity(0.3)),
+                                    border: Border.all(color: colour.kCobalt.withOpacity(0.3)),
                                   ),
                                   child: Text(
                                     master.PLANINGNoDisplay,
-                                    style: _body(isTablet ? 13 : 12,
-                                        color: colour.kCobalt,
-                                        fw: FontWeight.w700),
+                                    style: _body(isTablet ? 13 : 12, color: colour.kCobalt, fw: FontWeight.w700),
                                   ),
                                 ),
                                 const SizedBox(width: 10),
                                 Row(children: [
-                                  const Icon(Icons.calendar_today_rounded,
-                                      size: 12, color: AppTokens.planTextMuted),
+                                  const Icon(Icons.calendar_today_rounded, size: 12, color: AppTokens.planTextMuted),
                                   const SizedBox(width: 5),
-                                  Text(
-                                    master.PLANINGDate.toString(),
-                                    style: _label(isTablet ? 12 : 11),
-                                  ),
+                                  Text(master.PLANINGDate.toString(), style: _label(isTablet ? 12 : 11)),
                                 ]),
                               ],
                             ),
-                            // Row 2: Remarks
                             if (master.Remarks.isNotEmpty) ...[
                               const SizedBox(height: 8),
                               Row(children: [
-                                const Icon(Icons.notes_rounded,
-                                    size: 12, color: AppTokens.planTextMuted),
+                                const Icon(Icons.notes_rounded, size: 12, color: AppTokens.planTextMuted),
                                 const SizedBox(width: 5),
                                 Expanded(
                                   child: Text(
@@ -326,46 +301,28 @@ class _PlanningCard extends StatelessWidget {
                               ]),
                             ],
                             const SizedBox(height: 10),
-                            // Row 3: Action buttons
                             Row(children: [
-                              // Expand toggle
                               _ActionBtn(
-                                icon: isExpanded
-                                    ? Icons.keyboard_arrow_up_rounded
-                                    : Icons.keyboard_arrow_down_rounded,
+                                icon: isExpanded ? Icons.keyboard_arrow_up_rounded : Icons.keyboard_arrow_down_rounded,
                                 label: isExpanded ? 'Hide' : 'Details',
                                 color: isExpanded ? colour.kGold : colour.kCobalt,
-                                onTap: () => context
-                                    .read<PlanningBloc>()
-                                    .add(TogglePlanningExpand(
-                                  index: index,
-                                  masterRefId: master.Id,
-                                )),
+                                onTap: () => context.read<PlanningBloc>().add(
+                                    TogglePlanningExpand(index: index, masterRefId: master.Id)),
                               ),
                               const SizedBox(width: 8),
-                              // PDF Export
                               _ActionBtn(
                                 icon: Icons.picture_as_pdf_outlined,
                                 label: 'Export',
                                 color: colour.kDanger,
-                                onTap: () => context
-                                    .read<PlanningBloc>()
-                                    .add(SharePlanningPdfEvent(
-                                  id: master.Id,
-                                  planningNoDisplay:
-                                  master.PLANINGNoDisplay,
-                                )),
+                                onTap: () => context.read<PlanningBloc>().add(
+                                    SharePlanningPdfEvent(id: master.Id, planningNoDisplay: master.PLANINGNoDisplay)),
                               ),
-                              // PDF loading indicator
-                              if (state is PlanningPdfLoading) ...[
+                              // FIX 2: Check ID so only the correct card shows the loading indicator
+                              if (state is PlanningPdfLoading && (state as PlanningPdfLoading).loadingId == master.Id) ...[
                                 const SizedBox(width: 10),
                                 const SizedBox(
-                                  width: 14,
-                                  height: 14,
-                                  child: CircularProgressIndicator(
-                                    strokeWidth: 2,
-                                    color: colour.kGold,
-                                  ),
+                                  width: 14, height: 14,
+                                  child: CircularProgressIndicator(strokeWidth: 2, color: colour.kGold),
                                 ),
                               ]
                             ]),
@@ -377,12 +334,9 @@ class _PlanningCard extends StatelessWidget {
                 ],
               ),
             ),
-
-            // ── Expanded Details Section ──
             if (isExpanded) ...[
               Container(height: 1, color: colour.kBorder),
-              _DetailsSection(
-                  details: details, isTablet: isTablet),
+              _DetailsSection(details: details, isTablet: isTablet),
             ],
           ],
         ),
@@ -397,101 +351,60 @@ class _PlanningCard extends StatelessWidget {
       builder: (dContext) => _PasswordDialog(
         onConfirm: (pwd) async {
           Navigator.pop(dContext);
-
           context.read<PlanningBloc>().add(VerifyEditPasswordEvent(
-            password: pwd,
-            id: master.Id,
-            planningNo: master.PLANINGNo,
+            password: pwd, id: master.Id, planningNo: master.PLANINGNo,
           ));
         },
       ),
     );
   }
-
-
 }
 
 class _DetailsSection extends StatelessWidget {
   final List<dynamic> details;
   final bool isTablet;
-  const _DetailsSection(
-      {required this.details, required this.isTablet});
+  const _DetailsSection({required this.details, required this.isTablet});
 
   @override
   Widget build(BuildContext context) {
     if (details.isEmpty) {
       return Padding(
         padding: const EdgeInsets.all(20),
-        child: Center(
-          child: Text('No job records',
-              style: _label(13, color: AppTokens.planTextMuted)),
-        ),
+        child: Center(child: Text('No job records', style: _label(13, color: AppTokens.planTextMuted))),
       );
     }
-
     return Container(
       color: colour.kSurface2,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Sub-header
           Padding(
             padding: const EdgeInsets.fromLTRB(16, 12, 16, 8),
             child: Row(children: [
-              Container(
-                width: 3,
-                height: 14,
-                decoration: BoxDecoration(
-                  color: colour.kGold,
-                  borderRadius: BorderRadius.circular(4),
-                ),
-              ),
+              Container(width: 3, height: 14, decoration: BoxDecoration(color: colour.kGold, borderRadius: BorderRadius.circular(4))),
               const SizedBox(width: 8),
-              Text('Job Details',
-                  style: _body(12,
-                      color: colour.kGold, fw: FontWeight.w700)),
+              Text('Job Details', style: _body(12, color: colour.kGold, fw: FontWeight.w700)),
               const SizedBox(width: 8),
               Container(
-                padding: const EdgeInsets.symmetric(
-                    horizontal: 8, vertical: 2),
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                 decoration: BoxDecoration(
                   color: colour.kGold.withOpacity(0.1),
                   borderRadius: BorderRadius.circular(10),
-                  border:
-                  Border.all(color: colour.kGold.withOpacity(0.3)),
+                  border: Border.all(color: colour.kGold.withOpacity(0.3)),
                 ),
-                child: Text('${details.length}',
-                    style: _label(11, color: colour.kGold)),
+                child: Text('${details.length}', style: _label(11, color: colour.kGold)),
               ),
             ]),
           ),
-          // Column headers
           Padding(
             padding: const EdgeInsets.fromLTRB(16, 0, 16, 6),
             child: Row(children: [
-              Expanded(
-                  flex: 2,
-                  child: Text('Job No',
-                      style: _label(10,
-                          color: AppTokens.planTextMuted,
-                          fw: FontWeight.w700))),
-              Expanded(
-                  flex: 2,
-                  child: Text('Job Date',
-                      style: _label(10,
-                          color: AppTokens.planTextMuted,
-                          fw: FontWeight.w700))),
-              Expanded(
-                  flex: 2,
-                  child: Text('Truck',
-                      style: _label(10,
-                          color: AppTokens.planTextMuted,
-                          fw: FontWeight.w700))),
+              Expanded(flex: 2, child: Text('Job No', style: _label(10, color: AppTokens.planTextMuted, fw: FontWeight.w700))),
+              Expanded(flex: 2, child: Text('Job Date', style: _label(10, color: AppTokens.planTextMuted, fw: FontWeight.w700))),
+              Expanded(flex: 2, child: Text('Truck', style: _label(10, color: AppTokens.planTextMuted, fw: FontWeight.w700))),
             ]),
           ),
-          // Detail rows
-          ...details.map((item) => _DetailRow(
-              item: item, isTablet: isTablet)),
+          ...details.map((item) => _DetailRow(item: item, isTablet: isTablet)),
           const SizedBox(height: 8),
         ],
       ),
@@ -509,56 +422,21 @@ class _DetailRow extends StatelessWidget {
     return Container(
       margin: const EdgeInsets.fromLTRB(12, 0, 12, 8),
       padding: EdgeInsets.all(isTablet ? 14 : 12),
-      decoration: BoxDecoration(
-        color: colour.kSurface,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: colour.kBorder),
-      ),
+      decoration: BoxDecoration(color: colour.kSurface, borderRadius: BorderRadius.circular(12), border: Border.all(color: colour.kBorder)),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(children: [
-            Expanded(
-              flex: 2,
-              child: Text(
-                '${item["JobNo"]}',
-                style: _body(isTablet ? 12 : 11,
-                    color: colour.kCobalt, fw: FontWeight.w700),
-                overflow: TextOverflow.ellipsis,
-              ),
-            ),
-            Expanded(
-              flex: 2,
-              child: Text(
-                '${item["JobDate"]}',
-                style: _label(isTablet ? 12 : 11),
-                overflow: TextOverflow.ellipsis,
-              ),
-            ),
-            Expanded(
-              flex: 2,
-              child: Text(
-                '${item["TruckName"]}',
-                style: _body(isTablet ? 12 : 11,
-                    color: colour.kSuccess, fw: FontWeight.w600),
-                overflow: TextOverflow.ellipsis,
-              ),
-            ),
+            Expanded(flex: 2, child: Text('${item["JobNo"]}', style: _body(isTablet ? 12 : 11, color: colour.kCobalt, fw: FontWeight.w700), overflow: TextOverflow.ellipsis)),
+            Expanded(flex: 2, child: Text('${item["JobDate"]}', style: _label(isTablet ? 12 : 11), overflow: TextOverflow.ellipsis)),
+            Expanded(flex: 2, child: Text('${item["TruckName"]}', style: _body(isTablet ? 12 : 11, color: colour.kSuccess, fw: FontWeight.w600), overflow: TextOverflow.ellipsis)),
           ]),
           if ('${item["Remarks"]}'.isNotEmpty) ...[
             const SizedBox(height: 6),
             Row(children: [
-              const Icon(Icons.notes_rounded,
-                  size: 11, color: AppTokens.planTextMuted),
+              const Icon(Icons.notes_rounded, size: 11, color: AppTokens.planTextMuted),
               const SizedBox(width: 4),
-              Expanded(
-                child: Text(
-                  '${item["Remarks"]}',
-                  style: _label(isTablet ? 11 : 10,
-                      color: AppTokens.planTextMuted),
-                  overflow: TextOverflow.ellipsis,
-                ),
-              ),
+              Expanded(child: Text('${item["Remarks"]}', style: _label(isTablet ? 11 : 10, color: AppTokens.planTextMuted), overflow: TextOverflow.ellipsis)),
             ]),
           ],
         ],
@@ -574,26 +452,18 @@ class _FilterFab extends StatelessWidget {
       onPressed: () => _showFilterSheet(context),
       backgroundColor: AppTokens.invoiceHeaderStart,
       icon: const Icon(Icons.tune_rounded, color: colour.kBg, size: 20),
-      label: Text('Filter',
-          style: _body(13, color: colour.kBg, fw: FontWeight.w700)),
+      label: Text('Filter', style: _body(13, color: colour.kBg, fw: FontWeight.w700)),
     );
   }
 
   void _showFilterSheet(BuildContext context) {
     final bloc = context.read<PlanningBloc>();
-    final loaded = bloc.state is PlanningLoaded
-        ? bloc.state as PlanningLoaded
-        : null;
+    final loaded = bloc.state is PlanningLoaded ? bloc.state as PlanningLoaded : null;
 
-    // Local controllers for the sheet
-    final empController = TextEditingController(
-        text: loaded?.employeeName ?? '');
-    final planNoController = TextEditingController(
-        text: loaded?.planningNo ?? '');
-    var fromDate = loaded?.fromDate ??
-        DateFormat("yyyy-MM-dd").format(DateTime.now());
-    var toDate = loaded?.toDate ??
-        DateFormat("yyyy-MM-dd").format(DateTime.now());
+    final empController = TextEditingController(text: loaded?.employeeName ?? '');
+    final planNoController = TextEditingController(text: loaded?.planningNo ?? '');
+    var fromDate = loaded?.fromDate ?? DateFormat("yyyy-MM-dd").format(DateTime.now());
+    var toDate = loaded?.toDate ?? DateFormat("yyyy-MM-dd").format(DateTime.now());
     var checkLoggedEmp = loaded?.checkLoggedEmp ?? true;
     var empId = loaded?.employeeId ?? 0;
 
@@ -606,220 +476,100 @@ class _FilterFab extends StatelessWidget {
           return Container(
             decoration: const BoxDecoration(
               color: colour.kSurface,
-              borderRadius:
-              BorderRadius.vertical(top: Radius.circular(28)),
-              border: Border(
-                  top: BorderSide(color: colour.kBorder, width: 1)),
+              borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
+              border: Border(top: BorderSide(color: colour.kBorder, width: 1)),
             ),
             padding: EdgeInsets.only(
-              top: 20,
-              left: 20,
-              right: 20,
-              bottom:
-              MediaQuery.of(sheetCtx).viewInsets.bottom + 20,
+              top: 20, left: 20, right: 20,
+              bottom: MediaQuery.of(sheetCtx).viewInsets.bottom + 20,
             ),
             child: SingleChildScrollView(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Handle bar
-                  Center(
-                    child: Container(
-                      width: 40,
-                      height: 4,
-                      decoration: BoxDecoration(
-                        color: colour.kBorder,
-                        borderRadius: BorderRadius.circular(4),
-                      ),
-                    ),
-                  ),
+                  Center(child: Container(width: 40, height: 4, decoration: BoxDecoration(color: colour.kBorder, borderRadius: BorderRadius.circular(4)))),
                   const SizedBox(height: 16),
-                  // Title
                   Row(children: [
-                    Container(
-                      width: 3,
-                      height: 18,
-                      decoration: BoxDecoration(
-                        gradient: const LinearGradient(
-                          colors: [AppTokens.invoiceHeaderStart, colour.kCobalt],
-                          begin: Alignment.topCenter,
-                          end: Alignment.bottomCenter,
-                        ),
-                        borderRadius: BorderRadius.circular(4),
-                      ),
-                    ),
+                    Container(width: 3, height: 18, decoration: BoxDecoration(gradient: const LinearGradient(colors: [AppTokens.invoiceHeaderStart, colour.kCobalt], begin: Alignment.topCenter, end: Alignment.bottomCenter), borderRadius: BorderRadius.circular(4))),
                     const SizedBox(width: 10),
-                    Text('Filter Planning',
-                        style: GoogleFonts.dmSerifDisplay(
-                            fontSize: 18,
-                            color: colour.kText)),
+                    Text('Filter Planning', style: GoogleFonts.dmSerifDisplay(fontSize: 18, color: colour.kText)),
                   ]),
-
                   const SizedBox(height: 20),
-
-                  // Date row
                   Row(children: [
-                    Expanded(
-                      child: _SheetDateBtn(
-                        label: 'From',
-                        date: fromDate,
-                        onPick: (d) =>
-                            setSheetState(() => fromDate = d),
-                      ),
-                    ),
+                    Expanded(child: _SheetDateBtn(label: 'From', date: fromDate, onPick: (d) => setSheetState(() => fromDate = d))),
                     const SizedBox(width: 10),
-                    Expanded(
-                      child: _SheetDateBtn(
-                        label: 'To',
-                        date: toDate,
-                        onPick: (d) =>
-                            setSheetState(() => toDate = d),
-                      ),
-                    ),
+                    Expanded(child: _SheetDateBtn(label: 'To', date: toDate, onPick: (d) => setSheetState(() => toDate = d))),
                   ]),
-
                   const SizedBox(height: 14),
-
-                  // Employee field
                   _SheetTextField(
                     controller: empController,
                     hint: 'Select Employee',
                     readOnly: true,
-                    suffixIcon: Icon(
-                      empController.text.isNotEmpty
-                          ? Icons.close_rounded
-                          : Icons.search_rounded,
-                      color: checkLoggedEmp
-                          ? AppTokens.planTextMuted
-                          : colour.kCobalt,
-                    ),
-                    onSuffixTap: checkLoggedEmp
-                        ? null
-                        : () async {
+                    suffixIcon: Icon(empController.text.isNotEmpty ? Icons.close_rounded : Icons.search_rounded, color: checkLoggedEmp ? AppTokens.planTextMuted : colour.kCobalt),
+                    onSuffixTap: checkLoggedEmp ? null : () async {
                       if (empController.text.isEmpty) {
-                        await OnlineApi.SelectEmployee(
-                            context, 'sales', 'admin');
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (_) =>
-                              const Employee(
-                                  Searchby: 1,
-                                  SearchId: 0)),
-                        ).then((_) {
+                        await OnlineApi.SelectEmployee(context, 'sales', 'admin');
+                        Navigator.push(context, MaterialPageRoute(builder: (_) => const Employee(Searchby: 1, SearchId: 0))).then((_) {
                           setSheetState(() {
-                            empController.text = objfun
-                                .SelectEmployeeList
-                                .AccountName;
-                            empId = objfun
-                                .SelectEmployeeList.Id;
-                            objfun.SelectEmployeeList =
-                                EmployeeModel.Empty();
+                            empController.text = objfun.SelectEmployeeList.AccountName;
+                            empId = objfun.SelectEmployeeList.Id;
+                            objfun.SelectEmployeeList = EmployeeModel.Empty();
                           });
                         });
                       } else {
-                        setSheetState(() {
-                          empController.text = '';
-                          empId = 0;
-                        });
+                        setSheetState(() { empController.text = ''; empId = 0; });
                       }
                     },
                   ),
-
                   const SizedBox(height: 14),
-
-                  // Planning No field
-                  _SheetTextField(
-                    controller: planNoController,
-                    hint: 'Planning No',
-                    textCapitalization: TextCapitalization.characters,
-                  ),
-
+                  _SheetTextField(controller: planNoController, hint: 'Planning No', textCapitalization: TextCapitalization.characters),
                   const SizedBox(height: 14),
-
-                  // L.Emp checkbox
                   Container(
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 14, vertical: 10),
-                    decoration: BoxDecoration(
-                      color: colour.kSurface2,
-                      borderRadius: BorderRadius.circular(12),
-                      border: Border.all(color: colour.kBorder),
-                    ),
+                    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                    decoration: BoxDecoration(color: colour.kSurface2, borderRadius: BorderRadius.circular(12), border: Border.all(color: colour.kBorder)),
                     child: Row(children: [
                       SizedBox(
-                        width: 22,
-                        height: 22,
+                        width: 22, height: 22,
                         child: Checkbox(
                           value: checkLoggedEmp,
                           activeColor: AppTokens.invoiceHeaderStart,
                           checkColor: colour.kBg,
-                          side: const BorderSide(
-                              color: AppTokens.planTextMuted, width: 1.5),
-                          shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(4)),
-                          onChanged: (v) => setSheetState(
-                                  () => checkLoggedEmp = v!),
+                          side: const BorderSide(color: AppTokens.planTextMuted, width: 1.5),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
+                          onChanged: (v) => setSheetState(() => checkLoggedEmp = v!),
                         ),
                       ),
                       const SizedBox(width: 10),
-                      Text('Logged-in Employee',
-                          style: _body(13,
-                              color: colour.kTextDim,
-                              fw: FontWeight.w500)),
+                      Text('Logged-in Employee', style: _body(13, color: colour.kTextDim, fw: FontWeight.w500)),
                     ]),
                   ),
-
                   const SizedBox(height: 22),
-
-                  // Action buttons
                   Row(children: [
                     Expanded(
                       child: ElevatedButton(
                         onPressed: () {
                           Navigator.pop(sheetCtx);
-                          final resolvedEmpId = checkLoggedEmp
-                              ? objfun.EmpRefId
-                              : empId;
+                          final resolvedEmpId = checkLoggedEmp ? objfun.EmpRefId : empId;
+                          // FIX 3: Event-ku proper ah current values anuppura logic
                           bloc.add(LoadPlanningEvent(
                             fromDate: fromDate,
                             toDate: toDate,
                             employeeId: resolvedEmpId,
+                            employeeName: empController.text,
                             planningNo: planNoController.text,
+                            checkLoggedEmp: checkLoggedEmp,
                           ));
                         },
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: AppTokens.invoiceHeaderStart,
-                          padding: const EdgeInsets.symmetric(
-                              vertical: 14),
-                          shape: RoundedRectangleBorder(
-                              borderRadius:
-                              BorderRadius.circular(14)),
-                          elevation: 0,
-                        ),
-                        child: Text('View',
-                            style: _body(14,
-                                color: colour.kBg,
-                                fw: FontWeight.w700)),
+                        style: ElevatedButton.styleFrom(backgroundColor: AppTokens.invoiceHeaderStart, padding: const EdgeInsets.symmetric(vertical: 14), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)), elevation: 0),
+                        child: Text('View', style: _body(14, color: colour.kBg, fw: FontWeight.w700)),
                       ),
                     ),
                     const SizedBox(width: 10),
                     Expanded(
                       child: OutlinedButton(
                         onPressed: () => Navigator.pop(sheetCtx),
-                        style: OutlinedButton.styleFrom(
-                          foregroundColor: colour.kTextDim,
-                          side: const BorderSide(color: colour.kBorder),
-                          padding: const EdgeInsets.symmetric(
-                              vertical: 14),
-                          shape: RoundedRectangleBorder(
-                              borderRadius:
-                              BorderRadius.circular(14)),
-                        ),
-                        child: Text('Close',
-                            style: _body(14,
-                                color: colour.kTextDim,
-                                fw: FontWeight.w600)),
+                        style: OutlinedButton.styleFrom(foregroundColor: colour.kTextDim, side: const BorderSide(color: colour.kBorder), padding: const EdgeInsets.symmetric(vertical: 14), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14))),
+                        child: Text('Close', style: _body(14, color: colour.kTextDim, fw: FontWeight.w600)),
                       ),
                     ),
                   ]),
@@ -856,34 +606,22 @@ class _PasswordDialogState extends State<_PasswordDialog> {
   Widget build(BuildContext context) {
     return Dialog(
       backgroundColor: colour.kSurface,
-      shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(20)),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
       child: Padding(
         padding: const EdgeInsets.all(24),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            // Icon
             Container(
               padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                color: AppTokens.invoiceHeaderStart.withOpacity(0.1),
-                shape: BoxShape.circle,
-                border: Border.all(
-                    color: AppTokens.invoiceHeaderStart.withOpacity(0.3)),
-              ),
-              child: const Icon(Icons.lock_outline_rounded,
-                  color: AppTokens.invoiceHeaderStart, size: 28),
+              decoration: BoxDecoration(color: AppTokens.invoiceHeaderStart.withOpacity(0.1), shape: BoxShape.circle, border: Border.all(color: AppTokens.invoiceHeaderStart.withOpacity(0.3))),
+              child: const Icon(Icons.lock_outline_rounded, color: AppTokens.invoiceHeaderStart, size: 28),
             ),
             const SizedBox(height: 16),
-            Text('Edit Password',
-                style: GoogleFonts.dmSerifDisplay(
-                    fontSize: 18, color: colour.kText)),
+            Text('Edit Password', style: GoogleFonts.dmSerifDisplay(fontSize: 18, color: colour.kText)),
             const SizedBox(height: 4),
-            Text('Enter password to edit this planning',
-                style: _label(12, color: AppTokens.planTextMuted)),
+            Text('Enter password to edit this planning', style: _label(12, color: AppTokens.planTextMuted)),
             const SizedBox(height: 20),
-            // Password field
             TextField(
               controller: _ctrl,
               autofocus: true,
@@ -891,79 +629,36 @@ class _PasswordDialogState extends State<_PasswordDialog> {
               textCapitalization: TextCapitalization.characters,
               style: _body(14, color: colour.kText, fw: FontWeight.w600),
               decoration: InputDecoration(
-                hintText: 'Enter password',
-                hintStyle: _label(13),
-                filled: true,
-                fillColor: colour.kSurface2,
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  borderSide: const BorderSide(color: colour.kBorder),
-                ),
-                enabledBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  borderSide: const BorderSide(color: colour.kBorder),
-                ),
-                focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  borderSide:
-                  const BorderSide(color: AppTokens.invoiceHeaderStart, width: 1.5),
-                ),
-                prefixIcon: const Icon(Icons.key_rounded,
-                    color: AppTokens.invoiceHeaderStart, size: 18),
+                hintText: 'Enter password', hintStyle: _label(13), filled: true, fillColor: colour.kSurface2,
+                border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: colour.kBorder)),
+                enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: colour.kBorder)),
+                focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: AppTokens.invoiceHeaderStart, width: 1.5)),
+                prefixIcon: const Icon(Icons.key_rounded, color: AppTokens.invoiceHeaderStart, size: 18),
               ),
             ),
             const SizedBox(height: 20),
             Row(children: [
               Expanded(
                 child: ElevatedButton(
-                  onPressed: _loading
-                      ? null
-                      : () async {
+                  onPressed: _loading ? null : () async {
                     if (_ctrl.text.isEmpty) {
-                      objfun.ConfirmationOK(
-                          "Enter Password !!", context);
+                      objfun.ConfirmationOK("Enter Password !!", context);
                       return;
                     }
                     setState(() => _loading = true);
                     await widget.onConfirm(_ctrl.text);
-                    setState(() => _loading = false);
+                    // FIX 4: Removed setState(() => _loading = false) after pop logic to prevent crash
                   },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: AppTokens.invoiceHeaderStart,
-                    padding:
-                    const EdgeInsets.symmetric(vertical: 13),
-                    shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12)),
-                  ),
-                  child: _loading
-                      ? const SizedBox(
-                    width: 18,
-                    height: 18,
-                    child: CircularProgressIndicator(
-                      strokeWidth: 2,
-                      color: colour.kBg,
-                    ),
-                  )
-                      : Text('Confirm',
-                      style: _body(14,
-                          color: colour.kBg, fw: FontWeight.w700)),
+                  style: ElevatedButton.styleFrom(backgroundColor: AppTokens.invoiceHeaderStart, padding: const EdgeInsets.symmetric(vertical: 13), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12))),
+                  child: _loading ? const SizedBox(width: 18, height: 18, child: CircularProgressIndicator(strokeWidth: 2, color: colour.kBg)) : Text('Confirm', style: _body(14, color: colour.kBg, fw: FontWeight.w700)),
                 ),
               ),
               const SizedBox(width: 10),
               Expanded(
                 child: OutlinedButton(
                   onPressed: () => Navigator.pop(context),
-                  style: OutlinedButton.styleFrom(
-                    foregroundColor: colour.kTextDim,
-                    side: const BorderSide(color: colour.kBorder),
-                    padding: const EdgeInsets.symmetric(vertical: 13),
-                    shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12)),
-                  ),
-                  child: Text('Cancel',
-                      style: _body(14,
-                          color: colour.kTextDim,
-                          fw: FontWeight.w600)),
+                  style: OutlinedButton.styleFrom(foregroundColor: colour.kTextDim, side: const BorderSide(color: colour.kBorder), padding: const EdgeInsets.symmetric(vertical: 13), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12))),
+                  child: Text('Cancel', style: _body(14, color: colour.kTextDim, fw: FontWeight.w600)),
                 ),
               ),
             ]),
@@ -974,38 +669,22 @@ class _PasswordDialogState extends State<_PasswordDialog> {
   }
 }
 
-
 class _ActionBtn extends StatelessWidget {
   final IconData icon;
   final String label;
   final Color color;
   final VoidCallback onTap;
 
-  const _ActionBtn({
-    required this.icon,
-    required this.label,
-    required this.color,
-    required this.onTap,
-  });
+  const _ActionBtn({required this.icon, required this.label, required this.color, required this.onTap});
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        padding: const EdgeInsets.symmetric(
-            horizontal: 12, vertical: 6),
-        decoration: BoxDecoration(
-          color: color.withOpacity(0.1),
-          borderRadius: BorderRadius.circular(20),
-          border: Border.all(color: color.withOpacity(0.3)),
-        ),
-        child: Row(mainAxisSize: MainAxisSize.min, children: [
-          Icon(icon, size: 14, color: color),
-          const SizedBox(width: 5),
-          Text(label,
-              style: _body(11, color: color, fw: FontWeight.w700)),
-        ]),
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+        decoration: BoxDecoration(color: color.withOpacity(0.1), borderRadius: BorderRadius.circular(20), border: Border.all(color: color.withOpacity(0.3))),
+        child: Row(mainAxisSize: MainAxisSize.min, children: [Icon(icon, size: 14, color: color), const SizedBox(width: 5), Text(label, style: _body(11, color: color, fw: FontWeight.w700))]),
       ),
     );
   }
@@ -1016,59 +695,26 @@ class _SheetDateBtn extends StatelessWidget {
   final String date;
   final void Function(String) onPick;
 
-  const _SheetDateBtn({
-    required this.label,
-    required this.date,
-    required this.onPick,
-  });
+  const _SheetDateBtn({required this.label, required this.date, required this.onPick});
 
   @override
   Widget build(BuildContext context) {
-    final displayDate = DateFormat('dd MMM yyyy')
-        .format(DateTime.parse(date));
+    final displayDate = DateFormat('dd MMM yyyy').format(DateTime.parse(date));
     return GestureDetector(
       onTap: () async {
         final picked = await showDatePicker(
-          context: context,
-          initialDate: DateTime.parse(date),
-          firstDate: DateTime(1900),
-          lastDate: DateTime(2050),
-          builder: (_, child) => Theme(
-            data: ThemeData.dark().copyWith(
-              colorScheme: const ColorScheme.dark(
-                primary: AppTokens.invoiceHeaderStart,
-                onPrimary: colour.kBg,
-                surface: colour.kSurface,
-                onSurface: colour.kText,
-              ),
-            ),
-            child: child!,
-          ),
+          context: context, initialDate: DateTime.parse(date), firstDate: DateTime(1900), lastDate: DateTime(2050),
+          builder: (_, child) => Theme(data: ThemeData.dark().copyWith(colorScheme: const ColorScheme.dark(primary: AppTokens.invoiceHeaderStart, onPrimary: colour.kBg, surface: colour.kSurface, onSurface: colour.kText)), child: child!),
         );
-        if (picked != null) {
-          onPick(DateFormat("yyyy-MM-dd").format(picked));
-        }
+        if (picked != null) onPick(DateFormat("yyyy-MM-dd").format(picked));
       },
       child: Container(
-        padding: const EdgeInsets.symmetric(
-            horizontal: 14, vertical: 12),
-        decoration: BoxDecoration(
-          color: colour.kSurface2,
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: colour.kBorder),
-        ),
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+        decoration: BoxDecoration(color: colour.kSurface2, borderRadius: BorderRadius.circular(12), border: Border.all(color: colour.kBorder)),
         child: Row(children: [
-          const Icon(Icons.calendar_today_rounded,
-              size: 13, color: AppTokens.invoiceHeaderStart),
+          const Icon(Icons.calendar_today_rounded, size: 13, color: AppTokens.invoiceHeaderStart),
           const SizedBox(width: 8),
-          Column(crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(label,
-                    style: _label(9, color: AppTokens.planTextMuted)),
-                Text(displayDate,
-                    style: _body(12,
-                        color: colour.kText, fw: FontWeight.w600)),
-              ]),
+          Column(crossAxisAlignment: CrossAxisAlignment.start, children: [Text(label, style: _label(9, color: AppTokens.planTextMuted)), Text(displayDate, style: _body(12, color: colour.kText, fw: FontWeight.w600))]),
         ]),
       ),
     );
@@ -1083,47 +729,13 @@ class _SheetTextField extends StatelessWidget {
   final VoidCallback? onSuffixTap;
   final TextCapitalization textCapitalization;
 
-  const _SheetTextField({
-    required this.controller,
-    required this.hint,
-    this.readOnly = false,
-    this.suffixIcon,
-    this.onSuffixTap,
-    this.textCapitalization = TextCapitalization.none,
-  });
+  const _SheetTextField({required this.controller, required this.hint, this.readOnly = false, this.suffixIcon, this.onSuffixTap, this.textCapitalization = TextCapitalization.none});
 
   @override
   Widget build(BuildContext context) {
     return TextField(
-      controller: controller,
-      readOnly: readOnly,
-      textCapitalization: textCapitalization,
-      style: _body(13, color: colour.kText, fw: FontWeight.w600),
-      decoration: InputDecoration(
-        hintText: hint,
-        hintStyle: _label(13),
-        filled: true,
-        fillColor: colour.kSurface2,
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-          borderSide: const BorderSide(color: colour.kBorder),
-        ),
-        enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-          borderSide: const BorderSide(color: colour.kBorder),
-        ),
-        focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-          borderSide:
-          const BorderSide(color: colour.kCobalt, width: 1.5),
-        ),
-        suffixIcon: suffixIcon != null
-            ? GestureDetector(
-            onTap: onSuffixTap, child: suffixIcon)
-            : null,
-        contentPadding: const EdgeInsets.symmetric(
-            horizontal: 14, vertical: 12),
-      ),
+      controller: controller, readOnly: readOnly, textCapitalization: textCapitalization, style: _body(13, color: colour.kText, fw: FontWeight.w600),
+      decoration: InputDecoration(hintText: hint, hintStyle: _label(13), filled: true, fillColor: colour.kSurface2, border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: colour.kBorder)), enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: colour.kBorder)), focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: colour.kCobalt, width: 1.5)), suffixIcon: suffixIcon != null ? GestureDetector(onTap: onSuffixTap, child: suffixIcon) : null, contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12)),
     );
   }
 }
@@ -1134,84 +746,37 @@ class _FullScreenLoader extends StatefulWidget {
   State<_FullScreenLoader> createState() => _FullScreenLoaderState();
 }
 
-class _FullScreenLoaderState extends State<_FullScreenLoader>
-    with SingleTickerProviderStateMixin {
+class _FullScreenLoaderState extends State<_FullScreenLoader> with SingleTickerProviderStateMixin {
   late AnimationController _ctrl;
   late Animation<double> _anim;
 
   @override
   void initState() {
     super.initState();
-    _ctrl = AnimationController(
-        vsync: this,
-        duration: const Duration(milliseconds: 1400))
-      ..repeat(reverse: true);
-    _anim = Tween<double>(begin: 0.3, end: 0.9)
-        .animate(CurvedAnimation(parent: _ctrl, curve: Curves.easeInOut));
+    _ctrl = AnimationController(vsync: this, duration: const Duration(milliseconds: 1400))..repeat(reverse: true);
+    _anim = Tween<double>(begin: 0.3, end: 0.9).animate(CurvedAnimation(parent: _ctrl, curve: Curves.easeInOut));
   }
 
   @override
-  void dispose() {
-    _ctrl.dispose();
-    super.dispose();
-  }
+  void dispose() { _ctrl.dispose(); super.dispose(); }
 
   @override
   Widget build(BuildContext context) {
     return AnimatedBuilder(
       animation: _anim,
-      builder: (_, __) => Center(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Container(
-              width: 60,
-              height: 60,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: AppTokens.invoiceHeaderStart.withOpacity(_anim.value * 0.15),
-                border: Border.all(
-                    color: AppTokens.invoiceHeaderStart.withOpacity(_anim.value), width: 2),
-              ),
-              child: Icon(Icons.local_shipping_rounded,
-                  color: AppTokens.invoiceHeaderStart.withOpacity(_anim.value), size: 28),
-            ),
-            const SizedBox(height: 16),
-            Text('Loading Planning...',
-                style: _label(13, color: AppTokens.planTextMuted)),
-          ],
-        ),
-      ),
+      builder: (_, __) => Center(child: Column(mainAxisSize: MainAxisSize.min, children: [
+        Container(width: 60, height: 60, decoration: BoxDecoration(shape: BoxShape.circle, color: AppTokens.invoiceHeaderStart.withOpacity(_anim.value * 0.15), border: Border.all(color: AppTokens.invoiceHeaderStart.withOpacity(_anim.value), width: 2)), child: Icon(Icons.local_shipping_rounded, color: AppTokens.invoiceHeaderStart.withOpacity(_anim.value), size: 28)),
+        const SizedBox(height: 16), Text('Loading Planning...', style: _label(13, color: AppTokens.planTextMuted)),
+      ])),
     );
   }
 }
 
 class _EmptyView extends StatelessWidget {
   const _EmptyView();
-
   @override
   Widget build(BuildContext context) {
-    return Center(
-      child: Column(mainAxisSize: MainAxisSize.min, children: [
-        Container(
-          padding: const EdgeInsets.all(20),
-          decoration: BoxDecoration(
-            color: colour.kSurface,
-            shape: BoxShape.circle,
-            border: Border.all(color: colour.kBorder),
-          ),
-          child: const Icon(Icons.inbox_rounded,
-              color: AppTokens.planTextMuted, size: 36),
-        ),
-        const SizedBox(height: 14),
-        Text('No Planning Records',
-            style:
-            GoogleFonts.dmSerifDisplay(fontSize: 18, color: colour.kText)),
-        const SizedBox(height: 6),
-        Text('Try adjusting your filter',
-            style: _label(13, color: AppTokens.planTextMuted)),
-      ]),
-    );
+    return Center(child: Column(mainAxisSize: MainAxisSize.min, children: [Container(padding: const EdgeInsets.all(20), decoration: BoxDecoration(color: colour.kSurface, shape: BoxShape.circle, border: Border.all(color: colour.kBorder)), child: const Icon(Icons.inbox_rounded, color: AppTokens.planTextMuted, size: 36)), const SizedBox(height: 14), Text('No Planning Records', style: GoogleFonts.dmSerifDisplay(fontSize: 18, color: colour.kText)), const SizedBox(height: 6), Text('Try adjusting your filter', style: _label(13, color: AppTokens.planTextMuted))]));
   }
 }
 
@@ -1219,48 +784,8 @@ class _ErrorView extends StatelessWidget {
   final String message;
   final VoidCallback onRetry;
   const _ErrorView({required this.message, required this.onRetry});
-
   @override
   Widget build(BuildContext context) {
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.all(32),
-        child: Column(mainAxisSize: MainAxisSize.min, children: [
-          Container(
-            padding: const EdgeInsets.all(18),
-            decoration: BoxDecoration(
-              color: colour.kDanger.withOpacity(0.1),
-              shape: BoxShape.circle,
-              border: Border.all(color: colour.kDanger.withOpacity(0.3)),
-            ),
-            child: const Icon(Icons.error_outline_rounded,
-                color: colour.kDanger, size: 32),
-          ),
-          const SizedBox(height: 14),
-          Text('Something went wrong',
-              style: GoogleFonts.dmSerifDisplay(
-                  fontSize: 18, color: colour.kText)),
-          const SizedBox(height: 8),
-          Text(message,
-              style: _label(12, color: AppTokens.planTextMuted),
-              textAlign: TextAlign.center),
-          const SizedBox(height: 20),
-          ElevatedButton.icon(
-            onPressed: onRetry,
-            style: ElevatedButton.styleFrom(
-              backgroundColor: colour.kCobalt,
-              padding: const EdgeInsets.symmetric(
-                  horizontal: 24, vertical: 12),
-              shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12)),
-            ),
-            icon: const Icon(Icons.refresh_rounded,
-                color: colour.kText, size: 18),
-            label: Text('Retry',
-                style: _body(14, color: colour.kText, fw: FontWeight.w600)),
-          ),
-        ]),
-      ),
-    );
+    return Center(child: Padding(padding: const EdgeInsets.all(32), child: Column(mainAxisSize: MainAxisSize.min, children: [Container(padding: const EdgeInsets.all(18), decoration: BoxDecoration(color: colour.kDanger.withOpacity(0.1), shape: BoxShape.circle, border: Border.all(color: colour.kDanger.withOpacity(0.3))), child: const Icon(Icons.error_outline_rounded, color: colour.kDanger, size: 32)), const SizedBox(height: 14), Text('Something went wrong', style: GoogleFonts.dmSerifDisplay(fontSize: 18, color: colour.kText)), const SizedBox(height: 8), Text(message, style: _label(12, color: AppTokens.planTextMuted), textAlign: TextAlign.center), const SizedBox(height: 20), ElevatedButton.icon(onPressed: onRetry, style: ElevatedButton.styleFrom(backgroundColor: colour.kCobalt, padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12))), icon: const Icon(Icons.refresh_rounded, color: colour.kText, size: 18), label: Text('Retry', style: _body(14, color: colour.kText, fw: FontWeight.w600))) ])));
   }
 }

@@ -28,13 +28,12 @@ class VesselPlanningBloc extends Bloc<VesselPlanningEvent, VesselPlanningState> 
       ) async {
     emit(VesselPlanningLoading());
     try {
-      // SelectEmployee needs a context – keep using objfun pattern
-      // We call it here and store result in objfun.EmployeeList (existing pattern)
       await _loadData(
         fromDate: _today,
         toDate: _today,
         planningNo: '',
         empId: objfun.EmpRefId,
+        empName: '', // 💥 Itha add pannunga
         isLoggedInEmp: true,
         emit: emit,
         existingState: null,
@@ -56,6 +55,7 @@ class VesselPlanningBloc extends Bloc<VesselPlanningEvent, VesselPlanningState> 
       toDate: event.toDate,
       planningNo: event.planningNo,
       empId: event.isLoggedInEmp ? objfun.EmpRefId : event.empId,
+      empName: event.empName, // 💥 State-ku pudhu name pass pandrom
       isLoggedInEmp: event.isLoggedInEmp,
       emit: emit,
       existingState: current,
@@ -165,6 +165,7 @@ class VesselPlanningBloc extends Bloc<VesselPlanningEvent, VesselPlanningState> 
     required String toDate,
     required String planningNo,
     required int empId,
+    required String empName, // 💥 Parameter add pannirukkom
     required bool isLoggedInEmp,
     required Emitter<VesselPlanningState> emit,
     required VesselPlanningLoaded? existingState,
@@ -200,7 +201,7 @@ class VesselPlanningBloc extends Bloc<VesselPlanningEvent, VesselPlanningState> 
         toDate: toDate,
         planningNo: planningNo,
         empId: empId,
-        empName: existingState?.empName ?? '',
+        empName: empName, // 💥 existingState?.empName-ku bathila direct-a assign pandrom
         isLoggedInEmp: isLoggedInEmp,
       ));
     });
