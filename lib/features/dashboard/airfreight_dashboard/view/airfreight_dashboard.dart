@@ -1,8 +1,6 @@
 import 'package:flutter/Material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:intl/intl.dart';
-import 'package:maleva/features/dashboard/admin_dashboard/tabs/salesorder/bloc/salesorder_bloc.dart';
 import '../../../../core/di/injection.dart';
 import '../../../common_updates/blocs/sales/sales_bloc.dart';
 import '../../../common_updates/blocs/truck/truck_bloc.dart';
@@ -10,9 +8,6 @@ import '../../admin_dashboard/bloc/admin_tab_bloc.dart';
 import '../../admin_dashboard/tabs/inventoryreport/bloc/inventoryreport_bloc.dart';
 import '../../admin_dashboard/tabs/inventoryreport/data/inventoryreport_repository.dart';
 import '../../admin_dashboard/tabs/inventoryreport/view/inventoryview_tab.dart';
-import '../../admin_dashboard/tabs/rtiview/bloc/rtiview_bloc.dart';
-import '../../admin_dashboard/tabs/salary/bloc/salary_bloc.dart';
-import '../../admin_dashboard/tabs/salary/view/salary_tab.dart';
 import '../../admin_dashboard/tabs/spotsaleorder/bloc/spotsaleorder_bloc.dart';
 import '../../admin_dashboard/tabs/spotsaleorder/data/spotsale_repository.dart';
 import '../../admin_dashboard/tabs/spotsaleorder/view/spotsaleorder_add.dart';
@@ -105,7 +100,7 @@ class _AirfreightDashboardState extends State<AirfreightDashboard> with SingleTi
               isTablet: isTablet,
             ),
           ),
-        );                                      // ← MultiBlocProvider close
+        );
       },                                        // ← LayoutBuilder builder close
     );                                          // ← LayoutBuilder close
   }                                             // ← build() close

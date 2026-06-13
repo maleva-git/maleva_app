@@ -48,9 +48,12 @@ AssetImage lockimg = const AssetImage('assets/common/lockImg.png');
 // String port = "http://192.168.1.13:9007/";
 //String port = "http://103.215.139.8:8001/";
 // String port = "http://192.168.1.101:8003/";
+
 //String port = "http://103.215.139.121:9001/"; //Demos
-//String port = "http://103.215.139.8:8001/"; //Demolatest
-String port = "https://maleva.my"; //Live
+
+String port = "http://103.215.139.8:8001/"; //Demolatest
+
+//String port = "https://maleva.my"; //Live
 
 //String razorpaykey = "rzp_live_GmuWNB2PVXAnLt";
 

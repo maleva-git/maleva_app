@@ -78,17 +78,26 @@ class AirFreightBloc
       Emitter<AirFreightState> emit) {
     if (state is! AirFreightLoaded) return;
     final s = state as AirFreightLoaded;
-    final q = event.text.trim();
+    final q = event.text; // Use exact text, don't trim while typing
     List<dynamic> filtered = [];
+    int currentSaleOrderId = s.saleOrderId;
+
     if (q.isNotEmpty) {
       filtered = objfun.JobNoList
           .where((e) => e['CNumber'].toString().contains(q))
           .toList();
+
+      // Exact-a match aana auto-select the SaleOrderId
+      final exactMatch = filtered.where((e) => e['CNumber'].toString() == q).toList();
+      if (exactMatch.isNotEmpty) {
+        currentSaleOrderId = exactMatch.first['Id'];
+      }
     }
+
     emit(s.copyWith(
       jobNoText:        q,
       jobNoSuggestions: filtered,
-      saleOrderId:      0,
+      saleOrderId:      currentSaleOrderId, // ID ah maintain/update panrom
     ));
   }
 

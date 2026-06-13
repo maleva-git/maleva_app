@@ -15,8 +15,6 @@ import '../bloc/airfreight_bloc.dart';
 import '../bloc/airfreight_event.dart';
 import '../bloc/airfreight_state.dart';
 
-
-// ─── Design Tokens ────────────────────────────────────────────────────────────
 const kHeaderGradStart = Color(0xFF1A3A8F);
 const kHeaderGradEnd   = Color(0xFF4A6FD4);
 const kCardBorder      = Color(0xFFC5D0EE);
@@ -35,7 +33,6 @@ const kGradient = LinearGradient(
 
 const double kTabletBreak = 600;
 
-// ─── Root ─────────────────────────────────────────────────────────────────────
 class AirFrieghtUpdate extends StatelessWidget {
   final String? JobNo;
   final int?    JobId;
@@ -53,7 +50,6 @@ class AirFrieghtUpdate extends StatelessWidget {
   }
 }
 
-// ─── Page ─────────────────────────────────────────────────────────────────────
 class _AirFreightPage extends StatefulWidget {
   const _AirFreightPage();
 
@@ -323,7 +319,7 @@ class _JobNoRowState extends State<_JobNoRow> {
   @override
   void didUpdateWidget(_JobNoRow old) {
     super.didUpdateWidget(old);
-    if (widget.state.jobNoText != _ctrl.text) {
+    if (widget.state.jobNoText != _ctrl.text && FocusScope.of(context).hasFocus == false) {
       _ctrl.text = widget.state.jobNoText;
       _ctrl.selection = TextSelection.collapsed(
           offset: widget.state.jobNoText.length);
@@ -409,21 +405,25 @@ class _JobNoRowState extends State<_JobNoRow> {
                 isTablet: isTablet,
                 onPressed: () async {
                   if (s.jobNoText.isEmpty) {
-                    objfun.toastMsg(
-                        'Enter Job No', '', context);
+                    objfun.toastMsg('Enter Job No', '', context);
                     return;
                   }
-                  await OnlineApi.EditSalesOrder(
 
-                      s.saleOrderId,
-                      int.tryParse(s.jobNoText) ?? 0);
+                  // Backup lookup just in case ID missed
+                  int finalSaleId = s.saleOrderId;
+                  if (finalSaleId == 0) {
+                    final match = objfun.JobNoList.where((e) => e['CNumber'].toString() == s.jobNoText).toList();
+                    if(match.isNotEmpty) finalSaleId = match.first['Id'];
+                  }
+
+                  // Old code-la context pass panninga, puthu code la venumna API signature check pannikonga
+                  await OnlineApi.EditSalesOrder(finalSaleId, int.tryParse(s.jobNoText) ?? 0);
                   Navigator.push(
                     context,
                     MaterialPageRoute(
                       builder: (_) => SaleOrderDetails(
-                        saleDetails: null,
-                        saleMaster:
-                        objfun.SaleEditMasterList,
+                        saleDetails: null, // Note: Ensure naming matches your target class
+                        saleMaster: objfun.SaleEditMasterList,
                       ),
                     ),
                   );
