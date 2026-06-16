@@ -959,13 +959,19 @@ class _StatusField extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return InkWell(
-      onTap: () {
+      onTap: () async {
         if (state.statusName.isNotEmpty) {
           context
               .read<StockInEntryBloc>()
               .add(StockInEntryStatusCleared());
           return;
         }
+
+        // ──> நீங்க சொன்ன மாதிரி Common List-ஐ இங்க Load பண்றோம் <──
+        // JobAllStatus Screen-க்கு போறதுக்கு முன்னாடியே Data Load ஆகிடும்
+        await OnlineApi.SelectAllJobStatus(context, state.jobMasterId);
+
+        // அதுக்கப்புறம் நேவிகேஷன் நடக்கும்
         Navigator.push(
           context,
           MaterialPageRoute(
@@ -981,6 +987,7 @@ class _StatusField extends StatelessWidget {
                 StockInEntryStatusSelected(
                     statusId: sel.Status,
                     statusName: sel.StatusName));
+            // செலக்ட் பண்ண பிறகு காமன் லிஸ்ட்டை கிளியர் பண்றோம்
             objfun.SelectAllStatusList =
                 JobAllStatusModel.Empty();
           }

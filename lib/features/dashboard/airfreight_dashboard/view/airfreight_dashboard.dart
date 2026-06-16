@@ -5,6 +5,8 @@ import '../../../../core/di/injection.dart';
 import '../../../common_updates/blocs/sales/sales_bloc.dart';
 import '../../../common_updates/blocs/truck/truck_bloc.dart';
 import '../../admin_dashboard/bloc/admin_tab_bloc.dart';
+import '../../admin_dashboard/tabs/airfreightvessel/bloc/air_frieghtvessel_dashboard_bloc.dart';
+import '../../admin_dashboard/tabs/airfreightvessel/view/air_frieghtvessel_dashboard_page.dart';
 import '../../admin_dashboard/tabs/inventoryreport/bloc/inventoryreport_bloc.dart';
 import '../../admin_dashboard/tabs/inventoryreport/data/inventoryreport_repository.dart';
 import '../../admin_dashboard/tabs/inventoryreport/view/inventoryview_tab.dart';
@@ -69,8 +71,8 @@ class _AirfreightDashboardState extends State<AirfreightDashboard> with SingleTi
 
             BlocProvider(
               // Pass the context into sl() using param1
-              create: (context) => sl<VesselBloc>(param1: context),
-              child: VesselReportPage(),
+              create: (context) => sl<VesselDashboardBloc>(param1: context),
+              child: VesselDashboard(),
             ),
             BlocProvider(
               create: (context) => sl<TransportBloc>()

@@ -39,9 +39,12 @@ class BluetoothBloc extends Bloc<BluetoothEvent, BluetoothState> {
       BluetoothInitialized event,
       Emitter<BluetoothState> emit,
       ) async {
-    // Seed initial Bluetooth radio state from the static getter
+
+    // FIX 1: await used for isBlueOn
+    bool isBlueOn = await BluetoothPrintPlus.isBlueOn;
+
     emit(state.copyWith(
-      isBlueOn: BluetoothPrintPlus.isBlueOn,
+      isBlueOn: isBlueOn,
     ));
 
     // ── Subscribe to all hardware streams ─────────────────────────────────
@@ -66,30 +69,43 @@ class BluetoothBloc extends Bloc<BluetoothEvent, BluetoothState> {
     });
 
     _receivedDataSub = BluetoothPrintPlus.receivedData.listen((data) {
-      // Extend here to handle received data if needed
       debugPrint('Bluetooth received data: $data');
     });
 
     // ── Auto-connect when PrintData was passed ────────────────────────────
 
-    if (event.autoConnect && objfun.bluetoothdeviceList.isNotEmpty) {
-      final device = BluetoothDevice(
-        objfun.bluetoothdeviceList[0].name,
-        objfun.bluetoothdeviceList[0].address,
-      );
-      emit(state.copyWith(
-        isAutoConnecting: true,
-        selectedDevice:   device,
-        status:           BluetoothStatus.connectingToDevice,
-      ));
-      try {
-        await BluetoothPrintPlus.connect(device);
-      } catch (e, st) {
+    if (event.autoConnect) {
+      // FIX 2: Check if list is not empty, else throw error to avoid infinite loading
+      if (objfun.bluetoothdeviceList.isNotEmpty) {
+        // FIX 3: Correct BluetoothDevice object creation
+        final device = BluetoothDevice(
+          objfun.bluetoothdeviceList[0].name,
+          objfun.bluetoothdeviceList[0].address,
+        );
+
         emit(state.copyWith(
-          status:       BluetoothStatus.failure,
-          errorMessage: e.toString(),
+          isAutoConnecting: true,
+          selectedDevice:   device,
+          status:           BluetoothStatus.connectingToDevice,
         ));
-        _log(e, st);
+
+        try {
+          await BluetoothPrintPlus.connect(device);
+        } catch (e, st) {
+          emit(state.copyWith(
+            status:       BluetoothStatus.failure,
+            errorMessage: "Connection Failed: ${e.toString()}",
+            isAutoConnecting: false,
+          ));
+          _log(e, st);
+        }
+      } else {
+        // No device saved, but tried to auto-connect
+        emit(state.copyWith(
+          status: BluetoothStatus.failure,
+          errorMessage: 'No saved Bluetooth device found. Please scan and connect.',
+          isAutoConnecting: false,
+        ));
       }
     }
   }
@@ -101,8 +117,7 @@ class BluetoothBloc extends Bloc<BluetoothEvent, BluetoothState> {
       Emitter<BluetoothState> emit,
       ) async {
     try {
-      await BluetoothPrintPlus.startScan(
-          timeout: const Duration(seconds: 10));
+      await BluetoothPrintPlus.startScan(timeout: const Duration(seconds: 10));
     } catch (e, st) {
       emit(state.copyWith(
         status:       BluetoothStatus.failure,
@@ -186,29 +201,11 @@ class BluetoothBloc extends Bloc<BluetoothEvent, BluetoothState> {
   }
 
   // ── Save device to prefs ──────────────────────────────────────────────────
-  // Mirrors original saveclose() — saves device, updates global list.
-  // Emits BluetoothStatus.saved so the UI listener calls Navigator.pop().
 
-  Future<void> _saveDeviceAndClose(
-      Emitter<BluetoothState> emit) async {
+  Future<void> _saveDeviceAndClose(Emitter<BluetoothState> emit) async {
     try {
       final device = state.selectedDevice!;
-
       objfun.currentconnectionstate = true;
-
-      // Show toast (null context → Fluttertoast)
-      objfun.msgshow(
-        'Connected Successfully',
-        '',
-        Colors.white,
-        Colors.red,
-        null,
-        18.0 - objfun.reducesize,
-        objfun.tll,
-        objfun.tgc,
-        null,
-        2,
-      );
 
       // Update global device list
       objfun.bluetoothdeviceList.clear();
@@ -223,6 +220,9 @@ class BluetoothBloc extends Bloc<BluetoothEvent, BluetoothState> {
         'BlueTooth',
         jsonEncode(objfun.bluetoothdeviceList[0].toJson()),
       );
+
+      // FIX 4: Removed objfun.msgshow from here to avoid null context crash.
+      // Success message is now handled in the UI listener.
 
       emit(state.copyWith(
         status:         BluetoothStatus.saved,

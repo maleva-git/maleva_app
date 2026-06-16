@@ -7,23 +7,16 @@ import 'package:maleva/core/utils/clsfunction.dart' as objfun;
 import 'package:maleva/core/models/model.dart';
 
 import '../../../../../../core/di/injection.dart';
+import '../../../../../../core/theme/palette.dart';
 import '../bloc/drivermaintenance_bloc.dart';
 import '../bloc/drivermaintenance_event.dart';
 import '../bloc/drivermaintenance_state.dart';
 
-const kHeaderGradStart = Color(0xFF1A3A8F);
-const kHeaderGradEnd   = Color(0xFF4A6FD4);
-const kCardBorder      = Color(0xFFC5D0EE);
-const kPageBg          = Color(0xFFF4F6FB);
-const kTextDark        = Color(0xFF1E2D5E);
-const kTextMid         = Color(0xFF4A5A8A);
-const kTextMuted       = Color(0xFF8A96BF);
-const kDetailBg        = Color(0xFFF0F4FF);
-const kChipBg          = Color(0xFFEEF2FF);
-const kExpiredRed      = Color(0xFFD32F2F);
+
+
 
 const kGradient = LinearGradient(
-  colors: [kHeaderGradStart, kHeaderGradEnd],
+  colors: [Palette.blue700, Palette.blue400],
   begin: Alignment.topLeft,
   end: Alignment.bottomRight,
 );
@@ -57,7 +50,7 @@ class TruckMaintDashView extends StatelessWidget {
           return const Center(
             child: Padding(
               padding: EdgeInsets.all(20.0),
-              child: SpinKitFoldingCube(color: kHeaderGradEnd, size: 35),
+              child: SpinKitFoldingCube(color: Palette.blue400, size: 35),
             ),
           );
         }
@@ -75,7 +68,7 @@ class TruckMaintDashView extends StatelessWidget {
               padding: const EdgeInsets.all(20.0),
               child: Text(
                 state.message,
-                style: GoogleFonts.lato(color: kExpiredRed, fontSize: 13),
+                style: GoogleFonts.lato(color: Palette.kExpiredRed, fontSize: 13),
               ),
             ),
           );
@@ -121,7 +114,7 @@ class _TruckMaintDashBody extends StatelessWidget {
             child: Text(
               'TRUCK MAINTENANCE',
               style: GoogleFonts.lato(
-                color: kExpiredRed,
+                color: Palette.kExpiredRed,
                 fontWeight: FontWeight.w700,
                 fontSize: isTablet ? objfun.FontLarge + 2 : objfun.FontLarge,
                 letterSpacing: 0.3,
@@ -198,13 +191,13 @@ class _TruckDashCard extends StatelessWidget {
   });
 
   Color _expColor(String date) =>
-      _isExpired(date, state.expDate) ? kExpiredRed : kTextDark;
+      _isExpired(date, state.expDate) ? Palette.kExpiredRed : Palette.textDark2;
 
   Color _apadBonamColor(String date) =>
-      _isExpired(date, state.expApadBonam) ? kExpiredRed : kTextDark;
+      _isExpired(date, state.expApadBonam) ? Palette.kExpiredRed : Palette.textDark2;
 
   Color _serviceAlignGreeceColor(String date) =>
-      _isExpired(date, state.expServiceAlignGreece) ? kExpiredRed : kTextDark;
+      _isExpired(date, state.expServiceAlignGreece) ? Palette.kExpiredRed : Palette.textDark2;
 
   bool _isExpired(String licenseDate, String threshold) {
     if (threshold.isEmpty || licenseDate == 'null' || licenseDate.isEmpty) return false;
@@ -222,7 +215,7 @@ class _TruckDashCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final labelStyle = GoogleFonts.lato(
-      color: kTextMid,
+      color: Palette.textMid,
       fontWeight: FontWeight.w600,
       fontSize: isTablet ? objfun.FontLow + 1 : objfun.FontLow,
     );
@@ -232,10 +225,10 @@ class _TruckDashCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: kCardBorder, width: 0.5),
+        border: Border.all(color: Palette.cardBorder, width: 0.5),
         boxShadow: [
           BoxShadow(
-            color: kHeaderGradStart.withOpacity(0.07),
+            color: Palette.blue700.withOpacity(0.07),
             blurRadius: 10,
             offset: const Offset(0, 3),
           ),
@@ -251,13 +244,13 @@ class _TruckDashCard extends StatelessWidget {
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
               child: Row(
                 children: [
-                  const Icon(Icons.info_outline_rounded, size: 13, color: kTextMuted),
+                  const Icon(Icons.info_outline_rounded, size: 13, color: Palette.kTextMuted),
                   const SizedBox(width: 5),
                   Expanded(
                     child: Text(
                       'Expiry till: ${state.expDate}',
                       style: GoogleFonts.lato(
-                          color: kTextMuted,
+                          color: Palette.kTextMuted,
                           fontWeight: FontWeight.w500,
                           fontSize: isTablet ? 12 : 10),
                     ),
@@ -265,7 +258,7 @@ class _TruckDashCard extends StatelessWidget {
                 ],
               ),
             ),
-            const Divider(height: 1, color: kDetailBg),
+            const Divider(height: 1, color: Palette.grey200p),
             _SectionHeader(label: 'Truck 1', value: item.TruckNumber, isTablet: isTablet),
             _FieldRow('RotexMy Exp', _safe(item.RotexMyExp), _expColor(item.RotexMyExp), labelStyle),
             _FieldRow('RotexSG Exp', _safe(item.RotexSGExp), _expColor(item.RotexSGExp), labelStyle),
@@ -278,13 +271,13 @@ class _TruckDashCard extends StatelessWidget {
             _FieldRow('RotexSG1', _safe(item.RotexSGExp1), _expColor(item.RotexSGExp1), labelStyle),
             _FieldRow('PushpaCom1', _safe(item.PuspacomExp1), _expColor(item.PuspacomExp1), labelStyle),
             _FieldRow('Service Exp', _safe(item.ServiceExp), _serviceAlignGreeceColor(item.ServiceExp), labelStyle),
-            _FieldRow('Service Last', _safe(item.ServiceLast), kTextDark, labelStyle),
+            _FieldRow('Service Last', _safe(item.ServiceLast), Palette.textDark2, labelStyle),
             _FieldRow('AlignmentExp', _safe(item.AlignmentExp), _serviceAlignGreeceColor(item.AlignmentExp), labelStyle),
-            _FieldRow('AlignmentLast', _safe(item.AlignmentLast), kTextDark, labelStyle),
+            _FieldRow('AlignmentLast', _safe(item.AlignmentLast), Palette.textDark2, labelStyle),
             _FieldRow('Greece Exp', _safe(item.GreeceExp), _serviceAlignGreeceColor(item.GreeceExp), labelStyle),
-            _FieldRow('Greece Last', _safe(item.GreeceLast), kTextDark, labelStyle),
+            _FieldRow('Greece Last', _safe(item.GreeceLast), Palette.textDark2, labelStyle),
             _FieldRow('GearOil Exp', _safe(item.GearOilExp), _serviceAlignGreeceColor(item.GearOilExp), labelStyle),
-            _FieldRow('GearOil Last', _safe(item.GearOilLast), kTextDark, labelStyle),
+            _FieldRow('GearOil Last', _safe(item.GearOilLast), Palette.textDark2, labelStyle),
             _FieldRow('PTPSticker', _safe(item.PTPStickerExp), _serviceAlignGreeceColor(item.PTPStickerExp), labelStyle),
             const SizedBox(height: 8),
           ],
@@ -347,11 +340,11 @@ class _FieldRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isExpired = valueColor == kExpiredRed;
+    final isExpired = valueColor == Palette.kExpiredRed;
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
-      color: isExpired ? kExpiredRed.withOpacity(0.06) : Colors.transparent,
+      color: isExpired ? Palette.kExpiredRed.withOpacity(0.06) : Colors.transparent,
       child: Row(
         children: [
           Expanded(
@@ -366,7 +359,7 @@ class _FieldRow extends StatelessWidget {
                   Container(
                     width: 6,
                     height: 6,
-                    decoration: const BoxDecoration(color: kExpiredRed, shape: BoxShape.circle),
+                    decoration: const BoxDecoration(color: Palette.kExpiredRed, shape: BoxShape.circle),
                   ),
                   const SizedBox(width: 5),
                 ],
@@ -405,12 +398,12 @@ class _EmptyState extends StatelessWidget {
           Container(
             width: 64,
             height: 64,
-            decoration: BoxDecoration(color: kChipBg, borderRadius: BorderRadius.circular(16)),
-            child: const Icon(Icons.local_shipping_outlined, size: 32, color: kHeaderGradEnd),
+            decoration: BoxDecoration(color: Palette.grey200q, borderRadius: BorderRadius.circular(16)),
+            child: const Icon(Icons.local_shipping_outlined, size: 32, color: Palette.blue400),
           ),
           const SizedBox(height: 14),
           Text('No Truck Data',
-              style: GoogleFonts.lato(color: kTextDark, fontWeight: FontWeight.w600, fontSize: 15)),
+              style: GoogleFonts.lato(color: Palette.textDark2, fontWeight: FontWeight.w600, fontSize: 15)),
         ],
       ),
     );

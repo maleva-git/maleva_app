@@ -73,4 +73,8 @@ class Palette {
   static const kTextMuted     = Color(0xFF8A96BF);  // kChipBg
   static const kWhite = Colors.white;
 
+
+  static const kExpiredRed      = Color(0xFFD32F2F);
+
+
 }

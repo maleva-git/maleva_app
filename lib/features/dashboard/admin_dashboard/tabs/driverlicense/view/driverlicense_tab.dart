@@ -5,26 +5,15 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:maleva/core/utils/clsfunction.dart' as objfun;
 
 import '../../../../../../core/di/injection.dart';
+import '../../../../../../core/theme/palette.dart';
 import '../bloc/driverlicense_bloc.dart';
 import '../bloc/driverlicense_event.dart';
 import '../bloc/driverlicense_state.dart';
 
 
 
-// ─── Design Tokens ────────────────────────────────────────────────────────────
-const kHeaderGradStart = Color(0xFF1A3A8F);
-const kHeaderGradEnd   = Color(0xFF4A6FD4);
-const kCardBorder      = Color(0xFFC5D0EE);
-const kPageBg          = Color(0xFFF4F6FB);
-const kTextDark        = Color(0xFF1E2D5E);
-const kTextMid         = Color(0xFF4A5A8A);
-const kTextMuted       = Color(0xFF8A96BF);
-const kDetailBg        = Color(0xFFF0F4FF);
-const kChipBg          = Color(0xFFEEF2FF);
-const kAccentRed       = Color(0xFFB33040);
-
 const kGradient = LinearGradient(
-  colors: [kHeaderGradStart, kHeaderGradEnd],
+  colors: [Palette.blue700, Palette.blue400],
   begin: Alignment.topLeft,
   end: Alignment.bottomRight,
 );
@@ -74,7 +63,7 @@ class _DriverLicenseExpiryView extends StatelessWidget {
             state is DriverLicenseExpiryLoading) {
           return const Center(
             child: SpinKitFoldingCube(
-                color: kHeaderGradEnd, size: 35),
+                color: Palette.blue400, size: 35),
           );
         }
         if (state is DriverLicenseExpiryLoaded) {
@@ -93,7 +82,7 @@ class _DriverLicenseExpiryView extends StatelessWidget {
           return Center(
             child: Text(state.message,
                 style: GoogleFonts.lato(
-                    color: kAccentRed, fontSize: 13)),
+                    color: Palette.redAccent, fontSize: 13)),
           );
         }
         return const SizedBox.shrink();
@@ -125,7 +114,7 @@ class _DriverLicenseExpiryBody extends StatelessWidget {
             child: Text(
               'DRIVER LICENSE EXPIRY',
               style: GoogleFonts.lato(
-                color: kAccentRed,
+                color: Palette.redAccent,
                 fontWeight: FontWeight.w700,
                 fontSize: isTablet
                     ? objfun.FontLarge + 2
@@ -205,7 +194,7 @@ class _DriverCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final labelStyle = GoogleFonts.lato(
-      color: kTextMid,
+      color: Palette.textMid,
       fontWeight: FontWeight.w600,
       fontSize:
       isTablet ? objfun.FontLow + 1 : objfun.FontLow,
@@ -216,10 +205,10 @@ class _DriverCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: kCardBorder, width: 0.5),
+        border: Border.all(color: Palette.cardBorder, width: 0.5),
         boxShadow: [
           BoxShadow(
-            color: kHeaderGradStart.withOpacity(0.07),
+            color: Palette.blue700.withOpacity(0.07),
             blurRadius: 10,
             offset: const Offset(0, 3),
           ),
@@ -312,7 +301,7 @@ class _FieldRow extends StatelessWidget {
             child: Text(
               value.isEmpty ? '-' : value,
               style: GoogleFonts.lato(
-                color: kTextDark,
+                color: Palette.textDark2,
                 fontWeight: FontWeight.w600,
                 fontSize: labelStyle.fontSize,
               ),
@@ -340,15 +329,15 @@ class _EmptyState extends StatelessWidget {
             width: 64,
             height: 64,
             decoration: BoxDecoration(
-                color: kChipBg,
+                color: Palette.grey200q,
                 borderRadius: BorderRadius.circular(16)),
             child: const Icon(Icons.badge_outlined,
-                size: 32, color: kHeaderGradEnd),
+                size: 32, color: Palette.blue400),
           ),
           const SizedBox(height: 14),
           Text('No Driver Records',
               style: GoogleFonts.lato(
-                  color: kTextDark,
+                  color: Palette.textDark2,
                   fontWeight: FontWeight.w600,
                   fontSize: 15)),
         ],
