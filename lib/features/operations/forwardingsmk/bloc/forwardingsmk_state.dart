@@ -61,7 +61,7 @@ class FWSmkTabData {
           : fwDropdown as String?,
       date:        date        ?? this.date,
       dateEnabled: dateEnabled ?? this.dateEnabled,
-      original: original ?? this.original,
+      original:    original    ?? this.original,
     );
   }
 }

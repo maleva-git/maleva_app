@@ -133,7 +133,8 @@ class FWSmkBloc extends Bloc<FWSmkEvent, FWSmkState> {
             : m[0]['Forwarding'],
         date:        _parseDate(m[0]['ForwardingDate']),
         dateEnabled: m[0]['ForwardingDate'] != null,
-        original:    m[0]['Original'] == 1 || m[0]['Original'] == true,
+        original:    (m[0]['Original'] != null && (m[0]['Original'] == 1 || m[0]['Original'] == true)), // 🔥 Fix: Add null check
+
       );
       final tab2 = FWSmkTabData(
         smkNo:       m[0]['ForwardingSMKNo2'] ?? '',
@@ -145,7 +146,7 @@ class FWSmkBloc extends Bloc<FWSmkEvent, FWSmkState> {
             : m[0]['Forwarding2'],
         date:        _parseDate(m[0]['Forwarding2Date']),
         dateEnabled: m[0]['Forwarding2Date'] != null,
-        original:    m[0]['Original'] == 1 || m[0]['Original'] == true,
+        original:    (m[0]['Original'] != null && (m[0]['Original'] == 1 || m[0]['Original'] == true)), // 🔥 Fix: Add null check
       );
       final tab3 = FWSmkTabData(
         smkNo:       m[0]['ForwardingSMKNo3'] ?? '',
@@ -157,7 +158,7 @@ class FWSmkBloc extends Bloc<FWSmkEvent, FWSmkState> {
             : m[0]['Forwarding3'],
         date:        _parseDate(m[0]['Forwarding3Date']),
         dateEnabled: m[0]['Forwarding3Date'] != null,
-        original:    m[0]['Original'] == 1 || m[0]['Original'] == true,
+        original:    (m[0]['Original'] != null && (m[0]['Original'] == 1 || m[0]['Original'] == true)), // 🔥 Fix: Add null check
       );
 
       emit(s.copyWith(
@@ -205,6 +206,7 @@ class FWSmkBloc extends Bloc<FWSmkEvent, FWSmkState> {
         updated = tab.copyWith(fwDropdown: event.value);
         break;
       case 'original':
+      // 🔥 Fix: 'event.value' nu change pannunga. 'value' undefined nu varathu.
         updated = tab.copyWith(original: event.value == 'true');
         break;
       default:
