@@ -1,52 +1,47 @@
-
+import 'package:flutter/material.dart';
 
 abstract class AirFreightEvent {}
 
-// ── Startup ───────────────────────────────────────────────────────────────────
 class AirFreightStarted extends AirFreightEvent {
   final String? jobNo;
-  final int?    jobId;
-  AirFreightStarted({this.jobNo, this.jobId});
+  final int? jobId;
+  final BuildContext context;
+  AirFreightStarted({this.jobNo, this.jobId, required this.context});
 }
 
-// ── BillType radio ────────────────────────────────────────────────────────────
 class AirFreightBillTypeChanged extends AirFreightEvent {
   final String billType;
-  AirFreightBillTypeChanged(this.billType);
+  final BuildContext context;
+  AirFreightBillTypeChanged(this.billType, this.context);
 }
 
-// ── Job No autocomplete ───────────────────────────────────────────────────────
 class AirFreightJobNoTextChanged extends AirFreightEvent {
   final String text;
   AirFreightJobNoTextChanged(this.text);
 }
 
 class AirFreightJobNoSelected extends AirFreightEvent {
-  final int    saleOrderId;
+  final int saleOrderId;
   final String jobNo;
-  AirFreightJobNoSelected(
-      {required this.saleOrderId, required this.jobNo});
+  final BuildContext context;
+  AirFreightJobNoSelected({required this.saleOrderId, required this.jobNo, required this.context});
 }
 
 class AirFreightOverlayDismissed extends AirFreightEvent {}
 
-// ── Status search ─────────────────────────────────────────────────────────────
 class AirFreightStatusSelected extends AirFreightEvent {
-  final int    statusId;
+  final int statusId;
   final String statusName;
-  AirFreightStatusSelected(
-      {required this.statusId, required this.statusName});
+  AirFreightStatusSelected({required this.statusId, required this.statusName});
 }
 
 class AirFreightStatusCleared extends AirFreightEvent {}
 
-// ── AWB No text ───────────────────────────────────────────────────────────────
 class AirFreightAwbNoChanged extends AirFreightEvent {
   final String value;
   AirFreightAwbNoChanged(this.value);
 }
 
-// ── Image upload ──────────────────────────────────────────────────────────────
 class AirFreightImageUploadToggled extends AirFreightEvent {
   final bool value;
   AirFreightImageUploadToggled(this.value);
@@ -59,11 +54,13 @@ class AirFreightImagePicked extends AirFreightEvent {
 
 class AirFreightImageDeleted extends AirFreightEvent {
   final int index;
-  AirFreightImageDeleted(this.index);
+  final BuildContext context;
+  AirFreightImageDeleted(this.index, this.context);
 }
 
-// ── Save ──────────────────────────────────────────────────────────────────────
-class AirFreightSaveRequested extends AirFreightEvent {}
+class AirFreightSaveRequested extends AirFreightEvent {
+  final BuildContext context;
+  AirFreightSaveRequested(this.context);
+}
 
-// ── Clear / Reset ─────────────────────────────────────────────────────────────
 class AirFreightClearRequested extends AirFreightEvent {}

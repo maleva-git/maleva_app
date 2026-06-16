@@ -133,6 +133,8 @@ class FWSmkBloc extends Bloc<FWSmkEvent, FWSmkState> {
             : m[0]['Forwarding'],
         date:        _parseDate(m[0]['ForwardingDate']),
         dateEnabled: m[0]['ForwardingDate'] != null,
+        original:    (m[0]['Original'] != null && (m[0]['Original'] == 1 || m[0]['Original'] == true)), // 🔥 Fix: Add null check
+
       );
       final tab2 = FWSmkTabData(
         smkNo:       m[0]['ForwardingSMKNo2'] ?? '',
@@ -144,6 +146,7 @@ class FWSmkBloc extends Bloc<FWSmkEvent, FWSmkState> {
             : m[0]['Forwarding2'],
         date:        _parseDate(m[0]['Forwarding2Date']),
         dateEnabled: m[0]['Forwarding2Date'] != null,
+        original:    (m[0]['Original'] != null && (m[0]['Original'] == 1 || m[0]['Original'] == true)), // 🔥 Fix: Add null check
       );
       final tab3 = FWSmkTabData(
         smkNo:       m[0]['ForwardingSMKNo3'] ?? '',
@@ -155,6 +158,7 @@ class FWSmkBloc extends Bloc<FWSmkEvent, FWSmkState> {
             : m[0]['Forwarding3'],
         date:        _parseDate(m[0]['Forwarding3Date']),
         dateEnabled: m[0]['Forwarding3Date'] != null,
+        original:    (m[0]['Original'] != null && (m[0]['Original'] == 1 || m[0]['Original'] == true)), // 🔥 Fix: Add null check
       );
 
       emit(s.copyWith(
@@ -200,6 +204,10 @@ class FWSmkBloc extends Bloc<FWSmkEvent, FWSmkState> {
         break;
       case 'fwDropdown':
         updated = tab.copyWith(fwDropdown: event.value);
+        break;
+      case 'original':
+      // 🔥 Fix: 'event.value' nu change pannunga. 'value' undefined nu varathu.
+        updated = tab.copyWith(original: event.value == 'true');
         break;
       default:
         return;
@@ -262,6 +270,7 @@ class FWSmkBloc extends Bloc<FWSmkEvent, FWSmkState> {
         'Forwarding3Date': s.tab3.dateEnabled
             ? DateTime.parse(s.tab3.date).toIso8601String()
             : null,
+        'Original': s.tab1.original || s.tab2.original || s.tab3.original,
       };
 
       final header = {'Content-Type': 'application/json; charset=UTF-8'};

@@ -104,6 +104,7 @@ import '../../features/operations/forwarding/data/fwupdate_repository.dart';
 import '../../features/operations/forwardingsalary/bloc/forwardingsalary_bloc.dart';
 import '../../features/operations/forwardingsalary/data/forwardingsalary_repository.dart';
 
+
 final sl = GetIt.instance;
 
 Future<void> setupDependencies() async {
