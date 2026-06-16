@@ -14,6 +14,7 @@ class FWSmkTabData {
   final String? fwDropdown;   // K1/K2/K3/K8
   final String date;
   final bool dateEnabled;
+  final bool original;
 
   const FWSmkTabData({
     required this.smkNo,
@@ -23,6 +24,7 @@ class FWSmkTabData {
     required this.fwDropdown,
     required this.date,
     required this.dateEnabled,
+    required this.original,
   });
 
   static String _today() =>
@@ -36,6 +38,7 @@ class FWSmkTabData {
     fwDropdown:  null,
     date:        _today(),
     dateEnabled: false,
+    original: false,
   );
 
   FWSmkTabData copyWith({
@@ -46,6 +49,7 @@ class FWSmkTabData {
     Object? fwDropdown = _sentinel, // allows passing null explicitly
     String? date,
     bool? dateEnabled,
+    bool? original,
   }) {
     return FWSmkTabData(
       smkNo:       smkNo       ?? this.smkNo,
@@ -57,6 +61,7 @@ class FWSmkTabData {
           : fwDropdown as String?,
       date:        date        ?? this.date,
       dateEnabled: dateEnabled ?? this.dateEnabled,
+      original: original ?? this.original,
     );
   }
 }

@@ -689,7 +689,8 @@ class _MenuTileState extends State<_MenuTile>
             ctx,
             MaterialPageRoute(
               builder: (context) => BlocProvider(
-                create: (context) => AirFreightBloc()..add(AirFreightStarted()),
+                // 👇 Inga 'context: context' pass pannanum
+                create: (context) => AirFreightBloc()..add(AirFreightStarted(context: context)),
                 child: const AirFrieghtUpdate(),
               ),
             ),

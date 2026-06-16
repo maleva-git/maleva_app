@@ -4,7 +4,6 @@ import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:maleva/core/utils/clsfunction.dart' as objfun;
-import 'package:maleva/core/network/OnlineApi.dart' as OnlineApi;
 import 'package:maleva/menu/menulist.dart';
 import '../../../../core/theme/palette.dart';
 import '../bloc/forwardingsmk_bloc.dart';
@@ -155,7 +154,8 @@ class _FWSmkPageState extends State<_FWSmkPage>
         color: Colors.white,
         onPressed: () => Navigator.pop(context),
       ),
-      title: Column(
+      title:
+      Column(
         mainAxisAlignment: MainAxisAlignment.center,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -171,6 +171,7 @@ class _FWSmkPageState extends State<_FWSmkPage>
                   color: Colors.white.withOpacity(0.65),
                   fontWeight: FontWeight.w500,
                   fontSize: 12)),
+
         ],
       ),
       actions: [
@@ -204,6 +205,7 @@ class _FWSmkPageState extends State<_FWSmkPage>
           ),
         ),
       ],
+
       iconTheme: const IconThemeData(color: Colors.white),
     );
   }
@@ -503,7 +505,22 @@ class _FWSmkTabContentState extends State<_FWSmkTabContent> {
               _emit(FWSmkCheckboxChanged(tab: t, value: v)),
         ),
         const SizedBox(height: 12),
-
+        Container(
+          margin: const EdgeInsets.symmetric(vertical: 8),
+          padding: const EdgeInsets.symmetric(horizontal: 10),
+          decoration: BoxDecoration(color: kDetailBg, borderRadius: BorderRadius.circular(10)),
+          child: Row(
+            children: [
+              Checkbox(
+                value: tab.original,
+                activeColor: Palette.blue700,
+                onChanged: (v) => _emit(FWSmkFieldChanged(tab: t, field: 'original', value: v.toString())),
+              ),
+              Text("Original", style: GoogleFonts.lato(color: kTextDark, fontWeight: FontWeight.w600, fontSize: widget.isTablet ? objfun.FontLow + 1 : objfun.FontLow)),
+            ],
+          ),
+        ),
+        const SizedBox(height: 12),
         // ── FW Dropdown ──────────────────────────────────────────────
         _FieldLabel('FW $t', isTablet),
         const SizedBox(height: 6),
