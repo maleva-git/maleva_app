@@ -9,6 +9,7 @@ import 'package:maleva/core/utils/clsfunction.dart' as objfun;
 import 'package:maleva/core/network/OnlineApi.dart' as OnlineApi;
 import 'package:maleva/core/models/model.dart';
 import 'package:maleva/menu/menulist.dart';
+import '../../../../core/theme/palette.dart';
 import '../../../dashboard/admin_dashboard/tabs/saleorderdetails/view/saleorderdetails_tab.dart';
 import '../../../mastersearch/JobAllStatus.dart';
 import '../bloc/airfreight_bloc.dart';
@@ -16,26 +17,14 @@ import '../bloc/airfreight_event.dart';
 import '../bloc/airfreight_state.dart';
 
 
-// ─── Design Tokens ────────────────────────────────────────────────────────────
-const kHeaderGradStart = Color(0xFF1A3A8F);
-const kHeaderGradEnd   = Color(0xFF4A6FD4);
-const kCardBorder      = Color(0xFFC5D0EE);
-const kPageBg          = Color(0xFFF4F6FB);
-const kTextDark        = Color(0xFF1E2D5E);
-const kTextMid         = Color(0xFF4A5A8A);
-const kTextMuted       = Color(0xFF8A96BF);
-const kDetailBg        = Color(0xFFF0F4FF);
-const kChipBg          = Color(0xFFEEF2FF);
-
 const kGradient = LinearGradient(
-  colors: [kHeaderGradStart, kHeaderGradEnd],
+  colors: [Palette.blue700, Palette.blue400],
   begin: Alignment.topLeft,
   end: Alignment.bottomRight,
 );
 
 const double kTabletBreak = 600;
 
-// ─── Root ─────────────────────────────────────────────────────────────────────
 class AirFrieghtUpdate extends StatelessWidget {
   final String? JobNo;
   final int?    JobId;
@@ -53,7 +42,6 @@ class AirFrieghtUpdate extends StatelessWidget {
   }
 }
 
-// ─── Page ─────────────────────────────────────────────────────────────────────
 class _AirFreightPage extends StatefulWidget {
   const _AirFreightPage();
 
@@ -120,7 +108,7 @@ class _AirFreightPageState extends State<_AirFreightPage> {
         },
         child: Scaffold(
           resizeToAvoidBottomInset: true,
-          backgroundColor: kPageBg,
+          backgroundColor: Palette.grey100,
           appBar: _buildAppBar(context, userName),
           drawer: const Menulist(),
           body: BlocBuilder<AirFreightBloc, AirFreightState>(
@@ -129,7 +117,7 @@ class _AirFreightPageState extends State<_AirFreightPage> {
                   state is AirFreightLoading) {
                 return const Center(
                   child: SpinKitFoldingCube(
-                      color: kHeaderGradEnd, size: 35),
+                      color: Palette.blue400, size: 35),
                 );
               }
               if (state is AirFreightLoaded) {
@@ -323,7 +311,7 @@ class _JobNoRowState extends State<_JobNoRow> {
   @override
   void didUpdateWidget(_JobNoRow old) {
     super.didUpdateWidget(old);
-    if (widget.state.jobNoText != _ctrl.text) {
+    if (widget.state.jobNoText != _ctrl.text && FocusScope.of(context).hasFocus == false) {
       _ctrl.text = widget.state.jobNoText;
       _ctrl.selection = TextSelection.collapsed(
           offset: widget.state.jobNoText.length);
@@ -360,7 +348,7 @@ class _JobNoRowState extends State<_JobNoRow> {
                     .read<AirFreightBloc>()
                     .add(AirFreightJobNoTextChanged(v)),
                 style: GoogleFonts.lato(
-                    color: kTextDark,
+                    color: Palette.textDark2,
                     fontWeight: FontWeight.w600,
                     fontSize: isTablet
                         ? objfun.FontLow + 1
@@ -368,15 +356,15 @@ class _JobNoRowState extends State<_JobNoRow> {
                 decoration: InputDecoration(
                   hintText: 'Job No',
                   hintStyle: GoogleFonts.lato(
-                      color: kTextMuted,
+                      color: Palette.kTextMuted,
                       fontSize: isTablet
                           ? objfun.FontLow + 1
                           : objfun.FontLow),
                   filled: true,
-                  fillColor: kDetailBg,
+                  fillColor: Palette.grey200p,
                   prefixIcon: const Icon(
                       Icons.tag_rounded,
-                      color: kHeaderGradEnd,
+                      color: Palette.blue400,
                       size: 20),
                   contentPadding:
                   const EdgeInsets.symmetric(
@@ -389,13 +377,13 @@ class _JobNoRowState extends State<_JobNoRow> {
                     borderRadius:
                     BorderRadius.circular(12),
                     borderSide: const BorderSide(
-                        color: kCardBorder, width: 0.5),
+                        color: Palette.cardBorder, width: 0.5),
                   ),
                   focusedBorder: OutlineInputBorder(
                     borderRadius:
                     BorderRadius.circular(12),
                     borderSide: const BorderSide(
-                        color: kHeaderGradEnd, width: 1.5),
+                        color: Palette.blue400, width: 1.5),
                   ),
                 ),
               ),
@@ -409,21 +397,25 @@ class _JobNoRowState extends State<_JobNoRow> {
                 isTablet: isTablet,
                 onPressed: () async {
                   if (s.jobNoText.isEmpty) {
-                    objfun.toastMsg(
-                        'Enter Job No', '', context);
+                    objfun.toastMsg('Enter Job No', '', context);
                     return;
                   }
-                  await OnlineApi.EditSalesOrder(
 
-                      s.saleOrderId,
-                      int.tryParse(s.jobNoText) ?? 0);
+                  // Backup lookup just in case ID missed
+                  int finalSaleId = s.saleOrderId;
+                  if (finalSaleId == 0) {
+                    final match = objfun.JobNoList.where((e) => e['CNumber'].toString() == s.jobNoText).toList();
+                    if(match.isNotEmpty) finalSaleId = match.first['Id'];
+                  }
+
+                  // Old code-la context pass panninga, puthu code la venumna API signature check pannikonga
+                  await OnlineApi.EditSalesOrder(finalSaleId, int.tryParse(s.jobNoText) ?? 0);
                   Navigator.push(
                     context,
                     MaterialPageRoute(
                       builder: (_) => SaleOrderDetails(
-                        saleDetails: null,
-                        saleMaster:
-                        objfun.SaleEditMasterList,
+                        saleDetails: null, // Note: Ensure naming matches your target class
+                        saleMaster: objfun.SaleEditMasterList,
                       ),
                     ),
                   );
@@ -443,11 +435,11 @@ class _JobNoRowState extends State<_JobNoRow> {
               color: Colors.white,
               borderRadius: BorderRadius.circular(10),
               border: Border.all(
-                  color: kCardBorder, width: 0.5),
+                  color: Palette.cardBorder, width: 0.5),
               boxShadow: [
                 BoxShadow(
                   color:
-                  kHeaderGradStart.withOpacity(0.10),
+                  Palette.blue700.withOpacity(0.10),
                   blurRadius: 10,
                   offset: const Offset(0, 4),
                 ),
@@ -458,7 +450,7 @@ class _JobNoRowState extends State<_JobNoRow> {
               padding: EdgeInsets.zero,
               itemCount: s.jobNoSuggestions.length,
               separatorBuilder: (_, __) =>
-              const Divider(height: 1, color: kDetailBg),
+              const Divider(height: 1, color: Palette.grey200p),
               itemBuilder: (ctx, i) {
                 final item = s.jobNoSuggestions[i];
                 final cnum =
@@ -477,11 +469,11 @@ class _JobNoRowState extends State<_JobNoRow> {
                         const Icon(
                             Icons.work_outline_rounded,
                             size: 16,
-                            color: kHeaderGradEnd),
+                            color: Palette.blue400),
                         const SizedBox(width: 10),
                         Text(cnum,
                             style: GoogleFonts.lato(
-                                color: kTextDark,
+                                color: Palette.textDark2,
                                 fontWeight:
                                 FontWeight.w600,
                                 fontSize: isTablet
@@ -553,10 +545,10 @@ class _StatusField extends StatelessWidget {
         padding: const EdgeInsets.symmetric(
             horizontal: 14, vertical: 14),
         decoration: BoxDecoration(
-          color: kDetailBg,
+          color: Palette.grey200p,
           borderRadius: BorderRadius.circular(10),
           border:
-          Border.all(color: kCardBorder, width: 0.5),
+          Border.all(color: Palette.cardBorder, width: 0.5),
         ),
         child: Row(
           children: [
@@ -567,8 +559,8 @@ class _StatusField extends StatelessWidget {
                     : state.statusName,
                 style: GoogleFonts.lato(
                   color: state.statusName.isEmpty
-                      ? kTextMuted
-                      : kTextDark,
+                      ? Palette.kTextMuted
+                      : Palette.textDark2,
                   fontWeight: state.statusName.isEmpty
                       ? FontWeight.w500
                       : FontWeight.w600,
@@ -584,7 +576,7 @@ class _StatusField extends StatelessWidget {
                   ? Icons.close_rounded
                   : Icons.search_rounded,
               size: 20,
-              color: kHeaderGradEnd,
+              color: Palette.blue400,
             ),
           ],
         ),
@@ -640,7 +632,7 @@ class _AwbFieldState extends State<_AwbField> {
           .read<AirFreightBloc>()
           .add(AirFreightAwbNoChanged(v)),
       style: GoogleFonts.lato(
-          color: kTextDark,
+          color: Palette.textDark2,
           fontWeight: FontWeight.w600,
           fontSize: widget.isTablet
               ? objfun.FontLow + 1
@@ -648,12 +640,12 @@ class _AwbFieldState extends State<_AwbField> {
       decoration: InputDecoration(
         hintText: 'AWB NO',
         hintStyle: GoogleFonts.lato(
-            color: kTextMuted,
+            color: Palette.kTextMuted,
             fontSize: widget.isTablet
                 ? objfun.FontLow + 1
                 : objfun.FontLow),
         filled: true,
-        fillColor: kDetailBg,
+        fillColor: Palette.grey200p,
         contentPadding: const EdgeInsets.symmetric(
             horizontal: 14, vertical: 13),
         border: OutlineInputBorder(
@@ -662,11 +654,11 @@ class _AwbFieldState extends State<_AwbField> {
         enabledBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(10),
             borderSide: const BorderSide(
-                color: kCardBorder, width: 0.5)),
+                color: Palette.cardBorder, width: 0.5)),
         focusedBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(10),
             borderSide: const BorderSide(
-                color: kHeaderGradEnd, width: 1.5)),
+                color: Palette.blue400, width: 1.5)),
       ),
     );
   }
@@ -690,9 +682,9 @@ class _ImageUploadRow extends StatelessWidget {
       padding: const EdgeInsets.symmetric(
           horizontal: 12, vertical: 8),
       decoration: BoxDecoration(
-        color: kDetailBg,
+        color: Palette.grey200p,
         borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: kCardBorder, width: 0.5),
+        border: Border.all(color: Palette.cardBorder, width: 0.5),
       ),
       child: Row(
         children: [
@@ -711,7 +703,7 @@ class _ImageUploadRow extends StatelessWidget {
                 border: state.imageUploadEnabled
                     ? null
                     : Border.all(
-                    color: kCardBorder, width: 1.5),
+                    color: Palette.cardBorder, width: 1.5),
                 borderRadius: BorderRadius.circular(5),
               ),
               child: state.imageUploadEnabled
@@ -723,7 +715,7 @@ class _ImageUploadRow extends StatelessWidget {
           const SizedBox(width: 10),
           Text('Upload Image',
               style: GoogleFonts.lato(
-                  color: kTextDark,
+                  color: Palette.textDark2,
                   fontWeight: FontWeight.w600,
                   fontSize: isTablet
                       ? objfun.FontMedium + 1
@@ -770,13 +762,13 @@ class _PickBtn extends StatelessWidget {
         padding: const EdgeInsets.all(6),
         decoration: BoxDecoration(
           color: enabled
-              ? kHeaderGradStart.withOpacity(0.08)
+              ? Palette.blue700.withOpacity(0.08)
               : Colors.transparent,
           borderRadius: BorderRadius.circular(8),
         ),
         child: Icon(icon,
             size:  isTablet ? 28 : 24,
-            color: enabled ? kHeaderGradStart : kTextMuted),
+            color: enabled ? Palette.blue700 : Palette.kTextMuted),
       ),
     );
   }
@@ -800,7 +792,7 @@ class _ImageGrid extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: kCardBorder, width: 0.5),
+        border: Border.all(color: Palette.cardBorder, width: 0.5),
       ),
       child: state.images.isEmpty
           ? Center(
@@ -810,11 +802,11 @@ class _ImageGrid extends StatelessWidget {
           children: [
             Icon(Icons.image_outlined,
                 size: isTablet ? 48 : 36,
-                color: kTextMuted),
+                color: Palette.kTextMuted),
             const SizedBox(height: 8),
             Text('No images uploaded',
                 style: GoogleFonts.lato(
-                    color: kTextMuted,
+                    color: Palette.kTextMuted,
                     fontSize: 13)),
           ],
         ),
@@ -857,25 +849,25 @@ class _ImageGrid extends StatelessWidget {
                   fit: BoxFit.cover,
                   placeholder: (_, __) =>
                       Container(
-                        color: kDetailBg,
+                        color: Palette.grey200p,
                         child: const Center(
                           child: SizedBox(
                             width: 20,
                             height: 20,
                             child:
                             CircularProgressIndicator(
-                                color: kHeaderGradEnd,
+                                color: Palette.blue400,
                                 strokeWidth: 2),
                           ),
                         ),
                       ),
                   errorWidget: (_, __, ___) =>
                       Container(
-                        color: kDetailBg,
+                        color: Palette.grey200p,
                         child: const Icon(
                             Icons
                                 .image_not_supported_outlined,
-                            color: kHeaderGradEnd),
+                            color: Palette.blue400),
                       ),
                 ),
               ),
@@ -901,7 +893,7 @@ class _ImageGrid extends StatelessWidget {
                 imageUrl: url,
                 placeholder: (_, __) =>
                 const CircularProgressIndicator(
-                    color: kHeaderGradEnd),
+                    color: Palette.blue400),
               ),
             ),
             const SizedBox(height: 12),
@@ -910,7 +902,7 @@ class _ImageGrid extends StatelessWidget {
               child: IconButton(
                 onPressed: () => Navigator.pop(context),
                 icon: const Icon(Icons.close_rounded,
-                    color: kHeaderGradStart),
+                    color: Palette.blue700),
               ),
             ),
           ],
@@ -930,7 +922,7 @@ class _FieldLabel extends StatelessWidget {
   Widget build(BuildContext context) {
     return Text(text,
         style: GoogleFonts.lato(
-            color: kTextMid,
+            color: Palette.textMid,
             fontWeight: FontWeight.w600,
             fontSize: isTablet
                 ? objfun.FontLow + 1
@@ -950,19 +942,19 @@ class _ReadonlyInfoChip extends StatelessWidget {
       padding: const EdgeInsets.symmetric(
           horizontal: 12, vertical: 8),
       decoration: BoxDecoration(
-        color: kChipBg,
+        color: Palette.chipBg,
         borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: kCardBorder, width: 0.5),
+        border: Border.all(color: Palette.cardBorder, width: 0.5),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
           const Icon(Icons.flight_outlined,
-              size: 16, color: kHeaderGradEnd),
+              size: 16, color: Palette.blue400),
           const SizedBox(width: 8),
           Text(label,
               style: GoogleFonts.lato(
-                  color: kHeaderGradStart,
+                  color: Palette.blue700,
                   fontWeight: FontWeight.w600,
                   fontSize: isTablet
                       ? objfun.FontLow + 1
@@ -994,7 +986,7 @@ class _GradientButton extends StatelessWidget {
         borderRadius: BorderRadius.circular(10),
         boxShadow: [
           BoxShadow(
-              color: kHeaderGradStart.withOpacity(0.30),
+              color: Palette.blue700.withOpacity(0.30),
               blurRadius: 8,
               offset: const Offset(0, 3)),
         ],

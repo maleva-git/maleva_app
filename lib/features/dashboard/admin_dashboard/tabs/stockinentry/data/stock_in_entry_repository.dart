@@ -32,7 +32,6 @@ class StockInEntryRepository {
     return jobNoRes is List ? jobNoRes : [];
   }
 
-  // ─── Fetch Job Details & Parse Packages ────────────────────────────────────
   Future<Map<String, dynamic>> fetchJobDetails(int saleOrderId) async {
     final result = await ApiClient.postRequest("${objfun.apiSaleOrderDetailsLoad}$comid&Id=$saleOrderId", null);
 
@@ -52,14 +51,29 @@ class StockInEntryRepository {
         jobDate = data['SSaleDate'] ?? '';
         jobMasterId = data['JobMasterRefId'] ?? 0;
 
-        // Parse packages count from quantity string
         final qty = data['Quantity']?.toString() ?? '0';
         final match = RegExp(r'\d+').stringMatch(qty);
         weightPkg = int.tryParse(match ?? '0') ?? 0;
 
-        // Fetch dependent Job Statuses
-        final statusRes = await ApiClient.postRequest("${objfun.apiSelectAllJobStatus}$comid&JobMasterRefId=$jobMasterId", null);
-        jobStatuses = statusRes is List ? statusRes : [];
+        try {
+          final statusRes = await ApiClient.postRequest("${objfun.apiSelectAllJobStatus}$comid&Jobid=$jobMasterId", null);
+
+          if (statusRes != null && statusRes is List && statusRes.isNotEmpty) {
+
+            var firstItem = statusRes[0];
+
+            if (firstItem != null && firstItem['JobStatusDetails'] != null) {
+              jobStatuses = firstItem['JobStatusDetails'];
+            } else {
+              jobStatuses = [];
+            }
+
+          } else {
+            jobStatuses = [];
+          }
+        } catch (e) {
+          jobStatuses = [];
+        }
       }
     }
 
@@ -72,7 +86,6 @@ class StockInEntryRepository {
       'jobStatuses': jobStatuses,
     };
   }
-
   // ─── Delete Image ──────────────────────────────────────────────────────────
   Future<ResponseViewModel?> deleteImage(int saleOrderId, String folder, String imageName) async {
     final filePath = '/Upload/$comid/SalesOrder/$saleOrderId/$folder/$imageName';

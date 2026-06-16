@@ -125,7 +125,6 @@ class _MenulistState extends State<Menulist>
     );
   }
 
-  // ── Premium header card ────────────────────────────────────────────────────
   Widget _buildHeader() {
     return Padding(
       padding: const EdgeInsets.fromLTRB(18, 22, 18, 14),
@@ -271,7 +270,6 @@ class _MenulistState extends State<Menulist>
     );
   }
 
-  // ── Search bar ─────────────────────────────────────────────────────────────
   Widget _buildSearchBar() {
     return Padding(
       padding: const EdgeInsets.fromLTRB(18, 0, 18, 8),
@@ -320,7 +318,6 @@ class _MenulistState extends State<Menulist>
     );
   }
 
-  // ── Menu list ──────────────────────────────────────────────────────────────
   Widget _buildMenuList() {
     return ListView.builder(
       padding: const EdgeInsets.fromLTRB(14, 0, 14, 20),
@@ -334,7 +331,6 @@ class _MenulistState extends State<Menulist>
   }
 }
 
-// ─── Menu tile (recursive) ────────────────────────────────────────────────────
 
 class _MenuTile extends StatefulWidget {
   final MenuMasterModel entry;
@@ -404,7 +400,6 @@ class _MenuTileState extends State<_MenuTile>
     return _buildLeaf();
   }
 
-  // ── Leaf ──────────────────────────────────────────────────────────────────
   Widget _buildLeaf() {
     final meta = _metaFor(widget.entry.FormText);
     return GestureDetector(
@@ -485,7 +480,6 @@ class _MenuTileState extends State<_MenuTile>
     );
   }
 
-  // ── Parent ─────────────────────────────────────────────────────────────────
   Widget _buildParent() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,

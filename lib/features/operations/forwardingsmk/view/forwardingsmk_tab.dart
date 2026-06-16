@@ -6,15 +6,12 @@ import 'package:intl/intl.dart';
 import 'package:maleva/core/utils/clsfunction.dart' as objfun;
 import 'package:maleva/core/network/OnlineApi.dart' as OnlineApi;
 import 'package:maleva/menu/menulist.dart';
+import '../../../../core/theme/palette.dart';
 import '../bloc/forwardingsmk_bloc.dart';
 import '../bloc/forwardingsmk_event.dart';
 import '../bloc/forwardingsmk_state.dart';
 
 
-// ─── Design Tokens ────────────────────────────────────────────────────────────
-const kHeaderGradStart = Color(0xFF1A3A8F);
-const kHeaderGradEnd   = Color(0xFF4A6FD4);
-const kCardBorder      = Color(0xFFC5D0EE);
 const kPageBg          = Color(0xFFF4F6FB);
 const kTextDark        = Color(0xFF1E2D5E);
 const kTextMid         = Color(0xFF4A5A8A);
@@ -23,7 +20,7 @@ const kDetailBg        = Color(0xFFF0F4FF);
 const kChipBg          = Color(0xFFEEF2FF);
 
 const kGradient = LinearGradient(
-  colors: [kHeaderGradStart, kHeaderGradEnd],
+  colors: [Palette.blue700, Palette.blue400],
   begin: Alignment.topLeft,
   end: Alignment.bottomRight,
 );
@@ -110,7 +107,7 @@ class _FWSmkPageState extends State<_FWSmkPage>
             builder: (context, state) {
               if (state is FWSmkInitial || state is FWSmkLoading) {
                 return const Center(
-                  child: SpinKitFoldingCube(color: kHeaderGradEnd, size: 35),
+                  child: SpinKitFoldingCube(color: Palette.blue400, size: 35),
                 );
               }
               if (state is FWSmkLoaded) {
@@ -325,7 +322,7 @@ class _JobNoSectionState extends State<_JobNoSection> {
               filled: true,
               fillColor: kDetailBg,
               prefixIcon: const Icon(Icons.tag_rounded,
-                  color: kHeaderGradEnd, size: 20),
+                  color: Palette.blue400, size: 20),
               contentPadding: const EdgeInsets.symmetric(
                   horizontal: 14, vertical: 13),
               border: OutlineInputBorder(
@@ -334,12 +331,12 @@ class _JobNoSectionState extends State<_JobNoSection> {
               enabledBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(12),
                 borderSide:
-                const BorderSide(color: kCardBorder, width: 0.5),
+                const BorderSide(color: Palette.cardBorder, width: 0.5),
               ),
               focusedBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(12),
                 borderSide:
-                const BorderSide(color: kHeaderGradEnd, width: 1.5),
+                const BorderSide(color: Palette.blue400, width: 1.5),
               ),
             ),
             onChanged: (v) => context
@@ -355,10 +352,10 @@ class _JobNoSectionState extends State<_JobNoSection> {
               decoration: BoxDecoration(
                 color: Colors.white,
                 borderRadius: BorderRadius.circular(10),
-                border: Border.all(color: kCardBorder, width: 0.5),
+                border: Border.all(color: Palette.cardBorder, width: 0.5),
                 boxShadow: [
                   BoxShadow(
-                    color: kHeaderGradStart.withOpacity(0.10),
+                    color: Palette.blue700.withOpacity(0.10),
                     blurRadius: 10,
                     offset: const Offset(0, 4),
                   ),
@@ -383,7 +380,7 @@ class _JobNoSectionState extends State<_JobNoSection> {
                       child: Row(
                         children: [
                           const Icon(Icons.work_outline_rounded,
-                              size: 16, color: kHeaderGradEnd),
+                              size: 16, color: Palette.blue400),
                           const SizedBox(width: 10),
                           Text(cnum,
                               style: GoogleFonts.lato(
@@ -487,7 +484,7 @@ class _FWSmkTabContentState extends State<_FWSmkTabContent> {
               builder: (ctx, child) => Theme(
                 data: Theme.of(ctx).copyWith(
                   colorScheme: const ColorScheme.light(
-                    primary: kHeaderGradStart,
+                    primary: Palette.blue700,
                     onPrimary: Colors.white,
                     surface: Colors.white,
                     onSurface: kTextDark,
@@ -606,7 +603,7 @@ class _DateCheckRow extends StatelessWidget {
               decoration: BoxDecoration(
                 color: kDetailBg,
                 borderRadius: BorderRadius.circular(10),
-                border: Border.all(color: kCardBorder, width: 0.5),
+                border: Border.all(color: Palette.cardBorder, width: 0.5),
               ),
               child: Row(
                 children: [
@@ -624,7 +621,7 @@ class _DateCheckRow extends StatelessWidget {
                   Icon(
                     Icons.calendar_month_outlined,
                     size: 20,
-                    color: tab.dateEnabled ? kHeaderGradEnd : kTextMuted,
+                    color: tab.dateEnabled ? Palette.blue400 : kTextMuted,
                   ),
                 ],
               ),
@@ -645,7 +642,7 @@ class _DateCheckRow extends StatelessWidget {
               gradient: tab.dateEnabled ? kGradient : null,
               border: tab.dateEnabled
                   ? null
-                  : Border.all(color: kCardBorder, width: 1.5),
+                  : Border.all(color: Palette.cardBorder, width: 1.5),
               borderRadius: BorderRadius.circular(6),
             ),
             child: tab.dateEnabled
@@ -677,7 +674,7 @@ class _FWDropdown extends StatelessWidget {
       decoration: BoxDecoration(
         color: kDetailBg,
         borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: kCardBorder, width: 0.5),
+        border: Border.all(color: Palette.cardBorder, width: 0.5),
       ),
       child: DropdownButtonHideUnderline(
         child: DropdownButton<String>(
@@ -695,7 +692,7 @@ class _FWDropdown extends StatelessWidget {
           dropdownColor: Colors.white,
           borderRadius: BorderRadius.circular(10),
           icon: const Icon(Icons.keyboard_arrow_down_rounded,
-              color: kHeaderGradEnd),
+              color: Palette.blue400),
           onChanged: (v) {
             if (v != null) onChanged(v);
           },
@@ -731,7 +728,7 @@ class _BillTypeRow extends StatelessWidget {
       decoration: BoxDecoration(
         color: kDetailBg,
         borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: kCardBorder, width: 0.5),
+        border: Border.all(color: Palette.cardBorder, width: 0.5),
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -791,7 +788,7 @@ class _RadioOption extends StatelessWidget {
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
                 border: Border.all(
-                  color: selected ? kHeaderGradEnd : kCardBorder,
+                  color: selected ? Palette.blue400 : Palette.cardBorder,
                   width: selected ? 0 : 1.5,
                 ),
                 gradient: selected ? kGradient : null,
@@ -804,7 +801,7 @@ class _RadioOption extends StatelessWidget {
             Text(
               label,
               style: GoogleFonts.lato(
-                color: selected ? kHeaderGradStart : kTextMid,
+                color: selected ? Palette.blue700 : kTextMid,
                 fontWeight: FontWeight.w700,
                 fontSize:
                 isTablet ? objfun.FontMedium + 1 : objfun.FontMedium,
@@ -828,11 +825,11 @@ class _FWBottomNav extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       decoration: const BoxDecoration(
-          border: Border(top: BorderSide(color: kCardBorder, width: 0.5))),
+          border: Border(top: BorderSide(color: Palette.cardBorder, width: 0.5))),
       child: BottomNavigationBar(
         backgroundColor: Colors.white,
         currentIndex: currentIndex,
-        selectedItemColor: kHeaderGradStart,
+        selectedItemColor: Palette.blue700,
         unselectedItemColor: kTextMuted,
         selectedLabelStyle: GoogleFonts.lato(
             fontWeight: FontWeight.w700, fontSize: objfun.FontLow),
@@ -910,11 +907,11 @@ class _SMKTextField extends StatelessWidget {
             borderSide: BorderSide.none),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(10),
-          borderSide: const BorderSide(color: kCardBorder, width: 0.5),
+          borderSide: const BorderSide(color: Palette.cardBorder, width: 0.5),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(10),
-          borderSide: const BorderSide(color: kHeaderGradEnd, width: 1.5),
+          borderSide: const BorderSide(color: Palette.blue400, width: 1.5),
         ),
       ),
     );

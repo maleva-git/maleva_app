@@ -8,15 +8,9 @@ import 'package:maleva/core/theme/palette.dart';
 import '../../theme/tokens.dart';
 import '../bloc/bluetooth_bloc.dart';
 
-// ─────────────────────────────────────────────────────────────────────────────
-// Entry point
-// ─────────────────────────────────────────────────────────────────────────────
-
 class BluetoothPage extends StatelessWidget {
   const BluetoothPage({super.key, this.printData});
 
-  /// When non-null the page auto-connects to the saved device and shows
-  /// a spinner instead of the scan list — matches original PrintData behaviour.
   final List<BarcodePrintModel>? printData;
 
   @override
@@ -29,21 +23,15 @@ class BluetoothPage extends StatelessWidget {
   }
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// View
-// ─────────────────────────────────────────────────────────────────────────────
-
 class _BluetoothView extends StatelessWidget {
   const _BluetoothView({required this.isPrintMode});
 
-  /// true  → auto-connect spinner mode (PrintData was passed)
-  /// false → scan / device-list mode
   final bool isPrintMode;
 
   @override
   Widget build(BuildContext context) {
     return BlocConsumer<BluetoothBloc, BluetoothState>(
-      listener: _handleListener,
+      listener: (ctx, state) => _handleListener(ctx, state, isPrintMode),
       builder: (ctx, state) {
         return Scaffold(
           backgroundColor: AppTokens.surfacePage,
@@ -60,46 +48,47 @@ class _BluetoothView extends StatelessWidget {
 
   // ── Listener ──────────────────────────────────────────────────────────────
 
-  void _handleListener(BuildContext ctx, BluetoothState state) {
+  void _handleListener(BuildContext ctx, BluetoothState state, bool isPrintMode) {
     // Device saved → pop back to caller
     if (state.isSaved) {
+      // FIX: Showing success message here safely with valid context
+      ScaffoldMessenger.of(ctx).showSnackBar(SnackBar(
+        backgroundColor: AppTokens.statusSuccess,
+        content: Text('Connected Successfully', style: GoogleFonts.lato(color: Palette.white)),
+        duration: const Duration(seconds: 2),
+      ));
       Navigator.of(ctx).pop();
       return;
     }
 
     // Show error snackbar
-    if (state.status == BluetoothStatus.failure &&
-        state.errorMessage.isNotEmpty) {
+    if (state.status == BluetoothStatus.failure && state.errorMessage.isNotEmpty) {
       ScaffoldMessenger.of(ctx).showSnackBar(SnackBar(
         backgroundColor: Palette.redError,
-        content: Text(state.errorMessage,
-            style: GoogleFonts.lato(color: Palette.white)),
+        content: Text(state.errorMessage, style: GoogleFonts.lato(color: Palette.white)),
         duration: const Duration(seconds: 3),
       ));
+
+      // FIX 5: If connection fails while in AutoConnect mode, pop the screen
+      // so it doesn't freeze the app with an infinite loading spinner.
+      if (isPrintMode) {
+        Navigator.of(ctx).pop();
+      }
     }
   }
 
   // ── AppBar ─────────────────────────────────────────────────────────────────
 
-  PreferredSizeWidget _buildAppBar(
-      BuildContext ctx, BluetoothState state) {
+  PreferredSizeWidget _buildAppBar(BuildContext ctx, BluetoothState state) {
     return AppBar(
-      flexibleSpace: Container(
-          decoration:
-          const BoxDecoration(gradient: AppTokens.headerGradient)),
+      flexibleSpace: Container(decoration: const BoxDecoration(gradient: AppTokens.headerGradient)),
       backgroundColor: Colors.transparent,
       elevation: 0,
-      iconTheme:
-      const IconThemeData(color: AppTokens.appBarIcon),
+      iconTheme: const IconThemeData(color: AppTokens.appBarIcon),
       title: Text(
         'Bluetooth',
-        style: GoogleFonts.lato(
-          color: AppTokens.appBarTitle,
-          fontWeight: FontWeight.bold,
-          fontSize: 18,
-        ),
+        style: GoogleFonts.lato(color: AppTokens.appBarTitle, fontWeight: FontWeight.bold, fontSize: 18),
       ),
-      // Status indicator chip
       actions: [
         Padding(
           padding: const EdgeInsets.only(right: 12),
@@ -116,29 +105,17 @@ class _BluetoothView extends StatelessWidget {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          SpinKitFoldingCube(
-            color: Palette.redError,
-            size: 35,
-          ),
+          SpinKitFoldingCube(color: Palette.redError, size: 35),
           const SizedBox(height: 16),
           Text(
-            state.isConnecting
-                ? 'Connecting to printer…'
-                : 'Preparing print…',
-            style: GoogleFonts.lato(
-              color: AppTokens.textSecondary,
-              fontSize: 14,
-            ),
+            state.isConnecting ? 'Connecting to printer…' : 'Preparing print…',
+            style: GoogleFonts.lato(color: AppTokens.textSecondary, fontSize: 14),
           ),
           if (state.selectedDevice != null) ...[
             const SizedBox(height: 8),
             Text(
-              state.selectedDevice!.name,
-              style: GoogleFonts.lato(
-                color: AppTokens.textPrimary,
-                fontWeight: FontWeight.bold,
-                fontSize: 13,
-              ),
+              state.selectedDevice!.name ?? 'Unknown Device',
+              style: GoogleFonts.lato(color: AppTokens.textPrimary, fontWeight: FontWeight.bold, fontSize: 13),
             ),
           ],
         ],
@@ -148,8 +125,7 @@ class _BluetoothView extends StatelessWidget {
 
   // ── Scan mode ─────────────────────────────────────────────────────────────
 
-  Widget _buildScanBody(
-      BuildContext ctx, BluetoothState state) {
+  Widget _buildScanBody(BuildContext ctx, BluetoothState state) {
     if (!state.isBlueOn) return _BlueOffWidget();
 
     if (state.scanResults.isEmpty) {
@@ -157,18 +133,11 @@ class _BluetoothView extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(Icons.bluetooth_searching,
-                size: 64,
-                color: AppTokens.brandPrimary.withOpacity(0.4)),
+            Icon(Icons.bluetooth_searching, size: 64, color: AppTokens.brandPrimary.withOpacity(0.4)),
             const SizedBox(height: 12),
             Text(
-              state.isScanning
-                  ? 'Scanning for devices…'
-                  : 'Tap SCAN to find devices',
-              style: GoogleFonts.lato(
-                color: AppTokens.textSecondary,
-                fontSize: 14,
-              ),
+              state.isScanning ? 'Scanning for devices…' : 'Tap SCAN to find devices',
+              style: GoogleFonts.lato(color: AppTokens.textSecondary, fontSize: 14),
             ),
           ],
         ),
@@ -176,16 +145,12 @@ class _BluetoothView extends StatelessWidget {
     }
 
     return ListView.builder(
-      padding: const EdgeInsets.symmetric(
-          horizontal: 12, vertical: 8),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       itemCount: state.scanResults.length,
       itemBuilder: (_, i) => _DeviceRow(
         device: state.scanResults[i],
-        isConnecting: state.isConnecting &&
-            state.selectedDevice?.address ==
-                state.scanResults[i].address,
-        onConnect: () => ctx.read<BluetoothBloc>().add(
-            BluetoothDeviceConnectRequested(state.scanResults[i])),
+        isConnecting: state.isConnecting && state.selectedDevice?.address == state.scanResults[i].address,
+        onConnect: () => ctx.read<BluetoothBloc>().add(BluetoothDeviceConnectRequested(state.scanResults[i])),
       ),
     );
   }
@@ -198,34 +163,20 @@ class _BluetoothView extends StatelessWidget {
     return state.isScanning
         ? FloatingActionButton(
       backgroundColor: Palette.red,
-      onPressed: () =>
-          ctx.read<BluetoothBloc>().add(const BluetoothScanStopped()),
+      onPressed: () => ctx.read<BluetoothBloc>().add(const BluetoothScanStopped()),
       child: const Icon(Icons.stop, color: Palette.white),
     )
         : FloatingActionButton.extended(
       backgroundColor: AppTokens.statusSuccess,
-      onPressed: () =>
-          ctx.read<BluetoothBloc>().add(const BluetoothScanStarted()),
-      icon: const Icon(Icons.bluetooth_searching,
-          color: Palette.white),
-      label: Text('SCAN',
-          style: GoogleFonts.lato(
-              color: Palette.white,
-              fontWeight: FontWeight.bold)),
+      onPressed: () => ctx.read<BluetoothBloc>().add(const BluetoothScanStarted()),
+      icon: const Icon(Icons.bluetooth_searching, color: Palette.white),
+      label: Text('SCAN', style: GoogleFonts.lato(color: Palette.white, fontWeight: FontWeight.bold)),
     );
   }
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// Device list row
-// ─────────────────────────────────────────────────────────────────────────────
-
 class _DeviceRow extends StatelessWidget {
-  const _DeviceRow({
-    required this.device,
-    required this.isConnecting,
-    required this.onConnect,
-  });
+  const _DeviceRow({required this.device, required this.isConnecting, required this.onConnect});
 
   final BluetoothDevice device;
   final bool isConnecting;
@@ -237,87 +188,48 @@ class _DeviceRow extends StatelessWidget {
       margin: const EdgeInsets.only(bottom: 8),
       elevation: 2,
       color: AppTokens.surfaceCard,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(10),
-        side: const BorderSide(color: AppTokens.surfaceCardBorder),
-      ),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10), side: const BorderSide(color: AppTokens.surfaceCardBorder)),
       child: Padding(
-        padding: const EdgeInsets.symmetric(
-            horizontal: 14, vertical: 12),
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
         child: Row(
           children: [
-            // ── Device icon ─────────────────────────────────────────
             Container(
-              width: 40,
-              height: 40,
-              decoration: BoxDecoration(
-                color: AppTokens.brandPrimary.withOpacity(0.10),
-                shape: BoxShape.circle,
-              ),
-              child: const Icon(Icons.bluetooth,
-                  color: AppTokens.brandPrimary, size: 20),
+              width: 40, height: 40,
+              decoration: BoxDecoration(color: AppTokens.brandPrimary.withOpacity(0.10), shape: BoxShape.circle),
+              child: const Icon(Icons.bluetooth, color: AppTokens.brandPrimary, size: 20),
             ),
             const SizedBox(width: 12),
-
-            // ── Name + address ───────────────────────────────────────
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    device.name.isNotEmpty
-                        ? device.name
-                        : 'Unknown Device',
-                    style: GoogleFonts.lato(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 14,
-                      color: AppTokens.textPrimary,
-                    ),
+                    (device.name != null && device.name!.isNotEmpty) ? device.name! : 'Unknown Device',
+                    style: GoogleFonts.lato(fontWeight: FontWeight.bold, fontSize: 14, color: AppTokens.textPrimary),
                   ),
                   const SizedBox(height: 2),
                   Text(
-                    device.address,
+                    device.address ?? '',
                     overflow: TextOverflow.ellipsis,
-                    style: GoogleFonts.lato(
-                      fontSize: 12,
-                      color: AppTokens.textSecondary,
-                    ),
+                    style: GoogleFonts.lato(fontSize: 12, color: AppTokens.textSecondary),
                   ),
                 ],
               ),
             ),
-
             const SizedBox(width: 10),
-
-            // ── Connect button ───────────────────────────────────────
             isConnecting
                 ? const SizedBox(
-              width: 24,
-              height: 24,
-              child: CircularProgressIndicator(
-                strokeWidth: 2,
-                valueColor: AlwaysStoppedAnimation<Color>(
-                    AppTokens.brandPrimary),
-              ),
+              width: 24, height: 24,
+              child: CircularProgressIndicator(strokeWidth: 2, valueColor: AlwaysStoppedAnimation<Color>(AppTokens.brandPrimary)),
             )
                 : OutlinedButton(
               style: OutlinedButton.styleFrom(
-                side: const BorderSide(
-                    color: AppTokens.brandPrimary),
-                shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8)),
-                padding: const EdgeInsets.symmetric(
-                    horizontal: 14, vertical: 8),
+                side: const BorderSide(color: AppTokens.brandPrimary),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
               ),
               onPressed: onConnect,
-              child: Text(
-                'Connect',
-                style: GoogleFonts.lato(
-                  color: AppTokens.brandPrimary,
-                  fontWeight: FontWeight.bold,
-                  fontSize: 13,
-                ),
-              ),
+              child: Text('Connect', style: GoogleFonts.lato(color: AppTokens.brandPrimary, fontWeight: FontWeight.bold, fontSize: 13)),
             ),
           ],
         ),
@@ -325,10 +237,6 @@ class _DeviceRow extends StatelessWidget {
     );
   }
 }
-
-// ─────────────────────────────────────────────────────────────────────────────
-// Status chip shown in AppBar
-// ─────────────────────────────────────────────────────────────────────────────
 
 class _StatusChip extends StatelessWidget {
   const _StatusChip({required this.state});
@@ -355,30 +263,14 @@ class _StatusChip extends StatelessWidget {
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Container(
-            width: 6,
-            height: 6,
-            decoration:
-            BoxDecoration(color: color, shape: BoxShape.circle),
-          ),
+          Container(width: 6, height: 6, decoration: BoxDecoration(color: color, shape: BoxShape.circle)),
           const SizedBox(width: 5),
-          Text(
-            label,
-            style: GoogleFonts.lato(
-              color: color,
-              fontWeight: FontWeight.bold,
-              fontSize: 11,
-            ),
-          ),
+          Text(label, style: GoogleFonts.lato(color: color, fontWeight: FontWeight.bold, fontSize: 11)),
         ],
       ),
     );
   }
 }
-
-// ─────────────────────────────────────────────────────────────────────────────
-// Bluetooth off widget
-// ─────────────────────────────────────────────────────────────────────────────
 
 class _BlueOffWidget extends StatelessWidget {
   @override
@@ -387,27 +279,11 @@ class _BlueOffWidget extends StatelessWidget {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(Icons.bluetooth_disabled,
-              size: 64, color: Palette.redError.withOpacity(0.7)),
+          Icon(Icons.bluetooth_disabled, size: 64, color: Palette.redError.withOpacity(0.7)),
           const SizedBox(height: 16),
-          Text(
-            'Bluetooth is turned off',
-            style: GoogleFonts.lato(
-              color: Palette.redError,
-              fontWeight: FontWeight.bold,
-              fontSize: 16,
-            ),
-            textAlign: TextAlign.center,
-          ),
+          Text('Bluetooth is turned off', style: GoogleFonts.lato(color: Palette.redError, fontWeight: FontWeight.bold, fontSize: 16), textAlign: TextAlign.center),
           const SizedBox(height: 6),
-          Text(
-            'Please turn on Bluetooth to scan for devices',
-            style: GoogleFonts.lato(
-              color: AppTokens.textSecondary,
-              fontSize: 13,
-            ),
-            textAlign: TextAlign.center,
-          ),
+          Text('Please turn on Bluetooth to scan for devices', style: GoogleFonts.lato(color: AppTokens.textSecondary, fontSize: 13), textAlign: TextAlign.center),
         ],
       ),
     );

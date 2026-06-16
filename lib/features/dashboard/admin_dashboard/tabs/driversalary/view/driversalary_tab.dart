@@ -6,26 +6,16 @@ import 'package:intl/intl.dart';
 import 'package:maleva/core/utils/clsfunction.dart' as objfun;
 
 import '../../../../../../core/di/injection.dart';
+import '../../../../../../core/theme/palette.dart';
 import '../bloc/driversalary_bloc.dart';
 import '../bloc/driversalary_event.dart';
 import '../bloc/driversalary_state.dart';
 
 
-// ─── Design Tokens ────────────────────────────────────────────────────────────
-const kHeaderGradStart = Color(0xFF1A3A8F);
-const kHeaderGradEnd   = Color(0xFF4A6FD4);
-const kCardBorder      = Color(0xFFC5D0EE);
-const kPageBg          = Color(0xFFF4F6FB);
-const kTextDark        = Color(0xFF1E2D5E);
-const kTextMid         = Color(0xFF4A5A8A);
-const kTextMuted       = Color(0xFF8A96BF);
-const kDetailBg        = Color(0xFFF0F4FF);
-const kChipBg          = Color(0xFFEEF2FF);
-const kAccentRed       = Color(0xFFB33040);
-const kAccentGreen     = Color(0xFF2E7D32);
+
 
 const kGradient = LinearGradient(
-  colors: [kHeaderGradStart, kHeaderGradEnd],
+  colors: [Palette.blue700, Palette.blue400],
   begin: Alignment.topLeft,
   end: Alignment.bottomRight,
 );
@@ -64,7 +54,7 @@ class _DriverSalaryView extends StatelessWidget {
             state is DriverSalaryLoading) {
           return const Center(
             child: SpinKitFoldingCube(
-                color: kHeaderGradEnd, size: 35),
+                color: Palette.blue400, size: 35),
           );
         }
         if (state is DriverSalaryLoaded) {
@@ -81,7 +71,7 @@ class _DriverSalaryView extends StatelessWidget {
           return Center(
             child: Text(state.message,
                 style: GoogleFonts.lato(
-                    color: kAccentRed, fontSize: 13)),
+                    color: Palette.redAccent, fontSize: 13)),
           );
         }
         return const SizedBox.shrink();
@@ -146,7 +136,7 @@ class _DriverSalaryView extends StatelessWidget {
                   onPressed: () => Navigator.pop(context),
                   child: Text('Close',
                       style: GoogleFonts.lato(
-                          color: kHeaderGradStart,
+                          color: Palette.blue700,
                           fontWeight: FontWeight.w700)),
                 ),
               ),
@@ -173,7 +163,7 @@ class _DetailRow extends StatelessWidget {
             flex: 2,
             child: Text(label,
                 style: GoogleFonts.lato(
-                    color: kTextMid,
+                    color: Palette.textMid,
                     fontWeight: FontWeight.w600,
                     fontSize: 13)),
           ),
@@ -181,7 +171,7 @@ class _DetailRow extends StatelessWidget {
             flex: 3,
             child: Text(value,
                 style: GoogleFonts.lato(
-                    color: kTextDark,
+                    color: Palette.textDark2,
                     fontWeight: FontWeight.w600,
                     fontSize: 13)),
           ),
@@ -251,7 +241,7 @@ class _SalaryTitleRow extends StatelessWidget {
       children: [
         Text('SALARY',
             style: GoogleFonts.lato(
-              color: kAccentRed,
+              color: Palette.redAccent,
               fontWeight: FontWeight.w700,
               fontSize: isTablet
                   ? objfun.FontLarge + 2
@@ -261,7 +251,7 @@ class _SalaryTitleRow extends StatelessWidget {
         const SizedBox(width: 6),
         Text('- ${amount.toStringAsFixed(2)}',
             style: GoogleFonts.lato(
-              color: kAccentGreen,
+              color: Palette.greenSuccess,
               fontWeight: FontWeight.w700,
               fontSize: isTablet
                   ? objfun.FontLarge + 2
@@ -290,10 +280,10 @@ class _DateFilterRow extends StatelessWidget {
       builder: (ctx, child) => Theme(
         data: Theme.of(ctx).copyWith(
           colorScheme: const ColorScheme.light(
-            primary: kHeaderGradStart,
+            primary: Palette.blue700,
             onPrimary: Colors.white,
             surface: Colors.white,
-            onSurface: kTextDark,
+            onSurface: Palette.textDark2,
           ),
         ),
         child: child!,
@@ -369,17 +359,17 @@ class _DateTile extends StatelessWidget {
         padding: const EdgeInsets.symmetric(
             horizontal: 12, vertical: 10),
         decoration: BoxDecoration(
-          color: kDetailBg,
+          color: Palette.grey200p,
           borderRadius: BorderRadius.circular(10),
           border:
-          Border.all(color: kCardBorder, width: 0.5),
+          Border.all(color: Palette.cardBorder, width: 0.5),
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(label.toUpperCase(),
                 style: GoogleFonts.lato(
-                    color: kTextMuted,
+                    color: Palette.kTextMuted,
                     fontWeight: FontWeight.w700,
                     fontSize: 9,
                     letterSpacing: 0.6)),
@@ -390,13 +380,13 @@ class _DateTile extends StatelessWidget {
               children: [
                 Text(display,
                     style: GoogleFonts.lato(
-                        color: kTextDark,
+                        color: Palette.textDark2,
                         fontWeight: FontWeight.w700,
                         fontSize: isTablet ? 14 : 13)),
                 const Icon(
                     Icons.calendar_month_outlined,
                     size: 18,
-                    color: kHeaderGradEnd),
+                    color: Palette.blue400),
               ],
             ),
           ],
@@ -512,7 +502,7 @@ class _SalaryCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final valStyle = GoogleFonts.lato(
-      color: kTextDark,
+      color: Palette.textDark2,
       fontWeight: FontWeight.w600,
       fontSize:
       isTablet ? objfun.FontCardText + 1 : objfun.FontCardText,
@@ -534,10 +524,10 @@ class _SalaryCard extends StatelessWidget {
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: kCardBorder, width: 0.5),
+          border: Border.all(color: Palette.cardBorder, width: 0.5),
           boxShadow: [
             BoxShadow(
-              color: kHeaderGradStart.withOpacity(0.06),
+              color: Palette.blue700.withOpacity(0.06),
               blurRadius: 8,
               offset: const Offset(0, 2),
             ),
@@ -586,7 +576,7 @@ class _SalaryCard extends StatelessWidget {
                           child: Text(
                             amount,
                             style: valStyle.copyWith(
-                                color: kAccentGreen),
+                                color: Palette.greenSuccess),
                             overflow: TextOverflow.ellipsis,
                           ),
                         ),
@@ -601,7 +591,7 @@ class _SalaryCard extends StatelessWidget {
                 child: Icon(
                     Icons.arrow_forward_ios_rounded,
                     size: 12,
-                    color: kTextMuted),
+                    color: Palette.kTextMuted),
               ),
             ],
           ),
@@ -626,21 +616,21 @@ class _EmptyState extends StatelessWidget {
             width: 64,
             height: 64,
             decoration: BoxDecoration(
-                color: kChipBg,
+                color: Palette.chipBg,
                 borderRadius: BorderRadius.circular(16)),
             child: const Icon(Icons.payments_outlined,
-                size: 32, color: kHeaderGradEnd),
+                size: 32, color: Palette.blue400),
           ),
           const SizedBox(height: 14),
           Text('No Salary Records',
               style: GoogleFonts.lato(
-                  color: kTextDark,
+                  color: Palette.textDark2,
                   fontWeight: FontWeight.w600,
                   fontSize: 15)),
           const SizedBox(height: 4),
           Text('Select a date range to view salary',
               style: GoogleFonts.lato(
-                  color: kTextMuted, fontSize: 12)),
+                  color: Palette.kTextMuted, fontSize: 12)),
         ],
       ),
     );

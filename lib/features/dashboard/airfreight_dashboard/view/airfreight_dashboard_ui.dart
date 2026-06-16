@@ -11,6 +11,7 @@ import '../../../common_updates/blocs/sales/sales_bloc.dart';
 import '../../../common_updates/blocs/sales/sales_event.dart';
 import '../../../common_updates/blocs/truck/truck_bloc.dart';
 import '../../../common_updates/blocs/truck/truck_event.dart';
+import '../../admin_dashboard/tabs/airfreightvessel/view/air_frieghtvessel_dashboard_page.dart';
 import '../../admin_dashboard/tabs/inventoryreport/view/inventoryview_tab.dart';
 import '../../admin_dashboard/tabs/saleorderview/view/saleorderview_tab.dart';
 import '../../admin_dashboard/tabs/spotsaleorder/view/spotsaleorder_add.dart';
@@ -174,7 +175,7 @@ class AirfreightMobileDashboard extends StatelessWidget {
         children: [
 
 
-          const VesselReportPage(),  //1
+          const VesselDashboard(),  //1
           const SpotSaleEntryPage(),  //2
           const InventoryPage(),   //3
 
