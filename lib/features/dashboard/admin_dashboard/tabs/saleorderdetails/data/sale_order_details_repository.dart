@@ -31,8 +31,8 @@ class SaleOrderDetailsRepository {
     final jobTypeResponse = await ApiClient.postRequest("${objfun.apiSelectJobType}$comid", null);
 
     // Note: Assuming this API returns the Job Statuses and Job Type Details
-    final jobStatusResponse = await ApiClient.postRequest("${objfun.apiSelectAllJobStatus}$comid&JobMasterRefId=$jobMasterRefId", null);
-    final agentAllResponse = await ApiClient.postRequest("${objfun.apiSelectAgentAll}$comid&AgentCompanyRefId=$agentCompanyRefId", null);
+    final jobStatusResponse = await ApiClient.postRequest("${objfun.apiSelectAllJobStatus}$comid&JobId=$jobMasterRefId", null);
+    final agentAllResponse = await ApiClient.postRequest("${objfun.apiSelectAgentAll}$comid&Jobid=$agentCompanyRefId", null);
 
     return {
       'customers': customerResponse is List ? customerResponse : [],

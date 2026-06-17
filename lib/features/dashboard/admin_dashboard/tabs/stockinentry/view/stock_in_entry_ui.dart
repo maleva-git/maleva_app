@@ -13,6 +13,7 @@ import 'package:maleva/menu/menulist.dart';
 import '../../../../../../core/di/injection.dart';
 import '../../../../../../core/theme/palette.dart';
 import '../../../../../mastersearch/JobAllStatus.dart';
+import '../../../../../transaction/salesorder/add/view/salesorderadd_tab.dart';
 import '../../saleorderdetails/view/saleorderdetails_tab.dart';
 import '../bloc/stock_in_entry_bloc.dart';
 import '../bloc/stock_in_entry_event.dart';
@@ -576,13 +577,12 @@ class _JobNoRowState extends State<_JobNoRow> {
                       int.tryParse(s.jobNoText) ?? 0);
                   Navigator.push(
                     context,
-                    MaterialPageRoute(
-                      builder: (_) => SaleOrderDetails(
-                        saleDetails: null,
-                        saleMaster:
-                        objfun.SaleEditMasterList,
-                      ),
-                    ),
+                      MaterialPageRoute(
+                        builder: (_) => SalesOrdersAdd(
+                          SaleDetails: null,
+                          SaleMaster: objfun.SaleEditMasterList,
+                        ),
+                      )
                   );
                 },
               ),

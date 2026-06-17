@@ -170,7 +170,7 @@ class StockInEntryBloc extends Bloc<StockInEntryEvent, StockInEntryState> {
       // objfun is only used here for formatting the image URL prefix structure securely
       final imageUrls = s.images.map((img) => '${objfun.imagepath}SalesOrder/${s.saleOrderId}/${s.statusName.replaceAll(' ', '')}/$img').toList();
 
-      final empRefId = AppPreferences.getEmpRefId();
+      final empRefId =  objfun.EmpRefId ;
       final comId = AppPreferences.getComid();
 
       final master = [{

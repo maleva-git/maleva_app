@@ -16,11 +16,6 @@ import '../bloc/saleorderdetails_state.dart';
 
 
 
-
-// ── Color tokens (from palette.dart / AppTokens) ──────────────────────────────
-// Using the same hex values as Palette.blue700, Palette.blueLight, etc.
-// so no external import is needed in this file.
-
 const _kPrimary        = Color(0xFF1A3A8F); // Palette.blue700   – appBar, borders
 const _kPrimaryLight   = Color(0xFF5B9BD5); // Palette.blueLight – field fill
 const _kDisabled       = Color(0xFFECEEF5); // Palette.grey200   – disabled fill
