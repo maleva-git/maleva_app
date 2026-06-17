@@ -37,7 +37,7 @@ import '../../features/home/view/home_tab.dart';
 import '../../features/mastersearch/Employee.dart';
 import '../network/api_services/auth_api.dart';
 import 'app_preferences.dart';
-String appversion="1.1.10+97";
+String appversion="1.1.10+98";
 bool homepagecall = false;
 AssetImage logo = const AssetImage('assets/company/logo.png');
 AssetImage splashlogo = const AssetImage('assets/company/roundlogo.png');
@@ -51,9 +51,9 @@ AssetImage lockimg = const AssetImage('assets/common/lockImg.png');
 
 //String port = "http://103.215.139.121:9001/"; //Demos
 
-String port = "http://103.215.139.8:8001/"; //Demolatest
+//String port = "http://103.215.139.8:8001/"; //Demolatest
 
-//String port = "https://maleva.my"; //Live
+String port = "https://maleva.my"; //Live
 
 //String razorpaykey = "rzp_live_GmuWNB2PVXAnLt";
 
