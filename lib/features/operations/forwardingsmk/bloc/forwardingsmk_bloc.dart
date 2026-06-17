@@ -206,10 +206,10 @@ class FWSmkBloc extends Bloc<FWSmkEvent, FWSmkState> {
         updated = tab.copyWith(fwDropdown: event.value);
         break;
       case 'original':
-      // 🔥 Fix: 'event.value' nu change pannunga. 'value' undefined nu varathu.
+
         updated = tab.copyWith(original: event.value == 'true');
         break;
-      default:
+       default:
         return;
     }
     emit(s.withTab(event.tab, updated));
