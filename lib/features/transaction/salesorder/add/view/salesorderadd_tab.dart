@@ -969,6 +969,7 @@ class _SalesOrderAddBodyState extends State<_SalesOrderAddBody> with TickerProvi
     child: DropdownButtonHideUnderline(child: DropdownButton<T>(isExpanded: true, value: value, onChanged: enabled ? onChanged : null, style: GoogleFonts.poppins(color: colour.textMain, fontSize: 13, fontWeight: FontWeight.w600), icon: const Icon(Icons.keyboard_arrow_down_rounded, color: colour.brand, size: 20), items: items.map((v) => DropdownMenuItem<T>(value: v, child: Text(v.toString(), style: GoogleFonts.poppins(color: colour.textMain, fontSize: 13, fontWeight: FontWeight.w600)))).toList())),
   );
 
+
   Widget _dateCheckRow({required BuildContext context, required String label, required String dateStr, required bool checkValue, required String checkKey, required String dateKey, required bool enabled, required SalesOrderAddBloc bloc, bool showTime = false}) {
     // 1. ADDED ':ss' TO FORMAT SO SECONDS ARE VISIBLE IN UI
     final fmt = showTime ? "dd-MM-yyyy HH:mm:ss" : "dd-MM-yyyy";
