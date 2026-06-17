@@ -418,15 +418,18 @@ class _SalesOrderAddBodyState extends State<_SalesOrderAddBody> with TickerProvi
   // ════════════════════════════════════════════════════
   // TAB 3
   // ════════════════════════════════════════════════════
+// ════════════════════════════════════════════════════
+  // TAB 3
+  // ════════════════════════════════════════════════════
   Widget _buildTab3(BuildContext context, SalesOrderAddLoaded state, double height) {
     final bloc = context.read<SalesOrderAddBloc>();
     final fp = state.fieldPermission;
 
     return _tabScroll(children: [
       _sectionCard(children: [
-        if (state.visibleLETA) ...[ _dateCheckRow(context: context, label: "ETA", dateStr: state.dtpLETAdate, checkValue: state.checkBoxValueLETA, checkKey: 'checkBoxValueLETA', dateKey: 'dtpLETAdate', enabled: fp["chkLETA"] == true, bloc: bloc), _gap() ],
-        if (state.visibleLETB) ...[ _dateCheckRow(context: context, label: "ETB", dateStr: state.dtpLETBdate, checkValue: state.checkBoxValueLETB, checkKey: 'checkBoxValueLETB', dateKey: 'dtpLETBdate', enabled: fp["chkLETB"] == true, bloc: bloc), _gap() ],
-        if (state.visibleLETD) ...[ _dateCheckRow(context: context, label: "ETD", dateStr: state.dtpLETDdate, checkValue: state.checkBoxValueLETD, checkKey: 'checkBoxValueLETD', dateKey: 'dtpLETDdate', enabled: fp["chkLETD"] == true, bloc: bloc), _gap() ],
+        if (state.visibleLETA) ...[ _dateCheckRow(context: context, label: "ETA", dateStr: state.dtpLETAdate, checkValue: state.checkBoxValueLETA, checkKey: 'checkBoxValueLETA', dateKey: 'dtpLETAdate', enabled: fp["chkLETA"] == true, bloc: bloc, showTime: true), _gap() ],
+        if (state.visibleLETB) ...[ _dateCheckRow(context: context, label: "ETB", dateStr: state.dtpLETBdate, checkValue: state.checkBoxValueLETB, checkKey: 'checkBoxValueLETB', dateKey: 'dtpLETBdate', enabled: fp["chkLETB"] == true, bloc: bloc, showTime: true), _gap() ],
+        if (state.visibleLETD) ...[ _dateCheckRow(context: context, label: "ETD", dateStr: state.dtpLETDdate, checkValue: state.checkBoxValueLETD, checkKey: 'checkBoxValueLETD', dateKey: 'dtpLETDdate', enabled: fp["chkLETD"] == true, bloc: bloc, showTime: true), _gap() ],
         if (state.visibleFlightTime) ...[ _dateCheckRow(context: context, label: "Flight Time", dateStr: state.dtpFlightTimedate, checkValue: state.checkBoxValueFlightTime, checkKey: 'checkBoxValueFlightTime', dateKey: 'dtpFlightTimedate', enabled: fp["chkFlightTime"] == true, bloc: bloc, showTime: true), _gap() ],
         if (state.visibleLShippingAgent) ...[
           _searchField(
@@ -966,8 +969,10 @@ class _SalesOrderAddBodyState extends State<_SalesOrderAddBody> with TickerProvi
     child: DropdownButtonHideUnderline(child: DropdownButton<T>(isExpanded: true, value: value, onChanged: enabled ? onChanged : null, style: GoogleFonts.poppins(color: colour.textMain, fontSize: 13, fontWeight: FontWeight.w600), icon: const Icon(Icons.keyboard_arrow_down_rounded, color: colour.brand, size: 20), items: items.map((v) => DropdownMenuItem<T>(value: v, child: Text(v.toString(), style: GoogleFonts.poppins(color: colour.textMain, fontSize: 13, fontWeight: FontWeight.w600)))).toList())),
   );
 
+
   Widget _dateCheckRow({required BuildContext context, required String label, required String dateStr, required bool checkValue, required String checkKey, required String dateKey, required bool enabled, required SalesOrderAddBloc bloc, bool showTime = false}) {
-    final fmt = showTime ? "dd-MM-yyyy HH:mm" : "dd-MM-yyyy";
+    // 1. ADDED ':ss' TO FORMAT SO SECONDS ARE VISIBLE IN UI
+    final fmt = showTime ? "dd-MM-yyyy HH:mm:ss" : "dd-MM-yyyy";
     return Row(children: [
       SizedBox(width: 90, child: Text(label, style: GoogleFonts.poppins(color: colour.textMain, fontSize: 12, fontWeight: FontWeight.w600))),
       Expanded(
@@ -978,9 +983,12 @@ class _SalesOrderAddBodyState extends State<_SalesOrderAddBody> with TickerProvi
             if (date != null) {
               if (showTime) {
                 final time = await showTimePicker(context: context, initialTime: TimeOfDay.now(), builder: (ctx, child) => MediaQuery(data: MediaQuery.of(ctx).copyWith(alwaysUse24HourFormat: true), child: child!));
-                final combined = DateTime(date.year, date.month, date.day, time?.hour ?? 0, time?.minute ?? 0);
+                // 2. INJECTED DateTime.now().second SO IT DOESN'T DEFAULT TO 0 SECONDS
+                final combined = DateTime(date.year, date.month, date.day, time?.hour ?? 0, time?.minute ?? 0, DateTime.now().second);
                 bloc.add(UpdateDate(dateKey, DateFormat("yyyy-MM-dd HH:mm:ss").format(combined)));
-              } else { bloc.add(UpdateDate(dateKey, DateFormat("yyyy-MM-dd").format(date))); }
+              } else {
+                bloc.add(UpdateDate(dateKey, DateFormat("yyyy-MM-dd").format(date)));
+              }
             }
           },
           child: Container(height: 44, padding: const EdgeInsets.symmetric(horizontal: 12), decoration: BoxDecoration(color: checkValue ? colour.brandLight : colour.surface, borderRadius: BorderRadius.circular(10), border: Border.all(color: checkValue ? colour.border : colour.border.withOpacity(0.3))), child: Row(children: [const Icon(Icons.calendar_today_rounded, size: 14, color: colour.brand), const SizedBox(width: 8), Expanded(child: Text(DateFormat(fmt).format(DateTime.parse(dateStr)), style: GoogleFonts.poppins(color: checkValue ? colour.brandDark : colour.textSub, fontSize: 12, fontWeight: FontWeight.w600)))])),
