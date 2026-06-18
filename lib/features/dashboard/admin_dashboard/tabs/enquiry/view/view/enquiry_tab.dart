@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
-import '../../../../../../../core/colors/colors.dart' as colour;
+
+import '../../../../../../../core/theme/palette.dart';
+
 import '../../../../../../../core/di/injection.dart';
-import '../../../../../../../core/theme/tokens.dart';
 import '../../../../../../../core/utils/clsfunction.dart' as objfun;
+import '../../../../../../transaction/salesorder/add/view/salesorderadd_tab.dart';
 import '../../../saleorderadd/view/saleorderadd_tab.dart';
 import '../../add/view/enquiryadd.dart';
 import '../bloc/enquiry_bloc.dart';
@@ -17,13 +19,12 @@ class EnquiryScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return
-      BlocProvider(
-        create: (_) => EnquiryBloc(
-          repository: sl<EnquiryRepository>(),
-        ),
-        child: const _EnquiryView(),
-      );
+    return BlocProvider(
+      create: (_) => EnquiryBloc(
+        repository: sl<EnquiryRepository>(),
+      )..add(LoadEnquiryEvent()), // Good practice to load on init
+      child: const _EnquiryView(),
+    );
   }
 }
 
@@ -32,154 +33,152 @@ class _EnquiryView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final double height = MediaQuery.of(context).size.height;
-    final double width = MediaQuery.of(context).size.width;
-
-    return BlocListener<EnquiryBloc, EnquiryState>(
-      listenWhen: (prev, curr) => curr.errorMessage != null,
-      listener: (context, state) {
-        objfun.msgshow(
-          state.errorMessage!,
-          '',
-          Colors.white,
-          Colors.red,
-          null,
-          18.00 - objfun.reducesize,
-          objfun.tll,
-          objfun.tgc,
-          context,
-          2,
-        );
-      },
-      child: BlocBuilder<EnquiryBloc, EnquiryState>(
-        builder: (context, state) {
-          if (state.isLoading) {
-            return const Center(child: CircularProgressIndicator());
-          }
-
-          return Padding(
-            padding: const EdgeInsets.only(
-                top: 15.0, left: 10.0, right: 10.0),
-            child: ListView(
-              children: [
-
-                // ── Add Button ──
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: [
-                    const SizedBox(width: 5),
-            ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: AppTokens.invoiceHeaderStart,
-                side: const BorderSide(
-                  color: colour.cWhite,
-                  width: 1,
-                  style: BorderStyle.solid,
-                ),
-                elevation: 20.0,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10.0),
-                ),
-                padding: const EdgeInsets.all(4.0),
-              ),
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (_) => const AddEnquiryScreen()),
-                ).then((_) {
-                  context.read<EnquiryBloc>().add(LoadEnquiryEvent());
-                });
-              },
-              child: const Icon(
-                Icons.add,
-                color: Colors.white, // ✅ plus symbol white
-              ),
-            ),
-                  ],
-                ),
-                const SizedBox(height: 5),
-
-                // ── Grid Header ──
-                SizedBox(
-                  height: height * 0.05,
-                  child: Container(
-                    padding: const EdgeInsets.only(left: 5, right: 5),
-                    color: colour.commonColor,
-                    child: _buildGridHeader(),
-                  ),
-                ),
-
-                // ── List ──
-                SizedBox(
-                  height: height * 0.80,
-                  child: state.enquiryList.isNotEmpty
-                      ? ListView.builder(
-                    itemCount: state.enquiryList.length,
-                    itemBuilder: (context, index) {
-                      final item = state.enquiryList[index];
-                      return _EnquiryCard(
-                        item: item,
-                        index: index,
-                        height: height,
-                      );
-                    },
-                  )
-                      : SizedBox(
-                    width: width - 40.0,
-                    height: height / 1.4,
-                    child: const Center(
-                      child: Text('No Record'),
-                    ),
-                  ),
-                ),
-              ],
-            ),
+    return Scaffold(
+      backgroundColor: Palette.grey50, // Clean background
+      body: BlocListener<EnquiryBloc, EnquiryState>(
+        listenWhen: (prev, curr) => curr.errorMessage != null,
+        listener: (context, state) {
+          objfun.msgshow(
+            state.errorMessage!,
+            '',
+            Palette.white,
+            Palette.redError,
+            null,
+            18.00 - objfun.reducesize,
+            objfun.tll,
+            objfun.tgc,
+            context,
+            2,
           );
         },
-      ),
-    );
-  }
+        child: BlocBuilder<EnquiryBloc, EnquiryState>(
+          builder: (context, state) {
+            if (state.isLoading) {
+              return const Center(
+                child: CircularProgressIndicator(color: Palette.blue600),
+              );
+            }
 
-  Widget _buildGridHeader() {
-    return Column(
-      children: [
-        Expanded(
-          child: Row(
-            children: [
-              Expanded(
-                flex: 2,
-                child: Text(
-                  'Customer Name',
-                  textAlign: TextAlign.left,
-                  style: GoogleFonts.lato(
-                    textStyle: TextStyle(
-                      color: colour.ButtonForeColor,
-                      fontWeight: FontWeight.bold,
-                      fontSize: objfun.FontLow,
-                      letterSpacing: 0.3,
+            return Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
+              child: Column(
+                children: [
+                  // ── Action Bar (Add Button) ──
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      ElevatedButton.icon(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Palette.blue600,
+                          foregroundColor: Palette.white,
+                          elevation: 2,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8.0),
+                          ),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 16.0,
+                            vertical: 12.0,
+                          ),
+                        ),
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (_) => const AddEnquiryScreen()),
+                          ).then((_) {
+                            context.read<EnquiryBloc>().add(LoadEnquiryEvent());
+                          });
+                        },
+                        icon: const Icon(Icons.add, size: 20),
+                        label: Text(
+                          'New Enquiry',
+                          style: GoogleFonts.lato(
+                            fontWeight: FontWeight.w600,
+                            fontSize: 14,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 16),
+
+                  // ── Grid Header ──
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                    decoration: BoxDecoration(
+                      color: Palette.blue50,
+                      borderRadius: BorderRadius.circular(8),
+                      border: Border.all(color: Palette.blue200),
+                    ),
+                    child: Row(
+                      children: [
+                        Expanded(
+                          flex: 2,
+                          child: Text(
+                            'Customer Name',
+                            style: GoogleFonts.lato(
+                              color: Palette.blue900,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 14,
+                            ),
+                          ),
+                        ),
+                        Expanded(
+                          flex: 2,
+                          child: Text(
+                            'Notify Date',
+                            style: GoogleFonts.lato(
+                              color: Palette.blue900,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 14,
+                            ),
+                          ),
+                        ),
+                        // Empty spacer to align with the action buttons on the cards
+                        const SizedBox(width: 80),
+                      ],
                     ),
                   ),
-                ),
-              ),
-              Expanded(
-                flex: 2,
-                child: Text(
-                  'Notify Date',
-                  textAlign: TextAlign.left,
-                  style: GoogleFonts.lato(
-                    textStyle: TextStyle(
-                      color: colour.ButtonForeColor,
-                      fontWeight: FontWeight.bold,
-                      fontSize: objfun.FontLow,
-                      letterSpacing: 0.3,
+                  const SizedBox(height: 8),
+
+                  // ── List ──
+                  Expanded(
+                    child: state.enquiryList.isNotEmpty
+                        ? ListView.builder(
+                      itemCount: state.enquiryList.length,
+                      itemBuilder: (context, index) {
+                        final item = state.enquiryList[index];
+                        return _EnquiryCard(
+                          item: item,
+                          index: index,
+                        );
+                      },
+                    )
+                        : Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(Icons.inbox_rounded,
+                              size: 64, color: Palette.grey400),
+                          const SizedBox(height: 16),
+                          Text(
+                            'No Records Found',
+                            style: GoogleFonts.lato(
+                              color: Palette.textMuted,
+                              fontSize: 16,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                   ),
-                ),
+                ],
               ),
-            ],
-          ),
+            );
+          },
         ),
-      ],
+      ),
     );
   }
 }
@@ -188,29 +187,23 @@ class _EnquiryView extends StatelessWidget {
 class _EnquiryCard extends StatelessWidget {
   final Map<String, dynamic> item;
   final int index;
-  final double height;
 
   const _EnquiryCard({
     required this.item,
     required this.index,
-    required this.height,
   });
 
   Color _cardColor(int index) {
-    // உங்க existing _CardColor logic இங்க போடு
-    return index.isEven
-        ? colour.commonColorLight
-        : Colors.white;
+    return index.isEven ? Palette.white : Palette.grey50;
   }
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      height: height * 0.07,
+    return Container(
+      margin: const EdgeInsets.only(bottom: 8.0),
       child: InkWell(
-        onDoubleTap: () {
-          _showEnqDetails(context, item);
-        },
+        borderRadius: BorderRadius.circular(10),
+        onDoubleTap: () => _showEnqDetails(context, item),
         onLongPress: () {
           Navigator.push(
             context,
@@ -221,143 +214,172 @@ class _EnquiryCard extends StatelessWidget {
             context.read<EnquiryBloc>().add(LoadEnquiryEvent());
           });
         },
-        child: Card(
-          color: _cardColor(index),
-          elevation: 10.0,
-          shape: RoundedRectangleBorder(
-            side: const BorderSide(
-                color: colour.commonColor, width: 1),
+        child: Ink(
+          decoration: BoxDecoration(
+            color: _cardColor(index),
             borderRadius: BorderRadius.circular(10),
-          ),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-
-              // ── Row 1: Customer + Date ──
-              Row(
-                children: [
-                  Expanded(
-                    flex: 2,
-                    child: Container(
-                      padding: const EdgeInsets.all(1),
-                      child: Text(
-                        '   ${item["CustomerName"]}',
-                        textAlign: TextAlign.left,
-                        overflow: TextOverflow.ellipsis,
-                        maxLines: 1,
-                        style: GoogleFonts.lato(
-                          textStyle: TextStyle(
-                            color: colour.commonColor,
-                            fontWeight: FontWeight.bold,
-                            fontSize: objfun.FontCardText,
-                            letterSpacing: 0.3,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                  Expanded(
-                    flex: 2,
-                    child: Container(
-                      padding: const EdgeInsets.all(1),
-                      child: Text(
-                        '   ${item["SForwardingDate"]}',
-                        textAlign: TextAlign.left,
-                        overflow: TextOverflow.ellipsis,
-                        maxLines: 1,
-                        style: GoogleFonts.lato(
-                          textStyle: TextStyle(
-                            color: colour.commonColor,
-                            fontWeight: FontWeight.bold,
-                            fontSize: objfun.FontCardText,
-                            letterSpacing: 0.3,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-
-              // ── Row 2: Actions ──
-              Row(
-                children: [
-                  // Push to SalesOrder
-                  Expanded(
-                    flex: 2,
-                    child: InkWell(
-                      onTap: () async {
-                        bool result =
-                        await objfun.ConfirmationMsgYesNo(
-                          context,
-                          'Do You Want to Push to SalesOrder ?',
-                        );
-                        if (result == true) {
-                          objfun.storagenew
-                              .setString('EnquiryOpen', 'true');
-                          final List<dynamic> enquiryList = [item];
-                          Navigator.of(context).push(
-                            MaterialPageRoute(
-                              builder: (_) => SalesOrderAdd(
-                                saleDetails: null,
-                                saleMaster: enquiryList,
-                              ),
-                            ),
-                          );
-                        }
-                      },
-                      child: const Icon(
-                        Icons.fast_forward_sharp,
-                        color: colour.commonColor,
-                      ),
-                    ),
-                  ),
-                  // Cancel
-                  Expanded(
-                    flex: 2,
-                    child: InkWell(
-                      onTap: () async {
-                        bool result =
-                        await objfun.ConfirmationMsgYesNo(
-                          context,
-                          'Do You Want to Cancel the Enquiry ?',
-                        );
-                        if (result == true) {
-                          context.read<EnquiryBloc>().add(
-                            CancelEnquiryEvent(item['Id']),
-                          );
-                        }
-                      },
-                      child: const Icon(
-                        Icons.cancel,
-                        color: colour.commonColor,
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 10),
-                ],
+            border: Border.all(color: Palette.grey200),
+            boxShadow: const [
+              BoxShadow(
+                color: Color(0x0A000000), // Subtle shadow
+                blurRadius: 4,
+                offset: Offset(0, 2),
               ),
             ],
+          ),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+            child: Row(
+              children: [
+                // ── Customer Name ──
+                Expanded(
+                  flex: 2,
+                  child: Text(
+                    item["CustomerName"] ?? 'Unknown',
+                    overflow: TextOverflow.ellipsis,
+                    maxLines: 1,
+                    style: GoogleFonts.lato(
+                      color: Palette.textDark,
+                      fontWeight: FontWeight.w600,
+                      fontSize: 14,
+                    ),
+                  ),
+                ),
+
+                // ── Date ──
+                Expanded(
+                  flex: 2,
+                  child: Text(
+                    item["SForwardingDate"] ?? '-',
+                    overflow: TextOverflow.ellipsis,
+                    maxLines: 1,
+                    style: GoogleFonts.lato(
+                      color: Palette.textMuted,
+                      fontWeight: FontWeight.w500,
+                      fontSize: 14,
+                    ),
+                  ),
+                ),
+
+                // ── Actions ──
+                SizedBox(
+                  width: 80,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      // Push to SalesOrder
+                      _ActionButton(
+                        icon: Icons.fast_forward_rounded,
+                        color: Palette.blueMid,
+                        bgColor: Palette.chipBg,
+                        onTap: () async {
+                          bool result = await objfun.ConfirmationMsgYesNo(
+                            context,
+                            'Do You Want to Push to SalesOrder?',
+                          );
+                          if (result == true) {
+                            objfun.storagenew.setString('EnquiryOpen', 'true');
+                            final List<dynamic> enquiryList = [item];
+                            if (context.mounted) {
+                              Navigator.of(context).push(
+                                MaterialPageRoute(
+                                  builder: (_) => SalesOrdersAdd(
+                                    SaleDetails: null,
+                                    SaleMaster: enquiryList,
+                                  ),
+                                ),
+                              );
+                            }
+                          }
+                        },
+                      ),
+                      const SizedBox(width: 8),
+                      // Cancel
+                      _ActionButton(
+                        icon: Icons.close_rounded,
+                        color: Palette.rose,
+                        bgColor: Palette.rose.withOpacity(0.1),
+                        onTap: () async {
+                          bool result = await objfun.ConfirmationMsgYesNo(
+                            context,
+                            'Do You Want to Cancel the Enquiry?',
+                          );
+                          if (result == true && context.mounted) {
+                            context
+                                .read<EnquiryBloc>()
+                                .add(CancelEnquiryEvent(item['Id']));
+                          }
+                        },
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ),
     );
   }
 
-  void _showEnqDetails(
-      BuildContext context, Map<String, dynamic> item) {
-    // உங்க existing _showDialogEnqDetails logic இங்க போடு
+  void _showEnqDetails(BuildContext context, Map<String, dynamic> item) {
     showDialog(
       context: context,
       builder: (_) => AlertDialog(
-        title: Text(item['CustomerName'] ?? ''),
-        content: Text(item['SForwardingDate'] ?? ''),
+        backgroundColor: Palette.white,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        title: Text(
+          item['CustomerName'] ?? '',
+          style: GoogleFonts.lato(color: Palette.textDark2),
+        ),
+        content: Text(
+          'Date: ${item['SForwardingDate'] ?? ''}',
+          style: GoogleFonts.lato(color: Palette.textMuted),
+        ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('Close'),
+            child: Text(
+              'Close',
+              style: TextStyle(color: Palette.blue600),
+            ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+// Custom widget for modern looking icon buttons
+class _ActionButton extends StatelessWidget {
+  final IconData icon;
+  final Color color;
+  final Color bgColor;
+  final VoidCallback onTap;
+
+  const _ActionButton({
+    required this.icon,
+    required this.color,
+    required this.bgColor,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: bgColor,
+      borderRadius: BorderRadius.circular(6),
+      child: InkWell(
+        borderRadius: BorderRadius.circular(6),
+        onTap: onTap,
+        child: Padding(
+          padding: const EdgeInsets.all(6.0),
+          child: Icon(
+            icon,
+            size: 20,
+            color: color,
+          ),
+        ),
       ),
     );
   }

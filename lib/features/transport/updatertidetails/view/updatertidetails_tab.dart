@@ -9,6 +9,7 @@ import 'package:maleva/features/dashboard/airfreight_dashboard/view/airfreight_d
 import 'package:maleva/core/models/model.dart';
 import 'package:maleva/menu/menulist.dart';
 import 'package:maleva/features/dashboard/admin_dashboard/view/admin_dashboard.dart';
+import '../../../../core/theme/palette.dart';
 import '../../../dashboard/admin_dashboard/tabs/rtistatus/view/rtistatus_tab.dart';
 import '../../../dashboard/admin_dashboard/tabs/transportDB/view/transportdb_tab.dart';
 import '../../../dashboard/boarding_dashboard/view/boarding_dashboard.dart';
@@ -22,26 +23,16 @@ import '../bloc/updatertidetails_bloc.dart';
 import '../bloc/updatertidetails_event.dart';
 import '../bloc/updatertidetails_state.dart';
 
-// ─── Design Tokens ────────────────────────────────────────────────────────────
-const kHeaderGradStart = Color(0xFF1A3A8F);
-const kHeaderGradEnd   = Color(0xFF4A6FD4);
-const kCardBorder      = Color(0xFFC5D0EE);
-const kPageBg          = Color(0xFFF4F6FB);
-const kTextDark        = Color(0xFF1E2D5E);
-const kTextMid         = Color(0xFF4A5A8A);
-const kTextMuted       = Color(0xFF8A96BF);
-const kDetailBg        = Color(0xFFF0F4FF);
-const kChipBg          = Color(0xFFEEF2FF);
+
 
 const kGradient = LinearGradient(
-  colors: [kHeaderGradStart, kHeaderGradEnd],
+  colors: [Palette.blue700, Palette.blue400],
   begin: Alignment.topLeft,
   end: Alignment.bottomRight,
 );
 
 const double kTabletBreak = 600;
 
-// ─── Root ─────────────────────────────────────────────────────────────────────
 class UpdateRTI extends StatelessWidget {
   const UpdateRTI({super.key});
 
@@ -54,7 +45,6 @@ class UpdateRTI extends StatelessWidget {
   }
 }
 
-// ─── Page ─────────────────────────────────────────────────────────────────────
 class _UpdateRTIPage extends StatelessWidget {
   const _UpdateRTIPage();
 
@@ -84,14 +74,14 @@ class _UpdateRTIPage extends StatelessWidget {
         },
         child: Scaffold(
           resizeToAvoidBottomInset: false,
-          backgroundColor: kPageBg,
+          backgroundColor: Palette.grey100,
           appBar: _buildAppBar(context, userName),
           drawer: const Menulist(),
           body: BlocBuilder<UpdateRTIBloc, UpdateRTIState>(
             builder: (context, state) {
               if (state is UpdateRTIInitial || state is UpdateRTILoading) {
                 return const Center(
-                  child: SpinKitFoldingCube(color: kHeaderGradEnd, size: 35),
+                  child: SpinKitFoldingCube(color: Palette.blue400, size: 35),
                 );
               }
               if (state is UpdateRTILoaded) {
@@ -210,7 +200,7 @@ class _UpdateRTIBody extends StatelessWidget {
             Container(
               decoration: const BoxDecoration(
                 gradient: LinearGradient(
-                  colors: [kHeaderGradStart, Color(0xFF2D56C8)],
+                  colors: [Palette.blue700, Color(0xFF2D56C8)],
                   begin: Alignment.topCenter,
                   end: Alignment.bottomCenter,
                 ),
@@ -332,12 +322,12 @@ class _RTICard extends StatelessWidget {
   Widget build(BuildContext context) {
     final isExpanded = state.expandedIndex == index;
     final valStyle   = GoogleFonts.lato(
-      color:      kTextDark,
+      color:      Palette.textDark2,
       fontWeight: FontWeight.w600,
       fontSize:   isTablet ? objfun.FontCardText + 1 : objfun.FontCardText,
     );
     final labelStyle = GoogleFonts.lato(
-      color:      kTextMuted,
+      color:      Palette.kTextMuted,
       fontWeight: FontWeight.w600,
       fontSize:   isTablet ? 10 : 9,
       letterSpacing: 0.4,
@@ -354,10 +344,10 @@ class _RTICard extends StatelessWidget {
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(14),
-          border: Border.all(color: kCardBorder, width: 0.5),
+          border: Border.all(color: Palette.cardBorder, width: 0.5),
           boxShadow: [
             BoxShadow(
-              color: kHeaderGradStart.withOpacity(0.07),
+              color: Palette.blue700.withOpacity(0.07),
               blurRadius: 10,
               offset: const Offset(0, 3),
             ),
@@ -432,7 +422,7 @@ class _RTICard extends StatelessWidget {
                           child: _CardField(
                               label: 'REMARKS',
                               value: item.Remarks.toString(),
-                              valStyle: valStyle.copyWith(color: kTextMid),
+                              valStyle: valStyle.copyWith(color: Palette.textMid),
                               labelStyle: labelStyle),
                         ),
                       ],
@@ -537,7 +527,7 @@ class _DetailsSection extends StatelessWidget {
       letterSpacing: 0.5,
     );
     final rowStyle = GoogleFonts.lato(
-      color: kTextDark,
+      color: Palette.textDark2,
       fontWeight: FontWeight.w500,
       fontSize: isTablet ? objfun.FontCardText : objfun.FontCardText - 1,
     );
@@ -551,7 +541,7 @@ class _DetailsSection extends StatelessWidget {
               horizontal: 12, vertical: 6),
           decoration: const BoxDecoration(
             gradient: LinearGradient(
-              colors: [kHeaderGradStart, Color(0xFF2D56C8)],
+              colors: [Palette.blue700, Color(0xFF2D56C8)],
               begin: Alignment.topCenter,
               end: Alignment.bottomCenter,
             ),
@@ -583,7 +573,7 @@ class _DetailsSection extends StatelessWidget {
               ? Center(
               child: Text('No Records',
                   style: GoogleFonts.lato(
-                      color: kTextMuted, fontSize: 12)))
+                      color: Palette.kTextMuted, fontSize: 12)))
               : ListView.builder(
             padding: EdgeInsets.zero,
             itemCount: details.length,
@@ -607,7 +597,7 @@ class _DetailsSection extends StatelessWidget {
                   );
                 },
                 child: Container(
-                  color: i % 2 == 0 ? Colors.white : kDetailBg,
+                  color: i % 2 == 0 ? Colors.white : Palette.grey200p,
                   padding: const EdgeInsets.symmetric(
                       horizontal: 12, vertical: 6),
                   child: Column(
@@ -643,7 +633,7 @@ class _DetailsSection extends StatelessWidget {
                       Text(
                         '  ${d.CustomerName}',
                         style:
-                        rowStyle.copyWith(color: kTextMid),
+                        rowStyle.copyWith(color: Palette.textMid),
                         overflow: TextOverflow.ellipsis,
                       ),
                       const SizedBox(height: 3),
@@ -715,10 +705,10 @@ class _FilterSheetState extends State<_FilterSheet> {
       builder: (ctx, child) => Theme(
         data: Theme.of(ctx).copyWith(
           colorScheme: const ColorScheme.light(
-            primary: kHeaderGradStart,
+            primary: Palette.blue700,
             onPrimary: Colors.white,
             surface: Colors.white,
-            onSurface: kTextDark,
+            onSurface: Palette.textDark2,
           ),
         ),
         child: child!,
@@ -764,13 +754,13 @@ class _FilterSheetState extends State<_FilterSheet> {
                 width: 40,
                 height: 4,
                 decoration: BoxDecoration(
-                    color: kCardBorder,
+                    color: Palette.cardBorder,
                     borderRadius: BorderRadius.circular(2)),
               ),
             ),
             Text('Filter',
                 style: GoogleFonts.lato(
-                    color: kHeaderGradStart,
+                    color: Palette.blue700,
                     fontWeight: FontWeight.w700,
                     fontSize: isTablet ? 16 : 15)),
             const SizedBox(height: 16),
@@ -868,15 +858,15 @@ class _FilterSheetState extends State<_FilterSheet> {
               textCapitalization: TextCapitalization.characters,
               textInputAction: TextInputAction.done,
               style: GoogleFonts.lato(
-                  color: kTextDark,
+                  color: Palette.textDark2,
                   fontWeight: FontWeight.w600,
                   fontSize: isTablet ? objfun.FontLow + 1 : objfun.FontLow),
               decoration: InputDecoration(
                 hintText: 'RTI No',
                 hintStyle: GoogleFonts.lato(
-                    color: kTextMuted, fontSize: objfun.FontLow),
+                    color: Palette.kTextMuted, fontSize: objfun.FontLow),
                 filled: true,
-                fillColor: kDetailBg,
+                fillColor: Palette.grey200p,
                 contentPadding: const EdgeInsets.symmetric(
                     horizontal: 14, vertical: 13),
                 border: OutlineInputBorder(
@@ -885,11 +875,11 @@ class _FilterSheetState extends State<_FilterSheet> {
                 enabledBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(10),
                     borderSide:
-                    const BorderSide(color: kCardBorder, width: 0.5)),
+                    const BorderSide(color: Palette.cardBorder, width: 0.5)),
                 focusedBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(10),
                     borderSide: const BorderSide(
-                        color: kHeaderGradEnd, width: 1.5)),
+                        color: Palette.blue400, width: 1.5)),
               ),
               onChanged: (v) {
                 setState(() => _local = _local.copyWith(rtiNo: v));
@@ -934,19 +924,19 @@ class _EmptyState extends StatelessWidget {
             width: 64,
             height: 64,
             decoration: BoxDecoration(
-                color: kChipBg, borderRadius: BorderRadius.circular(16)),
+                color: Palette.chipBg, borderRadius: BorderRadius.circular(16)),
             child: const Icon(Icons.assignment_outlined,
-                size: 32, color: kHeaderGradEnd),
+                size: 32, color: Palette.blue400),
           ),
           const SizedBox(height: 14),
           Text('No Records Found',
               style: GoogleFonts.lato(
-                  color: kTextDark,
+                  color: Palette.textDark2,
                   fontWeight: FontWeight.w600,
                   fontSize: 15)),
           const SizedBox(height: 4),
           Text('Use the filter to load RTI records',
-              style: GoogleFonts.lato(color: kTextMuted, fontSize: 12)),
+              style: GoogleFonts.lato(color: Palette.kTextMuted, fontSize: 12)),
         ],
       ),
     );
@@ -968,7 +958,7 @@ class _RTIFab extends StatelessWidget {
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-              color: kHeaderGradStart.withOpacity(0.4),
+              color: Palette.blue700.withOpacity(0.4),
               blurRadius: 16,
               offset: const Offset(0, 6))
         ],
@@ -1004,18 +994,18 @@ class _CardChip extends StatelessWidget {
         padding:
         const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
         decoration: BoxDecoration(
-          color: kChipBg,
+          color: Palette.chipBg,
           borderRadius: BorderRadius.circular(20),
-          border: Border.all(color: kCardBorder, width: 0.5),
+          border: Border.all(color: Palette.cardBorder, width: 0.5),
         ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(icon, size: 14, color: kHeaderGradStart),
+            Icon(icon, size: 14, color: Palette.blue700),
             const SizedBox(width: 4),
             Text(label,
                 style: GoogleFonts.lato(
-                    color: kHeaderGradStart,
+                    color: Palette.blue700,
                     fontWeight: FontWeight.w600,
                     fontSize: 11)),
           ],
@@ -1043,16 +1033,16 @@ class _SheetDateTile extends StatelessWidget {
         padding: const EdgeInsets.symmetric(
             horizontal: 12, vertical: 10),
         decoration: BoxDecoration(
-          color: kDetailBg,
+          color: Palette.grey200p,
           borderRadius: BorderRadius.circular(10),
-          border: Border.all(color: kCardBorder, width: 0.5),
+          border: Border.all(color: Palette.cardBorder, width: 0.5),
         ),
         child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(label.toUpperCase(),
                   style: GoogleFonts.lato(
-                      color: kTextMuted,
+                      color: Palette.kTextMuted,
                       fontWeight: FontWeight.w700,
                       fontSize: 9,
                       letterSpacing: 0.6)),
@@ -1063,11 +1053,11 @@ class _SheetDateTile extends StatelessWidget {
                   children: [
                     Text(d,
                         style: GoogleFonts.lato(
-                            color: kTextDark,
+                            color: Palette.textDark2,
                             fontWeight: FontWeight.w700,
                             fontSize: 13)),
                     const Icon(Icons.calendar_month_outlined,
-                        size: 18, color: kHeaderGradEnd),
+                        size: 18, color: Palette.blue400),
                   ]),
             ]),
       ),
@@ -1099,9 +1089,9 @@ class _FilterSearchField extends StatelessWidget {
         padding: const EdgeInsets.symmetric(
             horizontal: 14, vertical: 13),
         decoration: BoxDecoration(
-          color: kDetailBg,
+          color: Palette.grey200p,
           borderRadius: BorderRadius.circular(10),
-          border: Border.all(color: kCardBorder, width: 0.5),
+          border: Border.all(color: Palette.cardBorder, width: 0.5),
         ),
         child: Row(
           children: [
@@ -1109,7 +1099,7 @@ class _FilterSearchField extends StatelessWidget {
               child: Text(
                 value.isEmpty ? hint : value,
                 style: GoogleFonts.lato(
-                  color: value.isEmpty ? kTextMuted : kTextDark,
+                  color: value.isEmpty ? Palette.kTextMuted : Palette.textDark2,
                   fontWeight: value.isEmpty
                       ? FontWeight.w500
                       : FontWeight.w600,
@@ -1125,7 +1115,7 @@ class _FilterSearchField extends StatelessWidget {
                   ? Icons.close_rounded
                   : Icons.search_rounded,
               size: 20,
-              color: kHeaderGradEnd,
+              color: Palette.blue400,
             ),
           ],
         ),
@@ -1148,7 +1138,7 @@ class _GradientButton extends StatelessWidget {
         borderRadius: BorderRadius.circular(24),
         boxShadow: [
           BoxShadow(
-              color: kHeaderGradStart.withOpacity(0.35),
+              color: Palette.blue700.withOpacity(0.35),
               blurRadius: 10,
               offset: const Offset(0, 4))
         ],
@@ -1183,9 +1173,9 @@ class _OutlineButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        color: kChipBg,
+        color: Palette.chipBg,
         borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: kCardBorder),
+        border: Border.all(color: Palette.cardBorder),
       ),
       child: Material(
         color: Colors.transparent,
@@ -1197,7 +1187,7 @@ class _OutlineButton extends StatelessWidget {
                 horizontal: 28, vertical: 11),
             child: Text(label,
                 style: GoogleFonts.lato(
-                    color: kHeaderGradStart,
+                    color: Palette.blue700,
                     fontWeight: FontWeight.w700,
                     fontSize: objfun.FontMedium)),
           ),

@@ -6,24 +6,17 @@ import 'package:intl/intl.dart';
 import 'package:maleva/core/utils/clsfunction.dart' as objfun;
 import 'package:maleva/core/models/model.dart';
 import 'package:maleva/menu/menulist.dart';
+import '../../../../core/theme/palette.dart';
 import '../../../mastersearch/Truck.dart';
 import '../bloc/licenseupdate_bloc.dart';
 import '../bloc/licenseupdate_event.dart';
 import '../bloc/licenseupdate_state.dart';
 
-// ─── Design Tokens ────────────────────────────────────────────────────────────
-const kHeaderGradStart = Color(0xFF1A3A8F);
-const kHeaderGradEnd   = Color(0xFF4A6FD4);
-const kCardBorder      = Color(0xFFC5D0EE);
-const kPageBg          = Color(0xFFF4F6FB);
-const kTextDark        = Color(0xFF1E2D5E);
-const kTextMid         = Color(0xFF4A5A8A);
-const kTextMuted       = Color(0xFF8A96BF);
-const kDetailBg        = Color(0xFFF0F4FF);
-const kChipBg          = Color(0xFFEEF2FF);
+
+
 
 const kGradient = LinearGradient(
-  colors: [kHeaderGradStart, kHeaderGradEnd],
+  colors: [Palette.blue700, Palette.blue400],
   begin: Alignment.topLeft,
   end: Alignment.bottomRight,
 );
@@ -96,7 +89,7 @@ class _LicenseUpdatePage extends StatelessWidget {
         },
         child: Scaffold(
           resizeToAvoidBottomInset: true,
-          backgroundColor: kPageBg,
+          backgroundColor: Palette.grey100,
           appBar: _buildAppBar(context, userName),
           drawer: const Menulist(),
           body:
@@ -106,7 +99,7 @@ class _LicenseUpdatePage extends StatelessWidget {
                   state is LicenseUpdateLoading) {
                 return const Center(
                   child: SpinKitFoldingCube(
-                      color: kHeaderGradEnd, size: 35),
+                      color: Palette.blue400, size: 35),
                 );
               }
               if (state is LicenseUpdateLoaded) {
@@ -286,14 +279,14 @@ class _TruckSelectorField extends StatelessWidget {
         padding: const EdgeInsets.symmetric(
             horizontal: 14, vertical: 14),
         decoration: BoxDecoration(
-          color: kDetailBg,
+          color: Palette.grey200p,
           borderRadius: BorderRadius.circular(10),
-          border: Border.all(color: kCardBorder, width: 0.5),
+          border: Border.all(color: Palette.cardBorder, width: 0.5),
         ),
         child: Row(
           children: [
             const Icon(Icons.local_shipping_outlined,
-                size: 20, color: kHeaderGradEnd),
+                size: 20, color: Palette.blue400),
             const SizedBox(width: 10),
             Expanded(
               child: Text(
@@ -302,8 +295,8 @@ class _TruckSelectorField extends StatelessWidget {
                     : state.truckName,
                 style: GoogleFonts.lato(
                   color: state.truckName.isEmpty
-                      ? kTextMuted
-                      : kTextDark,
+                      ? Palette.kTextMuted
+                      : Palette.textDark2,
                   fontWeight: state.truckName.isEmpty
                       ? FontWeight.w500
                       : FontWeight.w600,
@@ -319,7 +312,7 @@ class _TruckSelectorField extends StatelessWidget {
                   ? Icons.close_rounded
                   : Icons.search_rounded,
               size: 20,
-              color: kHeaderGradEnd,
+              color: Palette.blue400,
             ),
           ],
         ),
@@ -328,7 +321,6 @@ class _TruckSelectorField extends StatelessWidget {
   }
 }
 
-// ─── Truck Fields — Mobile (single column) ────────────────────────────────────
 class _TruckFieldsMobile extends StatelessWidget {
   final LicenseUpdateLoaded state;
   const _TruckFieldsMobile({required this.state});
@@ -356,18 +348,6 @@ class _TruckFieldsMobile extends StatelessWidget {
             isTablet: false),
         const SizedBox(height: 10),
         _TruckTextField(
-            label: 'Longitude',
-            fieldKey: 'longitude',
-            value: state.longitude,
-            isTablet: false),
-        const SizedBox(height: 10),
-        _TruckTextField(
-            label: 'Latitude',
-            fieldKey: 'latitude',
-            value: state.latitude,
-            isTablet: false),
-        const SizedBox(height: 10),
-        _TruckTextField(
             label: 'Truck Type',
             fieldKey: 'truckType',
             value: state.truckType,
@@ -377,7 +357,7 @@ class _TruckFieldsMobile extends StatelessWidget {
   }
 }
 
-// ─── Truck Fields — Tablet (2-column) ────────────────────────────────────────
+
 class _TruckFieldsTablet extends StatelessWidget {
   final LicenseUpdateLoaded state;
   final double gap;
@@ -390,8 +370,6 @@ class _TruckFieldsTablet extends StatelessWidget {
       ('Truck No 1',  'truckNo',       state.truckNo),
       ('Truck No 2',  'truckNo2',      state.truckNo2),
       ('Truck Name',  'truckName',     state.truckNameField),
-      ('Longitude',   'longitude',     state.longitude),
-      ('Latitude',    'latitude',      state.latitude),
       ('Truck Type',  'truckType',     state.truckType),
     ];
 
@@ -425,7 +403,7 @@ class _TruckFieldsTablet extends StatelessWidget {
   }
 }
 
-// ─── Expiry List — Mobile (single column) ────────────────────────────────────
+
 class _ExpiryListMobile extends StatelessWidget {
   final LicenseUpdateLoaded state;
   const _ExpiryListMobile({required this.state});
@@ -448,7 +426,6 @@ class _ExpiryListMobile extends StatelessWidget {
   }
 }
 
-// ─── Expiry Grid — Tablet (2-column) ─────────────────────────────────────────
 class _ExpiryGridTablet extends StatelessWidget {
   final LicenseUpdateLoaded state;
   final BoxConstraints constraints;
@@ -520,7 +497,7 @@ class _ExpiryDateRow extends StatelessWidget {
     }
 
     final labelStyle = GoogleFonts.lato(
-      color: kTextMid,
+      color: Palette.textMid,
       fontWeight: FontWeight.w600,
       fontSize:
       isTablet ? objfun.FontMedium + 1 : objfun.FontMedium,
@@ -547,10 +524,10 @@ class _ExpiryDateRow extends StatelessWidget {
                       data: Theme.of(ctx).copyWith(
                         colorScheme:
                         const ColorScheme.light(
-                          primary: kHeaderGradStart,
+                          primary: Palette.blue700,
                           onPrimary: Colors.white,
                           surface: Colors.white,
-                          onSurface: kTextDark,
+                          onSurface: Palette.textDark2,
                         ),
                       ),
                       child: child!,
@@ -571,12 +548,12 @@ class _ExpiryDateRow extends StatelessWidget {
                       horizontal: 12, vertical: 12),
                   decoration: BoxDecoration(
                     color: enabled
-                        ? kDetailBg
+                        ? Palette.grey200p
                         : const Color(0xFFEEEEEE),
                     borderRadius:
                     BorderRadius.circular(10),
                     border: Border.all(
-                        color: kCardBorder, width: 0.5),
+                        color: Palette.cardBorder, width: 0.5),
                   ),
                   child: Row(
                     children: [
@@ -585,8 +562,8 @@ class _ExpiryDateRow extends StatelessWidget {
                           display,
                           style: GoogleFonts.lato(
                             color: enabled
-                                ? kTextDark
-                                : kTextMuted,
+                                ? Palette.textDark2
+                                : Palette.kTextMuted,
                             fontWeight: FontWeight.w600,
                             fontSize: isTablet
                                 ? objfun.FontLow + 1
@@ -598,8 +575,8 @@ class _ExpiryDateRow extends StatelessWidget {
                         Icons.calendar_month_outlined,
                         size: 18,
                         color: enabled
-                            ? kHeaderGradEnd
-                            : kTextMuted,
+                            ? Palette.blue400
+                            : Palette.kTextMuted,
                       ),
                     ],
                   ),
@@ -627,7 +604,7 @@ class _ExpiryDateRow extends StatelessWidget {
                   border: enabled
                       ? null
                       : Border.all(
-                      color: kCardBorder,
+                      color: Palette.cardBorder,
                       width: 1.5),
                   borderRadius: BorderRadius.circular(6),
                 ),
@@ -700,7 +677,7 @@ class _TruckTextFieldState extends State<_TruckTextField> {
       children: [
         Text(widget.label,
             style: GoogleFonts.lato(
-                color: kTextMid,
+                color: Palette.textMid,
                 fontWeight: FontWeight.w600,
                 fontSize: widget.isTablet
                     ? objfun.FontLow + 1
@@ -717,7 +694,7 @@ class _TruckTextFieldState extends State<_TruckTextField> {
                       field: widget.fieldKey,
                       value: v)),
           style: GoogleFonts.lato(
-            color: kTextDark,
+            color: Palette.textDark2,
             fontWeight: FontWeight.w600,
             fontSize: widget.isTablet
                 ? objfun.FontLow + 1
@@ -726,12 +703,12 @@ class _TruckTextFieldState extends State<_TruckTextField> {
           decoration: InputDecoration(
             hintText: widget.label,
             hintStyle: GoogleFonts.lato(
-                color: kTextMuted,
+                color: Palette.kTextMuted,
                 fontSize: widget.isTablet
                     ? objfun.FontLow + 1
                     : objfun.FontLow),
             filled: true,
-            fillColor: isAdmin ? kDetailBg : const Color(0xFFEEEEEE),
+            fillColor: isAdmin ? Palette.grey200p : const Color(0xFFEEEEEE),
             contentPadding: const EdgeInsets.symmetric(
                 horizontal: 14, vertical: 13),
             border: OutlineInputBorder(
@@ -740,12 +717,12 @@ class _TruckTextFieldState extends State<_TruckTextField> {
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(10),
               borderSide: const BorderSide(
-                  color: kCardBorder, width: 0.5),
+                  color: Palette.cardBorder, width: 0.5),
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(10),
               borderSide: const BorderSide(
-                  color: kHeaderGradEnd, width: 1.5),
+                  color: Palette.blue400, width: 1.5),
             ),
           ),
         ),
@@ -775,7 +752,7 @@ class _SectionHeader extends StatelessWidget {
         const SizedBox(width: 8),
         Text(label,
             style: GoogleFonts.lato(
-                color: kTextDark,
+                color: Palette.textDark2,
                 fontWeight: FontWeight.w700,
                 fontSize:
                 isTablet ? 15 : 14)),

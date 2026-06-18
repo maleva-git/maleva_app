@@ -17,13 +17,12 @@ import '../../../../home/view/home_tab.dart';
 import '../../../../mastersearch/Customer.dart';
 import '../../../../mastersearch/Employee.dart';
 import '../../../../mastersearch/JobType.dart';
+import '../../../salesorder/add/view/salesorderadd_tab.dart';
 import '../../add/view/enquirytradd_tab.dart';
 import '../bloc/enquirytrview_bloc.dart';
 import '../bloc/enquirytrview_event.dart';
 import '../bloc/enquirytrview_state.dart';
 import 'package:maleva/core/colors/colors.dart' as colour;
-
-// ─── Design Tokens ────────────────────────────────────────────────────────────
 
 
 const kGradient = LinearGradient(
@@ -32,7 +31,7 @@ const kGradient = LinearGradient(
   end: Alignment.bottomRight,
 );
 
-// ─── Root ─────────────────────────────────────────────────────────────────────
+
 class EnquiryTRView extends StatelessWidget {
   const EnquiryTRView({super.key});
 
@@ -45,7 +44,6 @@ class EnquiryTRView extends StatelessWidget {
   }
 }
 
-// ─── Page ─────────────────────────────────────────────────────────────────────
 class _EnquiryViewPage extends StatelessWidget {
   const _EnquiryViewPage();
 
@@ -68,9 +66,9 @@ class _EnquiryViewPage extends StatelessWidget {
           Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (_) => SalesOrderAdd(
-                saleDetails: null,
-                saleMaster: state.enquiryList,
+              builder: (_) => SalesOrdersAdd(
+                SaleDetails: null,
+                SaleMaster: state.enquiryList,
               ),
             ),
           );
