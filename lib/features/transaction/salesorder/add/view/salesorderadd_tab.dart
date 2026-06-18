@@ -61,7 +61,6 @@ class _SalesOrderAddBodyState extends State<_SalesOrderAddBody> with TickerProvi
   late TabController _tabController;
   String _activeNumpadField = 'qty';
 
-  // ✅ GUARANTEED: Centralized Controller Memory. Never destroyed by TabBar.
   final Map<String, TextEditingController> _controllers = {};
 
   TextEditingController _getController(String key, String stateValue) {
@@ -358,9 +357,6 @@ class _SalesOrderAddBodyState extends State<_SalesOrderAddBody> with TickerProvi
     ]);
   }
 
-  // ════════════════════════════════════════════════════
-  // TAB 2
-  // ════════════════════════════════════════════════════
   Widget _buildTab2(BuildContext context, SalesOrderAddLoaded state, double width, double height) {
     final bloc = context.read<SalesOrderAddBloc>();
     final fp = state.fieldPermission;
@@ -415,12 +411,7 @@ class _SalesOrderAddBodyState extends State<_SalesOrderAddBody> with TickerProvi
     ]);
   }
 
-  // ════════════════════════════════════════════════════
-  // TAB 3
-  // ════════════════════════════════════════════════════
-// ════════════════════════════════════════════════════
-  // TAB 3
-  // ════════════════════════════════════════════════════
+
   Widget _buildTab3(BuildContext context, SalesOrderAddLoaded state, double height) {
     final bloc = context.read<SalesOrderAddBloc>();
     final fp = state.fieldPermission;
@@ -488,9 +479,6 @@ class _SalesOrderAddBodyState extends State<_SalesOrderAddBody> with TickerProvi
     ]);
   }
 
-  // ════════════════════════════════════════════════════
-  // TAB 4
-  // ════════════════════════════════════════════════════
   Widget _buildTab4(BuildContext context, SalesOrderAddLoaded state, double height) {
     final bloc = context.read<SalesOrderAddBloc>();
     final fp = state.fieldPermission;
@@ -557,9 +545,6 @@ class _SalesOrderAddBodyState extends State<_SalesOrderAddBody> with TickerProvi
     ]);
   }
 
-  // ════════════════════════════════════════════════════
-  // TAB 5
-  // ════════════════════════════════════════════════════
   Widget _buildTab5(BuildContext context, SalesOrderAddLoaded state, double height) {
     final bloc = context.read<SalesOrderAddBloc>();
     final fp = state.fieldPermission;
@@ -687,9 +672,7 @@ class _SalesOrderAddBodyState extends State<_SalesOrderAddBody> with TickerProvi
     ]);
   }
 
-  // ════════════════════════════════════════════════════
-  // TAB 6
-  // ════════════════════════════════════════════════════
+
   Widget _buildTab6(BuildContext context, SalesOrderAddLoaded state, double width, double height) {
     final bloc = context.read<SalesOrderAddBloc>();
     final fp = state.fieldPermission;
@@ -742,9 +725,7 @@ class _SalesOrderAddBodyState extends State<_SalesOrderAddBody> with TickerProvi
     ]);
   }
 
-  // ════════════════════════════════════════════════════
-  // Reusable Component Helpers (FW, ZB, Address)
-  // ════════════════════════════════════════════════════
+
   Widget _fwCard(
       BuildContext context, SalesOrderAddBloc bloc, SalesOrderAddLoaded state, Map<String, bool> fp, {
         required int fwNum, required bool visible, required String? dropValue, required String dropKey,
@@ -898,9 +879,7 @@ class _SalesOrderAddBodyState extends State<_SalesOrderAddBody> with TickerProvi
       ),
     ]);
   }
-  // ════════════════════════════════════════════════════
-  // Base UI Helpers
-  // ════════════════════════════════════════════════════
+
   Widget _tabScroll({required List<Widget> children}) => ListView(padding: const EdgeInsets.fromLTRB(14, 14, 14, 100), children: children);
   Widget _sectionCard({required List<Widget> children}) => Container(padding: const EdgeInsets.all(14), decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(16), border: Border.all(color: colour.border), boxShadow: const [BoxShadow(color: Color(0x0A1555F3), blurRadius: 8, offset: Offset(0, 2))]), child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: children));
   Widget _sectionLabel(String t) => Text(t, style: GoogleFonts.poppins(color: colour.textSub, fontSize: 10, fontWeight: FontWeight.w700, letterSpacing: 0.6));
@@ -926,7 +905,6 @@ class _SalesOrderAddBodyState extends State<_SalesOrderAddBody> with TickerProvi
     );
   }
 
-  // ✅ GUARANTEED: Centralized Controllers injected into TextField
   Widget _editField({required String hint, required String uniqueId, required String value, required bool enabled, required ValueChanged<String> onChanged, int minLines = 1, int? maxLines = 1, TextInputType keyboardType = TextInputType.text}) {
     return TextField(
       controller: _getController(uniqueId, value),
@@ -1001,9 +979,7 @@ class _SalesOrderAddBodyState extends State<_SalesOrderAddBody> with TickerProvi
 
   Widget _iconBtn({required IconData icon, required bool enabled, required VoidCallback onTap}) => GestureDetector(onTap: enabled ? onTap : null, child: Container(width: 40, height: 40, decoration: BoxDecoration(color: enabled ? colour.brandLight : colour.surface, borderRadius: BorderRadius.circular(10), border: Border.all(color: enabled ? colour.border : colour.border.withOpacity(0.3))), child: Icon(icon, color: enabled ? colour.brand : colour.textSub.withOpacity(0.3), size: 22)));
 
-  // ════════════════════════════════════════════════════
-  // Dialogs & Product Table
-  // ════════════════════════════════════════════════════
+
   void _showProductDialog(BuildContext context, SalesOrderAddLoaded state, int editIndex) {
     final bloc = context.read<SalesOrderAddBloc>();
     if (editIndex >= 0) { bloc.add(PrepareProductEdit(editIndex)); } else { bloc.add(ClearProduct()); }

@@ -52,7 +52,6 @@ class mobiledesign extends StatelessWidget {
   }
 }
 
-// ─── Single LoginBody — mobile & tablet both handle பண்றது ───────────────────
 class _LoginBody extends StatefulWidget {
   final LoginState state;
   final bool isTablet;
@@ -108,7 +107,6 @@ class _LoginBodyState extends State<_LoginBody>
     }
   }
 
-  // ── Shorthand getters ──────────────────────────────────────────────────
   bool get _isTablet => widget.isTablet;
   LoginState get _s => widget.state;
 
@@ -118,7 +116,6 @@ class _LoginBodyState extends State<_LoginBody>
     final compact = !_isTablet && screenH < 700;
 
     return Stack(children: [
-      // Background
       Positioned.fill(
         child: Container(
           decoration: const BoxDecoration(
@@ -139,11 +136,9 @@ class _LoginBodyState extends State<_LoginBody>
         child: FadeTransition(
           opacity: _fadeAnim,
           child:
-          // AFTER ✅
           SafeArea(
-            child: Column(                             // ← outer Column (fixed)
+            child: Column(
               children: [
-                // Brand strip — fixed, scroll ஆகாது
                 Padding(
                   padding: EdgeInsets.symmetric(
                     horizontal: _isTablet ? 32 : 20,
@@ -252,6 +247,7 @@ class _LoginBodyState extends State<_LoginBody>
       Row(mainAxisSize: MainAxisSize.min, children: [
         _lineDivider(),
         const SizedBox(width: 10),
+
         Text('LOGISTICS SUITE',
             style: GoogleFonts.dmSans(
                 fontSize: 9, fontWeight: FontWeight.w600,
@@ -260,6 +256,7 @@ class _LoginBodyState extends State<_LoginBody>
         _lineDivider(),
       ]),
     ]);
+
   }
 
   // ══════════════════════════════════════════════════════════════════════

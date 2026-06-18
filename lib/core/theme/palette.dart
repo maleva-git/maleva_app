@@ -3,27 +3,27 @@ import 'package:flutter/material.dart';
 class Palette {
   Palette._();
 
-  // ── Blues ─────────────────────────────────────────────────
-  static const blue50   = Color(0xFFE8EEFF);   // kAccent, kBlueBg, brandLight, accentBg.blue
+
+  static const blue50   = Color(0xFFE8EEFF);
   static const blue200  = Color(0xFFB5D4F4);
-  static const blue400  = Color(0xFF4A6FD4);   // kHeaderGradEnd, kBlueL, kPrimaryLight, cBlueLight, brandMid
-  static const blue500  = Color(0xFF3A7BFF);   // kPrimaryL, cBlueLight
-  static const blue600  = Color(0xFF1555F3);   // cBlue, brand, accentFg.blue
-  static const blue700  = Color(0xFF1A3A8F);   // kPrimary, kHeaderGradStart, AppColors.appBarColor, commonColor
-  static const blue800  = Color(0xFF0D3DB5);   // kPrimaryDark, kBlueDark, cBlueDark, brandDark
-  static const blue900  = Color(0xFF0A2D8A);   // brandDeep
-  static const blue950  = Color(0xFF0D2A99);   // kPrimaryD, cBlueDark (dark variant)
-  static const blueNavy = Color(0xFF1A2E5A);   // kNavy
-  static const blueDeep = Color(0xFF1E3A8A);   // AppColors.primaryGradient start
-  static const blueLight= Color(0xFF5B9BD5);   // kBlue, commonColorLight
-  static const blueMid  = Color(0xFF2563EB);   // AppColors.primaryGradient end
-  static const blueBar  = Color(0xFF3563E9);   // kBarBlue
-  static const blueCobalt= Color(0xFF3B82F6);  // kCobalt
-  static const blueAccent= Color(0xFF2F80ED);  // kBlueAccent
-  static const blueAccentFg= Color(0xFF4B7BF5);// brandMid
+  static const blue400  = Color(0xFF4A6FD4);
+  static const blue500  = Color(0xFF3A7BFF);
+  static const blue600  = Color(0xFF1555F3);
+  static const blue700  = Color(0xFF1A3A8F);
+  static const blue800  = Color(0xFF0D3DB5);
+  static const blue900  = Color(0xFF0A2D8A);
+  static const blue950  = Color(0xFF0D2A99);
+  static const blueNavy = Color(0xFF1A2E5A);
+  static const blueDeep = Color(0xFF1E3A8A);
+  static const blueLight= Color(0xFF5B9BD5);
+  static const blueMid  = Color(0xFF2563EB);
+  static const blueBar  = Color(0xFF3563E9);
+  static const blueCobalt= Color(0xFF3B82F6);
+  static const blueAccent= Color(0xFF2F80ED);
+  static const blueAccentFg= Color(0xFF4B7BF5);
 
   // ── Brand glow / translucent ──────────────────────────────
-  static const brandGlow  = Color(0x1F1555F3); // brandGlow
+  static const brandGlow  = Color(0x1F1555F3);
   static const brandBorder= Color(0x261555F3); // border (saleorder)
   static const pillBg     = Color(0x33FFFFFF);  // kPillBg
   static const rwhite     = Color(0x54E1E1E1);  // RWhite

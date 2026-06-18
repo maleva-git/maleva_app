@@ -55,10 +55,10 @@ class AppPreferences {
     await _prefs.setString('Username', '');
     await _prefs.setString('Password', '');
     await _prefs.setString('OldUsername', '');
+    await _prefs.setString('loadmenu', '');
     await _prefs.setInt('EmpRefId', 0);
     await _prefs.setInt('DriverLogin', 0);
   }
 
-  // Raw SharedPreferences access (legacy clsfunction.dart use panna vendiruntha)
   static SharedPreferences get raw => _prefs;
 }
