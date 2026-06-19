@@ -1,8 +1,12 @@
 
+import '../config/app_config.dart';
+
 class ApiConstants {
   ApiConstants._();
 
-static const String port = "https://maleva.my";
+  static const String port = AppConfig.baseUrl;
+
+//static const String port = "https://maleva.my";
   // Demo servers:
   // static const String port = "http://103.215.139.121:9001/";
   //static const String port = "http://103.215.139.8:8001/";
@@ -167,4 +171,7 @@ static const String port = "https://maleva.my";
   static const String apiSelectFuelFillingReport = "$port/api/MasterReportApp/SelectFuelFillings";
   static const String apiSelectEngineHoursReport = "$port/api/MasterReportApp/SelectEngineHours";
   static const String apiSelectDriverSalary   = "$port/api/TransactionReportApp/DriverRTIDetailedReport";
+
+  // ─── App Troubleshoot / Support Log ────────────────────────────────────────
+  static const String apiInsertAppLog         = "$port/api/AppLogApp/InsertAppLog";
 }

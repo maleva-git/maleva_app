@@ -35,6 +35,7 @@ import '../../features/auth/presentation/bloc/auth_bloc.dart';
 import '../../features/auth/presentation/pages/login_page.dart.dart';
 import '../../features/home/view/home_tab.dart';
 import '../../features/mastersearch/Employee.dart';
+import '../config/app_config.dart';
 import '../network/api_services/auth_api.dart';
 import 'app_preferences.dart';
 String appversion="1.1.10+98";
@@ -53,7 +54,9 @@ AssetImage lockimg = const AssetImage('assets/common/lockImg.png');
 
 //String port = "http://103.215.139.8:8001/"; //Demolatest
 
-String port = "https://maleva.my"; //Live
+//String port = "https://maleva.my"; //Live
+
+String port = AppConfig.baseUrl;
 
 //String razorpaykey = "rzp_live_GmuWNB2PVXAnLt";
 
