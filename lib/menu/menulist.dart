@@ -49,6 +49,7 @@ import '../features/transport/maintenance/view/maintenance_tab.dart';
 import '../features/transport/updatertidetails/bloc/updatertidetails_bloc.dart';
 import '../features/transport/updatertidetails/bloc/updatertidetails_event.dart';
 import '../features/transport/updatertidetails/view/updatertidetails_tab.dart';
+import '../features/troubleshoot/view/troubleshoot_sheet.dart';
 
 class Menulist extends StatefulWidget {
   const Menulist({super.key});
@@ -221,6 +222,7 @@ class _MenulistState extends State<Menulist>
                 const SizedBox(height: 16),
                 Row(
                   children: [
+
                     Container(
                       padding: const EdgeInsets.symmetric(
                           horizontal: 10, vertical: 4),
@@ -319,17 +321,70 @@ class _MenulistState extends State<Menulist>
   }
 
   Widget _buildMenuList() {
-    return ListView.builder(
-      padding: const EdgeInsets.fromLTRB(14, 0, 14, 20),
-      itemCount: _rootItems.length,
-      itemBuilder: (ctx, i) => _MenuTile(
-        entry: _rootItems[i],
-        drawerContext: context,
-        searchQuery: _query,
+    return Column(
+      children: [
+        Expanded(
+          child: ListView.builder(
+            padding: const EdgeInsets.fromLTRB(14, 0, 14, 4),
+            itemCount: _rootItems.length,
+            itemBuilder: (ctx, i) => _MenuTile(
+              entry: _rootItems[i],
+              drawerContext: context,
+              searchQuery: _query,
+            ),
+          ),
+        ),
+        _buildTroubleshootTile(),
+      ],
+    );
+  }
+
+  Widget _buildTroubleshootTile() {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(14, 4, 14, 16),
+      child: GestureDetector(
+        onTap: () => showTroubleshootSheet(context),
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 11),
+          decoration: BoxDecoration(
+            color: const Color(0xFFFFF8E8),
+            borderRadius: BorderRadius.circular(14),
+            border: Border.all(color: const Color(0xFFFFE9B8)),
+          ),
+          child: Row(
+            children: [
+              Container(
+                width: 36, height: 36,
+                decoration: BoxDecoration(
+                  color: const Color(0xFFFFF1CE),
+                  borderRadius: BorderRadius.circular(11),
+                ),
+                child: const Icon(Icons.bug_report_outlined,
+                    size: 18, color: Color(0xFFB8860B)),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Text(
+                  'Report a Problem',
+                  style: GoogleFonts.dmSans(
+                    fontSize: 13.5,
+                    fontWeight: FontWeight.w600,
+                    color: const Color(0xFF8A6400),
+                  ),
+                ),
+              ),
+              Icon(Icons.arrow_forward_ios_rounded,
+                  size: 12, color: const Color(0xFFB8860B).withOpacity(0.5)),
+            ],
+          ),
+        ),
       ),
     );
   }
+
 }
+
+
 
 
 class _MenuTile extends StatefulWidget {

@@ -21,8 +21,8 @@ class _AddressListstate extends State<AddressList> {
   bool? _loadState;
   String _errorMsg = '';
 
-  final txtSearch    = TextEditingController();
-  List<String> _masterList   = [];
+  final txtSearch = TextEditingController();
+  List<String> _masterList = [];
   List<String> _filteredList = [];
 
   @override
@@ -37,17 +37,15 @@ class _AddressListstate extends State<AddressList> {
     super.dispose();
   }
 
-  // ─── Fetch ───────────────────────────────────────────────────────────────
+  // ─── Fetch (Untouched) ───────────────────────────────────────────────────
 
   Future<void> _startup() async {
     if (mounted) setState(() { _loadState = null; _errorMsg = ''; });
 
     try {
-      // Call the API via ApiClient (POST with auth headers, same as every
-      // other screen in the app).
       final response = await ApiClient.postRequest(
         '${objfun.apiSelectAddressList}${objfun.Comid}',
-        null, // no request body — this endpoint takes no body
+        null,
       );
 
       if (!mounted) return;
@@ -57,24 +55,23 @@ class _AddressListstate extends State<AddressList> {
         loaded = response.map((e) => e.toString()).toList();
       }
 
-      // Also update the global so the rest of the app sees the fresh data
       objfun.AddressList = loaded;
 
       setState(() {
-        _masterList   = loaded;
+        _masterList = loaded;
         _filteredList = List<String>.from(loaded);
-        _loadState    = true;
+        _loadState = true;
       });
     } catch (e) {
       if (!mounted) return;
       setState(() {
-        _errorMsg  = e.toString();
+        _errorMsg = e.toString();
         _loadState = false;
       });
     }
   }
 
-  // ─── Search ───────────────────────────────────────────────────────────────
+  // ─── Search (Untouched) ──────────────────────────────────────────────────
 
   void _search(String value) {
     setState(() {
@@ -107,10 +104,18 @@ class _AddressListstate extends State<AddressList> {
 
   Widget _buildTabletLayout() => Scaffold(
     appBar: _buildAppBar(),
+    backgroundColor: Colors.grey.shade100, // Softer background for tablet
     body: Padding(
       padding: const EdgeInsets.only(
           left: 100, right: 100, top: 50, bottom: 40),
-      child: Card(elevation: 12, child: _buildBody()),
+      child: Card(
+        elevation: 8,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(16),
+          child: _buildBody(),
+        ),
+      ),
     ),
   );
 
@@ -130,8 +135,15 @@ class _AddressListstate extends State<AddressList> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Icon(Icons.wifi_off, color: colour.commonColorred, size: 48),
-            const SizedBox(height: 12),
+            Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: colour.commonColorred.withOpacity(0.1),
+                shape: BoxShape.circle,
+              ),
+              child: const Icon(Icons.wifi_off, color: colour.commonColorred, size: 48),
+            ),
+            const SizedBox(height: 16),
             Text(
               'Failed to load addresses',
               style: GoogleFonts.lato(
@@ -143,23 +155,25 @@ class _AddressListstate extends State<AddressList> {
             if (_errorMsg.isNotEmpty)
               Padding(
                 padding: const EdgeInsets.symmetric(
-                    horizontal: 24, vertical: 8),
+                    horizontal: 32, vertical: 12),
                 child: Text(
                   _errorMsg,
                   textAlign: TextAlign.center,
                   style: GoogleFonts.lato(
-                    color: Colors.grey,
+                    color: Colors.grey.shade600,
                     fontSize: objfun.FontCardText,
                   ),
                 ),
               ),
-            const SizedBox(height: 16),
+            const SizedBox(height: 20),
             ElevatedButton.icon(
               style: ElevatedButton.styleFrom(
-                  backgroundColor: colour.commonColor),
+                  backgroundColor: colour.commonColor,
+                  padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8))),
               icon: const Icon(Icons.refresh, color: Colors.white),
               label: Text('Retry',
-                  style: GoogleFonts.lato(color: Colors.white)),
+                  style: GoogleFonts.lato(color: Colors.white, fontWeight: FontWeight.bold)),
               onPressed: _startup,
             ),
           ],
@@ -168,14 +182,12 @@ class _AddressListstate extends State<AddressList> {
     }
 
     // Loaded
-    final double height = MediaQuery.of(context).size.height;
     return Column(
       children: [
-        const SizedBox(height: 5),
-        _buildSearchField(height * 0.06),
-        const SizedBox(height: 5),
-        const Divider(color: colour.commonColor, thickness: 1, height: 1),
-        const SizedBox(height: 5),
+        const SizedBox(height: 12),
+        _buildSearchField(),
+        const SizedBox(height: 12),
+        Divider(color: Colors.grey.shade300, thickness: 1, height: 1),
         Expanded(child: _buildListOrEmpty()),
       ],
     );
@@ -187,30 +199,29 @@ class _AddressListstate extends State<AddressList> {
     return AppBar(
       backgroundColor: colour.commonColor,
       centerTitle: objfun.MalevaScreen != 1,
+      elevation: 0,
       title: Text(
-        'Address',
+        'Address List',
         style: GoogleFonts.lato(
           textStyle: TextStyle(
             color: colour.topAppBarColor,
             fontWeight: FontWeight.bold,
             fontSize: objfun.FontLarge,
-            letterSpacing: 0.3,
+            letterSpacing: 0.5,
           ),
         ),
       ),
       leading: IconButton(
-        icon: const Icon(Icons.arrow_back,
-            color: colour.topAppBarColor, size: 35.0),
+        icon: const Icon(Icons.arrow_back_ios_new,
+            color: colour.topAppBarColor, size: 24.0), // Modern back icon
         onPressed: () => Navigator.pop(context),
       ),
     );
   }
 
-  Widget _buildSearchField(double fieldHeight) {
+  Widget _buildSearchField() {
     return Container(
-      height: fieldHeight,
-      alignment: Alignment.center,
-      margin: const EdgeInsets.symmetric(horizontal: 8),
+      margin: const EdgeInsets.symmetric(horizontal: 16),
       child: TextField(
         controller: txtSearch,
         keyboardType: TextInputType.text,
@@ -219,38 +230,41 @@ class _AddressListstate extends State<AddressList> {
         style: GoogleFonts.lato(
           textStyle: TextStyle(
             color: colour.commonColor,
-            fontWeight: FontWeight.bold,
+            fontWeight: FontWeight.w600,
             fontSize: objfun.FontLow,
             letterSpacing: 0.3,
           ),
         ),
         decoration: InputDecoration(
-          enabledBorder: const OutlineInputBorder(
-            borderRadius: BorderRadius.all(Radius.circular(10.0)),
-            borderSide: BorderSide(color: colour.commonColor),
+          filled: true,
+          fillColor: Colors.grey.shade100, // Nice soft background
+          contentPadding: const EdgeInsets.symmetric(vertical: 0, horizontal: 16),
+          enabledBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(12.0),
+            borderSide: BorderSide(color: Colors.grey.shade300, width: 1.5),
           ),
-          focusedBorder: const OutlineInputBorder(
-            borderRadius: BorderRadius.all(Radius.circular(10.0)),
-            borderSide: BorderSide(color: colour.commonColorred),
+          focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(12.0),
+            borderSide: const BorderSide(color: colour.commonColor, width: 2.0),
           ),
-          hintText: 'Search Address',
+          hintText: 'Search Address...',
           hintStyle: GoogleFonts.lato(
             textStyle: TextStyle(
-              letterSpacing: 2,
-              fontWeight: FontWeight.bold,
-              color: Colors.grey,
+              letterSpacing: 1,
+              color: Colors.grey.shade500,
               fontSize: objfun.FontLow,
             ),
           ),
+          prefixIcon: const Icon(Icons.search, color: Colors.grey),
           suffixIcon: txtSearch.text.isNotEmpty
               ? IconButton(
-            icon: const Icon(Icons.clear, color: colour.commonColorred),
+            icon: const Icon(Icons.cancel, color: Colors.grey),
             onPressed: () {
               txtSearch.clear();
               _search('');
             },
           )
-              : const Icon(Icons.search, color: colour.commonColor),
+              : null,
         ),
         onChanged: _search,
         onSubmitted: _search,
@@ -261,56 +275,66 @@ class _AddressListstate extends State<AddressList> {
   Widget _buildListOrEmpty() {
     if (_filteredList.isEmpty) {
       return Center(
-        child: Text(
-          txtSearch.text.isNotEmpty ? 'No match found' : 'No Record',
-          style: GoogleFonts.lato(
-            textStyle: TextStyle(
-              color: colour.commonColor,
-              fontWeight: FontWeight.bold,
-              fontSize: objfun.FontLow,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(
+              txtSearch.text.isNotEmpty ? Icons.search_off : Icons.inbox_outlined,
+              size: 64,
+              color: Colors.grey.shade400,
             ),
-          ),
+            const SizedBox(height: 16),
+            Text(
+              txtSearch.text.isNotEmpty ? 'No match found' : 'No Records Available',
+              style: GoogleFonts.lato(
+                textStyle: TextStyle(
+                  color: Colors.grey.shade600,
+                  fontWeight: FontWeight.bold,
+                  fontSize: objfun.FontLow,
+                ),
+              ),
+            ),
+          ],
         ),
       );
     }
 
     return ListView.builder(
-      padding: const EdgeInsets.all(10),
+      padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
       itemCount: _filteredList.length,
       itemBuilder: (context, index) {
         final item = _filteredList[index];
-        return InkWell(
-          onTap: () {
-            if (widget.Searchby == 1) _onItemTapped(item);
-          },
-          child: SizedBox(
-            height: 55,
-            child: Card(
-              margin: const EdgeInsets.only(
-                  right: 5.0, left: 5.0, top: 1, bottom: 1),
-              elevation: 10.0,
-              shape: RoundedRectangleBorder(
-                side: const BorderSide(color: colour.commonColor, width: 1),
-                borderRadius: BorderRadius.circular(10),
-              ),
-              child: Padding(
-                padding: const EdgeInsets.only(left: 10),
-                child: Align(
-                  alignment: Alignment.centerLeft,
-                  child: Text(
-                    item,
-                    overflow: TextOverflow.ellipsis,
-                    maxLines: 1,
-                    style: GoogleFonts.lato(
-                      textStyle: TextStyle(
-                        color: colour.commonColor,
-                        fontWeight: FontWeight.bold,
-                        fontSize: objfun.FontCardText,
-                        letterSpacing: 0.3,
-                      ),
+        return Card(
+          margin: const EdgeInsets.symmetric(vertical: 6.0, horizontal: 4.0),
+          elevation: 2.0, // Reduced from 10 for a cleaner look
+          shadowColor: Colors.black12,
+          shape: RoundedRectangleBorder(
+            side: BorderSide(color: colour.commonColor.withOpacity(0.15), width: 1),
+            borderRadius: BorderRadius.circular(12),
+          ),
+          child: InkWell(
+            borderRadius: BorderRadius.circular(12), // Match card radius
+            onTap: () {
+              if (widget.Searchby == 1) _onItemTapped(item);
+            },
+            child: Padding(
+              padding: const EdgeInsets.symmetric(vertical: 4.0),
+              child: ListTile(
+                title: Text(
+                  item,
+                  overflow: TextOverflow.ellipsis,
+                  maxLines: 2, // Allow 2 lines just in case address is long
+                  style: GoogleFonts.lato(
+                    textStyle: TextStyle(
+                      color: colour.commonColor,
+                      fontWeight: FontWeight.w600,
+                      fontSize: objfun.FontCardText,
+                      letterSpacing: 0.3,
+                      height: 1.4,
                     ),
                   ),
                 ),
+                trailing: Icon(Icons.chevron_right, color: Colors.grey.shade400),
               ),
             ),
           ),
