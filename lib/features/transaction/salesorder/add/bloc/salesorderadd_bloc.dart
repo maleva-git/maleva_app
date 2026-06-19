@@ -72,19 +72,41 @@ class SalesOrderAddBloc extends Bloc<SalesOrderAddEvent, SalesOrderAddState> {
       emit(_updateDateField(state as SalesOrderAddLoaded, event.field, event.value));
     });
 
+// ──────────────────────────────────────────────────────────────────────────
+    // ✅ BUG FIX: Prevent API Crash when Customer is Cleared (id == 0)
+    // ──────────────────────────────────────────────────────────────────────────
     on<CustomerSelected>((event, emit) async {
       if (state is! SalesOrderAddLoaded) return;
       final s = state as SalesOrderAddLoaded;
+
+      if (event.id == 0) {
+        // If user clears the customer, just update state and exit early.
+        // DO NOT call the API.
+        emit(s.copyWith(txtCustomer: '', custId: 0));
+        return;
+      }
+
       await OnlineApi.loadCustomerCurrency(context, event.id);
       emit(s.copyWith(txtCustomer: event.name, custId: event.id, currencyValue: objfun.CustomerCurrencyValue));
     });
 
+    // ──────────────────────────────────────────────────────────────────────────
+    // ✅ BUG FIX: Prevent API Crash when Job Type is Cleared (id == 0)
+    // ──────────────────────────────────────────────────────────────────────────
     on<JobTypeSelected>((event, emit) async {
       if (state is! SalesOrderAddLoaded) return;
       final s = state as SalesOrderAddLoaded;
+
+      if (event.id == 0) {
+        // Clear Job Type AND Job Status since status depends on type
+        emit(_applyVisibility(s.copyWith(txtJobType: '', jobTypeId: 0, txtJobStatus: '', statusId: 0)));
+        return;
+      }
+
       await OnlineApi.SelectAllJobStatus(context, event.id);
       emit(_applyVisibility(s.copyWith(txtJobType: event.name, jobTypeId: event.id)));
     });
+
 
     on<JobStatusSelected>((event, emit) { if (state is SalesOrderAddLoaded) emit((state as SalesOrderAddLoaded).copyWith(txtJobStatus: event.name, statusId: event.id)); });
     on<LAgentCompanySelected>((event, emit) { if (state is SalesOrderAddLoaded) emit((state as SalesOrderAddLoaded).copyWith(txtLAgentCompany: event.name, lAgentCompanyId: event.id)); });
