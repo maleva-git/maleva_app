@@ -14,6 +14,7 @@ import 'package:flutter_native_splash/flutter_native_splash.dart';
 
 import 'core/di/injection.dart';
 import 'core/utils/app_preferences.dart';
+import 'package:maleva/core/logging/app_navigator_observer.dart';
 
 
 class MyHttpOverrides extends HttpOverrides {
@@ -133,6 +134,9 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'MALEVA',
       navigatorKey: objfun.navigatorKey,
+      navigatorObservers: [
+        AppNavigatorObserver(),
+      ],
       builder: (context, child) {
         return ScrollConfiguration(
           behavior: MyBehavior(), //Design class page
