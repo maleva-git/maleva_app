@@ -46,13 +46,18 @@ class AuthRepository {
       if (value.IsSuccess == true) {
         await _saveLoginData(value, username, password, driverId, oldUsername);
         return true;
-      } else if (value.StatusCode != 500) {
-        throw Exception('Invalid Username & Password');
       } else {
-        throw Exception(value.Message ?? 'Server Error');
+        throw Exception('Invalid Username & Password');
       }
     } catch (e) {
-      rethrow;
+      final errStr = e.toString().toLowerCase();
+      if (errStr.contains('connection') ||
+          errStr.contains('timeout') ||
+          errStr.contains('network') ||
+          errStr.contains('socket')) {
+        rethrow;
+      }
+      throw Exception('Invalid Username & Password');
     }
   }
 

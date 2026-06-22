@@ -1,6 +1,9 @@
+import 'package:equatable/equatable.dart';
 
-
-abstract class StockUpdateState {}
+abstract class StockUpdateState extends Equatable {
+  @override
+  List<Object?> get props => [];
+}
 
 class StockUpdateInitial extends StockUpdateState {}
 
@@ -38,7 +41,7 @@ class StockUpdateLoaded extends StockUpdateState {
   final bool         imageUploadEnabled;
   final List<String> images;
 
-   StockUpdateLoaded({
+  StockUpdateLoaded({
     required this.jobNo,
     required this.totalPkg,
     required this.scnPkg,
@@ -60,7 +63,7 @@ class StockUpdateLoaded extends StockUpdateState {
     required this.images,
   });
 
-  factory StockUpdateLoaded.empty() =>  StockUpdateLoaded(
+  factory StockUpdateLoaded.empty() => StockUpdateLoaded(
     jobNo:              '',
     totalPkg:           0,
     scnPkg:             0,
@@ -125,6 +128,29 @@ class StockUpdateLoaded extends StockUpdateState {
       images:             images             ?? this.images,
     );
   }
+
+  @override
+  List<Object?> get props => [
+    jobNo,
+    totalPkg,
+    scnPkg,
+    stockId,
+    status,
+    saleOrderId,
+    jobId,
+    stockNoList,
+    checkStockNoList,
+    boardOfficerId1,
+    boardOfficerId2,
+    boardOfficerAmt1,
+    boardOfficerAmt2,
+    warehouseId,
+    warehouseName,
+    statusId,
+    statusName,
+    imageUploadEnabled,
+    images,
+  ];
 }
 
 class StockUpdateSaveSuccess extends StockUpdateState {}
@@ -132,4 +158,7 @@ class StockUpdateSaveSuccess extends StockUpdateState {}
 class StockUpdateError extends StockUpdateState {
   final String message;
   StockUpdateError(this.message);
+
+  @override
+  List<Object?> get props => [message];
 }
