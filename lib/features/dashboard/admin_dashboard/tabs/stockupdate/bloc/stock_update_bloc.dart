@@ -24,13 +24,7 @@ class StockUpdateBloc extends Bloc<StockUpdateEvent, StockUpdateState> {
   }
 
   Future<void> _onStarted(StockUpdateStarted event, Emitter<StockUpdateState> emit) async {
-    emit(StockUpdateLoading());
-    try {
-      await repository.prefetchJobData();
-      emit(StockUpdateLoaded.empty());
-    } catch (e) {
-      emit(StockUpdateError(e.toString()));
-    }
+    emit(StockUpdateLoaded.empty());
   }
 
   Future<void> _onBarcodeScan(StockUpdateBarcodeScanRequested event, Emitter<StockUpdateState> emit) async {

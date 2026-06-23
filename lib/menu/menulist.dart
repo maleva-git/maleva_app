@@ -23,7 +23,7 @@ import '../features/dashboard/admin_dashboard/tabs/stockinentry/bloc/stock_in_en
 import '../features/dashboard/admin_dashboard/tabs/stockinentry/bloc/stock_in_entry_event.dart';
 import '../features/dashboard/admin_dashboard/tabs/stockinentry/view/stock_in_entry_ui.dart';
 import '../features/dashboard/admin_dashboard/tabs/stocktransfer/bloc/stock_transfer_bloc.dart';
-import '../features/dashboard/admin_dashboard/tabs/stocktransfer/view/stcoktranfer_page.dart';
+import '../features/dashboard/admin_dashboard/tabs/stocktransfer/view/stock_transfer_page.dart';
 import '../features/dashboard/admin_dashboard/tabs/stockupdate/bloc/stock_update_bloc.dart';
 import '../features/dashboard/admin_dashboard/tabs/stockupdate/bloc/stock_update_event.dart';
 import '../features/dashboard/admin_dashboard/tabs/stockupdate/view/stock_update_tab.dart' show StockUpdate;

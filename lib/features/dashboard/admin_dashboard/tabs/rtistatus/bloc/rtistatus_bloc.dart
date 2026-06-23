@@ -25,13 +25,14 @@ class RTIStatusBloc extends Bloc<RTIStatusEvent, RTIStatusState> {
   Future<void> _onInitialized(RTIStatusInitialized event, Emitter<RTIStatusState> emit) async {
     final details = event.rtiDetails[0];
     emit(state.copyWith(
-      status: RTIStatusStatus.loading,
+      status: RTIStatusStatus.success,
       saleOrderId: int.tryParse(details['JobId'].toString()) ?? 0,
       rtiId: details['RtiId'] as int? ?? 0,
       jobNo: details['JobNo']?.toString() ?? '',
       rtiNo: details['RTINo']?.toString() ?? '',
       driverStatus: 'PickUp',
       driverFolder: 'DriverPickup',
+      imageNetwork: [],
     ));
     await _loadImages(emit);
   }
@@ -42,7 +43,7 @@ class RTIStatusBloc extends Bloc<RTIStatusEvent, RTIStatusState> {
       driverStatus: event.status,
       driverFolder: event.status == 'PickUp' ? 'DriverPickup' : 'DriverDelivery',
       imageNetwork: [],
-      status: RTIStatusStatus.loading,
+      status: RTIStatusStatus.success,
     ));
     await _loadImages(emit);
   }

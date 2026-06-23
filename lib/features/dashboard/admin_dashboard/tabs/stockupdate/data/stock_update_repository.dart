@@ -9,10 +9,7 @@ class StockUpdateRepository {
   final int driverLogin = AppPreferences.getDriverLogin(); // Assuming this is saved in prefs
 
   // ─── Initialize ────────────────────────────────────────────────────────────
-  Future<void> prefetchJobData() async {
-    // Replaces OnlineApi.GetJobNoForwarding(null, 0)
-    await ApiClient.postRequest("${objfun.apiGetJobNo}$comid&JobType=0", null);
-  }
+  // (No prefetch needed anymore)
 
   // ─── Scan Barcode ──────────────────────────────────────────────────────────
   Future<String?> scanBarcode() async {

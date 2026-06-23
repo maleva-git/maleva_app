@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:maleva/core/widgets/custom_app_bar.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -41,34 +42,25 @@ class SalesDashboardView extends StatelessWidget {
   }
 
   PreferredSizeWidget _buildAppBar(BuildContext context, bool isTablet){
-    return AppBar(
-      backgroundColor: colour.AppColors.appBarColor,
-      toolbarHeight: isTablet ? 64 : 56,
-      title: Text(
-        'Sales',
-        style: GoogleFonts.lato(
-          color: colour.topAppBarColor,
-          fontWeight: FontWeight.w900,
-          fontSize: isTablet ? 24 : 22,
-        ),
-      ),
-      iconTheme: const IconThemeData(color: colour.topAppBarColor),
+    return CustomGradientAppBar(
+      title: 'Sales',
+      isTablet: isTablet,
       actions: [
         IconButton(
           icon: Icon(Icons.directions_boat_filled,
-              size: isTablet ? 28 : 25, color: colour.topAppBarColor),
+              size: isTablet ? 28 : 25),
           onPressed: () => Navigator.push(context,
               MaterialPageRoute(builder: (_) => Saleorderview())),
         ),
         IconButton(
           icon: Icon(Icons.bluetooth_audio,
-              size: isTablet ? 28 : 25, color: colour.topAppBarColor),
+              size: isTablet ? 28 : 25),
           onPressed: () => Navigator.push(context,
               MaterialPageRoute(builder: (_) => BluetoothPage())),
         ),
         IconButton(
           icon: Icon(Icons.print,
-              size: isTablet ? 28 : 25, color: colour.topAppBarColor),
+              size: isTablet ? 28 : 25),
           onPressed: () async {
             await objfun.printdata([
               BarcodePrintModel("MALEVA", "SHIPNAME", "SHIPNAME",
@@ -78,7 +70,7 @@ class SalesDashboardView extends StatelessWidget {
         ),
         IconButton(
           icon: Icon(Icons.exit_to_app,
-              size: isTablet ? 32 : 30, color: colour.topAppBarColor),
+              size: isTablet ? 32 : 30),
           onPressed: () => objfun.logout(context),
         ),
         if (isTablet) const SizedBox(width: 8),

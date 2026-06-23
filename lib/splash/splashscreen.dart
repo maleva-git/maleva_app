@@ -11,7 +11,7 @@ import '../core/utils/app_preferences.dart';
 import 'package:maleva/core/network/OnlineApi.dart' as OnlineApi;
 import '../features/auth/data/repositories/auth_repository.dart';
 import '../features/auth/presentation/bloc/auth_bloc.dart';
-import '../features/auth/presentation/pages/login_page.dart.dart';
+import '../features/auth/presentation/pages/login_page.dart';
 import '../features/dashboard/admin_dashboard/bloc/admin_tab_bloc.dart';
 import '../features/dashboard/admin_dashboard/view/admin_dashboard.dart';
 import '../features/dashboard/airfreight_dashboard/bloc/airfreight_bloc.dart';

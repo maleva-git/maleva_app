@@ -47,9 +47,9 @@ import '../../admin_dashboard/tabs/speedingreport/view/speedingreport_view.dart'
 import '../../admin_dashboard/tabs/spotsaleorder/bloc/spotsaleorder_bloc.dart';
 import '../../admin_dashboard/tabs/spotsaleorder/data/spotsale_repository.dart';
 import '../../admin_dashboard/tabs/spotsaleorder/view/spotsaleorder_add.dart';
-import '../../admin_dashboard/tabs/subadminsale/bloc/salesreport bloc.dart';
-import '../../admin_dashboard/tabs/subadminsale/bloc/salesreport event.dart';
-import '../../admin_dashboard/tabs/subadminsale/view/salesreport view.dart';
+import '../../admin_dashboard/tabs/subadminsale/bloc/sales_report_bloc.dart';
+import '../../admin_dashboard/tabs/subadminsale/bloc/sales_report_event.dart';
+import '../../admin_dashboard/tabs/subadminsale/view/sales_report_view.dart';
 import '../../admin_dashboard/tabs/transport/bloc/transport_bloc.dart';
 import '../../admin_dashboard/tabs/transport/bloc/transport_event.dart';
 import '../../admin_dashboard/tabs/transport/view/transportview_tab.dart';

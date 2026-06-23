@@ -17,23 +17,23 @@ import '../bloc/stock_update_event.dart';
 import '../bloc/stock_update_state.dart';
 
 
-// ─── Design Tokens ────────────────────────────────────────────────────────────
-const kHeaderGradStart = Color(0xFF1A3A8F);
-const kHeaderGradEnd   = Color(0xFF4A6FD4);
-const kCardBorder      = Color(0xFFC5D0EE);
-const kPageBg          = Color(0xFFF4F6FB);
-const kTextDark        = Color(0xFF1E2D5E);
-const kTextMid         = Color(0xFF4A5A8A);
-const kTextMuted       = Color(0xFF8A96BF);
-const kDetailBg        = Color(0xFFF0F4FF);
-const kChipBg          = Color(0xFFEEF2FF);
-const kAccentRed       = Color(0xFFB33040);
+import '../../../../../../core/theme/palette.dart';
+import '../../../../../../core/theme/tokens.dart';
 
-const kGradient = LinearGradient(
-  colors: [kHeaderGradStart, kHeaderGradEnd],
-  begin: Alignment.topLeft,
-  end: Alignment.bottomRight,
-);
+
+// ─── Design Tokens ────────────────────────────────────────────────────────────
+const kHeaderGradStart = Palette.blue700;
+const kHeaderGradEnd   = Palette.blue400;
+const kCardBorder      = AppTokens.surfaceCardBorder;
+const kPageBg          = AppTokens.invoicePageBg;
+const kTextDark        = Palette.textDark2;
+const kTextMid         = Palette.textMid;
+const kTextMuted       = Palette.kTextMuted;
+const kDetailBg        = AppTokens.maintDetailBg;
+const kChipBg          = AppTokens.maintChipBg;
+const kAccentRed       = AppTokens.maintAccentRed;
+
+const kGradient = AppTokens.headerGradient;
 
 const double kTabletBreak = 600;
 

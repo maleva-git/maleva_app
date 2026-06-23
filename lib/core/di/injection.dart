@@ -79,7 +79,7 @@ import '../../features/dashboard/admin_dashboard/tabs/spotsaleorder/data/spotsal
 import '../../features/dashboard/admin_dashboard/tabs/stockinentry/data/stock_in_entry_repository.dart';
 import '../../features/dashboard/admin_dashboard/tabs/stocktransfer/data/stock_transfer_repository.dart';
 import '../../features/dashboard/admin_dashboard/tabs/stockupdate/data/stock_update_repository.dart';
-import '../../features/dashboard/admin_dashboard/tabs/subadminsale/bloc/salesreport bloc.dart';
+import '../../features/dashboard/admin_dashboard/tabs/subadminsale/bloc/sales_report_bloc.dart';
 import '../../features/dashboard/admin_dashboard/tabs/subadminsale/data/salesreport_repository.dart';
 import '../../features/dashboard/admin_dashboard/tabs/summonentry/bloc/summonentry_bloc.dart';
 import '../../features/dashboard/admin_dashboard/tabs/summonentry/data/summonentry_repository.dart';

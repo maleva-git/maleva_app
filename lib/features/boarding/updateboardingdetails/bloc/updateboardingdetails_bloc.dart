@@ -32,7 +32,15 @@ class BoardingStatusBloc
   Future<void> _onStarted(
       BoardingStatusStarted event,
       Emitter<BoardingStatusState> emit) async {
-    emit(BoardingStatusLoading());
+    // 1. Render UI instantly
+    if (event.jobId != null && event.jobNo != null) {
+      final shortNo = event.jobNo!.length >= 4 ? event.jobNo!.substring(4) : event.jobNo!;
+      emit(BoardingStatusLoaded.empty().copyWith(jobNoText: shortNo, saleOrderId: event.jobId!));
+    } else {
+      emit(BoardingStatusLoaded.empty());
+    }
+
+    // 2. Fetch data in the background
     try {
       await OnlineApi.GetJobNoForwarding(null, 0);
 
@@ -52,11 +60,9 @@ class BoardingStatusBloc
         if (loaded != null) {
           emit(loaded.copyWith(imageUploadEnabled: true));
         }
-      } else {
-        emit(BoardingStatusLoaded.empty());
       }
     } catch (e) {
-      emit(BoardingStatusError(e.toString()));
+      // Background load failed, ignore
     }
   }
 
