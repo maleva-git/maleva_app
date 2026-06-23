@@ -18,6 +18,7 @@ import '../../admin_dashboard/tabs/spotsaleorder/view/spotsaleorder_add.dart';
 import '../../admin_dashboard/tabs/vesselreport/view/vesselreportview_tab.dart';
 import '../bloc/operation_bloc.dart';
 import '../bloc/operation_state.dart';
+import 'package:maleva/core/widgets/custom_app_bar.dart';
 
 
 class OperationMobileDashboard extends StatelessWidget {
@@ -44,40 +45,32 @@ class OperationMobileDashboard extends StatelessWidget {
 
   // ── AppBar ────────────────────────────────────────────────────────────
   PreferredSizeWidget _buildAppBar(BuildContext context, bool isTablet) {
-    return AppBar(
-      backgroundColor: AppColors.appBarColor,
-      toolbarHeight: isTablet ? 64 : 56,
-      title: Text(
-        'Operation',
-        style: GoogleFonts.lato(
-          color: colour.topAppBarColor,
-          fontWeight: FontWeight.bold,
-          fontSize: isTablet ? 20 : objfun.FontLarge,
-        ),
-      ),
-      iconTheme: const IconThemeData(color: colour.topAppBarColor),
+    return CustomGradientAppBar(
+      title: 'Operation',
+      isTablet: isTablet,
       actions: [
         IconButton(
           icon: Icon(Icons.directions_boat_filled,
-              size: isTablet ? 28 : 25, color: colour.topAppBarColor),
+              size: isTablet ? 28 : 25, ),
           onPressed: () => Navigator.push(context,
               MaterialPageRoute(builder: (_) => Saleorderview())),
         ),
         IconButton(
           icon: Icon(Icons.bluetooth_audio,
-              size: isTablet ? 28 : 25, color: colour.topAppBarColor),
+              size: isTablet ? 28 : 25, ),
           onPressed: () => Navigator.push(context,
               MaterialPageRoute(builder: (_) => BluetoothPage())),
         ),
         IconButton(
           icon: Icon(Icons.print,
-              size: isTablet ? 28 : 25, color: colour.topAppBarColor),
+              size: isTablet ? 28 : 25, ),
           onPressed: () async {
             await objfun.printdata([
               BarcodePrintModel("MALEVA", "SHIPNAME", "SHIPNAME",
                   "B0005000", "2025-05-04", "WESTPORT", "WESTPORT", "(1/3)")
-            ]);
-          },
+            ],
+    );
+  },
         ),
         IconButton(
           icon: Icon(Icons.exit_to_app,

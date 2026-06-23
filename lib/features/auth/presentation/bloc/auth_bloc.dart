@@ -51,7 +51,7 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
     on<SubmitLogin>((event, emit) async {
       emit(state.copyWith(loading: true, errorMessage: ""));
 
-      String oldUserName = objfun.storagenew.getString('OldUsername') ?? state.username;
+      String oldUserName = objfun.storagenew.getString('OldUsername') ?? "";
 
       try {
 
@@ -63,7 +63,6 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
         );
 
         if (result) {
-          objfun.storagenew.setString('OldUsername', state.username);
           String role = objfun.storagenew.getString('RulesType') ?? "";
 
           emit(state.copyWith(

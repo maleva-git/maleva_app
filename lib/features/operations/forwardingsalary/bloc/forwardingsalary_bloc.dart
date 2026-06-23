@@ -30,15 +30,15 @@ class ForwardingSalaryBloc extends Bloc<ForwardingSalaryEvent, ForwardingSalaryS
 
   // ── Startup ─────────────────────────────────────────────────────────────────
   Future<void> _onStarted(ForwardingSalaryStarted event, Emitter<ForwardingSalaryState> emit) async {
-    emit(ForwardingSalaryLoading());
+    // Show UI instantly
+    emit(ForwardingSalaryLoaded.empty());
     try {
+      // Load data in background
       final data = await repository.initializeData();
       _jobNoList = data['jobNoList'] ?? [];
       _employeeList = data['employeeList'] ?? [];
-
-      emit(ForwardingSalaryLoaded.empty());
     } catch (e) {
-      emit(ForwardingSalaryError(e.toString()));
+      // Background load failed, ignore
     }
   }
 

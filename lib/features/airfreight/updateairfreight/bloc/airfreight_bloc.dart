@@ -25,7 +25,15 @@ class AirFreightBloc extends Bloc<AirFreightEvent, AirFreightState> {
   }
 
   Future<void> _onStarted(AirFreightStarted event, Emitter<AirFreightState> emit) async {
-    emit(AirFreightLoading());
+    // 1. Render UI instantly
+    if (event.jobId != null && event.jobNo != null) {
+      final shortNo = event.jobNo!.length >= 4 ? event.jobNo!.substring(4) : event.jobNo!;
+      emit(AirFreightLoaded.empty().copyWith(jobNoText: shortNo, saleOrderId: event.jobId!));
+    } else {
+      emit(AirFreightLoaded.empty());
+    }
+
+    // 2. Fetch data in the background
     try {
       // 🔥 Fixed: Removed context, passed null
       await OnlineApi.GetJobNoForwarding(null, 0);
@@ -35,14 +43,10 @@ class AirFreightBloc extends Bloc<AirFreightEvent, AirFreightState> {
         final loaded = await _loadJobData(saleOrderId: event.jobId!, jobNo: shortNo, context: event.context, emit: emit);
         if (loaded != null) {
           emit(loaded.copyWith(imageUploadEnabled: true));
-        } else {
-          emit(AirFreightLoaded.empty());
         }
-      } else {
-        emit(AirFreightLoaded.empty());
       }
     } catch (e) {
-      emit(AirFreightError(e.toString()));
+      // Background load failed, ignore
     }
   }
 

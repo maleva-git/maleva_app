@@ -14,8 +14,8 @@ import '../bloc/auth_bloc.dart';
 import '../bloc/auth_event.dart';
 import '../bloc/auth_state.dart';
 
-class mobiledesign extends StatelessWidget {
-  const mobiledesign({super.key});
+class MobileDesign extends StatelessWidget {
+  const MobileDesign({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -85,26 +85,7 @@ class _LoginBodyState extends State<_LoginBody>
   }
 
   void _onKey(String key) {
-    final bloc = context.read<LoginBloc>();
-    final cur = _pwCtrl.text;
-    if (key == 'CLEAR') {
-      _pwCtrl.clear();
-      bloc.add(PasswordChanged(''));
-    } else if (key == 'C') {
-      if (cur.isNotEmpty) {
-        final v = cur.substring(0, cur.length - 1);
-        _pwCtrl.value = TextEditingValue(
-            text: v,
-            selection: TextSelection.collapsed(offset: v.length));
-        bloc.add(PasswordChanged(v));
-      }
-    } else {
-      final v = cur + key;
-      _pwCtrl.value = TextEditingValue(
-          text: v,
-          selection: TextSelection.collapsed(offset: v.length));
-      bloc.add(PasswordChanged(v));
-    }
+    // Deprecated: Custom keypad removed. System keyboard is used instead.
   }
 
   bool get _isTablet => widget.isTablet;
@@ -285,25 +266,20 @@ class _LoginBodyState extends State<_LoginBody>
         SizedBox(height: sp * 0.4),
         _textField(hint: '• • • • • •',
             obscure: _s.obscurePassword,
-            ctrl: _pwCtrl, readOnly: true,
+            ctrl: _pwCtrl, readOnly: false,
             fs: 13, radius: 11,
             icon: _s.obscurePassword
                 ? Icons.visibility_off_outlined
                 : Icons.visibility_outlined,
             onIconTap: () =>
                 context.read<LoginBloc>().add(TogglePasswordVisibility()),
-            onChanged: (_) {}),
+            onChanged: (v) {
+              context.read<LoginBloc>().add(PasswordChanged(v));
+            }),
         SizedBox(height: sp * 0.85),
 
         _driverToggle(toggleSize: 13),
-        SizedBox(height: sp),
-
-        _pinLabel(),
-        SizedBox(height: sp * 0.6),
-
-        _keypad(btnH: compact ? 46 : 50, btnFs: compact ? 15 : 16,
-            radius: 11, rowSp: compact ? 7 : 9, colSp: 7),
-        SizedBox(height: sp * 0.7),
+        SizedBox(height: sp * 1.5),
 
         _loginButton(h: compact ? 48 : 52, fs: 13, radius: 13),
         SizedBox(height: sp * 0.5),
@@ -349,14 +325,16 @@ class _LoginBodyState extends State<_LoginBody>
                 const SizedBox(height: 7),
                 _textField(hint: '• • • • • •',
                     obscure: _s.obscurePassword,
-                    ctrl: _pwCtrl, readOnly: true,
+                    ctrl: _pwCtrl, readOnly: false,
                     fs: 15, radius: 13,
                     icon: _s.obscurePassword
                         ? Icons.visibility_off_outlined
                         : Icons.visibility_outlined,
                     onIconTap: () =>
                         context.read<LoginBloc>().add(TogglePasswordVisibility()),
-                    onChanged: (_) {}),
+                    onChanged: (v) {
+                      context.read<LoginBloc>().add(PasswordChanged(v));
+                    }),
                 const SizedBox(height: 18),
 
                 _driverToggle(toggleSize: 15),
@@ -379,11 +357,10 @@ class _LoginBodyState extends State<_LoginBody>
                   bottomRight: Radius.circular(28),
                 ),
               ),
-              child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                _pinLabel(),
-                const SizedBox(height: 16),
-                _keypad(btnH: 58, btnFs: 20, radius: 14, rowSp: 12, colSp: 10),
-                const SizedBox(height: 14),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
                 Flexible(
                   child: _loginButton(h: 50, fs: 16, radius: 8),
                 )

@@ -1,5 +1,8 @@
 library tabletpos.globals;
 
+export 'dialog_helper.dart';
+export 'printer_helper.dart';
+
 import 'dart:async';
 import 'dart:convert';
 import 'dart:core' as cc;
@@ -29,15 +32,17 @@ import 'package:maleva/core/network/OnlineApi.dart' as OnlineApi;
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:url_launcher/url_launcher.dart';
-
 import '../../features/auth/data/repositories/auth_repository.dart';
 import '../../features/auth/presentation/bloc/auth_bloc.dart';
-import '../../features/auth/presentation/pages/login_page.dart.dart';
+import '../../features/auth/presentation/pages/login_page.dart';
 import '../../features/home/view/home_tab.dart';
 import '../../features/mastersearch/Employee.dart';
 import '../config/app_config.dart';
 import '../network/api_services/auth_api.dart';
 import 'app_preferences.dart';
+import '../network/api_constants.dart';
+import '../network/api_client.dart';
+import 'dialog_helper.dart';
 String appversion="1.1.10+98";
 bool homepagecall = false;
 AssetImage logo = const AssetImage('assets/company/logo.png');
@@ -56,181 +61,179 @@ AssetImage lockimg = const AssetImage('assets/common/lockImg.png');
 
 //String port = "https://maleva.my"; //Live
 
-String port = AppConfig.baseUrl;
+String port = ApiConstants.port;
 
 //String razorpaykey = "rzp_live_GmuWNB2PVXAnLt";
 
 String imagepath = "$port/Upload/$Comid/";
-String apiPostimage = "$port/api/CommonApp/UploadFile/";
-String apiPostfile = "$port/api/CommonApp/UploadFile2/";
-String apiuploadpdffile = "$port/api/CommonApp/UploadPdfFile/";
-String apiGetimage = "$port/api/CommonApp/FetchFiles?ImageDirectory=";
-String apiDeleteimage = "$port/api/CommonApp/DeleteFile";
+String apiPostimage = ApiConstants.apiPostImage;
+String apiPostfile = ApiConstants.apiPostFile;
+String apiuploadpdffile = ApiConstants.apiUploadPdfFile;
+String apiGetimage = ApiConstants.apiGetImage;
+String apiDeleteimage = ApiConstants.apiDeleteImage;
 //String apiPostimage = port + "/api/SaleOrderApp/ImageUpload/";
 
-String apiInsertForwarding = "$port/api/ForwardingSalaryApp/InsertForwardingSalary";
-String apiSelectForwarding = "$port/api/ForwardingSalaryApp/SelectForwardingSalary";
+String apiInsertForwarding = ApiConstants.apiInsertForwarding;
+String apiSelectForwarding = ApiConstants.apiSelectForwarding;
 
-String apiLoginSuccess = "$port/api/LoginApp/LoginAppSuccess?Userid=";
-String apiSelectUser = "$port/api/LoginApp/SelectLoginUser?Comid=";
-String apiSelectCustomer = "$port/api/CustomerApp/GetCustomer?Comid=";
-String apiSelectLocation = "$port/api/LocationApp/SelectLocation?Comid=";
+String apiLoginSuccess = ApiConstants.apiLoginSuccess;
+String apiSelectUser = ApiConstants.apiSelectUser;
+String apiSelectCustomer = ApiConstants.apiSelectCustomer;
+String apiSelectLocation = ApiConstants.apiSelectLocation;
 
-String apiSelectEmployee = "$port/api/EmployeeApp/GetEmployee?Comid=";
-String apiSelectEmailData = "$port/api/EmployeeApp/SelectEmailData";
-String apiInsertMailMaster = "$port/api/EmployeeApp/InsertMailMaster";
+String apiSelectEmployee = ApiConstants.apiSelectEmployee;
+String apiSelectEmailData = ApiConstants.apiSelectEmailData;
+String apiInsertMailMaster = ApiConstants.apiInsertMailMaster;
 //New
-String apiUpdateSaleOrderMaster = "$port/api/SaleOrderApp/UpdateSaleorderMaster";
+String apiUpdateSaleOrderMaster = ApiConstants.apiUpdateSaleOrderMaster;
 
-String apiSelectJobStatus = "$port/api/JobStatusApp/SelectJobStatus?Comid=";
-String apiMaxSaleOrderNo = "$port/api/SaleOrderApp/MaxSaleOrderNo?Comid=";
-String apiSelectJobType = "$port/api/JobTypeApp/SelectJobType?Comid=";
-String apiSelectAllJobStatus = "$port/api/JobTypeApp/SelectJobAllData?Comid=";
-String apiGetRTINo = "$port/api/RTIApp/SelectRTINo?Comid=";
-String apiSelectAgentCompany =
-    "$port/api/AgentCompanyApp/SelectAgentCompany?Comid=";
-String apiSelectAgentAll = "$port/api/AgentApp/SelectAgentAll?Comid=";
-String apiGetProductList = "$port/api/ItemApp/GetProductList?Comid=";
-String apiSelectAddressList =
-    "$port/api/AddressApp/SelectDistinctAddress?Comid=";
-String apiSelectSalesOrder = "$port/api/SaleOrderApp/SelectSaleOrder";
-String apiSelectTVSaleOrder = "$port/api/SaleOrderApp/SelectTVSaleOrder";
-String apiEditPassword = "$port/api/LoginApp/EditPassword?password=";
-String apiEditSalesOrder = "$port/api/SaleOrderApp/EditSaleOrder?Id=";
-String apiInsertSalesOrder = "$port/api/SaleOrderApp/InsertSaleOrder";
-String apiDeleteSalesOrder = "$port/api/SaleOrderApp/DeleteSaleOrder?Id=";
-String apiSelectAddressDetails = "$port/api/AddressApp/SelectAddress?Comid=";
-String apiGetJobNo = "$port/api/SaleOrderApp/GetJobNo?Comid=";
-String apiUpdateForwarding = "$port/api/SaleOrderApp/UpdateForwarding";
-String apiUpdateBoardingDetails = "$port/api/SaleOrderApp/UpdateBoardingDetails";
-String apiUpdateBoardingOfficer = "$port/api/SaleOrderApp/UpdateBoardingOfficier";
-String apiUpdateAirFrieghtDetails = "$port/api/SaleOrderApp/UpdateAirFrieght";
-String apiselectBillordercheck = "$port/api/SaleOrderApp/GetBillordercheck";
-String apiGetTruckList = "$port/api/TruckApp/GetTruck?Comid=";
+String apiSelectJobStatus = ApiConstants.apiSelectJobStatus;
+String apiMaxSaleOrderNo = ApiConstants.apiMaxSaleOrderNo;
+String apiSelectJobType = ApiConstants.apiSelectJobType;
+String apiSelectAllJobStatus = ApiConstants.apiSelectAllJobStatus;
+String apiGetRTINo = ApiConstants.apiGetRTINo;
+String apiSelectAgentCompany = ApiConstants.apiSelectAgentCompany;
+String apiSelectAgentAll = ApiConstants.apiSelectAgentAll;
+String apiGetProductList = ApiConstants.apiGetProductList;
+String apiSelectAddressList = ApiConstants.apiSelectAddressList;
+String apiSelectSalesOrder = ApiConstants.apiSelectSalesOrder;
+String apiSelectTVSaleOrder = ApiConstants.apiSelectTVSaleOrder;
+String apiEditPassword = ApiConstants.apiEditPassword;
+String apiEditSalesOrder = ApiConstants.apiEditSalesOrder;
+String apiInsertSalesOrder = ApiConstants.apiInsertSalesOrder;
+String apiDeleteSalesOrder = ApiConstants.apiDeleteSalesOrder;
+String apiSelectAddressDetails = ApiConstants.apiSelectAddressDetails;
+String apiGetJobNo = ApiConstants.apiGetJobNo;
+String apiUpdateForwarding = ApiConstants.apiUpdateForwarding;
+String apiUpdateBoardingDetails = ApiConstants.apiUpdateBoardingDetails;
+String apiUpdateBoardingOfficer = ApiConstants.apiUpdateBoardingOfficer;
+String apiUpdateAirFrieghtDetails = ApiConstants.apiUpdateAirFrieghtDetails;
+String apiselectBillordercheck = ApiConstants.apiselectBillordercheck;
+String apiGetTruckList = ApiConstants.apiGetTruckList;
 
-String apiGetReceipt = "$port/api/ReceiptApp/SelectReceipt?Comid=";
-String apiSelectReceipt = "$port/api/TransactionReportApp/SelectCustomerBalance";
-String apiGetpettycash = "$port/api/BIllorderApp/SelectpetticashApp?Comid=";
-String apiGeteditepettycash = "$port/api/BIllorderApp/SelectpetticashApp?Comid=";
+String apiGetReceipt = ApiConstants.apiGetReceipt;
+String apiSelectReceipt = ApiConstants.apiSelectReceipt;
+String apiGetpettycash = ApiConstants.apiGetpettycash;
+String apiGeteditepettycash = ApiConstants.apiGetpettycash;
 
 //Employee
 
-String apiSelectEmployeeDetails = "$port/api/EmployeeApp/SelectEmployee?Comid=";
-String apiInsertEmployeeDetails = "$port/api/EmployeeApp/InsertEmployee";
-String apiSelectEmployeeType = "$port/api/EmployeeApp/SelectEmployeeType";
-String apiDeleteEmployeeType = "$port/api/EmployeeApp/DeleteEmployee?Id=";
+String apiSelectEmployeeDetails = ApiConstants.apiSelectEmployeeDetails;
+String apiInsertEmployeeDetails = ApiConstants.apiInsertEmployeeDetails;
+String apiSelectEmployeeType = ApiConstants.apiSelectEmployeeType;
+String apiDeleteEmployeeType = ApiConstants.apiDeleteEmployeeType;
 
-String apiSelectPaymentPending = "$port/api/DashBoardApp/SelectPendingPayment";
+String apiSelectPaymentPending = ApiConstants.apiSelectPaymentPending;
 
-String apiSelectAllInventory = "$port/api/CustomerApp/SelectAllInventoryt";
+String apiSelectAllInventory = ApiConstants.apiSelectAllInventory;
 
-String apiSelectTruckDetails = "$port/api/MasterReportApp/TruckReportView";
+String apiSelectTruckDetails = ApiConstants.apiSelectTruckDetails;
 
-String apiSelectDriverDetails = "$port/api/MasterReportApp/DriverReportView";
+String apiSelectDriverDetails = ApiConstants.apiSelectDriverDetails;
 
-String apiSelectSpeedingReport = "$port/api/MasterReportApp/SpeedingReportView";
-String apiSelectFuelFillingReport = "$port/api/MasterReportApp/SelectFuelFillings";
-String apiSelectEangiehoursReport = "$port/api/MasterReportApp/SelectEngineHours";
-String apiSelectDriverSalary = "$port/api/TransactionReportApp/DriverRTIDetailedReport";
-String apiSelectBoardingSalary = "$port/api/SaleOrderApp/GetBoardingSalary";
-String apiSelectGoogleReview = "$port/api/EmployeeApp/SelectGoogleReview";
-String apiDeleteGoogleReview = "$port/api/EmployeeApp/DeleteGoogleReview?Id=";
+String apiSelectSpeedingReport = ApiConstants.apiSelectSpeedingReport;
+String apiSelectFuelFillingReport = ApiConstants.apiSelectFuelFillingReport;
+String apiSelectEangiehoursReport = ApiConstants.apiSelectEngineHoursReport;
+String apiSelectDriverSalary = ApiConstants.apiSelectDriverSalary;
+String apiSelectBoardingSalary = ApiConstants.apiSelectBoardingSalary;
+String apiSelectGoogleReview = ApiConstants.apiSelectGoogleReview;
+String apiDeleteGoogleReview = ApiConstants.apiDeleteGoogleReview;
 /// Declear the  varibale  call  for the  checlsaleorder invoice
-String apiSelectSaleorderinvoicecheck = "$port/api/MasterReportApp/SelectChecksalesinvoice";
-String apiEditTruckDetails = "$port/api/TruckApp/SelectTruck?Comid=";
+String apiSelectSaleorderinvoicecheck = ApiConstants.apiSelectSaleorderinvoicecheck;
+String apiEditTruckDetails = ApiConstants.apiEditTruckDetails;
 
-String apiUpdateTruckDetails = "$port/api/TruckApp/InsertTruck?Comid=";
-String apiGetDriverList = "$port/api/DriverApp/GetDriver?Comid=";
-String apiSelectRTIView = "$port/api/RTIApp/SelectRTI?Comid=";
-String apiSelectRTIDetailsView = "$port/api/RTIApp/SelectRTIView?Comid=";
-String apiViewRTIPdf = "$port/api/RTIApp/RTIVIEW?RTINo=";
-String apiRTIMail = "$port/api/RTIApp/SendStatusMail";
-String apiViewDOConvert = "$port/api/SaleOrderApp/DoConvert?BillNo=";
-String apiViewInvoice = "$port/api/SaleOrderApp/InvoiceConvert?BillNo=";
-String apiGetSalesData = "$port/api/LoginApp/GetSalesData?Comid=";
-String apiGetEmployeeSalesData = "$port/api/LoginApp/GetEmployeeSalesData?Comid=";
-String apiGetEmployeeInvData = "$port/api/LoginApp/GetEmployeeInvData?Comid=";
-String apiGetFWData = "$port/api/LoginApp/GetFWData?Comid=";
+String apiUpdateTruckDetails = ApiConstants.apiUpdateTruckDetails;
+String apiGetDriverList = ApiConstants.apiGetDriverList;
+String apiSelectRTIView = ApiConstants.apiSelectRTIView;
+String apiSelectRTIDetailsView = ApiConstants.apiSelectRTIDetailsView;
+String apiViewRTIPdf = ApiConstants.apiViewRTIPdf;
+String apiRTIMail = ApiConstants.apiRTIMail;
+String apiViewDOConvert = ApiConstants.apiViewDOConvert;
+String apiViewInvoice = ApiConstants.apiViewInvoice;
+String apiGetSalesData = ApiConstants.apiGetSalesData;
+String apiGetEmployeeSalesData = ApiConstants.apiGetEmployeeSalesData;
+String apiGetEmployeeInvData = ApiConstants.apiGetEmployeeInvData;
+String apiGetFWData = ApiConstants.apiGetFWData;
 
-String apiGetMaintenance = "$port/api/DashboardApp/LoadSupplierExpenseData?Comid=";
-String apiGetMaintenance1 = "$port/api/DashboardApp/LoadExpenseData?Comid=";
-String apiGetMaintenance2= "$port/api/DashboardApp/SelectStatusBO?Comid=";
-String apiGetReceiptView= "$port/api/ReceiptApp/SelectTruck?Comid=";
+String apiGetMaintenance = ApiConstants.apiGetMaintenance;
+String apiGetMaintenance1 = ApiConstants.apiGetMaintenance1;
+String apiGetMaintenance2 = ApiConstants.apiGetMaintenance2;
+String apiGetReceiptView = ApiConstants.apiGetReceiptView;
 
-String apiGetExpData = "$port/api/LoginApp/GetExpData?Comid=";
-String apiGetComboS1 = "$port/api/SaleOrderApp/SelectComboS1?Comid=";
-String apiGetCurrencyValue = "$port/api/SaleOrderApp/GetCurrencyValue?Comid=";
-String apiBoardingMail = "$port/api/SaleOrderApp/SendBoardingMail";
+String apiGetExpData = ApiConstants.apiGetExpData;
+String apiGetComboS1 = ApiConstants.apiGetComboS1;
+String apiGetCurrencyValue = ApiConstants.apiGetCurrencyValue;
+String apiBoardingMail = ApiConstants.apiBoardingMail;
 
-String apiSelectExpenseDetails = "$port/api/DashboardApp/SelectExpenseName";
+String apiSelectExpenseDetails = ApiConstants.apiSelectExpenseDetails;
 
 
-String apiGoogleReviewInsert = "$port/api/EmployeeApp/InsertGoogleReview";
+String apiGoogleReviewInsert = ApiConstants.apiGoogleReviewInsert;
 
-String apiRTIDetailsInsert = "$port/api/RTIApp/InsertRTIStatus?Comid=";
+String apiRTIDetailsInsert = ApiConstants.apiRTIDetailsInsert;
 
 //PreAlert Report
 
-String apiPreAlertReport = "$port/api/TransactionReportApp/PreAlertReport?PreAlertName=";
-String apiViewPlanningPdf = "$port/api/PlanningApp/PLANINGVIEW?PlanningNo=";
-String apiSelectPlanning = "$port/api/PlanningApp/SelectPLANING";
-String apiEditPlanning = "$port/api/PlanningApp/EditPLANING?Id=";
-String PLANINGSearch = "$port/api/PlanningApp/PLANINGSearch";
+String apiPreAlertReport = ApiConstants.apiPreAlertReport;
+String apiViewPlanningPdf = ApiConstants.apiViewPlanningPdf;
+String apiSelectPlanning = ApiConstants.apiSelectPlanning;
+String apiEditPlanning = ApiConstants.apiEditPlanning;
+String PLANINGSearch = ApiConstants.PLANINGSearch;
 
-String AirFrieghtDB = "$port/api/DashBoardApp/AirFrieghtDB";
-String VESSELPLANINGDB = "$port/api/DashBoardApp/VESSELPLANINGDB";
-String PLANINGSearchDB = "$port/api/DashBoardApp/PLANINGSearchDB";
-String PLANINGDriverSearch = "$port/api/DashBoardApp/PLANINGDriverSearch";
-String SaleInvoiceCountDB = "$port/api/DashBoardApp/CheckSaleInvoiceCount";
-
-
-String SelectSalesOrderStatus = "$port/api/DashBoardApp/SelectSalesOrderStatus";
+String AirFrieghtDB = ApiConstants.AirFrieghtDB;
+String VESSELPLANINGDB = ApiConstants.VESSELPLANINGDB;
+String PLANINGSearchDB = ApiConstants.PLANINGSearchDB;
+String PLANINGDriverSearch = ApiConstants.PLANINGDriverSearch;
+String SaleInvoiceCountDB = ApiConstants.SaleInvoiceCountDB;
 
 
-String LoadRulesType = "$port/api/DashBoardApp/LoadRulesType";
-String LoadUnReleaseNo = "$port/api/DashBoardApp/LoadUnReleaseNo";
-String LoadK8UnReleaseNo = "$port/api/DashBoardApp/LoadK8UnReleaseNo";
+String SelectSalesOrderStatus = ApiConstants.SelectSalesOrderStatus;
 
-String apiViewVesselPlanningPdf = "$port/api/VesselPlanningApp/VESSELPLANINGVIEW?VesselPlanningNo=";
-String apiSelectVesselPlanning = "$port/api/VesselPlanningApp/SelectVESSELPLANING";
-String apiEditVesselPlanning = "$port/api/VesselPlanningApp/EditVESSELPLANING?Id=";
+
+String LoadRulesType = ApiConstants.LoadRulesType;
+String LoadUnReleaseNo = ApiConstants.LoadUnReleaseNo;
+String LoadK8UnReleaseNo = ApiConstants.LoadK8UnReleaseNo;
+
+String apiViewVesselPlanningPdf = ApiConstants.apiViewVesselPlanningPdf;
+String apiSelectVesselPlanning = ApiConstants.apiSelectVesselPlanning;
+String apiEditVesselPlanning = ApiConstants.apiEditVesselPlanning;
 //Fuel Entry
-String apiInsertFuelEntry = "$port/api/FuelEntryApp/InsertFuelEntry";
-String apiMaxFuelEntryNo = "$port/api/FuelEntryApp/MaxFuelEntryNo?Comid=";
-String apiDeleteFuelEntry = "$port/api/FuelEntryApp/DeleteFuelEntry?Id=";
-String apiEditFuelEntry = "$port/api/FuelEntryApp/EditFuelEntry?Id=";
-String apiSelectFuelEntry = "$port/api/FuelEntryApp/SelectFuelEntry";
+String apiInsertFuelEntry = ApiConstants.apiInsertFuelEntry;
+String apiMaxFuelEntryNo = ApiConstants.apiMaxFuelEntryNo;
+String apiDeleteFuelEntry = ApiConstants.apiDeleteFuelEntry;
+String apiEditFuelEntry = ApiConstants.apiEditFuelEntry;
+String apiSelectFuelEntry = ApiConstants.apiSelectFuelEntry;
 
-String apiInsertEnquiry = "$port/api/EnquiryMasterApp/InsertEnquiryMaster";
-String apiSelectEnquiryMaster = "$port/api/EnquiryMasterApp/SelectEnquiryMaster";
-String apiUpdateEnquiryMaster = "$port/api/EnquiryMasterApp/UpdateEnquiryMaster?Id=";
+String apiInsertEnquiry = ApiConstants.apiInsertEnquiry;
+String apiSelectEnquiryMaster = ApiConstants.apiSelectEnquiryMaster;
+String apiUpdateEnquiryMaster = ApiConstants.apiUpdateEnquiryMaster;
 //Driver view
-  String apiDriverViewRecords = "$port/api/DriverApp/SelectDriver?Comid=";
+  String apiDriverViewRecords = ApiConstants.apiDriverViewRecords;
   //comit
-  String apiBillorderview = "$port/api/BIllorderApp/SelectBillsOrderApp?Comid=";
-  String apiPettyCashview = "$port/api/PettyCashApp/SelectPettyCashMaster?Comid=";
-  String apiLicenseViewRecords = "$port/api/LicenseApp/SelectLicense";
+  String apiBillorderview = ApiConstants.apiBillorderview;
+  String apiPettyCashview = ApiConstants.apiPettyCashview;
+  String apiLicenseViewRecords = ApiConstants.apiLicenseViewRecords;
 //Stock
-String apiSelectStockDetails = "$port/api/StockApp/SelectSaleStock?Comid=";
-String apiEditStockIn = "$port/api/StockApp/EditStockIn?Id=";
-String apiUpdateStockIn = "$port/api/StockApp/UpdateStockIn?Id=";
-String apiUpdateStockTransfer = "$port/api/StockApp/UpdateStockTransfer?Id=";
-String apiInsertStockIn = "$port/api/StockApp/InsertStockIn?Comid=";
-String apiMaxStockNo = "$port/api/StockApp/MaxStockInNo?Comid=";
-String apiSaleOrderDetailsLoad = "$port/api/StockApp/SelectSaleStock?Comid=";
-String apiPrintStock = "$port/api/StockApp/SelectStockPrint?Id=";
-String apiSelectStockJob = "$port/api/StockApp/SelectStockJob?Comid=";
+String apiSelectStockDetails = ApiConstants.apiSelectStockDetails;
+String apiEditStockIn = ApiConstants.apiEditStockIn;
+String apiUpdateStockIn = ApiConstants.apiUpdateStockIn;
+String apiUpdateStockTransfer = ApiConstants.apiUpdateStockTransfer;
+String apiInsertStockIn = ApiConstants.apiInsertStockIn;
+String apiMaxStockNo = ApiConstants.apiMaxStockNo;
+String apiSaleOrderDetailsLoad = ApiConstants.apiSelectStockDetails;
+String apiPrintStock = ApiConstants.apiPrintStock;
+String apiSelectStockJob = ApiConstants.apiSelectStockJob;
 
-String apiWareHouseCombo = "$port/api/StockApp/SelectPortList?Comid=";
-String apiInsertSpareParts = "$port/api/TruckSparePartsApp/InsertSpareParts";
-String apiGetSpareParts = "$port/api/TruckSparePartsApp/SelectSpareParts?Comid=";
+String apiWareHouseCombo = ApiConstants.apiWareHouseCombo;
+String apiInsertSpareParts = ApiConstants.apiInsertSpareParts;
+String apiGetSpareParts = ApiConstants.apiGetSpareParts;
 
 
-String apiInsertSpotSaleEntry = "$port/api/TruckSparePartsApp/InsertSpotSaleEntry";
-String apiGetSpotSaleEntry = "$port/api/TruckSparePartsApp/SelectSpotSaleEntry?Comid=";
+String apiInsertSpotSaleEntry = ApiConstants.apiInsertSpotSaleEntry;
+String apiGetSpotSaleEntry = ApiConstants.apiGetSpotSaleEntry;
 
-String apiInsertSummonParts = "$port/api/TruckSparePartsApp/InsertSummon";
-String apiGetSummonParts = "$port/api/TruckSparePartsApp/SelectSummon?Comid=";
+String apiInsertSummonParts = ApiConstants.apiInsertSummonParts;
+String apiGetSummonParts = ApiConstants.apiGetSummonParts;
 
 
 final navigatorKey = GlobalKey<NavigatorState>();
@@ -283,42 +286,42 @@ Future<void> localstoragecall() async {
   storagenew = await SharedPreferences.getInstance();
 }
 
-Future<List<dynamic>> apiAllinoneSelect(api, insertDetails,
-    Map<String, String>? header, BuildContext ?context) async {
-  //returntype
-  //1 list
-  //2 status
-  //3 int
-  //4 string
-  //5 double
-  //rawbody
-  //0 OFF
-  //1 ON
-
-  String apiname = api.toString().split('?')[0];
-  apiname = "${apiname.replaceAll('$port/api/', '')}: ";
-  try {
-    header ??= <String, String>{
-      'Content-Type': 'application/json; charset=UTF-8',
-    };
-
+Map<String, String> _buildRequestHeaders(Map<String, String>? customHeaders, {bool skipAuth = false}) {
+  final headers = <String, String>{
+    'Content-Type': 'application/json; charset=UTF-8',
+  };
+  if (customHeaders != null) {
+    headers.addAll(customHeaders);
+  }
+  if (!skipAuth) {
     String token = storagenew.getString('Tokenkey') ?? "";
     String Userid = storagenew.getString('Userid') ?? "";
     String Profile = storagenew.getString('Profile') ?? "";
     if (token != "") {
-      header.addAll(<String, String>{
-        'Authorization': 'Bearer $token',
-        'Userid': Userid,
-        'Profile': Profile,
-      });
+      headers['Authorization'] = 'Bearer $token';
+      headers['Userid'] = Userid;
+      headers['Profile'] = Profile;
     }
-    String body = json.encode(insertDetails);
-    debugPrint(api);
-    if (body != '' && body != 'null') {
-      debugPrint(body);
-    }
-    http.Response result =
-        await http.post(Uri.parse(api), headers: header, body: body);
+  }
+  return headers;
+}
+
+Future<http.Response> _performPostRequest(String url, dynamic bodyData, Map<String, String> headers) async {
+  final body = json.encode(bodyData);
+  debugPrint(url);
+  if (body != '' && body != 'null') {
+    debugPrint(body);
+  }
+  return await http.post(Uri.parse(url), headers: headers, body: body).timeout(const Duration(seconds: 30));
+}
+
+Future<List<dynamic>> apiAllinoneSelect(api, insertDetails,
+    Map<String, String>? header, BuildContext ?context) async {
+  String apiname = api.toString().split('?')[0];
+  apiname = "${apiname.replaceAll('$port/api/', '')}: ";
+  try {
+    final headers = _buildRequestHeaders(header);
+    final result = await _performPostRequest(api, insertDetails, headers);
     if (result.statusCode == 200) {
       if (result.body == "") {
         return [];
@@ -340,17 +343,8 @@ Future<List<dynamic>> apiAllinoneSelect(api, insertDetails,
       storagenew.setString('Username', "");
       storagenew.setString('Password', "");
       storagenew.setString('OldUsername', "");
-
-      // ResponseViewModel? value = ResponseViewModel.fromJson(jsonDecode(result.body));
-      // msgshow(value.Message,"",Colors.white,Colors.green,null,18.00 - reducesize,tll,tgc,context,2);
       return [];
-    } else if (result.statusCode == 404) {
-      ResponseViewModel? value =
-          ResponseViewModel.fromJson(jsonDecode(result.body));
-      msgshow(value.Message, "", Colors.white, Colors.green, null,
-          18.00 - reducesize, tll, tgc, context, 2);
-      return [];
-    } else if (result.statusCode == 500) {
+    } else if (result.statusCode == 404 || result.statusCode == 500) {
       ResponseViewModel? value =
           ResponseViewModel.fromJson(jsonDecode(result.body));
       msgshow(value.Message, "", Colors.white, Colors.green, null,
@@ -361,16 +355,10 @@ Future<List<dynamic>> apiAllinoneSelect(api, insertDetails,
     }
   } on SocketException catch (_) {
     throw Exception('Check Your Network Connection');
-  }
-  // on Exception catch (ms) {
-  //   throw Exception(ms.toString());
-  // }
-  catch (error) {
+  } catch (error) {
     throw Exception('$apiname$error');
   }
 }
-
-
 
 Future<dynamic> apiAllinoneMapSelect(
     api,
@@ -380,46 +368,19 @@ Future<dynamic> apiAllinoneMapSelect(
   String apiname = api.toString().split('?')[0];
   apiname = "${apiname.replaceAll('$port/api/', '')}: ";
   try {
-    header ??= <String, String>{
-      'Content-Type': 'application/json; charset=UTF-8',
-    };
-
-    String token = storagenew.getString('Tokenkey') ?? "";
-    String Userid = storagenew.getString('Userid') ?? "";
-    String Profile = storagenew.getString('Profile') ?? "";
-    if (token != "") {
-      header.addAll(<String, String>{
-        'Authorization': 'Bearer $token',
-        'Userid': Userid,
-        'Profile': Profile,
-      });
-    }
-
-    String body = json.encode(insertDetails);
-    debugPrint(api);
-    if (body != '' && body != 'null') {
-      debugPrint(body);
-    }
-
-    http.Response result =
-    await http.post(Uri.parse(api), headers: header, body: body);
+    final headers = _buildRequestHeaders(header);
+    final result = await _performPostRequest(api, insertDetails, headers);
 
     if (result.statusCode == 200) {
       if (result.body == "") {
         return [];
       } else {
         final decoded = jsonDecode(result.body);
-
-        // 🔹 If response is Map
         if (decoded is Map<String, dynamic>) {
           return decoded;
-        }
-        // 🔹 If response is List
-        else if (decoded is List) {
+        } else if (decoded is List) {
           return decoded;
-        }
-        // 🔹 Any other type, return as-is
-        else {
+        } else {
           return decoded;
         }
       }
@@ -439,8 +400,7 @@ Future<dynamic> apiAllinoneMapSelect(
       storagenew.setString('Password', "");
       storagenew.setString('OldUsername', "");
       return [];
-    } else if (result.statusCode == 404 ||
-        result.statusCode == 500) {
+    } else if (result.statusCode == 404 || result.statusCode == 500) {
       ResponseViewModel? value =
       ResponseViewModel.fromJson(jsonDecode(result.body));
       msgshow(value.Message, "", Colors.white, Colors.green, null,
@@ -458,33 +418,11 @@ Future<dynamic> apiAllinoneMapSelect(
 
 Future<List<dynamic>> apiAllinoneSelectWithOutAuth(api, insertDetails,
     Map<String, String>? header, BuildContext context) async {
-  //returntype
-  //1 list
-  //2 status
-  //3 int
-  //4 string
-  //5 double
-  //rawbody
-  //0 OFF
-  //1 ON
   String apiname = api.toString().split('?')[0];
   apiname = "${apiname.replaceAll('$port/api/', '')}: ";
   try {
-    header ??= <String, String>{
-      'Content-Type': 'application/json; charset=UTF-8',
-    };
-
-    String token = storagenew.getString('Tokenkey') ?? "";
-    String Userid = storagenew.getString('Userid') ?? "";
-    String Profile = storagenew.getString('Profile') ?? "";
-
-    String body = json.encode(insertDetails);
-    debugPrint(api);
-    if (body != '' && body != 'null') {
-      debugPrint(body);
-    }
-    http.Response result =
-        await http.post(Uri.parse(api), headers: header, body: body);
+    final headers = _buildRequestHeaders(header, skipAuth: true);
+    final result = await _performPostRequest(api, insertDetails, headers);
     if (result.statusCode == 200) {
       if (result.body == "") {
         return [];
@@ -503,198 +441,15 @@ Future<List<dynamic>> apiAllinoneSelectWithOutAuth(api, insertDetails,
           "Already Login Another User.ReLogin or Change Password !!!", context);
       loginId = 0;
       loginname = '';
-
       storagenew.setString('Username', "");
       storagenew.setString('Password', "");
       storagenew.setString('OldUsername', "");
-
-      // ResponseViewModel? value = ResponseViewModel.fromJson(jsonDecode(result.body));
-      // msgshow(value.Message,"",Colors.white,Colors.green,null,18.00 - reducesize,tll,tgc,context,2);
       return [];
-    } else if (result.statusCode == 404) {
+    } else if (result.statusCode == 404 || result.statusCode == 500) {
       ResponseViewModel? value =
           ResponseViewModel.fromJson(jsonDecode(result.body));
       msgshow(value.Message, "", Colors.white, Colors.green, null,
           18.00 - reducesize, tll, tgc, context, 2);
-      return [];
-    } else if (result.statusCode == 500) {
-      ResponseViewModel? value =
-          ResponseViewModel.fromJson(jsonDecode(result.body));
-      msgshow(value.Message, "", Colors.white, Colors.green, null,
-          18.00 - reducesize, tll, tgc, context, 2);
-      return [];
-    } else {
-      throw Exception('${result.statusCode} Unknown Error Occurred');
-    }
-  } on SocketException catch (_) {
-    throw Exception('Check Your Network Connection');
-  }
-  // on Exception catch (ms) {
-  //   throw Exception(ms.toString());
-  // }
-  catch (error) {
-    throw Exception('$apiname$error');
-  }
-}
-
-Future<dynamic> apiAllinoneSelectArrayWithOutAuth(api, insertDetails,
-    Map<String, String>? header, BuildContext ?context) async {
-  //returntype
-  //1 list
-  //2 status
-  //3 int
-  //4 string
-  //5 double
-  //rawbody
-  //0 OFF
-  //1 ON
-
-  String apiname = api.toString().split('?')[0];
-  apiname = "${apiname.replaceAll('$port/api/', '')}: ";
-  try {
-    header ??= <String, String>{
-      'Content-Type': 'application/json; charset=UTF-8',
-    };
-
-    String token = storagenew.getString('Tokenkey') ?? "";
-    String Userid = storagenew.getString('Userid') ?? "";
-    String Profile = storagenew.getString('Profile') ?? "";
-    if (token != "") {
-      // header.addAll(<String, String>{
-      //   'Userid': Userid,
-      //   'Profile': Profile,
-      // });
-    }
-
-    String body = json.encode(insertDetails);
-    debugPrint(api);
-    if (body != '' && body != 'null') {
-      debugPrint(body);
-    }
-    http.Response result =
-        await http.post(Uri.parse(api), headers: header, body: body);
-    if (result.statusCode == 200) {
-      if (result.body == "") {
-        return [];
-      } else {
-        return jsonDecode(result.body);
-      }
-    } else if (result.statusCode == 401) {
-      ConfirmationOK("Authentication Failed !!!..ReLogin !!!", context);
-      ResponseViewModel? value =
-          ResponseViewModel.fromJson(jsonDecode(result.body));
-      msgshow(value.Message, "", Colors.white, Colors.green, null,
-          18.00 - reducesize, tll, tgc, context, 2);
-      return [];
-    } else if (result.statusCode == 406) {
-      ConfirmationOK(
-          "Already Login Another User.ReLogin or Change Password !!!", context);
-      loginId = 0;
-      loginname = '';
-
-      storagenew.setString('Username', "");
-      storagenew.setString('Password', "");
-      storagenew.setString('OldUsername', "");
-
-      // ResponseViewModel? value = ResponseViewModel.fromJson(jsonDecode(result.body));
-      // msgshow(value.Message,"",Colors.white,Colors.green,null,18.00 - reducesize,tll,tgc,context,2);
-      return [];
-    } else if (result.statusCode == 404) {
-      ResponseViewModel? value =
-          ResponseViewModel.fromJson(jsonDecode(result.body));
-      msgshow(value.Message, "", Colors.white, Colors.green, null,
-          18.00 - reducesize, tll, tgc, context, 2);
-      return [];
-    } else if (result.statusCode == 500) {
-      ResponseViewModel? value =
-          ResponseViewModel.fromJson(jsonDecode(result.body));
-      msgshow(value.Message, "", Colors.white, Colors.green, null,
-          18.00 - reducesize, tll, tgc, context, 2);
-      return [];
-    } else {
-      throw Exception('${result.statusCode} Unknown Error Occurred');
-    }
-  } on SocketException catch (_) {
-    throw Exception('Check Your Network Connection');
-  }
-  // on Exception catch (ms) {
-  //   throw Exception(ms.toString());
-  // }
-  catch (error) {
-    throw Exception('$apiname$error');
-  }
-}
-// create teh  test  jsut write th e conmmand
-Future<dynamic> apiAllinoneSelectArray(api, insertDetails,
-    Map<String, String>? header, BuildContext? context) async { // [!highlight]
-
-  String apiname = api.toString().split('?')[0];
-  apiname = "${apiname.replaceAll('$port/api/', '')}: ";
-  try {
-    header ??= <String, String>{
-      'Content-Type': 'application/json; charset=UTF-8',
-    };
-
-    String token = storagenew.getString('Tokenkey') ?? "";
-    String Userid = storagenew.getString('Userid') ?? "";
-    String Profile = storagenew.getString('Profile') ?? "";
-    if (token != "") {
-      header.addAll(<String, String>{
-        'Authorization': 'Bearer $token',
-        'Userid': Userid,
-        'Profile': Profile,
-      });
-    }
-
-    String body = json.encode(insertDetails);
-    debugPrint(api);
-    if (body != '' && body != 'null') {
-      debugPrint(body);
-    }
-
-    http.Response result = await http.post(Uri.parse(api), headers: header, body: body);
-
-    if (result.statusCode == 200) {
-      if (result.body == "") {
-        return [];
-      } else {
-        return jsonDecode(result.body);
-      }
-    } else if (result.statusCode == 401) {
-      if (context != null) { // [!highlight]
-        ConfirmationOK("Authentication Failed !!!..ReLogin !!!", context);
-        ResponseViewModel? value =
-        ResponseViewModel.fromJson(jsonDecode(result.body));
-        msgshow(value.Message, "", Colors.white, Colors.green, null,
-            18.00 - reducesize, tll, tgc, context, 2);
-      } // [!highlight]
-      return [];
-    } else if (result.statusCode == 406) {
-      loginId = 0;
-      loginname = '';
-      storagenew.setString('Username', "");
-      storagenew.setString('Password', "");
-      storagenew.setString('OldUsername', "");
-      if (context != null) { // [!highlight]
-        ConfirmationOK(
-            "Already Login Another User.ReLogin or Change Password !!!", context);
-      } // [!highlight]
-      return [];
-    } else if (result.statusCode == 404) {
-      if (context != null) { // [!highlight]
-        ResponseViewModel? value =
-        ResponseViewModel.fromJson(jsonDecode(result.body));
-        msgshow(value.Message, "", Colors.white, Colors.green, null,
-            18.00 - reducesize, tll, tgc, context, 2);
-      } // [!highlight]
-      return [];
-    } else if (result.statusCode == 500) {
-      if (context != null) { // [!highlight]
-        ResponseViewModel? value =
-        ResponseViewModel.fromJson(jsonDecode(result.body));
-        msgshow(value.Message, "", Colors.white, Colors.green, null,
-            18.00 - reducesize, tll, tgc, context, 2);
-      } // [!highlight]
       return [];
     } else {
       throw Exception('${result.statusCode} Unknown Error Occurred');
@@ -705,42 +460,110 @@ Future<dynamic> apiAllinoneSelectArray(api, insertDetails,
     throw Exception('$apiname$error');
   }
 }
-Future<dynamic> apiAllinone(api, insertDetails, Map<String, String>? header, BuildContext context) async {
-  //returntype
-  //1 list
-  //2 status
-  //3 int
-  //4 string
-  //5 double
-  //rawbody
-  //0 OFF
-  //1 ON
 
+Future<dynamic> apiAllinoneSelectArrayWithOutAuth(api, insertDetails,
+    Map<String, String>? header, BuildContext ?context) async {
   String apiname = api.toString().split('?')[0];
   apiname = "${apiname.replaceAll('$port/api/', '')}: ";
   try {
-    header ??= <String, String>{
-      'Content-Type': 'application/json; charset=UTF-8',
-    };
-
-    String token = storagenew.getString('Tokenkey') ?? "";
-    String Userid = storagenew.getString('Userid') ?? "";
-    String Profile = storagenew.getString('Profile') ?? "";
-    if (token != "") {
-      header.addAll(<String, String>{
-        'Authorization': 'Bearer $token',
-        'Userid': Userid,
-        'Profile': Profile,
-      });
+    final headers = _buildRequestHeaders(header, skipAuth: true);
+    final result = await _performPostRequest(api, insertDetails, headers);
+    if (result.statusCode == 200) {
+      if (result.body == "") {
+        return [];
+      } else {
+        return jsonDecode(result.body);
+      }
+    } else if (result.statusCode == 401) {
+      ConfirmationOK("Authentication Failed !!!..ReLogin !!!", context);
+      ResponseViewModel? value =
+          ResponseViewModel.fromJson(jsonDecode(result.body));
+      msgshow(value.Message, "", Colors.white, Colors.green, null,
+          18.00 - reducesize, tll, tgc, context, 2);
+      return [];
+    } else if (result.statusCode == 406) {
+      ConfirmationOK(
+          "Already Login Another User.ReLogin or Change Password !!!", context);
+      loginId = 0;
+      loginname = '';
+      storagenew.setString('Username', "");
+      storagenew.setString('Password', "");
+      storagenew.setString('OldUsername', "");
+      return [];
+    } else if (result.statusCode == 404 || result.statusCode == 500) {
+      ResponseViewModel? value =
+          ResponseViewModel.fromJson(jsonDecode(result.body));
+      msgshow(value.Message, "", Colors.white, Colors.green, null,
+          18.00 - reducesize, tll, tgc, context, 2);
+      return [];
+    } else {
+      throw Exception('${result.statusCode} Unknown Error Occurred');
     }
+  } on SocketException catch (_) {
+    throw Exception('Check Your Network Connection');
+  } catch (error) {
+    throw Exception('$apiname$error');
+  }
+}
 
-    String body = json.encode(insertDetails);
-    debugPrint(api);
-    if (body != '' && body != 'null') {
-      debugPrint(body);
+Future<dynamic> apiAllinoneSelectArray(api, insertDetails,
+    Map<String, String>? header, BuildContext? context) async {
+  String apiname = api.toString().split('?')[0];
+  apiname = "${apiname.replaceAll('$port/api/', '')}: ";
+  try {
+    final headers = _buildRequestHeaders(header);
+    final result = await _performPostRequest(api, insertDetails, headers);
+
+    if (result.statusCode == 200) {
+      if (result.body == "") {
+        return [];
+      } else {
+        return jsonDecode(result.body);
+      }
+    } else if (result.statusCode == 401) {
+      if (context != null) {
+        ConfirmationOK("Authentication Failed !!!..ReLogin !!!", context);
+        ResponseViewModel? value =
+        ResponseViewModel.fromJson(jsonDecode(result.body));
+        msgshow(value.Message, "", Colors.white, Colors.green, null,
+            18.00 - reducesize, tll, tgc, context, 2);
+      }
+      return [];
+    } else if (result.statusCode == 406) {
+      loginId = 0;
+      loginname = '';
+      storagenew.setString('Username', "");
+      storagenew.setString('Password', "");
+      storagenew.setString('OldUsername', "");
+      if (context != null) {
+        ConfirmationOK(
+            "Already Login Another User.ReLogin or Change Password !!!", context);
+      }
+      return [];
+    } else if (result.statusCode == 404 || result.statusCode == 500) {
+      if (context != null) {
+        ResponseViewModel? value =
+        ResponseViewModel.fromJson(jsonDecode(result.body));
+        msgshow(value.Message, "", Colors.white, Colors.green, null,
+            18.00 - reducesize, tll, tgc, context, 2);
+      }
+      return [];
+    } else {
+      throw Exception('${result.statusCode} Unknown Error Occurred');
     }
-    http.Response result =
-        await http.post(Uri.parse(api), headers: header, body: body);
+  } on SocketException catch (_) {
+    throw Exception('Check Your Network Connection');
+  } catch (error) {
+    throw Exception('$apiname$error');
+  }
+}
+
+Future<dynamic> apiAllinone(api, insertDetails, Map<String, String>? header, BuildContext context) async {
+  String apiname = api.toString().split('?')[0];
+  apiname = "${apiname.replaceAll('$port/api/', '')}: ";
+  try {
+    final headers = _buildRequestHeaders(header);
+    final result = await _performPostRequest(api, insertDetails, headers);
     if (result.statusCode == 200) {
       return true;
     } else if (result.statusCode == 401) {
@@ -755,13 +578,9 @@ Future<dynamic> apiAllinone(api, insertDetails, Map<String, String>? header, Bui
           "Already Login Another User.ReLogin or Change Password !!!", context);
       loginId = 0;
       loginname = '';
-
       storagenew.setString('Username', "");
       storagenew.setString('Password', "");
       storagenew.setString('OldUsername', "");
-
-      // ResponseViewModel? value = ResponseViewModel.fromJson(jsonDecode(result.body));
-      // msgshow(value.Message,"",Colors.white,Colors.green,null,18.00 - reducesize,tll,tgc,context,2);
       return [];
     } else if (result.statusCode == 404) {
       ResponseViewModel? value =
@@ -771,7 +590,6 @@ Future<dynamic> apiAllinone(api, insertDetails, Map<String, String>? header, Bui
       return false;
     } else if (result.statusCode == 406) {
       ConfirmationOK("Already login another devices.Please ReLogin.", context);
-
       return false;
     } else if (result.statusCode == 409) {
       ResponseViewModel? value =
@@ -792,23 +610,18 @@ Future<dynamic> apiAllinone(api, insertDetails, Map<String, String>? header, Bui
     msgshow('Check Your Network Connection', "", Colors.white, Colors.red, null,
         18.00 - reducesize, tll, tgc, context, 2);
     throw Exception('Check Your Network Connection');
-  }
-  // on Exception catch (ms) {
-  //   throw Exception(ms.toString());
-  // }
-  catch (error) {
+  } catch (error) {
     msgshow('Check Your Network Connection', "", Colors.white, Colors.red, null,
         18.00 - reducesize, tll, tgc, context, 2);
     throw Exception('$apiname$error');
   }
 }
 
-
 Future<String> apiGetString(api) async {
   try {
     debugPrint(api);
     numberofapicalls = numberofapicalls + 1;
-    var result = await http.post(Uri.parse(api));
+    var result = await http.post(Uri.parse(api)).timeout(const Duration(seconds: 30));
     if (result.statusCode == 200) {
       numberofapicalls = numberofapicalls - 1;
       return jsonDecode(result.body).toString();
@@ -822,495 +635,11 @@ Future<String> apiGetString(api) async {
     throw Exception('There is No Network !!');
   }
 }
-// ─── Replace your existing msgshow function with this ─────────────────────────
 
-void msgshow(
-    String msg,
-    String value,
-    col.Color? tcolor,
-    col.Color? bcolor,
-    Duration? dur,
-    double? fsize,
-    Toast? length,
-    ToastGravity? gravity,
-    BuildContext? context,
-    int type) async {
-  if (context != null) {
-    await Future.delayed(const Duration(milliseconds: 300));
-    // ignore: use_build_context_synchronously
-    _showTopBanner(
-      context: context,
-      message: msg + value,
-      backgroundColor: bcolor == Colors.green || bcolor == Colors.greenAccent
-          ? const Color(0xFF1555F3)
-          : bcolor ?? const Color(0xFF1555F3),
-      textColor: tcolor ?? Colors.white,
-      duration: dur ?? const Duration(seconds: 3),
-    );
-  } else {
-    Fluttertoast.showToast(
-        msg: msg,
-        textColor: tcolor ?? Colors.white,
-        fontSize: fsize ?? 14,
-        toastLength: length ?? Toast.LENGTH_SHORT,
-        backgroundColor: bcolor ?? Colors.black,
-        gravity: gravity ?? ToastGravity.CENTER);
-  }
-}
-
-// ─── Top Banner Implementation ─────────────────────────────────────────────────
-void _showTopBanner({
-  required BuildContext context,
-  required String message,
-  required col.Color backgroundColor,
-  required col.Color textColor,
-  required Duration duration,
-}) {
-  final overlay = Overlay.of(context);
-
-  late OverlayEntry entry;
-
-  entry = OverlayEntry(
-    builder: (_) => _TopBannerWidget(
-      message: message,
-      backgroundColor: backgroundColor,
-      textColor: textColor,
-      duration: duration,
-      onDismiss: () => entry.remove(),
-    ),
-  );
-
-  overlay.insert(entry);
-}
-
-// ─── Top Banner Widget ─────────────────────────────────────────────────────────
-class _TopBannerWidget extends StatefulWidget {
-  final String message;
-  final col.Color backgroundColor;
-  final col.Color textColor;
-  final Duration duration;
-  final VoidCallback onDismiss;
-
-  const _TopBannerWidget({
-    required this.message,
-    required this.backgroundColor,
-    required this.textColor,
-    required this.duration,
-    required this.onDismiss,
-  });
-
-  @override
-  State<_TopBannerWidget> createState() => _TopBannerWidgetState();
-}
-
-class _TopBannerWidgetState extends State<_TopBannerWidget>
-    with SingleTickerProviderStateMixin {
-  late AnimationController _controller;
-  late Animation<Offset> _slideAnimation;
-  late Animation<double> _fadeAnimation;
-
-  @override
-  void initState() {
-    super.initState();
-
-    _controller = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 400),
-    );
-
-    _slideAnimation = Tween<Offset>(
-      begin: const Offset(0, -1),
-      end: Offset.zero,
-    ).animate(CurvedAnimation(
-      parent: _controller,
-      curve: Curves.easeOutCubic,
-    ));
-
-    _fadeAnimation = Tween<double>(begin: 0, end: 1).animate(
-      CurvedAnimation(parent: _controller, curve: Curves.easeIn),
-    );
-
-    // Slide in
-    _controller.forward();
-
-    // Auto dismiss
-    Future.delayed(widget.duration, () async {
-      if (mounted) {
-        await _controller.reverse();
-        widget.onDismiss();
-      }
-    });
-  }
-
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
-  }
-
-  // Pick icon based on background color
-  IconData _getIcon() {
-    final bg = widget.backgroundColor;
-    if (bg == Colors.red || bg == Colors.redAccent) {
-      return Icons.error_outline_rounded;
-    } else if (bg == Colors.green || bg == Colors.greenAccent) {
-      return Icons.check_circle_outline_rounded;
-    } else if (bg == Colors.orange || bg == Colors.orangeAccent) {
-      return Icons.warning_amber_rounded;
-    } else {
-      return Icons.info_outline_rounded;
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final topPadding = MediaQuery.of(context).padding.top;
-
-    return Positioned(
-      top: 0,
-      left: 0,
-      right: 0,
-      child: SlideTransition(
-        position: _slideAnimation,
-        child: FadeTransition(
-          opacity: _fadeAnimation,
-          child: GestureDetector(
-            onTap: () async {
-              await _controller.reverse();
-              widget.onDismiss();
-            },
-            child: Container(
-              margin: EdgeInsets.only(
-                top: topPadding + 10,
-                left: 16,
-                right: 16,
-              ),
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-              decoration: BoxDecoration(
-                color: widget.backgroundColor,
-                borderRadius: BorderRadius.circular(16),
-                boxShadow: [
-                  BoxShadow(
-                    color: widget.backgroundColor.withOpacity(0.4),
-                    blurRadius: 16,
-                    offset: const Offset(0, 6),
-                  ),
-                ],
-              ),
-              child: Row(
-                children: [
-                  Icon(_getIcon(), color: widget.textColor, size: 22),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: Text(
-                      widget.message,
-                      style: TextStyle(
-                        color: widget.textColor,
-                        fontSize: 13,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: 8),
-                  Icon(Icons.close_rounded,
-                      color: widget.textColor.withOpacity(0.6), size: 18),
-                ],
-              ),
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-}
 Toast tls = Toast.LENGTH_SHORT;
 Toast tll = Toast.LENGTH_LONG;
 ToastGravity tgc = ToastGravity.CENTER;
-void msgshow1(
-    String msg,
-    String value,
-    col.Color? tcolor,
-    col.Color? bcolor,
-    Duration? dur,
-    double? fsize,
-    Toast? length,
-    ToastGravity? gravity,
-    BuildContext? context,
-    int type) async {
-  if (context != null) {
-    await Future.delayed(const Duration(seconds: 1));
-    // ignore: use_build_context_synchronously
 
-    // ignore: use_build_context_synchronously
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-      content: Text(
-        msg + value,
-        style: TextStyle(color: tcolor ?? Colors.white),
-      ),
-      backgroundColor: bcolor ?? Colors.black,
-      duration: dur ?? const Duration(seconds: 5),
-    ));
-  } else {
-    Fluttertoast.showToast(
-        msg: msg,
-        textColor: tcolor ?? Colors.white,
-        fontSize: fsize ?? 14,
-        toastLength: length ?? Toast.LENGTH_SHORT,
-        backgroundColor: bcolor ?? Colors.black,
-        gravity: gravity ?? ToastGravity.CENTER);
-  }
-}
-
-Future<bool> ConfirmationMsgYesNo(BuildContext context, String msg) async {
-  return await showDialog<bool>(
-    context: context,
-    barrierDismissible: false, // Veliya click panna close aagakudathu
-    builder: (BuildContext context) {
-
-      // Message-la "logout" irukka nu check panni color & icon mathikka
-      final bool isLogout = msg.toLowerCase().contains('logout');
-
-      return Dialog(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(24.0),
-        ),
-        elevation: 0,
-        backgroundColor: Colors.transparent,
-        child: Container(
-          padding: const EdgeInsets.all(24.0),
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(24.0),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withOpacity(0.12),
-                blurRadius: 24,
-                offset: const Offset(0, 8),
-              ),
-            ],
-          ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              // ── Icon Header ──
-              Container(
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: isLogout
-                      ? const Color(0xFFFFF1F2) // Soft Rose for Logout
-                      : const Color(0xFFF0F4FF), // Soft Blue for general
-                  shape: BoxShape.circle,
-                ),
-                child: Icon(
-                  isLogout ? Icons.logout_rounded : Icons.help_outline_rounded,
-                  size: 32,
-                  color: isLogout ? const Color(0xFFE11D48) : const Color(0xFF1555F3),
-                ),
-              ),
-              const SizedBox(height: 20),
-
-              // ── Title ──
-              Text(
-                isLogout ? "Logout" : "Confirm",
-                style: GoogleFonts.dmSans(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                  color: const Color(0xFF1E293B),
-                ),
-              ),
-              const SizedBox(height: 12),
-
-              // ── Message ──
-              Text(
-                msg,
-                textAlign: TextAlign.center,
-                style: GoogleFonts.dmSans(
-                  fontSize: 15,
-                  fontWeight: FontWeight.w500,
-                  color: const Color(0xFF64748B),
-                  height: 1.4,
-                ),
-              ),
-              const SizedBox(height: 28),
-
-              // ── Buttons ──
-              Row(
-                children: [
-                  // Cancel / No Button
-                  Expanded(
-                    child: TextButton(
-                      onPressed: () => Navigator.pop(context, false),
-                      style: TextButton.styleFrom(
-                        padding: const EdgeInsets.symmetric(vertical: 14),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(14),
-                        ),
-                        backgroundColor: const Color(0xFFF1F5F9), // Light Grey
-                      ),
-                      child: Text(
-                        'No',
-                        style: GoogleFonts.dmSans(
-                          fontSize: 15,
-                          fontWeight: FontWeight.w600,
-                          color: const Color(0xFF475569),
-                        ),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: 12),
-
-                  // Yes / Confirm Button
-                  Expanded(
-                    child: ElevatedButton(
-                      onPressed: () => Navigator.pop(context, true),
-                      style: ElevatedButton.styleFrom(
-                        elevation: 0,
-                        padding: const EdgeInsets.symmetric(vertical: 14),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(14),
-                        ),
-                        backgroundColor: isLogout
-                            ? const Color(0xFFE11D48) // Danger Red for Logout
-                            : const Color(0xFF1555F3), // Primary Blue
-                      ),
-                      child: Text(
-                        'Yes',
-                        style: GoogleFonts.dmSans(
-                          fontSize: 15,
-                          fontWeight: FontWeight.w700,
-                          color: Colors.white,
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ],
-          ),
-        ),
-      );
-    },
-  ).then((value) => value ?? false); // Default to false if dismissed
-}
-
-Future<bool> ConfirmationOK(String Msg, context) async {
-  return await showDialog(
-    context: context,
-    builder: (BuildContext context) {
-      // return object of type Dialog
-      return AlertDialog(
-        titlePadding: EdgeInsets.zero,
-        title: Container(
-          height:  MalevaScreen == 1
-              ?35 : 45,
-          padding: const EdgeInsets.all(5),
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(0.0),
-            color: colour.commonColor,
-            border: Border.all(
-              color: colour.commonColorLight,
-            ),
-            // side: const BorderSide(color: colour.commonColorLight, width: 1, style: BorderStyle.solid),
-          ),
-          child: Text(
-            "Maleva",
-            style: GoogleFonts.lato(
-              textStyle:  TextStyle(
-                  color: colour.whiteText,
-                  fontWeight: FontWeight.bold,
-                  fontSize: FontLarge,
-                  letterSpacing: 0.3),
-            ),
-          ),
-        ),
-        content: SizedBox(
-      width: MalevaScreen == 1
-      ?150: 300.0, // Adjust width as needed
-      height: MalevaScreen == 1
-      ?30 :50.0, // Adjust height as needed
-      child:  Text(
-          Msg,
-          style: GoogleFonts.lato(
-            textStyle:  TextStyle(
-                color: colour.commonColor,
-                fontWeight: FontWeight.bold,
-                fontSize:  MalevaScreen == 1
-                    ? FontLow : FontMedium,
-                letterSpacing: 0.3),
-          ),
-        ),),
-        actions: <Widget>[
-          // usually buttons at the bottom of the dialog
-          ElevatedButton(
-            style: ElevatedButton.styleFrom(
-              backgroundColor: colour.commonColor,
-              side: const BorderSide(
-                  color: colour.commonColorLight,
-                  width: 1,
-                  style: BorderStyle.solid),
-              textStyle: const TextStyle(color: Colors.black),
-              elevation: 20.0,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(5.0),
-              ),
-              padding: const EdgeInsets.all(4.0),
-            ),
-            onPressed: () {
-              Navigator.pop(context, true);
-            },
-            child: Text(
-              'OK',
-              style: GoogleFonts.lato(
-                  fontSize:  MalevaScreen == 1
-                      ? FontMedium - 2 : FontMedium,
-                  // height: 1.45,
-                  fontWeight: FontWeight.bold,
-                  color: colour.commonColorLight),
-            ),
-          ),
-        ],
-      );
-    },
-  ).then((exit) {
-    if (exit == null) return false;
-    if (exit) {
-      return true;
-    } else {
-      // user pressed No button
-      return false;
-    }
-  });
-}
-
-
-
-void toastMsg(msg, value, BuildContext context) {
-  ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-    content: Row(
-      children: [
-        Expanded(
-            flex: 1,
-            child: Text(
-              msg + value.toString(),
-              style:  GoogleFonts.lato(
-                textStyle: TextStyle(
-                  fontSize:  MalevaScreen == 1
-                      ? FontLow : FontMedium,
-                  fontWeight: FontWeight.bold,
-                  color: colour.commonColor)),
-            ))
-      ],
-    ),
-    padding: const EdgeInsets.all(15),
-    shape: RoundedRectangleBorder(
-      borderRadius: BorderRadius.circular(5.0),
-    ),
-    margin: const EdgeInsets.all(15),
-    behavior: SnackBarBehavior.floating,
-    backgroundColor: colour.commonColorLight,
-    duration: const Duration(seconds: 1),
-  ));
-}
 String currentdate(int days)  {
   DateTime currentDate = DateTime.now();
 
@@ -1604,98 +933,34 @@ Future<File> _getFile(String filename) async {
 }
 
 String networkimage = '';
-Future<String> upload(File imageFile, String imageapi,int Id,String FolderName ,String SubFolderName) async {networkimage = '';
-  var stream = http.ByteStream(imageFile.openRead());
-  stream.cast();
-  var length = await imageFile.length();
-
-  var uri = Uri.parse(imageapi);
-
-  var request = http.MultipartRequest("POST", uri);
-  var multipartFile = http.MultipartFile('MyImages0', stream, length,
-      filename: basename(imageFile.path),
-      contentType: MediaType('image', 'jpeg'));
-
-  request.files.add(multipartFile);
-  Map<String, String> header = {
-    'Comid': Comid.toString(),
-    'Id' : Id.toString(),
-    'FolderName' : FolderName,
-    'FileName' :basename(imageFile.path),
-    'SubFolderName' : SubFolderName
-
-  };
-
-  request.headers.addAll(header);
-
-  // Map<String, String> parameters = {
-  //   "imagefolder": 'KmImages',
-  // };
-  // request.headers.addAll(parameters);
-  http.Response response = await http.Response.fromStream(await request.send());
-  if (response.statusCode == 200) {
-    String imagename1 = response.body.replaceRange(0, 1, '');
-    String imagename =
-    imagename1.replaceRange(imagename1.length - 1, imagename1.length, '');
-//      networkimage= port + imagepath + imagename;
-    networkimage = imagename;
-    return networkimage;
-  } else {
-    return networkimage;
-  }
-}
-
-
-
-Future<String> uploadPdfOrImage(File file, int comid,int Id,String apiUploadPdfFile, String folderName, String subFolderName) async {String networkFileName = "";
-try {
-  var stream = http.ByteStream(file.openRead());
-  var length = await file.length();
-
-  var uri = Uri.parse(apiUploadPdfFile);
-
-  // Multipart request
-  var request = http.MultipartRequest("POST", uri);
-
-  // File -> key must be "MyFiles0" (your .NET code)
-  var multipartFile = http.MultipartFile(
-    'MyFiles0', // important: matches .NET API
-    stream,
-    length,
-    filename: basename(file.path),
-    contentType: MediaType('application', 'octet-stream'),
-  );
-
-  request.files.add(multipartFile);
-
-  // Required headers
-  request.headers.addAll({
-    'Comid': comid.toString(),
-    'Id' : Id.toString(),
-    'FolderName': folderName,
-    'FileName': basename(file.path),
-    'SubFolderName': subFolderName,
-  });
-
-  // Send request
-  var response = await http.Response.fromStream(await request.send());
-
-  if (response.statusCode == 200) {
-
-    String fileName1 = response.body.replaceRange(0, 1, '');
-    String fileName = fileName1.replaceRange(fileName1.length - 1, fileName1.length, '');
-
-    networkFileName = fileName;
-    return networkFileName;
-  }
-  else {
-    print("❌ Upload failed: ${response.statusCode}");
+Future<String> upload(File imageFile, String imageapi, int Id, String FolderName, String SubFolderName) async {
+  try {
+    return await ApiClient.uploadImage(
+      imageFile,
+      imageapi,
+      comId: Comid,
+      id: Id,
+      folderName: FolderName,
+      subFolderName: SubFolderName,
+    );
+  } catch (_) {
     return "";
   }
-} catch (e) {
-  print("⚠️ Error uploading: $e");
-  return "";
 }
+
+Future<String> uploadPdfOrImage(File file, int comid, int Id, String apiUploadPdfFile, String folderName, String subFolderName) async {
+  try {
+    return await ApiClient.uploadPdfOrFile(
+      file,
+      apiUploadPdfFile,
+      comId: comid,
+      id: Id,
+      folderName: folderName,
+      subFolderName: subFolderName,
+    );
+  } catch (_) {
+    return "";
+  }
 }
 
 
@@ -1717,8 +982,7 @@ Future<void> logout(BuildContext context) async {
   storagenew.setString('Password', "");
   storagenew.setString('OldUsername', "");
 
-  // 🚨 CRITICAL FIX: pushAndRemoveUntil thaan use pannanum.
-  // Appo thaan back amukkuna palaiya screen-ku pogathu.
+
   Navigator.pushAndRemoveUntil(
     context,
     MaterialPageRoute(
@@ -1731,7 +995,7 @@ Future<void> logout(BuildContext context) async {
         child: const Appuserloginmobile(),
       ),
     ),
-        (Route<dynamic> route) => false, // Clears the entire route history
+        (Route<dynamic> route) => false,
   );
 }
 
@@ -1787,11 +1051,7 @@ Future checkVersion(BuildContext context) async {
     // country: 'in',
   ).then((result) async {
     if (result.canUpdate!) {
-      // await AppVersionUpdate.showBottomSheetUpdate(context: context, appVersionResult: appVersionResult)
-      // await AppVersionUpdate.showPageUpdate(context: context, appVersionResult: appVersionResult)
-      // or use your own widget with information received from AppVersionResult
 
-      //##############################################################################################
       await AppVersionUpdate.showAlertUpdate(
         appVersionResult: result,
         context: context,
@@ -1914,7 +1174,6 @@ List<TruckDetailsModel> TruckDetailsList = [];
 
 TruckDetailsModel SelectTruckDetails = TruckDetailsModel.Empty();
 List<BarcodePrintModel> BarcodeList=[];
-List<BluetoothModel> bluetoothdeviceList = [];
 
 WareHouseModel SelectWareHouseList = WareHouseModel.Empty();
 List<WareHouseModel> WareHouseModelAllList = [];
@@ -2101,142 +1360,4 @@ void print_(dynamic msg) {
   if (kDebugMode) {
     print(msg);
   }
-}
-
-
-//Printer Work---------------
-bool currentconnectionstate=false;
-bool esccommand=false;
-Future printerinit() async {
-  // await Future.delayed(Duration(seconds: 2));
-  try{
-    await bpp.BluetoothPrintPlus.connect(bpp.BluetoothDevice(
-        bluetoothdeviceList[0].name, bluetoothdeviceList[0].address));
-  }
-  catch(e){
-    var check = e;
-  }
-
-}
-Future printfunction(List<BarcodePrintModel> obj) async {
-  if (currentconnectionstate) {
-    printdata(obj);
-  }
-  else {
-    printerinit();
-  }
-}
-
-Future printdata(List<BarcodePrintModel> obj) async {
-  List<Uint8List?> obj1 = [];
-  if (esccommand) {
-    obj1 = await escTemplateCmd(obj);
-  }
-  else {
-    obj1 = await tscTemplateCmd(obj);
-  }
-  for (var i = 0; i < obj1.length; i++) {
-     bpp.BluetoothPrintPlus.write(obj1[i]);
-  }
-}
-final escCommand = bpp.EscCommand();
-Future<List<Uint8List?>> escTemplateCmd(List<BarcodePrintModel> obj) async {
-  List<Uint8List?> returndata = [];
-  for (var i = 0; i < obj.length; i++) {
-    await escCommand.cleanCommand();
-    await escCommand.print(feedLines: 1);
-    await escCommand.newline();
-    await escCommand.text(
-        content: obj[i].CompanyName_Data,
-        alignment: bpp.Alignment.center,
-        style: bpp.EscTextStyle.underline,
-        fontSize: bpp.EscFontSize.size7);
-    await escCommand.newline();
-    await escCommand.text(
-        content: obj[i].ShipName_Data,
-        alignment: bpp.Alignment.center,
-        style: bpp.EscTextStyle.underline,
-        fontSize: bpp.EscFontSize.size7);
-    await escCommand.newline();
-    await escCommand.code128(content: obj[i].Barcode_Data,alignment:bpp.Alignment.center,height: 120,width:4 ,hriPosition: bpp.HriPosition.below);
-    await escCommand.newline();
-    // await escCommand.qrCode(content: obj[i].Barcode_Data);
-    // await escCommand.newline();
-    await escCommand.text(
-        content:"Date : ${obj[i].Date_Data}",
-        alignment: bpp.Alignment.center,
-        style: bpp.EscTextStyle.underline,
-        fontSize: bpp.EscFontSize.size7);
-    await escCommand.newline();
-    await escCommand.text(
-        content:"Job No : ${obj[i].JobNo_Data}",
-        alignment: bpp.Alignment.center,
-        style: bpp.EscTextStyle.underline,
-        fontSize: bpp.EscFontSize.size7);
-    await escCommand.newline();
-    await escCommand.text(
-        content:"Pkg : ${obj[i].Pkg_Data}",
-        alignment: bpp.Alignment.center,
-        style: bpp.EscTextStyle.underline,
-        fontSize: bpp.EscFontSize.size7);
-    await escCommand.print(feedLines: 1);
-    final cmd = await escCommand.getCommand();
-    returndata.add(cmd);
-  }
-  return returndata;
-}
-final tscCommand = bpp.TscCommand();
-Future<List<Uint8List?>> tscTemplateCmd(List<BarcodePrintModel> obj) async {
-  List<Uint8List?> returndata = [];
-  for (var i = 0; i < obj.length; i++) {
-    await tscCommand.cleanCommand();
-    await tscCommand.size(width: 60, height: 62);
-    await tscCommand.cls(); // most after size
-    await tscCommand.speed(8);
-    await tscCommand.density(8);
-    await tscCommand.text(
-      content: obj[i].CompanyName_Data,
-      x: 50,
-      y: 10,
-      xMulti: 2,
-      yMulti: 2,
-    );
-    await tscCommand.text(
-      content: obj[i].ShipName_Data,
-      x: 50,
-      y: 65,
-      xMulti: 2,
-      yMulti: 2,
-    );
-    await tscCommand.qrCode(
-        content: obj[i].Barcode_Data,
-        x: 50,
-        y: 120,
-        cellWidth: 6);
-    await tscCommand.text(
-      content: obj[i].JobNo_Data,
-      x: 50,
-      y: 270,
-      xMulti: 2,
-      yMulti: 2,
-    );
-    await tscCommand.text(
-      content: obj[i].Pkg_Data,
-      x: 50,
-      y: 320,
-      xMulti: 2,
-      yMulti: 2,
-    );
-    await tscCommand.text(
-      content:  obj[i].Date_Data,
-      x: 50,
-      y: 370,
-      xMulti: 2,
-      yMulti: 2,
-    );
-    await tscCommand.print(1);
-    final cmd = await tscCommand.getCommand();
-    returndata.add(cmd);
-  }
-  return returndata;
 }

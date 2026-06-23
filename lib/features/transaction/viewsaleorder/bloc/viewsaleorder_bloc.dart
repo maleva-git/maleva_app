@@ -26,13 +26,13 @@ class GetJobNoBloc extends Bloc<GetJobNoEvent, GetJobNoState> {
   // ── Startup ─────────────────────────────────────────────────────────────────
   Future<void> _onStarted(
       GetJobNoStarted event, Emitter<GetJobNoState> emit) async {
-    emit(GetJobNoLoading());
+    // Show UI instantly
+    emit(_defaultLoaded());
     try {
-      // Load job list for default BillType = 0
+      // Load job list for default BillType = 0 in background
       await OnlineApi.GetJobNoForwarding(null, 0);
-      emit(_defaultLoaded());
     } catch (e) {
-      emit(GetJobNoError(e.toString()));
+      // Background load failed, ignore
     }
   }
 

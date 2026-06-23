@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:maleva/core/widgets/custom_app_bar.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -205,37 +206,10 @@ class _StockInEntryPageState
 
   PreferredSizeWidget _buildAppBar(
       BuildContext context, String userName) {
-    return AppBar(
-      automaticallyImplyLeading: false,
-      elevation: 0,
-      toolbarHeight: 62,
-      flexibleSpace: Container(
-          decoration:
-          const BoxDecoration(gradient: kGradient)),
-      leading: IconButton(
-        icon: const Icon(Icons.arrow_back_ios_new_rounded,
-            size: 20),
-        color: Colors.white,
-        onPressed: () => Navigator.pop(context),
-      ),
-      title: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text('Stock Entry',
-              style: GoogleFonts.lato(
-                  color: Colors.white,
-                  fontWeight: FontWeight.w700,
-                  fontSize: 17,
-                  letterSpacing: 0.3)),
-          const SizedBox(height: 2),
-          Text(userName,
-              style: GoogleFonts.lato(
-                  color: Colors.white.withOpacity(0.65),
-                  fontWeight: FontWeight.w500,
-                  fontSize: 12)),
-        ],
-      ),
+    return CustomGradientAppBar(
+      title: 'Stock Entry',
+      isTablet: false,
+      showBackButton: true,
       actions: [
         Padding(
           padding: const EdgeInsets.only(
@@ -285,7 +259,6 @@ class _StockInEntryPageState
           ),
         ),
       ],
-      iconTheme: const IconThemeData(color: Colors.white),
     );
   }
 }

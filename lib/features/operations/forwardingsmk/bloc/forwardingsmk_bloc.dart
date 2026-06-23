@@ -37,13 +37,14 @@ class FWSmkBloc extends Bloc<FWSmkEvent, FWSmkState> {
   // ── Startup ────────────────────────────────────────────────────────────────
   Future<void> _onStarted(
       FWSmkStarted event, Emitter<FWSmkState> emit) async {
-    emit(FWSmkLoading());
+    // Show UI instantly
+    emit(_defaultLoaded());
     try {
+      // Load data in background
       await OnlineApi.GetJobNoForwarding(null, 0);
       await OnlineApi.loadComboS1(null, 0);
-      emit(_defaultLoaded());
     } catch (e) {
-      emit(FWSmkError(e.toString()));
+      // Background load failed, ignore
     }
   }
 

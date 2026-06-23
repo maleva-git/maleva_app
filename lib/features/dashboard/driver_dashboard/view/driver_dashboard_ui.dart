@@ -1,4 +1,5 @@
 import 'package:flutter/Material.dart';
+import 'package:maleva/core/widgets/custom_app_bar.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
@@ -39,30 +40,21 @@ class DriverDashboardView extends StatelessWidget {
     );
   }
   PreferredSizeWidget _buildAppBar(BuildContext context, bool isTablet){
-    return AppBar(
-      backgroundColor: colour.AppColors.appBarColor,
-      toolbarHeight: isTablet ? 64 : 56,
-      title: Text(
-        'Driver DashBoard',
-        style: GoogleFonts.lato(
-          color: colour.topAppBarColor,
-          fontWeight: FontWeight.bold,
-          fontSize: isTablet ? 20 : objfun.FontLarge,
-        ),
-      ),
-      iconTheme: const IconThemeData(color: colour.topAppBarColor),
+    return CustomGradientAppBar(
+      title: 'Driver DashBoard',
+      isTablet: isTablet,
       actions: [
 
         IconButton(
           icon: Icon(Icons.bluetooth_audio,
-              size: isTablet ? 28 : 25, color: colour.topAppBarColor),
+              size: isTablet ? 28 : 25),
           onPressed: () => Navigator.push(context,
               MaterialPageRoute(builder: (_) => BluetoothPage())),
         ),
 
         IconButton(
           icon: Icon(Icons.exit_to_app,
-              size: isTablet ? 32 : 30, color: colour.topAppBarColor),
+              size: isTablet ? 32 : 30),
           onPressed: () => objfun.logout(context),
         ),
         if (isTablet) const SizedBox(width: 8),
