@@ -43,12 +43,7 @@ class _DriverSalaryView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocConsumer<DriverSalaryBloc, DriverSalaryState>(
-      listener: (context, state) {
-        if (state is DriverSalaryShowDetail) {
-          _showSalaryDetails(context, state.item);
-        }
-      },
+    return BlocBuilder<DriverSalaryBloc, DriverSalaryState>(
       builder: (context, state) {
         if (state is DriverSalaryInitial ||
             state is DriverSalaryLoading) {
@@ -78,11 +73,12 @@ class _DriverSalaryView extends StatelessWidget {
       },
     );
   }
+}
 
-  void _showSalaryDetails(
-      BuildContext context, Map<String, dynamic> item) {
-    showDialog(
-      context: context,
+void _showSalaryDetailsDialog(
+    BuildContext context, Map<String, dynamic> item) {
+  showDialog(
+    context: context,
       barrierDismissible: true,
       builder: (_) => Dialog(
         shape: RoundedRectangleBorder(
@@ -146,7 +142,6 @@ class _DriverSalaryView extends StatelessWidget {
       ),
     );
   }
-}
 
 class _DetailRow extends StatelessWidget {
   final String label;
@@ -514,10 +509,8 @@ class _SalaryCard extends StatelessWidget {
     final amount  = item['Amount']?.toString()         ?? '-';
 
     return InkWell(
-      onTap: () => context
-          .read<DriverSalaryBloc>()
-          .add(DriverSalaryDetailRequested(
-          Map<String, dynamic>.from(item as Map))),
+      onTap: () => _showSalaryDetailsDialog(
+          context, Map<String, dynamic>.from(item as Map)),
       borderRadius: BorderRadius.circular(12),
       child: Container(
         margin: const EdgeInsets.only(bottom: 8),
