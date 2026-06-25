@@ -140,8 +140,6 @@ class _SplashScreenState extends State<SplashScreen>
         if(objfun.DriverLogin == 1)
         {
           // Navigator.push(context, MaterialPageRoute(builder: (context) => const DriverDashboard()));
-
-
           Navigator.pushReplacement(
             context,
             MaterialPageRoute(

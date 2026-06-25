@@ -95,23 +95,26 @@ class NewAdminDashboard extends StatefulWidget{
 class _AdminDashboardState extends State<NewAdminDashboard> with SingleTickerProviderStateMixin {
 
   late TabController _tabController;
+  late AdminTabBloc _adminTabBloc;
 
   @override
   void initState() {
     super.initState();
+    _adminTabBloc = AdminTabBloc();
     _tabController = TabController(length: 25, vsync: this);
     _tabController.addListener(_onTabChanged);
   }
 
   void _onTabChanged(){
     final index = _tabController.index;
-    context.read<AdminTabBloc>().add(AdminTabChanged(index));
+    _adminTabBloc.add(AdminTabChanged(index));
   }
 
   @override
   void dispose() {
     _tabController.removeListener(_onTabChanged);
     _tabController.dispose();
+    _adminTabBloc.close();
     super.dispose();
   }
 
@@ -121,7 +124,7 @@ class _AdminDashboardState extends State<NewAdminDashboard> with SingleTickerPro
     return MultiBlocProvider(
       providers: [
         // ✅ FIX 2: Removed all invalid 'child:' arguments
-        BlocProvider<AdminTabBloc>(create: (_) => AdminTabBloc()),
+        BlocProvider<AdminTabBloc>.value(value: _adminTabBloc),
         BlocProvider<SalesBloc>(create: (_) => SalesBloc()),
         BlocProvider<TruckBloc>(create: (_) => TruckBloc()),
         BlocProvider<InvoiceBloc>(
