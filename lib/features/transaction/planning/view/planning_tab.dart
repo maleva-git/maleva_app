@@ -40,10 +40,10 @@ class PlanningView extends StatelessWidget {
         ..add(LoadPlanningEvent(
           fromDate: _today,
           toDate: _today,
-          employeeId: 0,            // 💥 FIX 1: Default ID 0
+          employeeId: 0,
           employeeName: '',
           planningNo: '',
-          checkLoggedEmp: false,    // 💥 FIX 1: L.Emp default-a uncheck pannidrom
+          checkLoggedEmp: false,
         )),
       child: const _PlanningScaffold(),
     );
@@ -187,16 +187,21 @@ class _TabletLayout extends StatelessWidget {
   Widget build(BuildContext context) {
     return state.masterList.isEmpty
         ? const _EmptyView()
-        : ListView.builder(
-      padding: const EdgeInsets.fromLTRB(24, 16, 24, 100),
-      itemCount: state.masterList.length,
-      itemBuilder: (context, index) => _PlanningCard(
-        master: state.masterList[index],
-        index: index,
-        state: state,
-        isTablet: true,
-      ),
-    );
+        : Center(
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 950),
+              child: ListView.builder(
+                padding: const EdgeInsets.fromLTRB(24, 16, 24, 100),
+                itemCount: state.masterList.length,
+                itemBuilder: (context, index) => _PlanningCard(
+                  master: state.masterList[index],
+                  index: index,
+                  state: state,
+                  isTablet: true,
+                ),
+              ),
+            ),
+          );
   }
 }
 
@@ -473,7 +478,8 @@ class _FilterFab extends StatelessWidget {
       backgroundColor: Colors.transparent,
       builder: (sheetCtx) => StatefulBuilder(
         builder: (_, setSheetState) {
-          return Container(
+          final isTablet = MediaQuery.of(sheetCtx).size.width >= 600;
+          final Widget content = Container(
             decoration: const BoxDecoration(
               color: colour.kSurface,
               borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
@@ -578,6 +584,9 @@ class _FilterFab extends StatelessWidget {
               ),
             ),
           );
+          return isTablet
+              ? Center(child: ConstrainedBox(constraints: const BoxConstraints(maxWidth: 650), child: content))
+              : content;
         },
       ),
     );
@@ -607,62 +616,65 @@ class _PasswordDialogState extends State<_PasswordDialog> {
     return Dialog(
       backgroundColor: colour.kSurface,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-      child: Padding(
-        padding: const EdgeInsets.all(24),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Container(
-              padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(color: AppTokens.invoiceHeaderStart.withOpacity(0.1), shape: BoxShape.circle, border: Border.all(color: AppTokens.invoiceHeaderStart.withOpacity(0.3))),
-              child: const Icon(Icons.lock_outline_rounded, color: AppTokens.invoiceHeaderStart, size: 28),
-            ),
-            const SizedBox(height: 16),
-            Text('Edit Password', style: GoogleFonts.dmSerifDisplay(fontSize: 18, color: colour.kText)),
-            const SizedBox(height: 4),
-            Text('Enter password to edit this planning', style: _label(12, color: AppTokens.planTextMuted)),
-            const SizedBox(height: 20),
-            TextField(
-              controller: _ctrl,
-              autofocus: true,
-              obscureText: true,
-              textCapitalization: TextCapitalization.characters,
-              style: _body(14, color: colour.kText, fw: FontWeight.w600),
-              decoration: InputDecoration(
-                hintText: 'Enter password', hintStyle: _label(13), filled: true, fillColor: colour.kSurface2,
-                border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: colour.kBorder)),
-                enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: colour.kBorder)),
-                focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: AppTokens.invoiceHeaderStart, width: 1.5)),
-                prefixIcon: const Icon(Icons.key_rounded, color: AppTokens.invoiceHeaderStart, size: 18),
+      child: ConstrainedBox(
+        constraints: const BoxConstraints(maxWidth: 400),
+        child: Padding(
+          padding: const EdgeInsets.all(24),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(color: AppTokens.invoiceHeaderStart.withOpacity(0.1), shape: BoxShape.circle, border: Border.all(color: AppTokens.invoiceHeaderStart.withOpacity(0.3))),
+                child: const Icon(Icons.lock_outline_rounded, color: AppTokens.invoiceHeaderStart, size: 28),
               ),
-            ),
-            const SizedBox(height: 20),
-            Row(children: [
-              Expanded(
-                child: ElevatedButton(
-                  onPressed: _loading ? null : () async {
-                    if (_ctrl.text.isEmpty) {
-                      objfun.ConfirmationOK("Enter Password !!", context);
-                      return;
-                    }
-                    setState(() => _loading = true);
-                    await widget.onConfirm(_ctrl.text);
-                    // FIX 4: Removed setState(() => _loading = false) after pop logic to prevent crash
-                  },
-                  style: ElevatedButton.styleFrom(backgroundColor: AppTokens.invoiceHeaderStart, padding: const EdgeInsets.symmetric(vertical: 13), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12))),
-                  child: _loading ? const SizedBox(width: 18, height: 18, child: CircularProgressIndicator(strokeWidth: 2, color: colour.kBg)) : Text('Confirm', style: _body(14, color: colour.kBg, fw: FontWeight.w700)),
+              const SizedBox(height: 16),
+              Text('Edit Password', style: GoogleFonts.dmSerifDisplay(fontSize: 18, color: colour.kText)),
+              const SizedBox(height: 4),
+              Text('Enter password to edit this planning', style: _label(12, color: AppTokens.planTextMuted)),
+              const SizedBox(height: 20),
+              TextField(
+                controller: _ctrl,
+                autofocus: true,
+                obscureText: true,
+                textCapitalization: TextCapitalization.characters,
+                style: _body(14, color: colour.kText, fw: FontWeight.w600),
+                decoration: InputDecoration(
+                  hintText: 'Enter password', hintStyle: _label(13), filled: true, fillColor: colour.kSurface2,
+                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: colour.kBorder)),
+                  enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: colour.kBorder)),
+                  focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: AppTokens.invoiceHeaderStart, width: 1.5)),
+                  prefixIcon: const Icon(Icons.key_rounded, color: AppTokens.invoiceHeaderStart, size: 18),
                 ),
               ),
-              const SizedBox(width: 10),
-              Expanded(
-                child: OutlinedButton(
-                  onPressed: () => Navigator.pop(context),
-                  style: OutlinedButton.styleFrom(foregroundColor: colour.kTextDim, side: const BorderSide(color: colour.kBorder), padding: const EdgeInsets.symmetric(vertical: 13), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12))),
-                  child: Text('Cancel', style: _body(14, color: colour.kTextDim, fw: FontWeight.w600)),
+              const SizedBox(height: 20),
+              Row(children: [
+                Expanded(
+                  child: ElevatedButton(
+                    onPressed: _loading ? null : () async {
+                      if (_ctrl.text.isEmpty) {
+                        objfun.ConfirmationOK("Enter Password !!", context);
+                        return;
+                      }
+                      setState(() => _loading = true);
+                      await widget.onConfirm(_ctrl.text);
+                      // FIX 4: Removed setState(() => _loading = false) after pop logic to prevent crash
+                    },
+                    style: ElevatedButton.styleFrom(backgroundColor: AppTokens.invoiceHeaderStart, padding: const EdgeInsets.symmetric(vertical: 13), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12))),
+                    child: _loading ? const SizedBox(width: 18, height: 18, child: CircularProgressIndicator(strokeWidth: 2, color: colour.kBg)) : Text('Confirm', style: _body(14, color: colour.kBg, fw: FontWeight.w700)),
+                  ),
                 ),
-              ),
-            ]),
-          ],
+                const SizedBox(width: 10),
+                Expanded(
+                  child: OutlinedButton(
+                    onPressed: () => Navigator.pop(context),
+                    style: OutlinedButton.styleFrom(foregroundColor: colour.kTextDim, side: const BorderSide(color: colour.kBorder), padding: const EdgeInsets.symmetric(vertical: 13), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12))),
+                    child: Text('Cancel', style: _body(14, color: colour.kTextDim, fw: FontWeight.w600)),
+                  ),
+                ),
+              ]),
+            ],
+          ),
         ),
       ),
     );

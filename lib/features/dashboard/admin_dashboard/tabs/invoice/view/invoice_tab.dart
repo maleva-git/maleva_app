@@ -210,27 +210,17 @@ class _TabletBody extends StatelessWidget {
           _HeroHeader(state: state, data: data),
           Padding(
             padding: const EdgeInsets.all(20),
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                Expanded(
-                  flex: 6,
-                  child: Column(children: [
-                    _OverviewSection(state: state, data: data, isTablet: true),
-                    const SizedBox(height: 20),
-                    _MonthlyTrendSection(
-                      state: state,
-                      isTablet: true,
-                      onMonthTap: (i) => context
-                          .read<InvoiceBloc>()
-                          .add(LoadEmployeeInvData(i + 3)),
-                    ),
-                  ]),
-                ),
-                const SizedBox(width: 16),
-                Expanded(
-                  flex: 4,
-                  child: _TodayYesterdayChartCard(data: data),
+                _OverviewSection(state: state, data: data, isTablet: true),
+                const SizedBox(height: 20),
+                _MonthlyTrendSection(
+                  state: state,
+                  isTablet: true,
+                  onMonthTap: (i) => context
+                      .read<InvoiceBloc>()
+                      .add(LoadEmployeeInvData(i + 3)),
                 ),
               ],
             ),

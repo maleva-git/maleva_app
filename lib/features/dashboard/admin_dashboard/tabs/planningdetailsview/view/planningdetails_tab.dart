@@ -166,10 +166,13 @@ class _PlanningDetailsViewState extends State<_PlanningDetailsView> {
 
   Widget _buildBody(
       BuildContext ctx, PlanningDetailsState state, bool isTablet) {
-    return Padding(
-      padding: EdgeInsets.all(isTablet ? 12 : 6),
-      child: Column(
-        children: [
+    return Center(
+      child: ConstrainedBox(
+        constraints: const BoxConstraints(maxWidth: 800),
+        child: Padding(
+          padding: EdgeInsets.all(isTablet ? 12 : 6),
+          child: Column(
+            children: [
           // ── Column header card ─────────────────────────────────────────
           _ColumnHeaderCard(isTablet: isTablet),
 
@@ -199,36 +202,35 @@ class _PlanningDetailsViewState extends State<_PlanningDetailsView> {
 
           // ── List ───────────────────────────────────────────────────────
           Expanded(
-            child: state.isEmpty
-                ? const _EmptyWidget()
+            child: state.filteredPlanningList.isEmpty
+                ? const SizedBox.shrink()
                 : RefreshIndicator(
-              color: AppTokens.brandPrimary,
-              onRefresh: () async {
-                ctx.read<PlanningDetailsBloc>()
-                    .add(const PlanningDetailsRefreshRequested());
-                await Future.delayed(
-                    const Duration(milliseconds: 600));
-              },
-              child: ListView.builder(
-                physics: const AlwaysScrollableScrollPhysics(),
-                padding:
-                EdgeInsets.only(bottom: isTablet ? 20 : 12),
-                itemCount: state.filteredPlanningList.length,
-                itemBuilder: (_, i) => Padding(
-                  padding: const EdgeInsets.only(bottom: 8),
-                  child: _PlanningCard(
-                    index: i,
-                    item: state.filteredPlanningList[i],
-                    isTablet: isTablet,
+                    color: AppTokens.brandPrimary,
+                    onRefresh: () async {
+                      ctx.read<PlanningDetailsBloc>().add(const PlanningDetailsRefreshRequested());
+                      await Future.delayed(const Duration(milliseconds: 600));
+                    },
+                    child: ListView.builder(
+                      physics: const AlwaysScrollableScrollPhysics(),
+                      padding: EdgeInsets.only(bottom: isTablet ? 20 : 12),
+                      itemCount: state.filteredPlanningList.length,
+                      itemBuilder: (_, i) => Padding(
+                        padding: const EdgeInsets.only(bottom: 8),
+                        child: _PlanningCard(
+                          index: i,
+                          item: state.filteredPlanningList[i],
+                          isTablet: isTablet,
+                        ),
+                      ),
+                    ),
                   ),
-                ),
-              ),
-            ),
           ),
         ],
       ),
-    );
-  }
+    ),
+  ),
+);
+}
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -424,12 +426,7 @@ class _PlanningCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final double cardH =
-        MediaQuery.of(context).size.height * (isTablet ? 0.22 : 0.25);
-
-    return SizedBox(
-      height: cardH,
-      child: Card(
+    return Card(
         elevation: 6,
         shadowColor: Colors.black26,
         color: AppTokens.surfaceCard,
@@ -547,8 +544,7 @@ class _PlanningCard extends StatelessWidget {
             ],
           ),
         ),
-      ),
-    );
+      );
   }
 }
 
