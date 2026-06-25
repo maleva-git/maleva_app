@@ -150,43 +150,50 @@ class _SalesOrderTabState extends State<SalesOrderTab> {
       Map<String, dynamic> data, double screenW, int tabIndex) {
     return Padding(
       padding: const EdgeInsets.all(20),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
+          _HeroHeaderCard(state: state, data: data),
+          const SizedBox(height: 16),
           Expanded(
-            flex: 6,
-            child: Column(
-              children: [
-                Expanded(
-                  child: SingleChildScrollView(
-                    physics: const AlwaysScrollableScrollPhysics(),
-                    child: Column(children: [
-                      _HeroHeaderCard(state: state, data: data),
-                      const SizedBox(height: 16),
-                      _buildOverviewGrid(context, state, data, isTablet: true, tabIndex: tabIndex),
-                      const SizedBox(height: 16),
-                      _buildStatusRow(context, state, isTablet: true),
-                    ]),
-                  ),
-                ),
-                const SizedBox(height: 12),
-                _SOTabBar(
-                    selectedIndex: tabIndex,
-                    screenW: screenW,
-                    isTablet: true),
-              ],
-            ),
-          ),
-          const SizedBox(width: 16),
-          Expanded(
-            flex: 4,
-            child: Column(
+            child: Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                _buildTrendHeader(state, isTablet: true),
-                const SizedBox(height: 12),
                 Expanded(
-                  child: _buildMonthList(context, state, isTablet: true, tabIndex: tabIndex),
+                  flex: 6,
+                  child: Column(
+                    children: [
+                      Expanded(
+                        child: SingleChildScrollView(
+                          physics: const AlwaysScrollableScrollPhysics(),
+                          child: Column(children: [
+                            _buildOverviewGrid(context, state, data, isTablet: true, tabIndex: tabIndex),
+                            const SizedBox(height: 16),
+                            _buildStatusRow(context, state, isTablet: true),
+                          ]),
+                        ),
+                      ),
+                      const SizedBox(height: 12),
+                      _SOTabBar(
+                          selectedIndex: tabIndex,
+                          screenW: screenW,
+                          isTablet: true),
+                    ],
+                  ),
+                ),
+                const SizedBox(width: 16),
+                Expanded(
+                  flex: 4,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      _buildTrendHeader(state, isTablet: true),
+                      const SizedBox(height: 12),
+                      Expanded(
+                        child: _buildMonthList(context, state, isTablet: true, tabIndex: tabIndex),
+                      ),
+                    ],
+                  ),
                 ),
               ],
             ),

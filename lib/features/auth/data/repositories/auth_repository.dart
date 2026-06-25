@@ -76,6 +76,7 @@ class AuthRepository {
     objfun.selectedCompanyName = data['CompanyName'] ?? '';
     objfun.EmpRefId = idNew;
 
+    await AppPreferences.setEmpRefId(idNew);
     await AppPreferences.setEnquiryOpen('false');
     await AppPreferences.setUsername(username);
     await AppPreferences.setPassword(password);

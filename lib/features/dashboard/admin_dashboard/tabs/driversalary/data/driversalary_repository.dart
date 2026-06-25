@@ -10,7 +10,7 @@ class DriverSalaryRepository {
   }) async {
     final master = {
       'Comid':      AppPreferences.getComid(),
-      'DriverId':   AppPreferences.getEmpRefId(),
+      'DriverId':   AppPreferences.getDriverId() == 1 ? AppPreferences.getEmpRefId() : 0,
       'TruckId':    0,
       'FromDate':   fromDate,
       'ToDate':     toDate,

@@ -763,7 +763,7 @@ class SalesOrderAddBloc extends Bloc<SalesOrderAddEvent, SalesOrderAddState> {
         "PickupAddress": s.txtPickUpAddress,
         "PickupQuantity": s.txtPickUpQuantity,
         "PickupWeight": s.txtPickUpWeight,
-        "PickupTime": null
+        "PickupTime": DateTime.now().toIso8601String()
       });
     } else {
       for (int i = 0; i < s.pickUpAddressList.length; i++) {
@@ -771,7 +771,7 @@ class SalesOrderAddBloc extends Bloc<SalesOrderAddEvent, SalesOrderAddState> {
           "PickupAddress": s.pickUpAddressList[i],
           "PickupQuantity": i < s.pickUpQuantityList.length ? s.pickUpQuantityList[i] : "",
           "PickupWeight": i < s.pickUpWeightList.length ? s.pickUpWeightList[i] : "",
-          "PickupTime": null
+          "PickupTime": DateTime.now().toIso8601String()
         });
       }
     }
@@ -784,7 +784,7 @@ class SalesOrderAddBloc extends Bloc<SalesOrderAddEvent, SalesOrderAddState> {
         "DeliveryAddress": s.txtDeliveryAddress,
         "DeliveryQuantity": s.txtDeliveryQuantity,
         "DeliveryWeight": s.txtDeliveryWeight,
-        "DeliveryTime": null
+        "DeliveryTime": DateTime.now().toIso8601String()
       });
     } else {
       for (int i = 0; i < s.deliveryAddressList.length; i++) {
@@ -792,7 +792,7 @@ class SalesOrderAddBloc extends Bloc<SalesOrderAddEvent, SalesOrderAddState> {
           "DeliveryAddress": s.deliveryAddressList[i],
           "DeliveryQuantity": i < s.deliveryQuantityList.length ? s.deliveryQuantityList[i] : "",
           "DeliveryWeight": i < s.deliveryWeightList.length ? s.deliveryWeightList[i] : "",
-          "DeliveryTime": null
+          "DeliveryTime": DateTime.now().toIso8601String()
         });
       }
     }

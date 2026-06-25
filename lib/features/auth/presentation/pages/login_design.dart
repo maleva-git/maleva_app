@@ -302,31 +302,35 @@ class _LoginBodyState extends State<_LoginBody>
           Expanded(
             flex: 5,
             child: Container(
-              padding: const EdgeInsets.fromLTRB(32, 32, 28, 32),
+              padding: const EdgeInsets.fromLTRB(32, 32, 32, 32),
               decoration: const BoxDecoration(
-                border: Border(right: BorderSide(color: Color(0xFFECEEF5), width: 1)),
+                color: Colors.white,
+                borderRadius: BorderRadius.only(
+                  topLeft:    Radius.circular(28),
+                  bottomLeft: Radius.circular(28),
+                ),
               ),
               child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                _cardHeader(headingSize: 22, subSize: 13),
+                _cardHeader(headingSize: 26, subSize: 14),
                 const SizedBox(height: 6),
                 _headerDivider(),
-                const SizedBox(height: 22),
+                const SizedBox(height: 26),
 
-                _fieldLabel('Username', fs: 10),
-                const SizedBox(height: 7),
+                _fieldLabel('Username', fs: 11),
+                const SizedBox(height: 8),
                 _textField(hint: 'Enter your username',
                     icon: Icons.person_outline_rounded,
-                    fs: 15, radius: 13,
+                    fs: 16, radius: 14,
                     onChanged: (v) =>
                         context.read<LoginBloc>().add(UsernameChanged(v))),
-                const SizedBox(height: 18),
+                const SizedBox(height: 20),
 
-                _fieldLabel('Password', fs: 10),
-                const SizedBox(height: 7),
+                _fieldLabel('Password', fs: 11),
+                const SizedBox(height: 8),
                 _textField(hint: '• • • • • •',
                     obscure: _s.obscurePassword,
                     ctrl: _pwCtrl, readOnly: false,
-                    fs: 15, radius: 13,
+                    fs: 16, radius: 14,
                     icon: _s.obscurePassword
                         ? Icons.visibility_off_outlined
                         : Icons.visibility_outlined,
@@ -335,36 +339,92 @@ class _LoginBodyState extends State<_LoginBody>
                     onChanged: (v) {
                       context.read<LoginBloc>().add(PasswordChanged(v));
                     }),
-                const SizedBox(height: 18),
+                const SizedBox(height: 22),
 
-                _driverToggle(toggleSize: 15),
-
-                const Spacer(),
-                _footer(),
+                _driverToggle(toggleSize: 16),
+  
+                const SizedBox(height: 28),
+                _loginButton(h: 54, fs: 16, radius: 14),
+                const SizedBox(height: 20),
+                Center(child: _footer()),
               ]),
             ),
           ),
 
-          // ── RIGHT: keypad
+          // ── RIGHT: Hero Panel
           Expanded(
             flex: 4,
             child: Container(
-              padding: const EdgeInsets.fromLTRB(28, 32, 32, 32),
-              decoration: BoxDecoration(
-                color: const Color(0xFFF8F9FE),
-                borderRadius: const BorderRadius.only(
+              padding: const EdgeInsets.all(40),
+              decoration: const BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: [AppTokens.brandGradientStart, AppTokens.brandDark],
+                ),
+                borderRadius: BorderRadius.only(
                   topRight:    Radius.circular(28),
                   bottomRight: Radius.circular(28),
                 ),
               ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisAlignment: MainAxisAlignment.center,
+              child: Stack(
                 children: [
-                Flexible(
-                  child: _loginButton(h: 50, fs: 16, radius: 8),
-                )
-              ]),
+                  Positioned(
+                    top: -50,
+                    right: -50,
+                    child: Container(
+                      width: 200,
+                      height: 200,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: Colors.white.withOpacity(0.05),
+                      ),
+                    ),
+                  ),
+                  Positioned(
+                    bottom: -80,
+                    left: -40,
+                    child: Container(
+                      width: 250,
+                      height: 250,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: Colors.white.withOpacity(0.08),
+                      ),
+                    ),
+                  ),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.all(12),
+                        decoration: BoxDecoration(
+                          color: Colors.white.withOpacity(0.15),
+                          borderRadius: BorderRadius.circular(16),
+                        ),
+                        child: const Icon(Icons.rocket_launch_rounded, color: Colors.white, size: 36),
+                      ),
+                      const SizedBox(height: 24),
+                      Text('Empowering\nYour Logistics',
+                          style: GoogleFonts.playfairDisplay(
+                            fontSize: 36,
+                            fontWeight: FontWeight.w800,
+                            color: Colors.white,
+                            height: 1.1,
+                          )),
+                      const SizedBox(height: 16),
+                      Text('Streamline your operations, manage fleets efficiently, and track everything in real-time with Maleva Suite.',
+                          style: GoogleFonts.dmSans(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w400,
+                            color: Colors.white.withOpacity(0.85),
+                            height: 1.5,
+                          )),
+                    ]
+                  ),
+                ],
+              ),
             ),
           ),
 
