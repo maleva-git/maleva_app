@@ -25,24 +25,20 @@ class InvoiceTabSwitching extends SalesOrderState {
 class InvoiceLoaded extends SalesOrderState {
   final List<dynamic> saleDataAll;
   final List<dynamic> saleMonthData;
-  final List<dynamic> waitingBilling;
   final List<String> monthList;
   final List<dynamic> monthData;
   final bool is6Months;
   final String currentMonthName;
   final List<dynamic>? employeeData;
-  final bool showWaitingSheet;
   final int selectedTabIndex;
 
   InvoiceLoaded({
     required this.saleDataAll,
     required this.saleMonthData,
-    required this.waitingBilling,
     required this.monthList,
     required this.monthData,
     required this.is6Months,
     required this.currentMonthName,
-    required this.showWaitingSheet,
     this.employeeData,
     this.selectedTabIndex = 0,
   });
@@ -56,7 +52,6 @@ class InvoiceLoaded extends SalesOrderState {
   List<Object?> get props => [
     selectedTabIndex,  // int
     is6Months,         // bool
-    showWaitingSheet,  // bool
     currentMonthName,  // String
     employeeData,      // nullable — dialog trigger-க்கு மட்டும்
   ];
@@ -64,12 +59,10 @@ class InvoiceLoaded extends SalesOrderState {
   InvoiceLoaded copyWith({
     List<dynamic>? saleDataAll,
     List<dynamic>? saleMonthData,
-    List<dynamic>? waitingBilling,
     List<String>? monthList,
     List<dynamic>? monthData,
     bool? is6Months,
     String? currentMonthName,
-    bool? showWaitingSheet,
     List<dynamic>? employeeData,
     int? selectedTabIndex,
     bool clearEmployeeData = false,
@@ -77,12 +70,10 @@ class InvoiceLoaded extends SalesOrderState {
     return InvoiceLoaded(
       saleDataAll: saleDataAll ?? this.saleDataAll,
       saleMonthData: saleMonthData ?? this.saleMonthData,
-      waitingBilling: waitingBilling ?? this.waitingBilling,
       monthList: monthList ?? this.monthList,
       monthData: monthData ?? this.monthData,
       is6Months: is6Months ?? this.is6Months,
       currentMonthName: currentMonthName ?? this.currentMonthName,
-      showWaitingSheet: showWaitingSheet ?? this.showWaitingSheet,
       employeeData:
       clearEmployeeData ? null : (employeeData ?? this.employeeData),
       selectedTabIndex: selectedTabIndex ?? this.selectedTabIndex,

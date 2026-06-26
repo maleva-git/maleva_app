@@ -64,22 +64,15 @@ class _SalesOrderTabState extends State<SalesOrderTab> {
           if (curr is! InvoiceLoaded) return false;
           if (prev is! InvoiceLoaded) return false;
 
-          // Sheet: false→true only
-          final sheetOpened = !prev.showWaitingSheet && curr.showWaitingSheet;
-
           // Dialog: null→nonNull only (bloc always clears to null before fetch)
           final employeeArrived =
               prev.employeeData == null && curr.employeeData != null;
 
-          return sheetOpened || employeeArrived;
+          return employeeArrived;
         },
 
         listener: (context, state) {
           if (state is! InvoiceLoaded) return;
-
-          if (state.showWaitingSheet) {
-            showBillingBottomSheet(context, state.waitingBilling);
-          }
 
           if (state.employeeData != null) {
             _showDialogEmpDetails(state.employeeData!);
@@ -361,40 +354,19 @@ class _SalesOrderTabState extends State<SalesOrderTab> {
 
   Widget _buildStatusRow(BuildContext context, InvoiceLoaded state,
       {required bool isTablet}) {
-    return Row(
-      children: [
-        Expanded(
-          child: _StatusCard(
-            icon: Icons.hourglass_empty,
-            iconColor: Colors.orange,
-            count: state.waitingBilling.length.toString(),
-            label: 'WAITING BILLING',
-            bgColor: const Color(0xFFFFF3E0),
-            onTap: () =>
-                context.read<SalesOrderBloc>().add(LoadWaitingBills(0)),
-            onCountTap: () =>
-                showBillingBottomSheet(context, state.waitingBilling),
-            isTablet: isTablet,
-          ),
-        ),
-        const SizedBox(width: 10),
-        Expanded(
-          child: _StatusCard(
-            icon: Icons.check_box,
-            iconColor: Colors.green,
-            count: (Map<String, dynamic>.from(state.saleDataAll.isNotEmpty
-                ? state.saleDataAll[0] as Map
-                : {}))["MonthSales"]
-                ?.toString() ??
-                "0",
-            label: 'BILLED MONTH',
-            bgColor: const Color(0xFFE8F5E9),
-            onTap: null,
-            onCountTap: null,
-            isTablet: isTablet,
-          ),
-        ),
-      ],
+    return _StatusCard(
+      icon: Icons.check_box,
+      iconColor: Colors.green,
+      count: (Map<String, dynamic>.from(state.saleDataAll.isNotEmpty
+          ? state.saleDataAll[0] as Map
+          : {}))["MonthSales"]
+          ?.toString() ??
+          "0",
+      label: 'BILLED MONTH',
+      bgColor: const Color(0xFFE8F5E9),
+      onTap: null,
+      onCountTap: null,
+      isTablet: isTablet,
     );
   }
 
@@ -774,7 +746,6 @@ class _HeroHeaderCard extends StatelessWidget {
         double.tryParse(data["MonthAmount"]?.toString() ?? "0") ?? 0;
     final monthSales = data["MonthSales"]?.toString() ?? "0";
     final weekSales  = data["WeekSales"]?.toString()  ?? "0";
-    final waiting    = state.waitingBilling.length;
 
     String fmtIndian(double v) {
       final s = v.toStringAsFixed(0);
@@ -842,12 +813,8 @@ class _HeroHeaderCard extends StatelessWidget {
                 const SizedBox(height: 14),
                 Wrap(spacing: 8, runSpacing: 8, children: [
                   _HeaderChip(
-                      icon: Icons.receipt_long,
-                      label: '$weekSales this week',
-                      color: Colors.white.withOpacity(0.18)),
-                  _HeaderChip(
-                      icon: Icons.hourglass_empty,
-                      label: '$waiting waiting',
+                      icon: Icons.attach_money,
+                      label: '$weekSales weekly',
                       color: Colors.white.withOpacity(0.18)),
                   _HeaderChip(
                       icon: Icons.check_circle_outline,
@@ -1099,191 +1066,4 @@ class _SOTabBar extends StatelessWidget {
       ),
     );
   }
-}
-
-void showBillingBottomSheet(
-    BuildContext context, List<dynamic> billingData) {
-  showModalBottomSheet(
-    context: context,
-    isScrollControlled: true,
-    backgroundColor: Colors.white,
-    shape: const RoundedRectangleBorder(
-      borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-    ),
-    builder: (context) {
-      return DraggableScrollableSheet(
-        expand: false,
-        initialChildSize: 0.9,
-        maxChildSize: 0.95,
-        builder: (context, scrollController) {
-          return Column(children: [
-            Padding(
-              padding: const EdgeInsets.all(12),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text("Waiting for Billing Details",
-                      style: GoogleFonts.lato(
-                          fontSize: 18, fontWeight: FontWeight.bold)),
-                  IconButton(
-                      icon: const Icon(Icons.close),
-                      onPressed: () => Navigator.pop(context)),
-                ],
-              ),
-            ),
-            const Divider(),
-            Expanded(
-              child: ListView.builder(
-                controller: scrollController,
-                itemCount: billingData.length,
-                itemBuilder: (context, index) {
-                  final item = billingData[index];
-                  return Container(
-                    margin: const EdgeInsets.symmetric(
-                        horizontal: 12, vertical: 8),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(16),
-                      boxShadow: [
-                        BoxShadow(
-                            color: Colors.grey.withOpacity(0.2),
-                            blurRadius: 8,
-                            offset: const Offset(0, 4))
-                      ],
-                    ),
-                    child: InkWell(
-                      borderRadius: BorderRadius.circular(16),
-                      onTap: () {
-                        showDialog(
-                          context: context,
-                          builder: (context) => Dialog(
-                            shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(16)),
-                            child: Container(
-                              padding: const EdgeInsets.all(16),
-                              decoration: BoxDecoration(
-                                  color: Colors.white,
-                                  borderRadius:
-                                  BorderRadius.circular(16)),
-                              child: SingleChildScrollView(
-                                child: Column(
-                                    crossAxisAlignment:
-                                    CrossAxisAlignment.start,
-                                    children: [
-                                      Row(
-                                        mainAxisAlignment:
-                                        MainAxisAlignment
-                                            .spaceBetween,
-                                        children: [
-                                          Text("Billing Details",
-                                              style: GoogleFonts.lato(
-                                                  fontSize: 18,
-                                                  fontWeight:
-                                                  FontWeight.bold)),
-                                          IconButton(
-                                              icon: const Icon(
-                                                  Icons.close),
-                                              onPressed: () =>
-                                                  Navigator.pop(
-                                                      context)),
-                                        ],
-                                      ),
-                                      const SizedBox(height: 12),
-                                      _buildDetailRow(Icons.confirmation_number, "Bill No",     "${item['BillNoDisplay']}"),
-                                      _buildDetailRow(Icons.date_range,          "Bill Date",   "${item['BillDate']}"),
-                                      _buildDetailRow(Icons.access_time,         "Bill Time",   "${item['BillTime']}"),
-                                      _buildDetailRow(Icons.assignment,          "Job Status",  "${item['JobStatus']}"),
-                                      _buildDetailRow(Icons.person,              "Customer",    "${item['CustomerName']}"),
-                                      _buildDetailRow(Icons.badge,               "Employee",    "${item['EmployeeName']}"),
-                                      _buildDetailRow(Icons.local_shipping,      "Vessel",      "${item['Loadingvesselname']}"),
-                                      _buildDetailRow(Icons.anchor,              "Port",        "${item['SPort']}"),
-                                      _buildDetailRow(Icons.calendar_today,      "Pickup Date", "${item['SPickupDate']}"),
-                                      _buildDetailRow(Icons.flight_takeoff,      "ETA",         "${item['ETA']}"),
-                                      _buildDetailRow(Icons.monetization_on,     "Net Amount",  "${item['NetAmt']}"),
-                                    ]),
-                              ),
-                            ),
-                          ),
-                        );
-                      },
-                      child: Padding(
-                        padding: const EdgeInsets.all(14),
-                        child: Row(children: [
-                          Container(
-                            padding: const EdgeInsets.all(12),
-                            decoration: BoxDecoration(
-                                color: Colors.white.withOpacity(0.9),
-                                shape: BoxShape.circle),
-                            child: const Icon(Icons.receipt_long,
-                                color: AppTokens.invoiceHeaderStart,
-                                size: 28),
-                          ),
-                          const SizedBox(width: 12),
-                          Expanded(
-                            child: Column(
-                                crossAxisAlignment:
-                                CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                      "Bill No: ${item['BillNo'] ?? ''}",
-                                      style: GoogleFonts.lato(
-                                          fontSize: 16,
-                                          fontWeight: FontWeight.bold,
-                                          color: AppTokens
-                                              .invoiceHeaderStart)),
-                                  const SizedBox(height: 4),
-                                  Text(
-                                      "Customer: ${item['CustomerName'] ?? ''}",
-                                      style: GoogleFonts.lato(
-                                          fontSize: 14,
-                                          fontWeight: FontWeight.bold,
-                                          color:
-                                          const Color(0xFF145A32))),
-                                  const SizedBox(height: 2),
-                                  Text(
-                                      "Amount: ${item['NetAmt'] ?? ''}",
-                                      style: GoogleFonts.lato(
-                                          fontSize: 14,
-                                          fontWeight: FontWeight.bold,
-                                          color: colors.kOrange)),
-                                ]),
-                          ),
-                          Container(
-                            padding: const EdgeInsets.all(6),
-                            decoration: BoxDecoration(
-                                color: Colors.white.withOpacity(0.9),
-                                borderRadius:
-                                BorderRadius.circular(8)),
-                            child: const Icon(Icons.arrow_forward_ios,
-                                size: 16, color: colors.kOrange),
-                          ),
-                        ]),
-                      ),
-                    ),
-                  );
-                },
-              ),
-            ),
-          ]);
-        },
-      );
-    },
-  );
-}
-
-Widget _buildDetailRow(IconData icon, String label, String value) {
-  return Padding(
-    padding: const EdgeInsets.symmetric(vertical: 6),
-    child: Row(children: [
-      Icon(icon, color: const Color(0xFF6A994E)),
-      const SizedBox(width: 8),
-      Text("$label:",
-          style: const TextStyle(
-              fontWeight: FontWeight.bold, color: Color(0xFF3E2723))),
-      const SizedBox(width: 8),
-      Expanded(
-          child: Text(value,
-              style: const TextStyle(color: Color(0xFF2C3E50)))),
-    ]),
-  );
-}
+}

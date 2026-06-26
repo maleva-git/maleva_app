@@ -5,7 +5,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:maleva/core/utils/clsfunction.dart' as objfun;
 import 'package:maleva/core/network/OnlineApi.dart' as OnlineApi;
 import '../../../../core/theme/tokens.dart';
-import '../../../dashboard/admin_dashboard/tabs/saleorderdetails/view/saleorderdetails_tab.dart';
+import '../../salesorder/add/view/salesorderadd_tab.dart';
 import '../bloc/viewsaleorder_bloc.dart';
 import '../bloc/viewsaleorder_event.dart';
 import '../bloc/viewsaleorder_state.dart';
@@ -54,9 +54,9 @@ class _GetJobNoPageView extends StatelessWidget {
           Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (_) => SaleOrderDetails(
-                saleDetails: null,
-                saleMaster: objfun.SaleEditMasterList,
+              builder: (_) => SalesOrdersAdd(
+                SaleDetails: objfun.SaleEditDetailList,
+                SaleMaster: objfun.SaleEditMasterList,
               ),
             ),
           );
