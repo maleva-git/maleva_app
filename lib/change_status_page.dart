@@ -22,23 +22,11 @@ class ChangeStatusPageState extends State<ChangeStatusPage> {
   @override
   void initState() {
     super.initState();
-
 //check
-
-
-
-
-
-
-
-
-
     EditId = widget.masterId;
     if (EditId != 0){
       loadpettycash();
     }
-
-
   }
   List<PattycashMasterModel> pettycashMaster = [];
   List<PattyCashDetailsModel> pettycashDetails = [];

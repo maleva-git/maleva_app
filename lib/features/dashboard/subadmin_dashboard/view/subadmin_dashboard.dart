@@ -57,9 +57,7 @@ class _AdminDashboardState extends State<SubAdminDashboard> with SingleTickerPro
     super.initState();
     _tabController = TabController(length: 11, vsync: this);
     _tabController.addListener(_onTabChanged);
-
   }
-
   void _onTabChanged(){
     final index = _tabController.index;
     context.read<SubAdminTabBloc>().add(SATabChanged(index));
