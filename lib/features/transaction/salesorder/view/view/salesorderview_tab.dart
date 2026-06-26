@@ -1442,7 +1442,14 @@ class _FilterFab extends StatelessWidget {
       backgroundColor: Colors.transparent,
       builder: (_) => BlocProvider.value(
         value: BlocProvider.of<SalesOrderViewBloc>(ctx),
-        child: _FilterSheet(state: state),
+        child: BlocBuilder<SalesOrderViewBloc, SalesOrderViewState>(
+          builder: (context, state) {
+            if (state is SalesOrderViewLoaded) {
+              return _FilterSheet(state: state);
+            }
+            return const SizedBox.shrink();
+          },
+        ),
       ),
     );
   }
@@ -1469,6 +1476,10 @@ class _FilterSheetState extends State<_FilterSheet> {
   late bool   _chkPickup;
   late bool   _chkLEmp;
 
+  late final TextEditingController _jobNoCtrl;
+  late final TextEditingController _loadVesselCtrl;
+  late final TextEditingController _offVesselCtrl;
+
   @override
   void initState() {
     super.initState();
@@ -1480,6 +1491,18 @@ class _FilterSheetState extends State<_FilterSheet> {
     _chkETA    = widget.state.checkBoxValueETA;
     _chkPickup = widget.state.checkBoxValuePickUp;
     _chkLEmp   = widget.state.checkBoxValueLEmp;
+
+    _jobNoCtrl      = TextEditingController(text: widget.state.txtJobNo);
+    _loadVesselCtrl = TextEditingController(text: widget.state.txtLoadingVessel);
+    _offVesselCtrl  = TextEditingController(text: widget.state.txtOffVessel);
+  }
+
+  @override
+  void dispose() {
+    _jobNoCtrl.dispose();
+    _loadVesselCtrl.dispose();
+    _offVesselCtrl.dispose();
+    super.dispose();
   }
 
   @override
@@ -1612,7 +1635,7 @@ class _FilterSheetState extends State<_FilterSheet> {
             right: _fieldCol('Job No',
                 _textTile(
                     hint: 'Job number',
-                    value: state.txtJobNo,
+                    controller: _jobNoCtrl,
                     onChanged: (v) => bloc.add(
                         ViewUpdateTextField(
                             'txtJobNo', v)))),
@@ -1622,14 +1645,14 @@ class _FilterSheetState extends State<_FilterSheet> {
             left: _fieldCol('Loading Vessel',
                 _textTile(
                     hint: 'Loading vessel',
-                    value: state.txtLoadingVessel,
+                    controller: _loadVesselCtrl,
                     onChanged: (v) => bloc.add(
                         ViewUpdateTextField(
                             'txtLoadingVessel', v)))),
             right: _fieldCol('Off Vessel',
                 _textTile(
                     hint: 'Off vessel',
-                    value: state.txtOffVessel,
+                    controller: _offVesselCtrl,
                     onChanged: (v) => bloc.add(
                         ViewUpdateTextField(
                             'txtOffVessel', v)))),
@@ -1699,7 +1722,7 @@ class _FilterSheetState extends State<_FilterSheet> {
           _lbl('Job No'),
           _textTile(
               hint: 'Job number',
-              value: state.txtJobNo,
+              controller: _jobNoCtrl,
               onChanged: (v) =>
                   bloc.add(ViewUpdateTextField('txtJobNo', v))),
           const SizedBox(height: 8),
@@ -1707,7 +1730,7 @@ class _FilterSheetState extends State<_FilterSheet> {
             Expanded(
                 child: _textTile(
                     hint: 'Loading vessel',
-                    value: state.txtLoadingVessel,
+                    controller: _loadVesselCtrl,
                     onChanged: (v) => bloc.add(
                         ViewUpdateTextField(
                             'txtLoadingVessel', v)))),
@@ -1715,7 +1738,7 @@ class _FilterSheetState extends State<_FilterSheet> {
             Expanded(
                 child: _textTile(
                     hint: 'Off vessel',
-                    value: state.txtOffVessel,
+                    controller: _offVesselCtrl,
                     onChanged: (v) => bloc.add(
                         ViewUpdateTextField(
                             'txtOffVessel', v)))),
@@ -1991,11 +2014,11 @@ class _FilterSheetState extends State<_FilterSheet> {
 
   Widget _textTile({
     required String hint,
-    required String value,
+    required TextEditingController controller,
     required ValueChanged<String> onChanged,
   }) =>
       TextField(
-        controller: TextEditingController(text: value),
+        controller: controller,
         onChanged: onChanged,
         textCapitalization: TextCapitalization.characters,
         style: GoogleFonts.poppins(

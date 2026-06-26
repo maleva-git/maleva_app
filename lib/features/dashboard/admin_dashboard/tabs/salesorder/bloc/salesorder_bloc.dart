@@ -47,33 +47,15 @@ class SalesOrderBloc extends Bloc<SalesOrderEvent, SalesOrderState> {
         try {
           final t1 = sw.elapsedMilliseconds;
           print('⏱ Before API call: ${t1}ms');
-
-          final currentDate = DateFormat("yyyy/MM/dd").format(DateTime.now());
-          final master = {
-            'Comid': objfun.storagenew.getInt('Comid') ?? 0,
-            "DashboardStatus": 0,
-            'Fromdate': '2025/08/16',
-            "Employeeid ": 0,
-            'Id': 0,
-            "Invoice": true,
-            'Offvesselname': "",
-            "Invoicecheck": false,
-            'Remarks': 2,
-            "Search": 3,
-            'Todate': currentDate,
-            "completestatusnotshow": false,
-          };
-
+          
           final results = await Future.wait([
             repository.fetchSalesData(event.type),
-            repository.fetchSalesInvoiceCheck(master),
           ]);
 
           final t2 = sw.elapsedMilliseconds;
           print('⏱ After API response: ${t2}ms  (API took: ${t2 - t1}ms)');
 
           final resultData = results[0];
-          final waitingResult = results[1];
 
           if (resultData != null && resultData != "") {
             final saleMonthData =
@@ -83,12 +65,10 @@ class SalesOrderBloc extends Bloc<SalesOrderEvent, SalesOrderState> {
             emit(InvoiceLoaded(
               saleDataAll: List<dynamic>.from(resultData["Data1"] ?? []),
               saleMonthData: saleMonthData,
-              waitingBilling: List<dynamic>.from(waitingResult ?? []),
               monthList: monthResult.$1,
               monthData: monthResult.$2,
               is6Months: true,
               currentMonthName: DateFormat('MMMM').format(DateTime.now()),
-              showWaitingSheet: false,
               selectedTabIndex: newTabIndex,
               employeeData: null,
             ));
@@ -128,53 +108,9 @@ class SalesOrderBloc extends Bloc<SalesOrderEvent, SalesOrderState> {
         monthList: monthResult.$1,
         monthData: monthResult.$2,
         is6Months: event.months == 6,
-        showWaitingSheet: false,
         clearEmployeeData: true,
       ));
     });
-
-    on<LoadWaitingBills>(
-          (event, emit) async {
-        if (state is! InvoiceLoaded) return;
-        final current = state as InvoiceLoaded;
-        if (current.waitingBilling.isNotEmpty) {
-          emit(current.copyWith(
-            showWaitingSheet: true,
-            clearEmployeeData: true,
-          ));
-          return;
-        }
-        try {
-          final currentDate = DateFormat("yyyy/MM/dd").format(DateTime.now());
-          final master = {
-            'Comid': objfun.storagenew.getInt('Comid') ?? 0,
-            "DashboardStatus": 0,
-            'Fromdate': '2025/08/16',
-            "Employeeid ": 0,
-            'Id': 0,
-            "Invoice": true,
-            'Offvesselname': "",
-            "Invoicecheck": false,
-            'Remarks': 2,
-            "Search": 3,
-            'Todate': currentDate,
-            "completestatusnotshow": false,
-          };
-
-          final resultData = await repository.fetchWaitingBills(master);
-
-          emit(current.copyWith(
-            waitingBilling: List<dynamic>.from(resultData ?? []),
-            showWaitingSheet: true,
-            clearEmployeeData: true,
-          ));
-        } catch (_) {
-          emit(current.copyWith(
-              showWaitingSheet: true, clearEmployeeData: true));
-        }
-      },
-      transformer: droppable(),
-    );
 
     on<LoadEmployeeInvDatas>(
           (event, emit) async {
@@ -191,7 +127,6 @@ class SalesOrderBloc extends Bloc<SalesOrderEvent, SalesOrderState> {
 
           emit(current.copyWith(
             employeeData: List<dynamic>.from(resultData?["Data1"] ?? []),
-            showWaitingSheet: false,
           ));
         } catch (_) {}
       },
@@ -211,7 +146,6 @@ class SalesOrderBloc extends Bloc<SalesOrderEvent, SalesOrderState> {
           );
           emit(current.copyWith(
             employeeData:    List<dynamic>.from(resultData?["Data1"] ?? []),
-            showWaitingSheet: false,
           ));
         } catch (_) {}
       },
@@ -223,7 +157,6 @@ class SalesOrderBloc extends Bloc<SalesOrderEvent, SalesOrderState> {
       if (current.selectedTabIndex == event.index) return;
       emit(current.copyWith(
         selectedTabIndex: event.index,
-        showWaitingSheet: false,
         clearEmployeeData: true,
       ));
     });
