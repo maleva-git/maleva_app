@@ -41,17 +41,27 @@ class InvoiceRepositoryImpl implements InvoiceRepository {
     required int type,
   }) async {
     final comid = AppPreferences.getComid();
-    final today = DateFormat('yyyy-MM-dd').format(DateTime.now());
-    final fromdate = DateFormat('yyyy-MM-dd')
-        .format(DateTime(DateTime.now().year, DateTime.now().month, 1));
+    final today = DateFormat('yyyy/MM/dd').format(DateTime.now());
+
+    final master = {
+      'Comid': comid,
+      "DashboardStatus": 0,
+      'Fromdate': '2025/08/16',
+      "Employeeid ": 0,
+      'Id': 0,
+      "Invoice": true,
+      'Offvesselname': "",
+      "Invoicecheck": false,
+      'Remarks': 2,
+      "Search": 3,
+      'Todate': today,
+      "completestatusnotshow": false,
+    };
+
     // Exact same as original bloc — parallel Future.wait
     final results = await Future.wait([
       AuthApi.getSalesData(type),          // existing static method ✅
-      AuthApi.getSalesInvoiceCheck({       // existing static method ✅
-        'Comid': comid,
-        'Todate': today,
-        'Fromdate': fromdate,
-      }),
+      AuthApi.getSalesInvoiceCheck(master),
     ]);
 
     final salesData    = results[0] as Map<String, dynamic>?;
@@ -63,17 +73,25 @@ class InvoiceRepositoryImpl implements InvoiceRepository {
   @override
   Future<List<dynamic>> getWaitingBills() async {
     final comid = AppPreferences.getComid();
-    final today = DateFormat('yyyy-MM-dd').format(DateTime.now());
-    final fromdate = DateFormat('yyyy-MM-dd')
-        .format(DateTime(DateTime.now().year, DateTime.now().month, 1));
+    final today = DateFormat('yyyy/MM/dd').format(DateTime.now());
+
+    final master = {
+      'Comid': comid,
+      "DashboardStatus": 0,
+      'Fromdate': '2025/08/16',
+      "Employeeid ": 0,
+      'Id': 0,
+      "Invoice": true,
+      'Offvesselname': "",
+      "Invoicecheck": false,
+      'Remarks': 2,
+      "Search": 3,
+      'Todate': today,
+      "completestatusnotshow": false,
+    };
 
     // Same as original LoadWaitingBills handler
-    // Original used: ApiClient.postRequest(objfun.apiSelectSaleorderinvoicecheck, master)
-    final result = await AuthApi.getSalesInvoiceCheck({
-      'Comid': comid,
-      'Todate': today,
-      'Fromdate': fromdate,
-    });
+    final result = await AuthApi.getSalesInvoiceCheck(master);
 
     return List<dynamic>.from(result ?? []);
   }

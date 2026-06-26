@@ -48,13 +48,20 @@ class SalesOrderBloc extends Bloc<SalesOrderEvent, SalesOrderState> {
           final t1 = sw.elapsedMilliseconds;
           print('⏱ Before API call: ${t1}ms');
 
-          final currentDate = DateFormat("yyyy-MM-dd").format(DateTime.now());
-          final fromdate = DateFormat('yyyy-MM-dd')
-              .format(DateTime(DateTime.now().year, DateTime.now().month, 1));
+          final currentDate = DateFormat("yyyy/MM/dd").format(DateTime.now());
           final master = {
             'Comid': objfun.storagenew.getInt('Comid') ?? 0,
+            "DashboardStatus": 0,
+            'Fromdate': '2025/08/16',
+            "Employeeid ": 0,
+            'Id': 0,
+            "Invoice": true,
+            'Offvesselname': "",
+            "Invoicecheck": false,
+            'Remarks': 2,
+            "Search": 3,
             'Todate': currentDate,
-            'Fromdate': fromdate,
+            "completestatusnotshow": false,
           };
 
           final results = await Future.wait([
@@ -138,13 +145,20 @@ class SalesOrderBloc extends Bloc<SalesOrderEvent, SalesOrderState> {
           return;
         }
         try {
-          final currentDate = DateFormat("yyyy-MM-dd").format(DateTime.now());
-          final fromdate = DateFormat('yyyy-MM-dd')
-              .format(DateTime(DateTime.now().year, DateTime.now().month, 1));
+          final currentDate = DateFormat("yyyy/MM/dd").format(DateTime.now());
           final master = {
             'Comid': objfun.storagenew.getInt('Comid') ?? 0,
+            "DashboardStatus": 0,
+            'Fromdate': '2025/08/16',
+            "Employeeid ": 0,
+            'Id': 0,
+            "Invoice": true,
+            'Offvesselname': "",
+            "Invoicecheck": false,
+            'Remarks': 2,
+            "Search": 3,
             'Todate': currentDate,
-            'Fromdate': fromdate,
+            "completestatusnotshow": false,
           };
 
           final resultData = await repository.fetchWaitingBills(master);
