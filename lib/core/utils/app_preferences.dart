@@ -22,6 +22,8 @@ class AppPreferences {
   static int    getEmpRefId()    => _prefs.getInt('EmpRefId')    ?? 0;
   static int    getDeviceView()  => _prefs.getInt('DeviceView')  ?? 1;
   static int    getDriverLogin() => _prefs.getInt('DriverLogin') ?? 0;
+  static int    getRoleId()      => _prefs.getInt('role_id')     ?? 0;
+  static int    getPermissionId()=> _prefs.getInt('PermissionId')?? 0;
 
   static String getUsername()    => _prefs.getString('Username') ?? '';
   static String getPassword()    => _prefs.getString('Password') ?? '';
@@ -40,6 +42,8 @@ class AppPreferences {
   static Future<void> setDriverId(int v)     => _prefs.setInt('DriverId', v);
   static Future<void> setEmpRefId(int v)     => _prefs.setInt('EmpRefId', v);
   static Future<void> setDriverLogin(int v)  => _prefs.setInt('DriverLogin', v);
+  static Future<void> setRoleId(int v)       => _prefs.setInt('role_id', v);
+  static Future<void> setPermissionId(int v) => _prefs.setInt('PermissionId', v);
 
   static Future<void> setUsername(String v)  => _prefs.setString('Username', v);
   static Future<void> setPassword(String v)  => _prefs.setString('Password', v);
@@ -58,6 +62,8 @@ class AppPreferences {
     await _prefs.setString('loadmenu', '');
     await _prefs.setInt('EmpRefId', 0);
     await _prefs.setInt('DriverLogin', 0);
+    await _prefs.setInt('role_id', 0);
+    await _prefs.setInt('PermissionId', 0);
   }
 
   static SharedPreferences get raw => _prefs;

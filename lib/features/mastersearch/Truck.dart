@@ -59,477 +59,169 @@ class _Truckstate extends State<Truck> {
   @override
   Widget build(BuildContext context) {
     double width = MediaQuery.of(context).size.width;
-    double height = MediaQuery.of(context).size.height;
+    bool isTablet = objfun.MalevaScreen != 1;
 
-    return objfun.MalevaScreen == 1
-        ? Scaffold(
+    return Scaffold(
+      backgroundColor: const Color(0xFFF4F7FC), // Soft modern background
       appBar: AppBar(
+        elevation: 0,
         backgroundColor: colour.commonColor,
-        centerTitle: false,
+        centerTitle: true,
         title: Text(
-          'Truck',
+          'Select Truck',
           style: GoogleFonts.lato(
-            textStyle:  TextStyle(
+            textStyle: TextStyle(
                 color: colour.topAppBarColor,
-                fontWeight: FontWeight.bold,
+                fontWeight: FontWeight.w700,
                 fontSize: objfun.FontLarge,
-                letterSpacing: 0.3),
+                letterSpacing: 0.5),
           ),
         ),
         leading: IconButton(
-          icon: const Icon(
-            Icons.arrow_back,
-            color: colour.topAppBarColor,
-            size: 35.0,
-          ),
-          onPressed: () {
-            Navigator.pop(context);
-          },
+          icon: const Icon(Icons.arrow_back_ios_new_rounded, color: colour.topAppBarColor, size: 22),
+          onPressed: () => Navigator.pop(context),
         ),
       ),
-      body: progress == true
-          ? Container(
-          padding: const EdgeInsets.all(1),
-          child: ListView(
-            children: [
-              Column(
-                children: [
-                  const SizedBox(
-                    height: 5,
-                  ),
-
-                  Container(
-                    height: height * 0.06,
-                    alignment: Alignment.center,
-                    margin: const EdgeInsets.all(3),
-                    child: TextField(
-                      // autofocus: true,
-                      controller: txtSearch,
-                      keyboardType: TextInputType.text,
-                      textInputAction: TextInputAction.next,
-                      textCapitalization: TextCapitalization.characters,
-                      style: GoogleFonts.lato(
-                        textStyle: TextStyle(
-                            color: colour.commonColor,
-                            fontWeight: FontWeight.bold,
-                            fontSize: objfun.FontLow,
-                            letterSpacing: 0.3),
-                      ),
-                      decoration: InputDecoration(
-                        fillColor: Colors.black,
-                        enabledBorder: const OutlineInputBorder(
-                          borderRadius:
-                          BorderRadius.all(Radius.circular(10.0)),
-                          borderSide: BorderSide(color: colour.commonColor),
+      body: !progress
+          ? const Center(
+              child: SpinKitFoldingCube(color: colour.spinKitColor, size: 35.0),
+            )
+          : SafeArea(
+              child: Center(
+                child: Container(
+                  width: isTablet ? 600 : width, // Restrict width on tablet for a nice card feel
+                  padding: EdgeInsets.symmetric(
+                      horizontal: isTablet ? 20 : 16, vertical: 16),
+                  child: Column(
+                    children: [
+                      // ── Search Bar ──
+                      Container(
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(16),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withValues(alpha: 0.05),
+                              blurRadius: 10,
+                              offset: const Offset(0, 4),
+                            ),
+                          ],
                         ),
-                        focusedBorder: const OutlineInputBorder(
-                          borderRadius:
-                          BorderRadius.all(Radius.circular(10.0)),
-                          borderSide:
-                          BorderSide(color: colour.commonColorred),
-                        ),
-                        hintText: 'Search Truck No',
-                        hintStyle:  GoogleFonts.lato(
-                            textStyle:TextStyle(
-                              letterSpacing: 2,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.grey,
-                              fontSize:objfun.FontLow,
-                              fontFamily: 'Alatsi',
-                            )),
-                        labelStyle: GoogleFonts.lato(
-                          textStyle:  TextStyle(
-                              color: colour.commonColor,
-                              fontWeight: FontWeight.bold,
-                              fontSize: objfun.FontLow -2 ,
-                              letterSpacing: 1.3),
+                        child: TextField(
+                          controller: txtSearch,
+                          textInputAction: TextInputAction.search,
+                          textCapitalization: TextCapitalization.characters,
+                          style: GoogleFonts.lato(
+                            fontWeight: FontWeight.w600,
+                            color: const Color(0xFF1A2E5A),
+                            fontSize: 15,
+                          ),
+                          decoration: InputDecoration(
+                            hintText: 'Search Truck No...',
+                            hintStyle: GoogleFonts.lato(
+                              color: Colors.grey.shade400,
+                              fontWeight: FontWeight.w500,
+                            ),
+                            prefixIcon: Icon(Icons.search_rounded, color: Colors.grey.shade400),
+                            border: InputBorder.none,
+                            contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+                          ),
+                          onChanged: search,
+                          onSubmitted: search,
                         ),
                       ),
-                      onChanged: (String value) {
-                        setState(() {
-                          search(value);
-                        });
-                      },
-                      onSubmitted: (String value) {
-                        setState(() {
-                          search(value);
-                        });
-                      },
-                    ),
-                  ),
-                  const SizedBox(
-                    height: 5,
-                  ),
-                  const Divider(
-                    color: colour.commonColor,
-                    thickness: 1,
-                    height: 1,
-                  ),
-                  const SizedBox(
-                    height: 5,
-                  ),
+                      const SizedBox(height: 20),
 
-                  if (filtersearchlist.isNotEmpty)
-                    Container(
-                      // width: width - 20.0,
-                        height: height * 0.82,
-                        padding: const EdgeInsets.all(10),
-                        child: ListView.builder(
-                            itemCount: filtersearchlist.length,
-                            itemBuilder: (BuildContext context, int index) {
-                              return InkWell(
-                                  onTap: () {
-                                    setState(() {
-                                      if (widget.Searchby == 1) {
-                                        objfun.SelectTruckList =
-                                        filtersearchlist[index];
-                                        objfun.SelectedName =
-                                            filtersearchlist[index]
-                                                .AccountName
-                                                .toString();
-                                        objfun.SelectedId =
-                                            filtersearchlist[index].Id;
-                                        if (objfun.SelectedId != 0) {
-                                          Navigator.of(context,
-                                              rootNavigator: true)
-                                              .pop(context);
-                                        }
-                                      }
-                                    });
-                                  },
-                                  child: SizedBox(
-                                    height: 55,
-                                    child: Card(
-                                        margin: const EdgeInsets.only(
-                                            right: 5.0,
-                                            left: 5.0,
-                                            top: 1,
-                                            bottom: 1),
-                                        elevation: 10.0,
-                                        borderOnForeground: true,
-                                        semanticContainer: true,
-                                        shape: RoundedRectangleBorder(
-                                          side: const BorderSide(
-                                              color: colour.commonColor,
-                                              width: 1),
-                                          borderRadius:
-                                          BorderRadius.circular(10),
+                      // ── List View ──
+                      Expanded(
+                        child: filtersearchlist.isEmpty
+                            ? Center(
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Icon(Icons.search_off_rounded, size: 64, color: Colors.grey.shade300),
+                                    const SizedBox(height: 16),
+                                    Text(
+                                      'No Trucks Found',
+                                      style: GoogleFonts.lato(
+                                        color: Colors.grey.shade500,
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.w500,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              )
+                            : ListView.builder(
+                                physics: const BouncingScrollPhysics(),
+                                itemCount: filtersearchlist.length,
+                                itemBuilder: (context, index) {
+                                  final truck = filtersearchlist[index];
+                                  return Container(
+                                    margin: const EdgeInsets.only(bottom: 12),
+                                    decoration: BoxDecoration(
+                                      color: Colors.white,
+                                      borderRadius: BorderRadius.circular(12),
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: Colors.black.withValues(alpha: 0.03),
+                                          blurRadius: 8,
+                                          offset: const Offset(0, 2),
                                         ),
-                                        child: Column(
-                                          children: [
-                                            Expanded(
-                                                flex: 1,
-                                                child: Row(
-                                                  mainAxisAlignment:
-                                                  MainAxisAlignment
-                                                      .spaceBetween,
-                                                  crossAxisAlignment:
-                                                  CrossAxisAlignment
-                                                      .center,
-                                                  children: <Widget>[
-                                                    Expanded(
-                                                      flex: 10,
-                                                      child: Container(
-                                                        padding:
-                                                        const EdgeInsets
-                                                            .only(
-                                                            left: 5),
-                                                        child: Text(
-                                                          filtersearchlist[
-                                                          index]
-                                                              .AccountName
-                                                              .toString(),
-                                                          overflow:
-                                                          TextOverflow
-                                                              .ellipsis,
-                                                          maxLines: 1,
-                                                          textAlign:
-                                                          TextAlign
-                                                              .left,
-                                                          style: GoogleFonts
-                                                              .lato(
-                                                            textStyle:  TextStyle(
-                                                                color: colour
-                                                                    .commonColor,
-                                                                fontWeight:
-                                                                FontWeight
-                                                                    .bold,
-                                                                fontSize:
-                                                                objfun.FontCardText,
-                                                                letterSpacing:
-                                                                0.3),
-                                                          ),
-                                                        ),
-                                                      ),
-                                                    ),
-                                                  ],
-                                                )),
-                                          ],
-                                        )),
-                                  ));
-                            }))
-                  else
-                    Container(
-                        width: width - 40.0,
-                        height: height * 0.66,
-                        padding: const EdgeInsets.all(20),
-                        child: const Center(
-                          child: Text('No Record'),
-                        )),
-                  // Container(
-                  //   height: 3.0,
-                  //   margin: const EdgeInsets.only(top: 1),
-                  //   alignment: Alignment.topLeft,
-                  //   color: Colors.black,
-                  // ),
-                ],
-              )
-            ],
-          ))
-          : const Center(
-        child: SpinKitFoldingCube(
-          color: colour.spinKitColor,
-          size: 35.0,
-        ),
-      ),
-    )
-        : Scaffold(
-      appBar: AppBar(
-        backgroundColor: colour.commonColor,
-        centerTitle: false,
-        title: Center(
-          child: Text(
-            'Truck',
-            style: GoogleFonts.lato(
-              textStyle:  TextStyle(
-                  color: colour.topAppBarColor,
-                  fontWeight: FontWeight.bold,
-                  fontSize: objfun.FontLarge,
-                  letterSpacing: 0.3),
-            ),
-          ),
-        ),
-        leading: IconButton(
-          icon: const Icon(
-            Icons.arrow_back,
-            color: colour.topAppBarColor,
-            size: 35.0,
-          ),
-          onPressed: () {
-            Navigator.pop(context);
-          },
-        ),
-      ),
-      body: progress == true
-          ? Container(
-          padding: const EdgeInsets.only(left: 100,right: 100,top: 50,bottom: 40),
-          child: Card(
-            elevation: 12,
-            child: ListView(
-              children: [
-                Column(
-                  children: [
-                    const SizedBox(
-                      height: 5,
-                    ),
-
-                    Container(
-                      height: height * 0.07,
-                      alignment: Alignment.center,
-                      margin: const EdgeInsets.all(10),
-                      child: TextField(
-                        // autofocus: true,
-                        controller: txtSearch,
-                        keyboardType: TextInputType.text,
-                        textInputAction: TextInputAction.next,
-                        textCapitalization: TextCapitalization.characters,
-                        style: GoogleFonts.lato(
-                          textStyle: TextStyle(
-                              color: colour.commonColor,
-                              fontWeight: FontWeight.bold,
-                              fontSize: objfun.FontLow,
-                              letterSpacing: 0.3),
-                        ),
-                        decoration: InputDecoration(
-                          fillColor: Colors.black,
-                          enabledBorder: const OutlineInputBorder(
-                            borderRadius:
-                            BorderRadius.all(Radius.circular(10.0)),
-                            borderSide: BorderSide(color: colour.commonColor),
-                          ),
-                          focusedBorder: const OutlineInputBorder(
-                            borderRadius:
-                            BorderRadius.all(Radius.circular(10.0)),
-                            borderSide:
-                            BorderSide(color: colour.commonColorred),
-                          ),
-                          hintText: 'Search Truck No',
-                          hintStyle:  GoogleFonts.lato(
-                              textStyle:TextStyle(
-                                letterSpacing: 2,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.grey,
-                                fontSize:objfun.FontLow,
-                                fontFamily: 'Alatsi',
-                              )),
-                          labelStyle: GoogleFonts.lato(
-                            textStyle:  TextStyle(
-                                color: colour.commonColor,
-                                fontWeight: FontWeight.bold,
-                                fontSize: objfun.FontLow -2 ,
-                                letterSpacing: 1.3),
-                          ),
-                        ),
-                        onChanged: (String value) {
-                          setState(() {
-                            search(value);
-                          });
-                        },
-                        onSubmitted: (String value) {
-                          setState(() {
-                            search(value);
-                          });
-                        },
-                      ),
-                    ),
-                    const SizedBox(
-                      height: 5,
-                    ),
-                    const Divider(
-                      color: colour.commonColor,
-                      thickness: 1,
-                      height: 1,
-                    ),
-                    const SizedBox(
-                      height: 5,
-                    ),
-
-                    if (filtersearchlist.isNotEmpty)
-                      Container(
-                        // width: width - 20.0,
-                          height: height * 0.82,
-                          padding: const EdgeInsets.all(10),
-                          child: ListView.builder(
-                              itemCount: filtersearchlist.length,
-                              itemBuilder: (BuildContext context, int index) {
-                                return InkWell(
-                                    onTap: () {
-                                      setState(() {
-                                        if (widget.Searchby == 1) {
-                                          objfun.SelectTruckList =
-                                          filtersearchlist[index];
-                                          objfun.SelectedName =
-                                              filtersearchlist[index]
-                                                  .AccountName
-                                                  .toString();
-                                          objfun.SelectedId =
-                                              filtersearchlist[index].Id;
-                                          if (objfun.SelectedId != 0) {
-                                            Navigator.of(context,
-                                                rootNavigator: true)
-                                                .pop(context);
+                                      ],
+                                      border: Border.all(color: Colors.grey.shade100),
+                                    ),
+                                    child: InkWell(
+                                      borderRadius: BorderRadius.circular(12),
+                                      onTap: () {
+                                        setState(() {
+                                          if (widget.Searchby == 1) {
+                                            objfun.SelectTruckList = truck;
+                                            objfun.SelectedName = truck.AccountName.toString();
+                                            objfun.SelectedId = truck.Id;
+                                            if (objfun.SelectedId != 0) {
+                                              Navigator.of(context, rootNavigator: true).pop(context);
+                                            }
                                           }
-                                        }
-                                      });
-                                    },
-                                    child: SizedBox(
-                                      height: 55,
-                                      child: Card(
-                                          margin: const EdgeInsets.only(
-                                              right: 5.0,
-                                              left: 5.0,
-                                              top: 1,
-                                              bottom: 1),
-                                          elevation: 10.0,
-                                          borderOnForeground: true,
-                                          semanticContainer: true,
-                                          shape: RoundedRectangleBorder(
-                                            side: const BorderSide(
-                                                color: colour.commonColor,
-                                                width: 1),
-                                            borderRadius:
-                                            BorderRadius.circular(10),
-                                          ),
-                                          child: Column(
-                                            children: [
-                                              Expanded(
-                                                  flex: 1,
-                                                  child: Row(
-                                                    mainAxisAlignment:
-                                                    MainAxisAlignment
-                                                        .spaceBetween,
-                                                    crossAxisAlignment:
-                                                    CrossAxisAlignment
-                                                        .center,
-                                                    children: <Widget>[
-                                                      Expanded(
-                                                        flex: 10,
-                                                        child: Container(
-                                                          padding:
-                                                          const EdgeInsets
-                                                              .only(
-                                                              left: 5),
-                                                          child: Text(
-                                                            filtersearchlist[
-                                                            index]
-                                                                .AccountName
-                                                                .toString(),
-                                                            overflow:
-                                                            TextOverflow
-                                                                .ellipsis,
-                                                            maxLines: 1,
-                                                            textAlign:
-                                                            TextAlign
-                                                                .left,
-                                                            style: GoogleFonts
-                                                                .lato(
-                                                              textStyle:  TextStyle(
-                                                                  color: colour
-                                                                      .commonColor,
-                                                                  fontWeight:
-                                                                  FontWeight
-                                                                      .bold,
-                                                                  fontSize:
-                                                                  objfun.FontCardText,
-                                                                  letterSpacing:
-                                                                  0.3),
-                                                            ),
-                                                          ),
-                                                        ),
-                                                      ),
-                                                    ],
-                                                  )),
-                                            ],
-                                          )),
-                                    ));
-                              }))
-                    else
-                      Container(
-                          width: width - 40.0,
-                          height: height * 0.66,
-                          padding: const EdgeInsets.all(20),
-                          child: const Center(
-                            child: Text('No Record'),
-                          )),
-                    // Container(
-                    //   height: 3.0,
-                    //   margin: const EdgeInsets.only(top: 1),
-                    //   alignment: Alignment.topLeft,
-                    //   color: Colors.black,
-                    // ),
-                  ],
-                )
-              ],
+                                        });
+                                      },
+                                      child: Padding(
+                                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                                        child: Row(
+                                          children: [
+                                            Container(
+                                              padding: const EdgeInsets.all(10),
+                                              decoration: BoxDecoration(
+                                                color: colour.commonColor.withValues(alpha: 0.08),
+                                                shape: BoxShape.circle,
+                                              ),
+                                              child: Icon(Icons.local_shipping_rounded, color: colour.commonColor, size: 20),
+                                            ),
+                                            const SizedBox(width: 16),
+                                            Expanded(
+                                              child: Text(
+                                                truck.AccountName.toString(),
+                                                style: GoogleFonts.lato(
+                                                  fontWeight: FontWeight.w700,
+                                                  color: const Color(0xFF1A2E5A),
+                                                  fontSize: 15,
+                                                ),
+                                              ),
+                                            ),
+                                            Icon(Icons.chevron_right_rounded, color: Colors.grey.shade400, size: 24),
+                                          ],
+                                        ),
+                                      ),
+                                    ),
+                                  );
+                                },
+                              ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
             ),
-          )
-      )
-          : const Center(
-        child: SpinKitFoldingCube(
-          color: colour.spinKitColor,
-          size: 35.0,
-        ),
-      ),
     );
-
   }
 }

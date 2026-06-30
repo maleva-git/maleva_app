@@ -115,13 +115,16 @@ class TruckMaintenanceBloc
     final resultData = await objfun.apiAllinoneSelectArray(
         objfun.apiSelectTruckDetails, master, header, null);
 
-    if (resultData != '' && resultData.length != 0) {
-      final list = (resultData as List)
-          .map((e) => TruckDetailsModel.fromJson(e))
-          .cast<TruckDetailsModel>()
-          .toList();
-      objfun.TruckDetailsList = list;
-      return list;
+    if (resultData != '' && resultData != null) {
+      final value = ResponseViewModel.fromJson(resultData);
+      if (value.IsSuccess == true && value.data1 != null) {
+        final list = (value.data1 as List)
+            .map((e) => TruckDetailsModel.fromJson(e))
+            .cast<TruckDetailsModel>()
+            .toList();
+        objfun.TruckDetailsList = list;
+        return list;
+      }
     }
     return [];
   }

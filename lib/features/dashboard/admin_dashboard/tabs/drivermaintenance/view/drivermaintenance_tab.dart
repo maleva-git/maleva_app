@@ -24,19 +24,21 @@ const kGradient = LinearGradient(
 const double kTabletBreak = 600;
 
 class TruckMaintenanceDashboardWidget extends StatelessWidget {
-  const TruckMaintenanceDashboardWidget({super.key});
+  final bool showHeading;
+  const TruckMaintenanceDashboardWidget({super.key, this.showHeading = true});
 
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
       create: (context) => sl<TruckMaintDashBloc>()..add(TruckMaintDashStarted()),
-      child: const TruckMaintDashView(),
+      child: TruckMaintDashView(showHeading: showHeading),
     );
   }
 }
 
 class TruckMaintDashView extends StatelessWidget {
-  const TruckMaintDashView({super.key});
+  final bool showHeading;
+  const TruckMaintDashView({super.key, this.showHeading = true});
 
   @override
   Widget build(BuildContext context) {
@@ -58,7 +60,7 @@ class TruckMaintDashView extends StatelessWidget {
           return LayoutBuilder(
             builder: (context, constraints) {
               final isTablet = constraints.maxWidth > kTabletBreak;
-              return _TruckMaintDashBody(state: state, isTablet: isTablet);
+              return _TruckMaintDashBody(state: state, isTablet: isTablet, showHeading: showHeading);
             },
           );
         }
@@ -98,8 +100,9 @@ class TruckMaintDashView extends StatelessWidget {
 class _TruckMaintDashBody extends StatelessWidget {
   final TruckMaintDashLoaded state;
   final bool isTablet;
+  final bool showHeading;
 
-  const _TruckMaintDashBody({required this.state, required this.isTablet});
+  const _TruckMaintDashBody({required this.state, required this.isTablet, required this.showHeading});
 
   @override
   Widget build(BuildContext context) {
@@ -110,18 +113,20 @@ class _TruckMaintDashBody extends StatelessWidget {
         children: [
           const SizedBox(height: 7),
 
-          Center(
-            child: Text(
-              'TRUCK MAINTENANCE',
-              style: GoogleFonts.lato(
-                color: Palette.kExpiredRed,
-                fontWeight: FontWeight.w700,
-                fontSize: isTablet ? objfun.FontLarge + 2 : objfun.FontLarge,
-                letterSpacing: 0.3,
+          if (showHeading)
+            Center(
+              child: Text(
+                'TRUCK MAINTENANCE',
+                style: GoogleFonts.lato(
+                  color: Palette.kExpiredRed,
+                  fontWeight: FontWeight.w700,
+                  fontSize: isTablet ? objfun.FontLarge + 2 : objfun.FontLarge,
+                  letterSpacing: 0.3,
+                ),
               ),
             ),
-          ),
-          const SizedBox(height: 14),
+          if (showHeading)
+            const SizedBox(height: 14),
 
           Expanded(
             child: state.truckDetails.isEmpty

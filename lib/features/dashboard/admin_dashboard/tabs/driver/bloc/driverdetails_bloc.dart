@@ -32,18 +32,22 @@ class DriverBloc extends Bloc<DriverEvent, DriverState> {
       final resultData = await repository.fetchDriverDetails(body: master);
 
       // No data check
-      if (resultData == null || resultData == "" || (resultData is List && resultData.isEmpty)) {
+      if (resultData == null || resultData == "") {
         emit(const DriverLoaded(driverData: []));
         return;
       }
 
-      // Has data -> map to model
-      final List<DriverDetailsModel> driverList = (resultData as List)
-          .map((element) => DriverDetailsModel.fromJson(element))
-          .toList()
-          .cast<DriverDetailsModel>();
+      final value = ResponseViewModel.fromJson(resultData);
+      if (value.IsSuccess == true && value.data1 != null) {
+        final List<DriverDetailsModel> driverList = (value.data1 as List)
+            .map((element) => DriverDetailsModel.fromJson(element))
+            .toList()
+            .cast<DriverDetailsModel>();
 
-      emit(DriverLoaded(driverData: driverList));
+        emit(DriverLoaded(driverData: driverList));
+      } else {
+        emit(const DriverLoaded(driverData: []));
+      }
 
     } catch (error) {
       // ApiClient handles standardizing the exceptions
