@@ -26,21 +26,23 @@ const double kTabletBreak = 600;
 
 // ─── Root ─────────────────────────────────────────────────────────────────────
 class Maintenance extends StatelessWidget {
-  const Maintenance({super.key});
+  final bool showAppBar;
+  const Maintenance({super.key, this.showAppBar = true});
 
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
       create: (_) =>
       TruckMaintenanceBloc()..add(TruckMaintenanceStarted()),
-      child: const _MaintenancePage(),
+      child: _MaintenancePage(showAppBar: showAppBar),
     );
   }
 }
 
 // ─── Page ─────────────────────────────────────────────────────────────────────
 class _MaintenancePage extends StatelessWidget {
-  const _MaintenancePage();
+  final bool showAppBar;
+  const _MaintenancePage({this.showAppBar = true});
 
   @override
   Widget build(BuildContext context) {
@@ -54,8 +56,8 @@ class _MaintenancePage extends StatelessWidget {
       child: Scaffold(
         resizeToAvoidBottomInset: true,
         backgroundColor: AppTokens.invoicePageBg,
-        appBar: _buildAppBar(context, userName),
-        drawer: const Menulist(),
+        appBar: showAppBar ? _buildAppBar(context, userName) : null,
+        drawer: showAppBar ? const Menulist() : null,
         body: BlocBuilder<TruckMaintenanceBloc, TruckMaintenanceState>(
           builder: (context, state) {
             if (state is TruckMaintenanceInitial ||
@@ -192,45 +194,84 @@ class _TruckSelector extends StatelessWidget {
               .add(TruckMaintenanceTruckCleared());
         }
       },
-      borderRadius: BorderRadius.circular(10),
+      borderRadius: BorderRadius.circular(16),
       child: Container(
-        padding: const EdgeInsets.symmetric(
-            horizontal: 14, vertical: 14),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
         decoration: BoxDecoration(
-          color: AppTokens.maintDetailBg,
-          borderRadius: BorderRadius.circular(10),
-          border: Border.all(color: AppTokens.maintCardBorder, width: 0.5),
+          gradient: const LinearGradient(
+            colors: [Color(0xFFFFFFFF), Color(0xFFF8F9FA)],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+          borderRadius: BorderRadius.circular(16),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.05),
+              blurRadius: 12,
+              offset: const Offset(0, 4),
+            ),
+          ],
+          border: Border.all(color: AppTokens.maintCardBorder.withValues(alpha: 0.5), width: 1),
         ),
         child: Row(
           children: [
-            const Icon(Icons.local_shipping_outlined,
-                size: 20, color: AppTokens.invoiceHeaderEnd),
-            const SizedBox(width: 10),
+            Container(
+              padding: const EdgeInsets.all(10),
+              decoration: BoxDecoration(
+                color: AppTokens.invoiceHeaderEnd.withValues(alpha: 0.1),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: const Icon(Icons.local_shipping_rounded,
+                  size: 24, color: AppTokens.invoiceHeaderEnd),
+            ),
+            const SizedBox(width: 16),
             Expanded(
-              child: Text(
-                state.truckName.isEmpty
-                    ? 'Select Truck No'
-                    : state.truckName,
-                style: GoogleFonts.lato(
-                  color: state.truckName.isEmpty
-                      ? AppTokens.planTextMuted
-                      : AppTokens.maintTextDark,
-                  fontWeight: state.truckName.isEmpty
-                      ? FontWeight.w500
-                      : FontWeight.w600,
-                  fontSize: isTablet
-                      ? objfun.FontLow + 1
-                      : objfun.FontLow,
-                ),
-                overflow: TextOverflow.ellipsis,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'TRUCK SELECTION',
+                    style: GoogleFonts.lato(
+                      color: AppTokens.planTextMuted,
+                      fontWeight: FontWeight.w700,
+                      fontSize: 10,
+                      letterSpacing: 0.8,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    state.truckName.isEmpty ? 'Select Truck No' : state.truckName,
+                    style: GoogleFonts.lato(
+                      color: state.truckName.isEmpty
+                          ? AppTokens.maintTextDark.withValues(alpha: 0.6)
+                          : AppTokens.maintTextDark,
+                      fontWeight: state.truckName.isEmpty
+                          ? FontWeight.w500
+                          : FontWeight.w700,
+                      fontSize: isTablet ? objfun.FontLow + 2 : objfun.FontLow + 1,
+                    ),
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ],
               ),
             ),
-            Icon(
-              state.truckName.isNotEmpty
-                  ? Icons.close_rounded
-                  : Icons.search_rounded,
-              size: 20,
-              color: AppTokens.invoiceHeaderEnd,
+            Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: state.truckName.isNotEmpty 
+                    ? Colors.red.withValues(alpha: 0.1) 
+                    : AppTokens.invoiceHeaderEnd.withValues(alpha: 0.1),
+                shape: BoxShape.circle,
+              ),
+              child: Icon(
+                state.truckName.isNotEmpty
+                    ? Icons.close_rounded
+                    : Icons.search_rounded,
+                size: 20,
+                color: state.truckName.isNotEmpty 
+                    ? Colors.red 
+                    : AppTokens.invoiceHeaderEnd,
+              ),
             ),
           ],
         ),

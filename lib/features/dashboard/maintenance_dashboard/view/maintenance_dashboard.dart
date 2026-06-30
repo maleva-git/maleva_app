@@ -1,6 +1,7 @@
 import 'package:flutter/Material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:maleva/core/utils/app_preferences.dart';
 import 'package:intl/intl.dart';
 import 'package:maleva/features/dashboard/admin_dashboard/tabs/salesorder/bloc/salesorder_bloc.dart';
 import '../../../../core/di/injection.dart';
@@ -99,7 +100,9 @@ class _AdminDashboardState extends State<MaintenanceDashboard> with SingleTicker
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 10, vsync: this);
+    final bool showTruckMaint = AppPreferences.getRoleId() == 1300 && AppPreferences.getPermissionId() == 1;
+    final int tabCount = 10 + (showTruckMaint ? 1 : 0);
+    _tabController = TabController(length: tabCount, vsync: this);
     _tabController.addListener(_onTabChanged);
 
   }

@@ -11,6 +11,27 @@ import '../../../common_updates/blocs/sales/sales_bloc.dart';
 import '../../../common_updates/blocs/sales/sales_event.dart';
 import '../../../common_updates/blocs/truck/truck_bloc.dart';
 import '../../../common_updates/blocs/truck/truck_event.dart';
+import '../../../transport/maintenance/view/maintenance_tab.dart';
+import '../../admin_dashboard/bloc/admin_tab_bloc.dart';
+import '../../admin_dashboard/bloc/admin_tab_state.dart';
+import '../../admin_dashboard/tabs/driver/view/driverdetails_tab.dart';
+import '../../admin_dashboard/tabs/enginehours/view/enginehours_tab.dart';
+import '../../admin_dashboard/tabs/fuel/view/fuelreport_tab.dart';
+import '../../admin_dashboard/tabs/fuelfillings/view/fuelfillings_tab.dart';
+import 'package:flutter/Material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:maleva/core/utils/clsfunction.dart' as objfun;
+import 'package:maleva/core/colors/colors.dart' as colour;
+import '../../../../core/bluetooth/view/Bluetooth_tab.dart';
+import '../../../../core/colors/colors.dart';
+import '../../../../core/models/model.dart';
+import '../../../../menu/menulist.dart';
+import '../../../common_updates/blocs/sales/sales_bloc.dart';
+import '../../../common_updates/blocs/sales/sales_event.dart';
+import '../../../common_updates/blocs/truck/truck_bloc.dart';
+import '../../../common_updates/blocs/truck/truck_event.dart';
+import '../../../transport/maintenance/view/maintenance_tab.dart';
 import '../../admin_dashboard/bloc/admin_tab_bloc.dart';
 import '../../admin_dashboard/bloc/admin_tab_state.dart';
 import '../../admin_dashboard/tabs/driver/view/driverdetails_tab.dart';
@@ -24,6 +45,7 @@ import '../../admin_dashboard/tabs/speedingreport/view/speedingreport_view.dart'
 import '../../admin_dashboard/tabs/transport/view/transportview_tab.dart';
 import '../../admin_dashboard/tabs/truck/view/truckview_tab.dart';
 import '../../admin_dashboard/tabs/vesselreport/view/vesselreportview_tab.dart';
+import 'package:maleva/core/utils/app_preferences.dart';
 import 'package:maleva/core/widgets/custom_app_bar.dart';
 
 
@@ -91,6 +113,8 @@ class MaintenanceMobileDashboard extends StatelessWidget {
   // ── TabBar ────────────────────────────────────────────────────────────
 // ✅ Step 2: _buildTabBar() method-ல container size மாத்து
   Widget _buildTabBar(bool isTablet) {
+    final bool showTruckMaint = AppPreferences.getRoleId() == 1300 && AppPreferences.getPermissionId() == 1;
+
     return Container(
       margin: EdgeInsets.symmetric(
         horizontal: isTablet ? 20 : 12,
@@ -137,7 +161,7 @@ class MaintenanceMobileDashboard extends StatelessWidget {
           _tab('EngineHours',     isTablet),   // 7
           _tab('Fuel',            isTablet),   //8
           _tab('SparePartsEntry', isTablet),   //9
-
+          if (showTruckMaint) _tab('Truck Maint', isTablet),
         ],
       ),
     );
@@ -162,6 +186,8 @@ class MaintenanceMobileDashboard extends StatelessWidget {
   );
   // ── TabBarView ────────────────────────────────────────────────────────
   Widget _buildTabBarView(BuildContext context) {
+    final bool showTruckMaint = AppPreferences.getRoleId() == 1300 && AppPreferences.getPermissionId() == 1;
+
     return BlocListener<AdminTabBloc, AdminTabState>(
       listener: (context, tabState) {
         switch (tabState.index) {
@@ -187,7 +213,7 @@ class MaintenanceMobileDashboard extends StatelessWidget {
           const EngineHoursPage(),  //7
           const FuelDiffPage(),   //8
           const SparePartsEntryPage(),  //9
-
+          if (showTruckMaint) const Maintenance(showAppBar: false),
         ],
       ),
     );

@@ -155,6 +155,7 @@ class Appuserloginmobile extends StatelessWidget {
         );
         break;
       case "HR":
+      case "MAINTENANCE":
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(

@@ -85,6 +85,8 @@ class AuthRepository {
     await AppPreferences.setComid(comid);
     await AppPreferences.setMComid(mComid);
     await AppPreferences.setOldUsername(idNew.toString());
+    await AppPreferences.setRoleId(data['role_id'] ?? 0);
+    await AppPreferences.setPermissionId(data['PermisionId'] ?? 0);
 
     objfun.Comid = comid;
     objfun.DriverTruckRefId = data['TruckRefId'] ?? 0;

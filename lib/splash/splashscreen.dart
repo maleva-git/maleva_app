@@ -252,7 +252,7 @@ class _SplashScreenState extends State<SplashScreen>
         }
 
 
-        else if(objfun.storagenew.getString('RulesType') == "HR")
+        else if(objfun.storagenew.getString('RulesType') == "HR" || objfun.storagenew.getString('RulesType') == "MAINTENANCE")
         {
           Navigator.pushReplacement(
             context,
