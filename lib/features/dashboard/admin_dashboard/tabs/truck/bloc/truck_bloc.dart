@@ -37,20 +37,22 @@ class TruckDetailsBloc extends Bloc<TruckDetailsEvent, TruckDetailsState> {
 
       final resultData = await repository.fetchTruckDetails(body: body);
 
-      if (resultData == null ||
-          resultData == "" ||
-          (resultData is List && resultData.isEmpty)) {
+      if (resultData == null || resultData == "") {
         emit(const TruckLoadedState(truckData: []));
         return;
       }
 
-      final List<TruckDetailsModel> truckList = (resultData as List)
-          .map((e) => TruckDetailsModel.fromJson(e))
-          .toList()
-          .cast<TruckDetailsModel>();
+      final value = ResponseViewModel.fromJson(resultData);
+      if (value.IsSuccess == true && value.data1 != null) {
+        final List<TruckDetailsModel> truckList = (value.data1 as List)
+            .map((e) => TruckDetailsModel.fromJson(e))
+            .toList()
+            .cast<TruckDetailsModel>();
 
-      emit(TruckLoadedState(truckData: truckList));
-
+        emit(TruckLoadedState(truckData: truckList));
+      } else {
+        emit(const TruckLoadedState(truckData: []));
+      }
     } catch (error) {
 
       emit(TruckErrorState(errorMessage: error.toString()));
