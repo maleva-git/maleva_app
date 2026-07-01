@@ -87,7 +87,6 @@ class _AddressListstate extends State<AddressList> {
   }
 
   void _onItemTapped(String selected) {
-    objfun.SelectAddressList = selected;
     Navigator.of(context, rootNavigator: true).pop(selected);
   }
 

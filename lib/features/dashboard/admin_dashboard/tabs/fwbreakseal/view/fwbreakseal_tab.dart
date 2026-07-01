@@ -581,13 +581,15 @@ class _FWBreakSealViewState extends State<_FWBreakSealView>
             // Navigate to picker
             bloc.add(
                 FWBreakSealEmpSearchTapped(smkType: smkType, isClear: false));
-            await Navigator.push(
+            final __navResult1 = await Navigator.push(
               context,
               MaterialPageRoute(
                 builder: (_) =>
                 const Employee(Searchby: 1, SearchId: 0),
               ),
-            );
+            ); if (__navResult1 != null) { objfun.SelectEmployeeList = __navResult1; }
+if (__navResult1 != null) { objfun.SelectEmployeeList = __navResult1; }
+
             // Employee picker sets objfun.SelectEmployeeList
             final emp = objfun.SelectEmployeeList;
             if (emp.Id != 0) {

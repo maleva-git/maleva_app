@@ -348,7 +348,7 @@ class _SearchCard extends StatelessWidget {
                         builder: (_) =>
                         const Port(Searchby: 1, SearchId: 0),
                       ),
-                    ).then((_) {
+                    ).then((_navRes) {
                       if (objfun.SelectedPortName.isNotEmpty) {
                         bloc.add(UpdatePortEvent(
                             portName: objfun.SelectedPortName));

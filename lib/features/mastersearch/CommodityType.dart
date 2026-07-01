@@ -61,7 +61,6 @@ class _CommodityTypestate extends State<CommodityType> {
 
   void _onItemTapped(String item) {
     if (widget.Searchby == 1) {
-      objfun.SelectedCommodityName = item;
       Navigator.of(context, rootNavigator: true).pop(item);
     }
   }

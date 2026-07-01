@@ -49,11 +49,7 @@ class SaleOrderBloc extends Bloc<SaleOrderEvent, SaleOrderState> {
     emit(state.copyWith(status: SaleOrderStatus.loading));
     try {
       // Load all combo / dropdown data first
-      await OnlineApi.SelectCustomer(null);
-      await OnlineApi.SelectJobStatus(null);
-      await OnlineApi.SelectEmployee(null, 'Sales', '');
-      await OnlineApi.loadComboS1(null, 0);
-      // Then load the list
+      await OnlineApi.SelectCustomer(null);await OnlineApi.SelectJobStatus(null);await OnlineApi.SelectEmployee(null, 'Sales', '');await OnlineApi.loadComboS1(null, 0);// Then load the list
       await _fetchData(emit);
     } catch (e, st) {
       emit(state.copyWith(

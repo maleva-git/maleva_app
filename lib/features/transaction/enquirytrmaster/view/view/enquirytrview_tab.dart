@@ -718,7 +718,7 @@ class _FilterSheetState extends State<_FilterSheet> {
                   MaterialPageRoute(
                       builder: (_) =>
                       const Customer(Searchby: 1, SearchId: 0)),
-                ).then((_) {
+                ).then((_navRes) { if (_navRes != null) { objfun.SelectCustomerList = _navRes; }
                   final sel = objfun.SelectCustomerList;
                   if (sel.Id != 0) {
                     setState(() {
@@ -752,8 +752,7 @@ class _FilterSheetState extends State<_FilterSheet> {
                 ).then((_) async {
                   final sel = objfun.SelectJobTypeList;
                   if (sel.Id != 0) {
-                    await OnlineApi.SelectAllJobStatus(context, sel.Id);
-                    setState(() {
+                    await OnlineApi.SelectAllJobStatus(context, sel.Id); if (!context.mounted) return;setState(() {
                       _local =
                           _local.copyWith(jobId: sel.Id, jobName: sel.Name);
                     });
@@ -777,14 +776,13 @@ class _FilterSheetState extends State<_FilterSheet> {
               value: _local.empName,
               disabled: _local.checkLEmp,
               onSearch: () async {
-                await OnlineApi.SelectEmployee(context, 'sales', 'admin');
-                if (!_local.checkLEmp) {
+                await OnlineApi.SelectEmployee(context, 'sales', 'admin'); if (!context.mounted) return;if (!_local.checkLEmp) {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
                         builder: (_) =>
                         const Employee(Searchby: 1, SearchId: 0)),
-                  ).then((_) {
+                  ).then((_navRes) { if (_navRes != null) { objfun.SelectEmployeeList = _navRes; }
                     final sel = objfun.SelectEmployeeList;
                     if (sel.Id != 0) {
                       setState(() {

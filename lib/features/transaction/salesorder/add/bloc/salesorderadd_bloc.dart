@@ -30,12 +30,8 @@ class SalesOrderAddBloc extends Bloc<SalesOrderAddEvent, SalesOrderAddState> {
       try {
         final now = DateFormat("yyyy-MM-dd HH:mm:ss").format(DateTime.now());
         final today = DateFormat("yyyy-MM-dd").format(DateTime.now());
-        await OnlineApi.MaxSaleOrderNo(context, 'MY');
-        await OnlineApi.selectAddressList();
-        await OnlineApi.SelectAgentCompany(context);
-        await OnlineApi.SelectEmployee(context, '', 'Operation');
-
-        final permission = _buildPermissions();
+        await OnlineApi.MaxSaleOrderNo(context, 'MY');await OnlineApi.selectAddressList();
+        await OnlineApi.SelectAgentCompany(context);await OnlineApi.SelectEmployee(context, '', 'Operation');final permission = _buildPermissions();
         var base = SalesOrderAddLoaded(
           progress: true, dtpSaleOrderdate: today, dtpOETAdate: now, dtpOETBdate: now, dtpOETDdate: now,
           dtpLETAdate: now, dtpLETBdate: now, dtpLETDdate: now, dtpFlightTimedate: now, dtpPickUpdate: now,
@@ -86,8 +82,7 @@ class SalesOrderAddBloc extends Bloc<SalesOrderAddEvent, SalesOrderAddState> {
         return;
       }
 
-      await OnlineApi.loadCustomerCurrency(context, event.id);
-      emit(s.copyWith(txtCustomer: event.name, custId: event.id, currencyValue: objfun.CustomerCurrencyValue));
+      await OnlineApi.loadCustomerCurrency(context, event.id);emit(s.copyWith(txtCustomer: event.name, custId: event.id, currencyValue: objfun.CustomerCurrencyValue));
     });
 
     // ──────────────────────────────────────────────────────────────────────────
@@ -103,8 +98,7 @@ class SalesOrderAddBloc extends Bloc<SalesOrderAddEvent, SalesOrderAddState> {
         return;
       }
 
-      await OnlineApi.SelectAllJobStatus(context, event.id);
-      emit(_applyVisibility(s.copyWith(txtJobType: event.name, jobTypeId: event.id)));
+      await OnlineApi.SelectAllJobStatus(context, event.id);emit(_applyVisibility(s.copyWith(txtJobType: event.name, jobTypeId: event.id)));
     });
 
 
@@ -299,8 +293,7 @@ class SalesOrderAddBloc extends Bloc<SalesOrderAddEvent, SalesOrderAddState> {
     on<BillTypeChanged>((event, emit) async {
       if (state is! SalesOrderAddLoaded) return;
       final s = state as SalesOrderAddLoaded;
-      await OnlineApi.MaxSaleOrderNo(context, event.value);
-      emit(s.copyWith(dropdownValue: event.value, txtJobNo: objfun.MaxSaleOrderNum));
+      await OnlineApi.MaxSaleOrderNo(context, event.value);emit(s.copyWith(dropdownValue: event.value, txtJobNo: objfun.MaxSaleOrderNum));
     });
 
     on<SaveSalesOrderEvent>((event, emit) async {
@@ -617,23 +610,16 @@ class SalesOrderAddBloc extends Bloc<SalesOrderAddEvent, SalesOrderAddState> {
     final m = master[0];
     final now = DateFormat("yyyy-MM-dd HH:mm:ss").format(DateTime.now());
 
-    await OnlineApi.SelectCustomer(context); await OnlineApi.SelectJobType(context);
-    if (m["JobMasterRefId"] != null) await OnlineApi.SelectAllJobStatus(context, m["JobMasterRefId"]);
-
-    String lAgentName = '';
+    await OnlineApi.SelectCustomer(context);await OnlineApi.SelectJobType(context);if (m["JobMasterRefId"] != null) await OnlineApi.SelectAllJobStatus(context, m["JobMasterRefId"]);String lAgentName = '';
     if (m["AgentCompanyRefId"] != null && m["AgentCompanyRefId"] > 0) {
-      await OnlineApi.SelectAgentAll(context, m["AgentCompanyRefId"]);
-      lAgentName = _getFromAgentAll(m["AgentMasterRefId"]);
+      await OnlineApi.SelectAgentAll(context, m["AgentCompanyRefId"]);lAgentName = _getFromAgentAll(m["AgentMasterRefId"]);
     }
     String oAgentName = '';
     if (m["OAgentCompanyRefId"] != null && m["OAgentCompanyRefId"] > 0) {
-      await OnlineApi.SelectAgentAll(context, m["OAgentCompanyRefId"]);
-      oAgentName = _getFromAgentAll(m["OAgentMasterRefId"]);
+      await OnlineApi.SelectAgentAll(context, m["OAgentCompanyRefId"]);oAgentName = _getFromAgentAll(m["OAgentMasterRefId"]);
     }
 
-    await OnlineApi.loadCustomerCurrency(context, m["CustomerRefId"]);
-
-    String _safeStr(String? v) => v ?? ''; String _safeNum(dynamic v) => v != null ? v.toString() : '';
+    await OnlineApi.loadCustomerCurrency(context, m["CustomerRefId"]);String _safeStr(String? v) => v ?? ''; String _safeNum(dynamic v) => v != null ? v.toString() : '';
     String _parseDate(dynamic v, String fmt) { if (v == null) return now; return DateFormat(fmt).format(DateTime.parse(v.toString())); }
 
     List<int> loadedIds = [];

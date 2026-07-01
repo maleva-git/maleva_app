@@ -64,11 +64,8 @@ class _Customerstate extends State<Customer> {
 
   void _onItemTapped(CustomerModel selectedCustomer) {
     if (widget.Searchby == 1) {
-      objfun.SelectCustomerList = selectedCustomer;
-      objfun.SelectedName = selectedCustomer.AccountName.toString();
-      objfun.SelectedId = selectedCustomer.Id;
       if (objfun.SelectedId != 0) {
-        Navigator.of(context, rootNavigator: true).pop(context);
+        Navigator.of(context, rootNavigator: true).pop(selectedCustomer);
       }
     }
   }

@@ -79,6 +79,8 @@ class _StockInEntryPageState
         saleOrderId,
         'SalesOrder',
         statusName.replaceAll(' ', ''));
+    if (!mounted) return;
+
     context.read<StockInEntryBloc>().add(StockInEntryImagePicked(url));
   }
 
@@ -106,8 +108,10 @@ class _StockInEntryPageState
         if (state is StockInEntrySaveSuccess) {
           await objfun.ConfirmationOK(
               'Saved Successfully', context);
+          if (!mounted) return;
           // Print barcode
           await _doPrint(state.stockId, context);
+          if (!mounted) return;
           Navigator.pushReplacement(
             context,
             MaterialPageRoute(
@@ -547,8 +551,7 @@ class _JobNoRowState extends State<_JobNoRow> {
                   await OnlineApi.EditSalesOrder(
 
                       s.saleOrderId,
-                      int.tryParse(s.jobNoText) ?? 0);
-                  Navigator.push(
+                      int.tryParse(s.jobNoText) ?? 0); if (!context.mounted) return;Navigator.push(
                     context,
                       MaterialPageRoute(
                         builder: (_) => SalesOrdersAdd(
@@ -932,9 +935,7 @@ class _StatusField extends StatelessWidget {
 
         // ──> நீங்க சொன்ன மாதிரி Common List-ஐ இங்க Load பண்றோம் <──
         // JobAllStatus Screen-க்கு போறதுக்கு முன்னாடியே Data Load ஆகிடும்
-        await OnlineApi.SelectAllJobStatus(context, state.jobMasterId);
-
-        // அதுக்கப்புறம் நேவிகேஷன் நடக்கும்
+        await OnlineApi.SelectAllJobStatus(context, state.jobMasterId); if (!context.mounted) return;// அதுக்கப்புறம் நேவிகேஷன் நடக்கும்
         Navigator.push(
           context,
           MaterialPageRoute(
@@ -943,7 +944,7 @@ class _StatusField extends StatelessWidget {
                 SearchId: 0,
                 JobTypeId: state.jobMasterId,
               )),
-        ).then((_) {
+        ).then((_navRes) { if (_navRes != null) { objfun.SelectAllStatusList = _navRes; }
           final sel = objfun.SelectAllStatusList;
           if (sel.Status != 0) {
             context.read<StockInEntryBloc>().add(

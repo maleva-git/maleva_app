@@ -795,8 +795,7 @@ class _MobileCard extends StatelessWidget {
                         result['IsSuccess'] == true) {
                       ctrl.clear();
                       await OnlineApi.EditSalesOrder(
-                           id, saleNo);
-                      Navigator.of(ctx).pop();
+                           id, saleNo); if (!context.mounted) return;Navigator.of(ctx).pop();
                       Navigator.of(context)
                           .push(MaterialPageRoute(
                         builder: (_) => SalesOrdersAdd(
@@ -1191,8 +1190,7 @@ class _TabletRow extends StatelessWidget {
                           result['IsSuccess'] == true) {
                         ctrl.clear();
                         await OnlineApi.EditSalesOrder(
-                             id, saleNo);
-                        Navigator.of(ctx).pop();
+                             id, saleNo); if (!context.mounted) return;Navigator.of(ctx).pop();
                         Navigator.of(context)
                             .push(MaterialPageRoute(
                           builder: (_) => SalesOrdersAdd(
@@ -1776,7 +1774,7 @@ class _FilterSheetState extends State<_FilterSheet> {
     final r = await Navigator.push(context,
         MaterialPageRoute(
             builder: (_) =>
-            const Customer(Searchby: 1, SearchId: 0)));
+            const Customer(Searchby: 1, SearchId: 0))); if (r != null) { objfun.SelectCustomerList = r; }
     if (r != null) {
       bloc.add(ViewCustomerSelected(
           objfun.SelectCustomerList.AccountName,
@@ -1787,11 +1785,10 @@ class _FilterSheetState extends State<_FilterSheet> {
 
   Future<void> _pickEmployee(
       BuildContext context, SalesOrderViewBloc bloc) async {
-    await OnlineApi.SelectEmployee(context, 'sales', 'admin');
-    final r = await Navigator.push(context,
+    await OnlineApi.SelectEmployee(context, 'sales', 'admin'); if (!context.mounted) return;final r = await Navigator.push(context,
         MaterialPageRoute(
             builder: (_) =>
-            const Employee(Searchby: 1, SearchId: 0)));
+            const Employee(Searchby: 1, SearchId: 0))); if (r != null) { objfun.SelectEmployeeList = r; }
     if (r != null) {
       bloc.add(ViewEmployeeSelected(
           objfun.SelectEmployeeList.AccountName,
@@ -1805,7 +1802,7 @@ class _FilterSheetState extends State<_FilterSheet> {
     final r = await Navigator.push(context,
         MaterialPageRoute(
             builder: (_) =>
-            const JobStatus(Searchby: 1, SearchId: 0)));
+            const JobStatus(Searchby: 1, SearchId: 0))); if (r != null) { objfun.SelectJobStatusList = r; }
     if (r != null) {
       bloc.add(ViewStatusSelected(
           objfun.SelectJobStatusList.Name,
