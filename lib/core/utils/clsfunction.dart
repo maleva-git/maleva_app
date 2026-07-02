@@ -322,6 +322,7 @@ Future<List<dynamic>> apiAllinoneSelect(api, insertDetails,
   try {
     final headers = _buildRequestHeaders(header);
     final result = await _performPostRequest(api, insertDetails, headers);
+    if (context != null && !context.mounted) return [];
     if (result.statusCode == 200) {
       if (result.body == "") {
         return [];
@@ -371,6 +372,7 @@ Future<dynamic> apiAllinoneMapSelect(
     final headers = _buildRequestHeaders(header);
     final result = await _performPostRequest(api, insertDetails, headers);
 
+    if (context != null && !context.mounted) return [];
     if (result.statusCode == 200) {
       if (result.body == "") {
         return [];
@@ -423,6 +425,7 @@ Future<List<dynamic>> apiAllinoneSelectWithOutAuth(api, insertDetails,
   try {
     final headers = _buildRequestHeaders(header, skipAuth: true);
     final result = await _performPostRequest(api, insertDetails, headers);
+    if (context != null && !context.mounted) return [];
     if (result.statusCode == 200) {
       if (result.body == "") {
         return [];
@@ -468,6 +471,7 @@ Future<dynamic> apiAllinoneSelectArrayWithOutAuth(api, insertDetails,
   try {
     final headers = _buildRequestHeaders(header, skipAuth: true);
     final result = await _performPostRequest(api, insertDetails, headers);
+    if (context != null && !context.mounted) return [];
     if (result.statusCode == 200) {
       if (result.body == "") {
         return [];
@@ -514,6 +518,8 @@ Future<dynamic> apiAllinoneSelectArray(api, insertDetails,
     final headers = _buildRequestHeaders(header);
     final result = await _performPostRequest(api, insertDetails, headers);
 
+
+    if (context != null && !context.mounted) return [];
     if (result.statusCode == 200) {
       if (result.body == "") {
         return [];
@@ -564,6 +570,7 @@ Future<dynamic> apiAllinone(api, insertDetails, Map<String, String>? header, Bui
   try {
     final headers = _buildRequestHeaders(header);
     final result = await _performPostRequest(api, insertDetails, headers);
+    if (context != null && !context.mounted) return [];
     if (result.statusCode == 200) {
       return true;
     } else if (result.statusCode == 401) {
@@ -1341,18 +1348,30 @@ String channelName = "MALEVA channel"; //Required for Android 8.0 or after
 String channelDescription = "this is our MALEVA channel";
 String mobiletoken="";
 getDeviceToken() async {
-
-  FirebaseMessaging fcm = FirebaseMessaging.instance;
-  String? fcmToken = await fcm.getToken();
-  if (fcmToken != null) {
-    mobiletoken = fcmToken;
-    await AppPreferences.setFcmToken(fcmToken);
-    print_(mobiletoken);
+  try {
+    FirebaseMessaging fcm = FirebaseMessaging.instance;
+    
+    // Add a strict timeout to prevent splash screen hanging if Firebase is unreachable
+    String? fcmToken = await fcm.getToken().timeout(
+      const Duration(seconds: 6),
+      onTimeout: () => null,
+    );
+    
+    if (fcmToken != null) {
+      mobiletoken = fcmToken;
+      await AppPreferences.setFcmToken(fcmToken);
+      print_("FCM Token successfully fetched: $mobiletoken");
+    } else {
+      print_("FCM Token timeout or returned null");
+    }
+  } catch (e) {
+    print_("Error getting FCM Token: $e");
   }
 
-  FirebaseMessaging.onMessage.listen((RemoteMessage message) {});
-  // fcm.subscribeToTopic('puppies');
-  // fcm.unsubscribeFromTopic('puppies');
+  try {
+    FirebaseMessaging.onMessage.listen((RemoteMessage message) {});
+  } catch (e) {}
+
 }
 
 

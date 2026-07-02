@@ -9,8 +9,7 @@ class SparePartsRepository {
   /// Loads the global truck list
   Future<void> fetchTrucks() async {
     // We pass null for context so it safely runs in the background
-    await OnlineApi.SelectTruckList(null, null);
-  }
+    await OnlineApi.SelectTruckList(null, null);}
 
   /// Fetches Spare Parts records for the View page
   Future<dynamic> fetchSparePartsRecords({

@@ -126,6 +126,7 @@ class _SplashScreenState extends State<SplashScreen>
     await Future.delayed(const Duration(seconds: 3));
 
     await objfun.getDeviceToken();
+    if (!mounted) return;
     objfun.mobiletoken = AppPreferences.getFcmToken();
 
     String UserName = objfun.storagenew.getString('Username') ?? "";
@@ -134,9 +135,10 @@ class _SplashScreenState extends State<SplashScreen>
     objfun.MalevaScreen= objfun.storagenew.getInt('DeviceView') ?? 1;
     objfun.DriverLogin=objfun.storagenew.getInt('DriverId') ?? 0;
     if (UserName != "" && Password != "") {
-      if (await OnlineApi.Login(UserName, Password, OldUserName,objfun.DriverLogin, context) ==
-          true) {
-
+      bool loginSuccess = await OnlineApi.Login(UserName, Password, OldUserName,objfun.DriverLogin, context);
+      if (!mounted) return;
+      
+      if (loginSuccess) {
         if(objfun.DriverLogin == 1)
         {
           // Navigator.push(context, MaterialPageRoute(builder: (context) => const DriverDashboard()));

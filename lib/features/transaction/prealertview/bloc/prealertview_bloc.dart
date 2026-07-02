@@ -67,12 +67,7 @@ class PreAlertBloc extends Bloc<PreAlertEvent, PreAlertState> {
   Future<void> _onStarted(PreAlertStarted event, Emitter<PreAlertState> emit) async {
     emit(PreAlertLoading());
     try {
-      await OnlineApi.SelectCustomer(event.context);
-      await OnlineApi.SelectJobStatus(event.context);
-      await OnlineApi.SelectEmployee(event.context, 'Sales', '');
-      await OnlineApi.loadComboS1(event.context, 0);
-
-      final isAdmin = objfun.storagenew.getString('RulesType') == 'ADMIN';
+      await OnlineApi.SelectCustomer(event.context);await OnlineApi.SelectJobStatus(event.context);await OnlineApi.SelectEmployee(event.context, 'Sales', '');await OnlineApi.loadComboS1(event.context, 0);final isAdmin = objfun.storagenew.getString('RulesType') == 'ADMIN';
       emit(PreAlertLoaded(
         fromDate: DateFormat('yyyy-MM-dd').format(DateTime.now()),
         toDate: DateFormat('yyyy-MM-dd').format(DateTime.now()),

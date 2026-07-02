@@ -424,8 +424,7 @@ class _TransportTab extends StatelessWidget {
                         onTap: () => _showDetailsDialog(context, item),
                         onLongPress: () async {
                           await OnlineApi.EditSalesOrder(
-                               item['Id'], 0);
-                          Navigator.push(
+                               item['Id'], 0); if (!context.mounted) return;Navigator.push(
                             context,
                             MaterialPageRoute(
                               builder: (_) => SalesOrderAdd(

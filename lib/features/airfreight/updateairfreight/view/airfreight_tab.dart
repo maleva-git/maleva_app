@@ -375,7 +375,7 @@ class _StatusField extends StatelessWidget {
         await OnlineApi.EditSalesOrder(state.saleOrderId, int.tryParse(state.jobNoText) ?? 0);
         await OnlineApi.SelectAllJobStatus(context, objfun.SaleEditMasterList[0]['JobMasterRefId']);
 
-        Navigator.push(context, MaterialPageRoute(builder: (_) => const JobAllStatus(Searchby: 1, SearchId: 0, JobTypeId: 0))).then((_) {
+        Navigator.push(context, MaterialPageRoute(builder: (_) => const JobAllStatus(Searchby: 1, SearchId: 0, JobTypeId: 0))).then((_navRes) { if (_navRes != null) { objfun.SelectAllStatusList = _navRes; }
           final sel = objfun.SelectAllStatusList;
           if (sel.Status != 0) {
             context.read<AirFreightBloc>().add(AirFreightStatusSelected(statusId: sel.Status, statusName: sel.StatusName));

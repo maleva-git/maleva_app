@@ -514,8 +514,7 @@ class _FilterFab extends StatelessWidget {
                     suffixIcon: Icon(empController.text.isNotEmpty ? Icons.close_rounded : Icons.search_rounded, color: checkLoggedEmp ? AppTokens.planTextMuted : colour.kCobalt),
                     onSuffixTap: checkLoggedEmp ? null : () async {
                       if (empController.text.isEmpty) {
-                        await OnlineApi.SelectEmployee(context, 'sales', 'admin');
-                        Navigator.push(context, MaterialPageRoute(builder: (_) => const Employee(Searchby: 1, SearchId: 0))).then((_) {
+                        await OnlineApi.SelectEmployee(context, 'sales', 'admin'); if (!context.mounted) return;Navigator.push(context, MaterialPageRoute(builder: (_) => const Employee(Searchby: 1, SearchId: 0))).then((_navRes) { if (_navRes != null) { objfun.SelectEmployeeList = _navRes; }
                           setSheetState(() {
                             empController.text = objfun.SelectEmployeeList.AccountName;
                             empId = objfun.SelectEmployeeList.Id;

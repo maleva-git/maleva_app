@@ -580,7 +580,7 @@ class _StatusField extends StatelessWidget {
                 SearchId: 0,
                 JobTypeId: state.jobId,
               )),
-        ).then((_) {
+        ).then((_navRes) { if (_navRes != null) { objfun.SelectAllStatusList = _navRes; }
           final sel = objfun.SelectAllStatusList;
           if (sel.Status != 0) {
             context.read<StockUpdateBloc>().add(

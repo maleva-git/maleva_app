@@ -127,9 +127,7 @@ class VesselPlanningBloc extends Bloc<VesselPlanningEvent, VesselPlanningState> 
 
     try {
       // 2. ✅ NO .toString() HERE. The API needs the raw integer.
-      await OnlineApi.EditVesselPlanning(null, event.id, event.planningNo);
-
-      // 3. ✅ KEEP .toString() HERE. The State needs the text version.
+      await OnlineApi.EditVesselPlanning(null, event.id, event.planningNo);// 3. ✅ KEEP .toString() HERE. The State needs the text version.
       emit(VesselPlanningNavigateToEdit(
         id: event.id,
         planningNo: event.planningNo.toString(),

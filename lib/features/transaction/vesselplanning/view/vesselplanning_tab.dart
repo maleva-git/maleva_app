@@ -279,7 +279,7 @@ class _VesselPlanningPage extends StatelessWidget {
                     suffixIcon: InkWell(
                       onTap: () async {
                         if (isLoggedInEmp) return;
-                        await OnlineApi.SelectEmployee(ctx, 'sales', 'admin');
+                        await OnlineApi.SelectEmployee(ctx, 'sales', 'admin'); if (!ctx.mounted) return;
                         if (txtEmployee.text.isEmpty) {
                           Navigator.push(
                             ctx,
@@ -287,7 +287,7 @@ class _VesselPlanningPage extends StatelessWidget {
                               builder: (_) =>
                               const Employee(Searchby: 1, SearchId: 0),
                             ),
-                          ).then((_) {
+                          ).then((_navRes) { if (_navRes != null) { objfun.SelectEmployeeList = _navRes; }
                             setSheetState(() {
                               txtEmployee.text =
                                   objfun.SelectEmployeeList.AccountName;

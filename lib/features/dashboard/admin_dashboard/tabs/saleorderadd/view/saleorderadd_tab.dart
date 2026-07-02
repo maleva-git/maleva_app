@@ -528,7 +528,7 @@ class _SalesOrderViewState extends State<_SalesOrderView>
                 context,
                 MaterialPageRoute(
                     builder: (_) => const Customer(Searchby: 1, SearchId: 0)),
-              ).then((_) {
+              ).then((_navRes) { if (_navRes != null) { objfun.SelectCustomerList = _navRes; }
                 if (objfun.SelectCustomerList.Id != 0) {
                   bloc.add(SalesOrderCustomerSelected(
                     custId: objfun.SelectCustomerList.Id,
@@ -554,7 +554,7 @@ class _SalesOrderViewState extends State<_SalesOrderView>
                 context,
                 MaterialPageRoute(
                     builder: (_) => const JobType(Searchby: 1, SearchId: 0)),
-              ).then((_) {
+              ).then((_navRes) { if (_navRes != null) { objfun.SelectJobTypeList = _navRes; }
                 if (objfun.SelectJobTypeList.Id != 0) {
                   bloc.add(SalesOrderJobTypeSelected(
                     jobTypeId: objfun.SelectJobTypeList.Id,
@@ -581,7 +581,7 @@ class _SalesOrderViewState extends State<_SalesOrderView>
                 MaterialPageRoute(
                     builder: (_) => const JobAllStatus(
                         Searchby: 1, SearchId: 0, JobTypeId: 0)),
-              ).then((_) {
+              ).then((_navRes) { if (_navRes != null) { objfun.SelectAllStatusList = _navRes; }
                 if (objfun.SelectAllStatusList.Status != 0) {
                   bloc.add(SalesOrderJobStatusSelected(
                     statusId: objfun.SelectAllStatusList.Status,
@@ -669,7 +669,7 @@ class _SalesOrderViewState extends State<_SalesOrderView>
                 MaterialPageRoute(
                     builder: (_) =>
                     const Location(Searchby: 1, SearchId: 0)),
-              ).then((_) {
+              ).then((_navRes) { if (_navRes != null) { objfun.SelectLocationList = _navRes; }
                 if (objfun.SelectLocationList.Id != 0) {
                   bloc.add(SalesOrderOriginSelected(
                     id: objfun.SelectLocationList.Id,
@@ -694,7 +694,7 @@ class _SalesOrderViewState extends State<_SalesOrderView>
                 MaterialPageRoute(
                     builder: (_) =>
                     const Location(Searchby: 1, SearchId: 0)),
-              ).then((_) {
+              ).then((_navRes) { if (_navRes != null) { objfun.SelectLocationList = _navRes; }
                 if (objfun.SelectLocationList.Id != 0) {
                   bloc.add(SalesOrderDestinationSelected(
                     id: objfun.SelectLocationList.Id,
@@ -753,7 +753,7 @@ class _SalesOrderViewState extends State<_SalesOrderView>
                 MaterialPageRoute(
                     builder: (_) =>
                     const AddressList(Searchby: 1, SearchId: 0)),
-              ).then((_) {
+              ).then((_navRes) { if (_navRes != null) { objfun.SelectAddressList = _navRes; }
                 if (objfun.SelectAddressList.isNotEmpty) {
                   txtPickUpAddress.text = objfun.SelectAddressList;
                   bloc.add(SalesOrderPickupAddressListUpdated(
@@ -797,7 +797,7 @@ class _SalesOrderViewState extends State<_SalesOrderView>
                 MaterialPageRoute(
                     builder: (_) =>
                     const AddressList(Searchby: 1, SearchId: 0)),
-              ).then((_) {
+              ).then((_navRes) { if (_navRes != null) { objfun.SelectAddressList = _navRes; }
                 if (objfun.SelectAddressList.isNotEmpty) {
                   txtDeliveryAddress.text = objfun.SelectAddressList;
                   bloc.add(SalesOrderDeliveryAddressListUpdated(
@@ -840,7 +840,7 @@ class _SalesOrderViewState extends State<_SalesOrderView>
                 MaterialPageRoute(
                     builder: (_) =>
                     const AddressList(Searchby: 1, SearchId: 0)),
-              ).then((_) {
+              ).then((_navRes) { if (_navRes != null) { objfun.SelectAddressList = _navRes; }
                 if (objfun.SelectAddressList.isNotEmpty) {
                   txtWarehouseAddress.text = objfun.SelectAddressList;
                   objfun.SelectAddressList = '';
@@ -914,7 +914,7 @@ class _SalesOrderViewState extends State<_SalesOrderView>
                 MaterialPageRoute(
                     builder: (_) =>
                     const AgentCompany(Searchby: 1, SearchId: 0)),
-              ).then((_) {
+              ).then((_navRes) { if (_navRes != null) { objfun.SelectAgentCompanyList = _navRes; }
                 if (objfun.SelectAgentCompanyList.Id != 0) {
                   bloc.add(SalesOrderLAgentCompanySelected(
                       id: objfun.SelectAgentCompanyList.Id,
@@ -935,7 +935,7 @@ class _SalesOrderViewState extends State<_SalesOrderView>
                 MaterialPageRoute(
                     builder: (_) =>
                     const Agent(Searchby: 1, SearchId: 0, AgentCompanyId: 0)),
-              ).then((_) {
+              ).then((_navRes) { if (_navRes != null) { objfun.SelectAgentAllList = _navRes; }
                 if (objfun.SelectAgentAllList.Id != 0) {
                   bloc.add(SalesOrderLAgentSelected(
                       id: objfun.SelectAgentAllList.Id,
@@ -1043,7 +1043,7 @@ class _SalesOrderViewState extends State<_SalesOrderView>
                 MaterialPageRoute(
                     builder: (_) =>
                     const AgentCompany(Searchby: 1, SearchId: 0)),
-              ).then((_) {
+              ).then((_navRes) { if (_navRes != null) { objfun.SelectAgentCompanyList = _navRes; }
                 if (objfun.SelectAgentCompanyList.Id != 0) {
                   bloc.add(SalesOrderOAgentCompanySelected(
                       id: objfun.SelectAgentCompanyList.Id,
@@ -1064,7 +1064,7 @@ class _SalesOrderViewState extends State<_SalesOrderView>
                 MaterialPageRoute(
                     builder: (_) =>
                     const Agent(Searchby: 1, SearchId: 0, AgentCompanyId: 0)),
-              ).then((_) {
+              ).then((_navRes) { if (_navRes != null) { objfun.SelectAgentAllList = _navRes; }
                 if (objfun.SelectAgentAllList.Id != 0) {
                   bloc.add(SalesOrderOAgentSelected(
                       id: objfun.SelectAgentAllList.Id,
@@ -1705,7 +1705,7 @@ class _SalesOrderViewState extends State<_SalesOrderView>
       context,
       MaterialPageRoute(
           builder: (_) => const Employee(Searchby: 1, SearchId: 0)),
-    ).then((_) {
+    ).then((_navRes) { if (_navRes != null) { objfun.SelectEmployeeList = _navRes; }
       final emp = objfun.SelectEmployeeList;
       if (emp.Id != 0) {
         if (type == 'seal') {

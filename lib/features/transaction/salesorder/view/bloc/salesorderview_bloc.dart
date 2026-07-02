@@ -23,12 +23,7 @@ class SalesOrderViewBloc extends Bloc<SalesOrderViewEvent, SalesOrderViewState> 
 
       emit(SalesOrderViewLoading());
       try {
-        await OnlineApi.SelectCustomer(context);
-        await OnlineApi.SelectJobStatus(context);
-        await OnlineApi.SelectEmployee(context, 'Sales', '');
-        await OnlineApi.loadComboS1(context, 0);
-
-        final base = SalesOrderViewLoaded(
+        await OnlineApi.SelectCustomer(context);await OnlineApi.SelectJobStatus(context);await OnlineApi.SelectEmployee(context, 'Sales', '');await OnlineApi.loadComboS1(context, 0);final base = SalesOrderViewLoaded(
           dtpFromDate: today,
           dtpToDate: today,
           checkBoxValueLEmp: !isAdmin,

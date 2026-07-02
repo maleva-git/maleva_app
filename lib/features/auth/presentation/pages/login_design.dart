@@ -310,7 +310,8 @@ class _LoginBodyState extends State<_LoginBody>
                   bottomLeft: Radius.circular(28),
                 ),
               ),
-              child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              child: SingleChildScrollView(
+                child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                 _cardHeader(headingSize: 26, subSize: 14),
                 const SizedBox(height: 6),
                 _headerDivider(),
@@ -348,6 +349,7 @@ class _LoginBodyState extends State<_LoginBody>
                 const SizedBox(height: 20),
                 Center(child: _footer()),
               ]),
+              ),
             ),
           ),
 

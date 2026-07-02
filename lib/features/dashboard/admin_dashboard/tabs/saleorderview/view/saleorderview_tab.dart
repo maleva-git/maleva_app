@@ -917,7 +917,7 @@ class _FilterSheet extends StatelessWidget {
                     MaterialPageRoute(
                         builder: (_) =>
                         const Customer(Searchby: 1, SearchId: 0)),
-                  ).then((_) {
+                  ).then((_navRes) { if (_navRes != null) { objfun.SelectCustomerList = _navRes; }
                     txtCustomer.text =
                         objfun.SelectCustomerList.AccountName;
                     ctx.read<SaleOrderBloc>().add(SaleOrderCustomerChanged(
@@ -946,7 +946,7 @@ class _FilterSheet extends StatelessWidget {
                     MaterialPageRoute(
                         builder: (_) =>
                         const Employee(Searchby: 1, SearchId: 0)),
-                  ).then((_) {
+                  ).then((_navRes) { if (_navRes != null) { objfun.SelectEmployeeList = _navRes; }
                     txtEmployee.text =
                         objfun.SelectEmployeeList.AccountName;
                     ctx.read<SaleOrderBloc>().add(SaleOrderEmployeeChanged(
@@ -974,7 +974,7 @@ class _FilterSheet extends StatelessWidget {
                     MaterialPageRoute(
                         builder: (_) =>
                         const JobStatus(Searchby: 1, SearchId: 0)),
-                  ).then((_) {
+                  ).then((_navRes) { if (_navRes != null) { objfun.SelectJobStatusList = _navRes; }
                     txtStatus.text = objfun.SelectJobStatusList.Name;
                     ctx.read<SaleOrderBloc>().add(SaleOrderStatusChanged(
                       objfun.SelectJobStatusList.Id,

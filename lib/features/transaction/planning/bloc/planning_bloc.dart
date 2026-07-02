@@ -23,9 +23,7 @@ class PlanningBloc extends Bloc<PlanningEvent, PlanningState> {
         emit(PlanningLoading());
 
         try {
-          await OnlineApi.SelectEmployee(context, 'Sales', '');
-
-          Map<String, dynamic> master = {
+          await OnlineApi.SelectEmployee(context, 'Sales', '');Map<String, dynamic> master = {
             "Comid": objfun.storagenew.getInt('Comid') ?? 0,
             "Fromdate": event.fromDate,
             "Todate": event.toDate,
@@ -125,8 +123,7 @@ class PlanningBloc extends Bloc<PlanningEvent, PlanningState> {
       try {
         final resultData = await objfun.apiAllinoneSelectArray("${objfun.apiEditPassword}${event.password}&type=EditPassword&Comid=${objfun.Comid}", null, null, context);
         if (resultData != null && resultData.isNotEmpty && resultData["IsSuccess"] == true) {
-          await OnlineApi.EditPlanning(context, event.id, event.planningNo);
-          emit(PlanningNavigateToEdit(id: event.id, planningNo: event.planningNo));
+          await OnlineApi.EditPlanning(context, event.id, event.planningNo);emit(PlanningNavigateToEdit(id: event.id, planningNo: event.planningNo));
           emit(s); // Return to default loaded state after navigation
         } else {
           objfun.ConfirmationOK("Invalid Password !!!", context);

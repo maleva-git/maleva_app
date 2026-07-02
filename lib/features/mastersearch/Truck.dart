@@ -176,11 +176,8 @@ class _Truckstate extends State<Truck> {
                                       onTap: () {
                                         setState(() {
                                           if (widget.Searchby == 1) {
-                                            objfun.SelectTruckList = truck;
-                                            objfun.SelectedName = truck.AccountName.toString();
-                                            objfun.SelectedId = truck.Id;
                                             if (objfun.SelectedId != 0) {
-                                              Navigator.of(context, rootNavigator: true).pop(context);
+                                              Navigator.of(context, rootNavigator: true).pop(truck);
                                             }
                                           }
                                         });

@@ -11,8 +11,7 @@ class SummonRepository {
   /// Loads the global truck list
   Future<void> fetchTrucks() async {
     // We pass null for context so it safely runs in the background
-    await OnlineApi.SelectTruckList(null, null);
-  }
+    await OnlineApi.SelectTruckList(null, null);}
 
   /// Fetches Summon records for the View page
   Future<dynamic> fetchSummonRecords({

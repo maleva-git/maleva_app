@@ -69,8 +69,7 @@ class _CargoStatusstate extends State<CargoStatus> {
 
   void _onItemTapped(String item) {
     if (widget.Searchby == 1) {
-      objfun.SelectedCargoName = item;
-      Navigator.of(context, rootNavigator: true).pop(context);
+      Navigator.of(context, rootNavigator: true).pop(item);
     }
   }
 

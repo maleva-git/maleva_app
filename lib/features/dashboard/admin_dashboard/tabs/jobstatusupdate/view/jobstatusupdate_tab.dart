@@ -390,8 +390,7 @@ class _JobStatusUpdateViewState extends State<_JobStatusUpdateView> {
                 return;
               }
               await OnlineApi.EditSalesOrder(
-                   state.saleOrderId, int.tryParse(state.jobNo) ?? 0);
-              Navigator.of(context).push(MaterialPageRoute(
+                   state.saleOrderId, int.tryParse(state.jobNo) ?? 0); if (!context.mounted) return;Navigator.of(context).push(MaterialPageRoute(
                   builder: (_) => SaleOrderDetails(
                     saleDetails: null,
                     saleMaster: objfun.SaleEditMasterList,
@@ -413,16 +412,14 @@ class _JobStatusUpdateViewState extends State<_JobStatusUpdateView> {
                 await OnlineApi.EditSalesOrder(
 
                     state.saleOrderId,
-                    int.tryParse(state.jobNo) ?? 0);
-                await OnlineApi.SelectAllJobStatus(
+                    int.tryParse(state.jobNo) ?? 0); if (!context.mounted) return;await OnlineApi.SelectAllJobStatus(
                     context,
-                    objfun.SaleEditMasterList[0]['JobMasterRefId'] as int);
-                Navigator.push(
+                    objfun.SaleEditMasterList[0]['JobMasterRefId'] as int); if (!context.mounted) return;Navigator.push(
                   context,
                   MaterialPageRoute(
                       builder: (_) => const JobAllStatus(
                           Searchby: 1, SearchId: 0, JobTypeId: 0)),
-                ).then((_) {
+                ).then((_navRes) { if (_navRes != null) { objfun.SelectAllStatusList = _navRes; }
                   final selected = objfun.SelectAllStatusList;
                   if (selected.StatusName.isNotEmpty) {
                     context.read<JobStatusUpdateBloc>().add(
