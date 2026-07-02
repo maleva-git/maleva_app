@@ -175,7 +175,7 @@ class TransportMobileDashboard extends StatelessWidget {
           const ReviewEntryPage(),
           PDOViewPage(
             fromDate: DateFormat('yyyy-MM-dd')
-                .format(DateTime.now().subtract(const Duration(days: 30))),
+                .format(DateTime.now().subtract(const Duration(days: 7))),
             toDate: DateFormat('yyyy-MM-dd').format(DateTime.now()),
           ),
 

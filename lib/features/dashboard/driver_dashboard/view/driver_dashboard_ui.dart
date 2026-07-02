@@ -17,6 +17,7 @@ import '../../admin_dashboard/tabs/pdo/view/pdo_tab.dart';
 import '../../admin_dashboard/tabs/saleorderview/view/saleorderview_tab.dart';
 import '../../admin_dashboard/tabs/summonentry/view/summonentry_tab.dart';
 import '../../admin_dashboard/tabs/transport/view/transportview_tab.dart';
+import '../../admin_dashboard/tabs/driverleave/view/driver_leave_request_tab.dart';
 import '../bloc/driver_bloc.dart';
 import '../bloc/driver_state.dart';
 
@@ -105,7 +106,7 @@ class DriverDashboardView extends StatelessWidget {
           _tab('TruckLicense',   isTablet),
           _tab('Salary',   isTablet),
           _tab('PDO',       isTablet),
-
+          _tab('Leave', isTablet),
         ],
       ),
     );
@@ -146,10 +147,10 @@ class DriverDashboardView extends StatelessWidget {
           const DriverSalaryWidget(),
           PDOViewPage(
             fromDate: DateFormat('yyyy-MM-dd')
-                .format(DateTime.now().subtract(const Duration(days: 30))),
+                .format(DateTime.now().subtract(const Duration(days: 7))),
             toDate: DateFormat('yyyy-MM-dd').format(DateTime.now()),
           ),
-
+          const DriverLeaveRequestTab(),
         ],
       ),
     );

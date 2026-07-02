@@ -152,11 +152,11 @@ class _AdminDashboardState extends State<OperationAdminDashboard> with SingleTic
             BlocProvider(
               create: (_) => PDOBloc(
                 repository: sl<PDORepository>(), // ✅ Repository injected here!
-                fromDate: DateFormat('yyyy-MM-dd').format(DateTime.now().subtract(const Duration(days: 30))),
+                fromDate: DateFormat('yyyy-MM-dd').format(DateTime.now().subtract(const Duration(days: 7))),
                 toDate: DateFormat('yyyy-MM-dd').format(DateTime.now()),
               ),
               child: PDOViewPage(
-                fromDate: DateFormat('yyyy-MM-dd').format(DateTime.now().subtract(const Duration(days: 30))),
+                fromDate: DateFormat('yyyy-MM-dd').format(DateTime.now().subtract(const Duration(days: 7))),
                 toDate: DateFormat('yyyy-MM-dd').format(DateTime.now()),
               ),
             ),

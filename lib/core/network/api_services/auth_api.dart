@@ -96,6 +96,7 @@ class AuthApi {
     await AppPreferences.setMComid(mComid);
     await AppPreferences.setOldUsername(idNew.toString());
 
+    objfun.DriverLogin = driverId;
     objfun.Comid = comid;
     objfun.DriverTruckRefId = data['TruckRefId'] ?? 0;
     objfun.DriverTruckName  = data['TruckName'] ?? '';

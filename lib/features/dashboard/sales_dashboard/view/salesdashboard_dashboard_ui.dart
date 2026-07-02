@@ -17,6 +17,7 @@ import '../../admin_dashboard/tabs/paymentview/view/paymentview_tab.dart';
 import '../../admin_dashboard/tabs/saleorderview/view/saleorderview_tab.dart';
 import '../../admin_dashboard/tabs/transport/view/transportview_tab.dart';
 import '../../admin_dashboard/tabs/vesselreport/view/vesselreportview_tab.dart';
+import '../../admin_dashboard/tabs/driverleave/view/admin_leave_approval_tab.dart';
 import '../bloc/sales_bloc.dart';
 import '../bloc/sales_state.dart';
 class SalesDashboardView extends StatelessWidget {
@@ -121,6 +122,7 @@ class SalesDashboardView extends StatelessWidget {
           _tab('ENQUIRY', isTablet),
           _tab('FUEL VIEW', isTablet),
           _tab('PaymentView', isTablet),
+          _tab('Leave', isTablet),
         ],
       ),
     );
@@ -159,7 +161,7 @@ Tab _tab(String text, bool isTablet) => Tab(
             const EnquiryScreen(),
             const FuelDiffPage(),
             const PaymentPendingPage(),
-
+            const AdminLeaveApprovalTab(),
           ],
         ),
     );

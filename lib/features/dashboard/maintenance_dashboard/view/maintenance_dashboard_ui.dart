@@ -150,7 +150,9 @@ class MaintenanceMobileDashboard extends StatelessWidget {
           fontWeight: FontWeight.w500,
           fontSize: isTablet ? 14 : 13,
         ),
-        tabs: [
+        tabs: showTruckMaint
+          ? [ _tab('Truck Maint', isTablet) ]
+          : [
           _tab('Maintenance',             isTablet),   // 1
           _tab('Today Pickup',             isTablet),   // 1
           _tab('Vessel',       isTablet),    //2
@@ -161,7 +163,6 @@ class MaintenanceMobileDashboard extends StatelessWidget {
           _tab('EngineHours',     isTablet),   // 7
           _tab('Fuel',            isTablet),   //8
           _tab('SparePartsEntry', isTablet),   //9
-          if (showTruckMaint) _tab('Truck Maint', isTablet),
         ],
       ),
     );
@@ -201,8 +202,9 @@ class MaintenanceMobileDashboard extends StatelessWidget {
       },
       child: TabBarView(
         controller: tabController,
-        children: [
-
+        children: showTruckMaint
+          ? [ const Maintenance(showAppBar: false) ]
+          : [
           const MaintenanceDashboardWidget(),  //1
           const VesselReportPage(),  //1
           const TransportReportPage(), //2
@@ -213,7 +215,6 @@ class MaintenanceMobileDashboard extends StatelessWidget {
           const EngineHoursPage(),  //7
           const FuelDiffPage(),   //8
           const SparePartsEntryPage(),  //9
-          if (showTruckMaint) const Maintenance(showAppBar: false),
         ],
       ),
     );

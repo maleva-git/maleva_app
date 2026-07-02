@@ -18,6 +18,7 @@ import '../../admin_dashboard/tabs/googlereview/view/googlereview_tab.dart';
 import '../../admin_dashboard/tabs/inventoryreport/view/inventoryview_tab.dart';
 import '../../admin_dashboard/tabs/invoice/view/invoice_tab.dart';
 import '../../admin_dashboard/tabs/saleorderview/view/saleorderview_tab.dart';
+import '../../admin_dashboard/tabs/driverleave/view/admin_leave_approval_tab.dart';
 import '../../admin_dashboard/tabs/salesorder/view/salesorderview_tab.dart';
 import '../../admin_dashboard/tabs/spotsaleorder/view/spotsaleorder_add.dart';
 import '../../admin_dashboard/tabs/subadminsale/view/sales_report_view.dart';
@@ -139,6 +140,7 @@ class MobileDashboard extends StatelessWidget {
           _tab('EmployeeView',    isTablet),
           _tab('SpotsSaleOrder',  isTablet),
           _tab('InventoryReport', isTablet),
+          _tab('LeaveApproval',   isTablet),
         ],
       ),
     );
@@ -188,6 +190,7 @@ class MobileDashboard extends StatelessWidget {
           const EmployeeViewPage(),
           const SpotSaleEntryPage(),
           const InventoryPage(),
+          const AdminLeaveApprovalTab(),
 
 
         ],

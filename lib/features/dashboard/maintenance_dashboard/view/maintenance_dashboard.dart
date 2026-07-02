@@ -101,7 +101,7 @@ class _AdminDashboardState extends State<MaintenanceDashboard> with SingleTicker
   void initState() {
     super.initState();
     final bool showTruckMaint = AppPreferences.getRoleId() == 1300 && AppPreferences.getPermissionId() == 1;
-    final int tabCount = 10 + (showTruckMaint ? 1 : 0);
+    final int tabCount = showTruckMaint ? 1 : 10;
     _tabController = TabController(length: tabCount, vsync: this);
     _tabController.addListener(_onTabChanged);
 
@@ -252,11 +252,11 @@ class _AdminDashboardState extends State<MaintenanceDashboard> with SingleTicker
             BlocProvider(
               create: (_) => PDOBloc(
                 repository: sl<PDORepository>(),
-                fromDate: DateFormat('yyyy-MM-dd').format(DateTime.now().subtract(const Duration(days: 30))),
+                fromDate: DateFormat('yyyy-MM-dd').format(DateTime.now().subtract(const Duration(days: 7))),
                 toDate: DateFormat('yyyy-MM-dd').format(DateTime.now()),
               ),
               child: PDOViewPage(
-                fromDate: DateFormat('yyyy-MM-dd').format(DateTime.now().subtract(const Duration(days: 30))),
+                fromDate: DateFormat('yyyy-MM-dd').format(DateTime.now().subtract(const Duration(days: 7))),
                 toDate: DateFormat('yyyy-MM-dd').format(DateTime.now()),
               ),
             ),
