@@ -197,7 +197,7 @@ class MobileDashboard extends StatelessWidget {
           const InventoryPage(),
           PDOViewPage(
             fromDate: DateFormat('yyyy-MM-dd')
-                .format(DateTime.now().subtract(const Duration(days: 30))),
+                .format(DateTime.now().subtract(const Duration(days: 7))),
             toDate: DateFormat('yyyy-MM-dd').format(DateTime.now()),
           ),
           const RTIDetailsPage(),

@@ -38,6 +38,7 @@ Future<bool> Login(String Username, String Password, String OldUsername,int Driv
               objfun.storagenew.setString('Username', Username);
               objfun.storagenew.setString('Password', Password);
               objfun.storagenew.setInt('DriverId', DriverId);
+              objfun.DriverLogin = DriverId;
 
               objfun.storagenew.setString(
                   'RulesType', value.data1[0]["RulesType"] ?? '');

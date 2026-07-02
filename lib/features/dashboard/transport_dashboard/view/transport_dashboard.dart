@@ -89,11 +89,11 @@ class _TransportDashboardState extends State<TransportDashboard> with SingleTick
             BlocProvider(
               create: (_) => PDOBloc(
                 repository: sl<PDORepository>(),
-                fromDate: DateFormat('yyyy-MM-dd').format(DateTime.now().subtract(const Duration(days: 30))),
+                fromDate: DateFormat('yyyy-MM-dd').format(DateTime.now().subtract(const Duration(days: 7))),
                 toDate: DateFormat('yyyy-MM-dd').format(DateTime.now()),
               ),
               child: PDOViewPage(
-                fromDate: DateFormat('yyyy-MM-dd').format(DateTime.now().subtract(const Duration(days: 30))),
+                fromDate: DateFormat('yyyy-MM-dd').format(DateTime.now().subtract(const Duration(days: 7))),
                 toDate: DateFormat('yyyy-MM-dd').format(DateTime.now()),
               ),
             ),
