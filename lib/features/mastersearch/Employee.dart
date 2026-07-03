@@ -62,16 +62,12 @@ class _Employeestate extends State<Employee> {
 
   void _onItemTapped(EmployeeModel selectedEmployee) {
     if (widget.Searchby == 1) {
-      objfun.SelectEmployeeList = selectedEmployee;
-      objfun.SelectedName = selectedEmployee.AccountName.toString();
-      objfun.SelectedId = selectedEmployee.Id;
       if (objfun.SelectedId != 0) {
-        Navigator.of(context, rootNavigator: true).pop(context);
+        Navigator.of(context, rootNavigator: true).pop(selectedEmployee);
       }
     }
   }
 
-  // ─── Build ────────────────────────────────────────────────────────────────
 
   @override
   Widget build(BuildContext context) {

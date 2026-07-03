@@ -182,12 +182,13 @@ class _AddEnquiryViewState extends State<_AddEnquiryView> {
                         hasValue: state.customerName.isNotEmpty,
                         onTapSuffix: () async {
                           if (state.customerName.isEmpty) {
-                            await Navigator.push(context, MaterialPageRoute(builder: (_) => const Customer(Searchby: 1, SearchId: 0)));
+                            final __navResult1 = await Navigator.push(context, MaterialPageRoute(builder: (_) => const Customer(Searchby: 1, SearchId: 0))); if (__navResult1 != null) { objfun.SelectCustomerList = __navResult1; }
+if (__navResult1 != null) { objfun.SelectCustomerList = __navResult1; }
+
                             final cust = objfun.SelectCustomerList;
                             bloc.add(CustomerSelectedEvent(cust.AccountName, cust.Id));
                             objfun.SelectCustomerList = CustomerModel.Empty();
-                            await OnlineApi.loadCustomerCurrency(context, cust.Id);
-                          } else {
+                            await OnlineApi.loadCustomerCurrency(context, cust.Id); if (!context.mounted) return;} else {
                             bloc.add(CustomerClearedEvent());
                           }
                         },
@@ -201,10 +202,11 @@ class _AddEnquiryViewState extends State<_AddEnquiryView> {
                         hasValue: state.jobTypeName.isNotEmpty,
                         onTapSuffix: () async {
                           if (state.jobTypeName.isEmpty) {
-                            await Navigator.push(context, MaterialPageRoute(builder: (_) => const JobType(Searchby: 1, SearchId: 0)));
+                            final __navResult2 = await Navigator.push(context, MaterialPageRoute(builder: (_) => const JobType(Searchby: 1, SearchId: 0))); if (__navResult2 != null) { objfun.SelectJobTypeList = __navResult2; }
+if (__navResult2 != null) { objfun.SelectJobTypeList = __navResult2; }
+
                             final jt = objfun.SelectJobTypeList;
-                            await OnlineApi.SelectAllJobStatus(context, jt.Id);
-                            bloc.add(JobTypeSelectedEvent(jt.Name, jt.Id));
+                            await OnlineApi.SelectAllJobStatus(context, jt.Id); if (!context.mounted) return;bloc.add(JobTypeSelectedEvent(jt.Name, jt.Id));
                             objfun.SelectJobTypeList = JobTypeModel.Empty();
                           } else {
                             bloc.add(JobTypeClearedEvent());
@@ -302,7 +304,9 @@ class _AddEnquiryViewState extends State<_AddEnquiryView> {
                         hasValue: state.lPort.isNotEmpty,
                         onTapSuffix: () async {
                           if (state.lPort.isEmpty) {
-                            await Navigator.push(context, MaterialPageRoute(builder: (_) => const Port(Searchby: 1, SearchId: 0)));
+                            final __navResult3 = await Navigator.push(context, MaterialPageRoute(builder: (_) => const Port(Searchby: 1, SearchId: 0)));
+if (__navResult3 != null) { objfun.SelectedPortName = __navResult3; }
+
                             bloc.add(LPortSelectedEvent(objfun.SelectedPortName));
                             objfun.SelectedPortName = '';
                           } else {
@@ -350,7 +354,9 @@ class _AddEnquiryViewState extends State<_AddEnquiryView> {
                         hasValue: state.oPort.isNotEmpty,
                         onTapSuffix: () async {
                           if (state.oPort.isEmpty) {
-                            await Navigator.push(context, MaterialPageRoute(builder: (_) => const Port(Searchby: 1, SearchId: 0)));
+                            final __navResult4 = await Navigator.push(context, MaterialPageRoute(builder: (_) => const Port(Searchby: 1, SearchId: 0)));
+if (__navResult4 != null) { objfun.SelectedPortName = __navResult4; }
+
                             bloc.add(OPortSelectedEvent(objfun.SelectedPortName));
                             objfun.SelectedPortName = '';
                           } else {

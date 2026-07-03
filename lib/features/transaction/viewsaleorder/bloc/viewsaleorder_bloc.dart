@@ -30,8 +30,7 @@ class GetJobNoBloc extends Bloc<GetJobNoEvent, GetJobNoState> {
     emit(_defaultLoaded());
     try {
       // Load job list for default BillType = 0 in background
-      await OnlineApi.GetJobNoForwarding(null, 0);
-    } catch (e) {
+      await OnlineApi.GetJobNoForwarding(null, 0);} catch (e) {
       // Background load failed, ignore
     }
   }
@@ -44,8 +43,7 @@ class GetJobNoBloc extends Bloc<GetJobNoEvent, GetJobNoState> {
 
     // Re-fetch job list for new bill type
     try {
-      await OnlineApi.GetJobNoForwarding(null, int.parse(event.billType));
-    } catch (_) {}
+      await OnlineApi.GetJobNoForwarding(null, int.parse(event.billType));} catch (_) {}
 
     emit(s.copyWith(
       billType:    event.billType,

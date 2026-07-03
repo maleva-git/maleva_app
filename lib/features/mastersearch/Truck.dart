@@ -174,16 +174,10 @@ class _Truckstate extends State<Truck> {
                                     child: InkWell(
                                       borderRadius: BorderRadius.circular(12),
                                       onTap: () {
-                                        setState(() {
-                                          if (widget.Searchby == 1) {
-                                            objfun.SelectTruckList = truck;
-                                            objfun.SelectedName = truck.AccountName.toString();
-                                            objfun.SelectedId = truck.Id;
-                                            if (objfun.SelectedId != 0) {
-                                              Navigator.of(context, rootNavigator: true).pop(context);
-                                            }
-                                          }
-                                        });
+                                        if (widget.Searchby == 1) {
+                                          objfun.SelectTruckList = truck;
+                                          Navigator.of(context, rootNavigator: true).pop(truck);
+                                        }
                                       },
                                       child: Padding(
                                         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),

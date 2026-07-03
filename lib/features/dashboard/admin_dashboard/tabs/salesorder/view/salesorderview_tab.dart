@@ -141,14 +141,13 @@ class _SalesOrderTabState extends State<SalesOrderTab> {
 
   Widget _buildTabletLayout(BuildContext context, InvoiceLoaded state,
       Map<String, dynamic> data, double screenW, int tabIndex) {
-    return Padding(
-      padding: const EdgeInsets.all(20),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          _HeroHeaderCard(state: state, data: data),
-          const SizedBox(height: 16),
-          Expanded(
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        _HeroHeaderCard(state: state, data: data),
+        Expanded(
+          child: Padding(
+            padding: const EdgeInsets.all(20),
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -191,8 +190,8 @@ class _SalesOrderTabState extends State<SalesOrderTab> {
               ],
             ),
           ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 

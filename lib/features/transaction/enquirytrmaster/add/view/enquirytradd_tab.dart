@@ -195,8 +195,7 @@ class _AddEnquiryBody extends StatelessWidget {
               if (sel.Id != 0) {
                 _emit(context, EnquiryAddCustomerChanged(
                     custId: sel.Id, custName: sel.AccountName));
-                await OnlineApi.loadCustomerCurrency(context, sel.Id);
-                objfun.SelectCustomerList = CustomerModel.Empty();
+                await OnlineApi.loadCustomerCurrency(context, sel.Id); if (!context.mounted) return;objfun.SelectCustomerList = CustomerModel.Empty();
               }
             });
           },
@@ -219,8 +218,7 @@ class _AddEnquiryBody extends StatelessWidget {
             ).then((_) async {
               final sel = objfun.SelectJobTypeList;
               if (sel.Id != 0) {
-                await OnlineApi.SelectAllJobStatus(context, sel.Id);
-                _emit(context, EnquiryAddJobTypeChanged(
+                await OnlineApi.SelectAllJobStatus(context, sel.Id); if (!context.mounted) return;_emit(context, EnquiryAddJobTypeChanged(
                     jobTypeId: sel.Id, jobTypeName: sel.Name));
                 objfun.SelectJobTypeList = JobTypeModel.Empty();
               }
@@ -265,7 +263,7 @@ class _AddEnquiryBody extends StatelessWidget {
               MaterialPageRoute(
                   builder: (_) =>
                   const Location(Searchby: 1, SearchId: 0)),
-            ).then((_) {
+            ).then((_navRes) { if (_navRes != null) { objfun.SelectLocationList = _navRes; }
               final sel = objfun.SelectLocationList;
               if (sel.Id != 0) {
                 _emit(context, EnquiryAddOriginChanged(
@@ -290,7 +288,7 @@ class _AddEnquiryBody extends StatelessWidget {
               MaterialPageRoute(
                   builder: (_) =>
                   const Location(Searchby: 1, SearchId: 0)),
-            ).then((_) {
+            ).then((_navRes) { if (_navRes != null) { objfun.SelectLocationList = _navRes; }
               final sel = objfun.SelectLocationList;
               if (sel.Id != 0) {
                 _emit(context, EnquiryAddDestinationChanged(

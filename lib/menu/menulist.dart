@@ -686,7 +686,9 @@ class _MenuTileState extends State<_MenuTile>
     }
     Navigator.pop(widget.drawerContext);
     Future.delayed(const Duration(milliseconds: 80), () {
+      if (!mounted) return;
       final ctx = widget.drawerContext;
+      if (!ctx.mounted) return;
       switch (widget.entry.FormText) {
         case "Sales Order":
           Navigator.push(ctx, _r(const SaleOrderView()));       break;

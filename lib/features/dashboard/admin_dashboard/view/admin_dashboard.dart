@@ -101,7 +101,7 @@ class _AdminDashboardState extends State<NewAdminDashboard> with SingleTickerPro
   void initState() {
     super.initState();
     _adminTabBloc = AdminTabBloc();
-    _tabController = TabController(length: 25, vsync: this);
+    _tabController = TabController(length: 26, vsync: this);
     _tabController.addListener(_onTabChanged);
   }
 
@@ -155,7 +155,7 @@ class _AdminDashboardState extends State<NewAdminDashboard> with SingleTickerPro
         BlocProvider<PDOBloc>(
           create: (_) => PDOBloc(
             repository: sl<PDORepository>(),
-            fromDate: DateFormat('yyyy-MM-dd').format(DateTime.now().subtract(const Duration(days: 30))),
+            fromDate: DateFormat('yyyy-MM-dd').format(DateTime.now().subtract(const Duration(days: 7))),
             toDate: DateFormat('yyyy-MM-dd').format(DateTime.now()),
           ),
         ),

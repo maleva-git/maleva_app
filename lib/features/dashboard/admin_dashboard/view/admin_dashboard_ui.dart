@@ -40,6 +40,7 @@ import '../tabs/summonentry/view/summonentry_tab.dart';
 import '../tabs/transport/view/transportview_tab.dart';
 import '../tabs/truck/view/truckview_tab.dart';
 import '../tabs/vesselreport/view/vesselreportview_tab.dart';
+import '../tabs/driverleave/view/admin_leave_approval_tab.dart';
 import 'package:maleva/core/widgets/custom_app_bar.dart';
 
 class MobileDashboard extends StatelessWidget {
@@ -167,6 +168,7 @@ class MobileDashboard extends StatelessWidget {
           _tab('InventoryReport', isTablet),
           _tab('PDO',             isTablet),
           _tab('RTI',             isTablet),
+          _tab('LeaveApproval',   isTablet),
 
         ],
       ),
@@ -231,11 +233,11 @@ class MobileDashboard extends StatelessWidget {
           const InventoryPage(),
           PDOViewPage(
             fromDate: DateFormat('yyyy-MM-dd')
-                .format(DateTime.now().subtract(const Duration(days: 30))),
+                .format(DateTime.now().subtract(const Duration(days: 7))),
             toDate: DateFormat('yyyy-MM-dd').format(DateTime.now()),
           ),
           const RTIDetailsPage(),
-
+          const AdminLeaveApprovalTab(),
         ],
       ),
     );

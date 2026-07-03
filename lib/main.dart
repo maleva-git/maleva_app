@@ -11,11 +11,11 @@ import 'package:maleva/core/firebase/firebase_options.dart';
 import 'package:maleva/splash/splashscreen.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
+import 'package:maleva/features/troubleshoot/data/applog_api.dart';
 
 import 'core/di/injection.dart';
 import 'core/utils/app_preferences.dart';
 import 'package:maleva/core/logging/app_navigator_observer.dart';
-
 
 class MyHttpOverrides extends HttpOverrides {
   @override
@@ -25,79 +25,83 @@ class MyHttpOverrides extends HttpOverrides {
           (X509Certificate cert, String host, int port) => true;
   }
 }
+
 Future<void> backgroundHandler(RemoteMessage message) async {
   objfun.print_(message.data.toString());
   objfun.print_(message.notification!.title);
 }
+
 Future cleanTemporaryfiles() async {
   try {
     final dir = await getTemporaryDirectory();
 
     dir.deleteSync();
-  }
-  catch (e) {
+  } catch (e) {
     debugPrint(e.toString());
   }
 }
+
 Future<void> main() async {
   HttpOverrides.global = MyHttpOverrides();
   WidgetsBinding widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
   FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
 
   try {
-    await Firebase.initializeApp(
-      options: DefaultFirebaseOptions.currentPlatform,
-    );
-  } on FirebaseException catch (e) {
-    print(e);
-    if (e.code == 'duplicate-app') {
-      Firebase.initializeApp();
-    } else {
-      rethrow; // Re-throw unexpected errors
+    try {
+      await Firebase.initializeApp(
+        options: DefaultFirebaseOptions.currentPlatform,
+      );
+    } on FirebaseException catch (e) {
+      print(e);
+      if (e.code == 'duplicate-app') {
+        Firebase.initializeApp();
+      } else {
+        rethrow; // Re-throw unexpected errors
+      }
     }
-  }
-  await AppPreferences.init();
-  // ── DI setup — ONE call wires everything ──────────────────
-  await setupDependencies();
+    await AppPreferences.init();
+    // ── DI setup — ONE call wires everything ──────────────────
+    await setupDependencies();
 
-  FirebaseMessaging.onBackgroundMessage(backgroundHandler);
-  if (Platform.isIOS) {
-    FirebaseMessaging messaging = FirebaseMessaging.instance;
-    NotificationSettings settings = await messaging.requestPermission(
-      alert: true,
-      announcement: false,
-      badge: true,
-      carPlay: false,
-      criticalAlert: false,
-      provisional: false,
-      sound: true,
-    );
-    objfun.print_('User granted permission: ${settings.authorizationStatus}');
+    FirebaseMessaging.onBackgroundMessage(backgroundHandler);
+    if (Platform.isIOS) {
+      FirebaseMessaging messaging = FirebaseMessaging.instance;
+      NotificationSettings settings = await messaging.requestPermission(
+        alert: true,
+        announcement: false,
+        badge: true,
+        carPlay: false,
+        criticalAlert: false,
+        provisional: false,
+        sound: true,
+      );
+      objfun.print_('User granted permission: ${settings.authorizationStatus}');
+    }
+
+    await SystemChrome.setPreferredOrientations([
+      DeviceOrientation.portraitUp,
+      DeviceOrientation.portraitDown,
+      DeviceOrientation.landscapeLeft,
+      DeviceOrientation.landscapeRight,
+    ]);
+    HttpOverrides.global = MyHttpOverrides();
+    cleanTemporaryfiles();
+  } catch (e, stack) {
+    debugPrint("Error during main initialization: $e\n$stack");
+    try {
+      await AppLogApi.insertAppLog(
+        empRefId: 0,
+        empName: 'Splash Screen Crash',
+        comid: 0,
+        appVersion: 'Unknown (Startup)',
+        screenHistory: 'Main Initialization',
+        errorLog: "$e\n$stack",
+        userNote: 'Automatic Crash Report from Splash Screen',
+      ).timeout(const Duration(seconds: 3));
+    } catch (_) {}
+  } finally {
+    FlutterNativeSplash.remove();
   }
-  else
-  {
-    FirebaseMessaging.instance.setForegroundNotificationPresentationOptions(alert: true, badge: true, sound: true);
-  }
-  await SystemChrome.setPreferredOrientations([
-    DeviceOrientation.portraitUp,
-    DeviceOrientation.portraitDown,
-    DeviceOrientation.landscapeLeft,
-    DeviceOrientation.landscapeRight,
-  ]);
-  HttpOverrides.global = MyHttpOverrides();
-  cleanTemporaryfiles();
-  // // Pass all uncaught "fatal" errors from the framework to Crashlytics
-  // FlutterError.onError = FirebaseCrashlytics.instance.recordFlutterFatalError;
-  //
-  // // Forward Dart (async) errors
-  // PlatformDispatcher.instance.onError = (error, stack) {
-  //   FirebaseCrashlytics.instance.recordError(error, stack, fatal: true);
-  //   return true;
-  // };
-  // DatabaseHelper.instance;
-  // final dbHelper = DatabaseHelper.instance;
-  // await dbHelper.dropDataBase();
-  FlutterNativeSplash.remove();
 
   runApp(
     SafeArea(
@@ -130,7 +134,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final MaterialColor blue900Swatch =
-    MaterialColor(_yellow700Map[400]!.value, _yellow700Map);
+        MaterialColor(_yellow700Map[400]!.value, _yellow700Map);
     return MaterialApp(
       title: 'MALEVA',
       navigatorKey: objfun.navigatorKey,

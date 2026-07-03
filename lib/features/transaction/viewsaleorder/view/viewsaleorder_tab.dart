@@ -50,8 +50,7 @@ class _GetJobNoPageView extends StatelessWidget {
             return;
           }
           await OnlineApi.EditSalesOrder(
-               state.saleOrderId, state.jobNo);
-          Navigator.push(
+               state.saleOrderId, state.jobNo); if (!context.mounted) return;Navigator.push(
             context,
             MaterialPageRoute(
               builder: (_) => SalesOrdersAdd(

@@ -394,8 +394,7 @@ class _CustDashboardViewState extends State<_CustDashboardView>
                       onCardTap: (row) => _showTransportDialog(context, row),
                       onCardLongPress: (row) async {
                         await OnlineApi.EditSalesOrder(
-                             row['Id'] as int, 0);
-                        Navigator.of(context).push(MaterialPageRoute(
+                             row['Id'] as int, 0); if (!context.mounted) return;Navigator.of(context).push(MaterialPageRoute(
                             builder: (_) => SalesOrderAdd(
                               saleDetails: objfun.SaleEditDetailList,
                               saleMaster: objfun.SaleEditMasterList,
@@ -735,7 +734,7 @@ class _VesselTab extends StatelessWidget {
                               MaterialPageRoute(
                                   builder: (_) =>
                                   const Port(Searchby: 1, SearchId: 0)),
-                            ).then((_) {
+                            ).then((_navRes) {
                               portCtrl.text = objfun.SelectedPortName;
                               objfun.SelectedPortName = '';
                             });

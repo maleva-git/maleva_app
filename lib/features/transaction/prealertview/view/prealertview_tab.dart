@@ -163,7 +163,7 @@ class _PreAlertPage extends StatelessWidget {
           const SizedBox(height: 12),
           _PASearchField(
             hint: 'Customer Name', value: local.custName,
-            onSearch: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const Customer(Searchby: 1, SearchId: 0))).then((_) {
+            onSearch: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const Customer(Searchby: 1, SearchId: 0))).then((_navRes) { if (_navRes != null) { objfun.SelectCustomerList = _navRes; }
               if (objfun.SelectCustomerList.Id != 0) {
                 emit(PreAlertCustomerChanged(custId: objfun.SelectCustomerList.Id, custName: objfun.SelectCustomerList.AccountName));
                 objfun.SelectCustomerList = CustomerModel.Empty();
@@ -175,8 +175,7 @@ class _PreAlertPage extends StatelessWidget {
           _PASearchField(
             hint: 'Select Job Type', value: local.jobName, disabled: local.checkLEmp,
             onSearch: () async {
-              await OnlineApi.SelectJobType(context);
-              Navigator.push(context, MaterialPageRoute(builder: (_) => const JobType(Searchby: 1, SearchId: 0))).then((_) {
+              await OnlineApi.SelectJobType(context); if (!context.mounted) return;Navigator.push(context, MaterialPageRoute(builder: (_) => const JobType(Searchby: 1, SearchId: 0))).then((_navRes) { if (_navRes != null) { objfun.SelectJobTypeList = _navRes; }
                 if (objfun.SelectJobTypeList.Id != 0) {
                   emit(PreAlertJobTypeChanged(jobId: objfun.SelectJobTypeList.Id, jobName: objfun.SelectJobTypeList.Name));
                   objfun.SelectJobTypeList = JobTypeModel.Empty();
@@ -188,7 +187,7 @@ class _PreAlertPage extends StatelessWidget {
           const SizedBox(height: 10),
           _PASearchField(
             hint: 'Select Port', value: local.portName,
-            onSearch: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const Port(Searchby: 1, SearchId: 0))).then((_) {
+            onSearch: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const Port(Searchby: 1, SearchId: 0))).then((_navRes) {
               if (objfun.SelectedPortName.isNotEmpty) {
                 emit(PreAlertPortChanged(portId: 0, portName: objfun.SelectedPortName));
                 objfun.SelectJobStatusList = JobStatusModel.Empty();

@@ -35,7 +35,7 @@ class _DriverDashboardState extends State<DriverDashboard> with SingleTickerProv
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 6, vsync: this);
+    _tabController = TabController(length: 7, vsync: this);
     _tabController.addListener(_onTabChanged);
   }
   void _onTabChanged(){
@@ -79,11 +79,11 @@ class _DriverDashboardState extends State<DriverDashboard> with SingleTickerProv
                 BlocProvider(
                   create: (_) => PDOBloc(
                     repository: sl<PDORepository>(), // ✅ Repository injected here!
-                    fromDate: DateFormat('yyyy-MM-dd').format(DateTime.now().subtract(const Duration(days: 30))),
+                    fromDate: DateFormat('yyyy-MM-dd').format(DateTime.now().subtract(const Duration(days: 7))),
                     toDate: DateFormat('yyyy-MM-dd').format(DateTime.now()),
                   ),
                   child: PDOViewPage(
-                    fromDate: DateFormat('yyyy-MM-dd').format(DateTime.now().subtract(const Duration(days: 30))),
+                    fromDate: DateFormat('yyyy-MM-dd').format(DateTime.now().subtract(const Duration(days: 7))),
                     toDate: DateFormat('yyyy-MM-dd').format(DateTime.now()),
                   ),
                 ),
