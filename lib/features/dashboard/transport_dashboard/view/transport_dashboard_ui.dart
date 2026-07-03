@@ -22,6 +22,8 @@ import '../../admin_dashboard/tabs/transportsales/view/transport_sales_tab.dart'
 import '../bloc/transport_bloc.dart';
 import '../bloc/transport_state.dart';
 import 'package:maleva/core/widgets/custom_app_bar.dart';
+import 'package:maleva/features/dashboard/admin_dashboard/tabs/driverleave/view/admin_leave_approval_tab.dart';
+import 'package:maleva/features/dashboard/admin_dashboard/tabs/driverleave/view/employee_leave_request_tab.dart';
 
 
 class TransportMobileDashboard extends StatelessWidget {
@@ -129,6 +131,8 @@ class TransportMobileDashboard extends StatelessWidget {
           _tab('Email',           isTablet),
           _tab('GoogleReview',    isTablet),
           _tab('PDO',             isTablet),
+          _tab('LeaveApproval', isTablet),
+          _tab('EmpLeave', isTablet),
         ],
       ),
     );
@@ -181,6 +185,8 @@ class TransportMobileDashboard extends StatelessWidget {
 
 
 
+          const AdminLeaveApprovalTab(),
+          const EmployeeLeaveRequestTab(),
         ],
       ),
     );

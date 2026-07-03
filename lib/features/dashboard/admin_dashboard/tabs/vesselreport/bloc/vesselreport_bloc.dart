@@ -52,7 +52,7 @@ class VesselBloc extends Bloc<VesselEvent, VesselState> {
         'Fromdate': fromDate,
         'Todate': toDate,
         'Search': currentSearch,
-        'Employeeid': null,
+        'Employeeid': 0,
         'ETAType': 0,
       };
 

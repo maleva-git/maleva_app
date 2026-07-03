@@ -18,6 +18,8 @@ import '../../admin_dashboard/tabs/vesselreport/view/vesselreportview_tab.dart';
 import '../bloc/forwarding_bloc.dart';
 import '../bloc/forwarding_state.dart';
 import 'package:maleva/core/widgets/custom_app_bar.dart';
+import 'package:maleva/features/dashboard/admin_dashboard/tabs/driverleave/view/admin_leave_approval_tab.dart';
+import 'package:maleva/features/dashboard/admin_dashboard/tabs/driverleave/view/employee_leave_request_tab.dart';
 
 
 class ForwardingMobileDashboard extends StatelessWidget {
@@ -125,6 +127,8 @@ class ForwardingMobileDashboard extends StatelessWidget {
           _tab('K-1,2,3',             isTablet),  //2
           _tab('K8',             isTablet),  //3
 
+          _tab('LeaveApproval', isTablet),
+          _tab('EmpLeave', isTablet),
         ],
       ),
     );
@@ -168,6 +172,8 @@ class ForwardingMobileDashboard extends StatelessWidget {
           const UnReleasePage(),  //1
           const UnReleaseSMKPage(),  //1
 
+          const AdminLeaveApprovalTab(),
+          const EmployeeLeaveRequestTab(),
         ],
       ),
     );

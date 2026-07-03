@@ -101,7 +101,7 @@ class _AdminDashboardState extends State<MaintenanceDashboard> with SingleTicker
   void initState() {
     super.initState();
     final bool showTruckMaint = AppPreferences.getRoleId() == 1300 && AppPreferences.getPermissionId() == 1;
-    final int tabCount = showTruckMaint ? 1 : 10;
+    final int tabCount = showTruckMaint ? 1 : 12;
     _tabController = TabController(length: tabCount, vsync: this);
     _tabController.addListener(_onTabChanged);
 

@@ -35,7 +35,7 @@ class TransportBloc extends Bloc<TransportEvent, TransportState> {
         'Fromdate':   fromDate,
         'Todate':     toDate,
         'Search':     '',
-        'Employeeid': null,
+        'Employeeid': 0,
         'ETAType':    0,
       };
 

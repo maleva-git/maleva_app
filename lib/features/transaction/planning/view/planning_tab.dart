@@ -48,6 +48,7 @@ class PlanningView extends StatelessWidget {
       child: const _PlanningScaffold(),
     );
   }
+
 }
 class _PlanningScaffold extends StatelessWidget {
   const _PlanningScaffold();
@@ -402,49 +403,57 @@ class _DetailsSection extends StatelessWidget {
             ]),
           ),
           Padding(
-            padding: const EdgeInsets.fromLTRB(16, 0, 16, 6),
-            child: Row(children: [
-              Expanded(flex: 2, child: Text('Job No', style: _label(10, color: AppTokens.planTextMuted, fw: FontWeight.w700))),
-              Expanded(flex: 2, child: Text('Job Date', style: _label(10, color: AppTokens.planTextMuted, fw: FontWeight.w700))),
-              Expanded(flex: 2, child: Text('Truck', style: _label(10, color: AppTokens.planTextMuted, fw: FontWeight.w700))),
-            ]),
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            child: Table(
+              border: TableBorder.all(color: colour.kBorder, width: 1, borderRadius: BorderRadius.circular(8)),
+              columnWidths: const {
+                0: FlexColumnWidth(2),
+                1: FlexColumnWidth(2),
+                2: FlexColumnWidth(2),
+                3: FlexColumnWidth(2.5),
+              },
+              children: [
+                // Header Row
+                TableRow(
+                  decoration: BoxDecoration(
+                    color: colour.kCobalt.withOpacity(0.05),
+                    borderRadius: const BorderRadius.vertical(top: Radius.circular(8)),
+                  ),
+                  children: [
+                    _buildCell('Job No', isTablet, isHeader: true),
+                    _buildCell('Job Date', isTablet, isHeader: true),
+                    _buildCell('Truck', isTablet, isHeader: true),
+                    _buildCell('Remarks', isTablet, isHeader: true),
+                  ],
+                ),
+                // Data Rows
+                ...details.map((item) {
+                  return TableRow(
+                    children: [
+                      _buildCell('${item["JobNo"]}', isTablet, color: colour.kCobalt, fw: FontWeight.w700),
+                      _buildCell('${item["JobDate"]}', isTablet),
+                      _buildCell('${item["TruckName"]}', isTablet, color: colour.kSuccess, fw: FontWeight.w600),
+                      _buildCell('${item["Remarks"]}', isTablet, color: AppTokens.planTextMuted),
+                    ],
+                  );
+                }).toList(),
+              ],
+            ),
           ),
-          ...details.map((item) => _DetailRow(item: item, isTablet: isTablet)),
-          const SizedBox(height: 8),
+          const SizedBox(height: 12),
         ],
       ),
     );
   }
-}
 
-class _DetailRow extends StatelessWidget {
-  final Map<String, dynamic> item;
-  final bool isTablet;
-  const _DetailRow({required this.item, required this.isTablet});
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      margin: const EdgeInsets.fromLTRB(12, 0, 12, 8),
-      padding: EdgeInsets.all(isTablet ? 14 : 12),
-      decoration: BoxDecoration(color: colour.kSurface, borderRadius: BorderRadius.circular(12), border: Border.all(color: colour.kBorder)),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(children: [
-            Expanded(flex: 2, child: Text('${item["JobNo"]}', style: _body(isTablet ? 12 : 11, color: colour.kCobalt, fw: FontWeight.w700), overflow: TextOverflow.ellipsis)),
-            Expanded(flex: 2, child: Text('${item["JobDate"]}', style: _label(isTablet ? 12 : 11), overflow: TextOverflow.ellipsis)),
-            Expanded(flex: 2, child: Text('${item["TruckName"]}', style: _body(isTablet ? 12 : 11, color: colour.kSuccess, fw: FontWeight.w600), overflow: TextOverflow.ellipsis)),
-          ]),
-          if ('${item["Remarks"]}'.isNotEmpty) ...[
-            const SizedBox(height: 6),
-            Row(children: [
-              const Icon(Icons.notes_rounded, size: 11, color: AppTokens.planTextMuted),
-              const SizedBox(width: 4),
-              Expanded(child: Text('${item["Remarks"]}', style: _label(isTablet ? 11 : 10, color: AppTokens.planTextMuted), overflow: TextOverflow.ellipsis)),
-            ]),
-          ],
-        ],
+  Widget _buildCell(String text, bool isTablet, {bool isHeader = false, Color? color, FontWeight? fw}) {
+    return Padding(
+      padding: EdgeInsets.all(isTablet ? 12.0 : 8.0),
+      child: Text(
+        text,
+        style: isHeader
+            ? _label(10, color: AppTokens.planTextMuted, fw: FontWeight.w700)
+            : _body(isTablet ? 11 : 10, color: color ?? colour.kText, fw: fw ?? FontWeight.normal),
       ),
     );
   }

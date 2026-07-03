@@ -27,26 +27,14 @@ class _DriverLeaveRequestTabState extends State<DriverLeaveRequestTab> {
   List<LeaveTypeModel> _leaveTypes = [];
   int? _selectedLeaveTypeId;
   int? _selectedDriverId;
-  bool get _isDriverLogin => objfun.DriverLogin == 1;
   
   @override
   void initState() {
     super.initState();
-    if (_isDriverLogin) {
-      _selectedDriverId = objfun.EmpRefId;
-    }
+    // Always use the logged-in user's ID automatically.
+    _selectedDriverId = objfun.EmpRefId;
     _fetchRequests();
     _fetchLeaveTypes();
-    if (!_isDriverLogin) {
-      _fetchDrivers();
-    }
-  }
-
-  Future<void> _fetchDrivers() async {
-    if (objfun.GetDriverList.isEmpty) {
-      await SelectDriverList(context, "");
-    }
-    if (mounted) setState(() {});
   }
 
   Future<void> _fetchLeaveTypes() async {
@@ -57,11 +45,8 @@ class _DriverLeaveRequestTabState extends State<DriverLeaveRequestTab> {
   }
   
   Future<void> _fetchRequests() async {
-    if (_selectedDriverId == null) {
+    if (_selectedDriverId == null || _selectedDriverId == 0) {
       if (mounted) {
-        if (!_isDriverLogin) {
-          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Please select a Driver to search leaves')));
-        }
         setState(() {
           _requests = [];
           _isLoading = false;
@@ -104,8 +89,8 @@ class _DriverLeaveRequestTabState extends State<DriverLeaveRequestTab> {
   }
 
   Future<void> _submitLeave() async {
-    if (_selectedLeaveTypeId == null || _selectedDriverId == null) {
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Please select Driver and Leave Reason')));
+    if (_selectedLeaveTypeId == null) {
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Please select Leave Reason')));
       return;
     }
     
@@ -183,28 +168,6 @@ class _DriverLeaveRequestTabState extends State<DriverLeaveRequestTab> {
                   ),
                 ],
               ),
-              if (!_isDriverLogin) ...[
-                const SizedBox(height: 12),
-                Container(
-                  decoration: BoxDecoration(
-                    border: Border.all(color: Colors.grey.shade300),
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  padding: const EdgeInsets.symmetric(horizontal: 12),
-                  child: DropdownButtonHideUnderline(
-                    child: DropdownButton<int>(
-                      isExpanded: true,
-                      value: _selectedDriverId,
-                      hint: const Text('Select Driver'),
-                      items: objfun.GetDriverList.map((e) => DropdownMenuItem<int>(
-                        value: e.Id,
-                        child: Text(e.AccountName),
-                      )).toList(),
-                      onChanged: (val) => setState(() => _selectedDriverId = val),
-                    ),
-                  ),
-                ),
-              ],
               const SizedBox(height: 12),
               Container(
                 decoration: BoxDecoration(

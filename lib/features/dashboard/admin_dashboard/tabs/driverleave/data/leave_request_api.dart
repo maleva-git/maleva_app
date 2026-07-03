@@ -15,11 +15,12 @@ class LeaveRequestApi {
     required int totalDays,
     required String reason,
     required int applicantRefId,
+    int applicantType = 2,
   }) async {
     try {
       final body = {
         "CompanyRefId": objfun.Comid,
-        "ApplicantType": 2, // 2 for Driver
+        "ApplicantType": applicantType,
         "ApplicantRefId": applicantRefId,
         "LeaveTypeRefId": leaveTypeRefId,
         "FromDate": fromDate.toIso8601String(),

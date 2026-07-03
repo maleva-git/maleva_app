@@ -168,152 +168,116 @@ class _PlanningDetailsViewState extends State<_PlanningDetailsView> {
       BuildContext ctx, PlanningDetailsState state, bool isTablet) {
     return Center(
       child: ConstrainedBox(
-        constraints: const BoxConstraints(maxWidth: 800),
+        constraints: const BoxConstraints(maxWidth: 1200), // increased width for data table
         child: Padding(
           padding: EdgeInsets.all(isTablet ? 12 : 6),
           child: Column(
             children: [
-          // ── Column header card ─────────────────────────────────────────
-          _ColumnHeaderCard(isTablet: isTablet),
+              // ── Search field ───────────────────────────────────────────────
+              _SearchField(
+                controller: _searchController,
+                isTablet: isTablet,
+                onChanged: (q) => ctx
+                    .read<PlanningDetailsBloc>()
+                    .add(PlanningDetailsSearchChanged(q)),
+                onClear: () {
+                  _searchController.clear();
+                  ctx
+                      .read<PlanningDetailsBloc>()
+                      .add(const PlanningDetailsSearchChanged(''));
+                },
+              ),
 
-          const SizedBox(height: 6),
+              const SizedBox(height: 6),
 
-          // ── Search field ───────────────────────────────────────────────
-          _SearchField(
-            controller: _searchController,
-            isTablet: isTablet,
-            onChanged: (q) => ctx
-                .read<PlanningDetailsBloc>()
-                .add(PlanningDetailsSearchChanged(q)),
-            onClear: () {
-              _searchController.clear();
-              ctx
-                  .read<PlanningDetailsBloc>()
-                  .add(const PlanningDetailsSearchChanged(''));
-            },
-          ),
+              // ── Summary pill ───────────────────────────────────────────────
+              _SummaryPill(count: state.filteredPlanningList.length),
 
-          const SizedBox(height: 4),
+              const SizedBox(height: 6),
 
-          // ── Summary pill ───────────────────────────────────────────────
-          _SummaryPill(count: state.filteredPlanningList.length),
-
-          const SizedBox(height: 4),
-
-          // ── List ───────────────────────────────────────────────────────
-          Expanded(
-            child: state.filteredPlanningList.isEmpty
-                ? const SizedBox.shrink()
-                : RefreshIndicator(
-                    color: AppTokens.brandPrimary,
-                    onRefresh: () async {
-                      ctx.read<PlanningDetailsBloc>().add(const PlanningDetailsRefreshRequested());
-                      await Future.delayed(const Duration(milliseconds: 600));
-                    },
-                    child: ListView.builder(
-                      physics: const AlwaysScrollableScrollPhysics(),
-                      padding: EdgeInsets.only(bottom: isTablet ? 20 : 12),
-                      itemCount: state.filteredPlanningList.length,
-                      itemBuilder: (_, i) => Padding(
-                        padding: const EdgeInsets.only(bottom: 8),
-                        child: _PlanningCard(
-                          index: i,
-                          item: state.filteredPlanningList[i],
-                          isTablet: isTablet,
+              // ── Data Table ──────────────────────────────────────────────────
+              Expanded(
+                child: state.filteredPlanningList.isEmpty
+                    ? const SizedBox.shrink()
+                    : RefreshIndicator(
+                        color: AppTokens.brandPrimary,
+                        onRefresh: () async {
+                          ctx.read<PlanningDetailsBloc>().add(const PlanningDetailsRefreshRequested());
+                          await Future.delayed(const Duration(milliseconds: 600));
+                        },
+                        child: SingleChildScrollView(
+                          scrollDirection: Axis.vertical,
+                          physics: const AlwaysScrollableScrollPhysics(),
+                          child: SingleChildScrollView(
+                            scrollDirection: Axis.horizontal,
+                            child: Card(
+                              elevation: 2,
+                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                              clipBehavior: Clip.antiAlias,
+                              child: DataTable(
+                                headingRowColor: MaterialStateProperty.all(AppTokens.invoiceHeaderStart),
+                                headingTextStyle: GoogleFonts.lato(color: Colors.white, fontWeight: FontWeight.bold, fontSize: isTablet ? 13 : 11),
+                                dataRowMinHeight: 35,
+                                dataRowMaxHeight: 50,
+                                dataTextStyle: GoogleFonts.lato(color: AppTokens.textPrimary, fontSize: isTablet ? 13 : 11, fontWeight: FontWeight.w500),
+                                columnSpacing: 25,
+                                border: TableBorder(
+                                  horizontalInside: BorderSide(color: AppTokens.surfaceBorder.withOpacity(0.5), width: 1),
+                                  verticalInside: BorderSide(color: AppTokens.surfaceBorder.withOpacity(0.5), width: 1),
+                                ),
+                                columns: const [
+                                  DataColumn(label: Text('S.No')),
+                                  DataColumn(label: Text('Remarks')),
+                                  DataColumn(label: Text('Truck')),
+                                  DataColumn(label: Text('Pickup Date')),
+                                  DataColumn(label: Text('Delivery Date')),
+                                  DataColumn(label: Text('Origin')),
+                                  DataColumn(label: Text('Destination')),
+                                  DataColumn(label: Text('Package')),
+                                  DataColumn(label: Text('Customer')),
+                                  DataColumn(label: Text('Job No')),
+                                  DataColumn(label: Text('Vessel')),
+                                  DataColumn(label: Text('Status')),
+                                  DataColumn(label: Text('PIC')),
+                                  DataColumn(label: Text('LETA')),
+                                  DataColumn(label: Text('OETA')),
+                                ],
+                                rows: state.filteredPlanningList.asMap().entries.map((e) {
+                                  final i = e.key;
+                                  final item = e.value;
+                                  return DataRow(
+                                    color: MaterialStateProperty.all(i % 2 == 0 ? Colors.white : AppTokens.surfaceCard),
+                                    cells: [
+                                      DataCell(Text('${i + 1}')),
+                                      DataCell(Text('${item["Remarks"] ?? ""}')),
+                                      DataCell(Text('${item["TruckName"] ?? ""}')),
+                                      DataCell(Text('${item["SPickupDate"] ?? ""}')),
+                                      DataCell(Text('${item["SDeliveryDate"] ?? ""}')),
+                                      DataCell(Text('${item["Origin"] ?? ""}')),
+                                      DataCell(Text('${item["Destination"] ?? ""}')),
+                                      DataCell(Text('${item["pkg"] ?? ""}')),
+                                      DataCell(Text('${item["CustomerName"] ?? ""}')),
+                                      DataCell(Text('${item["JobNo"] ?? ""}', style: const TextStyle(color: AppTokens.brandPrimary, fontWeight: FontWeight.bold))),
+                                      DataCell(Text('${item["VesselName"] ?? ""}')),
+                                      DataCell(Text('${item["JobStatus"] ?? ""}')),
+                                      DataCell(Text('${item["EmployeeName"] ?? ""}')),
+                                      DataCell(Text('${item["LETA"] ?? ""}')),
+                                      DataCell(Text('${item["OETA"] ?? ""}')),
+                                    ],
+                                  );
+                                }).toList(),
+                              ),
+                            ),
+                          ),
                         ),
                       ),
-                    ),
-                  ),
+              ),
+            ],
           ),
-        ],
-      ),
-    ),
-  ),
-);
-}
-}
-
-// ─────────────────────────────────────────────────────────────────────────────
-// Column header card
-// ─────────────────────────────────────────────────────────────────────────────
-
-class _ColumnHeaderCard extends StatelessWidget {
-  const _ColumnHeaderCard({required this.isTablet});
-  final bool isTablet;
-
-  @override
-  Widget build(BuildContext context) {
-    final double fs = isTablet ? 13 : 11;
-    return Card(
-      color: AppTokens.invoiceHeaderStart,
-      elevation: 6,
-      shadowColor: Colors.black26,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(14),
-        side: BorderSide(
-            color: AppTokens.brandPrimary.withOpacity(0.4), width: 1),
-      ),
-      child: Padding(
-        padding: const EdgeInsets.all(10),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            _hRow([
-              _hText('S.No', flex: 1, fs: fs),
-              _hText('Remarks', flex: 3, fs: fs),
-              _hText('Truck', flex: 2, fs: fs),
-            ]),
-            const SizedBox(height: 6),
-            const Divider(color: Colors.white54, height: 1),
-            const SizedBox(height: 6),
-            _hRow([
-              _hText('Pickup Date',   flex: 3, fs: fs),
-              _hText('Delivery Date', flex: 3, fs: fs),
-            ]),
-            const SizedBox(height: 6),
-            _hRow([
-              _hText('Origin',      flex: 3, fs: fs),
-              _hText('Destination', flex: 3, fs: fs),
-              _hText('Package',     flex: 4, fs: fs),
-            ]),
-            const SizedBox(height: 6),
-            _hRow([
-              _hText('Customer', flex: 4, fs: fs),
-              _hText('Job No',   flex: 2, fs: fs),
-            ]),
-            const SizedBox(height: 6),
-            _hRow([
-              _hText('Vessel', flex: 3, fs: fs),
-              _hText('Status', flex: 2, fs: fs),
-              _hText('PIC',    flex: 3, fs: fs),
-            ]),
-            const SizedBox(height: 6),
-            _hRow([
-              _hText('LETA', flex: 3, fs: fs),
-              _hText('OETA', flex: 2, fs: fs),
-            ]),
-          ],
         ),
       ),
     );
   }
-
-  Widget _hRow(List<Widget> children) =>
-      Row(children: children);
-
-  Widget _hText(String text, {required int flex, required double fs}) =>
-      Expanded(
-        flex: flex,
-        child: Text(
-          text,
-          style: GoogleFonts.lato(
-            color: Palette.white,
-            fontWeight: FontWeight.bold,
-            fontSize: fs,
-            letterSpacing: 0.3,
-          ),
-        ),
-      );
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -410,184 +374,7 @@ class _SummaryPill extends StatelessWidget {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// Planning card
-// ─────────────────────────────────────────────────────────────────────────────
-
-class _PlanningCard extends StatelessWidget {
-  const _PlanningCard({
-    required this.index,
-    required this.item,
-    required this.isTablet,
-  });
-
-  final int index;
-  final dynamic item;
-  final bool isTablet;
-
-  @override
-  Widget build(BuildContext context) {
-    return Card(
-        elevation: 6,
-        shadowColor: Colors.black26,
-        color: AppTokens.surfaceCard,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(14),
-          side: BorderSide(
-            color: AppTokens.brandPrimary.withOpacity(0.3),
-            width: 0.8,
-          ),
-        ),
-        child: Padding(
-          padding: EdgeInsets.all(isTablet ? 14 : 10),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // ── TOP ROW: index avatar + remarks + job no chip ──────────
-              Row(children: [
-                CircleAvatar(
-                  radius: isTablet ? 16 : 14,
-                  backgroundColor: AppTokens.brandPrimary,
-                  child: Text(
-                    '${index + 1}',
-                    style: const TextStyle(
-                        color: Palette.white,
-                        fontWeight: FontWeight.bold,
-                        fontSize: 12),
-                  ),
-                ),
-                const SizedBox(width: 10),
-                Expanded(
-                  child: Text(
-                    item['Remarks'] ?? '',
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: GoogleFonts.lato(
-                      fontSize: isTablet ? 14 : 13,
-                      fontWeight: FontWeight.w700,
-                      color: AppTokens.textPrimary,
-                    ),
-                  ),
-                ),
-                // Job No chip
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                      horizontal: 8, vertical: 3),
-                  decoration: BoxDecoration(
-                    color: AppTokens.brandPrimary.withOpacity(0.10),
-                    borderRadius: BorderRadius.circular(20),
-                    border: Border.all(
-                      color: AppTokens.brandPrimary.withOpacity(0.35),
-                      width: 0.8,
-                    ),
-                  ),
-                  child: Text(
-                    item['JobNo'] ?? '',
-                    style: GoogleFonts.lato(
-                      fontSize: 11,
-                      fontWeight: FontWeight.bold,
-                      color: AppTokens.brandPrimary,
-                    ),
-                  ),
-                ),
-              ]),
-
-              const Divider(height: 10),
-
-              // ── ROW 2: Pickup + Delivery ───────────────────────────────
-              Row(children: [
-                Expanded(
-                    child: _Info('Pickup',
-                        item['SPickupDate'])),
-                Expanded(
-                    child: _Info('Delivery',
-                        item['SDeliveryDate'])),
-              ]),
-
-              const SizedBox(height: 5),
-
-              // ── ROW 3: Origin + Destination + Package ──────────────────
-              Row(children: [
-                Expanded(child: _Info('Origin',      item['Origin'])),
-                Expanded(child: _Info('Destination', item['Destination'])),
-                Expanded(child: _Info('Package',     item['pkg'])),
-              ]),
-
-              const SizedBox(height: 5),
-
-              // ── ROW 4: Customer + Truck ────────────────────────────────
-              Row(children: [
-                Expanded(
-                    child: _Info('Customer', item['CustomerName'])),
-                Expanded(
-                    child: _Info('Truck',    item['TruckName'])),
-              ]),
-
-              const SizedBox(height: 5),
-
-              // ── ROW 5: Vessel + JobStatus + PIC ───────────────────────
-              Row(children: [
-                Expanded(
-                    child: _Info('Vessel',    item['VesselName'])),
-                Expanded(
-                    child: _Info('Status',    item['JobStatus'])),
-                Expanded(
-                    child: _Info('PIC',       item['EmployeeName'])),
-              ]),
-
-              const SizedBox(height: 5),
-
-              // ── ROW 6: LETA + OETA ────────────────────────────────────
-              Row(children: [
-                Expanded(child: _Info('LETA', item['LETA'])),
-                Expanded(child: _Info('OETA', item['OETA'])),
-              ]),
-            ],
-          ),
-        ),
-      );
-  }
-}
-
-// ─────────────────────────────────────────────────────────────────────────────
-// _Info — label + value micro-widget (matches original _infoText)
-// ─────────────────────────────────────────────────────────────────────────────
-
-class _Info extends StatelessWidget {
-  const _Info(this.label, this.value);
-  final String label;
-  final dynamic value;
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          label,
-          style: GoogleFonts.lato(
-              fontSize: 9,
-              color: AppTokens.textSecondary),
-        ),
-        const SizedBox(height: 2),
-        Text(
-          value?.toString().isNotEmpty == true ? value.toString() : '—',
-          maxLines: 1,
-          overflow: TextOverflow.ellipsis,
-          style: GoogleFonts.lato(
-            fontSize: 11,
-            fontWeight: FontWeight.w600,
-            color: AppTokens.textPrimary,
-          ),
-        ),
-      ],
-    );
-  }
-}
-
-// ─────────────────────────────────────────────────────────────────────────────
-// Empty / Error placeholder widgets
-// ─────────────────────────────────────────────────────────────────────────────
-
+// Column header card
 class _EmptyWidget extends StatelessWidget {
   const _EmptyWidget();
 

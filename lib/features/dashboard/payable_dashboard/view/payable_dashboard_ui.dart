@@ -23,6 +23,8 @@ import '../../admin_dashboard/tabs/truck/view/truckview_tab.dart';
 import '../bloc/payable_dasboard_bloc.dart';
 import '../bloc/payable_dashboard_state.dart';
 import 'package:maleva/core/widgets/custom_app_bar.dart';
+import 'package:maleva/features/dashboard/admin_dashboard/tabs/driverleave/view/admin_leave_approval_tab.dart';
+import 'package:maleva/features/dashboard/admin_dashboard/tabs/driverleave/view/employee_leave_request_tab.dart';
 
 class PayableMobileDashboard extends StatelessWidget {
   final TabController tabController;
@@ -129,6 +131,8 @@ class PayableMobileDashboard extends StatelessWidget {
           _tab('Truck',           isTablet),
           _tab('PettyCash',       isTablet),
 
+          _tab('LeaveApproval', isTablet),
+          _tab('EmpLeave', isTablet),
         ],
       ),
     );
@@ -174,6 +178,8 @@ class PayableMobileDashboard extends StatelessWidget {
           const TruckDetailsReportPage(),
           const PettyCashPage(),
 
+          const AdminLeaveApprovalTab(),
+          const EmployeeLeaveRequestTab(),
         ],
       ),
     );

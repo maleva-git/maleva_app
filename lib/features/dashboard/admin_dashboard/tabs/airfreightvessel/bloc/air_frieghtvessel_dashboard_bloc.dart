@@ -51,7 +51,7 @@ class VesselDashboardBloc extends Bloc<VesselDashboardEvent, VesselDashboardStat
         'Fromdate': state.fromDate,
         'Todate': state.toDate,
         'Search': state.remarks,
-        'Employeeid': null,
+        'Employeeid': 0,
         'ETAType': 5,
         'StatusId': state.statusId
       };

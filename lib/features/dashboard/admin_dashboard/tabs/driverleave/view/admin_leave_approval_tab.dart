@@ -42,7 +42,7 @@ class _AdminLeaveApprovalTabState extends State<AdminLeaveApprovalTab> {
 
   Future<void> _fetchRequests() async {
     setState(() => _isLoading = true);
-    final data = await LeaveRequestApi.getLeaveRequests(context); // null to get all
+    final data = await LeaveRequestApi.getLeaveRequests(context, applicantType: 2); // 2 for Drivers
     setState(() {
       _requests = data;
       _isLoading = false;
