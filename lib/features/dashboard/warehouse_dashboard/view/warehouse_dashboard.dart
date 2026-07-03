@@ -27,7 +27,7 @@ class _WareHouseDashboardState extends State<WareHouseDashboard> with SingleTick
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 2, vsync: this);
+    _tabController = TabController(length: 4, vsync: this);
     _tabController.addListener(_onTabChanged);
 
   }

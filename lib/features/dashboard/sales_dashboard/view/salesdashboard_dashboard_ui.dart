@@ -20,6 +20,7 @@ import '../../admin_dashboard/tabs/vesselreport/view/vesselreportview_tab.dart';
 import '../../admin_dashboard/tabs/driverleave/view/admin_leave_approval_tab.dart';
 import '../bloc/sales_bloc.dart';
 import '../bloc/sales_state.dart';
+import 'package:maleva/features/dashboard/admin_dashboard/tabs/driverleave/view/employee_leave_request_tab.dart';
 class SalesDashboardView extends StatelessWidget {
   final TabController tabController;
   final bool isTablet;
@@ -123,6 +124,7 @@ class SalesDashboardView extends StatelessWidget {
           _tab('FUEL VIEW', isTablet),
           _tab('PaymentView', isTablet),
           _tab('Leave', isTablet),
+          _tab('EmpLeave', isTablet),
         ],
       ),
     );
@@ -162,6 +164,7 @@ Tab _tab(String text, bool isTablet) => Tab(
             const FuelDiffPage(),
             const PaymentPendingPage(),
             const AdminLeaveApprovalTab(),
+          const EmployeeLeaveRequestTab(),
           ],
         ),
     );

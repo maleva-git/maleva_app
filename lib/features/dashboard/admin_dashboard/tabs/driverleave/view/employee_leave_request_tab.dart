@@ -8,14 +8,15 @@ import 'package:maleva/core/utils/clsfunction.dart' as objfun;
 import 'package:maleva/core/network/OnlineApi.dart';
 import 'package:maleva/core/models/model.dart';
 
-class DriverLeaveRequestTab extends StatefulWidget {
-  const DriverLeaveRequestTab({Key? key}) : super(key: key);
+class EmployeeLeaveRequestTab extends StatefulWidget {
+  final bool isAdminOrSubadmin;
+  const EmployeeLeaveRequestTab({Key? key, this.isAdminOrSubadmin = false}) : super(key: key);
 
   @override
-  State<DriverLeaveRequestTab> createState() => _DriverLeaveRequestTabState();
+  State<EmployeeLeaveRequestTab> createState() => _EmployeeLeaveRequestTabState();
 }
 
-class _DriverLeaveRequestTabState extends State<DriverLeaveRequestTab> {
+class _EmployeeLeaveRequestTabState extends State<EmployeeLeaveRequestTab> {
   bool _isLoading = false;
   List<LeaveRequestModel> _requests = [];
   
@@ -45,7 +46,9 @@ class _DriverLeaveRequestTabState extends State<DriverLeaveRequestTab> {
   }
   
   Future<void> _fetchRequests() async {
-    if (_selectedDriverId == null || _selectedDriverId == 0) {
+    int fetchId = widget.isAdminOrSubadmin ? 0 : (_selectedDriverId ?? 0);
+    
+    if (!widget.isAdminOrSubadmin && fetchId == 0) {
       if (mounted) {
         setState(() {
           _requests = [];
@@ -57,8 +60,8 @@ class _DriverLeaveRequestTabState extends State<DriverLeaveRequestTab> {
 
     setState(() => _isLoading = true);
     final data = await LeaveRequestApi.getLeaveRequests(context, 
-      applicantType: 2,
-      applicantRefId: _selectedDriverId,
+      applicantType: 1,
+      applicantRefId: fetchId,
       fromDate: DateFormat('yyyy-MM-dd').format(_searchFromDate),
       toDate: DateFormat('yyyy-MM-dd').format(_searchToDate),
     );
@@ -105,6 +108,7 @@ class _DriverLeaveRequestTabState extends State<DriverLeaveRequestTab> {
       toDate: _toDate,
       totalDays: days,
       applicantRefId: _selectedDriverId!,
+      applicantType: 1,
       reason: _leaveTypes.firstWhere((e) => e.id == _selectedLeaveTypeId).name,
     );
     

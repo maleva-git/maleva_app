@@ -24,6 +24,9 @@ import '../../admin_dashboard/tabs/truck/view/truckview_tab.dart';
 import '../bloc/hradmin_bloc.dart';
 import '../bloc/hradmin_state.dart';
 import 'package:maleva/core/widgets/custom_app_bar.dart';
+import 'package:maleva/features/dashboard/admin_dashboard/tabs/driverleave/view/admin_leave_approval_tab.dart';
+import 'package:maleva/features/dashboard/admin_dashboard/tabs/driverleave/view/employee_leave_request_tab.dart';
+import 'package:maleva/features/dashboard/admin_dashboard/tabs/driverleave/view/employee_leave_approval_tab.dart';
 
 
 
@@ -138,6 +141,9 @@ class HrAMobileDashboard extends StatelessWidget {
           _tab('Truck',           isTablet),
           _tab('SparePartsEntry', isTablet),
           _tab('License', isTablet),
+          _tab('EmpApproval', isTablet),
+          _tab('EmpLeave', isTablet),
+          _tab('LeaveApproval', isTablet),
         ],
       ),
     );
@@ -186,6 +192,9 @@ class HrAMobileDashboard extends StatelessWidget {
           const SparePartsEntryPage(),
           const DriverLicensePage(),
 
+          const EmployeeLeaveApprovalTab(),
+          const EmployeeLeaveRequestTab(),
+          const AdminLeaveApprovalTab(),
         ],
       ),
     );

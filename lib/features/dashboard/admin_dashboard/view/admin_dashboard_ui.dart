@@ -42,6 +42,8 @@ import '../tabs/truck/view/truckview_tab.dart';
 import '../tabs/vesselreport/view/vesselreportview_tab.dart';
 import '../tabs/driverleave/view/admin_leave_approval_tab.dart';
 import 'package:maleva/core/widgets/custom_app_bar.dart';
+import 'package:maleva/features/dashboard/admin_dashboard/tabs/driverleave/view/employee_leave_request_tab.dart';
+import 'package:maleva/features/dashboard/admin_dashboard/tabs/driverleave/view/employee_leave_approval_tab.dart';
 
 class MobileDashboard extends StatelessWidget {
   final TabController tabController;
@@ -170,6 +172,8 @@ class MobileDashboard extends StatelessWidget {
           _tab('RTI',             isTablet),
           _tab('LeaveApproval',   isTablet),
 
+          _tab('EmpApproval', isTablet),
+          _tab('EmpLeave', isTablet),
         ],
       ),
     );
@@ -238,6 +242,8 @@ class MobileDashboard extends StatelessWidget {
           ),
           const RTIDetailsPage(),
           const AdminLeaveApprovalTab(),
+          const EmployeeLeaveApprovalTab(),
+          const EmployeeLeaveRequestTab(isAdminOrSubadmin: true),
         ],
       ),
     );

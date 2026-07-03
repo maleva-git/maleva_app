@@ -6,14 +6,14 @@ import 'package:intl/intl.dart';
 import 'package:maleva/core/utils/clsfunction.dart' as objfun;
 import 'package:maleva/core/network/OnlineApi.dart' as OnlineApi;
 
-class AdminLeaveApprovalTab extends StatefulWidget {
-  const AdminLeaveApprovalTab({Key? key}) : super(key: key);
+class EmployeeLeaveApprovalTab extends StatefulWidget {
+  const EmployeeLeaveApprovalTab({Key? key}) : super(key: key);
 
   @override
-  State<AdminLeaveApprovalTab> createState() => _AdminLeaveApprovalTabState();
+  State<EmployeeLeaveApprovalTab> createState() => _EmployeeLeaveApprovalTabState();
 }
 
-class _AdminLeaveApprovalTabState extends State<AdminLeaveApprovalTab> {
+class _EmployeeLeaveApprovalTabState extends State<EmployeeLeaveApprovalTab> {
   bool _isLoading = false;
   List<LeaveRequestModel> _requests = [];
   List<LeaveTypeModel> _leaveStatusList = [];
@@ -42,7 +42,7 @@ class _AdminLeaveApprovalTabState extends State<AdminLeaveApprovalTab> {
 
   Future<void> _fetchRequests() async {
     setState(() => _isLoading = true);
-    final data = await LeaveRequestApi.getLeaveRequests(context, applicantType: 2); // 2 for Drivers
+    final data = await LeaveRequestApi.getLeaveRequests(context, applicantType: 1); // 2 for Drivers
     setState(() {
       _requests = data;
       _isLoading = false;
@@ -148,7 +148,7 @@ class _AdminLeaveApprovalTabState extends State<AdminLeaveApprovalTab> {
           color: Colors.white,
           child: Row(
             children: [
-              const Expanded(child: Text('Driver Leave Requests', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16))),
+              const Expanded(child: Text('Employee Leave Requests', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16))),
               IconButton(icon: const Icon(Icons.refresh, color: colour.brand), onPressed: _fetchRequests),
             ],
           ),

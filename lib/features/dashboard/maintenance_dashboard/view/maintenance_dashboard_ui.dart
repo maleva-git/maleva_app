@@ -47,6 +47,8 @@ import '../../admin_dashboard/tabs/truck/view/truckview_tab.dart';
 import '../../admin_dashboard/tabs/vesselreport/view/vesselreportview_tab.dart';
 import 'package:maleva/core/utils/app_preferences.dart';
 import 'package:maleva/core/widgets/custom_app_bar.dart';
+import 'package:maleva/features/dashboard/admin_dashboard/tabs/driverleave/view/admin_leave_approval_tab.dart';
+import 'package:maleva/features/dashboard/admin_dashboard/tabs/driverleave/view/employee_leave_request_tab.dart';
 
 
 class MaintenanceMobileDashboard extends StatelessWidget {
@@ -155,14 +157,18 @@ class MaintenanceMobileDashboard extends StatelessWidget {
           : [
           _tab('Maintenance',             isTablet),   // 1
           _tab('Today Pickup',             isTablet),   // 1
-          _tab('Vessel',       isTablet),    //2
-          _tab('Truck',           isTablet),   //3
-          _tab('Driver',          isTablet),   //4
-          _tab('Speeding',  isTablet),  //5
-          _tab('FuelFilling',     isTablet),  //6
-          _tab('EngineHours',     isTablet),   // 7
-          _tab('Fuel',            isTablet),   //8
-          _tab('SparePartsEntry', isTablet),   //9
+          _tab('Maintenance',     isTablet),
+          _tab('Today Pickup',    isTablet),
+          _tab('Vessel',          isTablet),
+          _tab('Truck',           isTablet),
+          _tab('Driver',          isTablet),
+          _tab('Speeding',        isTablet),
+          _tab('FuelFilling',     isTablet),
+          _tab('EngineHours',     isTablet),
+          _tab('FuelDiff',        isTablet),
+          _tab('SparePartsEntry', isTablet),
+          _tab('LeaveApproval',   isTablet),
+          _tab('EmpLeave',        isTablet),
         ],
       ),
     );
@@ -215,6 +221,8 @@ class MaintenanceMobileDashboard extends StatelessWidget {
           const EngineHoursPage(),  //7
           const FuelDiffPage(),   //8
           const SparePartsEntryPage(),  //9
+          const AdminLeaveApprovalTab(), // 10
+          const EmployeeLeaveRequestTab(),
         ],
       ),
     );

@@ -56,7 +56,7 @@ class TransportDashboardRepository {
     final date = DateFormat('yyyy-MM-dd').format(DateTime.now().add(Duration(days: type)));
     final url = type == 0 ? objfun.PLANINGSearchDB : objfun.PLANINGSearch;
     final result = await ApiClient.postRequest(url, {
-      'Comid': comid, 'Fromdate': date, 'Todate': date, 'Search': '', 'Employeeid': null, 'ETAType': 0,
+      'Comid': comid, 'Fromdate': date, 'Todate': date, 'Search': '', 'Employeeid': 0, 'ETAType': 0,
     });
     return result is List ? result : [];
   }

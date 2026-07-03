@@ -101,7 +101,7 @@ class _AdminDashboardState extends State<NewAdminDashboard> with SingleTickerPro
   void initState() {
     super.initState();
     _adminTabBloc = AdminTabBloc();
-    _tabController = TabController(length: 26, vsync: this);
+    _tabController = TabController(length: 28, vsync: this);
     _tabController.addListener(_onTabChanged);
   }
 

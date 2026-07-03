@@ -76,7 +76,7 @@ class _HrAdminDashboardState extends State<HrAdminDashboard> with SingleTickerPr
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 9, vsync: this);
+    _tabController = TabController(length: 12, vsync: this);
     _tabController.addListener(_onTabChanged);
 
   }

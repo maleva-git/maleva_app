@@ -92,7 +92,7 @@ Future<void> main() async {
       await AppLogApi.insertAppLog(
         empRefId: 0,
         empName: 'Splash Screen Crash',
-        comid: 0,
+        comid: 6,
         appVersion: 'Unknown (Startup)',
         screenHistory: 'Main Initialization',
         errorLog: "$e\n$stack",

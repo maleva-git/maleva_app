@@ -17,6 +17,8 @@ import '../../admin_dashboard/tabs/spotsaleorder/view/spotsaleorder_add.dart';
 import '../bloc/warehouse_bloc.dart';
 import '../bloc/warehouse_state.dart';
 import 'package:maleva/core/widgets/custom_app_bar.dart';
+import 'package:maleva/features/dashboard/admin_dashboard/tabs/driverleave/view/admin_leave_approval_tab.dart';
+import 'package:maleva/features/dashboard/admin_dashboard/tabs/driverleave/view/employee_leave_request_tab.dart';
 
 
 class WareHouseMobileDashboard extends StatelessWidget {
@@ -121,6 +123,8 @@ class WareHouseMobileDashboard extends StatelessWidget {
         tabs: [
           _tab('SpotsSaleOrder',  isTablet),
           _tab('InventoryReport', isTablet),
+          _tab('LeaveApproval', isTablet),
+          _tab('EmpLeave', isTablet),
         ],
       ),
     );
@@ -163,6 +167,8 @@ class WareHouseMobileDashboard extends StatelessWidget {
           const InventoryPage(),
 
 
+          const AdminLeaveApprovalTab(),
+          const EmployeeLeaveRequestTab(),
         ],
       ),
     );
