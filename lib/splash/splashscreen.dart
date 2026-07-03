@@ -13,6 +13,7 @@ import '../features/auth/data/repositories/auth_repository.dart';
 import '../features/auth/presentation/bloc/auth_bloc.dart';
 import '../features/auth/presentation/pages/login_page.dart';
 import '../features/dashboard/admin_dashboard/bloc/admin_tab_bloc.dart';
+import '../features/dashboard/sales_dashboard/bloc/sales_bloc.dart';
 import '../features/dashboard/admin_dashboard/view/admin_dashboard.dart';
 import '../features/dashboard/airfreight_dashboard/bloc/airfreight_bloc.dart';
 import '../features/dashboard/airfreight_dashboard/view/airfreight_dashboard.dart';
@@ -120,12 +121,33 @@ class _SplashScreenState extends State<SplashScreen>
     startup();
   }
 
-  // ── ORIGINAL LOGIC — NOT MODIFIED ─────────────────────────────────────────
+  // ── STARTUP LOGIC (with error handling) ──────────────────────────────────
   Future startup() async {
-    await objfun.localstoragecall();
+    // ① Safe local storage init
+    try {
+      await objfun.localstoragecall();
+    } catch (e) {
+      debugPrint('❌ SharedPreferences init failed: $e');
+      if (mounted) {
+        _showErrorPopup(
+          'Startup Error',
+          'Failed to initialize app storage.\n\n'
+          'Please try clearing app data or reinstalling the app.\n\nError: $e',
+        );
+      }
+      return;
+    }
+
     await Future.delayed(const Duration(seconds: 3));
 
-    await objfun.getDeviceToken();
+    // ② FCM token with timeout — prevents indefinite hang on devices
+    // with missing or outdated Google Play Services
+    try {
+      await objfun.getDeviceToken().timeout(const Duration(seconds: 10));
+    } catch (e) {
+      debugPrint('⚠️ FCM Token fetch failed: $e');
+      // Continue without token — don't block app startup
+    }
     objfun.mobiletoken = AppPreferences.getFcmToken();
 
     String UserName = objfun.storagenew.getString('Username') ?? "";
@@ -134,8 +156,23 @@ class _SplashScreenState extends State<SplashScreen>
     objfun.MalevaScreen= objfun.storagenew.getInt('DeviceView') ?? 1;
     objfun.DriverLogin=objfun.storagenew.getInt('DriverId') ?? 0;
     if (UserName != "" && Password != "") {
-      if (await OnlineApi.Login(UserName, Password, OldUserName,objfun.DriverLogin, context) ==
-          true) {
+      // ③ Login API call with error handling
+      bool loginSuccess = false;
+      try {
+        loginSuccess = await OnlineApi.Login(UserName, Password, OldUserName,objfun.DriverLogin, context);
+      } catch (e) {
+        debugPrint('⚠️ Login API error: $e');
+        if (mounted) {
+          _showErrorPopup(
+            'Connection Error',
+            'Unable to connect to the server.\n\n'
+            'Please check your internet connection and try again.\n\nError: $e',
+          );
+        }
+        return;
+      }
+
+      if (loginSuccess) {
 
         if(objfun.DriverLogin == 1)
         {
@@ -175,11 +212,18 @@ class _SplashScreenState extends State<SplashScreen>
             ),
           );
         }
-        // else if(objfun.storagenew.getString('RulesType') == "SALES")
-        // {
-        // //  Navigator.push(context, MaterialPageRoute(builder: (context) => const CustDashboard()));
-        //   Navigator.push(context, MaterialPageRoute(builder: (context) => const SalesDashboard()));
-        // }
+        else if(objfun.storagenew.getString('RulesType') == "SALES")
+        {
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+              builder: (_) => BlocProvider(
+                create: (_) => SalesDashboardBloc(),
+                child: const SalesDashboard(),
+              ),
+            ),
+          );
+        }
         // else if(objfun.storagenew.getString('RulesType') == "TRANSPORTATION")
         // {
         //   Navigator.push(context, MaterialPageRoute(builder: (context) => const OldTransportDashboard()));
@@ -342,68 +386,25 @@ class _SplashScreenState extends State<SplashScreen>
           );
 
         }
-        // else if(objfun.storagenew.getString('RulesType') == "AIR FRIEGHT")
-        // {
-        //   Navigator.push(context, MaterialPageRoute(builder: (context) => const AirFrieghtDashboard()));
-        // }
-        // else if(objfun.storagenew.getString('RulesType') == "BOARDING" || objfun.storagenew.getString('RulesType') == "OPERATION")
-        // {
-        //   Navigator.push(context, MaterialPageRoute(builder: (context) => const BoardingDashboard()));
-        // }
-        // else if( objfun.storagenew.getString('RulesType') == "FORWARDING" )
-        // {
-        //   Navigator.push(context, MaterialPageRoute(builder: (context) => const ForwardingDashboard()));
-        // }
-        // else if( objfun.storagenew.getString('RulesType') == "HRADMIN")
-        // {
-        //   Navigator.push(context, MaterialPageRoute(builder: (context) => const HrDashboard()));
-        // }
-        // else if(objfun.storagenew.getString('RulesType') == "HR")
-        // {
-        //   Navigator.push(context, MaterialPageRoute(builder: (context) => const MaintenanceDashboard()));
-        // }
-        // else if( objfun.storagenew.getString('RulesType') == "RECEIVABLE" )
-        // {
-        //   Navigator.push(context, MaterialPageRoute(builder: (context) => const ReceivableDashboard()));
-        // }
-        // else if( objfun.storagenew.getString('RulesType') == "ACCOUNTS")
-        // {
-        //   Navigator.push(context, MaterialPageRoute(builder: (context) => const PayableDashbord()));
-        // }
-        // else
-        // {
-        //   Navigator.push(context, MaterialPageRoute(builder: (context) => const Homemobile()));
-        // }
+        else {
+          // ④ Unknown RulesType — no matching dashboard found
+          final rulesType = objfun.storagenew.getString('RulesType') ?? 'Unknown';
+          debugPrint('⚠️ Unknown RulesType: "$rulesType" — showing error');
+          if (mounted) {
+            _showErrorPopup(
+              'Access Error',
+              'Your account role "$rulesType" is not recognized by this version of the app.\n\n'
+              'Please contact your administrator or update the app to the latest version.',
+            );
+          }
+          return;
+        }
       }
       else {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (_) => BlocProvider(
-              create: (_) => LoginBloc(
-                authRepository: AuthRepository(
-                  authApi: AuthApi.instance,
-                ),
-              ),
-              child: const Appuserloginmobile(),
-            ),
-          ),
-        );
+        _navigateToLogin();
       }
     } else {
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (_) => BlocProvider(
-            create: (_) => LoginBloc(
-              authRepository: AuthRepository(
-                authApi: AuthApi.instance,
-              ),
-            ),
-            child: const Appuserloginmobile(),
-          ),
-        ),
-      );
+      _navigateToLogin();
     }
   }
 
@@ -414,7 +415,89 @@ class _SplashScreenState extends State<SplashScreen>
     super.dispose();
   }
 
-  // ── BUILD — only this section is redesigned ────────────────────────────────
+  // ── Error & Navigation Helpers ─────────────────────────────────────────────
+
+  void _navigateToLogin() {
+    if (!mounted) return;
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => BlocProvider(
+          create: (_) => LoginBloc(
+            authRepository: AuthRepository(
+              authApi: AuthApi.instance,
+            ),
+          ),
+          child: const Appuserloginmobile(),
+        ),
+      ),
+    );
+  }
+
+  void _showErrorPopup(String title, String message) {
+    if (!mounted) return;
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (ctx) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        title: Row(
+          children: [
+            const Icon(Icons.error_outline, color: Colors.redAccent, size: 28),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Text(
+                title,
+                style: GoogleFonts.dmSans(
+                  fontSize: 18,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ),
+          ],
+        ),
+        content: SingleChildScrollView(
+          child: Text(
+            message,
+            style: GoogleFonts.dmSans(fontSize: 14, color: Colors.grey[700]),
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.of(ctx).pop();
+              _navigateToLogin();
+            },
+            child: Text(
+              'Go to Login',
+              style: GoogleFonts.dmSans(fontWeight: FontWeight.w500),
+            ),
+          ),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: const Color(0xFF1555F3),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8),
+              ),
+            ),
+            onPressed: () {
+              Navigator.of(ctx).pop();
+              startup();
+            },
+            child: Text(
+              'Retry',
+              style: GoogleFonts.dmSans(
+                fontWeight: FontWeight.w600,
+                color: Colors.white,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // ── BUILD — only this section is redesigned ────────────────────────────────────────
   @override
   Widget build(BuildContext context) {
     return Scaffold(

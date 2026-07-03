@@ -43,7 +43,7 @@ import 'app_preferences.dart';
 import '../network/api_constants.dart';
 import '../network/api_client.dart';
 import 'dialog_helper.dart';
-String appversion="1.1.10+110";
+String appversion="1.1.10+112";
 bool homepagecall = false;
 AssetImage logo = const AssetImage('assets/company/logo.png');
 AssetImage splashlogo = const AssetImage('assets/company/roundlogo.png');
@@ -1341,13 +1341,16 @@ String channelName = "MALEVA channel"; //Required for Android 8.0 or after
 String channelDescription = "this is our MALEVA channel";
 String mobiletoken="";
 getDeviceToken() async {
-
-  FirebaseMessaging fcm = FirebaseMessaging.instance;
-  String? fcmToken = await fcm.getToken();
-  if (fcmToken != null) {
-    mobiletoken = fcmToken;
-    await AppPreferences.setFcmToken(fcmToken);
-    print_(mobiletoken);
+  try {
+    FirebaseMessaging fcm = FirebaseMessaging.instance;
+    String? fcmToken = await fcm.getToken().timeout(const Duration(seconds: 10));
+    if (fcmToken != null) {
+      mobiletoken = fcmToken;
+      await AppPreferences.setFcmToken(fcmToken);
+      print_(mobiletoken);
+    }
+  } catch (e) {
+    print_('⚠️ FCM Token fetch failed (check Google Play Services): $e');
   }
 
   FirebaseMessaging.onMessage.listen((RemoteMessage message) {});
