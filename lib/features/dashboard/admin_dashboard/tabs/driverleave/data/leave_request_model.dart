@@ -11,6 +11,8 @@ class LeaveRequestModel {
   final int statusRefId;
   final String statusName;
   final String reviewRemark;
+  final int reviewedBy;
+  final String reviewedByName;
   final DateTime createdDate;
 
   LeaveRequestModel({
@@ -26,6 +28,8 @@ class LeaveRequestModel {
     required this.statusRefId,
     required this.statusName,
     required this.reviewRemark,
+    required this.reviewedBy,
+    required this.reviewedByName,
     required this.createdDate,
   });
 
@@ -43,6 +47,8 @@ class LeaveRequestModel {
       statusRefId: json['StatusRefId'] ?? 0,
       statusName: json['StatusName'] ?? '',
       reviewRemark: json['ReviewRemark'] ?? '',
+      reviewedBy: json['ReviewedBy'] ?? 0,
+      reviewedByName: json['ReviewedByName'] ?? '',
       createdDate: DateTime.tryParse(json['Created_Date'] ?? '') ?? DateTime.now(),
     );
   }

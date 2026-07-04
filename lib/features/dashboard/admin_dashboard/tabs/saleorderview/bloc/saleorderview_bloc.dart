@@ -170,7 +170,10 @@ class SaleOrderBloc extends Bloc<SaleOrderEvent, SaleOrderState> {
       ) {
     final updated = List<SaleOrderMasterModel>.from(state.masterList);
     updated[event.index].isETASelected = event.value;
-    emit(state.copyWith(masterList: updated));
+    emit(state.copyWith(
+      masterList: updated,
+      toggleTrigger: state.toggleTrigger + 1,
+    ));
   }
 
   // ── Filter events (pure state updates, no API call) ───────────────────────
