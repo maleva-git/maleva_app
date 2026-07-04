@@ -14,6 +14,7 @@ class SaleOrderState extends Equatable {
     this.masterList       = const [],
     this.errorMessage     = '',
     this.currentlyVisibleIndex = -1,
+    this.toggleTrigger    = 0,
     // ── Filters ───────────────────────────────────────────
     String? fromDate,
     String? toDate,
@@ -45,6 +46,7 @@ class SaleOrderState extends Equatable {
   final List<SaleOrderMasterModel> masterList;
   final String errorMessage;
   final int currentlyVisibleIndex;
+  final int toggleTrigger;
 
   // Filters
   final String fromDate;
@@ -102,6 +104,7 @@ class SaleOrderState extends Equatable {
     List<SaleOrderMasterModel>? masterList,
     String? errorMessage,
     int? currentlyVisibleIndex,
+    int? toggleTrigger,
     String? fromDate,
     String? toDate,
     int? custId,
@@ -134,6 +137,7 @@ class SaleOrderState extends Equatable {
       masterList:           masterList           ?? this.masterList,
       errorMessage:         errorMessage         ?? this.errorMessage,
       currentlyVisibleIndex: currentlyVisibleIndex ?? this.currentlyVisibleIndex,
+      toggleTrigger:        toggleTrigger        ?? this.toggleTrigger,
       fromDate:             fromDate             ?? this.fromDate,
       toDate:               toDate               ?? this.toDate,
       custId:               custId               ?? this.custId,
@@ -161,7 +165,7 @@ class SaleOrderState extends Equatable {
 
   @override
   List<Object?> get props => [
-    status, masterList, errorMessage, currentlyVisibleIndex,
+    status, masterList, errorMessage, currentlyVisibleIndex, toggleTrigger,
     fromDate, toDate, custId, empId, statusId,
     checkBoxValueLEmp, checkBoxValuePickUp, completeStatusNotShow,
     cls, etaVal, etaRadioVal, checkBoxValueETA,

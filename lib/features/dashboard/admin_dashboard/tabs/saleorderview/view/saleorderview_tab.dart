@@ -460,55 +460,72 @@ class _DateRow extends StatelessWidget {
     final double fs = isTablet ? 14 : 12;
 
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       decoration: BoxDecoration(
         color: AppTokens.surfaceCard,
-        borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: AppTokens.surfaceCardBorder),
-      ),
-      child: Row(
-        children: [
-          const Icon(Icons.date_range_outlined,
-              size: 18, color: AppTokens.brandPrimary),
-          const SizedBox(width: 6),
-          Expanded(
-            child: Text(
-              DateFormat('dd MMM yyyy').format(DateTime.parse(fromDate)),
-              style: GoogleFonts.lato(
-                fontSize: fs,
-                fontWeight: FontWeight.bold,
-                color: AppTokens.textPrimary,
-              ),
-            ),
-          ),
-          IconButton(
-            icon: const Icon(Icons.calendar_month_outlined,
-                size: 22, color: AppTokens.brandPrimary),
-            onPressed: onFromTap,
-            padding: EdgeInsets.zero,
-            constraints: const BoxConstraints(),
-          ),
-          const SizedBox(width: 10),
-          const Icon(Icons.arrow_forward, size: 16, color: AppTokens.textSecondary),
-          const SizedBox(width: 10),
-          Expanded(
-            child: Text(
-              DateFormat('dd MMM yyyy').format(DateTime.parse(toDate)),
-              style: GoogleFonts.lato(
-                fontSize: fs,
-                fontWeight: FontWeight.bold,
-                color: AppTokens.textPrimary,
-              ),
-            ),
-          ),
-          IconButton(
-            icon: const Icon(Icons.calendar_month_outlined,
-                size: 22, color: AppTokens.brandPrimary),
-            onPressed: onToTap,
-            padding: EdgeInsets.zero,
-            constraints: const BoxConstraints(),
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: Palette.brandGlow.withValues(alpha: 0.15),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
           ),
         ],
+        border: Border.all(color: Palette.grey200.withValues(alpha: 0.5)),
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          _buildDateSelector('From', fromDate, onFromTap, fs),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+            decoration: BoxDecoration(
+              color: AppTokens.brandPrimary.withValues(alpha: 0.1),
+              borderRadius: BorderRadius.circular(20),
+            ),
+            child: const Icon(Icons.arrow_forward_rounded, size: 16, color: AppTokens.brandPrimary),
+          ),
+          _buildDateSelector('To', toDate, onToTap, fs),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildDateSelector(String label, String dateStr, VoidCallback onTap, double fs) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(12),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              label.toUpperCase(),
+              style: GoogleFonts.lato(
+                fontSize: 10,
+                fontWeight: FontWeight.bold,
+                color: AppTokens.textMuted,
+                letterSpacing: 0.8,
+              ),
+            ),
+            const SizedBox(height: 4),
+            Row(
+              children: [
+                const Icon(Icons.calendar_month_rounded, size: 16, color: AppTokens.brandPrimary),
+                const SizedBox(width: 6),
+                Text(
+                  DateFormat('dd MMM yyyy').format(DateTime.parse(dateStr)),
+                  style: GoogleFonts.lato(
+                    fontSize: fs,
+                    fontWeight: FontWeight.w700,
+                    color: AppTokens.textPrimary,
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -537,17 +554,21 @@ class _ActionButtons extends StatelessWidget {
   Widget build(BuildContext context) {
     final double fs = isTablet ? 14 : 12;
 
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        _btn('View',   Icons.search,       onView,   AppTokens.brandPrimary, fs),
-        const SizedBox(width: 6),
-        _btn('Filter', Icons.filter_alt,   onFilter, AppTokens.planCobalt,  fs),
-        const SizedBox(width: 6),
-        _btn('Dates',  Icons.event,        onDates,  AppTokens.statusWarning, fs),
-        const SizedBox(width: 6),
-        _btn('Update', Icons.save_rounded, onUpdate, AppTokens.statusSuccess, fs),
-      ],
+    return SingleChildScrollView(
+      scrollDirection: Axis.horizontal,
+      physics: const BouncingScrollPhysics(),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          _btn('View',   Icons.search_rounded,       onView,   AppTokens.brandPrimary, fs),
+          const SizedBox(width: 8),
+          _btn('Filter', Icons.filter_alt_rounded,   onFilter, AppTokens.planCobalt,  fs),
+          const SizedBox(width: 8),
+          _btn('Dates',  Icons.calendar_today_rounded, onDates,  AppTokens.statusWarning, fs),
+          const SizedBox(width: 8),
+          _btn('Update', Icons.save_rounded,         onUpdate, AppTokens.statusSuccess, fs),
+        ],
+      ),
     );
   }
 
@@ -557,11 +578,18 @@ class _ActionButtons extends StatelessWidget {
       style: ElevatedButton.styleFrom(
         backgroundColor: color,
         foregroundColor: Palette.white,
-        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-        elevation: 2,
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        elevation: 0,
+        shadowColor: color.withValues(alpha: 0.4),
+      ).copyWith(
+        elevation: WidgetStateProperty.resolveWith((states) {
+          if (states.contains(WidgetState.pressed)) return 2;
+          if (states.contains(WidgetState.hovered)) return 4;
+          return 0; // Flat design by default, elevates on hover
+        }),
       ),
-      icon: Icon(icon, size: 15),
+      icon: Icon(icon, size: 16),
       label: Text(label, style: GoogleFonts.lato(fontSize: fs, fontWeight: FontWeight.bold)),
       onPressed: onPressed,
     );
@@ -579,19 +607,42 @@ class _SummaryPill extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+      margin: const EdgeInsets.symmetric(vertical: 8),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       decoration: BoxDecoration(
-        gradient: AppTokens.headerGradient,
-        borderRadius: BorderRadius.circular(20),
-        boxShadow: [BoxShadow(color: Palette.brandGlow, blurRadius: 6)],
+        color: AppTokens.surfaceCard,
+        borderRadius: BorderRadius.circular(24),
+        border: Border.all(color: Palette.grey200),
+        boxShadow: [
+          BoxShadow(
+            color: Palette.brandGlow.withValues(alpha: 0.08),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+          ),
+        ],
       ),
-      child: Text(
-        'Total Orders: $count',
-        style: GoogleFonts.lato(
-          color: Palette.white,
-          fontWeight: FontWeight.w600,
-          fontSize: 12,
-        ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          const Icon(Icons.analytics_rounded, size: 16, color: AppTokens.brandPrimary),
+          const SizedBox(width: 8),
+          Text(
+            'Total Orders: ',
+            style: GoogleFonts.lato(
+              color: AppTokens.textSecondary,
+              fontWeight: FontWeight.w500,
+              fontSize: 12,
+            ),
+          ),
+          Text(
+            '$count',
+            style: GoogleFonts.lato(
+              color: AppTokens.brandPrimary,
+              fontWeight: FontWeight.w800,
+              fontSize: 13,
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -622,146 +673,195 @@ class _SaleOrderCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final double collapsedH = isTablet ? 110 : 96;
-    final double expandedH  = isTablet ? 260 : 220;
-    final double fs         = isTablet ? 13.5 : 12;
+    final double fs = isTablet ? 13.5 : 12;
 
-    return AnimatedContainer(
-      duration: const Duration(milliseconds: 280),
-      curve: Curves.easeInOut,
-      height: isExpanded ? expandedH : collapsedH,
-      margin: const EdgeInsets.symmetric(vertical: 4),
-      child: Card(
-        elevation: 4,
+    return Container(
+      margin: const EdgeInsets.symmetric(vertical: 6, horizontal: 2),
+      decoration: BoxDecoration(
         color: bgColor ?? AppTokens.surfaceCard,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12),
-          side: BorderSide(
-            color: AppTokens.surfaceCardBorder,
-            width: 0.8,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: Palette.brandGlow.withValues(alpha: isExpanded ? 0.15 : 0.05),
+            blurRadius: isExpanded ? 12 : 6,
+            offset: Offset(0, isExpanded ? 4 : 2),
           ),
-        ),
-        child: InkWell(
-          borderRadius: BorderRadius.circular(12),
-          onTap: onTap,
-          child: Padding(
-            padding: EdgeInsets.all(isTablet ? 14 : 10),
-            child: SingleChildScrollView(
-              physics: const NeverScrollableScrollPhysics(),
+        ],
+        border: Border.all(color: Palette.grey200.withValues(alpha: 0.6), width: 1),
+      ),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(16),
+        child: Material(
+          color: Colors.transparent,
+          child: InkWell(
+            onTap: onTap,
+            child: Container(
+              decoration: BoxDecoration(
+                border: Border(
+                  left: BorderSide(
+                    color: _getStatusColor(item.JobStatus),
+                    width: 5,
+                  ),
+                ),
+              ),
+              padding: EdgeInsets.all(isTablet ? 16 : 12),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
                 children: [
                   // ── Header row ─────────────────────────────────────
                   Row(
                     children: [
                       SizedBox(
-                        width: 28,
-                        height: 28,
+                        width: 24,
+                        height: 24,
                         child: Checkbox(
                           value: item.isETASelected,
                           activeColor: AppTokens.brandPrimary,
                           shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(4)),
+                              borderRadius: BorderRadius.circular(6)),
                           onChanged: (v) => onChecked(v ?? false),
                         ),
                       ),
-                      const SizedBox(width: 6),
+                      const SizedBox(width: 10),
                       Expanded(
                         child: Text(
                           item.BillNoDisplay,
                           overflow: TextOverflow.ellipsis,
                           style: GoogleFonts.lato(
-                            fontSize: fs + 1,
-                            fontWeight: FontWeight.bold,
+                            fontSize: fs + 2,
+                            fontWeight: FontWeight.w800,
                             color: AppTokens.textPrimary,
                           ),
                         ),
                       ),
                       _StatusChip(label: item.JobStatus, fontSize: fs - 1),
-                      const SizedBox(width: 4),
-                      Icon(
-                        isExpanded
-                            ? Icons.keyboard_arrow_up_rounded
-                            : Icons.keyboard_arrow_down_rounded,
-                        color: AppTokens.textSecondary,
-                        size: 18,
+                      const SizedBox(width: 8),
+                      AnimatedRotation(
+                        turns: isExpanded ? 0.5 : 0.0,
+                        duration: const Duration(milliseconds: 300),
+                        child: const Icon(
+                          Icons.keyboard_arrow_down_rounded,
+                          color: AppTokens.textSecondary,
+                          size: 22,
+                        ),
                       ),
                     ],
                   ),
 
-                  const SizedBox(height: 4),
+                  const SizedBox(height: 8),
 
                   // ── Vessel row ─────────────────────────────────────
                   Row(
                     children: [
-                      const Icon(Icons.directions_boat_outlined,
-                          size: 13, color: AppTokens.brandPrimary),
-                      const SizedBox(width: 4),
+                      Container(
+                        padding: const EdgeInsets.all(4),
+                        decoration: BoxDecoration(
+                          color: AppTokens.brandPrimary.withValues(alpha: 0.1),
+                          shape: BoxShape.circle,
+                        ),
+                        child: const Icon(Icons.directions_boat_rounded,
+                            size: 14, color: AppTokens.brandPrimary),
+                      ),
+                      const SizedBox(width: 8),
                       Expanded(
-                        child: Text(
-                          '${item.Loadingvesselname} → ${item.Offvesselname}',
+                        child: RichText(
+                          text: TextSpan(
+                            style: GoogleFonts.lato(
+                              fontSize: fs,
+                              color: AppTokens.textSecondary,
+                            ),
+                            children: [
+                              TextSpan(
+                                text: item.Loadingvesselname,
+                                style: const TextStyle(fontWeight: FontWeight.w700),
+                              ),
+                              const TextSpan(text: '  ➔  '),
+                              TextSpan(
+                                text: item.Offvesselname,
+                                style: const TextStyle(fontWeight: FontWeight.w700),
+                              ),
+                            ],
+                          ),
                           overflow: TextOverflow.ellipsis,
-                          style: GoogleFonts.lato(
-                              fontSize: fs - 1,
-                              fontWeight: FontWeight.w600,
-                              color: AppTokens.textSecondary),
                         ),
                       ),
                     ],
                   ),
 
-                  if (isExpanded) ...[
-                    const Divider(height: 12),
-
-                    // ── Employee ───────────────────────────────────
-                    Row(
+                  // ── Expanded Content ───────────────────────────────
+                  AnimatedCrossFade(
+                    firstChild: const SizedBox(width: double.infinity, height: 0),
+                    secondChild: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Icon(Icons.person_outline,
-                            size: 13, color: AppTokens.textSecondary),
-                        const SizedBox(width: 4),
-                        Text(
-                          item.EmployeeName,
-                          style: GoogleFonts.lato(
-                              fontSize: fs - 1,
-                              color: AppTokens.textPrimary),
+                        const SizedBox(height: 12),
+                        const Divider(height: 1),
+                        const SizedBox(height: 12),
+
+                        // ── Employee ───────────────────────────────────
+                        Row(
+                          children: [
+                            const Icon(Icons.person_pin_circle_rounded,
+                                size: 16, color: AppTokens.textSecondary),
+                            const SizedBox(width: 6),
+                            Text(
+                              item.EmployeeName,
+                              style: GoogleFonts.lato(
+                                  fontSize: fs,
+                                  fontWeight: FontWeight.w600,
+                                  color: AppTokens.textPrimary),
+                            ),
+                          ],
                         ),
-                      ],
-                    ),
 
-                    const SizedBox(height: 6),
+                        const SizedBox(height: 12),
 
-                    // ── ETA chips ──────────────────────────────────
-                    Wrap(
-                      spacing: 6,
-                      runSpacing: 4,
-                      children: [
-                        _ETAChip(label: 'SETA',  value: item.SETA,  fs: fs - 2),
-                        _ETAChip(label: 'SETB',  value: item.SETB,  fs: fs - 2),
-                        _ETAChip(label: 'SOETA', value: item.SOETA, fs: fs - 2),
-                        _ETAChip(label: 'SOETB', value: item.SOETB, fs: fs - 2),
-                      ],
-                    ),
-
-                    const SizedBox(height: 6),
-
-                    // ── Route ──────────────────────────────────────
-                    Row(
-                      children: [
-                        const Icon(Icons.route_outlined,
-                            size: 13, color: AppTokens.brandPrimary),
-                        const SizedBox(width: 4),
-                        Expanded(
-                          child: Text(
-                            '${item.Origin} → ${item.Destination}',
-                            overflow: TextOverflow.ellipsis,
-                            style: GoogleFonts.lato(
-                                fontSize: fs - 1,
-                                color: AppTokens.textMuted),
+                        // ── Route ──────────────────────────────────────
+                        Container(
+                          padding: const EdgeInsets.all(10),
+                          decoration: BoxDecoration(
+                            color: Palette.grey200.withValues(alpha: 0.4),
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          child: Row(
+                            children: [
+                              const Icon(Icons.alt_route_rounded,
+                                  size: 16, color: AppTokens.brandPrimary),
+                              const SizedBox(width: 8),
+                              Expanded(
+                                child: Text(
+                                  '${item.Origin}  ➔  ${item.Destination}',
+                                  overflow: TextOverflow.ellipsis,
+                                  style: GoogleFonts.lato(
+                                      fontSize: fs,
+                                      fontWeight: FontWeight.w600,
+                                      color: AppTokens.textSecondary),
+                                ),
+                              ),
+                            ],
                           ),
                         ),
+
+                        const SizedBox(height: 12),
+
+                        // ── ETA chips ──────────────────────────────────
+                        Wrap(
+                          spacing: 8,
+                          runSpacing: 8,
+                          children: [
+                            _ETAChip(label: 'SETA',  value: item.SETA,  fs: fs - 2),
+                            _ETAChip(label: 'SETB',  value: item.SETB,  fs: fs - 2),
+                            _ETAChip(label: 'SOETA', value: item.SOETA, fs: fs - 2),
+                            _ETAChip(label: 'SOETB', value: item.SOETB, fs: fs - 2),
+                          ],
+                        ),
                       ],
                     ),
-                  ],
+                    crossFadeState: isExpanded ? CrossFadeState.showSecond : CrossFadeState.showFirst,
+                    duration: const Duration(milliseconds: 250),
+                    sizeCurve: Curves.easeOutCubic,
+                  ),
                 ],
               ),
             ),
@@ -769,6 +869,13 @@ class _SaleOrderCard extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  Color _getStatusColor(String status) {
+    if (status.toLowerCase().contains('cancel')) return Palette.redError;
+    if (status.toLowerCase().contains('complete')) return AppTokens.statusSuccess;
+    if (status.toLowerCase().contains('progress')) return AppTokens.statusWarning;
+    return AppTokens.brandPrimary;
   }
 }
 
@@ -783,19 +890,25 @@ class _StatusChip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Dynamic color based on status text
+    Color chipColor = AppTokens.brandPrimary;
+    if (label.toLowerCase().contains('cancel')) chipColor = Palette.redError;
+    if (label.toLowerCase().contains('complete')) chipColor = AppTokens.statusSuccess;
+    if (label.toLowerCase().contains('progress')) chipColor = AppTokens.statusWarning;
+
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
       decoration: BoxDecoration(
-        color: AppTokens.brandPrimary.withOpacity(0.12),
+        color: chipColor.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: AppTokens.brandPrimary.withOpacity(0.35)),
+        border: Border.all(color: chipColor.withValues(alpha: 0.4), width: 1.5),
       ),
       child: Text(
         label,
         style: GoogleFonts.lato(
           fontSize: fontSize,
-          fontWeight: FontWeight.bold,
-          color: AppTokens.brandPrimary,
+          fontWeight: FontWeight.w800,
+          color: chipColor,
         ),
       ),
     );
@@ -812,26 +925,36 @@ class _ETAChip extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final bool hasValue = value.isNotEmpty && value != 'null';
+    final Color successText = const Color(0xFF047857); // Deep Emerald Green
+    final Color successBg = const Color(0xFF059669).withValues(alpha: 0.12); // Soft Emerald
+    
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
       decoration: BoxDecoration(
-        color: hasValue
-            ? Palette.greenEco.withOpacity(0.10)
-            : Palette.grey200,
-        borderRadius: BorderRadius.circular(8),
+        color: hasValue ? successBg : Palette.grey200.withValues(alpha: 0.3),
+        borderRadius: BorderRadius.circular(20),
         border: Border.all(
-          color: hasValue
-              ? Palette.greenEco.withOpacity(0.35)
-              : Palette.grey200,
+          color: hasValue ? successText.withValues(alpha: 0.3) : Palette.grey200.withValues(alpha: 0.8),
         ),
       ),
-      child: Text(
-        '$label: ${hasValue ? value.split(' ')[0] : '–'}',
-        style: GoogleFonts.lato(
-          fontSize: fs,
-          fontWeight: FontWeight.w600,
-          color: hasValue ? Palette.greenEco : AppTokens.textMuted,
-        ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(
+            hasValue ? Icons.check_circle_outline_rounded : Icons.access_time_rounded,
+            size: fs + 2,
+            color: hasValue ? successText : AppTokens.textMuted,
+          ),
+          const SizedBox(width: 4),
+          Text(
+            '$label: ${hasValue ? value.split(' ')[0] : '–'}',
+            style: GoogleFonts.lato(
+              fontSize: fs,
+              fontWeight: FontWeight.w700,
+              color: hasValue ? successText : AppTokens.textMuted,
+            ),
+          ),
+        ],
       ),
     );
   }
