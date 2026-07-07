@@ -81,7 +81,8 @@ class _SalesDashboardState extends State<SalesDashboard> with SingleTickerProvid
                 BlocProvider(
                   create: (_) => sl<PaymentPendingBloc>(),
                   child: const PaymentPendingPage(),
-                )
+                ),
+                BlocProvider<LeaveBloc>(create: (_) => sl<LeaveBloc>()),
               ],
               child: Builder(
                 builder: (context) {

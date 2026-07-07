@@ -149,9 +149,8 @@ Tab _tab(String text, bool isTablet) => Tab(
         listener: (context, tabState) {
         switch (tabState.index) {
           case 0:
-            context.read<SalesBloc>().add(LoadSales(0));
+            // AirfreightSales bloc auto-loads in constructor, so do nothing.
             break;
-
         }
       },
         child: TabBarView(

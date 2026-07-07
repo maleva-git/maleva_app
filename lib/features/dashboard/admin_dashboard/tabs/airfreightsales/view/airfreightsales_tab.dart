@@ -1,12 +1,9 @@
-// airfreightsales_view.dart
-
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import '../../../../../../core/colors/colors.dart' as colour;
 import '../../../../../../core/di/injection.dart';
-import '../../../../../../core/theme/tokens.dart';
 import '../bloc/airfreightsales_bloc.dart';
 import '../bloc/airfreightsales_event.dart';
 import '../bloc/airfreightsales_state.dart';
@@ -32,346 +29,371 @@ class _AirfreightView extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocBuilder<AirfreightBloc, AirfreightState>(
       builder: (context, state) {
-
-        // ── Loading ──────────────────────────────────────────────────────
         if (state.isLoading && state.rulesTypeEmployee.isEmpty) {
-          return const Center(
-            child: CircularProgressIndicator(color: Color(0xFF1555F3)),
+          return const Scaffold(
+            backgroundColor: colour.kPageBg,
+            body: Center(
+              child: CircularProgressIndicator(color: colour.kPrimary),
+            ),
           );
         }
 
         return Scaffold(
-          backgroundColor: const Color(0xFFF5F5F0),
-          body: SafeArea(
-            child: ListView(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
-              children: [
-
-                // ── Header ──────────────────────────────────────────────
-                Row(
-                  children: [
-                    Container(
-                      width: 42,
-                      height: 42,
-                      decoration: BoxDecoration(
-                        color: AppTokens.invoiceHeaderStart,
-                        borderRadius: BorderRadius.circular(12),
-                        boxShadow: [
-                          BoxShadow(
-                            color: AppTokens.invoiceHeaderStart
-                                .withOpacity(0.3),
-                            blurRadius: 8,
-                            offset: const Offset(0, 4),
-                          ),
-                        ],
-                      ),
-                      child: const Icon(Icons.flight_rounded,
-                          color: Colors.white, size: 22),
-                    ),
-                    const SizedBox(width: 12),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'Air Freight Sales',
-                          style: GoogleFonts.poppins(
-                            fontSize: 18,
-                            fontWeight: FontWeight.w600,
-                            color: colour.commonColor,
-                          ),
-                        ),
-                        Text(
-                          'Air Freight · ${DateFormat('MMMM yyyy').format(DateTime.now())}',
-                          style: GoogleFonts.poppins(
-                            fontSize: 13,
-                            fontWeight: FontWeight.w500,
-                            color: colour.commonColor.withOpacity(0.5),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
+          backgroundColor: colour.kPageBg,
+          body: CustomScrollView(
+            physics: const BouncingScrollPhysics(),
+            slivers: [
+              SliverToBoxAdapter(
+                child: _buildHeader(context, state),
+              ),
+              SliverPadding(
+                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                sliver: SliverToBoxAdapter(
+                  child: _buildStatsGrid(state),
                 ),
-                const SizedBox(height: 20),
-
-                // ── Employee Dropdown ────────────────────────────────────
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                      horizontal: 16, vertical: 6),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(16),
-                    border: Border.all(color: Colors.grey.shade100),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.03),
-                        blurRadius: 10,
-                        offset: const Offset(0, 4),
-                      ),
-                    ],
-                  ),
-                  child: DropdownButtonHideUnderline(
-                    child: DropdownButton<String>(
-                      isExpanded: true,
-                      value: state.dropdownValueEmp.isEmpty
-                          ? null
-                          : state.dropdownValueEmp,
-                      hint: Text(
-                        'Select Employee',
-                        style: GoogleFonts.poppins(
-                            fontSize: 14, color: Colors.grey.shade500),
-                      ),
-                      icon: const Icon(Icons.keyboard_arrow_down_rounded,
-                          color: Colors.grey),
-                      onChanged: (String? value) {
-                        if (value != null) {
-                          context
-                              .read<AirfreightBloc>()
-                              .add(EmployeeChangedEvent(value));
-                        }
-                      },
-                      style: GoogleFonts.poppins(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w600,
-                        color: colour.commonColor,
-                      ),
-                      items: state.rulesTypeEmployee
-                          .map<DropdownMenuItem<String>>(
-                            (item) => DropdownMenuItem<String>(
-                          value: item['Id'].toString(),
-                          child: Text(item['AccountName']!),
-                        ),
-                      )
-                          .toList(),
-                    ),
-                  ),
+              ),
+              SliverPadding(
+                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+                sliver: SliverToBoxAdapter(
+                  child: _buildStatusSection(state),
                 ),
-                const SizedBox(height: 20),
-
-                // ── Stats Grid ───────────────────────────────────────────
-                GridView.count(
-                  crossAxisCount: 2,
-                  shrinkWrap: true,
-                  physics: const NeverScrollableScrollPhysics(),
-                  crossAxisSpacing: 12,
-                  mainAxisSpacing: 12,
-                  childAspectRatio: 1.45,
-                  children: [
-                    _StatCard(
-                      label: 'Total Orders',
-                      value: state.totalCount.toString(),
-                      badge: 'This month',
-                      accentColor: const Color(0xFF1555F3),
-                      badgeColor: const Color(0xFFE6F1FB),
-                      badgeTextColor: const Color(0xFF185FA5),
-                    ),
-                    _StatCard(
-                      label: 'Without Invoice',
-                      value: state.withoutInvoiceCount.toString(),
-                      badge: 'Since Oct 2024',
-                      accentColor: const Color(0xFFD85A30),
-                      badgeColor: const Color(0xFFFAECE7),
-                      badgeTextColor: const Color(0xFF993C1D),
-                    ),
-                    _StatCard(
-                      label: 'Billed',
-                      value: state.totalBilledCount.toString(),
-                      badge: 'Completed',
-                      accentColor: const Color(0xFF1D9E75),
-                      badgeColor: const Color(0xFFE1F5EE),
-                      badgeTextColor: const Color(0xFF0F6E56),
-                    ),
-                    _StatCard(
-                      label: 'Unbilled',
-                      value: state.totalUnBilledCount.toString(),
-                      badge: 'Pending',
-                      accentColor: const Color(0xFFBA7517),
-                      badgeColor: const Color(0xFFFAEEDA),
-                      badgeTextColor: const Color(0xFF854F0B),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 24),
-
-                // ── Section Label ────────────────────────────────────────
-                Padding(
-                  padding: const EdgeInsets.only(left: 4),
-                  child: Text(
-                    'STATUS BREAKDOWN',
-                    style: GoogleFonts.poppins(
-                      fontSize: 12,
-                      fontWeight: FontWeight.w700,
-                      letterSpacing: 1.0,
-                      color: colour.commonColor.withOpacity(0.4),
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 10),
-
-                // ── Status List ──────────────────────────────────────────
-                if (state.salesReport.isEmpty)
-                  Padding(
-                    padding: const EdgeInsets.only(top: 24),
-                    child: Column(
-                      children: [
-                        Icon(Icons.inbox_outlined,
-                            size: 48,
-                            color: colour.commonColor.withOpacity(0.2)),
-                        const SizedBox(height: 12),
-                        Text(
-                          'No data found',
-                          style: GoogleFonts.poppins(
-                            fontSize: 14,
-                            color: colour.commonColor.withOpacity(0.4),
-                          ),
-                        ),
-                      ],
-                    ),
-                  )
-                else
-                  Container(
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(16),
-                      border: Border.all(color: Colors.grey.shade100),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withOpacity(0.02),
-                          blurRadius: 12,
-                          offset: const Offset(0, 5),
-                        ),
-                      ],
-                    ),
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(16),
-                      child: ListView.separated(
-                        shrinkWrap: true,
-                        physics: const NeverScrollableScrollPhysics(),
-                        itemCount: state.salesReport.length,
-                        separatorBuilder: (_, __) =>
-                            Divider(height: 1, color: Colors.grey.shade100),
-                        itemBuilder: (context, index) {
-                          final item = state.salesReport[index];
-                          final int dayCount =
-                              int.tryParse(item['DayCount'].toString()) ?? 0;
-                          final double progress =
-                          (dayCount / 100).clamp(0.0, 1.0);
-
-                          return Padding(
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: 16, vertical: 14),
-                            child: Row(
-                              children: [
-                                // Status dot
-                                Container(
-                                  width: 10,
-                                  height: 10,
-                                  decoration: BoxDecoration(
-                                    color: _statusColor(index),
-                                    shape: BoxShape.circle,
-                                    boxShadow: [
-                                      BoxShadow(
-                                        color: _statusColor(index)
-                                            .withOpacity(0.4),
-                                        blurRadius: 4,
-                                        offset: const Offset(0, 2),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                                const SizedBox(width: 12),
-                                // Status name
-                                Expanded(
-                                  child: Text(
-                                    item['JobStatus'].toString(),
-                                    style: GoogleFonts.poppins(
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.w600,
-                                      color: colour.commonColor,
-                                    ),
-                                  ),
-                                ),
-                                // Progress bar
-                                SizedBox(
-                                  width: 70,
-                                  child: ClipRRect(
-                                    borderRadius: BorderRadius.circular(4),
-                                    child: LinearProgressIndicator(
-                                      value: progress,
-                                      backgroundColor: Colors.grey.shade100,
-                                      color: _statusColor(index),
-                                      minHeight: 6,
-                                    ),
-                                  ),
-                                ),
-                                const SizedBox(width: 12),
-                                // Day count
-                                SizedBox(
-                                  width: 30,
-                                  child: Text(
-                                    dayCount.toString(),
-                                    textAlign: TextAlign.right,
-                                    style: GoogleFonts.poppins(
-                                      fontSize: 15,
-                                      fontWeight: FontWeight.w700,
-                                      color: colour.commonColor,
-                                    ),
-                                  ),
-                                ),
-                                const SizedBox(width: 4),
-                                Text(
-                                  'days',
-                                  style: GoogleFonts.poppins(
-                                    fontSize: 12,
-                                    fontWeight: FontWeight.w500,
-                                    color: colour.commonColor.withOpacity(0.4),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          );
-                        },
-                      ),
-                    ),
-                  ),
-
-                const SizedBox(height: 20),
-              ],
-            ),
+              ),
+              const SliverToBoxAdapter(
+                child: SizedBox(height: 30),
+              ),
+            ],
           ),
         );
       },
     );
   }
 
-  Color _statusColor(int index) {
+  // ── Header Section ──
+  Widget _buildHeader(BuildContext context, AirfreightState state) {
+    return Container(
+      width: double.infinity,
+      decoration: const BoxDecoration(
+        gradient: LinearGradient(
+          colors: [colour.kPrimary, colour.kPrimaryLight],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        borderRadius: BorderRadius.only(
+          bottomLeft: Radius.circular(32),
+          bottomRight: Radius.circular(32),
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: colour.kShadow,
+            blurRadius: 15,
+            offset: Offset(0, 8),
+          )
+        ],
+      ),
+      padding: const EdgeInsets.only(top: 50, left: 24, right: 24, bottom: 30),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Air Freight Sales',
+                    style: GoogleFonts.poppins(
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                      letterSpacing: 0.5,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    DateFormat('MMMM yyyy').format(DateTime.now()),
+                    style: GoogleFonts.poppins(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w500,
+                      color: Colors.white.withOpacity(0.8),
+                    ),
+                  ),
+                ],
+              ),
+              Container(
+                width: 52,
+                height: 52,
+                decoration: BoxDecoration(
+                  color: Colors.white.withOpacity(0.15),
+                  shape: BoxShape.circle,
+                  border: Border.all(color: Colors.white.withOpacity(0.2), width: 1.5),
+                ),
+                child: const Icon(Icons.flight_takeoff_rounded, color: Colors.white, size: 26),
+              )
+            ],
+          ),
+          const SizedBox(height: 24),
+          // Glassmorphism Dropdown
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            decoration: BoxDecoration(
+              color: Colors.white.withOpacity(0.15),
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(color: Colors.white.withOpacity(0.2)),
+            ),
+            child: DropdownButtonHideUnderline(
+              child: DropdownButton<String>(
+                isExpanded: true,
+                dropdownColor: colour.kPrimary, // Match theme
+                icon: const Icon(Icons.keyboard_arrow_down_rounded, color: Colors.white),
+                value: state.dropdownValueEmp.isEmpty ? null : state.dropdownValueEmp,
+                hint: Text(
+                  'Select Employee',
+                  style: GoogleFonts.poppins(fontSize: 14, color: Colors.white70),
+                ),
+                style: GoogleFonts.poppins(
+                  fontSize: 15,
+                  fontWeight: FontWeight.w600,
+                  color: Colors.white,
+                ),
+                onChanged: (String? value) {
+                  if (value != null) {
+                    context.read<AirfreightBloc>().add(EmployeeChangedEvent(value));
+                  }
+                },
+                items: state.rulesTypeEmployee.map<DropdownMenuItem<String>>((item) {
+                  return DropdownMenuItem<String>(
+                    value: item['Id'].toString(),
+                    child: Text(item['AccountName']!),
+                  );
+                }).toList(),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // ── Stats Grid ──
+  Widget _buildStatsGrid(AirfreightState state) {
+    return GridView.count(
+      crossAxisCount: 2,
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
+      crossAxisSpacing: 16,
+      mainAxisSpacing: 16,
+      childAspectRatio: 1.1,
+      children: [
+        _PremiumStatCard(
+          title: 'Total Orders',
+          value: state.totalCount.toString(),
+          icon: Icons.list_alt_rounded,
+          gradientColors: const [colour.kPrimary, colour.kPrimaryLight],
+        ),
+        _PremiumStatCard(
+          title: 'Without Invoice',
+          value: state.withoutInvoiceCount.toString(),
+          icon: Icons.receipt_long_rounded,
+          gradientColors: const [colour.kAccentRed, colour.cRose],
+        ),
+        _PremiumStatCard(
+          title: 'Billed',
+          value: state.totalBilledCount.toString(),
+          icon: Icons.check_circle_outline_rounded,
+          gradientColors: const [colour.kSuccess, colour.kGreen],
+        ),
+        _PremiumStatCard(
+          title: 'Unbilled',
+          value: state.totalUnBilledCount.toString(),
+          icon: Icons.hourglass_empty_rounded,
+          gradientColors: const [colour.kGold, colour.kOrange],
+        ),
+      ],
+    );
+  }
+
+  // ── Status Section ──
+  Widget _buildStatusSection(AirfreightState state) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: const EdgeInsets.only(left: 4, bottom: 16),
+          child: Text(
+            'STATUS BREAKDOWN',
+            style: GoogleFonts.poppins(
+              fontSize: 13,
+              fontWeight: FontWeight.w700,
+              letterSpacing: 1.2,
+              color: const Color(0xFF8B95A5),
+            ),
+          ),
+        ),
+        if (state.salesReport.isEmpty)
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.symmetric(vertical: 40),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(24),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.02),
+                  blurRadius: 15,
+                  offset: const Offset(0, 5),
+                )
+              ],
+            ),
+            child: Column(
+              children: [
+                Icon(Icons.inbox_rounded, size: 54, color: const Color(0xFFD2D6E0)),
+                const SizedBox(height: 12),
+                Text(
+                  'No data found',
+                  style: GoogleFonts.poppins(
+                    fontSize: 15,
+                    color: const Color(0xFF8B95A5),
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ],
+            ),
+          )
+        else
+          Container(
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(24),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.04),
+                  blurRadius: 20,
+                  offset: const Offset(0, 10),
+                )
+              ],
+            ),
+            child: ListView.separated(
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              padding: EdgeInsets.zero,
+              itemCount: state.salesReport.length,
+              separatorBuilder: (_, __) => Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 20),
+                child: Divider(height: 1, color: Colors.grey.shade100, thickness: 1.5),
+              ),
+              itemBuilder: (context, index) {
+                final item = state.salesReport[index];
+                final int dayCount = int.tryParse(item['DayCount'].toString()) ?? 0;
+                final double progress = (dayCount / 100).clamp(0.0, 1.0);
+                final Color themeColor = _statusThemeColor(index);
+
+                return Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
+                  child: Row(
+                    children: [
+                      // Icon/Dot
+                      Container(
+                        padding: const EdgeInsets.all(10),
+                        decoration: BoxDecoration(
+                          color: themeColor.withOpacity(0.1),
+                          shape: BoxShape.circle,
+                        ),
+                        child: Icon(
+                          Icons.insights_rounded,
+                          color: themeColor,
+                          size: 18,
+                        ),
+                      ),
+                      const SizedBox(width: 16),
+                      // Title
+                      Expanded(
+                        child: Text(
+                          item['JobStatus'].toString(),
+                          style: GoogleFonts.poppins(
+                            fontSize: 14.5,
+                            fontWeight: FontWeight.w600,
+                            color: const Color(0xFF2D3748),
+                          ),
+                        ),
+                      ),
+                      // Progress and Text
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.end,
+                        children: [
+                          Row(
+                            crossAxisAlignment: CrossAxisAlignment.baseline,
+                            textBaseline: TextBaseline.alphabetic,
+                            children: [
+                              Text(
+                                dayCount.toString(),
+                                style: GoogleFonts.poppins(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold,
+                                  color: themeColor,
+                                ),
+                              ),
+                              const SizedBox(width: 4),
+                              Text(
+                                'days',
+                                style: GoogleFonts.poppins(
+                                  fontSize: 11,
+                                  fontWeight: FontWeight.w500,
+                                  color: const Color(0xFFA0AEC0),
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 6),
+                          SizedBox(
+                            width: 80,
+                            child: ClipRRect(
+                              borderRadius: BorderRadius.circular(10),
+                              child: LinearProgressIndicator(
+                                value: progress,
+                                backgroundColor: themeColor.withOpacity(0.15),
+                                valueColor: AlwaysStoppedAnimation<Color>(themeColor),
+                                minHeight: 6,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                );
+              },
+            ),
+          ),
+      ],
+    );
+  }
+
+  Color _statusThemeColor(int index) {
     const colors = [
-      Color(0xFF1555F3), // blue
-      Color(0xFF1D9E75), // teal
-      Color(0xFFBA7517), // amber
-      Color(0xFFD85A30), // coral
-      Color(0xFF888780), // gray
+      colour.brand, // Blue
+      colour.kSuccess, // Teal
+      colour.cRose, // Red
+      colour.kGold, // Amber
+      colour.kNavy, // Navy instead of purple
+      colour.kBlue, // Cyan
     ];
     return colors[index % colors.length];
   }
 }
 
-// ── Stat Card Widget ───────────────────────────────────────────────────────────
-class _StatCard extends StatelessWidget {
-  final String label;
+// ── Premium Stat Card ──────────────────────────────────────────────────────────
+class _PremiumStatCard extends StatelessWidget {
+  final String title;
   final String value;
-  final String badge;
-  final Color accentColor;
-  final Color badgeColor;
-  final Color badgeTextColor;
+  final IconData icon;
+  final List<Color> gradientColors;
 
-  const _StatCard({
-    required this.label,
+  const _PremiumStatCard({
+    required this.title,
     required this.value,
-    required this.badge,
-    required this.accentColor,
-    required this.badgeColor,
-    required this.badgeTextColor,
+    required this.icon,
+    required this.gradientColors,
   });
 
   @override
@@ -379,79 +401,65 @@ class _StatCard extends StatelessWidget {
     return Container(
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.grey.shade100),
+        borderRadius: BorderRadius.circular(24),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.03),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
+            color: gradientColors.first.withOpacity(0.12),
+            blurRadius: 15,
+            offset: const Offset(0, 8),
           ),
         ],
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Accent top bar
-          Container(
-            height: 4,
-            decoration: BoxDecoration(
-              color: accentColor,
-              borderRadius: const BorderRadius.only(
-                topLeft: Radius.circular(16),
-                topRight: Radius.circular(16),
-              ),
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      colors: gradientColors,
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                    ),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Icon(icon, color: Colors.white, size: 20),
+                ),
+                Icon(Icons.arrow_outward_rounded, color: Colors.grey.shade300, size: 18),
+              ],
             ),
-          ),
-          Expanded(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(
-                  horizontal: 14, vertical: 12),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    label.toUpperCase(),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: GoogleFonts.poppins(
-                      fontSize: 10,
-                      fontWeight: FontWeight.w600,
-                      letterSpacing: 0.5,
-                      color: Colors.grey.shade500,
-                    ),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  value,
+                  style: GoogleFonts.poppins(
+                    fontSize: 26,
+                    fontWeight: FontWeight.bold,
+                    color: const Color(0xFF1A202C),
+                    height: 1.2,
                   ),
-                  Text(
-                    value,
-                    style: GoogleFonts.poppins(
-                      fontSize: 28,
-                      fontWeight: FontWeight.w700,
-                      color: colour.commonColor,
-                      height: 1,
-                    ),
+                ),
+                Text(
+                  title,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: GoogleFonts.poppins(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w500,
+                    color: const Color(0xFF718096),
                   ),
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 8, vertical: 3),
-                    decoration: BoxDecoration(
-                      color: badgeColor,
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                    child: Text(
-                      badge,
-                      style: GoogleFonts.poppins(
-                        fontSize: 9.5,
-                        color: badgeTextColor,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
+                ),
+              ],
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
