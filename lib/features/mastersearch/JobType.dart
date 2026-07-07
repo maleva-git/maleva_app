@@ -174,9 +174,7 @@ class _JobTypestate extends State<JobType> {
                                       onTap: () {
                                         setState(() {
                                           if (widget.Searchby == 1) {
-                                            if (objfun.SelectedId != 0) {
-                                              Navigator.of(context, rootNavigator: true).pop(item);
-                                            }
+                                            Navigator.of(context, rootNavigator: true).pop(item);
                                           }
                                         });
                                       },

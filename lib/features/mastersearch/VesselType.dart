@@ -178,7 +178,7 @@ class _VesselTypestate extends State<VesselType> {
                                         setState(() {
                                           if (widget.Searchby == 1) {
                                             objfun.SelectedVesselTypeName = item.toString();
-                                            Navigator.of(context, rootNavigator: true).pop(context);
+                                            Navigator.of(context, rootNavigator: true).pop(item.toString());
                                           }
                                         });
                                       },

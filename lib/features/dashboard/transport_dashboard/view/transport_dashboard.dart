@@ -25,6 +25,7 @@ import '../../admin_dashboard/tabs/transportsales/data/transport_sales_repositor
 import '../../admin_dashboard/tabs/transportsales/view/transport_sales_tab.dart';
 import '../bloc/transport_bloc.dart';
 import '../bloc/transport_event.dart';
+import 'package:maleva/features/dashboard/admin_dashboard/tabs/driverleave/bloc/leave_bloc.dart';
 
 class TransportDashboard extends StatefulWidget{
   const TransportDashboard({super.key});
@@ -98,7 +99,8 @@ class _TransportDashboardState extends State<TransportDashboard> with SingleTick
               ),
             ),
 
-          ],
+                  BlocProvider<LeaveBloc>(create: (_) => sl<LeaveBloc>()),
+      ],
           child: Scaffold(
             body: TransportMobileDashboard(
               tabController: _tabController,

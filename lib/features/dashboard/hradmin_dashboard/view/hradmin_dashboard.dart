@@ -61,6 +61,7 @@ import '../../admin_dashboard/tabs/vesselreport/view/vesselreportview_tab.dart';
 import '../bloc/hradmin_bloc.dart';
 import '../bloc/hradmin_event.dart';
 import 'hradmin_dashboard_ui.dart';
+import 'package:maleva/features/dashboard/admin_dashboard/tabs/driverleave/bloc/leave_bloc.dart';
 
 
 class HrAdminDashboard extends StatefulWidget{
@@ -144,7 +145,8 @@ class _HrAdminDashboardState extends State<HrAdminDashboard> with SingleTickerPr
               child: const LicensePage(), // Make sure to add a BlocListener inside here if you want to show snackbars for TruckErrorState!
             ),
 
-          ],
+                  BlocProvider<LeaveBloc>(create: (_) => sl<LeaveBloc>()),
+      ],
           child: Scaffold(
             body: HrAMobileDashboard(
               tabController: _tabController,

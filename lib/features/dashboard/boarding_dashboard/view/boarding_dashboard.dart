@@ -24,6 +24,7 @@ import '../../admin_dashboard/tabs/vesselreport/view/vesselreportview_tab.dart';
 import '../bloc/boarding_bloc.dart';
 import '../bloc/boarding_event.dart';
 import 'boarding_dashboard_ui.dart';
+import 'package:maleva/features/dashboard/admin_dashboard/tabs/driverleave/bloc/leave_bloc.dart';
 
 
 class BoardingDashboard extends StatefulWidget{
@@ -100,6 +101,7 @@ class _AdminDashboardState extends State<BoardingDashboard> with SingleTickerPro
               create: (_) => sl<SalaryBloc>(),
               child: const SalaryTab(),
             ),
+        BlocProvider<LeaveBloc>(create: (_) => sl<LeaveBloc>()),
           ],                                    // ← ] தான் close, } இல்ல
           child: Scaffold(
             body: BoardingMobileDashboard(

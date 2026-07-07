@@ -12,6 +12,7 @@ import '../../admin_dashboard/tabs/salesorder/bloc/salesorder_event.dart';
 import '../../admin_dashboard/tabs/salesorder/view/salesorderview_tab.dart';
 import '../bloc/receivable_bloc.dart';
 import '../bloc/receivable_event.dart';
+import 'package:maleva/features/dashboard/admin_dashboard/tabs/driverleave/bloc/leave_bloc.dart';
 
 class ReceivableDashboard extends StatefulWidget{
   const ReceivableDashboard({super.key});
@@ -60,7 +61,8 @@ class _AdminDashboardState extends State<ReceivableDashboard> with SingleTickerP
                 ..add(LoadInvoiceByTypes(1)),
               child: const SalesOrderTab(),
             ),
-          ],
+                  BlocProvider<LeaveBloc>(create: (_) => sl<LeaveBloc>()),
+      ],
           child: Scaffold(
             body: ReceivableMobileDashboard(
               tabController: _tabController,

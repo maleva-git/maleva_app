@@ -404,40 +404,51 @@ class _DetailsSection extends StatelessWidget {
           ),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-            child: Table(
-              border: TableBorder.all(color: colour.kBorder, width: 1, borderRadius: BorderRadius.circular(8)),
-              columnWidths: const {
-                0: FlexColumnWidth(2),
-                1: FlexColumnWidth(2),
-                2: FlexColumnWidth(2),
-                3: FlexColumnWidth(2.5),
-              },
-              children: [
-                // Header Row
-                TableRow(
-                  decoration: BoxDecoration(
-                    color: colour.kCobalt.withOpacity(0.05),
-                    borderRadius: const BorderRadius.vertical(top: Radius.circular(8)),
-                  ),
-                  children: [
-                    _buildCell('Job No', isTablet, isHeader: true),
-                    _buildCell('Job Date', isTablet, isHeader: true),
-                    _buildCell('Truck', isTablet, isHeader: true),
-                    _buildCell('Remarks', isTablet, isHeader: true),
-                  ],
+            child: SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: Container(
+                decoration: BoxDecoration(
+                  border: Border.all(color: colour.kBorder, width: 1),
+                  borderRadius: BorderRadius.circular(8),
                 ),
-                // Data Rows
-                ...details.map((item) {
-                  return TableRow(
-                    children: [
-                      _buildCell('${item["JobNo"]}', isTablet, color: colour.kCobalt, fw: FontWeight.w700),
-                      _buildCell('${item["JobDate"]}', isTablet),
-                      _buildCell('${item["TruckName"]}', isTablet, color: colour.kSuccess, fw: FontWeight.w600),
-                      _buildCell('${item["Remarks"]}', isTablet, color: AppTokens.planTextMuted),
-                    ],
-                  );
-                }).toList(),
-              ],
+                child: DataTable(
+                  headingRowColor: MaterialStateProperty.all(colour.kCobalt.withOpacity(0.05)),
+                  columnSpacing: 20,
+                  dataRowMinHeight: 40,
+                  dataRowMaxHeight: 60,
+                  headingRowHeight: 40,
+                  columns: [
+                    _buildCol('Job No', isTablet),
+                    _buildCol('Job Date', isTablet),
+                    _buildCol('Truck Name', isTablet),
+                    _buildCol('Driver Name', isTablet),
+                    _buildCol('Pickup Date', isTablet),
+                    _buildCol('Delivery Date', isTablet),
+                    _buildCol('Origin', isTablet),
+                    _buildCol('Destination', isTablet),
+                    _buildCol('Package', isTablet),
+                    _buildCol('Weight', isTablet),
+                    _buildCol('Remarks', isTablet),
+                  ],
+                  rows: details.map((item) {
+                    return DataRow(
+                      cells: [
+                        _buildCell('${item["JobNo"] ?? item["jobNo"] ?? ''}', isTablet, color: colour.kCobalt, fw: FontWeight.w700),
+                        _buildCell('${item["JobDate"] ?? item["jobDate"] ?? ''}', isTablet),
+                        _buildCell('${item["TruckName"] ?? item["truckName"] ?? ''}', isTablet, color: colour.kSuccess, fw: FontWeight.w600),
+                        _buildCell('${item["DriverName"] ?? item["driverName"] ?? ''}', isTablet),
+                        _buildCell('${item["PickupDate"] ?? item["pickupdate"] ?? item["pickupDate"] ?? item["SPickupDate"] ?? ''}', isTablet),
+                        _buildCell('${item["DeliveryDate"] ?? item["deliverydate"] ?? item["deliveryDate"] ?? item["SDeliveryDate"] ?? ''}', isTablet),
+                        _buildCell('${item["Origin"] ?? item["origin"] ?? ''}', isTablet),
+                        _buildCell('${item["Destination"] ?? item["destination"] ?? ''}', isTablet),
+                        _buildCell('${item["Package"] ?? item["package"] ?? item["pkg"] ?? ''}', isTablet),
+                        _buildCell('${item["Weight"] ?? item["weight"] ?? ''}', isTablet),
+                        _buildCell('${item["Remarks"] ?? item["remarks"] ?? ''}', isTablet, color: AppTokens.planTextMuted),
+                      ],
+                    );
+                  }).toList(),
+                ),
+              ),
             ),
           ),
           const SizedBox(height: 12),
@@ -446,14 +457,20 @@ class _DetailsSection extends StatelessWidget {
     );
   }
 
-  Widget _buildCell(String text, bool isTablet, {bool isHeader = false, Color? color, FontWeight? fw}) {
-    return Padding(
-      padding: EdgeInsets.all(isTablet ? 12.0 : 8.0),
-      child: Text(
+  DataColumn _buildCol(String text, bool isTablet) {
+    return DataColumn(
+      label: Text(
         text,
-        style: isHeader
-            ? _label(10, color: AppTokens.planTextMuted, fw: FontWeight.w700)
-            : _body(isTablet ? 11 : 10, color: color ?? colour.kText, fw: fw ?? FontWeight.normal),
+        style: _label(isTablet ? 12 : 11, color: AppTokens.planTextMuted, fw: FontWeight.w700),
+      ),
+    );
+  }
+
+  DataCell _buildCell(String text, bool isTablet, {Color? color, FontWeight? fw}) {
+    return DataCell(
+      Text(
+        text.isEmpty || text == 'null' ? '-' : text,
+        style: _body(isTablet ? 12 : 11, color: color ?? colour.kText, fw: fw ?? FontWeight.normal),
       ),
     );
   }

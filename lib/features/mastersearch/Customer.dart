@@ -64,9 +64,7 @@ class _Customerstate extends State<Customer> {
 
   void _onItemTapped(CustomerModel selectedCustomer) {
     if (widget.Searchby == 1) {
-      if (objfun.SelectedId != 0) {
-        Navigator.of(context, rootNavigator: true).pop(selectedCustomer);
-      }
+      Navigator.of(context, rootNavigator: true).pop(selectedCustomer);
     }
   }
 

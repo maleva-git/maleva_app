@@ -7,10 +7,12 @@ import 'package:maleva/core/utils/clsfunction.dart' as objfun;
 import 'package:maleva/core/network/OnlineApi.dart' as OnlineApi;
 import 'package:maleva/features/transaction/salesorder/add/bloc/salesorderadd_event.dart';
 import 'package:maleva/features/transaction/salesorder/add/bloc/salesorderadd_state.dart';
+import 'package:maleva/features/transaction/salesorder/add/data/salesorderadd_repository.dart';
 import 'dart:developer' as developer;
 
 class SalesOrderAddBloc extends Bloc<SalesOrderAddEvent, SalesOrderAddState> {
   final BuildContext context;
+  final SalesOrderAddRepository _repository;
 
   static const List<String> _billType = ['MY', 'TR'];
 
@@ -23,15 +25,15 @@ class SalesOrderAddBloc extends Bloc<SalesOrderAddEvent, SalesOrderAddState> {
   static List<String> get truckSizeList => _truckSizeList;
   static List<String> get zbNo => _zbNo;
 
-  SalesOrderAddBloc(this.context) : super(SalesOrderAddInitial()) {
+  SalesOrderAddBloc(this.context, this._repository) : super(SalesOrderAddInitial()) {
 
     on<StartupSalesOrderAdd>((event, emit) async {
       emit(SalesOrderAddLoading());
       try {
         final now = DateFormat("yyyy-MM-dd HH:mm:ss").format(DateTime.now());
         final today = DateFormat("yyyy-MM-dd").format(DateTime.now());
-        await OnlineApi.MaxSaleOrderNo(context, 'MY');await OnlineApi.selectAddressList();
-        await OnlineApi.SelectAgentCompany(context);await OnlineApi.SelectEmployee(context, '', 'Operation');final permission = _buildPermissions();
+        final maxMy = await _repository.maxSaleOrderNo('MY'); objfun.MaxSaleOrderNum = maxMy; objfun.AddressList = await _repository.selectAddressList();
+        objfun.AgentCompanyList = (await _repository.selectAgentCompany()).map<AgentCompanyModel>((e) => AgentCompanyModel.fromJson(e)).toList();objfun.EmployeeList = (await _repository.selectEmployee('', 'Operation')).map<EmployeeModel>((e) => EmployeeModel.fromJson(e)).toList();final permission = _buildPermissions();
         var base = SalesOrderAddLoaded(
           progress: true, dtpSaleOrderdate: today, dtpOETAdate: now, dtpOETBdate: now, dtpOETDdate: now,
           dtpLETAdate: now, dtpLETBdate: now, dtpLETDdate: now, dtpFlightTimedate: now, dtpPickUpdate: now,
@@ -82,7 +84,7 @@ class SalesOrderAddBloc extends Bloc<SalesOrderAddEvent, SalesOrderAddState> {
         return;
       }
 
-      await OnlineApi.loadCustomerCurrency(context, event.id);emit(s.copyWith(txtCustomer: event.name, custId: event.id, currencyValue: objfun.CustomerCurrencyValue));
+      objfun.CustomerCurrencyValue = await _repository.loadCustomerCurrency(event.id);emit(s.copyWith(txtCustomer: event.name, custId: event.id, currencyValue: objfun.CustomerCurrencyValue));
     });
 
     // ──────────────────────────────────────────────────────────────────────────
@@ -98,7 +100,12 @@ class SalesOrderAddBloc extends Bloc<SalesOrderAddEvent, SalesOrderAddState> {
         return;
       }
 
-      await OnlineApi.SelectAllJobStatus(context, event.id);emit(_applyVisibility(s.copyWith(txtJobType: event.name, jobTypeId: event.id)));
+      final jobData = await _repository.selectAllJobStatus(event.id);
+      if (jobData.isNotEmpty) {
+        if (jobData["JobStatusDetails"] != null) objfun.JobAllStatusList = (jobData["JobStatusDetails"] as List).map<JobAllStatusModel>((e) => JobAllStatusModel.fromJson(e)).toList();
+        if (jobData["JobTypeDetails"] != null) objfun.JobTypeDetailsList = (jobData["JobTypeDetails"] as List).map<JobTypeDetailsModel>((e) => JobTypeDetailsModel.fromJson(e)).toList();
+      }
+      emit(_applyVisibility(s.copyWith(txtJobType: event.name, jobTypeId: event.id)));
     });
 
 
@@ -251,18 +258,28 @@ class SalesOrderAddBloc extends Bloc<SalesOrderAddEvent, SalesOrderAddState> {
     on<RemovePickUpAddress>((event, emit) {
       if (state is! SalesOrderAddLoaded) return;
       final s = state as SalesOrderAddLoaded;
-      final addrList = List<dynamic>.from(s.pickUpAddressList)..removeAt(event.index);
-      final qtyList = List<dynamic>.from(s.pickUpQuantityList)..removeAt(event.index);
-      final wtList = List<dynamic>.from(s.pickUpWeightList)..removeAt(event.index); // ADDED
+      final addrList = List<dynamic>.from(s.pickUpAddressList);
+      final qtyList = List<dynamic>.from(s.pickUpQuantityList);
+      final wtList = List<dynamic>.from(s.pickUpWeightList);
+      
+      if (event.index < addrList.length) addrList.removeAt(event.index);
+      if (event.index < qtyList.length) qtyList.removeAt(event.index);
+      if (event.index < wtList.length) wtList.removeAt(event.index);
+      
       emit(s.copyWith(pickUpAddressList: addrList, pickUpQuantityList: qtyList, pickUpWeightList: wtList));
     });
 
     on<RemoveDeliveryAddress>((event, emit) {
       if (state is! SalesOrderAddLoaded) return;
       final s = state as SalesOrderAddLoaded;
-      final addrList = List<dynamic>.from(s.deliveryAddressList)..removeAt(event.index);
-      final qtyList = List<dynamic>.from(s.deliveryQuantityList)..removeAt(event.index);
-      final wtList = List<dynamic>.from(s.deliveryWeightList)..removeAt(event.index); // ADDED
+      final addrList = List<dynamic>.from(s.deliveryAddressList);
+      final qtyList = List<dynamic>.from(s.deliveryQuantityList);
+      final wtList = List<dynamic>.from(s.deliveryWeightList);
+      
+      if (event.index < addrList.length) addrList.removeAt(event.index);
+      if (event.index < qtyList.length) qtyList.removeAt(event.index);
+      if (event.index < wtList.length) wtList.removeAt(event.index);
+      
       emit(s.copyWith(deliveryAddressList: addrList, deliveryQuantityList: qtyList, deliveryWeightList: wtList));
     });
 
@@ -293,7 +310,7 @@ class SalesOrderAddBloc extends Bloc<SalesOrderAddEvent, SalesOrderAddState> {
     on<BillTypeChanged>((event, emit) async {
       if (state is! SalesOrderAddLoaded) return;
       final s = state as SalesOrderAddLoaded;
-      await OnlineApi.MaxSaleOrderNo(context, event.value);emit(s.copyWith(dropdownValue: event.value, txtJobNo: objfun.MaxSaleOrderNum));
+      final maxEv = await _repository.maxSaleOrderNo(event.value); objfun.MaxSaleOrderNum = maxEv;emit(s.copyWith(dropdownValue: event.value, txtJobNo: objfun.MaxSaleOrderNum));
     });
 
     on<SaveSalesOrderEvent>((event, emit) async {
@@ -610,16 +627,28 @@ class SalesOrderAddBloc extends Bloc<SalesOrderAddEvent, SalesOrderAddState> {
     final m = master[0];
     final now = DateFormat("yyyy-MM-dd HH:mm:ss").format(DateTime.now());
 
-    await OnlineApi.SelectCustomer(context);await OnlineApi.SelectJobType(context);if (m["JobMasterRefId"] != null) await OnlineApi.SelectAllJobStatus(context, m["JobMasterRefId"]);String lAgentName = '';
+
+
+
+    objfun.CustomerList = (await _repository.selectCustomer()).map<CustomerModel>((e) => CustomerModel.fromJson(e)).toList();
+    objfun.JobTypeList = (await _repository.selectJobType()).map<JobTypeModel>((e) => JobTypeModel.fromJson(e)).toList();
+    if (m["JobMasterRefId"] != null) {
+      final jobData = await _repository.selectAllJobStatus(m["JobMasterRefId"] as int? ?? 0);
+      if (jobData.isNotEmpty) {
+        if (jobData["JobStatusDetails"] != null) objfun.JobAllStatusList = (jobData["JobStatusDetails"] as List).map<JobAllStatusModel>((e) => JobAllStatusModel.fromJson(e)).toList();
+        if (jobData["JobTypeDetails"] != null) objfun.JobTypeDetailsList = (jobData["JobTypeDetails"] as List).map<JobTypeDetailsModel>((e) => JobTypeDetailsModel.fromJson(e)).toList();
+      }
+    }
+    String lAgentName = '';
     if (m["AgentCompanyRefId"] != null && m["AgentCompanyRefId"] > 0) {
-      await OnlineApi.SelectAgentAll(context, m["AgentCompanyRefId"]);lAgentName = _getFromAgentAll(m["AgentMasterRefId"]);
+      objfun.AgentAllList = (await _repository.selectAgentAll(m["AgentCompanyRefId"] as int? ?? 0)).map<AgentModel>((e) => AgentModel.fromJson(e)).toList();lAgentName = _getFromAgentAll(m["AgentMasterRefId"]);
     }
     String oAgentName = '';
     if (m["OAgentCompanyRefId"] != null && m["OAgentCompanyRefId"] > 0) {
-      await OnlineApi.SelectAgentAll(context, m["OAgentCompanyRefId"]);oAgentName = _getFromAgentAll(m["OAgentMasterRefId"]);
+      objfun.AgentAllList = (await _repository.selectAgentAll(m["OAgentCompanyRefId"] as int? ?? 0)).map<AgentModel>((e) => AgentModel.fromJson(e)).toList();oAgentName = _getFromAgentAll(m["OAgentMasterRefId"]);
     }
 
-    await OnlineApi.loadCustomerCurrency(context, m["CustomerRefId"]);String _safeStr(String? v) => v ?? ''; String _safeNum(dynamic v) => v != null ? v.toString() : '';
+    objfun.CustomerCurrencyValue = await _repository.loadCustomerCurrency(m["CustomerRefId"] as int? ?? 0);String _safeStr(String? v) => v ?? ''; String _safeNum(dynamic v) => v != null ? v.toString() : '';
     String _parseDate(dynamic v, String fmt) { if (v == null) return now; return DateFormat(fmt).format(DateTime.parse(v.toString())); }
 
     List<int> loadedIds = [];
@@ -749,7 +778,7 @@ class SalesOrderAddBloc extends Bloc<SalesOrderAddEvent, SalesOrderAddState> {
         "PickupAddress": s.txtPickUpAddress,
         "PickupQuantity": s.txtPickUpQuantity,
         "PickupWeight": s.txtPickUpWeight,
-        "PickupTime": DateTime.now().toIso8601String()
+        "PickupTime": DateTime.now().toIso8601String().split('.')[0]
       });
     } else {
       for (int i = 0; i < s.pickUpAddressList.length; i++) {
@@ -757,7 +786,7 @@ class SalesOrderAddBloc extends Bloc<SalesOrderAddEvent, SalesOrderAddState> {
           "PickupAddress": s.pickUpAddressList[i],
           "PickupQuantity": i < s.pickUpQuantityList.length ? s.pickUpQuantityList[i] : "",
           "PickupWeight": i < s.pickUpWeightList.length ? s.pickUpWeightList[i] : "",
-          "PickupTime": DateTime.now().toIso8601String()
+          "PickupTime": DateTime.now().toIso8601String().split('.')[0]
         });
       }
     }
@@ -770,7 +799,7 @@ class SalesOrderAddBloc extends Bloc<SalesOrderAddEvent, SalesOrderAddState> {
         "DeliveryAddress": s.txtDeliveryAddress,
         "DeliveryQuantity": s.txtDeliveryQuantity,
         "DeliveryWeight": s.txtDeliveryWeight,
-        "DeliveryTime": DateTime.now().toIso8601String()
+        "DeliveryTime": DateTime.now().toIso8601String().split('.')[0]
       });
     } else {
       for (int i = 0; i < s.deliveryAddressList.length; i++) {
@@ -778,7 +807,7 @@ class SalesOrderAddBloc extends Bloc<SalesOrderAddEvent, SalesOrderAddState> {
           "DeliveryAddress": s.deliveryAddressList[i],
           "DeliveryQuantity": i < s.deliveryQuantityList.length ? s.deliveryQuantityList[i] : "",
           "DeliveryWeight": i < s.deliveryWeightList.length ? s.deliveryWeightList[i] : "",
-          "DeliveryTime": DateTime.now().toIso8601String()
+          "DeliveryTime": DateTime.now().toIso8601String().split('.')[0]
         });
       }
     }
@@ -787,25 +816,36 @@ class SalesOrderAddBloc extends Bloc<SalesOrderAddEvent, SalesOrderAddState> {
     return {
       'Id': s.editId, 'CompanyRefId': objfun.Comid, 'EmployeeRefId': objfun.EmpRefId == 0 ? null : objfun.EmpRefId, 'AgentCompanyRefId': s.lAgentCompanyId == 0 ? null : s.lAgentCompanyId,
       'AgentMasterRefId': s.lAgentId == 0 ? null : s.lAgentId, 'OAgentCompanyRefId': s.oAgentCompanyId == 0 ? null : s.oAgentCompanyId, 'OAgentMasterRefId': s.oAgentId == 0 ? null : s.oAgentId,
-      'CustomerRefId': s.custId, 'JobMasterRefId': s.jobTypeId, 'SaleDate': DateTime.parse(s.dtpSaleOrderdate).toIso8601String(), 'BillType': s.dropdownValue,
+      'CustomerRefId': s.custId, 'JobMasterRefId': s.jobTypeId, 'SaleDate': DateTime.parse(s.dtpSaleOrderdate).toIso8601String().split('.')[0], 'BillType': s.dropdownValue,
       'Remarks': s.txtRemarks, 'DODescription': s.txtDoDescription, 'Amount': s.totalAmount, 'GrossAmount': s.totalAmount, 'TaxAmount': s.taxAmount,
       'Coinage': s.coinage, 'Offvesselname': s.txtOffVessel, 'Loadingvesselname': s.txtLoadingVessel, 'SPort': s.txtLPort, 'OPort': s.txtOPort,
       'Vessel': s.txtLVesselType, 'OVessel': s.txtOVesselType, 'Commodity': s.txtCommodityType, 'Cargo': s.txtCargo,
-      'ETA': s.checkBoxValueLETA ? DateTime.parse(s.dtpLETAdate).toIso8601String() : null, 'FlighTime': s.checkBoxValueFlightTime ? DateTime.parse(s.dtpFlightTimedate).toIso8601String() : null,
-      'ETB': s.checkBoxValueLETB ? DateTime.parse(s.dtpLETBdate).toIso8601String() : null, 'ETD': s.checkBoxValueLETD ? DateTime.parse(s.dtpLETDdate).toIso8601String() : null,
-      'OETA': s.checkBoxValueOETA ? DateTime.parse(s.dtpOETAdate).toIso8601String() : null, 'OETB': s.checkBoxValueOETB ? DateTime.parse(s.dtpOETBdate).toIso8601String() : null,
-      'OETD': s.checkBoxValueOETD ? DateTime.parse(s.dtpOETDdate).toIso8601String() : null, 'AWBNo': s.txtAWBNo, 'BLCopy': s.txtBLCopy, 'Quantity': s.txtQuantity,
+      'ETA': s.checkBoxValueLETA ? DateTime.parse(s.dtpLETAdate).toIso8601String().split('.')[0] : null, 'FlighTime': s.checkBoxValueFlightTime ? DateTime.parse(s.dtpFlightTimedate).toIso8601String().split('.')[0] : null,
+      'ETB': s.checkBoxValueLETB ? DateTime.parse(s.dtpLETBdate).toIso8601String().split('.')[0] : null, 'ETD': s.checkBoxValueLETD ? DateTime.parse(s.dtpLETDdate).toIso8601String().split('.')[0] : null,
+      'OETA': s.checkBoxValueOETA ? DateTime.parse(s.dtpOETAdate).toIso8601String().split('.')[0] : null, 'OETB': s.checkBoxValueOETB ? DateTime.parse(s.dtpOETBdate).toIso8601String().split('.')[0] : null,
+      'OETD': s.checkBoxValueOETD ? DateTime.parse(s.dtpOETDdate).toIso8601String().split('.')[0] : null, 'AWBNo': s.txtAWBNo, 'BLCopy': s.txtBLCopy, 'Quantity': s.txtQuantity,
       'TotalWeight': s.txtWeight, 'TruckSize': s.txtTruckSize, 'JStatus': s.statusId == 0 ? null : s.statusId, 'SealbyRefid': s.sealEmpId1, 'SealbreakbyRefid': s.breakEmpId1,
       'SealbyRefid2': s.sealEmpId2, 'SealbreakbyRefid2': s.breakEmpId2, 'SealbyRefid3': s.sealEmpId3, 'SealbreakbyRefid3': s.breakEmpId3, 'BoardingOfficerRefid': s.boardOfficerId1,
       'BoardingOfficer1Refid': s.boardOfficerId2, 'BoardingAmount': s.txtAmount1, 'BoardingAmount1': s.txtAmount2, 'ForwardingEnterRef': s.txtENRef1,
       'ForwardingExitRef': s.txtExRef1, 'ForwardingEnterRef2': s.txtENRef2, 'ForwardingExitRef2': s.txtExRef2, 'ForwardingEnterRef3': s.txtENRef3,
       'ForwardingExitRef3': s.txtExRef3, 'ForwardingSMKNo': s.txtSmk1, 'ForwardingSMKNo2': s.txtSmk2, 'ForwardingSMKNo3': s.txtSmk3, 'PortChargesRef': s.txtPortChargeRef1,
       'PortCharges': s.txtPortCharges, 'OriginRefId': s.originId, 'DestinationRefId': s.destinationId,
-      'PickupDate': s.checkBoxValuePickUp ? DateTime.parse(s.dtpPickUpdate).toIso8601String() : null, 'DeliveryDate': s.checkBoxValueDelivery ? DateTime.parse(s.dtpDeliverydate).toIso8601String() : null,
-      'WareHouseEnterDate': s.checkBoxValueWHEntry ? DateTime.parse(s.dtpWHEntrydate).toIso8601String() : null, 'WareHouseExitDate': s.checkBoxValueWHExit ? DateTime.parse(s.dtpWHExitdate).toIso8601String() : null,
+      'PickupDate': s.checkBoxValuePickUp ? DateTime.parse(s.dtpPickUpdate).toIso8601String().split('.')[0] : null, 'DeliveryDate': s.checkBoxValueDelivery ? DateTime.parse(s.dtpDeliverydate).toIso8601String().split('.')[0] : null,
+      'WareHouseEnterDate': s.checkBoxValueWHEntry ? DateTime.parse(s.dtpWHEntrydate).toIso8601String().split('.')[0] : null, 'WareHouseExitDate': s.checkBoxValueWHExit ? DateTime.parse(s.dtpWHExitdate).toIso8601String().split('.')[0] : null,
       'WareHouseAddress': s.txtWarehouseAddress,
 
-      // ✅ ADDED ARRAYS TO PAYLOAD
+      // Add standard flat fields for the first pickup and delivery since backend expects them
+      'PickupAddress': s.pickUpAddressList.isNotEmpty ? s.pickUpAddressList.join(', ') : s.txtPickUpAddress,
+      'pickupQuantityList': s.pickUpQuantityList.isNotEmpty ? s.pickUpQuantityList.join(', ') : s.txtPickUpQuantity,
+      'pickuptimelist': DateTime.now().toIso8601String().split('.')[0],
+      'PickupWeight': s.pickUpWeightList.isNotEmpty ? s.pickUpWeightList.join(', ') : s.txtPickUpWeight,
+      
+      'DeliveryAddress': s.deliveryAddressList.isNotEmpty ? s.deliveryAddressList.join(', ') : s.txtDeliveryAddress,
+      'DeliveryQuantityList': s.deliveryQuantityList.isNotEmpty ? s.deliveryQuantityList.join(', ') : s.txtDeliveryQuantity,
+      'DelivertimeList': DateTime.now().toIso8601String().split('.')[0],
+      'DeliveryWeight': s.deliveryWeightList.isNotEmpty ? s.deliveryWeightList.join(', ') : s.txtDeliveryWeight,
+
+      // Keep arrays just in case the backend was updated to support multiple
       'PickupsList': dynamicPickups,
       'DeliveriesList': dynamicDeliveries,
 
@@ -813,8 +853,8 @@ class SalesOrderAddBloc extends Bloc<SalesOrderAddEvent, SalesOrderAddState> {
       'SCN': s.txtOSCN, 'LSCN': s.txtLSCN, 'Zb': s.dropdownValueZB1, 'PTW': s.txtPTWNo, 'Zb2': s.dropdownValueZB2, 'ZbRef': s.txtZBRef1, 'ZbRef2': s.txtZBRef2,
       'Forwarding1S1': s.txtForwarding1S1, 'Forwarding1S2': s.txtForwarding1S2, 'Forwarding2S1': s.txtForwarding2S1, 'Forwarding2S2': s.txtForwarding2S2,
       'Forwarding3S1': s.txtForwarding3S1, 'Forwarding3S2': s.txtForwarding3S2, 'CurrencyValue': s.currencyValue, 'ActualNetAmount': s.actualAmount,
-      'ForwardingDate': s.checkBoxValueFW1 ? DateTime.parse(s.dtpFW1date).toIso8601String() : null, 'Forwarding2Date': s.checkBoxValueFW2 ? DateTime.parse(s.dtpFW2date).toIso8601String() : null,
-      'Forwarding3Date': s.checkBoxValueFW3 ? DateTime.parse(s.dtpFW3date).toIso8601String() : null,
+      'ForwardingDate': s.checkBoxValueFW1 ? DateTime.parse(s.dtpFW1date).toIso8601String().split('.')[0] : null, 'Forwarding2Date': s.checkBoxValueFW2 ? DateTime.parse(s.dtpFW2date).toIso8601String().split('.')[0] : null,
+      'Forwarding3Date': s.checkBoxValueFW3 ? DateTime.parse(s.dtpFW3date).toIso8601String().split('.')[0] : null,
 
       'SaleDetails': s.productViewList.asMap().entries.map((entry) {
         // ... pazhaya code ...
@@ -853,4 +893,17 @@ class SalesOrderAddBloc extends Bloc<SalesOrderAddEvent, SalesOrderAddState> {
     final header = {'Content-Type': 'application/json; charset=UTF-8'};
     await objfun.apiAllinoneSelectArray("${objfun.apiUpdateEnquiryMaster}$id&Comid=${objfun.Comid}&StatusName=CONFIRMED", null, header, context);
   }
+
+  double _safeNum(dynamic val) {
+    if (val == null) return 0.0;
+    if (val is num) return val.toDouble();
+    if (val is String) return double.tryParse(val) ?? 0.0;
+    return 0.0;
+  }
+  
+  String _safeStr(dynamic val) {
+    if (val == null) return '';
+    return val.toString();
+  }
+
 }

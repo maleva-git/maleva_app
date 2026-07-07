@@ -3,7 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 import 'package:maleva/core/models/model.dart';
 import 'package:maleva/core/utils/clsfunction.dart' as objfun;
-import 'package:maleva/core/network/OnlineApi.dart' as OnlineApi;
+import 'package:maleva/features/transaction/salesorder/view/data/salesorderview_repository.dart';
 import 'package:maleva/features/transaction/salesorder/view/bloc/salesorderview_event.dart';
 import 'package:maleva/features/transaction/salesorder/view/bloc/salesorderview_state.dart';
 
@@ -11,8 +11,9 @@ import 'package:maleva/features/transaction/salesorder/view/bloc/salesorderview_
 
 class SalesOrderViewBloc extends Bloc<SalesOrderViewEvent, SalesOrderViewState> {
   final BuildContext context;
+  final SalesOrderViewRepository _repository;
 
-  SalesOrderViewBloc(this.context) : super(SalesOrderViewInitial()) {
+  SalesOrderViewBloc(this.context, this._repository) : super(SalesOrderViewInitial()) {
 
     // ────────────────────────────────────────────────────
     // STARTUP
@@ -23,7 +24,20 @@ class SalesOrderViewBloc extends Bloc<SalesOrderViewEvent, SalesOrderViewState> 
 
       emit(SalesOrderViewLoading());
       try {
-        await OnlineApi.SelectCustomer(context);await OnlineApi.SelectJobStatus(context);await OnlineApi.SelectEmployee(context, 'Sales', '');await OnlineApi.loadComboS1(context, 0);final base = SalesOrderViewLoaded(
+        objfun.CustomerList = (await _repository.selectCustomer()).map<CustomerModel>((e) => CustomerModel.fromJson(e)).toList();
+        objfun.JobStatusList = (await _repository.selectJobStatus()).map<JobStatusModel>((e) => JobStatusModel.fromJson(e)).toList();
+        objfun.EmployeeList = (await _repository.selectEmployee('Sales', '')).map<EmployeeModel>((e) => EmployeeModel.fromJson(e)).toList();
+        final combo = await _repository.loadComboS1(0);
+        if (combo.isNotEmpty) {
+          objfun.ComboS1List.clear();
+          objfun.ComboS1List.add(combo["Data1"]);
+          objfun.ComboS1List.add(combo["Data2"]);
+          objfun.ComboS1List.add(combo["Data3"]);
+          objfun.ComboS1List.add(combo["Data4"]);
+          objfun.ComboS1List.add(combo["Data5"]);
+          objfun.ComboS1List.add(combo["Data6"]);
+        }
+        final base = SalesOrderViewLoaded(
           dtpFromDate: today,
           dtpToDate: today,
           checkBoxValueLEmp: !isAdmin,

@@ -27,6 +27,7 @@ import '../../admin_dashboard/tabs/vesselreport/view/vesselreportview_tab.dart';
 import '../bloc/forwarding_bloc.dart';
 import '../bloc/forwarding_event.dart';
 import 'forwarding_dashboard_ui.dart';
+import 'package:maleva/features/dashboard/admin_dashboard/tabs/driverleave/bloc/leave_bloc.dart';
 
 
 class ForwardingDashboard extends StatefulWidget{
@@ -88,7 +89,8 @@ class _ForwardingDashboardState extends State<ForwardingDashboard> with SingleTi
               create: (context) => sl<UnReleaseSMKBloc>(param1: context),
               child: UnReleaseSMKPage(),
             ),
-          ],
+                  BlocProvider<LeaveBloc>(create: (_) => sl<LeaveBloc>()),
+      ],
           child: Scaffold(
             body: ForwardingMobileDashboard(
               tabController: _tabController,
