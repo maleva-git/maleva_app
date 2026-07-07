@@ -224,7 +224,7 @@ class _Portstate extends State<Port> {
                                         setState(() {
                                           if (widget.Searchby == 1) {
                                             objfun.SelectedPortName = item.toString();
-                                            Navigator.of(context, rootNavigator: true).pop(context);
+                                            Navigator.of(context, rootNavigator: true).pop(item.toString());
                                           }
                                         });
                                       },

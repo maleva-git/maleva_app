@@ -1,39 +1,44 @@
+import 'package:dio/dio.dart';
 import 'package:maleva/core/models/model.dart';
-import 'package:maleva/core/network/api_client.dart';
-import 'package:maleva/core/utils/app_preferences.dart';
-import 'package:maleva/core/utils/clsfunction.dart' as objfun;
+import 'package:maleva/core/network/dio_client.dart';
+import 'package:maleva/core/network/api_constants.dart';
+import 'package:maleva/core/utils/session_manager.dart';
 
 class StockInEntryRepository {
-  final int comid = AppPreferences.getComid();
+  final DioClient _dioClient;
+  final SessionManager _sessionManager;
+
+  StockInEntryRepository(this._dioClient, this._sessionManager);
+
+  int get _comid => _sessionManager.companyId;
 
   // ─── Initial Startup Data ──────────────────────────────────────────────────
   Future<Map<String, dynamic>> fetchInitialData(int billType) async {
-    final maxStockRes = await ApiClient.postRequest("${objfun.apiMaxStockNo}$comid", null);
-    final stockJobRes = await ApiClient.postRequest("${objfun.apiSelectStockJob}$comid", null);
-
-    // Equivalent to OnlineApi.GetJobNoForwarding(null, billType)
-    final jobNoRes = await ApiClient.postRequest("${objfun.apiGetJobNo}$comid&JobType=$billType", null);
+    final maxStockRes = await _dioClient.dio.post("${ApiConstants.apiMaxStockNo}$_comid", data: {});
+    final stockJobRes = await _dioClient.dio.post("${ApiConstants.apiSelectStockJob}$_comid", data: {});
+    final jobNoRes = await _dioClient.dio.post("${ApiConstants.apiGetJobNo}$_comid&JobType=$billType", data: {});
 
     String maxNum = '';
-    if (maxStockRes != null && maxStockRes is List && maxStockRes.isNotEmpty) {
-      maxNum = maxStockRes[0]['MaxNo']?.toString() ?? '';
+    if (maxStockRes.data != null && maxStockRes.data is List && maxStockRes.data.isNotEmpty) {
+      maxNum = maxStockRes.data[0]['MaxNo']?.toString() ?? '';
     }
 
     return {
       'maxStockNo': maxNum,
-      'stockJobList': stockJobRes is List ? stockJobRes : [],
-      'jobNoList': jobNoRes is List ? jobNoRes : [],
+      'stockJobList': (stockJobRes.data is List) ? stockJobRes.data : [],
+      'jobNoList': (jobNoRes.data is List) ? jobNoRes.data : [],
     };
   }
 
   // ─── Fetch Job List by Bill Type ───────────────────────────────────────────
   Future<List<dynamic>> fetchJobNoList(int billType) async {
-    final jobNoRes = await ApiClient.postRequest("${objfun.apiGetJobNo}$comid&Type=$billType", null);
-    return jobNoRes is List ? jobNoRes : [];
+    final jobNoRes = await _dioClient.dio.post("${ApiConstants.apiGetJobNo}$_comid&Type=$billType", data: {});
+    return (jobNoRes.data != null && jobNoRes.data is List) ? jobNoRes.data : [];
   }
 
+  // ─── Fetch Job Details ─────────────────────────────────────────────────────
   Future<Map<String, dynamic>> fetchJobDetails(int saleOrderId) async {
-    final result = await ApiClient.postRequest("${objfun.apiSaleOrderDetailsLoad}$comid&Id=$saleOrderId", null);
+    final result = await _dioClient.dio.post("${ApiConstants.apiSelectStockDetails}$_comid&Id=$saleOrderId", data: {});
 
     String shipName = '';
     String customerName = '';
@@ -42,8 +47,8 @@ class StockInEntryRepository {
     int weightPkg = 0;
     List<dynamic> jobStatuses = [];
 
-    if (result != null) {
-      final value = ResponseViewModel.fromJson(result);
+    if (result.data != null) {
+      final value = ResponseViewModel.fromJson(result.data);
       if (value.IsSuccess == true && value.data1 != null && value.data1.isNotEmpty) {
         final data = value.data1[0];
         customerName = data['CustomerName'] ?? '';
@@ -56,23 +61,16 @@ class StockInEntryRepository {
         weightPkg = int.tryParse(match ?? '0') ?? 0;
 
         try {
-          final statusRes = await ApiClient.postRequest("${objfun.apiSelectAllJobStatus}$comid&Jobid=$jobMasterId", null);
+          final statusRes = await _dioClient.dio.post("${ApiConstants.apiSelectAllJobStatus}$_comid&Jobid=$jobMasterId", data: {});
 
-          if (statusRes != null && statusRes is List && statusRes.isNotEmpty) {
-
-            var firstItem = statusRes[0];
-
+          if (statusRes.data != null && statusRes.data is List && statusRes.data.isNotEmpty) {
+            var firstItem = statusRes.data[0];
             if (firstItem != null && firstItem['JobStatusDetails'] != null) {
               jobStatuses = firstItem['JobStatusDetails'];
-            } else {
-              jobStatuses = [];
             }
-
-          } else {
-            jobStatuses = [];
           }
         } catch (e) {
-          jobStatuses = [];
+          // ignore
         }
       }
     }
@@ -86,24 +84,60 @@ class StockInEntryRepository {
       'jobStatuses': jobStatuses,
     };
   }
+
+  // ─── Fetch Sales Order For Edit ────────────────────────────────────────────
+  Future<Map<String, dynamic>> fetchSalesOrderForEdit(int id, int saleNo) async {
+    try {
+      final endpoint = "${ApiConstants.apiEditSalesOrder}$id&SaleorderNo=$saleNo&Comid=$_comid";
+      final response = await _dioClient.dio.post(endpoint, data: {});
+      if (response.data != null && response.data.isNotEmpty) {
+         final item = response.data[0];
+         return {
+            'masterList': item['EditMasterDetails'] ?? [],
+            'detailsList': item['EditItemDetails'] ?? [],
+         };
+      }
+    } catch (e) {
+      // ignore
+    }
+    return {
+      'masterList': [],
+      'detailsList': [],
+    };
+  }
+
   // ─── Delete Image ──────────────────────────────────────────────────────────
   Future<ResponseViewModel?> deleteImage(int saleOrderId, String folder, String imageName) async {
-    final filePath = '/Upload/$comid/SalesOrder/$saleOrderId/$folder/$imageName';
-    final header = {
-      'Comid': comid.toString(),
+    final filePath = '/Upload/$_comid/SalesOrder/$saleOrderId/$folder/$imageName';
+    final options = Options(headers: {
+      'Comid': _comid.toString(),
       'Id': saleOrderId.toString(),
       'FolderName': 'SalesOrder',
       'FileName': filePath,
       'SubFolderName': folder,
-    };
+    });
 
-    final result = await ApiClient.postRequest(objfun.apiDeleteimage, null, headers: header);
-    return result != null ? ResponseViewModel.fromJson(result) : null;
+    try {
+      final result = await _dioClient.dio.post(ApiConstants.apiDeleteImage, options: options, data: {});
+      if (result.data != null) {
+        return ResponseViewModel.fromJson(result.data);
+      }
+    } catch (e) {
+      // ignore
+    }
+    return null;
   }
 
   // ─── Save Stock In ─────────────────────────────────────────────────────────
   Future<ResponseViewModel?> saveStockIn(List<Map<String, dynamic>> master) async {
-    final result = await ApiClient.postRequest('${objfun.apiInsertStockIn}$comid', master);
-    return result != null ? ResponseViewModel.fromJson(result) : null;
+    try {
+      final result = await _dioClient.dio.post('${ApiConstants.apiInsertStockIn}$_comid', data: master);
+      if (result.data != null) {
+        return ResponseViewModel.fromJson(result.data);
+      }
+    } catch (e) {
+      // ignore
+    }
+    return null;
   }
 }

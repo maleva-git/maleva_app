@@ -85,6 +85,7 @@ import '../../admin_dashboard/view/admin_dashboard_ui.dart';
 import '../bloc/maintenance_bloc.dart';
 import '../bloc/maintenance_event.dart';
 import 'maintenance_dashboard_ui.dart';
+import 'package:maleva/features/dashboard/admin_dashboard/tabs/driverleave/bloc/leave_bloc.dart';
 
 
 class MaintenanceDashboard extends StatefulWidget{
@@ -271,6 +272,7 @@ class _AdminDashboardState extends State<MaintenanceDashboard> with SingleTicker
               child: const MaintenanceDashboardWidget(),
             ),
 
+        BlocProvider<LeaveBloc>(create: (_) => sl<LeaveBloc>()),
           ],                                    // ← ] தான் close, } இல்ல
           child: Scaffold(
             body: MaintenanceMobileDashboard(

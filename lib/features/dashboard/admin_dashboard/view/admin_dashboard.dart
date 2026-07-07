@@ -82,7 +82,8 @@ import '../tabs/truck/bloc/truck_bloc.dart';
 import '../tabs/truck/view/truckview_tab.dart';
 import '../tabs/vesselreport/bloc/vesselreport_bloc.dart';
 import '../tabs/vesselreport/bloc/vesselreport_event.dart';
-import '../tabs/vesselreport/view/vesselreportview_tab.dart';
+import 'package:maleva/core/widgets/custom_app_bar.dart';
+import 'package:maleva/features/dashboard/admin_dashboard/tabs/driverleave/bloc/leave_bloc.dart';
 import 'admin_dashboard_ui.dart';
 
 class NewAdminDashboard extends StatefulWidget{
@@ -160,6 +161,7 @@ class _AdminDashboardState extends State<NewAdminDashboard> with SingleTickerPro
           ),
         ),
         BlocProvider<RTIDetailsBloc>(create: (_) => sl<RTIDetailsBloc>()),
+        BlocProvider<LeaveBloc>(create: (_) => sl<LeaveBloc>()),
       ],
       // ✅ FIX 3: LayoutBuilder is inside. Now, opening the drawer only redraws the UI, not the APIs!
       child: LayoutBuilder(

@@ -24,6 +24,7 @@ import '../../admin_dashboard/tabs/vesselreport/view/vesselreportview_tab.dart';
 import '../bloc/operation_bloc.dart';
 import '../bloc/operation_event.dart';
 import 'operation_dashboard_ui.dart';
+import 'package:maleva/features/dashboard/admin_dashboard/tabs/driverleave/bloc/leave_bloc.dart';
 
 
 class OperationDashboard extends StatefulWidget{
@@ -100,6 +101,7 @@ class _AdminDashboardState extends State<OperationDashboard> with SingleTickerPr
               create: (_) => sl<SalaryBloc>(),
               child: const SalaryTab(),
             ),
+        BlocProvider<LeaveBloc>(create: (_) => sl<LeaveBloc>()),
           ],                                    // ← ] தான் close, } இல்ல
           child: Scaffold(
             body: OperationMobileDashboard(

@@ -12,6 +12,7 @@ import '../../admin_dashboard/tabs/spotsaleorder/data/spotsale_repository.dart';
 import '../../admin_dashboard/tabs/spotsaleorder/view/spotsaleorder_add.dart';
 import '../bloc/warehouse_bloc.dart';
 import '../bloc/warehouse_event.dart';
+import 'package:maleva/features/dashboard/admin_dashboard/tabs/driverleave/bloc/leave_bloc.dart';
 
 
 class WareHouseDashboard extends StatefulWidget{
@@ -63,7 +64,8 @@ class _WareHouseDashboardState extends State<WareHouseDashboard> with SingleTick
               ),
               child: const InventoryPage(),
             ),
-          ],
+                  BlocProvider<LeaveBloc>(create: (_) => sl<LeaveBloc>()),
+      ],
           child: Scaffold(
             body: WareHouseMobileDashboard(
               tabController: _tabController,

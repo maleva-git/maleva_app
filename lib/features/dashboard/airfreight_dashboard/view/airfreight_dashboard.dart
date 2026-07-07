@@ -21,6 +21,7 @@ import '../../admin_dashboard/tabs/vesselreport/view/vesselreportview_tab.dart';
 import '../bloc/airfreight_bloc.dart';
 import '../bloc/airfreight_event.dart';
 import 'airfreight_dashboard_ui.dart';
+import 'package:maleva/features/dashboard/admin_dashboard/tabs/driverleave/bloc/leave_bloc.dart';
 
 
 
@@ -95,7 +96,8 @@ class _AirfreightDashboardState extends State<AirfreightDashboard> with SingleTi
               child: const SpotSaleEntryPage(),
             ),
 
-          ],                                    // ← ] தான் close, }
+        BlocProvider<LeaveBloc>(create: (_) => sl<LeaveBloc>()),
+          ], // ] தான் close, }
           child: Scaffold(
             body: AirfreightMobileDashboard( // Unga actual UI class name inga varanum
               tabController: _tabController,

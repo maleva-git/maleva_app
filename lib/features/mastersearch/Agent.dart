@@ -70,9 +70,7 @@ class _Agentstate extends State<Agent> {
 
   void _onItemTapped(AgentModel selectedAgent) {
     if (widget.Searchby == 1) {
-      if (objfun.SelectedId != 0) {
-        Navigator.of(context, rootNavigator: true).pop(selectedAgent);
-      }
+      Navigator.of(context, rootNavigator: true).pop(selectedAgent);
     }
   }
 

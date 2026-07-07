@@ -1,5 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:maleva/features/dashboard/admin_dashboard/tabs/driverleave/data/leave_request_api.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import '../bloc/leave_bloc.dart';
+import '../bloc/leave_event.dart';
+import '../bloc/leave_state.dart';
+import 'package:get_it/get_it.dart';
+
+
 import 'package:maleva/features/dashboard/admin_dashboard/tabs/driverleave/data/leave_request_model.dart';
 import 'package:maleva/core/colors/colors.dart' as colour;
 import 'package:maleva/core/widgets/maleva_inputs.dart';
@@ -19,63 +25,32 @@ class EmployeeLeaveRequestTab extends StatefulWidget {
 }
 
 class _EmployeeLeaveRequestTabState extends State<EmployeeLeaveRequestTab> {
-  bool _isLoading = false;
-  bool _isSubmitting = false;
-  List<LeaveRequestModel> _requests = [];
-  
   // Form state
   DateTime _fromDate = DateTime.now();
   DateTime _toDate = DateTime.now().add(const Duration(days: 1));
   DateTime _searchFromDate = DateTime.now().subtract(const Duration(days: 30));
   DateTime _searchToDate = DateTime.now();
-  List<LeaveTypeModel> _leaveTypes = [];
   int? _selectedLeaveTypeId;
-  int? _selectedDriverId;
+  int? _selectedId;
   
   @override
   void initState() {
     super.initState();
-    // Always use the logged-in user's ID automatically.
-    _selectedDriverId = objfun.EmpRefId;
+    _selectedId = objfun.EmpRefId;
     _fetchRequests();
-    _fetchLeaveTypes();
   }
 
-  Future<void> _fetchLeaveTypes() async {
-    final data = await LeaveRequestApi.getLeaveTypes(context);
-    setState(() {
-      _leaveTypes = data;
-    });
-  }
-  
-  Future<void> _fetchRequests() async {
-    int fetchId = widget.isAdminOrSubadmin ? 0 : (_selectedDriverId ?? 0);
-    
-    if (!widget.isAdminOrSubadmin && fetchId == 0) {
-      if (mounted) {
-        setState(() {
-          _requests = [];
-          _isLoading = false;
-        });
-      }
-      return;
+  void _fetchRequests() {
+    if (_selectedId != null && _selectedId != 0) {
+      context.read<LeaveBloc>().add(FetchLeaveData(
+        applicantType: 1,
+        applicantRefId: _selectedId!,
+        fromDate: DateFormat('yyyy-MM-dd').format(_searchFromDate),
+        toDate: DateFormat('yyyy-MM-dd').format(_searchToDate),
+      ));
     }
+  }
 
-    setState(() => _isLoading = true);
-    final data = await LeaveRequestApi.getLeaveRequests(context, 
-      applicantType: 1,
-      applicantRefId: fetchId,
-      fromDate: DateFormat('yyyy-MM-dd').format(_searchFromDate),
-      toDate: DateFormat('yyyy-MM-dd').format(_searchToDate),
-    );
-    if (mounted) {
-      setState(() {
-        _requests = data;
-        _isLoading = false;
-      });
-    }
-  }
-  
   Future<void> _pickSearchDate(bool isFrom) async {
     final picked = await showDatePicker(
       context: context,
@@ -85,16 +60,13 @@ class _EmployeeLeaveRequestTabState extends State<EmployeeLeaveRequestTab> {
     );
     if (picked != null) {
       setState(() {
-        if (isFrom) {
-          _searchFromDate = picked;
-        } else {
-          _searchToDate = picked;
-        }
+        if (isFrom) _searchFromDate = picked;
+        else _searchToDate = picked;
       });
     }
   }
 
-  Future<void> _submitLeave() async {
+  void _submitLeave(List<LeaveTypeModel> leaveTypes) {
     if (_selectedLeaveTypeId == null) {
       ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Please select Leave Reason')));
       return;
@@ -103,29 +75,15 @@ class _EmployeeLeaveRequestTabState extends State<EmployeeLeaveRequestTab> {
     int days = _toDate.difference(_fromDate).inDays + 1;
     if (days <= 0) days = 1;
     
-    setState(() => _isSubmitting = true);
-    bool success = await LeaveRequestApi.addLeaveRequest(
-      context,
+    context.read<LeaveBloc>().add(SubmitLeaveRequest(
       leaveTypeRefId: _selectedLeaveTypeId!,
       fromDate: _fromDate,
       toDate: _toDate,
       totalDays: days,
-      applicantRefId: _selectedDriverId!,
+      applicantRefId: _selectedId!,
       applicantType: 1,
-      reason: _leaveTypes.firstWhere((e) => e.id == _selectedLeaveTypeId).name,
-    );
-    
-    if (mounted) {
-      setState(() => _isSubmitting = false);
-    }
-    
-    if (success) {
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Leave Request Submitted')));
-      _selectedLeaveTypeId = null;
-      _fetchRequests();
-    } else {
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Failed to submit')));
-    }
+      reason: leaveTypes.firstWhere((e) => e.id == _selectedLeaveTypeId).name,
+    ));
   }
 
   Future<void> _pickDate(bool isFrom) async {
@@ -150,7 +108,36 @@ class _EmployeeLeaveRequestTabState extends State<EmployeeLeaveRequestTab> {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
+    return BlocProvider<LeaveBloc>(
+      create: (context) => GetIt.instance<LeaveBloc>()..add(FetchLeaveData(
+        applicantType: 1,
+        applicantRefId: _selectedId ?? 0,
+        fromDate: DateFormat('yyyy-MM-dd').format(_searchFromDate),
+        toDate: DateFormat('yyyy-MM-dd').format(_searchToDate),
+      )),
+      child: Builder(builder: (context) {
+        return BlocConsumer<LeaveBloc, LeaveState>(
+          listener: (context, state) {
+            if (state is LeaveActionSuccess) {
+              ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(state.message)));
+              setState(() => _selectedLeaveTypeId = null);
+              context.read<LeaveBloc>().add(FetchLeaveData(
+                applicantType: 1,
+                applicantRefId: _selectedId!,
+                fromDate: DateFormat('yyyy-MM-dd').format(_searchFromDate),
+                toDate: DateFormat('yyyy-MM-dd').format(_searchToDate),
+              ));
+            } else if (state is LeaveActionError) {
+              ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(state.message)));
+            }
+          },
+      builder: (context, state) {
+        bool isLoading = state is LeaveLoading || state is LeaveInitial;
+        bool isSubmitting = state is LeaveLoaded && state.isSubmitting;
+        List<LeaveRequestModel> requests = state is LeaveLoaded ? state.requests : [];
+        List<LeaveTypeModel> leaveTypes = state is LeaveLoaded ? state.leaveTypes : [];
+
+        return Column(
       children: [
         // Form Area
         Container(
@@ -224,7 +211,7 @@ class _EmployeeLeaveRequestTabState extends State<EmployeeLeaveRequestTab> {
                           value: _selectedLeaveTypeId,
                           icon: const Icon(Icons.keyboard_arrow_down_rounded, color: AppTokens.textMuted),
                           hint: Text('Select Leave Reason', style: GoogleFonts.lato(color: AppTokens.textMuted)),
-                          items: _leaveTypes.map((e) => DropdownMenuItem<int>(
+                          items: leaveTypes.map((e) => DropdownMenuItem<int>(
                             value: e.id,
                             child: Text(e.name, style: GoogleFonts.lato(color: AppTokens.textPrimary, fontWeight: FontWeight.w500)),
                           )).toList(),
@@ -242,8 +229,8 @@ class _EmployeeLeaveRequestTabState extends State<EmployeeLeaveRequestTab> {
                         padding: const EdgeInsets.symmetric(vertical: 16),
                         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                       ),
-                      onPressed: _isSubmitting ? null : _submitLeave,
-                      child: _isSubmitting 
+                      onPressed: isSubmitting ? null : () => _submitLeave(leaveTypes),
+                      child: isSubmitting 
                           ? const SizedBox(width: 24, height: 24, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2.5))
                           : Row(
                               mainAxisAlignment: MainAxisAlignment.center,
@@ -297,12 +284,12 @@ class _EmployeeLeaveRequestTabState extends State<EmployeeLeaveRequestTab> {
         const SizedBox(height: 8),
         // List
         Expanded(
-          child: _isLoading && _requests.isEmpty
+          child: isLoading && requests.isEmpty
               ? const Center(child: CircularProgressIndicator())
               : ListView.builder(
-                  itemCount: _requests.length,
+                  itemCount: requests.length,
                   itemBuilder: (context, index) {
-                    final req = _requests[index];
+                    final req = requests[index];
                     Color statusColor = const Color(0xFFEAB308); // Yellow/Orange
                     Color statusBg = const Color(0xFFFEF08A).withValues(alpha: 0.3);
                     if (req.statusRefId == 2) {
@@ -432,6 +419,10 @@ class _EmployeeLeaveRequestTabState extends State<EmployeeLeaveRequestTab> {
                 ),
         ),
       ],
+    );
+          },
+        );
+      }),
     );
   }
 }

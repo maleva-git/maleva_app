@@ -26,6 +26,7 @@ import '../../admin_dashboard/tabs/truck/bloc/truck_bloc.dart';
 import '../../admin_dashboard/tabs/truck/view/truckview_tab.dart';
 import '../bloc/payable_dasboard_bloc.dart';
 import '../bloc/payable_dashboard_event.dart';
+import 'package:maleva/features/dashboard/admin_dashboard/tabs/driverleave/bloc/leave_bloc.dart';
 
 
 class PayableDashboard extends StatefulWidget{
@@ -98,7 +99,8 @@ class _PayableDashboardState extends State<PayableDashboard> with SingleTickerPr
               child: const PettyCashPage(),
             ),
 
-          ],
+                  BlocProvider<LeaveBloc>(create: (_) => sl<LeaveBloc>()),
+      ],
           child: Scaffold(
             body: PayableMobileDashboard(
               tabController: _tabController,
