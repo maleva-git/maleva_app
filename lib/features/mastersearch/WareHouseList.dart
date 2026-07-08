@@ -173,9 +173,7 @@ class _WareHousestate extends State<WareHouse> {
                                       onTap: () {
                                         setState(() {
                                           if (widget.Searchby == 1) {
-                                            if (objfun.SelectedId != 0) {
-                                              Navigator.of(context, rootNavigator: true).pop(item);
-                                            }
+                                            Navigator.of(context, rootNavigator: true).pop(item);
                                           }
                                         });
                                       },

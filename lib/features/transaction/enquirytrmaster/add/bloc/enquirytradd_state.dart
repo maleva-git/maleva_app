@@ -36,6 +36,10 @@ class EnquiryAddLoaded extends EnquiryAddState {
   final bool checkDelivery;
   final bool checkOeta;
 
+  // New Data Fields
+  final double customerCurrencyValue;
+  final List<dynamic> jobStatuses;
+
    EnquiryAddLoaded({
     required this.editId,
     required this.custId,
@@ -57,6 +61,8 @@ class EnquiryAddLoaded extends EnquiryAddState {
     required this.checkCollection,
     required this.checkDelivery,
     required this.checkOeta,
+    this.customerCurrencyValue = 0.0,
+    this.jobStatuses = const [],
   });
 
   EnquiryAddLoaded copyWith({
@@ -80,6 +86,8 @@ class EnquiryAddLoaded extends EnquiryAddState {
     bool? checkCollection,
     bool? checkDelivery,
     bool? checkOeta,
+    double? customerCurrencyValue,
+    List<dynamic>? jobStatuses,
   }) {
     return EnquiryAddLoaded(
       editId:          editId          ?? this.editId,
@@ -102,6 +110,8 @@ class EnquiryAddLoaded extends EnquiryAddState {
       checkCollection: checkCollection ?? this.checkCollection,
       checkDelivery:   checkDelivery   ?? this.checkDelivery,
       checkOeta:       checkOeta       ?? this.checkOeta,
+      customerCurrencyValue: customerCurrencyValue ?? this.customerCurrencyValue,
+      jobStatuses: jobStatuses ?? this.jobStatuses,
     );
   }
 }

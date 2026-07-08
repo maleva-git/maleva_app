@@ -8,7 +8,6 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:maleva/core/utils/clsfunction.dart' as objfun;
-import 'package:maleva/core/network/OnlineApi.dart' as OnlineApi;
 import 'package:maleva/core/models/model.dart';
 import 'package:maleva/menu/menulist.dart';
 import '../../../../../../core/di/injection.dart';
@@ -119,6 +118,18 @@ class _StockInEntryPageState
           );
         }
         // ── Error ─────────────────────────────────────
+        if (state is StockInEntryLoaded && state.navigateEditSalesOrder) {
+          context.read<StockInEntryBloc>().add(StockInEntryNavigationHandled());
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (_) => SalesOrdersAdd(
+                SaleDetails: null,
+                SaleMaster: state.saleEditMasterList,
+              ),
+            ),
+          );
+        }
         if (state is StockInEntryError) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
@@ -548,17 +559,8 @@ class _JobNoRowState extends State<_JobNoRow> {
                         'Enter Job No', '', context);
                     return;
                   }
-                  await OnlineApi.EditSalesOrder(
-
-                      s.saleOrderId,
-                      int.tryParse(s.jobNoText) ?? 0); if (!context.mounted) return;Navigator.push(
-                    context,
-                      MaterialPageRoute(
-                        builder: (_) => SalesOrdersAdd(
-                          SaleDetails: null,
-                          SaleMaster: objfun.SaleEditMasterList,
-                        ),
-                      )
+                  context.read<StockInEntryBloc>().add(
+                    StockInEntryEditSalesOrderRequested(s.saleOrderId, int.tryParse(s.jobNoText) ?? 0)
                   );
                 },
               ),
@@ -933,9 +935,7 @@ class _StatusField extends StatelessWidget {
           return;
         }
 
-        // ──> நீங்க சொன்ன மாதிரி Common List-ஐ இங்க Load பண்றோம் <──
-        // JobAllStatus Screen-க்கு போறதுக்கு முன்னாடியே Data Load ஆகிடும்
-        await OnlineApi.SelectAllJobStatus(context, state.jobMasterId); if (!context.mounted) return;// அதுக்கப்புறம் நேவிகேஷன் நடக்கும்
+        // The BLoC has already fetched job statuses into objfun.JobAllStatusList!
         Navigator.push(
           context,
           MaterialPageRoute(

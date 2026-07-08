@@ -2,6 +2,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 import 'package:maleva/core/utils/clsfunction.dart' as objfun;
 import 'package:maleva/core/models/model.dart';
+import 'package:maleva/features/transaction/enquirytrmaster/data/enquiry_repository.dart';
+import 'package:maleva/core/utils/session_manager.dart';
 import 'enquirytradd_event.dart';
 import 'enquirytradd_state.dart';
 
@@ -9,7 +11,12 @@ import 'enquirytradd_state.dart';
 
 
 class EnquiryAddBloc extends Bloc<EnquiryAddEvent, EnquiryAddState> {
-  EnquiryAddBloc() : super(EnquiryAddInitial()) {
+  final EnquiryAddRepository _repository;
+  final SessionManager _sessionManager;
+
+  EnquiryAddBloc(this._repository, this._sessionManager) : super(EnquiryAddInitial()) {
+    on<EnquiryAddFetchCurrency>(_onFetchCurrency);
+    on<EnquiryAddFetchJobStatuses>(_onFetchJobStatuses);
     on<EnquiryAddStarted>(_onStarted);
     on<EnquiryAddCustomerChanged>(_onCustomerChanged);
     on<EnquiryAddCustomerCleared>(_onCustomerCleared);
@@ -263,9 +270,9 @@ class EnquiryAddBloc extends Bloc<EnquiryAddEvent, EnquiryAddState> {
       final payload = [
         {
           'Id':               s.editId,
-          'CompanyRefId':     objfun.Comid,
+          'CompanyRefId':     _sessionManager.companyId,
           'UserRefId':        null,
-          'EmployeeRefId':    objfun.EmpRefId == 0 ? null : objfun.EmpRefId,
+          'EmployeeRefId':    _sessionManager.empRefId == 0 ? null : _sessionManager.empRefId,
           'AgentCompanyRefId': null,
           'AgentMasterRefId': null,
           'OAgentCompanyRefId': null,
@@ -378,21 +385,9 @@ class EnquiryAddBloc extends Bloc<EnquiryAddEvent, EnquiryAddState> {
         }
       ];
 
-      final header = {'Content-Type': 'application/json; charset=UTF-8'};
-      final resultData = await objfun.apiAllinoneSelectArray(
-          '${objfun.apiInsertEnquiry}?Comid=${objfun.Comid}',
-          payload,
-          header,
-          null);
-
-      if (resultData != '') {
-        final value = ResponseViewModel.fromJson(resultData);
-        if (value.IsSuccess == true) {
-          emit(EnquiryAddSaveSuccess());
-        } else {
-          emit(s);
-          // Error handled in UI via listener
-        }
+      final success = await _repository.insertEnquiry(payload);
+      if (success) {
+        emit(EnquiryAddSaveSuccess());
       } else {
         emit(s);
       }
@@ -402,7 +397,24 @@ class EnquiryAddBloc extends Bloc<EnquiryAddEvent, EnquiryAddState> {
   }
 
   // ── Clear ────────────────────────────────────────────────────────────────────
-  void _onClearRequested(
+  
+  Future<void> _onFetchCurrency(EnquiryAddFetchCurrency event, Emitter<EnquiryAddState> emit) async {
+    if (state is EnquiryAddLoaded) {
+      final s = state as EnquiryAddLoaded;
+      final currency = await _repository.loadCustomerCurrency(event.customerId);
+      emit(s.copyWith(customerCurrencyValue: currency));
+    }
+  }
+
+  Future<void> _onFetchJobStatuses(EnquiryAddFetchJobStatuses event, Emitter<EnquiryAddState> emit) async {
+    if (state is EnquiryAddLoaded) {
+      final s = state as EnquiryAddLoaded;
+      final statuses = await _repository.selectAllJobStatus(event.jobId);
+      emit(s.copyWith(jobStatuses: statuses));
+    }
+  }
+
+void _onClearRequested(
       EnquiryAddClearRequested event, Emitter<EnquiryAddState> emit) {
     emit(_emptyLoaded());
   }

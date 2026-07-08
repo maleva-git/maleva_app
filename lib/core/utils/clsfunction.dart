@@ -307,9 +307,15 @@ Map<String, String> _buildRequestHeaders(Map<String, String>? customHeaders, {bo
 }
 
 Future<http.Response> _performPostRequest(String url, dynamic bodyData, Map<String, String> headers) async {
-  final body = json.encode(bodyData);
+  String body;
+  if (bodyData == null || bodyData == '') {
+    body = "{}";
+  } else {
+    body = json.encode(bodyData);
+  }
+  
   debugPrint(url);
-  if (body != '' && body != 'null') {
+  if (body != '' && body != 'null' && body != '{}') {
     debugPrint(body);
   }
   return await http.post(Uri.parse(url), headers: headers, body: body).timeout(const Duration(seconds: 30));

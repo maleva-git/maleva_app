@@ -786,11 +786,14 @@ class SalesOrderBloc extends Bloc<SalesOrderEvent, SalesOrderState> {
         'PickupsList': dynamicPickups,
         'DeliveriesList': dynamicDeliveries,
 
-        // Clearing obsolete flat keys
-        'PickUpAddress': '',
-        'PickUpQuantity': '',
-        'DeliveryAddress': '',
-        'DeliveryQuantity': '',
+        // Backend expects comma-separated strings using specific case-sensitive keys
+        'PickupAddress': state.pickupAddressList.isNotEmpty ? state.pickupAddressList.join(', ') : _f('pickupAddress'),
+        'pickupQuantityList': state.pickupQuantityList.isNotEmpty ? state.pickupQuantityList.join(', ') : _f('pickupQuantity'),
+        'pickuptimelist': DateTime.now().toIso8601String(),
+        
+        'DeliveryAddress': state.deliveryAddressList.isNotEmpty ? state.deliveryAddressList.join(', ') : _f('deliveryAddress'),
+        'DeliveryQuantityList': state.deliveryQuantityList.isNotEmpty ? state.deliveryQuantityList.join(', ') : _f('deliveryQuantity'),
+        'DelivertimeList': DateTime.now().toIso8601String(),
 
         'OriginRefId': state.originId,
         'OriginName': _f('originName'),

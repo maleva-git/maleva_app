@@ -984,8 +984,9 @@ class _SaleOrderDetailsViewState extends State<_SaleOrderDetailsView>
     await showDialog(
       barrierDismissible: false,
       context: ctx,
-      builder: (_) => StatefulBuilder(
-        builder: (_, setS) => Dialog(
+      builder: (_) => BlocBuilder<SaleOrderDetailsBloc, SaleOrderDetailsState>(
+        bloc: bloc,
+        builder: (_, st) => Dialog(
           elevation: 40,
           child: Container(
             width: size.width * 0.65,
@@ -1039,7 +1040,6 @@ class _SaleOrderDetailsViewState extends State<_SaleOrderDetailsView>
                             bloc.add(
                                 SaleOrderDeletePickUpAddressEvent(
                                     index: i));
-                            setS(() {});
                           }
                         },
                         onTap: () {
@@ -1091,8 +1091,9 @@ class _SaleOrderDetailsViewState extends State<_SaleOrderDetailsView>
     await showDialog(
       barrierDismissible: false,
       context: ctx,
-      builder: (_) => StatefulBuilder(
-        builder: (_, setS) => Dialog(
+      builder: (_) => BlocBuilder<SaleOrderDetailsBloc, SaleOrderDetailsState>(
+        bloc: bloc,
+        builder: (_, st) => Dialog(
           elevation: 40,
           child: Container(
             width: size.width * 0.65,
@@ -1144,7 +1145,6 @@ class _SaleOrderDetailsViewState extends State<_SaleOrderDetailsView>
                             bloc.add(
                                 SaleOrderDeleteDeliveryAddressEvent(
                                     index: i));
-                            setS(() {});
                           }
                         },
                         onTap: () {

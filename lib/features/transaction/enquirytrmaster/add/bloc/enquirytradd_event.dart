@@ -70,6 +70,17 @@ class EnquiryAddTextChanged extends EnquiryAddEvent {
 }
 
 // Save
+// Fetch events
+class EnquiryAddFetchCurrency extends EnquiryAddEvent {
+  final int customerId;
+  EnquiryAddFetchCurrency(this.customerId);
+}
+
+class EnquiryAddFetchJobStatuses extends EnquiryAddEvent {
+  final int jobId;
+  EnquiryAddFetchJobStatuses(this.jobId);
+}
+
 class EnquiryAddSaveRequested extends EnquiryAddEvent {}
 
 // Clear form

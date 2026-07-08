@@ -173,9 +173,7 @@ class _Driverstate extends State<Driver> {
                                       onTap: () {
                                         setState(() {
                                           if (widget.Searchby == 1) {
-                                            if (objfun.SelectedId != 0) {
-                                              Navigator.of(context, rootNavigator: true).pop(item);
-                                            }
+                                            Navigator.of(context, rootNavigator: true).pop(item);
                                           }
                                         });
                                       },

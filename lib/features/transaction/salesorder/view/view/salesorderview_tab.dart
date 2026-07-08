@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:maleva/core/di/injection.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:maleva/core/utils/clsfunction.dart' as objfun;
 import 'package:maleva/core/models/model.dart';
-import 'package:maleva/core/network/OnlineApi.dart' as OnlineApi;
+import 'package:maleva/features/transaction/salesorder/view/data/salesorderview_repository.dart';
 import 'package:maleva/menu/menulist.dart';
 import 'package:maleva/core/colors/colors.dart' as colour;
 import '../../../../mastersearch/Customer.dart';
@@ -32,7 +33,7 @@ class SaleOrderView extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocProvider(
       create: (ctx) =>
-      SalesOrderViewBloc(ctx)..add(StartupSalesOrderView()),
+      SalesOrderViewBloc(ctx, sl())..add(StartupSalesOrderView()),
       child: const _SaleOrderViewBody(),
     );
   }
@@ -794,8 +795,13 @@ class _MobileCard extends StatelessWidget {
                     if (result != null &&
                         result['IsSuccess'] == true) {
                       ctrl.clear();
-                      await OnlineApi.EditSalesOrder(
-                           id, saleNo); if (!context.mounted) return;Navigator.of(ctx).pop();
+                      final resultData = await sl<SalesOrderViewRepository>().editSalesOrder(id, saleNo);
+                      if (resultData.isNotEmpty) {
+                        objfun.SaleEditMasterList = resultData;
+                        objfun.SaleEditDetailList = (resultData[0]["SaleDetails"] as List).map<SaleEditDetailModel>((e) => SaleEditDetailModel.fromJson(e)).toList();
+                      } else {
+                        throw Exception("Data empty ah iruku");
+                      } if (!context.mounted) return;Navigator.of(ctx).pop();
                       Navigator.of(context)
                           .push(MaterialPageRoute(
                         builder: (_) => SalesOrdersAdd(
@@ -1189,8 +1195,13 @@ class _TabletRow extends StatelessWidget {
                       if (result != null &&
                           result['IsSuccess'] == true) {
                         ctrl.clear();
-                        await OnlineApi.EditSalesOrder(
-                             id, saleNo); if (!context.mounted) return;Navigator.of(ctx).pop();
+                        final resultData = await sl<SalesOrderViewRepository>().editSalesOrder(id, saleNo);
+                      if (resultData.isNotEmpty) {
+                        objfun.SaleEditMasterList = resultData;
+                        objfun.SaleEditDetailList = (resultData[0]["SaleDetails"] as List).map<SaleEditDetailModel>((e) => SaleEditDetailModel.fromJson(e)).toList();
+                      } else {
+                        throw Exception("Data empty ah iruku");
+                      } if (!context.mounted) return;Navigator.of(ctx).pop();
                         Navigator.of(context)
                             .push(MaterialPageRoute(
                           builder: (_) => SalesOrdersAdd(
@@ -1785,7 +1796,7 @@ class _FilterSheetState extends State<_FilterSheet> {
 
   Future<void> _pickEmployee(
       BuildContext context, SalesOrderViewBloc bloc) async {
-    await OnlineApi.SelectEmployee(context, 'sales', 'admin'); if (!context.mounted) return;final r = await Navigator.push(context,
+    objfun.EmployeeList = (await sl<SalesOrderViewRepository>().selectEmployee('sales', 'admin')).map<EmployeeModel>((e) => EmployeeModel.fromJson(e)).toList(); if (!context.mounted) return;final r = await Navigator.push(context,
         MaterialPageRoute(
             builder: (_) =>
             const Employee(Searchby: 1, SearchId: 0))); if (r != null) { objfun.SelectEmployeeList = r; }

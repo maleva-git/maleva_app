@@ -1,5 +1,3 @@
-
-
 import 'package:intl/intl.dart';
 
 abstract class StockInEntryState {}
@@ -33,6 +31,10 @@ class StockInEntryLoaded extends StockInEntryState {
   final bool         imageUploadEnabled;
   final List<String> images;
 
+  // ── Navigation ────────────────────────────────────────────────────────────
+  final bool navigateEditSalesOrder;
+  final List<dynamic> saleEditMasterList;
+
    StockInEntryLoaded({
     required this.billType,
     required this.jobNoText,
@@ -50,6 +52,8 @@ class StockInEntryLoaded extends StockInEntryState {
     required this.statusName,
     required this.imageUploadEnabled,
     required this.images,
+    this.navigateEditSalesOrder = false,
+    this.saleEditMasterList = const [],
   });
 
   static String _today() =>
@@ -60,7 +64,7 @@ class StockInEntryLoaded extends StockInEntryState {
         billType:          '0',
         jobNoText:         '',
         saleOrderId:       0,
-        jobNoSuggestions:  [],
+        jobNoSuggestions:  const [],
         stockNo:           stockNo,
         shipName:          '',
         customerName:      '',
@@ -73,6 +77,8 @@ class StockInEntryLoaded extends StockInEntryState {
         statusName:        '',
         imageUploadEnabled: false,
         images:            [],
+        navigateEditSalesOrder: false,
+        saleEditMasterList: const [],
       );
 
   StockInEntryLoaded copyWith({
@@ -92,6 +98,8 @@ class StockInEntryLoaded extends StockInEntryState {
     String? statusName,
     bool?   imageUploadEnabled,
     List<String>? images,
+    bool? navigateEditSalesOrder,
+    List<dynamic>? saleEditMasterList,
   }) {
     return StockInEntryLoaded(
       billType:          billType          ?? this.billType,
@@ -110,6 +118,8 @@ class StockInEntryLoaded extends StockInEntryState {
       statusName:        statusName        ?? this.statusName,
       imageUploadEnabled: imageUploadEnabled ?? this.imageUploadEnabled,
       images:            images            ?? this.images,
+      navigateEditSalesOrder: navigateEditSalesOrder ?? this.navigateEditSalesOrder,
+      saleEditMasterList: saleEditMasterList ?? this.saleEditMasterList,
     );
   }
 }

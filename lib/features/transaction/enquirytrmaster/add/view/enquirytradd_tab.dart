@@ -4,7 +4,7 @@ import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:maleva/core/utils/clsfunction.dart' as objfun;
-import 'package:maleva/core/network/OnlineApi.dart' as OnlineApi;
+import 'package:get_it/get_it.dart';
 import 'package:maleva/core/models/model.dart';
 import 'package:maleva/menu/menulist.dart';
 import '../../../../../core/theme/tokens.dart';
@@ -30,7 +30,7 @@ class AddEnquiryTR extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocProvider(
       create: (_) =>
-      EnquiryAddBloc()..add(EnquiryAddStarted(saleMaster: SaleMaster)),
+      GetIt.instance<EnquiryAddBloc>()..add(EnquiryAddStarted(saleMaster: SaleMaster)),
       child: const _AddEnquiryPage(),
     );
   }
@@ -195,7 +195,8 @@ class _AddEnquiryBody extends StatelessWidget {
               if (sel.Id != 0) {
                 _emit(context, EnquiryAddCustomerChanged(
                     custId: sel.Id, custName: sel.AccountName));
-                await OnlineApi.loadCustomerCurrency(context, sel.Id); if (!context.mounted) return;objfun.SelectCustomerList = CustomerModel.Empty();
+                context.read<EnquiryAddBloc>().add(EnquiryAddFetchCurrency(sel.Id));
+                objfun.SelectCustomerList = CustomerModel.Empty();
               }
             });
           },
@@ -218,8 +219,8 @@ class _AddEnquiryBody extends StatelessWidget {
             ).then((_) async {
               final sel = objfun.SelectJobTypeList;
               if (sel.Id != 0) {
-                await OnlineApi.SelectAllJobStatus(context, sel.Id); if (!context.mounted) return;_emit(context, EnquiryAddJobTypeChanged(
-                    jobTypeId: sel.Id, jobTypeName: sel.Name));
+                context.read<EnquiryAddBloc>().add(EnquiryAddFetchJobStatuses(sel.Id));
+                _emit(context, EnquiryAddJobTypeChanged(                    jobTypeId: sel.Id, jobTypeName: sel.Name));
                 objfun.SelectJobTypeList = JobTypeModel.Empty();
               }
             });

@@ -105,13 +105,53 @@ import '../../features/operations/forwardingsalary/bloc/forwardingsalary_bloc.da
 import '../../features/operations/forwardingsalary/data/forwardingsalary_repository.dart';
 
 
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:maleva/core/utils/local_storage_service.dart';
+import 'package:maleva/core/utils/session_manager.dart';
+import 'package:maleva/core/network/dio_client.dart';
+import 'package:maleva/features/dashboard/admin_dashboard/tabs/driverleave/data/leave_repository.dart';
+import 'package:maleva/features/dashboard/admin_dashboard/tabs/driverleave/bloc/leave_bloc.dart';
+import 'package:maleva/features/transaction/enquirytrmaster/data/enquiry_repository.dart';
+import 'package:maleva/features/transaction/enquirytrmaster/add/bloc/enquirytradd_bloc.dart';
+import 'package:maleva/features/transaction/salesorder/add/data/salesorderadd_repository.dart';
+import 'package:maleva/features/transaction/salesorder/view/data/salesorderview_repository.dart';
+
+import 'package:maleva/features/transaction/salesorder/add/bloc/salesorderadd_bloc.dart';
+
 final sl = GetIt.instance;
 
 Future<void> setupDependencies() async {
-
   if (sl.isRegistered<AuthApi>()) return;
 
   await AppPreferences.init();
+  
+  final sharedPreferences = await SharedPreferences.getInstance();
+  sl.registerLazySingleton<SharedPreferences>(() => sharedPreferences);
+  sl.registerLazySingleton<LocalStorageService>(() => LocalStorageService(sl<SharedPreferences>()));
+  sl.registerLazySingleton<SessionManager>(() => SessionManager(sl<LocalStorageService>()));
+  
+  sl.registerLazySingleton<DioClient>(() => DioClient(sl<SessionManager>()));
+
+  // Repositories
+  sl.registerLazySingleton<LeaveRepository>(
+    () => LeaveRepository(sl(), sl()),
+  );
+  sl.registerLazySingleton<EnquiryAddRepository>(
+    () => EnquiryAddRepository(sl(), sl()),
+  );
+
+  sl.registerLazySingleton<SalesOrderAddRepository>(
+    () => SalesOrderAddRepository(sl(), sl()),
+  );
+
+  // BLoCs
+  sl.registerFactory<LeaveBloc>(
+    () => LeaveBloc(sl()),
+  );
+  sl.registerFactory<EnquiryAddBloc>(
+    () => EnquiryAddBloc(sl(), sl()),
+  );
+
 
   sl.registerLazySingleton<AuthApi>(() => AuthApi.instance);
 
@@ -141,6 +181,8 @@ Future<void> setupDependencies() async {
         () => ExpenseReportBloc(repository: sl<ExpenseReportRepository>()),
   );
 
+  
+  sl.registerLazySingleton<SalesOrderViewRepository>(() => SalesOrderViewRepository(sl(), sl()));
   sl.registerLazySingleton<SalesOrderRepository>(() => SalesOrderRepository());
   sl.registerFactory<SalesOrderBloc>(
         () => SalesOrderBloc(repository: sl<SalesOrderRepository>()),
@@ -395,7 +437,7 @@ Future<void> setupDependencies() async {
 
   // ── Stock In Entry ────────────────────────────────────────────────────────
   sl.registerLazySingleton<StockInEntryRepository>(
-        () => StockInEntryRepository(),
+        () => StockInEntryRepository(sl(), sl()),
   );
   sl.registerFactory<StockInEntryBloc>(
         () => StockInEntryBloc(repository: sl<StockInEntryRepository>()),

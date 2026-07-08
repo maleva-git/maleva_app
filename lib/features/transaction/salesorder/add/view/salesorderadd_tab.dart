@@ -23,9 +23,11 @@ import '../../../../mastersearch/Product.dart';
 import '../../../../mastersearch/VesselType.dart';
 import '../../view/view/salesorderview_tab.dart';
 import '../bloc/salesorderadd_bloc.dart';
-import '../bloc/salesorderadd_event.dart';
-import '../bloc/salesorderadd_state.dart';
+import 'package:maleva/features/transaction/salesorder/add/bloc/salesorderadd_event.dart';
+import 'package:maleva/features/transaction/salesorder/add/bloc/salesorderadd_state.dart';
+import 'package:maleva/core/di/injection.dart';
 import 'package:maleva/core/colors/colors.dart' as colour;
+import 'package:maleva/features/transaction/salesorder/add/data/salesorderadd_repository.dart';
 
 class SalesOrdersAdd extends StatelessWidget {
   final List<SaleEditDetailModel>? SaleDetails;
@@ -39,7 +41,7 @@ class SalesOrdersAdd extends StatelessWidget {
     if (isEnquiry) objfun.storagenew.setString('EnquiryOpen', "false");
 
     return BlocProvider(
-      create: (ctx) => SalesOrderAddBloc(ctx)
+      create: (ctx) => SalesOrderAddBloc(ctx, sl())
         ..add(StartupSalesOrderAdd(
           saleDetails: SaleDetails,
           saleMaster: SaleMaster,
@@ -621,8 +623,7 @@ if (__navResult6 != null) { objfun.SelectedVesselTypeName = __navResult6; }
           final r = await Navigator.push(context, MaterialPageRoute(builder: (_) => const AddressList(Searchby: 1, SearchId: 0))); if (r != null) { objfun.SelectAddressList = r; }
           if (!context.mounted) return;
           if (r != null && objfun.SelectAddressList.isNotEmpty) {
-            final enc = Uri.encodeComponent(objfun.SelectAddressList);
-            await OnlineApi.SelectAddressDetails(context, enc); if (!context.mounted) return;if (objfun.AddressDetailedList.isNotEmpty) {
+            await OnlineApi.SelectAddressDetails(context, objfun.SelectAddressList); if (!context.mounted) return;if (objfun.AddressDetailedList.isNotEmpty) {
               bloc.add(PickUpAddressSelected(objfun.AddressDetailedList[0].Address + (objfun.AddressDetailedList[0].Phone != null ? " ${objfun.AddressDetailedList[0].Phone}" : "")));
             }
             objfun.SelectAddressList = "";
@@ -652,8 +653,7 @@ if (__navResult6 != null) { objfun.SelectedVesselTypeName = __navResult6; }
           final r = await Navigator.push(context, MaterialPageRoute(builder: (_) => const AddressList(Searchby: 1, SearchId: 0))); if (r != null) { objfun.SelectAddressList = r; }
           if (!context.mounted) return;
           if (r != null && objfun.SelectAddressList.isNotEmpty) {
-            final enc = Uri.encodeComponent(objfun.SelectAddressList);
-            await OnlineApi.SelectAddressDetails(context, enc); if (!context.mounted) return;if (objfun.AddressDetailedList.isNotEmpty) {
+            await OnlineApi.SelectAddressDetails(context, objfun.SelectAddressList); if (!context.mounted) return;if (objfun.AddressDetailedList.isNotEmpty) {
               bloc.add(DeliveryAddressSelected(objfun.AddressDetailedList[0].Address + (objfun.AddressDetailedList[0].Phone != null ? " ${objfun.AddressDetailedList[0].Phone}" : "")));
             }
             objfun.SelectAddressList = "";
@@ -674,8 +674,7 @@ if (__navResult6 != null) { objfun.SelectedVesselTypeName = __navResult6; }
             final r = await Navigator.push(context, MaterialPageRoute(builder: (_) => const AddressList(Searchby: 1, SearchId: 0))); if (r != null) { objfun.SelectAddressList = r; }
             if (!context.mounted) return;
             if (r != null && objfun.SelectAddressList.isNotEmpty) {
-              final enc = Uri.encodeComponent(objfun.SelectAddressList);
-              await OnlineApi.SelectAddressDetails(context, enc); if (!context.mounted) return;if (objfun.AddressDetailedList.isNotEmpty) {
+              await OnlineApi.SelectAddressDetails(context, objfun.SelectAddressList); if (!context.mounted) return;if (objfun.AddressDetailedList.isNotEmpty) {
                 bloc.add(WarehouseAddressSelected(objfun.AddressDetailedList[0].Address + (objfun.AddressDetailedList[0].Phone != null ? " ${objfun.AddressDetailedList[0].Phone}" : "")));
               }
               objfun.SelectAddressList = "";

@@ -30,6 +30,8 @@ class StockInEntryBloc extends Bloc<StockInEntryEvent, StockInEntryState> {
     on<StockInEntryImageDeleted>(_onImageDeleted);
     on<StockInEntrySaveRequested>(_onSaveRequested);
     on<StockInEntryClearRequested>(_onClearRequested);
+    on<StockInEntryEditSalesOrderRequested>(_onEditSalesOrderRequested);
+    on<StockInEntryNavigationHandled>(_onNavigationHandled);
   }
 
   // ── Startup ─────────────────────────────────────────────────────────────────
@@ -123,6 +125,7 @@ class StockInEntryBloc extends Bloc<StockInEntryEvent, StockInEntryState> {
     final details = await repository.fetchJobDetails(saleOrderId);
 
     _jobAllStatusList = details['jobStatuses'];
+    objfun.JobAllStatusList = _jobAllStatusList.map((e) => JobAllStatusModel.fromJson(e)).toList(); // Propagate for JobAllStatus screen
 
     return base.copyWith(
       jobNoText: jobNo,
@@ -157,6 +160,30 @@ class StockInEntryBloc extends Bloc<StockInEntryEvent, StockInEntryState> {
     } catch (e) {
       emit(StockInEntryError(e.toString()));
     }
+  }
+
+  
+  // ── Edit Sales Order ─────────────────────────────────────────────────────────
+  Future<void> _onEditSalesOrderRequested(StockInEntryEditSalesOrderRequested event, Emitter<StockInEntryState> emit) async {
+    if (state is! StockInEntryLoaded) return;
+    final s = state as StockInEntryLoaded;
+    
+    // Fetch data from repository
+    final result = await repository.fetchSalesOrderForEdit(event.saleOrderId, event.jobNo);
+    
+    // We only need the master list for StockInEntry navigation
+    final masterList = result['masterList'] as List<dynamic>;
+    
+    emit(s.copyWith(
+      navigateEditSalesOrder: true,
+      saleEditMasterList: masterList,
+    ));
+  }
+
+  void _onNavigationHandled(StockInEntryNavigationHandled event, Emitter<StockInEntryState> emit) {
+    if (state is! StockInEntryLoaded) return;
+    final s = state as StockInEntryLoaded;
+    emit(s.copyWith(navigateEditSalesOrder: false));
   }
 
   // ── Save ──────────────────────────────────────────────────────────────────────

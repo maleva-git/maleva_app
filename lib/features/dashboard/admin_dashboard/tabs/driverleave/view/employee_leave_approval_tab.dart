@@ -1,5 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:maleva/features/dashboard/admin_dashboard/tabs/driverleave/data/leave_request_api.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import '../bloc/leave_bloc.dart';
+import '../bloc/leave_event.dart';
+import '../bloc/leave_state.dart';
+import 'package:get_it/get_it.dart';
+
+
 import 'package:maleva/features/dashboard/admin_dashboard/tabs/driverleave/data/leave_request_model.dart';
 import 'package:maleva/core/colors/colors.dart' as colour;
 import 'package:intl/intl.dart';
@@ -15,103 +21,71 @@ class EmployeeLeaveApprovalTab extends StatefulWidget {
 }
 
 class _EmployeeLeaveApprovalTabState extends State<EmployeeLeaveApprovalTab> {
-  bool _isLoading = false;
-  List<LeaveRequestModel> _requests = [];
-  List<LeaveTypeModel> _leaveStatusList = [];
-
-  @override
+    @override
   void initState() {
     super.initState();
     _fetchRequests();
-    _loadEmployees();
-    _fetchLeaveStatus();
-  }
-  
-  Future<void> _fetchLeaveStatus() async {
-    final data = await LeaveRequestApi.getLeaveStatus(context);
-    if (mounted) {
-      setState(() {
-        _leaveStatusList = data;
-      });
-    }
-  }
-  
-  Future<void> _loadEmployees() async {
-    await OnlineApi.SelectEmployee(context, "0", "0");
-    setState(() {});
   }
 
-  Future<void> _fetchRequests() async {
-    setState(() => _isLoading = true);
-    final data = await LeaveRequestApi.getLeaveRequests(context, applicantType: 1); // 2 for Drivers
-    setState(() {
-      _requests = data;
-      _isLoading = false;
-    });
+  void _fetchRequests() {
+    context.read<LeaveBloc>().add(FetchLeaveData(
+      applicantType: 1,
+      applicantRefId: 0,
+      fromDate: "",
+      toDate: "",
+    ));
   }
-  
-  Future<void> _updateStatus(LeaveRequestModel req, int initialStatus) async {
-    int? selectedStatusId = initialStatus;
+
+  Future<void> _showApprovalDialog(LeaveRequestModel req) async {
     final remarkCtrl = TextEditingController();
-
+    int? selectedStatusId;
+    
     bool? confirm = await showDialog<bool>(
       context: context,
       builder: (ctx) {
         return StatefulBuilder(
-          builder: (context, setStateDialog) {
+          builder: (context, setDialogState) {
             return AlertDialog(
-              title: const Text('Review Leave Request'),
-              content: SingleChildScrollView(
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    const Text('Action Status:'),
-                    const SizedBox(height: 8),
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 12),
-                      decoration: BoxDecoration(
-                        border: Border.all(color: Colors.grey.shade400),
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      child: DropdownButtonHideUnderline(
-                        child: DropdownButton<int>(
-                          isExpanded: true,
-                          value: selectedStatusId,
-                          hint: const Text('Select Status'),
-                          items: _leaveStatusList.map((e) => DropdownMenuItem<int>(
-                            value: e.id,
-                            child: Text(e.name),
-                          )).toList(),
-                          onChanged: (val) {
-                            setStateDialog(() => selectedStatusId = val);
-                          },
-                        ),
-                      ),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+              title: Text('Review Leave Request', style: GoogleFonts.lato(fontWeight: FontWeight.bold)),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  DropdownButtonFormField<int>(
+                    decoration: InputDecoration(
+                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                     ),
-                    const SizedBox(height: 16),
-                    TextField(
-                      controller: remarkCtrl,
-                      decoration: const InputDecoration(
-                        labelText: 'Remark (Optional)',
-                        border: OutlineInputBorder(),
-                      ),
+                    hint: const Text('Select Status'),
+                    value: selectedStatusId,
+                    items: const [
+                      DropdownMenuItem(value: 2, child: Text('Approve', style: TextStyle(color: Colors.green, fontWeight: FontWeight.bold))),
+                      DropdownMenuItem(value: 3, child: Text('Reject', style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold))),
+                    ],
+                    onChanged: (val) => setDialogState(() => selectedStatusId = val),
+                  ),
+                  const SizedBox(height: 16),
+                  TextField(
+                    controller: remarkCtrl,
+                    decoration: InputDecoration(
+                      hintText: 'Enter Remarks',
+                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
                     ),
-                  ],
-                ),
+                    maxLines: 2,
+                  ),
+                ],
               ),
               actions: [
-                TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('Cancel')),
+                TextButton(
+                  onPressed: () => Navigator.pop(ctx, false),
+                  child: const Text('Cancel'),
+                ),
                 ElevatedButton(
-                  style: ElevatedButton.styleFrom(backgroundColor: colour.brand),
-                  onPressed: () {
-                    if (selectedStatusId == null) {
-                      ScaffoldMessenger.of(ctx).showSnackBar(const SnackBar(content: Text('Please select a status action')));
-                      return;
-                    }
-                    Navigator.pop(ctx, true);
-                  }, 
-                  child: const Text('Submit', style: TextStyle(color: Colors.white)),
+                  onPressed: selectedStatusId == null ? null : () => Navigator.pop(ctx, true),
+                  style: ElevatedButton.styleFrom(
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                  ),
+                  child: const Text('Submit'),
                 ),
               ],
             );
@@ -122,27 +96,43 @@ class _EmployeeLeaveApprovalTabState extends State<EmployeeLeaveApprovalTab> {
 
     if (confirm != true || selectedStatusId == null) return;
     
-    setState(() => _isLoading = true);
-    bool success = await LeaveRequestApi.updateLeaveStatus(
-      context,
+    context.read<LeaveBloc>().add(UpdateLeaveStatusEvent(
       id: req.id,
       statusRefId: selectedStatusId!,
       reviewRemark: remarkCtrl.text,
       reviewedBy: objfun.EmpRefId,
-    );
-    
-    if (success) {
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Leave Status Updated')));
-      _fetchRequests();
-    } else {
-      setState(() => _isLoading = false);
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Failed to update status')));
-    }
+    ));
   }
 
   @override
   Widget build(BuildContext context) {
-    return Column(
+    return BlocProvider<LeaveBloc>(
+      create: (context) => GetIt.instance<LeaveBloc>()..add(const FetchLeaveData(
+        applicantType: 1,
+        applicantRefId: 0,
+        fromDate: "",
+        toDate: "",
+      )),
+      child: Builder(builder: (context) {
+        return BlocConsumer<LeaveBloc, LeaveState>(
+          listener: (context, state) {
+            if (state is LeaveActionSuccess) {
+              ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(state.message)));
+              context.read<LeaveBloc>().add(const FetchLeaveData(
+                applicantType: 1,
+                applicantRefId: 0,
+                fromDate: "",
+                toDate: "",
+              ));
+            } else if (state is LeaveActionError) {
+              ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(state.message)));
+            }
+          },
+      builder: (context, state) {
+        bool isLoading = state is LeaveLoading || state is LeaveInitial;
+        List<LeaveRequestModel> requests = state is LeaveLoaded ? state.requests : [];
+
+        return Column(
       children: [
         Container(
           padding: const EdgeInsets.all(16),
@@ -156,12 +146,12 @@ class _EmployeeLeaveApprovalTabState extends State<EmployeeLeaveApprovalTab> {
         ),
         const Divider(height: 1, thickness: 1),
         Expanded(
-          child: _isLoading && _requests.isEmpty
+          child: isLoading && requests.isEmpty
               ? const Center(child: CircularProgressIndicator())
               : ListView.builder(
-                  itemCount: _requests.length,
+                  itemCount: requests.length,
                   itemBuilder: (context, index) {
-                    final req = _requests[index];
+                    final req = requests[index];
                     Color statusColor = const Color(0xFFEAB308); // Yellow/Orange
                     Color statusBg = const Color(0xFFFEF08A).withValues(alpha: 0.3);
                     if (req.statusRefId == 2) {
@@ -299,7 +289,7 @@ class _EmployeeLeaveApprovalTabState extends State<EmployeeLeaveApprovalTab> {
                                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                                     ),
                                     icon: const Icon(Icons.rate_review_rounded, color: Colors.white, size: 16),
-                                    onPressed: () => _updateStatus(req, 2),
+                                    onPressed: () => _showApprovalDialog(req),
                                     label: Text('Review', style: GoogleFonts.lato(color: Colors.white, fontWeight: FontWeight.w700)),
                                   ),
                                 ),
@@ -312,6 +302,10 @@ class _EmployeeLeaveApprovalTabState extends State<EmployeeLeaveApprovalTab> {
                 ),
         ),
       ],
+    );
+          },
+        );
+      }),
     );
   }
 }

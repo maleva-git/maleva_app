@@ -75,5 +75,14 @@ class StockInEntryImageDeleted extends StockInEntryEvent {
 // ── Save ──────────────────────────────────────────────────────────────────────
 class StockInEntrySaveRequested extends StockInEntryEvent {}
 
+// ── Edit Sales Order ──────────────────────────────────────────────────────────
+class StockInEntryEditSalesOrderRequested extends StockInEntryEvent {
+  final int saleOrderId;
+  final int jobNo;
+  StockInEntryEditSalesOrderRequested(this.saleOrderId, this.jobNo);
+}
+
+class StockInEntryNavigationHandled extends StockInEntryEvent {}
+
 // ── Clear / Reset ─────────────────────────────────────────────────────────────
 class StockInEntryClearRequested extends StockInEntryEvent {}

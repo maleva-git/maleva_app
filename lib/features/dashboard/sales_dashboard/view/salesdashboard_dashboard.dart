@@ -20,6 +20,7 @@ import '../../admin_dashboard/tabs/vesselreport/bloc/vesselreport_event.dart';
 import '../../admin_dashboard/tabs/vesselreport/view/vesselreportview_tab.dart';
 import '../bloc/sales_bloc.dart';
 import 'salesdashboard_dashboard_ui.dart';
+import 'package:maleva/features/dashboard/admin_dashboard/tabs/driverleave/bloc/leave_bloc.dart';
 
 class SalesDashboard extends StatefulWidget {
   const SalesDashboard({super.key});
@@ -80,7 +81,8 @@ class _SalesDashboardState extends State<SalesDashboard> with SingleTickerProvid
                 BlocProvider(
                   create: (_) => sl<PaymentPendingBloc>(),
                   child: const PaymentPendingPage(),
-                )
+                ),
+                BlocProvider<LeaveBloc>(create: (_) => sl<LeaveBloc>()),
               ],
               child: Builder(
                 builder: (context) {

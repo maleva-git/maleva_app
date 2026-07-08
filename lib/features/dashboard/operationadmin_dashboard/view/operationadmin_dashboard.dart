@@ -47,6 +47,7 @@ import '../../admin_dashboard/tabs/vesselreport/view/vesselreportview_tab.dart';
 import '../bloc/operationadmin_dashboard_bloc.dart';
 import '../bloc/operationadmin_dashboard_event.dart';
 import 'operationadmin_dashboard_ui.dart';
+import 'package:maleva/features/dashboard/admin_dashboard/tabs/driverleave/bloc/leave_bloc.dart';
 
 class OperationAdminDashboard extends StatefulWidget{
   const OperationAdminDashboard({super.key});
@@ -163,8 +164,9 @@ class _AdminDashboardState extends State<OperationAdminDashboard> with SingleTic
             BlocProvider(
               create: (_) => sl<RTIDetailsBloc>(),
               child: const RTIDetailsPage(),
-            )
-          ],
+            ),
+        BlocProvider<LeaveBloc>(create: (_) => sl<LeaveBloc>()),
+      ],
           child: Scaffold(
             body: MobileDashboard(
               tabController: _tabController,

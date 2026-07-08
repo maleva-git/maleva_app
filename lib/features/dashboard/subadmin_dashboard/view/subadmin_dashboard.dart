@@ -41,6 +41,7 @@ import '../../admin_dashboard/tabs/vesselreport/bloc/vesselreport_event.dart';
 import '../../admin_dashboard/tabs/vesselreport/view/vesselreportview_tab.dart';
 import '../bloc/subadmin_dashboard_bloc.dart';
 import '../bloc/subadmin_dashboard_event.dart';
+import 'package:maleva/features/dashboard/admin_dashboard/tabs/driverleave/bloc/leave_bloc.dart';
 
 class SubAdminDashboard extends StatefulWidget{
   const SubAdminDashboard({super.key});
@@ -149,7 +150,8 @@ class _AdminDashboardState extends State<SubAdminDashboard> with SingleTickerPro
             ),
 
 
-          ],
+                  BlocProvider<LeaveBloc>(create: (_) => sl<LeaveBloc>()),
+      ],
           child: Scaffold(
             body: MobileDashboard(
               tabController: _tabController,

@@ -62,9 +62,7 @@ class _Employeestate extends State<Employee> {
 
   void _onItemTapped(EmployeeModel selectedEmployee) {
     if (widget.Searchby == 1) {
-      if (objfun.SelectedId != 0) {
-        Navigator.of(context, rootNavigator: true).pop(selectedEmployee);
-      }
+      Navigator.of(context, rootNavigator: true).pop(selectedEmployee);
     }
   }
 
