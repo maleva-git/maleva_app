@@ -143,7 +143,7 @@ class _VesselPlanningDetailsView extends StatelessWidget {
       child: Column(
         children: [
 
-          _ColumnHeaderCard(isTablet: isTablet),
+          const SizedBox(height: 6),
           const SizedBox(height: 6),
           _SummaryPill(count: state.vesselPlanningList.length),
 
@@ -185,87 +185,7 @@ class _VesselPlanningDetailsView extends StatelessWidget {
 }
 
 
-class _ColumnHeaderCard extends StatelessWidget {
-  const _ColumnHeaderCard({required this.isTablet});
-  final bool isTablet;
-
-  @override
-  Widget build(BuildContext context) {
-    final double fs = isTablet ? 13 : 11;
-
-    return Container(
-      padding: const EdgeInsets.symmetric(
-          horizontal: 8, vertical: 10),
-      decoration: BoxDecoration(
-        gradient: AppTokens.headerGradient,
-        borderRadius: BorderRadius.circular(10),
-        boxShadow: [
-          BoxShadow(
-              color: Palette.brandGlow, blurRadius: 6,
-              offset: const Offset(0, 3)),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Row 1: S.No | Remarks | Job Type
-          _hRow([
-            _hText('S.No',     flex: 1, fs: fs),
-            _hText('Remarks',  flex: 3, fs: fs),
-            _hText('Job Type', flex: 4, fs: fs),
-          ]),
-          const SizedBox(height: 5),
-          const Divider(color: Colors.white38, height: 1),
-          const SizedBox(height: 5),
-          // Row 2: Off Vessel | Load Vessel
-          _hRow([
-            _hText('Off Vessel',  flex: 3, fs: fs),
-            _hText('Load Vessel', flex: 3, fs: fs),
-          ]),
-          const SizedBox(height: 5),
-          // Row 3: Origin | Destination | Package
-          _hRow([
-            _hText('Origin',      flex: 3, fs: fs),
-            _hText('Destination', flex: 3, fs: fs),
-            _hText('Package',     flex: 4, fs: fs),
-          ]),
-          const SizedBox(height: 5),
-          // Row 4: Customer Name | Job No
-          _hRow([
-            _hText('Customer Name', flex: 4, fs: fs),
-            _hText('Job No',        flex: 2, fs: fs),
-          ]),
-          const SizedBox(height: 5),
-          // Row 5: Cargo Loc | Status | PIC
-          _hRow([
-            _hText('Cargo Loc', flex: 3, fs: fs),
-            _hText('Status',    flex: 2, fs: fs),
-            _hText('PIC',       flex: 3, fs: fs),
-          ]),
-        ],
-      ),
-    );
-  }
-
-  Widget _hRow(List<Widget> children) =>
-      Row(children: children);
-
-  Widget _hText(String text,
-      {required int flex, required double fs}) =>
-      Expanded(
-        flex: flex,
-        child: Text(
-          text,
-          style: GoogleFonts.lato(
-            color: Palette.white,
-            fontWeight: FontWeight.bold,
-            fontSize: fs,
-            letterSpacing: 0.3,
-          ),
-        ),
-      );
-}
-
+// Removed _ColumnHeaderCard
 
 class _SummaryPill extends StatelessWidget {
   const _SummaryPill({required this.count});
@@ -308,235 +228,130 @@ class _VesselCard extends StatelessWidget {
   final dynamic item;
   final bool isTablet;
 
+  String _formatDate(dynamic date) {
+    if (date == null || date.toString().isEmpty) return '-';
+    String d = date.toString();
+    if (d.contains('T')) {
+      List<String> parts = d.split('T');
+      if (parts.length == 2) {
+        String time = parts[1].length > 5 ? parts[1].substring(0, 5) : parts[1];
+        return '${parts[0]} $time';
+      }
+    }
+    return d;
+  }
+
   @override
   Widget build(BuildContext context) {
-    final double cardH =
-        MediaQuery.of(context).size.height *
-            (isTablet ? 0.18 : 0.20);
-    final double fs = isTablet ? 13 : objfun.FontCardText;
-
-    return SizedBox(
-      height: cardH,
-      child: Card(
-        elevation: 6,
-        shadowColor: Colors.black26,
-        color: AppTokens.surfaceCard,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(10),
-          side: BorderSide(
-            color: AppTokens.brandPrimary.withOpacity(0.35),
-            width: 1,
-          ),
+    return Card(
+      elevation: 4,
+      shadowColor: Colors.black26,
+      color: AppTokens.surfaceCard,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12),
+        side: BorderSide(
+          color: AppTokens.brandPrimary.withOpacity(0.2),
+          width: 1,
         ),
-        child: Padding(
-          padding: EdgeInsets.symmetric(
-              horizontal: isTablet ? 12 : 6, vertical: 4),
-          child: Column(
-            children: [
-              // ── Row 1: S.No | Remarks | Job Type ───────────────────
-              Expanded(
-                flex: 1,
-                child: Row(children: [
-                  Expanded(
-                    flex: 1,
-                    child: _cell(
-                      '${index + 1}',
-                      fs: fs,
-                      bold: true,
-                      color: AppTokens.brandPrimary,
-                    ),
-                  ),
-                  Expanded(
-                    flex: 3,
-                    child: _cell(
-                      item['Remarks']?.toString() ?? '',
-                      fs: fs,
-                    ),
-                  ),
-                  Expanded(
-                    flex: 4,
-                    child: _cell(
-                      item['JobName']?.toString() ?? '',
-                      fs: fs,
-                    ),
-                  ),
-                ]),
-              ),
-
-              // ── Row 2: Off Vessel | Loading Vessel ─────────────────
-              Expanded(
-                flex: 1,
-                child: Row(children: [
-                  Expanded(
-                    flex: 3,
-                    child: _cell(
-                      item['Offvesselname']?.toString() ?? '',
-                      fs: fs,
-                    ),
-                  ),
-                  Expanded(
-                    flex: 3,
-                    child: _cell(
-                      item['Loadingvesselname']?.toString() ?? '',
-                      fs: fs,
-                    ),
-                  ),
-                ]),
-              ),
-
-              // ── Row 3: Origin | Destination | Package ──────────────
-              Expanded(
-                flex: 1,
-                child: Row(children: [
-                  Expanded(
-                    flex: 3,
-                    child: _cell(
-                      item['Origin']?.toString() ?? '',
-                      fs: fs,
-                    ),
-                  ),
-                  Expanded(
-                    flex: 3,
-                    child: _cell(
-                      item['Destination']?.toString() ?? '',
-                      fs: fs,
-                    ),
-                  ),
-                  Expanded(
-                    flex: 4,
-                    child: _cell(
-                      item['pkg']?.toString() ?? '',
-                      fs: fs,
-                    ),
-                  ),
-                ]),
-              ),
-
-              // ── Row 4: Customer Name | Job No ──────────────────────
-              Expanded(
-                flex: 1,
-                child: Row(children: [
-                  Expanded(
-                    flex: 4,
-                    child: _cell(
-                      item['CustomerName']?.toString() ?? '',
-                      fs: fs,
-                    ),
-                  ),
-                  Expanded(
-                    flex: 2,
-                    child: _jobNoChip(
-                      item['JobNo']?.toString() ?? '',
-                      fs: fs - 1,
-                    ),
-                  ),
-                ]),
-              ),
-
-              // ── Row 5: Cargo Loc | Job Status | PIC ───────────────
-              Expanded(
-                flex: 1,
-                child: Row(children: [
-                  Expanded(
-                    flex: 3,
-                    child: _cell(
-                      item['Cargo']?.toString() ?? '',
-                      fs: fs,
-                    ),
-                  ),
-                  Expanded(
-                    flex: 3,
-                    child: _statusChip(
-                      item['JobStatus']?.toString() ?? '',
-                      fs: fs - 1,
-                    ),
-                  ),
-                  Expanded(
-                    flex: 2,
-                    child: _cell(
-                      item['EmployeeName']?.toString() ?? '',
-                      fs: fs,
-                    ),
-                  ),
-                ]),
-              ),
-            ],
-          ),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(14),
+        child: Column(
+          children: [
+            // Row 1
+            Row(children: [
+              Expanded(child: _GridItem('Job No', item['JobNo']?.toString() ?? '', isPrimary: true)),
+              Expanded(child: _GridItem('Customer', item['CustomerName']?.toString() ?? '')),
+            ]),
+            const SizedBox(height: 12),
+            // Row 2
+            Row(children: [
+              Expanded(child: _GridItem('Vessel', item['Loadingvesselname']?.toString() ?? '')),
+              Expanded(child: _GridItem('Port', item['OPort']?.toString() ?? '')),
+            ]),
+            const SizedBox(height: 12),
+            // Row 3
+            Row(children: [
+              Expanded(child: _GridItem('Job Type', item['JobName']?.toString() ?? '')),
+              Expanded(child: _GridItem('Status', item['JobStatus']?.toString() ?? '', isStatus: true)),
+            ]),
+            const SizedBox(height: 12),
+            // Row 4
+            Row(children: [
+              Expanded(child: _GridItem('Package', item['pkg']?.toString() ?? '')),
+              Expanded(child: _GridItem('Remarks', item['Remarks']?.toString() ?? '')),
+            ]),
+            const SizedBox(height: 12),
+            const Divider(color: Colors.black12, height: 1),
+            const SizedBox(height: 12),
+            // Row 5: OETA / ETA
+            Row(children: [
+              Expanded(child: _GridItem('OETA', _formatDate(item['OETA']))),
+              Expanded(child: _GridItem('ETA', _formatDate(item['ETA']))),
+            ]),
+            const SizedBox(height: 12),
+            // Row 6: OETB / ETB
+            Row(children: [
+              Expanded(child: _GridItem('OETB', _formatDate(item['OETB']))),
+              Expanded(child: _GridItem('ETB', _formatDate(item['ETB']))),
+            ]),
+            const SizedBox(height: 12),
+            // Row 7: OETD / ETD
+            Row(children: [
+              Expanded(child: _GridItem('OETD', _formatDate(item['OETD']))),
+              Expanded(child: _GridItem('ETD', _formatDate(item['ETD']))),
+            ]),
+          ],
         ),
       ),
     );
   }
+}
 
-  // ── Micro widgets ──────────────────────────────────────────────────────────
+// ── Micro widgets ──────────────────────────────────────────────────────────
 
-  Widget _cell(
-      String text, {
-        required double fs,
-        bool bold = false,
-        Color? color,
-      }) {
-    return Text(
-      text.isEmpty ? '—' : text,
-      maxLines: 1,
-      overflow: TextOverflow.ellipsis,
-      style: GoogleFonts.lato(
-        fontSize: fs,
-        fontWeight: bold ? FontWeight.bold : FontWeight.w600,
-        color: color ?? AppTokens.textPrimary,
-        letterSpacing: 0.2,
-      ),
-    );
-  }
+class _GridItem extends StatelessWidget {
+  final String label;
+  final String value;
+  final bool isPrimary;
+  final bool isStatus;
 
-  /// Job number pill — branded colour, rounded border
-  Widget _jobNoChip(String jobNo, {required double fs}) {
-    if (jobNo.isEmpty) return const SizedBox.shrink();
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-      decoration: BoxDecoration(
-        color: AppTokens.brandPrimary.withOpacity(0.10),
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(
-          color: AppTokens.brandPrimary.withOpacity(0.35),
-          width: 0.8,
-        ),
-      ),
-      child: Text(
-        jobNo,
-        maxLines: 1,
-        overflow: TextOverflow.ellipsis,
-        style: GoogleFonts.lato(
-          fontSize: fs,
-          fontWeight: FontWeight.bold,
-          color: AppTokens.brandPrimary,
-        ),
-      ),
-    );
-  }
+  const _GridItem(this.label, this.value, {super.key, this.isPrimary = false, this.isStatus = false});
 
-  /// Job status pill — tinted background matching the status
-  Widget _statusChip(String status, {required double fs}) {
-    if (status.isEmpty) return const SizedBox.shrink();
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-      decoration: BoxDecoration(
-        color: AppTokens.statusSuccess.withOpacity(0.12),
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(
-          color: AppTokens.statusSuccess.withOpacity(0.35),
-          width: 0.8,
+  @override
+  Widget build(BuildContext context) {
+    String displayValue = value.isEmpty ? '-' : value;
+    
+    Widget contentWidget;
+    if (isPrimary && displayValue != '-') {
+      contentWidget = Container(
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+        decoration: BoxDecoration(
+          color: AppTokens.brandPrimary.withOpacity(0.1),
+          borderRadius: BorderRadius.circular(4),
         ),
-      ),
-      child: Text(
-        status,
-        maxLines: 1,
-        overflow: TextOverflow.ellipsis,
-        style: GoogleFonts.lato(
-          fontSize: fs,
-          fontWeight: FontWeight.bold,
-          color: AppTokens.statusSuccess,
+        child: Text(displayValue, style: GoogleFonts.lato(color: AppTokens.brandPrimary, fontWeight: FontWeight.bold, fontSize: 13)),
+      );
+    } else if (isStatus && displayValue != '-') {
+      contentWidget = Container(
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+        decoration: BoxDecoration(
+          color: AppTokens.statusSuccess.withOpacity(0.12),
+          borderRadius: BorderRadius.circular(4),
         ),
-      ),
+        child: Text(displayValue, style: GoogleFonts.lato(color: AppTokens.statusSuccess, fontWeight: FontWeight.bold, fontSize: 13)),
+      );
+    } else {
+      contentWidget = Text(displayValue, maxLines: 2, overflow: TextOverflow.ellipsis, style: GoogleFonts.lato(color: AppTokens.textPrimary, fontWeight: FontWeight.bold, fontSize: 13));
+    }
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(label, style: GoogleFonts.lato(color: AppTokens.planTextMuted, fontSize: 11, fontWeight: FontWeight.w600)),
+        const SizedBox(height: 2),
+        contentWidget,
+      ],
     );
   }
 }

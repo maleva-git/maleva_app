@@ -526,6 +526,7 @@ class _PaymentGridCard extends StatelessWidget {
                 color: isSelected
                     ? AppTokens.brandDark
                     : AppTokens.brandGradientStart,
+
                 borderRadius: const BorderRadius.only(
                     topLeft: Radius.circular(16),
                     topRight: Radius.circular(16)),

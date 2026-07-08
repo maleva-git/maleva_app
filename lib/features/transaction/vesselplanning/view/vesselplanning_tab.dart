@@ -473,18 +473,12 @@ class _GridHeader extends StatelessWidget {
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: [
         Row(children: [
-          Expanded(flex: 3, child: Text('PLANNING NO', style: style)),
+          Expanded(flex: 3, child: Text('DATE RANGE', style: style)),
+          Expanded(flex: 3, child: Text('PORT', style: style)),
+        ]),
+        Row(children: [
           Expanded(flex: 3, child: Text('PLANNING DATE', style: style)),
-        ]),
-        Row(children: [
           Expanded(flex: 3, child: Text('REMARKS', style: style)),
-        ]),
-        Row(children: [
-          const Expanded(flex: 3, child: SizedBox()),
-          Expanded(
-            flex: 2,
-            child: Text('EXPORT', textAlign: TextAlign.center, style: style),
-          ),
         ]),
       ],
     );
@@ -533,7 +527,14 @@ class _PlanningCard extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.only(bottom: 10),
       child: InkWell(
-        onLongPress: () => _showPasswordDialog(context),
+        onLongPress: () {
+          context.read<VesselPlanningBloc>().add(
+            VesselPlanningEditRequested(
+              id: item.Id,
+              planningNo: item.VESSELPLANINGNo,
+            ),
+          );
+        },
         borderRadius: BorderRadius.circular(14),
         child: Container(
           decoration: BoxDecoration(
@@ -566,17 +567,18 @@ class _PlanningCard extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      // Row 1: Planning No + Date
+                      // Row 1: DATE RANGE + PORT
                       Row(
                         children: [
                           Expanded(
+                            flex: 3,
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text('PLANNING NO', style: labelStyle),
+                                Text('DATE RANGE', style: labelStyle),
                                 const SizedBox(height: 2),
                                 Text(
-                                  item.VESSELPLANINGNoDisplay,
+                                  '${item.FDate} - ${item.TDate}',
                                   style: valStyle,
                                   overflow: TextOverflow.ellipsis,
                                 ),
@@ -585,13 +587,14 @@ class _PlanningCard extends StatelessWidget {
                           ),
                           const SizedBox(width: 12),
                           Expanded(
+                            flex: 3,
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text('DATE', style: labelStyle),
+                                Text('PORT', style: labelStyle),
                                 const SizedBox(height: 2),
                                 Text(
-                                  item.VESSELPLANINGDate.toString(),
+                                  item.Search.isEmpty ? '-' : item.Search,
                                   style: valStyle,
                                   overflow: TextOverflow.ellipsis,
                                 ),
@@ -602,14 +605,42 @@ class _PlanningCard extends StatelessWidget {
                       ),
                       const SizedBox(height: 8),
 
-                      // Row 2: Remarks
-                      Text('REMARKS', style: labelStyle),
-                      const SizedBox(height: 2),
-                      Text(
-                        item.Remarks,
-                        style: remarkStyle,
-                        overflow: TextOverflow.ellipsis,
-                        maxLines: 1,
+                      // Row 2: PLANNING DATE + REMARKS
+                      Row(
+                        children: [
+                          Expanded(
+                            flex: 3,
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text('PLANNING DATE', style: labelStyle),
+                                const SizedBox(height: 2),
+                                Text(
+                                  item.VESSELPLANINGDate.toString(),
+                                  style: valStyle,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ],
+                            ),
+                          ),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            flex: 3,
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text('REMARKS', style: labelStyle),
+                                const SizedBox(height: 2),
+                                Text(
+                                  item.Remarks.isEmpty ? '-' : item.Remarks,
+                                  style: remarkStyle,
+                                  overflow: TextOverflow.ellipsis,
+                                  maxLines: 1,
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
                       ),
                     ],
                   ),
@@ -668,155 +699,9 @@ class _PlanningCard extends StatelessWidget {
       ),
     );
   }
-
-  // ─── Password Dialog ───────────────────────────────────────────────────────
-  void _showPasswordDialog(BuildContext context) {
-    final txtPassword = TextEditingController();
-    final bloc = context.read<VesselPlanningBloc>();
-
-    showDialog(
-      context: context,
-      barrierDismissible: true,
-      builder: (dialogCtx) {
-        return Dialog(
-          elevation: 0,
-          backgroundColor: Colors.transparent,
-          child: Container(
-            width: 300,
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(20),
-              boxShadow: [
-                BoxShadow(
-                  color: AppTokens.invoiceHeaderStart.withOpacity(0.18),
-                  blurRadius: 30,
-                  offset: const Offset(0, 10),
-                ),
-              ],
-            ),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                // Header
-                Container(
-                  width: double.infinity,
-                  padding: const EdgeInsets.symmetric(
-                      horizontal: 20, vertical: 16),
-                  decoration: const BoxDecoration(
-                    gradient: kGradient,
-                    borderRadius:
-                    BorderRadius.vertical(top: Radius.circular(20)),
-                  ),
-                  child: Row(
-                    children: [
-                      const Icon(Icons.lock_outline_rounded,
-                          color: Colors.white, size: 20),
-                      const SizedBox(width: 10),
-                      Text(
-                        'Edit Password',
-                        style: GoogleFonts.lato(
-                          color: Colors.white,
-                          fontWeight: FontWeight.w700,
-                          fontSize: 15,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-
-                // Body
-                Padding(
-                  padding: const EdgeInsets.all(20),
-                  child: Column(
-                    children: [
-                      Container(
-                        decoration: BoxDecoration(
-                          image: DecorationImage(image: objfun.lockimg),
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        height: 100,
-                        width: double.infinity,
-                      ),
-                      const SizedBox(height: 14),
-                      TextField(
-                        controller: txtPassword,
-                        cursorColor: AppTokens.invoiceHeaderStart,
-                        textCapitalization: TextCapitalization.characters,
-                        textInputAction: TextInputAction.done,
-                        style: GoogleFonts.lato(
-                          color: colour.kTextDark,
-                          fontWeight: FontWeight.w600,
-                          fontSize: objfun.FontLow,
-                        ),
-                        decoration: InputDecoration(
-                          hintText: 'Enter password',
-                          hintStyle: GoogleFonts.lato(
-                            color: AppTokens.planTextMuted,
-                            fontSize: objfun.FontLow,
-                          ),
-                          filled: true,
-                          fillColor: colour.kDetailBg,
-                          contentPadding: const EdgeInsets.symmetric(
-                              horizontal: 14, vertical: 12),
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(10),
-                            borderSide: BorderSide.none,
-                          ),
-                          focusedBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(10),
-                            borderSide: const BorderSide(
-                                color: colour.kHeaderGradEnd, width: 1.5),
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: 16),
-                      SizedBox(
-                        width: double.infinity,
-                        child: _GradientButton(
-                          label: 'Confirm',
-                          onPressed: () async {
-                            if (txtPassword.text.isEmpty) {
-                              objfun.ConfirmationOK(
-                                  'Enter Password !!', dialogCtx);
-                              return;
-                            }
-                            await objfun
-                                .apiAllinoneSelectArray(
-                              '${objfun.apiEditPassword}${txtPassword.text}&type=EditPassword&Comid=${objfun.Comid}',
-                              null,
-                              null,
-                              dialogCtx,
-                            )
-                                .then((resultData) {
-                              if (resultData.length != 0 &&
-                                  resultData['IsSuccess'] == true) {
-                                txtPassword.text = '';
-                                Navigator.pop(dialogCtx);
-                                bloc.add(VesselPlanningEditRequested(
-                                  id: item.Id,
-                                  planningNo: item.VESSELPLANINGNo,
-                                ));
-                              } else {
-                                txtPassword.text = '';
-                                objfun.ConfirmationOK(
-                                    'Invalid Password !!!', dialogCtx);
-                              }
-                            });
-                          },
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-          ),
-        );
-      },
-    );
-  }
 }
 
+// ─── Details Section ──────────────────────────────────────────────────────────
 // ─── Details Section ──────────────────────────────────────────────────────────
 class _DetailsSection extends StatelessWidget {
   final List<dynamic> details;
@@ -833,89 +718,106 @@ class _DetailsSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    if (details.isEmpty) {
+      return SizedBox(
+        height: isTablet ? height * 0.28 : height * 0.24,
+        child: Center(
+          child: Text(
+            'No records found',
+            style: GoogleFonts.lato(
+                fontSize: objfun.FontLow, color: AppTokens.planTextMuted),
+          ),
+        ),
+      );
+    }
+
     final headerStyle = GoogleFonts.lato(
-      color: Colors.white.withOpacity(0.85),
-      fontWeight: FontWeight.w600,
-      fontSize: isTablet ? 10 : 9,
-      letterSpacing: 0.5,
+      color: Colors.white,
+      fontWeight: FontWeight.w700,
+      fontSize: 12,
     );
     final rowStyle = GoogleFonts.lato(
       color: colour.kTextDark,
-      fontWeight: FontWeight.w500,
-      fontSize: isTablet ? objfun.FontCardText : objfun.FontCardText - 1,
+      fontWeight: FontWeight.w600,
+      fontSize: 12,
     );
 
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        // Detail header
-        Container(
-          height: isTablet ? 36 : 32,
-          decoration: const BoxDecoration(gradient: kGradientVertical),
-          padding: const EdgeInsets.symmetric(horizontal: 14),
-          child: Row(
-            children: [
-              Expanded(flex: 2, child: Text('JOB NO', style: headerStyle)),
-              Expanded(flex: 2, child: Text('JOB DATE', style: headerStyle)),
-              Expanded(flex: 3, child: Text('REMARKS', style: headerStyle)),
-            ],
-          ),
+    return SizedBox(
+      height: isTablet ? height * 0.4 : height * 0.35,
+      width: double.infinity,
+      child: Container(
+        margin: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(10),
+          border: Border.all(color: AppTokens.maintCardBorder),
         ),
-
-        // Detail rows
-        SizedBox(
-          height: isTablet ? height * 0.28 : height * 0.24,
-          child: details.isEmpty
-              ? Center(
-            child: Text(
-              'No records found',
-              style: GoogleFonts.lato(
-                  fontSize: objfun.FontLow, color: AppTokens.planTextMuted),
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(10),
+          child: SingleChildScrollView(
+            scrollDirection: Axis.vertical,
+            child: SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: DataTable(
+                headingRowColor: MaterialStateProperty.all(colour.kHeaderGradEnd),
+                dataRowMinHeight: 40,
+                dataRowMaxHeight: 40,
+                columnSpacing: 20,
+                horizontalMargin: 16,
+                dividerThickness: 0.5,
+                columns: [
+                  DataColumn(label: Text('JOB NO', style: headerStyle)),
+                  DataColumn(label: Text('CUSTOMER', style: headerStyle)),
+                  DataColumn(label: Text('VESSEL', style: headerStyle)),
+                  DataColumn(label: Text('PORT', style: headerStyle)),
+                  DataColumn(label: Text('JOB TYPE', style: headerStyle)),
+                  DataColumn(label: Text('STATUS', style: headerStyle)),
+                  DataColumn(label: Text('PKG', style: headerStyle)),
+                  DataColumn(label: Text('REMARKS', style: headerStyle)),
+                  DataColumn(label: Text('OETA', style: headerStyle)),
+                  DataColumn(label: Text('ETA', style: headerStyle)),
+                  DataColumn(label: Text('OETB', style: headerStyle)),
+                  DataColumn(label: Text('ETB', style: headerStyle)),
+                  DataColumn(label: Text('OETD', style: headerStyle)),
+                  DataColumn(label: Text('ETD', style: headerStyle)),
+                ],
+                rows: details.map<DataRow>((item) {
+                  return DataRow(
+                    cells: [
+                      DataCell(Text(item['JobNo']?.toString() ?? '-', style: rowStyle.copyWith(color: AppTokens.brandPrimary, fontWeight: FontWeight.bold))),
+                      DataCell(Text(item['CustomerName']?.toString() ?? '-', style: rowStyle)),
+                      DataCell(Text(item['Loadingvesselname']?.toString() ?? '-', style: rowStyle)),
+                      DataCell(Text(item['OPort']?.toString() ?? '-', style: rowStyle)),
+                      DataCell(Text(item['JobName']?.toString() ?? '-', style: rowStyle)),
+                      DataCell(Text(item['JobStatus']?.toString() ?? '-', style: rowStyle.copyWith(color: AppTokens.statusSuccess))),
+                      DataCell(Text(item['pkg']?.toString() ?? '-', style: rowStyle)),
+                      DataCell(Text(item['Remarks']?.toString() ?? '-', style: rowStyle)),
+                      DataCell(Text(_formatDate(item['SOETA']), style: rowStyle)),
+                      DataCell(Text(_formatDate(item['SETA']), style: rowStyle)),
+                      DataCell(Text(_formatDate(item['SOETB']), style: rowStyle)),
+                      DataCell(Text(_formatDate(item['SETB']), style: rowStyle)),
+                      DataCell(Text(_formatDate(item['SOETD']), style: rowStyle)),
+                      DataCell(Text(_formatDate(item['SETD']), style: rowStyle)),
+                    ],
+                  );
+                }).toList(),
+              ),
             ),
-          )
-              : ListView.builder(
-            shrinkWrap: true,
-            itemCount: details.length,
-            itemBuilder: (ctx, i) {
-              final isOdd = i % 2 == 0;
-              return Container(
-                height: isTablet ? 42 : 38,
-                color: isOdd ? Colors.white : colour.kDetailBg,
-                padding: const EdgeInsets.symmetric(horizontal: 14),
-                child: Row(
-                  children: [
-                    Expanded(
-                      flex: 2,
-                      child: Text(
-                        details[i]['JobNo'] ?? '',
-                        style: rowStyle,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ),
-                    Expanded(
-                      flex: 2,
-                      child: Text(
-                        details[i]['JobDate'].toString(),
-                        style: rowStyle,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ),
-                    Expanded(
-                      flex: 3,
-                      child: Text(
-                        details[i]['Remarks'].toString(),
-                        style: rowStyle.copyWith(color: colour.kTextMid),
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ),
-                  ],
-                ),
-              );
-            },
           ),
         ),
-      ],
+      ),
     );
+  }
+
+  String _formatDate(dynamic dtStr) {
+    if (dtStr == null || dtStr.toString().isEmpty || dtStr.toString() == '-') return '-';
+    try {
+      DateTime dt = DateTime.parse(dtStr.toString());
+      if (dt.year == 1900) return '-';
+      return DateFormat('dd/MM/yyyy HH:mm').format(dt);
+    } catch (e) {
+      return dtStr.toString();
+    }
   }
 }
 

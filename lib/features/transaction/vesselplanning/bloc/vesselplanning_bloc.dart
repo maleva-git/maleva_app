@@ -122,6 +122,8 @@ class VesselPlanningBloc extends Bloc<VesselPlanningEvent, VesselPlanningState> 
       VesselPlanningEditRequested event,
       Emitter<VesselPlanningState> emit) async {
 
+    final currentState = state is VesselPlanningLoaded ? state as VesselPlanningLoaded : null;
+
     // 1. Show a loading spinner
     emit(VesselPlanningLoading());
 
@@ -133,9 +135,16 @@ class VesselPlanningBloc extends Bloc<VesselPlanningEvent, VesselPlanningState> 
         planningNo: event.planningNo.toString(),
       ));
 
+      // 💥 RESTORE LOADED STATE IMMEDIATELY to prevent white screen on pop
+      if (currentState != null) {
+        emit(currentState);
+      }
     } catch (e) {
       // 4. Catch any network errors
       emit(VesselPlanningError("Failed to edit vessel planning: ${e.toString()}"));
+      if (currentState != null) {
+        emit(currentState);
+      }
     }
   }
   void _onEmployeeSelected(
