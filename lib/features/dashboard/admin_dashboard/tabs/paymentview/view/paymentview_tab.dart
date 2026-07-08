@@ -495,12 +495,6 @@ class _PaymentGridCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isPaid = item.Paiddate != null &&
-        item.Paiddate!.isNotEmpty &&
-        item.Paiddate != '-';
-    final statusColor = isPaid ? Colors.green : Colors.orange;
-    final statusLabel = isPaid ? "Paid" : "Pending";
-
     return GestureDetector(
       onTap: onTap,
       child: AnimatedContainer(
@@ -583,26 +577,6 @@ class _PaymentGridCard extends StatelessWidget {
                         item.ExpenceDueDate?.toString() ?? '-'),
                     const Spacer(),
 
-                    Align(
-                      alignment: Alignment.centerRight,
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 10, vertical: 4),
-                        decoration: BoxDecoration(
-                          color: statusColor.withOpacity(0.12),
-                          borderRadius:
-                          BorderRadius.circular(20),
-                          border: Border.all(
-                              color:
-                              statusColor.withOpacity(0.4)),
-                        ),
-                        child: Text(statusLabel,
-                            style: GoogleFonts.lato(
-                                fontSize: 11,
-                                fontWeight: FontWeight.bold,
-                                color: statusColor)),
-                      ),
-                    ),
                   ],
                 ),
               ),
@@ -685,12 +659,6 @@ class _PaymentDetailPanel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isPaid = master.Paiddate != null &&
-        master.Paiddate!.isNotEmpty &&
-        master.Paiddate != '-';
-    final statusColor = isPaid ? Colors.green : Colors.orange;
-    final statusLabel = isPaid ? "Paid" : "Pending";
-
     return Container(
       margin: const EdgeInsets.only(right: 10, bottom: 20),
       decoration: BoxDecoration(
@@ -733,19 +701,6 @@ class _PaymentDetailPanel extends StatelessWidget {
                           color: colour.kWhite),
                       overflow: TextOverflow.ellipsis,
                     ),
-                  ),
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 8, vertical: 3),
-                    decoration: BoxDecoration(
-                      color: statusColor.withOpacity(0.2),
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    child: Text(statusLabel,
-                        style: GoogleFonts.lato(
-                            fontSize: 11,
-                            fontWeight: FontWeight.bold,
-                            color: colour.kWhite)),
                   ),
                 ]),
                 const SizedBox(height: 4),

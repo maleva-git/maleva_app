@@ -205,10 +205,6 @@ class _PDOViewBody extends StatelessWidget {
               itemCount: s.filteredMasters.length,
               itemBuilder: (context, index) {
                 final m = s.filteredMasters[index];
-                final detailsWithImg = s.detailsWithImageFor(m.Id);
-                if (detailsWithImg.isEmpty) {
-                  return const SizedBox.shrink();
-                }
                 return _RTIMasterCard(
                   master: m,
                   details: s.detailsFor(m.Id),
@@ -350,26 +346,28 @@ class _EmptyState extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Center(
-      child: Column(mainAxisSize: MainAxisSize.min, children: [
-        Container(
-          padding: const EdgeInsets.all(24),
-          decoration: BoxDecoration(
-              color: AppTokens.brandLight.withOpacity(0.5),
-              shape: BoxShape.circle),
-          child: Icon(Icons.receipt_long_outlined,
-              size: 48, color: AppTokens.brandGradientStart.withOpacity(0.5)),
-        ),
-        const SizedBox(height: 20),
-        Text("No Records Found",
-            style: GoogleFonts.lato(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-                color: AppTokens.brandDark)),
-        const SizedBox(height: 6),
-        Text("Try adjusting the date range or search",
-            style: GoogleFonts.lato(
-                fontSize: 14, color: Colors.grey.shade500)),
-      ]),
+      child: SingleChildScrollView(
+        child: Column(mainAxisSize: MainAxisSize.min, children: [
+          Container(
+            padding: const EdgeInsets.all(24),
+            decoration: BoxDecoration(
+                color: AppTokens.brandLight.withOpacity(0.5),
+                shape: BoxShape.circle),
+            child: Icon(Icons.receipt_long_outlined,
+                size: 48, color: AppTokens.brandGradientStart.withOpacity(0.5)),
+          ),
+          const SizedBox(height: 20),
+          Text("No Records Found",
+              style: GoogleFonts.lato(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  color: AppTokens.brandDark)),
+          const SizedBox(height: 6),
+          Text("Try adjusting the date range or search",
+              style: GoogleFonts.lato(
+                  fontSize: 14, color: Colors.grey.shade500)),
+        ]),
+      ),
     );
   }
 }
