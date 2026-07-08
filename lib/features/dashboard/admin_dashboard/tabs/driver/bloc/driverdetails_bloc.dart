@@ -37,14 +37,21 @@ class DriverBloc extends Bloc<DriverEvent, DriverState> {
         return;
       }
 
-      final value = ResponseViewModel.fromJson(resultData);
-      if (value.IsSuccess == true && value.data1 != null) {
-        final List<DriverDetailsModel> driverList = (value.data1 as List)
-            .map((element) => DriverDetailsModel.fromJson(element))
-            .toList()
-            .cast<DriverDetailsModel>();
-
+      if (resultData is List) {
+        final List<DriverDetailsModel> driverList = resultData
+            .map((element) => DriverDetailsModel.fromJson(element as Map<String, dynamic>))
+            .toList();
         emit(DriverLoaded(driverData: driverList));
+      } else if (resultData is Map<String, dynamic>) {
+        final value = ResponseViewModel.fromJson(resultData);
+        if (value.IsSuccess == true && value.data1 != null) {
+          final List<DriverDetailsModel> driverList = (value.data1 as List)
+              .map((element) => DriverDetailsModel.fromJson(element as Map<String, dynamic>))
+              .toList();
+          emit(DriverLoaded(driverData: driverList));
+        } else {
+          emit(const DriverLoaded(driverData: []));
+        }
       } else {
         emit(const DriverLoaded(driverData: []));
       }
