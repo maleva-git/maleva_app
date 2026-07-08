@@ -43,7 +43,7 @@ import 'app_preferences.dart';
 import '../network/api_constants.dart';
 import '../network/api_client.dart';
 import 'dialog_helper.dart';
-String appversion="1.1.10+110";
+String appversion="1.1.10+114";
 bool homepagecall = false;
 AssetImage logo = const AssetImage('assets/company/logo.png');
 AssetImage splashlogo = const AssetImage('assets/company/roundlogo.png');
