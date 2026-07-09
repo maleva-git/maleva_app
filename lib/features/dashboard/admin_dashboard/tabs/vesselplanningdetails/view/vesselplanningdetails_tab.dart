@@ -10,6 +10,8 @@ import '../../../../../../core/theme/tokens.dart';
 import '../bloc/vesselplanningdetails_bloc.dart';
 import '../bloc/vesselplanningdetails_event.dart';
 import '../bloc/vesselplanningdetails_state.dart';
+import 'package:intl/intl.dart';
+import 'package:maleva/core/colors/colors.dart' as colour;
 
 class VesselPlanningDetailsView extends StatelessWidget {
   final int masterId; // ✅ 1. Add the ID here
@@ -21,7 +23,7 @@ class VesselPlanningDetailsView extends StatelessWidget {
       create: (_) => sl<VesselPlanningDetailsBloc>()
       // ✅ 2. Pass the ID to the Startup event
         ..add(VesselPlanningDetailsStartupRequested(masterId)),
-      child: _VesselPlanningDetailsView(masterId: masterId), // ✅ 3. Pass it to the inner view
+      child: _VesselPlanningDetailsView(masterId: masterId), 
     );
   }
 }
@@ -123,16 +125,6 @@ class _VesselPlanningDetailsView extends StatelessWidget {
             ),
         ],
       ),
-      actions: [
-        IconButton(
-          icon: const Icon(Icons.refresh_rounded, color: AppTokens.appBarIcon),
-          tooltip: 'Refresh',
-          // ✅ Passed ID here
-          onPressed: () => ctx
-              .read<VesselPlanningDetailsBloc>()
-              .add(VesselPlanningDetailsRefreshRequested(masterId)),
-        ),
-      ],
     );
   }
 
@@ -152,38 +144,100 @@ class _VesselPlanningDetailsView extends StatelessWidget {
           Expanded(
             child: state.isEmpty
                 ? const _EmptyWidget()
-                : RefreshIndicator(
-              color: AppTokens.brandPrimary,
-              onRefresh: () async {
-                // ✅ Passed ID here
-                ctx.read<VesselPlanningDetailsBloc>().add(
-                    VesselPlanningDetailsRefreshRequested(masterId));
-                await Future.delayed(const Duration(milliseconds: 600));
-              },
-              child: ListView.builder(
-                physics:
-                const AlwaysScrollableScrollPhysics(),
-                padding: EdgeInsets.only(
-                    bottom: isTablet ? 20 : 12),
-                itemCount: state.vesselPlanningList.length,
-                itemBuilder: (_, i) => Padding(
-                  padding:
-                  const EdgeInsets.only(bottom: 8),
-                  child: _VesselCard(
-                    index: i,
-                    item: state.vesselPlanningList[i],
-                    isTablet: isTablet,
-                  ),
-                ),
-              ),
-            ),
+                : _buildDataTable(state.vesselPlanningList),
           ),
         ],
       ),
     );
   }
-}
 
+  Widget _buildDataTable(List<dynamic> details) {
+    final headerStyle = GoogleFonts.lato(
+      color: Colors.white,
+      fontWeight: FontWeight.w700,
+      fontSize: 12,
+    );
+    final rowStyle = GoogleFonts.lato(
+      color: colour.kTextDark,
+      fontWeight: FontWeight.w600,
+      fontSize: 12,
+    );
+
+    return Container(
+      width: double.infinity,
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(color: AppTokens.maintCardBorder),
+      ),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(10),
+        child: SingleChildScrollView(
+          scrollDirection: Axis.vertical,
+          physics: const AlwaysScrollableScrollPhysics(),
+          child: SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: DataTable(
+              headingRowColor: MaterialStateProperty.all(colour.kHeaderGradEnd),
+              dataRowMinHeight: 40,
+              dataRowMaxHeight: 40,
+              columnSpacing: 20,
+              horizontalMargin: 16,
+              dividerThickness: 0.5,
+              columns: [
+                DataColumn(label: Text('JOB NO', style: headerStyle)),
+                DataColumn(label: Text('CUSTOMER', style: headerStyle)),
+                DataColumn(label: Text('VESSEL', style: headerStyle)),
+                DataColumn(label: Text('PORT', style: headerStyle)),
+                DataColumn(label: Text('JOB TYPE', style: headerStyle)),
+                DataColumn(label: Text('STATUS', style: headerStyle)),
+                DataColumn(label: Text('PKG', style: headerStyle)),
+                DataColumn(label: Text('REMARKS', style: headerStyle)),
+                DataColumn(label: Text('OETA', style: headerStyle)),
+                DataColumn(label: Text('ETA', style: headerStyle)),
+                DataColumn(label: Text('OETB', style: headerStyle)),
+                DataColumn(label: Text('ETB', style: headerStyle)),
+                DataColumn(label: Text('OETD', style: headerStyle)),
+                DataColumn(label: Text('ETD', style: headerStyle)),
+              ],
+              rows: details.map<DataRow>((item) {
+                return DataRow(
+                  cells: [
+                    DataCell(Text(item['JobNo']?.toString() ?? '-', style: rowStyle.copyWith(color: AppTokens.brandPrimary, fontWeight: FontWeight.bold))),
+                    DataCell(Text(item['CustomerName']?.toString() ?? '-', style: rowStyle)),
+                    DataCell(Text(item['Loadingvesselname']?.toString() ?? '-', style: rowStyle)),
+                    DataCell(Text(item['OPort']?.toString() ?? '-', style: rowStyle)),
+                    DataCell(Text(item['JobName']?.toString() ?? '-', style: rowStyle)),
+                    DataCell(Text(item['JobStatus']?.toString() ?? '-', style: rowStyle.copyWith(color: AppTokens.statusSuccess))),
+                    DataCell(Text(item['pkg']?.toString() ?? '-', style: rowStyle)),
+                    DataCell(Text(item['Remarks']?.toString() ?? '-', style: rowStyle)),
+                    DataCell(Text(_formatDate(item['SOETA']), style: rowStyle)),
+                    DataCell(Text(_formatDate(item['SETA']), style: rowStyle)),
+                    DataCell(Text(_formatDate(item['SOETB']), style: rowStyle)),
+                    DataCell(Text(_formatDate(item['SETB']), style: rowStyle)),
+                    DataCell(Text(_formatDate(item['SOETD']), style: rowStyle)),
+                    DataCell(Text(_formatDate(item['SETD']), style: rowStyle)),
+                  ],
+                );
+              }).toList(),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  String _formatDate(dynamic dtStr) {
+    if (dtStr == null || dtStr.toString().isEmpty || dtStr.toString() == '-') return '-';
+    try {
+      DateTime dt = DateTime.parse(dtStr.toString());
+      if (dt.year == 1900) return '-';
+      return DateFormat('dd/MM/yyyy HH:mm').format(dt);
+    } catch (e) {
+      return dtStr.toString();
+    }
+  }
+}
 
 // Removed _ColumnHeaderCard
 
@@ -213,145 +267,6 @@ class _SummaryPill extends StatelessWidget {
               fontSize: 12),
         ),
       ),
-    );
-  }
-}
-
-class _VesselCard extends StatelessWidget {
-  const _VesselCard({
-    required this.index,
-    required this.item,
-    required this.isTablet,
-  });
-
-  final int index;
-  final dynamic item;
-  final bool isTablet;
-
-  String _formatDate(dynamic date) {
-    if (date == null || date.toString().isEmpty) return '-';
-    String d = date.toString();
-    if (d.contains('T')) {
-      List<String> parts = d.split('T');
-      if (parts.length == 2) {
-        String time = parts[1].length > 5 ? parts[1].substring(0, 5) : parts[1];
-        return '${parts[0]} $time';
-      }
-    }
-    return d;
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Card(
-      elevation: 4,
-      shadowColor: Colors.black26,
-      color: AppTokens.surfaceCard,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
-        side: BorderSide(
-          color: AppTokens.brandPrimary.withOpacity(0.2),
-          width: 1,
-        ),
-      ),
-      child: Padding(
-        padding: const EdgeInsets.all(14),
-        child: Column(
-          children: [
-            // Row 1
-            Row(children: [
-              Expanded(child: _GridItem('Job No', item['JobNo']?.toString() ?? '', isPrimary: true)),
-              Expanded(child: _GridItem('Customer', item['CustomerName']?.toString() ?? '')),
-            ]),
-            const SizedBox(height: 12),
-            // Row 2
-            Row(children: [
-              Expanded(child: _GridItem('Vessel', item['Loadingvesselname']?.toString() ?? '')),
-              Expanded(child: _GridItem('Port', item['OPort']?.toString() ?? '')),
-            ]),
-            const SizedBox(height: 12),
-            // Row 3
-            Row(children: [
-              Expanded(child: _GridItem('Job Type', item['JobName']?.toString() ?? '')),
-              Expanded(child: _GridItem('Status', item['JobStatus']?.toString() ?? '', isStatus: true)),
-            ]),
-            const SizedBox(height: 12),
-            // Row 4
-            Row(children: [
-              Expanded(child: _GridItem('Package', item['pkg']?.toString() ?? '')),
-              Expanded(child: _GridItem('Remarks', item['Remarks']?.toString() ?? '')),
-            ]),
-            const SizedBox(height: 12),
-            const Divider(color: Colors.black12, height: 1),
-            const SizedBox(height: 12),
-            // Row 5: OETA / ETA
-            Row(children: [
-              Expanded(child: _GridItem('OETA', _formatDate(item['OETA']))),
-              Expanded(child: _GridItem('ETA', _formatDate(item['ETA']))),
-            ]),
-            const SizedBox(height: 12),
-            // Row 6: OETB / ETB
-            Row(children: [
-              Expanded(child: _GridItem('OETB', _formatDate(item['OETB']))),
-              Expanded(child: _GridItem('ETB', _formatDate(item['ETB']))),
-            ]),
-            const SizedBox(height: 12),
-            // Row 7: OETD / ETD
-            Row(children: [
-              Expanded(child: _GridItem('OETD', _formatDate(item['OETD']))),
-              Expanded(child: _GridItem('ETD', _formatDate(item['ETD']))),
-            ]),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-// ── Micro widgets ──────────────────────────────────────────────────────────
-
-class _GridItem extends StatelessWidget {
-  final String label;
-  final String value;
-  final bool isPrimary;
-  final bool isStatus;
-
-  const _GridItem(this.label, this.value, {super.key, this.isPrimary = false, this.isStatus = false});
-
-  @override
-  Widget build(BuildContext context) {
-    String displayValue = value.isEmpty ? '-' : value;
-    
-    Widget contentWidget;
-    if (isPrimary && displayValue != '-') {
-      contentWidget = Container(
-        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-        decoration: BoxDecoration(
-          color: AppTokens.brandPrimary.withOpacity(0.1),
-          borderRadius: BorderRadius.circular(4),
-        ),
-        child: Text(displayValue, style: GoogleFonts.lato(color: AppTokens.brandPrimary, fontWeight: FontWeight.bold, fontSize: 13)),
-      );
-    } else if (isStatus && displayValue != '-') {
-      contentWidget = Container(
-        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-        decoration: BoxDecoration(
-          color: AppTokens.statusSuccess.withOpacity(0.12),
-          borderRadius: BorderRadius.circular(4),
-        ),
-        child: Text(displayValue, style: GoogleFonts.lato(color: AppTokens.statusSuccess, fontWeight: FontWeight.bold, fontSize: 13)),
-      );
-    } else {
-      contentWidget = Text(displayValue, maxLines: 2, overflow: TextOverflow.ellipsis, style: GoogleFonts.lato(color: AppTokens.textPrimary, fontWeight: FontWeight.bold, fontSize: 13));
-    }
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(label, style: GoogleFonts.lato(color: AppTokens.planTextMuted, fontSize: 11, fontWeight: FontWeight.w600)),
-        const SizedBox(height: 2),
-        contentWidget,
-      ],
     );
   }
 }

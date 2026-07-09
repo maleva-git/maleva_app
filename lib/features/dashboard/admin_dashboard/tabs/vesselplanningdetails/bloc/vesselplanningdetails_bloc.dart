@@ -30,7 +30,7 @@ class VesselPlanningDetailsBloc extends Bloc<VesselPlanningDetailsEvent, VesselP
     }
 
     emit(state.copyWith(status: VesselPlanningDetailsStatus.loading));
-    await _fetchData(emit);
+    await _fetchData(emit, event.masterRefId);
   }
 
   Future<void> _onRefresh(
@@ -38,13 +38,13 @@ class VesselPlanningDetailsBloc extends Bloc<VesselPlanningDetailsEvent, VesselP
       Emitter<VesselPlanningDetailsState> emit,
       ) async {
     emit(state.copyWith(status: VesselPlanningDetailsStatus.loading));
-    await _fetchData(emit);
+    await _fetchData(emit, event.masterRefId);
   }
 
   // ── Core fetch ────────────────────────────────────────────────────────────
-  Future<void> _fetchData(Emitter<VesselPlanningDetailsState> emit) async {
+  Future<void> _fetchData(Emitter<VesselPlanningDetailsState> emit, int masterId) async {
     try {
-      final list = await repository.fetchVesselPlanningData();
+      final list = await repository.fetchVesselPlanningData(masterId);
 
       emit(state.copyWith(
         status: VesselPlanningDetailsStatus.success,

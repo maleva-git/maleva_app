@@ -47,7 +47,7 @@ class VesselPlanningView extends StatelessWidget {
             toDate: today,
             planningNo: '',
             empId: 0,
-            empName: '', // 💥 Itha add pannunga
+            empName: '',
             isLoggedInEmp: false,
           ));
       },
@@ -702,7 +702,7 @@ class _PlanningCard extends StatelessWidget {
 }
 
 // ─── Details Section ──────────────────────────────────────────────────────────
-// ─── Details Section ──────────────────────────────────────────────────────────
+
 class _DetailsSection extends StatelessWidget {
   final List<dynamic> details;
   final bool isTablet;
