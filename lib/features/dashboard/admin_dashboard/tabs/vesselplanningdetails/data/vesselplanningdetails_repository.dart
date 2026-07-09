@@ -11,7 +11,7 @@ class VesselPlanningDetailsRepository {
   }
 
   // ─── Fetch Network Data ────────────────────────────────────────────────────
-  Future<List<dynamic>> fetchVesselPlanningData() async {
+  Future<List<dynamic>> fetchVesselPlanningData(int masterId) async {
     try {
       final int comid = AppPreferences.getComid();
       final int empRefId = AppPreferences.getEmpRefId();
@@ -23,15 +23,20 @@ class VesselPlanningDetailsRepository {
         'Todate': null,
       };
 
-      // ApiClient automatically manages the JSON headers and decoding
       final response = await ApiClient.postRequest(ApiConstants.VESSELPLANINGDB, body);
 
-      if (response != null && response is List && response.isNotEmpty) {
-        final list = List<dynamic>.from(response);
+      if (response != null && response is Map<String, dynamic>) {
+        if (response['IsSuccess'] == true && response['Data2'] != null) {
+          final allDetails = List<dynamic>.from(response['Data2']);
+          
+          // Filter details for this specific Master ID
+          final filteredList = allDetails.where((detail) {
+            return detail['VESSELPLANINGMasterRefId'] == masterId;
+          }).toList();
 
-        // Keep global list in sync for legacy pages that still read it
-        objfun.VesselPlanningEditList = list;
-        return list;
+          objfun.VesselPlanningEditList = filteredList;
+          return filteredList;
+        }
       }
 
       objfun.VesselPlanningEditList = [];

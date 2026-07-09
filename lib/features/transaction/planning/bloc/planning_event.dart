@@ -30,9 +30,8 @@ class SharePlanningPdfEvent extends PlanningEvent {
   SharePlanningPdfEvent({required this.id, required this.planningNoDisplay});
 }
 
-class VerifyEditPasswordEvent extends PlanningEvent {
-  final String password;
+class PlanningEditRequestedEvent extends PlanningEvent {
   final int id;
   final int planningNo;
-  VerifyEditPasswordEvent({required this.password, required this.id, required this.planningNo});
+  PlanningEditRequestedEvent({required this.id, required this.planningNo});
 }

@@ -116,18 +116,14 @@ class PlanningBloc extends Bloc<PlanningEvent, PlanningState> {
       transformer: droppable(),
     );
 
-    on<VerifyEditPasswordEvent>((event, emit) async {
+    on<PlanningEditRequestedEvent>((event, emit) async {
       if (state is! PlanningLoaded) return;
       final s = state as PlanningLoaded;
 
       try {
-        final resultData = await objfun.apiAllinoneSelectArray("${objfun.apiEditPassword}${event.password}&type=EditPassword&Comid=${objfun.Comid}", null, null, context);
-        if (resultData != null && resultData.isNotEmpty && resultData["IsSuccess"] == true) {
-          await OnlineApi.EditPlanning(context, event.id, event.planningNo);emit(PlanningNavigateToEdit(id: event.id, planningNo: event.planningNo));
-          emit(s); // Return to default loaded state after navigation
-        } else {
-          objfun.ConfirmationOK("Invalid Password !!!", context);
-        }
+        await OnlineApi.EditPlanning(context, event.id, event.planningNo);
+        emit(PlanningNavigateToEdit(id: event.id, planningNo: event.planningNo));
+        emit(s); // Return to default loaded state after navigation
       } catch (e, st) {
         objfun.msgshow(e.toString(), st.toString(), Colors.white, Colors.red, null, 18.00 - objfun.reducesize, objfun.tll, objfun.tgc, context, 2);
       }
