@@ -16,14 +16,26 @@ import 'package:maleva/core/models/model.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:maleva/core/theme/tokens.dart';
 
-class DriverLeaveRequestTab extends StatefulWidget {
+class DriverLeaveRequestTab extends StatelessWidget {
   const DriverLeaveRequestTab({Key? key}) : super(key: key);
 
   @override
-  State<DriverLeaveRequestTab> createState() => _DriverLeaveRequestTabState();
+  Widget build(BuildContext context) {
+    return BlocProvider(
+      create: (_) => GetIt.instance<LeaveBloc>(),
+      child: const _DriverLeaveRequestTabBody(),
+    );
+  }
 }
 
-class _DriverLeaveRequestTabState extends State<DriverLeaveRequestTab> {
+class _DriverLeaveRequestTabBody extends StatefulWidget {
+  const _DriverLeaveRequestTabBody({Key? key}) : super(key: key);
+
+  @override
+  State<_DriverLeaveRequestTabBody> createState() => _DriverLeaveRequestTabState();
+}
+
+class _DriverLeaveRequestTabState extends State<_DriverLeaveRequestTabBody> {
   // Form state
   DateTime _fromDate = DateTime.now();
   DateTime _toDate = DateTime.now().add(const Duration(days: 1));

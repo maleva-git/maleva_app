@@ -1,4 +1,4 @@
-
+import '../../../../../core/models/model.dart';
 
 abstract class EnquiryViewState {}
 
@@ -20,7 +20,7 @@ class EnquiryViewLoaded extends EnquiryViewState {
   final bool checkEnq;
 
   // List
-  final List<dynamic> masterList;
+  final List<EnquiryMasterModel> masterList;
 
    EnquiryViewLoaded({
     required this.fromDate,
@@ -47,7 +47,7 @@ class EnquiryViewLoaded extends EnquiryViewState {
     String? empName,
     bool? checkLEmp,
     bool? checkEnq,
-    List<dynamic>? masterList,
+    List<EnquiryMasterModel>? masterList,
   }) {
     return EnquiryViewLoaded(
       fromDate:   fromDate   ?? this.fromDate,
@@ -72,7 +72,7 @@ class EnquiryViewError extends EnquiryViewState {
 
 // Navigation states
 class EnquiryViewNavigateToEdit extends EnquiryViewState {
-  final Map<String, dynamic> item;
+  final EnquiryMasterModel item;
   EnquiryViewNavigateToEdit(this.item);
 }
 
@@ -82,6 +82,6 @@ class EnquiryViewNavigateToPushSaleOrder extends EnquiryViewState {
 }
 
 class EnquiryViewShowDetails extends EnquiryViewState {
-  final Map<String, dynamic> item;
+  final EnquiryMasterModel item;
   EnquiryViewShowDetails(this.item);
 }

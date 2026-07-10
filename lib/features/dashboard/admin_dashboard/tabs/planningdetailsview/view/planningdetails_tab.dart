@@ -166,14 +166,11 @@ class _PlanningDetailsViewState extends State<_PlanningDetailsView> {
 
   Widget _buildBody(
       BuildContext ctx, PlanningDetailsState state, bool isTablet) {
-    return Center(
-      child: ConstrainedBox(
-        constraints: const BoxConstraints(maxWidth: 1200), // increased width for data table
-        child: Padding(
-          padding: EdgeInsets.all(isTablet ? 12 : 6),
-          child: Column(
-            children: [
-              // ── Search field ───────────────────────────────────────────────
+    return Padding(
+      padding: EdgeInsets.all(isTablet ? 12 : 6),
+      child: Column(
+        children: [
+          // ── Search field ───────────────────────────────────────────────
               _SearchField(
                 controller: _searchController,
                 isTablet: isTablet,
@@ -274,8 +271,6 @@ class _PlanningDetailsViewState extends State<_PlanningDetailsView> {
               ),
             ],
           ),
-        ),
-      ),
     );
   }
 }

@@ -5,7 +5,8 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:maleva/core/utils/clsfunction.dart' as objfun;
 import 'package:maleva/core/colors/colors.dart' as colour;
-import 'package:maleva/core/network/OnlineApi.dart' as OnlineApi;
+import 'package:maleva/core/di/injection.dart';
+import 'package:maleva/features/transaction/vesselplanning/data/vesselplanning_repository.dart';
 import 'package:maleva/menu/menulist.dart';
 import 'package:maleva/core/models/model.dart';
 import '../../../../core/theme/tokens.dart';
@@ -40,7 +41,7 @@ class VesselPlanningView extends StatelessWidget {
       create: (_) {
         final today = DateFormat("yyyy-MM-dd").format(DateTime.now());
 
-        return VesselPlanningBloc()
+        return sl<VesselPlanningBloc>()
           ..add(VesselPlanningStarted())
           ..add(VesselPlanningFilterChanged(
             fromDate: today,
@@ -70,7 +71,6 @@ class _VesselPlanningPage extends StatelessWidget {
           Navigator.push(
             context,
             MaterialPageRoute(
-              // ✅ Pass the ID from the state into the Details View
               builder: (_) => VesselPlanningDetailsView(masterId: state.id),
             ),
           );
@@ -111,7 +111,7 @@ class _VesselPlanningPage extends StatelessWidget {
     );
   }
 
-  // ─── AppBar ────────────────────────────────────────────────────────────────
+
   PreferredSizeWidget _buildAppBar(
       BuildContext context, String userName, bool isTablet) {
     return AppBar(
@@ -279,7 +279,7 @@ class _VesselPlanningPage extends StatelessWidget {
                     suffixIcon: InkWell(
                       onTap: () async {
                         if (isLoggedInEmp) return;
-                        await OnlineApi.SelectEmployee(ctx, 'sales', 'admin'); if (!ctx.mounted) return;
+                        await sl<VesselPlanningRepository>().selectEmployee(ctx, 'sales', 'admin'); if (!ctx.mounted) return;
                         if (txtEmployee.text.isEmpty) {
                           Navigator.push(
                             ctx,
@@ -784,20 +784,20 @@ class _DetailsSection extends StatelessWidget {
                 rows: details.map<DataRow>((item) {
                   return DataRow(
                     cells: [
-                      DataCell(Text(item['JobNo']?.toString() ?? '-', style: rowStyle.copyWith(color: AppTokens.brandPrimary, fontWeight: FontWeight.bold))),
-                      DataCell(Text(item['CustomerName']?.toString() ?? '-', style: rowStyle)),
-                      DataCell(Text(item['Loadingvesselname']?.toString() ?? '-', style: rowStyle)),
-                      DataCell(Text(item['OPort']?.toString() ?? '-', style: rowStyle)),
-                      DataCell(Text(item['JobName']?.toString() ?? '-', style: rowStyle)),
-                      DataCell(Text(item['JobStatus']?.toString() ?? '-', style: rowStyle.copyWith(color: AppTokens.statusSuccess))),
-                      DataCell(Text(item['pkg']?.toString() ?? '-', style: rowStyle)),
-                      DataCell(Text(item['Remarks']?.toString() ?? '-', style: rowStyle)),
-                      DataCell(Text(_formatDate(item['SOETA']), style: rowStyle)),
-                      DataCell(Text(_formatDate(item['SETA']), style: rowStyle)),
-                      DataCell(Text(_formatDate(item['SOETB']), style: rowStyle)),
-                      DataCell(Text(_formatDate(item['SETB']), style: rowStyle)),
-                      DataCell(Text(_formatDate(item['SOETD']), style: rowStyle)),
-                      DataCell(Text(_formatDate(item['SETD']), style: rowStyle)),
+                      DataCell(Text(item.jobNo.isEmpty ? '-' : item.jobNo, style: rowStyle.copyWith(color: AppTokens.brandPrimary, fontWeight: FontWeight.bold))),
+                      DataCell(Text(item.customerName.isEmpty ? '-' : item.customerName, style: rowStyle)),
+                      DataCell(Text(item.loadingVesselName.isEmpty ? '-' : item.loadingVesselName, style: rowStyle)),
+                      DataCell(Text(item.oPort.isEmpty ? '-' : item.oPort, style: rowStyle)),
+                      DataCell(Text(item.jobName.isEmpty ? '-' : item.jobName, style: rowStyle)),
+                      DataCell(Text(item.jobStatus.isEmpty ? '-' : item.jobStatus, style: rowStyle.copyWith(color: AppTokens.statusSuccess))),
+                      DataCell(Text(item.pkg.isEmpty ? '-' : item.pkg, style: rowStyle)),
+                      DataCell(Text(item.remarks.isEmpty ? '-' : item.remarks, style: rowStyle)),
+                      DataCell(Text(_formatDate(item.soEta), style: rowStyle)),
+                      DataCell(Text(_formatDate(item.sEta), style: rowStyle)),
+                      DataCell(Text(_formatDate(item.soEtb), style: rowStyle)),
+                      DataCell(Text(_formatDate(item.sEtb), style: rowStyle)),
+                      DataCell(Text(_formatDate(item.soEtd), style: rowStyle)),
+                      DataCell(Text(_formatDate(item.sEtd), style: rowStyle)),
                     ],
                   );
                 }).toList(),

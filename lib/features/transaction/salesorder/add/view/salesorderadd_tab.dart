@@ -6,7 +6,7 @@ import 'package:intl/intl.dart';
 import 'package:salomon_bottom_bar/salomon_bottom_bar.dart';
 import 'package:maleva/core/utils/clsfunction.dart' as objfun;
 import 'package:maleva/core/models/model.dart';
-import 'package:maleva/core/network/OnlineApi.dart' as OnlineApi;
+import 'package:maleva/features/transaction/salesorder/add/data/salesorderadd_repository.dart';
 import 'package:maleva/menu/menulist.dart';
 import '../../../../mastersearch/AddressList.dart';
 import '../../../../mastersearch/Agent.dart';
@@ -41,7 +41,7 @@ class SalesOrdersAdd extends StatelessWidget {
     if (isEnquiry) objfun.storagenew.setString('EnquiryOpen', "false");
 
     return BlocProvider(
-      create: (ctx) => SalesOrderAddBloc(ctx, sl())
+      create: (ctx) => sl<SalesOrderAddBloc>(param1: ctx)
         ..add(StartupSalesOrderAdd(
           saleDetails: SaleDetails,
           saleMaster: SaleMaster,
@@ -623,7 +623,10 @@ if (__navResult6 != null) { objfun.SelectedVesselTypeName = __navResult6; }
           final r = await Navigator.push(context, MaterialPageRoute(builder: (_) => const AddressList(Searchby: 1, SearchId: 0))); if (r != null) { objfun.SelectAddressList = r; }
           if (!context.mounted) return;
           if (r != null && objfun.SelectAddressList.isNotEmpty) {
-            await OnlineApi.SelectAddressDetails(context, objfun.SelectAddressList); if (!context.mounted) return;if (objfun.AddressDetailedList.isNotEmpty) {
+            final details = await sl<SalesOrderAddRepository>().selectAddressDetails(objfun.SelectAddressList);
+            objfun.AddressDetailedList = details.map<AddressDetailsModel>((e) => AddressDetailsModel.fromJson(e)).toList();
+            if (!context.mounted) return;
+            if (objfun.AddressDetailedList.isNotEmpty) {
               bloc.add(PickUpAddressSelected(objfun.AddressDetailedList[0].Address + (objfun.AddressDetailedList[0].Phone != null ? " ${objfun.AddressDetailedList[0].Phone}" : "")));
             }
             objfun.SelectAddressList = "";
@@ -653,7 +656,10 @@ if (__navResult6 != null) { objfun.SelectedVesselTypeName = __navResult6; }
           final r = await Navigator.push(context, MaterialPageRoute(builder: (_) => const AddressList(Searchby: 1, SearchId: 0))); if (r != null) { objfun.SelectAddressList = r; }
           if (!context.mounted) return;
           if (r != null && objfun.SelectAddressList.isNotEmpty) {
-            await OnlineApi.SelectAddressDetails(context, objfun.SelectAddressList); if (!context.mounted) return;if (objfun.AddressDetailedList.isNotEmpty) {
+            final details = await sl<SalesOrderAddRepository>().selectAddressDetails(objfun.SelectAddressList);
+            objfun.AddressDetailedList = details.map<AddressDetailsModel>((e) => AddressDetailsModel.fromJson(e)).toList();
+            if (!context.mounted) return;
+            if (objfun.AddressDetailedList.isNotEmpty) {
               bloc.add(DeliveryAddressSelected(objfun.AddressDetailedList[0].Address + (objfun.AddressDetailedList[0].Phone != null ? " ${objfun.AddressDetailedList[0].Phone}" : "")));
             }
             objfun.SelectAddressList = "";
@@ -674,7 +680,10 @@ if (__navResult6 != null) { objfun.SelectedVesselTypeName = __navResult6; }
             final r = await Navigator.push(context, MaterialPageRoute(builder: (_) => const AddressList(Searchby: 1, SearchId: 0))); if (r != null) { objfun.SelectAddressList = r; }
             if (!context.mounted) return;
             if (r != null && objfun.SelectAddressList.isNotEmpty) {
-              await OnlineApi.SelectAddressDetails(context, objfun.SelectAddressList); if (!context.mounted) return;if (objfun.AddressDetailedList.isNotEmpty) {
+              final details = await sl<SalesOrderAddRepository>().selectAddressDetails(objfun.SelectAddressList);
+              objfun.AddressDetailedList = details.map<AddressDetailsModel>((e) => AddressDetailsModel.fromJson(e)).toList();
+              if (!context.mounted) return;
+              if (objfun.AddressDetailedList.isNotEmpty) {
                 bloc.add(WarehouseAddressSelected(objfun.AddressDetailedList[0].Address + (objfun.AddressDetailedList[0].Phone != null ? " ${objfun.AddressDetailedList[0].Phone}" : "")));
               }
               objfun.SelectAddressList = "";
@@ -709,7 +718,8 @@ if (__navResult6 != null) { objfun.SelectedVesselTypeName = __navResult6; }
         _searchField(
           hint: "Boarding Officer 1", uniqueId: 'search_board1', value: state.txtBoardingOfficer1, enabled: fp["txtBoardingOfficer1"] == true,
           onSearch: () async {
-            await OnlineApi.SelectEmployee(context, '', 'Operation');
+            final emps = await sl<SalesOrderAddRepository>().selectEmployee('', 'Operation');
+            objfun.EmployeeList = emps.map<EmployeeModel>((e) => EmployeeModel.fromJson(e)).toList();
             if (!context.mounted) return;
             final __navResult7 = await Navigator.push(context, MaterialPageRoute(builder: (_) => const Employee(Searchby: 1, SearchId: 0))); if (__navResult7 != null) { objfun.SelectEmployeeList = __navResult7; }
 if (__navResult7 != null) { objfun.SelectEmployeeList = __navResult7; }
@@ -728,7 +738,8 @@ if (__navResult7 != null) { objfun.SelectEmployeeList = __navResult7; }
         _searchField(
           hint: "Boarding Officer 2", uniqueId: 'search_board2', value: state.txtBoardingOfficer2, enabled: fp["txtBoardingOfficer2"] == true,
           onSearch: () async {
-            await OnlineApi.SelectEmployee(context, '', 'Operation');
+            final emps = await sl<SalesOrderAddRepository>().selectEmployee('', 'Operation');
+            objfun.EmployeeList = emps.map<EmployeeModel>((e) => EmployeeModel.fromJson(e)).toList();
             if (!context.mounted) return;
             final __navResult8 = await Navigator.push(context, MaterialPageRoute(builder: (_) => const Employee(Searchby: 1, SearchId: 0))); if (__navResult8 != null) { objfun.SelectEmployeeList = __navResult8; }
 if (__navResult8 != null) { objfun.SelectEmployeeList = __navResult8; }
@@ -788,7 +799,8 @@ if (__navResult8 != null) { objfun.SelectEmployeeList = __navResult8; }
               _searchField(
                 hint: "Seal By", uniqueId: 'search_seal_$fwNum', value: sealEmpValue, enabled: fp["txtSealByEmp$fwNum"] == true,
                 onSearch: () async {
-                  await OnlineApi.SelectEmployee(context, '', 'Operation');
+                  final emps = await sl<SalesOrderAddRepository>().selectEmployee('', 'Operation');
+                  objfun.EmployeeList = emps.map<EmployeeModel>((e) => EmployeeModel.fromJson(e)).toList();
                   if (!context.mounted) return;
                   final __navResult9 = await Navigator.push(context, MaterialPageRoute(builder: (_) => const Employee(Searchby: 1, SearchId: 0))); if (__navResult9 != null) { objfun.SelectEmployeeList = __navResult9; }
 if (__navResult9 != null) { objfun.SelectEmployeeList = __navResult9; }
@@ -800,7 +812,8 @@ if (__navResult9 != null) { objfun.SelectEmployeeList = __navResult9; }
               _searchField(
                 hint: "B.Seal By", uniqueId: 'search_bseal_$fwNum', value: breakEmpValue, enabled: fp["txtBreakByEmp$fwNum"] == true,
                 onSearch: () async {
-                  await OnlineApi.SelectEmployee(context, '', 'Operation');
+                  final emps = await sl<SalesOrderAddRepository>().selectEmployee('', 'Operation');
+                  objfun.EmployeeList = emps.map<EmployeeModel>((e) => EmployeeModel.fromJson(e)).toList();
                   if (!context.mounted) return;
                   final __navResult10 = await Navigator.push(context, MaterialPageRoute(builder: (_) => const Employee(Searchby: 1, SearchId: 0))); if (__navResult10 != null) { objfun.SelectEmployeeList = __navResult10; }
 if (__navResult10 != null) { objfun.SelectEmployeeList = __navResult10; }

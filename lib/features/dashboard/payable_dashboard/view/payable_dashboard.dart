@@ -59,11 +59,8 @@ class _PayableDashboardState extends State<PayableDashboard> with SingleTickerPr
   }
   @override
   Widget build(BuildContext context) {
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        final isTablet = constraints.maxWidth >= 600;
-        return MultiBlocProvider(
-          providers: [
+    return MultiBlocProvider(
+      providers: [
 
             BlocProvider(
               create: (context) => sl<TruckDetailsBloc>()..add(const LoadTruckDetailsEvent()),
@@ -101,14 +98,17 @@ class _PayableDashboardState extends State<PayableDashboard> with SingleTickerPr
 
                   BlocProvider<LeaveBloc>(create: (_) => sl<LeaveBloc>()),
       ],
-          child: Scaffold(
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+        final isTablet = constraints.maxWidth >= 600;
+        return Scaffold(
             body: PayableMobileDashboard(
               tabController: _tabController,
               isTablet: isTablet,
             ),
-          ),
-        );                                      // ← MultiBlocProvider close
-      },                                        // ← LayoutBuilder builder close
+          );
+        },
+      ),
     );
   }
 

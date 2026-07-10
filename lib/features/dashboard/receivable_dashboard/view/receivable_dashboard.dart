@@ -44,11 +44,8 @@ class _AdminDashboardState extends State<ReceivableDashboard> with SingleTickerP
   }
   @override
   Widget build(BuildContext context) {
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        final isTablet = constraints.maxWidth >= 600;
-        return MultiBlocProvider(
-          providers: [
+    return MultiBlocProvider(
+      providers: [
 
             BlocProvider(
               create: (_) => InvoiceBloc(
@@ -63,14 +60,17 @@ class _AdminDashboardState extends State<ReceivableDashboard> with SingleTickerP
             ),
                   BlocProvider<LeaveBloc>(create: (_) => sl<LeaveBloc>()),
       ],
-          child: Scaffold(
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+        final isTablet = constraints.maxWidth >= 600;
+        return Scaffold(
             body: ReceivableMobileDashboard(
               tabController: _tabController,
               isTablet: isTablet,
             ),
-          ),
-        );
-      },                                        // ← LayoutBuilder builder close
+          );
+        },
+      ),
     );                                          // ← LayoutBuilder close
   }                                             // ← build() close
 }

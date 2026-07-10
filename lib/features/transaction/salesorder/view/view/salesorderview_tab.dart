@@ -291,7 +291,7 @@ class _MobileCard extends StatelessWidget {
         child: InkWell(
           borderRadius: BorderRadius.circular(18),
           onLongPress: () =>
-              _showPasswordDialog(context, 1, model.Id, 0),
+              _navigateToEdit(context, model.Id, 0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -695,139 +695,28 @@ class _MobileCard extends StatelessWidget {
         ),
       );
 
-  Future<void> _showPasswordDialog(BuildContext context,
-      int type, int id, int saleNo) async {
-    final ctrl    = TextEditingController();
-    final pwdType = type == 1 ? 'EditPassword' : 'AdminPower';
-    final title   = type == 1 ? 'Edit Password' : 'Admin Pwd';
-
-    await showDialog(
-      barrierDismissible: true,
-      context: context,
-      builder: (ctx) => Dialog(
-        shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(20)),
-        child: Padding(
-          padding: const EdgeInsets.all(24),
-          child:
-          Column(mainAxisSize: MainAxisSize.min, children: [
-            Container(
-              width: 60,
-              height: 60,
-              decoration: BoxDecoration(
-                  color: colour.brandLight,
-                  borderRadius: BorderRadius.circular(30)),
-              child: const Icon(Icons.lock_rounded,
-                  color: colour.brand, size: 28),
-            ),
-            const SizedBox(height: 14),
-            Text(title,
-                style: GoogleFonts.poppins(
-                    color: colour.textMain,
-                    fontSize: 16,
-                    fontWeight: FontWeight.w700)),
-            const SizedBox(height: 14),
-            TextField(
-              controller: ctrl,
-              keyboardType: TextInputType.number,
-              obscureText: true,
-              decoration: InputDecoration(
-                hintText: 'Enter password',
-                hintStyle: GoogleFonts.poppins(
-                    color: colour.textSub, fontSize: 13),
-                filled: true,
-                fillColor: colour.brandLight,
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  borderSide: BorderSide.none,
-                ),
-                focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  borderSide: const BorderSide(
-                      color: colour.brand, width: 1.5),
-                ),
-                prefixIcon: const Icon(Icons.vpn_key_rounded,
-                    color: colour.brand),
-              ),
-            ),
-            const SizedBox(height: 16),
-            Row(children: [
-              Expanded(
-                child: OutlinedButton(
-                  onPressed: () => Navigator.of(ctx).pop(),
-                  style: OutlinedButton.styleFrom(
-                    side: const BorderSide(color: colour.border),
-                    shape: RoundedRectangleBorder(
-                        borderRadius:
-                        BorderRadius.circular(12)),
-                    padding: const EdgeInsets.symmetric(
-                        vertical: 12),
-                  ),
-                  child: Text('Cancel',
-                      style: GoogleFonts.poppins(
-                          color: colour.textSub,
-                          fontWeight: FontWeight.w600)),
-                ),
-              ),
-              const SizedBox(width: 10),
-              Expanded(
-                child: ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: colour.brand,
-                    shape: RoundedRectangleBorder(
-                        borderRadius:
-                        BorderRadius.circular(12)),
-                    padding: const EdgeInsets.symmetric(
-                        vertical: 12),
-                    elevation: 0,
-                  ),
-                  onPressed: () async {
-                    if (ctrl.text.isEmpty) {
-                      objfun.ConfirmationOK(
-                          'Enter Password !!', context);
-                      return;
-                    }
-                    final result =
-                    await objfun.apiAllinoneSelectArray(
-                      '${objfun.apiEditPassword}${ctrl.text}&type=$pwdType&Comid=${objfun.Comid}',
-                      null, null, context,
-                    );
-                    if (result != null &&
-                        result['IsSuccess'] == true) {
-                      ctrl.clear();
-                      final resultData = await sl<SalesOrderViewRepository>().editSalesOrder(id, saleNo);
-                      if (resultData.isNotEmpty) {
-                        objfun.SaleEditMasterList = resultData;
-                        objfun.SaleEditDetailList = (resultData[0]["SaleDetails"] as List).map<SaleEditDetailModel>((e) => SaleEditDetailModel.fromJson(e)).toList();
-                      } else {
-                        throw Exception("Data empty ah iruku");
-                      } if (!context.mounted) return;Navigator.of(ctx).pop();
-                      Navigator.of(context)
-                          .push(MaterialPageRoute(
-                        builder: (_) => SalesOrdersAdd(
-                          SaleDetails:
-                          objfun.SaleEditDetailList,
-                          SaleMaster:
-                          objfun.SaleEditMasterList,
-                        ),
-                      ));
-                    } else {
-                      ctrl.clear();
-                      objfun.ConfirmationOK(
-                          'Invalid Password !!!', context);
-                    }
-                  },
-                  child: Text('Confirm',
-                      style: GoogleFonts.poppins(
-                          color: Colors.white,
-                          fontWeight: FontWeight.w700)),
-                ),
-              ),
-            ]),
-          ]),
-        ),
-      ),
-    );
+  Future<void> _navigateToEdit(BuildContext context, int id, int saleNo) async {
+    try {
+      final resultData = await sl<SalesOrderViewRepository>().editSalesOrder(id, saleNo);
+      if (resultData.isNotEmpty) {
+        objfun.SaleEditMasterList = resultData;
+        objfun.SaleEditDetailList = (resultData[0]["SaleDetails"] as List).map<SaleEditDetailModel>((e) => SaleEditDetailModel.fromJson(e)).toList();
+        
+        if (!context.mounted) return;
+        Navigator.of(context).push(MaterialPageRoute(
+          builder: (_) => SalesOrdersAdd(
+            SaleDetails: objfun.SaleEditDetailList,
+            SaleMaster: objfun.SaleEditMasterList,
+          ),
+        ));
+      } else {
+        if (!context.mounted) return;
+        objfun.msgshow('Data empty', '', Colors.white, Colors.red, null, 18.0, objfun.tll, objfun.tgc, context, 2);
+      }
+    } catch (e) {
+      if (!context.mounted) return;
+      objfun.msgshow(e.toString(), '', Colors.white, Colors.red, null, 18.0, objfun.tll, objfun.tgc, context, 2);
+    }
   }
 }
 
@@ -936,7 +825,7 @@ class _TabletRow extends StatelessWidget {
       child: InkWell(
         borderRadius: BorderRadius.circular(12),
         onLongPress: () =>
-            _showPasswordDialog(context, 1, model.Id, 0),
+            _navigateToEdit(context, model.Id, 0),
         child: Column(children: [
           Padding(
             padding: const EdgeInsets.symmetric(
@@ -1093,143 +982,28 @@ class _TabletRow extends StatelessWidget {
         ),
       );
 
-  Future<void> _showPasswordDialog(BuildContext context,
-      int type, int id, int saleNo) async {
-    final ctrl    = TextEditingController();
-    final pwdType = type == 1 ? 'EditPassword' : 'AdminPower';
-    final title   = type == 1 ? 'Edit Password' : 'Admin Pwd';
-
-    await showDialog(
-      barrierDismissible: true,
-      context: context,
-      builder: (ctx) => Dialog(
-        shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(20)),
-        child: SizedBox(
-          width: 420,
-          child: Padding(
-            padding: const EdgeInsets.all(28),
-            child:
-            Column(mainAxisSize: MainAxisSize.min, children: [
-              Container(
-                width: 64,
-                height: 64,
-                decoration: BoxDecoration(
-                    color: colour.brandLight,
-                    borderRadius: BorderRadius.circular(32)),
-                child: const Icon(Icons.lock_rounded,
-                    color: colour.brand, size: 30),
-              ),
-              const SizedBox(height: 16),
-              Text(title,
-                  style: GoogleFonts.poppins(
-                      color: colour.textMain,
-                      fontSize: 18,
-                      fontWeight: FontWeight.w700)),
-              const SizedBox(height: 16),
-              TextField(
-                controller: ctrl,
-                keyboardType: TextInputType.number,
-                obscureText: true,
-                decoration: InputDecoration(
-                  hintText: 'Enter password',
-                  filled: true,
-                  fillColor: colour.brandLight,
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                    borderSide: BorderSide.none,
-                  ),
-                  focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                    borderSide: const BorderSide(
-                        color: colour.brand, width: 1.5),
-                  ),
-                  prefixIcon: const Icon(
-                      Icons.vpn_key_rounded,
-                      color: colour.brand),
-                ),
-              ),
-              const SizedBox(height: 20),
-              Row(children: [
-                Expanded(
-                  child: OutlinedButton(
-                    onPressed: () => Navigator.of(ctx).pop(),
-                    style: OutlinedButton.styleFrom(
-                      side: const BorderSide(color: colour.border),
-                      shape: RoundedRectangleBorder(
-                          borderRadius:
-                          BorderRadius.circular(12)),
-                      padding: const EdgeInsets.symmetric(
-                          vertical: 14),
-                    ),
-                    child: Text('Cancel',
-                        style: GoogleFonts.poppins(
-                            color: colour.textSub,
-                            fontWeight: FontWeight.w600,
-                            fontSize: 14)),
-                  ),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: colour.brand,
-                      shape: RoundedRectangleBorder(
-                          borderRadius:
-                          BorderRadius.circular(12)),
-                      padding: const EdgeInsets.symmetric(
-                          vertical: 14),
-                      elevation: 0,
-                    ),
-                    onPressed: () async {
-                      if (ctrl.text.isEmpty) {
-                        objfun.ConfirmationOK(
-                            'Enter Password !!', context);
-                        return;
-                      }
-                      final result =
-                      await objfun.apiAllinoneSelectArray(
-                        '${objfun.apiEditPassword}${ctrl.text}&type=$pwdType&Comid=${objfun.Comid}',
-                        null, null, context,
-                      );
-                      if (result != null &&
-                          result['IsSuccess'] == true) {
-                        ctrl.clear();
-                        final resultData = await sl<SalesOrderViewRepository>().editSalesOrder(id, saleNo);
-                      if (resultData.isNotEmpty) {
-                        objfun.SaleEditMasterList = resultData;
-                        objfun.SaleEditDetailList = (resultData[0]["SaleDetails"] as List).map<SaleEditDetailModel>((e) => SaleEditDetailModel.fromJson(e)).toList();
-                      } else {
-                        throw Exception("Data empty ah iruku");
-                      } if (!context.mounted) return;Navigator.of(ctx).pop();
-                        Navigator.of(context)
-                            .push(MaterialPageRoute(
-                          builder: (_) => SalesOrdersAdd(
-                            SaleDetails:
-                            objfun.SaleEditDetailList,
-                            SaleMaster:
-                            objfun.SaleEditMasterList,
-                          ),
-                        ));
-                      } else {
-                        ctrl.clear();
-                        objfun.ConfirmationOK(
-                            'Invalid Password !!!', context);
-                      }
-                    },
-                    child: Text('Confirm',
-                        style: GoogleFonts.poppins(
-                            color: Colors.white,
-                            fontWeight: FontWeight.w700,
-                            fontSize: 14)),
-                  ),
-                ),
-              ]),
-            ]),
+  Future<void> _navigateToEdit(BuildContext context, int id, int saleNo) async {
+    try {
+      final resultData = await sl<SalesOrderViewRepository>().editSalesOrder(id, saleNo);
+      if (resultData.isNotEmpty) {
+        objfun.SaleEditMasterList = resultData;
+        objfun.SaleEditDetailList = (resultData[0]["SaleDetails"] as List).map<SaleEditDetailModel>((e) => SaleEditDetailModel.fromJson(e)).toList();
+        
+        if (!context.mounted) return;
+        Navigator.of(context).push(MaterialPageRoute(
+          builder: (_) => SalesOrdersAdd(
+            SaleDetails: objfun.SaleEditDetailList,
+            SaleMaster: objfun.SaleEditMasterList,
           ),
-        ),
-      ),
-    );
+        ));
+      } else {
+        if (!context.mounted) return;
+        objfun.msgshow('Data empty', '', Colors.white, Colors.red, null, 18.0, objfun.tll, objfun.tgc, context, 2);
+      }
+    } catch (e) {
+      if (!context.mounted) return;
+      objfun.msgshow(e.toString(), '', Colors.white, Colors.red, null, 18.0, objfun.tll, objfun.tgc, context, 2);
+    }
   }
 }
 

@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 import 'package:maleva/core/network/api_services/auth_api.dart';
 import 'package:maleva/core/utils/app_preferences.dart';
@@ -113,11 +114,17 @@ import 'package:maleva/features/dashboard/admin_dashboard/tabs/driverleave/data/
 import 'package:maleva/features/dashboard/admin_dashboard/tabs/driverleave/bloc/leave_bloc.dart';
 import 'package:maleva/features/transaction/enquirytrmaster/data/enquiry_repository.dart';
 import 'package:maleva/features/transaction/enquirytrmaster/add/bloc/enquirytradd_bloc.dart';
+import 'package:maleva/features/transaction/planning/data/planning_repository.dart';
+import 'package:maleva/features/transaction/planning/bloc/planning_bloc.dart';
+import 'package:maleva/features/transaction/vesselplanning/data/vesselplanning_repository.dart';
+import 'package:maleva/features/transaction/vesselplanning/bloc/vesselplanning_bloc.dart';
+import 'package:maleva/features/transaction/enquirytrmaster/view/bloc/enquirytrview_bloc.dart';
 import 'package:maleva/features/transaction/salesorder/add/data/salesorderadd_repository.dart';
 import 'package:maleva/features/transaction/salesorder/view/data/salesorderview_repository.dart';
 
 import 'package:maleva/features/transaction/salesorder/add/bloc/salesorderadd_bloc.dart';
-
+import 'package:maleva/features/transaction/viewsaleorder/data/viewsaleorder_repository.dart';
+import 'package:maleva/features/transaction/viewsaleorder/bloc/viewsaleorder_bloc.dart';
 final sl = GetIt.instance;
 
 Future<void> setupDependencies() async {
@@ -136,12 +143,17 @@ Future<void> setupDependencies() async {
   sl.registerLazySingleton<LeaveRepository>(
     () => LeaveRepository(sl(), sl()),
   );
-  sl.registerLazySingleton<EnquiryAddRepository>(
-    () => EnquiryAddRepository(sl(), sl()),
+  sl.registerLazySingleton<EnquiryTrRepository>(
+    () => EnquiryTrRepository(sl(), sl()),
+
   );
 
   sl.registerLazySingleton<SalesOrderAddRepository>(
     () => SalesOrderAddRepository(sl(), sl()),
+  );
+
+  sl.registerLazySingleton<ViewSaleOrderRepository>(
+    () => ViewSaleOrderRepository(),
   );
 
   // BLoCs
@@ -150,6 +162,24 @@ Future<void> setupDependencies() async {
   );
   sl.registerFactory<EnquiryAddBloc>(
     () => EnquiryAddBloc(sl(), sl()),
+  );
+  sl.registerFactory<EnquiryViewBloc>(
+    () => EnquiryViewBloc(sl()),
+  );
+  sl.registerFactory<GetJobNoBloc>(
+    () => GetJobNoBloc(sl()),
+  );
+
+  sl.registerLazySingleton<VesselPlanningRepository>(() => VesselPlanningRepository());
+  sl.registerFactory<VesselPlanningBloc>(() => VesselPlanningBloc(sl()));
+
+  sl.registerLazySingleton<PlanningRepository>(() => PlanningRepository());
+  sl.registerFactoryParam<PlanningBloc, BuildContext, dynamic>(
+    (context, _) => PlanningBloc(context, sl()),
+  );
+
+  sl.registerFactoryParam<SalesOrderAddBloc, BuildContext, dynamic>(
+    (context, _) => SalesOrderAddBloc(context, sl()),
   );
 
 

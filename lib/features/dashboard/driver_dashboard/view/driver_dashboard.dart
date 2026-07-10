@@ -46,11 +46,8 @@ class _DriverDashboardState extends State<DriverDashboard> with SingleTickerProv
 
   @override
   Widget build(BuildContext context) {
-    return LayoutBuilder(
-        builder: (context, constraints){
-          final isTablet = constraints.maxWidth >= 600;
-          return MultiBlocProvider(
-              providers: [
+    return MultiBlocProvider(
+      providers: [
                 BlocProvider(
                   create: (context) => sl<TransportBloc>()
                     ..add(const LoadTransportDataEvent(type: 0)),
@@ -89,7 +86,10 @@ class _DriverDashboardState extends State<DriverDashboard> with SingleTickerProv
                   ),
                 ),
               ],
-              child: Builder(
+      child: LayoutBuilder(
+        builder: (context, constraints){
+          final isTablet = constraints.maxWidth >= 600;
+        return Builder(
                   builder: (context) {
                     return LayoutBuilder(
                         builder: (context, constraints) {
@@ -103,9 +103,9 @@ class _DriverDashboardState extends State<DriverDashboard> with SingleTickerProv
                         }
                     );
                   }
-              )
-          );
-        }
+              );
+        },
+      ),
     );
   }
 }

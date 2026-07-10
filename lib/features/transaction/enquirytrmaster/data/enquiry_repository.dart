@@ -2,11 +2,11 @@ import 'package:maleva/core/network/dio_client.dart';
 import 'package:maleva/core/network/api_constants.dart';
 import 'package:maleva/core/utils/session_manager.dart';
 
-class EnquiryAddRepository {
+class EnquiryTrRepository {
   final DioClient _dioClient;
   final SessionManager _sessionManager;
 
-  EnquiryAddRepository(this._dioClient, this._sessionManager);
+  EnquiryTrRepository(this._dioClient, this._sessionManager);
 
   int get _comId => _sessionManager.companyId;
 
@@ -16,8 +16,6 @@ class EnquiryAddRepository {
       final endpoint = "${ApiConstants.apiGetCurrencyValue}$_comId&CustId=$customerId";
       final response = await _dioClient.dio.post(endpoint, data: {});
       if (response.data != null && response.data.isNotEmpty) {
-        // Data format usually comes as a List for SelectArray, or a specific json. 
-        // We handle what the API originally returned (resultData["Data1"] or list mapping).
         final data = response.data;
         if (data is List && data.isNotEmpty) {
           final first = data[0];
@@ -28,9 +26,7 @@ class EnquiryAddRepository {
           return double.tryParse(data['Data1'].toString()) ?? 0.0;
         }
       }
-    } catch (e) {
-      // Return default on error to prevent crashes
-    }
+    } catch (e) {}
     return 0.0;
   }
 
@@ -47,9 +43,7 @@ class EnquiryAddRepository {
            }
         }
       }
-    } catch (e) {
-      // Return empty on error
-    }
+    } catch (e) {}
     return [];
   }
 
@@ -59,7 +53,6 @@ class EnquiryAddRepository {
       final endpoint = "${ApiConstants.apiInsertEnquiry}?Comid=$_comId";
       final response = await _dioClient.dio.post(endpoint, data: payload);
       if (response.data != null) {
-        // Typically returns a JSON string or map
         final data = response.data;
         if (data is Map && data['IsSuccess'] == true) {
           return true;
@@ -71,5 +64,66 @@ class EnquiryAddRepository {
       throw Exception("Failed to save enquiry: $e");
     }
     return false;
+  }
+
+  /// Fetch Enquiry Master List
+  Future<List<dynamic>> fetchEnquiryMaster(Map<String, dynamic> payload, Map<String, dynamic> header) async {
+    try {
+      final endpoint = ApiConstants.apiSelectEnquiryMaster;
+      final response = await _dioClient.dio.post(
+        endpoint,
+        data: {"_objModel": payload, "header": header},
+      );
+      if (response.data != null && response.data is List) {
+        return response.data;
+      }
+    } catch (e) {
+      throw Exception("Failed to fetch enquiry master: $e");
+    }
+    return [];
+  }
+
+  /// Cancel Enquiry
+  Future<bool> cancelEnquiry(int id) async {
+    try {
+      final endpoint = "${ApiConstants.apiUpdateEnquiryMaster}$id&Comid=$_comId&StatusName=CANCEL";
+      final response = await _dioClient.dio.post(endpoint, data: {});
+      if (response.data != null) {
+        final data = response.data;
+        if (data is Map && data['IsSuccess'] == true) {
+          return true;
+        } else if (data is String) {
+          return data.contains('"IsSuccess":true') || data.contains('"IsSuccess": true');
+        }
+      }
+    } catch (e) {
+      throw Exception("Failed to cancel enquiry: $e");
+    }
+    return false;
+  }
+
+  /// Get Planning PDF
+  Future<dynamic> getPlanningPdf(String planningNo) async {
+    try {
+      final endpoint = "${ApiConstants.apiViewPlanningPdf}$planningNo";
+      final response = await _dioClient.dio.post(endpoint, data: {});
+      return response.data;
+    } catch (e) {
+      throw Exception("Failed to view planning pdf: $e");
+    }
+  }
+
+  /// Select Employee list
+  Future<List<dynamic>> selectEmployee(String type, String type1) async {
+    try {
+      final endpoint = "${ApiConstants.apiSelectEmployee}$_comId&type=$type&type1=$type1";
+      final response = await _dioClient.dio.post(endpoint, data: {});
+      if (response.data != null && response.data is List) {
+        return response.data;
+      }
+    } catch (e) {
+      throw Exception("Failed to load employees: $e");
+    }
+    return [];
   }
 }

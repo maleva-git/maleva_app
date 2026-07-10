@@ -120,11 +120,8 @@ class _AdminDashboardState extends State<MaintenanceDashboard> with SingleTicker
   }
   @override
   Widget build(BuildContext context) {
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        final isTablet = constraints.maxWidth >= 600;
-        return MultiBlocProvider(
-          providers: [
+    return MultiBlocProvider(
+      providers: [
             BlocProvider<AdminTabBloc>(
               create: (_) => AdminTabBloc(),
             ),
@@ -273,15 +270,18 @@ class _AdminDashboardState extends State<MaintenanceDashboard> with SingleTicker
             ),
 
         BlocProvider<LeaveBloc>(create: (_) => sl<LeaveBloc>()),
-          ],                                    // ← ] தான் close, } இல்ல
-          child: Scaffold(
+          ],
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+        final isTablet = constraints.maxWidth >= 600;
+        return Scaffold(
             body: MaintenanceMobileDashboard(
               tabController: _tabController,
               isTablet: isTablet,
             ),
-          ),
-        );                                      // ← MultiBlocProvider close
-      },                                        // ← LayoutBuilder builder close
+          );
+        },
+      ),
     );                                          // ← LayoutBuilder close
   }                                             // ← build() close
 }

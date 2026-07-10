@@ -11,7 +11,7 @@ import 'enquirytradd_state.dart';
 
 
 class EnquiryAddBloc extends Bloc<EnquiryAddEvent, EnquiryAddState> {
-  final EnquiryAddRepository _repository;
+  final EnquiryTrRepository _repository;
   final SessionManager _sessionManager;
 
   EnquiryAddBloc(this._repository, this._sessionManager) : super(EnquiryAddInitial()) {

@@ -45,11 +45,8 @@ class _WareHouseDashboardState extends State<WareHouseDashboard> with SingleTick
   }
   @override
   Widget build(BuildContext context) {
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        final isTablet = constraints.maxWidth >= 600;
-        return MultiBlocProvider(
-          providers: [
+    return MultiBlocProvider(
+      providers: [
             BlocProvider(
               // ✅ Removed 'context', added named 'repository' parameter
               create: (_) => SpotSaleBloc.form(
@@ -66,14 +63,17 @@ class _WareHouseDashboardState extends State<WareHouseDashboard> with SingleTick
             ),
                   BlocProvider<LeaveBloc>(create: (_) => sl<LeaveBloc>()),
       ],
-          child: Scaffold(
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+        final isTablet = constraints.maxWidth >= 600;
+        return Scaffold(
             body: WareHouseMobileDashboard(
               tabController: _tabController,
               isTablet: isTablet,
             ),
-          ),
-        );                                      // ← MultiBlocProvider close
-      },                                        // ← LayoutBuilder builder close
+          );
+        },
+      ),
     );                                          // ← LayoutBuilder close
   }                                             // ← build() close
 }

@@ -4,15 +4,11 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:maleva/core/utils/clsfunction.dart' as objfun;
 import 'package:maleva/menu/menulist.dart';
-import 'package:maleva/core/network/OnlineApi.dart' as OnlineApi;
+import 'package:maleva/core/di/injection.dart';
+import 'package:maleva/features/transaction/planning/data/planning_repository.dart';
 import 'package:maleva/core/models/model.dart';
 import '../../../../core/theme/tokens.dart';
-import '../../../dashboard/admin_dashboard/tabs/custdashboard/view/custdashboard_tab.dart';
 import '../../../dashboard/admin_dashboard/tabs/planningdetailsview/view/planningdetails_tab.dart';
-import '../../../dashboard/admin_dashboard/tabs/transportDB/view/transportdb_tab.dart';
-import '../../../dashboard/admin_dashboard/view/admin_dashboard.dart';
-import '../../../dashboard/operationadmin_dashboard/view/operationadmin_dashboard.dart';
-import '../../../home/view/home_tab.dart';
 import '../../../mastersearch/Employee.dart';
 import '../bloc/planning_bloc.dart';
 import '../bloc/planning_event.dart';
@@ -24,9 +20,7 @@ TextStyle _body(double size, {Color color = colour.kText, FontWeight fw = FontWe
 TextStyle _label(double size, {Color color = colour.kTextDim, FontWeight fw = FontWeight.w600}) =>
     GoogleFonts.dmSans(fontSize: size, color: color, fontWeight: fw);
 
-// ════════════════════════════════════════════════════════════════════
-//  UI VIEW (PlanningView)
-// ════════════════════════════════════════════════════════════════════
+
 
 class PlanningView extends StatelessWidget {
   const PlanningView({super.key});
@@ -36,7 +30,7 @@ class PlanningView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (_) => PlanningBloc(context)
+      create: (_) => sl<PlanningBloc>(param1: context)
         ..add(LoadPlanningEvent(
           fromDate: _today,
           toDate: _today,
@@ -54,15 +48,9 @@ class _PlanningScaffold extends StatelessWidget {
   const _PlanningScaffold();
 
   void _onBackPressed(BuildContext context) {
-    final role = objfun.storagenew.getString('RulesType') ?? '';
-    final Widget dest = switch (role) {
-      'ADMIN'          => const NewAdminDashboard(),
-      'SALES'          => const CustDashboard(),
-      'TRANSPORTATION' => const TransportDashboard(),
-      'OPERATIONADMIN' => const OperationAdminDashboard(),
-      _                => const Homemobile(),
-    };
-    Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => dest));
+    if (Navigator.canPop(context)) {
+      Navigator.pop(context);
+    }
   }
 
   @override
@@ -188,19 +176,14 @@ class _TabletLayout extends StatelessWidget {
   Widget build(BuildContext context) {
     return state.masterList.isEmpty
         ? const _EmptyView()
-        : Center(
-            child: ConstrainedBox(
-              constraints: const BoxConstraints(maxWidth: 950),
-              child: ListView.builder(
-                padding: const EdgeInsets.fromLTRB(24, 16, 24, 100),
-                itemCount: state.masterList.length,
-                itemBuilder: (context, index) => _PlanningCard(
-                  master: state.masterList[index],
-                  index: index,
-                  state: state,
-                  isTablet: true,
-                ),
-              ),
+        : ListView.builder(
+            padding: const EdgeInsets.fromLTRB(24, 16, 24, 100),
+            itemCount: state.masterList.length,
+            itemBuilder: (context, index) => _PlanningCard(
+              master: state.masterList[index],
+              index: index,
+              state: state,
+              isTablet: true,
             ),
           );
   }
@@ -358,7 +341,7 @@ class _PlanningCard extends StatelessWidget {
 }
 
 class _DetailsSection extends StatelessWidget {
-  final List<dynamic> details;
+  final List<PlanningDetailModel> details;
   final bool isTablet;
   const _DetailsSection({required this.details, required this.isTablet});
 
@@ -424,17 +407,17 @@ class _DetailsSection extends StatelessWidget {
                   rows: details.map((item) {
                     return DataRow(
                       cells: [
-                        _buildCell('${item["JobNo"] ?? item["jobNo"] ?? ''}', isTablet, color: colour.kCobalt, fw: FontWeight.w700),
-                        _buildCell('${item["JobDate"] ?? item["jobDate"] ?? ''}', isTablet),
-                        _buildCell('${item["TruckName"] ?? item["truckName"] ?? ''}', isTablet, color: colour.kSuccess, fw: FontWeight.w600),
-                        _buildCell('${item["DriverName"] ?? item["driverName"] ?? ''}', isTablet),
-                        _buildCell('${item["PickupDate"] ?? item["pickupdate"] ?? item["pickupDate"] ?? item["SPickupDate"] ?? ''}', isTablet),
-                        _buildCell('${item["DeliveryDate"] ?? item["deliverydate"] ?? item["deliveryDate"] ?? item["SDeliveryDate"] ?? ''}', isTablet),
-                        _buildCell('${item["Origin"] ?? item["origin"] ?? ''}', isTablet),
-                        _buildCell('${item["Destination"] ?? item["destination"] ?? ''}', isTablet),
-                        _buildCell('${item["Package"] ?? item["package"] ?? item["pkg"] ?? ''}', isTablet),
-                        _buildCell('${item["Weight"] ?? item["weight"] ?? ''}', isTablet),
-                        _buildCell('${item["Remarks"] ?? item["remarks"] ?? ''}', isTablet, color: AppTokens.planTextMuted),
+                        _buildCell(item.jobNo, isTablet, color: colour.kCobalt, fw: FontWeight.w700),
+                        _buildCell(item.jobDate, isTablet),
+                        _buildCell(item.truckName, isTablet, color: colour.kSuccess, fw: FontWeight.w600),
+                        _buildCell(item.driverName, isTablet),
+                        _buildCell(item.pickupDate, isTablet),
+                        _buildCell(item.deliveryDate, isTablet),
+                        _buildCell(item.origin, isTablet),
+                        _buildCell(item.destination, isTablet),
+                        _buildCell(item.package, isTablet),
+                        _buildCell(item.weight, isTablet),
+                        _buildCell(item.remarks, isTablet, color: AppTokens.planTextMuted),
                       ],
                     );
                   }).toList(),
@@ -531,7 +514,7 @@ class _FilterFab extends StatelessWidget {
                     suffixIcon: Icon(empController.text.isNotEmpty ? Icons.close_rounded : Icons.search_rounded, color: checkLoggedEmp ? AppTokens.planTextMuted : colour.kCobalt),
                     onSuffixTap: checkLoggedEmp ? null : () async {
                       if (empController.text.isEmpty) {
-                        await OnlineApi.SelectEmployee(context, 'sales', 'admin'); if (!context.mounted) return;Navigator.push(context, MaterialPageRoute(builder: (_) => const Employee(Searchby: 1, SearchId: 0))).then((_navRes) { if (_navRes != null) { objfun.SelectEmployeeList = _navRes; }
+                        await sl<PlanningRepository>().selectEmployee(context, 'sales', 'admin'); if (!context.mounted) return;Navigator.push(context, MaterialPageRoute(builder: (_) => const Employee(Searchby: 1, SearchId: 0))).then((_navRes) { if (_navRes != null) { objfun.SelectEmployeeList = _navRes; }
                           setSheetState(() {
                             empController.text = objfun.SelectEmployeeList.AccountName;
                             empId = objfun.SelectEmployeeList.Id;

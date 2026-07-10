@@ -1,17 +1,17 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
-import 'package:maleva/core/utils/clsfunction.dart' as objfun;
-import 'package:maleva/core/network/OnlineApi.dart' as OnlineApi;
 import 'package:maleva/core/models/model.dart';
+import 'package:maleva/core/utils/clsfunction.dart' as objfun;
 
 
+import 'package:maleva/features/transaction/enquirytrmaster/data/enquiry_repository.dart';
 import 'enquirytrview_event.dart';
 import 'enquirytrview_state.dart';
 
-
-
 class EnquiryViewBloc extends Bloc<EnquiryViewEvent, EnquiryViewState> {
-  EnquiryViewBloc() : super(EnquiryViewInitial()) {
+  final EnquiryTrRepository _repository;
+
+  EnquiryViewBloc(this._repository) : super(EnquiryViewInitial()) {
     on<EnquiryViewStarted>(_onStarted);
     on<EnquiryViewFromDateChanged>(_onFromDate);
     on<EnquiryViewToDateChanged>(_onToDate);
@@ -157,21 +157,13 @@ class EnquiryViewBloc extends Bloc<EnquiryViewEvent, EnquiryViewState> {
       };
       final header = {'Content-Type': 'application/json; charset=UTF-8'};
 
-      final resultData = await objfun.apiAllinoneSelectArray(
-          objfun.apiSelectEnquiryMaster, master, header, null);
+      final resultData = await _repository.fetchEnquiryMaster(master, header);
 
-      List<dynamic> masterList = [];
-      if (resultData != '' && resultData.length != 0) {
-        masterList = List<dynamic>.from(resultData);
-        // Format SForwardingDate
-        for (var i = 0; i < masterList.length; i++) {
-          if (masterList[i]['ForwardingDate'] == null) {
-            masterList[i]['SForwardingDate'] = '';
-          } else {
-            masterList[i]['SForwardingDate'] = DateFormat('dd-MM-yyyy HH:mm')
-                .format(DateTime.parse(masterList[i]['ForwardingDate']));
-          }
-        }
+      List<EnquiryMasterModel> masterList = [];
+      if (resultData.isNotEmpty) {
+        masterList = (resultData as List)
+            .map((e) => EnquiryMasterModel.fromJson(e))
+            .toList();
         objfun.EnquiryMasterList = masterList;
       }
 
@@ -189,14 +181,7 @@ class EnquiryViewBloc extends Bloc<EnquiryViewEvent, EnquiryViewState> {
 
     emit(EnquiryViewLoading());
     try {
-      final comid = objfun.storagenew.getInt('Comid') ?? 0;
-      final header = {'Content-Type': 'application/json; charset=UTF-8'};
-
-      await objfun.apiAllinoneSelectArray(
-          '${objfun.apiUpdateEnquiryMaster}${event.id}&Comid=$comid&StatusName=CANCEL',
-          null,
-          header,
-          null);
+      await _repository.cancelEnquiry(event.id);
 
       emit(s);
       add(EnquiryViewLoadRequested(useDate: false));
@@ -239,17 +224,8 @@ class EnquiryViewBloc extends Bloc<EnquiryViewEvent, EnquiryViewState> {
       EnquiryViewShareRequested event, Emitter<EnquiryViewState> emit) async {
     if (state is! EnquiryViewLoaded) return;
     try {
-      final master = {
-        'SoId':  event.id,
-        'Comid': objfun.Comid,
-      };
-      final header = {'Content-Type': 'application/json; charset=UTF-8'};
-      final resultData = await objfun.apiAllinoneSelectArray(
-          '${objfun.apiViewPlanningPdf}${event.planningNo}',
-          master,
-          header,
-          null);
-      if (resultData != '') {
+      final resultData = await _repository.getPlanningPdf(event.planningNo.toString());
+      if (resultData != null && resultData != '') {
         final value = ResponseViewModel.fromJson(resultData);
         if (value.IsSuccess == true) objfun.launchInBrowser(value.data1);
       }

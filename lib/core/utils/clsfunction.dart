@@ -1032,6 +1032,9 @@ Future barcodeScanning() async {
     Fluttertoast.showToast(
         msg: 'Nothing captured.',
         textColor: Colors.black,
+
+
+
         fontSize: 18.00,
         toastLength: Toast.LENGTH_SHORT,
         backgroundColor: Colors.white,
