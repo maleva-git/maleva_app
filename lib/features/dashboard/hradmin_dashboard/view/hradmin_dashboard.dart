@@ -94,11 +94,8 @@ class _HrAdminDashboardState extends State<HrAdminDashboard> with SingleTickerPr
   }
   @override
   Widget build(BuildContext context) {
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        final isTablet = constraints.maxWidth >= 600;
-        return MultiBlocProvider(
-          providers: [
+    return MultiBlocProvider(
+      providers: [
             BlocProvider<HrAdminTabBloc>(
               create: (_) => HrAdminTabBloc(),
             ),
@@ -147,14 +144,17 @@ class _HrAdminDashboardState extends State<HrAdminDashboard> with SingleTickerPr
 
                   BlocProvider<LeaveBloc>(create: (_) => sl<LeaveBloc>()),
       ],
-          child: Scaffold(
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+        final isTablet = constraints.maxWidth >= 600;
+        return Scaffold(
             body: HrAMobileDashboard(
               tabController: _tabController,
               isTablet: isTablet,
             ),
-          ),
-        );
-      },                                        // ← LayoutBuilder builder close
+          );
+        },
+      ),
     );                                          // ← LayoutBuilder close
   }                                             // ← build() close
 }

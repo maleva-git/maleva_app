@@ -55,11 +55,8 @@ class _AirfreightDashboardState extends State<AirfreightDashboard> with SingleTi
   }
   @override
   Widget build(BuildContext context) {
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        final isTablet = constraints.maxWidth >= 600;
-        return MultiBlocProvider(
-          providers: [
+    return MultiBlocProvider(
+      providers: [
             BlocProvider<AdminTabBloc>(
               create: (_) => AdminTabBloc(),
             ),
@@ -97,15 +94,18 @@ class _AirfreightDashboardState extends State<AirfreightDashboard> with SingleTi
             ),
 
         BlocProvider<LeaveBloc>(create: (_) => sl<LeaveBloc>()),
-          ], // ] தான் close, }
-          child: Scaffold(
+          ],
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+        final isTablet = constraints.maxWidth >= 600;
+        return Scaffold(
             body: AirfreightMobileDashboard( // Unga actual UI class name inga varanum
               tabController: _tabController,
               isTablet: isTablet,
             ),
-          ),
-        );
-      },                                        // ← LayoutBuilder builder close
+          );
+        },
+      ),
     );                                          // ← LayoutBuilder close
   }                                             // ← build() close
 }

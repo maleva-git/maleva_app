@@ -3,13 +3,14 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 import 'package:maleva/core/models/model.dart';
 import 'package:maleva/core/utils/clsfunction.dart' as objfun;
-import 'package:maleva/core/network/OnlineApi.dart' as OnlineApi;
 import 'package:maleva/features/transaction/vesselplanning/bloc/vesselplanning_event.dart';
 import 'package:maleva/features/transaction/vesselplanning/bloc/vesselplanning_state.dart';
-
+import 'package:maleva/features/transaction/vesselplanning/data/vesselplanning_repository.dart';
 
 class VesselPlanningBloc extends Bloc<VesselPlanningEvent, VesselPlanningState> {
-  VesselPlanningBloc() : super(VesselPlanningInitial()) {
+  final VesselPlanningRepository _repository;
+
+  VesselPlanningBloc(this._repository) : super(VesselPlanningInitial()) {
     on<VesselPlanningStarted>(_onStarted);
     on<VesselPlanningFilterChanged>(_onFilterChanged);
     on<VesselPlanningRowToggled>(_onRowToggled);
@@ -74,9 +75,9 @@ class VesselPlanningBloc extends Bloc<VesselPlanningEvent, VesselPlanningState> 
     final newIndex = isAlreadyOpen ? -1 : event.index;
 
     final selectedDetails = isAlreadyOpen
-        ? []
+        ? <VesselPlanningDetailModel>[]
         : s.detailsList
-        .where((item) => item["VESSELPLANINGMasterRefId"] == event.masterRefId)
+        .where((item) => item.vesselPlaningMasterRefId == event.masterRefId)
         .toList();
 
     emit(s.copyWith(
@@ -93,27 +94,17 @@ class VesselPlanningBloc extends Bloc<VesselPlanningEvent, VesselPlanningState> 
     if (state is! VesselPlanningLoaded) return;
     final s = state as VesselPlanningLoaded;
 
-    Map<String?, dynamic> master = {
-      'SoId': event.id,
-      'Comid': objfun.Comid,
-    };
-    Map<String, String> header = {'Content-Type': 'application/json; charset=UTF-8'};
-
-    await objfun
-        .apiAllinoneSelectArray(
-      "${objfun.apiViewVesselPlanningPdf}${event.planningNoDisplay}",
-      master,
-      header,
-      null,
-    )
-        .then((resultData) {
-      if (resultData != "") {
+    try {
+      final resultData = await _repository.getSharePdfUrl(event.id, event.planningNoDisplay);
+      if (resultData != null && resultData.isNotEmpty) {
         ResponseViewModel? value = ResponseViewModel.fromJson(resultData);
         if (value.IsSuccess == true) {
           objfun.launchInBrowser(value.data1);
         }
       }
-    });
+    } catch (e) {
+      // Ignore or log error
+    }
 
     // Re-emit same loaded state (no change needed)
     emit(s.copyWith());
@@ -129,7 +120,7 @@ class VesselPlanningBloc extends Bloc<VesselPlanningEvent, VesselPlanningState> 
 
     try {
       // 2. ✅ NO .toString() HERE. The API needs the raw integer.
-      await OnlineApi.EditVesselPlanning(null, event.id, event.planningNo);// 3. ✅ KEEP .toString() HERE. The State needs the text version.
+      await _repository.editVesselPlanning(event.id, event.planningNo);// 3. ✅ KEEP .toString() HERE. The State needs the text version.
       emit(VesselPlanningNavigateToEdit(
         id: event.id,
         planningNo: event.planningNo.toString(),
@@ -177,23 +168,16 @@ class VesselPlanningBloc extends Bloc<VesselPlanningEvent, VesselPlanningState> 
     required Emitter<VesselPlanningState> emit,
     required VesselPlanningLoaded? existingState,
   }) async {
-    Map<String, dynamic> master = {
-      "Comid": objfun.storagenew.getInt('Comid') ?? 0,
-      "Fromdate": fromDate,
-      "Todate": toDate,
-      "Employeeid": empId,
-      "Search": planningNo,
-    };
-    Map<String, String> header = {'Content-Type': 'application/json; charset=UTF-8'};
-
-    await objfun
-        .apiAllinoneSelectArray(objfun.apiSelectVesselPlanning, master, header, null)
-        .then((resultData) {
-      if (resultData != "" && resultData.length != 0) {
+    try {
+      final resultData = await _repository.getVesselPlanning(fromDate, toDate, planningNo, empId);
+      
+      if (resultData.isNotEmpty) {
         objfun.VesselPlanningMasterList = resultData[0]["salemaster"]
             .map((e) => VesselPlanningMasterModel.fromJson(e))
             .toList();
-        objfun.VesselPlanningDetailsList = resultData[0]["saledetails"].toList();
+        objfun.VesselPlanningDetailsList = (resultData[0]["saledetails"] as List)
+            .map((e) => VesselPlanningDetailModel.fromJson(e))
+            .toList();
       } else {
         objfun.VesselPlanningMasterList = [];
         objfun.VesselPlanningDetailsList = [];
@@ -201,8 +185,8 @@ class VesselPlanningBloc extends Bloc<VesselPlanningEvent, VesselPlanningState> 
 
       emit(VesselPlanningLoaded(
         masterList: List.from(objfun.VesselPlanningMasterList),
-        detailsList: List.from(objfun.VesselPlanningDetailsList),
-        selectedDetails: [],
+        detailsList: List<VesselPlanningDetailModel>.from(objfun.VesselPlanningDetailsList),
+        selectedDetails: <VesselPlanningDetailModel>[],
         expandedIndex: -1,
         fromDate: fromDate,
         toDate: toDate,
@@ -211,6 +195,9 @@ class VesselPlanningBloc extends Bloc<VesselPlanningEvent, VesselPlanningState> 
         empName: empName, // 💥 existingState?.empName-ku bathila direct-a assign pandrom
         isLoggedInEmp: isLoggedInEmp,
       ));
-    });
+    } catch (e) {
+      // Propagate error back to caller
+      rethrow;
+    }
   }
 }

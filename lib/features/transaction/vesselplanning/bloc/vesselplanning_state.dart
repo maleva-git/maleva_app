@@ -10,8 +10,8 @@ class VesselPlanningLoading extends VesselPlanningState {}
 
 class VesselPlanningLoaded extends VesselPlanningState {
   final List<VesselPlanningMasterModel> masterList;
-  final List<dynamic> detailsList;
-  final List<dynamic> selectedDetails; // details for currently expanded row
+  final List<VesselPlanningDetailModel> detailsList;
+  final List<VesselPlanningDetailModel> selectedDetails; // details for currently expanded row
   final int expandedIndex;             // -1 = none expanded
   final String fromDate;
   final String toDate;
@@ -35,8 +35,8 @@ class VesselPlanningLoaded extends VesselPlanningState {
 
   VesselPlanningLoaded copyWith({
     List<VesselPlanningMasterModel>? masterList,
-    List<dynamic>? detailsList,
-    List<dynamic>? selectedDetails,
+    List<VesselPlanningDetailModel>? detailsList,
+    List<VesselPlanningDetailModel>? selectedDetails,
     int? expandedIndex,
     String? fromDate,
     String? toDate,
@@ -71,7 +71,4 @@ class VesselPlanningNavigateToEdit extends VesselPlanningState {
   final String planningNo; // (or int, depending on how you defined it)
 
    VesselPlanningNavigateToEdit({required this.id, required this.planningNo});
-
-  @override
-  List<Object?> get props => [id, planningNo];
 }

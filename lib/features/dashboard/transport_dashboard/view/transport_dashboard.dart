@@ -57,11 +57,8 @@ class _TransportDashboardState extends State<TransportDashboard> with SingleTick
   }
   @override
   Widget build(BuildContext context) {
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        final isTablet = constraints.maxWidth >= 600;
-        return MultiBlocProvider(
-          providers: [
+    return MultiBlocProvider(
+      providers: [
             BlocProvider(
               create: (context) => sl<TransportBloc>()
                 ..add(const LoadTransportDataEvent(type: 0)),
@@ -101,14 +98,17 @@ class _TransportDashboardState extends State<TransportDashboard> with SingleTick
 
                   BlocProvider<LeaveBloc>(create: (_) => sl<LeaveBloc>()),
       ],
-          child: Scaffold(
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+        final isTablet = constraints.maxWidth >= 600;
+        return Scaffold(
             body: TransportMobileDashboard(
               tabController: _tabController,
               isTablet: isTablet,
             ),
-          ),
-        );
-      },                                        // ← LayoutBuilder builder close
+          );
+        },
+      ),
     );                                          // ← LayoutBuilder close
   }
 }

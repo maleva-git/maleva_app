@@ -3,7 +3,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:maleva/core/utils/clsfunction.dart' as objfun;
-import 'package:maleva/core/network/OnlineApi.dart' as OnlineApi;
+import 'package:maleva/features/transaction/viewsaleorder/data/viewsaleorder_repository.dart';
+import 'package:maleva/core/di/injection.dart';
 import '../../../../core/theme/tokens.dart';
 import '../../salesorder/add/view/salesorderadd_tab.dart';
 import '../bloc/viewsaleorder_bloc.dart';
@@ -30,7 +31,7 @@ class GetJobNoPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (_) => GetJobNoBloc()..add(GetJobNoStarted()),
+      create: (_) => sl<GetJobNoBloc>()..add(GetJobNoStarted()),
       child: const _GetJobNoPageView(),
     );
   }
@@ -49,7 +50,7 @@ class _GetJobNoPageView extends StatelessWidget {
             objfun.toastMsg('Enter Job No', '', context);
             return;
           }
-          await OnlineApi.EditSalesOrder(
+          await sl<ViewSaleOrderRepository>().editSalesOrder(
                state.saleOrderId, state.jobNo); if (!context.mounted) return;Navigator.push(
             context,
             MaterialPageRoute(

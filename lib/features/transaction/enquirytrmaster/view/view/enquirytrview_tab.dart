@@ -3,18 +3,16 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
-import 'package:maleva/core/utils/clsfunction.dart' as objfun;
-import 'package:maleva/core/network/OnlineApi.dart' as OnlineApi;
 import 'package:maleva/core/models/model.dart';
+import 'package:maleva/core/utils/clsfunction.dart' as objfun;
 import 'package:maleva/menu/menulist.dart';
+import '../../../../mastersearch/Customer.dart';
 import '../../../../../core/theme/tokens.dart';
 import '../../../../dashboard/admin_dashboard/tabs/custdashboard/view/custdashboard_tab.dart';
-import '../../../../dashboard/admin_dashboard/tabs/saleorderadd/view/saleorderadd_tab.dart';
 import '../../../../dashboard/admin_dashboard/tabs/transportDB/view/transportdb_tab.dart';
 import '../../../../dashboard/admin_dashboard/view/admin_dashboard.dart';
 import '../../../../dashboard/operationadmin_dashboard/view/operationadmin_dashboard.dart';
 import '../../../../home/view/home_tab.dart';
-import '../../../../mastersearch/Customer.dart';
 import '../../../../mastersearch/Employee.dart';
 import '../../../../mastersearch/JobType.dart';
 import '../../../salesorder/add/view/salesorderadd_tab.dart';
@@ -22,6 +20,8 @@ import '../../add/view/enquirytradd_tab.dart';
 import '../bloc/enquirytrview_bloc.dart';
 import '../bloc/enquirytrview_event.dart';
 import '../bloc/enquirytrview_state.dart';
+import 'package:maleva/features/transaction/enquirytrmaster/data/enquiry_repository.dart';
+import '../../../../../core/di/injection.dart';
 import 'package:maleva/core/colors/colors.dart' as colour;
 
 
@@ -38,7 +38,7 @@ class EnquiryTRView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (_) => EnquiryViewBloc()..add(EnquiryViewStarted()),
+      create: (_) => sl<EnquiryViewBloc>()..add(EnquiryViewStarted()),
       child: const _EnquiryViewPage(),
     );
   }
@@ -46,6 +46,7 @@ class EnquiryTRView extends StatelessWidget {
 
 class _EnquiryViewPage extends StatelessWidget {
   const _EnquiryViewPage();
+
 
   @override
   Widget build(BuildContext context) {
@@ -58,7 +59,7 @@ class _EnquiryViewPage extends StatelessWidget {
           Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (_) => AddEnquiryTR(SaleMaster: state.item),
+              builder: (_) => AddEnquiryTR(SaleMaster: state.item.toJson()),
             ),
           );
         }
@@ -89,11 +90,11 @@ class _EnquiryViewPage extends StatelessWidget {
           );
         }
       },
-      child: WillPopScope(
-        onWillPop: () async {
+      child: PopScope(
+        canPop: false,
+        onPopInvokedWithResult: (didPop, result) {
           _navigateBack(context);
-          return false;
-        },
+          },
         child: Scaffold(
           resizeToAvoidBottomInset: false,
           backgroundColor: colour.kPageBg,
@@ -178,7 +179,7 @@ class _EnquiryViewPage extends StatelessWidget {
           Text(
             userName,
             style: GoogleFonts.lato(
-              color: Colors.white.withOpacity(0.65),
+              color: Colors.white.withValues(alpha: 0.65),
               fontWeight: FontWeight.w500,
               fontSize: isTablet ? objfun.FontLow : objfun.FontLow - 1,
             ),
@@ -212,16 +213,16 @@ class _EnquiryViewPage extends StatelessWidget {
     );
   }
 
-  void _showDetailsDialog(BuildContext context, Map<String, dynamic> item) {
+  void _showDetailsDialog(BuildContext context, EnquiryMasterModel item) {
     var collectionDate = '';
     var deliveryDate = '';
-    if ((item['SPickupDate'] ?? '') != '' && item['PickupDate'] != null) {
+    if (item.sPickupDate.isNotEmpty) {
       collectionDate = DateFormat('dd-MM-yyyy HH:mm')
-          .format(DateTime.parse(item['PickupDate']));
+          .format(DateTime.parse(item.pickupDate));
     }
-    if ((item['SDeliveryDate'] ?? '') != '' && item['DeliveryDate'] != null) {
+    if (item.sDeliveryDate.isNotEmpty) {
       deliveryDate = DateFormat('dd-MM-yyyy HH:mm')
-          .format(DateTime.parse(item['DeliveryDate']));
+          .format(DateTime.parse(item.deliveryDate));
     }
 
     showDialog(
@@ -237,7 +238,7 @@ class _EnquiryViewPage extends StatelessWidget {
             borderRadius: BorderRadius.circular(20),
             boxShadow: [
               BoxShadow(
-                color: AppTokens.invoiceHeaderStart.withOpacity(0.15),
+                color: AppTokens.invoiceHeaderStart.withValues(alpha: 0.15),
                 blurRadius: 30,
                 offset: const Offset(0, 10),
               ),
@@ -278,15 +279,15 @@ class _EnquiryViewPage extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    _DetailRow('Customer', item['CustomerName'] ?? ''),
-                    _DetailRow('Job Type',  item['JobType'] ?? ''),
-                    _DetailRow('Notify Date', item['SForwardingDate'] ?? ''),
+                    _DetailRow('Customer', item.customerName),
+                    _DetailRow('Job Type',  item.jobType),
+                    _DetailRow('Notify Date', item.sForwardingDate),
                     _DetailRow('Collection Date', collectionDate),
                     _DetailRow('Delivery Date',   deliveryDate),
-                    _DetailRow('Origin',      item['Origin'] ?? ''),
-                    _DetailRow('Destination', item['Destination'] ?? ''),
-                    _DetailRow('Quantity',    item['Quantity']?.toString() ?? ''),
-                    _DetailRow('Weight',      item['TotalWeight']?.toString() ?? ''),
+                    _DetailRow('Origin',      item.origin),
+                    _DetailRow('Destination', item.destination),
+                    _DetailRow('Quantity',    item.quantity),
+                    _DetailRow('Weight',      item.totalWeight),
                   ],
                 ),
               ),
@@ -368,8 +369,7 @@ class _EnquiryViewBody extends StatelessWidget {
                 horizontal: 10, vertical: 10),
             itemCount: state.masterList.length,
             itemBuilder: (ctx, index) {
-              final item = state.masterList[index]
-              as Map<String, dynamic>;
+              final item = state.masterList[index];
               return _EnquiryCard(
                 item: item,
                 index: index,
@@ -391,7 +391,7 @@ class _GridHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final style = GoogleFonts.lato(
-      color: Colors.white.withOpacity(0.85),
+      color: Colors.white.withValues(alpha: 0.85),
       fontWeight: FontWeight.w600,
       fontSize: isTablet ? 11 : 10,
       letterSpacing: 0.5,
@@ -408,7 +408,7 @@ class _GridHeader extends StatelessWidget {
 
 // ─── Enquiry Card ─────────────────────────────────────────────────────────────
 class _EnquiryCard extends StatelessWidget {
-  final Map<String, dynamic> item;
+  final EnquiryMasterModel item;
   final int index;
   final bool isTablet;
 
@@ -419,15 +419,15 @@ class _EnquiryCard extends StatelessWidget {
   });
 
   Color _cardColor() {
-    if (item['ForwardingDate'] == null) return AppTokens.invoiceCardBg;
+    if (item.forwardingDate.isEmpty) return AppTokens.invoiceCardBg;
     final now     = DateTime.now();
     final today   = DateFormat('yyyy-MM-dd').format(now);
     final tomorrow = DateFormat('yyyy-MM-dd').format(now.add(const Duration(days: 1)));
     final notify  = DateFormat('yyyy-MM-dd')
-        .format(DateTime.parse(item['ForwardingDate']));
+        .format(DateTime.parse(item.forwardingDate));
 
     if (notify == today ||
-        DateTime.parse(item['ForwardingDate']).isBefore(now)) {
+        DateTime.parse(item.forwardingDate).isBefore(now)) {
       return const Color(0xFFFFCDD2);
     } else if (notify == tomorrow) {
       return const Color(0xFFFFF9C4);
@@ -436,15 +436,15 @@ class _EnquiryCard extends StatelessWidget {
   }
 
   Color _dotColor() {
-    if (item['ForwardingDate'] == null) return AppTokens.planTextMuted;
+    if (item.forwardingDate.isEmpty) return AppTokens.planTextMuted;
     final now     = DateTime.now();
     final today   = DateFormat('yyyy-MM-dd').format(now);
     final tomorrow = DateFormat('yyyy-MM-dd').format(now.add(const Duration(days: 1)));
     final notify  = DateFormat('yyyy-MM-dd')
-        .format(DateTime.parse(item['ForwardingDate']));
+        .format(DateTime.parse(item.forwardingDate));
 
     if (notify == today ||
-        DateTime.parse(item['ForwardingDate']).isBefore(now)) {
+        DateTime.parse(item.forwardingDate).isBefore(now)) {
       return const Color(0xFFE53935);
     } else if (notify == tomorrow) {
       return const Color(0xFFF9A825);
@@ -483,7 +483,7 @@ class _EnquiryCard extends StatelessWidget {
             border: Border.all(color: AppTokens.maintCardBorder, width: 0.5),
             boxShadow: [
               BoxShadow(
-                color: AppTokens.invoiceHeaderStart.withOpacity(0.07),
+                color: AppTokens.invoiceHeaderStart.withValues(alpha: 0.07),
                 blurRadius: 12,
                 offset: const Offset(0, 3),
               ),
@@ -512,7 +512,7 @@ AppTokens.headerGradient)),
                             Text('CUSTOMER', style: labelStyle),
                             const SizedBox(height: 2),
                             Text(
-                              item['CustomerName'] ?? '',
+                              item.customerName,
                               style: valStyle,
                               overflow: TextOverflow.ellipsis,
                             ),
@@ -526,7 +526,7 @@ AppTokens.headerGradient)),
                             Text('NOTIFY DATE', style: labelStyle),
                             const SizedBox(height: 2),
                             Text(
-                              item['SForwardingDate'] ?? '',
+                              item.sForwardingDate,
                               style: valStyle,
                               overflow: TextOverflow.ellipsis,
                             ),
@@ -578,7 +578,7 @@ AppTokens.headerGradient)),
                           if (confirm == true) {
                             context.read<EnquiryViewBloc>().add(
                                 EnquiryViewCancelRequested(
-                                    item['Id']));
+                                    item.id));
                           }
                         },
                       ),
@@ -752,7 +752,12 @@ class _FilterSheetState extends State<_FilterSheet> {
                 ).then((_) async {
                   final sel = objfun.SelectJobTypeList;
                   if (sel.Id != 0) {
-                    await OnlineApi.SelectAllJobStatus(context, sel.Id); if (!context.mounted) return;setState(() {
+                    objfun.JobAllStatusList = (await sl<EnquiryTrRepository>().selectAllJobStatus(sel.Id))
+                        .map((e) => JobAllStatusModel.fromJson(e))
+                        .toList()
+                        .cast<JobAllStatusModel>();
+                    if (!context.mounted) return;
+                    setState(() {
                       _local =
                           _local.copyWith(jobId: sel.Id, jobName: sel.Name);
                     });
@@ -776,7 +781,11 @@ class _FilterSheetState extends State<_FilterSheet> {
               value: _local.empName,
               disabled: _local.checkLEmp,
               onSearch: () async {
-                await OnlineApi.SelectEmployee(context, 'sales', 'admin'); if (!context.mounted) return;if (!_local.checkLEmp) {
+                objfun.EmployeeList = (await sl<EnquiryTrRepository>().selectEmployee('sales', 'admin'))
+                    .map<EmployeeModel>((e) => EmployeeModel.fromJson(e))
+                    .toList();
+                if (!context.mounted) return;
+                if (!_local.checkLEmp) {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
@@ -837,7 +846,7 @@ class _FilterSheetState extends State<_FilterSheet> {
                   label: 'View',
                   onPressed: () {
                     _emit(EnquiryViewLoadRequested(useDate: true));
-                    Navigator.pop(context);
+                    if (context.mounted) Navigator.pop(context);
                   },
                 ),
                 const SizedBox(width: 12),
@@ -900,7 +909,7 @@ class _EFab extends StatelessWidget {
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-              color: AppTokens.invoiceHeaderStart.withOpacity(0.4),
+              color: AppTokens.invoiceHeaderStart.withValues(alpha: 0.4),
               blurRadius: 16,
               offset: const Offset(0, 6))
         ],
@@ -927,9 +936,9 @@ class _AddButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.15),
+        color: Colors.white.withValues(alpha: 0.15),
         borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: Colors.white.withOpacity(0.4), width: 0.5),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.4), width: 0.5),
       ),
       child: Material(
         color: Colors.transparent,
@@ -974,12 +983,12 @@ class _CardChip extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
         decoration: BoxDecoration(
           color: color != null
-              ? color!.withOpacity(0.08)
+              ? color!.withValues(alpha: 0.08)
               : AppTokens.maintChipBg,
           borderRadius: BorderRadius.circular(20),
           border: Border.all(
               color: color != null
-                  ? color!.withOpacity(0.3)
+                  ? color!.withValues(alpha: 0.3)
                   : AppTokens.maintCardBorder,
               width: 0.5),
         ),
@@ -1163,7 +1172,7 @@ class _GradientButton extends StatelessWidget {
         borderRadius: BorderRadius.circular(24),
         boxShadow: [
           BoxShadow(
-              color: AppTokens.invoiceHeaderStart.withOpacity(0.35),
+              color: AppTokens.invoiceHeaderStart.withValues(alpha: 0.35),
               blurRadius: 10,
               offset: const Offset(0, 4))
         ],

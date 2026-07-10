@@ -71,11 +71,8 @@ class _AdminDashboardState extends State<SubAdminDashboard> with SingleTickerPro
   }
   @override
   Widget build(BuildContext context) {
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        final isTablet = constraints.maxWidth >= 600;
-        return MultiBlocProvider(
-          providers: [
+    return MultiBlocProvider(
+      providers: [
             BlocProvider<SubAdminTabBloc>(
               create: (_) => SubAdminTabBloc(),
             ),
@@ -152,14 +149,17 @@ class _AdminDashboardState extends State<SubAdminDashboard> with SingleTickerPro
 
                   BlocProvider<LeaveBloc>(create: (_) => sl<LeaveBloc>()),
       ],
-          child: Scaffold(
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+        final isTablet = constraints.maxWidth >= 600;
+        return Scaffold(
             body: MobileDashboard(
               tabController: _tabController,
               isTablet: isTablet,
             ),
-          ),
-        );
-        },                                        // ← LayoutBuilder builder close
+          );
+        },
+      ),
     );                                          // ← LayoutBuilder close
   }                                             // ← build() close
 }

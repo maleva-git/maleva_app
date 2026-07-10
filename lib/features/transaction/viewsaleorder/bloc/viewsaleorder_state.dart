@@ -11,12 +11,14 @@ class GetJobNoLoaded extends GetJobNoState {
   final String jobNoText;      // current text field value
   final int saleOrderId;       // selected from autocomplete
   final List<dynamic> suggestions; // filtered autocomplete list
+  final List<dynamic> cachedJobList; // list fetched from API
 
    GetJobNoLoaded({
     required this.billType,
     required this.jobNoText,
     required this.saleOrderId,
     required this.suggestions,
+    required this.cachedJobList,
   });
 
   GetJobNoLoaded copyWith({
@@ -24,12 +26,14 @@ class GetJobNoLoaded extends GetJobNoState {
     String? jobNoText,
     int? saleOrderId,
     List<dynamic>? suggestions,
+    List<dynamic>? cachedJobList,
   }) {
     return GetJobNoLoaded(
-      billType:    billType    ?? this.billType,
-      jobNoText:   jobNoText   ?? this.jobNoText,
-      saleOrderId: saleOrderId ?? this.saleOrderId,
-      suggestions: suggestions ?? this.suggestions,
+      billType:      billType      ?? this.billType,
+      jobNoText:     jobNoText     ?? this.jobNoText,
+      saleOrderId:   saleOrderId   ?? this.saleOrderId,
+      suggestions:   suggestions   ?? this.suggestions,
+      cachedJobList: cachedJobList ?? this.cachedJobList,
     );
   }
 }

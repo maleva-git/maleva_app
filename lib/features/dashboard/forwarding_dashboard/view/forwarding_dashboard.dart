@@ -60,11 +60,8 @@ class _ForwardingDashboardState extends State<ForwardingDashboard> with SingleTi
   }
   @override
   Widget build(BuildContext context) {
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        final isTablet = constraints.maxWidth >= 600;
-        return MultiBlocProvider(
-          providers: [
+    return MultiBlocProvider(
+      providers: [
             BlocProvider<AdminTabBloc>(
               create: (_) => AdminTabBloc(),
             ),
@@ -91,14 +88,17 @@ class _ForwardingDashboardState extends State<ForwardingDashboard> with SingleTi
             ),
                   BlocProvider<LeaveBloc>(create: (_) => sl<LeaveBloc>()),
       ],
-          child: Scaffold(
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+        final isTablet = constraints.maxWidth >= 600;
+        return Scaffold(
             body: ForwardingMobileDashboard(
               tabController: _tabController,
               isTablet: isTablet,
             ),
-          ),
-        );                                      // ← MultiBlocProvider close
-      },                                        // ← LayoutBuilder builder close
+          );
+        },
+      ),
     );                                          // ← LayoutBuilder close
   }                                             // ← build() close
 }

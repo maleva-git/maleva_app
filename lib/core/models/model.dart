@@ -3,6 +3,104 @@
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 
+class EnquiryMasterModel {
+  final int id;
+  final int customerRefId;
+  final String customerName;
+  final int jobMasterRefId;
+  final String jobType;
+  final String forwardingDate;
+  final String sForwardingDate;
+  final String pickupDate;
+  final String sPickupDate;
+  final String deliveryDate;
+  final String sDeliveryDate;
+  final int originRefId;
+  final String origin;
+  final int destinationRefId;
+  final String destination;
+  final String quantity;
+  final String totalWeight;
+  final String sPort;
+  final String oPort;
+
+  EnquiryMasterModel({
+    required this.id,
+    required this.customerRefId,
+    required this.customerName,
+    required this.jobMasterRefId,
+    required this.jobType,
+    required this.forwardingDate,
+    required this.sForwardingDate,
+    required this.pickupDate,
+    required this.sPickupDate,
+    required this.deliveryDate,
+    required this.sDeliveryDate,
+    required this.originRefId,
+    required this.origin,
+    required this.destinationRefId,
+    required this.destination,
+    required this.quantity,
+    required this.totalWeight,
+    required this.sPort,
+    required this.oPort,
+  });
+
+  factory EnquiryMasterModel.fromJson(Map<String, dynamic> json) {
+    String formatDate(dynamic dateStr) {
+      if (dateStr == null || dateStr.toString().isEmpty) return '';
+      try {
+        return DateFormat('dd-MM-yyyy HH:mm').format(DateTime.parse(dateStr.toString()));
+      } catch (e) {
+        return dateStr.toString();
+      }
+    }
+
+    return EnquiryMasterModel(
+      id: json['Id'] ?? 0,
+      customerRefId: json['CustomerRefId'] ?? 0,
+      customerName: json['CustomerName']?.toString() ?? '',
+      jobMasterRefId: json['JobMasterRefId'] ?? 0,
+      jobType: json['JobType']?.toString() ?? '',
+      forwardingDate: json['ForwardingDate']?.toString() ?? '',
+      sForwardingDate: formatDate(json['ForwardingDate']),
+      pickupDate: json['PickupDate']?.toString() ?? '',
+      sPickupDate: formatDate(json['PickupDate']),
+      deliveryDate: json['DeliveryDate']?.toString() ?? '',
+      sDeliveryDate: formatDate(json['DeliveryDate']),
+      originRefId: json['OriginRefId'] ?? 0,
+      origin: json['Origin']?.toString() ?? '',
+      destinationRefId: json['DestinationRefId'] ?? 0,
+      destination: json['Destination']?.toString() ?? '',
+      quantity: json['Quantity']?.toString() ?? '',
+      totalWeight: json['TotalWeight']?.toString() ?? '',
+      sPort: json['SPort']?.toString() ?? '',
+      oPort: json['OPort']?.toString() ?? '',
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'Id': id,
+      'CustomerRefId': customerRefId,
+      'CustomerName': customerName,
+      'JobMasterRefId': jobMasterRefId,
+      'JobType': jobType,
+      'ForwardingDate': forwardingDate == '' ? null : forwardingDate,
+      'PickupDate': pickupDate == '' ? null : pickupDate,
+      'DeliveryDate': deliveryDate == '' ? null : deliveryDate,
+      'OriginRefId': originRefId,
+      'Origin': origin,
+      'DestinationRefId': destinationRefId,
+      'Destination': destination,
+      'Quantity': quantity,
+      'TotalWeight': totalWeight,
+      'SPort': sPort,
+      'OPort': oPort,
+    };
+  }
+}
+
 class SubscriptionKey {
   String MobileNo;
   String ShopName;
@@ -2496,6 +2594,53 @@ class SaleOrderDetailModel {
         ItemQty = 0.0,
         SAmount = 0.0;
 }
+class PlanningDetailModel {
+  final int planingMasterRefId;
+  final String jobNo;
+  final String jobDate;
+  final String truckName;
+  final String driverName;
+  final String pickupDate;
+  final String deliveryDate;
+  final String origin;
+  final String destination;
+  final String package;
+  final String weight;
+  final String remarks;
+
+  PlanningDetailModel({
+    required this.planingMasterRefId,
+    required this.jobNo,
+    required this.jobDate,
+    required this.truckName,
+    required this.driverName,
+    required this.pickupDate,
+    required this.deliveryDate,
+    required this.origin,
+    required this.destination,
+    required this.package,
+    required this.weight,
+    required this.remarks,
+  });
+
+  factory PlanningDetailModel.fromJson(Map<String, dynamic> json) {
+    return PlanningDetailModel(
+      planingMasterRefId: json['PLANINGMasterRefId'] ?? 0,
+      jobNo: (json['JobNo'] ?? json['jobNo'] ?? '').toString(),
+      jobDate: (json['JobDate'] ?? json['jobDate'] ?? '').toString(),
+      truckName: (json['TruckName'] ?? json['truckName'] ?? '').toString(),
+      driverName: (json['DriverName'] ?? json['driverName'] ?? '').toString(),
+      pickupDate: (json['PickupDate'] ?? json['pickupdate'] ?? json['pickupDate'] ?? json['SPickupDate'] ?? '').toString(),
+      deliveryDate: (json['DeliveryDate'] ?? json['deliverydate'] ?? json['deliveryDate'] ?? json['SDeliveryDate'] ?? '').toString(),
+      origin: (json['Origin'] ?? json['origin'] ?? '').toString(),
+      destination: (json['Destination'] ?? json['destination'] ?? '').toString(),
+      package: (json['Package'] ?? json['package'] ?? json['pkg'] ?? '').toString(),
+      weight: (json['Weight'] ?? json['weight'] ?? '').toString(),
+      remarks: (json['Remarks'] ?? json['remarks'] ?? '').toString(),
+    );
+  }
+}
+
 class PlanningMasterModel {
   int Id;
   int PLANINGNo;
@@ -2533,6 +2678,62 @@ class PlanningMasterModel {
         PLANINGDate = '',
         Remarks = '';
 }
+class VesselPlanningDetailModel {
+  final int vesselPlaningMasterRefId;
+  final String jobNo;
+  final String customerName;
+  final String loadingVesselName;
+  final String oPort;
+  final String jobName;
+  final String jobStatus;
+  final String pkg;
+  final String remarks;
+  final String soEta;
+  final String sEta;
+  final String soEtb;
+  final String sEtb;
+  final String soEtd;
+  final String sEtd;
+
+  VesselPlanningDetailModel({
+    required this.vesselPlaningMasterRefId,
+    required this.jobNo,
+    required this.customerName,
+    required this.loadingVesselName,
+    required this.oPort,
+    required this.jobName,
+    required this.jobStatus,
+    required this.pkg,
+    required this.remarks,
+    required this.soEta,
+    required this.sEta,
+    required this.soEtb,
+    required this.sEtb,
+    required this.soEtd,
+    required this.sEtd,
+  });
+
+  factory VesselPlanningDetailModel.fromJson(Map<String, dynamic> json) {
+    return VesselPlanningDetailModel(
+      vesselPlaningMasterRefId: json['VESSELPLANINGMasterRefId'] ?? 0,
+      jobNo: json['JobNo']?.toString() ?? '',
+      customerName: json['CustomerName']?.toString() ?? '',
+      loadingVesselName: json['Loadingvesselname']?.toString() ?? '',
+      oPort: json['OPort']?.toString() ?? '',
+      jobName: json['JobName']?.toString() ?? '',
+      jobStatus: json['JobStatus']?.toString() ?? '',
+      pkg: json['pkg']?.toString() ?? '',
+      remarks: json['Remarks']?.toString() ?? '',
+      soEta: json['SOETA']?.toString() ?? '',
+      sEta: json['SETA']?.toString() ?? '',
+      soEtb: json['SOETB']?.toString() ?? '',
+      sEtb: json['SETB']?.toString() ?? '',
+      soEtd: json['SOETD']?.toString() ?? '',
+      sEtd: json['SETD']?.toString() ?? '',
+    );
+  }
+}
+
 class VesselPlanningMasterModel {
   int Id;
   int VESSELPLANINGNo;

@@ -46,11 +46,8 @@ class _SalesDashboardState extends State<SalesDashboard> with SingleTickerProvid
 
   @override
   Widget build(BuildContext context) {
-    return LayoutBuilder(
-        builder: (context, constraints){
-          final isTablet = constraints.maxWidth >= 600;
-          return MultiBlocProvider(
-              providers: [
+    return MultiBlocProvider(
+      providers: [
                 BlocProvider(create: (context) => SalesDashboardBloc()),
                 BlocProvider(
                   // ✅ No ..add() cascade needed, and GetIt injects the repository automatically!
@@ -84,7 +81,10 @@ class _SalesDashboardState extends State<SalesDashboard> with SingleTickerProvid
                 ),
                 BlocProvider<LeaveBloc>(create: (_) => sl<LeaveBloc>()),
               ],
-              child: Builder(
+      child: LayoutBuilder(
+        builder: (context, constraints){
+          final isTablet = constraints.maxWidth >= 600;
+        return Builder(
                 builder: (context) {
                   return LayoutBuilder(
                     builder: (context, constraints) {
@@ -98,9 +98,9 @@ class _SalesDashboardState extends State<SalesDashboard> with SingleTickerProvid
                     }
                   );
                 }
-              )
-          );
-        }
+              );
+        },
+      ),
     );
   }
 }

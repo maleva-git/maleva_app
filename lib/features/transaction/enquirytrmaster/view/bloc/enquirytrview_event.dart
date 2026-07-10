@@ -1,4 +1,4 @@
-
+import '../../../../../core/models/model.dart';
 
 abstract class EnquiryViewEvent {}
 
@@ -64,12 +64,12 @@ class EnquiryViewPushToSaleOrder extends EnquiryViewEvent {
 }
 
 class EnquiryViewDetailsRequested extends EnquiryViewEvent {
-  final Map<String, dynamic> item;
+  final EnquiryMasterModel item;
   EnquiryViewDetailsRequested(this.item);
 }
 
 class EnquiryViewEditRequested extends EnquiryViewEvent {
-  final Map<String, dynamic> item;
+  final EnquiryMasterModel item;
   EnquiryViewEditRequested(this.item);
 }
 

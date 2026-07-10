@@ -15,7 +15,7 @@ class PlanningLoading extends PlanningState {}
 
 class PlanningLoaded extends PlanningState {
   final List<PlanningMasterModel> masterList;
-  final Map<int, List<dynamic>> detailsMap;
+  final Map<int, List<PlanningDetailModel>> detailsMap;
   final int expandedIndex;
   final String fromDate;
   final String toDate;
@@ -51,7 +51,7 @@ class PlanningLoaded extends PlanningState {
 
   PlanningLoaded copyWith({
     List<PlanningMasterModel>? masterList,
-    Map<int, List<dynamic>>? detailsMap,
+    Map<int, List<PlanningDetailModel>>? detailsMap,
     int? expandedIndex,
     String? fromDate,
     String? toDate,
