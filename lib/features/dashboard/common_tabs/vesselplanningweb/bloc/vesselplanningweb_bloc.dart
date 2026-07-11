@@ -37,7 +37,7 @@ class VesselPlanningWebBloc extends Bloc<VesselPlanningWebEvent, VesselPlanningW
       } catch (e) {
         emit(VesselPlanningWebError(message: e.toString()));
         if (currentState is VesselPlanningWebLoaded) {
-          emit(VesselPlanningWebLoaded(dataList: currentState.dataList));
+          emit(VesselPlanningWebLoaded(dataList: currentState.dataList, planningNo: currentState.planningNo));
         }
       }
     });
@@ -49,13 +49,23 @@ class VesselPlanningWebBloc extends Bloc<VesselPlanningWebEvent, VesselPlanningW
         final message = await repository.saveVesselPlanning(event.planningList);
         emit(VesselPlanningWebActionSuccess(message));
         if (currentState is VesselPlanningWebLoaded) {
-          emit(VesselPlanningWebLoaded(dataList: currentState.dataList));
+          emit(VesselPlanningWebLoaded(dataList: currentState.dataList, planningNo: currentState.planningNo));
         }
       } catch (e) {
         emit(VesselPlanningWebError(message: e.toString()));
         if (currentState is VesselPlanningWebLoaded) {
-          emit(VesselPlanningWebLoaded(dataList: currentState.dataList));
+          emit(VesselPlanningWebLoaded(dataList: currentState.dataList, planningNo: currentState.planningNo));
         }
+      }
+    });
+
+    on<LoadPlanningForEditEvent>((event, emit) async {
+      emit(VesselPlanningWebLoading());
+      try {
+        final dataList = await repository.getPlanningById(event.planningMaster['Id']);
+        emit(VesselPlanningWebLoaded(dataList: dataList, planningNo: event.planningMaster['CNumberDisplay'], masterData: event.planningMaster));
+      } catch (e) {
+        emit(VesselPlanningWebError(message: e.toString()));
       }
     });
   }
