@@ -1,6 +1,6 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../core/network/OnlineApi.dart' as OnlineApi;
-import '../../../../core/utils/clsfunction.dart' as objfun;
+import 'package:maleva/core/utils/app_globals.dart';
 import '../data/fwupdate_repository.dart';
 import 'forwarding_event.dart';
 import 'forwarding_state.dart';
@@ -56,7 +56,7 @@ class FWUpdateBloc extends Bloc<FWUpdateEvent, FWUpdateState> {
     List<dynamic> filtered = [];
     if (query.isNotEmpty) {
       final smkKey = event.type == 1 ? 'ForwardingSMKNo' : event.type == 2 ? 'ForwardingSMKNo2' : 'ForwardingSMKNo3';
-      filtered = objfun.JobNoList.where((e) {
+      filtered = AppGlobals.JobNoList.where((e) {
         final smkValue = (e[smkKey] ?? '').toString();
         return smkValue.contains(query);
       }).toList();
@@ -85,11 +85,11 @@ class FWUpdateBloc extends Bloc<FWUpdateEvent, FWUpdateState> {
 
     // 2. Exact Old Code Image Fetching Logic
     try {
-      String imgDir = "/Upload/${objfun.Comid}/SalesOrder/${event.saleOrderId}/${event.smkText}/";
+      String imgDir = "/Upload/${AppGlobals.Comid}/SalesOrder/${event.saleOrderId}/${event.smkText}/";
       Map<String, String> header = {'Content-Type': 'application/json; charset=UTF-8'};
 
-      var resultData = await objfun.apiAllinoneSelectArray(
-          "${objfun.apiGetimage}$imgDir", null, header, event.context
+      var resultData = await AppGlobals.apiAllinoneSelectArray(
+          "${AppGlobals.apiGetimage}$imgDir", null, header, event.context
       );
 
       if (resultData != "" && resultData != null && resultData is List) {
@@ -104,14 +104,14 @@ class FWUpdateBloc extends Bloc<FWUpdateEvent, FWUpdateState> {
     // 3. Extract Data from objfun globals
     FWTabData buildTabFromMaster(int type, FWTabData existing) {
       // Check pannrom data iruka illaya nu
-      if (objfun.SaleEditMasterList.isEmpty) {
+      if (AppGlobals.SaleEditMasterList.isEmpty) {
         return existing.copyWith(
           smkText: event.type == type ? event.smkText : existing.smkText,
           suggestions: [],
         );
       }
 
-      var master = objfun.SaleEditMasterList[0];
+      var master = AppGlobals.SaleEditMasterList[0];
 
       String enRef = '';
       String exRef = '';
@@ -139,12 +139,12 @@ class FWUpdateBloc extends Bloc<FWUpdateEvent, FWUpdateState> {
       String breakName = '';
 
       // Employee Object access using .Id and .AccountName (Fix for Map vs Object issue)
-      if (sealId != 0 && objfun.EmployeeList.isNotEmpty) {
-        var emp = objfun.EmployeeList.where((item) => item.Id == sealId).toList();
+      if (sealId != 0 && AppGlobals.EmployeeList.isNotEmpty) {
+        var emp = AppGlobals.EmployeeList.where((item) => item.Id == sealId).toList();
         if (emp.isNotEmpty) sealName = emp[0].AccountName ?? '';
       }
-      if (breakId != 0 && objfun.EmployeeList.isNotEmpty) {
-        var emp = objfun.EmployeeList.where((item) => item.Id == breakId).toList();
+      if (breakId != 0 && AppGlobals.EmployeeList.isNotEmpty) {
+        var emp = AppGlobals.EmployeeList.where((item) => item.Id == breakId).toList();
         if (emp.isNotEmpty) breakName = emp[0].AccountName ?? '';
       }
 
@@ -237,9 +237,9 @@ class FWUpdateBloc extends Bloc<FWUpdateEvent, FWUpdateState> {
     try {
       final master = {
         'Id': s.saleOrderId,
-        'Comid': objfun.Comid,
+        'Comid': AppGlobals.Comid,
         'Jobid': 0,
-        'EmployeeRefId': objfun.EmpRefId == 0 ? null : objfun.EmpRefId,
+        'EmployeeRefId': AppGlobals.EmpRefId == 0 ? null : AppGlobals.EmpRefId,
         'SealbyRefid': s.tab1.sealEmpId,
         'SealbreakbyRefid': s.tab1.breakEmpId,
         'SealbyRefid2': s.tab2.sealEmpId,

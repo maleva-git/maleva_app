@@ -4,7 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
-import 'package:maleva/core/utils/clsfunction.dart' as objfun;
+import 'package:maleva/core/utils/app_globals.dart';
 import 'package:maleva/core/models/model.dart';
 import 'package:maleva/features/transaction/salesorder/view/data/salesorderview_repository.dart';
 import 'package:maleva/menu/menulist.dart';
@@ -144,7 +144,7 @@ class _SaleAppBar extends StatelessWidget
                   fontSize: 17,
                   fontWeight: FontWeight.w700,
                   letterSpacing: 0.3)),
-          Text(objfun.storagenew.getString('Username') ?? '',
+          Text(AppGlobals.storagenew.getString('Username') ?? '',
               style: GoogleFonts.poppins(
                   color: Colors.white70,
                   fontSize: 11,
@@ -699,23 +699,23 @@ class _MobileCard extends StatelessWidget {
     try {
       final resultData = await sl<SalesOrderViewRepository>().editSalesOrder(id, saleNo);
       if (resultData.isNotEmpty) {
-        objfun.SaleEditMasterList = resultData;
-        objfun.SaleEditDetailList = (resultData[0]["SaleDetails"] as List).map<SaleEditDetailModel>((e) => SaleEditDetailModel.fromJson(e)).toList();
+        AppGlobals.SaleEditMasterList = resultData;
+        AppGlobals.SaleEditDetailList = (resultData[0]["SaleDetails"] as List).map<SaleEditDetailModel>((e) => SaleEditDetailModel.fromJson(e)).toList();
         
         if (!context.mounted) return;
         Navigator.of(context).push(MaterialPageRoute(
           builder: (_) => SalesOrdersAdd(
-            SaleDetails: objfun.SaleEditDetailList,
-            SaleMaster: objfun.SaleEditMasterList,
+            SaleDetails: AppGlobals.SaleEditDetailList,
+            SaleMaster: AppGlobals.SaleEditMasterList,
           ),
         ));
       } else {
         if (!context.mounted) return;
-        objfun.msgshow('Data empty', '', Colors.white, Colors.red, null, 18.0, objfun.tll, objfun.tgc, context, 2);
+        msgshow('Data empty', '', Colors.white, Colors.red, null, 18.0, AppGlobals.tll, AppGlobals.tgc, context, 2);
       }
     } catch (e) {
       if (!context.mounted) return;
-      objfun.msgshow(e.toString(), '', Colors.white, Colors.red, null, 18.0, objfun.tll, objfun.tgc, context, 2);
+      msgshow(e.toString(), '', Colors.white, Colors.red, null, 18.0, AppGlobals.tll, AppGlobals.tgc, context, 2);
     }
   }
 }
@@ -986,23 +986,23 @@ class _TabletRow extends StatelessWidget {
     try {
       final resultData = await sl<SalesOrderViewRepository>().editSalesOrder(id, saleNo);
       if (resultData.isNotEmpty) {
-        objfun.SaleEditMasterList = resultData;
-        objfun.SaleEditDetailList = (resultData[0]["SaleDetails"] as List).map<SaleEditDetailModel>((e) => SaleEditDetailModel.fromJson(e)).toList();
+        AppGlobals.SaleEditMasterList = resultData;
+        AppGlobals.SaleEditDetailList = (resultData[0]["SaleDetails"] as List).map<SaleEditDetailModel>((e) => SaleEditDetailModel.fromJson(e)).toList();
         
         if (!context.mounted) return;
         Navigator.of(context).push(MaterialPageRoute(
           builder: (_) => SalesOrdersAdd(
-            SaleDetails: objfun.SaleEditDetailList,
-            SaleMaster: objfun.SaleEditMasterList,
+            SaleDetails: AppGlobals.SaleEditDetailList,
+            SaleMaster: AppGlobals.SaleEditMasterList,
           ),
         ));
       } else {
         if (!context.mounted) return;
-        objfun.msgshow('Data empty', '', Colors.white, Colors.red, null, 18.0, objfun.tll, objfun.tgc, context, 2);
+        msgshow('Data empty', '', Colors.white, Colors.red, null, 18.0, AppGlobals.tll, AppGlobals.tgc, context, 2);
       }
     } catch (e) {
       if (!context.mounted) return;
-      objfun.msgshow(e.toString(), '', Colors.white, Colors.red, null, 18.0, objfun.tll, objfun.tgc, context, 2);
+      msgshow(e.toString(), '', Colors.white, Colors.red, null, 18.0, AppGlobals.tll, AppGlobals.tgc, context, 2);
     }
   }
 }
@@ -1559,26 +1559,26 @@ class _FilterSheetState extends State<_FilterSheet> {
     final r = await Navigator.push(context,
         MaterialPageRoute(
             builder: (_) =>
-            const Customer(Searchby: 1, SearchId: 0))); if (r != null) { objfun.SelectCustomerList = r; }
+            const Customer(Searchby: 1, SearchId: 0))); if (r != null) { AppGlobals.SelectCustomerList = r; }
     if (r != null) {
       bloc.add(ViewCustomerSelected(
-          objfun.SelectCustomerList.AccountName,
-          objfun.SelectCustomerList.Id));
-      objfun.SelectCustomerList = CustomerModel.Empty();
+          AppGlobals.SelectCustomerList.AccountName,
+          AppGlobals.SelectCustomerList.Id));
+      AppGlobals.SelectCustomerList = CustomerModel.Empty();
     }
   }
 
   Future<void> _pickEmployee(
       BuildContext context, SalesOrderViewBloc bloc) async {
-    objfun.EmployeeList = (await sl<SalesOrderViewRepository>().selectEmployee('sales', 'admin')).map<EmployeeModel>((e) => EmployeeModel.fromJson(e)).toList(); if (!context.mounted) return;final r = await Navigator.push(context,
+    AppGlobals.EmployeeList = (await sl<SalesOrderViewRepository>().selectEmployee('sales', 'admin')).map<EmployeeModel>((e) => EmployeeModel.fromJson(e)).toList(); if (!context.mounted) return;final r = await Navigator.push(context,
         MaterialPageRoute(
             builder: (_) =>
-            const Employee(Searchby: 1, SearchId: 0))); if (r != null) { objfun.SelectEmployeeList = r; }
+            const Employee(Searchby: 1, SearchId: 0))); if (r != null) { AppGlobals.SelectEmployeeList = r; }
     if (r != null) {
       bloc.add(ViewEmployeeSelected(
-          objfun.SelectEmployeeList.AccountName,
-          objfun.SelectEmployeeList.Id));
-      objfun.SelectEmployeeList = EmployeeModel.Empty();
+          AppGlobals.SelectEmployeeList.AccountName,
+          AppGlobals.SelectEmployeeList.Id));
+      AppGlobals.SelectEmployeeList = EmployeeModel.Empty();
     }
   }
 
@@ -1587,12 +1587,12 @@ class _FilterSheetState extends State<_FilterSheet> {
     final r = await Navigator.push(context,
         MaterialPageRoute(
             builder: (_) =>
-            const JobStatus(Searchby: 1, SearchId: 0))); if (r != null) { objfun.SelectJobStatusList = r; }
+            const JobStatus(Searchby: 1, SearchId: 0))); if (r != null) { AppGlobals.SelectJobStatusList = r; }
     if (r != null) {
       bloc.add(ViewStatusSelected(
-          objfun.SelectJobStatusList.Name,
-          objfun.SelectJobStatusList.Id));
-      objfun.SelectJobStatusList = JobStatusModel.Empty();
+          AppGlobals.SelectJobStatusList.Name,
+          AppGlobals.SelectJobStatusList.Id));
+      AppGlobals.SelectJobStatusList = JobStatusModel.Empty();
     }
   }
 

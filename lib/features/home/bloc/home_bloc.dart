@@ -47,7 +47,7 @@ class HomeDashboardBloc
   }
 
   // ── Store version check ───────────────────────────────────────────────────
-  // Uses the same package and IDs as your existing objfun.checkVersion().
+  // Uses the same package and IDs as your existing AppGlobals.checkVersion().
   // Context is NOT needed here — only the check, not the dialog.
   // The UI listener calls AppVersionUpdate.showAlertUpdate() with context.
 

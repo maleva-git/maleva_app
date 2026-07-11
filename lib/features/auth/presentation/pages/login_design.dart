@@ -9,7 +9,7 @@ import 'package:google_fonts/google_fonts.dart';
 
 import '../../../../core/colors/colors.dart' as colour;
 import '../../../../core/theme/tokens.dart';
-import '../../../../core/utils/clsfunction.dart' as objfun;
+import 'package:maleva/core/utils/app_globals.dart';
 import '../bloc/auth_bloc.dart';
 import '../bloc/auth_event.dart';
 import '../bloc/auth_state.dart';
@@ -203,7 +203,7 @@ class _LoginBodyState extends State<_LoginBody>
             borderRadius: BorderRadius.circular(logoSize * 0.30),
             child: Padding(
               padding: EdgeInsets.all(_isTablet ? 14 : 11),
-              child: Image(image: objfun.splashlogo, fit: BoxFit.contain),
+              child: Image(image: AppGlobals.splashlogo, fit: BoxFit.contain),
             ),
           ),
         ),

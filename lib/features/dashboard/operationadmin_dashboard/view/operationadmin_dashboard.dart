@@ -2,52 +2,50 @@ import 'package:flutter/Material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 import '../../../../core/di/injection.dart';
-import '../../../common_updates/blocs/sales/sales_bloc.dart';
-import '../../../common_updates/blocs/truck/truck_bloc.dart';
-import '../../admin_dashboard/tabs/driver/bloc/driverdetails_bloc.dart';
-import '../../admin_dashboard/tabs/driver/bloc/driverdetails_event.dart';
-import '../../admin_dashboard/tabs/driver/view/driverdetails_tab.dart';
-import '../../admin_dashboard/tabs/enginehours/bloc/enginehours_bloc.dart';
-import '../../admin_dashboard/tabs/enginehours/bloc/enginehours_event.dart';
-import '../../admin_dashboard/tabs/enginehours/view/enginehours_tab.dart';
-import '../../admin_dashboard/tabs/fuel/bloc/fuelreport_bloc.dart';
-import '../../admin_dashboard/tabs/fuel/bloc/fuelreport_event.dart';
-import '../../admin_dashboard/tabs/fuel/view/fuelreport_tab.dart';
-import '../../admin_dashboard/tabs/fuelfillings/bloc/fuelfillings_bloc.dart';
-import '../../admin_dashboard/tabs/fuelfillings/bloc/fuelfillings_event.dart';
-import '../../admin_dashboard/tabs/fuelfillings/view/fuelfillings_tab.dart';
-import '../../admin_dashboard/tabs/inventoryreport/bloc/inventoryreport_bloc.dart';
-import '../../admin_dashboard/tabs/inventoryreport/bloc/inventoryreport_event.dart';
-import '../../admin_dashboard/tabs/inventoryreport/data/inventoryreport_repository.dart';
-import '../../admin_dashboard/tabs/inventoryreport/view/inventoryview_tab.dart';
-import '../../admin_dashboard/tabs/maintenance/bloc/maintenance_bloc.dart';
-import '../../admin_dashboard/tabs/maintenance/bloc/maintenance_event.dart';
-import '../../admin_dashboard/tabs/maintenance/view/maintenance_tab.dart';
-import '../../admin_dashboard/tabs/pdo/bloc/pdo_bloc.dart';
-import '../../admin_dashboard/tabs/pdo/data/pdo_repository.dart';
-import '../../admin_dashboard/tabs/pdo/view/pdo_tab.dart';
-import '../../admin_dashboard/tabs/rtiview/bloc/rtiview_bloc.dart';
-import '../../admin_dashboard/tabs/rtiview/bloc/rtiview_event.dart';
-import '../../admin_dashboard/tabs/rtiview/view/rtiview_tab.dart';
-import '../../admin_dashboard/tabs/spareparts/bloc/spareparts_bloc.dart';
-import '../../admin_dashboard/tabs/spareparts/bloc/spareparts_event.dart';
-import '../../admin_dashboard/tabs/spareparts/data/spareparts_repository.dart';
-import '../../admin_dashboard/tabs/spareparts/view/sparepartsadd.dart';
-import '../../admin_dashboard/tabs/speedingreport/bloc/speeding_bloc.dart';
-import '../../admin_dashboard/tabs/speedingreport/bloc/speeding_event.dart';
-import '../../admin_dashboard/tabs/speedingreport/view/speedingreport_view.dart';
-import '../../admin_dashboard/tabs/spotsaleorder/bloc/spotsaleorder_bloc.dart';
-import '../../admin_dashboard/tabs/spotsaleorder/data/spotsale_repository.dart';
-import '../../admin_dashboard/tabs/spotsaleorder/view/spotsaleorder_add.dart';
-import '../../admin_dashboard/tabs/truck/bloc/truck_bloc.dart';
-import '../../admin_dashboard/tabs/truck/view/truckview_tab.dart';
-import '../../admin_dashboard/tabs/vesselreport/bloc/vesselreport_bloc.dart';
-import '../../admin_dashboard/tabs/vesselreport/bloc/vesselreport_event.dart';
-import '../../admin_dashboard/tabs/vesselreport/view/vesselreportview_tab.dart';
+import '../../common_tabs/driver/bloc/driverdetails_bloc.dart';
+import '../../common_tabs/driver/bloc/driverdetails_event.dart';
+import '../../common_tabs/driver/view/driverdetails_tab.dart';
+import '../../common_tabs/enginehours/bloc/enginehours_bloc.dart';
+import '../../common_tabs/enginehours/bloc/enginehours_event.dart';
+import '../../common_tabs/enginehours/view/enginehours_tab.dart';
+import '../../common_tabs/fuel/bloc/fuelreport_bloc.dart';
+import '../../common_tabs/fuel/bloc/fuelreport_event.dart';
+import '../../common_tabs/fuel/view/fuelreport_tab.dart';
+import '../../common_tabs/fuelfillings/bloc/fuelfillings_bloc.dart';
+import '../../common_tabs/fuelfillings/bloc/fuelfillings_event.dart';
+import '../../common_tabs/fuelfillings/view/fuelfillings_tab.dart';
+import '../../common_tabs/inventoryreport/bloc/inventoryreport_bloc.dart';
+import '../../common_tabs/inventoryreport/bloc/inventoryreport_event.dart';
+import '../../common_tabs/inventoryreport/data/inventoryreport_repository.dart';
+import '../../common_tabs/inventoryreport/view/inventoryview_tab.dart';
+import '../../common_tabs/maintenance/bloc/maintenance_bloc.dart';
+import '../../common_tabs/maintenance/bloc/maintenance_event.dart';
+import '../../common_tabs/maintenance/view/maintenance_tab.dart';
+import '../../common_tabs/pdo/bloc/pdo_bloc.dart';
+import '../../common_tabs/pdo/data/pdo_repository.dart';
+import '../../common_tabs/pdo/view/pdo_tab.dart';
+import '../../common_tabs/rtiview/bloc/rtiview_bloc.dart';
+import '../../common_tabs/rtiview/bloc/rtiview_event.dart';
+import '../../common_tabs/rtiview/view/rtiview_tab.dart';
+import '../../common_tabs/spareparts/bloc/spareparts_bloc.dart';
+import '../../common_tabs/spareparts/bloc/spareparts_event.dart';
+import '../../common_tabs/spareparts/data/spareparts_repository.dart';
+import '../../common_tabs/spareparts/view/sparepartsadd.dart';
+import '../../common_tabs/speedingreport/bloc/speeding_bloc.dart';
+import '../../common_tabs/speedingreport/bloc/speeding_event.dart';
+import '../../common_tabs/speedingreport/view/speedingreport_view.dart';
+import '../../common_tabs/spotsaleorder/bloc/spotsaleorder_bloc.dart';
+import '../../common_tabs/spotsaleorder/data/spotsale_repository.dart';
+import '../../common_tabs/spotsaleorder/view/spotsaleorder_add.dart';
+import '../../common_tabs/truck/bloc/truck_bloc.dart';
+import '../../common_tabs/truck/view/truckview_tab.dart';
+import '../../common_tabs/vesselreport/bloc/vesselreport_bloc.dart';
+import '../../common_tabs/vesselreport/bloc/vesselreport_event.dart';
+import '../../common_tabs/vesselreport/view/vesselreportview_tab.dart';
 import '../bloc/operationadmin_dashboard_bloc.dart';
 import '../bloc/operationadmin_dashboard_event.dart';
 import 'operationadmin_dashboard_ui.dart';
-import 'package:maleva/features/dashboard/admin_dashboard/tabs/driverleave/bloc/leave_bloc.dart';
+import 'package:maleva/features/dashboard/common_tabs/driverleave/bloc/leave_bloc.dart';
 
 class OperationAdminDashboard extends StatefulWidget{
   const OperationAdminDashboard({super.key});
@@ -83,12 +81,6 @@ class _AdminDashboardState extends State<OperationAdminDashboard> with SingleTic
       providers: [
             BlocProvider<OperationAdminTabBloc>(
               create: (_) => OperationAdminTabBloc(),
-            ),
-            BlocProvider<SalesBloc>(
-              create: (_) => SalesBloc(),
-            ),
-            BlocProvider<TruckBloc>(
-              create: (_) => TruckBloc(),
             ),
 
             BlocProvider(

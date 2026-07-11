@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 import 'package:maleva/core/models/model.dart';
-import 'package:maleva/core/utils/clsfunction.dart' as objfun;
+import 'package:maleva/core/utils/app_globals.dart';
 import 'package:maleva/features/transaction/salesorder/view/data/salesorderview_repository.dart';
 import 'package:maleva/features/transaction/salesorder/view/bloc/salesorderview_event.dart';
 import 'package:maleva/features/transaction/salesorder/view/bloc/salesorderview_state.dart';
@@ -20,22 +20,22 @@ class SalesOrderViewBloc extends Bloc<SalesOrderViewEvent, SalesOrderViewState> 
     // ────────────────────────────────────────────────────
     on<StartupSalesOrderView>((event, emit) async {
       final today = DateFormat("yyyy-MM-dd").format(DateTime.now());
-      final isAdmin = objfun.storagenew.getString('RulesType') == "ADMIN";
+      final isAdmin = AppGlobals.storagenew.getString('RulesType') == "ADMIN";
 
       emit(SalesOrderViewLoading());
       try {
-        objfun.CustomerList = (await _repository.selectCustomer()).map<CustomerModel>((e) => CustomerModel.fromJson(e)).toList();
-        objfun.JobStatusList = (await _repository.selectJobStatus()).map<JobStatusModel>((e) => JobStatusModel.fromJson(e)).toList();
-        objfun.EmployeeList = (await _repository.selectEmployee('Sales', '')).map<EmployeeModel>((e) => EmployeeModel.fromJson(e)).toList();
+        AppGlobals.CustomerList = (await _repository.selectCustomer()).map<CustomerModel>((e) => CustomerModel.fromJson(e)).toList();
+        AppGlobals.JobStatusList = (await _repository.selectJobStatus()).map<JobStatusModel>((e) => JobStatusModel.fromJson(e)).toList();
+        AppGlobals.EmployeeList = (await _repository.selectEmployee('Sales', '')).map<EmployeeModel>((e) => EmployeeModel.fromJson(e)).toList();
         final combo = await _repository.loadComboS1(0);
         if (combo.isNotEmpty) {
-          objfun.ComboS1List.clear();
-          objfun.ComboS1List.add(combo["Data1"]);
-          objfun.ComboS1List.add(combo["Data2"]);
-          objfun.ComboS1List.add(combo["Data3"]);
-          objfun.ComboS1List.add(combo["Data4"]);
-          objfun.ComboS1List.add(combo["Data5"]);
-          objfun.ComboS1List.add(combo["Data6"]);
+          AppGlobals.ComboS1List.clear();
+          AppGlobals.ComboS1List.add(combo["Data1"]);
+          AppGlobals.ComboS1List.add(combo["Data2"]);
+          AppGlobals.ComboS1List.add(combo["Data3"]);
+          AppGlobals.ComboS1List.add(combo["Data4"]);
+          AppGlobals.ComboS1List.add(combo["Data5"]);
+          AppGlobals.ComboS1List.add(combo["Data6"]);
         }
         final base = SalesOrderViewLoaded(
           dtpFromDate: today,
@@ -61,10 +61,10 @@ class SalesOrderViewBloc extends Bloc<SalesOrderViewEvent, SalesOrderViewState> 
       emit(s.copyWith(progress: false));
 
       try {
-        final leEmpRefId = s.checkBoxValueLEmp ? objfun.EmpRefId : s.empId;
+        final leEmpRefId = s.checkBoxValueLEmp ? AppGlobals.EmpRefId : s.empId;
         final master = {
           'SoId': 0,
-          'Comid': objfun.storagenew.getInt('Comid') ?? 0,
+          'Comid': AppGlobals.storagenew.getInt('Comid') ?? 0,
           'Fromdate': s.dtpFromDate,
           'Todate': s.dtpToDate,
           'Id': s.custId,
@@ -83,8 +83,8 @@ class SalesOrderViewBloc extends Bloc<SalesOrderViewEvent, SalesOrderViewState> 
         };
 
         final header = {'Content-Type': 'application/json; charset=UTF-8'};
-        final resultData = await objfun.apiAllinoneSelectArray(
-          objfun.apiSelectSalesOrder, master, header, context,
+        final resultData = await AppGlobals.apiAllinoneSelectArray(
+          AppGlobals.apiSelectSalesOrder, master, header, context,
         );
 
         if (resultData != "" && resultData.length != 0) {
@@ -96,8 +96,8 @@ class SalesOrderViewBloc extends Bloc<SalesOrderViewEvent, SalesOrderViewState> 
               .toList();
 
           // Update global lists too (for compatibility)
-          objfun.SaleOrderMasterList = masterList;
-          objfun.SaleOrderDetailList = detailList;
+          AppGlobals.SaleOrderMasterList = masterList;
+          AppGlobals.SaleOrderDetailList = detailList;
 
           emit(s.copyWith(
             masterList: masterList,
@@ -228,17 +228,17 @@ class SalesOrderViewBloc extends Bloc<SalesOrderViewEvent, SalesOrderViewState> 
       emit(s.copyWith(progress: false));
 
       try {
-        final master = {'SoId': event.id, 'Comid': objfun.Comid};
+        final master = {'SoId': event.id, 'Comid': AppGlobals.Comid};
         final header = {'Content-Type': 'application/json; charset=UTF-8'};
-        final resultData = await objfun.apiAllinoneSelectArray(
-          "${objfun.apiViewDOConvert}${event.billNo}",
+        final resultData = await AppGlobals.apiAllinoneSelectArray(
+          "${AppGlobals.apiViewDOConvert}${event.billNo}",
           master, header, context,
         );
 
         if (resultData != "") {
           final value = ResponseViewModel.fromJson(resultData);
           if (value.IsSuccess == true) {
-            objfun.launchInBrowser(value.data1);
+            AppGlobals.launchInBrowser(value.data1);
           }
         }
       } catch (_) {}

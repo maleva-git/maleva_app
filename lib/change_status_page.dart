@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:maleva/core/utils/clsfunction.dart' as objfun;
-import 'core/utils/clsfunction.dart';
+import 'package:maleva/core/utils/app_globals.dart';
+import 'package:maleva/core/utils/app_globals.dart';
 import 'core/models/model.dart';
 
 class ChangeStatusPage extends StatefulWidget {
@@ -38,8 +38,8 @@ class ChangeStatusPageState extends State<ChangeStatusPage> {
     Map<String, String> header = {
       'Content-Type': 'application/json; charset=UTF-8',
     };
-    await objfun.apiAllinoneSelectArray(
-      "${objfun.apiGeteditepettycash}${objfun.Comid}""",
+    await AppGlobals.apiAllinoneSelectArray(
+      "${AppGlobals.apiGeteditepettycash}${AppGlobals.Comid}""",
       null,
       header,
       context,
@@ -62,15 +62,15 @@ class ChangeStatusPageState extends State<ChangeStatusPage> {
         }
       }
     }).onError((error, stackTrace) {
-      objfun.msgshow(
+      msgshow(
         error.toString(),
         stackTrace.toString(),
         Colors.white,
         Colors.red,
         null,
-        18.00 - objfun.reducesize,
-        objfun.tll,
-        objfun.tgc,
+        18.00 - AppGlobals.reducesize,
+        AppGlobals.tll,
+        AppGlobals.tgc,
         context,
         2,
       );

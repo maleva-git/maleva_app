@@ -2,36 +2,32 @@ import 'package:flutter/Material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
-import 'package:maleva/core/utils/clsfunction.dart' as objfun;
+import 'package:maleva/core/utils/app_globals.dart';
 import 'package:maleva/core/colors/colors.dart' as colour;
 import '../../../../core/bluetooth/view/Bluetooth_tab.dart';
 import '../../../../core/colors/colors.dart';
 import '../../../../core/models/model.dart';
 import '../../../../menu/menulist.dart';
-import '../../../common_updates/blocs/sales/sales_bloc.dart';
-import '../../../common_updates/blocs/sales/sales_event.dart';
-import '../../../common_updates/blocs/truck/truck_bloc.dart';
-import '../../../common_updates/blocs/truck/truck_event.dart';
-import '../../admin_dashboard/tabs/driver/view/driverdetails_tab.dart';
-import '../../admin_dashboard/tabs/enginehours/view/enginehours_tab.dart';
-import '../../admin_dashboard/tabs/fuel/view/fuelreport_tab.dart';
-import '../../admin_dashboard/tabs/fuelfillings/view/fuelfillings_tab.dart';
-import '../../admin_dashboard/tabs/inventoryreport/view/inventoryview_tab.dart';
-import '../../admin_dashboard/tabs/maintenance/view/maintenance_tab.dart';
-import '../../admin_dashboard/tabs/pdo/view/pdo_tab.dart';
-import '../../admin_dashboard/tabs/rtiview/view/rtiview_tab.dart';
-import '../../admin_dashboard/tabs/saleorderview/view/saleorderview_tab.dart';
-import '../../admin_dashboard/tabs/spareparts/view/sparepartsadd.dart';
-import '../../admin_dashboard/tabs/speedingreport/view/speedingreport_view.dart';
-import '../../admin_dashboard/tabs/spotsaleorder/view/spotsaleorder_add.dart';
-import '../../admin_dashboard/tabs/truck/view/truckview_tab.dart';
-import '../../admin_dashboard/tabs/vesselreport/view/vesselreportview_tab.dart';
+import '../../common_tabs/driver/view/driverdetails_tab.dart';
+import '../../common_tabs/enginehours/view/enginehours_tab.dart';
+import '../../common_tabs/fuel/view/fuelreport_tab.dart';
+import '../../common_tabs/fuelfillings/view/fuelfillings_tab.dart';
+import '../../common_tabs/inventoryreport/view/inventoryview_tab.dart';
+import '../../common_tabs/maintenance/view/maintenance_tab.dart';
+import '../../common_tabs/pdo/view/pdo_tab.dart';
+import '../../common_tabs/rtiview/view/rtiview_tab.dart';
+import '../../common_tabs/saleorderview/view/saleorderview_tab.dart';
+import '../../common_tabs/spareparts/view/sparepartsadd.dart';
+import '../../common_tabs/speedingreport/view/speedingreport_view.dart';
+import '../../common_tabs/spotsaleorder/view/spotsaleorder_add.dart';
+import '../../common_tabs/truck/view/truckview_tab.dart';
+import '../../common_tabs/vesselreport/view/vesselreportview_tab.dart';
 import '../bloc/operationadmin_dashboard_bloc.dart';
 import '../bloc/operationadmin_dashboard_state.dart';
 import 'package:maleva/core/widgets/custom_app_bar.dart';
-import 'package:maleva/features/dashboard/admin_dashboard/tabs/driverleave/view/admin_leave_approval_tab.dart';
-import 'package:maleva/features/dashboard/admin_dashboard/tabs/driverleave/view/employee_leave_request_tab.dart';
-import 'package:maleva/features/dashboard/admin_dashboard/tabs/driverleave/view/employee_leave_approval_tab.dart';
+import 'package:maleva/features/dashboard/common_tabs/driverleave/view/admin_leave_approval_tab.dart';
+import 'package:maleva/features/dashboard/common_tabs/driverleave/view/employee_leave_request_tab.dart';
+import 'package:maleva/features/dashboard/common_tabs/driverleave/view/employee_leave_approval_tab.dart';
 
 
 class MobileDashboard extends StatelessWidget {
@@ -78,7 +74,7 @@ class MobileDashboard extends StatelessWidget {
           icon: Icon(Icons.print,
               size: isTablet ? 28 : 25, ),
           onPressed: () async {
-            await objfun.printdata([
+            await printdata([
               BarcodePrintModel("MALEVA", "SHIPNAME", "SHIPNAME",
                   "B0005000", "2025-05-04", "WESTPORT", "WESTPORT", "(1/3)")
             ],
@@ -88,7 +84,7 @@ class MobileDashboard extends StatelessWidget {
         IconButton(
           icon: Icon(Icons.exit_to_app,
               size: isTablet ? 32 : 30, color: colour.topAppBarColor),
-          onPressed: () => objfun.logout(context),
+          onPressed: () => AppGlobals.logout(context),
         ),
         if (isTablet) const SizedBox(width: 8),
       ],
@@ -179,10 +175,10 @@ class MobileDashboard extends StatelessWidget {
       listener: (context, tabState) {
         switch (tabState.index) {
           case 0:
-            context.read<SalesBloc>().add(LoadSales(0));
+            
             break;
           case 6:
-            context.read<TruckBloc>().add(LoadTruckList());
+            
             break;
         }
       },

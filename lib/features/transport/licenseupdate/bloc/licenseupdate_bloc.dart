@@ -1,6 +1,6 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
-import 'package:maleva/core/utils/clsfunction.dart' as objfun;
+import 'package:maleva/core/utils/app_globals.dart';
 import 'package:maleva/core/network/OnlineApi.dart' as OnlineApi;
 import 'package:maleva/core/models/model.dart';
 
@@ -28,13 +28,13 @@ class LicenseUpdateBloc
       Emitter<LicenseUpdateState> emit) async {
     emit(LicenseUpdateLoading());
     try {
-      objfun.TruckDetailsList = [];
-      final isAdmin = objfun.DriverTruckRefId == 0;
+      AppGlobals.TruckDetailsList = [];
+      final isAdmin = AppGlobals.DriverTruckRefId == 0;
 
       if (!isAdmin) {
         // Driver login: auto-load truck
         final loaded = await _fetchAndBuild(
-            objfun.DriverTruckRefId, admin: false);
+            AppGlobals.DriverTruckRefId, admin: false);
         emit(loaded);
       } else {
         emit(LicenseUpdateLoaded.empty(admin: true));
@@ -65,8 +65,8 @@ class LicenseUpdateBloc
       Emitter<LicenseUpdateState> emit) {
     if (state is! LicenseUpdateLoaded) return;
     final s = state as LicenseUpdateLoaded;
-    objfun.TruckDetailsList = [];
-    objfun.SelectTruckList  = GetTruckModel.Empty();
+    AppGlobals.TruckDetailsList = [];
+    AppGlobals.SelectTruckList  = GetTruckModel.Empty();
     emit(LicenseUpdateLoaded.empty(admin: s.admin));
   }
 
@@ -119,7 +119,7 @@ class LicenseUpdateBloc
       final master = [
         {
           'Id':           s.truckId,
-          'CompanyRefId': objfun.Comid,
+          'CompanyRefId': AppGlobals.Comid,
           'TruckName':    s.truckNameField,
           'TruckNumber':  s.truckNo,
           'TruckNumber1': s.truckNo2,
@@ -143,8 +143,8 @@ class LicenseUpdateBloc
       ];
 
       final header = {'Content-Type': 'application/json; charset=UTF-8'};
-      final result = await objfun.apiAllinoneSelectArray(
-          '${objfun.apiUpdateTruckDetails}${objfun.Comid}',
+      final result = await AppGlobals.apiAllinoneSelectArray(
+          '${AppGlobals.apiUpdateTruckDetails}${AppGlobals.Comid}',
           master,
           header,
           null);
@@ -169,8 +169,8 @@ class LicenseUpdateBloc
       Emitter<LicenseUpdateState> emit) {
     if (state is LicenseUpdateLoaded) {
       final s = state as LicenseUpdateLoaded;
-      objfun.TruckDetailsList = [];
-      objfun.SelectTruckList  = GetTruckModel.Empty();
+      AppGlobals.TruckDetailsList = [];
+      AppGlobals.SelectTruckList  = GetTruckModel.Empty();
       emit(LicenseUpdateLoaded.empty(admin: s.admin));
     }
   }
@@ -180,12 +180,12 @@ class LicenseUpdateBloc
       int truckId, {required bool admin}) async {
     await OnlineApi.EditTruckList(null, truckId, 'Id', null);
 
-    if (objfun.TruckDetailsList.isEmpty) {
+    if (AppGlobals.TruckDetailsList.isEmpty) {
       return LicenseUpdateLoaded.empty(admin: admin)
           .copyWith(truckId: truckId);
     }
 
-    final d  = objfun.TruckDetailsList[0];
+    final d  = AppGlobals.TruckDetailsList[0];
     final fmt = DateFormat('MM/dd/yyyy HH:mm:ss');
     final today = DateFormat('yyyy-MM-dd').format(DateTime.now());
 

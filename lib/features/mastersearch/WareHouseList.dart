@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:maleva/core/colors/colors.dart' as colour;
 import 'package:maleva/core/network/OnlineApi.dart' as OnlineApi;
-import 'package:maleva/core/utils/clsfunction.dart' as objfun;
+import 'package:maleva/core/utils/app_globals.dart';
 import 'package:maleva/core/models/model.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
@@ -36,7 +36,7 @@ class _WareHousestate extends State<WareHouse> {
   Future startup() async {
     await OnlineApi.SelectWareHouse(context);
     filtersearchlist.clear();
-    filtersearchlist.addAll(objfun.WareHouseList);
+    filtersearchlist.addAll(AppGlobals.WareHouseList);
     setState(() {
       progress = true;
     });
@@ -47,10 +47,10 @@ class _WareHousestate extends State<WareHouse> {
     String vv = value.toString().toUpperCase();
     if (vv == "") {
       filtersearchlist.clear();
-      filtersearchlist.addAll(objfun.WareHouseList.toList());
+      filtersearchlist.addAll(AppGlobals.WareHouseList.toList());
     } else {
       filtersearchlist.clear();
-      filtersearchlist.addAll(objfun.WareHouseList.where((element) =>
+      filtersearchlist.addAll(AppGlobals.WareHouseList.where((element) =>
       (element.PortName.toString().contains(vv) ||
           element.PortName.toString().contains(vv.toUpperCase()))).toList());
     }
@@ -59,7 +59,7 @@ class _WareHousestate extends State<WareHouse> {
   @override
   Widget build(BuildContext context) {
     double width = MediaQuery.of(context).size.width;
-    bool isTablet = objfun.MalevaScreen != 1;
+    bool isTablet = AppGlobals.MalevaScreen != 1;
 
     return Scaffold(
       backgroundColor: const Color(0xFFF4F7FC),
@@ -73,7 +73,7 @@ class _WareHousestate extends State<WareHouse> {
             textStyle: TextStyle(
                 color: colour.topAppBarColor,
                 fontWeight: FontWeight.w700,
-                fontSize: objfun.FontLarge,
+                fontSize: AppGlobals.FontLarge,
                 letterSpacing: 0.5),
           ),
         ),

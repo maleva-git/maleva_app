@@ -2,13 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
-import 'package:maleva/core/utils/clsfunction.dart' as objfun;
+import 'package:maleva/core/utils/app_globals.dart';
 import 'package:maleva/menu/menulist.dart';
 import 'package:maleva/core/di/injection.dart';
 import 'package:maleva/features/transaction/planning/data/planning_repository.dart';
 import 'package:maleva/core/models/model.dart';
 import '../../../../core/theme/tokens.dart';
-import '../../../dashboard/admin_dashboard/tabs/planningdetailsview/view/planningdetails_tab.dart';
+import '../../../dashboard/common_tabs/planningdetailsview/view/planningdetails_tab.dart';
 import '../../../mastersearch/Employee.dart';
 import '../bloc/planning_bloc.dart';
 import '../bloc/planning_event.dart';
@@ -55,7 +55,7 @@ class _PlanningScaffold extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final userName = objfun.storagenew.getString('Username') ?? '';
+    final userName = AppGlobals.storagenew.getString('Username') ?? '';
     final isTablet = MediaQuery.of(context).size.width >= 600;
 
     return BlocListener<PlanningBloc, PlanningState>(
@@ -91,7 +91,7 @@ class _PlanningScaffold extends StatelessWidget {
                     LoadPlanningEvent(
                       fromDate: DateFormat("yyyy-MM-dd").format(DateTime.now()),
                       toDate: DateFormat("yyyy-MM-dd").format(DateTime.now()),
-                      employeeId: objfun.EmpRefId,
+                      employeeId: AppGlobals.EmpRefId,
                       employeeName: '',
                       planningNo: '',
                       checkLoggedEmp: true,
@@ -514,11 +514,11 @@ class _FilterFab extends StatelessWidget {
                     suffixIcon: Icon(empController.text.isNotEmpty ? Icons.close_rounded : Icons.search_rounded, color: checkLoggedEmp ? AppTokens.planTextMuted : colour.kCobalt),
                     onSuffixTap: checkLoggedEmp ? null : () async {
                       if (empController.text.isEmpty) {
-                        await sl<PlanningRepository>().selectEmployee(context, 'sales', 'admin'); if (!context.mounted) return;Navigator.push(context, MaterialPageRoute(builder: (_) => const Employee(Searchby: 1, SearchId: 0))).then((_navRes) { if (_navRes != null) { objfun.SelectEmployeeList = _navRes; }
+                        await sl<PlanningRepository>().selectEmployee(context, 'sales', 'admin'); if (!context.mounted) return;Navigator.push(context, MaterialPageRoute(builder: (_) => const Employee(Searchby: 1, SearchId: 0))).then((_navRes) { if (_navRes != null) { AppGlobals.SelectEmployeeList = _navRes; }
                           setSheetState(() {
-                            empController.text = objfun.SelectEmployeeList.AccountName;
-                            empId = objfun.SelectEmployeeList.Id;
-                            objfun.SelectEmployeeList = EmployeeModel.Empty();
+                            empController.text = AppGlobals.SelectEmployeeList.AccountName;
+                            empId = AppGlobals.SelectEmployeeList.Id;
+                            AppGlobals.SelectEmployeeList = EmployeeModel.Empty();
                           });
                         });
                       } else {
@@ -554,7 +554,7 @@ class _FilterFab extends StatelessWidget {
                       child: ElevatedButton(
                         onPressed: () {
                           Navigator.pop(sheetCtx);
-                          final resolvedEmpId = checkLoggedEmp ? objfun.EmpRefId : empId;
+                          final resolvedEmpId = checkLoggedEmp ? AppGlobals.EmpRefId : empId;
                           // FIX 3: Event-ku proper ah current values anuppura logic
                           bloc.add(LoadPlanningEvent(
                             fromDate: fromDate,

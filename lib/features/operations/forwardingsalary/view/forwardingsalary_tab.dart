@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:maleva/core/utils/clsfunction.dart' as objfun;
+import 'package:maleva/core/utils/app_globals.dart';
 import 'package:maleva/core/network/OnlineApi.dart' as OnlineApi;
 import 'package:maleva/core/models/model.dart';
 import 'package:maleva/menu/menulist.dart';
@@ -52,12 +52,12 @@ class _ForwardingSalaryPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final userName = objfun.storagenew.getString('Username') ?? '';
+    final userName = AppGlobals.storagenew.getString('Username') ?? '';
 
     return BlocListener<ForwardingSalaryBloc, ForwardingSalaryState>(
       listener: (context, state) async {
         if (state is ForwardingSalarySaveSuccess) {
-          await objfun.ConfirmationOK('Saved Successfully', context);
+          await ConfirmationOK('Saved Successfully', context);
         }
         if (state is ForwardingSalaryError) {
           ScaffoldMessenger.of(context).showSnackBar(
@@ -150,12 +150,11 @@ class _ForwardingSalaryPage extends StatelessWidget {
               if (s.sealEmpName.isEmpty ||
                   s.breakEmpName.isEmpty ||
                   s.rtiText.isEmpty) {
-                objfun.toastMsg(
+                toastMsg(
                     'Please fill all required fields', '', context);
                 return;
               }
-              objfun
-                  .ConfirmationMsgYesNo(
+              ConfirmationMsgYesNo(
                   context, 'Are you sure to Save?')
                   .then((ok) {
                 if (ok == true) {
@@ -344,13 +343,14 @@ class _ForwardingSalaryBody extends StatelessWidget {
       context,
       MaterialPageRoute(
           builder: (_) => const Employee(Searchby: 1, SearchId: 0)),
-    ).then((_) {
-      final sel = objfun.SelectEmployeeList;
+    ).then((_navRes) {
+      if (_navRes != null) { AppGlobals.SelectEmployeeList = _navRes; }
+      final sel = AppGlobals.SelectEmployeeList;
       if (sel.Id != 0) {
         context.read<ForwardingSalaryBloc>().add(
             ForwardingSalarySealEmpChanged(
                 empId: sel.Id, empName: sel.AccountName));
-        objfun.SelectEmployeeList = EmployeeModel.Empty();
+        AppGlobals.SelectEmployeeList = EmployeeModel.Empty();
       }
     });
   }
@@ -361,13 +361,14 @@ class _ForwardingSalaryBody extends StatelessWidget {
       context,
       MaterialPageRoute(
           builder: (_) => const Employee(Searchby: 1, SearchId: 0)),
-    ).then((_) {
-      final sel = objfun.SelectEmployeeList;
+    ).then((_navRes) {
+      if (_navRes != null) { AppGlobals.SelectEmployeeList = _navRes; }
+      final sel = AppGlobals.SelectEmployeeList;
       if (sel.Id != 0) {
         context.read<ForwardingSalaryBloc>().add(
             ForwardingSalaryBreakEmpChanged(
                 empId: sel.Id, empName: sel.AccountName));
-        objfun.SelectEmployeeList = EmployeeModel.Empty();
+        AppGlobals.SelectEmployeeList = EmployeeModel.Empty();
       }
     });
   }
@@ -429,12 +430,12 @@ class _RtiFieldState extends State<_RtiField> {
           style: GoogleFonts.lato(
               color: kTextDark,
               fontWeight: FontWeight.w600,
-              fontSize: isTablet ? objfun.FontLow + 1 : objfun.FontLow),
+              fontSize: isTablet ? AppGlobals.FontLow + 1 : AppGlobals.FontLow),
           decoration: InputDecoration(
             hintText: 'RTI No',
             hintStyle: GoogleFonts.lato(
                 color: kTextMuted,
-                fontSize: isTablet ? objfun.FontLow + 1 : objfun.FontLow),
+                fontSize: isTablet ? AppGlobals.FontLow + 1 : AppGlobals.FontLow),
             filled: true,
             fillColor: kDetailBg,
             prefixIcon: const Icon(Icons.tag_rounded,
@@ -516,8 +517,8 @@ class _RtiFieldState extends State<_RtiField> {
                                 color: kTextDark,
                                 fontWeight: FontWeight.w600,
                                 fontSize: isTablet
-                                    ? objfun.FontLow + 1
-                                    : objfun.FontLow)),
+                                    ? AppGlobals.FontLow + 1
+                                    : AppGlobals.FontLow)),
                       ],
                     ),
                   ),
@@ -640,7 +641,7 @@ class _RadioOption extends StatelessWidget {
                 color: selected ? kHeaderGradStart : kTextMid,
                 fontWeight: FontWeight.w700,
                 fontSize:
-                isTablet ? objfun.FontMedium + 1 : objfun.FontMedium,
+                isTablet ? AppGlobals.FontMedium + 1 : AppGlobals.FontMedium,
               ),
             ),
           ],
@@ -663,7 +664,7 @@ class _FieldLabel extends StatelessWidget {
         style: GoogleFonts.lato(
             color: kTextMid,
             fontWeight: FontWeight.w600,
-            fontSize: isTablet ? objfun.FontLow + 1 : objfun.FontLow));
+            fontSize: isTablet ? AppGlobals.FontLow + 1 : AppGlobals.FontLow));
   }
 }
 
@@ -703,7 +704,7 @@ class _EmpSearchField extends StatelessWidget {
                   color: value.isEmpty ? kTextMuted : kTextDark,
                   fontWeight:
                   value.isEmpty ? FontWeight.w500 : FontWeight.w600,
-                  fontSize: isTablet ? objfun.FontLow + 1 : objfun.FontLow,
+                  fontSize: isTablet ? AppGlobals.FontLow + 1 : AppGlobals.FontLow,
                 ),
                 overflow: TextOverflow.ellipsis,
               ),
@@ -774,13 +775,13 @@ class _FSTextFieldState extends State<_FSTextField> {
       style: GoogleFonts.lato(
           color: kTextDark,
           fontWeight: FontWeight.w600,
-          fontSize: widget.isTablet ? objfun.FontLow + 1 : objfun.FontLow),
+          fontSize: widget.isTablet ? AppGlobals.FontLow + 1 : AppGlobals.FontLow),
       decoration: InputDecoration(
         hintText: widget.hint,
         hintStyle: GoogleFonts.lato(
             color: kTextMuted,
             fontSize:
-            widget.isTablet ? objfun.FontLow + 1 : objfun.FontLow),
+            widget.isTablet ? AppGlobals.FontLow + 1 : AppGlobals.FontLow),
         filled: true,
         fillColor: kDetailBg,
         contentPadding:
@@ -828,7 +829,7 @@ class _AppBarButton extends StatelessWidget {
                 style: GoogleFonts.lato(
                     color: Colors.white,
                     fontWeight: FontWeight.w700,
-                    fontSize: objfun.FontMedium)),
+                    fontSize: AppGlobals.FontMedium)),
           ),
         ),
       ),

@@ -5,7 +5,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-import 'package:maleva/core/utils/clsfunction.dart';
+import 'package:maleva/core/utils/app_globals.dart';
 import 'dart:io' show File, Platform;
 import 'package:http/http.dart' as http;
 import 'package:path_provider/path_provider.dart';
@@ -96,7 +96,7 @@ class LocalNotificationService {
           largeIconPath = null;
         }
 
-          print_(largeIconPath);
+          AppGlobals.print_(largeIconPath);
 
 
         DarwinNotificationDetails iOSPlatformChannelSpecifics = DarwinNotificationDetails(
@@ -161,8 +161,8 @@ class LocalNotificationService {
             summaryText: message.notification!.body,
           );
         }
-        AndroidNotificationDetails androidPlatformChannelSpecifics = AndroidNotificationDetails(channelId, channelName,
-            // objfun.channelDescription,
+        AndroidNotificationDetails androidPlatformChannelSpecifics = AndroidNotificationDetails(AppGlobals.channelId, AppGlobals.channelName,
+            // AppGlobals.channelDescription,
             importance: Importance.max,
             priority: Priority.high,
             playSound: true,
@@ -186,7 +186,7 @@ class LocalNotificationService {
       }
     } on Exception catch (e) {
 
-        print_(e);
+        AppGlobals.print_(e);
 
     }
   }

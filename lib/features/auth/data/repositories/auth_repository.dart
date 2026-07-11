@@ -4,7 +4,7 @@ import 'dart:convert';
 import 'package:maleva/core/models/model.dart';
 import 'package:maleva/core/network/api_services/auth_api.dart';
 import 'package:maleva/core/utils/app_preferences.dart';
-import 'package:maleva/core/utils/clsfunction.dart' as objfun;
+import 'package:maleva/core/utils/app_globals.dart';
 
 class AuthRepository {
   final AuthApi authApi;
@@ -22,7 +22,7 @@ class AuthRepository {
       String fcmToken = AppPreferences.getFcmToken();
       if (fcmToken.isEmpty) {
         try {
-          await objfun.getDeviceToken()
+          await AppGlobals.getDeviceToken()
               .timeout(const Duration(seconds: 5), onTimeout: () {});
           fcmToken = AppPreferences.getFcmToken(); // retry after fetch
         } catch (_) {
@@ -73,8 +73,8 @@ class AuthRepository {
     final comid = data['Comid'] ?? 0;
     final mComid = data['MComid'] ?? 0;
 
-    objfun.selectedCompanyName = data['CompanyName'] ?? '';
-    objfun.EmpRefId = idNew;
+    AppGlobals.selectedCompanyName = data['CompanyName'] ?? '';
+    AppGlobals.EmpRefId = idNew;
 
     await AppPreferences.setEmpRefId(idNew);
     await AppPreferences.setEnquiryOpen('false');
@@ -88,36 +88,36 @@ class AuthRepository {
     await AppPreferences.setRoleId(data['role_id'] ?? 0);
     await AppPreferences.setPermissionId(data['PermisionId'] ?? 0);
 
-    objfun.Comid = comid;
-    objfun.DriverTruckRefId = data['TruckRefId'] ?? 0;
-    objfun.DriverTruckName  = data['TruckName'] ?? '';
+    AppGlobals.Comid = comid;
+    AppGlobals.DriverTruckRefId = data['TruckRefId'] ?? 0;
+    AppGlobals.DriverTruckName  = data['TruckName'] ?? '';
 
     // Menu data caching logic
     if (oldUsername.isEmpty) {
       final menudata = value.data3 ?? [];
       if (menudata.isNotEmpty) {
-        objfun.objMenuMaster.clear();
-        objfun.parentclass.clear();
+        AppGlobals.objMenuMaster.clear();
+        AppGlobals.parentclass.clear();
         await AppPreferences.setLoadMenu(json.encode(menudata));
         for (var item in menudata) {
-          objfun.objMenuMaster.add(MenuMasterModel.fromJson(item));
+          AppGlobals.objMenuMaster.add(MenuMasterModel.fromJson(item));
         }
-        objfun.parentclass.addAll(
-          objfun.objMenuMaster.where((e) => e.ParentId == 0),
+        AppGlobals.parentclass.addAll(
+          AppGlobals.objMenuMaster.where((e) => e.ParentId == 0),
         );
       }
     } else {
       final temp = AppPreferences.getLoadMenu();
       if (temp.isNotEmpty && temp != 'null') {
         final menudata = json.decode(temp) as List;
-        objfun.objMenuMaster.clear();
-        objfun.parentclass.clear();
+        AppGlobals.objMenuMaster.clear();
+        AppGlobals.parentclass.clear();
         for (var item in menudata) {
           if (item['FormText'] == null) continue;
-          objfun.objMenuMaster.add(MenuMasterModel.fromJson(item));
+          AppGlobals.objMenuMaster.add(MenuMasterModel.fromJson(item));
         }
-        objfun.parentclass.addAll(
-          objfun.objMenuMaster.where((e) => e.ParentId == 0),
+        AppGlobals.parentclass.addAll(
+          AppGlobals.objMenuMaster.where((e) => e.ParentId == 0),
         );
       }
     }

@@ -7,20 +7,18 @@ import 'package:maleva/core/colors/colors.dart' as colour;
 import 'package:maleva/menu/menulist.dart';
 import '../../../../core/bluetooth/view/Bluetooth_tab.dart';
 import '../../../../core/models/model.dart';
-import '../../../../core/utils/clsfunction.dart' as objfun;
-import '../../../common_updates/blocs/sales/sales_bloc.dart';
-import '../../../common_updates/blocs/sales/sales_event.dart';
-import '../../admin_dashboard/tabs/airfreightsales/view/airfreightsales_tab.dart';
-import '../../admin_dashboard/tabs/enquiry/view/view/enquiry_tab.dart';
-import '../../admin_dashboard/tabs/fuel/view/fuelreport_tab.dart';
-import '../../admin_dashboard/tabs/paymentview/view/paymentview_tab.dart';
-import '../../admin_dashboard/tabs/saleorderview/view/saleorderview_tab.dart';
-import '../../admin_dashboard/tabs/transport/view/transportview_tab.dart';
-import '../../admin_dashboard/tabs/vesselreport/view/vesselreportview_tab.dart';
-import '../../admin_dashboard/tabs/driverleave/view/admin_leave_approval_tab.dart';
+import 'package:maleva/core/utils/app_globals.dart';
+import '../../common_tabs/airfreightsales/view/airfreightsales_tab.dart';
+import '../../common_tabs/enquiry/view/view/enquiry_tab.dart';
+import '../../common_tabs/fuel/view/fuelreport_tab.dart';
+import '../../common_tabs/paymentview/view/paymentview_tab.dart';
+import '../../common_tabs/saleorderview/view/saleorderview_tab.dart';
+import '../../common_tabs/transport/view/transportview_tab.dart';
+import '../../common_tabs/vesselreport/view/vesselreportview_tab.dart';
+import '../../common_tabs/driverleave/view/admin_leave_approval_tab.dart';
 import '../bloc/sales_bloc.dart';
 import '../bloc/sales_state.dart';
-import 'package:maleva/features/dashboard/admin_dashboard/tabs/driverleave/view/employee_leave_request_tab.dart';
+import 'package:maleva/features/dashboard/common_tabs/driverleave/view/employee_leave_request_tab.dart';
 class SalesDashboardView extends StatelessWidget {
   final TabController tabController;
   final bool isTablet;
@@ -64,7 +62,7 @@ class SalesDashboardView extends StatelessWidget {
           icon: Icon(Icons.print,
               size: isTablet ? 28 : 25),
           onPressed: () async {
-            await objfun.printdata([
+            await printdata([
               BarcodePrintModel("MALEVA", "SHIPNAME", "SHIPNAME",
                   "B0005000", "2025-05-04", "WESTPORT", "WESTPORT", "(1/3)")
             ]);
@@ -73,7 +71,7 @@ class SalesDashboardView extends StatelessWidget {
         IconButton(
           icon: Icon(Icons.exit_to_app,
               size: isTablet ? 32 : 30),
-          onPressed: () => objfun.logout(context),
+          onPressed: () => AppGlobals.logout(context),
         ),
         if (isTablet) const SizedBox(width: 8),
       ],

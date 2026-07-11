@@ -1,7 +1,7 @@
 import 'package:maleva/core/models/model.dart';
 import 'package:maleva/core/network/api_client.dart';
 import 'package:maleva/core/utils/app_preferences.dart';
-import 'package:maleva/core/utils/clsfunction.dart' as objfun;
+import 'package:maleva/core/utils/app_globals.dart';
 
 import '../../../../core/network/api_constants.dart';
 
@@ -10,15 +10,15 @@ class FWUpdateRepository {
   final int empRefId = AppPreferences.getEmpRefId();
 
   Future<List<dynamic>> fetchJobNoList() async {
-    final result = await ApiClient.postRequest("${objfun.apiGetJobNo}$comid&JobType=3", null);
+    final result = await ApiClient.postRequest("${AppGlobals.apiGetJobNo}$comid&JobType=3", null);
     return result is List ? result : [];
   }
 
   Future<Map<String, dynamic>> fetchJobDetailsAndEmployees(int saleOrderId) async {
 
-    final masterRes = await ApiClient.postRequest("${objfun.apiEditSalesOrder}$saleOrderId&CNumber=0", null);
+    final masterRes = await ApiClient.postRequest("${AppGlobals.apiEditSalesOrder}$saleOrderId&CNumber=0", null);
 
-    final empRes = await ApiClient.postRequest("${objfun.apiSelectEmployee}$comid&AccountName=&Type=Operation", null);
+    final empRes = await ApiClient.postRequest("${AppGlobals.apiSelectEmployee}$comid&AccountName=&Type=Operation", null);
 
     return {
       'master': (masterRes != null && masterRes is List && masterRes.isNotEmpty) ? masterRes[0] : null,
@@ -27,7 +27,7 @@ class FWUpdateRepository {
   }
   Future<List<String>> fetchImages(int saleOrderId, String smkKey) async {
     final imageDir = '/Upload/$comid/SalesOrder/$saleOrderId/$smkKey/';
-    final result = await ApiClient.postRequest('${objfun.apiGetimage}$imageDir', null);
+    final result = await ApiClient.postRequest('${AppGlobals.apiGetimage}$imageDir', null);
 
     List<String> images = [];
     if (result != null && result is List) {
@@ -45,7 +45,7 @@ class FWUpdateRepository {
       'SubFolderName': smkUpload,
     };
 
-    final result = await ApiClient.postRequest(objfun.apiDeleteimage, null, headers: header);
+    final result = await ApiClient.postRequest(AppGlobals.apiDeleteimage, null, headers: header);
     return result != null ? ResponseViewModel.fromJson(result) : null;
   }
 

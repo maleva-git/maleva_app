@@ -3,7 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
-import 'package:maleva/core/utils/clsfunction.dart' as objfun;
+import 'package:maleva/core/utils/app_globals.dart';
 import 'package:maleva/menu/menulist.dart';
 import '../../view/bloc/fuelentryview_bloc.dart';
 import '../../view/bloc/fuelentryview_event.dart';
@@ -53,12 +53,12 @@ class _FuelEntryPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final userName =
-        objfun.storagenew.getString('Username') ?? '';
+        AppGlobals.storagenew.getString('Username') ?? '';
 
     return BlocListener<FuelEntryBloc, FuelEntryState>(
       listener: (context, state) async {
         if (state is FuelEntrySaveSuccess) {
-          await objfun.ConfirmationOK(
+          await ConfirmationOK(
               'Saved Successfully', context);
         }
         if (state is FuelEntryError) {
@@ -297,17 +297,16 @@ class _FuelEntryCard extends StatelessWidget {
                     .state;
                 if (s is! FuelEntryLoaded) return;
                 if (s.liter.isEmpty) {
-                  objfun.toastMsg(
+                  toastMsg(
                       'Enter Liter', '', context);
                   return;
                 }
                 if (s.amount.isEmpty) {
-                  objfun.toastMsg(
+                  toastMsg(
                       'Enter Amount', '', context);
                   return;
                 }
-                objfun
-                    .ConfirmationMsgYesNo(context,
+                ConfirmationMsgYesNo(context,
                     'Do You Want to Save Fuel Entry ?')
                     .then((ok) {
                   if (ok == true) {
@@ -346,12 +345,12 @@ class _TruckBanner extends StatelessWidget {
           const SizedBox(width: 10),
           Expanded(
             child: Text(
-              'Truck: ${objfun.DriverTruckName}',
+              'Truck: ${AppGlobals.DriverTruckName}',
               style: GoogleFonts.lato(
                 color: Colors.white,
                 fontWeight: FontWeight.w700,
                 fontSize:
-                isTablet ? objfun.FontLarge : objfun.FontMedium,
+                isTablet ? AppGlobals.FontLarge : AppGlobals.FontMedium,
                 letterSpacing: 0.3,
               ),
               overflow: TextOverflow.ellipsis,
@@ -388,7 +387,7 @@ class _FormRow extends StatelessWidget {
               style: GoogleFonts.lato(
                 color: kTextMid,
                 fontWeight: FontWeight.w600,
-                fontSize: objfun.FontLow + 1,
+                fontSize: AppGlobals.FontLow + 1,
               ),
             ),
           ),
@@ -405,7 +404,7 @@ class _FormRow extends StatelessWidget {
             style: GoogleFonts.lato(
                 color: kTextMid,
                 fontWeight: FontWeight.w600,
-                fontSize: objfun.FontLow)),
+                fontSize: AppGlobals.FontLow)),
         const SizedBox(height: 5),
         child,
       ],
@@ -437,8 +436,8 @@ class _ReadonlyField extends StatelessWidget {
           color: kHeaderGradStart,
           fontWeight: FontWeight.w700,
           fontSize: isTablet
-              ? objfun.FontLow + 1
-              : objfun.FontLow,
+              ? AppGlobals.FontLow + 1
+              : AppGlobals.FontLow,
           letterSpacing: 0.5,
         ),
       ),
@@ -507,8 +506,8 @@ class _DateField extends StatelessWidget {
                   color: kTextDark,
                   fontWeight: FontWeight.w600,
                   fontSize: isTablet
-                      ? objfun.FontLow + 1
-                      : objfun.FontLow,
+                      ? AppGlobals.FontLow + 1
+                      : AppGlobals.FontLow,
                 ),
               ),
             ),
@@ -575,16 +574,16 @@ class _NumberFieldState extends State<_NumberField> {
         color: kTextDark,
         fontWeight: FontWeight.w600,
         fontSize: widget.isTablet
-            ? objfun.FontLow + 1
-            : objfun.FontLow,
+            ? AppGlobals.FontLow + 1
+            : AppGlobals.FontLow,
       ),
       decoration: InputDecoration(
         hintText: widget.hint,
         hintStyle: GoogleFonts.lato(
             color: kTextMuted,
             fontSize: widget.isTablet
-                ? objfun.FontLow + 1
-                : objfun.FontLow),
+                ? AppGlobals.FontLow + 1
+                : AppGlobals.FontLow),
         filled: true,
         fillColor: kDetailBg,
         contentPadding: const EdgeInsets.symmetric(
@@ -642,8 +641,8 @@ class _SaveButton extends StatelessWidget {
                 color: Colors.white,
                 fontWeight: FontWeight.w700,
                 fontSize: isTablet
-                    ? objfun.FontMedium + 1
-                    : objfun.FontMedium,
+                    ? AppGlobals.FontMedium + 1
+                    : AppGlobals.FontMedium,
               ),
             ),
           ),
@@ -682,7 +681,7 @@ class _AppBarButton extends StatelessWidget {
                 style: GoogleFonts.lato(
                     color: Colors.white,
                     fontWeight: FontWeight.w700,
-                    fontSize: objfun.FontMedium)),
+                    fontSize: AppGlobals.FontMedium)),
           ),
         ),
       ),

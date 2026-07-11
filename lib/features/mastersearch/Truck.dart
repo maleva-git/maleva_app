@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:maleva/core/models/model.dart';
-import 'package:maleva/core/utils/clsfunction.dart' as objfun;
+import 'package:maleva/core/utils/app_globals.dart';
 import 'package:maleva/core/colors/colors.dart' as colour;
 import 'package:maleva/core/network/OnlineApi.dart' as OnlineApi;
 import 'package:flutter_spinkit/flutter_spinkit.dart';
@@ -36,7 +36,7 @@ class _Truckstate extends State<Truck> {
   Future startup() async {
     await OnlineApi.SelectTruckList(context,null);
     filtersearchlist.clear();
-    filtersearchlist.addAll(objfun.GetTruckList);
+    filtersearchlist.addAll(AppGlobals.GetTruckList);
     setState(() {
       progress = true;
     });
@@ -47,10 +47,10 @@ class _Truckstate extends State<Truck> {
     String vv = value.toString().toUpperCase();
     if (vv == "") {
       filtersearchlist.clear();
-      filtersearchlist.addAll(objfun.GetTruckList.toList());
+      filtersearchlist.addAll(AppGlobals.GetTruckList.toList());
     } else {
       filtersearchlist.clear();
-      filtersearchlist.addAll(objfun.GetTruckList.where((element) =>
+      filtersearchlist.addAll(AppGlobals.GetTruckList.where((element) =>
       (element.AccountName.toString().contains(vv) ||
           element.AccountName.toString().contains(vv.toUpperCase()))).toList());
     }
@@ -59,7 +59,7 @@ class _Truckstate extends State<Truck> {
   @override
   Widget build(BuildContext context) {
     double width = MediaQuery.of(context).size.width;
-    bool isTablet = objfun.MalevaScreen != 1;
+    bool isTablet = AppGlobals.MalevaScreen != 1;
 
     return Scaffold(
       backgroundColor: const Color(0xFFF4F7FC), // Soft modern background
@@ -73,7 +73,7 @@ class _Truckstate extends State<Truck> {
             textStyle: TextStyle(
                 color: colour.topAppBarColor,
                 fontWeight: FontWeight.w700,
-                fontSize: objfun.FontLarge,
+                fontSize: AppGlobals.FontLarge,
                 letterSpacing: 0.5),
           ),
         ),
@@ -175,7 +175,7 @@ class _Truckstate extends State<Truck> {
                                       borderRadius: BorderRadius.circular(12),
                                       onTap: () {
                                         if (widget.Searchby == 1) {
-                                          objfun.SelectTruckList = truck;
+                                          AppGlobals.SelectTruckList = truck;
                                           Navigator.of(context, rootNavigator: true).pop(truck);
                                         }
                                       },

@@ -3,12 +3,12 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
-import 'package:maleva/core/utils/clsfunction.dart' as objfun;
+import 'package:maleva/core/utils/app_globals.dart';
 import 'package:maleva/core/network/OnlineApi.dart' as OnlineApi;
 import 'package:maleva/core/models/model.dart';
 import 'package:maleva/menu/menulist.dart';
 import '../../../../core/theme/tokens.dart';
-import '../../../dashboard/admin_dashboard/tabs/transportDB/view/transportdb_tab.dart';
+import '../../../dashboard/common_tabs/transportDB/view/transportdb_tab.dart';
 import '../../../dashboard/admin_dashboard/view/admin_dashboard.dart';
 import '../../../dashboard/airfreight_dashboard/view/airfreight_dashboard.dart';
 import '../../../dashboard/boarding_dashboard/view/boarding_dashboard.dart';
@@ -42,7 +42,7 @@ class _PreAlertPage extends StatelessWidget {
     const reportName = 'PreAlertReport';
     final master = {
       'SoId':                0,
-      'Comid':               objfun.storagenew.getInt('Comid') ?? 0,
+      'Comid':               AppGlobals.storagenew.getInt('Comid') ?? 0,
       'Fromdate':            s.fromDate,
       'Todate':              s.toDate,
       'CustomerId':          s.custId,
@@ -60,19 +60,19 @@ class _PreAlertPage extends StatelessWidget {
       'Cons':                s.checkConsolidated,
     };
     final header = {'Content-Type': 'application/json; charset=UTF-8'};
-    final resultData = await objfun.apiAllinoneSelectArray(
-        '${objfun.apiPreAlertReport}$reportName', master, header, context);
+    final resultData = await AppGlobals.apiAllinoneSelectArray(
+        '${AppGlobals.apiPreAlertReport}$reportName', master, header, context);
 
     if (resultData != null && resultData != '') {
       final value = ResponseViewModel.fromJson(resultData);
       if (value.IsSuccess == true) {
-        objfun.launchInBrowser(value.data1);
+        AppGlobals.launchInBrowser(value.data1);
       }
     }
   }
 
   void _navigateBack(BuildContext context) {
-    final role = objfun.storagenew.getString('RulesType') ?? '';
+    final role = AppGlobals.storagenew.getString('RulesType') ?? '';
     Widget dest;
     switch (role) {
       case 'ADMIN': dest = const NewAdminDashboard(); break;
@@ -89,8 +89,8 @@ class _PreAlertPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isTablet = objfun.MalevaScreen != 1;
-    final userName = objfun.storagenew.getString('Username') ?? '';
+    final isTablet = AppGlobals.MalevaScreen != 1;
+    final userName = AppGlobals.storagenew.getString('Username') ?? '';
 
     return WillPopScope(
       onWillPop: () async {
@@ -111,8 +111,8 @@ class _PreAlertPage extends StatelessWidget {
           title: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text('Pre Alert Report', style: GoogleFonts.lato(color: Colors.white, fontWeight: FontWeight.w700, fontSize: isTablet ? objfun.FontMedium + 2 : objfun.FontMedium)),
-              Text(userName, style: GoogleFonts.lato(color: Colors.white.withOpacity(0.65), fontWeight: FontWeight.w500, fontSize: isTablet ? objfun.FontLow : objfun.FontLow - 1)),
+              Text('Pre Alert Report', style: GoogleFonts.lato(color: Colors.white, fontWeight: FontWeight.w700, fontSize: isTablet ? AppGlobals.FontMedium + 2 : AppGlobals.FontMedium)),
+              Text(userName, style: GoogleFonts.lato(color: Colors.white.withOpacity(0.65), fontWeight: FontWeight.w500, fontSize: isTablet ? AppGlobals.FontLow : AppGlobals.FontLow - 1)),
             ],
           ),
         ),
@@ -163,10 +163,10 @@ class _PreAlertPage extends StatelessWidget {
           const SizedBox(height: 12),
           _PASearchField(
             hint: 'Customer Name', value: local.custName,
-            onSearch: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const Customer(Searchby: 1, SearchId: 0))).then((_navRes) { if (_navRes != null) { objfun.SelectCustomerList = _navRes; }
-              if (objfun.SelectCustomerList.Id != 0) {
-                emit(PreAlertCustomerChanged(custId: objfun.SelectCustomerList.Id, custName: objfun.SelectCustomerList.AccountName));
-                objfun.SelectCustomerList = CustomerModel.Empty();
+            onSearch: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const Customer(Searchby: 1, SearchId: 0))).then((_navRes) { if (_navRes != null) { AppGlobals.SelectCustomerList = _navRes; }
+              if (AppGlobals.SelectCustomerList.Id != 0) {
+                emit(PreAlertCustomerChanged(custId: AppGlobals.SelectCustomerList.Id, custName: AppGlobals.SelectCustomerList.AccountName));
+                AppGlobals.SelectCustomerList = CustomerModel.Empty();
               }
             }),
             onClear: () => emit(PreAlertCustomerCleared()),
@@ -175,10 +175,10 @@ class _PreAlertPage extends StatelessWidget {
           _PASearchField(
             hint: 'Select Job Type', value: local.jobName, disabled: local.checkLEmp,
             onSearch: () async {
-              await OnlineApi.SelectJobType(context); if (!context.mounted) return;Navigator.push(context, MaterialPageRoute(builder: (_) => const JobType(Searchby: 1, SearchId: 0))).then((_navRes) { if (_navRes != null) { objfun.SelectJobTypeList = _navRes; }
-                if (objfun.SelectJobTypeList.Id != 0) {
-                  emit(PreAlertJobTypeChanged(jobId: objfun.SelectJobTypeList.Id, jobName: objfun.SelectJobTypeList.Name));
-                  objfun.SelectJobTypeList = JobTypeModel.Empty();
+              await OnlineApi.SelectJobType(context); if (!context.mounted) return;Navigator.push(context, MaterialPageRoute(builder: (_) => const JobType(Searchby: 1, SearchId: 0))).then((_navRes) { if (_navRes != null) { AppGlobals.SelectJobTypeList = _navRes; }
+                if (AppGlobals.SelectJobTypeList.Id != 0) {
+                  emit(PreAlertJobTypeChanged(jobId: AppGlobals.SelectJobTypeList.Id, jobName: AppGlobals.SelectJobTypeList.Name));
+                  AppGlobals.SelectJobTypeList = JobTypeModel.Empty();
                 }
               });
             },
@@ -188,9 +188,9 @@ class _PreAlertPage extends StatelessWidget {
           _PASearchField(
             hint: 'Select Port', value: local.portName,
             onSearch: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const Port(Searchby: 1, SearchId: 0))).then((_navRes) {
-              if (objfun.SelectedPortName.isNotEmpty) {
-                emit(PreAlertPortChanged(portId: 0, portName: objfun.SelectedPortName));
-                objfun.SelectJobStatusList = JobStatusModel.Empty();
+              if (AppGlobals.SelectedPortName.isNotEmpty) {
+                emit(PreAlertPortChanged(portId: 0, portName: AppGlobals.SelectedPortName));
+                AppGlobals.SelectJobStatusList = JobStatusModel.Empty();
               }
             }),
             onClear: () => emit(PreAlertPortCleared()),
@@ -277,7 +277,7 @@ class _PASearchField extends StatelessWidget {
         decoration: BoxDecoration(color: disabled ? const Color(0xFFF5F5F5) : colour.kDetailBg, borderRadius: BorderRadius.circular(10), border: Border.all(color: AppTokens.maintCardBorder, width: 0.5)),
         child: Row(
           children: [
-            Expanded(child: Text(value.isEmpty ? hint : value, style: GoogleFonts.lato(color: value.isEmpty ? AppTokens.planTextMuted : colour.kTextDark, fontWeight: value.isEmpty ? FontWeight.w500 : FontWeight.w600, fontSize: objfun.FontLow))),
+            Expanded(child: Text(value.isEmpty ? hint : value, style: GoogleFonts.lato(color: value.isEmpty ? AppTokens.planTextMuted : colour.kTextDark, fontWeight: value.isEmpty ? FontWeight.w500 : FontWeight.w600, fontSize: AppGlobals.FontLow))),
             Icon(value.isNotEmpty ? Icons.close_rounded : Icons.search_rounded, size: 20, color: disabled ? AppTokens.planTextMuted :AppTokens.invoiceHeaderEnd),
           ],
         ),
@@ -295,8 +295,8 @@ class _PATextField extends StatelessWidget {
     return TextField(
       controller: TextEditingController(text: value)..selection = TextSelection.collapsed(offset: value.length),
       textCapitalization: TextCapitalization.characters, textInputAction: TextInputAction.done, onChanged: onChanged,
-      style: GoogleFonts.lato(color: colour.kTextDark, fontWeight: FontWeight.w600, fontSize: objfun.FontLow),
-      decoration: InputDecoration(hintText: hint, hintStyle: GoogleFonts.lato(color: AppTokens.planTextMuted, fontSize: objfun.FontLow), filled: true, fillColor: colour.kDetailBg, contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12), border: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: BorderSide.none), enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: const BorderSide(color: AppTokens.maintCardBorder, width: 0.5)), focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: const BorderSide(color:AppTokens.invoiceHeaderEnd, width: 1.5))),
+      style: GoogleFonts.lato(color: colour.kTextDark, fontWeight: FontWeight.w600, fontSize: AppGlobals.FontLow),
+      decoration: InputDecoration(hintText: hint, hintStyle: GoogleFonts.lato(color: AppTokens.planTextMuted, fontSize: AppGlobals.FontLow), filled: true, fillColor: colour.kDetailBg, contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12), border: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: BorderSide.none), enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: const BorderSide(color: AppTokens.maintCardBorder, width: 0.5)), focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: const BorderSide(color:AppTokens.invoiceHeaderEnd, width: 1.5))),
     );
   }
 }
@@ -322,7 +322,7 @@ class _CheckboxGrid extends StatelessWidget {
                 children: [
                   AnimatedContainer(duration: const Duration(milliseconds: 180), width: 18, height: 18, decoration: BoxDecoration(gradient: item.$3 ? colour.kGradient : null, border: item.$3 ? null : Border.all(color: AppTokens.maintCardBorder, width: 1.5), borderRadius: BorderRadius.circular(5)), child: item.$3 ? const Icon(Icons.check_rounded, size: 12, color: Colors.white) : null),
                   const SizedBox(width: 6),
-                  Text(item.$2, style: GoogleFonts.lato(color: colour.kTextDark, fontWeight: FontWeight.w600, fontSize: isTablet ? objfun.FontLow + 1 : objfun.FontLow)),
+                  Text(item.$2, style: GoogleFonts.lato(color: colour.kTextDark, fontWeight: FontWeight.w600, fontSize: isTablet ? AppGlobals.FontLow + 1 : AppGlobals.FontLow)),
                 ],
               ),
             ),
@@ -339,7 +339,7 @@ class _ETARadioRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final style = GoogleFonts.lato(color: colour.kTextDark, fontWeight: FontWeight.w600, fontSize: isTablet ? objfun.FontLow + 1 : objfun.FontLow);
+    final style = GoogleFonts.lato(color: colour.kTextDark, fontWeight: FontWeight.w600, fontSize: isTablet ? AppGlobals.FontLow + 1 : AppGlobals.FontLow);
     final options = [('1', 'OETA', '1', true), ('2', 'LETA', '1', true), ('3', 'All', '2', true), ('0', 'None', 'O', false)];
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 8),
@@ -385,7 +385,7 @@ class _GradientButton extends StatelessWidget {
           borderRadius: BorderRadius.circular(12),
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 14),
-            child: Text(label, textAlign: TextAlign.center, style: GoogleFonts.lato(color: Colors.white, fontWeight: FontWeight.w700, fontSize: objfun.FontMedium + 1)),
+            child: Text(label, textAlign: TextAlign.center, style: GoogleFonts.lato(color: Colors.white, fontWeight: FontWeight.w700, fontSize: AppGlobals.FontMedium + 1)),
           ),
         ),
       ),

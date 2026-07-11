@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:maleva/core/colors/colors.dart' as colour;
-import 'package:maleva/core/utils/clsfunction.dart' as objfun;
+import 'package:maleva/core/utils/app_globals.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 
@@ -77,7 +77,7 @@ class _CargoStatusstate extends State<CargoStatus> {
 
   @override
   Widget build(BuildContext context) {
-    final bool isTablet = objfun.MalevaScreen != 1;
+    final bool isTablet = AppGlobals.MalevaScreen != 1;
     return isTablet ? _buildTabletLayout() : _buildPhoneLayout();
   }
 
@@ -128,7 +128,7 @@ class _CargoStatusstate extends State<CargoStatus> {
   AppBar _buildAppBar() {
     return AppBar(
       backgroundColor: colour.commonColor,
-      centerTitle: objfun.MalevaScreen != 1,
+      centerTitle: AppGlobals.MalevaScreen != 1,
       elevation: 0,
       title: Text(
         'Cargo Status',
@@ -136,7 +136,7 @@ class _CargoStatusstate extends State<CargoStatus> {
           textStyle: TextStyle(
             color: colour.topAppBarColor,
             fontWeight: FontWeight.bold,
-            fontSize: objfun.FontLarge,
+            fontSize: AppGlobals.FontLarge,
             letterSpacing: 0.5,
           ),
         ),
@@ -161,7 +161,7 @@ class _CargoStatusstate extends State<CargoStatus> {
           textStyle: TextStyle(
             color: colour.commonColor,
             fontWeight: FontWeight.w600,
-            fontSize: objfun.FontLow,
+            fontSize: AppGlobals.FontLow,
             letterSpacing: 0.3,
           ),
         ),
@@ -182,7 +182,7 @@ class _CargoStatusstate extends State<CargoStatus> {
             textStyle: TextStyle(
               letterSpacing: 1,
               color: Colors.grey.shade500,
-              fontSize: objfun.FontLow,
+              fontSize: AppGlobals.FontLow,
             ),
           ),
           prefixIcon: const Icon(Icons.search, color: Colors.grey),
@@ -220,7 +220,7 @@ class _CargoStatusstate extends State<CargoStatus> {
                 textStyle: TextStyle(
                   color: Colors.grey.shade600,
                   fontWeight: FontWeight.bold,
-                  fontSize: objfun.FontLow,
+                  fontSize: AppGlobals.FontLow,
                 ),
               ),
             ),
@@ -260,7 +260,7 @@ class _CargoStatusstate extends State<CargoStatus> {
                     textStyle: TextStyle(
                       color: colour.commonColor,
                       fontWeight: FontWeight.w600,
-                      fontSize: objfun.FontCardText,
+                      fontSize: AppGlobals.FontCardText,
                       letterSpacing: 0.3,
                     ),
                   ),

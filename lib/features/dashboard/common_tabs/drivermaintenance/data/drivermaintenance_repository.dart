@@ -1,0 +1,56 @@
+import 'package:flutter/foundation.dart';
+import 'package:maleva/core/models/model.dart';
+import 'package:maleva/core/network/api_client.dart';
+import 'package:maleva/core/utils/app_preferences.dart';
+import 'package:maleva/core/utils/app_globals.dart';
+
+class TruckMaintenanceRepository {
+  Future<Map<String, dynamic>> fetchTruckData() async {
+    final expDate = AppGlobals.currentdate(AppGlobals.commonexpirydays);
+    final expApadBonam = AppGlobals.currentdate(AppGlobals.apadbonamexpirydays);
+    final expServiceAlignGreece = AppGlobals.currentdate(AppGlobals.ExpServiceAligmentGreecedays);
+
+    try {
+
+      final master = {
+        'Expdate': null,
+        'ExpApadBonam': expApadBonam,
+        'ExpServiceAligmentGreece': expServiceAlignGreece,
+        'Id': AppGlobals.DriverTruckRefId,
+        'SFromDate': null,
+        'Comid': AppPreferences.getComid(),
+      };
+
+      if (kDebugMode) debugPrint("➡️ Truck Payload: $master");
+
+      final resultData = await ApiClient.postRequest(
+        AppGlobals.apiSelectTruckDetails,
+        master,
+      );
+
+      List<TruckDetailsModel> details = [];
+      if (resultData != null && resultData is List) {
+        details = resultData
+            .map((e) => TruckDetailsModel.fromJson(e as Map<String, dynamic>))
+            .toList();
+      }
+
+      return {
+        'truckDetails': details,
+        'expDate': expDate,
+        'expApadBonam': expApadBonam,
+        'expServiceAlignGreece': expServiceAlignGreece,
+      };
+    } catch (e) {
+      if (e.toString().contains('500')) {
+        return {
+          'truckDetails': <TruckDetailsModel>[],
+          'expDate': expDate,
+          'expApadBonam': expApadBonam,
+          'expServiceAlignGreece': expServiceAlignGreece,
+        };
+      }
+      throw Exception('Failed to load truck maintenance: $e');
+    }
+  }
+}

@@ -3,16 +3,16 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:maleva/features/dashboard/warehouse_dashboard/view/warehouse_dashboard_ui.dart';
 import '../../../../core/di/injection.dart';
-import '../../admin_dashboard/tabs/inventoryreport/bloc/inventoryreport_bloc.dart';
-import '../../admin_dashboard/tabs/inventoryreport/bloc/inventoryreport_event.dart';
-import '../../admin_dashboard/tabs/inventoryreport/data/inventoryreport_repository.dart';
-import '../../admin_dashboard/tabs/inventoryreport/view/inventoryview_tab.dart';
-import '../../admin_dashboard/tabs/spotsaleorder/bloc/spotsaleorder_bloc.dart';
-import '../../admin_dashboard/tabs/spotsaleorder/data/spotsale_repository.dart';
-import '../../admin_dashboard/tabs/spotsaleorder/view/spotsaleorder_add.dart';
+import '../../common_tabs/inventoryreport/bloc/inventoryreport_bloc.dart';
+import '../../common_tabs/inventoryreport/bloc/inventoryreport_event.dart';
+import '../../common_tabs/inventoryreport/data/inventoryreport_repository.dart';
+import '../../common_tabs/inventoryreport/view/inventoryview_tab.dart';
+import '../../common_tabs/spotsaleorder/bloc/spotsaleorder_bloc.dart';
+import '../../common_tabs/spotsaleorder/data/spotsale_repository.dart';
+import '../../common_tabs/spotsaleorder/view/spotsaleorder_add.dart';
 import '../bloc/warehouse_bloc.dart';
 import '../bloc/warehouse_event.dart';
-import 'package:maleva/features/dashboard/admin_dashboard/tabs/driverleave/bloc/leave_bloc.dart';
+import 'package:maleva/features/dashboard/common_tabs/driverleave/bloc/leave_bloc.dart';
 
 
 class WareHouseDashboard extends StatefulWidget{

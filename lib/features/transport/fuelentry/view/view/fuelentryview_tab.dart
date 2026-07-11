@@ -3,7 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
-import 'package:maleva/core/utils/clsfunction.dart' as objfun;
+import 'package:maleva/core/utils/app_globals.dart';
 import 'package:maleva/menu/menulist.dart';
 import '../bloc/fuelentryview_bloc.dart';
 import '../bloc/fuelentryview_event.dart';
@@ -50,7 +50,7 @@ class _FuelEntryViewPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final userName =
-        objfun.storagenew.getString('Username') ?? '';
+        AppGlobals.storagenew.getString('Username') ?? '';
 
     return BlocListener<FuelEntryViewBloc, FuelEntryViewState>(
       listener: (context, state) {
@@ -375,8 +375,8 @@ class _ViewButton extends StatelessWidget {
                       color: Colors.white,
                       fontWeight: FontWeight.w700,
                       fontSize: isTablet
-                          ? objfun.FontMedium + 1
-                          : objfun.FontMedium)),
+                          ? AppGlobals.FontMedium + 1
+                          : AppGlobals.FontMedium)),
             ),
           ),
         ),
@@ -487,7 +487,7 @@ class _FuelList extends StatelessWidget {
 
   Future<void> _confirmDelete(
       BuildContext context, Map<String, dynamic> item) async {
-    final ok = await objfun.ConfirmationMsgYesNo(
+    final ok = await ConfirmationMsgYesNo(
         context, 'Do You Want to Delete Fuel Entry ?');
     if (ok == true) {
       context
@@ -517,7 +517,7 @@ class _FuelRow extends StatelessWidget {
       color: kTextDark,
       fontWeight: FontWeight.w600,
       fontSize:
-      isTablet ? objfun.FontCardText + 1 : objfun.FontCardText,
+      isTablet ? AppGlobals.FontCardText + 1 : AppGlobals.FontCardText,
     );
 
     final liter  = (item['Aliter']  as num?)?.toStringAsFixed(2) ?? '0.00';

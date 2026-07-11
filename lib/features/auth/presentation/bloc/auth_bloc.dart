@@ -1,5 +1,5 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:maleva/core/utils/clsfunction.dart' as objfun;
+import 'package:maleva/core/utils/app_globals.dart';
 import '../../data/repositories/auth_repository.dart';
 import 'auth_event.dart';
 import 'auth_state.dart';
@@ -51,7 +51,7 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
     on<SubmitLogin>((event, emit) async {
       emit(state.copyWith(loading: true, errorMessage: ""));
 
-      String oldUserName = objfun.storagenew.getString('OldUsername') ?? "";
+      String oldUserName = AppGlobals.storagenew.getString('OldUsername') ?? "";
 
       try {
 
@@ -63,7 +63,7 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
         );
 
         if (result) {
-          String role = objfun.storagenew.getString('RulesType') ?? "";
+          String role = AppGlobals.storagenew.getString('RulesType') ?? "";
 
           emit(state.copyWith(
             loading: false,

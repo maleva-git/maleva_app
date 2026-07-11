@@ -3,7 +3,7 @@ import 'package:maleva/core/models/model.dart';
 import 'package:maleva/core/network/api_client.dart';
 import 'package:maleva/core/network/api_constants.dart';
 import 'package:maleva/core/utils/app_preferences.dart';
-import 'package:maleva/core/utils/clsfunction.dart' as objfun;
+import 'package:maleva/core/utils/app_globals.dart';
 
 class AuthApi {
   AuthApi._();
@@ -83,8 +83,8 @@ class AuthApi {
     final comid = data['Comid'] ?? 0;
     final mComid = data['MComid'] ?? 0;
 
-    objfun.selectedCompanyName = data['CompanyName'] ?? '';
-    objfun.EmpRefId = idNew;
+    AppGlobals.selectedCompanyName = data['CompanyName'] ?? '';
+    AppGlobals.EmpRefId = idNew;
 
     await AppPreferences.setEmpRefId(idNew);
     await AppPreferences.setEnquiryOpen('false');
@@ -96,37 +96,37 @@ class AuthApi {
     await AppPreferences.setMComid(mComid);
     await AppPreferences.setOldUsername(idNew.toString());
 
-    objfun.DriverLogin = driverId;
-    objfun.Comid = comid;
-    objfun.DriverTruckRefId = data['TruckRefId'] ?? 0;
-    objfun.DriverTruckName  = data['TruckName'] ?? '';
+    AppGlobals.DriverLogin = driverId;
+    AppGlobals.Comid = comid;
+    AppGlobals.DriverTruckRefId = data['TruckRefId'] ?? 0;
+    AppGlobals.DriverTruckName  = data['TruckName'] ?? '';
 
     // Menu data
     if (oldUsername.isEmpty) {
       final menudata = value.data3 ?? [];
       if (menudata.isNotEmpty) {
-        objfun.objMenuMaster.clear();
-        objfun.parentclass.clear();
+        AppGlobals.objMenuMaster.clear();
+        AppGlobals.parentclass.clear();
         await AppPreferences.setLoadMenu(json.encode(menudata));
         for (var item in menudata) {
-          objfun.objMenuMaster.add(MenuMasterModel.fromJson(item));
+          AppGlobals.objMenuMaster.add(MenuMasterModel.fromJson(item));
         }
-        objfun.parentclass.addAll(
-          objfun.objMenuMaster.where((e) => e.ParentId == 0),
+        AppGlobals.parentclass.addAll(
+          AppGlobals.objMenuMaster.where((e) => e.ParentId == 0),
         );
       }
     } else {
       final temp = AppPreferences.getLoadMenu();
       if (temp.isNotEmpty && temp != 'null') {
         final menudata = json.decode(temp) as List;
-        objfun.objMenuMaster.clear();
-        objfun.parentclass.clear();
+        AppGlobals.objMenuMaster.clear();
+        AppGlobals.parentclass.clear();
         for (var item in menudata) {
           if (item['FormText'] == null) continue;
-          objfun.objMenuMaster.add(MenuMasterModel.fromJson(item));
+          AppGlobals.objMenuMaster.add(MenuMasterModel.fromJson(item));
         }
-        objfun.parentclass.addAll(
-          objfun.objMenuMaster.where((e) => e.ParentId == 0),
+        AppGlobals.parentclass.addAll(
+          AppGlobals.objMenuMaster.where((e) => e.ParentId == 0),
         );
       }
     }

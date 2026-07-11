@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:maleva/core/colors/colors.dart' as colour;
-import 'package:maleva/core/utils/clsfunction.dart' as objfun;
+import 'package:maleva/core/utils/app_globals.dart';
 import 'package:maleva/core/network/api_client.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
@@ -44,7 +44,7 @@ class _AddressListstate extends State<AddressList> {
 
     try {
       final response = await ApiClient.postRequest(
-        '${objfun.apiSelectAddressList}${objfun.Comid}',
+        '${AppGlobals.apiSelectAddressList}${AppGlobals.Comid}',
         null,
       );
 
@@ -55,7 +55,7 @@ class _AddressListstate extends State<AddressList> {
         loaded = response.map((e) => e.toString()).toList();
       }
 
-      objfun.AddressList = loaded;
+      AppGlobals.AddressList = loaded;
 
       setState(() {
         _masterList = loaded;
@@ -94,7 +94,7 @@ class _AddressListstate extends State<AddressList> {
 
   @override
   Widget build(BuildContext context) {
-    final bool isTablet = objfun.MalevaScreen != 1;
+    final bool isTablet = AppGlobals.MalevaScreen != 1;
     return isTablet ? _buildTabletLayout() : _buildPhoneLayout();
   }
 
@@ -148,7 +148,7 @@ class _AddressListstate extends State<AddressList> {
               style: GoogleFonts.lato(
                 color: colour.commonColor,
                 fontWeight: FontWeight.bold,
-                fontSize: objfun.FontLow,
+                fontSize: AppGlobals.FontLow,
               ),
             ),
             if (_errorMsg.isNotEmpty)
@@ -160,7 +160,7 @@ class _AddressListstate extends State<AddressList> {
                   textAlign: TextAlign.center,
                   style: GoogleFonts.lato(
                     color: Colors.grey.shade600,
-                    fontSize: objfun.FontCardText,
+                    fontSize: AppGlobals.FontCardText,
                   ),
                 ),
               ),
@@ -197,7 +197,7 @@ class _AddressListstate extends State<AddressList> {
   AppBar _buildAppBar() {
     return AppBar(
       backgroundColor: colour.commonColor,
-      centerTitle: objfun.MalevaScreen != 1,
+      centerTitle: AppGlobals.MalevaScreen != 1,
       elevation: 0,
       title: Text(
         'Address List',
@@ -205,7 +205,7 @@ class _AddressListstate extends State<AddressList> {
           textStyle: TextStyle(
             color: colour.topAppBarColor,
             fontWeight: FontWeight.bold,
-            fontSize: objfun.FontLarge,
+            fontSize: AppGlobals.FontLarge,
             letterSpacing: 0.5,
           ),
         ),
@@ -230,7 +230,7 @@ class _AddressListstate extends State<AddressList> {
           textStyle: TextStyle(
             color: colour.commonColor,
             fontWeight: FontWeight.w600,
-            fontSize: objfun.FontLow,
+            fontSize: AppGlobals.FontLow,
             letterSpacing: 0.3,
           ),
         ),
@@ -251,7 +251,7 @@ class _AddressListstate extends State<AddressList> {
             textStyle: TextStyle(
               letterSpacing: 1,
               color: Colors.grey.shade500,
-              fontSize: objfun.FontLow,
+              fontSize: AppGlobals.FontLow,
             ),
           ),
           prefixIcon: const Icon(Icons.search, color: Colors.grey),
@@ -289,7 +289,7 @@ class _AddressListstate extends State<AddressList> {
                 textStyle: TextStyle(
                   color: Colors.grey.shade600,
                   fontWeight: FontWeight.bold,
-                  fontSize: objfun.FontLow,
+                  fontSize: AppGlobals.FontLow,
                 ),
               ),
             ),
@@ -327,7 +327,7 @@ class _AddressListstate extends State<AddressList> {
                     textStyle: TextStyle(
                       color: colour.commonColor,
                       fontWeight: FontWeight.w600,
-                      fontSize: objfun.FontCardText,
+                      fontSize: AppGlobals.FontCardText,
                       letterSpacing: 0.3,
                       height: 1.4,
                     ),

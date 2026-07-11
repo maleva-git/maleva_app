@@ -1,6 +1,6 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
-import 'package:maleva/core/utils/clsfunction.dart' as objfun;
+import 'package:maleva/core/utils/app_globals.dart';
 import 'package:maleva/core/network/OnlineApi.dart' as OnlineApi;
 import 'package:maleva/core/models/model.dart';
 import 'prealertview_event.dart';
@@ -67,7 +67,7 @@ class PreAlertBloc extends Bloc<PreAlertEvent, PreAlertState> {
   Future<void> _onStarted(PreAlertStarted event, Emitter<PreAlertState> emit) async {
     emit(PreAlertLoading());
     try {
-      await OnlineApi.SelectCustomer(event.context);await OnlineApi.SelectJobStatus(event.context);await OnlineApi.SelectEmployee(event.context, 'Sales', '');await OnlineApi.loadComboS1(event.context, 0);final isAdmin = objfun.storagenew.getString('RulesType') == 'ADMIN';
+      await OnlineApi.SelectCustomer(event.context);await OnlineApi.SelectJobStatus(event.context);await OnlineApi.SelectEmployee(event.context, 'Sales', '');await OnlineApi.loadComboS1(event.context, 0);final isAdmin = AppGlobals.storagenew.getString('RulesType') == 'ADMIN';
       emit(PreAlertLoaded(
         fromDate: DateFormat('yyyy-MM-dd').format(DateTime.now()),
         toDate: DateFormat('yyyy-MM-dd').format(DateTime.now()),

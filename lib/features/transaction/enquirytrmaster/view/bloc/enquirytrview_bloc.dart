@@ -1,7 +1,7 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 import 'package:maleva/core/models/model.dart';
-import 'package:maleva/core/utils/clsfunction.dart' as objfun;
+import 'package:maleva/core/utils/app_globals.dart';
 
 
 import 'package:maleva/features/transaction/enquirytrmaster/data/enquiry_repository.dart';
@@ -144,10 +144,10 @@ class EnquiryViewBloc extends Bloc<EnquiryViewEvent, EnquiryViewState> {
 
     emit(EnquiryViewLoading());
     try {
-      final empRefId = s.checkLEmp ? objfun.EmpRefId : s.empId;
+      final empRefId = s.checkLEmp ? AppGlobals.EmpRefId : s.empId;
 
       final master = {
-        'Comid':     objfun.storagenew.getInt('Comid') ?? 0,
+        'Comid':     AppGlobals.storagenew.getInt('Comid') ?? 0,
         'Fromdate':  event.useDate ? s.fromDate : null,
         'Todate':    event.useDate ? s.toDate : null,
         'Employeeid': empRefId,
@@ -164,7 +164,7 @@ class EnquiryViewBloc extends Bloc<EnquiryViewEvent, EnquiryViewState> {
         masterList = (resultData as List)
             .map((e) => EnquiryMasterModel.fromJson(e))
             .toList();
-        objfun.EnquiryMasterList = masterList;
+        AppGlobals.EnquiryMasterList = masterList;
       }
 
       emit(s.copyWith(masterList: masterList));
@@ -198,7 +198,7 @@ class EnquiryViewBloc extends Bloc<EnquiryViewEvent, EnquiryViewState> {
     if (event.index >= s.masterList.length) return;
 
     final item = s.masterList[event.index];
-    objfun.storagenew.setString('EnquiryOpen', 'true');
+    AppGlobals.storagenew.setString('EnquiryOpen', 'true');
     emit(EnquiryViewNavigateToPushSaleOrder([item]));
     emit(s);
   }
@@ -227,7 +227,7 @@ class EnquiryViewBloc extends Bloc<EnquiryViewEvent, EnquiryViewState> {
       final resultData = await _repository.getPlanningPdf(event.planningNo.toString());
       if (resultData != null && resultData != '') {
         final value = ResponseViewModel.fromJson(resultData);
-        if (value.IsSuccess == true) objfun.launchInBrowser(value.data1);
+        if (value.IsSuccess == true) AppGlobals.launchInBrowser(value.data1);
       }
     } catch (_) {}
   }

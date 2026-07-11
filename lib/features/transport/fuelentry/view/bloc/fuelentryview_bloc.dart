@@ -1,5 +1,5 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:maleva/core/utils/clsfunction.dart' as objfun;
+import 'package:maleva/core/utils/app_globals.dart';
 import 'fuelentryview_event.dart';
 import 'fuelentryview_state.dart';
 
@@ -79,8 +79,8 @@ class FuelEntryViewBloc
     emit(FuelEntryViewLoading());
     try {
       final header = {'Content-Type': 'application/json; charset=UTF-8'};
-      await objfun.apiAllinoneSelectArray(
-          '${objfun.apiDeleteFuelEntry}${event.item['Id']}'
+      await AppGlobals.apiAllinoneSelectArray(
+          '${AppGlobals.apiDeleteFuelEntry}${event.item['Id']}'
               '&Comid=${event.item['CompanyRefId']}&Mobile=1',
           {},
           header,
@@ -100,20 +100,20 @@ class FuelEntryViewBloc
     required String fromDate,
     required String toDate,
   }) async {
-    final comId = objfun.storagenew.getInt('Comid') ?? 0;
+    final comId = AppGlobals.storagenew.getInt('Comid') ?? 0;
     final master = {
       'Comid':      comId,
       'Fromdate':   fromDate,
       'Todate':     toDate,
       'Employeeid': 0,
-      'DId':        objfun.DriverTruckRefId,
-      'TId':        objfun.EmpRefId,
+      'DId':        AppGlobals.DriverTruckRefId,
+      'TId':        AppGlobals.EmpRefId,
       'Search':     '',
     };
     final header = {'Content-Type': 'application/json; charset=UTF-8'};
 
-    final result = await objfun.apiAllinoneSelectArray(
-        objfun.apiSelectFuelEntry, master, header, null);
+    final result = await AppGlobals.apiAllinoneSelectArray(
+        AppGlobals.apiSelectFuelEntry, master, header, null);
 
     if (result != '' && result.length != 0) {
       return List<dynamic>.from(result as List);

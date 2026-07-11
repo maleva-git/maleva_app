@@ -3,7 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
-import 'package:maleva/core/utils/clsfunction.dart' as objfun;
+import 'package:maleva/core/utils/app_globals.dart';
 import 'package:maleva/core/models/model.dart';
 import 'package:maleva/menu/menulist.dart';
 import '../../../../core/theme/palette.dart';
@@ -60,12 +60,12 @@ class _LicenseUpdatePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final userName =
-        objfun.storagenew.getString('Username') ?? '';
+        AppGlobals.storagenew.getString('Username') ?? '';
 
     return BlocListener<LicenseUpdateBloc, LicenseUpdateState>(
       listener: (context, state) async {
         if (state is LicenseUpdateSaveSuccess) {
-          await objfun.ConfirmationOK(
+          await ConfirmationOK(
               'Updated Successfully', context);
         }
         if (state is LicenseUpdateError) {
@@ -164,12 +164,11 @@ class _LicenseUpdatePage extends StatelessWidget {
                       .state;
                   if (s is! LicenseUpdateLoaded) return;
                   if (s.truckNo.isEmpty) {
-                    objfun.toastMsg(
+                    toastMsg(
                         'Enter Truck No', '', context);
                     return;
                   }
-                  objfun
-                      .ConfirmationMsgYesNo(context,
+                  ConfirmationMsgYesNo(context,
                       'Are you sure to Update ?')
                       .then((ok) {
                     if (ok == true) {
@@ -258,13 +257,13 @@ class _TruckSelectorField extends StatelessWidget {
                 builder: (_) =>
                 const Truck(Searchby: 1, SearchId: 0)),
           ).then((_) {
-            final sel = objfun.SelectTruckList;
+            final sel = AppGlobals.SelectTruckList;
             if (sel.Id != 0) {
               context.read<LicenseUpdateBloc>().add(
                   LicenseUpdateTruckSelected(
                       truckId: sel.Id,
                       truckName: sel.AccountName));
-              objfun.SelectTruckList =
+              AppGlobals.SelectTruckList =
                   GetTruckModel.Empty();
             }
           });
@@ -301,8 +300,8 @@ class _TruckSelectorField extends StatelessWidget {
                       ? FontWeight.w500
                       : FontWeight.w600,
                   fontSize: isTablet
-                      ? objfun.FontLow + 1
-                      : objfun.FontLow,
+                      ? AppGlobals.FontLow + 1
+                      : AppGlobals.FontLow,
                 ),
                 overflow: TextOverflow.ellipsis,
               ),
@@ -500,7 +499,7 @@ class _ExpiryDateRow extends StatelessWidget {
       color: Palette.textMid,
       fontWeight: FontWeight.w600,
       fontSize:
-      isTablet ? objfun.FontMedium + 1 : objfun.FontMedium,
+      isTablet ? AppGlobals.FontMedium + 1 : AppGlobals.FontMedium,
     );
 
     return Column(
@@ -566,8 +565,8 @@ class _ExpiryDateRow extends StatelessWidget {
                                 : Palette.kTextMuted,
                             fontWeight: FontWeight.w600,
                             fontSize: isTablet
-                                ? objfun.FontLow + 1
-                                : objfun.FontLow,
+                                ? AppGlobals.FontLow + 1
+                                : AppGlobals.FontLow,
                           ),
                         ),
                       ),
@@ -680,8 +679,8 @@ class _TruckTextFieldState extends State<_TruckTextField> {
                 color: Palette.textMid,
                 fontWeight: FontWeight.w600,
                 fontSize: widget.isTablet
-                    ? objfun.FontLow + 1
-                    : objfun.FontLow)),
+                    ? AppGlobals.FontLow + 1
+                    : AppGlobals.FontLow)),
         const SizedBox(height: 4),
         TextField(
           controller: _ctrl,
@@ -697,16 +696,16 @@ class _TruckTextFieldState extends State<_TruckTextField> {
             color: Palette.textDark2,
             fontWeight: FontWeight.w600,
             fontSize: widget.isTablet
-                ? objfun.FontLow + 1
-                : objfun.FontLow,
+                ? AppGlobals.FontLow + 1
+                : AppGlobals.FontLow,
           ),
           decoration: InputDecoration(
             hintText: widget.label,
             hintStyle: GoogleFonts.lato(
                 color: Palette.kTextMuted,
                 fontSize: widget.isTablet
-                    ? objfun.FontLow + 1
-                    : objfun.FontLow),
+                    ? AppGlobals.FontLow + 1
+                    : AppGlobals.FontLow),
             filled: true,
             fillColor: isAdmin ? Palette.grey200p : const Color(0xFFEEEEEE),
             contentPadding: const EdgeInsets.symmetric(
@@ -790,7 +789,7 @@ class _AppBarButton extends StatelessWidget {
                 style: GoogleFonts.lato(
                     color: Colors.white,
                     fontWeight: FontWeight.w700,
-                    fontSize: objfun.FontMedium)),
+                    fontSize: AppGlobals.FontMedium)),
           ),
         ),
       ),

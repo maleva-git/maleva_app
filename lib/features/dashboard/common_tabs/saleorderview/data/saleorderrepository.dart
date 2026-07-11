@@ -1,0 +1,21 @@
+
+
+import '../../../../../core/network/api_client.dart';
+import 'package:maleva/core/utils/app_globals.dart';
+
+class SaleOrderRepository {
+
+  Future<dynamic> updateSaleOrderMaster(dynamic toSave) async {
+    // We use the exact URL variable you had in objfun
+    final String url = AppGlobals.apiUpdateSaleOrderMaster;
+
+    // ApiClient.postRequest will automatically add the Comid, Userid, Token, etc.
+    // So you don't need to manually pass headers anymore.
+    final response = await ApiClient.postRequest(
+      url,
+      toSave,
+    );
+
+    return response;
+  }
+}

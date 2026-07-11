@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:maleva/core/utils/clsfunction.dart' as objfun;
+import 'package:maleva/core/utils/app_globals.dart';
 import 'package:maleva/core/models/model.dart';
 import 'package:maleva/core/colors/colors.dart' as colour;
 import 'package:flutter_spinkit/flutter_spinkit.dart';
@@ -36,7 +36,7 @@ class _Employeestate extends State<Employee> {
 
   Future startup() async {
     filtersearchlist.clear();
-    filtersearchlist.addAll(objfun.EmployeeList);
+    filtersearchlist.addAll(AppGlobals.EmployeeList);
     if (mounted) {
       setState(() {
         progress = true;
@@ -51,10 +51,10 @@ class _Employeestate extends State<Employee> {
     setState(() {
       if (vv.isEmpty) {
         filtersearchlist.clear();
-        filtersearchlist.addAll(objfun.EmployeeList);
+        filtersearchlist.addAll(AppGlobals.EmployeeList);
       } else {
         filtersearchlist.clear();
-        filtersearchlist.addAll(objfun.EmployeeList.where((element) =>
+        filtersearchlist.addAll(AppGlobals.EmployeeList.where((element) =>
             element.AccountName.toString().toUpperCase().contains(vv)).toList());
       }
     });
@@ -69,7 +69,7 @@ class _Employeestate extends State<Employee> {
 
   @override
   Widget build(BuildContext context) {
-    final bool isTablet = objfun.MalevaScreen != 1;
+    final bool isTablet = AppGlobals.MalevaScreen != 1;
     return isTablet ? _buildTabletLayout() : _buildPhoneLayout();
   }
 
@@ -120,7 +120,7 @@ class _Employeestate extends State<Employee> {
   AppBar _buildAppBar() {
     return AppBar(
       backgroundColor: colour.commonColor,
-      centerTitle: objfun.MalevaScreen != 1,
+      centerTitle: AppGlobals.MalevaScreen != 1,
       elevation: 0,
       title: Text(
         'Employee List',
@@ -128,7 +128,7 @@ class _Employeestate extends State<Employee> {
           textStyle: TextStyle(
             color: colour.topAppBarColor,
             fontWeight: FontWeight.bold,
-            fontSize: objfun.FontLarge,
+            fontSize: AppGlobals.FontLarge,
             letterSpacing: 0.5,
           ),
         ),
@@ -153,7 +153,7 @@ class _Employeestate extends State<Employee> {
           textStyle: TextStyle(
             color: colour.commonColor,
             fontWeight: FontWeight.w600,
-            fontSize: objfun.FontLow,
+            fontSize: AppGlobals.FontLow,
             letterSpacing: 0.3,
           ),
         ),
@@ -174,7 +174,7 @@ class _Employeestate extends State<Employee> {
             textStyle: TextStyle(
               letterSpacing: 1,
               color: Colors.grey.shade500,
-              fontSize: objfun.FontLow,
+              fontSize: AppGlobals.FontLow,
             ),
           ),
           prefixIcon: const Icon(Icons.search, color: Colors.grey),
@@ -212,7 +212,7 @@ class _Employeestate extends State<Employee> {
                 textStyle: TextStyle(
                   color: Colors.grey.shade600,
                   fontWeight: FontWeight.bold,
-                  fontSize: objfun.FontLow,
+                  fontSize: AppGlobals.FontLow,
                 ),
               ),
             ),
@@ -252,7 +252,7 @@ class _Employeestate extends State<Employee> {
                     textStyle: TextStyle(
                       color: colour.commonColor,
                       fontWeight: FontWeight.w600,
-                      fontSize: objfun.FontCardText,
+                      fontSize: AppGlobals.FontCardText,
                       letterSpacing: 0.3,
                     ),
                   ),

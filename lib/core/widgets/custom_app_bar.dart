@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:maleva/core/theme/palette.dart';
-import 'package:maleva/core/utils/clsfunction.dart' as objfun;
+import 'package:maleva/core/utils/app_globals.dart';
 
 class CustomGradientAppBar extends StatelessWidget implements PreferredSizeWidget {
   final String title;
@@ -20,7 +20,7 @@ class CustomGradientAppBar extends StatelessWidget implements PreferredSizeWidge
   @override
   Widget build(BuildContext context) {
     // Fetch the logged-in username securely
-    final String userName = objfun.storagenew.getString('Username') ?? '';
+    final String userName = AppGlobals.storagenew.getString('Username') ?? '';
 
     return AppBar(
       automaticallyImplyLeading: false,
