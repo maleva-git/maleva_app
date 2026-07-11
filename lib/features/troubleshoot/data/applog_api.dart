@@ -72,7 +72,7 @@ class AppLogApi {
         'SubFolderName': '', // Can be left empty
       });
 
-      // Send the request exactly as done in objfun.upload
+      // Send the request exactly as done in AppGlobals.upload
       final response = await http.Response.fromStream(await request.send());
 
       // 4. Delete the temporary file

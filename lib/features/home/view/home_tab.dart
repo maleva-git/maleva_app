@@ -7,7 +7,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:maleva/core/theme/palette.dart';
-import 'package:maleva/core/utils/clsfunction.dart' as objfun;
+import 'package:maleva/core/utils/app_globals.dart';
 import 'package:maleva/menu/menulist.dart';
 
 import '../../../core/theme/tokens.dart';
@@ -16,15 +16,10 @@ import '../bloc/home_event.dart';
 import '../bloc/home_state.dart';
 
 
-// ─────────────────────────────────────────────────────────────────────────────
-// Breakpoints
-// ─────────────────────────────────────────────────────────────────────────────
 
 const double _kTabletBreak = 600.0; // width >= 600 → tablet layout
 
-// ─────────────────────────────────────────────────────────────────────────────
-// Entry point — provides the BLoC
-// ─────────────────────────────────────────────────────────────────────────────
+
 
 class Homemobile extends StatelessWidget {
   const Homemobile({super.key});
@@ -39,9 +34,6 @@ class Homemobile extends StatelessWidget {
   }
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// View — stateful only for back-press handling
-// ─────────────────────────────────────────────────────────────────────────────
 
 class _HomeDashboardView extends StatefulWidget {
   const _HomeDashboardView();
@@ -54,7 +46,7 @@ class _HomeDashboardViewState extends State<_HomeDashboardView> {
   // ── Back press ────────────────────────────────────────────────────────────
 
   Future<bool> _onBackPressed() async {
-    final bool confirmed = await objfun.ConfirmationMsgYesNo(
+    final bool confirmed = await ConfirmationMsgYesNo(
       context,
       'Are you sure you want to Exit?',
     );
@@ -86,7 +78,7 @@ class _HomeDashboardViewState extends State<_HomeDashboardView> {
               final bool isTablet = constraints.maxWidth >= _kTabletBreak;
 
               // Set global font sizes based on screen width so other pages
-              // that still read objfun.FontXxx continue to work correctly.
+              // that still read AppGlobals.FontXxx continue to work correctly.
               _setFontSizes(constraints.maxWidth, isTablet);
 
               return isTablet
@@ -206,20 +198,20 @@ class _HomeDashboardViewState extends State<_HomeDashboardView> {
 
   void _setFontSizes(double width, bool isTablet) {
     if (isTablet) {
-      objfun.FontLarge    = 26;
-      objfun.FontMedium   = 22;
-      objfun.FontLow      = 20;
-      objfun.FontCardText = 16;
+      AppGlobals.FontLarge    = 26;
+      AppGlobals.FontMedium   = 22;
+      AppGlobals.FontLow      = 20;
+      AppGlobals.FontCardText = 16;
     } else if (width <= 370) {
-      objfun.FontLarge    = 22;
-      objfun.FontMedium   = 18;
-      objfun.FontLow      = 16;
-      objfun.FontCardText = 12;
+      AppGlobals.FontLarge    = 22;
+      AppGlobals.FontMedium   = 18;
+      AppGlobals.FontLow      = 16;
+      AppGlobals.FontCardText = 12;
     } else {
-      objfun.FontLarge    = 24;
-      objfun.FontMedium   = 20;
-      objfun.FontLow      = 18;
-      objfun.FontCardText = 14;
+      AppGlobals.FontLarge    = 24;
+      AppGlobals.FontMedium   = 20;
+      AppGlobals.FontLow      = 18;
+      AppGlobals.FontCardText = 14;
     }
   }
 }
@@ -332,7 +324,7 @@ class _DashboardAppBar extends StatelessWidget
             color: AppTokens.appBarIcon,
           ),
           tooltip: 'Logout',
-          onPressed: () => objfun.logout(context),
+          onPressed: () => AppGlobals.logout(context),
         ),
       ],
     );
@@ -384,7 +376,7 @@ class _ReadyBody extends StatelessWidget {
               color: Colors.white24,
               borderRadius: BorderRadius.circular(isTablet ? 24 : 16),
               image: DecorationImage(
-                image: objfun.logo,
+                image: AppGlobals.logo,
                 colorFilter: ColorFilter.mode(
                   Colors.white.withOpacity(0.5),
                   BlendMode.dstATop,
@@ -397,8 +389,8 @@ class _ReadyBody extends StatelessWidget {
 
           // ── Greeting / Company name ──────────────────────────────
           Text(
-            objfun.selectedCompanyName.isNotEmpty
-                ? objfun.selectedCompanyName
+            AppGlobals.selectedCompanyName.isNotEmpty
+                ? AppGlobals.selectedCompanyName
                 : 'Welcome',
             style: GoogleFonts.lato(
               fontSize: isTablet ? 22 : 18,
@@ -454,8 +446,8 @@ class _TabletSideRail extends StatelessWidget {
                 ),
                 const SizedBox(height: 10),
                 Text(
-                  objfun.selectedCompanyName.isNotEmpty
-                      ? objfun.selectedCompanyName
+                  AppGlobals.selectedCompanyName.isNotEmpty
+                      ? AppGlobals.selectedCompanyName
                       : 'Maleva',
                   style: GoogleFonts.lato(
                     color: Palette.white,
@@ -473,7 +465,7 @@ class _TabletSideRail extends StatelessWidget {
           Expanded(
             child: ListView(
               padding: EdgeInsets.zero,
-              children: objfun.parentclass.map((menu) {
+              children: AppGlobals.parentclass.map((menu) {
                 return ListTile(
                   dense: true,
                   leading: const Icon(Icons.chevron_right,
@@ -506,7 +498,7 @@ class _TabletSideRail extends StatelessWidget {
                   fontSize: 13,
                   fontWeight: FontWeight.w600),
             ),
-            onTap: () => objfun.logout(context),
+            onTap: () => AppGlobals.logout(context),
           ),
           const SizedBox(height: 12),
         ],

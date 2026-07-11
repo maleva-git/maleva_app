@@ -1,7 +1,5 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
-import 'package:maleva/core/utils/clsfunction.dart' as objfun;
-import 'package:maleva/core/models/model.dart';
 import 'package:maleva/features/transaction/enquirytrmaster/data/enquiry_repository.dart';
 import 'package:maleva/core/utils/session_manager.dart';
 import 'enquirytradd_event.dart';
@@ -68,46 +66,43 @@ class EnquiryAddBloc extends Bloc<EnquiryAddEvent, EnquiryAddState> {
     emit(EnquiryAddLoading());
 
     try {
-      if (event.saleMaster != null && event.saleMaster!.isNotEmpty) {
+      if (event.saleMaster != null) {
         final m = event.saleMaster!;
         final now = DateFormat('yyyy-MM-dd HH:mm:ss').format(DateTime.now());
 
         String notifyDate = now;
-        if (m['ForwardingDate'] != null) {
-          notifyDate = DateFormat('yyyy-MM-dd HH:mm:ss')
-              .format(DateTime.parse(m['ForwardingDate'].toString()));
+        if (m.forwardingDate.isNotEmpty) {
+          notifyDate = m.forwardingDate;
         }
 
         String collectionDate = now;
         bool checkCollection = false;
-        if (m['PickupDate'] != null) {
+        if (m.pickupDate.isNotEmpty) {
           checkCollection = true;
-          collectionDate = DateFormat('yyyy-MM-dd HH:mm:ss')
-              .format(DateTime.parse(m['PickupDate'].toString()));
+          collectionDate = m.pickupDate;
         }
 
         String deliveryDate = now;
         bool checkDelivery = false;
-        if (m['DeliveryDate'] != null) {
+        if (m.deliveryDate.isNotEmpty) {
           checkDelivery = true;
-          deliveryDate = DateFormat('yyyy-MM-dd HH:mm:ss')
-              .format(DateTime.parse(m['DeliveryDate'].toString()));
+          deliveryDate = m.deliveryDate;
         }
 
         emit(EnquiryAddLoaded(
-          editId:          m['Id'] ?? 0,
-          custId:          m['CustomerRefId'] ?? 0,
-          custName:        m['CustomerName'] ?? '',
-          jobTypeId:       m['JobMasterRefId'] ?? 0,
-          jobTypeName:     m['JobType'] ?? '',
-          originId:        m['OriginRefId'] ?? 0,
-          originName:      m['Origin'] ?? '',
-          destinationId:   m['DestinationRefId'] ?? 0,
-          destinationName: m['Destination'] ?? '',
-          quantity:        m['Quantity']?.toString() ?? '',
-          weight:          m['TotalWeight']?.toString() ?? '',
-          lPort:           m['SPort'] ?? '',
-          oPort:           m['OPort'] ?? '',
+          editId:          m.id,
+          custId:          m.customerRefId,
+          custName:        m.customerName,
+          jobTypeId:       m.jobMasterRefId,
+          jobTypeName:     m.jobType,
+          originId:        m.originRefId,
+          originName:      m.origin,
+          destinationId:   m.destinationRefId,
+          destinationName: m.destination,
+          quantity:        m.quantity.toString() ?? '',
+          weight:          m.totalWeight.toString() ?? '',
+          lPort:           m.sPort,
+          oPort:           m.oPort,
           notifyDate:      notifyDate,
           collectionDate:  collectionDate,
           deliveryDate:    deliveryDate,

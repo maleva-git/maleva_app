@@ -1,0 +1,106 @@
+// lib/features/dashboard/common_tabs/invoice/data/invoice_repository.dart
+//
+// Real API calls — exact same endpoints as original bloc.
+// objfun removed, AppPreferences + ApiConstants use pannuvom.
+//
+// Original bloc calls:
+//   1. AuthApi.getSalesData(type)            → apiGetSalesData
+//   2. AuthApi.getSalesInvoiceCheck(master)  → apiSelectSaleorderinvoicecheck
+//   3. ApiClient.postRequest(apiGetEmployeeInvData + comid + type)
+
+import 'package:intl/intl.dart';
+import 'package:maleva/core/network/api_client.dart';
+import 'package:maleva/core/network/api_constants.dart';
+import 'package:maleva/core/network/api_services/auth_api.dart';
+import 'package:maleva/core/utils/app_preferences.dart';
+
+// ─────────────────────────────────────────────────────────────
+// ABSTRACT INTERFACE — BLoC depends only on this
+// ─────────────────────────────────────────────────────────────
+abstract class InvoiceRepository {
+  /// Parallel fetch: sales summary + waiting bills
+  /// Same as original: Future.wait([getSalesData, getSalesInvoiceCheck])
+  Future<(Map<String, dynamic>?, List<dynamic>)> loadDashboard({
+    required int type,
+  });
+
+  /// Waiting bills — on-demand, same endpoint as initial load
+  Future<List<dynamic>> getWaitingBills();
+
+  /// Employee breakdown per month index
+  /// Original: "${AppGlobals.apiGetEmployeeInvData}${AppGlobals.Comid}&type=$type"
+  Future<List<dynamic>> getEmployeeInvData({required int type});
+}
+
+// ─────────────────────────────────────────────────────────────
+// REAL IMPLEMENTATION — exact same API calls as original bloc
+// ─────────────────────────────────────────────────────────────
+class InvoiceRepositoryImpl implements InvoiceRepository {
+  @override
+  Future<(Map<String, dynamic>?, List<dynamic>)> loadDashboard({
+    required int type,
+  }) async {
+    final comid = AppPreferences.getComid();
+    final today = DateFormat('yyyy/MM/dd').format(DateTime.now());
+
+    final master = {
+      'Comid': comid,
+      "DashboardStatus": 0,
+      'Fromdate': '2025/08/16',
+      "Employeeid ": 0,
+      'Id': 0,
+      "Invoice": true,
+      'Offvesselname': "",
+      "Invoicecheck": false,
+      'Remarks': 2,
+      "Search": 3,
+      'Todate': today,
+      "completestatusnotshow": false,
+    };
+
+    // Exact same as original bloc — parallel Future.wait
+    final results = await Future.wait([
+      AuthApi.getSalesData(type),          // existing static method ✅
+      AuthApi.getSalesInvoiceCheck(master),
+    ]);
+
+    final salesData    = results[0] as Map<String, dynamic>?;
+    final waitingBills = List<dynamic>.from(results[1] ?? []);
+
+    return (salesData, waitingBills);
+  }
+
+  @override
+  Future<List<dynamic>> getWaitingBills() async {
+    final comid = AppPreferences.getComid();
+    final today = DateFormat('yyyy/MM/dd').format(DateTime.now());
+
+    final master = {
+      'Comid': comid,
+      "DashboardStatus": 0,
+      'Fromdate': '2025/08/16',
+      "Employeeid ": 0,
+      'Id': 0,
+      "Invoice": true,
+      'Offvesselname': "",
+      "Invoicecheck": false,
+      'Remarks': 2,
+      "Search": 3,
+      'Todate': today,
+      "completestatusnotshow": false,
+    };
+
+    // Same as original LoadWaitingBills handler
+    final result = await AuthApi.getSalesInvoiceCheck(master);
+
+    return List<dynamic>.from(result ?? []);
+  }
+
+  @override
+  Future<List<dynamic>> getEmployeeInvData({required int type}) async {
+    // AuthApi.getEmployeeInvData added to auth_api.dart (see auth_api_addition.dart)
+    // Original: "${AppGlobals.apiGetEmployeeInvData}${AppGlobals.Comid}&type=$type"
+    final result = await AuthApi.getEmployeeInvData(type: type);
+    return List<dynamic>.from(result?['Data1'] ?? []);
+  }
+}

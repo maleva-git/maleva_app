@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:maleva/core/utils/clsfunction.dart' as objfun;
+import 'package:maleva/core/utils/app_globals.dart';
 import 'package:maleva/features/transaction/viewsaleorder/data/viewsaleorder_repository.dart';
 import 'package:maleva/core/di/injection.dart';
 import '../../../../core/theme/tokens.dart';
@@ -47,7 +47,7 @@ class _GetJobNoPageView extends StatelessWidget {
       listener: (context, state) async {
         if (state is GetJobNoNavigateToDetails) {
           if (state.jobNo == 0 && state.saleOrderId == 0) {
-            objfun.toastMsg('Enter Job No', '', context);
+            toastMsg('Enter Job No', '', context);
             return;
           }
           await sl<ViewSaleOrderRepository>().editSalesOrder(
@@ -55,8 +55,8 @@ class _GetJobNoPageView extends StatelessWidget {
             context,
             MaterialPageRoute(
               builder: (_) => SalesOrdersAdd(
-                SaleDetails: objfun.SaleEditDetailList,
-                SaleMaster: objfun.SaleEditMasterList,
+                SaleDetails: AppGlobals.SaleEditDetailList,
+                SaleMaster: AppGlobals.SaleEditMasterList,
               ),
             ),
           );
@@ -253,7 +253,7 @@ class _BillTypeRow extends StatelessWidget {
     final labelStyle = GoogleFonts.lato(
       color: colour.kTextDark,
       fontWeight: FontWeight.w600,
-      fontSize: isTablet ? objfun.FontMedium + 1 : objfun.FontMedium,
+      fontSize: isTablet ? AppGlobals.FontMedium + 1 : AppGlobals.FontMedium,
     );
 
     return Container(
@@ -343,7 +343,7 @@ class _RadioOption extends StatelessWidget {
               style: GoogleFonts.lato(
                 color: selected ? AppTokens.invoiceHeaderStart : colour.kTextMid,
                 fontWeight: FontWeight.w700,
-                fontSize: isTablet ? objfun.FontMedium + 1 : objfun.FontMedium,
+                fontSize: isTablet ? AppGlobals.FontMedium + 1 : AppGlobals.FontMedium,
               ),
             ),
           ],
@@ -398,7 +398,7 @@ class _JobNoFieldState extends State<_JobNoField> {
           style: GoogleFonts.lato(
             color: colour.kTextMid,
             fontWeight: FontWeight.w600,
-            fontSize: isTablet ? objfun.FontLow + 1 : objfun.FontLow,
+            fontSize: isTablet ? AppGlobals.FontLow + 1 : AppGlobals.FontLow,
           ),
         ),
         const SizedBox(height: 6),
@@ -412,13 +412,13 @@ class _JobNoFieldState extends State<_JobNoField> {
           style: GoogleFonts.lato(
             color: colour.kTextDark,
             fontWeight: FontWeight.w600,
-            fontSize: isTablet ? objfun.FontLow + 1 : objfun.FontLow,
+            fontSize: isTablet ? AppGlobals.FontLow + 1 : AppGlobals.FontLow,
           ),
           decoration: InputDecoration(
             hintText: 'Enter Job No',
             hintStyle: GoogleFonts.lato(
                 color: AppTokens.planTextMuted,
-                fontSize: isTablet ? objfun.FontLow + 1 : objfun.FontLow),
+                fontSize: isTablet ? AppGlobals.FontLow + 1 : AppGlobals.FontLow),
             filled: true,
             fillColor: colour.kDetailBg,
             prefixIcon: const Icon(Icons.tag_rounded,
@@ -511,8 +511,8 @@ class _JobNoFieldState extends State<_JobNoField> {
                             color: colour.kTextDark,
                             fontWeight: FontWeight.w600,
                             fontSize: isTablet
-                                ? objfun.FontLow + 1
-                                : objfun.FontLow,
+                                ? AppGlobals.FontLow + 1
+                                : AppGlobals.FontLow,
                           ),
                         ),
                       ],
@@ -568,7 +568,7 @@ class _ActionButtons extends StatelessWidget {
           isTablet: isTablet,
           onPressed: () {
             if (jobNoText.isEmpty) {
-              objfun.toastMsg('Enter Job No', '', context);
+              toastMsg('Enter Job No', '', context);
               return;
             }
             context.read<GetJobNoBloc>().add(GetJobNoViewRequested());
@@ -653,7 +653,7 @@ class _GradientButton extends StatelessWidget {
                     color: Colors.white,
                     fontWeight: FontWeight.w700,
                     fontSize:
-                    isTablet ? objfun.FontMedium + 1 : objfun.FontMedium,
+                    isTablet ? AppGlobals.FontMedium + 1 : AppGlobals.FontMedium,
                   ),
                 ),
                 const SizedBox(width: 8),
@@ -710,7 +710,7 @@ class _OutlineButton extends StatelessWidget {
                     color: AppTokens.invoiceHeaderStart,
                     fontWeight: FontWeight.w700,
                     fontSize:
-                    isTablet ? objfun.FontMedium + 1 : objfun.FontMedium,
+                    isTablet ? AppGlobals.FontMedium + 1 : AppGlobals.FontMedium,
                   ),
                 ),
                 const SizedBox(width: 8),

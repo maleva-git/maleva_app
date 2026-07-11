@@ -1,18 +1,18 @@
 import 'package:flutter/Material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:maleva/features/dashboard/admin_dashboard/tabs/salesorder/bloc/salesorder_bloc.dart';
+import 'package:maleva/features/dashboard/common_tabs/salesorder/bloc/salesorder_bloc.dart';
 import 'package:maleva/features/dashboard/receivable_dashboard/view/receivable_dashboard_ui.dart';
 import '../../../../core/di/injection.dart';
-import '../../admin_dashboard/tabs/invoice/bloc/invoice_bloc.dart';
-import '../../admin_dashboard/tabs/invoice/bloc/invoice_event.dart';
-import '../../admin_dashboard/tabs/invoice/data/invoice_repository.dart';
-import '../../admin_dashboard/tabs/invoice/view/invoice_tab.dart';
-import '../../admin_dashboard/tabs/salesorder/bloc/salesorder_event.dart';
-import '../../admin_dashboard/tabs/salesorder/view/salesorderview_tab.dart';
+import '../../common_tabs/invoice/bloc/invoice_bloc.dart';
+import '../../common_tabs/invoice/bloc/invoice_event.dart';
+import '../../common_tabs/invoice/data/invoice_repository.dart';
+import '../../common_tabs/invoice/view/invoice_tab.dart';
+import '../../common_tabs/salesorder/bloc/salesorder_event.dart';
+import '../../common_tabs/salesorder/view/salesorderview_tab.dart';
 import '../bloc/receivable_bloc.dart';
 import '../bloc/receivable_event.dart';
-import 'package:maleva/features/dashboard/admin_dashboard/tabs/driverleave/bloc/leave_bloc.dart';
+import 'package:maleva/features/dashboard/common_tabs/driverleave/bloc/leave_bloc.dart';
 
 class ReceivableDashboard extends StatefulWidget{
   const ReceivableDashboard({super.key});

@@ -1,47 +1,45 @@
 import 'package:flutter/Material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:maleva/features/dashboard/admin_dashboard/tabs/salesorder/bloc/salesorder_bloc.dart';
+import 'package:maleva/features/dashboard/common_tabs/salesorder/bloc/salesorder_bloc.dart';
 import 'package:maleva/features/dashboard/subadmin_dashboard/view/subadmin_dashboard_ui.dart';
 import '../../../../core/di/injection.dart';
-import '../../../common_updates/blocs/sales/sales_bloc.dart';
-import '../../../common_updates/blocs/truck/truck_bloc.dart';
-import '../../admin_dashboard/tabs/emailinbox/bloc/emailinbox_bloc.dart';
-import '../../admin_dashboard/tabs/emailinbox/bloc/emailinbox_event.dart';
-import '../../admin_dashboard/tabs/emailinbox/view/emailinbox_tab.dart';
-import '../../admin_dashboard/tabs/employeemaster/bloc/employeemaster_bloc.dart';
-import '../../admin_dashboard/tabs/employeemaster/view/employeemaster_tab.dart';
-import '../../admin_dashboard/tabs/enquiry/view/bloc/enquiry_bloc.dart';
-import '../../admin_dashboard/tabs/enquiry/view/bloc/enquiry_event.dart';
-import '../../admin_dashboard/tabs/enquiry/view/data/enquiry_repository.dart';
-import '../../admin_dashboard/tabs/enquiry/view/view/enquiry_tab.dart';
-import '../../admin_dashboard/tabs/googlereview/bloc/googlereview_bloc.dart';
-import '../../admin_dashboard/tabs/googlereview/bloc/googlereview_event.dart';
-import '../../admin_dashboard/tabs/googlereview/view/googlereview_tab.dart';
-import '../../admin_dashboard/tabs/inventoryreport/bloc/inventoryreport_bloc.dart';
-import '../../admin_dashboard/tabs/inventoryreport/bloc/inventoryreport_event.dart';
-import '../../admin_dashboard/tabs/inventoryreport/data/inventoryreport_repository.dart';
-import '../../admin_dashboard/tabs/inventoryreport/view/inventoryview_tab.dart';
-import '../../admin_dashboard/tabs/invoice/bloc/invoice_bloc.dart';
-import '../../admin_dashboard/tabs/invoice/bloc/invoice_event.dart';
-import '../../admin_dashboard/tabs/invoice/data/invoice_repository.dart';
-import '../../admin_dashboard/tabs/invoice/view/invoice_tab.dart';
-import '../../admin_dashboard/tabs/salesorder/bloc/salesorder_event.dart';
-import '../../admin_dashboard/tabs/salesorder/view/salesorderview_tab.dart';
-import '../../admin_dashboard/tabs/spotsaleorder/bloc/spotsaleorder_bloc.dart';
-import '../../admin_dashboard/tabs/spotsaleorder/data/spotsale_repository.dart';
-import '../../admin_dashboard/tabs/spotsaleorder/view/spotsaleorder_add.dart';
-import '../../admin_dashboard/tabs/subadminsale/bloc/sales_report_bloc.dart';
-import '../../admin_dashboard/tabs/subadminsale/bloc/sales_report_event.dart';
-import '../../admin_dashboard/tabs/subadminsale/view/sales_report_view.dart';
-import '../../admin_dashboard/tabs/transport/bloc/transport_bloc.dart';
-import '../../admin_dashboard/tabs/transport/bloc/transport_event.dart';
-import '../../admin_dashboard/tabs/transport/view/transportview_tab.dart';
-import '../../admin_dashboard/tabs/vesselreport/bloc/vesselreport_bloc.dart';
-import '../../admin_dashboard/tabs/vesselreport/bloc/vesselreport_event.dart';
-import '../../admin_dashboard/tabs/vesselreport/view/vesselreportview_tab.dart';
+import '../../common_tabs/emailinbox/bloc/emailinbox_bloc.dart';
+import '../../common_tabs/emailinbox/bloc/emailinbox_event.dart';
+import '../../common_tabs/emailinbox/view/emailinbox_tab.dart';
+import '../../common_tabs/employeemaster/bloc/employeemaster_bloc.dart';
+import '../../common_tabs/employeemaster/view/employeemaster_tab.dart';
+import '../../common_tabs/enquiry/view/bloc/enquiry_bloc.dart';
+import '../../common_tabs/enquiry/view/bloc/enquiry_event.dart';
+import '../../common_tabs/enquiry/view/data/enquiry_repository.dart';
+import '../../common_tabs/enquiry/view/view/enquiry_tab.dart';
+import '../../common_tabs/googlereview/bloc/googlereview_bloc.dart';
+import '../../common_tabs/googlereview/bloc/googlereview_event.dart';
+import '../../common_tabs/googlereview/view/googlereview_tab.dart';
+import '../../common_tabs/inventoryreport/bloc/inventoryreport_bloc.dart';
+import '../../common_tabs/inventoryreport/bloc/inventoryreport_event.dart';
+import '../../common_tabs/inventoryreport/data/inventoryreport_repository.dart';
+import '../../common_tabs/inventoryreport/view/inventoryview_tab.dart';
+import '../../common_tabs/invoice/bloc/invoice_bloc.dart';
+import '../../common_tabs/invoice/bloc/invoice_event.dart';
+import '../../common_tabs/invoice/data/invoice_repository.dart';
+import '../../common_tabs/invoice/view/invoice_tab.dart';
+import '../../common_tabs/salesorder/bloc/salesorder_event.dart';
+import '../../common_tabs/salesorder/view/salesorderview_tab.dart';
+import '../../common_tabs/spotsaleorder/bloc/spotsaleorder_bloc.dart';
+import '../../common_tabs/spotsaleorder/data/spotsale_repository.dart';
+import '../../common_tabs/spotsaleorder/view/spotsaleorder_add.dart';
+import '../../common_tabs/subadminsale/bloc/sales_report_bloc.dart';
+import '../../common_tabs/subadminsale/bloc/sales_report_event.dart';
+import '../../common_tabs/subadminsale/view/sales_report_view.dart';
+import '../../common_tabs/transport/bloc/transport_bloc.dart';
+import '../../common_tabs/transport/bloc/transport_event.dart';
+import '../../common_tabs/transport/view/transportview_tab.dart';
+import '../../common_tabs/vesselreport/bloc/vesselreport_bloc.dart';
+import '../../common_tabs/vesselreport/bloc/vesselreport_event.dart';
+import '../../common_tabs/vesselreport/view/vesselreportview_tab.dart';
 import '../bloc/subadmin_dashboard_bloc.dart';
 import '../bloc/subadmin_dashboard_event.dart';
-import 'package:maleva/features/dashboard/admin_dashboard/tabs/driverleave/bloc/leave_bloc.dart';
+import 'package:maleva/features/dashboard/common_tabs/driverleave/bloc/leave_bloc.dart';
 
 class SubAdminDashboard extends StatefulWidget{
   const SubAdminDashboard({super.key});
@@ -75,12 +73,6 @@ class _AdminDashboardState extends State<SubAdminDashboard> with SingleTickerPro
       providers: [
             BlocProvider<SubAdminTabBloc>(
               create: (_) => SubAdminTabBloc(),
-            ),
-            BlocProvider<SalesBloc>(
-              create: (_) => SalesBloc(),
-            ),
-            BlocProvider<TruckBloc>(
-              create: (_) => TruckBloc(),
             ),
             BlocProvider(
               create: (_) => InvoiceBloc(

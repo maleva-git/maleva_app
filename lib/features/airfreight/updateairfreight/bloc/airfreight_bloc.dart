@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:maleva/core/utils/clsfunction.dart' as objfun;
+import 'package:maleva/core/utils/app_globals.dart';
 import 'package:maleva/core/network/OnlineApi.dart' as OnlineApi;
 import 'package:maleva/core/models/model.dart';
 
@@ -108,15 +108,15 @@ class AirFreightBloc extends Bloc<AirFreightEvent, AirFreightState> {
       final imageFile = s.images[event.index];
       final header = {
         'Content-Type': 'application/json; charset=UTF-8',
-        'Comid': objfun.Comid.toString(),
+        'Comid': AppGlobals.Comid.toString(),
         'Id': s.saleOrderId.toString(),
         'FolderName': 'SalesOrder',
-        'FileName': '/Upload/${objfun.Comid}/SalesOrder/${s.saleOrderId}/AirFrieght/$imageFile',
+        'FileName': '/Upload/${AppGlobals.Comid}/SalesOrder/${s.saleOrderId}/AirFrieght/$imageFile',
         'SubFolderName': 'AirFrieght',
       };
 
       // 🔥 Fixed: Passed null for context
-      final result = await objfun.apiAllinoneSelectArray(objfun.apiDeleteimage, null, header, null);
+      final result = await AppGlobals.apiAllinoneSelectArray(AppGlobals.apiDeleteimage, null, header, null);
       if (result != '') {
         final value = ResponseViewModel.fromJson(result);
         if (value.IsSuccess == true) {
@@ -138,16 +138,16 @@ class AirFreightBloc extends Bloc<AirFreightEvent, AirFreightState> {
     try {
       final master = {
         'Id': s.saleOrderId,
-        'Comid': objfun.Comid,
+        'Comid': AppGlobals.Comid,
         'Jobid': s.jobNoText,
-        'EmployeeRefId': objfun.EmpRefId == 0 ? null : objfun.EmpRefId,
+        'EmployeeRefId': AppGlobals.EmpRefId == 0 ? null : AppGlobals.EmpRefId,
         'StatusRefId': s.statusId,
         'AWBNO': s.awbNo,
       };
       final header = {'Content-Type': 'application/json; charset=UTF-8'};
 
       // 🔥 Fixed: Passed null for context
-      final result = await objfun.apiAllinoneSelectArray(objfun.apiUpdateAirFrieghtDetails, master, header, null);
+      final result = await AppGlobals.apiAllinoneSelectArray(AppGlobals.apiUpdateAirFrieghtDetails, master, header, null);
 
       if (result != '') {
         final value = ResponseViewModel.fromJson(result);
@@ -179,12 +179,12 @@ class AirFreightBloc extends Bloc<AirFreightEvent, AirFreightState> {
       // 🔥 Fixed: Removed context, passed only ID and JobNo
       await OnlineApi.EditSalesOrder(saleOrderId, int.tryParse(jobNo) ?? 0);
       await OnlineApi.SelectJobType(null);
-      await OnlineApi.SelectAllJobStatus(null, objfun.SaleEditMasterList[0]['JobMasterRefId']);
+      await OnlineApi.SelectAllJobStatus(null, AppGlobals.SaleEditMasterList[0]['JobMasterRefId']);
 
       String jobTypeName = '';
-      final jobMasterId = objfun.SaleEditMasterList[0]['JobMasterRefId'];
+      final jobMasterId = AppGlobals.SaleEditMasterList[0]['JobMasterRefId'];
       if (jobMasterId != null && jobMasterId != 0) {
-        final matches = objfun.JobTypeList.where((j) => j.Id == jobMasterId).toList();
+        final matches = AppGlobals.JobTypeList.where((j) => j.Id == jobMasterId).toList();
         if (matches.isNotEmpty) {
           final name = matches[0].Name.trim();
           if (name != 'AIR FRIEGHT IMPORT' && name != 'AIR FRIEGHT EXPORT') {
@@ -198,20 +198,20 @@ class AirFreightBloc extends Bloc<AirFreightEvent, AirFreightState> {
 
       int statusId = 0;
       String statusName = '';
-      final jStatus = objfun.SaleEditMasterList[0]['JStatus'];
+      final jStatus = AppGlobals.SaleEditMasterList[0]['JStatus'];
       if (jStatus != null && jStatus != 0) {
         statusId = jStatus;
-        final matches = objfun.JobAllStatusList.where((s) => s.Status == statusId).toList();
+        final matches = AppGlobals.JobAllStatusList.where((s) => s.Status == statusId).toList();
         if (matches.isNotEmpty) statusName = matches[0].StatusName;
       }
 
-      final awbNo = objfun.SaleEditMasterList[0]['AWBNo'] ?? '';
+      final awbNo = AppGlobals.SaleEditMasterList[0]['AWBNo'] ?? '';
 
-      final imageDir = '/Upload/${objfun.Comid}/SalesOrder/$saleOrderId/AirFrieght/';
+      final imageDir = '/Upload/${AppGlobals.Comid}/SalesOrder/$saleOrderId/AirFrieght/';
       final header = {'Content-Type': 'application/json; charset=UTF-8'};
 
       // 🔥 Fixed: Passed null for context
-      final imgResult = await objfun.apiAllinoneSelectArray('${objfun.apiGetimage}$imageDir', null, header, null);
+      final imgResult = await AppGlobals.apiAllinoneSelectArray('${AppGlobals.apiGetimage}$imageDir', null, header, null);
 
       List<String> images = [];
       if (imgResult != '' && imgResult.length != 0) {

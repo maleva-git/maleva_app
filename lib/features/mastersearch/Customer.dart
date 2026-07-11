@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:maleva/core/network/OnlineApi.dart' as OnlineApi;
-import 'package:maleva/core/utils/clsfunction.dart' as objfun;
+import 'package:maleva/core/utils/app_globals.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:maleva/core/colors/colors.dart' as colour;
@@ -40,7 +40,7 @@ class _Customerstate extends State<Customer> {
     if (!mounted) return;
 
     filtersearchlist.clear();
-    filtersearchlist.addAll(objfun.CustomerList);
+    filtersearchlist.addAll(AppGlobals.CustomerList);
     setState(() {
       progress = true;
     });
@@ -53,10 +53,10 @@ class _Customerstate extends State<Customer> {
     setState(() {
       if (vv.isEmpty) {
         filtersearchlist.clear();
-        filtersearchlist.addAll(objfun.CustomerList);
+        filtersearchlist.addAll(AppGlobals.CustomerList);
       } else {
         filtersearchlist.clear();
-        filtersearchlist.addAll(objfun.CustomerList.where((element) =>
+        filtersearchlist.addAll(AppGlobals.CustomerList.where((element) =>
             element.AccountName.toString().toUpperCase().contains(vv)).toList());
       }
     });
@@ -72,7 +72,7 @@ class _Customerstate extends State<Customer> {
 
   @override
   Widget build(BuildContext context) {
-    final bool isTablet = objfun.MalevaScreen != 1;
+    final bool isTablet = AppGlobals.MalevaScreen != 1;
     return isTablet ? _buildTabletLayout() : _buildPhoneLayout();
   }
 
@@ -123,7 +123,7 @@ class _Customerstate extends State<Customer> {
   AppBar _buildAppBar() {
     return AppBar(
       backgroundColor: colour.commonColor,
-      centerTitle: objfun.MalevaScreen != 1,
+      centerTitle: AppGlobals.MalevaScreen != 1,
       elevation: 0,
       title: Text(
         'Customer List',
@@ -131,7 +131,7 @@ class _Customerstate extends State<Customer> {
           textStyle: TextStyle(
             color: colour.topAppBarColor,
             fontWeight: FontWeight.bold,
-            fontSize: objfun.FontLarge,
+            fontSize: AppGlobals.FontLarge,
             letterSpacing: 0.5,
           ),
         ),
@@ -156,7 +156,7 @@ class _Customerstate extends State<Customer> {
           textStyle: TextStyle(
             color: colour.commonColor,
             fontWeight: FontWeight.w600,
-            fontSize: objfun.FontLow,
+            fontSize: AppGlobals.FontLow,
             letterSpacing: 0.3,
           ),
         ),
@@ -177,7 +177,7 @@ class _Customerstate extends State<Customer> {
             textStyle: TextStyle(
               letterSpacing: 1,
               color: Colors.grey.shade500,
-              fontSize: objfun.FontLow,
+              fontSize: AppGlobals.FontLow,
             ),
           ),
           prefixIcon: const Icon(Icons.search, color: Colors.grey),
@@ -215,7 +215,7 @@ class _Customerstate extends State<Customer> {
                 textStyle: TextStyle(
                   color: Colors.grey.shade600,
                   fontWeight: FontWeight.bold,
-                  fontSize: objfun.FontLow,
+                  fontSize: AppGlobals.FontLow,
                 ),
               ),
             ),
@@ -255,7 +255,7 @@ class _Customerstate extends State<Customer> {
                     textStyle: TextStyle(
                       color: colour.commonColor,
                       fontWeight: FontWeight.w600,
-                      fontSize: objfun.FontCardText,
+                      fontSize: AppGlobals.FontCardText,
                       letterSpacing: 0.3,
                     ),
                   ),

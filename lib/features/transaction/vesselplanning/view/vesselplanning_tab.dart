@@ -3,14 +3,14 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
-import 'package:maleva/core/utils/clsfunction.dart' as objfun;
+import 'package:maleva/core/utils/app_globals.dart';
 import 'package:maleva/core/colors/colors.dart' as colour;
 import 'package:maleva/core/di/injection.dart';
 import 'package:maleva/features/transaction/vesselplanning/data/vesselplanning_repository.dart';
 import 'package:maleva/menu/menulist.dart';
 import 'package:maleva/core/models/model.dart';
 import '../../../../core/theme/tokens.dart';
-import '../../../dashboard/admin_dashboard/tabs/vesselplanningdetails/view/vesselplanningdetails_tab.dart';
+import '../../../dashboard/common_tabs/vesselplanningdetails/view/vesselplanningdetails_tab.dart';
 import '../../../mastersearch/Employee.dart';
 import '../bloc/vesselplanning_bloc.dart';
 import '../bloc/vesselplanning_event.dart';
@@ -62,8 +62,8 @@ class _VesselPlanningPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isTablet = objfun.MalevaScreen != 1;
-    final userName = objfun.storagenew.getString('Username') ?? '';
+    final isTablet = AppGlobals.MalevaScreen != 1;
+    final userName = AppGlobals.storagenew.getString('Username') ?? '';
 
     return BlocListener<VesselPlanningBloc, VesselPlanningState>(
       listener: (context, state) {
@@ -135,7 +135,7 @@ class _VesselPlanningPage extends StatelessWidget {
             style: GoogleFonts.lato(
               color: Colors.white,
               fontWeight: FontWeight.w700,
-              fontSize: isTablet ? objfun.FontMedium + 2 : objfun.FontMedium,
+              fontSize: isTablet ? AppGlobals.FontMedium + 2 : AppGlobals.FontMedium,
               letterSpacing: 0.3,
             ),
           ),
@@ -145,7 +145,7 @@ class _VesselPlanningPage extends StatelessWidget {
             style: GoogleFonts.lato(
               color: Colors.white.withOpacity(0.65),
               fontWeight: FontWeight.w500,
-              fontSize: isTablet ? objfun.FontLow : objfun.FontLow - 1,
+              fontSize: isTablet ? AppGlobals.FontLow : AppGlobals.FontLow - 1,
             ),
           ),
         ],
@@ -179,7 +179,7 @@ class _VesselPlanningPage extends StatelessWidget {
       backgroundColor: Colors.transparent,
       builder: (sheetContext) {
         return StatefulBuilder(builder: (ctx, setSheetState) {
-          final isTablet = objfun.MalevaScreen != 1;
+          final isTablet = AppGlobals.MalevaScreen != 1;
 
           Future<void> pickDate(bool isFrom) async {
             final picked = await showDatePicker(
@@ -287,13 +287,13 @@ class _VesselPlanningPage extends StatelessWidget {
                               builder: (_) =>
                               const Employee(Searchby: 1, SearchId: 0),
                             ),
-                          ).then((_navRes) { if (_navRes != null) { objfun.SelectEmployeeList = _navRes; }
+                          ).then((_navRes) { if (_navRes != null) { AppGlobals.SelectEmployeeList = _navRes; }
                             setSheetState(() {
                               txtEmployee.text =
-                                  objfun.SelectEmployeeList.AccountName;
-                              empId   = objfun.SelectEmployeeList.Id;
+                                  AppGlobals.SelectEmployeeList.AccountName;
+                              empId   = AppGlobals.SelectEmployeeList.Id;
                               empName = txtEmployee.text;
-                              objfun.SelectEmployeeList = EmployeeModel.Empty();
+                              AppGlobals.SelectEmployeeList = EmployeeModel.Empty();
                             });
                           });
                         } else {
@@ -301,7 +301,7 @@ class _VesselPlanningPage extends StatelessWidget {
                             txtEmployee.text = '';
                             empId   = 0;
                             empName = '';
-                            objfun.SelectEmployeeList = EmployeeModel.Empty();
+                            AppGlobals.SelectEmployeeList = EmployeeModel.Empty();
                           });
                         }
                       },
@@ -360,8 +360,8 @@ class _VesselPlanningPage extends StatelessWidget {
                               color: colour.kTextDark,
                               fontWeight: FontWeight.w600,
                               fontSize: isTablet
-                                  ? objfun.FontLow + 1
-                                  : objfun.FontLow,
+                                  ? AppGlobals.FontLow + 1
+                                  : AppGlobals.FontLow,
                             ),
                           ),
                         ],
@@ -510,7 +510,7 @@ class _PlanningCard extends StatelessWidget {
     final valStyle = GoogleFonts.lato(
       color: colour.kTextDark,
       fontWeight: FontWeight.w600,
-      fontSize: isTablet ? objfun.FontCardText + 1 : objfun.FontCardText,
+      fontSize: isTablet ? AppGlobals.FontCardText + 1 : AppGlobals.FontCardText,
     );
     final labelStyle = GoogleFonts.lato(
       color: AppTokens.planTextMuted,
@@ -521,7 +521,7 @@ class _PlanningCard extends StatelessWidget {
     final remarkStyle = GoogleFonts.lato(
       color: colour.kTextMid,
       fontWeight: FontWeight.w500,
-      fontSize: isTablet ? objfun.FontCardText : objfun.FontCardText - 1,
+      fontSize: isTablet ? AppGlobals.FontCardText : AppGlobals.FontCardText - 1,
     );
 
     return Padding(
@@ -725,7 +725,7 @@ class _DetailsSection extends StatelessWidget {
           child: Text(
             'No records found',
             style: GoogleFonts.lato(
-                fontSize: objfun.FontLow, color: AppTokens.planTextMuted),
+                fontSize: AppGlobals.FontLow, color: AppTokens.planTextMuted),
           ),
         ),
       );
@@ -1038,14 +1038,14 @@ class _SheetTextField extends StatelessWidget {
       style: GoogleFonts.lato(
         color: colour.kTextDark,
         fontWeight: FontWeight.w600,
-        fontSize: objfun.FontLow,
+        fontSize: AppGlobals.FontLow,
       ),
       decoration: InputDecoration(
         hintText: hint,
         hintStyle: GoogleFonts.lato(
           color: AppTokens.planTextMuted,
           fontWeight: FontWeight.w500,
-          fontSize: objfun.FontLow,
+          fontSize: AppGlobals.FontLow,
         ),
         filled: true,
         fillColor: colour.kDetailBg,
@@ -1103,7 +1103,7 @@ class _GradientButton extends StatelessWidget {
               style: GoogleFonts.lato(
                 color: Colors.white,
                 fontWeight: FontWeight.w700,
-                fontSize: objfun.FontMedium,
+                fontSize: AppGlobals.FontMedium,
               ),
             ),
           ),
@@ -1141,7 +1141,7 @@ class _OutlineButton extends StatelessWidget {
               style: GoogleFonts.lato(
                 color: AppTokens.invoiceHeaderStart,
                 fontWeight: FontWeight.w700,
-                fontSize: objfun.FontMedium,
+                fontSize: AppGlobals.FontMedium,
               ),
             ),
           ),

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:maleva/core/network/OnlineApi.dart' as OnlineApi;
-import 'package:maleva/core/utils/clsfunction.dart' as objfun;
+import 'package:maleva/core/utils/app_globals.dart';
 import 'package:maleva/core/colors/colors.dart' as colour;
 import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
@@ -37,7 +37,7 @@ class _Productstate extends State<Product> {
   Future startup() async {
     await OnlineApi.SelectProductList(context);
     filtersearchlist.clear();
-    filtersearchlist.addAll(objfun.ProductList);
+    filtersearchlist.addAll(AppGlobals.ProductList);
     setState(() {
       progress = true;
     });
@@ -48,10 +48,10 @@ class _Productstate extends State<Product> {
     String vv = value.toString().toUpperCase();
     if (vv == "") {
       filtersearchlist.clear();
-      filtersearchlist.addAll(objfun.ProductList.toList());
+      filtersearchlist.addAll(AppGlobals.ProductList.toList());
     } else {
       filtersearchlist.clear();
-      filtersearchlist.addAll(objfun.ProductList.where((element) =>
+      filtersearchlist.addAll(AppGlobals.ProductList.where((element) =>
               (element.ProductName.toString().contains(vv) ||
                   element.ProductName.toString().contains(vv.toUpperCase())))
           .toList());
@@ -61,7 +61,7 @@ class _Productstate extends State<Product> {
   @override
   Widget build(BuildContext context) {
     double width = MediaQuery.of(context).size.width;
-    bool isTablet = objfun.MalevaScreen != 1;
+    bool isTablet = AppGlobals.MalevaScreen != 1;
 
     return Scaffold(
       backgroundColor: const Color(0xFFF4F7FC),
@@ -75,7 +75,7 @@ class _Productstate extends State<Product> {
             textStyle: TextStyle(
                 color: colour.topAppBarColor,
                 fontWeight: FontWeight.w700,
-                fontSize: objfun.FontLarge,
+                fontSize: AppGlobals.FontLarge,
                 letterSpacing: 0.5),
           ),
         ),

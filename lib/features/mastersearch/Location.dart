@@ -1,6 +1,6 @@
 import 'package:flutter/Material.dart';
 import 'package:maleva/core/network/OnlineApi.dart' as OnlineApi;
-import 'package:maleva/core/utils/clsfunction.dart' as objfun;
+import 'package:maleva/core/utils/app_globals.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:maleva/core/colors/colors.dart' as colour;
@@ -36,7 +36,7 @@ class _Locationstate extends State<Location> {
   Future startup() async {
     await OnlineApi.SelectLocation(context);
     filtersearchlist.clear();
-    filtersearchlist.addAll(objfun.LocationList);
+    filtersearchlist.addAll(AppGlobals.LocationList);
     setState(() {
       progress = true;
     });
@@ -47,10 +47,10 @@ class _Locationstate extends State<Location> {
     String vv = value.toString().toUpperCase();
     if (vv == "") {
       filtersearchlist.clear();
-      filtersearchlist.addAll(objfun.LocationList.toList());
+      filtersearchlist.addAll(AppGlobals.LocationList.toList());
     } else {
       filtersearchlist.clear();
-      filtersearchlist.addAll(objfun.LocationList.where((element) =>
+      filtersearchlist.addAll(AppGlobals.LocationList.where((element) =>
               (element.Location.toString().contains(vv) ||
                   element.Location.toString().contains(vv.toUpperCase())))
           .toList());
@@ -60,7 +60,7 @@ class _Locationstate extends State<Location> {
   @override
   Widget build(BuildContext context) {
     double width = MediaQuery.of(context).size.width;
-    bool isTablet = objfun.MalevaScreen != 1;
+    bool isTablet = AppGlobals.MalevaScreen != 1;
 
     return Scaffold(
       backgroundColor: const Color(0xFFF4F7FC),
@@ -74,7 +74,7 @@ class _Locationstate extends State<Location> {
             textStyle: TextStyle(
                 color: colour.topAppBarColor,
                 fontWeight: FontWeight.w700,
-                fontSize: objfun.FontLarge,
+                fontSize: AppGlobals.FontLarge,
                 letterSpacing: 0.5),
           ),
         ),

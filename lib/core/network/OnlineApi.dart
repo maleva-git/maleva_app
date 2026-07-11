@@ -2,10 +2,8 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/material.dart';
-import 'package:maleva/core/utils/clsfunction.dart' as objfun;
+import 'package:maleva/core/utils/app_globals.dart';
 import 'package:maleva/core/models/model.dart';
-
-import '../utils/clsfunction.dart';
 import 'api_client.dart';
 
 Future<bool> Login(String Username, String Password, String OldUsername,int DriverId, context) async {
@@ -14,10 +12,10 @@ Future<bool> Login(String Username, String Password, String OldUsername,int Driv
     int flag = 0;
     Map<String, String> header = {
       'Content-Type': 'application/json; charset=UTF-8',
-      'Token':objfun.mobiletoken,
+      'Token':AppGlobals.mobiletoken,
     };
     try {
-  final result = await objfun.apiAllinoneSelectArrayWithOutAuth(Uri.encodeFull("${objfun.apiLoginSuccess}$Username&Pwd=$Password&olduserid=$OldUsername&DriverId=$DriverId"),
+  final result = await AppGlobals.apiAllinoneSelectArrayWithOutAuth(Uri.encodeFull("${AppGlobals.apiLoginSuccess}$Username&Pwd=$Password&olduserid=$OldUsername&DriverId=$DriverId"),
             null,
             header,
             context);
@@ -31,57 +29,57 @@ Future<bool> Login(String Username, String Password, String OldUsername,int Driv
             var IdNew = value.data1[0]["UserId"] ?? 0;
             var Comid = value.data1[0]["Comid"] ?? 0;
             var MComid = value.data1[0]["MComid"] ?? 0;
-            objfun.selectedCompanyName = value.data1[0]["CompanyName"] ?? '';
-            objfun.EmpRefId = value.data1[0]["UserId"];
-            objfun.storagenew.setString('EnquiryOpen', "false");
+            AppGlobals.selectedCompanyName = value.data1[0]["CompanyName"] ?? '';
+            AppGlobals.EmpRefId = value.data1[0]["UserId"];
+            AppGlobals.storagenew.setString('EnquiryOpen', "false");
             if (IdNew != "") {
-              objfun.storagenew.setString('Username', Username);
-              objfun.storagenew.setString('Password', Password);
-              objfun.storagenew.setInt('DriverId', DriverId);
-              objfun.DriverLogin = DriverId;
+              AppGlobals.storagenew.setString('Username', Username);
+              AppGlobals.storagenew.setString('Password', Password);
+              AppGlobals.storagenew.setInt('DriverId', DriverId);
+              AppGlobals.DriverLogin = DriverId;
 
-              objfun.storagenew.setString(
+              AppGlobals.storagenew.setString(
                   'RulesType', value.data1[0]["RulesType"] ?? '');
-              objfun.storagenew.setInt('Comid', Comid);
-              objfun.Comid = objfun.storagenew.getInt('Comid') ?? 0;
-              objfun.DriverTruckRefId = value.data1[0]["TruckRefId"] ?? 0;
-              objfun.DriverTruckName = value.data1[0]["TruckName"] ?? '';
-              objfun.storagenew.setInt('MComid', MComid);
-              objfun.storagenew.setString('OldUsername', IdNew.toString());
+              AppGlobals.storagenew.setInt('Comid', Comid);
+              AppGlobals.Comid = AppGlobals.storagenew.getInt('Comid') ?? 0;
+              AppGlobals.DriverTruckRefId = value.data1[0]["TruckRefId"] ?? 0;
+              AppGlobals.DriverTruckName = value.data1[0]["TruckName"] ?? '';
+              AppGlobals.storagenew.setInt('MComid', MComid);
+              AppGlobals.storagenew.setString('OldUsername', IdNew.toString());
               if (OldUsername == "") {
                 var menudata = value.data3 ?? [];
                 if (menudata != null && menudata.isNotEmpty) {
-                  objfun.objMenuMaster.clear();
-                  objfun.parentclass.clear();
-                  objfun.storagenew.setString(
+                  AppGlobals.objMenuMaster.clear();
+                  AppGlobals.parentclass.clear();
+                  AppGlobals.storagenew.setString(
                       'loadmenu', json.encode(menudata));
                   for (int i = 0; i < menudata.length; i++) {
-                    objfun.objMenuMaster
+                    AppGlobals.objMenuMaster
                         .add(MenuMasterModel.fromJson(menudata[i]));
                   }
 
-                  objfun.parentclass.addAll(objfun.objMenuMaster
+                  AppGlobals.parentclass.addAll(AppGlobals.objMenuMaster
                       .where((element) => element.ParentId == 0)
                       .toList());
                 }
               }
               else {
-                String? temp1 = objfun.storagenew.getString('loadmenu');
+                String? temp1 = AppGlobals.storagenew.getString('loadmenu');
                 if (temp1 != null && temp1 != 'null') {
                   var decoded = json.decode(temp1);
                   List menudata = decoded;
 
                   if (menudata != null && menudata.isNotEmpty) {
-                    objfun.objMenuMaster.clear();
-                    objfun.parentclass.clear();
+                    AppGlobals.objMenuMaster.clear();
+                    AppGlobals.parentclass.clear();
                     for (int i = 0; i < menudata.length; i++) {
                       if (menudata[i]['FormText'] == null) {
                         continue;
                       }
-                      objfun.objMenuMaster
+                      AppGlobals.objMenuMaster
                           .add(MenuMasterModel.fromJson(menudata[i]));
                     }
-                    objfun.parentclass.addAll(objfun.objMenuMaster
+                    AppGlobals.parentclass.addAll(AppGlobals.objMenuMaster
                         .where((element) => element.ParentId == 0)
                         .toList());
                   }
@@ -91,29 +89,29 @@ Future<bool> Login(String Username, String Password, String OldUsername,int Driv
             flag = 1;
           }
           else if (value.StatusCode != 500) {
-            objfun.msgshow(
+            msgshow(
                 "Invaild Username & Password",
                 "",
                 Colors.white,
                 Colors.green,
                 null,
-                18.00 - objfun.reducesize,
-                objfun.tll,
-                objfun.tgc,
+                18.00 - AppGlobals.reducesize,
+                AppGlobals.tll,
+                AppGlobals.tgc,
                 context,
                 2);
             flag = 0;
           }
           else {
-            objfun.msgshow(
+            msgshow(
                 value.Message,
                 value.data1,
                 Colors.white,
                 Colors.red,
                 null,
-                18.00 - objfun.reducesize,
-                objfun.tll,
-                objfun.tgc,
+                18.00 - AppGlobals.reducesize,
+                AppGlobals.tll,
+                AppGlobals.tgc,
                 context,
                 2);
             flag = 0;
@@ -121,15 +119,15 @@ Future<bool> Login(String Username, String Password, String OldUsername,int Driv
         }
 
         else {
-          objfun.msgshow(
+          msgshow(
             "Unexpected response from server",
             "",
             Colors.white,
             Colors.red,
             null,
-            18.00 - objfun.reducesize,
-            objfun.tll,
-            objfun.tgc,
+            18.00 - AppGlobals.reducesize,
+            AppGlobals.tll,
+            AppGlobals.tgc,
             context,
             2,
           );
@@ -137,15 +135,15 @@ Future<bool> Login(String Username, String Password, String OldUsername,int Driv
         }
       }
 } catch (error, stackTrace) {
-  objfun.msgshow(
+  msgshow(
           error.toString(),
           stackTrace.toString(),
           Colors.white,
           Colors.red,
           null,
-          18.00 - objfun.reducesize,
-          objfun.tll,
-          objfun.tgc,
+          18.00 - AppGlobals.reducesize,
+          AppGlobals.tll,
+          AppGlobals.tgc,
           context,
           2);
       flag = 0;
@@ -163,27 +161,26 @@ Future<bool> Login(String Username, String Password, String OldUsername,int Driv
 
 Future SelectUser(context) async {
   try {
-    objfun.UserList.clear();
-    var Comid = objfun.storagenew.getInt('Comid') ?? 0;
+    AppGlobals.UserList.clear();
+    var Comid = AppGlobals.storagenew.getInt('Comid') ?? 0;
     try {
-  final resultData = await objfun
-        .apiAllinoneSelect(
-            Uri.encodeFull("${objfun.apiSelectUser}$Comid"), null, null, context);
+  final resultData = await AppGlobals.apiAllinoneSelect(
+            Uri.encodeFull("${AppGlobals.apiSelectUser}$Comid"), null, null, context);
   if (resultData.isNotEmpty) {
-        objfun.UserList = resultData
+        AppGlobals.UserList = resultData
             .map((element) => UserLoginModel.fromJson(element))
             .toList();
       }
 } catch (error, stackTrace) {
-  objfun.msgshow(
+  msgshow(
           error.toString(),
           stackTrace.toString(),
           Colors.white,
           Colors.red,
           null,
-          18.00 - objfun.reducesize,
-          objfun.tll,
-          objfun.tgc,
+          18.00 - AppGlobals.reducesize,
+          AppGlobals.tll,
+          AppGlobals.tgc,
           context,
           2);
 }
@@ -195,27 +192,26 @@ Future SelectUser(context) async {
 
 Future SelectCustomer(context) async {
   try {
-    objfun.CustomerList.clear();
-    var Comid = objfun.storagenew.getInt('Comid') ?? 0;
+    AppGlobals.CustomerList.clear();
+    var Comid = AppGlobals.storagenew.getInt('Comid') ?? 0;
     try {
-  final resultData = await objfun
-        .apiAllinoneSelect(
-            Uri.encodeFull("${objfun.apiSelectCustomer}$Comid"), null, null, context);
+  final resultData = await AppGlobals.apiAllinoneSelect(
+            Uri.encodeFull("${AppGlobals.apiSelectCustomer}$Comid"), null, null, context);
   if (resultData.isNotEmpty) {
-        objfun.CustomerList = resultData
+        AppGlobals.CustomerList = resultData
             .map((element) => CustomerModel.fromJson(element))
             .toList();
       }
 } catch (error, stackTrace) {
-  objfun.msgshow(
+  msgshow(
           error.toString(),
           stackTrace.toString(),
           Colors.white,
           Colors.red,
           null,
-          18.00 - objfun.reducesize,
-          objfun.tll,
-          objfun.tgc,
+          18.00 - AppGlobals.reducesize,
+          AppGlobals.tll,
+          AppGlobals.tgc,
           context,
           2);
 }
@@ -227,27 +223,26 @@ Future SelectCustomer(context) async {
 
 Future SelectLocation(context) async {
   try {
-    objfun.LocationList.clear();
-    var Comid = objfun.storagenew.getInt('Comid') ?? 0;
+    AppGlobals.LocationList.clear();
+    var Comid = AppGlobals.storagenew.getInt('Comid') ?? 0;
     try {
-  final resultData = await objfun
-        .apiAllinoneSelect(
-        Uri.encodeFull("${objfun.apiSelectLocation}$Comid"), null, null, context);
+  final resultData = await AppGlobals.apiAllinoneSelect(
+        Uri.encodeFull("${AppGlobals.apiSelectLocation}$Comid"), null, null, context);
   if (resultData.isNotEmpty) {
-        objfun.LocationList = resultData
+        AppGlobals.LocationList = resultData
             .map((element) => LocationModel.fromJson(element))
             .toList();
       }
 } catch (error, stackTrace) {
-  objfun.msgshow(
+  msgshow(
           error.toString(),
           stackTrace.toString(),
           Colors.white,
           Colors.red,
           null,
-          18.00 - objfun.reducesize,
-          objfun.tll,
-          objfun.tgc,
+          18.00 - AppGlobals.reducesize,
+          AppGlobals.tll,
+          AppGlobals.tgc,
           context,
           2);
 }
@@ -259,27 +254,26 @@ Future SelectLocation(context) async {
 
 Future SelectWareHouse(context) async {
   try {
-    objfun.WareHouseList.clear();
-    var Comid = objfun.storagenew.getInt('Comid') ?? 0;
+    AppGlobals.WareHouseList.clear();
+    var Comid = AppGlobals.storagenew.getInt('Comid') ?? 0;
     try {
-  final resultData = await objfun
-        .apiAllinoneSelectArrayWithOutAuth(
-        Uri.encodeFull("${objfun.apiWareHouseCombo}$Comid"), null, null, context);
+  final resultData = await AppGlobals.apiAllinoneSelectArrayWithOutAuth(
+        Uri.encodeFull("${AppGlobals.apiWareHouseCombo}$Comid"), null, null, context);
   if (resultData.isNotEmpty) {
-        objfun.WareHouseList = resultData["Data1"]
+        AppGlobals.WareHouseList = resultData["Data1"]
             .map((element) => WareHouseModel.fromJson(element))
             .toList().cast<WareHouseModel>();
       }
 } catch (error, stackTrace) {
-  objfun.msgshow(
+  msgshow(
           error.toString(),
           stackTrace.toString(),
           Colors.white,
           Colors.red,
           null,
-          18.00 - objfun.reducesize,
-          objfun.tll,
-          objfun.tgc,
+          18.00 - AppGlobals.reducesize,
+          AppGlobals.tll,
+          AppGlobals.tgc,
           context,
           2);
 }
@@ -291,27 +285,26 @@ Future SelectWareHouse(context) async {
 
 Future SelectStockJob(context) async {
   try {
-    objfun.StockJobList.clear();
-    var Comid = objfun.storagenew.getInt('Comid') ?? 0;
+    AppGlobals.StockJobList.clear();
+    var Comid = AppGlobals.storagenew.getInt('Comid') ?? 0;
     try {
-  final resultData = await objfun
-        .apiAllinoneSelectArrayWithOutAuth(
-        Uri.encodeFull("${objfun.apiSelectStockJob}$Comid"), null, null, context);
+  final resultData = await AppGlobals.apiAllinoneSelectArrayWithOutAuth(
+        Uri.encodeFull("${AppGlobals.apiSelectStockJob}$Comid"), null, null, context);
   if (resultData.isNotEmpty) {
-        objfun.StockJobList = resultData["Data1"]
+        AppGlobals.StockJobList = resultData["Data1"]
             .map((element) => WareHouseModel.fromJson(element))
             .toList().cast<WareHouseModel>();
       }
 } catch (error, stackTrace) {
-  objfun.msgshow(
+  msgshow(
           error.toString(),
           stackTrace.toString(),
           Colors.white,
           Colors.red,
           null,
-          18.00 - objfun.reducesize,
-          objfun.tll,
-          objfun.tgc,
+          18.00 - AppGlobals.reducesize,
+          AppGlobals.tll,
+          AppGlobals.tgc,
           context,
           2);
 }
@@ -323,30 +316,29 @@ Future SelectStockJob(context) async {
 
 Future SelectEmployee(context, String type, String type1) async {
   try {
-    objfun.EmployeeList.clear();
-    var Comid = objfun.storagenew.getInt('Comid') ?? 0;
+    AppGlobals.EmployeeList.clear();
+    var Comid = AppGlobals.storagenew.getInt('Comid') ?? 0;
     try {
-  final resultData = await objfun
-        .apiAllinoneSelect(
-            Uri.encodeFull("${objfun.apiSelectEmployee}$Comid&type=$type&type1=$type1"),
+  final resultData = await AppGlobals.apiAllinoneSelect(
+            Uri.encodeFull("${AppGlobals.apiSelectEmployee}$Comid&type=$type&type1=$type1"),
             null,
             null,
             context);
   if (resultData.isNotEmpty) {
-        objfun.EmployeeList = resultData
+        AppGlobals.EmployeeList = resultData
             .map((element) => EmployeeModel.fromJson(element))
             .toList();
       }
 } catch (error, stackTrace) {
-  objfun.msgshow(
+  msgshow(
           error.toString(),
           stackTrace.toString(),
           Colors.white,
           Colors.red,
           null,
-          18.00 - objfun.reducesize,
-          objfun.tll,
-          objfun.tgc,
+          18.00 - AppGlobals.reducesize,
+          AppGlobals.tll,
+          AppGlobals.tgc,
           context,
           2);
 }
@@ -358,27 +350,26 @@ Future SelectEmployee(context, String type, String type1) async {
 
 Future SelectJobStatus(context) async {
   try {
-    objfun.JobStatusList.clear();
-    var Comid = objfun.storagenew.getInt('Comid') ?? 0;
+    AppGlobals.JobStatusList.clear();
+    var Comid = AppGlobals.storagenew.getInt('Comid') ?? 0;
     try {
-  final resultData = await objfun
-        .apiAllinoneSelect(
-            Uri.encodeFull("${objfun.apiSelectJobStatus}$Comid"), null, null, context);
+  final resultData = await AppGlobals.apiAllinoneSelect(
+            Uri.encodeFull("${AppGlobals.apiSelectJobStatus}$Comid"), null, null, context);
   if (resultData.isNotEmpty) {
-        objfun.JobStatusList = resultData
+        AppGlobals.JobStatusList = resultData
             .map((element) => JobStatusModel.fromJson(element))
             .toList();
       }
 } catch (error, stackTrace) {
-  objfun.msgshow(
+  msgshow(
           error.toString(),
           stackTrace.toString(),
           Colors.white,
           Colors.red,
           null,
-          18.00 - objfun.reducesize,
-          objfun.tll,
-          objfun.tgc,
+          18.00 - AppGlobals.reducesize,
+          AppGlobals.tll,
+          AppGlobals.tgc,
           context,
           2);
 }
@@ -390,25 +381,24 @@ Future SelectJobStatus(context) async {
 
 Future MaxSaleOrderNo(context, String BillType) async {
   try {
-    var Comid = objfun.storagenew.getInt('Comid') ?? 0;
+    var Comid = AppGlobals.storagenew.getInt('Comid') ?? 0;
     try {
-  final resultData = await objfun
-        .apiGetString(
-            "${objfun.apiMaxSaleOrderNo}$Comid&BillType=$BillType");
+  final resultData = await AppGlobals.apiGetString(
+            "${AppGlobals.apiMaxSaleOrderNo}$Comid&BillType=$BillType");
   if (resultData.isNotEmpty) {
-        objfun.MaxSaleOrderNum = resultData;
+        AppGlobals.MaxSaleOrderNum = resultData;
       }
 } catch (error, stackTrace) {
-  objfun.msgshow(
+  msgshow(
           error.toString(),
           stackTrace.toString(),
           Colors.white,
           Colors.red,
           null,
 
-          18.00 - objfun.reducesize,
-          objfun.tll,
-          objfun.tgc,
+          18.00 - AppGlobals.reducesize,
+          AppGlobals.tll,
+          AppGlobals.tgc,
           context,
           2);
 }
@@ -420,25 +410,24 @@ Future MaxSaleOrderNo(context, String BillType) async {
 
 Future MaxStockNo(context) async {
   try {
-    var Comid = objfun.storagenew.getInt('Comid') ?? 0;
+    var Comid = AppGlobals.storagenew.getInt('Comid') ?? 0;
     try {
-  final resultData = await objfun
-        .apiAllinoneSelectArray(
-            Uri.encodeFull("${objfun.apiMaxStockNo}$Comid"), null, null, context);
+  final resultData = await AppGlobals.apiAllinoneSelectArray(
+            Uri.encodeFull("${AppGlobals.apiMaxStockNo}$Comid"), null, null, context);
   if (resultData.isNotEmpty) {
        // var checkdata = resultData["Data1"];
-        objfun.MaxStockNum = resultData["Data1"];
+        AppGlobals.MaxStockNum = resultData["Data1"];
       }
 } catch (error, stackTrace) {
-  objfun.msgshow(
+  msgshow(
           error.toString(),
           stackTrace.toString(),
           Colors.white,
           Colors.red,
           null,
-          18.00 - objfun.reducesize,
-          objfun.tll,
-          objfun.tgc,
+          18.00 - AppGlobals.reducesize,
+          AppGlobals.tll,
+          AppGlobals.tgc,
           context,
           2);
 }
@@ -450,27 +439,26 @@ Future MaxStockNo(context) async {
 
 Future SelectJobType(context) async {
   try {
-    objfun.JobTypeList.clear();
-    var Comid = objfun.storagenew.getInt('Comid') ?? 0;
+    AppGlobals.JobTypeList.clear();
+    var Comid = AppGlobals.storagenew.getInt('Comid') ?? 0;
     try {
-  final resultData = await objfun
-        .apiAllinoneSelect(
-            Uri.encodeFull("${objfun.apiSelectJobType}$Comid"), null, null, context);
+  final resultData = await AppGlobals.apiAllinoneSelect(
+            Uri.encodeFull("${AppGlobals.apiSelectJobType}$Comid"), null, null, context);
   if (resultData.isNotEmpty) {
-        objfun.JobTypeList = resultData
+        AppGlobals.JobTypeList = resultData
             .map((element) => JobTypeModel.fromJson(element))
             .toList();
       }
 } catch (error, stackTrace) {
-  objfun.msgshow(
+  msgshow(
           error.toString(),
           stackTrace.toString(),
           Colors.white,
           Colors.red,
           null,
-          18.00 - objfun.reducesize,
-          objfun.tll,
-          objfun.tgc,
+          18.00 - AppGlobals.reducesize,
+          AppGlobals.tll,
+          AppGlobals.tgc,
           context,
           2);
 }
@@ -482,37 +470,36 @@ Future SelectJobType(context) async {
 
 Future SelectAllJobStatus(context, int Jobid) async {
   try {
-    objfun.JobAllStatusList.clear();
-    var Comid = objfun.storagenew.getInt('Comid') ?? 0;
+    AppGlobals.JobAllStatusList.clear();
+    var Comid = AppGlobals.storagenew.getInt('Comid') ?? 0;
     try {
-  final resultData = await objfun
-        .apiAllinoneSelect(
-            Uri.encodeFull("${objfun.apiSelectAllJobStatus}$Comid&Jobid=$Jobid"),
+  final resultData = await AppGlobals.apiAllinoneSelect(
+            Uri.encodeFull("${AppGlobals.apiSelectAllJobStatus}$Comid&Jobid=$Jobid"),
             null,
             null,
             context);
   if (resultData.isNotEmpty) {
         var resultDetails = resultData[0]["JobTypeDetails"];
         var result = resultData[0]["JobStatusDetails"];
-        objfun.JobAllStatusList = result
+        AppGlobals.JobAllStatusList = result
             .map((element) => JobAllStatusModel.fromJson(element))
             .toList()
             .cast<JobAllStatusModel>();
-        objfun.JobTypeDetailsList = resultDetails
+        AppGlobals.JobTypeDetailsList = resultDetails
             .map((element) => JobTypeDetailsModel.fromJson(element))
             .toList()
             .cast<JobTypeDetailsModel>();
       }
 } catch (error, stackTrace) {
-  objfun.msgshow(
+  msgshow(
           error.toString(),
           stackTrace.toString(),
           Colors.white,
           Colors.red,
           null,
-          18.00 - objfun.reducesize,
-          objfun.tll,
-          objfun.tgc,
+          18.00 - AppGlobals.reducesize,
+          AppGlobals.tll,
+          AppGlobals.tgc,
           context,
           2);
 }
@@ -524,27 +511,26 @@ Future SelectAllJobStatus(context, int Jobid) async {
 
 Future SelectAgentCompany(context) async {
   try {
-    objfun.AgentCompanyList.clear();
-    var Comid = objfun.storagenew.getInt('Comid') ?? 0;
+    AppGlobals.AgentCompanyList.clear();
+    var Comid = AppGlobals.storagenew.getInt('Comid') ?? 0;
     try {
-  final resultData = await objfun
-        .apiAllinoneSelect(
-            Uri.encodeFull("${objfun.apiSelectAgentCompany}$Comid"), null, null, context);
+  final resultData = await AppGlobals.apiAllinoneSelect(
+            Uri.encodeFull("${AppGlobals.apiSelectAgentCompany}$Comid"), null, null, context);
   if (resultData.isNotEmpty) {
-        objfun.AgentCompanyList = resultData
+        AppGlobals.AgentCompanyList = resultData
             .map((element) => AgentCompanyModel.fromJson(element))
             .toList();
       }
 } catch (error, stackTrace) {
-  objfun.msgshow(
+  msgshow(
           error.toString(),
           stackTrace.toString(),
           Colors.white,
           Colors.red,
           null,
-          18.00 - objfun.reducesize,
-          objfun.tll,
-          objfun.tgc,
+          18.00 - AppGlobals.reducesize,
+          AppGlobals.tll,
+          AppGlobals.tgc,
           context,
           2);
 }
@@ -556,29 +542,28 @@ Future SelectAgentCompany(context) async {
 
 Future SelectAgentAll(context, int AgentCompanyId) async {
   try {
-    objfun.AgentAllList.clear();
-    var Comid = objfun.storagenew.getInt('Comid') ?? 0;
+    AppGlobals.AgentAllList.clear();
+    var Comid = AppGlobals.storagenew.getInt('Comid') ?? 0;
     try {
-  final resultData = await objfun
-        .apiAllinoneSelect(
-            Uri.encodeFull("${objfun.apiSelectAgentAll}$Comid&Jobid=$AgentCompanyId"),
+  final resultData = await AppGlobals.apiAllinoneSelect(
+            Uri.encodeFull("${AppGlobals.apiSelectAgentAll}$Comid&Jobid=$AgentCompanyId"),
             null,
             null,
             context);
   if (resultData.isNotEmpty) {
-        objfun.AgentAllList =
+        AppGlobals.AgentAllList =
             resultData.map((element) => AgentModel.fromJson(element)).toList();
       }
 } catch (error, stackTrace) {
-  objfun.msgshow(
+  msgshow(
           error.toString(),
           stackTrace.toString(),
           Colors.white,
           Colors.red,
           null,
-          18.00 - objfun.reducesize,
-          objfun.tll,
-          objfun.tgc,
+          18.00 - AppGlobals.reducesize,
+          AppGlobals.tll,
+          AppGlobals.tgc,
           context,
           2);
 }
@@ -590,27 +575,26 @@ Future SelectAgentAll(context, int AgentCompanyId) async {
 
 Future SelectProductList(context) async {
   try {
-    objfun.ProductList.clear();
-    var Comid = objfun.storagenew.getInt('Comid') ?? 0;
+    AppGlobals.ProductList.clear();
+    var Comid = AppGlobals.storagenew.getInt('Comid') ?? 0;
     try {
-  final resultData = await objfun
-        .apiAllinoneSelect(
-            Uri.encodeFull("${objfun.apiGetProductList}$Comid"), null, null, context);
+  final resultData = await AppGlobals.apiAllinoneSelect(
+            Uri.encodeFull("${AppGlobals.apiGetProductList}$Comid"), null, null, context);
   if (resultData.isNotEmpty) {
-        objfun.ProductList = resultData
+        AppGlobals.ProductList = resultData
             .map((element) => ProductModel.fromJson(element))
             .toList();
       }
 } catch (error, stackTrace) {
-  objfun.msgshow(
+  msgshow(
           error.toString(),
           stackTrace.toString(),
           Colors.white,
           Colors.red,
           null,
-          18.00 - objfun.reducesize,
-          objfun.tll,
-          objfun.tgc,
+          18.00 - AppGlobals.reducesize,
+          AppGlobals.tll,
+          AppGlobals.tgc,
           context,
           2);
 }
@@ -625,12 +609,12 @@ Future SelectProductList(context) async {
 // Context illa clean code!
 Future<List<dynamic>?> selectAddressList() async {
   try {
-    objfun.AddressList.clear();
-    final int comId = objfun.storagenew.getInt('Comid') ?? 0;
+    AppGlobals.AddressList.clear();
+    final int comId = AppGlobals.storagenew.getInt('Comid') ?? 0;
 
     // Call ApiClient.postRequest and pass null for the body
     final resultData = await ApiClient.postRequest(
-      "${objfun.apiSelectAddressList}$comId",
+      "${AppGlobals.apiSelectAddressList}$comId",
       null,
     );
 
@@ -657,13 +641,13 @@ Future<List<dynamic>?> selectAddressList() async {
 
 // Future<void> SelectAddressList(BuildContext context) async {
 //   try {
-//     objfun.AddressList.clear();
+//     AppGlobals.AddressList.clear();
 //
-//     final int comId = objfun.storagenew.getInt('Comid') ?? 0;
+//     final int comId = AppGlobals.storagenew.getInt('Comid') ?? 0;
 //
 //     final resultData = await objfun
 //         .apiAllinoneSelect(
-//       "${objfun.apiSelectAddressList}$comId",
+//       "${AppGlobals.apiSelectAddressList}$comId",
 //       null,
 //       null,
 //       context,
@@ -671,7 +655,7 @@ Future<List<dynamic>?> selectAddressList() async {
 //         .timeout(const Duration(seconds: 15));
 //
 //     if (resultData != null && resultData.isNotEmpty) {
-//       objfun.AddressList = resultData;
+//       AppGlobals.AddressList = resultData;
 //     }
 //
 //   } on TimeoutException {
@@ -688,15 +672,15 @@ Future<List<dynamic>?> selectAddressList() async {
 
 
 void _showError(BuildContext context, String message) {
-  objfun.msgshow(
+  msgshow(
     message,
     "",
     Colors.white,
     Colors.red,
     null,
-    18.00 - objfun.reducesize,
-    objfun.tll,
-    objfun.tgc,
+    18.00 - AppGlobals.reducesize,
+    AppGlobals.tll,
+    AppGlobals.tgc,
     context,
     2,
   );
@@ -704,14 +688,14 @@ void _showError(BuildContext context, String message) {
 
 Future EditSalesOrder(int Id, int SaleNo, {BuildContext? context}) async {
   try {
-    var Comid = objfun.storagenew.getInt('Comid') ?? 0;
-    var resultData = await objfun.apiAllinoneSelect(
-        Uri.encodeFull("${objfun.apiEditSalesOrder}$Id&SaleorderNo=$SaleNo&Comid=$Comid"),
+    var Comid = AppGlobals.storagenew.getInt('Comid') ?? 0;
+    var resultData = await AppGlobals.apiAllinoneSelect(
+        Uri.encodeFull("${AppGlobals.apiEditSalesOrder}$Id&SaleorderNo=$SaleNo&Comid=$Comid"),
         null, null, context);
 
     if (resultData != null && resultData.isNotEmpty) {
-      objfun.SaleEditMasterList = resultData;
-      objfun.SaleEditDetailList = resultData[0]["SaleDetails"]
+      AppGlobals.SaleEditMasterList = resultData;
+      AppGlobals.SaleEditDetailList = resultData[0]["SaleDetails"]
           .map((element) => SaleEditDetailModel.fromJson(element))
           .toList()
           .cast<SaleEditDetailModel>();
@@ -726,28 +710,27 @@ Future EditSalesOrder(int Id, int SaleNo, {BuildContext? context}) async {
 
 Future loadCustomerCurrency(context, int CustomerId) async {
   try {
-objfun.CustomerCurrencyValue = 0.0;
-    var Comid = objfun.storagenew.getInt('Comid') ?? 0;
+AppGlobals.CustomerCurrencyValue = 0.0;
+    var Comid = AppGlobals.storagenew.getInt('Comid') ?? 0;
     try {
-  final resultData = await objfun
-        .apiAllinoneSelectArray(
-        Uri.encodeFull("${objfun.apiGetCurrencyValue}$Comid&CustId=$CustomerId"),
+  final resultData = await AppGlobals.apiAllinoneSelectArray(
+        Uri.encodeFull("${AppGlobals.apiGetCurrencyValue}$Comid&CustId=$CustomerId"),
         null,
         null,
         context);
   if (resultData.length != 0) {
-        CustomerCurrencyValue = resultData["Data1"];
+        AppGlobals.CustomerCurrencyValue = resultData["Data1"];
       }
 } catch (error, stackTrace) {
-  objfun.msgshow(
+  msgshow(
           error.toString(),
           stackTrace.toString(),
           Colors.white,
           Colors.red,
           null,
-          18.00 - objfun.reducesize,
-          objfun.tll,
-          objfun.tgc,
+          18.00 - AppGlobals.reducesize,
+          AppGlobals.tll,
+          AppGlobals.tgc,
           context,
           2);
 }
@@ -758,34 +741,33 @@ objfun.CustomerCurrencyValue = 0.0;
 }
 Future loadComboS1(context, int type) async {
   try {
-    objfun.ComboS1List=[];
-    var Comid = objfun.storagenew.getInt('Comid') ?? 0;
+    AppGlobals.ComboS1List=[];
+    var Comid = AppGlobals.storagenew.getInt('Comid') ?? 0;
     try {
-  final resultData = await objfun
-        .apiAllinoneSelectArray(
-            Uri.encodeFull("${objfun.apiGetComboS1}$Comid&type=$type"),
+  final resultData = await AppGlobals.apiAllinoneSelectArray(
+            Uri.encodeFull("${AppGlobals.apiGetComboS1}$Comid&type=$type"),
             null,
             null,
             context);
   if (resultData.length != 0) {
-        objfun.ComboS1List.add(resultData["Data1"]);
-        objfun.ComboS1List.add(resultData["Data2"]);
-        objfun.ComboS1List.add(resultData["Data3"]);
-        objfun.ComboS1List.add(resultData["Data4"]);
-        objfun.ComboS1List.add(resultData["Data5"]);
-        objfun.ComboS1List.add(resultData["Data6"]);
+        AppGlobals.ComboS1List.add(resultData["Data1"]);
+        AppGlobals.ComboS1List.add(resultData["Data2"]);
+        AppGlobals.ComboS1List.add(resultData["Data3"]);
+        AppGlobals.ComboS1List.add(resultData["Data4"]);
+        AppGlobals.ComboS1List.add(resultData["Data5"]);
+        AppGlobals.ComboS1List.add(resultData["Data6"]);
 
       }
 } catch (error, stackTrace) {
-  objfun.msgshow(
+  msgshow(
           error.toString(),
           stackTrace.toString(),
           Colors.white,
           Colors.red,
           null,
-          18.00 - objfun.reducesize,
-          objfun.tll,
-          objfun.tgc,
+          18.00 - AppGlobals.reducesize,
+          AppGlobals.tll,
+          AppGlobals.tgc,
           context,
           2);
 }
@@ -796,28 +778,27 @@ Future loadComboS1(context, int type) async {
 }
 Future EditPlanning(context, int Id, int PlanningNo) async {
   try {
-    // objfun.PlanningEditList.clear();
-    var Comid = objfun.storagenew.getInt('Comid') ?? 0;
+    // AppGlobals.PlanningEditList.clear();
+    var Comid = AppGlobals.storagenew.getInt('Comid') ?? 0;
     try {
-  final resultData = await objfun
-        .apiAllinoneSelect(
-            Uri.encodeFull("${objfun.apiEditPlanning}$Id&PLANINGNo=$PlanningNo&Comid=$Comid"),
+  final resultData = await AppGlobals.apiAllinoneSelect(
+            Uri.encodeFull("${AppGlobals.apiEditPlanning}$Id&PLANINGNo=$PlanningNo&Comid=$Comid"),
             null,
             null,
             context);
   if (resultData.isNotEmpty) {
-        objfun.PlanningEditList = resultData[0]["SaleDetails"].toList();
+        AppGlobals.PlanningEditList = resultData[0]["SaleDetails"].toList();
       }
 } catch (error, stackTrace) {
-  objfun.msgshow(
+  msgshow(
           error.toString(),
           stackTrace.toString(),
           Colors.white,
           Colors.red,
           null,
-          18.00 - objfun.reducesize,
-          objfun.tll,
-          objfun.tgc,
+          18.00 - AppGlobals.reducesize,
+          AppGlobals.tll,
+          AppGlobals.tgc,
           context,
           2);
 }
@@ -828,27 +809,26 @@ Future EditPlanning(context, int Id, int PlanningNo) async {
 }
 Future EditVesselPlanning(context, int Id, int PlanningNo) async {
   try {
-    var Comid = objfun.storagenew.getInt('Comid') ?? 0;
+    var Comid = AppGlobals.storagenew.getInt('Comid') ?? 0;
     try {
-  final resultData = await objfun
-        .apiAllinoneSelect(
-        Uri.encodeFull("${objfun.apiEditVesselPlanning}$Id&VESSELPLANINGNo=$PlanningNo&Comid=$Comid"),
+  final resultData = await AppGlobals.apiAllinoneSelect(
+        Uri.encodeFull("${AppGlobals.apiEditVesselPlanning}$Id&VESSELPLANINGNo=$PlanningNo&Comid=$Comid"),
         null,
         null,
         context);
   if (resultData.isNotEmpty) {
-        objfun.VesselPlanningEditList = resultData[0]["SaleDetails"].toList();
+        AppGlobals.VesselPlanningEditList = resultData[0]["SaleDetails"].toList();
       }
 } catch (error, stackTrace) {
-  objfun.msgshow(
+  msgshow(
           error.toString(),
           stackTrace.toString(),
           Colors.white,
           Colors.red,
           null,
-          18.00 - objfun.reducesize,
-          objfun.tll,
-          objfun.tgc,
+          18.00 - AppGlobals.reducesize,
+          AppGlobals.tll,
+          AppGlobals.tgc,
           context,
           2);
 }
@@ -859,31 +839,30 @@ Future EditVesselPlanning(context, int Id, int PlanningNo) async {
 }
 Future DeleteSalesOrder(context, int Id) async {
   try {
-    // objfun.AddressList.clear();
-    var Comid = objfun.storagenew.getInt('Comid') ?? 0;
+    // AppGlobals.AddressList.clear();
+    var Comid = AppGlobals.storagenew.getInt('Comid') ?? 0;
     try {
-  final resultData = await objfun
-        .apiAllinoneSelectArray(
-            Uri.encodeFull("${objfun.apiDeleteSalesOrder}$Id&Comid=$Comid"),
+  final resultData = await AppGlobals.apiAllinoneSelectArray(
+            Uri.encodeFull("${AppGlobals.apiDeleteSalesOrder}$Id&Comid=$Comid"),
             null,
             null,
             context);
   if (resultData.length != 0) {
         ResponseViewModel? value = ResponseViewModel.fromJson(resultData);
         if (value.IsSuccess == true) {
-          await objfun.ConfirmationOK(value.Message, context);
+          await ConfirmationOK(value.Message, context);
         }
       }
 } catch (error, stackTrace) {
-  objfun.msgshow(
+  msgshow(
           error.toString(),
           stackTrace.toString(),
           Colors.white,
           Colors.red,
           null,
-          18.00 - objfun.reducesize,
-          objfun.tll,
-          objfun.tgc,
+          18.00 - AppGlobals.reducesize,
+          AppGlobals.tll,
+          AppGlobals.tgc,
           context,
           2);
 }
@@ -895,30 +874,29 @@ Future DeleteSalesOrder(context, int Id) async {
 
 Future SelectAddressDetails(context, String Keyword) async {
   try {
-    objfun.AddressDetailedList.clear();
-    var Comid = objfun.storagenew.getInt('Comid') ?? 0;
+    AppGlobals.AddressDetailedList.clear();
+    var Comid = AppGlobals.storagenew.getInt('Comid') ?? 0;
     try {
-  final resultData = await objfun
-        .apiAllinoneSelect(
-            Uri.encodeFull("${objfun.apiSelectAddressDetails}$Comid&KeyWord=$Keyword"),
+  final resultData = await AppGlobals.apiAllinoneSelect(
+            Uri.encodeFull("${AppGlobals.apiSelectAddressDetails}$Comid&KeyWord=$Keyword"),
             null,
             null,
             context);
   if (resultData.isNotEmpty) {
-        objfun.AddressDetailedList = resultData
+        AppGlobals.AddressDetailedList = resultData
             .map((element) => AddressDetailsModel.fromJson(element))
             .toList();
       }
 } catch (error, stackTrace) {
-  objfun.msgshow(
+  msgshow(
           error.toString(),
           stackTrace.toString(),
           Colors.white,
           Colors.red,
           null,
-          18.00 - objfun.reducesize,
-          objfun.tll,
-          objfun.tgc,
+          18.00 - AppGlobals.reducesize,
+          AppGlobals.tll,
+          AppGlobals.tgc,
           context,
           2);
 }
@@ -930,28 +908,27 @@ Future SelectAddressDetails(context, String Keyword) async {
 
 Future GetJobNoForwarding(context,int BillId) async {
   try {
-    objfun.ForwardingList.clear();
-    var Comid = objfun.storagenew.getInt('Comid') ?? 0;
+    AppGlobals.ForwardingList.clear();
+    var Comid = AppGlobals.storagenew.getInt('Comid') ?? 0;
     try {
-  final resultData = await objfun
-        .apiAllinoneSelectArray(
-        Uri.encodeFull("${objfun.apiGetJobNo}$Comid&JobType=$BillId"), null, null, context);
+  final resultData = await AppGlobals.apiAllinoneSelectArray(
+        Uri.encodeFull("${AppGlobals.apiGetJobNo}$Comid&JobType=$BillId"), null, null, context);
   if (resultData.length != 0) {   
-        objfun.ForwardingList = resultData["Data1"]
+        AppGlobals.ForwardingList = resultData["Data1"]
             .map((element) => ForwardingModel.fromJson(element))
             .toList().cast<ForwardingModel>();
-        objfun.JobNoList =  resultData["Data1"].toList();
+        AppGlobals.JobNoList =  resultData["Data1"].toList();
       }
 } catch (error, stackTrace) {
-  objfun.msgshow(
+  msgshow(
           error.toString(),
           stackTrace.toString(),
           Colors.white,
           Colors.red,
           null,
-          18.00 - objfun.reducesize,
-          objfun.tll,
-          objfun.tgc,
+          18.00 - AppGlobals.reducesize,
+          AppGlobals.tll,
+          AppGlobals.tgc,
           context,
           2);
 }
@@ -964,16 +941,16 @@ Future GetJobNoForwarding(context,int BillId) async {
 Future<void> GetRTINoForwarding(BuildContext ?context, int billId) async {
   try {
     // Clear existing job list
-    objfun.JobNoList.clear();
+    AppGlobals.JobNoList.clear();
 
     // Get company ID from storage
-    final int comId = objfun.storagenew.getInt('Comid') ?? 0;
+    final int comId = AppGlobals.storagenew.getInt('Comid') ?? 0;
 
     // Construct the API URL
-    final String apiUrl = '${objfun.apiGetRTINo}$comId';
+    final String apiUrl = '${AppGlobals.apiGetRTINo}$comId';
 
     // Call the API
-    final resultData = await objfun.apiAllinoneSelectArray(
+    final resultData = await AppGlobals.apiAllinoneSelectArray(
         apiUrl, null, null, context);
 
     // Check response validity and content
@@ -981,7 +958,7 @@ Future<void> GetRTINoForwarding(BuildContext ?context, int billId) async {
       final List<dynamic> dataList = resultData;
 
       // Clear existing job list
-      objfun.JobNoList.clear();
+      AppGlobals.JobNoList.clear();
 
       for (var item in dataList) {
         // Safety check: ensure item is a Map
@@ -989,26 +966,26 @@ Future<void> GetRTINoForwarding(BuildContext ?context, int billId) async {
           final String cNumber = item['RTINoDisplay']?.toString() ?? '';
           final int id = item['Id'] ?? 0;
 
-          objfun.JobNoList.add({
+          AppGlobals.JobNoList.add({
             'CNumber': cNumber,
             'Id': id,
           });
         }
       }
     } else {
-      objfun.JobNoList = []; // Default to empty list
+      AppGlobals.JobNoList = []; // Default to empty list
     }
   }
   catch (error, stackTrace) {
-    objfun.msgshow(
+    msgshow(
       error.toString(),
       stackTrace.toString(),
       Colors.white,
       Colors.red,
       null,
-      18.00 - objfun.reducesize,
-      objfun.tll,
-      objfun.tgc,
+      18.00 - AppGlobals.reducesize,
+      AppGlobals.tll,
+      AppGlobals.tgc,
       context,
       2,
     );
@@ -1016,28 +993,27 @@ Future<void> GetRTINoForwarding(BuildContext ?context, int billId) async {
 }
 Future SelectTruckList(context,String? Type) async {
   try {
-    objfun.GetTruckList.clear();
-    var Comid = objfun.storagenew.getInt('Comid') ?? 0;
+    AppGlobals.GetTruckList.clear();
+    var Comid = AppGlobals.storagenew.getInt('Comid') ?? 0;
 
     try {
-  final resultData = await objfun
-        .apiAllinoneSelect(
-        Uri.encodeFull("${objfun.apiGetTruckList}$Comid&type="), null, null, context);
+  final resultData = await AppGlobals.apiAllinoneSelect(
+        Uri.encodeFull("${AppGlobals.apiGetTruckList}$Comid&type="), null, null, context);
   if (resultData.isNotEmpty) {
-        objfun.GetTruckList = resultData
+        AppGlobals.GetTruckList = resultData
             .map((element) => GetTruckModel.fromJson(element))
             .toList();
       }
 } catch (error, stackTrace) {
-  objfun.msgshow(
+  msgshow(
           error.toString(),
           stackTrace.toString(),
           Colors.white,
           Colors.red,
           null,
-          18.00 - objfun.reducesize,
-          objfun.tll,
-          objfun.tgc,
+          18.00 - AppGlobals.reducesize,
+          AppGlobals.tll,
+          AppGlobals.tgc,
           context,
           2);
 }
@@ -1049,27 +1025,26 @@ Future SelectTruckList(context,String? Type) async {
 
 Future EditTruckList(context,int Keyword,String Column,String? Type) async {
   try {
-    objfun.TruckDetailsList.clear();
-    var Comid = objfun.storagenew.getInt('Comid') ?? 0;
+    AppGlobals.TruckDetailsList.clear();
+    var Comid = AppGlobals.storagenew.getInt('Comid') ?? 0;
     try {
-  final resultData = await objfun
-        .apiAllinoneSelect(
-        Uri.encodeFull("${objfun.apiEditTruckDetails}$Comid&Startindex=0&PageCount=0&Keyword=$Keyword&Column=$Column&type="), null, null, context);
+  final resultData = await AppGlobals.apiAllinoneSelect(
+        Uri.encodeFull("${AppGlobals.apiEditTruckDetails}$Comid&Startindex=0&PageCount=0&Keyword=$Keyword&Column=$Column&type="), null, null, context);
   if (resultData.isNotEmpty) {
-        objfun.TruckDetailsList = resultData
+        AppGlobals.TruckDetailsList = resultData
             .map((element) => TruckDetailsModel.fromJson(element))
             .toList();
       }
 } catch (error, stackTrace) {
-  objfun.msgshow(
+  msgshow(
           error.toString(),
           stackTrace.toString(),
           Colors.white,
           Colors.red,
           null,
-          18.00 - objfun.reducesize,
-          objfun.tll,
-          objfun.tgc,
+          18.00 - AppGlobals.reducesize,
+          AppGlobals.tll,
+          AppGlobals.tgc,
           context,
           2);
 }
@@ -1081,28 +1056,27 @@ Future EditTruckList(context,int Keyword,String Column,String? Type) async {
 
 Future SelectDriverList(context,String? Type) async {
   try {
-    objfun.GetDriverList.clear();
-    var Comid = objfun.storagenew.getInt('Comid') ?? 0;
+    AppGlobals.GetDriverList.clear();
+    var Comid = AppGlobals.storagenew.getInt('Comid') ?? 0;
 
     try {
-  final resultData = await objfun
-        .apiAllinoneSelect(
-        Uri.encodeFull("${objfun.apiGetDriverList}$Comid&type="), null, null, context);
+  final resultData = await AppGlobals.apiAllinoneSelect(
+        Uri.encodeFull("${AppGlobals.apiGetDriverList}$Comid&type="), null, null, context);
   if (resultData.isNotEmpty) {
-        objfun.GetDriverList = resultData
+        AppGlobals.GetDriverList = resultData
             .map((element) => GetTruckModel.fromJson(element))
             .toList();
       }
 } catch (error, stackTrace) {
-  objfun.msgshow(
+  msgshow(
           error.toString(),
           stackTrace.toString(),
           Colors.white,
           Colors.red,
           null,
-          18.00 - objfun.reducesize,
-          objfun.tll,
-          objfun.tgc,
+          18.00 - AppGlobals.reducesize,
+          AppGlobals.tll,
+          AppGlobals.tgc,
           context,
           2);
 }
@@ -1114,30 +1088,29 @@ Future SelectDriverList(context,String? Type) async {
 
 Future SelectRTIDetailViewList(context,String Fromdate,String Todate,int DId, int TId, int Employeeid,String Search) async {
   try {
-    objfun.RTIViewMasterList.clear();
-    var Comid = objfun.storagenew.getInt('Comid') ?? 0;
+    AppGlobals.RTIViewMasterList.clear();
+    var Comid = AppGlobals.storagenew.getInt('Comid') ?? 0;
     try {
-  final resultData = await objfun
-        .apiAllinoneSelect(
-        Uri.encodeFull("${objfun.apiSelectRTIDetailsView}$Comid&Fromdate=$Fromdate&Todate=$Todate&DId=$DId&TId=$TId&Employeeid=$Employeeid&Search$Search"), null, null, context);
+  final resultData = await AppGlobals.apiAllinoneSelect(
+        Uri.encodeFull("${AppGlobals.apiSelectRTIDetailsView}$Comid&Fromdate=$Fromdate&Todate=$Todate&DId=$DId&TId=$TId&Employeeid=$Employeeid&Search$Search"), null, null, context);
   if (resultData.isNotEmpty) {
-        objfun.RTIViewMasterList = resultData[0]["salemaster"]
+        AppGlobals.RTIViewMasterList = resultData[0]["salemaster"]
             .map((element) => RTIMasterViewModel.fromJson(element))
             .toList();
-        objfun.RTIViewDetailList = resultData[0]["saledetails"]
+        AppGlobals.RTIViewDetailList = resultData[0]["saledetails"]
             .map((element) => RTIDetailsViewModel.fromJson(element))
             .toList();
       }
 } catch (error, stackTrace) {
-  objfun.msgshow(
+  msgshow(
           error.toString(),
           stackTrace.toString(),
           Colors.white,
           Colors.red,
           null,
-          18.00 - objfun.reducesize,
-          objfun.tll,
-          objfun.tgc,
+          18.00 - AppGlobals.reducesize,
+          AppGlobals.tll,
+          AppGlobals.tgc,
           context,
           2);
 }
@@ -1149,30 +1122,29 @@ Future SelectRTIDetailViewList(context,String Fromdate,String Todate,int DId, in
 
 Future SelectRTIViewList(context,String Fromdate,String Todate,int DId, int TId, int Employeeid,String Search) async {
   try {
-    objfun.RTIViewMasterList.clear();
-    var Comid = objfun.storagenew.getInt('Comid') ?? 0;
+    AppGlobals.RTIViewMasterList.clear();
+    var Comid = AppGlobals.storagenew.getInt('Comid') ?? 0;
     try {
-  final resultData = await objfun
-        .apiAllinoneSelect(
-        Uri.encodeFull("${objfun.apiSelectRTIView}$Comid&Fromdate=$Fromdate&Todate=$Todate&DId=$DId&TId=$TId&Employeeid=$Employeeid&Search=$Search"), null, null, context);
+  final resultData = await AppGlobals.apiAllinoneSelect(
+        Uri.encodeFull("${AppGlobals.apiSelectRTIView}$Comid&Fromdate=$Fromdate&Todate=$Todate&DId=$DId&TId=$TId&Employeeid=$Employeeid&Search=$Search"), null, null, context);
   if (resultData.isNotEmpty) {
-        objfun.RTIViewMasterList = resultData[0]["salemaster"]
+        AppGlobals.RTIViewMasterList = resultData[0]["salemaster"]
             .map((element) => RTIMasterViewModel.fromJson(element))
             .toList();
-        objfun.RTIViewDetailList = resultData[0]["saledetails"]
+        AppGlobals.RTIViewDetailList = resultData[0]["saledetails"]
             .map((element) => RTIDetailsViewModel.fromJson(element))
             .toList();
       }
 } catch (error, stackTrace) {
-  objfun.msgshow(
+  msgshow(
           error.toString(),
           stackTrace.toString(),
           Colors.white,
           Colors.red,
           null,
-          18.00 - objfun.reducesize,
-          objfun.tll,
-          objfun.tgc,
+          18.00 - AppGlobals.reducesize,
+          AppGlobals.tll,
+          AppGlobals.tgc,
           context,
           2);
 }

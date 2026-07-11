@@ -1,6 +1,6 @@
 import 'dart:convert';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:maleva/core/utils/clsfunction.dart' as objfun;
+import 'package:maleva/core/utils/app_globals.dart';
 import 'package:maleva/core/models/model.dart';
 
 import 'fuelentry_event.dart';
@@ -62,7 +62,7 @@ class FuelEntryBloc extends Bloc<FuelEntryEvent, FuelEntryState> {
     final s = state as FuelEntryLoaded;
 
     // 🚨 Prevent saving if no truck is assigned
-    if (objfun.DriverTruckRefId == 0) {
+    if (AppGlobals.DriverTruckRefId == 0) {
       emit(FuelEntryError("No Truck Assigned! Please select or assign a truck first."));
       emit(s);
       return;
@@ -76,11 +76,11 @@ class FuelEntryBloc extends Bloc<FuelEntryEvent, FuelEntryState> {
           'CNumberDisplay': '0',
           'CNumber':        0,
           'Id':             0,
-          'CompanyRefId':   objfun.Comid,
+          'CompanyRefId':   AppGlobals.Comid,
           'UserRefId':      null,
           'EmployeeRefId':  null,
-          'TruckRefid':     objfun.DriverTruckRefId,
-          'DriverRefId':    objfun.EmpRefId,
+          'TruckRefid':     AppGlobals.DriverTruckRefId,
+          'DriverRefId':    AppGlobals.EmpRefId,
           'FilePath':       '',
           'Remarks':        '',
           'Aliter':         double.tryParse(s.liter) ?? 0,
@@ -100,11 +100,11 @@ class FuelEntryBloc extends Bloc<FuelEntryEvent, FuelEntryState> {
 
       final header = {
         'Content-Type': 'application/json; charset=UTF-8',
-        'Comid': objfun.Comid.toString(),
+        'Comid': AppGlobals.Comid.toString(),
       };
 
-      final resultData = await objfun.apiAllinoneSelectArray(
-          objfun.apiInsertFuelEntry, master, header, null);
+      final resultData = await AppGlobals.apiAllinoneSelectArray(
+          AppGlobals.apiInsertFuelEntry, master, header, null);
 
       if (resultData != null && resultData.toString().isNotEmpty) {
         try {
@@ -149,9 +149,9 @@ class FuelEntryBloc extends Bloc<FuelEntryEvent, FuelEntryState> {
   // ── Helper: fetch max fuel no ─────────────────────────────────────────────────
   Future<String> _fetchMaxFuelNo() async {
     try {
-      final comId = objfun.storagenew.getInt('Comid') ?? 0;
-      final result = await objfun.apiGetString(
-          '${objfun.apiMaxFuelEntryNo}$comId');
+      final comId = AppGlobals.storagenew.getInt('Comid') ?? 0;
+      final result = await AppGlobals.apiGetString(
+          '${AppGlobals.apiMaxFuelEntryNo}$comId');
       return result.isNotEmpty ? result : '';
     } catch (_) {
       return '';

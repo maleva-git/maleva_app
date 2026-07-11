@@ -5,7 +5,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import '../../../../core/models/model.dart';
 import '../../../../core/theme/tokens.dart';
-import '../../../../core/utils/clsfunction.dart' as objfun;
+import 'package:maleva/core/utils/app_globals.dart';
 import '../../../../menu/menulist.dart';
 import '../../../mastersearch/Truck.dart';
 import '../bloc/maintenance_bloc.dart';
@@ -46,7 +46,7 @@ class _MaintenancePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final userName = objfun.storagenew.getString('Username') ?? '';
+    final userName = AppGlobals.storagenew.getString('Username') ?? '';
 
     return WillPopScope(
       onWillPop: () async {
@@ -179,13 +179,13 @@ class _TruckSelector extends StatelessWidget {
                 builder: (_) =>
                 const Truck(Searchby: 1, SearchId: 0)),
           ).then((_) {
-            final sel = objfun.SelectTruckList;
+            final sel = AppGlobals.SelectTruckList;
             if (sel.Id != 0) {
               context.read<TruckMaintenanceBloc>().add(
                   TruckMaintenanceTruckSelected(
                       truckId: sel.Id,
                       truckName: sel.AccountName));
-              objfun.SelectTruckList = GetTruckModel.Empty();
+              AppGlobals.SelectTruckList = GetTruckModel.Empty();
             }
           });
         } else {
@@ -248,7 +248,7 @@ class _TruckSelector extends StatelessWidget {
                       fontWeight: state.truckName.isEmpty
                           ? FontWeight.w500
                           : FontWeight.w700,
-                      fontSize: isTablet ? objfun.FontLow + 2 : objfun.FontLow + 1,
+                      fontSize: isTablet ? AppGlobals.FontLow + 2 : AppGlobals.FontLow + 1,
                     ),
                     overflow: TextOverflow.ellipsis,
                   ),
@@ -379,7 +379,7 @@ class _TruckCard extends StatelessWidget {
     final labelStyle = GoogleFonts.lato(
       color: AppTokens.maintTextMid,
       fontWeight: FontWeight.w600,
-      fontSize: isTablet ? objfun.FontLow + 1 : objfun.FontLow,
+      fontSize: isTablet ? AppGlobals.FontLow + 1 : AppGlobals.FontLow,
     );
 
     // All field rows for this card
@@ -511,8 +511,8 @@ class _FieldSection extends StatelessWidget {
                 color: Colors.white,
                 fontWeight: FontWeight.w700,
                 fontSize: isTablet
-                    ? objfun.FontLow + 1
-                    : objfun.FontLow,
+                    ? AppGlobals.FontLow + 1
+                    : AppGlobals.FontLow,
               ),
             ),
           ),
@@ -524,8 +524,8 @@ class _FieldSection extends StatelessWidget {
                 color: Colors.white,
                 fontWeight: FontWeight.w700,
                 fontSize: isTablet
-                    ? objfun.FontLow + 1
-                    : objfun.FontLow,
+                    ? AppGlobals.FontLow + 1
+                    : AppGlobals.FontLow,
               ),
               overflow: TextOverflow.ellipsis,
             ),

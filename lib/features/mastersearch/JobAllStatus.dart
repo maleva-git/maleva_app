@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:maleva/core/models/model.dart';
-import 'package:maleva/core/utils/clsfunction.dart' as objfun;
+import 'package:maleva/core/utils/app_globals.dart';
 import 'package:maleva/core/colors/colors.dart' as colour;
 import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
@@ -38,7 +38,7 @@ class _JobAllStatusstate extends State<JobAllStatus> {
   }
   Future startup() async {
     filtersearchlist.clear();
-    filtersearchlist.addAll(objfun.JobAllStatusList);
+    filtersearchlist.addAll(AppGlobals.JobAllStatusList);
     setState(() {
       progress = true;
     });
@@ -49,10 +49,10 @@ class _JobAllStatusstate extends State<JobAllStatus> {
     String vv = value.toString().toUpperCase();
     if (vv == "") {
       filtersearchlist.clear();
-      filtersearchlist.addAll(objfun.JobAllStatusList.toList());
+      filtersearchlist.addAll(AppGlobals.JobAllStatusList.toList());
     } else {
       filtersearchlist.clear();
-      filtersearchlist.addAll(objfun.JobAllStatusList.where((element) =>
+      filtersearchlist.addAll(AppGlobals.JobAllStatusList.where((element) =>
               (element.StatusName.toString().contains(vv) ||
                   element.StatusName.toString().contains(vv.toUpperCase())))
           .toList());
@@ -62,7 +62,7 @@ class _JobAllStatusstate extends State<JobAllStatus> {
   @override
   Widget build(BuildContext context) {
     double width = MediaQuery.of(context).size.width;
-    bool isTablet = objfun.MalevaScreen != 1;
+    bool isTablet = AppGlobals.MalevaScreen != 1;
 
     return Scaffold(
       backgroundColor: const Color(0xFFF4F7FC),
@@ -76,7 +76,7 @@ class _JobAllStatusstate extends State<JobAllStatus> {
             textStyle: TextStyle(
                 color: colour.topAppBarColor,
                 fontWeight: FontWeight.w700,
-                fontSize: objfun.FontLarge,
+                fontSize: AppGlobals.FontLarge,
                 letterSpacing: 0.5),
           ),
         ),

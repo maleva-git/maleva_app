@@ -2,7 +2,7 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 import 'package:maleva/core/models/model.dart';
-import 'package:maleva/core/utils/clsfunction.dart' as objfun;
+import 'package:maleva/core/utils/app_globals.dart';
 import 'package:maleva/features/transaction/vesselplanning/bloc/vesselplanning_event.dart';
 import 'package:maleva/features/transaction/vesselplanning/bloc/vesselplanning_state.dart';
 import 'package:maleva/features/transaction/vesselplanning/data/vesselplanning_repository.dart';
@@ -33,7 +33,7 @@ class VesselPlanningBloc extends Bloc<VesselPlanningEvent, VesselPlanningState> 
         fromDate: _today,
         toDate: _today,
         planningNo: '',
-        empId: objfun.EmpRefId,
+        empId: AppGlobals.EmpRefId,
         empName: '', // 💥 Itha add pannunga
         isLoggedInEmp: true,
         emit: emit,
@@ -55,7 +55,7 @@ class VesselPlanningBloc extends Bloc<VesselPlanningEvent, VesselPlanningState> 
       fromDate: event.fromDate,
       toDate: event.toDate,
       planningNo: event.planningNo,
-      empId: event.isLoggedInEmp ? objfun.EmpRefId : event.empId,
+      empId: event.isLoggedInEmp ? AppGlobals.EmpRefId : event.empId,
       empName: event.empName, // 💥 State-ku pudhu name pass pandrom
       isLoggedInEmp: event.isLoggedInEmp,
       emit: emit,
@@ -99,7 +99,7 @@ class VesselPlanningBloc extends Bloc<VesselPlanningEvent, VesselPlanningState> 
       if (resultData != null && resultData.isNotEmpty) {
         ResponseViewModel? value = ResponseViewModel.fromJson(resultData);
         if (value.IsSuccess == true) {
-          objfun.launchInBrowser(value.data1);
+          AppGlobals.launchInBrowser(value.data1);
         }
       }
     } catch (e) {
@@ -172,20 +172,20 @@ class VesselPlanningBloc extends Bloc<VesselPlanningEvent, VesselPlanningState> 
       final resultData = await _repository.getVesselPlanning(fromDate, toDate, planningNo, empId);
       
       if (resultData.isNotEmpty) {
-        objfun.VesselPlanningMasterList = resultData[0]["salemaster"]
+        AppGlobals.VesselPlanningMasterList = resultData[0]["salemaster"]
             .map((e) => VesselPlanningMasterModel.fromJson(e))
             .toList();
-        objfun.VesselPlanningDetailsList = (resultData[0]["saledetails"] as List)
+        AppGlobals.VesselPlanningDetailsList = (resultData[0]["saledetails"] as List)
             .map((e) => VesselPlanningDetailModel.fromJson(e))
             .toList();
       } else {
-        objfun.VesselPlanningMasterList = [];
-        objfun.VesselPlanningDetailsList = [];
+        AppGlobals.VesselPlanningMasterList = [];
+        AppGlobals.VesselPlanningDetailsList = [];
       }
 
       emit(VesselPlanningLoaded(
-        masterList: List.from(objfun.VesselPlanningMasterList),
-        detailsList: List<VesselPlanningDetailModel>.from(objfun.VesselPlanningDetailsList),
+        masterList: List.from(AppGlobals.VesselPlanningMasterList),
+        detailsList: List<VesselPlanningDetailModel>.from(AppGlobals.VesselPlanningDetailsList),
         selectedDetails: <VesselPlanningDetailModel>[],
         expandedIndex: -1,
         fromDate: fromDate,

@@ -3,7 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
-import 'package:maleva/core/utils/clsfunction.dart' as objfun;
+import 'package:maleva/core/utils/app_globals.dart';
 import 'package:get_it/get_it.dart';
 import 'package:maleva/core/models/model.dart';
 import 'package:maleva/menu/menulist.dart';
@@ -23,7 +23,7 @@ const kGradient = LinearGradient(
 );
 
 class AddEnquiryTR extends StatelessWidget {
-  final Map<String, dynamic>? SaleMaster;
+  final EnquiryMasterModel? SaleMaster;
   const AddEnquiryTR({super.key, this.SaleMaster});
 
   @override
@@ -42,13 +42,14 @@ class _AddEnquiryPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isTablet = objfun.MalevaScreen != 1;
-    final userName = objfun.storagenew.getString('Username') ?? '';
+    final isTablet = AppGlobals.MalevaScreen != 1;
+    final userName = AppGlobals.storagenew.getString('Username') ?? '';
 
     return BlocListener<EnquiryAddBloc, EnquiryAddState>(
       listener: (context, state) async {
         if (state is EnquiryAddSaveSuccess) {
-          await objfun.ConfirmationOK('Created Successfully', context);
+          await ConfirmationOK('Created Successfully', context);
+          if (!context.mounted) return;
           Navigator.pushReplacement(
             context,
             MaterialPageRoute(builder: (_) => const AddEnquiryTR()),
@@ -67,11 +68,11 @@ class _AddEnquiryPage extends StatelessWidget {
           );
         }
       },
-      child: WillPopScope(
-        onWillPop: () async {
+      child: PopScope(
+        canPop: false,
+        onPopInvokedWithResult: (didPop, result) {
           Navigator.pop(context);
-          return false;
-        },
+          },
         child: Scaffold(
           resizeToAvoidBottomInset: true,
           backgroundColor: colour.kPageBg,
@@ -118,7 +119,7 @@ class _AddEnquiryPage extends StatelessWidget {
             style: GoogleFonts.lato(
               color: Colors.white,
               fontWeight: FontWeight.w700,
-              fontSize: isTablet ? objfun.FontMedium + 2 : objfun.FontMedium,
+              fontSize: isTablet ? AppGlobals.FontMedium + 2 : AppGlobals.FontMedium,
               letterSpacing: 0.3,
             ),
           ),
@@ -126,9 +127,9 @@ class _AddEnquiryPage extends StatelessWidget {
           Text(
             userName,
             style: GoogleFonts.lato(
-              color: Colors.white.withOpacity(0.65),
+              color: Colors.white.withValues(alpha: 0.65),
               fontWeight: FontWeight.w500,
-              fontSize: isTablet ? objfun.FontLow : objfun.FontLow - 1,
+              fontSize: isTablet ? AppGlobals.FontLow : AppGlobals.FontLow - 1,
             ),
           ),
         ],
@@ -138,13 +139,13 @@ class _AddEnquiryPage extends StatelessWidget {
           padding: const EdgeInsets.only(right: 12, top: 10, bottom: 10),
           child: _SaveButton(
             onPressed: () async {
-              final confirm = await objfun.ConfirmationMsgYesNo(
+              final confirm = await ConfirmationMsgYesNo(
                   context, 'Do You Want to Save ?');
               if (confirm == true) {
                 final state = context.read<EnquiryAddBloc>().state;
                 if (state is EnquiryAddLoaded &&
                     state.custName.isEmpty) {
-                  objfun.toastMsg('Enter Customer Name', '', context);
+                  toastMsg('Enter Customer Name', '', context);
                   return;
                 }
                 context
@@ -190,13 +191,14 @@ class _AddEnquiryBody extends StatelessWidget {
               MaterialPageRoute(
                   builder: (_) =>
                   const Customer(Searchby: 1, SearchId: 0)),
-            ).then((_) async {
-              final sel = objfun.SelectCustomerList;
+            ).then((_navRes) async {
+              if (_navRes != null) { AppGlobals.SelectCustomerList = _navRes; }
+              final sel = AppGlobals.SelectCustomerList;
               if (sel.Id != 0) {
                 _emit(context, EnquiryAddCustomerChanged(
                     custId: sel.Id, custName: sel.AccountName));
                 context.read<EnquiryAddBloc>().add(EnquiryAddFetchCurrency(sel.Id));
-                objfun.SelectCustomerList = CustomerModel.Empty();
+                AppGlobals.SelectCustomerList = CustomerModel.Empty();
               }
             });
           },
@@ -216,12 +218,13 @@ class _AddEnquiryBody extends StatelessWidget {
               MaterialPageRoute(
                   builder: (_) =>
                   const JobType(Searchby: 1, SearchId: 0)),
-            ).then((_) async {
-              final sel = objfun.SelectJobTypeList;
+            ).then((_navRes) async {
+              if (_navRes != null) { AppGlobals.SelectJobTypeList = _navRes; }
+              final sel = AppGlobals.SelectJobTypeList;
               if (sel.Id != 0) {
                 context.read<EnquiryAddBloc>().add(EnquiryAddFetchJobStatuses(sel.Id));
                 _emit(context, EnquiryAddJobTypeChanged(                    jobTypeId: sel.Id, jobTypeName: sel.Name));
-                objfun.SelectJobTypeList = JobTypeModel.Empty();
+                AppGlobals.SelectJobTypeList = JobTypeModel.Empty();
               }
             });
           },
@@ -264,12 +267,12 @@ class _AddEnquiryBody extends StatelessWidget {
               MaterialPageRoute(
                   builder: (_) =>
                   const Location(Searchby: 1, SearchId: 0)),
-            ).then((_navRes) { if (_navRes != null) { objfun.SelectLocationList = _navRes; }
-              final sel = objfun.SelectLocationList;
+            ).then((_navRes) { if (_navRes != null) { AppGlobals.SelectLocationList = _navRes; }
+              final sel = AppGlobals.SelectLocationList;
               if (sel.Id != 0) {
                 _emit(context, EnquiryAddOriginChanged(
                     originId: sel.Id, originName: sel.Location));
-                objfun.SelectLocationList = LocationModel.Empty();
+                AppGlobals.SelectLocationList = LocationModel.Empty();
               }
             });
           },
@@ -289,13 +292,13 @@ class _AddEnquiryBody extends StatelessWidget {
               MaterialPageRoute(
                   builder: (_) =>
                   const Location(Searchby: 1, SearchId: 0)),
-            ).then((_navRes) { if (_navRes != null) { objfun.SelectLocationList = _navRes; }
-              final sel = objfun.SelectLocationList;
+            ).then((_navRes) { if (_navRes != null) { AppGlobals.SelectLocationList = _navRes; }
+              final sel = AppGlobals.SelectLocationList;
               if (sel.Id != 0) {
                 _emit(context, EnquiryAddDestinationChanged(
                     destinationId: sel.Id,
                     destinationName: sel.Location));
-                objfun.SelectLocationList = LocationModel.Empty();
+                AppGlobals.SelectLocationList = LocationModel.Empty();
               }
             });
           },
@@ -443,7 +446,7 @@ class _SectionLabel extends StatelessWidget {
       style: GoogleFonts.lato(
         color: colour.kTextMid,
         fontWeight: FontWeight.w600,
-        fontSize: isTablet ? objfun.FontLow + 1 : objfun.FontLow,
+        fontSize: isTablet ? AppGlobals.FontLow + 1 : AppGlobals.FontLow,
         letterSpacing: 0.2,
       ),
     );
@@ -493,7 +496,7 @@ class _DateTimeField extends StatelessWidget {
                 style: GoogleFonts.lato(
                   color: enabled ? colour.kTextDark : AppTokens.planTextMuted,
                   fontWeight: FontWeight.w600,
-                  fontSize: objfun.FontLow,
+                  fontSize: AppGlobals.FontLow,
                 ),
               ),
             ),
@@ -544,7 +547,7 @@ class _DateTimeRow extends StatelessWidget {
             style: GoogleFonts.lato(
               color: colour.kTextMid,
               fontWeight: FontWeight.w600,
-              fontSize: isTablet ? objfun.FontLow + 1 : objfun.FontLow,
+              fontSize: isTablet ? AppGlobals.FontLow + 1 : AppGlobals.FontLow,
             ),
             textAlign: TextAlign.center,
           ),
@@ -573,8 +576,8 @@ class _DateTimeRow extends StatelessWidget {
                         color: enabled ? colour.kTextDark : AppTokens.planTextMuted,
                         fontWeight: FontWeight.w600,
                         fontSize: isTablet
-                            ? objfun.FontLow + 1
-                            : objfun.FontLow - 1,
+                            ? AppGlobals.FontLow + 1
+                            : AppGlobals.FontLow - 1,
                       ),
                     ),
                   ),
@@ -653,7 +656,7 @@ class _AddSearchField extends StatelessWidget {
                   color: value.isEmpty ? AppTokens.planTextMuted : colour.kTextDark,
                   fontWeight:
                   value.isEmpty ? FontWeight.w500 : FontWeight.w600,
-                  fontSize: objfun.FontLow,
+                  fontSize: AppGlobals.FontLow,
                 ),
                 overflow: TextOverflow.ellipsis,
               ),
@@ -693,12 +696,12 @@ class _AddTextField extends StatelessWidget {
       style: GoogleFonts.lato(
         color: colour.kTextDark,
         fontWeight: FontWeight.w600,
-        fontSize: objfun.FontLow,
+        fontSize: AppGlobals.FontLow,
       ),
       decoration: InputDecoration(
         hintText: hint,
         hintStyle:
-        GoogleFonts.lato(color: AppTokens.planTextMuted, fontSize: objfun.FontLow),
+        GoogleFonts.lato(color: AppTokens.planTextMuted, fontSize: AppGlobals.FontLow),
         filled: true,
         fillColor: colour.kDetailBg,
         contentPadding:
@@ -730,10 +733,10 @@ class _SaveButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.15),
+        color: Colors.white.withValues(alpha: 0.15),
         borderRadius: BorderRadius.circular(8),
         border:
-        Border.all(color: Colors.white.withOpacity(0.4), width: 0.5),
+        Border.all(color: Colors.white.withValues(alpha: 0.4), width: 0.5),
       ),
       child: Material(
         color: Colors.transparent,
@@ -746,7 +749,7 @@ class _SaveButton extends StatelessWidget {
                 style: GoogleFonts.lato(
                     color: Colors.white,
                     fontWeight: FontWeight.w700,
-                    fontSize: objfun.FontMedium)),
+                    fontSize: AppGlobals.FontMedium)),
           ),
         ),
       ),

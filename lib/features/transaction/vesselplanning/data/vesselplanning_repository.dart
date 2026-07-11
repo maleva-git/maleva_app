@@ -1,11 +1,11 @@
-import 'package:maleva/core/utils/clsfunction.dart' as objfun;
+import 'package:maleva/core/utils/app_globals.dart';
 import 'package:maleva/core/network/OnlineApi.dart' as OnlineApi;
 
 class VesselPlanningRepository {
   Future<List<dynamic>> getVesselPlanning(
       String fromDate, String toDate, String planningNo, int empId) async {
     Map<String, dynamic> master = {
-      "Comid": objfun.storagenew.getInt('Comid') ?? 0,
+      "Comid": AppGlobals.storagenew.getInt('Comid') ?? 0,
       "Fromdate": fromDate,
       "Todate": toDate,
       "Employeeid": empId,
@@ -15,8 +15,8 @@ class VesselPlanningRepository {
       'Content-Type': 'application/json; charset=UTF-8'
     };
 
-    final resultData = await objfun.apiAllinoneSelectArray(
-        objfun.apiSelectVesselPlanning, master, header, null);
+    final resultData = await AppGlobals.apiAllinoneSelectArray(
+        AppGlobals.apiSelectVesselPlanning, master, header, null);
     if (resultData == null || resultData == "") {
       return [];
     }
@@ -24,35 +24,35 @@ class VesselPlanningRepository {
   }
 
   Future<void> editVesselPlanning(int id, int planningNo) async {
-    var comId = objfun.storagenew.getInt('Comid') ?? 0;
+    var comId = AppGlobals.storagenew.getInt('Comid') ?? 0;
     
     // We fetch the edit data explicitly and store it in objfun's global list
     // to maintain compatibility with VesselPlanningDetailsView
-    final resultData = await objfun.apiAllinoneSelect(
+    final resultData = await AppGlobals.apiAllinoneSelect(
         Uri.encodeFull(
-            "${objfun.apiEditVesselPlanning}$id&VESSELPLANINGNo=$planningNo&Comid=$comId"),
+            "${AppGlobals.apiEditVesselPlanning}$id&VESSELPLANINGNo=$planningNo&Comid=$comId"),
         null,
         null,
         null); // Pass context as null since it isn't used effectively in apiAllinoneSelect
 
     if (resultData != null && resultData.isNotEmpty) {
-      objfun.VesselPlanningEditList = resultData[0]["SaleDetails"].toList();
+      AppGlobals.VesselPlanningEditList = resultData[0]["SaleDetails"].toList();
     } else {
-      objfun.VesselPlanningEditList = [];
+      AppGlobals.VesselPlanningEditList = [];
     }
   }
 
   Future<Map<String, dynamic>?> getSharePdfUrl(int id, String planningNoDisplay) async {
     Map<String?, dynamic> master = {
       'SoId': id,
-      'Comid': objfun.Comid,
+      'Comid': AppGlobals.Comid,
     };
     Map<String, String> header = {
       'Content-Type': 'application/json; charset=UTF-8'
     };
 
-    final resultData = await objfun.apiAllinoneSelectArray(
-      "${objfun.apiViewVesselPlanningPdf}$planningNoDisplay",
+    final resultData = await AppGlobals.apiAllinoneSelectArray(
+      "${AppGlobals.apiViewVesselPlanningPdf}$planningNoDisplay",
       master,
       header,
       null,

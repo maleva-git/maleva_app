@@ -1,10 +1,10 @@
-
+import '../../../../../core/models/model.dart';
 
 abstract class EnquiryAddEvent {}
 
 // Startup — pass existing SaleMaster for edit mode
 class EnquiryAddStarted extends EnquiryAddEvent {
-  final Map<String, dynamic>? saleMaster;
+  final EnquiryMasterModel? saleMaster;
   EnquiryAddStarted({this.saleMaster});
 }
 

@@ -1,26 +1,25 @@
 import 'package:flutter/Material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../core/di/injection.dart';
-import '../../admin_dashboard/tabs/airfreightsales/bloc/airfreightsales_bloc.dart';
-import '../../admin_dashboard/tabs/airfreightsales/bloc/airfreightsales_event.dart';
-import '../../admin_dashboard/tabs/airfreightsales/view/airfreightsales_tab.dart';
-import '../../admin_dashboard/tabs/enquiry/view/bloc/enquiry_bloc.dart';
-import '../../admin_dashboard/tabs/enquiry/view/data/enquiry_repository.dart';
-import '../../admin_dashboard/tabs/enquiry/view/view/enquiry_tab.dart';
-import '../../admin_dashboard/tabs/fuel/bloc/fuelreport_bloc.dart';
-import '../../admin_dashboard/tabs/fuel/bloc/fuelreport_event.dart';
-import '../../admin_dashboard/tabs/fuel/view/fuelreport_tab.dart';
-import '../../admin_dashboard/tabs/paymentview/bloc/paymentview_bloc.dart';
-import '../../admin_dashboard/tabs/paymentview/view/paymentview_tab.dart';
-import '../../admin_dashboard/tabs/transport/bloc/transport_bloc.dart';
-import '../../admin_dashboard/tabs/transport/bloc/transport_event.dart';
-import '../../admin_dashboard/tabs/transport/view/transportview_tab.dart';
-import '../../admin_dashboard/tabs/vesselreport/bloc/vesselreport_bloc.dart';
-import '../../admin_dashboard/tabs/vesselreport/bloc/vesselreport_event.dart';
-import '../../admin_dashboard/tabs/vesselreport/view/vesselreportview_tab.dart';
+import '../../common_tabs/airfreightsales/bloc/airfreightsales_bloc.dart';
+import '../../common_tabs/airfreightsales/view/airfreightsales_tab.dart';
+import '../../common_tabs/enquiry/view/bloc/enquiry_bloc.dart';
+import '../../common_tabs/enquiry/view/data/enquiry_repository.dart';
+import '../../common_tabs/enquiry/view/view/enquiry_tab.dart';
+import '../../common_tabs/fuel/bloc/fuelreport_bloc.dart';
+import '../../common_tabs/fuel/bloc/fuelreport_event.dart';
+import '../../common_tabs/fuel/view/fuelreport_tab.dart';
+import '../../common_tabs/paymentview/bloc/paymentview_bloc.dart';
+import '../../common_tabs/paymentview/view/paymentview_tab.dart';
+import '../../common_tabs/transport/bloc/transport_bloc.dart';
+import '../../common_tabs/transport/bloc/transport_event.dart';
+import '../../common_tabs/transport/view/transportview_tab.dart';
+import '../../common_tabs/vesselreport/bloc/vesselreport_bloc.dart';
+import '../../common_tabs/vesselreport/bloc/vesselreport_event.dart';
+import '../../common_tabs/vesselreport/view/vesselreportview_tab.dart';
 import '../bloc/sales_bloc.dart';
 import 'salesdashboard_dashboard_ui.dart';
-import 'package:maleva/features/dashboard/admin_dashboard/tabs/driverleave/bloc/leave_bloc.dart';
+import 'package:maleva/features/dashboard/common_tabs/driverleave/bloc/leave_bloc.dart';
 
 class SalesDashboard extends StatefulWidget {
   const SalesDashboard({super.key});
@@ -50,7 +49,6 @@ class _SalesDashboardState extends State<SalesDashboard> with SingleTickerProvid
       providers: [
                 BlocProvider(create: (context) => SalesDashboardBloc()),
                 BlocProvider(
-                  // ✅ No ..add() cascade needed, and GetIt injects the repository automatically!
                   create: (_) => sl<AirfreightBloc>(),
                   child: const AirfreightSales(),
                 ),
@@ -73,7 +71,7 @@ class _SalesDashboardState extends State<SalesDashboard> with SingleTickerProvid
                 ),
                 BlocProvider(
                   create: (context) => sl<FuelDiffBloc>()..add(const LoadFuelDiffEvent()),
-                  child: const FuelDiffPage(), // Remember to add BlocListener here if you want to show SnackBars for FuelDiffError!
+                  child: const FuelDiffPage(),
                 ),
                 BlocProvider(
                   create: (_) => sl<PaymentPendingBloc>(),

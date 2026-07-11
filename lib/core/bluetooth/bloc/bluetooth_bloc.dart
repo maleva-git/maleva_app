@@ -9,8 +9,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'package:maleva/core/models/model.dart';
-import 'package:maleva/core/utils/clsfunction.dart' as objfun;
-
+import 'package:maleva/core/utils/app_globals.dart';
+import 'package:maleva/core/utils/printer_helper.dart';
 part 'bluetooth_event.dart';
 part 'bluetooth_state.dart';
 
@@ -76,11 +76,11 @@ class BluetoothBloc extends Bloc<BluetoothEvent, BluetoothState> {
 
     if (event.autoConnect) {
       // FIX 2: Check if list is not empty, else throw error to avoid infinite loading
-      if (objfun.bluetoothdeviceList.isNotEmpty) {
+      if (bluetoothdeviceList.isNotEmpty) {
         // FIX 3: Correct BluetoothDevice object creation
         final device = BluetoothDevice(
-          objfun.bluetoothdeviceList[0].name,
-          objfun.bluetoothdeviceList[0].address,
+          bluetoothdeviceList[0].name,
+          bluetoothdeviceList[0].address,
         );
 
         emit(state.copyWith(
@@ -194,7 +194,7 @@ class BluetoothBloc extends Bloc<BluetoothEvent, BluetoothState> {
         await _saveDeviceAndClose(emit);
         break;
       case ConnectState.disconnected:
-        objfun.currentconnectionstate = false;
+        currentconnectionstate = false;
         emit(state.copyWith(status: BluetoothStatus.disconnected));
         break;
     }
@@ -205,23 +205,23 @@ class BluetoothBloc extends Bloc<BluetoothEvent, BluetoothState> {
   Future<void> _saveDeviceAndClose(Emitter<BluetoothState> emit) async {
     try {
       final device = state.selectedDevice!;
-      objfun.currentconnectionstate = true;
+      currentconnectionstate = true;
 
       // Update global device list
-      objfun.bluetoothdeviceList.clear();
+      bluetoothdeviceList.clear();
       final BluetoothModel ls = BluetoothModel.Empty();
       ls.name    = device.name;
       ls.address = device.address;
       ls.type    = device.type;
-      objfun.bluetoothdeviceList.add(ls);
+      bluetoothdeviceList.add(ls);
 
       // Persist to SharedPreferences
-      await objfun.storagenew.setString(
+      await AppGlobals.storagenew.setString(
         'BlueTooth',
-        jsonEncode(objfun.bluetoothdeviceList[0].toJson()),
+        jsonEncode(bluetoothdeviceList[0].toJson()),
       );
 
-      // FIX 4: Removed objfun.msgshow from here to avoid null context crash.
+      // FIX 4: Removed msgshow from here to avoid null context crash.
       // Success message is now handled in the UI listener.
 
       emit(state.copyWith(

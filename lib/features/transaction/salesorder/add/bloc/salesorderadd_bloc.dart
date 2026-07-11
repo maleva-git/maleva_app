@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 import 'package:maleva/core/models/model.dart';
-import 'package:maleva/core/utils/clsfunction.dart' as objfun;
+import 'package:maleva/core/utils/app_globals.dart';
 
 import 'package:maleva/features/transaction/salesorder/add/bloc/salesorderadd_event.dart';
 import 'package:maleva/features/transaction/salesorder/add/bloc/salesorderadd_state.dart';
@@ -32,13 +32,13 @@ class SalesOrderAddBloc extends Bloc<SalesOrderAddEvent, SalesOrderAddState> {
       try {
         final now = DateFormat("yyyy-MM-dd HH:mm:ss").format(DateTime.now());
         final today = DateFormat("yyyy-MM-dd").format(DateTime.now());
-        final maxMy = await _repository.maxSaleOrderNo('MY'); objfun.MaxSaleOrderNum = maxMy; objfun.AddressList = await _repository.selectAddressList();
-        objfun.AgentCompanyList = (await _repository.selectAgentCompany()).map<AgentCompanyModel>((e) => AgentCompanyModel.fromJson(e)).toList();objfun.EmployeeList = (await _repository.selectEmployee('', 'Operation')).map<EmployeeModel>((e) => EmployeeModel.fromJson(e)).toList();final permission = _buildPermissions();
+        final maxMy = await _repository.maxSaleOrderNo('MY'); AppGlobals.MaxSaleOrderNum = maxMy; AppGlobals.AddressList = await _repository.selectAddressList();
+        AppGlobals.AgentCompanyList = (await _repository.selectAgentCompany()).map<AgentCompanyModel>((e) => AgentCompanyModel.fromJson(e)).toList();AppGlobals.EmployeeList = (await _repository.selectEmployee('', 'Operation')).map<EmployeeModel>((e) => EmployeeModel.fromJson(e)).toList();final permission = _buildPermissions();
         var base = SalesOrderAddLoaded(
           progress: true, dtpSaleOrderdate: today, dtpOETAdate: now, dtpOETBdate: now, dtpOETDdate: now,
           dtpLETAdate: now, dtpLETBdate: now, dtpLETDdate: now, dtpFlightTimedate: now, dtpPickUpdate: now,
           dtpDeliverydate: now, dtpWHEntrydate: now, dtpWHExitdate: now, dtpFW1date: now, dtpFW2date: now,
-          dtpFW3date: now, txtJobNo: objfun.MaxSaleOrderNum, fieldPermission: permission,
+          dtpFW3date: now, txtJobNo: AppGlobals.MaxSaleOrderNum, fieldPermission: permission,
         );
 
         if (event.saleMaster != null && event.saleMaster!.isNotEmpty) {
@@ -84,7 +84,7 @@ class SalesOrderAddBloc extends Bloc<SalesOrderAddEvent, SalesOrderAddState> {
         return;
       }
 
-      objfun.CustomerCurrencyValue = await _repository.loadCustomerCurrency(event.id);emit(s.copyWith(txtCustomer: event.name, custId: event.id, currencyValue: objfun.CustomerCurrencyValue));
+      AppGlobals.CustomerCurrencyValue = await _repository.loadCustomerCurrency(event.id);emit(s.copyWith(txtCustomer: event.name, custId: event.id, currencyValue: AppGlobals.CustomerCurrencyValue));
     });
 
     // ──────────────────────────────────────────────────────────────────────────
@@ -102,8 +102,8 @@ class SalesOrderAddBloc extends Bloc<SalesOrderAddEvent, SalesOrderAddState> {
 
       final jobData = await _repository.selectAllJobStatus(event.id);
       if (jobData.isNotEmpty) {
-        if (jobData["JobStatusDetails"] != null) objfun.JobAllStatusList = (jobData["JobStatusDetails"] as List).map<JobAllStatusModel>((e) => JobAllStatusModel.fromJson(e)).toList();
-        if (jobData["JobTypeDetails"] != null) objfun.JobTypeDetailsList = (jobData["JobTypeDetails"] as List).map<JobTypeDetailsModel>((e) => JobTypeDetailsModel.fromJson(e)).toList();
+        if (jobData["JobStatusDetails"] != null) AppGlobals.JobAllStatusList = (jobData["JobStatusDetails"] as List).map<JobAllStatusModel>((e) => JobAllStatusModel.fromJson(e)).toList();
+        if (jobData["JobTypeDetails"] != null) AppGlobals.JobTypeDetailsList = (jobData["JobTypeDetails"] as List).map<JobTypeDetailsModel>((e) => JobTypeDetailsModel.fromJson(e)).toList();
       }
       emit(_applyVisibility(s.copyWith(txtJobType: event.name, jobTypeId: event.id)));
     });
@@ -310,7 +310,7 @@ class SalesOrderAddBloc extends Bloc<SalesOrderAddEvent, SalesOrderAddState> {
     on<BillTypeChanged>((event, emit) async {
       if (state is! SalesOrderAddLoaded) return;
       final s = state as SalesOrderAddLoaded;
-      final maxEv = await _repository.maxSaleOrderNo(event.value); objfun.MaxSaleOrderNum = maxEv;emit(s.copyWith(dropdownValue: event.value, txtJobNo: objfun.MaxSaleOrderNum));
+      final maxEv = await _repository.maxSaleOrderNo(event.value); AppGlobals.MaxSaleOrderNum = maxEv;emit(s.copyWith(dropdownValue: event.value, txtJobNo: AppGlobals.MaxSaleOrderNum));
     });
 
     on<SaveSalesOrderEvent>((event, emit) async {
@@ -348,9 +348,9 @@ class SalesOrderAddBloc extends Bloc<SalesOrderAddEvent, SalesOrderAddState> {
           }
 
           if (exactCompKey != null) {
-            jsonMap[exactCompKey] = objfun.Comid;
+            jsonMap[exactCompKey] = AppGlobals.Comid;
           } else {
-            jsonMap['CompanyRefId'] = objfun.Comid;
+            jsonMap['CompanyRefId'] = AppGlobals.Comid;
           }
 
           return jsonMap;
@@ -363,8 +363,8 @@ class SalesOrderAddBloc extends Bloc<SalesOrderAddEvent, SalesOrderAddState> {
 
         final header = {'Content-Type': 'application/json; charset=UTF-8'};
 
-        final resultData = await objfun.apiAllinoneSelectArray(
-          "${objfun.apiInsertSalesOrder}?Comid=${objfun.Comid}",
+        final resultData = await AppGlobals.apiAllinoneSelectArray(
+          "${AppGlobals.apiInsertSalesOrder}?Comid=${AppGlobals.Comid}",
           master, header, context,
         );
 
@@ -432,7 +432,7 @@ class SalesOrderAddBloc extends Bloc<SalesOrderAddEvent, SalesOrderAddState> {
     ];
     const restrictedIds = [138, 50, 127, 35, 75, 38, 68, 128, 100, 117, 121];
 
-    if (!restrictedIds.contains(objfun.EmpRefId)) return {for (var f in allFields) f: true};
+    if (!restrictedIds.contains(AppGlobals.EmpRefId)) return {for (var f in allFields) f: true};
     final map = {for (var f in allFields) f: false};
     for (var f in ["txtBoardingOfficer1", "txtBoardingOfficer2", "txtAmount1", "txtAmount2", "SAVE", "VIEW"]) map[f] = true;
     return map;
@@ -443,7 +443,7 @@ class SalesOrderAddBloc extends Bloc<SalesOrderAddEvent, SalesOrderAddState> {
     bool forwarding = false, origin = false, destination = false, zb = false, oETA = false, oETB = false, oETD = false, oShippingAgent = false;
     bool oAgentName = false, oScn = false, lScn = false, lShipping = false, lAgentName = false, lVesselType = false, oVesselType = false, oPort = false, lPort = false;
 
-    for (var item in objfun.JobTypeDetailsList) {
+    for (var item in AppGlobals.JobTypeDetailsList) {
       switch (item.Description) {
         case "OFF VESSEL NAME": offVessel = true; break; case "LOAD VESSEL NAME": loadingVessel = true; break;
         case "L ETA": lETA = true; break; case "L ETB": lETB = true; break; case "L ETD": lETD = true; break;
@@ -630,25 +630,25 @@ class SalesOrderAddBloc extends Bloc<SalesOrderAddEvent, SalesOrderAddState> {
 
 
 
-    objfun.CustomerList = (await _repository.selectCustomer()).map<CustomerModel>((e) => CustomerModel.fromJson(e)).toList();
-    objfun.JobTypeList = (await _repository.selectJobType()).map<JobTypeModel>((e) => JobTypeModel.fromJson(e)).toList();
+    AppGlobals.CustomerList = (await _repository.selectCustomer()).map<CustomerModel>((e) => CustomerModel.fromJson(e)).toList();
+    AppGlobals.JobTypeList = (await _repository.selectJobType()).map<JobTypeModel>((e) => JobTypeModel.fromJson(e)).toList();
     if (m["JobMasterRefId"] != null) {
       final jobData = await _repository.selectAllJobStatus(m["JobMasterRefId"] as int? ?? 0);
       if (jobData.isNotEmpty) {
-        if (jobData["JobStatusDetails"] != null) objfun.JobAllStatusList = (jobData["JobStatusDetails"] as List).map<JobAllStatusModel>((e) => JobAllStatusModel.fromJson(e)).toList();
-        if (jobData["JobTypeDetails"] != null) objfun.JobTypeDetailsList = (jobData["JobTypeDetails"] as List).map<JobTypeDetailsModel>((e) => JobTypeDetailsModel.fromJson(e)).toList();
+        if (jobData["JobStatusDetails"] != null) AppGlobals.JobAllStatusList = (jobData["JobStatusDetails"] as List).map<JobAllStatusModel>((e) => JobAllStatusModel.fromJson(e)).toList();
+        if (jobData["JobTypeDetails"] != null) AppGlobals.JobTypeDetailsList = (jobData["JobTypeDetails"] as List).map<JobTypeDetailsModel>((e) => JobTypeDetailsModel.fromJson(e)).toList();
       }
     }
     String lAgentName = '';
     if (m["AgentCompanyRefId"] != null && m["AgentCompanyRefId"] > 0) {
-      objfun.AgentAllList = (await _repository.selectAgentAll(m["AgentCompanyRefId"] as int? ?? 0)).map<AgentModel>((e) => AgentModel.fromJson(e)).toList();lAgentName = _getFromAgentAll(m["AgentMasterRefId"]);
+      AppGlobals.AgentAllList = (await _repository.selectAgentAll(m["AgentCompanyRefId"] as int? ?? 0)).map<AgentModel>((e) => AgentModel.fromJson(e)).toList();lAgentName = _getFromAgentAll(m["AgentMasterRefId"]);
     }
     String oAgentName = '';
     if (m["OAgentCompanyRefId"] != null && m["OAgentCompanyRefId"] > 0) {
-      objfun.AgentAllList = (await _repository.selectAgentAll(m["OAgentCompanyRefId"] as int? ?? 0)).map<AgentModel>((e) => AgentModel.fromJson(e)).toList();oAgentName = _getFromAgentAll(m["OAgentMasterRefId"]);
+      AppGlobals.AgentAllList = (await _repository.selectAgentAll(m["OAgentCompanyRefId"] as int? ?? 0)).map<AgentModel>((e) => AgentModel.fromJson(e)).toList();oAgentName = _getFromAgentAll(m["OAgentMasterRefId"]);
     }
 
-    objfun.CustomerCurrencyValue = await _repository.loadCustomerCurrency(m["CustomerRefId"] as int? ?? 0);String _safeStr(String? v) => v ?? ''; String _safeNum(dynamic v) => v != null ? v.toString() : '';
+    AppGlobals.CustomerCurrencyValue = await _repository.loadCustomerCurrency(m["CustomerRefId"] as int? ?? 0);String _safeStr(String? v) => v ?? ''; String _safeNum(dynamic v) => v != null ? v.toString() : '';
     String _parseDate(dynamic v, String fmt) { if (v == null) return now; return DateFormat(fmt).format(DateTime.parse(v.toString())); }
 
     List<int> loadedIds = [];
@@ -698,7 +698,7 @@ class SalesOrderAddBloc extends Bloc<SalesOrderAddEvent, SalesOrderAddState> {
     var result = base.copyWith(
       editId: isEnquiry ? 0 : (m["Id"] ?? 0), enquiryId: isEnquiry ? (m["Id"] ?? 0) : 0, productViewList: details ?? [],
       productIds: loadedIds,
-      currencyValue: objfun.CustomerCurrencyValue, custId: m["CustomerRefId"] ?? 0, jobTypeId: m["JobMasterRefId"] ?? 0,
+      currencyValue: AppGlobals.CustomerCurrencyValue, custId: m["CustomerRefId"] ?? 0, jobTypeId: m["JobMasterRefId"] ?? 0,
       lAgentCompanyId: m["AgentCompanyRefId"] ?? 0, lAgentId: m["AgentMasterRefId"] ?? 0, oAgentCompanyId: m["OAgentCompanyRefId"] ?? 0,
       oAgentId: m["OAgentMasterRefId"] ?? 0, originId: m["OriginRefId"] ?? 0, destinationId: m["DestinationRefId"] ?? 0,
       sealEmpId1: m["SealbyRefid"] ?? 0, sealEmpId2: m["SealbyRefid2"] ?? 0, sealEmpId3: m["SealbyRefid3"] ?? 0,
@@ -720,8 +720,8 @@ class SalesOrderAddBloc extends Bloc<SalesOrderAddEvent, SalesOrderAddState> {
       checkBoxValueOETA: m["OETA"] != null, checkBoxValueOETB: m["OETB"] != null, checkBoxValueOETD: m["OETD"] != null,
       checkBoxValuePickUp: m["PickupDate"] != null, checkBoxValueDelivery: m["DeliveryDate"] != null, checkBoxValueWHEntry: m["WareHouseEnterDate"] != null,
       checkBoxValueWHExit: m["WareHouseExitDate"] != null, checkBoxValueFW1: m["ForwardingDate"] != null, checkBoxValueFW2: m["Forwarding2Date"] != null,
-      checkBoxValueFW3: m["Forwarding3Date"] != null, txtJobNo: isEnquiry ? objfun.MaxSaleOrderNum : _safeNum(m["CNumber"]),
-      txtCustomer: _getFromList(objfun.CustomerList, m["CustomerRefId"], (e) => e.AccountName), txtJobType: _getFromList(objfun.JobTypeList, m["JobMasterRefId"], (e) => e.Name),
+      checkBoxValueFW3: m["Forwarding3Date"] != null, txtJobNo: isEnquiry ? AppGlobals.MaxSaleOrderNum : _safeNum(m["CNumber"]),
+      txtCustomer: _getFromList(AppGlobals.CustomerList, m["CustomerRefId"], (e) => e.AccountName), txtJobType: _getFromList(AppGlobals.JobTypeList, m["JobMasterRefId"], (e) => e.Name),
       txtJobStatus: _getFromStatusList(m["JStatus"]), txtSealByEmp1: _getEmpName(m["SealbyRefid"]), txtSealByEmp2: _getEmpName(m["SealbyRefid2"]),
       txtSealByEmp3: _getEmpName(m["SealbyRefid3"]), txtBreakByEmp1: _getEmpName(m["SealbreakbyRefid"]), txtBreakByEmp2: _getEmpName(m["SealbreakbyRefid2"]),
       txtBreakByEmp3: _getEmpName(m["SealbreakbyRefid3"]), txtBoardingOfficer1: _getEmpName(m["BoardingOfficerRefid"]), txtBoardingOfficer2: _getEmpName(m["BoardingOfficer1Refid"]),
@@ -758,10 +758,10 @@ class SalesOrderAddBloc extends Bloc<SalesOrderAddEvent, SalesOrderAddState> {
     return _applyVisibility(result);
   }
   String _getFromList<T>(List<T> list, dynamic id, String Function(T) getName) { if (id == null || id == 0) return ''; try { return getName((list as List).firstWhere((e) => (e as dynamic).Id == id) as T); } catch (_) { return ''; } }
-  String _getFromStatusList(dynamic id) { if (id == null || id == 0) return ''; try { return objfun.JobAllStatusList.firstWhere((e) => e.Status == id).StatusName; } catch (_) { return ''; } }
-  String _getEmpName(dynamic id) { if (id == null || id == 0) return ''; try { return objfun.EmployeeList.firstWhere((e) => e.Id == id).AccountName; } catch (_) { return ''; } }
-  String _getFromAgentCompany(dynamic id) { if (id == null || id == 0) return ''; try { return objfun.AgentCompanyList.firstWhere((e) => e.Id == id).Name; } catch (_) { return ''; } }
-  String _getFromAgentAll(dynamic id) { if (id == null || id == 0) return ''; try { return objfun.AgentAllList.firstWhere((e) => e.Id == id).AgentName; } catch (_) { return ''; } }
+  String _getFromStatusList(dynamic id) { if (id == null || id == 0) return ''; try { return AppGlobals.JobAllStatusList.firstWhere((e) => e.Status == id).StatusName; } catch (_) { return ''; } }
+  String _getEmpName(dynamic id) { if (id == null || id == 0) return ''; try { return AppGlobals.EmployeeList.firstWhere((e) => e.Id == id).AccountName; } catch (_) { return ''; } }
+  String _getFromAgentCompany(dynamic id) { if (id == null || id == 0) return ''; try { return AppGlobals.AgentCompanyList.firstWhere((e) => e.Id == id).Name; } catch (_) { return ''; } }
+  String _getFromAgentAll(dynamic id) { if (id == null || id == 0) return ''; try { return AppGlobals.AgentAllList.firstWhere((e) => e.Id == id).AgentName; } catch (_) { return ''; } }
   List<dynamic> _splitAddress(dynamic val) { if (val == null || val.toString().isEmpty) return []; final str = val.toString(); return str.contains('{@}') ? str.split('{@}') : [str]; }
   String _firstAddress(dynamic val) { if (val == null || val.toString().isEmpty) return ''; final str = val.toString(); return str.contains('{@}') ? str.split('{@}').first : str; }
 
@@ -814,7 +814,7 @@ class SalesOrderAddBloc extends Bloc<SalesOrderAddEvent, SalesOrderAddState> {
     // =========================================================================
 
     return {
-      'Id': s.editId, 'CompanyRefId': objfun.Comid, 'EmployeeRefId': objfun.EmpRefId == 0 ? null : objfun.EmpRefId, 'AgentCompanyRefId': s.lAgentCompanyId == 0 ? null : s.lAgentCompanyId,
+      'Id': s.editId, 'CompanyRefId': AppGlobals.Comid, 'EmployeeRefId': AppGlobals.EmpRefId == 0 ? null : AppGlobals.EmpRefId, 'AgentCompanyRefId': s.lAgentCompanyId == 0 ? null : s.lAgentCompanyId,
       'AgentMasterRefId': s.lAgentId == 0 ? null : s.lAgentId, 'OAgentCompanyRefId': s.oAgentCompanyId == 0 ? null : s.oAgentCompanyId, 'OAgentMasterRefId': s.oAgentId == 0 ? null : s.oAgentId,
       'CustomerRefId': s.custId, 'JobMasterRefId': s.jobTypeId, 'SaleDate': DateTime.parse(s.dtpSaleOrderdate).toIso8601String().split('.')[0], 'BillType': s.dropdownValue,
       'Remarks': s.txtRemarks, 'DODescription': s.txtDoDescription, 'Amount': s.totalAmount, 'GrossAmount': s.totalAmount, 'TaxAmount': s.taxAmount,
@@ -879,9 +879,9 @@ class SalesOrderAddBloc extends Bloc<SalesOrderAddEvent, SalesOrderAddState> {
         }
 
         if (exactCompKey != null) {
-          jsonMap[exactCompKey] = objfun.Comid;
+          jsonMap[exactCompKey] = AppGlobals.Comid;
         } else {
-          jsonMap['CompanyRefId'] = objfun.Comid;
+          jsonMap['CompanyRefId'] = AppGlobals.Comid;
         }
 
         return jsonMap;
@@ -891,7 +891,7 @@ class SalesOrderAddBloc extends Bloc<SalesOrderAddEvent, SalesOrderAddState> {
 
   Future<void> _confirmEnquiry(int id) async {
     final header = {'Content-Type': 'application/json; charset=UTF-8'};
-    await objfun.apiAllinoneSelectArray("${objfun.apiUpdateEnquiryMaster}$id&Comid=${objfun.Comid}&StatusName=CONFIRMED", null, header, context);
+    await AppGlobals.apiAllinoneSelectArray("${AppGlobals.apiUpdateEnquiryMaster}$id&Comid=${AppGlobals.Comid}&StatusName=CONFIRMED", null, header, context);
   }
 
   double _safeNum(dynamic val) {

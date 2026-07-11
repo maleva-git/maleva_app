@@ -4,7 +4,7 @@ import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:salomon_bottom_bar/salomon_bottom_bar.dart';
-import 'package:maleva/core/utils/clsfunction.dart' as objfun;
+import 'package:maleva/core/utils/app_globals.dart';
 import 'package:maleva/core/models/model.dart';
 import 'package:maleva/features/transaction/salesorder/add/data/salesorderadd_repository.dart';
 import 'package:maleva/menu/menulist.dart';
@@ -37,8 +37,8 @@ class SalesOrdersAdd extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isEnquiry = objfun.storagenew.getString('EnquiryOpen') == "true";
-    if (isEnquiry) objfun.storagenew.setString('EnquiryOpen', "false");
+    final isEnquiry = AppGlobals.storagenew.getString('EnquiryOpen') == "true";
+    if (isEnquiry) AppGlobals.storagenew.setString('EnquiryOpen', "false");
 
     return BlocProvider(
       create: (ctx) => sl<SalesOrderAddBloc>(param1: ctx)
@@ -112,7 +112,7 @@ class _SalesOrderAddBodyState extends State<_SalesOrderAddBody> with TickerProvi
       listener: (context, state) {
         if (state is SalesOrderAddLoaded) {
           if (state.savedMessage != null) {
-            objfun.toastMsg(state.savedMessage!, '', context);
+            toastMsg(state.savedMessage!, '', context);
           }
           if (state.isSaved) {
             Navigator.pushReplacement(
@@ -146,7 +146,7 @@ class _SalesOrderAddBodyState extends State<_SalesOrderAddBody> with TickerProvi
         return WillPopScope(
           onWillPop: () async {
             if (state.showSearch) return false;
-            final result = await objfun.ConfirmationMsgYesNo(context, "Are you Sure you want to Exit?");
+            final result = await ConfirmationMsgYesNo(context, "Are you Sure you want to Exit?");
             if (!context.mounted) return false;
             if (result == true) Navigator.of(context).pop();
             return false;
@@ -185,7 +185,7 @@ class _SalesOrderAddBodyState extends State<_SalesOrderAddBody> with TickerProvi
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Text('Sales Order', style: GoogleFonts.poppins(color: Colors.white, fontSize: 17, fontWeight: FontWeight.w700, letterSpacing: 0.3)),
-          Text(objfun.storagenew.getString('Username') ?? '', style: GoogleFonts.poppins(color: Colors.white70, fontSize: 11, fontWeight: FontWeight.w500)),
+          Text(AppGlobals.storagenew.getString('Username') ?? '', style: GoogleFonts.poppins(color: Colors.white70, fontSize: 11, fontWeight: FontWeight.w500)),
         ],
       ),
       actions: [
@@ -198,7 +198,7 @@ class _SalesOrderAddBodyState extends State<_SalesOrderAddBody> with TickerProvi
           label: 'SAVE',
           enabled: state.fieldPermission["SAVE"] == true,
           onPressed: () async {
-            final confirm = await objfun.ConfirmationMsgYesNo(context, "Do You Want to Save ?");
+            final confirm = await ConfirmationMsgYesNo(context, "Do You Want to Save ?");
             if (!context.mounted) return;
             if (confirm == true) {
               context.read<SalesOrderAddBloc>().add(SaveSalesOrderEvent());
@@ -301,10 +301,10 @@ class _SalesOrderAddBodyState extends State<_SalesOrderAddBody> with TickerProvi
         _searchField(
           hint: "Customer Name", uniqueId: 'search_customer', value: state.txtCustomer, enabled: fp["txtCustomer"] == true,
           onSearch: () async {
-            final r = await Navigator.push(context, MaterialPageRoute(builder: (_) => const Customer(Searchby: 1, SearchId: 0))); if (r != null) { objfun.SelectCustomerList = r; }
+            final r = await Navigator.push(context, MaterialPageRoute(builder: (_) => const Customer(Searchby: 1, SearchId: 0))); if (r != null) { AppGlobals.SelectCustomerList = r; }
             if (r != null) {
-              bloc.add(CustomerSelected(objfun.SelectCustomerList.AccountName, objfun.SelectCustomerList.Id));
-              objfun.SelectCustomerList = CustomerModel.Empty();
+              bloc.add(CustomerSelected(AppGlobals.SelectCustomerList.AccountName, AppGlobals.SelectCustomerList.Id));
+              AppGlobals.SelectCustomerList = CustomerModel.Empty();
             }
           },
           onClear: () => bloc.add(CustomerSelected('', 0)),
@@ -313,10 +313,10 @@ class _SalesOrderAddBodyState extends State<_SalesOrderAddBody> with TickerProvi
         _searchField(
           hint: "Job Type", uniqueId: 'search_jobtype', value: state.txtJobType, enabled: fp["txtJobType"] == true,
           onSearch: () async {
-            final r = await Navigator.push(context, MaterialPageRoute(builder: (_) => const JobType(Searchby: 1, SearchId: 0))); if (r != null) { objfun.SelectJobTypeList = r; }
+            final r = await Navigator.push(context, MaterialPageRoute(builder: (_) => const JobType(Searchby: 1, SearchId: 0))); if (r != null) { AppGlobals.SelectJobTypeList = r; }
             if (r != null) {
-              bloc.add(JobTypeSelected(objfun.SelectJobTypeList.Name, objfun.SelectJobTypeList.Id));
-              objfun.SelectJobTypeList = JobTypeModel.Empty();
+              bloc.add(JobTypeSelected(AppGlobals.SelectJobTypeList.Name, AppGlobals.SelectJobTypeList.Id));
+              AppGlobals.SelectJobTypeList = JobTypeModel.Empty();
             }
           },
           onClear: () => bloc.add(JobTypeSelected('', 0)),
@@ -325,10 +325,10 @@ class _SalesOrderAddBodyState extends State<_SalesOrderAddBody> with TickerProvi
         _searchField(
           hint: "Job Status", uniqueId: 'search_jobstatus', value: state.txtJobStatus, enabled: fp["txtJobStatus"] == true && state.txtJobType.isNotEmpty,
           onSearch: () async {
-            final r = await Navigator.push(context, MaterialPageRoute(builder: (_) => JobAllStatus(Searchby: 1, SearchId: 0, JobTypeId: state.jobTypeId))); if (r != null) { objfun.SelectAllStatusList = r; }
+            final r = await Navigator.push(context, MaterialPageRoute(builder: (_) => JobAllStatus(Searchby: 1, SearchId: 0, JobTypeId: state.jobTypeId))); if (r != null) { AppGlobals.SelectAllStatusList = r; }
             if (r != null) {
-              bloc.add(JobStatusSelected(objfun.SelectAllStatusList.StatusName, objfun.SelectAllStatusList.Status));
-              objfun.SelectAllStatusList = JobAllStatusModel.Empty();
+              bloc.add(JobStatusSelected(AppGlobals.SelectAllStatusList.StatusName, AppGlobals.SelectAllStatusList.Status));
+              AppGlobals.SelectAllStatusList = JobAllStatusModel.Empty();
             }
           },
           onClear: () => bloc.add(JobStatusSelected('', 0)),
@@ -372,12 +372,12 @@ class _SalesOrderAddBodyState extends State<_SalesOrderAddBody> with TickerProvi
         _searchField(
           hint: "Commodity Type", uniqueId: 'search_commodity', value: state.txtCommodityType, enabled: fp["txtCommodityType"] == true,
           onSearch: () async {
-            final __navResult1 = await Navigator.push(context, MaterialPageRoute(builder: (_) => const CommodityType(Searchby: 1, SearchId: 0))); if (__navResult1 != null) { objfun.SelectedCommodityName = __navResult1; }
-if (__navResult1 != null) { objfun.SelectedCommodityName = __navResult1; }
+            final __navResult1 = await Navigator.push(context, MaterialPageRoute(builder: (_) => const CommodityType(Searchby: 1, SearchId: 0))); if (__navResult1 != null) { AppGlobals.SelectedCommodityName = __navResult1; }
+if (__navResult1 != null) { AppGlobals.SelectedCommodityName = __navResult1; }
 
-            if (objfun.SelectedCommodityName.isNotEmpty) {
-              bloc.add(CommoditySelected(objfun.SelectedCommodityName));
-              objfun.SelectedCommodityName = "";
+            if (AppGlobals.SelectedCommodityName.isNotEmpty) {
+              bloc.add(CommoditySelected(AppGlobals.SelectedCommodityName));
+              AppGlobals.SelectedCommodityName = "";
             }
           },
           onClear: () => bloc.add(CommoditySelected('')),
@@ -406,11 +406,11 @@ if (__navResult1 != null) { objfun.SelectedCommodityName = __navResult1; }
           hint: "Cargo", uniqueId: 'search_cargo', value: state.txtCargo, enabled: fp["txtCargo"] == true,
           onSearch: () async {
             final __navResult2 = await Navigator.push(context, MaterialPageRoute(builder: (_) => const CargoStatus(Searchby: 1, SearchId: 0)));
-if (__navResult2 != null) { objfun.SelectedCargoName = __navResult2; }
+if (__navResult2 != null) { AppGlobals.SelectedCargoName = __navResult2; }
 
-            if (objfun.SelectedCargoName.isNotEmpty) {
-              bloc.add(CargoSelected(objfun.SelectedCargoName));
-              objfun.SelectedCargoName = "";
+            if (AppGlobals.SelectedCargoName.isNotEmpty) {
+              bloc.add(CargoSelected(AppGlobals.SelectedCargoName));
+              AppGlobals.SelectedCargoName = "";
             }
           },
           onClear: () => bloc.add(CargoSelected('')),
@@ -436,10 +436,10 @@ if (__navResult2 != null) { objfun.SelectedCargoName = __navResult2; }
           _searchField(
             hint: "Shipping Agent", uniqueId: 'search_l_shippingagent', value: state.txtLAgentCompany, enabled: fp["txtLAgentCompany"] == true,
             onSearch: () async {
-              final r = await Navigator.push(context, MaterialPageRoute(builder: (_) => const AgentCompany(Searchby: 1, SearchId: 0))); if (r != null) { objfun.SelectAgentCompanyList = r; }
+              final r = await Navigator.push(context, MaterialPageRoute(builder: (_) => const AgentCompany(Searchby: 1, SearchId: 0))); if (r != null) { AppGlobals.SelectAgentCompanyList = r; }
               if (r != null) {
-                bloc.add(LAgentCompanySelected(objfun.SelectAgentCompanyList.Name, objfun.SelectAgentCompanyList.Id));
-                objfun.SelectAgentCompanyList = AgentCompanyModel.Empty();
+                bloc.add(LAgentCompanySelected(AppGlobals.SelectAgentCompanyList.Name, AppGlobals.SelectAgentCompanyList.Id));
+                AppGlobals.SelectAgentCompanyList = AgentCompanyModel.Empty();
               }
             },
             onClear: () => bloc.add(LAgentCompanySelected('', 0)),
@@ -449,10 +449,10 @@ if (__navResult2 != null) { objfun.SelectedCargoName = __navResult2; }
           _searchField(
             hint: "Agent Name", uniqueId: 'search_l_agentname', value: state.txtLAgentName, enabled: fp["txtLAgentName"] == true && state.txtLAgentCompany.isNotEmpty,
             onSearch: () async {
-              final r = await Navigator.push(context, MaterialPageRoute(builder: (_) => Agent(Searchby: 1, SearchId: 0, AgentCompanyId: state.lAgentCompanyId))); if (r != null) { objfun.SelectAgentAllList = r; }
+              final r = await Navigator.push(context, MaterialPageRoute(builder: (_) => Agent(Searchby: 1, SearchId: 0, AgentCompanyId: state.lAgentCompanyId))); if (r != null) { AppGlobals.SelectAgentAllList = r; }
               if (r != null) {
-                bloc.add(LAgentSelected(objfun.SelectAgentAllList.AgentName, objfun.SelectAgentAllList.Id));
-                objfun.SelectAgentAllList = AgentModel.Empty();
+                bloc.add(LAgentSelected(AppGlobals.SelectAgentAllList.AgentName, AppGlobals.SelectAgentAllList.Id));
+                AppGlobals.SelectAgentAllList = AgentModel.Empty();
               }
             },
             onClear: () => bloc.add(LAgentSelected('', 0)),
@@ -465,11 +465,11 @@ if (__navResult2 != null) { objfun.SelectedCargoName = __navResult2; }
             hint: "Port", uniqueId: 'search_l_port', value: state.txtLPort, enabled: fp["txtLPort"] == true,
             onSearch: () async {
               final __navResult3 = await Navigator.push(context, MaterialPageRoute(builder: (_) => const Port(Searchby: 1, SearchId: 0)));
-if (__navResult3 != null) { objfun.SelectedPortName = __navResult3; }
+if (__navResult3 != null) { AppGlobals.SelectedPortName = __navResult3; }
 
-              if (objfun.SelectedPortName.isNotEmpty) {
-                bloc.add(LPortSelected(objfun.SelectedPortName));
-                objfun.SelectedPortName = "";
+              if (AppGlobals.SelectedPortName.isNotEmpty) {
+                bloc.add(LPortSelected(AppGlobals.SelectedPortName));
+                AppGlobals.SelectedPortName = "";
               }
             },
             onClear: () => bloc.add(LPortSelected('')),
@@ -480,11 +480,11 @@ if (__navResult3 != null) { objfun.SelectedPortName = __navResult3; }
             hint: "Vessel Type", uniqueId: 'search_l_vesseltype', value: state.txtLVesselType, enabled: fp["txtLVesselType"] == true,
             onSearch: () async {
               final __navResult4 = await Navigator.push(context, MaterialPageRoute(builder: (_) => const VesselType(Searchby: 1, SearchId: 0)));
-if (__navResult4 != null) { objfun.SelectedVesselTypeName = __navResult4; }
+if (__navResult4 != null) { AppGlobals.SelectedVesselTypeName = __navResult4; }
 
-              if (objfun.SelectedVesselTypeName.isNotEmpty) {
-                bloc.add(LVesselTypeSelected(objfun.SelectedVesselTypeName));
-                objfun.SelectedVesselTypeName = "";
+              if (AppGlobals.SelectedVesselTypeName.isNotEmpty) {
+                bloc.add(LVesselTypeSelected(AppGlobals.SelectedVesselTypeName));
+                AppGlobals.SelectedVesselTypeName = "";
               }
             },
             onClear: () => bloc.add(LVesselTypeSelected('')),
@@ -506,10 +506,10 @@ if (__navResult4 != null) { objfun.SelectedVesselTypeName = __navResult4; }
           _searchField(
             hint: "Shipping Agent", uniqueId: 'search_o_shippingagent', value: state.txtOAgentCompany, enabled: fp["txtOAgentCompany"] == true,
             onSearch: () async {
-              final r = await Navigator.push(context, MaterialPageRoute(builder: (_) => const AgentCompany(Searchby: 1, SearchId: 0))); if (r != null) { objfun.SelectAgentCompanyList = r; }
+              final r = await Navigator.push(context, MaterialPageRoute(builder: (_) => const AgentCompany(Searchby: 1, SearchId: 0))); if (r != null) { AppGlobals.SelectAgentCompanyList = r; }
               if (r != null) {
-                bloc.add(OAgentCompanySelected(objfun.SelectAgentCompanyList.Name, objfun.SelectAgentCompanyList.Id));
-                objfun.SelectAgentCompanyList = AgentCompanyModel.Empty();
+                bloc.add(OAgentCompanySelected(AppGlobals.SelectAgentCompanyList.Name, AppGlobals.SelectAgentCompanyList.Id));
+                AppGlobals.SelectAgentCompanyList = AgentCompanyModel.Empty();
               }
             },
             onClear: () => bloc.add(OAgentCompanySelected('', 0)),
@@ -519,10 +519,10 @@ if (__navResult4 != null) { objfun.SelectedVesselTypeName = __navResult4; }
           _searchField(
             hint: "Agent Name", uniqueId: 'search_o_agentname', value: state.txtOAgentName, enabled: fp["txtOAgentName"] == true && state.txtOAgentCompany.isNotEmpty,
             onSearch: () async {
-              final r = await Navigator.push(context, MaterialPageRoute(builder: (_) => Agent(Searchby: 1, SearchId: 0, AgentCompanyId: state.oAgentCompanyId))); if (r != null) { objfun.SelectAgentAllList = r; }
+              final r = await Navigator.push(context, MaterialPageRoute(builder: (_) => Agent(Searchby: 1, SearchId: 0, AgentCompanyId: state.oAgentCompanyId))); if (r != null) { AppGlobals.SelectAgentAllList = r; }
               if (r != null) {
-                bloc.add(OAgentSelected(objfun.SelectAgentAllList.AgentName, objfun.SelectAgentAllList.Id));
-                objfun.SelectAgentAllList = AgentModel.Empty();
+                bloc.add(OAgentSelected(AppGlobals.SelectAgentAllList.AgentName, AppGlobals.SelectAgentAllList.Id));
+                AppGlobals.SelectAgentAllList = AgentModel.Empty();
               }
             },
             onClear: () => bloc.add(OAgentSelected('', 0)),
@@ -535,11 +535,11 @@ if (__navResult4 != null) { objfun.SelectedVesselTypeName = __navResult4; }
             hint: "Port", uniqueId: 'search_o_port', value: state.txtOPort, enabled: fp["txtOPort"] == true,
             onSearch: () async {
               final __navResult5 = await Navigator.push(context, MaterialPageRoute(builder: (_) => const Port(Searchby: 1, SearchId: 0)));
-if (__navResult5 != null) { objfun.SelectedPortName = __navResult5; }
+if (__navResult5 != null) { AppGlobals.SelectedPortName = __navResult5; }
 
-              if (objfun.SelectedPortName.isNotEmpty) {
-                bloc.add(OPortSelected(objfun.SelectedPortName));
-                objfun.SelectedPortName = "";
+              if (AppGlobals.SelectedPortName.isNotEmpty) {
+                bloc.add(OPortSelected(AppGlobals.SelectedPortName));
+                AppGlobals.SelectedPortName = "";
               }
             },
             onClear: () => bloc.add(OPortSelected('')),
@@ -550,11 +550,11 @@ if (__navResult5 != null) { objfun.SelectedPortName = __navResult5; }
             hint: "Vessel Type", uniqueId: 'search_o_vesseltype', value: state.txtOVesselType, enabled: fp["txtOVesselType"] == true,
             onSearch: () async {
               final __navResult6 = await Navigator.push(context, MaterialPageRoute(builder: (_) => const VesselType(Searchby: 1, SearchId: 0)));
-if (__navResult6 != null) { objfun.SelectedVesselTypeName = __navResult6; }
+if (__navResult6 != null) { AppGlobals.SelectedVesselTypeName = __navResult6; }
 
-              if (objfun.SelectedVesselTypeName.isNotEmpty) {
-                bloc.add(OVesselTypeSelected(objfun.SelectedVesselTypeName));
-                objfun.SelectedVesselTypeName = "";
+              if (AppGlobals.SelectedVesselTypeName.isNotEmpty) {
+                bloc.add(OVesselTypeSelected(AppGlobals.SelectedVesselTypeName));
+                AppGlobals.SelectedVesselTypeName = "";
               }
             },
             onClear: () => bloc.add(OVesselTypeSelected('')),
@@ -583,10 +583,10 @@ if (__navResult6 != null) { objfun.SelectedVesselTypeName = __navResult6; }
             _searchField(
               hint: "Origin", uniqueId: 'search_origin_gc', value: state.txtOrigin, enabled: fp["txtOrigin"] == true,
               onSearch: () async {
-                final r = await Navigator.push(context, MaterialPageRoute(builder: (_) => const Location(Searchby: 1, SearchId: 0))); if (r != null) { objfun.SelectLocationList = r; }
+                final r = await Navigator.push(context, MaterialPageRoute(builder: (_) => const Location(Searchby: 1, SearchId: 0))); if (r != null) { AppGlobals.SelectLocationList = r; }
                 if (r != null) {
-                  bloc.add(OriginSelected(objfun.SelectLocationList.Location, objfun.SelectLocationList.Id));
-                  objfun.SelectLocationList = LocationModel.Empty();
+                  bloc.add(OriginSelected(AppGlobals.SelectLocationList.Location, AppGlobals.SelectLocationList.Id));
+                  AppGlobals.SelectLocationList = LocationModel.Empty();
                 }
               },
               onClear: () => bloc.add(OriginSelected('', 0)),
@@ -594,10 +594,10 @@ if (__navResult6 != null) { objfun.SelectedVesselTypeName = __navResult6; }
             _searchField(
               hint: "Destination", uniqueId: 'search_dest_gc', value: state.txtDestination, enabled: fp["txtDestination"] == true,
               onSearch: () async {
-                final r = await Navigator.push(context, MaterialPageRoute(builder: (_) => const Location(Searchby: 1, SearchId: 0))); if (r != null) { objfun.SelectLocationList = r; }
+                final r = await Navigator.push(context, MaterialPageRoute(builder: (_) => const Location(Searchby: 1, SearchId: 0))); if (r != null) { AppGlobals.SelectLocationList = r; }
                 if (r != null) {
-                  bloc.add(DestinationSelected(objfun.SelectLocationList.Location, objfun.SelectLocationList.Id));
-                  objfun.SelectLocationList = LocationModel.Empty();
+                  bloc.add(DestinationSelected(AppGlobals.SelectLocationList.Location, AppGlobals.SelectLocationList.Id));
+                  AppGlobals.SelectLocationList = LocationModel.Empty();
                 }
               },
               onClear: () => bloc.add(DestinationSelected('', 0)),
@@ -620,17 +620,17 @@ if (__navResult6 != null) { objfun.SelectedVesselTypeName = __navResult6; }
         onQtyChanged: (v) => bloc.add(UpdateTextField('txtPickUpQuantity', v)),
         onWeightChanged: (v) => bloc.add(UpdateTextField('txtPickUpWeight', v)),
         onSearch: () async {
-          final r = await Navigator.push(context, MaterialPageRoute(builder: (_) => const AddressList(Searchby: 1, SearchId: 0))); if (r != null) { objfun.SelectAddressList = r; }
+          final r = await Navigator.push(context, MaterialPageRoute(builder: (_) => const AddressList(Searchby: 1, SearchId: 0))); if (r != null) { AppGlobals.SelectAddressList = r; }
           if (!context.mounted) return;
-          if (r != null && objfun.SelectAddressList.isNotEmpty) {
-            final details = await sl<SalesOrderAddRepository>().selectAddressDetails(objfun.SelectAddressList);
-            objfun.AddressDetailedList = details.map<AddressDetailsModel>((e) => AddressDetailsModel.fromJson(e)).toList();
+          if (r != null && AppGlobals.SelectAddressList.isNotEmpty) {
+            final details = await sl<SalesOrderAddRepository>().selectAddressDetails(AppGlobals.SelectAddressList);
+            AppGlobals.AddressDetailedList = details.map<AddressDetailsModel>((e) => AddressDetailsModel.fromJson(e)).toList();
             if (!context.mounted) return;
-            if (objfun.AddressDetailedList.isNotEmpty) {
-              bloc.add(PickUpAddressSelected(objfun.AddressDetailedList[0].Address + (objfun.AddressDetailedList[0].Phone != null ? " ${objfun.AddressDetailedList[0].Phone}" : "")));
+            if (AppGlobals.AddressDetailedList.isNotEmpty) {
+              bloc.add(PickUpAddressSelected(AppGlobals.AddressDetailedList[0].Address + (AppGlobals.AddressDetailedList[0].Phone != null ? " ${AppGlobals.AddressDetailedList[0].Phone}" : "")));
             }
-            objfun.SelectAddressList = "";
-            objfun.AddressDetailedList = [];
+            AppGlobals.SelectAddressList = "";
+            AppGlobals.AddressDetailedList = [];
           }
         },
         onClear: () => bloc.add(PickUpAddressSelected('')),
@@ -653,17 +653,17 @@ if (__navResult6 != null) { objfun.SelectedVesselTypeName = __navResult6; }
         onQtyChanged: (v) => bloc.add(UpdateTextField('txtDeliveryQuantity', v)),
         onWeightChanged: (v) => bloc.add(UpdateTextField('txtDeliveryWeight', v)),
         onSearch: () async {
-          final r = await Navigator.push(context, MaterialPageRoute(builder: (_) => const AddressList(Searchby: 1, SearchId: 0))); if (r != null) { objfun.SelectAddressList = r; }
+          final r = await Navigator.push(context, MaterialPageRoute(builder: (_) => const AddressList(Searchby: 1, SearchId: 0))); if (r != null) { AppGlobals.SelectAddressList = r; }
           if (!context.mounted) return;
-          if (r != null && objfun.SelectAddressList.isNotEmpty) {
-            final details = await sl<SalesOrderAddRepository>().selectAddressDetails(objfun.SelectAddressList);
-            objfun.AddressDetailedList = details.map<AddressDetailsModel>((e) => AddressDetailsModel.fromJson(e)).toList();
+          if (r != null && AppGlobals.SelectAddressList.isNotEmpty) {
+            final details = await sl<SalesOrderAddRepository>().selectAddressDetails(AppGlobals.SelectAddressList);
+            AppGlobals.AddressDetailedList = details.map<AddressDetailsModel>((e) => AddressDetailsModel.fromJson(e)).toList();
             if (!context.mounted) return;
-            if (objfun.AddressDetailedList.isNotEmpty) {
-              bloc.add(DeliveryAddressSelected(objfun.AddressDetailedList[0].Address + (objfun.AddressDetailedList[0].Phone != null ? " ${objfun.AddressDetailedList[0].Phone}" : "")));
+            if (AppGlobals.AddressDetailedList.isNotEmpty) {
+              bloc.add(DeliveryAddressSelected(AppGlobals.AddressDetailedList[0].Address + (AppGlobals.AddressDetailedList[0].Phone != null ? " ${AppGlobals.AddressDetailedList[0].Phone}" : "")));
             }
-            objfun.SelectAddressList = "";
-            objfun.AddressDetailedList = [];
+            AppGlobals.SelectAddressList = "";
+            AppGlobals.AddressDetailedList = [];
           }
         },
         onClear: () => bloc.add(DeliveryAddressSelected('')),
@@ -677,17 +677,17 @@ if (__navResult6 != null) { objfun.SelectedVesselTypeName = __navResult6; }
           hint: 'Warehouse Address', uniqueId: 'addr_warehouse', value: state.txtWarehouseAddress, enabled: fp["txtWarehouseAddress"] == true,
           onChanged: (v) => bloc.add(UpdateTextField('txtWarehouseAddress', v)),
           onSearch: () async {
-            final r = await Navigator.push(context, MaterialPageRoute(builder: (_) => const AddressList(Searchby: 1, SearchId: 0))); if (r != null) { objfun.SelectAddressList = r; }
+            final r = await Navigator.push(context, MaterialPageRoute(builder: (_) => const AddressList(Searchby: 1, SearchId: 0))); if (r != null) { AppGlobals.SelectAddressList = r; }
             if (!context.mounted) return;
-            if (r != null && objfun.SelectAddressList.isNotEmpty) {
-              final details = await sl<SalesOrderAddRepository>().selectAddressDetails(objfun.SelectAddressList);
-              objfun.AddressDetailedList = details.map<AddressDetailsModel>((e) => AddressDetailsModel.fromJson(e)).toList();
+            if (r != null && AppGlobals.SelectAddressList.isNotEmpty) {
+              final details = await sl<SalesOrderAddRepository>().selectAddressDetails(AppGlobals.SelectAddressList);
+              AppGlobals.AddressDetailedList = details.map<AddressDetailsModel>((e) => AddressDetailsModel.fromJson(e)).toList();
               if (!context.mounted) return;
-              if (objfun.AddressDetailedList.isNotEmpty) {
-                bloc.add(WarehouseAddressSelected(objfun.AddressDetailedList[0].Address + (objfun.AddressDetailedList[0].Phone != null ? " ${objfun.AddressDetailedList[0].Phone}" : "")));
+              if (AppGlobals.AddressDetailedList.isNotEmpty) {
+                bloc.add(WarehouseAddressSelected(AppGlobals.AddressDetailedList[0].Address + (AppGlobals.AddressDetailedList[0].Phone != null ? " ${AppGlobals.AddressDetailedList[0].Phone}" : "")));
               }
-              objfun.SelectAddressList = "";
-              objfun.AddressDetailedList = [];
+              AppGlobals.SelectAddressList = "";
+              AppGlobals.AddressDetailedList = [];
             }
           },
           onClear: () => bloc.add(WarehouseAddressSelected('')),
@@ -719,14 +719,14 @@ if (__navResult6 != null) { objfun.SelectedVesselTypeName = __navResult6; }
           hint: "Boarding Officer 1", uniqueId: 'search_board1', value: state.txtBoardingOfficer1, enabled: fp["txtBoardingOfficer1"] == true,
           onSearch: () async {
             final emps = await sl<SalesOrderAddRepository>().selectEmployee('', 'Operation');
-            objfun.EmployeeList = emps.map<EmployeeModel>((e) => EmployeeModel.fromJson(e)).toList();
+            AppGlobals.EmployeeList = emps.map<EmployeeModel>((e) => EmployeeModel.fromJson(e)).toList();
             if (!context.mounted) return;
-            final __navResult7 = await Navigator.push(context, MaterialPageRoute(builder: (_) => const Employee(Searchby: 1, SearchId: 0))); if (__navResult7 != null) { objfun.SelectEmployeeList = __navResult7; }
-if (__navResult7 != null) { objfun.SelectEmployeeList = __navResult7; }
+            final __navResult7 = await Navigator.push(context, MaterialPageRoute(builder: (_) => const Employee(Searchby: 1, SearchId: 0))); if (__navResult7 != null) { AppGlobals.SelectEmployeeList = __navResult7; }
+if (__navResult7 != null) { AppGlobals.SelectEmployeeList = __navResult7; }
 
-            if (objfun.SelectEmployeeList.AccountName.isNotEmpty) {
-              bloc.add(BoardingOfficer1Selected(objfun.SelectEmployeeList.AccountName, objfun.SelectEmployeeList.Id));
-              objfun.SelectEmployeeList = EmployeeModel.Empty();
+            if (AppGlobals.SelectEmployeeList.AccountName.isNotEmpty) {
+              bloc.add(BoardingOfficer1Selected(AppGlobals.SelectEmployeeList.AccountName, AppGlobals.SelectEmployeeList.Id));
+              AppGlobals.SelectEmployeeList = EmployeeModel.Empty();
             }
           },
           onClear: () => bloc.add(BoardingOfficer1Selected('', 0)),
@@ -739,14 +739,14 @@ if (__navResult7 != null) { objfun.SelectEmployeeList = __navResult7; }
           hint: "Boarding Officer 2", uniqueId: 'search_board2', value: state.txtBoardingOfficer2, enabled: fp["txtBoardingOfficer2"] == true,
           onSearch: () async {
             final emps = await sl<SalesOrderAddRepository>().selectEmployee('', 'Operation');
-            objfun.EmployeeList = emps.map<EmployeeModel>((e) => EmployeeModel.fromJson(e)).toList();
+            AppGlobals.EmployeeList = emps.map<EmployeeModel>((e) => EmployeeModel.fromJson(e)).toList();
             if (!context.mounted) return;
-            final __navResult8 = await Navigator.push(context, MaterialPageRoute(builder: (_) => const Employee(Searchby: 1, SearchId: 0))); if (__navResult8 != null) { objfun.SelectEmployeeList = __navResult8; }
-if (__navResult8 != null) { objfun.SelectEmployeeList = __navResult8; }
+            final __navResult8 = await Navigator.push(context, MaterialPageRoute(builder: (_) => const Employee(Searchby: 1, SearchId: 0))); if (__navResult8 != null) { AppGlobals.SelectEmployeeList = __navResult8; }
+if (__navResult8 != null) { AppGlobals.SelectEmployeeList = __navResult8; }
 
-            if (objfun.SelectEmployeeList.AccountName.isNotEmpty) {
-              bloc.add(BoardingOfficer2Selected(objfun.SelectEmployeeList.AccountName, objfun.SelectEmployeeList.Id));
-              objfun.SelectEmployeeList = EmployeeModel.Empty();
+            if (AppGlobals.SelectEmployeeList.AccountName.isNotEmpty) {
+              bloc.add(BoardingOfficer2Selected(AppGlobals.SelectEmployeeList.AccountName, AppGlobals.SelectEmployeeList.Id));
+              AppGlobals.SelectEmployeeList = EmployeeModel.Empty();
             }
           },
           onClear: () => bloc.add(BoardingOfficer2Selected('', 0)),
@@ -800,12 +800,12 @@ if (__navResult8 != null) { objfun.SelectEmployeeList = __navResult8; }
                 hint: "Seal By", uniqueId: 'search_seal_$fwNum', value: sealEmpValue, enabled: fp["txtSealByEmp$fwNum"] == true,
                 onSearch: () async {
                   final emps = await sl<SalesOrderAddRepository>().selectEmployee('', 'Operation');
-                  objfun.EmployeeList = emps.map<EmployeeModel>((e) => EmployeeModel.fromJson(e)).toList();
+                  AppGlobals.EmployeeList = emps.map<EmployeeModel>((e) => EmployeeModel.fromJson(e)).toList();
                   if (!context.mounted) return;
-                  final __navResult9 = await Navigator.push(context, MaterialPageRoute(builder: (_) => const Employee(Searchby: 1, SearchId: 0))); if (__navResult9 != null) { objfun.SelectEmployeeList = __navResult9; }
-if (__navResult9 != null) { objfun.SelectEmployeeList = __navResult9; }
+                  final __navResult9 = await Navigator.push(context, MaterialPageRoute(builder: (_) => const Employee(Searchby: 1, SearchId: 0))); if (__navResult9 != null) { AppGlobals.SelectEmployeeList = __navResult9; }
+if (__navResult9 != null) { AppGlobals.SelectEmployeeList = __navResult9; }
 
-                  if (objfun.SelectEmployeeList.AccountName.isNotEmpty) { bloc.add(sealEvent(objfun.SelectEmployeeList.AccountName, objfun.SelectEmployeeList.Id)); objfun.SelectEmployeeList = EmployeeModel.Empty(); }
+                  if (AppGlobals.SelectEmployeeList.AccountName.isNotEmpty) { bloc.add(sealEvent(AppGlobals.SelectEmployeeList.AccountName, AppGlobals.SelectEmployeeList.Id)); AppGlobals.SelectEmployeeList = EmployeeModel.Empty(); }
                 },
                 onClear: () => bloc.add(sealEvent('', 0)),
               ), _gap(),
@@ -813,12 +813,12 @@ if (__navResult9 != null) { objfun.SelectEmployeeList = __navResult9; }
                 hint: "B.Seal By", uniqueId: 'search_bseal_$fwNum', value: breakEmpValue, enabled: fp["txtBreakByEmp$fwNum"] == true,
                 onSearch: () async {
                   final emps = await sl<SalesOrderAddRepository>().selectEmployee('', 'Operation');
-                  objfun.EmployeeList = emps.map<EmployeeModel>((e) => EmployeeModel.fromJson(e)).toList();
+                  AppGlobals.EmployeeList = emps.map<EmployeeModel>((e) => EmployeeModel.fromJson(e)).toList();
                   if (!context.mounted) return;
-                  final __navResult10 = await Navigator.push(context, MaterialPageRoute(builder: (_) => const Employee(Searchby: 1, SearchId: 0))); if (__navResult10 != null) { objfun.SelectEmployeeList = __navResult10; }
-if (__navResult10 != null) { objfun.SelectEmployeeList = __navResult10; }
+                  final __navResult10 = await Navigator.push(context, MaterialPageRoute(builder: (_) => const Employee(Searchby: 1, SearchId: 0))); if (__navResult10 != null) { AppGlobals.SelectEmployeeList = __navResult10; }
+if (__navResult10 != null) { AppGlobals.SelectEmployeeList = __navResult10; }
 
-                  if (objfun.SelectEmployeeList.AccountName.isNotEmpty) { bloc.add(breakEvent(objfun.SelectEmployeeList.AccountName, objfun.SelectEmployeeList.Id)); objfun.SelectEmployeeList = EmployeeModel.Empty(); }
+                  if (AppGlobals.SelectEmployeeList.AccountName.isNotEmpty) { bloc.add(breakEvent(AppGlobals.SelectEmployeeList.AccountName, AppGlobals.SelectEmployeeList.Id)); AppGlobals.SelectEmployeeList = EmployeeModel.Empty(); }
                 },
                 onClear: () => bloc.add(breakEvent('', 0)),
               ), _gap(),
@@ -1094,10 +1094,10 @@ class _ProductDialogState extends State<_ProductDialog> {
               _searchableField(
                 hint: "Product Description", value: state.txtProductDescription,
                 onSearch: () async {
-                  final r = await Navigator.push(context, MaterialPageRoute(builder: (_) => const Product(Searchby: 1, SearchId: 0))); if (r != null) { objfun.SelectProductList = r; }
+                  final r = await Navigator.push(context, MaterialPageRoute(builder: (_) => const Product(Searchby: 1, SearchId: 0))); if (r != null) { AppGlobals.SelectProductList = r; }
                   if (r != null) {
-                    bloc.add(ProductSelected(objfun.SelectProductList.ProductName, objfun.SelectProductList.Productcode, objfun.SelectProductList.Id));
-                    objfun.SelectProductList = ProductModel.Empty();
+                    bloc.add(ProductSelected(AppGlobals.SelectProductList.ProductName, AppGlobals.SelectProductList.Productcode, AppGlobals.SelectProductList.Id));
+                    AppGlobals.SelectProductList = ProductModel.Empty();
                     Navigator.of(context, rootNavigator: true).pop();
                     showDialog(context: context, barrierDismissible: false, builder: (ctx) => BlocProvider.value(value: bloc, child: _ProductDialog(activeField: _activeField)));
                   }
@@ -1185,7 +1185,7 @@ class _AddressListDialog extends StatelessWidget {
                     itemBuilder: (ctx, index) {
                       return InkWell(
                         onLongPress: () async {
-                          final del = await objfun.ConfirmationMsgYesNo(context, "Are you sure to delete?");
+                          final del = await ConfirmationMsgYesNo(context, "Are you sure to delete?");
             if (!context.mounted) return;
                           if (del == true) { if (isPickUp) { bloc.add(RemovePickUpAddress(index)); } else { bloc.add(RemoveDeliveryAddress(index)); } }
                         },
@@ -1211,7 +1211,7 @@ class _AddressListDialog extends StatelessWidget {
                             const SizedBox(width: 8),
 
                             // 4. Delete Icon
-                            GestureDetector(onTap: () async { final del = await objfun.ConfirmationMsgYesNo(context, "Are you sure to delete?");
+                            GestureDetector(onTap: () async { final del = await ConfirmationMsgYesNo(context, "Are you sure to delete?");
             if (!context.mounted) return; if (del == true) { if (isPickUp) { bloc.add(RemovePickUpAddress(index)); } else { bloc.add(RemoveDeliveryAddress(index)); } } }, child: const Icon(Icons.delete_rounded, color: colour.red, size: 18)),
                           ]),
                         ),

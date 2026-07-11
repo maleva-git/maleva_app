@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:maleva/core/colors/colors.dart' as colour;
-import 'package:maleva/core/utils/clsfunction.dart' as objfun;
+import 'package:maleva/core/utils/app_globals.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 
@@ -109,7 +109,7 @@ class _Portstate extends State<Port> {
   @override
   Widget build(BuildContext context) {
     double width = MediaQuery.of(context).size.width;
-    bool isTablet = objfun.MalevaScreen != 1;
+    bool isTablet = AppGlobals.MalevaScreen != 1;
 
     return Scaffold(
       backgroundColor: const Color(0xFFF4F7FC),
@@ -123,7 +123,7 @@ class _Portstate extends State<Port> {
             textStyle: TextStyle(
                 color: colour.topAppBarColor,
                 fontWeight: FontWeight.w700,
-                fontSize: objfun.FontLarge,
+                fontSize: AppGlobals.FontLarge,
                 letterSpacing: 0.5),
           ),
         ),
@@ -223,7 +223,7 @@ class _Portstate extends State<Port> {
                                       onTap: () {
                                         setState(() {
                                           if (widget.Searchby == 1) {
-                                            objfun.SelectedPortName = item.toString();
+                                            AppGlobals.SelectedPortName = item.toString();
                                             Navigator.of(context, rootNavigator: true).pop(item.toString());
                                           }
                                         });

@@ -4,12 +4,12 @@ import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:maleva/core/models/model.dart';
-import 'package:maleva/core/utils/clsfunction.dart' as objfun;
+import 'package:maleva/core/utils/app_globals.dart';
 import 'package:maleva/menu/menulist.dart';
 import '../../../../mastersearch/Customer.dart';
 import '../../../../../core/theme/tokens.dart';
-import '../../../../dashboard/admin_dashboard/tabs/custdashboard/view/custdashboard_tab.dart';
-import '../../../../dashboard/admin_dashboard/tabs/transportDB/view/transportdb_tab.dart';
+import '../../../../dashboard/common_tabs/custdashboard/view/custdashboard_tab.dart';
+import '../../../../dashboard/common_tabs/transportDB/view/transportdb_tab.dart';
 import '../../../../dashboard/admin_dashboard/view/admin_dashboard.dart';
 import '../../../../dashboard/operationadmin_dashboard/view/operationadmin_dashboard.dart';
 import '../../../../home/view/home_tab.dart';
@@ -50,8 +50,8 @@ class _EnquiryViewPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isTablet = objfun.MalevaScreen != 1;
-    final userName = objfun.storagenew.getString('Username') ?? '';
+    final isTablet = AppGlobals.MalevaScreen != 1;
+    final userName = AppGlobals.storagenew.getString('Username') ?? '';
 
     return BlocListener<EnquiryViewBloc, EnquiryViewState>(
       listener: (context, state) {
@@ -59,10 +59,11 @@ class _EnquiryViewPage extends StatelessWidget {
           Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (_) => AddEnquiryTR(SaleMaster: state.item.toJson()),
+              builder: (_) => AddEnquiryTR(SaleMaster: state.item),
             ),
           );
         }
+
         if (state is EnquiryViewNavigateToPushSaleOrder) {
           Navigator.push(
             context,
@@ -127,7 +128,7 @@ class _EnquiryViewPage extends StatelessWidget {
   }
 
   void _navigateBack(BuildContext context) {
-    final role = objfun.storagenew.getString('RulesType') ?? '';
+    final role = AppGlobals.storagenew.getString('RulesType') ?? '';
     Widget dest;
     switch (role) {
       case 'ADMIN':
@@ -171,7 +172,7 @@ class _EnquiryViewPage extends StatelessWidget {
             style: GoogleFonts.lato(
               color: Colors.white,
               fontWeight: FontWeight.w700,
-              fontSize: isTablet ? objfun.FontMedium + 2 : objfun.FontMedium,
+              fontSize: isTablet ? AppGlobals.FontMedium + 2 : AppGlobals.FontMedium,
               letterSpacing: 0.3,
             ),
           ),
@@ -181,7 +182,7 @@ class _EnquiryViewPage extends StatelessWidget {
             style: GoogleFonts.lato(
               color: Colors.white.withValues(alpha: 0.65),
               fontWeight: FontWeight.w500,
-              fontSize: isTablet ? objfun.FontLow : objfun.FontLow - 1,
+              fontSize: isTablet ? AppGlobals.FontLow : AppGlobals.FontLow - 1,
             ),
           ),
         ],
@@ -457,7 +458,7 @@ class _EnquiryCard extends StatelessWidget {
     final valStyle = GoogleFonts.lato(
       color: AppTokens.maintTextDark,
       fontWeight: FontWeight.w600,
-      fontSize: isTablet ? objfun.FontCardText + 1 : objfun.FontCardText,
+      fontSize: isTablet ? AppGlobals.FontCardText + 1 : AppGlobals.FontCardText,
     );
     final labelStyle = GoogleFonts.lato(
       color: AppTokens.planTextMuted,
@@ -556,7 +557,7 @@ AppTokens.headerGradient)),
                         label: 'Push to SO',
                         onTap: () async {
                           final confirm =
-                          await objfun.ConfirmationMsgYesNo(
+                          await ConfirmationMsgYesNo(
                               context,
                               'Do You Want to Push to SalesOrder ?');
                           if (confirm == true) {
@@ -572,7 +573,7 @@ AppTokens.headerGradient)),
                         color: const Color(0xFFB33040),
                         onTap: () async {
                           final confirm =
-                          await objfun.ConfirmationMsgYesNo(
+                          await ConfirmationMsgYesNo(
                               context,
                               'Do You Want to Cancel the Enquiry ?');
                           if (confirm == true) {
@@ -656,7 +657,7 @@ class _FilterSheetState extends State<_FilterSheet> {
 
   @override
   Widget build(BuildContext context) {
-    final isTablet = objfun.MalevaScreen != 1;
+    final isTablet = AppGlobals.MalevaScreen != 1;
 
     return Container(
       decoration: const BoxDecoration(
@@ -718,8 +719,8 @@ class _FilterSheetState extends State<_FilterSheet> {
                   MaterialPageRoute(
                       builder: (_) =>
                       const Customer(Searchby: 1, SearchId: 0)),
-                ).then((_navRes) { if (_navRes != null) { objfun.SelectCustomerList = _navRes; }
-                  final sel = objfun.SelectCustomerList;
+                ).then((_navRes) { if (_navRes != null) { AppGlobals.SelectCustomerList = _navRes; }
+                  final sel = AppGlobals.SelectCustomerList;
                   if (sel.Id != 0) {
                     setState(() {
                       _local = _local.copyWith(
@@ -727,7 +728,7 @@ class _FilterSheetState extends State<_FilterSheet> {
                     });
                     _emit(EnquiryViewCustomerChanged(
                         custId: sel.Id, custName: sel.AccountName));
-                    objfun.SelectCustomerList = CustomerModel.Empty();
+                    AppGlobals.SelectCustomerList = CustomerModel.Empty();
                   }
                 });
               },
@@ -750,9 +751,9 @@ class _FilterSheetState extends State<_FilterSheet> {
                       builder: (_) =>
                       const JobType(Searchby: 1, SearchId: 0)),
                 ).then((_) async {
-                  final sel = objfun.SelectJobTypeList;
+                  final sel = AppGlobals.SelectJobTypeList;
                   if (sel.Id != 0) {
-                    objfun.JobAllStatusList = (await sl<EnquiryTrRepository>().selectAllJobStatus(sel.Id))
+                    AppGlobals.JobAllStatusList = (await sl<EnquiryTrRepository>().selectAllJobStatus(sel.Id))
                         .map((e) => JobAllStatusModel.fromJson(e))
                         .toList()
                         .cast<JobAllStatusModel>();
@@ -763,7 +764,7 @@ class _FilterSheetState extends State<_FilterSheet> {
                     });
                     _emit(EnquiryViewJobTypeChanged(
                         jobId: sel.Id, jobName: sel.Name));
-                    objfun.SelectJobTypeList = JobTypeModel.Empty();
+                    AppGlobals.SelectJobTypeList = JobTypeModel.Empty();
                   }
                 });
               },
@@ -781,7 +782,7 @@ class _FilterSheetState extends State<_FilterSheet> {
               value: _local.empName,
               disabled: _local.checkLEmp,
               onSearch: () async {
-                objfun.EmployeeList = (await sl<EnquiryTrRepository>().selectEmployee('sales', 'admin'))
+                AppGlobals.EmployeeList = (await sl<EnquiryTrRepository>().selectEmployee('sales', 'admin'))
                     .map<EmployeeModel>((e) => EmployeeModel.fromJson(e))
                     .toList();
                 if (!context.mounted) return;
@@ -791,8 +792,8 @@ class _FilterSheetState extends State<_FilterSheet> {
                     MaterialPageRoute(
                         builder: (_) =>
                         const Employee(Searchby: 1, SearchId: 0)),
-                  ).then((_navRes) { if (_navRes != null) { objfun.SelectEmployeeList = _navRes; }
-                    final sel = objfun.SelectEmployeeList;
+                  ).then((_navRes) { if (_navRes != null) { AppGlobals.SelectEmployeeList = _navRes; }
+                    final sel = AppGlobals.SelectEmployeeList;
                     if (sel.Id != 0) {
                       setState(() {
                         _local = _local.copyWith(
@@ -800,7 +801,7 @@ class _FilterSheetState extends State<_FilterSheet> {
                       });
                       _emit(EnquiryViewEmployeeChanged(
                           empId: sel.Id, empName: sel.AccountName));
-                      objfun.SelectEmployeeList = EmployeeModel.Empty();
+                      AppGlobals.SelectEmployeeList = EmployeeModel.Empty();
                     }
                   });
                 }
@@ -951,7 +952,7 @@ class _AddButton extends StatelessWidget {
                 style: GoogleFonts.lato(
                     color: Colors.white,
                     fontWeight: FontWeight.w700,
-                    fontSize: objfun.FontMedium)),
+                    fontSize: AppGlobals.FontMedium)),
           ),
         ),
       ),
@@ -1092,7 +1093,7 @@ class _ESearchField extends StatelessWidget {
                   color: value.isEmpty ? AppTokens.planTextMuted : AppTokens.maintTextDark,
                   fontWeight:
                   value.isEmpty ? FontWeight.w500 : FontWeight.w600,
-                  fontSize: objfun.FontLow,
+                  fontSize: AppGlobals.FontLow,
                 ),
                 overflow: TextOverflow.ellipsis,
               ),
@@ -1119,7 +1120,7 @@ class _AnimatedCheckbox extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isTablet = objfun.MalevaScreen != 1;
+    final isTablet = AppGlobals.MalevaScreen != 1;
     return InkWell(
       onTap: () => onChanged(!value),
       borderRadius: BorderRadius.circular(8),
@@ -1150,8 +1151,8 @@ class _AnimatedCheckbox extends StatelessWidget {
                     color: AppTokens.maintTextDark,
                     fontWeight: FontWeight.w600,
                     fontSize: isTablet
-                        ? objfun.FontLow + 1
-                        : objfun.FontLow)),
+                        ? AppGlobals.FontLow + 1
+                        : AppGlobals.FontLow)),
           ],
         ),
       ),
@@ -1189,7 +1190,7 @@ class _GradientButton extends StatelessWidget {
                 style: GoogleFonts.lato(
                     color: Colors.white,
                     fontWeight: FontWeight.w700,
-                    fontSize: objfun.FontMedium)),
+                    fontSize: AppGlobals.FontMedium)),
           ),
         ),
       ),
@@ -1222,7 +1223,7 @@ class _OutlineButton extends StatelessWidget {
                 style: GoogleFonts.lato(
                     color: AppTokens.invoiceHeaderStart,
                     fontWeight: FontWeight.w700,
-                    fontSize: objfun.FontMedium)),
+                    fontSize: AppGlobals.FontMedium)),
           ),
         ),
       ),

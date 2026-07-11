@@ -1,5 +1,5 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:maleva/core/utils/clsfunction.dart' as objfun;
+import 'package:maleva/core/utils/app_globals.dart';
 import 'package:maleva/core/models/model.dart';
 
 import 'maintenance_event.dart';
@@ -23,14 +23,14 @@ class TruckMaintenanceBloc
       Emitter<TruckMaintenanceState> emit) async {
     emit(TruckMaintenanceLoading());
     try {
-      objfun.TruckDetailsList = [];
-      final isDriverLogin = objfun.DriverLogin == 1;
-      final truckId       = objfun.DriverTruckRefId;
+      AppGlobals.TruckDetailsList = [];
+      final isDriverLogin = AppGlobals.DriverLogin == 1;
+      final truckId       = AppGlobals.DriverTruckRefId;
 
-      final expDate          = objfun.currentdate(objfun.commonexpirydays);
-      final expApadBonam     = objfun.currentdate(objfun.apadbonamexpirydays);
+      final expDate          = AppGlobals.currentdate(AppGlobals.commonexpirydays);
+      final expApadBonam     = AppGlobals.currentdate(AppGlobals.apadbonamexpirydays);
       final expServiceAlignGreece =
-      objfun.currentdate(objfun.ExpServiceAligmentGreecedays);
+      AppGlobals.currentdate(AppGlobals.ExpServiceAligmentGreecedays);
 
       // Driver login: auto-load truck data
       if (truckId != 0) {
@@ -92,7 +92,7 @@ class TruckMaintenanceBloc
       Emitter<TruckMaintenanceState> emit) {
     if (state is! TruckMaintenanceLoaded) return;
     final s = state as TruckMaintenanceLoaded;
-    objfun.TruckDetailsList = [];
+    AppGlobals.TruckDetailsList = [];
     emit(s.copyWith(truckId: 0, truckName: '', truckDetails: []));
   }
 
@@ -108,12 +108,12 @@ class TruckMaintenanceBloc
       'ExpServiceAligmentGreece': expServiceAlignGreece,
       'Id':                     truckId,
       'SFromDate':              null,
-      'Comid':                  objfun.Comid,
+      'Comid':                  AppGlobals.Comid,
     };
     final header = {'Content-Type': 'application/json; charset=UTF-8'};
 
-    final resultData = await objfun.apiAllinoneSelectArray(
-        objfun.apiSelectTruckDetails, master, header, null);
+    final resultData = await AppGlobals.apiAllinoneSelectArray(
+        AppGlobals.apiSelectTruckDetails, master, header, null);
 
     if (resultData != '' && resultData != null) {
       final value = ResponseViewModel.fromJson(resultData);
@@ -122,7 +122,7 @@ class TruckMaintenanceBloc
             .map((e) => TruckDetailsModel.fromJson(e))
             .cast<TruckDetailsModel>()
             .toList();
-        objfun.TruckDetailsList = list;
+        AppGlobals.TruckDetailsList = list;
         return list;
       }
     }

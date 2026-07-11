@@ -2,7 +2,7 @@ import 'package:maleva/core/models/model.dart';
 import 'package:maleva/core/network/api_client.dart';
 import 'package:maleva/core/network/OnlineApi.dart' as OnlineApi;
 import 'package:maleva/core/utils/app_preferences.dart';
-import 'package:maleva/core/utils/clsfunction.dart' as objfun;
+import 'package:maleva/core/utils/app_globals.dart';
 
 class ForwardingSalaryRepository {
   final int comid = AppPreferences.getComid();
@@ -16,15 +16,15 @@ class ForwardingSalaryRepository {
     await OnlineApi.loadComboS1(null, 0);
 
     return {
-      'jobNoList': objfun.JobNoList,
-      'employeeList': objfun.EmployeeList,
+      'jobNoList': AppGlobals.JobNoList,
+      'employeeList': AppGlobals.EmployeeList,
     };
   }
 
   // ─── Fetch RTIs by Bill Type ───────────────────────────────────────────────
   Future<List<dynamic>> fetchRTINoForwarding(int billType) async {
     await OnlineApi.GetRTINoForwarding(null, billType);
-    return objfun.JobNoList;
+    return AppGlobals.JobNoList;
   }
 
   // ─── Fetch Specific Forwarding Data ────────────────────────────────────────
@@ -37,7 +37,7 @@ class ForwardingSalaryRepository {
       'RTIMasterRefId': saleOrderId,
     };
 
-    final result = await ApiClient.postRequest(objfun.apiSelectForwarding, body);
+    final result = await ApiClient.postRequest(AppGlobals.apiSelectForwarding, body);
 
     if (result != null && result is Map<String, dynamic> && result['IsSuccess'] == true) {
       if (result['Data1'] != null && (result['Data1'] as List).isNotEmpty) {
@@ -49,7 +49,7 @@ class ForwardingSalaryRepository {
 
   // ─── Save Forwarding Salary ────────────────────────────────────────────────
   Future<bool> saveForwardingSalary(Map<String, dynamic> masterPayload) async {
-    final result = await ApiClient.postRequest(objfun.apiInsertForwarding, [masterPayload]);
+    final result = await ApiClient.postRequest(AppGlobals.apiInsertForwarding, [masterPayload]);
 
     if (result != null && result is Map<String, dynamic>) {
       return result['Result'] == 1 || result['IsSuccess'] == true;

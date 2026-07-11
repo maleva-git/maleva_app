@@ -1,8 +1,9 @@
+import 'app_globals.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:maleva/core/colors/colors.dart' as colour;
-import 'clsfunction.dart' as globals;
+
 
 void msgshow(
     String msg,
@@ -299,7 +300,7 @@ Future<bool> ConfirmationMsgYesNo(BuildContext context, String msg) async {
                           ),
                         ],
                         image: DecorationImage(
-                          image: globals.logo,
+                          image: AppGlobals.logo,
                           fit: BoxFit.contain,
                         ),
                       ),
@@ -397,7 +398,7 @@ Future<bool> ConfirmationOK(String Msg, context) async {
       return AlertDialog(
         titlePadding: EdgeInsets.zero,
         title: Container(
-          height:  globals.MalevaScreen == 1 ? 35 : 45,
+          height:  AppGlobals.MalevaScreen == 1 ? 35 : 45,
           padding: const EdgeInsets.all(5),
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(0.0),
@@ -412,22 +413,22 @@ Future<bool> ConfirmationOK(String Msg, context) async {
               textStyle: TextStyle(
                   color: colour.whiteText,
                   fontWeight: FontWeight.bold,
-                  fontSize: globals.FontLarge,
+                  fontSize: AppGlobals.FontLarge,
                   letterSpacing: 0.3),
             ),
           ),
         ),
         content: SizedBox(
-          width: globals.MalevaScreen == 1 ? 150 : 300.0,
-          height: globals.MalevaScreen == 1 ? 30 : 50.0,
+          width: AppGlobals.MalevaScreen == 1 ? 150 : 300.0,
+          height: AppGlobals.MalevaScreen == 1 ? 30 : 50.0,
           child: Text(
             Msg,
             style: GoogleFonts.lato(
               textStyle: TextStyle(
                   color: colour.commonColor,
                   fontWeight: FontWeight.bold,
-                  fontSize:  globals.MalevaScreen == 1
-                      ? globals.FontLow : globals.FontMedium,
+                  fontSize:  AppGlobals.MalevaScreen == 1
+                      ? AppGlobals.FontLow : AppGlobals.FontMedium,
                   letterSpacing: 0.3),
             ),
           ),
@@ -453,8 +454,8 @@ Future<bool> ConfirmationOK(String Msg, context) async {
             child: Text(
               'OK',
               style: GoogleFonts.lato(
-                  fontSize:  globals.MalevaScreen == 1
-                      ? globals.FontMedium - 2 : globals.FontMedium,
+                  fontSize:  AppGlobals.MalevaScreen == 1
+                      ? AppGlobals.FontMedium - 2 : AppGlobals.FontMedium,
                   fontWeight: FontWeight.bold,
                   color: colour.commonColorLight),
             ),
@@ -482,8 +483,8 @@ void toastMsg(msg, value, BuildContext context) {
               msg + value.toString(),
               style:  GoogleFonts.lato(
                   textStyle: TextStyle(
-                      fontSize:  globals.MalevaScreen == 1
-                          ? globals.FontLow : globals.FontMedium,
+                      fontSize:  AppGlobals.MalevaScreen == 1
+                          ? AppGlobals.FontLow : AppGlobals.FontMedium,
                       fontWeight: FontWeight.bold,
                       color: colour.commonColor)),
             ))

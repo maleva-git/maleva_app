@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:maleva/core/models/model.dart';
-import 'package:maleva/core/utils/clsfunction.dart' as objfun;
+import 'package:maleva/core/utils/app_globals.dart';
 import 'package:maleva/core/colors/colors.dart' as colour;
 import 'package:maleva/core/network/OnlineApi.dart' as OnlineApi;
 import 'package:flutter_spinkit/flutter_spinkit.dart';
@@ -37,7 +37,7 @@ class _JobTypestate extends State<JobType> {
   Future startup() async {
     await OnlineApi.SelectJobType(context);
     filtersearchlist.clear();
-    filtersearchlist.addAll(objfun.JobTypeList);
+    filtersearchlist.addAll(AppGlobals.JobTypeList);
     setState(() {
       progress = true;
     });
@@ -48,10 +48,10 @@ class _JobTypestate extends State<JobType> {
     String vv = value.toString().toUpperCase();
     if (vv == "") {
       filtersearchlist.clear();
-      filtersearchlist.addAll(objfun.JobTypeList.toList());
+      filtersearchlist.addAll(AppGlobals.JobTypeList.toList());
     } else {
       filtersearchlist.clear();
-      filtersearchlist.addAll(objfun.JobTypeList.where((element) =>
+      filtersearchlist.addAll(AppGlobals.JobTypeList.where((element) =>
           (element.Name.toString().contains(vv) ||
               element.Name.toString().contains(vv.toUpperCase()))).toList());
     }
@@ -60,7 +60,7 @@ class _JobTypestate extends State<JobType> {
   @override
   Widget build(BuildContext context) {
     double width = MediaQuery.of(context).size.width;
-    bool isTablet = objfun.MalevaScreen != 1;
+    bool isTablet = AppGlobals.MalevaScreen != 1;
 
     return Scaffold(
       backgroundColor: const Color(0xFFF4F7FC),
@@ -74,7 +74,7 @@ class _JobTypestate extends State<JobType> {
             textStyle: TextStyle(
                 color: colour.topAppBarColor,
                 fontWeight: FontWeight.w700,
-                fontSize: objfun.FontLarge,
+                fontSize: AppGlobals.FontLarge,
                 letterSpacing: 0.5),
           ),
         ),

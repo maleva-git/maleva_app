@@ -6,12 +6,12 @@ import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
-import 'package:maleva/core/utils/clsfunction.dart' as objfun;
+import 'package:maleva/core/utils/app_globals.dart';
 import 'package:maleva/core/network/OnlineApi.dart' as OnlineApi;
 import 'package:maleva/core/models/model.dart';
 import 'package:maleva/menu/menulist.dart';
 import '../../../../core/theme/tokens.dart';
-import '../../../dashboard/admin_dashboard/tabs/saleorderdetails/view/saleorderdetails_tab.dart';
+import '../../../dashboard/common_tabs/saleorderdetails/view/saleorderdetails_tab.dart';
 import '../../../mastersearch/JobAllStatus.dart';
 import '../bloc/updateboardingdetails_bloc.dart';
 import '../bloc/updateboardingdetails_event.dart';
@@ -65,24 +65,24 @@ class _BoardingStatusPageState extends State<_BoardingStatusPage> {
 
   Future<void> _pickImage(ImageSource source, int saleOrderId) async {
     if (saleOrderId == 0) {
-      objfun.toastMsg('Enter Job No', '', context);
+      toastMsg('Enter Job No', '', context);
       return;
     }
     final file = await _picker.pickImage(source: source);
     if (file == null) return;
-    final url = await objfun.upload(
-        File(file.path), objfun.apiPostimage, saleOrderId, 'SalesOrder', 'Boarding');
+    final url = await AppGlobals.upload(
+        File(file.path), AppGlobals.apiPostimage, saleOrderId, 'SalesOrder', 'Boarding');
     context.read<BoardingStatusBloc>().add(BoardingStatusImagePicked(url));
   }
 
   @override
   Widget build(BuildContext context) {
-    final userName = objfun.storagenew.getString('Username') ?? '';
+    final userName = AppGlobals.storagenew.getString('Username') ?? '';
 
     return BlocListener<BoardingStatusBloc, BoardingStatusState>(
       listener: (context, state) async {
         if (state is BoardingStatusSaveSuccess) {
-          await objfun.ConfirmationOK('Updated Successfully', context);
+          await ConfirmationOK('Updated Successfully', context);
         }
         if (state is BoardingStatusNavigateToDetails) {
           final s = context.read<BoardingStatusBloc>().state;
@@ -94,7 +94,7 @@ class _BoardingStatusPageState extends State<_BoardingStatusPage> {
               MaterialPageRoute(
                 builder: (_) => SaleOrderDetails(
                   saleDetails: null,
-                  saleMaster: objfun.SaleEditMasterList,
+                  saleMaster: AppGlobals.SaleEditMasterList,
                 ),
               ),
             );
@@ -194,19 +194,18 @@ class _BoardingStatusPageState extends State<_BoardingStatusPage> {
                   !s.startTimeEnabled &&
                   !s.endTimeEnabled &&
                   !s.imageUploadEnabled) {
-                objfun.toastMsg('Enter Details to update', '', context);
+                toastMsg('Enter Details to update', '', context);
                 return;
               }
               if (s.jobNoText.isEmpty) {
-                objfun.toastMsg('Enter Job No', '', context);
+                toastMsg('Enter Job No', '', context);
                 return;
               }
               if (s.imageUploadEnabled && s.images.isEmpty) {
-                objfun.toastMsg('Select Images !!', '', context);
+                toastMsg('Select Images !!', '', context);
                 return;
               }
-              objfun
-                  .ConfirmationMsgYesNo(
+              ConfirmationMsgYesNo(
                   context, 'Are you sure to Update ?')
                   .then((ok) {
                 if (ok == true) {
@@ -486,8 +485,8 @@ class _RadioOption extends StatelessWidget {
                   color:      selected ? AppTokens.invoiceHeaderStart : AppTokens.maintTextMid,
                   fontWeight: FontWeight.w700,
                   fontSize: isTablet
-                      ? objfun.FontMedium + 1
-                      : objfun.FontMedium,
+                      ? AppGlobals.FontMedium + 1
+                      : AppGlobals.FontMedium,
                 )),
           ],
         ),
@@ -556,8 +555,8 @@ class _JobNoRowState extends State<_JobNoRow> {
                     color: AppTokens.maintTextDark,
                     fontWeight: FontWeight.w600,
                     fontSize: isTablet
-                        ? objfun.FontLow + 1
-                        : objfun.FontLow),
+                        ? AppGlobals.FontLow + 1
+                        : AppGlobals.FontLow),
                 onChanged: (v) => context
                     .read<BoardingStatusBloc>()
                     .add(BoardingStatusJobNoTextChanged(v)),
@@ -566,8 +565,8 @@ class _JobNoRowState extends State<_JobNoRow> {
                   hintStyle: GoogleFonts.lato(
                       color: AppTokens.planTextMuted,
                       fontSize: isTablet
-                          ? objfun.FontLow + 1
-                          : objfun.FontLow),
+                          ? AppGlobals.FontLow + 1
+                          : AppGlobals.FontLow),
                   filled: true,
                   fillColor: AppTokens.maintDetailBg,
                   prefixIcon: const Icon(Icons.tag_rounded,
@@ -601,7 +600,7 @@ class _JobNoRowState extends State<_JobNoRow> {
                 isTablet: isTablet,
                 onPressed: () async {
                   if (s.jobNoText.isEmpty) {
-                    objfun.toastMsg('Enter Job No', '', context);
+                    toastMsg('Enter Job No', '', context);
                     return;
                   }
                   await OnlineApi.EditSalesOrder(
@@ -613,7 +612,7 @@ class _JobNoRowState extends State<_JobNoRow> {
                     MaterialPageRoute(
                       builder: (_) => SaleOrderDetails(
                         saleDetails: null,
-                        saleMaster: objfun.SaleEditMasterList,
+                        saleMaster: AppGlobals.SaleEditMasterList,
                       ),
                     ),
                   );
@@ -667,8 +666,8 @@ class _JobNoRowState extends State<_JobNoRow> {
                                 color: AppTokens.maintTextDark,
                                 fontWeight: FontWeight.w600,
                                 fontSize: isTablet
-                                    ? objfun.FontLow + 1
-                                    : objfun.FontLow)),
+                                    ? AppGlobals.FontLow + 1
+                                    : AppGlobals.FontLow)),
                       ],
                     ),
                   ),
@@ -692,7 +691,7 @@ class _StatusField extends StatelessWidget {
     return InkWell(
       onTap: () async {
         if (state.jobNoText.isEmpty && state.statusName.isEmpty) {
-          objfun.toastMsg('Enter Job No', '', context);
+          toastMsg('Enter Job No', '', context);
           return;
         }
         if (state.statusName.isNotEmpty) {
@@ -705,19 +704,19 @@ class _StatusField extends StatelessWidget {
              state.saleOrderId, int.tryParse(state.jobNoText) ?? 0);
         await OnlineApi.SelectAllJobStatus(
             context,
-            objfun.SaleEditMasterList[0]['JobMasterRefId']);
+            AppGlobals.SaleEditMasterList[0]['JobMasterRefId']);
         Navigator.push(
           context,
           MaterialPageRoute(
               builder: (_) => const JobAllStatus(
                   Searchby: 1, SearchId: 0, JobTypeId: 0)),
-        ).then((_navRes) { if (_navRes != null) { objfun.SelectAllStatusList = _navRes; }
-          final sel = objfun.SelectAllStatusList;
+        ).then((_navRes) { if (_navRes != null) { AppGlobals.SelectAllStatusList = _navRes; }
+          final sel = AppGlobals.SelectAllStatusList;
           if (sel.Status != 0) {
             context.read<BoardingStatusBloc>().add(
                 BoardingStatusStatusSelected(
                     statusId: sel.Status, statusName: sel.StatusName));
-            objfun.SelectAllStatusList = JobAllStatusModel.Empty();
+            AppGlobals.SelectAllStatusList = JobAllStatusModel.Empty();
           }
         });
       },
@@ -743,7 +742,7 @@ class _StatusField extends StatelessWidget {
                       ? FontWeight.w500
                       : FontWeight.w600,
                   fontSize:
-                  isTablet ? objfun.FontLow + 1 : objfun.FontLow,
+                  isTablet ? AppGlobals.FontLow + 1 : AppGlobals.FontLow,
                 ),
                 overflow: TextOverflow.ellipsis,
               ),
@@ -799,7 +798,7 @@ class _DateTimeRow extends StatelessWidget {
             style: GoogleFonts.lato(
               color: AppTokens.maintTextMid,
               fontWeight: FontWeight.w600,
-              fontSize: isTablet ? objfun.FontMedium + 1 : objfun.FontMedium,
+              fontSize: isTablet ? AppGlobals.FontMedium + 1 : AppGlobals.FontMedium,
             ),
             textAlign: TextAlign.center,
           ),
@@ -828,8 +827,8 @@ class _DateTimeRow extends StatelessWidget {
                         color: enabled ? AppTokens.maintTextDark : AppTokens.planTextMuted,
                         fontWeight: FontWeight.w600,
                         fontSize: isTablet
-                            ? objfun.FontLow
-                            : objfun.FontLow - 1,
+                            ? AppGlobals.FontLow
+                            : AppGlobals.FontLow - 1,
                       ),
                     ),
                   ),
@@ -920,8 +919,8 @@ class _ImageUploadRow extends StatelessWidget {
                   color: AppTokens.maintTextDark,
                   fontWeight: FontWeight.w600,
                   fontSize: isTablet
-                      ? objfun.FontMedium + 1
-                      : objfun.FontMedium)),
+                      ? AppGlobals.FontMedium + 1
+                      : AppGlobals.FontMedium)),
           const Spacer(),
           _ImagePickBtn(
             icon: Icons.photo_outlined,
@@ -1022,10 +1021,10 @@ class _ImageGrid extends StatelessWidget {
           itemCount: state.images.length,
           itemBuilder: (ctx, i) {
             final url =
-                '${objfun.imagepath}SalesOrder/${state.saleOrderId}/Boarding/${state.images[i]}';
+                '${AppGlobals.imagepath}SalesOrder/${state.saleOrderId}/Boarding/${state.images[i]}';
             return InkWell(
               onLongPress: () async {
-                final ok = await objfun.ConfirmationMsgYesNo(
+                final ok = await ConfirmationMsgYesNo(
                     ctx, 'Are you sure to Delete ?');
                 if (ok == true) {
                   context.read<BoardingStatusBloc>().add(
@@ -1111,7 +1110,7 @@ class _FieldLabel extends StatelessWidget {
             color: AppTokens.maintTextMid,
             fontWeight: FontWeight.w600,
             fontSize:
-            isTablet ? objfun.FontLow + 1 : objfun.FontLow));
+            isTablet ? AppGlobals.FontLow + 1 : AppGlobals.FontLow));
   }
 }
 
@@ -1159,8 +1158,8 @@ class _GradientButton extends StatelessWidget {
                         color: Colors.white,
                         fontWeight: FontWeight.w700,
                         fontSize: isTablet
-                            ? objfun.FontMedium + 1
-                            : objfun.FontMedium)),
+                            ? AppGlobals.FontMedium + 1
+                            : AppGlobals.FontMedium)),
                 const SizedBox(width: 6),
                 Icon(icon,
                     color: Colors.white,
@@ -1200,7 +1199,7 @@ class _AppBarButton extends StatelessWidget {
                 style: GoogleFonts.lato(
                     color: Colors.white,
                     fontWeight: FontWeight.w700,
-                    fontSize: objfun.FontMedium)),
+                    fontSize: AppGlobals.FontMedium)),
           ),
         ),
       ),

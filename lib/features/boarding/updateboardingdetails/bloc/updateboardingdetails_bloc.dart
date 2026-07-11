@@ -1,6 +1,6 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
-import 'package:maleva/core/utils/clsfunction.dart' as objfun;
+import 'package:maleva/core/utils/app_globals.dart';
 import 'package:maleva/core/network/OnlineApi.dart' as OnlineApi;
 import 'package:maleva/core/models/model.dart';
 import 'package:maleva/features/boarding/updateboardingdetails/bloc/updateboardingdetails_event.dart';
@@ -76,14 +76,14 @@ class BoardingStatusBloc
     try {
       await OnlineApi.EditSalesOrder( saleOrderId, int.tryParse(jobNo) ?? 0);
       await OnlineApi.SelectAllJobStatus(
-          null, objfun.SaleEditMasterList[0]['JobMasterRefId']);
+          null, AppGlobals.SaleEditMasterList[0]['JobMasterRefId']);
 
       int    statusId   = 0;
       String statusName = '';
-      final jStatus = objfun.SaleEditMasterList[0]['JStatus'];
+      final jStatus = AppGlobals.SaleEditMasterList[0]['JStatus'];
       if (jStatus != null && jStatus != 0) {
         statusId = jStatus;
-        final match = objfun.JobAllStatusList
+        final match = AppGlobals.JobAllStatusList
             .where((s) => s.Status == statusId)
             .toList();
         if (match.isNotEmpty) statusName = match[0].StatusName;
@@ -91,10 +91,10 @@ class BoardingStatusBloc
 
       // Load images
       final imageDir =
-          '/Upload/${objfun.Comid}/SalesOrder/$saleOrderId/Boarding/';
+          '/Upload/${AppGlobals.Comid}/SalesOrder/$saleOrderId/Boarding/';
       final header = {'Content-Type': 'application/json; charset=UTF-8'};
-      final imgResult = await objfun.apiAllinoneSelectArray(
-          '${objfun.apiGetimage}$imageDir', null, header, null);
+      final imgResult = await AppGlobals.apiAllinoneSelectArray(
+          '${AppGlobals.apiGetimage}$imageDir', null, header, null);
 
       List<String> images = [];
       if (imgResult != '' && imgResult.length != 0) {
@@ -144,7 +144,7 @@ class BoardingStatusBloc
     final q = event.text.trim();
     List<dynamic> filtered = [];
     if (q.isNotEmpty) {
-      filtered = objfun.JobNoList
+      filtered = AppGlobals.JobNoList
           .where((e) => e['CNumber'].toString().contains(q))
           .toList();
     }
@@ -276,16 +276,16 @@ class BoardingStatusBloc
       final imageFile = s.images[event.index];
       final header = {
         'Content-Type':  'application/json; charset=UTF-8',
-        'Comid':         objfun.Comid.toString(),
+        'Comid':         AppGlobals.Comid.toString(),
         'Id':            s.saleOrderId.toString(),
         'FolderName':    'SalesOrder',
         'FileName':
-        '/Upload/${objfun.Comid}/SalesOrder/${s.saleOrderId}/Boarding/$imageFile',
+        '/Upload/${AppGlobals.Comid}/SalesOrder/${s.saleOrderId}/Boarding/$imageFile',
         'SubFolderName': 'Boarding',
       };
 
-      final result = await objfun.apiAllinoneSelectArray(
-          objfun.apiDeleteimage, null, header, null);
+      final result = await AppGlobals.apiAllinoneSelectArray(
+          AppGlobals.apiDeleteimage, null, header, null);
 
       if (result != '') {
         final value = ResponseViewModel.fromJson(result);
@@ -317,9 +317,9 @@ class BoardingStatusBloc
       if (s.statusName.isNotEmpty || s.startTimeEnabled || s.endTimeEnabled) {
         final master = {
           'Id':               s.saleOrderId,
-          'Comid':            objfun.Comid,
+          'Comid':            AppGlobals.Comid,
           'Jobid':            s.jobNoText,
-          'EmployeeRefId':    objfun.EmpRefId == 0 ? null : objfun.EmpRefId,
+          'EmployeeRefId':    AppGlobals.EmpRefId == 0 ? null : AppGlobals.EmpRefId,
           'StatusRefId':      s.statusId,
           'BoardingStartTime': s.startTimeEnabled
               ? DateTime.parse(s.startTime).toIso8601String()
@@ -330,8 +330,8 @@ class BoardingStatusBloc
         };
         final header = {'Content-Type': 'application/json; charset=UTF-8'};
 
-        final result = await objfun.apiAllinoneSelectArray(
-            objfun.apiUpdateBoardingDetails, master, header, null);
+        final result = await AppGlobals.apiAllinoneSelectArray(
+            AppGlobals.apiUpdateBoardingDetails, master, header, null);
 
         if (result != '') {
           final value = ResponseViewModel.fromJson(result);
@@ -359,11 +359,11 @@ class BoardingStatusBloc
     if (s.images.isEmpty) return;
     final imageUrls = s.images
         .map((img) =>
-    '${objfun.imagepath}SalesOrder/${s.saleOrderId}/Boarding/$img')
+    '${AppGlobals.imagepath}SalesOrder/${s.saleOrderId}/Boarding/$img')
         .toList();
 
     final master = {
-      'CompanyRefId': objfun.Comid,
+      'CompanyRefId': AppGlobals.Comid,
       'RTIId':        0,
       'RTINo':        '',
       'JobId':        s.saleOrderId,
@@ -373,8 +373,8 @@ class BoardingStatusBloc
       'ImageURL':     imageUrls,
     };
     final header = {'Content-Type': 'application/json; charset=UTF-8'};
-    await objfun.apiAllinoneSelectArray(
-        objfun.apiBoardingMail, master, header, null);
+    await AppGlobals.apiAllinoneSelectArray(
+        AppGlobals.apiBoardingMail, master, header, null);
   }
 
   // ── Reset ─────────────────────────────────────────────────────────────────────

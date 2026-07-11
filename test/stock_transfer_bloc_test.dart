@@ -1,8 +1,8 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:bloc_test/bloc_test.dart';
 import 'package:mocktail/mocktail.dart';
-import 'package:maleva/features/dashboard/admin_dashboard/tabs/stocktransfer/bloc/stock_transfer_bloc.dart';
-import 'package:maleva/features/dashboard/admin_dashboard/tabs/stocktransfer/data/stock_transfer_repository.dart';
+import 'package:maleva/features/dashboard/common_tabs/stocktransfer/bloc/stock_transfer_bloc.dart';
+import 'package:maleva/features/dashboard/common_tabs/stocktransfer/data/stock_transfer_repository.dart';
 
 class MockStockTransferRepository extends Mock implements StockTransferRepository {}
 

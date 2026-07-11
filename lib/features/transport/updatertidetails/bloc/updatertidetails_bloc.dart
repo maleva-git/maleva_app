@@ -1,6 +1,6 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
-import 'package:maleva/core/utils/clsfunction.dart' as objfun;
+import 'package:maleva/core/utils/app_globals.dart';
 import 'package:maleva/core/network/OnlineApi.dart' as OnlineApi;
 import 'package:maleva/core/models/model.dart';
 import 'package:maleva/features/transport/updatertidetails/bloc/updatertidetails_event.dart';
@@ -27,8 +27,8 @@ class UpdateRTIBloc extends Bloc<UpdateRTIEvent, UpdateRTIState> {
   // ── Default loaded state ────────────────────────────────────────────────────
   UpdateRTILoaded _defaultLoaded() {
     final today = DateFormat('yyyy-MM-dd').format(DateTime.now());
-    final isDriverLogin  = objfun.DriverLogin == 1;
-    final defaultDriver  = isDriverLogin ? objfun.EmpRefId : 0;
+    final isDriverLogin  = AppGlobals.DriverLogin == 1;
+    final defaultDriver  = isDriverLogin ? AppGlobals.EmpRefId : 0;
 
     return UpdateRTILoaded(
       fromDate:          today,
@@ -133,8 +133,8 @@ class UpdateRTIBloc extends Bloc<UpdateRTIEvent, UpdateRTIState> {
           s.rtiNo);
 
       emit(s.copyWith(
-        masterList:    objfun.RTIViewMasterList,
-        detailList:    objfun.RTIViewDetailList,
+        masterList:    AppGlobals.RTIViewMasterList,
+        detailList:    AppGlobals.RTIViewDetailList,
         expandedIndex: -1,
       ));
     } catch (e) {
@@ -157,16 +157,16 @@ class UpdateRTIBloc extends Bloc<UpdateRTIEvent, UpdateRTIState> {
       UpdateRTIShareRequested event, Emitter<UpdateRTIState> emit) async {
     if (state is! UpdateRTILoaded) return;
     try {
-      final master = {'SoId': event.id, 'Comid': objfun.Comid};
+      final master = {'SoId': event.id, 'Comid': AppGlobals.Comid};
       final header = {'Content-Type': 'application/json; charset=UTF-8'};
-      final result = await objfun.apiAllinoneSelectArray(
-          '${objfun.apiViewRTIPdf}${event.rtiNoDisplay}',
+      final result = await AppGlobals.apiAllinoneSelectArray(
+          '${AppGlobals.apiViewRTIPdf}${event.rtiNoDisplay}',
           master,
           header,
           null);
       if (result != '') {
         final value = ResponseViewModel.fromJson(result);
-        if (value.IsSuccess == true) objfun.launchInBrowser(value.data1);
+        if (value.IsSuccess == true) AppGlobals.launchInBrowser(value.data1);
       }
     } catch (_) {}
   }

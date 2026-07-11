@@ -7,7 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 import 'package:maleva/core/models/model.dart';
-import 'package:maleva/core/utils/clsfunction.dart' as objfun;
+import 'package:maleva/core/utils/app_globals.dart';
 
 import 'planning_event.dart';
 import 'planning_state.dart';
@@ -39,8 +39,8 @@ class PlanningBloc extends Bloc<PlanningEvent, PlanningState> {
             }
 
             _allDetails = detailsList;
-            objfun.PlanningMasterList = masterList;
-            objfun.PlanningDetailsList = detailsList;
+            AppGlobals.PlanningMasterList = masterList;
+            AppGlobals.PlanningDetailsList = detailsList;
 
             // Proper data mapping to state with updated user filter inputs
             emit(PlanningLoaded(
@@ -59,7 +59,7 @@ class PlanningBloc extends Bloc<PlanningEvent, PlanningState> {
           }
         } catch (e, st) {
           emit(PlanningError(e.toString()));
-          objfun.msgshow(e.toString(), st.toString(), Colors.white, Colors.red, null, 18.00 - objfun.reducesize, objfun.tll, objfun.tgc, context, 2);
+          msgshow(e.toString(), st.toString(), Colors.white, Colors.red, null, 18.00 - AppGlobals.reducesize, AppGlobals.tll, AppGlobals.tgc, context, 2);
         }
       },
       transformer: droppable(),
@@ -99,10 +99,10 @@ class PlanningBloc extends Bloc<PlanningEvent, PlanningState> {
 
           if (resultData != null) {
             final value = ResponseViewModel.fromJson(resultData);
-            if (value.IsSuccess == true) objfun.launchInBrowser(value.data1);
+            if (value.IsSuccess == true) AppGlobals.launchInBrowser(value.data1);
           }
         } catch (e, st) {
-          objfun.msgshow(e.toString(), st.toString(), Colors.white, Colors.red, null, 18.00 - objfun.reducesize, objfun.tll, objfun.tgc, context, 2);
+          msgshow(e.toString(), st.toString(), Colors.white, Colors.red, null, 18.00 - AppGlobals.reducesize, AppGlobals.tll, AppGlobals.tgc, context, 2);
         }
         emit(s);
       },
@@ -118,7 +118,7 @@ class PlanningBloc extends Bloc<PlanningEvent, PlanningState> {
         emit(PlanningNavigateToEdit(id: event.id, planningNo: event.planningNo));
         emit(s); // Return to default loaded state after navigation
       } catch (e, st) {
-        objfun.msgshow(e.toString(), st.toString(), Colors.white, Colors.red, null, 18.00 - objfun.reducesize, objfun.tll, objfun.tgc, context, 2);
+        msgshow(e.toString(), st.toString(), Colors.white, Colors.red, null, 18.00 - AppGlobals.reducesize, AppGlobals.tll, AppGlobals.tgc, context, 2);
       }
     });
   }

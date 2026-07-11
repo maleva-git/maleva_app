@@ -3,7 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
-import 'package:maleva/core/utils/clsfunction.dart' as objfun;
+import 'package:maleva/core/utils/app_globals.dart';
 import 'package:maleva/menu/menulist.dart';
 import '../../../../core/theme/palette.dart';
 import '../bloc/forwardingsmk_bloc.dart';
@@ -72,12 +72,12 @@ class _FWSmkPageState extends State<_FWSmkPage>
 
   @override
   Widget build(BuildContext context) {
-    final userName = objfun.storagenew.getString('Username') ?? '';
+    final userName = AppGlobals.storagenew.getString('Username') ?? '';
 
     return BlocListener<FWSmkBloc, FWSmkState>(
       listener: (context, state) async {
         if (state is FWSmkSaveSuccess) {
-          await objfun.ConfirmationOK('Updated Successfully', context);
+          await ConfirmationOK('Updated Successfully', context);
         }
         if (state is FWSmkError) {
           ScaffoldMessenger.of(context).showSnackBar(
@@ -186,15 +186,14 @@ class _FWSmkPageState extends State<_FWSmkPage>
               if (s.tab1.fwDropdown == null &&
                   s.tab2.fwDropdown == null &&
                   s.tab3.fwDropdown == null) {
-                objfun.toastMsg('Select FW', '', context);
+                toastMsg('Select FW', '', context);
                 return;
               }
               if (s.jobNoText.isEmpty) {
-                objfun.toastMsg('Enter Job No', '', context);
+                toastMsg('Enter Job No', '', context);
                 return;
               }
-              objfun
-                  .ConfirmationMsgYesNo(
+              ConfirmationMsgYesNo(
                   context, 'Are you sure to Update ?')
                   .then((ok) {
                 if (ok == true) {
@@ -316,11 +315,11 @@ class _JobNoSectionState extends State<_JobNoSection> {
                 color: kTextDark,
                 fontWeight: FontWeight.w600,
                 fontSize:
-                isTablet ? objfun.FontLow + 1 : objfun.FontLow),
+                isTablet ? AppGlobals.FontLow + 1 : AppGlobals.FontLow),
             decoration: InputDecoration(
               hintText: 'Job No',
               hintStyle:
-              GoogleFonts.lato(color: kTextMuted, fontSize: objfun.FontLow),
+              GoogleFonts.lato(color: kTextMuted, fontSize: AppGlobals.FontLow),
               filled: true,
               fillColor: kDetailBg,
               prefixIcon: const Icon(Icons.tag_rounded,
@@ -389,8 +388,8 @@ class _JobNoSectionState extends State<_JobNoSection> {
                                   color: kTextDark,
                                   fontWeight: FontWeight.w600,
                                   fontSize: isTablet
-                                      ? objfun.FontLow + 1
-                                      : objfun.FontLow)),
+                                      ? AppGlobals.FontLow + 1
+                                      : AppGlobals.FontLow)),
                         ],
                       ),
                     ),
@@ -516,7 +515,7 @@ class _FWSmkTabContentState extends State<_FWSmkTabContent> {
                 activeColor: Palette.blue700,
                 onChanged: (v) => _emit(FWSmkFieldChanged(tab: t, field: 'original', value: v.toString())),
               ),
-              Text("Original", style: GoogleFonts.lato(color: kTextDark, fontWeight: FontWeight.w600, fontSize: widget.isTablet ? objfun.FontLow + 1 : objfun.FontLow)),
+              Text("Original", style: GoogleFonts.lato(color: kTextDark, fontWeight: FontWeight.w600, fontSize: widget.isTablet ? AppGlobals.FontLow + 1 : AppGlobals.FontLow)),
             ],
           ),
         ),
@@ -631,7 +630,7 @@ class _DateCheckRow extends StatelessWidget {
                         color: tab.dateEnabled ? kTextDark : kTextMuted,
                         fontWeight: FontWeight.w600,
                         fontSize:
-                        isTablet ? objfun.FontLow + 1 : objfun.FontLow,
+                        isTablet ? AppGlobals.FontLow + 1 : AppGlobals.FontLow,
                       ),
                     ),
                   ),
@@ -700,11 +699,11 @@ class _FWDropdown extends StatelessWidget {
           hint: Text('Select FW',
               style: GoogleFonts.lato(
                   color: kTextMuted,
-                  fontSize: isTablet ? objfun.FontLow + 1 : objfun.FontLow)),
+                  fontSize: isTablet ? AppGlobals.FontLow + 1 : AppGlobals.FontLow)),
           style: GoogleFonts.lato(
             color: kTextDark,
             fontWeight: FontWeight.w600,
-            fontSize: isTablet ? objfun.FontLow + 1 : objfun.FontLow,
+            fontSize: isTablet ? AppGlobals.FontLow + 1 : AppGlobals.FontLow,
           ),
           dropdownColor: Colors.white,
           borderRadius: BorderRadius.circular(10),
@@ -721,7 +720,7 @@ class _FWDropdown extends StatelessWidget {
                   color: kTextDark,
                   fontWeight: FontWeight.w600,
                   fontSize:
-                  isTablet ? objfun.FontLow + 1 : objfun.FontLow,
+                  isTablet ? AppGlobals.FontLow + 1 : AppGlobals.FontLow,
                 )),
           ))
               .toList(),
@@ -821,7 +820,7 @@ class _RadioOption extends StatelessWidget {
                 color: selected ? Palette.blue700 : kTextMid,
                 fontWeight: FontWeight.w700,
                 fontSize:
-                isTablet ? objfun.FontMedium + 1 : objfun.FontMedium,
+                isTablet ? AppGlobals.FontMedium + 1 : AppGlobals.FontMedium,
               ),
             ),
           ],
@@ -849,9 +848,9 @@ class _FWBottomNav extends StatelessWidget {
         selectedItemColor: Palette.blue700,
         unselectedItemColor: kTextMuted,
         selectedLabelStyle: GoogleFonts.lato(
-            fontWeight: FontWeight.w700, fontSize: objfun.FontLow),
+            fontWeight: FontWeight.w700, fontSize: AppGlobals.FontLow),
         unselectedLabelStyle: GoogleFonts.lato(
-            fontWeight: FontWeight.w500, fontSize: objfun.FontCardText),
+            fontWeight: FontWeight.w500, fontSize: AppGlobals.FontCardText),
         onTap: onTap,
         items: const [
           BottomNavigationBarItem(
@@ -879,7 +878,7 @@ class _FieldLabel extends StatelessWidget {
       style: GoogleFonts.lato(
         color: kTextMid,
         fontWeight: FontWeight.w600,
-        fontSize: isTablet ? objfun.FontLow + 1 : objfun.FontLow,
+        fontSize: isTablet ? AppGlobals.FontLow + 1 : AppGlobals.FontLow,
       ),
     );
   }
@@ -908,13 +907,13 @@ class _SMKTextField extends StatelessWidget {
       style: GoogleFonts.lato(
         color: kTextDark,
         fontWeight: FontWeight.w600,
-        fontSize: isTablet ? objfun.FontLow + 1 : objfun.FontLow,
+        fontSize: isTablet ? AppGlobals.FontLow + 1 : AppGlobals.FontLow,
       ),
       decoration: InputDecoration(
         hintText: hint,
         hintStyle: GoogleFonts.lato(
             color: kTextMuted,
-            fontSize: isTablet ? objfun.FontLow + 1 : objfun.FontLow),
+            fontSize: isTablet ? AppGlobals.FontLow + 1 : AppGlobals.FontLow),
         filled: true,
         fillColor: kDetailBg,
         contentPadding:
@@ -961,7 +960,7 @@ class _AppBarButton extends StatelessWidget {
                 style: GoogleFonts.lato(
                     color: Colors.white,
                     fontWeight: FontWeight.w700,
-                    fontSize: objfun.FontMedium)),
+                    fontSize: AppGlobals.FontMedium)),
           ),
         ),
       ),

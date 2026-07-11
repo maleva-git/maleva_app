@@ -1,10 +1,10 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:bloc_test/bloc_test.dart';
 import 'package:mocktail/mocktail.dart';
-import 'package:maleva/features/dashboard/admin_dashboard/tabs/stockupdate/bloc/stock_update_bloc.dart';
-import 'package:maleva/features/dashboard/admin_dashboard/tabs/stockupdate/bloc/stock_update_event.dart';
-import 'package:maleva/features/dashboard/admin_dashboard/tabs/stockupdate/bloc/stock_update_state.dart';
-import 'package:maleva/features/dashboard/admin_dashboard/tabs/stockupdate/data/stock_update_repository.dart';
+import 'package:maleva/features/dashboard/common_tabs/stockupdate/bloc/stock_update_bloc.dart';
+import 'package:maleva/features/dashboard/common_tabs/stockupdate/bloc/stock_update_event.dart';
+import 'package:maleva/features/dashboard/common_tabs/stockupdate/bloc/stock_update_state.dart';
+import 'package:maleva/features/dashboard/common_tabs/stockupdate/data/stock_update_repository.dart';
 
 class MockStockUpdateRepository extends Mock implements StockUpdateRepository {}
 

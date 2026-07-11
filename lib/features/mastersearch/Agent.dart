@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:maleva/core/models/model.dart';
-import 'package:maleva/core/utils/clsfunction.dart' as objfun;
+import 'package:maleva/core/utils/app_globals.dart';
 import 'package:maleva/core/network/OnlineApi.dart' as OnlineApi;
 import 'package:maleva/core/colors/colors.dart' as colour;
 import 'package:google_fonts/google_fonts.dart';
@@ -46,7 +46,7 @@ class _Agentstate extends State<Agent> {
     if (!mounted) return;
 
     filtersearchlist.clear();
-    filtersearchlist.addAll(objfun.AgentAllList);
+    filtersearchlist.addAll(AppGlobals.AgentAllList);
     setState(() {
       progress = true;
     });
@@ -59,10 +59,10 @@ class _Agentstate extends State<Agent> {
     setState(() {
       if (vv.isEmpty) {
         filtersearchlist.clear();
-        filtersearchlist.addAll(objfun.AgentAllList);
+        filtersearchlist.addAll(AppGlobals.AgentAllList);
       } else {
         filtersearchlist.clear();
-        filtersearchlist.addAll(objfun.AgentAllList.where((element) =>
+        filtersearchlist.addAll(AppGlobals.AgentAllList.where((element) =>
             element.AgentName.toString().toUpperCase().contains(vv)).toList());
       }
     });
@@ -78,7 +78,7 @@ class _Agentstate extends State<Agent> {
 
   @override
   Widget build(BuildContext context) {
-    final bool isTablet = objfun.MalevaScreen != 1;
+    final bool isTablet = AppGlobals.MalevaScreen != 1;
     return isTablet ? _buildTabletLayout() : _buildPhoneLayout();
   }
 
@@ -129,7 +129,7 @@ class _Agentstate extends State<Agent> {
   AppBar _buildAppBar() {
     return AppBar(
       backgroundColor: colour.commonColor,
-      centerTitle: objfun.MalevaScreen != 1,
+      centerTitle: AppGlobals.MalevaScreen != 1,
       elevation: 0,
       title: Text(
         'Agent List',
@@ -137,7 +137,7 @@ class _Agentstate extends State<Agent> {
           textStyle: TextStyle(
             color: colour.topAppBarColor,
             fontWeight: FontWeight.bold,
-            fontSize: objfun.FontLarge,
+            fontSize: AppGlobals.FontLarge,
             letterSpacing: 0.5,
           ),
         ),
@@ -162,7 +162,7 @@ class _Agentstate extends State<Agent> {
           textStyle: TextStyle(
             color: colour.commonColor,
             fontWeight: FontWeight.w600,
-            fontSize: objfun.FontLow,
+            fontSize: AppGlobals.FontLow,
             letterSpacing: 0.3,
           ),
         ),
@@ -183,7 +183,7 @@ class _Agentstate extends State<Agent> {
             textStyle: TextStyle(
               letterSpacing: 1,
               color: Colors.grey.shade500,
-              fontSize: objfun.FontLow,
+              fontSize: AppGlobals.FontLow,
             ),
           ),
           prefixIcon: const Icon(Icons.search, color: Colors.grey),
@@ -221,7 +221,7 @@ class _Agentstate extends State<Agent> {
                 textStyle: TextStyle(
                   color: Colors.grey.shade600,
                   fontWeight: FontWeight.bold,
-                  fontSize: objfun.FontLow,
+                  fontSize: AppGlobals.FontLow,
                 ),
               ),
             ),
@@ -261,7 +261,7 @@ class _Agentstate extends State<Agent> {
                     textStyle: TextStyle(
                       color: colour.commonColor,
                       fontWeight: FontWeight.w600,
-                      fontSize: objfun.FontCardText,
+                      fontSize: AppGlobals.FontCardText,
                       letterSpacing: 0.3,
                     ),
                   ),

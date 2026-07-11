@@ -2,10 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:maleva/core/utils/clsfunction.dart' as objfun;
+import 'package:maleva/core/utils/app_globals.dart';
 import 'package:maleva/core/colors/colors.dart' as colour;
 import '../core/network/api_services/auth_api.dart';
-import '../core/network/api_services/firebase_service.dart';
 import '../core/theme/tokens.dart';
 import '../core/utils/app_preferences.dart';
 import 'package:maleva/core/network/OnlineApi.dart' as OnlineApi;
@@ -125,7 +124,7 @@ class _SplashScreenState extends State<SplashScreen>
   Future startup() async {
     // ① Safe local storage init
     try {
-      await objfun.localstoragecall();
+      await AppGlobals.localstoragecall();
     } catch (e) {
       debugPrint('❌ SharedPreferences init failed: $e');
       if (mounted) {
@@ -143,23 +142,23 @@ class _SplashScreenState extends State<SplashScreen>
     // ② FCM token with timeout — prevents indefinite hang on devices
     // with missing or outdated Google Play Services
     try {
-      await objfun.getDeviceToken().timeout(const Duration(seconds: 10));
+      await AppGlobals.getDeviceToken().timeout(const Duration(seconds: 10));
     } catch (e) {
       debugPrint('⚠️ FCM Token fetch failed: $e');
       // Continue without token — don't block app startup
     }
-    objfun.mobiletoken = AppPreferences.getFcmToken();
+    AppGlobals.mobiletoken = AppPreferences.getFcmToken();
 
-    String UserName = objfun.storagenew.getString('Username') ?? "";
-    String Password = objfun.storagenew.getString('Password') ?? "";
-    String OldUserName = objfun.storagenew.getString('OldUsername') ?? "";
-    objfun.MalevaScreen= objfun.storagenew.getInt('DeviceView') ?? 1;
-    objfun.DriverLogin=objfun.storagenew.getInt('DriverId') ?? 0;
+    String UserName = AppGlobals.storagenew.getString('Username') ?? "";
+    String Password = AppGlobals.storagenew.getString('Password') ?? "";
+    String OldUserName = AppGlobals.storagenew.getString('OldUsername') ?? "";
+    AppGlobals.MalevaScreen= AppGlobals.storagenew.getInt('DeviceView') ?? 1;
+    AppGlobals.DriverLogin=AppGlobals.storagenew.getInt('DriverId') ?? 0;
     if (UserName != "" && Password != "") {
       // ③ Login API call with error handling
       bool loginSuccess = false;
       try {
-        loginSuccess = await OnlineApi.Login(UserName, Password, OldUserName,objfun.DriverLogin, context);
+        loginSuccess = await OnlineApi.Login(UserName, Password, OldUserName,AppGlobals.DriverLogin, context);
       } catch (e) {
         debugPrint('⚠️ Login API error: $e');
         if (mounted) {
@@ -174,7 +173,7 @@ class _SplashScreenState extends State<SplashScreen>
 
       if (loginSuccess) {
 
-        if(objfun.DriverLogin == 1)
+        if(AppGlobals.DriverLogin == 1)
         {
           // Navigator.push(context, MaterialPageRoute(builder: (context) => const DriverDashboard()));
           Navigator.pushReplacement(
@@ -188,7 +187,7 @@ class _SplashScreenState extends State<SplashScreen>
           );
 
         }
-        else if(objfun.storagenew.getString('RulesType') == "ADMIN")
+        else if(AppGlobals.storagenew.getString('RulesType') == "ADMIN")
         {
           Navigator.pushReplacement(
             context,
@@ -200,7 +199,7 @@ class _SplashScreenState extends State<SplashScreen>
             ),
           );
         }
-        else if(objfun.storagenew.getString('RulesType') == "ADMIN2")
+        else if(AppGlobals.storagenew.getString('RulesType') == "ADMIN2")
         {
           Navigator.pushReplacement(
             context,
@@ -212,7 +211,7 @@ class _SplashScreenState extends State<SplashScreen>
             ),
           );
         }
-        else if(objfun.storagenew.getString('RulesType') == "SALES")
+        else if(AppGlobals.storagenew.getString('RulesType') == "SALES")
         {
           Navigator.pushReplacement(
             context,
@@ -224,11 +223,11 @@ class _SplashScreenState extends State<SplashScreen>
             ),
           );
         }
-        // else if(objfun.storagenew.getString('RulesType') == "TRANSPORTATION")
+        // else if(AppGlobals.storagenew.getString('RulesType') == "TRANSPORTATION")
         // {
         //   Navigator.push(context, MaterialPageRoute(builder: (context) => const OldTransportDashboard()));
         // }
-        else if(objfun.storagenew.getString('RulesType') == "OPERATIONADMIN")
+        else if(AppGlobals.storagenew.getString('RulesType') == "OPERATIONADMIN")
         {
           Navigator.pushReplacement(
             context,
@@ -240,7 +239,7 @@ class _SplashScreenState extends State<SplashScreen>
             ),
           );
         }
-        else if(objfun.storagenew.getString('RulesType') == "ACCOUNTS")
+        else if(AppGlobals.storagenew.getString('RulesType') == "ACCOUNTS")
         {
           Navigator.pushReplacement(
             context,
@@ -254,7 +253,7 @@ class _SplashScreenState extends State<SplashScreen>
         }
 
 
-        else if(objfun.storagenew.getString('RulesType') == "TRANSPORTATION")
+        else if(AppGlobals.storagenew.getString('RulesType') == "TRANSPORTATION")
         {
           Navigator.pushReplacement(
             context,
@@ -267,7 +266,7 @@ class _SplashScreenState extends State<SplashScreen>
           );
         }
 
-        else if(objfun.storagenew.getString('RulesType') == "WAREHOUSE")
+        else if(AppGlobals.storagenew.getString('RulesType') == "WAREHOUSE")
         {
           Navigator.pushReplacement(
             context,
@@ -281,7 +280,7 @@ class _SplashScreenState extends State<SplashScreen>
         }
 
 
-        else if(objfun.storagenew.getString('RulesType') == "RECEIVABLE")
+        else if(AppGlobals.storagenew.getString('RulesType') == "RECEIVABLE")
         {
           Navigator.pushReplacement(
             context,
@@ -296,7 +295,7 @@ class _SplashScreenState extends State<SplashScreen>
         }
 
 
-        else if(objfun.storagenew.getString('RulesType') == "HR" || objfun.storagenew.getString('RulesType') == "MAINTENANCE")
+        else if(AppGlobals.storagenew.getString('RulesType') == "HR" || AppGlobals.storagenew.getString('RulesType') == "MAINTENANCE")
         {
           Navigator.pushReplacement(
             context,
@@ -311,7 +310,7 @@ class _SplashScreenState extends State<SplashScreen>
         }
 
 
-        else if(objfun.storagenew.getString('RulesType') == "OPERATION")
+        else if(AppGlobals.storagenew.getString('RulesType') == "OPERATION")
         {
           Navigator.pushReplacement(
             context,
@@ -324,7 +323,7 @@ class _SplashScreenState extends State<SplashScreen>
           );
 
         }
-        else if(objfun.storagenew.getString('RulesType') == "BOARDING")
+        else if(AppGlobals.storagenew.getString('RulesType') == "BOARDING")
         {
           Navigator.pushReplacement(
             context,
@@ -347,7 +346,7 @@ class _SplashScreenState extends State<SplashScreen>
     // ),
     // );
     // break;
-        else if(objfun.storagenew.getString('RulesType') == "HRADMIN")
+        else if(AppGlobals.storagenew.getString('RulesType') == "HRADMIN")
         {
           Navigator.pushReplacement(
             context,
@@ -360,7 +359,7 @@ class _SplashScreenState extends State<SplashScreen>
           );
 
         }
-        else if(objfun.storagenew.getString('RulesType') == "AIR FRIEGHT")
+        else if(AppGlobals.storagenew.getString('RulesType') == "AIR FRIEGHT")
         {
           Navigator.pushReplacement(
             context,
@@ -373,7 +372,7 @@ class _SplashScreenState extends State<SplashScreen>
           );
 
         }
-        else if(objfun.storagenew.getString('RulesType') == "FORWARDING")
+        else if(AppGlobals.storagenew.getString('RulesType') == "FORWARDING")
         {
           Navigator.pushReplacement(
             context,
@@ -388,7 +387,7 @@ class _SplashScreenState extends State<SplashScreen>
         }
         else {
           // ④ Unknown RulesType — no matching dashboard found
-          final rulesType = objfun.storagenew.getString('RulesType') ?? 'Unknown';
+          final rulesType = AppGlobals.storagenew.getString('RulesType') ?? 'Unknown';
           debugPrint('⚠️ Unknown RulesType: "$rulesType" — showing error');
           if (mounted) {
             _showErrorPopup(
@@ -544,7 +543,7 @@ class _SplashScreenState extends State<SplashScreen>
                         color: Colors.white.withOpacity(0.18), width: 1),
                   ),
                   child: Text(
-                    objfun.appversion,
+                    AppGlobals.appversion,
                     style: GoogleFonts.dmSans(
                       fontSize: 10,
                       fontWeight: FontWeight.w500,
@@ -585,7 +584,7 @@ class _SplashScreenState extends State<SplashScreen>
                       child: ClipRRect(
                         borderRadius: BorderRadius.circular(33),
                         child: Image(
-                          image: objfun.splashlogo,
+                          image: AppGlobals.splashlogo,
                           fit: BoxFit.contain,
                         ),
                       ),

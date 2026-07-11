@@ -3,15 +3,15 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
-import 'package:maleva/core/utils/clsfunction.dart' as objfun;
+import 'package:maleva/core/utils/app_globals.dart';
 import 'package:maleva/core/network/OnlineApi.dart' as OnlineApi;
 import 'package:maleva/features/dashboard/airfreight_dashboard/view/airfreight_dashboard.dart';
 import 'package:maleva/core/models/model.dart';
 import 'package:maleva/menu/menulist.dart';
 import 'package:maleva/features/dashboard/admin_dashboard/view/admin_dashboard.dart';
 import '../../../../core/theme/palette.dart';
-import '../../../dashboard/admin_dashboard/tabs/rtistatus/view/rtistatus_tab.dart';
-import '../../../dashboard/admin_dashboard/tabs/transportDB/view/transportdb_tab.dart';
+import '../../../dashboard/common_tabs/rtistatus/view/rtistatus_tab.dart';
+import '../../../dashboard/common_tabs/transportDB/view/transportdb_tab.dart';
 import '../../../dashboard/boarding_dashboard/view/boarding_dashboard.dart';
 import '../../../dashboard/driver_dashboard/view/driver_dashboard.dart';
 import '../../../dashboard/forwarding_dashboard/view/forwarding_dashboard.dart';
@@ -50,7 +50,7 @@ class _UpdateRTIPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final userName = objfun.storagenew.getString('Username') ?? '';
+    final userName = AppGlobals.storagenew.getString('Username') ?? '';
 
     return BlocListener<UpdateRTIBloc, UpdateRTIState>(
       listener: (context, state) {
@@ -103,10 +103,10 @@ class _UpdateRTIPage extends StatelessWidget {
 
   void _navigateBack(BuildContext context) {
     Widget dest;
-    if (objfun.DriverLogin == 1) {
+    if (AppGlobals.DriverLogin == 1) {
       dest = const DriverDashboard();
     } else {
-      switch (objfun.storagenew.getString('RulesType')) {
+      switch (AppGlobals.storagenew.getString('RulesType')) {
         case 'ADMIN':
           dest = const NewAdminDashboard();
           break;
@@ -324,7 +324,7 @@ class _RTICard extends StatelessWidget {
     final valStyle   = GoogleFonts.lato(
       color:      Palette.textDark2,
       fontWeight: FontWeight.w600,
-      fontSize:   isTablet ? objfun.FontCardText + 1 : objfun.FontCardText,
+      fontSize:   isTablet ? AppGlobals.FontCardText + 1 : AppGlobals.FontCardText,
     );
     final labelStyle = GoogleFonts.lato(
       color:      Palette.kTextMuted,
@@ -529,7 +529,7 @@ class _DetailsSection extends StatelessWidget {
     final rowStyle = GoogleFonts.lato(
       color: Palette.textDark2,
       fontWeight: FontWeight.w500,
-      fontSize: isTablet ? objfun.FontCardText : objfun.FontCardText - 1,
+      fontSize: isTablet ? AppGlobals.FontCardText : AppGlobals.FontCardText - 1,
     );
 
     return Column(
@@ -796,7 +796,7 @@ class _FilterSheetState extends State<_FilterSheet> {
                         builder: (_) => const Driver(
                             Searchby: 1, SearchId: 0)),
                   ).then((_) {
-                    final sel = objfun.SelectDriverList;
+                    final sel = AppGlobals.SelectDriverList;
                     if (sel.Id != 0) {
                       setState(() {
                         _local = _local.copyWith(
@@ -806,7 +806,7 @@ class _FilterSheetState extends State<_FilterSheet> {
                       _emit(UpdateRTIDriverChanged(
                           driverId: sel.Id,
                           driverName: sel.AccountName));
-                      objfun.SelectDriverList = GetTruckModel.Empty();
+                      AppGlobals.SelectDriverList = GetTruckModel.Empty();
                     }
                   });
                 },
@@ -829,7 +829,7 @@ class _FilterSheetState extends State<_FilterSheet> {
                         builder: (_) => const Truck(
                             Searchby: 1, SearchId: 0)),
                   ).then((_) {
-                    final sel = objfun.SelectTruckList;
+                    final sel = AppGlobals.SelectTruckList;
                     if (sel.Id != 0) {
                       setState(() {
                         _local = _local.copyWith(
@@ -839,7 +839,7 @@ class _FilterSheetState extends State<_FilterSheet> {
                       _emit(UpdateRTITruckChanged(
                           truckId: sel.Id,
                           truckName: sel.AccountName));
-                      objfun.SelectTruckList = GetTruckModel.Empty();
+                      AppGlobals.SelectTruckList = GetTruckModel.Empty();
                     }
                   });
                 },
@@ -860,11 +860,11 @@ class _FilterSheetState extends State<_FilterSheet> {
               style: GoogleFonts.lato(
                   color: Palette.textDark2,
                   fontWeight: FontWeight.w600,
-                  fontSize: isTablet ? objfun.FontLow + 1 : objfun.FontLow),
+                  fontSize: isTablet ? AppGlobals.FontLow + 1 : AppGlobals.FontLow),
               decoration: InputDecoration(
                 hintText: 'RTI No',
                 hintStyle: GoogleFonts.lato(
-                    color: Palette.kTextMuted, fontSize: objfun.FontLow),
+                    color: Palette.kTextMuted, fontSize: AppGlobals.FontLow),
                 filled: true,
                 fillColor: Palette.grey200p,
                 contentPadding: const EdgeInsets.symmetric(
@@ -1104,8 +1104,8 @@ class _FilterSearchField extends StatelessWidget {
                       ? FontWeight.w500
                       : FontWeight.w600,
                   fontSize: isTablet
-                      ? objfun.FontLow + 1
-                      : objfun.FontLow,
+                      ? AppGlobals.FontLow + 1
+                      : AppGlobals.FontLow,
                 ),
                 overflow: TextOverflow.ellipsis,
               ),
@@ -1155,7 +1155,7 @@ class _GradientButton extends StatelessWidget {
                 style: GoogleFonts.lato(
                     color: Colors.white,
                     fontWeight: FontWeight.w700,
-                    fontSize: objfun.FontMedium)),
+                    fontSize: AppGlobals.FontMedium)),
           ),
         ),
       ),
@@ -1189,7 +1189,7 @@ class _OutlineButton extends StatelessWidget {
                 style: GoogleFonts.lato(
                     color: Palette.blue700,
                     fontWeight: FontWeight.w700,
-                    fontSize: objfun.FontMedium)),
+                    fontSize: AppGlobals.FontMedium)),
           ),
         ),
       ),

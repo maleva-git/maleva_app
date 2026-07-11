@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:maleva/core/utils/clsfunction.dart' as objfun;
+import 'package:maleva/core/utils/app_globals.dart';
 import 'package:maleva/core/models/model.dart';
 import 'package:maleva/features/operations/forwarding/bloc/forwarding_event.dart';
 import 'package:maleva/features/transaction/viewsaleorder/view/viewsaleorder_tab.dart';
@@ -13,20 +13,20 @@ import '../features/airfreight/updateairfreight/view/airfreight_tab.dart';
 import '../features/boarding/updateboardingdetails/bloc/updateboardingdetails_bloc.dart';
 import '../features/boarding/updateboardingdetails/bloc/updateboardingdetails_event.dart';
 import '../features/boarding/updateboardingdetails/view/updateboardingdetails_tab.dart';
-import '../features/dashboard/admin_dashboard/tabs/emailinbox/view/emailinbox_tab.dart';
-import '../features/dashboard/admin_dashboard/tabs/enquiry/view/view/enquiry_tab.dart';
-import '../features/dashboard/admin_dashboard/tabs/fwbreakseal/view/fwbreakseal_tab.dart';
-import '../features/dashboard/admin_dashboard/tabs/googlereview/view/googlereview_tab.dart';
-import '../features/dashboard/admin_dashboard/tabs/jobstatusupdate/view/jobstatusupdate_tab.dart';
-import '../features/dashboard/admin_dashboard/tabs/spotsaleorder/view/spotsaleorder_view.dart';
-import '../features/dashboard/admin_dashboard/tabs/stockinentry/bloc/stock_in_entry_bloc.dart';
-import '../features/dashboard/admin_dashboard/tabs/stockinentry/bloc/stock_in_entry_event.dart';
-import '../features/dashboard/admin_dashboard/tabs/stockinentry/view/stock_in_entry_ui.dart';
-import '../features/dashboard/admin_dashboard/tabs/stocktransfer/bloc/stock_transfer_bloc.dart';
-import '../features/dashboard/admin_dashboard/tabs/stocktransfer/view/stock_transfer_page.dart';
-import '../features/dashboard/admin_dashboard/tabs/stockupdate/bloc/stock_update_bloc.dart';
-import '../features/dashboard/admin_dashboard/tabs/stockupdate/bloc/stock_update_event.dart';
-import '../features/dashboard/admin_dashboard/tabs/stockupdate/view/stock_update_tab.dart' show StockUpdate;
+import '../features/dashboard/common_tabs/emailinbox/view/emailinbox_tab.dart';
+import '../features/dashboard/common_tabs/enquiry/view/view/enquiry_tab.dart';
+import '../features/dashboard/common_tabs/fwbreakseal/view/fwbreakseal_tab.dart';
+import '../features/dashboard/common_tabs/googlereview/view/googlereview_tab.dart';
+import '../features/dashboard/common_tabs/jobstatusupdate/view/jobstatusupdate_tab.dart';
+import '../features/dashboard/common_tabs/spotsaleorder/view/spotsaleorder_view.dart';
+import '../features/dashboard/common_tabs/stockinentry/bloc/stock_in_entry_bloc.dart';
+import '../features/dashboard/common_tabs/stockinentry/bloc/stock_in_entry_event.dart';
+import '../features/dashboard/common_tabs/stockinentry/view/stock_in_entry_ui.dart';
+import '../features/dashboard/common_tabs/stocktransfer/bloc/stock_transfer_bloc.dart';
+import '../features/dashboard/common_tabs/stocktransfer/view/stock_transfer_page.dart';
+import '../features/dashboard/common_tabs/stockupdate/bloc/stock_update_bloc.dart';
+import '../features/dashboard/common_tabs/stockupdate/bloc/stock_update_event.dart';
+import '../features/dashboard/common_tabs/stockupdate/view/stock_update_tab.dart' show StockUpdate;
 import '../features/operations/forwarding/bloc/forwarding_bloc.dart';
 import '../features/operations/forwarding/view/forwarding_tab.dart';
 import '../features/operations/forwardingsalary/bloc/forwardingsalary_bloc.dart';
@@ -39,6 +39,7 @@ import '../features/transaction/prealertview/view/prealertview_tab.dart';
 import '../features/transaction/salesorder/view/view/salesorderview_tab.dart';
 import '../../../../../../../core/colors/colors.dart' as colour;
 import '../features/transaction/vesselplanning/view/vesselplanning_tab.dart';
+import '../features/dashboard/common_tabs/vesselplanningweb/view/vesselplanningweb_tab.dart';
 import '../features/transport/fuelentry/add/bloc/fuelentry_bloc.dart';
 import '../features/transport/fuelentry/add/bloc/fuelentry_event.dart';
 import '../features/transport/fuelentry/add/view/fuelentry_tab.dart';
@@ -85,12 +86,12 @@ class _MenulistState extends State<Menulist>
     super.dispose();
   }
 
-  List<MenuMasterModel> get _rootItems => objfun.parentclass.where((e) {
+  List<MenuMasterModel> get _rootItems => AppGlobals.parentclass.where((e) {
     if (e.FormText.trim().isEmpty) return false;
 
     if (_query.isEmpty) return true;
     return e.FormText.toLowerCase().contains(_query) ||
-        objfun.objMenuMaster
+        AppGlobals.objMenuMaster
             .where((c) => c.ParentId == e.Id)
             .any((c) => c.FormText.toLowerCase().contains(_query));
   }).toList();
@@ -187,7 +188,7 @@ class _MenulistState extends State<Menulist>
                         border: Border.all(
                             color: Colors.white.withOpacity(0.22), width: 1),
                         image: DecorationImage(
-                            image: objfun.logo, fit: BoxFit.contain),
+                            image: AppGlobals.logo, fit: BoxFit.contain),
                       ),
                     ),
                     const SizedBox(width: 12),
@@ -233,7 +234,7 @@ class _MenulistState extends State<Menulist>
                             color: Colors.white.withOpacity(0.20)),
                       ),
                       child: Text(
-                        objfun.appversion,
+                        AppGlobals.appversion,
                         style: GoogleFonts.dmSans(
                           fontSize: 10,
                           fontWeight: FontWeight.w500,
@@ -413,7 +414,7 @@ class _MenuTileState extends State<_MenuTile>
   late final Animation<double>   _expandAnim;
 
 
-  List<MenuMasterModel> get _children => objfun.objMenuMaster
+  List<MenuMasterModel> get _children => AppGlobals.objMenuMaster
       .where((e) => e.ParentId == widget.entry.Id && e.Id != widget.entry.Id && e.FormText.trim().isNotEmpty)
       .toList();
 
@@ -681,7 +682,7 @@ class _MenuTileState extends State<_MenuTile>
   // ── Navigation ─────────────────────────────────────────────────────────────
   void _navigate() {
     if (widget.entry.FormText == "Logout") {
-      objfun.logout(widget.drawerContext);
+      AppGlobals.logout(widget.drawerContext);
       return;
     }
     Navigator.pop(widget.drawerContext);
@@ -900,10 +901,12 @@ class _MenuTileState extends State<_MenuTile>
         case "Forwarding SMK Update":
           Navigator.push(ctx, _r(const FWSmkUpdate()));         break;
 
+/*        case "Vessel Planning":
+          Navigator.push(ctx, _r(const VesselPlanningView()));  break;*/
         case "Vessel Planning":
-          Navigator.push(ctx, _r(const VesselPlanningView()));  break;
+          Navigator.push(ctx, _r(const VesselPlanningWebTab())); break;
         case "Logout":
-          objfun.logout(ctx);                                   break;
+          AppGlobals.logout(ctx);                                   break;
       }
     });
   }
@@ -925,7 +928,8 @@ class _MenuTileState extends State<_MenuTile>
       case "SpotSaleOrder":
       case "View":              return Icons.receipt_long_rounded;
       case "Planning":
-      case "Vessel Planning":   return Icons.calendar_month_rounded;
+      case "Vessel Planning":
+      case "VESSEL PLANNING (WEB)":   return Icons.calendar_month_rounded;
       case "Email InBox":       return Icons.mail_outline_rounded;
       case "Google Review":     return Icons.star_outline_rounded;
       case "Update Air Frieght": return Icons.flight_rounded;
@@ -962,6 +966,7 @@ class _MenuTileState extends State<_MenuTile>
       case "EnquiryTR Master": return colour.Accent.blue;
       case "Planning":
       case "Vessel Planning":
+      case "VESSEL PLANNING (WEB)":
       case "PreAlertReport":
       case "Google Review":
       case "Update Boarding Details": return colour.Accent.green;
@@ -987,6 +992,7 @@ class _MenuTileState extends State<_MenuTile>
       case "Planning":            return "Schedule & track";
       case "SpotSaleOrder":       return "Quick spot orders";
       case "Vessel Planning":     return "Sea freight planning";
+      case "VESSEL PLANNING (WEB)": return "Web style sea freight planning";
       case "Update Air Frieght":  return "Update shipments";
       case "JobStatus Update":    return "Live job tracking";
       case "Email InBox":         return "Messages & alerts";

@@ -1,7 +1,7 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:maleva/core/logging/app_logger.dart';
 import 'package:maleva/core/utils/app_preferences.dart';
-import 'package:maleva/core/utils/clsfunction.dart' as objfun;
+import 'package:maleva/core/utils/app_globals.dart';
 import '../data/applog_api.dart';
 import 'troubleshoot_event.dart';
 import 'troubleshoot_state.dart';
@@ -25,10 +25,10 @@ class TroubleshootBloc extends Bloc<TroubleshootEvent, TroubleshootState> {
         // already in chronological order — simplest payload for a first version.
 
         await AppLogApi.insertAppLog(
-          empRefId: objfun.EmpRefId,
+          empRefId: AppGlobals.EmpRefId,
           empName: AppPreferences.getUserId(),
-          comid: objfun.Comid,
-          appVersion: objfun.appversion,
+          comid: AppGlobals.Comid,
+          appVersion: AppGlobals.appversion,
           screenHistory: screenHistory,
           errorLog: "", // kept separate for a future version if you want to
           // split screens vs errors server-side; for now everything

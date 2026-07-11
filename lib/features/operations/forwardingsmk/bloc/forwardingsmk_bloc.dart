@@ -1,6 +1,6 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
-import 'package:maleva/core/utils/clsfunction.dart' as objfun;
+import 'package:maleva/core/utils/app_globals.dart';
 import 'package:maleva/core/network/OnlineApi.dart' as OnlineApi;
 import 'package:maleva/core/models/model.dart';
 
@@ -80,7 +80,7 @@ class FWSmkBloc extends Bloc<FWSmkEvent, FWSmkState> {
 
     List<dynamic> filtered = [];
     if (q.isNotEmpty) {
-      filtered = objfun.JobNoList
+      filtered = AppGlobals.JobNoList
           .where((e) => e['CNumber'].toString().contains(q))
           .toList();
     }
@@ -102,7 +102,7 @@ class FWSmkBloc extends Bloc<FWSmkEvent, FWSmkState> {
       await OnlineApi.EditSalesOrder(event.saleOrderId, 0);
       await OnlineApi.SelectEmployee(null, '', 'Operation');
 
-      final m = objfun.SaleEditMasterList;
+      final m = AppGlobals.SaleEditMasterList;
       if (m.isEmpty) {
         emit(s.copyWith(
           jobNoText:        event.jobNo,
@@ -244,9 +244,9 @@ class FWSmkBloc extends Bloc<FWSmkEvent, FWSmkState> {
     try {
       final master = {
         'Id':                s.saleOrderId,
-        'Comid':             objfun.Comid,
+        'Comid':             AppGlobals.Comid,
         'Jobid':             s.jobNoText,
-        'EmployeeRefId':     objfun.EmpRefId == 0 ? null : objfun.EmpRefId,
+        'EmployeeRefId':     AppGlobals.EmpRefId == 0 ? null : AppGlobals.EmpRefId,
         'ForwardingSMKNo':   s.tab1.smkNo,
         'ForwardingSMKNo2':  s.tab2.smkNo,
         'ForwardingSMKNo3':  s.tab3.smkNo,
@@ -275,8 +275,8 @@ class FWSmkBloc extends Bloc<FWSmkEvent, FWSmkState> {
       };
 
       final header = {'Content-Type': 'application/json; charset=UTF-8'};
-      final result = await objfun.apiAllinoneSelectArray(
-          objfun.apiUpdateForwarding, master, header, null);
+      final result = await AppGlobals.apiAllinoneSelectArray(
+          AppGlobals.apiUpdateForwarding, master, header, null);
 
       if (result != '') {
         final value = ResponseViewModel.fromJson(result);

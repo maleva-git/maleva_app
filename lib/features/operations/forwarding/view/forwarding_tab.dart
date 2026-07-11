@@ -5,7 +5,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:maleva/core/utils/clsfunction.dart' as objfun;
+import 'package:maleva/core/utils/app_globals.dart';
 import 'package:maleva/core/network/OnlineApi.dart' as OnlineApi;
 import 'package:maleva/core/models/model.dart';
 import 'package:maleva/menu/menulist.dart';
@@ -75,7 +75,7 @@ class FWUpdatePageState extends State<FWUpdatePage> with SingleTickerProviderSta
 
   Future<void> _pickImage(BuildContext context, ImageSource source, int type, String smkText) async {
     if (smkText.isEmpty) {
-      objfun.toastMsg('Enter SMK No $type', '', context);
+      toastMsg('Enter SMK No $type', '', context);
       return;
     }
     final s = context.read<FWUpdateBloc>().state;
@@ -85,7 +85,7 @@ class FWUpdatePageState extends State<FWUpdatePage> with SingleTickerProviderSta
     final file = await picker.pickImage(source: source);
     if (file == null) return;
 
-    final url = await objfun.upload(File(file.path), objfun.apiPostimage, s.saleOrderId, 'SalesOrder', smkText);
+    final url = await AppGlobals.upload(File(file.path), AppGlobals.apiPostimage, s.saleOrderId, 'SalesOrder', smkText);
     if (url != null && url.isNotEmpty) {
       context.read<FWUpdateBloc>().add(FWUpdateImagePicked(type: type, imageUrl: url));
     }
@@ -93,12 +93,12 @@ class FWUpdatePageState extends State<FWUpdatePage> with SingleTickerProviderSta
 
   @override
   Widget build(BuildContext context) {
-    final userName = objfun.storagenew.getString('Username') ?? '';
+    final userName = AppGlobals.storagenew.getString('Username') ?? '';
 
     return BlocListener<FWUpdateBloc, FWUpdateState>(
       listener: (context, state) async {
         if (state is FWUpdateSaveSuccess) {
-          await objfun.ConfirmationOK('Updated Successfully', context);
+          await ConfirmationOK('Updated Successfully', context);
         }
         if (state is FWUpdateError) {
           ScaffoldMessenger.of(context).showSnackBar(
@@ -205,14 +205,14 @@ class FWUpdatePageState extends State<FWUpdatePage> with SingleTickerProviderSta
                 final smk3 = state.tab3.smkText.isNotEmpty;
 
                 if (!smk1 && !smk2 && !smk3) {
-                  objfun.toastMsg('Enter Entry SMK No', '', context);
+                  toastMsg('Enter Entry SMK No', '', context);
                   return;
                 }
                 if ((smk1 && smk2) || (smk1 && smk3) || (smk2 && smk3)) {
-                  objfun.toastMsg('Enter Proper Entry Details', '', context);
+                  toastMsg('Enter Proper Entry Details', '', context);
                   return;
                 }
-                objfun.ConfirmationMsgYesNo(context, 'Are you sure to Update ?').then((confirmed) {
+                ConfirmationMsgYesNo(context, 'Are you sure to Update ?').then((confirmed) {
                   if (confirmed == true) {
                     context.read<FWUpdateBloc>().add(FWUpdateSaveRequested());
                   }
@@ -411,11 +411,12 @@ class _FWTabContentState extends State<_FWTabContent> {
             Navigator.push(
               context,
               MaterialPageRoute(builder: (_) => const Employee(Searchby: 1, SearchId: 0)),
-            ).then((_) {
-              final sel = objfun.SelectEmployeeList;
+            ).then((_navRes) {
+              if (_navRes != null) { AppGlobals.SelectEmployeeList = _navRes; }
+              final sel = AppGlobals.SelectEmployeeList;
               if (sel.Id != 0) {
                 _emit(FWUpdateSealEmpChanged(type: t, empId: sel.Id, empName: sel.AccountName));
-                objfun.SelectEmployeeList = EmployeeModel.Empty();
+                AppGlobals.SelectEmployeeList = EmployeeModel.Empty();
               }
             });
           },
@@ -435,11 +436,12 @@ class _FWTabContentState extends State<_FWTabContent> {
             Navigator.push(
               context,
               MaterialPageRoute(builder: (_) => const Employee(Searchby: 1, SearchId: 0)),
-            ).then((_) {
-              final sel = objfun.SelectEmployeeList;
+            ).then((_navRes) {
+              if (_navRes != null) { AppGlobals.SelectEmployeeList = _navRes; }
+              final sel = AppGlobals.SelectEmployeeList;
               if (sel.Id != 0) {
                 _emit(FWUpdateBreakEmpChanged(type: t, empId: sel.Id, empName: sel.AccountName));
-                objfun.SelectEmployeeList = EmployeeModel.Empty();
+                AppGlobals.SelectEmployeeList = EmployeeModel.Empty();
               }
             });
           },
@@ -566,7 +568,7 @@ class _SmkFieldState extends State<_SmkField> {
                         children: [
                           const Icon(Icons.local_shipping_outlined, size: 16, color: Palette.blue400),
                           const SizedBox(width: 10),
-                          Text(smkVal, style: GoogleFonts.lato(color: Palette.textDark2, fontWeight: FontWeight.w600, fontSize: widget.isTablet ? objfun.FontLow + 1 : objfun.FontLow)),
+                          Text(smkVal, style: GoogleFonts.lato(color: Palette.textDark2, fontWeight: FontWeight.w600, fontSize: widget.isTablet ? AppGlobals.FontLow + 1 : AppGlobals.FontLow)),
                         ],
                       ),
                     ),
@@ -600,12 +602,12 @@ class _SmkFieldState extends State<_SmkField> {
         style: GoogleFonts.lato(
           color: Palette.textDark2,
           fontWeight: FontWeight.w600,
-          fontSize: widget.isTablet ? objfun.FontLow + 1 : objfun.FontLow,
+          fontSize: widget.isTablet ? AppGlobals.FontLow + 1 : AppGlobals.FontLow,
         ),
         onChanged: widget.onChanged,
         decoration: InputDecoration(
           hintText: 'SMK No ${widget.type}',
-          hintStyle: GoogleFonts.lato(color: Palette.kTextMuted, fontSize: widget.isTablet ? objfun.FontLow + 1 : objfun.FontLow),
+          hintStyle: GoogleFonts.lato(color: Palette.kTextMuted, fontSize: widget.isTablet ? AppGlobals.FontLow + 1 : AppGlobals.FontLow),
           filled: true,
           fillColor: Palette.grey200p,
           prefixIcon: const Icon(Icons.tag_rounded, color: Palette.blue400, size: 20),
@@ -671,7 +673,7 @@ class _ImageUploadSection extends StatelessWidget {
               ),
               const SizedBox(width: 10),
               Text('Upload Image',
-                style: GoogleFonts.lato(color: Palette.textDark2, fontWeight: FontWeight.w600, fontSize: isTablet ? objfun.FontMedium + 1 : objfun.FontMedium),
+                style: GoogleFonts.lato(color: Palette.textDark2, fontWeight: FontWeight.w600, fontSize: isTablet ? AppGlobals.FontMedium + 1 : AppGlobals.FontMedium),
               ),
               const Spacer(),
               _ImagePickBtn(icon: Icons.photo_outlined, enabled: tab.imageUploadEnabled, isTablet: isTablet, onTap: () => onPickImage(ImageSource.gallery, type, tab.smkText)),
@@ -706,15 +708,15 @@ class _ImageUploadSection extends StatelessWidget {
               gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: gridCols, crossAxisSpacing: 6, mainAxisSpacing: 6),
               itemCount: tab.images.length,
               itemBuilder: (ctx, index) {
-                final imageUrl = '${objfun.imagepath}SalesOrder/$saleOrderId/${tab.smkText}/${tab.images[index]}';
+                final imageUrl = '${AppGlobals.imagepath}SalesOrder/$saleOrderId/${tab.smkText}/${tab.images[index]}';
                 return InkWell(
                   onLongPress: () async {
-                    final ok = await objfun.ConfirmationMsgYesNo(ctx, 'Are you sure to Delete ?');
+                    final ok = await ConfirmationMsgYesNo(ctx, 'Are you sure to Delete ?');
                     if (ok == true) {
                       context.read<FWUpdateBloc>().add(FWUpdateImageDeleted(type: type, index: index));
                     }
                   },
-                  onTap: () => objfun.launchInBrowser(imageUrl),
+                  onTap: () => AppGlobals.launchInBrowser(imageUrl),
                   borderRadius: BorderRadius.circular(8),
                   child: ClipRRect(
                     borderRadius: BorderRadius.circular(8),
@@ -772,8 +774,8 @@ class _FWBottomNav extends StatelessWidget {
         currentIndex: currentIndex,
         selectedItemColor: Palette.blue700,
         unselectedItemColor: Palette.kTextMuted,
-        selectedLabelStyle: GoogleFonts.lato(fontWeight: FontWeight.w700, fontSize: objfun.FontLow),
-        unselectedLabelStyle: GoogleFonts.lato(fontWeight: FontWeight.w500, fontSize: objfun.FontCardText),
+        selectedLabelStyle: GoogleFonts.lato(fontWeight: FontWeight.w700, fontSize: AppGlobals.FontLow),
+        unselectedLabelStyle: GoogleFonts.lato(fontWeight: FontWeight.w500, fontSize: AppGlobals.FontCardText),
         onTap: onTap,
         items: const [
           BottomNavigationBarItem(icon: Icon(Icons.local_shipping_outlined), label: 'FW 1'),
@@ -792,7 +794,7 @@ class _FieldLabel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Text(text, style: GoogleFonts.lato(color: Palette.textMid, fontWeight: FontWeight.w600, fontSize: isTablet ? objfun.FontLow + 1 : objfun.FontLow));
+    return Text(text, style: GoogleFonts.lato(color: Palette.textMid, fontWeight: FontWeight.w600, fontSize: isTablet ? AppGlobals.FontLow + 1 : AppGlobals.FontLow));
   }
 }
 
@@ -818,7 +820,7 @@ class _EmployeeSearchField extends StatelessWidget {
         decoration: BoxDecoration(color: Palette.grey200p, borderRadius: BorderRadius.circular(10), border: Border.all(color: Palette.cardBorder, width: 0.5)),
         child: Row(
           children: [
-            Expanded(child: Text(value.isEmpty ? hint : value, style: GoogleFonts.lato(color: value.isEmpty ? Palette.kTextMuted : Palette.textDark2, fontWeight: value.isEmpty ? FontWeight.w500 : FontWeight.w600, fontSize: isTablet ? objfun.FontLow + 1 : objfun.FontLow), overflow: TextOverflow.ellipsis)),
+            Expanded(child: Text(value.isEmpty ? hint : value, style: GoogleFonts.lato(color: value.isEmpty ? Palette.kTextMuted : Palette.textDark2, fontWeight: value.isEmpty ? FontWeight.w500 : FontWeight.w600, fontSize: isTablet ? AppGlobals.FontLow + 1 : AppGlobals.FontLow), overflow: TextOverflow.ellipsis)),
             Icon(value.isNotEmpty ? Icons.close_rounded : Icons.search_rounded, size: 20, color: Palette.blue400),
           ],
         ),
@@ -842,10 +844,10 @@ class _FWTextField extends StatelessWidget {
       textCapitalization: TextCapitalization.characters,
       textInputAction: TextInputAction.done,
       onChanged: onChanged,
-      style: GoogleFonts.lato(color: Palette.textDark2, fontWeight: FontWeight.w600, fontSize: isTablet ? objfun.FontLow + 1 : objfun.FontLow),
+      style: GoogleFonts.lato(color: Palette.textDark2, fontWeight: FontWeight.w600, fontSize: isTablet ? AppGlobals.FontLow + 1 : AppGlobals.FontLow),
       decoration: InputDecoration(
         hintText: hint,
-        hintStyle: GoogleFonts.lato(color: Palette.kTextMuted, fontSize: isTablet ? objfun.FontLow + 1 : objfun.FontLow),
+        hintStyle: GoogleFonts.lato(color: Palette.kTextMuted, fontSize: isTablet ? AppGlobals.FontLow + 1 : AppGlobals.FontLow),
         filled: true,
         fillColor: Palette.grey200p,
         contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
@@ -871,7 +873,7 @@ class _AppBarButton extends StatelessWidget {
         child: InkWell(
           onTap: onPressed,
           borderRadius: BorderRadius.circular(8),
-          child: Padding(padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6), child: Text(label, style: GoogleFonts.lato(color: Colors.white, fontWeight: FontWeight.w700, fontSize: objfun.FontMedium))),
+          child: Padding(padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6), child: Text(label, style: GoogleFonts.lato(color: Colors.white, fontWeight: FontWeight.w700, fontSize: AppGlobals.FontMedium))),
         ),
       ),
     );

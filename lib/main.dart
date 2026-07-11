@@ -6,7 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:maleva/core/theme/my_behaviour.dart';
 import 'package:maleva/core/firebase/local_notification_service.dart';
-import 'package:maleva/core/utils/clsfunction.dart' as objfun;
+import 'package:maleva/core/utils/app_globals.dart';
 import 'package:maleva/core/firebase/firebase_options.dart';
 import 'package:maleva/splash/splashscreen.dart';
 import 'package:path_provider/path_provider.dart';
@@ -27,8 +27,8 @@ class MyHttpOverrides extends HttpOverrides {
 }
 
 Future<void> backgroundHandler(RemoteMessage message) async {
-  objfun.print_(message.data.toString());
-  objfun.print_(message.notification!.title);
+  AppGlobals.print_(message.data.toString());
+  AppGlobals.print_(message.notification!.title);
 }
 
 Future cleanTemporaryfiles() async {
@@ -75,7 +75,7 @@ Future<void> main() async {
         provisional: false,
         sound: true,
       );
-      objfun.print_('User granted permission: ${settings.authorizationStatus}');
+      AppGlobals.print_('User granted permission: ${settings.authorizationStatus}');
     }
 
     await SystemChrome.setPreferredOrientations([
@@ -137,7 +137,7 @@ class MyApp extends StatelessWidget {
         MaterialColor(_yellow700Map[400]!.value, _yellow700Map);
     return MaterialApp(
       title: 'MALEVA',
-      navigatorKey: objfun.navigatorKey,
+      navigatorKey: AppGlobals.navigatorKey,
       navigatorObservers: [
         AppNavigatorObserver(),
       ],
@@ -179,11 +179,11 @@ class _MyHomePageState extends State<MyHomePage> {
     FirebaseMessaging.instance.getInitialMessage().then((message) {
       if (message != null) {
         // Navigator.push(context, MaterialPageRoute(builder: (context) => Home()));
-        // objfun.getLocation().then((value) => {
+        // AppGlobals.getLocation().then((value) => {
         //       Navigator.pushNamed(context, '/MapPicker'),
         //       // Navigator.pushNamedAndRemoveUntil(context, 'MapPicker', (route) => false)
         //       // Navigator.of(context).push(
-        //       //     MaterialPageRoute(builder: (context) => PlacePicker(objfun.googleapikey,displayLocation: objfun.kInitialPosition, ))),
+        //       //     MaterialPageRoute(builder: (context) => PlacePicker(AppGlobals.googleapikey,displayLocation: AppGlobals.kInitialPosition, ))),
         //     });
         // Navigator.of(context).push(
         //     MaterialPageRoute(builder: (context) => MobileNo()));
@@ -193,8 +193,8 @@ class _MyHomePageState extends State<MyHomePage> {
     ///forground work
     FirebaseMessaging.onMessage.listen((message) {
       if (message.notification != null) {
-        objfun.print_(message.notification!.body);
-        objfun.print_(message.notification!.title);
+        AppGlobals.print_(message.notification!.body);
+        AppGlobals.print_(message.notification!.title);
         // final snackbar = SnackBar(
         //   content: Text(message.notification!.title!),
         //   action: SnackBarAction(
@@ -233,12 +233,12 @@ class _MyHomePageState extends State<MyHomePage> {
     //   print('********** connectState change: $event **********');
     //   switch (event) {
     //     case bpp.ConnectState.connected:
-    //       objfun.currentconnectionstate = true;
-    //       objfun.msgshow('Connected Successfully ', "", Colors.white, Colors.red, null,
-    //           18.00 - objfun.reducesize, objfun.tll, objfun.tgc, context, 2);
+    //       AppGlobals.currentconnectionstate = true;
+    //       msgshow('Connected Successfully ', "", Colors.white, Colors.red, null,
+    //           18.00 - AppGlobals.reducesize, AppGlobals.tll, AppGlobals.tgc, context, 2);
     //       break;
     //     case bpp.ConnectState.disconnected:
-    //       objfun.currentconnectionstate = false;
+    //       AppGlobals.currentconnectionstate = false;
     //       break;
     //   }
     // });
@@ -254,7 +254,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
   _getFCMToken() async {
     String? token = await FirebaseMessaging.instance.getToken();
-    objfun.print_("🔥 FCM Token: $token");
+    AppGlobals.print_("🔥 FCM Token: $token");
     print("🔥 FCM Token: $token");
     // TODO: send this token to your ASP.NET server
     // await http.post("https://yourserver.com/api/saveToken", body: {"token": token});
@@ -262,7 +262,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   Widget build(BuildContext context) {
-    objfun.SizeConfig().init(context);
+    SizeConfig.init(context);
     return const Scaffold(
       resizeToAvoidBottomInset: false,
       body: SplashScreen(),
