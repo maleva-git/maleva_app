@@ -1,124 +1,303 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:intl/intl.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import '../../../../../core/colors/colors.dart' as colour;
 import '../../../../../core/theme/tokens.dart';
+import '../../../../../core/network/api_services/master_api.dart';
+import '../../../../../core/models/model.dart';
+import '../../../../../core/utils/app_globals.dart';
+import '../../../../mastersearch/Port.dart';
+import '../../../../mastersearch/Employee.dart';
+import '../../../../../core/network/OnlineApi.dart' as OnlineApi;
 import '../bloc/vesselplanningweb_bloc.dart';
 import '../bloc/vesselplanningweb_event.dart';
 import '../bloc/vesselplanningweb_state.dart';
 import '../data/vesselplanningweb_repository.dart';
 import '../models/vesselplanningweb_model.dart';
-import 'vesselplanning_filter_sheet.dart';
 import 'vesselplanning_update_sheet.dart';
+import 'vesselplanningweb_saved_sheet.dart';
 
 const kGradient = LinearGradient(
   colors: [AppTokens.invoiceHeaderStart, colour.kHeaderGradEnd],
   begin: Alignment.topLeft,
   end: Alignment.bottomRight,
 );
+
 class VesselPlanningWebTab extends StatelessWidget {
-  const VesselPlanningWebTab({super.key});
+  final bool pageView;
+  final bool pageAdd;
+  final bool pageEdit;
+  final bool pageDelete;
+
+  const VesselPlanningWebTab({
+    super.key,
+    this.pageView = true,
+    this.pageAdd = true,
+    this.pageEdit = true,
+    this.pageDelete = true,
+  });
 
   @override
   Widget build(BuildContext context) {
+    if (!pageView) {
+      return Scaffold(
+        appBar: AppBar(title: const Text('Access Denied')),
+        body: const Center(
+            child: Text('You do not have permission to view this page.')),
+      );
+    }
+
     return BlocProvider(
       create: (context) => VesselPlanningWebBloc(
         repository: VesselPlanningWebRepository(),
-      )..add(const FetchVesselPlanningSearch(
-          fromDate: '2000-01-01', // Fetch all initially or last month
-          toDate: '2100-01-01',
+      )..add(FetchVesselPlanningSearch(
+          fromDate: DateFormat('yyyy-MM-dd').format(DateTime.now()),
+          toDate: DateFormat('yyyy-MM-dd').format(DateTime.now()),
           etaType: 3,
           searchPorts: '',
           deliveryDone: true,
           employeeId: 0,
         )),
-      child: const VesselPlanningWebView(),
+      child: VesselPlanningWebView(
+        pageAdd: pageAdd,
+        pageEdit: pageEdit,
+        pageDelete: pageDelete,
+      ),
     );
   }
 }
 
 class VesselPlanningWebView extends StatefulWidget {
-  const VesselPlanningWebView({super.key});
+  final bool pageAdd;
+  final bool pageEdit;
+  final bool pageDelete;
+
+  const VesselPlanningWebView({
+    super.key,
+    this.pageAdd = true,
+    this.pageEdit = true,
+    this.pageDelete = true,
+  });
 
   @override
   _VesselPlanningWebViewState createState() => _VesselPlanningWebViewState();
 }
 
 class _VesselPlanningWebViewState extends State<VesselPlanningWebView> {
+  // Data State
   List<VesselPlanningWebModel> _currentData = [];
+  String _searchQuery = '';
+  final TextEditingController _searchCtrl = TextEditingController();
 
-  void _showFilterSheet(BuildContext context) {
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      builder: (ctx) {
-        return VesselPlanningFilterSheet(
-          onSearch: (fromDate, toDate, etaType, searchPorts, deliveryDone) {
-            context.read<VesselPlanningWebBloc>().add(
-              FetchVesselPlanningSearch(
-                fromDate: fromDate,
-                toDate: toDate,
-                etaType: etaType,
-                searchPorts: searchPorts,
-                deliveryDone: deliveryDone,
-                employeeId: 0, // 0 for all
-              ),
-            );
-          },
-        );
-      },
-    );
+  // Master UI State
+  final TextEditingController _planningNoCtrl = TextEditingController();
+  final TextEditingController _remarksCtrl = TextEditingController();
+  final TextEditingController _portStringController = TextEditingController();
+  final TextEditingController _dropdownSearchController =
+      TextEditingController();
+
+  DateTime _planningDate = DateTime.now();
+  DateTime _etaDate = DateTime.now();
+  DateTime _toDate = DateTime.now();
+
+  int _etaType = 3; // 1: OETA, 2: L ETA, 3: A ETA
+  bool _deliveryDone = true;
+
+  // Employee
+  EmployeeModel? _selectedEmployee;
+
+  // Master ID if editing
+  int _currentMasterId = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    _planningNoCtrl.text = "NEW";
   }
 
-  void _showUpdateSheet(BuildContext context, VesselPlanningWebModel jobData) {
-    showModalBottomSheet(
+  Future<void> _selectDate(BuildContext context, int type) async {
+    DateTime initial = _planningDate;
+    if (type == 2) initial = _etaDate;
+    if (type == 3) initial = _toDate;
+
+    final DateTime? picked = await showDatePicker(
       context: context,
-      isScrollControlled: true,
-      builder: (ctx) {
-        return VesselPlanningUpdateSheet(
-          jobData: jobData,
-          onUpdate: (updateList) {
-            context.read<VesselPlanningWebBloc>().add(
-              UpdateSpecificJobEvent(
-                updateList: updateList,
-                onSuccess: () {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Job Updated Successfully')),
-                  );
-                },
-              ),
-            );
-          },
-        );
-      },
+      initialDate: initial,
+      firstDate: DateTime(2000),
+      lastDate: DateTime(2101),
+      builder: (context, child) => Theme(
+        data: Theme.of(context).copyWith(
+          colorScheme: const ColorScheme.light(
+            primary: AppTokens.invoiceHeaderStart,
+            onPrimary: Colors.white,
+            surface: Colors.white,
+            onSurface: colour.kTextDark,
+          ),
+        ),
+        child: child!,
+      ),
     );
+    if (picked != null) {
+      setState(() {
+        if (type == 1) _planningDate = picked;
+        if (type == 2) _etaDate = picked;
+        if (type == 3) _toDate = picked;
+      });
+    }
+  }
+
+  void _populateMasterData(Map<String, dynamic> masterData) {
+    setState(() {
+      _currentMasterId = masterData['Id'] ?? 0;
+      _planningNoCtrl.text = masterData['VESSELPLANINGNoDisplay'] ??
+          masterData['VESSELPLANINGNo'] ??
+          masterData['CNumberDisplay'] ??
+          '';
+      _remarksCtrl.text = masterData['Remarks'] ?? '';
+
+      if (masterData['PortName'] != null) {
+        _portStringController.text = masterData['PortName'].toString();
+      }
+
+      if (masterData['EmployeeName'] != null ||
+          masterData['EmployeeId'] != null) {
+        _selectedEmployee = EmployeeModel(masterData['EmployeeId'] ?? 0,
+            masterData['EmployeeName'] ?? 'Employee', '');
+      }
+
+      try {
+        final dateRaw = masterData['VESSELPLANINGDate'] ?? masterData['Pdate'];
+        if (dateRaw != null) {
+          _planningDate = DateTime.parse(dateRaw.toString().split('T')[0]);
+        }
+
+        final etaDateRaw = masterData['ETADate'];
+        if (etaDateRaw != null) {
+          _etaDate = DateTime.parse(etaDateRaw.toString().split('T')[0]);
+        }
+
+        final toDateRaw = masterData['ToDate'];
+        if (toDateRaw != null) {
+          _toDate = DateTime.parse(toDateRaw.toString().split('T')[0]);
+        }
+      } catch (_) {}
+    });
+  }
+
+  List<VesselPlanningWebModel> get _filtered {
+    if (_searchQuery.isEmpty) return _currentData;
+    final q = _searchQuery.toLowerCase();
+    return _currentData.where((d) {
+      return d.jobNo.toLowerCase().contains(q) ||
+          d.jobName.toLowerCase().contains(q) ||
+          d.customerName.toLowerCase().contains(q) ||
+          d.sPort.toLowerCase().contains(q) ||
+          d.vessel.toLowerCase().contains(q) ||
+          d.jobStatus.toLowerCase().contains(q);
+    }).toList();
+  }
+
+  void _doSearch() {
+    context.read<VesselPlanningWebBloc>().add(
+          FetchVesselPlanningSearch(
+            fromDate: DateFormat('yyyy-MM-dd').format(_etaDate),
+            toDate: DateFormat('yyyy-MM-dd').format(_toDate),
+            etaType: _etaType,
+            searchPorts: _portStringController.text,
+            deliveryDone: _deliveryDone,
+            employeeId: _selectedEmployee?.Id ?? 0,
+          ),
+        );
   }
 
   void _savePlanning(BuildContext context) {
-    final checkedItems = _currentData.where((element) => element.isChecked).toList();
-    if (checkedItems.isEmpty) {
+    if (!widget.pageAdd) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please select at least one job to plan.')),
+        const SnackBar(
+            content: Text('You do not have permission to add plannings.')),
       );
       return;
     }
 
-    // Prepare data for InsertVESSELPLANING API
-    List<Map<String, dynamic>> planningList = [
+    final checkedItems = _currentData.where((e) => e.isChecked).toList();
+    if (checkedItems.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+            content: Text('Please select at least one job to plan.')),
+      );
+      return;
+    }
+
+    final planningList = [
       {
-        "Id": 0,
-        "CNumberDisplay": "",
-        "Remarks": "Generated from Mobile App",
-        "SaleDetails": checkedItems.map((e) => {
-          "SDId": 0,
-          "SaleOrderMasterRefId": e.saleOrderMasterRefId,
-          "Remarks": "Added via Web Style Mobile View"
-        }).toList()
+        "Id": _currentMasterId,
+        "CNumberDisplay": _planningNoCtrl.text,
+        "Remarks": _remarksCtrl.text,
+        "Pdate": DateFormat('yyyy-MM-dd').format(_planningDate),
+        "SaleDetails": checkedItems
+            .map((e) => {
+                  "SDId": 0,
+                  "SaleOrderMasterRefId": e.saleOrderMasterRefId,
+                  "Remarks": "Added via Vessel Planning Mobile"
+                })
+            .toList()
       }
     ];
 
-    context.read<VesselPlanningWebBloc>().add(SaveVesselPlanningEvent(planningList: planningList));
+    context
+        .read<VesselPlanningWebBloc>()
+        .add(SaveVesselPlanningEvent(planningList: planningList));
+  }
+
+  void _showSavedPlanningsSheet(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (ctx) => BlocProvider.value(
+        value: context.read<VesselPlanningWebBloc>(),
+        child: const VesselPlanningSavedSheet(),
+      ),
+    );
+  }
+
+  void _showUpdateSheet(BuildContext context, VesselPlanningWebModel jobData) {
+    if (!widget.pageEdit) return;
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (ctx) => VesselPlanningUpdateSheet(
+        jobData: jobData,
+        onUpdate: (updateList) {
+          context.read<VesselPlanningWebBloc>().add(
+                UpdateSpecificJobEvent(
+                  updateList: updateList,
+                  onSuccess: () {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                          content: Text(
+                              'Job ${jobData.jobNo} updated successfully!')),
+                    );
+                  },
+                ),
+              );
+        },
+      ),
+    );
+  }
+
+  @override
+  void dispose() {
+    _searchCtrl.dispose();
+    _planningNoCtrl.dispose();
+    _remarksCtrl.dispose();
+    _portStringController.dispose();
+    _dropdownSearchController.dispose();
+    super.dispose();
   }
 
   @override
@@ -138,7 +317,7 @@ class _VesselPlanningWebViewState extends State<VesselPlanningWebView> {
           onPressed: () => Navigator.pop(context),
         ),
         title: Text(
-          'Vessel Planning (Web Style)',
+          "Vessel Planning",
           style: GoogleFonts.lato(
             color: Colors.white,
             fontWeight: FontWeight.w700,
@@ -146,146 +325,790 @@ class _VesselPlanningWebViewState extends State<VesselPlanningWebView> {
             letterSpacing: 0.3,
           ),
         ),
-        iconTheme: const IconThemeData(color: Colors.white),
         actions: [
           IconButton(
-            icon: const Icon(Icons.save, color: Colors.white),
-            onPressed: () => _savePlanning(context),
-          )
-        ],
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () => _showFilterSheet(context),
-        elevation: 4,
-        backgroundColor: Colors.transparent,
-        child: Container(
-          width: 60,
-          height: 60,
-          decoration: const BoxDecoration(
-            shape: BoxShape.circle,
-            gradient: kGradient,
+            icon: const Icon(Icons.folder_copy_outlined, color: Colors.white),
+            tooltip: 'View Saved Plannings',
+            onPressed: () => _showSavedPlanningsSheet(context),
           ),
-          child: const Icon(Icons.filter_list_rounded, color: Colors.white, size: 26),
-        ),
+        ],
       ),
       body: BlocConsumer<VesselPlanningWebBloc, VesselPlanningWebState>(
         listener: (context, state) {
           if (state is VesselPlanningWebError) {
-            ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(state.message)));
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                  content: Text(state.message),
+                  backgroundColor: Colors.redAccent),
+            );
           } else if (state is VesselPlanningWebActionSuccess) {
-            ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(state.message)));
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                  content: Text(state.message),
+                  backgroundColor: AppTokens.statusSuccess),
+            );
+          }
+
+          if (state is VesselPlanningWebLoaded && state.masterData != null) {
+            _populateMasterData(state.masterData!);
           }
         },
         builder: (context, state) {
-          if (state is VesselPlanningWebLoading) {
-            return const Center(child: SpinKitFoldingCube(color: colour.kHeaderGradEnd, size: 35.0));
-          } else if (state is VesselPlanningWebLoaded) {
+          bool isLoading = state is VesselPlanningWebLoading ||
+              state is VesselPlanningWebActionLoading;
+
+          if (state is VesselPlanningWebLoaded) {
             _currentData = state.dataList;
-            if (_currentData.isEmpty) {
-              return const Center(child: Text("No records found"));
-            }
-            return _buildDataTable();
-          } else if (state is VesselPlanningWebActionLoading) {
-            return const Center(child: SpinKitFoldingCube(color: colour.kHeaderGradEnd, size: 35.0));
           }
-          return const Center(child: Text("Use the filter to search jobs"));
+
+          return Column(
+            children: [
+              _buildMasterPanel(context),
+              if (isLoading)
+                const Padding(
+                  padding: EdgeInsets.all(20.0),
+                  child: SpinKitFoldingCube(
+                      color: colour.kHeaderGradEnd, size: 35.0),
+                )
+              else
+                Expanded(child: _buildCardList(context)),
+            ],
+          );
         },
       ),
     );
   }
 
-  Widget _buildDataTable() {
-    final headerStyle = GoogleFonts.lato(color: Colors.white, fontWeight: FontWeight.w700, fontSize: 12);
-    final rowStyle = GoogleFonts.lato(color: colour.kTextDark, fontWeight: FontWeight.w600, fontSize: 12);
-
-    return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: AppTokens.maintCardBorder),
-      ),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(10),
-        child: SingleChildScrollView(
-          scrollDirection: Axis.vertical,
-          child: SingleChildScrollView(
-            scrollDirection: Axis.horizontal,
-            child: DataTable(
-              headingRowColor: MaterialStateProperty.all(colour.kHeaderGradEnd),
-              dataRowMinHeight: 40,
-              dataRowMaxHeight: 40,
-              columnSpacing: 20,
-              horizontalMargin: 16,
-              dividerThickness: 0.5,
-              showCheckboxColumn: true,
-              columns: [
-                DataColumn(label: Text("Select", style: headerStyle)),
-                DataColumn(label: Text("PORT", style: headerStyle)),
-                DataColumn(label: Text("Remarks", style: headerStyle)),
-                DataColumn(label: Text("Off Vessel", style: headerStyle)),
-                DataColumn(label: Text("Loading Vessel", style: headerStyle)),
-                DataColumn(label: Text("Job No", style: headerStyle)),
-                DataColumn(label: Text("Job Type", style: headerStyle)),
-                DataColumn(label: Text("Status", style: headerStyle)),
-                DataColumn(label: Text("ETA", style: headerStyle)),
-                DataColumn(label: Text("OETA", style: headerStyle)),
-                DataColumn(label: Text("Package", style: headerStyle)),
-                DataColumn(label: Text("Customer Name", style: headerStyle)),
-                DataColumn(label: Text("Job Date", style: headerStyle)),
-                DataColumn(label: Text("Origin", style: headerStyle)),
-                DataColumn(label: Text("Destination", style: headerStyle)),
-                DataColumn(label: Text("Action", style: headerStyle)),
-              ],
-          rows: _currentData.map((data) {
-            return DataRow(
-              selected: data.isChecked,
-              onSelectChanged: (val) {
-                setState(() {
-                  data.isChecked = val ?? false;
-                });
-              },
-              cells: [
-                DataCell(
-                  Checkbox(
-                    value: data.isChecked,
-                    onChanged: (val) {
-                      setState(() => data.isChecked = val ?? false);
-                    },
-                  )
-                ),
-                DataCell(Text(data.sPort.isNotEmpty ? data.sPort : data.oPort, style: rowStyle)),
-                DataCell(Text(data.remarks, style: rowStyle)),
-                DataCell(Text(data.offvesselname, style: rowStyle)),
-                DataCell(Text(data.loadingvesselname, style: rowStyle)),
-                DataCell(Text(data.jobNo, style: rowStyle.copyWith(color: AppTokens.brandPrimary, fontWeight: FontWeight.bold))),
-                DataCell(Text(data.jobName, style: rowStyle)),
-                DataCell(Text(data.jobStatus, style: rowStyle.copyWith(color: AppTokens.statusSuccess))),
-                DataCell(Text(data.eta, style: rowStyle)),
-                DataCell(Text(data.oeta, style: rowStyle)),
-                DataCell(Text(data.pkg, style: rowStyle)),
-                DataCell(Text(data.customerName, style: rowStyle)),
-                DataCell(Text(data.jobDate, style: rowStyle)),
-                DataCell(Text(data.origin, style: rowStyle)),
-                DataCell(Text(data.destination, style: rowStyle)),
-                DataCell(
-                  ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: AppTokens.invoiceHeaderStart,
-                      foregroundColor: Colors.white,
-                      minimumSize: const Size(60, 30),
-                      padding: const EdgeInsets.symmetric(horizontal: 10),
+  Widget _buildMasterPanel(BuildContext context) {
+    return ExpansionTile(
+      initiallyExpanded: true,
+      title: Text("Master Filters & Planning Info",
+          style: GoogleFonts.lato(
+              fontWeight: FontWeight.w700,
+              fontSize: 14,
+              color: colour.kTextDark)),
+      childrenPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      backgroundColor: Colors.white,
+      collapsedBackgroundColor: Colors.white,
+      children: [
+        // Top Row: Planning No, Date, ETA Date, To Date
+        Row(
+          children: [
+            Expanded(
+              flex: 2,
+              child: _TextFieldItem(
+                  label: "Planing No",
+                  controller: _planningNoCtrl,
+                  readOnly: true),
+            ),
+            const SizedBox(width: 8),
+            Expanded(
+              flex: 2,
+              child: _DateTile(
+                  label: "Planing Date",
+                  date: DateFormat('dd/MM/yyyy').format(_planningDate),
+                  onTap: () => _selectDate(context, 1)),
+            ),
+            const SizedBox(width: 8),
+            Expanded(
+              flex: 2,
+              child: _DateTile(
+                  label: "ETA Date",
+                  date: DateFormat('dd/MM/yyyy').format(_etaDate),
+                  onTap: () => _selectDate(context, 2)),
+            ),
+            const SizedBox(width: 8),
+            Expanded(
+              flex: 2,
+              child: _DateTile(
+                  label: "To Date",
+                  date: DateFormat('dd/MM/yyyy').format(_toDate),
+                  onTap: () => _selectDate(context, 3)),
+            ),
+          ],
+        ),
+        const SizedBox(height: 12),
+        // ETA Types, Delivery Done
+        Row(
+          children: [
+            _EtaChip(
+                label: 'O ETA',
+                selected: _etaType == 1,
+                onTap: () => setState(() => _etaType = 1)),
+            const SizedBox(width: 8),
+            _EtaChip(
+                label: 'L ETA',
+                selected: _etaType == 2,
+                onTap: () => setState(() => _etaType = 2)),
+            const SizedBox(width: 8),
+            _EtaChip(
+                label: 'A ETA',
+                selected: _etaType == 3,
+                onTap: () => setState(() => _etaType = 3)),
+            const Spacer(),
+            Checkbox(
+              value: _deliveryDone,
+              onChanged: (val) => setState(() => _deliveryDone = val ?? true),
+              activeColor: AppTokens.invoiceHeaderStart,
+            ),
+            Text("Delivery Done",
+                style: GoogleFonts.lato(
+                    fontSize: 12, fontWeight: FontWeight.w600)),
+          ],
+        ),
+        const SizedBox(height: 12),
+        // Ports and Employee
+        Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Expanded(
+              flex: 3,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text("Search Port",
+                      style: GoogleFonts.lato(
+                          fontSize: 12, fontWeight: FontWeight.w600)),
+                  const SizedBox(height: 4),
+                  Container(
+                    height: 40,
+                    decoration: BoxDecoration(
+                      color: colour.kCardBg,
+                      borderRadius: BorderRadius.circular(8),
+                      border: Border.all(color: AppTokens.maintCardBorder),
                     ),
-                    onPressed: () => _showUpdateSheet(context, data),
-                    child: const Text("Edit", style: TextStyle(fontSize: 11)),
-                  )
-                ),
+                    child: TextField(
+                      controller: _portStringController,
+                      style: const TextStyle(fontSize: 12),
+                      decoration: const InputDecoration(
+                          border: InputBorder.none,
+                          contentPadding: EdgeInsets.symmetric(
+                              horizontal: 10, vertical: 10)),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(width: 8),
+            Expanded(
+              flex: 2,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text("Add Port",
+                      style: GoogleFonts.lato(
+                          fontSize: 12, fontWeight: FontWeight.w600)),
+                  const SizedBox(height: 4),
+                  InkWell(
+                    onTap: () {
+                      Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (_) =>
+                                      const Port(Searchby: 1, SearchId: 0)))
+                          .then((res) {
+                        if (res != null && res is String) {
+                          final currentText = _portStringController.text.trim();
+                          if (currentText.isEmpty) {
+                            _portStringController.text = res;
+                          } else {
+                            final portsList = currentText
+                                .split(',')
+                                .map((e) => e.trim())
+                                .toList();
+                            if (!portsList.contains(res)) {
+                              _portStringController.text = '$currentText,$res';
+                            }
+                          }
+                        }
+                      });
+                    },
+                    child: Container(
+                      height: 40,
+                      decoration: BoxDecoration(
+                        color: colour.kCardBg,
+                        borderRadius: BorderRadius.circular(8),
+                        border: Border.all(color: AppTokens.maintCardBorder),
+                      ),
+                      padding: const EdgeInsets.symmetric(horizontal: 10),
+                      alignment: Alignment.centerLeft,
+                      child: const Text('Select Port',
+                          style: TextStyle(fontSize: 12),
+                          overflow: TextOverflow.ellipsis),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(width: 8),
+            Expanded(
+              flex: 2,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text("Employee",
+                      style: GoogleFonts.lato(
+                          fontSize: 12, fontWeight: FontWeight.w600)),
+                  const SizedBox(height: 4),
+                  InkWell(
+                    onTap: () async {
+                      await OnlineApi.SelectEmployee(context, 'Sales', '');
+                      if (!mounted) return;
+                      final res = await Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (_) =>
+                                  Employee(Searchby: 1, SearchId: 0)));
+                      if (res != null && res is EmployeeModel) {
+                        setState(() => _selectedEmployee = res);
+                      }
+                    },
+                    child: Container(
+                      height: 40,
+                      decoration: BoxDecoration(
+                        color: colour.kCardBg,
+                        borderRadius: BorderRadius.circular(8),
+                        border: Border.all(color: AppTokens.maintCardBorder),
+                      ),
+                      padding: const EdgeInsets.symmetric(horizontal: 10),
+                      alignment: Alignment.centerLeft,
+                      child: Text(
+                        _selectedEmployee?.AccountName ?? 'Select Emp',
+                        style: const TextStyle(fontSize: 12),
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 12),
+        // Remarks and Action Buttons
+        Row(
+          children: [
+            Expanded(
+              flex: 3,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text("Remarks",
+                      style: GoogleFonts.lato(
+                          fontSize: 12, fontWeight: FontWeight.w600)),
+                  const SizedBox(height: 4),
+                  Container(
+                    height: 40,
+                    decoration: BoxDecoration(
+                      color: colour.kCardBg,
+                      borderRadius: BorderRadius.circular(8),
+                      border: Border.all(color: AppTokens.maintCardBorder),
+                    ),
+                    child: TextField(
+                      controller: _remarksCtrl,
+                      style: const TextStyle(fontSize: 12),
+                      decoration: const InputDecoration(
+                          border: InputBorder.none,
+                          contentPadding: EdgeInsets.symmetric(
+                              horizontal: 10, vertical: 10)),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(width: 16),
+            Expanded(
+              flex: 2,
+              child: Column(
+                children: [
+                  const SizedBox(height: 18),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: ElevatedButton(
+                          onPressed: _doSearch,
+                          style: ElevatedButton.styleFrom(
+                              backgroundColor: colour.kHeaderGradEnd,
+                              foregroundColor: Colors.white,
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 4)),
+                          child: const Text('VIEW',
+                              style: TextStyle(fontSize: 11)),
+                        ),
+                      ),
+                      const SizedBox(width: 4),
+                      Expanded(
+                        child: ElevatedButton(
+                          onPressed: () => _savePlanning(context),
+                          style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.green,
+                              foregroundColor: Colors.white,
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 4)),
+                          child: const Text('SAVE',
+                              style: TextStyle(fontSize: 11)),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+
+  Widget _buildCardList(BuildContext context) {
+    final filtered = _filtered;
+    return Column(
+      children: [
+        Padding(
+          padding: const EdgeInsets.fromLTRB(12, 12, 12, 6),
+          child: Container(
+            height: 40,
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(8),
+              border: Border.all(color: AppTokens.maintCardBorder),
+            ),
+            child: TextField(
+              controller: _searchCtrl,
+              onChanged: (v) => setState(() => _searchQuery = v),
+              style: GoogleFonts.lato(
+                  color: colour.kTextDark,
+                  fontSize: 13,
+                  fontWeight: FontWeight.w600),
+              decoration: InputDecoration(
+                hintText: 'Search within grid...',
+                hintStyle: GoogleFonts.lato(
+                    color: AppTokens.planTextMuted, fontSize: 13),
+                border: InputBorder.none,
+                contentPadding:
+                    const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                prefixIcon: const Icon(Icons.search_rounded,
+                    color: colour.kHeaderGradEnd, size: 20),
+                suffixIcon: _searchQuery.isNotEmpty
+                    ? IconButton(
+                        icon: const Icon(Icons.clear_rounded,
+                            size: 18, color: AppTokens.planTextMuted),
+                        onPressed: () {
+                          _searchCtrl.clear();
+                          setState(() => _searchQuery = '');
+                        },
+                      )
+                    : null,
+              ),
+            ),
+          ),
+        ),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 4),
+          child: Row(
+            children: [
+              Text('${filtered.length} jobs',
+                  style: GoogleFonts.lato(
+                      color: AppTokens.planTextMuted,
+                      fontSize: 12,
+                      fontWeight: FontWeight.w600)),
+              const Spacer(),
+              Text('Long press a card to edit',
+                  style: GoogleFonts.lato(
+                      color: AppTokens.planTextMuted, fontSize: 11)),
+            ],
+          ),
+        ),
+        Expanded(
+          child: ListView.builder(
+            padding: const EdgeInsets.fromLTRB(12, 4, 12, 80),
+            itemCount: filtered.length,
+            itemBuilder: (ctx, i) => _JobCard(
+              data: filtered[i],
+              onLongPress: () => _showUpdateSheet(context, filtered[i]),
+              onCheckChanged: (val) =>
+                  setState(() => filtered[i].isChecked = val ?? false),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _TextFieldItem extends StatelessWidget {
+  final String label;
+  final TextEditingController controller;
+  final bool readOnly;
+  const _TextFieldItem(
+      {required this.label, required this.controller, this.readOnly = false});
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(label,
+            style: GoogleFonts.lato(fontSize: 12, fontWeight: FontWeight.w600)),
+        const SizedBox(height: 4),
+        Container(
+          height: 38,
+          decoration: BoxDecoration(
+            color: readOnly ? Colors.grey.shade200 : colour.kCardBg,
+            borderRadius: BorderRadius.circular(8),
+            border: Border.all(color: AppTokens.maintCardBorder),
+          ),
+          child: TextField(
+            controller: controller,
+            readOnly: readOnly,
+            style: const TextStyle(fontSize: 12),
+            decoration: const InputDecoration(
+                border: InputBorder.none,
+                contentPadding:
+                    EdgeInsets.symmetric(horizontal: 10, vertical: 10)),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _DateTile extends StatelessWidget {
+  final String label;
+  final String date;
+  final VoidCallback onTap;
+  const _DateTile(
+      {required this.label, required this.date, required this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(label,
+            style: GoogleFonts.lato(fontSize: 12, fontWeight: FontWeight.w600)),
+        const SizedBox(height: 4),
+        InkWell(
+          onTap: onTap,
+          child: Container(
+            height: 38,
+            decoration: BoxDecoration(
+              color: colour.kCardBg,
+              borderRadius: BorderRadius.circular(8),
+              border: Border.all(color: AppTokens.maintCardBorder),
+            ),
+            padding: const EdgeInsets.symmetric(horizontal: 8),
+            child: Row(
+              children: [
+                const Icon(Icons.calendar_today,
+                    size: 14, color: AppTokens.invoiceHeaderStart),
+                const SizedBox(width: 4),
+                Expanded(
+                    child: Text(date,
+                        style: const TextStyle(fontSize: 11),
+                        overflow: TextOverflow.ellipsis)),
               ],
-            );
-          }).toList(),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _EtaChip extends StatelessWidget {
+  final String label;
+  final bool selected;
+  final VoidCallback onTap;
+  const _EtaChip(
+      {required this.label, required this.selected, required this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+        decoration: BoxDecoration(
+          color: selected ? AppTokens.invoiceHeaderStart : Colors.transparent,
+          border: Border.all(
+              color: selected
+                  ? AppTokens.invoiceHeaderStart
+                  : AppTokens.maintCardBorder),
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: Text(
+          label,
+          style: GoogleFonts.lato(
+            color: selected ? Colors.white : AppTokens.planTextMuted,
+            fontWeight: FontWeight.w600,
+            fontSize: 11,
+          ),
         ),
       ),
-    ),
+    );
+  }
+}
+
+// ─── Job Card ─────────────────────────────────────────────────────────────────
+class _JobCard extends StatelessWidget {
+  final VesselPlanningWebModel data;
+  final VoidCallback onLongPress;
+  final ValueChanged<bool?> onCheckChanged;
+
+  const _JobCard({
+    required this.data,
+    required this.onLongPress,
+    required this.onCheckChanged,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onLongPress: onLongPress,
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
+        margin: const EdgeInsets.only(bottom: 10),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(14),
+          border: Border.all(
+            color: data.isChecked
+                ? AppTokens.invoiceHeaderStart
+                : AppTokens.maintCardBorder,
+            width: data.isChecked ? 1.5 : 0.8,
+          ),
+          boxShadow: [
+            BoxShadow(
+              color: data.isChecked
+                  ? AppTokens.invoiceHeaderStart.withValues(alpha: 0.12)
+                  : Colors.black.withValues(alpha: 0.05),
+              blurRadius: data.isChecked ? 12 : 6,
+              offset: const Offset(0, 3),
+            ),
+          ],
+        ),
+        child: Column(
+          children: [
+            // ── Header bar ───────────────────────────────────────────
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [
+                    AppTokens.invoiceHeaderStart.withValues(alpha: 0.08),
+                    colour.kHeaderGradEnd.withValues(alpha: 0.05),
+                  ],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                ),
+                borderRadius:
+                    const BorderRadius.vertical(top: Radius.circular(14)),
+              ),
+              child: Row(
+                children: [
+                  // Checkbox
+                  GestureDetector(
+                    onTap: () => onCheckChanged(!data.isChecked),
+                    child: AnimatedContainer(
+                      duration: const Duration(milliseconds: 180),
+                      width: 20,
+                      height: 20,
+                      decoration: BoxDecoration(
+                        gradient: data.isChecked ? kGradient : null,
+                        border: data.isChecked
+                            ? null
+                            : Border.all(
+                                color: AppTokens.maintCardBorder, width: 1.5),
+                        borderRadius: BorderRadius.circular(5),
+                      ),
+                      child: data.isChecked
+                          ? const Icon(Icons.check_rounded,
+                              size: 13, color: Colors.white)
+                          : null,
+                    ),
+                  ),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: Text(
+                      data.jobNo.isNotEmpty
+                          ? data.jobNo
+                          : '#${data.saleOrderMasterRefId}',
+                      style: GoogleFonts.lato(
+                        color: AppTokens.invoiceHeaderStart,
+                        fontWeight: FontWeight.w800,
+                        fontSize: 14,
+                      ),
+                    ),
+                  ),
+                  // Status badge
+                  if (data.jobStatus.isNotEmpty)
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 8, vertical: 3),
+                      decoration: BoxDecoration(
+                        color: AppTokens.statusSuccess.withValues(alpha: 0.1),
+                        borderRadius: BorderRadius.circular(20),
+                        border: Border.all(
+                          color: AppTokens.statusSuccess.withValues(alpha: 0.3),
+                        ),
+                      ),
+                      child: Text(
+                        data.jobStatus,
+                        style: GoogleFonts.lato(
+                          color: AppTokens.statusSuccess,
+                          fontSize: 9,
+                          fontWeight: FontWeight.w700,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                  const SizedBox(width: 8),
+                  // Long press hint
+                  Container(
+                    padding: const EdgeInsets.all(4),
+                    decoration: BoxDecoration(
+                      gradient: kGradient,
+                      borderRadius: BorderRadius.circular(6),
+                    ),
+                    child: const Icon(Icons.edit_rounded,
+                        size: 13, color: Colors.white),
+                  ),
+                ],
+              ),
+            ),
+
+            // ── Body ─────────────────────────────────────────────────
+            Padding(
+              padding: const EdgeInsets.all(14),
+              child: Column(
+                children: [
+                  if (data.jobName.isNotEmpty)
+                    _CardRow(
+                        Icons.work_outline_rounded, 'Job Type', data.jobName),
+                  if (data.customerName.isNotEmpty)
+                    _CardRow(Icons.person_outline_rounded, 'Customer',
+                        data.customerName),
+                  // Port row
+                  _CardRow(
+                    Icons.location_on_outlined,
+                    'Port',
+                    data.sPort.isNotEmpty ? data.sPort : data.oPort,
+                  ),
+                  if (data.vessel.isNotEmpty)
+                    _CardRow(Icons.directions_boat_outlined, 'Loading Vessel',
+                        data.vessel),
+                  if (data.offvesselname.isNotEmpty)
+                    _CardRow(Icons.directions_boat_outlined, 'Off Vessel',
+                        data.offvesselname),
+                  if (data.eta.isNotEmpty)
+                    _CardRow(Icons.access_time_rounded, 'ETA',
+                        _fmtDate(data.seta.isNotEmpty ? data.seta : data.eta)),
+                  if (data.etb.isNotEmpty)
+                    _CardRow(Icons.anchor_rounded, 'ETB',
+                        _fmtDate(data.setb.isNotEmpty ? data.setb : data.etb)),
+                  if (data.etd.isNotEmpty)
+                    _CardRow(Icons.directions_run_rounded, 'ETD',
+                        _fmtDate(data.setd.isNotEmpty ? data.setd : data.etd)),
+                  if (data.pkg.isNotEmpty && data.pkg != '/')
+                    _CardRow(Icons.inventory_2_outlined, 'Package', data.pkg),
+                  if (data.remarks.isNotEmpty)
+                    _CardRow(Icons.comment_outlined, 'Remarks', data.remarks),
+                ],
+              ),
+            ),
+
+            // ── Footer ───────────────────────────────────────────────
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+              decoration: BoxDecoration(
+                color: colour.kCardBg,
+                borderRadius:
+                    const BorderRadius.vertical(bottom: Radius.circular(14)),
+              ),
+              child: Row(
+                children: [
+                  const Icon(Icons.calendar_today_outlined,
+                      size: 12, color: AppTokens.planTextMuted),
+                  const SizedBox(width: 4),
+                  Text(
+                    'Job Date: ${data.jobDate}',
+                    style: GoogleFonts.lato(
+                      color: AppTokens.planTextMuted,
+                      fontSize: 11,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                  const Spacer(),
+                  const Icon(Icons.touch_app_rounded,
+                      size: 12, color: AppTokens.planTextMuted),
+                  const SizedBox(width: 4),
+                  Text(
+                    'Long press to edit',
+                    style: GoogleFonts.lato(
+                      color: AppTokens.planTextMuted,
+                      fontSize: 11,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  String _fmtDate(String raw) {
+    if (raw.isEmpty) return '';
+    try {
+      final dt = DateTime.parse(raw.replaceFirst(' ', 'T'));
+      return '${dt.day.toString().padLeft(2, '0')}/${dt.month.toString().padLeft(2, '0')}/${dt.year}  ${dt.hour.toString().padLeft(2, '0')}:${dt.minute.toString().padLeft(2, '0')}';
+    } catch (_) {
+      return raw;
+    }
+  }
+}
+
+class _CardRow extends StatelessWidget {
+  final IconData icon;
+  final String label;
+  final String value;
+  const _CardRow(this.icon, this.label, this.value);
+
+  @override
+  Widget build(BuildContext context) {
+    if (value.isEmpty) return const SizedBox.shrink();
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 6),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Icon(icon, size: 13, color: colour.kHeaderGradEnd),
+          const SizedBox(width: 6),
+          SizedBox(
+            width: 90,
+            child: Text(
+              label,
+              style: GoogleFonts.lato(
+                color: AppTokens.planTextMuted,
+                fontSize: 11,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ),
+          Expanded(
+            child: Text(
+              value,
+              style: GoogleFonts.lato(
+                color: colour.kTextDark,
+                fontSize: 12,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }

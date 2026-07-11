@@ -46,3 +46,29 @@ class SaveVesselPlanningEvent extends VesselPlanningWebEvent {
   @override
   List<Object> get props => [planningList];
 }
+
+class FetchSavedPlanningsEvent extends VesselPlanningWebEvent {
+  final String fromDate;
+  final String toDate;
+  final String search;
+  final int employeeId;
+
+  const FetchSavedPlanningsEvent({
+    required this.fromDate,
+    required this.toDate,
+    required this.search,
+    required this.employeeId,
+  });
+
+  @override
+  List<Object> get props => [fromDate, toDate, search, employeeId];
+}
+
+class LoadPlanningForEditEvent extends VesselPlanningWebEvent {
+  final Map<String, dynamic> planningMaster;
+
+  const LoadPlanningForEditEvent({required this.planningMaster});
+
+  @override
+  List<Object> get props => [planningMaster];
+}

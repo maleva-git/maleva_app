@@ -904,7 +904,13 @@ class _MenuTileState extends State<_MenuTile>
 /*        case "Vessel Planning":
           Navigator.push(ctx, _r(const VesselPlanningView()));  break;*/
         case "Vessel Planning":
-          Navigator.push(ctx, _r(const VesselPlanningWebTab())); break;
+          Navigator.push(ctx, _r(VesselPlanningWebTab(
+            pageView: widget.entry.PageView == 1,
+            pageAdd: widget.entry.PageAdd == 1,
+            pageEdit: widget.entry.PageEdit == 1,
+            pageDelete: widget.entry.PageDelete == 1,
+          ))); 
+          break;
         case "Logout":
           AppGlobals.logout(ctx);                                   break;
       }

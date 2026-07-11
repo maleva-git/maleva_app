@@ -124,7 +124,7 @@ class MasterApi {
     final result = await ApiClient.postRequest(
       '${ApiConstants.apiWareHouseCombo}$comid', null,
     );
-    final data = result['Data1'] as List;
+    final data = result as List;
     return data.map((e) => WareHouseModel.fromJson(e)).toList();
   }
 
