@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:equatable/equatable.dart';
 
 abstract class VesselPlanningWebEvent extends Equatable {
@@ -29,13 +31,13 @@ class FetchVesselPlanningSearch extends VesselPlanningWebEvent {
 }
 
 class UpdateSpecificJobEvent extends VesselPlanningWebEvent {
-  final List<Map<String, dynamic>> updateList;
-  final Function() onSuccess;
+  final Map<String, dynamic> updateData;
+  final VoidCallback onSuccess;
 
-  const UpdateSpecificJobEvent({required this.updateList, required this.onSuccess});
+  const UpdateSpecificJobEvent({required this.updateData, required this.onSuccess});
 
   @override
-  List<Object> get props => [updateList];
+  List<Object> get props => [updateData];
 }
 
 class SaveVesselPlanningEvent extends VesselPlanningWebEvent {

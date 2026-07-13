@@ -41,8 +41,8 @@ class VesselPlanningWebRepository {
     print("Response Body: ${response.body}");
 
     if (response.statusCode == 200) {
+      if (response.body.isEmpty || response.body == 'null') return [];
       final jsonResponse = jsonDecode(response.body);
-      
       if (jsonResponse is List) {
         return jsonResponse.map((json) => VesselPlanningWebModel.fromJson(json)).toList();
       } else if (jsonResponse is Map<String, dynamic>) {
@@ -60,11 +60,11 @@ class VesselPlanningWebRepository {
     }
   }
 
-  Future<String> updateSpecificJob(List<Map<String, dynamic>> updateList) async {
+  Future<String> updateSpecificJob(Map<String, dynamic> updateData) async {
     print("========== VESSEL PLANNING WEB (UPDATE) ==========");
     print("API URL: ${AppGlobals.apiUpdateSaleOrderSpecific}");
     print("Headers: {'Content-Type': 'application/json; charset=UTF-8', 'Comid': '${AppGlobals.Comid}'}");
-    print("Body: ${jsonEncode(updateList)}");
+    print("Body: ${jsonEncode(updateData)}");
     print("==================================================");
 
     final response = await http.post(
@@ -73,15 +73,23 @@ class VesselPlanningWebRepository {
         'Content-Type': 'application/json; charset=UTF-8',
         'Comid': AppGlobals.Comid.toString(),
       },
-      body: jsonEncode(updateList),
+      body: jsonEncode(updateData),
     );
 
     if (response.statusCode == 200) {
-      final jsonResponse = jsonDecode(response.body);
-      if (jsonResponse['ok'] == true) {
-        return jsonResponse['message'] ?? 'Success';
-      } else {
-        throw Exception(jsonResponse['message'] ?? 'Failed to update');
+      if (response.body.isEmpty || response.body == 'null') return 'Success';
+      try {
+        final jsonResponse = jsonDecode(response.body);
+        if (jsonResponse is Map<String, dynamic>) {
+          if (jsonResponse['ok'] == true || jsonResponse['status'] == 'success') {
+            return jsonResponse['message'] ?? 'Success';
+          } else if (jsonResponse.containsKey('ok') && jsonResponse['ok'] == false) {
+            throw Exception(jsonResponse['message'] ?? 'Failed to update');
+          }
+        }
+        return 'Success';
+      } catch (e) {
+        return 'Success';
       }
     } else {
       throw Exception('Server Error: ${response.statusCode}');
@@ -108,11 +116,21 @@ class VesselPlanningWebRepository {
     print("Response Body: ${response.body}");
 
     if (response.statusCode == 200) {
-      final jsonResponse = jsonDecode(response.body);
-      if (jsonResponse['ok'] == true) {
-        return jsonResponse['message'] ?? 'Success';
-      } else {
-        throw Exception(jsonResponse['message'] ?? 'Failed to save');
+      if (response.body.isEmpty || response.body == 'null') {
+        return 'Success';
+      }
+      try {
+        final jsonResponse = jsonDecode(response.body);
+        if (jsonResponse is Map<String, dynamic>) {
+          if (jsonResponse['ok'] == true || jsonResponse['status'] == 'success') {
+            return jsonResponse['message'] ?? 'Success';
+          } else if (jsonResponse.containsKey('ok') && jsonResponse['ok'] == false) {
+            throw Exception(jsonResponse['message'] ?? 'Failed to save');
+          }
+        }
+        return 'Success';
+      } catch (e) {
+        return 'Success';
       }
     } else {
       throw Exception('Server Error: ${response.statusCode}');
@@ -152,6 +170,7 @@ class VesselPlanningWebRepository {
     print("Response Body: ${response.body}");
 
     if (response.statusCode == 200) {
+      if (response.body.isEmpty || response.body == 'null') return [];
       final jsonResponse = jsonDecode(response.body);
       List<dynamic> extractEnrichedMaster(dynamic firstObj) {
         if (firstObj is Map && firstObj['salemaster'] != null) {
@@ -191,7 +210,7 @@ class VesselPlanningWebRepository {
     }
   }
 
-  Future<List<VesselPlanningWebModel>> getPlanningById(int id) async {
+  Future<Map<String, dynamic>> getPlanningById(int id) async {
     final response = await http.post(
       Uri.parse('${AppGlobals.apiEditVesselPlanning}$id&VESSELPLANINGNo=0&Comid=${AppGlobals.Comid}'),
       headers: <String, String>{
@@ -201,31 +220,62 @@ class VesselPlanningWebRepository {
     );
 
     if (response.statusCode == 200) {
+      if (response.body.isEmpty || response.body == 'null') return {'master': null, 'details': <VesselPlanningWebModel>[]};
       final jsonResponse = jsonDecode(response.body);
-      // Depending on how backend returns Edit data. Usually it returns the master object with SaleDetails array,
-      // or just the SaleDetails directly. Assuming it returns a list of items for the grid:
+      
+      Map<String, dynamic>? masterData;
       List<dynamic> data = [];
+      
       if (jsonResponse is List) {
-        if (jsonResponse.isNotEmpty && jsonResponse[0] is Map && jsonResponse[0]['SaleDetails'] != null) {
-          data = jsonResponse[0]['SaleDetails'];
+        if (jsonResponse.isNotEmpty && jsonResponse[0] is Map) {
+          masterData = jsonResponse[0] as Map<String, dynamic>;
+          if (masterData['SaleDetails'] != null) {
+            data = masterData['SaleDetails'];
+          }
         } else {
           data = jsonResponse;
         }
       } else if (jsonResponse is Map<String, dynamic>) {
         if (jsonResponse['Data1'] != null) {
           final data1 = jsonResponse['Data1'];
-          if (data1 is List && data1.isNotEmpty && data1[0] is Map && data1[0]['SaleDetails'] != null) {
-            data = data1[0]['SaleDetails'];
+          if (data1 is List && data1.isNotEmpty && data1[0] is Map) {
+            masterData = data1[0] as Map<String, dynamic>;
+            if (masterData['SaleDetails'] != null) {
+              data = masterData['SaleDetails'];
+            }
           }
-        } else if (jsonResponse['SaleDetails'] != null) {
-          data = jsonResponse['SaleDetails'];
-        } else if (jsonResponse['Data'] != null) {
-          data = jsonResponse['Data'];
+        } else {
+          masterData = jsonResponse;
+          if (jsonResponse['SaleDetails'] != null) {
+            data = jsonResponse['SaleDetails'];
+          } else if (jsonResponse['Data'] != null) {
+            data = jsonResponse['Data'];
+          }
         }
       }
-      return data.map((json) => VesselPlanningWebModel.fromJson(json)).toList();
+      return {
+        'master': masterData,
+        'details': data.map((json) => VesselPlanningWebModel.fromJson(json)).toList()
+      };
     } else {
       throw Exception('Server Error: ${response.statusCode}');
     }
+  }
+
+  Future<String> getMaxVesselPlanningNo() async {
+    try {
+      final comId = AppGlobals.storagenew.getInt('Comid') ?? 0;
+      final url = '${AppGlobals.apiMaxVesselPlanningNo}?Comid=$comId&BillType=VP';
+      final response = await http.post(Uri.parse(url));
+      if (response.statusCode == 200) {
+        final decoded = jsonDecode(response.body);
+        if (decoded != null && decoded['ok'] == true && decoded['No'] != null) {
+          return decoded['No'].toString();
+        }
+      }
+    } catch (e) {
+      // ignore
+    }
+    return "";
   }
 }

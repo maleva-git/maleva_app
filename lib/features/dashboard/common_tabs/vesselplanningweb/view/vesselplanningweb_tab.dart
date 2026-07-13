@@ -6,9 +6,9 @@ import 'package:intl/intl.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import '../../../../../core/colors/colors.dart' as colour;
 import '../../../../../core/theme/tokens.dart';
-import '../../../../../core/network/api_services/master_api.dart';
 import '../../../../../core/models/model.dart';
 import '../../../../../core/utils/app_globals.dart';
+import '../../../../../core/utils/app_preferences.dart';
 import '../../../../mastersearch/Port.dart';
 import '../../../../mastersearch/Employee.dart';
 import '../../../../../core/network/OnlineApi.dart' as OnlineApi;
@@ -116,6 +116,25 @@ class _VesselPlanningWebViewState extends State<VesselPlanningWebView> {
   void initState() {
     super.initState();
     _planningNoCtrl.text = "NEW";
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (_currentMasterId == 0) {
+        _fetchMaxPlanningNo();
+      }
+    });
+  }
+
+  Future<void> _fetchMaxPlanningNo() async {
+    try {
+      final repo = VesselPlanningWebRepository();
+      final maxNo = await repo.getMaxVesselPlanningNo();
+      if (maxNo.isNotEmpty && mounted) {
+        setState(() {
+          _planningNoCtrl.text = maxNo;
+        });
+      }
+    } catch (e) {
+      print('Error fetching max planning no: $e');
+    }
   }
 
   Future<void> _selectDate(BuildContext context, int type) async {
@@ -162,25 +181,25 @@ class _VesselPlanningWebViewState extends State<VesselPlanningWebView> {
         _portStringController.text = masterData['PortName'].toString();
       }
 
-      if (masterData['EmployeeName'] != null ||
-          masterData['EmployeeId'] != null) {
-        _selectedEmployee = EmployeeModel(masterData['EmployeeId'] ?? 0,
-            masterData['EmployeeName'] ?? 'Employee', '');
+      final empId = masterData['EmployeeId'] ?? masterData['EmployeeRefId'];
+      final empName = masterData['EmployeeName'] ?? masterData['AccountName'] ?? 'Employee';
+      if (empId != null || masterData['EmployeeName'] != null || masterData['AccountName'] != null) {
+        _selectedEmployee = EmployeeModel(empId ?? 0, empName, '');
       }
 
       try {
-        final dateRaw = masterData['VESSELPLANINGDate'] ?? masterData['Pdate'];
-        if (dateRaw != null) {
+        final dateRaw = masterData['VESSELPLANINGDate'] ?? masterData['Pdate'] ?? masterData['SaleDate'];
+        if (dateRaw != null && dateRaw.toString().isNotEmpty) {
           _planningDate = DateTime.parse(dateRaw.toString().split('T')[0]);
         }
 
-        final etaDateRaw = masterData['ETADate'];
-        if (etaDateRaw != null) {
+        final etaDateRaw = masterData['ETADate'] ?? masterData['FDate'];
+        if (etaDateRaw != null && etaDateRaw.toString().isNotEmpty) {
           _etaDate = DateTime.parse(etaDateRaw.toString().split('T')[0]);
         }
 
-        final toDateRaw = masterData['ToDate'];
-        if (toDateRaw != null) {
+        final toDateRaw = masterData['ToDate'] ?? masterData['TDate'];
+        if (toDateRaw != null && toDateRaw.toString().isNotEmpty) {
           _toDate = DateTime.parse(toDateRaw.toString().split('T')[0]);
         }
       } catch (_) {}
@@ -215,33 +234,112 @@ class _VesselPlanningWebViewState extends State<VesselPlanningWebView> {
 
   void _savePlanning(BuildContext context) {
     if (!widget.pageAdd) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-            content: Text('You do not have permission to add plannings.')),
-      );
+      msgshow('Permission Denied', ' You do not have permission to add plannings.', Colors.white, Colors.redAccent, null, 14, null, null, context, 2);
       return;
     }
 
     final checkedItems = _currentData.where((e) => e.isChecked).toList();
     if (checkedItems.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-            content: Text('Please select at least one job to plan.')),
-      );
+      msgshow('Selection Required', ' Please select at least one job to plan.', Colors.white, Colors.redAccent, null, 14, null, null, context, 2);
       return;
     }
 
+    final String defaultDate = "1900-01-01T00:00:00";
     final planningList = [
       {
         "Id": _currentMasterId,
-        "CNumberDisplay": _planningNoCtrl.text,
+        "SDId": 0,
+        "CompanyRefId": AppGlobals.Comid,
+        "UserRefId": int.tryParse(AppPreferences.getUserId()) ?? (AppGlobals.Comid == 0 ? null : AppGlobals.Comid),
+        "EmployeeRefId": _selectedEmployee?.Id ?? (AppGlobals.EmpRefId == 0 ? null : AppGlobals.EmpRefId),
+        "FDate": _etaDate.toIso8601String(),
+        "TDate": _toDate.toIso8601String(),
+        "SFDate": "",
+        "STDate": "",
+        "SaleDate": _planningDate.toIso8601String(),
+        "SSaleDate": "",
+        "CNumberDisplay": _planningNoCtrl.text.isEmpty ? "NEW" : _planningNoCtrl.text,
+        "CNumber": 0,
         "Remarks": _remarksCtrl.text,
-        "Pdate": DateFormat('yyyy-MM-dd').format(_planningDate),
+        "Active": 0,
+        "Created_Date": defaultDate,
+        "Created_By": "",
+        "Modified_Date": defaultDate,
+        "Modified_By": "",
         "SaleDetails": checkedItems
             .map((e) => {
+                  "Id": 0,
                   "SDId": 0,
+                  "VESSELPLANINGMasterRefId": _currentMasterId,
                   "SaleOrderMasterRefId": e.saleOrderMasterRefId,
-                  "Remarks": "Added via Vessel Planning Mobile"
+                  "Origin": e.origin,
+                  "Destination": e.destination,
+                  "JobNo": e.jobNo,
+                  "JobDate": e.jobDate,
+                  "JobStatus": e.jobStatus,
+                  "SCN": e.scn,
+                  "LScn": e.lscn,
+                  "VesselType": "",
+                  "DETA": defaultDate,
+                  "ETA": defaultDate,
+                  "SETA": "",
+                  "ETB": defaultDate,
+                  "SETB": "",
+                  "ETD": defaultDate,
+                  "SETD": "",
+                  "OETA": defaultDate,
+                  "SOETA": "",
+                  "OETB": defaultDate,
+                  "SOETB": "",
+                  "OETD": defaultDate,
+                  "SOETD": "",
+                  "PickupDate": "",
+                  "SPickupDate": "",
+                  "DeliveryDate": "",
+                  "SDeliveryDate": "",
+                  "WareHouseEnterDate": "",
+                  "SWareHouseEnterDate": "",
+                  "SWareHouseExitDate": "",
+                  "WareHouseExitDate": "",
+                  "WareHouseAddress": "",
+                  "pkg": e.pkg,
+                  "Loadingvesselname": e.loadingvesselname,
+                  "BLCopy": e.blCopy,
+                  "TruckSize": e.truckSize,
+                  "OSCN": "",
+                  "Offvesselname": e.offvesselname,
+                  "Commodity": e.commodity,
+                  "Vessel": e.vessel,
+                  "OVessel": e.oVessel,
+                  "SPort": e.sPort,
+                  "OPort": e.oPort,
+                  "Port": "",
+                  "JobName": e.jobName,
+                  "AWBNo": e.awbNo,
+                  "Remarks1": e.remarks1,
+                  "PTW": e.ptw,
+                  "ZB": e.zb,
+                  "ZB2": e.zb2,
+                  "ZBRef": e.zbRef,
+                  "ZBRef2": e.zbRef2,
+                  "PortCharges": 0.0,
+                  "PortChargesRef": e.portChargesRef,
+                  "AgentCompany": "",
+                  "OAgentCompany": "",
+                  "AgentName": e.agentName,
+                  "AgentPhone": e.agentPhone,
+                  "OAgentName": e.oAgentName,
+                  "OAgentPhone": e.oAgentPhone,
+                  "BoardingOfficerRefid": 0,
+                  "BoardingOfficerName": "",
+                  "BoardingOfficer1Refid": 0,
+                  "BoardingOfficerName1": "",
+                  "BoardingAmount": 0.0,
+                  "BoardingAmount1": 0.0,
+                  "CustomerName": e.customerName,
+                  "EmployeeName": e.employeeName,
+                  "Remarks": "Added via Vessel Planning Mobile",
+                  "Cargo": e.cargo
                 })
             .toList()
       }
@@ -272,16 +370,12 @@ class _VesselPlanningWebViewState extends State<VesselPlanningWebView> {
       backgroundColor: Colors.transparent,
       builder: (ctx) => VesselPlanningUpdateSheet(
         jobData: jobData,
-        onUpdate: (updateList) {
+        onUpdate: (updateData) {
           context.read<VesselPlanningWebBloc>().add(
                 UpdateSpecificJobEvent(
-                  updateList: updateList,
+                  updateData: updateData,
                   onSuccess: () {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                          content: Text(
-                              'Job ${jobData.jobNo} updated successfully!')),
-                    );
+                    msgshow('Success', ' Job ${jobData.jobNo} updated successfully!', Colors.white, AppTokens.statusSuccess, null, 14, null, null, context, 2);
                   },
                 ),
               );
@@ -336,21 +430,21 @@ class _VesselPlanningWebViewState extends State<VesselPlanningWebView> {
       body: BlocConsumer<VesselPlanningWebBloc, VesselPlanningWebState>(
         listener: (context, state) {
           if (state is VesselPlanningWebError) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                  content: Text(state.message),
-                  backgroundColor: Colors.redAccent),
-            );
+            msgshow('Error', ' ${state.message}', Colors.white, Colors.redAccent, null, 14, null, null, context, 2);
           } else if (state is VesselPlanningWebActionSuccess) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                  content: Text(state.message),
-                  backgroundColor: AppTokens.statusSuccess),
-            );
+            msgshow('Success', ' ${state.message}', Colors.white, AppTokens.statusSuccess, null, 14, null, null, context, 2);
+            if (_currentMasterId == 0) {
+              _fetchMaxPlanningNo();
+            }
           }
 
-          if (state is VesselPlanningWebLoaded && state.masterData != null) {
-            _populateMasterData(state.masterData!);
+          if (state is VesselPlanningWebLoaded) {
+            if (state.dataList.isEmpty) {
+              msgshow('No Results', ' No data found for the selected criteria.', Colors.white, Colors.orangeAccent, null, 14, null, null, context, 2);
+            }
+            if (state.masterData != null) {
+              _populateMasterData(state.masterData!);
+            }
           }
         },
         builder: (context, state) {
@@ -361,7 +455,7 @@ class _VesselPlanningWebViewState extends State<VesselPlanningWebView> {
             _currentData = state.dataList;
           }
 
-          return Column(
+          return ListView(
             children: [
               _buildMasterPanel(context),
               if (isLoading)
@@ -371,7 +465,7 @@ class _VesselPlanningWebViewState extends State<VesselPlanningWebView> {
                       color: colour.kHeaderGradEnd, size: 35.0),
                 )
               else
-                Expanded(child: _buildCardList(context)),
+                _buildCardList(context),
             ],
           );
         },
@@ -413,7 +507,7 @@ class _VesselPlanningWebViewState extends State<VesselPlanningWebView> {
             Expanded(
               flex: 2,
               child: _DateTile(
-                  label: "ETA Date",
+                  label: "From Date",
                   date: DateFormat('dd/MM/yyyy').format(_etaDate),
                   onTap: () => _selectDate(context, 2)),
             ),
@@ -719,16 +813,16 @@ class _VesselPlanningWebViewState extends State<VesselPlanningWebView> {
             ],
           ),
         ),
-        Expanded(
-          child: ListView.builder(
-            padding: const EdgeInsets.fromLTRB(12, 4, 12, 80),
-            itemCount: filtered.length,
-            itemBuilder: (ctx, i) => _JobCard(
-              data: filtered[i],
-              onLongPress: () => _showUpdateSheet(context, filtered[i]),
-              onCheckChanged: (val) =>
-                  setState(() => filtered[i].isChecked = val ?? false),
-            ),
+        ListView.builder(
+          shrinkWrap: true,
+          physics: const ClampingScrollPhysics(),
+          padding: const EdgeInsets.fromLTRB(12, 4, 12, 80),
+          itemCount: filtered.length,
+          itemBuilder: (ctx, i) => _JobCard(
+            data: filtered[i],
+            onLongPress: () => _showUpdateSheet(context, filtered[i]),
+            onCheckChanged: (val) =>
+                setState(() => filtered[i].isChecked = val ?? false),
           ),
         ),
       ],
