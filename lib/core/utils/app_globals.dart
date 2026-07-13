@@ -194,6 +194,7 @@ class AppGlobals {
   static String apiSelectVesselPlanning = ApiConstants.apiSelectVesselPlanning;
   static String apiEditVesselPlanning = ApiConstants.apiEditVesselPlanning;
   static String apiVesselPlanningSearch = ApiConstants.apiVesselPlanningSearch;
+  static String apiMaxVesselPlanningNo  = ApiConstants.apiMaxVesselPlanningNo;
   static String apiInsertVesselPlanning = ApiConstants.apiInsertVesselPlanning;
   static String apiDeleteVesselPlanning = ApiConstants.apiDeleteVesselPlanning;
   static String apiUpdateSaleOrderSpecific = ApiConstants.apiUpdateSaleOrderSpecific;

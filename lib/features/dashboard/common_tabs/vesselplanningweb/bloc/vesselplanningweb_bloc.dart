@@ -1,7 +1,9 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../data/vesselplanningweb_repository.dart';
+import '../models/vesselplanningweb_model.dart';
 import 'vesselplanningweb_event.dart';
 import 'vesselplanningweb_state.dart';
+
 
 class VesselPlanningWebBloc extends Bloc<VesselPlanningWebEvent, VesselPlanningWebState> {
   final VesselPlanningWebRepository repository;
@@ -28,7 +30,7 @@ class VesselPlanningWebBloc extends Bloc<VesselPlanningWebEvent, VesselPlanningW
       final currentState = state;
       emit(VesselPlanningWebActionLoading());
       try {
-        final message = await repository.updateSpecificJob(event.updateList);
+        final message = await repository.updateSpecificJob(event.updateData);
         emit(VesselPlanningWebActionSuccess(message));
         event.onSuccess();
         if (currentState is VesselPlanningWebLoaded) {
@@ -45,6 +47,9 @@ class VesselPlanningWebBloc extends Bloc<VesselPlanningWebEvent, VesselPlanningW
     on<SaveVesselPlanningEvent>((event, emit) async {
       final currentState = state;
       emit(VesselPlanningWebActionLoading());
+
+
+
       try {
         final message = await repository.saveVesselPlanning(event.planningList);
         emit(VesselPlanningWebActionSuccess(message));
@@ -62,11 +67,32 @@ class VesselPlanningWebBloc extends Bloc<VesselPlanningWebEvent, VesselPlanningW
     on<LoadPlanningForEditEvent>((event, emit) async {
       emit(VesselPlanningWebLoading());
       try {
-        final dataList = await repository.getPlanningById(event.planningMaster['Id']);
-        emit(VesselPlanningWebLoaded(dataList: dataList, planningNo: event.planningMaster['CNumberDisplay'], masterData: event.planningMaster));
+        final result = await repository.getPlanningById(event.planningMaster['Id']);
+        final List<VesselPlanningWebModel> dataList = result['details'] ?? [];
+        final Map<String, dynamic>? apiMaster = result['master'];
+        
+        final Map<String, dynamic> finalMaster = {};
+        finalMaster.addAll(event.planningMaster);
+        if (apiMaster != null && apiMaster.isNotEmpty) {
+          apiMaster.forEach((key, value) {
+            if (value != null && value.toString().isNotEmpty) {
+              finalMaster[key] = value;
+            }
+          });
+        }
+        
+        emit(VesselPlanningWebLoaded(
+            dataList: dataList, 
+            planningNo: finalMaster['VESSELPLANINGNoDisplay'] ?? finalMaster['CNumberDisplay'] ?? event.planningMaster['CNumberDisplay'], 
+            masterData: finalMaster));
       } catch (e) {
         emit(VesselPlanningWebError(message: e.toString()));
       }
     });
   }
+
+
+
+
+
 }

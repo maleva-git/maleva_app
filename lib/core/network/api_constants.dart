@@ -93,9 +93,10 @@ class ApiConstants {
   static const String apiViewVesselPlanningPdf = "$port/api/VesselPlanningApp/VESSELPLANINGVIEW?VesselPlanningNo=";
   static const String VESSELPLANINGDB         = "$port/api/DashBoardApp/VESSELPLANINGDB";
   static const String apiVesselPlanningSearch = "$port/api/VesselPlanningApp/VESSELPLANINGSearch";
+  static const String apiMaxVesselPlanningNo  = "$port/VESSELPLANING/MaxVESSELPLANINGNo";
   static const String apiInsertVesselPlanning = "$port/api/VesselPlanningApp/InsertVESSELPLANING";
   static const String apiDeleteVesselPlanning = "$port/api/VesselPlanningApp/DeleteVESSELPLANING?Id=";
-  static const String apiUpdateSaleOrderSpecific = "$port/api/SaleOrderApp/UpdateSaleOrder";
+  static const String apiUpdateSaleOrderSpecific = "$port/SaleOrder/UpdateSaleorder";
 
   // ─── RTI ──────────────────────────────────────────────────────────────────
   static const String apiGetRTINo             = "$port/api/RTIApp/SelectRTINo?Comid=";
