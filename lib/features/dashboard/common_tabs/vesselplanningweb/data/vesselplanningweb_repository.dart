@@ -50,11 +50,17 @@ class VesselPlanningWebRepository {
           List<dynamic> data = jsonResponse['Data'];
           return data.map((json) => VesselPlanningWebModel.fromJson(json)).toList();
         } else {
+          final msg = (jsonResponse['message'] ?? '').toString().toLowerCase();
+          if (msg.contains('not found') || msg.contains('no data')) {
+            return [];
+          }
           throw Exception(jsonResponse['message'] ?? 'Failed to load data');
         }
       } else {
         throw Exception('Unexpected response format');
       }
+    } else if (response.statusCode == 404 || response.statusCode == 500) {
+      return [];
     } else {
       throw Exception('Server Error: ${response.statusCode}');
     }
@@ -110,6 +116,52 @@ class VesselPlanningWebRepository {
         'Comid': AppGlobals.Comid.toString(),
       },
       body: jsonEncode(planningList),
+    );
+
+    print("Response Status Code: ${response.statusCode}");
+    print("Response Body: ${response.body}");
+
+    if (response.statusCode == 200) {
+      if (response.body.isEmpty || response.body == 'null') {
+        return 'Success';
+      }
+      try {
+        final jsonResponse = jsonDecode(response.body);
+        if (jsonResponse is Map<String, dynamic>) {
+          if (jsonResponse['ok'] == true || jsonResponse['status'] == 'success') {
+            return jsonResponse['message'] ?? 'Success';
+          } else if (jsonResponse.containsKey('ok') && jsonResponse['ok'] == false) {
+            throw Exception(jsonResponse['message'] ?? 'Failed to save');
+          }
+        }
+        return 'Success';
+      } catch (e) {
+        return 'Success';
+      }
+    } else {
+      throw Exception('Server Error: ${response.statusCode}');
+    }
+  }
+
+  Future<String> deleteVesselPlanning(int id) async {
+    final Map<String, dynamic> requestBody = {
+      "Id": id,
+      "Comid": AppGlobals.Comid,
+    };
+
+    print("========== VESSEL PLANNING WEB (DELETE) ==========");
+    print("API URL: ${AppGlobals.apiDeleteVesselPlanning}$id");
+    print("Headers: {'Content-Type': 'application/json; charset=UTF-8', 'Comid': '${AppGlobals.Comid}'}");
+    print("Body: ${jsonEncode(requestBody)}");
+    print("==================================================");
+
+    final response = await http.post(
+      Uri.parse('${AppGlobals.apiDeleteVesselPlanning}$id&Comid=${AppGlobals.Comid}'),
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+        'Comid': AppGlobals.Comid.toString(),
+      },
+      body: jsonEncode(requestBody),
     );
 
     print("Response Status Code: ${response.statusCode}");
@@ -204,6 +256,8 @@ class VesselPlanningWebRepository {
           return jsonResponse['Data'];
         }
       }
+      return [];
+    } else if (response.statusCode == 404 || response.statusCode == 500) {
       return [];
     } else {
       throw Exception('Server Error: ${response.statusCode}');

@@ -180,6 +180,12 @@ class _VesselPlanningWebViewState extends State<VesselPlanningWebView> {
       if (masterData['PortName'] != null) {
         _portStringController.text = masterData['PortName'].toString();
       }
+      
+      if (masterData['Search'] != null && masterData['Search'].toString().isNotEmpty) {
+        _portStringController.text = masterData['Search'].toString();
+        _searchCtrl.text = masterData['Search'].toString();
+        _searchQuery = _searchCtrl.text;
+      }
 
       final empId = masterData['EmployeeId'] ?? masterData['EmployeeRefId'];
       final empName = masterData['EmployeeName'] ?? masterData['AccountName'] ?? 'Employee';
@@ -203,6 +209,10 @@ class _VesselPlanningWebViewState extends State<VesselPlanningWebView> {
           _toDate = DateTime.parse(toDateRaw.toString().split('T')[0]);
         }
       } catch (_) {}
+
+      // Reset master filter toggles since backend doesn't store them for saved plannings
+      _etaType = 3; 
+      _deliveryDone = false;
     });
   }
 
@@ -350,6 +360,26 @@ class _VesselPlanningWebViewState extends State<VesselPlanningWebView> {
         .add(SaveVesselPlanningEvent(planningList: planningList));
   }
 
+  void _deletePlanning() async {
+    final bool? ok = await ConfirmationMsgYesNo(context, 'Do You Want To Delete VESSEL PLANING ?');
+    if (ok == true) {
+      if (!mounted) return;
+      context
+          .read<VesselPlanningWebBloc>()
+          .add(DeleteVesselPlanningEvent(id: _currentMasterId));
+      setState(() {
+        _currentMasterId = 0;
+        _planningNoCtrl.clear();
+        _remarksCtrl.clear();
+        _portStringController.clear();
+        _searchCtrl.clear();
+        for (var element in _currentData) {
+          element.isChecked = false;
+        }
+      });
+    }
+  }
+
   void _showSavedPlanningsSheet(BuildContext context) {
     showModalBottomSheet(
       context: context,
@@ -420,6 +450,12 @@ class _VesselPlanningWebViewState extends State<VesselPlanningWebView> {
           ),
         ),
         actions: [
+          if (_currentMasterId > 0 && widget.pageDelete)
+            IconButton(
+              icon: const Icon(Icons.delete_outline, color: Colors.white),
+              tooltip: 'Delete Vessel Planning',
+              onPressed: _deletePlanning,
+            ),
           IconButton(
             icon: const Icon(Icons.folder_copy_outlined, color: Colors.white),
             tooltip: 'View Saved Plannings',
@@ -440,7 +476,7 @@ class _VesselPlanningWebViewState extends State<VesselPlanningWebView> {
 
           if (state is VesselPlanningWebLoaded) {
             if (state.dataList.isEmpty) {
-              msgshow('No Results', ' No data found for the selected criteria.', Colors.white, Colors.orangeAccent, null, 14, null, null, context, 2);
+              msgshow('No Results', ' No data found for the selected criteria.', Colors.white, colour.kHeaderGradEnd, null, 14, null, null, context, 2);
             }
             if (state.masterData != null) {
               _populateMasterData(state.masterData!);
@@ -813,18 +849,37 @@ class _VesselPlanningWebViewState extends State<VesselPlanningWebView> {
             ],
           ),
         ),
-        ListView.builder(
-          shrinkWrap: true,
-          physics: const ClampingScrollPhysics(),
-          padding: const EdgeInsets.fromLTRB(12, 4, 12, 80),
-          itemCount: filtered.length,
-          itemBuilder: (ctx, i) => _JobCard(
-            data: filtered[i],
-            onLongPress: () => _showUpdateSheet(context, filtered[i]),
-            onCheckChanged: (val) =>
-                setState(() => filtered[i].isChecked = val ?? false),
+        if (filtered.isEmpty)
+          Padding(
+            padding: const EdgeInsets.only(top: 40, bottom: 40),
+            child: Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Icon(Icons.search_off_rounded, size: 50, color: Colors.grey),
+                  const SizedBox(height: 12),
+                  Text('No Data Found',
+                      style: GoogleFonts.lato(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                          color: Colors.grey.shade600)),
+                ],
+              ),
+            ),
+          )
+        else
+          ListView.builder(
+            shrinkWrap: true,
+            physics: const ClampingScrollPhysics(),
+            padding: const EdgeInsets.fromLTRB(12, 4, 12, 80),
+            itemCount: filtered.length,
+            itemBuilder: (ctx, i) => _JobCard(
+              data: filtered[i],
+              onLongPress: () => _showUpdateSheet(context, filtered[i]),
+              onCheckChanged: (val) =>
+                  setState(() => filtered[i].isChecked = val ?? false),
+            ),
           ),
-        ),
       ],
     );
   }
@@ -843,10 +898,10 @@ class _TextFieldItem extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(label,
-            style: GoogleFonts.lato(fontSize: 12, fontWeight: FontWeight.w600)),
-        const SizedBox(height: 4),
+            style: GoogleFonts.lato(fontSize: 14, fontWeight: FontWeight.w600)),
+        const SizedBox(height: 6),
         Container(
-          height: 38,
+          height: 44,
           decoration: BoxDecoration(
             color: readOnly ? Colors.grey.shade200 : colour.kCardBg,
             borderRadius: BorderRadius.circular(8),
@@ -855,11 +910,11 @@ class _TextFieldItem extends StatelessWidget {
           child: TextField(
             controller: controller,
             readOnly: readOnly,
-            style: const TextStyle(fontSize: 12),
+            style: const TextStyle(fontSize: 14),
             decoration: const InputDecoration(
                 border: InputBorder.none,
                 contentPadding:
-                    EdgeInsets.symmetric(horizontal: 10, vertical: 10)),
+                    EdgeInsets.symmetric(horizontal: 10, vertical: 12)),
           ),
         ),
       ],
@@ -880,26 +935,26 @@ class _DateTile extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(label,
-            style: GoogleFonts.lato(fontSize: 12, fontWeight: FontWeight.w600)),
-        const SizedBox(height: 4),
+            style: GoogleFonts.lato(fontSize: 14, fontWeight: FontWeight.w600)),
+        const SizedBox(height: 6),
         InkWell(
           onTap: onTap,
           child: Container(
-            height: 38,
+            height: 44,
             decoration: BoxDecoration(
               color: colour.kCardBg,
               borderRadius: BorderRadius.circular(8),
               border: Border.all(color: AppTokens.maintCardBorder),
             ),
-            padding: const EdgeInsets.symmetric(horizontal: 8),
+            padding: const EdgeInsets.symmetric(horizontal: 10),
             child: Row(
               children: [
                 const Icon(Icons.calendar_today,
-                    size: 14, color: AppTokens.invoiceHeaderStart),
-                const SizedBox(width: 4),
+                    size: 16, color: AppTokens.invoiceHeaderStart),
+                const SizedBox(width: 8),
                 Expanded(
                     child: Text(date,
-                        style: const TextStyle(fontSize: 11),
+                        style: const TextStyle(fontSize: 14),
                         overflow: TextOverflow.ellipsis)),
               ],
             ),
