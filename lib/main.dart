@@ -69,10 +69,15 @@ Future<void> main() async {
       NotificationSettings settings = await messaging.requestPermission(
         alert: true,
         announcement: false,
-        badge: true,
+        badge: false, // Disable app icon badge
         carPlay: false,
         criticalAlert: false,
         provisional: false,
+        sound: true,
+      );
+      await messaging.setForegroundNotificationPresentationOptions(
+        alert: true,
+        badge: false, // Disable app icon badge in foreground
         sound: true,
       );
       AppGlobals.print_('User granted permission: ${settings.authorizationStatus}');

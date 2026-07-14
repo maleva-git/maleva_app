@@ -521,11 +521,10 @@ class _VesselPlanningWebViewState extends State<VesselPlanningWebView> {
       backgroundColor: Colors.white,
       collapsedBackgroundColor: Colors.white,
       children: [
-        // Top Row: Planning No, Date, ETA Date, To Date
+        // Top Row: Planning No, Planning Date
         Row(
           children: [
             Expanded(
-              flex: 2,
               child: _TextFieldItem(
                   label: "Planing No",
                   controller: _planningNoCtrl,
@@ -533,15 +532,18 @@ class _VesselPlanningWebViewState extends State<VesselPlanningWebView> {
             ),
             const SizedBox(width: 8),
             Expanded(
-              flex: 2,
               child: _DateTile(
                   label: "Planing Date",
                   date: DateFormat('dd/MM/yyyy').format(_planningDate),
                   onTap: () => _selectDate(context, 1)),
             ),
-            const SizedBox(width: 8),
+          ],
+        ),
+        const SizedBox(height: 12),
+        // Second Row: From Date, To Date
+        Row(
+          children: [
             Expanded(
-              flex: 2,
               child: _DateTile(
                   label: "From Date",
                   date: DateFormat('dd/MM/yyyy').format(_etaDate),
@@ -549,7 +551,6 @@ class _VesselPlanningWebViewState extends State<VesselPlanningWebView> {
             ),
             const SizedBox(width: 8),
             Expanded(
-              flex: 2,
               child: _DateTile(
                   label: "To Date",
                   date: DateFormat('dd/MM/yyyy').format(_toDate),
@@ -592,16 +593,15 @@ class _VesselPlanningWebViewState extends State<VesselPlanningWebView> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Expanded(
-              flex: 3,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text("Search Port",
                       style: GoogleFonts.lato(
-                          fontSize: 12, fontWeight: FontWeight.w600)),
-                  const SizedBox(height: 4),
+                          fontSize: 16, fontWeight: FontWeight.bold)),
+                  const SizedBox(height: 6),
                   Container(
-                    height: 40,
+                    height: 48,
                     decoration: BoxDecoration(
                       color: colour.kCardBg,
                       borderRadius: BorderRadius.circular(8),
@@ -609,26 +609,30 @@ class _VesselPlanningWebViewState extends State<VesselPlanningWebView> {
                     ),
                     child: TextField(
                       controller: _portStringController,
-                      style: const TextStyle(fontSize: 12),
+                      style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
                       decoration: const InputDecoration(
                           border: InputBorder.none,
                           contentPadding: EdgeInsets.symmetric(
-                              horizontal: 10, vertical: 10)),
+                              horizontal: 10, vertical: 12)),
                     ),
                   ),
                 ],
               ),
             ),
-            const SizedBox(width: 8),
+          ],
+        ),
+        const SizedBox(height: 12),
+        Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
             Expanded(
-              flex: 2,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text("Add Port",
                       style: GoogleFonts.lato(
-                          fontSize: 12, fontWeight: FontWeight.w600)),
-                  const SizedBox(height: 4),
+                          fontSize: 16, fontWeight: FontWeight.bold)),
+                  const SizedBox(height: 6),
                   InkWell(
                     onTap: () {
                       Navigator.push(
@@ -654,7 +658,7 @@ class _VesselPlanningWebViewState extends State<VesselPlanningWebView> {
                       });
                     },
                     child: Container(
-                      height: 40,
+                      height: 48,
                       decoration: BoxDecoration(
                         color: colour.kCardBg,
                         borderRadius: BorderRadius.circular(8),
@@ -663,7 +667,7 @@ class _VesselPlanningWebViewState extends State<VesselPlanningWebView> {
                       padding: const EdgeInsets.symmetric(horizontal: 10),
                       alignment: Alignment.centerLeft,
                       child: const Text('Select Port',
-                          style: TextStyle(fontSize: 12),
+                          style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
                           overflow: TextOverflow.ellipsis),
                     ),
                   ),
@@ -672,14 +676,13 @@ class _VesselPlanningWebViewState extends State<VesselPlanningWebView> {
             ),
             const SizedBox(width: 8),
             Expanded(
-              flex: 2,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text("Employee",
                       style: GoogleFonts.lato(
-                          fontSize: 12, fontWeight: FontWeight.w600)),
-                  const SizedBox(height: 4),
+                          fontSize: 16, fontWeight: FontWeight.bold)),
+                  const SizedBox(height: 6),
                   InkWell(
                     onTap: () async {
                       await OnlineApi.SelectEmployee(context, 'Sales', '');
@@ -694,7 +697,7 @@ class _VesselPlanningWebViewState extends State<VesselPlanningWebView> {
                       }
                     },
                     child: Container(
-                      height: 40,
+                      height: 48,
                       decoration: BoxDecoration(
                         color: colour.kCardBg,
                         borderRadius: BorderRadius.circular(8),
@@ -704,7 +707,7 @@ class _VesselPlanningWebViewState extends State<VesselPlanningWebView> {
                       alignment: Alignment.centerLeft,
                       child: Text(
                         _selectedEmployee?.AccountName ?? 'Select Emp',
-                        style: const TextStyle(fontSize: 12),
+                        style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
                         overflow: TextOverflow.ellipsis,
                       ),
                     ),
@@ -715,20 +718,19 @@ class _VesselPlanningWebViewState extends State<VesselPlanningWebView> {
           ],
         ),
         const SizedBox(height: 12),
-        // Remarks and Action Buttons
+        // Remarks
         Row(
           children: [
             Expanded(
-              flex: 3,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text("Remarks",
                       style: GoogleFonts.lato(
-                          fontSize: 12, fontWeight: FontWeight.w600)),
-                  const SizedBox(height: 4),
+                          fontSize: 16, fontWeight: FontWeight.bold)),
+                  const SizedBox(height: 6),
                   Container(
-                    height: 40,
+                    height: 48,
                     decoration: BoxDecoration(
                       color: colour.kCardBg,
                       borderRadius: BorderRadius.circular(8),
@@ -736,52 +738,49 @@ class _VesselPlanningWebViewState extends State<VesselPlanningWebView> {
                     ),
                     child: TextField(
                       controller: _remarksCtrl,
-                      style: const TextStyle(fontSize: 12),
+                      style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
                       decoration: const InputDecoration(
                           border: InputBorder.none,
                           contentPadding: EdgeInsets.symmetric(
-                              horizontal: 10, vertical: 10)),
+                              horizontal: 10, vertical: 12)),
                     ),
                   ),
                 ],
               ),
             ),
-            const SizedBox(width: 16),
+          ],
+        ),
+        const SizedBox(height: 16),
+        // Action Buttons
+        Row(
+          children: [
             Expanded(
-              flex: 2,
-              child: Column(
-                children: [
-                  const SizedBox(height: 18),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: ElevatedButton(
-                          onPressed: _doSearch,
-                          style: ElevatedButton.styleFrom(
-                              backgroundColor: colour.kHeaderGradEnd,
-                              foregroundColor: Colors.white,
-                              padding:
-                                  const EdgeInsets.symmetric(horizontal: 4)),
-                          child: const Text('VIEW',
-                              style: TextStyle(fontSize: 11)),
-                        ),
-                      ),
-                      const SizedBox(width: 4),
-                      Expanded(
-                        child: ElevatedButton(
-                          onPressed: () => _savePlanning(context),
-                          style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.green,
-                              foregroundColor: Colors.white,
-                              padding:
-                                  const EdgeInsets.symmetric(horizontal: 4)),
-                          child: const Text('SAVE',
-                              style: TextStyle(fontSize: 11)),
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
+              child: SizedBox(
+                height: 48,
+                child: ElevatedButton(
+                  onPressed: _doSearch,
+                  style: ElevatedButton.styleFrom(
+                      backgroundColor: colour.kHeaderGradEnd,
+                      foregroundColor: Colors.white,
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8))),
+                  child: const Text('VIEW',
+                      style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold)),
+                ),
+              ),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: SizedBox(
+                height: 48,
+                child: ElevatedButton(
+                  onPressed: () => _savePlanning(context),
+                  style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.green,
+                      foregroundColor: Colors.white,
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8))),
+                  child: const Text('SAVE',
+                      style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold)),
+                ),
               ),
             ),
           ],
@@ -898,10 +897,10 @@ class _TextFieldItem extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(label,
-            style: GoogleFonts.lato(fontSize: 14, fontWeight: FontWeight.w600)),
+            style: GoogleFonts.lato(fontSize: 16, fontWeight: FontWeight.bold)),
         const SizedBox(height: 6),
         Container(
-          height: 44,
+          height: 48,
           decoration: BoxDecoration(
             color: readOnly ? Colors.grey.shade200 : colour.kCardBg,
             borderRadius: BorderRadius.circular(8),
@@ -910,7 +909,7 @@ class _TextFieldItem extends StatelessWidget {
           child: TextField(
             controller: controller,
             readOnly: readOnly,
-            style: const TextStyle(fontSize: 14),
+            style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
             decoration: const InputDecoration(
                 border: InputBorder.none,
                 contentPadding:
@@ -935,12 +934,12 @@ class _DateTile extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(label,
-            style: GoogleFonts.lato(fontSize: 14, fontWeight: FontWeight.w600)),
+            style: GoogleFonts.lato(fontSize: 16, fontWeight: FontWeight.bold)),
         const SizedBox(height: 6),
         InkWell(
           onTap: onTap,
           child: Container(
-            height: 44,
+            height: 48,
             decoration: BoxDecoration(
               color: colour.kCardBg,
               borderRadius: BorderRadius.circular(8),
@@ -950,11 +949,11 @@ class _DateTile extends StatelessWidget {
             child: Row(
               children: [
                 const Icon(Icons.calendar_today,
-                    size: 16, color: AppTokens.invoiceHeaderStart),
+                    size: 18, color: AppTokens.invoiceHeaderStart),
                 const SizedBox(width: 8),
                 Expanded(
                     child: Text(date,
-                        style: const TextStyle(fontSize: 14),
+                        style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
                         overflow: TextOverflow.ellipsis)),
               ],
             ),
