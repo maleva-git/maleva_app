@@ -89,10 +89,22 @@ class VesselPlanningWebBloc extends Bloc<VesselPlanningWebEvent, VesselPlanningW
         emit(VesselPlanningWebError(message: e.toString()));
       }
     });
+
+    on<DeleteVesselPlanningEvent>((event, emit) async {
+      final currentState = state;
+      emit(VesselPlanningWebActionLoading());
+      try {
+        final message = await repository.deleteVesselPlanning(event.id);
+        emit(VesselPlanningWebActionSuccess(message));
+        // After deletion, we do not emit Loaded with old data because it's deleted.
+        // We leave it to the UI to reset or fetch empty state.
+      } catch (e) {
+        emit(VesselPlanningWebError(message: e.toString()));
+        if (currentState is VesselPlanningWebLoaded) {
+          emit(VesselPlanningWebLoaded(dataList: currentState.dataList, planningNo: currentState.planningNo, masterData: currentState.masterData));
+        }
+      }
+    });
   }
-
-
-
-
 
 }

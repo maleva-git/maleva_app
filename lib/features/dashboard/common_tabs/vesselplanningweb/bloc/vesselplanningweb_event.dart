@@ -74,3 +74,12 @@ class LoadPlanningForEditEvent extends VesselPlanningWebEvent {
   @override
   List<Object> get props => [planningMaster];
 }
+
+class DeleteVesselPlanningEvent extends VesselPlanningWebEvent {
+  final int id;
+
+  const DeleteVesselPlanningEvent({required this.id});
+
+  @override
+  List<Object> get props => [id];
+}

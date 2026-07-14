@@ -221,13 +221,13 @@ class _VesselPlanningUpdateSheetState extends State<VesselPlanningUpdateSheet> {
                     alignment: Alignment.centerLeft,
                     padding: const EdgeInsets.symmetric(horizontal: 10),
                     decoration: BoxDecoration(
-                      border: Border.all(color: Colors.grey.shade300),
+                      border: Border.all(color: AppTokens.maintCardBorder),
                       borderRadius: BorderRadius.circular(4),
-                      color: Colors.grey.shade50,
+                      color: colour.kCardBg,
                     ),
                     child: Text(
                       widget.jobData.jobNo.isNotEmpty ? widget.jobData.jobNo : widget.jobData.saleOrderMasterRefId.toString(),
-                      style: GoogleFonts.lato(fontSize: 13, color: Colors.black87),
+                      style: GoogleFonts.lato(fontSize: 13, color: colour.kTextDark),
                     ),
                   ), null, null),
                   const SizedBox(height: 8),
@@ -259,15 +259,15 @@ class _VesselPlanningUpdateSheetState extends State<VesselPlanningUpdateSheet> {
                         contentPadding: const EdgeInsets.symmetric(horizontal: 10),
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(4),
-                          borderSide: BorderSide(color: Colors.grey.shade300),
+                          borderSide: BorderSide(color: AppTokens.maintCardBorder),
                         ),
                         enabledBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(4),
-                          borderSide: BorderSide(color: Colors.grey.shade300),
+                          borderSide: BorderSide(color: AppTokens.maintCardBorder),
                         ),
                         focusedBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(4),
-                          borderSide: BorderSide(color: Colors.grey.shade400),
+                          borderSide: const BorderSide(color: AppTokens.invoiceHeaderStart),
                         ),
                       ),
                     ),
@@ -275,25 +275,35 @@ class _VesselPlanningUpdateSheetState extends State<VesselPlanningUpdateSheet> {
                   
                   const SizedBox(height: 20),
                   
-                  SizedBox(
+                  Container(
                     width: double.infinity,
                     height: 42,
-                    child: ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.grey.shade200,
-                        foregroundColor: Colors.black87,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(4),
-                          side: BorderSide(color: Colors.grey.shade300),
+                    decoration: BoxDecoration(
+                      gradient: _kGrad,
+                      borderRadius: BorderRadius.circular(4),
+                      boxShadow: [
+                        BoxShadow(
+                          color: AppTokens.invoiceHeaderStart.withOpacity(0.3),
+                          blurRadius: 6,
+                          offset: const Offset(0, 3),
                         ),
-                        elevation: 0,
-                      ),
-                      onPressed: _submitUpdate,
-                      child: Text(
-                        'SAVE ALL',
-                        style: GoogleFonts.lato(
-                          fontWeight: FontWeight.w800,
-                          fontSize: 14,
+                      ],
+                    ),
+                    child: Material(
+                      color: Colors.transparent,
+                      child: InkWell(
+                        borderRadius: BorderRadius.circular(4),
+                        onTap: _submitUpdate,
+                        child: Center(
+                          child: Text(
+                            'SAVE ALL',
+                            style: GoogleFonts.lato(
+                              fontWeight: FontWeight.w800,
+                              fontSize: 14,
+                              color: Colors.white,
+                              letterSpacing: 0.5,
+                            ),
+                          ),
                         ),
                       ),
                     ),
@@ -330,7 +340,7 @@ class _VesselPlanningUpdateSheetState extends State<VesselPlanningUpdateSheet> {
         child: Container(
           height: 36,
           decoration: BoxDecoration(
-            border: Border.all(color: Colors.grey.shade300),
+            border: Border.all(color: AppTokens.maintCardBorder),
             borderRadius: BorderRadius.circular(4),
           ),
           child: Row(
@@ -340,21 +350,21 @@ class _VesselPlanningUpdateSheetState extends State<VesselPlanningUpdateSheet> {
                   padding: const EdgeInsets.only(left: 10),
                   child: Text(
                     _formatDisplayDate(ctrl.text),
-                    style: GoogleFonts.lato(fontSize: 13, color: Colors.black87),
+                    style: GoogleFonts.lato(fontSize: 13, color: colour.kTextDark),
                   ),
                 ),
               ),
               Container(
                 width: 50,
-                decoration: BoxDecoration(
-                  border: Border(left: BorderSide(color: Colors.grey.shade300)),
-                  color: Colors.grey.shade50,
+                decoration: const BoxDecoration(
+                  border: Border(left: BorderSide(color: AppTokens.maintCardBorder)),
+                  color: colour.kCardBg,
                 ),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: const [
-                    Icon(Icons.calendar_month, size: 14, color: Colors.grey),
-                    Icon(Icons.access_time, size: 14, color: Colors.grey),
+                    Icon(Icons.calendar_month, size: 14, color: AppTokens.planTextMuted),
+                    Icon(Icons.access_time, size: 14, color: AppTokens.planTextMuted),
                   ],
                 ),
               )
@@ -367,7 +377,8 @@ class _VesselPlanningUpdateSheetState extends State<VesselPlanningUpdateSheet> {
         onChanged: (v) => onChanged(v ?? false),
         materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
         visualDensity: const VisualDensity(horizontal: -4, vertical: -4),
-        activeColor: Colors.grey.shade600,
+        activeColor: AppTokens.invoiceHeaderStart,
+        side: const BorderSide(color: AppTokens.planTextMuted),
       ),
       true
     );
@@ -388,7 +399,7 @@ class _VesselPlanningUpdateSheetState extends State<VesselPlanningUpdateSheet> {
         child: Container(
           height: 36,
           decoration: BoxDecoration(
-            border: Border.all(color: Colors.grey.shade300),
+            border: Border.all(color: AppTokens.maintCardBorder),
             borderRadius: BorderRadius.circular(4),
           ),
           child: Row(
@@ -398,14 +409,14 @@ class _VesselPlanningUpdateSheetState extends State<VesselPlanningUpdateSheet> {
                   padding: const EdgeInsets.only(left: 10),
                   child: Text(
                     emp?.AccountName ?? 'Select Employee',
-                    style: GoogleFonts.lato(fontSize: 13, color: emp == null ? Colors.grey : Colors.black87),
+                    style: GoogleFonts.lato(fontSize: 13, color: emp == null ? AppTokens.planTextMuted : colour.kTextDark),
                     overflow: TextOverflow.ellipsis,
                   ),
                 ),
               ),
               const Padding(
                 padding: EdgeInsets.only(right: 8),
-                child: Icon(Icons.arrow_drop_down, color: Colors.grey),
+                child: Icon(Icons.arrow_drop_down, color: AppTokens.planTextMuted),
               )
             ],
           ),
@@ -424,7 +435,7 @@ class _VesselPlanningUpdateSheetState extends State<VesselPlanningUpdateSheet> {
           width: 90,
           child: Text(
             label.replaceAll(r'\n', '\n'),
-            style: GoogleFonts.lato(fontSize: 12, fontWeight: FontWeight.w600, color: Colors.black87),
+            style: GoogleFonts.lato(fontSize: 12, fontWeight: FontWeight.w600, color: colour.kTextDark),
           ),
         ),
         Expanded(child: child),
@@ -433,23 +444,35 @@ class _VesselPlanningUpdateSheetState extends State<VesselPlanningUpdateSheet> {
           child: checkbox != null ? Center(child: checkbox) : const SizedBox.shrink(),
         ),
         if (hasSave == true)
-          SizedBox(
+          Container(
             width: 70,
             height: 32,
-            child: ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.grey.shade100,
-                foregroundColor: Colors.black87,
-                padding: EdgeInsets.zero,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(4),
+            decoration: BoxDecoration(
+              gradient: _kGrad,
+              borderRadius: BorderRadius.circular(4),
+              boxShadow: [
+                BoxShadow(
+                  color: AppTokens.invoiceHeaderStart.withOpacity(0.2),
+                  blurRadius: 4,
+                  offset: const Offset(0, 2),
                 ),
-                elevation: 0,
-              ),
-              onPressed: _submitUpdate,
-              child: Text(
-                'SAVE',
-                style: GoogleFonts.lato(fontSize: 12, fontWeight: FontWeight.w700),
+              ],
+            ),
+            child: Material(
+              color: Colors.transparent,
+              child: InkWell(
+                borderRadius: BorderRadius.circular(4),
+                onTap: _submitUpdate,
+                child: Center(
+                  child: Text(
+                    'SAVE',
+                    style: GoogleFonts.lato(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w700,
+                      color: Colors.white,
+                    ),
+                  ),
+                ),
               ),
             ),
           )
