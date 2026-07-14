@@ -27,18 +27,17 @@ class LocalNotificationService {
     _notificationsPlugin.resolvePlatformSpecificImplementation<
         AndroidFlutterLocalNotificationsPlugin>()?.requestNotificationsPermission();
     if (Platform.isIOS) {
-      // ignore: unused_element
       requestIOSPermission() {
         flutterLocalNotificationsPlugin.resolvePlatformSpecificImplementation<IOSFlutterLocalNotificationsPlugin>()!.requestPermissions(
           alert: true,
-          badge: true,
+          badge: false, // Disabled badge
           sound: true,
         );
       }
 
       final DarwinInitializationSettings initializationSettingsIOS = DarwinInitializationSettings(
           requestSoundPermission: true,
-          requestBadgePermission: true,
+          requestBadgePermission: false, // Disabled badge
           requestAlertPermission: true,
           // onDidReceiveLocalNotification: (
           //     int id,
@@ -108,10 +107,10 @@ class LocalNotificationService {
           ]
               : null,
           presentAlert: true, // Present an alert when the notification is displayed and the application is in the foreground (only from iOS 10 onwards)
-          presentBadge: true, // Present the badge number when the notification is displayed and the application is in the foreground (only from iOS 10 onwards)
+          presentBadge: false, // DO NOT present the badge number when the notification is displayed
           presentSound: true, // Play a sound when the notification is displayed and the application is in the foreground (only from iOS 10 onwards)
           // sound: String?,  // Specifics the file path to play (only from iOS 10 onwards)
-          badgeNumber: 1,
+          badgeNumber: 0, // Set badge to 0
           // The application's icon badge number
           // attachments: List<IOSNotificationAttachment>?, (only from iOS 10 onwards)
           // subtitle: String?, //Secondary description  (only from iOS 10 onwards)
@@ -166,6 +165,7 @@ class LocalNotificationService {
             importance: Importance.max,
             priority: Priority.high,
             playSound: true,
+            channelShowBadge: false, // Disable app icon badge for this channel
             styleInformation: bigPictureStyleInformation);
         final id = DateTime.now().millisecondsSinceEpoch ~/ 1000;
 
