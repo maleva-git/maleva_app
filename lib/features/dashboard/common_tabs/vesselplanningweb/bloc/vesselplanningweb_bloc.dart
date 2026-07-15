@@ -105,6 +105,23 @@ class VesselPlanningWebBloc extends Bloc<VesselPlanningWebEvent, VesselPlanningW
         }
       }
     });
+
+    on<FetchVesselPlanningPdfEvent>((event, emit) async {
+      try {
+        final pdfUrl = await repository.fetchVesselPlanningPdfUrl(
+          planningNo: event.planningNo,
+          soId: event.id,
+        );
+
+        if (pdfUrl != null && pdfUrl.isNotEmpty) {
+          emit(VesselPlanningPdfLaunchSuccess(pdfUrl));
+        } else {
+          emit(const VesselPlanningPdfLaunchError("Failed to fetch PDF URL from server."));
+        }
+      } catch (e) {
+        emit(VesselPlanningPdfLaunchError("Error loading PDF: ${e.toString()}"));
+      }
+    });
   }
 
 }

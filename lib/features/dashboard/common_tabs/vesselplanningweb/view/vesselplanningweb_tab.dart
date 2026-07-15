@@ -89,6 +89,7 @@ class VesselPlanningWebView extends StatefulWidget {
 class _VesselPlanningWebViewState extends State<VesselPlanningWebView> {
   // Data State
   List<VesselPlanningWebModel> _currentData = [];
+  bool _isSortMode = false;
   String _searchQuery = '';
   final TextEditingController _searchCtrl = TextEditingController();
 
@@ -287,6 +288,7 @@ class _VesselPlanningWebViewState extends State<VesselPlanningWebView> {
                   "JobNo": e.jobNo,
                   "JobDate": e.jobDate,
                   "JobStatus": e.jobStatus,
+                  "SortBy": e.sortBy,
                   "SCN": e.scn,
                   "LScn": e.lscn,
                   "VesselType": "",
@@ -488,7 +490,7 @@ class _VesselPlanningWebViewState extends State<VesselPlanningWebView> {
               state is VesselPlanningWebActionLoading;
 
           if (state is VesselPlanningWebLoaded) {
-            _currentData = state.dataList;
+            _currentData = List.from(state.dataList)..sort((a, b) => a.sortBy.compareTo(b.sortBy));
           }
 
           return ListView(
@@ -842,9 +844,25 @@ class _VesselPlanningWebViewState extends State<VesselPlanningWebView> {
                       fontSize: 12,
                       fontWeight: FontWeight.w600)),
               const Spacer(),
-              Text('Long press a card to edit',
-                  style: GoogleFonts.lato(
-                      color: AppTokens.planTextMuted, fontSize: 11)),
+              if (filtered.isNotEmpty)
+                TextButton.icon(
+                  onPressed: () {
+                    if (_searchQuery.isNotEmpty) {
+                      msgshow('Cannot Sort', 'Please clear the search filter before sorting.', Colors.white, Colors.orangeAccent, null, 14, null, null, context, 2);
+                      return;
+                    }
+                    setState(() {
+                      _isSortMode = !_isSortMode;
+                    });
+                  },
+                  icon: Icon(_isSortMode ? Icons.check : Icons.sort, size: 16, color: _isSortMode ? Colors.green : AppTokens.planTextMuted),
+                  label: Text(_isSortMode ? 'DONE' : 'SORT', style: TextStyle(fontSize: 12, color: _isSortMode ? Colors.green : AppTokens.planTextMuted, fontWeight: FontWeight.bold)),
+                  style: TextButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    minimumSize: Size.zero,
+                    tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                  ),
+                ),
             ],
           ),
         ),
@@ -866,6 +884,35 @@ class _VesselPlanningWebViewState extends State<VesselPlanningWebView> {
               ),
             ),
           )
+        else if (_isSortMode)
+          ReorderableListView.builder(
+            buildDefaultDragHandles: false,
+            shrinkWrap: true,
+            physics: const ClampingScrollPhysics(),
+            padding: const EdgeInsets.fromLTRB(12, 4, 12, 80),
+            itemCount: filtered.length,
+            onReorder: (oldIndex, newIndex) {
+              setState(() {
+                if (newIndex > oldIndex) {
+                  newIndex -= 1;
+                }
+                final item = _currentData.removeAt(oldIndex);
+                _currentData.insert(newIndex, item);
+                for (int i = 0; i < _currentData.length; i++) {
+                  _currentData[i].sortBy = i + 1;
+                }
+              });
+            },
+            itemBuilder: (ctx, i) => _JobCard(
+              key: ValueKey(filtered[i].saleOrderMasterRefId),
+              index: i,
+              isSortMode: true,
+              data: filtered[i],
+              onLongPress: () => _showUpdateSheet(context, filtered[i]),
+              onCheckChanged: (val) =>
+                  setState(() => filtered[i].isChecked = val ?? false),
+            ),
+          )
         else
           ListView.builder(
             shrinkWrap: true,
@@ -873,6 +920,7 @@ class _VesselPlanningWebViewState extends State<VesselPlanningWebView> {
             padding: const EdgeInsets.fromLTRB(12, 4, 12, 80),
             itemCount: filtered.length,
             itemBuilder: (ctx, i) => _JobCard(
+              key: ValueKey(filtered[i].saleOrderMasterRefId),
               data: filtered[i],
               onLongPress: () => _showUpdateSheet(context, filtered[i]),
               onCheckChanged: (val) =>
@@ -1003,11 +1051,16 @@ class _JobCard extends StatelessWidget {
   final VesselPlanningWebModel data;
   final VoidCallback onLongPress;
   final ValueChanged<bool?> onCheckChanged;
+  final bool isSortMode;
+  final int index;
 
   const _JobCard({
+    super.key,
     required this.data,
     required this.onLongPress,
     required this.onCheckChanged,
+    this.isSortMode = false,
+    this.index = 0,
   });
 
   @override
@@ -1055,27 +1108,36 @@ class _JobCard extends StatelessWidget {
               ),
               child: Row(
                 children: [
-                  // Checkbox
-                  GestureDetector(
-                    onTap: () => onCheckChanged(!data.isChecked),
-                    child: AnimatedContainer(
-                      duration: const Duration(milliseconds: 180),
-                      width: 20,
-                      height: 20,
-                      decoration: BoxDecoration(
-                        gradient: data.isChecked ? kGradient : null,
-                        border: data.isChecked
-                            ? null
-                            : Border.all(
-                                color: AppTokens.maintCardBorder, width: 1.5),
-                        borderRadius: BorderRadius.circular(5),
+                  // Checkbox or Drag Handle
+                  if (isSortMode)
+                    ReorderableDragStartListener(
+                      index: index,
+                      child: const Padding(
+                        padding: EdgeInsets.only(right: 8.0),
+                        child: Icon(Icons.drag_handle_rounded, color: Colors.grey, size: 24),
                       ),
-                      child: data.isChecked
-                          ? const Icon(Icons.check_rounded,
-                              size: 13, color: Colors.white)
-                          : null,
+                    )
+                  else
+                    GestureDetector(
+                      onTap: () => onCheckChanged(!data.isChecked),
+                      child: AnimatedContainer(
+                        duration: const Duration(milliseconds: 180),
+                        width: 20,
+                        height: 20,
+                        decoration: BoxDecoration(
+                          gradient: data.isChecked ? kGradient : null,
+                          border: data.isChecked
+                              ? null
+                              : Border.all(
+                                  color: AppTokens.maintCardBorder, width: 1.5),
+                          borderRadius: BorderRadius.circular(5),
+                        ),
+                        child: data.isChecked
+                            ? const Icon(Icons.check_rounded,
+                                size: 13, color: Colors.white)
+                            : null,
+                      ),
                     ),
-                  ),
                   const SizedBox(width: 10),
                   Expanded(
                     child: Text(
