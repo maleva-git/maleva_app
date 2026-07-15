@@ -65,6 +65,7 @@ class VesselPlanningWebModel {
   String employeeName;
   String remarks;
   bool isChecked;
+  int sortBy;
 
   VesselPlanningWebModel({
     required this.id,
@@ -133,6 +134,7 @@ class VesselPlanningWebModel {
     required this.employeeName,
     required this.remarks,
     this.isChecked = false,
+    required this.sortBy,
   });
 
   static int _parseInt(dynamic value) {
@@ -219,9 +221,10 @@ class VesselPlanningWebModel {
       boardingAmount: _parseDouble(json['BoardingAmount']),
       boardingAmount1: _parseDouble(json['BoardingAmount1']),
       customerName: _parseString(json['CustomerName']),
-      employeeName: _parseString(json['EmployeeName']),
-      remarks: _parseString(json['Remarks']),
+      employeeName: json['EmployeeName']?.toString() ?? '',
+      remarks: json['Remarks']?.toString() ?? '',
       isChecked: false,
+      sortBy: json['SortBy'] ?? 0,
     );
   }
 }

@@ -1,6 +1,8 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import '../../../../../core/utils/app_globals.dart';
+import '../../../../../core/network/api_client.dart';
+import 'package:maleva/core/models/model.dart';
 import '../models/vesselplanningweb_model.dart';
 
 class VesselPlanningWebRepository {
@@ -331,5 +333,25 @@ class VesselPlanningWebRepository {
       // ignore
     }
     return "";
+  }
+
+  Future<String?> fetchVesselPlanningPdfUrl({
+    required int soId,
+    required String planningNo,
+  }) async {
+    final Map<String, dynamic> body = {
+      'SoId': soId,
+      'Comid': AppGlobals.Comid,
+    };
+
+    final result = await ApiClient.postRequest("${AppGlobals.apiViewVesselPlanningPdf}$planningNo", body);
+
+    if (result != null && result.toString().isNotEmpty) {
+      ResponseViewModel value = ResponseViewModel.fromJson(result);
+      if (value.IsSuccess == true) {
+        return value.data1;
+      }
+    }
+    return null;
   }
 }

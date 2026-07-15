@@ -42,3 +42,21 @@ class VesselPlanningWebError extends VesselPlanningWebState {
   @override
   List<Object> get props => [message];
 }
+
+class VesselPlanningPdfLaunchSuccess extends VesselPlanningWebState {
+  final String url;
+
+  const VesselPlanningPdfLaunchSuccess(this.url);
+
+  @override
+  List<Object> get props => [url];
+}
+
+class VesselPlanningPdfLaunchError extends VesselPlanningWebState {
+  final String message;
+
+  const VesselPlanningPdfLaunchError(this.message);
+
+  @override
+  List<Object> get props => [message];
+}

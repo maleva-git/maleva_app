@@ -10,9 +10,14 @@ import '../../../../../core/utils/dialog_helper.dart';
 import '../data/vesselplanningweb_repository.dart';
 import '../bloc/vesselplanningweb_bloc.dart';
 import '../bloc/vesselplanningweb_event.dart';
+import 'dart:io';
+import 'package:http/http.dart' as http;
+import 'package:open_file/open_file.dart';
+import 'package:path_provider/path_provider.dart';
 import '../../../../../core/models/model.dart';
 import '../../../../../core/network/OnlineApi.dart' as OnlineApi;
 import '../../../../mastersearch/Employee.dart';
+import '../bloc/vesselplanningweb_state.dart';
 
 class VesselPlanningSavedSheet extends StatefulWidget {
   const VesselPlanningSavedSheet({super.key});
@@ -111,9 +116,81 @@ class _VesselPlanningSavedSheetState extends State<VesselPlanningSavedSheet> {
 
   }
 
+  // ── Download PDF to temp file then open with device viewer ──────────────────
+  Future<void> _openPdf(BuildContext context, String url) async {
+    try {
+      showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (ctx) => AlertDialog(
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          content: Row(
+            children: [
+              const SpinKitFadingCircle(color: colour.kHeaderGradEnd, size: 30),
+              const SizedBox(width: 20),
+              Text("Loading PDF...",
+                  style: GoogleFonts.lato(fontSize: 16, fontWeight: FontWeight.bold)),
+            ],
+          ),
+        ),
+      );
+
+      final response = await http.get(Uri.parse(url));
+
+      if (!context.mounted) return;
+      Navigator.pop(context); // Close dialog
+
+      if (response.statusCode == 200) {
+        final dir = await getTemporaryDirectory();
+        final file = File('${dir.path}/vp_${DateTime.now().millisecondsSinceEpoch}.pdf');
+        await file.writeAsBytes(response.bodyBytes);
+
+        final result = await OpenFile.open(file.path);
+        if (result.type != ResultType.done && context.mounted) {
+          showDialog(
+            context: context,
+            builder: (ctx) => AlertDialog(
+              title: const Text("Error"),
+              content: Text("Could not open PDF: ${result.message}"),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(ctx),
+                  child: const Text("OK"),
+                )
+              ],
+            ),
+          );
+        }
+      } else {
+        if (context.mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text("Failed to download PDF (${response.statusCode})")),
+          );
+        }
+      }
+    } catch (e) {
+      if (!context.mounted) return;
+      Navigator.pop(context);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Error: ${e.toString()}")),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Container(
+    return BlocListener<VesselPlanningWebBloc, VesselPlanningWebState>(
+      listenWhen: (prev, curr) => curr is VesselPlanningPdfLaunchSuccess || curr is VesselPlanningPdfLaunchError,
+      listener: (context, state) async {
+        if (state is VesselPlanningPdfLaunchSuccess) {
+          await _openPdf(context, state.url);
+        } else if (state is VesselPlanningPdfLaunchError) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(state.message), backgroundColor: Colors.red),
+          );
+        }
+      },
+      child: Container(
       decoration: BoxDecoration(
         color: colour.kPageBg,
         borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
@@ -332,6 +409,7 @@ class _VesselPlanningSavedSheetState extends State<VesselPlanningSavedSheet> {
           ),
         ],
       ),
+      ),
     );
   }
 
@@ -421,9 +499,33 @@ class _VesselPlanningSavedSheetState extends State<VesselPlanningSavedSheet> {
                     children: [
                       Icon(Icons.description_outlined, size: 20, color: colour.kHeaderGradEnd),
                       const SizedBox(width: 8),
-                      Text(
-                        planningNo,
-                        style: GoogleFonts.lato(color: colour.kTextDark, fontSize: 15, fontWeight: FontWeight.bold),
+                      Expanded(
+                        child: Text(
+                          planningNo,
+                          style: GoogleFonts.lato(color: colour.kTextDark, fontSize: 15, fontWeight: FontWeight.bold),
+                        ),
+                      ),
+                      GestureDetector(
+                        behavior: HitTestBehavior.opaque,
+                        onTap: () {
+                          context.read<VesselPlanningWebBloc>().add(FetchVesselPlanningPdfEvent(planningNo: planningNo, id: id));
+                        },
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                          decoration: BoxDecoration(
+                            color: Colors.red.withValues(alpha: 0.1),
+                            borderRadius: BorderRadius.circular(20),
+                            border: Border.all(color: Colors.red.withValues(alpha: 0.3)),
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              const Icon(Icons.picture_as_pdf_outlined, size: 14, color: Colors.red),
+                              const SizedBox(width: 4),
+                              Text("PDF", style: GoogleFonts.lato(fontSize: 10, fontWeight: FontWeight.bold, color: Colors.red)),
+                            ],
+                          ),
+                        ),
                       ),
                     ],
                   ),
