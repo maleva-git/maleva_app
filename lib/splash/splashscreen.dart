@@ -187,6 +187,18 @@ class _SplashScreenState extends State<SplashScreen>
           );
 
         }
+        else if (AppPreferences.getRoleId() == 600)
+        {
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+              builder: (_) => BlocProvider(
+                create: (_) => BoardingTabBloc(),
+                child: const BoardingDashboard(),
+              ),
+            ),
+          );
+        }
         else if(AppGlobals.storagenew.getString('RulesType') == "ADMIN")
         {
           Navigator.pushReplacement(
@@ -323,18 +335,7 @@ class _SplashScreenState extends State<SplashScreen>
           );
 
         }
-        else if(AppGlobals.storagenew.getString('RulesType') == "BOARDING")
-        {
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(
-              builder: (_) => BlocProvider(
-                create: (_) => BoardingTabBloc(),
-                child: const BoardingDashboard(),
-              ),
-            ),
-          );
-        }
+
     // case "HRADMIN":
     // Navigator.pushReplacement(
     // context,

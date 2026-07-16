@@ -33,7 +33,7 @@ import '../../../dashboard/warehouse_dashboard/view/warehouse_dashboard.dart';
 import '../bloc/auth_bloc.dart';
 import '../bloc/auth_state.dart';
 import 'login_design.dart';
-
+import '../../../../core/utils/app_preferences.dart';
 
 class Appuserloginmobile extends StatelessWidget {
   const Appuserloginmobile ({super.key});
@@ -74,6 +74,19 @@ class Appuserloginmobile extends StatelessWidget {
           builder: (_) => BlocProvider(
             create: (_) => DriverDashboardBloc(),
             child: const DriverDashboard(),
+          ),
+        ),
+      );
+      return;
+    }
+
+    if (AppPreferences.getRoleId() == 600) {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (_) => BlocProvider(
+            create: (_) => BoardingTabBloc(),
+            child: const BoardingDashboard(),
           ),
         ),
       );
@@ -173,17 +186,6 @@ class Appuserloginmobile extends StatelessWidget {
             builder: (_) => BlocProvider(
               create: (_) => OperationTabBloc(),
               child: const OperationDashboard(),
-            ),
-          ),
-        );
-        break;
-      case "BOARDING":
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(
-            builder: (_) => BlocProvider(
-              create: (_) => BoardingTabBloc(),
-              child: const BoardingDashboard(),
             ),
           ),
         );

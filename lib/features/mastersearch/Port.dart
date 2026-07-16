@@ -3,7 +3,8 @@ import 'package:maleva/core/colors/colors.dart' as colour;
 import 'package:maleva/core/utils/app_globals.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
-
+import 'package:maleva/core/utils/app_preferences.dart';
+import 'package:maleva/core/network/OnlineApi.dart' as OnlineApi;
 class Port extends StatefulWidget {
   final int Searchby;
   final int SearchId;
@@ -88,10 +89,19 @@ class _Portstate extends State<Port> {
     super.dispose();
   }
   Future startup() async {
+    if (AppPreferences.getRoleId() == 600) {
+      List<String> apiPorts = await OnlineApi.GetEmployeeport(context);
+      if (apiPorts.isNotEmpty) {
+        PortList = apiPorts;
+      }
+    }
+
     filtersearchlist = PortList;
-    setState(() {
-      progress = true;
-    });
+    if (mounted) {
+      setState(() {
+        progress = true;
+      });
+    }
   }
 
   void search(value) {

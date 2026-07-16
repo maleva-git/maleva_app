@@ -1153,4 +1153,20 @@ Future SelectRTIViewList(context,String Fromdate,String Todate,int DId, int TId,
     if (error.toString() == "") {}
   }
 }
-
+Future<List<String>> GetEmployeeport(context) async {
+  try {
+    var Comid = AppGlobals.storagenew.getInt('Comid') ?? 0;
+    var empId = AppGlobals.storagenew.getInt('EmpRefId') ?? 0;
+    
+    // Using apiAllinoneSelect as it handles GET requests returning JSON arrays well
+    final resultData = await AppGlobals.apiAllinoneSelect(
+        Uri.encodeFull("${AppGlobals.port}/api/EmployeeApp/GetEmployeeport?Comid=$Comid&id=$empId"), null, null, context);
+        
+    if (resultData != null && resultData is List) {
+      return resultData.map((e) => e["AccountName"].toString()).toList();
+    }
+  } catch (error) {
+    debugPrint("Error fetching employee ports: $error");
+  }
+  return [];
+}
