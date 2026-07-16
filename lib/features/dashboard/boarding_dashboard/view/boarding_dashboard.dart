@@ -18,6 +18,7 @@ import '../../common_tabs/transport/bloc/transport_bloc.dart';
 import '../../common_tabs/transport/bloc/transport_event.dart';
 import '../../common_tabs/transport/view/transportview_tab.dart';
 import '../../common_tabs/vesselreport/bloc/vesselreport_bloc.dart';
+import '../../common_tabs/vesselreport/bloc/vesselreport_event.dart';
 import '../../common_tabs/vesselreport/view/vesselreportview_tab.dart';
 import '../bloc/boarding_bloc.dart';
 import '../bloc/boarding_event.dart';
@@ -63,7 +64,8 @@ class _AdminDashboardState extends State<BoardingDashboard> with SingleTickerPro
 
             BlocProvider(
               // Pass the context into sl() using param1
-              create: (context) => sl<VesselBloc>(param1: context),
+              create: (context) => sl<VesselBloc>()
+                ..add(const LoadVesselDataEvent(type: 0)),
               child: VesselReportPage(),
             ),
             BlocProvider(

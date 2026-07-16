@@ -1,6 +1,8 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 import 'package:maleva/core/utils/app_globals.dart';
+import 'package:maleva/core/utils/app_preferences.dart';
+import 'package:maleva/core/network/OnlineApi.dart' as OnlineApi;
 
 import '../data/vessel_report_repository.dart';
 import 'vesselreport_event.dart';
@@ -47,11 +49,20 @@ class VesselBloc extends Bloc<VesselEvent, VesselState> {
         fromDate = "2025-02-01";
       }
 
+      // ✅ If Boarding role (600), auto-load employee ports as Search
+      String searchValue = currentSearch;
+      if (AppPreferences.getRoleId() == 600 && currentSearch.isEmpty) {
+        List<String> employeePorts = await OnlineApi.GetEmployeeport(null);
+        if (employeePorts.isNotEmpty) {
+          searchValue = employeePorts.join(',');
+        }
+      }
+
       final Map<String, dynamic> body = {
         'Comid': AppGlobals.storagenew.getInt('Comid') ?? 0,
         'Fromdate': fromDate,
         'Todate': toDate,
-        'Search': currentSearch,
+        'Search': searchValue,
         'Employeeid': 0,
         'ETAType': 0,
       };
@@ -66,7 +77,7 @@ class VesselBloc extends Bloc<VesselEvent, VesselState> {
           vesselList: const [],
           isPlanToday: currentIsPlanToday,
           portName: currentPort,
-          searchText: currentSearch,
+          searchText: searchValue,
         ));
         return;
       }
@@ -85,7 +96,7 @@ class VesselBloc extends Bloc<VesselEvent, VesselState> {
           vesselList: list,
           isPlanToday: currentIsPlanToday,
           portName: currentPort,
-          searchText: currentSearch,
+          searchText: searchValue,
         ));
       }
     } catch (error) {
