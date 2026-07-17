@@ -1,12 +1,14 @@
+import 'package:maleva/core/utils/system_helpers.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
-import 'package:maleva/core/models/model.dart';
 import 'package:maleva/core/utils/app_globals.dart';
 
 
 import 'package:maleva/features/transaction/enquirytrmaster/data/enquiry_repository.dart';
 import 'enquirytrview_event.dart';
 import 'enquirytrview_state.dart';
+import 'package:maleva/features/transaction/enquirytrmaster/models/enquiry_master_model.dart';
+import 'package:maleva/core/models/shared/response_view_model.dart';
 
 class EnquiryViewBloc extends Bloc<EnquiryViewEvent, EnquiryViewState> {
   final EnquiryTrRepository _repository;
@@ -227,7 +229,7 @@ class EnquiryViewBloc extends Bloc<EnquiryViewEvent, EnquiryViewState> {
       final resultData = await _repository.getPlanningPdf(event.planningNo.toString());
       if (resultData != null && resultData != '') {
         final value = ResponseViewModel.fromJson(resultData);
-        if (value.IsSuccess == true) AppGlobals.launchInBrowser(value.data1);
+        if (value.IsSuccess == true) SystemHelpers.launchInBrowser(value.data1);
       }
     } catch (_) {}
   }

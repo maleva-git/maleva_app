@@ -1,6 +1,7 @@
+import 'package:maleva/core/network/api_constants.dart';
 import 'package:maleva/core/network/api_client.dart';
 import 'package:maleva/core/utils/app_globals.dart';
-import 'package:maleva/core/models/model.dart';
+import 'package:maleva/core/models/shared/response_view_model.dart';
 
 class RTIViewRepository {
   /// Fetches the RTI Master and Details records
@@ -9,7 +10,7 @@ class RTIViewRepository {
     required String fromDate,
     required String toDate,
   }) async {
-    final url = "${AppGlobals.apiSelectRTIView}$comId&Fromdate=$fromDate&Todate=$toDate&DId=0&TId=0&Employeeid=0&Search=";
+    final url = "${ApiConstants.apiSelectRTIView}$comId&Fromdate=$fromDate&Todate=$toDate&DId=0&TId=0&Employeeid=0&Search=";
     return await ApiClient.postRequest(url, null);
   }
 
@@ -24,7 +25,7 @@ class RTIViewRepository {
       'Comid': comId,
     };
 
-    final result = await ApiClient.postRequest("${AppGlobals.apiViewRTIPdf}$rtiNo", body);
+    final result = await ApiClient.postRequest("${ApiConstants.apiViewRTIPdf}$rtiNo", body);
 
     if (result != null && result.toString().isNotEmpty) {
       ResponseViewModel value = ResponseViewModel.fromJson(result);

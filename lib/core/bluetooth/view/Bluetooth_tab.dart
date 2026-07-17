@@ -3,10 +3,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:maleva/core/models/model.dart';
 import 'package:maleva/core/theme/palette.dart';
 import '../../theme/tokens.dart';
 import '../bloc/bluetooth_bloc.dart';
+import 'package:maleva/core/models/shared/barcode_print_model.dart';
 
 class BluetoothPage extends StatelessWidget {
   const BluetoothPage({super.key, this.printData});

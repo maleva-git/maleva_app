@@ -14,7 +14,6 @@ import 'package:maleva/core/utils/app_globals.dart';
 import 'package:maleva/core/network/OnlineApi.dart' as OnlineApi;
 import 'package:google_fonts/google_fonts.dart';
 import 'package:maleva/core/theme/tokens.dart';
-import 'package:maleva/core/models/model.dart';
 
 class EmployeeLeaveRequestTab extends StatefulWidget {
   final bool isAdminOrSubadmin;

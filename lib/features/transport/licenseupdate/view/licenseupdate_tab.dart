@@ -4,13 +4,13 @@ import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:maleva/core/utils/app_globals.dart';
-import 'package:maleva/core/models/model.dart';
 import 'package:maleva/menu/menulist.dart';
 import '../../../../core/theme/palette.dart';
 import '../../../mastersearch/Truck.dart';
 import '../bloc/licenseupdate_bloc.dart';
 import '../bloc/licenseupdate_event.dart';
 import '../bloc/licenseupdate_state.dart';
+import 'package:maleva/core/models/shared/get_truck_model.dart';
 
 
 

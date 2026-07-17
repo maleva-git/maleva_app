@@ -5,6 +5,8 @@ import 'package:maleva/core/utils/app_globals.dart';
 import 'package:maleva/features/dashboard/common_tabs/truck/bloc/truck_state.dart';
 import '../../../../../core/models/model.dart';
 import '../data/truck_repository.dart';
+import 'package:maleva/core/models/shared/truck_details_model.dart';
+import 'package:maleva/core/models/shared/response_view_model.dart';
 part 'truck_event.dart';
 
 

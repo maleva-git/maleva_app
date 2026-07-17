@@ -1,3 +1,4 @@
+import 'package:maleva/core/network/api_constants.dart';
 import 'package:maleva/core/network/api_client.dart';
 import 'package:maleva/core/utils/app_globals.dart';
 
@@ -8,12 +9,12 @@ class TransportSalesRepository {
       'Comid': comId,
       "Employeeid": empId,
     };
-    return await ApiClient.postRequest(AppGlobals.LoadRulesType, body);
+    return await ApiClient.postRequest(ApiConstants.LoadRulesType, body);
   }
 
   /// Fetches the invoice count based on specific parameters
   Future<dynamic> fetchInvoiceCount(Map<String, dynamic> body) async {
-    return await ApiClient.postRequest(AppGlobals.SaleInvoiceCountDB, body);
+    return await ApiClient.postRequest(ApiConstants.SaleInvoiceCountDB, body);
   }
 
   /// Fetches the overall sales order status
@@ -22,6 +23,6 @@ class TransportSalesRepository {
       'Comid': comId,
       "Employeeid": empId,
     };
-    return await ApiClient.postRequest(AppGlobals.SelectSalesOrderStatus, body);
+    return await ApiClient.postRequest(ApiConstants.SelectSalesOrderStatus, body);
   }
 }

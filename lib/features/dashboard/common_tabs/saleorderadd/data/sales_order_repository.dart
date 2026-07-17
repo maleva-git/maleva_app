@@ -1,7 +1,8 @@
-import 'package:maleva/core/models/model.dart';
+import 'package:maleva/core/network/api_constants.dart';
 import 'package:maleva/core/network/api_client.dart';
 import 'package:maleva/core/utils/app_preferences.dart';
 import 'package:maleva/core/utils/app_globals.dart';
+import 'package:maleva/core/models/shared/response_view_model.dart';
 
 class SalesOrderRepository {
   final int comid = AppPreferences.getComid();
@@ -9,9 +10,9 @@ class SalesOrderRepository {
   // ─── Initial Data Loading ──────────────────────────────────────────────────
   Future<Map<String, dynamic>> fetchInitialData(String billType) async {
     // Replace these with your actual ApiClient.postRequest calls mapping to objfun URLs
-    final maxOrderResponse = await ApiClient.postRequest("${AppGlobals.apiMaxSaleOrderNo}$comid&BillType=$billType", null);
-    final agentCompanyResponse = await ApiClient.postRequest("${AppGlobals.apiSelectAgentCompany}$comid", null);
-    final employeeResponse = await ApiClient.postRequest("${AppGlobals.apiSelectEmployee}$comid&AccountName=&Type=Operation", null);
+    final maxOrderResponse = await ApiClient.postRequest("${ApiConstants.apiMaxSaleOrderNo}$comid&BillType=$billType", null);
+    final agentCompanyResponse = await ApiClient.postRequest("${ApiConstants.apiSelectAgentCompany}$comid", null);
+    final employeeResponse = await ApiClient.postRequest("${ApiConstants.apiSelectEmployee}$comid&AccountName=&Type=Operation", null);
 
     // Determine Max Order Num safely
     String maxNum = '';
@@ -28,11 +29,11 @@ class SalesOrderRepository {
 
   // ─── Master Data Loading (For Edits/Enquiries) ───────────────────────────
   Future<Map<String, dynamic>> fetchMasterData(int jobMasterRefId, int agentCompanyRefId, int customerRefId) async {
-    final customerResponse = await ApiClient.postRequest("${AppGlobals.apiSelectCustomer}$comid", null);
-    final jobTypeResponse = await ApiClient.postRequest("${AppGlobals.apiSelectJobType}$comid", null);
-    final jobStatusResponse = await ApiClient.postRequest("${AppGlobals.apiSelectAllJobStatus}$comid&JobMasterRefId=$jobMasterRefId", null);
-    final agentAllResponse = await ApiClient.postRequest("${AppGlobals.apiSelectAgentAll}$comid&AgentCompanyRefId=$agentCompanyRefId", null);
-    final currencyResponse = await ApiClient.postRequest("${AppGlobals.apiGetCurrencyValue}$comid&CustomerRefId=$customerRefId", null);
+    final customerResponse = await ApiClient.postRequest("${ApiConstants.apiSelectCustomer}$comid", null);
+    final jobTypeResponse = await ApiClient.postRequest("${ApiConstants.apiSelectJobType}$comid", null);
+    final jobStatusResponse = await ApiClient.postRequest("${ApiConstants.apiSelectAllJobStatus}$comid&JobMasterRefId=$jobMasterRefId", null);
+    final agentAllResponse = await ApiClient.postRequest("${ApiConstants.apiSelectAgentAll}$comid&AgentCompanyRefId=$agentCompanyRefId", null);
+    final currencyResponse = await ApiClient.postRequest("${ApiConstants.apiGetCurrencyValue}$comid&CustomerRefId=$customerRefId", null);
 
     double currencyVal = 0.0;
     if (currencyResponse != null && currencyResponse is List && currencyResponse.isNotEmpty) {
@@ -50,8 +51,8 @@ class SalesOrderRepository {
 
   // ─── Job Type Changed Data ───────────────────────────────────────────────
   Future<Map<String, dynamic>> fetchJobTypeDependencies(int jobTypeId) async {
-    final jobStatusResponse = await ApiClient.postRequest("${AppGlobals.apiSelectAllJobStatus}$comid&JobMasterRefId=$jobTypeId", null);
-    final comboS1Response = await ApiClient.postRequest("${AppGlobals.apiGetComboS1}$comid&JobMasterRefId=$jobTypeId", null);
+    final jobStatusResponse = await ApiClient.postRequest("${ApiConstants.apiSelectAllJobStatus}$comid&JobMasterRefId=$jobTypeId", null);
+    final comboS1Response = await ApiClient.postRequest("${ApiConstants.apiGetComboS1}$comid&JobMasterRefId=$jobTypeId", null);
 
     return {
       'jobStatuses': jobStatusResponse is List ? jobStatusResponse : [],
@@ -61,11 +62,11 @@ class SalesOrderRepository {
 
   // ─── Save / Update ───────────────────────────────────────────────────────
   Future<ResponseViewModel?> saveSalesOrder(List<Map<String, dynamic>> master) async {
-    final response = await ApiClient.postRequest('${AppGlobals.apiInsertSalesOrder}?Comid=$comid', master);
+    final response = await ApiClient.postRequest('${ApiConstants.apiInsertSalesOrder}?Comid=$comid', master);
     return response != null ? ResponseViewModel.fromJson(response) : null;
   }
 
   Future<void> confirmEnquiry(int enquiryId) async {
-    await ApiClient.postRequest('${AppGlobals.apiUpdateEnquiryMaster}$enquiryId&Comid=$comid&StatusName=CONFIRMED', null);
+    await ApiClient.postRequest('${ApiConstants.apiUpdateEnquiryMaster}$enquiryId&Comid=$comid&StatusName=CONFIRMED', null);
   }
 }

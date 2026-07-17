@@ -1,4 +1,5 @@
 import '../../../../../core/models/model.dart';
+import 'package:maleva/core/models/shared/pattycash_master_model.dart';
 
 abstract class PettyCashEvent {
   const PettyCashEvent();

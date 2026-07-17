@@ -1,3 +1,4 @@
+import 'package:maleva/core/network/api_constants.dart';
 import 'package:maleva/core/network/api_client.dart';
 import 'package:maleva/core/utils/app_globals.dart';
 
@@ -9,7 +10,7 @@ class PettyCashRepository {
     required String toDate,
   }) async {
     // Construct the URL with query parameters
-    final url = "${AppGlobals.apiGetpettycash}$comId"
+    final url = "${ApiConstants.apiGetpettycash}$comId"
         "&Fromdate=$fromDate"
         "&Todate=$toDate" 
         "&Employeeid=0&Search=&PaymentStatus=&PaymentTo";

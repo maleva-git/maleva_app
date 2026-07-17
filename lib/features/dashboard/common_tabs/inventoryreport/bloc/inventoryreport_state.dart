@@ -1,4 +1,4 @@
-import 'package:maleva/core/models/model.dart';
+import 'package:maleva/core/models/shared/inventory_model.dart';
 
 // ── Filter constants ──────────────────────────────────────────────────────────
 const kInventoryPortFilters = [

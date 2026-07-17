@@ -1,3 +1,4 @@
+import 'package:maleva/core/network/api_constants.dart';
 import 'package:maleva/core/network/api_client.dart';
 import 'package:maleva/core/utils/app_globals.dart';
 
@@ -6,7 +7,7 @@ class TruckRepository {
     required Map<String, dynamic> body,
   }) async {
     return await ApiClient.postRequest(
-        AppGlobals.apiSelectTruckDetails,
+        ApiConstants.apiSelectTruckDetails,
         body
     );
   }

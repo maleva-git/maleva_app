@@ -1,4 +1,4 @@
-import 'package:maleva/core/models/model.dart';
+import 'package:maleva/core/models/shared/speeding_view.dart';
 
 abstract class SpeedingState {}
 

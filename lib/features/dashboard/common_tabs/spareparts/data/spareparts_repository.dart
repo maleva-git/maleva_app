@@ -1,3 +1,4 @@
+import 'package:maleva/core/network/api_constants.dart';
 import 'dart:convert';
 import 'dart:io';
 import 'package:http/http.dart' as http;
@@ -17,7 +18,7 @@ class SparePartsRepository {
     required String fromDate,
     required String toDate,
   }) async {
-    final url = "${AppGlobals.apiGetSpareParts}$comId&Fromdate=$fromDate&Todate=$toDate";
+    final url = "${ApiConstants.apiGetSpareParts}$comId&Fromdate=$fromDate&Todate=$toDate";
     return await ApiClient.postRequest(url, null);
   }
 
@@ -28,7 +29,7 @@ class SparePartsRepository {
     File? image,
     File? pdf,
   }) async {
-    final uri = Uri.parse("${AppGlobals.apiInsertSpareParts}?Comid=$comId");
+    final uri = Uri.parse("${ApiConstants.apiInsertSpareParts}?Comid=$comId");
     final request = http.MultipartRequest("POST", uri);
 
     request.fields["details"] = jsonEncode(body);

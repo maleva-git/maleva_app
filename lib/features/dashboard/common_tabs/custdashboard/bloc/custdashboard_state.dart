@@ -3,6 +3,8 @@
 import 'package:equatable/equatable.dart';
 
 import '../../../../../core/models/model.dart';
+import 'package:maleva/core/models/shared/payment_pending_model.dart';
+import 'package:maleva/features/transport/models/fuelselect_model.dart';
 
 enum CustDashboardStatus { initial, loading, success, failure }
 

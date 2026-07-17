@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
-import 'package:maleva/core/models/model.dart';
 import 'package:maleva/core/utils/app_globals.dart';
 import 'package:maleva/core/colors/colors.dart' as colour;
 import '../../../../../core/di/injection.dart';
@@ -10,6 +9,7 @@ import '../../../../../core/theme/tokens.dart';
 import '../bloc/enginehours_bloc.dart';
 import '../bloc/enginehours_event.dart';
 import '../bloc/enginehours_state.dart';
+import 'package:maleva/core/models/shared/engine_hoursdata.dart';
 
 // ── Entry Point ───────────────────────────────────────────────────────────────
 class EngineHoursPage extends StatelessWidget {

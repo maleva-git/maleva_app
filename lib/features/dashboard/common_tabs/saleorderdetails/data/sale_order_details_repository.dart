@@ -1,3 +1,4 @@
+import 'package:maleva/core/network/api_constants.dart';
 import 'package:maleva/core/network/api_client.dart';
 import 'package:maleva/core/utils/app_preferences.dart';
 import 'package:maleva/core/utils/app_globals.dart';
@@ -7,10 +8,10 @@ class SaleOrderDetailsRepository {
 
   // ─── Initial Startup Data ──────────────────────────────────────────────────
   Future<Map<String, dynamic>> fetchInitialData(String billType) async {
-    final maxOrderResponse = await ApiClient.postRequest("${AppGlobals.apiMaxSaleOrderNo}$comid&BillType=$billType", null);
-    final addressResponse = await ApiClient.postRequest("${AppGlobals.apiSelectAddressList}$comid", null);
-    final agentCompanyResponse = await ApiClient.postRequest("${AppGlobals.apiSelectAgentCompany}$comid", null);
-    final employeeResponse = await ApiClient.postRequest("${AppGlobals.apiSelectEmployee}$comid&AccountName=&Type=Operation", null);
+    final maxOrderResponse = await ApiClient.postRequest("${ApiConstants.apiMaxSaleOrderNo}$comid&BillType=$billType", null);
+    final addressResponse = await ApiClient.postRequest("${ApiConstants.apiSelectAddressList}$comid", null);
+    final agentCompanyResponse = await ApiClient.postRequest("${ApiConstants.apiSelectAgentCompany}$comid", null);
+    final employeeResponse = await ApiClient.postRequest("${ApiConstants.apiSelectEmployee}$comid&AccountName=&Type=Operation", null);
 
     String maxNum = '';
     if (maxOrderResponse != null && maxOrderResponse is List && maxOrderResponse.isNotEmpty) {
@@ -27,12 +28,12 @@ class SaleOrderDetailsRepository {
 
   // ─── Master Dependencies (For loading the edit view) ───────────────────────
   Future<Map<String, dynamic>> fetchMasterDependencies(int jobMasterRefId, int agentCompanyRefId) async {
-    final customerResponse = await ApiClient.postRequest("${AppGlobals.apiSelectCustomer}$comid", null);
-    final jobTypeResponse = await ApiClient.postRequest("${AppGlobals.apiSelectJobType}$comid", null);
+    final customerResponse = await ApiClient.postRequest("${ApiConstants.apiSelectCustomer}$comid", null);
+    final jobTypeResponse = await ApiClient.postRequest("${ApiConstants.apiSelectJobType}$comid", null);
 
     // Note: Assuming this API returns the Job Statuses and Job Type Details
-    final jobStatusResponse = await ApiClient.postRequest("${AppGlobals.apiSelectAllJobStatus}$comid&JobId=$jobMasterRefId", null);
-    final agentAllResponse = await ApiClient.postRequest("${AppGlobals.apiSelectAgentAll}$comid&Jobid=$agentCompanyRefId", null);
+    final jobStatusResponse = await ApiClient.postRequest("${ApiConstants.apiSelectAllJobStatus}$comid&JobId=$jobMasterRefId", null);
+    final agentAllResponse = await ApiClient.postRequest("${ApiConstants.apiSelectAgentAll}$comid&Jobid=$agentCompanyRefId", null);
 
     return {
       'customers': customerResponse is List ? customerResponse : [],
@@ -43,7 +44,7 @@ class SaleOrderDetailsRepository {
   }
 
   Future<String> fetchMaxOrderNo(String billType) async {
-    final maxOrderResponse = await ApiClient.postRequest("${AppGlobals.apiMaxSaleOrderNo}$comid&BillType=$billType", null);
+    final maxOrderResponse = await ApiClient.postRequest("${ApiConstants.apiMaxSaleOrderNo}$comid&BillType=$billType", null);
     if (maxOrderResponse != null && maxOrderResponse is List && maxOrderResponse.isNotEmpty) {
       return maxOrderResponse[0]['MaxNo']?.toString() ?? '';
     }

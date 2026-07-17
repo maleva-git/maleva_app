@@ -19,7 +19,7 @@ class SummonRepository {
     required String fromDate,
     required String toDate,
   }) async {
-    final url = "${AppGlobals.apiGetSummonParts}$comId&Fromdate=$fromDate&Todate=$toDate";
+    final url = "${ApiConstants.apiGetSummonParts}$comId&Fromdate=$fromDate&Todate=$toDate";
     return await ApiClient.postRequest(url, null);
   }
 

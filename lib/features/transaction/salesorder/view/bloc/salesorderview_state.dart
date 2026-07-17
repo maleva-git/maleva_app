@@ -2,7 +2,8 @@
 // salesorder_view_state.dart
 // ═══════════════════════════════════════════════════════
 import 'package:equatable/equatable.dart';
-import 'package:maleva/core/models/model.dart';
+import 'package:maleva/features/transaction/salesorder/models/sale_order_master_model.dart';
+import 'package:maleva/features/transaction/salesorder/models/sale_order_detail_model.dart';
 
 abstract class SalesOrderViewState extends Equatable {
   @override

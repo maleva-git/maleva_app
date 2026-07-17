@@ -1,3 +1,5 @@
+import 'package:maleva/core/utils/system_helpers.dart';
+import 'package:maleva/core/network/api_constants.dart';
 import 'dart:io';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
@@ -8,7 +10,6 @@ import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:maleva/core/utils/app_globals.dart';
 import 'package:maleva/core/network/OnlineApi.dart' as OnlineApi;
-import 'package:maleva/core/models/model.dart';
 import 'package:maleva/menu/menulist.dart';
 import '../../../../core/theme/tokens.dart';
 import '../../../dashboard/common_tabs/saleorderdetails/view/saleorderdetails_tab.dart';
@@ -16,6 +17,7 @@ import '../../../mastersearch/JobAllStatus.dart';
 import '../bloc/updateboardingdetails_bloc.dart';
 import '../bloc/updateboardingdetails_event.dart';
 import '../bloc/updateboardingdetails_state.dart';
+import 'package:maleva/features/operations/models/job_all_status_model.dart';
 
 // ─── Design Tokens ────────────────────────────────────────────────────────────
 
@@ -70,8 +72,8 @@ class _BoardingStatusPageState extends State<_BoardingStatusPage> {
     }
     final file = await _picker.pickImage(source: source);
     if (file == null) return;
-    final url = await AppGlobals.upload(
-        File(file.path), AppGlobals.apiPostimage, saleOrderId, 'SalesOrder', 'Boarding');
+    final url = await SystemHelpers.upload(
+        File(file.path), ApiConstants.apiPostImage, saleOrderId, 'SalesOrder', 'Boarding');
     context.read<BoardingStatusBloc>().add(BoardingStatusImagePicked(url));
   }
 

@@ -28,7 +28,7 @@ abstract class InvoiceRepository {
   Future<List<dynamic>> getWaitingBills();
 
   /// Employee breakdown per month index
-  /// Original: "${AppGlobals.apiGetEmployeeInvData}${AppGlobals.Comid}&type=$type"
+  /// Original: "${ApiConstants.apiGetEmployeeInvData}${AppGlobals.Comid}&type=$type"
   Future<List<dynamic>> getEmployeeInvData({required int type});
 }
 
@@ -99,7 +99,7 @@ class InvoiceRepositoryImpl implements InvoiceRepository {
   @override
   Future<List<dynamic>> getEmployeeInvData({required int type}) async {
     // AuthApi.getEmployeeInvData added to auth_api.dart (see auth_api_addition.dart)
-    // Original: "${AppGlobals.apiGetEmployeeInvData}${AppGlobals.Comid}&type=$type"
+    // Original: "${ApiConstants.apiGetEmployeeInvData}${AppGlobals.Comid}&type=$type"
     final result = await AuthApi.getEmployeeInvData(type: type);
     return List<dynamic>.from(result?['Data1'] ?? []);
   }

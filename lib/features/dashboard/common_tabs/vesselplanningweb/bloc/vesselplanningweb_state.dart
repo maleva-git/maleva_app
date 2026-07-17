@@ -15,7 +15,11 @@ class VesselPlanningWebLoading extends VesselPlanningWebState {}
 class VesselPlanningWebLoaded extends VesselPlanningWebState {
   final List<VesselPlanningWebModel> dataList;
   final String? planningNo;
+
+
+  
   final Map<String, dynamic>? masterData;
+
 
   const VesselPlanningWebLoaded({required this.dataList, this.planningNo, this.masterData});
 

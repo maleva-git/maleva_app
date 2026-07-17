@@ -1,3 +1,4 @@
+import 'package:maleva/core/network/api_legacy_helper.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
@@ -124,7 +125,7 @@ class _SplashScreenState extends State<SplashScreen>
   Future startup() async {
     // ① Safe local storage init
     try {
-      await AppGlobals.localstoragecall();
+      await ApiLegacyHelper.localstoragecall();
     } catch (e) {
       debugPrint('❌ SharedPreferences init failed: $e');
       if (mounted) {
@@ -158,6 +159,7 @@ class _SplashScreenState extends State<SplashScreen>
       // ③ Login API call with error handling
       bool loginSuccess = false;
       try {
+        if (!mounted) return;
         loginSuccess = await OnlineApi.Login(UserName, Password, OldUserName,AppGlobals.DriverLogin, context);
       } catch (e) {
         debugPrint('⚠️ Login API error: $e');
@@ -172,6 +174,7 @@ class _SplashScreenState extends State<SplashScreen>
       }
 
       if (loginSuccess) {
+        if (!mounted) return;
 
         if(AppGlobals.DriverLogin == 1)
         {
@@ -538,17 +541,17 @@ class _SplashScreenState extends State<SplashScreen>
                   padding:
                   const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
                   decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.12),
+                    color: Colors.white.withValues(alpha: 0.12),
                     borderRadius: BorderRadius.circular(20),
                     border: Border.all(
-                        color: Colors.white.withOpacity(0.18), width: 1),
+                        color: Colors.white.withValues(alpha: 0.18), width: 1),
                   ),
                   child: Text(
                     AppGlobals.appversion,
                     style: GoogleFonts.dmSans(
                       fontSize: 10,
                       fontWeight: FontWeight.w500,
-                      color: Colors.white.withOpacity(0.75),
+                      color: Colors.white.withValues(alpha: 0.75),
                       letterSpacing: 0.6,
                     ),
                   ),
@@ -570,13 +573,13 @@ class _SplashScreenState extends State<SplashScreen>
                     child: Container(
                       width: 120, height: 120,
                       decoration: BoxDecoration(
-                        color: Colors.white.withOpacity(0.10),
+                        color: Colors.white.withValues(alpha: 0.10),
                         borderRadius: BorderRadius.circular(34),
                         border: Border.all(
-                            color: Colors.white.withOpacity(0.20), width: 1),
+                            color: Colors.white.withValues(alpha: 0.20), width: 1),
                         boxShadow: [
                           BoxShadow(
-                            color: Colors.black.withOpacity(0.15),
+                            color: Colors.black.withValues(alpha: 0.15),
                             blurRadius: 30,
                             offset: const Offset(0, 12),
                           ),
@@ -618,7 +621,7 @@ class _SplashScreenState extends State<SplashScreen>
                           children: [
                             Container(
                               width: 28, height: 1,
-                              color: Colors.white.withOpacity(0.30),
+                              color: Colors.white.withValues(alpha: 0.30),
                             ),
                             const SizedBox(width: 10),
                             Text(
@@ -626,14 +629,14 @@ class _SplashScreenState extends State<SplashScreen>
                               style: GoogleFonts.dmSans(
                                 fontSize: 11,
                                 fontWeight: FontWeight.w400,
-                                color: Colors.white.withOpacity(0.50),
+                                color: Colors.white.withValues(alpha: 0.50),
                                 letterSpacing: 2.8,
                               ),
                             ),
                             const SizedBox(width: 10),
                             Container(
                               width: 28, height: 1,
-                              color: Colors.white.withOpacity(0.30),
+                              color: Colors.white.withValues(alpha: 0.30),
                             ),
                           ],
                         ),
@@ -683,7 +686,7 @@ class _SplashScreenState extends State<SplashScreen>
                               Container(
                                 height: 2,
                                 width: double.infinity,
-                                color: Colors.white.withOpacity(0.12),
+                                color: Colors.white.withValues(alpha: 0.12),
                               ),
                               // Fill
                               FractionallySizedBox(
@@ -692,7 +695,7 @@ class _SplashScreenState extends State<SplashScreen>
                                   height: 2,
                                   decoration: BoxDecoration(
                                     color:
-                                    Colors.white.withOpacity(0.65 * op),
+                                    Colors.white.withValues(alpha: 0.65 * op),
                                     borderRadius: BorderRadius.circular(2),
                                   ),
                                 ),
@@ -711,7 +714,7 @@ class _SplashScreenState extends State<SplashScreen>
                       style: GoogleFonts.dmSans(
                         fontSize: 9,
                         fontWeight: FontWeight.w500,
-                        color: Colors.white.withOpacity(0.35),
+                        color: Colors.white.withValues(alpha: 0.35),
                         letterSpacing: 2.0,
                       ),
                     ),
@@ -731,7 +734,7 @@ class _SplashScreenState extends State<SplashScreen>
       shape: BoxShape.circle,
       gradient: RadialGradient(
         colors: [
-          Colors.white.withOpacity(opacity),
+          Colors.white.withValues(alpha: opacity),
           Colors.transparent,
         ],
       ),
@@ -784,7 +787,7 @@ class _AnimatedDotState extends State<_AnimatedDot>
         child: Container(
           width: 5, height: 5,
           decoration: BoxDecoration(
-            color: Colors.white.withOpacity(0.70),
+            color: Colors.white.withValues(alpha: 0.70),
             shape: BoxShape.circle,
           ),
         ),
@@ -815,7 +818,7 @@ class _CornerPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final paint = Paint()
-      ..color = Colors.white.withOpacity(0.15)
+      ..color = Colors.white.withValues(alpha: 0.15)
       ..style = PaintingStyle.stroke
       ..strokeWidth = 1.5;
 
@@ -846,7 +849,7 @@ class _GridPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final paint = Paint()
-      ..color = Colors.white.withOpacity(0.03)
+      ..color = Colors.white.withValues(alpha: 0.03)
       ..strokeWidth = 0.8;
 
     const step = 32.0;

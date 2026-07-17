@@ -1,10 +1,12 @@
+import 'package:maleva/core/network/api_legacy_helper.dart';
+import 'package:maleva/core/network/api_constants.dart';
 import 'dart:convert';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:maleva/core/utils/app_globals.dart';
-import 'package:maleva/core/models/model.dart';
 
 import 'fuelentry_event.dart';
 import 'fuelentry_state.dart';
+import 'package:maleva/core/models/shared/response_view_model.dart';
 
 class FuelEntryBloc extends Bloc<FuelEntryEvent, FuelEntryState> {
   FuelEntryBloc() : super(FuelEntryInitial()) {
@@ -103,8 +105,8 @@ class FuelEntryBloc extends Bloc<FuelEntryEvent, FuelEntryState> {
         'Comid': AppGlobals.Comid.toString(),
       };
 
-      final resultData = await AppGlobals.apiAllinoneSelectArray(
-          AppGlobals.apiInsertFuelEntry, master, header, null);
+      final resultData = await ApiLegacyHelper.apiAllinoneSelectArray(
+          ApiConstants.apiInsertFuelEntry, master, header, null);
 
       if (resultData != null && resultData.toString().isNotEmpty) {
         try {
@@ -150,8 +152,8 @@ class FuelEntryBloc extends Bloc<FuelEntryEvent, FuelEntryState> {
   Future<String> _fetchMaxFuelNo() async {
     try {
       final comId = AppGlobals.storagenew.getInt('Comid') ?? 0;
-      final result = await AppGlobals.apiGetString(
-          '${AppGlobals.apiMaxFuelEntryNo}$comId');
+      final result = await ApiLegacyHelper.apiGetString(
+          '${ApiConstants.apiMaxFuelEntryNo}$comId');
       return result.isNotEmpty ? result : '';
     } catch (_) {
       return '';

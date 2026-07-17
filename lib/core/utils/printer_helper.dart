@@ -1,6 +1,7 @@
 import 'dart:typed_data';
 import 'package:bluetooth_print_plus/bluetooth_print_plus.dart' as bpp;
-import 'package:maleva/core/models/model.dart';
+import 'package:maleva/core/models/shared/barcode_print_model.dart';
+import 'package:maleva/core/models/shared/bluetooth_model.dart';
 
 List<BluetoothModel> bluetoothdeviceList = [];
 

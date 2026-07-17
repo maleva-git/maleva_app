@@ -1,12 +1,12 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
-import 'package:maleva/core/models/model.dart';
 import 'package:maleva/core/utils/app_preferences.dart';
 import 'package:maleva/core/utils/app_globals.dart';
 import '../data/transportdb_repository.dart';
 import 'transportdb_event.dart';
 import 'transportdb_state.dart';
+import 'package:maleva/core/models/shared/email_model.dart';
 
 class TransportDashboardBloc extends Bloc<TransportDashboardEvent, TransportDashboardState> {
   final TransportDashboardRepository repository;

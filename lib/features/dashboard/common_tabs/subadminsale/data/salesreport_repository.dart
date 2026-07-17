@@ -1,3 +1,4 @@
+import 'package:maleva/core/network/api_constants.dart';
 import 'package:maleva/core/network/api_client.dart';
 import 'package:maleva/core/utils/app_globals.dart';
 
@@ -8,12 +9,12 @@ class SalesReportRepository {
       'Comid': comId,
       'Employeeid': empId,
     };
-    return await ApiClient.postRequest(AppGlobals.LoadRulesType, body);
+    return await ApiClient.postRequest(ApiConstants.LoadRulesType, body);
   }
 
   /// Fetches the invoice counts (Total, Billed, Unbilled, Without Invoice)
   Future<dynamic> fetchInvoiceCount(Map<String, dynamic> body) async {
-    return await ApiClient.postRequest(AppGlobals.SaleInvoiceCountDB, body);
+    return await ApiClient.postRequest(ApiConstants.SaleInvoiceCountDB, body);
   }
 
   /// Fetches the main sales report list
@@ -22,12 +23,12 @@ class SalesReportRepository {
       'Comid': comId,
       "Employeeid": empId,
     };
-    return await ApiClient.postRequest(AppGlobals.SelectSalesOrderStatus, body);
+    return await ApiClient.postRequest(ApiConstants.SelectSalesOrderStatus, body);
   }
 
   /// Fetches the specific employee invoice data for the Dialog
   Future<dynamic> fetchEmployeeInvData(int comId, int type) async {
-    final url = "${AppGlobals.apiGetEmployeeInvData}$comId&type=$type";
+    final url = "${ApiConstants.apiGetEmployeeInvData}$comId&type=$type";
     return await ApiClient.postRequest(url, null);
   }
 }

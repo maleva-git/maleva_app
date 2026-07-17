@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:maleva/core/models/model.dart';
 import '../../../../../core/di/injection.dart';
 import '../../../../../core/theme/tokens.dart';
 import '../bloc/bocheck_bloc.dart';
 import '../bloc/bocheck_event.dart';
 import '../bloc/bocheck_state.dart';
 import 'package:maleva/core/colors/colors.dart' as colour;
+import 'package:maleva/core/models/shared/bo_detail_response.dart';
 
 // ── Entry Point ───────────────────────────────────────────────────────────────
 class BocPage extends StatelessWidget {

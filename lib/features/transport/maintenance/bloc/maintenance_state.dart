@@ -1,6 +1,7 @@
 
 
 import '../../../../core/models/model.dart';
+import 'package:maleva/core/models/shared/truck_details_model.dart';
 
 abstract class TruckMaintenanceState {}
 

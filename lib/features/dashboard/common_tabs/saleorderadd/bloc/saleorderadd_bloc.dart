@@ -1,12 +1,12 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
-import 'package:maleva/core/models/model.dart';
 import 'package:maleva/core/utils/app_preferences.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../data/sales_order_repository.dart';
 import 'saleorderadd_event.dart';
 import 'saleorderadd_state.dart';
+import 'package:maleva/core/models/shared/sale_edit_detail_model.dart';
 
 class SalesOrderBloc extends Bloc<SalesOrderEvent, SalesOrderState> {
   final SalesOrderRepository repository;

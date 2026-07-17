@@ -1,3 +1,5 @@
+import 'package:maleva/core/network/api_legacy_helper.dart';
+import 'package:maleva/core/network/api_constants.dart';
 import 'package:maleva/core/utils/app_globals.dart';
 import 'package:maleva/core/network/OnlineApi.dart' as OnlineApi;
 
@@ -15,8 +17,8 @@ class PlanningRepository {
       'Content-Type': 'application/json; charset=UTF-8'
     };
 
-    final resultData = await AppGlobals.apiAllinoneSelectArray(
-        AppGlobals.apiSelectPlanning, master, header, null);
+    final resultData = await ApiLegacyHelper.apiAllinoneSelectArray(
+        ApiConstants.apiSelectPlanning, master, header, null);
     
     if (resultData == null || resultData == "") {
       return [];
@@ -27,9 +29,9 @@ class PlanningRepository {
   Future<void> editPlanning(dynamic context, int id, int planningNo) async {
     var comId = AppGlobals.storagenew.getInt('Comid') ?? 0;
 
-    final resultData = await AppGlobals.apiAllinoneSelect(
+    final resultData = await ApiLegacyHelper.apiAllinoneSelect(
         Uri.encodeFull(
-            "${AppGlobals.apiEditPlanning}$id&PLANINGNo=$planningNo&Comid=$comId"),
+            "${ApiConstants.apiEditPlanning}$id&PLANINGNo=$planningNo&Comid=$comId"),
         null,
         null,
         context);
@@ -50,8 +52,8 @@ class PlanningRepository {
       'Content-Type': 'application/json; charset=UTF-8'
     };
 
-    final resultData = await AppGlobals.apiAllinoneSelectArray(
-      "${AppGlobals.apiViewPlanningPdf}$planningNoDisplay",
+    final resultData = await ApiLegacyHelper.apiAllinoneSelectArray(
+      "${ApiConstants.apiViewPlanningPdf}$planningNoDisplay",
       master,
       header,
       context,

@@ -4,6 +4,8 @@
 import 'package:equatable/equatable.dart';
 
 import '../../../../../core/models/model.dart';
+import 'package:maleva/core/models/shared/review.dart';
+import 'package:maleva/core/models/shared/employee_model.dart';
 
 abstract class TransportDashboardEvent extends Equatable {
   const TransportDashboardEvent();

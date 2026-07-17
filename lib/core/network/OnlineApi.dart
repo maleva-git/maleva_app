@@ -1,10 +1,32 @@
+import 'package:maleva/core/network/api_legacy_helper.dart';
+import 'package:maleva/core/network/api_constants.dart';
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:maleva/core/utils/app_globals.dart';
-import 'package:maleva/core/models/model.dart';
 import 'api_client.dart';
+import 'package:maleva/core/models/shared/agent_company_model.dart';
+import 'package:maleva/features/operations/models/job_all_status_model.dart';
+import 'package:maleva/features/operations/models/job_type_model.dart';
+import 'package:maleva/core/models/shared/get_truck_model.dart';
+import 'package:maleva/core/models/shared/address_details_model.dart';
+import 'package:maleva/features/auth/models/user_login_model.dart';
+import 'package:maleva/core/models/shared/customer_model.dart';
+import 'package:maleva/core/models/shared/truck_details_model.dart';
+import 'package:maleva/core/models/shared/ware_house_model.dart';
+import 'package:maleva/features/operations/models/forwarding_model.dart';
+import 'package:maleva/core/models/shared/sale_edit_detail_model.dart';
+import 'package:maleva/core/models/shared/agent_model.dart';
+import 'package:maleva/features/operations/models/job_status_model.dart';
+import 'package:maleva/core/models/shared/product_model.dart';
+import 'package:maleva/features/operations/models/job_type_details_model.dart';
+import 'package:maleva/core/models/shared/r_t_i_master_view_model.dart';
+import 'package:maleva/core/models/shared/employee_model.dart';
+import 'package:maleva/core/models/shared/menu_master_model.dart';
+import 'package:maleva/core/models/shared/location_model.dart';
+import 'package:maleva/core/models/shared/response_view_model.dart';
+import 'package:maleva/core/models/shared/r_t_i_details_view_model.dart';
 
 Future<bool> Login(String Username, String Password, String OldUsername,int DriverId, context) async {
   try {
@@ -15,7 +37,7 @@ Future<bool> Login(String Username, String Password, String OldUsername,int Driv
       'Token':AppGlobals.mobiletoken,
     };
     try {
-  final result = await AppGlobals.apiAllinoneSelectArrayWithOutAuth(Uri.encodeFull("${AppGlobals.apiLoginSuccess}$Username&Pwd=$Password&olduserid=$OldUsername&DriverId=$DriverId"),
+  final result = await ApiLegacyHelper.apiAllinoneSelectArrayWithOutAuth(Uri.encodeFull("${ApiConstants.apiLoginSuccess}$Username&Pwd=$Password&olduserid=$OldUsername&DriverId=$DriverId"),
             null,
             header,
             context);
@@ -164,8 +186,8 @@ Future SelectUser(context) async {
     AppGlobals.UserList.clear();
     var Comid = AppGlobals.storagenew.getInt('Comid') ?? 0;
     try {
-  final resultData = await AppGlobals.apiAllinoneSelect(
-            Uri.encodeFull("${AppGlobals.apiSelectUser}$Comid"), null, null, context);
+  final resultData = await ApiLegacyHelper.apiAllinoneSelect(
+            Uri.encodeFull("${ApiConstants.apiSelectUser}$Comid"), null, null, context);
   if (resultData.isNotEmpty) {
         AppGlobals.UserList = resultData
             .map((element) => UserLoginModel.fromJson(element))
@@ -195,8 +217,8 @@ Future SelectCustomer(context) async {
     AppGlobals.CustomerList.clear();
     var Comid = AppGlobals.storagenew.getInt('Comid') ?? 0;
     try {
-  final resultData = await AppGlobals.apiAllinoneSelect(
-            Uri.encodeFull("${AppGlobals.apiSelectCustomer}$Comid"), null, null, context);
+  final resultData = await ApiLegacyHelper.apiAllinoneSelect(
+            Uri.encodeFull("${ApiConstants.apiSelectCustomer}$Comid"), null, null, context);
   if (resultData.isNotEmpty) {
         AppGlobals.CustomerList = resultData
             .map((element) => CustomerModel.fromJson(element))
@@ -226,8 +248,8 @@ Future SelectLocation(context) async {
     AppGlobals.LocationList.clear();
     var Comid = AppGlobals.storagenew.getInt('Comid') ?? 0;
     try {
-  final resultData = await AppGlobals.apiAllinoneSelect(
-        Uri.encodeFull("${AppGlobals.apiSelectLocation}$Comid"), null, null, context);
+  final resultData = await ApiLegacyHelper.apiAllinoneSelect(
+        Uri.encodeFull("${ApiConstants.apiSelectLocation}$Comid"), null, null, context);
   if (resultData.isNotEmpty) {
         AppGlobals.LocationList = resultData
             .map((element) => LocationModel.fromJson(element))
@@ -257,8 +279,8 @@ Future SelectWareHouse(context) async {
     AppGlobals.WareHouseList.clear();
     var Comid = AppGlobals.storagenew.getInt('Comid') ?? 0;
     try {
-  final resultData = await AppGlobals.apiAllinoneSelectArrayWithOutAuth(
-        Uri.encodeFull("${AppGlobals.apiWareHouseCombo}$Comid"), null, null, context);
+  final resultData = await ApiLegacyHelper.apiAllinoneSelectArrayWithOutAuth(
+        Uri.encodeFull("${ApiConstants.apiWareHouseCombo}$Comid"), null, null, context);
   if (resultData.isNotEmpty) {
         AppGlobals.WareHouseList = resultData["Data1"]
             .map((element) => WareHouseModel.fromJson(element))
@@ -288,8 +310,8 @@ Future SelectStockJob(context) async {
     AppGlobals.StockJobList.clear();
     var Comid = AppGlobals.storagenew.getInt('Comid') ?? 0;
     try {
-  final resultData = await AppGlobals.apiAllinoneSelectArrayWithOutAuth(
-        Uri.encodeFull("${AppGlobals.apiSelectStockJob}$Comid"), null, null, context);
+  final resultData = await ApiLegacyHelper.apiAllinoneSelectArrayWithOutAuth(
+        Uri.encodeFull("${ApiConstants.apiSelectStockJob}$Comid"), null, null, context);
   if (resultData.isNotEmpty) {
         AppGlobals.StockJobList = resultData["Data1"]
             .map((element) => WareHouseModel.fromJson(element))
@@ -319,8 +341,8 @@ Future SelectEmployee(context, String type, String type1) async {
     AppGlobals.EmployeeList.clear();
     var Comid = AppGlobals.storagenew.getInt('Comid') ?? 0;
     try {
-  final resultData = await AppGlobals.apiAllinoneSelect(
-            Uri.encodeFull("${AppGlobals.apiSelectEmployee}$Comid&type=$type&type1=$type1"),
+  final resultData = await ApiLegacyHelper.apiAllinoneSelect(
+            Uri.encodeFull("${ApiConstants.apiSelectEmployee}$Comid&type=$type&type1=$type1"),
             null,
             null,
             context);
@@ -353,8 +375,8 @@ Future SelectJobStatus(context) async {
     AppGlobals.JobStatusList.clear();
     var Comid = AppGlobals.storagenew.getInt('Comid') ?? 0;
     try {
-  final resultData = await AppGlobals.apiAllinoneSelect(
-            Uri.encodeFull("${AppGlobals.apiSelectJobStatus}$Comid"), null, null, context);
+  final resultData = await ApiLegacyHelper.apiAllinoneSelect(
+            Uri.encodeFull("${ApiConstants.apiSelectJobStatus}$Comid"), null, null, context);
   if (resultData.isNotEmpty) {
         AppGlobals.JobStatusList = resultData
             .map((element) => JobStatusModel.fromJson(element))
@@ -383,8 +405,8 @@ Future MaxSaleOrderNo(context, String BillType) async {
   try {
     var Comid = AppGlobals.storagenew.getInt('Comid') ?? 0;
     try {
-  final resultData = await AppGlobals.apiGetString(
-            "${AppGlobals.apiMaxSaleOrderNo}$Comid&BillType=$BillType");
+  final resultData = await ApiLegacyHelper.apiGetString(
+            "${ApiConstants.apiMaxSaleOrderNo}$Comid&BillType=$BillType");
   if (resultData.isNotEmpty) {
         AppGlobals.MaxSaleOrderNum = resultData;
       }
@@ -412,8 +434,8 @@ Future MaxStockNo(context) async {
   try {
     var Comid = AppGlobals.storagenew.getInt('Comid') ?? 0;
     try {
-  final resultData = await AppGlobals.apiAllinoneSelectArray(
-            Uri.encodeFull("${AppGlobals.apiMaxStockNo}$Comid"), null, null, context);
+  final resultData = await ApiLegacyHelper.apiAllinoneSelectArray(
+            Uri.encodeFull("${ApiConstants.apiMaxStockNo}$Comid"), null, null, context);
   if (resultData.isNotEmpty) {
        // var checkdata = resultData["Data1"];
         AppGlobals.MaxStockNum = resultData["Data1"];
@@ -442,8 +464,8 @@ Future SelectJobType(context) async {
     AppGlobals.JobTypeList.clear();
     var Comid = AppGlobals.storagenew.getInt('Comid') ?? 0;
     try {
-  final resultData = await AppGlobals.apiAllinoneSelect(
-            Uri.encodeFull("${AppGlobals.apiSelectJobType}$Comid"), null, null, context);
+  final resultData = await ApiLegacyHelper.apiAllinoneSelect(
+            Uri.encodeFull("${ApiConstants.apiSelectJobType}$Comid"), null, null, context);
   if (resultData.isNotEmpty) {
         AppGlobals.JobTypeList = resultData
             .map((element) => JobTypeModel.fromJson(element))
@@ -473,8 +495,8 @@ Future SelectAllJobStatus(context, int Jobid) async {
     AppGlobals.JobAllStatusList.clear();
     var Comid = AppGlobals.storagenew.getInt('Comid') ?? 0;
     try {
-  final resultData = await AppGlobals.apiAllinoneSelect(
-            Uri.encodeFull("${AppGlobals.apiSelectAllJobStatus}$Comid&Jobid=$Jobid"),
+  final resultData = await ApiLegacyHelper.apiAllinoneSelect(
+            Uri.encodeFull("${ApiConstants.apiSelectAllJobStatus}$Comid&Jobid=$Jobid"),
             null,
             null,
             context);
@@ -514,8 +536,8 @@ Future SelectAgentCompany(context) async {
     AppGlobals.AgentCompanyList.clear();
     var Comid = AppGlobals.storagenew.getInt('Comid') ?? 0;
     try {
-  final resultData = await AppGlobals.apiAllinoneSelect(
-            Uri.encodeFull("${AppGlobals.apiSelectAgentCompany}$Comid"), null, null, context);
+  final resultData = await ApiLegacyHelper.apiAllinoneSelect(
+            Uri.encodeFull("${ApiConstants.apiSelectAgentCompany}$Comid"), null, null, context);
   if (resultData.isNotEmpty) {
         AppGlobals.AgentCompanyList = resultData
             .map((element) => AgentCompanyModel.fromJson(element))
@@ -545,8 +567,8 @@ Future SelectAgentAll(context, int AgentCompanyId) async {
     AppGlobals.AgentAllList.clear();
     var Comid = AppGlobals.storagenew.getInt('Comid') ?? 0;
     try {
-  final resultData = await AppGlobals.apiAllinoneSelect(
-            Uri.encodeFull("${AppGlobals.apiSelectAgentAll}$Comid&Jobid=$AgentCompanyId"),
+  final resultData = await ApiLegacyHelper.apiAllinoneSelect(
+            Uri.encodeFull("${ApiConstants.apiSelectAgentAll}$Comid&Jobid=$AgentCompanyId"),
             null,
             null,
             context);
@@ -578,8 +600,8 @@ Future SelectProductList(context) async {
     AppGlobals.ProductList.clear();
     var Comid = AppGlobals.storagenew.getInt('Comid') ?? 0;
     try {
-  final resultData = await AppGlobals.apiAllinoneSelect(
-            Uri.encodeFull("${AppGlobals.apiGetProductList}$Comid"), null, null, context);
+  final resultData = await ApiLegacyHelper.apiAllinoneSelect(
+            Uri.encodeFull("${ApiConstants.apiGetProductList}$Comid"), null, null, context);
   if (resultData.isNotEmpty) {
         AppGlobals.ProductList = resultData
             .map((element) => ProductModel.fromJson(element))
@@ -614,7 +636,7 @@ Future<List<dynamic>?> selectAddressList() async {
 
     // Call ApiClient.postRequest and pass null for the body
     final resultData = await ApiClient.postRequest(
-      "${AppGlobals.apiSelectAddressList}$comId",
+      "${ApiConstants.apiSelectAddressList}$comId",
       null,
     );
 
@@ -647,7 +669,7 @@ Future<List<dynamic>?> selectAddressList() async {
 //
 //     final resultData = await objfun
 //         .apiAllinoneSelect(
-//       "${AppGlobals.apiSelectAddressList}$comId",
+//       "${ApiConstants.apiSelectAddressList}$comId",
 //       null,
 //       null,
 //       context,
@@ -689,8 +711,8 @@ void _showError(BuildContext context, String message) {
 Future EditSalesOrder(int Id, int SaleNo, {BuildContext? context}) async {
   try {
     var Comid = AppGlobals.storagenew.getInt('Comid') ?? 0;
-    var resultData = await AppGlobals.apiAllinoneSelect(
-        Uri.encodeFull("${AppGlobals.apiEditSalesOrder}$Id&SaleorderNo=$SaleNo&Comid=$Comid"),
+    var resultData = await ApiLegacyHelper.apiAllinoneSelect(
+        Uri.encodeFull("${ApiConstants.apiEditSalesOrder}$Id&SaleorderNo=$SaleNo&Comid=$Comid"),
         null, null, context);
 
     if (resultData != null && resultData.isNotEmpty) {
@@ -713,8 +735,8 @@ Future loadCustomerCurrency(context, int CustomerId) async {
 AppGlobals.CustomerCurrencyValue = 0.0;
     var Comid = AppGlobals.storagenew.getInt('Comid') ?? 0;
     try {
-  final resultData = await AppGlobals.apiAllinoneSelectArray(
-        Uri.encodeFull("${AppGlobals.apiGetCurrencyValue}$Comid&CustId=$CustomerId"),
+  final resultData = await ApiLegacyHelper.apiAllinoneSelectArray(
+        Uri.encodeFull("${ApiConstants.apiGetCurrencyValue}$Comid&CustId=$CustomerId"),
         null,
         null,
         context);
@@ -744,8 +766,8 @@ Future loadComboS1(context, int type) async {
     AppGlobals.ComboS1List=[];
     var Comid = AppGlobals.storagenew.getInt('Comid') ?? 0;
     try {
-  final resultData = await AppGlobals.apiAllinoneSelectArray(
-            Uri.encodeFull("${AppGlobals.apiGetComboS1}$Comid&type=$type"),
+  final resultData = await ApiLegacyHelper.apiAllinoneSelectArray(
+            Uri.encodeFull("${ApiConstants.apiGetComboS1}$Comid&type=$type"),
             null,
             null,
             context);
@@ -781,8 +803,8 @@ Future EditPlanning(context, int Id, int PlanningNo) async {
     // AppGlobals.PlanningEditList.clear();
     var Comid = AppGlobals.storagenew.getInt('Comid') ?? 0;
     try {
-  final resultData = await AppGlobals.apiAllinoneSelect(
-            Uri.encodeFull("${AppGlobals.apiEditPlanning}$Id&PLANINGNo=$PlanningNo&Comid=$Comid"),
+  final resultData = await ApiLegacyHelper.apiAllinoneSelect(
+            Uri.encodeFull("${ApiConstants.apiEditPlanning}$Id&PLANINGNo=$PlanningNo&Comid=$Comid"),
             null,
             null,
             context);
@@ -811,8 +833,8 @@ Future EditVesselPlanning(context, int Id, int PlanningNo) async {
   try {
     var Comid = AppGlobals.storagenew.getInt('Comid') ?? 0;
     try {
-  final resultData = await AppGlobals.apiAllinoneSelect(
-        Uri.encodeFull("${AppGlobals.apiEditVesselPlanning}$Id&VESSELPLANINGNo=$PlanningNo&Comid=$Comid"),
+  final resultData = await ApiLegacyHelper.apiAllinoneSelect(
+        Uri.encodeFull("${ApiConstants.apiEditVesselPlanning}$Id&VESSELPLANINGNo=$PlanningNo&Comid=$Comid"),
         null,
         null,
         context);
@@ -842,8 +864,8 @@ Future DeleteSalesOrder(context, int Id) async {
     // AppGlobals.AddressList.clear();
     var Comid = AppGlobals.storagenew.getInt('Comid') ?? 0;
     try {
-  final resultData = await AppGlobals.apiAllinoneSelectArray(
-            Uri.encodeFull("${AppGlobals.apiDeleteSalesOrder}$Id&Comid=$Comid"),
+  final resultData = await ApiLegacyHelper.apiAllinoneSelectArray(
+            Uri.encodeFull("${ApiConstants.apiDeleteSalesOrder}$Id&Comid=$Comid"),
             null,
             null,
             context);
@@ -877,8 +899,8 @@ Future SelectAddressDetails(context, String Keyword) async {
     AppGlobals.AddressDetailedList.clear();
     var Comid = AppGlobals.storagenew.getInt('Comid') ?? 0;
     try {
-  final resultData = await AppGlobals.apiAllinoneSelect(
-            Uri.encodeFull("${AppGlobals.apiSelectAddressDetails}$Comid&KeyWord=$Keyword"),
+  final resultData = await ApiLegacyHelper.apiAllinoneSelect(
+            Uri.encodeFull("${ApiConstants.apiSelectAddressDetails}$Comid&KeyWord=$Keyword"),
             null,
             null,
             context);
@@ -911,8 +933,8 @@ Future GetJobNoForwarding(context,int BillId) async {
     AppGlobals.ForwardingList.clear();
     var Comid = AppGlobals.storagenew.getInt('Comid') ?? 0;
     try {
-  final resultData = await AppGlobals.apiAllinoneSelectArray(
-        Uri.encodeFull("${AppGlobals.apiGetJobNo}$Comid&JobType=$BillId"), null, null, context);
+  final resultData = await ApiLegacyHelper.apiAllinoneSelectArray(
+        Uri.encodeFull("${ApiConstants.apiGetJobNo}$Comid&JobType=$BillId"), null, null, context);
   if (resultData.length != 0) {   
         AppGlobals.ForwardingList = resultData["Data1"]
             .map((element) => ForwardingModel.fromJson(element))
@@ -947,10 +969,10 @@ Future<void> GetRTINoForwarding(BuildContext ?context, int billId) async {
     final int comId = AppGlobals.storagenew.getInt('Comid') ?? 0;
 
     // Construct the API URL
-    final String apiUrl = '${AppGlobals.apiGetRTINo}$comId';
+    final String apiUrl = '${ApiConstants.apiGetRTINo}$comId';
 
     // Call the API
-    final resultData = await AppGlobals.apiAllinoneSelectArray(
+    final resultData = await ApiLegacyHelper.apiAllinoneSelectArray(
         apiUrl, null, null, context);
 
     // Check response validity and content
@@ -997,8 +1019,8 @@ Future SelectTruckList(context,String? Type) async {
     var Comid = AppGlobals.storagenew.getInt('Comid') ?? 0;
 
     try {
-  final resultData = await AppGlobals.apiAllinoneSelect(
-        Uri.encodeFull("${AppGlobals.apiGetTruckList}$Comid&type="), null, null, context);
+  final resultData = await ApiLegacyHelper.apiAllinoneSelect(
+        Uri.encodeFull("${ApiConstants.apiGetTruckList}$Comid&type="), null, null, context);
   if (resultData.isNotEmpty) {
         AppGlobals.GetTruckList = resultData
             .map((element) => GetTruckModel.fromJson(element))
@@ -1028,8 +1050,8 @@ Future EditTruckList(context,int Keyword,String Column,String? Type) async {
     AppGlobals.TruckDetailsList.clear();
     var Comid = AppGlobals.storagenew.getInt('Comid') ?? 0;
     try {
-  final resultData = await AppGlobals.apiAllinoneSelect(
-        Uri.encodeFull("${AppGlobals.apiEditTruckDetails}$Comid&Startindex=0&PageCount=0&Keyword=$Keyword&Column=$Column&type="), null, null, context);
+  final resultData = await ApiLegacyHelper.apiAllinoneSelect(
+        Uri.encodeFull("${ApiConstants.apiEditTruckDetails}$Comid&Startindex=0&PageCount=0&Keyword=$Keyword&Column=$Column&type="), null, null, context);
   if (resultData.isNotEmpty) {
         AppGlobals.TruckDetailsList = resultData
             .map((element) => TruckDetailsModel.fromJson(element))
@@ -1060,8 +1082,8 @@ Future SelectDriverList(context,String? Type) async {
     var Comid = AppGlobals.storagenew.getInt('Comid') ?? 0;
 
     try {
-  final resultData = await AppGlobals.apiAllinoneSelect(
-        Uri.encodeFull("${AppGlobals.apiGetDriverList}$Comid&type="), null, null, context);
+  final resultData = await ApiLegacyHelper.apiAllinoneSelect(
+        Uri.encodeFull("${ApiConstants.apiGetDriverList}$Comid&type="), null, null, context);
   if (resultData.isNotEmpty) {
         AppGlobals.GetDriverList = resultData
             .map((element) => GetTruckModel.fromJson(element))
@@ -1091,8 +1113,8 @@ Future SelectRTIDetailViewList(context,String Fromdate,String Todate,int DId, in
     AppGlobals.RTIViewMasterList.clear();
     var Comid = AppGlobals.storagenew.getInt('Comid') ?? 0;
     try {
-  final resultData = await AppGlobals.apiAllinoneSelect(
-        Uri.encodeFull("${AppGlobals.apiSelectRTIDetailsView}$Comid&Fromdate=$Fromdate&Todate=$Todate&DId=$DId&TId=$TId&Employeeid=$Employeeid&Search$Search"), null, null, context);
+  final resultData = await ApiLegacyHelper.apiAllinoneSelect(
+        Uri.encodeFull("${ApiConstants.apiSelectRTIDetailsView}$Comid&Fromdate=$Fromdate&Todate=$Todate&DId=$DId&TId=$TId&Employeeid=$Employeeid&Search$Search"), null, null, context);
   if (resultData.isNotEmpty) {
         AppGlobals.RTIViewMasterList = resultData[0]["salemaster"]
             .map((element) => RTIMasterViewModel.fromJson(element))
@@ -1125,8 +1147,8 @@ Future SelectRTIViewList(context,String Fromdate,String Todate,int DId, int TId,
     AppGlobals.RTIViewMasterList.clear();
     var Comid = AppGlobals.storagenew.getInt('Comid') ?? 0;
     try {
-  final resultData = await AppGlobals.apiAllinoneSelect(
-        Uri.encodeFull("${AppGlobals.apiSelectRTIView}$Comid&Fromdate=$Fromdate&Todate=$Todate&DId=$DId&TId=$TId&Employeeid=$Employeeid&Search=$Search"), null, null, context);
+  final resultData = await ApiLegacyHelper.apiAllinoneSelect(
+        Uri.encodeFull("${ApiConstants.apiSelectRTIView}$Comid&Fromdate=$Fromdate&Todate=$Todate&DId=$DId&TId=$TId&Employeeid=$Employeeid&Search=$Search"), null, null, context);
   if (resultData.isNotEmpty) {
         AppGlobals.RTIViewMasterList = resultData[0]["salemaster"]
             .map((element) => RTIMasterViewModel.fromJson(element))
@@ -1159,8 +1181,8 @@ Future<List<String>> GetEmployeeport(context) async {
     var empId = AppGlobals.storagenew.getInt('EmpRefId') ?? 0;
     
     // Using apiAllinoneSelect as it handles GET requests returning JSON arrays well
-    final resultData = await AppGlobals.apiAllinoneSelect(
-        Uri.encodeFull("${AppGlobals.port}/api/EmployeeApp/GetEmployeeport?Comid=$Comid&id=$empId"), null, null, context);
+    final resultData = await ApiLegacyHelper.apiAllinoneSelect(
+        Uri.encodeFull("${ApiConstants.port}/api/EmployeeApp/GetEmployeeport?Comid=$Comid&id=$empId"), null, null, context);
         
     if (resultData != null && resultData is List) {
       return resultData.map((e) => e["AccountName"].toString()).toList();

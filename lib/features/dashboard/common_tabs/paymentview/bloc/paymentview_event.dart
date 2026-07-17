@@ -1,4 +1,5 @@
 import '../../../../../core/models/model.dart';
+import 'package:maleva/core/models/shared/payment_pending_model.dart';
 
 abstract class PaymentPendingEvent {
   const PaymentPendingEvent();

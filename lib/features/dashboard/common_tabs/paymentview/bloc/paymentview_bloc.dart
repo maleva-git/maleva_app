@@ -1,12 +1,12 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 
-import 'package:maleva/core/models/model.dart';
 import 'package:maleva/core/utils/app_globals.dart';
 
 import '../data/paymentview_repository.dart';
 import 'paymentview_event.dart';
 import 'paymentview_state.dart';
+import 'package:maleva/core/models/shared/payment_pending_model.dart';
 
 class PaymentPendingBloc extends Bloc<PaymentPendingEvent, PaymentPendingState> {
   // ❌ REMOVED: final BuildContext context;

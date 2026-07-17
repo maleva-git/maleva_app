@@ -1,7 +1,9 @@
-import 'package:maleva/core/models/model.dart';
+import 'package:maleva/core/utils/system_helpers.dart';
+import 'package:maleva/core/network/api_constants.dart';
 import 'package:maleva/core/network/api_client.dart';
 import 'package:maleva/core/utils/app_preferences.dart';
 import 'package:maleva/core/utils/app_globals.dart'; // Only for image path parsing
+import 'package:maleva/core/models/shared/response_view_model.dart';
 
 class StockUpdateRepository {
   final int comid = AppPreferences.getComid();
@@ -13,7 +15,7 @@ class StockUpdateRepository {
 
   // ─── Scan Barcode ──────────────────────────────────────────────────────────
   Future<String?> scanBarcode() async {
-    await AppGlobals.barcodeScanning();
+    await SystemHelpers.barcodeScanning();
     if (AppGlobals.barcodeerror == true) return null;
     return AppGlobals.barcodestring as String;
   }
@@ -21,7 +23,7 @@ class StockUpdateRepository {
   // ─── Load Stock Data (First Scan) ──────────────────────────────────────────
   Future<Map<String, dynamic>?> loadStockData(String barcodeLabel) async {
     final response = await ApiClient.postRequest(
-        "${AppGlobals.apiEditStockIn}0&barcodeLabel=$barcodeLabel&Comid=$comid", null);
+        "${ApiConstants.apiEditStockIn}0&barcodeLabel=$barcodeLabel&Comid=$comid", null);
 
     if (response != null) {
       final value = ResponseViewModel.fromJson(response);
@@ -35,7 +37,7 @@ class StockUpdateRepository {
   // ─── Load Job Details & Calculate Status & Boarding Officers ─────────────
   Future<Map<String, dynamic>?> loadJobDetails(int saleOrderId) async {
     final response = await ApiClient.postRequest(
-        "${AppGlobals.apiSaleOrderDetailsLoad}$comid&Id=$saleOrderId", null);
+        "${ApiConstants.apiSelectStockDetails}$comid&Id=$saleOrderId", null);
 
     if (response == null) return null;
     final value = ResponseViewModel.fromJson(response);
@@ -48,7 +50,7 @@ class StockUpdateRepository {
 
     // Fetch Job Statuses
     final statusListRes = await ApiClient.postRequest(
-        "${AppGlobals.apiSelectAllJobStatus}$comid&JobMasterRefId=$jobMId", null);
+        "${ApiConstants.apiSelectAllJobStatus}$comid&JobMasterRefId=$jobMId", null);
 
     int statusId = 0;
     String statusName = '';
@@ -80,7 +82,7 @@ class StockUpdateRepository {
       boardId1 = empRefId;
       boardAmt1 = 50;
     } else if (statusId == 5) {
-      final editRes = await ApiClient.postRequest("${AppGlobals.apiEditSalesOrder}$soId&CNumber=0", null);
+      final editRes = await ApiClient.postRequest("${ApiConstants.apiEditSalesOrder}$soId&CNumber=0", null);
       if (editRes != null && editRes is List && editRes.isNotEmpty) {
         boardId1 = editRes[0]['LBoardingOfficerRefid'] ?? 0;
         if (boardId1 != empRefId) {
@@ -114,13 +116,13 @@ class StockUpdateRepository {
       'SubFolderName': folder,
     };
 
-    final result = await ApiClient.postRequest(AppGlobals.apiDeleteimage, null, headers: header);
+    final result = await ApiClient.postRequest(ApiConstants.apiDeleteImage, null, headers: header);
     return result != null ? ResponseViewModel.fromJson(result) : null;
   }
 
   // ─── Save Stock Update ───────────────────────────────────────────────────
   Future<ResponseViewModel?> saveStockUpdate(int stockId, int statusId, int warehouseId, List<String> imageUrls) async {
-    final url = '${AppGlobals.apiUpdateStockIn}$stockId&StatusId=$statusId&Comid=$comid&PortRefid=$warehouseId&ImageURL';
+    final url = '${ApiConstants.apiUpdateStockIn}$stockId&StatusId=$statusId&Comid=$comid&PortRefid=$warehouseId&ImageURL';
     final result = await ApiClient.postRequest(url, imageUrls);
     return result != null ? ResponseViewModel.fromJson(result) : null;
   }
@@ -151,6 +153,6 @@ class StockUpdateRepository {
       };
     }
 
-    await ApiClient.postRequest(AppGlobals.apiUpdateBoardingOfficer, master);
+    await ApiClient.postRequest(ApiConstants.apiUpdateBoardingOfficer, master);
   }
 }

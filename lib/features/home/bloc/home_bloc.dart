@@ -1,3 +1,4 @@
+import 'package:maleva/core/utils/system_helpers.dart';
 import 'package:app_version_update/app_version_update.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -47,7 +48,7 @@ class HomeDashboardBloc
   }
 
   // ── Store version check ───────────────────────────────────────────────────
-  // Uses the same package and IDs as your existing AppGlobals.checkVersion().
+  // Uses the same package and IDs as your existing SystemHelpers.checkVersion().
   // Context is NOT needed here — only the check, not the dialog.
   // The UI listener calls AppVersionUpdate.showAlertUpdate() with context.
 

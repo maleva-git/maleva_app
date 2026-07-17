@@ -1,4 +1,5 @@
 import '../../../../../core/models/model.dart';
+import 'package:maleva/core/models/shared/driver_details_model.dart';
 
 abstract class DriverState  {
   const DriverState();

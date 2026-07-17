@@ -1,3 +1,4 @@
+import 'package:maleva/core/network/api_legacy_helper.dart';
 import 'package:flutter/Material.dart';
 import 'package:maleva/core/widgets/custom_app_bar.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -54,7 +55,7 @@ class DriverDashboardView extends StatelessWidget {
         IconButton(
           icon: Icon(Icons.exit_to_app,
               size: isTablet ? 32 : 30),
-          onPressed: () => AppGlobals.logout(context),
+          onPressed: () => ApiLegacyHelper.logout(context),
         ),
         if (isTablet) const SizedBox(width: 8),
       ],

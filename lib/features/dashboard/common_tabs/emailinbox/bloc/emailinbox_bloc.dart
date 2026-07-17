@@ -1,10 +1,11 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:maleva/core/models/model.dart';
 import 'package:maleva/core/utils/app_globals.dart';
 import 'dart:convert';
 import '../data/emailinbox_repository.dart';
 import 'emailinbox_event.dart';
 import 'emailinbox_state.dart';
+import 'package:maleva/core/models/shared/email_model.dart';
+import 'package:maleva/core/models/shared/employee_model.dart';
 
 class EmailBloc extends Bloc<EmailEvent, EmailState> {
   // ❌ REMOVED: final BuildContext context;

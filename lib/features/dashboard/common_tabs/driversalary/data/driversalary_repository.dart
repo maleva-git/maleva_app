@@ -1,7 +1,8 @@
+import 'package:maleva/core/network/api_constants.dart';
 import 'package:maleva/core/network/api_client.dart';
 import 'package:maleva/core/utils/app_preferences.dart';
 import 'package:maleva/core/utils/app_globals.dart';
-import 'package:maleva/core/models/model.dart';
+import 'package:maleva/core/models/shared/response_view_model.dart';
 
 class DriverSalaryRepository {
   Future<Map<String, dynamic>> fetchSalaryData({
@@ -20,7 +21,7 @@ class DriverSalaryRepository {
 
     // Use ApiClient.postRequest (assuming it handles the headers internally as discussed)
     final resultData = await ApiClient.postRequest(
-      AppGlobals.apiSelectDriverSalary,
+      ApiConstants.apiSelectDriverSalary,
       master,
     );
 

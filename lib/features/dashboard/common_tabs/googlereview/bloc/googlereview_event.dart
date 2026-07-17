@@ -1,4 +1,3 @@
-import 'package:maleva/core/models/model.dart';
 
 abstract class ReviewEvent {
   const ReviewEvent();

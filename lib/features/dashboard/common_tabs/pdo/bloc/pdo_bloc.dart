@@ -1,10 +1,11 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:maleva/core/models/model.dart';
 import 'package:maleva/core/utils/app_globals.dart';
 
 import '../data/pdo_repository.dart';
 import 'pdo_event.dart';
 import 'pdo_state.dart';
+import 'package:maleva/core/models/shared/r_t_i_master_view_model.dart';
+import 'package:maleva/core/models/shared/r_t_i_details_view_model.dart';
 
 class PDOBloc extends Bloc<PDOViewEvent, PDOViewState> {
   final PDORepository repository; // ✅ Injected Repository

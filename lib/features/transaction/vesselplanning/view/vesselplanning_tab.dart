@@ -8,13 +8,14 @@ import 'package:maleva/core/colors/colors.dart' as colour;
 import 'package:maleva/core/di/injection.dart';
 import 'package:maleva/features/transaction/vesselplanning/data/vesselplanning_repository.dart';
 import 'package:maleva/menu/menulist.dart';
-import 'package:maleva/core/models/model.dart';
 import '../../../../core/theme/tokens.dart';
 import '../../../dashboard/common_tabs/vesselplanningdetails/view/vesselplanningdetails_tab.dart';
 import '../../../mastersearch/Employee.dart';
 import '../bloc/vesselplanning_bloc.dart';
 import '../bloc/vesselplanning_event.dart';
 import '../bloc/vesselplanning_state.dart';
+import 'package:maleva/features/transaction/vesselplanning/models/vessel_planning_master_model.dart';
+import 'package:maleva/core/models/shared/employee_model.dart';
 
 
 

@@ -5,6 +5,7 @@ import '../../../../../core/models/model.dart';
 import '../data/bocheck_repository.dart';
 import 'bocheck_event.dart';
 import 'bocheck_state.dart';
+import 'package:maleva/core/models/shared/bo_detail_response.dart';
 
 class BocBloc extends Bloc<BocEvent, BocState> {
   // ❌ REMOVED: final BuildContext context;

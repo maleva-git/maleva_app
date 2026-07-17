@@ -5,6 +5,7 @@ import '../../../../../core/models/model.dart';
 import '../data/enginehours_repository.dart';
 import 'enginehours_event.dart';
 import 'enginehours_state.dart';
+import 'package:maleva/core/models/shared/engine_hoursdata.dart';
 
 class EngineHoursBloc extends Bloc<EngineHoursEvent, EngineHoursState> {
 

@@ -1,3 +1,4 @@
+import 'package:maleva/core/network/api_constants.dart';
 import '../../../../../core/network/api_client.dart';
 import '../../../../../core/network/api_services/auth_api.dart';
 import 'package:maleva/core/utils/app_globals.dart';
@@ -19,14 +20,14 @@ class SalesOrderRepository {
 
   Future<dynamic> fetchWaitingBills(Map<String, dynamic> master) async {
     return await ApiClient.postRequest(
-      AppGlobals.apiSelectSaleorderinvoicecheck,
+      ApiConstants.apiSelectSaleorderinvoicecheck,
       master,
     );
   }
 
   Future<dynamic> fetchEmployeeInvData(int type, dynamic comId) async {
     return await ApiClient.postRequest(
-      "${AppGlobals.apiGetEmployeeInvData}$comId&type=$type",
+      "${ApiConstants.apiGetEmployeeInvData}$comId&type=$type",
       null,
     );
   }

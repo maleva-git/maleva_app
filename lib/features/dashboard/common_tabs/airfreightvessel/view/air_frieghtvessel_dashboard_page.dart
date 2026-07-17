@@ -12,6 +12,7 @@ import '../../stockinentry/view/stock_in_entry_ui.dart';
 import '../bloc/air_frieghtvessel_dashboard_bloc.dart';
 import '../bloc/air_frieghtvessel_dashboard_event.dart';
 import '../bloc/air_frieghtvessel_dashboard_state.dart';
+import 'package:maleva/features/operations/models/job_status_model.dart';
 
 
 class VesselDashboard extends StatelessWidget {
@@ -129,6 +130,7 @@ class _VesselDashboardView extends StatelessWidget {
                     if (state.statusName.isEmpty) {
                       Navigator.push(context, MaterialPageRoute(builder: (_) => const JobStatus(Searchby: 1, SearchId: 0)))
                           .then((_) {
+                        if (!context.mounted) return;
                         if (AppGlobals.SelectJobStatusList.Id != 0) {
                           context.read<VesselDashboardBloc>().add(VesselStatusSelected(
                               statusId: AppGlobals.SelectJobStatusList.Id, statusName: AppGlobals.SelectJobStatusList.Name));
@@ -150,6 +152,7 @@ class _VesselDashboardView extends StatelessWidget {
                   onTap: () {
                     Navigator.push(context, MaterialPageRoute(builder: (_) => const Port(Searchby: 1, SearchId: 0)))
                         .then((_) {
+                      if (!context.mounted) return;
                       if (AppGlobals.SelectedPortName.isNotEmpty) {
                         context.read<VesselDashboardBloc>().add(VesselPortAdded(AppGlobals.SelectedPortName));
                         context.read<VesselDashboardBloc>().add(VesselLoadRequested());
@@ -368,6 +371,7 @@ class _VesselDashboardView extends StatelessWidget {
             lastDate: DateTime(2050),
           );
           if (picked != null) {
+            if (!context.mounted) return;
             String formatted = DateFormat("yyyy-MM-dd").format(picked);
             if (isFrom) {
               context.read<VesselDashboardBloc>().add(VesselDatesChanged(fromDate: formatted, toDate: state.toDate));

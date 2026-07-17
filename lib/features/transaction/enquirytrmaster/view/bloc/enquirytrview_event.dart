@@ -1,4 +1,5 @@
 import '../../../../../core/models/model.dart';
+import 'package:maleva/features/transaction/enquirytrmaster/models/enquiry_master_model.dart';
 
 abstract class EnquiryViewEvent {}
 

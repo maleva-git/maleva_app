@@ -5,7 +5,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:maleva/core/utils/app_globals.dart';
-import 'package:maleva/core/models/model.dart';
 import 'package:maleva/core/colors/colors.dart' as colour;
 import 'package:maleva/features/dashboard/common_tabs/spotsaleorder/view/spotsaleorder_view.dart';
 import '../../../../../core/di/injection.dart';
@@ -14,6 +13,9 @@ import '../bloc/spotsaleorder_bloc.dart';
 import '../bloc/spotsaleorder_event.dart';
 import '../bloc/spotsaleorder_state.dart';
 import '../data/spotsale_repository.dart';
+import 'package:maleva/core/models/shared/list_item.dart';
+import 'package:maleva/features/operations/models/job_status_model.dart';
+import 'package:maleva/features/operations/models/job_type_model.dart';
 
 // ── Entry Point ───────────────────────────────────────────────────────────────
 class SpotSaleEntryPage extends StatelessWidget {

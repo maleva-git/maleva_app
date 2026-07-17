@@ -1,12 +1,13 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 
-import 'package:maleva/core/models/model.dart';
 import 'package:maleva/core/utils/app_globals.dart';
 
 import '../data/inventoryreport_repository.dart';
 import 'inventoryreport_event.dart';
 import 'inventoryreport_state.dart';
+import 'package:maleva/core/models/shared/inventory_model.dart';
+import 'package:maleva/core/models/shared/customer_model.dart';
 
 class InventoryBloc extends Bloc<InventoryEvent, InventoryState> {
   // ❌ REMOVED: final BuildContext context;

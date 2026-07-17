@@ -1,3 +1,4 @@
+import 'package:maleva/core/network/api_constants.dart';
 import 'package:maleva/core/network/api_client.dart';
 import 'package:maleva/core/utils/app_globals.dart';
 
@@ -8,7 +9,7 @@ class FuelRepository {
   }) async {
     // ApiClient seamlessly handles the headers, timeout, and authorization
     return await ApiClient.postRequest(
-      AppGlobals.apiSelectFuelEntry,
+      ApiConstants.apiSelectFuelEntry,
       body,
     );
   }

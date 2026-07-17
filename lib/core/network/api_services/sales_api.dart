@@ -1,10 +1,14 @@
 // core/network/api_services/sales_api.dart
 // Sales Order, Planning, Vessel Planning, Job No, Combo — ella sales calls inga
 
-import 'package:maleva/core/models/model.dart';
 import 'package:maleva/core/network/api_client.dart';
 import 'package:maleva/core/network/api_constants.dart';
 import 'package:maleva/core/utils/app_preferences.dart';
+import 'package:maleva/core/models/shared/r_t_i_master_view_model.dart';
+import 'package:maleva/features/operations/models/forwarding_model.dart';
+import 'package:maleva/core/models/shared/sale_edit_detail_model.dart';
+import 'package:maleva/core/models/shared/response_view_model.dart';
+import 'package:maleva/core/models/shared/r_t_i_details_view_model.dart';
 
 class SalesApi {
   SalesApi._();

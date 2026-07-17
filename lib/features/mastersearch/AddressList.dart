@@ -1,3 +1,4 @@
+import 'package:maleva/core/network/api_constants.dart';
 import 'package:flutter/material.dart';
 import 'package:maleva/core/colors/colors.dart' as colour;
 import 'package:maleva/core/utils/app_globals.dart';
@@ -44,7 +45,7 @@ class _AddressListstate extends State<AddressList> {
 
     try {
       final response = await ApiClient.postRequest(
-        '${AppGlobals.apiSelectAddressList}${AppGlobals.Comid}',
+        '${ApiConstants.apiSelectAddressList}${AppGlobals.Comid}',
         null,
       );
 

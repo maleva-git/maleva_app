@@ -1,11 +1,12 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
-import 'package:maleva/core/models/model.dart';
 import 'package:maleva/core/utils/app_globals.dart';
 
 import '../data/googlereview_repository.dart';
 import 'googlereview_event.dart';
 import 'googlereview_state.dart';
+import 'package:maleva/core/models/shared/review.dart';
+import 'package:maleva/core/models/shared/employee_model.dart';
 
 class ReviewBloc extends Bloc<ReviewEvent, ReviewState> {
   // ❌ REMOVED: final BuildContext context;

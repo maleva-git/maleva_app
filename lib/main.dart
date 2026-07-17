@@ -69,7 +69,7 @@ Future<void> main() async {
       NotificationSettings settings = await messaging.requestPermission(
         alert: true,
         announcement: false,
-        badge: false, // Disable app icon badge
+        badge: false, // Disable a icon badge
         carPlay: false,
         criticalAlert: false,
         provisional: false,

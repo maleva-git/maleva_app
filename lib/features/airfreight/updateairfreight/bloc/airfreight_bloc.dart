@@ -1,11 +1,13 @@
+import 'package:maleva/core/network/api_legacy_helper.dart';
+import 'package:maleva/core/network/api_constants.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:maleva/core/utils/app_globals.dart';
 import 'package:maleva/core/network/OnlineApi.dart' as OnlineApi;
-import 'package:maleva/core/models/model.dart';
 
 import 'airfreight_event.dart';
 import 'airfreight_state.dart';
+import 'package:maleva/core/models/shared/response_view_model.dart';
 
 class AirFreightBloc extends Bloc<AirFreightEvent, AirFreightState> {
   AirFreightBloc() : super(AirFreightInitial()) {
@@ -116,7 +118,7 @@ class AirFreightBloc extends Bloc<AirFreightEvent, AirFreightState> {
       };
 
       // 🔥 Fixed: Passed null for context
-      final result = await AppGlobals.apiAllinoneSelectArray(AppGlobals.apiDeleteimage, null, header, null);
+      final result = await ApiLegacyHelper.apiAllinoneSelectArray(ApiConstants.apiDeleteImage, null, header, null);
       if (result != '') {
         final value = ResponseViewModel.fromJson(result);
         if (value.IsSuccess == true) {
@@ -147,7 +149,7 @@ class AirFreightBloc extends Bloc<AirFreightEvent, AirFreightState> {
       final header = {'Content-Type': 'application/json; charset=UTF-8'};
 
       // 🔥 Fixed: Passed null for context
-      final result = await AppGlobals.apiAllinoneSelectArray(AppGlobals.apiUpdateAirFrieghtDetails, master, header, null);
+      final result = await ApiLegacyHelper.apiAllinoneSelectArray(ApiConstants.apiUpdateAirFrieghtDetails, master, header, null);
 
       if (result != '') {
         final value = ResponseViewModel.fromJson(result);
@@ -211,7 +213,7 @@ class AirFreightBloc extends Bloc<AirFreightEvent, AirFreightState> {
       final header = {'Content-Type': 'application/json; charset=UTF-8'};
 
       // 🔥 Fixed: Passed null for context
-      final imgResult = await AppGlobals.apiAllinoneSelectArray('${AppGlobals.apiGetimage}$imageDir', null, header, null);
+      final imgResult = await ApiLegacyHelper.apiAllinoneSelectArray('${ApiConstants.apiGetImage}$imageDir', null, header, null);
 
       List<String> images = [];
       if (imgResult != '' && imgResult.length != 0) {

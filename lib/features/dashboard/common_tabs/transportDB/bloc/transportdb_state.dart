@@ -3,6 +3,11 @@
 import 'package:equatable/equatable.dart';
 
 import '../../../../../core/models/model.dart';
+import 'package:maleva/core/models/shared/email_model.dart';
+import 'package:maleva/core/models/shared/r_t_i_details_view_model.dart';
+import 'package:maleva/core/models/shared/review.dart';
+import 'package:maleva/core/models/shared/employee_model.dart';
+import 'package:maleva/core/models/shared/r_t_i_master_view_model.dart';
 
 enum TransportDashboardStatus { initial, loading, success, failure }
 

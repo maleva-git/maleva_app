@@ -1,3 +1,5 @@
+import 'package:maleva/core/utils/system_helpers.dart';
+import 'package:maleva/core/network/api_constants.dart';
 import 'dart:io';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
@@ -7,7 +9,6 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:maleva/core/utils/app_globals.dart';
 import 'package:maleva/core/network/OnlineApi.dart' as OnlineApi;
-import 'package:maleva/core/models/model.dart';
 import 'package:maleva/menu/menulist.dart';
 import '../../../../core/di/injection.dart';
 import '../../../../core/theme/palette.dart';
@@ -15,6 +16,7 @@ import '../../../mastersearch/Employee.dart';
 import '../bloc/forwarding_bloc.dart';
 import '../bloc/forwarding_event.dart';
 import '../bloc/forwarding_state.dart';
+import 'package:maleva/core/models/shared/employee_model.dart';
 
 
 const kGradient = LinearGradient(
@@ -85,7 +87,7 @@ class FWUpdatePageState extends State<FWUpdatePage> with SingleTickerProviderSta
     final file = await picker.pickImage(source: source);
     if (file == null) return;
 
-    final url = await AppGlobals.upload(File(file.path), AppGlobals.apiPostimage, s.saleOrderId, 'SalesOrder', smkText);
+    final url = await SystemHelpers.upload(File(file.path), ApiConstants.apiPostImage, s.saleOrderId, 'SalesOrder', smkText);
     if (url != null && url.isNotEmpty) {
       context.read<FWUpdateBloc>().add(FWUpdateImagePicked(type: type, imageUrl: url));
     }
@@ -716,7 +718,7 @@ class _ImageUploadSection extends StatelessWidget {
                       context.read<FWUpdateBloc>().add(FWUpdateImageDeleted(type: type, index: index));
                     }
                   },
-                  onTap: () => AppGlobals.launchInBrowser(imageUrl),
+                  onTap: () => SystemHelpers.launchInBrowser(imageUrl),
                   borderRadius: BorderRadius.circular(8),
                   child: ClipRRect(
                     borderRadius: BorderRadius.circular(8),

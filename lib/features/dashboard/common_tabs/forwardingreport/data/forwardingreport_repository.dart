@@ -1,3 +1,5 @@
+import 'package:maleva/core/network/api_legacy_helper.dart';
+import 'package:maleva/core/network/api_constants.dart';
 import 'package:maleva/core/utils/app_preferences.dart';
 import 'package:maleva/core/utils/app_globals.dart';
 
@@ -22,8 +24,8 @@ class ForwardingReportRepository {
 
       // Removed BuildContext since it shouldn't be in the data layer.
       // Ensure your apiAllinoneSelectArray is updated to handle context optionally or via a global navigator key if needed for token expiry dialogs.
-      final resultData = await AppGlobals.apiAllinoneSelectArray(
-        "${AppGlobals.apiGetFWData}$comId&startDate=$fromDate&endDate=$toDate",
+      final resultData = await ApiLegacyHelper.apiAllinoneSelectArray(
+        "${ApiConstants.apiGetFWData}$comId&startDate=$fromDate&endDate=$toDate",
         null,
         header,
         null, // Pass null for context

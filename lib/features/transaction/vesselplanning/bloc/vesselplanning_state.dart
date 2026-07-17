@@ -1,6 +1,8 @@
 
 
 import '../../../../core/models/model.dart';
+import 'package:maleva/features/transaction/vesselplanning/models/vessel_planning_master_model.dart';
+import 'package:maleva/features/transaction/vesselplanning/models/vessel_planning_detail_model.dart';
 
 abstract class VesselPlanningState {}
 

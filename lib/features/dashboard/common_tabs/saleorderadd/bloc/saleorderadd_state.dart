@@ -2,6 +2,7 @@ import 'package:equatable/equatable.dart';
 import 'package:intl/intl.dart';
 
 import '../../../../../core/models/model.dart';
+import 'package:maleva/core/models/shared/sale_edit_detail_model.dart';
 
 enum SalesOrderStatus { initial, loading, success, failure }
 

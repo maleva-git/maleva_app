@@ -1,4 +1,4 @@
-import 'package:maleva/core/models/model.dart';
+import 'package:maleva/core/network/api_constants.dart';
 import 'package:maleva/core/network/api_client.dart';
 import 'package:maleva/core/network/OnlineApi.dart' as OnlineApi;
 import 'package:maleva/core/utils/app_preferences.dart';
@@ -37,7 +37,7 @@ class ForwardingSalaryRepository {
       'RTIMasterRefId': saleOrderId,
     };
 
-    final result = await ApiClient.postRequest(AppGlobals.apiSelectForwarding, body);
+    final result = await ApiClient.postRequest(ApiConstants.apiSelectForwarding, body);
 
     if (result != null && result is Map<String, dynamic> && result['IsSuccess'] == true) {
       if (result['Data1'] != null && (result['Data1'] as List).isNotEmpty) {
@@ -49,7 +49,7 @@ class ForwardingSalaryRepository {
 
   // ─── Save Forwarding Salary ────────────────────────────────────────────────
   Future<bool> saveForwardingSalary(Map<String, dynamic> masterPayload) async {
-    final result = await ApiClient.postRequest(AppGlobals.apiInsertForwarding, [masterPayload]);
+    final result = await ApiClient.postRequest(ApiConstants.apiInsertForwarding, [masterPayload]);
 
     if (result != null && result is Map<String, dynamic>) {
       return result['Result'] == 1 || result['IsSuccess'] == true;

@@ -4,10 +4,11 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 
 import 'package:maleva/core/utils/app_globals.dart';
-import 'package:maleva/core/models/model.dart';
 import '../data/spotsale_repository.dart';
 import 'spotsaleorder_event.dart';
 import 'spotsaleorder_state.dart';
+import 'package:maleva/features/operations/models/job_status_model.dart';
+import 'package:maleva/features/operations/models/job_type_model.dart';
 
 class SpotSaleBloc extends Bloc<SpotSaleEvent, SpotSaleState> {
   final SpotSaleRepository repository; // ✅ Injected Repository

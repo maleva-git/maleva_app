@@ -1,11 +1,14 @@
+import 'package:maleva/core/utils/system_helpers.dart';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
-import 'package:maleva/core/models/model.dart';
 import 'package:maleva/core/utils/app_globals.dart';
 import 'package:maleva/features/transaction/vesselplanning/bloc/vesselplanning_event.dart';
 import 'package:maleva/features/transaction/vesselplanning/bloc/vesselplanning_state.dart';
 import 'package:maleva/features/transaction/vesselplanning/data/vesselplanning_repository.dart';
+import 'package:maleva/features/transaction/vesselplanning/models/vessel_planning_master_model.dart';
+import 'package:maleva/features/transaction/vesselplanning/models/vessel_planning_detail_model.dart';
+import 'package:maleva/core/models/shared/response_view_model.dart';
 
 class VesselPlanningBloc extends Bloc<VesselPlanningEvent, VesselPlanningState> {
   final VesselPlanningRepository _repository;
@@ -99,7 +102,7 @@ class VesselPlanningBloc extends Bloc<VesselPlanningEvent, VesselPlanningState> 
       if (resultData != null && resultData.isNotEmpty) {
         ResponseViewModel? value = ResponseViewModel.fromJson(resultData);
         if (value.IsSuccess == true) {
-          AppGlobals.launchInBrowser(value.data1);
+          SystemHelpers.launchInBrowser(value.data1);
         }
       }
     } catch (e) {

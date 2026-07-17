@@ -1,4 +1,5 @@
-import 'package:maleva/core/models/model.dart';
+import 'package:maleva/core/models/shared/patty_cash_details_model.dart';
+import 'package:maleva/core/models/shared/pattycash_master_model.dart';
 
 abstract class PettyCashState {
   const PettyCashState();

@@ -1,3 +1,5 @@
+import 'package:maleva/core/network/api_legacy_helper.dart';
+import 'package:maleva/core/network/api_constants.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:maleva/core/utils/app_globals.dart';
 import 'air_frieghtvessel_dashboard_event.dart';
@@ -56,7 +58,7 @@ class VesselDashboardBloc extends Bloc<VesselDashboardEvent, VesselDashboardStat
         'StatusId': state.statusId
       };
 
-      final result = await AppGlobals.apiAllinoneSelectArray(AppGlobals.AirFrieghtDB, master, header, null);
+      final result = await ApiLegacyHelper.apiAllinoneSelectArray(ApiConstants.AirFrieghtDB, master, header, null);
 
       if (result != null && result is List) {
         result.sort((a, b) => (a['Port'] ?? '').toString().toLowerCase().compareTo((b['Port'] ?? '').toString().toLowerCase()));

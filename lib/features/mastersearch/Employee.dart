@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:maleva/core/utils/app_globals.dart';
-import 'package:maleva/core/models/model.dart';
 import 'package:maleva/core/colors/colors.dart' as colour;
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:maleva/core/models/shared/employee_model.dart';
 
 class Employee extends StatefulWidget {
   final int Searchby;

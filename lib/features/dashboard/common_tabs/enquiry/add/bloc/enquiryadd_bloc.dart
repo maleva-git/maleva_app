@@ -1,10 +1,12 @@
+import 'package:maleva/core/network/api_legacy_helper.dart';
+import 'package:maleva/core/network/api_constants.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
-import 'package:maleva/core/models/model.dart';
 import 'package:maleva/core/utils/app_globals.dart';
 import 'enquiryadd_event.dart';
 import 'enquiryadd_state.dart';
+import 'package:maleva/core/models/shared/response_view_model.dart';
 
 
 
@@ -317,8 +319,8 @@ class AddEnquiryBloc extends Bloc<AddEnquiryEvent, AddEnquiryState> {
     ];
 
     try {
-      final resultData = await AppGlobals.apiAllinoneSelectArray(
-        '${AppGlobals.apiInsertEnquiry}?Comid=${AppGlobals.Comid}',
+      final resultData = await ApiLegacyHelper.apiAllinoneSelectArray(
+        '${ApiConstants.apiInsertEnquiry}?Comid=${AppGlobals.Comid}',
         master,
         header,
         null,

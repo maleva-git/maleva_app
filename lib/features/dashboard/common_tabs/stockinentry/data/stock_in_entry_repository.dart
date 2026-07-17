@@ -1,8 +1,8 @@
 import 'package:dio/dio.dart';
-import 'package:maleva/core/models/model.dart';
 import 'package:maleva/core/network/dio_client.dart';
 import 'package:maleva/core/network/api_constants.dart';
 import 'package:maleva/core/utils/session_manager.dart';
+import 'package:maleva/core/models/shared/response_view_model.dart';
 
 class StockInEntryRepository {
   final DioClient _dioClient;

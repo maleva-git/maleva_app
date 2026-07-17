@@ -1,7 +1,6 @@
 // core/network/api_services/operations_api.dart
 // RTI operations, Fuel Entry, Stock, Truck update, Forwarding Salary
 
-import 'package:maleva/core/models/model.dart';
 import 'package:maleva/core/network/api_client.dart';
 import 'package:maleva/core/network/api_constants.dart';
 import 'package:maleva/core/utils/app_preferences.dart';

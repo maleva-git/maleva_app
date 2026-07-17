@@ -1,10 +1,10 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
-import 'package:maleva/core/models/model.dart';
 import 'package:maleva/core/utils/app_globals.dart';
 import '../data/fuel_repository.dart';
 import 'fuelreport_event.dart';
 import 'fuelreport_state.dart';
+import 'package:maleva/features/transport/models/fuelselect_model.dart';
 
 class FuelDiffBloc extends Bloc<FuelDiffEvent, FuelDiffState> {
   final FuelRepository repository;

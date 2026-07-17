@@ -5,7 +5,6 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:salomon_bottom_bar/salomon_bottom_bar.dart';
 
-import 'package:maleva/core/models/model.dart';
 import 'package:maleva/core/utils/app_globals.dart';
 import 'package:maleva/menu/menulist.dart';
 
@@ -13,6 +12,7 @@ import '../../../../../core/di/injection.dart';
 import '../bloc/saleorderdetails_bloc.dart';
 import '../bloc/saleorderdetails_event.dart';
 import '../bloc/saleorderdetails_state.dart';
+import 'package:maleva/core/models/shared/sale_edit_detail_model.dart';
 
 
 

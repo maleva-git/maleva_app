@@ -1,3 +1,5 @@
+import 'package:maleva/core/network/api_legacy_helper.dart';
+import 'package:maleva/core/network/api_constants.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:maleva/core/utils/app_globals.dart';
 import 'fuelentryview_event.dart';
@@ -79,8 +81,8 @@ class FuelEntryViewBloc
     emit(FuelEntryViewLoading());
     try {
       final header = {'Content-Type': 'application/json; charset=UTF-8'};
-      await AppGlobals.apiAllinoneSelectArray(
-          '${AppGlobals.apiDeleteFuelEntry}${event.item['Id']}'
+      await ApiLegacyHelper.apiAllinoneSelectArray(
+          '${ApiConstants.apiDeleteFuelEntry}${event.item['Id']}'
               '&Comid=${event.item['CompanyRefId']}&Mobile=1',
           {},
           header,
@@ -112,8 +114,8 @@ class FuelEntryViewBloc
     };
     final header = {'Content-Type': 'application/json; charset=UTF-8'};
 
-    final result = await AppGlobals.apiAllinoneSelectArray(
-        AppGlobals.apiSelectFuelEntry, master, header, null);
+    final result = await ApiLegacyHelper.apiAllinoneSelectArray(
+        ApiConstants.apiSelectFuelEntry, master, header, null);
 
     if (result != '' && result.length != 0) {
       return List<dynamic>.from(result as List);

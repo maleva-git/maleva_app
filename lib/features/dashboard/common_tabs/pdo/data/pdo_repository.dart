@@ -1,8 +1,9 @@
+import 'package:maleva/core/network/api_constants.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:maleva/core/network/api_client.dart';
 import 'package:maleva/core/utils/app_globals.dart';
-import 'package:maleva/core/models/model.dart';
+import 'package:maleva/core/models/shared/r_t_i_details_view_model.dart';
 
 class PDORepository {
   /// Fetches PDO / RTI Records
@@ -15,7 +16,7 @@ class PDORepository {
     required int employeeId,
     required String search,
   }) async {
-    final url = "${AppGlobals.apiSelectRTIView}$comId"
+    final url = "${ApiConstants.apiSelectRTIView}$comId"
         "&Fromdate=$fromDate&Todate=$toDate"
         "&DId=$driverId&TId=$truckId&Employeeid=$employeeId"
         "&Search=$search";
@@ -29,7 +30,7 @@ class PDORepository {
     required List<Map<String, dynamic>> payload,
     required List<RTIDetailsViewModel> checkedDetails,
   }) async {
-    final uri = Uri.parse("${AppGlobals.apiRTIDetailsInsert}$comId");
+    final uri = Uri.parse("${ApiConstants.apiRTIDetailsInsert}$comId");
     final request = http.MultipartRequest("POST", uri);
 
     request.fields["objReceipt"] = jsonEncode(payload);

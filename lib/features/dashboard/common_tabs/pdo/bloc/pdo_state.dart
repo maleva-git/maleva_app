@@ -1,4 +1,5 @@
-import 'package:maleva/core/models/model.dart';
+import 'package:maleva/core/models/shared/r_t_i_master_view_model.dart';
+import 'package:maleva/core/models/shared/r_t_i_details_view_model.dart';
 
 abstract class PDOViewState {
   const PDOViewState();

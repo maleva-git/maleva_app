@@ -9,7 +9,6 @@ import 'package:maleva/core/colors/colors.dart' as colors;
 import 'package:maleva/core/theme/palette.dart';
 import 'package:maleva/core/utils/app_globals.dart';
 import 'package:maleva/core/network/OnlineApi.dart' as OnlineApi;
-import 'package:maleva/core/models/model.dart';
 import 'package:maleva/menu/menulist.dart';
 import '../../../../../mastersearch/Customer.dart';
 import '../../../../../mastersearch/JobType.dart';
@@ -17,6 +16,8 @@ import '../../../../../mastersearch/Port.dart';
 import '../bloc/enquiryadd_bloc.dart';
 import '../bloc/enquiryadd_event.dart';
 import '../bloc/enquiryadd_state.dart';
+import 'package:maleva/core/models/shared/customer_model.dart';
+import 'package:maleva/features/operations/models/job_type_model.dart';
 
 
 class AddEnquiryScreen extends StatelessWidget {

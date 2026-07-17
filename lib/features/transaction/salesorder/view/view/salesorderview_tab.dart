@@ -5,7 +5,6 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:maleva/core/utils/app_globals.dart';
-import 'package:maleva/core/models/model.dart';
 import 'package:maleva/features/transaction/salesorder/view/data/salesorderview_repository.dart';
 import 'package:maleva/menu/menulist.dart';
 import 'package:maleva/core/colors/colors.dart' as colour;
@@ -16,6 +15,11 @@ import '../../add/view/salesorderadd_tab.dart';
 import '../bloc/salesorderview_bloc.dart';
 import '../bloc/salesorderview_event.dart';
 import '../bloc/salesorderview_state.dart';
+import 'package:maleva/core/models/shared/customer_model.dart';
+import 'package:maleva/core/models/shared/employee_model.dart';
+import 'package:maleva/core/models/shared/sale_edit_detail_model.dart';
+import 'package:maleva/features/transaction/salesorder/models/sale_order_master_model.dart';
+import 'package:maleva/features/operations/models/job_status_model.dart';
 
 
 

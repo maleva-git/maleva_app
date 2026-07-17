@@ -1,3 +1,4 @@
+import 'package:maleva/core/network/api_legacy_helper.dart';
 import 'package:flutter/material.dart';
 import 'package:maleva/core/widgets/custom_app_bar.dart';
 import 'package:flutter/cupertino.dart';
@@ -19,6 +20,7 @@ import '../../common_tabs/driverleave/view/admin_leave_approval_tab.dart';
 import '../bloc/sales_bloc.dart';
 import '../bloc/sales_state.dart';
 import 'package:maleva/features/dashboard/common_tabs/driverleave/view/employee_leave_request_tab.dart';
+import 'package:maleva/core/models/shared/barcode_print_model.dart';
 class SalesDashboardView extends StatelessWidget {
   final TabController tabController;
   final bool isTablet;
@@ -71,7 +73,7 @@ class SalesDashboardView extends StatelessWidget {
         IconButton(
           icon: Icon(Icons.exit_to_app,
               size: isTablet ? 32 : 30),
-          onPressed: () => AppGlobals.logout(context),
+          onPressed: () => ApiLegacyHelper.logout(context),
         ),
         if (isTablet) const SizedBox(width: 8),
       ],

@@ -1,3 +1,4 @@
+import 'package:maleva/core/utils/system_helpers.dart';
 // ════════════════════════════════════════════════════════════════════
 //  planning_bloc.dart
 // ════════════════════════════════════════════════════════════════════
@@ -6,12 +7,14 @@ import 'package:bloc_concurrency/bloc_concurrency.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
-import 'package:maleva/core/models/model.dart';
 import 'package:maleva/core/utils/app_globals.dart';
 
 import 'planning_event.dart';
 import 'planning_state.dart';
 import 'package:maleva/features/transaction/planning/data/planning_repository.dart';
+import 'package:maleva/core/models/shared/planning_detail_model.dart';
+import 'package:maleva/core/models/shared/response_view_model.dart';
+import 'package:maleva/core/models/shared/planning_master_model.dart';
 
 class PlanningBloc extends Bloc<PlanningEvent, PlanningState> {
   final BuildContext context;
@@ -99,7 +102,7 @@ class PlanningBloc extends Bloc<PlanningEvent, PlanningState> {
 
           if (resultData != null) {
             final value = ResponseViewModel.fromJson(resultData);
-            if (value.IsSuccess == true) AppGlobals.launchInBrowser(value.data1);
+            if (value.IsSuccess == true) SystemHelpers.launchInBrowser(value.data1);
           }
         } catch (e, st) {
           msgshow(e.toString(), st.toString(), Colors.white, Colors.red, null, 18.00 - AppGlobals.reducesize, AppGlobals.tll, AppGlobals.tgc, context, 2);

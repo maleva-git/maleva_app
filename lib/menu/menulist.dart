@@ -1,8 +1,8 @@
+import 'package:maleva/core/network/api_legacy_helper.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:maleva/core/utils/app_globals.dart';
-import 'package:maleva/core/models/model.dart';
 import 'package:maleva/features/operations/forwarding/bloc/forwarding_event.dart';
 import 'package:maleva/features/transaction/viewsaleorder/view/viewsaleorder_tab.dart';
 import '../core/di/injection.dart';
@@ -51,6 +51,8 @@ import '../features/transport/updatertidetails/bloc/updatertidetails_bloc.dart';
 import '../features/transport/updatertidetails/bloc/updatertidetails_event.dart';
 import '../features/transport/updatertidetails/view/updatertidetails_tab.dart';
 import '../features/troubleshoot/view/troubleshoot_sheet.dart';
+import 'package:maleva/core/models/shared/menu_master_model.dart';
+import 'package:maleva/core/models/shared/review.dart';
 
 class Menulist extends StatefulWidget {
   const Menulist({super.key});
@@ -682,7 +684,7 @@ class _MenuTileState extends State<_MenuTile>
   // ── Navigation ─────────────────────────────────────────────────────────────
   void _navigate() {
     if (widget.entry.FormText == "Logout") {
-      AppGlobals.logout(widget.drawerContext);
+      ApiLegacyHelper.logout(widget.drawerContext);
       return;
     }
     Navigator.pop(widget.drawerContext);
@@ -912,7 +914,7 @@ class _MenuTileState extends State<_MenuTile>
           ))); 
           break;
         case "Logout":
-          AppGlobals.logout(ctx);                                   break;
+          ApiLegacyHelper.logout(ctx);                                   break;
       }
     });
   }
