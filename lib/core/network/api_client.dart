@@ -63,7 +63,7 @@ class ApiClient {
       if (kDebugMode) {
         debugPrint("✅ API RESPONSE");
         debugPrint("⬅️ Status Code: ${response.statusCode}");
-     //   debugPrint("⬅️ Body: ${response.body}");
+        debugPrint("⬅️ Body: ${response.body}");
       }
 
       return _handleResponse(response);

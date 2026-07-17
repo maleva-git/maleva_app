@@ -80,7 +80,7 @@ class Appuserloginmobile extends StatelessWidget {
       return;
     }
 
-    if (AppPreferences.getRoleId() == 600) {
+    if (AppPreferences.getRoleId() == 600 || AppPreferences.getRoleId() == 500) {
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(

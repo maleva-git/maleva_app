@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 import 'package:maleva/core/utils/app_globals.dart';
@@ -17,6 +18,7 @@ class VesselBloc extends Bloc<VesselEvent, VesselState> {
     on<ClearPortEvent>(_onClearPort);
     on<AddPortToSearchEvent>(_onAddPortToSearch);
     on<ClearSearchEvent>(_onClearSearch);
+    on<UpdateVesselDateEvent>(_onUpdateVesselDate);
   }
 
   Future<void> _onLoadVesselData(
@@ -51,11 +53,19 @@ class VesselBloc extends Bloc<VesselEvent, VesselState> {
 
       // ✅ If Boarding role (600), auto-load employee ports as Search
       String searchValue = currentSearch;
-      if (AppPreferences.getRoleId() == 600 && currentSearch.isEmpty) {
+      if ((AppPreferences.getRoleId() == 600 || AppPreferences.getRoleId() == 500) && currentSearch.isEmpty) {
         List<String> employeePorts = await OnlineApi.GetEmployeeport(null);
-        if (employeePorts.isNotEmpty) {
-          searchValue = employeePorts.join(',');
+        if (employeePorts.isEmpty) {
+          // If no ports are assigned to this user, do not load all ports. Just return empty.
+          emit(VesselLoadedState(
+            vesselList: const [],
+            isPlanToday: currentIsPlanToday,
+            portName: currentPort,
+            searchText: '',
+          ));
+          return;
         }
+        searchValue = employeePorts.join(',');
       }
 
       final Map<String, dynamic> body = {
@@ -71,6 +81,9 @@ class VesselBloc extends Bloc<VesselEvent, VesselState> {
       final resultData = await repository.fetchVesselPlanningData(
         body: body,
       );
+
+      // 🔍 DEBUG: Print the API response data in console
+      debugPrint('🔍 VESSELPLANINGDB Response: $resultData');
 
       if (resultData == null || resultData == "" || (resultData is List && resultData.isEmpty)) {
         emit(VesselLoadedState(
@@ -137,5 +150,25 @@ class VesselBloc extends Bloc<VesselEvent, VesselState> {
     if (state is VesselLoadedState) return (state as VesselLoadedState).portName;
     if (state is VesselFieldUpdatedState) return (state as VesselFieldUpdatedState).portName;
     return '';
+  }
+
+  Future<void> _onUpdateVesselDate(UpdateVesselDateEvent event, Emitter<VesselState> emit) async {
+    final currentState = state;
+    emit(const VesselUpdateActionLoading());
+    try {
+      final message = await repository.updateVesselPlanningDates(event.updateData);
+      // Wait for 1 second before showing success to ensure UI has time to load
+      await Future.delayed(const Duration(milliseconds: 500));
+      emit(VesselUpdateActionSuccess(message: message?.toString() ?? 'Success'));
+      event.onSuccess();
+      if (currentState is VesselLoadedState) {
+        emit(currentState); // Restore the loaded state so list remains visible
+      }
+    } catch (e) {
+      emit(VesselUpdateActionError(message: e.toString()));
+      if (currentState is VesselLoadedState) {
+        emit(currentState);
+      }
+    }
   }
 }

@@ -68,3 +68,22 @@ class VesselFieldUpdatedState extends VesselState {
   List<Object?> get props => [portName, searchText];
 }
 
+class VesselUpdateActionLoading extends VesselState {
+  const VesselUpdateActionLoading();
+}
+
+class VesselUpdateActionSuccess extends VesselState {
+  final String message;
+  const VesselUpdateActionSuccess({required this.message});
+
+  @override
+  List<Object?> get props => [message];
+}
+
+class VesselUpdateActionError extends VesselState {
+  final String message;
+  const VesselUpdateActionError({required this.message});
+
+  @override
+  List<Object?> get props => [message];
+}

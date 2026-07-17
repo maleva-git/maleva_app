@@ -89,11 +89,9 @@ class _Portstate extends State<Port> {
     super.dispose();
   }
   Future startup() async {
-    if (AppPreferences.getRoleId() == 600) {
+    if (AppPreferences.getRoleId() == 600 || AppPreferences.getRoleId() == 500) {
       List<String> apiPorts = await OnlineApi.GetEmployeeport(context);
-      if (apiPorts.isNotEmpty) {
-        PortList = apiPorts;
-      }
+      PortList = apiPorts; // Set to empty if no ports are assigned
     }
 
     filtersearchlist = PortList;

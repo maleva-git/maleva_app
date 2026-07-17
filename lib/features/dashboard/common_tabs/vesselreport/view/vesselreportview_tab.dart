@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:intl/intl.dart';
 import 'package:maleva/core/utils/app_globals.dart';
+import 'package:maleva/core/utils/app_preferences.dart';
 import '../../../../../core/di/injection.dart';
 import '../../../../../core/theme/tokens.dart';
 import '../../../../mastersearch/Port.dart';
@@ -75,6 +77,32 @@ class _VesselReportViewState extends State<_VesselReportView> {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text(state.errorMessage,
+                  style: GoogleFonts.poppins(color: colour.kWhite)),
+              backgroundColor: Colors.redAccent,
+              behavior: SnackBarBehavior.floating,
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12)),
+            ),
+          );
+        }
+
+        if (state is VesselUpdateActionSuccess) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(state.message,
+                  style: GoogleFonts.poppins(color: colour.kWhite)),
+              backgroundColor: Colors.green,
+              behavior: SnackBarBehavior.floating,
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12)),
+            ),
+          );
+        }
+
+        if (state is VesselUpdateActionError) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(state.message,
                   style: GoogleFonts.poppins(color: colour.kWhite)),
               backgroundColor: Colors.redAccent,
               behavior: SnackBarBehavior.floating,
@@ -186,8 +214,9 @@ class _VesselReportViewState extends State<_VesselReportView> {
                         index:      index,
                         vesselName: item["Loadingvesselname"]
                             .toString(),
-                        port: item["Port"].toString(),
+                        jobNo: item["JobNo"]?.toString() ?? '',
                         isTablet: true,
+                        itemData: item,
                       );
                     },
                   ),
@@ -256,8 +285,9 @@ class _VesselReportViewState extends State<_VesselReportView> {
             return _VesselCard(
               index:      index,
               vesselName: item["Loadingvesselname"].toString(),
-              port:       item["Port"].toString(),
+              jobNo:      item["JobNo"]?.toString() ?? '',
               isTablet:   false,
+              itemData:   item,
             );
           }),
       ],
@@ -657,7 +687,7 @@ class _ListHeader extends StatelessWidget {
         ),
         Expanded(
           flex: 2,
-          child: Text('Port',
+          child: Text('Job No.',
               textAlign: TextAlign.end,
               style: GoogleFonts.poppins(
                   fontSize:   isTablet ? 13 : 12,
@@ -673,14 +703,16 @@ class _ListHeader extends StatelessWidget {
 class _VesselCard extends StatelessWidget {
   final int index;
   final String vesselName;
-  final String port;
+  final String jobNo;
   final bool isTablet;
+  final Map<String, dynamic> itemData;
 
   const _VesselCard({
     required this.index,
     required this.vesselName,
-    required this.port,
+    required this.jobNo,
     required this.isTablet,
+    required this.itemData,
   });
 
   @override
@@ -693,7 +725,12 @@ class _VesselCard extends StatelessWidget {
         color: isEven ? colour.kWhite : AppTokens.brandLight,
         borderRadius: BorderRadius.circular(isTablet ? 16 : 14),
         child: InkWell(
-          onTap: () {},
+          onTap: () => _showVesselDetails(context),
+          onLongPress: () {
+            if (AppPreferences.getRoleId() != 500) {
+              _showVesselEditSheet(context);
+            }
+          },
           borderRadius: BorderRadius.circular(isTablet ? 16 : 14),
           splashColor: AppTokens.brandGradientStart.withOpacity(0.08),
           child: Container(
@@ -770,7 +807,7 @@ class _VesselCard extends StatelessWidget {
                       width: 1),
                 ),
                 child: Text(
-                  port,
+                  jobNo,
                   overflow: TextOverflow.ellipsis,
                   maxLines: 1,
                   style: GoogleFonts.poppins(
@@ -783,6 +820,403 @@ class _VesselCard extends StatelessWidget {
           ),
         ),
       ),
+    );
+  }
+
+  void _showVesselDetails(BuildContext context) {
+    final isTab = MediaQuery.of(context).size.width >= 600;
+
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) {
+        return Container(
+          constraints: BoxConstraints(
+            maxHeight: MediaQuery.of(context).size.height * 0.75,
+          ),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+            boxShadow: [
+              BoxShadow(
+                color: AppTokens.brandGradientStart.withOpacity(0.15),
+                blurRadius: 20,
+                offset: const Offset(0, -5),
+              ),
+            ],
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              // Handle bar
+              Container(
+                margin: const EdgeInsets.only(top: 12),
+                width: 40,
+                height: 4,
+                decoration: BoxDecoration(
+                  color: AppTokens.brandMid.withOpacity(0.3),
+                  borderRadius: BorderRadius.circular(2),
+                ),
+              ),
+
+              // Title
+              Padding(
+                padding: EdgeInsets.fromLTRB(
+                    isTab ? 24 : 20, 16, isTab ? 24 : 20, 8),
+                child: Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(10),
+                      decoration: BoxDecoration(
+                        color: AppTokens.brandGradientStart.withOpacity(0.1),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Icon(Icons.directions_boat_filled,
+                          color: AppTokens.brandGradientStart,
+                          size: isTab ? 24 : 20),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            vesselName,
+                            style: GoogleFonts.poppins(
+                              fontSize: isTab ? 18 : 16,
+                              fontWeight: FontWeight.w700,
+                              color: AppTokens.brandDark,
+                            ),
+                          ),
+                          Text(
+                            itemData["Port"]?.toString() ?? '',
+                            style: GoogleFonts.poppins(
+                              fontSize: isTab ? 13 : 12,
+                              color: AppTokens.brandMid,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    IconButton(
+                      onPressed: () => Navigator.pop(context),
+                      icon: Icon(Icons.close_rounded,
+                          color: AppTokens.brandMid, size: isTab ? 24 : 22),
+                    ),
+                  ],
+                ),
+              ),
+
+              Divider(color: AppTokens.brandLight, thickness: 1.5),
+
+              // Detail rows
+              Flexible(
+                child: SingleChildScrollView(
+                  padding: EdgeInsets.fromLTRB(
+                      isTab ? 24 : 20, 8, isTab ? 24 : 20, 24),
+                  child: Column(
+                    children: [
+                      _detailRow('Job No', itemData['JobNo'], isTab),
+                      _detailRow('Job Date', itemData['JobDate'], isTab),
+                      _detailRow('Job Status', itemData['JobStatus'], isTab),
+                      _detailRow('Vessel Type', itemData['VesselType'], isTab),
+                      _detailRow('Vessel Name', itemData['Loadingvesselname'], isTab),
+                      _detailRow('Off Vessel', itemData['Offvesselname'], isTab),
+                      _detailRow('PKG', itemData['pkg'], isTab),
+                      _detailRow('SCN', itemData['SCN'], isTab),
+                      _detailRow('OSCN', itemData['OSCN'], isTab),
+                      _detailRow('LSCN', itemData['LSCN'], isTab),
+                      _detailRow('ETA', itemData['SETA'], isTab),
+                      _detailRow('ETB', itemData['SETB'], isTab),
+                      _detailRow('ETD', itemData['SETD'], isTab),
+                      _detailRow('OETA', itemData['SOETA'], isTab),
+                      _detailRow('OETB', itemData['SOETB'], isTab),
+                      _detailRow('OETD', itemData['SOETD'], isTab),
+                      _detailRow('Origin', itemData['Origin'], isTab),
+                      _detailRow('Destination', itemData['Destination'], isTab),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _detailRow(String label, dynamic value, bool isTab) {
+    final displayValue = (value == null || value.toString().trim().isEmpty)
+        ? '-'
+        : value.toString().trim();
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 6),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          SizedBox(
+            width: isTab ? 130 : 110,
+            child: Text(
+              label,
+              style: GoogleFonts.poppins(
+                fontSize: isTab ? 13 : 12,
+                fontWeight: FontWeight.w500,
+                color: AppTokens.brandMid,
+              ),
+            ),
+          ),
+          const SizedBox(width: 8),
+          Expanded(
+            child: Text(
+              displayValue,
+              style: GoogleFonts.poppins(
+                fontSize: isTab ? 14 : 13,
+                fontWeight: FontWeight.w600,
+                color: AppTokens.brandDark,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showVesselEditSheet(BuildContext context) {
+    // We capture the bloc here so we can pass its value into the new route
+    final vesselBloc = context.read<VesselBloc>();
+    final isTab = MediaQuery.of(context).size.width >= 600;
+    
+    // Initial data parsing
+    String _parseDate(dynamic val) {
+      if (val == null) return '';
+      final s = val.toString().trim();
+      if (s.isEmpty || s.startsWith('0001-01-01') || s.startsWith('1900-')) return '';
+      // Ensure we display correctly, but the API might expect a specific format
+      return s; 
+    }
+
+    String eta = _parseDate(itemData['SETA']);
+    String etb = _parseDate(itemData['SETB']);
+    String oeta = _parseDate(itemData['SOETA']);
+    String oetb = _parseDate(itemData['SOETB']);
+
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (ctx) {
+        // We use BlocProvider.value to properly inject the BLoC into the BottomSheet's widget tree
+        // This is the correct standard architectural pattern for BLoC and new routes
+        return BlocProvider.value(
+          value: vesselBloc,
+          child: StatefulBuilder(
+            builder: (BuildContext sheetContext, StateSetter setState) {
+            
+            Widget _buildEditField(String label, String value, Function(String) onChanged) {
+              final controller = TextEditingController(text: value);
+              return Padding(
+                padding: const EdgeInsets.symmetric(vertical: 8),
+                child: Row(
+                  children: [
+                    SizedBox(
+                      width: isTab ? 90 : 80,
+                      child: Text(
+                        label,
+                        style: GoogleFonts.poppins(
+                          fontSize: isTab ? 13 : 12,
+                          fontWeight: FontWeight.w600,
+                          color: AppTokens.brandMid,
+                        ),
+                      ),
+                    ),
+                    Expanded(
+                      child: TextField(
+                        controller: controller,
+                        readOnly: true,
+                        style: GoogleFonts.poppins(
+                          fontSize: isTab ? 14 : 13,
+                          fontWeight: FontWeight.w500,
+                          color: AppTokens.brandDark,
+                        ),
+                        decoration: InputDecoration(
+                          isDense: true,
+                          contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(8),
+                            borderSide: BorderSide(color: AppTokens.brandMid.withOpacity(0.3)),
+                          ),
+                          enabledBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(8),
+                            borderSide: BorderSide(color: AppTokens.brandMid.withOpacity(0.3)),
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(8),
+                            borderSide: const BorderSide(color: AppTokens.brandGradientStart),
+                          ),
+                          suffixIcon: Icon(Icons.calendar_month_outlined, size: 20, color: AppTokens.brandMid),
+                        ),
+                        onTap: () async {
+                          DateTime initial = DateTime.now();
+                          if (value.isNotEmpty) {
+                            try {
+                              initial = DateFormat('yyyy-MM-dd HH:mm:ss').parse(value.replaceAll('T', ' '));
+                            } catch (e) {
+                              // ignore
+                            }
+                          }
+                          final date = await showDatePicker(
+                            context: context,
+                            initialDate: initial,
+                            firstDate: DateTime(2000),
+                            lastDate: DateTime(2100),
+                          );
+                          if (date != null) {
+                            final time = await showTimePicker(
+                              context: context,
+                              initialTime: TimeOfDay.fromDateTime(initial),
+                              initialEntryMode: TimePickerEntryMode.input,
+                              builder: (BuildContext context, Widget? child) {
+                                return MediaQuery(
+                                  data: MediaQuery.of(context).copyWith(alwaysUse24HourFormat: true),
+                                  child: Theme(
+                                    data: Theme.of(context).copyWith(
+                                      colorScheme: const ColorScheme.light(
+                                        primary: AppTokens.brandGradientStart, // matches your button color
+                                      ),
+                                    ),
+                                    child: child!,
+                                  ),
+                                );
+                              },
+                            );
+                            if (time != null) {
+                              final combined = DateTime(date.year, date.month, date.day, time.hour, time.minute);
+                              final formatted = DateFormat('yyyy-MM-dd HH:mm:ss').format(combined);
+                              controller.text = formatted;
+                              onChanged(formatted);
+                              setState(() {});
+                            }
+                          }
+                        },
+                      ),
+                    ),
+                  ],
+                ),
+              );
+            }
+
+            return Container(
+              padding: EdgeInsets.only(
+                bottom: MediaQuery.of(context).viewInsets.bottom,
+              ),
+              decoration: const BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+              ),
+              child: SingleChildScrollView(
+                padding: EdgeInsets.fromLTRB(isTab ? 24 : 20, 16, isTab ? 24 : 20, 24),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    // Handle
+                    Container(
+                      width: 40,
+                      height: 4,
+                      decoration: BoxDecoration(
+                        color: AppTokens.brandMid.withOpacity(0.3),
+                        borderRadius: BorderRadius.circular(2),
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    Text(
+                      'Update Vessel Dates',
+                      style: GoogleFonts.poppins(
+                        fontSize: isTab ? 18 : 16,
+                        fontWeight: FontWeight.w700,
+                        color: AppTokens.brandDark,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      vesselName,
+                      style: GoogleFonts.poppins(
+                        fontSize: isTab ? 14 : 13,
+                        color: AppTokens.brandMid,
+                      ),
+                    ),
+                    const SizedBox(height: 24),
+
+                    if (eta.isNotEmpty) _buildEditField('ETA', eta, (v) => eta = v),
+                    if (etb.isNotEmpty) _buildEditField('ETB', etb, (v) => etb = v),
+                    if (oeta.isNotEmpty) _buildEditField('OETA', oeta, (v) => oeta = v),
+                    if (oetb.isNotEmpty) _buildEditField('OETB', oetb, (v) => oetb = v),
+
+
+                    const SizedBox(height: 32),
+                    SizedBox(
+                      width: double.infinity,
+                      child: ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: AppTokens.brandGradientStart,
+                          padding: const EdgeInsets.symmetric(vertical: 14),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                        ),
+                        onPressed: () {
+                          // Hide keyboard
+                          FocusScope.of(context).unfocus();
+
+                          // Format for API: "yyyy-MM-dd HH:mm:ss"
+                          String _formatForApi(String dt, String originalKey) {
+                            if (dt.isEmpty) {
+                              // If empty (hidden from UI), send the original value so we don't send "" to a DateTime field
+                              return itemData[originalKey]?.toString() ?? "";
+                            }
+                            return dt.replaceAll('T', ' ');
+                          }
+
+                          final updateData = {
+                            "Jobid": itemData['SaleOrderMasterRefId'],
+                            "ETA": _formatForApi(eta, 'SETA'),
+                            "ETB": _formatForApi(etb, 'SETB'),
+                            "OETA": _formatForApi(oeta, 'SOETA'),
+                            "OETB": _formatForApi(oetb, 'SOETB'),
+                            "Comid": AppGlobals.Comid,
+                            "Type": 100, // SAVE ALL
+                          };
+
+                          vesselBloc.add(
+                            UpdateVesselDateEvent(
+                              updateData: updateData,
+                              onSuccess: () {
+                                Navigator.pop(ctx);
+                                // The BLoC listener will show success and we can refresh
+                                vesselBloc.add(const LoadVesselDataEvent(type: 0));
+                              },
+                            ),
+                          );
+                        },
+                        child: Text(
+                          'Save Updates',
+                          style: GoogleFonts.poppins(
+                            fontSize: isTab ? 15 : 14,
+                            fontWeight: FontWeight.w600,
+                            color: Colors.white,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            );
+          },
+        ),
+        );
+      },
     );
   }
 }

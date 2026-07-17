@@ -37,3 +37,16 @@ class AddPortToSearchEvent extends VesselEvent {
 class ClearSearchEvent extends VesselEvent {
   const ClearSearchEvent();
 }
+
+class UpdateVesselDateEvent extends VesselEvent {
+  final Map<String, dynamic> updateData;
+  final Function() onSuccess;
+
+  const UpdateVesselDateEvent({
+    required this.updateData,
+    required this.onSuccess,
+  });
+
+  @override
+  List<Object?> get props => [updateData];
+}

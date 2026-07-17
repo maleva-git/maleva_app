@@ -120,10 +120,10 @@ class BoardingMobileDashboard extends StatelessWidget {
         ),
         tabs: [
 
-          _tab('Salary',             isTablet),  //1
           _tab('VSL',             isTablet),  //1
-          _tab('SpotsSaleOrder',  isTablet),  //2
-          _tab('InventoryReport', isTablet),  //3
+          _tab('Salary',          isTablet),  //2
+          _tab('SpotsSaleOrder',  isTablet),  //3
+          _tab('InventoryReport', isTablet),  //4
 
           _tab('LeaveApproval', isTablet),
           _tab('EmpLeave', isTablet),
@@ -166,10 +166,10 @@ class BoardingMobileDashboard extends StatelessWidget {
         controller: tabController,
         children: [
 
-          const SalaryTab(),  //1
           const VesselReportPage(),  //1
-          const SpotSaleEntryPage(),  //2
-          const InventoryPage(),   //3
+          const SalaryTab(),  //2
+          const SpotSaleEntryPage(),  //3
+          const InventoryPage(),   //4
 
           const AdminLeaveApprovalTab(),
           const EmployeeLeaveRequestTab(),

@@ -187,7 +187,7 @@ class _SplashScreenState extends State<SplashScreen>
           );
 
         }
-        else if (AppPreferences.getRoleId() == 600)
+        else if (AppPreferences.getRoleId() == 600 || AppPreferences.getRoleId() == 500)
         {
           Navigator.pushReplacement(
             context,
