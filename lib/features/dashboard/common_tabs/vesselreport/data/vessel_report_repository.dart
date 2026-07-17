@@ -19,7 +19,7 @@ class VesselReportRepository {
   /// Updates specific vessel dates (ETA/ETB/OETA/OETB)
   Future<dynamic> updateVesselPlanningDates(Map<String, dynamic> updateData) async {
     return await ApiClient.postRequest(
-      AppGlobals.apiUpdateSaleOrderSpecific,
+      ApiConstants.apiUpdateSaleOrderSpecific,
       updateData,
     );
   }
