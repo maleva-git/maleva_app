@@ -5,7 +5,6 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:salomon_bottom_bar/salomon_bottom_bar.dart';
 import 'package:maleva/core/utils/app_globals.dart';
-import 'package:maleva/core/models/model.dart';
 import 'package:maleva/features/transaction/salesorder/add/data/salesorderadd_repository.dart';
 import 'package:maleva/menu/menulist.dart';
 import '../../../../mastersearch/AddressList.dart';
@@ -28,6 +27,16 @@ import 'package:maleva/features/transaction/salesorder/add/bloc/salesorderadd_st
 import 'package:maleva/core/di/injection.dart';
 import 'package:maleva/core/colors/colors.dart' as colour;
 import 'package:maleva/features/transaction/salesorder/add/data/salesorderadd_repository.dart';
+import 'package:maleva/core/models/shared/customer_model.dart';
+import 'package:maleva/core/models/shared/employee_model.dart';
+import 'package:maleva/core/models/shared/address_details_model.dart';
+import 'package:maleva/core/models/shared/sale_edit_detail_model.dart';
+import 'package:maleva/core/models/shared/location_model.dart';
+import 'package:maleva/core/models/shared/agent_model.dart';
+import 'package:maleva/core/models/shared/agent_company_model.dart';
+import 'package:maleva/features/operations/models/job_all_status_model.dart';
+import 'package:maleva/core/models/shared/product_model.dart';
+import 'package:maleva/features/operations/models/job_type_model.dart';
 
 class SalesOrdersAdd extends StatelessWidget {
   final List<SaleEditDetailModel>? SaleDetails;

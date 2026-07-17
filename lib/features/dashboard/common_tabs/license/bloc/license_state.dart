@@ -1,6 +1,7 @@
+import 'package:maleva/core/models/shared/license_view_model.dart';
 // license_state.dart
 
-import 'package:maleva/core/models/model.dart'; // Update path
+ // Update path
 
 abstract class LicenseState {
   const LicenseState();

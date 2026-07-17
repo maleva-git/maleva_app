@@ -1,11 +1,14 @@
+import 'package:maleva/core/network/api_legacy_helper.dart';
+import 'package:maleva/core/network/api_constants.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 import 'package:maleva/core/utils/app_globals.dart';
 import 'package:maleva/core/network/OnlineApi.dart' as OnlineApi;
-import 'package:maleva/core/models/model.dart';
 
 import 'licenseupdate_event.dart';
 import 'licenseupdate_state.dart';
+import 'package:maleva/core/models/shared/response_view_model.dart';
+import 'package:maleva/core/models/shared/get_truck_model.dart';
 
 
 
@@ -143,8 +146,8 @@ class LicenseUpdateBloc
       ];
 
       final header = {'Content-Type': 'application/json; charset=UTF-8'};
-      final result = await AppGlobals.apiAllinoneSelectArray(
-          '${AppGlobals.apiUpdateTruckDetails}${AppGlobals.Comid}',
+      final result = await ApiLegacyHelper.apiAllinoneSelectArray(
+          '${ApiConstants.apiUpdateTruckDetails}${AppGlobals.Comid}',
           master,
           header,
           null);

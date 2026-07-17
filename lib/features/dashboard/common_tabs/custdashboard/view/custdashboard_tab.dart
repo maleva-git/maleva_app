@@ -1,3 +1,4 @@
+import 'package:maleva/core/network/api_legacy_helper.dart';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
@@ -7,7 +8,6 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:maleva/core/utils/app_globals.dart';
 import 'package:maleva/core/colors/colors.dart' as colour;
-import 'package:maleva/core/models/model.dart';
 import 'package:maleva/menu/menulist.dart';
 import 'package:maleva/core/network/OnlineApi.dart' as OnlineApi;
 
@@ -17,6 +17,7 @@ import '../../saleorderadd/view/saleorderadd_tab.dart';
 import '../bloc/custdashboard_bloc.dart';
 import '../bloc/custdashboard_event.dart';
 import '../bloc/custdashboard_state.dart';
+import 'package:maleva/core/models/shared/payment_pending_model.dart';
 
 
 
@@ -442,7 +443,7 @@ class _CustDashboardViewState extends State<_CustDashboardView>
         IconButton(
           icon: const Icon(Icons.exit_to_app,
               size: 30, color: colour.topAppBarColor),
-          onPressed: () => AppGlobals.logout(context),
+          onPressed: () => ApiLegacyHelper.logout(context),
         ),
       ],
       bottom: TabBar(
@@ -1111,6 +1112,7 @@ class _EnquiryTab extends StatelessWidget {
                                         context,
                                         'Do You Want to Push to SalesOrder ?');
                                     if (ok) {
+                                      if (!context.mounted) return;
                                       AppGlobals.storagenew.setString(
                                           'EnquiryOpen', 'true');
                                       Navigator.of(context).push(
@@ -1136,6 +1138,7 @@ class _EnquiryTab extends StatelessWidget {
                                         context,
                                         'Do You Want to Cancel the Enquiry ?');
                                     if (ok) {
+                                      if (!context.mounted) return;
                                       context
                                           .read<CustDashboardBloc>()
                                           .add(CustDashboardCancelEnquiry(
@@ -1205,6 +1208,7 @@ class _FuelTab extends StatelessWidget {
                         firstDate: DateTime(1900),
                         lastDate: DateTime(2050));
                     if (picked != null) {
+                      if (!context.mounted) return;
                       context.read<CustDashboardBloc>().add(
                           CustDashboardFuelFromDateChanged(
                               DateFormat('yyyy-MM-dd').format(picked)));
@@ -1236,6 +1240,7 @@ class _FuelTab extends StatelessWidget {
                         firstDate: DateTime(1900),
                         lastDate: DateTime(2050));
                     if (picked != null) {
+                      if (!context.mounted) return;
                       context.read<CustDashboardBloc>().add(
                           CustDashboardFuelToDateChanged(
                               DateFormat('yyyy-MM-dd').format(picked)));
@@ -1514,6 +1519,7 @@ class _PaymentTab extends StatelessWidget {
                           firstDate: DateTime(2020),
                           lastDate: DateTime(2035));
                       if (picked != null) {
+                        if (!context.mounted) return;
                         fromCtrl.text =
                             DateFormat('yyyy-MM-dd').format(picked);
                         context
@@ -1540,6 +1546,7 @@ class _PaymentTab extends StatelessWidget {
                           firstDate: DateTime(2020),
                           lastDate: DateTime(2035));
                       if (picked != null) {
+                        if (!context.mounted) return;
                         toCtrl.text =
                             DateFormat('yyyy-MM-dd').format(picked);
                         context

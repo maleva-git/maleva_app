@@ -1,3 +1,4 @@
+import 'package:maleva/core/network/api_legacy_helper.dart';
 import 'dart:io';
 
 import 'package:app_version_update/app_version_update.dart';
@@ -324,7 +325,7 @@ class _DashboardAppBar extends StatelessWidget
             color: AppTokens.appBarIcon,
           ),
           tooltip: 'Logout',
-          onPressed: () => AppGlobals.logout(context),
+          onPressed: () => ApiLegacyHelper.logout(context),
         ),
       ],
     );
@@ -498,7 +499,7 @@ class _TabletSideRail extends StatelessWidget {
                   fontSize: 13,
                   fontWeight: FontWeight.w600),
             ),
-            onTap: () => AppGlobals.logout(context),
+            onTap: () => ApiLegacyHelper.logout(context),
           ),
           const SizedBox(height: 12),
         ],

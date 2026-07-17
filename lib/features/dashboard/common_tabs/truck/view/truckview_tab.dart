@@ -8,6 +8,7 @@ import '../../../../../core/theme/tokens.dart';
 import '../bloc/truck_bloc.dart';
 import '../bloc/truck_state.dart';
 import 'package:maleva/core/colors/colors.dart' as colour;
+import 'package:maleva/core/models/shared/truck_details_model.dart';
 
 class TruckDetailsReportPage extends StatelessWidget {
   const TruckDetailsReportPage({super.key});

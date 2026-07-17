@@ -1,3 +1,4 @@
+import 'package:maleva/core/network/api_constants.dart';
 import 'package:maleva/core/network/api_client.dart';
 import 'package:maleva/core/utils/app_preferences.dart';
 import 'package:maleva/core/utils/app_globals.dart';
@@ -6,7 +7,7 @@ class UnReleaseSMKRepository {
   Future<List<Map<String, dynamic>>> fetchUnReleaseSMKData() async {
     try {
       final int comid = AppPreferences.getComid();
-      final String url = AppGlobals.LoadK8UnReleaseNo;
+      final String url = ApiConstants.LoadK8UnReleaseNo;
 
       final Map<String, dynamic> body = {
         'Comid': comid,

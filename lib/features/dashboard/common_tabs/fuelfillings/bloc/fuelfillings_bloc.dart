@@ -5,6 +5,7 @@ import '../../../../../core/models/model.dart';
 import '../data/fuelfillings_repository.dart';
 import 'fuelfillings_event.dart';
 import 'fuelfillings_state.dart';
+import 'package:maleva/features/transport/models/fuel_filling.dart';
 
 class FuelFillingBloc extends Bloc<FuelFillingEvent, FuelFillingState> {
 

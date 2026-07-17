@@ -1,11 +1,19 @@
+import 'package:maleva/core/utils/system_helpers.dart';
+import 'package:maleva/core/network/api_legacy_helper.dart';
+import 'package:maleva/core/network/api_constants.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
-import 'package:maleva/core/models/model.dart';
 import 'package:maleva/core/utils/app_globals.dart';
 import 'package:maleva/features/transaction/salesorder/view/data/salesorderview_repository.dart';
 import 'package:maleva/features/transaction/salesorder/view/bloc/salesorderview_event.dart';
 import 'package:maleva/features/transaction/salesorder/view/bloc/salesorderview_state.dart';
+import 'package:maleva/core/models/shared/customer_model.dart';
+import 'package:maleva/core/models/shared/employee_model.dart';
+import 'package:maleva/features/transaction/salesorder/models/sale_order_detail_model.dart';
+import 'package:maleva/features/transaction/salesorder/models/sale_order_master_model.dart';
+import 'package:maleva/core/models/shared/response_view_model.dart';
+import 'package:maleva/features/operations/models/job_status_model.dart';
 
 
 
@@ -83,8 +91,8 @@ class SalesOrderViewBloc extends Bloc<SalesOrderViewEvent, SalesOrderViewState> 
         };
 
         final header = {'Content-Type': 'application/json; charset=UTF-8'};
-        final resultData = await AppGlobals.apiAllinoneSelectArray(
-          AppGlobals.apiSelectSalesOrder, master, header, context,
+        final resultData = await ApiLegacyHelper.apiAllinoneSelectArray(
+          ApiConstants.apiSelectSalesOrder, master, header, context,
         );
 
         if (resultData != "" && resultData.length != 0) {
@@ -230,15 +238,15 @@ class SalesOrderViewBloc extends Bloc<SalesOrderViewEvent, SalesOrderViewState> 
       try {
         final master = {'SoId': event.id, 'Comid': AppGlobals.Comid};
         final header = {'Content-Type': 'application/json; charset=UTF-8'};
-        final resultData = await AppGlobals.apiAllinoneSelectArray(
-          "${AppGlobals.apiViewDOConvert}${event.billNo}",
+        final resultData = await ApiLegacyHelper.apiAllinoneSelectArray(
+          "${ApiConstants.apiViewDOConvert}${event.billNo}",
           master, header, context,
         );
 
         if (resultData != "") {
           final value = ResponseViewModel.fromJson(resultData);
           if (value.IsSuccess == true) {
-            AppGlobals.launchInBrowser(value.data1);
+            SystemHelpers.launchInBrowser(value.data1);
           }
         }
       } catch (_) {}

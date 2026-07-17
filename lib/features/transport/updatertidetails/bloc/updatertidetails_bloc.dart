@@ -1,10 +1,13 @@
+import 'package:maleva/core/utils/system_helpers.dart';
+import 'package:maleva/core/network/api_legacy_helper.dart';
+import 'package:maleva/core/network/api_constants.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 import 'package:maleva/core/utils/app_globals.dart';
 import 'package:maleva/core/network/OnlineApi.dart' as OnlineApi;
-import 'package:maleva/core/models/model.dart';
 import 'package:maleva/features/transport/updatertidetails/bloc/updatertidetails_event.dart';
 import 'package:maleva/features/transport/updatertidetails/bloc/updatertidetails_state.dart';
+import 'package:maleva/core/models/shared/response_view_model.dart';
 
 
 
@@ -159,14 +162,14 @@ class UpdateRTIBloc extends Bloc<UpdateRTIEvent, UpdateRTIState> {
     try {
       final master = {'SoId': event.id, 'Comid': AppGlobals.Comid};
       final header = {'Content-Type': 'application/json; charset=UTF-8'};
-      final result = await AppGlobals.apiAllinoneSelectArray(
-          '${AppGlobals.apiViewRTIPdf}${event.rtiNoDisplay}',
+      final result = await ApiLegacyHelper.apiAllinoneSelectArray(
+          '${ApiConstants.apiViewRTIPdf}${event.rtiNoDisplay}',
           master,
           header,
           null);
       if (result != '') {
         final value = ResponseViewModel.fromJson(result);
-        if (value.IsSuccess == true) AppGlobals.launchInBrowser(value.data1);
+        if (value.IsSuccess == true) SystemHelpers.launchInBrowser(value.data1);
       }
     } catch (_) {}
   }

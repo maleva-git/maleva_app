@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
-import 'package:maleva/core/models/model.dart';
 import 'package:maleva/core/utils/app_globals.dart';
 import '../../../../../core/di/injection.dart';
 import '../../../../../core/theme/palette.dart';
@@ -12,6 +11,7 @@ import '../bloc/employeemaster_event.dart';
 import '../bloc/employeemaster_state.dart';
 import 'employeeadd_tab.dart';
 import '../data/employee_repository.dart'; // Add this line
+import 'package:maleva/core/models/shared/employee_details_model.dart';
 
 
 class EmployeeViewPage extends StatelessWidget {

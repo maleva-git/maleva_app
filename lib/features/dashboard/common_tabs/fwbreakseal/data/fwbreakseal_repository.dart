@@ -1,7 +1,8 @@
-import 'package:maleva/core/models/model.dart';
+import 'package:maleva/core/network/api_constants.dart';
 import 'package:maleva/core/network/api_client.dart';
 import 'package:maleva/core/utils/app_preferences.dart';
 import 'package:maleva/core/utils/app_globals.dart';
+import 'package:maleva/core/models/shared/response_view_model.dart';
 
 class FWBreakSealRepository {
 
@@ -10,7 +11,7 @@ class FWBreakSealRepository {
     final comid = AppPreferences.getComid();
 
     // MATCHED: String apiGetJobNo = "$port/api/SaleOrderApp/GetJobNo?Comid=";
-    final String url = "${AppGlobals.apiGetJobNo}$comid&JobType=$type";
+    final String url = "${ApiConstants.apiGetJobNo}$comid&JobType=$type";
 
     final response = await ApiClient.postRequest(url, null);
 
@@ -23,7 +24,7 @@ class FWBreakSealRepository {
   // 2. Fetch Sales Order Details
   Future<Map<String, dynamic>> fetchSalesOrderDetails(int id, int cNumber) async {
     // MATCHED: String apiEditSalesOrder = "$port/api/SaleOrderApp/EditSaleOrder?Id=";
-    final String url = "${AppGlobals.apiEditSalesOrder}$id&CNumber=$cNumber";
+    final String url = "${ApiConstants.apiEditSalesOrder}$id&CNumber=$cNumber";
 
     final response = await ApiClient.postRequest(url, null);
 
@@ -37,7 +38,7 @@ class FWBreakSealRepository {
   Future<List<dynamic>> fetchEmployees() async {
     final comid = AppPreferences.getComid();
 
-    final String url = "${AppGlobals.apiSelectEmployee}$comid&AccountName=&Type=Operation";
+    final String url = "${ApiConstants.apiSelectEmployee}$comid&AccountName=&Type=Operation";
 
     final response = await ApiClient.postRequest(url, null);
     return response is List ? response : [];
@@ -45,7 +46,7 @@ class FWBreakSealRepository {
 
   Future<ResponseViewModel?> updateForwarding(Map<String, dynamic> master) async {
 
-    final response = await ApiClient.postRequest(AppGlobals.apiUpdateForwarding, master);
+    final response = await ApiClient.postRequest(ApiConstants.apiUpdateForwarding, master);
 
     if (response != null) {
       return ResponseViewModel.fromJson(response);

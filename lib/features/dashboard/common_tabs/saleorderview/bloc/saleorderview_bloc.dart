@@ -1,12 +1,15 @@
+import 'package:maleva/core/network/api_legacy_helper.dart';
+import 'package:maleva/core/network/api_constants.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:maleva/core/models/model.dart';
 import 'package:maleva/core/network/OnlineApi.dart' as OnlineApi;
 import 'package:maleva/core/utils/app_globals.dart';
 import 'package:maleva/features/dashboard/common_tabs/saleorderview/bloc/saleorderview_event.dart';
 import 'package:maleva/features/dashboard/common_tabs/saleorderview/bloc/saleorderview_state.dart';
 
 import '../data/saleorderrepository.dart';
+import 'package:maleva/features/transaction/salesorder/models/sale_order_master_model.dart';
+import 'package:maleva/features/transaction/salesorder/models/sale_order_detail_model.dart';
 
 // Import your repository
 
@@ -107,8 +110,8 @@ class SaleOrderBloc extends Bloc<SaleOrderEvent, SaleOrderState> {
 
       final headers = {'Content-Type': 'application/json; charset=UTF-8'};
 
-      final resultData = await AppGlobals.apiAllinoneSelectArray(
-        AppGlobals.apiSelectTVSaleOrder,
+      final resultData = await ApiLegacyHelper.apiAllinoneSelectArray(
+        ApiConstants.apiSelectTVSaleOrder,
         body,
         headers,
         null,

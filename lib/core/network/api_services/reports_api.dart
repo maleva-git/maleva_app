@@ -1,7 +1,6 @@
 // core/network/api_services/reports_api.dart
 // Dashboard data, RTI view, Truck/Driver reports, Planning DB calls
 
-import 'package:maleva/core/models/model.dart';
 import 'package:maleva/core/network/api_client.dart';
 import 'package:maleva/core/network/api_constants.dart';
 import 'package:maleva/core/utils/app_preferences.dart';

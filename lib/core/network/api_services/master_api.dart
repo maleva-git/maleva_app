@@ -3,10 +3,23 @@
 // Multiple BLoC pages same master data use pannuvanga —
 // so oru common class la vaichirukkom
 
-import 'package:maleva/core/models/model.dart';
 import 'package:maleva/core/network/api_client.dart';
 import 'package:maleva/core/network/api_constants.dart';
 import 'package:maleva/core/utils/app_preferences.dart';
+import 'package:maleva/features/operations/models/job_type_model.dart';
+import 'package:maleva/core/models/shared/customer_model.dart';
+import 'package:maleva/core/models/shared/employee_model.dart';
+import 'package:maleva/core/models/shared/truck_details_model.dart';
+import 'package:maleva/core/models/shared/ware_house_model.dart';
+import 'package:maleva/core/models/shared/address_details_model.dart';
+import 'package:maleva/core/models/shared/location_model.dart';
+import 'package:maleva/core/models/shared/agent_model.dart';
+import 'package:maleva/features/operations/models/job_status_model.dart';
+import 'package:maleva/features/operations/models/job_all_status_model.dart';
+import 'package:maleva/core/models/shared/agent_company_model.dart';
+import 'package:maleva/core/models/shared/product_model.dart';
+import 'package:maleva/features/operations/models/job_type_details_model.dart';
+import 'package:maleva/core/models/shared/get_truck_model.dart';
 
 class MasterApi {
   MasterApi._();

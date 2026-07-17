@@ -8,6 +8,7 @@ import '../../../../../core/theme/tokens.dart';
 import '../../../../mastersearch/Employee.dart';
 import '../../../../../core/models/model.dart';
 import '../../../../../core/network/OnlineApi.dart' as OnlineApi;
+import 'package:maleva/core/models/shared/employee_model.dart';
 
 const _kGrad = LinearGradient(
   colors: [AppTokens.invoiceHeaderStart, colour.kHeaderGradEnd],

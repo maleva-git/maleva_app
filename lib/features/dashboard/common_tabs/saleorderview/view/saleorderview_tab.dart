@@ -1,9 +1,9 @@
+import 'package:maleva/core/network/api_legacy_helper.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
-import 'package:maleva/core/models/model.dart';
 import 'package:maleva/core/utils/app_globals.dart';
 import 'package:maleva/core/theme/palette.dart';
 import 'package:maleva/menu/menulist.dart';
@@ -16,6 +16,11 @@ import '../bloc/saleorderview_bloc.dart';
 import '../bloc/saleorderview_event.dart';
 import '../bloc/saleorderview_state.dart';
 import '../data/saleorderrepository.dart';
+import 'package:maleva/core/models/shared/barcode_print_model.dart';
+import 'package:maleva/core/models/shared/customer_model.dart';
+import 'package:maleva/core/models/shared/employee_model.dart';
+import 'package:maleva/features/transaction/salesorder/models/sale_order_master_model.dart';
+import 'package:maleva/features/operations/models/job_status_model.dart';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Entry point
@@ -286,7 +291,7 @@ class _SaleOrderViewState extends State<_SaleOrderView> {
         IconButton(
           icon: const Icon(Icons.exit_to_app, size: 26),
           tooltip: 'Logout',
-          onPressed: () => AppGlobals.logout(context),
+          onPressed: () => ApiLegacyHelper.logout(context),
         ),
       ],
     );

@@ -1,4 +1,4 @@
-import 'package:maleva/core/models/model.dart';
+import 'package:maleva/features/transport/models/fuel_filling.dart';
 
 abstract class FuelFillingState {}
 

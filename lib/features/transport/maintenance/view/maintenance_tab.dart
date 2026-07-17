@@ -11,6 +11,8 @@ import '../../../mastersearch/Truck.dart';
 import '../bloc/maintenance_bloc.dart';
 import '../bloc/maintenance_event.dart';
 import '../bloc/maintenance_state.dart';
+import 'package:maleva/core/models/shared/get_truck_model.dart';
+import 'package:maleva/core/models/shared/truck_details_model.dart';
 
 
 

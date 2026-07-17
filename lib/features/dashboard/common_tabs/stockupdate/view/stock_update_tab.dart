@@ -1,3 +1,5 @@
+import 'package:maleva/core/utils/system_helpers.dart';
+import 'package:maleva/core/network/api_constants.dart';
 import 'dart:io';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
@@ -6,7 +8,6 @@ import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:maleva/core/utils/app_globals.dart';
-import 'package:maleva/core/models/model.dart';
 import 'package:maleva/menu/menulist.dart';
 
 import '../../../../../core/di/injection.dart';
@@ -19,6 +20,8 @@ import '../bloc/stock_update_state.dart';
 
 import '../../../../../core/theme/palette.dart';
 import '../../../../../core/theme/tokens.dart';
+import 'package:maleva/core/models/shared/ware_house_model.dart';
+import 'package:maleva/features/operations/models/job_all_status_model.dart';
 
 
 // ─── Design Tokens ────────────────────────────────────────────────────────────
@@ -74,9 +77,9 @@ class _StockUpdatePageState
     }
     final file = await _picker.pickImage(source: source);
     if (file == null) return;
-    final url = await AppGlobals.upload(
+    final url = await SystemHelpers.upload(
         File(file.path),
-        AppGlobals.apiPostimage,
+        ApiConstants.apiPostImage,
         saleOrderId,
         'SalesOrder',
         statusName.replaceAll(' ', ''));

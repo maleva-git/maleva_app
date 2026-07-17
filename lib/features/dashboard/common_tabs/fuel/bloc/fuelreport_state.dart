@@ -1,4 +1,4 @@
-import 'package:maleva/core/models/model.dart';
+import 'package:maleva/features/transport/models/fuelselect_model.dart';
 
 abstract class FuelDiffState {
   const FuelDiffState();

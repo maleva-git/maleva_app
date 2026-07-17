@@ -1,3 +1,6 @@
+import 'package:maleva/core/utils/system_helpers.dart';
+import 'package:maleva/core/network/api_legacy_helper.dart';
+import 'package:maleva/core/network/api_constants.dart';
 import 'dart:io';
 import 'package:maleva/core/widgets/custom_app_bar.dart';
 import 'package:cached_network_image/cached_network_image.dart';
@@ -8,7 +11,6 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:maleva/core/utils/app_globals.dart';
-import 'package:maleva/core/models/model.dart';
 import 'package:maleva/menu/menulist.dart';
 import '../../../../../core/di/injection.dart';
 import '../../../../../core/theme/palette.dart';
@@ -18,6 +20,9 @@ import '../../saleorderdetails/view/saleorderdetails_tab.dart';
 import '../bloc/stock_in_entry_bloc.dart';
 import '../bloc/stock_in_entry_event.dart';
 import '../bloc/stock_in_entry_state.dart';
+import 'package:maleva/core/models/shared/barcode_print_model.dart';
+import 'package:maleva/core/models/shared/response_view_model.dart';
+import 'package:maleva/features/operations/models/job_all_status_model.dart';
 
 
 const kChipBg          = Color(0xFFEEF2FF);
@@ -72,9 +77,9 @@ class _StockInEntryPageState
     }
     final file = await _picker.pickImage(source: source);
     if (file == null) return;
-    final url = await AppGlobals.upload(
+    final url = await SystemHelpers.upload(
         File(file.path),
-        AppGlobals.apiPostimage,
+        ApiConstants.apiPostImage,
         saleOrderId,
         'SalesOrder',
         statusName.replaceAll(' ', ''));
@@ -189,8 +194,8 @@ class _StockInEntryPageState
       int stockId, BuildContext context) async {
     final comId = AppGlobals.storagenew.getInt('Comid') ?? 0;
     final header = {'Content-Type': 'application/json; charset=UTF-8'};
-    final result = await AppGlobals.apiAllinoneSelectArray(
-        '${AppGlobals.apiPrintStock}$stockId&Comid=$comId',
+    final result = await ApiLegacyHelper.apiAllinoneSelectArray(
+        '${ApiConstants.apiPrintStock}$stockId&Comid=$comId',
         {},
         header,
         null);

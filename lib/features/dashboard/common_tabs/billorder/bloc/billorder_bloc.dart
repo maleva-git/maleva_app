@@ -1,5 +1,4 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:maleva/core/models/model.dart';
 
 import 'billorder_event.dart';
 import 'billorder_state.dart';

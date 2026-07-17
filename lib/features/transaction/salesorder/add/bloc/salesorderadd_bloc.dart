@@ -1,14 +1,24 @@
+import 'package:maleva/core/network/api_legacy_helper.dart';
+import 'package:maleva/core/network/api_constants.dart';
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
-import 'package:maleva/core/models/model.dart';
 import 'package:maleva/core/utils/app_globals.dart';
 
 import 'package:maleva/features/transaction/salesorder/add/bloc/salesorderadd_event.dart';
 import 'package:maleva/features/transaction/salesorder/add/bloc/salesorderadd_state.dart';
 import 'package:maleva/features/transaction/salesorder/add/data/salesorderadd_repository.dart';
 import 'dart:developer' as developer;
+import 'package:maleva/core/models/shared/customer_model.dart';
+import 'package:maleva/core/models/shared/employee_model.dart';
+import 'package:maleva/core/models/shared/sale_edit_detail_model.dart';
+import 'package:maleva/core/models/shared/agent_model.dart';
+import 'package:maleva/core/models/shared/agent_company_model.dart';
+import 'package:maleva/features/operations/models/job_all_status_model.dart';
+import 'package:maleva/core/models/shared/response_view_model.dart';
+import 'package:maleva/features/operations/models/job_type_details_model.dart';
+import 'package:maleva/features/operations/models/job_type_model.dart';
 
 class SalesOrderAddBloc extends Bloc<SalesOrderAddEvent, SalesOrderAddState> {
   final BuildContext context;
@@ -363,8 +373,8 @@ class SalesOrderAddBloc extends Bloc<SalesOrderAddEvent, SalesOrderAddState> {
 
         final header = {'Content-Type': 'application/json; charset=UTF-8'};
 
-        final resultData = await AppGlobals.apiAllinoneSelectArray(
-          "${AppGlobals.apiInsertSalesOrder}?Comid=${AppGlobals.Comid}",
+        final resultData = await ApiLegacyHelper.apiAllinoneSelectArray(
+          "${ApiConstants.apiInsertSalesOrder}?Comid=${AppGlobals.Comid}",
           master, header, context,
         );
 
@@ -891,7 +901,7 @@ class SalesOrderAddBloc extends Bloc<SalesOrderAddEvent, SalesOrderAddState> {
 
   Future<void> _confirmEnquiry(int id) async {
     final header = {'Content-Type': 'application/json; charset=UTF-8'};
-    await AppGlobals.apiAllinoneSelectArray("${AppGlobals.apiUpdateEnquiryMaster}$id&Comid=${AppGlobals.Comid}&StatusName=CONFIRMED", null, header, context);
+    await ApiLegacyHelper.apiAllinoneSelectArray("${ApiConstants.apiUpdateEnquiryMaster}$id&Comid=${AppGlobals.Comid}&StatusName=CONFIRMED", null, header, context);
   }
 
   double _safeNum(dynamic val) {

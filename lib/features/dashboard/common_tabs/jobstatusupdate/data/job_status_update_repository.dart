@@ -1,14 +1,15 @@
-import 'package:maleva/core/models/model.dart';
+import 'package:maleva/core/network/api_constants.dart';
 import 'package:maleva/core/network/api_client.dart';
 import 'package:maleva/core/utils/app_preferences.dart';
 import 'package:maleva/core/utils/app_globals.dart';
+import 'package:maleva/core/models/shared/response_view_model.dart';
 
 class JobStatusUpdateRepository {
 
   // 1. Fetch Job Numbers
   Future<List<Map<String, dynamic>>> fetchJobs(int type) async {
     final comid = AppPreferences.getComid();
-    final String url = "${AppGlobals.apiGetJobNo}$comid&JobType=$type";
+    final String url = "${ApiConstants.apiGetJobNo}$comid&JobType=$type";
 
     final response = await ApiClient.postRequest(url, null);
     if (response != null && response is List) {
@@ -25,7 +26,7 @@ class JobStatusUpdateRepository {
     List<String> images = [];
 
     // A. Fetch Sales Order
-    final String editUrl = "${AppGlobals.apiEditSalesOrder}$saleOrderId&CNumber=$cNumber";
+    final String editUrl = "${ApiConstants.apiEditSalesOrder}$saleOrderId&CNumber=$cNumber";
     final editResponse = await ApiClient.postRequest(editUrl, null);
 
     if (editResponse != null && editResponse is List && editResponse.isNotEmpty) {
@@ -36,7 +37,7 @@ class JobStatusUpdateRepository {
       // B. Fetch Job Status List & Find Match
       if (jStatus != null && jStatus != 0) {
         statusId = jStatus as int;
-        final String statusUrl = "${AppGlobals.apiSelectAllJobStatus}$comid&JobMasterRefId=$jobMasterRefId";
+        final String statusUrl = "${ApiConstants.apiSelectAllJobStatus}$comid&JobMasterRefId=$jobMasterRefId";
         final statusResponse = await ApiClient.postRequest(statusUrl, null);
 
         if (statusResponse != null && statusResponse is List) {
@@ -53,7 +54,7 @@ class JobStatusUpdateRepository {
 
     // C. Fetch Images
     final imageDir = '/Upload/$comid/SalesOrder/$saleOrderId/Boarding/';
-    final String imgUrl = "${AppGlobals.apiGetimage}$imageDir";
+    final String imgUrl = "${ApiConstants.apiGetImage}$imageDir";
     final imageResponse = await ApiClient.postRequest(imgUrl, null);
 
     if (imageResponse != null && imageResponse is List) {
@@ -82,7 +83,7 @@ class JobStatusUpdateRepository {
     };
 
     final response = await ApiClient.postRequest(
-        AppGlobals.apiDeleteimage,
+        ApiConstants.apiDeleteImage,
         null,
         headers: headers
     );
@@ -92,13 +93,13 @@ class JobStatusUpdateRepository {
 
   // 4. Update Boarding Details
   Future<ResponseViewModel?> updateBoardingDetails(Map<String, dynamic> master) async {
-    final response = await ApiClient.postRequest(AppGlobals.apiUpdateBoardingDetails, master);
+    final response = await ApiClient.postRequest(ApiConstants.apiUpdateBoardingDetails, master);
     return response != null ? ResponseViewModel.fromJson(response) : null;
   }
 
   // 5. Send Email
   Future<ResponseViewModel?> sendBoardingMail(Map<String, dynamic> master) async {
-    final response = await ApiClient.postRequest(AppGlobals.apiBoardingMail, master);
+    final response = await ApiClient.postRequest(ApiConstants.apiBoardingMail, master);
     return response != null ? ResponseViewModel.fromJson(response) : null;
   }
 }

@@ -1,3 +1,4 @@
+import 'package:maleva/core/network/api_constants.dart';
 import 'dart:convert';
 import 'dart:io';
 import 'package:http/http.dart' as http;
@@ -7,12 +8,12 @@ import 'package:maleva/core/utils/app_globals.dart';
 class SpotSaleRepository {
   /// Fetches Job Types
   Future<dynamic> fetchJobTypes(int comId) async {
-    return await ApiClient.postRequest("${AppGlobals.apiSelectJobType}$comId", null);
+    return await ApiClient.postRequest("${ApiConstants.apiSelectJobType}$comId", null);
   }
 
   /// Fetches Job Statuses
   Future<dynamic> fetchJobStatus(int comId) async {
-    return await ApiClient.postRequest("${AppGlobals.apiSelectJobStatus}$comId", null);
+    return await ApiClient.postRequest("${ApiConstants.apiSelectJobStatus}$comId", null);
   }
 
   /// Fetches Spot Sale Records for the View page
@@ -21,7 +22,7 @@ class SpotSaleRepository {
     required String fromDate,
     required String toDate,
   }) async {
-    final url = "${AppGlobals.apiGetSpotSaleEntry}$comId&Fromdate=$fromDate&Todate=$toDate&Id=0";
+    final url = "${ApiConstants.apiGetSpotSaleEntry}$comId&Fromdate=$fromDate&Todate=$toDate&Id=0";
     return await ApiClient.postRequest(url, null);
   }
 
@@ -32,7 +33,7 @@ class SpotSaleRepository {
     File? image,
     File? pdf,
   }) async {
-    final uri = Uri.parse("${AppGlobals.apiInsertSpotSaleEntry}?Comid=$comId");
+    final uri = Uri.parse("${ApiConstants.apiInsertSpotSaleEntry}?Comid=$comId");
     final request = http.MultipartRequest("POST", uri);
 
     request.fields["details"] = jsonEncode(body);

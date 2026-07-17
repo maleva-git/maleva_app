@@ -5,7 +5,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
-import 'package:maleva/core/models/model.dart';
 import 'package:maleva/core/utils/app_globals.dart';
 import 'package:maleva/core/colors/colors.dart' as colour;
 import 'package:maleva/features/dashboard/common_tabs/spareparts/view/sparepartsview.dart';
@@ -15,6 +14,7 @@ import '../bloc/spareparts_bloc.dart';
 import '../bloc/spareparts_event.dart';
 import '../bloc/spareparts_state.dart';
 import '../data/spareparts_repository.dart';
+import 'package:maleva/core/models/shared/get_truck_model.dart';
 // ── Entry Point ───────────────────────────────────────────────────────────────
 class SparePartsEntryPage extends StatelessWidget {
   const SparePartsEntryPage({super.key});

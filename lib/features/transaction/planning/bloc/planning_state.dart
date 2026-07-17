@@ -3,7 +3,8 @@
 // ════════════════════════════════════════════════════════════════════
 
 import 'package:equatable/equatable.dart';
-import 'package:maleva/core/models/model.dart';
+import 'package:maleva/core/models/shared/planning_detail_model.dart';
+import 'package:maleva/core/models/shared/planning_master_model.dart';
 
 abstract class PlanningState extends Equatable {
   @override

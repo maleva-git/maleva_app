@@ -1,4 +1,4 @@
-import 'package:maleva/core/models/model.dart';
+import 'package:maleva/core/models/shared/bo_detail_response.dart';
 
 abstract class BocState {}
 

@@ -1,3 +1,5 @@
+import 'package:maleva/core/utils/system_helpers.dart';
+import 'package:maleva/core/network/api_constants.dart';
 import 'dart:io';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
@@ -7,7 +9,6 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:maleva/core/utils/app_globals.dart';
 import 'package:maleva/core/network/OnlineApi.dart' as OnlineApi;
-import 'package:maleva/core/models/model.dart';
 import 'package:maleva/menu/menulist.dart';
 import '../../../../core/theme/palette.dart';
 import '../../../mastersearch/JobAllStatus.dart';
@@ -15,6 +16,7 @@ import '../../../transaction/salesorder/add/view/salesorderadd_tab.dart';
 import '../bloc/airfreight_bloc.dart';
 import '../bloc/airfreight_event.dart';
 import '../bloc/airfreight_state.dart';
+import 'package:maleva/features/operations/models/job_all_status_model.dart';
 
 const kGradient = LinearGradient(colors: [Palette.blue700, Palette.blue400], begin: Alignment.topLeft, end: Alignment.bottomRight);
 const double kTabletBreak = 600;
@@ -48,7 +50,7 @@ class _AirFreightPageState extends State<_AirFreightPage> {
     }
     final file = await _picker.pickImage(source: source);
     if (file == null) return;
-    final url = await AppGlobals.upload(File(file.path), AppGlobals.apiPostimage, saleOrderId, 'SalesOrder', 'AirFrieght');
+    final url = await SystemHelpers.upload(File(file.path), ApiConstants.apiPostImage, saleOrderId, 'SalesOrder', 'AirFrieght');
     context.read<AirFreightBloc>().add(AirFreightImagePicked(url));
   }
 

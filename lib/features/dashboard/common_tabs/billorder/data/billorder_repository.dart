@@ -1,7 +1,8 @@
-import 'package:maleva/core/models/model.dart';
+import 'package:maleva/core/network/api_constants.dart';
 import 'package:maleva/core/network/api_client.dart';
 import 'package:maleva/core/utils/app_preferences.dart';
 import 'package:maleva/core/utils/app_globals.dart';
+import 'package:maleva/core/models/shared/bill_view_model.dart';
 
 class BillOrderRepository {
 
@@ -14,7 +15,7 @@ class BillOrderRepository {
       final int comid = AppPreferences.getComid();
 
       // 2. Construct the API URL using existing constants
-      final String apiUrl = "${AppGlobals.apiBillorderview}$comid&Fromdate=$fromDate&Todate=$toDate";
+      final String apiUrl = "${ApiConstants.apiBillorderview}$comid&Fromdate=$fromDate&Todate=$toDate";
 
       // 3. Make the static API call
       final responseData = await ApiClient.postRequest(

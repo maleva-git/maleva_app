@@ -1,10 +1,14 @@
+import 'package:maleva/core/network/api_constants.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
-import 'package:maleva/core/models/model.dart';
 import 'package:maleva/core/network/api_client.dart';
 import 'package:maleva/core/utils/app_preferences.dart';
 import 'package:maleva/core/utils/app_globals.dart';
+import 'package:maleva/core/models/shared/email_model.dart';
+import 'package:maleva/core/models/shared/r_t_i_details_view_model.dart';
+import 'package:maleva/core/models/shared/employee_model.dart';
+import 'package:maleva/core/models/shared/r_t_i_master_view_model.dart';
 
 class TransportDashboardRepository {
   final int comid = AppPreferences.getComid();
@@ -17,23 +21,23 @@ class TransportDashboardRepository {
     final fromDate = DateFormat('yyyy-MM-dd').format(DateTime(now.year, now.month, 1));
 
     // Notice we use ApiClient for everything now
-    final r1 = await ApiClient.postRequest(AppGlobals.SaleInvoiceCountDB, {
+    final r1 = await ApiClient.postRequest(ApiConstants.SaleInvoiceCountDB, {
       'Comid': comid, 'Fromdate': '2024-10-01', 'Todate': toDate, 'Statusid': 0,
       'Employeeid': empId, 'Remarks': 2, 'Search': '0', 'completestatusnotshow': false, 'Invoice': false,
     });
-    final r2 = await ApiClient.postRequest(AppGlobals.SaleInvoiceCountDB, {
+    final r2 = await ApiClient.postRequest(ApiConstants.SaleInvoiceCountDB, {
       'Comid': comid, 'Fromdate': fromDate, 'Todate': toDate, 'Statusid': 0,
       'Employeeid': empId, 'Remarks': 0, 'Search': '0', 'completestatusnotshow': false, 'Invoice': false,
     });
-    final r3 = await ApiClient.postRequest(AppGlobals.SaleInvoiceCountDB, {
+    final r3 = await ApiClient.postRequest(ApiConstants.SaleInvoiceCountDB, {
       'Comid': comid, 'Fromdate': fromDate, 'Todate': toDate, 'Statusid': 0,
       'Employeeid': empId, 'Remarks': 1, 'Search': '0', 'completestatusnotshow': false, 'Invoice': false,
     });
-    final r4 = await ApiClient.postRequest(AppGlobals.SaleInvoiceCountDB, {
+    final r4 = await ApiClient.postRequest(ApiConstants.SaleInvoiceCountDB, {
       'Comid': comid, 'Fromdate': fromDate, 'Todate': toDate, 'Statusid': 0,
       'Employeeid': empId, 'Remarks': 2, 'Search': '0', 'completestatusnotshow': false, 'Invoice': false,
     });
-    final r5 = await ApiClient.postRequest(AppGlobals.SelectSalesOrderStatus, {
+    final r5 = await ApiClient.postRequest(ApiConstants.SelectSalesOrderStatus, {
       'Comid': comid, 'Employeeid': empId
     });
 
@@ -47,14 +51,14 @@ class TransportDashboardRepository {
   }
 
   Future<List<Map<String, dynamic>>> fetchRulesType() async {
-    final result = await ApiClient.postRequest(AppGlobals.LoadRulesType, {'Comid': comid, 'Employeeid': empRefId});
+    final result = await ApiClient.postRequest(ApiConstants.LoadRulesType, {'Comid': comid, 'Employeeid': empRefId});
     return result is List ? result.cast<Map<String, dynamic>>() : [];
   }
 
   // ─── Transport/Planning ────────────────────────────────────────────────────
   Future<List<dynamic>> fetchPlanningData(int type) async {
     final date = DateFormat('yyyy-MM-dd').format(DateTime.now().add(Duration(days: type)));
-    final url = type == 0 ? AppGlobals.PLANINGSearchDB : AppGlobals.PLANINGSearch;
+    final url = type == 0 ? ApiConstants.PLANINGSearchDB : ApiConstants.PLANINGSearch;
     final result = await ApiClient.postRequest(url, {
       'Comid': comid, 'Fromdate': date, 'Todate': date, 'Search': '', 'Employeeid': 0, 'ETAType': 0,
     });
@@ -63,7 +67,7 @@ class TransportDashboardRepository {
 
   // ─── Enquiry ───────────────────────────────────────────────────────────────
   Future<List<dynamic>> fetchEnquiryData() async {
-    final result = await ApiClient.postRequest(AppGlobals.apiSelectEnquiryMaster, {
+    final result = await ApiClient.postRequest(ApiConstants.apiSelectEnquiryMaster, {
       'Comid': comid, 'Fromdate': null, 'Todate': null, 'Employeeid': empRefId,
       'Invoice': false, 'Id': 0, 'JId': 0, 'DashboardStatus': 2,
     });
@@ -80,17 +84,17 @@ class TransportDashboardRepository {
   }
 
   Future<void> cancelEnquiry(int id) async {
-    await ApiClient.postRequest('${AppGlobals.apiUpdateEnquiryMaster}$id&Comid=$comid&StatusName=CANCEL', null);
+    await ApiClient.postRequest('${ApiConstants.apiUpdateEnquiryMaster}$id&Comid=$comid&StatusName=CANCEL', null);
   }
 
   // ─── Emails ────────────────────────────────────────────────────────────────
   Future<List<EmployeeModel>> fetchEmployees() async {
-    final result = await ApiClient.postRequest('${AppGlobals.apiSelectEmployee}$comid&type=&type1=', null);
+    final result = await ApiClient.postRequest('${ApiConstants.apiSelectEmployee}$comid&type=&type1=', null);
     return result is List ? result.map((e) => EmployeeModel.fromJson(e)).toList() : [];
   }
 
   Future<List<EmailModel>> fetchEmailsForEmployee(int employeeId) async {
-    final result = await ApiClient.postRequest(AppGlobals.apiSelectEmailData, [{'Id': employeeId}], headers: {'Comid': comid.toString()});
+    final result = await ApiClient.postRequest(ApiConstants.apiSelectEmailData, [{'Id': employeeId}], headers: {'Comid': comid.toString()});
     if (result is Map<String, dynamic> && result['unread_unreplied_emails'] is List) {
       return (result['unread_unreplied_emails'] as List).map((e) => EmailModel.fromJson(e as Map<String, dynamic>)).toList();
     }
@@ -98,17 +102,17 @@ class TransportDashboardRepository {
   }
 
   Future<void> saveEmails(List<Map<String, dynamic>> payload) async {
-    await ApiClient.postRequest(AppGlobals.apiInsertMailMaster, payload, headers: {'Comid': comid.toString()});
+    await ApiClient.postRequest(ApiConstants.apiInsertMailMaster, payload, headers: {'Comid': comid.toString()});
   }
 
   // ─── Google Reviews ────────────────────────────────────────────────────────
   Future<void> saveGoogleReview(Map<String, dynamic> payload) async {
-    await ApiClient.postRequest(AppGlobals.apiGoogleReviewInsert, [payload]);
+    await ApiClient.postRequest(ApiConstants.apiGoogleReviewInsert, [payload]);
   }
 
   // ─── RTI / PDO ─────────────────────────────────────────────────────────────
   Future<Map<String, dynamic>> fetchRTIData(String fromDate, String toDate, int driverId, int truckId, String search) async {
-    final url = '${AppGlobals.apiSelectRTIView}$comid&Fromdate=$fromDate&Todate=$toDate&DId=$driverId&TId=$truckId&Employeeid=0&Search=$search';
+    final url = '${ApiConstants.apiSelectRTIView}$comid&Fromdate=$fromDate&Todate=$toDate&DId=$driverId&TId=$truckId&Employeeid=0&Search=$search';
     final result = await ApiClient.postRequest(url, null);
 
     List<RTIMasterViewModel> masterList = [];
@@ -126,7 +130,7 @@ class TransportDashboardRepository {
   }
 
   Future<void> saveRTIData(List<Map<String, dynamic>> selectedDetails, List<RTIDetailsViewModel> rawDetailsToUpload, int masterId) async {
-    final uri = Uri.parse('${AppGlobals.apiRTIDetailsInsert}$comid');
+    final uri = Uri.parse('${ApiConstants.apiRTIDetailsInsert}$comid');
     final request = http.MultipartRequest('POST', uri);
     request.fields['objReceipt'] = jsonEncode(selectedDetails);
     request.fields['Comid'] = comid.toString();

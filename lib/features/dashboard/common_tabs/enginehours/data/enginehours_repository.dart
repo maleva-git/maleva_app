@@ -1,3 +1,4 @@
+import 'package:maleva/core/network/api_constants.dart';
 import 'package:maleva/core/network/api_client.dart';
 import 'package:maleva/core/utils/app_globals.dart';
 
@@ -8,7 +9,7 @@ class EngineHoursRepository {
   }) async {
     // ApiClient safely handles the network call, headers, and errors
     return await ApiClient.postRequest(
-      AppGlobals.apiSelectEangiehoursReport,
+      ApiConstants.apiSelectEngineHoursReport,
       body,
     );
   }

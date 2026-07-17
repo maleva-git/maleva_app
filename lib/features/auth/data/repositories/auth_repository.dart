@@ -1,10 +1,11 @@
 
 
 import 'dart:convert';
-import 'package:maleva/core/models/model.dart';
 import 'package:maleva/core/network/api_services/auth_api.dart';
 import 'package:maleva/core/utils/app_preferences.dart';
 import 'package:maleva/core/utils/app_globals.dart';
+import 'package:maleva/core/models/shared/menu_master_model.dart';
+import 'package:maleva/core/models/shared/response_view_model.dart';
 
 class AuthRepository {
   final AuthApi authApi;

@@ -6,7 +6,6 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:maleva/menu/menulist.dart';
 import 'package:maleva/core/network/OnlineApi.dart' as OnlineApi;
 import 'package:maleva/core/utils/app_globals.dart';
-import 'package:maleva/core/models/model.dart';
 
 import '../../../../../core/di/injection.dart';
 import '../../../../../core/theme/palette.dart';
@@ -15,6 +14,7 @@ import '../../../../mastersearch/Employee.dart';
 import '../bloc/fwbreakseal_bloc.dart';
 import '../bloc/fwbreakseal_event.dart';
 import '../bloc/fwbreakseal_state.dart';
+import 'package:maleva/core/models/shared/employee_model.dart';
 
 
 

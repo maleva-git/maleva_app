@@ -10,6 +10,7 @@ import '../bloc/speeding_bloc.dart';
 import '../bloc/speeding_event.dart';
 import '../bloc/speeding_state.dart';
 import 'package:maleva/core/colors/colors.dart' as colour;
+import 'package:maleva/core/models/shared/speeding_view.dart';
 
 class SpeedingScreen extends StatelessWidget {
   const SpeedingScreen({super.key});

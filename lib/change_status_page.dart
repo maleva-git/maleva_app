@@ -1,7 +1,11 @@
+import 'package:maleva/core/network/api_legacy_helper.dart';
+import 'package:maleva/core/network/api_constants.dart';
 import 'package:flutter/material.dart';
 import 'package:maleva/core/utils/app_globals.dart';
 import 'package:maleva/core/utils/app_globals.dart';
 import 'core/models/model.dart';
+import 'package:maleva/core/models/shared/pattycash_master_model.dart';
+import 'package:maleva/core/models/shared/patty_cash_details_model.dart';
 
 class ChangeStatusPage extends StatefulWidget {
   final int masterId;
@@ -38,8 +42,8 @@ class ChangeStatusPageState extends State<ChangeStatusPage> {
     Map<String, String> header = {
       'Content-Type': 'application/json; charset=UTF-8',
     };
-    await AppGlobals.apiAllinoneSelectArray(
-      "${AppGlobals.apiGeteditepettycash}${AppGlobals.Comid}""",
+    await ApiLegacyHelper.apiAllinoneSelectArray(
+      "${ApiConstants.apiGetpettycash}${AppGlobals.Comid}""",
       null,
       header,
       context,

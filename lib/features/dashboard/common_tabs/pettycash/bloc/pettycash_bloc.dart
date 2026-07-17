@@ -1,11 +1,12 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
-import 'package:maleva/core/models/model.dart';
 import 'package:maleva/core/utils/app_globals.dart';
 
 import '../data/pettycash_repository.dart';
 import 'pettycash_event.dart';
 import 'pettycash_state.dart';
+import 'package:maleva/core/models/shared/patty_cash_details_model.dart';
+import 'package:maleva/core/models/shared/pattycash_master_model.dart';
 
 class PettyCashBloc extends Bloc<PettyCashEvent, PettyCashState> {
   // ❌ REMOVED: final BuildContext context;

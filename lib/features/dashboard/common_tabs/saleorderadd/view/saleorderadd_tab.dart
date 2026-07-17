@@ -1,9 +1,10 @@
+import 'package:maleva/core/network/api_legacy_helper.dart';
+import 'package:maleva/core/network/api_constants.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
-import 'package:maleva/core/models/model.dart';
 import 'package:maleva/core/utils/app_globals.dart';
 import 'package:maleva/core/colors/colors.dart' as colour;
 import 'package:maleva/features/mastersearch/JobAllStatus.dart';
@@ -20,6 +21,14 @@ import '../../saleorderview/view/saleorderview_tab.dart';
 import '../bloc/saleorderadd_bloc.dart';
 import '../bloc/saleorderadd_event.dart';
 import '../bloc/saleorderadd_state.dart';
+import 'package:maleva/core/models/shared/customer_model.dart';
+import 'package:maleva/core/models/shared/employee_model.dart';
+import 'package:maleva/core/models/shared/sale_edit_detail_model.dart';
+import 'package:maleva/core/models/shared/location_model.dart';
+import 'package:maleva/core/models/shared/agent_model.dart';
+import 'package:maleva/core/models/shared/agent_company_model.dart';
+import 'package:maleva/features/operations/models/job_all_status_model.dart';
+import 'package:maleva/features/operations/models/job_type_model.dart';
 
 
 
@@ -1695,8 +1704,8 @@ class _SalesOrderViewState extends State<_SalesOrderView>
       String type,
       int slot,
       ) async {
-    await AppGlobals.apiAllinoneSelect(
-        '${AppGlobals.apiSelectEmployee}${AppGlobals.Comid}&type=&type1=Operation',
+    await ApiLegacyHelper.apiAllinoneSelect(
+        '${ApiConstants.apiSelectEmployee}${AppGlobals.Comid}&type=&type1=Operation',
         null, null, context);
 
     if (!context.mounted) return;

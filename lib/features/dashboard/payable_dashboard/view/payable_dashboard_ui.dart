@@ -1,3 +1,4 @@
+import 'package:maleva/core/network/api_legacy_helper.dart';
 import 'package:flutter/Material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -21,6 +22,8 @@ import '../bloc/payable_dashboard_state.dart';
 import 'package:maleva/core/widgets/custom_app_bar.dart';
 import 'package:maleva/features/dashboard/common_tabs/driverleave/view/admin_leave_approval_tab.dart';
 import 'package:maleva/features/dashboard/common_tabs/driverleave/view/employee_leave_request_tab.dart';
+import 'package:maleva/core/models/shared/barcode_print_model.dart';
+import 'package:maleva/features/transport/models/fuel_filling.dart';
 
 class PayableMobileDashboard extends StatelessWidget {
   final TabController tabController;
@@ -75,7 +78,7 @@ class PayableMobileDashboard extends StatelessWidget {
         IconButton(
           icon: Icon(Icons.exit_to_app,
               size: isTablet ? 32 : 30, color: colour.topAppBarColor),
-          onPressed: () => AppGlobals.logout(context),
+          onPressed: () => ApiLegacyHelper.logout(context),
         ),
         if (isTablet) const SizedBox(width: 8),
       ],

@@ -1,9 +1,10 @@
+import 'package:maleva/core/network/api_constants.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import '../../../../../core/utils/app_globals.dart';
 import '../../../../../core/network/api_client.dart';
-import 'package:maleva/core/models/model.dart';
 import '../models/vesselplanningweb_model.dart';
+import 'package:maleva/core/models/shared/response_view_model.dart';
 
 class VesselPlanningWebRepository {
   Future<List<VesselPlanningWebModel>> getVesselPlanningSearch({
@@ -24,27 +25,13 @@ class VesselPlanningWebRepository {
       "Employeeid": employeeId,
     };
 
-    print("========== VESSEL PLANNING WEB (SEARCH) ==========");
-    print("API URL: ${AppGlobals.apiVesselPlanningSearch}");
-    print("Headers: {'Content-Type': 'application/json; charset=UTF-8', 'Comid': '${AppGlobals.Comid}'}");
-    print("Body: ${jsonEncode(requestBody)}");
-    print("==================================================");
+    try {
+      final jsonResponse = await ApiClient.postRequest(
+        ApiConstants.apiVesselPlanningSearch,
+        requestBody,
+        headers: {'Comid': AppGlobals.Comid.toString()},
+      );
 
-    final response = await http.post(
-      Uri.parse(AppGlobals.apiVesselPlanningSearch),
-      headers: <String, String>{
-        'Content-Type': 'application/json; charset=UTF-8',
-        'Comid': AppGlobals.Comid.toString(),
-      },
-      body: jsonEncode(requestBody),
-    );
-
-    print("Response Status Code: ${response.statusCode}");
-    print("Response Body: ${response.body}");
-
-    if (response.statusCode == 200) {
-      if (response.body.isEmpty || response.body == 'null') return [];
-      final jsonResponse = jsonDecode(response.body);
       if (jsonResponse is List) {
         return jsonResponse.map((json) => VesselPlanningWebModel.fromJson(json)).toList();
       } else if (jsonResponse is Map<String, dynamic>) {
@@ -58,90 +45,58 @@ class VesselPlanningWebRepository {
           }
           throw Exception(jsonResponse['message'] ?? 'Failed to load data');
         }
-      } else {
-        throw Exception('Unexpected response format');
       }
-    } else if (response.statusCode == 404 || response.statusCode == 500) {
       return [];
-    } else {
-      throw Exception('Server Error: ${response.statusCode}');
+    } catch (e) {
+      final errorMsg = e.toString().toLowerCase();
+      if (errorMsg.contains('404') || errorMsg.contains('500') || errorMsg.contains('server error')) {
+        return [];
+      }
+      rethrow;
     }
   }
 
   Future<String> updateSpecificJob(Map<String, dynamic> updateData) async {
-    print("========== VESSEL PLANNING WEB (UPDATE) ==========");
-    print("API URL: ${AppGlobals.apiUpdateSaleOrderSpecific}");
-    print("Headers: {'Content-Type': 'application/json; charset=UTF-8', 'Comid': '${AppGlobals.Comid}'}");
-    print("Body: ${jsonEncode(updateData)}");
-    print("==================================================");
+    try {
+      final jsonResponse = await ApiClient.postRequest(
+        ApiConstants.apiUpdateSaleOrderSpecific,
+        updateData,
+        headers: {'Comid': AppGlobals.Comid.toString()},
+      );
 
-    final response = await http.post(
-      Uri.parse(AppGlobals.apiUpdateSaleOrderSpecific),
-      headers: <String, String>{
-        'Content-Type': 'application/json; charset=UTF-8',
-        'Comid': AppGlobals.Comid.toString(),
-      },
-      body: jsonEncode(updateData),
-    );
-
-    if (response.statusCode == 200) {
-      if (response.body.isEmpty || response.body == 'null') return 'Success';
-      try {
-        final jsonResponse = jsonDecode(response.body);
-        if (jsonResponse is Map<String, dynamic>) {
-          if (jsonResponse['ok'] == true || jsonResponse['status'] == 'success') {
-            return jsonResponse['message'] ?? 'Success';
-          } else if (jsonResponse.containsKey('ok') && jsonResponse['ok'] == false) {
-            throw Exception(jsonResponse['message'] ?? 'Failed to update');
-          }
+      if (jsonResponse is Map<String, dynamic>) {
+        if (jsonResponse['ok'] == true || jsonResponse['status'] == 'success') {
+          return jsonResponse['message'] ?? 'Success';
+        } else if (jsonResponse.containsKey('ok') && jsonResponse['ok'] == false) {
+          throw Exception(jsonResponse['message'] ?? 'Failed to update');
         }
-        return 'Success';
-      } catch (e) {
-        return 'Success';
       }
-    } else {
-      throw Exception('Server Error: ${response.statusCode}');
+      return 'Success';
+    } catch (e) {
+      if (e.toString().contains('Failed to update')) rethrow;
+      return 'Success';
     }
   }
 
   Future<String> saveVesselPlanning(List<Map<String, dynamic>> planningList) async {
-    print("========== VESSEL PLANNING WEB (SAVE NEW) ==========");
-    print("API URL: ${AppGlobals.apiInsertVesselPlanning}");
-    print("Headers: {'Content-Type': 'application/json; charset=UTF-8', 'Comid': '${AppGlobals.Comid}'}");
-    print("Body: ${jsonEncode(planningList)}");
-    print("==================================================");
+    try {
+      final jsonResponse = await ApiClient.postRequest(
+        ApiConstants.apiInsertVesselPlanning,
+        planningList,
+        headers: {'Comid': AppGlobals.Comid.toString()},
+      );
 
-    final response = await http.post(
-      Uri.parse(AppGlobals.apiInsertVesselPlanning),
-      headers: <String, String>{
-        'Content-Type': 'application/json; charset=UTF-8',
-        'Comid': AppGlobals.Comid.toString(),
-      },
-      body: jsonEncode(planningList),
-    );
-
-    print("Response Status Code: ${response.statusCode}");
-    print("Response Body: ${response.body}");
-
-    if (response.statusCode == 200) {
-      if (response.body.isEmpty || response.body == 'null') {
-        return 'Success';
-      }
-      try {
-        final jsonResponse = jsonDecode(response.body);
-        if (jsonResponse is Map<String, dynamic>) {
-          if (jsonResponse['ok'] == true || jsonResponse['status'] == 'success') {
-            return jsonResponse['message'] ?? 'Success';
-          } else if (jsonResponse.containsKey('ok') && jsonResponse['ok'] == false) {
-            throw Exception(jsonResponse['message'] ?? 'Failed to save');
-          }
+      if (jsonResponse is Map<String, dynamic>) {
+        if (jsonResponse['ok'] == true || jsonResponse['status'] == 'success') {
+          return jsonResponse['message'] ?? 'Success';
+        } else if (jsonResponse.containsKey('ok') && jsonResponse['ok'] == false) {
+          throw Exception(jsonResponse['message'] ?? 'Failed to save');
         }
-        return 'Success';
-      } catch (e) {
-        return 'Success';
       }
-    } else {
-      throw Exception('Server Error: ${response.statusCode}');
+      return 'Success';
+    } catch (e) {
+      if (e.toString().contains('Failed to save')) rethrow;
+      return 'Success';
     }
   }
 
@@ -151,43 +106,24 @@ class VesselPlanningWebRepository {
       "Comid": AppGlobals.Comid,
     };
 
-    print("========== VESSEL PLANNING WEB (DELETE) ==========");
-    print("API URL: ${AppGlobals.apiDeleteVesselPlanning}$id");
-    print("Headers: {'Content-Type': 'application/json; charset=UTF-8', 'Comid': '${AppGlobals.Comid}'}");
-    print("Body: ${jsonEncode(requestBody)}");
-    print("==================================================");
+    try {
+      final jsonResponse = await ApiClient.postRequest(
+        '${ApiConstants.apiDeleteVesselPlanning}$id&Comid=${AppGlobals.Comid}',
+        requestBody,
+        headers: {'Comid': AppGlobals.Comid.toString()},
+      );
 
-    final response = await http.post(
-      Uri.parse('${AppGlobals.apiDeleteVesselPlanning}$id&Comid=${AppGlobals.Comid}'),
-      headers: <String, String>{
-        'Content-Type': 'application/json; charset=UTF-8',
-        'Comid': AppGlobals.Comid.toString(),
-      },
-      body: jsonEncode(requestBody),
-    );
-
-    print("Response Status Code: ${response.statusCode}");
-    print("Response Body: ${response.body}");
-
-    if (response.statusCode == 200) {
-      if (response.body.isEmpty || response.body == 'null') {
-        return 'Success';
-      }
-      try {
-        final jsonResponse = jsonDecode(response.body);
-        if (jsonResponse is Map<String, dynamic>) {
-          if (jsonResponse['ok'] == true || jsonResponse['status'] == 'success') {
-            return jsonResponse['message'] ?? 'Success';
-          } else if (jsonResponse.containsKey('ok') && jsonResponse['ok'] == false) {
-            throw Exception(jsonResponse['message'] ?? 'Failed to save');
-          }
+      if (jsonResponse is Map<String, dynamic>) {
+        if (jsonResponse['ok'] == true || jsonResponse['status'] == 'success') {
+          return jsonResponse['message'] ?? 'Success';
+        } else if (jsonResponse.containsKey('ok') && jsonResponse['ok'] == false) {
+          throw Exception(jsonResponse['message'] ?? 'Failed to save');
         }
-        return 'Success';
-      } catch (e) {
-        return 'Success';
       }
-    } else {
-      throw Exception('Server Error: ${response.statusCode}');
+      return 'Success';
+    } catch (e) {
+      if (e.toString().contains('Failed to save')) rethrow;
+      return 'Success';
     }
   }
 
@@ -205,27 +141,13 @@ class VesselPlanningWebRepository {
       "Employeeid": employeeId,
     };
 
-    print("========== VESSEL PLANNING WEB (GET SAVED PLANNINGS) ==========");
-    print("API URL: ${AppGlobals.apiSelectVesselPlanning}");
-    print("Headers: {'Content-Type': 'application/json; charset=UTF-8', 'Comid': '${AppGlobals.Comid}'}");
-    print("Body: ${jsonEncode(requestBody)}");
-    print("===============================================================");
+    try {
+      final jsonResponse = await ApiClient.postRequest(
+        ApiConstants.apiSelectVesselPlanning,
+        requestBody,
+        headers: {'Comid': AppGlobals.Comid.toString()},
+      );
 
-    final response = await http.post(
-      Uri.parse(AppGlobals.apiSelectVesselPlanning),
-      headers: <String, String>{
-        'Content-Type': 'application/json; charset=UTF-8',
-        'Comid': AppGlobals.Comid.toString(),
-      },
-      body: jsonEncode(requestBody),
-    );
-
-    print("Response Status Code: ${response.statusCode}");
-    print("Response Body: ${response.body}");
-
-    if (response.statusCode == 200) {
-      if (response.body.isEmpty || response.body == 'null') return [];
-      final jsonResponse = jsonDecode(response.body);
       List<dynamic> extractEnrichedMaster(dynamic firstObj) {
         if (firstObj is Map && firstObj['salemaster'] != null) {
           List<dynamic> masters = firstObj['salemaster'];
@@ -259,26 +181,23 @@ class VesselPlanningWebRepository {
         }
       }
       return [];
-    } else if (response.statusCode == 404 || response.statusCode == 500) {
-      return [];
-    } else {
-      throw Exception('Server Error: ${response.statusCode}');
+    } catch (e) {
+      final errorMsg = e.toString().toLowerCase();
+      if (errorMsg.contains('404') || errorMsg.contains('500') || errorMsg.contains('server error')) {
+        return [];
+      }
+      rethrow;
     }
   }
 
   Future<Map<String, dynamic>> getPlanningById(int id) async {
-    final response = await http.post(
-      Uri.parse('${AppGlobals.apiEditVesselPlanning}$id&VESSELPLANINGNo=0&Comid=${AppGlobals.Comid}'),
-      headers: <String, String>{
-        'Content-Type': 'application/json; charset=UTF-8',
-        'Comid': AppGlobals.Comid.toString(),
-      },
-    );
+    try {
+      final jsonResponse = await ApiClient.postRequest(
+        '${ApiConstants.apiEditVesselPlanning}$id&VESSELPLANINGNo=0&Comid=${AppGlobals.Comid}',
+        null,
+        headers: {'Comid': AppGlobals.Comid.toString()},
+      );
 
-    if (response.statusCode == 200) {
-      if (response.body.isEmpty || response.body == 'null') return {'master': null, 'details': <VesselPlanningWebModel>[]};
-      final jsonResponse = jsonDecode(response.body);
-      
       Map<String, dynamic>? masterData;
       List<dynamic> data = [];
       
@@ -313,21 +232,19 @@ class VesselPlanningWebRepository {
         'master': masterData,
         'details': data.map((json) => VesselPlanningWebModel.fromJson(json)).toList()
       };
-    } else {
-      throw Exception('Server Error: ${response.statusCode}');
+    } catch (e) {
+      throw Exception('Server Error: ${e.toString()}');
     }
   }
 
   Future<String> getMaxVesselPlanningNo() async {
     try {
       final comId = AppGlobals.storagenew.getInt('Comid') ?? 0;
-      final url = '${AppGlobals.apiMaxVesselPlanningNo}?Comid=$comId&BillType=VP';
-      final response = await http.post(Uri.parse(url));
-      if (response.statusCode == 200) {
-        final decoded = jsonDecode(response.body);
-        if (decoded != null && decoded['ok'] == true && decoded['No'] != null) {
-          return decoded['No'].toString();
-        }
+      final url = '${ApiConstants.apiMaxVesselPlanningNo}?Comid=$comId&BillType=VP';
+      final jsonResponse = await ApiClient.postRequest(url, null);
+      
+      if (jsonResponse != null && jsonResponse['ok'] == true && jsonResponse['No'] != null) {
+        return jsonResponse['No'].toString();
       }
     } catch (e) {
       // ignore
@@ -344,7 +261,7 @@ class VesselPlanningWebRepository {
       'Comid': AppGlobals.Comid,
     };
 
-    final result = await ApiClient.postRequest("${AppGlobals.apiViewVesselPlanningPdf}$planningNo", body);
+    final result = await ApiClient.postRequest("${ApiConstants.apiViewVesselPlanningPdf}$planningNo", body);
 
     if (result != null && result.toString().isNotEmpty) {
       ResponseViewModel value = ResponseViewModel.fromJson(result);

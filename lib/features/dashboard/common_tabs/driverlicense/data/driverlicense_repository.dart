@@ -1,7 +1,8 @@
+import 'package:maleva/core/network/api_constants.dart';
 import 'package:flutter/foundation.dart';
-import 'package:maleva/core/models/model.dart';
 import 'package:maleva/core/network/api_client.dart';
 import 'package:maleva/core/utils/app_globals.dart';
+import 'package:maleva/core/models/shared/truck_details_model.dart';
 
 class DriverLicenseRepository {
   Future<Map<String, dynamic>> fetchLicenseData() async {
@@ -19,7 +20,7 @@ class DriverLicenseRepository {
       if (kDebugMode) debugPrint("➡️ Driver License Payload: $driverMaster");
 
       final driverResult = await ApiClient.postRequest(
-          AppGlobals.apiSelectDriverDetails,
+          ApiConstants.apiSelectDriverDetails,
           driverMaster
       );
 

@@ -1,14 +1,15 @@
-import 'package:maleva/core/models/model.dart';
+import 'package:maleva/core/network/api_constants.dart';
 import 'package:maleva/core/network/api_client.dart';
 import 'package:maleva/core/utils/app_preferences.dart';
 import 'package:maleva/core/utils/app_globals.dart';
+import 'package:maleva/features/transport/models/maintenance_model.dart';
 
 class MaintenanceRepository {
   // ── 1. Fetch Current Month Stats ──────────────────────────────────────────
   Future<Map<String, dynamic>> fetchCurrentMonthStats(String fromDate, String toDate) async {
     try {
       final comid = AppPreferences.getComid();
-      final url = '${AppGlobals.apiGetMaintenance2}$comid&Fromdate=$fromDate&Todate=$toDate';
+      final url = '${ApiConstants.apiGetMaintenance2}$comid&Fromdate=$fromDate&Todate=$toDate';
 
       final response = await ApiClient.postRequest(url, null);
 
@@ -68,7 +69,7 @@ class MaintenanceRepository {
   Future<List<dynamic>> fetchPendingMaintenance() async {
     try {
       final comid = AppPreferences.getComid();
-      final url = '${AppGlobals.apiGetMaintenance}$comid';
+      final url = '${ApiConstants.apiGetMaintenance}$comid';
 
       final response = await ApiClient.postRequest(url, null);
 
@@ -87,7 +88,7 @@ class MaintenanceRepository {
   Future<List<dynamic>> fetchSummaryMaintenance(String fromDate, String toDate) async {
     try {
       final comid = AppPreferences.getComid();
-      final url = '${AppGlobals.apiGetMaintenance1}$comid&Fromdate=$fromDate&Todate=$toDate';
+      final url = '${ApiConstants.apiGetMaintenance1}$comid&Fromdate=$fromDate&Todate=$toDate';
 
       final response = await ApiClient.postRequest(url, null);
 

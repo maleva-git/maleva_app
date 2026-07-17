@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
-import 'package:maleva/core/models/model.dart';
 import 'package:maleva/core/utils/app_globals.dart';
 import '../../../../../core/di/injection.dart';
 import '../../../../../core/theme/tokens.dart';
@@ -10,6 +9,7 @@ import '../bloc/fuelfillings_bloc.dart';
 import '../bloc/fuelfillings_event.dart';
 import '../bloc/fuelfillings_state.dart';
 import 'package:maleva/core/colors/colors.dart' as colour;
+import 'package:maleva/features/transport/models/fuel_filling.dart';
 
 // ── Entry Point ───────────────────────────────────────────────────────────────
 class FuelFillingPage extends StatelessWidget {

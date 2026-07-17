@@ -1,3 +1,6 @@
+import 'package:maleva/core/utils/system_helpers.dart';
+import 'package:maleva/core/network/api_legacy_helper.dart';
+import 'package:maleva/core/network/api_constants.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
@@ -5,7 +8,6 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:maleva/core/utils/app_globals.dart';
 import 'package:maleva/core/network/OnlineApi.dart' as OnlineApi;
-import 'package:maleva/core/models/model.dart';
 import 'package:maleva/menu/menulist.dart';
 import '../../../../core/theme/tokens.dart';
 import '../../../dashboard/common_tabs/transportDB/view/transportdb_tab.dart';
@@ -22,6 +24,10 @@ import '../../../mastersearch/Port.dart';
 import '../bloc/prealertview_bloc.dart';
 import '../bloc/prealertview_event.dart';
 import 'package:maleva/core/colors/colors.dart' as colour;
+import 'package:maleva/core/models/shared/response_view_model.dart';
+import 'package:maleva/core/models/shared/customer_model.dart';
+import 'package:maleva/features/operations/models/job_status_model.dart';
+import 'package:maleva/features/operations/models/job_type_model.dart';
 
 class PreAlertReport extends StatelessWidget {
   const PreAlertReport({super.key});
@@ -60,13 +66,13 @@ class _PreAlertPage extends StatelessWidget {
       'Cons':                s.checkConsolidated,
     };
     final header = {'Content-Type': 'application/json; charset=UTF-8'};
-    final resultData = await AppGlobals.apiAllinoneSelectArray(
-        '${AppGlobals.apiPreAlertReport}$reportName', master, header, context);
+    final resultData = await ApiLegacyHelper.apiAllinoneSelectArray(
+        '${ApiConstants.apiPreAlertReport}$reportName', master, header, context);
 
     if (resultData != null && resultData != '') {
       final value = ResponseViewModel.fromJson(resultData);
       if (value.IsSuccess == true) {
-        AppGlobals.launchInBrowser(value.data1);
+        SystemHelpers.launchInBrowser(value.data1);
       }
     }
   }

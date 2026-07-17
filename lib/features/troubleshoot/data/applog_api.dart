@@ -1,3 +1,4 @@
+import 'package:maleva/core/utils/system_helpers.dart';
 import 'dart:io';
 import 'package:http/http.dart' as http;
 import 'package:http_parser/http_parser.dart';
@@ -72,7 +73,7 @@ class AppLogApi {
         'SubFolderName': '', // Can be left empty
       });
 
-      // Send the request exactly as done in AppGlobals.upload
+      // Send the request exactly as done in SystemHelpers.upload
       final response = await http.Response.fromStream(await request.send());
 
       // 4. Delete the temporary file

@@ -1,3 +1,4 @@
+import 'package:maleva/core/network/api_constants.dart';
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:maleva/core/network/api_client.dart';
@@ -6,7 +7,7 @@ import 'package:http/http.dart' as http;
 import 'leave_request_model.dart';
 
 class LeaveRequestApi {
-  static final String _baseUrl = '${AppGlobals.port}/api/LeaveRequestApp';
+  static final String _baseUrl = '${ApiConstants.port}/api/LeaveRequestApp';
 
   static Future<bool> addLeaveRequest(BuildContext context, {
     required int leaveTypeRefId,

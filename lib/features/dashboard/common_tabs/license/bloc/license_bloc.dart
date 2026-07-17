@@ -1,9 +1,9 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:maleva/core/models/model.dart';
 
 import '../data/license_repository.dart'; // Adjust this path if needed
 import 'license_event.dart';
 import 'license_state.dart';
+import 'package:maleva/core/models/shared/license_view_model.dart';
 
 class LicenseBloc extends Bloc<LicenseEvent, LicenseState> {
   final LicenseRepository repository;

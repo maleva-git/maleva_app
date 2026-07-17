@@ -1,4 +1,5 @@
 import '../../../../../core/models/model.dart';
+import 'package:maleva/features/transport/models/fuelselect_model.dart';
 
 abstract class FuelDiffEvent {
   const FuelDiffEvent();

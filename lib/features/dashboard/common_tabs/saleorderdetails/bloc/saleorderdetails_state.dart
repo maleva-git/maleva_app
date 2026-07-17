@@ -4,6 +4,7 @@
 import 'package:equatable/equatable.dart';
 
 import '../../../../../core/models/model.dart';
+import 'package:maleva/core/models/shared/sale_edit_detail_model.dart';
 
 class SaleOrderVisibility extends Equatable {
   final bool offVessel;

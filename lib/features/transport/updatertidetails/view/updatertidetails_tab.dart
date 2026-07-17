@@ -6,7 +6,6 @@ import 'package:intl/intl.dart';
 import 'package:maleva/core/utils/app_globals.dart';
 import 'package:maleva/core/network/OnlineApi.dart' as OnlineApi;
 import 'package:maleva/features/dashboard/airfreight_dashboard/view/airfreight_dashboard.dart';
-import 'package:maleva/core/models/model.dart';
 import 'package:maleva/menu/menulist.dart';
 import 'package:maleva/features/dashboard/admin_dashboard/view/admin_dashboard.dart';
 import '../../../../core/theme/palette.dart';
@@ -22,6 +21,7 @@ import '../../../mastersearch/Truck.dart';
 import '../bloc/updatertidetails_bloc.dart';
 import '../bloc/updatertidetails_event.dart';
 import '../bloc/updatertidetails_state.dart';
+import 'package:maleva/core/models/shared/get_truck_model.dart';
 
 
 

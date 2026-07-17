@@ -1,10 +1,12 @@
+import 'package:maleva/core/network/api_legacy_helper.dart';
+import 'package:maleva/core/network/api_constants.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 import 'package:maleva/core/utils/app_globals.dart';
 import 'package:maleva/core/network/OnlineApi.dart' as OnlineApi;
-import 'package:maleva/core/models/model.dart';
 import 'package:maleva/features/boarding/updateboardingdetails/bloc/updateboardingdetails_event.dart';
 import 'package:maleva/features/boarding/updateboardingdetails/bloc/updateboardingdetails_state.dart';
+import 'package:maleva/core/models/shared/response_view_model.dart';
 
 
 class BoardingStatusBloc
@@ -93,8 +95,8 @@ class BoardingStatusBloc
       final imageDir =
           '/Upload/${AppGlobals.Comid}/SalesOrder/$saleOrderId/Boarding/';
       final header = {'Content-Type': 'application/json; charset=UTF-8'};
-      final imgResult = await AppGlobals.apiAllinoneSelectArray(
-          '${AppGlobals.apiGetimage}$imageDir', null, header, null);
+      final imgResult = await ApiLegacyHelper.apiAllinoneSelectArray(
+          '${ApiConstants.apiGetImage}$imageDir', null, header, null);
 
       List<String> images = [];
       if (imgResult != '' && imgResult.length != 0) {
@@ -284,8 +286,8 @@ class BoardingStatusBloc
         'SubFolderName': 'Boarding',
       };
 
-      final result = await AppGlobals.apiAllinoneSelectArray(
-          AppGlobals.apiDeleteimage, null, header, null);
+      final result = await ApiLegacyHelper.apiAllinoneSelectArray(
+          ApiConstants.apiDeleteImage, null, header, null);
 
       if (result != '') {
         final value = ResponseViewModel.fromJson(result);
@@ -330,8 +332,8 @@ class BoardingStatusBloc
         };
         final header = {'Content-Type': 'application/json; charset=UTF-8'};
 
-        final result = await AppGlobals.apiAllinoneSelectArray(
-            AppGlobals.apiUpdateBoardingDetails, master, header, null);
+        final result = await ApiLegacyHelper.apiAllinoneSelectArray(
+            ApiConstants.apiUpdateBoardingDetails, master, header, null);
 
         if (result != '') {
           final value = ResponseViewModel.fromJson(result);
@@ -373,8 +375,8 @@ class BoardingStatusBloc
       'ImageURL':     imageUrls,
     };
     final header = {'Content-Type': 'application/json; charset=UTF-8'};
-    await AppGlobals.apiAllinoneSelectArray(
-        AppGlobals.apiBoardingMail, master, header, null);
+    await ApiLegacyHelper.apiAllinoneSelectArray(
+        ApiConstants.apiBoardingMail, master, header, null);
   }
 
   // ── Reset ─────────────────────────────────────────────────────────────────────

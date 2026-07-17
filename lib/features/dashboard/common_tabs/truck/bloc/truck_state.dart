@@ -1,3 +1,4 @@
+import 'package:maleva/core/models/shared/truck_details_model.dart';
 
 
   import '../../../../../core/models/model.dart';

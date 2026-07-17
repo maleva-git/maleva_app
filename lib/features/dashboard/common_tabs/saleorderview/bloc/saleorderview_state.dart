@@ -5,6 +5,7 @@ import 'package:flutter/Material.dart';
 import 'package:intl/intl.dart';
 
 import '../../../../../core/models/model.dart';
+import 'package:maleva/features/transaction/salesorder/models/sale_order_master_model.dart';
 
 enum SaleOrderStatus { initial, loading, success, failure, updating }
 

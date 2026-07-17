@@ -12,7 +12,6 @@ import 'package:maleva/core/widgets/maleva_inputs.dart';
 import 'package:intl/intl.dart';
 import 'package:maleva/core/utils/app_globals.dart';
 import 'package:maleva/core/network/OnlineApi.dart';
-import 'package:maleva/core/models/model.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:maleva/core/theme/tokens.dart';
 

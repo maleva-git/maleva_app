@@ -1,4 +1,5 @@
 import '../../../../../core/models/model.dart';
+import 'package:maleva/core/models/shared/employee_details_model.dart';
 
 abstract class EmployeeMasterEvent {
   const EmployeeMasterEvent();

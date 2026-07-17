@@ -1,8 +1,8 @@
+import 'package:maleva/core/network/api_constants.dart';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:maleva/core/models/model.dart';
 import 'package:maleva/core/utils/app_globals.dart';
 import 'package:maleva/core/colors/colors.dart' as colour;
 import '../../../../../core/di/injection.dart';
@@ -11,6 +11,8 @@ import '../bloc/pdo_bloc.dart';
 import '../bloc/pdo_event.dart';
 import '../bloc/pdo_state.dart';
 import '../data/pdo_repository.dart';
+import 'package:maleva/core/models/shared/r_t_i_master_view_model.dart';
+import 'package:maleva/core/models/shared/r_t_i_details_view_model.dart';
 
 // ── Entry Point ───────────────────────────────────────────────────────────────
 // ── Entry Point ───────────────────────────────────────────────────────────────
@@ -780,7 +782,7 @@ Widget _buildImageThumbnail(BuildContext context, String? path) {
         errorBuilder: (_, __, ___) =>
             Icon(Icons.broken_image_rounded, color: Colors.red.shade300));
   } else if (path.startsWith("/")) {
-    final url = AppGlobals.port + path;
+    final url = ApiConstants.port + path;
     imageWidget = Image.network(url,
         fit: BoxFit.cover,
         errorBuilder: (_, __, ___) =>

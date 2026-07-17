@@ -1,8 +1,9 @@
+import 'package:maleva/core/network/api_constants.dart';
 import 'package:flutter/foundation.dart';
-import 'package:maleva/core/models/model.dart';
 import 'package:maleva/core/network/api_client.dart';
 import 'package:maleva/core/utils/app_preferences.dart';
 import 'package:maleva/core/utils/app_globals.dart';
+import 'package:maleva/core/models/shared/truck_details_model.dart';
 
 class TruckMaintenanceRepository {
   Future<Map<String, dynamic>> fetchTruckData() async {
@@ -24,7 +25,7 @@ class TruckMaintenanceRepository {
       if (kDebugMode) debugPrint("➡️ Truck Payload: $master");
 
       final resultData = await ApiClient.postRequest(
-        AppGlobals.apiSelectTruckDetails,
+        ApiConstants.apiSelectTruckDetails,
         master,
       );
 

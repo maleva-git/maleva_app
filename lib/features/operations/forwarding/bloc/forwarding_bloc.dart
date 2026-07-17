@@ -1,3 +1,5 @@
+import 'package:maleva/core/network/api_legacy_helper.dart';
+import 'package:maleva/core/network/api_constants.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../core/network/OnlineApi.dart' as OnlineApi;
 import 'package:maleva/core/utils/app_globals.dart';
@@ -88,8 +90,8 @@ class FWUpdateBloc extends Bloc<FWUpdateEvent, FWUpdateState> {
       String imgDir = "/Upload/${AppGlobals.Comid}/SalesOrder/${event.saleOrderId}/${event.smkText}/";
       Map<String, String> header = {'Content-Type': 'application/json; charset=UTF-8'};
 
-      var resultData = await AppGlobals.apiAllinoneSelectArray(
-          "${AppGlobals.apiGetimage}$imgDir", null, header, event.context
+      var resultData = await ApiLegacyHelper.apiAllinoneSelectArray(
+          "${ApiConstants.apiGetImage}$imgDir", null, header, event.context
       );
 
       if (resultData != "" && resultData != null && resultData is List) {

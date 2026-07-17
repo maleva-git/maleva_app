@@ -8,9 +8,9 @@ import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import 'package:maleva/core/models/model.dart';
 import 'package:maleva/core/utils/app_globals.dart';
 import 'package:maleva/core/utils/printer_helper.dart';
+import 'package:maleva/core/models/shared/bluetooth_model.dart';
 part 'bluetooth_event.dart';
 part 'bluetooth_state.dart';
 

@@ -1,4 +1,4 @@
-import 'package:maleva/core/models/model.dart';
+import 'package:maleva/core/models/shared/bill_view_model.dart';
 
 abstract class BillOrderState {}
 

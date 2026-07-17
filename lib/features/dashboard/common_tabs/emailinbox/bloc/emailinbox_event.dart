@@ -1,4 +1,4 @@
-import 'package:maleva/core/models/model.dart';
+import 'package:maleva/core/models/shared/employee_model.dart';
 
 abstract class EmailEvent {
   const EmailEvent();

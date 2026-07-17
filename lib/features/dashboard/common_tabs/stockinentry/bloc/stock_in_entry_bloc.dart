@@ -1,11 +1,11 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:maleva/core/models/model.dart';
 import 'package:maleva/core/utils/app_preferences.dart';
 import 'package:maleva/core/utils/app_globals.dart';
 
 import '../data/stock_in_entry_repository.dart';
 import 'stock_in_entry_event.dart';
 import 'stock_in_entry_state.dart';
+import 'package:maleva/features/operations/models/job_all_status_model.dart';
 
 class StockInEntryBloc extends Bloc<StockInEntryEvent, StockInEntryState> {
   final StockInEntryRepository repository;

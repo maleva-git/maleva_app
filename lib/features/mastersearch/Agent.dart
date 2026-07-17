@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:maleva/core/models/model.dart';
 import 'package:maleva/core/utils/app_globals.dart';
 import 'package:maleva/core/network/OnlineApi.dart' as OnlineApi;
 import 'package:maleva/core/colors/colors.dart' as colour;
 import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
+import 'package:maleva/core/models/shared/agent_model.dart';
 
 class Agent extends StatefulWidget {
   final int Searchby;

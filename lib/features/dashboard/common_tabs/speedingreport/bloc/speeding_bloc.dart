@@ -6,6 +6,7 @@ import '../../../../../core/models/model.dart';
 import '../data/speeding_repository.dart';
 import 'speeding_event.dart';
 import 'speeding_state.dart';
+import 'package:maleva/core/models/shared/speeding_view.dart';
 
 class SpeedingBloc extends Bloc<SpeedingEvent, SpeedingState> {
   // ❌ REMOVED: final BuildContext context;

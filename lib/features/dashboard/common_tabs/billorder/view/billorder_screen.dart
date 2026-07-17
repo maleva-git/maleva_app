@@ -2,12 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
-import 'package:maleva/core/models/model.dart';
 import '../../../../../core/di/injection.dart';
 import '../../../../../core/theme/tokens.dart';
 import '../bloc/billorder_bloc.dart';
 import '../bloc/billorder_event.dart';
 import '../bloc/billorder_state.dart';
+import 'package:maleva/core/models/shared/bill_view_model.dart';
 
 // ── Entry Point ───────────────────────────────────────────────────────────────
 class BillOrderScreen extends StatelessWidget {

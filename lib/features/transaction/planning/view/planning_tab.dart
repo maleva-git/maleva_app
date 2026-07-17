@@ -6,7 +6,6 @@ import 'package:maleva/core/utils/app_globals.dart';
 import 'package:maleva/menu/menulist.dart';
 import 'package:maleva/core/di/injection.dart';
 import 'package:maleva/features/transaction/planning/data/planning_repository.dart';
-import 'package:maleva/core/models/model.dart';
 import '../../../../core/theme/tokens.dart';
 import '../../../dashboard/common_tabs/planningdetailsview/view/planningdetails_tab.dart';
 import '../../../mastersearch/Employee.dart';
@@ -14,6 +13,9 @@ import '../bloc/planning_bloc.dart';
 import '../bloc/planning_event.dart';
 import '../bloc/planning_state.dart';
 import 'package:maleva/core/colors/colors.dart' as colour;
+import 'package:maleva/core/models/shared/planning_detail_model.dart';
+import 'package:maleva/core/models/shared/employee_model.dart';
+import 'package:maleva/core/models/shared/planning_master_model.dart';
 TextStyle _body(double size, {Color color = colour.kText, FontWeight fw = FontWeight.normal}) =>
     GoogleFonts.dmSans(fontSize: size, color: color, fontWeight: fw);
 

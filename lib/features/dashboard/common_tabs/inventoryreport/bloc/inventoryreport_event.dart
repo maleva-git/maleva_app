@@ -1,4 +1,5 @@
 import '../../../../../core/models/model.dart';
+import 'package:maleva/core/models/shared/inventory_model.dart';
 
 abstract class InventoryEvent {
   const InventoryEvent();

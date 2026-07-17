@@ -3,7 +3,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
-import 'package:maleva/core/models/model.dart';
 import 'package:maleva/core/utils/app_globals.dart';
 import 'package:maleva/menu/menulist.dart';
 import '../../../../mastersearch/Customer.dart';
@@ -23,6 +22,11 @@ import '../bloc/enquirytrview_state.dart';
 import 'package:maleva/features/transaction/enquirytrmaster/data/enquiry_repository.dart';
 import '../../../../../core/di/injection.dart';
 import 'package:maleva/core/colors/colors.dart' as colour;
+import 'package:maleva/core/models/shared/customer_model.dart';
+import 'package:maleva/core/models/shared/employee_model.dart';
+import 'package:maleva/features/transaction/enquirytrmaster/models/enquiry_master_model.dart';
+import 'package:maleva/features/operations/models/job_all_status_model.dart';
+import 'package:maleva/features/operations/models/job_type_model.dart';
 
 
 const kGradient = LinearGradient(

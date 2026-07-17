@@ -1,9 +1,9 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:maleva/core/models/model.dart';
 
 import '../data/forwardingsalary_repository.dart';
 import 'forwardingsalary_event.dart';
 import 'forwardingsalary_state.dart';
+import 'package:maleva/core/models/shared/employee_model.dart';
 
 class ForwardingSalaryBloc extends Bloc<ForwardingSalaryEvent, ForwardingSalaryState> {
   final ForwardingSalaryRepository repository;

@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
-import 'package:maleva/core/models/model.dart';
 import 'package:maleva/core/utils/app_globals.dart';
 import '../../../../../core/colors/colors.dart';
 import '../../../../../core/di/injection.dart';
@@ -10,6 +9,8 @@ import '../../../../../core/theme/tokens.dart';
 import '../bloc/pettycash_bloc.dart';
 import '../bloc/pettycash_event.dart';
 import '../bloc/pettycash_state.dart';
+import 'package:maleva/core/models/shared/patty_cash_details_model.dart';
+import 'package:maleva/core/models/shared/pattycash_master_model.dart';
 
 // ── Entry Point ───────────────────────────────────────────────────────────────
 class PettyCashPage extends StatelessWidget {

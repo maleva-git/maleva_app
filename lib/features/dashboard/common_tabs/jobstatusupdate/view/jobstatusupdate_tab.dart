@@ -1,3 +1,5 @@
+import 'package:maleva/core/utils/system_helpers.dart';
+import 'package:maleva/core/network/api_constants.dart';
 import 'dart:io';
 
 import 'package:cached_network_image/cached_network_image.dart';
@@ -8,7 +10,6 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:maleva/core/colors/colors.dart' as colour;
-import 'package:maleva/core/models/model.dart';
 import 'package:maleva/core/network/OnlineApi.dart' as OnlineApi;
 import 'package:maleva/core/utils/app_globals.dart';
 import 'package:maleva/menu/menulist.dart';
@@ -19,6 +20,7 @@ import '../../saleorderdetails/view/saleorderdetails_tab.dart';
 import '../bloc/jobstatusupdate_bloc.dart';
 import '../bloc/jobstatusupdate_event.dart';
 import '../bloc/jobstatusupdate_state.dart';
+import 'package:maleva/features/operations/models/job_all_status_model.dart';
 
 
 // ─── Entry point ─────────────────────────────────────────────────────────────
@@ -136,9 +138,9 @@ class _JobStatusUpdateViewState extends State<_JobStatusUpdateView> {
     final XFile? pickedFile = await _picker.pickImage(source: source);
     if (pickedFile == null) return;
 
-    final imageName = await AppGlobals.upload(
+    final imageName = await SystemHelpers.upload(
       File(pickedFile.path),
-      AppGlobals.apiPostimage,
+      ApiConstants.apiPostImage,
       saleOrderId,
       'SalesOrder',
       'Boarding',

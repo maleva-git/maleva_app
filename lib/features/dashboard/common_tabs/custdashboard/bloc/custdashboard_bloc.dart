@@ -1,11 +1,14 @@
+import 'package:maleva/core/network/api_legacy_helper.dart';
+import 'package:maleva/core/network/api_constants.dart';
 import 'dart:async';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
-import 'package:maleva/core/models/model.dart';
 import 'package:maleva/core/utils/app_globals.dart';
 import 'package:maleva/core/network/OnlineApi.dart' as OnlineApi;
 import 'custdashboard_event.dart';
 import 'custdashboard_state.dart';
+import 'package:maleva/features/transport/models/fuelselect_model.dart';
+import 'package:maleva/core/models/shared/payment_pending_model.dart';
 
 
 class CustDashboardBloc
@@ -143,8 +146,8 @@ class CustDashboardBloc
     final toDate = _today;
 
     // ── Without invoice count (from 2024-10-01) ───────────────────────────
-    final withoutResult = await _safeApiCall(() => AppGlobals.apiAllinoneSelectArray(
-        AppGlobals.SaleInvoiceCountDB,
+    final withoutResult = await _safeApiCall(() => ApiLegacyHelper.apiAllinoneSelectArray(
+        ApiConstants.SaleInvoiceCountDB,
         {
           'Comid': comid,
           'Fromdate': '2024-10-01',
@@ -160,8 +163,8 @@ class CustDashboardBloc
         null));
 
     // ── Total count ────────────────────────────────────────────────────────
-    final totalResult = await _safeApiCall(() => AppGlobals.apiAllinoneSelectArray(
-        AppGlobals.SaleInvoiceCountDB,
+    final totalResult = await _safeApiCall(() => ApiLegacyHelper.apiAllinoneSelectArray(
+        ApiConstants.SaleInvoiceCountDB,
         {
           'Comid': comid,
           'Fromdate': fromDate,
@@ -177,8 +180,8 @@ class CustDashboardBloc
         null));
 
     // ── Billed count ───────────────────────────────────────────────────────
-    final billedResult = await _safeApiCall(() => AppGlobals.apiAllinoneSelectArray(
-        AppGlobals.SaleInvoiceCountDB,
+    final billedResult = await _safeApiCall(() => ApiLegacyHelper.apiAllinoneSelectArray(
+        ApiConstants.SaleInvoiceCountDB,
         {
           'Comid': comid,
           'Fromdate': fromDate,
@@ -195,8 +198,8 @@ class CustDashboardBloc
 
     // ── Unbilled count ─────────────────────────────────────────────────────
     final unbilledResult =
-    await _safeApiCall(() => AppGlobals.apiAllinoneSelectArray(
-        AppGlobals.SaleInvoiceCountDB,
+    await _safeApiCall(() => ApiLegacyHelper.apiAllinoneSelectArray(
+        ApiConstants.SaleInvoiceCountDB,
         {
           'Comid': comid,
           'Fromdate': fromDate,
@@ -213,8 +216,8 @@ class CustDashboardBloc
 
     // ── Sales order status ─────────────────────────────────────────────────
     final salesStatusResult =
-    await _safeApiCall(() => AppGlobals.apiAllinoneSelectArray(
-        AppGlobals.SelectSalesOrderStatus,
+    await _safeApiCall(() => ApiLegacyHelper.apiAllinoneSelectArray(
+        ApiConstants.SelectSalesOrderStatus,
         {'Comid': comid, 'Employeeid': empRefId},
         header,
         null));
@@ -234,8 +237,8 @@ class CustDashboardBloc
     final header = {'Content-Type': 'application/json; charset=UTF-8'};
     final comid = AppGlobals.storagenew.getInt('Comid') ?? 0;
 
-    final result = await _safeApiCall(() => AppGlobals.apiAllinoneSelectArray(
-        AppGlobals.LoadRulesType,
+    final result = await _safeApiCall(() => ApiLegacyHelper.apiAllinoneSelectArray(
+        ApiConstants.LoadRulesType,
         {'Comid': comid, 'Employeeid': AppGlobals.EmpRefId},
         header,
         null));
@@ -314,8 +317,8 @@ class CustDashboardBloc
       fromDate = '2024-10-01';
     }
 
-    final result = await _safeApiCall(() => AppGlobals.apiAllinoneSelectArray(
-        AppGlobals.VESSELPLANINGDB,
+    final result = await _safeApiCall(() => ApiLegacyHelper.apiAllinoneSelectArray(
+        ApiConstants.VESSELPLANINGDB,
         {
           'Comid': comid,
           'Fromdate': fromDate,
@@ -358,9 +361,9 @@ class CustDashboardBloc
     final comid = AppGlobals.storagenew.getInt('Comid') ?? 0;
 
     final dateStr = _offsetDate(dayOffset);
-    final url = dayOffset == 0 ? AppGlobals.PLANINGSearchDB : AppGlobals.PLANINGSearch;
+    final url = dayOffset == 0 ? ApiConstants.PLANINGSearchDB : ApiConstants.PLANINGSearch;
 
-    final result = await _safeApiCall(() => AppGlobals.apiAllinoneSelectArray(
+    final result = await _safeApiCall(() => ApiLegacyHelper.apiAllinoneSelectArray(
         url,
         {
           'Comid': comid,
@@ -394,8 +397,8 @@ class CustDashboardBloc
     final header = {'Content-Type': 'application/json; charset=UTF-8'};
     final comid = AppGlobals.storagenew.getInt('Comid') ?? 0;
 
-    await _safeApiCall(() => AppGlobals.apiAllinoneSelectArray(
-        '${AppGlobals.apiUpdateEnquiryMaster}${event.id}&Comid=$comid&StatusName=CANCEL',
+    await _safeApiCall(() => ApiLegacyHelper.apiAllinoneSelectArray(
+        '${ApiConstants.apiUpdateEnquiryMaster}${event.id}&Comid=$comid&StatusName=CANCEL',
         null,
         header,
         null));
@@ -408,8 +411,8 @@ class CustDashboardBloc
     final header = {'Content-Type': 'application/json; charset=UTF-8'};
     final comid = AppGlobals.storagenew.getInt('Comid') ?? 0;
 
-    final result = await _safeApiCall(() => AppGlobals.apiAllinoneSelectArray(
-        AppGlobals.apiSelectEnquiryMaster,
+    final result = await _safeApiCall(() => ApiLegacyHelper.apiAllinoneSelectArray(
+        ApiConstants.apiSelectEnquiryMaster,
         {
           'Comid': comid,
           'Fromdate': null,
@@ -476,8 +479,8 @@ class CustDashboardBloc
     final header = {'Content-Type': 'application/json; charset=UTF-8'};
     final comid = AppGlobals.storagenew.getInt('Comid') ?? 0;
 
-    final result = await _safeApiCall(() => AppGlobals.apiAllinoneSelectArray(
-        AppGlobals.apiSelectFuelEntry,
+    final result = await _safeApiCall(() => ApiLegacyHelper.apiAllinoneSelectArray(
+        ApiConstants.apiSelectFuelEntry,
         {
           'Comid': comid,
           'Fromdate': fromDate,
@@ -568,8 +571,8 @@ class CustDashboardBloc
       toDateStr = _offsetDate(6);
     }
 
-    final result = await _safeApiCall(() => AppGlobals.apiAllinoneSelectArray(
-        '${AppGlobals.apiSelectPaymentPending}?Startindex=0&PageCount=400',
+    final result = await _safeApiCall(() => ApiLegacyHelper.apiAllinoneSelectArray(
+        '${ApiConstants.apiSelectPaymentPending}?Startindex=0&PageCount=400',
         {
           'Comid': comid,
           'Fromdate': fromDateStr,

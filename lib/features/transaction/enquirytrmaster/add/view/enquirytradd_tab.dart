@@ -5,7 +5,6 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:maleva/core/utils/app_globals.dart';
 import 'package:get_it/get_it.dart';
-import 'package:maleva/core/models/model.dart';
 import 'package:maleva/menu/menulist.dart';
 import '../../../../../core/theme/tokens.dart';
 import '../../../../mastersearch/Customer.dart';
@@ -15,6 +14,10 @@ import '../bloc/enquirytradd_bloc.dart';
 import '../bloc/enquirytradd_event.dart';
 import '../bloc/enquirytradd_state.dart';
 import 'package:maleva/core/colors/colors.dart' as colour;
+import 'package:maleva/core/models/shared/location_model.dart';
+import 'package:maleva/features/transaction/enquirytrmaster/models/enquiry_master_model.dart';
+import 'package:maleva/core/models/shared/customer_model.dart';
+import 'package:maleva/features/operations/models/job_type_model.dart';
 
 const kGradient = LinearGradient(
   colors: [AppTokens.invoiceHeaderStart, colour.kHeaderGradEnd],

@@ -18,6 +18,7 @@ import '../../../../../core/models/model.dart';
 import '../../../../../core/network/OnlineApi.dart' as OnlineApi;
 import '../../../../mastersearch/Employee.dart';
 import '../bloc/vesselplanningweb_state.dart';
+import 'package:maleva/core/models/shared/employee_model.dart';
 
 class VesselPlanningSavedSheet extends StatefulWidget {
   const VesselPlanningSavedSheet({super.key});

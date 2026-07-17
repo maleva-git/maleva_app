@@ -1,10 +1,11 @@
+import 'package:maleva/core/network/api_legacy_helper.dart';
+import 'package:maleva/core/network/api_constants.dart';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
-import 'package:maleva/core/models/model.dart';
 import 'package:maleva/core/utils/app_globals.dart';
 import 'package:maleva/core/colors/colors.dart' as colour;
 import 'package:maleva/menu/menulist.dart';
@@ -16,6 +17,8 @@ import '../../spotsaleorder/view/spotsaleorder_view.dart';
 import '../bloc/transportdb_bloc.dart';
 import '../bloc/transportdb_event.dart';
 import '../bloc/transportdb_state.dart';
+import 'package:maleva/core/models/shared/review.dart';
+import 'package:maleva/core/models/shared/employee_model.dart';
 
 
 
@@ -173,7 +176,7 @@ class _TransportDashboardViewState extends State<_TransportDashboardView>
       actions: [
         IconButton(
           icon: const Icon(Icons.exit_to_app, size: 30, color: colour.topAppBarColor),
-          onPressed: () => AppGlobals.logout(context),
+          onPressed: () => ApiLegacyHelper.logout(context),
         ),
       ],
       bottom: TabBar(
@@ -1417,7 +1420,7 @@ class _PDOTab extends StatelessWidget {
           errorBuilder: (_, __, ___) =>
           const Icon(Icons.broken_image, color: Colors.red));
     } else if (path.startsWith('/')) {
-      final fullUrl = AppGlobals.port + path;
+      final fullUrl = ApiConstants.port + path;
       imageWidget = Image.network(fullUrl, fit: BoxFit.contain,
           errorBuilder: (_, __, ___) =>
           const Icon(Icons.broken_image, color: Colors.red));

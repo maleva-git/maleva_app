@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
-
 import '../../../../../../core/theme/palette.dart';
-
 import '../../../../../../core/di/injection.dart';
 import 'package:maleva/core/utils/app_globals.dart';
 import '../../../../../transaction/salesorder/add/view/salesorderadd_tab.dart';
@@ -22,7 +20,7 @@ class EnquiryScreen extends StatelessWidget {
     return BlocProvider(
       create: (_) => EnquiryBloc(
         repository: sl<EnquiryRepository>(),
-      )..add(LoadEnquiryEvent()), // Good practice to load on init
+      )..add(LoadEnquiryEvent()),
       child: const _EnquiryView(),
     );
   }

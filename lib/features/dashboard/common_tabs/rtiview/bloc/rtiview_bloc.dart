@@ -1,11 +1,12 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
-import 'package:maleva/core/models/model.dart';
 import 'package:maleva/core/utils/app_globals.dart';
 
 import '../data/rtiview_repository.dart';
 import 'rtiview_event.dart';
 import 'rtiview_state.dart';
+import 'package:maleva/core/models/shared/r_t_i_master_view_model.dart';
+import 'package:maleva/core/models/shared/r_t_i_details_view_model.dart';
 
 class RTIDetailsBloc extends Bloc<RTIDetailsEvent, RTIDetailsState> {
   final RTIViewRepository repository;

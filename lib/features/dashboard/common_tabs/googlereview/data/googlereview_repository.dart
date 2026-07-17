@@ -1,11 +1,13 @@
+import 'package:maleva/core/network/api_constants.dart';
 import 'package:maleva/core/network/api_client.dart';
 import 'package:maleva/core/utils/app_globals.dart';
+import 'package:maleva/core/models/shared/review.dart';
 
 class GoogleReviewRepository {
   /// Fetches the list of employees
   Future<dynamic> fetchEmployees({required int comId}) async {
     return await ApiClient.postRequest(
-      "${AppGlobals.apiSelectEmployee}$comId&type=&type1=",
+      "${ApiConstants.apiSelectEmployee}$comId&type=&type1=",
       null,
     );
   }
@@ -13,7 +15,7 @@ class GoogleReviewRepository {
   /// Inserts or updates a Google Review entry
   Future<dynamic> saveReview({required List<Map<String, dynamic>> body}) async {
     return await ApiClient.postRequest(
-      AppGlobals.apiGoogleReviewInsert,
+      ApiConstants.apiGoogleReviewInsert,
       body,
     );
   }
@@ -25,7 +27,7 @@ class GoogleReviewRepository {
     required String toDate,
     required int empId,
   }) async {
-    final url = Uri.parse(AppGlobals.apiSelectGoogleReview).replace(
+    final url = Uri.parse(ApiConstants.apiSelectGoogleReview).replace(
       queryParameters: {
         'Comid': comId.toString(),
         'fromdate': fromDate,
@@ -39,7 +41,7 @@ class GoogleReviewRepository {
 
   /// Deletes a specific Google Review by ID
   Future<dynamic> deleteReview({required int id}) async {
-    final url = Uri.parse(AppGlobals.apiDeleteGoogleReview).replace(
+    final url = Uri.parse(ApiConstants.apiDeleteGoogleReview).replace(
       queryParameters: {'Id': id.toString()},
     ).toString();
 

@@ -4,7 +4,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
-import 'package:maleva/core/models/model.dart';
 import 'package:maleva/core/colors/colors.dart' as colour;
 import 'package:open_file/open_file.dart';
 import 'package:path_provider/path_provider.dart';
@@ -13,6 +12,8 @@ import '../../../../../core/theme/tokens.dart';
 import '../bloc/rtiview_bloc.dart';
 import '../bloc/rtiview_event.dart';
 import '../bloc/rtiview_state.dart';
+import 'package:maleva/core/models/shared/r_t_i_master_view_model.dart';
+import 'package:maleva/core/models/shared/r_t_i_details_view_model.dart';
 
 // ── Entry Point ───────────────────────────────────────────────────────────────
 class RTIDetailsPage extends StatelessWidget {

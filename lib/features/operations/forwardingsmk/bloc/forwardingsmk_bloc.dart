@@ -1,11 +1,13 @@
+import 'package:maleva/core/network/api_legacy_helper.dart';
+import 'package:maleva/core/network/api_constants.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 import 'package:maleva/core/utils/app_globals.dart';
 import 'package:maleva/core/network/OnlineApi.dart' as OnlineApi;
-import 'package:maleva/core/models/model.dart';
 
 import 'forwardingsmk_event.dart';
 import 'forwardingsmk_state.dart';
+import 'package:maleva/core/models/shared/response_view_model.dart';
 
 
 class FWSmkBloc extends Bloc<FWSmkEvent, FWSmkState> {
@@ -275,8 +277,8 @@ class FWSmkBloc extends Bloc<FWSmkEvent, FWSmkState> {
       };
 
       final header = {'Content-Type': 'application/json; charset=UTF-8'};
-      final result = await AppGlobals.apiAllinoneSelectArray(
-          AppGlobals.apiUpdateForwarding, master, header, null);
+      final result = await ApiLegacyHelper.apiAllinoneSelectArray(
+          ApiConstants.apiUpdateForwarding, master, header, null);
 
       if (result != '') {
         final value = ResponseViewModel.fromJson(result);

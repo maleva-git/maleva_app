@@ -1,4 +1,4 @@
-import 'package:maleva/core/models/model.dart';
+import 'package:maleva/core/models/shared/engine_hoursdata.dart';
 
 abstract class EngineHoursState {
   const EngineHoursState();
