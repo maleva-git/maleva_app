@@ -1,5 +1,6 @@
 import 'package:maleva/core/network/api_legacy_helper.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -178,230 +179,54 @@ class _SplashScreenState extends State<SplashScreen>
 
         if(AppGlobals.DriverLogin == 1)
         {
-          // Navigator.push(context, MaterialPageRoute(builder: (context) => const DriverDashboard()));
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(
-              builder: (_) => BlocProvider(
-                create: (_) => DriverDashboardBloc(),
-                child: const DriverDashboard(),
-              ),
-            ),
-          );
-
-        }
-        else if (AppPreferences.getRoleId() == 600 || AppPreferences.getRoleId() == 500)
-        {
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(
-              builder: (_) => BlocProvider(
-                create: (_) => BoardingTabBloc(),
-                child: const BoardingDashboard(),
-              ),
-            ),
-          );
-        }
-        else if(AppGlobals.storagenew.getString('RulesType') == "ADMIN")
-        {
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(
-              builder: (_) => BlocProvider(
-                create: (_) => AdminTabBloc(),
-                child: const NewAdminDashboard(),
-              ),
-            ),
-          );
-        }
-        else if(AppGlobals.storagenew.getString('RulesType') == "ADMIN2")
-        {
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(
-              builder: (_) => BlocProvider(
-                create: (_) => SubAdminTabBloc(),
-                child: const SubAdminDashboard(),
-              ),
-            ),
-          );
-        }
-        else if(AppGlobals.storagenew.getString('RulesType') == "SALES")
-        {
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(
-              builder: (_) => BlocProvider(
-                create: (_) => SalesDashboardBloc(),
-                child: const SalesDashboard(),
-              ),
-            ),
-          );
-        }
-        // else if(AppGlobals.storagenew.getString('RulesType') == "TRANSPORTATION")
-        // {
-        //   Navigator.push(context, MaterialPageRoute(builder: (context) => const OldTransportDashboard()));
-        // }
-        else if(AppGlobals.storagenew.getString('RulesType') == "OPERATIONADMIN")
-        {
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(
-              builder: (_) => BlocProvider(
-                create: (_) => OperationAdminTabBloc(),
-                child: const OperationAdminDashboard(),
-              ),
-            ),
-          );
-        }
-        else if(AppGlobals.storagenew.getString('RulesType') == "ACCOUNTS")
-        {
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(
-              builder: (_) => BlocProvider(
-                create: (_) => PayableTabBloc(),
-                child: const PayableDashboard(),
-              ),
-            ),
-          );
-        }
-
-
-        else if(AppGlobals.storagenew.getString('RulesType') == "TRANSPORTATION")
-        {
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(
-              builder: (_) => BlocProvider(
-                create: (_) => TransportTabBloc(),
-                child: const TransportDashboard(),
-              ),
-            ),
-          );
-        }
-
-        else if(AppGlobals.storagenew.getString('RulesType') == "WAREHOUSE")
-        {
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(
-              builder: (_) => BlocProvider(
-                create: (_) => WareHouseTabBloc(),
-                child: const WareHouseDashboard(),
-              ),
-            ),
-          );
-        }
-
-
-        else if(AppGlobals.storagenew.getString('RulesType') == "RECEIVABLE")
-        {
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(
-              builder: (_) => BlocProvider(
-                create: (_) => ReceivableTabBloc(),
-                child: const ReceivableDashboard(),
-              ),
-            ),
-          );
-
-        }
-
-
-        else if(AppGlobals.storagenew.getString('RulesType') == "HR" || AppGlobals.storagenew.getString('RulesType') == "MAINTENANCE")
-        {
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(
-              builder: (_) => BlocProvider(
-                create: (_) => MaintenanceTabBloc(),
-                child: const MaintenanceDashboard(),
-              ),
-            ),
-          );
-
-        }
-
-
-        else if(AppGlobals.storagenew.getString('RulesType') == "OPERATION")
-        {
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(
-              builder: (_) => BlocProvider(
-                create: (_) => OperationTabBloc(),
-                child: const OperationDashboard(),
-              ),
-            ),
-          );
-
-        }
-
-    // case "HRADMIN":
-    // Navigator.pushReplacement(
-    // context,
-    // MaterialPageRoute(
-    // builder: (_) => BlocProvider(
-    // create: (_) => HrAdminTabBloc(),
-    // child: const HrAdminDashboard(),
-    // ),
-    // ),
-    // );
-    // break;
-        else if(AppGlobals.storagenew.getString('RulesType') == "HRADMIN")
-        {
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(
-              builder: (_) => BlocProvider(
-                create: (_) => HrAdminTabBloc(),
-                child: const HrAdminDashboard(),
-              ),
-            ),
-          );
-
-        }
-        else if(AppGlobals.storagenew.getString('RulesType') == "AIR FRIEGHT")
-        {
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(
-              builder: (_) => BlocProvider(
-                create: (_) => AirfreightTabBloc(),
-                child: const AirfreightDashboard(),
-              ),
-            ),
-          );
-
-        }
-        else if(AppGlobals.storagenew.getString('RulesType') == "FORWARDING")
-        {
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(
-              builder: (_) => BlocProvider(
-                create: (_) => ForwardingTabBloc(),
-                child: const ForwardingDashboard(),
-              ),
-            ),
-          );
-
-        }
-        else {
-          // ④ Unknown RulesType — no matching dashboard found
-          final rulesType = AppGlobals.storagenew.getString('RulesType') ?? 'Unknown';
-          debugPrint('⚠️ Unknown RulesType: "$rulesType" — showing error');
-          if (mounted) {
-            _showErrorPopup(
-              'Access Error',
-              'Your account role "$rulesType" is not recognized by this version of the app.\n\n'
-              'Please contact your administrator or update the app to the latest version.',
-            );
-          }
+          context.go('/driver_dashboard');
           return;
         }
+
+        int roleId = AppPreferences.getRoleId();
+
+    switch (roleId) {
+      case 100: // ADMIN
+        context.go('/dashboard/admin');
+        break;
+      case 200: // ADMIN2
+        context.go('/dashboard/admin');
+        break;
+      case 300: // SALES
+        context.go('/dashboard/sales');
+        break;
+      case 400: // OPERATIONADMIN
+        context.go('/dashboard/admin');
+        break;
+      case 500: // BOARDING
+      case 600: // BOARDINGOFFICERADMIN
+        context.go('/dashboard/boarding');
+        break;
+      case 800: // HRADMIN
+        context.go('/dashboard/admin');
+        break;
+      case 900: // ACCOUNTS
+        context.go('/dashboard/payable');
+        break;
+      case 1000: // TRANSPORTATION
+        context.go('/dashboard/transport');
+        break;
+      case 1200: // RECEIVABLE
+        context.go('/dashboard/receivable');
+        break;
+      case 1300: // MAINTENANCE
+        context.go('/dashboard/maintenance');
+        break;
+      case 1400: // FORWARDING
+        context.go('/dashboard/forwarding');
+        break;
+      case 1500: // AIR FREIGHT
+        context.go('/dashboard/air_freight');
+        break;
+      default:
+        context.go('/dashboard/admin');
+        break;
+    }
       }
       else {
         _navigateToLogin();

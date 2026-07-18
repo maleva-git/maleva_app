@@ -7,6 +7,7 @@ import 'package:flutter/services.dart';
 import 'package:maleva/core/theme/my_behaviour.dart';
 import 'package:maleva/core/firebase/local_notification_service.dart';
 import 'package:maleva/core/utils/app_globals.dart';
+import 'package:maleva/core/router/app_router.dart';
 import 'package:maleva/core/firebase/firebase_options.dart';
 import 'package:maleva/splash/splashscreen.dart';
 import 'package:path_provider/path_provider.dart';
@@ -140,12 +141,9 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     final MaterialColor blue900Swatch =
         MaterialColor(_yellow700Map[400]!.value, _yellow700Map);
-    return MaterialApp(
+    return MaterialApp.router(
       title: 'MALEVA',
-      navigatorKey: AppGlobals.navigatorKey,
-      navigatorObservers: [
-        AppNavigatorObserver(),
-      ],
+      routerConfig: appRouter,
       builder: (context, child) {
         return ScrollConfiguration(
           behavior: MyBehavior(), //Design class page
@@ -158,7 +156,6 @@ class MyApp extends StatelessWidget {
         primaryColor: blue900Swatch,
         primaryColorLight: blue900Swatch,
       ),
-      home: const MyHomePage(),
       debugShowCheckedModeBanner: false,
     );
   }

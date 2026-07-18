@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../dashboard/admin_dashboard/bloc/admin_tab_bloc.dart';
 import '../../../dashboard/admin_dashboard/view/admin_dashboard.dart';
@@ -63,211 +64,58 @@ class Appuserloginmobile extends StatelessWidget {
   }
 
 
+  
   void _navigateBasedOnRole(
       BuildContext context, LoginState state) {
 
     if (state.driverLogin) {
-
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(
-          builder: (_) => BlocProvider(
-            create: (_) => DriverDashboardBloc(),
-            child: const DriverDashboard(),
-          ),
-        ),
-      );
+      context.go('/driver_dashboard');
       return;
     }
 
-    if (AppPreferences.getRoleId() == 600 || AppPreferences.getRoleId() == 500) {
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(
-          builder: (_) => BlocProvider(
-            create: (_) => BoardingTabBloc(),
-            child: const BoardingDashboard(),
-          ),
-        ),
-      );
-      return;
-    }
+    int roleId = AppPreferences.getRoleId();
 
-    switch (state.role) {
-      case "ADMIN":
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(
-            builder: (_) => BlocProvider(
-              create: (_) => AdminTabBloc(),
-              child: const NewAdminDashboard(),
-            ),
-          ),
-        );
-
+    switch (roleId) {
+      case 100: // ADMIN
+        context.go('/dashboard/admin');
         break;
-      case "SALES":
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(
-            builder: (_) => BlocProvider(
-              create: (_) => SalesDashboardBloc(),
-              child: const SalesDashboard(),
-            ),
-          ),
-        );
-
+      case 200: // ADMIN2
+        context.go('/dashboard/admin');
         break;
-
-      case
-
-
-      "ACCOUNTS":
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(
-            builder: (_) => BlocProvider(
-              create: (_) => PayableTabBloc(),
-              child: const PayableDashboard(),
-            ),
-          ),
-        );
+      case 300: // SALES
+        context.go('/dashboard/sales');
         break;
-
-      case "ADMIN2":
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(
-            builder: (_) => BlocProvider(
-              create: (_) => SubAdminTabBloc(),
-              child: const SubAdminDashboard(),
-            ),
-          ),
-        );
+      case 400: // OPERATIONADMIN
+        context.go('/dashboard/admin');
         break;
-      case "TRANSPORTATION":
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(
-            builder: (_) => BlocProvider(
-              create: (_) => TransportTabBloc(),
-              child: const TransportDashboard(),
-            ),
-          ),
-        );
+      case 500: // BOARDING
+      case 600: // BOARDINGOFFICERADMIN
+        context.go('/dashboard/boarding');
         break;
-      case "HRADMIN":
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(
-            builder: (_) => BlocProvider(
-              create: (_) => HrAdminTabBloc(),
-              child: const HrAdminDashboard(),
-            ),
-          ),
-        );
+      case 800: // HRADMIN
+        context.go('/dashboard/admin');
         break;
-      case "HR":
-      case "MAINTENANCE":
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(
-            builder: (_) => BlocProvider(
-              create: (_) => MaintenanceTabBloc(),
-              child: const MaintenanceDashboard(),
-            ),
-          ),
-        );
+      case 900: // ACCOUNTS
+        context.go('/dashboard/payable');
         break;
-      case "OPERATION":
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(
-            builder: (_) => BlocProvider(
-              create: (_) => OperationTabBloc(),
-              child: const OperationDashboard(),
-            ),
-          ),
-        );
+      case 1000: // TRANSPORTATION
+        context.go('/dashboard/transport');
         break;
-      case "AIR FRIEGHT":
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(
-            builder: (_) => BlocProvider(
-              create: (_) => AirfreightTabBloc(),
-              child: const AirfreightDashboard(),
-            ),
-          ),
-        );
+      case 1200: // RECEIVABLE
+        context.go('/dashboard/receivable');
         break;
-
-      case "FORWARDING":
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(
-            builder: (_) => BlocProvider(
-              create: (_) => ForwardingTabBloc(),
-              child: const ForwardingDashboard(),
-            ),
-          ),
-        );
+      case 1300: // MAINTENANCE
+        context.go('/dashboard/maintenance');
         break;
-
-      case "OPERATIONADMIN":
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(
-            builder: (_) => BlocProvider(
-              create: (_) => OperationAdminTabBloc(),
-              child: const OperationAdminDashboard(),
-            ),
-          ),
-        );
+      case 1400: // FORWARDING
+        context.go('/dashboard/forwarding');
         break;
-
-      case "WAREHOUSE":
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(
-            builder: (_) => BlocProvider(
-              create: (_) => WareHouseTabBloc(),
-              child: const WareHouseDashboard(),
-            ),
-          ),
-        );
+      case 1500: // AIR FREIGHT
+        context.go('/dashboard/air_freight');
         break;
-
-      case "RECEIVABLE":
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(
-            builder: (_) => BlocProvider(
-              create: (_) => ReceivableTabBloc(),
-              child: const ReceivableDashboard(),
-            ),
-          ),
-        );
-        break;
-
-
-
       default:
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(
-            builder: (_) => BlocProvider(
-              create: (_) => SubAdminTabBloc(),
-              child: const SubAdminDashboard(),
-            ),
-          ),
-        );
-        // Navigator.pushReplacement(
-        //   context,
-        //   MaterialPageRoute(
-        //       builder: (_) => const Homemobile()),
-        // );
+        context.go('/dashboard/admin');
+        break;
     }
   }
 }
-
