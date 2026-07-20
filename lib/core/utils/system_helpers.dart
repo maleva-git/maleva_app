@@ -7,7 +7,6 @@ import 'package:app_version_update/app_version_update.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'dart:io';
 import 'package:flutter/material.dart';
-import 'package:maleva/core/utils/dialog_helper.dart';
 import 'package:maleva/core/utils/app_globals.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:package_info_plus/package_info_plus.dart';
@@ -16,6 +15,7 @@ import 'package:http/http.dart' as http;
 import 'package:flutter_barcode_scanner_plus/flutter_barcode_scanner_plus.dart';
 
 class SystemHelpers {
+
   static Future barcodeScanning() async {
     try {
       AppGlobals.barcodestring = "";
@@ -191,7 +191,7 @@ class SystemHelpers {
           AppGlobals.progress = 0;
           await file.writeAsBytes(bytes);
           // Share.shareFiles(file.path);
-          Share.shareXFiles([XFile(file.path)], text: 'BillMaster_Invoice.jpg');
+          Share.shareXFiles([XFile(file.path)], text: 'Maleva_Invoice.jpg');
           // final result = await  OpenFile.open(file.path);
           // print("type=${result.type}  message=${result.message}");
         },
