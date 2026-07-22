@@ -80,6 +80,7 @@ class _FWSmkPageState extends State<_FWSmkPage>
           await ConfirmationOK('Updated Successfully', context);
         }
         if (state is FWSmkError) {
+          if (!context.mounted) return;
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text(state.message,
@@ -168,7 +169,7 @@ class _FWSmkPageState extends State<_FWSmkPage>
           const SizedBox(height: 2),
           Text(userName,
               style: GoogleFonts.lato(
-                  color: Colors.white.withOpacity(0.65),
+                  color: Colors.white.withValues(alpha: 0.65),
                   fontWeight: FontWeight.w500,
                   fontSize: 12)),
 
@@ -197,6 +198,7 @@ class _FWSmkPageState extends State<_FWSmkPage>
                   context, 'Are you sure to Update ?')
                   .then((ok) {
                 if (ok == true) {
+                  if (!context.mounted) return;
                   context.read<FWSmkBloc>().add(FWSmkSaveRequested());
                 }
               });
@@ -356,7 +358,7 @@ class _JobNoSectionState extends State<_JobNoSection> {
                 border: Border.all(color: Palette.cardBorder, width: 0.5),
                 boxShadow: [
                   BoxShadow(
-                    color: Palette.blue700.withOpacity(0.10),
+                    color: Palette.blue700.withValues(alpha: 0.10),
                     blurRadius: 10,
                     offset: const Offset(0, 4),
                   ),
@@ -943,10 +945,10 @@ class _AppBarButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.15),
+        color: Colors.white.withValues(alpha: 0.15),
         borderRadius: BorderRadius.circular(8),
         border:
-        Border.all(color: Colors.white.withOpacity(0.4), width: 0.5),
+        Border.all(color: Colors.white.withValues(alpha: 0.4), width: 0.5),
       ),
       child: Material(
         color: Colors.transparent,

@@ -52,13 +52,13 @@ class AirfreightMobileDashboard extends StatelessWidget {
           icon: Icon(Icons.directions_boat_filled,
               size: isTablet ? 28 : 25, ),
           onPressed: () => Navigator.push(context,
-              MaterialPageRoute(builder: (_) => Saleorderview())),
+              MaterialPageRoute(builder: (_) => const Saleorderview())),
         ),
         IconButton(
           icon: Icon(Icons.bluetooth_audio,
               size: isTablet ? 28 : 25, ),
           onPressed: () => Navigator.push(context,
-              MaterialPageRoute(builder: (_) => BluetoothPage())),
+              MaterialPageRoute(builder: (_) => const BluetoothPage())),
         ),
         IconButton(
           icon: Icon(Icons.print,
@@ -93,7 +93,7 @@ class AirfreightMobileDashboard extends StatelessWidget {
         borderRadius: BorderRadius.circular(isTablet ? 36 : 30),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.06),
+            color: Colors.black.withValues(alpha: 0.06),
             blurRadius: isTablet ? 12 : 8,
             offset: const Offset(0, 4),
           ),
@@ -160,15 +160,15 @@ class AirfreightMobileDashboard extends StatelessWidget {
       },
       child: TabBarView(
         controller: tabController,
-        children: [
+        children: const [
 
 
-          const VesselDashboard(),  //1
-          const SpotSaleEntryPage(),  //2
-          const InventoryPage(),   //3
+          VesselDashboard(),  //1
+          SpotSaleEntryPage(),  //2
+          InventoryPage(),   //3
 
-          const AdminLeaveApprovalTab(),
-          const EmployeeLeaveRequestTab(),
+          AdminLeaveApprovalTab(),
+          EmployeeLeaveRequestTab(),
         ],
       ),
     );

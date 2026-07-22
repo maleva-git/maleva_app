@@ -287,10 +287,12 @@ class _DateFilterRow extends StatelessWidget {
     if (picked == null) return;
     final f = DateFormat('yyyy-MM-dd').format(picked);
     if (isFrom) {
+      if (!context.mounted) return;
       context
           .read<DriverSalaryBloc>()
           .add(DriverSalaryFromDateChanged(f));
     } else {
+      if (!context.mounted) return;
       context
           .read<DriverSalaryBloc>()
           .add(DriverSalaryToDateChanged(f));
@@ -299,7 +301,7 @@ class _DateFilterRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    String _fmt(String d) {
+    String fmt(String d) {
       try {
         return DateFormat('dd-MM-yy')
             .format(DateTime.parse(d));
@@ -313,7 +315,7 @@ class _DateFilterRow extends StatelessWidget {
         Expanded(
           child: _DateTile(
             label:   'From',
-            display: _fmt(state.fromDate),
+            display: fmt(state.fromDate),
             onTap:   () => _pick(context, true),
             isTablet: isTablet,
           ),
@@ -322,7 +324,7 @@ class _DateFilterRow extends StatelessWidget {
         Expanded(
           child: _DateTile(
             label:   'To',
-            display: _fmt(state.toDate),
+            display: fmt(state.toDate),
             onTap:   () => _pick(context, false),
             isTablet: isTablet,
           ),
@@ -399,7 +401,7 @@ class _GridHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final style = GoogleFonts.lato(
-      color: Colors.white.withOpacity(0.85),
+      color: Colors.white.withValues(alpha: 0.85),
       fontWeight: FontWeight.w600,
       fontSize: isTablet ? 11 : 10,
       letterSpacing: 0.5,
@@ -520,7 +522,7 @@ class _SalaryCard extends StatelessWidget {
           border: Border.all(color: Palette.cardBorder, width: 0.5),
           boxShadow: [
             BoxShadow(
-              color: Palette.blue700.withOpacity(0.06),
+              color: Palette.blue700.withValues(alpha: 0.06),
               blurRadius: 8,
               offset: const Offset(0, 2),
             ),

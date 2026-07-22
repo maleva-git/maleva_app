@@ -118,7 +118,7 @@ class _PreAlertPage extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text('Pre Alert Report', style: GoogleFonts.lato(color: Colors.white, fontWeight: FontWeight.w700, fontSize: isTablet ? AppGlobals.FontMedium + 2 : AppGlobals.FontMedium)),
-              Text(userName, style: GoogleFonts.lato(color: Colors.white.withOpacity(0.65), fontWeight: FontWeight.w500, fontSize: isTablet ? AppGlobals.FontLow : AppGlobals.FontLow - 1)),
+              Text(userName, style: GoogleFonts.lato(color: Colors.white.withValues(alpha: 0.65), fontWeight: FontWeight.w500, fontSize: isTablet ? AppGlobals.FontLow : AppGlobals.FontLow - 1)),
             ],
           ),
         ),
@@ -169,7 +169,7 @@ class _PreAlertPage extends StatelessWidget {
           const SizedBox(height: 12),
           _PASearchField(
             hint: 'Customer Name', value: local.custName,
-            onSearch: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const Customer(Searchby: 1, SearchId: 0))).then((_navRes) { if (_navRes != null) { AppGlobals.SelectCustomerList = _navRes; }
+            onSearch: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const Customer(Searchby: 1, SearchId: 0))).then((navRes) { if (navRes != null) { AppGlobals.SelectCustomerList = navRes; }
               if (AppGlobals.SelectCustomerList.Id != 0) {
                 emit(PreAlertCustomerChanged(custId: AppGlobals.SelectCustomerList.Id, custName: AppGlobals.SelectCustomerList.AccountName));
                 AppGlobals.SelectCustomerList = CustomerModel.Empty();
@@ -181,7 +181,7 @@ class _PreAlertPage extends StatelessWidget {
           _PASearchField(
             hint: 'Select Job Type', value: local.jobName, disabled: local.checkLEmp,
             onSearch: () async {
-              await OnlineApi.SelectJobType(context); if (!context.mounted) return;Navigator.push(context, MaterialPageRoute(builder: (_) => const JobType(Searchby: 1, SearchId: 0))).then((_navRes) { if (_navRes != null) { AppGlobals.SelectJobTypeList = _navRes; }
+              await OnlineApi.SelectJobType(context); if (!context.mounted) return;Navigator.push(context, MaterialPageRoute(builder: (_) => const JobType(Searchby: 1, SearchId: 0))).then((navRes) { if (navRes != null) { AppGlobals.SelectJobTypeList = navRes; }
                 if (AppGlobals.SelectJobTypeList.Id != 0) {
                   emit(PreAlertJobTypeChanged(jobId: AppGlobals.SelectJobTypeList.Id, jobName: AppGlobals.SelectJobTypeList.Name));
                   AppGlobals.SelectJobTypeList = JobTypeModel.Empty();
@@ -193,7 +193,7 @@ class _PreAlertPage extends StatelessWidget {
           const SizedBox(height: 10),
           _PASearchField(
             hint: 'Select Port', value: local.portName,
-            onSearch: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const Port(Searchby: 1, SearchId: 0))).then((_navRes) {
+            onSearch: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const Port(Searchby: 1, SearchId: 0))).then((navRes) {
               if (AppGlobals.SelectedPortName.isNotEmpty) {
                 emit(PreAlertPortChanged(portId: 0, portName: AppGlobals.SelectedPortName));
                 AppGlobals.SelectJobStatusList = JobStatusModel.Empty();
@@ -383,7 +383,7 @@ class _GradientButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      decoration: BoxDecoration(gradient: colour.kGradient, borderRadius: BorderRadius.circular(12), boxShadow: [BoxShadow(color: AppTokens.invoiceHeaderStart.withOpacity(0.35), blurRadius: 10, offset: const Offset(0, 4))]),
+      decoration: BoxDecoration(gradient: colour.kGradient, borderRadius: BorderRadius.circular(12), boxShadow: [BoxShadow(color: AppTokens.invoiceHeaderStart.withValues(alpha: 0.35), blurRadius: 10, offset: const Offset(0, 4))]),
       child: Material(
         color: Colors.transparent,
         child: InkWell(

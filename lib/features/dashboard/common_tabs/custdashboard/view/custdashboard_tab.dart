@@ -125,9 +125,9 @@ class _CustDashboardViewState extends State<_CustDashboardView>
     final tomorrow = DateFormat('yyyy-MM-dd').format(now.add(const Duration(days: 1)));
     if (notifyDate == today ||
         DateTime.parse(enq['ForwardingDate']).isBefore(now)) {
-      return Colors.redAccent.withOpacity(0.3);
+      return Colors.redAccent.withValues(alpha: 0.3);
     } else if (notifyDate == tomorrow) {
-      return Colors.yellowAccent.withOpacity(0.3);
+      return Colors.yellowAccent.withValues(alpha: 0.3);
     }
     return null;
   }
@@ -136,8 +136,8 @@ class _CustDashboardViewState extends State<_CustDashboardView>
     final etb = row['SETB'] == '' ? null : DateTime.tryParse(row['SETB'] ?? '');
     final oetb = row['SOETB'] == '' ? null : DateTime.tryParse(row['SOETB'] ?? '');
     final yesterday = DateTime.now().subtract(const Duration(days: 1));
-    if (etb != null && yesterday.isAfter(etb)) return Colors.redAccent.withOpacity(0.3);
-    if (oetb != null && yesterday.isAfter(oetb)) return Colors.redAccent.withOpacity(0.3);
+    if (etb != null && yesterday.isAfter(etb)) return Colors.redAccent.withValues(alpha: 0.3);
+    if (oetb != null && yesterday.isAfter(oetb)) return Colors.redAccent.withValues(alpha: 0.3);
     return null;
   }
 
@@ -735,7 +735,7 @@ class _VesselTab extends StatelessWidget {
                               MaterialPageRoute(
                                   builder: (_) =>
                                   const Port(Searchby: 1, SearchId: 0)),
-                            ).then((_navRes) {
+                            ).then((navRes) {
                               portCtrl.text = AppGlobals.SelectedPortName;
                               AppGlobals.SelectedPortName = '';
                             });
@@ -1292,7 +1292,7 @@ class _FuelTab extends StatelessWidget {
                     borderRadius: BorderRadius.circular(16),
                     boxShadow: [
                       BoxShadow(
-                          color: Colors.orange.shade100.withOpacity(0.6),
+                          color: Colors.orange.shade100.withValues(alpha: 0.6),
                           blurRadius: 10,
                           offset: const Offset(0, 4))
                     ],
@@ -1358,7 +1358,7 @@ class _FuelTab extends StatelessWidget {
                           padding: const EdgeInsets.symmetric(
                               horizontal: 10, vertical: 8),
                           decoration: BoxDecoration(
-                              color: diffColor.withOpacity(0.1),
+                              color: diffColor.withValues(alpha: 0.1),
                               borderRadius: BorderRadius.circular(10)),
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.center,
@@ -1607,7 +1607,7 @@ class _PaymentTab extends StatelessWidget {
                       borderRadius: BorderRadius.circular(18),
                       boxShadow: [
                         BoxShadow(
-                            color: Colors.black.withOpacity(0.08),
+                            color: Colors.black.withValues(alpha: 0.08),
                             blurRadius: 8,
                             offset: const Offset(0, 3))
                       ],

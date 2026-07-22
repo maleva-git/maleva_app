@@ -178,7 +178,7 @@ class _VesselPlanningDetailsView extends StatelessWidget {
           child: SingleChildScrollView(
             scrollDirection: Axis.horizontal,
             child: DataTable(
-              headingRowColor: MaterialStateProperty.all(colour.kHeaderGradEnd),
+              headingRowColor: WidgetStateProperty.all(colour.kHeaderGradEnd),
               dataRowMinHeight: 40,
               dataRowMaxHeight: 40,
               columnSpacing: 20,
@@ -255,7 +255,7 @@ class _SummaryPill extends StatelessWidget {
         decoration: BoxDecoration(
           gradient: AppTokens.headerGradient,
           borderRadius: BorderRadius.circular(20),
-          boxShadow: [
+          boxShadow: const [
             BoxShadow(color: Palette.brandGlow, blurRadius: 6)
           ],
         ),
@@ -286,7 +286,7 @@ class _EmptyWidget extends StatelessWidget {
         children: [
           Icon(Icons.directions_boat_outlined,
               size: 64,
-              color: Palette.grey400.withOpacity(0.6)),
+              color: Palette.grey400.withValues(alpha: 0.6)),
           const SizedBox(height: 12),
           Text('No vessel planning records',
               style: GoogleFonts.lato(

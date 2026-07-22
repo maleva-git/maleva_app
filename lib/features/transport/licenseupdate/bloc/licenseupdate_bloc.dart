@@ -116,7 +116,7 @@ class LicenseUpdateBloc
 
     emit(LicenseUpdateLoading());
     try {
-      String? _iso(bool cb, String date) =>
+      String? iso(bool cb, String date) =>
           cb ? DateTime.parse(date).toIso8601String() : null;
 
       final master = [
@@ -129,18 +129,18 @@ class LicenseUpdateBloc
           'TruckType':    s.truckType,
           'Latitude':     s.latitude,
           'longitude':    s.longitude,
-          'RotexMyExp':   _iso(s.cbRotexMyExp,    s.rotexMyExp),
-          'RotexSGExp':   _iso(s.cbRotexSGExp,    s.rotexSGExp),
-          'PuspacomExp':  _iso(s.cbPuspacomExp,   s.puspacomExp),
-          'RotexMyExp1':  _iso(s.cbRotexMyExp1,   s.rotexMyExp1),
-          'RotexSGExp1':  _iso(s.cbRotexSGExp1,   s.rotexSGExp1),
-          'PuspacomExp1': _iso(s.cbPuspacomExp1,  s.puspacomExp1),
-          'InsuratnceExp':_iso(s.cbInsuratnceExp, s.insuratnceExp),
-          'BonamExp':     _iso(s.cbBonamExp,      s.bonamExp),
-          'ApadExp':      _iso(s.cbApadExp,       s.apadExp),
-          'ServiceExp':   _iso(s.cbServiceExp,    s.serviceExp),
-          'AlignmentExp': _iso(s.cbAlignmentExp,  s.alignmentExp),
-          'GreeceExp':    _iso(s.cbGreeceExp,     s.greeceExp),
+          'RotexMyExp':   iso(s.cbRotexMyExp,    s.rotexMyExp),
+          'RotexSGExp':   iso(s.cbRotexSGExp,    s.rotexSGExp),
+          'PuspacomExp':  iso(s.cbPuspacomExp,   s.puspacomExp),
+          'RotexMyExp1':  iso(s.cbRotexMyExp1,   s.rotexMyExp1),
+          'RotexSGExp1':  iso(s.cbRotexSGExp1,   s.rotexSGExp1),
+          'PuspacomExp1': iso(s.cbPuspacomExp1,  s.puspacomExp1),
+          'InsuratnceExp':iso(s.cbInsuratnceExp, s.insuratnceExp),
+          'BonamExp':     iso(s.cbBonamExp,      s.bonamExp),
+          'ApadExp':      iso(s.cbApadExp,       s.apadExp),
+          'ServiceExp':   iso(s.cbServiceExp,    s.serviceExp),
+          'AlignmentExp': iso(s.cbAlignmentExp,  s.alignmentExp),
+          'GreeceExp':    iso(s.cbGreeceExp,     s.greeceExp),
           'Active':       s.active,
         }
       ];
@@ -192,7 +192,7 @@ class LicenseUpdateBloc
     final fmt = DateFormat('MM/dd/yyyy HH:mm:ss');
     final today = DateFormat('yyyy-MM-dd').format(DateTime.now());
 
-    String _parse(String raw) {
+    String parse(String raw) {
       if (raw == 'null' || raw.isEmpty) return today;
       try {
         return DateFormat('yyyy-MM-dd').format(fmt.parse(raw));
@@ -201,7 +201,7 @@ class LicenseUpdateBloc
       }
     }
 
-    bool _hasVal(String raw) => raw != 'null' && raw.isNotEmpty;
+    bool hasVal(String raw) => raw != 'null' && raw.isNotEmpty;
 
     return LicenseUpdateLoaded(
       truckId:        truckId,
@@ -217,30 +217,30 @@ class LicenseUpdateBloc
       cNumber:        d.CNumber,
       active:         d.Active,
 
-      rotexMyExp:    _parse(d.RotexMyExp),
-      cbRotexMyExp:  _hasVal(d.RotexMyExp),
-      rotexSGExp:    _parse(d.RotexSGExp),
-      cbRotexSGExp:  _hasVal(d.RotexSGExp),
-      puspacomExp:   _parse(d.PuspacomExp),
-      cbPuspacomExp: _hasVal(d.PuspacomExp),
-      rotexMyExp1:   _parse(d.RotexMyExp1),
-      cbRotexMyExp1: _hasVal(d.RotexMyExp1),
-      rotexSGExp1:   _parse(d.RotexSGExp1),
-      cbRotexSGExp1: _hasVal(d.RotexSGExp1),
-      puspacomExp1:  _parse(d.PuspacomExp1),
-      cbPuspacomExp1:_hasVal(d.PuspacomExp1),
-      insuratnceExp: _parse(d.InsuratnceExp),
-      cbInsuratnceExp:_hasVal(d.InsuratnceExp),
-      bonamExp:      _parse(d.BonamExp),
-      cbBonamExp:    _hasVal(d.BonamExp),
-      apadExp:       _parse(d.ApadExp),
-      cbApadExp:     _hasVal(d.ApadExp),
-      serviceExp:    _parse(d.ServiceExp),
-      cbServiceExp:  _hasVal(d.ServiceExp),
-      alignmentExp:  _parse(d.AlignmentExp),
-      cbAlignmentExp:_hasVal(d.AlignmentExp),
-      greeceExp:     _parse(d.GreeceExp),
-      cbGreeceExp:   _hasVal(d.GreeceExp),
+      rotexMyExp:    parse(d.RotexMyExp),
+      cbRotexMyExp:  hasVal(d.RotexMyExp),
+      rotexSGExp:    parse(d.RotexSGExp),
+      cbRotexSGExp:  hasVal(d.RotexSGExp),
+      puspacomExp:   parse(d.PuspacomExp),
+      cbPuspacomExp: hasVal(d.PuspacomExp),
+      rotexMyExp1:   parse(d.RotexMyExp1),
+      cbRotexMyExp1: hasVal(d.RotexMyExp1),
+      rotexSGExp1:   parse(d.RotexSGExp1),
+      cbRotexSGExp1: hasVal(d.RotexSGExp1),
+      puspacomExp1:  parse(d.PuspacomExp1),
+      cbPuspacomExp1:hasVal(d.PuspacomExp1),
+      insuratnceExp: parse(d.InsuratnceExp),
+      cbInsuratnceExp:hasVal(d.InsuratnceExp),
+      bonamExp:      parse(d.BonamExp),
+      cbBonamExp:    hasVal(d.BonamExp),
+      apadExp:       parse(d.ApadExp),
+      cbApadExp:     hasVal(d.ApadExp),
+      serviceExp:    parse(d.ServiceExp),
+      cbServiceExp:  hasVal(d.ServiceExp),
+      alignmentExp:  parse(d.AlignmentExp),
+      cbAlignmentExp:hasVal(d.AlignmentExp),
+      greeceExp:     parse(d.GreeceExp),
+      cbGreeceExp:   hasVal(d.GreeceExp),
     );
   }
 }

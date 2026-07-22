@@ -4,7 +4,6 @@ import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:maleva/core/utils/app_globals.dart';
-import 'package:maleva/core/network/OnlineApi.dart' as OnlineApi;
 import 'package:maleva/features/dashboard/airfreight_dashboard/view/airfreight_dashboard.dart';
 import 'package:maleva/menu/menulist.dart';
 import 'package:maleva/features/dashboard/admin_dashboard/view/admin_dashboard.dart';
@@ -160,7 +159,7 @@ class _UpdateRTIPage extends StatelessWidget {
           const SizedBox(height: 2),
           Text(userName,
               style: GoogleFonts.lato(
-                  color: Colors.white.withOpacity(0.65),
+                  color: Colors.white.withValues(alpha: 0.65),
                   fontWeight: FontWeight.w500,
                   fontSize: 12)),
         ],
@@ -235,7 +234,7 @@ class _GridHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final style = GoogleFonts.lato(
-      color: Colors.white.withOpacity(0.85),
+      color: Colors.white.withValues(alpha: 0.85),
       fontWeight: FontWeight.w600,
       fontSize: isTablet ? 11 : 10,
       letterSpacing: 0.5,
@@ -347,7 +346,7 @@ class _RTICard extends StatelessWidget {
           border: Border.all(color: Palette.cardBorder, width: 0.5),
           boxShadow: [
             BoxShadow(
-              color: Palette.blue700.withOpacity(0.07),
+              color: Palette.blue700.withValues(alpha: 0.07),
               blurRadius: 10,
               offset: const Offset(0, 3),
             ),
@@ -521,7 +520,7 @@ class _DetailsSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final headerStyle = GoogleFonts.lato(
-      color: Colors.white.withOpacity(0.85),
+      color: Colors.white.withValues(alpha: 0.85),
       fontWeight: FontWeight.w600,
       fontSize: isTablet ? 10 : 9,
       letterSpacing: 0.5,
@@ -958,7 +957,7 @@ class _RTIFab extends StatelessWidget {
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-              color: Palette.blue700.withOpacity(0.4),
+              color: Palette.blue700.withValues(alpha: 0.4),
               blurRadius: 16,
               offset: const Offset(0, 6))
         ],
@@ -1138,7 +1137,7 @@ class _GradientButton extends StatelessWidget {
         borderRadius: BorderRadius.circular(24),
         boxShadow: [
           BoxShadow(
-              color: Palette.blue700.withOpacity(0.35),
+              color: Palette.blue700.withValues(alpha: 0.35),
               blurRadius: 10,
               offset: const Offset(0, 4))
         ],

@@ -1,21 +1,7 @@
 import 'package:flutter/Material.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:intl/intl.dart';
-import 'package:maleva/features/dashboard/common_tabs/salesorder/bloc/salesorder_bloc.dart';
 import '../../../../core/di/injection.dart';
 import '../../admin_dashboard/bloc/admin_tab_bloc.dart';
-import '../../common_tabs/inventoryreport/bloc/inventoryreport_bloc.dart';
-import '../../common_tabs/inventoryreport/data/inventoryreport_repository.dart';
-import '../../common_tabs/inventoryreport/view/inventoryview_tab.dart';
-import '../../common_tabs/salary/bloc/salary_bloc.dart';
-import '../../common_tabs/salary/view/salary_tab.dart';
-import '../../common_tabs/spotsaleorder/bloc/spotsaleorder_bloc.dart';
-import '../../common_tabs/spotsaleorder/data/spotsale_repository.dart';
-import '../../common_tabs/spotsaleorder/view/spotsaleorder_add.dart';
-import '../../common_tabs/transport/bloc/transport_bloc.dart';
-import '../../common_tabs/transport/bloc/transport_event.dart';
-import '../../common_tabs/transport/view/transportview_tab.dart';
 import '../../common_tabs/unrelease/bloc/unrelease_bloc.dart';
 import '../../common_tabs/unrelease/view/unrelease_tab.dart';
 import '../../common_tabs/unreleasesmk/bloc/unreleasesmk_bloc.dart';
@@ -66,17 +52,17 @@ class _ForwardingDashboardState extends State<ForwardingDashboard> with SingleTi
             BlocProvider(
               // Pass the context into sl() using param1
               create: (context) => sl<VesselBloc>(param1: context),
-              child: VesselReportPage(),
+              child: const VesselReportPage(),
             ),
             BlocProvider(
               // Pass the context into sl() using param1
               create: (context) => sl<UnReleaseBloc>(param1: context),
-              child: UnReleasePage(),
+              child: const UnReleasePage(),
             ),
             BlocProvider(
               // Pass the context into sl() using param1
               create: (context) => sl<UnReleaseSMKBloc>(param1: context),
-              child: UnReleaseSMKPage(),
+              child: const UnReleaseSMKPage(),
             ),
                   BlocProvider<LeaveBloc>(create: (_) => sl<LeaveBloc>()),
       ],

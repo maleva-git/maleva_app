@@ -172,7 +172,7 @@ class _TopBannerWidgetState extends State<_TopBannerWidget>
                 borderRadius: BorderRadius.circular(16),
                 boxShadow: [
                   BoxShadow(
-                    color: widget.backgroundColor.withOpacity(0.4),
+                    color: widget.backgroundColor.withValues(alpha: 0.4),
                     blurRadius: 16,
                     offset: const Offset(0, 6),
                   ),
@@ -194,7 +194,7 @@ class _TopBannerWidgetState extends State<_TopBannerWidget>
                   ),
                   const SizedBox(width: 8),
                   Icon(Icons.close_rounded,
-                      color: widget.textColor.withOpacity(0.6), size: 18),
+                      color: widget.textColor.withValues(alpha: 0.6), size: 18),
                 ],
               ),
             ),
@@ -259,7 +259,7 @@ Future<bool> ConfirmationMsgYesNo(BuildContext context, String msg) async {
             borderRadius: BorderRadius.circular(28.0),
             boxShadow: [
               BoxShadow(
-                color: colour.cBlue.withOpacity(0.15),
+                color: colour.cBlue.withValues(alpha: 0.15),
                 blurRadius: 32,
                 offset: const Offset(0, 12),
               ),
@@ -294,7 +294,7 @@ Future<bool> ConfirmationMsgYesNo(BuildContext context, String msg) async {
                         borderRadius: BorderRadius.circular(20),
                         boxShadow: [
                           BoxShadow(
-                            color: Colors.black.withOpacity(0.1),
+                            color: Colors.black.withValues(alpha: 0.1),
                             blurRadius: 10,
                             offset: const Offset(0, 4),
                           ),

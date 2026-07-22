@@ -1,4 +1,3 @@
-import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 import 'package:maleva/core/utils/app_preferences.dart';
@@ -186,14 +185,14 @@ class SaleOrderDetailsBloc extends Bloc<SaleOrderDetailsEvent, SaleOrderDetailsS
       }
 
       // ── Seal / Break employees ─────────────────────────────────────────────
-      String _empName(dynamic refId) {
+      String empName(dynamic refId) {
         if ((refId ?? 0) == 0) return '';
         final found = _employeeList.where((e) => e['Id'] == refId).toList();
         return found.isNotEmpty ? found[0]['AccountName'] ?? '' : '';
       }
 
       // ── Dates ─────────────────────────────────────────────────────────────
-      String _parseDate(dynamic raw, {bool dateOnly = false}) {
+      String parseDate(dynamic raw, {bool dateOnly = false}) {
         if (raw == null) return dateOnly ? _todayIso() : _nowIso();
         final dt = DateTime.parse(raw.toString());
         return dateOnly ? DateFormat("yyyy-MM-dd").format(dt) : DateFormat("yyyy-MM-dd HH:mm:ss").format(dt);
@@ -224,7 +223,7 @@ class SaleOrderDetailsBloc extends Bloc<SaleOrderDetailsEvent, SaleOrderDetailsS
         editId: m["Id"] ?? 0,
         billType: m["BillType"] ?? 'MY',
         jobNo: m["CNumber"]?.toString() ?? '',
-        dtpSaleOrderDate: _parseDate(m["SaleDate"], dateOnly: true),
+        dtpSaleOrderDate: parseDate(m["SaleDate"], dateOnly: true),
         customerName: custName, custId: custId,
         jobType: jobTypeName, jobTypeId: jobTypeId,
         jobStatus: jobStatusName, statusId: statusId,
@@ -237,12 +236,12 @@ class SaleOrderDetailsBloc extends Bloc<SaleOrderDetailsEvent, SaleOrderDetailsS
         loadingVessel: m["Loadingvesselname"] ?? '',
         lPort: m["SPort"] ?? '', oPort: m["OPort"] ?? '',
         smk1: m["ForwardingSMKNo"] ?? '', smk2: m["ForwardingSMKNo2"] ?? '', smk3: m["ForwardingSMKNo3"] ?? '',
-        checkLEta: m["ETA"] != null, dtpLEta: _parseDate(m["ETA"]),
-        checkLEtb: m["ETB"] != null, dtpLEtb: _parseDate(m["ETB"]),
-        checkLEtd: m["ETD"] != null, dtpLEtd: _parseDate(m["ETD"]),
-        checkOEta: m["OETA"] != null, dtpOEta: _parseDate(m["OETA"]),
-        checkOEtb: m["OETB"] != null, dtpOEtb: _parseDate(m["OETB"]),
-        checkOEtd: m["OETD"] != null, dtpOEtd: _parseDate(m["OETD"]),
+        checkLEta: m["ETA"] != null, dtpLEta: parseDate(m["ETA"]),
+        checkLEtb: m["ETB"] != null, dtpLEtb: parseDate(m["ETB"]),
+        checkLEtd: m["ETD"] != null, dtpLEtd: parseDate(m["ETD"]),
+        checkOEta: m["OETA"] != null, dtpOEta: parseDate(m["OETA"]),
+        checkOEtb: m["OETB"] != null, dtpOEtb: parseDate(m["OETB"]),
+        checkOEtd: m["OETD"] != null, dtpOEtd: parseDate(m["OETD"]),
         awbNo: m["AWBNo"] ?? '', blCopy: m["BLCopy"] ?? '',
         oScn: m["SCN"] ?? '', lVesselType: m["Vessel"] ?? '',
         oVesselType: m["OVessel"] ?? '', commodityType: m["Commodity"] ?? '',
@@ -251,16 +250,16 @@ class SaleOrderDetailsBloc extends Bloc<SaleOrderDetailsEvent, SaleOrderDetailsS
         oAgentName: oAgentName, oAgentId: oAgentId,
         lAgentCompany: lAgentCompanyName, lAgentCompanyId: lAgentCompanyId,
         lAgentName: lAgentName, lAgentId: lAgentId,
-        sealByEmp1: _empName(m["SealbyRefid"]), sealEmpId1: m["SealbyRefid"] ?? 0,
-        breakByEmp1: _empName(m["SealbreakbyRefid"]), breakEmpId1: m["SealbreakbyRefid"] ?? 0,
-        sealByEmp2: _empName(m["SealbyRefid2"]), sealEmpId2: m["SealbyRefid2"] ?? 0,
-        breakByEmp2: _empName(m["SealbreakbyRefid2"]), breakEmpId2: m["SealbreakbyRefid2"] ?? 0,
-        sealByEmp3: _empName(m["SealbyRefid3"]), sealEmpId3: m["SealbyRefid3"] ?? 0,
-        breakByEmp3: _empName(m["SealbreakbyRefid3"]), breakEmpId3: m["SealbreakbyRefid3"] ?? 0,
-        checkPickUp: m["PickupDate"] != null, dtpPickUpDate: _parseDate(m["PickupDate"]),
-        checkDelivery: m["DeliveryDate"] != null, dtpDeliveryDate: _parseDate(m["DeliveryDate"]),
-        checkWhEntry: m["WareHouseEnterDate"] != null, dtpWhEntryDate: _parseDate(m["WareHouseEnterDate"]),
-        checkWhExit: m["WareHouseExitDate"] != null, dtpWhExitDate: _parseDate(m["WareHouseExitDate"]),
+        sealByEmp1: empName(m["SealbyRefid"]), sealEmpId1: m["SealbyRefid"] ?? 0,
+        breakByEmp1: empName(m["SealbreakbyRefid"]), breakEmpId1: m["SealbreakbyRefid"] ?? 0,
+        sealByEmp2: empName(m["SealbyRefid2"]), sealEmpId2: m["SealbyRefid2"] ?? 0,
+        breakByEmp2: empName(m["SealbreakbyRefid2"]), breakEmpId2: m["SealbreakbyRefid2"] ?? 0,
+        sealByEmp3: empName(m["SealbyRefid3"]), sealEmpId3: m["SealbyRefid3"] ?? 0,
+        breakByEmp3: empName(m["SealbreakbyRefid3"]), breakEmpId3: m["SealbreakbyRefid3"] ?? 0,
+        checkPickUp: m["PickupDate"] != null, dtpPickUpDate: parseDate(m["PickupDate"]),
+        checkDelivery: m["DeliveryDate"] != null, dtpDeliveryDate: parseDate(m["DeliveryDate"]),
+        checkWhEntry: m["WareHouseEnterDate"] != null, dtpWhEntryDate: parseDate(m["WareHouseEnterDate"]),
+        checkWhExit: m["WareHouseExitDate"] != null, dtpWhExitDate: parseDate(m["WareHouseExitDate"]),
         pickUpAddress: pickUpAddr, pickUpAddressList: pickUpList,
         deliveryAddress: deliveryAddr, deliveryAddressList: deliveryList,
         warehouseAddress: m["WareHouseAddress"] ?? '',
@@ -271,8 +270,8 @@ class SaleOrderDetailsBloc extends Bloc<SaleOrderDetailsEvent, SaleOrderDetailsS
         dropdownZB1: (m["Zb"] ?? '') != '' ? m["Zb"] as String : null,
         dropdownZB2: (m["Zb2"] ?? '') != '' ? m["Zb2"] as String : null,
         ptwNo: m["PTW"] ?? '',
-        boardingOfficer1: _empName(m["BoardingOfficerRefid"]), boardOfficerId1: m["BoardingOfficerRefid"] ?? 0,
-        boardingOfficer2: _empName(m["BoardingOfficer1Refid"]), boardOfficerId2: m["BoardingOfficer1Refid"] ?? 0,
+        boardingOfficer1: empName(m["BoardingOfficerRefid"]), boardOfficerId1: m["BoardingOfficerRefid"] ?? 0,
+        boardingOfficer2: empName(m["BoardingOfficer1Refid"]), boardOfficerId2: m["BoardingOfficer1Refid"] ?? 0,
         amount1: m["BoardingAmount"]?.toString() ?? '', amount2: m["BoardingAmount1"]?.toString() ?? '',
         enRef1: m["ForwardingEnterRef"] ?? '', exRef1: m["ForwardingExitRef"] ?? '',
         enRef2: m["ForwardingEnterRef2"] ?? '', exRef2: m["ForwardingExitRef2"] ?? '',

@@ -164,6 +164,7 @@ class _JobStatusUpdateViewState extends State<_JobStatusUpdateView> {
     );
     if (date == null) return;
 
+    if (!context.mounted) return;
     final time = await showTimePicker(
       context: context,
       initialTime: TimeOfDay.now(),
@@ -176,10 +177,12 @@ class _JobStatusUpdateViewState extends State<_JobStatusUpdateView> {
     DateFormat('yyyy-MM-dd HH:mm:ss').format(combined);
 
     if (isStart) {
+      if (!mounted) return;
       context
           .read<JobStatusUpdateBloc>()
           .add(JobStatusUpdateStartTimePicked(formatted));
     } else {
+      if (!mounted) return;
       context
           .read<JobStatusUpdateBloc>()
           .add(JobStatusUpdateEndTimePicked(formatted));
@@ -259,6 +262,7 @@ class _JobStatusUpdateViewState extends State<_JobStatusUpdateView> {
     // Reset and reload after successful update
     if (state.action == JobStatusUpdateAction.resetAndReload) {
       _ok('Updated Successfully').then((_) {
+        if (!context.mounted) return;
         context
             .read<JobStatusUpdateBloc>()
             .add(const JobStatusUpdateFormCleared());
@@ -342,6 +346,7 @@ class _JobStatusUpdateViewState extends State<_JobStatusUpdateView> {
               onPressed: () async {
                 final ok = await _confirm('Are you sure to Update ?');
                 if (ok) {
+                  if (!context.mounted) return;
                   context
                       .read<JobStatusUpdateBloc>()
                       .add(const JobStatusUpdateSubmitted());
@@ -421,9 +426,10 @@ class _JobStatusUpdateViewState extends State<_JobStatusUpdateView> {
                   MaterialPageRoute(
                       builder: (_) => const JobAllStatus(
                           Searchby: 1, SearchId: 0, JobTypeId: 0)),
-                ).then((_navRes) { if (_navRes != null) { AppGlobals.SelectAllStatusList = _navRes; }
+                ).then((navRes) { if (navRes != null) { AppGlobals.SelectAllStatusList = navRes; }
                   final selected = AppGlobals.SelectAllStatusList;
                   if (selected.StatusName.isNotEmpty) {
+                    if (!context.mounted) return;
                     context.read<JobStatusUpdateBloc>().add(
                       JobStatusUpdateStatusSelected(
                         statusName: selected.StatusName,
@@ -510,6 +516,7 @@ class _JobStatusUpdateViewState extends State<_JobStatusUpdateView> {
                 final ok =
                 await _confirm('Are you sure to Delete ?');
                 if (ok) {
+                  if (!context.mounted) return;
                   context
                       .read<JobStatusUpdateBloc>()
                       .add(JobStatusUpdateImageDeleted(i));

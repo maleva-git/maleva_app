@@ -51,6 +51,7 @@ class _AirFreightPageState extends State<_AirFreightPage> {
     final file = await _picker.pickImage(source: source);
     if (file == null) return;
     final url = await SystemHelpers.upload(File(file.path), ApiConstants.apiPostImage, saleOrderId, 'SalesOrder', 'AirFrieght');
+    if (!mounted) return;
     context.read<AirFreightBloc>().add(AirFreightImagePicked(url));
   }
 
@@ -64,9 +65,11 @@ class _AirFreightPageState extends State<_AirFreightPage> {
           await ConfirmationOK('Updated Successfully', context);
         }
         if (state is AirFreightInvalidJobType) {
+          if (!context.mounted) return;
           toastMsg('Enter Air Frieght JobNo', '', context);
         }
         if (state is AirFreightError) {
+          if (!context.mounted) return;
           ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(state.message, style: GoogleFonts.lato(color: Colors.white)), backgroundColor: const Color(0xFFB33040), behavior: SnackBarBehavior.floating, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10))));
         }
       },
@@ -105,7 +108,7 @@ class _AirFreightPageState extends State<_AirFreightPage> {
         mainAxisAlignment: MainAxisAlignment.center, crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text('Air Frieght Update', style: GoogleFonts.lato(color: Colors.white, fontWeight: FontWeight.w700, fontSize: 17, letterSpacing: 0.3)),
-          Text(userName, style: GoogleFonts.lato(color: Colors.white.withOpacity(0.65), fontWeight: FontWeight.w500, fontSize: 12)),
+          Text(userName, style: GoogleFonts.lato(color: Colors.white.withValues(alpha: 0.65), fontWeight: FontWeight.w500, fontSize: 12)),
         ],
       ),
       actions: [
@@ -121,6 +124,7 @@ class _AirFreightPageState extends State<_AirFreightPage> {
               if (s.awbNo.isEmpty) { toastMsg('Enter AWB No', '', context); return; }
               if (s.imageUploadEnabled && s.images.isEmpty) { toastMsg('Select Images !!', '', context); return; }
               ConfirmationMsgYesNo(context, 'Are you sure to Update ?').then((ok) {
+                if (!context.mounted) return;
                 if (ok == true) context.read<AirFreightBloc>().add(AirFreightSaveRequested(context));
               });
             },
@@ -340,6 +344,7 @@ class _JobNoRowState extends State<_JobNoRow> {
 
                     await OnlineApi.EditSalesOrder(finalSaleId, int.tryParse(s.jobNoText) ?? 0);
 
+                    if (!context.mounted) return;
                     Navigator.push(
                       context,
                       MaterialPageRoute(
@@ -375,11 +380,14 @@ class _StatusField extends StatelessWidget {
 
         // 🔥 FIXED: Removed 'context' from EditSalesOrder
         await OnlineApi.EditSalesOrder(state.saleOrderId, int.tryParse(state.jobNoText) ?? 0);
+        if (!context.mounted) return;
         await OnlineApi.SelectAllJobStatus(context, AppGlobals.SaleEditMasterList[0]['JobMasterRefId']);
 
-        Navigator.push(context, MaterialPageRoute(builder: (_) => const JobAllStatus(Searchby: 1, SearchId: 0, JobTypeId: 0))).then((_navRes) { if (_navRes != null) { AppGlobals.SelectAllStatusList = _navRes; }
+        if (!context.mounted) return;
+        Navigator.push(context, MaterialPageRoute(builder: (_) => const JobAllStatus(Searchby: 1, SearchId: 0, JobTypeId: 0))).then((navRes) { if (navRes != null) { AppGlobals.SelectAllStatusList = navRes; }
           final sel = AppGlobals.SelectAllStatusList;
           if (sel.Status != 0) {
+            if (!context.mounted) return;
             context.read<AirFreightBloc>().add(AirFreightStatusSelected(statusId: sel.Status, statusName: sel.StatusName));
             AppGlobals.SelectAllStatusList = JobAllStatusModel.Empty();
           }
@@ -470,7 +478,7 @@ class _PickBtn extends StatelessWidget {
       onTap: enabled ? onTap : null, borderRadius: BorderRadius.circular(8),
       child: Container(
         padding: const EdgeInsets.all(6),
-        decoration: BoxDecoration(color: enabled ? Palette.blue700.withOpacity(0.08) : Colors.transparent, borderRadius: BorderRadius.circular(8)),
+        decoration: BoxDecoration(color: enabled ? Palette.blue700.withValues(alpha: 0.08) : Colors.transparent, borderRadius: BorderRadius.circular(8)),
         child: Icon(icon, size: isTablet ? 28 : 24, color: enabled ? Palette.blue700 : Palette.kTextMuted),
       ),
     );
@@ -500,6 +508,7 @@ class _ImageGrid extends StatelessWidget {
             return InkWell(
               onLongPress: () async {
                 final ok = await ConfirmationMsgYesNo(ctx, 'Are you sure to Delete ?');
+                if (!context.mounted) return;
                 if (ok == true) context.read<AirFreightBloc>().add(AirFreightImageDeleted(i, context));
               },
               onTap: () => _showPreview(ctx, url),
@@ -552,11 +561,11 @@ class _ReadonlyInfoChip extends StatelessWidget {
 class _GradientButton extends StatelessWidget {
   final String label; final IconData icon; final bool isTablet; final VoidCallback onPressed;
   const _GradientButton({required this.label, required this.icon, required this.isTablet, required this.onPressed});
-  @override Widget build(BuildContext context) => Container(decoration: BoxDecoration(gradient: kGradient, borderRadius: BorderRadius.circular(10), boxShadow: [BoxShadow(color: Palette.blue700.withOpacity(0.30), blurRadius: 8, offset: const Offset(0, 3))]), child: Material(color: Colors.transparent, child: InkWell(onTap: onPressed, borderRadius: BorderRadius.circular(10), child: Padding(padding: EdgeInsets.symmetric(horizontal: isTablet ? 18 : 12, vertical: isTablet ? 13 : 11), child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [Text(label, style: GoogleFonts.lato(color: Colors.white, fontWeight: FontWeight.w700, fontSize: isTablet ? AppGlobals.FontMedium + 1 : AppGlobals.FontMedium)), const SizedBox(width: 6), Icon(icon, color: Colors.white, size: isTablet ? 20 : 17)])))));
+  @override Widget build(BuildContext context) => Container(decoration: BoxDecoration(gradient: kGradient, borderRadius: BorderRadius.circular(10), boxShadow: [BoxShadow(color: Palette.blue700.withValues(alpha: 0.30), blurRadius: 8, offset: const Offset(0, 3))]), child: Material(color: Colors.transparent, child: InkWell(onTap: onPressed, borderRadius: BorderRadius.circular(10), child: Padding(padding: EdgeInsets.symmetric(horizontal: isTablet ? 18 : 12, vertical: isTablet ? 13 : 11), child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [Text(label, style: GoogleFonts.lato(color: Colors.white, fontWeight: FontWeight.w700, fontSize: isTablet ? AppGlobals.FontMedium + 1 : AppGlobals.FontMedium)), const SizedBox(width: 6), Icon(icon, color: Colors.white, size: isTablet ? 20 : 17)])))));
 }
 
 class _AppBarButton extends StatelessWidget {
   final String label; final VoidCallback onPressed;
   const _AppBarButton({required this.label, required this.onPressed});
-  @override Widget build(BuildContext context) => Container(decoration: BoxDecoration(color: Colors.white.withOpacity(0.15), borderRadius: BorderRadius.circular(8), border: Border.all(color: Colors.white.withOpacity(0.4), width: 0.5)), child: Material(color: Colors.transparent, child: InkWell(onTap: onPressed, borderRadius: BorderRadius.circular(8), child: Padding(padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6), child: Text(label, style: GoogleFonts.lato(color: Colors.white, fontWeight: FontWeight.w700, fontSize: AppGlobals.FontMedium))))));
+  @override Widget build(BuildContext context) => Container(decoration: BoxDecoration(color: Colors.white.withValues(alpha: 0.15), borderRadius: BorderRadius.circular(8), border: Border.all(color: Colors.white.withValues(alpha: 0.4), width: 0.5)), child: Material(color: Colors.transparent, child: InkWell(onTap: onPressed, borderRadius: BorderRadius.circular(8), child: Padding(padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6), child: Text(label, style: GoogleFonts.lato(color: Colors.white, fontWeight: FontWeight.w700, fontSize: AppGlobals.FontMedium))))));
 }

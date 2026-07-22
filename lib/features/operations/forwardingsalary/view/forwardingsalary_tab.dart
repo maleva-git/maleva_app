@@ -60,6 +60,7 @@ class _ForwardingSalaryPage extends StatelessWidget {
           await ConfirmationOK('Saved Successfully', context);
         }
         if (state is ForwardingSalaryError) {
+          if (!context.mounted) return;
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text(state.message,
@@ -133,7 +134,7 @@ class _ForwardingSalaryPage extends StatelessWidget {
           const SizedBox(height: 2),
           Text(userName,
               style: GoogleFonts.lato(
-                  color: Colors.white.withOpacity(0.65),
+                  color: Colors.white.withValues(alpha: 0.65),
                   fontWeight: FontWeight.w500,
                   fontSize: 12)),
         ],
@@ -158,6 +159,7 @@ class _ForwardingSalaryPage extends StatelessWidget {
                   context, 'Are you sure to Save?')
                   .then((ok) {
                 if (ok == true) {
+                  if (!context.mounted) return;
                   context
                       .read<ForwardingSalaryBloc>()
                       .add(ForwardingSalarySaveRequested());
@@ -339,14 +341,16 @@ class _ForwardingSalaryBody extends StatelessWidget {
   // ─── Employee pickers ────────────────────────────────────────────────────────
   Future<void> _pickSealEmp(BuildContext context) async {
     await OnlineApi.SelectEmployee(context, '', 'Operation');
-    Navigator.push(
+    if (!context.mounted) return;
+Navigator.push(
       context,
       MaterialPageRoute(
           builder: (_) => const Employee(Searchby: 1, SearchId: 0)),
-    ).then((_navRes) {
-      if (_navRes != null) { AppGlobals.SelectEmployeeList = _navRes; }
+    ).then((navRes) {
+      if (navRes != null) { AppGlobals.SelectEmployeeList = navRes; }
       final sel = AppGlobals.SelectEmployeeList;
       if (sel.Id != 0) {
+        if (!context.mounted) return;
         context.read<ForwardingSalaryBloc>().add(
             ForwardingSalarySealEmpChanged(
                 empId: sel.Id, empName: sel.AccountName));
@@ -357,14 +361,16 @@ class _ForwardingSalaryBody extends StatelessWidget {
 
   Future<void> _pickBreakEmp(BuildContext context) async {
     await OnlineApi.SelectEmployee(context, '', 'Operation');
-    Navigator.push(
+    if (!context.mounted) return;
+Navigator.push(
       context,
       MaterialPageRoute(
           builder: (_) => const Employee(Searchby: 1, SearchId: 0)),
-    ).then((_navRes) {
-      if (_navRes != null) { AppGlobals.SelectEmployeeList = _navRes; }
+    ).then((navRes) {
+      if (navRes != null) { AppGlobals.SelectEmployeeList = navRes; }
       final sel = AppGlobals.SelectEmployeeList;
       if (sel.Id != 0) {
+        if (!context.mounted) return;
         context.read<ForwardingSalaryBloc>().add(
             ForwardingSalaryBreakEmpChanged(
                 empId: sel.Id, empName: sel.AccountName));
@@ -484,7 +490,7 @@ class _RtiFieldState extends State<_RtiField> {
               border: Border.all(color: kCardBorder, width: 0.5),
               boxShadow: [
                 BoxShadow(
-                  color: kHeaderGradStart.withOpacity(0.10),
+                  color: kHeaderGradStart.withValues(alpha: 0.10),
                   blurRadius: 10,
                   offset: const Offset(0, 4),
                 ),
@@ -812,10 +818,10 @@ class _AppBarButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.15),
+        color: Colors.white.withValues(alpha: 0.15),
         borderRadius: BorderRadius.circular(8),
         border:
-        Border.all(color: Colors.white.withOpacity(0.4), width: 0.5),
+        Border.all(color: Colors.white.withValues(alpha: 0.4), width: 0.5),
       ),
       child: Material(
         color: Colors.transparent,

@@ -13,7 +13,7 @@ class MalevaTextField extends StatelessWidget {
   final TextInputType keyboardType;
 
   const MalevaTextField({
-    Key? key,
+    super.key,
     required this.hint,
     required this.uniqueId,
     required this.value,
@@ -22,7 +22,7 @@ class MalevaTextField extends StatelessWidget {
     this.minLines = 1,
     this.maxLines = 1,
     this.keyboardType = TextInputType.text,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -41,7 +41,7 @@ class MalevaTextField extends StatelessWidget {
       decoration: InputDecoration(
         hintText: hint,
         hintStyle: GoogleFonts.poppins(
-          color: colour.textSub.withOpacity(0.45),
+          color: colour.textSub.withValues(alpha: 0.45),
           fontSize: 13,
           fontWeight: FontWeight.w400,
         ),
@@ -50,11 +50,11 @@ class MalevaTextField extends StatelessWidget {
         contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(10),
-          borderSide: BorderSide(color: colour.border),
+          borderSide: const BorderSide(color: colour.border),
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(10),
-          borderSide: BorderSide(color: colour.border),
+          borderSide: const BorderSide(color: colour.border),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(10),
@@ -62,7 +62,7 @@ class MalevaTextField extends StatelessWidget {
         ),
         disabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(10),
-          borderSide: BorderSide(color: colour.border),
+          borderSide: const BorderSide(color: colour.border),
         ),
       ),
       onChanged: onChanged,
@@ -79,14 +79,14 @@ class MalevaSearchField extends StatelessWidget {
   final VoidCallback onClear;
 
   const MalevaSearchField({
-    Key? key,
+    super.key,
     required this.hint,
     required this.uniqueId,
     required this.value,
     required this.enabled,
     required this.onSearch,
     required this.onClear,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -111,7 +111,7 @@ class MalevaSearchField extends StatelessWidget {
                 value.isEmpty ? hint : value,
                 style: GoogleFonts.poppins(
                   color: value.isEmpty
-                      ? colour.textSub.withOpacity(0.45)
+                      ? colour.textSub.withValues(alpha: 0.45)
                       : colour.textMain,
                   fontSize: 13,
                   fontWeight: value.isEmpty ? FontWeight.w400 : FontWeight.w600,
@@ -143,10 +143,10 @@ class MalevaDateField extends StatelessWidget {
   final VoidCallback? onTap;
 
   const MalevaDateField({
-    Key? key,
+    super.key,
     required this.date,
     required this.onTap,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

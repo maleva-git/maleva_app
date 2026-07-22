@@ -45,7 +45,7 @@ class FWUpdate extends StatelessWidget {
 }
 
 class FWUpdatePage extends StatefulWidget {
-  const FWUpdatePage();
+  const FWUpdatePage({super.key});
 
   @override
   State<FWUpdatePage> createState() => FWUpdatePageState();
@@ -88,7 +88,8 @@ class FWUpdatePageState extends State<FWUpdatePage> with SingleTickerProviderSta
     if (file == null) return;
 
     final url = await SystemHelpers.upload(File(file.path), ApiConstants.apiPostImage, s.saleOrderId, 'SalesOrder', smkText);
-    if (url != null && url.isNotEmpty) {
+    if (url.isNotEmpty) {
+      if (!context.mounted) return;
       context.read<FWUpdateBloc>().add(FWUpdateImagePicked(type: type, imageUrl: url));
     }
   }
@@ -103,6 +104,7 @@ class FWUpdatePageState extends State<FWUpdatePage> with SingleTickerProviderSta
           await ConfirmationOK('Updated Successfully', context);
         }
         if (state is FWUpdateError) {
+          if (!context.mounted) return;
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text(state.message, style: GoogleFonts.lato(color: Colors.white)),
@@ -113,6 +115,7 @@ class FWUpdatePageState extends State<FWUpdatePage> with SingleTickerProviderSta
           );
         }
         if (state is FWUpdateShowImagePreview) {
+          if (!context.mounted) return;
           _showImagePreview(context, state.imageUrl);
         }
       },
@@ -188,7 +191,7 @@ class FWUpdatePageState extends State<FWUpdatePage> with SingleTickerProviderSta
               style: GoogleFonts.lato(color: Colors.white, fontWeight: FontWeight.w700, fontSize: 17, letterSpacing: 0.3)),
           const SizedBox(height: 2),
           Text(userName,
-              style: GoogleFonts.lato(color: Colors.white.withOpacity(0.65), fontWeight: FontWeight.w500, fontSize: 12)),
+              style: GoogleFonts.lato(color: Colors.white.withValues(alpha: 0.65), fontWeight: FontWeight.w500, fontSize: 12)),
         ],
       ),
       actions: [
@@ -216,6 +219,7 @@ class FWUpdatePageState extends State<FWUpdatePage> with SingleTickerProviderSta
                 }
                 ConfirmationMsgYesNo(context, 'Are you sure to Update ?').then((confirmed) {
                   if (confirmed == true) {
+                    if (!context.mounted) return;
                     context.read<FWUpdateBloc>().add(FWUpdateSaveRequested());
                   }
                 });
@@ -410,11 +414,12 @@ class _FWTabContentState extends State<_FWTabContent> {
           onSearch: () async {
             context.read<FWUpdateBloc>().add(FWUpdateOverlayDismissed());
             await OnlineApi.SelectEmployee(context, '', 'Operation');
-            Navigator.push(
+            if (!context.mounted) return;
+Navigator.push(
               context,
               MaterialPageRoute(builder: (_) => const Employee(Searchby: 1, SearchId: 0)),
-            ).then((_navRes) {
-              if (_navRes != null) { AppGlobals.SelectEmployeeList = _navRes; }
+            ).then((navRes) {
+              if (navRes != null) { AppGlobals.SelectEmployeeList = navRes; }
               final sel = AppGlobals.SelectEmployeeList;
               if (sel.Id != 0) {
                 _emit(FWUpdateSealEmpChanged(type: t, empId: sel.Id, empName: sel.AccountName));
@@ -435,11 +440,12 @@ class _FWTabContentState extends State<_FWTabContent> {
           onSearch: () async {
             context.read<FWUpdateBloc>().add(FWUpdateOverlayDismissed());
             await OnlineApi.SelectEmployee(context, '', 'Operation');
-            Navigator.push(
+            if (!context.mounted) return;
+Navigator.push(
               context,
               MaterialPageRoute(builder: (_) => const Employee(Searchby: 1, SearchId: 0)),
-            ).then((_navRes) {
-              if (_navRes != null) { AppGlobals.SelectEmployeeList = _navRes; }
+            ).then((navRes) {
+              if (navRes != null) { AppGlobals.SelectEmployeeList = navRes; }
               final sel = AppGlobals.SelectEmployeeList;
               if (sel.Id != 0) {
                 _emit(FWUpdateBreakEmpChanged(type: t, empId: sel.Id, empName: sel.AccountName));
@@ -715,6 +721,7 @@ class _ImageUploadSection extends StatelessWidget {
                   onLongPress: () async {
                     final ok = await ConfirmationMsgYesNo(ctx, 'Are you sure to Delete ?');
                     if (ok == true) {
+                      if (!context.mounted) return;
                       context.read<FWUpdateBloc>().add(FWUpdateImageDeleted(type: type, index: index));
                     }
                   },
@@ -754,7 +761,7 @@ class _ImagePickBtn extends StatelessWidget {
       borderRadius: BorderRadius.circular(8),
       child: Container(
         padding: const EdgeInsets.all(6),
-        decoration: BoxDecoration(color: enabled ? Palette.blue700.withOpacity(0.08) : Colors.transparent, borderRadius: BorderRadius.circular(8)),
+        decoration: BoxDecoration(color: enabled ? Palette.blue700.withValues(alpha: 0.08) : Colors.transparent, borderRadius: BorderRadius.circular(8)),
         child: Icon(icon, size: isTablet ? 28 : 24, color: enabled ? Palette.blue700 : Palette.kTextMuted),
       ),
     );
@@ -869,7 +876,7 @@ class _AppBarButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      decoration: BoxDecoration(color: Colors.white.withOpacity(0.15), borderRadius: BorderRadius.circular(8), border: Border.all(color: Colors.white.withOpacity(0.4), width: 0.5)),
+      decoration: BoxDecoration(color: Colors.white.withValues(alpha: 0.15), borderRadius: BorderRadius.circular(8), border: Border.all(color: Colors.white.withValues(alpha: 0.4), width: 0.5)),
       child: Material(
         color: Colors.transparent,
         child: InkWell(

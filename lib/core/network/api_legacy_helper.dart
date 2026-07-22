@@ -15,390 +15,60 @@ import 'dart:convert';
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:go_router/go_router.dart';
 import 'package:maleva/core/utils/app_globals.dart';
-import 'package:maleva/core/utils/dialog_helper.dart';
 import 'package:maleva/core/models/shared/response_view_model.dart';
 import 'package:maleva/core/models/shared/employee_model.dart';
+
+import 'package:maleva/core/network/api_client.dart';
+
+import '../utils/app_preferences.dart';
 
 class ApiLegacyHelper {
   static Future<void> localstoragecall() async {
     AppGlobals.storagenew = await SharedPreferences.getInstance();
   }
 
-  static Future<http.Response> _performPostRequest(String url, dynamic bodyData, Map<String, String> headers) async {
-  String body;
-    if (bodyData == null || bodyData == '') {
-      body = "{}";
-    } else {
-      body = json.encode(bodyData);
-    }
-  
-    debugPrint(url);
-    if (body != '' && body != 'null' && body != '{}') {
-      debugPrint(body);
-    }
-    return await http.post(Uri.parse(url), headers: headers, body: body).timeout(const Duration(seconds: 30));
-  }
-
   static Future<List<dynamic>> apiAllinoneSelect(api, insertDetails,
-      Map<String, String>? header, BuildContext ?context) async {
-  String apiname = api.toString().split('?')[0];
-    apiname = "${apiname.replaceAll('$AppGlobals.port/api/', '')}: ";
-    try {
-  final headers = AppGlobals.buildRequestHeaders(header);
-  final result = await _performPostRequest(api, insertDetails, headers);
-      if (result.statusCode == 200) {
-        if (result.body == "") {
-          return [];
-        } else {
-          return jsonDecode(result.body);
-        }
-      } else if (result.statusCode == 401) {
-        if (context != null && !context.mounted) return [];
-        ConfirmationOK("Authentication Failed !!!..ReLogin !!!", context);
-        try {
-          ResponseViewModel? value =
-              ResponseViewModel.fromJson(jsonDecode(result.body));
-          msgshow(value.Message, "", Colors.white, Colors.green, null,
-              18.00 - AppGlobals.reducesize, AppGlobals.tll, AppGlobals.tgc, context, 2);
-        } catch (_) {}
-        return [];
-      } else if (result.statusCode == 406) {
-        if (context != null && !context.mounted) return [];
-        ConfirmationOK(
-            "Already Login Another User.ReLogin or Change Password !!!", context);
-        AppGlobals.loginId = 0;
-        AppGlobals.loginname = '';
-        AppGlobals.storagenew.setString('Username', "");
-        AppGlobals.storagenew.setString('Password', "");
-        AppGlobals.storagenew.setString('OldUsername', "");
-        return [];
-      } else if (result.statusCode == 404 || result.statusCode == 500) {
-        if (context != null && !context.mounted) return [];
-        try {
-          ResponseViewModel? value =
-              ResponseViewModel.fromJson(jsonDecode(result.body));
-          msgshow(value.Message, "", Colors.white, Colors.green, null,
-              18.00 - AppGlobals.reducesize, AppGlobals.tll, AppGlobals.tgc, context, 2);
-        } catch (e) {
-          msgshow("Server Error: ${result.statusCode}", "", Colors.white, Colors.red, null,
-              18.00 - AppGlobals.reducesize, AppGlobals.tll, AppGlobals.tgc, context, 2);
-        }
-        return [];
-      } else {
-  throw Exception('${result.statusCode} Unknown Error Occurred');
-      }
-    } on SocketException catch (_) {
-  throw Exception('Check Your Network Connection');
-    } catch (error) {
-  throw Exception('$apiname$error');
-    }
+      Map<String, String>? header, BuildContext? context) async {
+    final result = await ApiClient.postRequest(api, insertDetails, headers: header);
+    if (result is List) return result;
+    if (result is Map) return [result];
+    return [];
   }
 
   static Future<dynamic> apiAllinoneMapSelect(
       api,
       insertDetails,
       Map<String, String>? header,
-      BuildContext context) async {
-  String apiname = api.toString().split('?')[0];
-    apiname = "${apiname.replaceAll('$AppGlobals.port/api/', '')}: ";
-    try {
-  final headers = AppGlobals.buildRequestHeaders(header);
-  final result = await _performPostRequest(api, insertDetails, headers);
-
-      if (result.statusCode == 200) {
-        if (result.body == "") {
-          return [];
-        } else {
-  final decoded = jsonDecode(result.body);
-          if (decoded is Map<String, dynamic>) {
-            return decoded;
-          } else if (decoded is List) {
-            return decoded;
-          } else {
-            return decoded;
-          }
-        }
-      } else if (result.statusCode == 401) {
-        if (!context.mounted) return [];
-        ConfirmationOK("Authentication Failed !!!..ReLogin !!!", context);
-        try {
-          ResponseViewModel? value =
-          ResponseViewModel.fromJson(jsonDecode(result.body));
-          msgshow(value.Message, "", Colors.white, Colors.green, null,
-              18.00 - AppGlobals.reducesize, AppGlobals.tll, AppGlobals.tgc, context, 2);
-        } catch (_) {}
-        return [];
-      } else if (result.statusCode == 406) {
-        if (!context.mounted) return [];
-        ConfirmationOK(
-            "Already Login Another User.ReLogin or Change Password !!!", context);
-        AppGlobals.loginId = 0;
-        AppGlobals.loginname = '';
-        AppGlobals.storagenew.setString('Username', "");
-        AppGlobals.storagenew.setString('Password', "");
-        AppGlobals.storagenew.setString('OldUsername', "");
-        return [];
-      } else if (result.statusCode == 404 || result.statusCode == 500) {
-        if (!context.mounted) return [];
-        try {
-          ResponseViewModel? value =
-          ResponseViewModel.fromJson(jsonDecode(result.body));
-          msgshow(value.Message, "", Colors.white, Colors.green, null,
-              18.00 - AppGlobals.reducesize, AppGlobals.tll, AppGlobals.tgc, context, 2);
-        } catch (e) {
-          msgshow("Server Error: ${result.statusCode}", "", Colors.white, Colors.red, null,
-              18.00 - AppGlobals.reducesize, AppGlobals.tll, AppGlobals.tgc, context, 2);
-        }
-        return [];
-      } else {
-  throw Exception('${result.statusCode} Unknown Error Occurred');
-      }
-    } on SocketException catch (_) {
-  throw Exception('Check Your Network Connection');
-    } catch (error) {
-  throw Exception('$apiname$error');
-    }
+      BuildContext? context) async {
+    return await ApiClient.postRequest(api, insertDetails, headers: header);
   }
 
   static Future<List<dynamic>> apiAllinoneSelectWithOutAuth(api, insertDetails,
-      Map<String, String>? header, BuildContext context) async {
-  String apiname = api.toString().split('?')[0];
-    apiname = "${apiname.replaceAll('$AppGlobals.port/api/', '')}: ";
-    try {
-  final headers = AppGlobals.buildRequestHeaders(header, skipAuth: true);
-  final result = await _performPostRequest(api, insertDetails, headers);
-      if (result.statusCode == 200) {
-        if (result.body == "") {
-          return [];
-        } else {
-          return jsonDecode(result.body);
-        }
-      } else if (result.statusCode == 401) {
-        if (!context.mounted) return [];
-        ConfirmationOK("Authentication Failed !!!..ReLogin !!!", context);
-        try {
-          ResponseViewModel? value =
-              ResponseViewModel.fromJson(jsonDecode(result.body));
-          msgshow(value.Message, "", Colors.white, Colors.green, null,
-              18.00 - AppGlobals.reducesize, AppGlobals.tll, AppGlobals.tgc, context, 2);
-        } catch (_) {}
-        return [];
-      } else if (result.statusCode == 406) {
-        if (!context.mounted) return [];
-        ConfirmationOK(
-            "Already Login Another User.ReLogin or Change Password !!!", context);
-        AppGlobals.loginId = 0;
-        AppGlobals.loginname = '';
-        AppGlobals.storagenew.setString('Username', "");
-        AppGlobals.storagenew.setString('Password', "");
-        AppGlobals.storagenew.setString('OldUsername', "");
-        return [];
-      } else if (result.statusCode == 404 || result.statusCode == 500) {
-        if (!context.mounted) return [];
-        try {
-          ResponseViewModel? value =
-              ResponseViewModel.fromJson(jsonDecode(result.body));
-          msgshow(value.Message, "", Colors.white, Colors.green, null,
-              18.00 - AppGlobals.reducesize, AppGlobals.tll, AppGlobals.tgc, context, 2);
-        } catch (e) {
-          msgshow("Server Error: ${result.statusCode}", "", Colors.white, Colors.red, null,
-              18.00 - AppGlobals.reducesize, AppGlobals.tll, AppGlobals.tgc, context, 2);
-        }
-        return [];
-      } else {
-  throw Exception('${result.statusCode} Unknown Error Occurred');
-      }
-    } on SocketException catch (_) {
-  throw Exception('Check Your Network Connection');
-    } catch (error) {
-  throw Exception('$apiname$error');
-    }
+      Map<String, String>? header, BuildContext? context) async {
+    final result = await ApiClient.postRequest(api, insertDetails, headers: header, skipAuth: true);
+    if (result is List) return result;
+    if (result is Map) return [result];
+    return [];
   }
 
   static Future<dynamic> apiAllinoneSelectArrayWithOutAuth(api, insertDetails,
-      Map<String, String>? header, BuildContext ?context) async {
-  String apiname = api.toString().split('?')[0];
-    apiname = "${apiname.replaceAll('$AppGlobals.port/api/', '')}: ";
-    try {
-  final headers = AppGlobals.buildRequestHeaders(header, skipAuth: true);
-  final result = await _performPostRequest(api, insertDetails, headers);
-      if (result.statusCode == 200) {
-        if (result.body == "") {
-          return [];
-        } else {
-          return jsonDecode(result.body);
-        }
-      } else if (result.statusCode == 401) {
-        if (context != null && !context.mounted) return [];
-        ConfirmationOK("Authentication Failed !!!..ReLogin !!!", context);
-        try {
-          ResponseViewModel? value =
-              ResponseViewModel.fromJson(jsonDecode(result.body));
-          msgshow(value.Message, "", Colors.white, Colors.green, null,
-              18.00 - AppGlobals.reducesize, AppGlobals.tll, AppGlobals.tgc, context, 2);
-        } catch (_) {}
-        return [];
-      } else if (result.statusCode == 406) {
-        if (context != null && !context.mounted) return [];
-        ConfirmationOK(
-            "Already Login Another User.ReLogin or Change Password !!!", context);
-        AppGlobals.loginId = 0;
-        AppGlobals.loginname = '';
-        AppGlobals.storagenew.setString('Username', "");
-        AppGlobals.storagenew.setString('Password', "");
-        AppGlobals.storagenew.setString('OldUsername', "");
-        return [];
-      } else if (result.statusCode == 404 || result.statusCode == 500) {
-        if (context != null && !context.mounted) return [];
-        try {
-          ResponseViewModel? value =
-              ResponseViewModel.fromJson(jsonDecode(result.body));
-          msgshow(value.Message, "", Colors.white, Colors.green, null,
-              18.00 - AppGlobals.reducesize, AppGlobals.tll, AppGlobals.tgc, context, 2);
-        } catch (e) {
-          msgshow("Server Error: ${result.statusCode}", "", Colors.white, Colors.red, null,
-              18.00 - AppGlobals.reducesize, AppGlobals.tll, AppGlobals.tgc, context, 2);
-        }
-        return [];
-      } else {
-  throw Exception('${result.statusCode} Unknown Error Occurred');
-      }
-    } on SocketException catch (_) {
-  throw Exception('Check Your Network Connection');
-    } catch (error) {
-  throw Exception('$apiname$error');
-    }
+      Map<String, String>? header, BuildContext? context) async {
+    return await ApiClient.postRequest(api, insertDetails, headers: header, skipAuth: true);
   }
 
   static Future<dynamic> apiAllinoneSelectArray(api, insertDetails,
       Map<String, String>? header, BuildContext? context) async {
-  String apiname = api.toString().split('?')[0];
-    apiname = "${apiname.replaceAll('$AppGlobals.port/api/', '')}: ";
-    try {
-  final headers = AppGlobals.buildRequestHeaders(header);
-  final result = await _performPostRequest(api, insertDetails, headers);
-
-      if (result.statusCode == 200) {
-        if (result.body == "") {
-          return [];
-        } else {
-          return jsonDecode(result.body);
-        }
-      } else if (result.statusCode == 401) {
-        if (context != null) {
-          ConfirmationOK("Authentication Failed !!!..ReLogin !!!", context);
-          ResponseViewModel? value =
-          ResponseViewModel.fromJson(jsonDecode(result.body));
-          msgshow(value.Message, "", Colors.white, Colors.green, null,
-              18.00 - AppGlobals.reducesize, AppGlobals.tll, AppGlobals.tgc, context, 2);
-        }
-        return [];
-      } else if (result.statusCode == 406) {
-        AppGlobals.loginId = 0;
-        AppGlobals.loginname = '';
-        AppGlobals.storagenew.setString('Username', "");
-        AppGlobals.storagenew.setString('Password', "");
-        AppGlobals.storagenew.setString('OldUsername', "");
-        if (context != null) {
-          ConfirmationOK(
-              "Already Login Another User.ReLogin or Change Password !!!", context);
-        }
-        return [];
-      } else if (result.statusCode == 404 || result.statusCode == 500) {
-        if (context != null) {
-          ResponseViewModel? value =
-          ResponseViewModel.fromJson(jsonDecode(result.body));
-          msgshow(value.Message, "", Colors.white, Colors.green, null,
-              18.00 - AppGlobals.reducesize, AppGlobals.tll, AppGlobals.tgc, context, 2);
-        }
-        return [];
-      } else {
-  throw Exception('${result.statusCode} Unknown Error Occurred');
-      }
-    } on SocketException catch (_) {
-  throw Exception('Check Your Network Connection');
-    } catch (error) {
-  throw Exception('$apiname$error');
-    }
+    return await ApiClient.postRequest(api, insertDetails, headers: header);
   }
 
   static Future<dynamic> apiAllinone(api, insertDetails, Map<String, String>? header, BuildContext context) async {
-  String apiname = api.toString().split('?')[0];
-    apiname = "${apiname.replaceAll('$AppGlobals.port/api/', '')}: ";
-    try {
-  final headers = AppGlobals.buildRequestHeaders(header);
-  final result = await _performPostRequest(api, insertDetails, headers);
-      if (result.statusCode == 200) {
-        return true;
-      } else if (result.statusCode == 401) {
-        ConfirmationOK("Authentication Failed !!!..ReLogin !!!", context);
-        ResponseViewModel? value =
-            ResponseViewModel.fromJson(jsonDecode(result.body));
-        msgshow(value.Message, "", Colors.white, Colors.green, null,
-            18.00 - AppGlobals.reducesize, AppGlobals.tll, AppGlobals.tgc, context, 2);
-        return [];
-      } else if (result.statusCode == 406) {
-        ConfirmationOK(
-            "Already Login Another User.ReLogin or Change Password !!!", context);
-        AppGlobals.loginId = 0;
-        AppGlobals.loginname = '';
-        AppGlobals.storagenew.setString('Username', "");
-        AppGlobals.storagenew.setString('Password', "");
-        AppGlobals.storagenew.setString('OldUsername', "");
-        return [];
-      } else if (result.statusCode == 404) {
-        ResponseViewModel? value =
-            ResponseViewModel.fromJson(jsonDecode(result.body));
-        msgshow(value.Message, "", Colors.white, Colors.green, null,
-            18.00 - AppGlobals.reducesize, AppGlobals.tll, AppGlobals.tgc, context, 2);
-        return false;
-      } else if (result.statusCode == 406) {
-        ConfirmationOK("Already login another devices.Please ReLogin.", context);
-        return false;
-      } else if (result.statusCode == 409) {
-        ResponseViewModel? value =
-            ResponseViewModel.fromJson(jsonDecode(result.body));
-        msgshow(value.Message, "", Colors.white, Colors.green, null,
-            18.00 - AppGlobals.reducesize, AppGlobals.tll, AppGlobals.tgc, context, 2);
-        return false;
-      } else if (result.statusCode == 500) {
-        ResponseViewModel? value =
-            ResponseViewModel.fromJson(jsonDecode(result.body));
-        msgshow(value.Message, "", Colors.white, Colors.green, null,
-            18.00 - AppGlobals.reducesize, AppGlobals.tll, AppGlobals.tgc, context, 2);
-        return false;
-      } else {
-  throw Exception('${result.statusCode} Unknown Error Occurred');
-      }
-    } on SocketException catch (_) {
-      msgshow('Check Your Network Connection', "", Colors.white, Colors.red, null,
-          18.00 - AppGlobals.reducesize, AppGlobals.tll, AppGlobals.tgc, context, 2);
-  throw Exception('Check Your Network Connection');
-    } catch (error) {
-      msgshow('Check Your Network Connection', "", Colors.white, Colors.red, null,
-          18.00 - AppGlobals.reducesize, AppGlobals.tll, AppGlobals.tgc, context, 2);
-  throw Exception('$apiname$error');
-    }
+    return await ApiClient.postRequest(api, insertDetails, headers: header);
   }
 
   static Future<String> apiGetString(api) async {
-    try {
-      debugPrint(api);
-      AppGlobals.numberofapicalls = AppGlobals.numberofapicalls + 1;
-  var result = await http.post(Uri.parse(api)).timeout(const Duration(seconds: 30));
-      if (result.statusCode == 200) {
-        AppGlobals.numberofapicalls = AppGlobals.numberofapicalls - 1;
-        return jsonDecode(result.body).toString();
-      } else {
-        AppGlobals.numberofapicalls = AppGlobals.numberofapicalls - 1;
-  throw Exception('Failed to Get String');
-      }
-    } on SocketException catch (_) {
-      AppGlobals.networkConnection = false;
-      AppGlobals.currenttryconnection = AppGlobals.currenttryconnection + 1;
-  throw Exception('There is No Network !!');
-    }
+    return await ApiClient.getString(api);
   }
 
   static Future<void> EmployeeLogin(context, int type) async {
@@ -483,6 +153,7 @@ class ApiLegacyHelper {
                           if (AppGlobals.txtLoginEmployee.text == "") {
                             await OnlineApi.SelectEmployee(
                                 context, 'Sales', 'admin');
+                            if (!context.mounted) return;
                             Navigator.push(
                               context,
                               MaterialPageRoute(
@@ -628,25 +299,10 @@ class ApiLegacyHelper {
     AppGlobals.DriverLogin = 0;
     AppGlobals.DriverTruckRefId = 0;
 
-    AppGlobals.storagenew.setString('Username', "");
-    AppGlobals.storagenew.setString('Password', "");
-    AppGlobals.storagenew.setString('OldUsername', "");
+    await
+    AppPreferences.clearOnLogout();
 
-
-    Navigator.pushAndRemoveUntil(
-      context,
-      MaterialPageRoute(
-        builder: (_) => BlocProvider(
-          create: (_) => LoginBloc(
-            authRepository: AuthRepository(
-              authApi: AuthApi.instance,
-            ),
-          ),
-          child: const Appuserloginmobile(),
-        ),
-      ),
-          (Route<dynamic> route) => false,
-    );
+    if (!context.mounted) return;
+    context.go('/login');
   }
-
 }

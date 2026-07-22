@@ -8,7 +8,6 @@ import 'package:maleva/core/theme/palette.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:http/http.dart' as http;
-import 'package:maleva/core/utils/app_globals.dart';
 import '../../../../../core/di/injection.dart';
 import '../../../../../core/theme/tokens.dart';
 import '../bloc/summonentry_bloc.dart';
@@ -95,7 +94,7 @@ class _SummonViewBody extends StatelessWidget {
                     color: AppTokens.brandLight,
                     borderRadius: BorderRadius.circular(12),
                     border: Border.all(
-                        color: AppTokens.brandMid.withOpacity(0.3)),
+                        color: AppTokens.brandMid.withValues(alpha: 0.3)),
                   ),
                   child: Column(
                     children: [
@@ -122,6 +121,7 @@ class _SummonViewBody extends StatelessWidget {
                                   ),
                                 );
                                 if (picked != null) {
+                                  if (!context.mounted) return;
                                   context.read<SummonBloc>().add(
                                       SelectViewFromDateEvent(picked));
                                 }
@@ -149,6 +149,7 @@ class _SummonViewBody extends StatelessWidget {
                                   ),
                                 );
                                 if (picked != null) {
+                                  if (!context.mounted) return;
                                   context.read<SummonBloc>().add(
                                       SelectViewToDateEvent(picked));
                                 }
@@ -242,7 +243,7 @@ class _SummonCard extends StatelessWidget {
         border: Border.all(color: AppTokens.brandLight, width: 1.5),
         boxShadow: [
           BoxShadow(
-              color: AppTokens.brandGradientStart.withOpacity(0.07),
+              color: AppTokens.brandGradientStart.withValues(alpha: 0.07),
               blurRadius: 10,
               offset: const Offset(0, 3))
         ],
@@ -295,7 +296,7 @@ class _SummonCard extends StatelessWidget {
             ),
 
             const SizedBox(height: 10),
-            Divider(color: AppTokens.brandLight, thickness: 1),
+            const Divider(color: AppTokens.brandLight, thickness: 1),
 
             // Info rows
             _infoRow("Summon", item['Summon']),
@@ -416,6 +417,7 @@ class _ImagePreviewDialog extends StatelessWidget {
       await file.writeAsBytes(response.bodyBytes);
       await Share.shareXFiles([XFile(filePath)], text: "Shared Image");
     } catch (e) {
+      if (!context.mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text("Sharing failed: $e")));
     }
@@ -435,7 +437,7 @@ Widget _dateField({
       decoration: BoxDecoration(
         color: Palette.kWhite,
         borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: AppTokens.brandMid.withOpacity(0.4)),
+        border: Border.all(color: AppTokens.brandMid.withValues(alpha: 0.4)),
       ),
       child: Row(
         children: [

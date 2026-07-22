@@ -2,18 +2,14 @@ import 'package:maleva/core/network/api_legacy_helper.dart';
 import 'package:flutter/Material.dart';
 import 'package:maleva/core/widgets/custom_app_bar.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import '../../../../core/bluetooth/view/Bluetooth_tab.dart';
 import '../../../../core/colors/colors.dart' as colour;
-import '../../../../core/models/model.dart';
-import 'package:maleva/core/utils/app_globals.dart';
 import '../../../../menu/menulist.dart';
 import '../../common_tabs/driverlicense/view/driverlicense_tab.dart';
 import '../../common_tabs/drivermaintenance/view/drivermaintenance_tab.dart';
 import '../../common_tabs/driversalary/view/driversalary_tab.dart';
 import '../../common_tabs/pdo/view/pdo_tab.dart';
-import '../../common_tabs/saleorderview/view/saleorderview_tab.dart';
 import '../../common_tabs/summonentry/view/summonentry_tab.dart';
 import '../../common_tabs/transport/view/transportview_tab.dart';
 import '../../common_tabs/driverleave/view/driver_leave_request_tab.dart';
@@ -49,7 +45,7 @@ class DriverDashboardView extends StatelessWidget {
           icon: Icon(Icons.bluetooth_audio,
               size: isTablet ? 28 : 25),
           onPressed: () => Navigator.push(context,
-              MaterialPageRoute(builder: (_) => BluetoothPage())),
+              MaterialPageRoute(builder: (_) => const BluetoothPage())),
         ),
 
         IconButton(
@@ -73,7 +69,7 @@ class DriverDashboardView extends StatelessWidget {
         borderRadius: BorderRadius.circular(isTablet ? 36 : 30),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.06),
+            color: Colors.black.withValues(alpha: 0.06),
             blurRadius: isTablet ? 12 : 0,
             offset: const Offset(0, 4),
           ),

@@ -39,6 +39,7 @@ class _EmailBody extends StatelessWidget {
         if (state is EmailSaveSuccess) {
           await ConfirmationOK(
               'Updated Successfully:\n${state.message}', context);
+          if (!context.mounted) return;
           final bloc    = context.read<EmailBloc>();
           final current = bloc.state;
           if (current is EmployeesLoaded &&
@@ -47,6 +48,7 @@ class _EmailBody extends StatelessWidget {
           }
         }
         if (state is EmailError) {
+          if (!context.mounted) return;
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
                 content:         Text(state.message),
@@ -150,7 +152,7 @@ class _EmailBody extends StatelessWidget {
                 child: CircularProgressIndicator(
                     color: AppTokens.brandGradientStart))
                 : state.emails.isEmpty
-                ? _EmptyState(isTablet: true)
+                ? const _EmptyState(isTablet: true)
                 : ListView.builder(
               itemCount: state.emails.length,
               itemBuilder: (context, index) =>
@@ -183,7 +185,7 @@ class _EmailBody extends StatelessWidget {
               child: CircularProgressIndicator(
                   color: AppTokens.brandGradientStart))
               : state.emails.isEmpty
-              ? _EmptyState(isTablet: false)
+              ? const _EmptyState(isTablet: false)
               : ListView.builder(
             itemCount: state.emails.length,
             itemBuilder: (context, index) =>
@@ -216,7 +218,7 @@ class _EmployeeDropdown extends StatelessWidget {
         color:         AppTokens.brandLight,
         borderRadius: BorderRadius.circular(isTablet ? 14 : 12),
         border: Border.all(
-            color: AppTokens.brandMid.withOpacity(0.3)),
+            color: AppTokens.brandMid.withValues(alpha: 0.3)),
       ),
       padding: EdgeInsets.symmetric(
           horizontal: isTablet ? 14 : 12),
@@ -279,7 +281,7 @@ class _CountBadge extends StatelessWidget {
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color:     AppTokens.brandGradientStart.withOpacity(0.28),
+            color:     AppTokens.brandGradientStart.withValues(alpha: 0.28),
             blurRadius: 16,
             offset:    const Offset(0, 6),
           ),
@@ -289,7 +291,7 @@ class _CountBadge extends StatelessWidget {
         Container(
           padding: const EdgeInsets.all(10),
           decoration: BoxDecoration(
-            color: colour.kWhite.withOpacity(0.20),
+            color: colour.kWhite.withValues(alpha: 0.20),
             shape: BoxShape.circle,
           ),
           child: const Icon(Icons.email_rounded,
@@ -302,7 +304,7 @@ class _CountBadge extends StatelessWidget {
             Text('Total Emails',
                 style: GoogleFonts.lato(
                   fontSize:   12,
-                  color:      colour.kWhite.withOpacity(0.75),
+                  color:      colour.kWhite.withValues(alpha: 0.75),
                   fontWeight: FontWeight.w500,
                 )),
             Text('$count',
@@ -362,6 +364,7 @@ class _SaveButton extends StatelessWidget {
               .where((e) => e.isActive)
               .toList();
           if (toSave.isEmpty) {
+            if (!context.mounted) return;
             ScaffoldMessenger.of(context).showSnackBar(
               const SnackBar(
                 content: Text(
@@ -370,6 +373,7 @@ class _SaveButton extends StatelessWidget {
             );
             return;
           }
+          if (!context.mounted) return;
           context
               .read<EmailBloc>()
               .add(const SaveEmailsEvent());
@@ -410,7 +414,7 @@ class _EmailCard extends StatelessWidget {
         border: Border.all(color: AppTokens.brandLight, width: 1.5),
         boxShadow: [
           BoxShadow(
-            color:     AppTokens.brandGradientStart.withOpacity(0.07),
+            color:     AppTokens.brandGradientStart.withValues(alpha: 0.07),
             blurRadius: 10,
             offset:    const Offset(0, 4),
           ),
@@ -485,7 +489,7 @@ class _EmailCard extends StatelessWidget {
 
             SizedBox(height: isTablet ? 14 : 12),
 
-            Divider(color: AppTokens.brandLight, thickness: 1, height: 1),
+            const Divider(color: AppTokens.brandLight, thickness: 1, height: 1),
 
             SizedBox(height: isTablet ? 10 : 8),
 
@@ -561,12 +565,12 @@ class _CheckboxChip extends StatelessWidget {
       ),
       decoration: BoxDecoration(
         color: value
-            ? activeColor.withOpacity(0.1)
+            ? activeColor.withValues(alpha: 0.1)
             : Colors.grey.shade50,
         borderRadius: BorderRadius.circular(20),
         border: Border.all(
           color: value
-              ? activeColor.withOpacity(0.4)
+              ? activeColor.withValues(alpha: 0.4)
               : Colors.grey.shade200,
         ),
       ),

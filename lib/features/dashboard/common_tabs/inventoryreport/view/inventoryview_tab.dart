@@ -79,7 +79,7 @@ class _InventoryBody extends StatelessWidget {
                 Border.all(color: AppTokens.brandLight, width: 1.5),
                 boxShadow: [
                   BoxShadow(
-                      color: AppTokens.brandGradientStart.withOpacity(0.05),
+                      color: AppTokens.brandGradientStart.withValues(alpha: 0.05),
                       blurRadius: 8,
                       offset: const Offset(0, 3)),
                 ],
@@ -135,12 +135,12 @@ class _InventoryBody extends StatelessWidget {
                                     color: isActive
                                         ? AppTokens.brandGradientStart
                                         : AppTokens.brandMid
-                                        .withOpacity(0.3)),
+                                        .withValues(alpha: 0.3)),
                                 boxShadow: isActive
                                     ? [
                                   BoxShadow(
                                       color: AppTokens.brandGradientStart
-                                          .withOpacity(0.3),
+                                          .withValues(alpha: 0.3),
                                       blurRadius: 6,
                                       offset: const Offset(
                                           0, 3))
@@ -195,7 +195,7 @@ class _InventoryBody extends StatelessWidget {
                 Border.all(color: AppTokens.brandLight, width: 1.5),
                 boxShadow: [
                   BoxShadow(
-                      color: AppTokens.brandGradientStart.withOpacity(0.05),
+                      color: AppTokens.brandGradientStart.withValues(alpha: 0.05),
                       blurRadius: 8,
                       offset: const Offset(0, 3)),
                 ],
@@ -247,7 +247,7 @@ class _InventoryBody extends StatelessWidget {
                               border: Border.all(
                                 color: custName.isNotEmpty
                                     ? AppTokens.brandMid
-                                    .withOpacity(0.4)
+                                    .withValues(alpha: 0.4)
                                     : Colors.grey.shade300,
                               ),
                             ),
@@ -322,7 +322,7 @@ class _InventoryBody extends StatelessWidget {
                                 color: (s?.isChecked ?? false)
                                     ? AppTokens.brandGradientStart
                                     : AppTokens.brandMid
-                                    .withOpacity(0.3)),
+                                    .withValues(alpha: 0.3)),
                           ),
                           child: Row(
                               mainAxisSize: MainAxisSize.min,
@@ -370,7 +370,7 @@ class _InventoryBody extends StatelessWidget {
                   borderRadius: BorderRadius.circular(14),
                   border: Border.all(
                       color:
-                      AppTokens.brandMid.withOpacity(0.3)),
+                      AppTokens.brandMid.withValues(alpha: 0.3)),
                 ),
                 child: Row(children: [
                   Expanded(
@@ -397,7 +397,7 @@ class _InventoryBody extends StatelessWidget {
                       width: 1,
                       height: 28,
                       color:
-                      AppTokens.brandMid.withOpacity(0.3),
+                      AppTokens.brandMid.withValues(alpha: 0.3),
                       margin: const EdgeInsets.symmetric(
                           horizontal: 8)),
                   Expanded(
@@ -470,7 +470,7 @@ class _InventoryBody extends StatelessWidget {
                 ]),
               ),
 
-            Divider(
+            const Divider(
                 color: AppTokens.brandLight,
                 thickness: 1.5,
                 height: 10),
@@ -659,7 +659,7 @@ class _InventoryGridCard extends StatelessWidget {
           boxShadow: [
             BoxShadow(
                 color: AppTokens.brandGradientStart
-                    .withOpacity(isSelected ? 0.15 : 0.06),
+                    .withValues(alpha: isSelected ? 0.15 : 0.06),
                 blurRadius: isSelected ? 14 : 8,
                 offset: const Offset(0, 3)),
           ],
@@ -693,7 +693,7 @@ class _InventoryGridCard extends StatelessWidget {
                     padding: const EdgeInsets.symmetric(
                         horizontal: 7, vertical: 2),
                     decoration: BoxDecoration(
-                      color: colour.kWhite.withOpacity(0.2),
+                      color: colour.kWhite.withValues(alpha: 0.2),
                       borderRadius: BorderRadius.circular(20),
                     ),
                     child: Text(item.jobStatus ?? '-',
@@ -733,7 +733,7 @@ class _InventoryGridCard extends StatelessWidget {
                     _gridRow(
                         Icons.access_time_rounded, item.eta),
                     const Spacer(),
-                    Divider(
+                    const Divider(
                         color: AppTokens.brandLight,
                         height: 10,
                         thickness: 1),
@@ -809,7 +809,7 @@ class _EmptyDetailPanel extends StatelessWidget {
         border: Border.all(color: AppTokens.brandLight, width: 1.5),
         boxShadow: [
           BoxShadow(
-              color: AppTokens.brandGradientStart.withOpacity(0.05),
+              color: AppTokens.brandGradientStart.withValues(alpha: 0.05),
               blurRadius: 12,
               offset: const Offset(0, 4))
         ],
@@ -855,7 +855,7 @@ class _InventoryDetailPanel extends StatelessWidget {
         border: Border.all(color: AppTokens.brandLight, width: 1.5),
         boxShadow: [
           BoxShadow(
-              color: AppTokens.brandGradientStart.withOpacity(0.07),
+              color: AppTokens.brandGradientStart.withValues(alpha: 0.07),
               blurRadius: 16,
               offset: const Offset(0, 5))
         ],
@@ -896,7 +896,7 @@ class _InventoryDetailPanel extends StatelessWidget {
                   padding: const EdgeInsets.symmetric(
                       horizontal: 8, vertical: 3),
                   decoration: BoxDecoration(
-                    color: colour.kWhite.withOpacity(0.2),
+                    color: colour.kWhite.withValues(alpha: 0.2),
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Text(item.jobStatus ?? '-',
@@ -1025,7 +1025,7 @@ class _InventoryDetailPanel extends StatelessWidget {
   }
 
   Widget _divider() =>
-      Divider(color: AppTokens.brandLight, thickness: 1, height: 14);
+      const Divider(color: AppTokens.brandLight, thickness: 1, height: 14);
 }
 
 // ── Customer Select Page (unchanged) ─────────────────────────────────────────
@@ -1111,7 +1111,7 @@ class _InventoryCustomerSelectPageState
           padding: const EdgeInsets.symmetric(
               horizontal: 16, vertical: 10),
           child: Row(children: [
-            Icon(Icons.person_rounded,
+            const Icon(Icons.person_rounded,
                 color: AppTokens.brandMid, size: 16),
             const SizedBox(width: 6),
             Text("${_filtered.length} customers",
@@ -1163,7 +1163,7 @@ class _InventoryCustomerSelectPageState
                     boxShadow: [
                       BoxShadow(
                           color: AppTokens.brandGradientStart
-                              .withOpacity(0.05),
+                              .withValues(alpha: 0.05),
                           blurRadius: 6,
                           offset: const Offset(0, 2)),
                     ],

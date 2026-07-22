@@ -4,7 +4,6 @@
 import 'package:maleva/core/network/api_client.dart';
 import 'package:maleva/core/network/api_constants.dart';
 import 'package:maleva/core/utils/app_preferences.dart';
-import 'package:intl/intl.dart';
 
 class ReportsApi {
   ReportsApi._();

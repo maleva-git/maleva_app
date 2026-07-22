@@ -5,6 +5,6 @@ void main() async {
   var request = await HttpClient().postUrl(Uri.parse(url));
   var response = await request.close();
   var responseBody = await response.transform(utf8.decoder).join();
-  print('Status: ' + response.statusCode.toString());
-  print('Body: ' + responseBody);
+  print('Status: ${response.statusCode}');
+  print('Body: $responseBody');
 }

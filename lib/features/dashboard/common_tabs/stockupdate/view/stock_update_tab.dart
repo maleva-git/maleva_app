@@ -83,6 +83,7 @@ class _StockUpdatePageState
         saleOrderId,
         'SalesOrder',
         statusName.replaceAll(' ', ''));
+    if (!mounted) return;
     context
         .read<StockUpdateBloc>()
         .add(StockUpdateImagePicked(url));
@@ -98,13 +99,15 @@ class _StockUpdatePageState
         if (state is StockUpdateSaveSuccess) {
           await ConfirmationOK(
               'Updated Successfully', context);
-          Navigator.pushReplacement(
+          if (!context.mounted) return;
+Navigator.pushReplacement(
             context,
             MaterialPageRoute(
                 builder: (_) => const StockUpdate()),
           );
         }
         if (state is StockUpdateError) {
+          if (!context.mounted) return;
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text(state.message,
@@ -182,7 +185,7 @@ class _StockUpdatePageState
           const SizedBox(height: 2),
           Text(userName,
               style: GoogleFonts.lato(
-                  color: Colors.white.withOpacity(0.65),
+                  color: Colors.white.withValues(alpha: 0.65),
                   fontWeight: FontWeight.w500,
                   fontSize: 12)),
         ],
@@ -194,10 +197,10 @@ class _StockUpdatePageState
               right: 12, top: 10, bottom: 10),
           child: Container(
             decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.15),
+              color: Colors.white.withValues(alpha: 0.15),
               borderRadius: BorderRadius.circular(8),
               border: Border.all(
-                  color: Colors.white.withOpacity(0.4),
+                  color: Colors.white.withValues(alpha: 0.4),
                   width: 0.5),
             ),
             child: Material(
@@ -300,7 +303,7 @@ class _PackagesScanRow extends StatelessWidget {
         border: Border.all(color: kCardBorder, width: 0.5),
         boxShadow: [
           BoxShadow(
-              color: kHeaderGradStart.withOpacity(0.06),
+              color: kHeaderGradStart.withValues(alpha: 0.06),
               blurRadius: 8,
               offset: const Offset(0, 2)),
         ],
@@ -336,7 +339,7 @@ class _PackagesScanRow extends StatelessWidget {
                 horizontal: 10, vertical: 5),
             decoration: BoxDecoration(
               color: state.scnPkg > 0
-                  ? kAccentRed.withOpacity(0.10)
+                  ? kAccentRed.withValues(alpha: 0.10)
                   : kDetailBg,
               borderRadius: BorderRadius.circular(8),
             ),
@@ -382,7 +385,7 @@ class _ScanButton extends StatelessWidget {
         borderRadius: BorderRadius.circular(10),
         boxShadow: [
           BoxShadow(
-              color: kHeaderGradStart.withOpacity(0.30),
+              color: kHeaderGradStart.withValues(alpha: 0.30),
               blurRadius: 8,
               offset: const Offset(0, 3)),
         ],
@@ -435,6 +438,7 @@ class _WarehouseField extends StatelessWidget {
         ).then((_) {
           final sel = AppGlobals.SelectWareHouseList;
           if (sel.Id != 0) {
+            if (!context.mounted) return;
             context.read<StockUpdateBloc>().add(
                 StockUpdateWarehouseSelected(
                     warehouseId:   sel.Id,
@@ -583,9 +587,10 @@ class _StatusField extends StatelessWidget {
                 SearchId: 0,
                 JobTypeId: state.jobId,
               )),
-        ).then((_navRes) { if (_navRes != null) { AppGlobals.SelectAllStatusList = _navRes; }
+        ).then((navRes) { if (navRes != null) { AppGlobals.SelectAllStatusList = navRes; }
           final sel = AppGlobals.SelectAllStatusList;
           if (sel.Status != 0) {
+            if (!context.mounted) return;
             context.read<StockUpdateBloc>().add(
                 StockUpdateStatusSelected(
                     statusId:   sel.Status,
@@ -655,7 +660,7 @@ class _SaveButton extends StatelessWidget {
         borderRadius: BorderRadius.circular(10),
         boxShadow: [
           BoxShadow(
-              color: kHeaderGradStart.withOpacity(0.30),
+              color: kHeaderGradStart.withValues(alpha: 0.30),
               blurRadius: 8,
               offset: const Offset(0, 3)),
         ],
@@ -671,6 +676,7 @@ class _SaveButton extends StatelessWidget {
                     context,
                     'Do you want to update the Status ?');
                 if (ok == true) {
+                  if (!context.mounted) return;
                   context
                       .read<StockUpdateBloc>()
                       .add(StockUpdateSaveRequested());
@@ -817,7 +823,7 @@ class _ScannedItemRow extends StatelessWidget {
             child: Container(
               padding: const EdgeInsets.all(4),
               decoration: BoxDecoration(
-                color: kAccentRed.withOpacity(0.08),
+                color: kAccentRed.withValues(alpha: 0.08),
                 borderRadius: BorderRadius.circular(6),
               ),
               child: Icon(
@@ -931,7 +937,7 @@ class _PickBtn extends StatelessWidget {
         padding: const EdgeInsets.all(6),
         decoration: BoxDecoration(
           color: enabled
-              ? kHeaderGradStart.withOpacity(0.08)
+              ? kHeaderGradStart.withValues(alpha: 0.08)
               : Colors.transparent,
           borderRadius: BorderRadius.circular(8),
         ),
@@ -1002,6 +1008,7 @@ class _ImageGrid extends StatelessWidget {
                     ctx,
                     'Are you sure to Delete ?');
                 if (ok == true) {
+                  if (!context.mounted) return;
                   context
                       .read<StockUpdateBloc>()
                       .add(StockUpdateImageDeleted(i));

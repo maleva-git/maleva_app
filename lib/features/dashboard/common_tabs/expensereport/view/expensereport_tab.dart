@@ -81,13 +81,13 @@ class ExpenseReportView extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  _SectionHeader(title: 'Expense Report', isTablet: true),
+                  const _SectionHeader(title: 'Expense Report', isTablet: true),
                   const SizedBox(height: 20),
                   _SummaryCard(
                       saleExpReport: state.saleExpReport,
                       isTablet: true),
                   const SizedBox(height: 20),
-                  _DatePickerCard(isTablet: true),
+                  const _DatePickerCard(isTablet: true),
                   const SizedBox(height: 20),
                 ],
               ),
@@ -102,7 +102,7 @@ class ExpenseReportView extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                _ListHeader(isTablet: true),
+                const _ListHeader(isTablet: true),
                 const SizedBox(height: 10),
                 Expanded(
                   child: ListView.builder(
@@ -146,17 +146,17 @@ class ExpenseReportView extends StatelessWidget {
     return ListView(
       padding: const EdgeInsets.fromLTRB(16, 20, 16, 24),
       children: [
-        _SectionHeader(title: 'Expense Report', isTablet: false),
+        const _SectionHeader(title: 'Expense Report', isTablet: false),
         const SizedBox(height: 16),
 
         _SummaryCard(
             saleExpReport: state.saleExpReport, isTablet: false),
         const SizedBox(height: 20),
 
-        _DatePickerCard(isTablet: false),
+        const _DatePickerCard(isTablet: false),
         const SizedBox(height: 20),
 
-        _ListHeader(isTablet: false),
+        const _ListHeader(isTablet: false),
         const SizedBox(height: 8),
 
         ...List.generate(state.saleExpReport2.length, (index) {
@@ -244,7 +244,7 @@ class _SummaryCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(isTablet ? 24 : 20),
         boxShadow: [
           BoxShadow(
-            color: AppTokens.brandGradientStart.withOpacity(0.35),
+            color: AppTokens.brandGradientStart.withValues(alpha: 0.35),
             blurRadius: 20,
             offset: const Offset(0, 8),
           ),
@@ -265,7 +265,7 @@ class _SummaryCard extends StatelessWidget {
                 flex: 3,
                 child: Text('Period',
                     style: GoogleFonts.poppins(
-                        color: colour.kWhite.withOpacity(0.75),
+                        color: colour.kWhite.withValues(alpha: 0.75),
                         fontSize: isTablet ? 13 : 12,
                         fontWeight: FontWeight.w600)),
               ),
@@ -274,7 +274,7 @@ class _SummaryCard extends StatelessWidget {
                 child: Text('Count',
                     textAlign: TextAlign.center,
                     style: GoogleFonts.poppins(
-                        color: colour.kWhite.withOpacity(0.75),
+                        color: colour.kWhite.withValues(alpha: 0.75),
                         fontSize: isTablet ? 13 : 12,
                         fontWeight: FontWeight.w600)),
               ),
@@ -283,7 +283,7 @@ class _SummaryCard extends StatelessWidget {
                 child: Text('Amount',
                     textAlign: TextAlign.end,
                     style: GoogleFonts.poppins(
-                        color: colour.kWhite.withOpacity(0.75),
+                        color: colour.kWhite.withValues(alpha: 0.75),
                         fontSize: isTablet ? 13 : 12,
                         fontWeight: FontWeight.w600)),
               ),
@@ -376,7 +376,7 @@ class _DatePickerCard extends StatelessWidget {
             border: Border.all(color: AppTokens.brandLight, width: 1.5),
             boxShadow: [
               BoxShadow(
-                color: AppTokens.brandGradientStart.withOpacity(0.08),
+                color: AppTokens.brandGradientStart.withValues(alpha: 0.08),
                 blurRadius: 12,
                 offset: const Offset(0, 4),
               ),
@@ -409,6 +409,7 @@ class _DatePickerCard extends StatelessWidget {
                     ),
                   );
                   if (value != null) {
+                    if (!context.mounted) return;
                     context.read<ExpenseReportBloc>().add(
                       SelectFromDateEvent(value), // ✅ New Event takes DateTime directly
                     );
@@ -450,6 +451,7 @@ class _DatePickerCard extends StatelessWidget {
                     ),
                   );
                   if (value != null) {
+                    if (!context.mounted) return;
                     context.read<ExpenseReportBloc>().add(
                       SelectToDateEvent(value), // ✅ New Event takes DateTime directly
                     );
@@ -602,7 +604,7 @@ class _ExpenseItemCard extends StatelessWidget {
               border: Border.all(color: AppTokens.brandLight, width: 1.2),
               boxShadow: [
                 BoxShadow(
-                  color: AppTokens.brandGradientStart.withOpacity(0.06),
+                  color: AppTokens.brandGradientStart.withValues(alpha: 0.06),
                   blurRadius: 8,
                   offset: const Offset(0, 3),
                 ),

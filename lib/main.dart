@@ -1,5 +1,4 @@
 import 'dart:io';
-import 'dart:ui';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
@@ -16,7 +15,6 @@ import 'package:maleva/features/troubleshoot/data/applog_api.dart';
 
 import 'core/di/injection.dart';
 import 'core/utils/app_preferences.dart';
-import 'package:maleva/core/logging/app_navigator_observer.dart';
 
 class MyHttpOverrides extends HttpOverrides {
   @override

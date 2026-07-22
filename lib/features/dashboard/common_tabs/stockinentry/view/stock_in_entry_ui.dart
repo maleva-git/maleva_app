@@ -16,7 +16,6 @@ import '../../../../../core/di/injection.dart';
 import '../../../../../core/theme/palette.dart';
 import '../../../../mastersearch/JobAllStatus.dart';
 import '../../../../transaction/salesorder/add/view/salesorderadd_tab.dart';
-import '../../saleorderdetails/view/saleorderdetails_tab.dart';
 import '../bloc/stock_in_entry_bloc.dart';
 import '../bloc/stock_in_entry_event.dart';
 import '../bloc/stock_in_entry_state.dart';
@@ -58,7 +57,7 @@ class Stockinentry extends StatelessWidget {
 }
 
 class StockInEntryPage extends StatefulWidget {
-  const StockInEntryPage();
+  const StockInEntryPage({super.key});
 
   @override
   State<StockInEntryPage> createState() =>
@@ -101,6 +100,7 @@ class _StockInEntryPageState
               context,
               'Stock Already Exists !! Do you want Remove and Save ??');
           if (ok == true) {
+            if (!context.mounted) return;
             context.read<StockInEntryBloc>().add(
                 StockInEntryJobNoSelected(
                     saleOrderId: state.saleOrderId,
@@ -110,10 +110,10 @@ class _StockInEntryPageState
         }
         // ── Save success ──────────────────────────────
         if (state is StockInEntrySaveSuccess) {
-          await ConfirmationOK(
-              'Saved Successfully', context);
+          await ConfirmationOK('Saved Successfully', context);
           if (!mounted) return;
           // Print barcode
+          if (!context.mounted) return;
           await _doPrint(state.stockId, context);
           if (!mounted) return;
           Navigator.pushReplacement(
@@ -124,6 +124,7 @@ class _StockInEntryPageState
         }
         // ── Error ─────────────────────────────────────
         if (state is StockInEntryLoaded && state.navigateEditSalesOrder) {
+          if (!context.mounted) return;
           context.read<StockInEntryBloc>().add(StockInEntryNavigationHandled());
           Navigator.push(
             context,
@@ -136,6 +137,7 @@ class _StockInEntryPageState
           );
         }
         if (state is StockInEntryError) {
+          if (!context.mounted) return;
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text(state.message,
@@ -269,6 +271,7 @@ class _StockInEntryPageState
                   context, 'Do you want to Save ?')
                   .then((ok) {
                 if (ok == true) {
+                  if (!context.mounted) return;
                   context
                       .read<StockInEntryBloc>()
                       .add(StockInEntrySaveRequested());
@@ -585,7 +588,7 @@ class _JobNoRowState extends State<_JobNoRow> {
               boxShadow: [
                 BoxShadow(
                     color:
-                    Palette.blue700.withOpacity(0.10),
+                    Palette.blue700.withValues(alpha: 0.10),
                     blurRadius: 10,
                     offset: const Offset(0, 4)),
               ],
@@ -795,6 +798,7 @@ class _DateRow extends StatelessWidget {
               ),
             );
             if (picked != null) {
+              if (!context.mounted) return;
               context.read<StockInEntryBloc>().add(
                   StockInEntryDateChanged(
                       DateFormat('yyyy-MM-dd')
@@ -948,9 +952,10 @@ class _StatusField extends StatelessWidget {
                 SearchId: 0,
                 JobTypeId: state.jobMasterId,
               )),
-        ).then((_navRes) { if (_navRes != null) { AppGlobals.SelectAllStatusList = _navRes; }
+        ).then((navRes) { if (navRes != null) { AppGlobals.SelectAllStatusList = navRes; }
           final sel = AppGlobals.SelectAllStatusList;
           if (sel.Status != 0) {
+            if (!context.mounted) return;
             context.read<StockInEntryBloc>().add(
                 StockInEntryStatusSelected(
                     statusId: sel.Status,
@@ -1104,7 +1109,7 @@ class _PickBtn extends StatelessWidget {
         padding: const EdgeInsets.all(6),
         decoration: BoxDecoration(
           color: enabled
-              ? Palette.blue700.withOpacity(0.08)
+              ? Palette.blue700.withValues(alpha: 0.08)
               : Colors.transparent,
           borderRadius: BorderRadius.circular(8),
         ),
@@ -1175,6 +1180,7 @@ class _ImageGrid extends StatelessWidget {
                     ctx,
                     'Are you sure to Delete ?');
                 if (ok == true) {
+                  if (!context.mounted) return;
                   context
                       .read<StockInEntryBloc>()
                       .add(StockInEntryImageDeleted(i));
@@ -1292,7 +1298,7 @@ class _GradientButton extends StatelessWidget {
         borderRadius: BorderRadius.circular(10),
         boxShadow: [
           BoxShadow(
-              color: Palette.blue700.withOpacity(0.30),
+              color: Palette.blue700.withValues(alpha: 0.30),
               blurRadius: 8,
               offset: const Offset(0, 3)),
         ],
@@ -1340,10 +1346,10 @@ class _AppBarButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.15),
+        color: Colors.white.withValues(alpha: 0.15),
         borderRadius: BorderRadius.circular(8),
         border: Border.all(
-            color: Colors.white.withOpacity(0.4),
+            color: Colors.white.withValues(alpha: 0.4),
             width: 0.5),
       ),
       child: Material(

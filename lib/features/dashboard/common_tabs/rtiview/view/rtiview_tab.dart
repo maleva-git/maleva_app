@@ -102,7 +102,7 @@ class _RTIDetailsBody extends StatelessWidget {
                     borderRadius: BorderRadius.circular(20),
                   ),
                   child: Row(mainAxisSize: MainAxisSize.min, children: [
-                    Icon(Icons.folder_open_rounded,
+                    const Icon(Icons.folder_open_rounded,
                         size: 13, color: AppTokens.brandGradientStart),
                     const SizedBox(width: 4),
                     Text("${s!.masters.length} records",
@@ -196,7 +196,7 @@ class _RTIDetailsBody extends StatelessWidget {
             borderRadius: BorderRadius.circular(16),
           ),
           child: Column(mainAxisSize: MainAxisSize.min, children: [
-            CircularProgressIndicator(color: AppTokens.brandGradientStart),
+            const CircularProgressIndicator(color: AppTokens.brandGradientStart),
             const SizedBox(height: 16),
             Text("Loading PDF…",
                 style: GoogleFonts.lato(
@@ -284,7 +284,7 @@ class _PageHeader extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.fromLTRB(14, 14, 14, 14),
-      decoration: BoxDecoration(
+      decoration: const BoxDecoration(
         color: colour.kWhite,
         border: Border(
             bottom: BorderSide(color: AppTokens.brandLight, width: 1.5)),
@@ -299,7 +299,7 @@ class _PageHeader extends StatelessWidget {
               gradient: LinearGradient(
                 colors: [
                   AppTokens.brandGradientStart,
-                  AppTokens.brandGradientStart.withOpacity(0.75),
+                  AppTokens.brandGradientStart.withValues(alpha: 0.75),
                 ],
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
@@ -342,7 +342,7 @@ class _PageHeader extends StatelessWidget {
 
           // Arrow
           Icon(Icons.arrow_forward_rounded,
-              color: AppTokens.brandGradientStart.withOpacity(0.5), size: 18),
+              color: AppTokens.brandGradientStart.withValues(alpha: 0.5), size: 18),
 
           const SizedBox(width: 10),
 
@@ -367,7 +367,7 @@ class _PageHeader extends StatelessWidget {
               style: ElevatedButton.styleFrom(
                 backgroundColor: AppTokens.brandGradientStart,
                 disabledBackgroundColor:
-                AppTokens.brandGradientStart.withOpacity(0.4),
+                AppTokens.brandGradientStart.withValues(alpha: 0.4),
                 shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12)),
                 elevation: 0,
@@ -409,7 +409,7 @@ class _DatePickerCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 9),
       decoration: BoxDecoration(
-        color: AppTokens.brandLight.withOpacity(0.7),
+        color: AppTokens.brandLight.withValues(alpha: 0.7),
         borderRadius: BorderRadius.circular(12),
         border: Border.all(color: AppTokens.brandLight, width: 1.5),
       ),
@@ -417,9 +417,9 @@ class _DatePickerCard extends StatelessWidget {
         Container(
           padding: const EdgeInsets.all(5),
           decoration: BoxDecoration(
-              color: AppTokens.brandGradientStart.withOpacity(0.12),
+              color: AppTokens.brandGradientStart.withValues(alpha: 0.12),
               borderRadius: BorderRadius.circular(7)),
-          child: Icon(Icons.calendar_today_rounded,
+          child: const Icon(Icons.calendar_today_rounded,
               color: AppTokens.brandGradientStart, size: 13),
         ),
         const SizedBox(width: 7),
@@ -452,7 +452,7 @@ class _LoadingView extends StatelessWidget {
   Widget build(BuildContext context) {
     return Center(
       child: Column(mainAxisSize: MainAxisSize.min, children: [
-        SizedBox(
+        const SizedBox(
           width: 48,
           height: 48,
           child: CircularProgressIndicator(
@@ -526,11 +526,11 @@ class _EmptyState extends StatelessWidget {
       child: Column(mainAxisSize: MainAxisSize.min, children: [
         Container(
           padding: const EdgeInsets.all(22),
-          decoration: BoxDecoration(
+          decoration: const BoxDecoration(
               color: AppTokens.brandLight, shape: BoxShape.circle),
           child: Icon(Icons.receipt_long_outlined,
               size: 44,
-              color: AppTokens.brandGradientStart.withOpacity(0.4)),
+              color: AppTokens.brandGradientStart.withValues(alpha: 0.4)),
         ),
         const SizedBox(height: 16),
         Text("No Records Found",
@@ -574,14 +574,14 @@ class _RTIDetailsCardState extends State<_RTIDetailsCard> {
         color: colour.kWhite,
         borderRadius: BorderRadius.circular(18),
         border: Border.all(
-            color: AppTokens.brandLight.withOpacity(0.8), width: 1.5),
+            color: AppTokens.brandLight.withValues(alpha: 0.8), width: 1.5),
         boxShadow: [
           BoxShadow(
-              color: AppTokens.brandGradientStart.withOpacity(0.07),
+              color: AppTokens.brandGradientStart.withValues(alpha: 0.07),
               blurRadius: 12,
               offset: const Offset(0, 4)),
           BoxShadow(
-              color: Colors.black.withOpacity(0.02),
+              color: Colors.black.withValues(alpha: 0.02),
               blurRadius: 4,
               offset: const Offset(0, 1)),
         ],
@@ -620,7 +620,7 @@ class _RTIDetailsCardState extends State<_RTIDetailsCard> {
                         width: 40,
                         height: 40,
                         decoration: BoxDecoration(
-                            color: colour.kWhite.withOpacity(0.15),
+                            color: colour.kWhite.withValues(alpha: 0.15),
                             shape: BoxShape.circle),
                         child: const Icon(Icons.person_rounded,
                             color: colour.kWhite, size: 20),
@@ -644,7 +644,7 @@ class _RTIDetailsCardState extends State<_RTIDetailsCard> {
                               Row(children: [
                                 Icon(Icons.tag_rounded,
                                     size: 11,
-                                    color: colour.kWhite.withOpacity(0.7)),
+                                    color: colour.kWhite.withValues(alpha: 0.7)),
                                 const SizedBox(width: 3),
                                 Flexible(
                                   child: Text(
@@ -654,7 +654,7 @@ class _RTIDetailsCardState extends State<_RTIDetailsCard> {
                                     style: GoogleFonts.lato(
                                         fontSize: 12,
                                         color:
-                                        colour.kWhite.withOpacity(0.85)),
+                                        colour.kWhite.withValues(alpha: 0.85)),
                                   ),
                                 ),
                               ]),
@@ -683,10 +683,10 @@ class _RTIDetailsCardState extends State<_RTIDetailsCard> {
                       padding: const EdgeInsets.symmetric(
                           horizontal: 10, vertical: 6),
                       decoration: BoxDecoration(
-                        color: colour.kWhite.withOpacity(0.15),
+                        color: colour.kWhite.withValues(alpha: 0.15),
                         borderRadius: BorderRadius.circular(8),
                         border: Border.all(
-                            color: colour.kWhite.withOpacity(0.25), width: 1),
+                            color: colour.kWhite.withValues(alpha: 0.25), width: 1),
                       ),
                       child: Row(mainAxisSize: MainAxisSize.min, children: [
                         Icon(Icons.picture_as_pdf_outlined,
@@ -708,14 +708,14 @@ class _RTIDetailsCardState extends State<_RTIDetailsCard> {
                     padding: const EdgeInsets.symmetric(
                         horizontal: 10, vertical: 5),
                     decoration: BoxDecoration(
-                      color: colour.kWhite.withOpacity(0.18),
+                      color: colour.kWhite.withValues(alpha: 0.18),
                       borderRadius: BorderRadius.circular(20),
                       border: Border.all(
-                          color: colour.kWhite.withOpacity(0.25), width: 1),
+                          color: colour.kWhite.withValues(alpha: 0.25), width: 1),
                     ),
                     child: Row(mainAxisSize: MainAxisSize.min, children: [
                       Icon(Icons.calendar_today_rounded,
-                          size: 10, color: colour.kWhite.withOpacity(0.75)),
+                          size: 10, color: colour.kWhite.withValues(alpha: 0.75)),
                       const SizedBox(width: 4),
                       Text(widget.master.RTIDate.toString(),
                           style: GoogleFonts.lato(
@@ -735,7 +735,7 @@ class _RTIDetailsCardState extends State<_RTIDetailsCard> {
                       turns: _expanded ? 0.5 : 0.0,
                       duration: const Duration(milliseconds: 200),
                       child: Icon(Icons.keyboard_arrow_down_rounded,
-                          color: colour.kWhite.withOpacity(0.9), size: 22),
+                          color: colour.kWhite.withValues(alpha: 0.9), size: 22),
                     ),
                   ),
                 ]),
@@ -757,9 +757,9 @@ class _RTIDetailsCardState extends State<_RTIDetailsCard> {
                 height: 1,
                 decoration: BoxDecoration(
                   gradient: LinearGradient(colors: [
-                    AppTokens.brandGradientStart.withOpacity(0.0),
-                    AppTokens.brandGradientStart.withOpacity(0.3),
-                    AppTokens.brandGradientStart.withOpacity(0.0),
+                    AppTokens.brandGradientStart.withValues(alpha: 0.0),
+                    AppTokens.brandGradientStart.withValues(alpha: 0.3),
+                    AppTokens.brandGradientStart.withValues(alpha: 0.0),
                   ]),
                 ),
               ),
@@ -829,7 +829,7 @@ class _DetailsTable extends StatelessWidget {
         child: SingleChildScrollView(
           scrollDirection: Axis.horizontal,
           child: DataTable(
-            headingRowColor: MaterialStateProperty.all(AppTokens.brandLight),
+            headingRowColor: WidgetStateProperty.all(AppTokens.brandLight),
             headingRowHeight: 38,
             dataRowMinHeight: 42,
             dataRowMaxHeight: 48,
@@ -841,7 +841,7 @@ class _DetailsTable extends StatelessWidget {
                 fontSize: 12),
             dataTextStyle: GoogleFonts.lato(
                 fontSize: 13, color: AppTokens.brandDark),
-            border: TableBorder(
+            border: const TableBorder(
               horizontalInside: BorderSide(
                   color: AppTokens.brandLight, width: 1),
             ),
@@ -855,9 +855,9 @@ class _DetailsTable extends StatelessWidget {
               final idx = entry.key;
               final d   = entry.value;
               return DataRow(
-                color: MaterialStateProperty.resolveWith<Color?>((states) {
+                color: WidgetStateProperty.resolveWith<Color?>((states) {
                   return idx.isOdd
-                      ? AppTokens.brandLight.withOpacity(0.35)
+                      ? AppTokens.brandLight.withValues(alpha: 0.35)
                       : null;
                 }),
                 cells: [

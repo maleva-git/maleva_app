@@ -7,16 +7,14 @@ import 'package:get_it/get_it.dart';
 
 
 import 'package:maleva/features/dashboard/common_tabs/driverleave/data/leave_request_model.dart';
-import 'package:maleva/core/colors/colors.dart' as colour;
 import 'package:maleva/core/widgets/maleva_inputs.dart';
 import 'package:intl/intl.dart';
 import 'package:maleva/core/utils/app_globals.dart';
-import 'package:maleva/core/network/OnlineApi.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:maleva/core/theme/tokens.dart';
 
 class DriverLeaveRequestTab extends StatelessWidget {
-  const DriverLeaveRequestTab({Key? key}) : super(key: key);
+  const DriverLeaveRequestTab({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -28,7 +26,7 @@ class DriverLeaveRequestTab extends StatelessWidget {
 }
 
 class _DriverLeaveRequestTabBody extends StatefulWidget {
-  const _DriverLeaveRequestTabBody({Key? key}) : super(key: key);
+  const _DriverLeaveRequestTabBody();
 
   @override
   State<_DriverLeaveRequestTabBody> createState() => _DriverLeaveRequestTabState();
@@ -70,8 +68,11 @@ class _DriverLeaveRequestTabState extends State<_DriverLeaveRequestTabBody> {
     );
     if (picked != null) {
       setState(() {
-        if (isFrom) _searchFromDate = picked;
-        else _searchToDate = picked;
+        if (isFrom) {
+          _searchFromDate = picked;
+        } else {
+          _searchToDate = picked;
+        }
       });
     }
   }

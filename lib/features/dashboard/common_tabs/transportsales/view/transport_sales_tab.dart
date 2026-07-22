@@ -13,7 +13,7 @@ import '../data/transport_sales_repository.dart'; // Make sure this import match
 
 
 class TransportSalesTab extends StatelessWidget {
-  const TransportSalesTab({Key? key}) : super(key: key);
+  const TransportSalesTab({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -28,7 +28,7 @@ class TransportSalesTab extends StatelessWidget {
 }
 
 class _TransportSalesTabView extends StatelessWidget {
-  const _TransportSalesTabView({Key? key}) : super(key: key);
+  const _TransportSalesTabView();
 
   @override
   Widget build(BuildContext context) {
@@ -60,7 +60,7 @@ class _TransportSalesTabView extends StatelessWidget {
                             borderRadius: BorderRadius.circular(12),
                             boxShadow: [
                               BoxShadow(
-                                color: AppTokens.invoiceHeaderStart.withOpacity(0.3),
+                                color: AppTokens.invoiceHeaderStart.withValues(alpha: 0.3),
                                 blurRadius: 8,
                                 offset: const Offset(0, 4),
                               ),
@@ -83,7 +83,7 @@ class _TransportSalesTabView extends StatelessWidget {
                               style: GoogleFonts.poppins(
                                   fontSize: 13,
                                   fontWeight: FontWeight.w500,
-                                  color: colour.commonColor.withOpacity(0.5)),
+                                  color: colour.commonColor.withValues(alpha: 0.5)),
                             ),
                           ],
                         ),
@@ -100,7 +100,7 @@ class _TransportSalesTabView extends StatelessWidget {
                         border: Border.all(color: Colors.grey.shade100),
                         boxShadow: [
                           BoxShadow(
-                            color: Colors.black.withOpacity(0.03),
+                            color: Colors.black.withValues(alpha: 0.03),
                             blurRadius: 10,
                             offset: const Offset(0, 4),
                           ),
@@ -197,7 +197,7 @@ class _TransportSalesTabView extends StatelessWidget {
                               fontSize: 12,
                               fontWeight: FontWeight.w700,
                               letterSpacing: 1.0,
-                              color: colour.commonColor.withOpacity(0.4))),
+                              color: colour.commonColor.withValues(alpha: 0.4))),
                     ),
                     const SizedBox(height: 10),
 
@@ -210,7 +210,7 @@ class _TransportSalesTabView extends StatelessWidget {
                           border: Border.all(color: Colors.grey.shade100),
                           boxShadow: [
                             BoxShadow(
-                              color: Colors.black.withOpacity(0.02),
+                              color: Colors.black.withValues(alpha: 0.02),
                               blurRadius: 12,
                               offset: const Offset(0, 5),
                             ),
@@ -246,7 +246,7 @@ class _TransportSalesTabView extends StatelessWidget {
                                         shape: BoxShape.circle,
                                         boxShadow: [
                                           BoxShadow(
-                                            color: _statusColor(index).withOpacity(0.4),
+                                            color: _statusColor(index).withValues(alpha: 0.4),
                                             blurRadius: 4,
                                             offset: const Offset(0, 2),
                                           ),
@@ -296,7 +296,7 @@ class _TransportSalesTabView extends StatelessWidget {
                                             fontSize: 12,
                                             fontWeight: FontWeight.w500,
                                             color: colour.commonColor
-                                                .withOpacity(0.4))),
+                                                .withValues(alpha: 0.4))),
                                   ],
                                 ),
                               );
@@ -319,9 +319,9 @@ class _TransportSalesTabView extends StatelessWidget {
 
                 // Loading Overlay when refreshing data
                 if (state.status == TransportSalesStatus.loading && state.rulesTypeEmployee.isNotEmpty)
-                  Positioned(
+                  const Positioned(
                     top: 0, left: 0, right: 0,
-                    child: const LinearProgressIndicator(
+                    child: LinearProgressIndicator(
                       backgroundColor: Colors.transparent,
                       color: Color(0xFF1555F3),
                       minHeight: 3,
@@ -374,7 +374,7 @@ class _StatCard extends StatelessWidget {
         border: Border.all(color: Colors.grey.shade100),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.03),
+            color: Colors.black.withValues(alpha: 0.03),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),

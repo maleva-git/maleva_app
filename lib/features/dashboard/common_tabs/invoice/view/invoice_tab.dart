@@ -422,7 +422,7 @@ class _BillingCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-              color: Colors.grey.withOpacity(0.2),
+              color: Colors.grey.withValues(alpha: 0.2),
               blurRadius: 8,
               offset: const Offset(0, 4)),
         ],
@@ -436,7 +436,7 @@ class _BillingCard extends StatelessWidget {
             Container(
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.9),
+                  color: Colors.white.withValues(alpha: 0.9),
                   shape: BoxShape.circle),
               child: const Icon(Icons.receipt_long,
                   color: AppTokens.invoiceHeaderStart, size: 28),
@@ -468,7 +468,7 @@ class _BillingCard extends StatelessWidget {
             Container(
               padding: const EdgeInsets.all(6),
               decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.9),
+                  color: Colors.white.withValues(alpha: 0.9),
                   borderRadius: BorderRadius.circular(8)),
               child: const Icon(Icons.arrow_forward_ios,
                   size: 16, color: colors.kOrange),
@@ -639,7 +639,7 @@ class _HeroHeader extends StatelessWidget {
         Text(
           '${state.currentMonthName.toUpperCase()} SALES · INV',
           style: GoogleFonts.lato(
-              color: Colors.white.withOpacity(0.80),
+              color: Colors.white.withValues(alpha: 0.80),
               fontSize: 12,
               fontWeight: FontWeight.w700,
               letterSpacing: 1.2),
@@ -653,7 +653,7 @@ class _HeroHeader extends StatelessWidget {
         const SizedBox(height: 2),
         Text('$totalCount invoices this month',
             style: GoogleFonts.lato(
-                color: Colors.white.withOpacity(0.75), fontSize: 13)),
+                color: Colors.white.withValues(alpha: 0.75), fontSize: 13)),
         const SizedBox(height: 16),
         Wrap(spacing: 8, runSpacing: 8, children: [
           _Pill(
@@ -708,7 +708,7 @@ class _Pill extends StatelessWidget {
       decoration: BoxDecoration(
         color: colors.kPillBg,
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: Colors.white.withOpacity(0.25), width: 1),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.25), width: 1),
       ),
       child: Row(mainAxisSize: MainAxisSize.min, children: [
         Icon(icon, size: 13, color: iconColor),
@@ -1238,9 +1238,9 @@ class _TodayYesterdayChartCard extends StatelessWidget {
                 fontWeight: FontWeight.w800,
                 color: AppTokens.textNavy)),
         const SizedBox(height: 4),
-        Row(children: [
+        const Row(children: [
           _LegendDot(color: AppTokens.invoiceHeaderStart, label: 'Today'),
-          const SizedBox(width: 12),
+          SizedBox(width: 12),
           _LegendDot(color: Colors.orange, label: 'Yesterday'),
         ]),
         const SizedBox(height: 12),
@@ -1270,9 +1270,9 @@ class _TodayYesterdayChartCard extends StatelessWidget {
       ),
       borderData: FlBorderData(show: false),
       titlesData: FlTitlesData(
-        leftTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
-        rightTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
-        topTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
+        leftTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+        rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+        topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
         bottomTitles: AxisTitles(
           sideTitles: SideTitles(
             showTitles: true,
@@ -1320,7 +1320,7 @@ class _TodayYesterdayChartCard extends StatelessWidget {
 
   LineChartBarData _bar(double value, Color color) {
     return LineChartBarData(
-      spots: [FlSpot(0, 0), FlSpot(1, value * 0.6), FlSpot(2, value)],
+      spots: [const FlSpot(0, 0), FlSpot(1, value * 0.6), FlSpot(2, value)],
       isCurved: true,
       color: color,
       barWidth: 2.5,
@@ -1336,7 +1336,7 @@ class _TodayYesterdayChartCard extends StatelessWidget {
       belowBarData: BarAreaData(
         show: true,
         gradient: LinearGradient(
-          colors: [color.withOpacity(0.18), color.withOpacity(0.0)],
+          colors: [color.withValues(alpha: 0.18), color.withValues(alpha: 0.0)],
           begin: Alignment.topCenter,
           end: Alignment.bottomCenter,
         ),

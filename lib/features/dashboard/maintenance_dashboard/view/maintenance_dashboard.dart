@@ -1,5 +1,4 @@
 import 'package:flutter/Material.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:maleva/core/utils/app_preferences.dart';
 import 'package:intl/intl.dart';
@@ -79,7 +78,6 @@ import '../../common_tabs/truck/bloc/truck_bloc.dart';
 import '../../common_tabs/truck/view/truckview_tab.dart';
 import '../../common_tabs/vesselreport/bloc/vesselreport_bloc.dart';
 import '../../common_tabs/vesselreport/view/vesselreportview_tab.dart';
-import '../../admin_dashboard/view/admin_dashboard_ui.dart';
 import '../bloc/maintenance_bloc.dart';
 import '../bloc/maintenance_event.dart';
 import 'maintenance_dashboard_ui.dart';
@@ -153,7 +151,7 @@ class _AdminDashboardState extends State<MaintenanceDashboard> with SingleTicker
             BlocProvider(
               // Pass the context into sl() using param1
               create: (context) => sl<VesselBloc>(param1: context),
-              child: VesselReportPage(),
+              child: const VesselReportPage(),
             ),
             BlocProvider(
               create: (context) => sl<TransportBloc>()

@@ -13,36 +13,6 @@ import 'package:maleva/core/network/OnlineApi.dart' as OnlineApi;
 import '../features/auth/data/repositories/auth_repository.dart';
 import '../features/auth/presentation/bloc/auth_bloc.dart';
 import '../features/auth/presentation/pages/login_page.dart';
-import '../features/dashboard/admin_dashboard/bloc/admin_tab_bloc.dart';
-import '../features/dashboard/sales_dashboard/bloc/sales_bloc.dart';
-import '../features/dashboard/admin_dashboard/view/admin_dashboard.dart';
-import '../features/dashboard/airfreight_dashboard/bloc/airfreight_bloc.dart';
-import '../features/dashboard/airfreight_dashboard/view/airfreight_dashboard.dart';
-import '../features/dashboard/boarding_dashboard/bloc/boarding_bloc.dart';
-import '../features/dashboard/boarding_dashboard/view/boarding_dashboard.dart';
-import '../features/dashboard/driver_dashboard/bloc/driver_bloc.dart';
-import '../features/dashboard/driver_dashboard/view/driver_dashboard.dart';
-import '../features/dashboard/forwarding_dashboard/bloc/forwarding_bloc.dart';
-import '../features/dashboard/forwarding_dashboard/view/forwarding_dashboard.dart';
-import '../features/dashboard/hradmin_dashboard/bloc/hradmin_bloc.dart';
-import '../features/dashboard/hradmin_dashboard/view/hradmin_dashboard.dart';
-import '../features/dashboard/maintenance_dashboard/bloc/maintenance_bloc.dart';
-import '../features/dashboard/maintenance_dashboard/view/maintenance_dashboard.dart';
-import '../features/dashboard/operation_dashboard/bloc/operation_bloc.dart';
-import '../features/dashboard/operation_dashboard/view/operation_dashboard.dart';
-import '../features/dashboard/operationadmin_dashboard/bloc/operationadmin_dashboard_bloc.dart';
-import '../features/dashboard/operationadmin_dashboard/view/operationadmin_dashboard.dart';
-import '../features/dashboard/payable_dashboard/bloc/payable_dasboard_bloc.dart';
-import '../features/dashboard/payable_dashboard/view/payable_dashboard.dart';
-import '../features/dashboard/receivable_dashboard/bloc/receivable_bloc.dart';
-import '../features/dashboard/receivable_dashboard/view/receivable_dashboard.dart';
-import '../features/dashboard/sales_dashboard/view/salesdashboard_dashboard.dart';
-import '../features/dashboard/subadmin_dashboard/bloc/subadmin_dashboard_bloc.dart';
-import '../features/dashboard/subadmin_dashboard/view/subadmin_dashboard.dart';
-import '../features/dashboard/transport_dashboard/bloc/transport_bloc.dart';
-import '../features/dashboard/transport_dashboard/view/transport_dashboard.dart';
-import '../features/dashboard/warehouse_dashboard/bloc/warehouse_bloc.dart';
-import '../features/dashboard/warehouse_dashboard/view/warehouse_dashboard.dart';
 
 // ─── Design tokens (splash only) ─────────────────────────────────────────────
 
@@ -247,19 +217,7 @@ class _SplashScreenState extends State<SplashScreen>
 
   void _navigateToLogin() {
     if (!mounted) return;
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (_) => BlocProvider(
-          create: (_) => LoginBloc(
-            authRepository: AuthRepository(
-              authApi: AuthApi.instance,
-            ),
-          ),
-          child: const Appuserloginmobile(),
-        ),
-      ),
-    );
+    context.go('/login');
   }
 
   void _showErrorPopup(String title, String message) {

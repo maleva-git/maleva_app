@@ -53,7 +53,7 @@ class ReceiptRepositoryImpl implements ReceiptRepository {
     // Same API call: ReportsApi.getCustomerBalance(master, header)
     final resultData = await ReportsApi.getCustomerBalance(master, header);
 
-    if (resultData == null || resultData.isEmpty) return null;
+    if (resultData.isEmpty) return null;
 
     return ReceiptResult(
       masterList: resultData['Data1'] is List ? resultData['Data1'] : [],

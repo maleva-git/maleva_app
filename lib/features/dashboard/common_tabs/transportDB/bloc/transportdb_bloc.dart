@@ -41,7 +41,7 @@ class TransportDashboardBloc extends Bloc<TransportDashboardEvent, TransportDash
     final empId = AppPreferences.getEmpRefId();
     emit(state.copyWith(empId: empId, selectedDate: DateTime.now()));
 
-    add(LoadRulesTypeRequested());
+    add(const LoadRulesTypeRequested());
     add(LoadSalesDataRequested(empId: empId));
 
     final now = DateTime.now();

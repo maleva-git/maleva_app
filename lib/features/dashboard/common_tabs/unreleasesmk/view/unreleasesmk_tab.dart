@@ -301,10 +301,10 @@ class _UnReleaseSMKCard extends StatelessWidget {
                       padding: const EdgeInsets.symmetric(
                           horizontal: 8, vertical: 2),
                       decoration: BoxDecoration(
-                        color: dayBadgeColor.withOpacity(0.12),
+                        color: dayBadgeColor.withValues(alpha: 0.12),
                         borderRadius: BorderRadius.circular(20),
                         border: Border.all(
-                          color: dayBadgeColor.withOpacity(0.35),
+                          color: dayBadgeColor.withValues(alpha: 0.35),
                           width: 0.8,
                         ),
                       ),
@@ -401,7 +401,7 @@ class _EmptyWidget extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         children: [
           Icon(Icons.check_circle_outline_rounded,
-              size: 64, color: Palette.greenEco.withOpacity(0.7)),
+              size: 64, color: Palette.greenEco.withValues(alpha: 0.7)),
           const SizedBox(height: 12),
           Text(
             'No unreleased K8 SMK bills',

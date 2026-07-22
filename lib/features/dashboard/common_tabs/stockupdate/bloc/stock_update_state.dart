@@ -71,8 +71,8 @@ class StockUpdateLoaded extends StockUpdateState {
     status:             0,
     saleOrderId:        0,
     jobId:              0,
-    stockNoList:        [],
-    checkStockNoList:   [],
+    stockNoList:        const [],
+    checkStockNoList:   const [],
     boardOfficerId1:    0,
     boardOfficerId2:    0,
     boardOfficerAmt1:   0.0,
@@ -82,7 +82,7 @@ class StockUpdateLoaded extends StockUpdateState {
     statusId:           0,
     statusName:         '',
     imageUploadEnabled: false,
-    images:             [],
+    images:             const [],
   );
 
   StockUpdateLoaded copyWith({

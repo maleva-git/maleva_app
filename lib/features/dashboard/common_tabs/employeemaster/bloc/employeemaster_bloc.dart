@@ -22,13 +22,13 @@ class EmployeeMasterBloc extends Bloc<EmployeeMasterEvent, EmployeeState> {
     EmployeeDetailsModel? existing,
   }) : super(EmployeeFormState(
     employee: existing ?? EmployeeDetailsModel.Empty(),
-    selectedCurrency: existing?.Employeecurrency?.isNotEmpty == true
+    selectedCurrency: existing?.Employeecurrency.isNotEmpty == true
         ? existing!.Employeecurrency
         : null,
-    selectedEmployeeType: existing?.EmployeeType?.isNotEmpty == true
+    selectedEmployeeType: existing?.EmployeeType.isNotEmpty == true
         ? existing!.EmployeeType
         : null,
-    selectedRulesType: existing?.RulesType?.isNotEmpty == true
+    selectedRulesType: existing?.RulesType.isNotEmpty == true
         ? existing!.RulesType
         : null,
   )) {
