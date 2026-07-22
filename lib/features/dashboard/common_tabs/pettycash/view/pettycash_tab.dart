@@ -258,7 +258,7 @@ class _DateFilterBar extends StatelessWidget {
         color: AppTokens.brandLight,
         borderRadius: BorderRadius.circular(isTablet ? 16 : 14),
         border:
-        Border.all(color: AppTokens.brandMid.withOpacity(0.3)),
+        Border.all(color: AppTokens.brandMid.withValues(alpha: 0.3)),
       ),
       child: Row(
         children: [
@@ -306,7 +306,7 @@ class _DateFilterBar extends StatelessWidget {
 
           Container(
             width: 1, height: 30,
-            color: AppTokens.brandMid.withOpacity(0.3),
+            color: AppTokens.brandMid.withValues(alpha: 0.3),
             margin: const EdgeInsets.symmetric(horizontal: 8),
           ),
 
@@ -440,7 +440,7 @@ class _PettyCashCard extends StatelessWidget {
           boxShadow: [
             BoxShadow(
               color: AppTokens.brandGradientStart
-                  .withOpacity(isSelected ? 0.15 : 0.07),
+                  .withValues(alpha: isSelected ? 0.15 : 0.07),
               blurRadius: isSelected ? 14 : 10,
               offset: const Offset(0, 4),
             ),
@@ -529,7 +529,7 @@ class _EmptyDetailPanel extends StatelessWidget {
         border: Border.all(color: AppTokens.brandLight, width: 1.5),
         boxShadow: [
           BoxShadow(
-              color: AppTokens.brandGradientStart.withOpacity(0.05),
+              color: AppTokens.brandGradientStart.withValues(alpha: 0.05),
               blurRadius: 12,
               offset: const Offset(0, 4))
         ],
@@ -580,7 +580,7 @@ class _PettyCashDetailPanel extends StatelessWidget {
         border: Border.all(color: AppTokens.brandLight, width: 1.5),
         boxShadow: [
           BoxShadow(
-              color: AppTokens.brandGradientStart.withOpacity(0.07),
+              color: AppTokens.brandGradientStart.withValues(alpha: 0.07),
               blurRadius: 16,
               offset: const Offset(0, 5))
         ],
@@ -727,7 +727,7 @@ class _PettyCashDetailPanel extends StatelessWidget {
   }
 
   Widget _divider() =>
-      Divider(color: AppTokens.brandLight, thickness: 1.5, height: 20);
+      const Divider(color: AppTokens.brandLight, thickness: 1.5, height: 20);
 }
 
 // ── Dialog (Mobile only) ──────────────────────────────────────────────────────
@@ -927,5 +927,5 @@ class _PettyCashDialog extends StatelessWidget {
   }
 
   Widget _divider() =>
-      Divider(color: AppTokens.brandLight, thickness: 1.5, height: 20);
+      const Divider(color: AppTokens.brandLight, thickness: 1.5, height: 20);
 }

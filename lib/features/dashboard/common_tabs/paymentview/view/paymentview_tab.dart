@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
-import 'package:maleva/core/utils/app_globals.dart';
 import 'package:maleva/core/colors/colors.dart' as colour;
 import '../../../../../core/di/injection.dart';
 import '../../../../../core/theme/tokens.dart';
@@ -64,7 +63,7 @@ class _PaymentPendingBody extends StatelessWidget {
                   indicatorWeight: 3,
                   labelColor: colour.kWhite,
                   unselectedLabelColor:
-                  colour.kWhite.withOpacity(0.55),
+                  colour.kWhite.withValues(alpha: 0.55),
                   labelStyle: GoogleFonts.lato(
                       fontWeight: FontWeight.bold,
                       fontSize: 13),
@@ -85,7 +84,7 @@ class _PaymentPendingBody extends StatelessWidget {
               // PAID FILTER
               // ════════════════════════════════════
               Container(
-                color: AppTokens.brandGradientStart.withOpacity(0.06),
+                color: AppTokens.brandGradientStart.withValues(alpha: 0.06),
                 padding: const EdgeInsets.symmetric(
                     horizontal: 12, vertical: 8),
                 child: Row(
@@ -113,7 +112,7 @@ class _PaymentPendingBody extends StatelessWidget {
                                 color: active
                                     ? AppTokens.brandGradientStart
                                     : AppTokens.brandMid
-                                    .withOpacity(0.25)),
+                                    .withValues(alpha: 0.25)),
                           ),
                           child: Text(f,
                               textAlign: TextAlign.center,
@@ -145,7 +144,7 @@ class _PaymentPendingBody extends StatelessWidget {
                     borderRadius: BorderRadius.circular(14),
                     border: Border.all(
                         color:
-                        AppTokens.brandMid.withOpacity(0.3)),
+                        AppTokens.brandMid.withValues(alpha: 0.3)),
                   ),
                   child: Row(children: [
                     Expanded(
@@ -171,7 +170,7 @@ class _PaymentPendingBody extends StatelessWidget {
                         width: 1,
                         height: 28,
                         color:
-                        AppTokens.brandMid.withOpacity(0.3),
+                        AppTokens.brandMid.withValues(alpha: 0.3),
                         margin: const EdgeInsets.symmetric(
                             horizontal: 8)),
                     Expanded(
@@ -509,7 +508,7 @@ class _PaymentGridCard extends StatelessWidget {
           boxShadow: [
             BoxShadow(
                 color: AppTokens.brandGradientStart
-                    .withOpacity(isSelected ? 0.15 : 0.07),
+                    .withValues(alpha: isSelected ? 0.15 : 0.07),
                 blurRadius: isSelected ? 14 : 8,
                 offset: const Offset(0, 3)),
           ],
@@ -617,7 +616,7 @@ class _EmptyDetailPanel extends StatelessWidget {
         border: Border.all(color: AppTokens.brandLight, width: 1.5),
         boxShadow: [
           BoxShadow(
-              color: AppTokens.brandGradientStart.withOpacity(0.05),
+              color: AppTokens.brandGradientStart.withValues(alpha: 0.05),
               blurRadius: 12,
               offset: const Offset(0, 4))
         ],
@@ -668,7 +667,7 @@ class _PaymentDetailPanel extends StatelessWidget {
         border: Border.all(color: AppTokens.brandLight, width: 1.5),
         boxShadow: [
           BoxShadow(
-              color: AppTokens.brandGradientStart.withOpacity(0.07),
+              color: AppTokens.brandGradientStart.withValues(alpha: 0.07),
               blurRadius: 16,
               offset: const Offset(0, 5))
         ],
@@ -707,7 +706,7 @@ class _PaymentDetailPanel extends StatelessWidget {
                 const SizedBox(height: 4),
                 Text("Bank: ${master.BankName ?? '-'}",
                     style: GoogleFonts.lato(
-                        color: colour.kWhite.withOpacity(0.75),
+                        color: colour.kWhite.withValues(alpha: 0.75),
                         fontSize: 12)),
               ],
             ),
@@ -725,7 +724,7 @@ class _PaymentDetailPanel extends StatelessWidget {
             ]),
           ),
 
-          Divider(
+          const Divider(
               color: AppTokens.brandLight,
               thickness: 1.5,
               height: 16),
@@ -767,7 +766,7 @@ class _PaymentDetailPanel extends StatelessWidget {
                     BorderRadius.circular(14),
                     border: Border.all(
                         color: AppTokens.brandMid
-                            .withOpacity(0.2)),
+                            .withValues(alpha: 0.2)),
                   ),
                   child: Row(children: [
                     Expanded(
@@ -816,7 +815,7 @@ class _PaymentDetailPanel extends StatelessWidget {
         color: AppTokens.brandLight,
         borderRadius: BorderRadius.circular(10),
         border: Border.all(
-            color: AppTokens.brandMid.withOpacity(0.3)),
+            color: AppTokens.brandMid.withValues(alpha: 0.3)),
       ),
       child: Row(mainAxisSize: MainAxisSize.min, children: [
         Icon(icon, size: 13, color: AppTokens.brandGradientStart),
@@ -928,7 +927,7 @@ class _DetailSheet extends StatelessWidget {
                             "Bank: ${master.BankName ?? '-'}",
                             style: GoogleFonts.lato(
                                 color: colour.kWhite
-                                    .withOpacity(0.75),
+                                    .withValues(alpha: 0.75),
                                 fontSize: 12)),
                       ]),
                 ),
@@ -938,7 +937,7 @@ class _DetailSheet extends StatelessWidget {
                     width: 30, height: 30,
                     decoration: BoxDecoration(
                         color:
-                        colour.kWhite.withOpacity(0.2),
+                        colour.kWhite.withValues(alpha: 0.2),
                         borderRadius:
                         BorderRadius.circular(15)),
                     child: const Icon(Icons.close,
@@ -958,7 +957,7 @@ class _DetailSheet extends StatelessWidget {
                     "RM ${(master.Amount ?? 0).toStringAsFixed(2)}"),
               ]),
             ),
-            Divider(
+            const Divider(
                 color: AppTokens.brandLight,
                 thickness: 1.5,
                 height: 16),
@@ -998,7 +997,7 @@ class _DetailSheet extends StatelessWidget {
                       BorderRadius.circular(14),
                       border: Border.all(
                           color: AppTokens.brandMid
-                              .withOpacity(0.2)),
+                              .withValues(alpha: 0.2)),
                     ),
                     child: Row(children: [
                       Expanded(
@@ -1076,7 +1075,7 @@ class _DetailSheet extends StatelessWidget {
         color: AppTokens.brandLight,
         borderRadius: BorderRadius.circular(10),
         border: Border.all(
-            color: AppTokens.brandMid.withOpacity(0.3)),
+            color: AppTokens.brandMid.withValues(alpha: 0.3)),
       ),
       child: Row(mainAxisSize: MainAxisSize.min, children: [
         Icon(icon, size: 13, color: AppTokens.brandGradientStart),

@@ -4,7 +4,6 @@ import 'dart:async';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 import 'package:maleva/core/utils/app_globals.dart';
-import 'package:maleva/core/network/OnlineApi.dart' as OnlineApi;
 import 'custdashboard_event.dart';
 import 'custdashboard_state.dart';
 import 'package:maleva/features/transport/models/fuelselect_model.dart';
@@ -160,7 +159,7 @@ class CustDashboardBloc
           'Invoice': false,
         },
         header,
-        null));
+        null), emit);
 
     // ── Total count ────────────────────────────────────────────────────────
     final totalResult = await _safeApiCall(() => ApiLegacyHelper.apiAllinoneSelectArray(
@@ -177,7 +176,7 @@ class CustDashboardBloc
           'Invoice': false,
         },
         header,
-        null));
+        null), emit);
 
     // ── Billed count ───────────────────────────────────────────────────────
     final billedResult = await _safeApiCall(() => ApiLegacyHelper.apiAllinoneSelectArray(
@@ -194,7 +193,7 @@ class CustDashboardBloc
           'Invoice': false,
         },
         header,
-        null));
+        null), emit);
 
     // ── Unbilled count ─────────────────────────────────────────────────────
     final unbilledResult =
@@ -212,7 +211,7 @@ class CustDashboardBloc
           'Invoice': false,
         },
         header,
-        null));
+        null), emit);
 
     // ── Sales order status ─────────────────────────────────────────────────
     final salesStatusResult =
@@ -220,7 +219,7 @@ class CustDashboardBloc
         ApiConstants.SelectSalesOrderStatus,
         {'Comid': comid, 'Employeeid': empRefId},
         header,
-        null));
+        null), emit);
 
     emit(state.copyWith(
       withoutInvoiceCount: (withoutResult is List) ? withoutResult.length : 0,
@@ -241,7 +240,7 @@ class CustDashboardBloc
         ApiConstants.LoadRulesType,
         {'Comid': comid, 'Employeeid': AppGlobals.EmpRefId},
         header,
-        null));
+        null), emit);
 
     if (result is List && result.isNotEmpty) {
       final rules = result
@@ -328,7 +327,7 @@ class CustDashboardBloc
           'ETAType': 0,
         },
         header,
-        null));
+        null), emit);
 
     if (result is List && result.isNotEmpty) {
       final sorted = List<dynamic>.from(result)
@@ -374,7 +373,7 @@ class CustDashboardBloc
           'ETAType': 0,
         },
         header,
-        null));
+        null), emit);
 
     emit(state.copyWith(
       saleTransReport: (result is List) ? result : [],
@@ -401,7 +400,7 @@ class CustDashboardBloc
         '${ApiConstants.apiUpdateEnquiryMaster}${event.id}&Comid=$comid&StatusName=CANCEL',
         null,
         header,
-        null));
+        null), emit);
 
     await _fetchEnquiryData(emit);
     emit(state.copyWith(status: CustDashboardStatus.success));
@@ -424,7 +423,7 @@ class CustDashboardBloc
           'DashboardStatus': 2,
         },
         header,
-        null));
+        null), emit);
 
     if (result is List && result.isNotEmpty) {
       final formatted = result.map((item) {
@@ -491,7 +490,7 @@ class CustDashboardBloc
           'Search': '',
         },
         header,
-        null));
+        null), emit);
 
     if (result is List && result.isNotEmpty) {
       final records = result
@@ -581,7 +580,7 @@ class CustDashboardBloc
           'SupplierId1': state.pSid,
         },
         header,
-        null));
+        null), emit);
 
     List<PaymentPendingModel> masterList = [];
     List<PaymentPendingModel> detailsList = [];
@@ -627,10 +626,11 @@ class CustDashboardBloc
 
   // ─── Safe API call wrapper ─────────────────────────────────────────────────
 
-  Future<dynamic> _safeApiCall(Future<dynamic> Function() call) async {
+  Future<dynamic> _safeApiCall(Future<dynamic> Function() call, Emitter<CustDashboardState> emit) async {
     try {
       return await call();
-    } catch (_) {
+    } catch (e) {
+      emit(state.copyWith(status: CustDashboardStatus.failure, errorMessage: e.toString()));
       return null;
     }
   }

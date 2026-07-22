@@ -336,10 +336,10 @@ class _UnReleaseCard extends StatelessWidget {
                         padding: const EdgeInsets.symmetric(
                             horizontal: 8, vertical: 2),
                         decoration: BoxDecoration(
-                          color: dayCountColor.withOpacity(0.12),
+                          color: dayCountColor.withValues(alpha: 0.12),
                           borderRadius: BorderRadius.circular(20),
                           border: Border.all(
-                              color: dayCountColor.withOpacity(0.35),
+                              color: dayCountColor.withValues(alpha: 0.35),
                               width: 0.8),
                         ),
                         child: Text(
@@ -424,7 +424,7 @@ class _EmptyWidget extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         children: [
           Icon(Icons.check_circle_outline_rounded,
-              size: 64, color: Palette.greenEco.withOpacity(0.7)),
+              size: 64, color: Palette.greenEco.withValues(alpha: 0.7)),
           const SizedBox(height: 12),
           Text(
             'No unreleased bills found',

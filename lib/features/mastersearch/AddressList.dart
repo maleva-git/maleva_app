@@ -138,7 +138,7 @@ class _AddressListstate extends State<AddressList> {
             Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
-                color: colour.commonColorred.withOpacity(0.1),
+                color: colour.commonColorred.withValues(alpha: 0.1),
                 shape: BoxShape.circle,
               ),
               child: const Icon(Icons.wifi_off, color: colour.commonColorred, size: 48),
@@ -309,7 +309,7 @@ class _AddressListstate extends State<AddressList> {
           elevation: 2.0, // Reduced from 10 for a cleaner look
           shadowColor: Colors.black12,
           shape: RoundedRectangleBorder(
-            side: BorderSide(color: colour.commonColor.withOpacity(0.15), width: 1),
+            side: BorderSide(color: colour.commonColor.withValues(alpha: 0.15), width: 1),
             borderRadius: BorderRadius.circular(12),
           ),
           child: InkWell(

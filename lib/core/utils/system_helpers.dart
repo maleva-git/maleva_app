@@ -9,7 +9,6 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:maleva/core/utils/app_globals.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'package:package_info_plus/package_info_plus.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter_barcode_scanner_plus/flutter_barcode_scanner_plus.dart';

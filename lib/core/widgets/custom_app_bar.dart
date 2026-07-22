@@ -10,12 +10,12 @@ class CustomGradientAppBar extends StatelessWidget implements PreferredSizeWidge
   final bool showBackButton;
 
   const CustomGradientAppBar({
-    Key? key,
+    super.key,
     required this.title,
     this.isTablet = false,
     this.actions,
     this.showBackButton = false,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -73,7 +73,7 @@ class CustomGradientAppBar extends StatelessWidget implements PreferredSizeWidge
           Text(
             userName,
             style: GoogleFonts.lato(
-              color: Colors.white.withOpacity(0.65),
+              color: Colors.white.withValues(alpha: 0.65),
               fontWeight: FontWeight.w500,
               fontSize: isTablet ? 13 : 12,
             ),

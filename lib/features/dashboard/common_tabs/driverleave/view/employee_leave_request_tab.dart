@@ -7,17 +7,15 @@ import 'package:get_it/get_it.dart';
 
 
 import 'package:maleva/features/dashboard/common_tabs/driverleave/data/leave_request_model.dart';
-import 'package:maleva/core/colors/colors.dart' as colour;
 import 'package:maleva/core/widgets/maleva_inputs.dart';
 import 'package:intl/intl.dart';
 import 'package:maleva/core/utils/app_globals.dart';
-import 'package:maleva/core/network/OnlineApi.dart' as OnlineApi;
 import 'package:google_fonts/google_fonts.dart';
 import 'package:maleva/core/theme/tokens.dart';
 
 class EmployeeLeaveRequestTab extends StatefulWidget {
   final bool isAdminOrSubadmin;
-  const EmployeeLeaveRequestTab({Key? key, this.isAdminOrSubadmin = false}) : super(key: key);
+  const EmployeeLeaveRequestTab({super.key, this.isAdminOrSubadmin = false});
 
   @override
   State<EmployeeLeaveRequestTab> createState() => _EmployeeLeaveRequestTabState();
@@ -59,8 +57,11 @@ class _EmployeeLeaveRequestTabState extends State<EmployeeLeaveRequestTab> {
     );
     if (picked != null) {
       setState(() {
-        if (isFrom) _searchFromDate = picked;
-        else _searchToDate = picked;
+        if (isFrom) {
+          _searchFromDate = picked;
+        } else {
+          _searchToDate = picked;
+        }
       });
     }
   }

@@ -573,9 +573,9 @@ class _EnquiryTab extends StatelessWidget {
     DateFormat('yyyy-MM-dd').format(DateTime.parse(item['ForwardingDate']));
     if (notifyDate == nowStr ||
         DateTime.parse(item['ForwardingDate']).isBefore(now)) {
-      return Colors.redAccent.withOpacity(0.3);
+      return Colors.redAccent.withValues(alpha: 0.3);
     } else if (notifyDate == tomorrowStr) {
-      return Colors.yellowAccent.withOpacity(0.3);
+      return Colors.yellowAccent.withValues(alpha: 0.3);
     }
     return null;
   }
@@ -734,7 +734,8 @@ class _EnquiryTab extends StatelessWidget {
                                         if (confirm) {
                                           AppGlobals.storagenew.setString(
                                               'EnquiryOpen', 'true');
-                                          Navigator.push(
+                                          if (!context.mounted) return;
+Navigator.push(
                                             context,
                                             MaterialPageRoute(
                                               builder: (_) =>
@@ -865,7 +866,7 @@ class _EmailInboxTab extends StatelessWidget {
             children: [
               DropdownButtonFormField<EmployeeModel>(
                 isExpanded: true,
-                value: state.selectedEmployee,
+                initialValue: state.selectedEmployee,
                 decoration: InputDecoration(
                   labelText: 'Select Employee',
                   border: OutlineInputBorder(
@@ -1066,7 +1067,7 @@ class _GoogleReviewTab extends StatelessWidget {
                     const SizedBox(height: 10),
 
                     DropdownButtonFormField<int>(
-                      value: state.selectedReview >= 1 &&
+                      initialValue: state.selectedReview >= 1 &&
                           state.selectedReview <= 5
                           ? state.selectedReview
                           : 1,
@@ -1096,7 +1097,7 @@ class _GoogleReviewTab extends StatelessWidget {
                     const SizedBox(height: 16),
 
                     DropdownButtonFormField<int>(
-                      value: state.employees
+                      initialValue: state.employees
                           .any((e) => e.Id == state.selectedEmpId)
                           ? state.selectedEmpId
                           : null,

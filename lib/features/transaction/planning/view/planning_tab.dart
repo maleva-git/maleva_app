@@ -139,7 +139,7 @@ class _PlanningScaffold extends StatelessWidget {
           decoration: BoxDecoration(
             gradient: LinearGradient(colors: [
               Colors.transparent,
-              colour.kGold.withOpacity(0.4),
+              colour.kGold.withValues(alpha: 0.4),
               Colors.transparent,
             ]),
           ),
@@ -215,17 +215,17 @@ class _PlanningCard extends StatelessWidget {
         color: colour.kSurface,
         borderRadius: BorderRadius.circular(isTablet ? 22 : 18),
         border: Border.all(
-          color: isExpanded ? colour.kGold.withOpacity(0.4) : colour.kBorder,
+          color: isExpanded ? colour.kGold.withValues(alpha: 0.4) : colour.kBorder,
           width: 1,
         ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.2),
+            color: Colors.black.withValues(alpha: 0.2),
             blurRadius: 14,
             offset: const Offset(0, 4),
           ),
           if (isExpanded)
-            BoxShadow(color: colour.kGold.withOpacity(0.06), blurRadius: 20),
+            BoxShadow(color: colour.kGold.withValues(alpha: 0.06), blurRadius: 20),
         ],
       ),
       child: ClipRRect(
@@ -240,8 +240,8 @@ class _PlanningCard extends StatelessWidget {
                     decoration: BoxDecoration(
                       gradient: LinearGradient(
                         colors: isExpanded
-                            ? [colour.kGold, colour.kGold.withOpacity(0.3)]
-                            : [colour.kCobalt, colour.kCobalt.withOpacity(0.2)],
+                            ? [colour.kGold, colour.kGold.withValues(alpha: 0.3)]
+                            : [colour.kCobalt, colour.kCobalt.withValues(alpha: 0.2)],
                         begin: Alignment.topCenter,
                         end: Alignment.bottomCenter,
                       ),
@@ -265,9 +265,9 @@ class _PlanningCard extends StatelessWidget {
                                 Container(
                                   padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                                   decoration: BoxDecoration(
-                                    color: colour.kCobalt.withOpacity(0.12),
+                                    color: colour.kCobalt.withValues(alpha: 0.12),
                                     borderRadius: BorderRadius.circular(8),
-                                    border: Border.all(color: colour.kCobalt.withOpacity(0.3)),
+                                    border: Border.all(color: colour.kCobalt.withValues(alpha: 0.3)),
                                   ),
                                   child: Text(
                                     master.PLANINGNoDisplay,
@@ -370,9 +370,9 @@ class _DetailsSection extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                 decoration: BoxDecoration(
-                  color: colour.kGold.withOpacity(0.1),
+                  color: colour.kGold.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(10),
-                  border: Border.all(color: colour.kGold.withOpacity(0.3)),
+                  border: Border.all(color: colour.kGold.withValues(alpha: 0.3)),
                 ),
                 child: Text('${details.length}', style: _label(11, color: colour.kGold)),
               ),
@@ -388,7 +388,7 @@ class _DetailsSection extends StatelessWidget {
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: DataTable(
-                  headingRowColor: MaterialStateProperty.all(colour.kCobalt.withOpacity(0.05)),
+                  headingRowColor: WidgetStateProperty.all(colour.kCobalt.withValues(alpha: 0.05)),
                   columnSpacing: 20,
                   dataRowMinHeight: 40,
                   dataRowMaxHeight: 60,
@@ -516,7 +516,7 @@ class _FilterFab extends StatelessWidget {
                     suffixIcon: Icon(empController.text.isNotEmpty ? Icons.close_rounded : Icons.search_rounded, color: checkLoggedEmp ? AppTokens.planTextMuted : colour.kCobalt),
                     onSuffixTap: checkLoggedEmp ? null : () async {
                       if (empController.text.isEmpty) {
-                        await sl<PlanningRepository>().selectEmployee(context, 'sales', 'admin'); if (!context.mounted) return;Navigator.push(context, MaterialPageRoute(builder: (_) => const Employee(Searchby: 1, SearchId: 0))).then((_navRes) { if (_navRes != null) { AppGlobals.SelectEmployeeList = _navRes; }
+                        await sl<PlanningRepository>().selectEmployee(context, 'sales', 'admin'); if (!context.mounted) return;Navigator.push(context, MaterialPageRoute(builder: (_) => const Employee(Searchby: 1, SearchId: 0))).then((navRes) { if (navRes != null) { AppGlobals.SelectEmployeeList = navRes; }
                           setSheetState(() {
                             empController.text = AppGlobals.SelectEmployeeList.AccountName;
                             empId = AppGlobals.SelectEmployeeList.Id;
@@ -609,7 +609,7 @@ class _ActionBtn extends StatelessWidget {
       onTap: onTap,
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-        decoration: BoxDecoration(color: color.withOpacity(0.1), borderRadius: BorderRadius.circular(20), border: Border.all(color: color.withOpacity(0.3))),
+        decoration: BoxDecoration(color: color.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(20), border: Border.all(color: color.withValues(alpha: 0.3))),
         child: Row(mainAxisSize: MainAxisSize.min, children: [Icon(icon, size: 14, color: color), const SizedBox(width: 5), Text(label, style: _body(11, color: color, fw: FontWeight.w700))]),
       ),
     );
@@ -691,7 +691,7 @@ class _FullScreenLoaderState extends State<_FullScreenLoader> with SingleTickerP
     return AnimatedBuilder(
       animation: _anim,
       builder: (_, __) => Center(child: Column(mainAxisSize: MainAxisSize.min, children: [
-        Container(width: 60, height: 60, decoration: BoxDecoration(shape: BoxShape.circle, color: AppTokens.invoiceHeaderStart.withOpacity(_anim.value * 0.15), border: Border.all(color: AppTokens.invoiceHeaderStart.withOpacity(_anim.value), width: 2)), child: Icon(Icons.local_shipping_rounded, color: AppTokens.invoiceHeaderStart.withOpacity(_anim.value), size: 28)),
+        Container(width: 60, height: 60, decoration: BoxDecoration(shape: BoxShape.circle, color: AppTokens.invoiceHeaderStart.withValues(alpha: _anim.value * 0.15), border: Border.all(color: AppTokens.invoiceHeaderStart.withValues(alpha: _anim.value), width: 2)), child: Icon(Icons.local_shipping_rounded, color: AppTokens.invoiceHeaderStart.withValues(alpha: _anim.value), size: 28)),
         const SizedBox(height: 16), Text('Loading Planning...', style: _label(13, color: AppTokens.planTextMuted)),
       ])),
     );
@@ -712,6 +712,6 @@ class _ErrorView extends StatelessWidget {
   const _ErrorView({required this.message, required this.onRetry});
   @override
   Widget build(BuildContext context) {
-    return Center(child: Padding(padding: const EdgeInsets.all(32), child: Column(mainAxisSize: MainAxisSize.min, children: [Container(padding: const EdgeInsets.all(18), decoration: BoxDecoration(color: colour.kDanger.withOpacity(0.1), shape: BoxShape.circle, border: Border.all(color: colour.kDanger.withOpacity(0.3))), child: const Icon(Icons.error_outline_rounded, color: colour.kDanger, size: 32)), const SizedBox(height: 14), Text('Something went wrong', style: GoogleFonts.dmSerifDisplay(fontSize: 18, color: colour.kText)), const SizedBox(height: 8), Text(message, style: _label(12, color: AppTokens.planTextMuted), textAlign: TextAlign.center), const SizedBox(height: 20), ElevatedButton.icon(onPressed: onRetry, style: ElevatedButton.styleFrom(backgroundColor: colour.kCobalt, padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12))), icon: const Icon(Icons.refresh_rounded, color: colour.kText, size: 18), label: Text('Retry', style: _body(14, color: colour.kText, fw: FontWeight.w600))) ])));
+    return Center(child: Padding(padding: const EdgeInsets.all(32), child: Column(mainAxisSize: MainAxisSize.min, children: [Container(padding: const EdgeInsets.all(18), decoration: BoxDecoration(color: colour.kDanger.withValues(alpha: 0.1), shape: BoxShape.circle, border: Border.all(color: colour.kDanger.withValues(alpha: 0.3))), child: const Icon(Icons.error_outline_rounded, color: colour.kDanger, size: 32)), const SizedBox(height: 14), Text('Something went wrong', style: GoogleFonts.dmSerifDisplay(fontSize: 18, color: colour.kText)), const SizedBox(height: 8), Text(message, style: _label(12, color: AppTokens.planTextMuted), textAlign: TextAlign.center), const SizedBox(height: 20), ElevatedButton.icon(onPressed: onRetry, style: ElevatedButton.styleFrom(backgroundColor: colour.kCobalt, padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12))), icon: const Icon(Icons.refresh_rounded, color: colour.kText, size: 18), label: Text('Retry', style: _body(14, color: colour.kText, fw: FontWeight.w600))) ])));
   }
 }

@@ -185,7 +185,7 @@ class _FilterCard extends StatelessWidget {
         border: Border.all(color: kAccent, width: 1.5),
         boxShadow: [
           BoxShadow(
-            color: AppTokens.brandGradientStart.withOpacity(0.08),
+            color: AppTokens.brandGradientStart.withValues(alpha: 0.08),
             blurRadius: 20,
             offset: const Offset(0, 4),
           ),
@@ -229,7 +229,7 @@ class _FilterCard extends StatelessWidget {
               borderRadius: BorderRadius.circular(isTablet ? 16 : 14),
               boxShadow: [
                 BoxShadow(
-                  color: AppTokens.brandGradientStart.withOpacity(0.35),
+                  color: AppTokens.brandGradientStart.withValues(alpha: 0.35),
                   blurRadius: 12,
                   offset: const Offset(0, 4),
                 ),
@@ -272,13 +272,13 @@ class _DateButton extends StatelessWidget {
         decoration: BoxDecoration(
           color: kAccent,
           borderRadius: BorderRadius.circular(isTablet ? 14 : 12),
-          border: Border.all(color: AppTokens.brandMid.withOpacity(0.4)),
+          border: Border.all(color: AppTokens.brandMid.withValues(alpha: 0.4)),
         ),
         child: Row(children: [
           Container(
             padding: EdgeInsets.all(isTablet ? 6 : 5),
             decoration: BoxDecoration(
-              color: AppTokens.brandGradientStart.withOpacity(0.12),
+              color: AppTokens.brandGradientStart.withValues(alpha: 0.12),
               borderRadius: BorderRadius.circular(7),
             ),
             child: Icon(icon,
@@ -327,7 +327,7 @@ class _SummaryCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(isTablet ? 28 : 24),
         boxShadow: [
           BoxShadow(
-            color: AppTokens.brandGradientStart.withOpacity(0.4),
+            color: AppTokens.brandGradientStart.withValues(alpha: 0.4),
             blurRadius: 24,
             offset: const Offset(0, 8),
           ),
@@ -340,16 +340,16 @@ class _SummaryCard extends StatelessWidget {
             label: 'Total Amount',
             value: 'RM ${state.totalAmount.toStringAsFixed(2)}',
             icon: Icons.account_balance_wallet_rounded,
-            iconBg: kWhite.withOpacity(0.2),
+            iconBg: kWhite.withValues(alpha: 0.2),
             isTablet: isTablet,
           ),
           Container(width: 1, height: isTablet ? 60 : 50,
-              color: kWhite.withOpacity(0.2)),
+              color: kWhite.withValues(alpha: 0.2)),
           _SummaryTile(
             label: 'Outstanding',
             value: 'RM ${state.totalBalance.toStringAsFixed(2)}',
             icon: Icons.warning_amber_rounded,
-            iconBg: Colors.red.withOpacity(0.25),
+            iconBg: Colors.red.withValues(alpha: 0.25),
             alignEnd: true,
             isTablet: isTablet,
           ),
@@ -394,7 +394,7 @@ class _SummaryTile extends StatelessWidget {
           ],
           Text(label,
               style: GoogleFonts.poppins(
-                  color: kWhite.withOpacity(0.7),
+                  color: kWhite.withValues(alpha: 0.7),
                   fontSize: isTablet ? 12 : 11,
                   fontWeight: FontWeight.w500)),
           if (alignEnd) ...[
@@ -444,7 +444,7 @@ class _StatsPanel extends StatelessWidget {
         border: Border.all(color: kAccent, width: 1.5),
         boxShadow: [
           BoxShadow(
-            color: AppTokens.brandGradientStart.withOpacity(0.07),
+            color: AppTokens.brandGradientStart.withValues(alpha: 0.07),
             blurRadius: 16,
             offset: const Offset(0, 4),
           ),
@@ -478,7 +478,7 @@ class _StatsPanel extends StatelessWidget {
           _statRow('Pending',        '$pendingCount',
               Icons.pending_rounded,       const Color(0xFFEA580C)),
           const SizedBox(height: 16),
-          Divider(color: kAccent, height: 1),
+          const Divider(color: kAccent, height: 1),
           const SizedBox(height: 16),
           _amountRow('Collected',  'RM ${collected.toStringAsFixed(2)}',
               const Color(0xFF059669)),
@@ -491,7 +491,7 @@ class _StatsPanel extends StatelessWidget {
             Text('Collection Progress',
                 style: GoogleFonts.poppins(
                     fontSize: 11,
-                    color: AppTokens.brandDark.withOpacity(0.6))),
+                    color: AppTokens.brandDark.withValues(alpha: 0.6))),
             Text('${(percent * 100).toStringAsFixed(1)}%',
                 style: GoogleFonts.poppins(
                     fontSize: 11,
@@ -522,7 +522,7 @@ class _StatsPanel extends StatelessWidget {
           Container(
             padding: const EdgeInsets.all(7),
             decoration: BoxDecoration(
-              color: color.withOpacity(0.10),
+              color: color.withValues(alpha: 0.10),
               borderRadius: BorderRadius.circular(8),
             ),
             child: Icon(icon, color: color, size: 15),
@@ -548,7 +548,7 @@ class _StatsPanel extends StatelessWidget {
         Text(label,
             style: GoogleFonts.poppins(
                 fontSize: 12,
-                color: AppTokens.brandDark.withOpacity(0.6),
+                color: AppTokens.brandDark.withValues(alpha: 0.6),
                 fontWeight: FontWeight.w500)),
         Text(value,
             style: GoogleFonts.poppins(
@@ -643,7 +643,7 @@ class _ReceiptCard extends StatelessWidget {
         border: Border.all(color: kAccent, width: 1.2),
         boxShadow: [
           BoxShadow(
-            color: AppTokens.brandGradientStart.withOpacity(0.07),
+            color: AppTokens.brandGradientStart.withValues(alpha: 0.07),
             blurRadius: 16,
             offset: const Offset(0, 4),
           ),
@@ -673,7 +673,7 @@ class _ReceiptCard extends StatelessWidget {
                       Text('${data['BillNo']} • ${data['BillDate']}',
                           style: GoogleFonts.poppins(
                             fontSize: isTablet ? 12 : 11,
-                            color: AppTokens.brandMid.withOpacity(0.7),
+                            color: AppTokens.brandMid.withValues(alpha: 0.7),
                           )),
                     ],
                   ),
@@ -688,8 +688,8 @@ class _ReceiptCard extends StatelessWidget {
                     borderRadius: BorderRadius.circular(20),
                     border: Border.all(
                       color: isPaid
-                          ? const Color(0xFF0F766E).withOpacity(0.3)
-                          : AppTokens.brandMid.withOpacity(0.4),
+                          ? const Color(0xFF0F766E).withValues(alpha: 0.3)
+                          : AppTokens.brandMid.withValues(alpha: 0.4),
                     ),
                   ),
                   child: Text(
@@ -707,7 +707,7 @@ class _ReceiptCard extends StatelessWidget {
             ),
 
             SizedBox(height: isTablet ? 16 : 14),
-            Divider(color: kAccent, height: 1),
+            const Divider(color: kAccent, height: 1),
             SizedBox(height: isTablet ? 14 : 12),
 
             // Amount chips
@@ -783,7 +783,7 @@ class _AmountChip extends StatelessWidget {
               overflow: TextOverflow.ellipsis,
               style: GoogleFonts.poppins(
                 fontSize: isTablet ? 11 : 10,
-                color: color.withOpacity(0.7),
+                color: color.withValues(alpha: 0.7),
                 fontWeight: FontWeight.w500,
               )),
           const SizedBox(height: 3),

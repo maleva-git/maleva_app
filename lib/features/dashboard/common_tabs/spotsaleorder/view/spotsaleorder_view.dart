@@ -82,7 +82,7 @@ class _SpotSaleViewBody extends StatelessWidget {
                   color: AppTokens.brandLight,
                   borderRadius: BorderRadius.circular(12),
                   border: Border.all(
-                      color: AppTokens.brandMid.withOpacity(0.3)),
+                      color: AppTokens.brandMid.withValues(alpha: 0.3)),
                 ),
                 child: Column(children: [
                   Row(children: [
@@ -93,6 +93,7 @@ class _SpotSaleViewBody extends StatelessWidget {
                         onTap: () async {
                           final p = await _pickDate(context, fromDate);
                           if (p != null) {
+                            if (!context.mounted) return;
                             context
                                 .read<SpotSaleBloc>()
                                 .add(SelectViewFromDateEvent(p));
@@ -108,6 +109,7 @@ class _SpotSaleViewBody extends StatelessWidget {
                         onTap: () async {
                           final p = await _pickDate(context, toDate);
                           if (p != null) {
+                            if (!context.mounted) return;
                             context
                                 .read<SpotSaleBloc>()
                                 .add(SelectViewToDateEvent(p));
@@ -249,7 +251,7 @@ class _SpotSaleCard extends StatelessWidget {
           border: Border.all(color: AppTokens.brandLight, width: 1.5),
           boxShadow: [
             BoxShadow(
-                color: AppTokens.brandGradientStart.withOpacity(0.06),
+                color: AppTokens.brandGradientStart.withValues(alpha: 0.06),
                 blurRadius: 10,
                 offset: const Offset(0, 3)),
           ],
@@ -285,7 +287,7 @@ class _SpotSaleCard extends StatelessWidget {
                 padding: const EdgeInsets.symmetric(
                     horizontal: 10, vertical: 4),
                 decoration: BoxDecoration(
-                  color: colour.kWhite.withOpacity(0.2),
+                  color: colour.kWhite.withValues(alpha: 0.2),
                   borderRadius: BorderRadius.circular(20),
                 ),
                 child: Text(
@@ -404,7 +406,7 @@ class _DateTile extends StatelessWidget {
           color: colour.kWhite,
           borderRadius: BorderRadius.circular(10),
           border:
-          Border.all(color: AppTokens.brandMid.withOpacity(0.35)),
+          Border.all(color: AppTokens.brandMid.withValues(alpha: 0.35)),
         ),
         child: Row(children: [
           const Icon(Icons.date_range_rounded,
@@ -477,6 +479,7 @@ class _ImagePreviewDialog extends StatelessWidget {
       await File(path).writeAsBytes(response.bodyBytes);
       await Share.shareXFiles([XFile(path)], text: "Spot Sale Document");
     } catch (e) {
+      if (!context.mounted) return;
       ScaffoldMessenger.of(context)
           .showSnackBar(SnackBar(content: Text("Sharing failed: $e")));
     }

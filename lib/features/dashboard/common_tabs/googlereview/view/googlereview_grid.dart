@@ -207,6 +207,7 @@ class _ReviewGridBody extends StatelessWidget {
               "Delete this review?",
             );
             if (confirm) {
+              if (!context.mounted) return;
               context
                   .read<ReviewBloc>()
                   .add(DeleteReviewEvent(r.id));
@@ -254,7 +255,7 @@ class _FilterCard extends StatelessWidget {
               color:         AppTokens.brandLight,
               borderRadius: BorderRadius.circular(14),
               border: Border.all(
-                  color: AppTokens.brandMid.withOpacity(0.3)),
+                  color: AppTokens.brandMid.withValues(alpha: 0.3)),
             ),
             child: Row(children: [
               const Icon(Icons.date_range_rounded,
@@ -296,7 +297,7 @@ class _FilterCard extends StatelessWidget {
             color:         kWhite,
             borderRadius: BorderRadius.circular(12),
             border: Border.all(
-                color: AppTokens.brandMid.withOpacity(0.3)),
+                color: AppTokens.brandMid.withValues(alpha: 0.3)),
           ),
           child: _employeeDropdown(context, fontSize: 14),
         ),
@@ -331,7 +332,7 @@ class _FilterCard extends StatelessWidget {
             color:         kWhite,
             borderRadius: BorderRadius.circular(10),
             border: Border.all(
-                color: AppTokens.brandMid.withOpacity(0.3)),
+                color: AppTokens.brandMid.withValues(alpha: 0.3)),
           ),
           child: _employeeDropdown(context, fontSize: 13),
         ),
@@ -385,6 +386,7 @@ class _FilterCard extends StatelessWidget {
       ),
     );
     if (picked != null) {
+      if (!context.mounted) return;
       context.read<ReviewBloc>().add(
         SelectDateRangeEvent(
           fromDate: picked.start,
@@ -415,7 +417,7 @@ class _CountBadge extends StatelessWidget {
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color:     AppTokens.brandGradientStart.withOpacity(0.28),
+            color:     AppTokens.brandGradientStart.withValues(alpha: 0.28),
             blurRadius: 16,
             offset:    const Offset(0, 6),
           ),
@@ -425,7 +427,7 @@ class _CountBadge extends StatelessWidget {
         Container(
           padding: const EdgeInsets.all(10),
           decoration: BoxDecoration(
-            color: kWhite.withOpacity(0.20),
+            color: kWhite.withValues(alpha: 0.20),
             shape: BoxShape.circle,
           ),
           child: const Icon(Icons.star_rounded,
@@ -438,7 +440,7 @@ class _CountBadge extends StatelessWidget {
             Text('Total Reviews',
                 style: GoogleFonts.lato(
                   fontSize:   12,
-                  color:      kWhite.withOpacity(0.75),
+                  color:      kWhite.withValues(alpha: 0.75),
                   fontWeight: FontWeight.w500,
                 )),
             Text('$count',
@@ -475,7 +477,7 @@ class _ReviewCard extends StatelessWidget {
         border: Border.all(color: AppTokens.brandLight, width: 1.5),
         boxShadow: [
           BoxShadow(
-            color:     AppTokens.brandGradientStart.withOpacity(0.07),
+            color:     AppTokens.brandGradientStart.withValues(alpha: 0.07),
             blurRadius: 8,
             offset:    const Offset(0, 3),
           ),

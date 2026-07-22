@@ -69,6 +69,7 @@ class _LicenseUpdatePage extends StatelessWidget {
               'Updated Successfully', context);
         }
         if (state is LicenseUpdateError) {
+          if (!context.mounted) return;
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text(state.message,
@@ -141,7 +142,7 @@ class _LicenseUpdatePage extends StatelessWidget {
           const SizedBox(height: 2),
           Text(userName,
               style: GoogleFonts.lato(
-                  color: Colors.white.withOpacity(0.65),
+                  color: Colors.white.withValues(alpha: 0.65),
                   fontWeight: FontWeight.w500,
                   fontSize: 12)),
         ],
@@ -172,6 +173,7 @@ class _LicenseUpdatePage extends StatelessWidget {
                       'Are you sure to Update ?')
                       .then((ok) {
                     if (ok == true) {
+                      if (!context.mounted) return;
                       context.read<LicenseUpdateBloc>().add(
                           LicenseUpdateSaveRequested());
                     }
@@ -259,6 +261,7 @@ class _TruckSelectorField extends StatelessWidget {
           ).then((_) {
             final sel = AppGlobals.SelectTruckList;
             if (sel.Id != 0) {
+              if (!context.mounted) return;
               context.read<LicenseUpdateBloc>().add(
                   LicenseUpdateTruckSelected(
                       truckId: sel.Id,
@@ -533,6 +536,7 @@ class _ExpiryDateRow extends StatelessWidget {
                     ),
                   );
                   if (picked != null) {
+                    if (!context.mounted) return;
                     context.read<LicenseUpdateBloc>().add(
                         LicenseUpdateDateChanged(
                           key:  dateKey,
@@ -771,10 +775,10 @@ class _AppBarButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.15),
+        color: Colors.white.withValues(alpha: 0.15),
         borderRadius: BorderRadius.circular(8),
         border: Border.all(
-            color: Colors.white.withOpacity(0.4),
+            color: Colors.white.withValues(alpha: 0.4),
             width: 0.5),
       ),
       child: Material(

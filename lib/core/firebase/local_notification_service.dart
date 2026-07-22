@@ -35,7 +35,7 @@ class LocalNotificationService {
         );
       }
 
-      final DarwinInitializationSettings initializationSettingsIOS = DarwinInitializationSettings(
+      const DarwinInitializationSettings initializationSettingsIOS = DarwinInitializationSettings(
           requestSoundPermission: true,
           requestBadgePermission: false, // Disabled badge
           requestAlertPermission: true,
@@ -55,7 +55,7 @@ class LocalNotificationService {
           //   );
           // }
           );
-      final InitializationSettings initializationSettings = InitializationSettings(iOS: initializationSettingsIOS, macOS: null);
+      const InitializationSettings initializationSettings = InitializationSettings(iOS: initializationSettingsIOS, macOS: null);
 
       _notificationsPlugin.initialize(
         initializationSettings,

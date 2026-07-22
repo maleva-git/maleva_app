@@ -183,12 +183,13 @@ class _AddEnquiryViewState extends State<_AddEnquiryView> {
                         hasValue: state.customerName.isNotEmpty,
                         onTapSuffix: () async {
                           if (state.customerName.isEmpty) {
-                            final __navResult1 = await Navigator.push(context, MaterialPageRoute(builder: (_) => const Customer(Searchby: 1, SearchId: 0))); if (__navResult1 != null) { AppGlobals.SelectCustomerList = __navResult1; }
-if (__navResult1 != null) { AppGlobals.SelectCustomerList = __navResult1; }
+                            final navResult1 = await Navigator.push(context, MaterialPageRoute(builder: (_) => const Customer(Searchby: 1, SearchId: 0))); if (navResult1 != null) { AppGlobals.SelectCustomerList = navResult1; }
+if (navResult1 != null) { AppGlobals.SelectCustomerList = navResult1; }
 
                             final cust = AppGlobals.SelectCustomerList;
                             bloc.add(CustomerSelectedEvent(cust.AccountName, cust.Id));
                             AppGlobals.SelectCustomerList = CustomerModel.Empty();
+                            if (!context.mounted) return;
                             await OnlineApi.loadCustomerCurrency(context, cust.Id); if (!context.mounted) return;} else {
                             bloc.add(CustomerClearedEvent());
                           }
@@ -203,10 +204,11 @@ if (__navResult1 != null) { AppGlobals.SelectCustomerList = __navResult1; }
                         hasValue: state.jobTypeName.isNotEmpty,
                         onTapSuffix: () async {
                           if (state.jobTypeName.isEmpty) {
-                            final __navResult2 = await Navigator.push(context, MaterialPageRoute(builder: (_) => const JobType(Searchby: 1, SearchId: 0))); if (__navResult2 != null) { AppGlobals.SelectJobTypeList = __navResult2; }
-if (__navResult2 != null) { AppGlobals.SelectJobTypeList = __navResult2; }
+                            final navResult2 = await Navigator.push(context, MaterialPageRoute(builder: (_) => const JobType(Searchby: 1, SearchId: 0))); if (navResult2 != null) { AppGlobals.SelectJobTypeList = navResult2; }
+if (navResult2 != null) { AppGlobals.SelectJobTypeList = navResult2; }
 
                             final jt = AppGlobals.SelectJobTypeList;
+                            if (!context.mounted) return;
                             await OnlineApi.SelectAllJobStatus(context, jt.Id); if (!context.mounted) return;bloc.add(JobTypeSelectedEvent(jt.Name, jt.Id));
                             AppGlobals.SelectJobTypeList = JobTypeModel.Empty();
                           } else {
@@ -256,6 +258,7 @@ if (__navResult2 != null) { AppGlobals.SelectJobTypeList = __navResult2; }
                               firstDate: DateTime(2020),
                               lastDate: DateTime(2100));
                           if (d != null) {
+                            if (!context.mounted) return;
                             final t = await _pickTime(context);
                             bloc.add(CollectionDateChangedEvent(d, t));
                           }
@@ -291,6 +294,7 @@ if (__navResult2 != null) { AppGlobals.SelectJobTypeList = __navResult2; }
                               firstDate: DateTime(2020),
                               lastDate: DateTime(2100));
                           if (d != null) {
+                            if (!context.mounted) return;
                             final t = await _pickTime(context);
                             bloc.add(LETADateChangedEvent(d, t));
                           }
@@ -305,8 +309,8 @@ if (__navResult2 != null) { AppGlobals.SelectJobTypeList = __navResult2; }
                         hasValue: state.lPort.isNotEmpty,
                         onTapSuffix: () async {
                           if (state.lPort.isEmpty) {
-                            final __navResult3 = await Navigator.push(context, MaterialPageRoute(builder: (_) => const Port(Searchby: 1, SearchId: 0)));
-if (__navResult3 != null) { AppGlobals.SelectedPortName = __navResult3; }
+                            final navResult3 = await Navigator.push(context, MaterialPageRoute(builder: (_) => const Port(Searchby: 1, SearchId: 0)));
+if (navResult3 != null) { AppGlobals.SelectedPortName = navResult3; }
 
                             bloc.add(LPortSelectedEvent(AppGlobals.SelectedPortName));
                             AppGlobals.SelectedPortName = '';
@@ -341,6 +345,7 @@ if (__navResult3 != null) { AppGlobals.SelectedPortName = __navResult3; }
                               firstDate: DateTime(2020),
                               lastDate: DateTime(2100));
                           if (d != null) {
+                            if (!context.mounted) return;
                             final t = await _pickTime(context);
                             bloc.add(OETADateChangedEvent(d, t));
                           }
@@ -355,8 +360,8 @@ if (__navResult3 != null) { AppGlobals.SelectedPortName = __navResult3; }
                         hasValue: state.oPort.isNotEmpty,
                         onTapSuffix: () async {
                           if (state.oPort.isEmpty) {
-                            final __navResult4 = await Navigator.push(context, MaterialPageRoute(builder: (_) => const Port(Searchby: 1, SearchId: 0)));
-if (__navResult4 != null) { AppGlobals.SelectedPortName = __navResult4; }
+                            final navResult4 = await Navigator.push(context, MaterialPageRoute(builder: (_) => const Port(Searchby: 1, SearchId: 0)));
+if (navResult4 != null) { AppGlobals.SelectedPortName = navResult4; }
 
                             bloc.add(OPortSelectedEvent(AppGlobals.SelectedPortName));
                             AppGlobals.SelectedPortName = '';
@@ -548,7 +553,7 @@ class _DateTimeRowModern extends StatelessWidget {
                 child: Container(
                   padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
                   decoration: BoxDecoration(
-                    color: isEnabled ? Palette.grey50 : Palette.grey200.withOpacity(0.5),
+                    color: isEnabled ? Palette.grey50 : Palette.grey200.withValues(alpha: 0.5),
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Row(
@@ -572,7 +577,7 @@ class _DateTimeRowModern extends StatelessWidget {
             const SizedBox(width: 12),
             Container(
               decoration: BoxDecoration(
-                color: checkValue ? Palette.blue600.withOpacity(0.1) : Colors.transparent,
+                color: checkValue ? Palette.blue600.withValues(alpha: 0.1) : Colors.transparent,
                 borderRadius: BorderRadius.circular(8),
               ),
               child: Checkbox(

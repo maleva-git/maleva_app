@@ -4,7 +4,6 @@ import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import 'package:maleva/menu/menulist.dart';
-import 'package:maleva/core/network/OnlineApi.dart' as OnlineApi;
 import 'package:maleva/core/utils/app_globals.dart';
 
 import '../../../../../core/di/injection.dart';
@@ -215,6 +214,7 @@ class _FWBreakSealViewState extends State<_FWBreakSealView>
           ConfirmationOK(state.successMessage ?? 'Updated Successfully',
               context)
               .then((_) {
+            if (!context.mounted) return;
             context.read<FWBreakSealBloc>().add(const FWBreakSealCleared());
           });
         }
@@ -411,7 +411,7 @@ class _FWBreakSealViewState extends State<_FWBreakSealView>
   Widget _buildBottomNav(BuildContext context, FWBreakSealState state) {
     return BottomNavigationBar(
       backgroundColor: AppTokens.brandLight,
-      unselectedItemColor: AppTokens.appBarBg.withOpacity(0.5),
+      unselectedItemColor: AppTokens.appBarBg.withValues(alpha: 0.5),
       currentIndex: state.activeTab,
       selectedLabelStyle: GoogleFonts.lato(
         textStyle: TextStyle(
@@ -580,14 +580,14 @@ class _FWBreakSealViewState extends State<_FWBreakSealView>
             // Navigate to picker
             bloc.add(
                 FWBreakSealEmpSearchTapped(smkType: smkType, isClear: false));
-            final __navResult1 = await Navigator.push(
+            final navResult1 = await Navigator.push(
               context,
               MaterialPageRoute(
                 builder: (_) =>
                 const Employee(Searchby: 1, SearchId: 0),
               ),
-            ); if (__navResult1 != null) { AppGlobals.SelectEmployeeList = __navResult1; }
-if (__navResult1 != null) { AppGlobals.SelectEmployeeList = __navResult1; }
+            ); if (navResult1 != null) { AppGlobals.SelectEmployeeList = navResult1; }
+if (navResult1 != null) { AppGlobals.SelectEmployeeList = navResult1; }
 
             // Employee picker sets AppGlobals.SelectEmployeeList
             final emp = AppGlobals.SelectEmployeeList;

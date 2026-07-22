@@ -2,7 +2,6 @@ import 'package:maleva/core/network/api_constants.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:maleva/core/network/api_client.dart';
-import 'package:maleva/core/utils/app_globals.dart';
 import 'package:maleva/core/models/shared/r_t_i_details_view_model.dart';
 
 class PDORepository {

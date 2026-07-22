@@ -281,7 +281,7 @@ class _MobileCard extends StatelessWidget {
         border: Border.all(color: colour.border, width: 1),
         boxShadow: [
           BoxShadow(
-              color: strip.withOpacity(0.08),
+              color: strip.withValues(alpha: 0.08),
               blurRadius: 14,
               offset: const Offset(0, 4)),
           const BoxShadow(
@@ -304,7 +304,7 @@ class _MobileCard extends StatelessWidget {
                 height: 4,
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
-                    colors: [strip, strip.withOpacity(0.6)],
+                    colors: [strip, strip.withValues(alpha: 0.6)],
                   ),
                 ),
               ),
@@ -323,14 +323,14 @@ class _MobileCard extends StatelessWidget {
                       decoration: BoxDecoration(
                         gradient: LinearGradient(
                           colors: [
-                            strip.withOpacity(0.15),
-                            strip.withOpacity(0.08)
+                            strip.withValues(alpha: 0.15),
+                            strip.withValues(alpha: 0.08)
                           ],
                         ),
                         borderRadius:
                         BorderRadius.circular(16),
                         border: Border.all(
-                            color: strip.withOpacity(0.3),
+                            color: strip.withValues(alpha: 0.3),
                             width: 1.5),
                       ),
                       alignment: Alignment.center,
@@ -346,11 +346,11 @@ class _MobileCard extends StatelessWidget {
                       padding: const EdgeInsets.symmetric(
                           horizontal: 10, vertical: 4),
                       decoration: BoxDecoration(
-                        color: strip.withOpacity(0.1),
+                        color: strip.withValues(alpha: 0.1),
                         borderRadius:
                         BorderRadius.circular(20),
                         border: Border.all(
-                            color: strip.withOpacity(0.3),
+                            color: strip.withValues(alpha: 0.3),
                             width: 1),
                       ),
                       child: Row(
@@ -384,7 +384,7 @@ class _MobileCard extends StatelessWidget {
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          Icon(Icons.person_outline_rounded,
+                          const Icon(Icons.person_outline_rounded,
                               size: 13, color: colour.textSub),
                           const SizedBox(width: 3),
                           Flexible(
@@ -468,7 +468,7 @@ class _MobileCard extends StatelessWidget {
                     width: 28,
                     height: 28,
                     decoration: BoxDecoration(
-                      color: colour.brand.withOpacity(0.12),
+                      color: colour.brand.withValues(alpha: 0.12),
                       borderRadius:
                       BorderRadius.circular(8),
                     ),
@@ -497,7 +497,7 @@ class _MobileCard extends StatelessWidget {
                       borderRadius:
                       BorderRadius.circular(8),
                       border: Border.all(
-                          color: colour.brand.withOpacity(0.25)),
+                          color: colour.brand.withValues(alpha: 0.25)),
                     ),
                     child: Text(
                       model.BillNoDisplay.toString(),
@@ -621,7 +621,7 @@ class _MobileCard extends StatelessWidget {
                           gradient: LinearGradient(
                             colors: [
                               strip,
-                              strip.withOpacity(0.8)
+                              strip.withValues(alpha: 0.8)
                             ],
                           ),
                           borderRadius:
@@ -629,7 +629,7 @@ class _MobileCard extends StatelessWidget {
                           boxShadow: [
                             BoxShadow(
                               color:
-                              strip.withOpacity(0.35),
+                              strip.withValues(alpha: 0.35),
                               blurRadius: 8,
                               offset: const Offset(0, 3),
                             )
@@ -842,10 +842,10 @@ class _TabletRow extends StatelessWidget {
                   width: 28,
                   height: 28,
                   decoration: BoxDecoration(
-                    color: strip.withOpacity(0.12),
+                    color: strip.withValues(alpha: 0.12),
                     borderRadius: BorderRadius.circular(14),
                     border: Border.all(
-                        color: strip.withOpacity(0.3)),
+                        color: strip.withValues(alpha: 0.3)),
                   ),
                   alignment: Alignment.center,
                   child: Text('${index + 1}',
@@ -863,10 +863,10 @@ class _TabletRow extends StatelessWidget {
                       horizontal: 7, vertical: 3),
                   margin: const EdgeInsets.only(right: 6),
                   decoration: BoxDecoration(
-                    color: strip.withOpacity(0.1),
+                    color: strip.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(16),
                     border: Border.all(
-                        color: strip.withOpacity(0.25)),
+                        color: strip.withValues(alpha: 0.25)),
                   ),
                   child: Text(
                     model.JobStatus.toString().toUpperCase(),
@@ -978,9 +978,9 @@ class _TabletRow extends StatelessWidget {
           width: 32,
           height: 32,
           decoration: BoxDecoration(
-            color: color.withOpacity(0.1),
+            color: color.withValues(alpha: 0.1),
             borderRadius: BorderRadius.circular(8),
-            border: Border.all(color: color.withOpacity(0.3)),
+            border: Border.all(color: color.withValues(alpha: 0.3)),
           ),
           child: Icon(icon, color: color, size: 17),
         ),
@@ -1023,7 +1023,7 @@ class _DetailPanel extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      decoration: BoxDecoration(
+      decoration: const BoxDecoration(
         color: colour.surface,
         border: Border(top: BorderSide(color: colour.border)),
       ),
@@ -1038,7 +1038,7 @@ class _DetailPanel extends StatelessWidget {
             decoration: BoxDecoration(
               gradient: LinearGradient(colors: [
                 accent,
-                accent.withOpacity(0.75)
+                accent.withValues(alpha: 0.75)
               ]),
               borderRadius: BorderRadius.circular(10),
             ),
@@ -1072,7 +1072,7 @@ class _DetailPanel extends StatelessWidget {
                 index: e.key,
                 d: e.value,
                 accent: accent))
-                .toList(),
+                ,
         ],
       ),
     );
@@ -1195,7 +1195,7 @@ class _EmptyState extends StatelessWidget {
         const SizedBox(height: 4),
         Text('Adjust your filter to see results',
             style: GoogleFonts.poppins(
-                color: colour.textSub.withOpacity(0.6),
+                color: colour.textSub.withValues(alpha: 0.6),
                 fontSize: 12)),
       ]),
     );
@@ -1623,9 +1623,10 @@ class _FilterSheetState extends State<_FilterSheet> {
               .format(DateTime.parse(_from)),
               () async {
             final p = await _pickDate(context);
-            if (p != null)
+            if (p != null) {
               setState(() =>
               _from = DateFormat('yyyy-MM-dd').format(p));
+            }
           },
         )),
     const SizedBox(width: 10),
@@ -1635,9 +1636,10 @@ class _FilterSheetState extends State<_FilterSheet> {
               .format(DateTime.parse(_to)),
               () async {
             final p = await _pickDate(context);
-            if (p != null)
+            if (p != null) {
               setState(() =>
               _to = DateFormat('yyyy-MM-dd').format(p));
+            }
           },
         )),
   ]);
@@ -1759,7 +1761,7 @@ class _FilterSheetState extends State<_FilterSheet> {
           border: Border.all(
               color: enabled
                   ? colour.border
-                  : colour.border.withOpacity(0.3)),
+                  : colour.border.withValues(alpha: 0.3)),
           color: enabled ? Colors.white : colour.surface,
         ),
         child: Row(children: [
@@ -1769,7 +1771,7 @@ class _FilterSheetState extends State<_FilterSheet> {
               value.isEmpty ? hint : value,
               style: GoogleFonts.poppins(
                   color: value.isEmpty
-                      ? colour.textSub.withOpacity(0.45)
+                      ? colour.textSub.withValues(alpha: 0.45)
                       : colour.textMain,
                   fontSize: 13,
                   fontWeight: value.isEmpty
@@ -1790,7 +1792,7 @@ class _FilterSheetState extends State<_FilterSheet> {
                     : Icons.close_rounded,
                 color: enabled
                     ? colour.brand
-                    : colour.textSub.withOpacity(0.25),
+                    : colour.textSub.withValues(alpha: 0.25),
                 size: 20,
               ),
             ),
@@ -1814,7 +1816,7 @@ class _FilterSheetState extends State<_FilterSheet> {
         decoration: InputDecoration(
           hintText: hint,
           hintStyle: GoogleFonts.poppins(
-              color: colour.textSub.withOpacity(0.45),
+              color: colour.textSub.withValues(alpha: 0.45),
               fontSize: 13),
           contentPadding: const EdgeInsets.symmetric(
               horizontal: 14, vertical: 12),

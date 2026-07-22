@@ -107,7 +107,7 @@ class _SalesOrderTabState extends State<SalesOrderTab> {
 
           final isTabSwitching = state is InvoiceTabSwitching;
           final tabIndex = isTabSwitching
-              ? (state as InvoiceTabSwitching).targetTabIndex
+              ? (state).targetTabIndex
               : loaded.selectedTabIndex;
 
           final data = loaded.saleDataAll.isNotEmpty
@@ -245,10 +245,10 @@ class _SalesOrderTabState extends State<SalesOrderTab> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Row(
+        const Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            const Text('Overview',
+            Text('Overview',
                 style: TextStyle(
                     fontSize: 15,
                     fontWeight: FontWeight.bold,
@@ -774,7 +774,7 @@ class _HeroHeaderCard extends StatelessWidget {
             child: Container(
               width: 140, height: 140,
               decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.07),
+                  color: Colors.white.withValues(alpha: 0.07),
                   shape: BoxShape.circle),
             ),
           ),
@@ -783,7 +783,7 @@ class _HeroHeaderCard extends StatelessWidget {
             child: Container(
               width: 80, height: 80,
               decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.05),
+                  color: Colors.white.withValues(alpha: 0.05),
                   shape: BoxShape.circle),
             ),
           ),
@@ -814,11 +814,11 @@ class _HeroHeaderCard extends StatelessWidget {
                   _HeaderChip(
                       icon: Icons.attach_money,
                       label: '$weekSales weekly',
-                      color: Colors.white.withOpacity(0.18)),
+                      color: Colors.white.withValues(alpha: 0.18)),
                   _HeaderChip(
                       icon: Icons.check_circle_outline,
                       label: '$monthSales billed',
-                      color: Colors.green.withOpacity(0.35)),
+                      color: Colors.green.withValues(alpha: 0.35)),
                 ]),
               ],
             ),

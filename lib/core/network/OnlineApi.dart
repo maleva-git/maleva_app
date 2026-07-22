@@ -91,7 +91,7 @@ Future<bool> Login(String Username, String Password, String OldUsername,int Driv
                   var decoded = json.decode(temp1);
                   List menudata = decoded;
 
-                  if (menudata != null && menudata.isNotEmpty) {
+                  if (menudata.isNotEmpty) {
                     AppGlobals.objMenuMaster.clear();
                     AppGlobals.parentclass.clear();
                     for (int i = 0; i < menudata.length; i++) {
@@ -715,7 +715,7 @@ Future EditSalesOrder(int Id, int SaleNo, {BuildContext? context}) async {
         Uri.encodeFull("${ApiConstants.apiEditSalesOrder}$Id&SaleorderNo=$SaleNo&Comid=$Comid"),
         null, null, context);
 
-    if (resultData != null && resultData.isNotEmpty) {
+    if (resultData.isNotEmpty) {
       AppGlobals.SaleEditMasterList = resultData;
       AppGlobals.SaleEditDetailList = resultData[0]["SaleDetails"]
           .map((element) => SaleEditDetailModel.fromJson(element))
@@ -1184,10 +1184,8 @@ Future<List<String>> GetEmployeeport(context) async {
     final resultData = await ApiLegacyHelper.apiAllinoneSelect(
         Uri.encodeFull("${ApiConstants.port}/api/EmployeeApp/GetEmployeeport?Comid=$Comid&id=$empId"), null, null, context);
         
-    if (resultData != null && resultData is List) {
-      return resultData.map((e) => e["AccountName"].toString()).toList();
-    }
-  } catch (error) {
+    return resultData.map((e) => e["AccountName"].toString()).toList();
+    } catch (error) {
     debugPrint("Error fetching employee ports: $error");
   }
   return [];

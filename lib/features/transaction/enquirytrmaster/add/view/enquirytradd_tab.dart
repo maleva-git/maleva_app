@@ -145,12 +145,15 @@ class _AddEnquiryPage extends StatelessWidget {
               final confirm = await ConfirmationMsgYesNo(
                   context, 'Do You Want to Save ?');
               if (confirm == true) {
+                if (!context.mounted) return;
                 final state = context.read<EnquiryAddBloc>().state;
                 if (state is EnquiryAddLoaded &&
                     state.custName.isEmpty) {
+                  if (!context.mounted) return;
                   toastMsg('Enter Customer Name', '', context);
                   return;
                 }
+                if (!context.mounted) return;
                 context
                     .read<EnquiryAddBloc>()
                     .add(EnquiryAddSaveRequested());
@@ -194,12 +197,14 @@ class _AddEnquiryBody extends StatelessWidget {
               MaterialPageRoute(
                   builder: (_) =>
                   const Customer(Searchby: 1, SearchId: 0)),
-            ).then((_navRes) async {
-              if (_navRes != null) { AppGlobals.SelectCustomerList = _navRes; }
+            ).then((navRes) async {
+              if (navRes != null) { AppGlobals.SelectCustomerList = navRes; }
               final sel = AppGlobals.SelectCustomerList;
               if (sel.Id != 0) {
+                if (!context.mounted) return;
                 _emit(context, EnquiryAddCustomerChanged(
                     custId: sel.Id, custName: sel.AccountName));
+                if (!context.mounted) return;
                 context.read<EnquiryAddBloc>().add(EnquiryAddFetchCurrency(sel.Id));
                 AppGlobals.SelectCustomerList = CustomerModel.Empty();
               }
@@ -221,11 +226,13 @@ class _AddEnquiryBody extends StatelessWidget {
               MaterialPageRoute(
                   builder: (_) =>
                   const JobType(Searchby: 1, SearchId: 0)),
-            ).then((_navRes) async {
-              if (_navRes != null) { AppGlobals.SelectJobTypeList = _navRes; }
+            ).then((navRes) async {
+              if (navRes != null) { AppGlobals.SelectJobTypeList = navRes; }
               final sel = AppGlobals.SelectJobTypeList;
               if (sel.Id != 0) {
+                if (!context.mounted) return;
                 context.read<EnquiryAddBloc>().add(EnquiryAddFetchJobStatuses(sel.Id));
+                if (!context.mounted) return;
                 _emit(context, EnquiryAddJobTypeChanged(                    jobTypeId: sel.Id, jobTypeName: sel.Name));
                 AppGlobals.SelectJobTypeList = JobTypeModel.Empty();
               }
@@ -251,6 +258,7 @@ class _AddEnquiryBody extends StatelessWidget {
               builder: _datepickerTheme,
             );
             if (picked != null) {
+              if (!context.mounted) return;
               _emit(context,
                   EnquiryAddNotifyDateChanged(picked.toString()));
             }
@@ -270,9 +278,10 @@ class _AddEnquiryBody extends StatelessWidget {
               MaterialPageRoute(
                   builder: (_) =>
                   const Location(Searchby: 1, SearchId: 0)),
-            ).then((_navRes) { if (_navRes != null) { AppGlobals.SelectLocationList = _navRes; }
+            ).then((navRes) { if (navRes != null) { AppGlobals.SelectLocationList = navRes; }
               final sel = AppGlobals.SelectLocationList;
               if (sel.Id != 0) {
+                if (!context.mounted) return;
                 _emit(context, EnquiryAddOriginChanged(
                     originId: sel.Id, originName: sel.Location));
                 AppGlobals.SelectLocationList = LocationModel.Empty();
@@ -295,9 +304,10 @@ class _AddEnquiryBody extends StatelessWidget {
               MaterialPageRoute(
                   builder: (_) =>
                   const Location(Searchby: 1, SearchId: 0)),
-            ).then((_navRes) { if (_navRes != null) { AppGlobals.SelectLocationList = _navRes; }
+            ).then((navRes) { if (navRes != null) { AppGlobals.SelectLocationList = navRes; }
               final sel = AppGlobals.SelectLocationList;
               if (sel.Id != 0) {
+                if (!context.mounted) return;
                 _emit(context, EnquiryAddDestinationChanged(
                     destinationId: sel.Id,
                     destinationName: sel.Location));
@@ -411,6 +421,7 @@ class _AddEnquiryBody extends StatelessWidget {
       builder: _datepickerTheme,
     );
     if (date == null) return;
+    if (!context.mounted) return;
     final time = await showTimePicker(
       context: context,
       initialTime: TimeOfDay.now(),
@@ -631,6 +642,7 @@ class _AddSearchField extends StatelessWidget {
   final VoidCallback onClear;
 
   const _AddSearchField({
+    super.key,
     required this.hint,
     required this.value,
     this.disabled = false,

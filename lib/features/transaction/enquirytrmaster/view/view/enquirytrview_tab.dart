@@ -565,6 +565,7 @@ AppTokens.headerGradient)),
                               context,
                               'Do You Want to Push to SalesOrder ?');
                           if (confirm == true) {
+                            if (!context.mounted) return;
                             context.read<EnquiryViewBloc>().add(
                                 EnquiryViewPushToSaleOrder(index));
                           }
@@ -581,6 +582,7 @@ AppTokens.headerGradient)),
                               context,
                               'Do You Want to Cancel the Enquiry ?');
                           if (confirm == true) {
+                            if (!context.mounted) return;
                             context.read<EnquiryViewBloc>().add(
                                 EnquiryViewCancelRequested(
                                     item.id));
@@ -723,7 +725,7 @@ class _FilterSheetState extends State<_FilterSheet> {
                   MaterialPageRoute(
                       builder: (_) =>
                       const Customer(Searchby: 1, SearchId: 0)),
-                ).then((_navRes) { if (_navRes != null) { AppGlobals.SelectCustomerList = _navRes; }
+                ).then((navRes) { if (navRes != null) { AppGlobals.SelectCustomerList = navRes; }
                   final sel = AppGlobals.SelectCustomerList;
                   if (sel.Id != 0) {
                     setState(() {
@@ -796,7 +798,7 @@ class _FilterSheetState extends State<_FilterSheet> {
                     MaterialPageRoute(
                         builder: (_) =>
                         const Employee(Searchby: 1, SearchId: 0)),
-                  ).then((_navRes) { if (_navRes != null) { AppGlobals.SelectEmployeeList = _navRes; }
+                  ).then((navRes) { if (navRes != null) { AppGlobals.SelectEmployeeList = navRes; }
                     final sel = AppGlobals.SelectEmployeeList;
                     if (sel.Id != 0) {
                       setState(() {

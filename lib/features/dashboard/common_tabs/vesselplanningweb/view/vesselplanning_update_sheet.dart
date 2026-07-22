@@ -111,6 +111,7 @@ class _VesselPlanningUpdateSheetState extends State<VesselPlanningUpdateSheet> {
     );
     if (date == null || !mounted) return;
 
+    if (!context.mounted) return;
     final time = await showTimePicker(
       context: context,
       initialTime: TimeOfDay.fromDateTime(initial),
@@ -260,11 +261,11 @@ class _VesselPlanningUpdateSheetState extends State<VesselPlanningUpdateSheet> {
                         contentPadding: const EdgeInsets.symmetric(horizontal: 10),
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(4),
-                          borderSide: BorderSide(color: AppTokens.maintCardBorder),
+                          borderSide: const BorderSide(color: AppTokens.maintCardBorder),
                         ),
                         enabledBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(4),
-                          borderSide: BorderSide(color: AppTokens.maintCardBorder),
+                          borderSide: const BorderSide(color: AppTokens.maintCardBorder),
                         ),
                         focusedBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(4),
@@ -284,7 +285,7 @@ class _VesselPlanningUpdateSheetState extends State<VesselPlanningUpdateSheet> {
                       borderRadius: BorderRadius.circular(4),
                       boxShadow: [
                         BoxShadow(
-                          color: AppTokens.invoiceHeaderStart.withOpacity(0.3),
+                          color: AppTokens.invoiceHeaderStart.withValues(alpha: 0.3),
                           blurRadius: 6,
                           offset: const Offset(0, 3),
                         ),
@@ -361,9 +362,9 @@ class _VesselPlanningUpdateSheetState extends State<VesselPlanningUpdateSheet> {
                   border: Border(left: BorderSide(color: AppTokens.maintCardBorder)),
                   color: colour.kCardBg,
                 ),
-                child: Row(
+                child: const Row(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: const [
+                  children: [
                     Icon(Icons.calendar_month, size: 14, color: AppTokens.planTextMuted),
                     Icon(Icons.access_time, size: 14, color: AppTokens.planTextMuted),
                   ],
@@ -453,7 +454,7 @@ class _VesselPlanningUpdateSheetState extends State<VesselPlanningUpdateSheet> {
               borderRadius: BorderRadius.circular(4),
               boxShadow: [
                 BoxShadow(
-                  color: AppTokens.invoiceHeaderStart.withOpacity(0.2),
+                  color: AppTokens.invoiceHeaderStart.withValues(alpha: 0.2),
                   blurRadius: 4,
                   offset: const Offset(0, 2),
                 ),

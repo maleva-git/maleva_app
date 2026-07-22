@@ -73,7 +73,7 @@ class LicenseView extends StatelessWidget {
                           width: 40,
                           height: 40,
                           decoration: BoxDecoration(
-                            color: Palette.white.withOpacity(0.18),
+                            color: Palette.white.withValues(alpha: 0.18),
                             borderRadius: BorderRadius.circular(12),
                           ),
                           child: const Icon(Icons.badge_outlined,
@@ -92,7 +92,7 @@ class LicenseView extends StatelessWidget {
                             Text("License records",
                                 style: GoogleFonts.poppins(
                                   fontSize: 12,
-                                  color: Palette.white.withOpacity(0.7),
+                                  color: Palette.white.withValues(alpha: 0.7),
                                 )),
                           ],
                         ),
@@ -105,10 +105,10 @@ class LicenseView extends StatelessWidget {
                             width: 36,
                             height: 36,
                             decoration: BoxDecoration(
-                              color: Palette.white.withOpacity(0.15),
+                              color: Palette.white.withValues(alpha: 0.15),
                               borderRadius: BorderRadius.circular(10),
                               border: Border.all(
-                                  color: Palette.white.withOpacity(0.3)),
+                                  color: Palette.white.withValues(alpha: 0.3)),
                             ),
                             child: const Icon(Icons.refresh_rounded,
                                 color: Palette.white, size: 18),
@@ -124,7 +124,7 @@ class LicenseView extends StatelessWidget {
                         borderRadius: BorderRadius.circular(14),
                         boxShadow: [
                           BoxShadow(
-                            color: Colors.black.withOpacity(0.08),
+                            color: Colors.black.withValues(alpha: 0.08),
                             blurRadius: 8,
                             offset: const Offset(0, 3),
                           ),
@@ -189,9 +189,9 @@ class LicenseView extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.all(20),
                 decoration: BoxDecoration(
-                    color: Palette.redDanger.withOpacity(0.08),
+                    color: Palette.redDanger.withValues(alpha: 0.08),
                     shape: BoxShape.circle),
-                child: Icon(Icons.wifi_off_rounded,
+                child: const Icon(Icons.wifi_off_rounded,
                     color: Palette.redDanger, size: 40),
               ),
               const SizedBox(height: 16),
@@ -362,12 +362,12 @@ class _LicenseCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(20),
         border: Border.all(
           color: isActive
-              ? Palette.greenEco.withOpacity(0.15)
-              : Palette.redDanger.withOpacity(0.15),
+              ? Palette.greenEco.withValues(alpha: 0.15)
+              : Palette.redDanger.withValues(alpha: 0.15),
         ),
         boxShadow: [
           BoxShadow(
-            color: AppTokens.brandPrimary.withOpacity(0.05),
+            color: AppTokens.brandPrimary.withValues(alpha: 0.05),
             blurRadius: 14,
             offset: const Offset(0, 5),
           ),
@@ -401,7 +401,7 @@ class _LicenseCard extends StatelessWidget {
                       width: 46,
                       height: 46,
                       decoration: BoxDecoration(
-                        color: AppTokens.brandPrimary.withOpacity(0.08),
+                        color: AppTokens.brandPrimary.withValues(alpha: 0.08),
                         borderRadius: BorderRadius.circular(14),
                       ),
                       child: const Icon(Icons.person_rounded,
@@ -461,10 +461,10 @@ class _LicenseCard extends StatelessWidget {
                       padding: const EdgeInsets.symmetric(
                           horizontal: 10, vertical: 5),
                       decoration: BoxDecoration(
-                        color: statusColor.withOpacity(0.1),
+                        color: statusColor.withValues(alpha: 0.1),
                         borderRadius: BorderRadius.circular(10),
                         border:
-                        Border.all(color: statusColor.withOpacity(0.3)),
+                        Border.all(color: statusColor.withValues(alpha: 0.3)),
                       ),
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
@@ -492,7 +492,7 @@ class _LicenseCard extends StatelessWidget {
                 ),
 
                 const SizedBox(height: 12),
-                Divider(color: AppTokens.surfaceBorder, height: 1),
+                const Divider(color: AppTokens.surfaceBorder, height: 1),
                 const SizedBox(height: 12),
 
                 // ── Info Chips ───────────────────────────────────────────
@@ -515,7 +515,7 @@ class _LicenseCard extends StatelessWidget {
                       label: "License Exp",
                       value: _fmt(_licenseExp),
                       iconColor: expiryColor,
-                      bgColor: expiryColor.withOpacity(0.08),
+                      bgColor: expiryColor.withValues(alpha: 0.08),
                       valueColor: expiryColor,
                     ),
                   ],
@@ -530,13 +530,13 @@ class _LicenseCard extends StatelessWidget {
                         horizontal: 12, vertical: 8),
                     decoration: BoxDecoration(
                       color: expired
-                          ? Palette.redDanger.withOpacity(0.06)
-                          : Palette.amber.withOpacity(0.06),
+                          ? Palette.redDanger.withValues(alpha: 0.06)
+                          : Palette.amber.withValues(alpha: 0.06),
                       borderRadius: BorderRadius.circular(10),
                       border: Border.all(
                         color: expired
-                            ? Palette.redDanger.withOpacity(0.2)
-                            : Palette.amber.withOpacity(0.2),
+                            ? Palette.redDanger.withValues(alpha: 0.2)
+                            : Palette.amber.withValues(alpha: 0.2),
                       ),
                     ),
                     child: Row(

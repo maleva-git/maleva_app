@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:image_picker/image_picker.dart';
 
 import 'package:maleva/core/utils/app_globals.dart';
 import 'package:maleva/core/colors/colors.dart' as colour;
@@ -58,7 +57,8 @@ class _RTIStatusView extends StatelessWidget {
           if (state.status == RTIStatusStatus.success &&
               state.jobNo.isEmpty) {
             // jobNo is cleared after RTIStatusClearRequested → means update was done
-            Navigator.pushReplacement(
+            if (!context.mounted) return;
+Navigator.pushReplacement(
               context,
               MaterialPageRoute(builder: (_) => const UpdateRTI()),
             );
@@ -83,8 +83,10 @@ class _RTIStatusView extends StatelessWidget {
 
         // Show image preview dialog
         if (state.previewImageIndex != null) {
+          if (!context.mounted) return;
           _showPreviewDialog(context, state);
           // Clear the trigger immediately
+          if (!context.mounted) return;
           context
               .read<RTIStatusBloc>()
               .emit(state.copyWith(clearPreview: true));

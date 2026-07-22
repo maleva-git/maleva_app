@@ -1,4 +1,3 @@
-import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:maleva/core/network/dio_client.dart';
 import 'package:maleva/core/utils/session_manager.dart';

@@ -26,7 +26,6 @@ import 'package:maleva/features/transaction/salesorder/add/bloc/salesorderadd_ev
 import 'package:maleva/features/transaction/salesorder/add/bloc/salesorderadd_state.dart';
 import 'package:maleva/core/di/injection.dart';
 import 'package:maleva/core/colors/colors.dart' as colour;
-import 'package:maleva/features/transaction/salesorder/add/data/salesorderadd_repository.dart';
 import 'package:maleva/core/models/shared/customer_model.dart';
 import 'package:maleva/core/models/shared/employee_model.dart';
 import 'package:maleva/core/models/shared/address_details_model.dart';
@@ -70,7 +69,7 @@ class _SalesOrderAddBody extends StatefulWidget {
 
 class _SalesOrderAddBodyState extends State<_SalesOrderAddBody> with TickerProviderStateMixin {
   late TabController _tabController;
-  String _activeNumpadField = 'qty';
+  final String _activeNumpadField = 'qty';
 
   final Map<String, TextEditingController> _controllers = {};
 
@@ -225,7 +224,7 @@ class _SalesOrderAddBodyState extends State<_SalesOrderAddBody> with TickerProvi
       child: TextButton(
         onPressed: enabled ? onPressed : null,
         style: TextButton.styleFrom(
-          backgroundColor: enabled ? Colors.white.withOpacity(0.2) : Colors.white.withOpacity(0.07),
+          backgroundColor: enabled ? Colors.white.withValues(alpha: 0.2) : Colors.white.withValues(alpha: 0.07),
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8), side: BorderSide(color: enabled ? Colors.white54 : Colors.white24)),
           padding: const EdgeInsets.symmetric(horizontal: 12),
         ),
@@ -261,8 +260,8 @@ class _SalesOrderAddBodyState extends State<_SalesOrderAddBody> with TickerProvi
     return Container(
       decoration: BoxDecoration(
         color: Colors.white,
-        boxShadow: [BoxShadow(color: colour.brand.withOpacity(0.1), blurRadius: 12, offset: const Offset(0, -3))],
-        border: Border(top: BorderSide(color: colour.border, width: 1)),
+        boxShadow: [BoxShadow(color: colour.brand.withValues(alpha: 0.1), blurRadius: 12, offset: const Offset(0, -3))],
+        border: const Border(top: BorderSide(color: colour.border, width: 1)),
       ),
       child: SalomonBottomBar(
         duration: const Duration(milliseconds: 300),
@@ -367,7 +366,7 @@ class _SalesOrderAddBodyState extends State<_SalesOrderAddBody> with TickerProvi
         _productHeader(),
         const SizedBox(height: 4),
         if (state.productViewList.isEmpty) _emptyProducts()
-        else ...state.productViewList.asMap().entries.map((e) => _productRow(context, state, e.key, e.value, bloc)).toList(),
+        else ...state.productViewList.asMap().entries.map((e) => _productRow(context, state, e.key, e.value, bloc)),
       ],
     ]);
   }
@@ -381,8 +380,8 @@ class _SalesOrderAddBodyState extends State<_SalesOrderAddBody> with TickerProvi
         _searchField(
           hint: "Commodity Type", uniqueId: 'search_commodity', value: state.txtCommodityType, enabled: fp["txtCommodityType"] == true,
           onSearch: () async {
-            final __navResult1 = await Navigator.push(context, MaterialPageRoute(builder: (_) => const CommodityType(Searchby: 1, SearchId: 0))); if (__navResult1 != null) { AppGlobals.SelectedCommodityName = __navResult1; }
-if (__navResult1 != null) { AppGlobals.SelectedCommodityName = __navResult1; }
+            final navResult1 = await Navigator.push(context, MaterialPageRoute(builder: (_) => const CommodityType(Searchby: 1, SearchId: 0))); if (navResult1 != null) { AppGlobals.SelectedCommodityName = navResult1; }
+if (navResult1 != null) { AppGlobals.SelectedCommodityName = navResult1; }
 
             if (AppGlobals.SelectedCommodityName.isNotEmpty) {
               bloc.add(CommoditySelected(AppGlobals.SelectedCommodityName));
@@ -414,8 +413,8 @@ if (__navResult1 != null) { AppGlobals.SelectedCommodityName = __navResult1; }
         _searchField(
           hint: "Cargo", uniqueId: 'search_cargo', value: state.txtCargo, enabled: fp["txtCargo"] == true,
           onSearch: () async {
-            final __navResult2 = await Navigator.push(context, MaterialPageRoute(builder: (_) => const CargoStatus(Searchby: 1, SearchId: 0)));
-if (__navResult2 != null) { AppGlobals.SelectedCargoName = __navResult2; }
+            final navResult2 = await Navigator.push(context, MaterialPageRoute(builder: (_) => const CargoStatus(Searchby: 1, SearchId: 0)));
+if (navResult2 != null) { AppGlobals.SelectedCargoName = navResult2; }
 
             if (AppGlobals.SelectedCargoName.isNotEmpty) {
               bloc.add(CargoSelected(AppGlobals.SelectedCargoName));
@@ -473,8 +472,8 @@ if (__navResult2 != null) { AppGlobals.SelectedCargoName = __navResult2; }
           _searchField(
             hint: "Port", uniqueId: 'search_l_port', value: state.txtLPort, enabled: fp["txtLPort"] == true,
             onSearch: () async {
-              final __navResult3 = await Navigator.push(context, MaterialPageRoute(builder: (_) => const Port(Searchby: 1, SearchId: 0)));
-if (__navResult3 != null) { AppGlobals.SelectedPortName = __navResult3; }
+              final navResult3 = await Navigator.push(context, MaterialPageRoute(builder: (_) => const Port(Searchby: 1, SearchId: 0)));
+if (navResult3 != null) { AppGlobals.SelectedPortName = navResult3; }
 
               if (AppGlobals.SelectedPortName.isNotEmpty) {
                 bloc.add(LPortSelected(AppGlobals.SelectedPortName));
@@ -488,8 +487,8 @@ if (__navResult3 != null) { AppGlobals.SelectedPortName = __navResult3; }
           _searchField(
             hint: "Vessel Type", uniqueId: 'search_l_vesseltype', value: state.txtLVesselType, enabled: fp["txtLVesselType"] == true,
             onSearch: () async {
-              final __navResult4 = await Navigator.push(context, MaterialPageRoute(builder: (_) => const VesselType(Searchby: 1, SearchId: 0)));
-if (__navResult4 != null) { AppGlobals.SelectedVesselTypeName = __navResult4; }
+              final navResult4 = await Navigator.push(context, MaterialPageRoute(builder: (_) => const VesselType(Searchby: 1, SearchId: 0)));
+if (navResult4 != null) { AppGlobals.SelectedVesselTypeName = navResult4; }
 
               if (AppGlobals.SelectedVesselTypeName.isNotEmpty) {
                 bloc.add(LVesselTypeSelected(AppGlobals.SelectedVesselTypeName));
@@ -543,8 +542,8 @@ if (__navResult4 != null) { AppGlobals.SelectedVesselTypeName = __navResult4; }
           _searchField(
             hint: "Port", uniqueId: 'search_o_port', value: state.txtOPort, enabled: fp["txtOPort"] == true,
             onSearch: () async {
-              final __navResult5 = await Navigator.push(context, MaterialPageRoute(builder: (_) => const Port(Searchby: 1, SearchId: 0)));
-if (__navResult5 != null) { AppGlobals.SelectedPortName = __navResult5; }
+              final navResult5 = await Navigator.push(context, MaterialPageRoute(builder: (_) => const Port(Searchby: 1, SearchId: 0)));
+if (navResult5 != null) { AppGlobals.SelectedPortName = navResult5; }
 
               if (AppGlobals.SelectedPortName.isNotEmpty) {
                 bloc.add(OPortSelected(AppGlobals.SelectedPortName));
@@ -558,8 +557,8 @@ if (__navResult5 != null) { AppGlobals.SelectedPortName = __navResult5; }
           _searchField(
             hint: "Vessel Type", uniqueId: 'search_o_vesseltype', value: state.txtOVesselType, enabled: fp["txtOVesselType"] == true,
             onSearch: () async {
-              final __navResult6 = await Navigator.push(context, MaterialPageRoute(builder: (_) => const VesselType(Searchby: 1, SearchId: 0)));
-if (__navResult6 != null) { AppGlobals.SelectedVesselTypeName = __navResult6; }
+              final navResult6 = await Navigator.push(context, MaterialPageRoute(builder: (_) => const VesselType(Searchby: 1, SearchId: 0)));
+if (navResult6 != null) { AppGlobals.SelectedVesselTypeName = navResult6; }
 
               if (AppGlobals.SelectedVesselTypeName.isNotEmpty) {
                 bloc.add(OVesselTypeSelected(AppGlobals.SelectedVesselTypeName));
@@ -636,7 +635,7 @@ if (__navResult6 != null) { AppGlobals.SelectedVesselTypeName = __navResult6; }
             AppGlobals.AddressDetailedList = details.map<AddressDetailsModel>((e) => AddressDetailsModel.fromJson(e)).toList();
             if (!context.mounted) return;
             if (AppGlobals.AddressDetailedList.isNotEmpty) {
-              bloc.add(PickUpAddressSelected(AppGlobals.AddressDetailedList[0].Address + (AppGlobals.AddressDetailedList[0].Phone != null ? " ${AppGlobals.AddressDetailedList[0].Phone}" : "")));
+              bloc.add(PickUpAddressSelected(AppGlobals.AddressDetailedList[0].Address + (" ${AppGlobals.AddressDetailedList[0].Phone}")));
             }
             AppGlobals.SelectAddressList = "";
             AppGlobals.AddressDetailedList = [];
@@ -669,7 +668,7 @@ if (__navResult6 != null) { AppGlobals.SelectedVesselTypeName = __navResult6; }
             AppGlobals.AddressDetailedList = details.map<AddressDetailsModel>((e) => AddressDetailsModel.fromJson(e)).toList();
             if (!context.mounted) return;
             if (AppGlobals.AddressDetailedList.isNotEmpty) {
-              bloc.add(DeliveryAddressSelected(AppGlobals.AddressDetailedList[0].Address + (AppGlobals.AddressDetailedList[0].Phone != null ? " ${AppGlobals.AddressDetailedList[0].Phone}" : "")));
+              bloc.add(DeliveryAddressSelected(AppGlobals.AddressDetailedList[0].Address + (" ${AppGlobals.AddressDetailedList[0].Phone}")));
             }
             AppGlobals.SelectAddressList = "";
             AppGlobals.AddressDetailedList = [];
@@ -693,7 +692,7 @@ if (__navResult6 != null) { AppGlobals.SelectedVesselTypeName = __navResult6; }
               AppGlobals.AddressDetailedList = details.map<AddressDetailsModel>((e) => AddressDetailsModel.fromJson(e)).toList();
               if (!context.mounted) return;
               if (AppGlobals.AddressDetailedList.isNotEmpty) {
-                bloc.add(WarehouseAddressSelected(AppGlobals.AddressDetailedList[0].Address + (AppGlobals.AddressDetailedList[0].Phone != null ? " ${AppGlobals.AddressDetailedList[0].Phone}" : "")));
+                bloc.add(WarehouseAddressSelected(AppGlobals.AddressDetailedList[0].Address + (" ${AppGlobals.AddressDetailedList[0].Phone}")));
               }
               AppGlobals.SelectAddressList = "";
               AppGlobals.AddressDetailedList = [];
@@ -730,8 +729,8 @@ if (__navResult6 != null) { AppGlobals.SelectedVesselTypeName = __navResult6; }
             final emps = await sl<SalesOrderAddRepository>().selectEmployee('', 'Operation');
             AppGlobals.EmployeeList = emps.map<EmployeeModel>((e) => EmployeeModel.fromJson(e)).toList();
             if (!context.mounted) return;
-            final __navResult7 = await Navigator.push(context, MaterialPageRoute(builder: (_) => const Employee(Searchby: 1, SearchId: 0))); if (__navResult7 != null) { AppGlobals.SelectEmployeeList = __navResult7; }
-if (__navResult7 != null) { AppGlobals.SelectEmployeeList = __navResult7; }
+            final navResult7 = await Navigator.push(context, MaterialPageRoute(builder: (_) => const Employee(Searchby: 1, SearchId: 0))); if (navResult7 != null) { AppGlobals.SelectEmployeeList = navResult7; }
+if (navResult7 != null) { AppGlobals.SelectEmployeeList = navResult7; }
 
             if (AppGlobals.SelectEmployeeList.AccountName.isNotEmpty) {
               bloc.add(BoardingOfficer1Selected(AppGlobals.SelectEmployeeList.AccountName, AppGlobals.SelectEmployeeList.Id));
@@ -750,8 +749,8 @@ if (__navResult7 != null) { AppGlobals.SelectEmployeeList = __navResult7; }
             final emps = await sl<SalesOrderAddRepository>().selectEmployee('', 'Operation');
             AppGlobals.EmployeeList = emps.map<EmployeeModel>((e) => EmployeeModel.fromJson(e)).toList();
             if (!context.mounted) return;
-            final __navResult8 = await Navigator.push(context, MaterialPageRoute(builder: (_) => const Employee(Searchby: 1, SearchId: 0))); if (__navResult8 != null) { AppGlobals.SelectEmployeeList = __navResult8; }
-if (__navResult8 != null) { AppGlobals.SelectEmployeeList = __navResult8; }
+            final navResult8 = await Navigator.push(context, MaterialPageRoute(builder: (_) => const Employee(Searchby: 1, SearchId: 0))); if (navResult8 != null) { AppGlobals.SelectEmployeeList = navResult8; }
+if (navResult8 != null) { AppGlobals.SelectEmployeeList = navResult8; }
 
             if (AppGlobals.SelectEmployeeList.AccountName.isNotEmpty) {
               bloc.add(BoardingOfficer2Selected(AppGlobals.SelectEmployeeList.AccountName, AppGlobals.SelectEmployeeList.Id));
@@ -789,7 +788,7 @@ if (__navResult8 != null) { AppGlobals.SelectEmployeeList = __navResult8; }
             padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
             decoration: BoxDecoration(color: visible ? colour.brandLight : Colors.white, borderRadius: const BorderRadius.vertical(top: Radius.circular(16))),
             child: Row(children: [
-              AnimatedRotation(turns: visible ? 0.25 : 0, duration: const Duration(milliseconds: 200), child: Icon(Icons.arrow_right_rounded, color: colour.brand, size: 28)),
+              AnimatedRotation(turns: visible ? 0.25 : 0, duration: const Duration(milliseconds: 200), child: const Icon(Icons.arrow_right_rounded, color: colour.brand, size: 28)),
               const SizedBox(width: 8), Text("FW $fwNum", style: GoogleFonts.poppins(color: colour.brandDark, fontSize: 14, fontWeight: FontWeight.w700)),
               const SizedBox(width: 12), Expanded(child: _styledDropdown<String>(value: dropValue, items: SalesOrderAddBloc.forwardingNo, enabled: fp[dropKey] == true, onChanged: (v) => bloc.add(UpdateDropdown(dropKey, v)))),
             ]),
@@ -811,8 +810,8 @@ if (__navResult8 != null) { AppGlobals.SelectEmployeeList = __navResult8; }
                   final emps = await sl<SalesOrderAddRepository>().selectEmployee('', 'Operation');
                   AppGlobals.EmployeeList = emps.map<EmployeeModel>((e) => EmployeeModel.fromJson(e)).toList();
                   if (!context.mounted) return;
-                  final __navResult9 = await Navigator.push(context, MaterialPageRoute(builder: (_) => const Employee(Searchby: 1, SearchId: 0))); if (__navResult9 != null) { AppGlobals.SelectEmployeeList = __navResult9; }
-if (__navResult9 != null) { AppGlobals.SelectEmployeeList = __navResult9; }
+                  final navResult9 = await Navigator.push(context, MaterialPageRoute(builder: (_) => const Employee(Searchby: 1, SearchId: 0))); if (navResult9 != null) { AppGlobals.SelectEmployeeList = navResult9; }
+if (navResult9 != null) { AppGlobals.SelectEmployeeList = navResult9; }
 
                   if (AppGlobals.SelectEmployeeList.AccountName.isNotEmpty) { bloc.add(sealEvent(AppGlobals.SelectEmployeeList.AccountName, AppGlobals.SelectEmployeeList.Id)); AppGlobals.SelectEmployeeList = EmployeeModel.Empty(); }
                 },
@@ -824,8 +823,8 @@ if (__navResult9 != null) { AppGlobals.SelectEmployeeList = __navResult9; }
                   final emps = await sl<SalesOrderAddRepository>().selectEmployee('', 'Operation');
                   AppGlobals.EmployeeList = emps.map<EmployeeModel>((e) => EmployeeModel.fromJson(e)).toList();
                   if (!context.mounted) return;
-                  final __navResult10 = await Navigator.push(context, MaterialPageRoute(builder: (_) => const Employee(Searchby: 1, SearchId: 0))); if (__navResult10 != null) { AppGlobals.SelectEmployeeList = __navResult10; }
-if (__navResult10 != null) { AppGlobals.SelectEmployeeList = __navResult10; }
+                  final navResult10 = await Navigator.push(context, MaterialPageRoute(builder: (_) => const Employee(Searchby: 1, SearchId: 0))); if (navResult10 != null) { AppGlobals.SelectEmployeeList = navResult10; }
+if (navResult10 != null) { AppGlobals.SelectEmployeeList = navResult10; }
 
                   if (AppGlobals.SelectEmployeeList.AccountName.isNotEmpty) { bloc.add(breakEvent(AppGlobals.SelectEmployeeList.AccountName, AppGlobals.SelectEmployeeList.Id)); AppGlobals.SelectEmployeeList = EmployeeModel.Empty(); }
                 },
@@ -934,7 +933,7 @@ if (__navResult10 != null) { AppGlobals.SelectEmployeeList = __navResult10; }
   Widget _sectionLabel(String t) => Text(t, style: GoogleFonts.poppins(color: colour.textSub, fontSize: 10, fontWeight: FontWeight.w700, letterSpacing: 0.6));
   Widget _labelText(String t) => Text(t, style: GoogleFonts.poppins(color: colour.textMain, fontSize: 13, fontWeight: FontWeight.w600));
   Widget _gap() => const SizedBox(height: 10);
-  Widget _divider() => Divider(color: colour.border, thickness: 1);
+  Widget _divider() => const Divider(color: colour.border, thickness: 1);
   Widget _readonlyBox(String val) => Container(key: ValueKey('readonly_$val'), height: 44, padding: const EdgeInsets.symmetric(horizontal: 12), decoration: BoxDecoration(color: colour.brandLight, borderRadius: BorderRadius.circular(10), border: Border.all(color: colour.border)), alignment: Alignment.centerLeft, child: Text(val, style: GoogleFonts.poppins(color: colour.brandDark, fontSize: 13, fontWeight: FontWeight.w700)));
   Widget _dateTapBox({required String date, required VoidCallback? onTap}) => GestureDetector(onTap: onTap, child: Container(height: 44, padding: const EdgeInsets.symmetric(horizontal: 12), decoration: BoxDecoration(color: colour.brandLight, borderRadius: BorderRadius.circular(10), border: Border.all(color: colour.border)), child: Row(children: [const Icon(Icons.calendar_today_rounded, color: colour.brand, size: 15), const SizedBox(width: 8), Flexible(child: Text(date, style: GoogleFonts.poppins(color: colour.brandDark, fontSize: 13, fontWeight: FontWeight.w600)))])));
 
@@ -944,11 +943,11 @@ if (__navResult10 != null) { AppGlobals.SelectEmployeeList = __navResult10; }
       key: ValueKey(uniqueId),
       onTap: action,
       child: Container(
-        height: 46, decoration: BoxDecoration(color: enabled ? Colors.white : colour.surface, borderRadius: BorderRadius.circular(10), border: Border.all(color: enabled ? colour.border : colour.border.withOpacity(0.3))),
+        height: 46, decoration: BoxDecoration(color: enabled ? Colors.white : colour.surface, borderRadius: BorderRadius.circular(10), border: Border.all(color: enabled ? colour.border : colour.border.withValues(alpha: 0.3))),
         child: Row(children: [
           const SizedBox(width: 12),
-          Expanded(child: Text(value.isEmpty ? hint : value, style: GoogleFonts.poppins(color: value.isEmpty ? colour.textSub.withOpacity(0.45) : colour.textMain, fontSize: 13, fontWeight: value.isEmpty ? FontWeight.w400 : FontWeight.w600), overflow: TextOverflow.ellipsis)),
-          Padding(padding: const EdgeInsets.all(10), child: Icon(value.isEmpty ? Icons.search_rounded : Icons.close_rounded, color: enabled ? colour.brand : colour.textSub.withOpacity(0.25), size: 20)),
+          Expanded(child: Text(value.isEmpty ? hint : value, style: GoogleFonts.poppins(color: value.isEmpty ? colour.textSub.withValues(alpha: 0.45) : colour.textMain, fontSize: 13, fontWeight: value.isEmpty ? FontWeight.w400 : FontWeight.w600), overflow: TextOverflow.ellipsis)),
+          Padding(padding: const EdgeInsets.all(10), child: Icon(value.isEmpty ? Icons.search_rounded : Icons.close_rounded, color: enabled ? colour.brand : colour.textSub.withValues(alpha: 0.25), size: 20)),
         ]),
       ),
     );
@@ -965,11 +964,11 @@ if (__navResult10 != null) { AppGlobals.SelectEmployeeList = __navResult10; }
       textCapitalization: TextCapitalization.characters,
       style: GoogleFonts.poppins(color: colour.textMain, fontSize: 13, fontWeight: FontWeight.w600),
       decoration: InputDecoration(
-        hintText: hint, hintStyle: GoogleFonts.poppins(color: colour.textSub.withOpacity(0.45), fontSize: 13),
+        hintText: hint, hintStyle: GoogleFonts.poppins(color: colour.textSub.withValues(alpha: 0.45), fontSize: 13),
         contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
         filled: true, fillColor: enabled ? Colors.white : colour.surface,
         enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: const BorderSide(color: colour.border)),
-        disabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: BorderSide(color: colour.border.withOpacity(0.3))),
+        disabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: BorderSide(color: colour.border.withValues(alpha: 0.3))),
         focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: const BorderSide(color: colour.brand, width: 1.5)),
       ),
     );
@@ -983,7 +982,7 @@ if (__navResult10 != null) { AppGlobals.SelectEmployeeList = __navResult10; }
         enabled: enabled, onChanged: onChanged, maxLines: null, minLines: 3, textCapitalization: TextCapitalization.characters,
         style: GoogleFonts.poppins(color: colour.textMain, fontSize: 13, fontWeight: FontWeight.w600),
         decoration: InputDecoration(
-          hintText: hint, hintStyle: GoogleFonts.poppins(color: colour.textSub.withOpacity(0.45), fontSize: 13), contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12), border: InputBorder.none,
+          hintText: hint, hintStyle: GoogleFonts.poppins(color: colour.textSub.withValues(alpha: 0.45), fontSize: 13), contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12), border: InputBorder.none,
           suffixIcon: onSearch != null ? GestureDetector(onTap: value.isEmpty ? onSearch : onClear, child: Padding(padding: const EdgeInsets.all(8), child: Icon(value.isEmpty ? Icons.search_rounded : Icons.close_rounded, color: colour.brand, size: 20))) : null,
         ),
       ),
@@ -992,7 +991,7 @@ if (__navResult10 != null) { AppGlobals.SelectEmployeeList = __navResult10; }
 
   Widget _styledDropdown<T>({required T? value, required List<T> items, required bool enabled, required ValueChanged<T?> onChanged}) => Container(
     key: ValueKey('dropdown_${T}_$value'), padding: const EdgeInsets.symmetric(horizontal: 12),
-    decoration: BoxDecoration(color: enabled ? Colors.white : colour.surface, borderRadius: BorderRadius.circular(10), border: Border.all(color: enabled ? colour.border : colour.border.withOpacity(0.3))),
+    decoration: BoxDecoration(color: enabled ? Colors.white : colour.surface, borderRadius: BorderRadius.circular(10), border: Border.all(color: enabled ? colour.border : colour.border.withValues(alpha: 0.3))),
     child: DropdownButtonHideUnderline(child: DropdownButton<T>(isExpanded: true, value: value, onChanged: enabled ? onChanged : null, style: GoogleFonts.poppins(color: colour.textMain, fontSize: 13, fontWeight: FontWeight.w600), icon: const Icon(Icons.keyboard_arrow_down_rounded, color: colour.brand, size: 20), items: items.map((v) => DropdownMenuItem<T>(value: v, child: Text(v.toString(), style: GoogleFonts.poppins(color: colour.textMain, fontSize: 13, fontWeight: FontWeight.w600)))).toList())),
   );
 
@@ -1009,6 +1008,7 @@ if (__navResult10 != null) { AppGlobals.SelectEmployeeList = __navResult10; }
             final date = await showDatePicker(context: context, initialDate: DateTime.now(), firstDate: DateTime(2020), lastDate: DateTime(2100), builder: (ctx, child) => Theme(data: Theme.of(ctx).copyWith(colorScheme: const ColorScheme.light(primary: colour.brand, onPrimary: Colors.white, onSurface: colour.textMain)), child: child!));
             if (date != null) {
               if (showTime) {
+                if (!context.mounted) return;
                 final time = await showTimePicker(context: context, initialTime: TimeOfDay.now(), builder: (ctx, child) => MediaQuery(data: MediaQuery.of(ctx).copyWith(alwaysUse24HourFormat: true), child: child!));
                 // 2. INJECTED DateTime.now().second SO IT DOESN'T DEFAULT TO 0 SECONDS
                 final combined = DateTime(date.year, date.month, date.day, time?.hour ?? 0, time?.minute ?? 0, DateTime.now().second);
@@ -1018,15 +1018,15 @@ if (__navResult10 != null) { AppGlobals.SelectEmployeeList = __navResult10; }
               }
             }
           },
-          child: Container(height: 44, padding: const EdgeInsets.symmetric(horizontal: 12), decoration: BoxDecoration(color: checkValue ? colour.brandLight : colour.surface, borderRadius: BorderRadius.circular(10), border: Border.all(color: checkValue ? colour.border : colour.border.withOpacity(0.3))), child: Row(children: [const Icon(Icons.calendar_today_rounded, size: 14, color: colour.brand), const SizedBox(width: 8), Expanded(child: Text(DateFormat(fmt).format(DateTime.parse(dateStr)), style: GoogleFonts.poppins(color: checkValue ? colour.brandDark : colour.textSub, fontSize: 12, fontWeight: FontWeight.w600)))])),
+          child: Container(height: 44, padding: const EdgeInsets.symmetric(horizontal: 12), decoration: BoxDecoration(color: checkValue ? colour.brandLight : colour.surface, borderRadius: BorderRadius.circular(10), border: Border.all(color: checkValue ? colour.border : colour.border.withValues(alpha: 0.3))), child: Row(children: [const Icon(Icons.calendar_today_rounded, size: 14, color: colour.brand), const SizedBox(width: 8), Expanded(child: Text(DateFormat(fmt).format(DateTime.parse(dateStr)), style: GoogleFonts.poppins(color: checkValue ? colour.brandDark : colour.textSub, fontSize: 12, fontWeight: FontWeight.w600)))])),
         ),
       ),
       const SizedBox(width: 8),
-      Transform.scale(scale: 1.1, child: Checkbox(value: checkValue, activeColor: colour.brand, side: BorderSide(color: colour.border, width: 1.5), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)), onChanged: enabled ? (v) => bloc.add(UpdateCheckbox(checkKey, v!)) : null)),
+      Transform.scale(scale: 1.1, child: Checkbox(value: checkValue, activeColor: colour.brand, side: const BorderSide(color: colour.border, width: 1.5), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)), onChanged: enabled ? (v) => bloc.add(UpdateCheckbox(checkKey, v!)) : null)),
     ]);
   }
 
-  Widget _iconBtn({required IconData icon, required bool enabled, required VoidCallback onTap}) => GestureDetector(onTap: enabled ? onTap : null, child: Container(width: 40, height: 40, decoration: BoxDecoration(color: enabled ? colour.brandLight : colour.surface, borderRadius: BorderRadius.circular(10), border: Border.all(color: enabled ? colour.border : colour.border.withOpacity(0.3))), child: Icon(icon, color: enabled ? colour.brand : colour.textSub.withOpacity(0.3), size: 22)));
+  Widget _iconBtn({required IconData icon, required bool enabled, required VoidCallback onTap}) => GestureDetector(onTap: enabled ? onTap : null, child: Container(width: 40, height: 40, decoration: BoxDecoration(color: enabled ? colour.brandLight : colour.surface, borderRadius: BorderRadius.circular(10), border: Border.all(color: enabled ? colour.border : colour.border.withValues(alpha: 0.3))), child: Icon(icon, color: enabled ? colour.brand : colour.textSub.withValues(alpha: 0.3), size: 22)));
 
 
   void _showProductDialog(BuildContext context, SalesOrderAddLoaded state, int editIndex) {
@@ -1064,8 +1064,8 @@ if (__navResult10 != null) { AppGlobals.SelectEmployeeList = __navResult10; }
         Expanded(flex: 2, child: Text('${p.TaxPercent}%', style: GoogleFonts.poppins(color: colour.textSub, fontSize: 11))),
         Expanded(flex: 2, child: Text('${p.Amount}', textAlign: TextAlign.right, style: GoogleFonts.poppins(color: colour.brand, fontSize: 11, fontWeight: FontWeight.w800))),
         Row(mainAxisSize: MainAxisSize.min, children: [
-          GestureDetector(onTap: () => _showProductDialog(context, state, index), child: Padding(padding: const EdgeInsets.symmetric(horizontal: 2), child: const Icon(Icons.edit_rounded, color: colour.brand, size: 18))),
-          GestureDetector(onTap: () => bloc.add(RemoveProduct(index)), child: Padding(padding: const EdgeInsets.symmetric(horizontal: 2), child: Icon(Icons.delete_rounded, color: colour.red, size: 18))),
+          GestureDetector(onTap: () => _showProductDialog(context, state, index), child: const Padding(padding: EdgeInsets.symmetric(horizontal: 2), child: Icon(Icons.edit_rounded, color: colour.brand, size: 18))),
+          GestureDetector(onTap: () => bloc.add(RemoveProduct(index)), child: const Padding(padding: EdgeInsets.symmetric(horizontal: 2), child: Icon(Icons.delete_rounded, color: colour.red, size: 18))),
         ]),
       ]),
     );
@@ -1097,7 +1097,7 @@ class _ProductDialogState extends State<_ProductDialog> {
               const Spacer(),
               GestureDetector(onTap: () { bloc.add(ClearProduct()); Navigator.of(context, rootNavigator: true).pop(); }, child: Container(width: 32, height: 32, decoration: BoxDecoration(color: colour.surface, borderRadius: BorderRadius.circular(8), border: Border.all(color: colour.border)), child: const Icon(Icons.close_rounded, color: colour.textSub, size: 18))),
             ]),
-            const SizedBox(height: 12), Divider(color: colour.border), const SizedBox(height: 8),
+            const SizedBox(height: 12), const Divider(color: colour.border), const SizedBox(height: 8),
             Expanded(flex: 3, child: SingleChildScrollView(child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
               _roField("Product Code", state.txtProductCode), const SizedBox(height: 8),
               _searchableField(
@@ -1107,14 +1107,16 @@ class _ProductDialogState extends State<_ProductDialog> {
                   if (r != null) {
                     bloc.add(ProductSelected(AppGlobals.SelectProductList.ProductName, AppGlobals.SelectProductList.Productcode, AppGlobals.SelectProductList.Id));
                     AppGlobals.SelectProductList = ProductModel.Empty();
+                    if (!context.mounted) return;
                     Navigator.of(context, rootNavigator: true).pop();
+                    if (!context.mounted) return;
                     showDialog(context: context, barrierDismissible: false, builder: (ctx) => BlocProvider.value(value: bloc, child: _ProductDialog(activeField: _activeField)));
                   }
                 },
                 onClear: () => bloc.add(ClearProduct()),
               ),
               const SizedBox(height: 8), _numField("Qty", state.txtProductQty, 'qty'), const SizedBox(height: 6), _numField("Sale Rate", state.txtProductSaleRate, 'saleRate'), const SizedBox(height: 6), _numField("GST", state.txtProductGst, 'gst'), const SizedBox(height: 6),
-              Container(height: 44, padding: const EdgeInsets.symmetric(horizontal: 12), decoration: BoxDecoration(color: colour.brandLight, borderRadius: BorderRadius.circular(10), border: Border.all(color: colour.brand.withOpacity(0.3))), child: Row(children: [Text('Amount : ', style: GoogleFonts.poppins(color: colour.textSub, fontSize: 12, fontWeight: FontWeight.w600)), Text(state.txtProductAmount, style: GoogleFonts.poppins(color: colour.brand, fontSize: 15, fontWeight: FontWeight.w800))])),
+              Container(height: 44, padding: const EdgeInsets.symmetric(horizontal: 12), decoration: BoxDecoration(color: colour.brandLight, borderRadius: BorderRadius.circular(10), border: Border.all(color: colour.brand.withValues(alpha: 0.3))), child: Row(children: [Text('Amount : ', style: GoogleFonts.poppins(color: colour.textSub, fontSize: 12, fontWeight: FontWeight.w600)), Text(state.txtProductAmount, style: GoogleFonts.poppins(color: colour.brand, fontSize: 15, fontWeight: FontWeight.w800))])),
             ]))),
             const SizedBox(height: 10),
             Expanded(flex: 4, child: Container(decoration: BoxDecoration(color: colour.surface, borderRadius: BorderRadius.circular(14), border: Border.all(color: colour.border)), padding: const EdgeInsets.all(8), child: Column(children: [
@@ -1127,13 +1129,13 @@ class _ProductDialogState extends State<_ProductDialog> {
     });
   }
   Widget _roField(String hint, String value) => Container(height: 44, padding: const EdgeInsets.symmetric(horizontal: 12), decoration: BoxDecoration(color: colour.surface, borderRadius: BorderRadius.circular(10), border: Border.all(color: colour.border)), alignment: Alignment.centerLeft, child: Text(value.isEmpty ? hint : value, style: GoogleFonts.poppins(color: value.isEmpty ? colour.textSub : colour.textMain, fontSize: 13, fontWeight: value.isEmpty ? FontWeight.w400 : FontWeight.w600)));
-  Widget _searchableField({required String hint, required String value, required VoidCallback onSearch, required VoidCallback onClear}) => Container(height: 46, decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(10), border: Border.all(color: colour.border)), child: Row(children: [const SizedBox(width: 12), Expanded(child: Text(value.isEmpty ? hint : value, style: GoogleFonts.poppins(color: value.isEmpty ? colour.textSub.withOpacity(0.45) : colour.textMain, fontSize: 13, fontWeight: value.isEmpty ? FontWeight.w400 : FontWeight.w600), overflow: TextOverflow.ellipsis)), GestureDetector(onTap: value.isEmpty ? onSearch : onClear, child: Padding(padding: const EdgeInsets.all(10), child: Icon(value.isEmpty ? Icons.search_rounded : Icons.close_rounded, color: colour.brand, size: 20)))]));
+  Widget _searchableField({required String hint, required String value, required VoidCallback onSearch, required VoidCallback onClear}) => Container(height: 46, decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(10), border: Border.all(color: colour.border)), child: Row(children: [const SizedBox(width: 12), Expanded(child: Text(value.isEmpty ? hint : value, style: GoogleFonts.poppins(color: value.isEmpty ? colour.textSub.withValues(alpha: 0.45) : colour.textMain, fontSize: 13, fontWeight: value.isEmpty ? FontWeight.w400 : FontWeight.w600), overflow: TextOverflow.ellipsis)), GestureDetector(onTap: value.isEmpty ? onSearch : onClear, child: Padding(padding: const EdgeInsets.all(10), child: Icon(value.isEmpty ? Icons.search_rounded : Icons.close_rounded, color: colour.brand, size: 20)))]));
   Widget _numField(String hint, String value, String fieldKey) {
     final active = _activeField == fieldKey;
-    return GestureDetector(onTap: () => setState(() => _activeField = fieldKey), child: Container(height: 44, padding: const EdgeInsets.symmetric(horizontal: 12), decoration: BoxDecoration(color: active ? colour.brandLight : Colors.white, borderRadius: BorderRadius.circular(10), border: Border.all(color: active ? colour.brand : colour.border, width: active ? 1.5 : 1)), child: Row(children: [Expanded(child: Text(value.isEmpty ? hint : value, style: GoogleFonts.poppins(color: value.isEmpty ? colour.textSub.withOpacity(0.45) : colour.textMain, fontSize: 13, fontWeight: value.isEmpty ? FontWeight.w400 : FontWeight.w700))), if (active) Container(width: 2, height: 18, color: colour.brand)])));
+    return GestureDetector(onTap: () => setState(() => _activeField = fieldKey), child: Container(height: 44, padding: const EdgeInsets.symmetric(horizontal: 12), decoration: BoxDecoration(color: active ? colour.brandLight : Colors.white, borderRadius: BorderRadius.circular(10), border: Border.all(color: active ? colour.brand : colour.border, width: active ? 1.5 : 1)), child: Row(children: [Expanded(child: Text(value.isEmpty ? hint : value, style: GoogleFonts.poppins(color: value.isEmpty ? colour.textSub.withValues(alpha: 0.45) : colour.textMain, fontSize: 13, fontWeight: value.isEmpty ? FontWeight.w400 : FontWeight.w700))), if (active) Container(width: 2, height: 18, color: colour.brand)])));
   }
   Widget _numRow(List<String> keys, SalesOrderAddBloc bloc) => Expanded(child: Row(children: keys.map((k) => _numBtn(k, () => bloc.add(KeyPress(k, _activeField)))).toList()));
-  Widget _numBtn(String label, VoidCallback onPressed, {bool isAction = false}) => Expanded(child: Padding(padding: const EdgeInsets.all(3), child: GestureDetector(onTap: onPressed, child: Container(decoration: BoxDecoration(color: isAction ? colour.brand : Colors.white, borderRadius: BorderRadius.circular(10), border: Border.all(color: isAction ? colour.brand : colour.border), boxShadow: [BoxShadow(color: isAction ? colour.brand.withOpacity(0.2) : Colors.black.withOpacity(0.04), blurRadius: 4, offset: const Offset(0, 2))]), alignment: Alignment.center, child: Text(label, style: GoogleFonts.poppins(color: isAction ? Colors.white : colour.textMain, fontSize: isAction ? 13 : 16, fontWeight: FontWeight.w700))))));
+  Widget _numBtn(String label, VoidCallback onPressed, {bool isAction = false}) => Expanded(child: Padding(padding: const EdgeInsets.all(3), child: GestureDetector(onTap: onPressed, child: Container(decoration: BoxDecoration(color: isAction ? colour.brand : Colors.white, borderRadius: BorderRadius.circular(10), border: Border.all(color: isAction ? colour.brand : colour.border), boxShadow: [BoxShadow(color: isAction ? colour.brand.withValues(alpha: 0.2) : Colors.black.withValues(alpha: 0.04), blurRadius: 4, offset: const Offset(0, 2))]), alignment: Alignment.center, child: Text(label, style: GoogleFonts.poppins(color: isAction ? Colors.white : colour.textMain, fontSize: isAction ? 13 : 16, fontWeight: FontWeight.w700))))));
 }
 class _AddressListDialog extends StatelessWidget {
   final String title;
@@ -1170,7 +1172,7 @@ class _AddressListDialog extends StatelessWidget {
               GestureDetector(onTap: () => Navigator.of(context, rootNavigator: true).pop(), child: Container(width: 32, height: 32, decoration: BoxDecoration(color: colour.surface, borderRadius: BorderRadius.circular(8), border: Border.all(color: colour.border)), child: const Icon(Icons.close_rounded, color: colour.textSub, size: 18))),
             ]),
             const SizedBox(height: 10),
-            Divider(color: colour.border),
+            const Divider(color: colour.border),
             const SizedBox(height: 6),
 
             // --- PUDHU HEADER ROW (Theliva irukka) ---

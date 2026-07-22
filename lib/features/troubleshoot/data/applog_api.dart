@@ -1,4 +1,3 @@
-import 'package:maleva/core/utils/system_helpers.dart';
 import 'dart:io';
 import 'package:http/http.dart' as http;
 import 'package:http_parser/http_parser.dart';
@@ -46,7 +45,7 @@ class AppLogApi {
 
     try {
       // 3. Prepare the multipart request to UploadFile2 endpoint
-      final uploadUrl = ApiConstants.apiPostFile; // "$port/api/CommonApp/UploadFile2/"
+      const uploadUrl = ApiConstants.apiPostFile; // "$port/api/CommonApp/UploadFile2/"
       final uri = Uri.parse(uploadUrl);
       final request = http.MultipartRequest("POST", uri);
 

@@ -444,7 +444,9 @@ class SalesOrderAddBloc extends Bloc<SalesOrderAddEvent, SalesOrderAddState> {
 
     if (!restrictedIds.contains(AppGlobals.EmpRefId)) return {for (var f in allFields) f: true};
     final map = {for (var f in allFields) f: false};
-    for (var f in ["txtBoardingOfficer1", "txtBoardingOfficer2", "txtAmount1", "txtAmount2", "SAVE", "VIEW"]) map[f] = true;
+    for (var f in ["txtBoardingOfficer1", "txtBoardingOfficer2", "txtAmount1", "txtAmount2", "SAVE", "VIEW"]) {
+      map[f] = true;
+    }
     return map;
   }
 
@@ -658,8 +660,8 @@ class SalesOrderAddBloc extends Bloc<SalesOrderAddEvent, SalesOrderAddState> {
       AppGlobals.AgentAllList = (await _repository.selectAgentAll(m["OAgentCompanyRefId"] as int? ?? 0)).map<AgentModel>((e) => AgentModel.fromJson(e)).toList();oAgentName = _getFromAgentAll(m["OAgentMasterRefId"]);
     }
 
-    AppGlobals.CustomerCurrencyValue = await _repository.loadCustomerCurrency(m["CustomerRefId"] as int? ?? 0);String _safeStr(String? v) => v ?? ''; String _safeNum(dynamic v) => v != null ? v.toString() : '';
-    String _parseDate(dynamic v, String fmt) { if (v == null) return now; return DateFormat(fmt).format(DateTime.parse(v.toString())); }
+    AppGlobals.CustomerCurrencyValue = await _repository.loadCustomerCurrency(m["CustomerRefId"] as int? ?? 0);String safeStr(String? v) => v ?? ''; String safeNum(dynamic v) => v != null ? v.toString() : '';
+    String parseDate(dynamic v, String fmt) { if (v == null) return now; return DateFormat(fmt).format(DateTime.parse(v.toString())); }
 
     List<int> loadedIds = [];
     if (details != null) {
@@ -718,19 +720,19 @@ class SalesOrderAddBloc extends Bloc<SalesOrderAddEvent, SalesOrderAddState> {
       dropdownValueFW1: m["Forwarding"] != "" ? m["Forwarding"] : null, dropdownValueFW2: m["Forwarding2"] != "" ? m["Forwarding2"] : null,
       dropdownValueFW3: m["Forwarding3"] != "" ? m["Forwarding3"] : null, dropdownValueZB1: m["Zb"] != "" ? m["Zb"] : null,
       dropdownValueZB2: m["Zb2"] != "" ? m["Zb2"] : null, dropdownValueTruckSize: m["TruckSize"] != null && m["TruckSize"] != "" ? m["TruckSize"].toString() : null,
-      dtpSaleOrderdate: _parseDate(m["SaleDate"], "yyyy-MM-dd"), dtpLETAdate: m["ETA"] != null ? _parseDate(m["ETA"], "yyyy-MM-dd HH:mm:ss") : now,
-      dtpLETBdate: m["ETB"] != null ? _parseDate(m["ETB"], "yyyy-MM-dd HH:mm:ss") : now, dtpLETDdate: m["ETD"] != null ? _parseDate(m["ETD"], "yyyy-MM-dd HH:mm:ss") : now,
-      dtpFlightTimedate: m["FlighTime"] != null ? _parseDate(m["FlighTime"], "yyyy-MM-dd HH:mm:ss") : now, dtpOETAdate: m["OETA"] != null ? _parseDate(m["OETA"], "yyyy-MM-dd HH:mm:ss") : now,
-      dtpOETBdate: m["OETB"] != null ? _parseDate(m["OETB"], "yyyy-MM-dd HH:mm:ss") : now, dtpOETDdate: m["OETD"] != null ? _parseDate(m["OETD"], "yyyy-MM-dd HH:mm:ss") : now,
-      dtpPickUpdate: m["PickupDate"] != null ? _parseDate(m["PickupDate"], "yyyy-MM-dd HH:mm:ss") : now, dtpDeliverydate: m["DeliveryDate"] != null ? _parseDate(m["DeliveryDate"], "yyyy-MM-dd HH:mm:ss") : now,
-      dtpWHEntrydate: m["WareHouseEnterDate"] != null ? _parseDate(m["WareHouseEnterDate"], "yyyy-MM-dd HH:mm:ss") : now, dtpWHExitdate: m["WareHouseExitDate"] != null ? _parseDate(m["WareHouseExitDate"], "yyyy-MM-dd HH:mm:ss") : now,
-      dtpFW1date: m["ForwardingDate"] != null ? _parseDate(m["ForwardingDate"], "yyyy-MM-dd HH:mm:ss") : now, dtpFW2date: m["Forwarding2Date"] != null ? _parseDate(m["Forwarding2Date"], "yyyy-MM-dd HH:mm:ss") : now,
-      dtpFW3date: m["Forwarding3Date"] != null ? _parseDate(m["Forwarding3Date"], "yyyy-MM-dd HH:mm:ss") : now, checkBoxValueLETA: m["ETA"] != null,
+      dtpSaleOrderdate: parseDate(m["SaleDate"], "yyyy-MM-dd"), dtpLETAdate: m["ETA"] != null ? parseDate(m["ETA"], "yyyy-MM-dd HH:mm:ss") : now,
+      dtpLETBdate: m["ETB"] != null ? parseDate(m["ETB"], "yyyy-MM-dd HH:mm:ss") : now, dtpLETDdate: m["ETD"] != null ? parseDate(m["ETD"], "yyyy-MM-dd HH:mm:ss") : now,
+      dtpFlightTimedate: m["FlighTime"] != null ? parseDate(m["FlighTime"], "yyyy-MM-dd HH:mm:ss") : now, dtpOETAdate: m["OETA"] != null ? parseDate(m["OETA"], "yyyy-MM-dd HH:mm:ss") : now,
+      dtpOETBdate: m["OETB"] != null ? parseDate(m["OETB"], "yyyy-MM-dd HH:mm:ss") : now, dtpOETDdate: m["OETD"] != null ? parseDate(m["OETD"], "yyyy-MM-dd HH:mm:ss") : now,
+      dtpPickUpdate: m["PickupDate"] != null ? parseDate(m["PickupDate"], "yyyy-MM-dd HH:mm:ss") : now, dtpDeliverydate: m["DeliveryDate"] != null ? parseDate(m["DeliveryDate"], "yyyy-MM-dd HH:mm:ss") : now,
+      dtpWHEntrydate: m["WareHouseEnterDate"] != null ? parseDate(m["WareHouseEnterDate"], "yyyy-MM-dd HH:mm:ss") : now, dtpWHExitdate: m["WareHouseExitDate"] != null ? parseDate(m["WareHouseExitDate"], "yyyy-MM-dd HH:mm:ss") : now,
+      dtpFW1date: m["ForwardingDate"] != null ? parseDate(m["ForwardingDate"], "yyyy-MM-dd HH:mm:ss") : now, dtpFW2date: m["Forwarding2Date"] != null ? parseDate(m["Forwarding2Date"], "yyyy-MM-dd HH:mm:ss") : now,
+      dtpFW3date: m["Forwarding3Date"] != null ? parseDate(m["Forwarding3Date"], "yyyy-MM-dd HH:mm:ss") : now, checkBoxValueLETA: m["ETA"] != null,
       checkBoxValueLETB: m["ETB"] != null, checkBoxValueLETD: m["ETD"] != null, checkBoxValueFlightTime: m["FlighTime"] != null,
       checkBoxValueOETA: m["OETA"] != null, checkBoxValueOETB: m["OETB"] != null, checkBoxValueOETD: m["OETD"] != null,
       checkBoxValuePickUp: m["PickupDate"] != null, checkBoxValueDelivery: m["DeliveryDate"] != null, checkBoxValueWHEntry: m["WareHouseEnterDate"] != null,
       checkBoxValueWHExit: m["WareHouseExitDate"] != null, checkBoxValueFW1: m["ForwardingDate"] != null, checkBoxValueFW2: m["Forwarding2Date"] != null,
-      checkBoxValueFW3: m["Forwarding3Date"] != null, txtJobNo: isEnquiry ? AppGlobals.MaxSaleOrderNum : _safeNum(m["CNumber"]),
+      checkBoxValueFW3: m["Forwarding3Date"] != null, txtJobNo: isEnquiry ? AppGlobals.MaxSaleOrderNum : safeNum(m["CNumber"]),
       txtCustomer: _getFromList(AppGlobals.CustomerList, m["CustomerRefId"], (e) => e.AccountName), txtJobType: _getFromList(AppGlobals.JobTypeList, m["JobMasterRefId"], (e) => e.Name),
       txtJobStatus: _getFromStatusList(m["JStatus"]), txtSealByEmp1: _getEmpName(m["SealbyRefid"]), txtSealByEmp2: _getEmpName(m["SealbyRefid2"]),
       txtSealByEmp3: _getEmpName(m["SealbyRefid3"]), txtBreakByEmp1: _getEmpName(m["SealbreakbyRefid"]), txtBreakByEmp2: _getEmpName(m["SealbreakbyRefid2"]),
@@ -738,18 +740,18 @@ class SalesOrderAddBloc extends Bloc<SalesOrderAddEvent, SalesOrderAddState> {
 
       txtLAgentCompany: _getFromAgentCompany(m["AgentCompanyRefId"]), txtLAgentName: lAgentName, txtOAgentCompany: _getFromAgentCompany(m["OAgentCompanyRefId"]), txtOAgentName: oAgentName,
 
-      txtDoDescription: _safeStr(m["DODescription"]), txtTruckSize: _safeNum(m["TruckSize"]),
-      txtRemarks: _safeStr(m["Remarks"]), txtOffVessel: _safeStr(m["Offvesselname"]), txtLoadingVessel: _safeStr(m["Loadingvesselname"]), txtLPort: _safeStr(m["SPort"]),
-      txtOPort: _safeStr(m["OPort"]), txtSmk1: _safeStr(m["ForwardingSMKNo"]), txtSmk2: _safeStr(m["ForwardingSMKNo2"]), txtSmk3: _safeStr(m["ForwardingSMKNo3"]),
-      txtAWBNo: _safeStr(m["AWBNo"]), txtBLCopy: _safeStr(m["BLCopy"]), txtOSCN: _safeStr(m["SCN"]), txtLSCN: _safeStr(m["LSCN"]), txtLVesselType: _safeStr(m["Vessel"]),
-      txtOVesselType: _safeStr(m["OVessel"]), txtCommodityType: _safeStr(m["Commodity"]), txtCargo: _safeStr(m["Cargo"]), txtWeight: _safeNum(m["TotalWeight"]),
-      txtQuantity: _safeNum(m["Quantity"]), txtOrigin: _safeStr(m["Origin"]), txtDestination: _safeStr(m["Destination"]), txtPTWNo: _safeStr(m["PTW"]),
-      txtENRef1: _safeStr(m["ForwardingEnterRef"]), txtENRef2: _safeStr(m["ForwardingEnterRef2"]), txtENRef3: _safeStr(m["ForwardingEnterRef3"]),
-      txtExRef1: _safeStr(m["ForwardingExitRef"]), txtExRef2: _safeStr(m["ForwardingExitRef2"]), txtExRef3: _safeStr(m["ForwardingExitRef3"]),
-      txtPortChargeRef1: _safeStr(m["PortChargesRef"]), txtPortCharges: _safeNum(m["PortCharges"]), txtAmount1: _safeNum(m["BoardingAmount"]),
-      txtAmount2: _safeNum(m["BoardingAmount1"]), txtZBRef1: _safeStr(m["ZbRef"]), txtZBRef2: _safeStr(m["ZbRef2"]), txtWarehouseAddress: _safeStr(m["WareHouseAddress"]),
-      txtForwarding1S1: _safeStr(m["Forwarding1S1"]), txtForwarding1S2: _safeStr(m["Forwarding1S2"]), txtForwarding2S1: _safeStr(m["Forwarding2S1"]),
-      txtForwarding2S2: _safeStr(m["Forwarding2S2"]), txtForwarding3S1: _safeStr(m["Forwarding3S1"]), txtForwarding3S2: _safeStr(m["Forwarding3S2"]),
+      txtDoDescription: safeStr(m["DODescription"]), txtTruckSize: safeNum(m["TruckSize"]),
+      txtRemarks: safeStr(m["Remarks"]), txtOffVessel: safeStr(m["Offvesselname"]), txtLoadingVessel: safeStr(m["Loadingvesselname"]), txtLPort: safeStr(m["SPort"]),
+      txtOPort: safeStr(m["OPort"]), txtSmk1: safeStr(m["ForwardingSMKNo"]), txtSmk2: safeStr(m["ForwardingSMKNo2"]), txtSmk3: safeStr(m["ForwardingSMKNo3"]),
+      txtAWBNo: safeStr(m["AWBNo"]), txtBLCopy: safeStr(m["BLCopy"]), txtOSCN: safeStr(m["SCN"]), txtLSCN: safeStr(m["LSCN"]), txtLVesselType: safeStr(m["Vessel"]),
+      txtOVesselType: safeStr(m["OVessel"]), txtCommodityType: safeStr(m["Commodity"]), txtCargo: safeStr(m["Cargo"]), txtWeight: safeNum(m["TotalWeight"]),
+      txtQuantity: safeNum(m["Quantity"]), txtOrigin: safeStr(m["Origin"]), txtDestination: safeStr(m["Destination"]), txtPTWNo: safeStr(m["PTW"]),
+      txtENRef1: safeStr(m["ForwardingEnterRef"]), txtENRef2: safeStr(m["ForwardingEnterRef2"]), txtENRef3: safeStr(m["ForwardingEnterRef3"]),
+      txtExRef1: safeStr(m["ForwardingExitRef"]), txtExRef2: safeStr(m["ForwardingExitRef2"]), txtExRef3: safeStr(m["ForwardingExitRef3"]),
+      txtPortChargeRef1: safeStr(m["PortChargesRef"]), txtPortCharges: safeNum(m["PortCharges"]), txtAmount1: safeNum(m["BoardingAmount"]),
+      txtAmount2: safeNum(m["BoardingAmount1"]), txtZBRef1: safeStr(m["ZbRef"]), txtZBRef2: safeStr(m["ZbRef2"]), txtWarehouseAddress: safeStr(m["WareHouseAddress"]),
+      txtForwarding1S1: safeStr(m["Forwarding1S1"]), txtForwarding1S2: safeStr(m["Forwarding1S2"]), txtForwarding2S1: safeStr(m["Forwarding2S1"]),
+      txtForwarding2S2: safeStr(m["Forwarding2S2"]), txtForwarding3S1: safeStr(m["Forwarding3S1"]), txtForwarding3S2: safeStr(m["Forwarding3S2"]),
 
       // MAP NEW ARRAYS TO STATE
       pickUpAddressList: parsedPickupAddresses,

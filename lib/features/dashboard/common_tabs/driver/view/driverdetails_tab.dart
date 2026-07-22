@@ -69,7 +69,7 @@ class _DriverDetailsViewState extends State<DriverDetailsView> {
           width: 260,
           child: Column(
             children: [
-              _GradientHeader(isTablet: true),
+              const _GradientHeader(isTablet: true),
               const SizedBox(height: 20),
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -118,7 +118,7 @@ class _DriverDetailsViewState extends State<DriverDetailsView> {
                     // List
                     Expanded(
                       child: list.isEmpty
-                          ? _EmptyState(isTablet: true)
+                          ? const _EmptyState(isTablet: true)
                           : GridView.builder(
                         padding: const EdgeInsets.fromLTRB(
                             16, 0, 16, 20),
@@ -155,7 +155,7 @@ class _DriverDetailsViewState extends State<DriverDetailsView> {
   Widget _buildMobileLayout(BuildContext context) {
     return Column(
       children: [
-        _GradientHeader(isTablet: false),
+        const _GradientHeader(isTablet: false),
 
         Expanded(
           child: BlocBuilder<DriverBloc, DriverState>(
@@ -188,7 +188,7 @@ class _DriverDetailsViewState extends State<DriverDetailsView> {
                     // List
                     Expanded(
                       child: list.isEmpty
-                          ? _EmptyState(isTablet: false)
+                          ? const _EmptyState(isTablet: false)
                           : ListView.builder(
                         padding: const EdgeInsets.fromLTRB(
                             16, 8, 16, 20),
@@ -232,11 +232,11 @@ class _SearchBar extends StatelessWidget {
         color:         colour.kWhite,
         borderRadius: BorderRadius.circular(14),
         border: Border.all(
-            color: AppTokens.brandGradientStart.withOpacity(0.3),
+            color: AppTokens.brandGradientStart.withValues(alpha: 0.3),
             width: 1.5),
         boxShadow: [
           BoxShadow(
-            color:      AppTokens.brandGradientStart.withOpacity(0.07),
+            color:      AppTokens.brandGradientStart.withValues(alpha: 0.07),
             blurRadius: 10,
             offset:     const Offset(0, 3),
           ),
@@ -327,7 +327,7 @@ class _GradientHeader extends StatelessWidget {
             Container(
               padding: EdgeInsets.all(isTablet ? 12 : 10),
               decoration: BoxDecoration(
-                color:         colour.kWhite.withOpacity(0.15),
+                color:         colour.kWhite.withValues(alpha: 0.15),
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Icon(
@@ -357,7 +357,7 @@ class _GradientHeader extends StatelessWidget {
               "All registered drivers",
               style: GoogleFonts.poppins(
                 fontSize:   isTablet ? 14 : 13,
-                color:      colour.kWhite.withOpacity(0.75),
+                color:      colour.kWhite.withValues(alpha: 0.75),
                 fontWeight: FontWeight.w400,
               ),
             ),
@@ -387,7 +387,7 @@ class _CountBadge extends StatelessWidget {
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color:     AppTokens.brandGradientStart.withOpacity(0.30),
+            color:     AppTokens.brandGradientStart.withValues(alpha: 0.30),
             blurRadius: 16,
             offset:    const Offset(0, 6),
           ),
@@ -397,7 +397,7 @@ class _CountBadge extends StatelessWidget {
         Container(
           padding: const EdgeInsets.all(10),
           decoration: BoxDecoration(
-            color: colour.kWhite.withOpacity(0.20),
+            color: colour.kWhite.withValues(alpha: 0.20),
             shape: BoxShape.circle,
           ),
           child: const Icon(
@@ -413,7 +413,7 @@ class _CountBadge extends StatelessWidget {
             Text('Total Drivers',
                 style: GoogleFonts.poppins(
                   fontSize:   12,
-                  color:      colour.kWhite.withOpacity(0.75),
+                  color:      colour.kWhite.withValues(alpha: 0.75),
                   fontWeight: FontWeight.w500,
                 )),
             Text('$count',

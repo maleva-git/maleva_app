@@ -239,7 +239,7 @@ class _CargoStatusstate extends State<CargoStatus> {
           elevation: 2.0,
           shadowColor: Colors.black12,
           shape: RoundedRectangleBorder(
-            side: BorderSide(color: colour.commonColor.withOpacity(0.15), width: 1),
+            side: BorderSide(color: colour.commonColor.withValues(alpha: 0.15), width: 1),
             borderRadius: BorderRadius.circular(12),
           ),
           child: InkWell(
@@ -249,7 +249,7 @@ class _CargoStatusstate extends State<CargoStatus> {
               padding: const EdgeInsets.symmetric(vertical: 4.0),
               child: ListTile(
                 leading: CircleAvatar(
-                  backgroundColor: colour.commonColor.withOpacity(0.1),
+                  backgroundColor: colour.commonColor.withValues(alpha: 0.1),
                   child: const Icon(Icons.inventory_2, color: colour.commonColor), // Cargo box icon
                 ),
                 title: Text(

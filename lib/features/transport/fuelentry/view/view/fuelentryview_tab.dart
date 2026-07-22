@@ -127,7 +127,7 @@ class _FuelEntryViewPage extends StatelessWidget {
           const SizedBox(height: 2),
           Text(userName,
               style: GoogleFonts.lato(
-                  color: Colors.white.withOpacity(0.65),
+                  color: Colors.white.withValues(alpha: 0.65),
                   fontWeight: FontWeight.w500,
                   fontSize: 12)),
         ],
@@ -210,10 +210,12 @@ class _DateFilterBar extends StatelessWidget {
     if (picked == null) return;
     final f = DateFormat('yyyy-MM-dd').format(picked);
     if (isFrom) {
+      if (!context.mounted) return;
       context
           .read<FuelEntryViewBloc>()
           .add(FuelEntryViewFromDateChanged(f));
     } else {
+      if (!context.mounted) return;
       context
           .read<FuelEntryViewBloc>()
           .add(FuelEntryViewToDateChanged(f));
@@ -353,7 +355,7 @@ class _ViewButton extends StatelessWidget {
         borderRadius: BorderRadius.circular(10),
         boxShadow: [
           BoxShadow(
-              color: kHeaderGradStart.withOpacity(0.3),
+              color: kHeaderGradStart.withValues(alpha: 0.3),
               blurRadius: 8,
               offset: const Offset(0, 3))
         ],
@@ -395,7 +397,7 @@ class _TableHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final style = GoogleFonts.lato(
-      color: Colors.white.withOpacity(0.85),
+      color: Colors.white.withValues(alpha: 0.85),
       fontWeight: FontWeight.w600,
       fontSize: isTablet ? 11 : 10,
       letterSpacing: 0.5,
@@ -490,6 +492,7 @@ class _FuelList extends StatelessWidget {
     final ok = await ConfirmationMsgYesNo(
         context, 'Do You Want to Delete Fuel Entry ?');
     if (ok == true) {
+      if (!context.mounted) return;
       context
           .read<FuelEntryViewBloc>()
           .add(FuelEntryViewDeleteRequested(item));
@@ -532,7 +535,7 @@ class _FuelRow extends StatelessWidget {
         border: Border.all(color: kCardBorder, width: 0.5),
         boxShadow: [
           BoxShadow(
-            color: kHeaderGradStart.withOpacity(0.06),
+            color: kHeaderGradStart.withValues(alpha: 0.06),
             blurRadius: 8,
             offset: const Offset(0, 2),
           ),

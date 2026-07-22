@@ -74,6 +74,7 @@ class _BoardingStatusPageState extends State<_BoardingStatusPage> {
     if (file == null) return;
     final url = await SystemHelpers.upload(
         File(file.path), ApiConstants.apiPostImage, saleOrderId, 'SalesOrder', 'Boarding');
+    if (!mounted) return;
     context.read<BoardingStatusBloc>().add(BoardingStatusImagePicked(url));
   }
 
@@ -87,10 +88,12 @@ class _BoardingStatusPageState extends State<_BoardingStatusPage> {
           await ConfirmationOK('Updated Successfully', context);
         }
         if (state is BoardingStatusNavigateToDetails) {
+          if (!context.mounted) return;
           final s = context.read<BoardingStatusBloc>().state;
           if (s is BoardingStatusLoaded && s.jobNoText.isNotEmpty) {
             await OnlineApi.EditSalesOrder(
                  s.saleOrderId, int.tryParse(s.jobNoText) ?? 0);
+            if (!context.mounted) return;
             Navigator.push(
               context,
               MaterialPageRoute(
@@ -103,6 +106,7 @@ class _BoardingStatusPageState extends State<_BoardingStatusPage> {
           }
         }
         if (state is BoardingStatusError) {
+          if (!context.mounted) return;
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text(state.message,
@@ -178,7 +182,7 @@ class _BoardingStatusPageState extends State<_BoardingStatusPage> {
           const SizedBox(height: 2),
           Text(userName,
               style: GoogleFonts.lato(
-                  color: Colors.white.withOpacity(0.65),
+                  color: Colors.white.withValues(alpha: 0.65),
                   fontWeight: FontWeight.w500,
                   fontSize: 12)),
         ],
@@ -211,6 +215,7 @@ class _BoardingStatusPageState extends State<_BoardingStatusPage> {
                   context, 'Are you sure to Update ?')
                   .then((ok) {
                 if (ok == true) {
+                  if (!context.mounted) return;
                   context
                       .read<BoardingStatusBloc>()
                       .add(BoardingStatusSaveRequested());
@@ -369,6 +374,7 @@ class _BoardingStatusBody extends StatelessWidget {
     );
     if (date == null) return;
 
+    if (!context.mounted) return;
     final time = await showTimePicker(
       context: context,
       initialTime: TimeOfDay.now(),
@@ -385,10 +391,12 @@ class _BoardingStatusBody extends StatelessWidget {
     DateFormat('yyyy-MM-dd HH:mm:ss').format(combined);
 
     if (isStart) {
+      if (!context.mounted) return;
       context
           .read<BoardingStatusBloc>()
           .add(BoardingStatusStartTimeChanged(formatted));
     } else {
+      if (!context.mounted) return;
       context
           .read<BoardingStatusBloc>()
           .add(BoardingStatusEndTimeChanged(formatted));
@@ -609,6 +617,7 @@ class _JobNoRowState extends State<_JobNoRow> {
 
                       s.saleOrderId,
                       int.tryParse(s.jobNoText) ?? 0);
+                  if (!context.mounted) return;
                   Navigator.push(
                     context,
                     MaterialPageRoute(
@@ -635,7 +644,7 @@ class _JobNoRowState extends State<_JobNoRow> {
               border: Border.all(color: AppTokens.maintCardBorder, width: 0.5),
               boxShadow: [
                 BoxShadow(
-                  color: AppTokens.invoiceHeaderStart.withOpacity(0.10),
+                  color: AppTokens.invoiceHeaderStart.withValues(alpha: 0.10),
                   blurRadius: 10,
                   offset: const Offset(0, 4),
                 ),
@@ -707,14 +716,16 @@ class _StatusField extends StatelessWidget {
         await OnlineApi.SelectAllJobStatus(
             context,
             AppGlobals.SaleEditMasterList[0]['JobMasterRefId']);
+        if (!context.mounted) return;
         Navigator.push(
           context,
           MaterialPageRoute(
               builder: (_) => const JobAllStatus(
                   Searchby: 1, SearchId: 0, JobTypeId: 0)),
-        ).then((_navRes) { if (_navRes != null) { AppGlobals.SelectAllStatusList = _navRes; }
+        ).then((navRes) { if (navRes != null) { AppGlobals.SelectAllStatusList = navRes; }
           final sel = AppGlobals.SelectAllStatusList;
           if (sel.Status != 0) {
+            if (!context.mounted) return;
             context.read<BoardingStatusBloc>().add(
                 BoardingStatusStatusSelected(
                     statusId: sel.Status, statusName: sel.StatusName));
@@ -965,7 +976,7 @@ class _ImagePickBtn extends StatelessWidget {
         padding: const EdgeInsets.all(6),
         decoration: BoxDecoration(
           color: enabled
-              ? AppTokens.invoiceHeaderStart.withOpacity(0.08)
+              ? AppTokens.invoiceHeaderStart.withValues(alpha: 0.08)
               : Colors.transparent,
           borderRadius: BorderRadius.circular(8),
         ),
@@ -1029,6 +1040,7 @@ class _ImageGrid extends StatelessWidget {
                 final ok = await ConfirmationMsgYesNo(
                     ctx, 'Are you sure to Delete ?');
                 if (ok == true) {
+                  if (!context.mounted) return;
                   context.read<BoardingStatusBloc>().add(
                       BoardingStatusImageDeleted(i));
                 }
@@ -1137,7 +1149,7 @@ class _GradientButton extends StatelessWidget {
         borderRadius: BorderRadius.circular(10),
         boxShadow: [
           BoxShadow(
-            color: AppTokens.invoiceHeaderStart.withOpacity(0.30),
+            color: AppTokens.invoiceHeaderStart.withValues(alpha: 0.30),
             blurRadius: 8,
             offset: const Offset(0, 3),
           ),
@@ -1184,10 +1196,10 @@ class _AppBarButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.15),
+        color: Colors.white.withValues(alpha: 0.15),
         borderRadius: BorderRadius.circular(8),
         border: Border.all(
-            color: Colors.white.withOpacity(0.4), width: 0.5),
+            color: Colors.white.withValues(alpha: 0.4), width: 0.5),
       ),
       child: Material(
         color: Colors.transparent,

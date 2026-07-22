@@ -1,4 +1,3 @@
-import 'package:maleva/features/transport/models/maintenance_model.dart';
 
 
 abstract class MaintenanceState {}

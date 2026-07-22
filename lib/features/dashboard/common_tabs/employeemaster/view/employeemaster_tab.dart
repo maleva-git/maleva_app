@@ -41,6 +41,7 @@ class _EmployeeListBody extends StatelessWidget {
           await ConfirmationOK(state.message, context);
         }
         if (state is EmployeeError) {
+          if (!context.mounted) return;
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
                 content: Text(state.message),
@@ -175,10 +176,10 @@ class _EmployeeListBody extends StatelessWidget {
         borderRadius:
         BorderRadius.circular(isTablet ? 14 : 12),
         border:
-        Border.all(color: AppTokens.brandMid.withOpacity(0.3)),
+        Border.all(color: AppTokens.brandMid.withValues(alpha: 0.3)),
         boxShadow: [
           BoxShadow(
-              color: AppTokens.brandGradientStart.withOpacity(0.06),
+              color: AppTokens.brandGradientStart.withValues(alpha: 0.06),
               blurRadius: 8,
               offset: const Offset(0, 2))
         ],
@@ -392,7 +393,7 @@ class _EmployeeCard extends StatelessWidget {
           ),
           boxShadow: [
             BoxShadow(
-              color: AppTokens.brandGradientStart.withOpacity(
+              color: AppTokens.brandGradientStart.withValues(alpha: 
                   isSelected ? 0.15 : 0.07),
               blurRadius: isSelected ? 14 : 10,
               offset: const Offset(0, 3),
@@ -444,7 +445,7 @@ class _EmployeeCard extends StatelessWidget {
           padding: const EdgeInsets.symmetric(
               horizontal: 8, vertical: 4),
           decoration: BoxDecoration(
-              color: statusColor.withOpacity(0.1),
+              color: statusColor.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(12)),
           child: Row(mainAxisSize: MainAxisSize.min, children: [
             Icon(
@@ -500,7 +501,7 @@ class _EmployeeCard extends StatelessWidget {
               padding: const EdgeInsets.symmetric(
                   horizontal: 10, vertical: 4),
               decoration: BoxDecoration(
-                  color: statusColor.withOpacity(0.1),
+                  color: statusColor.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(20)),
               child: Row(
                   mainAxisSize: MainAxisSize.min,
@@ -522,7 +523,7 @@ class _EmployeeCard extends StatelessWidget {
           ],
         ),
         const SizedBox(height: 10),
-        Divider(color: AppTokens.brandLight, thickness: 1),
+        const Divider(color: AppTokens.brandLight, thickness: 1),
         Wrap(spacing: 8, runSpacing: 8, children: [
           _chip(Icons.calendar_today_rounded, "Joining",
               _fmt(record.JoiningDate)),
@@ -545,7 +546,7 @@ class _EmployeeCard extends StatelessWidget {
               icon: Icons.delete_rounded,
               label: "Delete",
               color: Colors.red,
-              bg: Colors.red.withOpacity(0.08),
+              bg: Colors.red.withValues(alpha: 0.08),
               onTap: onDelete,
             ),
           ],
@@ -614,7 +615,7 @@ class _EmptyDetailPanel extends StatelessWidget {
         border: Border.all(color: AppTokens.brandLight, width: 1.5),
         boxShadow: [
           BoxShadow(
-              color: AppTokens.brandGradientStart.withOpacity(0.05),
+              color: AppTokens.brandGradientStart.withValues(alpha: 0.05),
               blurRadius: 12,
               offset: const Offset(0, 4))
         ],
@@ -680,7 +681,7 @@ class _EmployeeDetailPanel extends StatelessWidget {
         border: Border.all(color: AppTokens.brandLight, width: 1.5),
         boxShadow: [
           BoxShadow(
-              color: AppTokens.brandGradientStart.withOpacity(0.07),
+              color: AppTokens.brandGradientStart.withValues(alpha: 0.07),
               blurRadius: 16,
               offset: const Offset(0, 5))
         ],
@@ -718,7 +719,7 @@ class _EmployeeDetailPanel extends StatelessWidget {
                 padding: const EdgeInsets.symmetric(
                     horizontal: 8, vertical: 4),
                 decoration: BoxDecoration(
-                    color: Palette.kWhite.withOpacity(0.2),
+                    color: Palette.kWhite.withValues(alpha: 0.2),
                     borderRadius: BorderRadius.circular(12)),
                 child: Text(
                   isActive ? 'Active' : 'Inactive',

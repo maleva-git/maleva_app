@@ -11,8 +11,6 @@ import '../../../mastersearch/Truck.dart';
 import '../bloc/maintenance_bloc.dart';
 import '../bloc/maintenance_event.dart';
 import '../bloc/maintenance_state.dart';
-import 'package:maleva/core/models/shared/get_truck_model.dart';
-import 'package:maleva/core/models/shared/truck_details_model.dart';
 
 
 
@@ -110,7 +108,7 @@ class _MaintenancePage extends StatelessWidget {
           const SizedBox(height: 2),
           Text(userName,
               style: GoogleFonts.lato(
-                  color: Colors.white.withOpacity(0.65),
+                  color: Colors.white.withValues(alpha: 0.65),
                   fontWeight: FontWeight.w500,
                   fontSize: 12)),
         ],
@@ -183,6 +181,7 @@ class _TruckSelector extends StatelessWidget {
           ).then((_) {
             final sel = AppGlobals.SelectTruckList;
             if (sel.Id != 0) {
+              if (!context.mounted) return;
               context.read<TruckMaintenanceBloc>().add(
                   TruckMaintenanceTruckSelected(
                       truckId: sel.Id,
@@ -430,7 +429,7 @@ class _TruckCard extends StatelessWidget {
         border: Border.all(color: AppTokens.maintCardBorder, width: 0.5),
         boxShadow: [
           BoxShadow(
-            color: AppTokens.invoiceHeaderStart.withOpacity(0.07),
+            color: AppTokens.invoiceHeaderStart.withValues(alpha: 0.07),
             blurRadius: 10,
             offset: const Offset(0, 3),
           ),
@@ -557,7 +556,7 @@ class _FieldRow extends StatelessWidget {
       padding: const EdgeInsets.symmetric(
           horizontal: 12, vertical: 6),
       color: isExpired
-          ? AppTokens.kExpiredRed.withOpacity(0.06)
+          ? AppTokens.kExpiredRed.withValues(alpha: 0.06)
           : Colors.transparent,
       child: Row(
         children: [

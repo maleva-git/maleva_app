@@ -163,7 +163,7 @@ class EnquiryViewBloc extends Bloc<EnquiryViewEvent, EnquiryViewState> {
 
       List<EnquiryMasterModel> masterList = [];
       if (resultData.isNotEmpty) {
-        masterList = (resultData as List)
+        masterList = (resultData)
             .map((e) => EnquiryMasterModel.fromJson(e))
             .toList();
         AppGlobals.EnquiryMasterList = masterList;

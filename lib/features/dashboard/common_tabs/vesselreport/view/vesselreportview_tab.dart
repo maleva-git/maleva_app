@@ -4,7 +4,6 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:maleva/core/utils/app_globals.dart';
 import 'package:maleva/core/utils/app_preferences.dart';
-import '../../../../../core/di/injection.dart';
 import '../../../../../core/theme/tokens.dart';
 import '../../../../mastersearch/Port.dart';
 import '../bloc/vesselreport_bloc.dart';
@@ -160,7 +159,7 @@ class _VesselReportViewState extends State<_VesselReportView> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  _SectionHeader(title: 'Vessel Report', isTablet: true),
+                  const _SectionHeader(title: 'Vessel Report', isTablet: true),
                   const SizedBox(height: 20),
                   _SearchCard(
                     txtPort:     _txtPort,
@@ -195,7 +194,7 @@ class _VesselReportViewState extends State<_VesselReportView> {
             flex: 55,
             child: Column(
               children: [
-                _ListHeader(isTablet: true),
+                const _ListHeader(isTablet: true),
                 const SizedBox(height: 10),
                 Expanded(
                   child: isLoading
@@ -241,7 +240,7 @@ class _VesselReportViewState extends State<_VesselReportView> {
     return ListView(
       padding: const EdgeInsets.fromLTRB(16, 20, 16, 24),
       children: [
-        _SectionHeader(title: 'Vessel Report', isTablet: false),
+        const _SectionHeader(title: 'Vessel Report', isTablet: false),
         const SizedBox(height: 16),
 
         _SearchCard(
@@ -267,7 +266,7 @@ class _VesselReportViewState extends State<_VesselReportView> {
         ),
         const SizedBox(height: 16),
 
-        _ListHeader(isTablet: false),
+        const _ListHeader(isTablet: false),
         const SizedBox(height: 8),
 
         if (isLoading)
@@ -353,7 +352,7 @@ class _SearchCard extends StatelessWidget {
         border: Border.all(color: AppTokens.brandLight, width: 1.5),
         boxShadow: [
           BoxShadow(
-            color: AppTokens.brandGradientStart.withOpacity(0.08),
+            color: AppTokens.brandGradientStart.withValues(alpha: 0.08),
             blurRadius: 14,
             offset: const Offset(0, 5),
           ),
@@ -378,7 +377,7 @@ class _SearchCard extends StatelessWidget {
                         builder: (_) =>
                         const Port(Searchby: 1, SearchId: 0),
                       ),
-                    ).then((_navRes) {
+                    ).then((navRes) {
                       if (AppGlobals.SelectedPortName.isNotEmpty) {
                         bloc.add(UpdatePortEvent(
                             portName: AppGlobals.SelectedPortName));
@@ -487,7 +486,7 @@ class _StyledTextField extends StatelessWidget {
         hintText: hint,
         hintStyle: GoogleFonts.poppins(
           fontSize: isTablet ? 14 : 13,
-          color:    AppTokens.brandMid.withOpacity(0.6),
+          color:    AppTokens.brandMid.withValues(alpha: 0.6),
         ),
         suffixIcon: suffixIcon != null
             ? Padding(
@@ -505,7 +504,7 @@ class _StyledTextField extends StatelessWidget {
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(isTablet ? 14 : 12),
-          borderSide: BorderSide(color: AppTokens.brandLight),
+          borderSide: const BorderSide(color: AppTokens.brandLight),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(isTablet ? 14 : 12),
@@ -537,7 +536,7 @@ class _ActionIconButton extends StatelessWidget {
   Widget build(BuildContext context) {
     final color = isDestructive ? Colors.redAccent : AppTokens.brandGradientStart;
     final bg    = isDestructive
-        ? Colors.red.withOpacity(0.08)
+        ? Colors.red.withValues(alpha: 0.08)
         : AppTokens.brandLight;
     final size  = isTablet ? 44.0 : 38.0;
 
@@ -625,7 +624,7 @@ class _ToggleTab extends StatelessWidget {
             boxShadow: isActive
                 ? [
               BoxShadow(
-                color:  AppTokens.brandGradientStart.withOpacity(0.3),
+                color:  AppTokens.brandGradientStart.withValues(alpha: 0.3),
                 blurRadius: 8,
                 offset: const Offset(0, 3),
               )
@@ -674,7 +673,7 @@ class _ListHeader extends StatelessWidget {
               style: GoogleFonts.poppins(
                   fontSize:   isTablet ? 13 : 12,
                   fontWeight: FontWeight.w700,
-                  color:      colour.kWhite.withOpacity(0.8))),
+                  color:      colour.kWhite.withValues(alpha: 0.8))),
         ),
         const SizedBox(width: 8),
         Expanded(
@@ -732,7 +731,7 @@ class _VesselCard extends StatelessWidget {
             }
           },
           borderRadius: BorderRadius.circular(isTablet ? 16 : 14),
-          splashColor: AppTokens.brandGradientStart.withOpacity(0.08),
+          splashColor: AppTokens.brandGradientStart.withValues(alpha: 0.08),
           child: Container(
             padding: EdgeInsets.symmetric(
               horizontal: isTablet ? 18 : 14,
@@ -744,13 +743,13 @@ class _VesselCard extends StatelessWidget {
               border: Border.all(
                 color: isEven
                     ? AppTokens.brandLight
-                    : AppTokens.brandMid.withOpacity(0.3),
+                    : AppTokens.brandMid.withValues(alpha: 0.3),
                 width: 1.2,
               ),
               boxShadow: isEven
                   ? [
                 BoxShadow(
-                  color:  AppTokens.brandGradientStart.withOpacity(0.05),
+                  color:  AppTokens.brandGradientStart.withValues(alpha: 0.05),
                   blurRadius: 6,
                   offset: const Offset(0, 2),
                 )
@@ -765,7 +764,7 @@ class _VesselCard extends StatelessWidget {
                 decoration: BoxDecoration(
                   color: isEven
                       ? AppTokens.brandLight
-                      : AppTokens.brandGradientStart.withOpacity(0.12),
+                      : AppTokens.brandGradientStart.withValues(alpha: 0.12),
                   borderRadius: BorderRadius.circular(isTablet ? 10 : 8),
                 ),
                 alignment: Alignment.center,
@@ -800,10 +799,10 @@ class _VesselCard extends StatelessWidget {
                   vertical:   isTablet ? 6  : 4,
                 ),
                 decoration: BoxDecoration(
-                  color: AppTokens.brandGradientStart.withOpacity(0.08),
+                  color: AppTokens.brandGradientStart.withValues(alpha: 0.08),
                   borderRadius: BorderRadius.circular(20),
                   border: Border.all(
-                      color: AppTokens.brandMid.withOpacity(0.3),
+                      color: AppTokens.brandMid.withValues(alpha: 0.3),
                       width: 1),
                 ),
                 child: Text(
@@ -840,7 +839,7 @@ class _VesselCard extends StatelessWidget {
             borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
             boxShadow: [
               BoxShadow(
-                color: AppTokens.brandGradientStart.withOpacity(0.15),
+                color: AppTokens.brandGradientStart.withValues(alpha: 0.15),
                 blurRadius: 20,
                 offset: const Offset(0, -5),
               ),
@@ -855,7 +854,7 @@ class _VesselCard extends StatelessWidget {
                 width: 40,
                 height: 4,
                 decoration: BoxDecoration(
-                  color: AppTokens.brandMid.withOpacity(0.3),
+                  color: AppTokens.brandMid.withValues(alpha: 0.3),
                   borderRadius: BorderRadius.circular(2),
                 ),
               ),
@@ -869,7 +868,7 @@ class _VesselCard extends StatelessWidget {
                     Container(
                       padding: const EdgeInsets.all(10),
                       decoration: BoxDecoration(
-                        color: AppTokens.brandGradientStart.withOpacity(0.1),
+                        color: AppTokens.brandGradientStart.withValues(alpha: 0.1),
                         borderRadius: BorderRadius.circular(12),
                       ),
                       child: Icon(Icons.directions_boat_filled,
@@ -908,7 +907,7 @@ class _VesselCard extends StatelessWidget {
                 ),
               ),
 
-              Divider(color: AppTokens.brandLight, thickness: 1.5),
+              const Divider(color: AppTokens.brandLight, thickness: 1.5),
 
               // Detail rows
               Flexible(
@@ -989,7 +988,7 @@ class _VesselCard extends StatelessWidget {
     final isTab = MediaQuery.of(context).size.width >= 600;
     
     // Initial data parsing
-    String _parseDate(dynamic val) {
+    String parseDate(dynamic val) {
       if (val == null) return '';
       final s = val.toString().trim();
       if (s.isEmpty || s.startsWith('0001-01-01') || s.startsWith('1900-')) return '';
@@ -997,10 +996,10 @@ class _VesselCard extends StatelessWidget {
       return s; 
     }
 
-    String eta = _parseDate(itemData['SETA']);
-    String etb = _parseDate(itemData['SETB']);
-    String oeta = _parseDate(itemData['SOETA']);
-    String oetb = _parseDate(itemData['SOETB']);
+    String eta = parseDate(itemData['SETA']);
+    String etb = parseDate(itemData['SETB']);
+    String oeta = parseDate(itemData['SOETA']);
+    String oetb = parseDate(itemData['SOETB']);
 
     showModalBottomSheet(
       context: context,
@@ -1014,7 +1013,7 @@ class _VesselCard extends StatelessWidget {
           child: StatefulBuilder(
             builder: (BuildContext sheetContext, StateSetter setState) {
             
-            Widget _buildEditField(String label, String value, Function(String) onChanged) {
+            Widget buildEditField(String label, String value, Function(String) onChanged) {
               final controller = TextEditingController(text: value);
               return Padding(
                 padding: const EdgeInsets.symmetric(vertical: 8),
@@ -1045,17 +1044,17 @@ class _VesselCard extends StatelessWidget {
                           contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(8),
-                            borderSide: BorderSide(color: AppTokens.brandMid.withOpacity(0.3)),
+                            borderSide: BorderSide(color: AppTokens.brandMid.withValues(alpha: 0.3)),
                           ),
                           enabledBorder: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(8),
-                            borderSide: BorderSide(color: AppTokens.brandMid.withOpacity(0.3)),
+                            borderSide: BorderSide(color: AppTokens.brandMid.withValues(alpha: 0.3)),
                           ),
                           focusedBorder: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(8),
                             borderSide: const BorderSide(color: AppTokens.brandGradientStart),
                           ),
-                          suffixIcon: Icon(Icons.calendar_month_outlined, size: 20, color: AppTokens.brandMid),
+                          suffixIcon: const Icon(Icons.calendar_month_outlined, size: 20, color: AppTokens.brandMid),
                         ),
                         onTap: () async {
                           DateTime initial = DateTime.now();
@@ -1073,6 +1072,7 @@ class _VesselCard extends StatelessWidget {
                             lastDate: DateTime(2100),
                           );
                           if (date != null) {
+                            if (!context.mounted) return;
                             final time = await showTimePicker(
                               context: context,
                               initialTime: TimeOfDay.fromDateTime(initial),
@@ -1125,7 +1125,7 @@ class _VesselCard extends StatelessWidget {
                       width: 40,
                       height: 4,
                       decoration: BoxDecoration(
-                        color: AppTokens.brandMid.withOpacity(0.3),
+                        color: AppTokens.brandMid.withValues(alpha: 0.3),
                         borderRadius: BorderRadius.circular(2),
                       ),
                     ),
@@ -1148,10 +1148,10 @@ class _VesselCard extends StatelessWidget {
                     ),
                     const SizedBox(height: 24),
 
-                    if (eta.isNotEmpty) _buildEditField('ETA', eta, (v) => eta = v),
-                    if (etb.isNotEmpty) _buildEditField('ETB', etb, (v) => etb = v),
-                    if (oeta.isNotEmpty) _buildEditField('OETA', oeta, (v) => oeta = v),
-                    if (oetb.isNotEmpty) _buildEditField('OETB', oetb, (v) => oetb = v),
+                    if (eta.isNotEmpty) buildEditField('ETA', eta, (v) => eta = v),
+                    if (etb.isNotEmpty) buildEditField('ETB', etb, (v) => etb = v),
+                    if (oeta.isNotEmpty) buildEditField('OETA', oeta, (v) => oeta = v),
+                    if (oetb.isNotEmpty) buildEditField('OETB', oetb, (v) => oetb = v),
 
 
                     const SizedBox(height: 32),
@@ -1170,7 +1170,7 @@ class _VesselCard extends StatelessWidget {
                           FocusScope.of(context).unfocus();
 
                           // Format for API: "yyyy-MM-dd HH:mm:ss"
-                          String _formatForApi(String dt, String originalKey) {
+                          String formatForApi(String dt, String originalKey) {
                             if (dt.isEmpty) {
                               // If empty (hidden from UI), send the original value so we don't send "" to a DateTime field
                               return itemData[originalKey]?.toString() ?? "";
@@ -1180,10 +1180,10 @@ class _VesselCard extends StatelessWidget {
 
                           final updateData = {
                             "Jobid": itemData['SaleOrderMasterRefId'],
-                            "ETA": _formatForApi(eta, 'SETA'),
-                            "ETB": _formatForApi(etb, 'SETB'),
-                            "OETA": _formatForApi(oeta, 'SOETA'),
-                            "OETB": _formatForApi(oetb, 'SOETB'),
+                            "ETA": formatForApi(eta, 'SETA'),
+                            "ETB": formatForApi(etb, 'SETB'),
+                            "OETA": formatForApi(oeta, 'SOETA'),
+                            "OETB": formatForApi(oetb, 'SOETB'),
                             "Comid": AppGlobals.Comid,
                             "Type": 100, // SAVE ALL
                           };
@@ -1231,7 +1231,7 @@ class _EmptyState extends StatelessWidget {
       child: Column(children: [
         Container(
           padding: EdgeInsets.all(isTablet ? 24 : 20),
-          decoration: BoxDecoration(
+          decoration: const BoxDecoration(
             color: AppTokens.brandLight,
             shape: BoxShape.circle,
           ),
