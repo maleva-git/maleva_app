@@ -250,8 +250,13 @@ class _FWBreakSealViewState extends State<_FWBreakSealView>
   Widget _buildMobile(BuildContext context, FWBreakSealState state) {
     final double height = MediaQuery.of(context).size.height;
 
-    return WillPopScope(
-      onWillPop: _onWillPop,
+    return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: (didPop, result) async {
+        if (didPop) return;
+        bool pop = await _onWillPop();
+        if (pop) Navigator.pop(context);
+      },
       child: Scaffold(
         resizeToAvoidBottomInset: true,
         backgroundColor: Palette.white,
@@ -277,8 +282,13 @@ class _FWBreakSealViewState extends State<_FWBreakSealView>
   Widget _buildTablet(BuildContext context, FWBreakSealState state) {
     final double height = MediaQuery.of(context).size.height;
 
-    return WillPopScope(
-      onWillPop: _onWillPop,
+    return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: (didPop, result) async {
+        if (didPop) return;
+        bool pop = await _onWillPop();
+        if (pop) Navigator.pop(context);
+      },
       child: Scaffold(
         resizeToAvoidBottomInset: true,
         backgroundColor: Palette.white,

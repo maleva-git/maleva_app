@@ -119,11 +119,12 @@ class FWUpdatePageState extends State<FWUpdatePage> with SingleTickerProviderSta
           _showImagePreview(context, state.imageUrl);
         }
       },
-      child: WillPopScope(
-        onWillPop: () async {
+      child: PopScope(
+        canPop: false,
+        onPopInvokedWithResult: (didPop, result) {
+          if (didPop) return;
           context.read<FWUpdateBloc>().add(FWUpdateOverlayDismissed());
           Navigator.pop(context);
-          return false;
         },
         child: Scaffold(
           resizeToAvoidBottomInset: true,

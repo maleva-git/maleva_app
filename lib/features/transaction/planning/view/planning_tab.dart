@@ -70,10 +70,11 @@ class _PlanningScaffold extends StatelessWidget {
           );
         }
       },
-      child: WillPopScope(
-        onWillPop: () async {
+      child: PopScope(
+        canPop: false,
+        onPopInvokedWithResult: (didPop, result) {
+          if (didPop) return;
           _onBackPressed(context);
-          return false;
         },
         child: Scaffold(
           backgroundColor: colour.kBg,

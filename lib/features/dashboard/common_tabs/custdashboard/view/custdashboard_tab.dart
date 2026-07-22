@@ -339,8 +339,13 @@ class _CustDashboardViewState extends State<_CustDashboardView>
   Widget build(BuildContext context) {
     _applyFontSizes(MediaQuery.of(context).size.width);
 
-    return WillPopScope(
-      onWillPop: _onWillPop,
+    return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: (didPop, result) async {
+        if (didPop) return;
+        bool pop = await _onWillPop();
+        if (pop) Navigator.pop(context);
+      },
       child: Scaffold(
         resizeToAvoidBottomInset: false,
         backgroundColor: Colors.white,

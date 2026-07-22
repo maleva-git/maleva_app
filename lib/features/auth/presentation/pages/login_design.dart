@@ -6,7 +6,6 @@
 import 'package:flutter/Material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
-
 import '../../../../core/colors/colors.dart' as colour;
 import '../../../../core/theme/tokens.dart';
 import 'package:maleva/core/utils/app_globals.dart';
@@ -26,6 +25,7 @@ class MobileDesign extends StatelessWidget {
           listenWhen: (p, c) =>
           p.loginSuccess != c.loginSuccess ||
               p.errorMessage != c.errorMessage,
+
           listener: (context, state) {
             if (state.loginSuccess && state.role != null) {
               Navigator.pushReplacementNamed(context, state.role!);
@@ -41,6 +41,7 @@ class MobileDesign extends StatelessWidget {
             }
           },
           child: BlocBuilder<LoginBloc, LoginState>(
+            
             builder: (context, state) => _LoginBody(
               state: state,
               isTablet: constraints.maxWidth >= 600, // ← single flag
@@ -133,7 +134,7 @@ class _LoginBodyState extends State<_LoginBody>
 
                 Expanded(
                   child: SingleChildScrollView(
-                    physics: const BouncingScrollPhysics(),
+                    physics: const ClampingScrollPhysics(),
                     padding: EdgeInsets.symmetric(
                       horizontal: _isTablet ? 32 : 20,
                     ),
@@ -352,6 +353,7 @@ class _LoginBodyState extends State<_LoginBody>
               ),
             ),
           ),
+
 
           // ── RIGHT: Hero Panel
           Expanded(

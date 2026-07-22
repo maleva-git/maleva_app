@@ -10,8 +10,9 @@ import '../bloc/employeemaster_bloc.dart';
 import '../bloc/employeemaster_event.dart';
 import '../bloc/employeemaster_state.dart';
 import 'employeeadd_tab.dart';
-import '../data/employee_repository.dart'; // Add this line
+import '../data/employee_repository.dart';
 import 'package:maleva/core/models/shared/employee_details_model.dart';
+import '../../../../../core/widgets/debounced_search_bar.dart';
 
 
 class EmployeeViewPage extends StatelessWidget {
@@ -146,6 +147,7 @@ class _EmployeeListBody extends StatelessWidget {
   // ══════════════════════════════════════════════════════
   Widget _buildMobileLayout(
       BuildContext context, EmployeeListLoaded state) {
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -170,38 +172,15 @@ class _EmployeeListBody extends StatelessWidget {
   // ══════════════════════════════════════════════════════
   Widget _buildSearchBar(BuildContext context,
       {required bool isTablet}) {
-    return Container(
-      decoration: BoxDecoration(
-        color: Palette.kWhite,
-        borderRadius:
-        BorderRadius.circular(isTablet ? 14 : 12),
-        border:
-        Border.all(color: AppTokens.brandMid.withValues(alpha: 0.3)),
-        boxShadow: [
-          BoxShadow(
-              color: AppTokens.brandGradientStart.withValues(alpha: 0.06),
-              blurRadius: 8,
-              offset: const Offset(0, 2))
-        ],
-      ),
-      child: TextField(
-        onChanged: (q) => context
-            .read<EmployeeMasterBloc>()
-            .add(SearchEmployeeMasterEvent(q)),
-        decoration: InputDecoration(
-          prefixIcon:
-          const Icon(Icons.search, color: AppTokens.brandGradientStart),
-          hintText: 'Search Employee...',
-          hintStyle: GoogleFonts.lato(color: Colors.grey),
-          border: InputBorder.none,
-          contentPadding: EdgeInsets.symmetric(
-            vertical: isTablet ? 16 : 14,
-            horizontal: 12,
-          ),
-        ),
-      ),
+    return DebouncedSearchBar(
+      isTablet: isTablet,
+      hintText: 'Search Employee...',
+      onChanged: (q) => context
+          .read<EmployeeMasterBloc>()
+          .add(SearchEmployeeMasterEvent(q)),
     );
   }
+
 
   Widget _buildTitleBar(BuildContext context,
       {required bool isTablet}) {

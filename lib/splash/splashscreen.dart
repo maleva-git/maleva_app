@@ -1,18 +1,13 @@
 import 'package:maleva/core/network/api_legacy_helper.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:maleva/core/utils/app_globals.dart';
 import 'package:maleva/core/colors/colors.dart' as colour;
-import '../core/network/api_services/auth_api.dart';
 import '../core/theme/tokens.dart';
 import '../core/utils/app_preferences.dart';
 import 'package:maleva/core/network/OnlineApi.dart' as OnlineApi;
-import '../features/auth/data/repositories/auth_repository.dart';
-import '../features/auth/presentation/bloc/auth_bloc.dart';
-import '../features/auth/presentation/pages/login_page.dart';
 
 // ─── Design tokens (splash only) ─────────────────────────────────────────────
 

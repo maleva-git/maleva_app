@@ -75,8 +75,12 @@ class _PlanningDetailsViewState extends State<_PlanningDetailsView> {
         }
       },
       builder: (ctx, state) {
-        return WillPopScope(
-          onWillPop: _onBackPressed,
+        return PopScope(
+          canPop: false,
+          onPopInvokedWithResult: (didPop, result) async {
+            if (didPop) return;
+            await _onBackPressed();
+          },
           child: LayoutBuilder(
             builder: (_, constraints) {
               final bool isTablet = constraints.maxWidth >= 600;

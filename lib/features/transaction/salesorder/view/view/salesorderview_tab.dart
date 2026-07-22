@@ -77,11 +77,12 @@ class _SaleOrderViewBody extends StatelessWidget {
         }
         if (state is! SalesOrderViewLoaded) return const SizedBox();
 
-        return WillPopScope(
-          onWillPop: () async {
-            Navigator.pop(context);
-            return false;
-          },
+        return PopScope(
+        canPop: false,
+        onPopInvokedWithResult: (didPop, result) {
+          if (didPop) return;
+          Navigator.pop(context);
+        },
           child: Scaffold(
             backgroundColor: colour.surface,
             appBar: _SaleAppBar(state: state),
@@ -187,7 +188,6 @@ class _MobileBody extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Column(children: [
-      _MobileColHeader(),
       Expanded(
         child: state.masterList.isEmpty
             ? _EmptyState()
@@ -204,46 +204,7 @@ class _MobileBody extends StatelessWidget {
   }
 }
 
-// ── Mobile Column Header ──────────────────────────────────
-class _MobileColHeader extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      color: colour.brandDeep,
-      padding:
-      const EdgeInsets.symmetric(horizontal: 16, vertical: 9),
-      child: Column(children: [
-        Row(children: [
-          _h('#',        flex: 1),
-          _h('Status',   flex: 3),
-          _h('Employee', flex: 4),
-        ]),
-        const SizedBox(height: 4),
-        Row(children: [
-          _h('L.Vessel', flex: 3),
-          _h('ETA',      flex: 4),
-          _h('ETB',      flex: 3),
-        ]),
-        const SizedBox(height: 4),
-        Row(children: [
-          _h('Port',     flex: 3),
-          _h('Customer', flex: 5),
-          _h('Order No', flex: 3),
-        ]),
-      ]),
-    );
-  }
 
-  Widget _h(String t, {int flex = 1}) => Expanded(
-    flex: flex,
-    child: Text(t,
-        style: GoogleFonts.poppins(
-            color: Colors.white54,
-            fontSize: 9,
-            fontWeight: FontWeight.w700,
-            letterSpacing: 0.8)),
-  );
-}
 
 // ── Mobile Card ───────────────────────────────────────────
 class _MobileCard extends StatelessWidget {
@@ -252,10 +213,9 @@ class _MobileCard extends StatelessWidget {
   final SalesOrderViewLoaded state;
   const _MobileCard(
       {required this.model,
-        required this.index,
-        required this.state});
+      required this.index,
+      required this.state});
 
-  // Status strip color logic
   Color _strip() {
     final hasPickup = model.SPickupDate.toString().isNotEmpty;
     final hasETA    = model.SETA.toString().isNotEmpty;
@@ -277,127 +237,157 @@ class _MobileCard extends StatelessWidget {
       margin: const EdgeInsets.only(bottom: 12),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(18),
+        borderRadius: BorderRadius.circular(16),
         border: Border.all(color: colour.border, width: 1),
         boxShadow: [
           BoxShadow(
-              color: strip.withValues(alpha: 0.08),
-              blurRadius: 14,
+              color: strip.withValues(alpha: 0.1),
+              blurRadius: 10,
               offset: const Offset(0, 4)),
-          const BoxShadow(
-              color: Color(0x08000000),
-              blurRadius: 6,
-              offset: Offset(0, 2)),
         ],
       ),
       child: ClipRRect(
-        borderRadius: BorderRadius.circular(18),
+        borderRadius: BorderRadius.circular(16),
         child: InkWell(
-          borderRadius: BorderRadius.circular(18),
-          onLongPress: () =>
-              _navigateToEdit(context, model.Id, 0),
+          onLongPress: () => _navigateToEdit(context, model.Id, 0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // ── Top accent bar ────────────────────────
-              Container(
-                height: 4,
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    colors: [strip, strip.withValues(alpha: 0.6)],
-                  ),
+              // Top strip
+              Container(height: 4, color: strip),
+
+              // Header: SNo, Job No & Status
+              Padding(
+                padding: const EdgeInsets.fromLTRB(16, 12, 16, 8),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Row(
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.all(6),
+                          decoration: BoxDecoration(
+                            color: colour.brand.withValues(alpha: 0.1),
+                            shape: BoxShape.circle,
+                          ),
+                          child: Text('${index + 1}',
+                              style: GoogleFonts.poppins(
+                                  color: colour.brand,
+                                  fontSize: 10,
+                                  fontWeight: FontWeight.w800)),
+                        ),
+                        const SizedBox(width: 8),
+                        Text(
+                          model.BillNoDisplay.toString(),
+                          style: GoogleFonts.poppins(
+                              color: colour.brandDark,
+                              fontSize: 14,
+                              fontWeight: FontWeight.w800),
+                        ),
+                      ],
+                    ),
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                      decoration: BoxDecoration(
+                        color: strip.withValues(alpha: 0.15),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Text(
+                        model.JobStatus.toString().toUpperCase(),
+                        style: GoogleFonts.poppins(
+                            color: strip,
+                            fontSize: 10,
+                            fontWeight: FontWeight.w700),
+                      ),
+                    ),
+                  ],
                 ),
               ),
 
-              // ── Header: SNo + Status + Employee ──────
+              // Customer & Employee
               Padding(
-                padding:
-                const EdgeInsets.fromLTRB(14, 12, 14, 8),
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.center,
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // Serial no circle
-                    Container(
-                      width: 32,
-                      height: 32,
-                      decoration: BoxDecoration(
-                        gradient: LinearGradient(
-                          colors: [
-                            strip.withValues(alpha: 0.15),
-                            strip.withValues(alpha: 0.08)
-                          ],
-                        ),
-                        borderRadius:
-                        BorderRadius.circular(16),
-                        border: Border.all(
-                            color: strip.withValues(alpha: 0.3),
-                            width: 1.5),
-                      ),
-                      alignment: Alignment.center,
-                      child: Text('${index + 1}',
-                          style: GoogleFonts.poppins(
-                              color: strip,
-                              fontSize: 12,
-                              fontWeight: FontWeight.w800)),
-                    ),
-                    const SizedBox(width: 10),
-                    // Status badge
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 10, vertical: 4),
-                      decoration: BoxDecoration(
-                        color: strip.withValues(alpha: 0.1),
-                        borderRadius:
-                        BorderRadius.circular(20),
-                        border: Border.all(
-                            color: strip.withValues(alpha: 0.3),
-                            width: 1),
-                      ),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Container(
-                            width: 6,
-                            height: 6,
-                            decoration: BoxDecoration(
-                              color: strip,
-                              borderRadius:
-                              BorderRadius.circular(3),
-                            ),
-                          ),
-                          const SizedBox(width: 5),
-                          Text(
-                            model.JobStatus.toString()
-                                .toUpperCase(),
+                    Row(
+                      children: [
+                        const Icon(Icons.business_rounded, size: 14, color: colour.brand),
+                        const SizedBox(width: 6),
+                        Expanded(
+                          child: Text(
+                            model.CustomerName.toString(),
                             style: GoogleFonts.poppins(
-                                color: strip,
-                                fontSize: 10,
-                                fontWeight: FontWeight.w700,
-                                letterSpacing: 0.3),
+                                color: colour.brandDark,
+                                fontSize: 13,
+                                fontWeight: FontWeight.w700),
                           ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 4),
+                    Row(
+                      children: [
+                        const Icon(Icons.person_outline_rounded, size: 14, color: colour.textSub),
+                        const SizedBox(width: 6),
+                        Expanded(
+                          child: Text(
+                            model.EmployeeName.toString(),
+                            style: GoogleFonts.poppins(
+                                color: colour.textSub,
+                                fontSize: 12,
+                                fontWeight: FontWeight.w500),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+
+              const Padding(
+                padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                child: Divider(height: 1, color: colour.border),
+              ),
+
+              // Vessels Grid (2 columns)
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Left Column (Loading Vessel)
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          _infoCell('Loading Vessel', model.Loadingvesselname.toString(), Icons.directions_boat_rounded),
+                          const SizedBox(height: 8),
+                          Row(
+                            children: [
+                              Expanded(child: _infoCell('ETA', model.SETA.toString(), null)),
+                              const SizedBox(width: 8),
+                              Expanded(child: _infoCell('ETB', model.SETB.toString(), null)),
+                            ],
+                          )
                         ],
                       ),
                     ),
-                    const Spacer(),
-                    // Employee
-                    Flexible(
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
+                    const SizedBox(width: 16),
+                    // Right Column (Off Vessel)
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          const Icon(Icons.person_outline_rounded,
-                              size: 13, color: colour.textSub),
-                          const SizedBox(width: 3),
-                          Flexible(
-                            child: Text(
-                              model.EmployeeName.toString(),
-                              style: GoogleFonts.poppins(
-                                  color: colour.textSub,
-                                  fontSize: 11,
-                                  fontWeight:
-                                  FontWeight.w600),
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                          ),
+                          _infoCell('Off Vessel', model.Offvesselname.toString(), Icons.directions_boat_outlined),
+                          const SizedBox(height: 8),
+                          Row(
+                            children: [
+                              Expanded(child: _infoCell('OETA', model.SOETA.toString(), null)),
+                              const SizedBox(width: 8),
+                              Expanded(child: _infoCell('OETB', model.SOETB.toString(), null)),
+                            ],
+                          )
                         ],
                       ),
                     ),
@@ -405,263 +395,76 @@ class _MobileCard extends StatelessWidget {
                 ),
               ),
 
-              // ── Divider ───────────────────────────────
-              Container(
-                  height: 1,
-                  margin: const EdgeInsets.symmetric(
-                      horizontal: 14),
-                  color: colour.brandLight),
-
-              // ── Vessel / ETA info grid ────────────────
-              Padding(
-                padding:
-                const EdgeInsets.fromLTRB(14, 12, 14, 4),
-                child: Column(children: [
-                  // Row 1: L.Vessel, ETA, ETB
-                  Row(children: [
-                    _infoCell('L.Vessel',
-                        model.Loadingvesselname.toString(),
-                        flex: 3),
-                    _infoCell('ETA',
-                        model.SETA.toString(),
-                        flex: 4),
-                    _infoCell('ETB',
-                        model.SETB.toString(),
-                        flex: 3),
-                  ]),
-                  const SizedBox(height: 8),
-                  // Row 2: O.Vessel, OETA, OETB
-                  Row(children: [
-                    _infoCell('O.Vessel',
-                        model.Offvesselname.toString(),
-                        flex: 3),
-                    _infoCell('OETA',
-                        model.SOETA.toString(),
-                        flex: 4),
-                    _infoCell('OETB',
-                        model.SOETB.toString(),
-                        flex: 3),
-                  ]),
-                ]),
-              ),
-
-              // ── Customer chip ─────────────────────────
-              Container(
-                margin:
-                const EdgeInsets.fromLTRB(14, 8, 14, 0),
-                padding: const EdgeInsets.symmetric(
-                    horizontal: 12, vertical: 9),
-                decoration: BoxDecoration(
-                  gradient: const LinearGradient(
-                    colors: [
-                      Color(0xFFEEF2FF),
-                      Color(0xFFE8EFFE)
-                    ],
-                    begin: Alignment.centerLeft,
-                    end: Alignment.centerRight,
-                  ),
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: colour.border),
-                ),
-                child: Row(children: [
-                  Container(
-                    width: 28,
-                    height: 28,
-                    decoration: BoxDecoration(
-                      color: colour.brand.withValues(alpha: 0.12),
-                      borderRadius:
-                      BorderRadius.circular(8),
-                    ),
-                    child: const Icon(
-                        Icons.business_rounded,
-                        color: colour.brand,
-                        size: 16),
-                  ),
-                  const SizedBox(width: 10),
-                  Expanded(
-                    child: Text(
-                      model.CustomerName.toString(),
-                      style: GoogleFonts.poppins(
-                          color: colour.brandDark,
-                          fontSize: 12,
-                          fontWeight: FontWeight.w700),
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ),
-                  const SizedBox(width: 8),
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 9, vertical: 3),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius:
-                      BorderRadius.circular(8),
-                      border: Border.all(
-                          color: colour.brand.withValues(alpha: 0.25)),
-                    ),
-                    child: Text(
-                      model.BillNoDisplay.toString(),
-                      style: GoogleFonts.poppins(
-                          color: colour.brand,
-                          fontSize: 10,
-                          fontWeight: FontWeight.w800,
-                          letterSpacing: 0.3),
-                    ),
-                  ),
-                ]),
-              ),
-
-              // ── Port + Flight row ─────────────────────
-              if (model.SPort.toString().isNotEmpty ||
-                  model.FlighTime.toString().isNotEmpty)
+              // Port & Flight
+              if (model.SPort.toString().isNotEmpty || model.FlighTime.toString().isNotEmpty)
                 Padding(
-                  padding:
-                  const EdgeInsets.fromLTRB(14, 8, 14, 0),
-                  child: Row(children: [
-                    if (model.SPort.toString().isNotEmpty) ...[
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 8, vertical: 3),
-                        decoration: BoxDecoration(
-                          color: colour.brandLight,
-                          borderRadius:
-                          BorderRadius.circular(6),
-                        ),
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            const Icon(Icons.anchor_rounded,
-                                color: colour.brandMid, size: 12),
-                            const SizedBox(width: 4),
-                            Text(model.SPort.toString(),
-                                style: GoogleFonts.poppins(
-                                    color: colour.brandDark,
-                                    fontSize: 10,
-                                    fontWeight:
-                                    FontWeight.w700)),
-                          ],
-                        ),
-                      ),
-                    ],
-                    if (model.FlighTime.toString()
-                        .isNotEmpty) ...[
-                      const SizedBox(width: 8),
-                      const Icon(Icons.flight_rounded,
-                          color: colour.brandMid, size: 12),
-                      const SizedBox(width: 4),
-                      Expanded(
-                        child: Text(
-                          model.FlighTime.toString(),
-                          style: GoogleFonts.poppins(
-                              color: colour.textSub,
-                              fontSize: 10,
-                              fontWeight: FontWeight.w500),
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ),
-                    ],
-                  ]),
-                ),
-
-              // ── Action Buttons ────────────────────────
-              Padding(
-                padding:
-                const EdgeInsets.fromLTRB(12, 10, 12, 12),
-                child: Row(children: [
-                  // Details expand button
-                  Expanded(
-                    child: GestureDetector(
-                      onTap: () =>
-                          bloc.add(ExpandRow(index)),
-                      child: Container(
-                        height: 38,
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius:
-                          BorderRadius.circular(10),
-                          border:
-                          Border.all(color: colour.border),
-                        ),
-                        child: Row(
-                          mainAxisAlignment:
-                          MainAxisAlignment.center,
-                          children: [
-                            Icon(
-                              _expanded
-                                  ? Icons
-                                  .keyboard_arrow_up_rounded
-                                  : Icons
-                                  .keyboard_arrow_down_rounded,
-                              size: 18,
-                              color: colour.brand,
-                            ),
-                            const SizedBox(width: 4),
-                            Text(
-                              _expanded ? 'Close' : 'Details',
-                              style: GoogleFonts.poppins(
-                                  color: colour.brand,
-                                  fontSize: 12,
-                                  fontWeight:
-                                  FontWeight.w700),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: 10),
-                  // DO button
-                  Expanded(
-                    child: GestureDetector(
-                      onTap: () => bloc.add(
-                          ShareDO(model.Id, model.BillNo)),
-                      child: Container(
-                        height: 38,
-                        decoration: BoxDecoration(
-                          gradient: LinearGradient(
-                            colors: [
-                              strip,
-                              strip.withValues(alpha: 0.8)
+                  padding: const EdgeInsets.fromLTRB(16, 12, 16, 0),
+                  child: Row(
+                    children: [
+                      if (model.SPort.toString().isNotEmpty)
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                          decoration: BoxDecoration(
+                            color: colour.brandLight,
+                            borderRadius: BorderRadius.circular(6),
+                          ),
+                          child: Row(
+                            children: [
+                              const Icon(Icons.anchor_rounded, color: colour.brandMid, size: 12),
+                              const SizedBox(width: 4),
+                              Text(model.SPort.toString(), style: GoogleFonts.poppins(color: colour.brandDark, fontSize: 11, fontWeight: FontWeight.w600)),
                             ],
                           ),
-                          borderRadius:
-                          BorderRadius.circular(10),
-                          boxShadow: [
-                            BoxShadow(
-                              color:
-                              strip.withValues(alpha: 0.35),
-                              blurRadius: 8,
-                              offset: const Offset(0, 3),
-                            )
-                          ],
                         ),
-                        child: Row(
-                          mainAxisAlignment:
-                          MainAxisAlignment.center,
-                          children: [
-                            const Icon(
-                                Icons.picture_as_pdf_rounded,
-                                size: 15,
-                                color: Colors.white),
-                            const SizedBox(width: 5),
-                            Text('DO',
-                                style: GoogleFonts.poppins(
-                                    color: Colors.white,
-                                    fontSize: 12,
-                                    fontWeight:
-                                    FontWeight.w800,
-                                    letterSpacing: 0.5)),
-                          ],
+                      if (model.FlighTime.toString().isNotEmpty) ...[
+                        const SizedBox(width: 12),
+                        const Icon(Icons.flight_rounded, color: colour.brandMid, size: 14),
+                        const SizedBox(width: 4),
+                        Text(model.FlighTime.toString(), style: GoogleFonts.poppins(color: colour.textSub, fontSize: 11, fontWeight: FontWeight.w600)),
+                      ],
+                    ],
+                  ),
+                ),
+
+              // Actions
+              Padding(
+                padding: const EdgeInsets.all(16),
+                child: Row(
+                  children: [
+                    Expanded(
+                      flex: 2,
+                      child: OutlinedButton.icon(
+                        onPressed: () => bloc.add(ExpandRow(index)),
+                        icon: Icon(_expanded ? Icons.keyboard_arrow_up : Icons.keyboard_arrow_down, size: 18, color: colour.brand),
+                        label: Text(_expanded ? 'Close' : 'Details', style: GoogleFonts.poppins(color: colour.brand, fontWeight: FontWeight.w600)),
+                        style: OutlinedButton.styleFrom(
+                          side: const BorderSide(color: colour.border),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                          padding: const EdgeInsets.symmetric(vertical: 10),
                         ),
                       ),
                     ),
-                  ),
-                ]),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      flex: 1,
+                      child: ElevatedButton.icon(
+                        onPressed: () => bloc.add(ShareDO(model.Id, model.BillNo)),
+                        icon: const Icon(Icons.picture_as_pdf_rounded, size: 16, color: Colors.white),
+                        label: Text('DO', style: GoogleFonts.poppins(color: Colors.white, fontWeight: FontWeight.w600)),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: strip,
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                          padding: const EdgeInsets.symmetric(vertical: 10),
+                          elevation: 0,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
               ),
 
-              // ── Expanded Detail Panel ─────────────────
-              if (_expanded)
-                _DetailPanel(state: state, accent: strip),
+              // Details Panel
+              if (_expanded) _DetailPanel(state: state, accent: strip),
             ],
           ),
         ),
@@ -669,34 +472,32 @@ class _MobileCard extends StatelessWidget {
     );
   }
 
-  Widget _infoCell(String label, String val, {int flex = 1}) =>
-      Expanded(
-        flex: flex,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(label,
-                style: GoogleFonts.poppins(
-                    color: colour.textSub,
-                    fontSize: 9,
-                    fontWeight: FontWeight.w600,
-                    letterSpacing: 0.5)),
-            const SizedBox(height: 2),
-            Text(
-              val.isEmpty ? '—' : val,
-              style: GoogleFonts.poppins(
-                  color: val.isEmpty
-                      ? const Color(0xFFCBD5E1)
-                      : colour.textMain,
-                  fontSize: 11,
-                  fontWeight: val.isEmpty
-                      ? FontWeight.w400
-                      : FontWeight.w600),
-              overflow: TextOverflow.ellipsis,
-              maxLines: 1,
-            ),
-          ],
-        ),
+  Widget _infoCell(String label, String val, IconData? icon) =>
+      Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              if (icon != null) ...[
+                Icon(icon, size: 12, color: colour.textSub),
+                const SizedBox(width: 4),
+              ],
+              Text(label,
+                  style: GoogleFonts.poppins(
+                      color: colour.textSub,
+                      fontSize: 10,
+                      fontWeight: FontWeight.w500)),
+            ],
+          ),
+          const SizedBox(height: 2),
+          Text(
+            val.isEmpty ? '—' : val,
+            style: GoogleFonts.poppins(
+                color: val.isEmpty ? const Color(0xFFCBD5E1) : colour.textMain,
+                fontSize: 11,
+                fontWeight: FontWeight.w600),
+          ),
+        ],
       );
 
   Future<void> _navigateToEdit(BuildContext context, int id, int saleNo) async {
@@ -724,6 +525,7 @@ class _MobileCard extends StatelessWidget {
   }
 }
 
+
 // ════════════════════════════════════════════════════════
 // ██  TABLET BODY
 // ════════════════════════════════════════════════════════
@@ -733,13 +535,21 @@ class _TabletBody extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(children: [
-      // Tablet header — all columns one row
-      Container(
-        color: colour.brandDeep,
-        padding: const EdgeInsets.symmetric(
-            horizontal: 16, vertical: 11),
-        child: Row(children: [
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        const minWidth = 1200.0;
+        final w = constraints.maxWidth > minWidth ? constraints.maxWidth : minWidth;
+        return SingleChildScrollView(
+          scrollDirection: Axis.horizontal,
+          child: SizedBox(
+            width: w,
+            child: Column(children: [
+              // Tablet header — all columns one row
+              Container(
+                color: colour.brandDeep,
+                padding: const EdgeInsets.symmetric(
+                    horizontal: 16, vertical: 11),
+                child: Row(children: [
           _th('#',         flex: 1),
           _th('Status',    flex: 3),
           _th('Employee',  flex: 4),
@@ -768,7 +578,11 @@ class _TabletBody extends StatelessWidget {
               state: state),
         ),
       ),
-    ]);
+    ]),
+          ),
+        );
+      }
+    );
   }
 
   Widget _th(String t,
@@ -1017,161 +831,113 @@ class _TabletRow extends StatelessWidget {
 class _DetailPanel extends StatelessWidget {
   final SalesOrderViewLoaded state;
   final Color accent;
-  const _DetailPanel(
-      {required this.state, required this.accent});
+  const _DetailPanel({required this.state, required this.accent});
 
   @override
   Widget build(BuildContext context) {
     return Container(
       decoration: const BoxDecoration(
-        color: colour.surface,
+        color: Color(0xFFF8FAFC),
         border: Border(top: BorderSide(color: colour.border)),
       ),
-      padding: const EdgeInsets.all(12),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Header bar
-          Container(
-            padding: const EdgeInsets.symmetric(
-                horizontal: 12, vertical: 8),
-            decoration: BoxDecoration(
-              gradient: LinearGradient(colors: [
-                accent,
-                accent.withValues(alpha: 0.75)
-              ]),
-              borderRadius: BorderRadius.circular(10),
-            ),
-            child: Row(children: [
-              _dh('S',           flex: 1),
-              _dh('Code',        flex: 3),
-              _dh('Description', flex: 5),
-              _dh('Qty',         flex: 2),
-              _dh('Rate',        flex: 3),
-              _dh('GST',         flex: 2),
-              _dh('Amount',      flex: 3,
-                  align: TextAlign.right),
-            ]),
-          ),
-          const SizedBox(height: 8),
-          if (state.selectedDetails.isEmpty)
-            Padding(
-              padding:
-              const EdgeInsets.symmetric(vertical: 16),
-              child: Center(
-                child: Text('No items',
-                    style: GoogleFonts.poppins(
-                        color: colour.textSub, fontSize: 13)),
+      padding: const EdgeInsets.all(16),
+      child: state.selectedDetails.isEmpty
+          ? Center(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(vertical: 16),
+                child: Text('No items found.', style: GoogleFonts.poppins(color: colour.textSub)),
               ),
             )
-          else
-            ...state.selectedDetails
-                .asMap()
-                .entries
-                .map((e) => _DetailRow(
-                index: e.key,
-                d: e.value,
-                accent: accent))
-                ,
-        ],
-      ),
+          : Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: state.selectedDetails
+                  .asMap()
+                  .entries
+                  .map((e) => _DetailRow(index: e.key, d: e.value, accent: accent))
+                  .toList(),
+            ),
     );
   }
-
-  Widget _dh(String t,
-      {int flex = 1,
-        TextAlign align = TextAlign.left}) =>
-      Expanded(
-        flex: flex,
-        child: Text(t,
-            textAlign: align,
-            style: GoogleFonts.poppins(
-                color: Colors.white,
-                fontSize: 9,
-                fontWeight: FontWeight.w700,
-                letterSpacing: 0.5)),
-      );
 }
 
 class _DetailRow extends StatelessWidget {
   final int index;
   final dynamic d;
   final Color accent;
-  const _DetailRow(
-      {required this.index,
-        required this.d,
-        required this.accent});
+  const _DetailRow({required this.index, required this.d, required this.accent});
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: const EdgeInsets.only(bottom: 7),
+      margin: const EdgeInsets.only(bottom: 12),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(10),
+        borderRadius: BorderRadius.circular(12),
         border: Border.all(color: colour.border),
+        boxShadow: const [
+          BoxShadow(color: Color(0x05000000), blurRadius: 4, offset: Offset(0, 2))
+        ],
       ),
-      padding: const EdgeInsets.symmetric(
-          horizontal: 12, vertical: 10),
-      child: Row(children: [
-        Expanded(
-            flex: 1,
-            child: Text('${index + 1}',
-                style: GoogleFonts.poppins(
-                    color: accent,
-                    fontSize: 11,
-                    fontWeight: FontWeight.w800))),
-        Expanded(
-            flex: 3,
-            child: Text(d.ProductCode.toString(),
-                style: GoogleFonts.poppins(
-                    color: colour.brand,
-                    fontSize: 11,
-                    fontWeight: FontWeight.w700),
-                overflow: TextOverflow.ellipsis)),
-        Expanded(
-            flex: 5,
-            child: Text(d.ProductName.toString(),
-                style: GoogleFonts.poppins(
-                    color: colour.textMain,
-                    fontSize: 12,
-                    fontWeight: FontWeight.w600),
-                overflow: TextOverflow.ellipsis)),
-        Expanded(
-            flex: 2,
-            child: Text('×${d.ItemQty}',
-                style: GoogleFonts.poppins(
-                    color: colour.textSub,
-                    fontSize: 11,
-                    fontWeight: FontWeight.w600))),
-        Expanded(
-            flex: 3,
-            child: Text('${d.SaleRate}',
-                style: GoogleFonts.poppins(
-                    color: colour.textSub, fontSize: 11),
-                overflow: TextOverflow.ellipsis)),
-        Expanded(
-            flex: 2,
-            child: Text('${d.TaxPercent}%',
-                style: GoogleFonts.poppins(
-                    color: colour.textSub, fontSize: 11))),
-        Expanded(
-          flex: 3,
-          child: Text('₹${d.SAmount}',
-              textAlign: TextAlign.right,
-              style: GoogleFonts.poppins(
-                  color: accent,
-                  fontSize: 13,
-                  fontWeight: FontWeight.w800)),
-        ),
-      ]),
+      padding: const EdgeInsets.all(12),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Expanded(
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(6),
+                      decoration: BoxDecoration(color: accent.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(6)),
+                      child: Text('${index + 1}', style: GoogleFonts.poppins(color: accent, fontSize: 10, fontWeight: FontWeight.bold)),
+                    ),
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(d.ProductCode.toString(), style: GoogleFonts.poppins(color: colour.brand, fontSize: 12, fontWeight: FontWeight.bold)),
+                          const SizedBox(height: 2),
+                          Text(d.ProductName.toString(), style: GoogleFonts.poppins(color: colour.textMain, fontSize: 13, fontWeight: FontWeight.w600)),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                decoration: BoxDecoration(color: colour.brandLight, borderRadius: BorderRadius.circular(6)),
+                child: Text('Qty: ${d.ItemQty}', style: GoogleFonts.poppins(color: colour.brandDark, fontSize: 11, fontWeight: FontWeight.bold)),
+              ),
+            ],
+          ),
+          const Padding(
+            padding: EdgeInsets.symmetric(vertical: 8),
+            child: Divider(height: 1, color: colour.border),
+          ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Row(
+                children: [
+                  Text('Rate: ${d.SaleRate}', style: GoogleFonts.poppins(color: colour.textSub, fontSize: 12, fontWeight: FontWeight.w500)),
+                  const SizedBox(width: 8),
+                  Text('Tax: ${d.TaxAmt}', style: GoogleFonts.poppins(color: colour.textSub, fontSize: 12, fontWeight: FontWeight.w500)),
+                ],
+              ),
+              Text('Amt: ${d.SAmount}', style: GoogleFonts.poppins(color: colour.brandDark, fontSize: 13, fontWeight: FontWeight.bold)),
+            ],
+          ),
+        ],
+      ),
     );
   }
 }
-
-// ════════════════════════════════════════════════════════
-// Empty State
-// ════════════════════════════════════════════════════════
 class _EmptyState extends StatelessWidget {
   @override
   Widget build(BuildContext context) {

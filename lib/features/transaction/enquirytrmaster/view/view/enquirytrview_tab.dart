@@ -756,7 +756,8 @@ class _FilterSheetState extends State<_FilterSheet> {
                   MaterialPageRoute(
                       builder: (_) =>
                       const JobType(Searchby: 1, SearchId: 0)),
-                ).then((_) async {
+                ).then((navRes) async {
+                  if (navRes != null) { AppGlobals.SelectJobTypeList = navRes; }
                   final sel = AppGlobals.SelectJobTypeList;
                   if (sel.Id != 0) {
                     AppGlobals.JobAllStatusList = (await sl<EnquiryTrRepository>().selectAllJobStatus(sel.Id))

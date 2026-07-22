@@ -310,10 +310,11 @@ Navigator.pushReplacement(
       builder: (context, state) {
         final bloc = context.read<SalesOrderBloc>();
 
-        return WillPopScope(
-          onWillPop: () async {
-            Navigator.of(context).pop();
-            return true;
+        return PopScope(
+          canPop: false,
+          onPopInvokedWithResult: (didPop, result) {
+            if (didPop) return;
+            Navigator.pop(context);
           },
           child: Scaffold(
             resizeToAvoidBottomInset: true,

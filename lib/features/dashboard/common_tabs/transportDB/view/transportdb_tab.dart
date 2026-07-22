@@ -129,8 +129,13 @@ class _TransportDashboardViewState extends State<_TransportDashboardView>
     // Determine if tablet or mobile from objfun flag
     final isTablet = AppGlobals.MalevaScreen != 1;
 
-    return WillPopScope(
-      onWillPop: _onWillPop,
+    return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: (didPop, result) async {
+        if (didPop) return;
+        bool pop = await _onWillPop();
+        if (pop) Navigator.pop(context);
+      },
       child: Scaffold(
         resizeToAvoidBottomInset: false,
         backgroundColor: Colors.white,

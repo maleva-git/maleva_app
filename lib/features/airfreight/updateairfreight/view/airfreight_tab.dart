@@ -73,8 +73,12 @@ class _AirFreightPageState extends State<_AirFreightPage> {
           ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(state.message, style: GoogleFonts.lato(color: Colors.white)), backgroundColor: const Color(0xFFB33040), behavior: SnackBarBehavior.floating, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10))));
         }
       },
-      child: WillPopScope(
-        onWillPop: () async { Navigator.pop(context); return false; },
+      child: PopScope(
+        canPop: false,
+        onPopInvokedWithResult: (didPop, result) {
+          if (didPop) return;
+          Navigator.pop(context);
+        },
         child: Scaffold(
           resizeToAvoidBottomInset: true,
           backgroundColor: Palette.grey100,
