@@ -68,10 +68,11 @@ class _FuelEntryViewPage extends StatelessWidget {
           );
         }
       },
-      child: WillPopScope(
-        onWillPop: () async {
+      child: PopScope(
+        canPop: false,
+        onPopInvokedWithResult: (didPop, result) {
+          if (didPop) return;
           Navigator.pop(context);
-          return false;
         },
         child: Scaffold(
           resizeToAvoidBottomInset: true,

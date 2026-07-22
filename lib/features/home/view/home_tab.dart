@@ -1,6 +1,5 @@
 import 'package:maleva/core/network/api_legacy_helper.dart';
 import 'dart:io';
-
 import 'package:app_version_update/app_version_update.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -10,7 +9,6 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:maleva/core/theme/palette.dart';
 import 'package:maleva/core/utils/app_globals.dart';
 import 'package:maleva/menu/menulist.dart';
-
 import '../../../core/theme/tokens.dart';
 import '../bloc/home_bloc.dart';
 import '../bloc/home_event.dart';
@@ -73,8 +71,12 @@ class _HomeDashboardViewState extends State<_HomeDashboardView> {
     return BlocConsumer<HomeDashboardBloc, HomeDashboardState>(
       listener: _handleListener,
       builder: (ctx, state) {
-        return WillPopScope(
-          onWillPop: _onBackPressed,
+        return PopScope(
+          canPop: false,
+          onPopInvokedWithResult: (didPop, result) async {
+            if (didPop) return;
+            await _onBackPressed();
+          },
           child: LayoutBuilder(
             builder: (_, constraints) {
               final bool isTablet = constraints.maxWidth >= _kTabletBreak;

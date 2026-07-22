@@ -642,7 +642,6 @@ class _AddSearchField extends StatelessWidget {
   final VoidCallback onClear;
 
   const _AddSearchField({
-    super.key,
     required this.hint,
     required this.value,
     this.disabled = false,

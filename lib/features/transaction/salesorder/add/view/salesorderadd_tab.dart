@@ -151,13 +151,14 @@ class _SalesOrderAddBodyState extends State<_SalesOrderAddBody> with TickerProvi
 
         if (state is! SalesOrderAddLoaded) return const SizedBox();
 
-        return WillPopScope(
-          onWillPop: () async {
-            if (state.showSearch) return false;
+        return PopScope(
+          canPop: false,
+          onPopInvokedWithResult: (didPop, resultVal) async {
+            if (didPop) return;
+            if (state.showSearch) return;
             final result = await ConfirmationMsgYesNo(context, "Are you Sure you want to Exit?");
-            if (!context.mounted) return false;
+            if (!context.mounted) return;
             if (result == true) Navigator.of(context).pop();
-            return false;
           },
           child: Scaffold(
             resizeToAvoidBottomInset: true,

@@ -48,11 +48,12 @@ class _MaintenancePage extends StatelessWidget {
   Widget build(BuildContext context) {
     final userName = AppGlobals.storagenew.getString('Username') ?? '';
 
-    return WillPopScope(
-      onWillPop: () async {
-        Navigator.pop(context);
-        return false;
-      },
+    return PopScope(
+        canPop: false,
+        onPopInvokedWithResult: (didPop, result) {
+          if (didPop) return;
+          Navigator.pop(context);
+        },
       child: Scaffold(
         resizeToAvoidBottomInset: true,
         backgroundColor: AppTokens.invoicePageBg,

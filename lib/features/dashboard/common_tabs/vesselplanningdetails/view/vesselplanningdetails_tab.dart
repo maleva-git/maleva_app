@@ -47,10 +47,11 @@ class _VesselPlanningDetailsView extends StatelessWidget {
         }
       },
       builder: (ctx, state) {
-        return WillPopScope(
-          onWillPop: () async {
-            Navigator.of(context).pop();
-            return true;
+        return PopScope(
+          canPop: false,
+          onPopInvokedWithResult: (didPop, result) {
+            if (didPop) return;
+            Navigator.pop(context);
           },
           child: LayoutBuilder(
             builder: (_, constraints) {

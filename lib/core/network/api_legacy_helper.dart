@@ -1,27 +1,16 @@
 
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:maleva/core/network/api_services/auth_api.dart';
-import 'package:maleva/features/auth/data/repositories/auth_repository.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:maleva/features/auth/presentation/bloc/auth_bloc.dart';
-import 'package:maleva/features/auth/presentation/pages/login_page.dart';
 import 'package:maleva/core/network/OnlineApi.dart' as OnlineApi;
 import 'package:maleva/features/mastersearch/Employee.dart';
 import 'package:maleva/features/home/view/home_tab.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:maleva/core/colors/colors.dart' as colour;
-import 'dart:io';
-import 'dart:convert';
 import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
 import 'package:go_router/go_router.dart';
 import 'package:maleva/core/utils/app_globals.dart';
-import 'package:maleva/core/models/shared/response_view_model.dart';
 import 'package:maleva/core/models/shared/employee_model.dart';
-
 import 'package:maleva/core/network/api_client.dart';
-
 import '../utils/app_preferences.dart';
 
 class ApiLegacyHelper {

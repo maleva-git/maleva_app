@@ -217,8 +217,13 @@ class _JobStatusUpdateViewState extends State<_JobStatusUpdateView> {
     return BlocConsumer<JobStatusUpdateBloc, JobStatusUpdateState>(
       listener: _handleStateChange,
       builder: (context, state) {
-        return WillPopScope(
-          onWillPop: _onWillPop,
+        return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: (didPop, result) async {
+        if (didPop) return;
+        bool pop = await _onWillPop();
+        if (pop) Navigator.pop(context);
+      },
           child: Scaffold(
             resizeToAvoidBottomInset: true,
             backgroundColor: Colors.white,

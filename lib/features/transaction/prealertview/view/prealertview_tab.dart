@@ -98,10 +98,11 @@ class _PreAlertPage extends StatelessWidget {
     final isTablet = AppGlobals.MalevaScreen != 1;
     final userName = AppGlobals.storagenew.getString('Username') ?? '';
 
-    return WillPopScope(
-      onWillPop: () async {
+    return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: (didPop, result) {
+        if (didPop) return;
         _navigateBack(context);
-        return false;
       },
       child: Scaffold(
         backgroundColor: colour.kPageBg,
