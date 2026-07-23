@@ -36,7 +36,7 @@ class PlanningRepository {
         null,
         context);
 
-    if (resultData != null && resultData.isNotEmpty) {
+    if (resultData.isNotEmpty) {
       AppGlobals.PlanningEditList = resultData[0]["SaleDetails"].toList();
     } else {
       AppGlobals.PlanningEditList = [];

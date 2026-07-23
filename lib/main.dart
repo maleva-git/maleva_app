@@ -1,5 +1,4 @@
 import 'dart:io';
-import 'dart:ui';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
@@ -7,6 +6,7 @@ import 'package:flutter/services.dart';
 import 'package:maleva/core/theme/my_behaviour.dart';
 import 'package:maleva/core/firebase/local_notification_service.dart';
 import 'package:maleva/core/utils/app_globals.dart';
+import 'package:maleva/core/router/app_router.dart';
 import 'package:maleva/core/firebase/firebase_options.dart';
 import 'package:maleva/splash/splashscreen.dart';
 import 'package:path_provider/path_provider.dart';
@@ -15,7 +15,6 @@ import 'package:maleva/features/troubleshoot/data/applog_api.dart';
 
 import 'core/di/injection.dart';
 import 'core/utils/app_preferences.dart';
-import 'package:maleva/core/logging/app_navigator_observer.dart';
 
 class MyHttpOverrides extends HttpOverrides {
   @override
@@ -140,12 +139,9 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     final MaterialColor blue900Swatch =
         MaterialColor(_yellow700Map[400]!.value, _yellow700Map);
-    return MaterialApp(
+    return MaterialApp.router(
       title: 'MALEVA',
-      navigatorKey: AppGlobals.navigatorKey,
-      navigatorObservers: [
-        AppNavigatorObserver(),
-      ],
+      routerConfig: appRouter,
       builder: (context, child) {
         return ScrollConfiguration(
           behavior: MyBehavior(), //Design class page
@@ -158,7 +154,6 @@ class MyApp extends StatelessWidget {
         primaryColor: blue900Swatch,
         primaryColorLight: blue900Swatch,
       ),
-      home: const MyHomePage(),
       debugShowCheckedModeBanner: false,
     );
   }

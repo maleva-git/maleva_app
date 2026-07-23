@@ -6,7 +6,6 @@ import 'package:maleva/core/utils/system_helpers.dart';
 import 'package:bloc_concurrency/bloc_concurrency.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:intl/intl.dart';
 import 'package:maleva/core/utils/app_globals.dart';
 
 import 'planning_event.dart';
@@ -32,36 +31,33 @@ class PlanningBloc extends Bloc<PlanningEvent, PlanningState> {
           final resultData = await _repository.getPlanning(
               event.fromDate, event.toDate, event.planningNo, event.employeeId);
 
-          if (resultData != null) {
-            List<PlanningMasterModel> masterList = [];
-            List<PlanningDetailModel> detailsList = [];
+          List<PlanningMasterModel> masterList = [];
+          List<PlanningDetailModel> detailsList = [];
 
-            if (resultData.isNotEmpty) {
-              masterList = (resultData[0]["salemaster"] as List).map((e) => PlanningMasterModel.fromJson(e)).toList();
-              detailsList = (resultData[0]["saledetails"] as List).map((e) => PlanningDetailModel.fromJson(e)).toList();
-            }
-
-            _allDetails = detailsList;
-            AppGlobals.PlanningMasterList = masterList;
-            AppGlobals.PlanningDetailsList = detailsList;
-
-            // Proper data mapping to state with updated user filter inputs
-            emit(PlanningLoaded(
-              masterList: masterList,
-              detailsMap: const {},
-              expandedIndex: -1,
-              fromDate: event.fromDate,
-              toDate: event.toDate,
-              employeeId: event.employeeId,
-              employeeName: event.employeeName,
-              planningNo: event.planningNo,
-              checkLoggedEmp: event.checkLoggedEmp,
-            ));
-          } else {
-            emit(PlanningError("No data returned"));
+          if (resultData.isNotEmpty) {
+            masterList = (resultData[0]["salemaster"] as List).map((e) => PlanningMasterModel.fromJson(e)).toList();
+            detailsList = (resultData[0]["saledetails"] as List).map((e) => PlanningDetailModel.fromJson(e)).toList();
           }
-        } catch (e, st) {
+
+          _allDetails = detailsList;
+          AppGlobals.PlanningMasterList = masterList;
+          AppGlobals.PlanningDetailsList = detailsList;
+
+          // Proper data mapping to state with updated user filter inputs
+          emit(PlanningLoaded(
+            masterList: masterList,
+            detailsMap: const {},
+            expandedIndex: -1,
+            fromDate: event.fromDate,
+            toDate: event.toDate,
+            employeeId: event.employeeId,
+            employeeName: event.employeeName,
+            planningNo: event.planningNo,
+            checkLoggedEmp: event.checkLoggedEmp,
+          ));
+                } catch (e, st) {
           emit(PlanningError(e.toString()));
+          if (!context.mounted) return;
           msgshow(e.toString(), st.toString(), Colors.white, Colors.red, null, 18.00 - AppGlobals.reducesize, AppGlobals.tll, AppGlobals.tgc, context, 2);
         }
       },
@@ -105,6 +101,7 @@ class PlanningBloc extends Bloc<PlanningEvent, PlanningState> {
             if (value.IsSuccess == true) SystemHelpers.launchInBrowser(value.data1);
           }
         } catch (e, st) {
+          if (!context.mounted) return;
           msgshow(e.toString(), st.toString(), Colors.white, Colors.red, null, 18.00 - AppGlobals.reducesize, AppGlobals.tll, AppGlobals.tgc, context, 2);
         }
         emit(s);
@@ -121,6 +118,7 @@ class PlanningBloc extends Bloc<PlanningEvent, PlanningState> {
         emit(PlanningNavigateToEdit(id: event.id, planningNo: event.planningNo));
         emit(s); // Return to default loaded state after navigation
       } catch (e, st) {
+        if (!context.mounted) return;
         msgshow(e.toString(), st.toString(), Colors.white, Colors.red, null, 18.00 - AppGlobals.reducesize, AppGlobals.tll, AppGlobals.tgc, context, 2);
       }
     });

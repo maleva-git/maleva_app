@@ -79,7 +79,7 @@ class _SalesReportView extends StatelessWidget {
                     Container(
                       padding: const EdgeInsets.all(20),
                       decoration: BoxDecoration(
-                        color: Palette.red.withOpacity(0.08),
+                        color: Palette.red.withValues(alpha: 0.08),
                         shape: BoxShape.circle,
                       ),
                       child: const Icon(Icons.wifi_off_rounded,
@@ -112,7 +112,7 @@ class _SalesReportView extends StatelessWidget {
                           borderRadius: BorderRadius.circular(12),
                           boxShadow: [
                             BoxShadow(
-                              color: AppTokens.brandPrimary.withOpacity(0.3),
+                              color: AppTokens.brandPrimary.withValues(alpha: 0.3),
                               blurRadius: 12,
                               offset: const Offset(0, 4),
                             ),
@@ -175,7 +175,7 @@ class _SalesReportView extends StatelessWidget {
                         "Monthly overview",
                         style: GoogleFonts.poppins(
                           fontSize: 12,
-                          color: Palette.white.withOpacity(0.7),
+                          color: Palette.white.withValues(alpha: 0.7),
                         ),
                       ),
                       const SizedBox(height: 16),
@@ -185,10 +185,10 @@ class _SalesReportView extends StatelessWidget {
                         padding:
                         const EdgeInsets.symmetric(horizontal: 14),
                         decoration: BoxDecoration(
-                          color: Palette.white.withOpacity(0.15),
+                          color: Palette.white.withValues(alpha: 0.15),
                           borderRadius: BorderRadius.circular(12),
                           border: Border.all(
-                              color: Palette.white.withOpacity(0.25)),
+                              color: Palette.white.withValues(alpha: 0.25)),
                         ),
                         child: DropdownButtonHideUnderline(
                           child: DropdownButton<String>(
@@ -203,7 +203,7 @@ class _SalesReportView extends StatelessWidget {
                             hint: Text(
                               "Select Employee",
                               style: GoogleFonts.poppins(
-                                color: Palette.white.withOpacity(0.8),
+                                color: Palette.white.withValues(alpha: 0.8),
                                 fontSize: 13,
                               ),
                             ),
@@ -247,7 +247,7 @@ class _SalesReportView extends StatelessWidget {
                             label: "Without\nInvoice",
                             value: state.withoutInvoiceCount.toString(),
                             icon: Icons.receipt_long_outlined,
-                            iconBg: Palette.redDanger.withOpacity(0.1),
+                            iconBg: Palette.redDanger.withValues(alpha: 0.1),
                             iconColor: Palette.redDanger,
                             valueColor: Palette.redDanger,
                           ),
@@ -256,7 +256,7 @@ class _SalesReportView extends StatelessWidget {
                             label: "Total\nCount",
                             value: state.totalCount.toString(),
                             icon: Icons.bar_chart_rounded,
-                            iconBg: AppTokens.brandPrimary.withOpacity(0.1),
+                            iconBg: AppTokens.brandPrimary.withValues(alpha: 0.1),
                             iconColor: AppTokens.brandPrimary,
                             valueColor: AppTokens.brandPrimary,
                           ),
@@ -269,7 +269,7 @@ class _SalesReportView extends StatelessWidget {
                             label: "Billed",
                             value: state.totalBilledCount.toString(),
                             icon: Icons.check_circle_outline_rounded,
-                            iconBg: Palette.greenEco.withOpacity(0.1),
+                            iconBg: Palette.greenEco.withValues(alpha: 0.1),
                             iconColor: Palette.greenEco,
                             valueColor: Palette.greenEco,
                           ),
@@ -278,7 +278,7 @@ class _SalesReportView extends StatelessWidget {
                             label: "UnBilled",
                             value: state.totalUnBilledCount.toString(),
                             icon: Icons.pending_outlined,
-                            iconBg: Palette.amber.withOpacity(0.1),
+                            iconBg: Palette.amber.withValues(alpha: 0.1),
                             iconColor: Palette.amber,
                             valueColor: Palette.amber,
                           ),
@@ -309,7 +309,7 @@ class _SalesReportView extends StatelessWidget {
                                 style: GoogleFonts.poppins(
                                   fontSize: 12,
                                   fontWeight: FontWeight.w700,
-                                  color: Palette.white.withOpacity(0.85),
+                                  color: Palette.white.withValues(alpha: 0.85),
                                 )),
                           ],
                         ),
@@ -323,7 +323,7 @@ class _SalesReportView extends StatelessWidget {
                           padding: const EdgeInsets.only(top: 32),
                           child: Column(
                             children: [
-                              Icon(Icons.inbox_outlined,
+                              const Icon(Icons.inbox_outlined,
                                   size: 48,
                                   color: AppTokens.textDim),
                               const SizedBox(height: 12),
@@ -350,13 +350,13 @@ class _SalesReportView extends StatelessWidget {
                                   border: Border.all(
                                     color: isEven
                                         ? AppTokens.surfaceBorder
-                                        : Palette.blue400.withOpacity(0.2),
+                                        : Palette.blue400.withValues(alpha: 0.2),
                                   ),
                                   boxShadow: isEven
                                       ? [
                                     BoxShadow(
                                       color: AppTokens.brandPrimary
-                                          .withOpacity(0.04),
+                                          .withValues(alpha: 0.04),
                                       blurRadius: 6,
                                       offset: const Offset(0, 2),
                                     )
@@ -374,7 +374,7 @@ class _SalesReportView extends StatelessWidget {
                                         height: 26,
                                         decoration: BoxDecoration(
                                           color: AppTokens.brandPrimary
-                                              .withOpacity(0.1),
+                                              .withValues(alpha: 0.1),
                                           borderRadius:
                                           BorderRadius.circular(7),
                                         ),
@@ -406,7 +406,7 @@ class _SalesReportView extends StatelessWidget {
                                             horizontal: 10, vertical: 4),
                                         decoration: BoxDecoration(
                                           color: AppTokens.brandPrimary
-                                              .withOpacity(0.08),
+                                              .withValues(alpha: 0.08),
                                           borderRadius:
                                           BorderRadius.circular(8),
                                         ),
@@ -482,7 +482,7 @@ class _SalesReportView extends StatelessWidget {
                       width: 30,
                       height: 30,
                       decoration: BoxDecoration(
-                        color: Palette.white.withOpacity(0.2),
+                        color: Palette.white.withValues(alpha: 0.2),
                         borderRadius: BorderRadius.circular(8),
                       ),
                       child: const Icon(Icons.close_rounded,
@@ -572,7 +572,7 @@ class _StatCard extends StatelessWidget {
           border: Border.all(color: AppTokens.surfaceBorder),
           boxShadow: [
             BoxShadow(
-              color: AppTokens.brandPrimary.withOpacity(0.05),
+              color: AppTokens.brandPrimary.withValues(alpha: 0.05),
               blurRadius: 10,
               offset: const Offset(0, 4),
             ),

@@ -1,7 +1,6 @@
 import 'package:maleva/core/network/api_legacy_helper.dart';
 import 'package:flutter/Material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:maleva/core/utils/app_globals.dart';
 import 'package:maleva/core/colors/colors.dart' as colour;
 import '../../../../core/bluetooth/view/Bluetooth_tab.dart';
@@ -25,7 +24,6 @@ import 'package:maleva/features/dashboard/common_tabs/driverleave/view/admin_lea
 import 'package:maleva/features/dashboard/common_tabs/driverleave/view/employee_leave_request_tab.dart';
 import 'package:maleva/features/dashboard/common_tabs/driverleave/view/employee_leave_approval_tab.dart';
 import 'package:maleva/core/models/shared/barcode_print_model.dart';
-import 'package:maleva/features/transport/models/fuel_filling.dart';
 
 
 
@@ -61,13 +59,13 @@ class HrAMobileDashboard extends StatelessWidget {
           icon: Icon(Icons.directions_boat_filled,
               size: isTablet ? 28 : 25, ),
           onPressed: () => Navigator.push(context,
-              MaterialPageRoute(builder: (_) => Saleorderview())),
+              MaterialPageRoute(builder: (_) => const Saleorderview())),
         ),
         IconButton(
           icon: Icon(Icons.bluetooth_audio,
               size: isTablet ? 28 : 25, ),
           onPressed: () => Navigator.push(context,
-              MaterialPageRoute(builder: (_) => BluetoothPage())),
+              MaterialPageRoute(builder: (_) => const BluetoothPage())),
         ),
         IconButton(
           icon: Icon(Icons.print,
@@ -104,7 +102,7 @@ class HrAMobileDashboard extends StatelessWidget {
         borderRadius: BorderRadius.circular(isTablet ? 36 : 30),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.06),
+            color: Colors.black.withValues(alpha: 0.06),
             blurRadius: isTablet ? 12 : 8,
             offset: const Offset(0, 4),
           ),
@@ -180,20 +178,20 @@ class HrAMobileDashboard extends StatelessWidget {
       },
       child: TabBarView(
         controller: tabController,
-        children: [
-          const FuelFillingPage(),
-          const SpeedingScreen(),
-          const EngineHoursPage(),
-          const FuelDiffPage(),
-          const DriverDetailsView(),
-          const EmployeeViewPage(),
-          const TruckDetailsReportPage(),
-          const SparePartsEntryPage(),
-          const DriverLicensePage(),
+        children: const [
+          FuelFillingPage(),
+          SpeedingScreen(),
+          EngineHoursPage(),
+          FuelDiffPage(),
+          DriverDetailsView(),
+          EmployeeViewPage(),
+          TruckDetailsReportPage(),
+          SparePartsEntryPage(),
+          DriverLicensePage(),
 
-          const EmployeeLeaveApprovalTab(),
-          const EmployeeLeaveRequestTab(),
-          const AdminLeaveApprovalTab(),
+          EmployeeLeaveApprovalTab(),
+          EmployeeLeaveRequestTab(),
+          AdminLeaveApprovalTab(),
         ],
       ),
     );

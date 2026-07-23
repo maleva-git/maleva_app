@@ -90,11 +90,12 @@ class SaleOrderState extends Equatable {
     final hasSOETA  = item.SOETA.toString().isNotEmpty;
 
     if (hasPickup && (hasSETA || hasSOETA)) return null;
-    if (!hasPickup && !hasSETA && !hasSOETA)
-      return Colors.redAccent.withOpacity(0.3);
-    if (!hasPickup) return Colors.yellowAccent.withOpacity(0.3);
+    if (!hasPickup && !hasSETA && !hasSOETA) {
+      return Colors.redAccent.withValues(alpha: 0.3);
+    }
+    if (!hasPickup) return Colors.yellowAccent.withValues(alpha: 0.3);
     if (item.JobMasterRefId == 10) return null;
-    return Colors.greenAccent.withOpacity(0.3);
+    return Colors.greenAccent.withValues(alpha: 0.3);
   }
 
   static String today() =>

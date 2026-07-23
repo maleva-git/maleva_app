@@ -10,7 +10,7 @@ import 'forwarding_state.dart';
 class FWUpdateBloc extends Bloc<FWUpdateEvent, FWUpdateState> {
   final FWUpdateRepository repository; // Pass your repo interface
 
-  List<dynamic> _employeeList = [];
+  final List<dynamic> _employeeList = [];
 
   FWUpdateBloc({required this.repository}) : super(FWUpdateInitial()) {
     on<FWUpdateStarted>(_onStarted);
@@ -78,12 +78,20 @@ class FWUpdateBloc extends Bloc<FWUpdateEvent, FWUpdateState> {
     List<String> fetchedImages = [];
 
     // 1. Exact Old Code API Calls (Direct-a OnlineApi use panrom)
+
     try {
       await OnlineApi.EditSalesOrder(event.saleOrderId, 0);
+      if (!event.context.mounted) return;
       await OnlineApi.SelectEmployee(event.context, '', 'Operation');
     } catch (e) {
       print("Master/Employee API Error (Ignored): $e");
     }
+
+
+
+
+
+
 
     // 2. Exact Old Code Image Fetching Logic
     try {

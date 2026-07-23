@@ -10,12 +10,10 @@ import 'package:maleva/features/dashboard/common_tabs/driverleave/data/leave_req
 import 'package:maleva/core/colors/colors.dart' as colour;
 import 'package:intl/intl.dart';
 import 'package:maleva/core/utils/app_globals.dart';
-import 'package:maleva/core/network/OnlineApi.dart' as OnlineApi;
 import 'package:google_fonts/google_fonts.dart';
-import 'package:maleva/core/models/shared/review.dart';
 
 class EmployeeLeaveApprovalTab extends StatefulWidget {
-  const EmployeeLeaveApprovalTab({Key? key}) : super(key: key);
+  const EmployeeLeaveApprovalTab({super.key});
 
   @override
   State<EmployeeLeaveApprovalTab> createState() => _EmployeeLeaveApprovalTabState();
@@ -29,7 +27,7 @@ class _EmployeeLeaveApprovalTabState extends State<EmployeeLeaveApprovalTab> {
   }
 
   void _fetchRequests() {
-    context.read<LeaveBloc>().add(FetchLeaveData(
+    context.read<LeaveBloc>().add(const FetchLeaveData(
       applicantType: 1,
       applicantRefId: 0,
       fromDate: "",
@@ -58,7 +56,7 @@ class _EmployeeLeaveApprovalTabState extends State<EmployeeLeaveApprovalTab> {
                       contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                     ),
                     hint: const Text('Select Status'),
-                    value: selectedStatusId,
+                    initialValue: selectedStatusId,
                     items: const [
                       DropdownMenuItem(value: 2, child: Text('Approve', style: TextStyle(color: Colors.green, fontWeight: FontWeight.bold))),
                       DropdownMenuItem(value: 3, child: Text('Reject', style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold))),
@@ -97,6 +95,7 @@ class _EmployeeLeaveApprovalTabState extends State<EmployeeLeaveApprovalTab> {
 
     if (confirm != true || selectedStatusId == null) return;
     
+    if (!mounted) return;
     context.read<LeaveBloc>().add(UpdateLeaveStatusEvent(
       id: req.id,
       statusRefId: selectedStatusId!,

@@ -1,6 +1,5 @@
 import 'package:maleva/core/network/api_constants.dart';
 import 'package:maleva/core/network/api_client.dart';
-import 'package:maleva/core/utils/app_globals.dart';
 
 class DriverRepository {
   /// Fetches driver details data from the backend

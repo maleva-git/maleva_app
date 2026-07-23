@@ -17,7 +17,7 @@ class StockUpdateRepository {
   Future<String?> scanBarcode() async {
     await SystemHelpers.barcodeScanning();
     if (AppGlobals.barcodeerror == true) return null;
-    return AppGlobals.barcodestring as String;
+    return AppGlobals.barcodestring;
   }
 
   // ─── Load Stock Data (First Scan) ──────────────────────────────────────────
@@ -57,12 +57,14 @@ class StockUpdateRepository {
 
     // Status Transition Logic
     if (driverLogin == 1) {
-      if (jStatus == 3) statusId = 11;
-      else if (jStatus == 11) statusId = 19;
+      if (jStatus == 3) {
+        statusId = 11;
+      } else if (jStatus == 11) statusId = 19;
       else return null; // Invalid state
     } else {
-      if (jStatus == 19) statusId = 4;
-      else if (jStatus == 4) statusId = 7;
+      if (jStatus == 19) {
+        statusId = 4;
+      } else if (jStatus == 4) statusId = 7;
       else if (jStatus == 7) statusId = 5;
       else return null; // Invalid state
     }

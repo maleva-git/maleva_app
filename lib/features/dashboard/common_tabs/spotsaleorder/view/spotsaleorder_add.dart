@@ -365,7 +365,7 @@ class _SpotSaleEntryBody extends StatelessWidget {
                     borderRadius: BorderRadius.circular(10),
                     border: Border.all(
                         color:
-                        AppTokens.brandGradientStart.withOpacity(0.2)),
+                        AppTokens.brandGradientStart.withValues(alpha: 0.2)),
                   ),
                   child: Row(children: [
                     const Icon(Icons.picture_as_pdf,
@@ -503,7 +503,7 @@ class _SpotSalePreviewPanel extends StatelessWidget {
         border: Border.all(color: AppTokens.brandLight, width: 1.5),
         boxShadow: [
           BoxShadow(
-            color: AppTokens.brandGradientStart.withOpacity(0.07),
+            color: AppTokens.brandGradientStart.withValues(alpha: 0.07),
             blurRadius: 16,
             offset: const Offset(0, 5),
           ),
@@ -550,7 +550,7 @@ class _SpotSalePreviewPanel extends StatelessWidget {
                   Text('Job Type',
                       style: GoogleFonts.lato(
                         fontSize: 11,
-                        color: colour.kWhite.withOpacity(0.75),
+                        color: colour.kWhite.withValues(alpha: 0.75),
                       )),
                   const SizedBox(height: 4),
                   Text(
@@ -1074,7 +1074,7 @@ class _SelectListTile extends StatelessWidget {
           Border.all(color: AppTokens.brandLight, width: 1.5),
           boxShadow: [
             BoxShadow(
-                color: AppTokens.brandGradientStart.withOpacity(0.05),
+                color: AppTokens.brandGradientStart.withValues(alpha: 0.05),
                 blurRadius: 6,
                 offset: const Offset(0, 2)),
           ],
@@ -1155,7 +1155,7 @@ class _SectionCard extends StatelessWidget {
                   color: AppTokens.brandLight, width: 1.5),
               boxShadow: [
                 BoxShadow(
-                    color: AppTokens.brandGradientStart.withOpacity(0.05),
+                    color: AppTokens.brandGradientStart.withValues(alpha: 0.05),
                     blurRadius: 10,
                     offset: const Offset(0, 3)),
               ],
@@ -1199,7 +1199,7 @@ class _SelectTile extends StatelessWidget {
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
             color: hasValue
-                ? AppTokens.brandMid.withOpacity(0.4)
+                ? AppTokens.brandMid.withValues(alpha: 0.4)
                 : Colors.grey.shade300,
           ),
         ),
@@ -1260,7 +1260,7 @@ InputDecoration _decor(String label, IconData icon) {
     enabledBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(10),
         borderSide: BorderSide(
-            color: AppTokens.brandMid.withOpacity(0.35))),
+            color: AppTokens.brandMid.withValues(alpha: 0.35))),
     filled: true,
     fillColor: Colors.grey.shade50,
     contentPadding: const EdgeInsets.symmetric(

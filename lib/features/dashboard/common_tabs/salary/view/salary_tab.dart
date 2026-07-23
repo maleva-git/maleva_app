@@ -66,7 +66,7 @@ class _PhoneLayout extends StatelessWidget {
           const SizedBox(height: 10),
           _DateRangeRow(state: state),
           const SizedBox(height: 10),
-          _TableHeader(),
+          const _TableHeader(),
           const SizedBox(height: 6),
           Expanded(
             child: _SalaryList(state: state, onRowTap: onRowTap),
@@ -126,7 +126,7 @@ class _TabletLayout extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                _TableHeader(),
+                const _TableHeader(),
                 const SizedBox(height: 6),
                 Expanded(
                   child: _SalaryList(state: state, onRowTap: onRowTap),
@@ -253,7 +253,7 @@ class _InlineDatePicker extends StatelessWidget {
         ),
         child: Row(
           children: [
-            Icon(Icons.calendar_today_rounded,
+            const Icon(Icons.calendar_today_rounded,
                 size: 18, color: AppTokens.brandPrimary),
             const SizedBox(width: 8),
             Text(
@@ -315,17 +315,17 @@ class _DatePickerCard extends StatelessWidget {
           color: AppTokens.surfaceCard,
           border: Border.all(color: AppTokens.surfaceBorder),
           borderRadius: BorderRadius.circular(10),
-          boxShadow: [
+          boxShadow: const [
             BoxShadow(
               color: AppTokens.brandGlow,
               blurRadius: 4,
-              offset: const Offset(0, 1),
+              offset: Offset(0, 1),
             ),
           ],
         ),
         child: Row(
           children: [
-            Icon(Icons.calendar_today_rounded,
+            const Icon(Icons.calendar_today_rounded,
                 size: 20, color: AppTokens.brandPrimary),
             const SizedBox(width: 10),
             Column(
@@ -352,7 +352,7 @@ class _DatePickerCard extends StatelessWidget {
               ],
             ),
             const Spacer(),
-            Icon(Icons.arrow_drop_down_rounded,
+            const Icon(Icons.arrow_drop_down_rounded,
                 color: AppTokens.textSecondary),
           ],
         ),
@@ -373,8 +373,8 @@ class _TableHeader extends StatelessWidget {
         color: AppTokens.brandDark,
         borderRadius: BorderRadius.circular(8),
       ),
-      child: Row(
-        children: const [
+      child: const Row(
+        children: [
           Expanded(flex: 3, child: _HeaderCell('Bill Date')),
           Expanded(flex: 3, child: _HeaderCell('Bill No')),
           Expanded(flex: 2, child: _HeaderCell('Net Amt', align: TextAlign.right)),
@@ -475,11 +475,11 @@ class _SalaryRow extends StatelessWidget {
           color: AppTokens.surfaceCard,
           border: Border.all(color: AppTokens.surfaceBorder),
           borderRadius: BorderRadius.circular(8),
-          boxShadow: [
+          boxShadow: const [
             BoxShadow(
               color: AppTokens.brandGlow,
               blurRadius: 4,
-              offset: const Offset(0, 1),
+              offset: Offset(0, 1),
             ),
           ],
         ),

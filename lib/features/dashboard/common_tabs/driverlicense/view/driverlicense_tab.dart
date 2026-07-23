@@ -208,7 +208,7 @@ class _DriverCard extends StatelessWidget {
         border: Border.all(color: Palette.cardBorder, width: 0.5),
         boxShadow: [
           BoxShadow(
-            color: Palette.blue700.withOpacity(0.07),
+            color: Palette.blue700.withValues(alpha: 0.07),
             blurRadius: 10,
             offset: const Offset(0, 3),
           ),

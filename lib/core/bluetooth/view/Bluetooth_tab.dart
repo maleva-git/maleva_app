@@ -105,7 +105,7 @@ class _BluetoothView extends StatelessWidget {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          SpinKitFoldingCube(color: Palette.redError, size: 35),
+          const SpinKitFoldingCube(color: Palette.redError, size: 35),
           const SizedBox(height: 16),
           Text(
             state.isConnecting ? 'Connecting to printer…' : 'Preparing print…',
@@ -133,7 +133,7 @@ class _BluetoothView extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(Icons.bluetooth_searching, size: 64, color: AppTokens.brandPrimary.withOpacity(0.4)),
+            Icon(Icons.bluetooth_searching, size: 64, color: AppTokens.brandPrimary.withValues(alpha: 0.4)),
             const SizedBox(height: 12),
             Text(
               state.isScanning ? 'Scanning for devices…' : 'Tap SCAN to find devices',
@@ -195,7 +195,7 @@ class _DeviceRow extends StatelessWidget {
           children: [
             Container(
               width: 40, height: 40,
-              decoration: BoxDecoration(color: AppTokens.brandPrimary.withOpacity(0.10), shape: BoxShape.circle),
+              decoration: BoxDecoration(color: AppTokens.brandPrimary.withValues(alpha: 0.10), shape: BoxShape.circle),
               child: const Icon(Icons.bluetooth, color: AppTokens.brandPrimary, size: 20),
             ),
             const SizedBox(width: 12),
@@ -204,7 +204,7 @@ class _DeviceRow extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    (device.name != null && device.name!.isNotEmpty) ? device.name! : 'Unknown Device',
+                    (device.name.isNotEmpty) ? device.name : 'Unknown Device',
                     style: GoogleFonts.lato(fontWeight: FontWeight.bold, fontSize: 14, color: AppTokens.textPrimary),
                   ),
                   const SizedBox(height: 2),
@@ -256,9 +256,9 @@ class _StatusChip extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.15),
+        color: color.withValues(alpha: 0.15),
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: color.withOpacity(0.4)),
+        border: Border.all(color: color.withValues(alpha: 0.4)),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
@@ -279,7 +279,7 @@ class _BlueOffWidget extends StatelessWidget {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(Icons.bluetooth_disabled, size: 64, color: Palette.redError.withOpacity(0.7)),
+          Icon(Icons.bluetooth_disabled, size: 64, color: Palette.redError.withValues(alpha: 0.7)),
           const SizedBox(height: 16),
           Text('Bluetooth is turned off', style: GoogleFonts.lato(color: Palette.redError, fontWeight: FontWeight.bold, fontSize: 16), textAlign: TextAlign.center),
           const SizedBox(height: 6),

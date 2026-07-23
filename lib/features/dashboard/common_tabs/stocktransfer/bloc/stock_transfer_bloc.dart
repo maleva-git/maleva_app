@@ -36,7 +36,7 @@ class StockTransferBloc extends Bloc<StockTransferEvent, StockTransferState> {
     emit(const StockTransferInitialLoading());
     try {
       _wareHouseList = await repository.fetchWarehouses();
-      emit(StockTransferLoaded(data: const StockTransferData()));
+      emit(const StockTransferLoaded(data: StockTransferData()));
     } catch (e) {
       emit(StockTransferInitError(e.toString()));
     }
@@ -90,7 +90,7 @@ class StockTransferBloc extends Bloc<StockTransferEvent, StockTransferState> {
           checkStockNoList: checkList,
         ),
       ));
-    } catch (e, st) {
+    } catch (e) {
       emit(_withMsg(current, e.toString(), MessageType.error));
     }
   }
@@ -132,7 +132,7 @@ class StockTransferBloc extends Bloc<StockTransferEvent, StockTransferState> {
     final newList = List<String>.from(data.stockNoList)..removeAt(event.index);
 
     if (newList.isEmpty) {
-      emit(StockTransferLoaded(data: const StockTransferData()));
+      emit(const StockTransferLoaded(data: StockTransferData()));
       return;
     }
     emit(_loaded.copyWith(data: data.copyWith(stockNoList: newList, scnPkg: newList.length)));
@@ -152,20 +152,20 @@ class StockTransferBloc extends Bloc<StockTransferEvent, StockTransferState> {
       final result = await repository.updateStockTransfer(data.stockId, data.selectedWareHouseId);
 
       if (result?.IsSuccess == true) {
-        emit(StockTransferLoaded(
-          data: const StockTransferData(),
-          message: const StockTransferMessage('Updated Successfully', MessageType.success),
+        emit(const StockTransferLoaded(
+          data: StockTransferData(),
+          message: StockTransferMessage('Updated Successfully', MessageType.success),
         ));
       } else {
         emit(_withMsg(current, result?.Message ?? 'Update failed', MessageType.error));
       }
-    } catch (e, st) {
+    } catch (e) {
       emit(_withMsg(current, e.toString(), MessageType.error));
     }
   }
 
   void _onCleared(StockTransferCleared _, Emitter<StockTransferState> emit) {
-    emit(StockTransferLoaded(data: const StockTransferData()));
+    emit(const StockTransferLoaded(data: StockTransferData()));
   }
 
   void _onMessageDismissed(StockTransferMessageDismissed _, Emitter<StockTransferState> emit) {

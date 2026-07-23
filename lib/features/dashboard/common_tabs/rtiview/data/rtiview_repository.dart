@@ -1,6 +1,5 @@
 import 'package:maleva/core/network/api_constants.dart';
 import 'package:maleva/core/network/api_client.dart';
-import 'package:maleva/core/utils/app_globals.dart';
 import 'package:maleva/core/models/shared/response_view_model.dart';
 
 class RTIViewRepository {

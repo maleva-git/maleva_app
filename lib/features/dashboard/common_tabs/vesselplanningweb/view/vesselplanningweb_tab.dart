@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
@@ -256,7 +255,7 @@ class _VesselPlanningWebViewState extends State<VesselPlanningWebView> {
       return;
     }
 
-    final String defaultDate = "1900-01-01T00:00:00";
+    const String defaultDate = "1900-01-01T00:00:00";
     final planningList = [
       {
         "Id": _currentMasterId,
@@ -364,7 +363,7 @@ class _VesselPlanningWebViewState extends State<VesselPlanningWebView> {
   }
 
   void _deletePlanning() async {
-    final bool? ok = await ConfirmationMsgYesNo(context, 'Do You Want To Delete VESSEL PLANING ?');
+    final bool ok = await ConfirmationMsgYesNo(context, 'Do You Want To Delete VESSEL PLANING ?');
     if (ok == true) {
       if (!mounted) return;
       context
@@ -690,11 +689,12 @@ class _VesselPlanningWebViewState extends State<VesselPlanningWebView> {
                     onTap: () async {
                       await OnlineApi.SelectEmployee(context, 'Sales', '');
                       if (!mounted) return;
+                      if (!context.mounted) return;
                       final res = await Navigator.push(
                           context,
                           MaterialPageRoute(
                               builder: (_) =>
-                                  Employee(Searchby: 1, SearchId: 0)));
+                                  const Employee(Searchby: 1, SearchId: 0)));
                       if (res != null && res is EmployeeModel) {
                         setState(() => _selectedEmployee = res);
                       }
@@ -1233,10 +1233,10 @@ class _JobCard extends StatelessWidget {
             // ── Footer ───────────────────────────────────────────────
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-              decoration: BoxDecoration(
+              decoration: const BoxDecoration(
                 color: colour.kCardBg,
                 borderRadius:
-                    const BorderRadius.vertical(bottom: Radius.circular(14)),
+                    BorderRadius.vertical(bottom: Radius.circular(14)),
               ),
               child: Row(
                 children: [

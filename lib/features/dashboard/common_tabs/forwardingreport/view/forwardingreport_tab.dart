@@ -76,11 +76,11 @@ class ForwardingReportView extends StatelessWidget {
             child: SingleChildScrollView(
               physics: const BouncingScrollPhysics(),
               child: Column(children: [
-                _TitleBadge(isTablet: true),
+                const _TitleBadge(isTablet: true),
                 const SizedBox(height: 20),
                 _SummaryCard(state: state, isTablet: true),
                 const SizedBox(height: 16),
-                _DatePickerRow(isTablet: true),
+                const _DatePickerRow(isTablet: true),
                 const SizedBox(height: 20),
               ]),
             ),
@@ -131,11 +131,11 @@ class ForwardingReportView extends StatelessWidget {
       padding: const EdgeInsets.only(top: 15, left: 12, right: 12),
       child: ListView(children: [
         const SizedBox(height: 7),
-        _TitleBadge(isTablet: false),
+        const _TitleBadge(isTablet: false),
         const SizedBox(height: 16),
         _SummaryCard(state: state, isTablet: false),
         const SizedBox(height: 14),
-        _DatePickerRow(isTablet: false),
+        const _DatePickerRow(isTablet: false),
         const SizedBox(height: 14),
         _KTypeCard(state: state, isTablet: false),
         const SizedBox(height: 20),
@@ -166,7 +166,7 @@ class _TitleBadge extends StatelessWidget {
           borderRadius: BorderRadius.circular(30),
           boxShadow: [
             BoxShadow(
-              color: AppTokens.invoiceHeaderStart.withOpacity(0.35),
+              color: AppTokens.invoiceHeaderStart.withValues(alpha: 0.35),
               blurRadius: 12,
               offset: const Offset(0, 4),
             ),
@@ -209,7 +209,7 @@ class _SummaryCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(isTablet ? 20 : 16),
         boxShadow: [
           BoxShadow(
-            color: AppTokens.invoiceHeaderStart.withOpacity(0.10),
+            color: AppTokens.invoiceHeaderStart.withValues(alpha: 0.10),
             blurRadius: 16,
             offset: const Offset(0, 4),
           ),
@@ -248,7 +248,7 @@ class _SummaryCard extends StatelessWidget {
 
           return Container(
             color: isEven
-                ? colour.kAccent.withOpacity(0.4)
+                ? colour.kAccent.withValues(alpha: 0.4)
                 : colour.kWhite,
             padding: EdgeInsets.symmetric(
               horizontal: isTablet ? 20 : 16,
@@ -336,9 +336,9 @@ class _SummaryCard extends StatelessWidget {
             vertical:   isTablet ? 5  : 3,
           ),
           decoration: BoxDecoration(
-            color: color.withOpacity(0.10),
+            color: color.withValues(alpha: 0.10),
             borderRadius: BorderRadius.circular(20),
-            border: Border.all(color: color.withOpacity(0.3)),
+            border: Border.all(color: color.withValues(alpha: 0.3)),
           ),
           child: Text(
             value,
@@ -373,7 +373,7 @@ class _DatePickerRow extends StatelessWidget {
             borderRadius: BorderRadius.circular(isTablet ? 18 : 14),
             boxShadow: [
               BoxShadow(
-                color: AppTokens.brandGradientStart.withOpacity(0.08),
+                color: AppTokens.brandGradientStart.withValues(alpha: 0.08),
                 blurRadius: 12,
                 offset: const Offset(0, 3),
               ),
@@ -402,6 +402,7 @@ class _DatePickerRow extends StatelessWidget {
                     ),
                   );
                   if (value != null) {
+                    if (!context.mounted) return;
                     context.read<ForwardingReportBloc>().add(
                       SelectFromDateEvent(value),// New event name, takes DateTime directly
                     );
@@ -414,7 +415,7 @@ class _DatePickerRow extends StatelessWidget {
             Container(
               height: isTablet ? 50 : 40,
               width: 1,
-              color: AppTokens.brandGradientStart.withOpacity(0.2),
+              color: AppTokens.brandGradientStart.withValues(alpha: 0.2),
               margin: const EdgeInsets.symmetric(horizontal: 10),
             ),
 
@@ -440,6 +441,7 @@ class _DatePickerRow extends StatelessWidget {
                     ),
                   );
                   if (value != null) {
+                    if (!context.mounted) return;
                     context.read<ForwardingReportBloc>().add(
                       SelectToDateEvent(value), // ✅ New event name, takes DateTime directly
                     );
@@ -491,7 +493,7 @@ class _DateTile extends StatelessWidget {
               label,
               style: GoogleFonts.lato(
                 textStyle: TextStyle(
-                  color: AppTokens.brandGradientStart.withOpacity(0.6),
+                  color: AppTokens.brandGradientStart.withValues(alpha: 0.6),
                   fontSize: isTablet ? 12 : 11,
                   fontWeight: FontWeight.w600,
                 ),
@@ -537,7 +539,7 @@ class _KTypeCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(isTablet ? 20 : 16),
         boxShadow: [
           BoxShadow(
-            color: AppTokens.brandGradientStart.withOpacity(0.10),
+            color: AppTokens.brandGradientStart.withValues(alpha: 0.10),
             blurRadius: 16,
             offset: const Offset(0, 4),
           ),
@@ -575,7 +577,7 @@ class _KTypeCard extends StatelessWidget {
 
           return Container(
             color: isEven
-                ? colour.kAccent.withOpacity(0.4)
+                ? colour.kAccent.withValues(alpha: 0.4)
                 : colour.kWhite,
             padding: EdgeInsets.symmetric(
               horizontal: isTablet ? 20 : 16,

@@ -233,7 +233,7 @@ class _TruckDashCard extends StatelessWidget {
         border: Border.all(color: Palette.cardBorder, width: 0.5),
         boxShadow: [
           BoxShadow(
-            color: Palette.blue700.withOpacity(0.07),
+            color: Palette.blue700.withValues(alpha: 0.07),
             blurRadius: 10,
             offset: const Offset(0, 3),
           ),
@@ -349,7 +349,7 @@ class _FieldRow extends StatelessWidget {
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
-      color: isExpired ? Palette.kExpiredRed.withOpacity(0.06) : Colors.transparent,
+      color: isExpired ? Palette.kExpiredRed.withValues(alpha: 0.06) : Colors.transparent,
       child: Row(
         children: [
           Expanded(

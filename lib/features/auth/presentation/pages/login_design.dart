@@ -6,7 +6,6 @@
 import 'package:flutter/Material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
-
 import '../../../../core/colors/colors.dart' as colour;
 import '../../../../core/theme/tokens.dart';
 import 'package:maleva/core/utils/app_globals.dart';
@@ -26,6 +25,7 @@ class MobileDesign extends StatelessWidget {
           listenWhen: (p, c) =>
           p.loginSuccess != c.loginSuccess ||
               p.errorMessage != c.errorMessage,
+
           listener: (context, state) {
             if (state.loginSuccess && state.role != null) {
               Navigator.pushReplacementNamed(context, state.role!);
@@ -41,6 +41,7 @@ class MobileDesign extends StatelessWidget {
             }
           },
           child: BlocBuilder<LoginBloc, LoginState>(
+            
             builder: (context, state) => _LoginBody(
               state: state,
               isTablet: constraints.maxWidth >= 600, // ← single flag
@@ -133,7 +134,7 @@ class _LoginBodyState extends State<_LoginBody>
 
                 Expanded(
                   child: SingleChildScrollView(
-                    physics: const BouncingScrollPhysics(),
+                    physics: const ClampingScrollPhysics(),
                     padding: EdgeInsets.symmetric(
                       horizontal: _isTablet ? 32 : 20,
                     ),
@@ -181,8 +182,8 @@ class _LoginBodyState extends State<_LoginBody>
           decoration: BoxDecoration(
             shape: BoxShape.circle,
             gradient: RadialGradient(colors: [
-              AppTokens.brandGradientStart.withOpacity(0.18),
-              AppTokens.brandGradientStart.withOpacity(0.0),
+              AppTokens.brandGradientStart.withValues(alpha: 0.18),
+              AppTokens.brandGradientStart.withValues(alpha: 0.0),
             ]),
           ),
         ),
@@ -193,10 +194,10 @@ class _LoginBodyState extends State<_LoginBody>
           decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.circular(logoSize * 0.32),
-            border: Border.all(color: AppTokens.brandGradientStart.withOpacity(0.14), width: 1.5),
+            border: Border.all(color: AppTokens.brandGradientStart.withValues(alpha: 0.14), width: 1.5),
             boxShadow: [
-              BoxShadow(color: AppTokens.brandGradientStart.withOpacity(0.26), blurRadius: 24, offset: const Offset(0, 8)),
-              BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 6, offset: const Offset(0, 2)),
+              BoxShadow(color: AppTokens.brandGradientStart.withValues(alpha: 0.26), blurRadius: 24, offset: const Offset(0, 8)),
+              BoxShadow(color: Colors.black.withValues(alpha: 0.05), blurRadius: 6, offset: const Offset(0, 2)),
             ],
           ),
           child: ClipRRect(
@@ -353,6 +354,7 @@ class _LoginBodyState extends State<_LoginBody>
             ),
           ),
 
+
           // ── RIGHT: Hero Panel
           Expanded(
             flex: 4,
@@ -379,7 +381,7 @@ class _LoginBodyState extends State<_LoginBody>
                       height: 200,
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
-                        color: Colors.white.withOpacity(0.05),
+                        color: Colors.white.withValues(alpha: 0.05),
                       ),
                     ),
                   ),
@@ -391,7 +393,7 @@ class _LoginBodyState extends State<_LoginBody>
                       height: 250,
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
-                        color: Colors.white.withOpacity(0.08),
+                        color: Colors.white.withValues(alpha: 0.08),
                       ),
                     ),
                   ),
@@ -402,7 +404,7 @@ class _LoginBodyState extends State<_LoginBody>
                       Container(
                         padding: const EdgeInsets.all(12),
                         decoration: BoxDecoration(
-                          color: Colors.white.withOpacity(0.15),
+                          color: Colors.white.withValues(alpha: 0.15),
                           borderRadius: BorderRadius.circular(16),
                         ),
                         child: const Icon(Icons.rocket_launch_rounded, color: Colors.white, size: 36),
@@ -420,7 +422,7 @@ class _LoginBodyState extends State<_LoginBody>
                           style: GoogleFonts.dmSans(
                             fontSize: 14,
                             fontWeight: FontWeight.w400,
-                            color: Colors.white.withOpacity(0.85),
+                            color: Colors.white.withValues(alpha: 0.85),
                             height: 1.5,
                           )),
                     ]
@@ -442,12 +444,12 @@ class _LoginBodyState extends State<_LoginBody>
   Widget _cardShell({required double padH, required double padV, required Widget child}) {
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.93),
+        color: Colors.white.withValues(alpha: 0.93),
         borderRadius: BorderRadius.circular(28),
-        border: Border.all(color: Colors.white.withOpacity(0.9), width: 1.5),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.9), width: 1.5),
         boxShadow: [
-          BoxShadow(color: AppTokens.brandGradientStart.withOpacity(0.07), blurRadius: 8, offset: const Offset(0, 2)),
-          BoxShadow(color: AppTokens.brandGradientStart.withOpacity(0.11), blurRadius: 55, offset: const Offset(0, 22)),
+          BoxShadow(color: AppTokens.brandGradientStart.withValues(alpha: 0.07), blurRadius: 8, offset: const Offset(0, 2)),
+          BoxShadow(color: AppTokens.brandGradientStart.withValues(alpha: 0.11), blurRadius: 55, offset: const Offset(0, 22)),
         ],
       ),
       padding: padH > 0
@@ -473,9 +475,9 @@ class _LoginBodyState extends State<_LoginBody>
       Container(
         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
         decoration: BoxDecoration(
-          color: AppTokens.brandGradientStart.withOpacity(0.08),
+          color: AppTokens.brandGradientStart.withValues(alpha: 0.08),
           borderRadius: BorderRadius.circular(20),
-          border: Border.all(color: AppTokens.brandGradientStart.withOpacity(0.15), width: 1),
+          border: Border.all(color: AppTokens.brandGradientStart.withValues(alpha: 0.15), width: 1),
         ),
         child: Text('v2.0',
             style: GoogleFonts.dmSans(
@@ -535,10 +537,10 @@ class _LoginBodyState extends State<_LoginBody>
         duration: const Duration(milliseconds: 200),
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 11),
         decoration: BoxDecoration(
-          color: on ? AppTokens.brandGradientStart.withOpacity(0.07) : colour.kSurface,
+          color: on ? AppTokens.brandGradientStart.withValues(alpha: 0.07) : colour.kSurface,
           borderRadius: BorderRadius.circular(13),
           border: Border.all(
-              color: on ? AppTokens.brandGradientStart.withOpacity(0.30) : colour.kBorder, width: 1.5),
+              color: on ? AppTokens.brandGradientStart.withValues(alpha: 0.30) : colour.kBorder, width: 1.5),
         ),
         child: Row(children: [
           AnimatedContainer(
@@ -549,7 +551,7 @@ class _LoginBodyState extends State<_LoginBody>
               color: on ? AppTokens.brandGradientStart : const Color(0xFFDDE0EE),
               borderRadius: BorderRadius.circular(toggleSize),
               boxShadow: on
-                  ? [BoxShadow(color: AppTokens.brandGradientStart.withOpacity(0.35), blurRadius: 8, offset: const Offset(0, 3))]
+                  ? [BoxShadow(color: AppTokens.brandGradientStart.withValues(alpha: 0.35), blurRadius: 8, offset: const Offset(0, 3))]
                   : [],
             ),
             child: AnimatedAlign(
@@ -561,7 +563,7 @@ class _LoginBodyState extends State<_LoginBody>
                 margin: const EdgeInsets.symmetric(horizontal: 2),
                 decoration: BoxDecoration(
                   color: colour.cWhite, shape: BoxShape.circle,
-                  boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.15), blurRadius: 3, offset: const Offset(0, 1))],
+                  boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.15), blurRadius: 3, offset: const Offset(0, 1))],
                 ),
               ),
             ),
@@ -632,7 +634,7 @@ class _LoginBodyState extends State<_LoginBody>
             stops: [0.0, 0.45, 1.0],
           ),
           borderRadius: BorderRadius.circular(radius),
-          boxShadow: [BoxShadow(color: AppTokens.brandGradientStart.withOpacity(0.40), blurRadius: 20, offset: const Offset(0, 8))],
+          boxShadow: [BoxShadow(color: AppTokens.brandGradientStart.withValues(alpha: 0.40), blurRadius: 20, offset: const Offset(0, 8))],
         ),
         child: ElevatedButton(
           style: ElevatedButton.styleFrom(
@@ -651,7 +653,7 @@ class _LoginBodyState extends State<_LoginBody>
             Container(
               width: 26, height: 26,
               decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.20), shape: BoxShape.circle),
+                  color: Colors.white.withValues(alpha: 0.20), shape: BoxShape.circle),
               child: const Icon(Icons.arrow_forward_rounded, color: Colors.white, size: 15),
             ),
           ]),
@@ -664,14 +666,14 @@ class _LoginBodyState extends State<_LoginBody>
     child: Text('SHIP SPARE IN TRANSIT',
         style: GoogleFonts.dmSans(
             fontSize: 9, fontWeight: FontWeight.w500,
-            color: colour.kSubText.withOpacity(0.50), letterSpacing: 2.0)),
+            color: colour.kSubText.withValues(alpha: 0.50), letterSpacing: 2.0)),
   );
   Widget _lineDivider() => Container(
     width: 28,
     height: 1,
     decoration: BoxDecoration(
       gradient: LinearGradient(
-          colors: [colour.kSubText.withOpacity(0.0), colour.kSubText.withOpacity(0.4)]),
+          colors: [colour.kSubText.withValues(alpha: 0.0), colour.kSubText.withValues(alpha: 0.4)]),
     ),
   );
 
@@ -679,8 +681,8 @@ class _LoginBodyState extends State<_LoginBody>
     height: 1,
     decoration: BoxDecoration(
       gradient: LinearGradient(colors: [
-        AppTokens.brandGradientStart.withOpacity(0.25),
-        AppTokens.brandGradientStart.withOpacity(0.0),
+        AppTokens.brandGradientStart.withValues(alpha: 0.25),
+        AppTokens.brandGradientStart.withValues(alpha: 0.0),
       ]),
     ),
   );
@@ -690,7 +692,7 @@ class _LoginBodyState extends State<_LoginBody>
       decoration: BoxDecoration(
         color: AppTokens.brandGradientStart,
         borderRadius: BorderRadius.circular(3),
-        boxShadow: [BoxShadow(color: AppTokens.brandGradientStart.withOpacity(0.4), blurRadius: 6, offset: const Offset(0, 2))],
+        boxShadow: [BoxShadow(color: AppTokens.brandGradientStart.withValues(alpha: 0.4), blurRadius: 6, offset: const Offset(0, 2))],
       ),
     ),
     const SizedBox(width: 5),
@@ -702,7 +704,7 @@ class _LoginBodyState extends State<_LoginBody>
   ]);
 
   Widget _buildLoadingOverlay() => Container(
-    color: Colors.black.withOpacity(0.25),
+    color: Colors.black.withValues(alpha: 0.25),
     child: Center(
       child: Container(
         width: 72, height: 72,
@@ -710,8 +712,8 @@ class _LoginBodyState extends State<_LoginBody>
           color: colour.cWhite,
           borderRadius: BorderRadius.circular(20),
           boxShadow: [
-            BoxShadow(color: AppTokens.brandGradientStart.withOpacity(0.15), blurRadius: 30),
-            BoxShadow(color: Colors.black.withOpacity(0.10), blurRadius: 12),
+            BoxShadow(color: AppTokens.brandGradientStart.withValues(alpha: 0.15), blurRadius: 30),
+            BoxShadow(color: Colors.black.withValues(alpha: 0.10), blurRadius: 12),
           ],
         ),
         child: const Center(
@@ -769,17 +771,17 @@ class _KeypadButtonState extends State<_KeypadButton>
           decoration: BoxDecoration(
             gradient: widget.isAction
                 ? LinearGradient(begin: Alignment.topLeft, end: Alignment.bottomRight,
-                colors: [AppTokens.brandDark, AppTokens.brandDark.withOpacity(0.82)])
+                colors: [AppTokens.brandDark, AppTokens.brandDark.withValues(alpha: 0.82)])
                 : const LinearGradient(begin: Alignment.topLeft, end: Alignment.bottomRight,
                 colors: [AppTokens.brandGradientStart, AppTokens.brandMid]),
             borderRadius: BorderRadius.circular(widget.radius),
             boxShadow: [
               BoxShadow(
-                color: (widget.isAction ? AppTokens.brandDark : AppTokens.brandGradientStart).withOpacity(0.28),
+                color: (widget.isAction ? AppTokens.brandDark : AppTokens.brandGradientStart).withValues(alpha: 0.28),
                 blurRadius: 10, offset: const Offset(0, 5),
               ),
             ],
-            border: Border.all(color: Colors.white.withOpacity(0.15), width: 1),
+            border: Border.all(color: Colors.white.withValues(alpha: 0.15), width: 1),
           ),
           child: Center(
             child: Text(
@@ -803,7 +805,7 @@ class _DotPatternPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final paint = Paint()
-      ..color = const Color(0xFF1555F3).withOpacity(0.04)
+      ..color = const Color(0xFF1555F3).withValues(alpha: 0.04)
       ..style = PaintingStyle.fill;
     for (double x = 0; x < size.width; x += 28) {
       for (double y = 0; y < size.height; y += 28) {

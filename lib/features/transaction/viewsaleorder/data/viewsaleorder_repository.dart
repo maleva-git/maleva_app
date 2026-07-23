@@ -41,7 +41,7 @@ class ViewSaleOrderRepository {
     
     final resultData = await ApiLegacyHelper.apiAllinoneSelect(Uri.encodeFull(url), null, null, null);
     
-    if (resultData != null && resultData.isNotEmpty) {
+    if (resultData.isNotEmpty) {
       // Legacy support for unrefactored modules
       AppGlobals.SaleEditMasterList = resultData;
       if (resultData[0]["SaleDetails"] != null) {

@@ -61,9 +61,11 @@ class _EmployeeAddBody extends StatelessWidget {
       listener: (context, state) async {
         if (state is EmployeeSaveSuccess) {
           await ConfirmationOK(state.message, context);
+          if (!context.mounted) return;
           Navigator.pop(context, true);
         }
         if (state is EmployeeError) {
+          if (!context.mounted) return;
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text(state.message),
@@ -127,8 +129,11 @@ class _EmployeeAddBody extends StatelessWidget {
                 }
               },
               onStepCancel: () {
-                if (s.currentStep > 0) bloc.add(const PreviousStepEvent());
-                else Navigator.pop(context);
+                if (s.currentStep > 0) {
+                  bloc.add(const PreviousStepEvent());
+                } else {
+                  Navigator.pop(context);
+                }
               },
               controlsBuilder: (context, details) {
                 return Row(children: [
@@ -257,7 +262,7 @@ Widget _section(List<Widget> children) {
       color: colour.kWhite,
       borderRadius: BorderRadius.circular(12),
       border: Border.all(color: AppTokens.brandLight),
-      boxShadow: [BoxShadow(color: AppTokens.brandGradientStart.withOpacity(0.05),
+      boxShadow: [BoxShadow(color: AppTokens.brandGradientStart.withValues(alpha: 0.05),
           blurRadius: 8, offset: const Offset(0, 2))],
     ),
     child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: children),
@@ -302,7 +307,7 @@ Widget _dropdown(
     padding: const EdgeInsets.only(bottom: 14),
     child: DropdownButtonFormField<String>(
       isExpanded: true, // <--- Add this line
-      value: items.contains(value) ? value : null,
+      initialValue: items.contains(value) ? value : null,
       decoration: InputDecoration(
         labelText: label,
         labelStyle: const TextStyle(color: AppTokens.brandDark),

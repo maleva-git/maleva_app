@@ -219,7 +219,7 @@ class _MaintenanceStatRow extends StatelessWidget {
         border: Border.all(color: AppTokens.maintCardBorder, width: 0.5),
         boxShadow: [
           BoxShadow(
-            color: AppTokens.invoiceHeaderStart.withOpacity(0.05),
+            color: AppTokens.invoiceHeaderStart.withValues(alpha: 0.05),
             blurRadius: 6,
             offset: const Offset(0, 2),
           ),
@@ -312,7 +312,7 @@ class _MaintenanceStatCard extends StatelessWidget {
         border: Border.all(color: AppTokens.maintCardBorder, width: 0.5),
         boxShadow: [
           BoxShadow(
-            color: AppTokens.invoiceHeaderStart.withOpacity(0.05),
+            color: AppTokens.invoiceHeaderStart.withValues(alpha: 0.05),
             blurRadius: 6,
             offset: const Offset(0, 2),
           ),
@@ -462,7 +462,7 @@ class _MaintenanceCard extends StatelessWidget {
         border: Border.all(color: AppTokens.maintCardBorder, width: 0.5),
         boxShadow: [
           BoxShadow(
-            color: AppTokens.invoiceHeaderStart.withOpacity(0.06),
+            color: AppTokens.invoiceHeaderStart.withValues(alpha: 0.06),
             blurRadius: 8,
             offset: const Offset(0, 2),
           ),
@@ -570,10 +570,10 @@ class _ToggleButton extends StatelessWidget {
         ),
         boxShadow: active
             ? [
-          BoxShadow(
+          const BoxShadow(
             color: AppTokens.invoiceHeaderStart,
             blurRadius: 8,
-            offset: const Offset(0, 3),
+            offset: Offset(0, 3),
           )
         ]
             : [],

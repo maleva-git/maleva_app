@@ -113,7 +113,7 @@ class _BocBodyState extends State<_BocBody> {
                 BlocBuilder<BocBloc, BocState>(
                   builder: (context, state) {
                     if (state is BocInitial) {
-                      return _InitialHint(isTablet: true);
+                      return const _InitialHint(isTablet: true);
                     }
                     if (state is BocLoading) {
                       return const Center(
@@ -152,7 +152,7 @@ class _BocBodyState extends State<_BocBody> {
                   return const SizedBox.shrink();
                 }
                 if (state is BocEmpty) {
-                  return _EmptyState(isTablet: true);
+                  return const _EmptyState(isTablet: true);
                 }
                 if (state is BocLoaded) {
                   return ListView.builder(
@@ -191,7 +191,7 @@ class _BocBodyState extends State<_BocBody> {
             child: BlocBuilder<BocBloc, BocState>(
               builder: (context, state) {
                 if (state is BocInitial) {
-                  return _InitialHint(isTablet: false);
+                  return const _InitialHint(isTablet: false);
                 }
                 if (state is BocLoading) {
                   return const Center(
@@ -206,7 +206,7 @@ class _BocBodyState extends State<_BocBody> {
                       isTablet: false);
                 }
                 if (state is BocEmpty) {
-                  return _EmptyState(isTablet: false);
+                  return const _EmptyState(isTablet: false);
                 }
                 if (state is BocLoaded) {
                   return ListView.builder(
@@ -245,7 +245,7 @@ class _SearchBar extends StatelessWidget {
         color: AppTokens.brandLight,
         borderRadius: BorderRadius.circular(isTablet ? 24 : 22),
         border:
-        Border.all(color: AppTokens.brandMid.withOpacity(0.3)),
+        Border.all(color: AppTokens.brandMid.withValues(alpha: 0.3)),
       ),
       child: TextField(
         controller: controller,
@@ -300,7 +300,7 @@ class _ResultCountBadge extends StatelessWidget {
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color:     AppTokens.brandGradientStart.withOpacity(0.28),
+            color:     AppTokens.brandGradientStart.withValues(alpha: 0.28),
             blurRadius: 16,
             offset:    const Offset(0, 6),
           ),
@@ -310,7 +310,7 @@ class _ResultCountBadge extends StatelessWidget {
         Container(
           padding: const EdgeInsets.all(10),
           decoration: BoxDecoration(
-            color: colour.kWhite.withOpacity(0.20),
+            color: colour.kWhite.withValues(alpha: 0.20),
             shape: BoxShape.circle,
           ),
           child: const Icon(Icons.receipt_long_rounded,
@@ -323,7 +323,7 @@ class _ResultCountBadge extends StatelessWidget {
             Text('Results Found',
                 style: GoogleFonts.lato(
                   fontSize:   12,
-                  color:      colour.kWhite.withOpacity(0.75),
+                  color:      colour.kWhite.withValues(alpha: 0.75),
                   fontWeight: FontWeight.w500,
                 )),
             Text('$count',
@@ -454,7 +454,7 @@ class _BocCard extends StatelessWidget {
             border: Border.all(color: AppTokens.brandLight, width: 1.5),
             boxShadow: [
               BoxShadow(
-                color:     AppTokens.brandGradientStart.withOpacity(0.07),
+                color:     AppTokens.brandGradientStart.withValues(alpha: 0.07),
                 blurRadius: 12,
                 offset:    const Offset(0, 5),
               ),
@@ -644,7 +644,7 @@ class _BocCard extends StatelessWidget {
   }
 
   Widget _buildDivider() =>
-      Divider(color: AppTokens.brandLight, thickness: 1.5, height: 24);
+      const Divider(color: AppTokens.brandLight, thickness: 1.5, height: 24);
 
   Widget _buildInfoRow(
       IconData icon, String label, String value,
@@ -705,10 +705,10 @@ class _DetailItem extends StatelessWidget {
       margin: EdgeInsets.only(bottom: isTablet ? 12 : 10),
       padding: EdgeInsets.all(isTablet ? 14 : 12),
       decoration: BoxDecoration(
-        color:         AppTokens.brandLight.withOpacity(0.6),
+        color:         AppTokens.brandLight.withValues(alpha: 0.6),
         borderRadius: BorderRadius.circular(isTablet ? 14 : 12),
         border: Border.all(
-            color: AppTokens.brandMid.withOpacity(0.2)),
+            color: AppTokens.brandMid.withValues(alpha: 0.2)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,

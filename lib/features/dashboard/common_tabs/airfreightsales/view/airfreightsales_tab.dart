@@ -115,7 +115,7 @@ class _AirfreightView extends StatelessWidget {
                     style: GoogleFonts.poppins(
                       fontSize: 14,
                       fontWeight: FontWeight.w500,
-                      color: Colors.white.withOpacity(0.8),
+                      color: Colors.white.withValues(alpha: 0.8),
                     ),
                   ),
                 ],
@@ -124,9 +124,9 @@ class _AirfreightView extends StatelessWidget {
                 width: 52,
                 height: 52,
                 decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.15),
+                  color: Colors.white.withValues(alpha: 0.15),
                   shape: BoxShape.circle,
-                  border: Border.all(color: Colors.white.withOpacity(0.2), width: 1.5),
+                  border: Border.all(color: Colors.white.withValues(alpha: 0.2), width: 1.5),
                 ),
                 child: const Icon(Icons.flight_takeoff_rounded, color: Colors.white, size: 26),
               )
@@ -137,9 +137,9 @@ class _AirfreightView extends StatelessWidget {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
             decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.15),
+              color: Colors.white.withValues(alpha: 0.15),
               borderRadius: BorderRadius.circular(16),
-              border: Border.all(color: Colors.white.withOpacity(0.2)),
+              border: Border.all(color: Colors.white.withValues(alpha: 0.2)),
             ),
             child: DropdownButtonHideUnderline(
               child: DropdownButton<String>(
@@ -239,7 +239,7 @@ class _AirfreightView extends StatelessWidget {
               borderRadius: BorderRadius.circular(24),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withOpacity(0.02),
+                  color: Colors.black.withValues(alpha: 0.02),
                   blurRadius: 15,
                   offset: const Offset(0, 5),
                 )
@@ -247,7 +247,7 @@ class _AirfreightView extends StatelessWidget {
             ),
             child: Column(
               children: [
-                Icon(Icons.inbox_rounded, size: 54, color: const Color(0xFFD2D6E0)),
+                const Icon(Icons.inbox_rounded, size: 54, color: Color(0xFFD2D6E0)),
                 const SizedBox(height: 12),
                 Text(
                   'No data found',
@@ -267,7 +267,7 @@ class _AirfreightView extends StatelessWidget {
               borderRadius: BorderRadius.circular(24),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withOpacity(0.04),
+                  color: Colors.black.withValues(alpha: 0.04),
                   blurRadius: 20,
                   offset: const Offset(0, 10),
                 )
@@ -296,7 +296,7 @@ class _AirfreightView extends StatelessWidget {
                       Container(
                         padding: const EdgeInsets.all(10),
                         decoration: BoxDecoration(
-                          color: themeColor.withOpacity(0.1),
+                          color: themeColor.withValues(alpha: 0.1),
                           shape: BoxShape.circle,
                         ),
                         child: Icon(
@@ -351,7 +351,7 @@ class _AirfreightView extends StatelessWidget {
                               borderRadius: BorderRadius.circular(10),
                               child: LinearProgressIndicator(
                                 value: progress,
-                                backgroundColor: themeColor.withOpacity(0.15),
+                                backgroundColor: themeColor.withValues(alpha: 0.15),
                                 valueColor: AlwaysStoppedAnimation<Color>(themeColor),
                                 minHeight: 6,
                               ),
@@ -404,7 +404,7 @@ class _PremiumStatCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(24),
         boxShadow: [
           BoxShadow(
-            color: gradientColors.first.withOpacity(0.12),
+            color: gradientColors.first.withValues(alpha: 0.12),
             blurRadius: 15,
             offset: const Offset(0, 8),
           ),

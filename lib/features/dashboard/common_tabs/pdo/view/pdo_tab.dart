@@ -3,7 +3,6 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:maleva/core/utils/app_globals.dart';
 import 'package:maleva/core/colors/colors.dart' as colour;
 import '../../../../../core/di/injection.dart';
 import '../../../../../core/theme/tokens.dart';
@@ -118,7 +117,7 @@ class _PDOViewBody extends StatelessWidget {
         if (state is PDOViewLoading) {
           return Center(
             child: Column(mainAxisSize: MainAxisSize.min, children: [
-              SizedBox(
+              const SizedBox(
                 width: 48,
                 height: 48,
                 child: CircularProgressIndicator(
@@ -234,11 +233,11 @@ class _PageHeader extends StatelessWidget {
         color: colour.kWhite,
         boxShadow: [
           BoxShadow(
-              color: Colors.black.withOpacity(0.03),
+              color: Colors.black.withValues(alpha: 0.03),
               blurRadius: 10,
               offset: const Offset(0, 2))
         ],
-        border: Border(
+        border: const Border(
             bottom: BorderSide(color: AppTokens.brandLight, width: 1.0)),
       ),
       child: Row(children: [
@@ -249,7 +248,7 @@ class _PageHeader extends StatelessWidget {
             gradient: LinearGradient(
               colors: [
                 AppTokens.brandGradientStart,
-                AppTokens.brandGradientStart.withOpacity(0.8),
+                AppTokens.brandGradientStart.withValues(alpha: 0.8),
               ],
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
@@ -282,7 +281,7 @@ class _PageHeader extends StatelessWidget {
               borderRadius: BorderRadius.circular(24),
             ),
             child: Row(mainAxisSize: MainAxisSize.min, children: [
-              Icon(Icons.folder_open_rounded,
+              const Icon(Icons.folder_open_rounded,
                   size: 14, color: AppTokens.brandGradientStart),
               const SizedBox(width: 6),
               Text("$count records",
@@ -311,7 +310,7 @@ class _SearchBar extends StatelessWidget {
         border: Border.all(color: AppTokens.brandLight, width: 1.0),
         boxShadow: [
           BoxShadow(
-              color: AppTokens.brandGradientStart.withOpacity(0.04),
+              color: AppTokens.brandGradientStart.withValues(alpha: 0.04),
               blurRadius: 12,
               offset: const Offset(0, 4)),
         ],
@@ -323,7 +322,7 @@ class _SearchBar extends StatelessWidget {
           hintText: "Search RTI No / Driver / Truck",
           hintStyle:
           GoogleFonts.lato(color: Colors.grey.shade400, fontSize: 14),
-          prefixIcon: Icon(Icons.search_rounded,
+          prefixIcon: const Icon(Icons.search_rounded,
               color: AppTokens.brandGradientStart, size: 22),
           contentPadding:
           const EdgeInsets.symmetric(vertical: 16, horizontal: 16),
@@ -331,7 +330,7 @@ class _SearchBar extends StatelessWidget {
           focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(16),
               borderSide:
-              BorderSide(color: AppTokens.brandGradientStart, width: 1.5)),
+              const BorderSide(color: AppTokens.brandGradientStart, width: 1.5)),
           enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(16),
               borderSide: BorderSide.none),
@@ -353,10 +352,10 @@ class _EmptyState extends StatelessWidget {
           Container(
             padding: const EdgeInsets.all(24),
             decoration: BoxDecoration(
-                color: AppTokens.brandLight.withOpacity(0.5),
+                color: AppTokens.brandLight.withValues(alpha: 0.5),
                 shape: BoxShape.circle),
             child: Icon(Icons.receipt_long_outlined,
-                size: 48, color: AppTokens.brandGradientStart.withOpacity(0.5)),
+                size: 48, color: AppTokens.brandGradientStart.withValues(alpha: 0.5)),
           ),
           const SizedBox(height: 20),
           Text("No Records Found",
@@ -396,7 +395,7 @@ class _RTIMasterCard extends StatelessWidget {
         border: Border.all(color: AppTokens.brandLight, width: 1.0),
         boxShadow: [
           BoxShadow(
-              color: AppTokens.brandGradientStart.withOpacity(0.06),
+              color: AppTokens.brandGradientStart.withValues(alpha: 0.06),
               blurRadius: 16,
               offset: const Offset(0, 6)),
         ],
@@ -415,7 +414,7 @@ class _RTIMasterCard extends StatelessWidget {
             childrenPadding: EdgeInsets.zero,
             // Customizing arrow icon color to match the header gradient
             iconColor: colour.kWhite,
-            collapsedIconColor: colour.kWhite.withOpacity(0.9),
+            collapsedIconColor: colour.kWhite.withValues(alpha: 0.9),
 
             // ── Header ───────────────────────────────────────
             title: _MasterCardHeader(master: master),
@@ -511,7 +510,7 @@ class _MasterCardHeader extends StatelessWidget {
         Container(
           padding: const EdgeInsets.all(8),
           decoration: BoxDecoration(
-              color: colour.kWhite.withOpacity(0.2), shape: BoxShape.circle),
+              color: colour.kWhite.withValues(alpha: 0.2), shape: BoxShape.circle),
           child: const Icon(Icons.receipt_rounded,
               color: colour.kWhite, size: 18),
         ),
@@ -529,11 +528,11 @@ class _MasterCardHeader extends StatelessWidget {
             const SizedBox(height: 4),
             Row(children: [
               Icon(Icons.calendar_today_rounded,
-                  size: 12, color: colour.kWhite.withOpacity(0.8)),
+                  size: 12, color: colour.kWhite.withValues(alpha: 0.8)),
               const SizedBox(width: 6),
               Text(master.RTIDate,
                   style: GoogleFonts.lato(
-                      fontSize: 12, color: colour.kWhite.withOpacity(0.9))),
+                      fontSize: 12, color: colour.kWhite.withValues(alpha: 0.9))),
             ]),
           ]),
         ),
@@ -542,9 +541,9 @@ class _MasterCardHeader extends StatelessWidget {
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
           decoration: BoxDecoration(
-            color: colour.kWhite.withOpacity(0.2),
+            color: colour.kWhite.withValues(alpha: 0.2),
             borderRadius: BorderRadius.circular(20),
-            border: Border.all(color: colour.kWhite.withOpacity(0.3), width: 1),
+            border: Border.all(color: colour.kWhite.withValues(alpha: 0.3), width: 1),
           ),
           child: Text("RM ${master.Amount}",
               style: GoogleFonts.lato(
@@ -568,7 +567,7 @@ class _MasterInfoCard extends StatelessWidget {
       width: double.infinity,
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: AppTokens.brandLight.withOpacity(0.3),
+        color: AppTokens.brandLight.withValues(alpha: 0.3),
         borderRadius: BorderRadius.circular(14),
         border: Border.all(color: AppTokens.brandLight, width: 1.0),
       ),
@@ -616,7 +615,7 @@ class _VerifyButton extends StatelessWidget {
         onPressed: isSaving ? null : onTap,
         child: isSaving
             ? Row(mainAxisSize: MainAxisSize.min, children: [
-          SizedBox(
+          const SizedBox(
             width: 18,
             height: 18,
             child: CircularProgressIndicator(
@@ -661,7 +660,7 @@ class _RTIDetailRow extends StatelessWidget {
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color:
-        isVerified ? Colors.green.shade50.withOpacity(0.5) : colour.kWhite,
+        isVerified ? Colors.green.shade50.withValues(alpha: 0.5) : colour.kWhite,
         borderRadius: BorderRadius.circular(14),
         border: Border.all(
           color: isVerified ? Colors.green.shade200 : AppTokens.brandLight,
@@ -670,8 +669,8 @@ class _RTIDetailRow extends StatelessWidget {
         boxShadow: [
           BoxShadow(
               color: isVerified
-                  ? Colors.green.withOpacity(0.04)
-                  : AppTokens.brandGradientStart.withOpacity(0.03),
+                  ? Colors.green.withValues(alpha: 0.04)
+                  : AppTokens.brandGradientStart.withValues(alpha: 0.03),
               blurRadius: 8,
               offset: const Offset(0, 3)),
         ],
@@ -712,12 +711,12 @@ class _RTIDetailRow extends StatelessWidget {
                 border: Border.all(
                     color: isVerified
                         ? Colors.green.shade600
-                        : AppTokens.brandGradientStart.withOpacity(0.3),
+                        : AppTokens.brandGradientStart.withValues(alpha: 0.3),
                     width: 1),
                 boxShadow: isVerified
                     ? [
                   BoxShadow(
-                      color: Colors.green.withOpacity(0.2),
+                      color: Colors.green.withValues(alpha: 0.2),
                       blurRadius: 4,
                       offset: const Offset(0, 2))
                 ]
@@ -803,7 +802,7 @@ Widget _buildImageThumbnail(BuildContext context, String? path) {
           border: Border.all(color: AppTokens.brandLight, width: 1),
           boxShadow: [
             BoxShadow(
-                color: Colors.black.withOpacity(0.08),
+                color: Colors.black.withValues(alpha: 0.08),
                 blurRadius: 10,
                 offset: const Offset(0, 4)),
           ],
@@ -820,7 +819,7 @@ Widget _buildImageThumbnail(BuildContext context, String? path) {
         child: Container(
           padding: const EdgeInsets.all(5),
           decoration: BoxDecoration(
-              color: Colors.black.withOpacity(0.6),
+              color: Colors.black.withValues(alpha: 0.6),
               borderRadius: BorderRadius.circular(8)),
           child: const Icon(Icons.fullscreen_rounded,
               color: colour.kWhite, size: 16),
@@ -851,7 +850,7 @@ void _showImagePopup(BuildContext context, Widget imageWidget) {
               width: 40,
               height: 40,
               decoration: BoxDecoration(
-                  color: Colors.black.withOpacity(0.6),
+                  color: Colors.black.withValues(alpha: 0.6),
                   shape: BoxShape.circle),
               child: const Icon(Icons.close_rounded,
                   color: colour.kWhite, size: 20),
@@ -870,7 +869,7 @@ Widget _infoChip(IconData icon, String label, String? value) {
     Padding(
       padding: const EdgeInsets.only(top: 2),
       child: Icon(icon,
-          size: 16, color: AppTokens.brandGradientStart.withOpacity(0.8)),
+          size: 16, color: AppTokens.brandGradientStart.withValues(alpha: 0.8)),
     ),
     const SizedBox(width: 8),
     SizedBox(

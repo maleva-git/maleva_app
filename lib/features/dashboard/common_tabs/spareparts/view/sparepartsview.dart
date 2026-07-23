@@ -7,14 +7,12 @@ import 'package:intl/intl.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:http/http.dart' as http;
-import 'package:maleva/core/utils/app_globals.dart';
 import '../../../../../core/di/injection.dart';
 import '../../../../../core/theme/palette.dart';
 import '../../../../../core/theme/tokens.dart';
 import '../bloc/spareparts_bloc.dart';
 import '../bloc/spareparts_event.dart';
 import '../bloc/spareparts_state.dart';
-import '../data/spareparts_repository.dart';
 import '../data/spareparts_repository.dart';
 
 // ── Entry Point ───────────────────────────────────────────────────────────────
@@ -238,7 +236,7 @@ class _DateFilterBar extends StatelessWidget {
       decoration: BoxDecoration(
         color: AppTokens.brandLight,
         borderRadius: BorderRadius.circular(isTablet ? 16 : 12),
-        border: Border.all(color: AppTokens.brandMid.withOpacity(0.3)),
+        border: Border.all(color: AppTokens.brandMid.withValues(alpha: 0.3)),
       ),
       child: Column(children: [
         Row(children: [
@@ -360,7 +358,7 @@ class _SparePartsCard extends StatelessWidget {
           boxShadow: [
             BoxShadow(
               color: AppTokens.brandGradientStart
-                  .withOpacity(isSelected ? 0.15 : 0.06),
+                  .withValues(alpha: isSelected ? 0.15 : 0.06),
               blurRadius: isSelected ? 14 : 10,
               offset: const Offset(0, 3),
             )
@@ -463,7 +461,7 @@ class _SparePartsCard extends StatelessWidget {
           ),
         ]),
 
-        Divider(color: AppTokens.brandLight, thickness: 1.5, height: 20),
+        const Divider(color: AppTokens.brandLight, thickness: 1.5, height: 20),
 
         Row(crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -525,7 +523,7 @@ class _EmptyDetailPanel extends StatelessWidget {
         border: Border.all(color: AppTokens.brandLight, width: 1.5),
         boxShadow: [
           BoxShadow(
-              color: AppTokens.brandGradientStart.withOpacity(0.05),
+              color: AppTokens.brandGradientStart.withValues(alpha: 0.05),
               blurRadius: 12,
               offset: const Offset(0, 4))
         ],
@@ -574,7 +572,7 @@ class _SparePartsDetailPanel extends StatelessWidget {
         border: Border.all(color: AppTokens.brandLight, width: 1.5),
         boxShadow: [
           BoxShadow(
-              color: AppTokens.brandGradientStart.withOpacity(0.07),
+              color: AppTokens.brandGradientStart.withValues(alpha: 0.07),
               blurRadius: 16,
               offset: const Offset(0, 5))
         ],
@@ -706,7 +704,7 @@ class _SparePartsDetailPanel extends StatelessWidget {
   }
 
   Widget _divider() =>
-      Divider(color: AppTokens.brandLight, thickness: 1.5, height: 20);
+      const Divider(color: AppTokens.brandLight, thickness: 1.5, height: 20);
 }
 
 // ── Image Preview Dialog ──────────────────────────────────────────────────────
@@ -760,6 +758,7 @@ class _ImagePreviewDialog extends StatelessWidget {
       await Share.shareXFiles([XFile(path)],
           text: "Spare Parts Document");
     } catch (e) {
+      if (!context.mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text("Sharing failed: $e")));
     }
@@ -793,7 +792,7 @@ class _DateTile extends StatelessWidget {
           color: Palette.kWhite,
           borderRadius: BorderRadius.circular(10),
           border: Border.all(
-              color: AppTokens.brandMid.withOpacity(0.35)),
+              color: AppTokens.brandMid.withValues(alpha: 0.35)),
         ),
         child: Row(children: [
           const Icon(Icons.date_range_rounded,

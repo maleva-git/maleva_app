@@ -1,7 +1,6 @@
 import 'package:maleva/core/network/api_constants.dart';
 import '../../../../../core/network/api_client.dart';
 import '../../../../../core/network/api_services/auth_api.dart';
-import 'package:maleva/core/utils/app_globals.dart';
 
 class SalesOrderRepository {
 

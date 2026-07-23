@@ -38,7 +38,6 @@ import '../features/transaction/planning/view/planning_tab.dart';
 import '../features/transaction/prealertview/view/prealertview_tab.dart';
 import '../features/transaction/salesorder/view/view/salesorderview_tab.dart';
 import '../../../../../../../core/colors/colors.dart' as colour;
-import '../features/transaction/vesselplanning/view/vesselplanning_tab.dart';
 import '../features/dashboard/common_tabs/vesselplanningweb/view/vesselplanningweb_tab.dart';
 import '../features/transport/fuelentry/add/bloc/fuelentry_bloc.dart';
 import '../features/transport/fuelentry/add/bloc/fuelentry_event.dart';
@@ -52,7 +51,6 @@ import '../features/transport/updatertidetails/bloc/updatertidetails_event.dart'
 import '../features/transport/updatertidetails/view/updatertidetails_tab.dart';
 import '../features/troubleshoot/view/troubleshoot_sheet.dart';
 import 'package:maleva/core/models/shared/menu_master_model.dart';
-import 'package:maleva/core/models/shared/review.dart';
 
 class Menulist extends StatefulWidget {
   const Menulist({super.key});
@@ -144,12 +142,12 @@ class _MenulistState extends State<Menulist>
           borderRadius: BorderRadius.circular(24),
           boxShadow: [
             BoxShadow(
-              color: colour.cBlue.withOpacity(0.30),
+              color: colour.cBlue.withValues(alpha: 0.30),
               blurRadius: 20,
               offset: const Offset(0, 8),
             ),
             BoxShadow(
-              color: colour.cBlue.withOpacity(0.12),
+              color: colour.cBlue.withValues(alpha: 0.12),
               blurRadius: 6,
               offset: const Offset(0, 2),
             ),
@@ -163,7 +161,7 @@ class _MenulistState extends State<Menulist>
                 width: 90, height: 90,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  color: Colors.white.withOpacity(0.06),
+                  color: Colors.white.withValues(alpha: 0.06),
                 ),
               ),
             ),
@@ -173,7 +171,7 @@ class _MenulistState extends State<Menulist>
                 width: 60, height: 60,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  color: Colors.white.withOpacity(0.04),
+                  color: Colors.white.withValues(alpha: 0.04),
                 ),
               ),
             ),
@@ -185,10 +183,10 @@ class _MenulistState extends State<Menulist>
                     Container(
                       width: 44, height: 44,
                       decoration: BoxDecoration(
-                        color: Colors.white.withOpacity(0.14),
+                        color: Colors.white.withValues(alpha: 0.14),
                         borderRadius: BorderRadius.circular(14),
                         border: Border.all(
-                            color: Colors.white.withOpacity(0.22), width: 1),
+                            color: Colors.white.withValues(alpha: 0.22), width: 1),
                         image: DecorationImage(
                             image: AppGlobals.logo, fit: BoxFit.contain),
                       ),
@@ -213,7 +211,7 @@ class _MenulistState extends State<Menulist>
                             style: GoogleFonts.dmSans(
                               fontSize: 9,
                               fontWeight: FontWeight.w500,
-                              color: Colors.white.withOpacity(0.55),
+                              color: Colors.white.withValues(alpha: 0.55),
                               letterSpacing: 1.6,
                             ),
                           ),
@@ -230,17 +228,17 @@ class _MenulistState extends State<Menulist>
                       padding: const EdgeInsets.symmetric(
                           horizontal: 10, vertical: 4),
                       decoration: BoxDecoration(
-                        color: Colors.white.withOpacity(0.12),
+                        color: Colors.white.withValues(alpha: 0.12),
                         borderRadius: BorderRadius.circular(20),
                         border: Border.all(
-                            color: Colors.white.withOpacity(0.20)),
+                            color: Colors.white.withValues(alpha: 0.20)),
                       ),
                       child: Text(
                         AppGlobals.appversion,
                         style: GoogleFonts.dmSans(
                           fontSize: 10,
                           fontWeight: FontWeight.w500,
-                          color: Colors.white.withOpacity(0.85),
+                          color: Colors.white.withValues(alpha: 0.85),
                           letterSpacing: 0.5,
                         ),
                       ),
@@ -260,7 +258,7 @@ class _MenulistState extends State<Menulist>
                           'Online',
                           style: GoogleFonts.dmSans(
                             fontSize: 10,
-                            color: Colors.white.withOpacity(0.60),
+                            color: Colors.white.withValues(alpha: 0.60),
                           ),
                         ),
                       ],
@@ -288,7 +286,7 @@ class _MenulistState extends State<Menulist>
         child: Row(
           children: [
             const SizedBox(width: 12),
-            Icon(Icons.search_rounded, size: 18, color: colour.cSub),
+            const Icon(Icons.search_rounded, size: 18, color: colour.cSub),
             const SizedBox(width: 8),
             Expanded(
               child: TextField(
@@ -312,8 +310,8 @@ class _MenulistState extends State<Menulist>
             if (_query.isNotEmpty)
               GestureDetector(
                 onTap: () => _search.clear(),
-                child: Padding(
-                  padding: const EdgeInsets.only(right: 10),
+                child: const Padding(
+                  padding: EdgeInsets.only(right: 10),
                   child: Icon(Icons.close_rounded, size: 16, color: colour.cSub),
                 ),
               ),
@@ -377,7 +375,7 @@ class _MenulistState extends State<Menulist>
                 ),
               ),
               Icon(Icons.arrow_forward_ios_rounded,
-                  size: 12, color: const Color(0xFFB8860B).withOpacity(0.5)),
+                  size: 12, color: const Color(0xFFB8860B).withValues(alpha: 0.5)),
             ],
           ),
         ),
@@ -401,8 +399,7 @@ class _MenuTile extends StatefulWidget {
     required this.drawerContext,
     this.depth = 0,
     this.searchQuery = '',
-    Key? key,
-  }) : super(key: key);
+  });
 
   @override
   State<_MenuTile> createState() => _MenuTileState();
@@ -509,13 +506,13 @@ class _MenuTileState extends State<_MenuTile>
                 ),
               ),
               Icon(Icons.arrow_forward_ios_rounded,
-                  size: 12, color: colour.cSub.withOpacity(0.6)),
+                  size: 12, color: colour.cSub.withValues(alpha: 0.6)),
             ] else ...[
               Container(
                 width: 5, height: 5,
                 margin: const EdgeInsets.only(right: 10),
                 decoration: BoxDecoration(
-                  color: colour.cBlue.withOpacity(0.25),
+                  color: colour.cBlue.withValues(alpha: 0.25),
                   shape: BoxShape.circle,
                 ),
               ),
@@ -530,7 +527,7 @@ class _MenuTileState extends State<_MenuTile>
                 ),
               ),
               Icon(Icons.arrow_forward_ios_rounded,
-                  size: 10, color: colour.cSub.withOpacity(0.4)),
+                  size: 10, color: colour.cSub.withValues(alpha: 0.4)),
             ],
           ],
         ),
@@ -555,7 +552,7 @@ class _MenuTileState extends State<_MenuTile>
               borderRadius: BorderRadius.circular(14),
               border: Border.all(
                 color: _expanded
-                    ? colour.cBlue.withOpacity(0.20)
+                    ? colour.cBlue.withValues(alpha: 0.20)
                     : const Color(0xFFEEF0F8),
               ),
             ),
@@ -590,7 +587,7 @@ class _MenuTileState extends State<_MenuTile>
             decoration: BoxDecoration(
               border: Border(
                 left: BorderSide(
-                    color: colour.cBlue.withOpacity(0.15), width: 2),
+                    color: colour.cBlue.withValues(alpha: 0.15), width: 2),
               ),
             ),
             child: Column(
@@ -643,7 +640,7 @@ class _MenuTileState extends State<_MenuTile>
               ),
             ),
             Icon(Icons.arrow_forward_ios_rounded,
-                size: 12, color: colour.cRose.withOpacity(0.35)),
+                size: 12, color: colour.cRose.withValues(alpha: 0.35)),
           ],
         ),
       ),

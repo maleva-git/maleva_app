@@ -6,7 +6,6 @@ import 'package:flutter_spinkit/flutter_spinkit.dart';
 import '../../../../../core/colors/colors.dart' as colour;
 import '../../../../../core/theme/tokens.dart';
 import '../../../../../core/utils/app_globals.dart';
-import '../../../../../core/utils/dialog_helper.dart';
 import '../data/vesselplanningweb_repository.dart';
 import '../bloc/vesselplanningweb_bloc.dart';
 import '../bloc/vesselplanningweb_event.dart';
@@ -83,7 +82,7 @@ class _VesselPlanningSavedSheetState extends State<VesselPlanningSavedSheet> {
       builder: (context, child) {
         return Theme(
           data: ThemeData.light().copyWith(
-            colorScheme: ColorScheme.light(
+            colorScheme: const ColorScheme.light(
               primary: colour.kHeaderGradEnd,
               onPrimary: Colors.white,
               surface: Colors.white,
@@ -192,9 +191,9 @@ class _VesselPlanningSavedSheetState extends State<VesselPlanningSavedSheet> {
         }
       },
       child: Container(
-      decoration: BoxDecoration(
+      decoration: const BoxDecoration(
         color: colour.kPageBg,
-        borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
       padding: const EdgeInsets.all(20),
       child: Column(
@@ -233,7 +232,7 @@ class _VesselPlanningSavedSheetState extends State<VesselPlanningSavedSheet> {
                     shape: BoxShape.circle,
                     border: Border.all(color: AppTokens.maintCardBorder),
                   ),
-                  child: Icon(Icons.close_rounded,
+                  child: const Icon(Icons.close_rounded,
                       size: 20, color: colour.kTextDark),
                 ),
               ),
@@ -372,7 +371,7 @@ class _VesselPlanningSavedSheetState extends State<VesselPlanningSavedSheet> {
                   height: 48,
                   padding: const EdgeInsets.symmetric(horizontal: 20),
                   decoration: BoxDecoration(
-                    gradient: LinearGradient(
+                    gradient: const LinearGradient(
                       colors: [colour.kHeaderGradStart, colour.kHeaderGradEnd],
                     ),
                     borderRadius: BorderRadius.circular(10),
@@ -391,7 +390,7 @@ class _VesselPlanningSavedSheetState extends State<VesselPlanningSavedSheet> {
           // List
           Expanded(
             child: _isLoading
-                ? Center(child: SpinKitFoldingCube(color: colour.kHeaderGradEnd, size: 40))
+                ? const Center(child: SpinKitFoldingCube(color: colour.kHeaderGradEnd, size: 40))
                 : _savedPlannings.isEmpty
                     ? Center(
                         child: Text(
@@ -438,7 +437,7 @@ class _VesselPlanningSavedSheetState extends State<VesselPlanningSavedSheet> {
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
             child: Row(
               children: [
-                Icon(Icons.calendar_month_outlined, size: 18, color: colour.kHeaderGradEnd),
+                const Icon(Icons.calendar_month_outlined, size: 18, color: colour.kHeaderGradEnd),
                 const SizedBox(width: 8),
                 Expanded(
                   child: Text(
@@ -498,7 +497,7 @@ class _VesselPlanningSavedSheetState extends State<VesselPlanningSavedSheet> {
                 children: [
                   Row(
                     children: [
-                      Icon(Icons.description_outlined, size: 20, color: colour.kHeaderGradEnd),
+                      const Icon(Icons.description_outlined, size: 20, color: colour.kHeaderGradEnd),
                       const SizedBox(width: 8),
                       Expanded(
                         child: Text(
@@ -533,7 +532,7 @@ class _VesselPlanningSavedSheetState extends State<VesselPlanningSavedSheet> {
                   const SizedBox(height: 8),
                   Row(
                     children: [
-                      Icon(Icons.calendar_month_outlined, size: 14, color: AppTokens.planTextMuted),
+                      const Icon(Icons.calendar_month_outlined, size: 14, color: AppTokens.planTextMuted),
                       const SizedBox(width: 4),
                       Text(
                         date,
@@ -608,7 +607,7 @@ class _VesselPlanningSavedSheetState extends State<VesselPlanningSavedSheet> {
                             const SizedBox(height: 6),
                             Row(
                               children: [
-                                Icon(Icons.person_outline, size: 14, color: AppTokens.planTextMuted),
+                                const Icon(Icons.person_outline, size: 14, color: AppTokens.planTextMuted),
                                 const SizedBox(width: 4),
                                 Expanded(
                                   child: Text(
@@ -619,7 +618,7 @@ class _VesselPlanningSavedSheetState extends State<VesselPlanningSavedSheet> {
                                   ),
                                 ),
                                 const SizedBox(width: 8),
-                                Icon(Icons.calendar_today_outlined, size: 12, color: AppTokens.planTextMuted),
+                                const Icon(Icons.calendar_today_outlined, size: 12, color: AppTokens.planTextMuted),
                                 const SizedBox(width: 4),
                                 Text(
                                   jobDate,

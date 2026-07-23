@@ -124,7 +124,7 @@ class _BillOrderBodyState extends State<_BillOrderBody> {
                   return Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      _SectionTitle(isTablet: true),
+                      const _SectionTitle(isTablet: true),
                       const SizedBox(height: 20),
                       _CountBadge(count: count),
                       const SizedBox(height: 20),
@@ -148,7 +148,7 @@ class _BillOrderBodyState extends State<_BillOrderBody> {
               child: BlocBuilder<BillOrderBloc, BillOrderState>(
                 builder: (context, state) {
                   if (state is BillOrderLoading) {
-                    return _LoadingView(isTablet: true);
+                    return const _LoadingView(isTablet: true);
                   }
                   if (state is BillOrderError) {
                     return _ErrorState(
@@ -156,7 +156,7 @@ class _BillOrderBodyState extends State<_BillOrderBody> {
                   }
                   if (state is BillOrderLoaded) {
                     if (state.records.isEmpty) {
-                      return _EmptyState(isTablet: true);
+                      return const _EmptyState(isTablet: true);
                     }
                     return _BillList(
                         records: state.records, isTablet: true);
@@ -186,7 +186,7 @@ class _BillOrderBodyState extends State<_BillOrderBody> {
       child: Column(children: [
 
         // ── Header ──────────────────────────────────────────────────────
-        _HeaderCard(isTablet: false),
+        const _HeaderCard(isTablet: false),
 
         // ── Record count + Date filter ───────────────────────────────────
         BlocBuilder<BillOrderBloc, BillOrderState>(
@@ -221,7 +221,7 @@ class _BillOrderBodyState extends State<_BillOrderBody> {
           child: BlocBuilder<BillOrderBloc, BillOrderState>(
             builder: (context, state) {
               if (state is BillOrderLoading) {
-                return _LoadingView(isTablet: false);
+                return const _LoadingView(isTablet: false);
               }
               if (state is BillOrderError) {
                 return _ErrorState(
@@ -229,7 +229,7 @@ class _BillOrderBodyState extends State<_BillOrderBody> {
               }
               if (state is BillOrderLoaded) {
                 if (state.records.isEmpty) {
-                  return _EmptyState(isTablet: false);
+                  return const _EmptyState(isTablet: false);
                 }
                 return _BillList(
                     records: state.records, isTablet: false);
@@ -288,7 +288,7 @@ class _HeaderCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(18),
         boxShadow: [
           BoxShadow(
-              color:     Colors.black.withOpacity(0.06),
+              color:     Colors.black.withValues(alpha: 0.06),
               blurRadius: 16,
               offset:    const Offset(0, 4)),
         ],
@@ -302,7 +302,7 @@ class _HeaderCard extends StatelessWidget {
             borderRadius: BorderRadius.circular(14),
             boxShadow: [
               BoxShadow(
-                  color:     const Color(0xFF10B981).withOpacity(0.3),
+                  color:     const Color(0xFF10B981).withValues(alpha: 0.3),
                   blurRadius: 10,
                   offset:    const Offset(0, 4)),
             ],
@@ -346,7 +346,7 @@ class _RecordCountPill extends StatelessWidget {
         color: const Color(0xFFECFDF5),
         borderRadius: BorderRadius.circular(20),
         border: Border.all(
-            color: const Color(0xFF10B981).withOpacity(0.3), width: 1),
+            color: const Color(0xFF10B981).withValues(alpha: 0.3), width: 1),
       ),
       child: Row(mainAxisSize: MainAxisSize.min, children: [
         const Icon(Icons.folder_open_rounded,
@@ -381,7 +381,7 @@ class _CountBadge extends StatelessWidget {
         borderRadius: BorderRadius.circular(18),
         boxShadow: [
           BoxShadow(
-              color:     const Color(0xFF10B981).withOpacity(0.3),
+              color:     const Color(0xFF10B981).withValues(alpha: 0.3),
               blurRadius: 16,
               offset:    const Offset(0, 6)),
         ],
@@ -390,7 +390,7 @@ class _CountBadge extends StatelessWidget {
         Container(
           padding: const EdgeInsets.all(10),
           decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.2),
+              color: Colors.white.withValues(alpha: 0.2),
               shape: BoxShape.circle),
           child: const Icon(Icons.receipt_long,
               color: Colors.white, size: 22),
@@ -400,7 +400,7 @@ class _CountBadge extends StatelessWidget {
           Text('Total Records',
               style: GoogleFonts.inter(
                 fontSize:   12,
-                color:      Colors.white.withOpacity(0.8),
+                color:      Colors.white.withValues(alpha: 0.8),
                 fontWeight: FontWeight.w500,
               )),
           Text('$count',
@@ -459,7 +459,7 @@ class _DateFilterBar extends StatelessWidget {
       Padding(
         padding: const EdgeInsets.symmetric(horizontal: 8),
         child: Icon(Icons.arrow_forward_rounded,
-            color: const Color(0xFF10B981).withOpacity(0.5), size: 18),
+            color: const Color(0xFF10B981).withValues(alpha: 0.5), size: 18),
       ),
       Expanded(
         child: _DateButton(
@@ -497,11 +497,11 @@ class _DateButton extends StatelessWidget {
           color: Colors.white,
           borderRadius: BorderRadius.circular(13),
           border: Border.all(
-              color: const Color(0xFF10B981).withOpacity(0.4),
+              color: const Color(0xFF10B981).withValues(alpha: 0.4),
               width: 1.5),
           boxShadow: [
             BoxShadow(
-                color:     const Color(0xFF10B981).withOpacity(0.08),
+                color:     const Color(0xFF10B981).withValues(alpha: 0.08),
                 blurRadius: 8,
                 offset:    const Offset(0, 3)),
           ],
@@ -511,7 +511,7 @@ class _DateButton extends StatelessWidget {
           Container(
             padding: const EdgeInsets.all(5),
             decoration: BoxDecoration(
-                color: const Color(0xFF10B981).withOpacity(0.1),
+                color: const Color(0xFF10B981).withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(7)),
             child: Icon(Icons.calendar_today_rounded,
                 size:  isTablet ? 14 : 13,
@@ -556,11 +556,11 @@ class _LoadingView extends StatelessWidget {
   Widget build(BuildContext context) {
     return Center(
       child: Column(mainAxisSize: MainAxisSize.min, children: [
-        SizedBox(
+        const SizedBox(
           width: 48,
           height: 48,
           child: CircularProgressIndicator(
-              color: const Color(0xFF10B981), strokeWidth: 3),
+              color: Color(0xFF10B981), strokeWidth: 3),
         ),
         const SizedBox(height: 16),
         Text("Fetching bill orders…",
@@ -625,11 +625,11 @@ class _BillCard extends StatelessWidget {
           color:         Colors.white,
           borderRadius: BorderRadius.circular(16),
           border: Border.all(
-              color: const Color(0xFF10B981).withOpacity(0.1),
+              color: const Color(0xFF10B981).withValues(alpha: 0.1),
               width: 1.2),
           boxShadow: [
             BoxShadow(
-                color:     Colors.black.withOpacity(0.05),
+                color:     Colors.black.withValues(alpha: 0.05),
                 blurRadius: 10,
                 offset:    const Offset(0, 3)),
           ],
@@ -663,7 +663,7 @@ class _BillCard extends StatelessWidget {
                 Container(
                   padding: const EdgeInsets.all(6),
                   decoration: BoxDecoration(
-                      color: Colors.white.withOpacity(0.15),
+                      color: Colors.white.withValues(alpha: 0.15),
                       shape: BoxShape.circle),
                   child: const Icon(Icons.receipt_rounded,
                       color: Colors.white, size: 14),
@@ -685,7 +685,7 @@ class _BillCard extends StatelessWidget {
                   padding: const EdgeInsets.symmetric(
                       horizontal: 8, vertical: 4),
                   decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.18),
+                    color: Colors.white.withValues(alpha: 0.18),
                     borderRadius: BorderRadius.circular(20),
                   ),
                   child: Text(bill.BillNoDisplay1,
@@ -762,18 +762,18 @@ class _BillCard extends StatelessWidget {
                             padding: const EdgeInsets.symmetric(
                                 horizontal: 12, vertical: 5),
                             decoration: BoxDecoration(
-                              color: const Color(0xFF10B981).withOpacity(0.1),
+                              color: const Color(0xFF10B981).withValues(alpha: 0.1),
                               borderRadius: BorderRadius.circular(20),
                               border: Border.all(
-                                  color: const Color(0xFF10B981).withOpacity(0.2),
+                                  color: const Color(0xFF10B981).withValues(alpha: 0.2),
                                   width: 1),
                             ),
                             child: Row(
                                 mainAxisSize: MainAxisSize.min,
                                 children: [
-                                  Icon(Icons.attach_money_rounded,
+                                  const Icon(Icons.attach_money_rounded,
                                       size: 14,
-                                      color: const Color(0xFF047857)),
+                                      color: Color(0xFF047857)),
                                   Text(
                                     'RM ${bill.NetAmt.toStringAsFixed(2)}',
                                     style: GoogleFonts.inter(
@@ -818,7 +818,7 @@ class _BillCard extends StatelessWidget {
               borderRadius: BorderRadius.circular(22),
               boxShadow: [
                 BoxShadow(
-                    color:     Colors.black.withOpacity(0.15),
+                    color:     Colors.black.withValues(alpha: 0.15),
                     blurRadius: 30,
                     offset:    const Offset(0, 10)),
               ],
@@ -834,9 +834,9 @@ class _BillCard extends StatelessWidget {
                     vertical:   isTablet ? 20 : 18,
                     horizontal: isTablet ? 28 : 24,
                   ),
-                  decoration: BoxDecoration(
+                  decoration: const BoxDecoration(
                     gradient: AppTokens.primaryGradient,
-                    borderRadius: const BorderRadius.only(
+                    borderRadius: BorderRadius.only(
                       topLeft:  Radius.circular(22),
                       topRight: Radius.circular(22),
                     ),
@@ -845,7 +845,7 @@ class _BillCard extends StatelessWidget {
                     Container(
                       padding: const EdgeInsets.all(8),
                       decoration: BoxDecoration(
-                          color: Colors.white.withOpacity(0.15),
+                          color: Colors.white.withValues(alpha: 0.15),
                           shape: BoxShape.circle),
                       child: const Icon(Icons.receipt_long,
                           color: Colors.white, size: 20),
@@ -865,7 +865,7 @@ class _BillCard extends StatelessWidget {
                         width: 32,
                         height: 32,
                         decoration: BoxDecoration(
-                            color: Colors.white.withOpacity(0.15),
+                            color: Colors.white.withValues(alpha: 0.15),
                             shape: BoxShape.circle),
                         child: const Icon(Icons.close_rounded,
                             color: Colors.white, size: 16),
@@ -933,9 +933,9 @@ class _BillCard extends StatelessWidget {
                               borderRadius:
                               BorderRadius.circular(8),
                             ),
-                            child: Icon(
+                            child: const Icon(
                                 Icons.check_circle_outline_rounded,
-                                color: const Color(0xFF10B981),
+                                color: Color(0xFF10B981),
                                 size: 18),
                           ),
                           const SizedBox(width: 12),
@@ -1018,8 +1018,8 @@ class _StatusPill extends StatelessWidget {
         borderRadius: BorderRadius.circular(20),
         border: Border.all(
           color: isPending
-              ? const Color(0xFFF59E0B).withOpacity(0.4)
-              : const Color(0xFF10B981).withOpacity(0.4),
+              ? const Color(0xFFF59E0B).withValues(alpha: 0.4)
+              : const Color(0xFF10B981).withValues(alpha: 0.4),
           width: 1,
         ),
       ),
@@ -1193,8 +1193,8 @@ class _EmptyState extends StatelessWidget {
       child: Column(mainAxisSize: MainAxisSize.min, children: [
         Container(
           padding: EdgeInsets.all(isTablet ? 26 : 22),
-          decoration: BoxDecoration(
-              color: const Color(0xFFECFDF5), shape: BoxShape.circle),
+          decoration: const BoxDecoration(
+              color: Color(0xFFECFDF5), shape: BoxShape.circle),
           child: Icon(Icons.receipt_long_outlined,
               size:  isTablet ? 52 : 44,
               color: const Color(0xFF10B981)),

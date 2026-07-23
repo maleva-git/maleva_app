@@ -1,7 +1,6 @@
 import 'package:maleva/core/network/api_legacy_helper.dart';
 import 'package:flutter/Material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:maleva/core/utils/app_globals.dart';
 import 'package:maleva/core/colors/colors.dart' as colour;
 import '../../../../core/bluetooth/view/Bluetooth_tab.dart';
@@ -51,13 +50,13 @@ class WareHouseMobileDashboard extends StatelessWidget {
           icon: Icon(Icons.directions_boat_filled,
               size: isTablet ? 28 : 25, ),
           onPressed: () => Navigator.push(context,
-              MaterialPageRoute(builder: (_) => Saleorderview())),
+              MaterialPageRoute(builder: (_) => const Saleorderview())),
         ),
         IconButton(
           icon: Icon(Icons.bluetooth_audio,
               size: isTablet ? 28 : 25, ),
           onPressed: () => Navigator.push(context,
-              MaterialPageRoute(builder: (_) => BluetoothPage())),
+              MaterialPageRoute(builder: (_) => const BluetoothPage())),
         ),
         IconButton(
           icon: Icon(Icons.print,
@@ -94,7 +93,7 @@ class WareHouseMobileDashboard extends StatelessWidget {
         borderRadius: BorderRadius.circular(isTablet ? 36 : 30),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.06),
+            color: Colors.black.withValues(alpha: 0.06),
             blurRadius: isTablet ? 12 : 8,
             offset: const Offset(0, 4),
           ),
@@ -160,13 +159,13 @@ class WareHouseMobileDashboard extends StatelessWidget {
       },
       child: TabBarView(
         controller: tabController,
-        children: [
-          const SpotSaleEntryPage(),
-          const InventoryPage(),
+        children: const [
+          SpotSaleEntryPage(),
+          InventoryPage(),
 
 
-          const AdminLeaveApprovalTab(),
-          const EmployeeLeaveRequestTab(),
+          AdminLeaveApprovalTab(),
+          EmployeeLeaveRequestTab(),
         ],
       ),
     );

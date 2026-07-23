@@ -294,7 +294,8 @@ class _SalesOrderViewState extends State<_SalesOrderView>
         }
         if (state.successMessage != null) {
           await ConfirmationOK(state.successMessage!, context);
-          Navigator.pushReplacement(
+          if (!context.mounted) return;
+Navigator.pushReplacement(
             context,
             MaterialPageRoute(builder: (_) => const SalesOrderAdd()),
           );
@@ -309,10 +310,11 @@ class _SalesOrderViewState extends State<_SalesOrderView>
       builder: (context, state) {
         final bloc = context.read<SalesOrderBloc>();
 
-        return WillPopScope(
-          onWillPop: () async {
-            Navigator.of(context).pop();
-            return true;
+        return PopScope(
+          canPop: false,
+          onPopInvokedWithResult: (didPop, result) {
+            if (didPop) return;
+            Navigator.pop(context);
           },
           child: Scaffold(
             resizeToAvoidBottomInset: true,
@@ -454,7 +456,7 @@ class _SalesOrderViewState extends State<_SalesOrderView>
     return BottomNavigationBar(
       backgroundColor: colour.commonColorLight,
       currentIndex: state.currentTabIndex,
-      unselectedItemColor: colour.commonHeadingColor.withOpacity(0.5),
+      unselectedItemColor: colour.commonHeadingColor.withValues(alpha: 0.5),
       selectedFontSize:
       isTablet ? AppGlobals.FontLow.toDouble() : AppGlobals.FontCardText.toDouble(),
       unselectedFontSize: isTablet ? AppGlobals.FontCardText.toDouble() : 10,
@@ -537,7 +539,7 @@ class _SalesOrderViewState extends State<_SalesOrderView>
                 context,
                 MaterialPageRoute(
                     builder: (_) => const Customer(Searchby: 1, SearchId: 0)),
-              ).then((_navRes) { if (_navRes != null) { AppGlobals.SelectCustomerList = _navRes; }
+              ).then((navRes) { if (navRes != null) { AppGlobals.SelectCustomerList = navRes; }
                 if (AppGlobals.SelectCustomerList.Id != 0) {
                   bloc.add(SalesOrderCustomerSelected(
                     custId: AppGlobals.SelectCustomerList.Id,
@@ -563,7 +565,7 @@ class _SalesOrderViewState extends State<_SalesOrderView>
                 context,
                 MaterialPageRoute(
                     builder: (_) => const JobType(Searchby: 1, SearchId: 0)),
-              ).then((_navRes) { if (_navRes != null) { AppGlobals.SelectJobTypeList = _navRes; }
+              ).then((navRes) { if (navRes != null) { AppGlobals.SelectJobTypeList = navRes; }
                 if (AppGlobals.SelectJobTypeList.Id != 0) {
                   bloc.add(SalesOrderJobTypeSelected(
                     jobTypeId: AppGlobals.SelectJobTypeList.Id,
@@ -590,7 +592,7 @@ class _SalesOrderViewState extends State<_SalesOrderView>
                 MaterialPageRoute(
                     builder: (_) => const JobAllStatus(
                         Searchby: 1, SearchId: 0, JobTypeId: 0)),
-              ).then((_navRes) { if (_navRes != null) { AppGlobals.SelectAllStatusList = _navRes; }
+              ).then((navRes) { if (navRes != null) { AppGlobals.SelectAllStatusList = navRes; }
                 if (AppGlobals.SelectAllStatusList.Status != 0) {
                   bloc.add(SalesOrderJobStatusSelected(
                     statusId: AppGlobals.SelectAllStatusList.Status,
@@ -678,7 +680,7 @@ class _SalesOrderViewState extends State<_SalesOrderView>
                 MaterialPageRoute(
                     builder: (_) =>
                     const Location(Searchby: 1, SearchId: 0)),
-              ).then((_navRes) { if (_navRes != null) { AppGlobals.SelectLocationList = _navRes; }
+              ).then((navRes) { if (navRes != null) { AppGlobals.SelectLocationList = navRes; }
                 if (AppGlobals.SelectLocationList.Id != 0) {
                   bloc.add(SalesOrderOriginSelected(
                     id: AppGlobals.SelectLocationList.Id,
@@ -703,7 +705,7 @@ class _SalesOrderViewState extends State<_SalesOrderView>
                 MaterialPageRoute(
                     builder: (_) =>
                     const Location(Searchby: 1, SearchId: 0)),
-              ).then((_navRes) { if (_navRes != null) { AppGlobals.SelectLocationList = _navRes; }
+              ).then((navRes) { if (navRes != null) { AppGlobals.SelectLocationList = navRes; }
                 if (AppGlobals.SelectLocationList.Id != 0) {
                   bloc.add(SalesOrderDestinationSelected(
                     id: AppGlobals.SelectLocationList.Id,
@@ -762,7 +764,7 @@ class _SalesOrderViewState extends State<_SalesOrderView>
                 MaterialPageRoute(
                     builder: (_) =>
                     const AddressList(Searchby: 1, SearchId: 0)),
-              ).then((_navRes) { if (_navRes != null) { AppGlobals.SelectAddressList = _navRes; }
+              ).then((navRes) { if (navRes != null) { AppGlobals.SelectAddressList = navRes; }
                 if (AppGlobals.SelectAddressList.isNotEmpty) {
                   txtPickUpAddress.text = AppGlobals.SelectAddressList;
                   bloc.add(SalesOrderPickupAddressListUpdated(
@@ -806,7 +808,7 @@ class _SalesOrderViewState extends State<_SalesOrderView>
                 MaterialPageRoute(
                     builder: (_) =>
                     const AddressList(Searchby: 1, SearchId: 0)),
-              ).then((_navRes) { if (_navRes != null) { AppGlobals.SelectAddressList = _navRes; }
+              ).then((navRes) { if (navRes != null) { AppGlobals.SelectAddressList = navRes; }
                 if (AppGlobals.SelectAddressList.isNotEmpty) {
                   txtDeliveryAddress.text = AppGlobals.SelectAddressList;
                   bloc.add(SalesOrderDeliveryAddressListUpdated(
@@ -849,7 +851,7 @@ class _SalesOrderViewState extends State<_SalesOrderView>
                 MaterialPageRoute(
                     builder: (_) =>
                     const AddressList(Searchby: 1, SearchId: 0)),
-              ).then((_navRes) { if (_navRes != null) { AppGlobals.SelectAddressList = _navRes; }
+              ).then((navRes) { if (navRes != null) { AppGlobals.SelectAddressList = navRes; }
                 if (AppGlobals.SelectAddressList.isNotEmpty) {
                   txtWarehouseAddress.text = AppGlobals.SelectAddressList;
                   AppGlobals.SelectAddressList = '';
@@ -923,7 +925,7 @@ class _SalesOrderViewState extends State<_SalesOrderView>
                 MaterialPageRoute(
                     builder: (_) =>
                     const AgentCompany(Searchby: 1, SearchId: 0)),
-              ).then((_navRes) { if (_navRes != null) { AppGlobals.SelectAgentCompanyList = _navRes; }
+              ).then((navRes) { if (navRes != null) { AppGlobals.SelectAgentCompanyList = navRes; }
                 if (AppGlobals.SelectAgentCompanyList.Id != 0) {
                   bloc.add(SalesOrderLAgentCompanySelected(
                       id: AppGlobals.SelectAgentCompanyList.Id,
@@ -944,7 +946,7 @@ class _SalesOrderViewState extends State<_SalesOrderView>
                 MaterialPageRoute(
                     builder: (_) =>
                     const Agent(Searchby: 1, SearchId: 0, AgentCompanyId: 0)),
-              ).then((_navRes) { if (_navRes != null) { AppGlobals.SelectAgentAllList = _navRes; }
+              ).then((navRes) { if (navRes != null) { AppGlobals.SelectAgentAllList = navRes; }
                 if (AppGlobals.SelectAgentAllList.Id != 0) {
                   bloc.add(SalesOrderLAgentSelected(
                       id: AppGlobals.SelectAgentAllList.Id,
@@ -1052,7 +1054,7 @@ class _SalesOrderViewState extends State<_SalesOrderView>
                 MaterialPageRoute(
                     builder: (_) =>
                     const AgentCompany(Searchby: 1, SearchId: 0)),
-              ).then((_navRes) { if (_navRes != null) { AppGlobals.SelectAgentCompanyList = _navRes; }
+              ).then((navRes) { if (navRes != null) { AppGlobals.SelectAgentCompanyList = navRes; }
                 if (AppGlobals.SelectAgentCompanyList.Id != 0) {
                   bloc.add(SalesOrderOAgentCompanySelected(
                       id: AppGlobals.SelectAgentCompanyList.Id,
@@ -1073,7 +1075,7 @@ class _SalesOrderViewState extends State<_SalesOrderView>
                 MaterialPageRoute(
                     builder: (_) =>
                     const Agent(Searchby: 1, SearchId: 0, AgentCompanyId: 0)),
-              ).then((_navRes) { if (_navRes != null) { AppGlobals.SelectAgentAllList = _navRes; }
+              ).then((navRes) { if (navRes != null) { AppGlobals.SelectAgentAllList = navRes; }
                 if (AppGlobals.SelectAgentAllList.Id != 0) {
                   bloc.add(SalesOrderOAgentSelected(
                       id: AppGlobals.SelectAgentAllList.Id,
@@ -1714,7 +1716,7 @@ class _SalesOrderViewState extends State<_SalesOrderView>
       context,
       MaterialPageRoute(
           builder: (_) => const Employee(Searchby: 1, SearchId: 0)),
-    ).then((_navRes) { if (_navRes != null) { AppGlobals.SelectEmployeeList = _navRes; }
+    ).then((navRes) { if (navRes != null) { AppGlobals.SelectEmployeeList = navRes; }
       final emp = AppGlobals.SelectEmployeeList;
       if (emp.Id != 0) {
         if (type == 'seal') {

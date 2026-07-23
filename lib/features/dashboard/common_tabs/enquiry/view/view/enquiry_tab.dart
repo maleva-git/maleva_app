@@ -5,7 +5,6 @@ import '../../../../../../core/theme/palette.dart';
 import '../../../../../../core/di/injection.dart';
 import 'package:maleva/core/utils/app_globals.dart';
 import '../../../../../transaction/salesorder/add/view/salesorderadd_tab.dart';
-import '../../../saleorderadd/view/saleorderadd_tab.dart';
 import '../../add/view/enquiryadd.dart';
 import '../bloc/enquiry_bloc.dart';
 import '../bloc/enquiry_event.dart';
@@ -84,6 +83,7 @@ class _EnquiryView extends StatelessWidget {
                             MaterialPageRoute(
                                 builder: (_) => const AddEnquiryScreen()),
                           ).then((_) {
+                            if (!context.mounted) return;
                             context.read<EnquiryBloc>().add(LoadEnquiryEvent());
                           });
                         },
@@ -156,7 +156,7 @@ class _EnquiryView extends StatelessWidget {
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Icon(Icons.inbox_rounded,
+                          const Icon(Icons.inbox_rounded,
                               size: 64, color: Palette.grey400),
                           const SizedBox(height: 16),
                           Text(
@@ -209,6 +209,7 @@ class _EnquiryCard extends StatelessWidget {
               builder: (_) => AddEnquiryScreen(saleMaster: item),
             ),
           ).then((_) {
+            if (!context.mounted) return;
             context.read<EnquiryBloc>().add(LoadEnquiryEvent());
           });
         },
@@ -296,7 +297,7 @@ class _EnquiryCard extends StatelessWidget {
                       _ActionButton(
                         icon: Icons.close_rounded,
                         color: Palette.rose,
-                        bgColor: Palette.rose.withOpacity(0.1),
+                        bgColor: Palette.rose.withValues(alpha: 0.1),
                         onTap: () async {
                           bool result = await ConfirmationMsgYesNo(
                             context,
@@ -337,7 +338,7 @@ class _EnquiryCard extends StatelessWidget {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: Text(
+            child: const Text(
               'Close',
               style: TextStyle(color: Palette.blue600),
             ),

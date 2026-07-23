@@ -1,9 +1,7 @@
 import 'package:maleva/core/network/api_legacy_helper.dart';
 import 'package:flutter/material.dart';
 import 'package:maleva/core/widgets/custom_app_bar.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:maleva/core/colors/colors.dart' as colour;
 import 'package:maleva/menu/menulist.dart';
 import '../../../../core/bluetooth/view/Bluetooth_tab.dart';
@@ -52,13 +50,13 @@ class SalesDashboardView extends StatelessWidget {
           icon: Icon(Icons.directions_boat_filled,
               size: isTablet ? 28 : 25),
           onPressed: () => Navigator.push(context,
-              MaterialPageRoute(builder: (_) => Saleorderview())),
+              MaterialPageRoute(builder: (_) => const Saleorderview())),
         ),
         IconButton(
           icon: Icon(Icons.bluetooth_audio,
               size: isTablet ? 28 : 25),
           onPressed: () => Navigator.push(context,
-              MaterialPageRoute(builder: (_) => BluetoothPage())),
+              MaterialPageRoute(builder: (_) => const BluetoothPage())),
         ),
         IconButton(
           icon: Icon(Icons.print,
@@ -92,7 +90,7 @@ class SalesDashboardView extends StatelessWidget {
         borderRadius: BorderRadius.circular(isTablet ? 36 : 30),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.06),
+            color: Colors.black.withValues(alpha: 0.06),
             blurRadius: isTablet ? 12 : 0,
             offset: const Offset(0, 4),
           ),
@@ -155,15 +153,15 @@ Tab _tab(String text, bool isTablet) => Tab(
       },
         child: TabBarView(
           controller: tabController,
-          children: [
-            const AirfreightSales(),
-            const VesselReportPage(),
-            const TransportReportPage(),
-            const EnquiryScreen(),
-            const FuelDiffPage(),
-            const PaymentPendingPage(),
-            const AdminLeaveApprovalTab(),
-          const EmployeeLeaveRequestTab(),
+          children: const [
+            AirfreightSales(),
+            VesselReportPage(),
+            TransportReportPage(),
+            EnquiryScreen(),
+            FuelDiffPage(),
+            PaymentPendingPage(),
+            AdminLeaveApprovalTab(),
+          EmployeeLeaveRequestTab(),
           ],
         ),
     );

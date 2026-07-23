@@ -5,8 +5,6 @@ import '../../../../../core/models/model.dart';
 import '../data/driver_repository.dart';
 import 'driverdetails_event.dart';
 import 'driverdetails_state.dart';
-import 'package:maleva/core/models/shared/driver_details_model.dart';
-import 'package:maleva/core/models/shared/response_view_model.dart';
 
 class DriverBloc extends Bloc<DriverEvent, DriverState> {
   // ❌ REMOVED: final BuildContext context;

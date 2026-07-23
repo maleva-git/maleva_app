@@ -75,8 +75,12 @@ class _PlanningDetailsViewState extends State<_PlanningDetailsView> {
         }
       },
       builder: (ctx, state) {
-        return WillPopScope(
-          onWillPop: _onBackPressed,
+        return PopScope(
+          canPop: false,
+          onPopInvokedWithResult: (didPop, result) async {
+            if (didPop) return;
+            await _onBackPressed();
+          },
           child: LayoutBuilder(
             builder: (_, constraints) {
               final bool isTablet = constraints.maxWidth >= 600;
@@ -212,15 +216,15 @@ class _PlanningDetailsViewState extends State<_PlanningDetailsView> {
                               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
                               clipBehavior: Clip.antiAlias,
                               child: DataTable(
-                                headingRowColor: MaterialStateProperty.all(AppTokens.invoiceHeaderStart),
+                                headingRowColor: WidgetStateProperty.all(AppTokens.invoiceHeaderStart),
                                 headingTextStyle: GoogleFonts.lato(color: Colors.white, fontWeight: FontWeight.bold, fontSize: isTablet ? 13 : 11),
                                 dataRowMinHeight: 35,
                                 dataRowMaxHeight: 50,
                                 dataTextStyle: GoogleFonts.lato(color: AppTokens.textPrimary, fontSize: isTablet ? 13 : 11, fontWeight: FontWeight.w500),
                                 columnSpacing: 25,
                                 border: TableBorder(
-                                  horizontalInside: BorderSide(color: AppTokens.surfaceBorder.withOpacity(0.5), width: 1),
-                                  verticalInside: BorderSide(color: AppTokens.surfaceBorder.withOpacity(0.5), width: 1),
+                                  horizontalInside: BorderSide(color: AppTokens.surfaceBorder.withValues(alpha: 0.5), width: 1),
+                                  verticalInside: BorderSide(color: AppTokens.surfaceBorder.withValues(alpha: 0.5), width: 1),
                                 ),
                                 columns: const [
                                   DataColumn(label: Text('S.No')),
@@ -243,7 +247,7 @@ class _PlanningDetailsViewState extends State<_PlanningDetailsView> {
                                   final i = e.key;
                                   final item = e.value;
                                   return DataRow(
-                                    color: MaterialStateProperty.all(i % 2 == 0 ? Colors.white : AppTokens.surfaceCard),
+                                    color: WidgetStateProperty.all(i % 2 == 0 ? Colors.white : AppTokens.surfaceCard),
                                     cells: [
                                       DataCell(Text('${i + 1}')),
                                       DataCell(Text('${item["Remarks"] ?? ""}')),
@@ -352,7 +356,7 @@ class _SummaryPill extends StatelessWidget {
         decoration: BoxDecoration(
           gradient: AppTokens.headerGradient,
           borderRadius: BorderRadius.circular(20),
-          boxShadow: [
+          boxShadow: const [
             BoxShadow(color: Palette.brandGlow, blurRadius: 6)
           ],
         ),
@@ -381,7 +385,7 @@ class _EmptyWidget extends StatelessWidget {
         children: [
           Icon(Icons.inbox_rounded,
               size: 64,
-              color: Palette.grey400.withOpacity(0.6)),
+              color: Palette.grey400.withValues(alpha: 0.6)),
           const SizedBox(height: 12),
           Text('No planning records found',
               style: GoogleFonts.lato(

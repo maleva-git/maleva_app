@@ -189,7 +189,7 @@ class _Truckstate extends State<Truck> {
                                                 color: colour.commonColor.withValues(alpha: 0.08),
                                                 shape: BoxShape.circle,
                                               ),
-                                              child: Icon(Icons.local_shipping_rounded, color: colour.commonColor, size: 20),
+                                              child: const Icon(Icons.local_shipping_rounded, color: colour.commonColor, size: 20),
                                             ),
                                             const SizedBox(width: 16),
                                             Expanded(

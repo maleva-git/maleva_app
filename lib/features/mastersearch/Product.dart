@@ -189,7 +189,7 @@ class _Productstate extends State<Product> {
                                                 color: colour.commonColor.withValues(alpha: 0.08),
                                                 shape: BoxShape.circle,
                                               ),
-                                              child: Icon(Icons.inventory_2_rounded, color: colour.commonColor, size: 20),
+                                              child: const Icon(Icons.inventory_2_rounded, color: colour.commonColor, size: 20),
                                             ),
                                             const SizedBox(width: 16),
                                             Expanded(

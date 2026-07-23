@@ -121,7 +121,7 @@ class _TransportReportView extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  _SectionHeader(title: 'Transport Report', isTablet: true),
+                  const _SectionHeader(title: 'Transport Report', isTablet: true),
                   const SizedBox(height: 20),
 
                   _DayToggle(
@@ -154,7 +154,7 @@ class _TransportReportView extends StatelessWidget {
             flex: 65,
             child: Column(
               children: [
-                _ListHeader(isTablet: true),
+                const _ListHeader(isTablet: true),
                 const SizedBox(height: 10),
                 Expanded(
                   child: isLoading
@@ -206,7 +206,7 @@ class _TransportReportView extends StatelessWidget {
     return ListView(
       padding: const EdgeInsets.fromLTRB(16, 20, 16, 24),
       children: [
-        _SectionHeader(title: 'Transport Report', isTablet: false),
+        const _SectionHeader(title: 'Transport Report', isTablet: false),
         const SizedBox(height: 16),
 
         _DayToggle(
@@ -221,7 +221,7 @@ class _TransportReportView extends StatelessWidget {
         ),
         const SizedBox(height: 16),
 
-        _ListHeader(isTablet: false),
+        const _ListHeader(isTablet: false),
         const SizedBox(height: 8),
 
         if (isLoading)
@@ -395,7 +395,7 @@ class _CountBadge extends StatelessWidget {
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color:     colour.kBlue.withOpacity(0.30),
+            color:     colour.kBlue.withValues(alpha: 0.30),
             blurRadius: 16,
             offset:    const Offset(0, 6),
           ),
@@ -405,7 +405,7 @@ class _CountBadge extends StatelessWidget {
         Container(
           padding: const EdgeInsets.all(10),
           decoration: BoxDecoration(
-            color:         Colors.white.withOpacity(0.20),
+            color:         Colors.white.withValues(alpha: 0.20),
             shape:         BoxShape.circle,
           ),
           child: const Icon(Icons.local_shipping_outlined,
@@ -416,7 +416,7 @@ class _CountBadge extends StatelessWidget {
           Text('Total Records',
               style: GoogleFonts.poppins(
                 fontSize:   12,
-                color:      Colors.white.withOpacity(0.75),
+                color:      Colors.white.withValues(alpha: 0.75),
                 fontWeight: FontWeight.w500,
               )),
           Text('$count',
@@ -496,7 +496,7 @@ class _ToggleTab extends StatelessWidget {
             boxShadow: isActive
                 ? [
               BoxShadow(
-                color:     AppTokens.invoiceHeaderStart.withOpacity(0.3),
+                color:     AppTokens.invoiceHeaderStart.withValues(alpha: 0.3),
                 blurRadius: 8,
                 offset:    const Offset(0, 3),
               )
@@ -545,7 +545,7 @@ class _ListHeader extends StatelessWidget {
               style: GoogleFonts.poppins(
                   fontSize:   isTablet ? 13 : 12,
                   fontWeight: FontWeight.w700,
-                  color:      Colors.white.withOpacity(0.8))),
+                  color:      Colors.white.withValues(alpha: 0.8))),
         ),
         const SizedBox(width: 8),
         Expanded(
@@ -591,7 +591,7 @@ class _TransportCard extends StatelessWidget {
           onTap:        onTap,
           onLongPress:  onLongPress,
           borderRadius: BorderRadius.circular(isTablet ? 16 : 14),
-          splashColor:  colour.kBlue.withOpacity(0.08),
+          splashColor:  colour.kBlue.withValues(alpha: 0.08),
           child: Container(
             padding: EdgeInsets.symmetric(
               horizontal: isTablet ? 18 : 14,
@@ -603,13 +603,13 @@ class _TransportCard extends StatelessWidget {
               border: Border.all(
                 color: isEven
                     ? colour.kBlueBg
-                    : AppTokens.transBlueLight.withOpacity(0.3),
+                    : AppTokens.transBlueLight.withValues(alpha: 0.3),
                 width: 1.2,
               ),
               boxShadow: isEven
                   ? [
                 BoxShadow(
-                  color:     colour.kBlue.withOpacity(0.05),
+                  color:     colour.kBlue.withValues(alpha: 0.05),
                   blurRadius: 6,
                   offset:    const Offset(0, 2),
                 )
@@ -624,7 +624,7 @@ class _TransportCard extends StatelessWidget {
                 decoration: BoxDecoration(
                   color: isEven
                       ? colour.kBlueBg
-                      : colour.kBlue.withOpacity(0.12),
+                      : colour.kBlue.withValues(alpha: 0.12),
                   borderRadius:
                   BorderRadius.circular(isTablet ? 10 : 8),
                 ),

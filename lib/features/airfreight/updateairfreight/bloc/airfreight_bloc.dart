@@ -42,6 +42,7 @@ class AirFreightBloc extends Bloc<AirFreightEvent, AirFreightState> {
 
       if (event.jobId != null && event.jobNo != null) {
         final shortNo = event.jobNo!.length >= 4 ? event.jobNo!.substring(4) : event.jobNo!;
+        if (!event.context.mounted) return;
         final loaded = await _loadJobData(saleOrderId: event.jobId!, jobNo: shortNo, context: event.context, emit: emit);
         if (loaded != null) {
           emit(loaded.copyWith(imageUploadEnabled: true));

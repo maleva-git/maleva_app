@@ -125,7 +125,6 @@ import 'package:maleva/features/transaction/salesorder/view/data/salesorderview_
 import 'package:maleva/features/transaction/salesorder/add/bloc/salesorderadd_bloc.dart';
 import 'package:maleva/features/transaction/viewsaleorder/data/viewsaleorder_repository.dart';
 import 'package:maleva/features/transaction/viewsaleorder/bloc/viewsaleorder_bloc.dart';
-import 'package:maleva/core/models/shared/review.dart';
 final sl = GetIt.instance;
 
 Future<void> setupDependencies() async {

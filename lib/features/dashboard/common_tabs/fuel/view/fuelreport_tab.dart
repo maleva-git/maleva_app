@@ -222,7 +222,7 @@ class _DateFilterBar extends StatelessWidget {
         color: colour.kAccent,
         borderRadius: BorderRadius.circular(isTablet ? 16 : 14),
         border: Border.all(
-            color: AppTokens.brandGradientStartLight.withOpacity(0.3)),
+            color: AppTokens.brandGradientStartLight.withValues(alpha: 0.3)),
       ),
       child: Row(
         children: [
@@ -258,7 +258,7 @@ class _DateFilterBar extends StatelessWidget {
           Container(
             width: 1,
             height: 30,
-            color: AppTokens.brandGradientStartLight.withOpacity(0.3),
+            color: AppTokens.brandGradientStartLight.withValues(alpha: 0.3),
             margin: const EdgeInsets.symmetric(horizontal: 8),
           ),
 
@@ -417,7 +417,7 @@ class _FuelDiffCard extends StatelessWidget {
           boxShadow: [
             BoxShadow(
               color: (isSelected ? AppTokens.brandGradientStart : AppTokens.brandGradientStart)
-                  .withOpacity(isSelected ? 0.15 : 0.07),
+                  .withValues(alpha: isSelected ? 0.15 : 0.07),
               blurRadius: isSelected ? 14 : 10,
               offset: const Offset(0, 4),
             ),
@@ -477,7 +477,7 @@ class _FuelDiffCard extends StatelessWidget {
           padding: const EdgeInsets.symmetric(
               horizontal: 8, vertical: 4),
           decoration: BoxDecoration(
-            color: diffColor.withOpacity(0.1),
+            color: diffColor.withValues(alpha: 0.1),
             borderRadius: BorderRadius.circular(8),
           ),
           child: Row(
@@ -543,7 +543,7 @@ class _FuelDiffCard extends StatelessWidget {
           ],
         ),
         const SizedBox(height: 10),
-        Divider(color: colour.kAccent, thickness: 1),
+        const Divider(color: colour.kAccent, thickness: 1),
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
@@ -568,7 +568,7 @@ class _FuelDiffCard extends StatelessWidget {
           padding: const EdgeInsets.symmetric(
               horizontal: 10, vertical: 8),
           decoration: BoxDecoration(
-            color: diffColor.withOpacity(0.1),
+            color: diffColor.withValues(alpha: 0.1),
             borderRadius: BorderRadius.circular(10),
           ),
           child: Row(
@@ -621,7 +621,7 @@ class _EmptyDetailPanel extends StatelessWidget {
         border: Border.all(color: colour.kAccent, width: 1.5),
         boxShadow: [
           BoxShadow(
-            color: AppTokens.brandGradientStart.withOpacity(0.05),
+            color: AppTokens.brandGradientStart.withValues(alpha: 0.05),
             blurRadius: 12,
             offset: const Offset(0, 4),
           ),
@@ -688,7 +688,7 @@ class _DetailPanel extends StatelessWidget {
         border: Border.all(color: colour.kAccent, width: 1.5),
         boxShadow: [
           BoxShadow(
-            color: AppTokens.brandGradientStart.withOpacity(0.07),
+            color: AppTokens.brandGradientStart.withValues(alpha: 0.07),
             blurRadius: 16,
             offset: const Offset(0, 5),
           ),
@@ -730,7 +730,7 @@ class _DetailPanel extends StatelessWidget {
               padding: const EdgeInsets.symmetric(
                   horizontal: 12, vertical: 10),
               decoration: BoxDecoration(
-                color: diffColor.withOpacity(0.1),
+                color: diffColor.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Row(
@@ -811,7 +811,7 @@ class _DetailPanel extends StatelessWidget {
   }
 
   Widget _divider() =>
-      Divider(color: colour.kAccent, thickness: 1.5, height: 16);
+      const Divider(color: colour.kAccent, thickness: 1.5, height: 16);
 
   Widget _detailRow(
       IconData icon, String label, String value) {
@@ -1003,7 +1003,7 @@ class _FuelDetailsDialog extends StatelessWidget {
   }
 
   Widget _divider() =>
-      Divider(color: colour.kAccent, thickness: 1.5, height: 20);
+      const Divider(color: colour.kAccent, thickness: 1.5, height: 20);
 
   Widget _dialogRow(
       IconData icon, String label, String value) {

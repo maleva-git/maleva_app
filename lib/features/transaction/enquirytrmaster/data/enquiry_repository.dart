@@ -69,7 +69,7 @@ class EnquiryTrRepository {
   /// Fetch Enquiry Master List
   Future<List<dynamic>> fetchEnquiryMaster(Map<String, dynamic> payload, Map<String, dynamic> header) async {
     try {
-      final endpoint = ApiConstants.apiSelectEnquiryMaster;
+      const endpoint = ApiConstants.apiSelectEnquiryMaster;
       final response = await _dioClient.dio.post(
         endpoint,
         data: {"_objModel": payload, "header": header},

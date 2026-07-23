@@ -144,7 +144,7 @@ class _VesselPlanningPage extends StatelessWidget {
           Text(
             userName,
             style: GoogleFonts.lato(
-              color: Colors.white.withOpacity(0.65),
+              color: Colors.white.withValues(alpha: 0.65),
               fontWeight: FontWeight.w500,
               fontSize: isTablet ? AppGlobals.FontLow : AppGlobals.FontLow - 1,
             ),
@@ -203,8 +203,11 @@ class _VesselPlanningPage extends StatelessWidget {
             if (picked != null) {
               final formatted = DateFormat("yyyy-MM-dd").format(picked);
               setSheetState(() {
-                if (isFrom) fromDate = formatted;
-                else toDate = formatted;
+                if (isFrom) {
+                  fromDate = formatted;
+                } else {
+                  toDate = formatted;
+                }
               });
             }
           }
@@ -288,7 +291,7 @@ class _VesselPlanningPage extends StatelessWidget {
                               builder: (_) =>
                               const Employee(Searchby: 1, SearchId: 0),
                             ),
-                          ).then((_navRes) { if (_navRes != null) { AppGlobals.SelectEmployeeList = _navRes; }
+                          ).then((navRes) { if (navRes != null) { AppGlobals.SelectEmployeeList = navRes; }
                             setSheetState(() {
                               txtEmployee.text =
                                   AppGlobals.SelectEmployeeList.AccountName;
@@ -465,7 +468,7 @@ class _GridHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final style = GoogleFonts.lato(
-      color: Colors.white.withOpacity(0.85),
+      color: Colors.white.withValues(alpha: 0.85),
       fontWeight: FontWeight.w600,
       fontSize: isTablet ? 11 : 10,
       letterSpacing: 0.6,
@@ -544,7 +547,7 @@ class _PlanningCard extends StatelessWidget {
             border: Border.all(color: AppTokens.maintCardBorder, width: 0.5),
             boxShadow: [
               BoxShadow(
-                color: AppTokens.invoiceHeaderStart.withOpacity(0.07),
+                color: AppTokens.invoiceHeaderStart.withValues(alpha: 0.07),
                 blurRadius: 12,
                 offset: const Offset(0, 3),
               ),
@@ -760,7 +763,7 @@ class _DetailsSection extends StatelessWidget {
             child: SingleChildScrollView(
               scrollDirection: Axis.horizontal,
               child: DataTable(
-                headingRowColor: MaterialStateProperty.all(colour.kHeaderGradEnd),
+                headingRowColor: WidgetStateProperty.all(colour.kHeaderGradEnd),
                 dataRowMinHeight: 40,
                 dataRowMaxHeight: 40,
                 columnSpacing: 20,
@@ -881,7 +884,7 @@ class _VPFab extends StatelessWidget {
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: AppTokens.invoiceHeaderStart.withOpacity(0.4),
+            color: AppTokens.invoiceHeaderStart.withValues(alpha: 0.4),
             blurRadius: 16,
             offset: const Offset(0, 6),
           ),
@@ -1085,7 +1088,7 @@ class _GradientButton extends StatelessWidget {
         borderRadius: BorderRadius.circular(24),
         boxShadow: [
           BoxShadow(
-            color: AppTokens.invoiceHeaderStart.withOpacity(0.35),
+            color: AppTokens.invoiceHeaderStart.withValues(alpha: 0.35),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),

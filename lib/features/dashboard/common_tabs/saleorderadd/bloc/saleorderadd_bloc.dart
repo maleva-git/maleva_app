@@ -298,7 +298,7 @@ class SalesOrderBloc extends Bloc<SalesOrderEvent, SalesOrderState> {
   /// Populates state from a master data map (edit or enquiry load).
   SalesOrderState _populateFromMaster(
       SalesOrderState s, Map<String, dynamic> m, bool isEnquiry) {
-    String _dateStr(String key) {
+    String dateStr(String key) {
       if (m[key] == null) return '';
       try {
         return DateFormat('yyyy-MM-dd HH:mm:ss')
@@ -368,7 +368,7 @@ class SalesOrderBloc extends Bloc<SalesOrderEvent, SalesOrderState> {
     }
 
     // Resolve employee names
-    String _empName(int refId) {
+    String empName(int refId) {
       if (refId == 0) return '';
       final match =
       _employeeList.where((e) => e['Id'] == refId).toList();
@@ -489,49 +489,49 @@ class SalesOrderBloc extends Bloc<SalesOrderEvent, SalesOrderState> {
       lAgentId: lAgentId,
       lAgentName: lAgentName,
       sealEmpId1: sealEmpId1,
-      sealEmpName1: _empName(sealEmpId1),
+      sealEmpName1: empName(sealEmpId1),
       sealEmpId2: sealEmpId2,
-      sealEmpName2: _empName(sealEmpId2),
+      sealEmpName2: empName(sealEmpId2),
       sealEmpId3: sealEmpId3,
-      sealEmpName3: _empName(sealEmpId3),
+      sealEmpName3: empName(sealEmpId3),
       breakEmpId1: breakEmpId1,
-      breakEmpName1: _empName(breakEmpId1),
+      breakEmpName1: empName(breakEmpId1),
       breakEmpId2: breakEmpId2,
-      breakEmpName2: _empName(breakEmpId2),
+      breakEmpName2: empName(breakEmpId2),
       breakEmpId3: breakEmpId3,
-      breakEmpName3: _empName(breakEmpId3),
+      breakEmpName3: empName(breakEmpId3),
       boardOfficerId1: boardOfficerId1,
-      boardingOfficerName1: _empName(boardOfficerId1),
+      boardingOfficerName1: empName(boardOfficerId1),
       boardOfficerId2: boardOfficerId2,
-      boardingOfficerName2: _empName(boardOfficerId2),
+      boardingOfficerName2: empName(boardOfficerId2),
       chkLETA: m['ChkLETA'] == 1 || m['ChkLETA'] == true,
-      dtpLETAdate: _dateStr('LETADate'),
+      dtpLETAdate: dateStr('LETADate'),
       chkLETB: m['ChkLETB'] == 1 || m['ChkLETB'] == true,
-      dtpLETBdate: _dateStr('LETBDate'),
+      dtpLETBdate: dateStr('LETBDate'),
       chkLETD: m['ChkLETD'] == 1 || m['ChkLETD'] == true,
-      dtpLETDdate: _dateStr('LETDDate'),
+      dtpLETDdate: dateStr('LETDDate'),
       chkOETA: m['ChkOETA'] == 1 || m['ChkOETA'] == true,
-      dtpOETAdate: _dateStr('OETADate'),
+      dtpOETAdate: dateStr('OETADate'),
       chkOETB: m['ChkOETB'] == 1 || m['ChkOETB'] == true,
-      dtpOETBdate: _dateStr('OETBDate'),
+      dtpOETBdate: dateStr('OETBDate'),
       chkOETD: m['ChkOETD'] == 1 || m['ChkOETD'] == true,
-      dtpOETDdate: _dateStr('OETDDate'),
+      dtpOETDdate: dateStr('OETDDate'),
       chkFlightTime: m['ChkFlightTime'] == 1 || m['ChkFlightTime'] == true,
-      dtpFlightTimeDate: _dateStr('FlightTimeDate'),
+      dtpFlightTimeDate: dateStr('FlightTimeDate'),
       chkPickUp: m['ChkPickUp'] == 1 || m['ChkPickUp'] == true,
-      dtpPickUpDate: _dateStr('PickUpDate'),
+      dtpPickUpDate: dateStr('PickUpDate'),
       chkDelivery: m['ChkDelivery'] == 1 || m['ChkDelivery'] == true,
-      dtpDeliveryDate: _dateStr('DeliveryDate'),
+      dtpDeliveryDate: dateStr('DeliveryDate'),
       chkWHEntry: m['ChkWHEntry'] == 1 || m['ChkWHEntry'] == true,
-      dtpWHEntryDate: _dateStr('WHEntryDate'),
+      dtpWHEntryDate: dateStr('WHEntryDate'),
       chkWHExit: m['ChkWHExit'] == 1 || m['ChkWHExit'] == true,
-      dtpWHExitDate: _dateStr('WHExitDate'),
+      dtpWHExitDate: dateStr('WHExitDate'),
       chkFW1: m['ChkFW1'] == 1 || m['ChkFW1'] == true,
-      dtpFW1date: _dateStr('FW1Date'),
+      dtpFW1date: dateStr('FW1Date'),
       chkFW2: m['ChkFW2'] == 1 || m['ChkFW2'] == true,
-      dtpFW2date: _dateStr('FW2Date'),
+      dtpFW2date: dateStr('FW2Date'),
       chkFW3: m['ChkFW3'] == 1 || m['ChkFW3'] == true,
-      dtpFW3date: _dateStr('FW3Date'),
+      dtpFW3date: dateStr('FW3Date'),
       fw1Dropdown: m['FW1']?.toString(),
       fw2Dropdown: m['FW2']?.toString(),
       fw3Dropdown: m['FW3']?.toString(),
@@ -707,24 +707,24 @@ class SalesOrderBloc extends Bloc<SalesOrderEvent, SalesOrderState> {
     emit(state.copyWith(
         status: SalesOrderStatus.loading, clearError: true));
 
-    String _f(String key) => event.fields[key] ?? '';
+    String f(String key) => event.fields[key] ?? '';
 
     // Pickups and Deliveries logic cleanly parsing UI fields
     List<Map<String, dynamic>> dynamicPickups = [];
-    if (_f('pickupAddress').isNotEmpty) {
+    if (f('pickupAddress').isNotEmpty) {
       dynamicPickups.add({
-        "PickupAddress": _f('pickupAddress'),
-        "PickupWeight": _f('pickupWeight'),
-        "PickupQuantity": _f('pickupQuantity'),
+        "PickupAddress": f('pickupAddress'),
+        "PickupWeight": f('pickupWeight'),
+        "PickupQuantity": f('pickupQuantity'),
       });
     }
 
     List<Map<String, dynamic>> dynamicDeliveries = [];
-    if (_f('deliveryAddress').isNotEmpty) {
+    if (f('deliveryAddress').isNotEmpty) {
       dynamicDeliveries.add({
-        "DeliveryAddress": _f('deliveryAddress'),
-        "DeliveryWeight": _f('deliveryWeight'),
-        "DeliveryQuantity": _f('deliveryQuantity'),
+        "DeliveryAddress": f('deliveryAddress'),
+        "DeliveryWeight": f('deliveryWeight'),
+        "DeliveryQuantity": f('deliveryQuantity'),
       });
     }
 
@@ -741,64 +741,64 @@ class SalesOrderBloc extends Bloc<SalesOrderEvent, SalesOrderState> {
         'SaleDate': DateTime.parse(state.dtpSaleOrderDate).toIso8601String(),
         'BillType': state.billType,
         'CNumber': state.jobNo,
-        'Remarks': _f('remarks'),
-        'DODescription': _f('doDescription'),
-        'OffVesselName': _f('offVessel'),
-        'LoadingVesselName': _f('loadingVessel'),
-        'LPort': _f('lPort'),
-        'OPort': _f('oPort'),
-        'LVesselType': _f('lVesselType'),
-        'OVesselType': _f('oVesselType'),
-        'CommodityType': _f('commodityType'),
-        'Cargo': _f('cargo'),
-        'AWBNo': _f('awbNo'),
-        'BLCopy': _f('blCopy'),
-        'OSCN': _f('oScn'),
-        'LSCN': _f('lScn'),
-        'Weight': _f('weight'),
-        'Quantity': _f('quantity'),
-        'TruckSize': state.truckSizeDropdown ?? _f('truckSize'),
-        'PTWNo': _f('ptwNo'),
-        'SMKNo1': _f('smk1'),
-        'SMKNo2': _f('smk2'),
-        'SMKNo3': _f('smk3'),
-        'ENRef1': _f('enRef1'),
-        'ENRef2': _f('enRef2'),
-        'ENRef3': _f('enRef3'),
-        'EXRef1': _f('exRef1'),
-        'EXRef2': _f('exRef2'),
-        'EXRef3': _f('exRef3'),
-        'ZBRef1': _f('zbRef1'),
-        'ZBRef2': _f('zbRef2'),
-        'Amount1': _f('amount1'),
-        'Amount2': _f('amount2'),
-        'PortChargeRef1': _f('portChargeRef1'),
-        'PortCharges': _f('portCharges'),
-        'Forwarding1S1': _f('forwarding1S1'),
-        'Forwarding1S2': _f('forwarding1S2'),
-        'Forwarding2S1': _f('forwarding2S1'),
-        'Forwarding2S2': _f('forwarding2S2'),
-        'Forwarding3S1': _f('forwarding3S1'),
-        'Forwarding3S2': _f('forwarding3S2'),
-        'WarehouseAddress': _f('warehouseAddress'),
+        'Remarks': f('remarks'),
+        'DODescription': f('doDescription'),
+        'OffVesselName': f('offVessel'),
+        'LoadingVesselName': f('loadingVessel'),
+        'LPort': f('lPort'),
+        'OPort': f('oPort'),
+        'LVesselType': f('lVesselType'),
+        'OVesselType': f('oVesselType'),
+        'CommodityType': f('commodityType'),
+        'Cargo': f('cargo'),
+        'AWBNo': f('awbNo'),
+        'BLCopy': f('blCopy'),
+        'OSCN': f('oScn'),
+        'LSCN': f('lScn'),
+        'Weight': f('weight'),
+        'Quantity': f('quantity'),
+        'TruckSize': state.truckSizeDropdown ?? f('truckSize'),
+        'PTWNo': f('ptwNo'),
+        'SMKNo1': f('smk1'),
+        'SMKNo2': f('smk2'),
+        'SMKNo3': f('smk3'),
+        'ENRef1': f('enRef1'),
+        'ENRef2': f('enRef2'),
+        'ENRef3': f('enRef3'),
+        'EXRef1': f('exRef1'),
+        'EXRef2': f('exRef2'),
+        'EXRef3': f('exRef3'),
+        'ZBRef1': f('zbRef1'),
+        'ZBRef2': f('zbRef2'),
+        'Amount1': f('amount1'),
+        'Amount2': f('amount2'),
+        'PortChargeRef1': f('portChargeRef1'),
+        'PortCharges': f('portCharges'),
+        'Forwarding1S1': f('forwarding1S1'),
+        'Forwarding1S2': f('forwarding1S2'),
+        'Forwarding2S1': f('forwarding2S1'),
+        'Forwarding2S2': f('forwarding2S2'),
+        'Forwarding3S1': f('forwarding3S1'),
+        'Forwarding3S2': f('forwarding3S2'),
+        'WarehouseAddress': f('warehouseAddress'),
 
         // Map list arrays
         'PickupsList': dynamicPickups,
         'DeliveriesList': dynamicDeliveries,
 
         // Backend expects comma-separated strings using specific case-sensitive keys
-        'PickupAddress': state.pickupAddressList.isNotEmpty ? state.pickupAddressList.join(', ') : _f('pickupAddress'),
-        'pickupQuantityList': state.pickupQuantityList.isNotEmpty ? state.pickupQuantityList.join(', ') : _f('pickupQuantity'),
+        'PickupAddress': state.pickupAddressList.isNotEmpty ? state.pickupAddressList.join(', ') : f('pickupAddress'),
+        'pickupQuantityList': state.pickupQuantityList.isNotEmpty ? state.pickupQuantityList.join(', ') : f('pickupQuantity'),
         'pickuptimelist': DateTime.now().toIso8601String(),
         
-        'DeliveryAddress': state.deliveryAddressList.isNotEmpty ? state.deliveryAddressList.join(', ') : _f('deliveryAddress'),
-        'DeliveryQuantityList': state.deliveryQuantityList.isNotEmpty ? state.deliveryQuantityList.join(', ') : _f('deliveryQuantity'),
+        'DeliveryAddress': state.deliveryAddressList.isNotEmpty ? state.deliveryAddressList.join(', ') : f('deliveryAddress'),
+        'DeliveryQuantityList': state.deliveryQuantityList.isNotEmpty ? state.deliveryQuantityList.join(', ') : f('deliveryQuantity'),
         'DelivertimeList': DateTime.now().toIso8601String(),
 
         'OriginRefId': state.originId,
-        'OriginName': _f('originName'),
+        'OriginName': f('originName'),
         'DestinationRefId': state.destinationId,
-        'DestinationName': _f('destinationName'),
+        'DestinationName': f('destinationName'),
         'AgentCompanyRefId': state.lAgentCompanyId,
         'AgentRefId': state.lAgentId,
         'OAgentCompanyRefId': state.oAgentCompanyId,

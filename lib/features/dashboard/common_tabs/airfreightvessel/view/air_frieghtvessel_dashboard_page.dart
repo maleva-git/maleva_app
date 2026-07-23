@@ -113,7 +113,7 @@ class _VesselDashboardView extends StatelessWidget {
         color: Palette.white,
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
-          BoxShadow(color: Palette.brandBorder.withOpacity(0.05), blurRadius: 15, offset: const Offset(0, 5)),
+          BoxShadow(color: Palette.brandBorder.withValues(alpha: 0.05), blurRadius: 15, offset: const Offset(0, 5)),
         ],
       ),
       child: Column(
@@ -224,11 +224,11 @@ class _VesselDashboardView extends StatelessWidget {
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       decoration: BoxDecoration(
-        color: isExpired ? Palette.rose.withOpacity(0.04) : Palette.white,
+        color: isExpired ? Palette.rose.withValues(alpha: 0.04) : Palette.white,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: isExpired ? Palette.rose.withOpacity(0.3) : Palette.grey200),
+        border: Border.all(color: isExpired ? Palette.rose.withValues(alpha: 0.3) : Palette.grey200),
         boxShadow: [
-          BoxShadow(color: Palette.grey200.withOpacity(0.5), blurRadius: 8, offset: const Offset(0, 3)),
+          BoxShadow(color: Palette.grey200.withValues(alpha: 0.5), blurRadius: 8, offset: const Offset(0, 3)),
         ],
       ),
       child: Material(
@@ -280,7 +280,7 @@ class _VesselDashboardView extends StatelessWidget {
                 const SizedBox(height: 12),
                 Row(
                   children: [
-                    Icon(Icons.airplane_ticket_outlined, size: 16, color: Palette.grey500),
+                    const Icon(Icons.airplane_ticket_outlined, size: 16, color: Palette.grey500),
                     const SizedBox(width: 6),
                     // Expanded added here to fix the RenderFlex overflow
                     Expanded(
@@ -351,9 +351,9 @@ class _VesselDashboardView extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.all(10),
         decoration: BoxDecoration(
-          color: color.withOpacity(0.1),
+          color: color.withValues(alpha: 0.1),
           borderRadius: BorderRadius.circular(10),
-          border: Border.all(color: color.withOpacity(0.3)),
+          border: Border.all(color: color.withValues(alpha: 0.3)),
         ),
         child: Icon(icon, color: color, size: 20),
       ),
@@ -392,7 +392,7 @@ class _VesselDashboardView extends StatelessWidget {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(Icons.calendar_today_rounded, size: 14, color: Palette.blue600),
+              const Icon(Icons.calendar_today_rounded, size: 14, color: Palette.blue600),
               const SizedBox(width: 6),
               Text(
                 dateText,

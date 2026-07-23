@@ -62,6 +62,7 @@ class _FuelEntryPage extends StatelessWidget {
               'Saved Successfully', context);
         }
         if (state is FuelEntryError) {
+          if (!context.mounted) return;
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text(state.message,
@@ -75,10 +76,11 @@ class _FuelEntryPage extends StatelessWidget {
           );
         }
       },
-      child: WillPopScope(
-        onWillPop: () async {
+      child: PopScope(
+        canPop: false,
+        onPopInvokedWithResult: (didPop, result) {
+          if (didPop) return;
           Navigator.pop(context);
-          return false;
         },
         child: Scaffold(
           resizeToAvoidBottomInset: true,
@@ -134,7 +136,7 @@ class _FuelEntryPage extends StatelessWidget {
           const SizedBox(height: 2),
           Text(userName,
               style: GoogleFonts.lato(
-                  color: Colors.white.withOpacity(0.65),
+                  color: Colors.white.withValues(alpha: 0.65),
                   fontWeight: FontWeight.w500,
                   fontSize: 12)),
         ],
@@ -218,7 +220,7 @@ class _FuelEntryCard extends StatelessWidget {
         boxShadow: [
           BoxShadow(
             color:
-            kHeaderGradStart.withOpacity(0.10),
+            kHeaderGradStart.withValues(alpha: 0.10),
             blurRadius: 24,
             offset: const Offset(0, 6),
           ),
@@ -310,6 +312,7 @@ class _FuelEntryCard extends StatelessWidget {
                     'Do You Want to Save Fuel Entry ?')
                     .then((ok) {
                   if (ok == true) {
+                    if (!context.mounted) return;
                     context
                         .read<FuelEntryBloc>()
                         .add(FuelEntrySaveRequested());
@@ -482,6 +485,7 @@ class _DateField extends StatelessWidget {
           ),
         );
         if (picked != null) {
+          if (!context.mounted) return;
           context.read<FuelEntryBloc>().add(
               FuelEntryDateChanged(
                   DateFormat('yyyy-MM-dd').format(picked)));
@@ -623,7 +627,7 @@ class _SaveButton extends StatelessWidget {
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
-            color: kHeaderGradStart.withOpacity(0.35),
+            color: kHeaderGradStart.withValues(alpha: 0.35),
             blurRadius: 12,
             offset: const Offset(0, 4),
           ),
@@ -663,10 +667,10 @@ class _AppBarButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.15),
+        color: Colors.white.withValues(alpha: 0.15),
         borderRadius: BorderRadius.circular(8),
         border: Border.all(
-            color: Colors.white.withOpacity(0.4),
+            color: Colors.white.withValues(alpha: 0.4),
             width: 0.5),
       ),
       child: Material(

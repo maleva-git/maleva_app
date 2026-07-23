@@ -1,6 +1,5 @@
 import 'package:maleva/core/network/api_legacy_helper.dart';
 import 'dart:io';
-
 import 'package:app_version_update/app_version_update.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -10,7 +9,6 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:maleva/core/theme/palette.dart';
 import 'package:maleva/core/utils/app_globals.dart';
 import 'package:maleva/menu/menulist.dart';
-
 import '../../../core/theme/tokens.dart';
 import '../bloc/home_bloc.dart';
 import '../bloc/home_event.dart';
@@ -53,6 +51,7 @@ class _HomeDashboardViewState extends State<_HomeDashboardView> {
     );
 
     if (confirmed) {
+      if (!mounted) return false;
       context.read<HomeDashboardBloc>().add(const HomeDashboardExitConfirmed());
 
       if (Platform.isAndroid) {
@@ -72,8 +71,12 @@ class _HomeDashboardViewState extends State<_HomeDashboardView> {
     return BlocConsumer<HomeDashboardBloc, HomeDashboardState>(
       listener: _handleListener,
       builder: (ctx, state) {
-        return WillPopScope(
-          onWillPop: _onBackPressed,
+        return PopScope(
+          canPop: false,
+          onPopInvokedWithResult: (didPop, result) async {
+            if (didPop) return;
+            await _onBackPressed();
+          },
           child: LayoutBuilder(
             builder: (_, constraints) {
               final bool isTablet = constraints.maxWidth >= _kTabletBreak;
@@ -143,7 +146,7 @@ class _HomeDashboardViewState extends State<_HomeDashboardView> {
             content:
             'Would you like to update your app to the latest version?',
             contentTextStyle: GoogleFonts.lato(
-              textStyle: TextStyle(
+              textStyle: const TextStyle(
                 color: AppTokens.textPrimary,
                 fontWeight: FontWeight.w400,
               ),
@@ -231,11 +234,11 @@ class _MobileDashboard extends StatelessWidget {
     return Scaffold(
       resizeToAvoidBottomInset: false,
       backgroundColor: Palette.white,
-      appBar: _DashboardAppBar(isTablet: false),
+      appBar: const _DashboardAppBar(isTablet: false),
       drawer: const Menulist(),
       body: state.isLoading
-          ? _LoadingBody(isTablet: false)
-          : _ReadyBody(isTablet: false),
+          ? const _LoadingBody(isTablet: false)
+          : const _ReadyBody(isTablet: false),
     );
   }
 }
@@ -266,11 +269,11 @@ class _TabletDashboard extends StatelessWidget {
           Expanded(
             child: Column(
               children: [
-                _DashboardAppBar(isTablet: true),
+                const _DashboardAppBar(isTablet: true),
                 Expanded(
                   child: state.isLoading
-                      ? _LoadingBody(isTablet: true)
-                      : _ReadyBody(isTablet: true),
+                      ? const _LoadingBody(isTablet: true)
+                      : const _ReadyBody(isTablet: true),
                 ),
               ],
             ),
@@ -379,7 +382,7 @@ class _ReadyBody extends StatelessWidget {
               image: DecorationImage(
                 image: AppGlobals.logo,
                 colorFilter: ColorFilter.mode(
-                  Colors.white.withOpacity(0.5),
+                  Colors.white.withValues(alpha: 0.5),
                   BlendMode.dstATop,
                 ),
               ),
@@ -441,7 +444,7 @@ class _TabletSideRail extends StatelessWidget {
               children: [
                 CircleAvatar(
                   radius: 28,
-                  backgroundColor: Palette.white.withOpacity(0.2),
+                  backgroundColor: Palette.white.withValues(alpha: 0.2),
                   child: const Icon(Icons.person_outline,
                       color: Palette.white, size: 28),
                 ),

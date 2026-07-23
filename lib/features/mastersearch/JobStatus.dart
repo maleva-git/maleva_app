@@ -186,7 +186,7 @@ class _JobStatusstate extends State<JobStatus> {
                                                 color: colour.commonColor.withValues(alpha: 0.08),
                                                 shape: BoxShape.circle,
                                               ),
-                                              child: Icon(Icons.list_alt_rounded, color: colour.commonColor, size: 20),
+                                              child: const Icon(Icons.list_alt_rounded, color: colour.commonColor, size: 20),
                                             ),
                                             const SizedBox(width: 16),
                                             Expanded(

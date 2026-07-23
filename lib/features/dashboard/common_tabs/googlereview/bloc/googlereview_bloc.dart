@@ -189,7 +189,9 @@ class ReviewBloc extends Bloc<ReviewEvent, ReviewState> {
 
     if (current.selectedEmpId == null ||
         current.fromDate == null ||
-        current.toDate == null) return;
+        current.toDate == null) {
+      return;
+    }
 
     emit(current.copyWith(loading: true));
 

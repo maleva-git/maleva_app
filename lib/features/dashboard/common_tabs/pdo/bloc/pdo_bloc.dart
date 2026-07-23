@@ -91,8 +91,8 @@ class PDOBloc extends Bloc<PDOViewEvent, PDOViewState> {
         ? List<RTIMasterViewModel>.from(_s.allMasters)
         : _s.allMasters.where((m) {
       return (m.RTINoDisplay.toLowerCase().contains(q)) ||
-          (m.DriverName?.toLowerCase().contains(q) ?? false) ||
-          (m.TruckName?.toLowerCase().contains(q) ?? false);
+          (m.DriverName.toLowerCase().contains(q) ?? false) ||
+          (m.TruckName.toLowerCase().contains(q) ?? false);
     }).toList();
 
     emit(_s.copyWith(

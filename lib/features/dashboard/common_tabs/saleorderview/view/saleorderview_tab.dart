@@ -274,7 +274,7 @@ class _SaleOrderViewState extends State<_SaleOrderView> {
           icon: const Icon(Icons.bluetooth_audio, size: 24),
           tooltip: 'Bluetooth',
           onPressed: () => Navigator.push(context,
-              MaterialPageRoute(builder: (_) => BluetoothPage())),
+              MaterialPageRoute(builder: (_) => const BluetoothPage())),
         ),
         IconButton(
           icon: const Icon(Icons.print, size: 24),
@@ -930,7 +930,7 @@ class _ETAChip extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final bool hasValue = value.isNotEmpty && value != 'null';
-    final Color successText = const Color(0xFF047857); // Deep Emerald Green
+    const Color successText = Color(0xFF047857); // Deep Emerald Green
     final Color successBg = const Color(0xFF059669).withValues(alpha: 0.12); // Soft Emerald
     
     return Container(
@@ -1045,9 +1045,10 @@ class _FilterSheet extends StatelessWidget {
                     MaterialPageRoute(
                         builder: (_) =>
                         const Customer(Searchby: 1, SearchId: 0)),
-                  ).then((_navRes) { if (_navRes != null) { AppGlobals.SelectCustomerList = _navRes; }
+                  ).then((navRes) { if (navRes != null) { AppGlobals.SelectCustomerList = navRes; }
                     txtCustomer.text =
                         AppGlobals.SelectCustomerList.AccountName;
+                    if (!context.mounted) return;
                     ctx.read<SaleOrderBloc>().add(SaleOrderCustomerChanged(
                       AppGlobals.SelectCustomerList.Id,
                       AppGlobals.SelectCustomerList.AccountName,
@@ -1074,9 +1075,10 @@ class _FilterSheet extends StatelessWidget {
                     MaterialPageRoute(
                         builder: (_) =>
                         const Employee(Searchby: 1, SearchId: 0)),
-                  ).then((_navRes) { if (_navRes != null) { AppGlobals.SelectEmployeeList = _navRes; }
+                  ).then((navRes) { if (navRes != null) { AppGlobals.SelectEmployeeList = navRes; }
                     txtEmployee.text =
                         AppGlobals.SelectEmployeeList.AccountName;
+                    if (!context.mounted) return;
                     ctx.read<SaleOrderBloc>().add(SaleOrderEmployeeChanged(
                       AppGlobals.SelectEmployeeList.Id,
                       AppGlobals.SelectEmployeeList.AccountName,
@@ -1102,8 +1104,9 @@ class _FilterSheet extends StatelessWidget {
                     MaterialPageRoute(
                         builder: (_) =>
                         const JobStatus(Searchby: 1, SearchId: 0)),
-                  ).then((_navRes) { if (_navRes != null) { AppGlobals.SelectJobStatusList = _navRes; }
+                  ).then((navRes) { if (navRes != null) { AppGlobals.SelectJobStatusList = navRes; }
                     txtStatus.text = AppGlobals.SelectJobStatusList.Name;
+                    if (!context.mounted) return;
                     ctx.read<SaleOrderBloc>().add(SaleOrderStatusChanged(
                       AppGlobals.SelectJobStatusList.Id,
                       AppGlobals.SelectJobStatusList.Name,
@@ -1398,7 +1401,7 @@ class _EmptyWidget extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         children: [
           Icon(Icons.inbox_rounded,
-              size: 64, color: Palette.grey400.withOpacity(0.6)),
+              size: 64, color: Palette.grey400.withValues(alpha: 0.6)),
           const SizedBox(height: 12),
           Text('No orders found',
               style: GoogleFonts.lato(

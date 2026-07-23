@@ -72,9 +72,11 @@ class _ReviewEntryFormState extends State<ReviewEntryForm> {
           _shopCtrl.clear();
           _mobileCtrl.clear();
           _reviewMsgCtrl.clear();
+          if (!context.mounted) return;
           context.read<ReviewBloc>().add(const ResetFormEvent());
         }
         if (state is ReviewError) {
+          if (!context.mounted) return;
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
                 content:         Text(state.message),
@@ -363,7 +365,7 @@ class _ReviewEntryFormState extends State<ReviewEntryForm> {
       decoration: BoxDecoration(
         color:         AppTokens.brandLight,
         borderRadius: BorderRadius.circular(isTablet ? 14 : 12),
-        border: Border.all(color: AppTokens.brandMid.withOpacity(0.3)),
+        border: Border.all(color: AppTokens.brandMid.withValues(alpha: 0.3)),
       ),
       child: Row(children: [
         Icon(Icons.calendar_today_rounded,
@@ -394,6 +396,7 @@ class _ReviewEntryFormState extends State<ReviewEntryForm> {
                 lastDate:    DateTime(2100),
               );
               if (picked != null) {
+                if (!context.mounted) return;
                 context
                     .read<ReviewBloc>()
                     .add(SelectDateEvent(picked));
@@ -476,6 +479,7 @@ class _ReviewEntryFormState extends State<ReviewEntryForm> {
                   builder: (_) => const ReviewGridPage()),
             );
             if (result == true) {
+              if (!context.mounted) return;
               context
                   .read<ReviewBloc>()
                   .add(const LoadEmployeeEvent());
@@ -556,7 +560,7 @@ class _ReviewEntryFormState extends State<ReviewEntryForm> {
             color:         AppTokens.brandLight,
             borderRadius: BorderRadius.circular(isTablet ? 14 : 12),
             border: Border.all(
-                color: AppTokens.brandMid.withOpacity(0.3)),
+                color: AppTokens.brandMid.withValues(alpha: 0.3)),
           ),
           child: child,
         ),
@@ -589,7 +593,7 @@ class _InfoPanel extends StatelessWidget {
         border: Border.all(color: AppTokens.brandLight, width: 1.5),
         boxShadow: [
           BoxShadow(
-            color:     AppTokens.brandGradientStart.withOpacity(0.07),
+            color:     AppTokens.brandGradientStart.withValues(alpha: 0.07),
             blurRadius: 16,
             offset:    const Offset(0, 5),
           ),
@@ -637,7 +641,7 @@ class _InfoPanel extends StatelessWidget {
                 Text('Rating',
                     style: GoogleFonts.lato(
                       fontSize: 11,
-                      color:    Colors.white.withOpacity(0.75),
+                      color:    Colors.white.withValues(alpha: 0.75),
                     )),
                 const SizedBox(height: 4),
                 Text(

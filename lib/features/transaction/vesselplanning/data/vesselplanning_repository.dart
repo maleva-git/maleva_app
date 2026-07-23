@@ -37,7 +37,7 @@ class VesselPlanningRepository {
         null,
         null); // Pass context as null since it isn't used effectively in apiAllinoneSelect
 
-    if (resultData != null && resultData.isNotEmpty) {
+    if (resultData.isNotEmpty) {
       AppGlobals.VesselPlanningEditList = resultData[0]["SaleDetails"].toList();
     } else {
       AppGlobals.VesselPlanningEditList = [];

@@ -1,7 +1,6 @@
 import 'package:maleva/core/network/api_legacy_helper.dart';
 import 'package:maleva/core/network/api_constants.dart';
 import 'package:maleva/core/utils/app_preferences.dart';
-import 'package:maleva/core/utils/app_globals.dart';
 
 class ExpenseReportResult {
   final List<Map<String, dynamic>> data1;
@@ -16,7 +15,7 @@ class ExpenseReportRepository {
     required String toDate,
   }) async {
     try {
-      final String comId = (await AppPreferences.getComid()).toString();
+      final String comId = (AppPreferences.getComid()).toString();
 
       Map<String, String> header = {
         'Content-Type': 'application/json; charset=UTF-8',

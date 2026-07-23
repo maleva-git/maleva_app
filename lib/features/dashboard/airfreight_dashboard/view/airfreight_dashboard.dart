@@ -1,5 +1,4 @@
 import 'package:flutter/Material.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../core/di/injection.dart';
 import '../../admin_dashboard/bloc/admin_tab_bloc.dart';
@@ -14,8 +13,6 @@ import '../../common_tabs/spotsaleorder/view/spotsaleorder_add.dart';
 import '../../common_tabs/transport/bloc/transport_bloc.dart';
 import '../../common_tabs/transport/bloc/transport_event.dart';
 import '../../common_tabs/transport/view/transportview_tab.dart';
-import '../../common_tabs/vesselreport/bloc/vesselreport_bloc.dart';
-import '../../common_tabs/vesselreport/view/vesselreportview_tab.dart';
 import '../bloc/airfreight_bloc.dart';
 import '../bloc/airfreight_event.dart';
 import 'airfreight_dashboard_ui.dart';
@@ -62,7 +59,7 @@ class _AirfreightDashboardState extends State<AirfreightDashboard> with SingleTi
             BlocProvider(
               // Pass the context into sl() using param1
               create: (context) => sl<VesselDashboardBloc>(param1: context),
-              child: VesselDashboard(),
+              child: const VesselDashboard(),
             ),
             BlocProvider(
               create: (context) => sl<TransportBloc>()

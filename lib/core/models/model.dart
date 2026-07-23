@@ -1,4 +1,3 @@
-import 'package:maleva/core/models/shared/license_view_model.dart';
 // GENERATED BARREL FILE
 // This file exports all models for backward compatibility.
 // ignore_for_file: non_constant_identifier_names

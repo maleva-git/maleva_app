@@ -167,7 +167,7 @@ class _FuelFillingBodyState extends State<_FuelFillingBody> {
                 }
                 if (state is FuelFillingLoaded) {
                   if (state.fuelFillingRecords.isEmpty) {
-                    return _EmptyState(isTablet: true);
+                    return const _EmptyState(isTablet: true);
                   }
                   return ListView.builder(
                     itemCount: state.fuelFillingRecords.length,
@@ -227,7 +227,7 @@ class _FuelFillingBodyState extends State<_FuelFillingBody> {
               }
               if (state is FuelFillingLoaded) {
                 if (state.fuelFillingRecords.isEmpty) {
-                  return _EmptyState(isTablet: false);
+                  return const _EmptyState(isTablet: false);
                 }
                 return ListView.builder(
                   itemCount: state.fuelFillingRecords.length,
@@ -337,11 +337,11 @@ class _DateButton extends StatelessWidget {
           color:         colour.kWhite,
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
-              color: AppTokens.brandGradientStart.withOpacity(0.4),
+              color: AppTokens.brandGradientStart.withValues(alpha: 0.4),
               width: 1.5),
           boxShadow: [
             BoxShadow(
-              color:      AppTokens.brandGradientStart.withOpacity(0.07),
+              color:      AppTokens.brandGradientStart.withValues(alpha: 0.07),
               blurRadius: 8,
               offset:     const Offset(0, 3),
             ),
@@ -404,7 +404,7 @@ class _CountBadge extends StatelessWidget {
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color:     AppTokens.brandGradientStart.withOpacity(0.30),
+            color:     AppTokens.brandGradientStart.withValues(alpha: 0.30),
             blurRadius: 16,
             offset:    const Offset(0, 6),
           ),
@@ -414,7 +414,7 @@ class _CountBadge extends StatelessWidget {
         Container(
           padding: const EdgeInsets.all(10),
           decoration: BoxDecoration(
-            color: colour.kWhite.withOpacity(0.20),
+            color: colour.kWhite.withValues(alpha: 0.20),
             shape: BoxShape.circle,
           ),
           child: const Icon(Icons.local_gas_station_rounded,
@@ -427,7 +427,7 @@ class _CountBadge extends StatelessWidget {
             Text('Total Records',
                 style: GoogleFonts.lato(
                   fontSize:   12,
-                  color:      colour.kWhite.withOpacity(0.75),
+                  color:      colour.kWhite.withValues(alpha: 0.75),
                   fontWeight: FontWeight.w500,
                 )),
             Text('$count',
@@ -462,7 +462,7 @@ class _FuelFillingCard extends StatelessWidget {
           border: Border.all(color: AppTokens.brandLight, width: 1.5),
           boxShadow: [
             BoxShadow(
-              color:     AppTokens.brandGradientStart.withOpacity(0.08),
+              color:     AppTokens.brandGradientStart.withValues(alpha: 0.08),
               blurRadius: 10,
               offset:    const Offset(0, 4),
             ),
@@ -541,7 +541,7 @@ class _FuelFillingCard extends StatelessWidget {
                         label:     record.filled.isNotEmpty
                             ? "${record.filled} L"
                             : "N/A",
-                        bgColor:   AppTokens.brandGradientStart.withOpacity(0.1),
+                        bgColor:   AppTokens.brandGradientStart.withValues(alpha: 0.1),
                         textColor: AppTokens.brandGradientStart,
                         isTablet:  isTablet,
                       ),
@@ -553,7 +553,7 @@ class _FuelFillingCard extends StatelessWidget {
                         label:     record.location.isNotEmpty
                             ? record.location
                             : "N/A",
-                        bgColor:   Colors.orange.withOpacity(0.1),
+                        bgColor:   Colors.orange.withValues(alpha: 0.1),
                         textColor: Colors.orange.shade700,
                         isTablet:  isTablet,
                       ),
@@ -605,7 +605,7 @@ class _FuelFillingCard extends StatelessWidget {
               borderRadius: BorderRadius.circular(20),
               boxShadow: [
                 BoxShadow(
-                  color:     AppTokens.brandGradientStart.withOpacity(0.18),
+                  color:     AppTokens.brandGradientStart.withValues(alpha: 0.18),
                   blurRadius: 30,
                   offset:    const Offset(0, 10),
                 ),
@@ -725,7 +725,7 @@ class _FuelFillingCard extends StatelessWidget {
   }
 
   Widget _buildDivider() =>
-      Divider(color: AppTokens.brandLight, thickness: 1.5, height: 24);
+      const Divider(color: AppTokens.brandLight, thickness: 1.5, height: 24);
 
   Widget _buildInfoRow(
       IconData icon, String label, String? value,

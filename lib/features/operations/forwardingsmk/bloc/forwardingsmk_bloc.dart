@@ -116,7 +116,7 @@ class FWSmkBloc extends Bloc<FWSmkEvent, FWSmkState> {
 
       final today = DateFormat('yyyy-MM-dd').format(DateTime.now());
 
-      String _parseDate(dynamic raw) {
+      String parseDate(dynamic raw) {
         if (raw == null) return today;
         try {
           return DateFormat('yyyy-MM-dd')
@@ -134,7 +134,7 @@ class FWSmkBloc extends Bloc<FWSmkEvent, FWSmkState> {
         fwDropdown:  (m[0]['Forwarding'] == null || m[0]['Forwarding'] == '')
             ? null
             : m[0]['Forwarding'],
-        date:        _parseDate(m[0]['ForwardingDate']),
+        date:        parseDate(m[0]['ForwardingDate']),
         dateEnabled: m[0]['ForwardingDate'] != null,
         original:    (m[0]['Original'] != null && (m[0]['Original'] == 1 || m[0]['Original'] == true)), // 🔥 Fix: Add null check
 
@@ -147,7 +147,7 @@ class FWSmkBloc extends Bloc<FWSmkEvent, FWSmkState> {
         fwDropdown:  (m[0]['Forwarding2'] == null || m[0]['Forwarding2'] == '')
             ? null
             : m[0]['Forwarding2'],
-        date:        _parseDate(m[0]['Forwarding2Date']),
+        date:        parseDate(m[0]['Forwarding2Date']),
         dateEnabled: m[0]['Forwarding2Date'] != null,
         original:    (m[0]['Original'] != null && (m[0]['Original'] == 1 || m[0]['Original'] == true)), // 🔥 Fix: Add null check
       );
@@ -159,7 +159,7 @@ class FWSmkBloc extends Bloc<FWSmkEvent, FWSmkState> {
         fwDropdown:  (m[0]['Forwarding3'] == null || m[0]['Forwarding3'] == '')
             ? null
             : m[0]['Forwarding3'],
-        date:        _parseDate(m[0]['Forwarding3Date']),
+        date:        parseDate(m[0]['Forwarding3Date']),
         dateEnabled: m[0]['Forwarding3Date'] != null,
         original:    (m[0]['Original'] != null && (m[0]['Original'] == 1 || m[0]['Original'] == true)), // 🔥 Fix: Add null check
       );

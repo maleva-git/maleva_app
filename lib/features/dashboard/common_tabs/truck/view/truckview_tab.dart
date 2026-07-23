@@ -239,11 +239,11 @@ class _SearchBar extends StatelessWidget {
         color:         colour.kWhite,
         borderRadius: BorderRadius.circular(14),
         border: Border.all(
-            color: AppTokens.brandGradientStart.withOpacity(0.3),
+            color: AppTokens.brandGradientStart.withValues(alpha: 0.3),
             width: 1.5),
         boxShadow: [
           BoxShadow(
-            color:      AppTokens.brandGradientStart.withOpacity(0.07),
+            color:      AppTokens.brandGradientStart.withValues(alpha: 0.07),
             blurRadius: 10,
             offset:     const Offset(0, 3),
           ),
@@ -348,7 +348,7 @@ class _CountBadge extends StatelessWidget {
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color:     AppTokens.brandGradientStart.withOpacity(0.30),
+            color:     AppTokens.brandGradientStart.withValues(alpha: 0.30),
             blurRadius: 16,
             offset:    const Offset(0, 6),
           ),
@@ -358,7 +358,7 @@ class _CountBadge extends StatelessWidget {
         Container(
           padding: const EdgeInsets.all(10),
           decoration: BoxDecoration(
-            color: colour.kWhite.withOpacity(0.20),
+            color: colour.kWhite.withValues(alpha: 0.20),
             shape: BoxShape.circle,
           ),
           child: const Icon(Icons.local_shipping_rounded,
@@ -371,7 +371,7 @@ class _CountBadge extends StatelessWidget {
             Text('Total Trucks',
                 style: GoogleFonts.poppins(
                   fontSize:   12,
-                  color:      colour.kWhite.withOpacity(0.75),
+                  color:      colour.kWhite.withValues(alpha: 0.75),
                   fontWeight: FontWeight.w500,
                 )),
             Text('$count',
@@ -410,7 +410,7 @@ class _TruckCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(isTablet ? 16 : 16),
         child: InkWell(
           borderRadius: BorderRadius.circular(isTablet ? 16 : 16),
-          splashColor: AppTokens.brandGradientStart.withOpacity(0.08),
+          splashColor: AppTokens.brandGradientStart.withValues(alpha: 0.08),
           onTap: () => _showTruckDialog(context, truck, isTablet),
           child: Container(
             padding: EdgeInsets.symmetric(
@@ -422,13 +422,13 @@ class _TruckCard extends StatelessWidget {
               border: Border.all(
                 color: isEven
                     ? AppTokens.brandLight
-                    : AppTokens.brandMid.withOpacity(0.3),
+                    : AppTokens.brandMid.withValues(alpha: 0.3),
                 width: 1.2,
               ),
               boxShadow: isEven
                   ? [
                 BoxShadow(
-                  color:     AppTokens.brandGradientStart.withOpacity(0.05),
+                  color:     AppTokens.brandGradientStart.withValues(alpha: 0.05),
                   blurRadius: 8,
                   offset:    const Offset(0, 3),
                 )
@@ -443,7 +443,7 @@ class _TruckCard extends StatelessWidget {
                 decoration: BoxDecoration(
                   color: isEven
                       ? AppTokens.brandLight
-                      : AppTokens.brandGradientStart.withOpacity(0.12),
+                      : AppTokens.brandGradientStart.withValues(alpha: 0.12),
                   borderRadius: BorderRadius.circular(isTablet ? 10 : 12),
                 ),
                 child: Icon(Icons.local_shipping_rounded,
@@ -476,7 +476,7 @@ class _TruckCard extends StatelessWidget {
                         style: GoogleFonts.poppins(
                           fontSize: 11,
                           color:
-                          AppTokens.brandMid.withOpacity(0.7),
+                          AppTokens.brandMid.withValues(alpha: 0.7),
                         ),
                       ),
                     ],
@@ -490,7 +490,7 @@ class _TruckCard extends StatelessWidget {
                 decoration: BoxDecoration(
                   color: isEven
                       ? AppTokens.brandLight
-                      : AppTokens.brandGradientStart.withOpacity(0.12),
+                      : AppTokens.brandGradientStart.withValues(alpha: 0.12),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Icon(Icons.chevron_right_rounded,
@@ -544,7 +544,7 @@ class _TruckCard extends StatelessWidget {
                   Container(
                     padding: const EdgeInsets.all(8),
                     decoration: BoxDecoration(
-                      color: colour.kWhite.withOpacity(0.2),
+                      color: colour.kWhite.withValues(alpha: 0.2),
                       borderRadius: BorderRadius.circular(10),
                     ),
                     child: Icon(Icons.local_shipping_rounded,
@@ -558,7 +558,7 @@ class _TruckCard extends StatelessWidget {
                       children: [
                         Text('Truck Info',
                             style: GoogleFonts.poppins(
-                                color:    colour.kWhite.withOpacity(0.8),
+                                color:    colour.kWhite.withValues(alpha: 0.8),
                                 fontSize: isTablet ? 12 : 11)),
                         Text(
                           truck.TruckNumber.isNotEmpty
@@ -580,7 +580,7 @@ class _TruckCard extends StatelessWidget {
               // Expiry rows
               ...expiryItems.map((e) => _ExpiryRow(
                 label:   e['label'] as String,
-                rawDate: e['date'] as String?,
+                rawDate: e['date'],
                 isTablet: isTablet,
               )),
 
@@ -654,9 +654,9 @@ class _ExpiryRow extends StatelessWidget {
             vertical:   isTablet ? 5  : 4,
           ),
           decoration: BoxDecoration(
-            color:         color.withOpacity(0.1),
+            color:         color.withValues(alpha: 0.1),
             borderRadius: BorderRadius.circular(8),
-            border:        Border.all(color: color.withOpacity(0.3)),
+            border:        Border.all(color: color.withValues(alpha: 0.3)),
           ),
           child: Text(formatted,
               style: GoogleFonts.poppins(

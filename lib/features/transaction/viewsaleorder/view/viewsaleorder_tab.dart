@@ -74,10 +74,11 @@ class _GetJobNoPageView extends StatelessWidget {
           );
         }
       },
-      child: WillPopScope(
-        onWillPop: () async {
+      child: PopScope(
+        canPop: false,
+        onPopInvokedWithResult: (didPop, result) {
+          if (didPop) return;
           Navigator.pop(context);
-          return false;
         },
         child: Scaffold(
           resizeToAvoidBottomInset: true,
@@ -178,7 +179,7 @@ class _JobNoCard extends StatelessWidget {
         border: Border.all(color: AppTokens.maintCardBorder, width: 0.5),
         boxShadow: [
           BoxShadow(
-            color: AppTokens.invoiceHeaderStart.withOpacity(0.10),
+            color: AppTokens.invoiceHeaderStart.withValues(alpha: 0.10),
             blurRadius: 24,
             offset: const Offset(0, 8),
           ),
@@ -467,7 +468,7 @@ class _JobNoFieldState extends State<_JobNoField> {
               border: Border.all(color: AppTokens.maintCardBorder, width: 0.5),
               boxShadow: [
                 BoxShadow(
-                  color: AppTokens.invoiceHeaderStart.withOpacity(0.10),
+                  color: AppTokens.invoiceHeaderStart.withValues(alpha: 0.10),
                   blurRadius: 12,
                   offset: const Offset(0, 4),
                 ),
@@ -628,7 +629,7 @@ class _GradientButton extends StatelessWidget {
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
-            color: AppTokens.invoiceHeaderStart.withOpacity(0.35),
+            color: AppTokens.invoiceHeaderStart.withValues(alpha: 0.35),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),

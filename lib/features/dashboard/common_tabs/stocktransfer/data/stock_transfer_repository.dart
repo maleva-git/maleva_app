@@ -42,6 +42,6 @@ class StockTransferRepository {
   Future<String?> scanBarcode() async {
     await SystemHelpers.barcodeScanning();
     if (AppGlobals.barcodeerror == true) return null;
-    return AppGlobals.barcodestring as String;
+    return AppGlobals.barcodestring;
   }
 }

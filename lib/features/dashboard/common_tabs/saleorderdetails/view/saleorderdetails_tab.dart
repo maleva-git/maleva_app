@@ -1256,10 +1256,11 @@ class _SaleOrderDetailsViewState extends State<_SaleOrderDetailsView>
           _tabController.index = st.currentTabIndex;
         }
 
-        return WillPopScope(
-          onWillPop: () async {
+        return PopScope(
+          canPop: false,
+          onPopInvokedWithResult: (didPop, result) {
+            if (didPop) return;
             Navigator.of(ctx).pop();
-            return true;
           },
           child: Scaffold(
             resizeToAvoidBottomInset: true,
