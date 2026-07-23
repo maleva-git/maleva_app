@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 import 'package:maleva/features/dashboard/common_tabs/salesorder/bloc/salesorder_bloc.dart';
 import '../../../../core/di/injection.dart';
+import '../../../../core/utils/app_preferences.dart';
 import '../../admin_dashboard/bloc/admin_tab_bloc.dart';
 import '../../common_tabs/inventoryreport/bloc/inventoryreport_bloc.dart';
 import '../../common_tabs/inventoryreport/data/inventoryreport_repository.dart';
@@ -39,9 +40,10 @@ class _AdminDashboardState extends State<BoardingDashboard> with SingleTickerPro
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 6, vsync: this);
+    final roleId = AppPreferences.getRoleId();
+    final int tabCount = (roleId == 500) ? 4 : 6;
+    _tabController = TabController(length: tabCount, vsync: this);
     _tabController.addListener(_onTabChanged);
-
   }
 
   void _onTabChanged(){

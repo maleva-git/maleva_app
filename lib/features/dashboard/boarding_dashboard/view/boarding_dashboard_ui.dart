@@ -3,6 +3,7 @@ import 'package:flutter/Material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:maleva/core/utils/app_globals.dart';
+import 'package:maleva/core/utils/app_preferences.dart';
 import 'package:maleva/core/colors/colors.dart' as colour;
 import '../../../../core/bluetooth/view/Bluetooth_tab.dart';
 import '../../../../core/colors/colors.dart';
@@ -124,8 +125,8 @@ class BoardingMobileDashboard extends StatelessWidget {
 
           _tab('VSL',             isTablet),  //1
           _tab('Salary',          isTablet),  //2
-          _tab('SpotsSaleOrder',  isTablet),  //3
-          _tab('InventoryReport', isTablet),  //4
+          if (AppPreferences.getRoleId() != 500) _tab('SpotsSaleOrder',  isTablet),  //3
+          if (AppPreferences.getRoleId() != 500) _tab('InventoryReport', isTablet),  //4
 
           _tab('LeaveApproval', isTablet),
           _tab('EmpLeave', isTablet),
@@ -170,8 +171,8 @@ class BoardingMobileDashboard extends StatelessWidget {
 
           const VesselReportPage(),  //1
           const SalaryTab(),  //2
-          const SpotSaleEntryPage(),  //3
-          const InventoryPage(),   //4
+          if (AppPreferences.getRoleId() != 500) const SpotSaleEntryPage(),  //3
+          if (AppPreferences.getRoleId() != 500) const InventoryPage(),   //4
 
           const AdminLeaveApprovalTab(),
           const EmployeeLeaveRequestTab(),

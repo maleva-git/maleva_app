@@ -60,7 +60,7 @@ import 'package:maleva/core/models/shared/r_t_i_details_view_model.dart';
 class AppGlobals {
   AppGlobals._();
 
-  static String appversion="1.1.10+114";
+  static String appversion="1.1.12+125";
   static bool homepagecall = false;
   static AssetImage logo = const AssetImage('assets/company/logo.png');
   static AssetImage splashlogo = const AssetImage('assets/company/roundlogo.png');

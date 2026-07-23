@@ -11,7 +11,8 @@ import '../bloc/vesselreport_bloc.dart';
 import '../bloc/vesselreport_event.dart';
 import '../bloc/vesselreport_state.dart';
 import 'package:maleva/core/colors/colors.dart' as colour;
-
+import 'package:maleva/core/network/api_services/master_api.dart';
+import 'package:maleva/features/operations/models/job_status_model.dart';
 // VesselReportPage — REMOVE BlocProvider from here
 class VesselReportPage extends StatelessWidget {
   const VesselReportPage({super.key});
@@ -162,6 +163,7 @@ class _VesselReportViewState extends State<_VesselReportView> {
                 children: [
                   _SectionHeader(title: 'Vessel Report', isTablet: true),
                   const SizedBox(height: 20),
+                  /*
                   _SearchCard(
                     txtPort:     _txtPort,
                     txtRemarks:  _txtRemarks,
@@ -170,6 +172,7 @@ class _VesselReportViewState extends State<_VesselReportView> {
                     isTablet:    true,
                   ),
                   const SizedBox(height: 16),
+                  */
                   _DayToggle(
                     isPlanToday: _isPlanToday,
                     isTablet:    true,
@@ -217,6 +220,7 @@ class _VesselReportViewState extends State<_VesselReportView> {
                         jobNo: item["JobNo"]?.toString() ?? '',
                         isTablet: true,
                         itemData: item,
+                        isPlanToday: _isPlanToday,
                       );
                     },
                   ),
@@ -244,6 +248,7 @@ class _VesselReportViewState extends State<_VesselReportView> {
         _SectionHeader(title: 'Vessel Report', isTablet: false),
         const SizedBox(height: 16),
 
+        /*
         _SearchCard(
           txtPort:     _txtPort,
           txtRemarks:  _txtRemarks,
@@ -252,6 +257,7 @@ class _VesselReportViewState extends State<_VesselReportView> {
           isTablet:    false,
         ),
         const SizedBox(height: 14),
+        */
 
         _DayToggle(
           isPlanToday: _isPlanToday,
@@ -288,6 +294,7 @@ class _VesselReportViewState extends State<_VesselReportView> {
               jobNo:      item["JobNo"]?.toString() ?? '',
               isTablet:   false,
               itemData:   item,
+              isPlanToday: _isPlanToday,
             );
           }),
       ],
@@ -706,6 +713,7 @@ class _VesselCard extends StatelessWidget {
   final String jobNo;
   final bool isTablet;
   final Map<String, dynamic> itemData;
+  final bool isPlanToday;
 
   const _VesselCard({
     required this.index,
@@ -713,59 +721,126 @@ class _VesselCard extends StatelessWidget {
     required this.jobNo,
     required this.isTablet,
     required this.itemData,
+    required this.isPlanToday,
   });
+
+  Color _getThemeColor(String status) {
+    final colors = [
+      Colors.blue,
+      Colors.orange,
+      Colors.purple,
+      Colors.teal,
+      Colors.pink,
+      Colors.indigo,
+    ];
+    if (status.isEmpty) return AppTokens.brandGradientStart;
+    final int hash = status.codeUnits.fold(0, (p, c) => p + c);
+    return colors[hash % colors.length];
+  }
 
   @override
   Widget build(BuildContext context) {
     final isEven = index % 2 == 0;
+    final status = itemData['JobStatus']?.toString().trim() ?? '';
+    final themeColor = _getThemeColor(status);
+    final offVessel = itemData['Offvesselname']?.toString().trim();
+    final hasTransshipment = offVessel != null && offVessel.isNotEmpty && offVessel != '-';
+
+    bool _hasDateValue(dynamic value) {
+      if (value == null) return false;
+      final str = value.toString().trim();
+      if (str.isEmpty || str.startsWith('0001-01-01') || str.startsWith('1900-')) return false;
+      return true;
+    }
+
+    bool hasLoadingDates = _hasDateValue(itemData['SETA']) || _hasDateValue(itemData['SETB']) || _hasDateValue(itemData['SETD']);
+    bool hasOffloadDates = _hasDateValue(itemData['SOETA']) || _hasDateValue(itemData['SOETB']) || _hasDateValue(itemData['SOETD']);
+
+    if (hasLoadingDates && hasOffloadDates) {
+      DateTime targetDate = isPlanToday ? DateTime.now() : DateTime.now().add(const Duration(days: 1));
+      
+      String _parse(dynamic val) {
+        if (val == null) return '';
+        final str = val.toString().trim();
+        if (str.isEmpty || str.startsWith('0001-01-01') || str.startsWith('1900-')) return '';
+        return str;
+      }
+
+      DateTime? _getNearestDate(List<String> dateStrings) {
+        DateTime? nearest;
+        for (var str in dateStrings) {
+          if (str.isEmpty) continue;
+          try {
+            DateTime d = DateTime.parse(str.replaceAll(' ', 'T'));
+            if (nearest == null || d.difference(targetDate).abs() < nearest.difference(targetDate).abs()) {
+              nearest = d;
+            }
+          } catch (_) {}
+        }
+        return nearest;
+      }
+
+      DateTime? nearestOffload = _getNearestDate([_parse(itemData['SOETA']), _parse(itemData['SOETB']), _parse(itemData['SOETD'])]);
+      DateTime? nearestLoading = _getNearestDate([_parse(itemData['SETA']), _parse(itemData['SETB']), _parse(itemData['SETD'])]);
+
+      if (nearestOffload != null && nearestLoading != null) {
+        if (nearestOffload.difference(targetDate).abs() <= nearestLoading.difference(targetDate).abs()) {
+          hasLoadingDates = false;
+        } else {
+          hasOffloadDates = false;
+        }
+      }
+    }
+
+    // Apply color logic
+    Color finalThemeColor = themeColor;
+    if (hasOffloadDates && !hasLoadingDates) {
+      finalThemeColor = Colors.deepOrange; // Off Vessel Color
+    } else if (hasLoadingDates && !hasOffloadDates) {
+      finalThemeColor = Colors.purple; // Loading Vessel Color
+    }
 
     return Padding(
       padding: EdgeInsets.only(bottom: isTablet ? 10 : 8),
-      child: Material(
-        color: isEven ? colour.kWhite : AppTokens.brandLight,
-        borderRadius: BorderRadius.circular(isTablet ? 16 : 14),
-        child: InkWell(
-          onTap: () => _showVesselDetails(context),
-          onLongPress: () {
-            if (AppPreferences.getRoleId() != 500) {
-              _showVesselEditSheet(context);
-            }
-          },
+      child: Container(
+        decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(isTablet ? 16 : 14),
-          splashColor: AppTokens.brandGradientStart.withOpacity(0.08),
-          child: Container(
-            padding: EdgeInsets.symmetric(
-              horizontal: isTablet ? 18 : 14,
-              vertical:   isTablet ? 14 : 12,
-            ),
-            decoration: BoxDecoration(
-              borderRadius:
-              BorderRadius.circular(isTablet ? 16 : 14),
-              border: Border.all(
-                color: isEven
-                    ? AppTokens.brandLight
-                    : AppTokens.brandMid.withOpacity(0.3),
-                width: 1.2,
-              ),
-              boxShadow: isEven
-                  ? [
-                BoxShadow(
-                  color:  AppTokens.brandGradientStart.withOpacity(0.05),
-                  blurRadius: 6,
-                  offset: const Offset(0, 2),
-                )
-              ]
-                  : [],
-            ),
+          boxShadow: [
+            BoxShadow(
+              color: finalThemeColor.withOpacity(0.08),
+              blurRadius: 8,
+              offset: const Offset(0, 3),
+            )
+          ],
+        ),
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(isTablet ? 16 : 14),
+          child: Material(
+            color: finalThemeColor.withOpacity(0.04), // Light tinted background
+            child: InkWell(
+              onTap: () => _showVesselDetails(context),
+              onLongPress: () => _showVesselEditSheet(context),
+              splashColor: finalThemeColor.withOpacity(0.1),
+              child: Container(
+                padding: EdgeInsets.symmetric(
+                  horizontal: isTablet ? 18 : 14,
+                  vertical:   isTablet ? 14 : 12,
+                ),
+                decoration: BoxDecoration(
+                  border: Border(
+                    left: BorderSide(color: finalThemeColor, width: 4),
+                    top: BorderSide(color: finalThemeColor.withOpacity(0.15), width: 1),
+                    right: BorderSide(color: finalThemeColor.withOpacity(0.15), width: 1),
+                    bottom: BorderSide(color: finalThemeColor.withOpacity(0.15), width: 1),
+                  ),
+                ),
             child: Row(children: [
               // Index badge
               Container(
                 width:  isTablet ? 32 : 28,
                 height: isTablet ? 32 : 28,
                 decoration: BoxDecoration(
-                  color: isEven
-                      ? AppTokens.brandLight
-                      : AppTokens.brandGradientStart.withOpacity(0.12),
+                  color: finalThemeColor.withOpacity(0.12),
                   borderRadius: BorderRadius.circular(isTablet ? 10 : 8),
                 ),
                 alignment: Alignment.center,
@@ -774,7 +849,7 @@ class _VesselCard extends StatelessWidget {
                   style: GoogleFonts.poppins(
                       fontSize:   isTablet ? 12 : 11,
                       fontWeight: FontWeight.w700,
-                      color:      AppTokens.brandGradientStart),
+                      color:      finalThemeColor),
                 ),
               ),
               const SizedBox(width: 10),
@@ -782,29 +857,52 @@ class _VesselCard extends StatelessWidget {
               // Vessel name
               Expanded(
                 flex: 3,
-                child: Text(
-                  vesselName,
-                  overflow: TextOverflow.ellipsis,
-                  maxLines: 1,
-                  style: GoogleFonts.poppins(
-                      fontSize:   isTablet ? 14 : 13,
-                      fontWeight: FontWeight.w600,
-                      color:      AppTokens.brandDark),
-                ),
+                child: hasTransshipment
+                    ? Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
+                            offVessel,
+                            overflow: TextOverflow.ellipsis,
+                            maxLines: 1,
+                            style: GoogleFonts.poppins(
+                                fontSize:   isTablet ? 12 : 11,
+                                fontWeight: FontWeight.w500,
+                                color:      AppTokens.brandMid),
+                          ),
+                          Icon(Icons.arrow_downward_rounded, size: 14, color: finalThemeColor),
+                          Text(
+                            vesselName,
+                            overflow: TextOverflow.ellipsis,
+                            maxLines: 1,
+                            style: GoogleFonts.poppins(
+                                fontSize:   isTablet ? 14 : 13,
+                                fontWeight: FontWeight.w600,
+                                color:      AppTokens.brandDark),
+                          ),
+                        ],
+                      )
+                    : Text(
+                        vesselName,
+                        overflow: TextOverflow.ellipsis,
+                        maxLines: 1,
+                        style: GoogleFonts.poppins(
+                            fontSize:   isTablet ? 14 : 13,
+                            fontWeight: FontWeight.w600,
+                            color:      AppTokens.brandDark),
+                      ),
               ),
 
-              // Port chip
+              // JobNo Pill
               Container(
                 padding: EdgeInsets.symmetric(
                   horizontal: isTablet ? 14 : 10,
                   vertical:   isTablet ? 6  : 4,
                 ),
                 decoration: BoxDecoration(
-                  color: AppTokens.brandGradientStart.withOpacity(0.08),
+                  color: finalThemeColor,
                   borderRadius: BorderRadius.circular(20),
-                  border: Border.all(
-                      color: AppTokens.brandMid.withOpacity(0.3),
-                      width: 1),
                 ),
                 child: Text(
                   jobNo,
@@ -813,18 +911,118 @@ class _VesselCard extends StatelessWidget {
                   style: GoogleFonts.poppins(
                       fontSize:   isTablet ? 12 : 11,
                       fontWeight: FontWeight.w600,
-                      color:      AppTokens.brandGradientStart),
+                      color:      Colors.white),
                 ),
               ),
             ]),
           ),
         ),
       ),
+      ),
+      ),
     );
   }
 
   void _showVesselDetails(BuildContext context) {
     final isTab = MediaQuery.of(context).size.width >= 600;
+
+    final jobType = itemData['JobName']?.toString().trim().toUpperCase() ?? '';
+    final isV2V = jobType == 'VESSEL TO VESSEL';
+
+    bool _hasDateValue(dynamic value) {
+      if (value == null) return false;
+      final str = value.toString().trim();
+      if (str.isEmpty || str.startsWith('0001-01-01') || str.startsWith('1900-')) return false;
+      return true;
+    }
+
+    bool hasLoadingDates = _hasDateValue(itemData['SETA']) || _hasDateValue(itemData['SETB']) || _hasDateValue(itemData['SETD']);
+    bool hasOffloadDates = _hasDateValue(itemData['SOETA']) || _hasDateValue(itemData['SOETB']) || _hasDateValue(itemData['SOETD']);
+
+    bool isLoadingHighlighted = false;
+    bool isOffloadHighlighted = false;
+
+    if (hasLoadingDates && hasOffloadDates) {
+      DateTime targetDate = isPlanToday ? DateTime.now() : DateTime.now().add(const Duration(days: 1));
+      String targetDateStr = DateFormat('yyyy-MM-dd').format(targetDate);
+      
+      String _parse(dynamic val) {
+        if (val == null) return '';
+        final str = val.toString().trim();
+        if (str.isEmpty || str.startsWith('0001-01-01') || str.startsWith('1900-')) return '';
+        return str;
+      }
+
+      if (isV2V) {
+        String _getDatePart(String raw) {
+          try {
+            return DateFormat('yyyy-MM-dd').format(DateTime.parse(raw.replaceAll(' ', 'T')));
+          } catch (_) {
+            return '';
+          }
+        }
+        
+        final lDates = [_getDatePart(_parse(itemData['SETA'])), _getDatePart(_parse(itemData['SETB'])), _getDatePart(_parse(itemData['SETD']))];
+        final oDates = [_getDatePart(_parse(itemData['SOETA'])), _getDatePart(_parse(itemData['SOETB'])), _getDatePart(_parse(itemData['SOETD']))];
+        
+        if (lDates.contains(targetDateStr)) isLoadingHighlighted = true;
+        if (oDates.contains(targetDateStr)) isOffloadHighlighted = true;
+      } else {
+        DateTime? _getNearestDate(List<String> dateStrings) {
+          DateTime? nearest;
+          for (var str in dateStrings) {
+            if (str.isEmpty) continue;
+            try {
+              DateTime d = DateTime.parse(str.replaceAll(' ', 'T'));
+              if (nearest == null || d.difference(targetDate).abs() < nearest.difference(targetDate).abs()) {
+                nearest = d;
+              }
+            } catch (_) {}
+          }
+          return nearest;
+        }
+
+        DateTime? nearestOffload = _getNearestDate([_parse(itemData['SOETA']), _parse(itemData['SOETB']), _parse(itemData['SOETD'])]);
+        DateTime? nearestLoading = _getNearestDate([_parse(itemData['SETA']), _parse(itemData['SETB']), _parse(itemData['SETD'])]);
+
+        if (nearestOffload != null && nearestLoading != null) {
+          if (nearestOffload.difference(targetDate).abs() <= nearestLoading.difference(targetDate).abs()) {
+            hasLoadingDates = false;
+          } else {
+            hasOffloadDates = false;
+          }
+        }
+      }
+    }
+
+    String headerVesselName = vesselName;
+    String headerLabel = 'Please refer to Loading Vessel details';
+    Color headerColor = Colors.purple;
+
+    if (isV2V) {
+      if (isOffloadHighlighted && !isLoadingHighlighted) {
+        headerVesselName = itemData['Offvesselname']?.toString().trim() ?? '';
+        if (headerVesselName.isEmpty || headerVesselName == '-') headerVesselName = vesselName;
+        headerLabel = 'Please refer to Off Vessel details';
+        headerColor = Colors.deepOrange;
+      } else if (isLoadingHighlighted && !isOffloadHighlighted) {
+        headerLabel = 'Please refer to Loading Vessel details';
+        headerColor = Colors.purple;
+      } else {
+        headerLabel = 'Please refer to Transshipment details';
+        headerColor = AppTokens.brandMid;
+      }
+    } else {
+      if (!hasLoadingDates && hasOffloadDates) {
+        headerVesselName = itemData['Offvesselname']?.toString().trim() ?? '';
+        if (headerVesselName.isEmpty || headerVesselName == '-') headerVesselName = vesselName;
+        headerLabel = 'Please refer to Off Vessel details';
+        headerColor = Colors.deepOrange;
+      } else {
+        headerLabel = 'Please refer to Loading Vessel details';
+        headerColor = Colors.purple;
+      }
+    }
 
     showModalBottomSheet(
       context: context,
@@ -869,11 +1067,11 @@ class _VesselCard extends StatelessWidget {
                     Container(
                       padding: const EdgeInsets.all(10),
                       decoration: BoxDecoration(
-                        color: AppTokens.brandGradientStart.withOpacity(0.1),
+                        color: headerColor.withOpacity(0.1),
                         borderRadius: BorderRadius.circular(12),
                       ),
                       child: Icon(Icons.directions_boat_filled,
-                          color: AppTokens.brandGradientStart,
+                          color: headerColor,
                           size: isTab ? 24 : 20),
                     ),
                     const SizedBox(width: 12),
@@ -882,7 +1080,15 @@ class _VesselCard extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            vesselName,
+                            headerLabel,
+                            style: GoogleFonts.poppins(
+                              fontSize: isTab ? 12 : 11,
+                              fontWeight: FontWeight.w600,
+                              color: headerColor,
+                            ),
+                          ),
+                          Text(
+                            headerVesselName,
                             style: GoogleFonts.poppins(
                               fontSize: isTab ? 18 : 16,
                               fontWeight: FontWeight.w700,
@@ -918,23 +1124,85 @@ class _VesselCard extends StatelessWidget {
                   child: Column(
                     children: [
                       _detailRow('Job No', itemData['JobNo'], isTab),
-                      _detailRow('Job Date', itemData['JobDate'], isTab),
+                      _detailRow('Job Type', itemData['JobName'], isTab),
+                      _conditionalDetailRow('Customer Name', itemData['CustomerName'], isTab),
                       _detailRow('Job Status', itemData['JobStatus'], isTab),
                       _detailRow('Vessel Type', itemData['VesselType'], isTab),
-                      _detailRow('Vessel Name', itemData['Loadingvesselname'], isTab),
-                      _detailRow('Off Vessel', itemData['Offvesselname'], isTab),
+                      _buildVesselFlow(itemData, isTab),
                       _detailRow('PKG', itemData['pkg'], isTab),
-                      _detailRow('SCN', itemData['SCN'], isTab),
-                      _detailRow('OSCN', itemData['OSCN'], isTab),
-                      _detailRow('LSCN', itemData['LSCN'], isTab),
-                      _detailRow('ETA', itemData['SETA'], isTab),
-                      _detailRow('ETB', itemData['SETB'], isTab),
-                      _detailRow('ETD', itemData['SETD'], isTab),
-                      _detailRow('OETA', itemData['SOETA'], isTab),
-                      _detailRow('OETB', itemData['SOETB'], isTab),
-                      _detailRow('OETD', itemData['SOETD'], isTab),
-                      _detailRow('Origin', itemData['Origin'], isTab),
-                      _detailRow('Destination', itemData['Destination'], isTab),
+                      _conditionalDetailRow('SCN', itemData['SCN'], isTab),
+                      _conditionalDetailRow('CS Name', itemData['EmployeeName'], isTab),
+                      const SizedBox(height: 12),
+
+                      if (hasOffloadDates) ...[
+                        Divider(color: AppTokens.brandLight),
+                        Container(
+                          margin: const EdgeInsets.symmetric(vertical: 4.0),
+                          padding: const EdgeInsets.all(12),
+                          decoration: BoxDecoration(
+                            color: isOffloadHighlighted ? Colors.deepOrange.withOpacity(0.05) : Colors.transparent,
+                            border: isOffloadHighlighted ? Border.all(color: Colors.deepOrange.withOpacity(0.5), width: 2) : Border.all(color: Colors.transparent),
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Container(
+                                margin: const EdgeInsets.only(bottom: 8.0),
+                                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                                decoration: BoxDecoration(
+                                  color: Colors.deepOrange.withOpacity(0.1),
+                                  borderRadius: BorderRadius.circular(6),
+                                  border: Border.all(color: Colors.deepOrange.withOpacity(0.3)),
+                                ),
+                                child: Text('Offload Details', style: GoogleFonts.poppins(fontWeight: FontWeight.bold, color: Colors.deepOrange.shade700, fontSize: isTab ? 15 : 14)),
+                              ),
+                              _conditionalDetailRow('Off Vessel', itemData['Offvesselname'], isTab),
+                              _conditionalDetailRow('OSCN', itemData['OSCN'], isTab),
+                              _conditionalDetailRow('Offload BO 1', itemData['OBoardingOfficerName'], isTab),
+                              _conditionalDetailRow('Offload BO 2', itemData['OBoardingOfficerName1'], isTab),
+                              _conditionalDetailRow('OETA', itemData['SOETA'], isTab),
+                              _conditionalDetailRow('OETB', itemData['SOETB'], isTab),
+                              _conditionalDetailRow('OETD', itemData['SOETD'], isTab),
+                            ],
+                          ),
+                        ),
+                      ],
+
+                      if (hasLoadingDates) ...[
+                        if (!hasOffloadDates) Divider(color: AppTokens.brandLight),
+                        Container(
+                          margin: const EdgeInsets.symmetric(vertical: 4.0),
+                          padding: const EdgeInsets.all(12),
+                          decoration: BoxDecoration(
+                            color: isLoadingHighlighted ? Colors.purple.withOpacity(0.05) : Colors.transparent,
+                            border: isLoadingHighlighted ? Border.all(color: Colors.purple.withOpacity(0.5), width: 2) : Border.all(color: Colors.transparent),
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Container(
+                                margin: const EdgeInsets.only(bottom: 8.0),
+                                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                                decoration: BoxDecoration(
+                                  color: Colors.purple.withOpacity(0.1),
+                                  borderRadius: BorderRadius.circular(6),
+                                  border: Border.all(color: Colors.purple.withOpacity(0.3)),
+                                ),
+                                child: Text('Loading Details', style: GoogleFonts.poppins(fontWeight: FontWeight.bold, color: Colors.purple.shade800, fontSize: isTab ? 15 : 14)),
+                              ),
+                              _conditionalDetailRow('Loading Vessel', itemData['Loadingvesselname'], isTab),
+                              _conditionalDetailRow('LSCN', itemData['LSCN'], isTab),
+                              _conditionalDetailRow('Loading BO 1', itemData['LBoardingOfficerName'], isTab),
+                              _conditionalDetailRow('Loading BO 2', itemData['LBoardingOfficerName1'], isTab),
+                              _conditionalDetailRow('L ETA', itemData['SETA'], isTab),
+                              _conditionalDetailRow('L ETB', itemData['SETB'], isTab),
+                              _conditionalDetailRow('L ETD', itemData['SETD'], isTab),
+                            ],
+                          ),
+                        ),
+                      ],
                     ],
                   ),
                 ),
@@ -944,6 +1212,25 @@ class _VesselCard extends StatelessWidget {
         );
       },
     );
+  }
+
+  Widget _conditionalDetailRow(String label, dynamic value, bool isTab) {
+    if (value == null) return const SizedBox.shrink();
+    final str = value.toString().trim();
+    if (str.isEmpty || str.startsWith('0001-01-01') || str.startsWith('1900-')) {
+      return const SizedBox.shrink();
+    }
+    
+    String displayValue = str;
+    final isDateField = label.contains('ETA') || label.contains('ETB') || label.contains('ETD');
+    if (isDateField) {
+      try {
+        DateTime d = DateTime.parse(str.replaceAll(' ', 'T'));
+        displayValue = DateFormat('dd-MM-yyyy HH:mm').format(d);
+      } catch (_) {}
+    }
+    
+    return _detailRow(label, displayValue, isTab);
   }
 
   Widget _detailRow(String label, dynamic value, bool isTab) {
@@ -983,6 +1270,73 @@ class _VesselCard extends StatelessWidget {
     );
   }
 
+  Widget _buildVesselFlow(Map<String, dynamic> itemData, bool isTab) {
+    final offVesselRaw = itemData['Offvesselname']?.toString().trim();
+    final offVessel = (offVesselRaw == null || offVesselRaw.isEmpty) ? '-' : offVesselRaw;
+    
+    final loadingVesselRaw = itemData['Loadingvesselname']?.toString().trim();
+    final loadingVessel = (loadingVesselRaw == null || loadingVesselRaw.isEmpty) ? '-' : loadingVesselRaw;
+
+    final jobName = itemData['JobName']?.toString().trim().toUpperCase() ?? '';
+
+    if (jobName != 'VESSEL TO VESSEL' && offVessel == '-') {
+      return Column(
+        children: [
+          _detailRow('Off Vessel', '-', isTab),
+          _detailRow('Loading Vessel', loadingVessel, isTab),
+        ],
+      );
+    }
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 6),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          SizedBox(
+            width: isTab ? 130 : 110,
+            child: Text(
+              'Transshipment',
+              style: GoogleFonts.poppins(
+                fontSize: isTab ? 13 : 12,
+                fontWeight: FontWeight.w500,
+                color: AppTokens.brandMid,
+              ),
+            ),
+          ),
+          const SizedBox(width: 8),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Off Vessel: $offVessel',
+                  style: GoogleFonts.poppins(
+                    fontSize: isTab ? 14 : 13,
+                    fontWeight: FontWeight.w600,
+                    color: AppTokens.brandDark,
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 2, horizontal: 4),
+                  child: Icon(Icons.arrow_downward_rounded, size: 16, color: AppTokens.brandGradientStart),
+                ),
+                Text(
+                  'Loading: $loadingVessel',
+                  style: GoogleFonts.poppins(
+                    fontSize: isTab ? 14 : 13,
+                    fontWeight: FontWeight.w600,
+                    color: AppTokens.brandDark,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   void _showVesselEditSheet(BuildContext context) {
     // We capture the bloc here so we can pass its value into the new route
     final vesselBloc = context.read<VesselBloc>();
@@ -999,8 +1353,50 @@ class _VesselCard extends StatelessWidget {
 
     String eta = _parseDate(itemData['SETA']);
     String etb = _parseDate(itemData['SETB']);
+    String etd = _parseDate(itemData['SETD']);
     String oeta = _parseDate(itemData['SOETA']);
     String oetb = _parseDate(itemData['SOETB']);
+    String oetd = _parseDate(itemData['SOETD']);
+
+    bool hasLoadingDates = eta.isNotEmpty || etb.isNotEmpty || _parseDate(itemData['SETD']).isNotEmpty;
+    bool hasOffloadDates = oeta.isNotEmpty || oetb.isNotEmpty || _parseDate(itemData['SOETD']).isNotEmpty;
+
+    if (hasLoadingDates && hasOffloadDates) {
+      DateTime targetDate = isPlanToday ? DateTime.now() : DateTime.now().add(const Duration(days: 1));
+
+      DateTime? _getNearestDate(List<String> dateStrings) {
+        DateTime? nearest;
+        for (var str in dateStrings) {
+          if (str.isEmpty) continue;
+          try {
+            // Replace space with T for clean ISO 8601 parsing if needed
+            String formattedStr = str.replaceAll(' ', 'T');
+            DateTime d = DateTime.parse(formattedStr);
+            if (nearest == null || d.difference(targetDate).abs() < nearest.difference(targetDate).abs()) {
+              nearest = d;
+            }
+          } catch (_) {}
+        }
+        return nearest;
+      }
+
+      DateTime? nearestOffload = _getNearestDate([oeta, oetb, _parseDate(itemData['SOETD'])]);
+      DateTime? nearestLoading = _getNearestDate([eta, etb, _parseDate(itemData['SETD'])]);
+
+      if (nearestOffload != null && nearestLoading != null) {
+        if (nearestOffload.difference(targetDate).abs() <= nearestLoading.difference(targetDate).abs()) {
+          // Offload is nearer to targetDate
+          hasLoadingDates = false;
+        } else {
+          // Loading is nearer to today
+          hasOffloadDates = false;
+        }
+      }
+    }
+
+    int? selectedJobStatusId;
+    List<JobStatusModel> jobStatuses = [];
+    bool isLoadingStatuses = true;
 
     showModalBottomSheet(
       context: context,
@@ -1013,9 +1409,54 @@ class _VesselCard extends StatelessWidget {
           value: vesselBloc,
           child: StatefulBuilder(
             builder: (BuildContext sheetContext, StateSetter setState) {
+              if (isLoadingStatuses && jobStatuses.isEmpty) {
+                 isLoadingStatuses = false; // Prevent multiple calls
+                 MasterApi.getJobStatuses().then((list) {
+                   if (sheetContext.mounted) {
+                     setState(() {
+                       List<int> allowedIds = [];
+                       if (hasOffloadDates) allowedIds.addAll([10, 28]);
+                       if (hasLoadingDates) allowedIds.addAll([7, 5]);
+                       if (allowedIds.isEmpty) allowedIds = [7, 5]; // Fallback
+
+                       if (AppPreferences.getRoleId() == 500) {
+                         allowedIds.remove(28); // UNLOADING DONE
+                         allowedIds.remove(5);  // DELIVERY DONE
+                         allowedIds.remove(29); // LOADING DONE
+                       }
+
+                       jobStatuses = list.where((s) => allowedIds.contains(s.Id)).toList();
+                       final currentStatusStr = itemData['JobStatus']?.toString().trim();
+                       if (currentStatusStr != null && currentStatusStr.isNotEmpty) {
+                         try {
+                           selectedJobStatusId = jobStatuses.firstWhere((e) => e.Name.trim().toLowerCase() == currentStatusStr.toLowerCase()).Id;
+                         } catch (_) {
+                           // If the current status isn't in the allowed list, try looking in the full list
+                           // just to preserve the ID, but it won't show in the dropdown gracefully.
+                           try {
+                              selectedJobStatusId = list.firstWhere((e) => e.Name.trim().toLowerCase() == currentStatusStr.toLowerCase()).Id;
+                              // Force add it to the dropdown so it doesn't break the UI value
+                              jobStatuses.add(list.firstWhere((e) => e.Id == selectedJobStatusId));
+                           } catch (_) {}
+                         }
+                       }
+                     });
+                   }
+                 }).catchError((_) {
+                   if (sheetContext.mounted) {
+                     setState(() { isLoadingStatuses = false; });
+                   }
+                 });
+              }
             
-            Widget _buildEditField(String label, String value, Function(String) onChanged) {
-              final controller = TextEditingController(text: value);
+            Widget _buildEditField(String label, String rawValue, Function(String) onChanged) {
+              String displayValue = "";
+              try {
+                DateTime d = DateTime.parse(rawValue.replaceAll(' ', 'T'));
+                displayValue = DateFormat('dd-MM-yyyy HH:mm').format(d);
+              } catch (_) {}
+
+              final controller = TextEditingController(text: displayValue);
               return Padding(
                 padding: const EdgeInsets.symmetric(vertical: 8),
                 child: Row(
@@ -1059,9 +1500,9 @@ class _VesselCard extends StatelessWidget {
                         ),
                         onTap: () async {
                           DateTime initial = DateTime.now();
-                          if (value.isNotEmpty) {
+                          if (rawValue.isNotEmpty) {
                             try {
-                              initial = DateFormat('yyyy-MM-dd HH:mm:ss').parse(value.replaceAll('T', ' '));
+                              initial = DateFormat('yyyy-MM-dd HH:mm:ss').parse(rawValue.replaceAll('T', ' '));
                             } catch (e) {
                               // ignore
                             }
@@ -1093,9 +1534,9 @@ class _VesselCard extends StatelessWidget {
                             );
                             if (time != null) {
                               final combined = DateTime(date.year, date.month, date.day, time.hour, time.minute);
-                              final formatted = DateFormat('yyyy-MM-dd HH:mm:ss').format(combined);
-                              controller.text = formatted;
-                              onChanged(formatted);
+                              final rawFormatted = DateFormat('yyyy-MM-dd HH:mm:ss').format(combined);
+                              onChanged(rawFormatted);
+                              controller.text = DateFormat('dd-MM-yyyy HH:mm').format(combined);
                               setState(() {});
                             }
                           }
@@ -1148,11 +1589,77 @@ class _VesselCard extends StatelessWidget {
                     ),
                     const SizedBox(height: 24),
 
-                    if (eta.isNotEmpty) _buildEditField('ETA', eta, (v) => eta = v),
-                    if (etb.isNotEmpty) _buildEditField('ETB', etb, (v) => etb = v),
-                    if (oeta.isNotEmpty) _buildEditField('OETA', oeta, (v) => oeta = v),
-                    if (oetb.isNotEmpty) _buildEditField('OETB', oetb, (v) => oetb = v),
+                    if (AppPreferences.getRoleId() != 500) ...[
+                      if (hasLoadingDates) _buildEditField('L ETB', etb, (v) => etb = v),
+                      if (hasLoadingDates) _buildEditField('L ETD', etd, (v) => etd = v),
+                      if (hasOffloadDates) _buildEditField('OETB', oetb, (v) => oetb = v),
+                      if (hasOffloadDates) _buildEditField('OETD', oetd, (v) => oetd = v),
+                    ],
 
+                    if (jobStatuses.isEmpty)
+                      const Padding(
+                        padding: EdgeInsets.symmetric(vertical: 8),
+                        child: Center(child: CircularProgressIndicator(strokeWidth: 2)),
+                      )
+                    else
+                      Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 8),
+                        child: Row(
+                          children: [
+                            SizedBox(
+                              width: isTab ? 90 : 80,
+                              child: Text(
+                                'Job Status',
+                                style: GoogleFonts.poppins(
+                                  fontSize: isTab ? 13 : 12,
+                                  fontWeight: FontWeight.w600,
+                                  color: AppTokens.brandMid,
+                                ),
+                              ),
+                            ),
+                            Expanded(
+                              child: Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 12),
+                                decoration: BoxDecoration(
+                                  border: Border.all(color: AppTokens.brandMid.withOpacity(0.3)),
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                                child: DropdownButtonHideUnderline(
+                                  child: DropdownButton<int>(
+                                    isExpanded: true,
+                                    value: selectedJobStatusId,
+                                    hint: Text(
+                                      'Select Job Status',
+                                      style: GoogleFonts.poppins(
+                                        fontSize: isTab ? 14 : 13,
+                                        color: AppTokens.brandMid,
+                                      ),
+                                    ),
+                                    items: jobStatuses.map((JobStatusModel status) {
+                                      return DropdownMenuItem<int>(
+                                        value: status.Id,
+                                        child: Text(
+                                          status.Name,
+                                          style: GoogleFonts.poppins(
+                                            fontSize: isTab ? 14 : 13,
+                                            fontWeight: FontWeight.w500,
+                                            color: AppTokens.brandDark,
+                                          ),
+                                        ),
+                                      );
+                                    }).toList(),
+                                    onChanged: (int? newValue) {
+                                      setState(() {
+                                        selectedJobStatusId = newValue;
+                                      });
+                                    },
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
 
                     const SizedBox(height: 32),
                     SizedBox(
@@ -1182,11 +1689,17 @@ class _VesselCard extends StatelessWidget {
                             "Jobid": itemData['SaleOrderMasterRefId'],
                             "ETA": _formatForApi(eta, 'SETA'),
                             "ETB": _formatForApi(etb, 'SETB'),
+                            "ETD": _formatForApi(etd, 'SETD'),
                             "OETA": _formatForApi(oeta, 'SOETA'),
                             "OETB": _formatForApi(oetb, 'SOETB'),
+                            "OETD": _formatForApi(oetd, 'SOETD'),
                             "Comid": AppGlobals.Comid,
                             "Type": 100, // SAVE ALL
                           };
+
+                          if (selectedJobStatusId != null) {
+                            updateData['Status'] = selectedJobStatusId;
+                          }
 
                           vesselBloc.add(
                             UpdateVesselDateEvent(
