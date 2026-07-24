@@ -1,3 +1,4 @@
+import 'package:maleva/core/theme/app_typography.dart';
 import 'package:maleva/core/network/api_legacy_helper.dart';
 import 'dart:io';
 
@@ -1322,13 +1323,9 @@ class _FuelTab extends StatelessWidget {
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Text(rec.driverName ?? 'Unknown',
-                                      style: GoogleFonts.poppins(
-                                          fontSize: 16,
-                                          fontWeight: FontWeight.bold)),
+                                      style: AppTypography.heading1()),
                                   Text(rec.truckName ?? 'No Truck',
-                                      style: GoogleFonts.lato(
-                                          fontSize: 13,
-                                          color: Colors.grey[600])),
+                                      style: AppTypography.bodyLarge(color: Colors.grey[600])),
                                 ],
                               ),
                             ),
@@ -1372,10 +1369,7 @@ class _FuelTab extends StatelessWidget {
                               const SizedBox(width: 6),
                               Text(
                                 'Difference: ${diff >= 0 ? '+' : ''}${diff.toStringAsFixed(2)}',
-                                style: GoogleFonts.poppins(
-                                    color: diffColor,
-                                    fontWeight: FontWeight.w600,
-                                    fontSize: 15),
+                                style: AppTypography.heading2(color: diffColor, fontWeight: FontWeight.w600),
                               ),
                             ],
                           ),
@@ -1397,11 +1391,10 @@ class _FuelTab extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(title,
-            style: GoogleFonts.lato(fontSize: 13, color: Colors.grey[600])),
+            style: AppTypography.bodyLarge(color: Colors.grey[600])),
         const SizedBox(height: 2),
         Text(value,
-            style: GoogleFonts.poppins(
-                fontSize: 14, color: color, fontWeight: FontWeight.bold)),
+            style: AppTypography.heading3(color: color, fontWeight: FontWeight.bold)),
       ],
     );
   }

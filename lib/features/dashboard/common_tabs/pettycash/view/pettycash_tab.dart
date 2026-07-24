@@ -1,3 +1,4 @@
+import 'package:maleva/core/theme/app_typography.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -136,8 +137,7 @@ class _PettyCashBody extends StatelessWidget {
             const SizedBox(height: 12),
             Text(state.message,
                 textAlign: TextAlign.center,
-                style: GoogleFonts.lato(
-                    color: Colors.red, fontSize: 14)),
+                style: AppTypography.bodyLarge(color: Colors.red)),
             const SizedBox(height: 16),
             ElevatedButton.icon(
               onPressed: () => context
@@ -158,7 +158,7 @@ class _PettyCashBody extends StatelessWidget {
         child: Text(
           "Select dates and press View",
           style:
-          GoogleFonts.lato(fontSize: 15, color: Colors.grey),
+          AppTypography.heading2(color: Colors.grey),
         ),
       );
     }
@@ -167,8 +167,7 @@ class _PettyCashBody extends StatelessWidget {
       if (state.masterRecords.isEmpty) {
         return Center(
           child: Text("No records found",
-              style: GoogleFonts.lato(
-                  fontSize: 16, color: Colors.grey)),
+              style: AppTypography.heading1(color: Colors.grey)),
         );
       }
 
@@ -269,10 +268,7 @@ class _DateFilterBar extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text("From",
-                    style: GoogleFonts.lato(
-                        fontSize: 11,
-                        color: Colors.grey[500],
-                        fontWeight: FontWeight.w600)),
+                    style: AppTypography.bodySmall(color: Colors.grey[500], fontWeight: FontWeight.w600)),
                 Text(
                   DateFormat("dd-MM-yy").format(fromDate),
                   style: GoogleFonts.lato(
@@ -317,10 +313,7 @@ class _DateFilterBar extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text("To",
-                    style: GoogleFonts.lato(
-                        fontSize: 11,
-                        color: Colors.grey[500],
-                        fontWeight: FontWeight.w600)),
+                    style: AppTypography.bodySmall(color: Colors.grey[500], fontWeight: FontWeight.w600)),
                 Text(
                   DateFormat("dd-MM-yy").format(toDate),
                   style: GoogleFonts.lato(
@@ -468,25 +461,18 @@ class _PettyCashCard extends StatelessWidget {
                   children: [
                     Text(
                       master.employeeName ?? "-",
-                      style: GoogleFonts.lato(
-                          fontSize: isTablet ? 14 : 16,
-                          fontWeight: FontWeight.bold,
-                          color: AppTokens.brandDark),
+                      style: AppTypography.heading1(color: AppTokens.brandDark, fontWeight: FontWeight.bold),
                       overflow: TextOverflow.ellipsis,
                     ),
                     Text(
                       master.cNumberDisplay ?? "-",
-                      style: GoogleFonts.lato(
-                          fontSize: isTablet ? 12 : 13,
-                          color: Colors.grey[600]),
+                      style: AppTypography.bodyLarge(color: Colors.grey[600]),
                     ),
                     if (!isTablet)
                       Text(
                         DateFormat('dd-MM-yyyy')
                             .format(master.pettyCashDate),
-                        style: GoogleFonts.lato(
-                            fontSize: 13,
-                            color: Colors.grey[600]),
+                        style: AppTypography.bodyLarge(color: Colors.grey[600]),
                       ),
                   ],
                 ),
@@ -503,10 +489,7 @@ class _PettyCashCard extends StatelessWidget {
                     BorderRadius.circular(10)),
                 child: Text(
                   "RM ${master.amount ?? '-'}",
-                  style: GoogleFonts.lato(
-                      fontSize: isTablet ? 13 : 14,
-                      fontWeight: FontWeight.bold,
-                      color: AppTokens.brandGradientStart),
+                  style: AppTypography.heading3(color: AppTokens.brandGradientStart, fontWeight: FontWeight.bold),
                 ),
               ),
             ],
@@ -546,14 +529,10 @@ class _EmptyDetailPanel extends StatelessWidget {
           ),
           const SizedBox(height: 16),
           Text("Select a record",
-              style: GoogleFonts.lato(
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
-                  color: AppTokens.brandDark)),
+              style: AppTypography.heading1(color: AppTokens.brandDark, fontWeight: FontWeight.bold)),
           const SizedBox(height: 6),
           Text("Tap any card to view details",
-              style: GoogleFonts.lato(
-                  fontSize: 13, color: Colors.grey[500])),
+              style: AppTypography.bodyLarge(color: Colors.grey[500])),
         ],
       ),
     );
@@ -608,10 +587,7 @@ class _PettyCashDetailPanel extends StatelessWidget {
               Expanded(
                 child: Text(
                   master.employeeName ?? "Petty Cash Details",
-                  style: GoogleFonts.lato(
-                      fontSize: 17,
-                      fontWeight: FontWeight.bold,
-                      color: kWhite),
+                  style: AppTypography.heading1(color: kWhite, fontWeight: FontWeight.bold),
                   overflow: TextOverflow.ellipsis,
                 ),
               ),
@@ -645,10 +621,7 @@ class _PettyCashDetailPanel extends StatelessWidget {
                   if (details.isNotEmpty) ...[
                     const SizedBox(height: 16),
                     Text("Details",
-                        style: GoogleFonts.lato(
-                            fontSize: 15,
-                            fontWeight: FontWeight.bold,
-                            color: AppTokens.brandDark)),
+                        style: AppTypography.heading2(color: AppTokens.brandDark, fontWeight: FontWeight.bold)),
                     const SizedBox(height: 8),
                     ...details.map((d) => Container(
                       margin: const EdgeInsets.only(
@@ -710,15 +683,9 @@ class _PettyCashDetailPanel extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(label,
-                  style: GoogleFonts.lato(
-                      fontSize: 11,
-                      color: Colors.grey[500],
-                      fontWeight: FontWeight.w600)),
+                  style: AppTypography.bodySmall(color: Colors.grey[500], fontWeight: FontWeight.w600)),
               Text(value,
-                  style: GoogleFonts.lato(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w700,
-                      color: AppTokens.brandDark)),
+                  style: AppTypography.heading3(color: AppTokens.brandDark, fontWeight: FontWeight.w700)),
             ],
           ),
         ),
@@ -777,10 +744,7 @@ class _PettyCashDialog extends StatelessWidget {
                     child: Text(
                       master.employeeName ??
                           "Petty Cash Details",
-                      style: GoogleFonts.lato(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                          color: kWhite),
+                      style: AppTypography.heading1(color: kWhite, fontWeight: FontWeight.bold),
                       overflow: TextOverflow.ellipsis,
                     ),
                   ),
@@ -817,10 +781,7 @@ class _PettyCashDialog extends StatelessWidget {
                       if (details.isNotEmpty) ...[
                         const SizedBox(height: 16),
                         Text("Details",
-                            style: GoogleFonts.lato(
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold,
-                                color: AppTokens.brandDark)),
+                            style: AppTypography.heading1(color: AppTokens.brandDark, fontWeight: FontWeight.bold)),
                         const SizedBox(height: 8),
                         ...details.map((d) => Container(
                           margin: const EdgeInsets.only(
@@ -875,11 +836,7 @@ class _PettyCashDialog extends StatelessWidget {
                           onPressed: () =>
                               Navigator.pop(context),
                           child: Text("Close",
-                              style: GoogleFonts.lato(
-                                  color: kWhite,
-                                  fontSize: 16,
-                                  fontWeight:
-                                  FontWeight.bold)),
+                              style: AppTypography.heading1(color: kWhite, fontWeight: FontWeight.bold)),
                         ),
                       ),
                     ],
@@ -910,15 +867,9 @@ class _PettyCashDialog extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(label,
-                  style: GoogleFonts.lato(
-                      fontSize: 11,
-                      color: Colors.grey[500],
-                      fontWeight: FontWeight.w600)),
+                  style: AppTypography.bodySmall(color: Colors.grey[500], fontWeight: FontWeight.w600)),
               Text(value,
-                  style: GoogleFonts.lato(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w700,
-                      color: AppTokens.brandDark)),
+                  style: AppTypography.heading3(color: AppTokens.brandDark, fontWeight: FontWeight.w700)),
             ],
           ),
         ),

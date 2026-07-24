@@ -1,3 +1,4 @@
+import 'package:maleva/core/theme/app_typography.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -375,13 +376,11 @@ Widget _datePicker(
           const SizedBox(width: 10),
           Expanded(
             child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              Text(label, style: GoogleFonts.lato(fontSize: 11, color: Colors.grey[600])),
+              Text(label, style: AppTypography.bodySmall(color: Colors.grey[600])),
               const SizedBox(height: 2),
               Text(
                 value.isNotEmpty ? value : 'Select Date',
-                style: GoogleFonts.lato(fontSize: 14,
-                    color: value.isNotEmpty ? AppTokens.brandDark : Colors.grey,
-                    fontWeight: FontWeight.w600),
+                style: AppTypography.bodyLarge(color: value.isNotEmpty ? AppTokens.brandDark : Colors.grey, fontWeight: FontWeight.w600),
               ),
             ]),
           ),

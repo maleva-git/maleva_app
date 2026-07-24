@@ -1,3 +1,4 @@
+import 'package:maleva/core/theme/app_typography.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
@@ -136,20 +137,12 @@ class _PlanningDetailsViewState extends State<_PlanningDetailsView> {
         children: [
           Text(
             'Planning Details',
-            style: GoogleFonts.lato(
-              color: AppTokens.appBarTitle,
-              fontWeight: FontWeight.bold,
-              fontSize: isTablet ? 18 : 16,
-            ),
+            style: AppTypography.heading1(color: AppTokens.appBarTitle, fontWeight: FontWeight.bold),
           ),
           if (userName.isNotEmpty)
             Text(
               userName,
-              style: GoogleFonts.lato(
-                color: AppTokens.invoicePillBg,
-                fontSize: isTablet ? 13 : 11,
-                fontWeight: FontWeight.w500,
-              ),
+              style: AppTypography.bodySmall(color: AppTokens.invoicePillBg, fontWeight: FontWeight.w500),
             ),
         ],
       ),
@@ -217,10 +210,10 @@ class _PlanningDetailsViewState extends State<_PlanningDetailsView> {
                               clipBehavior: Clip.antiAlias,
                               child: DataTable(
                                 headingRowColor: WidgetStateProperty.all(AppTokens.invoiceHeaderStart),
-                                headingTextStyle: GoogleFonts.lato(color: Colors.white, fontWeight: FontWeight.bold, fontSize: isTablet ? 13 : 11),
+                                headingTextStyle: AppTypography.bodySmall(color: Colors.white, fontWeight: FontWeight.bold),
                                 dataRowMinHeight: 35,
                                 dataRowMaxHeight: 50,
-                                dataTextStyle: GoogleFonts.lato(color: AppTokens.textPrimary, fontSize: isTablet ? 13 : 11, fontWeight: FontWeight.w500),
+                                dataTextStyle: AppTypography.bodySmall(color: AppTokens.textPrimary, fontWeight: FontWeight.w500),
                                 columnSpacing: 25,
                                 border: TableBorder(
                                   horizontalInside: BorderSide(color: AppTokens.surfaceBorder.withValues(alpha: 0.5), width: 1),
@@ -301,13 +294,10 @@ class _SearchField extends StatelessWidget {
     return TextField(
       controller: controller,
       onChanged: onChanged,
-      style: GoogleFonts.lato(
-          fontSize: isTablet ? 14 : 13, color: AppTokens.textPrimary),
+      style: AppTypography.bodyLarge(color: AppTokens.textPrimary),
       decoration: InputDecoration(
         hintText: 'Search by Planning No / PIC / Date / Port',
-        hintStyle: GoogleFonts.lato(
-            fontSize: isTablet ? 13 : 12,
-            color: AppTokens.textSecondary),
+        hintStyle: AppTypography.bodyMedium(color: AppTokens.textSecondary),
         prefixIcon: const Icon(Icons.search,
             color: AppTokens.brandPrimary, size: 20),
         suffixIcon: controller.text.isNotEmpty
@@ -362,10 +352,7 @@ class _SummaryPill extends StatelessWidget {
         ),
         child: Text(
           'Results: $count',
-          style: GoogleFonts.lato(
-              color: Palette.white,
-              fontWeight: FontWeight.w600,
-              fontSize: 12),
+          style: AppTypography.bodyMedium(color: Palette.white, fontWeight: FontWeight.w600),
         ),
       ),
     );
@@ -388,14 +375,10 @@ class _EmptyWidget extends StatelessWidget {
               color: Palette.grey400.withValues(alpha: 0.6)),
           const SizedBox(height: 12),
           Text('No planning records found',
-              style: GoogleFonts.lato(
-                  fontSize: 15,
-                  fontWeight: FontWeight.w600,
-                  color: AppTokens.textSecondary)),
+              style: AppTypography.heading2(color: AppTokens.textSecondary, fontWeight: FontWeight.w600)),
           const SizedBox(height: 4),
           Text('Adjust filters or refresh',
-              style: GoogleFonts.lato(
-                  fontSize: 12, color: AppTokens.textMuted)),
+              style: AppTypography.bodyMedium(color: AppTokens.textMuted)),
         ],
       ),
     );
@@ -420,17 +403,13 @@ class _ErrorWidget extends StatelessWidget {
                 size: 56, color: Palette.redError),
             const SizedBox(height: 12),
             Text('Failed to load data',
-                style: GoogleFonts.lato(
-                    fontSize: 15,
-                    fontWeight: FontWeight.bold,
-                    color: AppTokens.textPrimary)),
+                style: AppTypography.heading2(color: AppTokens.textPrimary, fontWeight: FontWeight.bold)),
             const SizedBox(height: 6),
             Text(message,
                 textAlign: TextAlign.center,
                 maxLines: 3,
                 overflow: TextOverflow.ellipsis,
-                style: GoogleFonts.lato(
-                    fontSize: 12, color: AppTokens.textMuted)),
+                style: AppTypography.bodyMedium(color: AppTokens.textMuted)),
             const SizedBox(height: 18),
             ElevatedButton.icon(
               style: ElevatedButton.styleFrom(

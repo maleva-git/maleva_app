@@ -1,3 +1,4 @@
+import 'package:maleva/core/theme/app_typography.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
@@ -49,7 +50,7 @@ class _MaintenanceView extends StatelessWidget {
         if (state is MaintenanceError) {
           return Center(
             child: Text(state.message,
-                style: GoogleFonts.lato(color: AppTokens.maintAccentRed, fontSize: 13)),
+                style: AppTypography.bodyLarge(color: AppTokens.maintAccentRed)),
           );
         }
         return const SizedBox.shrink();
@@ -400,10 +401,7 @@ class _MaintenanceList extends StatelessWidget {
             ),
             const SizedBox(height: 12),
             Text('No Records Found',
-                style: GoogleFonts.lato(
-                    color: AppTokens.maintTextDark,
-                    fontWeight: FontWeight.w600,
-                    fontSize: 14)),
+                style: AppTypography.bodyLarge(color: AppTokens.maintTextDark, fontWeight: FontWeight.w600)),
           ],
         ),
       );
@@ -505,11 +503,7 @@ class _MaintenanceCard extends StatelessWidget {
                                 const SizedBox(width: 4),
                                 Text(
                                   'Due: $dueDate',
-                                  style: GoogleFonts.lato(
-                                    color: AppTokens.planTextMuted,
-                                    fontSize: 11,
-                                    fontWeight: FontWeight.w500,
-                                  ),
+                                  style: AppTypography.bodySmall(color: AppTokens.planTextMuted, fontWeight: FontWeight.w500),
                                 ),
                               ],
                             ),

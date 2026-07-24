@@ -1,3 +1,4 @@
+import 'package:maleva/core/theme/app_typography.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
@@ -70,7 +71,7 @@ class TruckMaintDashView extends StatelessWidget {
               padding: const EdgeInsets.all(20.0),
               child: Text(
                 state.message,
-                style: GoogleFonts.lato(color: Palette.kExpiredRed, fontSize: 13),
+                style: AppTypography.bodyLarge(color: Palette.kExpiredRed),
               ),
             ),
           );
@@ -254,10 +255,7 @@ class _TruckDashCard extends StatelessWidget {
                   Expanded(
                     child: Text(
                       'Expiry till: ${state.expDate}',
-                      style: GoogleFonts.lato(
-                          color: Palette.kTextMuted,
-                          fontWeight: FontWeight.w500,
-                          fontSize: isTablet ? 12 : 10),
+                      style: AppTypography.badgeText(color: Palette.kTextMuted, fontWeight: FontWeight.w500),
                     ),
                   ),
                 ],
@@ -408,7 +406,7 @@ class _EmptyState extends StatelessWidget {
           ),
           const SizedBox(height: 14),
           Text('No Truck Data',
-              style: GoogleFonts.lato(color: Palette.textDark2, fontWeight: FontWeight.w600, fontSize: 15)),
+              style: AppTypography.heading2(color: Palette.textDark2, fontWeight: FontWeight.w600)),
         ],
       ),
     );

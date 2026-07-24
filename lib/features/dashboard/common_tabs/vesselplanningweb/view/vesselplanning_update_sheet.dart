@@ -1,3 +1,4 @@
+import 'package:maleva/core/theme/app_typography.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
@@ -192,11 +193,7 @@ class _VesselPlanningUpdateSheetState extends State<VesselPlanningUpdateSheet> {
                 Expanded(
                   child: Text(
                     'Sale Order Update',
-                    style: GoogleFonts.lato(
-                      color: colour.kTextDark,
-                      fontWeight: FontWeight.w700,
-                      fontSize: 16,
-                    ),
+                    style: AppTypography.heading1(color: colour.kTextDark, fontWeight: FontWeight.w700),
                   ),
                 ),
                 IconButton(
@@ -229,7 +226,7 @@ class _VesselPlanningUpdateSheetState extends State<VesselPlanningUpdateSheet> {
                     ),
                     child: Text(
                       widget.jobData.jobNo.isNotEmpty ? widget.jobData.jobNo : widget.jobData.saleOrderMasterRefId.toString(),
-                      style: GoogleFonts.lato(fontSize: 13, color: colour.kTextDark),
+                      style: AppTypography.bodyLarge(color: colour.kTextDark),
                     ),
                   ), null, null),
                   const SizedBox(height: 8),
@@ -256,7 +253,7 @@ class _VesselPlanningUpdateSheetState extends State<VesselPlanningUpdateSheet> {
                     height: 36,
                     child: TextField(
                       controller: _ptwController,
-                      style: GoogleFonts.lato(fontSize: 13),
+                      style: AppTypography.bodyLarge(),
                       decoration: InputDecoration(
                         contentPadding: const EdgeInsets.symmetric(horizontal: 10),
                         border: OutlineInputBorder(
@@ -299,12 +296,7 @@ class _VesselPlanningUpdateSheetState extends State<VesselPlanningUpdateSheet> {
                         child: Center(
                           child: Text(
                             'SAVE ALL',
-                            style: GoogleFonts.lato(
-                              fontWeight: FontWeight.w800,
-                              fontSize: 14,
-                              color: Colors.white,
-                              letterSpacing: 0.5,
-                            ),
+                            style: AppTypography.heading3(color: Colors.white, fontWeight: FontWeight.w800),
                           ),
                         ),
                       ),
@@ -352,7 +344,7 @@ class _VesselPlanningUpdateSheetState extends State<VesselPlanningUpdateSheet> {
                   padding: const EdgeInsets.only(left: 10),
                   child: Text(
                     _formatDisplayDate(ctrl.text),
-                    style: GoogleFonts.lato(fontSize: 13, color: colour.kTextDark),
+                    style: AppTypography.bodyLarge(color: colour.kTextDark),
                   ),
                 ),
               ),
@@ -411,7 +403,7 @@ class _VesselPlanningUpdateSheetState extends State<VesselPlanningUpdateSheet> {
                   padding: const EdgeInsets.only(left: 10),
                   child: Text(
                     emp?.AccountName ?? 'Select Employee',
-                    style: GoogleFonts.lato(fontSize: 13, color: emp == null ? AppTokens.planTextMuted : colour.kTextDark),
+                    style: AppTypography.bodyLarge(color: emp == null ? AppTokens.planTextMuted : colour.kTextDark),
                     overflow: TextOverflow.ellipsis,
                   ),
                 ),
@@ -437,7 +429,7 @@ class _VesselPlanningUpdateSheetState extends State<VesselPlanningUpdateSheet> {
           width: 90,
           child: Text(
             label.replaceAll(r'\n', '\n'),
-            style: GoogleFonts.lato(fontSize: 12, fontWeight: FontWeight.w600, color: colour.kTextDark),
+            style: AppTypography.bodyMedium(color: colour.kTextDark, fontWeight: FontWeight.w600),
           ),
         ),
         Expanded(child: child),
@@ -468,11 +460,7 @@ class _VesselPlanningUpdateSheetState extends State<VesselPlanningUpdateSheet> {
                 child: Center(
                   child: Text(
                     'SAVE',
-                    style: GoogleFonts.lato(
-                      fontSize: 12,
-                      fontWeight: FontWeight.w700,
-                      color: Colors.white,
-                    ),
+                    style: AppTypography.bodyMedium(color: Colors.white, fontWeight: FontWeight.w700),
                   ),
                 ),
               ),

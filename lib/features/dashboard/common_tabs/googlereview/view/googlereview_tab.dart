@@ -1,3 +1,4 @@
+import 'package:maleva/core/theme/app_typography.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -133,22 +134,13 @@ class _ReviewEntryFormState extends State<ReviewEntryForm> {
                       ),
                       const SizedBox(width: 10),
                       Text('GOOGLE REVIEW',
-                          style: GoogleFonts.lato(
-                            fontSize:      20,
-                            fontWeight:    FontWeight.bold,
-                            color:         AppTokens.brandDark,
-                            letterSpacing: 1.2,
-                          )),
+                          style: AppTypography.heading1(color: AppTokens.brandDark, fontWeight: FontWeight.bold)),
                     ]),
                     const SizedBox(height: 6),
                     Padding(
                       padding: const EdgeInsets.only(left: 14),
                       child: Text('Entry Form',
-                          style: GoogleFonts.lato(
-                            fontSize:   14,
-                            color:      AppTokens.brandMid,
-                            fontWeight: FontWeight.w500,
-                          )),
+                          style: AppTypography.bodyLarge(color: AppTokens.brandMid, fontWeight: FontWeight.w500)),
                     ),
                     const SizedBox(height: 24),
 
@@ -375,11 +367,7 @@ class _ReviewEntryFormState extends State<ReviewEntryForm> {
         Expanded(
           child: Text(
             'Date: ${DateFormat('yyyy-MM-dd').format(state.selectedDate)}',
-            style: GoogleFonts.lato(
-              color:      AppTokens.brandDark,
-              fontWeight: FontWeight.w600,
-              fontSize:   isTablet ? 15 : 14,
-            ),
+            style: AppTypography.bodyLarge(color: AppTokens.brandDark, fontWeight: FontWeight.w600),
           ),
         ),
         Material(
@@ -427,11 +415,7 @@ class _ReviewEntryFormState extends State<ReviewEntryForm> {
               size:  isTablet ? 22 : 20),
           label: Text(
             state.saving ? "Saving..." : "Save",
-            style: GoogleFonts.lato(
-              color:      kWhite,
-              fontWeight: FontWeight.bold,
-              fontSize:   isTablet ? 15 : 14,
-            ),
+            style: AppTypography.heading3(color: kWhite, fontWeight: FontWeight.bold),
           ),
           onPressed: state.saving
               ? null
@@ -467,11 +451,7 @@ class _ReviewEntryFormState extends State<ReviewEntryForm> {
               color: AppTokens.brandGradientStart,
               size:  isTablet ? 22 : 20),
           label: Text("View",
-              style: GoogleFonts.lato(
-                color:      AppTokens.brandGradientStart,
-                fontWeight: FontWeight.bold,
-                fontSize:   isTablet ? 15 : 14,
-              )),
+              style: AppTypography.heading3(color: AppTokens.brandGradientStart, fontWeight: FontWeight.bold)),
           onPressed: () async {
             final result = await Navigator.push(
               context,
@@ -511,14 +491,10 @@ class _ReviewEntryFormState extends State<ReviewEntryForm> {
       validator:    validator,
       keyboardType: keyboardType,
       maxLines:     maxLines,
-      style: GoogleFonts.lato(
-          color:    AppTokens.brandDark,
-          fontSize: isTablet ? 15 : 14),
+      style: AppTypography.bodyLarge(color: AppTokens.brandDark),
       decoration: InputDecoration(
         labelText:  label,
-        labelStyle: GoogleFonts.lato(
-            color:    Colors.grey[600],
-            fontSize: isTablet ? 14 : 13),
+        labelStyle: AppTypography.bodyLarge(color: Colors.grey[600]),
         filled:    true,
         fillColor: AppTokens.brandLight,
         border: OutlineInputBorder(
@@ -547,11 +523,7 @@ class _ReviewEntryFormState extends State<ReviewEntryForm> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(label,
-            style: GoogleFonts.lato(
-              fontSize:   isTablet ? 13 : 12,
-              color:      Colors.grey[600],
-              fontWeight: FontWeight.w600,
-            )),
+            style: AppTypography.bodyMedium(color: Colors.grey[600], fontWeight: FontWeight.w600)),
         const SizedBox(height: 6),
         Container(
           padding: EdgeInsets.symmetric(
@@ -613,11 +585,7 @@ class _InfoPanel extends StatelessWidget {
             ),
             const SizedBox(width: 10),
             Text('Review Preview',
-                style: GoogleFonts.lato(
-                  fontSize:   15,
-                  fontWeight: FontWeight.bold,
-                  color:      AppTokens.brandDark,
-                )),
+                style: AppTypography.heading2(color: AppTokens.brandDark, fontWeight: FontWeight.bold)),
           ]),
 
           const SizedBox(height: 20),
@@ -639,18 +607,11 @@ class _InfoPanel extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text('Rating',
-                    style: GoogleFonts.lato(
-                      fontSize: 11,
-                      color:    Colors.white.withValues(alpha: 0.75),
-                    )),
+                    style: AppTypography.bodySmall(color: Colors.white.withValues(alpha: 0.75))),
                 const SizedBox(height: 4),
                 Text(
                   stars > 0 ? '⭐' * stars : 'Not selected',
-                  style: GoogleFonts.lato(
-                    fontSize:   22,
-                    fontWeight: FontWeight.bold,
-                    color:      Colors.white,
-                  ),
+                  style: AppTypography.heading1(color: Colors.white, fontWeight: FontWeight.bold),
                 ),
               ],
             ),
@@ -684,11 +645,7 @@ class _InfoPanel extends StatelessWidget {
                       color: AppTokens.brandGradientStart, size: 16),
                   const SizedBox(width: 6),
                   Text('Tips',
-                      style: GoogleFonts.lato(
-                        fontSize:   12,
-                        fontWeight: FontWeight.bold,
-                        color:      AppTokens.brandDark,
-                      )),
+                      style: AppTypography.bodyMedium(color: AppTokens.brandDark, fontWeight: FontWeight.bold)),
                 ]),
                 const SizedBox(height: 8),
                 _tipRow('Fill all required fields before saving'),
@@ -720,18 +677,10 @@ class _InfoPanel extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(label,
-                  style: GoogleFonts.lato(
-                    fontSize: 11,
-                    color:    Colors.grey[500],
-                    fontWeight: FontWeight.w600,
-                  )),
+                  style: AppTypography.bodySmall(color: Colors.grey[500], fontWeight: FontWeight.w600)),
               const SizedBox(height: 2),
               Text(value,
-                  style: GoogleFonts.lato(
-                    fontSize:   14,
-                    fontWeight: FontWeight.w700,
-                    color:      AppTokens.brandDark,
-                  )),
+                  style: AppTypography.heading3(color: AppTokens.brandDark, fontWeight: FontWeight.w700)),
             ],
           ),
         ),
@@ -748,10 +697,7 @@ class _InfoPanel extends StatelessWidget {
         const SizedBox(width: 6),
         Expanded(
           child: Text(text,
-              style: GoogleFonts.lato(
-                fontSize: 12,
-                color:    Colors.grey[600],
-              )),
+              style: AppTypography.bodyMedium(color: Colors.grey[600])),
         ),
       ]),
     );

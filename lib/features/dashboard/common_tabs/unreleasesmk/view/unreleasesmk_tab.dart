@@ -1,3 +1,4 @@
+import 'package:maleva/core/theme/app_typography.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -72,14 +73,7 @@ class _UnReleaseSMKView extends StatelessWidget {
       centerTitle: true,
       title: Text(
         'K8 UnRelease SMK',
-        style: GoogleFonts.lato(
-          textStyle: const TextStyle(
-            color: AppTokens.appBarTitle,
-            fontWeight: FontWeight.bold,
-            fontSize: 18,
-            letterSpacing: 0.5,
-          ),
-        ),
+        style: AppTypography.heading1(color: AppTokens.appBarTitle, fontWeight: FontWeight.bold),
       ),
       actions: [
         IconButton(
@@ -169,14 +163,7 @@ class _SummaryBadge extends StatelessWidget {
           const SizedBox(width: 6),
           Text(
             'Total Unreleased: $count',
-            style: GoogleFonts.lato(
-              textStyle: const TextStyle(
-                color: Palette.white,
-                fontWeight: FontWeight.w600,
-                fontSize: 13,
-                letterSpacing: 0.4,
-              ),
-            ),
+            style: AppTypography.bodyLarge(color: Palette.white, fontWeight: FontWeight.w600),
           ),
         ],
       ),
@@ -378,12 +365,7 @@ class _LoadingWidget extends StatelessWidget {
           const SizedBox(height: 14),
           Text(
             'Loading K8 SMK bills…',
-            style: GoogleFonts.lato(
-              textStyle: const TextStyle(
-                color: AppTokens.textSecondary,
-                fontSize: 13,
-              ),
-            ),
+            style: AppTypography.bodyLarge(color: AppTokens.textSecondary),
           ),
         ],
       ),
@@ -405,21 +387,12 @@ class _EmptyWidget extends StatelessWidget {
           const SizedBox(height: 12),
           Text(
             'No unreleased K8 SMK bills',
-            style: GoogleFonts.lato(
-              textStyle: const TextStyle(
-                color: AppTokens.textSecondary,
-                fontSize: 15,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
+            style: AppTypography.heading2(color: AppTokens.textSecondary, fontWeight: FontWeight.w600),
           ),
           const SizedBox(height: 4),
           Text(
             'All K8 SMK bills are released',
-            style: GoogleFonts.lato(
-              textStyle: const TextStyle(
-                  color: AppTokens.textMuted, fontSize: 12),
-            ),
+            style: AppTypography.bodyMedium(color: AppTokens.textMuted),
           ),
         ],
       ),
@@ -446,13 +419,7 @@ class _ErrorWidget extends StatelessWidget {
             const SizedBox(height: 12),
             Text(
               'Failed to load data',
-              style: GoogleFonts.lato(
-                textStyle: const TextStyle(
-                  color: AppTokens.textPrimary,
-                  fontSize: 15,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
+              style: AppTypography.heading2(color: AppTokens.textPrimary, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 6),
             Text(
@@ -460,10 +427,7 @@ class _ErrorWidget extends StatelessWidget {
               textAlign: TextAlign.center,
               maxLines: 3,
               overflow: TextOverflow.ellipsis,
-              style: GoogleFonts.lato(
-                textStyle: const TextStyle(
-                    color: AppTokens.textMuted, fontSize: 12),
-              ),
+              style: AppTypography.bodyMedium(color: AppTokens.textMuted),
             ),
             const SizedBox(height: 18),
             ElevatedButton.icon(

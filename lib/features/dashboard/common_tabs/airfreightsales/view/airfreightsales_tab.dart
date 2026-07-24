@@ -1,3 +1,4 @@
+import 'package:maleva/core/theme/app_typography.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -102,21 +103,12 @@ class _AirfreightView extends StatelessWidget {
                 children: [
                   Text(
                     'Air Freight Sales',
-                    style: GoogleFonts.poppins(
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
-                      letterSpacing: 0.5,
-                    ),
+                    style: AppTypography.display(color: Colors.white, fontWeight: FontWeight.bold),
                   ),
                   const SizedBox(height: 4),
                   Text(
                     DateFormat('MMMM yyyy').format(DateTime.now()),
-                    style: GoogleFonts.poppins(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w500,
-                      color: Colors.white.withValues(alpha: 0.8),
-                    ),
+                    style: AppTypography.bodyLarge(color: Colors.white.withValues(alpha: 0.8), fontWeight: FontWeight.w500),
                   ),
                 ],
               ),
@@ -149,13 +141,9 @@ class _AirfreightView extends StatelessWidget {
                 value: state.dropdownValueEmp.isEmpty ? null : state.dropdownValueEmp,
                 hint: Text(
                   'Select Employee',
-                  style: GoogleFonts.poppins(fontSize: 14, color: Colors.white70),
+                  style: AppTypography.bodyLarge(color: Colors.white70),
                 ),
-                style: GoogleFonts.poppins(
-                  fontSize: 15,
-                  fontWeight: FontWeight.w600,
-                  color: Colors.white,
-                ),
+                style: AppTypography.heading2(color: Colors.white, fontWeight: FontWeight.w600),
                 onChanged: (String? value) {
                   if (value != null) {
                     context.read<AirfreightBloc>().add(EmployeeChangedEvent(value));
@@ -222,12 +210,7 @@ class _AirfreightView extends StatelessWidget {
           padding: const EdgeInsets.only(left: 4, bottom: 16),
           child: Text(
             'STATUS BREAKDOWN',
-            style: GoogleFonts.poppins(
-              fontSize: 13,
-              fontWeight: FontWeight.w700,
-              letterSpacing: 1.2,
-              color: const Color(0xFF8B95A5),
-            ),
+            style: AppTypography.heading3(color: const Color(0xFF8B95A5), fontWeight: FontWeight.w700),
           ),
         ),
         if (state.salesReport.isEmpty)
@@ -251,11 +234,7 @@ class _AirfreightView extends StatelessWidget {
                 const SizedBox(height: 12),
                 Text(
                   'No data found',
-                  style: GoogleFonts.poppins(
-                    fontSize: 15,
-                    color: const Color(0xFF8B95A5),
-                    fontWeight: FontWeight.w500,
-                  ),
+                  style: AppTypography.heading2(color: const Color(0xFF8B95A5), fontWeight: FontWeight.w500),
                 ),
               ],
             ),
@@ -310,11 +289,7 @@ class _AirfreightView extends StatelessWidget {
                       Expanded(
                         child: Text(
                           item['JobStatus'].toString(),
-                          style: GoogleFonts.poppins(
-                            fontSize: 14.5,
-                            fontWeight: FontWeight.w600,
-                            color: const Color(0xFF2D3748),
-                          ),
+                          style: AppTypography.bodyLarge(color: const Color(0xFF2D3748), fontWeight: FontWeight.w600),
                         ),
                       ),
                       // Progress and Text
@@ -327,20 +302,12 @@ class _AirfreightView extends StatelessWidget {
                             children: [
                               Text(
                                 dayCount.toString(),
-                                style: GoogleFonts.poppins(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.bold,
-                                  color: themeColor,
-                                ),
+                                style: AppTypography.heading1(color: themeColor, fontWeight: FontWeight.bold),
                               ),
                               const SizedBox(width: 4),
                               Text(
                                 'days',
-                                style: GoogleFonts.poppins(
-                                  fontSize: 11,
-                                  fontWeight: FontWeight.w500,
-                                  color: const Color(0xFFA0AEC0),
-                                ),
+                                style: AppTypography.bodySmall(color: const Color(0xFFA0AEC0), fontWeight: FontWeight.w500),
                               ),
                             ],
                           ),
@@ -439,22 +406,13 @@ class _PremiumStatCard extends StatelessWidget {
               children: [
                 Text(
                   value,
-                  style: GoogleFonts.poppins(
-                    fontSize: 26,
-                    fontWeight: FontWeight.bold,
-                    color: const Color(0xFF1A202C),
-                    height: 1.2,
-                  ),
+                  style: AppTypography.display(color: const Color(0xFF1A202C), fontWeight: FontWeight.bold),
                 ),
                 Text(
                   title,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
-                  style: GoogleFonts.poppins(
-                    fontSize: 12,
-                    fontWeight: FontWeight.w500,
-                    color: const Color(0xFF718096),
-                  ),
+                  style: AppTypography.bodyMedium(color: const Color(0xFF718096), fontWeight: FontWeight.w500),
                 ),
               ],
             ),

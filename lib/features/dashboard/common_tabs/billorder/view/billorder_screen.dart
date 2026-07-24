@@ -1,3 +1,4 @@
+import 'package:maleva/core/theme/app_typography.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -262,12 +263,7 @@ class _SectionTitle extends StatelessWidget {
       const SizedBox(width: 10),
       Text(
         'BILL ORDERS',
-        style: GoogleFonts.inter(
-          fontSize:      isTablet ? 20 : 17,
-          fontWeight:    FontWeight.w700,
-          color:         const Color(0xFF1E293B),
-          letterSpacing: 1.2,
-        ),
+        style: AppTypography.heading1(color: const Color(0xFF1E293B), fontWeight: FontWeight.w700),
       ),
     ]);
   }
@@ -316,15 +312,10 @@ class _HeaderCard extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text('Bill Order Reports',
-                    style: GoogleFonts.inter(
-                      fontSize:   19,
-                      fontWeight: FontWeight.w700,
-                      color:      const Color(0xFF1E293B),
-                    )),
+                    style: AppTypography.heading1(color: const Color(0xFF1E293B), fontWeight: FontWeight.w700)),
                 const SizedBox(height: 3),
                 Text('View all bill and order transactions',
-                    style: GoogleFonts.inter(
-                        fontSize: 13, color: const Color(0xFF64748B))),
+                    style: AppTypography.bodyLarge(color: const Color(0xFF64748B))),
               ]),
         ),
       ]),
@@ -353,10 +344,7 @@ class _RecordCountPill extends StatelessWidget {
             size: 13, color: Color(0xFF10B981)),
         const SizedBox(width: 5),
         Text("$count records",
-            style: GoogleFonts.inter(
-                color:      const Color(0xFF047857),
-                fontWeight: FontWeight.bold,
-                fontSize:   12)),
+            style: AppTypography.bodyMedium(color: const Color(0xFF047857), fontWeight: FontWeight.bold)),
       ]),
     );
   }
@@ -398,17 +386,9 @@ class _CountBadge extends StatelessWidget {
         const SizedBox(width: 14),
         Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
           Text('Total Records',
-              style: GoogleFonts.inter(
-                fontSize:   12,
-                color:      Colors.white.withValues(alpha: 0.8),
-                fontWeight: FontWeight.w500,
-              )),
+              style: AppTypography.bodyMedium(color: Colors.white.withValues(alpha: 0.8), fontWeight: FontWeight.w500)),
           Text('$count',
-              style: GoogleFonts.inter(
-                fontSize:   28,
-                color:      Colors.white,
-                fontWeight: FontWeight.w700,
-              )),
+              style: AppTypography.display(color: Colors.white, fontWeight: FontWeight.w700)),
         ]),
       ]),
     );
@@ -523,19 +503,10 @@ class _DateButton extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(label,
-                      style: GoogleFonts.inter(
-                        fontSize:      isTablet ? 11 : 10,
-                        color:         Colors.grey[500],
-                        fontWeight:    FontWeight.w600,
-                        letterSpacing: 0.5,
-                      )),
+                      style: AppTypography.badgeText(color: Colors.grey[500], fontWeight: FontWeight.w600)),
                   const SizedBox(height: 1),
                   Text(value,
-                      style: GoogleFonts.inter(
-                        fontSize:   isTablet ? 13 : 12,
-                        fontWeight: FontWeight.w700,
-                        color:      const Color(0xFF1E293B),
-                      )),
+                      style: AppTypography.bodyMedium(color: const Color(0xFF1E293B), fontWeight: FontWeight.w700)),
                 ]),
           ),
           Icon(Icons.keyboard_arrow_down_rounded,
@@ -564,9 +535,7 @@ class _LoadingView extends StatelessWidget {
         ),
         const SizedBox(height: 16),
         Text("Fetching bill orders…",
-            style: GoogleFonts.inter(
-                color: Colors.grey.shade500,
-                fontSize: isTablet ? 14 : 13)),
+            style: AppTypography.bodyLarge(color: Colors.grey.shade500)),
       ]),
     );
   }
@@ -673,11 +642,7 @@ class _BillCard extends StatelessWidget {
                   child: Text(
                     bill.BillNoDisplay,
                     overflow: TextOverflow.ellipsis,
-                    style: GoogleFonts.inter(
-                      fontSize:   isTablet ? 14 : 15,
-                      fontWeight: FontWeight.w700,
-                      color:      Colors.white,
-                    ),
+                    style: AppTypography.heading2(color: Colors.white, fontWeight: FontWeight.w700),
                   ),
                 ),
                 // Date badge
@@ -689,11 +654,7 @@ class _BillCard extends StatelessWidget {
                     borderRadius: BorderRadius.circular(20),
                   ),
                   child: Text(bill.BillNoDisplay1,
-                      style: GoogleFonts.inter(
-                        fontSize:   isTablet ? 10 : 11,
-                        color:      Colors.white,
-                        fontWeight: FontWeight.w600,
-                      )),
+                      style: AppTypography.bodySmall(color: Colors.white, fontWeight: FontWeight.w600)),
                 ),
               ]),
             ),
@@ -709,11 +670,7 @@ class _BillCard extends StatelessWidget {
                     Text(
                       bill.SupplierName,
                       overflow: TextOverflow.ellipsis,
-                      style: GoogleFonts.inter(
-                        fontSize:   isTablet ? 13 : 14,
-                        color:      const Color(0xFF334155),
-                        fontWeight: FontWeight.w700,
-                      ),
+                      style: AppTypography.heading3(color: const Color(0xFF334155), fontWeight: FontWeight.w700),
                     ),
                     SizedBox(height: isTablet ? 4 : 6),
 
@@ -727,10 +684,7 @@ class _BillCard extends StatelessWidget {
                         child: Text(
                           bill.EmployeeName,
                           overflow: TextOverflow.ellipsis,
-                          style: GoogleFonts.inter(
-                            fontSize: isTablet ? 12 : 13,
-                            color:    const Color(0xFF64748B),
-                          ),
+                          style: AppTypography.bodyLarge(color: const Color(0xFF64748B)),
                         ),
                       ),
                       if (bill.InvoiceNo.isNotEmpty) ...[
@@ -739,10 +693,7 @@ class _BillCard extends StatelessWidget {
                             color: const Color(0xFF94A3B8)),
                         const SizedBox(width: 4),
                         Text(bill.InvoiceNo,
-                            style: GoogleFonts.inter(
-                              fontSize: isTablet ? 12 : 13,
-                              color:    const Color(0xFF64748B),
-                            )),
+                            style: AppTypography.bodyLarge(color: const Color(0xFF64748B))),
                       ],
                     ]),
                     SizedBox(height: isTablet ? 8 : 10),
@@ -776,11 +727,7 @@ class _BillCard extends StatelessWidget {
                                       color: Color(0xFF047857)),
                                   Text(
                                     'RM ${bill.NetAmt.toStringAsFixed(2)}',
-                                    style: GoogleFonts.inter(
-                                      color:      const Color(0xFF047857),
-                                      fontWeight: FontWeight.w700,
-                                      fontSize:   isTablet ? 12 : 13,
-                                    ),
+                                    style: AppTypography.heading3(color: const Color(0xFF047857), fontWeight: FontWeight.w700),
                                   ),
                                 ]),
                           ),
@@ -852,11 +799,7 @@ class _BillCard extends StatelessWidget {
                     ),
                     const SizedBox(width: 12),
                     Text('Bill Details',
-                        style: GoogleFonts.inter(
-                          fontSize:   isTablet ? 20 : 18,
-                          fontWeight: FontWeight.w700,
-                          color:      Colors.white,
-                        )),
+                        style: AppTypography.heading1(color: Colors.white, fontWeight: FontWeight.w700)),
                     const Spacer(),
                     // Close X button in header
                     GestureDetector(
@@ -944,11 +887,7 @@ class _BillCard extends StatelessWidget {
                               CrossAxisAlignment.start,
                               children: [
                                 Text('Status',
-                                    style: GoogleFonts.inter(
-                                      fontSize:   11,
-                                      color:      Colors.grey[500],
-                                      fontWeight: FontWeight.w600,
-                                    )),
+                                    style: AppTypography.bodySmall(color: Colors.grey[500], fontWeight: FontWeight.w600)),
                                 const SizedBox(height: 3),
                                 _StatusPill(
                                     isPending: bill.PStatus == 0,
@@ -969,9 +908,7 @@ class _BillCard extends StatelessWidget {
                           icon: const Icon(Icons.check_rounded,
                               size: 18),
                           label: Text('Close',
-                              style: GoogleFonts.inter(
-                                  fontWeight: FontWeight.w600,
-                                  fontSize: 15)),
+                              style: AppTypography.heading2(fontWeight: FontWeight.w600)),
                           style: ElevatedButton.styleFrom(
                             backgroundColor:
                             const Color(0xFF2563EB),
@@ -1083,22 +1020,13 @@ class _DetailRow extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(label,
-                    style: GoogleFonts.inter(
-                      fontSize:      11,
-                      color:         Colors.grey[500],
-                      fontWeight:    FontWeight.w600,
-                      letterSpacing: 0.4,
-                    )),
+                    style: AppTypography.bodySmall(color: Colors.grey[500], fontWeight: FontWeight.w600)),
                 const SizedBox(height: 2),
                 Text(
                   isEmpty ? 'N/A' : value,
-                  style: GoogleFonts.inter(
-                    fontSize:   14,
-                    fontWeight: FontWeight.w600,
-                    color: isEmpty
+                  style: AppTypography.bodyLarge(color: isEmpty
                         ? Colors.grey
-                        : const Color(0xFF1E293B),
-                  ),
+                        : const Color(0xFF1E293B), fontWeight: FontWeight.w600),
                 ),
                 // Underline divider
                 const SizedBox(height: 8),
@@ -1135,17 +1063,11 @@ class _ErrorState extends StatelessWidget {
           ),
           SizedBox(height: isTablet ? 16 : 14),
           Text("Something went wrong",
-              style: GoogleFonts.inter(
-                fontSize:   isTablet ? 17 : 15,
-                fontWeight: FontWeight.w700,
-                color:      const Color(0xFF1E293B),
-              )),
+              style: AppTypography.heading2(color: const Color(0xFF1E293B), fontWeight: FontWeight.w700)),
           SizedBox(height: isTablet ? 8 : 6),
           Text(message,
               textAlign: TextAlign.center,
-              style: GoogleFonts.inter(
-                  color:    Colors.grey,
-                  fontSize: isTablet ? 14 : 13)),
+              style: AppTypography.bodyLarge(color: Colors.grey)),
           SizedBox(height: isTablet ? 20 : 16),
           ElevatedButton.icon(
             onPressed: () => context
@@ -1161,9 +1083,7 @@ class _ErrorState extends StatelessWidget {
             icon:  Icon(Icons.refresh_rounded,
                 size: isTablet ? 20 : 18),
             label: Text('Try Again',
-                style: GoogleFonts.inter(
-                    fontSize:   isTablet ? 15 : 14,
-                    fontWeight: FontWeight.w600)),
+                style: AppTypography.bodyLarge(fontWeight: FontWeight.w600)),
             style: ElevatedButton.styleFrom(
               backgroundColor: const Color(0xFF10B981),
               foregroundColor: Colors.white,
@@ -1201,17 +1121,11 @@ class _EmptyState extends StatelessWidget {
         ),
         SizedBox(height: isTablet ? 20 : 16),
         Text('No Bill Records',
-            style: GoogleFonts.inter(
-              fontSize:   isTablet ? 18 : 16,
-              fontWeight: FontWeight.w700,
-              color:      const Color(0xFF334155),
-            )),
+            style: AppTypography.heading1(color: const Color(0xFF334155), fontWeight: FontWeight.w700)),
         SizedBox(height: isTablet ? 8 : 6),
         Text('No bill orders found for the selected period',
             textAlign: TextAlign.center,
-            style: GoogleFonts.inter(
-                fontSize: isTablet ? 14 : 13,
-                color:    Colors.grey.shade400)),
+            style: AppTypography.bodyLarge(color: Colors.grey.shade400)),
       ]),
     );
   }

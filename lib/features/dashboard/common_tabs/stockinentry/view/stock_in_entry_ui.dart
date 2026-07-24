@@ -1,3 +1,4 @@
+import 'package:maleva/core/theme/app_typography.dart';
 import 'package:maleva/core/utils/system_helpers.dart';
 import 'package:maleva/core/network/api_legacy_helper.dart';
 import 'package:maleva/core/network/api_constants.dart';
@@ -1154,9 +1155,7 @@ class _ImageGrid extends StatelessWidget {
                 color: Palette.kTextMuted),
             const SizedBox(height: 8),
             Text('No images uploaded',
-                style: GoogleFonts.lato(
-                    color: Palette.kTextMuted,
-                    fontSize: 13)),
+                style: AppTypography.bodyLarge(color: Palette.kTextMuted)),
           ],
         ),
       )

@@ -1,3 +1,4 @@
+import 'package:maleva/core/theme/app_typography.dart';
 import 'package:maleva/core/network/api_constants.dart';
 import 'dart:io';
 import 'package:flutter/material.dart';
@@ -158,10 +159,7 @@ class _SparePartsViewBody extends StatelessWidget {
     if (records.isEmpty) {
       return Center(
         child: Text("No Records Found",
-            style: GoogleFonts.lato(
-                fontSize: 18,
-                fontWeight: FontWeight.w500,
-                color: Colors.grey)),
+            style: AppTypography.heading1(color: Colors.grey, fontWeight: FontWeight.w500)),
       );
     }
 
@@ -312,10 +310,7 @@ class _DateFilterBar extends StatelessWidget {
               elevation: 0,
             ),
             child: Text("Search",
-                style: GoogleFonts.lato(
-                    fontSize: isTablet ? 17 : 16,
-                    fontWeight: FontWeight.bold,
-                    color: Palette.kWhite)),
+                style: AppTypography.heading1(color: Palette.kWhite, fontWeight: FontWeight.bold)),
           ),
         ),
       ]),
@@ -390,15 +385,10 @@ class _SparePartsCard extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text("${item['TruckName'] ?? '-'}",
-                style: GoogleFonts.lato(
-                    fontSize: 14,
-                    fontWeight: FontWeight.bold,
-                    color: AppTokens.brandDark),
+                style: AppTypography.heading3(color: AppTokens.brandDark, fontWeight: FontWeight.bold),
                 overflow: TextOverflow.ellipsis),
             Text("${item['EntryDate'] ?? '-'}",
-                style: GoogleFonts.lato(
-                    fontSize: 12,
-                    color: Colors.grey[500])),
+                style: AppTypography.bodyMedium(color: Colors.grey[500])),
           ],
         ),
       ),
@@ -409,10 +399,7 @@ class _SparePartsCard extends StatelessWidget {
             color: AppTokens.brandLight,
             borderRadius: BorderRadius.circular(8)),
         child: Text("₹${item['Amount'] ?? '-'}",
-            style: GoogleFonts.lato(
-                fontWeight: FontWeight.bold,
-                color: AppTokens.brandGradientStart,
-                fontSize: 13)),
+            style: AppTypography.heading3(color: AppTokens.brandGradientStart, fontWeight: FontWeight.bold)),
       ),
     ]);
   }
@@ -437,14 +424,9 @@ class _SparePartsCard extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text("${item['TruckName'] ?? '-'}",
-                      style: GoogleFonts.lato(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                          color: AppTokens.brandDark)),
+                      style: AppTypography.heading1(color: AppTokens.brandDark, fontWeight: FontWeight.bold)),
                   Text("${item['EntryDate'] ?? '-'}",
-                      style: GoogleFonts.lato(
-                          fontSize: 13,
-                          color: Colors.grey[500])),
+                      style: AppTypography.bodyLarge(color: Colors.grey[500])),
                 ]),
           ),
           Container(
@@ -454,10 +436,7 @@ class _SparePartsCard extends StatelessWidget {
                 color: AppTokens.brandLight,
                 borderRadius: BorderRadius.circular(10)),
             child: Text("₹${item['Amount'] ?? '-'}",
-                style: GoogleFonts.lato(
-                    fontWeight: FontWeight.bold,
-                    color: AppTokens.brandGradientStart,
-                    fontSize: 14)),
+                style: AppTypography.heading3(color: AppTokens.brandGradientStart, fontWeight: FontWeight.bold)),
           ),
         ]),
 
@@ -471,10 +450,7 @@ class _SparePartsCard extends StatelessWidget {
               Expanded(
                 child: Text(
                   item['SpareParts'] ?? '-',
-                  style: GoogleFonts.lato(
-                      fontSize: 14,
-                      color: AppTokens.brandDark,
-                      height: 1.4),
+                  style: AppTypography.bodyLarge(color: AppTokens.brandDark),
                 ),
               ),
             ]),
@@ -540,14 +516,10 @@ class _EmptyDetailPanel extends StatelessWidget {
           ),
           const SizedBox(height: 16),
           Text("Select a record",
-              style: GoogleFonts.lato(
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
-                  color: AppTokens.brandDark)),
+              style: AppTypography.heading1(color: AppTokens.brandDark, fontWeight: FontWeight.bold)),
           const SizedBox(height: 6),
           Text("Tap any card to view details",
-              style: GoogleFonts.lato(
-                  fontSize: 13, color: Colors.grey[500])),
+              style: AppTypography.bodyLarge(color: Colors.grey[500])),
         ],
       ),
     );
@@ -598,10 +570,7 @@ class _SparePartsDetailPanel extends StatelessWidget {
               Expanded(
                 child: Text(
                   item['TruckName'] ?? 'Spare Parts Details',
-                  style: GoogleFonts.lato(
-                      fontSize: 17,
-                      fontWeight: FontWeight.bold,
-                      color: Palette.kWhite),
+                  style: AppTypography.heading1(color: Palette.kWhite, fontWeight: FontWeight.bold),
                   overflow: TextOverflow.ellipsis,
                 ),
               ),
@@ -630,10 +599,7 @@ class _SparePartsDetailPanel extends StatelessWidget {
                   if (hasDoc) ...[
                     _divider(),
                     Text("Document",
-                        style: GoogleFonts.lato(
-                            fontSize: 11,
-                            color: Colors.grey[500],
-                            fontWeight: FontWeight.w600)),
+                        style: AppTypography.bodySmall(color: Colors.grey[500], fontWeight: FontWeight.w600)),
                     const SizedBox(height: 8),
                     GestureDetector(
                       onTap: () => showDialog(
@@ -687,15 +653,9 @@ class _SparePartsDetailPanel extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(label,
-                  style: GoogleFonts.lato(
-                      fontSize: 11,
-                      color: Colors.grey[500],
-                      fontWeight: FontWeight.w600)),
+                  style: AppTypography.bodySmall(color: Colors.grey[500], fontWeight: FontWeight.w600)),
               Text(value,
-                  style: GoogleFonts.lato(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w700,
-                      color: AppTokens.brandDark)),
+                  style: AppTypography.heading3(color: AppTokens.brandDark, fontWeight: FontWeight.w700)),
             ],
           ),
         ),
@@ -803,14 +763,9 @@ class _DateTile extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(label,
-                      style: GoogleFonts.lato(
-                          fontSize: 10,
-                          color: Colors.grey[500])),
+                      style: AppTypography.badgeText(color: Colors.grey[500])),
                   Text(value,
-                      style: GoogleFonts.lato(
-                          fontSize: isTablet ? 14 : 13,
-                          color: AppTokens.brandDark,
-                          fontWeight: FontWeight.w600)),
+                      style: AppTypography.bodyLarge(color: AppTokens.brandDark, fontWeight: FontWeight.w600)),
                 ]),
           ),
         ]),

@@ -1,3 +1,4 @@
+import 'package:maleva/core/theme/app_typography.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -107,22 +108,13 @@ class _EmailBody extends StatelessWidget {
                   ),
                   const SizedBox(width: 10),
                   Text('EMAIL',
-                      style: GoogleFonts.lato(
-                        fontSize:      20,
-                        fontWeight:    FontWeight.bold,
-                        color:         AppTokens.brandDark,
-                        letterSpacing: 1.2,
-                      )),
+                      style: AppTypography.heading1(color: AppTokens.brandDark, fontWeight: FontWeight.bold)),
                 ]),
                 const SizedBox(height: 6),
                 Padding(
                   padding: const EdgeInsets.only(left: 14),
                   child: Text('Inbox Management',
-                      style: GoogleFonts.lato(
-                        fontSize:   14,
-                        color:      AppTokens.brandMid,
-                        fontWeight: FontWeight.w500,
-                      )),
+                      style: AppTypography.bodyLarge(color: AppTokens.brandMid, fontWeight: FontWeight.w500)),
                 ),
                 const SizedBox(height: 20),
 
@@ -227,10 +219,7 @@ class _EmployeeDropdown extends StatelessWidget {
           isExpanded: true,
           value:      state.selectedEmployee,
           hint: Text("Select Employee",
-              style: GoogleFonts.lato(
-                color:    Colors.grey,
-                fontSize: isTablet ? 15 : 14,
-              )),
+              style: AppTypography.bodyLarge(color: Colors.grey)),
           icon: Icon(Icons.keyboard_arrow_down_rounded,
               color: AppTokens.brandGradientStart,
               size:  isTablet ? 24 : 22),
@@ -240,11 +229,7 @@ class _EmployeeDropdown extends StatelessWidget {
               child: Text(
                 emp.AccountName,
                 overflow: TextOverflow.ellipsis,
-                style: GoogleFonts.lato(
-                  color:      AppTokens.brandDark,
-                  fontWeight: FontWeight.w600,
-                  fontSize:   isTablet ? 15 : 14,
-                ),
+                style: AppTypography.bodyLarge(color: AppTokens.brandDark, fontWeight: FontWeight.w600),
               ),
             );
           }).toList(),
@@ -302,17 +287,9 @@ class _CountBadge extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text('Total Emails',
-                style: GoogleFonts.lato(
-                  fontSize:   12,
-                  color:      colour.kWhite.withValues(alpha: 0.75),
-                  fontWeight: FontWeight.w500,
-                )),
+                style: AppTypography.bodyMedium(color: colour.kWhite.withValues(alpha: 0.75), fontWeight: FontWeight.w500)),
             Text('$count',
-                style: GoogleFonts.lato(
-                  fontSize:   28,
-                  color:      colour.kWhite,
-                  fontWeight: FontWeight.bold,
-                )),
+                style: AppTypography.display(color: colour.kWhite, fontWeight: FontWeight.bold)),
           ],
         ),
       ]),
@@ -344,11 +321,7 @@ class _SaveButton extends StatelessWidget {
             size:  isTablet ? 22 : 20),
         label: Text(
           state.saving ? "Saving..." : "Save Emails",
-          style: GoogleFonts.lato(
-            color:      colour.kWhite,
-            fontSize:   isTablet ? 16 : 15,
-            fontWeight: FontWeight.bold,
-          ),
+          style: AppTypography.heading2(color: colour.kWhite, fontWeight: FontWeight.bold),
         ),
         onPressed: state.saving
             ? null
@@ -433,11 +406,7 @@ class _EmailCard extends StatelessWidget {
                   child: Text(
                     email.name,
                     overflow: TextOverflow.ellipsis,
-                    style: GoogleFonts.lato(
-                      fontWeight: FontWeight.bold,
-                      fontSize:   isTablet ? 17 : 16,
-                      color:      AppTokens.brandDark,
-                    ),
+                    style: AppTypography.heading1(color: AppTokens.brandDark, fontWeight: FontWeight.bold),
                   ),
                 ),
                 const SizedBox(width: 8),
@@ -447,10 +416,7 @@ class _EmailCard extends StatelessWidget {
                       .toString()
                       .split('.')
                       .first,
-                  style: GoogleFonts.lato(
-                    color:    Colors.grey[500],
-                    fontSize: isTablet ? 12 : 11,
-                  ),
+                  style: AppTypography.bodySmall(color: Colors.grey[500]),
                 ),
               ],
             ),
@@ -460,11 +426,7 @@ class _EmailCard extends StatelessWidget {
             // Subject
             Text(
               email.subject,
-              style: GoogleFonts.lato(
-                fontSize:   isTablet ? 16 : 15,
-                fontWeight: FontWeight.w600,
-                color:      Colors.black87,
-              ),
+              style: AppTypography.heading2(color: Colors.black87, fontWeight: FontWeight.w600),
             ),
 
             SizedBox(height: isTablet ? 6 : 4),
@@ -479,10 +441,7 @@ class _EmailCard extends StatelessWidget {
                 child: Text(
                   email.sender,
                   overflow: TextOverflow.ellipsis,
-                  style: GoogleFonts.lato(
-                    color:    Colors.grey[600],
-                    fontSize: isTablet ? 14 : 13,
-                  ),
+                  style: AppTypography.bodyLarge(color: Colors.grey[600]),
                 ),
               ),
             ]),
@@ -591,12 +550,7 @@ class _CheckboxChip extends StatelessWidget {
           const SizedBox(width: 4),
           Text(
             label,
-            style: GoogleFonts.lato(
-              fontSize:   isTablet ? 14 : 13,
-              fontWeight: FontWeight.w600,
-              color:
-              value ? activeColor : Colors.grey[600],
-            ),
+            style: AppTypography.bodyLarge(color: value ? activeColor : Colors.grey[600], fontWeight: FontWeight.w600),
           ),
           const SizedBox(width: 4),
         ],
@@ -621,9 +575,7 @@ class _ErrorState extends StatelessWidget {
               size:  isTablet ? 60 : 48),
           SizedBox(height: isTablet ? 16 : 12),
           Text("Something went wrong",
-              style: GoogleFonts.lato(
-                  color:    Colors.red,
-                  fontSize: isTablet ? 16 : 14)),
+              style: AppTypography.bodyLarge(color: Colors.red)),
           SizedBox(height: isTablet ? 20 : 16),
           ElevatedButton.icon(
             onPressed: () => context
@@ -632,8 +584,7 @@ class _ErrorState extends StatelessWidget {
             icon:  Icon(Icons.refresh,
                 size: isTablet ? 20 : 18),
             label: Text("Retry",
-                style: GoogleFonts.lato(
-                    fontSize: isTablet ? 15 : 14)),
+                style: AppTypography.bodyLarge()),
             style: ElevatedButton.styleFrom(
               backgroundColor: AppTokens.brandGradientStart,
               padding: EdgeInsets.symmetric(
@@ -659,9 +610,7 @@ class _EmptyState extends StatelessWidget {
   Widget build(BuildContext context) {
     return Center(
       child: Text("No emails found.",
-          style: GoogleFonts.lato(
-              fontSize: isTablet ? 18 : 16,
-              color:    Colors.grey)),
+          style: AppTypography.heading1(color: Colors.grey)),
     );
   }
 }

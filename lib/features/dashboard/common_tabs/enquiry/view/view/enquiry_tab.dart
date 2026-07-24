@@ -1,3 +1,4 @@
+import 'package:maleva/core/theme/app_typography.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -90,10 +91,7 @@ class _EnquiryView extends StatelessWidget {
                         icon: const Icon(Icons.add, size: 20),
                         label: Text(
                           'New Enquiry',
-                          style: GoogleFonts.lato(
-                            fontWeight: FontWeight.w600,
-                            fontSize: 14,
-                          ),
+                          style: AppTypography.bodyLarge(),
                         ),
                       ),
                     ],
@@ -114,22 +112,14 @@ class _EnquiryView extends StatelessWidget {
                           flex: 2,
                           child: Text(
                             'Customer Name',
-                            style: GoogleFonts.lato(
-                              color: Palette.blue900,
-                              fontWeight: FontWeight.bold,
-                              fontSize: 14,
-                            ),
+                            style: AppTypography.heading3(color: Palette.blue900, fontWeight: FontWeight.bold),
                           ),
                         ),
                         Expanded(
                           flex: 2,
                           child: Text(
                             'Notify Date',
-                            style: GoogleFonts.lato(
-                              color: Palette.blue900,
-                              fontWeight: FontWeight.bold,
-                              fontSize: 14,
-                            ),
+                            style: AppTypography.heading3(color: Palette.blue900, fontWeight: FontWeight.bold),
                           ),
                         ),
                         // Empty spacer to align with the action buttons on the cards
@@ -161,11 +151,7 @@ class _EnquiryView extends StatelessWidget {
                           const SizedBox(height: 16),
                           Text(
                             'No Records Found',
-                            style: GoogleFonts.lato(
-                              color: Palette.textMuted,
-                              fontSize: 16,
-                              fontWeight: FontWeight.w500,
-                            ),
+                            style: AppTypography.heading1(color: Palette.textMuted, fontWeight: FontWeight.w500),
                           ),
                         ],
                       ),
@@ -237,11 +223,7 @@ class _EnquiryCard extends StatelessWidget {
                     item["CustomerName"] ?? 'Unknown',
                     overflow: TextOverflow.ellipsis,
                     maxLines: 1,
-                    style: GoogleFonts.lato(
-                      color: Palette.textDark,
-                      fontWeight: FontWeight.w600,
-                      fontSize: 14,
-                    ),
+                    style: AppTypography.bodyLarge(color: Palette.textDark, fontWeight: FontWeight.w600),
                   ),
                 ),
 
@@ -252,11 +234,7 @@ class _EnquiryCard extends StatelessWidget {
                     item["SForwardingDate"] ?? '-',
                     overflow: TextOverflow.ellipsis,
                     maxLines: 1,
-                    style: GoogleFonts.lato(
-                      color: Palette.textMuted,
-                      fontWeight: FontWeight.w500,
-                      fontSize: 14,
-                    ),
+                    style: AppTypography.bodyLarge(color: Palette.textMuted, fontWeight: FontWeight.w500),
                   ),
                 ),
 

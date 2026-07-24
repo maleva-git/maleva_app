@@ -1,3 +1,4 @@
+import 'package:maleva/core/theme/app_typography.dart';
 import 'package:maleva/core/network/api_legacy_helper.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -256,13 +257,7 @@ class _SaleOrderViewState extends State<_SaleOrderView> {
       iconTheme: const IconThemeData(color: AppTokens.appBarIcon),
       title: Text(
         'Dash Board',
-        style: GoogleFonts.lato(
-          textStyle: const TextStyle(
-            color: AppTokens.appBarTitle,
-            fontWeight: FontWeight.bold,
-            fontSize: 18,
-          ),
-        ),
+        style: AppTypography.heading1(color: AppTokens.appBarTitle, fontWeight: FontWeight.bold),
       ),
       actions: [
         IconButton(
@@ -507,12 +502,7 @@ class _DateRow extends StatelessWidget {
           children: [
             Text(
               label.toUpperCase(),
-              style: GoogleFonts.lato(
-                fontSize: 10,
-                fontWeight: FontWeight.bold,
-                color: AppTokens.textMuted,
-                letterSpacing: 0.8,
-              ),
+              style: AppTypography.badgeText(color: AppTokens.textMuted, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 4),
             Row(
@@ -633,19 +623,11 @@ class _SummaryPill extends StatelessWidget {
           const SizedBox(width: 8),
           Text(
             'Total Orders: ',
-            style: GoogleFonts.lato(
-              color: AppTokens.textSecondary,
-              fontWeight: FontWeight.w500,
-              fontSize: 12,
-            ),
+            style: AppTypography.bodyMedium(color: AppTokens.textSecondary, fontWeight: FontWeight.w500),
           ),
           Text(
             '$count',
-            style: GoogleFonts.lato(
-              color: AppTokens.brandPrimary,
-              fontWeight: FontWeight.w800,
-              fontSize: 13,
-            ),
+            style: AppTypography.heading3(color: AppTokens.brandPrimary, fontWeight: FontWeight.w800),
           ),
         ],
       ),
@@ -1026,11 +1008,7 @@ class _FilterSheet extends StatelessWidget {
 
                 Text(
                   'Filter Orders',
-                  style: GoogleFonts.lato(
-                    fontSize: isTablet ? 17 : 15,
-                    fontWeight: FontWeight.bold,
-                    color: AppTokens.textPrimary,
-                  ),
+                  style: AppTypography.heading2(color: AppTokens.textPrimary, fontWeight: FontWeight.bold),
                 ),
                 const SizedBox(height: 14),
 
@@ -1404,14 +1382,10 @@ class _EmptyWidget extends StatelessWidget {
               size: 64, color: Palette.grey400.withValues(alpha: 0.6)),
           const SizedBox(height: 12),
           Text('No orders found',
-              style: GoogleFonts.lato(
-                  fontSize: 15,
-                  fontWeight: FontWeight.w600,
-                  color: AppTokens.textSecondary)),
+              style: AppTypography.heading2(color: AppTokens.textSecondary, fontWeight: FontWeight.w600)),
           const SizedBox(height: 4),
           Text('Adjust filters and tap View',
-              style: GoogleFonts.lato(
-                  fontSize: 12, color: AppTokens.textMuted)),
+              style: AppTypography.bodyMedium(color: AppTokens.textMuted)),
         ],
       ),
     );
@@ -1435,17 +1409,13 @@ class _ErrorWidget extends StatelessWidget {
                 size: 56, color: Palette.redError),
             const SizedBox(height: 12),
             Text('Failed to load data',
-                style: GoogleFonts.lato(
-                    fontSize: 15,
-                    fontWeight: FontWeight.bold,
-                    color: AppTokens.textPrimary)),
+                style: AppTypography.heading2(color: AppTokens.textPrimary, fontWeight: FontWeight.bold)),
             const SizedBox(height: 6),
             Text(message,
                 textAlign: TextAlign.center,
                 maxLines: 3,
                 overflow: TextOverflow.ellipsis,
-                style: GoogleFonts.lato(
-                    fontSize: 12, color: AppTokens.textMuted)),
+                style: AppTypography.bodyMedium(color: AppTokens.textMuted)),
             const SizedBox(height: 18),
             ElevatedButton.icon(
               style: ElevatedButton.styleFrom(

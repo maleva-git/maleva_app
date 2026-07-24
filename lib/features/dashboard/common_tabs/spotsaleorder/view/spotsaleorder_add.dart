@@ -1,3 +1,4 @@
+import 'package:maleva/core/theme/app_typography.dart';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
@@ -157,22 +158,13 @@ class _SpotSaleEntryBody extends StatelessWidget {
               ),
               const SizedBox(width: 10),
               Text('SPOT SALE ENTRY',
-                  style: GoogleFonts.lato(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                    color: AppTokens.brandDark,
-                    letterSpacing: 1.2,
-                  )),
+                  style: AppTypography.heading1(color: AppTokens.brandDark, fontWeight: FontWeight.bold)),
             ]),
             const SizedBox(height: 6),
             Padding(
               padding: const EdgeInsets.only(left: 14),
               child: Text('Entry Form',
-                  style: GoogleFonts.lato(
-                    fontSize: 14,
-                    color: AppTokens.brandMid,
-                    fontWeight: FontWeight.w500,
-                  )),
+                  style: AppTypography.bodyLarge(color: AppTokens.brandMid, fontWeight: FontWeight.w500)),
             ),
             const SizedBox(height: 24),
           ],
@@ -340,9 +332,7 @@ class _SpotSaleEntryBody extends StatelessWidget {
                     (s.pickedImage == null && s.pickedPDF == null)
                         ? "Upload Document"
                         : "Change Document",
-                    style: GoogleFonts.lato(
-                        fontSize: 15,
-                        fontWeight: FontWeight.w600),
+                    style: AppTypography.heading2(fontWeight: FontWeight.w600),
                   ),
                 ),
               ),
@@ -374,9 +364,7 @@ class _SpotSaleEntryBody extends StatelessWidget {
                     Expanded(
                       child: Text(
                         s.pickedPDF!.path.split('/').last,
-                        style: GoogleFonts.lato(
-                            fontSize: 14,
-                            fontWeight: FontWeight.w600),
+                        style: AppTypography.bodyLarge(fontWeight: FontWeight.w600),
                         overflow: TextOverflow.ellipsis,
                       ),
                     ),
@@ -436,10 +424,7 @@ class _SpotSaleEntryBody extends StatelessWidget {
                         color: colour.kWhite,
                         strokeWidth: 2))
                     : Text("Submit",
-                    style: GoogleFonts.lato(
-                        fontSize: isTablet ? 17 : 18,
-                        fontWeight: FontWeight.bold,
-                        color: colour.kWhite)),
+                    style: AppTypography.heading1(color: colour.kWhite, fontWeight: FontWeight.bold)),
               ),
             ),
             const SizedBox(width: 12),
@@ -460,10 +445,7 @@ class _SpotSaleEntryBody extends StatelessWidget {
                         builder: (_) =>
                         const SpotSaleViewPage())),
                 child: Text("View",
-                    style: GoogleFonts.lato(
-                        fontSize: isTablet ? 17 : 18,
-                        fontWeight: FontWeight.bold,
-                        color: colour.kWhite)),
+                    style: AppTypography.heading1(color: colour.kWhite, fontWeight: FontWeight.bold)),
               ),
             ),
           ]),
@@ -526,11 +508,7 @@ class _SpotSalePreviewPanel extends StatelessWidget {
               ),
               const SizedBox(width: 10),
               Text('Entry Preview',
-                  style: GoogleFonts.lato(
-                    fontSize: 15,
-                    fontWeight: FontWeight.bold,
-                    color: AppTokens.brandDark,
-                  )),
+                  style: AppTypography.heading2(color: AppTokens.brandDark, fontWeight: FontWeight.bold)),
             ]),
 
             const SizedBox(height: 20),
@@ -548,18 +526,11 @@ class _SpotSalePreviewPanel extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text('Job Type',
-                      style: GoogleFonts.lato(
-                        fontSize: 11,
-                        color: colour.kWhite.withValues(alpha: 0.75),
-                      )),
+                      style: AppTypography.bodySmall(color: colour.kWhite.withValues(alpha: 0.75))),
                   const SizedBox(height: 4),
                   Text(
                     jobTypeName,
-                    style: GoogleFonts.lato(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                      color: colour.kWhite,
-                    ),
+                    style: AppTypography.heading1(color: colour.kWhite, fontWeight: FontWeight.bold),
                     overflow: TextOverflow.ellipsis,
                   ),
                 ],
@@ -614,11 +585,7 @@ class _SpotSalePreviewPanel extends StatelessWidget {
                         color: AppTokens.brandGradientStart, size: 16),
                     const SizedBox(width: 6),
                     Text('Document',
-                        style: GoogleFonts.lato(
-                          fontSize: 12,
-                          fontWeight: FontWeight.bold,
-                          color: AppTokens.brandDark,
-                        )),
+                        style: AppTypography.bodyMedium(color: AppTokens.brandDark, fontWeight: FontWeight.bold)),
                   ]),
                   const SizedBox(height: 8),
 
@@ -661,9 +628,7 @@ class _SpotSalePreviewPanel extends StatelessWidget {
                               .split('/')
                               .last
                               : 'No document uploaded',
-                          style: GoogleFonts.lato(
-                              fontSize: 12,
-                              color: Colors.grey[600]),
+                          style: AppTypography.bodyMedium(color: Colors.grey[600]),
                           overflow: TextOverflow.ellipsis,
                         ),
                       ),
@@ -690,11 +655,7 @@ class _SpotSalePreviewPanel extends StatelessWidget {
                         color: AppTokens.brandGradientStart, size: 16),
                     const SizedBox(width: 6),
                     Text('Tips',
-                        style: GoogleFonts.lato(
-                          fontSize: 12,
-                          fontWeight: FontWeight.bold,
-                          color: AppTokens.brandDark,
-                        )),
+                        style: AppTypography.bodyMedium(color: AppTokens.brandDark, fontWeight: FontWeight.bold)),
                   ]),
                   const SizedBox(height: 8),
                   _tipRow('Select Job Type and Status first'),
@@ -728,18 +689,10 @@ class _SpotSalePreviewPanel extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(label,
-                  style: GoogleFonts.lato(
-                    fontSize: 11,
-                    color: Colors.grey[500],
-                    fontWeight: FontWeight.w600,
-                  )),
+                  style: AppTypography.bodySmall(color: Colors.grey[500], fontWeight: FontWeight.w600)),
               const SizedBox(height: 2),
               Text(value,
-                  style: GoogleFonts.lato(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w700,
-                    color: AppTokens.brandDark,
-                  ),
+                  style: AppTypography.heading3(color: AppTokens.brandDark, fontWeight: FontWeight.w700),
                   overflow: TextOverflow.ellipsis),
             ],
           ),
@@ -757,10 +710,7 @@ class _SpotSalePreviewPanel extends StatelessWidget {
         const SizedBox(width: 6),
         Expanded(
           child: Text(text,
-              style: GoogleFonts.lato(
-                fontSize: 12,
-                color: Colors.grey[600],
-              )),
+              style: AppTypography.bodyMedium(color: Colors.grey[600])),
         ),
       ]),
     );
@@ -979,10 +929,7 @@ class _SelectPageScaffold extends StatelessWidget {
               color: colour.kWhite, size: 20),
         ),
         title: Text(title,
-            style: GoogleFonts.lato(
-                fontWeight: FontWeight.bold,
-                fontSize: 18,
-                color: colour.kWhite)),
+            style: AppTypography.heading1(color: colour.kWhite, fontWeight: FontWeight.bold)),
         centerTitle: true,
       ),
       body: Column(children: [
@@ -1018,10 +965,7 @@ class _SelectPageScaffold extends StatelessWidget {
                 color: AppTokens.brandMid, size: 16),
             const SizedBox(width: 6),
             Text("$count items found",
-                style: GoogleFonts.lato(
-                    fontSize: 13,
-                    color: Colors.grey[500],
-                    fontWeight: FontWeight.w600)),
+                style: AppTypography.bodyLarge(color: Colors.grey[500], fontWeight: FontWeight.w600)),
           ]),
         ),
         Expanded(
@@ -1035,9 +979,7 @@ class _SelectPageScaffold extends StatelessWidget {
                       size: 56),
                   const SizedBox(height: 10),
                   Text("No items found",
-                      style: GoogleFonts.lato(
-                          fontSize: 16,
-                          color: Colors.grey)),
+                      style: AppTypography.heading1(color: Colors.grey)),
                 ]),
           )
               : ListView.builder(
@@ -1093,10 +1035,7 @@ class _SelectListTile extends StatelessWidget {
           const SizedBox(width: 14),
           Expanded(
             child: Text(label,
-                style: GoogleFonts.lato(
-                    fontSize: 15,
-                    fontWeight: FontWeight.w600,
-                    color: AppTokens.brandDark)),
+                style: AppTypography.heading2(color: AppTokens.brandDark, fontWeight: FontWeight.w600)),
           ),
           const Icon(Icons.chevron_right_rounded,
               color: AppTokens.brandMid),
@@ -1138,10 +1077,7 @@ class _SectionCard extends StatelessWidget {
             ),
             const SizedBox(width: 8),
             Text(title,
-                style: GoogleFonts.lato(
-                    fontSize: isTablet ? 14 : 13,
-                    fontWeight: FontWeight.bold,
-                    color: AppTokens.brandDark)),
+                style: AppTypography.heading3(color: AppTokens.brandDark, fontWeight: FontWeight.bold)),
           ]),
           const SizedBox(height: 8),
           Container(
@@ -1213,21 +1149,15 @@ class _SelectTile extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(label,
-                      style: GoogleFonts.lato(
-                          fontSize: 11,
-                          color: hasValue
+                      style: AppTypography.bodySmall(color: hasValue
                               ? AppTokens.brandGradientStart
-                              : Colors.grey,
-                          fontWeight: FontWeight.w600)),
+                              : Colors.grey, fontWeight: FontWeight.w600)),
                   const SizedBox(height: 2),
                   Text(
                     hasValue ? value! : placeholder,
-                    style: GoogleFonts.lato(
-                        fontSize: 14,
-                        color: hasValue
+                    style: AppTypography.heading3(color: hasValue
                             ? AppTokens.brandDark
-                            : Colors.grey.shade400,
-                        fontWeight: hasValue
+                            : Colors.grey.shade400, fontWeight: hasValue
                             ? FontWeight.bold
                             : FontWeight.normal),
                     overflow: TextOverflow.ellipsis,

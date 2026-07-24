@@ -1,3 +1,4 @@
+import 'package:maleva/core/theme/app_typography.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../bloc/leave_bloc.dart';
@@ -181,7 +182,7 @@ class _DriverLeaveRequestTabState extends State<_DriverLeaveRequestTabBody> {
                     const SizedBox(width: 8),
                     Text(
                       'Request Leave',
-                      style: GoogleFonts.lato(fontWeight: FontWeight.w800, fontSize: 16, color: AppTokens.brandDark),
+                      style: AppTypography.heading1(color: AppTokens.brandDark, fontWeight: FontWeight.w800),
                     ),
                   ],
                 ),
@@ -248,7 +249,7 @@ class _DriverLeaveRequestTabState extends State<_DriverLeaveRequestTabBody> {
                               children: [
                                 const Icon(Icons.send_rounded, color: Colors.white, size: 18),
                                 const SizedBox(width: 8),
-                                Text('Submit Request', style: GoogleFonts.lato(color: Colors.white, fontSize: 15, fontWeight: FontWeight.bold)),
+                                Text('Submit Request', style: AppTypography.heading2(color: Colors.white, fontWeight: FontWeight.bold)),
                               ],
                             ),
                     ),
@@ -339,7 +340,7 @@ class _DriverLeaveRequestTabState extends State<_DriverLeaveRequestTabBody> {
                                     const SizedBox(width: 6),
                                     Text(
                                       '${DateFormat('dd MMM').format(req.fromDate)}  ➔  ${DateFormat('dd MMM').format(req.toDate)}',
-                                      style: GoogleFonts.lato(color: Colors.black87, fontSize: 14, fontWeight: FontWeight.w700),
+                                      style: AppTypography.heading3(color: Colors.black87, fontWeight: FontWeight.w700),
                                     ),
                                   ],
                                 ),
@@ -352,7 +353,7 @@ class _DriverLeaveRequestTabState extends State<_DriverLeaveRequestTabBody> {
                                   ),
                                   child: Text(
                                     req.statusName, 
-                                    style: GoogleFonts.lato(color: statusColor, fontSize: 11, fontWeight: FontWeight.bold),
+                                    style: AppTypography.bodySmall(color: statusColor, fontWeight: FontWeight.bold),
                                   ),
                                 ),
                               ],
@@ -372,9 +373,9 @@ class _DriverLeaveRequestTabState extends State<_DriverLeaveRequestTabBody> {
                                     child: Column(
                                       crossAxisAlignment: CrossAxisAlignment.start,
                                       children: [
-                                        Text('Reason', style: GoogleFonts.lato(fontSize: 11, color: Colors.grey, fontWeight: FontWeight.w600)),
+                                        Text('Reason', style: AppTypography.bodySmall(color: Colors.grey, fontWeight: FontWeight.w600)),
                                         const SizedBox(height: 2),
-                                        Text(req.reason, style: GoogleFonts.lato(fontSize: 13, color: Colors.black87, fontWeight: FontWeight.w500)),
+                                        Text(req.reason, style: AppTypography.bodyLarge(color: Colors.black87, fontWeight: FontWeight.w500)),
                                       ],
                                     ),
                                   ),
@@ -386,7 +387,7 @@ class _DriverLeaveRequestTabState extends State<_DriverLeaveRequestTabBody> {
                                     ),
                                     child: Text(
                                       '${req.totalDays} Days',
-                                      style: GoogleFonts.lato(color: Colors.blue.shade700, fontSize: 12, fontWeight: FontWeight.bold),
+                                      style: AppTypography.bodyMedium(color: Colors.blue.shade700, fontWeight: FontWeight.bold),
                                     ),
                                   ),
                                 ],
@@ -402,7 +403,7 @@ class _DriverLeaveRequestTabState extends State<_DriverLeaveRequestTabBody> {
                                     Expanded(
                                       child: Text(
                                         'Remark: ${req.reviewRemark}',
-                                        style: GoogleFonts.lato(color: Colors.redAccent, fontSize: 12, fontWeight: FontWeight.w500),
+                                        style: AppTypography.bodyMedium(color: Colors.redAccent, fontWeight: FontWeight.w500),
                                       ),
                                     ),
                                   ],
@@ -417,7 +418,7 @@ class _DriverLeaveRequestTabState extends State<_DriverLeaveRequestTabBody> {
                                     const SizedBox(width: 4),
                                     Text(
                                       'Reviewed By: ${req.reviewedByName}',
-                                      style: GoogleFonts.lato(color: Colors.blueGrey, fontSize: 12, fontWeight: FontWeight.w600),
+                                      style: AppTypography.bodyMedium(color: Colors.blueGrey, fontWeight: FontWeight.w600),
                                     ),
                                   ],
                                 ),

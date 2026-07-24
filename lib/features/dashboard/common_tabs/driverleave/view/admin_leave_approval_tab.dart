@@ -1,3 +1,4 @@
+import 'package:maleva/core/theme/app_typography.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../bloc/leave_bloc.dart';
@@ -188,7 +189,7 @@ class _AdminLeaveApprovalTabState extends State<AdminLeaveApprovalTab> {
                                 Expanded(
                                   child: Text(
                                     req.applicantName.isNotEmpty ? req.applicantName : 'Driver ${req.applicantRefId}', 
-                                    style: GoogleFonts.lato(fontWeight: FontWeight.w800, fontSize: 16, color: AppTokens.textPrimary),
+                                    style: AppTypography.heading1(color: AppTokens.textPrimary, fontWeight: FontWeight.w800),
                                     maxLines: 1,
                                     overflow: TextOverflow.ellipsis,
                                   ),
@@ -202,7 +203,7 @@ class _AdminLeaveApprovalTabState extends State<AdminLeaveApprovalTab> {
                                   ),
                                   child: Text(
                                     req.statusName, 
-                                    style: GoogleFonts.lato(color: statusColor, fontSize: 11, fontWeight: FontWeight.bold),
+                                    style: AppTypography.bodySmall(color: statusColor, fontWeight: FontWeight.bold),
                                   ),
                                 ),
                               ],
@@ -214,7 +215,7 @@ class _AdminLeaveApprovalTabState extends State<AdminLeaveApprovalTab> {
                                 const SizedBox(width: 6),
                                 Text(
                                   '${DateFormat('dd MMM yyyy').format(req.fromDate)}  ➔  ${DateFormat('dd MMM yyyy').format(req.toDate)}',
-                                  style: GoogleFonts.lato(color: AppTokens.textPrimary, fontSize: 13, fontWeight: FontWeight.w600),
+                                  style: AppTypography.bodyLarge(color: AppTokens.textPrimary, fontWeight: FontWeight.w600),
                                 ),
                                 const Spacer(),
                                 Container(
@@ -225,7 +226,7 @@ class _AdminLeaveApprovalTabState extends State<AdminLeaveApprovalTab> {
                                   ),
                                   child: Text(
                                     '${req.totalDays} Days',
-                                    style: GoogleFonts.lato(color: Colors.blue.shade700, fontSize: 12, fontWeight: FontWeight.bold),
+                                    style: AppTypography.bodyMedium(color: Colors.blue.shade700, fontWeight: FontWeight.bold),
                                   ),
                                 ),
                               ],
@@ -241,9 +242,9 @@ class _AdminLeaveApprovalTabState extends State<AdminLeaveApprovalTab> {
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Text('Reason', style: GoogleFonts.lato(fontSize: 11, color: AppTokens.textMuted, fontWeight: FontWeight.w600)),
+                                  Text('Reason', style: AppTypography.bodySmall(color: AppTokens.textMuted, fontWeight: FontWeight.w600)),
                                   const SizedBox(height: 2),
-                                  Text(req.reason, style: GoogleFonts.lato(fontSize: 13, color: AppTokens.textPrimary, fontWeight: FontWeight.w500)),
+                                  Text(req.reason, style: AppTypography.bodyLarge(color: AppTokens.textPrimary, fontWeight: FontWeight.w500)),
                                 ],
                               ),
                             ),
@@ -257,7 +258,7 @@ class _AdminLeaveApprovalTabState extends State<AdminLeaveApprovalTab> {
                                     Expanded(
                                       child: Text(
                                         'Remark: ${req.reviewRemark}',
-                                        style: GoogleFonts.lato(color: Colors.redAccent, fontSize: 12, fontWeight: FontWeight.w500),
+                                        style: AppTypography.bodyMedium(color: Colors.redAccent, fontWeight: FontWeight.w500),
                                       ),
                                     ),
                                   ],
@@ -272,7 +273,7 @@ class _AdminLeaveApprovalTabState extends State<AdminLeaveApprovalTab> {
                                     const SizedBox(width: 4),
                                     Text(
                                       'Reviewed By: ${req.reviewedByName}',
-                                      style: GoogleFonts.lato(color: Colors.blueGrey, fontSize: 12, fontWeight: FontWeight.w600),
+                                      style: AppTypography.bodyMedium(color: Colors.blueGrey, fontWeight: FontWeight.w600),
                                     ),
                                   ],
                                 ),
