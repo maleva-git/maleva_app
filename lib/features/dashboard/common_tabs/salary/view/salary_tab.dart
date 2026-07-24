@@ -1,3 +1,4 @@
+import 'package:maleva/core/theme/app_typography.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -152,21 +153,11 @@ class _SalaryHeader extends StatelessWidget {
       children: [
         Text(
           'SALARY',
-          style: GoogleFonts.lato(
-            color: Palette.redError,
-            fontWeight: FontWeight.bold,
-            fontSize: 18,
-            letterSpacing: 0.3,
-          ),
+          style: AppTypography.heading1(color: Palette.redError, fontWeight: FontWeight.bold),
         ),
         Text(
           '  –  RM ${state.salaryAmount.toStringAsFixed(2)}',
-          style: GoogleFonts.lato(
-            color: Palette.green,
-            fontWeight: FontWeight.bold,
-            fontSize: 18,
-            letterSpacing: 0.3,
-          ),
+          style: AppTypography.heading1(color: Palette.green, fontWeight: FontWeight.bold),
         ),
       ],
     );
@@ -258,11 +249,7 @@ class _InlineDatePicker extends StatelessWidget {
             const SizedBox(width: 8),
             Text(
               displayDate,
-              style: GoogleFonts.lato(
-                fontSize: 13,
-                fontWeight: FontWeight.bold,
-                color: AppTokens.brandDark,
-              ),
+              style: AppTypography.heading3(color: AppTokens.brandDark, fontWeight: FontWeight.bold),
             ),
           ],
         ),
@@ -333,21 +320,12 @@ class _DatePickerCard extends StatelessWidget {
               children: [
                 Text(
                   label,
-                  style: GoogleFonts.lato(
-                    fontSize: 11,
-                    color: AppTokens.textSecondary,
-                    fontWeight: FontWeight.w600,
-                    letterSpacing: 0.4,
-                  ),
+                  style: AppTypography.bodySmall(color: AppTokens.textSecondary, fontWeight: FontWeight.w600),
                 ),
                 const SizedBox(height: 2),
                 Text(
                   displayDate,
-                  style: GoogleFonts.lato(
-                    fontSize: 14,
-                    fontWeight: FontWeight.bold,
-                    color: AppTokens.brandDark,
-                  ),
+                  style: AppTypography.heading3(color: AppTokens.brandDark, fontWeight: FontWeight.bold),
                 ),
               ],
             ),
@@ -395,12 +373,7 @@ class _HeaderCell extends StatelessWidget {
     return Text(
       text,
       textAlign: align,
-      style: GoogleFonts.lato(
-        color: AppTokens.textOnDark,
-        fontWeight: FontWeight.bold,
-        fontSize: 13,
-        letterSpacing: 0.4,
-      ),
+      style: AppTypography.heading3(color: AppTokens.textOnDark, fontWeight: FontWeight.bold),
     );
   }
 }
@@ -425,7 +398,7 @@ class _SalaryList extends StatelessWidget {
         child: Text(
           'Failed to load data.\n${state.errorMessage ?? ''}',
           textAlign: TextAlign.center,
-          style: GoogleFonts.lato(color: AppTokens.statusDanger, fontSize: 14),
+          style: AppTypography.bodyLarge(color: AppTokens.statusDanger),
         ),
       );
     }
@@ -434,10 +407,7 @@ class _SalaryList extends StatelessWidget {
       return Center(
         child: Text(
           'No salary records found.',
-          style: GoogleFonts.lato(
-            color: AppTokens.textSecondary,
-            fontSize: 14,
-          ),
+          style: AppTypography.bodyLarge(color: AppTokens.textSecondary),
         ),
       );
     }
@@ -492,11 +462,7 @@ class _SalaryRow extends StatelessWidget {
                 billDate,
                 overflow: TextOverflow.ellipsis,
                 maxLines: 1,
-                style: GoogleFonts.lato(
-                  fontSize: 13,
-                  fontWeight: FontWeight.w600,
-                  color: AppTokens.brandDark,
-                ),
+                style: AppTypography.bodyLarge(color: AppTokens.brandDark, fontWeight: FontWeight.w600),
               ),
             ),
             // Bill No
@@ -506,11 +472,7 @@ class _SalaryRow extends StatelessWidget {
                 billNo,
                 overflow: TextOverflow.ellipsis,
                 maxLines: 1,
-                style: GoogleFonts.lato(
-                  fontSize: 13,
-                  fontWeight: FontWeight.w600,
-                  color: AppTokens.maintTextMid,
-                ),
+                style: AppTypography.bodyLarge(color: AppTokens.maintTextMid, fontWeight: FontWeight.w600),
               ),
             ),
             // Net Amount — right-aligned with accent chip
@@ -527,11 +489,7 @@ class _SalaryRow extends StatelessWidget {
                   ),
                   child: Text(
                     'RM ${netAmt.toStringAsFixed(2)}',
-                    style: GoogleFonts.lato(
-                      fontSize: 12,
-                      fontWeight: FontWeight.bold,
-                      color: AppTokens.brandPrimary,
-                    ),
+                    style: AppTypography.bodyMedium(color: AppTokens.brandPrimary, fontWeight: FontWeight.bold),
                   ),
                 ),
               ),

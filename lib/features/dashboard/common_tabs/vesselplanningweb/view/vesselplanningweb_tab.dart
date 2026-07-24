@@ -1,3 +1,4 @@
+import 'package:maleva/core/theme/app_typography.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -444,12 +445,7 @@ class _VesselPlanningWebViewState extends State<VesselPlanningWebView> {
         ),
         title: Text(
           "Vessel Planning",
-          style: GoogleFonts.lato(
-            color: Colors.white,
-            fontWeight: FontWeight.w700,
-            fontSize: 16,
-            letterSpacing: 0.3,
-          ),
+          style: AppTypography.heading1(color: Colors.white, fontWeight: FontWeight.w700),
         ),
         actions: [
           if (_currentMasterId > 0 && widget.pageDelete)
@@ -515,10 +511,7 @@ class _VesselPlanningWebViewState extends State<VesselPlanningWebView> {
     return ExpansionTile(
       initiallyExpanded: true,
       title: Text("Master Filters & Planning Info",
-          style: GoogleFonts.lato(
-              fontWeight: FontWeight.w700,
-              fontSize: 14,
-              color: colour.kTextDark)),
+          style: AppTypography.heading3(color: colour.kTextDark, fontWeight: FontWeight.w700)),
       childrenPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       backgroundColor: Colors.white,
       collapsedBackgroundColor: Colors.white,
@@ -585,8 +578,7 @@ class _VesselPlanningWebViewState extends State<VesselPlanningWebView> {
               activeColor: AppTokens.invoiceHeaderStart,
             ),
             Text("Delivery Done",
-                style: GoogleFonts.lato(
-                    fontSize: 12, fontWeight: FontWeight.w600)),
+                style: AppTypography.bodyMedium()),
           ],
         ),
         const SizedBox(height: 12),
@@ -599,8 +591,7 @@ class _VesselPlanningWebViewState extends State<VesselPlanningWebView> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text("Search Port",
-                      style: GoogleFonts.lato(
-                          fontSize: 16, fontWeight: FontWeight.bold)),
+                      style: AppTypography.heading1()),
                   const SizedBox(height: 6),
                   Container(
                     height: 48,
@@ -632,8 +623,7 @@ class _VesselPlanningWebViewState extends State<VesselPlanningWebView> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text("Add Port",
-                      style: GoogleFonts.lato(
-                          fontSize: 16, fontWeight: FontWeight.bold)),
+                      style: AppTypography.heading1()),
                   const SizedBox(height: 6),
                   InkWell(
                     onTap: () {
@@ -682,8 +672,7 @@ class _VesselPlanningWebViewState extends State<VesselPlanningWebView> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text("Employee",
-                      style: GoogleFonts.lato(
-                          fontSize: 16, fontWeight: FontWeight.bold)),
+                      style: AppTypography.heading1()),
                   const SizedBox(height: 6),
                   InkWell(
                     onTap: () async {
@@ -729,8 +718,7 @@ class _VesselPlanningWebViewState extends State<VesselPlanningWebView> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text("Remarks",
-                      style: GoogleFonts.lato(
-                          fontSize: 16, fontWeight: FontWeight.bold)),
+                      style: AppTypography.heading1()),
                   const SizedBox(height: 6),
                   Container(
                     height: 48,
@@ -808,14 +796,10 @@ class _VesselPlanningWebViewState extends State<VesselPlanningWebView> {
             child: TextField(
               controller: _searchCtrl,
               onChanged: (v) => setState(() => _searchQuery = v),
-              style: GoogleFonts.lato(
-                  color: colour.kTextDark,
-                  fontSize: 13,
-                  fontWeight: FontWeight.w600),
+              style: AppTypography.bodyLarge(color: colour.kTextDark, fontWeight: FontWeight.w600),
               decoration: InputDecoration(
                 hintText: 'Search within grid...',
-                hintStyle: GoogleFonts.lato(
-                    color: AppTokens.planTextMuted, fontSize: 13),
+                hintStyle: AppTypography.bodyLarge(color: AppTokens.planTextMuted),
                 border: InputBorder.none,
                 contentPadding:
                     const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
@@ -840,10 +824,7 @@ class _VesselPlanningWebViewState extends State<VesselPlanningWebView> {
           child: Row(
             children: [
               Text('${filtered.length} jobs',
-                  style: GoogleFonts.lato(
-                      color: AppTokens.planTextMuted,
-                      fontSize: 12,
-                      fontWeight: FontWeight.w600)),
+                  style: AppTypography.bodyMedium(color: AppTokens.planTextMuted, fontWeight: FontWeight.w600)),
               const Spacer(),
               if (filtered.isNotEmpty)
                 TextButton.icon(
@@ -877,10 +858,7 @@ class _VesselPlanningWebViewState extends State<VesselPlanningWebView> {
                   const Icon(Icons.search_off_rounded, size: 50, color: Colors.grey),
                   const SizedBox(height: 12),
                   Text('No Data Found',
-                      style: GoogleFonts.lato(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w600,
-                          color: Colors.grey.shade600)),
+                      style: AppTypography.heading1(color: Colors.grey.shade600, fontWeight: FontWeight.w600)),
                 ],
               ),
             ),
@@ -946,7 +924,7 @@ class _TextFieldItem extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(label,
-            style: GoogleFonts.lato(fontSize: 16, fontWeight: FontWeight.bold)),
+            style: AppTypography.heading1()),
         const SizedBox(height: 6),
         Container(
           height: 48,
@@ -983,7 +961,7 @@ class _DateTile extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(label,
-            style: GoogleFonts.lato(fontSize: 16, fontWeight: FontWeight.bold)),
+            style: AppTypography.heading1()),
         const SizedBox(height: 6),
         InkWell(
           onTap: onTap,
@@ -1036,11 +1014,7 @@ class _EtaChip extends StatelessWidget {
         ),
         child: Text(
           label,
-          style: GoogleFonts.lato(
-            color: selected ? Colors.white : AppTokens.planTextMuted,
-            fontWeight: FontWeight.w600,
-            fontSize: 11,
-          ),
+          style: AppTypography.bodySmall(color: selected ? Colors.white : AppTokens.planTextMuted, fontWeight: FontWeight.w600),
         ),
       ),
     );
@@ -1145,11 +1119,7 @@ class _JobCard extends StatelessWidget {
                       data.jobNo.isNotEmpty
                           ? data.jobNo
                           : '#${data.saleOrderMasterRefId}',
-                      style: GoogleFonts.lato(
-                        color: AppTokens.invoiceHeaderStart,
-                        fontWeight: FontWeight.w800,
-                        fontSize: 14,
-                      ),
+                      style: AppTypography.heading3(color: AppTokens.invoiceHeaderStart, fontWeight: FontWeight.w800),
                     ),
                   ),
                   // Status badge
@@ -1166,11 +1136,7 @@ class _JobCard extends StatelessWidget {
                       ),
                       child: Text(
                         data.jobStatus,
-                        style: GoogleFonts.lato(
-                          color: AppTokens.statusSuccess,
-                          fontSize: 9,
-                          fontWeight: FontWeight.w700,
-                        ),
+                        style: AppTypography.badgeText(color: AppTokens.statusSuccess, fontWeight: FontWeight.w700),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                       ),
@@ -1245,11 +1211,7 @@ class _JobCard extends StatelessWidget {
                   const SizedBox(width: 4),
                   Text(
                     'Job Date: ${data.jobDate}',
-                    style: GoogleFonts.lato(
-                      color: AppTokens.planTextMuted,
-                      fontSize: 11,
-                      fontWeight: FontWeight.w600,
-                    ),
+                    style: AppTypography.bodySmall(color: AppTokens.planTextMuted, fontWeight: FontWeight.w600),
                   ),
                   const Spacer(),
                   const Icon(Icons.touch_app_rounded,
@@ -1257,10 +1219,7 @@ class _JobCard extends StatelessWidget {
                   const SizedBox(width: 4),
                   Text(
                     'Long press to edit',
-                    style: GoogleFonts.lato(
-                      color: AppTokens.planTextMuted,
-                      fontSize: 11,
-                    ),
+                    style: AppTypography.bodySmall(color: AppTokens.planTextMuted),
                   ),
                 ],
               ),
@@ -1302,21 +1261,13 @@ class _CardRow extends StatelessWidget {
             width: 90,
             child: Text(
               label,
-              style: GoogleFonts.lato(
-                color: AppTokens.planTextMuted,
-                fontSize: 11,
-                fontWeight: FontWeight.w600,
-              ),
+              style: AppTypography.bodySmall(color: AppTokens.planTextMuted, fontWeight: FontWeight.w600),
             ),
           ),
           Expanded(
             child: Text(
               value,
-              style: GoogleFonts.lato(
-                color: colour.kTextDark,
-                fontSize: 12,
-                fontWeight: FontWeight.w600,
-              ),
+              style: AppTypography.bodyMedium(color: colour.kTextDark, fontWeight: FontWeight.w600),
             ),
           ),
         ],

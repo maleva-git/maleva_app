@@ -1,3 +1,4 @@
+import 'package:maleva/core/theme/app_typography.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -315,12 +316,7 @@ class _SectionHeader extends StatelessWidget {
       const SizedBox(width: 10),
       Text(
         title.toUpperCase(),
-        style: GoogleFonts.poppins(
-          fontSize:      isTablet ? 20 : 17,
-          fontWeight:    FontWeight.w700,
-          color:         AppTokens.brandDark,
-          letterSpacing: 1.2,
-        ),
+        style: AppTypography.heading1(color: AppTokens.brandDark, fontWeight: FontWeight.w700),
       ),
     ]);
   }
@@ -477,17 +473,10 @@ class _StyledTextField extends StatelessWidget {
       maxLines:           maxLines,
       textCapitalization: textCapitalization,
       textInputAction:    TextInputAction.done,
-      style: GoogleFonts.poppins(
-        fontSize:   isTablet ? 14 : 13,
-        fontWeight: FontWeight.w600,
-        color:      AppTokens.brandDark,
-      ),
+      style: AppTypography.bodyLarge(color: AppTokens.brandDark, fontWeight: FontWeight.w600),
       decoration: InputDecoration(
         hintText: hint,
-        hintStyle: GoogleFonts.poppins(
-          fontSize: isTablet ? 14 : 13,
-          color:    AppTokens.brandMid.withValues(alpha: 0.6),
-        ),
+        hintStyle: AppTypography.bodyLarge(color: AppTokens.brandMid.withValues(alpha: 0.6)),
         suffixIcon: suffixIcon != null
             ? Padding(
           padding: const EdgeInsets.only(right: 8),
@@ -634,11 +623,7 @@ class _ToggleTab extends StatelessWidget {
           alignment: Alignment.center,
           child: Text(
             label,
-            style: GoogleFonts.poppins(
-              fontSize:   isTablet ? 14 : 13,
-              fontWeight: FontWeight.w600,
-              color:      isActive ? colour.kWhite : AppTokens.brandMid,
-            ),
+            style: AppTypography.bodyLarge(color: isActive ? colour.kWhite : AppTokens.brandMid, fontWeight: FontWeight.w600),
           ),
         ),
       ),
@@ -670,28 +655,19 @@ class _ListHeader extends StatelessWidget {
         SizedBox(
           width: isTablet ? 36 : 32,
           child: Text('#',
-              style: GoogleFonts.poppins(
-                  fontSize:   isTablet ? 13 : 12,
-                  fontWeight: FontWeight.w700,
-                  color:      colour.kWhite.withValues(alpha: 0.8))),
+              style: AppTypography.bodyMedium(color: colour.kWhite.withValues(alpha: 0.8), fontWeight: FontWeight.w700)),
         ),
         const SizedBox(width: 8),
         Expanded(
           flex: 3,
           child: Text('Vessel Name',
-              style: GoogleFonts.poppins(
-                  fontSize:   isTablet ? 13 : 12,
-                  fontWeight: FontWeight.w700,
-                  color:      colour.kWhite)),
+              style: AppTypography.bodyMedium(color: colour.kWhite, fontWeight: FontWeight.w700)),
         ),
         Expanded(
           flex: 2,
           child: Text('Job No.',
               textAlign: TextAlign.end,
-              style: GoogleFonts.poppins(
-                  fontSize:   isTablet ? 13 : 12,
-                  fontWeight: FontWeight.w700,
-                  color:      colour.kWhite)),
+              style: AppTypography.bodyMedium(color: colour.kWhite, fontWeight: FontWeight.w700)),
         ),
       ]),
     );
@@ -770,10 +746,7 @@ class _VesselCard extends StatelessWidget {
                 alignment: Alignment.center,
                 child: Text(
                   '${index + 1}',
-                  style: GoogleFonts.poppins(
-                      fontSize:   isTablet ? 12 : 11,
-                      fontWeight: FontWeight.w700,
-                      color:      AppTokens.brandGradientStart),
+                  style: AppTypography.bodySmall(color: AppTokens.brandGradientStart, fontWeight: FontWeight.w700),
                 ),
               ),
               const SizedBox(width: 10),
@@ -785,10 +758,7 @@ class _VesselCard extends StatelessWidget {
                   vesselName,
                   overflow: TextOverflow.ellipsis,
                   maxLines: 1,
-                  style: GoogleFonts.poppins(
-                      fontSize:   isTablet ? 14 : 13,
-                      fontWeight: FontWeight.w600,
-                      color:      AppTokens.brandDark),
+                  style: AppTypography.bodyLarge(color: AppTokens.brandDark, fontWeight: FontWeight.w600),
                 ),
               ),
 
@@ -809,10 +779,7 @@ class _VesselCard extends StatelessWidget {
                   jobNo,
                   overflow: TextOverflow.ellipsis,
                   maxLines: 1,
-                  style: GoogleFonts.poppins(
-                      fontSize:   isTablet ? 12 : 11,
-                      fontWeight: FontWeight.w600,
-                      color:      AppTokens.brandGradientStart),
+                  style: AppTypography.bodySmall(color: AppTokens.brandGradientStart, fontWeight: FontWeight.w600),
                 ),
               ),
             ]),
@@ -882,18 +849,11 @@ class _VesselCard extends StatelessWidget {
                         children: [
                           Text(
                             vesselName,
-                            style: GoogleFonts.poppins(
-                              fontSize: isTab ? 18 : 16,
-                              fontWeight: FontWeight.w700,
-                              color: AppTokens.brandDark,
-                            ),
+                            style: AppTypography.heading1(color: AppTokens.brandDark, fontWeight: FontWeight.w700),
                           ),
                           Text(
                             itemData["Port"]?.toString() ?? '',
-                            style: GoogleFonts.poppins(
-                              fontSize: isTab ? 13 : 12,
-                              color: AppTokens.brandMid,
-                            ),
+                            style: AppTypography.bodyMedium(color: AppTokens.brandMid),
                           ),
                         ],
                       ),
@@ -959,22 +919,14 @@ class _VesselCard extends StatelessWidget {
             width: isTab ? 130 : 110,
             child: Text(
               label,
-              style: GoogleFonts.poppins(
-                fontSize: isTab ? 13 : 12,
-                fontWeight: FontWeight.w500,
-                color: AppTokens.brandMid,
-              ),
+              style: AppTypography.bodyMedium(color: AppTokens.brandMid, fontWeight: FontWeight.w500),
             ),
           ),
           const SizedBox(width: 8),
           Expanded(
             child: Text(
               displayValue,
-              style: GoogleFonts.poppins(
-                fontSize: isTab ? 14 : 13,
-                fontWeight: FontWeight.w600,
-                color: AppTokens.brandDark,
-              ),
+              style: AppTypography.bodyLarge(color: AppTokens.brandDark, fontWeight: FontWeight.w600),
             ),
           ),
         ],
@@ -1023,22 +975,14 @@ class _VesselCard extends StatelessWidget {
                       width: isTab ? 90 : 80,
                       child: Text(
                         label,
-                        style: GoogleFonts.poppins(
-                          fontSize: isTab ? 13 : 12,
-                          fontWeight: FontWeight.w600,
-                          color: AppTokens.brandMid,
-                        ),
+                        style: AppTypography.bodyMedium(color: AppTokens.brandMid, fontWeight: FontWeight.w600),
                       ),
                     ),
                     Expanded(
                       child: TextField(
                         controller: controller,
                         readOnly: true,
-                        style: GoogleFonts.poppins(
-                          fontSize: isTab ? 14 : 13,
-                          fontWeight: FontWeight.w500,
-                          color: AppTokens.brandDark,
-                        ),
+                        style: AppTypography.bodyLarge(color: AppTokens.brandDark, fontWeight: FontWeight.w500),
                         decoration: InputDecoration(
                           isDense: true,
                           contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
@@ -1132,19 +1076,12 @@ class _VesselCard extends StatelessWidget {
                     const SizedBox(height: 16),
                     Text(
                       'Update Vessel Dates',
-                      style: GoogleFonts.poppins(
-                        fontSize: isTab ? 18 : 16,
-                        fontWeight: FontWeight.w700,
-                        color: AppTokens.brandDark,
-                      ),
+                      style: AppTypography.heading1(color: AppTokens.brandDark, fontWeight: FontWeight.w700),
                     ),
                     const SizedBox(height: 8),
                     Text(
                       vesselName,
-                      style: GoogleFonts.poppins(
-                        fontSize: isTab ? 14 : 13,
-                        color: AppTokens.brandMid,
-                      ),
+                      style: AppTypography.bodyLarge(color: AppTokens.brandMid),
                     ),
                     const SizedBox(height: 24),
 
@@ -1201,11 +1138,7 @@ class _VesselCard extends StatelessWidget {
                         },
                         child: Text(
                           'Save Updates',
-                          style: GoogleFonts.poppins(
-                            fontSize: isTab ? 15 : 14,
-                            fontWeight: FontWeight.w600,
-                            color: Colors.white,
-                          ),
+                          style: AppTypography.bodyLarge(color: Colors.white, fontWeight: FontWeight.w600),
                         ),
                       ),
                     ),
@@ -1241,17 +1174,10 @@ class _EmptyState extends StatelessWidget {
         ),
         SizedBox(height: isTablet ? 20 : 16),
         Text('No vessels found',
-            style: GoogleFonts.poppins(
-              fontSize:   isTablet ? 17 : 15,
-              fontWeight: FontWeight.w600,
-              color:      AppTokens.brandDark,
-            )),
+            style: AppTypography.heading2(color: AppTokens.brandDark, fontWeight: FontWeight.w600)),
         SizedBox(height: isTablet ? 8 : 6),
         Text('Try adjusting your search or date filter',
-            style: GoogleFonts.poppins(
-              fontSize: isTablet ? 13 : 12,
-              color:    AppTokens.brandMid,
-            )),
+            style: AppTypography.bodyMedium(color: AppTokens.brandMid)),
       ]),
     );
   }

@@ -1,3 +1,4 @@
+import 'package:maleva/core/theme/app_typography.dart';
 import 'package:maleva/core/network/api_constants.dart';
 import 'dart:io';
 import 'package:flutter/material.dart';
@@ -135,10 +136,7 @@ class _SpotSaleViewBody extends StatelessWidget {
                         elevation: 0,
                       ),
                       child: Text("Search",
-                          style: GoogleFonts.lato(
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
-                              color: colour.kWhite)),
+                          style: AppTypography.heading1(color: colour.kWhite, fontWeight: FontWeight.bold)),
                     ),
                   ),
                 ]),
@@ -159,10 +157,7 @@ class _SpotSaleViewBody extends StatelessWidget {
                         borderRadius: BorderRadius.circular(8),
                       ),
                       child: Text("${records.length} records",
-                          style: GoogleFonts.lato(
-                              color: AppTokens.brandGradientStart,
-                              fontWeight: FontWeight.bold,
-                              fontSize: 13)),
+                          style: AppTypography.heading3(color: AppTokens.brandGradientStart, fontWeight: FontWeight.bold)),
                     ),
                   ]),
                 ),
@@ -189,7 +184,7 @@ class _SpotSaleViewBody extends StatelessWidget {
               size: 60, color: Colors.grey.shade300),
           const SizedBox(height: 12),
           Text("No Records Found",
-              style: GoogleFonts.lato(fontSize: 18, color: Colors.grey)),
+              style: AppTypography.heading1(color: Colors.grey)),
         ]),
       );
     }
@@ -275,10 +270,7 @@ class _SpotSaleCard extends StatelessWidget {
               Expanded(
                 child: Text(
                   item['SVehicleName'] ?? '-',
-                  style: GoogleFonts.lato(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                      color: colour.kWhite),
+                  style: AppTypography.heading1(color: colour.kWhite, fontWeight: FontWeight.bold),
                   overflow: TextOverflow.ellipsis,
                 ),
               ),
@@ -292,10 +284,7 @@ class _SpotSaleCard extends StatelessWidget {
                 ),
                 child: Text(
                   item['StatusName'] ?? '-',
-                  style: GoogleFonts.lato(
-                      color: colour.kWhite,
-                      fontSize: 12,
-                      fontWeight: FontWeight.w600),
+                  style: AppTypography.bodyMedium(color: colour.kWhite, fontWeight: FontWeight.w600),
                 ),
               ),
             ]),
@@ -357,12 +346,9 @@ class _SpotSaleCard extends StatelessWidget {
       Expanded(
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
           Text(label,
-              style: GoogleFonts.lato(fontSize: 10, color: Colors.grey[400])),
+              style: AppTypography.badgeText(color: Colors.grey[400])),
           Text(value,
-              style: GoogleFonts.lato(
-                  fontSize: 13,
-                  color: AppTokens.brandDark,
-                  fontWeight: FontWeight.w600),
+              style: AppTypography.bodyLarge(color: AppTokens.brandDark, fontWeight: FontWeight.w600),
               overflow: TextOverflow.ellipsis),
         ]),
       ),
@@ -417,13 +403,9 @@ class _DateTile extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(label,
-                      style: GoogleFonts.lato(
-                          fontSize: 10, color: Colors.grey[500])),
+                      style: AppTypography.badgeText(color: Colors.grey[500])),
                   Text(value,
-                      style: GoogleFonts.lato(
-                          fontSize: 13,
-                          color: AppTokens.brandDark,
-                          fontWeight: FontWeight.w600)),
+                      style: AppTypography.bodyLarge(color: AppTokens.brandDark, fontWeight: FontWeight.w600)),
                 ]),
           ),
         ]),

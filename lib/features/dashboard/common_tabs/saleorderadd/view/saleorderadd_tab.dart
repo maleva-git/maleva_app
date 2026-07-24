@@ -1,3 +1,4 @@
+import 'package:maleva/core/theme/app_typography.dart';
 import 'package:maleva/core/network/api_legacy_helper.dart';
 import 'package:maleva/core/network/api_constants.dart';
 import 'package:flutter/material.dart';
@@ -1515,9 +1516,7 @@ Navigator.pushReplacement(
                                 : AppGlobals.FontCardText.toDouble())),
                     subtitle: Text(
                         'Qty: ${p.ItemQty}  Rate: ${p.SalesRate}  Amt: ${p.Amount.toStringAsFixed(2)}',
-                        style: GoogleFonts.lato(
-                            color: colour.commonColor,
-                            fontSize: isTablet ? 14.0 : 12.0)),
+                        style: AppTypography.bodyMedium(color: colour.commonColor)),
                     trailing: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [

@@ -1,3 +1,4 @@
+import 'package:maleva/core/theme/app_typography.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
@@ -81,8 +82,7 @@ class _DriverLicenseExpiryView extends StatelessWidget {
         if (state is DriverLicenseExpiryError) {
           return Center(
             child: Text(state.message,
-                style: GoogleFonts.lato(
-                    color: Palette.redAccent, fontSize: 13)),
+                style: AppTypography.bodyLarge(color: Palette.redAccent)),
           );
         }
         return const SizedBox.shrink();
@@ -336,10 +336,7 @@ class _EmptyState extends StatelessWidget {
           ),
           const SizedBox(height: 14),
           Text('No Driver Records',
-              style: GoogleFonts.lato(
-                  color: Palette.textDark2,
-                  fontWeight: FontWeight.w600,
-                  fontSize: 15)),
+              style: AppTypography.heading2(color: Palette.textDark2, fontWeight: FontWeight.w600)),
         ],
       ),
     );

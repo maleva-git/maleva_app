@@ -1,3 +1,4 @@
+import 'package:maleva/core/theme/app_typography.dart';
 // salesreport_view.dart
 
 import 'package:flutter/material.dart';
@@ -87,18 +88,11 @@ class _SalesReportView extends StatelessWidget {
                     ),
                     const SizedBox(height: 16),
                     Text("Something went wrong",
-                        style: GoogleFonts.poppins(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w700,
-                          color: AppTokens.textPrimary,
-                        )),
+                        style: AppTypography.heading1(color: AppTokens.textPrimary, fontWeight: FontWeight.w700)),
                     const SizedBox(height: 8),
                     Text(state.errorMessage,
                         textAlign: TextAlign.center,
-                        style: GoogleFonts.poppins(
-                          fontSize: 12,
-                          color: AppTokens.textSecondary,
-                        )),
+                        style: AppTypography.bodyMedium(color: AppTokens.textSecondary)),
                     const SizedBox(height: 24),
                     GestureDetector(
                       onTap: () => context
@@ -125,11 +119,7 @@ class _SalesReportView extends StatelessWidget {
                                 color: Palette.white, size: 16),
                             const SizedBox(width: 8),
                             Text("Retry",
-                                style: GoogleFonts.poppins(
-                                  color: Palette.white,
-                                  fontWeight: FontWeight.w600,
-                                  fontSize: 13,
-                                )),
+                                style: AppTypography.bodyLarge(color: Palette.white, fontWeight: FontWeight.w600)),
                           ],
                         ),
                       ),
@@ -163,20 +153,12 @@ class _SalesReportView extends StatelessWidget {
                     children: [
                       Text(
                         "Sales Report",
-                        style: GoogleFonts.poppins(
-                          fontSize: 20,
-                          fontWeight: FontWeight.w700,
-                          color: Palette.white,
-                          letterSpacing: 0.3,
-                        ),
+                        style: AppTypography.heading1(color: Palette.white, fontWeight: FontWeight.w700),
                       ),
                       const SizedBox(height: 4),
                       Text(
                         "Monthly overview",
-                        style: GoogleFonts.poppins(
-                          fontSize: 12,
-                          color: Palette.white.withValues(alpha: 0.7),
-                        ),
+                        style: AppTypography.bodyMedium(color: Palette.white.withValues(alpha: 0.7)),
                       ),
                       const SizedBox(height: 16),
 
@@ -202,10 +184,7 @@ class _SalesReportView extends StatelessWidget {
                                 : null,
                             hint: Text(
                               "Select Employee",
-                              style: GoogleFonts.poppins(
-                                color: Palette.white.withValues(alpha: 0.8),
-                                fontSize: 13,
-                              ),
+                              style: AppTypography.bodyLarge(color: Palette.white.withValues(alpha: 0.8)),
                             ),
                             onChanged: (String? value) {
                               context.read<SalesReportBloc>().add(
@@ -217,10 +196,7 @@ class _SalesReportView extends StatelessWidget {
                                 value: item['Id'].toString(),
                                 child: Text(
                                   item['AccountName'] ?? "",
-                                  style: GoogleFonts.poppins(
-                                    color: Palette.white,
-                                    fontSize: 13,
-                                  ),
+                                  style: AppTypography.bodyLarge(color: Palette.white),
                                 ),
                               ),
                             )
@@ -299,18 +275,10 @@ class _SalesReportView extends StatelessWidget {
                           children: [
                             Expanded(
                               child: Text("Job Status",
-                                  style: GoogleFonts.poppins(
-                                    fontSize: 12,
-                                    fontWeight: FontWeight.w700,
-                                    color: Palette.white,
-                                  )),
+                                  style: AppTypography.bodyMedium(color: Palette.white, fontWeight: FontWeight.w700)),
                             ),
                             Text("Day Count",
-                                style: GoogleFonts.poppins(
-                                  fontSize: 12,
-                                  fontWeight: FontWeight.w700,
-                                  color: Palette.white.withValues(alpha: 0.85),
-                                )),
+                                style: AppTypography.bodyMedium(color: Palette.white.withValues(alpha: 0.85), fontWeight: FontWeight.w700)),
                           ],
                         ),
                       ),
@@ -328,10 +296,7 @@ class _SalesReportView extends StatelessWidget {
                                   color: AppTokens.textDim),
                               const SizedBox(height: 12),
                               Text("No data found",
-                                  style: GoogleFonts.poppins(
-                                    fontSize: 14,
-                                    color: AppTokens.textSecondary,
-                                  )),
+                                  style: AppTypography.bodyLarge(color: AppTokens.textSecondary)),
                             ],
                           ),
                         )
@@ -381,11 +346,7 @@ class _SalesReportView extends StatelessWidget {
                                         alignment: Alignment.center,
                                         child: Text(
                                           '${index + 1}',
-                                          style: GoogleFonts.poppins(
-                                            fontSize: 10,
-                                            fontWeight: FontWeight.w700,
-                                            color: AppTokens.brandPrimary,
-                                          ),
+                                          style: AppTypography.badgeText(color: AppTokens.brandPrimary, fontWeight: FontWeight.w700),
                                         ),
                                       ),
                                       const SizedBox(width: 10),
@@ -394,11 +355,7 @@ class _SalesReportView extends StatelessWidget {
                                           item["JobStatus"]?.toString() ??
                                               "-",
                                           overflow: TextOverflow.ellipsis,
-                                          style: GoogleFonts.poppins(
-                                            fontSize: 12,
-                                            fontWeight: FontWeight.w600,
-                                            color: AppTokens.textPrimary,
-                                          ),
+                                          style: AppTypography.bodyMedium(color: AppTokens.textPrimary, fontWeight: FontWeight.w600),
                                         ),
                                       ),
                                       Container(
@@ -413,11 +370,7 @@ class _SalesReportView extends StatelessWidget {
                                         child: Text(
                                           item["DayCount"]?.toString() ??
                                               "-",
-                                          style: GoogleFonts.poppins(
-                                            fontSize: 12,
-                                            fontWeight: FontWeight.w700,
-                                            color: AppTokens.brandPrimary,
-                                          ),
+                                          style: AppTypography.bodyMedium(color: AppTokens.brandPrimary, fontWeight: FontWeight.w700),
                                         ),
                                       ),
                                     ],
@@ -469,11 +422,7 @@ class _SalesReportView extends StatelessWidget {
                   Expanded(
                     child: Text(
                       "Employee Details",
-                      style: GoogleFonts.poppins(
-                        fontSize: 15,
-                        fontWeight: FontWeight.w700,
-                        color: Palette.white,
-                      ),
+                      style: AppTypography.heading2(color: Palette.white, fontWeight: FontWeight.w700),
                     ),
                   ),
                   GestureDetector(
@@ -511,22 +460,14 @@ class _SalesReportView extends StatelessWidget {
                             flex: 2,
                             child: Text(
                               item.keys.first.toString(),
-                              style: GoogleFonts.poppins(
-                                fontSize: 11,
-                                color: AppTokens.textSecondary,
-                                fontWeight: FontWeight.w500,
-                              ),
+                              style: AppTypography.bodySmall(color: AppTokens.textSecondary, fontWeight: FontWeight.w500),
                             ),
                           ),
                           Expanded(
                             flex: 3,
                             child: Text(
                               item.values.first?.toString() ?? '-',
-                              style: GoogleFonts.poppins(
-                                fontSize: 11,
-                                fontWeight: FontWeight.w600,
-                                color: AppTokens.textPrimary,
-                              ),
+                              style: AppTypography.bodySmall(color: AppTokens.textPrimary, fontWeight: FontWeight.w600),
                             ),
                           ),
                         ],
@@ -596,21 +537,11 @@ class _StatCard extends StatelessWidget {
                 children: [
                   Text(
                     value,
-                    style: GoogleFonts.poppins(
-                      fontSize: 20,
-                      fontWeight: FontWeight.w800,
-                      color: valueColor,
-                      height: 1.1,
-                    ),
+                    style: AppTypography.heading1(color: valueColor, fontWeight: FontWeight.w800),
                   ),
                   Text(
                     label,
-                    style: GoogleFonts.poppins(
-                      fontSize: 10,
-                      color: AppTokens.textSecondary,
-                      fontWeight: FontWeight.w500,
-                      height: 1.2,
-                    ),
+                    style: AppTypography.badgeText(color: AppTokens.textSecondary, fontWeight: FontWeight.w500),
                   ),
                 ],
               ),

@@ -1,3 +1,4 @@
+import 'package:maleva/core/theme/app_typography.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -245,18 +246,10 @@ class _SearchBar extends StatelessWidget {
       child: TextField(
         controller:  controller,
         onChanged:   onChanged,
-        style: GoogleFonts.poppins(
-          fontSize:   isTablet ? 14 : 13,
-          color:      AppTokens.brandDark,
-          fontWeight: FontWeight.w500,
-        ),
+        style: AppTypography.bodyLarge(color: AppTokens.brandDark, fontWeight: FontWeight.w500),
         decoration: InputDecoration(
           hintText: "Search driver...",
-          hintStyle: GoogleFonts.poppins(
-            fontSize:   isTablet ? 14 : 13,
-            color:      Colors.grey.shade400,
-            fontWeight: FontWeight.w400,
-          ),
+          hintStyle: AppTypography.bodyLarge(color: Colors.grey.shade400, fontWeight: FontWeight.w400),
           prefixIcon: Icon(
             Icons.search_rounded,
             color: AppTokens.brandGradientStart,
@@ -341,12 +334,7 @@ class _GradientHeader extends StatelessWidget {
               child: Text(
                 "Driver Details",
                 overflow: TextOverflow.ellipsis,
-                style: GoogleFonts.poppins(
-                  fontSize:      isTablet ? 26 : 22,
-                  fontWeight:    FontWeight.w700,
-                  color:         colour.kWhite,
-                  letterSpacing: 0.3,
-                ),
+                style: AppTypography.heading1(color: colour.kWhite, fontWeight: FontWeight.w700),
               ),
             ),
           ]),
@@ -355,11 +343,7 @@ class _GradientHeader extends StatelessWidget {
             padding: const EdgeInsets.only(left: 4),
             child: Text(
               "All registered drivers",
-              style: GoogleFonts.poppins(
-                fontSize:   isTablet ? 14 : 13,
-                color:      colour.kWhite.withValues(alpha: 0.75),
-                fontWeight: FontWeight.w400,
-              ),
+              style: AppTypography.bodyLarge(color: colour.kWhite.withValues(alpha: 0.75), fontWeight: FontWeight.w400),
             ),
           ),
         ],
@@ -411,17 +395,9 @@ class _CountBadge extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text('Total Drivers',
-                style: GoogleFonts.poppins(
-                  fontSize:   12,
-                  color:      colour.kWhite.withValues(alpha: 0.75),
-                  fontWeight: FontWeight.w500,
-                )),
+                style: AppTypography.bodyMedium(color: colour.kWhite.withValues(alpha: 0.75), fontWeight: FontWeight.w500)),
             Text('$count',
-                style: GoogleFonts.poppins(
-                  fontSize:   28,
-                  color:      colour.kWhite,
-                  fontWeight: FontWeight.w700,
-                )),
+                style: AppTypography.display(color: colour.kWhite, fontWeight: FontWeight.w700)),
           ],
         ),
       ]),
@@ -480,11 +456,7 @@ class _DriverCard extends StatelessWidget {
                     driver.DriverName!.isNotEmpty)
                     ? driver.DriverName![0].toUpperCase()
                     : "D",
-                style: GoogleFonts.poppins(
-                  color:      colour.kWhite,
-                  fontSize:   isTablet ? 17 : 20,
-                  fontWeight: FontWeight.w700,
-                ),
+                style: AppTypography.heading1(color: colour.kWhite, fontWeight: FontWeight.w700),
               ),
             ),
           ),
@@ -499,11 +471,7 @@ class _DriverCard extends StatelessWidget {
                 Text(
                   driver.DriverName ?? "-",
                   overflow: TextOverflow.ellipsis,
-                  style: GoogleFonts.poppins(
-                    fontSize:   isTablet ? 13 : 15,
-                    fontWeight: FontWeight.w600,
-                    color:      const Color(0xFF1A1A2E),
-                  ),
+                  style: AppTypography.heading2(color: const Color(0xFF1A1A2E), fontWeight: FontWeight.w600),
                 ),
                 const SizedBox(height: 3),
                 Row(children: [
@@ -512,11 +480,7 @@ class _DriverCard extends StatelessWidget {
                   const SizedBox(width: 5),
                   Text(
                     "Active Driver",
-                    style: GoogleFonts.poppins(
-                      fontSize:   isTablet ? 11 : 12,
-                      color:      Colors.grey.shade500,
-                      fontWeight: FontWeight.w400,
-                    ),
+                    style: AppTypography.bodyMedium(color: Colors.grey.shade500, fontWeight: FontWeight.w400),
                   ),
                 ]),
               ],
@@ -570,20 +534,13 @@ class _ErrorState extends StatelessWidget {
             SizedBox(height: isTablet ? 20 : 16),
             Text(
               "Something went wrong",
-              style: GoogleFonts.poppins(
-                fontSize:   isTablet ? 18 : 16,
-                fontWeight: FontWeight.w600,
-                color:      Colors.red.shade400,
-              ),
+              style: AppTypography.heading1(color: Colors.red.shade400, fontWeight: FontWeight.w600),
             ),
             SizedBox(height: isTablet ? 10 : 8),
             Text(
               message,
               textAlign: TextAlign.center,
-              style: GoogleFonts.poppins(
-                fontSize: isTablet ? 14 : 13,
-                color:    Colors.grey.shade600,
-              ),
+              style: AppTypography.bodyLarge(color: Colors.grey.shade600),
             ),
             SizedBox(height: isTablet ? 24 : 20),
             ElevatedButton.icon(
@@ -593,9 +550,7 @@ class _ErrorState extends StatelessWidget {
               icon:  Icon(Icons.refresh_rounded,
                   size: isTablet ? 20 : 18),
               label: Text("Retry",
-                  style: GoogleFonts.poppins(
-                      fontWeight: FontWeight.w600,
-                      fontSize:   isTablet ? 14 : 13)),
+                  style: AppTypography.bodyLarge(fontWeight: FontWeight.w600)),
               style: ElevatedButton.styleFrom(
                 backgroundColor: AppTokens.brandGradientStart,
                 foregroundColor: colour.kWhite,
@@ -639,11 +594,7 @@ class _EmptyState extends StatelessWidget {
           SizedBox(height: isTablet ? 20 : 16),
           Text(
             "No drivers found",
-            style: GoogleFonts.poppins(
-              fontSize:   isTablet ? 18 : 16,
-              fontWeight: FontWeight.w600,
-              color:      Colors.grey.shade700,
-            ),
+            style: AppTypography.heading1(color: Colors.grey.shade700, fontWeight: FontWeight.w600),
           ),
         ],
       ),

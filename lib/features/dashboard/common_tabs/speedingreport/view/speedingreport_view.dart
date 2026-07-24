@@ -1,3 +1,4 @@
+import 'package:maleva/core/theme/app_typography.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -113,12 +114,7 @@ class _SpeedingBodyState extends State<_SpeedingBody> {
                       const SizedBox(width: 10),
                       Text(
                         "SPEEDING",
-                        style: GoogleFonts.lato(
-                          fontSize:      20,
-                          fontWeight:    FontWeight.bold,
-                          color:         AppTokens.brandDark,
-                          letterSpacing: 1.2,
-                        ),
+                        style: AppTypography.heading1(color: AppTokens.brandDark, fontWeight: FontWeight.bold),
                       ),
                     ]),
                     const SizedBox(height: 6),
@@ -126,11 +122,7 @@ class _SpeedingBodyState extends State<_SpeedingBody> {
                       padding: const EdgeInsets.only(left: 14),
                       child: Text(
                         "Details",
-                        style: GoogleFonts.lato(
-                          fontSize:   14,
-                          color:      AppTokens.brandMid,
-                          fontWeight: FontWeight.w500,
-                        ),
+                        style: AppTypography.bodyLarge(color: AppTokens.brandMid, fontWeight: FontWeight.w500),
                       ),
                     ),
                     const SizedBox(height: 20),
@@ -361,20 +353,11 @@ class _DateButton extends StatelessWidget {
               children: [
                 Text(
                   label,
-                  style: GoogleFonts.lato(
-                    fontSize:      isTablet ? 11 : 10,
-                    color:         Colors.grey[500],
-                    fontWeight:    FontWeight.w600,
-                    letterSpacing: 0.5,
-                  ),
+                  style: AppTypography.badgeText(color: Colors.grey[500], fontWeight: FontWeight.w600),
                 ),
                 Text(
                   value,
-                  style: GoogleFonts.lato(
-                    fontSize:   isTablet ? 13 : 12,
-                    fontWeight: FontWeight.bold,
-                    color:      AppTokens.brandDark,
-                  ),
+                  style: AppTypography.bodyMedium(color: AppTokens.brandDark, fontWeight: FontWeight.bold),
                 ),
               ],
             ),
@@ -428,17 +411,9 @@ class _CountBadge extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text('Total Records',
-                style: GoogleFonts.lato(
-                  fontSize:   12,
-                  color:      colour.kWhite.withValues(alpha: 0.75),
-                  fontWeight: FontWeight.w500,
-                )),
+                style: AppTypography.bodyMedium(color: colour.kWhite.withValues(alpha: 0.75), fontWeight: FontWeight.w500)),
             Text('$count',
-                style: GoogleFonts.lato(
-                  fontSize:   28,
-                  color:      colour.kWhite,
-                  fontWeight: FontWeight.bold,
-                )),
+                style: AppTypography.display(color: colour.kWhite, fontWeight: FontWeight.bold)),
           ],
         ),
       ]),
@@ -513,11 +488,7 @@ class _SpeedingCard extends StatelessWidget {
                 children: [
                   Text(
                     record.vehicle ?? "-",
-                    style: GoogleFonts.lato(
-                      fontWeight: FontWeight.bold,
-                      fontSize:   isTablet ? 17 : 16,
-                      color:      AppTokens.brandDark,
-                    ),
+                    style: AppTypography.heading1(color: AppTokens.brandDark, fontWeight: FontWeight.bold),
                   ),
                   SizedBox(height: isTablet ? 8 : 6),
                   Row(children: [
@@ -531,10 +502,7 @@ class _SpeedingCard extends StatelessWidget {
                             ? record.driver
                             : "Not Available",
                         overflow: TextOverflow.ellipsis,
-                        style: GoogleFonts.lato(
-                          fontSize: isTablet ? 14 : 13,
-                          color:    Colors.grey[600],
-                        ),
+                        style: AppTypography.bodyLarge(color: Colors.grey[600]),
                       ),
                     ),
                   ]),
@@ -640,11 +608,7 @@ class _SpeedingCard extends StatelessWidget {
                     const SizedBox(width: 12),
                     Text(
                       "Truck Info",
-                      style: GoogleFonts.lato(
-                        fontSize:   isTablet ? 22 : 20,
-                        fontWeight: FontWeight.bold,
-                        color:      colour.kWhite,
-                      ),
+                      style: AppTypography.heading1(color: colour.kWhite, fontWeight: FontWeight.bold),
                     ),
                   ]),
                 ),
@@ -696,11 +660,7 @@ class _SpeedingCard extends StatelessWidget {
                             Navigator.of(context).pop(),
                         child: Text(
                           "Close",
-                          style: GoogleFonts.lato(
-                            color:      colour.kWhite,
-                            fontSize:   isTablet ? 17 : 16,
-                            fontWeight: FontWeight.bold,
-                          ),
+                          style: AppTypography.heading1(color: colour.kWhite, fontWeight: FontWeight.bold),
                         ),
                       ),
                     ),
@@ -745,20 +705,11 @@ class _SpeedingCard extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(label,
-                  style: GoogleFonts.lato(
-                    fontSize:      isTablet ? 13 : 12,
-                    color:         Colors.grey[500],
-                    fontWeight:    FontWeight.w600,
-                    letterSpacing: 0.5,
-                  )),
+                  style: AppTypography.bodyMedium(color: Colors.grey[500], fontWeight: FontWeight.w600)),
               const SizedBox(height: 2),
               Text(
                 value?.isNotEmpty == true ? value! : "Not Available",
-                style: GoogleFonts.lato(
-                  fontSize:   isTablet ? 16 : 15,
-                  fontWeight: FontWeight.w700,
-                  color:      AppTokens.brandDark,
-                ),
+                style: AppTypography.heading2(color: AppTokens.brandDark, fontWeight: FontWeight.w700),
               ),
             ],
           ),
@@ -802,11 +753,7 @@ class _MiniChip extends StatelessWidget {
           const SizedBox(width: 4),
           Text(
             label,
-            style: GoogleFonts.lato(
-              fontSize:   isTablet ? 12 : 11,
-              fontWeight: FontWeight.bold,
-              color:      textColor,
-            ),
+            style: AppTypography.bodySmall(color: textColor, fontWeight: FontWeight.bold),
           ),
         ],
       ),
@@ -832,9 +779,7 @@ class _ErrorState extends StatelessWidget {
           SizedBox(height: isTablet ? 16 : 12),
           Text(message,
               textAlign: TextAlign.center,
-              style: GoogleFonts.lato(
-                  color:    Colors.red,
-                  fontSize: isTablet ? 15 : 14)),
+              style: AppTypography.bodyLarge(color: Colors.red)),
           SizedBox(height: isTablet ? 20 : 16),
           ElevatedButton.icon(
             onPressed: () => context
@@ -843,8 +788,7 @@ class _ErrorState extends StatelessWidget {
             icon:  Icon(Icons.refresh,
                 size: isTablet ? 20 : 18),
             label: Text("Retry",
-                style: GoogleFonts.lato(
-                    fontSize: isTablet ? 15 : 14)),
+                style: AppTypography.bodyLarge()),
             style: ElevatedButton.styleFrom(
               backgroundColor: AppTokens.brandGradientStart,
               padding: EdgeInsets.symmetric(
@@ -871,10 +815,7 @@ class _EmptyState extends StatelessWidget {
     return Center(
       child: Text(
         "No speeding records found.",
-        style: GoogleFonts.lato(
-          fontSize: isTablet ? 18 : 16,
-          color:    Colors.grey,
-        ),
+        style: AppTypography.heading1(color: Colors.grey),
       ),
     );
   }

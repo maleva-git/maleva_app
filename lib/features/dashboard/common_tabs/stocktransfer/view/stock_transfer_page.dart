@@ -1,3 +1,4 @@
+import 'package:maleva/core/theme/app_typography.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
@@ -114,11 +115,9 @@ class _StockTransferView extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Text('Stock Transfer Update',
-                  style: GoogleFonts.poppins(
-                      color: Colors.white, fontWeight: FontWeight.w600, fontSize: 16)),
+                  style: AppTypography.heading1(color: Colors.white, fontWeight: FontWeight.w600)),
               Text(userName,
-                  style: GoogleFonts.poppins(
-                      color: Colors.white70, fontSize: 11, fontWeight: FontWeight.w400)),
+                  style: AppTypography.bodySmall(color: Colors.white70, fontWeight: FontWeight.w400)),
             ],
           ),
           actions: const [SizedBox(width: 12)],
@@ -300,8 +299,7 @@ class _StatsBar extends StatelessWidget {
           Expanded(
             child: Text(
               data.portName.isEmpty ? '—' : data.portName,
-              style: GoogleFonts.poppins(
-                  fontSize: 13, fontWeight: FontWeight.w600, color: kTextDark),
+              style: AppTypography.bodyLarge(color: kTextDark, fontWeight: FontWeight.w600),
               overflow: TextOverflow.ellipsis,
             ),
           ),
@@ -327,10 +325,7 @@ class _StatsBar extends StatelessWidget {
               color: Colors.white, size: 18),
           label: isTablet
               ? Text('SCAN',
-              style: GoogleFonts.poppins(
-                  color: Colors.white,
-                  fontSize: 12,
-                  fontWeight: FontWeight.w700))
+              style: AppTypography.bodyMedium(color: Colors.white, fontWeight: FontWeight.w700))
               : const SizedBox.shrink(),
         ),
       ]),
@@ -341,8 +336,7 @@ class _StatsBar extends StatelessWidget {
     return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
       Text(
         d.portName.isEmpty ? '—' : d.portName,
-        style: GoogleFonts.poppins(
-            fontSize: 11, fontWeight: FontWeight.w600, color: kTextDark),
+        style: AppTypography.bodySmall(color: kTextDark, fontWeight: FontWeight.w600),
         overflow: TextOverflow.ellipsis,
       ),
       const SizedBox(height: 4),
@@ -370,10 +364,9 @@ class _NumBadge extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(mainAxisSize: MainAxisSize.min, children: [
       Text(value.toString(),
-          style: GoogleFonts.poppins(
-              fontSize: 18, fontWeight: FontWeight.bold, color: color)),
+          style: AppTypography.heading1(color: color, fontWeight: FontWeight.bold)),
       Text(label,
-          style: GoogleFonts.poppins(fontSize: 10, color: kTextMuted)),
+          style: AppTypography.badgeText(color: kTextMuted)),
     ]);
   }
 }
@@ -404,10 +397,7 @@ class _ActionBar extends StatelessWidget {
           ),
           icon: const Icon(Icons.refresh_rounded, color: kTextMid, size: 18),
           label: Text('CLEAR ALL',
-              style: GoogleFonts.poppins(
-                  fontSize: 13,
-                  fontWeight: FontWeight.w600,
-                  color: kTextMid)),
+              style: AppTypography.bodyLarge(color: kTextMid, fontWeight: FontWeight.w600)),
         ),
       ]);
     }
@@ -426,10 +416,7 @@ class _ActionBar extends StatelessWidget {
                 borderRadius: BorderRadius.circular(8),
                 border: Border.all(color: kCardBorder)),
             child: Text(data.jobNo,
-                style: GoogleFonts.poppins(
-                    fontSize: 12,
-                    fontWeight: FontWeight.w600,
-                    color: kTextDark),
+                style: AppTypography.bodyMedium(color: kTextDark, fontWeight: FontWeight.w600),
                 overflow: TextOverflow.ellipsis),
           ),
         ),
@@ -457,11 +444,7 @@ class _ActionBar extends StatelessWidget {
             color: Colors.white, size: 20),
         const SizedBox(width: 8),
         Text('TRANSFER STOCK',
-            style: GoogleFonts.poppins(
-                fontSize: 13,
-                fontWeight: FontWeight.w700,
-                color: Colors.white,
-                letterSpacing: 0.6)),
+            style: AppTypography.heading3(color: Colors.white, fontWeight: FontWeight.w700)),
       ])
           : const Icon(Icons.save_as_outlined, color: Colors.white, size: 20),
     );
@@ -554,11 +537,7 @@ class _WareHouseField extends StatelessWidget {
           Expanded(
             child: Text(
               hasValue ? data.selectedWareHouseName : 'Select WareHouse',
-              style: GoogleFonts.poppins(
-                fontSize: 13,
-                fontWeight: hasValue ? FontWeight.w600 : FontWeight.w400,
-                color: hasValue ? kTextDark : kTextMuted,
-              ),
+              style: AppTypography.bodyLarge(color: hasValue ? kTextDark : kTextMuted, fontWeight: hasValue ? FontWeight.w600 : FontWeight.w400),
               overflow: TextOverflow.ellipsis,
             ),
           ),
@@ -596,14 +575,12 @@ class _JobCard extends StatelessWidget {
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         Text(
           data.jobNo.isEmpty ? 'No Job Loaded' : data.jobNo,
-          style: GoogleFonts.poppins(
-              fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white),
+          style: AppTypography.heading1(color: Colors.white, fontWeight: FontWeight.bold),
         ),
         if (data.portName.isNotEmpty) ...[
           const SizedBox(height: 4),
           Text(data.portName,
-              style: GoogleFonts.poppins(
-                  fontSize: 12, color: Colors.white70)),
+              style: AppTypography.bodyMedium(color: Colors.white70)),
         ],
         const SizedBox(height: 14),
         Row(children: [
@@ -640,13 +617,9 @@ class _GlassStat extends StatelessWidget {
         ),
         child: Column(children: [
           Text(value.toString(),
-              style: GoogleFonts.poppins(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white)),
+              style: AppTypography.heading1(color: Colors.white, fontWeight: FontWeight.bold)),
           Text(label,
-              style: GoogleFonts.poppins(
-                  fontSize: 10, color: Colors.white70)),
+              style: AppTypography.badgeText(color: Colors.white70)),
         ]),
       ),
     );
@@ -668,15 +641,11 @@ class _ScannedList extends StatelessWidget {
               size: isTablet ? 72 : 56, color: kCardBorder),
           const SizedBox(height: 12),
           Text('No Stock Scanned',
-              style: GoogleFonts.poppins(
-                  color: kTextMuted,
-                  fontSize: 14,
-                  fontWeight: FontWeight.w500)),
+              style: AppTypography.bodyLarge(color: kTextMuted, fontWeight: FontWeight.w500)),
           if (isTablet) ...[
             const SizedBox(height: 6),
             Text('Tap SCAN to start',
-                style: GoogleFonts.poppins(
-                    color: kTextMuted.withValues(alpha: 0.6), fontSize: 12)),
+                style: AppTypography.bodyMedium(color: kTextMuted.withValues(alpha: 0.6))),
           ],
         ]),
       );
@@ -687,11 +656,7 @@ class _ScannedList extends StatelessWidget {
       if (isTablet) ...[
         Row(children: [
           Text('SCANNED PACKAGES',
-              style: GoogleFonts.poppins(
-                  fontSize: 10,
-                  letterSpacing: 1.2,
-                  fontWeight: FontWeight.w600,
-                  color: kTextMuted)),
+              style: AppTypography.badgeText(color: kTextMuted, fontWeight: FontWeight.w600)),
           const SizedBox(width: 8),
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
@@ -700,10 +665,7 @@ class _ScannedList extends StatelessWidget {
                 borderRadius: BorderRadius.circular(20),
                 border: Border.all(color: kCardBorder)),
             child: Text('${data.scnPkg} / ${data.totalPkg}',
-                style: GoogleFonts.poppins(
-                    fontSize: 11,
-                    fontWeight: FontWeight.w600,
-                    color: kHeaderGradEnd)),
+                style: AppTypography.bodySmall(color: kHeaderGradEnd, fontWeight: FontWeight.w600)),
           ),
         ]),
         const SizedBox(height: 8),
@@ -772,16 +734,10 @@ class _ItemCard extends StatelessWidget {
               borderRadius: BorderRadius.circular(isTablet ? 8 : 6)),
           alignment: Alignment.center,
           child: Text(serialNo.toString(),
-              style: GoogleFonts.poppins(
-                  fontSize: isTablet ? 13 : 11,
-                  fontWeight: FontWeight.bold,
-                  color: kHeaderGradEnd)),
+              style: AppTypography.bodySmall(color: kHeaderGradEnd, fontWeight: FontWeight.bold)),
         ),
         title: Text(barcode,
-            style: GoogleFonts.poppins(
-                fontSize: isTablet ? 14 : 13,
-                fontWeight: FontWeight.w600,
-                color: kTextDark),
+            style: AppTypography.bodyLarge(color: kTextDark, fontWeight: FontWeight.w600),
             overflow: TextOverflow.ellipsis),
         trailing: IconButton(
           icon: const Icon(Icons.delete_outline_rounded,

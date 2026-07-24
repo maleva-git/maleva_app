@@ -1,3 +1,4 @@
+import 'package:maleva/core/theme/app_typography.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
@@ -65,8 +66,7 @@ class _DriverSalaryView extends StatelessWidget {
         if (state is DriverSalaryError) {
           return Center(
             child: Text(state.message,
-                style: GoogleFonts.lato(
-                    color: Palette.redAccent, fontSize: 13)),
+                style: AppTypography.bodyLarge(color: Palette.redAccent)),
           );
         }
         return const SizedBox.shrink();
@@ -107,10 +107,7 @@ void _showSalaryDetailsDialog(
                     Text(
                       item['CNumberDisplay']?.toString() ??
                           '-',
-                      style: GoogleFonts.lato(
-                          color: Colors.white,
-                          fontWeight: FontWeight.w700,
-                          fontSize: 15),
+                      style: AppTypography.heading2(color: Colors.white, fontWeight: FontWeight.w700),
                     ),
                   ],
                 ),
@@ -157,18 +154,12 @@ class _DetailRow extends StatelessWidget {
           Expanded(
             flex: 2,
             child: Text(label,
-                style: GoogleFonts.lato(
-                    color: Palette.textMid,
-                    fontWeight: FontWeight.w600,
-                    fontSize: 13)),
+                style: AppTypography.bodyLarge(color: Palette.textMid, fontWeight: FontWeight.w600)),
           ),
           Expanded(
             flex: 3,
             child: Text(value,
-                style: GoogleFonts.lato(
-                    color: Palette.textDark2,
-                    fontWeight: FontWeight.w600,
-                    fontSize: 13)),
+                style: AppTypography.bodyLarge(color: Palette.textDark2, fontWeight: FontWeight.w600)),
           ),
         ],
       ),
@@ -365,21 +356,14 @@ class _DateTile extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(label.toUpperCase(),
-                style: GoogleFonts.lato(
-                    color: Palette.kTextMuted,
-                    fontWeight: FontWeight.w700,
-                    fontSize: 9,
-                    letterSpacing: 0.6)),
+                style: AppTypography.badgeText(color: Palette.kTextMuted, fontWeight: FontWeight.w700)),
             const SizedBox(height: 4),
             Row(
               mainAxisAlignment:
               MainAxisAlignment.spaceBetween,
               children: [
                 Text(display,
-                    style: GoogleFonts.lato(
-                        color: Palette.textDark2,
-                        fontWeight: FontWeight.w700,
-                        fontSize: isTablet ? 14 : 13)),
+                    style: AppTypography.heading3(color: Palette.textDark2, fontWeight: FontWeight.w700)),
                 const Icon(
                     Icons.calendar_month_outlined,
                     size: 18,
@@ -400,12 +384,7 @@ class _GridHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final style = GoogleFonts.lato(
-      color: Colors.white.withValues(alpha: 0.85),
-      fontWeight: FontWeight.w600,
-      fontSize: isTablet ? 11 : 10,
-      letterSpacing: 0.5,
-    );
+    final style = AppTypography.badgeText(color: Colors.white.withValues(alpha: 0.85), fontWeight: FontWeight.w600);
 
     return Container(
       padding: const EdgeInsets.symmetric(
@@ -618,14 +597,10 @@ class _EmptyState extends StatelessWidget {
           ),
           const SizedBox(height: 14),
           Text('No Salary Records',
-              style: GoogleFonts.lato(
-                  color: Palette.textDark2,
-                  fontWeight: FontWeight.w600,
-                  fontSize: 15)),
+              style: AppTypography.heading2(color: Palette.textDark2, fontWeight: FontWeight.w600)),
           const SizedBox(height: 4),
           Text('Select a date range to view salary',
-              style: GoogleFonts.lato(
-                  color: Palette.kTextMuted, fontSize: 12)),
+              style: AppTypography.bodyMedium(color: Palette.kTextMuted)),
         ],
       ),
     );

@@ -1,3 +1,4 @@
+import 'package:maleva/core/theme/app_typography.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -178,11 +179,7 @@ class _VesselPlanningFilterSheetState
 
               Text(
                 'Filter Vessel Planning',
-                style: GoogleFonts.lato(
-                  color: AppTokens.invoiceHeaderStart,
-                  fontWeight: FontWeight.w700,
-                  fontSize: 16,
-                ),
+                style: AppTypography.heading1(color: AppTokens.invoiceHeaderStart, fontWeight: FontWeight.w700),
               ),
               const SizedBox(height: 16),
 
@@ -211,11 +208,7 @@ class _VesselPlanningFilterSheetState
               // ── ETA Type Chips ─────────────────────────────────────────
               Text(
                 'ETA Type',
-                style: GoogleFonts.lato(
-                  color: colour.kTextDark,
-                  fontWeight: FontWeight.w600,
-                  fontSize: 13,
-                ),
+                style: AppTypography.bodyLarge(color: colour.kTextDark, fontWeight: FontWeight.w600),
               ),
               const SizedBox(height: 8),
               Row(
@@ -244,11 +237,7 @@ class _VesselPlanningFilterSheetState
               // ── Port Search + Add ──────────────────────────────────────
               Text(
                 'Ports Search',
-                style: GoogleFonts.lato(
-                  color: colour.kTextDark,
-                  fontWeight: FontWeight.w600,
-                  fontSize: 13,
-                ),
+                style: AppTypography.bodyLarge(color: colour.kTextDark, fontWeight: FontWeight.w600),
               ),
               const SizedBox(height: 8),
 
@@ -261,17 +250,10 @@ class _VesselPlanningFilterSheetState
                 ),
                 child: TextField(
                   controller: _portStringController,
-                  style: GoogleFonts.lato(
-                    color: colour.kTextDark,
-                    fontSize: 13,
-                    fontWeight: FontWeight.w600,
-                  ),
+                  style: AppTypography.bodyLarge(color: colour.kTextDark, fontWeight: FontWeight.w600),
                   decoration: InputDecoration(
                     hintText: 'Comma separated ports...',
-                    hintStyle: GoogleFonts.lato(
-                      color: AppTokens.planTextMuted,
-                      fontSize: 13,
-                    ),
+                    hintStyle: AppTypography.bodyLarge(color: AppTokens.planTextMuted),
                     border: InputBorder.none,
                     contentPadding: const EdgeInsets.symmetric(
                         horizontal: 14, vertical: 14),
@@ -309,17 +291,10 @@ class _VesselPlanningFilterSheetState
                             controller: _dropdownSearchController,
                             onTap: () => setState(() => _showPortDropdown = true),
                             onChanged: (_) => setState(() => _showPortDropdown = true),
-                            style: GoogleFonts.lato(
-                              color: colour.kTextDark,
-                              fontSize: 13,
-                              fontWeight: FontWeight.w600,
-                            ),
+                            style: AppTypography.bodyLarge(color: colour.kTextDark, fontWeight: FontWeight.w600),
                             decoration: InputDecoration(
                               hintText: 'Select a port...',
-                              hintStyle: GoogleFonts.lato(
-                                color: AppTokens.planTextMuted,
-                                fontSize: 13,
-                              ),
+                              hintStyle: AppTypography.bodyLarge(color: AppTokens.planTextMuted),
                               border: InputBorder.none,
                               contentPadding: const EdgeInsets.symmetric(
                                   horizontal: 14, vertical: 14),
@@ -354,8 +329,7 @@ class _VesselPlanningFilterSheetState
                                         padding: const EdgeInsets.all(16),
                                         child: Text(
                                           'No ports found',
-                                          style: GoogleFonts.lato(
-                                              color: AppTokens.planTextMuted, fontSize: 13),
+                                          style: AppTypography.bodyLarge(color: AppTokens.planTextMuted),
                                         ),
                                       )
                                     : ListView.separated(
@@ -379,11 +353,7 @@ class _VesselPlanningFilterSheetState
                                                   horizontal: 14, vertical: 12),
                                               child: Text(
                                                 port.PortName,
-                                                style: GoogleFonts.lato(
-                                                  color: colour.kTextDark,
-                                                  fontWeight: FontWeight.w500,
-                                                  fontSize: 13,
-                                                ),
+                                                style: AppTypography.bodyLarge(color: colour.kTextDark, fontWeight: FontWeight.w500),
                                               ),
                                             ),
                                           );
@@ -410,11 +380,7 @@ class _VesselPlanningFilterSheetState
                       alignment: Alignment.center,
                       child: Text(
                         'Add',
-                        style: GoogleFonts.lato(
-                          color: Colors.white,
-                          fontWeight: FontWeight.w700,
-                          fontSize: 14,
-                        ),
+                        style: AppTypography.heading3(color: Colors.white, fontWeight: FontWeight.w700),
                       ),
                     ),
                   ),
@@ -452,11 +418,7 @@ class _VesselPlanningFilterSheetState
                       const SizedBox(width: 10),
                       Text(
                         'Exclude Delivery Done / Completed',
-                        style: GoogleFonts.lato(
-                          color: colour.kTextDark,
-                          fontWeight: FontWeight.w600,
-                          fontSize: 13,
-                        ),
+                        style: AppTypography.bodyLarge(color: colour.kTextDark, fontWeight: FontWeight.w600),
                       ),
                     ],
                   ),
@@ -537,16 +499,10 @@ class _DateTile extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(label,
-                      style: GoogleFonts.lato(
-                          color: AppTokens.planTextMuted,
-                          fontSize: 10,
-                          fontWeight: FontWeight.w600)),
+                      style: AppTypography.badgeText(color: AppTokens.planTextMuted, fontWeight: FontWeight.w600)),
                   const SizedBox(height: 2),
                   Text(date,
-                      style: GoogleFonts.lato(
-                          color: colour.kTextDark,
-                          fontSize: 12,
-                          fontWeight: FontWeight.w700)),
+                      style: AppTypography.bodyMedium(color: colour.kTextDark, fontWeight: FontWeight.w700)),
                 ],
               ),
             ),
@@ -581,11 +537,7 @@ class _EtaChip extends StatelessWidget {
         ),
         child: Text(
           label,
-          style: GoogleFonts.lato(
-            color: selected ? Colors.white : colour.kTextDark,
-            fontWeight: FontWeight.w600,
-            fontSize: 12,
-          ),
+          style: AppTypography.bodyMedium(color: selected ? Colors.white : colour.kTextDark, fontWeight: FontWeight.w600),
         ),
       ),
     );
@@ -622,10 +574,7 @@ class _GradButton extends StatelessWidget {
         ),
         onPressed: onPressed,
         child: Text(label,
-            style: GoogleFonts.lato(
-                color: Colors.white,
-                fontWeight: FontWeight.w700,
-                fontSize: 14)),
+            style: AppTypography.heading3(color: Colors.white, fontWeight: FontWeight.w700)),
       ),
     );
   }
@@ -650,8 +599,7 @@ class _OutlineBtn extends StatelessWidget {
         ),
         onPressed: onPressed,
         child: Text(label,
-            style: GoogleFonts.lato(
-                fontWeight: FontWeight.w600, fontSize: 14)),
+            style: AppTypography.bodyLarge()),
       ),
     );
   }

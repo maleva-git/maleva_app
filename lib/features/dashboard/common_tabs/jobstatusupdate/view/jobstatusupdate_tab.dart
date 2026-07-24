@@ -1,3 +1,4 @@
+import 'package:maleva/core/theme/app_typography.dart';
 import 'package:maleva/core/utils/system_helpers.dart';
 import 'package:maleva/core/network/api_constants.dart';
 import 'dart:io';

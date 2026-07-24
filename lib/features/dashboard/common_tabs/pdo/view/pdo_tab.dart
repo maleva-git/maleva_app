@@ -1,3 +1,4 @@
+import 'package:maleva/core/theme/app_typography.dart';
 import 'package:maleva/core/network/api_constants.dart';
 import 'dart:io';
 import 'package:flutter/material.dart';
@@ -91,8 +92,7 @@ class _PDOViewBody extends StatelessWidget {
                       style: GoogleFonts.lato(fontWeight: FontWeight.bold)),
                 ]),
                 content: Text(state.saveError!,
-                    style: GoogleFonts.lato(
-                        fontSize: 15, color: Colors.grey.shade800)),
+                    style: AppTypography.heading2(color: Colors.grey.shade800)),
                 actions: [
                   TextButton(
                     onPressed: () {
@@ -102,10 +102,7 @@ class _PDOViewBody extends StatelessWidget {
                           .add(const ResetPDOSaveStatusEvent());
                     },
                     child: Text("OK",
-                        style: GoogleFonts.lato(
-                            color: AppTokens.brandGradientStart,
-                            fontWeight: FontWeight.bold,
-                            fontSize: 15)),
+                        style: AppTypography.heading2(color: AppTokens.brandGradientStart, fontWeight: FontWeight.bold)),
                   ),
                 ],
               ),
@@ -127,10 +124,7 @@ class _PDOViewBody extends StatelessWidget {
               ),
               const SizedBox(height: 20),
               Text("Loading RTI Details…",
-                  style: GoogleFonts.lato(
-                      color: Colors.grey.shade600,
-                      fontSize: 14,
-                      fontWeight: FontWeight.w500)),
+                  style: AppTypography.bodyLarge(color: Colors.grey.shade600, fontWeight: FontWeight.w500)),
             ]),
           );
         }
@@ -149,23 +143,18 @@ class _PDOViewBody extends StatelessWidget {
                 ),
                 const SizedBox(height: 20),
                 Text("Something went wrong",
-                    style: GoogleFonts.lato(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                        color: AppTokens.brandDark)),
+                    style: AppTypography.heading1(color: AppTokens.brandDark, fontWeight: FontWeight.bold)),
                 const SizedBox(height: 8),
                 Text(state.message,
                     textAlign: TextAlign.center,
-                    style: GoogleFonts.lato(
-                        color: Colors.grey.shade600, fontSize: 14)),
+                    style: AppTypography.bodyLarge(color: Colors.grey.shade600)),
                 const SizedBox(height: 24),
                 ElevatedButton.icon(
                   onPressed: () =>
                       context.read<PDOBloc>().add(const LoadPDOViewEvent()),
                   icon: const Icon(Icons.refresh_rounded, size: 20),
                   label: Text("Try Again",
-                      style: GoogleFonts.lato(
-                          fontWeight: FontWeight.bold, fontSize: 15)),
+                      style: AppTypography.heading2(fontWeight: FontWeight.bold)),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppTokens.brandGradientStart,
                     foregroundColor: colour.kWhite,
@@ -261,16 +250,10 @@ class _PageHeader extends StatelessWidget {
         const SizedBox(width: 14),
         Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
           Text("RTI Details",
-              style: GoogleFonts.lato(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                  color: AppTokens.brandGradientStartDark)),
+              style: AppTypography.heading1(color: AppTokens.brandGradientStartDark, fontWeight: FontWeight.bold)),
           const SizedBox(height: 2),
           Text("Return to Inventory",
-              style: GoogleFonts.lato(
-                  fontSize: 12,
-                  color: Colors.grey.shade500,
-                  fontWeight: FontWeight.w500)),
+              style: AppTypography.bodyMedium(color: Colors.grey.shade500, fontWeight: FontWeight.w500)),
         ]),
         const Spacer(),
         if (count > 0)
@@ -285,10 +268,7 @@ class _PageHeader extends StatelessWidget {
                   size: 14, color: AppTokens.brandGradientStart),
               const SizedBox(width: 6),
               Text("$count records",
-                  style: GoogleFonts.lato(
-                      color: AppTokens.brandGradientStart,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 13)),
+                  style: AppTypography.heading3(color: AppTokens.brandGradientStart, fontWeight: FontWeight.bold)),
             ]),
           ),
       ]),
@@ -317,11 +297,11 @@ class _SearchBar extends StatelessWidget {
       ),
       child: TextField(
         onChanged: onChanged,
-        style: GoogleFonts.lato(color: AppTokens.brandDark, fontSize: 15),
+        style: AppTypography.heading2(color: AppTokens.brandDark),
         decoration: InputDecoration(
           hintText: "Search RTI No / Driver / Truck",
           hintStyle:
-          GoogleFonts.lato(color: Colors.grey.shade400, fontSize: 14),
+          AppTypography.bodyLarge(color: Colors.grey.shade400),
           prefixIcon: const Icon(Icons.search_rounded,
               color: AppTokens.brandGradientStart, size: 22),
           contentPadding:
@@ -359,14 +339,10 @@ class _EmptyState extends StatelessWidget {
           ),
           const SizedBox(height: 20),
           Text("No Records Found",
-              style: GoogleFonts.lato(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                  color: AppTokens.brandDark)),
+              style: AppTypography.heading1(color: AppTokens.brandDark, fontWeight: FontWeight.bold)),
           const SizedBox(height: 6),
           Text("Try adjusting the date range or search",
-              style: GoogleFonts.lato(
-                  fontSize: 14, color: Colors.grey.shade500)),
+              style: AppTypography.bodyLarge(color: Colors.grey.shade500)),
         ]),
       ),
     );
@@ -457,11 +433,7 @@ class _RTIMasterCard extends StatelessWidget {
                   ),
                   const SizedBox(width: 8),
                   Text("JOB DETAILS",
-                      style: GoogleFonts.lato(
-                          fontSize: 12,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.grey.shade500,
-                          letterSpacing: 0.8)),
+                      style: AppTypography.bodyMedium(color: Colors.grey.shade500, fontWeight: FontWeight.bold)),
                 ]),
               ),
 
@@ -521,18 +493,14 @@ class _MasterCardHeader extends StatelessWidget {
           child:
           Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
             Text(master.RTINoDisplay,
-                style: GoogleFonts.lato(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 16,
-                    color: colour.kWhite)),
+                style: AppTypography.heading1(color: colour.kWhite, fontWeight: FontWeight.bold)),
             const SizedBox(height: 4),
             Row(children: [
               Icon(Icons.calendar_today_rounded,
                   size: 12, color: colour.kWhite.withValues(alpha: 0.8)),
               const SizedBox(width: 6),
               Text(master.RTIDate,
-                  style: GoogleFonts.lato(
-                      fontSize: 12, color: colour.kWhite.withValues(alpha: 0.9))),
+                  style: AppTypography.bodyMedium(color: colour.kWhite.withValues(alpha: 0.9))),
             ]),
           ]),
         ),
@@ -546,10 +514,7 @@ class _MasterCardHeader extends StatelessWidget {
             border: Border.all(color: colour.kWhite.withValues(alpha: 0.3), width: 1),
           ),
           child: Text("RM ${master.Amount}",
-              style: GoogleFonts.lato(
-                  color: colour.kWhite,
-                  fontWeight: FontWeight.bold,
-                  fontSize: 14)),
+              style: AppTypography.heading3(color: colour.kWhite, fontWeight: FontWeight.bold)),
         ),
       ]),
     );
@@ -623,20 +588,14 @@ class _VerifyButton extends StatelessWidget {
           ),
           const SizedBox(width: 10),
           Text("Saving…",
-              style: GoogleFonts.lato(
-                  color: colour.kWhite,
-                  fontWeight: FontWeight.bold,
-                  fontSize: 15)),
+              style: AppTypography.heading2(color: colour.kWhite, fontWeight: FontWeight.bold)),
         ])
             : Row(mainAxisSize: MainAxisSize.min, children: [
           const Icon(Icons.verified_rounded,
               color: colour.kWhite, size: 20),
           const SizedBox(width: 8),
           Text("Verify RTI Request",
-              style: GoogleFonts.lato(
-                  color: colour.kWhite,
-                  fontWeight: FontWeight.bold,
-                  fontSize: 15)),
+              style: AppTypography.heading2(color: colour.kWhite, fontWeight: FontWeight.bold)),
         ]),
       ),
     );
@@ -692,10 +651,7 @@ class _RTIDetailRow extends StatelessWidget {
           ),
           Expanded(
             child: Text(detail.JobNo,
-                style: GoogleFonts.lato(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 15,
-                    color: AppTokens.brandDark)),
+                style: AppTypography.heading2(color: AppTokens.brandDark, fontWeight: FontWeight.bold)),
           ),
 
           // Verify toggle pill
@@ -738,12 +694,9 @@ class _RTIDetailRow extends StatelessWidget {
                 const SizedBox(width: 6),
                 Text(
                   isVerified ? "Verified" : "Verify",
-                  style: GoogleFonts.lato(
-                      fontSize: 13,
-                      fontWeight: FontWeight.bold,
-                      color: isVerified
+                  style: AppTypography.heading3(color: isVerified
                           ? colour.kWhite
-                          : AppTokens.brandGradientStart),
+                          : AppTokens.brandGradientStart, fontWeight: FontWeight.bold),
                 ),
               ]),
             ),
@@ -875,10 +828,7 @@ Widget _infoChip(IconData icon, String label, String? value) {
     SizedBox(
       width: 70,
       child: Text(label,
-          style: GoogleFonts.lato(
-              fontSize: 13,
-              color: Colors.grey.shade600,
-              fontWeight: FontWeight.w600)),
+          style: AppTypography.bodyLarge(color: Colors.grey.shade600, fontWeight: FontWeight.w600)),
     ),
     const Padding(
       padding: EdgeInsets.symmetric(horizontal: 4),
@@ -886,10 +836,7 @@ Widget _infoChip(IconData icon, String label, String? value) {
     ),
     Expanded(
       child: Text(value,
-          style: GoogleFonts.lato(
-              fontSize: 14,
-              color: AppTokens.brandDark,
-              fontWeight: FontWeight.w500)),
+          style: AppTypography.bodyLarge(color: AppTokens.brandDark, fontWeight: FontWeight.w500)),
     ),
   ]);
 }
@@ -901,10 +848,7 @@ Widget _infoRow(String label, String? value) {
     SizedBox(
       width: 75,
       child: Text(label,
-          style: GoogleFonts.lato(
-              fontSize: 13,
-              color: Colors.grey.shade600,
-              fontWeight: FontWeight.w600)),
+          style: AppTypography.bodyLarge(color: Colors.grey.shade600, fontWeight: FontWeight.w600)),
     ),
     const Padding(
       padding: EdgeInsets.symmetric(horizontal: 4),
@@ -912,10 +856,7 @@ Widget _infoRow(String label, String? value) {
     ),
     Expanded(
       child: Text(value,
-          style: GoogleFonts.lato(
-              fontSize: 14,
-              color: AppTokens.brandDark,
-              fontWeight: FontWeight.w500)),
+          style: AppTypography.bodyLarge(color: AppTokens.brandDark, fontWeight: FontWeight.w500)),
     ),
   ]);
 }
@@ -940,15 +881,11 @@ class _SuccessDialog extends StatelessWidget {
         ),
         const SizedBox(height: 16),
         Text("Saved Successfully!",
-            style: GoogleFonts.lato(
-                fontWeight: FontWeight.bold,
-                fontSize: 18,
-                color: AppTokens.brandDark)),
+            style: AppTypography.heading1(color: AppTokens.brandDark, fontWeight: FontWeight.bold)),
         const SizedBox(height: 8),
         Text("The RTI record has been verified.",
             textAlign: TextAlign.center,
-            style: GoogleFonts.lato(
-                fontSize: 14, color: Colors.grey.shade600)),
+            style: AppTypography.bodyLarge(color: Colors.grey.shade600)),
         const SizedBox(height: 24),
         SizedBox(
           width: double.infinity,
@@ -962,10 +899,7 @@ class _SuccessDialog extends StatelessWidget {
               elevation: 0,
             ),
             child: Text("Done",
-                style: GoogleFonts.lato(
-                    color: colour.kWhite,
-                    fontWeight: FontWeight.bold,
-                    fontSize: 16)),
+                style: AppTypography.heading1(color: colour.kWhite, fontWeight: FontWeight.bold)),
           ),
         ),
       ]),

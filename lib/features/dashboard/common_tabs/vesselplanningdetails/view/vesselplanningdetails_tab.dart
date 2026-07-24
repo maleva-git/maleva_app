@@ -1,3 +1,4 @@
+import 'package:maleva/core/theme/app_typography.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
@@ -109,20 +110,12 @@ class _VesselPlanningDetailsView extends StatelessWidget {
         children: [
           Text(
             'Vessel Details',
-            style: GoogleFonts.lato(
-              color: AppTokens.appBarTitle,
-              fontWeight: FontWeight.bold,
-              fontSize: isTablet ? 18 : 16,
-            ),
+            style: AppTypography.heading1(color: AppTokens.appBarTitle, fontWeight: FontWeight.bold),
           ),
           if (userName.isNotEmpty)
             Text(
               userName,
-              style: GoogleFonts.lato(
-                color: AppTokens.invoicePillBg,
-                fontSize: isTablet ? 13 : 11,
-                fontWeight: FontWeight.w500,
-              ),
+              style: AppTypography.bodySmall(color: AppTokens.invoicePillBg, fontWeight: FontWeight.w500),
             ),
         ],
       ),
@@ -153,16 +146,8 @@ class _VesselPlanningDetailsView extends StatelessWidget {
   }
 
   Widget _buildDataTable(List<dynamic> details) {
-    final headerStyle = GoogleFonts.lato(
-      color: Colors.white,
-      fontWeight: FontWeight.w700,
-      fontSize: 12,
-    );
-    final rowStyle = GoogleFonts.lato(
-      color: colour.kTextDark,
-      fontWeight: FontWeight.w600,
-      fontSize: 12,
-    );
+    final headerStyle = AppTypography.bodyMedium(color: Colors.white, fontWeight: FontWeight.w700);
+    final rowStyle = AppTypography.bodyMedium(color: colour.kTextDark, fontWeight: FontWeight.w600);
 
     return Container(
       width: double.infinity,
@@ -262,10 +247,7 @@ class _SummaryPill extends StatelessWidget {
         ),
         child: Text(
           'Total: $count',
-          style: GoogleFonts.lato(
-              color: Palette.white,
-              fontWeight: FontWeight.w600,
-              fontSize: 12),
+          style: AppTypography.bodyMedium(color: Palette.white, fontWeight: FontWeight.w600),
         ),
       ),
     );
@@ -290,14 +272,10 @@ class _EmptyWidget extends StatelessWidget {
               color: Palette.grey400.withValues(alpha: 0.6)),
           const SizedBox(height: 12),
           Text('No vessel planning records',
-              style: GoogleFonts.lato(
-                  fontSize: 15,
-                  fontWeight: FontWeight.w600,
-                  color: AppTokens.textSecondary)),
+              style: AppTypography.heading2(color: AppTokens.textSecondary, fontWeight: FontWeight.w600)),
           const SizedBox(height: 4),
           Text('Pull down to refresh',
-              style: GoogleFonts.lato(
-                  fontSize: 12, color: AppTokens.textMuted)),
+              style: AppTypography.bodyMedium(color: AppTokens.textMuted)),
         ],
       ),
     );
@@ -322,17 +300,13 @@ class _ErrorWidget extends StatelessWidget {
                 size: 56, color: Palette.redError),
             const SizedBox(height: 12),
             Text('Failed to load data',
-                style: GoogleFonts.lato(
-                    fontSize: 15,
-                    fontWeight: FontWeight.bold,
-                    color: AppTokens.textPrimary)),
+                style: AppTypography.heading2(color: AppTokens.textPrimary, fontWeight: FontWeight.bold)),
             const SizedBox(height: 6),
             Text(message,
                 textAlign: TextAlign.center,
                 maxLines: 3,
                 overflow: TextOverflow.ellipsis,
-                style: GoogleFonts.lato(
-                    fontSize: 12, color: AppTokens.textMuted)),
+                style: AppTypography.bodyMedium(color: AppTokens.textMuted)),
             const SizedBox(height: 18),
             ElevatedButton.icon(
               style: ElevatedButton.styleFrom(

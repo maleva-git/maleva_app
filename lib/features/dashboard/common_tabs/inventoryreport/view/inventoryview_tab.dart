@@ -1,3 +1,4 @@
+import 'package:maleva/core/theme/app_typography.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -21,22 +22,20 @@ const kPortChips = [
   {"id": 6, "name": "PasirGudang", "icon": Icons.warehouse},
 ];
 
-// ── Entry Point ───────────────────────────────────────────────────────────────
 class InventoryPage extends StatelessWidget {
   const InventoryPage({super.key});
 
   @override
   Widget build(BuildContext context) {
     return
+
       BlocProvider(
-        // ✅ Removed 'context' and used our Service Locator (sl) to inject the BLoC and Repository automatically
         create: (_) => sl<InventoryBloc>(),
         child: const _InventoryBody(),
       );
   }
 }
 
-// ── Body ──────────────────────────────────────────────────────────────────────
 class _InventoryBody extends StatelessWidget {
   const _InventoryBody();
 
@@ -98,10 +97,7 @@ class _InventoryBody extends StatelessWidget {
                       ),
                       const SizedBox(width: 6),
                       Text("Port Filter",
-                          style: GoogleFonts.lato(
-                              fontSize: 12,
-                              fontWeight: FontWeight.bold,
-                              color: AppTokens.brandDark)),
+                          style: AppTypography.bodyMedium(color: AppTokens.brandDark, fontWeight: FontWeight.bold)),
                     ]),
                     const SizedBox(height: 10),
                     SizedBox(
@@ -158,14 +154,11 @@ class _InventoryBody extends StatelessWidget {
                                           : AppTokens.brandGradientStart),
                                   const SizedBox(height: 5),
                                   Text(f['name'] as String,
-                                      style: GoogleFonts.lato(
-                                          fontSize: 11,
-                                          fontWeight: isActive
-                                              ? FontWeight.bold
-                                              : FontWeight.w500,
-                                          color: isActive
+                                      style: AppTypography.bodySmall(color: isActive
                                               ? colour.kWhite
-                                              : AppTokens.brandDark),
+                                              : AppTokens.brandDark, fontWeight: isActive
+                                              ? FontWeight.bold
+                                              : FontWeight.w500),
                                       textAlign: TextAlign.center,
                                       maxLines: 1,
                                       overflow:
@@ -214,10 +207,7 @@ class _InventoryBody extends StatelessWidget {
                       ),
                       const SizedBox(width: 6),
                       Text("Customer & Status",
-                          style: GoogleFonts.lato(
-                              fontSize: 12,
-                              fontWeight: FontWeight.bold,
-                              color: AppTokens.brandDark)),
+                          style: AppTypography.bodyMedium(color: AppTokens.brandDark, fontWeight: FontWeight.bold)),
                     ]),
                     const SizedBox(height: 10),
                     Row(children: [
@@ -264,26 +254,19 @@ class _InventoryBody extends StatelessWidget {
                                     CrossAxisAlignment.start,
                                     children: [
                                       Text("Customer",
-                                          style: GoogleFonts.lato(
-                                              fontSize: 10,
-                                              color: custName
+                                          style: AppTypography.badgeText(color: custName
                                                   .isNotEmpty
                                                   ? AppTokens.brandGradientStart
-                                                  : Colors.grey,
-                                              fontWeight:
-                                              FontWeight.w600)),
+                                                  : Colors.grey, fontWeight: FontWeight.w600)),
                                       Text(
                                         custName.isNotEmpty
                                             ? custName
                                             : "Select Customer",
-                                        style: GoogleFonts.lato(
-                                            fontSize: 12,
-                                            color: custName
+                                        style: AppTypography.bodyMedium(color: custName
                                                 .isNotEmpty
                                                 ? AppTokens.brandDark
                                                 : Colors
-                                                .grey.shade400,
-                                            fontWeight: custName
+                                                .grey.shade400, fontWeight: custName
                                                 .isNotEmpty
                                                 ? FontWeight.bold
                                                 : FontWeight.normal),
@@ -339,14 +322,10 @@ class _InventoryBody extends StatelessWidget {
                                 ),
                                 const SizedBox(width: 6),
                                 Text("Active",
-                                    style: GoogleFonts.lato(
-                                        fontSize: 13,
-                                        fontWeight: FontWeight.bold,
-                                        color:
-                                        (s?.isChecked ?? false)
+                                    style: AppTypography.heading3(color: (s?.isChecked ?? false)
                                             ? colour.kWhite
                                             : colour
-                                            .kPrimaryDark)),
+                                            .kPrimaryDark, fontWeight: FontWeight.bold)),
                               ]),
                         ),
                       ),
@@ -437,10 +416,7 @@ class _InventoryBody extends StatelessWidget {
                       elevation: 0,
                     ),
                     child: Text("Search",
-                        style: GoogleFonts.lato(
-                            color: colour.kWhite,
-                            fontWeight: FontWeight.bold,
-                            fontSize: 13)),
+                        style: AppTypography.heading3(color: colour.kWhite, fontWeight: FontWeight.bold)),
                   ),
                 ]),
               ),
@@ -462,10 +438,7 @@ class _InventoryBody extends StatelessWidget {
                         borderRadius: BorderRadius.circular(8)),
                     child: Text(
                         "${s!.records.length} records",
-                        style: GoogleFonts.lato(
-                            color: AppTokens.brandGradientStart,
-                            fontWeight: FontWeight.bold,
-                            fontSize: 12)),
+                        style: AppTypography.bodyMedium(color: AppTokens.brandGradientStart, fontWeight: FontWeight.bold)),
                   ),
                 ]),
               ),
@@ -499,9 +472,7 @@ class _InventoryBody extends StatelessWidget {
                             Colors.grey.shade300),
                         const SizedBox(height: 12),
                         Text("No Records Found",
-                            style: GoogleFonts.lato(
-                                fontSize: 16,
-                                color: Colors.grey)),
+                            style: AppTypography.heading1(color: Colors.grey)),
                       ]))
                   : isTablet
                   ? _buildTabletLayout(context, s)
@@ -682,10 +653,7 @@ class _InventoryGridCard extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(item.jobType ?? '-',
-                      style: GoogleFonts.lato(
-                          fontSize: 13,
-                          fontWeight: FontWeight.bold,
-                          color: colour.kWhite),
+                      style: AppTypography.heading3(color: colour.kWhite, fontWeight: FontWeight.bold),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis),
                   const SizedBox(height: 3),
@@ -697,10 +665,7 @@ class _InventoryGridCard extends StatelessWidget {
                       borderRadius: BorderRadius.circular(20),
                     ),
                     child: Text(item.jobStatus ?? '-',
-                        style: GoogleFonts.lato(
-                            fontSize: 10,
-                            color: colour.kWhite,
-                            fontWeight: FontWeight.w600),
+                        style: AppTypography.badgeText(color: colour.kWhite, fontWeight: FontWeight.w600),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis),
                   ),
@@ -768,10 +733,7 @@ class _InventoryGridCard extends StatelessWidget {
         Icon(icon, size: 11, color: AppTokens.brandGradientStart),
         const SizedBox(width: 3),
         Text(val ?? '-',
-            style: GoogleFonts.lato(
-                fontSize: 11,
-                color: AppTokens.brandDark,
-                fontWeight: FontWeight.w600)),
+            style: AppTypography.bodySmall(color: AppTokens.brandDark, fontWeight: FontWeight.w600)),
       ]),
     );
   }
@@ -784,8 +746,7 @@ class _InventoryGridCard extends StatelessWidget {
           const SizedBox(width: 5),
           Expanded(
             child: Text(val ?? '-',
-                style: GoogleFonts.lato(
-                    fontSize: 11, color: AppTokens.brandDark),
+                style: AppTypography.bodySmall(color: AppTokens.brandDark),
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis),
           ),
@@ -793,8 +754,7 @@ class _InventoryGridCard extends StatelessWidget {
   }
 
   Widget _tinyText(String t) => Text(t,
-      style: GoogleFonts.lato(
-          fontSize: 10, color: Colors.grey[400]));
+      style: AppTypography.badgeText(color: Colors.grey[400]));
 }
 
 // ── Empty Detail Panel ────────────────────────────────────────────────────────
@@ -826,14 +786,10 @@ class _EmptyDetailPanel extends StatelessWidget {
           ),
           const SizedBox(height: 16),
           Text("Select a record",
-              style: GoogleFonts.lato(
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
-                  color: AppTokens.brandDark)),
+              style: AppTypography.heading1(color: AppTokens.brandDark, fontWeight: FontWeight.bold)),
           const SizedBox(height: 6),
           Text("Tap any card to view details",
-              style: GoogleFonts.lato(
-                  fontSize: 13, color: Colors.grey[500])),
+              style: AppTypography.bodyLarge(color: Colors.grey[500])),
         ],
       ),
     );
@@ -883,10 +839,7 @@ class _InventoryDetailPanel extends StatelessWidget {
                   Expanded(
                     child: Text(
                       item.jobType ?? '-',
-                      style: GoogleFonts.lato(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                          color: colour.kWhite),
+                      style: AppTypography.heading1(color: colour.kWhite, fontWeight: FontWeight.bold),
                       overflow: TextOverflow.ellipsis,
                     ),
                   ),
@@ -900,10 +853,7 @@ class _InventoryDetailPanel extends StatelessWidget {
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Text(item.jobStatus ?? '-',
-                      style: GoogleFonts.lato(
-                          fontSize: 11,
-                          color: colour.kWhite,
-                          fontWeight: FontWeight.w600)),
+                      style: AppTypography.bodySmall(color: colour.kWhite, fontWeight: FontWeight.w600)),
                 ),
               ],
             ),
@@ -973,17 +923,11 @@ class _InventoryDetailPanel extends StatelessWidget {
               Icon(icon, size: 12, color: AppTokens.brandGradientStart),
               const SizedBox(width: 4),
               Text(label,
-                  style: GoogleFonts.lato(
-                      fontSize: 10,
-                      color: Colors.grey[500],
-                      fontWeight: FontWeight.w600)),
+                  style: AppTypography.badgeText(color: Colors.grey[500], fontWeight: FontWeight.w600)),
             ]),
             const SizedBox(height: 2),
             Text(value,
-                style: GoogleFonts.lato(
-                    fontSize: 14,
-                    fontWeight: FontWeight.bold,
-                    color: AppTokens.brandDark)),
+                style: AppTypography.heading3(color: AppTokens.brandDark, fontWeight: FontWeight.bold)),
           ],
         ),
       ),
@@ -1008,15 +952,9 @@ class _InventoryDetailPanel extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(label,
-                  style: GoogleFonts.lato(
-                      fontSize: 10,
-                      color: Colors.grey[500],
-                      fontWeight: FontWeight.w600)),
+                  style: AppTypography.badgeText(color: Colors.grey[500], fontWeight: FontWeight.w600)),
               Text(value ?? '-',
-                  style: GoogleFonts.lato(
-                      fontSize: 13,
-                      fontWeight: FontWeight.w700,
-                      color: AppTokens.brandDark)),
+                  style: AppTypography.heading3(color: AppTokens.brandDark, fontWeight: FontWeight.w700)),
             ],
           ),
         ),
@@ -1076,10 +1014,7 @@ class _InventoryCustomerSelectPageState
               color: colour.kWhite, size: 20),
         ),
         title: Text("Select Customer",
-            style: GoogleFonts.lato(
-                fontWeight: FontWeight.bold,
-                fontSize: 18,
-                color: colour.kWhite)),
+            style: AppTypography.heading1(color: colour.kWhite, fontWeight: FontWeight.bold)),
         centerTitle: true,
       ),
       body: Column(children: [
@@ -1115,10 +1050,7 @@ class _InventoryCustomerSelectPageState
                 color: AppTokens.brandMid, size: 16),
             const SizedBox(width: 6),
             Text("${_filtered.length} customers",
-                style: GoogleFonts.lato(
-                    fontSize: 13,
-                    color: Colors.grey[500],
-                    fontWeight: FontWeight.w600)),
+                style: AppTypography.bodyLarge(color: Colors.grey[500], fontWeight: FontWeight.w600)),
           ]),
         ),
         Expanded(
@@ -1132,9 +1064,7 @@ class _InventoryCustomerSelectPageState
                         size: 56),
                     const SizedBox(height: 10),
                     Text("No customers found",
-                        style: GoogleFonts.lato(
-                            fontSize: 16,
-                            color: Colors.grey)),
+                        style: AppTypography.heading1(color: Colors.grey)),
                   ]))
               : ListView.builder(
             padding: const EdgeInsets.symmetric(
@@ -1182,11 +1112,7 @@ class _InventoryCustomerSelectPageState
                     const SizedBox(width: 12),
                     Expanded(
                       child: Text(c.AccountName ?? '',
-                          style: GoogleFonts.lato(
-                              fontSize: 14,
-                              fontWeight: FontWeight.w600,
-                              color:
-                              AppTokens.brandDark)),
+                          style: AppTypography.bodyLarge(color: AppTokens.brandDark, fontWeight: FontWeight.w600)),
                     ),
                     const Icon(
                         Icons.chevron_right_rounded,
@@ -1242,15 +1168,9 @@ class _DateCell extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(label,
-                style: GoogleFonts.lato(
-                    fontSize: 10,
-                    color: Colors.grey[500],
-                    fontWeight: FontWeight.w600)),
+                style: AppTypography.badgeText(color: Colors.grey[500], fontWeight: FontWeight.w600)),
             Text(value,
-                style: GoogleFonts.lato(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 13,
-                    color: AppTokens.brandDark)),
+                style: AppTypography.heading3(color: AppTokens.brandDark, fontWeight: FontWeight.bold)),
           ]),
     );
   }

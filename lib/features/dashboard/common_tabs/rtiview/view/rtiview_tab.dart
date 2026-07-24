@@ -1,3 +1,4 @@
+import 'package:maleva/core/theme/app_typography.dart';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -106,10 +107,7 @@ class _RTIDetailsBody extends StatelessWidget {
                         size: 13, color: AppTokens.brandGradientStart),
                     const SizedBox(width: 4),
                     Text("${s!.masters.length} records",
-                        style: GoogleFonts.lato(
-                            color: AppTokens.brandGradientStart,
-                            fontWeight: FontWeight.bold,
-                            fontSize: 12)),
+                        style: AppTypography.bodyMedium(color: AppTokens.brandGradientStart, fontWeight: FontWeight.bold)),
                   ]),
                 ),
               ]),
@@ -199,8 +197,7 @@ class _RTIDetailsBody extends StatelessWidget {
             const CircularProgressIndicator(color: AppTokens.brandGradientStart),
             const SizedBox(height: 16),
             Text("Loading PDF…",
-                style: GoogleFonts.lato(
-                    fontSize: 14, color: AppTokens.brandDark)),
+                style: AppTypography.bodyLarge(color: AppTokens.brandDark)),
           ]),
         ),
       ),
@@ -312,13 +309,9 @@ class _PageHeader extends StatelessWidget {
           const SizedBox(width: 10),
           Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
             Text("RTI Details",
-                style: GoogleFonts.lato(
-                    fontSize: 17,
-                    fontWeight: FontWeight.bold,
-                    color: AppTokens.brandGradientStartDark)),
+                style: AppTypography.heading1(color: AppTokens.brandGradientStartDark, fontWeight: FontWeight.bold)),
             Text("Return to Inventory",
-                style: GoogleFonts.lato(
-                    fontSize: 11, color: Colors.grey.shade500)),
+                style: AppTypography.bodySmall(color: Colors.grey.shade500)),
           ]),
         ]),
 
@@ -385,10 +378,7 @@ class _PageHeader extends StatelessWidget {
                     color: colour.kWhite, size: 16),
                 const SizedBox(width: 5),
                 Text("Search",
-                    style: GoogleFonts.lato(
-                        color: colour.kWhite,
-                        fontWeight: FontWeight.bold,
-                        fontSize: 13)),
+                    style: AppTypography.heading3(color: colour.kWhite, fontWeight: FontWeight.bold)),
               ]),
             ),
           ),
@@ -428,17 +418,11 @@ class _DatePickerCard extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(label,
-                    style: GoogleFonts.lato(
-                        fontSize: 10,
-                        color: Colors.grey.shade500,
-                        fontWeight: FontWeight.w600)),
+                    style: AppTypography.badgeText(color: Colors.grey.shade500, fontWeight: FontWeight.w600)),
                 const SizedBox(height: 1),
                 Text(value,
                     overflow: TextOverflow.ellipsis,
-                    style: GoogleFonts.lato(
-                        fontSize: 13,
-                        fontWeight: FontWeight.bold,
-                        color: AppTokens.brandDark)),
+                    style: AppTypography.heading3(color: AppTokens.brandDark, fontWeight: FontWeight.bold)),
               ]),
         ),
       ]),
@@ -460,8 +444,7 @@ class _LoadingView extends StatelessWidget {
         ),
         const SizedBox(height: 16),
         Text("Fetching RTI records…",
-            style: GoogleFonts.lato(
-                color: Colors.grey.shade500, fontSize: 13)),
+            style: AppTypography.bodyLarge(color: Colors.grey.shade500)),
       ]),
     );
   }
@@ -488,14 +471,11 @@ class _ErrorView extends StatelessWidget {
           ),
           const SizedBox(height: 16),
           Text("Something went wrong",
-              style: GoogleFonts.lato(
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
-                  color: AppTokens.brandDark)),
+              style: AppTypography.heading1(color: AppTokens.brandDark, fontWeight: FontWeight.bold)),
           const SizedBox(height: 6),
           Text(message,
               textAlign: TextAlign.center,
-              style: GoogleFonts.lato(color: Colors.grey, fontSize: 13)),
+              style: AppTypography.bodyLarge(color: Colors.grey)),
           const SizedBox(height: 20),
           ElevatedButton.icon(
             onPressed: onRetry,
@@ -534,14 +514,10 @@ class _EmptyState extends StatelessWidget {
         ),
         const SizedBox(height: 16),
         Text("No Records Found",
-            style: GoogleFonts.lato(
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
-                color: AppTokens.brandDark)),
+            style: AppTypography.heading1(color: AppTokens.brandDark, fontWeight: FontWeight.bold)),
         const SizedBox(height: 4),
         Text("Try changing the date range and search again",
-            style: GoogleFonts.lato(
-                fontSize: 13, color: Colors.grey.shade400)),
+            style: AppTypography.bodyLarge(color: Colors.grey.shade400)),
       ]),
     );
   }
@@ -634,10 +610,7 @@ class _RTIDetailsCardState extends State<_RTIDetailsCard> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(widget.master.DriverName ?? '-',
-                                  style: GoogleFonts.lato(
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 14,
-                                      color: colour.kWhite),
+                                  style: AppTypography.heading3(color: colour.kWhite, fontWeight: FontWeight.bold),
                                   maxLines: 1,
                                   overflow: TextOverflow.ellipsis),
                               const SizedBox(height: 3),
@@ -651,10 +624,7 @@ class _RTIDetailsCardState extends State<_RTIDetailsCard> {
                                     widget.master.RTINoDisplay,
                                     overflow: TextOverflow.ellipsis,
                                     maxLines: 1,
-                                    style: GoogleFonts.lato(
-                                        fontSize: 12,
-                                        color:
-                                        colour.kWhite.withValues(alpha: 0.85)),
+                                    style: AppTypography.bodyMedium(color: colour.kWhite.withValues(alpha: 0.85)),
                                   ),
                                 ),
                               ]),
@@ -693,10 +663,7 @@ class _RTIDetailsCardState extends State<_RTIDetailsCard> {
                             color: Colors.red.shade300, size: 16),
                         const SizedBox(width: 4),
                         Text("PDF",
-                            style: GoogleFonts.lato(
-                                color: colour.kWhite,
-                                fontSize: 11,
-                                fontWeight: FontWeight.bold)),
+                            style: AppTypography.bodySmall(color: colour.kWhite, fontWeight: FontWeight.bold)),
                       ]),
                     ),
                   ),
@@ -718,10 +685,7 @@ class _RTIDetailsCardState extends State<_RTIDetailsCard> {
                           size: 10, color: colour.kWhite.withValues(alpha: 0.75)),
                       const SizedBox(width: 4),
                       Text(widget.master.RTIDate.toString(),
-                          style: GoogleFonts.lato(
-                              color: colour.kWhite,
-                              fontSize: 11,
-                              fontWeight: FontWeight.w600)),
+                          style: AppTypography.bodySmall(color: colour.kWhite, fontWeight: FontWeight.w600)),
                     ]),
                   ),
 
@@ -780,11 +744,7 @@ class _RTIDetailsCardState extends State<_RTIDetailsCard> {
                   ),
                   const SizedBox(width: 7),
                   Text("Job Details",
-                      style: GoogleFonts.lato(
-                          fontSize: 12,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.grey.shade500,
-                          letterSpacing: 0.5)),
+                      style: AppTypography.bodyMedium(color: Colors.grey.shade500, fontWeight: FontWeight.bold)),
                 ]),
               ),
 
@@ -835,12 +795,8 @@ class _DetailsTable extends StatelessWidget {
             dataRowMaxHeight: 48,
             horizontalMargin: 12,
             columnSpacing: 16,
-            headingTextStyle: GoogleFonts.lato(
-                fontWeight: FontWeight.bold,
-                color: AppTokens.brandGradientStartDark,
-                fontSize: 12),
-            dataTextStyle: GoogleFonts.lato(
-                fontSize: 13, color: AppTokens.brandDark),
+            headingTextStyle: AppTypography.bodyMedium(color: AppTokens.brandGradientStartDark, fontWeight: FontWeight.bold),
+            dataTextStyle: AppTypography.bodyLarge(color: AppTokens.brandDark),
             border: const TableBorder(
               horizontalInside: BorderSide(
                   color: AppTokens.brandLight, width: 1),
