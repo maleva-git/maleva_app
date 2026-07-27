@@ -110,6 +110,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:maleva/core/utils/local_storage_service.dart';
 import 'package:maleva/core/utils/session_manager.dart';
 import 'package:maleva/core/network/dio_client.dart';
+import 'package:maleva/core/network/legacy_api_repository.dart';
 import 'package:maleva/features/dashboard/common_tabs/driverleave/data/leave_repository.dart';
 import 'package:maleva/features/dashboard/common_tabs/driverleave/bloc/leave_bloc.dart';
 import 'package:maleva/features/transaction/enquirytrmaster/data/enquiry_repository.dart';
@@ -138,6 +139,7 @@ Future<void> setupDependencies() async {
   sl.registerLazySingleton<SessionManager>(() => SessionManager(sl<LocalStorageService>()));
   
   sl.registerLazySingleton<DioClient>(() => DioClient(sl<SessionManager>()));
+  sl.registerLazySingleton<LegacyApiRepository>(() => LegacyApiRepository(sl<DioClient>()));
 
   // Repositories
   sl.registerLazySingleton<LeaveRepository>(

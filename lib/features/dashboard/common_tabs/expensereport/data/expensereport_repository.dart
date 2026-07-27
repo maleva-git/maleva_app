@@ -1,6 +1,7 @@
-import 'package:maleva/core/network/api_legacy_helper.dart';
 import 'package:maleva/core/network/api_constants.dart';
 import 'package:maleva/core/utils/app_preferences.dart';
+import 'package:maleva/core/network/legacy_api_repository.dart';
+import 'package:maleva/core/di/injection.dart';
 
 class ExpenseReportResult {
   final List<Map<String, dynamic>> data1;
@@ -22,7 +23,7 @@ class ExpenseReportRepository {
       };
 
       // Ensure your apiAllinoneSelectArray is updated to handle context optionally
-      final resultData = await ApiLegacyHelper.apiAllinoneSelectArray(
+      final resultData = await sl<LegacyApiRepository>().apiAllinoneSelectArray(
         "${ApiConstants.apiGetExpData}$comId&startDate=$fromDate&endDate=$toDate",
         null,
         header,

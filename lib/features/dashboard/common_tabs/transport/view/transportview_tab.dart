@@ -1,3 +1,5 @@
+import 'package:maleva/core/network/legacy_api_repository.dart';
+import 'package:maleva/core/di/injection.dart';
 import 'package:maleva/core/theme/app_typography.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -5,7 +7,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:maleva/core/utils/app_globals.dart';
 import 'package:maleva/core/colors/colors.dart' as colour;
 import '../../../../../core/di/injection.dart';
-import '../../../../../core/network/OnlineApi.dart' as OnlineApi;
+
 import '../../../../../core/theme/tokens.dart';
 import '../../saleorderadd/view/saleorderadd_tab.dart';
 import '../bloc/transport_bloc.dart';
@@ -31,14 +33,14 @@ class TransportReportPage extends StatelessWidget {
             // ✅ Handle Errors
             if (state is TransportErrorState) {
               ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text(state.errorMessage), backgroundColor: Colors.red),
+                SnackBar(content: Text(state.errorMessage), backgroundColor: colour.commonColorred),
               );
             }
 
             // ✅ Handle Navigation / Edit (Using the UI's context!)
             if (state is TransportNavigateToEditState) {
               // We moved this out of the BLoC so it can safely use the UI context
-              OnlineApi.EditSalesOrder(state.id, 0);
+              sl<LegacyApiRepository>().EditSalesOrder(state.id, 0);
             }
 
           },
@@ -159,7 +161,7 @@ class _TransportReportView extends StatelessWidget {
                 const SizedBox(height: 10),
                 Expanded(
                   child: isLoading
-                      ? const Center(
+                      ? Center(
                       child: CircularProgressIndicator(
                           color: colour.kBlue))
                       : transportList.isEmpty
@@ -226,7 +228,7 @@ class _TransportReportView extends StatelessWidget {
         const SizedBox(height: 8),
 
         if (isLoading)
-          const Padding(
+          Padding(
             padding: EdgeInsets.only(top: 40),
             child: Center(
                 child: CircularProgressIndicator(color: colour.kBlue)),

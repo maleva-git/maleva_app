@@ -11,7 +11,6 @@ import 'package:maleva/features/dashboard/common_tabs/driverleave/data/leave_req
 import 'package:maleva/core/colors/colors.dart' as colour;
 import 'package:intl/intl.dart';
 import 'package:maleva/core/utils/app_globals.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:maleva/core/theme/tokens.dart';
 
 class AdminLeaveApprovalTab extends StatefulWidget {
@@ -48,7 +47,7 @@ class _AdminLeaveApprovalTabState extends State<AdminLeaveApprovalTab> {
           builder: (context, setDialogState) {
             return AlertDialog(
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-              title: Text('Review Leave Request', style: GoogleFonts.lato(fontWeight: FontWeight.bold)),
+              title: Text('Review Leave Request', style: AppTypography.heading2()),
               content: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
@@ -57,11 +56,11 @@ class _AdminLeaveApprovalTabState extends State<AdminLeaveApprovalTab> {
                       border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
                       contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                     ),
-                    hint: const Text('Select Status'),
+                    hint: Text('Select Status'),
                     initialValue: selectedStatusId,
-                    items: const [
-                      DropdownMenuItem(value: 2, child: Text('Approve', style: TextStyle(color: Colors.green, fontWeight: FontWeight.bold))),
-                      DropdownMenuItem(value: 3, child: Text('Reject', style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold))),
+                    items: [
+                      DropdownMenuItem(value: 2, child: Text('Approve', style: AppTypography.heading2())),
+                      DropdownMenuItem(value: 3, child: Text('Reject', style: AppTypography.heading2())),
                     ],
                     onChanged: (val) => setDialogState(() => selectedStatusId = val),
                   ),
@@ -79,14 +78,14 @@ class _AdminLeaveApprovalTabState extends State<AdminLeaveApprovalTab> {
               actions: [
                 TextButton(
                   onPressed: () => Navigator.pop(ctx, false),
-                  child: const Text('Cancel'),
+                  child: Text('Cancel'),
                 ),
                 ElevatedButton(
                   onPressed: selectedStatusId == null ? null : () => Navigator.pop(ctx, true),
                   style: ElevatedButton.styleFrom(
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                   ),
-                  child: const Text('Submit'),
+                  child: Text('Submit'),
                 ),
               ],
             );
@@ -141,7 +140,7 @@ class _AdminLeaveApprovalTabState extends State<AdminLeaveApprovalTab> {
           color: Colors.white,
           child: Row(
             children: [
-              const Expanded(child: Text('Driver Leave Requests', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16))),
+              Expanded(child: Text('Driver Leave Requests', style: AppTypography.heading2())),
               IconButton(icon: const Icon(Icons.refresh, color: colour.brand), onPressed: _fetchRequests),
             ],
           ),
@@ -149,7 +148,7 @@ class _AdminLeaveApprovalTabState extends State<AdminLeaveApprovalTab> {
         const Divider(height: 1, thickness: 1),
         Expanded(
           child: isLoading && requests.isEmpty
-              ? const Center(child: CircularProgressIndicator())
+              ? Center(child: CircularProgressIndicator())
               : ListView.builder(
                   itemCount: requests.length,
                   itemBuilder: (context, index) {
@@ -221,12 +220,12 @@ class _AdminLeaveApprovalTabState extends State<AdminLeaveApprovalTab> {
                                 Container(
                                   padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                                   decoration: BoxDecoration(
-                                    color: Colors.blue.shade50,
+                                    color: colour.commonColorhighlight.withValues(alpha: 0.1),
                                     borderRadius: BorderRadius.circular(8),
                                   ),
                                   child: Text(
                                     '${req.totalDays} Days',
-                                    style: AppTypography.bodyMedium(color: Colors.blue.shade700, fontWeight: FontWeight.bold),
+                                    style: AppTypography.bodyMedium(color: colour.commonColorhighlight, fontWeight: FontWeight.bold),
                                   ),
                                 ),
                               ],
@@ -253,12 +252,12 @@ class _AdminLeaveApprovalTabState extends State<AdminLeaveApprovalTab> {
                                 padding: const EdgeInsets.only(top: 8),
                                 child: Row(
                                   children: [
-                                    const Icon(Icons.info_outline_rounded, size: 14, color: Colors.redAccent),
+                                    Icon(Icons.info_outline_rounded, size: 14, color: colour.commonColorred),
                                     const SizedBox(width: 4),
                                     Expanded(
                                       child: Text(
                                         'Remark: ${req.reviewRemark}',
-                                        style: AppTypography.bodyMedium(color: Colors.redAccent, fontWeight: FontWeight.w500),
+                                        style: AppTypography.bodyMedium(color: colour.commonColorred, fontWeight: FontWeight.w500),
                                       ),
                                     ),
                                   ],
@@ -269,11 +268,11 @@ class _AdminLeaveApprovalTabState extends State<AdminLeaveApprovalTab> {
                                 padding: const EdgeInsets.only(top: 12),
                                 child: Row(
                                   children: [
-                                    const Icon(Icons.verified_user_rounded, size: 14, color: Colors.blueGrey),
+                                    Icon(Icons.verified_user_rounded, size: 14, color: Colors.grey),
                                     const SizedBox(width: 4),
                                     Text(
                                       'Reviewed By: ${req.reviewedByName}',
-                                      style: AppTypography.bodyMedium(color: Colors.blueGrey, fontWeight: FontWeight.w600),
+                                      style: AppTypography.bodyMedium(color: Colors.grey, fontWeight: FontWeight.w600),
                                     ),
                                   ],
                                 ),
@@ -285,14 +284,14 @@ class _AdminLeaveApprovalTabState extends State<AdminLeaveApprovalTab> {
                                   alignment: Alignment.centerRight,
                                   child: ElevatedButton.icon(
                                     style: ElevatedButton.styleFrom(
-                                      backgroundColor: colour.brand,
+                                      backgroundColor: AppTokens.appBarBg,
                                       elevation: 0,
                                       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
                                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                                     ),
                                     icon: const Icon(Icons.rate_review_rounded, color: Colors.white, size: 16),
                                     onPressed: () => _showApprovalDialog(req),
-                                    label: Text('Review', style: GoogleFonts.lato(color: Colors.white, fontWeight: FontWeight.w700)),
+                                    label: Text('Review', style: AppTypography.heading2(color: Colors.white)),
                                   ),
                                 ),
                               ),

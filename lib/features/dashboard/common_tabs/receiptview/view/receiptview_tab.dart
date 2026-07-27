@@ -1,3 +1,4 @@
+import 'package:maleva/core/theme/app_typography.dart';
 // lib/features/dashboard/common_tabs/receiptview/view/receiptview_tab.dart
 //
 // ── Changes from original ──────────────────────────────────────────────────────
@@ -13,11 +14,29 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:maleva/core/colors/colors.dart';
+import 'package:maleva/core/colors/colors.dart' as colour;
 import 'package:maleva/core/di/injection.dart';
 import 'package:maleva/core/theme/tokens.dart';
 import '../bloc/receiptview_bloc.dart';
 import '../bloc/receiptview_event.dart';
 import '../bloc/receiptview_state.dart';
+
+
+String _fmtAmount(double v) {
+  final s = v.toStringAsFixed(2);
+  final parts = s.split('.');
+  final whole = parts[0];
+  final dec = parts.length > 1 ? '.' + parts[1] : '';
+  if (whole.length <= 3) return s;
+  final last3 = whole.substring(whole.length - 3);
+  final rest = whole.substring(0, whole.length - 3);
+  final buf = StringBuffer();
+  for (int i = 0; i < rest.length; i++) {
+    if (i > 0 && (rest.length - i) % 2 == 0) buf.write(',');
+    buf.write(rest[i]);
+  }
+  return '${buf.toString()},$last3$dec';
+}
 
 class ReceiptTab extends StatelessWidget {
   const ReceiptTab({super.key});
@@ -62,7 +81,7 @@ class ReceiptPage extends StatelessWidget {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text(state.errorMessage!),
-              backgroundColor: Colors.red,
+              backgroundColor: colour.commonColorred,
             ),
           );
         }
@@ -104,7 +123,7 @@ class ReceiptPage extends StatelessWidget {
               const SizedBox(height: 12),
               Expanded(
                 child: state.isLoading
-                    ? const Center(
+                    ? Center(
                   child: CircularProgressIndicator(
                     color: AppTokens.brandGradientStart,
                   ),
@@ -142,7 +161,7 @@ class ReceiptPage extends StatelessWidget {
       _SummaryCard(state: state, isTablet: false),
       Expanded(
         child: state.isLoading
-            ? const Center(
+            ? Center(
           child: CircularProgressIndicator(
             color: AppTokens.brandGradientStart,
           ),
@@ -289,11 +308,7 @@ class _DateButton extends StatelessWidget {
           Flexible(
             child: Text(
               label,
-              style: GoogleFonts.poppins(
-                fontSize: isTablet ? 12 : 11,
-                fontWeight: FontWeight.w600,
-                color: AppTokens.brandDark,
-              ),
+              style: AppTypography.bodySmall(color: AppTokens.brandDark),
               overflow: TextOverflow.ellipsis,
             ),
           ),
@@ -336,28 +351,36 @@ class _SummaryCard extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          _SummaryTile(
-            label: 'Total Amount',
-            value: 'RM ${state.totalAmount.toStringAsFixed(2)}',
-            icon: Icons.account_balance_wallet_rounded,
-            iconBg: kWhite.withValues(alpha: 0.2),
-            isTablet: isTablet,
+          Expanded(
+            child: _SummaryTile(
+              label: 'Total Amount',
+              value: 'RM ${_fmtAmount(state.totalAmount)}',
+              icon: Icons.account_balance_wallet_rounded,
+              iconBg: kWhite.withValues(alpha: 0.2),
+              isTablet: isTablet,
+            ),
           ),
-          Container(width: 1, height: isTablet ? 60 : 50,
-              color: kWhite.withValues(alpha: 0.2)),
-          _SummaryTile(
-            label: 'Outstanding',
-            value: 'RM ${state.totalBalance.toStringAsFixed(2)}',
-            icon: Icons.warning_amber_rounded,
-            iconBg: Colors.red.withValues(alpha: 0.25),
-            alignEnd: true,
-            isTablet: isTablet,
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 8.0),
+            child: Container(width: 1, height: isTablet ? 60 : 50,
+                color: kWhite.withValues(alpha: 0.2)),
+          ),
+          Expanded(
+            child: _SummaryTile(
+              label: 'Outstanding',
+              value: 'RM ${_fmtAmount(state.totalBalance)}',
+              icon: Icons.warning_amber_rounded,
+              iconBg: colour.commonColorred.withValues(alpha: 0.25),
+              alignEnd: true,
+              isTablet: isTablet,
+            ),
           ),
         ],
       ),
     );
   }
 }
+
 
 class _SummaryTile extends StatelessWidget {
   final String label;
@@ -382,7 +405,9 @@ class _SummaryTile extends StatelessWidget {
       crossAxisAlignment:
       alignEnd ? CrossAxisAlignment.end : CrossAxisAlignment.start,
       children: [
-        Row(children: [
+        Row(
+          mainAxisAlignment: alignEnd ? MainAxisAlignment.end : MainAxisAlignment.start,
+          children: [
           if (!alignEnd) ...[
             Container(
               padding: EdgeInsets.all(isTablet ? 8 : 6),
@@ -392,11 +417,11 @@ class _SummaryTile extends StatelessWidget {
             ),
             const SizedBox(width: 8),
           ],
-          Text(label,
-              style: GoogleFonts.poppins(
-                  color: kWhite.withValues(alpha: 0.7),
-                  fontSize: isTablet ? 12 : 11,
-                  fontWeight: FontWeight.w500)),
+          Flexible(
+            child: Text(label,
+                style: AppTypography.bodySmall(color: kWhite.withValues(alpha: 0.7)),
+                overflow: TextOverflow.ellipsis),
+          ),
           if (alignEnd) ...[
             const SizedBox(width: 8),
             Container(
@@ -408,11 +433,12 @@ class _SummaryTile extends StatelessWidget {
           ],
         ]),
         const SizedBox(height: 4),
-        Text(value,
-            style: GoogleFonts.poppins(
-                color: kWhite,
-                fontSize: isTablet ? 18 : 15,
-                fontWeight: FontWeight.bold)),
+        FittedBox(
+          fit: BoxFit.scaleDown,
+          alignment: alignEnd ? Alignment.centerRight : Alignment.centerLeft,
+          child: Text(value,
+              style: AppTypography.heading1(color: kWhite)),
+        ),
       ],
     );
   }
@@ -463,10 +489,7 @@ class _StatsPanel extends StatelessWidget {
             ),
             const SizedBox(width: 8),
             Text('Summary',
-                style: GoogleFonts.poppins(
-                    fontSize: 15,
-                    fontWeight: FontWeight.w700,
-                    color: AppTokens.brandDark)),
+                style: AppTypography.heading2(color: AppTokens.brandDark)),
           ]),
           const SizedBox(height: 16),
           _statRow('Total Bills',    '${state.receiptMaster.length}',
@@ -480,23 +503,18 @@ class _StatsPanel extends StatelessWidget {
           const SizedBox(height: 16),
           const Divider(color: kAccent, height: 1),
           const SizedBox(height: 16),
-          _amountRow('Collected',  'RM ${collected.toStringAsFixed(2)}',
+          _amountRow('Collected',  'RM ${_fmtAmount(collected)}',
               const Color(0xFF059669)),
           const SizedBox(height: 10),
-          _amountRow('Outstanding','RM ${balance.toStringAsFixed(2)}',
+          _amountRow('Outstanding','RM ${_fmtAmount(balance)}',
               const Color(0xFFEA580C)),
           const SizedBox(height: 16),
           // Progress bar
           Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
             Text('Collection Progress',
-                style: GoogleFonts.poppins(
-                    fontSize: 11,
-                    color: AppTokens.brandDark.withValues(alpha: 0.6))),
+                style: AppTypography.bodySmall(color: AppTokens.brandDark.withValues(alpha: 0.6))),
             Text('${(percent * 100).toStringAsFixed(1)}%',
-                style: GoogleFonts.poppins(
-                    fontSize: 11,
-                    color: AppTokens.brandGradientStart,
-                    fontWeight: FontWeight.w700)),
+                style: AppTypography.bodySmall(color: AppTokens.brandGradientStart)),
           ]),
           const SizedBox(height: 8),
           ClipRRect(
@@ -529,14 +547,10 @@ class _StatsPanel extends StatelessWidget {
           ),
           const SizedBox(width: 10),
           Text(label,
-              style: GoogleFonts.poppins(
-                  fontSize: 13,
-                  color: AppTokens.brandDark,
-                  fontWeight: FontWeight.w500)),
+              style: AppTypography.bodyLarge(color: AppTokens.brandDark)),
         ]),
         Text(value,
-            style: GoogleFonts.poppins(
-                fontSize: 14, color: color, fontWeight: FontWeight.w700)),
+            style: AppTypography.heading2(color: color)),
       ],
     );
   }
@@ -546,13 +560,9 @@ class _StatsPanel extends StatelessWidget {
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         Text(label,
-            style: GoogleFonts.poppins(
-                fontSize: 12,
-                color: AppTokens.brandDark.withValues(alpha: 0.6),
-                fontWeight: FontWeight.w500)),
+            style: AppTypography.bodySmall(color: AppTokens.brandDark.withValues(alpha: 0.6))),
         Text(value,
-            style: GoogleFonts.poppins(
-                fontSize: 13, color: color, fontWeight: FontWeight.w700)),
+            style: AppTypography.bodyLarge(color: color)),
       ],
     );
   }
@@ -576,7 +586,7 @@ class _ReceiptList extends StatelessWidget {
             Icon(Icons.receipt_long_outlined, size: 48, color: Colors.grey.shade400),
             const SizedBox(height: 12),
             Text('No receipts found',
-                style: GoogleFonts.poppins(color: Colors.grey)),
+                style: AppTypography.bodyLarge()),
           ],
         ),
       );
@@ -602,11 +612,7 @@ class _ReceiptList extends StatelessWidget {
               const SizedBox(width: 8),
               Text(
                 'Receipts (${state.receiptMaster.length})',
-                style: GoogleFonts.poppins(
-                  fontSize: isTablet ? 16 : 15,
-                  fontWeight: FontWeight.w700,
-                  color: AppTokens.brandDark,
-                ),
+                style: AppTypography.heading2(color: AppTokens.brandDark),
               ),
             ]),
           );
@@ -663,18 +669,11 @@ class _ReceiptCard extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(data['CustomerName'] ?? '',
-                          style: GoogleFonts.poppins(
-                            fontSize: isTablet ? 15 : 14,
-                            fontWeight: FontWeight.w700,
-                            color: AppTokens.brandDark,
-                          ),
+                          style: AppTypography.heading2(color: AppTokens.brandDark),
                           overflow: TextOverflow.ellipsis),
                       const SizedBox(height: 3),
                       Text('${data['BillNo']} • ${data['BillDate']}',
-                          style: GoogleFonts.poppins(
-                            fontSize: isTablet ? 12 : 11,
-                            color: AppTokens.brandMid.withValues(alpha: 0.7),
-                          )),
+                          style: AppTypography.bodySmall(color: AppTokens.brandMid.withValues(alpha: 0.7))),
                     ],
                   ),
                 ),
@@ -694,13 +693,9 @@ class _ReceiptCard extends StatelessWidget {
                   ),
                   child: Text(
                     isPaid ? '✓ Paid' : 'Pending',
-                    style: GoogleFonts.poppins(
-                      fontSize: isTablet ? 12 : 11,
-                      fontWeight: FontWeight.w700,
-                      color: isPaid
+                    style: AppTypography.bodySmall(color: isPaid
                           ? const Color(0xFF0F766E)
-                          : AppTokens.brandGradientStart,
-                    ),
+                          : AppTokens.brandGradientStart),
                   ),
                 ),
               ],
@@ -715,7 +710,7 @@ class _ReceiptCard extends StatelessWidget {
               Expanded(
                 child: _AmountChip(
                   label: 'Total',
-                  amount: 'RM ${billAmount.toStringAsFixed(2)}',
+                  amount: 'RM ${_fmtAmount(billAmount)}',
                   color: AppTokens.brandGradientStart,
                   isTablet: isTablet,
                 ),
@@ -724,7 +719,7 @@ class _ReceiptCard extends StatelessWidget {
               Expanded(
                 child: _AmountChip(
                   label: 'Collected',
-                  amount: 'RM ${collected.toStringAsFixed(2)}',
+                  amount: 'RM ${_fmtAmount(collected)}',
                   color: AppTokens.brandGradientStart,
                   isTablet: isTablet,
                 ),
@@ -733,7 +728,7 @@ class _ReceiptCard extends StatelessWidget {
               Expanded(
                 child: _AmountChip(
                   label: 'Balance',
-                  amount: 'RM ${balance.toStringAsFixed(2)}',
+                  amount: 'RM ${_fmtAmount(balance)}',
                   color: balance > 0
                       ? const Color(0xFF740000)
                       : AppTokens.brandGradientStart,
@@ -781,20 +776,14 @@ class _AmountChip extends StatelessWidget {
           Text(label,
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
-              style: GoogleFonts.poppins(
-                fontSize: isTablet ? 11 : 10,
-                color: color.withValues(alpha: 0.7),
-                fontWeight: FontWeight.w500,
-              )),
+              style: AppTypography.bodySmall(color: color.withValues(alpha: 0.7))),
           const SizedBox(height: 3),
-          Text(amount,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              style: GoogleFonts.poppins(
-                fontSize: isTablet ? 13 : 12,
-                color: color,
-                fontWeight: FontWeight.w700,
-              )),
+          FittedBox(
+            fit: BoxFit.scaleDown,
+            alignment: Alignment.center,
+            child: Text(amount,
+                style: AppTypography.bodySmall(color: color)),
+          ),
         ],
       ),
     );

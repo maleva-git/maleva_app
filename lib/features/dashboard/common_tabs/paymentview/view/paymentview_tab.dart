@@ -261,7 +261,7 @@ class _PaymentPendingBody extends StatelessWidget {
               // ════════════════════════════════════
               Expanded(
                 child: isLoading
-                    ? const Center(
+                    ? Center(
                     child: CircularProgressIndicator(
                         color: AppTokens.brandGradientStart))
                     : state is PaymentPendingError
@@ -415,18 +415,18 @@ class _PaymentPendingBody extends StatelessWidget {
     return Center(
       child: Column(mainAxisSize: MainAxisSize.min, children: [
         const Icon(Icons.error_outline,
-            color: Colors.red, size: 48),
+            color: colour.commonColorred, size: 48),
         const SizedBox(height: 12),
         Text(msg,
             textAlign: TextAlign.center,
-            style: GoogleFonts.lato(color: Colors.red)),
+            style: AppTypography.bodyLarge()),
         const SizedBox(height: 16),
         ElevatedButton.icon(
           onPressed: () => context
               .read<PaymentPendingBloc>()
               .add(const LoadPaymentPendingEvent()),
-          icon: const Icon(Icons.refresh),
-          label: const Text("Retry"),
+          icon: Icon(Icons.refresh),
+          label: Text("Retry"),
           style: ElevatedButton.styleFrom(
               backgroundColor: AppTokens.brandGradientStart),
         ),
@@ -573,7 +573,7 @@ class _PaymentGridCard extends StatelessWidget {
           const SizedBox(width: 4),
           Expanded(
             child: Text(text,
-                style: AppTypography.bodySmall(color: Colors.black54),
+                style: AppTypography.bodySmall(color: colour.commonColor),
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis),
           ),
@@ -713,8 +713,7 @@ class _PaymentDetailPanel extends StatelessWidget {
             child: related.isEmpty
                 ? Center(
                 child: Text("No detail records",
-                    style: GoogleFonts.lato(
-                        color: Colors.grey)))
+                    style: AppTypography.bodyLarge()))
                 : ListView.builder(
               padding: const EdgeInsets.symmetric(
                   horizontal: 14, vertical: 4),
@@ -916,8 +915,7 @@ class _DetailSheet extends StatelessWidget {
               child: related.isEmpty
                   ? Center(
                   child: Text("No detail records",
-                      style: GoogleFonts.lato(
-                          color: Colors.grey)))
+                      style: AppTypography.bodyLarge()))
                   : ListView.builder(
                 controller: controller,
                 padding: const EdgeInsets.symmetric(

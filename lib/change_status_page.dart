@@ -1,8 +1,11 @@
-import 'package:maleva/core/network/api_legacy_helper.dart';
+import 'package:maleva/core/theme/app_typography.dart';
+import 'package:maleva/core/colors/colors.dart' as colour;
 import 'package:maleva/core/network/api_constants.dart';
 import 'package:flutter/material.dart';
 import 'package:maleva/core/utils/app_globals.dart';
 import 'core/models/model.dart';
+import 'package:maleva/core/network/legacy_api_repository.dart';
+import 'package:maleva/core/di/injection.dart';
 
 class ChangeStatusPage extends StatefulWidget {
   final int masterId;
@@ -39,7 +42,7 @@ class ChangeStatusPageState extends State<ChangeStatusPage> {
     Map<String, String> header = {
       'Content-Type': 'application/json; charset=UTF-8',
     };
-    await ApiLegacyHelper.apiAllinoneSelectArray(
+    await sl<LegacyApiRepository>().apiAllinoneSelectArray(
       "${ApiConstants.apiGetpettycash}${AppGlobals.Comid}""",
       null,
       header,
@@ -67,7 +70,7 @@ class ChangeStatusPageState extends State<ChangeStatusPage> {
         error.toString(),
         stackTrace.toString(),
         Colors.white,
-        Colors.red,
+        colour.commonColorred,
         null,
         18.00 - AppGlobals.reducesize,
         AppGlobals.tll,
@@ -88,15 +91,12 @@ class ChangeStatusPageState extends State<ChangeStatusPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Change Status'),
+        title: Text('Change Status'),
       ),
       body: Center(
         child: Text(
           "Selected ID: ${widget.masterId}",
-          style: const TextStyle(
-            fontSize: 22,
-            fontWeight: FontWeight.bold,
-          ),
+          style: AppTypography.heading1(),
         ),
       ),
     );

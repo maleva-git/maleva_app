@@ -1,3 +1,4 @@
+import 'package:maleva/core/colors/colors.dart' as colour;
 import 'package:maleva/core/theme/app_typography.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -47,11 +48,7 @@ class _PettyCashBody extends StatelessWidget {
               // ── Title ──
               Text(
                 "Petty Cash",
-                style: GoogleFonts.lato(
-                  fontSize: AppGlobals.FontLarge,
-                  fontWeight: FontWeight.bold,
-                  color: AppTokens.brandDark,
-                ),
+                style: AppTypography.heading1(color: AppTokens.brandDark),
               ),
 
               SizedBox(height: isTablet ? 14 : 10),
@@ -123,7 +120,7 @@ class _PettyCashBody extends StatelessWidget {
         bool isTablet = false,
       }) {
     if (state is PettyCashLoading) {
-      return const Center(
+      return Center(
           child: CircularProgressIndicator(color: AppTokens.brandGradientStart));
     }
 
@@ -133,18 +130,18 @@ class _PettyCashBody extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             const Icon(Icons.error_outline,
-                color: Colors.red, size: 48),
+                color: colour.commonColorred, size: 48),
             const SizedBox(height: 12),
             Text(state.message,
                 textAlign: TextAlign.center,
-                style: AppTypography.bodyLarge(color: Colors.red)),
+                style: AppTypography.bodyLarge(color: colour.commonColorred)),
             const SizedBox(height: 16),
             ElevatedButton.icon(
               onPressed: () => context
                   .read<PettyCashBloc>()
                   .add(const LoadPettyCashEvent()),
-              icon: const Icon(Icons.refresh),
-              label: const Text("Retry"),
+              icon: Icon(Icons.refresh),
+              label: Text("Retry"),
               style: ElevatedButton.styleFrom(
                   backgroundColor: AppTokens.brandGradientStart),
             ),
@@ -271,10 +268,7 @@ class _DateFilterBar extends StatelessWidget {
                     style: AppTypography.bodySmall(color: Colors.grey[500], fontWeight: FontWeight.w600)),
                 Text(
                   DateFormat("dd-MM-yy").format(fromDate),
-                  style: GoogleFonts.lato(
-                      fontWeight: FontWeight.bold,
-                      fontSize: AppGlobals.FontLow,
-                      color: AppTokens.brandDark),
+                  style: AppTypography.bodySmall(color: AppTokens.brandDark),
                 ),
               ],
             ),
@@ -316,10 +310,7 @@ class _DateFilterBar extends StatelessWidget {
                     style: AppTypography.bodySmall(color: Colors.grey[500], fontWeight: FontWeight.w600)),
                 Text(
                   DateFormat("dd-MM-yy").format(toDate),
-                  style: GoogleFonts.lato(
-                      fontWeight: FontWeight.bold,
-                      fontSize: AppGlobals.FontLow,
-                      color: AppTokens.brandDark),
+                  style: AppTypography.bodySmall(color: AppTokens.brandDark),
                 ),
               ],
             ),
@@ -364,10 +355,7 @@ class _DateFilterBar extends StatelessWidget {
               elevation: 0,
             ),
             child: Text("View",
-                style: GoogleFonts.lato(
-                    color: kWhite,
-                    fontWeight: FontWeight.bold,
-                    fontSize: AppGlobals.FontLow)),
+                style: AppTypography.bodySmall(color: kWhite)),
           ),
         ],
       ),
@@ -638,21 +626,13 @@ class _PettyCashDetailPanel extends StatelessWidget {
                         children: [
                           Text(
                               "Item: ${d.items ?? '-'}",
-                              style: GoogleFonts.lato(
-                                  fontWeight:
-                                  FontWeight.w600,
-                                  color: AppTokens.brandDark)),
+                              style: AppTypography.bodyLarge(color: AppTokens.brandDark)),
                           Text(
                               "Notes: ${d.notes ?? '-'}",
-                              style: GoogleFonts.lato(
-                                  color:
-                                  Colors.grey[700])),
+                              style: AppTypography.bodyLarge()),
                           Text(
                               "Amount: RM ${d.amount ?? '-'}",
-                              style: GoogleFonts.lato(
-                                  fontWeight:
-                                  FontWeight.bold,
-                                  color: AppTokens.brandGradientStart)),
+                              style: AppTypography.heading2(color: AppTokens.brandGradientStart)),
                         ],
                       ),
                     )),
@@ -799,21 +779,14 @@ class _PettyCashDialog extends StatelessWidget {
                             children: [
                               Text(
                                   "Item: ${d.items ?? '-'}",
-                                  style: GoogleFonts.lato(
-                                      fontWeight:
-                                      FontWeight.w600,
-                                      color: AppTokens.brandDark)),
+                                  style: AppTypography.bodyLarge(color: AppTokens.brandDark)),
                               Text(
                                   "Notes: ${d.notes ?? '-'}",
-                                  style: GoogleFonts.lato(
-                                      color: Colors
+                                  style: AppTypography.bodyLarge(color: Colors
                                           .grey[700])),
                               Text(
                                   "Amount: RM ${d.amount ?? '-'}",
-                                  style: GoogleFonts.lato(
-                                      fontWeight:
-                                      FontWeight.bold,
-                                      color: AppTokens.brandGradientStart)),
+                                  style: AppTypography.heading2(color: AppTokens.brandGradientStart)),
                             ],
                           ),
                         )),

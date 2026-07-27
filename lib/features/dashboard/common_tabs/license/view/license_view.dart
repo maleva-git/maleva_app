@@ -1,3 +1,4 @@
+import 'package:maleva/core/colors/colors.dart' as colour;
 import 'package:maleva/core/theme/app_typography.dart';
 // license_view.dart
 
@@ -42,7 +43,7 @@ class LicenseView extends StatelessWidget {
         if (state is LicenseError) {
           msgshow(
             state.errorMessage, '',
-            Colors.white, Colors.red, null,
+            Colors.white, colour.commonColorred, null,
             18.00 - AppGlobals.reducesize,
             AppGlobals.tll, AppGlobals.tgc, context, 2,
           );
@@ -283,7 +284,7 @@ class _LicenseCard extends StatelessWidget {
     for (final fmt in formats) {
       try {
         return DateFormat('dd MMM yyyy').format(DateFormat(fmt).parse(s));
-      } catch (_) {}
+      } catch (e, stack) { debugPrint("Error caught globally: $e\n$stack"); }
     }
     return s;
   }

@@ -1,3 +1,4 @@
+import 'package:maleva/core/colors/colors.dart' as colour;
 import 'package:maleva/core/theme/app_typography.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -39,7 +40,7 @@ class _UnReleaseSMKView extends StatelessWidget {
                 backgroundColor: Palette.redError,
                 content: Text(
                   state.errorMessage,
-                  style: GoogleFonts.lato(color: Palette.white),
+                  style: AppTypography.bodyLarge(color: Palette.white),
                 ),
                 duration: const Duration(seconds: 3),
               ),
@@ -203,14 +204,7 @@ class _ColumnHeader extends StatelessWidget {
   Widget _hdr(String label, double size, TextAlign align) => Text(
     label,
     textAlign: align,
-    style: GoogleFonts.lato(
-      textStyle: TextStyle(
-        color: Palette.white,
-        fontWeight: FontWeight.bold,
-        fontSize: size,
-        letterSpacing: 0.4,
-      ),
-    ),
+    style: AppTypography.bodyLarge(color: Palette.white),
   );
 }
 
@@ -299,14 +293,7 @@ class _UnReleaseSMKCard extends StatelessWidget {
                         dayCount,
                         overflow: TextOverflow.ellipsis,
                         maxLines: 1,
-                        style: GoogleFonts.lato(
-                          textStyle: TextStyle(
-                            color: dayBadgeColor,
-                            fontWeight: FontWeight.bold,
-                            fontSize: fs - 0.5,
-                            letterSpacing: 0.2,
-                          ),
-                        ),
+                        style: AppTypography.bodyLarge(color: dayBadgeColor),
                       ),
                     ),
                   ),
@@ -340,14 +327,7 @@ class _UnReleaseSMKCard extends StatelessWidget {
         textAlign: align,
         overflow: TextOverflow.ellipsis,
         maxLines: 1,
-        style: GoogleFonts.lato(
-          textStyle: TextStyle(
-            color: color,
-            fontWeight: FontWeight.w600,
-            fontSize: size,
-            letterSpacing: 0.2,
-          ),
-        ),
+        style: AppTypography.bodyLarge(color: color),
       );
 }
 
@@ -443,7 +423,7 @@ class _ErrorWidget extends StatelessWidget {
               icon: const Icon(Icons.refresh_rounded, size: 18),
               label: Text(
                 'Retry',
-                style: GoogleFonts.lato(fontWeight: FontWeight.bold),
+                style: AppTypography.heading2(),
               ),
             ),
           ],

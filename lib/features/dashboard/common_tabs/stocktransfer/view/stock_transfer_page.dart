@@ -1,3 +1,4 @@
+import 'package:maleva/core/colors/colors.dart' as colour;
 import 'package:maleva/core/theme/app_typography.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -129,13 +130,13 @@ class _StockTransferView extends StatelessWidget {
   // ── Body ───────────────────────────────────────────────────────────────────
   Widget _buildBody(BuildContext context, StockTransferState state) {
     if (state is StockTransferInitialLoading) {
-      return const Center(
+      return Center(
           child: SpinKitFoldingCube(color: kHeaderGradEnd, size: 35));
     }
     if (state is StockTransferInitError) {
       return Center(
           child: Text(state.message,
-              style: GoogleFonts.poppins(color: kAccentRed),
+              style: AppTypography.bodyLarge(color: kAccentRed),
               textAlign: TextAlign.center));
     }
     if (state is StockTransferLoaded) {
@@ -150,7 +151,7 @@ class _StockTransferView extends StatelessWidget {
         if (state.isBusy)
           Container(
             color: Colors.black26,
-            child: const Center(
+            child: Center(
                 child: SpinKitFoldingCube(color: kHeaderGradEnd, size: 35)),
           ),
       ]);
@@ -166,7 +167,7 @@ class _StockTransferView extends StatelessWidget {
         ? const Color(0xFF2E7D32)
         : kHeaderGradEnd;
     ScaffoldMessenger.of(ctx).showSnackBar(SnackBar(
-      content: Text(msg, style: GoogleFonts.poppins(color: Colors.white)),
+      content: Text(msg, style: AppTypography.bodyLarge(color: Colors.white)),
       backgroundColor: color,
       behavior: SnackBarBehavior.floating,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
@@ -180,16 +181,14 @@ class _StockTransferView extends StatelessWidget {
       builder: (dlg) => AlertDialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         title: Text('Success',
-            style: GoogleFonts.poppins(
-                fontWeight: FontWeight.bold, color: kTextDark)),
+            style: AppTypography.heading2(color: kTextDark)),
         content: Text(msg,
-            style: GoogleFonts.poppins(color: kTextMid)),
+            style: AppTypography.bodyLarge(color: kTextMid)),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(dlg).pop(),
             child: Text('OK',
-                style: GoogleFonts.poppins(
-                    color: kHeaderGradEnd, fontWeight: FontWeight.w600)),
+                style: AppTypography.bodyLarge(color: kHeaderGradEnd)),
           )
         ],
       ),
@@ -458,16 +457,15 @@ class _ActionBar extends StatelessWidget {
         shape:
         RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         title: Text('Confirm Transfer',
-            style: GoogleFonts.poppins(
-                fontWeight: FontWeight.bold, color: kTextDark)),
+            style: AppTypography.heading2(color: kTextDark)),
         content: Text(
             'Transfer ${data.scnPkg} package(s) to ${data.selectedWareHouseName}?',
-            style: GoogleFonts.poppins(color: kTextMid)),
+            style: AppTypography.bodyLarge(color: kTextMid)),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(dlg).pop(false),
             child: Text('Cancel',
-                style: GoogleFonts.poppins(color: kTextMuted)),
+                style: AppTypography.bodyLarge(color: kTextMuted)),
           ),
           ElevatedButton(
             style: ElevatedButton.styleFrom(
@@ -476,7 +474,7 @@ class _ActionBar extends StatelessWidget {
                     borderRadius: BorderRadius.circular(8))),
             onPressed: () => Navigator.of(dlg).pop(true),
             child: Text('Confirm',
-                style: GoogleFonts.poppins(color: Colors.white)),
+                style: AppTypography.bodyLarge(color: Colors.white)),
           ),
         ],
       ),

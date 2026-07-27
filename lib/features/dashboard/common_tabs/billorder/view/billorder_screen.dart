@@ -1,3 +1,4 @@
+import 'package:maleva/core/colors/colors.dart' as colour;
 import 'package:maleva/core/theme/app_typography.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -748,7 +749,7 @@ class _BillCard extends StatelessWidget {
       context:            context,
       barrierDismissible: true,
       barrierLabel:       '',
-      barrierColor:       Colors.black54,
+      barrierColor:       colour.commonColor,
       transitionDuration: const Duration(milliseconds: 280),
       pageBuilder: (_, __, ___) => Center(
         child: Material(
@@ -973,13 +974,9 @@ class _StatusPill extends StatelessWidget {
         const SizedBox(width: 4),
         Text(
           isPending ? 'Pending' : 'Completed',
-          style: GoogleFonts.inter(
-            color: isPending
+          style: AppTypography.bodyLarge(color: isPending
                 ? const Color(0xFF92400E)
-                : const Color(0xFF047857),
-            fontWeight: FontWeight.w700,
-            fontSize:   fontSize,
-          ),
+                : const Color(0xFF047857)),
         ),
       ]),
     );
@@ -1056,9 +1053,9 @@ class _ErrorState extends StatelessWidget {
           Container(
             padding: const EdgeInsets.all(20),
             decoration: BoxDecoration(
-                color: Colors.red.shade50, shape: BoxShape.circle),
+                color: colour.commonColorred.withValues(alpha: 0.1), shape: BoxShape.circle),
             child: Icon(Icons.error_outline,
-                color: Colors.red.shade400,
+                color: colour.commonColorred,
                 size: isTablet ? 44 : 38),
           ),
           SizedBox(height: isTablet ? 16 : 14),

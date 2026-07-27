@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 
@@ -65,7 +66,7 @@ class InventoryBloc extends Bloc<InventoryEvent, InventoryState> {
           AppGlobals.CustomerList =
               result.map((e) => CustomerModel.fromJson(e as Map<String, dynamic>)).toList();
         }
-      } catch (_) {}
+      } catch (e, stack) { debugPrint("Error caught globally: $e\n$stack"); }
     }
     // Auto-load default data
     await _fetch(emit, _s);

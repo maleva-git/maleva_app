@@ -1,3 +1,4 @@
+import 'package:maleva/core/colors/colors.dart' as colour;
 import 'package:maleva/core/theme/app_typography.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -48,7 +49,7 @@ class _DriverSalaryView extends StatelessWidget {
       builder: (context, state) {
         if (state is DriverSalaryInitial ||
             state is DriverSalaryLoading) {
-          return const Center(
+          return Center(
             child: SpinKitFoldingCube(
                 color: Palette.blue400, size: 35),
           );
@@ -128,9 +129,7 @@ void _showSalaryDetailsDialog(
                 child: TextButton(
                   onPressed: () => Navigator.pop(context),
                   child: Text('Close',
-                      style: GoogleFonts.lato(
-                          color: Palette.blue700,
-                          fontWeight: FontWeight.w700)),
+                      style: AppTypography.heading2(color: Palette.blue700)),
                 ),
               ),
             ],
@@ -226,24 +225,10 @@ class _SalaryTitleRow extends StatelessWidget {
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         Text('SALARY',
-            style: GoogleFonts.lato(
-              color: Palette.redAccent,
-              fontWeight: FontWeight.w700,
-              fontSize: isTablet
-                  ? AppGlobals.FontLarge + 2
-                  : AppGlobals.FontLarge,
-              letterSpacing: 0.3,
-            )),
+            style: AppTypography.heading1(color: Palette.redAccent)),
         const SizedBox(width: 6),
         Text('- ${amount.toStringAsFixed(2)}',
-            style: GoogleFonts.lato(
-              color: Palette.greenSuccess,
-              fontWeight: FontWeight.w700,
-              fontSize: isTablet
-                  ? AppGlobals.FontLarge + 2
-                  : AppGlobals.FontLarge,
-              letterSpacing: 0.3,
-            )),
+            style: AppTypography.heading1(color: Palette.greenSuccess)),
       ],
     );
   }
@@ -477,12 +462,7 @@ class _SalaryCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final valStyle = GoogleFonts.lato(
-      color: Palette.textDark2,
-      fontWeight: FontWeight.w600,
-      fontSize:
-      isTablet ? AppGlobals.FontCardText + 1 : AppGlobals.FontCardText,
-    );
+    final valStyle = AppTypography.bodyLarge(color: Palette.textDark2);
 
     final rtiDate = item['SSaleDate']?.toString()    ?? '-';
     final rtiNo   = item['CNumberDisplay']?.toString() ?? '-';
@@ -560,7 +540,7 @@ class _SalaryCard extends StatelessWidget {
                 ),
               ),
               // Arrow hint
-              const Padding(
+              Padding(
                 padding: EdgeInsets.only(right: 8),
                 child: Icon(
                     Icons.arrow_forward_ios_rounded,

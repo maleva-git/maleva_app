@@ -1,3 +1,4 @@
+import 'package:maleva/core/theme/app_typography.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -82,22 +83,13 @@ class _BocBodyState extends State<_BocBody> {
                   ),
                   const SizedBox(width: 10),
                   Text('BOC CHECK',
-                      style: GoogleFonts.lato(
-                        fontSize:      20,
-                        fontWeight:    FontWeight.bold,
-                        color:         AppTokens.brandDark,
-                        letterSpacing: 1.2,
-                      )),
+                      style: AppTypography.heading1(color: AppTokens.brandDark)),
                 ]),
                 const SizedBox(height: 6),
                 Padding(
                   padding: const EdgeInsets.only(left: 14),
                   child: Text('Search bills & invoices',
-                      style: GoogleFonts.lato(
-                        fontSize:   14,
-                        color:      AppTokens.brandMid,
-                        fontWeight: FontWeight.w500,
-                      )),
+                      style: AppTypography.heading2(color: AppTokens.brandMid)),
                 ),
                 const SizedBox(height: 20),
 
@@ -116,7 +108,7 @@ class _BocBodyState extends State<_BocBody> {
                       return const _InitialHint(isTablet: true);
                     }
                     if (state is BocLoading) {
-                      return const Center(
+                      return Center(
                         child: CircularProgressIndicator(
                             color: AppTokens.brandGradientStart),
                       );
@@ -194,7 +186,7 @@ class _BocBodyState extends State<_BocBody> {
                   return const _InitialHint(isTablet: false);
                 }
                 if (state is BocLoading) {
-                  return const Center(
+                  return Center(
                     child: CircularProgressIndicator(
                         color: AppTokens.brandGradientStart),
                   );
@@ -252,10 +244,7 @@ class _SearchBar extends StatelessWidget {
         onSubmitted: (_) => onSearch(),
         decoration: InputDecoration(
           hintText:  "Search bills, invoices...",
-          hintStyle: GoogleFonts.lato(
-            color:    Colors.grey.shade500,
-            fontSize: isTablet ? 15 : 16,
-          ),
+          hintStyle: AppTypography.heading2(),
           prefixIcon: Icon(Icons.search_rounded,
               color: AppTokens.brandGradientStart,
               size:  isTablet ? 22 : 20),
@@ -272,10 +261,7 @@ class _SearchBar extends StatelessWidget {
           ),
           border: InputBorder.none,
         ),
-        style: GoogleFonts.lato(
-          color:    Colors.black87,
-          fontSize: isTablet ? 16 : 17,
-        ),
+        style: AppTypography.heading2(),
       ),
     );
   }
@@ -321,17 +307,9 @@ class _ResultCountBadge extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text('Results Found',
-                style: GoogleFonts.lato(
-                  fontSize:   12,
-                  color:      colour.kWhite.withValues(alpha: 0.75),
-                  fontWeight: FontWeight.w500,
-                )),
+                style: AppTypography.bodySmall(color: colour.kWhite.withValues(alpha: 0.75))),
             Text('$count',
-                style: GoogleFonts.lato(
-                  fontSize:   28,
-                  color:      colour.kWhite,
-                  fontWeight: FontWeight.bold,
-                )),
+                style: AppTypography.bodyLarge(color: colour.kWhite)),
           ],
         ),
       ]),
@@ -356,9 +334,7 @@ class _InitialHint extends StatelessWidget {
           const SizedBox(height: 12),
           Text(
             "Search bills or invoices above",
-            style: GoogleFonts.lato(
-                fontSize: isTablet ? 16 : 15,
-                color:    Colors.grey),
+            style: AppTypography.heading2(),
           ),
         ],
       ),
@@ -384,22 +360,19 @@ class _ErrorState extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         children: [
           Icon(Icons.error_outline,
-              color: Colors.red,
+              color: colour.commonColorred,
               size:  isTablet ? 60 : 48),
           SizedBox(height: isTablet ? 16 : 12),
           Text(message,
               textAlign: TextAlign.center,
-              style: GoogleFonts.lato(
-                  color:    Colors.red,
-                  fontSize: isTablet ? 15 : 14)),
+              style: AppTypography.heading2()),
           SizedBox(height: isTablet ? 20 : 16),
           ElevatedButton.icon(
             onPressed: onRetry,
             icon:  Icon(Icons.refresh,
                 size: isTablet ? 20 : 18),
             label: Text("Retry",
-                style: GoogleFonts.lato(
-                    fontSize: isTablet ? 15 : 14)),
+                style: AppTypography.heading2()),
             style: ElevatedButton.styleFrom(
               backgroundColor: AppTokens.brandGradientStart,
               padding: EdgeInsets.symmetric(
@@ -425,9 +398,7 @@ class _EmptyState extends StatelessWidget {
   Widget build(BuildContext context) {
     return Center(
       child: Text("No records found.",
-          style: GoogleFonts.lato(
-              fontSize: isTablet ? 18 : 16,
-              color:    Colors.grey)),
+          style: AppTypography.heading1()),
     );
   }
 }
@@ -486,11 +457,7 @@ class _BocCard extends StatelessWidget {
                           size:  isTablet ? 24 : 22),
                       const SizedBox(width: 10),
                       Text(master.billNoDisplay,
-                          style: GoogleFonts.lato(
-                            fontSize:   isTablet ? 20 : 18,
-                            fontWeight: FontWeight.bold,
-                            color:      colour.kWhite,
-                          )),
+                          style: AppTypography.heading1(color: colour.kWhite)),
                     ]),
                     Container(
                       padding: EdgeInsets.symmetric(
@@ -500,15 +467,11 @@ class _BocCard extends StatelessWidget {
                       decoration: BoxDecoration(
                         color: master.billStatus == "Open"
                             ? Colors.green.shade400
-                            : Colors.red.shade400,
+                            : colour.commonColorred,
                         borderRadius: BorderRadius.circular(20),
                       ),
                       child: Text(master.billStatus,
-                          style: GoogleFonts.lato(
-                            fontSize:   isTablet ? 13 : 12,
-                            fontWeight: FontWeight.bold,
-                            color:      colour.kWhite,
-                          )),
+                          style: AppTypography.bodySmall(color: colour.kWhite)),
                     ),
                   ],
                 ),
@@ -552,30 +515,18 @@ class _BocCard extends StatelessWidget {
                             CrossAxisAlignment.start,
                             children: [
                               Text("Invoice",
-                                  style: GoogleFonts.lato(
-                                    fontSize:      isTablet ? 13 : 12,
-                                    color:         Colors.grey[500],
-                                    fontWeight:    FontWeight.w600,
-                                    letterSpacing: 0.5,
-                                  )),
+                                  style: AppTypography.bodySmall()),
                               const SizedBox(height: 2),
                               RichText(
                                 text: TextSpan(children: [
                                   TextSpan(
                                     text: "${master.invoiceNo}  ",
-                                    style: GoogleFonts.lato(
-                                      fontSize:   isTablet ? 16 : 15,
-                                      fontWeight: FontWeight.bold,
-                                      color:      AppTokens.brandDark,
-                                    ),
+                                    style: AppTypography.heading2(color: AppTokens.brandDark),
                                   ),
                                   TextSpan(
                                     text:
                                     "(${master.invoiceDate})",
-                                    style: GoogleFonts.lato(
-                                      fontSize: isTablet ? 14 : 13,
-                                      color:    Colors.grey[600],
-                                    ),
+                                    style: AppTypography.heading2(),
                                   ),
                                 ]),
                               ),
@@ -604,11 +555,7 @@ class _BocCard extends StatelessWidget {
                         const SizedBox(width: 8),
                         Text(
                           "Net Amount: ₹${master.netAmt.toStringAsFixed(2)}",
-                          style: GoogleFonts.lato(
-                            fontSize:   isTablet ? 17 : 16,
-                            fontWeight: FontWeight.bold,
-                            color:      AppTokens.brandDark,
-                          ),
+                          style: AppTypography.heading2(color: AppTokens.brandDark),
                         ),
                       ]),
                     ),
@@ -622,12 +569,7 @@ class _BocCard extends StatelessWidget {
                     if (details.isNotEmpty) ...[
                       _buildDivider(),
                       Text("Order Details",
-                          style: GoogleFonts.lato(
-                            fontSize:      isTablet ? 14 : 13,
-                            color:         Colors.grey[500],
-                            fontWeight:    FontWeight.w600,
-                            letterSpacing: 0.5,
-                          )),
+                          style: AppTypography.heading2()),
                       const SizedBox(height: 10),
                       ...details.map<Widget>((d) =>
                           _DetailItem(
@@ -669,20 +611,11 @@ class _BocCard extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(label,
-                  style: GoogleFonts.lato(
-                    fontSize:      isTablet ? 13 : 12,
-                    color:         Colors.grey[500],
-                    fontWeight:    FontWeight.w600,
-                    letterSpacing: 0.5,
-                  )),
+                  style: AppTypography.bodySmall()),
               const SizedBox(height: 2),
               Text(
                 value.isNotEmpty ? value : "Not Available",
-                style: GoogleFonts.lato(
-                  fontSize:   isTablet ? 16 : 15,
-                  fontWeight: FontWeight.w700,
-                  color:      AppTokens.brandDark,
-                ),
+                style: AppTypography.heading2(color: AppTokens.brandDark),
               ),
             ],
           ),
@@ -721,11 +654,7 @@ class _DetailItem extends StatelessWidget {
             Expanded(
               child: Text(
                 detail.productName,
-                style: GoogleFonts.lato(
-                  fontSize:   isTablet ? 16 : 15,
-                  fontWeight: FontWeight.w700,
-                  color:      AppTokens.brandDark,
-                ),
+                style: AppTypography.heading2(color: AppTokens.brandDark),
               ),
 
             ),
@@ -736,11 +665,7 @@ class _DetailItem extends StatelessWidget {
               padding: const EdgeInsets.only(top: 6, left: 24),
               child: Text(
                 "Remarks: ${detail.RemarksD}",
-                style: GoogleFonts.lato(
-                  fontSize:  isTablet ? 14 : 13,
-                  color:     Colors.grey[600],
-                  fontStyle: FontStyle.italic,
-                ),
+                style: AppTypography.heading2(),
               ),
             ),
         ],

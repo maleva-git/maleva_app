@@ -1,3 +1,5 @@
+import 'package:maleva/core/theme/app_typography.dart';
+import 'package:maleva/core/colors/colors.dart' as colour;
 import 'package:maleva/core/utils/system_helpers.dart';
 // ════════════════════════════════════════════════════════════════════
 //  planning_bloc.dart
@@ -58,7 +60,7 @@ class PlanningBloc extends Bloc<PlanningEvent, PlanningState> {
                 } catch (e, st) {
           emit(PlanningError(e.toString()));
           if (!context.mounted) return;
-          msgshow(e.toString(), st.toString(), Colors.white, Colors.red, null, 18.00 - AppGlobals.reducesize, AppGlobals.tll, AppGlobals.tgc, context, 2);
+          msgshow(e.toString(), st.toString(), Colors.white, colour.commonColorred, null, 18.00 - AppGlobals.reducesize, AppGlobals.tll, AppGlobals.tgc, context, 2);
         }
       },
       transformer: droppable(),
@@ -102,7 +104,7 @@ class PlanningBloc extends Bloc<PlanningEvent, PlanningState> {
           }
         } catch (e, st) {
           if (!context.mounted) return;
-          msgshow(e.toString(), st.toString(), Colors.white, Colors.red, null, 18.00 - AppGlobals.reducesize, AppGlobals.tll, AppGlobals.tgc, context, 2);
+          msgshow(e.toString(), st.toString(), Colors.white, colour.commonColorred, null, 18.00 - AppGlobals.reducesize, AppGlobals.tll, AppGlobals.tgc, context, 2);
         }
         emit(s);
       },
@@ -119,7 +121,7 @@ class PlanningBloc extends Bloc<PlanningEvent, PlanningState> {
         emit(s); // Return to default loaded state after navigation
       } catch (e, st) {
         if (!context.mounted) return;
-        msgshow(e.toString(), st.toString(), Colors.white, Colors.red, null, 18.00 - AppGlobals.reducesize, AppGlobals.tll, AppGlobals.tgc, context, 2);
+        msgshow(e.toString(), st.toString(), Colors.white, colour.commonColorred, null, 18.00 - AppGlobals.reducesize, AppGlobals.tll, AppGlobals.tgc, context, 2);
       }
     });
   }

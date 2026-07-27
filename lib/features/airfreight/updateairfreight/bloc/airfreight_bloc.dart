@@ -1,9 +1,10 @@
-import 'package:maleva/core/network/api_legacy_helper.dart';
+import 'package:maleva/core/network/legacy_api_repository.dart';
+import 'package:maleva/core/di/injection.dart';
 import 'package:maleva/core/network/api_constants.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:maleva/core/utils/app_globals.dart';
-import 'package:maleva/core/network/OnlineApi.dart' as OnlineApi;
+
 
 import 'airfreight_event.dart';
 import 'airfreight_state.dart';
@@ -38,7 +39,7 @@ class AirFreightBloc extends Bloc<AirFreightEvent, AirFreightState> {
     // 2. Fetch data in the background
     try {
       // 🔥 Fixed: Removed context, passed null
-      await OnlineApi.GetJobNoForwarding(null, 0);
+      await sl<LegacyApiRepository>().GetJobNoForwarding(null, 0);
 
       if (event.jobId != null && event.jobNo != null) {
         final shortNo = event.jobNo!.length >= 4 ? event.jobNo!.substring(4) : event.jobNo!;
@@ -58,8 +59,8 @@ class AirFreightBloc extends Bloc<AirFreightEvent, AirFreightState> {
     final s = state as AirFreightLoaded;
     try {
       // 🔥 Fixed: Removed context, passed null
-      await OnlineApi.GetJobNoForwarding(null, int.parse(event.billType));
-    } catch (_) {}
+      await sl<LegacyApiRepository>().GetJobNoForwarding(null, int.parse(event.billType));
+    } catch (e, stack) { debugPrint("Error caught globally: $e\n$stack"); }
     emit(s.copyWith(billType: event.billType, jobNoText: '', saleOrderId: 0, jobNoSuggestions: []));
   }
 
@@ -119,7 +120,7 @@ class AirFreightBloc extends Bloc<AirFreightEvent, AirFreightState> {
       };
 
       // 🔥 Fixed: Passed null for context
-      final result = await ApiLegacyHelper.apiAllinoneSelectArray(ApiConstants.apiDeleteImage, null, header, null);
+      final result = await sl<LegacyApiRepository>().apiAllinoneSelectArray(ApiConstants.apiDeleteImage, null, header, null);
       if (result != '') {
         final value = ResponseViewModel.fromJson(result);
         if (value.IsSuccess == true) {
@@ -150,7 +151,7 @@ class AirFreightBloc extends Bloc<AirFreightEvent, AirFreightState> {
       final header = {'Content-Type': 'application/json; charset=UTF-8'};
 
       // 🔥 Fixed: Passed null for context
-      final result = await ApiLegacyHelper.apiAllinoneSelectArray(ApiConstants.apiUpdateAirFrieghtDetails, master, header, null);
+      final result = await sl<LegacyApiRepository>().apiAllinoneSelectArray(ApiConstants.apiUpdateAirFrieghtDetails, master, header, null);
 
       if (result != '') {
         final value = ResponseViewModel.fromJson(result);
@@ -180,9 +181,9 @@ class AirFreightBloc extends Bloc<AirFreightEvent, AirFreightState> {
     final prev = state is AirFreightLoaded ? state as AirFreightLoaded : AirFreightLoaded.empty();
     try {
       // 🔥 Fixed: Removed context, passed only ID and JobNo
-      await OnlineApi.EditSalesOrder(saleOrderId, int.tryParse(jobNo) ?? 0);
-      await OnlineApi.SelectJobType(null);
-      await OnlineApi.SelectAllJobStatus(null, AppGlobals.SaleEditMasterList[0]['JobMasterRefId']);
+      await sl<LegacyApiRepository>().EditSalesOrder(saleOrderId, int.tryParse(jobNo) ?? 0);
+      await sl<LegacyApiRepository>().SelectJobType(null);
+      await sl<LegacyApiRepository>().SelectAllJobStatus(null, AppGlobals.SaleEditMasterList[0]['JobMasterRefId']);
 
       String jobTypeName = '';
       final jobMasterId = AppGlobals.SaleEditMasterList[0]['JobMasterRefId'];
@@ -214,7 +215,7 @@ class AirFreightBloc extends Bloc<AirFreightEvent, AirFreightState> {
       final header = {'Content-Type': 'application/json; charset=UTF-8'};
 
       // 🔥 Fixed: Passed null for context
-      final imgResult = await ApiLegacyHelper.apiAllinoneSelectArray('${ApiConstants.apiGetImage}$imageDir', null, header, null);
+      final imgResult = await sl<LegacyApiRepository>().apiAllinoneSelectArray('${ApiConstants.apiGetImage}$imageDir', null, header, null);
 
       List<String> images = [];
       if (imgResult != '' && imgResult.length != 0) {

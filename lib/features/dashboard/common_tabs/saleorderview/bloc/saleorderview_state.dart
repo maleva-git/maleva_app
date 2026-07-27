@@ -1,3 +1,5 @@
+import 'package:maleva/core/theme/app_typography.dart';
+import 'package:maleva/core/colors/colors.dart' as colour;
 
 
 import 'package:equatable/equatable.dart';
@@ -91,7 +93,7 @@ class SaleOrderState extends Equatable {
 
     if (hasPickup && (hasSETA || hasSOETA)) return null;
     if (!hasPickup && !hasSETA && !hasSOETA) {
-      return Colors.redAccent.withValues(alpha: 0.3);
+      return colour.commonColorred.withValues(alpha: 0.3);
     }
     if (!hasPickup) return Colors.yellowAccent.withValues(alpha: 0.3);
     if (item.JobMasterRefId == 10) return null;

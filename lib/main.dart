@@ -1,3 +1,5 @@
+import 'package:maleva/core/theme/app_typography.dart';
+import 'package:maleva/core/colors/colors.dart' as colour;
 import 'dart:io';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
@@ -102,7 +104,7 @@ Future<void> main() async {
         errorLog: "$e\n$stack",
         userNote: 'Automatic Crash Report from Splash Screen',
       ).timeout(const Duration(seconds: 3));
-    } catch (_) {}
+    } catch (e, stack) { debugPrint("Error caught globally: $e\n$stack"); }
   } finally {
     FlutterNativeSplash.remove();
   }
@@ -234,7 +236,7 @@ class _MyHomePageState extends State<MyHomePage> {
     //   switch (event) {
     //     case bpp.ConnectState.connected:
     //       AppGlobals.currentconnectionstate = true;
-    //       msgshow('Connected Successfully ', "", Colors.white, Colors.red, null,
+    //       msgshow('Connected Successfully ', "", Colors.white, colour.commonColorred, null,
     //           18.00 - AppGlobals.reducesize, AppGlobals.tll, AppGlobals.tgc, context, 2);
     //       break;
     //     case bpp.ConnectState.disconnected:

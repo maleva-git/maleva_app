@@ -92,7 +92,7 @@ class _DriverDetailsViewState extends State<DriverDetailsView> {
           child: BlocBuilder<DriverBloc, DriverState>(
             builder: (context, state) {
               if (state is DriverLoading) {
-                return const Center(
+                return Center(
                   child: CircularProgressIndicator(
                       color: AppTokens.brandGradientStart),
                 );
@@ -162,7 +162,7 @@ class _DriverDetailsViewState extends State<DriverDetailsView> {
           child: BlocBuilder<DriverBloc, DriverState>(
             builder: (context, state) {
               if (state is DriverLoading) {
-                return const Center(
+                return Center(
                   child: CircularProgressIndicator(
                       color: AppTokens.brandGradientStart),
                 );
@@ -524,17 +524,17 @@ class _ErrorState extends StatelessWidget {
             Container(
               padding: EdgeInsets.all(isTablet ? 24 : 20),
               decoration: BoxDecoration(
-                color: Colors.red.shade50,
+                color: colour.commonColorred.withValues(alpha: 0.1),
                 shape: BoxShape.circle,
               ),
               child: Icon(Icons.error_outline_rounded,
-                  color: Colors.red.shade400,
+                  color: colour.commonColorred,
                   size:  isTablet ? 56 : 48),
             ),
             SizedBox(height: isTablet ? 20 : 16),
             Text(
               "Something went wrong",
-              style: AppTypography.heading1(color: Colors.red.shade400, fontWeight: FontWeight.w600),
+              style: AppTypography.heading1(color: colour.commonColorred, fontWeight: FontWeight.w600),
             ),
             SizedBox(height: isTablet ? 10 : 8),
             Text(

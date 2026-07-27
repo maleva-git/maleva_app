@@ -24,7 +24,7 @@ class VesselReportPage extends StatelessWidget {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text(state.errorMessage),
-              backgroundColor: Colors.red,
+              backgroundColor: colour.commonColorred,
             ),
           );
         }
@@ -77,8 +77,8 @@ class _VesselReportViewState extends State<_VesselReportView> {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text(state.errorMessage,
-                  style: GoogleFonts.poppins(color: colour.kWhite)),
-              backgroundColor: Colors.redAccent,
+                  style: AppTypography.bodyLarge(color: colour.kWhite)),
+              backgroundColor: colour.commonColorred,
               behavior: SnackBarBehavior.floating,
               shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12)),
@@ -90,7 +90,7 @@ class _VesselReportViewState extends State<_VesselReportView> {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text(state.message,
-                  style: GoogleFonts.poppins(color: colour.kWhite)),
+                  style: AppTypography.bodyLarge(color: colour.kWhite)),
               backgroundColor: Colors.green,
               behavior: SnackBarBehavior.floating,
               shape: RoundedRectangleBorder(
@@ -103,8 +103,8 @@ class _VesselReportViewState extends State<_VesselReportView> {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text(state.message,
-                  style: GoogleFonts.poppins(color: colour.kWhite)),
-              backgroundColor: Colors.redAccent,
+                  style: AppTypography.bodyLarge(color: colour.kWhite)),
+              backgroundColor: colour.commonColorred,
               behavior: SnackBarBehavior.floating,
               shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12)),
@@ -199,7 +199,7 @@ class _VesselReportViewState extends State<_VesselReportView> {
                 const SizedBox(height: 10),
                 Expanded(
                   child: isLoading
-                      ? const Center(
+                      ? Center(
                     child: CircularProgressIndicator(
                         color: AppTokens.brandGradientStart),
                   )
@@ -271,7 +271,7 @@ class _VesselReportViewState extends State<_VesselReportView> {
         const SizedBox(height: 8),
 
         if (isLoading)
-          const Padding(
+          Padding(
             padding: EdgeInsets.only(top: 40),
             child: Center(
                 child: CircularProgressIndicator(
@@ -523,9 +523,9 @@ class _ActionIconButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final color = isDestructive ? Colors.redAccent : AppTokens.brandGradientStart;
+    final color = isDestructive ? colour.commonColorred : AppTokens.brandGradientStart;
     final bg    = isDestructive
-        ? Colors.red.withValues(alpha: 0.08)
+        ? colour.commonColorred.withValues(alpha: 0.08)
         : AppTokens.brandLight;
     final size  = isTablet ? 44.0 : 38.0;
 

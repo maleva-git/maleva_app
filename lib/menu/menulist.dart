@@ -1,4 +1,5 @@
-import 'package:maleva/core/network/api_legacy_helper.dart';
+import 'package:maleva/core/theme/app_typography.dart';
+import 'package:maleva/core/colors/colors.dart' as colour;
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -51,6 +52,7 @@ import '../features/transport/updatertidetails/bloc/updatertidetails_event.dart'
 import '../features/transport/updatertidetails/view/updatertidetails_tab.dart';
 import '../features/troubleshoot/view/troubleshoot_sheet.dart';
 import 'package:maleva/core/models/shared/menu_master_model.dart';
+import 'package:maleva/core/utils/auth_helper.dart';
 
 class Menulist extends StatefulWidget {
   const Menulist({super.key});
@@ -198,22 +200,12 @@ class _MenulistState extends State<Menulist>
                         children: [
                           Text(
                             'Maleva',
-                            style: GoogleFonts.playfairDisplay(
-                              fontSize: 19,
-                              fontWeight: FontWeight.w700,
-                              color: Colors.white,
-                              letterSpacing: -0.3,
-                            ),
+                            style: AppTypography.bodySmall(color: Colors.white),
                           ),
                           const SizedBox(height: 2),
                           Text(
                             'LOGISTICS SUITE',
-                            style: GoogleFonts.dmSans(
-                              fontSize: 9,
-                              fontWeight: FontWeight.w500,
-                              color: Colors.white.withValues(alpha: 0.55),
-                              letterSpacing: 1.6,
-                            ),
+                            style: AppTypography.bodySmall(color: Colors.white),
                           ),
                         ],
                       ),
@@ -235,12 +227,7 @@ class _MenulistState extends State<Menulist>
                       ),
                       child: Text(
                         AppGlobals.appversion,
-                        style: GoogleFonts.dmSans(
-                          fontSize: 10,
-                          fontWeight: FontWeight.w500,
-                          color: Colors.white.withValues(alpha: 0.85),
-                          letterSpacing: 0.5,
-                        ),
+                        style: AppTypography.bodySmall(color: Colors.white),
                       ),
                     ),
                     const Spacer(),
@@ -256,10 +243,7 @@ class _MenulistState extends State<Menulist>
                         const SizedBox(width: 5),
                         Text(
                           'Online',
-                          style: GoogleFonts.dmSans(
-                            fontSize: 10,
-                            color: Colors.white.withValues(alpha: 0.60),
-                          ),
+                          style: AppTypography.bodySmall(color: Colors.white),
                         ),
                       ],
                     ),
@@ -291,16 +275,10 @@ class _MenulistState extends State<Menulist>
             Expanded(
               child: TextField(
                 controller: _search,
-                style: GoogleFonts.dmSans(
-                    fontSize: 13,
-                    color: colour.cText,
-                    fontWeight: FontWeight.w400),
+                style: AppTypography.bodyLarge(color: colour.cText),
                 decoration: InputDecoration(
                   hintText: 'Search menu…',
-                  hintStyle: GoogleFonts.dmSans(
-                      fontSize: 13,
-                      color: colour.cSub,
-                      fontWeight: FontWeight.w400),
+                  hintStyle: AppTypography.bodyLarge(color: colour.cSub),
                   border: InputBorder.none,
                   isDense: true,
                   contentPadding: EdgeInsets.zero,
@@ -310,7 +288,7 @@ class _MenulistState extends State<Menulist>
             if (_query.isNotEmpty)
               GestureDetector(
                 onTap: () => _search.clear(),
-                child: const Padding(
+                child: Padding(
                   padding: EdgeInsets.only(right: 10),
                   child: Icon(Icons.close_rounded, size: 16, color: colour.cSub),
                 ),
@@ -367,11 +345,7 @@ class _MenulistState extends State<Menulist>
               Expanded(
                 child: Text(
                   'Report a Problem',
-                  style: GoogleFonts.dmSans(
-                    fontSize: 13.5,
-                    fontWeight: FontWeight.w600,
-                    color: const Color(0xFF8A6400),
-                  ),
+                  style: AppTypography.bodyLarge(color: const Color(0xFF8A6400)),
                 ),
               ),
               Icon(Icons.arrow_forward_ios_rounded,
@@ -485,21 +459,13 @@ class _MenuTileState extends State<_MenuTile>
                   children: [
                     Text(
                       widget.entry.FormText,
-                      style: GoogleFonts.dmSans(
-                        fontSize: 13.5,
-                        fontWeight: FontWeight.w500,
-                        color: colour.cText,
-                      ),
+                      style: AppTypography.bodyLarge(color: colour.cText),
                     ),
                     if (meta.isNotEmpty) ...[
                       const SizedBox(height: 2),
                       Text(
                         meta,
-                        style: GoogleFonts.dmSans(
-                          fontSize: 10,
-                          fontWeight: FontWeight.w400,
-                          color: colour.cSub,
-                        ),
+                        style: AppTypography.bodySmall(color: colour.cSub),
                       ),
                     ],
                   ],
@@ -519,11 +485,7 @@ class _MenuTileState extends State<_MenuTile>
               Expanded(
                 child: Text(
                   widget.entry.FormText,
-                  style: GoogleFonts.dmSans(
-                    fontSize: 12.5,
-                    fontWeight: FontWeight.w400,
-                    color: const Color(0xFF505578),
-                  ),
+                  style: AppTypography.bodySmall(color: const Color(0xFF505578)),
                 ),
               ),
               Icon(Icons.arrow_forward_ios_rounded,
@@ -563,11 +525,7 @@ class _MenuTileState extends State<_MenuTile>
                 Expanded(
                   child: Text(
                     widget.entry.FormText,
-                    style: GoogleFonts.dmSans(
-                      fontSize: 13.5,
-                      fontWeight: FontWeight.w600,
-                      color: colour.cBlue,
-                    ),
+                    style: AppTypography.bodyLarge(color: colour.cBlue),
                   ),
                 ),
                 AnimatedRotation(
@@ -632,11 +590,7 @@ class _MenuTileState extends State<_MenuTile>
             Expanded(
               child: Text(
                 'Logout',
-                style: GoogleFonts.dmSans(
-                  fontSize: 13.5,
-                  fontWeight: FontWeight.w600,
-                  color: colour.cRose,
-                ),
+                style: AppTypography.bodyLarge(color: colour.cRose),
               ),
             ),
             Icon(Icons.arrow_forward_ios_rounded,
@@ -681,7 +635,7 @@ class _MenuTileState extends State<_MenuTile>
   // ── Navigation ─────────────────────────────────────────────────────────────
   void _navigate() {
     if (widget.entry.FormText == "Logout") {
-      ApiLegacyHelper.logout(widget.drawerContext);
+      AuthHelper.logout(widget.drawerContext);
       return;
     }
     Navigator.pop(widget.drawerContext);
@@ -706,10 +660,7 @@ class _MenuTileState extends State<_MenuTile>
                 appBar: AppBar(
                   title: Text(
                     'Email InBox',
-                    style: GoogleFonts.poppins(
-                      fontWeight: FontWeight.w600,
-                      color: Colors.white,
-                    ),
+                    style: AppTypography.bodyLarge(color: Colors.white),
                   ),
                   backgroundColor: AppTokens.invoiceHeaderStart,
                   iconTheme: const IconThemeData(color: Colors.white),
@@ -727,10 +678,7 @@ class _MenuTileState extends State<_MenuTile>
                 appBar: AppBar(
                   title: Text(
                     'Google Review',
-                    style: GoogleFonts.poppins(
-                      fontWeight: FontWeight.w600,
-                      color: Colors.white,
-                    ),
+                    style: AppTypography.bodyLarge(color: Colors.white),
                   ),
                   backgroundColor: AppTokens.invoiceHeaderStart,
                   iconTheme: const IconThemeData(color: Colors.white),
@@ -839,10 +787,7 @@ class _MenuTileState extends State<_MenuTile>
                 appBar: AppBar(
                   title: Text(
                     'Enquiry Screen',
-                    style: GoogleFonts.poppins(
-                      fontWeight: FontWeight.w600,
-                      color: Colors.white,
-                    ),
+                    style: AppTypography.bodyLarge(color: Colors.white),
                   ),
                   backgroundColor: AppTokens.invoiceHeaderStart,
                   iconTheme: const IconThemeData(color: Colors.white),
@@ -911,7 +856,7 @@ class _MenuTileState extends State<_MenuTile>
           ))); 
           break;
         case "Logout":
-          ApiLegacyHelper.logout(ctx);                                   break;
+          AuthHelper.logout(ctx);                                   break;
       }
     });
   }

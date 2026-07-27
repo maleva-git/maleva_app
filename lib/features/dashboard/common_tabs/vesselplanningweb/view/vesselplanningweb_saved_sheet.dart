@@ -1,3 +1,6 @@
+import 'package:maleva/core/colors/colors.dart' as colour;
+import 'package:maleva/core/network/legacy_api_repository.dart';
+import 'package:maleva/core/di/injection.dart';
 import 'package:maleva/core/theme/app_typography.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -15,7 +18,7 @@ import 'package:http/http.dart' as http;
 import 'package:open_file/open_file.dart';
 import 'package:path_provider/path_provider.dart';
 import '../../../../../core/models/model.dart';
-import '../../../../../core/network/OnlineApi.dart' as OnlineApi;
+
 import '../../../../mastersearch/Employee.dart';
 import '../bloc/vesselplanningweb_state.dart';
 import 'package:maleva/core/models/shared/employee_model.dart';
@@ -68,7 +71,7 @@ class _VesselPlanningSavedSheetState extends State<VesselPlanningSavedSheet> {
     } catch (e) {
       setState(() => _isLoading = false);
       if (mounted) {
-        msgshow(e.toString(), "", Colors.white, Colors.red, null, 14, AppGlobals.tls, AppGlobals.tgc, context, 2);
+        msgshow(e.toString(), "", Colors.white, colour.commonColorred, null, 14, AppGlobals.tls, AppGlobals.tgc, context, 2);
       }
     }
   }
@@ -151,12 +154,12 @@ class _VesselPlanningSavedSheetState extends State<VesselPlanningSavedSheet> {
           showDialog(
             context: context,
             builder: (ctx) => AlertDialog(
-              title: const Text("Error"),
+              title: Text("Error"),
               content: Text("Could not open PDF: ${result.message}"),
               actions: [
                 TextButton(
                   onPressed: () => Navigator.pop(ctx),
-                  child: const Text("OK"),
+                  child: Text("OK"),
                 )
               ],
             ),
@@ -187,7 +190,7 @@ class _VesselPlanningSavedSheetState extends State<VesselPlanningSavedSheet> {
           await _openPdf(context, state.url);
         } else if (state is VesselPlanningPdfLaunchError) {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(state.message), backgroundColor: Colors.red),
+            SnackBar(content: Text(state.message), backgroundColor: colour.commonColorred),
           );
         }
       },
@@ -267,7 +270,7 @@ class _VesselPlanningSavedSheetState extends State<VesselPlanningSavedSheet> {
                         ? null
                         : () async {
                             setState(() => _isLoading = true);
-                            await OnlineApi.SelectEmployee(context, 'Sales', '');
+                            await sl<LegacyApiRepository>().SelectEmployee(context, 'Sales', '');
                             setState(() => _isLoading = false);
                             if (!mounted) return;
                             Navigator.push(context, MaterialPageRoute(builder: (_) => const Employee(Searchby: 1, SearchId: 0))).then((result) {
@@ -382,7 +385,7 @@ class _VesselPlanningSavedSheetState extends State<VesselPlanningSavedSheet> {
           // List
           Expanded(
             child: _isLoading
-                ? const Center(child: SpinKitFoldingCube(color: colour.kHeaderGradEnd, size: 40))
+                ? Center(child: SpinKitFoldingCube(color: colour.kHeaderGradEnd, size: 40))
                 : _savedPlannings.isEmpty
                     ? Center(
                         child: Text(
@@ -497,16 +500,16 @@ class _VesselPlanningSavedSheetState extends State<VesselPlanningSavedSheet> {
                         child: Container(
                           padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                           decoration: BoxDecoration(
-                            color: Colors.red.withValues(alpha: 0.1),
+                            color: colour.commonColorred.withValues(alpha: 0.1),
                             borderRadius: BorderRadius.circular(20),
-                            border: Border.all(color: Colors.red.withValues(alpha: 0.3)),
+                            border: Border.all(color: colour.commonColorred.withValues(alpha: 0.3)),
                           ),
                           child: Row(
                             mainAxisSize: MainAxisSize.min,
                             children: [
-                              const Icon(Icons.picture_as_pdf_outlined, size: 14, color: Colors.red),
+                              const Icon(Icons.picture_as_pdf_outlined, size: 14, color: colour.commonColorred),
                               const SizedBox(width: 4),
-                              Text("PDF", style: AppTypography.badgeText(color: Colors.red, fontWeight: FontWeight.bold)),
+                              Text("PDF", style: AppTypography.badgeText(color: colour.commonColorred, fontWeight: FontWeight.bold)),
                             ],
                           ),
                         ),

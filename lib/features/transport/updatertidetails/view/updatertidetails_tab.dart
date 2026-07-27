@@ -1,3 +1,5 @@
+import 'package:maleva/core/theme/app_typography.dart';
+import 'package:maleva/core/colors/colors.dart' as colour;
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
@@ -21,8 +23,7 @@ import '../bloc/updatertidetails_bloc.dart';
 import '../bloc/updatertidetails_event.dart';
 import '../bloc/updatertidetails_state.dart';
 import 'package:maleva/core/models/shared/get_truck_model.dart';
-
-
+import 'package:maleva/core/theme/tokens.dart';
 
 const kGradient = LinearGradient(
   colors: [Palette.blue700, Palette.blue400],
@@ -57,8 +58,8 @@ class _UpdateRTIPage extends StatelessWidget {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text(state.message,
-                  style: GoogleFonts.lato(color: Colors.white)),
-              backgroundColor: const Color(0xFFB33040),
+                  style: AppTypography.bodyLarge(color: Colors.white)),
+              backgroundColor: AppTokens.appBarBg,
               behavior: SnackBarBehavior.floating,
               shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(10)),
@@ -80,7 +81,7 @@ class _UpdateRTIPage extends StatelessWidget {
           body: BlocBuilder<UpdateRTIBloc, UpdateRTIState>(
             builder: (context, state) {
               if (state is UpdateRTIInitial || state is UpdateRTILoading) {
-                return const Center(
+                return Center(
                   child: SpinKitFoldingCube(color: Palette.blue400, size: 35),
                 );
               }
@@ -117,7 +118,8 @@ class _UpdateRTIPage extends StatelessWidget {
           dest = const OperationAdminDashboard();
           break;
         case 'AIR FRIEGHT':
-          dest = const AirfreightDashboard(); // ← lowercase 'f', correct spelling
+          dest =
+              const AirfreightDashboard(); // ← lowercase 'f', correct spelling
           break;
         case 'BOARDING':
         case 'OPERATION':
@@ -131,8 +133,7 @@ class _UpdateRTIPage extends StatelessWidget {
           dest = const Homemobile();
       }
     }
-    Navigator.pushReplacement(
-        context, MaterialPageRoute(builder: (_) => dest));
+    Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => dest));
   }
 
   PreferredSizeWidget _buildAppBar(BuildContext context, String userName) {
@@ -141,7 +142,7 @@ class _UpdateRTIPage extends StatelessWidget {
       elevation: 0,
       toolbarHeight: 62,
       flexibleSpace:
-      Container(decoration: const BoxDecoration(gradient: kGradient)),
+          Container(decoration: const BoxDecoration(gradient: kGradient)),
       leading: IconButton(
         icon: const Icon(Icons.arrow_back_ios_new_rounded, size: 20),
         color: Colors.white,
@@ -152,17 +153,10 @@ class _UpdateRTIPage extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text('Update RTI',
-              style: GoogleFonts.lato(
-                  color: Colors.white,
-                  fontWeight: FontWeight.w700,
-                  fontSize: 17,
-                  letterSpacing: 0.3)),
+              style: AppTypography.bodyLarge(
+                  color: Colors.white, fontWeight: FontWeight.bold)),
           const SizedBox(height: 2),
-          Text(userName,
-              style: GoogleFonts.lato(
-                  color: Colors.white.withValues(alpha: 0.65),
-                  fontWeight: FontWeight.w500,
-                  fontSize: 12)),
+          Text(userName, style: AppTypography.bodySmall(color: Colors.white)),
         ],
       ),
       iconTheme: const IconThemeData(color: Colors.white),
@@ -192,7 +186,7 @@ class _UpdateRTIBody extends StatelessWidget {
     return LayoutBuilder(
       builder: (context, constraints) {
         final isTablet = constraints.maxWidth > kTabletBreak;
-        final hPad     = isTablet ? constraints.maxWidth * 0.04 : 5.0;
+        final hPad = isTablet ? constraints.maxWidth * 0.04 : 5.0;
 
         return Column(
           children: [
@@ -200,13 +194,12 @@ class _UpdateRTIBody extends StatelessWidget {
             Container(
               decoration: const BoxDecoration(
                 gradient: LinearGradient(
-                  colors: [Palette.blue700, Color(0xFF2D56C8)],
+                  colors: [Palette.blue700, AppTokens.brandGradientEnd],
                   begin: Alignment.topCenter,
                   end: Alignment.bottomCenter,
                 ),
               ),
-              padding: EdgeInsets.symmetric(
-                  horizontal: hPad + 5, vertical: 6),
+              padding: EdgeInsets.symmetric(horizontal: hPad + 5, vertical: 6),
               child: _GridHeader(isTablet: isTablet),
             ),
 
@@ -215,10 +208,8 @@ class _UpdateRTIBody extends StatelessWidget {
               child: state.masterList.isEmpty
                   ? _EmptyState()
                   : isTablet
-                  ? _TabletRTIList(
-                  state: state, hPad: hPad)
-                  : _MobileRTIList(
-                  state: state, hPad: hPad),
+                      ? _TabletRTIList(state: state, hPad: hPad)
+                      : _MobileRTIList(state: state, hPad: hPad),
             ),
           ],
         );
@@ -234,19 +225,14 @@ class _GridHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final style = GoogleFonts.lato(
-      color: Colors.white.withValues(alpha: 0.85),
-      fontWeight: FontWeight.w600,
-      fontSize: isTablet ? 11 : 10,
-      letterSpacing: 0.5,
-    );
+    final style = AppTypography.bodySmall(color: Colors.white);
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
         Row(children: [
-          Expanded(flex: 2, child: Text('RTI NO',    style: style)),
-          Expanded(flex: 2, child: Text('RTI DATE',  style: style)),
-          Expanded(flex: 2, child: Text('AMOUNT',    style: style)),
+          Expanded(flex: 2, child: Text('RTI NO', style: style)),
+          Expanded(flex: 2, child: Text('RTI DATE', style: style)),
+          Expanded(flex: 2, child: Text('AMOUNT', style: style)),
         ]),
         const SizedBox(height: 3),
         Row(children: [
@@ -255,7 +241,7 @@ class _GridHeader extends StatelessWidget {
         const SizedBox(height: 3),
         Row(children: [
           Expanded(flex: 3, child: Text('TRUCK NAME', style: style)),
-          Expanded(flex: 3, child: Text('REMARKS',    style: style)),
+          Expanded(flex: 3, child: Text('REMARKS', style: style)),
         ]),
       ],
     );
@@ -274,10 +260,10 @@ class _MobileRTIList extends StatelessWidget {
       padding: EdgeInsets.fromLTRB(hPad, 6, hPad, 24),
       itemCount: state.masterList.length,
       itemBuilder: (ctx, i) => _RTICard(
-        item:          state.masterList[i],
-        index:         i,
-        state:         state,
-        isTablet:      false,
+        item: state.masterList[i],
+        index: i,
+        state: state,
+        isTablet: false,
       ),
     );
   }
@@ -295,10 +281,10 @@ class _TabletRTIList extends StatelessWidget {
       padding: EdgeInsets.fromLTRB(hPad, 6, hPad, 24),
       itemCount: state.masterList.length,
       itemBuilder: (ctx, i) => _RTICard(
-        item:          state.masterList[i],
-        index:         i,
-        state:         state,
-        isTablet:      true,
+        item: state.masterList[i],
+        index: i,
+        state: state,
+        isTablet: true,
       ),
     );
   }
@@ -307,9 +293,9 @@ class _TabletRTIList extends StatelessWidget {
 // ─── RTI Master Card ──────────────────────────────────────────────────────────
 class _RTICard extends StatelessWidget {
   final dynamic item; // RTIViewMasterModel
-  final int     index;
+  final int index;
   final UpdateRTILoaded state;
-  final bool    isTablet;
+  final bool isTablet;
 
   const _RTICard({
     required this.item,
@@ -321,22 +307,12 @@ class _RTICard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isExpanded = state.expandedIndex == index;
-    final valStyle   = GoogleFonts.lato(
-      color:      Palette.textDark2,
-      fontWeight: FontWeight.w600,
-      fontSize:   isTablet ? AppGlobals.FontCardText + 1 : AppGlobals.FontCardText,
-    );
-    final labelStyle = GoogleFonts.lato(
-      color:      Palette.kTextMuted,
-      fontWeight: FontWeight.w600,
-      fontSize:   isTablet ? 10 : 9,
-      letterSpacing: 0.4,
-    );
+    final valStyle = AppTypography.bodyLarge(color: Palette.textDark2);
+    final labelStyle = AppTypography.bodySmall(color: Palette.kTextMuted);
 
     // Filter details for this master item
-    final details = state.detailList
-        .where((d) => d.RTIMasterRefId == item.Id)
-        .toList();
+    final details =
+        state.detailList.where((d) => d.RTIMasterRefId == item.Id).toList();
 
     return Padding(
       padding: const EdgeInsets.only(bottom: 10),
@@ -361,8 +337,7 @@ class _RTICard extends StatelessWidget {
               // Top gradient accent
               Container(
                   height: 3,
-                  decoration:
-                  const BoxDecoration(gradient: kGradient)),
+                  decoration: const BoxDecoration(gradient: kGradient)),
 
               Padding(
                 padding: const EdgeInsets.fromLTRB(12, 10, 12, 0),
@@ -422,7 +397,8 @@ class _RTICard extends StatelessWidget {
                           child: _CardField(
                               label: 'REMARKS',
                               value: item.Remarks.toString(),
-                              valStyle: valStyle.copyWith(color: Palette.textMid),
+                              valStyle:
+                                  valStyle.copyWith(color: Palette.textMid),
                               labelStyle: labelStyle),
                         ),
                       ],
@@ -433,8 +409,8 @@ class _RTICard extends StatelessWidget {
 
               // Action chips row
               Padding(
-                padding: const EdgeInsets.symmetric(
-                    horizontal: 10, vertical: 8),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
                 child: Row(
                   children: [
                     _CardChip(
@@ -450,11 +426,9 @@ class _RTICard extends StatelessWidget {
                     _CardChip(
                       icon: Icons.picture_as_pdf_outlined,
                       label: 'PDF',
-                      onTap: () => context
-                          .read<UpdateRTIBloc>()
-                          .add(UpdateRTIShareRequested(
-                          id: item.Id,
-                          rtiNoDisplay: item.RTINoDisplay)),
+                      onTap: () => context.read<UpdateRTIBloc>().add(
+                          UpdateRTIShareRequested(
+                              id: item.Id, rtiNoDisplay: item.RTINoDisplay)),
                     ),
                   ],
                 ),
@@ -463,9 +437,9 @@ class _RTICard extends StatelessWidget {
               // Expanded details
               if (isExpanded)
                 _DetailsSection(
-                  details:  details,
+                  details: details,
                   masterId: item.Id,
-                  rtiNo:    item.RTINoDisplay,
+                  rtiNo: item.RTINoDisplay,
                   isTablet: isTablet,
                 ),
             ],
@@ -507,9 +481,9 @@ class _CardField extends StatelessWidget {
 // ─── Expanded Details Section ─────────────────────────────────────────────────
 class _DetailsSection extends StatelessWidget {
   final List<dynamic> details;
-  final int           masterId;
-  final String        rtiNo;
-  final bool          isTablet;
+  final int masterId;
+  final String rtiNo;
+  final bool isTablet;
 
   const _DetailsSection({
     required this.details,
@@ -520,28 +494,18 @@ class _DetailsSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final headerStyle = GoogleFonts.lato(
-      color: Colors.white.withValues(alpha: 0.85),
-      fontWeight: FontWeight.w600,
-      fontSize: isTablet ? 10 : 9,
-      letterSpacing: 0.5,
-    );
-    final rowStyle = GoogleFonts.lato(
-      color: Palette.textDark2,
-      fontWeight: FontWeight.w500,
-      fontSize: isTablet ? AppGlobals.FontCardText : AppGlobals.FontCardText - 1,
-    );
+    final headerStyle = AppTypography.bodySmall(color: Colors.white);
+    final rowStyle = AppTypography.bodyLarge(color: Palette.textDark2);
 
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
         // Detail header strip
         Container(
-          padding: const EdgeInsets.symmetric(
-              horizontal: 12, vertical: 6),
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
           decoration: const BoxDecoration(
             gradient: LinearGradient(
-              colors: [Palette.blue700, Color(0xFF2D56C8)],
+              colors: [Palette.blue700, AppTokens.brandGradientEnd],
               begin: Alignment.topCenter,
               end: Alignment.bottomCenter,
             ),
@@ -549,9 +513,9 @@ class _DetailsSection extends StatelessWidget {
           child: Column(
             children: [
               Row(children: [
-                Expanded(flex: 2, child: Text('JOB NO',   style: headerStyle)),
+                Expanded(flex: 2, child: Text('JOB NO', style: headerStyle)),
                 Expanded(flex: 2, child: Text('JOB DATE', style: headerStyle)),
-                Expanded(flex: 2, child: Text('SALARY',   style: headerStyle)),
+                Expanded(flex: 2, child: Text('SALARY', style: headerStyle)),
               ]),
               const SizedBox(height: 3),
               Row(children: [
@@ -571,96 +535,95 @@ class _DetailsSection extends StatelessWidget {
           height: isTablet ? 280 : 240,
           child: details.isEmpty
               ? Center(
-              child: Text('No Records',
-                  style: GoogleFonts.lato(
-                      color: Palette.kTextMuted, fontSize: 12)))
+                  child: Text('No Records',
+                      style:
+                          AppTypography.bodySmall(color: Palette.kTextMuted)))
               : ListView.builder(
-            padding: EdgeInsets.zero,
-            itemCount: details.length,
-            itemBuilder: (ctx, i) {
-              final d = details[i];
-              return InkWell(
-                onLongPress: () {
-                  final rtiDetails = [
-                    {
-                      'RtiId': d.RTIMasterRefId,
-                      'RTINo': rtiNo,
-                      'JobId': d.SaleOrderMasterRefId.toString(),
-                      'JobNo': d.JobNo.toString(),
-                    }
-                  ];
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-
-                        builder: (_) => RTIStatusPage(rtiDetails: rtiDetails)),
-                  );
-                },
-                child: Container(
-                  color: i % 2 == 0 ? Colors.white : Palette.grey200p,
-                  padding: const EdgeInsets.symmetric(
-                      horizontal: 12, vertical: 6),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(children: [
-                        Expanded(
-                          flex: 2,
-                          child: Text(
-                            '  ${d.JobNo}',
-                            style: rowStyle,
-                            overflow: TextOverflow.ellipsis,
-                          ),
+                  padding: EdgeInsets.zero,
+                  itemCount: details.length,
+                  itemBuilder: (ctx, i) {
+                    final d = details[i];
+                    return InkWell(
+                      onLongPress: () {
+                        final rtiDetails = [
+                          {
+                            'RtiId': d.RTIMasterRefId,
+                            'RTINo': rtiNo,
+                            'JobId': d.SaleOrderMasterRefId.toString(),
+                            'JobNo': d.JobNo.toString(),
+                          }
+                        ];
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (_) =>
+                                  RTIStatusPage(rtiDetails: rtiDetails)),
+                        );
+                      },
+                      child: Container(
+                        color: i % 2 == 0 ? Colors.white : Palette.grey200p,
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 12, vertical: 6),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(children: [
+                              Expanded(
+                                flex: 2,
+                                child: Text(
+                                  '  ${d.JobNo}',
+                                  style: rowStyle,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ),
+                              Expanded(
+                                flex: 2,
+                                child: Text(
+                                  d.JobDate.toString(),
+                                  style: rowStyle,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ),
+                              Expanded(
+                                flex: 2,
+                                child: Text(
+                                  d.Salary.toString(),
+                                  style: rowStyle,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ),
+                            ]),
+                            const SizedBox(height: 3),
+                            Text(
+                              '  ${d.CustomerName}',
+                              style: rowStyle.copyWith(color: Palette.textMid),
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                            const SizedBox(height: 3),
+                            Row(children: [
+                              Expanded(
+                                flex: 2,
+                                child: Text(
+                                  '  ${d.PPIC}',
+                                  style: rowStyle,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ),
+                              Expanded(
+                                flex: 2,
+                                child: Text(
+                                  d.DPIC.toString(),
+                                  style: rowStyle,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ),
+                            ]),
+                          ],
                         ),
-                        Expanded(
-                          flex: 2,
-                          child: Text(
-                            d.JobDate.toString(),
-                            style: rowStyle,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                        ),
-                        Expanded(
-                          flex: 2,
-                          child: Text(
-                            d.Salary.toString(),
-                            style: rowStyle,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                        ),
-                      ]),
-                      const SizedBox(height: 3),
-                      Text(
-                        '  ${d.CustomerName}',
-                        style:
-                        rowStyle.copyWith(color: Palette.textMid),
-                        overflow: TextOverflow.ellipsis,
                       ),
-                      const SizedBox(height: 3),
-                      Row(children: [
-                        Expanded(
-                          flex: 2,
-                          child: Text(
-                            '  ${d.PPIC}',
-                            style: rowStyle,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                        ),
-                        Expanded(
-                          flex: 2,
-                          child: Text(
-                            d.DPIC.toString(),
-                            style: rowStyle,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                        ),
-                      ]),
-                    ],
-                  ),
+                    );
+                  },
                 ),
-              );
-            },
-          ),
         ),
       ],
     );
@@ -683,7 +646,7 @@ class _FilterSheetState extends State<_FilterSheet> {
   @override
   void initState() {
     super.initState();
-    _local  = widget.current;
+    _local = widget.current;
     _rtiCtrl = TextEditingController(text: _local.rtiNo);
   }
 
@@ -693,8 +656,7 @@ class _FilterSheetState extends State<_FilterSheet> {
     super.dispose();
   }
 
-  void _emit(UpdateRTIEvent e) =>
-      context.read<UpdateRTIBloc>().add(e);
+  void _emit(UpdateRTIEvent e) => context.read<UpdateRTIBloc>().add(e);
 
   Future<void> _pickDate(bool isFrom) async {
     final picked = await showDatePicker(
@@ -734,8 +696,7 @@ class _FilterSheetState extends State<_FilterSheet> {
     return Container(
       decoration: const BoxDecoration(
         color: Colors.white,
-        borderRadius:
-        BorderRadius.vertical(top: Radius.circular(24)),
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
       ),
       padding: EdgeInsets.only(
         left: 16,
@@ -749,8 +710,7 @@ class _FilterSheetState extends State<_FilterSheet> {
           children: [
             Center(
               child: Container(
-                margin:
-                const EdgeInsets.only(top: 12, bottom: 18),
+                margin: const EdgeInsets.only(top: 12, bottom: 18),
                 width: 40,
                 height: 4,
                 decoration: BoxDecoration(
@@ -759,10 +719,8 @@ class _FilterSheetState extends State<_FilterSheet> {
               ),
             ),
             Text('Filter',
-                style: GoogleFonts.lato(
-                    color: Palette.blue700,
-                    fontWeight: FontWeight.w700,
-                    fontSize: isTablet ? 16 : 15)),
+                style: AppTypography.bodyLarge(
+                    color: Palette.blue700, fontWeight: FontWeight.bold)),
             const SizedBox(height: 16),
 
             // Date row
@@ -793,31 +751,27 @@ class _FilterSheetState extends State<_FilterSheet> {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                        builder: (_) => const Driver(
-                            Searchby: 1, SearchId: 0)),
+                        builder: (_) => const Driver(Searchby: 1, SearchId: 0)),
                   ).then((_) {
                     final sel = AppGlobals.SelectDriverList;
                     if (sel.Id != 0) {
                       setState(() {
                         _local = _local.copyWith(
-                            driverId: sel.Id,
-                            driverName: sel.AccountName);
+                            driverId: sel.Id, driverName: sel.AccountName);
                       });
                       _emit(UpdateRTIDriverChanged(
-                          driverId: sel.Id,
-                          driverName: sel.AccountName));
+                          driverId: sel.Id, driverName: sel.AccountName));
                       AppGlobals.SelectDriverList = GetTruckModel.Empty();
                     }
                   });
                 },
                 onClear: () {
-                  setState(() => _local =
-                      _local.copyWith(driverId: 0, driverName: ''));
+                  setState(() =>
+                      _local = _local.copyWith(driverId: 0, driverName: ''));
                   _emit(UpdateRTIDriverCleared());
                 },
               ),
               const SizedBox(height: 10),
-
               _FilterSearchField(
                 hint: 'Select Truck',
                 value: _local.truckName,
@@ -826,26 +780,23 @@ class _FilterSheetState extends State<_FilterSheet> {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                        builder: (_) => const Truck(
-                            Searchby: 1, SearchId: 0)),
+                        builder: (_) => const Truck(Searchby: 1, SearchId: 0)),
                   ).then((_) {
                     final sel = AppGlobals.SelectTruckList;
                     if (sel.Id != 0) {
                       setState(() {
                         _local = _local.copyWith(
-                            truckId: sel.Id,
-                            truckName: sel.AccountName);
+                            truckId: sel.Id, truckName: sel.AccountName);
                       });
                       _emit(UpdateRTITruckChanged(
-                          truckId: sel.Id,
-                          truckName: sel.AccountName));
+                          truckId: sel.Id, truckName: sel.AccountName));
                       AppGlobals.SelectTruckList = GetTruckModel.Empty();
                     }
                   });
                 },
                 onClear: () {
-                  setState(() => _local =
-                      _local.copyWith(truckId: 0, truckName: ''));
+                  setState(() =>
+                      _local = _local.copyWith(truckId: 0, truckName: ''));
                   _emit(UpdateRTITruckCleared());
                 },
               ),
@@ -857,29 +808,25 @@ class _FilterSheetState extends State<_FilterSheet> {
               controller: _rtiCtrl,
               textCapitalization: TextCapitalization.characters,
               textInputAction: TextInputAction.done,
-              style: GoogleFonts.lato(
-                  color: Palette.textDark2,
-                  fontWeight: FontWeight.w600,
-                  fontSize: isTablet ? AppGlobals.FontLow + 1 : AppGlobals.FontLow),
+              style: AppTypography.bodySmall(color: Palette.textDark2),
               decoration: InputDecoration(
                 hintText: 'RTI No',
-                hintStyle: GoogleFonts.lato(
-                    color: Palette.kTextMuted, fontSize: AppGlobals.FontLow),
+                hintStyle: AppTypography.bodySmall(color: Palette.kTextMuted),
                 filled: true,
                 fillColor: Palette.grey200p,
-                contentPadding: const EdgeInsets.symmetric(
-                    horizontal: 14, vertical: 13),
+                contentPadding:
+                    const EdgeInsets.symmetric(horizontal: 14, vertical: 13),
                 border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(10),
                     borderSide: BorderSide.none),
                 enabledBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(10),
-                    borderSide:
-                    const BorderSide(color: Palette.cardBorder, width: 0.5)),
+                    borderSide: const BorderSide(
+                        color: Palette.cardBorder, width: 0.5)),
                 focusedBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(10),
-                    borderSide: const BorderSide(
-                        color: Palette.blue400, width: 1.5)),
+                    borderSide:
+                        const BorderSide(color: Palette.blue400, width: 1.5)),
               ),
               onChanged: (v) {
                 setState(() => _local = _local.copyWith(rtiNo: v));
@@ -930,13 +877,11 @@ class _EmptyState extends StatelessWidget {
           ),
           const SizedBox(height: 14),
           Text('No Records Found',
-              style: GoogleFonts.lato(
-                  color: Palette.textDark2,
-                  fontWeight: FontWeight.w600,
-                  fontSize: 15)),
+              style: AppTypography.bodyLarge(
+                  color: Palette.textDark2, fontWeight: FontWeight.bold)),
           const SizedBox(height: 4),
           Text('Use the filter to load RTI records',
-              style: GoogleFonts.lato(color: Palette.kTextMuted, fontSize: 12)),
+              style: AppTypography.bodySmall(color: Palette.kTextMuted)),
         ],
       ),
     );
@@ -979,7 +924,7 @@ class _RTIFab extends StatelessWidget {
 // ─── Shared Reusable Widgets ──────────────────────────────────────────────────
 class _CardChip extends StatelessWidget {
   final IconData icon;
-  final String   label;
+  final String label;
   final VoidCallback onTap;
 
   const _CardChip(
@@ -991,8 +936,7 @@ class _CardChip extends StatelessWidget {
       onTap: onTap,
       borderRadius: BorderRadius.circular(20),
       child: Container(
-        padding:
-        const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
         decoration: BoxDecoration(
           color: Palette.chipBg,
           borderRadius: BorderRadius.circular(20),
@@ -1003,11 +947,7 @@ class _CardChip extends StatelessWidget {
           children: [
             Icon(icon, size: 14, color: Palette.blue700),
             const SizedBox(width: 4),
-            Text(label,
-                style: GoogleFonts.lato(
-                    color: Palette.blue700,
-                    fontWeight: FontWeight.w600,
-                    fontSize: 11)),
+            Text(label, style: AppTypography.bodySmall(color: Palette.blue700)),
           ],
         ),
       ),
@@ -1016,8 +956,8 @@ class _CardChip extends StatelessWidget {
 }
 
 class _SheetDateTile extends StatelessWidget {
-  final String   label;
-  final String   date;
+  final String label;
+  final String date;
   final VoidCallback onTap;
 
   const _SheetDateTile(
@@ -1030,45 +970,31 @@ class _SheetDateTile extends StatelessWidget {
       onTap: onTap,
       borderRadius: BorderRadius.circular(10),
       child: Container(
-        padding: const EdgeInsets.symmetric(
-            horizontal: 12, vertical: 10),
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
         decoration: BoxDecoration(
           color: Palette.grey200p,
           borderRadius: BorderRadius.circular(10),
           border: Border.all(color: Palette.cardBorder, width: 0.5),
         ),
-        child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(label.toUpperCase(),
-                  style: GoogleFonts.lato(
-                      color: Palette.kTextMuted,
-                      fontWeight: FontWeight.w700,
-                      fontSize: 9,
-                      letterSpacing: 0.6)),
-              const SizedBox(height: 4),
-              Row(
-                  mainAxisAlignment:
-                  MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(d,
-                        style: GoogleFonts.lato(
-                            color: Palette.textDark2,
-                            fontWeight: FontWeight.w700,
-                            fontSize: 13)),
-                    const Icon(Icons.calendar_month_outlined,
-                        size: 18, color: Palette.blue400),
-                  ]),
-            ]),
+        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          Text(label.toUpperCase(),
+              style: AppTypography.bodySmall(color: Palette.kTextMuted)),
+          const SizedBox(height: 4),
+          Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
+            Text(d, style: AppTypography.bodyLarge(color: Palette.textDark2)),
+            const Icon(Icons.calendar_month_outlined,
+                size: 18, color: Palette.blue400),
+          ]),
+        ]),
       ),
     );
   }
 }
 
 class _FilterSearchField extends StatelessWidget {
-  final String   hint;
-  final String   value;
-  final bool     isTablet;
+  final String hint;
+  final String value;
+  final bool isTablet;
   final VoidCallback onSearch;
   final VoidCallback onClear;
 
@@ -1086,8 +1012,7 @@ class _FilterSearchField extends StatelessWidget {
       onTap: value.isEmpty ? onSearch : onClear,
       borderRadius: BorderRadius.circular(10),
       child: Container(
-        padding: const EdgeInsets.symmetric(
-            horizontal: 14, vertical: 13),
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 13),
         decoration: BoxDecoration(
           color: Palette.grey200p,
           borderRadius: BorderRadius.circular(10),
@@ -1098,22 +1023,14 @@ class _FilterSearchField extends StatelessWidget {
             Expanded(
               child: Text(
                 value.isEmpty ? hint : value,
-                style: GoogleFonts.lato(
-                  color: value.isEmpty ? Palette.kTextMuted : Palette.textDark2,
-                  fontWeight: value.isEmpty
-                      ? FontWeight.w500
-                      : FontWeight.w600,
-                  fontSize: isTablet
-                      ? AppGlobals.FontLow + 1
-                      : AppGlobals.FontLow,
-                ),
+                style: AppTypography.bodySmall(
+                    color:
+                        value.isEmpty ? Palette.kTextMuted : Palette.textDark2),
                 overflow: TextOverflow.ellipsis,
               ),
             ),
             Icon(
-              value.isNotEmpty
-                  ? Icons.close_rounded
-                  : Icons.search_rounded,
+              value.isNotEmpty ? Icons.close_rounded : Icons.search_rounded,
               size: 20,
               color: Palette.blue400,
             ),
@@ -1127,8 +1044,7 @@ class _FilterSearchField extends StatelessWidget {
 class _GradientButton extends StatelessWidget {
   final String label;
   final VoidCallback onPressed;
-  const _GradientButton(
-      {required this.label, required this.onPressed});
+  const _GradientButton({required this.label, required this.onPressed});
 
   @override
   Widget build(BuildContext context) {
@@ -1149,13 +1065,10 @@ class _GradientButton extends StatelessWidget {
           onTap: onPressed,
           borderRadius: BorderRadius.circular(24),
           child: Padding(
-            padding: const EdgeInsets.symmetric(
-                horizontal: 28, vertical: 11),
+            padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 11),
             child: Text(label,
-                style: GoogleFonts.lato(
-                    color: Colors.white,
-                    fontWeight: FontWeight.w700,
-                    fontSize: AppGlobals.FontMedium)),
+                style: AppTypography.bodyLarge(
+                    color: Colors.white, fontWeight: FontWeight.bold)),
           ),
         ),
       ),
@@ -1166,8 +1079,7 @@ class _GradientButton extends StatelessWidget {
 class _OutlineButton extends StatelessWidget {
   final String label;
   final VoidCallback onPressed;
-  const _OutlineButton(
-      {required this.label, required this.onPressed});
+  const _OutlineButton({required this.label, required this.onPressed});
 
   @override
   Widget build(BuildContext context) {
@@ -1183,13 +1095,10 @@ class _OutlineButton extends StatelessWidget {
           onTap: onPressed,
           borderRadius: BorderRadius.circular(24),
           child: Padding(
-            padding: const EdgeInsets.symmetric(
-                horizontal: 28, vertical: 11),
+            padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 11),
             child: Text(label,
-                style: GoogleFonts.lato(
-                    color: Palette.blue700,
-                    fontWeight: FontWeight.w700,
-                    fontSize: AppGlobals.FontMedium)),
+                style: AppTypography.bodyLarge(
+                    color: Palette.blue700, fontWeight: FontWeight.bold)),
           ),
         ),
       ),

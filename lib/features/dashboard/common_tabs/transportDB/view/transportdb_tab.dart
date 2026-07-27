@@ -1,5 +1,6 @@
+import 'package:maleva/core/network/legacy_api_repository.dart';
+import 'package:maleva/core/di/injection.dart';
 import 'package:maleva/core/theme/app_typography.dart';
-import 'package:maleva/core/network/api_legacy_helper.dart';
 import 'package:maleva/core/network/api_constants.dart';
 import 'dart:io';
 import 'package:flutter/material.dart';
@@ -10,7 +11,7 @@ import 'package:intl/intl.dart';
 import 'package:maleva/core/utils/app_globals.dart';
 import 'package:maleva/core/colors/colors.dart' as colour;
 import 'package:maleva/menu/menulist.dart';
-import 'package:maleva/core/network/OnlineApi.dart' as OnlineApi;
+
 import '../../../../../core/di/injection.dart';
 import '../../../../transaction/enquirytrmaster/add/view/enquirytradd_tab.dart';
 import '../../saleorderadd/view/saleorderadd_tab.dart';
@@ -20,6 +21,7 @@ import '../bloc/transportdb_event.dart';
 import '../bloc/transportdb_state.dart';
 import 'package:maleva/core/models/shared/review.dart';
 import 'package:maleva/core/models/shared/employee_model.dart';
+import 'package:maleva/core/utils/auth_helper.dart';
 
 
 
@@ -172,17 +174,13 @@ class _TransportDashboardViewState extends State<_TransportDashboardView>
     return AppBar(
       title: Text(
         'Dash Board',
-        style: GoogleFonts.lato(
-          color: colour.topAppBarColor,
-          fontWeight: FontWeight.bold,
-          fontSize: titleSize,
-        ),
+        style: AppTypography.bodyLarge(color: colour.topAppBarColor),
       ),
       iconTheme: const IconThemeData(color: colour.topAppBarColor),
       actions: [
         IconButton(
           icon: const Icon(Icons.exit_to_app, size: 30, color: colour.topAppBarColor),
-          onPressed: () => ApiLegacyHelper.logout(context),
+          onPressed: () => AuthHelper.logout(context),
         ),
       ],
       bottom: TabBar(
@@ -234,7 +232,7 @@ class _SalesTab extends StatelessWidget {
                         .any((e) => e['Id'].toString() == state.dropdownValueEmp)
                         ? state.dropdownValueEmp
                         : null,
-                    hint: const Text('Select Employee'),
+                    hint: Text('Select Employee'),
                     onChanged: (value) {
                       bloc.add(EmployeeFilterChanged(
                         dropdownValueEmp: value,
@@ -328,11 +326,7 @@ class _SalesTab extends StatelessWidget {
     padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 5),
     child: Text(
       text,
-      style: GoogleFonts.lato(
-        color: colour.commonColor,
-        fontWeight: FontWeight.bold,
-        fontSize: isTablet ? AppGlobals.FontLow : AppGlobals.FontLow - 2,
-      ),
+      style: AppTypography.bodySmall(color: colour.commonColor),
     ),
   );
 
@@ -340,11 +334,7 @@ class _SalesTab extends StatelessWidget {
     padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 5),
     child: Text(
       text,
-      style: GoogleFonts.lato(
-        color: colour.commonColorhighlight,
-        fontWeight: FontWeight.bold,
-        fontSize: isTablet ? AppGlobals.FontLow : AppGlobals.FontLow - 2,
-      ),
+      style: AppTypography.bodySmall(color: colour.commonColorhighlight),
     ),
   );
 
@@ -355,11 +345,7 @@ class _SalesTab extends StatelessWidget {
       textAlign: TextAlign.center,
       overflow: TextOverflow.ellipsis,
       maxLines: 1,
-      style: GoogleFonts.lato(
-        color: colour.commonColor,
-        fontWeight: FontWeight.bold,
-        fontSize: isTablet ? AppGlobals.FontCardText + 2 : AppGlobals.FontCardText,
-      ),
+      style: AppTypography.bodyLarge(color: colour.commonColor),
     ),
   );
 }
@@ -388,11 +374,7 @@ class _TransportTab extends StatelessWidget {
               Center(
                 child: Text(
                   'TRANSPORT REPORT',
-                  style: GoogleFonts.lato(
-                    color: colour.commonColorred,
-                    fontWeight: FontWeight.bold,
-                    fontSize: isTablet ? AppGlobals.FontLarge + 4 : AppGlobals.FontLarge,
-                  ),
+                  style: AppTypography.heading1(color: colour.commonColorred),
                 ),
               ),
               const SizedBox(height: 8),
@@ -432,7 +414,7 @@ class _TransportTab extends StatelessWidget {
                       child: InkWell(
                         onTap: () => _showDetailsDialog(context, item),
                         onLongPress: () async {
-                          await OnlineApi.EditSalesOrder(
+                          await sl<LegacyApiRepository>().EditSalesOrder(
                                item['Id'], 0); if (!context.mounted) return;Navigator.push(
                             context,
                             MaterialPageRoute(
@@ -493,11 +475,7 @@ class _TransportTab extends StatelessWidget {
       onPressed: onPressed,
       child: Text(
         label,
-        style: GoogleFonts.lato(
-          fontSize: isTablet ? AppGlobals.FontMedium + 2 : AppGlobals.FontMedium,
-          fontWeight: FontWeight.bold,
-          color: colour.commonColor,
-        ),
+        style: AppTypography.heading2(color: colour.commonColor),
       ),
     );
   }
@@ -509,11 +487,7 @@ class _TransportTab extends StatelessWidget {
       textAlign: align,
       overflow: TextOverflow.ellipsis,
       maxLines: 1,
-      style: GoogleFonts.lato(
-        color: colour.commonColor,
-        fontWeight: FontWeight.bold,
-        fontSize: isTablet ? AppGlobals.FontCardText + 2 : AppGlobals.FontCardText,
-      ),
+      style: AppTypography.bodyLarge(color: colour.commonColor),
     ),
   );
 
@@ -533,9 +507,7 @@ class _TransportTab extends StatelessWidget {
               children: [
                 Center(
                   child: Text('DETAILS',
-                      style: GoogleFonts.lato(
-                          fontWeight: FontWeight.bold,
-                          color: colour.commonColorred)),
+                      style: AppTypography.heading2(color: colour.commonColorred)),
                 ),
                 const SizedBox(height: 15),
                 ...[
@@ -553,9 +525,7 @@ class _TransportTab extends StatelessWidget {
                 ].map((t) => Padding(
                   padding: const EdgeInsets.only(bottom: 4),
                   child: Text(t,
-                      style: GoogleFonts.lato(
-                          fontWeight: FontWeight.bold,
-                          color: colour.commonColor)),
+                      style: AppTypography.heading2(color: colour.commonColor)),
                 )),
               ],
             ),
@@ -579,7 +549,7 @@ class _EnquiryTab extends StatelessWidget {
     DateFormat('yyyy-MM-dd').format(DateTime.parse(item['ForwardingDate']));
     if (notifyDate == nowStr ||
         DateTime.parse(item['ForwardingDate']).isBefore(now)) {
-      return Colors.redAccent.withValues(alpha: 0.3);
+      return colour.commonColorred.withValues(alpha: 0.3);
     } else if (notifyDate == tomorrowStr) {
       return Colors.yellowAccent.withValues(alpha: 0.3);
     }
@@ -631,22 +601,12 @@ class _EnquiryTab extends StatelessWidget {
                     Expanded(
                       flex: 2,
                       child: Text('Customer Name',
-                          style: GoogleFonts.lato(
-                              color: colour.ButtonForeColor,
-                              fontWeight: FontWeight.bold,
-                              fontSize: isTablet
-                                  ? AppGlobals.FontLow + 2
-                                  : AppGlobals.FontLow)),
+                          style: AppTypography.bodySmall(color: colour.ButtonForeColor)),
                     ),
                     Expanded(
                       flex: 2,
                       child: Text('Notify Date',
-                          style: GoogleFonts.lato(
-                              color: colour.ButtonForeColor,
-                              fontWeight: FontWeight.bold,
-                              fontSize: isTablet
-                                  ? AppGlobals.FontLow + 2
-                                  : AppGlobals.FontLow)),
+                          style: AppTypography.bodySmall(color: colour.ButtonForeColor)),
                     ),
                   ],
                 ),
@@ -655,7 +615,7 @@ class _EnquiryTab extends StatelessWidget {
               // List
               Expanded(
                 child: state.enquiryMasterList.isEmpty
-                    ? const Center(child: Text('No Record'))
+                    ? Center(child: Text('No Record'))
                     : ListView.builder(
                   itemCount: state.enquiryMasterList.length,
                   itemBuilder: (context, index) {
@@ -696,13 +656,7 @@ class _EnquiryTab extends StatelessWidget {
                                         '   ${item["CustomerName"]}',
                                         overflow: TextOverflow.ellipsis,
                                         maxLines: 1,
-                                        style: GoogleFonts.lato(
-                                          color: colour.commonColor,
-                                          fontWeight: FontWeight.bold,
-                                          fontSize: isTablet
-                                              ? AppGlobals.FontCardText + 2
-                                              : AppGlobals.FontCardText,
-                                        ),
+                                        style: AppTypography.bodyLarge(color: colour.commonColor),
                                       ),
                                     ),
                                   ),
@@ -714,13 +668,7 @@ class _EnquiryTab extends StatelessWidget {
                                         '   ${item["SForwardingDate"]}',
                                         overflow: TextOverflow.ellipsis,
                                         maxLines: 1,
-                                        style: GoogleFonts.lato(
-                                          color: colour.commonColor,
-                                          fontWeight: FontWeight.bold,
-                                          fontSize: isTablet
-                                              ? AppGlobals.FontCardText + 2
-                                              : AppGlobals.FontCardText,
-                                        ),
+                                        style: AppTypography.bodyLarge(color: colour.commonColor),
                                       ),
                                     ),
                                   ),
@@ -821,9 +769,7 @@ Navigator.push(
               children: [
                 Center(
                   child: Text('DETAILS',
-                      style: GoogleFonts.lato(
-                          fontWeight: FontWeight.bold,
-                          color: colour.commonColorred)),
+                      style: AppTypography.heading2(color: colour.commonColorred)),
                 ),
                 const SizedBox(height: 15),
                 ...[
@@ -839,9 +785,7 @@ Navigator.push(
                 ].map((t) => Padding(
                   padding: const EdgeInsets.only(bottom: 4),
                   child: Text(t,
-                      style: GoogleFonts.lato(
-                          fontWeight: FontWeight.bold,
-                          color: colour.commonColor)),
+                      style: AppTypography.heading2(color: colour.commonColor)),
                 )),
               ],
             ),
@@ -982,8 +926,8 @@ class _EmailInboxTab extends StatelessWidget {
                       width: 16,
                       height: 16,
                       child: CircularProgressIndicator(strokeWidth: 2))
-                      : const Icon(Icons.save),
-                  label: const Text('Save Emails'),
+                      : Icon(Icons.save),
+                  label: Text('Save Emails'),
                   onPressed: state.isSavingEmails
                       ? null
                       : () async {
@@ -1172,7 +1116,7 @@ class _GoogleReviewTab extends StatelessWidget {
                                 height: 16,
                                 child: CircularProgressIndicator(
                                     strokeWidth: 2))
-                                : const Text('Save'),
+                                : Text('Save'),
                           ),
                         ),
                         const SizedBox(width: 10),
@@ -1189,7 +1133,7 @@ class _GoogleReviewTab extends StatelessWidget {
                                 bloc.add(const LoadEmployeesRequested());
                               }
                             },
-                            child: const Text('View'),
+                            child: Text('View'),
                           ),
                         ),
                       ],
@@ -1245,7 +1189,7 @@ class _PDOTab extends StatelessWidget {
 
               Expanded(
                 child: state.status == TransportDashboardStatus.loading
-                    ? const Center(child: CircularProgressIndicator())
+                    ? Center(child: CircularProgressIndicator())
                     : ListView.builder(
                   itemCount: state.filteredRTIMasterList.length,
                   itemBuilder: (context, index) {
@@ -1271,19 +1215,14 @@ class _PDOTab extends StatelessWidget {
                               MainAxisAlignment.spaceBetween,
                               children: [
                                 Text(m.RTINoDisplay,
-                                    style: const TextStyle(
-                                        fontWeight: FontWeight.bold)),
+                                    style: AppTypography.heading2()),
                                 Text('RM${m.Amount}',
-                                    style: const TextStyle(
-                                        color: Colors.green,
-                                        fontWeight: FontWeight.bold)),
+                                    style: AppTypography.heading2()),
                               ],
                             ),
                             const SizedBox(height: 4),
                             Text(m.RTIDate,
-                                style: const TextStyle(
-                                    fontSize: 12,
-                                    color: Colors.grey)),
+                                style: AppTypography.bodySmall()),
                           ],
                         ),
                         children: [
@@ -1320,9 +1259,7 @@ class _PDOTab extends StatelessWidget {
                               CrossAxisAlignment.start,
                               children: [
                                 Text(d.JobNo,
-                                    style: const TextStyle(
-                                        fontWeight:
-                                        FontWeight.bold)),
+                                    style: AppTypography.heading2()),
                                 const SizedBox(height: 6),
                                 _infoRow('Customer', d.CustomerName),
                                 Checkbox(
@@ -1345,7 +1282,7 @@ class _PDOTab extends StatelessWidget {
                                       icon: const Icon(
                                           Icons.camera_alt),
                                       label:
-                                      const Text('Camera'),
+                                      Text('Camera'),
                                     ),
                                     ElevatedButton.icon(
                                       onPressed: () => bloc.add(
@@ -1354,7 +1291,7 @@ class _PDOTab extends StatelessWidget {
                                               fromCamera: false)),
                                       icon: const Icon(
                                           Icons.photo_library),
-                                      label: const Text('Gallery'),
+                                      label: Text('Gallery'),
                                     ),
                                     _buildImageWidget(
                                         d.imagePath, context),
@@ -1373,7 +1310,7 @@ class _PDOTab extends StatelessWidget {
                                       child:
                                       CircularProgressIndicator(
                                           strokeWidth: 2))
-                                      : const Text('Save'),
+                                      : Text('Save'),
                                 ),
                               ],
                             ),
@@ -1399,15 +1336,12 @@ class _PDOTab extends StatelessWidget {
         SizedBox(
           width: 90,
           child: Text('$label :',
-              style: const TextStyle(
-                  fontSize: 12,
-                  fontWeight: FontWeight.w600,
-                  color: Colors.black87)),
+              style: AppTypography.bodySmall()),
         ),
         Expanded(
           child: Text(
             value.isEmpty ? '-' : value,
-            style: const TextStyle(fontSize: 12, color: Colors.black54),
+            style: AppTypography.bodySmall(),
           ),
         ),
       ],
@@ -1421,16 +1355,16 @@ class _PDOTab extends StatelessWidget {
     if (path.startsWith('http')) {
       imageWidget = Image.network(path, fit: BoxFit.contain,
           errorBuilder: (_, __, ___) =>
-          const Icon(Icons.broken_image, color: Colors.red));
+          const Icon(Icons.broken_image, color: colour.commonColorred));
     } else if (path.startsWith('/data/')) {
       imageWidget = Image.file(File(path), fit: BoxFit.contain,
           errorBuilder: (_, __, ___) =>
-          const Icon(Icons.broken_image, color: Colors.red));
+          const Icon(Icons.broken_image, color: colour.commonColorred));
     } else if (path.startsWith('/')) {
       final fullUrl = ApiConstants.port + path;
       imageWidget = Image.network(fullUrl, fit: BoxFit.contain,
           errorBuilder: (_, __, ___) =>
-          const Icon(Icons.broken_image, color: Colors.red));
+          const Icon(Icons.broken_image, color: colour.commonColorred));
     } else {
       return const SizedBox.shrink();
     }

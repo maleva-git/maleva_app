@@ -1,3 +1,5 @@
+import 'package:maleva/core/network/legacy_api_repository.dart';
+import 'package:maleva/core/di/injection.dart';
 import 'package:maleva/core/theme/app_typography.dart';
 // ui/add_enquiry_screen.dart
 
@@ -9,7 +11,7 @@ import 'package:intl/intl.dart';
 import 'package:maleva/core/colors/colors.dart' as colors;
 import 'package:maleva/core/theme/palette.dart';
 import 'package:maleva/core/utils/app_globals.dart';
-import 'package:maleva/core/network/OnlineApi.dart' as OnlineApi;
+
 import 'package:maleva/menu/menulist.dart';
 import '../../../../../mastersearch/Customer.dart';
 import '../../../../../mastersearch/JobType.dart';
@@ -77,7 +79,7 @@ class _AddEnquiryViewState extends State<_AddEnquiryView> {
             state.errorMessage!,
             '',
             Colors.white,
-            Colors.red,
+            colors.commonColorred,
             null,
             18.00 - AppGlobals.reducesize,
             AppGlobals.tll,
@@ -149,7 +151,7 @@ class _AddEnquiryViewState extends State<_AddEnquiryView> {
             ),
             drawer: const Menulist(),
             body: state.status == AddEnquiryStatus.loading
-                ? const Center(
+                ? Center(
               child: SpinKitFoldingCube(
                 color: Palette.blue700,
                 size: 35.0,
@@ -179,7 +181,7 @@ if (navResult1 != null) { AppGlobals.SelectCustomerList = navResult1; }
                             bloc.add(CustomerSelectedEvent(cust.AccountName, cust.Id));
                             AppGlobals.SelectCustomerList = CustomerModel.Empty();
                             if (!context.mounted) return;
-                            await OnlineApi.loadCustomerCurrency(context, cust.Id); if (!context.mounted) return;} else {
+                            await sl<LegacyApiRepository>().loadCustomerCurrency(context, cust.Id); if (!context.mounted) return;} else {
                             bloc.add(CustomerClearedEvent());
                           }
                         },
@@ -198,7 +200,7 @@ if (navResult2 != null) { AppGlobals.SelectJobTypeList = navResult2; }
 
                             final jt = AppGlobals.SelectJobTypeList;
                             if (!context.mounted) return;
-                            await OnlineApi.SelectAllJobStatus(context, jt.Id); if (!context.mounted) return;bloc.add(JobTypeSelectedEvent(jt.Name, jt.Id));
+                            await sl<LegacyApiRepository>().SelectAllJobStatus(context, jt.Id); if (!context.mounted) return;bloc.add(JobTypeSelectedEvent(jt.Name, jt.Id));
                             AppGlobals.SelectJobTypeList = JobTypeModel.Empty();
                           } else {
                             bloc.add(JobTypeClearedEvent());
@@ -308,7 +310,7 @@ if (navResult3 != null) { AppGlobals.SelectedPortName = navResult3; }
                           }
                         },
                       ),
-                      const Padding(
+                      Padding(
                         padding: EdgeInsets.symmetric(vertical: 16.0),
                         child: Divider(color: Palette.grey200, thickness: 1.5),
                       ),

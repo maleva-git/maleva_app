@@ -1,3 +1,4 @@
+import 'package:maleva/core/colors/colors.dart' as colour;
 import 'package:maleva/core/theme/app_typography.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -126,23 +127,10 @@ class _SaleOrderDetailsViewState extends State<_SaleOrderDetailsView>
       keyboardType: multiLine ? TextInputType.multiline : keyboardType,
       textCapitalization: TextCapitalization.characters,
       textInputAction: multiLine ? TextInputAction.newline : TextInputAction.done,
-      style: GoogleFonts.lato(
-        textStyle: TextStyle(
-          color: _kPrimary,
-          fontWeight: FontWeight.bold,
-          fontSize: _fontLow,
-          letterSpacing: 0.3,
-        ),
-      ),
+      style: AppTypography.bodyLarge(color: _kPrimary),
       decoration: InputDecoration(
         hintText: hint,
-        hintStyle: GoogleFonts.lato(
-          textStyle: TextStyle(
-            fontSize: _fontMedium,
-            fontWeight: FontWeight.bold,
-            color: _kPrimaryLight,
-          ),
-        ),
+        hintStyle: AppTypography.bodyLarge(color: _kPrimaryLight),
         contentPadding:
         const EdgeInsets.only(left: 10, right: 20, top: 10),
         enabledBorder: OutlineInputBorder(
@@ -177,13 +165,7 @@ class _SaleOrderDetailsViewState extends State<_SaleOrderDetailsView>
           child: Text(
             label,
             textAlign: TextAlign.center,
-            style: GoogleFonts.lato(
-              textStyle: TextStyle(
-                fontSize: _fontMedium,
-                color: _kPrimary,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
+            style: AppTypography.bodyLarge(color: _kPrimary),
           ),
         ),
         const SizedBox(width: 5),
@@ -204,13 +186,7 @@ class _SaleOrderDetailsViewState extends State<_SaleOrderDetailsView>
                   flex: 4,
                   child: Text(
                     display,
-                    style: GoogleFonts.lato(
-                      textStyle: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: _fontMedium,
-                        color: textColor,
-                      ),
-                    ),
+                    style: AppTypography.bodyLarge(color: textColor),
                   ),
                 ),
                 Expanded(
@@ -261,27 +237,13 @@ class _SaleOrderDetailsViewState extends State<_SaleOrderDetailsView>
           isExpanded: true,
           value: value,
           onChanged: onChanged,
-          style: GoogleFonts.lato(
-            textStyle: TextStyle(
-              color: _kPrimary,
-              fontWeight: FontWeight.bold,
-              fontSize: _fontMedium,
-              letterSpacing: 0.3,
-            ),
-          ),
+          style: AppTypography.bodyLarge(color: _kPrimary),
           items: items
               .map((v) => DropdownMenuItem<String>(
             value: v,
             child: Text(
               v,
-              style: GoogleFonts.lato(
-                textStyle: TextStyle(
-                  color: _kPrimary,
-                  fontWeight: FontWeight.bold,
-                  fontSize: _fontMedium,
-                  letterSpacing: 0.3,
-                ),
-              ),
+              style: AppTypography.bodyLarge(color: _kPrimary),
             ),
           ))
               .toList(),
@@ -331,13 +293,7 @@ class _SaleOrderDetailsViewState extends State<_SaleOrderDetailsView>
               child: Text(
                 'FW $fwIndex',
                 textAlign: TextAlign.center,
-                style: GoogleFonts.lato(
-                  textStyle: TextStyle(
-                    fontSize: _fontMedium,
-                    fontWeight: FontWeight.bold,
-                    color: _kPrimary,
-                  ),
-                ),
+                style: AppTypography.bodyLarge(color: _kPrimary),
               ),
             ),
             Expanded(
@@ -393,13 +349,7 @@ class _SaleOrderDetailsViewState extends State<_SaleOrderDetailsView>
               flex: 1,
               child: Text(
                 'Job No :',
-                style: GoogleFonts.lato(
-                  textStyle: TextStyle(
-                    fontSize: _fontLow,
-                    fontWeight: FontWeight.bold,
-                    color: _kPrimary,
-                  ),
-                ),
+                style: AppTypography.bodyLarge(color: _kPrimary),
               ),
             ),
             Expanded(
@@ -418,13 +368,7 @@ class _SaleOrderDetailsViewState extends State<_SaleOrderDetailsView>
                     alignment: Alignment.centerLeft,
                     child: Text(
                       st.jobNo,
-                      style: GoogleFonts.lato(
-                        textStyle: TextStyle(
-                          color: _kPrimary,
-                          fontWeight: FontWeight.bold,
-                          fontSize: _fontLow - 2,
-                        ),
-                      ),
+                      style: AppTypography.bodyLarge(color: _kPrimary),
                     ),
                   ),
                 ),
@@ -451,13 +395,7 @@ class _SaleOrderDetailsViewState extends State<_SaleOrderDetailsView>
                             DateTime.parse(st.dtpSaleOrderDate))
                             : DateFormat("dd-MM-yyyy").format(
                             DateTime.parse(st.dtpSaleOrderDate)),
-                        style: GoogleFonts.lato(
-                          textStyle: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontSize: _fontLow,
-                            color: _kPrimary,
-                          ),
-                        ),
+                        style: AppTypography.bodyLarge(color: _kPrimary),
                       ),
                     ),
                     Expanded(
@@ -825,13 +763,7 @@ class _SaleOrderDetailsViewState extends State<_SaleOrderDetailsView>
                 child: Text(
                   'ZB 1',
                   textAlign: TextAlign.center,
-                  style: GoogleFonts.lato(
-                    textStyle: TextStyle(
-                      fontSize: _fontMedium,
-                      fontWeight: FontWeight.bold,
-                      color: _kPrimary,
-                    ),
-                  ),
+                  style: AppTypography.bodyLarge(color: _kPrimary),
                 ),
               ),
               Expanded(
@@ -855,13 +787,7 @@ class _SaleOrderDetailsViewState extends State<_SaleOrderDetailsView>
                 child: Text(
                   'ZB 2',
                   textAlign: TextAlign.center,
-                  style: GoogleFonts.lato(
-                    textStyle: TextStyle(
-                      fontSize: _fontMedium,
-                      fontWeight: FontWeight.bold,
-                      color: _kPrimary,
-                    ),
-                  ),
+                  style: AppTypography.bodyLarge(color: _kPrimary),
                 ),
               ),
               Expanded(
@@ -892,21 +818,10 @@ class _SaleOrderDetailsViewState extends State<_SaleOrderDetailsView>
             controller: TextEditingController(text: st.amount1),
             readOnly: st.disabledAmount1,
             showCursor: !st.disabledAmount1,
-            style: GoogleFonts.lato(
-              textStyle: TextStyle(
-                  color: _kPrimary,
-                  fontWeight: FontWeight.bold,
-                  fontSize: _fontLow,
-                  letterSpacing: 0.3),
-            ),
+            style: AppTypography.bodyLarge(color: _kPrimary),
             decoration: InputDecoration(
               hintText: 'Amount 1',
-              hintStyle: GoogleFonts.lato(
-                textStyle: TextStyle(
-                    fontSize: _fontMedium,
-                    fontWeight: FontWeight.bold,
-                    color: _kPrimaryLight),
-              ),
+              hintStyle: AppTypography.bodyLarge(color: _kPrimaryLight),
               contentPadding:
               const EdgeInsets.only(left: 10, right: 20, top: 10),
               enabledBorder: OutlineInputBorder(
@@ -937,21 +852,10 @@ class _SaleOrderDetailsViewState extends State<_SaleOrderDetailsView>
             controller: TextEditingController(text: st.amount2),
             readOnly: st.disabledAmount2,
             showCursor: !st.disabledAmount2,
-            style: GoogleFonts.lato(
-              textStyle: TextStyle(
-                  color: _kPrimary,
-                  fontWeight: FontWeight.bold,
-                  fontSize: _fontLow,
-                  letterSpacing: 0.3),
-            ),
+            style: AppTypography.bodyLarge(color: _kPrimary),
             decoration: InputDecoration(
               hintText: 'Amount 2',
-              hintStyle: GoogleFonts.lato(
-                textStyle: TextStyle(
-                    fontSize: _fontMedium,
-                    fontWeight: FontWeight.bold,
-                    color: _kPrimaryLight),
-              ),
+              hintStyle: AppTypography.bodyLarge(color: _kPrimaryLight),
               contentPadding:
               const EdgeInsets.only(left: 10, right: 20, top: 10),
               enabledBorder: OutlineInputBorder(
@@ -1016,19 +920,14 @@ class _SaleOrderDetailsViewState extends State<_SaleOrderDetailsView>
                       vertical: 8, horizontal: 12),
                   child: Text(
                     'PickUp Address List',
-                    style: GoogleFonts.lato(
-                      textStyle: TextStyle(
-                          color: _kWhite,
-                          fontWeight: FontWeight.bold,
-                          fontSize: _fontMedium),
-                    ),
+                    style: AppTypography.bodyLarge(color: _kWhite),
                   ),
                 ),
                 const SizedBox(height: 10),
                 // List
                 Expanded(
                   child: st.pickUpAddressList.isEmpty
-                      ? const Center(child: Text('No Record'))
+                      ? Center(child: Text('No Record'))
                       : ListView.builder(
                     itemCount: st.pickUpAddressList.length,
                     itemBuilder: (_, i) {
@@ -1062,13 +961,7 @@ class _SaleOrderDetailsViewState extends State<_SaleOrderDetailsView>
                             child: Text(
                               st.pickUpAddressList[i].toString(),
                               textAlign: TextAlign.justify,
-                              style: GoogleFonts.lato(
-                                textStyle: TextStyle(
-                                    color: _kPrimary,
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: _fontLow,
-                                    letterSpacing: 0.3),
-                              ),
+                              style: AppTypography.bodyLarge(color: _kPrimary),
                             ),
                           ),
                         ),
@@ -1122,18 +1015,13 @@ class _SaleOrderDetailsViewState extends State<_SaleOrderDetailsView>
                       vertical: 8, horizontal: 10),
                   child: Text(
                     'Delivery Address List',
-                    style: GoogleFonts.lato(
-                      textStyle: TextStyle(
-                          color: _kWhite,
-                          fontWeight: FontWeight.bold,
-                          fontSize: _fontMedium),
-                    ),
+                    style: AppTypography.bodyLarge(color: _kWhite),
                   ),
                 ),
                 const SizedBox(height: 10),
                 Expanded(
                   child: st.deliveryAddressList.isEmpty
-                      ? const Center(child: Text('No Record'))
+                      ? Center(child: Text('No Record'))
                       : ListView.builder(
                     itemCount: st.deliveryAddressList.length,
                     itemBuilder: (_, i) {
@@ -1167,13 +1055,7 @@ class _SaleOrderDetailsViewState extends State<_SaleOrderDetailsView>
                             child: Text(
                               st.deliveryAddressList[i].toString(),
                               textAlign: TextAlign.justify,
-                              style: GoogleFonts.lato(
-                                textStyle: TextStyle(
-                                    color: _kPrimary,
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: _fontLow,
-                                    letterSpacing: 0.3),
-                              ),
+                              style: AppTypography.bodyLarge(color: _kPrimary),
                             ),
                           ),
                         ),
@@ -1204,31 +1086,31 @@ class _SaleOrderDetailsViewState extends State<_SaleOrderDetailsView>
         items: [
           SalomonBottomBarItem(
             icon: Icon(Icons.info_outline, color: _kPrimary, size: iconSize),
-            title: const Text(''),
+            title: Text(''),
           ),
           SalomonBottomBarItem(
             icon: Icon(Icons.comment_outlined, color: _kPrimary, size: iconSize),
-            title: const Text(''),
+            title: Text(''),
           ),
           SalomonBottomBarItem(
             icon: Icon(Icons.directions_boat_filled,
                 color: _kPrimary, size: iconSize),
-            title: const Text(''),
+            title: Text(''),
           ),
           SalomonBottomBarItem(
             icon: Icon(Icons.directions_boat_filled_outlined,
                 color: _kPrimary, size: iconSize),
-            title: const Text(''),
+            title: Text(''),
           ),
           SalomonBottomBarItem(
             icon: Icon(Icons.rate_review_outlined,
                 color: _kPrimary, size: iconSize),
-            title: const Text(''),
+            title: Text(''),
           ),
           SalomonBottomBarItem(
             icon: Icon(Icons.local_shipping_sharp,
                 color: _kPrimary, size: iconSize),
-            title: const Text(''),
+            title: Text(''),
           ),
         ],
         currentIndex: st.currentTabIndex,
@@ -1270,7 +1152,7 @@ class _SaleOrderDetailsViewState extends State<_SaleOrderDetailsView>
             drawer: const Menulist(),
             body: st.status == SaleOrderStatus.loading ||
                 st.status == SaleOrderStatus.initial
-                ? const Center(
+                ? Center(
               child: SpinKitFoldingCube(
                 color: _kSpinKit,
                 size: 35,
@@ -1310,25 +1192,11 @@ class _SaleOrderDetailsViewState extends State<_SaleOrderDetailsView>
         children: [
           Text(
             'Sales Order',
-            style: GoogleFonts.lato(
-              textStyle: TextStyle(
-                color: _kWhite,
-                fontWeight: FontWeight.bold,
-                fontSize: isTablet ? AppGlobals.FontMedium : AppGlobals.FontLow,
-              ),
-            ),
+            style: AppTypography.heading2(color: _kWhite),
           ),
           Text(
             st.userName,
-            style: GoogleFonts.lato(
-              textStyle: TextStyle(
-                color: _kPrimaryLight,
-                fontWeight: FontWeight.bold,
-                fontSize: isTablet
-                    ? AppGlobals.FontLow - 2
-                    : AppGlobals.FontLow - 4,
-              ),
-            ),
+            style: AppTypography.bodySmall(color: _kPrimaryLight),
           ),
         ],
       ),

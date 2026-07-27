@@ -72,7 +72,7 @@ Navigator.pushReplacement(
             state.errorMessage!,
             '',
             Colors.white,
-            Colors.red,
+            colour.commonColorred,
             null,
             18.0 - AppGlobals.reducesize,
             AppGlobals.tll,
@@ -110,7 +110,7 @@ Navigator.pushReplacement(
             drawer: const Menulist(),
             appBar: _buildAppBar(context, state, bloc, userName, isTablet),
             body: state.status == RTIStatusStatus.loading
-                ? const Center(
+                ? Center(
               child: SpinKitFoldingCube(
                 color: colour.spinKitColor,
                 size: 35.0,
@@ -154,21 +154,13 @@ Navigator.pushReplacement(
             Expanded(
               child: Text(
                 'RTI Status',
-                style: GoogleFonts.lato(
-                  color: colour.topAppBarColor,
-                  fontWeight: FontWeight.bold,
-                  fontSize: titleFontSize,
-                ),
+                style: AppTypography.bodyLarge(color: colour.topAppBarColor),
               ),
             ),
             Expanded(
               child: Text(
                 userName,
-                style: GoogleFonts.lato(
-                  color: colour.commonColorLight,
-                  fontWeight: FontWeight.bold,
-                  fontSize: subFontSize,
-                ),
+                style: AppTypography.bodyLarge(color: colour.commonColorLight),
               ),
             ),
           ],
@@ -200,13 +192,7 @@ Navigator.pushReplacement(
               },
               child: Text(
                 'UPDATE',
-                style: GoogleFonts.lato(
-                  fontSize: isTablet
-                      ? AppGlobals.FontMedium.toDouble()
-                      : AppGlobals.FontMedium.toDouble(),
-                  fontWeight: FontWeight.bold,
-                  color: colour.commonColor,
-                ),
+                style: AppTypography.heading2(color: colour.commonColor),
               ),
             ),
           ),
@@ -274,25 +260,13 @@ Navigator.pushReplacement(
                           status: value));
                     }
                   },
-                  style: GoogleFonts.lato(
-                    color: colour.commonColor,
-                    fontWeight: FontWeight.bold,
-                    fontSize: isTablet
-                        ? AppGlobals.FontMedium.toDouble() + 2
-                        : AppGlobals.FontMedium.toDouble(),
-                  ),
+                  style: AppTypography.heading2(color: colour.commonColor),
                   items: _driverStatuses
                       .map((s) => DropdownMenuItem(
                     value: s,
                     child: Text(
                       s,
-                      style: GoogleFonts.lato(
-                        color: colour.commonColor,
-                        fontWeight: FontWeight.bold,
-                        fontSize: isTablet
-                            ? AppGlobals.FontMedium.toDouble() + 2
-                            : AppGlobals.FontMedium.toDouble(),
-                      ),
+                      style: AppTypography.heading2(color: colour.commonColor),
                     ),
                   ))
                       .toList(),
@@ -319,13 +293,7 @@ Navigator.pushReplacement(
               ),
               Text(
                 'Upload Image',
-                style: GoogleFonts.lato(
-                  color: colour.commonColor,
-                  fontWeight: FontWeight.bold,
-                  fontSize: isTablet
-                      ? AppGlobals.FontMedium.toDouble() + 2
-                      : AppGlobals.FontMedium.toDouble(),
-                ),
+                style: AppTypography.heading2(color: colour.commonColor),
               ),
               const Spacer(),
               // Gallery button
@@ -385,11 +353,7 @@ Navigator.pushReplacement(
                 ? Center(
               child: Text(
                 'No Image Selected.',
-                style: GoogleFonts.lato(
-                  color: colour.commonColorLight,
-                  fontWeight: FontWeight.bold,
-                  fontSize: AppGlobals.FontLow.toDouble(),
-                ),
+                style: AppTypography.bodySmall(color: colour.commonColorLight),
               ),
             )
                 : GridView.builder(
@@ -421,11 +385,11 @@ Navigator.pushReplacement(
                   child: CachedNetworkImage(
                     imageUrl: imageUrl,
                     fit: BoxFit.fill,
-                    placeholder: (_, __) => const Center(
+                    placeholder: (_, __) => Center(
                         child: CircularProgressIndicator()),
                     errorWidget: (_, __, ___) => const Icon(
                         Icons.broken_image,
-                        color: Colors.red),
+                        color: colour.commonColorred),
                   ),
                 );
               },
@@ -453,13 +417,7 @@ Navigator.pushReplacement(
         showCursor: false,
         decoration: InputDecoration(
           hintText: hint,
-          hintStyle: GoogleFonts.lato(
-            color: colour.commonColorLight,
-            fontWeight: FontWeight.bold,
-            fontSize: isTablet
-                ? AppGlobals.FontMedium.toDouble() + 2
-                : AppGlobals.FontMedium.toDouble(),
-          ),
+          hintStyle: AppTypography.heading2(color: colour.commonColorLight),
           enabledBorder: const OutlineInputBorder(
             borderRadius: BorderRadius.all(Radius.circular(10)),
             borderSide: BorderSide(color: colour.commonColor),
@@ -471,14 +429,7 @@ Navigator.pushReplacement(
           contentPadding:
           const EdgeInsets.only(left: 10, right: 20, top: 10),
         ),
-        style: GoogleFonts.lato(
-          color: colour.commonColor,
-          fontWeight: FontWeight.bold,
-          fontSize: isTablet
-              ? AppGlobals.FontLow.toDouble() + 2
-              : AppGlobals.FontLow.toDouble(),
-          letterSpacing: 0.3,
-        ),
+        style: AppTypography.bodySmall(color: colour.commonColor),
       ),
     );
   }
@@ -503,7 +454,7 @@ Navigator.pushReplacement(
               placeholder: (_, __) =>
               const CircularProgressIndicator(),
               errorWidget: (_, __, ___) =>
-              const Icon(Icons.broken_image, color: Colors.red),
+              const Icon(Icons.broken_image, color: colour.commonColorred),
             ),
             const SizedBox(height: 7),
             CircleAvatar(

@@ -1,3 +1,4 @@
+import 'package:maleva/core/colors/colors.dart' as colors;
 import 'package:maleva/core/theme/app_typography.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -82,7 +83,7 @@ class _SalesOrderTabState extends State<SalesOrderTab> {
 
         builder: (context, state) {
           if (state is InvoiceLoading) {
-            return const Center(child: CircularProgressIndicator());
+            return Center(child: CircularProgressIndicator());
           }
 
           if (state is InvoiceError) {
@@ -96,7 +97,7 @@ class _SalesOrderTabState extends State<SalesOrderTab> {
                     onPressed: () => context
                         .read<SalesOrderBloc>()
                         .add(RefreshSalesOrder()),
-                    child: const Text("Retry"),
+                    child: Text("Retry"),
                   ),
                 ],
               ),
@@ -246,14 +247,11 @@ class _SalesOrderTabState extends State<SalesOrderTab> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Row(
+        Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Text('Overview',
-                style: TextStyle(
-                    fontSize: 15,
-                    fontWeight: FontWeight.bold,
-                    color: Color(0xFF1A2340))),
+                style: AppTypography.heading2(color: Color(0xFF1A2340))),
 
           ],
         ),
@@ -288,7 +286,7 @@ class _SalesOrderTabState extends State<SalesOrderTab> {
                 count: monthly,
                 sub: _indFmt(monthAmt),
                 subLabel: 'Invoices',              // ✅ Added required parameter
-                subColor: Colors.blue,             // ✅ Added required parameter
+                subColor: colors.commonColorhighlight,             // ✅ Added required parameter
                 subIcon: Icons.receipt,            // ✅ Added required parameter
                 isTablet: isTablet,                // ✅ Added required parameter
                 onTap: () => context
@@ -485,10 +483,7 @@ class _SalesOrderTabState extends State<SalesOrderTab> {
                   children: [
                     TextSpan(
                       text: "so",
-                      style: TextStyle(
-                        color: Colors.blue[900],
-
-                      ),
+                      style: AppTypography.bodyLarge(),
                     ),
                   ],
                 ),
@@ -513,7 +508,7 @@ class _SalesOrderTabState extends State<SalesOrderTab> {
                   Icon(
                     isGrowth ? Icons.arrow_upward : Icons.arrow_downward,
                     size: isTablet ? 15 : 13,
-                    color: isGrowth ? Colors.green : Colors.red,
+                    color: isGrowth ? Colors.green : colors.commonColorred,
                   ),
                 ],
               ),
@@ -542,16 +537,13 @@ class _SalesOrderTabState extends State<SalesOrderTab> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  const Text("Employee Details",
-                      style: TextStyle(
-                          fontSize: 17,
-                          fontWeight: FontWeight.bold,
-                          color: Color(0xFF1A2340))),
+                  Text("Employee Details",
+                      style: AppTypography.heading2(color: const Color(0xFF1A2340))),
                   InkWell(
                     onTap: () => Navigator.pop(context),
                     child: const CircleAvatar(
                       radius: 14,
-                      backgroundColor: Colors.red,
+                      backgroundColor: colors.commonColorred,
                       child:
                       Icon(Icons.close, size: 16, color: Colors.white),
                     ),
@@ -588,10 +580,7 @@ class _SalesOrderTabState extends State<SalesOrderTab> {
                             Expanded(
                               child: Text(
                                   emp["EmployeeName"].toString(),
-                                  style: const TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 14,
-                                      color: Color(0xFF1A2340))),
+                                  style: AppTypography.heading2(color: const Color(0xFF1A2340))),
                             ),
                           ]),
                           const SizedBox(height: 8),
@@ -602,18 +591,14 @@ class _SalesOrderTabState extends State<SalesOrderTab> {
                               Row(children: [
                                 const SizedBox(width: 4),
                                 Text(emp["Amount"].toString(),
-                                    style: const TextStyle(
-                                        fontWeight: FontWeight.w600,
-                                        color: Colors.green)),
+                                    style: AppTypography.bodyLarge()),
                               ]),
                               Row(children: [
                                 const Icon(Icons.shopping_cart,
                                     size: 16, color: Colors.orange),
                                 const SizedBox(width: 4),
                                 Text(emp["SalesCount"].toString(),
-                                    style: const TextStyle(
-                                        fontWeight: FontWeight.w600,
-                                        color: Colors.orange)),
+                                    style: AppTypography.bodyLarge()),
                               ]),
                             ],
                           ),
@@ -634,10 +619,8 @@ class _SalesOrderTabState extends State<SalesOrderTab> {
                     padding: const EdgeInsets.symmetric(vertical: 12),
                   ),
                   onPressed: () => Navigator.pop(context),
-                  child: const Text("Back to Dashboard",
-                      style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white)),
+                  child: Text("Back to Dashboard",
+                      style: AppTypography.heading2(color: Colors.white)),
                 ),
               ),
             ],
@@ -694,25 +677,17 @@ class _OverviewCard extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(label,
-                style: TextStyle(
-                    fontSize: isTablet ? 11 : 10,
-                    fontWeight: FontWeight.w700,
-                    letterSpacing: 0.8,
-                    color: const Color(0xFF8A94A6))),
+                style: AppTypography.badgeText(color: Colors.grey.shade500, fontWeight: FontWeight.w700)),
             SizedBox(height: isTablet ? 10 : 8),
             Text(count,
-                style: TextStyle(
-                    fontSize: isTablet ? 28 : 26,
-                    fontWeight: FontWeight.bold,
-                    color: const Color(0xFF1A2340))),
+                style: AppTypography.display(color: AppTokens.textNavy, fontWeight: FontWeight.w900)),
             SizedBox(height: isTablet ? 6 : 5),
             Text(sub,
-                style: TextStyle(
-                    fontSize: isTablet ? 12 : 11,
+                style: AppTypography.bodyLarge(
                     color: isToday && count == '0'
-                        ? const Color(0xFF8A94A6)
+                        ? Colors.grey
                         : subColor,
-                    fontWeight: FontWeight.w500)),
+                    fontWeight: FontWeight.w600)),
             const SizedBox(height: 4),
             Row(children: [
               if (subIcon != null) ...[
@@ -720,10 +695,7 @@ class _OverviewCard extends StatelessWidget {
                 const SizedBox(width: 4),
               ],
               Text(subLabel,
-                  style: TextStyle(
-                      fontSize: 11,
-                      color: subColor,
-                      fontWeight: FontWeight.w500)),
+                  style: AppTypography.bodySmall(color: subColor, fontWeight: FontWeight.w600)),
             ]),
           ],
         ),
@@ -793,23 +765,14 @@ class _HeroHeaderCard extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('${state.currentMonthName} SALES - INV',
-                    style: const TextStyle(
-                        color: Colors.white70,
-                        fontSize: 11,
-                        fontWeight: FontWeight.w600,
-                        letterSpacing: 1.2)),
+                Text('${state.currentMonthName.toUpperCase()} SALES - INV',
+                    style: AppTypography.bodyMedium(color: Colors.white.withValues(alpha: 0.80), fontWeight: FontWeight.w700)),
                 const SizedBox(height: 6),
                 Text(fmtIndian(monthAmt),
-                    style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 32,
-                        fontWeight: FontWeight.bold,
-                        letterSpacing: -0.5)),
+                    style: AppTypography.display(color: Colors.white, fontWeight: FontWeight.w900)),
                 const SizedBox(height: 4),
                 Text('$monthSales invoices this month',
-                    style: const TextStyle(
-                        color: Colors.white70, fontSize: 12)),
+                    style: AppTypography.bodyLarge(color: Colors.white.withValues(alpha: 0.75))),
                 const SizedBox(height: 14),
                 Wrap(spacing: 8, runSpacing: 8, children: [
                   _HeaderChip(
@@ -847,10 +810,7 @@ class _HeaderChip extends StatelessWidget {
         Icon(icon, size: 13, color: Colors.white),
         const SizedBox(width: 5),
         Text(label,
-            style: const TextStyle(
-                color: Colors.white,
-                fontSize: 11,
-                fontWeight: FontWeight.w600)),
+            style: AppTypography.bodySmall(color: Colors.white)),
       ]),
     );
   }
@@ -1024,40 +984,19 @@ class _SOTabBar extends StatelessWidget {
                   icon: const Icon(Icons.receipt,
                       color: colors.AppColors.whitecolor),
                   title: Text("All",
-                      style: GoogleFonts.lato(
-                          textStyle: TextStyle(
-                              color: colors.AppColors.whitecolor,
-                              fontSize: isTablet
-                                  ? 14
-                                  : (screenW <= 370
-                                  ? AppGlobals.FontCardText + 2
-                                  : AppGlobals.FontLow)))),
+                      style: AppTypography.heading2(color: colors.AppColors.whitecolor)),
                 ),
                 SalomonBottomBarItem(
                   icon: const Icon(Icons.receipt_long,
                       color: colors.AppColors.whitecolor),
                   title: Text("With",
-                      style: GoogleFonts.lato(
-                          textStyle: TextStyle(
-                              color: colors.AppColors.whitecolor,
-                              fontSize: isTablet
-                                  ? 14
-                                  : (screenW <= 370
-                                  ? AppGlobals.FontCardText + 2
-                                  : AppGlobals.FontLow)))),
+                      style: AppTypography.heading2(color: colors.AppColors.whitecolor)),
                 ),
                 SalomonBottomBarItem(
                   icon: const Icon(Icons.receipt_long_outlined,
                       color: colors.AppColors.whitecolor),
                   title: Text("Without",
-                      style: GoogleFonts.lato(
-                          textStyle: TextStyle(
-                              color: colors.AppColors.whitecolor,
-                              fontSize: isTablet
-                                  ? 14
-                                  : (screenW <= 370
-                                  ? AppGlobals.FontCardText + 2
-                                  : AppGlobals.FontLow)))),
+                      style: AppTypography.heading2(color: colors.AppColors.whitecolor)),
                 ),
               ],
             ),

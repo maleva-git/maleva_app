@@ -26,7 +26,9 @@ class EnquiryTrRepository {
           return double.tryParse(data['Data1'].toString()) ?? 0.0;
         }
       }
-    } catch (e) {}
+    } catch (e) {
+      print("Error loading customer currency: $e");
+    }
     return 0.0;
   }
 
@@ -43,7 +45,9 @@ class EnquiryTrRepository {
            }
         }
       }
-    } catch (e) {}
+    } catch (e) {
+      print("Error selecting all job status: $e");
+    }
     return [];
   }
 

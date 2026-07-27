@@ -1,7 +1,8 @@
-import 'package:maleva/core/network/api_legacy_helper.dart';
+import 'package:maleva/core/network/legacy_api_repository.dart';
+import 'package:maleva/core/di/injection.dart';
 import 'package:maleva/core/network/api_constants.dart';
 import 'package:maleva/core/utils/app_globals.dart';
-import 'package:maleva/core/network/OnlineApi.dart' as OnlineApi;
+
 
 class PlanningRepository {
   Future<List<dynamic>> getPlanning(
@@ -17,7 +18,7 @@ class PlanningRepository {
       'Content-Type': 'application/json; charset=UTF-8'
     };
 
-    final resultData = await ApiLegacyHelper.apiAllinoneSelectArray(
+    final resultData = await sl<LegacyApiRepository>().apiAllinoneSelectArray(
         ApiConstants.apiSelectPlanning, master, header, null);
     
     if (resultData == null || resultData == "") {
@@ -29,7 +30,7 @@ class PlanningRepository {
   Future<void> editPlanning(dynamic context, int id, int planningNo) async {
     var comId = AppGlobals.storagenew.getInt('Comid') ?? 0;
 
-    final resultData = await ApiLegacyHelper.apiAllinoneSelect(
+    final resultData = await sl<LegacyApiRepository>().apiAllinoneSelect(
         Uri.encodeFull(
             "${ApiConstants.apiEditPlanning}$id&PLANINGNo=$planningNo&Comid=$comId"),
         null,
@@ -52,7 +53,7 @@ class PlanningRepository {
       'Content-Type': 'application/json; charset=UTF-8'
     };
 
-    final resultData = await ApiLegacyHelper.apiAllinoneSelectArray(
+    final resultData = await sl<LegacyApiRepository>().apiAllinoneSelectArray(
       "${ApiConstants.apiViewPlanningPdf}$planningNoDisplay",
       master,
       header,
@@ -66,6 +67,6 @@ class PlanningRepository {
   }
 
   Future<void> selectEmployee(dynamic context, String type, String userType) async {
-    await OnlineApi.SelectEmployee(context, type, userType);
+    await sl<LegacyApiRepository>().SelectEmployee(context, type, userType);
   }
 }

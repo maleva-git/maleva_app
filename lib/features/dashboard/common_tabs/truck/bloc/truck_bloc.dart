@@ -1,3 +1,5 @@
+import 'package:maleva/core/theme/app_typography.dart';
+import 'package:maleva/core/colors/colors.dart' as colour;
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
@@ -76,7 +78,7 @@ class TruckDetailsBloc extends Bloc<TruckDetailsEvent, TruckDetailsState> {
       final dt = DateTime.parse(rawDate);
       if (dt.year <= 1) return Colors.grey;
       final diff = dt.difference(DateTime.now()).inDays;
-      if (diff < 0)  return Colors.red;
+      if (diff < 0)  return colour.commonColorred;
       if (diff <= 30) return Colors.orange;
       return const Color(0xFF1555F3);
     } catch (_) {

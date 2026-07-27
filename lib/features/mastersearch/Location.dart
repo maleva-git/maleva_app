@@ -1,5 +1,8 @@
+import 'package:maleva/core/theme/app_typography.dart';
+import 'package:maleva/core/network/legacy_api_repository.dart';
+import 'package:maleva/core/di/injection.dart';
 import 'package:flutter/Material.dart';
-import 'package:maleva/core/network/OnlineApi.dart' as OnlineApi;
+
 import 'package:maleva/core/utils/app_globals.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -34,7 +37,7 @@ class _Locationstate extends State<Location> {
     super.dispose();
   }
   Future startup() async {
-    await OnlineApi.SelectLocation(context);
+    await sl<LegacyApiRepository>().SelectLocation(context);
     filtersearchlist.clear();
     filtersearchlist.addAll(AppGlobals.LocationList);
     setState(() {
@@ -70,13 +73,7 @@ class _Locationstate extends State<Location> {
         centerTitle: true,
         title: Text(
           'Location',
-          style: GoogleFonts.lato(
-            textStyle: TextStyle(
-                color: colour.topAppBarColor,
-                fontWeight: FontWeight.w700,
-                fontSize: AppGlobals.FontLarge,
-                letterSpacing: 0.5),
-          ),
+          style: AppTypography.heading1(color: colour.topAppBarColor),
         ),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_ios_new_rounded, color: colour.topAppBarColor, size: 22),
@@ -84,7 +81,7 @@ class _Locationstate extends State<Location> {
         ),
       ),
       body: !progress
-          ? const Center(
+          ? Center(
               child: SpinKitFoldingCube(color: colour.spinKitColor, size: 35.0),
             )
           : SafeArea(
@@ -111,17 +108,10 @@ class _Locationstate extends State<Location> {
                           controller: txtSearch,
                           textInputAction: TextInputAction.search,
                           textCapitalization: TextCapitalization.characters,
-                          style: GoogleFonts.lato(
-                            fontWeight: FontWeight.w600,
-                            color: const Color(0xFF1A2E5A),
-                            fontSize: 15,
-                          ),
+                          style: AppTypography.heading2(color: const Color(0xFF1A2E5A)),
                           decoration: InputDecoration(
                             hintText: 'Search Location...',
-                            hintStyle: GoogleFonts.lato(
-                              color: Colors.grey.shade400,
-                              fontWeight: FontWeight.w500,
-                            ),
+                            hintStyle: AppTypography.bodyLarge(),
                             prefixIcon: Icon(Icons.search_rounded, color: Colors.grey.shade400),
                             border: InputBorder.none,
                             contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
@@ -141,11 +131,7 @@ class _Locationstate extends State<Location> {
                                     const SizedBox(height: 16),
                                     Text(
                                       'No Location Found',
-                                      style: GoogleFonts.lato(
-                                        color: Colors.grey.shade500,
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.w500,
-                                      ),
+                                      style: AppTypography.heading2(),
                                     ),
                                   ],
                                 ),
@@ -194,11 +180,7 @@ class _Locationstate extends State<Location> {
                                             Expanded(
                                               child: Text(
                                                 item.Location.toString(),
-                                                style: GoogleFonts.lato(
-                                                  fontWeight: FontWeight.w700,
-                                                  color: const Color(0xFF1A2E5A),
-                                                  fontSize: 15,
-                                                ),
+                                                style: AppTypography.heading2(color: const Color(0xFF1A2E5A)),
                                               ),
                                             ),
                                             Icon(Icons.chevron_right_rounded, color: Colors.grey.shade400, size: 24),

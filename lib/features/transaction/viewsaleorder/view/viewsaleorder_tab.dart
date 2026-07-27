@@ -1,3 +1,4 @@
+import 'package:maleva/core/theme/app_typography.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
@@ -11,8 +12,6 @@ import '../bloc/viewsaleorder_bloc.dart';
 import '../bloc/viewsaleorder_event.dart';
 import '../bloc/viewsaleorder_state.dart';
 import 'package:maleva/core/colors/colors.dart' as colour;
-
-
 
 const kGradient = LinearGradient(
   colors: [AppTokens.invoiceHeaderStart, colour.kHeaderGradEnd],
@@ -50,8 +49,10 @@ class _GetJobNoPageView extends StatelessWidget {
             toastMsg('Enter Job No', '', context);
             return;
           }
-          await sl<ViewSaleOrderRepository>().editSalesOrder(
-               state.saleOrderId, state.jobNo); if (!context.mounted) return;Navigator.push(
+          await sl<ViewSaleOrderRepository>()
+              .editSalesOrder(state.saleOrderId, state.jobNo);
+          if (!context.mounted) return;
+          Navigator.push(
             context,
             MaterialPageRoute(
               builder: (_) => SalesOrdersAdd(
@@ -65,8 +66,8 @@ class _GetJobNoPageView extends StatelessWidget {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text(state.message,
-                  style: GoogleFonts.lato(color: Colors.white)),
-              backgroundColor: const Color(0xFFB33040),
+                  style: AppTypography.bodyLarge(color: Colors.white)),
+              backgroundColor: AppTokens.appBarBg,
               behavior: SnackBarBehavior.floating,
               shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(10)),
@@ -87,8 +88,9 @@ class _GetJobNoPageView extends StatelessWidget {
           body: BlocBuilder<GetJobNoBloc, GetJobNoState>(
             builder: (context, state) {
               if (state is GetJobNoInitial || state is GetJobNoLoading) {
-                return const Center(
-                  child: SpinKitFoldingCube(color: colour.kHeaderGradEnd, size: 35),
+                return Center(
+                  child: SpinKitFoldingCube(
+                      color: colour.kHeaderGradEnd, size: 35),
                 );
               }
               if (state is GetJobNoLoaded) {
@@ -109,8 +111,8 @@ class _GetJobNoPageView extends StatelessWidget {
       elevation: 0,
       // Use LayoutBuilder inside flexibleSpace for adaptive height
       toolbarHeight: 62,
-      flexibleSpace: Container(
-          decoration: const BoxDecoration(gradient: kGradient)),
+      flexibleSpace:
+          Container(decoration: const BoxDecoration(gradient: kGradient)),
       leading: IconButton(
         icon: const Icon(Icons.arrow_back_ios_new_rounded, size: 20),
         color: Colors.white,
@@ -118,12 +120,8 @@ class _GetJobNoPageView extends StatelessWidget {
       ),
       title: Text(
         'Get Job No',
-        style: GoogleFonts.lato(
-          color: Colors.white,
-          fontWeight: FontWeight.w700,
-          fontSize: 17,
-          letterSpacing: 0.3,
-        ),
+        style: AppTypography.bodyLarge(
+            color: Colors.white, fontWeight: FontWeight.bold),
       ),
       iconTheme: const IconThemeData(color: Colors.white),
     );
@@ -205,11 +203,8 @@ class _JobNoCard extends StatelessWidget {
                   const SizedBox(width: 10),
                   Text(
                     'Job Number Lookup',
-                    style: GoogleFonts.lato(
-                      color: Colors.white,
-                      fontWeight: FontWeight.w700,
-                      fontSize: isTablet ? 16 : 15,
-                    ),
+                    style: AppTypography.bodyLarge(
+                        color: Colors.white, fontWeight: FontWeight.bold),
                   ),
                 ],
               ),
@@ -222,8 +217,7 @@ class _JobNoCard extends StatelessWidget {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   // ── Bill Type radios ──────────────────────────────
-                  _BillTypeRow(
-                      billType: state.billType, isTablet: isTablet),
+                  _BillTypeRow(billType: state.billType, isTablet: isTablet),
                   SizedBox(height: isTablet ? 20 : 16),
 
                   // ── Job No field + suggestions ────────────────────
@@ -231,7 +225,8 @@ class _JobNoCard extends StatelessWidget {
                   SizedBox(height: isTablet ? 24 : 18),
 
                   // ── Action buttons ────────────────────────────────
-                  _ActionButtons(isTablet: isTablet, jobNoText: state.jobNoText),
+                  _ActionButtons(
+                      isTablet: isTablet, jobNoText: state.jobNoText),
                 ],
               ),
             ),
@@ -251,11 +246,7 @@ class _BillTypeRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final labelStyle = GoogleFonts.lato(
-      color: colour.kTextDark,
-      fontWeight: FontWeight.w600,
-      fontSize: isTablet ? AppGlobals.FontMedium + 1 : AppGlobals.FontMedium,
-    );
+    final labelStyle = AppTypography.heading2(color: colour.kTextDark);
 
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 8),
@@ -328,24 +319,24 @@ class _RadioOption extends StatelessWidget {
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
                 border: Border.all(
-                  color: selected ? colour.kHeaderGradEnd : AppTokens.maintCardBorder,
+                  color: selected
+                      ? colour.kHeaderGradEnd
+                      : AppTokens.maintCardBorder,
                   width: selected ? 0 : 1.5,
                 ),
                 gradient: selected ? kGradient : null,
               ),
               child: selected
-                  ? const Icon(Icons.circle,
-                  size: 10, color: Colors.white)
+                  ? const Icon(Icons.circle, size: 10, color: Colors.white)
                   : null,
             ),
             SizedBox(width: isTablet ? 8 : 6),
             Text(
               label,
-              style: GoogleFonts.lato(
-                color: selected ? AppTokens.invoiceHeaderStart : colour.kTextMid,
-                fontWeight: FontWeight.w700,
-                fontSize: isTablet ? AppGlobals.FontMedium + 1 : AppGlobals.FontMedium,
-              ),
+              style: AppTypography.bodyLarge(
+                  color:
+                      selected ? AppTokens.invoiceHeaderStart : colour.kTextMid,
+                  fontWeight: FontWeight.bold),
             ),
           ],
         ),
@@ -374,8 +365,8 @@ class _JobNoFieldState extends State<_JobNoField> {
     // Sync controller when suggestion selected from bloc
     if (widget.state.jobNoText != _controller.text) {
       _controller.text = widget.state.jobNoText;
-      _controller.selection = TextSelection.collapsed(
-          offset: widget.state.jobNoText.length);
+      _controller.selection =
+          TextSelection.collapsed(offset: widget.state.jobNoText.length);
     }
   }
 
@@ -396,11 +387,7 @@ class _JobNoFieldState extends State<_JobNoField> {
         // Label
         Text(
           'Job No',
-          style: GoogleFonts.lato(
-            color: colour.kTextMid,
-            fontWeight: FontWeight.w600,
-            fontSize: isTablet ? AppGlobals.FontLow + 1 : AppGlobals.FontLow,
-          ),
+          style: AppTypography.bodySmall(color: colour.kTextMid),
         ),
         const SizedBox(height: 6),
 
@@ -410,46 +397,39 @@ class _JobNoFieldState extends State<_JobNoField> {
           keyboardType: TextInputType.number,
           textInputAction: TextInputAction.done,
           textCapitalization: TextCapitalization.characters,
-          style: GoogleFonts.lato(
-            color: colour.kTextDark,
-            fontWeight: FontWeight.w600,
-            fontSize: isTablet ? AppGlobals.FontLow + 1 : AppGlobals.FontLow,
-          ),
+          style: AppTypography.bodySmall(color: colour.kTextDark),
           decoration: InputDecoration(
             hintText: 'Enter Job No',
-            hintStyle: GoogleFonts.lato(
-                color: AppTokens.planTextMuted,
-                fontSize: isTablet ? AppGlobals.FontLow + 1 : AppGlobals.FontLow),
+            hintStyle: AppTypography.bodySmall(color: AppTokens.planTextMuted),
             filled: true,
             fillColor: colour.kDetailBg,
             prefixIcon: const Icon(Icons.tag_rounded,
                 color: colour.kHeaderGradEnd, size: 20),
             suffixIcon: _controller.text.isNotEmpty
                 ? IconButton(
-              icon: const Icon(Icons.close_rounded,
-                  color: AppTokens.planTextMuted, size: 18),
-              onPressed: () {
-                _controller.clear();
-                context
-                    .read<GetJobNoBloc>()
-                    .add(GetJobNoTextChanged(''));
-              },
-            )
+                    icon: const Icon(Icons.close_rounded,
+                        color: AppTokens.planTextMuted, size: 18),
+                    onPressed: () {
+                      _controller.clear();
+                      context.read<GetJobNoBloc>().add(GetJobNoTextChanged(''));
+                    },
+                  )
                 : null,
-            contentPadding: const EdgeInsets.symmetric(
-                horizontal: 14, vertical: 14),
+            contentPadding:
+                const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
               borderSide: BorderSide.none,
             ),
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
-              borderSide: const BorderSide(color: AppTokens.maintCardBorder, width: 0.5),
+              borderSide: const BorderSide(
+                  color: AppTokens.maintCardBorder, width: 0.5),
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
               borderSide:
-              const BorderSide(color: colour.kHeaderGradEnd, width: 1.5),
+                  const BorderSide(color: colour.kHeaderGradEnd, width: 1.5),
             ),
           ),
           onChanged: (v) {
@@ -479,25 +459,27 @@ class _JobNoFieldState extends State<_JobNoField> {
               padding: EdgeInsets.zero,
               itemCount: suggestions.length,
               separatorBuilder: (_, __) => const Divider(
-                  height: 1, color: colour.kDetailBg, indent: 14, endIndent: 14),
+                  height: 1,
+                  color: colour.kDetailBg,
+                  indent: 14,
+                  endIndent: 14),
               itemBuilder: (ctx, i) {
                 final item = suggestions[i];
                 final jobNo = item['CNumber'].toString();
-                final id    = item['Id'];
+                final id = item['Id'];
                 return InkWell(
                   onTap: () {
                     context.read<GetJobNoBloc>().add(
-                      GetJobNoSuggestionSelected(
-                          saleOrderId: id, jobNo: jobNo),
-                    );
+                          GetJobNoSuggestionSelected(
+                              saleOrderId: id, jobNo: jobNo),
+                        );
                   },
                   borderRadius: i == 0
-                      ? const BorderRadius.vertical(
-                      top: Radius.circular(12))
+                      ? const BorderRadius.vertical(top: Radius.circular(12))
                       : i == suggestions.length - 1
-                      ? const BorderRadius.vertical(
-                      bottom: Radius.circular(12))
-                      : BorderRadius.zero,
+                          ? const BorderRadius.vertical(
+                              bottom: Radius.circular(12))
+                          : BorderRadius.zero,
                   child: Padding(
                     padding: const EdgeInsets.symmetric(
                         horizontal: 16, vertical: 12),
@@ -508,13 +490,8 @@ class _JobNoFieldState extends State<_JobNoField> {
                         const SizedBox(width: 10),
                         Text(
                           jobNo,
-                          style: GoogleFonts.lato(
-                            color: colour.kTextDark,
-                            fontWeight: FontWeight.w600,
-                            fontSize: isTablet
-                                ? AppGlobals.FontLow + 1
-                                : AppGlobals.FontLow,
-                          ),
+                          style:
+                              AppTypography.bodySmall(color: colour.kTextDark),
                         ),
                       ],
                     ),
@@ -537,8 +514,8 @@ class _JobNoFieldState extends State<_JobNoField> {
                 const SizedBox(width: 6),
                 Text(
                   'No matching job numbers found',
-                  style: GoogleFonts.lato(
-                      color: AppTokens.planTextMuted, fontSize: 12),
+                  style:
+                      AppTypography.bodySmall(color: AppTokens.planTextMuted),
                 ),
               ],
             ),
@@ -553,8 +530,7 @@ class _ActionButtons extends StatelessWidget {
   final bool isTablet;
   final String jobNoText;
 
-  const _ActionButtons(
-      {required this.isTablet, required this.jobNoText});
+  const _ActionButtons({required this.isTablet, required this.jobNoText});
 
   @override
   Widget build(BuildContext context) {
@@ -650,17 +626,11 @@ class _GradientButton extends StatelessWidget {
               children: [
                 Text(
                   label,
-                  style: GoogleFonts.lato(
-                    color: Colors.white,
-                    fontWeight: FontWeight.w700,
-                    fontSize:
-                    isTablet ? AppGlobals.FontMedium + 1 : AppGlobals.FontMedium,
-                  ),
+                  style: AppTypography.bodyLarge(
+                      color: Colors.white, fontWeight: FontWeight.bold),
                 ),
                 const SizedBox(width: 8),
-                Icon(icon,
-                    color: Colors.white,
-                    size: isTablet ? 22 : 18),
+                Icon(icon, color: Colors.white, size: isTablet ? 22 : 18),
               ],
             ),
           ),
@@ -707,12 +677,9 @@ class _OutlineButton extends StatelessWidget {
               children: [
                 Text(
                   label,
-                  style: GoogleFonts.lato(
-                    color: AppTokens.invoiceHeaderStart,
-                    fontWeight: FontWeight.w700,
-                    fontSize:
-                    isTablet ? AppGlobals.FontMedium + 1 : AppGlobals.FontMedium,
-                  ),
+                  style: AppTypography.bodyLarge(
+                      color: AppTokens.invoiceHeaderStart,
+                      fontWeight: FontWeight.bold),
                 ),
                 const SizedBox(width: 8),
                 Icon(icon,

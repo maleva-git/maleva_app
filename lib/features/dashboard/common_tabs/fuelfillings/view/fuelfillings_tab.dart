@@ -152,7 +152,7 @@ class _FuelFillingBodyState extends State<_FuelFillingBody> {
             child: BlocBuilder<FuelFillingBloc, FuelFillingState>(
               builder: (context, state) {
                 if (state is FuelFillingLoading) {
-                  return const Center(
+                  return Center(
                     child: CircularProgressIndicator(
                         color: AppTokens.brandGradientStart),
                   );
@@ -190,11 +190,7 @@ class _FuelFillingBodyState extends State<_FuelFillingBody> {
       child: Column(children: [
         Text(
           "Fuel Filling",
-          style: GoogleFonts.lato(
-            fontSize:   AppGlobals.FontLarge,
-            fontWeight: FontWeight.bold,
-            color:      AppTokens.brandGradientStartDark,
-          ),
+          style: AppTypography.heading1(color: AppTokens.brandGradientStartDark),
         ),
         const SizedBox(height: 10),
 
@@ -212,7 +208,7 @@ class _FuelFillingBodyState extends State<_FuelFillingBody> {
           child: BlocBuilder<FuelFillingBloc, FuelFillingState>(
             builder: (context, state) {
               if (state is FuelFillingLoading) {
-                return const Center(
+                return Center(
                   child: CircularProgressIndicator(
                       color: AppTokens.brandGradientStart),
                 );
@@ -562,7 +558,7 @@ class _FuelFillingCard extends StatelessWidget {
       context:            context,
       barrierDismissible: true,
       barrierLabel:       '',
-      barrierColor:       Colors.black54,
+      barrierColor:       colour.commonColor,
       transitionDuration: const Duration(milliseconds: 280),
       pageBuilder: (_, __, ___) => Center(
         child: Material(
@@ -789,12 +785,12 @@ class _ErrorState extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         children: [
           Icon(Icons.error_outline,
-              color: Colors.red,
+              color: colour.commonColorred,
               size:  isTablet ? 60 : 48),
           SizedBox(height: isTablet ? 16 : 12),
           Text(message,
               textAlign: TextAlign.center,
-              style: AppTypography.bodyLarge(color: Colors.red)),
+              style: AppTypography.bodyLarge(color: colour.commonColorred)),
           SizedBox(height: isTablet ? 20 : 16),
           ElevatedButton.icon(
             onPressed: () => context

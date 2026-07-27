@@ -1,6 +1,6 @@
+import 'package:maleva/core/theme/app_typography.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import '../../../../../core/di/injection.dart';
 import '../../../../../core/theme/tokens.dart';
@@ -22,7 +22,6 @@ class ExpenseReportPage extends StatelessWidget {
   }
 }
 
-// ─── View ──────────────────────────────────────────────────────────────────────
 class ExpenseReportView extends StatelessWidget {
   const ExpenseReportView({super.key});
 
@@ -36,8 +35,8 @@ class ExpenseReportView extends StatelessWidget {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text(state.errorMessage,
-                  style: GoogleFonts.poppins(color: colour.kWhite)),
-              backgroundColor: Colors.redAccent,
+                  style: AppTypography.bodyLarge(color: colour.kWhite)),
+              backgroundColor: colour.commonColorred,
               behavior: SnackBarBehavior.floating,
               shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12)),
@@ -47,7 +46,7 @@ class ExpenseReportView extends StatelessWidget {
       },
       builder: (context, state) {
         if (state.status == ExpenseReportStatus.loading) { // ✅ New Enum Name
-          return const Center(
+          return Center(
             child: CircularProgressIndicator(color: AppTokens.brandGradientStart),
           );
         }
@@ -202,12 +201,7 @@ class _SectionHeader extends StatelessWidget {
       const SizedBox(width: 10),
       Text(
         title.toUpperCase(),
-        style: GoogleFonts.poppins(
-          fontSize: isTablet ? 20 : 17,
-          fontWeight: FontWeight.w700,
-          color: AppTokens.brandDark,
-          letterSpacing: 1.2,
-        ),
+        style: AppTypography.heading2(color: AppTokens.brandDark),
       ),
     ]);
   }
@@ -264,28 +258,19 @@ class _SummaryCard extends StatelessWidget {
               Expanded(
                 flex: 3,
                 child: Text('Period',
-                    style: GoogleFonts.poppins(
-                        color: colour.kWhite.withValues(alpha: 0.75),
-                        fontSize: isTablet ? 13 : 12,
-                        fontWeight: FontWeight.w600)),
+                    style: AppTypography.bodySmall(color: colour.kWhite.withValues(alpha: 0.75))),
               ),
               Expanded(
                 flex: 2,
                 child: Text('Count',
                     textAlign: TextAlign.center,
-                    style: GoogleFonts.poppins(
-                        color: colour.kWhite.withValues(alpha: 0.75),
-                        fontSize: isTablet ? 13 : 12,
-                        fontWeight: FontWeight.w600)),
+                    style: AppTypography.bodySmall(color: colour.kWhite.withValues(alpha: 0.75))),
               ),
               Expanded(
                 flex: 2,
                 child: Text('Amount',
                     textAlign: TextAlign.end,
-                    style: GoogleFonts.poppins(
-                        color: colour.kWhite.withValues(alpha: 0.75),
-                        fontSize: isTablet ? 13 : 12,
-                        fontWeight: FontWeight.w600)),
+                    style: AppTypography.bodySmall(color: colour.kWhite.withValues(alpha: 0.75))),
               ),
             ]),
           ),
@@ -328,28 +313,19 @@ class _SummaryRow extends StatelessWidget {
         Expanded(
           flex: 3,
           child: Text(label,
-              style: GoogleFonts.poppins(
-                  color: colour.kWhite,
-                  fontSize: isTablet ? 14 : 13,
-                  fontWeight: FontWeight.w500)),
+              style: AppTypography.heading3(color: colour.kWhite)),
         ),
         Expanded(
           flex: 2,
           child: Text(count,
               textAlign: TextAlign.center,
-              style: GoogleFonts.poppins(
-                  color: AppTokens.brandLight,
-                  fontSize: isTablet ? 14 : 13,
-                  fontWeight: FontWeight.w600)),
+              style: AppTypography.heading3(color: AppTokens.brandLight)),
         ),
         Expanded(
           flex: 2,
           child: Text(amount,
               textAlign: TextAlign.end,
-              style: GoogleFonts.poppins(
-                  color: AppTokens.brandLight,
-                  fontSize: isTablet ? 14 : 13,
-                  fontWeight: FontWeight.w600)),
+              style: AppTypography.heading3(color: AppTokens.brandLight)),
         ),
       ]),
     );
@@ -497,20 +473,20 @@ class _DateField extends StatelessWidget {
                 color: AppTokens.brandGradientStart),
           ),
           const SizedBox(width: 10),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(label,
-                  style: GoogleFonts.poppins(
-                      fontSize: isTablet ? 11 : 10,
-                      color: AppTokens.brandMid,
-                      fontWeight: FontWeight.w500)),
-              Text(date,
-                  style: GoogleFonts.poppins(
-                      fontSize: isTablet ? 14 : 13,
-                      color: AppTokens.brandDark,
-                      fontWeight: FontWeight.w600)),
-            ],
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(label,
+                    style: AppTypography.bodySmall(color: AppTokens.brandMid)),
+                FittedBox(
+                  fit: BoxFit.scaleDown,
+                  alignment: Alignment.centerLeft,
+                  child: Text(date,
+                      style: AppTypography.heading3(color: AppTokens.brandDark)),
+                ),
+              ],
+            ),
           ),
         ]),
       ),
@@ -538,28 +514,19 @@ class _ListHeader extends StatelessWidget {
         Expanded(
           flex: 3,
           child: Text('Expense',
-              style: GoogleFonts.poppins(
-                  fontSize: isTablet ? 13 : 12,
-                  fontWeight: FontWeight.w700,
-                  color: AppTokens.brandDark)),
+              style: AppTypography.bodySmall(color: AppTokens.brandDark)),
         ),
         Expanded(
           flex: 2,
           child: Text('Count',
               textAlign: TextAlign.center,
-              style: GoogleFonts.poppins(
-                  fontSize: isTablet ? 13 : 12,
-                  fontWeight: FontWeight.w700,
-                  color: AppTokens.brandDark)),
+              style: AppTypography.bodySmall(color: AppTokens.brandDark)),
         ),
         Expanded(
           flex: 2,
           child: Text('Amount',
               textAlign: TextAlign.end,
-              style: GoogleFonts.poppins(
-                  fontSize: isTablet ? 13 : 12,
-                  fontWeight: FontWeight.w700,
-                  color: AppTokens.brandDark)),
+              style: AppTypography.bodySmall(color: AppTokens.brandDark)),
         ),
       ]),
     );
@@ -624,29 +591,20 @@ class _ExpenseItemCard extends StatelessWidget {
                 alignment: Alignment.center,
                 child: Text(
                   '${index + 1}',
-                  style: GoogleFonts.poppins(
-                      fontSize: isTablet ? 12 : 11,
-                      fontWeight: FontWeight.w700,
-                      color: AppTokens.brandGradientStart),
+                  style: AppTypography.bodySmall(color: AppTokens.brandGradientStart),
                 ),
               ),
 
               Expanded(
                 flex: 3,
                 child: Text(name,
-                    style: GoogleFonts.poppins(
-                        fontSize: isTablet ? 14 : 13,
-                        fontWeight: FontWeight.w600,
-                        color: AppTokens.brandDark)),
+                    style: AppTypography.heading3(color: AppTokens.brandDark)),
               ),
               Expanded(
                 flex: 2,
                 child: Text(count,
                     textAlign: TextAlign.center,
-                    style: GoogleFonts.poppins(
-                        fontSize: isTablet ? 14 : 13,
-                        fontWeight: FontWeight.w500,
-                        color: AppTokens.brandGradientStartLight)),
+                    style: AppTypography.heading3(color: AppTokens.brandGradientStartLight)),
               ),
               Expanded(
                 flex: 2,
@@ -662,10 +620,7 @@ class _ExpenseItemCard extends StatelessWidget {
                   ),
                   child: Text(amount,
                       textAlign: TextAlign.end,
-                      style: GoogleFonts.poppins(
-                          fontSize: isTablet ? 14 : 13,
-                          fontWeight: FontWeight.w700,
-                          color: AppTokens.brandGradientStart)),
+                      style: AppTypography.heading3(color: AppTokens.brandGradientStart)),
                 ),
               ),
             ]),

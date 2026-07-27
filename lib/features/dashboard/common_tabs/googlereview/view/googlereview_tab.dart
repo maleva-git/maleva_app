@@ -1,3 +1,4 @@
+import 'package:maleva/core/colors/colors.dart' as colour;
 import 'package:maleva/core/theme/app_typography.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -81,13 +82,13 @@ class _ReviewEntryFormState extends State<ReviewEntryForm> {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
                 content:         Text(state.message),
-                backgroundColor: Colors.red),
+                backgroundColor: colour.commonColorred),
           );
         }
       },
       builder: (context, state) {
         if (state is ReviewEmployeesLoading) {
-          return const Center(
+          return Center(
               child: CircularProgressIndicator(color: AppTokens.brandGradientStart));
         }
         if (state is! ReviewFormState) return const SizedBox.shrink();
@@ -295,9 +296,7 @@ class _ReviewEntryFormState extends State<ReviewEntryForm> {
           value: val,
           child: Text(
             '⭐' * val + '  ($val)',
-            style: GoogleFonts.lato(
-                color:      AppTokens.brandDark,
-                fontWeight: FontWeight.w600),
+            style: AppTypography.bodyLarge(color: AppTokens.brandDark),
           ),
         ))
             .toList(),
@@ -320,7 +319,7 @@ class _ReviewEntryFormState extends State<ReviewEntryForm> {
             : null,
         isExpanded: true,
         hint: Text('Select Employee',
-            style: GoogleFonts.lato(color: Colors.grey)),
+            style: AppTypography.bodyLarge()),
         icon: const Icon(Icons.keyboard_arrow_down_rounded,
             color: AppTokens.brandGradientStart),
         items: state.employees
@@ -329,9 +328,7 @@ class _ReviewEntryFormState extends State<ReviewEntryForm> {
           child: Text(
             e.AccountName,
             overflow: TextOverflow.ellipsis,
-            style: GoogleFonts.lato(
-                color:      AppTokens.brandDark,
-                fontWeight: FontWeight.w600),
+            style: AppTypography.bodyLarge(color: AppTokens.brandDark),
           ),
         ))
             .toList(),

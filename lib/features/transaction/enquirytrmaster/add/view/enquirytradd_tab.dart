@@ -1,3 +1,4 @@
+import 'package:maleva/core/theme/app_typography.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
@@ -62,7 +63,7 @@ class _AddEnquiryPage extends StatelessWidget {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text(state.message,
-                  style: GoogleFonts.lato(color: Colors.white)),
+                  style: AppTypography.bodyLarge(color: Colors.white)),
               backgroundColor: const Color(0xFFB33040),
               behavior: SnackBarBehavior.floating,
               shape: RoundedRectangleBorder(
@@ -84,7 +85,7 @@ class _AddEnquiryPage extends StatelessWidget {
           body: BlocBuilder<EnquiryAddBloc, EnquiryAddState>(
             builder: (context, state) {
               if (state is EnquiryAddInitial || state is EnquiryAddLoading) {
-                return const Center(
+                return Center(
                   child:
                   SpinKitFoldingCube(color: colour.kHeaderGradEnd, size: 35),
                 );
@@ -119,21 +120,12 @@ class _AddEnquiryPage extends StatelessWidget {
         children: [
           Text(
             'Enquiry TR Add',
-            style: GoogleFonts.lato(
-              color: Colors.white,
-              fontWeight: FontWeight.w700,
-              fontSize: isTablet ? AppGlobals.FontMedium + 2 : AppGlobals.FontMedium,
-              letterSpacing: 0.3,
-            ),
+            style: AppTypography.heading2(color: Colors.white),
           ),
           const SizedBox(height: 2),
           Text(
             userName,
-            style: GoogleFonts.lato(
-              color: Colors.white.withValues(alpha: 0.65),
-              fontWeight: FontWeight.w500,
-              fontSize: isTablet ? AppGlobals.FontLow : AppGlobals.FontLow - 1,
-            ),
+            style: AppTypography.bodySmall(color: Colors.white),
           ),
         ],
       ),
@@ -457,12 +449,7 @@ class _SectionLabel extends StatelessWidget {
   Widget build(BuildContext context) {
     return Text(
       text,
-      style: GoogleFonts.lato(
-        color: colour.kTextMid,
-        fontWeight: FontWeight.w600,
-        fontSize: isTablet ? AppGlobals.FontLow + 1 : AppGlobals.FontLow,
-        letterSpacing: 0.2,
-      ),
+      style: AppTypography.bodySmall(color: colour.kTextMid),
     );
   }
 }
@@ -507,11 +494,7 @@ class _DateTimeField extends StatelessWidget {
             Expanded(
               child: Text(
                 display,
-                style: GoogleFonts.lato(
-                  color: enabled ? colour.kTextDark : AppTokens.planTextMuted,
-                  fontWeight: FontWeight.w600,
-                  fontSize: AppGlobals.FontLow,
-                ),
+                style: AppTypography.bodySmall(color: enabled ? colour.kTextDark : AppTokens.planTextMuted),
               ),
             ),
             const Icon(Icons.calendar_month_outlined,
@@ -558,11 +541,7 @@ class _DateTimeRow extends StatelessWidget {
           width: isTablet ? 140 : 110,
           child: Text(
             label,
-            style: GoogleFonts.lato(
-              color: colour.kTextMid,
-              fontWeight: FontWeight.w600,
-              fontSize: isTablet ? AppGlobals.FontLow + 1 : AppGlobals.FontLow,
-            ),
+            style: AppTypography.bodySmall(color: colour.kTextMid),
             textAlign: TextAlign.center,
           ),
         ),
@@ -586,13 +565,7 @@ class _DateTimeRow extends StatelessWidget {
                   Expanded(
                     child: Text(
                       display,
-                      style: GoogleFonts.lato(
-                        color: enabled ? colour.kTextDark : AppTokens.planTextMuted,
-                        fontWeight: FontWeight.w600,
-                        fontSize: isTablet
-                            ? AppGlobals.FontLow + 1
-                            : AppGlobals.FontLow - 1,
-                      ),
+                      style: AppTypography.bodySmall(color: enabled ? colour.kTextDark : AppTokens.planTextMuted),
                     ),
                   ),
                   Icon(
@@ -666,12 +639,7 @@ class _AddSearchField extends StatelessWidget {
             Expanded(
               child: Text(
                 value.isEmpty ? hint : value,
-                style: GoogleFonts.lato(
-                  color: value.isEmpty ? AppTokens.planTextMuted : colour.kTextDark,
-                  fontWeight:
-                  value.isEmpty ? FontWeight.w500 : FontWeight.w600,
-                  fontSize: AppGlobals.FontLow,
-                ),
+                style: AppTypography.bodySmall(color: value.isEmpty ? AppTokens.planTextMuted : colour.kTextDark),
                 overflow: TextOverflow.ellipsis,
               ),
             ),
@@ -707,15 +675,11 @@ class _AddTextField extends StatelessWidget {
       textCapitalization: TextCapitalization.characters,
       textInputAction: TextInputAction.done,
       onChanged: onChanged,
-      style: GoogleFonts.lato(
-        color: colour.kTextDark,
-        fontWeight: FontWeight.w600,
-        fontSize: AppGlobals.FontLow,
-      ),
+      style: AppTypography.bodySmall(color: colour.kTextDark),
       decoration: InputDecoration(
         hintText: hint,
         hintStyle:
-        GoogleFonts.lato(color: AppTokens.planTextMuted, fontSize: AppGlobals.FontLow),
+        AppTypography.bodySmall(color: AppTokens.planTextMuted),
         filled: true,
         fillColor: colour.kDetailBg,
         contentPadding:
@@ -760,10 +724,7 @@ class _SaveButton extends StatelessWidget {
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
             child: Text('Save',
-                style: GoogleFonts.lato(
-                    color: Colors.white,
-                    fontWeight: FontWeight.w700,
-                    fontSize: AppGlobals.FontMedium)),
+                style: AppTypography.heading2(color: Colors.white)),
           ),
         ),
       ),

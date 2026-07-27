@@ -1,3 +1,5 @@
+import 'package:maleva/core/theme/app_typography.dart';
+import 'package:maleva/core/colors/colors.dart' as colour;
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -5,6 +7,7 @@ import '../../../core/colors/colors.dart' as colour;
 import '../bloc/troubleshoot_bloc.dart';
 import '../bloc/troubleshoot_event.dart';
 import '../bloc/troubleshoot_state.dart';
+import 'package:maleva/core/theme/palette.dart';
 
 /// Call this from anywhere — e.g. a drawer item, an app bar icon,
 /// or a floating button — to open the "Report a Problem" sheet.
@@ -63,9 +66,9 @@ class _TroubleshootSheetState extends State<_TroubleshootSheet> {
                 SnackBar(
                   content: Text(
                     "Report sent! Our team will look into it.",
-                    style: GoogleFonts.dmSans(),
+                    style: AppTypography.bodyLarge(),
                   ),
-                  backgroundColor: const Color(0xFF22A06B),
+                  backgroundColor: Palette.green,
                 ),
               );
             }
@@ -92,7 +95,7 @@ class _TroubleshootSheetState extends State<_TroubleshootSheet> {
                       width: 40,
                       height: 40,
                       decoration: BoxDecoration(
-                        color: const Color(0xFFFFF1F2),
+                        color: Palette.grey150,
                         borderRadius: BorderRadius.circular(12),
                       ),
                       child: const Icon(Icons.bug_report_outlined,
@@ -102,11 +105,8 @@ class _TroubleshootSheetState extends State<_TroubleshootSheet> {
                     Expanded(
                       child: Text(
                         "Report a Problem",
-                        style: GoogleFonts.dmSans(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w700,
-                          color: colour.cText,
-                        ),
+                        style: AppTypography.bodyLarge(
+                            color: colour.cText, fontWeight: FontWeight.bold),
                       ),
                     ),
                   ],
@@ -115,21 +115,20 @@ class _TroubleshootSheetState extends State<_TroubleshootSheet> {
                 Text(
                   "We'll send your recent activity along with this note "
                   "so our team can find and fix the issue faster.",
-                  style: GoogleFonts.dmSans(
-                    fontSize: 12.5,
-                    color: colour.cSub,
-                  ),
+                  style: AppTypography.bodySmall(color: colour.cSub),
                 ),
                 const SizedBox(height: 16),
                 TextField(
                   controller: _controller,
                   maxLines: 4,
-                  onChanged: (v) =>
-                      context.read<TroubleshootBloc>().add(TroubleshootNoteChanged(v)),
-                  style: GoogleFonts.dmSans(fontSize: 13.5, color: colour.cText),
+                  onChanged: (v) => context
+                      .read<TroubleshootBloc>()
+                      .add(TroubleshootNoteChanged(v)),
+                  style: AppTypography.bodyLarge(color: colour.cText),
                   decoration: InputDecoration(
-                    hintText: "What went wrong? (optional)\nE.g. \"Menu didn't load after login\"",
-                    hintStyle: GoogleFonts.dmSans(fontSize: 13, color: colour.cSub),
+                    hintText:
+                        "What went wrong? (optional)\nE.g. \"Menu didn't load after login\"",
+                    hintStyle: AppTypography.bodyLarge(color: colour.cSub),
                     filled: true,
                     fillColor: colour.cSurface,
                     border: OutlineInputBorder(
@@ -139,11 +138,12 @@ class _TroubleshootSheetState extends State<_TroubleshootSheet> {
                     contentPadding: const EdgeInsets.all(14),
                   ),
                 ),
-                if (state.errorMessage != null && state.errorMessage!.isNotEmpty) ...[
+                if (state.errorMessage != null &&
+                    state.errorMessage!.isNotEmpty) ...[
                   const SizedBox(height: 10),
                   Text(
                     state.errorMessage!,
-                    style: GoogleFonts.dmSans(fontSize: 12, color: colour.cRose),
+                    style: AppTypography.bodySmall(color: colour.cRose),
                   ),
                 ],
                 const SizedBox(height: 18),
@@ -152,7 +152,9 @@ class _TroubleshootSheetState extends State<_TroubleshootSheet> {
                   child: ElevatedButton(
                     onPressed: state.sending
                         ? null
-                        : () => context.read<TroubleshootBloc>().add(TroubleshootSubmitted()),
+                        : () => context
+                            .read<TroubleshootBloc>()
+                            .add(TroubleshootSubmitted()),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: colour.cBlue,
                       shape: RoundedRectangleBorder(
@@ -171,11 +173,9 @@ class _TroubleshootSheetState extends State<_TroubleshootSheet> {
                           )
                         : Text(
                             "Send Report",
-                            style: GoogleFonts.dmSans(
-                              fontSize: 14,
-                              fontWeight: FontWeight.w600,
-                              color: Colors.white,
-                            ),
+                            style: AppTypography.bodyLarge(
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold),
                           ),
                   ),
                 ),

@@ -47,7 +47,7 @@ class _SparePartsEntryBody extends StatelessWidget {
         if (state is SparePartsSubmitSuccess) {
           ScaffoldMessenger.of(context).showSnackBar(SnackBar(
             content: Text("Submitted successfully ✅",
-                style: GoogleFonts.lato(color: colour.kWhite)),
+                style: AppTypography.bodyLarge(color: colour.kWhite)),
             backgroundColor: Colors.green,
             behavior: SnackBarBehavior.floating,
             shape: RoundedRectangleBorder(
@@ -60,7 +60,7 @@ class _SparePartsEntryBody extends StatelessWidget {
         if (state is SparePartsEntryError) {
           ScaffoldMessenger.of(context).showSnackBar(SnackBar(
             content: Text(state.message),
-            backgroundColor: Colors.red,
+            backgroundColor: colour.commonColorred,
             behavior: SnackBarBehavior.floating,
           ));
         }
@@ -320,7 +320,7 @@ class _SparePartsEntryBody extends StatelessWidget {
                   ),
                   child: Row(children: [
                     const Icon(Icons.picture_as_pdf,
-                        color: Colors.red, size: 36),
+                        color: colour.commonColorred, size: 36),
                     const SizedBox(width: 10),
                     Expanded(
                       child: Text(
@@ -554,7 +554,7 @@ class _SparePartsPreviewPanel extends StatelessWidget {
                             ? Icons.picture_as_pdf
                             : Icons.radio_button_unchecked_rounded,
                         color: s.pickedPDF != null
-                            ? Colors.red
+                            ? colour.commonColorred
                             : Colors.grey,
                         size: 15,
                       ),
@@ -712,12 +712,10 @@ class _SparePartsTruckSelectPageState
               controller: _searchCtrl,
               textCapitalization: TextCapitalization.characters,
               onChanged: _search,
-              style: GoogleFonts.lato(
-                  color:AppTokens.brandDark,
-                  fontWeight: FontWeight.w600),
+              style: AppTypography.bodyLarge(color: AppTokens.brandDark),
               decoration: InputDecoration(
                 hintText: 'Search Truck No...',
-                hintStyle: GoogleFonts.lato(color: Colors.grey),
+                hintStyle: AppTypography.bodyLarge(),
                 prefixIcon: const Icon(Icons.search,
                     color: AppTokens.brandGradientStart),
                 border: OutlineInputBorder(
@@ -956,7 +954,7 @@ class _SelectTile extends StatelessWidget {
 InputDecoration _decor(String label, IconData icon) {
   return InputDecoration(
     labelText: label,
-    labelStyle: const TextStyle(color:AppTokens.brandDark),
+    labelStyle: AppTypography.bodyLarge(color: AppTokens.brandDark),
     prefixIcon: Icon(icon, color: AppTokens.brandGradientStart, size: 20),
     border:
     OutlineInputBorder(borderRadius: BorderRadius.circular(10)),

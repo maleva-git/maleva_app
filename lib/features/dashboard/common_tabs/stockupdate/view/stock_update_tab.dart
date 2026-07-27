@@ -1,3 +1,5 @@
+import 'package:maleva/core/theme/app_typography.dart';
+import 'package:maleva/core/colors/colors.dart' as colour;
 import 'package:maleva/core/utils/system_helpers.dart';
 import 'package:maleva/core/network/api_constants.dart';
 import 'dart:io';
@@ -111,8 +113,7 @@ Navigator.pushReplacement(
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text(state.message,
-                  style: GoogleFonts.lato(
-                      color: Colors.white)),
+                  style: AppTypography.bodyLarge(color: Colors.white)),
               backgroundColor: kAccentRed,
               behavior: SnackBarBehavior.floating,
               shape: RoundedRectangleBorder(
@@ -136,7 +137,7 @@ Navigator.pushReplacement(
             builder: (context, state) {
               if (state is StockUpdateInitial ||
                   state is StockUpdateLoading) {
-                return const Center(
+                return Center(
                   child: SpinKitFoldingCube(
                       color: kHeaderGradEnd, size: 35),
                 );
@@ -178,17 +179,10 @@ Navigator.pushReplacement(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text('Stock Update',
-              style: GoogleFonts.lato(
-                  color: Colors.white,
-                  fontWeight: FontWeight.w700,
-                  fontSize: 17,
-                  letterSpacing: 0.3)),
+              style: AppTypography.heading2(color: Colors.white)),
           const SizedBox(height: 2),
           Text(userName,
-              style: GoogleFonts.lato(
-                  color: Colors.white.withValues(alpha: 0.65),
-                  fontWeight: FontWeight.w500,
-                  fontSize: 12)),
+              style: AppTypography.bodySmall(color: Colors.white)),
         ],
       ),
       actions: [
@@ -211,7 +205,7 @@ Navigator.pushReplacement(
                     .read<StockUpdateBloc>()
                     .add(StockUpdateClearRequested()),
                 borderRadius: BorderRadius.circular(8),
-                child: const Padding(
+                child: Padding(
                   padding: EdgeInsets.all(6),
                   child: Icon(Icons.refresh_rounded,
                       color: Colors.white, size: 20),
@@ -316,18 +310,12 @@ class _PackagesScanRow extends StatelessWidget {
             flex: 4,
             child: RichText(
               text: TextSpan(
-                style: GoogleFonts.lato(
-                    color: kTextDark,
-                    fontWeight: FontWeight.w600,
-                    fontSize: isTablet
-                        ? AppGlobals.FontMedium + 1
-                        : AppGlobals.FontMedium),
+                style: AppTypography.heading2(color: kTextDark),
                 children: [
                   const TextSpan(text: 'Packages: '),
                   TextSpan(
                     text: state.totalPkg.toString(),
-                    style: const TextStyle(
-                        color: kHeaderGradStart),
+                    style: AppTypography.bodyLarge(color: kHeaderGradStart),
                   ),
                 ],
               ),
@@ -346,25 +334,14 @@ class _PackagesScanRow extends StatelessWidget {
             ),
             child: Text(
               state.scnPkg.toString(),
-              style: GoogleFonts.lato(
-                color: state.scnPkg > 0
+              style: AppTypography.heading2(color: state.scnPkg > 0
                     ? kAccentRed
-                    : kTextMuted,
-                fontWeight: FontWeight.w700,
-                fontSize: isTablet
-                    ? AppGlobals.FontMedium + 1
-                    : AppGlobals.FontMedium,
-              ),
+                    : kTextMuted),
             ),
           ),
           const SizedBox(width: 8),
           Text('SCAN',
-              style: GoogleFonts.lato(
-                  color: kTextMid,
-                  fontWeight: FontWeight.w600,
-                  fontSize: isTablet
-                      ? AppGlobals.FontMedium + 1
-                      : AppGlobals.FontMedium)),
+              style: AppTypography.heading2(color: kTextMid)),
           const SizedBox(width: 8),
           // Scan button
           _ScanButton(isTablet: isTablet),
@@ -469,17 +446,9 @@ class _WarehouseField extends StatelessWidget {
                 state.warehouseName.isEmpty
                     ? 'Select Location'
                     : state.warehouseName,
-                style: GoogleFonts.lato(
-                  color: state.warehouseName.isEmpty
+                style: AppTypography.bodySmall(color: state.warehouseName.isEmpty
                       ? kTextMuted
-                      : kTextDark,
-                  fontWeight: state.warehouseName.isEmpty
-                      ? FontWeight.w500
-                      : FontWeight.w600,
-                  fontSize: isTablet
-                      ? AppGlobals.FontLow + 1
-                      : AppGlobals.FontLow,
-                ),
+                      : kTextDark),
                 overflow: TextOverflow.ellipsis,
               ),
             ),
@@ -515,10 +484,7 @@ class _MobileStatusSection extends StatelessWidget {
             Expanded(
               child: Text(
                 '  ${state.jobNo}',
-                style: GoogleFonts.lato(
-                    color: kTextDark,
-                    fontWeight: FontWeight.w700,
-                    fontSize: AppGlobals.FontMedium),
+                style: AppTypography.heading2(color: kTextDark),
                 overflow: TextOverflow.ellipsis,
               ),
             ),
@@ -549,10 +515,7 @@ class _TabletStatusRow extends StatelessWidget {
           flex: 2,
           child: Text(
             '  ${state.jobNo}',
-            style: GoogleFonts.lato(
-                color: kTextDark,
-                fontWeight: FontWeight.w700,
-                fontSize: AppGlobals.FontMedium + 1),
+            style: AppTypography.heading2(color: kTextDark),
             overflow: TextOverflow.ellipsis,
           ),
         ),
@@ -618,17 +581,9 @@ class _StatusField extends StatelessWidget {
                 state.statusName.isEmpty
                     ? 'Job Status'
                     : state.statusName,
-                style: GoogleFonts.lato(
-                  color: state.statusName.isEmpty
+                style: AppTypography.bodySmall(color: state.statusName.isEmpty
                       ? kTextMuted
-                      : kTextDark,
-                  fontWeight: state.statusName.isEmpty
-                      ? FontWeight.w500
-                      : FontWeight.w600,
-                  fontSize: isTablet
-                      ? AppGlobals.FontLow + 1
-                      : AppGlobals.FontLow,
-                ),
+                      : kTextDark),
                 overflow: TextOverflow.ellipsis,
               ),
             ),
@@ -733,8 +688,7 @@ class _ScannedList extends StatelessWidget {
                   color: kTextMuted),
               const SizedBox(height: 8),
               Text('No Stock Scanned',
-                  style: GoogleFonts.lato(
-                      color: kTextMuted, fontSize: 13)),
+                  style: AppTypography.bodyLarge(color: kTextMuted)),
             ],
           ),
         ),
@@ -795,10 +749,7 @@ class _ScannedItemRow extends StatelessWidget {
             child: Center(
               child: Text(
                 '${index + 1}',
-                style: GoogleFonts.lato(
-                    color: kHeaderGradStart,
-                    fontWeight: FontWeight.w700,
-                    fontSize: 10),
+                style: AppTypography.bodySmall(color: kHeaderGradStart),
               ),
             ),
           ),
@@ -806,13 +757,7 @@ class _ScannedItemRow extends StatelessWidget {
           Expanded(
             child: Text(
               barcode,
-              style: GoogleFonts.lato(
-                color: kTextDark,
-                fontWeight: FontWeight.w600,
-                fontSize: isTablet
-                    ? AppGlobals.FontCardText + 1
-                    : AppGlobals.FontCardText,
-              ),
+              style: AppTypography.bodyLarge(color: kTextDark),
               overflow: TextOverflow.ellipsis,
             ),
           ),
@@ -891,12 +836,7 @@ class _ImageUploadRow extends StatelessWidget {
           ),
           const SizedBox(width: 10),
           Text('Upload Image',
-              style: GoogleFonts.lato(
-                  color: kTextDark,
-                  fontWeight: FontWeight.w600,
-                  fontSize: isTablet
-                      ? AppGlobals.FontMedium + 1
-                      : AppGlobals.FontMedium)),
+              style: AppTypography.heading2(color: kTextDark)),
           const Spacer(),
           _PickBtn(
             icon:     Icons.photo_outlined,
@@ -982,9 +922,7 @@ class _ImageGrid extends StatelessWidget {
                 color: kTextMuted),
             const SizedBox(height: 8),
             Text('No images uploaded',
-                style: GoogleFonts.lato(
-                    color: kTextMuted,
-                    fontSize: 13)),
+                style: AppTypography.bodyLarge(color: kTextMuted)),
           ],
         ),
       )
@@ -1027,7 +965,7 @@ class _ImageGrid extends StatelessWidget {
                   placeholder: (_, __) =>
                       Container(
                         color: kDetailBg,
-                        child: const Center(
+                        child: Center(
                           child: SizedBox(
                             width: 20,
                             height: 20,

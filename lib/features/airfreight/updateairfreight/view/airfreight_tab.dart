@@ -1,3 +1,7 @@
+import 'package:maleva/core/theme/app_typography.dart';
+import 'package:maleva/core/colors/colors.dart' as colour;
+import 'package:maleva/core/network/legacy_api_repository.dart';
+import 'package:maleva/core/di/injection.dart';
 import 'package:maleva/core/utils/system_helpers.dart';
 import 'package:maleva/core/network/api_constants.dart';
 import 'dart:io';
@@ -8,7 +12,7 @@ import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:maleva/core/utils/app_globals.dart';
-import 'package:maleva/core/network/OnlineApi.dart' as OnlineApi;
+
 import 'package:maleva/menu/menulist.dart';
 import '../../../../core/theme/palette.dart';
 import '../../../mastersearch/JobAllStatus.dart';
@@ -70,7 +74,7 @@ class _AirFreightPageState extends State<_AirFreightPage> {
         }
         if (state is AirFreightError) {
           if (!context.mounted) return;
-          ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(state.message, style: GoogleFonts.lato(color: Colors.white)), backgroundColor: const Color(0xFFB33040), behavior: SnackBarBehavior.floating, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10))));
+          ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(state.message, style: AppTypography.bodyLarge(color: Colors.white)), backgroundColor: const Color(0xFFB33040), behavior: SnackBarBehavior.floating, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10))));
         }
       },
       child: PopScope(
@@ -87,7 +91,7 @@ class _AirFreightPageState extends State<_AirFreightPage> {
           body: BlocBuilder<AirFreightBloc, AirFreightState>(
             builder: (context, state) {
               if (state is AirFreightInitial || state is AirFreightLoading) {
-                return const Center(child: SpinKitFoldingCube(color: Palette.blue400, size: 35));
+                return Center(child: SpinKitFoldingCube(color: Palette.blue400, size: 35));
               }
               if (state is AirFreightLoaded) {
                 return GestureDetector(
@@ -111,8 +115,8 @@ class _AirFreightPageState extends State<_AirFreightPage> {
       title: Column(
         mainAxisAlignment: MainAxisAlignment.center, crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('Air Frieght Update', style: GoogleFonts.lato(color: Colors.white, fontWeight: FontWeight.w700, fontSize: 17, letterSpacing: 0.3)),
-          Text(userName, style: GoogleFonts.lato(color: Colors.white.withValues(alpha: 0.65), fontWeight: FontWeight.w500, fontSize: 12)),
+          Text('Air Frieght Update', style: AppTypography.heading2(color: Colors.white)),
+          Text(userName, style: AppTypography.bodySmall(color: Colors.white)),
         ],
       ),
       actions: [
@@ -264,7 +268,7 @@ class _JobNoRowState extends State<_JobNoRow> {
                                     children: [
                                       const Icon(Icons.work_outline_rounded, size: 16, color: Palette.blue400),
                                       const SizedBox(width: 10),
-                                      Text(cnum, style: GoogleFonts.lato(color: Palette.textDark2, fontWeight: FontWeight.w600, fontSize: widget.isTablet ? AppGlobals.FontLow + 1 : AppGlobals.FontLow)),
+                                      Text(cnum, style: AppTypography.bodySmall(color: Palette.textDark2)),
                                     ],
                                   ),
                                 ),
@@ -315,10 +319,10 @@ class _JobNoRowState extends State<_JobNoRow> {
                   textCapitalization: TextCapitalization.characters,
                   textInputAction: TextInputAction.done,
                   onChanged: _onSearchChanged,
-                  style: GoogleFonts.lato(color: Palette.textDark2, fontWeight: FontWeight.w600, fontSize: isTablet ? AppGlobals.FontLow + 1 : AppGlobals.FontLow),
+                  style: AppTypography.bodySmall(color: Palette.textDark2),
                   decoration: InputDecoration(
                     hintText: 'Job No',
-                    hintStyle: GoogleFonts.lato(color: Palette.kTextMuted, fontSize: isTablet ? AppGlobals.FontLow + 1 : AppGlobals.FontLow),
+                    hintStyle: AppTypography.bodySmall(color: Palette.kTextMuted),
                     filled: true, fillColor: Palette.grey200p,
                     prefixIcon: const Icon(Icons.tag_rounded, color: Palette.blue400, size: 20),
                     contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 13),
@@ -346,7 +350,7 @@ class _JobNoRowState extends State<_JobNoRow> {
                       if(match.isNotEmpty) finalSaleId = match.first['Id'];
                     }
 
-                    await OnlineApi.EditSalesOrder(finalSaleId, int.tryParse(s.jobNoText) ?? 0);
+                    await sl<LegacyApiRepository>().EditSalesOrder(finalSaleId, int.tryParse(s.jobNoText) ?? 0);
 
                     if (!context.mounted) return;
                     Navigator.push(
@@ -383,9 +387,9 @@ class _StatusField extends StatelessWidget {
         if (state.statusName.isNotEmpty) { context.read<AirFreightBloc>().add(AirFreightStatusCleared()); return; }
 
         // 🔥 FIXED: Removed 'context' from EditSalesOrder
-        await OnlineApi.EditSalesOrder(state.saleOrderId, int.tryParse(state.jobNoText) ?? 0);
+        await sl<LegacyApiRepository>().EditSalesOrder(state.saleOrderId, int.tryParse(state.jobNoText) ?? 0);
         if (!context.mounted) return;
-        await OnlineApi.SelectAllJobStatus(context, AppGlobals.SaleEditMasterList[0]['JobMasterRefId']);
+        await sl<LegacyApiRepository>().SelectAllJobStatus(context, AppGlobals.SaleEditMasterList[0]['JobMasterRefId']);
 
         if (!context.mounted) return;
         Navigator.push(context, MaterialPageRoute(builder: (_) => const JobAllStatus(Searchby: 1, SearchId: 0, JobTypeId: 0))).then((navRes) { if (navRes != null) { AppGlobals.SelectAllStatusList = navRes; }
@@ -403,7 +407,7 @@ class _StatusField extends StatelessWidget {
         decoration: BoxDecoration(color: Palette.grey200p, borderRadius: BorderRadius.circular(10), border: Border.all(color: Palette.cardBorder, width: 0.5)),
         child: Row(
           children: [
-            Expanded(child: Text(state.statusName.isEmpty ? 'Select Status' : state.statusName, style: GoogleFonts.lato(color: state.statusName.isEmpty ? Palette.kTextMuted : Palette.textDark2, fontWeight: state.statusName.isEmpty ? FontWeight.w500 : FontWeight.w600, fontSize: isTablet ? AppGlobals.FontLow + 1 : AppGlobals.FontLow), overflow: TextOverflow.ellipsis)),
+            Expanded(child: Text(state.statusName.isEmpty ? 'Select Status' : state.statusName, style: AppTypography.bodySmall(color: state.statusName.isEmpty ? Palette.kTextMuted : Palette.textDark2), overflow: TextOverflow.ellipsis)),
             Icon(state.statusName.isNotEmpty ? Icons.close_rounded : Icons.search_rounded, size: 20, color: Palette.blue400),
           ],
         ),
@@ -436,8 +440,8 @@ class _AwbFieldState extends State<_AwbField> {
     return TextField(
       controller: _ctrl, textCapitalization: TextCapitalization.characters, textInputAction: TextInputAction.done,
       onChanged: (v) => context.read<AirFreightBloc>().add(AirFreightAwbNoChanged(v)),
-      style: GoogleFonts.lato(color: Palette.textDark2, fontWeight: FontWeight.w600, fontSize: widget.isTablet ? AppGlobals.FontLow + 1 : AppGlobals.FontLow),
-      decoration: InputDecoration(hintText: 'AWB NO', hintStyle: GoogleFonts.lato(color: Palette.kTextMuted, fontSize: widget.isTablet ? AppGlobals.FontLow + 1 : AppGlobals.FontLow), filled: true, fillColor: Palette.grey200p, contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 13), border: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: BorderSide.none), enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: const BorderSide(color: Palette.cardBorder, width: 0.5)), focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: const BorderSide(color: Palette.blue400, width: 1.5))),
+      style: AppTypography.bodySmall(color: Palette.textDark2),
+      decoration: InputDecoration(hintText: 'AWB NO', hintStyle: AppTypography.bodySmall(color: Palette.kTextMuted), filled: true, fillColor: Palette.grey200p, contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 13), border: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: BorderSide.none), enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: const BorderSide(color: Palette.cardBorder, width: 0.5)), focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: const BorderSide(color: Palette.blue400, width: 1.5))),
     );
   }
 }
@@ -461,7 +465,7 @@ class _ImageUploadRow extends StatelessWidget {
               child: state.imageUploadEnabled ? const Icon(Icons.check_rounded, size: 12, color: Colors.white) : null,
             ),
           ),
-          const SizedBox(width: 10), Text('Upload Image', style: GoogleFonts.lato(color: Palette.textDark2, fontWeight: FontWeight.w600, fontSize: isTablet ? AppGlobals.FontMedium + 1 : AppGlobals.FontMedium)),
+          const SizedBox(width: 10), Text('Upload Image', style: AppTypography.heading2(color: Palette.textDark2)),
           const Spacer(),
           _PickBtn(icon: Icons.photo_outlined, enabled: state.imageUploadEnabled, isTablet: isTablet, onTap: () => onPickImage(ImageSource.gallery)),
           const SizedBox(width: 4),
@@ -500,7 +504,7 @@ class _ImageGrid extends StatelessWidget {
       height: gridHeight,
       decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(12), border: Border.all(color: Palette.cardBorder, width: 0.5)),
       child: state.images.isEmpty
-          ? Center(child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [Icon(Icons.image_outlined, size: isTablet ? 48 : 36, color: Palette.kTextMuted), const SizedBox(height: 8), Text('No images uploaded', style: GoogleFonts.lato(color: Palette.kTextMuted, fontSize: 13))]))
+          ? Center(child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [Icon(Icons.image_outlined, size: isTablet ? 48 : 36, color: Palette.kTextMuted), const SizedBox(height: 8), Text('No images uploaded', style: AppTypography.bodyLarge(color: Palette.kTextMuted))]))
           : ClipRRect(
         borderRadius: BorderRadius.circular(12),
         child: GridView.builder(
@@ -521,7 +525,7 @@ class _ImageGrid extends StatelessWidget {
                 borderRadius: BorderRadius.circular(8),
                 child: CachedNetworkImage(
                   imageUrl: url, fit: BoxFit.cover,
-                  placeholder: (_, __) => Container(color: Palette.grey200p, child: const Center(child: SizedBox(width: 20, height: 20, child: CircularProgressIndicator(color: Palette.blue400, strokeWidth: 2)))),
+                  placeholder: (_, __) => Container(color: Palette.grey200p, child: Center(child: SizedBox(width: 20, height: 20, child: CircularProgressIndicator(color: Palette.blue400, strokeWidth: 2)))),
                   errorWidget: (_, __, ___) => Container(color: Palette.grey200p, child: const Icon(Icons.image_not_supported_outlined, color: Palette.blue400)),
                 ),
               ),
@@ -553,23 +557,23 @@ class _ImageGrid extends StatelessWidget {
 class _FieldLabel extends StatelessWidget {
   final String text; final bool isTablet;
   const _FieldLabel(this.text, this.isTablet);
-  @override Widget build(BuildContext context) => Text(text, style: GoogleFonts.lato(color: Palette.textMid, fontWeight: FontWeight.w600, fontSize: isTablet ? AppGlobals.FontLow + 1 : AppGlobals.FontLow));
+  @override Widget build(BuildContext context) => Text(text, style: AppTypography.bodySmall(color: Palette.textMid));
 }
 
 class _ReadonlyInfoChip extends StatelessWidget {
   final String label; final bool isTablet;
   const _ReadonlyInfoChip({required this.label, required this.isTablet});
-  @override Widget build(BuildContext context) => Container(padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8), decoration: BoxDecoration(color: Palette.chipBg, borderRadius: BorderRadius.circular(8), border: Border.all(color: Palette.cardBorder, width: 0.5)), child: Row(mainAxisSize: MainAxisSize.min, children: [const Icon(Icons.flight_outlined, size: 16, color: Palette.blue400), const SizedBox(width: 8), Text(label, style: GoogleFonts.lato(color: Palette.blue700, fontWeight: FontWeight.w600, fontSize: isTablet ? AppGlobals.FontLow + 1 : AppGlobals.FontLow))]));
+  @override Widget build(BuildContext context) => Container(padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8), decoration: BoxDecoration(color: Palette.chipBg, borderRadius: BorderRadius.circular(8), border: Border.all(color: Palette.cardBorder, width: 0.5)), child: Row(mainAxisSize: MainAxisSize.min, children: [const Icon(Icons.flight_outlined, size: 16, color: Palette.blue400), const SizedBox(width: 8), Text(label, style: AppTypography.bodySmall(color: Palette.blue700))]));
 }
 
 class _GradientButton extends StatelessWidget {
   final String label; final IconData icon; final bool isTablet; final VoidCallback onPressed;
   const _GradientButton({required this.label, required this.icon, required this.isTablet, required this.onPressed});
-  @override Widget build(BuildContext context) => Container(decoration: BoxDecoration(gradient: kGradient, borderRadius: BorderRadius.circular(10), boxShadow: [BoxShadow(color: Palette.blue700.withValues(alpha: 0.30), blurRadius: 8, offset: const Offset(0, 3))]), child: Material(color: Colors.transparent, child: InkWell(onTap: onPressed, borderRadius: BorderRadius.circular(10), child: Padding(padding: EdgeInsets.symmetric(horizontal: isTablet ? 18 : 12, vertical: isTablet ? 13 : 11), child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [Text(label, style: GoogleFonts.lato(color: Colors.white, fontWeight: FontWeight.w700, fontSize: isTablet ? AppGlobals.FontMedium + 1 : AppGlobals.FontMedium)), const SizedBox(width: 6), Icon(icon, color: Colors.white, size: isTablet ? 20 : 17)])))));
+  @override Widget build(BuildContext context) => Container(decoration: BoxDecoration(gradient: kGradient, borderRadius: BorderRadius.circular(10), boxShadow: [BoxShadow(color: Palette.blue700.withValues(alpha: 0.30), blurRadius: 8, offset: const Offset(0, 3))]), child: Material(color: Colors.transparent, child: InkWell(onTap: onPressed, borderRadius: BorderRadius.circular(10), child: Padding(padding: EdgeInsets.symmetric(horizontal: isTablet ? 18 : 12, vertical: isTablet ? 13 : 11), child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [Text(label, style: AppTypography.heading2(color: Colors.white)), const SizedBox(width: 6), Icon(icon, color: Colors.white, size: isTablet ? 20 : 17)])))));
 }
 
 class _AppBarButton extends StatelessWidget {
   final String label; final VoidCallback onPressed;
   const _AppBarButton({required this.label, required this.onPressed});
-  @override Widget build(BuildContext context) => Container(decoration: BoxDecoration(color: Colors.white.withValues(alpha: 0.15), borderRadius: BorderRadius.circular(8), border: Border.all(color: Colors.white.withValues(alpha: 0.4), width: 0.5)), child: Material(color: Colors.transparent, child: InkWell(onTap: onPressed, borderRadius: BorderRadius.circular(8), child: Padding(padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6), child: Text(label, style: GoogleFonts.lato(color: Colors.white, fontWeight: FontWeight.w700, fontSize: AppGlobals.FontMedium))))));
+  @override Widget build(BuildContext context) => Container(decoration: BoxDecoration(color: Colors.white.withValues(alpha: 0.15), borderRadius: BorderRadius.circular(8), border: Border.all(color: Colors.white.withValues(alpha: 0.4), width: 0.5)), child: Material(color: Colors.transparent, child: InkWell(onTap: onPressed, borderRadius: BorderRadius.circular(8), child: Padding(padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6), child: Text(label, style: AppTypography.heading2(color: Colors.white))))));
 }

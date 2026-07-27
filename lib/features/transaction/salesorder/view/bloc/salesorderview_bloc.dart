@@ -1,5 +1,4 @@
 import 'package:maleva/core/utils/system_helpers.dart';
-import 'package:maleva/core/network/api_legacy_helper.dart';
 import 'package:maleva/core/network/api_constants.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -14,6 +13,8 @@ import 'package:maleva/features/transaction/salesorder/models/sale_order_detail_
 import 'package:maleva/features/transaction/salesorder/models/sale_order_master_model.dart';
 import 'package:maleva/core/models/shared/response_view_model.dart';
 import 'package:maleva/features/operations/models/job_status_model.dart';
+import 'package:maleva/core/network/legacy_api_repository.dart';
+import 'package:maleva/core/di/injection.dart';
 
 
 
@@ -91,7 +92,7 @@ class SalesOrderViewBloc extends Bloc<SalesOrderViewEvent, SalesOrderViewState> 
         };
 
         final header = {'Content-Type': 'application/json; charset=UTF-8'};
-        final resultData = await ApiLegacyHelper.apiAllinoneSelectArray(
+        final resultData = await sl<LegacyApiRepository>().apiAllinoneSelectArray(
           ApiConstants.apiSelectSalesOrder, master, header, context,
         );
 
@@ -238,7 +239,7 @@ class SalesOrderViewBloc extends Bloc<SalesOrderViewEvent, SalesOrderViewState> 
       try {
         final master = {'SoId': event.id, 'Comid': AppGlobals.Comid};
         final header = {'Content-Type': 'application/json; charset=UTF-8'};
-        final resultData = await ApiLegacyHelper.apiAllinoneSelectArray(
+        final resultData = await sl<LegacyApiRepository>().apiAllinoneSelectArray(
           "${ApiConstants.apiViewDOConvert}${event.billNo}",
           master, header, context,
         );
@@ -249,7 +250,7 @@ class SalesOrderViewBloc extends Bloc<SalesOrderViewEvent, SalesOrderViewState> 
             SystemHelpers.launchInBrowser(value.data1);
           }
         }
-      } catch (_) {}
+      } catch (e, stack) { debugPrint("Error caught globally: $e\n$stack"); }
 
       emit(s.copyWith(progress: true));
     });

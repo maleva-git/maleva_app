@@ -1,3 +1,5 @@
+import 'package:maleva/core/theme/app_typography.dart';
+import 'package:maleva/core/colors/colors.dart' as colour;
 
 
 // ─── Design tokens ─────────────────────────────────────────────────────────────
@@ -216,12 +218,7 @@ class _LoginBodyState extends State<_LoginBody>
         shaderCallback: (b) =>
             const LinearGradient(colors: [AppTokens.brandDark, AppTokens.brandGradientStart]).createShader(b),
         child: Text('Maleva',
-            style: GoogleFonts.playfairDisplay(
-              fontSize:   titleFontSize,
-              fontWeight: FontWeight.w700,
-              color:      Colors.white,
-              letterSpacing: -0.5,
-            )),
+            style: AppTypography.bodyLarge(color: Colors.white)),
       ),
 
       const SizedBox(height: 5),
@@ -231,9 +228,7 @@ class _LoginBodyState extends State<_LoginBody>
         const SizedBox(width: 10),
 
         Text('LOGISTICS SUITE',
-            style: GoogleFonts.dmSans(
-                fontSize: 9, fontWeight: FontWeight.w600,
-                color: colour.kSubText, letterSpacing: 3.0)),
+            style: AppTypography.bodySmall(color: colour.kSubText)),
         const SizedBox(width: 10),
         _lineDivider(),
       ]),
@@ -411,20 +406,10 @@ class _LoginBodyState extends State<_LoginBody>
                       ),
                       const SizedBox(height: 24),
                       Text('Empowering\nYour Logistics',
-                          style: GoogleFonts.playfairDisplay(
-                            fontSize: 36,
-                            fontWeight: FontWeight.w800,
-                            color: Colors.white,
-                            height: 1.1,
-                          )),
+                          style: AppTypography.bodyLarge(color: Colors.white)),
                       const SizedBox(height: 16),
                       Text('Streamline your operations, manage fleets efficiently, and track everything in real-time with Maleva Suite.',
-                          style: GoogleFonts.dmSans(
-                            fontSize: 14,
-                            fontWeight: FontWeight.w400,
-                            color: Colors.white.withValues(alpha: 0.85),
-                            height: 1.5,
-                          )),
+                          style: AppTypography.heading2(color: Colors.white)),
                     ]
                   ),
                 ],
@@ -463,14 +448,10 @@ class _LoginBodyState extends State<_LoginBody>
     return Row(children: [
       Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         Text('Welcome back',
-            style: GoogleFonts.dmSans(
-                fontSize: headingSize, fontWeight: FontWeight.w700,
-                color: colour.kText, letterSpacing: -0.4)),
+            style: AppTypography.bodyLarge(color: colour.kText)),
         const SizedBox(height: 3),
         Text('Sign in to continue',
-            style: GoogleFonts.dmSans(
-                fontSize: subSize, fontWeight: FontWeight.w400,
-                color: colour.kSubText)),
+            style: AppTypography.bodyLarge(color: colour.kSubText)),
       ])),
       Container(
         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
@@ -480,18 +461,14 @@ class _LoginBodyState extends State<_LoginBody>
           border: Border.all(color: AppTokens.brandGradientStart.withValues(alpha: 0.15), width: 1),
         ),
         child: Text('v2.0',
-            style: GoogleFonts.dmSans(
-                fontSize: 10, fontWeight: FontWeight.w600,
-                color: AppTokens.brandGradientStart, letterSpacing: 0.5)),
+            style: AppTypography.bodySmall(color: AppTokens.brandGradientStart)),
       ),
     ]);
   }
 
   Widget _fieldLabel(String text, {required double fs}) => Text(
     text.toUpperCase(),
-    style: GoogleFonts.dmSans(
-        fontSize: fs, fontWeight: FontWeight.w600,
-        color: colour.kFieldText, letterSpacing: 1.0),
+    style: AppTypography.bodyLarge(color: colour.kFieldText),
   );
 
   Widget _textField({
@@ -510,10 +487,10 @@ class _LoginBodyState extends State<_LoginBody>
       readOnly:    readOnly,
       obscureText: obscure,
       onChanged:   onChanged,
-      style: GoogleFonts.dmSans(fontSize: fs, color: colour.kText),
+      style: AppTypography.bodyLarge(color: colour.kText),
       decoration: InputDecoration(
         hintText:  hint,
-        hintStyle: GoogleFonts.dmSans(fontSize: fs, color: colour.kSubText),
+        hintStyle: AppTypography.bodyLarge(color: colour.kSubText),
         filled:    true,
         fillColor: colour.kSurface,
         contentPadding: EdgeInsets.symmetric(horizontal: radius + 4, vertical: radius),
@@ -571,9 +548,7 @@ class _LoginBodyState extends State<_LoginBody>
           const SizedBox(width: 12),
           Expanded(
             child: Text('Driver Login',
-                style: GoogleFonts.dmSans(
-                    fontSize: toggleSize, fontWeight: FontWeight.w500,
-                    color: on ? AppTokens.brandGradientStart : const Color(0xFF505578))),
+                style: AppTypography.bodyLarge(color: on ? AppTokens.brandGradientStart : const Color(0xFF505578))),
           ),
           if (on) Icon(Icons.check_circle_rounded, color: AppTokens.brandGradientStart, size: toggleSize * 1.35),
         ]),
@@ -583,9 +558,7 @@ class _LoginBodyState extends State<_LoginBody>
 
   Widget _pinLabel() => Row(children: [
     Text('ENTER PIN',
-        style: GoogleFonts.dmSans(
-            fontSize: 9, fontWeight: FontWeight.w600,
-            color: colour.kSubText, letterSpacing: 2.0)),
+        style: AppTypography.bodySmall(color: colour.kSubText)),
     const SizedBox(width: 10),
     Expanded(child: Container(height: 1, color: colour.kBorder)),
   ]);
@@ -646,9 +619,7 @@ class _LoginBodyState extends State<_LoginBody>
           onPressed: () => context.read<LoginBloc>().add(SubmitLogin(context)),
           child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
             Text('LOGIN',
-                style: GoogleFonts.dmSans(
-                    fontSize: fs, fontWeight: FontWeight.w700,
-                    color: Colors.white, letterSpacing: 2.5)),
+                style: AppTypography.bodyLarge(color: Colors.white)),
             const SizedBox(width: 10),
             Container(
               width: 26, height: 26,
@@ -664,9 +635,7 @@ class _LoginBodyState extends State<_LoginBody>
 
   Widget _footer() => Center(
     child: Text('SHIP SPARE IN TRANSIT',
-        style: GoogleFonts.dmSans(
-            fontSize: 9, fontWeight: FontWeight.w500,
-            color: colour.kSubText.withValues(alpha: 0.50), letterSpacing: 2.0)),
+        style: AppTypography.bodySmall(color: colour.kSubText.withValues(alpha: 0.50))),
   );
   Widget _lineDivider() => Container(
     width: 28,
@@ -716,7 +685,7 @@ class _LoginBodyState extends State<_LoginBody>
             BoxShadow(color: Colors.black.withValues(alpha: 0.10), blurRadius: 12),
           ],
         ),
-        child: const Center(
+        child: Center(
           child: CircularProgressIndicator(color: AppTokens.brandGradientStart, strokeWidth: 2.5),
         ),
       ),
@@ -786,12 +755,7 @@ class _KeypadButtonState extends State<_KeypadButton>
           child: Center(
             child: Text(
               widget.label,
-              style: GoogleFonts.dmSans(
-                fontSize:   widget.label == 'CLEAR' ? widget.fontSize * 0.68 : widget.fontSize,
-                fontWeight: FontWeight.w700,
-                color:      colour.cWhite,
-                letterSpacing: widget.label == 'CLEAR' ? 1.0 : 0,
-              ),
+              style: AppTypography.bodyLarge(color: colour.cWhite),
             ),
           ),
         ),

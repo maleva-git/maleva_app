@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:maleva/core/utils/app_preferences.dart';
 import 'package:maleva/core/utils/app_globals.dart';
@@ -75,7 +76,7 @@ class StockInEntryBloc extends Bloc<StockInEntryEvent, StockInEntryState> {
     final s = state as StockInEntryLoaded;
     try {
       _jobNoList = await repository.fetchJobNoList(int.parse(event.billType));
-    } catch (_) {}
+    } catch (e, stack) { debugPrint("Error caught globally: $e\n$stack"); }
 
     emit(s.copyWith(
       billType: event.billType,
