@@ -1,3 +1,4 @@
+import 'package:maleva/core/theme/app_typography.dart';
 import 'package:flutter/material.dart';
 import 'package:maleva/core/colors/colors.dart' as colour;
 import 'package:maleva/core/utils/app_globals.dart';
@@ -98,7 +99,7 @@ class _CommodityTypestate extends State<CommodityType> {
   Widget _buildBody() {
     // Loading State
     if (!progress) {
-      return const Center(
+      return Center(
         child: SpinKitFoldingCube(color: colour.spinKitColor, size: 35.0),
       );
     }
@@ -123,14 +124,7 @@ class _CommodityTypestate extends State<CommodityType> {
       elevation: 0,
       title: Text(
         'Commodity Type',
-        style: GoogleFonts.lato(
-          textStyle: TextStyle(
-            color: colour.topAppBarColor,
-            fontWeight: FontWeight.bold,
-            fontSize: AppGlobals.FontLarge,
-            letterSpacing: 0.5,
-          ),
-        ),
+        style: AppTypography.heading1(color: colour.topAppBarColor),
       ),
       leading: IconButton(
         icon: const Icon(Icons.arrow_back_ios_new,
@@ -148,14 +142,7 @@ class _CommodityTypestate extends State<CommodityType> {
         keyboardType: TextInputType.text,
         textInputAction: TextInputAction.search,
         textCapitalization: TextCapitalization.characters,
-        style: GoogleFonts.lato(
-          textStyle: TextStyle(
-            color: colour.commonColor,
-            fontWeight: FontWeight.w600,
-            fontSize: AppGlobals.FontLow,
-            letterSpacing: 0.3,
-          ),
-        ),
+        style: AppTypography.bodySmall(color: colour.commonColor),
         decoration: InputDecoration(
           filled: true,
           fillColor: Colors.grey.shade100,
@@ -169,13 +156,7 @@ class _CommodityTypestate extends State<CommodityType> {
             borderSide: const BorderSide(color: colour.commonColor, width: 2.0),
           ),
           hintText: 'Search Commodity...',
-          hintStyle: GoogleFonts.lato(
-            textStyle: TextStyle(
-              letterSpacing: 1,
-              color: Colors.grey.shade500,
-              fontSize: AppGlobals.FontLow,
-            ),
-          ),
+          hintStyle: AppTypography.bodySmall(),
           prefixIcon: const Icon(Icons.search, color: Colors.grey),
           suffixIcon: txtSearch.text.isNotEmpty
               ? IconButton(
@@ -207,13 +188,7 @@ class _CommodityTypestate extends State<CommodityType> {
             const SizedBox(height: 16),
             Text(
               txtSearch.text.isNotEmpty ? 'No match found' : 'No Commodity Types',
-              style: GoogleFonts.lato(
-                textStyle: TextStyle(
-                  color: Colors.grey.shade600,
-                  fontWeight: FontWeight.bold,
-                  fontSize: AppGlobals.FontLow,
-                ),
-              ),
+              style: AppTypography.bodySmall(),
             ),
           ],
         ),
@@ -247,14 +222,7 @@ class _CommodityTypestate extends State<CommodityType> {
                   item.toString(),
                   overflow: TextOverflow.ellipsis,
                   maxLines: 1,
-                  style: GoogleFonts.lato(
-                    textStyle: TextStyle(
-                      color: colour.commonColor,
-                      fontWeight: FontWeight.w600,
-                      fontSize: AppGlobals.FontCardText,
-                      letterSpacing: 0.3,
-                    ),
-                  ),
+                  style: AppTypography.bodyLarge(color: colour.commonColor),
                 ),
                 trailing: Icon(Icons.chevron_right, color: Colors.grey.shade400),
               ),

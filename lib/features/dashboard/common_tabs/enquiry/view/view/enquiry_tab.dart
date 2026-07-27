@@ -1,3 +1,4 @@
+import 'package:maleva/core/colors/colors.dart' as colour;
 import 'package:maleva/core/theme/app_typography.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -52,7 +53,7 @@ class _EnquiryView extends StatelessWidget {
         child: BlocBuilder<EnquiryBloc, EnquiryState>(
           builder: (context, state) {
             if (state.isLoading) {
-              return const Center(
+              return Center(
                 child: CircularProgressIndicator(color: Palette.blue600),
               );
             }
@@ -307,18 +308,18 @@ class _EnquiryCard extends StatelessWidget {
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
         title: Text(
           item['CustomerName'] ?? '',
-          style: GoogleFonts.lato(color: Palette.textDark2),
+          style: AppTypography.bodyLarge(color: Palette.textDark2),
         ),
         content: Text(
           'Date: ${item['SForwardingDate'] ?? ''}',
-          style: GoogleFonts.lato(color: Palette.textMuted),
+          style: AppTypography.bodyLarge(color: Palette.textMuted),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text(
+            child: Text(
               'Close',
-              style: TextStyle(color: Palette.blue600),
+              style: AppTypography.bodyLarge(color: Palette.blue600),
             ),
           ),
         ],

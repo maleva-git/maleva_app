@@ -118,7 +118,7 @@ class _InvoiceView extends StatelessWidget {
         },
         builder: (context, state) {
           if (state is InvoiceLoading) {
-            return const Center(child: CircularProgressIndicator());
+            return Center(child: CircularProgressIndicator());
           }
 
           if (state is InvoiceError) {
@@ -183,13 +183,13 @@ class _ErrorBody extends StatelessWidget {
           const SizedBox(height: 12),
           Text(message,
               textAlign: TextAlign.center,
-              style: const TextStyle(color: Colors.grey)),
+              style: AppTypography.bodyLarge()),
           const SizedBox(height: 16),
           ElevatedButton.icon(
             onPressed: () =>
                 context.read<InvoiceBloc>().add(RefreshInvoice()),
-            icon: const Icon(Icons.refresh),
-            label: const Text('Retry'),
+            icon: Icon(Icons.refresh),
+            label: Text('Retry'),
           ),
         ],
       ),
@@ -363,16 +363,13 @@ void _showEmployeeDialog(BuildContext context, List<dynamic> data) {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const Text('Employee Details',
-                    style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                        color: AppTokens.textNavy)),
+                Text('Employee Details',
+                    style: AppTypography.heading1(color: AppTokens.textNavy)),
                 InkWell(
                   onTap: () => Navigator.pop(ctx),
                   child: const CircleAvatar(
                     radius: 14,
-                    backgroundColor: Colors.red,
+                    backgroundColor: colors.commonColorred,
                     child: Icon(Icons.close, size: 16, color: Colors.white),
                   ),
                 ),
@@ -397,9 +394,8 @@ void _showEmployeeDialog(BuildContext context, List<dynamic> data) {
                   padding: const EdgeInsets.symmetric(vertical: 12),
                 ),
                 onPressed: () => Navigator.pop(ctx),
-                child: const Text('Back to Dashboard',
-                    style: TextStyle(
-                        fontWeight: FontWeight.bold, color: Colors.white)),
+                child: Text('Back to Dashboard',
+                    style: AppTypography.heading2(color: Colors.white)),
               ),
             ),
           ],
@@ -537,12 +533,11 @@ class _DetailRow extends StatelessWidget {
         Icon(icon, color: const Color(0xFF6A994E)),
         const SizedBox(width: 8),
         Text('$label:',
-            style: const TextStyle(
-                fontWeight: FontWeight.bold, color: Color(0xFF3E2723))),
+            style: AppTypography.heading2(color: const Color(0xFF3E2723))),
         const SizedBox(width: 8),
         Expanded(
             child: Text(value,
-                style: const TextStyle(color: Color(0xFF2C3E50)))),
+                style: AppTypography.bodyLarge(color: const Color(0xFF2C3E50)))),
       ]),
     );
   }
@@ -571,29 +566,24 @@ class _EmployeeCard extends StatelessWidget {
           const SizedBox(width: 6),
           Expanded(
             child: Text(emp['EmployeeName'].toString(),
-                style: const TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 14,
-                    color: AppTokens.textNavy)),
+                style: AppTypography.heading2(color: AppTokens.textNavy)),
           ),
         ]),
         const SizedBox(height: 8),
         Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
           Row(children: [
-            const Text('RM',
+            Text('RM',
                 style:
-                TextStyle(fontWeight: FontWeight.bold, color: Colors.green)),
+                AppTypography.heading2()),
             const SizedBox(width: 4),
             Text(emp['Amount'].toString(),
-                style: const TextStyle(
-                    fontWeight: FontWeight.w600, color: Colors.green)),
+                style: AppTypography.bodyLarge()),
           ]),
           Row(children: [
             const Icon(Icons.shopping_cart, size: 16, color: Colors.orange),
             const SizedBox(width: 4),
             Text(emp['SalesCount'].toString(),
-                style: const TextStyle(
-                    fontWeight: FontWeight.w600, color: Colors.orange)),
+                style: AppTypography.bodyLarge()),
           ]),
         ]),
       ]),
@@ -1085,14 +1075,18 @@ class _MonthBarItem extends StatelessWidget {
                     width: 10,
                     height: 10,
                     decoration: BoxDecoration(
-                      color: isGrowth ? AppTokens.statusSuccess : Colors.red,
+                      color: isGrowth ? AppTokens.statusSuccess : colors.commonColorred,
                       shape: BoxShape.circle,
                     ),
                   ),
                   const SizedBox(width: 10),
                   Text(
                     month,
-                    style: AppTypography.heading3(color: AppTokens.textNavy, fontWeight: FontWeight.w700),
+                    style: TextStyle(
+                      color: const Color(0xFF1A2340),
+                      fontWeight: FontWeight.w600,
+                      fontSize: isTablet ? 15 : 14,
+                    ),
                   ),
                 ],
               ),
@@ -1101,10 +1095,22 @@ class _MonthBarItem extends StatelessWidget {
             // --- MIDDLE COLUMN ---
             Expanded(
               flex: 4,
-              child: Text(
-                "$count Invoices",
+              child: Text.rich(
+                TextSpan(
+                  text: "$count ",
+                  style: TextStyle(
+                    color: const Color(0xFF1A2340),
+                    fontSize: isTablet ? 14 : 13,
+                    fontWeight: FontWeight.bold,
+                  ),
+                  children: [
+                    TextSpan(
+                      text: "Invoices",
+                      style: AppTypography.bodyLarge(),
+                    ),
+                  ],
+                ),
                 textAlign: TextAlign.center,
-                style: AppTypography.bodyLarge(color: AppTokens.textNavy, fontWeight: FontWeight.w900),
               ),
             ),
 
@@ -1116,13 +1122,17 @@ class _MonthBarItem extends StatelessWidget {
                 children: [
                   Text(
                     _shortAmount(current),
-                    style: AppTypography.heading3(color: AppTokens.textNavy, fontWeight: FontWeight.w800),
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: isTablet ? 14 : 13,
+                      color: const Color(0xFF1A2340),
+                    ),
                   ),
                   const SizedBox(width: 4),
                   Icon(
                     isGrowth ? Icons.arrow_upward : Icons.arrow_downward,
                     size: isTablet ? 15 : 13,
-                    color: isGrowth ? AppTokens.statusSuccess : Colors.red,
+                    color: isGrowth ? AppTokens.statusSuccess : colors.commonColorred,
                   ),
                 ],
               ),
@@ -1218,7 +1228,7 @@ class _TodayYesterdayChartCard extends StatelessWidget {
                 padding: const EdgeInsets.only(top: 6),
                 child: Text(labels[i],
                     style:
-                    const TextStyle(fontSize: 10, color: Colors.grey)),
+                    AppTypography.bodySmall()),
               );
             },
           ),
@@ -1290,7 +1300,7 @@ class _LegendDot extends StatelessWidget {
       Container(width: 10, height: 3, color: color),
       const SizedBox(width: 4),
       Text(label,
-          style: TextStyle(fontSize: 11, color: Colors.grey.shade600)),
+          style: AppTypography.bodySmall()),
     ]);
   }
 }
@@ -1306,7 +1316,7 @@ class _LegendDot extends StatelessWidget {
 //       Container(width: 10, height: 3, color: color),
 //       const SizedBox(width: 4),
 //       Text(label,
-//           style: TextStyle(fontSize: 11, color: Colors.grey.shade600)),
+//           style: AppTypography.bodySmall()),
 //     ]);
 //   }
 // }

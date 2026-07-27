@@ -42,7 +42,7 @@ class _VesselPlanningDetailsView extends StatelessWidget {
           ScaffoldMessenger.of(ctx).showSnackBar(SnackBar(
             backgroundColor: Palette.redError,
             content: Text(state.errorMessage,
-                style: GoogleFonts.lato(color: Palette.white)),
+                style: AppTypography.bodyLarge(color: Palette.white)),
             duration: const Duration(seconds: 3),
           ));
         }
@@ -73,7 +73,7 @@ class _VesselPlanningDetailsView extends StatelessWidget {
       appBar: _buildAppBar(ctx, isTablet),
       drawer: const Menulist(),
       body: state.isLoading
-          ? const Center(
+          ? Center(
           child: SpinKitFoldingCube(
               color: AppTokens.spinKit, size: 35))
           : state.status == VesselPlanningDetailsStatus.failure
@@ -320,8 +320,7 @@ class _ErrorWidget extends StatelessWidget {
               onPressed: onRetry,
               icon: const Icon(Icons.refresh_rounded, size: 18),
               label: Text('Retry',
-                  style: GoogleFonts.lato(
-                      fontWeight: FontWeight.bold)),
+                  style: AppTypography.heading2()),
             ),
           ],
         ),

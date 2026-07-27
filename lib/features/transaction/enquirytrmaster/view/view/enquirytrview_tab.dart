@@ -1,3 +1,4 @@
+import 'package:maleva/core/theme/app_typography.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
@@ -86,7 +87,7 @@ class _EnquiryViewPage extends StatelessWidget {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text(state.message,
-                  style: GoogleFonts.lato(color: Colors.white)),
+                  style: AppTypography.bodyLarge(color: Colors.white)),
               backgroundColor: const Color(0xFFB33040),
               behavior: SnackBarBehavior.floating,
               shape: RoundedRectangleBorder(
@@ -108,7 +109,7 @@ class _EnquiryViewPage extends StatelessWidget {
           body: BlocBuilder<EnquiryViewBloc, EnquiryViewState>(
             builder: (context, state) {
               if (state is EnquiryViewInitial || state is EnquiryViewLoading) {
-                return const Center(
+                return Center(
                   child: SpinKitFoldingCube(color: AppTokens.invoiceHeaderEnd, size: 35),
                 );
               }
@@ -173,21 +174,12 @@ class _EnquiryViewPage extends StatelessWidget {
         children: [
           Text(
             'Enquiry TR View',
-            style: GoogleFonts.lato(
-              color: Colors.white,
-              fontWeight: FontWeight.w700,
-              fontSize: isTablet ? AppGlobals.FontMedium + 2 : AppGlobals.FontMedium,
-              letterSpacing: 0.3,
-            ),
+            style: AppTypography.heading2(color: Colors.white),
           ),
           const SizedBox(height: 2),
           Text(
             userName,
-            style: GoogleFonts.lato(
-              color: Colors.white.withValues(alpha: 0.65),
-              fontWeight: FontWeight.w500,
-              fontSize: isTablet ? AppGlobals.FontLow : AppGlobals.FontLow - 1,
-            ),
+            style: AppTypography.bodySmall(color: Colors.white),
           ),
         ],
       ),
@@ -269,11 +261,7 @@ class _EnquiryViewPage extends StatelessWidget {
                     const SizedBox(width: 10),
                     Text(
                       'Details',
-                      style: GoogleFonts.lato(
-                        color: Colors.white,
-                        fontWeight: FontWeight.w700,
-                        fontSize: 15,
-                      ),
+                      style: AppTypography.heading2(color: Colors.white),
                     ),
                   ],
                 ),
@@ -320,17 +308,11 @@ class _DetailRow extends StatelessWidget {
           SizedBox(
             width: 120,
             child: Text(label,
-                style: GoogleFonts.lato(
-                    color: AppTokens.planTextMuted,
-                    fontWeight: FontWeight.w600,
-                    fontSize: 12)),
+                style: AppTypography.bodySmall(color: AppTokens.planTextMuted)),
           ),
           Expanded(
             child: Text(value.isEmpty ? '-' : value,
-                style: GoogleFonts.lato(
-                    color: AppTokens.maintTextDark,
-                    fontWeight: FontWeight.w600,
-                    fontSize: 12)),
+                style: AppTypography.bodySmall(color: AppTokens.maintTextDark)),
           ),
         ],
       ),
@@ -395,12 +377,7 @@ class _GridHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final style = GoogleFonts.lato(
-      color: Colors.white.withValues(alpha: 0.85),
-      fontWeight: FontWeight.w600,
-      fontSize: isTablet ? 11 : 10,
-      letterSpacing: 0.5,
-    );
+    final style = AppTypography.bodySmall(color: Colors.white);
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
@@ -459,17 +436,8 @@ class _EnquiryCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final valStyle = GoogleFonts.lato(
-      color: AppTokens.maintTextDark,
-      fontWeight: FontWeight.w600,
-      fontSize: isTablet ? AppGlobals.FontCardText + 1 : AppGlobals.FontCardText,
-    );
-    final labelStyle = GoogleFonts.lato(
-      color: AppTokens.planTextMuted,
-      fontWeight: FontWeight.w600,
-      fontSize: isTablet ? 10 : 9,
-      letterSpacing: 0.4,
-    );
+    final valStyle = AppTypography.bodyLarge(color: AppTokens.maintTextDark);
+    final labelStyle = AppTypography.bodySmall(color: AppTokens.planTextMuted);
 
     return Padding(
       padding: const EdgeInsets.only(bottom: 10),
@@ -691,10 +659,7 @@ class _FilterSheetState extends State<_FilterSheet> {
               ),
             ),
             Text('Filter',
-                style: GoogleFonts.lato(
-                    color: AppTokens.invoiceHeaderStart,
-                    fontWeight: FontWeight.w700,
-                    fontSize: isTablet ? 16 : 15)),
+                style: AppTypography.heading2(color: AppTokens.invoiceHeaderStart)),
             const SizedBox(height: 16),
 
             // Date row
@@ -891,11 +856,10 @@ class _EmptyState extends StatelessWidget {
           ),
           const SizedBox(height: 14),
           Text('No Records Found',
-              style: GoogleFonts.lato(
-                  color: AppTokens.maintTextDark, fontWeight: FontWeight.w600, fontSize: 15)),
+              style: AppTypography.heading2(color: AppTokens.maintTextDark)),
           const SizedBox(height: 4),
           Text('Try adjusting your filters',
-              style: GoogleFonts.lato(color: AppTokens.planTextMuted, fontSize: 12)),
+              style: AppTypography.bodySmall(color: AppTokens.planTextMuted)),
         ],
       ),
     );
@@ -956,10 +920,7 @@ class _AddButton extends StatelessWidget {
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
             child: Text('Add',
-                style: GoogleFonts.lato(
-                    color: Colors.white,
-                    fontWeight: FontWeight.w700,
-                    fontSize: AppGlobals.FontMedium)),
+                style: AppTypography.heading2(color: Colors.white)),
           ),
         ),
       ),
@@ -1006,10 +967,7 @@ class _CardChip extends StatelessWidget {
             Icon(icon, size: 14, color: c),
             const SizedBox(width: 4),
             Text(label,
-                style: GoogleFonts.lato(
-                    color: c,
-                    fontWeight: FontWeight.w600,
-                    fontSize: 11)),
+                style: AppTypography.bodySmall(color: c)),
           ],
         ),
       ),
@@ -1040,20 +998,13 @@ class _SheetDateTile extends StatelessWidget {
         ),
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
           Text(label.toUpperCase(),
-              style: GoogleFonts.lato(
-                  color: AppTokens.planTextMuted,
-                  fontWeight: FontWeight.w700,
-                  fontSize: 9,
-                  letterSpacing: 0.6)),
+              style: AppTypography.bodySmall(color: AppTokens.planTextMuted)),
           const SizedBox(height: 4),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(d,
-                  style: GoogleFonts.lato(
-                      color: AppTokens.maintTextDark,
-                      fontWeight: FontWeight.w700,
-                      fontSize: 13)),
+                  style: AppTypography.bodyLarge(color: AppTokens.maintTextDark)),
               const Icon(Icons.calendar_month_outlined,
                   size: 18, color: AppTokens.invoiceHeaderEnd),
             ],
@@ -1096,12 +1047,7 @@ class _ESearchField extends StatelessWidget {
             Expanded(
               child: Text(
                 value.isEmpty ? hint : value,
-                style: GoogleFonts.lato(
-                  color: value.isEmpty ? AppTokens.planTextMuted : AppTokens.maintTextDark,
-                  fontWeight:
-                  value.isEmpty ? FontWeight.w500 : FontWeight.w600,
-                  fontSize: AppGlobals.FontLow,
-                ),
+                style: AppTypography.bodySmall(color: value.isEmpty ? AppTokens.planTextMuted : AppTokens.maintTextDark),
                 overflow: TextOverflow.ellipsis,
               ),
             ),
@@ -1154,12 +1100,7 @@ class _AnimatedCheckbox extends StatelessWidget {
             ),
             const SizedBox(width: 6),
             Text(label,
-                style: GoogleFonts.lato(
-                    color: AppTokens.maintTextDark,
-                    fontWeight: FontWeight.w600,
-                    fontSize: isTablet
-                        ? AppGlobals.FontLow + 1
-                        : AppGlobals.FontLow)),
+                style: AppTypography.bodySmall(color: AppTokens.maintTextDark)),
           ],
         ),
       ),
@@ -1194,10 +1135,7 @@ class _GradientButton extends StatelessWidget {
             padding:
             const EdgeInsets.symmetric(horizontal: 28, vertical: 11),
             child: Text(label,
-                style: GoogleFonts.lato(
-                    color: Colors.white,
-                    fontWeight: FontWeight.w700,
-                    fontSize: AppGlobals.FontMedium)),
+                style: AppTypography.heading2(color: Colors.white)),
           ),
         ),
       ),
@@ -1227,10 +1165,7 @@ class _OutlineButton extends StatelessWidget {
             padding:
             const EdgeInsets.symmetric(horizontal: 28, vertical: 11),
             child: Text(label,
-                style: GoogleFonts.lato(
-                    color: AppTokens.invoiceHeaderStart,
-                    fontWeight: FontWeight.w700,
-                    fontSize: AppGlobals.FontMedium)),
+                style: AppTypography.heading2(color: AppTokens.invoiceHeaderStart)),
           ),
         ),
       ),

@@ -1,4 +1,5 @@
-import 'package:maleva/core/network/api_legacy_helper.dart';
+import 'package:maleva/core/theme/app_typography.dart';
+import 'package:maleva/core/colors/colors.dart' as colour;
 import 'dart:io';
 import 'package:app_version_update/app_version_update.dart';
 import 'package:flutter/material.dart';
@@ -13,6 +14,7 @@ import '../../../core/theme/tokens.dart';
 import '../bloc/home_bloc.dart';
 import '../bloc/home_event.dart';
 import '../bloc/home_state.dart';
+import 'package:maleva/core/utils/auth_helper.dart';
 
 
 
@@ -106,7 +108,7 @@ class _HomeDashboardViewState extends State<_HomeDashboardView> {
           behavior: SnackBarBehavior.floating,
           content: Text(
             'Version check failed: ${state.errorMessage}',
-            style: GoogleFonts.lato(color: Palette.white, fontSize: 13),
+            style: AppTypography.bodyLarge(color: Palette.white),
           ),
           action: SnackBarAction(
             label: 'OK',
@@ -134,23 +136,12 @@ class _HomeDashboardViewState extends State<_HomeDashboardView> {
           await AppVersionUpdate.showAlertUpdate(
             appVersionResult: result,
             context: ctx,
-            backgroundColor: Colors.grey[200],
+            backgroundColor: colour.commonColorLight,
             title: 'New Update Available Now',
-            titleTextStyle: GoogleFonts.lato(
-              textStyle: const TextStyle(
-                color: AppTokens.textPrimary,
-                fontWeight: FontWeight.w600,
-                fontSize: 24.0,
-              ),
-            ),
+            titleTextStyle: AppTypography.bodyLarge(color: AppTokens.textPrimary),
             content:
             'Would you like to update your app to the latest version?',
-            contentTextStyle: GoogleFonts.lato(
-              textStyle: const TextStyle(
-                color: AppTokens.textPrimary,
-                fontWeight: FontWeight.w400,
-              ),
-            ),
+            contentTextStyle: AppTypography.bodyLarge(color: AppTokens.textPrimary),
             updateButtonText: 'Update',
             cancelButtonText: 'Later',
             mandatory: true,
@@ -170,13 +161,11 @@ class _HomeDashboardViewState extends State<_HomeDashboardView> {
         RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         title: Text(
           'Update Required',
-          style: GoogleFonts.lato(
-              fontWeight: FontWeight.bold,
-              color: AppTokens.textPrimary),
+          style: AppTypography.heading2(color: AppTokens.textPrimary),
         ),
         content: Text(
           'A new version is available. Please update the app to continue.',
-          style: GoogleFonts.lato(color: AppTokens.textSecondary),
+          style: AppTypography.bodyLarge(color: AppTokens.textSecondary),
         ),
         actions: [
           ElevatedButton(
@@ -190,7 +179,7 @@ class _HomeDashboardViewState extends State<_HomeDashboardView> {
               // TODO: launch store URL via url_launcher
             },
             child:
-            Text('Update Now', style: GoogleFonts.lato()),
+            Text('Update Now', style: AppTypography.bodyLarge()),
           ),
         ],
       ),
@@ -311,14 +300,7 @@ class _DashboardAppBar extends StatelessWidget
       centerTitle: true,
       title: Text(
         'Dash Board',
-        style: GoogleFonts.lato(
-          textStyle: TextStyle(
-            color: AppTokens.appBarTitle,
-            fontWeight: FontWeight.bold,
-            fontSize: isTablet ? 20 : 18,
-            letterSpacing: 0.4,
-          ),
-        ),
+        style: AppTypography.heading1(color: AppTokens.appBarTitle),
       ),
       actions: [
         IconButton(
@@ -328,7 +310,7 @@ class _DashboardAppBar extends StatelessWidget
             color: AppTokens.appBarIcon,
           ),
           tooltip: 'Logout',
-          onPressed: () => ApiLegacyHelper.logout(context),
+          onPressed: () => AuthHelper.logout(context),
         ),
       ],
     );
@@ -346,7 +328,7 @@ class _LoadingBody extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Center(
+    return Center(
       child: SpinKitFoldingCube(
         color: AppTokens.spinKit,
         size: 38.0,
@@ -396,23 +378,14 @@ class _ReadyBody extends StatelessWidget {
             AppGlobals.selectedCompanyName.isNotEmpty
                 ? AppGlobals.selectedCompanyName
                 : 'Welcome',
-            style: GoogleFonts.lato(
-              fontSize: isTablet ? 22 : 18,
-              fontWeight: FontWeight.bold,
-              color: AppTokens.textPrimary,
-              letterSpacing: 0.4,
-            ),
+            style: AppTypography.heading1(color: AppTokens.textPrimary),
           ),
 
           const SizedBox(height: 8),
 
           Text(
             'Dashboard',
-            style: GoogleFonts.lato(
-              fontSize: isTablet ? 15 : 13,
-              color: AppTokens.textSecondary,
-              letterSpacing: 0.3,
-            ),
+            style: AppTypography.heading2(color: AppTokens.textSecondary),
           ),
         ],
       ),
@@ -453,11 +426,7 @@ class _TabletSideRail extends StatelessWidget {
                   AppGlobals.selectedCompanyName.isNotEmpty
                       ? AppGlobals.selectedCompanyName
                       : 'Maleva',
-                  style: GoogleFonts.lato(
-                    color: Palette.white,
-                    fontWeight: FontWeight.bold,
-                    fontSize: 14,
-                  ),
+                  style: AppTypography.heading2(color: Palette.white),
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
                 ),
@@ -476,11 +445,7 @@ class _TabletSideRail extends StatelessWidget {
                       color: Palette.white, size: 18),
                   title: Text(
                     menu.FormText ?? '',
-                    style: GoogleFonts.lato(
-                      color: Palette.white,
-                      fontSize: 13,
-                      fontWeight: FontWeight.w500,
-                    ),
+                    style: AppTypography.bodyLarge(color: Palette.white),
                   ),
                   onTap: () {
                     // TODO: navigate using menu.FormLink or equivalent
@@ -497,12 +462,9 @@ class _TabletSideRail extends StatelessWidget {
                 color: Palette.white, size: 20),
             title: Text(
               'Logout',
-              style: GoogleFonts.lato(
-                  color: Palette.white,
-                  fontSize: 13,
-                  fontWeight: FontWeight.w600),
+              style: AppTypography.bodyLarge(color: Palette.white),
             ),
-            onTap: () => ApiLegacyHelper.logout(context),
+            onTap: () => AuthHelper.logout(context),
           ),
           const SizedBox(height: 12),
         ],

@@ -1,3 +1,4 @@
+import 'package:maleva/core/colors/colors.dart' as colour;
 import 'package:maleva/core/theme/app_typography.dart';
 import 'package:maleva/core/network/api_constants.dart';
 import 'dart:io';
@@ -50,8 +51,7 @@ class _SparePartsViewBody extends StatelessWidget {
         foregroundColor: Palette.kWhite,
         elevation: 0,
         title: Text("Spare Parts Entries",
-            style: GoogleFonts.lato(
-                fontWeight: FontWeight.bold, color: Palette.kWhite)),
+            style: AppTypography.heading2(color: Palette.kWhite)),
         centerTitle: true,
       ),
       body: BlocConsumer<SparePartsBloc, SparePartsState>(
@@ -59,7 +59,7 @@ class _SparePartsViewBody extends StatelessWidget {
           if (state is SparePartsViewError) {
             ScaffoldMessenger.of(context).showSnackBar(SnackBar(
               content: Text(state.message),
-              backgroundColor: Colors.red,
+              backgroundColor: colour.commonColorred,
             ));
           }
         },
@@ -153,7 +153,7 @@ class _SparePartsViewBody extends StatelessWidget {
         Map<String, dynamic>? selected,
       }) {
     if (isLoading) {
-      return const Center(
+      return Center(
           child: CircularProgressIndicator(color: AppTokens.brandGradientStart));
     }
     if (records.isEmpty) {
@@ -474,7 +474,7 @@ class _SparePartsCard extends StatelessWidget {
                 errorBuilder: (_, __, ___) => Container(
                   height: 80,
                   color: AppTokens.brandLight,
-                  child: const Center(
+                  child: Center(
                       child: Icon(Icons.broken_image_rounded,
                           color: AppTokens.brandMid)),
                 ),
@@ -618,7 +618,7 @@ class _SparePartsDetailPanel extends StatelessWidget {
                               Container(
                                 height: 80,
                                 color: AppTokens.brandLight,
-                                child: const Center(
+                                child: Center(
                                     child: Icon(
                                         Icons.broken_image_rounded,
                                         color: AppTokens.brandMid)),
@@ -675,7 +675,7 @@ class _ImagePreviewDialog extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Dialog(
-      backgroundColor: Colors.black87,
+      backgroundColor: colour.commonColor,
       insetPadding: const EdgeInsets.all(10),
       child: Stack(children: [
         InteractiveViewer(
@@ -687,7 +687,7 @@ class _ImagePreviewDialog extends StatelessWidget {
             child: Container(
               width: 36, height: 36,
               decoration: BoxDecoration(
-                  color: Colors.black54,
+                  color: colour.commonColor,
                   borderRadius: BorderRadius.circular(20)),
               child: const Icon(Icons.close,
                   color: Palette.kWhite, size: 20),

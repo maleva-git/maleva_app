@@ -1,3 +1,4 @@
+import 'package:maleva/core/colors/colors.dart' as colour;
 import 'package:maleva/core/theme/app_typography.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -299,7 +300,7 @@ class _VesselPlanningFilterSheetState
                               contentPadding: const EdgeInsets.symmetric(
                                   horizontal: 14, vertical: 14),
                               suffixIcon: _loadingPorts
-                                  ? const Padding(
+                                  ? Padding(
                                       padding: EdgeInsets.all(12),
                                       child: SpinKitFoldingCube(
                                           color: colour.kHeaderGradEnd, size: 16),

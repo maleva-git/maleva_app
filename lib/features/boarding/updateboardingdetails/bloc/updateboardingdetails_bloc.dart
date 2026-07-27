@@ -1,9 +1,11 @@
-import 'package:maleva/core/network/api_legacy_helper.dart';
+import 'package:flutter/foundation.dart';
+import 'package:maleva/core/network/legacy_api_repository.dart';
+import 'package:maleva/core/di/injection.dart';
 import 'package:maleva/core/network/api_constants.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 import 'package:maleva/core/utils/app_globals.dart';
-import 'package:maleva/core/network/OnlineApi.dart' as OnlineApi;
+
 import 'package:maleva/features/boarding/updateboardingdetails/bloc/updateboardingdetails_event.dart';
 import 'package:maleva/features/boarding/updateboardingdetails/bloc/updateboardingdetails_state.dart';
 import 'package:maleva/core/models/shared/response_view_model.dart';
@@ -44,7 +46,7 @@ class BoardingStatusBloc
 
     // 2. Fetch data in the background
     try {
-      await OnlineApi.GetJobNoForwarding(null, 0);
+      await sl<LegacyApiRepository>().GetJobNoForwarding(null, 0);
 
       // Pre-fill when coming from dashboard with JobNo + JobId
       if (event.jobId != null && event.jobNo != null) {
@@ -76,8 +78,8 @@ class BoardingStatusBloc
     required Emitter<BoardingStatusState> emit,
   }) async {
     try {
-      await OnlineApi.EditSalesOrder( saleOrderId, int.tryParse(jobNo) ?? 0);
-      await OnlineApi.SelectAllJobStatus(
+      await sl<LegacyApiRepository>().EditSalesOrder( saleOrderId, int.tryParse(jobNo) ?? 0);
+      await sl<LegacyApiRepository>().SelectAllJobStatus(
           null, AppGlobals.SaleEditMasterList[0]['JobMasterRefId']);
 
       int    statusId   = 0;
@@ -95,7 +97,7 @@ class BoardingStatusBloc
       final imageDir =
           '/Upload/${AppGlobals.Comid}/SalesOrder/$saleOrderId/Boarding/';
       final header = {'Content-Type': 'application/json; charset=UTF-8'};
-      final imgResult = await ApiLegacyHelper.apiAllinoneSelectArray(
+      final imgResult = await sl<LegacyApiRepository>().apiAllinoneSelectArray(
           '${ApiConstants.apiGetImage}$imageDir', null, header, null);
 
       List<String> images = [];
@@ -127,8 +129,8 @@ class BoardingStatusBloc
     if (state is! BoardingStatusLoaded) return;
     final s = state as BoardingStatusLoaded;
     try {
-      await OnlineApi.GetJobNoForwarding(null, int.parse(event.billType));
-    } catch (_) {}
+      await sl<LegacyApiRepository>().GetJobNoForwarding(null, int.parse(event.billType));
+    } catch (e, stack) { debugPrint("Error caught globally: $e\n$stack"); }
     emit(s.copyWith(
       billType:         event.billType,
       jobNoText:        '',
@@ -286,7 +288,7 @@ class BoardingStatusBloc
         'SubFolderName': 'Boarding',
       };
 
-      final result = await ApiLegacyHelper.apiAllinoneSelectArray(
+      final result = await sl<LegacyApiRepository>().apiAllinoneSelectArray(
           ApiConstants.apiDeleteImage, null, header, null);
 
       if (result != '') {
@@ -332,7 +334,7 @@ class BoardingStatusBloc
         };
         final header = {'Content-Type': 'application/json; charset=UTF-8'};
 
-        final result = await ApiLegacyHelper.apiAllinoneSelectArray(
+        final result = await sl<LegacyApiRepository>().apiAllinoneSelectArray(
             ApiConstants.apiUpdateBoardingDetails, master, header, null);
 
         if (result != '') {
@@ -375,7 +377,7 @@ class BoardingStatusBloc
       'ImageURL':     imageUrls,
     };
     final header = {'Content-Type': 'application/json; charset=UTF-8'};
-    await ApiLegacyHelper.apiAllinoneSelectArray(
+    await sl<LegacyApiRepository>().apiAllinoneSelectArray(
         ApiConstants.apiBoardingMail, master, header, null);
   }
 

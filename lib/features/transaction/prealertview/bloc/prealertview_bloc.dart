@@ -1,7 +1,9 @@
+import 'package:maleva/core/network/legacy_api_repository.dart';
+import 'package:maleva/core/di/injection.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 import 'package:maleva/core/utils/app_globals.dart';
-import 'package:maleva/core/network/OnlineApi.dart' as OnlineApi;
+
 import 'prealertview_event.dart';
 
 // ─── STATE CLASSES ────────────────────────────────────────────────────────
@@ -67,7 +69,14 @@ class PreAlertBloc extends Bloc<PreAlertEvent, PreAlertState> {
     emit(PreAlertLoading());
     try {
       if (!event.context.mounted) return;
-      await OnlineApi.SelectCustomer(event.context);await OnlineApi.SelectJobStatus(event.context);await OnlineApi.SelectEmployee(event.context, 'Sales', '');await OnlineApi.loadComboS1(event.context, 0);final isAdmin = AppGlobals.storagenew.getString('RulesType') == 'ADMIN';
+      await sl<LegacyApiRepository>().SelectCustomer(event.context);
+      if (!event.context.mounted) return;
+      await sl<LegacyApiRepository>().SelectJobStatus(event.context);
+      if (!event.context.mounted) return;
+      await sl<LegacyApiRepository>().SelectEmployee(event.context, 'Sales', '');
+      if (!event.context.mounted) return;
+      await sl<LegacyApiRepository>().loadComboS1(event.context, 0);
+      final isAdmin = AppGlobals.storagenew.getString('RulesType') == 'ADMIN';
       emit(PreAlertLoaded(
         fromDate: DateFormat('yyyy-MM-dd').format(DateTime.now()),
         toDate: DateFormat('yyyy-MM-dd').format(DateTime.now()),

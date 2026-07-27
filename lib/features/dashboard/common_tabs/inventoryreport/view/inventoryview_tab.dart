@@ -453,7 +453,7 @@ class _InventoryBody extends StatelessWidget {
             // ════════════════════════════════════
             Expanded(
               child: isLoading
-                  ? const Center(
+                  ? Center(
                   child: CircularProgressIndicator(
                       color: AppTokens.brandGradientStart))
                   : state is InventoryError
@@ -582,18 +582,18 @@ class _InventoryBody extends StatelessWidget {
     return Center(
       child: Column(mainAxisSize: MainAxisSize.min, children: [
         const Icon(Icons.error_outline,
-            color: Colors.red, size: 48),
+            color: colour.commonColorred, size: 48),
         const SizedBox(height: 12),
         Text(msg,
             textAlign: TextAlign.center,
-            style: GoogleFonts.lato(color: Colors.red)),
+            style: AppTypography.bodyLarge()),
         const SizedBox(height: 16),
         ElevatedButton.icon(
           onPressed: () => context
               .read<InventoryBloc>()
               .add(const LoadInventoryListsEvent()),
-          icon: const Icon(Icons.refresh),
-          label: const Text("Retry"),
+          icon: Icon(Icons.refresh),
+          label: Text("Retry"),
           style: ElevatedButton.styleFrom(
               backgroundColor: AppTokens.brandGradientStart),
         ),
@@ -1024,12 +1024,10 @@ class _InventoryCustomerSelectPageState
           child: TextField(
             controller: _searchCtrl,
             onChanged: _search,
-            style: GoogleFonts.lato(
-                color: AppTokens.brandDark,
-                fontWeight: FontWeight.w600),
+            style: AppTypography.bodyLarge(color: AppTokens.brandDark),
             decoration: InputDecoration(
               hintText: 'Search Customer...',
-              hintStyle: GoogleFonts.lato(color: Colors.grey),
+              hintStyle: AppTypography.bodyLarge(),
               prefixIcon: const Icon(Icons.search,
                   color: AppTokens.brandGradientStart),
               border: OutlineInputBorder(

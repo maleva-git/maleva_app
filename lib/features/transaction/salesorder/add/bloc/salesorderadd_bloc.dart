@@ -1,4 +1,3 @@
-import 'package:maleva/core/network/api_legacy_helper.dart';
 import 'package:maleva/core/network/api_constants.dart';
 import 'dart:convert';
 import 'package:flutter/material.dart';
@@ -19,6 +18,8 @@ import 'package:maleva/features/operations/models/job_all_status_model.dart';
 import 'package:maleva/core/models/shared/response_view_model.dart';
 import 'package:maleva/features/operations/models/job_type_details_model.dart';
 import 'package:maleva/features/operations/models/job_type_model.dart';
+import 'package:maleva/core/network/legacy_api_repository.dart';
+import 'package:maleva/core/di/injection.dart';
 
 class SalesOrderAddBloc extends Bloc<SalesOrderAddEvent, SalesOrderAddState> {
   final BuildContext context;
@@ -373,7 +374,7 @@ class SalesOrderAddBloc extends Bloc<SalesOrderAddEvent, SalesOrderAddState> {
 
         final header = {'Content-Type': 'application/json; charset=UTF-8'};
 
-        final resultData = await ApiLegacyHelper.apiAllinoneSelectArray(
+        final resultData = await sl<LegacyApiRepository>().apiAllinoneSelectArray(
           "${ApiConstants.apiInsertSalesOrder}?Comid=${AppGlobals.Comid}",
           master, header, context,
         );
@@ -903,7 +904,7 @@ class SalesOrderAddBloc extends Bloc<SalesOrderAddEvent, SalesOrderAddState> {
 
   Future<void> _confirmEnquiry(int id) async {
     final header = {'Content-Type': 'application/json; charset=UTF-8'};
-    await ApiLegacyHelper.apiAllinoneSelectArray("${ApiConstants.apiUpdateEnquiryMaster}$id&Comid=${AppGlobals.Comid}&StatusName=CONFIRMED", null, header, context);
+    await sl<LegacyApiRepository>().apiAllinoneSelectArray("${ApiConstants.apiUpdateEnquiryMaster}$id&Comid=${AppGlobals.Comid}&StatusName=CONFIRMED", null, header, context);
   }
 
   double _safeNum(dynamic val) {

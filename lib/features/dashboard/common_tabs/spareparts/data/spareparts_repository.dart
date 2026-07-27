@@ -1,15 +1,17 @@
+import 'package:maleva/core/network/legacy_api_repository.dart';
+import 'package:maleva/core/di/injection.dart';
 import 'package:maleva/core/network/api_constants.dart';
 import 'dart:convert';
 import 'dart:io';
 import 'package:http/http.dart' as http;
 import 'package:maleva/core/network/api_client.dart';
-import 'package:maleva/core/network/OnlineApi.dart' as OnlineApi;
+
 
 class SparePartsRepository {
   /// Loads the global truck list
   Future<void> fetchTrucks() async {
     // We pass null for context so it safely runs in the background
-    await OnlineApi.SelectTruckList(null, null);}
+    await sl<LegacyApiRepository>().SelectTruckList(null, null);}
 
   /// Fetches Spare Parts records for the View page
   Future<dynamic> fetchSparePartsRecords({

@@ -50,8 +50,8 @@ class _RTIDetailsBody extends StatelessWidget {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text(state.message,
-                  style: GoogleFonts.lato(color: colour.kWhite)),
-              backgroundColor: Colors.red.shade600,
+                  style: AppTypography.bodyLarge(color: colour.kWhite)),
+              backgroundColor: colour.commonColorred,
               behavior: SnackBarBehavior.floating,
               shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(10)),
@@ -212,8 +212,8 @@ class _RTIDetailsBody extends StatelessWidget {
         if (context.mounted) {
           ScaffoldMessenger.of(context).showSnackBar(SnackBar(
             content: Text("Failed to download PDF (${response.statusCode})",
-                style: GoogleFonts.lato(color: Colors.white)),
-            backgroundColor: Colors.red.shade600,
+                style: AppTypography.bodyLarge(color: Colors.white)),
+            backgroundColor: colour.commonColorred,
             behavior: SnackBarBehavior.floating,
             shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(10)),
@@ -236,8 +236,8 @@ class _RTIDetailsBody extends StatelessWidget {
       if (result.type != ResultType.done && context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(
           content: Text("Could not open PDF: ${result.message}",
-              style: GoogleFonts.lato(color: Colors.white)),
-          backgroundColor: Colors.red.shade600,
+              style: AppTypography.bodyLarge(color: Colors.white)),
+          backgroundColor: colour.commonColorred,
           behavior: SnackBarBehavior.floating,
           shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(10)),
@@ -248,8 +248,8 @@ class _RTIDetailsBody extends StatelessWidget {
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(
           content: Text("Error: ${e.toString()}",
-              style: GoogleFonts.lato(color: Colors.white)),
-          backgroundColor: Colors.red.shade600,
+              style: AppTypography.bodyLarge(color: Colors.white)),
+          backgroundColor: colour.commonColorred,
           behavior: SnackBarBehavior.floating,
           shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(10)),
@@ -465,9 +465,9 @@ class _ErrorView extends StatelessWidget {
           Container(
             padding: const EdgeInsets.all(20),
             decoration: BoxDecoration(
-                color: Colors.red.shade50, shape: BoxShape.circle),
+                color: colour.commonColorred.withValues(alpha: 0.1), shape: BoxShape.circle),
             child:
-            Icon(Icons.error_outline, color: Colors.red.shade400, size: 40),
+            Icon(Icons.error_outline, color: colour.commonColorred, size: 40),
           ),
           const SizedBox(height: 16),
           Text("Something went wrong",
@@ -481,7 +481,7 @@ class _ErrorView extends StatelessWidget {
             onPressed: onRetry,
             icon: const Icon(Icons.refresh_rounded, size: 18),
             label: Text("Try Again",
-                style: GoogleFonts.lato(fontWeight: FontWeight.bold)),
+                style: AppTypography.heading2()),
             style: ElevatedButton.styleFrom(
               backgroundColor: AppTokens.brandGradientStart,
               foregroundColor: colour.kWhite,
@@ -660,7 +660,7 @@ class _RTIDetailsCardState extends State<_RTIDetailsCard> {
                       ),
                       child: Row(mainAxisSize: MainAxisSize.min, children: [
                         Icon(Icons.picture_as_pdf_outlined,
-                            color: Colors.red.shade300, size: 16),
+                            color: colour.commonColorred, size: 16),
                         const SizedBox(width: 4),
                         Text("PDF",
                             style: AppTypography.bodySmall(color: colour.kWhite, fontWeight: FontWeight.bold)),
@@ -774,7 +774,7 @@ class _DetailsTable extends StatelessWidget {
         padding: const EdgeInsets.symmetric(vertical: 16),
         child: Center(
           child: Text("No Details Found",
-              style: GoogleFonts.lato(color: Colors.grey)),
+              style: AppTypography.bodyLarge()),
         ),
       );
     }
@@ -818,15 +818,11 @@ class _DetailsTable extends StatelessWidget {
                 }),
                 cells: [
                   DataCell(Text(d.JobNo,
-                      style: GoogleFonts.lato(
-                          fontWeight: FontWeight.w600,
-                          color: AppTokens.brandGradientStart))),
+                      style: AppTypography.bodyLarge(color: AppTokens.brandGradientStart))),
                   DataCell(Text(d.JobDate)),
                   DataCell(Text(d.CustomerName)),
                   DataCell(Text(d.Salary.toStringAsFixed(2),
-                      style: GoogleFonts.lato(
-                          fontWeight: FontWeight.bold,
-                          color: Colors.green.shade700))),
+                      style: AppTypography.heading2())),
                 ],
               );
             }).toList(),

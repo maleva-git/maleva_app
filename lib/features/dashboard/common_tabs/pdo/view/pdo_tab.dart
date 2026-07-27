@@ -13,6 +13,7 @@ import '../bloc/pdo_state.dart';
 import '../data/pdo_repository.dart';
 import 'package:maleva/core/models/shared/r_t_i_master_view_model.dart';
 import 'package:maleva/core/models/shared/r_t_i_details_view_model.dart';
+import 'package:maleva/core/theme/palette.dart';
 
 // ── Entry Point ───────────────────────────────────────────────────────────────
 // ── Entry Point ───────────────────────────────────────────────────────────────
@@ -83,16 +84,20 @@ class _PDOViewBody extends StatelessWidget {
                   Container(
                     padding: const EdgeInsets.all(8),
                     decoration: BoxDecoration(
-                        color: Colors.red.shade50, shape: BoxShape.circle),
+                        color: colour.commonColorred.withValues(alpha: 0.1),
+                        shape: BoxShape.circle),
                     child: Icon(Icons.error_outline,
-                        color: Colors.red.shade600, size: 22),
+                        color: colour.commonColorred, size: 22),
                   ),
                   const SizedBox(width: 12),
                   Text("Error",
-                      style: GoogleFonts.lato(fontWeight: FontWeight.bold)),
+                      style: AppTypography.heading3(
+                          color: colour.commonColorred,
+                          fontWeight: FontWeight.bold)),
                 ]),
                 content: Text(state.saveError!,
-                    style: AppTypography.heading2(color: Colors.grey.shade800)),
+                    style:
+                        AppTypography.bodyLarge(color: AppTokens.textPrimary)),
                 actions: [
                   TextButton(
                     onPressed: () {
@@ -102,7 +107,9 @@ class _PDOViewBody extends StatelessWidget {
                           .add(const ResetPDOSaveStatusEvent());
                     },
                     child: Text("OK",
-                        style: AppTypography.heading2(color: AppTokens.brandGradientStart, fontWeight: FontWeight.bold)),
+                        style: AppTypography.bodyLarge(
+                            color: AppTokens.brandGradientStart,
+                            fontWeight: FontWeight.bold)),
                   ),
                 ],
               ),
@@ -124,7 +131,8 @@ class _PDOViewBody extends StatelessWidget {
               ),
               const SizedBox(height: 20),
               Text("Loading RTI Details…",
-                  style: AppTypography.bodyLarge(color: Colors.grey.shade600, fontWeight: FontWeight.w500)),
+                  style: AppTypography.bodyLarge(
+                      color: AppTokens.textMuted, fontWeight: FontWeight.w500)),
             ]),
           );
         }
@@ -137,24 +145,28 @@ class _PDOViewBody extends StatelessWidget {
                 Container(
                   padding: const EdgeInsets.all(24),
                   decoration: BoxDecoration(
-                      color: Colors.red.shade50, shape: BoxShape.circle),
+                      color: colour.commonColorred.withValues(alpha: 0.1),
+                      shape: BoxShape.circle),
                   child: Icon(Icons.error_outline,
-                      color: Colors.red.shade400, size: 48),
+                      color: colour.commonColorred, size: 48),
                 ),
                 const SizedBox(height: 20),
                 Text("Something went wrong",
-                    style: AppTypography.heading1(color: AppTokens.brandDark, fontWeight: FontWeight.bold)),
+                    style: AppTypography.heading1(
+                        color: AppTokens.brandDark,
+                        fontWeight: FontWeight.bold)),
                 const SizedBox(height: 8),
                 Text(state.message,
                     textAlign: TextAlign.center,
-                    style: AppTypography.bodyLarge(color: Colors.grey.shade600)),
+                    style: AppTypography.bodyLarge(color: AppTokens.textMuted)),
                 const SizedBox(height: 24),
                 ElevatedButton.icon(
                   onPressed: () =>
                       context.read<PDOBloc>().add(const LoadPDOViewEvent()),
                   icon: const Icon(Icons.refresh_rounded, size: 20),
                   label: Text("Try Again",
-                      style: AppTypography.heading2(fontWeight: FontWeight.bold)),
+                      style:
+                          AppTypography.bodyLarge(fontWeight: FontWeight.bold)),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppTokens.brandGradientStart,
                     foregroundColor: colour.kWhite,
@@ -191,17 +203,17 @@ class _PDOViewBody extends StatelessWidget {
             child: s.filteredMasters.isEmpty
                 ? const _EmptyState()
                 : ListView.builder(
-              padding: const EdgeInsets.fromLTRB(16, 8, 16, 24),
-              itemCount: s.filteredMasters.length,
-              itemBuilder: (context, index) {
-                final m = s.filteredMasters[index];
-                return _RTIMasterCard(
-                  master: m,
-                  details: s.detailsFor(m.Id),
-                  isSaving: s.isSaving,
-                );
-              },
-            ),
+                    padding: const EdgeInsets.fromLTRB(16, 8, 16, 24),
+                    itemCount: s.filteredMasters.length,
+                    itemBuilder: (context, index) {
+                      final m = s.filteredMasters[index];
+                      return _RTIMasterCard(
+                        master: m,
+                        details: s.detailsFor(m.Id),
+                        isSaving: s.isSaving,
+                      );
+                    },
+                  ),
           ),
         ]);
       },
@@ -250,10 +262,13 @@ class _PageHeader extends StatelessWidget {
         const SizedBox(width: 14),
         Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
           Text("RTI Details",
-              style: AppTypography.heading1(color: AppTokens.brandGradientStartDark, fontWeight: FontWeight.bold)),
+              style: AppTypography.heading1(
+                  color: AppTokens.brandGradientStartDark,
+                  fontWeight: FontWeight.bold)),
           const SizedBox(height: 2),
           Text("Return to Inventory",
-              style: AppTypography.bodyMedium(color: Colors.grey.shade500, fontWeight: FontWeight.w500)),
+              style: AppTypography.bodyMedium(
+                  color: AppTokens.textMuted, fontWeight: FontWeight.w500)),
         ]),
         const Spacer(),
         if (count > 0)
@@ -268,7 +283,9 @@ class _PageHeader extends StatelessWidget {
                   size: 14, color: AppTokens.brandGradientStart),
               const SizedBox(width: 6),
               Text("$count records",
-                  style: AppTypography.heading3(color: AppTokens.brandGradientStart, fontWeight: FontWeight.bold)),
+                  style: AppTypography.heading3(
+                      color: AppTokens.brandGradientStart,
+                      fontWeight: FontWeight.bold)),
             ]),
           ),
       ]),
@@ -297,20 +314,20 @@ class _SearchBar extends StatelessWidget {
       ),
       child: TextField(
         onChanged: onChanged,
-        style: AppTypography.heading2(color: AppTokens.brandDark),
+        style: AppTypography.bodyLarge(
+            color: AppTokens.brandDark, fontWeight: FontWeight.bold),
         decoration: InputDecoration(
           hintText: "Search RTI No / Driver / Truck",
-          hintStyle:
-          AppTypography.bodyLarge(color: Colors.grey.shade400),
+          hintStyle: AppTypography.bodyLarge(color: AppTokens.textMuted),
           prefixIcon: const Icon(Icons.search_rounded,
               color: AppTokens.brandGradientStart, size: 22),
           contentPadding:
-          const EdgeInsets.symmetric(vertical: 16, horizontal: 16),
+              const EdgeInsets.symmetric(vertical: 16, horizontal: 16),
           border: InputBorder.none,
           focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(16),
-              borderSide:
-              const BorderSide(color: AppTokens.brandGradientStart, width: 1.5)),
+              borderSide: const BorderSide(
+                  color: AppTokens.brandGradientStart, width: 1.5)),
           enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(16),
               borderSide: BorderSide.none),
@@ -335,14 +352,16 @@ class _EmptyState extends StatelessWidget {
                 color: AppTokens.brandLight.withValues(alpha: 0.5),
                 shape: BoxShape.circle),
             child: Icon(Icons.receipt_long_outlined,
-                size: 48, color: AppTokens.brandGradientStart.withValues(alpha: 0.5)),
+                size: 48,
+                color: AppTokens.brandGradientStart.withValues(alpha: 0.5)),
           ),
           const SizedBox(height: 20),
           Text("No Records Found",
-              style: AppTypography.heading1(color: AppTokens.brandDark, fontWeight: FontWeight.bold)),
+              style: AppTypography.heading1(
+                  color: AppTokens.brandDark, fontWeight: FontWeight.bold)),
           const SizedBox(height: 6),
           Text("Try adjusting the date range or search",
-              style: AppTypography.bodyLarge(color: Colors.grey.shade500)),
+              style: AppTypography.bodyLarge(color: AppTokens.textMuted)),
         ]),
       ),
     );
@@ -433,7 +452,9 @@ class _RTIMasterCard extends StatelessWidget {
                   ),
                   const SizedBox(width: 8),
                   Text("JOB DETAILS",
-                      style: AppTypography.bodyMedium(color: Colors.grey.shade500, fontWeight: FontWeight.bold)),
+                      style: AppTypography.bodyMedium(
+                          color: AppTokens.textMuted,
+                          fontWeight: FontWeight.bold)),
                 ]),
               ),
 
@@ -441,12 +462,12 @@ class _RTIMasterCard extends StatelessWidget {
 
               // Detail rows
               ...details.map((d) => Padding(
-                padding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
-                child: _RTIDetailRow(
-                  detail: d,
-                  masterId: master.Id,
-                ),
-              )),
+                    padding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
+                    child: _RTIDetailRow(
+                      detail: d,
+                      masterId: master.Id,
+                    ),
+                  )),
 
               const SizedBox(height: 8),
             ],
@@ -470,8 +491,7 @@ class _MasterCardHeader extends StatelessWidget {
         gradient: LinearGradient(
           colors: [
             AppTokens.brandGradientStart,
-            AppTokens.brandGradientStart.withBlue(
-                (AppTokens.brandGradientStart.blue + 25).clamp(0, 255)),
+            AppTokens.brandGradientEnd,
           ],
           begin: Alignment.centerLeft,
           end: Alignment.centerRight,
@@ -482,25 +502,28 @@ class _MasterCardHeader extends StatelessWidget {
         Container(
           padding: const EdgeInsets.all(8),
           decoration: BoxDecoration(
-              color: colour.kWhite.withValues(alpha: 0.2), shape: BoxShape.circle),
-          child: const Icon(Icons.receipt_rounded,
-              color: colour.kWhite, size: 18),
+              color: colour.kWhite.withValues(alpha: 0.2),
+              shape: BoxShape.circle),
+          child:
+              const Icon(Icons.receipt_rounded, color: colour.kWhite, size: 18),
         ),
         const SizedBox(width: 12),
 
         // RTI No + Date
         Expanded(
           child:
-          Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
             Text(master.RTINoDisplay,
-                style: AppTypography.heading1(color: colour.kWhite, fontWeight: FontWeight.bold)),
+                style: AppTypography.bodyLarge(
+                    color: colour.kWhite, fontWeight: FontWeight.bold)),
             const SizedBox(height: 4),
             Row(children: [
               Icon(Icons.calendar_today_rounded,
                   size: 12, color: colour.kWhite.withValues(alpha: 0.8)),
               const SizedBox(width: 6),
               Text(master.RTIDate,
-                  style: AppTypography.bodyMedium(color: colour.kWhite.withValues(alpha: 0.9))),
+                  style: AppTypography.bodyMedium(
+                      color: colour.kWhite.withValues(alpha: 0.9))),
             ]),
           ]),
         ),
@@ -511,10 +534,12 @@ class _MasterCardHeader extends StatelessWidget {
           decoration: BoxDecoration(
             color: colour.kWhite.withValues(alpha: 0.2),
             borderRadius: BorderRadius.circular(20),
-            border: Border.all(color: colour.kWhite.withValues(alpha: 0.3), width: 1),
+            border: Border.all(
+                color: colour.kWhite.withValues(alpha: 0.3), width: 1),
           ),
           child: Text("RM ${master.Amount}",
-              style: AppTypography.heading3(color: colour.kWhite, fontWeight: FontWeight.bold)),
+              style: AppTypography.heading3(
+                  color: colour.kWhite, fontWeight: FontWeight.bold)),
         ),
       ]),
     );
@@ -532,7 +557,7 @@ class _MasterInfoCard extends StatelessWidget {
       width: double.infinity,
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: AppTokens.brandLight.withValues(alpha: 0.3),
+        color: AppTokens.surfaceDetail,
         borderRadius: BorderRadius.circular(14),
         border: Border.all(color: AppTokens.brandLight, width: 1.0),
       ),
@@ -540,14 +565,14 @@ class _MasterInfoCard extends StatelessWidget {
         _infoChip(Icons.person_outline_rounded, "Driver", master.DriverName),
         if ((master.DriverName ?? '').isNotEmpty &&
             (master.TruckName ?? '').isNotEmpty)
-          const Padding(
+          Padding(
             padding: EdgeInsets.symmetric(vertical: 4),
             child: Divider(height: 16, thickness: 0.5),
           ),
         _infoChip(Icons.local_shipping_outlined, "Truck", master.TruckName),
         if ((master.TruckName ?? '').isNotEmpty &&
             (master.Remarks ?? '').isNotEmpty)
-          const Padding(
+          Padding(
             padding: EdgeInsets.symmetric(vertical: 4),
             child: Divider(height: 16, thickness: 0.5),
           ),
@@ -570,33 +595,35 @@ class _VerifyButton extends StatelessWidget {
       height: 48,
       child: ElevatedButton(
         style: ElevatedButton.styleFrom(
-          backgroundColor: Colors.green.shade600,
+          backgroundColor: Palette.green,
           disabledBackgroundColor: Colors.green.shade300,
           shape:
-          RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
           elevation: 2,
-          shadowColor: Colors.green.shade200,
+          shadowColor: Colors.green.shade300,
         ),
         onPressed: isSaving ? null : onTap,
         child: isSaving
             ? Row(mainAxisSize: MainAxisSize.min, children: [
-          const SizedBox(
-            width: 18,
-            height: 18,
-            child: CircularProgressIndicator(
-                color: colour.kWhite, strokeWidth: 2.5),
-          ),
-          const SizedBox(width: 10),
-          Text("Saving…",
-              style: AppTypography.heading2(color: colour.kWhite, fontWeight: FontWeight.bold)),
-        ])
+                const SizedBox(
+                  width: 18,
+                  height: 18,
+                  child: CircularProgressIndicator(
+                      color: colour.kWhite, strokeWidth: 2.5),
+                ),
+                const SizedBox(width: 10),
+                Text("Saving…",
+                    style: AppTypography.bodyLarge(
+                        color: colour.kWhite, fontWeight: FontWeight.bold)),
+              ])
             : Row(mainAxisSize: MainAxisSize.min, children: [
-          const Icon(Icons.verified_rounded,
-              color: colour.kWhite, size: 20),
-          const SizedBox(width: 8),
-          Text("Verify RTI Request",
-              style: AppTypography.heading2(color: colour.kWhite, fontWeight: FontWeight.bold)),
-        ]),
+                const Icon(Icons.verified_rounded,
+                    color: colour.kWhite, size: 20),
+                const SizedBox(width: 8),
+                Text("Verify RTI Request",
+                    style: AppTypography.bodyLarge(
+                        color: colour.kWhite, fontWeight: FontWeight.bold)),
+              ]),
       ),
     );
   }
@@ -618,17 +645,18 @@ class _RTIDetailRow extends StatelessWidget {
       curve: Curves.easeInOut,
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color:
-        isVerified ? Colors.green.shade50.withValues(alpha: 0.5) : colour.kWhite,
+        color: isVerified
+            ? Palette.green.withValues(alpha: 0.1).withValues(alpha: 0.5)
+            : colour.kWhite,
         borderRadius: BorderRadius.circular(14),
         border: Border.all(
-          color: isVerified ? Colors.green.shade200 : AppTokens.brandLight,
+          color: isVerified ? Colors.green.shade300 : AppTokens.brandLight,
           width: 1.0,
         ),
         boxShadow: [
           BoxShadow(
               color: isVerified
-                  ? Colors.green.withValues(alpha: 0.04)
+                  ? Palette.green.withValues(alpha: 0.04)
                   : AppTokens.brandGradientStart.withValues(alpha: 0.03),
               blurRadius: 8,
               offset: const Offset(0, 3)),
@@ -643,15 +671,14 @@ class _RTIDetailRow extends StatelessWidget {
             height: 8,
             margin: const EdgeInsets.only(right: 10),
             decoration: BoxDecoration(
-              color: isVerified
-                  ? Colors.green.shade500
-                  : AppTokens.brandGradientStart,
+              color: isVerified ? Palette.green : AppTokens.brandGradientStart,
               shape: BoxShape.circle,
             ),
           ),
           Expanded(
             child: Text(detail.JobNo,
-                style: AppTypography.heading2(color: AppTokens.brandDark, fontWeight: FontWeight.bold)),
+                style: AppTypography.bodyLarge(
+                    color: AppTokens.brandDark, fontWeight: FontWeight.bold)),
           ),
 
           // Verify toggle pill
@@ -662,20 +689,20 @@ class _RTIDetailRow extends StatelessWidget {
               duration: const Duration(milliseconds: 200),
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
               decoration: BoxDecoration(
-                color: isVerified ? Colors.green.shade600 : AppTokens.brandLight,
+                color: isVerified ? Palette.green : AppTokens.brandLight,
                 borderRadius: BorderRadius.circular(24),
                 border: Border.all(
                     color: isVerified
-                        ? Colors.green.shade600
+                        ? Palette.green
                         : AppTokens.brandGradientStart.withValues(alpha: 0.3),
                     width: 1),
                 boxShadow: isVerified
                     ? [
-                  BoxShadow(
-                      color: Colors.green.withValues(alpha: 0.2),
-                      blurRadius: 4,
-                      offset: const Offset(0, 2))
-                ]
+                        BoxShadow(
+                            color: Palette.green.withValues(alpha: 0.2),
+                            blurRadius: 4,
+                            offset: const Offset(0, 2))
+                      ]
                     : [],
               ),
               child: Row(mainAxisSize: MainAxisSize.min, children: [
@@ -686,17 +713,20 @@ class _RTIDetailRow extends StatelessWidget {
                         ? Icons.check_circle_rounded
                         : Icons.circle_outlined,
                     key: ValueKey(isVerified),
-                    color:
-                    isVerified ? colour.kWhite : AppTokens.brandGradientStart,
+                    color: isVerified
+                        ? colour.kWhite
+                        : AppTokens.brandGradientStart,
                     size: 16,
                   ),
                 ),
                 const SizedBox(width: 6),
                 Text(
                   isVerified ? "Verified" : "Verify",
-                  style: AppTypography.heading3(color: isVerified
+                  style: AppTypography.heading3(
+                      color: isVerified
                           ? colour.kWhite
-                          : AppTokens.brandGradientStart, fontWeight: FontWeight.bold),
+                          : AppTokens.brandGradientStart,
+                      fontWeight: FontWeight.bold),
                 ),
               ]),
             ),
@@ -727,18 +757,18 @@ Widget _buildImageThumbnail(BuildContext context, String? path) {
     imageWidget = Image.network(path,
         fit: BoxFit.cover,
         errorBuilder: (_, __, ___) =>
-            Icon(Icons.broken_image_rounded, color: Colors.red.shade300));
+            Icon(Icons.broken_image_rounded, color: colour.commonColorred));
   } else if (path.startsWith("/data/")) {
     imageWidget = Image.file(File(path),
         fit: BoxFit.cover,
         errorBuilder: (_, __, ___) =>
-            Icon(Icons.broken_image_rounded, color: Colors.red.shade300));
+            Icon(Icons.broken_image_rounded, color: colour.commonColorred));
   } else if (path.startsWith("/")) {
     final url = ApiConstants.port + path;
     imageWidget = Image.network(url,
         fit: BoxFit.cover,
         errorBuilder: (_, __, ___) =>
-            Icon(Icons.broken_image_rounded, color: Colors.red.shade300));
+            Icon(Icons.broken_image_rounded, color: colour.commonColorred));
   } else {
     return const SizedBox.shrink();
   }
@@ -786,7 +816,7 @@ void _showImagePopup(BuildContext context, Widget imageWidget) {
   showDialog(
     context: context,
     builder: (_) => Dialog(
-      backgroundColor: Colors.black87,
+      backgroundColor: colour.commonColor,
       insetPadding: const EdgeInsets.all(16),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
       child: Stack(children: [
@@ -828,15 +858,17 @@ Widget _infoChip(IconData icon, String label, String? value) {
     SizedBox(
       width: 70,
       child: Text(label,
-          style: AppTypography.bodyLarge(color: Colors.grey.shade600, fontWeight: FontWeight.w600)),
+          style: AppTypography.bodyLarge(
+              color: AppTokens.textMuted, fontWeight: FontWeight.w600)),
     ),
-    const Padding(
+    Padding(
       padding: EdgeInsets.symmetric(horizontal: 4),
-      child: Text(":", style: TextStyle(color: Colors.grey, fontSize: 13)),
+      child: Text(":", style: AppTypography.bodyLarge()),
     ),
     Expanded(
       child: Text(value,
-          style: AppTypography.bodyLarge(color: AppTokens.brandDark, fontWeight: FontWeight.w500)),
+          style: AppTypography.bodyLarge(
+              color: AppTokens.brandDark, fontWeight: FontWeight.w500)),
     ),
   ]);
 }
@@ -848,15 +880,17 @@ Widget _infoRow(String label, String? value) {
     SizedBox(
       width: 75,
       child: Text(label,
-          style: AppTypography.bodyLarge(color: Colors.grey.shade600, fontWeight: FontWeight.w600)),
+          style: AppTypography.bodyLarge(
+              color: AppTokens.textMuted, fontWeight: FontWeight.w600)),
     ),
-    const Padding(
+    Padding(
       padding: EdgeInsets.symmetric(horizontal: 4),
-      child: Text(":", style: TextStyle(color: Colors.grey, fontSize: 13)),
+      child: Text(":", style: AppTypography.bodyLarge()),
     ),
     Expanded(
       child: Text(value,
-          style: AppTypography.bodyLarge(color: AppTokens.brandDark, fontWeight: FontWeight.w500)),
+          style: AppTypography.bodyLarge(
+              color: AppTokens.brandDark, fontWeight: FontWeight.w500)),
     ),
   ]);
 }
@@ -875,17 +909,19 @@ class _SuccessDialog extends StatelessWidget {
         Container(
           padding: const EdgeInsets.all(18),
           decoration: BoxDecoration(
-              color: Colors.green.shade50, shape: BoxShape.circle),
-          child: Icon(Icons.check_circle_rounded,
-              color: Colors.green.shade600, size: 40),
+              color: Palette.green.withValues(alpha: 0.1),
+              shape: BoxShape.circle),
+          child:
+              Icon(Icons.check_circle_rounded, color: Palette.green, size: 40),
         ),
         const SizedBox(height: 16),
         Text("Saved Successfully!",
-            style: AppTypography.heading1(color: AppTokens.brandDark, fontWeight: FontWeight.bold)),
+            style: AppTypography.heading1(
+                color: AppTokens.brandDark, fontWeight: FontWeight.bold)),
         const SizedBox(height: 8),
         Text("The RTI record has been verified.",
             textAlign: TextAlign.center,
-            style: AppTypography.bodyLarge(color: Colors.grey.shade600)),
+            style: AppTypography.bodyLarge(color: AppTokens.textMuted)),
         const SizedBox(height: 24),
         SizedBox(
           width: double.infinity,
@@ -899,7 +935,8 @@ class _SuccessDialog extends StatelessWidget {
               elevation: 0,
             ),
             child: Text("Done",
-                style: AppTypography.heading1(color: colour.kWhite, fontWeight: FontWeight.bold)),
+                style: AppTypography.bodyLarge(
+                    color: colour.kWhite, fontWeight: FontWeight.bold)),
           ),
         ),
       ]),

@@ -1,3 +1,4 @@
+import 'package:maleva/core/colors/colors.dart' as colour;
 import 'package:maleva/core/theme/app_typography.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -42,7 +43,7 @@ class _VesselDashboardView extends StatelessWidget {
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
                   backgroundColor: Palette.redAccent,
-                  content: Text(state.errorMessage, style: GoogleFonts.lato(color: Palette.white)),
+                  content: Text(state.errorMessage, style: AppTypography.bodyLarge(color: Palette.white)),
                   behavior: SnackBarBehavior.floating,
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                 ),
@@ -57,7 +58,7 @@ class _VesselDashboardView extends StatelessWidget {
                 _buildFilterSection(context, state),
                 Expanded(
                   child: state.isLoading
-                      ? const Center(child: SpinKitFoldingCube(color: Palette.blue500, size: 35.0))
+                      ? Center(child: SpinKitFoldingCube(color: Palette.blue500, size: 35.0))
                       : state.vesselList.isEmpty
                       ? Center(
                       child: Text('No Vessel Data Found',
@@ -198,7 +199,7 @@ class _VesselDashboardView extends StatelessWidget {
           Row(
             children: [
               _buildDateBadge(context, "From", state.fromDate, true, state),
-              const Padding(
+              Padding(
                 padding: EdgeInsets.symmetric(horizontal: 10),
                 child: Icon(Icons.arrow_forward_rounded, color: Palette.grey400, size: 16),
               ),

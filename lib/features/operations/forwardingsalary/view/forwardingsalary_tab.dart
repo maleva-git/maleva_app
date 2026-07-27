@@ -1,9 +1,13 @@
+import 'package:maleva/core/theme/app_typography.dart';
+import 'package:maleva/core/colors/colors.dart' as colour;
+import 'package:maleva/core/network/legacy_api_repository.dart';
+import 'package:maleva/core/di/injection.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:maleva/core/utils/app_globals.dart';
-import 'package:maleva/core/network/OnlineApi.dart' as OnlineApi;
+
 import 'package:maleva/menu/menulist.dart';
 import '../../../../core/di/injection.dart';
 import '../../../mastersearch/Employee.dart';
@@ -64,7 +68,7 @@ class _ForwardingSalaryPage extends StatelessWidget {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text(state.message,
-                  style: GoogleFonts.lato(color: Colors.white)),
+                  style: AppTypography.bodyLarge(color: Colors.white)),
               backgroundColor: const Color(0xFFB33040),
               behavior: SnackBarBehavior.floating,
               shape: RoundedRectangleBorder(
@@ -88,7 +92,7 @@ class _ForwardingSalaryPage extends StatelessWidget {
             builder: (context, state) {
               if (state is ForwardingSalaryInitial ||
                   state is ForwardingSalaryLoading) {
-                return const Center(
+                return Center(
                   child: SpinKitFoldingCube(
                       color: kHeaderGradEnd, size: 35),
                 );
@@ -127,17 +131,10 @@ class _ForwardingSalaryPage extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text('F/S Update',
-              style: GoogleFonts.lato(
-                  color: Colors.white,
-                  fontWeight: FontWeight.w700,
-                  fontSize: 17,
-                  letterSpacing: 0.3)),
+              style: AppTypography.heading2(color: Colors.white)),
           const SizedBox(height: 2),
           Text(userName,
-              style: GoogleFonts.lato(
-                  color: Colors.white.withValues(alpha: 0.65),
-                  fontWeight: FontWeight.w500,
-                  fontSize: 12)),
+              style: AppTypography.bodySmall(color: Colors.white)),
         ],
       ),
       actions: [
@@ -341,7 +338,7 @@ class _ForwardingSalaryBody extends StatelessWidget {
 
   // ─── Employee pickers ────────────────────────────────────────────────────────
   Future<void> _pickSealEmp(BuildContext context) async {
-    await OnlineApi.SelectEmployee(context, '', 'Operation');
+    await sl<LegacyApiRepository>().SelectEmployee(context, '', 'Operation');
     if (!context.mounted) return;
 Navigator.push(
       context,
@@ -361,7 +358,7 @@ Navigator.push(
   }
 
   Future<void> _pickBreakEmp(BuildContext context) async {
-    await OnlineApi.SelectEmployee(context, '', 'Operation');
+    await sl<LegacyApiRepository>().SelectEmployee(context, '', 'Operation');
     if (!context.mounted) return;
 Navigator.push(
       context,
@@ -434,15 +431,10 @@ class _RtiFieldState extends State<_RtiField> {
           keyboardType: TextInputType.number,
           textCapitalization: TextCapitalization.characters,
           textInputAction: TextInputAction.done,
-          style: GoogleFonts.lato(
-              color: kTextDark,
-              fontWeight: FontWeight.w600,
-              fontSize: isTablet ? AppGlobals.FontLow + 1 : AppGlobals.FontLow),
+          style: AppTypography.bodySmall(color: kTextDark),
           decoration: InputDecoration(
             hintText: 'RTI No',
-            hintStyle: GoogleFonts.lato(
-                color: kTextMuted,
-                fontSize: isTablet ? AppGlobals.FontLow + 1 : AppGlobals.FontLow),
+            hintStyle: AppTypography.bodySmall(color: kTextMuted),
             filled: true,
             fillColor: kDetailBg,
             prefixIcon: const Icon(Icons.tag_rounded,
@@ -520,12 +512,7 @@ class _RtiFieldState extends State<_RtiField> {
                             size: 16, color: kHeaderGradEnd),
                         const SizedBox(width: 10),
                         Text(cnum,
-                            style: GoogleFonts.lato(
-                                color: kTextDark,
-                                fontWeight: FontWeight.w600,
-                                fontSize: isTablet
-                                    ? AppGlobals.FontLow + 1
-                                    : AppGlobals.FontLow)),
+                            style: AppTypography.bodySmall(color: kTextDark)),
                       ],
                     ),
                   ),
@@ -546,8 +533,7 @@ class _RtiFieldState extends State<_RtiField> {
                     size: 14, color: kTextMuted),
                 const SizedBox(width: 6),
                 Text('No matching RTI numbers',
-                    style: GoogleFonts.lato(
-                        color: kTextMuted, fontSize: 12)),
+                    style: AppTypography.bodySmall(color: kTextMuted)),
               ],
             ),
           ),
@@ -644,12 +630,7 @@ class _RadioOption extends StatelessWidget {
             SizedBox(width: isTablet ? 8 : 6),
             Text(
               label,
-              style: GoogleFonts.lato(
-                color: selected ? kHeaderGradStart : kTextMid,
-                fontWeight: FontWeight.w700,
-                fontSize:
-                isTablet ? AppGlobals.FontMedium + 1 : AppGlobals.FontMedium,
-              ),
+              style: AppTypography.heading2(color: selected ? kHeaderGradStart : kTextMid),
             ),
           ],
         ),
@@ -668,10 +649,7 @@ class _FieldLabel extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Text(text,
-        style: GoogleFonts.lato(
-            color: kTextMid,
-            fontWeight: FontWeight.w600,
-            fontSize: isTablet ? AppGlobals.FontLow + 1 : AppGlobals.FontLow));
+        style: AppTypography.bodySmall(color: kTextMid));
   }
 }
 
@@ -707,12 +685,7 @@ class _EmpSearchField extends StatelessWidget {
             Expanded(
               child: Text(
                 value.isEmpty ? hint : value,
-                style: GoogleFonts.lato(
-                  color: value.isEmpty ? kTextMuted : kTextDark,
-                  fontWeight:
-                  value.isEmpty ? FontWeight.w500 : FontWeight.w600,
-                  fontSize: isTablet ? AppGlobals.FontLow + 1 : AppGlobals.FontLow,
-                ),
+                style: AppTypography.bodySmall(color: value.isEmpty ? kTextMuted : kTextDark),
                 overflow: TextOverflow.ellipsis,
               ),
             ),
@@ -779,16 +752,10 @@ class _FSTextFieldState extends State<_FSTextField> {
       keyboardType: widget.keyboardType,
       textInputAction: TextInputAction.done,
       onChanged: widget.onChanged,
-      style: GoogleFonts.lato(
-          color: kTextDark,
-          fontWeight: FontWeight.w600,
-          fontSize: widget.isTablet ? AppGlobals.FontLow + 1 : AppGlobals.FontLow),
+      style: AppTypography.bodySmall(color: kTextDark),
       decoration: InputDecoration(
         hintText: widget.hint,
-        hintStyle: GoogleFonts.lato(
-            color: kTextMuted,
-            fontSize:
-            widget.isTablet ? AppGlobals.FontLow + 1 : AppGlobals.FontLow),
+        hintStyle: AppTypography.bodySmall(color: kTextMuted),
         filled: true,
         fillColor: kDetailBg,
         contentPadding:
@@ -833,10 +800,7 @@ class _AppBarButton extends StatelessWidget {
             padding:
             const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
             child: Text(label,
-                style: GoogleFonts.lato(
-                    color: Colors.white,
-                    fontWeight: FontWeight.w700,
-                    fontSize: AppGlobals.FontMedium)),
+                style: AppTypography.heading2(color: Colors.white)),
           ),
         ),
       ),

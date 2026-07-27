@@ -120,7 +120,7 @@ class _TruckReportViewState extends State<_TruckReportView> {
           Expanded(
             flex: 70,
             child: isLoading
-                ? const Center(
+                ? Center(
                 child: CircularProgressIndicator(
                     color: AppTokens.brandGradientStart))
                 : Column(
@@ -181,7 +181,7 @@ class _TruckReportViewState extends State<_TruckReportView> {
 
         Expanded(
           child: isLoading
-              ? const Center(
+              ? Center(
               child: CircularProgressIndicator(
                   color: AppTokens.brandGradientStart))
               : Column(

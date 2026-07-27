@@ -53,13 +53,13 @@ class _EmailBody extends StatelessWidget {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
                 content:         Text(state.message),
-                backgroundColor: Colors.red),
+                backgroundColor: colour.commonColorred),
           );
         }
       },
       builder: (context, state) {
         if (state is EmployeesLoading) {
-          return const Center(
+          return Center(
             child:
             CircularProgressIndicator(color: AppTokens.brandGradientStart),
           );
@@ -140,7 +140,7 @@ class _EmailBody extends StatelessWidget {
           // ── RIGHT — Email list
           Expanded(
             child: state.emailsLoading
-                ? const Center(
+                ? Center(
                 child: CircularProgressIndicator(
                     color: AppTokens.brandGradientStart))
                 : state.emails.isEmpty
@@ -173,7 +173,7 @@ class _EmailBody extends StatelessWidget {
 
         Expanded(
           child: state.emailsLoading
-              ? const Center(
+              ? Center(
               child: CircularProgressIndicator(
                   color: AppTokens.brandGradientStart))
               : state.emails.isEmpty
@@ -426,7 +426,7 @@ class _EmailCard extends StatelessWidget {
             // Subject
             Text(
               email.subject,
-              style: AppTypography.heading2(color: Colors.black87, fontWeight: FontWeight.w600),
+              style: AppTypography.heading2(color: colour.commonColor, fontWeight: FontWeight.w600),
             ),
 
             SizedBox(height: isTablet ? 6 : 4),
@@ -571,11 +571,11 @@ class _ErrorState extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         children: [
           Icon(Icons.error_outline,
-              color: Colors.red,
+              color: colour.commonColorred,
               size:  isTablet ? 60 : 48),
           SizedBox(height: isTablet ? 16 : 12),
           Text("Something went wrong",
-              style: AppTypography.bodyLarge(color: Colors.red)),
+              style: AppTypography.bodyLarge(color: colour.commonColorred)),
           SizedBox(height: isTablet ? 20 : 16),
           ElevatedButton.icon(
             onPressed: () => context

@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../data/forwardingsalary_repository.dart';
@@ -48,7 +49,7 @@ class ForwardingSalaryBloc extends Bloc<ForwardingSalaryEvent, ForwardingSalaryS
     final s = state as ForwardingSalaryLoaded;
     try {
       _jobNoList = await repository.fetchRTINoForwarding(int.parse(event.billType));
-    } catch (_) {}
+    } catch (e, stack) { debugPrint("Error caught globally: $e\n$stack"); }
 
     emit(s.copyWith(
       billType: event.billType,

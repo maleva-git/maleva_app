@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:bloc_concurrency/bloc_concurrency.dart';
 import 'package:intl/intl.dart';
@@ -128,7 +129,7 @@ class SalesOrderBloc extends Bloc<SalesOrderEvent, SalesOrderState> {
           emit(current.copyWith(
             employeeData: List<dynamic>.from(resultData?["Data1"] ?? []),
           ));
-        } catch (_) {}
+        } catch (e, stack) { debugPrint("Error caught globally: $e\n$stack"); }
       },
       transformer: droppable(),
     );
@@ -147,7 +148,7 @@ class SalesOrderBloc extends Bloc<SalesOrderEvent, SalesOrderState> {
           emit(current.copyWith(
             employeeData:    List<dynamic>.from(resultData?["Data1"] ?? []),
           ));
-        } catch (_) {}
+        } catch (e, stack) { debugPrint("Error caught globally: $e\n$stack"); }
       },
       transformer: droppable(),
     );

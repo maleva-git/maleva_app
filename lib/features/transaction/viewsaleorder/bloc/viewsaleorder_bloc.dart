@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:maleva/features/transaction/viewsaleorder/data/viewsaleorder_repository.dart';
 import 'package:maleva/features/transaction/viewsaleorder/bloc/viewsaleorder_event.dart';
@@ -61,7 +62,7 @@ class GetJobNoBloc extends Bloc<GetJobNoEvent, GetJobNoState> {
       if (updatedState is GetJobNoLoaded) {
         emit(updatedState.copyWith(cachedJobList: jobs));
       }
-    } catch (_) {}
+    } catch (e, stack) { debugPrint("Error caught globally: $e\n$stack"); }
   }
 
   // ── Text changed — filter autocomplete ─────────────────────────────────────

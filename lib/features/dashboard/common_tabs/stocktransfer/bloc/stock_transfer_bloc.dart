@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -78,7 +79,7 @@ class StockTransferBloc extends Bloc<StockTransferEvent, StockTransferState> {
       try {
         final match = _wareHouseList.firstWhere((w) => w['Id'] == portMasterRefId, orElse: () => null);
         if (match != null) portName = match['PortName'] ?? '';
-      } catch (_) {}
+      } catch (e, stack) { debugPrint("Error caught globally: $e\n$stack"); }
 
       emit(current.copyWith(
         isBusy: false,

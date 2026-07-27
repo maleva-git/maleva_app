@@ -1,9 +1,10 @@
-import 'package:maleva/core/network/api_legacy_helper.dart';
+import 'package:maleva/core/network/legacy_api_repository.dart';
+import 'package:maleva/core/di/injection.dart';
 import 'package:maleva/core/network/api_constants.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 import 'package:maleva/core/utils/app_globals.dart';
-import 'package:maleva/core/network/OnlineApi.dart' as OnlineApi;
+
 
 import 'licenseupdate_event.dart';
 import 'licenseupdate_state.dart';
@@ -146,7 +147,7 @@ class LicenseUpdateBloc
       ];
 
       final header = {'Content-Type': 'application/json; charset=UTF-8'};
-      final result = await ApiLegacyHelper.apiAllinoneSelectArray(
+      final result = await sl<LegacyApiRepository>().apiAllinoneSelectArray(
           '${ApiConstants.apiUpdateTruckDetails}${AppGlobals.Comid}',
           master,
           header,
@@ -181,7 +182,7 @@ class LicenseUpdateBloc
   // ── Helper: fetch truck + parse all 12 date fields ───────────────────────────
   Future<LicenseUpdateLoaded> _fetchAndBuild(
       int truckId, {required bool admin}) async {
-    await OnlineApi.EditTruckList(null, truckId, 'Id', null);
+    await sl<LegacyApiRepository>().EditTruckList(null, truckId, 'Id', null);
 
     if (AppGlobals.TruckDetailsList.isEmpty) {
       return LicenseUpdateLoaded.empty(admin: admin)

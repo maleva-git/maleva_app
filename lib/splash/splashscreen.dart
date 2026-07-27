@@ -1,4 +1,7 @@
-import 'package:maleva/core/network/api_legacy_helper.dart';
+import 'package:maleva/core/theme/app_typography.dart';
+import 'package:maleva/core/network/legacy_api_repository.dart';
+import 'package:maleva/core/di/injection.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
@@ -7,7 +10,7 @@ import 'package:maleva/core/utils/app_globals.dart';
 import 'package:maleva/core/colors/colors.dart' as colour;
 import '../core/theme/tokens.dart';
 import '../core/utils/app_preferences.dart';
-import 'package:maleva/core/network/OnlineApi.dart' as OnlineApi;
+
 
 // ─── Design tokens (splash only) ─────────────────────────────────────────────
 
@@ -91,7 +94,7 @@ class _SplashScreenState extends State<SplashScreen>
   Future startup() async {
     // ① Safe local storage init
     try {
-      await ApiLegacyHelper.localstoragecall();
+      AppGlobals.storagenew = await SharedPreferences.getInstance(); //);
     } catch (e) {
       debugPrint('❌ SharedPreferences init failed: $e');
       if (mounted) {
@@ -126,7 +129,7 @@ class _SplashScreenState extends State<SplashScreen>
       bool loginSuccess = false;
       try {
         if (!mounted) return;
-        loginSuccess = await OnlineApi.Login(UserName, Password, OldUserName,AppGlobals.DriverLogin, context);
+        loginSuccess = await sl<LegacyApiRepository>().Login(UserName, Password, OldUserName,AppGlobals.DriverLogin, context);
       } catch (e) {
         debugPrint('⚠️ Login API error: $e');
         if (mounted) {
@@ -229,10 +232,7 @@ class _SplashScreenState extends State<SplashScreen>
             Expanded(
               child: Text(
                 title,
-                style: GoogleFonts.dmSans(
-                  fontSize: 18,
-                  fontWeight: FontWeight.w600,
-                ),
+                style: AppTypography.heading1(),
               ),
             ),
           ],
@@ -240,7 +240,7 @@ class _SplashScreenState extends State<SplashScreen>
         content: SingleChildScrollView(
           child: Text(
             message,
-            style: GoogleFonts.dmSans(fontSize: 14, color: Colors.grey[700]),
+            style: AppTypography.heading2(),
           ),
         ),
         actions: [
@@ -251,7 +251,7 @@ class _SplashScreenState extends State<SplashScreen>
             },
             child: Text(
               'Go to Login',
-              style: GoogleFonts.dmSans(fontWeight: FontWeight.w500),
+              style: AppTypography.bodyLarge(),
             ),
           ),
           ElevatedButton(
@@ -267,10 +267,7 @@ class _SplashScreenState extends State<SplashScreen>
             },
             child: Text(
               'Retry',
-              style: GoogleFonts.dmSans(
-                fontWeight: FontWeight.w600,
-                color: Colors.white,
-              ),
+              style: AppTypography.bodyLarge(color: Colors.white),
             ),
           ),
         ],
@@ -326,12 +323,7 @@ class _SplashScreenState extends State<SplashScreen>
                   ),
                   child: Text(
                     AppGlobals.appversion,
-                    style: GoogleFonts.dmSans(
-                      fontSize: 10,
-                      fontWeight: FontWeight.w500,
-                      color: Colors.white.withValues(alpha: 0.75),
-                      letterSpacing: 0.6,
-                    ),
+                    style: AppTypography.bodySmall(color: Colors.white),
                   ),
                 ),
               ),
@@ -385,13 +377,7 @@ class _SplashScreenState extends State<SplashScreen>
                       children: [
                         Text(
                           'Maleva',
-                          style: GoogleFonts.playfairDisplay(
-                            fontSize: 38,
-                            fontWeight: FontWeight.w700,
-                            color: colour.kWhite,
-                            letterSpacing: -1.0,
-                            height: 1.0,
-                          ),
+                          style: AppTypography.bodyLarge(color: colour.kWhite),
                         ),
                         const SizedBox(height: 10),
                         Row(
@@ -404,12 +390,7 @@ class _SplashScreenState extends State<SplashScreen>
                             const SizedBox(width: 10),
                             Text(
                               'LOGISTICS SUITE',
-                              style: GoogleFonts.dmSans(
-                                fontSize: 11,
-                                fontWeight: FontWeight.w400,
-                                color: Colors.white.withValues(alpha: 0.50),
-                                letterSpacing: 2.8,
-                              ),
+                              style: AppTypography.bodySmall(color: Colors.white),
                             ),
                             const SizedBox(width: 10),
                             Container(
@@ -489,12 +470,7 @@ class _SplashScreenState extends State<SplashScreen>
                     // Label
                     Text(
                       'INITIALIZING',
-                      style: GoogleFonts.dmSans(
-                        fontSize: 9,
-                        fontWeight: FontWeight.w500,
-                        color: Colors.white.withValues(alpha: 0.35),
-                        letterSpacing: 2.0,
-                      ),
+                      style: AppTypography.bodySmall(color: Colors.white),
                     ),
                   ],
                 ),

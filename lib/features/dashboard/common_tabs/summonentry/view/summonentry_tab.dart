@@ -1,3 +1,4 @@
+import 'package:maleva/core/colors/colors.dart' as colour;
 import 'package:maleva/core/theme/app_typography.dart';
 import 'dart:io';
 
@@ -80,7 +81,7 @@ class _SummonEntryBodyState extends State<_SummonEntryBody> {
 
           ScaffoldMessenger.of(context).showSnackBar(SnackBar(
             content: Text("Submitted successfully ✅",
-                style: GoogleFonts.lato(color: Palette.kWhite)),
+                style: AppTypography.bodyLarge(color: Palette.kWhite)),
             backgroundColor: Colors.green,
             behavior: SnackBarBehavior.floating,
             shape: RoundedRectangleBorder(
@@ -91,7 +92,7 @@ class _SummonEntryBodyState extends State<_SummonEntryBody> {
         if (state is SummonEntryError) {
           ScaffoldMessenger.of(context).showSnackBar(SnackBar(
             content: Text(state.message),
-            backgroundColor: Colors.red,
+            backgroundColor: colour.commonColorred,
             behavior: SnackBarBehavior.floating,
           ));
         }
@@ -422,7 +423,7 @@ class _SummonEntryBodyState extends State<_SummonEntryBody> {
                   ),
                   child: Row(children: [
                     const Icon(Icons.picture_as_pdf,
-                        color: Colors.red, size: 36),
+                        color: colour.commonColorred, size: 36),
                     const SizedBox(width: 10),
                     Expanded(
                       child: Text(
@@ -788,11 +789,10 @@ class _TruckSelectPageState extends State<_TruckSelectPage> {
               controller: _searchCtrl,
               textCapitalization: TextCapitalization.characters,
               onChanged: _search,
-              style: GoogleFonts.lato(
-                  color: AppTokens.brandDark, fontWeight: FontWeight.w600),
+              style: AppTypography.bodyLarge(color: AppTokens.brandDark),
               decoration: InputDecoration(
                 hintText: 'Search Truck No...',
-                hintStyle: GoogleFonts.lato(color: Colors.grey),
+                hintStyle: AppTypography.bodyLarge(),
                 prefixIcon:
                 const Icon(Icons.search, color: AppTokens.brandGradientStart),
                 border: OutlineInputBorder(
@@ -1035,7 +1035,7 @@ Widget _field(
 InputDecoration _decor(String label, IconData icon) {
   return InputDecoration(
     labelText: label,
-    labelStyle: const TextStyle(color: AppTokens.brandDark),
+    labelStyle: AppTypography.bodyLarge(color: AppTokens.brandDark),
     prefixIcon: Icon(icon, color: AppTokens.brandGradientStart, size: 20),
     border: OutlineInputBorder(
         borderRadius: BorderRadius.circular(10)),

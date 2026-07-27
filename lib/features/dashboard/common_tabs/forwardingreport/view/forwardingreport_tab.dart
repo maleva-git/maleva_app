@@ -1,3 +1,4 @@
+import 'package:maleva/core/theme/app_typography.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -38,14 +39,14 @@ class ForwardingReportView extends StatelessWidget {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text(state.errorMessage),
-              backgroundColor: Colors.red,
+              backgroundColor: colour.commonColorred,
             ),
           );
         }
       },
       builder: (context, state) {
         if (state.status == ForwardingReportStatus.loading) { // ✅ Use new enum name
-          return const Center(
+          return Center(
             child: CircularProgressIndicator(color: AppTokens.brandGradientStart),
           );
         }
@@ -101,14 +102,7 @@ class ForwardingReportView extends StatelessWidget {
                     padding: const EdgeInsets.only(bottom: 12, left: 4),
                     child: Text(
                       'K-Type Breakdown',
-                      style: GoogleFonts.lato(
-                        textStyle: const TextStyle(
-                          fontSize: 15,
-                          fontWeight: FontWeight.bold,
-                          color: AppTokens.brandDark,
-                          letterSpacing: 0.5,
-                        ),
-                      ),
+                      style: AppTypography.heading3(color: AppTokens.brandDark),
                     ),
                   ),
                   _KTypeCard(state: state, isTablet: true),
@@ -174,14 +168,7 @@ class _TitleBadge extends StatelessWidget {
         ),
         child: Text(
           'FORWARDING REPORT',
-          style: GoogleFonts.lato(
-            textStyle: TextStyle(
-              color: colour.kWhite,
-              fontWeight: FontWeight.bold,
-              fontSize: isTablet ? 18 : 16,
-              letterSpacing: 1.5,
-            ),
-          ),
+          style: AppTypography.heading2(color: colour.kWhite),
         ),
       ),
     );
@@ -259,15 +246,7 @@ class _SummaryCard extends StatelessWidget {
                 flex: 3,
                 child: Text(
                   row['label']!,
-                  style: GoogleFonts.lato(
-                    textStyle: TextStyle(
-                      color: AppTokens.brandDark,
-                      fontWeight: FontWeight.bold,
-                      fontSize: isTablet
-                          ? AppGlobals.FontLow + 1
-                          : AppGlobals.FontLow - 1,
-                    ),
-                  ),
+                  style: AppTypography.bodySmall(color: AppTokens.brandDark),
                 ),
               ),
               Expanded(
@@ -318,14 +297,7 @@ class _SummaryCard extends StatelessWidget {
   Widget _headerText(String text, bool isTablet) => Text(
     text,
     textAlign: TextAlign.center,
-    style: GoogleFonts.lato(
-      textStyle: TextStyle(
-        color: colour.kWhite,
-        fontWeight: FontWeight.bold,
-        fontSize: isTablet ? 14 : 13,
-        letterSpacing: 0.5,
-      ),
-    ),
+    style: AppTypography.heading3(color: colour.kWhite),
   );
 
   Widget _valueChip(String value, Color color, bool isTablet) =>
@@ -342,13 +314,7 @@ class _SummaryCard extends StatelessWidget {
           ),
           child: Text(
             value,
-            style: GoogleFonts.lato(
-              textStyle: TextStyle(
-                color: color,
-                fontWeight: FontWeight.bold,
-                fontSize: isTablet ? 14 : 13,
-              ),
-            ),
+            style: AppTypography.heading3(color: color),
           ),
         ),
       );
@@ -491,23 +457,11 @@ class _DateTile extends StatelessWidget {
           children: [
             Text(
               label,
-              style: GoogleFonts.lato(
-                textStyle: TextStyle(
-                  color: AppTokens.brandGradientStart.withValues(alpha: 0.6),
-                  fontSize: isTablet ? 12 : 11,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
+              style: AppTypography.bodySmall(color: AppTokens.brandGradientStart.withValues(alpha: 0.6)),
             ),
             Text(
               date,
-              style: GoogleFonts.lato(
-                textStyle: TextStyle(
-                  color: AppTokens.brandDark,
-                  fontSize: isTablet ? 14 : 13,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
+              style: AppTypography.heading3(color: AppTokens.brandDark),
             ),
           ],
         ),
@@ -599,13 +553,7 @@ class _KTypeCard extends StatelessWidget {
                   child: Text(
                     k['label']!,
                     textAlign: TextAlign.center,
-                    style: GoogleFonts.lato(
-                      textStyle: TextStyle(
-                        color: colour.kWhite,
-                        fontWeight: FontWeight.bold,
-                        fontSize: isTablet ? 14 : 13,
-                      ),
-                    ),
+                    style: AppTypography.heading3(color: colour.kWhite),
                   ),
                 ),
               ),
@@ -617,13 +565,7 @@ class _KTypeCard extends StatelessWidget {
                     data.isEmpty
                         ? '0'
                         : data[0][k['countKey']]?.toString() ?? '0',
-                    style: GoogleFonts.lato(
-                      textStyle: TextStyle(
-                        color: AppTokens.brandDark,
-                        fontWeight: FontWeight.bold,
-                        fontSize: isTablet ? 15 : 14,
-                      ),
-                    ),
+                    style: AppTypography.heading3(color: AppTokens.brandDark),
                   ),
                 ),
               ),
@@ -635,13 +577,7 @@ class _KTypeCard extends StatelessWidget {
                     data.isEmpty
                         ? '0'
                         : data[0][k['withKey']]?.toString() ?? '0',
-                    style: GoogleFonts.lato(
-                      textStyle: TextStyle(
-                        color: Colors.green.shade700,
-                        fontWeight: FontWeight.bold,
-                        fontSize: isTablet ? 15 : 14,
-                      ),
-                    ),
+                    style: AppTypography.heading3(),
                   ),
                 ),
               ),
@@ -653,13 +589,7 @@ class _KTypeCard extends StatelessWidget {
                     data.isEmpty
                         ? '0'
                         : data[0][k['withoutKey']]?.toString() ?? '0',
-                    style: GoogleFonts.lato(
-                      textStyle: TextStyle(
-                        color: Colors.orange.shade700,
-                        fontWeight: FontWeight.bold,
-                        fontSize: isTablet ? 15 : 14,
-                      ),
-                    ),
+                    style: AppTypography.heading3(),
                   ),
                 ),
               ),
@@ -675,13 +605,6 @@ class _KTypeCard extends StatelessWidget {
   Widget _headerText(String text, bool isTablet) => Text(
     text,
     textAlign: TextAlign.center,
-    style: GoogleFonts.lato(
-      textStyle: TextStyle(
-        color: colour.kWhite,
-        fontWeight: FontWeight.bold,
-        fontSize: isTablet ? 14 : 13,
-        letterSpacing: 0.5,
-      ),
-    ),
+    style: AppTypography.heading3(color: colour.kWhite),
   );
 }

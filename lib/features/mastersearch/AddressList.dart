@@ -1,3 +1,4 @@
+import 'package:maleva/core/theme/app_typography.dart';
 import 'package:maleva/core/network/api_constants.dart';
 import 'package:flutter/material.dart';
 import 'package:maleva/core/colors/colors.dart' as colour;
@@ -124,7 +125,7 @@ class _AddressListstate extends State<AddressList> {
   Widget _buildBody() {
     // Loading
     if (_loadState == null) {
-      return const Center(
+      return Center(
         child: SpinKitFoldingCube(color: colour.spinKitColor, size: 35.0),
       );
     }
@@ -146,11 +147,7 @@ class _AddressListstate extends State<AddressList> {
             const SizedBox(height: 16),
             Text(
               'Failed to load addresses',
-              style: GoogleFonts.lato(
-                color: colour.commonColor,
-                fontWeight: FontWeight.bold,
-                fontSize: AppGlobals.FontLow,
-              ),
+              style: AppTypography.bodySmall(color: colour.commonColor),
             ),
             if (_errorMsg.isNotEmpty)
               Padding(
@@ -159,10 +156,7 @@ class _AddressListstate extends State<AddressList> {
                 child: Text(
                   _errorMsg,
                   textAlign: TextAlign.center,
-                  style: GoogleFonts.lato(
-                    color: Colors.grey.shade600,
-                    fontSize: AppGlobals.FontCardText,
-                  ),
+                  style: AppTypography.bodyLarge(),
                 ),
               ),
             const SizedBox(height: 20),
@@ -173,7 +167,7 @@ class _AddressListstate extends State<AddressList> {
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8))),
               icon: const Icon(Icons.refresh, color: Colors.white),
               label: Text('Retry',
-                  style: GoogleFonts.lato(color: Colors.white, fontWeight: FontWeight.bold)),
+                  style: AppTypography.heading2(color: Colors.white)),
               onPressed: _startup,
             ),
           ],
@@ -202,14 +196,7 @@ class _AddressListstate extends State<AddressList> {
       elevation: 0,
       title: Text(
         'Address List',
-        style: GoogleFonts.lato(
-          textStyle: TextStyle(
-            color: colour.topAppBarColor,
-            fontWeight: FontWeight.bold,
-            fontSize: AppGlobals.FontLarge,
-            letterSpacing: 0.5,
-          ),
-        ),
+        style: AppTypography.heading1(color: colour.topAppBarColor),
       ),
       leading: IconButton(
         icon: const Icon(Icons.arrow_back_ios_new,
@@ -227,14 +214,7 @@ class _AddressListstate extends State<AddressList> {
         keyboardType: TextInputType.text,
         textInputAction: TextInputAction.search,
         textCapitalization: TextCapitalization.characters,
-        style: GoogleFonts.lato(
-          textStyle: TextStyle(
-            color: colour.commonColor,
-            fontWeight: FontWeight.w600,
-            fontSize: AppGlobals.FontLow,
-            letterSpacing: 0.3,
-          ),
-        ),
+        style: AppTypography.bodySmall(color: colour.commonColor),
         decoration: InputDecoration(
           filled: true,
           fillColor: Colors.grey.shade100, // Nice soft background
@@ -248,13 +228,7 @@ class _AddressListstate extends State<AddressList> {
             borderSide: const BorderSide(color: colour.commonColor, width: 2.0),
           ),
           hintText: 'Search Address...',
-          hintStyle: GoogleFonts.lato(
-            textStyle: TextStyle(
-              letterSpacing: 1,
-              color: Colors.grey.shade500,
-              fontSize: AppGlobals.FontLow,
-            ),
-          ),
+          hintStyle: AppTypography.bodySmall(),
           prefixIcon: const Icon(Icons.search, color: Colors.grey),
           suffixIcon: txtSearch.text.isNotEmpty
               ? IconButton(
@@ -286,13 +260,7 @@ class _AddressListstate extends State<AddressList> {
             const SizedBox(height: 16),
             Text(
               txtSearch.text.isNotEmpty ? 'No match found' : 'No Records Available',
-              style: GoogleFonts.lato(
-                textStyle: TextStyle(
-                  color: Colors.grey.shade600,
-                  fontWeight: FontWeight.bold,
-                  fontSize: AppGlobals.FontLow,
-                ),
-              ),
+              style: AppTypography.bodySmall(),
             ),
           ],
         ),
@@ -324,15 +292,7 @@ class _AddressListstate extends State<AddressList> {
                   item,
                   overflow: TextOverflow.ellipsis,
                   maxLines: 2, // Allow 2 lines just in case address is long
-                  style: GoogleFonts.lato(
-                    textStyle: TextStyle(
-                      color: colour.commonColor,
-                      fontWeight: FontWeight.w600,
-                      fontSize: AppGlobals.FontCardText,
-                      letterSpacing: 0.3,
-                      height: 1.4,
-                    ),
-                  ),
+                  style: AppTypography.bodyLarge(color: colour.commonColor),
                 ),
                 trailing: Icon(Icons.chevron_right, color: Colors.grey.shade400),
               ),

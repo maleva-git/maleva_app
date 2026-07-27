@@ -52,7 +52,7 @@ class _SpotSaleEntryBody extends StatelessWidget {
         if (state is SpotSaleSubmitSuccess) {
           ScaffoldMessenger.of(context).showSnackBar(SnackBar(
             content: Text("Submitted successfully ✅",
-                style: GoogleFonts.lato(color: colour.kWhite)),
+                style: AppTypography.bodyLarge(color: colour.kWhite)),
             backgroundColor: Colors.green,
             behavior: SnackBarBehavior.floating,
             shape: RoundedRectangleBorder(
@@ -65,7 +65,7 @@ class _SpotSaleEntryBody extends StatelessWidget {
         if (state is SpotSaleEntryError) {
           ScaffoldMessenger.of(context).showSnackBar(SnackBar(
             content: Text(state.message),
-            backgroundColor: Colors.red,
+            backgroundColor: colour.commonColorred,
             behavior: SnackBarBehavior.floating,
           ));
         }
@@ -359,7 +359,7 @@ class _SpotSaleEntryBody extends StatelessWidget {
                   ),
                   child: Row(children: [
                     const Icon(Icons.picture_as_pdf,
-                        color: Colors.red, size: 36),
+                        color: colour.commonColorred, size: 36),
                     const SizedBox(width: 10),
                     Expanded(
                       child: Text(
@@ -380,14 +380,14 @@ class _SpotSaleEntryBody extends StatelessWidget {
                     width: double.infinity,
                     fit: BoxFit.cover,
                     errorBuilder: (_, __, ___) =>
-                    const Text("Unable to load image"),
+                    Text("Unable to load image"),
                   ),
                 ),
               ] else ...[
                 const SizedBox(height: 10),
                 Text("No document uploaded",
                     style:
-                    GoogleFonts.lato(color: Colors.grey)),
+                    AppTypography.bodyLarge()),
               ],
             ],
           ),
@@ -616,7 +616,7 @@ class _SpotSalePreviewPanel extends StatelessWidget {
                             ? Icons.picture_as_pdf
                             : Icons.radio_button_unchecked_rounded,
                         color: s.pickedPDF != null
-                            ? Colors.red
+                            ? colour.commonColorred
                             : Colors.grey,
                         size: 15,
                       ),
@@ -939,12 +939,10 @@ class _SelectPageScaffold extends StatelessWidget {
           child: TextField(
             controller: searchCtrl,
             onChanged: onSearch,
-            style: GoogleFonts.lato(
-                color: AppTokens.brandDark,
-                fontWeight: FontWeight.w600),
+            style: AppTypography.bodyLarge(color: AppTokens.brandDark),
             decoration: InputDecoration(
               hintText: 'Search $title...',
-              hintStyle: GoogleFonts.lato(color: Colors.grey),
+              hintStyle: AppTypography.bodyLarge(),
               prefixIcon: const Icon(Icons.search,
                   color: AppTokens.brandGradientStart),
               border: OutlineInputBorder(
@@ -1179,7 +1177,7 @@ InputDecoration _decor(String label, IconData icon) {
   return InputDecoration(
     labelText: label,
     labelStyle:
-    const TextStyle(color: AppTokens.brandDark),
+    AppTypography.bodyLarge(color: AppTokens.brandDark),
     prefixIcon: Icon(icon, color: AppTokens.brandGradientStart, size: 20),
     border: OutlineInputBorder(
         borderRadius: BorderRadius.circular(10)),

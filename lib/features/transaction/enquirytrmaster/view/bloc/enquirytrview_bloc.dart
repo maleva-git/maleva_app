@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:maleva/core/utils/system_helpers.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
@@ -231,6 +232,6 @@ class EnquiryViewBloc extends Bloc<EnquiryViewEvent, EnquiryViewState> {
         final value = ResponseViewModel.fromJson(resultData);
         if (value.IsSuccess == true) SystemHelpers.launchInBrowser(value.data1);
       }
-    } catch (_) {}
+    } catch (e, stack) { debugPrint("Error caught globally: $e\n$stack"); }
   }
 }

@@ -1,3 +1,4 @@
+import 'package:maleva/core/colors/colors.dart' as colour;
 import 'package:maleva/core/theme/app_typography.dart';
 import 'package:maleva/core/network/api_constants.dart';
 import 'dart:io';
@@ -52,8 +53,7 @@ class _SummonViewBody extends StatelessWidget {
         foregroundColor: Palette.kWhite,
         elevation: 0,
         title: Text("Saved Summon Entries",
-            style: GoogleFonts.lato(
-                fontWeight: FontWeight.bold, color: Palette.kWhite)),
+            style: AppTypography.heading2(color: Palette.kWhite)),
         centerTitle: true,
       ),
       body: BlocConsumer<SummonBloc, SummonState>(
@@ -62,13 +62,13 @@ class _SummonViewBody extends StatelessWidget {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
                   content: Text(state.message),
-                  backgroundColor: Colors.red),
+                  backgroundColor: colour.commonColorred),
             );
           }
         },
         builder: (context, state) {
           if (state is! SummonViewState && state is! SummonViewError) {
-            return const Center(
+            return Center(
                 child: CircularProgressIndicator(color: AppTokens.brandGradientStart));
           }
 
@@ -200,7 +200,7 @@ class _SummonViewBody extends StatelessWidget {
 
   Widget _buildList(bool isLoading, List<dynamic> records) {
     if (isLoading) {
-      return const Center(
+      return Center(
           child: CircularProgressIndicator(color: AppTokens.brandGradientStart));
     }
     if (records.isEmpty) {
@@ -312,7 +312,7 @@ class _SummonCard extends StatelessWidget {
                     errorBuilder: (_, __, ___) => Container(
                       height: 80,
                       color: AppTokens.brandLight,
-                      child: const Center(
+                      child: Center(
                           child: Icon(Icons.broken_image_rounded,
                               color: AppTokens.brandMid)),
                     ),
@@ -351,7 +351,7 @@ class _ImagePreviewDialog extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Dialog(
-      backgroundColor: Colors.black87,
+      backgroundColor: colour.commonColor,
       insetPadding: const EdgeInsets.all(10),
       child: Stack(
         children: [
@@ -368,7 +368,7 @@ class _ImagePreviewDialog extends StatelessWidget {
                 width: 36,
                 height: 36,
                 decoration: BoxDecoration(
-                    color: Colors.black54,
+                    color: colour.commonColor,
                     borderRadius: BorderRadius.circular(20)),
                 child: const Icon(Icons.close, color: Palette.kWhite, size: 20),
               ),

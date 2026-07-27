@@ -6,7 +6,7 @@ class UnReleaseSMKRepository {
   Future<List<Map<String, dynamic>>> fetchUnReleaseSMKData() async {
     try {
       final int comid = AppPreferences.getComid();
-      const String url = ApiConstants.LoadK8UnReleaseNo;
+      String url = ApiConstants.LoadK8UnReleaseNo;
 
       final Map<String, dynamic> body = {
         'Comid': comid,

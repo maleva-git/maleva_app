@@ -1,3 +1,6 @@
+import 'package:maleva/core/colors/colors.dart' as colour;
+import 'package:maleva/core/network/legacy_api_repository.dart';
+import 'package:maleva/core/di/injection.dart';
 import 'package:maleva/core/theme/app_typography.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -8,7 +11,7 @@ import '../../../../../core/colors/colors.dart' as colour;
 import '../../../../../core/theme/tokens.dart';
 import '../../../../mastersearch/Employee.dart';
 import '../../../../../core/models/model.dart';
-import '../../../../../core/network/OnlineApi.dart' as OnlineApi;
+
 import 'package:maleva/core/models/shared/employee_model.dart';
 
 const _kGrad = LinearGradient(
@@ -89,7 +92,7 @@ class _VesselPlanningUpdateSheetState extends State<VesselPlanningUpdateSheet> {
       } catch (_) {
         try {
           initial = DateTime.parse(ctrl.text);
-        } catch (_) {}
+        } catch (e, stack) { debugPrint("Error caught globally: $e\n$stack"); }
       }
     }
 
@@ -383,7 +386,7 @@ class _VesselPlanningUpdateSheetState extends State<VesselPlanningUpdateSheet> {
       label,
       GestureDetector(
         onTap: () async {
-          await OnlineApi.SelectEmployee(context, 'Sales', '');
+          await sl<LegacyApiRepository>().SelectEmployee(context, 'Sales', '');
           if (!mounted) return;
           final res = await Navigator.push(context, MaterialPageRoute(builder: (_) => const Employee(Searchby: 1, SearchId: 0)));
           if (res != null && res is EmployeeModel) {
@@ -408,7 +411,7 @@ class _VesselPlanningUpdateSheetState extends State<VesselPlanningUpdateSheet> {
                   ),
                 ),
               ),
-              const Padding(
+              Padding(
                 padding: EdgeInsets.only(right: 8),
                 child: Icon(Icons.arrow_drop_down, color: AppTokens.planTextMuted),
               )

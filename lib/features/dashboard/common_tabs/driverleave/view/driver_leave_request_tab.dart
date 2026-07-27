@@ -1,3 +1,4 @@
+import 'package:maleva/core/colors/colors.dart' as colour;
 import 'package:maleva/core/theme/app_typography.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -222,10 +223,10 @@ class _DriverLeaveRequestTabState extends State<_DriverLeaveRequestTabBody> {
                           isExpanded: true,
                           value: _selectedLeaveTypeId,
                           icon: const Icon(Icons.keyboard_arrow_down_rounded, color: AppTokens.textMuted),
-                          hint: Text('Select Leave Reason', style: GoogleFonts.lato(color: AppTokens.textMuted)),
+                          hint: Text('Select Leave Reason', style: AppTypography.bodyLarge(color: AppTokens.textMuted)),
                           items: leaveTypes.map((e) => DropdownMenuItem<int>(
                             value: e.id,
-                            child: Text(e.name, style: GoogleFonts.lato(color: AppTokens.textPrimary, fontWeight: FontWeight.w500)),
+                            child: Text(e.name, style: AppTypography.bodyLarge(color: AppTokens.textPrimary)),
                           )).toList(),
                           onChanged: (val) {
                             setState(() => _selectedLeaveTypeId = val);
@@ -297,7 +298,7 @@ class _DriverLeaveRequestTabState extends State<_DriverLeaveRequestTabBody> {
         // List
         Expanded(
           child: isLoading && requests.isEmpty
-              ? const Center(child: CircularProgressIndicator())
+              ? Center(child: CircularProgressIndicator())
               : ListView.builder(
                   itemCount: requests.length,
                   itemBuilder: (context, index) {
@@ -340,7 +341,7 @@ class _DriverLeaveRequestTabState extends State<_DriverLeaveRequestTabBody> {
                                     const SizedBox(width: 6),
                                     Text(
                                       '${DateFormat('dd MMM').format(req.fromDate)}  ➔  ${DateFormat('dd MMM').format(req.toDate)}',
-                                      style: AppTypography.heading3(color: Colors.black87, fontWeight: FontWeight.w700),
+                                      style: AppTypography.heading3(color: colour.commonColor, fontWeight: FontWeight.w700),
                                     ),
                                   ],
                                 ),
@@ -375,19 +376,19 @@ class _DriverLeaveRequestTabState extends State<_DriverLeaveRequestTabBody> {
                                       children: [
                                         Text('Reason', style: AppTypography.bodySmall(color: Colors.grey, fontWeight: FontWeight.w600)),
                                         const SizedBox(height: 2),
-                                        Text(req.reason, style: AppTypography.bodyLarge(color: Colors.black87, fontWeight: FontWeight.w500)),
+                                        Text(req.reason, style: AppTypography.bodyLarge(color: colour.commonColor, fontWeight: FontWeight.w500)),
                                       ],
                                     ),
                                   ),
                                   Container(
                                     padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                                     decoration: BoxDecoration(
-                                      color: Colors.blue.shade50,
+                                      color: colour.commonColorhighlight.withValues(alpha: 0.1),
                                       borderRadius: BorderRadius.circular(8),
                                     ),
                                     child: Text(
                                       '${req.totalDays} Days',
-                                      style: AppTypography.bodyMedium(color: Colors.blue.shade700, fontWeight: FontWeight.bold),
+                                      style: AppTypography.bodyMedium(color: colour.commonColorhighlight, fontWeight: FontWeight.bold),
                                     ),
                                   ),
                                 ],
@@ -398,12 +399,12 @@ class _DriverLeaveRequestTabState extends State<_DriverLeaveRequestTabBody> {
                                 padding: const EdgeInsets.only(top: 8),
                                 child: Row(
                                   children: [
-                                    const Icon(Icons.info_outline_rounded, size: 14, color: Colors.redAccent),
+                                    Icon(Icons.info_outline_rounded, size: 14, color: colour.commonColorred),
                                     const SizedBox(width: 4),
                                     Expanded(
                                       child: Text(
                                         'Remark: ${req.reviewRemark}',
-                                        style: AppTypography.bodyMedium(color: Colors.redAccent, fontWeight: FontWeight.w500),
+                                        style: AppTypography.bodyMedium(color: colour.commonColorred, fontWeight: FontWeight.w500),
                                       ),
                                     ),
                                   ],
@@ -414,11 +415,11 @@ class _DriverLeaveRequestTabState extends State<_DriverLeaveRequestTabBody> {
                                 padding: const EdgeInsets.only(top: 12),
                                 child: Row(
                                   children: [
-                                    const Icon(Icons.verified_user_rounded, size: 14, color: Colors.blueGrey),
+                                    Icon(Icons.verified_user_rounded, size: 14, color: Colors.grey),
                                     const SizedBox(width: 4),
                                     Text(
                                       'Reviewed By: ${req.reviewedByName}',
-                                      style: AppTypography.bodyMedium(color: Colors.blueGrey, fontWeight: FontWeight.w600),
+                                      style: AppTypography.bodyMedium(color: Colors.grey, fontWeight: FontWeight.w600),
                                     ),
                                   ],
                                 ),

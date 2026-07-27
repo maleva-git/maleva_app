@@ -1,3 +1,5 @@
+import 'package:maleva/core/theme/app_typography.dart';
+import 'package:maleva/core/colors/colors.dart' as colour;
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
@@ -84,7 +86,7 @@ class _FWSmkPageState extends State<_FWSmkPage>
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text(state.message,
-                  style: GoogleFonts.lato(color: Colors.white)),
+                  style: AppTypography.bodyLarge(color: Colors.white)),
               backgroundColor: const Color(0xFFB33040),
               behavior: SnackBarBehavior.floating,
               shape: RoundedRectangleBorder(
@@ -107,7 +109,7 @@ class _FWSmkPageState extends State<_FWSmkPage>
           body: BlocBuilder<FWSmkBloc, FWSmkState>(
             builder: (context, state) {
               if (state is FWSmkInitial || state is FWSmkLoading) {
-                return const Center(
+                return Center(
                   child: SpinKitFoldingCube(color: Palette.blue400, size: 35),
                 );
               }
@@ -162,17 +164,10 @@ class _FWSmkPageState extends State<_FWSmkPage>
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text('SMK Update',
-              style: GoogleFonts.lato(
-                  color: Colors.white,
-                  fontWeight: FontWeight.w700,
-                  fontSize: 17,
-                  letterSpacing: 0.3)),
+              style: AppTypography.heading2(color: Colors.white)),
           const SizedBox(height: 2),
           Text(userName,
-              style: GoogleFonts.lato(
-                  color: Colors.white.withValues(alpha: 0.65),
-                  fontWeight: FontWeight.w500,
-                  fontSize: 12)),
+              style: AppTypography.bodySmall(color: Colors.white)),
 
         ],
       ),
@@ -314,15 +309,11 @@ class _JobNoSectionState extends State<_JobNoSection> {
             keyboardType: TextInputType.number,
             textCapitalization: TextCapitalization.characters,
             textInputAction: TextInputAction.done,
-            style: GoogleFonts.lato(
-                color: kTextDark,
-                fontWeight: FontWeight.w600,
-                fontSize:
-                isTablet ? AppGlobals.FontLow + 1 : AppGlobals.FontLow),
+            style: AppTypography.bodySmall(color: kTextDark),
             decoration: InputDecoration(
               hintText: 'Job No',
               hintStyle:
-              GoogleFonts.lato(color: kTextMuted, fontSize: AppGlobals.FontLow),
+              AppTypography.bodySmall(color: kTextMuted),
               filled: true,
               fillColor: kDetailBg,
               prefixIcon: const Icon(Icons.tag_rounded,
@@ -387,12 +378,7 @@ class _JobNoSectionState extends State<_JobNoSection> {
                               size: 16, color: Palette.blue400),
                           const SizedBox(width: 10),
                           Text(cnum,
-                              style: GoogleFonts.lato(
-                                  color: kTextDark,
-                                  fontWeight: FontWeight.w600,
-                                  fontSize: isTablet
-                                      ? AppGlobals.FontLow + 1
-                                      : AppGlobals.FontLow)),
+                              style: AppTypography.bodySmall(color: kTextDark)),
                         ],
                       ),
                     ),
@@ -518,7 +504,7 @@ class _FWSmkTabContentState extends State<_FWSmkTabContent> {
                 activeColor: Palette.blue700,
                 onChanged: (v) => _emit(FWSmkFieldChanged(tab: t, field: 'original', value: v.toString())),
               ),
-              Text("Original", style: GoogleFonts.lato(color: kTextDark, fontWeight: FontWeight.w600, fontSize: widget.isTablet ? AppGlobals.FontLow + 1 : AppGlobals.FontLow)),
+              Text("Original", style: AppTypography.bodySmall(color: kTextDark)),
             ],
           ),
         ),
@@ -629,12 +615,7 @@ class _DateCheckRow extends StatelessWidget {
                   Expanded(
                     child: Text(
                       display,
-                      style: GoogleFonts.lato(
-                        color: tab.dateEnabled ? kTextDark : kTextMuted,
-                        fontWeight: FontWeight.w600,
-                        fontSize:
-                        isTablet ? AppGlobals.FontLow + 1 : AppGlobals.FontLow,
-                      ),
+                      style: AppTypography.bodySmall(color: tab.dateEnabled ? kTextDark : kTextMuted),
                     ),
                   ),
                   Icon(
@@ -700,14 +681,8 @@ class _FWDropdown extends StatelessWidget {
           isExpanded: true,
           value: value,
           hint: Text('Select FW',
-              style: GoogleFonts.lato(
-                  color: kTextMuted,
-                  fontSize: isTablet ? AppGlobals.FontLow + 1 : AppGlobals.FontLow)),
-          style: GoogleFonts.lato(
-            color: kTextDark,
-            fontWeight: FontWeight.w600,
-            fontSize: isTablet ? AppGlobals.FontLow + 1 : AppGlobals.FontLow,
-          ),
+              style: AppTypography.bodySmall(color: kTextMuted)),
+          style: AppTypography.bodySmall(color: kTextDark),
           dropdownColor: Colors.white,
           borderRadius: BorderRadius.circular(10),
           icon: const Icon(Icons.keyboard_arrow_down_rounded,
@@ -719,12 +694,7 @@ class _FWDropdown extends StatelessWidget {
               .map((v) => DropdownMenuItem(
             value: v,
             child: Text(v,
-                style: GoogleFonts.lato(
-                  color: kTextDark,
-                  fontWeight: FontWeight.w600,
-                  fontSize:
-                  isTablet ? AppGlobals.FontLow + 1 : AppGlobals.FontLow,
-                )),
+                style: AppTypography.bodySmall(color: kTextDark)),
           ))
               .toList(),
         ),
@@ -819,12 +789,7 @@ class _RadioOption extends StatelessWidget {
             SizedBox(width: isTablet ? 8 : 6),
             Text(
               label,
-              style: GoogleFonts.lato(
-                color: selected ? Palette.blue700 : kTextMid,
-                fontWeight: FontWeight.w700,
-                fontSize:
-                isTablet ? AppGlobals.FontMedium + 1 : AppGlobals.FontMedium,
-              ),
+              style: AppTypography.heading2(color: selected ? Palette.blue700 : kTextMid),
             ),
           ],
         ),
@@ -850,10 +815,8 @@ class _FWBottomNav extends StatelessWidget {
         currentIndex: currentIndex,
         selectedItemColor: Palette.blue700,
         unselectedItemColor: kTextMuted,
-        selectedLabelStyle: GoogleFonts.lato(
-            fontWeight: FontWeight.w700, fontSize: AppGlobals.FontLow),
-        unselectedLabelStyle: GoogleFonts.lato(
-            fontWeight: FontWeight.w500, fontSize: AppGlobals.FontCardText),
+        selectedLabelStyle: AppTypography.bodySmall(),
+        unselectedLabelStyle: AppTypography.bodyLarge(),
         onTap: onTap,
         items: const [
           BottomNavigationBarItem(
@@ -878,11 +841,7 @@ class _FieldLabel extends StatelessWidget {
   Widget build(BuildContext context) {
     return Text(
       text,
-      style: GoogleFonts.lato(
-        color: kTextMid,
-        fontWeight: FontWeight.w600,
-        fontSize: isTablet ? AppGlobals.FontLow + 1 : AppGlobals.FontLow,
-      ),
+      style: AppTypography.bodySmall(color: kTextMid),
     );
   }
 }
@@ -907,16 +866,10 @@ class _SMKTextField extends StatelessWidget {
       textCapitalization: TextCapitalization.characters,
       textInputAction: TextInputAction.done,
       onChanged: onChanged,
-      style: GoogleFonts.lato(
-        color: kTextDark,
-        fontWeight: FontWeight.w600,
-        fontSize: isTablet ? AppGlobals.FontLow + 1 : AppGlobals.FontLow,
-      ),
+      style: AppTypography.bodySmall(color: kTextDark),
       decoration: InputDecoration(
         hintText: hint,
-        hintStyle: GoogleFonts.lato(
-            color: kTextMuted,
-            fontSize: isTablet ? AppGlobals.FontLow + 1 : AppGlobals.FontLow),
+        hintStyle: AppTypography.bodySmall(color: kTextMuted),
         filled: true,
         fillColor: kDetailBg,
         contentPadding:
@@ -960,10 +913,7 @@ class _AppBarButton extends StatelessWidget {
             padding:
             const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
             child: Text(label,
-                style: GoogleFonts.lato(
-                    color: Colors.white,
-                    fontWeight: FontWeight.w700,
-                    fontSize: AppGlobals.FontMedium)),
+                style: AppTypography.heading2(color: Colors.white)),
           ),
         ),
       ),

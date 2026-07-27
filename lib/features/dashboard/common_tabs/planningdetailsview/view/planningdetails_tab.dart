@@ -1,3 +1,4 @@
+import 'package:maleva/core/colors/colors.dart' as colour;
 import 'package:maleva/core/theme/app_typography.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -70,7 +71,7 @@ class _PlanningDetailsViewState extends State<_PlanningDetailsView> {
           ScaffoldMessenger.of(ctx).showSnackBar(SnackBar(
             backgroundColor: Palette.redError,
             content: Text(state.errorMessage,
-                style: GoogleFonts.lato(color: Palette.white)),
+                style: AppTypography.bodyLarge(color: Palette.white)),
             duration: const Duration(seconds: 3),
           ));
         }
@@ -101,7 +102,7 @@ class _PlanningDetailsViewState extends State<_PlanningDetailsView> {
       appBar: _buildAppBar(isTablet),
       drawer: const Menulist(),
       body: state.isLoading
-          ? const Center(
+          ? Center(
           child: SpinKitFoldingCube(
               color: AppTokens.spinKit, size: 35))
           : state.status == PlanningDetailsStatus.failure
@@ -251,7 +252,7 @@ class _PlanningDetailsViewState extends State<_PlanningDetailsView> {
                                       DataCell(Text('${item["Destination"] ?? ""}')),
                                       DataCell(Text('${item["pkg"] ?? ""}')),
                                       DataCell(Text('${item["CustomerName"] ?? ""}')),
-                                      DataCell(Text('${item["JobNo"] ?? ""}', style: const TextStyle(color: AppTokens.brandPrimary, fontWeight: FontWeight.bold))),
+                                      DataCell(Text('${item["JobNo"] ?? ""}', style: AppTypography.heading2(color: AppTokens.brandPrimary))),
                                       DataCell(Text('${item["VesselName"] ?? ""}')),
                                       DataCell(Text('${item["JobStatus"] ?? ""}')),
                                       DataCell(Text('${item["EmployeeName"] ?? ""}')),
@@ -423,8 +424,7 @@ class _ErrorWidget extends StatelessWidget {
               onPressed: onRetry,
               icon: const Icon(Icons.refresh_rounded, size: 18),
               label: Text('Retry',
-                  style: GoogleFonts.lato(
-                      fontWeight: FontWeight.bold)),
+                  style: AppTypography.heading2()),
             ),
           ],
         ),

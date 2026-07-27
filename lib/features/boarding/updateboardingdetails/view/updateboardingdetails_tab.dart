@@ -1,3 +1,7 @@
+import 'package:maleva/core/theme/app_typography.dart';
+import 'package:maleva/core/colors/colors.dart' as colour;
+import 'package:maleva/core/network/legacy_api_repository.dart';
+import 'package:maleva/core/di/injection.dart';
 import 'package:maleva/core/utils/system_helpers.dart';
 import 'package:maleva/core/network/api_constants.dart';
 import 'dart:io';
@@ -9,7 +13,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:maleva/core/utils/app_globals.dart';
-import 'package:maleva/core/network/OnlineApi.dart' as OnlineApi;
+
 import 'package:maleva/menu/menulist.dart';
 import '../../../../core/theme/tokens.dart';
 import '../../../dashboard/common_tabs/saleorderdetails/view/saleorderdetails_tab.dart';
@@ -91,7 +95,7 @@ class _BoardingStatusPageState extends State<_BoardingStatusPage> {
           if (!context.mounted) return;
           final s = context.read<BoardingStatusBloc>().state;
           if (s is BoardingStatusLoaded && s.jobNoText.isNotEmpty) {
-            await OnlineApi.EditSalesOrder(
+            await sl<LegacyApiRepository>().EditSalesOrder(
                  s.saleOrderId, int.tryParse(s.jobNoText) ?? 0);
             if (!context.mounted) return;
             Navigator.push(
@@ -110,7 +114,7 @@ class _BoardingStatusPageState extends State<_BoardingStatusPage> {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text(state.message,
-                  style: GoogleFonts.lato(color: Colors.white)),
+                  style: AppTypography.bodyLarge(color: Colors.white)),
               backgroundColor: const Color(0xFFB33040),
               behavior: SnackBarBehavior.floating,
               shape: RoundedRectangleBorder(
@@ -134,7 +138,7 @@ class _BoardingStatusPageState extends State<_BoardingStatusPage> {
             builder: (context, state) {
               if (state is BoardingStatusInitial ||
                   state is BoardingStatusLoading) {
-                return const Center(
+                return Center(
                   child: SpinKitFoldingCube(color: AppTokens.invoiceHeaderEnd, size: 35),
                 );
               }
@@ -175,17 +179,10 @@ class _BoardingStatusPageState extends State<_BoardingStatusPage> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text('Status Update',
-              style: GoogleFonts.lato(
-                  color: Colors.white,
-                  fontWeight: FontWeight.w700,
-                  fontSize: 17,
-                  letterSpacing: 0.3)),
+              style: AppTypography.heading2(color: Colors.white)),
           const SizedBox(height: 2),
           Text(userName,
-              style: GoogleFonts.lato(
-                  color: Colors.white.withValues(alpha: 0.65),
-                  fontWeight: FontWeight.w500,
-                  fontSize: 12)),
+              style: AppTypography.bodySmall(color: Colors.white)),
         ],
       ),
       actions: [
@@ -492,13 +489,7 @@ class _RadioOption extends StatelessWidget {
             ),
             SizedBox(width: isTablet ? 8 : 6),
             Text(label,
-                style: GoogleFonts.lato(
-                  color:      selected ? AppTokens.invoiceHeaderStart : AppTokens.maintTextMid,
-                  fontWeight: FontWeight.w700,
-                  fontSize: isTablet
-                      ? AppGlobals.FontMedium + 1
-                      : AppGlobals.FontMedium,
-                )),
+                style: AppTypography.heading2(color: selected ? AppTokens.invoiceHeaderStart : AppTokens.maintTextMid)),
           ],
         ),
       ),
@@ -562,22 +553,13 @@ class _JobNoRowState extends State<_JobNoRow> {
                 keyboardType: TextInputType.number,
                 textCapitalization: TextCapitalization.characters,
                 textInputAction: TextInputAction.done,
-                style: GoogleFonts.lato(
-                    color: AppTokens.maintTextDark,
-                    fontWeight: FontWeight.w600,
-                    fontSize: isTablet
-                        ? AppGlobals.FontLow + 1
-                        : AppGlobals.FontLow),
+                style: AppTypography.bodySmall(color: AppTokens.maintTextDark),
                 onChanged: (v) => context
                     .read<BoardingStatusBloc>()
                     .add(BoardingStatusJobNoTextChanged(v)),
                 decoration: InputDecoration(
                   hintText: 'Job No',
-                  hintStyle: GoogleFonts.lato(
-                      color: AppTokens.planTextMuted,
-                      fontSize: isTablet
-                          ? AppGlobals.FontLow + 1
-                          : AppGlobals.FontLow),
+                  hintStyle: AppTypography.bodySmall(color: AppTokens.planTextMuted),
                   filled: true,
                   fillColor: AppTokens.maintDetailBg,
                   prefixIcon: const Icon(Icons.tag_rounded,
@@ -614,7 +596,7 @@ class _JobNoRowState extends State<_JobNoRow> {
                     toastMsg('Enter Job No', '', context);
                     return;
                   }
-                  await OnlineApi.EditSalesOrder(
+                  await sl<LegacyApiRepository>().EditSalesOrder(
 
                       s.saleOrderId,
                       int.tryParse(s.jobNoText) ?? 0);
@@ -674,12 +656,7 @@ class _JobNoRowState extends State<_JobNoRow> {
                             size: 16, color: AppTokens.invoiceHeaderEnd),
                         const SizedBox(width: 10),
                         Text(cnum,
-                            style: GoogleFonts.lato(
-                                color: AppTokens.maintTextDark,
-                                fontWeight: FontWeight.w600,
-                                fontSize: isTablet
-                                    ? AppGlobals.FontLow + 1
-                                    : AppGlobals.FontLow)),
+                            style: AppTypography.bodySmall(color: AppTokens.maintTextDark)),
                       ],
                     ),
                   ),
@@ -712,9 +689,9 @@ class _StatusField extends StatelessWidget {
               .add(BoardingStatusStatusCleared());
           return;
         }
-        await OnlineApi.EditSalesOrder(
+        await sl<LegacyApiRepository>().EditSalesOrder(
              state.saleOrderId, int.tryParse(state.jobNoText) ?? 0);
-        await OnlineApi.SelectAllJobStatus(
+        await sl<LegacyApiRepository>().SelectAllJobStatus(
             context,
             AppGlobals.SaleEditMasterList[0]['JobMasterRefId']);
         if (!context.mounted) return;
@@ -750,14 +727,7 @@ class _StatusField extends StatelessWidget {
                 state.statusName.isEmpty
                     ? 'Select Status'
                     : state.statusName,
-                style: GoogleFonts.lato(
-                  color: state.statusName.isEmpty ? AppTokens.planTextMuted : AppTokens.maintTextDark,
-                  fontWeight: state.statusName.isEmpty
-                      ? FontWeight.w500
-                      : FontWeight.w600,
-                  fontSize:
-                  isTablet ? AppGlobals.FontLow + 1 : AppGlobals.FontLow,
-                ),
+                style: AppTypography.bodySmall(color: state.statusName.isEmpty ? AppTokens.planTextMuted : AppTokens.maintTextDark),
                 overflow: TextOverflow.ellipsis,
               ),
             ),
@@ -809,11 +779,7 @@ class _DateTimeRow extends StatelessWidget {
           width: isTablet ? 50 : 42,
           child: Text(
             label,
-            style: GoogleFonts.lato(
-              color: AppTokens.maintTextMid,
-              fontWeight: FontWeight.w600,
-              fontSize: isTablet ? AppGlobals.FontMedium + 1 : AppGlobals.FontMedium,
-            ),
+            style: AppTypography.heading2(color: AppTokens.maintTextMid),
             textAlign: TextAlign.center,
           ),
         ),
@@ -837,13 +803,7 @@ class _DateTimeRow extends StatelessWidget {
                   Expanded(
                     child: Text(
                       display,
-                      style: GoogleFonts.lato(
-                        color: enabled ? AppTokens.maintTextDark : AppTokens.planTextMuted,
-                        fontWeight: FontWeight.w600,
-                        fontSize: isTablet
-                            ? AppGlobals.FontLow
-                            : AppGlobals.FontLow - 1,
-                      ),
+                      style: AppTypography.bodySmall(color: enabled ? AppTokens.maintTextDark : AppTokens.planTextMuted),
                     ),
                   ),
                   Icon(Icons.calendar_month_outlined,
@@ -929,12 +889,7 @@ class _ImageUploadRow extends StatelessWidget {
           ),
           const SizedBox(width: 10),
           Text('Upload Image',
-              style: GoogleFonts.lato(
-                  color: AppTokens.maintTextDark,
-                  fontWeight: FontWeight.w600,
-                  fontSize: isTablet
-                      ? AppGlobals.FontMedium + 1
-                      : AppGlobals.FontMedium)),
+              style: AppTypography.heading2(color: AppTokens.maintTextDark)),
           const Spacer(),
           _ImagePickBtn(
             icon: Icons.photo_outlined,
@@ -1017,8 +972,7 @@ class _ImageGrid extends StatelessWidget {
                 size: isTablet ? 48 : 36, color: AppTokens.planTextMuted),
             const SizedBox(height: 8),
             Text('No images uploaded',
-                style: GoogleFonts.lato(
-                    color: AppTokens.planTextMuted, fontSize: 13)),
+                style: AppTypography.bodyLarge(color: AppTokens.planTextMuted)),
           ],
         ),
       )
@@ -1055,7 +1009,7 @@ class _ImageGrid extends StatelessWidget {
                   fit: BoxFit.cover,
                   placeholder: (_, __) => Container(
                     color: AppTokens.maintDetailBg,
-                    child: const Center(
+                    child: Center(
                       child: SizedBox(
                         width: 20,
                         height: 20,
@@ -1121,11 +1075,7 @@ class _FieldLabel extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Text(text,
-        style: GoogleFonts.lato(
-            color: AppTokens.maintTextMid,
-            fontWeight: FontWeight.w600,
-            fontSize:
-            isTablet ? AppGlobals.FontLow + 1 : AppGlobals.FontLow));
+        style: AppTypography.bodySmall(color: AppTokens.maintTextMid));
   }
 }
 
@@ -1169,12 +1119,7 @@ class _GradientButton extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Text(label,
-                    style: GoogleFonts.lato(
-                        color: Colors.white,
-                        fontWeight: FontWeight.w700,
-                        fontSize: isTablet
-                            ? AppGlobals.FontMedium + 1
-                            : AppGlobals.FontMedium)),
+                    style: AppTypography.heading2(color: Colors.white)),
                 const SizedBox(width: 6),
                 Icon(icon,
                     color: Colors.white,
@@ -1211,10 +1156,7 @@ class _AppBarButton extends StatelessWidget {
             padding: const EdgeInsets.symmetric(
                 horizontal: 12, vertical: 6),
             child: Text(label,
-                style: GoogleFonts.lato(
-                    color: Colors.white,
-                    fontWeight: FontWeight.w700,
-                    fontSize: AppGlobals.FontMedium)),
+                style: AppTypography.heading2(color: Colors.white)),
           ),
         ),
       ),

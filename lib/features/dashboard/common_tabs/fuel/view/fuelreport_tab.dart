@@ -41,7 +41,7 @@ class _FuelDiffBody extends StatelessWidget {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text(state.message),
-              backgroundColor: Colors.red,
+              backgroundColor: colour.commonColorred,
             ),
           );
         }
@@ -49,7 +49,7 @@ class _FuelDiffBody extends StatelessWidget {
       builder: (context, state) {
         // ── Loading ──
         if (state is FuelDiffLoading) {
-          return const Center(
+          return Center(
               child: CircularProgressIndicator(color: AppTokens.brandGradientStart));
         }
 
@@ -59,18 +59,18 @@ class _FuelDiffBody extends StatelessWidget {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                const Icon(Icons.error_outline, color: Colors.red, size: 48),
+                const Icon(Icons.error_outline, color: colour.commonColorred, size: 48),
                 const SizedBox(height: 12),
                 Text(state.message,
                     textAlign: TextAlign.center,
-                    style: AppTypography.bodyLarge(color: Colors.red)),
+                    style: AppTypography.bodyLarge(color: colour.commonColorred)),
                 const SizedBox(height: 16),
                 ElevatedButton.icon(
                   onPressed: () => context
                       .read<FuelDiffBloc>()
                       .add(const LoadFuelDiffEvent()),
-                  icon: const Icon(Icons.refresh),
-                  label: const Text("Retry"),
+                  icon: Icon(Icons.refresh),
+                  label: Text("Retry"),
                   style: ElevatedButton.styleFrom(
                       backgroundColor: AppTokens.brandGradientStart),
                 ),
@@ -88,11 +88,7 @@ class _FuelDiffBody extends StatelessWidget {
                 // ── Title ──
                 Text(
                   "Fuel Different",
-                  style: GoogleFonts.lato(
-                    fontSize: AppGlobals.FontLarge,
-                    fontWeight: FontWeight.bold,
-                    color: AppTokens.brandGradientStartDark,
-                  ),
+                  style: AppTypography.heading1(color: AppTokens.brandGradientStartDark),
                 ),
 
                 SizedBox(height: isTablet ? 14 : 10),
@@ -237,10 +233,7 @@ class _DateFilterBar extends StatelessWidget {
                 Text(
                   DateFormat("dd-MM-yy")
                       .format(DateTime.parse(state.fromDate)),
-                  style: GoogleFonts.lato(
-                      fontWeight: FontWeight.bold,
-                      fontSize: AppGlobals.FontLow,
-                      color: AppTokens.brandGradientStartDark),
+                  style: AppTypography.bodySmall(color: AppTokens.brandGradientStartDark),
                 ),
               ],
             ),
@@ -270,10 +263,7 @@ class _DateFilterBar extends StatelessWidget {
                 Text(
                   DateFormat("dd-MM-yy")
                       .format(DateTime.parse(state.toDate)),
-                  style: GoogleFonts.lato(
-                      fontWeight: FontWeight.bold,
-                      fontSize: AppGlobals.FontLow,
-                      color: AppTokens.brandGradientStartDark),
+                  style: AppTypography.bodySmall(color: AppTokens.brandGradientStartDark),
                 ),
               ],
             ),
@@ -302,10 +292,7 @@ class _DateFilterBar extends StatelessWidget {
               elevation: 0,
             ),
             child: Text("View",
-                style: GoogleFonts.lato(
-                    color: colour.kWhite,
-                    fontWeight: FontWeight.bold,
-                    fontSize: AppGlobals.FontLow)),
+                style: AppTypography.bodySmall(color: colour.kWhite)),
           ),
         ],
       ),
@@ -384,7 +371,7 @@ class _FuelDiffCard extends StatelessWidget {
       diffColor = Colors.green;
       diffIcon  = Icons.trending_up;
     } else if (difference < 0) {
-      diffColor = Colors.red;
+      diffColor = colour.commonColorred;
       diffIcon  = Icons.trending_down;
     } else {
       diffColor = Colors.grey;
@@ -642,7 +629,7 @@ class _DetailPanel extends StatelessWidget {
       diffColor = Colors.green;
       diffIcon  = Icons.trending_up;
     } else if (difference < 0) {
-      diffColor = Colors.red;
+      diffColor = colour.commonColorred;
       diffIcon  = Icons.trending_down;
     } else {
       diffColor = Colors.grey;

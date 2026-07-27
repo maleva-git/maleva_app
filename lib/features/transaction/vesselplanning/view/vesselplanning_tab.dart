@@ -1,3 +1,4 @@
+import 'package:maleva/core/theme/app_typography.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
@@ -17,8 +18,6 @@ import '../bloc/vesselplanning_state.dart';
 import 'package:maleva/features/transaction/vesselplanning/models/vessel_planning_master_model.dart';
 import 'package:maleva/core/models/shared/employee_model.dart';
 
-
-
 const kGradient = LinearGradient(
   colors: [AppTokens.invoiceHeaderStart, colour.kHeaderGradEnd],
   begin: Alignment.topLeft,
@@ -26,11 +25,10 @@ const kGradient = LinearGradient(
 );
 
 const kGradientVertical = LinearGradient(
-  colors: [AppTokens.invoiceHeaderStart, Color(0xFF2D56C8)],
+  colors: [AppTokens.invoiceHeaderStart, AppTokens.brandGradientEnd],
   begin: Alignment.topCenter,
   end: Alignment.bottomCenter,
 );
-
 
 // ─── Root Widget ──────────────────────────────────────────────────────────────
 class VesselPlanningView extends StatelessWidget {
@@ -79,10 +77,12 @@ class _VesselPlanningPage extends StatelessWidget {
         if (state is VesselPlanningError) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text(state.message, style: GoogleFonts.lato(color: Colors.white)),
-              backgroundColor: const Color(0xFFB33040),
+              content: Text(state.message,
+                  style: AppTypography.bodyLarge(color: Colors.white)),
+              backgroundColor: AppTokens.appBarBg,
               behavior: SnackBarBehavior.floating,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10)),
             ),
           );
         }
@@ -94,9 +94,11 @@ class _VesselPlanningPage extends StatelessWidget {
         drawer: const Menulist(),
         body: BlocBuilder<VesselPlanningBloc, VesselPlanningState>(
           builder: (context, state) {
-            if (state is VesselPlanningLoading || state is VesselPlanningInitial) {
-              return const Center(
-                child: SpinKitFoldingCube(color: colour.kHeaderGradEnd, size: 35.0),
+            if (state is VesselPlanningLoading ||
+                state is VesselPlanningInitial) {
+              return Center(
+                child: SpinKitFoldingCube(
+                    color: colour.kHeaderGradEnd, size: 35.0),
               );
             }
             if (state is VesselPlanningLoaded) {
@@ -111,7 +113,6 @@ class _VesselPlanningPage extends StatelessWidget {
       ),
     );
   }
-
 
   PreferredSizeWidget _buildAppBar(
       BuildContext context, String userName, bool isTablet) {
@@ -133,21 +134,13 @@ class _VesselPlanningPage extends StatelessWidget {
         children: [
           Text(
             'Vessel Planning',
-            style: GoogleFonts.lato(
-              color: Colors.white,
-              fontWeight: FontWeight.w700,
-              fontSize: isTablet ? AppGlobals.FontMedium + 2 : AppGlobals.FontMedium,
-              letterSpacing: 0.3,
-            ),
+            style: AppTypography.bodyLarge(
+                color: Colors.white, fontWeight: FontWeight.bold),
           ),
           const SizedBox(height: 2),
           Text(
             userName,
-            style: GoogleFonts.lato(
-              color: Colors.white.withValues(alpha: 0.65),
-              fontWeight: FontWeight.w500,
-              fontSize: isTablet ? AppGlobals.FontLow : AppGlobals.FontLow - 1,
-            ),
+            style: AppTypography.bodySmall(color: Colors.white),
           ),
         ],
       ),
@@ -164,15 +157,15 @@ class _VesselPlanningPage extends StatelessWidget {
 
     String fromDate = currentState?.fromDate ??
         DateFormat("yyyy-MM-dd").format(DateTime.now());
-    String toDate = currentState?.toDate ??
-        DateFormat("yyyy-MM-dd").format(DateTime.now());
+    String toDate =
+        currentState?.toDate ?? DateFormat("yyyy-MM-dd").format(DateTime.now());
     String planningNo = currentState?.planningNo ?? '';
     bool isLoggedInEmp = currentState?.isLoggedInEmp ?? true;
     int empId = currentState?.empId ?? 0;
     String empName = currentState?.empName ?? '';
 
     final txtPlanningNo = TextEditingController(text: planningNo);
-    final txtEmployee   = TextEditingController(text: empName);
+    final txtEmployee = TextEditingController(text: empName);
 
     showModalBottomSheet(
       context: pageContext,
@@ -244,12 +237,9 @@ class _VesselPlanningPage extends StatelessWidget {
                   // Sheet title
                   Text(
                     'Filter',
-                    style: GoogleFonts.lato(
-                      color: AppTokens.invoiceHeaderStart,
-                      fontWeight: FontWeight.w700,
-                      fontSize: isTablet ? 16 : 15,
-                      letterSpacing: 0.2,
-                    ),
+                    style: AppTypography.bodyLarge(
+                        color: AppTokens.invoiceHeaderStart,
+                        fontWeight: FontWeight.bold),
                   ),
                   const SizedBox(height: 16),
 
@@ -283,29 +273,36 @@ class _VesselPlanningPage extends StatelessWidget {
                     suffixIcon: InkWell(
                       onTap: () async {
                         if (isLoggedInEmp) return;
-                        await sl<VesselPlanningRepository>().selectEmployee(ctx, 'sales', 'admin'); if (!ctx.mounted) return;
+                        await sl<VesselPlanningRepository>()
+                            .selectEmployee(ctx, 'sales', 'admin');
+                        if (!ctx.mounted) return;
                         if (txtEmployee.text.isEmpty) {
                           Navigator.push(
                             ctx,
                             MaterialPageRoute(
                               builder: (_) =>
-                              const Employee(Searchby: 1, SearchId: 0),
+                                  const Employee(Searchby: 1, SearchId: 0),
                             ),
-                          ).then((navRes) { if (navRes != null) { AppGlobals.SelectEmployeeList = navRes; }
+                          ).then((navRes) {
+                            if (navRes != null) {
+                              AppGlobals.SelectEmployeeList = navRes;
+                            }
                             setSheetState(() {
                               txtEmployee.text =
                                   AppGlobals.SelectEmployeeList.AccountName;
-                              empId   = AppGlobals.SelectEmployeeList.Id;
+                              empId = AppGlobals.SelectEmployeeList.Id;
                               empName = txtEmployee.text;
-                              AppGlobals.SelectEmployeeList = EmployeeModel.Empty();
+                              AppGlobals.SelectEmployeeList =
+                                  EmployeeModel.Empty();
                             });
                           });
                         } else {
                           setSheetState(() {
                             txtEmployee.text = '';
-                            empId   = 0;
+                            empId = 0;
                             empName = '';
-                            AppGlobals.SelectEmployeeList = EmployeeModel.Empty();
+                            AppGlobals.SelectEmployeeList =
+                                EmployeeModel.Empty();
                           });
                         }
                       },
@@ -349,24 +346,21 @@ class _VesselPlanningPage extends StatelessWidget {
                               gradient: isLoggedInEmp ? kGradient : null,
                               border: isLoggedInEmp
                                   ? null
-                                  : Border.all(color: AppTokens.maintCardBorder, width: 1.5),
+                                  : Border.all(
+                                      color: AppTokens.maintCardBorder,
+                                      width: 1.5),
                               borderRadius: BorderRadius.circular(5),
                             ),
                             child: isLoggedInEmp
                                 ? const Icon(Icons.check_rounded,
-                                size: 14, color: Colors.white)
+                                    size: 14, color: Colors.white)
                                 : null,
                           ),
                           const SizedBox(width: 10),
                           Text(
                             'Logged-in Employee',
-                            style: GoogleFonts.lato(
-                              color: colour.kTextDark,
-                              fontWeight: FontWeight.w600,
-                              fontSize: isTablet
-                                  ? AppGlobals.FontLow + 1
-                                  : AppGlobals.FontLow,
-                            ),
+                            style: AppTypography.bodySmall(
+                                color: colour.kTextDark),
                           ),
                         ],
                       ),
@@ -381,15 +375,16 @@ class _VesselPlanningPage extends StatelessWidget {
                         label: 'View',
                         onPressed: () {
                           pageContext.read<VesselPlanningBloc>().add(
-                            VesselPlanningFilterChanged(
-                              fromDate: fromDate,
-                              toDate: toDate,
-                              planningNo: txtPlanningNo.text,
-                              empId: empId,
-                              empName: txtEmployee.text, // 💥 TextBox-la enna name irukko atha pass pandrom
-                              isLoggedInEmp: isLoggedInEmp,
-                            ),
-                          );
+                                VesselPlanningFilterChanged(
+                                  fromDate: fromDate,
+                                  toDate: toDate,
+                                  planningNo: txtPlanningNo.text,
+                                  empId: empId,
+                                  empName: txtEmployee
+                                      .text, // 💥 TextBox-la enna name irukko atha pass pandrom
+                                  isLoggedInEmp: isLoggedInEmp,
+                                ),
+                              );
                           Navigator.pop(ctx);
                         },
                       ),
@@ -420,7 +415,7 @@ class _VesselPlanningBody extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final height = MediaQuery.of(context).size.height;
-    final width  = MediaQuery.of(context).size.width;
+    final width = MediaQuery.of(context).size.width;
 
     return Column(
       children: [
@@ -437,23 +432,23 @@ class _VesselPlanningBody extends StatelessWidget {
           child: state.masterList.isEmpty
               ? _EmptyState()
               : ListView.builder(
-            padding:
-            const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
-            itemCount: state.masterList.length,
-            itemBuilder: (ctx, index) {
-              final item = state.masterList[index];
-              final isExpanded = state.expandedIndex == index;
-              return _PlanningCard(
-                item: item,
-                index: index,
-                isExpanded: isExpanded,
-                selectedDetails: state.selectedDetails,
-                isTablet: isTablet,
-                height: height,
-                width: width,
-              );
-            },
-          ),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+                  itemCount: state.masterList.length,
+                  itemBuilder: (ctx, index) {
+                    final item = state.masterList[index];
+                    final isExpanded = state.expandedIndex == index;
+                    return _PlanningCard(
+                      item: item,
+                      index: index,
+                      isExpanded: isExpanded,
+                      selectedDetails: state.selectedDetails,
+                      isTablet: isTablet,
+                      height: height,
+                      width: width,
+                    );
+                  },
+                ),
         ),
       ],
     );
@@ -467,12 +462,7 @@ class _GridHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final style = GoogleFonts.lato(
-      color: Colors.white.withValues(alpha: 0.85),
-      fontWeight: FontWeight.w600,
-      fontSize: isTablet ? 11 : 10,
-      letterSpacing: 0.6,
-    );
+    final style = AppTypography.bodySmall(color: Colors.white);
     return Column(
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: [
@@ -511,33 +501,20 @@ class _PlanningCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final valStyle = GoogleFonts.lato(
-      color: colour.kTextDark,
-      fontWeight: FontWeight.w600,
-      fontSize: isTablet ? AppGlobals.FontCardText + 1 : AppGlobals.FontCardText,
-    );
-    final labelStyle = GoogleFonts.lato(
-      color: AppTokens.planTextMuted,
-      fontWeight: FontWeight.w600,
-      fontSize: isTablet ? 10 : 9,
-      letterSpacing: 0.4,
-    );
-    final remarkStyle = GoogleFonts.lato(
-      color: colour.kTextMid,
-      fontWeight: FontWeight.w500,
-      fontSize: isTablet ? AppGlobals.FontCardText : AppGlobals.FontCardText - 1,
-    );
+    final valStyle = AppTypography.bodyLarge(color: colour.kTextDark);
+    final labelStyle = AppTypography.bodySmall(color: AppTokens.planTextMuted);
+    final remarkStyle = AppTypography.bodyLarge(color: colour.kTextMid);
 
     return Padding(
       padding: const EdgeInsets.only(bottom: 10),
       child: InkWell(
         onLongPress: () {
           context.read<VesselPlanningBloc>().add(
-            VesselPlanningEditRequested(
-              id: item.Id,
-              planningNo: item.VESSELPLANINGNo,
-            ),
-          );
+                VesselPlanningEditRequested(
+                  id: item.Id,
+                  planningNo: item.VESSELPLANINGNo,
+                ),
+              );
         },
         borderRadius: BorderRadius.circular(14),
         child: Container(
@@ -653,7 +630,7 @@ class _PlanningCard extends StatelessWidget {
                 // ── Action row ────────────────────────────────────────────
                 Padding(
                   padding:
-                  const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                      const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
                   child: Row(
                     children: [
                       _CardActionChip(
@@ -663,11 +640,11 @@ class _PlanningCard extends StatelessWidget {
                         label: isExpanded ? 'Collapse' : 'Details',
                         onTap: () {
                           context.read<VesselPlanningBloc>().add(
-                            VesselPlanningRowToggled(
-                              index: index,
-                              masterRefId: item.Id,
-                            ),
-                          );
+                                VesselPlanningRowToggled(
+                                  index: index,
+                                  masterRefId: item.Id,
+                                ),
+                              );
                         },
                       ),
                       const SizedBox(width: 8),
@@ -676,12 +653,12 @@ class _PlanningCard extends StatelessWidget {
                         label: 'Export PDF',
                         onTap: () {
                           context.read<VesselPlanningBloc>().add(
-                            VesselPlanningShareRequested(
-                              id: item.Id,
-                              planningNoDisplay:
-                              item.VESSELPLANINGNoDisplay,
-                            ),
-                          );
+                                VesselPlanningShareRequested(
+                                  id: item.Id,
+                                  planningNoDisplay:
+                                      item.VESSELPLANINGNoDisplay,
+                                ),
+                              );
                         },
                       ),
                     ],
@@ -728,23 +705,14 @@ class _DetailsSection extends StatelessWidget {
         child: Center(
           child: Text(
             'No records found',
-            style: GoogleFonts.lato(
-                fontSize: AppGlobals.FontLow, color: AppTokens.planTextMuted),
+            style: AppTypography.bodySmall(color: AppTokens.planTextMuted),
           ),
         ),
       );
     }
 
-    final headerStyle = GoogleFonts.lato(
-      color: Colors.white,
-      fontWeight: FontWeight.w700,
-      fontSize: 12,
-    );
-    final rowStyle = GoogleFonts.lato(
-      color: colour.kTextDark,
-      fontWeight: FontWeight.w600,
-      fontSize: 12,
-    );
+    final headerStyle = AppTypography.bodySmall(color: Colors.white);
+    final rowStyle = AppTypography.bodySmall(color: colour.kTextDark);
 
     return SizedBox(
       height: isTablet ? height * 0.4 : height * 0.35,
@@ -788,14 +756,30 @@ class _DetailsSection extends StatelessWidget {
                 rows: details.map<DataRow>((item) {
                   return DataRow(
                     cells: [
-                      DataCell(Text(item.jobNo.isEmpty ? '-' : item.jobNo, style: rowStyle.copyWith(color: AppTokens.brandPrimary, fontWeight: FontWeight.bold))),
-                      DataCell(Text(item.customerName.isEmpty ? '-' : item.customerName, style: rowStyle)),
-                      DataCell(Text(item.loadingVesselName.isEmpty ? '-' : item.loadingVesselName, style: rowStyle)),
-                      DataCell(Text(item.oPort.isEmpty ? '-' : item.oPort, style: rowStyle)),
-                      DataCell(Text(item.jobName.isEmpty ? '-' : item.jobName, style: rowStyle)),
-                      DataCell(Text(item.jobStatus.isEmpty ? '-' : item.jobStatus, style: rowStyle.copyWith(color: AppTokens.statusSuccess))),
-                      DataCell(Text(item.pkg.isEmpty ? '-' : item.pkg, style: rowStyle)),
-                      DataCell(Text(item.remarks.isEmpty ? '-' : item.remarks, style: rowStyle)),
+                      DataCell(Text(item.jobNo.isEmpty ? '-' : item.jobNo,
+                          style: rowStyle.copyWith(
+                              color: AppTokens.brandPrimary,
+                              fontWeight: FontWeight.bold))),
+                      DataCell(Text(
+                          item.customerName.isEmpty ? '-' : item.customerName,
+                          style: rowStyle)),
+                      DataCell(Text(
+                          item.loadingVesselName.isEmpty
+                              ? '-'
+                              : item.loadingVesselName,
+                          style: rowStyle)),
+                      DataCell(Text(item.oPort.isEmpty ? '-' : item.oPort,
+                          style: rowStyle)),
+                      DataCell(Text(item.jobName.isEmpty ? '-' : item.jobName,
+                          style: rowStyle)),
+                      DataCell(Text(
+                          item.jobStatus.isEmpty ? '-' : item.jobStatus,
+                          style: rowStyle.copyWith(
+                              color: AppTokens.statusSuccess))),
+                      DataCell(Text(item.pkg.isEmpty ? '-' : item.pkg,
+                          style: rowStyle)),
+                      DataCell(Text(item.remarks.isEmpty ? '-' : item.remarks,
+                          style: rowStyle)),
                       DataCell(Text(_formatDate(item.soEta), style: rowStyle)),
                       DataCell(Text(_formatDate(item.sEta), style: rowStyle)),
                       DataCell(Text(_formatDate(item.soEtb), style: rowStyle)),
@@ -814,7 +798,8 @@ class _DetailsSection extends StatelessWidget {
   }
 
   String _formatDate(dynamic dtStr) {
-    if (dtStr == null || dtStr.toString().isEmpty || dtStr.toString() == '-') return '-';
+    if (dtStr == null || dtStr.toString().isEmpty || dtStr.toString() == '-')
+      return '-';
     try {
       DateTime dt = DateTime.parse(dtStr.toString());
       if (dt.year == 1900) return '-';
@@ -849,19 +834,13 @@ class _EmptyState extends StatelessWidget {
           const SizedBox(height: 14),
           Text(
             'No Records Found',
-            style: GoogleFonts.lato(
-              color: colour.kTextDark,
-              fontWeight: FontWeight.w600,
-              fontSize: 15,
-            ),
+            style: AppTypography.bodyLarge(
+                color: colour.kTextDark, fontWeight: FontWeight.bold),
           ),
           const SizedBox(height: 4),
           Text(
             'Try adjusting your filters',
-            style: GoogleFonts.lato(
-              color: AppTokens.planTextMuted,
-              fontSize: 12,
-            ),
+            style: AppTypography.bodySmall(color: AppTokens.planTextMuted),
           ),
         ],
       ),
@@ -937,11 +916,8 @@ class _CardActionChip extends StatelessWidget {
             const SizedBox(width: 4),
             Text(
               label,
-              style: GoogleFonts.lato(
-                color: AppTokens.invoiceHeaderStart,
-                fontWeight: FontWeight.w600,
-                fontSize: 11,
-              ),
+              style:
+                  AppTypography.bodySmall(color: AppTokens.invoiceHeaderStart),
             ),
           ],
         ),
@@ -964,8 +940,7 @@ class _SheetDateTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final displayDate =
-    DateFormat('dd-MM-yy').format(DateTime.parse(date));
+    final displayDate = DateFormat('dd-MM-yy').format(DateTime.parse(date));
     return InkWell(
       onTap: onTap,
       borderRadius: BorderRadius.circular(10),
@@ -981,12 +956,7 @@ class _SheetDateTile extends StatelessWidget {
           children: [
             Text(
               label.toUpperCase(),
-              style: GoogleFonts.lato(
-                color: AppTokens.planTextMuted,
-                fontWeight: FontWeight.w700,
-                fontSize: 9,
-                letterSpacing: 0.6,
-              ),
+              style: AppTypography.bodySmall(color: AppTokens.planTextMuted),
             ),
             const SizedBox(height: 4),
             Row(
@@ -994,11 +964,7 @@ class _SheetDateTile extends StatelessWidget {
               children: [
                 Text(
                   displayDate,
-                  style: GoogleFonts.lato(
-                    color: colour.kTextDark,
-                    fontWeight: FontWeight.w700,
-                    fontSize: 13,
-                  ),
+                  style: AppTypography.bodyLarge(color: colour.kTextDark),
                 ),
                 const Icon(
                   Icons.calendar_month_outlined,
@@ -1039,34 +1005,28 @@ class _SheetTextField extends StatelessWidget {
       readOnly: readOnly,
       textCapitalization: textCapitalization,
       textInputAction: textInputAction,
-      style: GoogleFonts.lato(
-        color: colour.kTextDark,
-        fontWeight: FontWeight.w600,
-        fontSize: AppGlobals.FontLow,
-      ),
+      style: AppTypography.bodySmall(color: colour.kTextDark),
       decoration: InputDecoration(
         hintText: hint,
-        hintStyle: GoogleFonts.lato(
-          color: AppTokens.planTextMuted,
-          fontWeight: FontWeight.w500,
-          fontSize: AppGlobals.FontLow,
-        ),
+        hintStyle: AppTypography.bodySmall(color: AppTokens.planTextMuted),
         filled: true,
         fillColor: colour.kDetailBg,
         suffixIcon: suffixIcon,
         contentPadding:
-        const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+            const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(10),
           borderSide: BorderSide.none,
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(10),
-          borderSide: const BorderSide(color: AppTokens.maintCardBorder, width: 0.5),
+          borderSide:
+              const BorderSide(color: AppTokens.maintCardBorder, width: 0.5),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(10),
-          borderSide: const BorderSide(color: colour.kHeaderGradEnd, width: 1.5),
+          borderSide:
+              const BorderSide(color: colour.kHeaderGradEnd, width: 1.5),
         ),
       ),
     );
@@ -1100,15 +1060,11 @@ class _GradientButton extends StatelessWidget {
           onTap: onPressed,
           borderRadius: BorderRadius.circular(24),
           child: Padding(
-            padding:
-            const EdgeInsets.symmetric(horizontal: 28, vertical: 11),
+            padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 11),
             child: Text(
               label,
-              style: GoogleFonts.lato(
-                color: Colors.white,
-                fontWeight: FontWeight.w700,
-                fontSize: AppGlobals.FontMedium,
-              ),
+              style: AppTypography.bodyLarge(
+                  color: Colors.white, fontWeight: FontWeight.bold),
             ),
           ),
         ),
@@ -1138,15 +1094,12 @@ class _OutlineButton extends StatelessWidget {
           onTap: onPressed,
           borderRadius: BorderRadius.circular(24),
           child: Padding(
-            padding:
-            const EdgeInsets.symmetric(horizontal: 28, vertical: 11),
+            padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 11),
             child: Text(
               label,
-              style: GoogleFonts.lato(
-                color: AppTokens.invoiceHeaderStart,
-                fontWeight: FontWeight.w700,
-                fontSize: AppGlobals.FontMedium,
-              ),
+              style: AppTypography.bodyLarge(
+                  color: AppTokens.invoiceHeaderStart,
+                  fontWeight: FontWeight.bold),
             ),
           ),
         ),

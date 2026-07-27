@@ -70,7 +70,7 @@ class _EmployeeAddBody extends StatelessWidget {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text(state.message),
-              backgroundColor: Colors.red,
+              backgroundColor: colour.commonColorred,
               behavior: SnackBarBehavior.floating,
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
             ),
@@ -95,7 +95,7 @@ class _EmployeeAddBody extends StatelessWidget {
             foregroundColor: colour.kWhite,
             elevation: 0,
             title: Text(isEdit ? "Edit Employee" : "Add Employee",
-                style: GoogleFonts.lato(fontWeight: FontWeight.bold, color: colour.kWhite)),
+                style: AppTypography.heading2(color: colour.kWhite)),
           ),
           body: SingleChildScrollView(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
@@ -110,15 +110,15 @@ class _EmployeeAddBody extends StatelessWidget {
                     context: context,
                     builder: (_) => AlertDialog(
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
-                      title: const Text("Confirm Save",
-                          style: TextStyle(fontWeight: FontWeight.bold)),
-                      content: const Text("Do you want to save this employee's details?"),
+                      title: Text("Confirm Save",
+                          style: AppTypography.heading2()),
+                      content: Text("Do you want to save this employee's details?"),
                       actions: [
                         TextButton(onPressed: () => Navigator.pop(context, false),
-                            child: const Text("Cancel")),
+                            child: Text("Cancel")),
                         ElevatedButton.icon(
-                          icon: const Icon(Icons.check, size: 18),
-                          label: const Text("Yes, Save"),
+                          icon: Icon(Icons.check, size: 18),
+                          label: Text("Yes, Save"),
                           style: ElevatedButton.styleFrom(backgroundColor: AppTokens.brandGradientStart,
                               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8))),
                           onPressed: () => Navigator.pop(context, true),
@@ -147,7 +147,7 @@ class _EmployeeAddBody extends StatelessWidget {
                         ? const SizedBox(width: 18, height: 18,
                         child: CircularProgressIndicator(color: colour.kWhite, strokeWidth: 2))
                         : Text(s.currentStep == 3 ? "Save" : "Next",
-                        style: const TextStyle(color: colour.kWhite)),
+                        style: AppTypography.bodyLarge(color: colour.kWhite)),
                   ),
                   const SizedBox(width: 12),
                   OutlinedButton(
@@ -156,15 +156,14 @@ class _EmployeeAddBody extends StatelessWidget {
                         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
                         side: const BorderSide(color: AppTokens.brandGradientStart),
                         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10))),
-                    child: const Text("Back", style: TextStyle(color: AppTokens.brandDark)),
+                    child: Text("Back", style: AppTypography.bodyLarge(color: AppTokens.brandDark)),
                   ),
                 ]);
               },
               steps: [
                 // ── Step 1: Basic Info ──
                 Step(
-                  title: Text("Basic Info", style: GoogleFonts.lato(
-                      fontWeight: FontWeight.bold, color: AppTokens.brandDark)),
+                  title: Text("Basic Info", style: AppTypography.heading2(color: AppTokens.brandDark)),
                   content: _section([
                     _field("Employee Name", s.employee.EmployeeName,
                             (v) => bloc.add(UpdateFieldEvent('EmployeeName', v))),
@@ -185,8 +184,7 @@ class _EmployeeAddBody extends StatelessWidget {
 
                 // ── Step 2: Address Info ──
                 Step(
-                  title: Text("Address Info", style: GoogleFonts.lato(
-                      fontWeight: FontWeight.bold, color: AppTokens.brandDark)),
+                  title: Text("Address Info", style: AppTypography.heading2(color: AppTokens.brandDark)),
                   content: _section([
                     _field("Address 1", s.employee.Address1,
                             (v) => bloc.add(UpdateFieldEvent('Address1', v))),
@@ -208,8 +206,7 @@ class _EmployeeAddBody extends StatelessWidget {
 
                 // ── Step 3: Job Info ──
                 Step(
-                  title: Text("Job Info", style: GoogleFonts.lato(
-                      fontWeight: FontWeight.bold, color: AppTokens.brandDark)),
+                  title: Text("Job Info", style: AppTypography.heading2(color: AppTokens.brandDark)),
                   content: _section([
                     _field("User Name", s.employee.UserName,
                             (v) => bloc.add(UpdateFieldEvent('UserName', v))),
@@ -233,8 +230,7 @@ class _EmployeeAddBody extends StatelessWidget {
 
                 // ── Step 4: Bank Info ──
                 Step(
-                  title: Text("Bank Details", style: GoogleFonts.lato(
-                      fontWeight: FontWeight.bold, color: AppTokens.brandDark)),
+                  title: Text("Bank Details", style: AppTypography.heading2(color: AppTokens.brandDark)),
                   content: _section([
                     _field("Bank Name", s.employee.BankName,
                             (v) => bloc.add(UpdateFieldEvent('BankName', v))),
@@ -286,7 +282,7 @@ Widget _field(
       onChanged: onChanged,
       decoration: InputDecoration(
         labelText: label,
-        labelStyle: const TextStyle(color: AppTokens.brandDark),
+        labelStyle: AppTypography.bodyLarge(color: AppTokens.brandDark),
         border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
         focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(10),
             borderSide: const BorderSide(color: AppTokens.brandGradientStart, width: 1.5)),
@@ -311,7 +307,7 @@ Widget _dropdown(
       initialValue: items.contains(value) ? value : null,
       decoration: InputDecoration(
         labelText: label,
-        labelStyle: const TextStyle(color: AppTokens.brandDark),
+        labelStyle: AppTypography.bodyLarge(color: AppTokens.brandDark),
         border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(10),

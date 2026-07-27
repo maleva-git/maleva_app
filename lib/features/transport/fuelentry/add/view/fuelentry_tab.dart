@@ -1,3 +1,5 @@
+import 'package:maleva/core/theme/app_typography.dart';
+import 'package:maleva/core/colors/colors.dart' as colour;
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
@@ -11,22 +13,12 @@ import '../../view/view/fuelentryview_tab.dart';
 import '../bloc/fuelentry_bloc.dart';
 import '../bloc/fuelentry_event.dart';
 import '../bloc/fuelentry_state.dart';
-
-
+import 'package:maleva/core/theme/tokens.dart';
 
 // ─── Design Tokens ────────────────────────────────────────────────────────────
-const kHeaderGradStart = Color(0xFF1A3A8F);
-const kHeaderGradEnd   = Color(0xFF4A6FD4);
-const kCardBorder      = Color(0xFFC5D0EE);
-const kPageBg          = Color(0xFFF4F6FB);
-const kTextDark        = Color(0xFF1E2D5E);
-const kTextMid         = Color(0xFF4A5A8A);
-const kTextMuted       = Color(0xFF8A96BF);
-const kDetailBg        = Color(0xFFF0F4FF);
-const kChipBg          = Color(0xFFEEF2FF);
 
 const kGradient = LinearGradient(
-  colors: [kHeaderGradStart, kHeaderGradEnd],
+  colors: [AppTokens.brandGradientStart, AppTokens.brandGradientEnd],
   begin: Alignment.topLeft,
   end: Alignment.bottomRight,
 );
@@ -52,23 +44,20 @@ class _FuelEntryPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final userName =
-        AppGlobals.storagenew.getString('Username') ?? '';
+    final userName = AppGlobals.storagenew.getString('Username') ?? '';
 
     return BlocListener<FuelEntryBloc, FuelEntryState>(
       listener: (context, state) async {
         if (state is FuelEntrySaveSuccess) {
-          await ConfirmationOK(
-              'Saved Successfully', context);
+          await ConfirmationOK('Saved Successfully', context);
         }
         if (state is FuelEntryError) {
           if (!context.mounted) return;
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text(state.message,
-                  style:
-                  GoogleFonts.lato(color: Colors.white)),
-              backgroundColor: const Color(0xFFB33040),
+                  style: AppTypography.bodyLarge(color: Colors.white)),
+              backgroundColor: AppTokens.appBarBg,
               behavior: SnackBarBehavior.floating,
               shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(10)),
@@ -84,17 +73,15 @@ class _FuelEntryPage extends StatelessWidget {
         },
         child: Scaffold(
           resizeToAvoidBottomInset: true,
-          backgroundColor: kPageBg,
+          backgroundColor: AppTokens.surfacePage,
           appBar: _buildAppBar(context, userName),
           drawer: const Menulist(),
-          body:
-          BlocBuilder<FuelEntryBloc, FuelEntryState>(
+          body: BlocBuilder<FuelEntryBloc, FuelEntryState>(
             builder: (context, state) {
-              if (state is FuelEntryInitial ||
-                  state is FuelEntryLoading) {
-                return const Center(
+              if (state is FuelEntryInitial || state is FuelEntryLoading) {
+                return Center(
                   child: SpinKitFoldingCube(
-                      color: kHeaderGradEnd, size: 35),
+                      color: AppTokens.brandGradientEnd, size: 35),
                 );
               }
               if (state is FuelEntryLoaded) {
@@ -108,18 +95,15 @@ class _FuelEntryPage extends StatelessWidget {
     );
   }
 
-  PreferredSizeWidget _buildAppBar(
-      BuildContext context, String userName) {
+  PreferredSizeWidget _buildAppBar(BuildContext context, String userName) {
     return AppBar(
       automaticallyImplyLeading: false,
       elevation: 0,
       toolbarHeight: 62,
-      flexibleSpace: Container(
-          decoration:
-          const BoxDecoration(gradient: kGradient)),
+      flexibleSpace:
+          Container(decoration: const BoxDecoration(gradient: kGradient)),
       leading: IconButton(
-        icon: const Icon(Icons.arrow_back_ios_new_rounded,
-            size: 20),
+        icon: const Icon(Icons.arrow_back_ios_new_rounded, size: 20),
         color: Colors.white,
         onPressed: () => Navigator.pop(context),
       ),
@@ -128,33 +112,26 @@ class _FuelEntryPage extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text('Fuel Entry',
-              style: GoogleFonts.lato(
-                  color: Colors.white,
-                  fontWeight: FontWeight.w700,
-                  fontSize: 17,
-                  letterSpacing: 0.3)),
+              style: AppTypography.bodyLarge(
+                  color: Colors.white, fontWeight: FontWeight.bold)),
           const SizedBox(height: 2),
-          Text(userName,
-              style: GoogleFonts.lato(
-                  color: Colors.white.withValues(alpha: 0.65),
-                  fontWeight: FontWeight.w500,
-                  fontSize: 12)),
+          Text(userName, style: AppTypography.bodySmall(color: Colors.white)),
         ],
       ),
       actions: [
         Padding(
-          padding: const EdgeInsets.only(
-              right: 12, top: 10, bottom: 10),
+          padding: const EdgeInsets.only(right: 12, top: 10, bottom: 10),
           child: _AppBarButton(
             label: 'View',
             onPressed: () => Navigator.push(
               context,
-         /*     MaterialPageRoute(
+              /*     MaterialPageRoute(
                   builder: (_) => const FuelEntryView()),*/
 
               MaterialPageRoute(
                 builder: (context) => BlocProvider(
-                  create: (context) => FuelEntryViewBloc()..add(FuelEntryViewStarted()),
+                  create: (context) =>
+                      FuelEntryViewBloc()..add(FuelEntryViewStarted()),
                   child: const FuelEntryView(),
                 ),
               ),
@@ -178,17 +155,14 @@ class _FuelEntryBody extends StatelessWidget {
       builder: (context, constraints) {
         final isTablet = constraints.maxWidth > kTabletBreak;
         // Tablet: centre the form card with proportional padding
-        final hPad =
-        isTablet ? constraints.maxWidth * 0.15 : 0.0;
+        final hPad = isTablet ? constraints.maxWidth * 0.15 : 0.0;
 
         return SingleChildScrollView(
           child: Padding(
             padding: EdgeInsets.symmetric(horizontal: hPad),
             child: isTablet
-                ? _FuelEntryCard(
-                state: state, isTablet: true)
-                : _FuelEntryCard(
-                state: state, isTablet: false),
+                ? _FuelEntryCard(state: state, isTablet: true)
+                : _FuelEntryCard(state: state, isTablet: false),
           ),
         );
       },
@@ -200,36 +174,28 @@ class _FuelEntryBody extends StatelessWidget {
 class _FuelEntryCard extends StatelessWidget {
   final FuelEntryLoaded state;
   final bool isTablet;
-  const _FuelEntryCard(
-      {required this.state, required this.isTablet});
+  const _FuelEntryCard({required this.state, required this.isTablet});
 
   @override
   Widget build(BuildContext context) {
     return Container(
       margin: EdgeInsets.fromLTRB(
-          isTablet ? 0 : 14,
-          isTablet ? 32 : 20,
-          isTablet ? 0 : 14,
-          24),
+          isTablet ? 0 : 14, isTablet ? 32 : 20, isTablet ? 0 : 14, 24),
       decoration: isTablet
           ? BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(
-            color: kCardBorder, width: 0.5),
-        boxShadow: [
-          BoxShadow(
-            color:
-            kHeaderGradStart.withValues(alpha: 0.10),
-            blurRadius: 24,
-            offset: const Offset(0, 6),
-          ),
-        ],
-      )
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(20),
+              border: Border.all(color: AppTokens.surfaceBorder, width: 0.5),
+              boxShadow: [
+                BoxShadow(
+                  color: AppTokens.brandGradientStart.withValues(alpha: 0.10),
+                  blurRadius: 24,
+                  offset: const Offset(0, 6),
+                ),
+              ],
+            )
           : null,
-      padding: isTablet
-          ? const EdgeInsets.all(32)
-          : EdgeInsets.zero,
+      padding: isTablet ? const EdgeInsets.all(32) : EdgeInsets.zero,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
@@ -241,9 +207,7 @@ class _FuelEntryCard extends StatelessWidget {
           _FormRow(
             label: 'Fuel No',
             isTablet: isTablet,
-            child: _ReadonlyField(
-                value: state.fuelNo,
-                isTablet: isTablet),
+            child: _ReadonlyField(value: state.fuelNo, isTablet: isTablet),
           ),
           SizedBox(height: isTablet ? 16 : 12),
 
@@ -251,8 +215,7 @@ class _FuelEntryCard extends StatelessWidget {
           _FormRow(
             label: 'Entry Date',
             isTablet: isTablet,
-            child: _DateField(
-                state: state, isTablet: isTablet),
+            child: _DateField(state: state, isTablet: isTablet),
           ),
           SizedBox(height: isTablet ? 16 : 12),
 
@@ -264,9 +227,8 @@ class _FuelEntryCard extends StatelessWidget {
               hint: 'Liter',
               value: state.liter,
               isTablet: isTablet,
-              onChanged: (v) => context
-                  .read<FuelEntryBloc>()
-                  .add(FuelEntryLiterChanged(v)),
+              onChanged: (v) =>
+                  context.read<FuelEntryBloc>().add(FuelEntryLiterChanged(v)),
             ),
           ),
           SizedBox(height: isTablet ? 16 : 12),
@@ -279,43 +241,34 @@ class _FuelEntryCard extends StatelessWidget {
               hint: 'Amount',
               value: state.amount,
               isTablet: isTablet,
-              onChanged: (v) => context
-                  .read<FuelEntryBloc>()
-                  .add(FuelEntryAmountChanged(v)),
+              onChanged: (v) =>
+                  context.read<FuelEntryBloc>().add(FuelEntryAmountChanged(v)),
             ),
           ),
           SizedBox(height: isTablet ? 28 : 20),
 
           // ── Save button ─────────────────────────────
           Align(
-            alignment: isTablet
-                ? Alignment.center
-                : Alignment.centerLeft,
+            alignment: isTablet ? Alignment.center : Alignment.centerLeft,
             child: _SaveButton(
               isTablet: isTablet,
               onPressed: () {
-                final s = context
-                    .read<FuelEntryBloc>()
-                    .state;
+                final s = context.read<FuelEntryBloc>().state;
                 if (s is! FuelEntryLoaded) return;
                 if (s.liter.isEmpty) {
-                  toastMsg(
-                      'Enter Liter', '', context);
+                  toastMsg('Enter Liter', '', context);
                   return;
                 }
                 if (s.amount.isEmpty) {
-                  toastMsg(
-                      'Enter Amount', '', context);
+                  toastMsg('Enter Amount', '', context);
                   return;
                 }
-                ConfirmationMsgYesNo(context,
-                    'Do You Want to Save Fuel Entry ?')
+                ConfirmationMsgYesNo(
+                        context, 'Do You Want to Save Fuel Entry ?')
                     .then((ok) {
                   if (ok == true) {
                     if (!context.mounted) return;
-                    context
-                        .read<FuelEntryBloc>()
-                        .add(FuelEntrySaveRequested());
+                    context.read<FuelEntryBloc>().add(FuelEntrySaveRequested());
                   }
                 });
               },
@@ -335,8 +288,7 @@ class _TruckBanner extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(
-          horizontal: 16, vertical: 14),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
       decoration: BoxDecoration(
         gradient: kGradient,
         borderRadius: BorderRadius.circular(12),
@@ -349,13 +301,7 @@ class _TruckBanner extends StatelessWidget {
           Expanded(
             child: Text(
               'Truck: ${AppGlobals.DriverTruckName}',
-              style: GoogleFonts.lato(
-                color: Colors.white,
-                fontWeight: FontWeight.w700,
-                fontSize:
-                isTablet ? AppGlobals.FontLarge : AppGlobals.FontMedium,
-                letterSpacing: 0.3,
-              ),
+              style: AppTypography.heading1(color: Colors.white),
               overflow: TextOverflow.ellipsis,
             ),
           ),
@@ -369,7 +315,7 @@ class _TruckBanner extends StatelessWidget {
 class _FormRow extends StatelessWidget {
   final String label;
   final Widget child;
-  final bool   isTablet;
+  final bool isTablet;
 
   const _FormRow({
     required this.label,
@@ -387,11 +333,7 @@ class _FormRow extends StatelessWidget {
             width: 130,
             child: Text(
               label,
-              style: GoogleFonts.lato(
-                color: kTextMid,
-                fontWeight: FontWeight.w600,
-                fontSize: AppGlobals.FontLow + 1,
-              ),
+              style: AppTypography.bodySmall(color: AppTokens.textPrimary),
             ),
           ),
           const SizedBox(width: 16),
@@ -404,10 +346,7 @@ class _FormRow extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(label,
-            style: GoogleFonts.lato(
-                color: kTextMid,
-                fontWeight: FontWeight.w600,
-                fontSize: AppGlobals.FontLow)),
+            style: AppTypography.bodySmall(color: AppTokens.textPrimary)),
         const SizedBox(height: 5),
         child,
       ],
@@ -418,31 +357,22 @@ class _FormRow extends StatelessWidget {
 // ─── Read-only fuel No field ──────────────────────────────────────────────────
 class _ReadonlyField extends StatelessWidget {
   final String value;
-  final bool   isTablet;
-  const _ReadonlyField(
-      {required this.value, required this.isTablet});
+  final bool isTablet;
+  const _ReadonlyField({required this.value, required this.isTablet});
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(
-          horizontal: 14, vertical: 13),
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 13),
       decoration: BoxDecoration(
-        color: kChipBg,
+        color: AppTokens.surfaceChip,
         borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: kCardBorder, width: 0.5),
+        border: Border.all(color: AppTokens.surfaceBorder, width: 0.5),
       ),
       child: Text(
         value.isEmpty ? '—' : value,
         textAlign: TextAlign.center,
-        style: GoogleFonts.lato(
-          color: kHeaderGradStart,
-          fontWeight: FontWeight.w700,
-          fontSize: isTablet
-              ? AppGlobals.FontLow + 1
-              : AppGlobals.FontLow,
-          letterSpacing: 0.5,
-        ),
+        style: AppTypography.bodySmall(color: AppTokens.brandGradientStart),
       ),
     );
   }
@@ -451,16 +381,14 @@ class _ReadonlyField extends StatelessWidget {
 // ─── Date Field ───────────────────────────────────────────────────────────────
 class _DateField extends StatelessWidget {
   final FuelEntryLoaded state;
-  final bool   isTablet;
-  const _DateField(
-      {required this.state, required this.isTablet});
+  final bool isTablet;
+  const _DateField({required this.state, required this.isTablet});
 
   @override
   Widget build(BuildContext context) {
     String display;
     try {
-      display = DateFormat('dd-MM-yy')
-          .format(DateTime.parse(state.date));
+      display = DateFormat('dd-MM-yy').format(DateTime.parse(state.date));
     } catch (_) {
       display = state.date;
     }
@@ -475,10 +403,10 @@ class _DateField extends StatelessWidget {
           builder: (ctx, child) => Theme(
             data: Theme.of(ctx).copyWith(
               colorScheme: const ColorScheme.light(
-                primary: kHeaderGradStart,
+                primary: AppTokens.brandGradientStart,
                 onPrimary: Colors.white,
                 surface: Colors.white,
-                onSurface: kTextDark,
+                onSurface: AppTokens.textPrimary,
               ),
             ),
             child: child!,
@@ -487,36 +415,27 @@ class _DateField extends StatelessWidget {
         if (picked != null) {
           if (!context.mounted) return;
           context.read<FuelEntryBloc>().add(
-              FuelEntryDateChanged(
-                  DateFormat('yyyy-MM-dd').format(picked)));
+              FuelEntryDateChanged(DateFormat('yyyy-MM-dd').format(picked)));
         }
       },
       borderRadius: BorderRadius.circular(10),
       child: Container(
-        padding: const EdgeInsets.symmetric(
-            horizontal: 14, vertical: 13),
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 13),
         decoration: BoxDecoration(
-          color: kDetailBg,
+          color: AppTokens.surfaceDetail,
           borderRadius: BorderRadius.circular(10),
-          border:
-          Border.all(color: kCardBorder, width: 0.5),
+          border: Border.all(color: AppTokens.surfaceBorder, width: 0.5),
         ),
         child: Row(
           children: [
             Expanded(
               child: Text(
                 display,
-                style: GoogleFonts.lato(
-                  color: kTextDark,
-                  fontWeight: FontWeight.w600,
-                  fontSize: isTablet
-                      ? AppGlobals.FontLow + 1
-                      : AppGlobals.FontLow,
-                ),
+                style: AppTypography.bodySmall(color: AppTokens.textPrimary),
               ),
             ),
             const Icon(Icons.calendar_month_outlined,
-                size: 20, color: kHeaderGradEnd),
+                size: 20, color: AppTokens.brandGradientEnd),
           ],
         ),
       ),
@@ -528,7 +447,7 @@ class _DateField extends StatelessWidget {
 class _NumberField extends StatefulWidget {
   final String hint;
   final String value;
-  final bool   isTablet;
+  final bool isTablet;
   final void Function(String) onChanged;
 
   const _NumberField({
@@ -556,8 +475,7 @@ class _NumberFieldState extends State<_NumberField> {
     super.didUpdateWidget(old);
     if (widget.value != _ctrl.text) {
       _ctrl.text = widget.value;
-      _ctrl.selection = TextSelection.collapsed(
-          offset: widget.value.length);
+      _ctrl.selection = TextSelection.collapsed(offset: widget.value.length);
     }
   }
 
@@ -574,36 +492,26 @@ class _NumberFieldState extends State<_NumberField> {
       keyboardType: TextInputType.number,
       textInputAction: TextInputAction.done,
       onChanged: widget.onChanged,
-      style: GoogleFonts.lato(
-        color: kTextDark,
-        fontWeight: FontWeight.w600,
-        fontSize: widget.isTablet
-            ? AppGlobals.FontLow + 1
-            : AppGlobals.FontLow,
-      ),
+      style: AppTypography.bodySmall(color: AppTokens.textPrimary),
       decoration: InputDecoration(
         hintText: widget.hint,
-        hintStyle: GoogleFonts.lato(
-            color: kTextMuted,
-            fontSize: widget.isTablet
-                ? AppGlobals.FontLow + 1
-                : AppGlobals.FontLow),
+        hintStyle: AppTypography.bodySmall(color: AppTokens.textMuted),
         filled: true,
-        fillColor: kDetailBg,
-        contentPadding: const EdgeInsets.symmetric(
-            horizontal: 14, vertical: 13),
+        fillColor: AppTokens.surfaceDetail,
+        contentPadding:
+            const EdgeInsets.symmetric(horizontal: 14, vertical: 13),
         border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(10),
             borderSide: BorderSide.none),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(10),
-          borderSide: const BorderSide(
-              color: kCardBorder, width: 0.5),
+          borderSide:
+              const BorderSide(color: AppTokens.surfaceBorder, width: 0.5),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(10),
-          borderSide: const BorderSide(
-              color: kHeaderGradEnd, width: 1.5),
+          borderSide:
+              const BorderSide(color: AppTokens.brandGradientEnd, width: 1.5),
         ),
       ),
     );
@@ -612,22 +520,21 @@ class _NumberFieldState extends State<_NumberField> {
 
 // ─── Save Button ──────────────────────────────────────────────────────────────
 class _SaveButton extends StatelessWidget {
-  final bool         isTablet;
+  final bool isTablet;
   final VoidCallback onPressed;
-  const _SaveButton(
-      {required this.isTablet, required this.onPressed});
+  const _SaveButton({required this.isTablet, required this.onPressed});
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      width:  isTablet ? 200 : null,
-      height: isTablet ? 52  : 48,
+      width: isTablet ? 200 : null,
+      height: isTablet ? 52 : 48,
       decoration: BoxDecoration(
         gradient: kGradient,
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
-            color: kHeaderGradStart.withValues(alpha: 0.35),
+            color: AppTokens.brandGradientStart.withValues(alpha: 0.35),
             blurRadius: 12,
             offset: const Offset(0, 4),
           ),
@@ -641,13 +548,8 @@ class _SaveButton extends StatelessWidget {
           child: Center(
             child: Text(
               'Save',
-              style: GoogleFonts.lato(
-                color: Colors.white,
-                fontWeight: FontWeight.w700,
-                fontSize: isTablet
-                    ? AppGlobals.FontMedium + 1
-                    : AppGlobals.FontMedium,
-              ),
+              style: AppTypography.bodyLarge(
+                  color: Colors.white, fontWeight: FontWeight.bold),
             ),
           ),
         ),
@@ -660,8 +562,7 @@ class _SaveButton extends StatelessWidget {
 class _AppBarButton extends StatelessWidget {
   final String label;
   final VoidCallback onPressed;
-  const _AppBarButton(
-      {required this.label, required this.onPressed});
+  const _AppBarButton({required this.label, required this.onPressed});
 
   @override
   Widget build(BuildContext context) {
@@ -669,9 +570,8 @@ class _AppBarButton extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.white.withValues(alpha: 0.15),
         borderRadius: BorderRadius.circular(8),
-        border: Border.all(
-            color: Colors.white.withValues(alpha: 0.4),
-            width: 0.5),
+        border:
+            Border.all(color: Colors.white.withValues(alpha: 0.4), width: 0.5),
       ),
       child: Material(
         color: Colors.transparent,
@@ -679,13 +579,10 @@ class _AppBarButton extends StatelessWidget {
           onTap: onPressed,
           borderRadius: BorderRadius.circular(8),
           child: Padding(
-            padding: const EdgeInsets.symmetric(
-                horizontal: 12, vertical: 6),
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
             child: Text(label,
-                style: GoogleFonts.lato(
-                    color: Colors.white,
-                    fontWeight: FontWeight.w700,
-                    fontSize: AppGlobals.FontMedium)),
+                style: AppTypography.bodyLarge(
+                    color: Colors.white, fontWeight: FontWeight.bold)),
           ),
         ),
       ),

@@ -1,4 +1,3 @@
-import 'package:maleva/core/network/api_legacy_helper.dart';
 import 'package:flutter/Material.dart';
 import 'package:maleva/core/widgets/custom_app_bar.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -15,6 +14,7 @@ import '../../common_tabs/transport/view/transportview_tab.dart';
 import '../../common_tabs/driverleave/view/driver_leave_request_tab.dart';
 import '../bloc/driver_bloc.dart';
 import '../bloc/driver_state.dart';
+import 'package:maleva/core/utils/auth_helper.dart';
 
 class DriverDashboardView extends StatelessWidget {
   final TabController tabController;
@@ -51,7 +51,7 @@ class DriverDashboardView extends StatelessWidget {
         IconButton(
           icon: Icon(Icons.exit_to_app,
               size: isTablet ? 32 : 30),
-          onPressed: () => ApiLegacyHelper.logout(context),
+          onPressed: () => AuthHelper.logout(context),
         ),
         if (isTablet) const SizedBox(width: 8),
       ],

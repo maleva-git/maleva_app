@@ -1,7 +1,8 @@
-import 'package:maleva/core/network/api_legacy_helper.dart';
+import 'package:maleva/core/network/legacy_api_repository.dart';
+import 'package:maleva/core/di/injection.dart';
 import 'package:maleva/core/network/api_constants.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import '../../../../core/network/OnlineApi.dart' as OnlineApi;
+
 import 'package:maleva/core/utils/app_globals.dart';
 import '../data/fwupdate_repository.dart';
 import 'forwarding_event.dart';
@@ -80,9 +81,9 @@ class FWUpdateBloc extends Bloc<FWUpdateEvent, FWUpdateState> {
     // 1. Exact Old Code API Calls (Direct-a OnlineApi use panrom)
 
     try {
-      await OnlineApi.EditSalesOrder(event.saleOrderId, 0);
+      await sl<LegacyApiRepository>().EditSalesOrder(event.saleOrderId, 0);
       if (!event.context.mounted) return;
-      await OnlineApi.SelectEmployee(event.context, '', 'Operation');
+      await sl<LegacyApiRepository>().SelectEmployee(event.context, '', 'Operation');
     } catch (e) {
       print("Master/Employee API Error (Ignored): $e");
     }
@@ -95,10 +96,11 @@ class FWUpdateBloc extends Bloc<FWUpdateEvent, FWUpdateState> {
 
     // 2. Exact Old Code Image Fetching Logic
     try {
+      if (!event.context.mounted) return;
       String imgDir = "/Upload/${AppGlobals.Comid}/SalesOrder/${event.saleOrderId}/${event.smkText}/";
       Map<String, String> header = {'Content-Type': 'application/json; charset=UTF-8'};
 
-      var resultData = await ApiLegacyHelper.apiAllinoneSelectArray(
+      var resultData = await sl<LegacyApiRepository>().apiAllinoneSelectArray(
           "${ApiConstants.apiGetImage}$imgDir", null, header, event.context
       );
 

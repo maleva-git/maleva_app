@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
@@ -88,7 +89,7 @@ class TransportDashboardBloc extends Bloc<TransportDashboardEvent, TransportDash
       if (rules.map((e) => e['Id'].toString()).contains(empIdStr)) dropdownVal = empIdStr;
 
       emit(state.copyWith(rulesTypeEmployee: rules, dropdownValueEmp: dropdownVal));
-    } catch (_) {}
+    } catch (e, stack) { debugPrint("Error caught globally: $e\n$stack"); }
   }
 
   Future<void> _onLoadPlanningData(LoadPlanningDataRequested event, Emitter<TransportDashboardState> emit) async {
@@ -115,7 +116,7 @@ class TransportDashboardBloc extends Bloc<TransportDashboardEvent, TransportDash
     try {
       await repository.cancelEnquiry(event.id);
       add(const LoadEnquiryDataRequested());
-    } catch (_) {}
+    } catch (e, stack) { debugPrint("Error caught globally: $e\n$stack"); }
   }
 
   Future<void> _onLoadEmployees(LoadEmployeesRequested event, Emitter<TransportDashboardState> emit) async {
@@ -125,7 +126,7 @@ class TransportDashboardBloc extends Bloc<TransportDashboardEvent, TransportDash
         emit(state.copyWith(employees: employees, selectedEmployee: employees.first));
         add(EmployeeSelectedForEmail(employee: employees.first));
       }
-    } catch (_) {}
+    } catch (e, stack) { debugPrint("Error caught globally: $e\n$stack"); }
   }
 
   Future<void> _onEmployeeSelectedForEmail(EmployeeSelectedForEmail event, Emitter<TransportDashboardState> emit) async {

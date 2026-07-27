@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 
@@ -71,7 +72,7 @@ class SpotSaleBloc extends Bloc<SpotSaleEvent, SpotSaleState> {
           AppGlobals.JobTypeList =
               result.map((e) => JobTypeModel.fromJson(e as Map<String, dynamic>)).toList();
         }
-      } catch (_) {}
+      } catch (e, stack) { debugPrint("Error caught globally: $e\n$stack"); }
     }
 
     // Load JobStatus
@@ -82,7 +83,7 @@ class SpotSaleBloc extends Bloc<SpotSaleEvent, SpotSaleState> {
           AppGlobals.JobStatusList =
               result.map((e) => JobStatusModel.fromJson(e as Map<String, dynamic>)).toList();
         }
-      } catch (_) {}
+      } catch (e, stack) { debugPrint("Error caught globally: $e\n$stack"); }
     }
 
     if (state is SpotSaleEntryState) {

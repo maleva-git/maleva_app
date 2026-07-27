@@ -1,3 +1,4 @@
+import 'package:maleva/core/colors/colors.dart' as colour;
 import 'package:maleva/core/theme/app_typography.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -47,13 +48,13 @@ class _EmployeeListBody extends StatelessWidget {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
                 content: Text(state.message),
-                backgroundColor: Colors.red),
+                backgroundColor: colour.commonColorred),
           );
         }
       },
       builder: (context, state) {
         if (state is EmployeeListLoading) {
-          return const Center(
+          return Center(
               child: CircularProgressIndicator(color: AppTokens.brandGradientStart));
         }
 
@@ -63,18 +64,18 @@ class _EmployeeListBody extends StatelessWidget {
               mainAxisSize: MainAxisSize.min,
               children: [
                 const Icon(Icons.error_outline,
-                    color: Colors.red, size: 48),
+                    color: colour.commonColorred, size: 48),
                 const SizedBox(height: 12),
                 Text(state.message,
                     textAlign: TextAlign.center,
-                    style: GoogleFonts.lato(color: Colors.red)),
+                    style: AppTypography.bodyLarge()),
                 const SizedBox(height: 16),
                 ElevatedButton.icon(
                   onPressed: () => context
                       .read<EmployeeMasterBloc>()
                       .add(const LoadEmployeesmasterEvent()),
-                  icon: const Icon(Icons.refresh),
-                  label: const Text("Retry"),
+                  icon: Icon(Icons.refresh),
+                  label: Text("Retry"),
                   style: ElevatedButton.styleFrom(
                       backgroundColor: AppTokens.brandGradientStart),
                 ),
@@ -289,18 +290,18 @@ class _EmployeeListBody extends StatelessWidget {
       builder: (_) => AlertDialog(
         shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(16)),
-        title: const Text("Confirm Delete"),
+        title: Text("Confirm Delete"),
         content: Text("Delete ${record.EmployeeName}?"),
         actions: [
           TextButton(
               onPressed: () => Navigator.pop(context, false),
-              child: const Text("Cancel")),
+              child: Text("Cancel")),
           ElevatedButton(
             style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.red),
+                backgroundColor: colour.commonColorred),
             onPressed: () => Navigator.pop(context, true),
-            child: const Text("Delete",
-                style: TextStyle(color: Palette.kWhite)),
+            child: Text("Delete",
+                style: AppTypography.bodyLarge(color: Palette.kWhite)),
           ),
         ],
       ),
@@ -351,7 +352,7 @@ class _EmployeeCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final isActive = record.Active != 0;
     final statusColor =
-    isActive ? Colors.green.shade600 : Colors.red.shade600;
+    isActive ? Colors.green : colour.commonColorred;
 
     return GestureDetector(
       onTap: onTap,
@@ -504,8 +505,8 @@ class _EmployeeCard extends StatelessWidget {
             _actionBtn(
               icon: Icons.delete_rounded,
               label: "Delete",
-              color: Colors.red,
-              bg: Colors.red.withValues(alpha: 0.08),
+              color: colour.commonColorred,
+              bg: colour.commonColorred.withValues(alpha: 0.08),
               onTap: onDelete,
             ),
           ],
@@ -620,7 +621,7 @@ class _EmployeeDetailPanel extends StatelessWidget {
   Widget build(BuildContext context) {
     final isActive = record.Active != 0;
     final statusColor =
-    isActive ? Colors.green.shade600 : Colors.red.shade600;
+    isActive ? Colors.green : colour.commonColorred;
 
     return Container(
       width: double.infinity,
@@ -686,9 +687,7 @@ class _EmployeeDetailPanel extends StatelessWidget {
                   icon: const Icon(Icons.edit_rounded,
                       color: AppTokens.brandGradientStart, size: 16),
                   label: Text("Edit",
-                      style: GoogleFonts.lato(
-                          color: AppTokens.brandGradientStart,
-                          fontWeight: FontWeight.bold)),
+                      style: AppTypography.heading2(color: AppTokens.brandGradientStart)),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppTokens.brandLight,
                     elevation: 0,
@@ -705,11 +704,9 @@ class _EmployeeDetailPanel extends StatelessWidget {
                   icon: const Icon(Icons.delete_rounded,
                       color: Palette.kWhite, size: 16),
                   label: Text("Delete",
-                      style: GoogleFonts.lato(
-                          color: Palette.kWhite,
-                          fontWeight: FontWeight.bold)),
+                      style: AppTypography.heading2(color: Palette.kWhite)),
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.red,
+                    backgroundColor: colour.commonColorred,
                     elevation: 0,
                     shape: RoundedRectangleBorder(
                         borderRadius:

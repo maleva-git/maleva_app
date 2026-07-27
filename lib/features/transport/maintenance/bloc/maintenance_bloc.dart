@@ -1,4 +1,3 @@
-import 'package:maleva/core/network/api_legacy_helper.dart';
 import 'package:maleva/core/network/api_constants.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:maleva/core/utils/app_globals.dart';
@@ -7,6 +6,8 @@ import 'maintenance_event.dart';
 import 'maintenance_state.dart';
 import 'package:maleva/core/models/shared/truck_details_model.dart';
 import 'package:maleva/core/models/shared/response_view_model.dart';
+import 'package:maleva/core/network/legacy_api_repository.dart';
+import 'package:maleva/core/di/injection.dart';
 
 
 
@@ -115,7 +116,7 @@ class TruckMaintenanceBloc
     };
     final header = {'Content-Type': 'application/json; charset=UTF-8'};
 
-    final resultData = await ApiLegacyHelper.apiAllinoneSelectArray(
+    final resultData = await sl<LegacyApiRepository>().apiAllinoneSelectArray(
         ApiConstants.apiSelectTruckDetails, master, header, null);
 
     if (resultData != '' && resultData != null) {

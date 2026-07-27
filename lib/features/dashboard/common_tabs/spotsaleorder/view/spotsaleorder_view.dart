@@ -53,8 +53,7 @@ class _SpotSaleViewBody extends StatelessWidget {
         foregroundColor: colour.kWhite,
         elevation: 0,
         title: Text("Spot Sale Entries",
-            style: GoogleFonts.lato(
-                fontWeight: FontWeight.bold, color: colour.kWhite)),
+            style: AppTypography.heading2(color: colour.kWhite)),
         centerTitle: true,
       ),
       body: BlocConsumer<SpotSaleBloc, SpotSaleState>(
@@ -62,7 +61,7 @@ class _SpotSaleViewBody extends StatelessWidget {
           if (state is SpotSaleViewError) {
             ScaffoldMessenger.of(context).showSnackBar(SnackBar(
               content: Text(state.message),
-              backgroundColor: Colors.red,
+              backgroundColor: colour.commonColorred,
             ));
           }
         },
@@ -174,7 +173,7 @@ class _SpotSaleViewBody extends StatelessWidget {
   Widget _buildContent(
       BuildContext context, bool isLoading, List<dynamic> records) {
     if (isLoading) {
-      return const Center(
+      return Center(
           child: CircularProgressIndicator(color: AppTokens.brandGradientStart));
     }
     if (records.isEmpty) {
@@ -422,7 +421,7 @@ class _ImagePreviewDialog extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Dialog(
-      backgroundColor: Colors.black87,
+      backgroundColor: colour.commonColor,
       insetPadding: const EdgeInsets.all(10),
       child: Stack(children: [
         InteractiveViewer(
@@ -434,7 +433,7 @@ class _ImagePreviewDialog extends StatelessWidget {
             child: Container(
               width: 36, height: 36,
               decoration: BoxDecoration(
-                  color: Colors.black54,
+                  color: colour.commonColor,
                   borderRadius: BorderRadius.circular(20)),
               child: const Icon(Icons.close, color: colour.kWhite, size: 20),
             ),
