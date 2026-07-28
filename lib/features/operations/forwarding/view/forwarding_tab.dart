@@ -280,10 +280,9 @@ class _FWUpdateBody extends StatelessWidget {
     return LayoutBuilder(
       builder: (context, constraints) {
         final isTablet = constraints.maxWidth > kTabletBreak;
-        final hPad = isTablet ? constraints.maxWidth * 0.06 : 0.0;
 
         return Padding(
-          padding: EdgeInsets.symmetric(horizontal: hPad),
+          padding: EdgeInsets.zero,
           child: TabBarView(
             controller: tabController,
             physics: const NeverScrollableScrollPhysics(),
@@ -371,8 +370,8 @@ class _FWTabContentState extends State<_FWTabContent> {
     final tab = widget.tab;
     final isTablet = widget.isTablet;
 
-    return ListView(
-      padding: EdgeInsets.fromLTRB(14, 16, 14, isTablet ? 24 : 16),
+    final smkField = Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         _FieldLabel('SMK No $t', isTablet),
         const SizedBox(height: 6),
@@ -384,12 +383,15 @@ class _FWTabContentState extends State<_FWTabContent> {
           onChanged: (v) => _emit(FWUpdateSmkTextChanged(type: t, text: v)),
           onSuggestionTap: (id, smk) {
             FocusScope.of(context).unfocus();
-            // Inga context-a pass panrom
             _emit(FWUpdateSmkSuggestionSelected(context: context, type: t, saleOrderId: id, smkText: smk));
           },
         ),
-        SizedBox(height: isTablet ? 16 : 12),
+      ],
+    );
 
+    final enRefField = Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
         _FieldLabel('EN Ref $t', isTablet),
         const SizedBox(height: 6),
         _FWTextField(
@@ -398,8 +400,12 @@ class _FWTabContentState extends State<_FWTabContent> {
           isTablet: isTablet,
           onChanged: (v) => _emit(FWUpdateEnRefChanged(type: t, value: v)),
         ),
-        SizedBox(height: isTablet ? 16 : 12),
+      ],
+    );
 
+    final exRefField = Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
         _FieldLabel('EX Ref $t', isTablet),
         const SizedBox(height: 6),
         _FWTextField(
@@ -408,8 +414,12 @@ class _FWTabContentState extends State<_FWTabContent> {
           isTablet: isTablet,
           onChanged: (v) => _emit(FWUpdateExRefChanged(type: t, value: v)),
         ),
-        SizedBox(height: isTablet ? 16 : 12),
+      ],
+    );
 
+    final sealByField = Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
         _FieldLabel('Seal By', isTablet),
         const SizedBox(height: 6),
         _EmployeeSearchField(
@@ -420,7 +430,7 @@ class _FWTabContentState extends State<_FWTabContent> {
             context.read<FWUpdateBloc>().add(FWUpdateOverlayDismissed());
             await sl<LegacyApiRepository>().SelectEmployee(context, '', 'Operation');
             if (!context.mounted) return;
-Navigator.push(
+            Navigator.push(
               context,
               MaterialPageRoute(builder: (_) => const Employee(Searchby: 1, SearchId: 0)),
             ).then((navRes) {
@@ -434,8 +444,12 @@ Navigator.push(
           },
           onClear: () => _emit(FWUpdateSealEmpCleared(t)),
         ),
-        SizedBox(height: isTablet ? 16 : 12),
+      ],
+    );
 
+    final breakSealByField = Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
         _FieldLabel('Break Seal By', isTablet),
         const SizedBox(height: 6),
         _EmployeeSearchField(
@@ -446,7 +460,7 @@ Navigator.push(
             context.read<FWUpdateBloc>().add(FWUpdateOverlayDismissed());
             await sl<LegacyApiRepository>().SelectEmployee(context, '', 'Operation');
             if (!context.mounted) return;
-Navigator.push(
+            Navigator.push(
               context,
               MaterialPageRoute(builder: (_) => const Employee(Searchby: 1, SearchId: 0)),
             ).then((navRes) {
@@ -460,16 +474,67 @@ Navigator.push(
           },
           onClear: () => _emit(FWUpdateBreakEmpCleared(t)),
         ),
-        SizedBox(height: isTablet ? 20 : 14),
-
-        _ImageUploadSection(
-          type: t,
-          tab: tab,
-          saleOrderId: widget.saleOrderId,
-          isTablet: isTablet,
-          onPickImage: widget.onPickImage,
-        ),
       ],
+    );
+
+    return ListView(
+      padding: EdgeInsets.fromLTRB(14, 16, 14, isTablet ? 32 : 16),
+      children: isTablet
+          ? [
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Expanded(child: smkField),
+                  const SizedBox(width: 16),
+                  Expanded(child: enRefField),
+                ],
+              ),
+              const SizedBox(height: 16),
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Expanded(child: exRefField),
+                  const SizedBox(width: 16),
+                  Expanded(child: sealByField),
+                ],
+              ),
+              const SizedBox(height: 16),
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Expanded(child: breakSealByField),
+                  const SizedBox(width: 16),
+                  const Expanded(child: SizedBox()),
+                ],
+              ),
+              const SizedBox(height: 24),
+              _ImageUploadSection(
+                type: t,
+                tab: tab,
+                saleOrderId: widget.saleOrderId,
+                isTablet: isTablet,
+                onPickImage: widget.onPickImage,
+              ),
+            ]
+          : [
+              smkField,
+              const SizedBox(height: 12),
+              enRefField,
+              const SizedBox(height: 12),
+              exRefField,
+              const SizedBox(height: 12),
+              sealByField,
+              const SizedBox(height: 12),
+              breakSealByField,
+              const SizedBox(height: 16),
+              _ImageUploadSection(
+                type: t,
+                tab: tab,
+                saleOrderId: widget.saleOrderId,
+                isTablet: isTablet,
+                onPickImage: widget.onPickImage,
+              ),
+            ],
     );
   }
 }

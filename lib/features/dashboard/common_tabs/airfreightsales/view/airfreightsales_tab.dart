@@ -48,13 +48,15 @@ class _AirfreightView extends StatelessWidget {
                 child: _buildHeader(context, state),
               ),
               SliverPadding(
-                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
                 sliver: SliverToBoxAdapter(
-                  child: _buildStatsGrid(state),
+                  child: _buildStatsGrid(context, state),
                 ),
               ),
               SliverPadding(
-                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
                 sliver: SliverToBoxAdapter(
                   child: _buildStatusSection(state),
                 ),
@@ -103,12 +105,15 @@ class _AirfreightView extends StatelessWidget {
                 children: [
                   Text(
                     'Air Freight Sales',
-                    style: AppTypography.display(color: Colors.white, fontWeight: FontWeight.bold),
+                    style: AppTypography.display(
+                        color: Colors.white, fontWeight: FontWeight.bold),
                   ),
                   const SizedBox(height: 4),
                   Text(
                     DateFormat('MMMM yyyy').format(DateTime.now()),
-                    style: AppTypography.bodyLarge(color: Colors.white.withValues(alpha: 0.8), fontWeight: FontWeight.w500),
+                    style: AppTypography.bodyLarge(
+                        color: Colors.white.withValues(alpha: 0.8),
+                        fontWeight: FontWeight.w500),
                   ),
                 ],
               ),
@@ -118,9 +123,11 @@ class _AirfreightView extends StatelessWidget {
                 decoration: BoxDecoration(
                   color: Colors.white.withValues(alpha: 0.15),
                   shape: BoxShape.circle,
-                  border: Border.all(color: Colors.white.withValues(alpha: 0.2), width: 1.5),
+                  border: Border.all(
+                      color: Colors.white.withValues(alpha: 0.2), width: 1.5),
                 ),
-                child: const Icon(Icons.flight_takeoff_rounded, color: Colors.white, size: 26),
+                child: const Icon(Icons.flight_takeoff_rounded,
+                    color: Colors.white, size: 26),
               )
             ],
           ),
@@ -137,19 +144,26 @@ class _AirfreightView extends StatelessWidget {
               child: DropdownButton<String>(
                 isExpanded: true,
                 dropdownColor: colour.kPrimary, // Match theme
-                icon: const Icon(Icons.keyboard_arrow_down_rounded, color: Colors.white),
-                value: state.dropdownValueEmp.isEmpty ? null : state.dropdownValueEmp,
+                icon: const Icon(Icons.keyboard_arrow_down_rounded,
+                    color: Colors.white),
+                value: state.dropdownValueEmp.isEmpty
+                    ? null
+                    : state.dropdownValueEmp,
                 hint: Text(
                   'Select Employee',
                   style: AppTypography.bodyLarge(color: Colors.white70),
                 ),
-                style: AppTypography.heading2(color: Colors.white, fontWeight: FontWeight.w600),
+                style: AppTypography.heading2(
+                    color: Colors.white, fontWeight: FontWeight.w600),
                 onChanged: (String? value) {
                   if (value != null) {
-                    context.read<AirfreightBloc>().add(EmployeeChangedEvent(value));
+                    context
+                        .read<AirfreightBloc>()
+                        .add(EmployeeChangedEvent(value));
                   }
                 },
-                items: state.rulesTypeEmployee.map<DropdownMenuItem<String>>((item) {
+                items: state.rulesTypeEmployee
+                    .map<DropdownMenuItem<String>>((item) {
                   return DropdownMenuItem<String>(
                     value: item['Id'].toString(),
                     child: Text(item['AccountName']!),
@@ -164,9 +178,9 @@ class _AirfreightView extends StatelessWidget {
   }
 
   // ── Stats Grid ──
-  Widget _buildStatsGrid(AirfreightState state) {
+  Widget _buildStatsGrid(BuildContext context, AirfreightState state) {
     return GridView.count(
-      crossAxisCount: 2,
+      crossAxisCount: MediaQuery.of(context).size.width > 600 ? 4 : 2,
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
       crossAxisSpacing: 16,
@@ -210,7 +224,8 @@ class _AirfreightView extends StatelessWidget {
           padding: const EdgeInsets.only(left: 4, bottom: 16),
           child: Text(
             'STATUS BREAKDOWN',
-            style: AppTypography.heading3(color: const Color(0xFF8B95A5), fontWeight: FontWeight.w700),
+            style: AppTypography.heading3(
+                color: const Color(0xFF8B95A5), fontWeight: FontWeight.w700),
           ),
         ),
         if (state.salesReport.isEmpty)
@@ -230,11 +245,14 @@ class _AirfreightView extends StatelessWidget {
             ),
             child: Column(
               children: [
-                const Icon(Icons.inbox_rounded, size: 54, color: Color(0xFFD2D6E0)),
+                const Icon(Icons.inbox_rounded,
+                    size: 54, color: Color(0xFFD2D6E0)),
                 const SizedBox(height: 12),
                 Text(
                   'No data found',
-                  style: AppTypography.heading2(color: const Color(0xFF8B95A5), fontWeight: FontWeight.w500),
+                  style: AppTypography.heading2(
+                      color: const Color(0xFF8B95A5),
+                      fontWeight: FontWeight.w500),
                 ),
               ],
             ),
@@ -259,16 +277,19 @@ class _AirfreightView extends StatelessWidget {
               itemCount: state.salesReport.length,
               separatorBuilder: (_, __) => Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 20),
-                child: Divider(height: 1, color: Colors.grey.shade100, thickness: 1.5),
+                child: Divider(
+                    height: 1, color: Colors.grey.shade100, thickness: 1.5),
               ),
               itemBuilder: (context, index) {
                 final item = state.salesReport[index];
-                final int dayCount = int.tryParse(item['DayCount'].toString()) ?? 0;
+                final int dayCount =
+                    int.tryParse(item['DayCount'].toString()) ?? 0;
                 final double progress = (dayCount / 100).clamp(0.0, 1.0);
                 final Color themeColor = _statusThemeColor(index);
 
                 return Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
                   child: Row(
                     children: [
                       // Icon/Dot
@@ -289,7 +310,9 @@ class _AirfreightView extends StatelessWidget {
                       Expanded(
                         child: Text(
                           item['JobStatus'].toString(),
-                          style: AppTypography.bodyLarge(color: const Color(0xFF2D3748), fontWeight: FontWeight.w600),
+                          style: AppTypography.bodyLarge(
+                              color: const Color(0xFF2D3748),
+                              fontWeight: FontWeight.w600),
                         ),
                       ),
                       // Progress and Text
@@ -302,12 +325,16 @@ class _AirfreightView extends StatelessWidget {
                             children: [
                               Text(
                                 dayCount.toString(),
-                                style: AppTypography.heading1(color: themeColor, fontWeight: FontWeight.bold),
+                                style: AppTypography.heading1(
+                                    color: themeColor,
+                                    fontWeight: FontWeight.bold),
                               ),
                               const SizedBox(width: 4),
                               Text(
                                 'days',
-                                style: AppTypography.bodySmall(color: const Color(0xFFA0AEC0), fontWeight: FontWeight.w500),
+                                style: AppTypography.bodySmall(
+                                    color: const Color(0xFFA0AEC0),
+                                    fontWeight: FontWeight.w500),
                               ),
                             ],
                           ),
@@ -318,8 +345,10 @@ class _AirfreightView extends StatelessWidget {
                               borderRadius: BorderRadius.circular(10),
                               child: LinearProgressIndicator(
                                 value: progress,
-                                backgroundColor: themeColor.withValues(alpha: 0.15),
-                                valueColor: AlwaysStoppedAnimation<Color>(themeColor),
+                                backgroundColor:
+                                    themeColor.withValues(alpha: 0.15),
+                                valueColor:
+                                    AlwaysStoppedAnimation<Color>(themeColor),
                                 minHeight: 6,
                               ),
                             ),
@@ -398,7 +427,8 @@ class _PremiumStatCard extends StatelessWidget {
                   ),
                   child: Icon(icon, color: Colors.white, size: 20),
                 ),
-                Icon(Icons.arrow_outward_rounded, color: Colors.grey.shade300, size: 18),
+                Icon(Icons.arrow_outward_rounded,
+                    color: Colors.grey.shade300, size: 18),
               ],
             ),
             Column(
@@ -406,13 +436,17 @@ class _PremiumStatCard extends StatelessWidget {
               children: [
                 Text(
                   value,
-                  style: AppTypography.display(color: const Color(0xFF1A202C), fontWeight: FontWeight.bold),
+                  style: AppTypography.display(
+                      color: const Color(0xFF1A202C),
+                      fontWeight: FontWeight.bold),
                 ),
                 Text(
                   title,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
-                  style: AppTypography.bodyMedium(color: const Color(0xFF718096), fontWeight: FontWeight.w500),
+                  style: AppTypography.bodyMedium(
+                      color: const Color(0xFF718096),
+                      fontWeight: FontWeight.w500),
                 ),
               ],
             ),

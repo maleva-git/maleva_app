@@ -97,7 +97,7 @@ class _PreAlertPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isTablet = AppGlobals.MalevaScreen != 1;
+    final isTablet = MediaQuery.of(context).size.width > 600;
     final userName = AppGlobals.storagenew.getString('Username') ?? '';
 
     return PopScope(
@@ -157,8 +157,48 @@ class _PreAlertPage extends StatelessWidget {
       }
     }
 
+    final customerField = _PASearchField(
+      hint: 'Customer Name', value: local.custName,
+      onSearch: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const Customer(Searchby: 1, SearchId: 0))).then((navRes) { if (navRes != null) { AppGlobals.SelectCustomerList = navRes; }
+        if (AppGlobals.SelectCustomerList.Id != 0) {
+          emit(PreAlertCustomerChanged(custId: AppGlobals.SelectCustomerList.Id, custName: AppGlobals.SelectCustomerList.AccountName));
+          AppGlobals.SelectCustomerList = CustomerModel.Empty();
+        }
+      }),
+      onClear: () => emit(PreAlertCustomerCleared()),
+    );
+
+    final jobTypeField = _PASearchField(
+      hint: 'Select Job Type', value: local.jobName, disabled: local.checkLEmp,
+      onSearch: () async {
+        await sl<LegacyApiRepository>().SelectJobType(context); if (!context.mounted) return;Navigator.push(context, MaterialPageRoute(builder: (_) => const JobType(Searchby: 1, SearchId: 0))).then((navRes) { if (navRes != null) { AppGlobals.SelectJobTypeList = navRes; }
+          if (AppGlobals.SelectJobTypeList.Id != 0) {
+            emit(PreAlertJobTypeChanged(jobId: AppGlobals.SelectJobTypeList.Id, jobName: AppGlobals.SelectJobTypeList.Name));
+            AppGlobals.SelectJobTypeList = JobTypeModel.Empty();
+          }
+        });
+      },
+      onClear: () => emit(PreAlertJobTypeCleared()),
+    );
+
+    final portField = _PASearchField(
+      hint: 'Select Port', value: local.portName,
+      onSearch: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const Port(Searchby: 1, SearchId: 0))).then((navRes) {
+        if (AppGlobals.SelectedPortName.isNotEmpty) {
+          emit(PreAlertPortChanged(portId: 0, portName: AppGlobals.SelectedPortName));
+          AppGlobals.SelectJobStatusList = JobStatusModel.Empty();
+        }
+      }),
+      onClear: () => emit(PreAlertPortCleared()),
+    );
+
+    final vesselField = _PATextField(
+      hint: 'Vessel', value: local.vessel,
+      onChanged: (v) => emit(PreAlertVesselChanged(v)),
+    );
+
     return SingleChildScrollView(
-      padding: const EdgeInsets.all(16.0),
+      padding: EdgeInsets.symmetric(horizontal: isTablet ? 32.0 : 16.0, vertical: 24.0),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -170,45 +210,31 @@ class _PreAlertPage extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 12),
-          _PASearchField(
-            hint: 'Customer Name', value: local.custName,
-            onSearch: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const Customer(Searchby: 1, SearchId: 0))).then((navRes) { if (navRes != null) { AppGlobals.SelectCustomerList = navRes; }
-              if (AppGlobals.SelectCustomerList.Id != 0) {
-                emit(PreAlertCustomerChanged(custId: AppGlobals.SelectCustomerList.Id, custName: AppGlobals.SelectCustomerList.AccountName));
-                AppGlobals.SelectCustomerList = CustomerModel.Empty();
-              }
-            }),
-            onClear: () => emit(PreAlertCustomerCleared()),
-          ),
-          const SizedBox(height: 10),
-          _PASearchField(
-            hint: 'Select Job Type', value: local.jobName, disabled: local.checkLEmp,
-            onSearch: () async {
-              await sl<LegacyApiRepository>().SelectJobType(context); if (!context.mounted) return;Navigator.push(context, MaterialPageRoute(builder: (_) => const JobType(Searchby: 1, SearchId: 0))).then((navRes) { if (navRes != null) { AppGlobals.SelectJobTypeList = navRes; }
-                if (AppGlobals.SelectJobTypeList.Id != 0) {
-                  emit(PreAlertJobTypeChanged(jobId: AppGlobals.SelectJobTypeList.Id, jobName: AppGlobals.SelectJobTypeList.Name));
-                  AppGlobals.SelectJobTypeList = JobTypeModel.Empty();
-                }
-              });
-            },
-            onClear: () => emit(PreAlertJobTypeCleared()),
-          ),
-          const SizedBox(height: 10),
-          _PASearchField(
-            hint: 'Select Port', value: local.portName,
-            onSearch: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const Port(Searchby: 1, SearchId: 0))).then((navRes) {
-              if (AppGlobals.SelectedPortName.isNotEmpty) {
-                emit(PreAlertPortChanged(portId: 0, portName: AppGlobals.SelectedPortName));
-                AppGlobals.SelectJobStatusList = JobStatusModel.Empty();
-              }
-            }),
-            onClear: () => emit(PreAlertPortCleared()),
-          ),
-          const SizedBox(height: 10),
-          _PATextField(
-            hint: 'Vessel', value: local.vessel,
-            onChanged: (v) => emit(PreAlertVesselChanged(v)),
-          ),
+          if (isTablet) ...[
+            Row(
+              children: [
+                Expanded(child: customerField),
+                const SizedBox(width: 16),
+                Expanded(child: jobTypeField),
+              ],
+            ),
+            const SizedBox(height: 12),
+            Row(
+              children: [
+                Expanded(child: portField),
+                const SizedBox(width: 16),
+                Expanded(child: vesselField),
+              ],
+            ),
+          ] else ...[
+            customerField,
+            const SizedBox(height: 10),
+            jobTypeField,
+            const SizedBox(height: 10),
+            portField,
+            const SizedBox(height: 10),
+            vesselField,
+          ],
           const SizedBox(height: 14),
           _CheckboxGrid(
             local: local,

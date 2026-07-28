@@ -373,6 +373,7 @@ class _VesselPlanningPage extends StatelessWidget {
                     children: [
                       _GradientButton(
                         label: 'View',
+                        isTablet: isTablet,
                         onPressed: () {
                           pageContext.read<VesselPlanningBloc>().add(
                                 VesselPlanningFilterChanged(
@@ -391,6 +392,7 @@ class _VesselPlanningPage extends StatelessWidget {
                       const SizedBox(width: 12),
                       _OutlineButton(
                         label: 'Close',
+                        isTablet: isTablet,
                         onPressed: () => Navigator.pop(ctx),
                       ),
                     ],
@@ -1037,8 +1039,9 @@ class _SheetTextField extends StatelessWidget {
 class _GradientButton extends StatelessWidget {
   final String label;
   final VoidCallback onPressed;
+  final bool isTablet;
 
-  const _GradientButton({required this.label, required this.onPressed});
+  const _GradientButton({required this.label, required this.onPressed, this.isTablet = false});
 
   @override
   Widget build(BuildContext context) {
@@ -1060,7 +1063,7 @@ class _GradientButton extends StatelessWidget {
           onTap: onPressed,
           borderRadius: BorderRadius.circular(24),
           child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 11),
+            padding: EdgeInsets.symmetric(horizontal: isTablet ? 36 : 28, vertical: isTablet ? 14 : 11),
             child: Text(
               label,
               style: AppTypography.bodyLarge(
@@ -1077,8 +1080,9 @@ class _GradientButton extends StatelessWidget {
 class _OutlineButton extends StatelessWidget {
   final String label;
   final VoidCallback onPressed;
+  final bool isTablet;
 
-  const _OutlineButton({required this.label, required this.onPressed});
+  const _OutlineButton({required this.label, required this.onPressed, this.isTablet = false});
 
   @override
   Widget build(BuildContext context) {
@@ -1094,7 +1098,7 @@ class _OutlineButton extends StatelessWidget {
           onTap: onPressed,
           borderRadius: BorderRadius.circular(24),
           child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 11),
+            padding: EdgeInsets.symmetric(horizontal: isTablet ? 36 : 28, vertical: isTablet ? 14 : 11),
             child: Text(
               label,
               style: AppTypography.bodyLarge(

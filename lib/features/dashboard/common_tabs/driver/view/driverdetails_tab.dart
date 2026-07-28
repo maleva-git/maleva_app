@@ -14,13 +14,14 @@ class DriverDetailsScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return
-      BlocProvider(
-        create: (context) => sl<DriverBloc>()..add(const LoadDriverEvent()),
-        child: const DriverDetailsView(), // Remember to add a BlocListener here if you want to show errors to the user!
-      );
+    return BlocProvider(
+      create: (context) => sl<DriverBloc>()..add(const LoadDriverEvent()),
+      child:
+          const DriverDetailsView(), // Remember to add a BlocListener here if you want to show errors to the user!
+    );
   }
 }
+
 // ── View ──────────────────────────────────────────────────────────────────────
 class DriverDetailsView extends StatefulWidget {
   const DriverDetailsView({super.key});
@@ -37,15 +38,16 @@ class _DriverDetailsViewState extends State<DriverDetailsView> {
     _searchController.dispose();
     super.dispose();
   }
+
   // Filter helper
   List<dynamic> _filtered(List<dynamic> all) {
     if (_searchQuery.isEmpty) return all;
     final q = _searchQuery.toLowerCase();
     return all
-        .where((d) =>
-        (d.DriverName ?? '').toLowerCase().contains(q))
+        .where((d) => (d.DriverName ?? '').toLowerCase().contains(q))
         .toList();
   }
+
   @override
   Widget build(BuildContext context) {
     final isTablet = MediaQuery.of(context).size.width >= 600;
@@ -64,7 +66,6 @@ class _DriverDetailsViewState extends State<DriverDetailsView> {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-
         // ── LEFT (260px)
         SizedBox(
           width: 260,
@@ -98,8 +99,7 @@ class _DriverDetailsViewState extends State<DriverDetailsView> {
                 );
               }
               if (state is DriverError) {
-                return _ErrorState(
-                    message: state.errorMessage, isTablet: true);
+                return _ErrorState(message: state.errorMessage, isTablet: true);
               }
               if (state is DriverLoaded) {
                 final list = _filtered(state.driverData);
@@ -107,12 +107,10 @@ class _DriverDetailsViewState extends State<DriverDetailsView> {
                   children: [
                     // Search bar
                     Padding(
-                      padding:
-                      const EdgeInsets.fromLTRB(16, 20, 16, 12),
+                      padding: const EdgeInsets.fromLTRB(16, 20, 16, 12),
                       child: _SearchBar(
                         controller: _searchController,
-                        onChanged: (v) =>
-                            setState(() => _searchQuery = v),
+                        onChanged: (v) => setState(() => _searchQuery = v),
                         isTablet: true,
                       ),
                     ),
@@ -121,23 +119,21 @@ class _DriverDetailsViewState extends State<DriverDetailsView> {
                       child: list.isEmpty
                           ? const _EmptyState(isTablet: true)
                           : GridView.builder(
-                        padding: const EdgeInsets.fromLTRB(
-                            16, 0, 16, 20),
-                        gridDelegate:
-                        const SliverGridDelegateWithFixedCrossAxisCount(
-                          crossAxisCount:   2,
-                          crossAxisSpacing: 12,
-                          mainAxisSpacing:  12,
-                          childAspectRatio: 3.0,
-                        ),
-                        itemCount: list.length,
-                        itemBuilder: (context, index) =>
-                            _DriverCard(
-                              driver:   list[index],
-                              index:    index,
-                              isTablet: true,
+                              padding: const EdgeInsets.fromLTRB(16, 0, 16, 20),
+                              gridDelegate:
+                                  SliverGridDelegateWithFixedCrossAxisCount(
+                                crossAxisCount: MediaQuery.of(context).size.width > 600 ? 4 : 2,
+                                crossAxisSpacing: 12,
+                                mainAxisSpacing: 12,
+                                childAspectRatio: 3.0,
+                              ),
+                              itemCount: list.length,
+                              itemBuilder: (context, index) => _DriverCard(
+                                driver: list[index],
+                                index: index,
+                                isTablet: true,
+                              ),
                             ),
-                      ),
                     ),
                   ],
                 );
@@ -157,7 +153,6 @@ class _DriverDetailsViewState extends State<DriverDetailsView> {
     return Column(
       children: [
         const _GradientHeader(isTablet: false),
-
         Expanded(
           child: BlocBuilder<DriverBloc, DriverState>(
             builder: (context, state) {
@@ -177,12 +172,10 @@ class _DriverDetailsViewState extends State<DriverDetailsView> {
                   children: [
                     // Search bar
                     Padding(
-                      padding:
-                      const EdgeInsets.fromLTRB(16, 16, 16, 8),
+                      padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
                       child: _SearchBar(
                         controller: _searchController,
-                        onChanged: (v) =>
-                            setState(() => _searchQuery = v),
+                        onChanged: (v) => setState(() => _searchQuery = v),
                         isTablet: false,
                       ),
                     ),
@@ -191,16 +184,14 @@ class _DriverDetailsViewState extends State<DriverDetailsView> {
                       child: list.isEmpty
                           ? const _EmptyState(isTablet: false)
                           : ListView.builder(
-                        padding: const EdgeInsets.fromLTRB(
-                            16, 8, 16, 20),
-                        itemCount: list.length,
-                        itemBuilder: (context, index) =>
-                            _DriverCard(
-                              driver:   list[index],
-                              index:    index,
-                              isTablet: false,
+                              padding: const EdgeInsets.fromLTRB(16, 8, 16, 20),
+                              itemCount: list.length,
+                              itemBuilder: (context, index) => _DriverCard(
+                                driver: list[index],
+                                index: index,
+                                isTablet: false,
+                              ),
                             ),
-                      ),
                     ),
                   ],
                 );
@@ -217,8 +208,8 @@ class _DriverDetailsViewState extends State<DriverDetailsView> {
 // ─── Search Bar ───────────────────────────────────────────────────────────────
 class _SearchBar extends StatelessWidget {
   final TextEditingController controller;
-  final ValueChanged<String>  onChanged;
-  final bool                  isTablet;
+  final ValueChanged<String> onChanged;
+  final bool isTablet;
 
   const _SearchBar({
     required this.controller,
@@ -230,45 +221,46 @@ class _SearchBar extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        color:         colour.kWhite,
+        color: colour.kWhite,
         borderRadius: BorderRadius.circular(14),
         border: Border.all(
             color: AppTokens.brandGradientStart.withValues(alpha: 0.3),
             width: 1.5),
         boxShadow: [
           BoxShadow(
-            color:      AppTokens.brandGradientStart.withValues(alpha: 0.07),
+            color: AppTokens.brandGradientStart.withValues(alpha: 0.07),
             blurRadius: 10,
-            offset:     const Offset(0, 3),
+            offset: const Offset(0, 3),
           ),
         ],
       ),
       child: TextField(
-        controller:  controller,
-        onChanged:   onChanged,
-        style: AppTypography.bodyLarge(color: AppTokens.brandDark, fontWeight: FontWeight.w500),
+        controller: controller,
+        onChanged: onChanged,
+        style: AppTypography.bodyLarge(
+            color: AppTokens.brandDark, fontWeight: FontWeight.w500),
         decoration: InputDecoration(
           hintText: "Search driver...",
-          hintStyle: AppTypography.bodyLarge(color: Colors.grey.shade400, fontWeight: FontWeight.w400),
+          hintStyle: AppTypography.bodyLarge(
+              color: Colors.grey.shade400, fontWeight: FontWeight.w400),
           prefixIcon: Icon(
             Icons.search_rounded,
             color: AppTokens.brandGradientStart,
-            size:  isTablet ? 22 : 20,
+            size: isTablet ? 22 : 20,
           ),
           suffixIcon: controller.text.isNotEmpty
               ? IconButton(
-            icon: Icon(Icons.close_rounded,
-                color: Colors.grey.shade400,
-                size:  isTablet ? 20 : 18),
-            onPressed: () {
-              controller.clear();
-              onChanged('');
-            },
-          )
+                  icon: Icon(Icons.close_rounded,
+                      color: Colors.grey.shade400, size: isTablet ? 20 : 18),
+                  onPressed: () {
+                    controller.clear();
+                    onChanged('');
+                  },
+                )
               : null,
-          border:         InputBorder.none,
+          border: InputBorder.none,
           contentPadding: EdgeInsets.symmetric(
-            vertical:   isTablet ? 14 : 12,
+            vertical: isTablet ? 14 : 12,
             horizontal: 16,
           ),
         ),
@@ -296,20 +288,19 @@ class _GradientHeader extends StatelessWidget {
         gradient: const LinearGradient(
           colors: [AppTokens.brandGradientStart, AppTokens.brandDark],
           begin: Alignment.topLeft,
-          end:   Alignment.bottomRight,
+          end: Alignment.bottomRight,
         ),
         borderRadius: isTablet
-            ? const BorderRadius.only(
-            bottomRight: Radius.circular(28))
+            ? const BorderRadius.only(bottomRight: Radius.circular(28))
             : const BorderRadius.only(
-          bottomLeft:  Radius.circular(28),
-          bottomRight: Radius.circular(28),
-        ),
+                bottomLeft: Radius.circular(28),
+                bottomRight: Radius.circular(28),
+              ),
         boxShadow: const [
           BoxShadow(
-            color:     Color(0x401555F3),
+            color: Color(0x401555F3),
             blurRadius: 20,
-            offset:    Offset(0, 8),
+            offset: Offset(0, 8),
           ),
         ],
       ),
@@ -320,13 +311,13 @@ class _GradientHeader extends StatelessWidget {
             Container(
               padding: EdgeInsets.all(isTablet ? 12 : 10),
               decoration: BoxDecoration(
-                color:         colour.kWhite.withValues(alpha: 0.15),
+                color: colour.kWhite.withValues(alpha: 0.15),
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Icon(
                 Icons.airline_seat_recline_extra_rounded,
                 color: colour.kWhite,
-                size:  isTablet ? 26 : 22,
+                size: isTablet ? 26 : 22,
               ),
             ),
             const SizedBox(width: 12),
@@ -334,7 +325,8 @@ class _GradientHeader extends StatelessWidget {
               child: Text(
                 "Driver Details",
                 overflow: TextOverflow.ellipsis,
-                style: AppTypography.heading1(color: colour.kWhite, fontWeight: FontWeight.w700),
+                style: AppTypography.heading1(
+                    color: colour.kWhite, fontWeight: FontWeight.w700),
               ),
             ),
           ]),
@@ -343,7 +335,9 @@ class _GradientHeader extends StatelessWidget {
             padding: const EdgeInsets.only(left: 4),
             child: Text(
               "All registered drivers",
-              style: AppTypography.bodyLarge(color: colour.kWhite.withValues(alpha: 0.75), fontWeight: FontWeight.w400),
+              style: AppTypography.bodyLarge(
+                  color: colour.kWhite.withValues(alpha: 0.75),
+                  fontWeight: FontWeight.w400),
             ),
           ),
         ],
@@ -366,14 +360,14 @@ class _CountBadge extends StatelessWidget {
         gradient: const LinearGradient(
           colors: [AppTokens.brandGradientStart, AppTokens.brandDark],
           begin: Alignment.topLeft,
-          end:   Alignment.bottomRight,
+          end: Alignment.bottomRight,
         ),
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color:     AppTokens.brandGradientStart.withValues(alpha: 0.30),
+            color: AppTokens.brandGradientStart.withValues(alpha: 0.30),
             blurRadius: 16,
-            offset:    const Offset(0, 6),
+            offset: const Offset(0, 6),
           ),
         ],
       ),
@@ -387,7 +381,7 @@ class _CountBadge extends StatelessWidget {
           child: const Icon(
             Icons.airline_seat_recline_extra_rounded,
             color: colour.kWhite,
-            size:  22,
+            size: 22,
           ),
         ),
         const SizedBox(width: 14),
@@ -395,9 +389,12 @@ class _CountBadge extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text('Total Drivers',
-                style: AppTypography.bodyMedium(color: colour.kWhite.withValues(alpha: 0.75), fontWeight: FontWeight.w500)),
+                style: AppTypography.bodyMedium(
+                    color: colour.kWhite.withValues(alpha: 0.75),
+                    fontWeight: FontWeight.w500)),
             Text('$count',
-                style: AppTypography.display(color: colour.kWhite, fontWeight: FontWeight.w700)),
+                style: AppTypography.display(
+                    color: colour.kWhite, fontWeight: FontWeight.w700)),
           ],
         ),
       ]),
@@ -422,41 +419,44 @@ class _DriverCard extends StatelessWidget {
     return Container(
       margin: EdgeInsets.only(bottom: isTablet ? 0 : 12),
       decoration: BoxDecoration(
-        color:         colour.kWhite,
+        color: colour.kWhite,
         borderRadius: BorderRadius.circular(isTablet ? 16 : 16),
         boxShadow: const [
           BoxShadow(
-            color:     Color(0x141555F3),
+            color: Color(0x141555F3),
             blurRadius: 12,
-            offset:    Offset(0, 4),
+            offset: Offset(0, 4),
           ),
         ],
       ),
       child: Padding(
         padding: EdgeInsets.symmetric(
           horizontal: isTablet ? 12 : 16,
-          vertical:   isTablet ? 10 : 14,
+          vertical: isTablet ? 10 : 14,
         ),
         child: Row(children: [
           // Avatar
           Container(
-            width:  isTablet ? 40 : 48,
+            width: isTablet ? 40 : 48,
             height: isTablet ? 40 : 48,
             decoration: BoxDecoration(
               gradient: const LinearGradient(
-                colors: [AppTokens.brandGradientStartLight, AppTokens.brandGradientStart],
+                colors: [
+                  AppTokens.brandGradientStartLight,
+                  AppTokens.brandGradientStart
+                ],
                 begin: Alignment.topLeft,
-                end:   Alignment.bottomRight,
+                end: Alignment.bottomRight,
               ),
               borderRadius: BorderRadius.circular(isTablet ? 12 : 14),
             ),
             child: Center(
               child: Text(
-                (driver.DriverName != null &&
-                    driver.DriverName!.isNotEmpty)
+                (driver.DriverName != null && driver.DriverName!.isNotEmpty)
                     ? driver.DriverName![0].toUpperCase()
                     : "D",
-                style: AppTypography.heading1(color: colour.kWhite, fontWeight: FontWeight.w700),
+                style: AppTypography.heading1(
+                    color: colour.kWhite, fontWeight: FontWeight.w700),
               ),
             ),
           ),
@@ -471,16 +471,19 @@ class _DriverCard extends StatelessWidget {
                 Text(
                   driver.DriverName ?? "-",
                   overflow: TextOverflow.ellipsis,
-                  style: AppTypography.heading2(color: const Color(0xFF1A1A2E), fontWeight: FontWeight.w600),
+                  style: AppTypography.heading2(
+                      color: const Color(0xFF1A1A2E),
+                      fontWeight: FontWeight.w600),
                 ),
                 const SizedBox(height: 3),
                 Row(children: [
-                  const Icon(Icons.circle,
-                      size: 7, color: Color(0xFF22C55E)),
+                  const Icon(Icons.circle, size: 7, color: Color(0xFF22C55E)),
                   const SizedBox(width: 5),
                   Text(
                     "Active Driver",
-                    style: AppTypography.bodyMedium(color: Colors.grey.shade500, fontWeight: FontWeight.w400),
+                    style: AppTypography.bodyMedium(
+                        color: Colors.grey.shade500,
+                        fontWeight: FontWeight.w400),
                   ),
                 ]),
               ],
@@ -489,15 +492,15 @@ class _DriverCard extends StatelessWidget {
 
           // Arrow
           Container(
-            width:  isTablet ? 28 : 34,
+            width: isTablet ? 28 : 34,
             height: isTablet ? 28 : 34,
             decoration: BoxDecoration(
-              color:         AppTokens.brandLight,
+              color: AppTokens.brandLight,
               borderRadius: BorderRadius.circular(isTablet ? 8 : 10),
             ),
             child: Icon(
               Icons.arrow_forward_ios_rounded,
-              size:  isTablet ? 12 : 14,
+              size: isTablet ? 12 : 14,
               color: AppTokens.brandGradientStart,
             ),
           ),
@@ -528,13 +531,13 @@ class _ErrorState extends StatelessWidget {
                 shape: BoxShape.circle,
               ),
               child: Icon(Icons.error_outline_rounded,
-                  color: colour.commonColorred,
-                  size:  isTablet ? 56 : 48),
+                  color: colour.commonColorred, size: isTablet ? 56 : 48),
             ),
             SizedBox(height: isTablet ? 20 : 16),
             Text(
               "Something went wrong",
-              style: AppTypography.heading1(color: colour.commonColorred, fontWeight: FontWeight.w600),
+              style: AppTypography.heading1(
+                  color: colour.commonColorred, fontWeight: FontWeight.w600),
             ),
             SizedBox(height: isTablet ? 10 : 8),
             Text(
@@ -544,11 +547,9 @@ class _ErrorState extends StatelessWidget {
             ),
             SizedBox(height: isTablet ? 24 : 20),
             ElevatedButton.icon(
-              onPressed: () => context
-                  .read<DriverBloc>()
-                  .add(const LoadDriverEvent()),
-              icon:  Icon(Icons.refresh_rounded,
-                  size: isTablet ? 20 : 18),
+              onPressed: () =>
+                  context.read<DriverBloc>().add(const LoadDriverEvent()),
+              icon: Icon(Icons.refresh_rounded, size: isTablet ? 20 : 18),
               label: Text("Retry",
                   style: AppTypography.bodyLarge(fontWeight: FontWeight.w600)),
               style: ElevatedButton.styleFrom(
@@ -556,7 +557,7 @@ class _ErrorState extends StatelessWidget {
                 foregroundColor: colour.kWhite,
                 padding: EdgeInsets.symmetric(
                   horizontal: isTablet ? 36 : 28,
-                  vertical:   isTablet ? 14 : 12,
+                  vertical: isTablet ? 14 : 12,
                 ),
                 shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12)),
@@ -588,13 +589,13 @@ class _EmptyState extends StatelessWidget {
               shape: BoxShape.circle,
             ),
             child: Icon(Icons.person_off_rounded,
-                color: AppTokens.brandGradientStart,
-                size:  isTablet ? 52 : 44),
+                color: AppTokens.brandGradientStart, size: isTablet ? 52 : 44),
           ),
           SizedBox(height: isTablet ? 20 : 16),
           Text(
             "No drivers found",
-            style: AppTypography.heading1(color: Colors.grey.shade700, fontWeight: FontWeight.w600),
+            style: AppTypography.heading1(
+                color: Colors.grey.shade700, fontWeight: FontWeight.w600),
           ),
         ],
       ),

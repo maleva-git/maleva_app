@@ -15,8 +15,7 @@ import 'package:maleva/core/models/shared/r_t_i_master_view_model.dart';
 import 'package:maleva/core/models/shared/r_t_i_details_view_model.dart';
 import 'package:maleva/core/theme/palette.dart';
 
-// ── Entry Point ───────────────────────────────────────────────────────────────
-// ── Entry Point ───────────────────────────────────────────────────────────────
+
 class PDOViewPage extends StatelessWidget {
   final String fromDate;
   final String toDate;
@@ -38,7 +37,6 @@ class PDOViewPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      // ✅ Inject the PDORepository and pass the runtime parameters safely!
       create: (_) => PDOBloc(
         repository: sl<PDORepository>(),
         fromDate: fromDate,
@@ -53,7 +51,7 @@ class PDOViewPage extends StatelessWidget {
   }
 }
 
-// ── Body ──────────────────────────────────────────────────────────────────────
+
 class _PDOViewBody extends StatelessWidget {
   const _PDOViewBody();
 
