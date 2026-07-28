@@ -13,9 +13,6 @@ import '../bloc/driversalary_bloc.dart';
 import '../bloc/driversalary_event.dart';
 import '../bloc/driversalary_state.dart';
 
-
-
-
 const kGradient = LinearGradient(
   colors: [Palette.blue700, Palette.blue400],
   begin: Alignment.topLeft,
@@ -30,12 +27,10 @@ class DriverSalaryWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return
-      BlocProvider(
-        create: (context) => sl<DriverSalaryBloc>()
-          ..add(DriverSalaryStarted()),
-        child: const _DriverSalaryView(),
-      );
+    return BlocProvider(
+      create: (context) => sl<DriverSalaryBloc>()..add(DriverSalaryStarted()),
+      child: const _DriverSalaryView(),
+    );
   }
 }
 
@@ -47,20 +42,16 @@ class _DriverSalaryView extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocBuilder<DriverSalaryBloc, DriverSalaryState>(
       builder: (context, state) {
-        if (state is DriverSalaryInitial ||
-            state is DriverSalaryLoading) {
+        if (state is DriverSalaryInitial || state is DriverSalaryLoading) {
           return Center(
-            child: SpinKitFoldingCube(
-                color: Palette.blue400, size: 35),
+            child: SpinKitFoldingCube(color: Palette.blue400, size: 35),
           );
         }
         if (state is DriverSalaryLoaded) {
           return LayoutBuilder(
             builder: (context, constraints) {
-              final isTablet =
-                  constraints.maxWidth > kTabletBreak;
-              return _DriverSalaryBody(
-                  state: state, isTablet: isTablet);
+              final isTablet = constraints.maxWidth > kTabletBreak;
+              return _DriverSalaryBody(state: state, isTablet: isTablet);
             },
           );
         }
@@ -76,68 +67,60 @@ class _DriverSalaryView extends StatelessWidget {
   }
 }
 
-void _showSalaryDetailsDialog(
-    BuildContext context, Map<String, dynamic> item) {
+void _showSalaryDetailsDialog(BuildContext context, Map<String, dynamic> item) {
   showDialog(
     context: context,
-      barrierDismissible: true,
-      builder: (_) => Dialog(
-        shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16)),
-        child: Container(
-          padding: const EdgeInsets.all(20),
-          decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(16)),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Header
-              Container(
-                padding: const EdgeInsets.symmetric(
-                    horizontal: 14, vertical: 10),
-                decoration: BoxDecoration(
-                    gradient: kGradient,
-                    borderRadius: BorderRadius.circular(10)),
-                child: Row(
-                  children: [
-                    const Icon(Icons.receipt_long_outlined,
-                        size: 18, color: Colors.white),
-                    const SizedBox(width: 8),
-                    Text(
-                      item['CNumberDisplay']?.toString() ??
-                          '-',
-                      style: AppTypography.heading2(color: Colors.white, fontWeight: FontWeight.w700),
-                    ),
-                  ],
-                ),
+    barrierDismissible: true,
+    builder: (_) => Dialog(
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      child: Container(
+        padding: const EdgeInsets.all(20),
+        decoration: BoxDecoration(
+            color: Colors.white, borderRadius: BorderRadius.circular(16)),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Header
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+              decoration: BoxDecoration(
+                  gradient: kGradient, borderRadius: BorderRadius.circular(10)),
+              child: Row(
+                children: [
+                  const Icon(Icons.receipt_long_outlined,
+                      size: 18, color: Colors.white),
+                  const SizedBox(width: 8),
+                  Text(
+                    item['CNumberDisplay']?.toString() ?? '-',
+                    style: AppTypography.heading2(
+                        color: Colors.white, fontWeight: FontWeight.w700),
+                  ),
+                ],
               ),
-              const SizedBox(height: 14),
+            ),
+            const SizedBox(height: 14),
 
-              // Detail rows
-              _DetailRow('RTI Date',
-                  item['SSaleDate']?.toString() ?? '-'),
-              _DetailRow('Job No',
-                  item['JobNo']?.toString() ?? '-'),
-              _DetailRow('Amount',
-                  item['Amount']?.toString() ?? '-'),
+            // Detail rows
+            _DetailRow('RTI Date', item['SSaleDate']?.toString() ?? '-'),
+            _DetailRow('Job No', item['JobNo']?.toString() ?? '-'),
+            _DetailRow('Amount', item['Amount']?.toString() ?? '-'),
 
-              const SizedBox(height: 16),
-              Align(
-                alignment: Alignment.centerRight,
-                child: TextButton(
-                  onPressed: () => Navigator.pop(context),
-                  child: Text('Close',
-                      style: AppTypography.heading2(color: Palette.blue700)),
-                ),
+            const SizedBox(height: 16),
+            Align(
+              alignment: Alignment.centerRight,
+              child: TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: Text('Close',
+                    style: AppTypography.heading2(color: Palette.blue700)),
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
-    );
-  }
+    ),
+  );
+}
 
 class _DetailRow extends StatelessWidget {
   final String label;
@@ -153,12 +136,14 @@ class _DetailRow extends StatelessWidget {
           Expanded(
             flex: 2,
             child: Text(label,
-                style: AppTypography.bodyLarge(color: Palette.textMid, fontWeight: FontWeight.w600)),
+                style: AppTypography.bodyLarge(
+                    color: Palette.textMid, fontWeight: FontWeight.w600)),
           ),
           Expanded(
             flex: 3,
             child: Text(value,
-                style: AppTypography.bodyLarge(color: Palette.textDark2, fontWeight: FontWeight.w600)),
+                style: AppTypography.bodyLarge(
+                    color: Palette.textDark2, fontWeight: FontWeight.w600)),
           ),
         ],
       ),
@@ -171,23 +156,20 @@ class _DriverSalaryBody extends StatelessWidget {
   final DriverSalaryLoaded state;
   final bool isTablet;
 
-  const _DriverSalaryBody(
-      {required this.state, required this.isTablet});
+  const _DriverSalaryBody({required this.state, required this.isTablet});
 
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: EdgeInsets.fromLTRB(
-          isTablet ? 20 : 10, 15, isTablet ? 20 : 10, 0),
+      padding:
+          EdgeInsets.fromLTRB(isTablet ? 20 : 10, 15, isTablet ? 20 : 10, 0),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           const SizedBox(height: 7),
 
           // ── Salary title + amount ───────────────────
-          _SalaryTitleRow(
-              amount: state.salaryAmount,
-              isTablet: isTablet),
+          _SalaryTitleRow(amount: state.salaryAmount, isTablet: isTablet),
           const SizedBox(height: 10),
 
           // ── Date filter row ─────────────────────────
@@ -203,8 +185,8 @@ class _DriverSalaryBody extends StatelessWidget {
             child: state.salaryList.isEmpty
                 ? _EmptyState(isTablet: isTablet)
                 : isTablet
-                ? _TabletGrid(state: state)
-                : _MobileList(state: state),
+                    ? _TabletGrid(state: state)
+                    : _MobileList(state: state),
           ),
         ],
       ),
@@ -215,17 +197,15 @@ class _DriverSalaryBody extends StatelessWidget {
 // ─── Salary Title Row ─────────────────────────────────────────────────────────
 class _SalaryTitleRow extends StatelessWidget {
   final double amount;
-  final bool   isTablet;
-  const _SalaryTitleRow(
-      {required this.amount, required this.isTablet});
+  final bool isTablet;
+  const _SalaryTitleRow({required this.amount, required this.isTablet});
 
   @override
   Widget build(BuildContext context) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        Text('SALARY',
-            style: AppTypography.heading1(color: Palette.redAccent)),
+        Text('SALARY', style: AppTypography.heading1(color: Palette.redAccent)),
         const SizedBox(width: 6),
         Text('- ${amount.toStringAsFixed(2)}',
             style: AppTypography.heading1(color: Palette.greenSuccess)),
@@ -238,11 +218,9 @@ class _SalaryTitleRow extends StatelessWidget {
 class _DateFilterRow extends StatelessWidget {
   final DriverSalaryLoaded state;
   final bool isTablet;
-  const _DateFilterRow(
-      {required this.state, required this.isTablet});
+  const _DateFilterRow({required this.state, required this.isTablet});
 
-  Future<void> _pick(
-      BuildContext context, bool isFrom) async {
+  Future<void> _pick(BuildContext context, bool isFrom) async {
     final picked = await showDatePicker(
       context: context,
       initialDate: DateTime.now(),
@@ -264,14 +242,10 @@ class _DateFilterRow extends StatelessWidget {
     final f = DateFormat('yyyy-MM-dd').format(picked);
     if (isFrom) {
       if (!context.mounted) return;
-      context
-          .read<DriverSalaryBloc>()
-          .add(DriverSalaryFromDateChanged(f));
+      context.read<DriverSalaryBloc>().add(DriverSalaryFromDateChanged(f));
     } else {
       if (!context.mounted) return;
-      context
-          .read<DriverSalaryBloc>()
-          .add(DriverSalaryToDateChanged(f));
+      context.read<DriverSalaryBloc>().add(DriverSalaryToDateChanged(f));
     }
   }
 
@@ -279,8 +253,7 @@ class _DateFilterRow extends StatelessWidget {
   Widget build(BuildContext context) {
     String fmt(String d) {
       try {
-        return DateFormat('dd-MM-yy')
-            .format(DateTime.parse(d));
+        return DateFormat('dd-MM-yy').format(DateTime.parse(d));
       } catch (_) {
         return d;
       }
@@ -290,18 +263,18 @@ class _DateFilterRow extends StatelessWidget {
       children: [
         Expanded(
           child: _DateTile(
-            label:   'From',
+            label: 'From',
             display: fmt(state.fromDate),
-            onTap:   () => _pick(context, true),
+            onTap: () => _pick(context, true),
             isTablet: isTablet,
           ),
         ),
         const SizedBox(width: 10),
         Expanded(
           child: _DateTile(
-            label:   'To',
+            label: 'To',
             display: fmt(state.toDate),
-            onTap:   () => _pick(context, false),
+            onTap: () => _pick(context, false),
             isTablet: isTablet,
           ),
         ),
@@ -311,9 +284,9 @@ class _DateFilterRow extends StatelessWidget {
 }
 
 class _DateTile extends StatelessWidget {
-  final String   label;
-  final String   display;
-  final bool     isTablet;
+  final String label;
+  final String display;
+  final bool isTablet;
   final VoidCallback onTap;
 
   const _DateTile({
@@ -329,30 +302,27 @@ class _DateTile extends StatelessWidget {
       onTap: onTap,
       borderRadius: BorderRadius.circular(10),
       child: Container(
-        padding: const EdgeInsets.symmetric(
-            horizontal: 12, vertical: 10),
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
         decoration: BoxDecoration(
           color: Palette.grey200p,
           borderRadius: BorderRadius.circular(10),
-          border:
-          Border.all(color: Palette.cardBorder, width: 0.5),
+          border: Border.all(color: Palette.cardBorder, width: 0.5),
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(label.toUpperCase(),
-                style: AppTypography.badgeText(color: Palette.kTextMuted, fontWeight: FontWeight.w700)),
+                style: AppTypography.badgeText(
+                    color: Palette.kTextMuted, fontWeight: FontWeight.w700)),
             const SizedBox(height: 4),
             Row(
-              mainAxisAlignment:
-              MainAxisAlignment.spaceBetween,
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(display,
-                    style: AppTypography.heading3(color: Palette.textDark2, fontWeight: FontWeight.w700)),
-                const Icon(
-                    Icons.calendar_month_outlined,
-                    size: 18,
-                    color: Palette.blue400),
+                    style: AppTypography.heading3(
+                        color: Palette.textDark2, fontWeight: FontWeight.w700)),
+                const Icon(Icons.calendar_month_outlined,
+                    size: 18, color: Palette.blue400),
               ],
             ),
           ],
@@ -369,11 +339,12 @@ class _GridHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final style = AppTypography.badgeText(color: Colors.white.withValues(alpha: 0.85), fontWeight: FontWeight.w600);
+    final style = AppTypography.badgeText(
+        color: Colors.white.withValues(alpha: 0.85),
+        fontWeight: FontWeight.w600);
 
     return Container(
-      padding: const EdgeInsets.symmetric(
-          horizontal: 12, vertical: 8),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       decoration: BoxDecoration(
         gradient: kGradient,
         borderRadius: BorderRadius.circular(10),
@@ -383,27 +354,20 @@ class _GridHeader extends StatelessWidget {
           Row(children: [
             Expanded(
                 flex: 2,
-                child: Text('RTI Date',
-                    textAlign: TextAlign.left,
-                    style: style)),
+                child:
+                    Text('RTI Date', textAlign: TextAlign.left, style: style)),
             Expanded(
                 flex: 2,
-                child: Text('RTI No',
-                    textAlign: TextAlign.left,
-                    style: style)),
+                child: Text('RTI No', textAlign: TextAlign.left, style: style)),
           ]),
           const SizedBox(height: 3),
           Row(children: [
             Expanded(
                 flex: 2,
-                child: Text('Job No',
-                    textAlign: TextAlign.left,
-                    style: style)),
+                child: Text('Job No', textAlign: TextAlign.left, style: style)),
             Expanded(
                 flex: 2,
-                child: Text('Amount',
-                    textAlign: TextAlign.left,
-                    style: style)),
+                child: Text('Amount', textAlign: TextAlign.left, style: style)),
           ]),
         ],
       ),
@@ -421,7 +385,7 @@ class _MobileList extends StatelessWidget {
     return ListView.builder(
       itemCount: state.salaryList.length,
       itemBuilder: (ctx, i) => _SalaryCard(
-        item:     state.salaryList[i],
+        item: state.salaryList[i],
         isTablet: false,
       ),
     );
@@ -436,16 +400,15 @@ class _TabletGrid extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GridView.builder(
-      gridDelegate:
-      const SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount:   2,
+      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: MediaQuery.of(context).size.width > 600 ? 4 : 2,
         crossAxisSpacing: 12,
-        mainAxisSpacing:  10,
+        mainAxisSpacing: 10,
         childAspectRatio: 3.2,
       ),
       itemCount: state.salaryList.length,
       itemBuilder: (ctx, i) => _SalaryCard(
-        item:     state.salaryList[i],
+        item: state.salaryList[i],
         isTablet: true,
       ),
     );
@@ -455,19 +418,18 @@ class _TabletGrid extends StatelessWidget {
 // ─── Single Salary Card ───────────────────────────────────────────────────────
 class _SalaryCard extends StatelessWidget {
   final dynamic item;
-  final bool    isTablet;
+  final bool isTablet;
 
-  const _SalaryCard(
-      {required this.item, required this.isTablet});
+  const _SalaryCard({required this.item, required this.isTablet});
 
   @override
   Widget build(BuildContext context) {
     final valStyle = AppTypography.bodyLarge(color: Palette.textDark2);
 
-    final rtiDate = item['SSaleDate']?.toString()    ?? '-';
-    final rtiNo   = item['CNumberDisplay']?.toString() ?? '-';
-    final jobNo   = item['JobNo']?.toString()          ?? '-';
-    final amount  = item['Amount']?.toString()         ?? '-';
+    final rtiDate = item['SSaleDate']?.toString() ?? '-';
+    final rtiNo = item['CNumberDisplay']?.toString() ?? '-';
+    final jobNo = item['JobNo']?.toString() ?? '-';
+    final amount = item['Amount']?.toString() ?? '-';
 
     return InkWell(
       onTap: () => _showSalaryDetailsDialog(
@@ -494,28 +456,24 @@ class _SalaryCard extends StatelessWidget {
               // Left gradient accent
               Container(
                 width: 4,
-                decoration: const BoxDecoration(
-                    gradient: kGradient),
+                decoration: const BoxDecoration(gradient: kGradient),
               ),
               Expanded(
                 child: Padding(
-                  padding: const EdgeInsets.symmetric(
-                      horizontal: 10, vertical: 8),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
                   child: Column(
-                    crossAxisAlignment:
-                    CrossAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       // Row 1: RTI Date + RTI No
                       Row(children: [
                         Expanded(
                           child: Text(rtiDate,
-                              style: valStyle,
-                              overflow: TextOverflow.ellipsis),
+                              style: valStyle, overflow: TextOverflow.ellipsis),
                         ),
                         Expanded(
                           child: Text(rtiNo,
-                              style: valStyle,
-                              overflow: TextOverflow.ellipsis),
+                              style: valStyle, overflow: TextOverflow.ellipsis),
                         ),
                       ]),
                       const SizedBox(height: 4),
@@ -523,14 +481,13 @@ class _SalaryCard extends StatelessWidget {
                       Row(children: [
                         Expanded(
                           child: Text(jobNo,
-                              style: valStyle,
-                              overflow: TextOverflow.ellipsis),
+                              style: valStyle, overflow: TextOverflow.ellipsis),
                         ),
                         Expanded(
                           child: Text(
                             amount,
-                            style: valStyle.copyWith(
-                                color: Palette.greenSuccess),
+                            style:
+                                valStyle.copyWith(color: Palette.greenSuccess),
                             overflow: TextOverflow.ellipsis,
                           ),
                         ),
@@ -542,10 +499,8 @@ class _SalaryCard extends StatelessWidget {
               // Arrow hint
               Padding(
                 padding: EdgeInsets.only(right: 8),
-                child: Icon(
-                    Icons.arrow_forward_ios_rounded,
-                    size: 12,
-                    color: Palette.kTextMuted),
+                child: Icon(Icons.arrow_forward_ios_rounded,
+                    size: 12, color: Palette.kTextMuted),
               ),
             ],
           ),
@@ -570,14 +525,14 @@ class _EmptyState extends StatelessWidget {
             width: 64,
             height: 64,
             decoration: BoxDecoration(
-                color: Palette.chipBg,
-                borderRadius: BorderRadius.circular(16)),
+                color: Palette.chipBg, borderRadius: BorderRadius.circular(16)),
             child: const Icon(Icons.payments_outlined,
                 size: 32, color: Palette.blue400),
           ),
           const SizedBox(height: 14),
           Text('No Salary Records',
-              style: AppTypography.heading2(color: Palette.textDark2, fontWeight: FontWeight.w600)),
+              style: AppTypography.heading2(
+                  color: Palette.textDark2, fontWeight: FontWeight.w600)),
           const SizedBox(height: 4),
           Text('Select a date range to view salary',
               style: AppTypography.bodyMedium(color: Palette.kTextMuted)),

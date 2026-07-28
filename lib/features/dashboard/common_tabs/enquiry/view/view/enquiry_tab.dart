@@ -66,33 +66,50 @@ class _EnquiryView extends StatelessWidget {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.end,
                     children: [
-                      ElevatedButton.icon(
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Palette.blue600,
-                          foregroundColor: Palette.white,
-                          elevation: 2,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(8.0),
-                          ),
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 16.0,
-                            vertical: 12.0,
-                          ),
+                      Container(
+                        decoration: BoxDecoration(
+                          gradient: colour.kGradient,
+                          borderRadius: BorderRadius.circular(8.0),
+                          boxShadow: const [
+                            BoxShadow(
+                              color: Color(0x33000000),
+                              blurRadius: 4,
+                              offset: Offset(0, 2),
+                            ),
+                          ],
                         ),
-                        onPressed: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (_) => const AddEnquiryScreen()),
-                          ).then((_) {
-                            if (!context.mounted) return;
-                            context.read<EnquiryBloc>().add(LoadEnquiryEvent());
-                          });
-                        },
-                        icon: const Icon(Icons.add, size: 20),
-                        label: Text(
-                          'New Enquiry',
-                          style: AppTypography.bodyLarge(),
+                        child: Material(
+                          color: Colors.transparent,
+                          child: InkWell(
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (_) => const AddEnquiryScreen()),
+                              ).then((_) {
+                                if (!context.mounted) return;
+                                context.read<EnquiryBloc>().add(LoadEnquiryEvent());
+                              });
+                            },
+                            borderRadius: BorderRadius.circular(8.0),
+                            child: Padding(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 16.0,
+                                vertical: 12.0,
+                              ),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  const Icon(Icons.add, size: 20, color: Colors.white),
+                                  const SizedBox(width: 6),
+                                  Text(
+                                    'New Enquiry',
+                                    style: AppTypography.bodyLarge(color: Colors.white),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
                         ),
                       ),
                     ],

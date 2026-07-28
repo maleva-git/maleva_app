@@ -55,7 +55,7 @@ class _EnquiryViewPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isTablet = AppGlobals.MalevaScreen != 1;
+    final isTablet = MediaQuery.of(context).size.width > 600;
     final userName = AppGlobals.storagenew.getString('Username') ?? '';
 
     return BlocListener<EnquiryViewBloc, EnquiryViewState>(
@@ -631,7 +631,107 @@ class _FilterSheetState extends State<_FilterSheet> {
 
   @override
   Widget build(BuildContext context) {
-    final isTablet = AppGlobals.MalevaScreen != 1;
+    final isTablet = MediaQuery.of(context).size.width > 600;
+
+    final customerField = _ESearchField(
+      hint: 'Customer Name',
+      value: _local.custName,
+      onSearch: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+              builder: (_) =>
+              const Customer(Searchby: 1, SearchId: 0)),
+        ).then((navRes) { if (navRes != null) { AppGlobals.SelectCustomerList = navRes; }
+          final sel = AppGlobals.SelectCustomerList;
+          if (sel.Id != 0) {
+            setState(() {
+              _local = _local.copyWith(
+                  custId: sel.Id, custName: sel.AccountName);
+            });
+            _emit(EnquiryViewCustomerChanged(
+                custId: sel.Id, custName: sel.AccountName));
+            AppGlobals.SelectCustomerList = CustomerModel.Empty();
+          }
+        });
+      },
+      onClear: () {
+        setState(
+                () => _local = _local.copyWith(custId: 0, custName: ''));
+        _emit(EnquiryViewCustomerCleared());
+      },
+    );
+
+    final jobTypeField = _ESearchField(
+      hint: 'Job Type',
+      value: _local.jobName,
+      onSearch: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+              builder: (_) =>
+              const JobType(Searchby: 1, SearchId: 0)),
+        ).then((navRes) async {
+          if (navRes != null) { AppGlobals.SelectJobTypeList = navRes; }
+          final sel = AppGlobals.SelectJobTypeList;
+          if (sel.Id != 0) {
+            AppGlobals.JobAllStatusList = (await sl<EnquiryTrRepository>().selectAllJobStatus(sel.Id))
+                .map((e) => JobAllStatusModel.fromJson(e))
+                .toList()
+                .cast<JobAllStatusModel>();
+            if (!context.mounted) return;
+            setState(() {
+              _local =
+                  _local.copyWith(jobId: sel.Id, jobName: sel.Name);
+            });
+            _emit(EnquiryViewJobTypeChanged(
+                jobId: sel.Id, jobName: sel.Name));
+            AppGlobals.SelectJobTypeList = JobTypeModel.Empty();
+          }
+        });
+      },
+      onClear: () {
+        setState(
+                () => _local = _local.copyWith(jobId: 0, jobName: ''));
+        _emit(EnquiryViewJobTypeCleared());
+      },
+    );
+
+    final employeeField = _ESearchField(
+      hint: 'Select Employee',
+      value: _local.empName,
+      disabled: _local.checkLEmp,
+      onSearch: () async {
+        AppGlobals.EmployeeList = (await sl<EnquiryTrRepository>().selectEmployee('sales', 'admin'))
+            .map<EmployeeModel>((e) => EmployeeModel.fromJson(e))
+            .toList();
+        if (!context.mounted) return;
+        if (!_local.checkLEmp) {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (_) =>
+                const Employee(Searchby: 1, SearchId: 0)),
+          ).then((navRes) { if (navRes != null) { AppGlobals.SelectEmployeeList = navRes; }
+            final sel = AppGlobals.SelectEmployeeList;
+            if (sel.Id != 0) {
+              setState(() {
+                _local = _local.copyWith(
+                    empId: sel.Id, empName: sel.AccountName);
+              });
+              _emit(EnquiryViewEmployeeChanged(
+                  empId: sel.Id, empName: sel.AccountName));
+              AppGlobals.SelectEmployeeList = EmployeeModel.Empty();
+            }
+          });
+        }
+      },
+      onClear: () {
+        setState(
+                () => _local = _local.copyWith(empId: 0, empName: ''));
+        _emit(EnquiryViewEmployeeCleared());
+      },
+    );
 
     return Container(
       decoration: const BoxDecoration(
@@ -680,111 +780,31 @@ class _FilterSheetState extends State<_FilterSheet> {
             ),
             const SizedBox(height: 12),
 
-            // Customer
-            _ESearchField(
-              hint: 'Customer Name',
-              value: _local.custName,
-              onSearch: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (_) =>
-                      const Customer(Searchby: 1, SearchId: 0)),
-                ).then((navRes) { if (navRes != null) { AppGlobals.SelectCustomerList = navRes; }
-                  final sel = AppGlobals.SelectCustomerList;
-                  if (sel.Id != 0) {
-                    setState(() {
-                      _local = _local.copyWith(
-                          custId: sel.Id, custName: sel.AccountName);
-                    });
-                    _emit(EnquiryViewCustomerChanged(
-                        custId: sel.Id, custName: sel.AccountName));
-                    AppGlobals.SelectCustomerList = CustomerModel.Empty();
-                  }
-                });
-              },
-              onClear: () {
-                setState(
-                        () => _local = _local.copyWith(custId: 0, custName: ''));
-                _emit(EnquiryViewCustomerCleared());
-              },
-            ),
-            const SizedBox(height: 10),
-
-            // Job Type
-            _ESearchField(
-              hint: 'Job Type',
-              value: _local.jobName,
-              onSearch: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (_) =>
-                      const JobType(Searchby: 1, SearchId: 0)),
-                ).then((navRes) async {
-                  if (navRes != null) { AppGlobals.SelectJobTypeList = navRes; }
-                  final sel = AppGlobals.SelectJobTypeList;
-                  if (sel.Id != 0) {
-                    AppGlobals.JobAllStatusList = (await sl<EnquiryTrRepository>().selectAllJobStatus(sel.Id))
-                        .map((e) => JobAllStatusModel.fromJson(e))
-                        .toList()
-                        .cast<JobAllStatusModel>();
-                    if (!context.mounted) return;
-                    setState(() {
-                      _local =
-                          _local.copyWith(jobId: sel.Id, jobName: sel.Name);
-                    });
-                    _emit(EnquiryViewJobTypeChanged(
-                        jobId: sel.Id, jobName: sel.Name));
-                    AppGlobals.SelectJobTypeList = JobTypeModel.Empty();
-                  }
-                });
-              },
-              onClear: () {
-                setState(
-                        () => _local = _local.copyWith(jobId: 0, jobName: ''));
-                _emit(EnquiryViewJobTypeCleared());
-              },
-            ),
-            const SizedBox(height: 10),
-
-            // Employee
-            _ESearchField(
-              hint: 'Select Employee',
-              value: _local.empName,
-              disabled: _local.checkLEmp,
-              onSearch: () async {
-                AppGlobals.EmployeeList = (await sl<EnquiryTrRepository>().selectEmployee('sales', 'admin'))
-                    .map<EmployeeModel>((e) => EmployeeModel.fromJson(e))
-                    .toList();
-                if (!context.mounted) return;
-                if (!_local.checkLEmp) {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (_) =>
-                        const Employee(Searchby: 1, SearchId: 0)),
-                  ).then((navRes) { if (navRes != null) { AppGlobals.SelectEmployeeList = navRes; }
-                    final sel = AppGlobals.SelectEmployeeList;
-                    if (sel.Id != 0) {
-                      setState(() {
-                        _local = _local.copyWith(
-                            empId: sel.Id, empName: sel.AccountName);
-                      });
-                      _emit(EnquiryViewEmployeeChanged(
-                          empId: sel.Id, empName: sel.AccountName));
-                      AppGlobals.SelectEmployeeList = EmployeeModel.Empty();
-                    }
-                  });
-                }
-              },
-              onClear: () {
-                setState(
-                        () => _local = _local.copyWith(empId: 0, empName: ''));
-                _emit(EnquiryViewEmployeeCleared());
-              },
-            ),
-            const SizedBox(height: 12),
+            if (isTablet) ...[
+              Row(
+                children: [
+                  Expanded(child: customerField),
+                  const SizedBox(width: 16),
+                  Expanded(child: jobTypeField),
+                ],
+              ),
+              const SizedBox(height: 12),
+              Row(
+                children: [
+                  Expanded(child: employeeField),
+                  const SizedBox(width: 16),
+                  const Expanded(child: SizedBox()),
+                ],
+              ),
+              const SizedBox(height: 12),
+            ] else ...[
+              customerField,
+              const SizedBox(height: 10),
+              jobTypeField,
+              const SizedBox(height: 10),
+              employeeField,
+              const SizedBox(height: 12),
+            ],
 
             // Checkboxes
             Row(

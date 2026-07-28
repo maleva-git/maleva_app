@@ -751,14 +751,31 @@ class _VesselPlanningWebViewState extends State<VesselPlanningWebView> {
             Expanded(
               child: SizedBox(
                 height: 48,
-                child: ElevatedButton(
-                  onPressed: _doSearch,
-                  style: ElevatedButton.styleFrom(
-                      backgroundColor: colour.kHeaderGradEnd,
-                      foregroundColor: Colors.white,
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8))),
-                  child: Text('VIEW',
-                      style: AppTypography.heading2()),
+                child: Container(
+                  decoration: BoxDecoration(
+                    gradient: kGradient,
+                    borderRadius: BorderRadius.circular(8),
+                    boxShadow: [
+                      BoxShadow(
+                        color: AppTokens.invoiceHeaderStart.withValues(alpha: 0.35),
+                        blurRadius: 8,
+                        offset: const Offset(0, 3),
+                      ),
+                    ],
+                  ),
+                  child: Material(
+                    color: Colors.transparent,
+                    child: InkWell(
+                      onTap: _doSearch,
+                      borderRadius: BorderRadius.circular(8),
+                      child: Center(
+                        child: Text(
+                          'VIEW',
+                          style: AppTypography.heading2(color: Colors.white),
+                        ),
+                      ),
+                    ),
+                  ),
                 ),
               ),
             ),
@@ -766,14 +783,31 @@ class _VesselPlanningWebViewState extends State<VesselPlanningWebView> {
             Expanded(
               child: SizedBox(
                 height: 48,
-                child: ElevatedButton(
-                  onPressed: () => _savePlanning(context),
-                  style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.green,
-                      foregroundColor: Colors.white,
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8))),
-                  child: Text('SAVE',
-                      style: AppTypography.heading2()),
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: AppTokens.statusSuccess, // Replaced Colors.green with standard token
+                    borderRadius: BorderRadius.circular(8),
+                    boxShadow: [
+                      BoxShadow(
+                        color: AppTokens.statusSuccess.withValues(alpha: 0.35),
+                        blurRadius: 8,
+                        offset: const Offset(0, 3),
+                      ),
+                    ],
+                  ),
+                  child: Material(
+                    color: Colors.transparent,
+                    child: InkWell(
+                      onTap: () => _savePlanning(context),
+                      borderRadius: BorderRadius.circular(8),
+                      child: Center(
+                        child: Text(
+                          'SAVE',
+                          style: AppTypography.heading2(color: Colors.white),
+                        ),
+                      ),
+                    ),
+                  ),
                 ),
               ),
             ),

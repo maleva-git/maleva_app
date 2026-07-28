@@ -601,7 +601,6 @@ class _MenuTileState extends State<_MenuTile>
     );
   }
 
-  // ── Icon box ───────────────────────────────────────────────────────────────
   Widget _buildIconBox(String name) {
     final accent  = _accentFor(name);
     final bgColor = colour.accentBg[accent]!;
@@ -632,7 +631,6 @@ class _MenuTileState extends State<_MenuTile>
     );
   }
 
-  // ── Navigation ─────────────────────────────────────────────────────────────
   void _navigate() {
     if (widget.entry.FormText == "Logout") {
       AuthHelper.logout(widget.drawerContext);

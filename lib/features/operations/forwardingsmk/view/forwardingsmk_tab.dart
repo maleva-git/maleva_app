@@ -220,10 +220,9 @@ class _FWSmkBody extends StatelessWidget {
     return LayoutBuilder(
       builder: (context, constraints) {
         final isTablet = constraints.maxWidth > kTabletBreak;
-        final hPad = isTablet ? constraints.maxWidth * 0.06 : 0.0;
 
         return Padding(
-          padding: EdgeInsets.symmetric(horizontal: hPad),
+          padding: EdgeInsets.zero,
           child: Column(
             children: [
               // ── Job No + BillType shared across tabs ─────────────────
@@ -457,59 +456,57 @@ class _FWSmkTabContentState extends State<_FWSmkTabContent> {
     final tab = widget.tab;
     final isTablet = widget.isTablet;
 
-    return ListView(
-      padding: EdgeInsets.fromLTRB(14, 14, 14, isTablet ? 24 : 16),
-      children: [
-        // ── Date + checkbox ──────────────────────────────────────────
-        _DateCheckRow(
-          tab: tab,
-          isTablet: isTablet,
-          onDateTap: () async {
-            if (!tab.dateEnabled) return;
-            final picked = await showDatePicker(
-              context: context,
-              initialDate: DateTime.tryParse(tab.date) ?? DateTime.now(),
-              firstDate: DateTime(1900),
-              lastDate: DateTime(2050),
-              builder: (ctx, child) => Theme(
-                data: Theme.of(ctx).copyWith(
-                  colorScheme: const ColorScheme.light(
-                    primary: Palette.blue700,
-                    onPrimary: Colors.white,
-                    surface: Colors.white,
-                    onSurface: kTextDark,
-                  ),
-                ),
-                child: child!,
+    final dateRow = _DateCheckRow(
+      tab: tab,
+      isTablet: isTablet,
+      onDateTap: () async {
+        if (!tab.dateEnabled) return;
+        final picked = await showDatePicker(
+          context: context,
+          initialDate: DateTime.tryParse(tab.date) ?? DateTime.now(),
+          firstDate: DateTime(1900),
+          lastDate: DateTime(2050),
+          builder: (ctx, child) => Theme(
+            data: Theme.of(ctx).copyWith(
+              colorScheme: const ColorScheme.light(
+                primary: Palette.blue700,
+                onPrimary: Colors.white,
+                surface: Colors.white,
+                onSurface: kTextDark,
               ),
-            );
-            if (picked != null) {
-              _emit(FWSmkDateChanged(
-                  tab: t,
-                  date: DateFormat('yyyy-MM-dd').format(picked)));
-            }
-          },
-          onCheckChanged: (v) =>
-              _emit(FWSmkCheckboxChanged(tab: t, value: v)),
-        ),
-        const SizedBox(height: 12),
-        Container(
-          margin: const EdgeInsets.symmetric(vertical: 8),
-          padding: const EdgeInsets.symmetric(horizontal: 10),
-          decoration: BoxDecoration(color: kDetailBg, borderRadius: BorderRadius.circular(10)),
-          child: Row(
-            children: [
-              Checkbox(
-                value: tab.original,
-                activeColor: Palette.blue700,
-                onChanged: (v) => _emit(FWSmkFieldChanged(tab: t, field: 'original', value: v.toString())),
-              ),
-              Text("Original", style: AppTypography.bodySmall(color: kTextDark)),
-            ],
+            ),
+            child: child!,
           ),
-        ),
-        const SizedBox(height: 12),
-        // ── FW Dropdown ──────────────────────────────────────────────
+        );
+        if (picked != null) {
+          _emit(FWSmkDateChanged(
+              tab: t,
+              date: DateFormat('yyyy-MM-dd').format(picked)));
+        }
+      },
+      onCheckChanged: (v) =>
+          _emit(FWSmkCheckboxChanged(tab: t, value: v)),
+    );
+
+    final originalCheckbox = Container(
+      margin: const EdgeInsets.symmetric(vertical: 8),
+      padding: const EdgeInsets.symmetric(horizontal: 10),
+      decoration: BoxDecoration(color: kDetailBg, borderRadius: BorderRadius.circular(10)),
+      child: Row(
+        children: [
+          Checkbox(
+            value: tab.original,
+            activeColor: Palette.blue700,
+            onChanged: (v) => _emit(FWSmkFieldChanged(tab: t, field: 'original', value: v.toString())),
+          ),
+          Text("Original", style: AppTypography.bodySmall(color: kTextDark)),
+        ],
+      ),
+    );
+
+    final fwDropdown = Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
         _FieldLabel('FW $t', isTablet),
         const SizedBox(height: 6),
         _FWDropdown(
@@ -518,9 +515,12 @@ class _FWSmkTabContentState extends State<_FWSmkTabContent> {
           onChanged: (v) =>
               _emit(FWSmkFieldChanged(tab: t, field: 'fwDropdown', value: v)),
         ),
-        const SizedBox(height: 12),
+      ],
+    );
 
-        // ── SMK No ───────────────────────────────────────────────────
+    final smkNo = Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
         _FieldLabel('SMK No $t', isTablet),
         const SizedBox(height: 6),
         _SMKTextField(
@@ -530,9 +530,12 @@ class _FWSmkTabContentState extends State<_FWSmkTabContent> {
           onChanged: (v) =>
               _emit(FWSmkFieldChanged(tab: t, field: 'smkNo', value: v)),
         ),
-        const SizedBox(height: 12),
+      ],
+    );
 
-        // ── R.No ─────────────────────────────────────────────────────
+    final rNo = Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
         _FieldLabel('R.No $t', isTablet),
         const SizedBox(height: 6),
         _SMKTextField(
@@ -542,9 +545,12 @@ class _FWSmkTabContentState extends State<_FWSmkTabContent> {
           onChanged: (v) =>
               _emit(FWSmkFieldChanged(tab: t, field: 'enRef', value: v)),
         ),
-        const SizedBox(height: 12),
+      ],
+    );
 
-        // ── S1 ───────────────────────────────────────────────────────
+    final s1Field = Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
         _FieldLabel('S1', isTablet),
         const SizedBox(height: 6),
         _SMKTextField(
@@ -554,9 +560,12 @@ class _FWSmkTabContentState extends State<_FWSmkTabContent> {
           onChanged: (v) =>
               _emit(FWSmkFieldChanged(tab: t, field: 's1', value: v)),
         ),
-        const SizedBox(height: 12),
+      ],
+    );
 
-        // ── S2 ───────────────────────────────────────────────────────
+    final s2Field = Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
         _FieldLabel('S2', isTablet),
         const SizedBox(height: 6),
         _SMKTextField(
@@ -567,6 +576,63 @@ class _FWSmkTabContentState extends State<_FWSmkTabContent> {
               _emit(FWSmkFieldChanged(tab: t, field: 's2', value: v)),
         ),
       ],
+    );
+
+    return ListView(
+      padding: EdgeInsets.fromLTRB(14, 14, 14, isTablet ? 32 : 16),
+      children: isTablet
+          ? [
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Expanded(flex: 3, child: dateRow),
+                  const SizedBox(width: 16),
+                  Expanded(flex: 2, child: originalCheckbox),
+                ],
+              ),
+              const SizedBox(height: 16),
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Expanded(child: fwDropdown),
+                  const SizedBox(width: 16),
+                  Expanded(child: smkNo),
+                ],
+              ),
+              const SizedBox(height: 16),
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Expanded(child: rNo),
+                  const SizedBox(width: 16),
+                  Expanded(child: s1Field),
+                ],
+              ),
+              const SizedBox(height: 16),
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Expanded(child: s2Field),
+                  const SizedBox(width: 16),
+                  const Expanded(child: SizedBox()),
+                ],
+              ),
+            ]
+          : [
+              dateRow,
+              const SizedBox(height: 4),
+              originalCheckbox,
+              const SizedBox(height: 12),
+              fwDropdown,
+              const SizedBox(height: 12),
+              smkNo,
+              const SizedBox(height: 12),
+              rNo,
+              const SizedBox(height: 12),
+              s1Field,
+              const SizedBox(height: 12),
+              s2Field,
+            ],
     );
   }
 }
