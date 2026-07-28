@@ -1,5 +1,7 @@
+import 'package:maleva/core/theme/app_typography.dart';
+import 'package:maleva/core/network/legacy_api_repository.dart';
+import 'package:maleva/core/di/injection.dart';
 import 'package:maleva/core/utils/system_helpers.dart';
-import 'package:maleva/core/network/api_legacy_helper.dart';
 import 'package:maleva/core/network/api_constants.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -7,7 +9,7 @@ import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:maleva/core/utils/app_globals.dart';
-import 'package:maleva/core/network/OnlineApi.dart' as OnlineApi;
+
 import 'package:maleva/menu/menulist.dart';
 import '../../../../core/theme/tokens.dart';
 import '../../../dashboard/common_tabs/transportDB/view/transportdb_tab.dart';
@@ -66,7 +68,7 @@ class _PreAlertPage extends StatelessWidget {
       'Cons':                s.checkConsolidated,
     };
     final header = {'Content-Type': 'application/json; charset=UTF-8'};
-    final resultData = await ApiLegacyHelper.apiAllinoneSelectArray(
+    final resultData = await sl<LegacyApiRepository>().apiAllinoneSelectArray(
         '${ApiConstants.apiPreAlertReport}$reportName', master, header, context);
 
     if (resultData != null && resultData != '') {
@@ -95,7 +97,7 @@ class _PreAlertPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isTablet = AppGlobals.MalevaScreen != 1;
+    final isTablet = MediaQuery.of(context).size.width > 600;
     final userName = AppGlobals.storagenew.getString('Username') ?? '';
 
     return PopScope(
@@ -118,8 +120,8 @@ class _PreAlertPage extends StatelessWidget {
           title: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text('Pre Alert Report', style: GoogleFonts.lato(color: Colors.white, fontWeight: FontWeight.w700, fontSize: isTablet ? AppGlobals.FontMedium + 2 : AppGlobals.FontMedium)),
-              Text(userName, style: GoogleFonts.lato(color: Colors.white.withValues(alpha: 0.65), fontWeight: FontWeight.w500, fontSize: isTablet ? AppGlobals.FontLow : AppGlobals.FontLow - 1)),
+              Text('Pre Alert Report', style: AppTypography.heading2(color: Colors.white)),
+              Text(userName, style: AppTypography.bodySmall(color: Colors.white)),
             ],
           ),
         ),
@@ -127,7 +129,7 @@ class _PreAlertPage extends StatelessWidget {
         body: BlocBuilder<PreAlertBloc, PreAlertState>(
           builder: (context, state) {
             if (state is PreAlertLoading || state is PreAlertInitial) {
-              return const Center(child: SpinKitFoldingCube(color: AppTokens.invoiceHeaderEnd, size: 35));
+              return Center(child: SpinKitFoldingCube(color: AppTokens.invoiceHeaderEnd, size: 35));
             }
             if (state is PreAlertError) {
               return Center(child: Text(state.message));
@@ -155,8 +157,48 @@ class _PreAlertPage extends StatelessWidget {
       }
     }
 
+    final customerField = _PASearchField(
+      hint: 'Customer Name', value: local.custName,
+      onSearch: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const Customer(Searchby: 1, SearchId: 0))).then((navRes) { if (navRes != null) { AppGlobals.SelectCustomerList = navRes; }
+        if (AppGlobals.SelectCustomerList.Id != 0) {
+          emit(PreAlertCustomerChanged(custId: AppGlobals.SelectCustomerList.Id, custName: AppGlobals.SelectCustomerList.AccountName));
+          AppGlobals.SelectCustomerList = CustomerModel.Empty();
+        }
+      }),
+      onClear: () => emit(PreAlertCustomerCleared()),
+    );
+
+    final jobTypeField = _PASearchField(
+      hint: 'Select Job Type', value: local.jobName, disabled: local.checkLEmp,
+      onSearch: () async {
+        await sl<LegacyApiRepository>().SelectJobType(context); if (!context.mounted) return;Navigator.push(context, MaterialPageRoute(builder: (_) => const JobType(Searchby: 1, SearchId: 0))).then((navRes) { if (navRes != null) { AppGlobals.SelectJobTypeList = navRes; }
+          if (AppGlobals.SelectJobTypeList.Id != 0) {
+            emit(PreAlertJobTypeChanged(jobId: AppGlobals.SelectJobTypeList.Id, jobName: AppGlobals.SelectJobTypeList.Name));
+            AppGlobals.SelectJobTypeList = JobTypeModel.Empty();
+          }
+        });
+      },
+      onClear: () => emit(PreAlertJobTypeCleared()),
+    );
+
+    final portField = _PASearchField(
+      hint: 'Select Port', value: local.portName,
+      onSearch: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const Port(Searchby: 1, SearchId: 0))).then((navRes) {
+        if (AppGlobals.SelectedPortName.isNotEmpty) {
+          emit(PreAlertPortChanged(portId: 0, portName: AppGlobals.SelectedPortName));
+          AppGlobals.SelectJobStatusList = JobStatusModel.Empty();
+        }
+      }),
+      onClear: () => emit(PreAlertPortCleared()),
+    );
+
+    final vesselField = _PATextField(
+      hint: 'Vessel', value: local.vessel,
+      onChanged: (v) => emit(PreAlertVesselChanged(v)),
+    );
+
     return SingleChildScrollView(
-      padding: const EdgeInsets.all(16.0),
+      padding: EdgeInsets.symmetric(horizontal: isTablet ? 32.0 : 16.0, vertical: 24.0),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -168,45 +210,31 @@ class _PreAlertPage extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 12),
-          _PASearchField(
-            hint: 'Customer Name', value: local.custName,
-            onSearch: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const Customer(Searchby: 1, SearchId: 0))).then((navRes) { if (navRes != null) { AppGlobals.SelectCustomerList = navRes; }
-              if (AppGlobals.SelectCustomerList.Id != 0) {
-                emit(PreAlertCustomerChanged(custId: AppGlobals.SelectCustomerList.Id, custName: AppGlobals.SelectCustomerList.AccountName));
-                AppGlobals.SelectCustomerList = CustomerModel.Empty();
-              }
-            }),
-            onClear: () => emit(PreAlertCustomerCleared()),
-          ),
-          const SizedBox(height: 10),
-          _PASearchField(
-            hint: 'Select Job Type', value: local.jobName, disabled: local.checkLEmp,
-            onSearch: () async {
-              await OnlineApi.SelectJobType(context); if (!context.mounted) return;Navigator.push(context, MaterialPageRoute(builder: (_) => const JobType(Searchby: 1, SearchId: 0))).then((navRes) { if (navRes != null) { AppGlobals.SelectJobTypeList = navRes; }
-                if (AppGlobals.SelectJobTypeList.Id != 0) {
-                  emit(PreAlertJobTypeChanged(jobId: AppGlobals.SelectJobTypeList.Id, jobName: AppGlobals.SelectJobTypeList.Name));
-                  AppGlobals.SelectJobTypeList = JobTypeModel.Empty();
-                }
-              });
-            },
-            onClear: () => emit(PreAlertJobTypeCleared()),
-          ),
-          const SizedBox(height: 10),
-          _PASearchField(
-            hint: 'Select Port', value: local.portName,
-            onSearch: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const Port(Searchby: 1, SearchId: 0))).then((navRes) {
-              if (AppGlobals.SelectedPortName.isNotEmpty) {
-                emit(PreAlertPortChanged(portId: 0, portName: AppGlobals.SelectedPortName));
-                AppGlobals.SelectJobStatusList = JobStatusModel.Empty();
-              }
-            }),
-            onClear: () => emit(PreAlertPortCleared()),
-          ),
-          const SizedBox(height: 10),
-          _PATextField(
-            hint: 'Vessel', value: local.vessel,
-            onChanged: (v) => emit(PreAlertVesselChanged(v)),
-          ),
+          if (isTablet) ...[
+            Row(
+              children: [
+                Expanded(child: customerField),
+                const SizedBox(width: 16),
+                Expanded(child: jobTypeField),
+              ],
+            ),
+            const SizedBox(height: 12),
+            Row(
+              children: [
+                Expanded(child: portField),
+                const SizedBox(width: 16),
+                Expanded(child: vesselField),
+              ],
+            ),
+          ] else ...[
+            customerField,
+            const SizedBox(height: 10),
+            jobTypeField,
+            const SizedBox(height: 10),
+            portField,
+            const SizedBox(height: 10),
+            vesselField,
+          ],
           const SizedBox(height: 14),
           _CheckboxGrid(
             local: local,
@@ -254,12 +282,12 @@ class _SheetDateTile extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(label.toUpperCase(), style: GoogleFonts.lato(color: AppTokens.planTextMuted, fontWeight: FontWeight.w700, fontSize: 9)),
+            Text(label.toUpperCase(), style: AppTypography.bodySmall(color: AppTokens.planTextMuted)),
             const SizedBox(height: 4),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text(displayDate, style: GoogleFonts.lato(color: colour.kTextDark, fontWeight: FontWeight.w700, fontSize: 13)),
+                Text(displayDate, style: AppTypography.bodyLarge(color: colour.kTextDark)),
                 const Icon(Icons.calendar_month_outlined, size: 18, color:AppTokens.invoiceHeaderEnd),
               ],
             ),
@@ -284,7 +312,7 @@ class _PASearchField extends StatelessWidget {
         decoration: BoxDecoration(color: disabled ? const Color(0xFFF5F5F5) : colour.kDetailBg, borderRadius: BorderRadius.circular(10), border: Border.all(color: AppTokens.maintCardBorder, width: 0.5)),
         child: Row(
           children: [
-            Expanded(child: Text(value.isEmpty ? hint : value, style: GoogleFonts.lato(color: value.isEmpty ? AppTokens.planTextMuted : colour.kTextDark, fontWeight: value.isEmpty ? FontWeight.w500 : FontWeight.w600, fontSize: AppGlobals.FontLow))),
+            Expanded(child: Text(value.isEmpty ? hint : value, style: AppTypography.bodySmall(color: value.isEmpty ? AppTokens.planTextMuted : colour.kTextDark))),
             Icon(value.isNotEmpty ? Icons.close_rounded : Icons.search_rounded, size: 20, color: disabled ? AppTokens.planTextMuted :AppTokens.invoiceHeaderEnd),
           ],
         ),
@@ -302,8 +330,8 @@ class _PATextField extends StatelessWidget {
     return TextField(
       controller: TextEditingController(text: value)..selection = TextSelection.collapsed(offset: value.length),
       textCapitalization: TextCapitalization.characters, textInputAction: TextInputAction.done, onChanged: onChanged,
-      style: GoogleFonts.lato(color: colour.kTextDark, fontWeight: FontWeight.w600, fontSize: AppGlobals.FontLow),
-      decoration: InputDecoration(hintText: hint, hintStyle: GoogleFonts.lato(color: AppTokens.planTextMuted, fontSize: AppGlobals.FontLow), filled: true, fillColor: colour.kDetailBg, contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12), border: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: BorderSide.none), enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: const BorderSide(color: AppTokens.maintCardBorder, width: 0.5)), focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: const BorderSide(color:AppTokens.invoiceHeaderEnd, width: 1.5))),
+      style: AppTypography.bodySmall(color: colour.kTextDark),
+      decoration: InputDecoration(hintText: hint, hintStyle: AppTypography.bodySmall(color: AppTokens.planTextMuted), filled: true, fillColor: colour.kDetailBg, contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12), border: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: BorderSide.none), enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: const BorderSide(color: AppTokens.maintCardBorder, width: 0.5)), focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: const BorderSide(color:AppTokens.invoiceHeaderEnd, width: 1.5))),
     );
   }
 }
@@ -329,7 +357,7 @@ class _CheckboxGrid extends StatelessWidget {
                 children: [
                   AnimatedContainer(duration: const Duration(milliseconds: 180), width: 18, height: 18, decoration: BoxDecoration(gradient: item.$3 ? colour.kGradient : null, border: item.$3 ? null : Border.all(color: AppTokens.maintCardBorder, width: 1.5), borderRadius: BorderRadius.circular(5)), child: item.$3 ? const Icon(Icons.check_rounded, size: 12, color: Colors.white) : null),
                   const SizedBox(width: 6),
-                  Text(item.$2, style: GoogleFonts.lato(color: colour.kTextDark, fontWeight: FontWeight.w600, fontSize: isTablet ? AppGlobals.FontLow + 1 : AppGlobals.FontLow)),
+                  Text(item.$2, style: AppTypography.bodySmall(color: colour.kTextDark)),
                 ],
               ),
             ),
@@ -346,7 +374,7 @@ class _ETARadioRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final style = GoogleFonts.lato(color: colour.kTextDark, fontWeight: FontWeight.w600, fontSize: isTablet ? AppGlobals.FontLow + 1 : AppGlobals.FontLow);
+    final style = AppTypography.bodySmall(color: colour.kTextDark);
     final options = [('1', 'OETA', '1', true), ('2', 'LETA', '1', true), ('3', 'All', '2', true), ('0', 'None', 'O', false)];
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 8),
@@ -392,7 +420,7 @@ class _GradientButton extends StatelessWidget {
           borderRadius: BorderRadius.circular(12),
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 14),
-            child: Text(label, textAlign: TextAlign.center, style: GoogleFonts.lato(color: Colors.white, fontWeight: FontWeight.w700, fontSize: AppGlobals.FontMedium + 1)),
+            child: Text(label, textAlign: TextAlign.center, style: AppTypography.heading2(color: Colors.white)),
           ),
         ),
       ),

@@ -1,4 +1,6 @@
-import 'package:maleva/core/network/api_legacy_helper.dart';
+import 'package:maleva/core/network/legacy_api_repository.dart';
+import 'package:maleva/core/di/injection.dart';
+import 'package:maleva/core/theme/app_typography.dart';
 import 'package:maleva/core/network/api_constants.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -302,7 +304,7 @@ Navigator.pushReplacement(
         }
         if (state.errorMessage != null) {
           msgshow(
-            state.errorMessage!, '', Colors.white, Colors.red, null,
+            state.errorMessage!, '', Colors.white, colour.commonColorred, null,
             18.0 - AppGlobals.reducesize, AppGlobals.tll, AppGlobals.tgc, context, 2,
           );
         }
@@ -322,7 +324,7 @@ Navigator.pushReplacement(
             drawer: const Menulist(),
             appBar: _buildAppBar(context, state, bloc, isTablet),
             body: state.status == SalesOrderStatus.loading
-                ? const Center(
+                ? Center(
                 child: SpinKitFoldingCube(
                     color: colour.spinKitColor, size: 35))
                 : _buildTabBody(context, state, bloc, isTablet),
@@ -362,17 +364,11 @@ Navigator.pushReplacement(
           children: [
             Expanded(
               child: Text('Sales Order',
-                  style: GoogleFonts.lato(
-                      color: colour.topAppBarColor,
-                      fontWeight: FontWeight.bold,
-                      fontSize: titleSize)),
+                  style: AppTypography.bodyLarge(color: colour.topAppBarColor)),
             ),
             Expanded(
               child: Text(userName,
-                  style: GoogleFonts.lato(
-                      color: colour.commonColorLight,
-                      fontWeight: FontWeight.bold,
-                      fontSize: subSize)),
+                  style: AppTypography.bodyLarge(color: colour.commonColorLight)),
             ),
           ],
         ),
@@ -427,10 +423,7 @@ Navigator.pushReplacement(
         ),
         onPressed: onPressed,
         child: Text(label,
-            style: GoogleFonts.lato(
-                fontSize: AppGlobals.FontMedium.toDouble(),
-                fontWeight: FontWeight.bold,
-                color: colour.commonColor)),
+            style: AppTypography.heading2(color: colour.commonColor)),
       ),
     );
   }
@@ -757,7 +750,7 @@ Navigator.pushReplacement(
             enabled: state.isAllowed('txtPickUpAddress'),
             isTablet: isTablet,
             onSearch: () {
-              // Do NOT call OnlineApi.selectAddressList() here.
+              // Do NOT call sl<LegacyApiRepository>().selectAddressList() here.
               // AddressList widget handles its own fetch in initState.
               Navigator.push(
                 context,
@@ -1149,7 +1142,7 @@ Navigator.pushReplacement(
       bool isTablet,
       ) {
     if (!state.visibility.forwarding) {
-      return const Center(child: Text('Not applicable for this job type'));
+      return Center(child: Text('Not applicable for this job type'));
     }
     return Padding(
       padding: EdgeInsets.all(isTablet ? 20 : 15),
@@ -1449,8 +1442,8 @@ Navigator.pushReplacement(
             Align(
               alignment: Alignment.centerRight,
               child: ElevatedButton.icon(
-                icon: const Icon(Icons.add),
-                label: const Text('Add Product'),
+                icon: Icon(Icons.add),
+                label: Text('Add Product'),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: colour.commonColorLight,
                   side: const BorderSide(color: colour.commonColor),
@@ -1474,23 +1467,11 @@ Navigator.pushReplacement(
               children: [
                 Text(
                   'Total: ${state.totalAmount.toStringAsFixed(2)}',
-                  style: GoogleFonts.lato(
-                    color: colour.commonColor,
-                    fontWeight: FontWeight.bold,
-                    fontSize: isTablet
-                        ? AppGlobals.FontMedium.toDouble()
-                        : AppGlobals.FontLow.toDouble(),
-                  ),
+                  style: AppTypography.heading2(color: colour.commonColor),
                 ),
                 Text(
                   'Actual: ${state.actualAmount.toStringAsFixed(2)}',
-                  style: GoogleFonts.lato(
-                    color: colour.commonColor,
-                    fontWeight: FontWeight.bold,
-                    fontSize: isTablet
-                        ? AppGlobals.FontMedium.toDouble()
-                        : AppGlobals.FontLow.toDouble(),
-                  ),
+                  style: AppTypography.heading2(color: colour.commonColor),
                 ),
               ],
             ),
@@ -1507,17 +1488,10 @@ Navigator.pushReplacement(
                   margin: const EdgeInsets.only(bottom: 8),
                   child: ListTile(
                     title: Text(p.ProductName,
-                        style: GoogleFonts.lato(
-                            fontWeight: FontWeight.bold,
-                            color: colour.commonColor,
-                            fontSize: isTablet
-                                ? AppGlobals.FontMedium.toDouble()
-                                : AppGlobals.FontCardText.toDouble())),
+                        style: AppTypography.heading2(color: colour.commonColor)),
                     subtitle: Text(
                         'Qty: ${p.ItemQty}  Rate: ${p.SalesRate}  Amt: ${p.Amount.toStringAsFixed(2)}',
-                        style: GoogleFonts.lato(
-                            color: colour.commonColor,
-                            fontSize: isTablet ? 14.0 : 12.0)),
+                        style: AppTypography.bodyMedium(color: colour.commonColor)),
                     trailing: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
@@ -1585,9 +1559,7 @@ Navigator.pushReplacement(
       context: context,
       builder: (_) => AlertDialog(
         title: Text(editIndex != null ? 'Edit Product' : 'Add Product',
-            style: GoogleFonts.lato(
-                color: colour.commonColor,
-                fontWeight: FontWeight.bold)),
+            style: AppTypography.heading2(color: colour.commonColor)),
         content: SizedBox(
           width: isTablet ? 500 : double.maxFinite,
           child: ListView(
@@ -1626,7 +1598,7 @@ Navigator.pushReplacement(
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel'),
+            child: Text('Cancel'),
           ),
           ElevatedButton(
             style: ElevatedButton.styleFrom(
@@ -1691,7 +1663,7 @@ Navigator.pushReplacement(
                   product: product, updateIndex: editIndex));
             },
             child: Text('Save',
-                style: GoogleFonts.lato(color: Colors.white)),
+                style: AppTypography.bodyLarge(color: Colors.white)),
           ),
         ],
       ),
@@ -1706,7 +1678,7 @@ Navigator.pushReplacement(
       String type,
       int slot,
       ) async {
-    await ApiLegacyHelper.apiAllinoneSelect(
+    await sl<LegacyApiRepository>().apiAllinoneSelect(
         '${ApiConstants.apiSelectEmployee}${AppGlobals.Comid}&type=&type1=Operation',
         null, null, context);
 
@@ -1754,21 +1726,10 @@ Navigator.pushReplacement(
         enabled: enabled,
         keyboardType: keyboardType,
         textCapitalization: TextCapitalization.characters,
-        style: GoogleFonts.lato(
-            color: colour.commonColor,
-            fontWeight: FontWeight.bold,
-            fontSize: isTablet
-                ? AppGlobals.FontLow + 2.0
-                : AppGlobals.FontLow.toDouble(),
-            letterSpacing: 0.3),
+        style: AppTypography.bodySmall(color: colour.commonColor),
         decoration: InputDecoration(
           hintText: hint,
-          hintStyle: GoogleFonts.lato(
-              color: colour.commonColorLight,
-              fontWeight: FontWeight.bold,
-              fontSize: isTablet
-                  ? AppGlobals.FontMedium + 2.0
-                  : AppGlobals.FontMedium.toDouble()),
+          hintStyle: AppTypography.heading2(color: colour.commonColorLight),
           contentPadding:
           const EdgeInsets.only(left: 10, right: 20, top: 10),
           enabledBorder: const OutlineInputBorder(
@@ -1805,20 +1766,10 @@ Navigator.pushReplacement(
         controller: controller,
         readOnly: true,
         enabled: enabled,
-        style: GoogleFonts.lato(
-            color: colour.commonColor,
-            fontWeight: FontWeight.bold,
-            fontSize: isTablet
-                ? AppGlobals.FontLow + 2.0
-                : AppGlobals.FontLow.toDouble()),
+        style: AppTypography.bodySmall(color: colour.commonColor),
         decoration: InputDecoration(
           hintText: hint,
-          hintStyle: GoogleFonts.lato(
-              color: colour.commonColorLight,
-              fontWeight: FontWeight.bold,
-              fontSize: isTablet
-                  ? AppGlobals.FontMedium + 2.0
-                  : AppGlobals.FontMedium.toDouble()),
+          hintStyle: AppTypography.heading2(color: colour.commonColorLight),
           contentPadding:
           const EdgeInsets.only(left: 10, right: 20, top: 10),
           suffixIcon: InkWell(
@@ -1864,19 +1815,9 @@ Navigator.pushReplacement(
           isExpanded: true,
           value: value,
           hint: Text(label,
-              style: GoogleFonts.lato(
-                  color: colour.commonColorLight,
-                  fontWeight: FontWeight.bold,
-                  fontSize: isTablet
-                      ? AppGlobals.FontMedium + 2.0
-                      : AppGlobals.FontMedium.toDouble())),
+              style: AppTypography.heading2(color: colour.commonColorLight)),
           onChanged: enabled ? onChanged : null,
-          style: GoogleFonts.lato(
-              color: colour.commonColor,
-              fontWeight: FontWeight.bold,
-              fontSize: isTablet
-                  ? AppGlobals.FontMedium + 2.0
-                  : AppGlobals.FontMedium.toDouble()),
+          style: AppTypography.heading2(color: colour.commonColor),
           items: items
               .map((item) => DropdownMenuItem<T>(
             value: item,
@@ -1906,12 +1847,7 @@ Navigator.pushReplacement(
           onChanged: onToggle,
         ),
         Text(label,
-            style: GoogleFonts.lato(
-                color: colour.commonColor,
-                fontWeight: FontWeight.bold,
-                fontSize: isTablet
-                    ? AppGlobals.FontMedium.toDouble()
-                    : AppGlobals.FontCardText.toDouble())),
+            style: AppTypography.heading2(color: colour.commonColor)),
         if (checked) ...[
           const Spacer(),
           InkWell(
@@ -1936,12 +1872,7 @@ Navigator.pushReplacement(
                 dateStr.length >= 10
                     ? dateStr.substring(0, 16)
                     : dateStr,
-                style: GoogleFonts.lato(
-                    color: colour.commonColor,
-                    fontWeight: FontWeight.bold,
-                    fontSize: isTablet
-                        ? AppGlobals.FontCardText + 2.0
-                        : AppGlobals.FontCardText.toDouble()),
+                style: AppTypography.bodyLarge(color: colour.commonColor),
               ),
             ),
           ),
@@ -1961,12 +1892,7 @@ Navigator.pushReplacement(
       children: [
         Expanded(
           child: Text('$label: $dateStr',
-              style: GoogleFonts.lato(
-                  color: colour.commonColor,
-                  fontWeight: FontWeight.bold,
-                  fontSize: isTablet
-                      ? AppGlobals.FontLow.toDouble()
-                      : AppGlobals.FontCardText.toDouble())),
+              style: AppTypography.bodySmall(color: colour.commonColor)),
         ),
         IconButton(
           icon: const Icon(Icons.date_range, color: colour.commonColor),
@@ -2031,12 +1957,7 @@ Navigator.pushReplacement(
                     padding: const EdgeInsets.symmetric(
                         horizontal: 24, vertical: 12),
                     child: Text(val,
-                        style: GoogleFonts.lato(
-                            color: colour.commonColor,
-                            fontWeight: FontWeight.bold,
-                            fontSize: isTablet
-                                ? AppGlobals.FontLow.toDouble()
-                                : AppGlobals.FontCardText.toDouble())),
+                        style: AppTypography.bodySmall(color: colour.commonColor)),
                   ),
                 );
               },

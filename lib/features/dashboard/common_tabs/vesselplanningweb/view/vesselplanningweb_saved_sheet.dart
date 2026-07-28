@@ -1,3 +1,7 @@
+import 'package:maleva/core/colors/colors.dart' as colour;
+import 'package:maleva/core/network/legacy_api_repository.dart';
+import 'package:maleva/core/di/injection.dart';
+import 'package:maleva/core/theme/app_typography.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -14,7 +18,7 @@ import 'package:http/http.dart' as http;
 import 'package:open_file/open_file.dart';
 import 'package:path_provider/path_provider.dart';
 import '../../../../../core/models/model.dart';
-import '../../../../../core/network/OnlineApi.dart' as OnlineApi;
+
 import '../../../../mastersearch/Employee.dart';
 import '../bloc/vesselplanningweb_state.dart';
 import 'package:maleva/core/models/shared/employee_model.dart';
@@ -67,7 +71,7 @@ class _VesselPlanningSavedSheetState extends State<VesselPlanningSavedSheet> {
     } catch (e) {
       setState(() => _isLoading = false);
       if (mounted) {
-        msgshow(e.toString(), "", Colors.white, Colors.red, null, 14, AppGlobals.tls, AppGlobals.tgc, context, 2);
+        msgshow(e.toString(), "", Colors.white, colour.commonColorred, null, 14, AppGlobals.tls, AppGlobals.tgc, context, 2);
       }
     }
   }
@@ -129,7 +133,7 @@ class _VesselPlanningSavedSheetState extends State<VesselPlanningSavedSheet> {
               const SpinKitFadingCircle(color: colour.kHeaderGradEnd, size: 30),
               const SizedBox(width: 20),
               Text("Loading PDF...",
-                  style: GoogleFonts.lato(fontSize: 16, fontWeight: FontWeight.bold)),
+                  style: AppTypography.heading1()),
             ],
           ),
         ),
@@ -150,12 +154,12 @@ class _VesselPlanningSavedSheetState extends State<VesselPlanningSavedSheet> {
           showDialog(
             context: context,
             builder: (ctx) => AlertDialog(
-              title: const Text("Error"),
+              title: Text("Error"),
               content: Text("Could not open PDF: ${result.message}"),
               actions: [
                 TextButton(
                   onPressed: () => Navigator.pop(ctx),
-                  child: const Text("OK"),
+                  child: Text("OK"),
                 )
               ],
             ),
@@ -186,7 +190,7 @@ class _VesselPlanningSavedSheetState extends State<VesselPlanningSavedSheet> {
           await _openPdf(context, state.url);
         } else if (state is VesselPlanningPdfLaunchError) {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(state.message), backgroundColor: Colors.red),
+            SnackBar(content: Text(state.message), backgroundColor: colour.commonColorred),
           );
         }
       },
@@ -215,12 +219,7 @@ class _VesselPlanningSavedSheetState extends State<VesselPlanningSavedSheet> {
             children: [
               Text(
                 'View Saved Plannings',
-                style: GoogleFonts.lato(
-                  color: colour.kTextDark,
-                  fontSize: 18,
-                  fontWeight: FontWeight.w800,
-                  letterSpacing: 0.5,
-                ),
+                style: AppTypography.heading1(color: colour.kTextDark, fontWeight: FontWeight.w800),
               ),
               const Spacer(),
               InkWell(
@@ -271,7 +270,7 @@ class _VesselPlanningSavedSheetState extends State<VesselPlanningSavedSheet> {
                         ? null
                         : () async {
                             setState(() => _isLoading = true);
-                            await OnlineApi.SelectEmployee(context, 'Sales', '');
+                            await sl<LegacyApiRepository>().SelectEmployee(context, 'Sales', '');
                             setState(() => _isLoading = false);
                             if (!mounted) return;
                             Navigator.push(context, MaterialPageRoute(builder: (_) => const Employee(Searchby: 1, SearchId: 0))).then((result) {
@@ -288,11 +287,7 @@ class _VesselPlanningSavedSheetState extends State<VesselPlanningSavedSheet> {
                         Expanded(
                           child: Text(
                             _selectedEmployee?.AccountName ?? 'Select Employee',
-                            style: GoogleFonts.lato(
-                              color: _selectedEmployee != null ? colour.kTextDark : AppTokens.planTextMuted,
-                              fontSize: 13,
-                              fontWeight: _selectedEmployee != null ? FontWeight.w600 : FontWeight.normal,
-                            ),
+                            style: AppTypography.bodyLarge(color: _selectedEmployee != null ? colour.kTextDark : AppTokens.planTextMuted),
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
                           ),
@@ -333,7 +328,7 @@ class _VesselPlanningSavedSheetState extends State<VesselPlanningSavedSheet> {
                       const SizedBox(width: 6),
                       Text(
                         'L.Emp',
-                        style: GoogleFonts.lato(color: colour.kTextDark, fontWeight: FontWeight.w700, fontSize: 13),
+                        style: AppTypography.heading3(color: colour.kTextDark, fontWeight: FontWeight.w700),
                       ),
                     ],
                   ),
@@ -354,10 +349,10 @@ class _VesselPlanningSavedSheetState extends State<VesselPlanningSavedSheet> {
                   ),
                   child: TextField(
                     controller: _searchController,
-                    style: GoogleFonts.lato(color: colour.kTextDark, fontSize: 13, fontWeight: FontWeight.w600),
+                    style: AppTypography.bodyLarge(color: colour.kTextDark, fontWeight: FontWeight.w600),
                     decoration: InputDecoration(
                       hintText: 'Planning No',
-                      hintStyle: GoogleFonts.lato(color: AppTokens.planTextMuted, fontSize: 13),
+                      hintStyle: AppTypography.bodyLarge(color: AppTokens.planTextMuted),
                       border: InputBorder.none,
                       contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
                     ),
@@ -379,7 +374,7 @@ class _VesselPlanningSavedSheetState extends State<VesselPlanningSavedSheet> {
                   alignment: Alignment.center,
                   child: Text(
                     'Search',
-                    style: GoogleFonts.lato(color: Colors.white, fontWeight: FontWeight.w700, fontSize: 14),
+                    style: AppTypography.heading3(color: Colors.white, fontWeight: FontWeight.w700),
                   ),
                 ),
               ),
@@ -390,12 +385,12 @@ class _VesselPlanningSavedSheetState extends State<VesselPlanningSavedSheet> {
           // List
           Expanded(
             child: _isLoading
-                ? const Center(child: SpinKitFoldingCube(color: colour.kHeaderGradEnd, size: 40))
+                ? Center(child: SpinKitFoldingCube(color: colour.kHeaderGradEnd, size: 40))
                 : _savedPlannings.isEmpty
                     ? Center(
                         child: Text(
                           'No saved plannings found.',
-                          style: GoogleFonts.lato(color: AppTokens.planTextMuted, fontSize: 14),
+                          style: AppTypography.bodyLarge(color: AppTokens.planTextMuted),
                         ),
                       )
                     : ListView.separated(
@@ -419,11 +414,7 @@ class _VesselPlanningSavedSheetState extends State<VesselPlanningSavedSheet> {
       children: [
         Text(
           label,
-          style: GoogleFonts.lato(
-            color: colour.kTextDark,
-            fontWeight: FontWeight.w600,
-            fontSize: 13,
-          ),
+          style: AppTypography.bodyLarge(color: colour.kTextDark, fontWeight: FontWeight.w600),
         ),
         const SizedBox(height: 8),
         InkWell(
@@ -442,11 +433,7 @@ class _VesselPlanningSavedSheetState extends State<VesselPlanningSavedSheet> {
                 Expanded(
                   child: Text(
                     controller.text,
-                    style: GoogleFonts.lato(
-                      color: colour.kTextDark,
-                      fontSize: 13,
-                      fontWeight: FontWeight.w600,
-                    ),
+                    style: AppTypography.bodyLarge(color: colour.kTextDark, fontWeight: FontWeight.w600),
                   ),
                 ),
               ],
@@ -502,7 +489,7 @@ class _VesselPlanningSavedSheetState extends State<VesselPlanningSavedSheet> {
                       Expanded(
                         child: Text(
                           planningNo,
-                          style: GoogleFonts.lato(color: colour.kTextDark, fontSize: 15, fontWeight: FontWeight.bold),
+                          style: AppTypography.heading2(color: colour.kTextDark, fontWeight: FontWeight.bold),
                         ),
                       ),
                       GestureDetector(
@@ -513,16 +500,16 @@ class _VesselPlanningSavedSheetState extends State<VesselPlanningSavedSheet> {
                         child: Container(
                           padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                           decoration: BoxDecoration(
-                            color: Colors.red.withValues(alpha: 0.1),
+                            color: colour.commonColorred.withValues(alpha: 0.1),
                             borderRadius: BorderRadius.circular(20),
-                            border: Border.all(color: Colors.red.withValues(alpha: 0.3)),
+                            border: Border.all(color: colour.commonColorred.withValues(alpha: 0.3)),
                           ),
                           child: Row(
                             mainAxisSize: MainAxisSize.min,
                             children: [
-                              const Icon(Icons.picture_as_pdf_outlined, size: 14, color: Colors.red),
+                              const Icon(Icons.picture_as_pdf_outlined, size: 14, color: colour.commonColorred),
                               const SizedBox(width: 4),
-                              Text("PDF", style: GoogleFonts.lato(fontSize: 10, fontWeight: FontWeight.bold, color: Colors.red)),
+                              Text("PDF", style: AppTypography.badgeText(color: colour.commonColorred, fontWeight: FontWeight.bold)),
                             ],
                           ),
                         ),
@@ -536,12 +523,12 @@ class _VesselPlanningSavedSheetState extends State<VesselPlanningSavedSheet> {
                       const SizedBox(width: 4),
                       Text(
                         date,
-                        style: GoogleFonts.lato(color: colour.kTextDark, fontSize: 12, fontWeight: FontWeight.w600),
+                        style: AppTypography.bodyMedium(color: colour.kTextDark, fontWeight: FontWeight.w600),
                       ),
                       const SizedBox(width: 12),
                       Text(
                         '(Long press to edit)',
-                        style: GoogleFonts.lato(color: AppTokens.planTextMuted, fontSize: 10, fontStyle: FontStyle.italic),
+                        style: AppTypography.badgeText(color: AppTokens.planTextMuted),
                       ),
                     ],
                   ),
@@ -549,7 +536,7 @@ class _VesselPlanningSavedSheetState extends State<VesselPlanningSavedSheet> {
                     const SizedBox(height: 4),
                     Text(
                       remarks,
-                      style: GoogleFonts.lato(color: AppTokens.planTextMuted, fontSize: 12),
+                      style: AppTypography.bodyMedium(color: AppTokens.planTextMuted),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                     ),
@@ -561,7 +548,7 @@ class _VesselPlanningSavedSheetState extends State<VesselPlanningSavedSheet> {
               if (details.isEmpty)
                 Padding(
                   padding: const EdgeInsets.all(16.0),
-                  child: Text('No details found', style: GoogleFonts.lato(color: AppTokens.planTextMuted, fontSize: 13)),
+                  child: Text('No details found', style: AppTypography.bodyLarge(color: AppTokens.planTextMuted)),
                 )
               else
                 Container(
@@ -589,7 +576,7 @@ class _VesselPlanningSavedSheetState extends State<VesselPlanningSavedSheet> {
                             Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
-                                Text(jobNo, style: GoogleFonts.lato(color: colour.kTextDark, fontSize: 13, fontWeight: FontWeight.w700)),
+                                Text(jobNo, style: AppTypography.heading3(color: colour.kTextDark, fontWeight: FontWeight.w700)),
                                 if (status.isNotEmpty)
                                   Container(
                                     padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
@@ -599,7 +586,7 @@ class _VesselPlanningSavedSheetState extends State<VesselPlanningSavedSheet> {
                                     ),
                                     child: Text(
                                       status.trim(),
-                                      style: GoogleFonts.lato(color: colour.kHeaderGradEnd, fontSize: 10, fontWeight: FontWeight.w800),
+                                      style: AppTypography.badgeText(color: colour.kHeaderGradEnd, fontWeight: FontWeight.w800),
                                     ),
                                   ),
                               ],
@@ -612,7 +599,7 @@ class _VesselPlanningSavedSheetState extends State<VesselPlanningSavedSheet> {
                                 Expanded(
                                   child: Text(
                                     customer,
-                                    style: GoogleFonts.lato(color: colour.kTextDark, fontSize: 12),
+                                    style: AppTypography.bodyMedium(color: colour.kTextDark),
                                     maxLines: 1,
                                     overflow: TextOverflow.ellipsis,
                                   ),
@@ -622,7 +609,7 @@ class _VesselPlanningSavedSheetState extends State<VesselPlanningSavedSheet> {
                                 const SizedBox(width: 4),
                                 Text(
                                   jobDate,
-                                  style: GoogleFonts.lato(color: colour.kTextDark, fontSize: 11),
+                                  style: AppTypography.bodySmall(color: colour.kTextDark),
                                 ),
                               ],
                             )

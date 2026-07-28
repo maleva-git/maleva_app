@@ -1,3 +1,5 @@
+import 'package:maleva/core/colors/colors.dart' as colour;
+import 'package:maleva/core/theme/app_typography.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
@@ -41,7 +43,7 @@ class _VesselDashboardView extends StatelessWidget {
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
                   backgroundColor: Palette.redAccent,
-                  content: Text(state.errorMessage, style: GoogleFonts.lato(color: Palette.white)),
+                  content: Text(state.errorMessage, style: AppTypography.bodyLarge(color: Palette.white)),
                   behavior: SnackBarBehavior.floating,
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                 ),
@@ -56,11 +58,11 @@ class _VesselDashboardView extends StatelessWidget {
                 _buildFilterSection(context, state),
                 Expanded(
                   child: state.isLoading
-                      ? const Center(child: SpinKitFoldingCube(color: Palette.blue500, size: 35.0))
+                      ? Center(child: SpinKitFoldingCube(color: Palette.blue500, size: 35.0))
                       : state.vesselList.isEmpty
                       ? Center(
                       child: Text('No Vessel Data Found',
-                          style: GoogleFonts.lato(color: Palette.grey500, fontSize: 16)))
+                          style: AppTypography.heading1(color: Palette.grey500)))
                       : ListView.builder(
                     padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
                     itemCount: state.vesselList.length,
@@ -87,17 +89,12 @@ class _VesselDashboardView extends StatelessWidget {
         children: [
           Text(
             'Vessel Report',
-            style: GoogleFonts.lato(
-              color: Palette.blue700,
-              fontSize: 26,
-              fontWeight: FontWeight.w800,
-              letterSpacing: 0.5,
-            ),
+            style: AppTypography.display(color: Palette.blue700, fontWeight: FontWeight.w800),
           ),
           const SizedBox(height: 4),
           Text(
             'Manage and track your vessel statuses',
-            style: GoogleFonts.lato(color: Palette.grey600, fontSize: 13),
+            style: AppTypography.bodyLarge(color: Palette.grey600),
           ),
         ],
       ),
@@ -179,10 +176,7 @@ class _VesselDashboardView extends StatelessWidget {
                   ),
                   child: Text(
                     state.remarks.isEmpty ? "No Remarks..." : state.remarks,
-                    style: GoogleFonts.lato(
-                      color: state.remarks.isEmpty ? Palette.grey500 : Palette.textDark2,
-                      fontSize: 14,
-                    ),
+                    style: AppTypography.bodyLarge(color: state.remarks.isEmpty ? Palette.grey500 : Palette.textDark2),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                   ),
@@ -205,7 +199,7 @@ class _VesselDashboardView extends StatelessWidget {
           Row(
             children: [
               _buildDateBadge(context, "From", state.fromDate, true, state),
-              const Padding(
+              Padding(
                 padding: EdgeInsets.symmetric(horizontal: 10),
                 child: Icon(Icons.arrow_forward_rounded, color: Palette.grey400, size: 16),
               ),
@@ -257,7 +251,7 @@ class _VesselDashboardView extends StatelessWidget {
                     Expanded(
                       child: Text(
                         item["Loadingvesselname"] ?? "Unknown Vessel",
-                        style: GoogleFonts.lato(color: Palette.textDark2, fontSize: 16, fontWeight: FontWeight.bold),
+                        style: AppTypography.heading1(color: Palette.textDark2, fontWeight: FontWeight.bold),
                         overflow: TextOverflow.ellipsis,
                         maxLines: 1,
                       ),
@@ -271,7 +265,7 @@ class _VesselDashboardView extends StatelessWidget {
                       ),
                       child: Text(
                         item["Port"] ?? "No Port",
-                        style: GoogleFonts.lato(color: Palette.blue600, fontSize: 12, fontWeight: FontWeight.w700),
+                        style: AppTypography.bodyMedium(color: Palette.blue600, fontWeight: FontWeight.w700),
                         overflow: TextOverflow.ellipsis,
                       ),
                     ),
@@ -286,7 +280,7 @@ class _VesselDashboardView extends StatelessWidget {
                     Expanded(
                       child: Text(
                         "AWB: ${item["AWBNo"]}",
-                        style: GoogleFonts.lato(color: Palette.grey600, fontSize: 13, fontWeight: FontWeight.w600),
+                        style: AppTypography.bodyLarge(color: Palette.grey600, fontWeight: FontWeight.w600),
                         overflow: TextOverflow.ellipsis,
                         maxLines: 1,
                       ),
@@ -300,7 +294,7 @@ class _VesselDashboardView extends StatelessWidget {
                       ),
                       child: Text(
                         "Status: ${item["JobStatus"]}",
-                        style: GoogleFonts.lato(color: Palette.textNavy, fontSize: 11, fontWeight: FontWeight.bold),
+                        style: AppTypography.bodySmall(color: Palette.textNavy, fontWeight: FontWeight.bold),
                         overflow: TextOverflow.ellipsis,
                       ),
                     ),
@@ -333,7 +327,7 @@ class _VesselDashboardView extends StatelessWidget {
             Expanded(
               child: Text(
                 hint,
-                style: GoogleFonts.lato(color: Palette.grey600, fontSize: 14),
+                style: AppTypography.bodyLarge(color: Palette.grey600),
                 overflow: TextOverflow.ellipsis,
               ),
             ),
@@ -396,7 +390,7 @@ class _VesselDashboardView extends StatelessWidget {
               const SizedBox(width: 6),
               Text(
                 dateText,
-                style: GoogleFonts.lato(color: Palette.blue700, fontSize: 13, fontWeight: FontWeight.bold),
+                style: AppTypography.heading3(color: Palette.blue700, fontWeight: FontWeight.bold),
               ),
             ],
           ),

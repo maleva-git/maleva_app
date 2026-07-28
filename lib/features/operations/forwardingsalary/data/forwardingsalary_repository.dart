@@ -1,6 +1,8 @@
+import 'package:maleva/core/network/legacy_api_repository.dart';
+import 'package:maleva/core/di/injection.dart';
 import 'package:maleva/core/network/api_constants.dart';
 import 'package:maleva/core/network/api_client.dart';
-import 'package:maleva/core/network/OnlineApi.dart' as OnlineApi;
+
 import 'package:maleva/core/utils/app_preferences.dart';
 import 'package:maleva/core/utils/app_globals.dart';
 
@@ -11,9 +13,9 @@ class ForwardingSalaryRepository {
   Future<Map<String, dynamic>> initializeData() async {
     // We execute the legacy OnlineApi wrappers to populate the lists,
     // but return them so the BLoC can cache them locally instead of referencing globals.
-    await OnlineApi.GetRTINoForwarding(null, 0);
-    await OnlineApi.SelectEmployee(null, '', 'Operation');
-    await OnlineApi.loadComboS1(null, 0);
+    await sl<LegacyApiRepository>().GetRTINoForwarding(null, 0);
+    await sl<LegacyApiRepository>().SelectEmployee(null, '', 'Operation');
+    await sl<LegacyApiRepository>().loadComboS1(null, 0);
 
     return {
       'jobNoList': AppGlobals.JobNoList,
@@ -23,7 +25,7 @@ class ForwardingSalaryRepository {
 
   // ─── Fetch RTIs by Bill Type ───────────────────────────────────────────────
   Future<List<dynamic>> fetchRTINoForwarding(int billType) async {
-    await OnlineApi.GetRTINoForwarding(null, billType);
+    await sl<LegacyApiRepository>().GetRTINoForwarding(null, billType);
     return AppGlobals.JobNoList;
   }
 

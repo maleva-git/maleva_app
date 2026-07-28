@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 import 'package:maleva/core/utils/app_preferences.dart';
@@ -1205,7 +1206,7 @@ class SalesOrderBloc extends Bloc<SalesOrderEvent, SalesOrderState> {
               .toList();
         }
       }
-    } catch (_) {}
+    } catch (e, stack) { debugPrint("Error caught globally: $e\n$stack"); }
 
     emit(state.copyWith(
         showOverlay: preds.isNotEmpty,

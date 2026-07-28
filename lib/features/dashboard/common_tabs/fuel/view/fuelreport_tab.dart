@@ -1,3 +1,4 @@
+import 'package:maleva/core/theme/app_typography.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -40,7 +41,7 @@ class _FuelDiffBody extends StatelessWidget {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text(state.message),
-              backgroundColor: Colors.red,
+              backgroundColor: colour.commonColorred,
             ),
           );
         }
@@ -48,7 +49,7 @@ class _FuelDiffBody extends StatelessWidget {
       builder: (context, state) {
         // ── Loading ──
         if (state is FuelDiffLoading) {
-          return const Center(
+          return Center(
               child: CircularProgressIndicator(color: AppTokens.brandGradientStart));
         }
 
@@ -58,19 +59,18 @@ class _FuelDiffBody extends StatelessWidget {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                const Icon(Icons.error_outline, color: Colors.red, size: 48),
+                const Icon(Icons.error_outline, color: colour.commonColorred, size: 48),
                 const SizedBox(height: 12),
                 Text(state.message,
                     textAlign: TextAlign.center,
-                    style: GoogleFonts.lato(
-                        color: Colors.red, fontSize: 14)),
+                    style: AppTypography.bodyLarge(color: colour.commonColorred)),
                 const SizedBox(height: 16),
                 ElevatedButton.icon(
                   onPressed: () => context
                       .read<FuelDiffBloc>()
                       .add(const LoadFuelDiffEvent()),
-                  icon: const Icon(Icons.refresh),
-                  label: const Text("Retry"),
+                  icon: Icon(Icons.refresh),
+                  label: Text("Retry"),
                   style: ElevatedButton.styleFrom(
                       backgroundColor: AppTokens.brandGradientStart),
                 ),
@@ -88,11 +88,7 @@ class _FuelDiffBody extends StatelessWidget {
                 // ── Title ──
                 Text(
                   "Fuel Different",
-                  style: GoogleFonts.lato(
-                    fontSize: AppGlobals.FontLarge,
-                    fontWeight: FontWeight.bold,
-                    color: AppTokens.brandGradientStartDark,
-                  ),
+                  style: AppTypography.heading1(color: AppTokens.brandGradientStartDark),
                 ),
 
                 SizedBox(height: isTablet ? 14 : 10),
@@ -163,7 +159,7 @@ class _FuelDiffBody extends StatelessWidget {
       return Center(
         child: Text(
           "No records found.",
-          style: GoogleFonts.lato(fontSize: 16, color: Colors.grey),
+          style: AppTypography.heading1(color: Colors.grey),
         ),
       );
     }
@@ -233,17 +229,11 @@ class _DateFilterBar extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text("From",
-                    style: GoogleFonts.lato(
-                        fontSize: 11,
-                        color: Colors.grey[500],
-                        fontWeight: FontWeight.w600)),
+                    style: AppTypography.bodySmall(color: Colors.grey[500], fontWeight: FontWeight.w600)),
                 Text(
                   DateFormat("dd-MM-yy")
                       .format(DateTime.parse(state.fromDate)),
-                  style: GoogleFonts.lato(
-                      fontWeight: FontWeight.bold,
-                      fontSize: AppGlobals.FontLow,
-                      color: AppTokens.brandGradientStartDark),
+                  style: AppTypography.bodySmall(color: AppTokens.brandGradientStartDark),
                 ),
               ],
             ),
@@ -269,17 +259,11 @@ class _DateFilterBar extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text("To",
-                    style: GoogleFonts.lato(
-                        fontSize: 11,
-                        color: Colors.grey[500],
-                        fontWeight: FontWeight.w600)),
+                    style: AppTypography.bodySmall(color: Colors.grey[500], fontWeight: FontWeight.w600)),
                 Text(
                   DateFormat("dd-MM-yy")
                       .format(DateTime.parse(state.toDate)),
-                  style: GoogleFonts.lato(
-                      fontWeight: FontWeight.bold,
-                      fontSize: AppGlobals.FontLow,
-                      color: AppTokens.brandGradientStartDark),
+                  style: AppTypography.bodySmall(color: AppTokens.brandGradientStartDark),
                 ),
               ],
             ),
@@ -308,10 +292,7 @@ class _DateFilterBar extends StatelessWidget {
               elevation: 0,
             ),
             child: Text("View",
-                style: GoogleFonts.lato(
-                    color: colour.kWhite,
-                    fontWeight: FontWeight.bold,
-                    fontSize: AppGlobals.FontLow)),
+                style: AppTypography.bodySmall(color: colour.kWhite)),
           ),
         ],
       ),
@@ -390,7 +371,7 @@ class _FuelDiffCard extends StatelessWidget {
       diffColor = Colors.green;
       diffIcon  = Icons.trending_up;
     } else if (difference < 0) {
-      diffColor = Colors.red;
+      diffColor = colour.commonColorred;
       diffIcon  = Icons.trending_down;
     } else {
       diffColor = Colors.grey;
@@ -460,14 +441,10 @@ class _FuelDiffCard extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(driverName,
-                  style: GoogleFonts.lato(
-                      fontSize: 14,
-                      fontWeight: FontWeight.bold,
-                      color: AppTokens.brandGradientStartDark),
+                  style: AppTypography.heading3(color: AppTokens.brandGradientStartDark, fontWeight: FontWeight.bold),
                   overflow: TextOverflow.ellipsis),
               Text(truckName,
-                  style: GoogleFonts.lato(
-                      fontSize: 12, color: Colors.grey[600]),
+                  style: AppTypography.bodyMedium(color: Colors.grey[600]),
                   overflow: TextOverflow.ellipsis),
             ],
           ),
@@ -487,10 +464,7 @@ class _FuelDiffCard extends StatelessWidget {
               const SizedBox(width: 4),
               Text(
                 "${difference >= 0 ? '+' : ''}${difference.toStringAsFixed(1)}",
-                style: GoogleFonts.lato(
-                    color: diffColor,
-                    fontWeight: FontWeight.w700,
-                    fontSize: 13),
+                style: AppTypography.heading3(color: diffColor, fontWeight: FontWeight.w700),
               ),
             ],
           ),
@@ -529,14 +503,9 @@ class _FuelDiffCard extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(driverName,
-                      style: GoogleFonts.lato(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                          color: AppTokens.brandGradientStartDark)),
+                      style: AppTypography.heading1(color: AppTokens.brandGradientStartDark, fontWeight: FontWeight.bold)),
                   Text(truckName,
-                      style: GoogleFonts.lato(
-                          fontSize: 13,
-                          color: Colors.grey[600])),
+                      style: AppTypography.bodyLarge(color: Colors.grey[600])),
                 ],
               ),
             ),
@@ -578,10 +547,7 @@ class _FuelDiffCard extends StatelessWidget {
               const SizedBox(width: 6),
               Text(
                 "Difference: ${difference >= 0 ? '+' : ''}${difference.toStringAsFixed(2)}",
-                style: GoogleFonts.lato(
-                    color: diffColor,
-                    fontWeight: FontWeight.w600,
-                    fontSize: 15),
+                style: AppTypography.heading2(color: diffColor, fontWeight: FontWeight.w600),
               ),
             ],
           ),
@@ -595,15 +561,9 @@ class _FuelDiffCard extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(label,
-            style: GoogleFonts.lato(
-                fontSize: 11,
-                color: Colors.grey[500],
-                fontWeight: FontWeight.w600)),
+            style: AppTypography.bodySmall(color: Colors.grey[500], fontWeight: FontWeight.w600)),
         Text(value,
-            style: GoogleFonts.lato(
-                fontSize: 14,
-                fontWeight: FontWeight.bold,
-                color: color)),
+            style: AppTypography.heading3(color: color, fontWeight: FontWeight.bold)),
       ],
     );
   }
@@ -640,14 +600,10 @@ class _EmptyDetailPanel extends StatelessWidget {
           ),
           const SizedBox(height: 16),
           Text("Select a record",
-              style: GoogleFonts.lato(
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
-                  color: AppTokens.brandGradientStartDark)),
+              style: AppTypography.heading1(color: AppTokens.brandGradientStartDark, fontWeight: FontWeight.bold)),
           const SizedBox(height: 6),
           Text("Tap any card to view details",
-              style: GoogleFonts.lato(
-                  fontSize: 13, color: Colors.grey[500])),
+              style: AppTypography.bodyLarge(color: Colors.grey[500])),
         ],
       ),
     );
@@ -673,7 +629,7 @@ class _DetailPanel extends StatelessWidget {
       diffColor = Colors.green;
       diffIcon  = Icons.trending_up;
     } else if (difference < 0) {
-      diffColor = Colors.red;
+      diffColor = colour.commonColorred;
       diffIcon  = Icons.trending_down;
     } else {
       diffColor = Colors.grey;
@@ -714,10 +670,7 @@ class _DetailPanel extends StatelessWidget {
                     color: colour.kWhite, size: 22),
                 const SizedBox(width: 10),
                 Text("Fuel Details",
-                    style: GoogleFonts.lato(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                        color: colour.kWhite)),
+                    style: AppTypography.heading1(color: colour.kWhite, fontWeight: FontWeight.bold)),
               ],
             ),
           ),
@@ -740,10 +693,7 @@ class _DetailPanel extends StatelessWidget {
                   const SizedBox(width: 8),
                   Text(
                     "Diff: ${difference >= 0 ? '+' : ''}${difference.toStringAsFixed(2)} L",
-                    style: GoogleFonts.lato(
-                        color: diffColor,
-                        fontWeight: FontWeight.bold,
-                        fontSize: 16),
+                    style: AppTypography.heading1(color: diffColor, fontWeight: FontWeight.bold),
                   ),
                 ],
               ),
@@ -832,16 +782,10 @@ class _DetailPanel extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(label,
-                  style: GoogleFonts.lato(
-                      fontSize: 11,
-                      color: Colors.grey[500],
-                      fontWeight: FontWeight.w600)),
+                  style: AppTypography.bodySmall(color: Colors.grey[500], fontWeight: FontWeight.w600)),
               Text(
                 value.isNotEmpty ? value : "Not Available",
-                style: GoogleFonts.lato(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w700,
-                    color: AppTokens.brandGradientStartDark),
+                style: AppTypography.heading3(color: AppTokens.brandGradientStartDark, fontWeight: FontWeight.w700),
               ),
             ],
           ),
@@ -896,10 +840,7 @@ class _FuelDetailsDialog extends StatelessWidget {
                         color: colour.kWhite, size: 24),
                     const SizedBox(width: 12),
                     Text("Fuel Details",
-                        style: GoogleFonts.lato(
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold,
-                            color: colour.kWhite)),
+                        style: AppTypography.heading1(color: colour.kWhite, fontWeight: FontWeight.bold)),
                   ],
                 ),
               ),
@@ -984,11 +925,7 @@ class _FuelDetailsDialog extends StatelessWidget {
                           onPressed: () =>
                               Navigator.pop(context),
                           child: Text("Close",
-                              style: GoogleFonts.lato(
-                                  color: colour.kWhite,
-                                  fontSize: 16,
-                                  fontWeight:
-                                  FontWeight.bold)),
+                              style: AppTypography.heading1(color: colour.kWhite, fontWeight: FontWeight.bold)),
                         ),
                       ),
                     ],
@@ -1024,16 +961,10 @@ class _FuelDetailsDialog extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(label,
-                  style: GoogleFonts.lato(
-                      fontSize: 11,
-                      color: Colors.grey[500],
-                      fontWeight: FontWeight.w600)),
+                  style: AppTypography.bodySmall(color: Colors.grey[500], fontWeight: FontWeight.w600)),
               Text(
                 value.isNotEmpty ? value : "Not Available",
-                style: GoogleFonts.lato(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w700,
-                    color: AppTokens.brandGradientStartDark),
+                style: AppTypography.heading3(color: AppTokens.brandGradientStartDark, fontWeight: FontWeight.w700),
               ),
             ],
           ),

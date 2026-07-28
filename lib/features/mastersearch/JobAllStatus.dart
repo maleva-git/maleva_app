@@ -1,3 +1,4 @@
+import 'package:maleva/core/theme/app_typography.dart';
 import 'package:flutter/material.dart';
 import 'package:maleva/core/utils/app_globals.dart';
 import 'package:maleva/core/colors/colors.dart' as colour;
@@ -72,13 +73,7 @@ class _JobAllStatusstate extends State<JobAllStatus> {
         centerTitle: true,
         title: Text(
           'Job Status',
-          style: GoogleFonts.lato(
-            textStyle: TextStyle(
-                color: colour.topAppBarColor,
-                fontWeight: FontWeight.w700,
-                fontSize: AppGlobals.FontLarge,
-                letterSpacing: 0.5),
-          ),
+          style: AppTypography.heading1(color: colour.topAppBarColor),
         ),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_ios_new_rounded, color: colour.topAppBarColor, size: 22),
@@ -86,7 +81,7 @@ class _JobAllStatusstate extends State<JobAllStatus> {
         ),
       ),
       body: !progress
-          ? const Center(
+          ? Center(
               child: SpinKitFoldingCube(color: colour.spinKitColor, size: 35.0),
             )
           : SafeArea(
@@ -113,17 +108,10 @@ class _JobAllStatusstate extends State<JobAllStatus> {
                           controller: txtSearch,
                           textInputAction: TextInputAction.search,
                           textCapitalization: TextCapitalization.characters,
-                          style: GoogleFonts.lato(
-                            fontWeight: FontWeight.w600,
-                            color: const Color(0xFF1A2E5A),
-                            fontSize: 15,
-                          ),
+                          style: AppTypography.heading2(color: const Color(0xFF1A2E5A)),
                           decoration: InputDecoration(
                             hintText: 'Search Job Status...',
-                            hintStyle: GoogleFonts.lato(
-                              color: Colors.grey.shade400,
-                              fontWeight: FontWeight.w500,
-                            ),
+                            hintStyle: AppTypography.bodyLarge(),
                             prefixIcon: Icon(Icons.search_rounded, color: Colors.grey.shade400),
                             border: InputBorder.none,
                             contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
@@ -143,11 +131,7 @@ class _JobAllStatusstate extends State<JobAllStatus> {
                                     const SizedBox(height: 16),
                                     Text(
                                       'No Job Status Found',
-                                      style: GoogleFonts.lato(
-                                        color: Colors.grey.shade500,
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.w500,
-                                      ),
+                                      style: AppTypography.heading2(),
                                     ),
                                   ],
                                 ),
@@ -196,11 +180,7 @@ class _JobAllStatusstate extends State<JobAllStatus> {
                                             Expanded(
                                               child: Text(
                                                 item.StatusName.toString(),
-                                                style: GoogleFonts.lato(
-                                                  fontWeight: FontWeight.w700,
-                                                  color: const Color(0xFF1A2E5A),
-                                                  fontSize: 15,
-                                                ),
+                                                style: AppTypography.heading2(color: const Color(0xFF1A2E5A)),
                                               ),
                                             ),
                                             Icon(Icons.chevron_right_rounded, color: Colors.grey.shade400, size: 24),

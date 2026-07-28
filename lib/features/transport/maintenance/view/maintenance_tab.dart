@@ -1,3 +1,5 @@
+import 'package:maleva/core/theme/app_typography.dart';
+import 'package:maleva/core/colors/colors.dart' as colour;
 import 'package:flutter/Material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
@@ -11,9 +13,6 @@ import '../../../mastersearch/Truck.dart';
 import '../bloc/maintenance_bloc.dart';
 import '../bloc/maintenance_event.dart';
 import '../bloc/maintenance_state.dart';
-
-
-
 
 const kGradient = LinearGradient(
   colors: [AppTokens.invoiceHeaderStart, AppTokens.invoiceHeaderEnd],
@@ -32,8 +31,7 @@ class Maintenance extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (_) =>
-      TruckMaintenanceBloc()..add(TruckMaintenanceStarted()),
+      create: (_) => TruckMaintenanceBloc()..add(TruckMaintenanceStarted()),
       child: _MaintenancePage(showAppBar: showAppBar),
     );
   }
@@ -49,11 +47,11 @@ class _MaintenancePage extends StatelessWidget {
     final userName = AppGlobals.storagenew.getString('Username') ?? '';
 
     return PopScope(
-        canPop: false,
-        onPopInvokedWithResult: (didPop, result) {
-          if (didPop) return;
-          Navigator.pop(context);
-        },
+      canPop: false,
+      onPopInvokedWithResult: (didPop, result) {
+        if (didPop) return;
+        Navigator.pop(context);
+      },
       child: Scaffold(
         resizeToAvoidBottomInset: true,
         backgroundColor: AppTokens.invoicePageBg,
@@ -63,8 +61,9 @@ class _MaintenancePage extends StatelessWidget {
           builder: (context, state) {
             if (state is TruckMaintenanceInitial ||
                 state is TruckMaintenanceLoading) {
-              return const Center(
-                child: SpinKitFoldingCube(color: AppTokens.invoiceHeaderEnd, size: 35),
+              return Center(
+                child: SpinKitFoldingCube(
+                    color: AppTokens.invoiceHeaderEnd, size: 35),
               );
             }
             if (state is TruckMaintenanceLoaded) {
@@ -73,7 +72,8 @@ class _MaintenancePage extends StatelessWidget {
             if (state is TruckMaintenanceError) {
               return Center(
                 child: Text(state.message,
-                    style: GoogleFonts.lato(color: AppTokens.kExpiredRed)),
+                    style:
+                        AppTypography.bodyLarge(color: AppTokens.kExpiredRed)),
               );
             }
             return const SizedBox.shrink();
@@ -83,14 +83,13 @@ class _MaintenancePage extends StatelessWidget {
     );
   }
 
-  PreferredSizeWidget _buildAppBar(
-      BuildContext context, String userName) {
+  PreferredSizeWidget _buildAppBar(BuildContext context, String userName) {
     return AppBar(
       automaticallyImplyLeading: false,
       elevation: 0,
       toolbarHeight: 62,
       flexibleSpace:
-      Container(decoration: const BoxDecoration(gradient: kGradient)),
+          Container(decoration: const BoxDecoration(gradient: kGradient)),
       leading: IconButton(
         icon: const Icon(Icons.arrow_back_ios_new_rounded, size: 20),
         color: Colors.white,
@@ -101,17 +100,10 @@ class _MaintenancePage extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text('Truck Maintenance',
-              style: GoogleFonts.lato(
-                  color: Colors.white,
-                  fontWeight: FontWeight.w700,
-                  fontSize: 17,
-                  letterSpacing: 0.3)),
+              style: AppTypography.bodyLarge(
+                  color: Colors.white, fontWeight: FontWeight.bold)),
           const SizedBox(height: 2),
-          Text(userName,
-              style: GoogleFonts.lato(
-                  color: Colors.white.withValues(alpha: 0.65),
-                  fontWeight: FontWeight.w500,
-                  fontSize: 12)),
+          Text(userName, style: AppTypography.bodySmall(color: Colors.white)),
         ],
       ),
       iconTheme: const IconThemeData(color: Colors.white),
@@ -137,8 +129,7 @@ class _MaintenanceBody extends StatelessWidget {
             if (state.visibleTruck)
               Padding(
                 padding: EdgeInsets.fromLTRB(hPad, 14, hPad, 0),
-                child: _TruckSelector(
-                    state: state, isTablet: isTablet),
+                child: _TruckSelector(state: state, isTablet: isTablet),
               ),
 
             const SizedBox(height: 8),
@@ -148,12 +139,9 @@ class _MaintenanceBody extends StatelessWidget {
               child: state.truckDetails.isEmpty
                   ? _EmptyState()
                   : isTablet
-                  ? _TruckDetailGridList(
-                  state: state,
-                  hPad: hPad,
-                  constraints: constraints)
-                  : _TruckDetailList(
-                  state: state, hPad: hPad),
+                      ? _TruckDetailGridList(
+                          state: state, hPad: hPad, constraints: constraints)
+                      : _TruckDetailList(state: state, hPad: hPad),
             ),
           ],
         );
@@ -166,8 +154,7 @@ class _MaintenanceBody extends StatelessWidget {
 class _TruckSelector extends StatelessWidget {
   final TruckMaintenanceLoaded state;
   final bool isTablet;
-  const _TruckSelector(
-      {required this.state, required this.isTablet});
+  const _TruckSelector({required this.state, required this.isTablet});
 
   @override
   Widget build(BuildContext context) {
@@ -177,16 +164,14 @@ class _TruckSelector extends StatelessWidget {
           Navigator.push(
             context,
             MaterialPageRoute(
-                builder: (_) =>
-                const Truck(Searchby: 1, SearchId: 0)),
+                builder: (_) => const Truck(Searchby: 1, SearchId: 0)),
           ).then((_) {
             final sel = AppGlobals.SelectTruckList;
             if (sel.Id != 0) {
               if (!context.mounted) return;
               context.read<TruckMaintenanceBloc>().add(
                   TruckMaintenanceTruckSelected(
-                      truckId: sel.Id,
-                      truckName: sel.AccountName));
+                      truckId: sel.Id, truckName: sel.AccountName));
               AppGlobals.SelectTruckList = GetTruckModel.Empty();
             }
           });
@@ -201,7 +186,7 @@ class _TruckSelector extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
         decoration: BoxDecoration(
           gradient: const LinearGradient(
-            colors: [Color(0xFFFFFFFF), Color(0xFFF8F9FA)],
+            colors: [Colors.white, AppTokens.surfacePage],
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
           ),
@@ -213,7 +198,9 @@ class _TruckSelector extends StatelessWidget {
               offset: const Offset(0, 4),
             ),
           ],
-          border: Border.all(color: AppTokens.maintCardBorder.withValues(alpha: 0.5), width: 1),
+          border: Border.all(
+              color: AppTokens.maintCardBorder.withValues(alpha: 0.5),
+              width: 1),
         ),
         child: Row(
           children: [
@@ -233,25 +220,18 @@ class _TruckSelector extends StatelessWidget {
                 children: [
                   Text(
                     'TRUCK SELECTION',
-                    style: GoogleFonts.lato(
-                      color: AppTokens.planTextMuted,
-                      fontWeight: FontWeight.w700,
-                      fontSize: 10,
-                      letterSpacing: 0.8,
-                    ),
+                    style:
+                        AppTypography.bodySmall(color: AppTokens.planTextMuted),
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    state.truckName.isEmpty ? 'Select Truck No' : state.truckName,
-                    style: GoogleFonts.lato(
-                      color: state.truckName.isEmpty
-                          ? AppTokens.maintTextDark.withValues(alpha: 0.6)
-                          : AppTokens.maintTextDark,
-                      fontWeight: state.truckName.isEmpty
-                          ? FontWeight.w500
-                          : FontWeight.w700,
-                      fontSize: isTablet ? AppGlobals.FontLow + 2 : AppGlobals.FontLow + 1,
-                    ),
+                    state.truckName.isEmpty
+                        ? 'Select Truck No'
+                        : state.truckName,
+                    style: AppTypography.bodySmall(
+                        color: state.truckName.isEmpty
+                            ? AppTokens.maintTextDark.withValues(alpha: 0.6)
+                            : AppTokens.maintTextDark),
                     overflow: TextOverflow.ellipsis,
                   ),
                 ],
@@ -260,8 +240,8 @@ class _TruckSelector extends StatelessWidget {
             Container(
               padding: const EdgeInsets.all(8),
               decoration: BoxDecoration(
-                color: state.truckName.isNotEmpty 
-                    ? Colors.red.withValues(alpha: 0.1) 
+                color: state.truckName.isNotEmpty
+                    ? colour.commonColorred.withValues(alpha: 0.1)
                     : AppTokens.invoiceHeaderEnd.withValues(alpha: 0.1),
                 shape: BoxShape.circle,
               ),
@@ -270,8 +250,8 @@ class _TruckSelector extends StatelessWidget {
                     ? Icons.close_rounded
                     : Icons.search_rounded,
                 size: 20,
-                color: state.truckName.isNotEmpty 
-                    ? Colors.red 
+                color: state.truckName.isNotEmpty
+                    ? colour.commonColorred
                     : AppTokens.invoiceHeaderEnd,
               ),
             ),
@@ -286,8 +266,7 @@ class _TruckSelector extends StatelessWidget {
 class _TruckDetailList extends StatelessWidget {
   final TruckMaintenanceLoaded state;
   final double hPad;
-  const _TruckDetailList(
-      {required this.state, required this.hPad});
+  const _TruckDetailList({required this.state, required this.hPad});
 
   @override
   Widget build(BuildContext context) {
@@ -320,9 +299,9 @@ class _TruckDetailGridList extends StatelessWidget {
     return GridView.builder(
       padding: EdgeInsets.fromLTRB(hPad, 8, hPad, 24),
       gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount:   2,
+        crossAxisCount: 2,
         crossAxisSpacing: 12,
-        mainAxisSpacing:  12,
+        mainAxisSpacing: 12,
         childAspectRatio: 0.72,
       ),
       itemCount: state.truckDetails.length,
@@ -342,16 +321,16 @@ class _TruckCard extends StatelessWidget {
   final bool isTablet;
 
   const _TruckCard(
-      {required this.item,
-        required this.state,
-        required this.isTablet});
+      {required this.item, required this.state, required this.isTablet});
 
   // Expiry color helpers — pure functions, no setState needed
-  Color _expColor(String date) =>
-      _isExpired(date, state.expDate) ? AppTokens.kExpiredRed : AppTokens.maintTextDark;
+  Color _expColor(String date) => _isExpired(date, state.expDate)
+      ? AppTokens.kExpiredRed
+      : AppTokens.maintTextDark;
 
-  Color _apadBonamColor(String date) =>
-      _isExpired(date, state.expApadBonam) ? AppTokens.kExpiredRed : AppTokens.maintTextDark;
+  Color _apadBonamColor(String date) => _isExpired(date, state.expApadBonam)
+      ? AppTokens.kExpiredRed
+      : AppTokens.maintTextDark;
 
   Color _serviceAlignGreeceColor(String date) =>
       _isExpired(date, state.expServiceAlignGreece)
@@ -363,12 +342,9 @@ class _TruckCard extends StatelessWidget {
       return false;
     }
     try {
-      final lic =
-      DateFormat('yyyy/MM/dd').parse(licenseDate);
-      final thr =
-      DateFormat('yyyy-MM-dd').parse(threshold);
-      return lic.isBefore(thr) ||
-          lic.isAtSameMomentAs(thr);
+      final lic = DateFormat('yyyy/MM/dd').parse(licenseDate);
+      final thr = DateFormat('yyyy-MM-dd').parse(threshold);
+      return lic.isBefore(thr) || lic.isAtSameMomentAs(thr);
     } catch (_) {
       return false;
     }
@@ -378,11 +354,7 @@ class _TruckCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final labelStyle = GoogleFonts.lato(
-      color: AppTokens.maintTextMid,
-      fontWeight: FontWeight.w600,
-      fontSize: isTablet ? AppGlobals.FontLow + 1 : AppGlobals.FontLow,
-    );
+    final labelStyle = AppTypography.bodySmall(color: AppTokens.maintTextMid);
 
     // All field rows for this card
     final fields = [
@@ -394,12 +366,18 @@ class _TruckCard extends StatelessWidget {
         valueColor: Colors.white,
         isTablet: isTablet,
       ),
-      _FieldRow('RotexMy Exp',  _safe(item.RotexMyExp),  _expColor(item.RotexMyExp),  labelStyle),
-      _FieldRow('RotexSG Exp',  _safe(item.RotexSGExp),  _expColor(item.RotexSGExp),  labelStyle),
-      _FieldRow('PushpaCom',    _safe(item.PuspacomExp), _expColor(item.PuspacomExp), labelStyle),
-      _FieldRow('Insurance',    _safe(item.InsuratnceExp),_expColor(item.InsuratnceExp),labelStyle),
-      _FieldRow('Bonam Exp',    _safe(item.BonamExp),    _apadBonamColor(item.BonamExp),  labelStyle),
-      _FieldRow('Apad Exp',     _safe(item.ApadExp),     _apadBonamColor(item.ApadExp),   labelStyle),
+      _FieldRow('RotexMy Exp', _safe(item.RotexMyExp),
+          _expColor(item.RotexMyExp), labelStyle),
+      _FieldRow('RotexSG Exp', _safe(item.RotexSGExp),
+          _expColor(item.RotexSGExp), labelStyle),
+      _FieldRow('PushpaCom', _safe(item.PuspacomExp),
+          _expColor(item.PuspacomExp), labelStyle),
+      _FieldRow('Insurance', _safe(item.InsuratnceExp),
+          _expColor(item.InsuratnceExp), labelStyle),
+      _FieldRow('Bonam Exp', _safe(item.BonamExp),
+          _apadBonamColor(item.BonamExp), labelStyle),
+      _FieldRow('Apad Exp', _safe(item.ApadExp), _apadBonamColor(item.ApadExp),
+          labelStyle),
       // Truck 2 header
       _FieldSection(
         isHeader: true,
@@ -408,18 +386,30 @@ class _TruckCard extends StatelessWidget {
         valueColor: Colors.white,
         isTablet: isTablet,
       ),
-      _FieldRow('RotexMy1',     _safe(item.RotexMyExp1),  _expColor(item.RotexMyExp1),  labelStyle),
-      _FieldRow('RotexSG1',     _safe(item.RotexSGExp1),  _expColor(item.RotexSGExp1),  labelStyle),
-      _FieldRow('PushpaCom1',   _safe(item.PuspacomExp1), _expColor(item.PuspacomExp1), labelStyle),
-      _FieldRow('Service Exp',  _safe(item.ServiceExp),   _serviceAlignGreeceColor(item.ServiceExp),  labelStyle),
-      _FieldRow('Service Last', _safe(item.ServiceLast),  AppTokens.maintTextDark, labelStyle),
-      _FieldRow('AlignmentExp', _safe(item.AlignmentExp), _serviceAlignGreeceColor(item.AlignmentExp), labelStyle),
-      _FieldRow('Alignment Last',_safe(item.AlignmentLast),AppTokens.maintTextDark, labelStyle),
-      _FieldRow('Greece Exp',   _safe(item.GreeceExp),    _serviceAlignGreeceColor(item.GreeceExp),   labelStyle),
-      _FieldRow('Greece Last',  _safe(item.GreeceLast),   AppTokens.maintTextDark, labelStyle),
-      _FieldRow('GearOil Exp',  _safe(item.GearOilExp),   _serviceAlignGreeceColor(item.GearOilExp),  labelStyle),
-      _FieldRow('GearOil Last', _safe(item.GearOilLast),  AppTokens.maintTextDark, labelStyle),
-      _FieldRow('PTPSticker Exp',_safe(item.PTPStickerExp),_serviceAlignGreeceColor(item.PTPStickerExp),labelStyle),
+      _FieldRow('RotexMy1', _safe(item.RotexMyExp1),
+          _expColor(item.RotexMyExp1), labelStyle),
+      _FieldRow('RotexSG1', _safe(item.RotexSGExp1),
+          _expColor(item.RotexSGExp1), labelStyle),
+      _FieldRow('PushpaCom1', _safe(item.PuspacomExp1),
+          _expColor(item.PuspacomExp1), labelStyle),
+      _FieldRow('Service Exp', _safe(item.ServiceExp),
+          _serviceAlignGreeceColor(item.ServiceExp), labelStyle),
+      _FieldRow('Service Last', _safe(item.ServiceLast),
+          AppTokens.maintTextDark, labelStyle),
+      _FieldRow('AlignmentExp', _safe(item.AlignmentExp),
+          _serviceAlignGreeceColor(item.AlignmentExp), labelStyle),
+      _FieldRow('Alignment Last', _safe(item.AlignmentLast),
+          AppTokens.maintTextDark, labelStyle),
+      _FieldRow('Greece Exp', _safe(item.GreeceExp),
+          _serviceAlignGreeceColor(item.GreeceExp), labelStyle),
+      _FieldRow('Greece Last', _safe(item.GreeceLast), AppTokens.maintTextDark,
+          labelStyle),
+      _FieldRow('GearOil Exp', _safe(item.GearOilExp),
+          _serviceAlignGreeceColor(item.GearOilExp), labelStyle),
+      _FieldRow('GearOil Last', _safe(item.GearOilLast),
+          AppTokens.maintTextDark, labelStyle),
+      _FieldRow('PTPSticker Exp', _safe(item.PTPStickerExp),
+          _serviceAlignGreeceColor(item.PTPStickerExp), labelStyle),
     ];
 
     return Container(
@@ -444,13 +434,11 @@ class _TruckCard extends StatelessWidget {
             // Top gradient accent
             Container(
                 height: 3,
-                decoration:
-                const BoxDecoration(gradient: kGradient)),
+                decoration: const BoxDecoration(gradient: kGradient)),
 
             // Expiry notice
             Padding(
-              padding: const EdgeInsets.symmetric(
-                  horizontal: 12, vertical: 6),
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
               child: Row(
                 children: [
                   const Icon(Icons.info_outline_rounded,
@@ -459,11 +447,8 @@ class _TruckCard extends StatelessWidget {
                   Expanded(
                     child: Text(
                       'Expiry till: ${state.expDate}',
-                      style: GoogleFonts.lato(
-                        color: AppTokens.planTextMuted,
-                        fontWeight: FontWeight.w500,
-                        fontSize: isTablet ? 12 : 11,
-                      ),
+                      style: AppTypography.bodySmall(
+                          color: AppTokens.planTextMuted),
                     ),
                   ),
                 ],
@@ -482,11 +467,11 @@ class _TruckCard extends StatelessWidget {
 
 // ─── Section header row (Truck 1 / Truck 2) ──────────────────────────────────
 class _FieldSection extends StatelessWidget {
-  final bool   isHeader;
+  final bool isHeader;
   final String label;
   final String value;
-  final Color  valueColor;
-  final bool   isTablet;
+  final Color valueColor;
+  final bool isTablet;
 
   const _FieldSection({
     required this.isHeader,
@@ -499,36 +484,22 @@ class _FieldSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(
-          horizontal: 12, vertical: 8),
-      decoration: const BoxDecoration(
-          gradient: kGradient),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      decoration: const BoxDecoration(gradient: kGradient),
       child: Row(
         children: [
           Expanded(
             flex: 2,
             child: Text(
               label,
-              style: GoogleFonts.lato(
-                color: Colors.white,
-                fontWeight: FontWeight.w700,
-                fontSize: isTablet
-                    ? AppGlobals.FontLow + 1
-                    : AppGlobals.FontLow,
-              ),
+              style: AppTypography.bodySmall(color: Colors.white),
             ),
           ),
           Expanded(
             flex: 3,
             child: Text(
               value,
-              style: GoogleFonts.lato(
-                color: Colors.white,
-                fontWeight: FontWeight.w700,
-                fontSize: isTablet
-                    ? AppGlobals.FontLow + 1
-                    : AppGlobals.FontLow,
-              ),
+              style: AppTypography.bodySmall(color: Colors.white),
               overflow: TextOverflow.ellipsis,
             ),
           ),
@@ -542,11 +513,10 @@ class _FieldSection extends StatelessWidget {
 class _FieldRow extends StatelessWidget {
   final String label;
   final String value;
-  final Color  valueColor;
+  final Color valueColor;
   final TextStyle labelStyle;
 
-  const _FieldRow(
-      this.label, this.value, this.valueColor, this.labelStyle);
+  const _FieldRow(this.label, this.value, this.valueColor, this.labelStyle);
 
   @override
   Widget build(BuildContext context) {
@@ -554,8 +524,7 @@ class _FieldRow extends StatelessWidget {
     final isExpired = valueColor == AppTokens.kExpiredRed;
 
     return Container(
-      padding: const EdgeInsets.symmetric(
-          horizontal: 12, vertical: 6),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
       color: isExpired
           ? AppTokens.kExpiredRed.withValues(alpha: 0.06)
           : Colors.transparent,
@@ -587,11 +556,7 @@ class _FieldRow extends StatelessWidget {
                 Expanded(
                   child: Text(
                     value.isEmpty ? '-' : value,
-                    style: GoogleFonts.lato(
-                      color: valueColor,
-                      fontWeight: FontWeight.w600,
-                      fontSize: labelStyle.fontSize,
-                    ),
+                    style: AppTypography.bodyLarge(color: valueColor),
                     overflow: TextOverflow.ellipsis,
                   ),
                 ),
@@ -624,14 +589,11 @@ class _EmptyState extends StatelessWidget {
           ),
           const SizedBox(height: 14),
           Text('No Truck Selected',
-              style: GoogleFonts.lato(
-                  color: AppTokens.maintTextDark,
-                  fontWeight: FontWeight.w600,
-                  fontSize: 15)),
+              style: AppTypography.bodyLarge(
+                  color: AppTokens.maintTextDark, fontWeight: FontWeight.bold)),
           const SizedBox(height: 4),
           Text('Search for a truck to view maintenance details',
-              style: GoogleFonts.lato(
-                  color: AppTokens.planTextMuted, fontSize: 12)),
+              style: AppTypography.bodySmall(color: AppTokens.planTextMuted)),
         ],
       ),
     );

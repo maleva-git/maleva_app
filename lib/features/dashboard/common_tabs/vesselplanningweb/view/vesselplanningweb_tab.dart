@@ -1,3 +1,7 @@
+import 'package:maleva/core/colors/colors.dart' as colour;
+import 'package:maleva/core/network/legacy_api_repository.dart';
+import 'package:maleva/core/di/injection.dart';
+import 'package:maleva/core/theme/app_typography.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -10,7 +14,7 @@ import '../../../../../core/utils/app_globals.dart';
 import '../../../../../core/utils/app_preferences.dart';
 import '../../../../mastersearch/Port.dart';
 import '../../../../mastersearch/Employee.dart';
-import '../../../../../core/network/OnlineApi.dart' as OnlineApi;
+
 import '../bloc/vesselplanningweb_bloc.dart';
 import '../bloc/vesselplanningweb_event.dart';
 import '../bloc/vesselplanningweb_state.dart';
@@ -44,8 +48,8 @@ class VesselPlanningWebTab extends StatelessWidget {
   Widget build(BuildContext context) {
     if (!pageView) {
       return Scaffold(
-        appBar: AppBar(title: const Text('Access Denied')),
-        body: const Center(
+        appBar: AppBar(title: Text('Access Denied')),
+        body: Center(
             child: Text('You do not have permission to view this page.')),
       );
     }
@@ -209,7 +213,7 @@ class _VesselPlanningWebViewState extends State<VesselPlanningWebView> {
         if (toDateRaw != null && toDateRaw.toString().isNotEmpty) {
           _toDate = DateTime.parse(toDateRaw.toString().split('T')[0]);
         }
-      } catch (_) {}
+      } catch (e, stack) { debugPrint("Error caught globally: $e\n$stack"); }
 
       // Reset master filter toggles since backend doesn't store them for saved plannings
       _etaType = 3; 
@@ -245,13 +249,13 @@ class _VesselPlanningWebViewState extends State<VesselPlanningWebView> {
 
   void _savePlanning(BuildContext context) {
     if (!widget.pageAdd) {
-      msgshow('Permission Denied', ' You do not have permission to add plannings.', Colors.white, Colors.redAccent, null, 14, null, null, context, 2);
+      msgshow('Permission Denied', ' You do not have permission to add plannings.', Colors.white, colour.commonColorred, null, 14, null, null, context, 2);
       return;
     }
 
     final checkedItems = _currentData.where((e) => e.isChecked).toList();
     if (checkedItems.isEmpty) {
-      msgshow('Selection Required', ' Please select at least one job to plan.', Colors.white, Colors.redAccent, null, 14, null, null, context, 2);
+      msgshow('Selection Required', ' Please select at least one job to plan.', Colors.white, colour.commonColorred, null, 14, null, null, context, 2);
       return;
     }
 
@@ -444,12 +448,7 @@ class _VesselPlanningWebViewState extends State<VesselPlanningWebView> {
         ),
         title: Text(
           "Vessel Planning",
-          style: GoogleFonts.lato(
-            color: Colors.white,
-            fontWeight: FontWeight.w700,
-            fontSize: 16,
-            letterSpacing: 0.3,
-          ),
+          style: AppTypography.heading1(color: Colors.white, fontWeight: FontWeight.w700),
         ),
         actions: [
           if (_currentMasterId > 0 && widget.pageDelete)
@@ -468,7 +467,7 @@ class _VesselPlanningWebViewState extends State<VesselPlanningWebView> {
       body: BlocConsumer<VesselPlanningWebBloc, VesselPlanningWebState>(
         listener: (context, state) {
           if (state is VesselPlanningWebError) {
-            msgshow('Error', ' ${state.message}', Colors.white, Colors.redAccent, null, 14, null, null, context, 2);
+            msgshow('Error', ' ${state.message}', Colors.white, colour.commonColorred, null, 14, null, null, context, 2);
           } else if (state is VesselPlanningWebActionSuccess) {
             msgshow('Success', ' ${state.message}', Colors.white, AppTokens.statusSuccess, null, 14, null, null, context, 2);
             if (_currentMasterId == 0) {
@@ -497,7 +496,7 @@ class _VesselPlanningWebViewState extends State<VesselPlanningWebView> {
             children: [
               _buildMasterPanel(context),
               if (isLoading)
-                const Padding(
+                Padding(
                   padding: EdgeInsets.all(20.0),
                   child: SpinKitFoldingCube(
                       color: colour.kHeaderGradEnd, size: 35.0),
@@ -515,10 +514,7 @@ class _VesselPlanningWebViewState extends State<VesselPlanningWebView> {
     return ExpansionTile(
       initiallyExpanded: true,
       title: Text("Master Filters & Planning Info",
-          style: GoogleFonts.lato(
-              fontWeight: FontWeight.w700,
-              fontSize: 14,
-              color: colour.kTextDark)),
+          style: AppTypography.heading3(color: colour.kTextDark, fontWeight: FontWeight.w700)),
       childrenPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       backgroundColor: Colors.white,
       collapsedBackgroundColor: Colors.white,
@@ -585,8 +581,7 @@ class _VesselPlanningWebViewState extends State<VesselPlanningWebView> {
               activeColor: AppTokens.invoiceHeaderStart,
             ),
             Text("Delivery Done",
-                style: GoogleFonts.lato(
-                    fontSize: 12, fontWeight: FontWeight.w600)),
+                style: AppTypography.bodyMedium()),
           ],
         ),
         const SizedBox(height: 12),
@@ -599,8 +594,7 @@ class _VesselPlanningWebViewState extends State<VesselPlanningWebView> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text("Search Port",
-                      style: GoogleFonts.lato(
-                          fontSize: 16, fontWeight: FontWeight.bold)),
+                      style: AppTypography.heading1()),
                   const SizedBox(height: 6),
                   Container(
                     height: 48,
@@ -611,7 +605,7 @@ class _VesselPlanningWebViewState extends State<VesselPlanningWebView> {
                     ),
                     child: TextField(
                       controller: _portStringController,
-                      style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+                      style: AppTypography.heading2(),
                       decoration: const InputDecoration(
                           border: InputBorder.none,
                           contentPadding: EdgeInsets.symmetric(
@@ -632,8 +626,7 @@ class _VesselPlanningWebViewState extends State<VesselPlanningWebView> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text("Add Port",
-                      style: GoogleFonts.lato(
-                          fontSize: 16, fontWeight: FontWeight.bold)),
+                      style: AppTypography.heading1()),
                   const SizedBox(height: 6),
                   InkWell(
                     onTap: () {
@@ -668,8 +661,8 @@ class _VesselPlanningWebViewState extends State<VesselPlanningWebView> {
                       ),
                       padding: const EdgeInsets.symmetric(horizontal: 10),
                       alignment: Alignment.centerLeft,
-                      child: const Text('Select Port',
-                          style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+                      child: Text('Select Port',
+                          style: AppTypography.heading2(),
                           overflow: TextOverflow.ellipsis),
                     ),
                   ),
@@ -682,12 +675,11 @@ class _VesselPlanningWebViewState extends State<VesselPlanningWebView> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text("Employee",
-                      style: GoogleFonts.lato(
-                          fontSize: 16, fontWeight: FontWeight.bold)),
+                      style: AppTypography.heading1()),
                   const SizedBox(height: 6),
                   InkWell(
                     onTap: () async {
-                      await OnlineApi.SelectEmployee(context, 'Sales', '');
+                      await sl<LegacyApiRepository>().SelectEmployee(context, 'Sales', '');
                       if (!mounted) return;
                       if (!context.mounted) return;
                       final res = await Navigator.push(
@@ -710,7 +702,7 @@ class _VesselPlanningWebViewState extends State<VesselPlanningWebView> {
                       alignment: Alignment.centerLeft,
                       child: Text(
                         _selectedEmployee?.AccountName ?? 'Select Emp',
-                        style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+                        style: AppTypography.heading2(),
                         overflow: TextOverflow.ellipsis,
                       ),
                     ),
@@ -729,8 +721,7 @@ class _VesselPlanningWebViewState extends State<VesselPlanningWebView> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text("Remarks",
-                      style: GoogleFonts.lato(
-                          fontSize: 16, fontWeight: FontWeight.bold)),
+                      style: AppTypography.heading1()),
                   const SizedBox(height: 6),
                   Container(
                     height: 48,
@@ -741,7 +732,7 @@ class _VesselPlanningWebViewState extends State<VesselPlanningWebView> {
                     ),
                     child: TextField(
                       controller: _remarksCtrl,
-                      style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+                      style: AppTypography.heading2(),
                       decoration: const InputDecoration(
                           border: InputBorder.none,
                           contentPadding: EdgeInsets.symmetric(
@@ -760,14 +751,31 @@ class _VesselPlanningWebViewState extends State<VesselPlanningWebView> {
             Expanded(
               child: SizedBox(
                 height: 48,
-                child: ElevatedButton(
-                  onPressed: _doSearch,
-                  style: ElevatedButton.styleFrom(
-                      backgroundColor: colour.kHeaderGradEnd,
-                      foregroundColor: Colors.white,
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8))),
-                  child: const Text('VIEW',
-                      style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold)),
+                child: Container(
+                  decoration: BoxDecoration(
+                    gradient: kGradient,
+                    borderRadius: BorderRadius.circular(8),
+                    boxShadow: [
+                      BoxShadow(
+                        color: AppTokens.invoiceHeaderStart.withValues(alpha: 0.35),
+                        blurRadius: 8,
+                        offset: const Offset(0, 3),
+                      ),
+                    ],
+                  ),
+                  child: Material(
+                    color: Colors.transparent,
+                    child: InkWell(
+                      onTap: _doSearch,
+                      borderRadius: BorderRadius.circular(8),
+                      child: Center(
+                        child: Text(
+                          'VIEW',
+                          style: AppTypography.heading2(color: Colors.white),
+                        ),
+                      ),
+                    ),
+                  ),
                 ),
               ),
             ),
@@ -775,14 +783,31 @@ class _VesselPlanningWebViewState extends State<VesselPlanningWebView> {
             Expanded(
               child: SizedBox(
                 height: 48,
-                child: ElevatedButton(
-                  onPressed: () => _savePlanning(context),
-                  style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.green,
-                      foregroundColor: Colors.white,
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8))),
-                  child: const Text('SAVE',
-                      style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold)),
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: AppTokens.statusSuccess, // Replaced Colors.green with standard token
+                    borderRadius: BorderRadius.circular(8),
+                    boxShadow: [
+                      BoxShadow(
+                        color: AppTokens.statusSuccess.withValues(alpha: 0.35),
+                        blurRadius: 8,
+                        offset: const Offset(0, 3),
+                      ),
+                    ],
+                  ),
+                  child: Material(
+                    color: Colors.transparent,
+                    child: InkWell(
+                      onTap: () => _savePlanning(context),
+                      borderRadius: BorderRadius.circular(8),
+                      child: Center(
+                        child: Text(
+                          'SAVE',
+                          style: AppTypography.heading2(color: Colors.white),
+                        ),
+                      ),
+                    ),
+                  ),
                 ),
               ),
             ),
@@ -808,14 +833,10 @@ class _VesselPlanningWebViewState extends State<VesselPlanningWebView> {
             child: TextField(
               controller: _searchCtrl,
               onChanged: (v) => setState(() => _searchQuery = v),
-              style: GoogleFonts.lato(
-                  color: colour.kTextDark,
-                  fontSize: 13,
-                  fontWeight: FontWeight.w600),
+              style: AppTypography.bodyLarge(color: colour.kTextDark, fontWeight: FontWeight.w600),
               decoration: InputDecoration(
                 hintText: 'Search within grid...',
-                hintStyle: GoogleFonts.lato(
-                    color: AppTokens.planTextMuted, fontSize: 13),
+                hintStyle: AppTypography.bodyLarge(color: AppTokens.planTextMuted),
                 border: InputBorder.none,
                 contentPadding:
                     const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
@@ -840,10 +861,7 @@ class _VesselPlanningWebViewState extends State<VesselPlanningWebView> {
           child: Row(
             children: [
               Text('${filtered.length} jobs',
-                  style: GoogleFonts.lato(
-                      color: AppTokens.planTextMuted,
-                      fontSize: 12,
-                      fontWeight: FontWeight.w600)),
+                  style: AppTypography.bodyMedium(color: AppTokens.planTextMuted, fontWeight: FontWeight.w600)),
               const Spacer(),
               if (filtered.isNotEmpty)
                 TextButton.icon(
@@ -877,10 +895,7 @@ class _VesselPlanningWebViewState extends State<VesselPlanningWebView> {
                   const Icon(Icons.search_off_rounded, size: 50, color: Colors.grey),
                   const SizedBox(height: 12),
                   Text('No Data Found',
-                      style: GoogleFonts.lato(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w600,
-                          color: Colors.grey.shade600)),
+                      style: AppTypography.heading1(color: Colors.grey.shade600, fontWeight: FontWeight.w600)),
                 ],
               ),
             ),
@@ -946,7 +961,7 @@ class _TextFieldItem extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(label,
-            style: GoogleFonts.lato(fontSize: 16, fontWeight: FontWeight.bold)),
+            style: AppTypography.heading1()),
         const SizedBox(height: 6),
         Container(
           height: 48,
@@ -958,7 +973,7 @@ class _TextFieldItem extends StatelessWidget {
           child: TextField(
             controller: controller,
             readOnly: readOnly,
-            style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+            style: AppTypography.heading2(),
             decoration: const InputDecoration(
                 border: InputBorder.none,
                 contentPadding:
@@ -983,7 +998,7 @@ class _DateTile extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(label,
-            style: GoogleFonts.lato(fontSize: 16, fontWeight: FontWeight.bold)),
+            style: AppTypography.heading1()),
         const SizedBox(height: 6),
         InkWell(
           onTap: onTap,
@@ -1002,7 +1017,7 @@ class _DateTile extends StatelessWidget {
                 const SizedBox(width: 8),
                 Expanded(
                     child: Text(date,
-                        style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+                        style: AppTypography.heading2(),
                         overflow: TextOverflow.ellipsis)),
               ],
             ),
@@ -1036,11 +1051,7 @@ class _EtaChip extends StatelessWidget {
         ),
         child: Text(
           label,
-          style: GoogleFonts.lato(
-            color: selected ? Colors.white : AppTokens.planTextMuted,
-            fontWeight: FontWeight.w600,
-            fontSize: 11,
-          ),
+          style: AppTypography.bodySmall(color: selected ? Colors.white : AppTokens.planTextMuted, fontWeight: FontWeight.w600),
         ),
       ),
     );
@@ -1113,7 +1124,7 @@ class _JobCard extends StatelessWidget {
                   if (isSortMode)
                     ReorderableDragStartListener(
                       index: index,
-                      child: const Padding(
+                      child: Padding(
                         padding: EdgeInsets.only(right: 8.0),
                         child: Icon(Icons.drag_handle_rounded, color: Colors.grey, size: 24),
                       ),
@@ -1145,11 +1156,7 @@ class _JobCard extends StatelessWidget {
                       data.jobNo.isNotEmpty
                           ? data.jobNo
                           : '#${data.saleOrderMasterRefId}',
-                      style: GoogleFonts.lato(
-                        color: AppTokens.invoiceHeaderStart,
-                        fontWeight: FontWeight.w800,
-                        fontSize: 14,
-                      ),
+                      style: AppTypography.heading3(color: AppTokens.invoiceHeaderStart, fontWeight: FontWeight.w800),
                     ),
                   ),
                   // Status badge
@@ -1166,11 +1173,7 @@ class _JobCard extends StatelessWidget {
                       ),
                       child: Text(
                         data.jobStatus,
-                        style: GoogleFonts.lato(
-                          color: AppTokens.statusSuccess,
-                          fontSize: 9,
-                          fontWeight: FontWeight.w700,
-                        ),
+                        style: AppTypography.badgeText(color: AppTokens.statusSuccess, fontWeight: FontWeight.w700),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                       ),
@@ -1245,11 +1248,7 @@ class _JobCard extends StatelessWidget {
                   const SizedBox(width: 4),
                   Text(
                     'Job Date: ${data.jobDate}',
-                    style: GoogleFonts.lato(
-                      color: AppTokens.planTextMuted,
-                      fontSize: 11,
-                      fontWeight: FontWeight.w600,
-                    ),
+                    style: AppTypography.bodySmall(color: AppTokens.planTextMuted, fontWeight: FontWeight.w600),
                   ),
                   const Spacer(),
                   const Icon(Icons.touch_app_rounded,
@@ -1257,10 +1256,7 @@ class _JobCard extends StatelessWidget {
                   const SizedBox(width: 4),
                   Text(
                     'Long press to edit',
-                    style: GoogleFonts.lato(
-                      color: AppTokens.planTextMuted,
-                      fontSize: 11,
-                    ),
+                    style: AppTypography.bodySmall(color: AppTokens.planTextMuted),
                   ),
                 ],
               ),
@@ -1302,21 +1298,13 @@ class _CardRow extends StatelessWidget {
             width: 90,
             child: Text(
               label,
-              style: GoogleFonts.lato(
-                color: AppTokens.planTextMuted,
-                fontSize: 11,
-                fontWeight: FontWeight.w600,
-              ),
+              style: AppTypography.bodySmall(color: AppTokens.planTextMuted, fontWeight: FontWeight.w600),
             ),
           ),
           Expanded(
             child: Text(
               value,
-              style: GoogleFonts.lato(
-                color: colour.kTextDark,
-                fontSize: 12,
-                fontWeight: FontWeight.w600,
-              ),
+              style: AppTypography.bodyMedium(color: colour.kTextDark, fontWeight: FontWeight.w600),
             ),
           ),
         ],

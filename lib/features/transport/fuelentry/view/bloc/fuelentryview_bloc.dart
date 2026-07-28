@@ -1,9 +1,10 @@
-import 'package:maleva/core/network/api_legacy_helper.dart';
 import 'package:maleva/core/network/api_constants.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:maleva/core/utils/app_globals.dart';
 import 'fuelentryview_event.dart';
 import 'fuelentryview_state.dart';
+import 'package:maleva/core/network/legacy_api_repository.dart';
+import 'package:maleva/core/di/injection.dart';
 
 class FuelEntryViewBloc
     extends Bloc<FuelEntryViewEvent, FuelEntryViewState> {
@@ -81,7 +82,7 @@ class FuelEntryViewBloc
     emit(FuelEntryViewLoading());
     try {
       final header = {'Content-Type': 'application/json; charset=UTF-8'};
-      await ApiLegacyHelper.apiAllinoneSelectArray(
+      await sl<LegacyApiRepository>().apiAllinoneSelectArray(
           '${ApiConstants.apiDeleteFuelEntry}${event.item['Id']}'
               '&Comid=${event.item['CompanyRefId']}&Mobile=1',
           {},
@@ -114,7 +115,7 @@ class FuelEntryViewBloc
     };
     final header = {'Content-Type': 'application/json; charset=UTF-8'};
 
-    final result = await ApiLegacyHelper.apiAllinoneSelectArray(
+    final result = await sl<LegacyApiRepository>().apiAllinoneSelectArray(
         ApiConstants.apiSelectFuelEntry, master, header, null);
 
     if (result != '' && result.length != 0) {

@@ -1,3 +1,7 @@
+import 'package:maleva/core/colors/colors.dart' as colour;
+import 'package:maleva/core/network/legacy_api_repository.dart';
+import 'package:maleva/core/di/injection.dart';
+import 'package:maleva/core/theme/app_typography.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
@@ -7,7 +11,7 @@ import '../../../../../core/colors/colors.dart' as colour;
 import '../../../../../core/theme/tokens.dart';
 import '../../../../mastersearch/Employee.dart';
 import '../../../../../core/models/model.dart';
-import '../../../../../core/network/OnlineApi.dart' as OnlineApi;
+
 import 'package:maleva/core/models/shared/employee_model.dart';
 
 const _kGrad = LinearGradient(
@@ -88,7 +92,7 @@ class _VesselPlanningUpdateSheetState extends State<VesselPlanningUpdateSheet> {
       } catch (_) {
         try {
           initial = DateTime.parse(ctrl.text);
-        } catch (_) {}
+        } catch (e, stack) { debugPrint("Error caught globally: $e\n$stack"); }
       }
     }
 
@@ -192,11 +196,7 @@ class _VesselPlanningUpdateSheetState extends State<VesselPlanningUpdateSheet> {
                 Expanded(
                   child: Text(
                     'Sale Order Update',
-                    style: GoogleFonts.lato(
-                      color: colour.kTextDark,
-                      fontWeight: FontWeight.w700,
-                      fontSize: 16,
-                    ),
+                    style: AppTypography.heading1(color: colour.kTextDark, fontWeight: FontWeight.w700),
                   ),
                 ),
                 IconButton(
@@ -229,7 +229,7 @@ class _VesselPlanningUpdateSheetState extends State<VesselPlanningUpdateSheet> {
                     ),
                     child: Text(
                       widget.jobData.jobNo.isNotEmpty ? widget.jobData.jobNo : widget.jobData.saleOrderMasterRefId.toString(),
-                      style: GoogleFonts.lato(fontSize: 13, color: colour.kTextDark),
+                      style: AppTypography.bodyLarge(color: colour.kTextDark),
                     ),
                   ), null, null),
                   const SizedBox(height: 8),
@@ -256,7 +256,7 @@ class _VesselPlanningUpdateSheetState extends State<VesselPlanningUpdateSheet> {
                     height: 36,
                     child: TextField(
                       controller: _ptwController,
-                      style: GoogleFonts.lato(fontSize: 13),
+                      style: AppTypography.bodyLarge(),
                       decoration: InputDecoration(
                         contentPadding: const EdgeInsets.symmetric(horizontal: 10),
                         border: OutlineInputBorder(
@@ -299,12 +299,7 @@ class _VesselPlanningUpdateSheetState extends State<VesselPlanningUpdateSheet> {
                         child: Center(
                           child: Text(
                             'SAVE ALL',
-                            style: GoogleFonts.lato(
-                              fontWeight: FontWeight.w800,
-                              fontSize: 14,
-                              color: Colors.white,
-                              letterSpacing: 0.5,
-                            ),
+                            style: AppTypography.heading3(color: Colors.white, fontWeight: FontWeight.w800),
                           ),
                         ),
                       ),
@@ -352,7 +347,7 @@ class _VesselPlanningUpdateSheetState extends State<VesselPlanningUpdateSheet> {
                   padding: const EdgeInsets.only(left: 10),
                   child: Text(
                     _formatDisplayDate(ctrl.text),
-                    style: GoogleFonts.lato(fontSize: 13, color: colour.kTextDark),
+                    style: AppTypography.bodyLarge(color: colour.kTextDark),
                   ),
                 ),
               ),
@@ -391,7 +386,7 @@ class _VesselPlanningUpdateSheetState extends State<VesselPlanningUpdateSheet> {
       label,
       GestureDetector(
         onTap: () async {
-          await OnlineApi.SelectEmployee(context, 'Sales', '');
+          await sl<LegacyApiRepository>().SelectEmployee(context, 'Sales', '');
           if (!mounted) return;
           final res = await Navigator.push(context, MaterialPageRoute(builder: (_) => const Employee(Searchby: 1, SearchId: 0)));
           if (res != null && res is EmployeeModel) {
@@ -411,12 +406,12 @@ class _VesselPlanningUpdateSheetState extends State<VesselPlanningUpdateSheet> {
                   padding: const EdgeInsets.only(left: 10),
                   child: Text(
                     emp?.AccountName ?? 'Select Employee',
-                    style: GoogleFonts.lato(fontSize: 13, color: emp == null ? AppTokens.planTextMuted : colour.kTextDark),
+                    style: AppTypography.bodyLarge(color: emp == null ? AppTokens.planTextMuted : colour.kTextDark),
                     overflow: TextOverflow.ellipsis,
                   ),
                 ),
               ),
-              const Padding(
+              Padding(
                 padding: EdgeInsets.only(right: 8),
                 child: Icon(Icons.arrow_drop_down, color: AppTokens.planTextMuted),
               )
@@ -437,7 +432,7 @@ class _VesselPlanningUpdateSheetState extends State<VesselPlanningUpdateSheet> {
           width: 90,
           child: Text(
             label.replaceAll(r'\n', '\n'),
-            style: GoogleFonts.lato(fontSize: 12, fontWeight: FontWeight.w600, color: colour.kTextDark),
+            style: AppTypography.bodyMedium(color: colour.kTextDark, fontWeight: FontWeight.w600),
           ),
         ),
         Expanded(child: child),
@@ -468,11 +463,7 @@ class _VesselPlanningUpdateSheetState extends State<VesselPlanningUpdateSheet> {
                 child: Center(
                   child: Text(
                     'SAVE',
-                    style: GoogleFonts.lato(
-                      fontSize: 12,
-                      fontWeight: FontWeight.w700,
-                      color: Colors.white,
-                    ),
+                    style: AppTypography.bodyMedium(color: Colors.white, fontWeight: FontWeight.w700),
                   ),
                 ),
               ),

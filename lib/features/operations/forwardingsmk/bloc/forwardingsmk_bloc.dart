@@ -1,9 +1,11 @@
-import 'package:maleva/core/network/api_legacy_helper.dart';
+import 'package:flutter/foundation.dart';
+import 'package:maleva/core/network/legacy_api_repository.dart';
+import 'package:maleva/core/di/injection.dart';
 import 'package:maleva/core/network/api_constants.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 import 'package:maleva/core/utils/app_globals.dart';
-import 'package:maleva/core/network/OnlineApi.dart' as OnlineApi;
+
 
 import 'forwardingsmk_event.dart';
 import 'forwardingsmk_state.dart';
@@ -43,8 +45,8 @@ class FWSmkBloc extends Bloc<FWSmkEvent, FWSmkState> {
     emit(_defaultLoaded());
     try {
       // Load data in background
-      await OnlineApi.GetJobNoForwarding(null, 0);
-      await OnlineApi.loadComboS1(null, 0);
+      await sl<LegacyApiRepository>().GetJobNoForwarding(null, 0);
+      await sl<LegacyApiRepository>().loadComboS1(null, 0);
     } catch (e) {
       // Background load failed, ignore
     }
@@ -63,8 +65,8 @@ class FWSmkBloc extends Bloc<FWSmkEvent, FWSmkState> {
     if (state is! FWSmkLoaded) return;
     final s = state as FWSmkLoaded;
     try {
-      await OnlineApi.GetJobNoForwarding(null, int.parse(event.billType));
-    } catch (_) {}
+      await sl<LegacyApiRepository>().GetJobNoForwarding(null, int.parse(event.billType));
+    } catch (e, stack) { debugPrint("Error caught globally: $e\n$stack"); }
     emit(s.copyWith(
       billType:         event.billType,
       jobNoText:        '',
@@ -101,8 +103,8 @@ class FWSmkBloc extends Bloc<FWSmkEvent, FWSmkState> {
 
     emit(FWSmkLoading());
     try {
-      await OnlineApi.EditSalesOrder(event.saleOrderId, 0);
-      await OnlineApi.SelectEmployee(null, '', 'Operation');
+      await sl<LegacyApiRepository>().EditSalesOrder(event.saleOrderId, 0);
+      await sl<LegacyApiRepository>().SelectEmployee(null, '', 'Operation');
 
       final m = AppGlobals.SaleEditMasterList;
       if (m.isEmpty) {
@@ -277,7 +279,7 @@ class FWSmkBloc extends Bloc<FWSmkEvent, FWSmkState> {
       };
 
       final header = {'Content-Type': 'application/json; charset=UTF-8'};
-      final result = await ApiLegacyHelper.apiAllinoneSelectArray(
+      final result = await sl<LegacyApiRepository>().apiAllinoneSelectArray(
           ApiConstants.apiUpdateForwarding, master, header, null);
 
       if (result != '') {

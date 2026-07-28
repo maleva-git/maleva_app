@@ -36,7 +36,7 @@ class FWBreakSealBloc extends Bloc<FWBreakSealEvent, FWBreakSealState> {
       // Fetch data that was previously global
       _allJobs = await repository.fetchJobs(3);
       _employees = await repository.fetchEmployees();
-    } catch (_) {}
+    } catch (e, stack) { debugPrint("Error caught globally: $e\n$stack"); }
     emit(state.copyWith(isLoading: false));
   }
 

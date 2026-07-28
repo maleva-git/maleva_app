@@ -1,3 +1,5 @@
+import  'package:maleva/core/colors/colors.dart' as colour;
+import 'package:maleva/core/theme/app_typography.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../bloc/leave_bloc.dart';
@@ -170,7 +172,7 @@ class _EmployeeLeaveRequestTabState extends State<EmployeeLeaveRequestTab> {
                     const SizedBox(width: 8),
                     Text(
                       'Request Leave',
-                      style: GoogleFonts.lato(fontWeight: FontWeight.w800, fontSize: 16, color: AppTokens.brandDark),
+                      style: AppTypography.heading1(color: AppTokens.brandDark, fontWeight: FontWeight.w800),
                     ),
                   ],
                 ),
@@ -210,10 +212,10 @@ class _EmployeeLeaveRequestTabState extends State<EmployeeLeaveRequestTab> {
                           isExpanded: true,
                           value: _selectedLeaveTypeId,
                           icon: const Icon(Icons.keyboard_arrow_down_rounded, color: AppTokens.textMuted),
-                          hint: Text('Select Leave Reason', style: GoogleFonts.lato(color: AppTokens.textMuted)),
+                          hint: Text('Select Leave Reason', style: AppTypography.bodyLarge(color: AppTokens.textMuted)),
                           items: leaveTypes.map((e) => DropdownMenuItem<int>(
                             value: e.id,
-                            child: Text(e.name, style: GoogleFonts.lato(color: AppTokens.textPrimary, fontWeight: FontWeight.w500)),
+                            child: Text(e.name, style: AppTypography.bodyLarge(color: AppTokens.textPrimary)),
                           )).toList(),
                           onChanged: (val) {
                             setState(() => _selectedLeaveTypeId = val);
@@ -224,7 +226,7 @@ class _EmployeeLeaveRequestTabState extends State<EmployeeLeaveRequestTab> {
                     const SizedBox(height: 24),
                     ElevatedButton(
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: AppTokens.brandPrimary,
+                        backgroundColor: AppTokens.appBarBg,
                         elevation: 0,
                         padding: const EdgeInsets.symmetric(vertical: 16),
                         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
@@ -237,7 +239,7 @@ class _EmployeeLeaveRequestTabState extends State<EmployeeLeaveRequestTab> {
                               children: [
                                 const Icon(Icons.send_rounded, color: Colors.white, size: 18),
                                 const SizedBox(width: 8),
-                                Text('Submit Request', style: GoogleFonts.lato(color: Colors.white, fontSize: 15, fontWeight: FontWeight.bold)),
+                                Text('Submit Request', style: AppTypography.heading2(color: Colors.white, fontWeight: FontWeight.bold)),
                               ],
                             ),
                     ),
@@ -285,7 +287,7 @@ class _EmployeeLeaveRequestTabState extends State<EmployeeLeaveRequestTab> {
         // List
         Expanded(
           child: isLoading && requests.isEmpty
-              ? const Center(child: CircularProgressIndicator())
+              ? Center(child: CircularProgressIndicator())
               : ListView.builder(
                   itemCount: requests.length,
                   itemBuilder: (context, index) {
@@ -328,7 +330,7 @@ class _EmployeeLeaveRequestTabState extends State<EmployeeLeaveRequestTab> {
                                     const SizedBox(width: 6),
                                     Text(
                                       '${DateFormat('dd MMM').format(req.fromDate)}  ➔  ${DateFormat('dd MMM').format(req.toDate)}',
-                                      style: GoogleFonts.lato(color: Colors.black87, fontSize: 14, fontWeight: FontWeight.w700),
+                                      style: AppTypography.heading3(color: colour.commonColor, fontWeight: FontWeight.w700),
                                     ),
                                   ],
                                 ),
@@ -341,7 +343,7 @@ class _EmployeeLeaveRequestTabState extends State<EmployeeLeaveRequestTab> {
                                   ),
                                   child: Text(
                                     req.statusName, 
-                                    style: GoogleFonts.lato(color: statusColor, fontSize: 11, fontWeight: FontWeight.bold),
+                                    style: AppTypography.bodySmall(color: statusColor, fontWeight: FontWeight.bold),
                                   ),
                                 ),
                               ],
@@ -361,21 +363,21 @@ class _EmployeeLeaveRequestTabState extends State<EmployeeLeaveRequestTab> {
                                     child: Column(
                                       crossAxisAlignment: CrossAxisAlignment.start,
                                       children: [
-                                        Text('Reason', style: GoogleFonts.lato(fontSize: 11, color: Colors.grey, fontWeight: FontWeight.w600)),
+                                        Text('Reason', style: AppTypography.bodySmall(color: Colors.grey, fontWeight: FontWeight.w600)),
                                         const SizedBox(height: 2),
-                                        Text(req.reason, style: GoogleFonts.lato(fontSize: 13, color: Colors.black87, fontWeight: FontWeight.w500)),
+                                        Text(req.reason, style: AppTypography.bodyLarge(color: colour.commonColor, fontWeight: FontWeight.w500)),
                                       ],
                                     ),
                                   ),
                                   Container(
                                     padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                                     decoration: BoxDecoration(
-                                      color: Colors.blue.shade50,
+                                      color: colour.commonColorhighlight.withValues(alpha: 0.1),
                                       borderRadius: BorderRadius.circular(8),
                                     ),
                                     child: Text(
                                       '${req.totalDays} Days',
-                                      style: GoogleFonts.lato(color: Colors.blue.shade700, fontSize: 12, fontWeight: FontWeight.bold),
+                                      style: AppTypography.bodyMedium(color: colour.commonColorhighlight, fontWeight: FontWeight.bold),
                                     ),
                                   ),
                                 ],
@@ -386,12 +388,12 @@ class _EmployeeLeaveRequestTabState extends State<EmployeeLeaveRequestTab> {
                                 padding: const EdgeInsets.only(top: 8),
                                 child: Row(
                                   children: [
-                                    const Icon(Icons.info_outline_rounded, size: 14, color: Colors.redAccent),
+                                    Icon(Icons.info_outline_rounded, size: 14, color: colour.commonColorred),
                                     const SizedBox(width: 4),
                                     Expanded(
                                       child: Text(
                                         'Remark: ${req.reviewRemark}',
-                                        style: GoogleFonts.lato(color: Colors.redAccent, fontSize: 12, fontWeight: FontWeight.w500),
+                                        style: AppTypography.bodyMedium(color: colour.commonColorred, fontWeight: FontWeight.w500),
                                       ),
                                     ),
                                   ],
@@ -402,11 +404,11 @@ class _EmployeeLeaveRequestTabState extends State<EmployeeLeaveRequestTab> {
                                 padding: const EdgeInsets.only(top: 12),
                                 child: Row(
                                   children: [
-                                    const Icon(Icons.verified_user_rounded, size: 14, color: Colors.blueGrey),
+                                    Icon(Icons.verified_user_rounded, size: 14, color: Colors.grey),
                                     const SizedBox(width: 4),
                                     Text(
                                       'Reviewed By: ${req.reviewedByName}',
-                                      style: GoogleFonts.lato(color: Colors.blueGrey, fontSize: 12, fontWeight: FontWeight.w600),
+                                      style: AppTypography.bodyMedium(color: Colors.grey, fontWeight: FontWeight.w600),
                                     ),
                                   ],
                                 ),

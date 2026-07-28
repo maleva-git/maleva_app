@@ -1,3 +1,5 @@
+import 'package:maleva/core/theme/app_typography.dart';
+import 'package:maleva/core/colors/colors.dart' as colour;
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
@@ -11,9 +13,7 @@ import '../bloc/licenseupdate_bloc.dart';
 import '../bloc/licenseupdate_event.dart';
 import '../bloc/licenseupdate_state.dart';
 import 'package:maleva/core/models/shared/get_truck_model.dart';
-
-
-
+import 'package:maleva/core/theme/tokens.dart';
 
 const kGradient = LinearGradient(
   colors: [Palette.blue700, Palette.blue400],
@@ -25,18 +25,18 @@ const double kTabletBreak = 600;
 
 // All 12 expiry keys with display labels
 const List<(String, String)> kExpiryFields = [
-  ('rotexMyExp',    'RotexMy Exp'),
-  ('rotexSGExp',    'RotexSG Exp'),
-  ('puspacomExp',   'Puspacom Exp'),
-  ('rotexMyExp1',   'RotexMy Exp 1'),
-  ('rotexSGExp1',   'RotexSG Exp 1'),
-  ('puspacomExp1',  'Puspacom Exp 1'),
+  ('rotexMyExp', 'RotexMy Exp'),
+  ('rotexSGExp', 'RotexSG Exp'),
+  ('puspacomExp', 'Puspacom Exp'),
+  ('rotexMyExp1', 'RotexMy Exp 1'),
+  ('rotexSGExp1', 'RotexSG Exp 1'),
+  ('puspacomExp1', 'Puspacom Exp 1'),
   ('insuratnceExp', 'Insurance Exp'),
-  ('bonamExp',      'Bonam Exp'),
-  ('apadExp',       'Apad Exp'),
-  ('serviceExp',    'Service Exp'),
-  ('alignmentExp',  'Alignment Exp'),
-  ('greeceExp',     'Greece Exp'),
+  ('bonamExp', 'Bonam Exp'),
+  ('apadExp', 'Apad Exp'),
+  ('serviceExp', 'Service Exp'),
+  ('alignmentExp', 'Alignment Exp'),
+  ('greeceExp', 'Greece Exp'),
 ];
 
 // ─── Root ─────────────────────────────────────────────────────────────────────
@@ -46,8 +46,7 @@ class LicenseUpdate extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (_) =>
-      LicenseUpdateBloc()..add(LicenseUpdateStarted()),
+      create: (_) => LicenseUpdateBloc()..add(LicenseUpdateStarted()),
       child: const _LicenseUpdatePage(),
     );
   }
@@ -59,23 +58,20 @@ class _LicenseUpdatePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final userName =
-        AppGlobals.storagenew.getString('Username') ?? '';
+    final userName = AppGlobals.storagenew.getString('Username') ?? '';
 
     return BlocListener<LicenseUpdateBloc, LicenseUpdateState>(
       listener: (context, state) async {
         if (state is LicenseUpdateSaveSuccess) {
-          await ConfirmationOK(
-              'Updated Successfully', context);
+          await ConfirmationOK('Updated Successfully', context);
         }
         if (state is LicenseUpdateError) {
           if (!context.mounted) return;
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text(state.message,
-                  style:
-                  GoogleFonts.lato(color: Colors.white)),
-              backgroundColor: const Color(0xFFB33040),
+                  style: AppTypography.bodyLarge(color: Colors.white)),
+              backgroundColor: AppTokens.appBarBg,
               behavior: SnackBarBehavior.floating,
               shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(10)),
@@ -94,14 +90,12 @@ class _LicenseUpdatePage extends StatelessWidget {
           backgroundColor: Palette.grey100,
           appBar: _buildAppBar(context, userName),
           drawer: const Menulist(),
-          body:
-          BlocBuilder<LicenseUpdateBloc, LicenseUpdateState>(
+          body: BlocBuilder<LicenseUpdateBloc, LicenseUpdateState>(
             builder: (context, state) {
               if (state is LicenseUpdateInitial ||
                   state is LicenseUpdateLoading) {
-                return const Center(
-                  child: SpinKitFoldingCube(
-                      color: Palette.blue400, size: 35),
+                return Center(
+                  child: SpinKitFoldingCube(color: Palette.blue400, size: 35),
                 );
               }
               if (state is LicenseUpdateLoaded) {
@@ -115,18 +109,15 @@ class _LicenseUpdatePage extends StatelessWidget {
     );
   }
 
-  PreferredSizeWidget _buildAppBar(
-      BuildContext context, String userName) {
+  PreferredSizeWidget _buildAppBar(BuildContext context, String userName) {
     return AppBar(
       automaticallyImplyLeading: false,
       elevation: 0,
       toolbarHeight: 62,
-      flexibleSpace: Container(
-          decoration:
-          const BoxDecoration(gradient: kGradient)),
+      flexibleSpace:
+          Container(decoration: const BoxDecoration(gradient: kGradient)),
       leading: IconButton(
-        icon: const Icon(Icons.arrow_back_ios_new_rounded,
-            size: 20),
+        icon: const Icon(Icons.arrow_back_ios_new_rounded, size: 20),
         color: Colors.white,
         onPressed: () => Navigator.pop(context),
       ),
@@ -135,48 +126,36 @@ class _LicenseUpdatePage extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text('License Update',
-              style: GoogleFonts.lato(
-                  color: Colors.white,
-                  fontWeight: FontWeight.w700,
-                  fontSize: 17,
-                  letterSpacing: 0.3)),
+              style: AppTypography.bodyLarge(
+                  color: Colors.white, fontWeight: FontWeight.bold)),
           const SizedBox(height: 2),
-          Text(userName,
-              style: GoogleFonts.lato(
-                  color: Colors.white.withValues(alpha: 0.65),
-                  fontWeight: FontWeight.w500,
-                  fontSize: 12)),
+          Text(userName, style: AppTypography.bodySmall(color: Colors.white)),
         ],
       ),
       actions: [
         BlocBuilder<LicenseUpdateBloc, LicenseUpdateState>(
           builder: (context, state) {
-            if (state is! LicenseUpdateLoaded ||
-                !state.admin) {
+            if (state is! LicenseUpdateLoaded || !state.admin) {
               return const SizedBox.shrink();
             }
             return Padding(
-              padding: const EdgeInsets.only(
-                  right: 12, top: 10, bottom: 10),
+              padding: const EdgeInsets.only(right: 12, top: 10, bottom: 10),
               child: _AppBarButton(
                 label: 'UPDATE',
                 onPressed: () {
-                  final s = context
-                      .read<LicenseUpdateBloc>()
-                      .state;
+                  final s = context.read<LicenseUpdateBloc>().state;
                   if (s is! LicenseUpdateLoaded) return;
                   if (s.truckNo.isEmpty) {
-                    toastMsg(
-                        'Enter Truck No', '', context);
+                    toastMsg('Enter Truck No', '', context);
                     return;
                   }
-                  ConfirmationMsgYesNo(context,
-                      'Are you sure to Update ?')
+                  ConfirmationMsgYesNo(context, 'Are you sure to Update ?')
                       .then((ok) {
                     if (ok == true) {
                       if (!context.mounted) return;
-                      context.read<LicenseUpdateBloc>().add(
-                          LicenseUpdateSaveRequested());
+                      context
+                          .read<LicenseUpdateBloc>()
+                          .add(LicenseUpdateSaveRequested());
                     }
                   });
                 },
@@ -200,40 +179,31 @@ class _LicenseUpdateBody extends StatelessWidget {
     return LayoutBuilder(
       builder: (context, constraints) {
         final isTablet = constraints.maxWidth > kTabletBreak;
-        final hPad =
-        isTablet ? constraints.maxWidth * 0.07 : 14.0;
+        final hPad = isTablet ? constraints.maxWidth * 0.07 : 14.0;
 
         return ListView(
-          padding:
-          EdgeInsets.fromLTRB(hPad, 14, hPad, 24),
+          padding: EdgeInsets.fromLTRB(hPad, 14, hPad, 24),
           children: [
             // ── Truck selector ──────────────────────────
-            _TruckSelectorField(
-                state: state, isTablet: isTablet),
+            _TruckSelectorField(state: state, isTablet: isTablet),
             const SizedBox(height: 12),
 
             // ── Truck text fields ───────────────────────
             // Tablet: 2-column grid, Mobile: single column
             isTablet
                 ? _TruckFieldsTablet(
-                state: state,
-                gap:
-                constraints.maxWidth * 0.03)
+                    state: state, gap: constraints.maxWidth * 0.03)
                 : _TruckFieldsMobile(state: state),
             const SizedBox(height: 16),
 
             // ── Section header ──────────────────────────
-            _SectionHeader(
-                label: 'Expiry Dates',
-                isTablet: isTablet),
+            _SectionHeader(label: 'Expiry Dates', isTablet: isTablet),
             const SizedBox(height: 10),
 
             // ── 12 expiry date rows ─────────────────────
             // Tablet: 2-column GridView, Mobile: single column
             isTablet
-                ? _ExpiryGridTablet(
-                state: state,
-                constraints: constraints)
+                ? _ExpiryGridTablet(state: state, constraints: constraints)
                 : _ExpiryListMobile(state: state),
           ],
         );
@@ -246,8 +216,7 @@ class _LicenseUpdateBody extends StatelessWidget {
 class _TruckSelectorField extends StatelessWidget {
   final LicenseUpdateLoaded state;
   final bool isTablet;
-  const _TruckSelectorField(
-      {required this.state, required this.isTablet});
+  const _TruckSelectorField({required this.state, required this.isTablet});
 
   @override
   Widget build(BuildContext context) {
@@ -257,30 +226,23 @@ class _TruckSelectorField extends StatelessWidget {
           Navigator.push(
             context,
             MaterialPageRoute(
-                builder: (_) =>
-                const Truck(Searchby: 1, SearchId: 0)),
+                builder: (_) => const Truck(Searchby: 1, SearchId: 0)),
           ).then((_) {
             final sel = AppGlobals.SelectTruckList;
             if (sel.Id != 0) {
               if (!context.mounted) return;
-              context.read<LicenseUpdateBloc>().add(
-                  LicenseUpdateTruckSelected(
-                      truckId: sel.Id,
-                      truckName: sel.AccountName));
-              AppGlobals.SelectTruckList =
-                  GetTruckModel.Empty();
+              context.read<LicenseUpdateBloc>().add(LicenseUpdateTruckSelected(
+                  truckId: sel.Id, truckName: sel.AccountName));
+              AppGlobals.SelectTruckList = GetTruckModel.Empty();
             }
           });
         } else {
-          context
-              .read<LicenseUpdateBloc>()
-              .add(LicenseUpdateTruckCleared());
+          context.read<LicenseUpdateBloc>().add(LicenseUpdateTruckCleared());
         }
       },
       borderRadius: BorderRadius.circular(10),
       child: Container(
-        padding: const EdgeInsets.symmetric(
-            horizontal: 14, vertical: 14),
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
         decoration: BoxDecoration(
           color: Palette.grey200p,
           borderRadius: BorderRadius.circular(10),
@@ -293,20 +255,11 @@ class _TruckSelectorField extends StatelessWidget {
             const SizedBox(width: 10),
             Expanded(
               child: Text(
-                state.truckName.isEmpty
-                    ? 'Select Truck No'
-                    : state.truckName,
-                style: GoogleFonts.lato(
-                  color: state.truckName.isEmpty
-                      ? Palette.kTextMuted
-                      : Palette.textDark2,
-                  fontWeight: state.truckName.isEmpty
-                      ? FontWeight.w500
-                      : FontWeight.w600,
-                  fontSize: isTablet
-                      ? AppGlobals.FontLow + 1
-                      : AppGlobals.FontLow,
-                ),
+                state.truckName.isEmpty ? 'Select Truck No' : state.truckName,
+                style: AppTypography.bodySmall(
+                    color: state.truckName.isEmpty
+                        ? Palette.kTextMuted
+                        : Palette.textDark2),
                 overflow: TextOverflow.ellipsis,
               ),
             ),
@@ -360,20 +313,18 @@ class _TruckFieldsMobile extends StatelessWidget {
   }
 }
 
-
 class _TruckFieldsTablet extends StatelessWidget {
   final LicenseUpdateLoaded state;
   final double gap;
-  const _TruckFieldsTablet(
-      {required this.state, required this.gap});
+  const _TruckFieldsTablet({required this.state, required this.gap});
 
   @override
   Widget build(BuildContext context) {
     final fields = [
-      ('Truck No 1',  'truckNo',       state.truckNo),
-      ('Truck No 2',  'truckNo2',      state.truckNo2),
-      ('Truck Name',  'truckName',     state.truckNameField),
-      ('Truck Type',  'truckType',     state.truckType),
+      ('Truck No 1', 'truckNo', state.truckNo),
+      ('Truck No 2', 'truckNo2', state.truckNo2),
+      ('Truck Name', 'truckName', state.truckNameField),
+      ('Truck Type', 'truckType', state.truckType),
     ];
 
     return Column(
@@ -393,10 +344,10 @@ class _TruckFieldsTablet extends StatelessWidget {
                 Expanded(
                     child: i + 1 < fields.length
                         ? _TruckTextField(
-                        label: fields[i + 1].$1,
-                        fieldKey: fields[i + 1].$2,
-                        value: fields[i + 1].$3,
-                        isTablet: true)
+                            label: fields[i + 1].$1,
+                            fieldKey: fields[i + 1].$2,
+                            value: fields[i + 1].$3,
+                            isTablet: true)
                         : const SizedBox.shrink()),
               ],
             ),
@@ -405,7 +356,6 @@ class _TruckFieldsTablet extends StatelessWidget {
     );
   }
 }
-
 
 class _ExpiryListMobile extends StatelessWidget {
   final LicenseUpdateLoaded state;
@@ -416,14 +366,14 @@ class _ExpiryListMobile extends StatelessWidget {
     return Column(
       children: kExpiryFields
           .map((f) => Padding(
-        padding: const EdgeInsets.only(bottom: 10),
-        child: _ExpiryDateRow(
-          label:   f.$2,
-          dateKey: f.$1,
-          state:   state,
-          isTablet: false,
-        ),
-      ))
+                padding: const EdgeInsets.only(bottom: 10),
+                child: _ExpiryDateRow(
+                  label: f.$2,
+                  dateKey: f.$1,
+                  state: state,
+                  isTablet: false,
+                ),
+              ))
           .toList(),
     );
   }
@@ -432,8 +382,7 @@ class _ExpiryListMobile extends StatelessWidget {
 class _ExpiryGridTablet extends StatelessWidget {
   final LicenseUpdateLoaded state;
   final BoxConstraints constraints;
-  const _ExpiryGridTablet(
-      {required this.state, required this.constraints});
+  const _ExpiryGridTablet({required this.state, required this.constraints});
 
   @override
   Widget build(BuildContext context) {
@@ -447,9 +396,9 @@ class _ExpiryGridTablet extends StatelessWidget {
               children: [
                 Expanded(
                   child: _ExpiryDateRow(
-                    label:    kExpiryFields[i].$2,
-                    dateKey:  kExpiryFields[i].$1,
-                    state:    state,
+                    label: kExpiryFields[i].$2,
+                    dateKey: kExpiryFields[i].$1,
+                    state: state,
                     isTablet: true,
                   ),
                 ),
@@ -457,11 +406,11 @@ class _ExpiryGridTablet extends StatelessWidget {
                 Expanded(
                   child: i + 1 < kExpiryFields.length
                       ? _ExpiryDateRow(
-                    label:    kExpiryFields[i + 1].$2,
-                    dateKey:  kExpiryFields[i + 1].$1,
-                    state:    state,
-                    isTablet: true,
-                  )
+                          label: kExpiryFields[i + 1].$2,
+                          dateKey: kExpiryFields[i + 1].$1,
+                          state: state,
+                          isTablet: true,
+                        )
                       : const SizedBox.shrink(),
                 ),
               ],
@@ -477,7 +426,7 @@ class _ExpiryDateRow extends StatelessWidget {
   final String label;
   final String dateKey;
   final LicenseUpdateLoaded state;
-  final bool   isTablet;
+  final bool isTablet;
 
   const _ExpiryDateRow({
     required this.label,
@@ -493,18 +442,12 @@ class _ExpiryDateRow extends StatelessWidget {
 
     String display;
     try {
-      display = DateFormat('dd-MM-yyyy')
-          .format(DateTime.parse(dateStr));
+      display = DateFormat('dd-MM-yyyy').format(DateTime.parse(dateStr));
     } catch (_) {
       display = dateStr;
     }
 
-    final labelStyle = GoogleFonts.lato(
-      color: Palette.textMid,
-      fontWeight: FontWeight.w600,
-      fontSize:
-      isTablet ? AppGlobals.FontMedium + 1 : AppGlobals.FontMedium,
-    );
+    final labelStyle = AppTypography.heading2(color: Palette.textMid);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -525,8 +468,7 @@ class _ExpiryDateRow extends StatelessWidget {
                     lastDate: DateTime(2100),
                     builder: (ctx, child) => Theme(
                       data: Theme.of(ctx).copyWith(
-                        colorScheme:
-                        const ColorScheme.light(
+                        colorScheme: const ColorScheme.light(
                           primary: Palette.blue700,
                           onPrimary: Colors.white,
                           surface: Colors.white,
@@ -538,49 +480,38 @@ class _ExpiryDateRow extends StatelessWidget {
                   );
                   if (picked != null) {
                     if (!context.mounted) return;
-                    context.read<LicenseUpdateBloc>().add(
-                        LicenseUpdateDateChanged(
-                          key:  dateKey,
-                          date: DateFormat('yyyy-MM-dd')
-                              .format(picked),
+                    context
+                        .read<LicenseUpdateBloc>()
+                        .add(LicenseUpdateDateChanged(
+                          key: dateKey,
+                          date: DateFormat('yyyy-MM-dd').format(picked),
                         ));
                   }
                 },
                 borderRadius: BorderRadius.circular(10),
                 child: Container(
-                  padding: const EdgeInsets.symmetric(
-                      horizontal: 12, vertical: 12),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
                   decoration: BoxDecoration(
-                    color: enabled
-                        ? Palette.grey200p
-                        : const Color(0xFFEEEEEE),
-                    borderRadius:
-                    BorderRadius.circular(10),
-                    border: Border.all(
-                        color: Palette.cardBorder, width: 0.5),
+                    color: enabled ? Palette.grey200p : AppTokens.surfaceDetail,
+                    borderRadius: BorderRadius.circular(10),
+                    border: Border.all(color: Palette.cardBorder, width: 0.5),
                   ),
                   child: Row(
                     children: [
                       Expanded(
                         child: Text(
                           display,
-                          style: GoogleFonts.lato(
-                            color: enabled
-                                ? Palette.textDark2
-                                : Palette.kTextMuted,
-                            fontWeight: FontWeight.w600,
-                            fontSize: isTablet
-                                ? AppGlobals.FontLow + 1
-                                : AppGlobals.FontLow,
-                          ),
+                          style: AppTypography.bodySmall(
+                              color: enabled
+                                  ? Palette.textDark2
+                                  : Palette.kTextMuted),
                         ),
                       ),
                       Icon(
                         Icons.calendar_month_outlined,
                         size: 18,
-                        color: enabled
-                            ? Palette.blue400
-                            : Palette.kTextMuted,
+                        color: enabled ? Palette.blue400 : Palette.kTextMuted,
                       ),
                     ],
                   ),
@@ -599,22 +530,19 @@ class _ExpiryDateRow extends StatelessWidget {
               },
               borderRadius: BorderRadius.circular(6),
               child: AnimatedContainer(
-                duration:
-                const Duration(milliseconds: 180),
-                width:  isTablet ? 24 : 20,
+                duration: const Duration(milliseconds: 180),
+                width: isTablet ? 24 : 20,
                 height: isTablet ? 24 : 20,
                 decoration: BoxDecoration(
                   gradient: enabled ? kGradient : null,
                   border: enabled
                       ? null
-                      : Border.all(
-                      color: Palette.cardBorder,
-                      width: 1.5),
+                      : Border.all(color: Palette.cardBorder, width: 1.5),
                   borderRadius: BorderRadius.circular(6),
                 ),
                 child: enabled
                     ? const Icon(Icons.check_rounded,
-                    size: 13, color: Colors.white)
+                        size: 13, color: Colors.white)
                     : null,
               ),
             ),
@@ -630,7 +558,7 @@ class _TruckTextField extends StatefulWidget {
   final String label;
   final String fieldKey;
   final String value;
-  final bool   isTablet;
+  final bool isTablet;
 
   const _TruckTextField({
     required this.label,
@@ -640,8 +568,7 @@ class _TruckTextField extends StatefulWidget {
   });
 
   @override
-  State<_TruckTextField> createState() =>
-      _TruckTextFieldState();
+  State<_TruckTextField> createState() => _TruckTextFieldState();
 }
 
 class _TruckTextFieldState extends State<_TruckTextField> {
@@ -658,8 +585,7 @@ class _TruckTextFieldState extends State<_TruckTextField> {
     super.didUpdateWidget(old);
     if (widget.value != _ctrl.text) {
       _ctrl.text = widget.value;
-      _ctrl.selection = TextSelection.collapsed(
-          offset: widget.value.length);
+      _ctrl.selection = TextSelection.collapsed(offset: widget.value.length);
     }
   }
 
@@ -671,62 +597,43 @@ class _TruckTextFieldState extends State<_TruckTextField> {
 
   @override
   Widget build(BuildContext context) {
-    final isAdmin = context.select(
-            (LicenseUpdateBloc b) =>
+    final isAdmin = context.select((LicenseUpdateBloc b) =>
         b.state is LicenseUpdateLoaded &&
-            (b.state as LicenseUpdateLoaded).admin);
+        (b.state as LicenseUpdateLoaded).admin);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(widget.label,
-            style: GoogleFonts.lato(
-                color: Palette.textMid,
-                fontWeight: FontWeight.w600,
-                fontSize: widget.isTablet
-                    ? AppGlobals.FontLow + 1
-                    : AppGlobals.FontLow)),
+            style: AppTypography.bodySmall(color: Palette.textMid)),
         const SizedBox(height: 4),
         TextField(
           controller: _ctrl,
           readOnly: !isAdmin,
           textCapitalization: TextCapitalization.characters,
           textInputAction: TextInputAction.done,
-          onChanged: (v) =>
-              context.read<LicenseUpdateBloc>().add(
-                  LicenseUpdateTextChanged(
-                      field: widget.fieldKey,
-                      value: v)),
-          style: GoogleFonts.lato(
-            color: Palette.textDark2,
-            fontWeight: FontWeight.w600,
-            fontSize: widget.isTablet
-                ? AppGlobals.FontLow + 1
-                : AppGlobals.FontLow,
-          ),
+          onChanged: (v) => context
+              .read<LicenseUpdateBloc>()
+              .add(LicenseUpdateTextChanged(field: widget.fieldKey, value: v)),
+          style: AppTypography.bodySmall(color: Palette.textDark2),
           decoration: InputDecoration(
             hintText: widget.label,
-            hintStyle: GoogleFonts.lato(
-                color: Palette.kTextMuted,
-                fontSize: widget.isTablet
-                    ? AppGlobals.FontLow + 1
-                    : AppGlobals.FontLow),
+            hintStyle: AppTypography.bodySmall(color: Palette.kTextMuted),
             filled: true,
-            fillColor: isAdmin ? Palette.grey200p : const Color(0xFFEEEEEE),
-            contentPadding: const EdgeInsets.symmetric(
-                horizontal: 14, vertical: 13),
+            fillColor: isAdmin ? Palette.grey200p : AppTokens.surfaceDetail,
+            contentPadding:
+                const EdgeInsets.symmetric(horizontal: 14, vertical: 13),
             border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(10),
                 borderSide: BorderSide.none),
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(10),
-              borderSide: const BorderSide(
-                  color: Palette.cardBorder, width: 0.5),
+              borderSide:
+                  const BorderSide(color: Palette.cardBorder, width: 0.5),
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(10),
-              borderSide: const BorderSide(
-                  color: Palette.blue400, width: 1.5),
+              borderSide: const BorderSide(color: Palette.blue400, width: 1.5),
             ),
           ),
         ),
@@ -738,9 +645,8 @@ class _TruckTextFieldState extends State<_TruckTextField> {
 // ─── Section Header ───────────────────────────────────────────────────────────
 class _SectionHeader extends StatelessWidget {
   final String label;
-  final bool   isTablet;
-  const _SectionHeader(
-      {required this.label, required this.isTablet});
+  final bool isTablet;
+  const _SectionHeader({required this.label, required this.isTablet});
 
   @override
   Widget build(BuildContext context) {
@@ -750,16 +656,12 @@ class _SectionHeader extends StatelessWidget {
           width: 4,
           height: 18,
           decoration: BoxDecoration(
-              gradient: kGradient,
-              borderRadius: BorderRadius.circular(2)),
+              gradient: kGradient, borderRadius: BorderRadius.circular(2)),
         ),
         const SizedBox(width: 8),
         Text(label,
-            style: GoogleFonts.lato(
-                color: Palette.textDark2,
-                fontWeight: FontWeight.w700,
-                fontSize:
-                isTablet ? 15 : 14)),
+            style: AppTypography.bodyLarge(
+                color: Palette.textDark2, fontWeight: FontWeight.bold)),
       ],
     );
   }
@@ -769,8 +671,7 @@ class _SectionHeader extends StatelessWidget {
 class _AppBarButton extends StatelessWidget {
   final String label;
   final VoidCallback onPressed;
-  const _AppBarButton(
-      {required this.label, required this.onPressed});
+  const _AppBarButton({required this.label, required this.onPressed});
 
   @override
   Widget build(BuildContext context) {
@@ -778,9 +679,8 @@ class _AppBarButton extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.white.withValues(alpha: 0.15),
         borderRadius: BorderRadius.circular(8),
-        border: Border.all(
-            color: Colors.white.withValues(alpha: 0.4),
-            width: 0.5),
+        border:
+            Border.all(color: Colors.white.withValues(alpha: 0.4), width: 0.5),
       ),
       child: Material(
         color: Colors.transparent,
@@ -788,13 +688,10 @@ class _AppBarButton extends StatelessWidget {
           onTap: onPressed,
           borderRadius: BorderRadius.circular(8),
           child: Padding(
-            padding: const EdgeInsets.symmetric(
-                horizontal: 12, vertical: 6),
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
             child: Text(label,
-                style: GoogleFonts.lato(
-                    color: Colors.white,
-                    fontWeight: FontWeight.w700,
-                    fontSize: AppGlobals.FontMedium)),
+                style: AppTypography.bodyLarge(
+                    color: Colors.white, fontWeight: FontWeight.bold)),
           ),
         ),
       ),

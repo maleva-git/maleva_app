@@ -1,3 +1,5 @@
+import 'package:maleva/core/colors/colors.dart' as colour;
+import 'package:maleva/core/theme/app_typography.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
@@ -61,7 +63,7 @@ class _DriverLicenseExpiryView extends StatelessWidget {
       builder: (context, state) {
         if (state is DriverLicenseExpiryInitial ||
             state is DriverLicenseExpiryLoading) {
-          return const Center(
+          return Center(
             child: SpinKitFoldingCube(
                 color: Palette.blue400, size: 35),
           );
@@ -81,8 +83,7 @@ class _DriverLicenseExpiryView extends StatelessWidget {
         if (state is DriverLicenseExpiryError) {
           return Center(
             child: Text(state.message,
-                style: GoogleFonts.lato(
-                    color: Palette.redAccent, fontSize: 13)),
+                style: AppTypography.bodyLarge(color: Palette.redAccent)),
           );
         }
         return const SizedBox.shrink();
@@ -113,14 +114,7 @@ class _DriverLicenseExpiryBody extends StatelessWidget {
           Center(
             child: Text(
               'DRIVER LICENSE EXPIRY',
-              style: GoogleFonts.lato(
-                color: Palette.redAccent,
-                fontWeight: FontWeight.w700,
-                fontSize: isTablet
-                    ? AppGlobals.FontLarge + 2
-                    : AppGlobals.FontLarge,
-                letterSpacing: 0.3,
-              ),
+              style: AppTypography.heading1(color: Palette.redAccent),
             ),
           ),
           const SizedBox(height: 14),
@@ -193,12 +187,7 @@ class _DriverCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final labelStyle = GoogleFonts.lato(
-      color: Palette.textMid,
-      fontWeight: FontWeight.w600,
-      fontSize:
-      isTablet ? AppGlobals.FontLow + 1 : AppGlobals.FontLow,
-    );
+    final labelStyle = AppTypography.bodySmall(color: Palette.textMid);
 
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
@@ -242,13 +231,7 @@ class _DriverCard extends StatelessWidget {
                       _safe(item['DriverName']).isEmpty
                           ? '-'
                           : _safe(item['DriverName']),
-                      style: GoogleFonts.lato(
-                        color: Colors.white,
-                        fontWeight: FontWeight.w700,
-                        fontSize: isTablet
-                            ? AppGlobals.FontLow + 1
-                            : AppGlobals.FontLow,
-                      ),
+                      style: AppTypography.bodySmall(color: Colors.white),
                       overflow: TextOverflow.ellipsis,
                     ),
                   ),
@@ -300,11 +283,7 @@ class _FieldRow extends StatelessWidget {
             flex: 3,
             child: Text(
               value.isEmpty ? '-' : value,
-              style: GoogleFonts.lato(
-                color: Palette.textDark2,
-                fontWeight: FontWeight.w600,
-                fontSize: labelStyle.fontSize,
-              ),
+              style: AppTypography.bodyLarge(color: Palette.textDark2),
               overflow: TextOverflow.ellipsis,
             ),
           ),
@@ -336,10 +315,7 @@ class _EmptyState extends StatelessWidget {
           ),
           const SizedBox(height: 14),
           Text('No Driver Records',
-              style: GoogleFonts.lato(
-                  color: Palette.textDark2,
-                  fontWeight: FontWeight.w600,
-                  fontSize: 15)),
+              style: AppTypography.heading2(color: Palette.textDark2, fontWeight: FontWeight.w600)),
         ],
       ),
     );

@@ -1,3 +1,4 @@
+import 'package:maleva/core/theme/app_typography.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../bloc/leave_bloc.dart';
@@ -46,7 +47,7 @@ class _EmployeeLeaveApprovalTabState extends State<EmployeeLeaveApprovalTab> {
           builder: (context, setDialogState) {
             return AlertDialog(
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-              title: Text('Review Leave Request', style: GoogleFonts.lato(fontWeight: FontWeight.bold)),
+              title: Text('Review Leave Request', style: AppTypography.heading2()),
               content: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
@@ -55,11 +56,11 @@ class _EmployeeLeaveApprovalTabState extends State<EmployeeLeaveApprovalTab> {
                       border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
                       contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                     ),
-                    hint: const Text('Select Status'),
+                    hint: Text('Select Status'),
                     initialValue: selectedStatusId,
-                    items: const [
-                      DropdownMenuItem(value: 2, child: Text('Approve', style: TextStyle(color: Colors.green, fontWeight: FontWeight.bold))),
-                      DropdownMenuItem(value: 3, child: Text('Reject', style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold))),
+                    items: [
+                      DropdownMenuItem(value: 2, child: Text('Approve', style: AppTypography.heading2())),
+                      DropdownMenuItem(value: 3, child: Text('Reject', style: AppTypography.heading2())),
                     ],
                     onChanged: (val) => setDialogState(() => selectedStatusId = val),
                   ),
@@ -77,14 +78,14 @@ class _EmployeeLeaveApprovalTabState extends State<EmployeeLeaveApprovalTab> {
               actions: [
                 TextButton(
                   onPressed: () => Navigator.pop(ctx, false),
-                  child: const Text('Cancel'),
+                  child: Text('Cancel'),
                 ),
                 ElevatedButton(
                   onPressed: selectedStatusId == null ? null : () => Navigator.pop(ctx, true),
                   style: ElevatedButton.styleFrom(
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                   ),
-                  child: const Text('Submit'),
+                  child: Text('Submit'),
                 ),
               ],
             );
@@ -139,7 +140,7 @@ class _EmployeeLeaveApprovalTabState extends State<EmployeeLeaveApprovalTab> {
           color: Colors.white,
           child: Row(
             children: [
-              const Expanded(child: Text('Employee Leave Requests', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16))),
+              Expanded(child: Text('Employee Leave Requests', style: AppTypography.heading2())),
               IconButton(icon: const Icon(Icons.refresh, color: colour.brand), onPressed: _fetchRequests),
             ],
           ),
@@ -147,7 +148,7 @@ class _EmployeeLeaveApprovalTabState extends State<EmployeeLeaveApprovalTab> {
         const Divider(height: 1, thickness: 1),
         Expanded(
           child: isLoading && requests.isEmpty
-              ? const Center(child: CircularProgressIndicator())
+              ? Center(child: CircularProgressIndicator())
               : ListView.builder(
                   itemCount: requests.length,
                   itemBuilder: (context, index) {
@@ -187,7 +188,7 @@ class _EmployeeLeaveApprovalTabState extends State<EmployeeLeaveApprovalTab> {
                                 Expanded(
                                   child: Text(
                                     req.applicantName.isNotEmpty ? req.applicantName : 'Employee ${req.applicantRefId}', 
-                                    style: GoogleFonts.lato(fontWeight: FontWeight.w800, fontSize: 16, color: Colors.black87),
+                                    style: AppTypography.heading1(color: colour.commonColor, fontWeight: FontWeight.w800),
                                     maxLines: 1,
                                     overflow: TextOverflow.ellipsis,
                                   ),
@@ -201,7 +202,7 @@ class _EmployeeLeaveApprovalTabState extends State<EmployeeLeaveApprovalTab> {
                                   ),
                                   child: Text(
                                     req.statusName, 
-                                    style: GoogleFonts.lato(color: statusColor, fontSize: 11, fontWeight: FontWeight.bold),
+                                    style: AppTypography.bodySmall(color: statusColor, fontWeight: FontWeight.bold),
                                   ),
                                 ),
                               ],
@@ -213,18 +214,18 @@ class _EmployeeLeaveApprovalTabState extends State<EmployeeLeaveApprovalTab> {
                                 const SizedBox(width: 6),
                                 Text(
                                   '${DateFormat('dd MMM yyyy').format(req.fromDate)}  ➔  ${DateFormat('dd MMM yyyy').format(req.toDate)}',
-                                  style: GoogleFonts.lato(color: Colors.black87, fontSize: 13, fontWeight: FontWeight.w600),
+                                  style: AppTypography.bodyLarge(color: colour.commonColor, fontWeight: FontWeight.w600),
                                 ),
                                 const Spacer(),
                                 Container(
                                   padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                                   decoration: BoxDecoration(
-                                    color: Colors.blue.shade50,
+                                    color: colour.commonColorhighlight.withValues(alpha: 0.1),
                                     borderRadius: BorderRadius.circular(8),
                                   ),
                                   child: Text(
                                     '${req.totalDays} Days',
-                                    style: GoogleFonts.lato(color: Colors.blue.shade700, fontSize: 12, fontWeight: FontWeight.bold),
+                                    style: AppTypography.bodyMedium(color: colour.commonColorhighlight, fontWeight: FontWeight.bold),
                                   ),
                                 ),
                               ],
@@ -240,9 +241,9 @@ class _EmployeeLeaveApprovalTabState extends State<EmployeeLeaveApprovalTab> {
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Text('Reason', style: GoogleFonts.lato(fontSize: 11, color: Colors.grey, fontWeight: FontWeight.w600)),
+                                  Text('Reason', style: AppTypography.bodySmall(color: Colors.grey, fontWeight: FontWeight.w600)),
                                   const SizedBox(height: 2),
-                                  Text(req.reason, style: GoogleFonts.lato(fontSize: 13, color: Colors.black87, fontWeight: FontWeight.w500)),
+                                  Text(req.reason, style: AppTypography.bodyLarge(color: colour.commonColor, fontWeight: FontWeight.w500)),
                                 ],
                               ),
                             ),
@@ -251,12 +252,12 @@ class _EmployeeLeaveApprovalTabState extends State<EmployeeLeaveApprovalTab> {
                                 padding: const EdgeInsets.only(top: 8),
                                 child: Row(
                                   children: [
-                                    const Icon(Icons.info_outline_rounded, size: 14, color: Colors.redAccent),
+                                    Icon(Icons.info_outline_rounded, size: 14, color: colour.commonColorred),
                                     const SizedBox(width: 4),
                                     Expanded(
                                       child: Text(
                                         'Remark: ${req.reviewRemark}',
-                                        style: GoogleFonts.lato(color: Colors.redAccent, fontSize: 12, fontWeight: FontWeight.w500),
+                                        style: AppTypography.bodyMedium(color: colour.commonColorred, fontWeight: FontWeight.w500),
                                       ),
                                     ),
                                   ],
@@ -267,11 +268,11 @@ class _EmployeeLeaveApprovalTabState extends State<EmployeeLeaveApprovalTab> {
                                 padding: const EdgeInsets.only(top: 12),
                                 child: Row(
                                   children: [
-                                    const Icon(Icons.verified_user_rounded, size: 14, color: Colors.blueGrey),
+                                    Icon(Icons.verified_user_rounded, size: 14, color: Colors.grey),
                                     const SizedBox(width: 4),
                                     Text(
                                       'Reviewed By: ${req.reviewedByName}',
-                                      style: GoogleFonts.lato(color: Colors.blueGrey, fontSize: 12, fontWeight: FontWeight.w600),
+                                      style: AppTypography.bodyMedium(color: Colors.grey, fontWeight: FontWeight.w600),
                                     ),
                                   ],
                                 ),
@@ -290,7 +291,7 @@ class _EmployeeLeaveApprovalTabState extends State<EmployeeLeaveApprovalTab> {
                                     ),
                                     icon: const Icon(Icons.rate_review_rounded, color: Colors.white, size: 16),
                                     onPressed: () => _showApprovalDialog(req),
-                                    label: Text('Review', style: GoogleFonts.lato(color: Colors.white, fontWeight: FontWeight.w700)),
+                                    label: Text('Review', style: AppTypography.heading2(color: Colors.white)),
                                   ),
                                 ),
                               ),

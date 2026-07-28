@@ -1,3 +1,5 @@
+import 'package:maleva/core/theme/app_typography.dart';
+import 'package:maleva/core/colors/colors.dart' as colour;
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -39,11 +41,7 @@ class _ReviewGridBody extends StatelessWidget {
         backgroundColor: AppTokens.brandGradientStart,
         toolbarHeight: isTablet ? 64 : 56,
         title: Text('Google Reviews',
-            style: GoogleFonts.lato(
-              color:      kWhite,
-              fontWeight: FontWeight.bold,
-              fontSize:   isTablet ? 20 : 18,
-            )),
+            style: AppTypography.heading1(color: kWhite)),
         iconTheme: const IconThemeData(color: kWhite),
       ),
       body: BlocConsumer<ReviewBloc, ReviewState>(
@@ -52,13 +50,13 @@ class _ReviewGridBody extends StatelessWidget {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
                   content:         Text(state.message),
-                  backgroundColor: Colors.red),
+                  backgroundColor: colour.commonColorred),
             );
           }
         },
         builder: (context, state) {
           if (state is! ReviewGridState) {
-            return const Center(
+            return Center(
                 child: CircularProgressIndicator(color: AppTokens.brandGradientStart));
           }
 
@@ -103,12 +101,7 @@ class _ReviewGridBody extends StatelessWidget {
                   ),
                   const SizedBox(width: 10),
                   Text('FILTERS',
-                      style: GoogleFonts.lato(
-                        fontSize:      18,
-                        fontWeight:    FontWeight.bold,
-                        color:         AppTokens.brandDark,
-                        letterSpacing: 1.2,
-                      )),
+                      style: AppTypography.heading1(color: AppTokens.brandDark)),
                 ]),
                 const SizedBox(height: 20),
 
@@ -156,7 +149,7 @@ class _ReviewGridBody extends StatelessWidget {
         required bool isTablet,
       }) {
     if (state.loading) {
-      return const Center(
+      return Center(
           child: CircularProgressIndicator(color: AppTokens.brandGradientStart));
     }
 
@@ -173,9 +166,7 @@ class _ReviewGridBody extends StatelessWidget {
             SizedBox(height: isTablet ? 16 : 12),
             Text(
               'Select employee and date range',
-              style: GoogleFonts.lato(
-                  fontSize: isTablet ? 16 : 15,
-                  color:    Colors.grey),
+              style: AppTypography.heading2(),
             ),
           ],
         ),
@@ -185,9 +176,7 @@ class _ReviewGridBody extends StatelessWidget {
     if (state.reviews.isEmpty) {
       return Center(
         child: Text('No reviews found',
-            style: GoogleFonts.lato(
-                fontSize: isTablet ? 18 : 16,
-                color:    Colors.grey)),
+            style: AppTypography.heading1()),
       );
     }
 
@@ -266,13 +255,9 @@ class _FilterCard extends StatelessWidget {
                   state.fromDate != null && state.toDate != null
                       ? '${DateFormat('dd MMM').format(state.fromDate!)} - ${DateFormat('dd MMM').format(state.toDate!)}'
                       : 'Select date range',
-                  style: GoogleFonts.lato(
-                    fontSize:   14,
-                    color:      state.fromDate != null
+                  style: AppTypography.heading2(color: state.fromDate != null
                         ? AppTokens.brandDark
-                        : Colors.grey,
-                    fontWeight: FontWeight.w600,
-                  ),
+                        : Colors.grey),
                 ),
               ),
               const Icon(Icons.chevron_right_rounded,
@@ -285,11 +270,7 @@ class _FilterCard extends StatelessWidget {
 
         // Employee dropdown
         Text('Employee',
-            style: GoogleFonts.lato(
-              fontSize:   12,
-              color:      Colors.grey[600],
-              fontWeight: FontWeight.w600,
-            )),
+            style: AppTypography.bodySmall()),
         const SizedBox(height: 6),
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 12),
@@ -316,11 +297,7 @@ class _FilterCard extends StatelessWidget {
       if (state.fromDate != null && state.toDate != null)
         Text(
           '${DateFormat('dd/MM').format(state.fromDate!)} - ${DateFormat('dd/MM').format(state.toDate!)}',
-          style: GoogleFonts.lato(
-            fontSize:   12,
-            color:      AppTokens.brandDark,
-            fontWeight: FontWeight.w600,
-          ),
+          style: AppTypography.bodySmall(color: AppTokens.brandDark),
         ),
 
       const SizedBox(width: 8),
@@ -347,8 +324,7 @@ class _FilterCard extends StatelessWidget {
         isExpanded: true,
         value:      state.selectedEmpId,
         hint: Text('Select Employee',
-            style: GoogleFonts.lato(
-                color: Colors.grey, fontSize: fontSize)),
+            style: AppTypography.bodyLarge()),
         icon: const Icon(Icons.keyboard_arrow_down_rounded,
             color: AppTokens.brandGradientStart),
         items: state.employees
@@ -356,9 +332,7 @@ class _FilterCard extends StatelessWidget {
           value: e.Id,
           child: Text(e.AccountName,
               overflow: TextOverflow.ellipsis,
-              style: GoogleFonts.lato(
-                  color:    AppTokens.brandDark,
-                  fontSize: fontSize)),
+              style: AppTypography.bodyLarge(color: AppTokens.brandDark)),
         ))
             .toList(),
         onChanged: (v) {
@@ -438,17 +412,9 @@ class _CountBadge extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text('Total Reviews',
-                style: GoogleFonts.lato(
-                  fontSize:   12,
-                  color:      kWhite.withValues(alpha: 0.75),
-                  fontWeight: FontWeight.w500,
-                )),
+                style: AppTypography.bodySmall(color: kWhite.withValues(alpha: 0.75))),
             Text('$count',
-                style: GoogleFonts.lato(
-                  fontSize:   28,
-                  color:      kWhite,
-                  fontWeight: FontWeight.bold,
-                )),
+                style: AppTypography.bodyLarge(color: kWhite)),
           ],
         ),
       ]),
@@ -499,18 +465,11 @@ class _ReviewCard extends StatelessWidget {
         ),
         title: Text(
           '${review.shopName} (${review.employeeName ?? ''})',
-          style: GoogleFonts.lato(
-            fontWeight: FontWeight.bold,
-            fontSize:   isTablet ? 16 : 15,
-            color:      AppTokens.brandDark,
-          ),
+          style: AppTypography.heading2(color: AppTokens.brandDark),
         ),
         subtitle: Text(
           'Review: ${review.googleReview ?? ''}\nDate: ${DateFormat('yyyy-MM-dd').format(review.supportDate)}',
-          style: GoogleFonts.lato(
-            fontSize: isTablet ? 14 : 13,
-            color:    Colors.grey[600],
-          ),
+          style: AppTypography.heading2(),
         ),
         trailing: Container(
           width:  isTablet ? 38 : 34,
@@ -522,7 +481,7 @@ class _ReviewCard extends StatelessWidget {
           child: IconButton(
             padding: EdgeInsets.zero,
             icon: Icon(Icons.delete_rounded,
-                color: Colors.red,
+                color: colour.commonColorred,
                 size:  isTablet ? 20 : 18),
             onPressed: onDelete,
           ),

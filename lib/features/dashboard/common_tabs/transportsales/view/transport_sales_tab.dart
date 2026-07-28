@@ -1,3 +1,4 @@
+import 'package:maleva/core/theme/app_typography.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -36,7 +37,7 @@ class _TransportSalesTabView extends StatelessWidget {
       builder: (context, state) {
         // Initial Loading State
         if (state.status == TransportSalesStatus.loading && state.rulesTypeEmployee.isEmpty) {
-          return const Center(
+          return Center(
             child: CircularProgressIndicator(color: Color(0xFF1555F3)),
           );
         }
@@ -74,16 +75,10 @@ class _TransportSalesTabView extends StatelessWidget {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text('Transport Sales',
-                                style: GoogleFonts.poppins(
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.w600,
-                                    color: colour.commonColor)),
+                                style: AppTypography.heading1(color: colour.commonColor)),
                             Text(
                               'Dashboard · ${DateFormat('MMMM yyyy').format(DateTime.now())}',
-                              style: GoogleFonts.poppins(
-                                  fontSize: 13,
-                                  fontWeight: FontWeight.w500,
-                                  color: colour.commonColor.withValues(alpha: 0.5)),
+                              style: AppTypography.bodyLarge(color: colour.commonColor.withValues(alpha: 0.5)),
                             ),
                           ],
                         ),
@@ -114,9 +109,7 @@ class _TransportSalesTabView extends StatelessWidget {
                               ? state.selectedEmpId
                               : null,
                           hint: Text('Select Employee',
-                              style: GoogleFonts.poppins(
-                                  fontSize: 14,
-                                  color: Colors.grey.shade500)),
+                              style: AppTypography.heading2()),
                           icon: const Icon(Icons.keyboard_arrow_down_rounded,
                               color: Colors.grey),
                           onChanged: (String? value) {
@@ -127,11 +120,7 @@ class _TransportSalesTabView extends StatelessWidget {
                                   .add(ChangeEmployeeEvent(value));
                             }
                           },
-                          style: GoogleFonts.poppins(
-                            fontSize: 14,
-                            fontWeight: FontWeight.w600,
-                            color: colour.commonColor,
-                          ),
+                          style: AppTypography.heading2(color: colour.commonColor),
                           items: state.rulesTypeEmployee
                               .map<DropdownMenuItem<String>>(
                                 (item) => DropdownMenuItem<String>(
@@ -193,11 +182,7 @@ class _TransportSalesTabView extends StatelessWidget {
                     Padding(
                       padding: const EdgeInsets.only(left: 4),
                       child: Text('STATUS BREAKDOWN',
-                          style: GoogleFonts.poppins(
-                              fontSize: 12,
-                              fontWeight: FontWeight.w700,
-                              letterSpacing: 1.0,
-                              color: colour.commonColor.withValues(alpha: 0.4))),
+                          style: AppTypography.bodySmall(color: colour.commonColor.withValues(alpha: 0.4))),
                     ),
                     const SizedBox(height: 10),
 
@@ -258,10 +243,7 @@ class _TransportSalesTabView extends StatelessWidget {
                                     Expanded(
                                       child: Text(
                                         item['JobStatus'].toString(),
-                                        style: GoogleFonts.poppins(
-                                            fontSize: 14,
-                                            fontWeight: FontWeight.w600,
-                                            color: colour.commonColor),
+                                        style: AppTypography.heading2(color: colour.commonColor),
                                       ),
                                     ),
                                     // Progress bar
@@ -284,18 +266,12 @@ class _TransportSalesTabView extends StatelessWidget {
                                       child: Text(
                                         dayCount.toString(),
                                         textAlign: TextAlign.right,
-                                        style: GoogleFonts.poppins(
-                                            fontSize: 15,
-                                            fontWeight: FontWeight.w700,
-                                            color: colour.commonColor),
+                                        style: AppTypography.heading2(color: colour.commonColor),
                                       ),
                                     ),
                                     const SizedBox(width: 4),
                                     Text('days',
-                                        style: GoogleFonts.poppins(
-                                            fontSize: 12,
-                                            fontWeight: FontWeight.w500,
-                                            color: colour.commonColor
+                                        style: AppTypography.bodySmall(color: colour.commonColor
                                                 .withValues(alpha: 0.4))),
                                   ],
                                 ),
@@ -309,8 +285,7 @@ class _TransportSalesTabView extends StatelessWidget {
                         padding: const EdgeInsets.all(20.0),
                         child: Center(
                           child: Text("No status data available.",
-                              style: GoogleFonts.poppins(
-                                  color: Colors.grey, fontWeight: FontWeight.w500)),
+                              style: AppTypography.bodyLarge()),
                         ),
                       ),
                     const SizedBox(height: 20),
@@ -404,17 +379,9 @@ class _StatCard extends StatelessWidget {
                   Text(label.toUpperCase(),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
-                      style: GoogleFonts.poppins(
-                          fontSize: 10,
-                          fontWeight: FontWeight.w600,
-                          letterSpacing: 0.5,
-                          color: Colors.grey.shade500)),
+                      style: AppTypography.bodySmall()),
                   Text(value,
-                      style: GoogleFonts.poppins(
-                          fontSize: 28,
-                          fontWeight: FontWeight.w700,
-                          color: colour.commonColor,
-                          height: 1)),
+                      style: AppTypography.bodyLarge(color: colour.commonColor)),
                   Container(
                     padding: const EdgeInsets.symmetric(
                         horizontal: 8, vertical: 3),
@@ -423,10 +390,7 @@ class _StatCard extends StatelessWidget {
                       borderRadius: BorderRadius.circular(20),
                     ),
                     child: Text(badge,
-                        style: GoogleFonts.poppins(
-                            fontSize: 9.5,
-                            color: badgeTextColor,
-                            fontWeight: FontWeight.w600)),
+                        style: AppTypography.bodySmall(color: badgeTextColor)),
                   ),
                 ],
               ),

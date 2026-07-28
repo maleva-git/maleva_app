@@ -1,4 +1,3 @@
-import 'package:maleva/core/network/api_legacy_helper.dart';
 import 'package:maleva/core/network/api_constants.dart';
 
 import 'package:maleva/core/utils/app_globals.dart';
@@ -6,6 +5,7 @@ import 'package:maleva/core/di/injection.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:maleva/core/models/shared/sale_edit_detail_model.dart';
 import 'package:maleva/features/operations/models/forwarding_model.dart';
+import 'package:maleva/core/network/legacy_api_repository.dart';
 
 class ViewSaleOrderRepository {
   final SharedPreferences prefs = sl<SharedPreferences>();
@@ -14,7 +14,7 @@ class ViewSaleOrderRepository {
     final comid = prefs.getInt('Comid') ?? 0;
     final url = "${ApiConstants.apiGetJobNo}$comid&JobType=$billId";
     
-    final resultData = await ApiLegacyHelper.apiAllinoneSelectArray(Uri.encodeFull(url), null, null, null);
+    final resultData = await sl<LegacyApiRepository>().apiAllinoneSelectArray(Uri.encodeFull(url), null, null, null);
     
     if (resultData != null && resultData.isNotEmpty && resultData["Data1"] != null) {
       final List<dynamic> data1List = resultData["Data1"].toList();
@@ -39,7 +39,7 @@ class ViewSaleOrderRepository {
     final comid = prefs.getInt('Comid') ?? 0;
     final url = "${ApiConstants.apiEditSalesOrder}$id&SaleorderNo=$saleNo&Comid=$comid";
     
-    final resultData = await ApiLegacyHelper.apiAllinoneSelect(Uri.encodeFull(url), null, null, null);
+    final resultData = await sl<LegacyApiRepository>().apiAllinoneSelect(Uri.encodeFull(url), null, null, null);
     
     if (resultData.isNotEmpty) {
       // Legacy support for unrefactored modules

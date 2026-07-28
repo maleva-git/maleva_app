@@ -1,3 +1,4 @@
+import 'package:maleva/core/theme/app_typography.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
@@ -143,7 +144,7 @@ class _SalesOrderAddBodyState extends State<_SalesOrderAddBody> with TickerProvi
               child: Column(mainAxisSize: MainAxisSize.min, children: [
                 const Icon(Icons.error_outline, color: colour.red, size: 48),
                 const SizedBox(height: 12),
-                Text(state.message, style: GoogleFonts.poppins(color: colour.textSub, fontSize: 14)),
+                Text(state.message, style: AppTypography.heading2(color: colour.textSub)),
               ]),
             ),
           );
@@ -166,7 +167,7 @@ class _SalesOrderAddBodyState extends State<_SalesOrderAddBody> with TickerProvi
             appBar: _buildAppBar(context, state),
             drawer: const Menulist(),
             body: state.progress == false
-                ? const Center(child: SpinKitFoldingCube(color: colour.brand, size: 35))
+                ? Center(child: SpinKitFoldingCube(color: colour.brand, size: 35))
                 : _buildTabBody(context, state, width, height),
             bottomNavigationBar: _buildBottomNav(context, state),
           ),
@@ -193,8 +194,8 @@ class _SalesOrderAddBodyState extends State<_SalesOrderAddBody> with TickerProvi
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Text('Sales Order', style: GoogleFonts.poppins(color: Colors.white, fontSize: 17, fontWeight: FontWeight.w700, letterSpacing: 0.3)),
-          Text(AppGlobals.storagenew.getString('Username') ?? '', style: GoogleFonts.poppins(color: Colors.white70, fontSize: 11, fontWeight: FontWeight.w500)),
+          Text('Sales Order', style: AppTypography.heading2(color: Colors.white)),
+          Text(AppGlobals.storagenew.getString('Username') ?? '', style: AppTypography.bodySmall(color: Colors.white)),
         ],
       ),
       actions: [
@@ -229,7 +230,7 @@ class _SalesOrderAddBodyState extends State<_SalesOrderAddBody> with TickerProvi
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8), side: BorderSide(color: enabled ? Colors.white54 : Colors.white24)),
           padding: const EdgeInsets.symmetric(horizontal: 12),
         ),
-        child: Text(label, style: GoogleFonts.poppins(color: enabled ? Colors.white : Colors.white38, fontSize: 12, fontWeight: FontWeight.w700)),
+        child: Text(label, style: AppTypography.bodySmall(color: enabled ? Colors.white : Colors.white38)),
       ),
     );
   }
@@ -300,7 +301,7 @@ class _SalesOrderAddBodyState extends State<_SalesOrderAddBody> with TickerProvi
       const SizedBox(height: 10),
       _sectionCard(children: [
         Row(children: [
-          Expanded(flex: 2, child: Center(child: Text(state.totalAmount.toString(), style: GoogleFonts.poppins(color: colour.red, fontSize: 16, fontWeight: FontWeight.w800)))),
+          Expanded(flex: 2, child: Center(child: Text(state.totalAmount.toString(), style: AppTypography.heading2(color: colour.red)))),
           const SizedBox(width: 10),
           Expanded(flex: 3, child: _styledDropdown<String>(value: state.dropdownValue, items: SalesOrderAddBloc.billType, enabled: fp["cmbBillType"] == true && !state.disabledBillType, onChanged: (v) => bloc.add(BillTypeChanged(v!)))),
         ]),
@@ -790,7 +791,7 @@ if (navResult8 != null) { AppGlobals.SelectEmployeeList = navResult8; }
             decoration: BoxDecoration(color: visible ? colour.brandLight : Colors.white, borderRadius: const BorderRadius.vertical(top: Radius.circular(16))),
             child: Row(children: [
               AnimatedRotation(turns: visible ? 0.25 : 0, duration: const Duration(milliseconds: 200), child: const Icon(Icons.arrow_right_rounded, color: colour.brand, size: 28)),
-              const SizedBox(width: 8), Text("FW $fwNum", style: GoogleFonts.poppins(color: colour.brandDark, fontSize: 14, fontWeight: FontWeight.w700)),
+              const SizedBox(width: 8), Text("FW $fwNum", style: AppTypography.heading2(color: colour.brandDark)),
               const SizedBox(width: 12), Expanded(child: _styledDropdown<String>(value: dropValue, items: SalesOrderAddBloc.forwardingNo, enabled: fp[dropKey] == true, onChanged: (v) => bloc.add(UpdateDropdown(dropKey, v)))),
             ]),
           ),
@@ -848,7 +849,7 @@ if (navResult10 != null) { AppGlobals.SelectEmployeeList = navResult10; }
     final refVal = zbNum == 1 ? state.txtZBRef1 : state.txtZBRef2;
     return _sectionCard(children: [
       Row(children: [
-        Text("ZB $zbNum", style: GoogleFonts.poppins(color: colour.brandDark, fontSize: 14, fontWeight: FontWeight.w700)),
+        Text("ZB $zbNum", style: AppTypography.heading2(color: colour.brandDark)),
         const SizedBox(width: 12),
         Expanded(child: _styledDropdown<String>(value: dropVal, items: SalesOrderAddBloc.zbNo, enabled: fp[dropKey] == true, onChanged: (v) => bloc.add(UpdateDropdown(dropKey, v)))),
       ]), _gap(),
@@ -931,12 +932,12 @@ if (navResult10 != null) { AppGlobals.SelectEmployeeList = navResult10; }
 
   Widget _tabScroll({required List<Widget> children}) => ListView(padding: const EdgeInsets.fromLTRB(14, 14, 14, 100), children: children);
   Widget _sectionCard({required List<Widget> children}) => Container(padding: const EdgeInsets.all(14), decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(16), border: Border.all(color: colour.border), boxShadow: const [BoxShadow(color: Color(0x0A1555F3), blurRadius: 8, offset: Offset(0, 2))]), child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: children));
-  Widget _sectionLabel(String t) => Text(t, style: GoogleFonts.poppins(color: colour.textSub, fontSize: 10, fontWeight: FontWeight.w700, letterSpacing: 0.6));
-  Widget _labelText(String t) => Text(t, style: GoogleFonts.poppins(color: colour.textMain, fontSize: 13, fontWeight: FontWeight.w600));
+  Widget _sectionLabel(String t) => Text(t, style: AppTypography.bodySmall(color: colour.textSub));
+  Widget _labelText(String t) => Text(t, style: AppTypography.bodyLarge(color: colour.textMain));
   Widget _gap() => const SizedBox(height: 10);
   Widget _divider() => const Divider(color: colour.border, thickness: 1);
-  Widget _readonlyBox(String val) => Container(key: ValueKey('readonly_$val'), height: 44, padding: const EdgeInsets.symmetric(horizontal: 12), decoration: BoxDecoration(color: colour.brandLight, borderRadius: BorderRadius.circular(10), border: Border.all(color: colour.border)), alignment: Alignment.centerLeft, child: Text(val, style: GoogleFonts.poppins(color: colour.brandDark, fontSize: 13, fontWeight: FontWeight.w700)));
-  Widget _dateTapBox({required String date, required VoidCallback? onTap}) => GestureDetector(onTap: onTap, child: Container(height: 44, padding: const EdgeInsets.symmetric(horizontal: 12), decoration: BoxDecoration(color: colour.brandLight, borderRadius: BorderRadius.circular(10), border: Border.all(color: colour.border)), child: Row(children: [const Icon(Icons.calendar_today_rounded, color: colour.brand, size: 15), const SizedBox(width: 8), Flexible(child: Text(date, style: GoogleFonts.poppins(color: colour.brandDark, fontSize: 13, fontWeight: FontWeight.w600)))])));
+  Widget _readonlyBox(String val) => Container(key: ValueKey('readonly_$val'), height: 44, padding: const EdgeInsets.symmetric(horizontal: 12), decoration: BoxDecoration(color: colour.brandLight, borderRadius: BorderRadius.circular(10), border: Border.all(color: colour.border)), alignment: Alignment.centerLeft, child: Text(val, style: AppTypography.bodyLarge(color: colour.brandDark)));
+  Widget _dateTapBox({required String date, required VoidCallback? onTap}) => GestureDetector(onTap: onTap, child: Container(height: 44, padding: const EdgeInsets.symmetric(horizontal: 12), decoration: BoxDecoration(color: colour.brandLight, borderRadius: BorderRadius.circular(10), border: Border.all(color: colour.border)), child: Row(children: [const Icon(Icons.calendar_today_rounded, color: colour.brand, size: 15), const SizedBox(width: 8), Flexible(child: Text(date, style: AppTypography.bodyLarge(color: colour.brandDark)))])));
 
   Widget _searchField({required String hint, required String uniqueId, required String value, required bool enabled, required VoidCallback onSearch, required VoidCallback onClear}) {
     final action = enabled ? (value.isEmpty ? onSearch : onClear) : null;
@@ -947,7 +948,7 @@ if (navResult10 != null) { AppGlobals.SelectEmployeeList = navResult10; }
         height: 46, decoration: BoxDecoration(color: enabled ? Colors.white : colour.surface, borderRadius: BorderRadius.circular(10), border: Border.all(color: enabled ? colour.border : colour.border.withValues(alpha: 0.3))),
         child: Row(children: [
           const SizedBox(width: 12),
-          Expanded(child: Text(value.isEmpty ? hint : value, style: GoogleFonts.poppins(color: value.isEmpty ? colour.textSub.withValues(alpha: 0.45) : colour.textMain, fontSize: 13, fontWeight: value.isEmpty ? FontWeight.w400 : FontWeight.w600), overflow: TextOverflow.ellipsis)),
+          Expanded(child: Text(value.isEmpty ? hint : value, style: AppTypography.bodyLarge(color: value.isEmpty ? colour.textSub.withValues(alpha: 0.45) : colour.textMain), overflow: TextOverflow.ellipsis)),
           Padding(padding: const EdgeInsets.all(10), child: Icon(value.isEmpty ? Icons.search_rounded : Icons.close_rounded, color: enabled ? colour.brand : colour.textSub.withValues(alpha: 0.25), size: 20)),
         ]),
       ),
@@ -963,9 +964,9 @@ if (navResult10 != null) { AppGlobals.SelectEmployeeList = navResult10; }
       maxLines: maxLines,
       keyboardType: keyboardType,
       textCapitalization: TextCapitalization.characters,
-      style: GoogleFonts.poppins(color: colour.textMain, fontSize: 13, fontWeight: FontWeight.w600),
+      style: AppTypography.bodyLarge(color: colour.textMain),
       decoration: InputDecoration(
-        hintText: hint, hintStyle: GoogleFonts.poppins(color: colour.textSub.withValues(alpha: 0.45), fontSize: 13),
+        hintText: hint, hintStyle: AppTypography.bodyLarge(color: colour.textSub.withValues(alpha: 0.45)),
         contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
         filled: true, fillColor: enabled ? Colors.white : colour.surface,
         enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: const BorderSide(color: colour.border)),
@@ -981,9 +982,9 @@ if (navResult10 != null) { AppGlobals.SelectEmployeeList = navResult10; }
       child: TextField(
         controller: _getController(uniqueId, value),
         enabled: enabled, onChanged: onChanged, maxLines: null, minLines: 3, textCapitalization: TextCapitalization.characters,
-        style: GoogleFonts.poppins(color: colour.textMain, fontSize: 13, fontWeight: FontWeight.w600),
+        style: AppTypography.bodyLarge(color: colour.textMain),
         decoration: InputDecoration(
-          hintText: hint, hintStyle: GoogleFonts.poppins(color: colour.textSub.withValues(alpha: 0.45), fontSize: 13), contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12), border: InputBorder.none,
+          hintText: hint, hintStyle: AppTypography.bodyLarge(color: colour.textSub.withValues(alpha: 0.45)), contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12), border: InputBorder.none,
           suffixIcon: onSearch != null ? GestureDetector(onTap: value.isEmpty ? onSearch : onClear, child: Padding(padding: const EdgeInsets.all(8), child: Icon(value.isEmpty ? Icons.search_rounded : Icons.close_rounded, color: colour.brand, size: 20))) : null,
         ),
       ),
@@ -993,7 +994,7 @@ if (navResult10 != null) { AppGlobals.SelectEmployeeList = navResult10; }
   Widget _styledDropdown<T>({required T? value, required List<T> items, required bool enabled, required ValueChanged<T?> onChanged}) => Container(
     key: ValueKey('dropdown_${T}_$value'), padding: const EdgeInsets.symmetric(horizontal: 12),
     decoration: BoxDecoration(color: enabled ? Colors.white : colour.surface, borderRadius: BorderRadius.circular(10), border: Border.all(color: enabled ? colour.border : colour.border.withValues(alpha: 0.3))),
-    child: DropdownButtonHideUnderline(child: DropdownButton<T>(isExpanded: true, value: value, onChanged: enabled ? onChanged : null, style: GoogleFonts.poppins(color: colour.textMain, fontSize: 13, fontWeight: FontWeight.w600), icon: const Icon(Icons.keyboard_arrow_down_rounded, color: colour.brand, size: 20), items: items.map((v) => DropdownMenuItem<T>(value: v, child: Text(v.toString(), style: GoogleFonts.poppins(color: colour.textMain, fontSize: 13, fontWeight: FontWeight.w600)))).toList())),
+    child: DropdownButtonHideUnderline(child: DropdownButton<T>(isExpanded: true, value: value, onChanged: enabled ? onChanged : null, style: AppTypography.bodyLarge(color: colour.textMain), icon: const Icon(Icons.keyboard_arrow_down_rounded, color: colour.brand, size: 20), items: items.map((v) => DropdownMenuItem<T>(value: v, child: Text(v.toString(), style: AppTypography.bodyLarge(color: colour.textMain)))).toList())),
   );
 
 
@@ -1001,7 +1002,7 @@ if (navResult10 != null) { AppGlobals.SelectEmployeeList = navResult10; }
     // 1. ADDED ':ss' TO FORMAT SO SECONDS ARE VISIBLE IN UI
     final fmt = showTime ? "dd-MM-yyyy HH:mm:ss" : "dd-MM-yyyy";
     return Row(children: [
-      SizedBox(width: 90, child: Text(label, style: GoogleFonts.poppins(color: colour.textMain, fontSize: 12, fontWeight: FontWeight.w600))),
+      SizedBox(width: 90, child: Text(label, style: AppTypography.bodySmall(color: colour.textMain))),
       Expanded(
         child: GestureDetector(
           onTap: () async {
@@ -1019,7 +1020,7 @@ if (navResult10 != null) { AppGlobals.SelectEmployeeList = navResult10; }
               }
             }
           },
-          child: Container(height: 44, padding: const EdgeInsets.symmetric(horizontal: 12), decoration: BoxDecoration(color: checkValue ? colour.brandLight : colour.surface, borderRadius: BorderRadius.circular(10), border: Border.all(color: checkValue ? colour.border : colour.border.withValues(alpha: 0.3))), child: Row(children: [const Icon(Icons.calendar_today_rounded, size: 14, color: colour.brand), const SizedBox(width: 8), Expanded(child: Text(DateFormat(fmt).format(DateTime.parse(dateStr)), style: GoogleFonts.poppins(color: checkValue ? colour.brandDark : colour.textSub, fontSize: 12, fontWeight: FontWeight.w600)))])),
+          child: Container(height: 44, padding: const EdgeInsets.symmetric(horizontal: 12), decoration: BoxDecoration(color: checkValue ? colour.brandLight : colour.surface, borderRadius: BorderRadius.circular(10), border: Border.all(color: checkValue ? colour.border : colour.border.withValues(alpha: 0.3))), child: Row(children: [const Icon(Icons.calendar_today_rounded, size: 14, color: colour.brand), const SizedBox(width: 8), Expanded(child: Text(DateFormat(fmt).format(DateTime.parse(dateStr)), style: AppTypography.bodySmall(color: checkValue ? colour.brandDark : colour.textSub)))])),
         ),
       ),
       const SizedBox(width: 8),
@@ -1050,23 +1051,23 @@ if (navResult10 != null) { AppGlobals.SelectEmployeeList = navResult10; }
       child: Row(children: [_ph('S', flex: 1), _ph('Code', flex: 2), _ph('Description', flex: 4), _ph('Qty', flex: 1), _ph('Rate', flex: 2), _ph('GST', flex: 2), _ph('Amount', flex: 2, align: TextAlign.right), _ph('', flex: 2)]),
     );
   }
-  Widget _ph(String t, {int flex = 1, TextAlign align = TextAlign.left}) => Expanded(flex: flex, child: Text(t, textAlign: align, style: GoogleFonts.poppins(color: Colors.white, fontSize: 9, fontWeight: FontWeight.w700, letterSpacing: 0.5)));
-  Widget _emptyProducts() => Container(padding: const EdgeInsets.symmetric(vertical: 20), child: Center(child: Text('No products added', style: GoogleFonts.poppins(color: colour.textSub, fontSize: 13))));
+  Widget _ph(String t, {int flex = 1, TextAlign align = TextAlign.left}) => Expanded(flex: flex, child: Text(t, textAlign: align, style: AppTypography.bodySmall(color: Colors.white)));
+  Widget _emptyProducts() => Container(padding: const EdgeInsets.symmetric(vertical: 20), child: Center(child: Text('No products added', style: AppTypography.bodyLarge(color: colour.textSub))));
   Widget _productRow(BuildContext context, SalesOrderAddLoaded state, int index, dynamic p, SalesOrderAddBloc bloc) {
     return Container(
       margin: const EdgeInsets.only(bottom: 6), padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
       decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(10), border: Border.all(color: colour.border)),
       child: Row(children: [
-        Expanded(flex: 1, child: Text('${index + 1}', style: GoogleFonts.poppins(color: colour.brand, fontSize: 11, fontWeight: FontWeight.w800))),
-        Expanded(flex: 2, child: Text(p.ProductCode.toString(), style: GoogleFonts.poppins(color: colour.brand, fontSize: 11, fontWeight: FontWeight.w700), overflow: TextOverflow.ellipsis)),
-        Expanded(flex: 4, child: Text(p.ProductName.toString(), style: GoogleFonts.poppins(color: colour.textMain, fontSize: 11, fontWeight: FontWeight.w600), overflow: TextOverflow.ellipsis)),
-        Expanded(flex: 1, child: Text('${p.ItemQty}', style: GoogleFonts.poppins(color: colour.textSub, fontSize: 11, fontWeight: FontWeight.w600))),
-        Expanded(flex: 2, child: Text('${p.SalesRate}', style: GoogleFonts.poppins(color: colour.textSub, fontSize: 11), overflow: TextOverflow.ellipsis)),
-        Expanded(flex: 2, child: Text('${p.TaxPercent}%', style: GoogleFonts.poppins(color: colour.textSub, fontSize: 11))),
-        Expanded(flex: 2, child: Text('${p.Amount}', textAlign: TextAlign.right, style: GoogleFonts.poppins(color: colour.brand, fontSize: 11, fontWeight: FontWeight.w800))),
+        Expanded(flex: 1, child: Text('${index + 1}', style: AppTypography.bodySmall(color: colour.brand))),
+        Expanded(flex: 2, child: Text(p.ProductCode.toString(), style: AppTypography.bodySmall(color: colour.brand), overflow: TextOverflow.ellipsis)),
+        Expanded(flex: 4, child: Text(p.ProductName.toString(), style: AppTypography.bodySmall(color: colour.textMain), overflow: TextOverflow.ellipsis)),
+        Expanded(flex: 1, child: Text('${p.ItemQty}', style: AppTypography.bodySmall(color: colour.textSub))),
+        Expanded(flex: 2, child: Text('${p.SalesRate}', style: AppTypography.bodySmall(color: colour.textSub), overflow: TextOverflow.ellipsis)),
+        Expanded(flex: 2, child: Text('${p.TaxPercent}%', style: AppTypography.bodySmall(color: colour.textSub))),
+        Expanded(flex: 2, child: Text('${p.Amount}', textAlign: TextAlign.right, style: AppTypography.bodySmall(color: colour.brand))),
         Row(mainAxisSize: MainAxisSize.min, children: [
-          GestureDetector(onTap: () => _showProductDialog(context, state, index), child: const Padding(padding: EdgeInsets.symmetric(horizontal: 2), child: Icon(Icons.edit_rounded, color: colour.brand, size: 18))),
-          GestureDetector(onTap: () => bloc.add(RemoveProduct(index)), child: const Padding(padding: EdgeInsets.symmetric(horizontal: 2), child: Icon(Icons.delete_rounded, color: colour.red, size: 18))),
+          GestureDetector(onTap: () => _showProductDialog(context, state, index), child: Padding(padding: EdgeInsets.symmetric(horizontal: 2), child: Icon(Icons.edit_rounded, color: colour.brand, size: 18))),
+          GestureDetector(onTap: () => bloc.add(RemoveProduct(index)), child: Padding(padding: EdgeInsets.symmetric(horizontal: 2), child: Icon(Icons.delete_rounded, color: colour.red, size: 18))),
         ]),
       ]),
     );
@@ -1094,7 +1095,7 @@ class _ProductDialogState extends State<_ProductDialog> {
           child: Column(children: [
             Row(children: [
               Container(width: 36, height: 36, decoration: BoxDecoration(color: colour.brandLight, borderRadius: BorderRadius.circular(10)), child: const Icon(Icons.add_shopping_cart_rounded, color: colour.brand, size: 20)),
-              const SizedBox(width: 10), Text("Add Product", style: GoogleFonts.poppins(color: colour.textMain, fontSize: 15, fontWeight: FontWeight.w700)),
+              const SizedBox(width: 10), Text("Add Product", style: AppTypography.heading2(color: colour.textMain)),
               const Spacer(),
               GestureDetector(onTap: () { bloc.add(ClearProduct()); Navigator.of(context, rootNavigator: true).pop(); }, child: Container(width: 32, height: 32, decoration: BoxDecoration(color: colour.surface, borderRadius: BorderRadius.circular(8), border: Border.all(color: colour.border)), child: const Icon(Icons.close_rounded, color: colour.textSub, size: 18))),
             ]),
@@ -1117,7 +1118,7 @@ class _ProductDialogState extends State<_ProductDialog> {
                 onClear: () => bloc.add(ClearProduct()),
               ),
               const SizedBox(height: 8), _numField("Qty", state.txtProductQty, 'qty'), const SizedBox(height: 6), _numField("Sale Rate", state.txtProductSaleRate, 'saleRate'), const SizedBox(height: 6), _numField("GST", state.txtProductGst, 'gst'), const SizedBox(height: 6),
-              Container(height: 44, padding: const EdgeInsets.symmetric(horizontal: 12), decoration: BoxDecoration(color: colour.brandLight, borderRadius: BorderRadius.circular(10), border: Border.all(color: colour.brand.withValues(alpha: 0.3))), child: Row(children: [Text('Amount : ', style: GoogleFonts.poppins(color: colour.textSub, fontSize: 12, fontWeight: FontWeight.w600)), Text(state.txtProductAmount, style: GoogleFonts.poppins(color: colour.brand, fontSize: 15, fontWeight: FontWeight.w800))])),
+              Container(height: 44, padding: const EdgeInsets.symmetric(horizontal: 12), decoration: BoxDecoration(color: colour.brandLight, borderRadius: BorderRadius.circular(10), border: Border.all(color: colour.brand.withValues(alpha: 0.3))), child: Row(children: [Text('Amount : ', style: AppTypography.bodySmall(color: colour.textSub)), Text(state.txtProductAmount, style: AppTypography.heading2(color: colour.brand))])),
             ]))),
             const SizedBox(height: 10),
             Expanded(flex: 4, child: Container(decoration: BoxDecoration(color: colour.surface, borderRadius: BorderRadius.circular(14), border: Border.all(color: colour.border)), padding: const EdgeInsets.all(8), child: Column(children: [
@@ -1129,14 +1130,14 @@ class _ProductDialogState extends State<_ProductDialog> {
       );
     });
   }
-  Widget _roField(String hint, String value) => Container(height: 44, padding: const EdgeInsets.symmetric(horizontal: 12), decoration: BoxDecoration(color: colour.surface, borderRadius: BorderRadius.circular(10), border: Border.all(color: colour.border)), alignment: Alignment.centerLeft, child: Text(value.isEmpty ? hint : value, style: GoogleFonts.poppins(color: value.isEmpty ? colour.textSub : colour.textMain, fontSize: 13, fontWeight: value.isEmpty ? FontWeight.w400 : FontWeight.w600)));
-  Widget _searchableField({required String hint, required String value, required VoidCallback onSearch, required VoidCallback onClear}) => Container(height: 46, decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(10), border: Border.all(color: colour.border)), child: Row(children: [const SizedBox(width: 12), Expanded(child: Text(value.isEmpty ? hint : value, style: GoogleFonts.poppins(color: value.isEmpty ? colour.textSub.withValues(alpha: 0.45) : colour.textMain, fontSize: 13, fontWeight: value.isEmpty ? FontWeight.w400 : FontWeight.w600), overflow: TextOverflow.ellipsis)), GestureDetector(onTap: value.isEmpty ? onSearch : onClear, child: Padding(padding: const EdgeInsets.all(10), child: Icon(value.isEmpty ? Icons.search_rounded : Icons.close_rounded, color: colour.brand, size: 20)))]));
+  Widget _roField(String hint, String value) => Container(height: 44, padding: const EdgeInsets.symmetric(horizontal: 12), decoration: BoxDecoration(color: colour.surface, borderRadius: BorderRadius.circular(10), border: Border.all(color: colour.border)), alignment: Alignment.centerLeft, child: Text(value.isEmpty ? hint : value, style: AppTypography.bodyLarge(color: value.isEmpty ? colour.textSub : colour.textMain)));
+  Widget _searchableField({required String hint, required String value, required VoidCallback onSearch, required VoidCallback onClear}) => Container(height: 46, decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(10), border: Border.all(color: colour.border)), child: Row(children: [const SizedBox(width: 12), Expanded(child: Text(value.isEmpty ? hint : value, style: AppTypography.bodyLarge(color: value.isEmpty ? colour.textSub.withValues(alpha: 0.45) : colour.textMain), overflow: TextOverflow.ellipsis)), GestureDetector(onTap: value.isEmpty ? onSearch : onClear, child: Padding(padding: const EdgeInsets.all(10), child: Icon(value.isEmpty ? Icons.search_rounded : Icons.close_rounded, color: colour.brand, size: 20)))]));
   Widget _numField(String hint, String value, String fieldKey) {
     final active = _activeField == fieldKey;
-    return GestureDetector(onTap: () => setState(() => _activeField = fieldKey), child: Container(height: 44, padding: const EdgeInsets.symmetric(horizontal: 12), decoration: BoxDecoration(color: active ? colour.brandLight : Colors.white, borderRadius: BorderRadius.circular(10), border: Border.all(color: active ? colour.brand : colour.border, width: active ? 1.5 : 1)), child: Row(children: [Expanded(child: Text(value.isEmpty ? hint : value, style: GoogleFonts.poppins(color: value.isEmpty ? colour.textSub.withValues(alpha: 0.45) : colour.textMain, fontSize: 13, fontWeight: value.isEmpty ? FontWeight.w400 : FontWeight.w700))), if (active) Container(width: 2, height: 18, color: colour.brand)])));
+    return GestureDetector(onTap: () => setState(() => _activeField = fieldKey), child: Container(height: 44, padding: const EdgeInsets.symmetric(horizontal: 12), decoration: BoxDecoration(color: active ? colour.brandLight : Colors.white, borderRadius: BorderRadius.circular(10), border: Border.all(color: active ? colour.brand : colour.border, width: active ? 1.5 : 1)), child: Row(children: [Expanded(child: Text(value.isEmpty ? hint : value, style: AppTypography.bodyLarge(color: value.isEmpty ? colour.textSub.withValues(alpha: 0.45) : colour.textMain))), if (active) Container(width: 2, height: 18, color: colour.brand)])));
   }
   Widget _numRow(List<String> keys, SalesOrderAddBloc bloc) => Expanded(child: Row(children: keys.map((k) => _numBtn(k, () => bloc.add(KeyPress(k, _activeField)))).toList()));
-  Widget _numBtn(String label, VoidCallback onPressed, {bool isAction = false}) => Expanded(child: Padding(padding: const EdgeInsets.all(3), child: GestureDetector(onTap: onPressed, child: Container(decoration: BoxDecoration(color: isAction ? colour.brand : Colors.white, borderRadius: BorderRadius.circular(10), border: Border.all(color: isAction ? colour.brand : colour.border), boxShadow: [BoxShadow(color: isAction ? colour.brand.withValues(alpha: 0.2) : Colors.black.withValues(alpha: 0.04), blurRadius: 4, offset: const Offset(0, 2))]), alignment: Alignment.center, child: Text(label, style: GoogleFonts.poppins(color: isAction ? Colors.white : colour.textMain, fontSize: isAction ? 13 : 16, fontWeight: FontWeight.w700))))));
+  Widget _numBtn(String label, VoidCallback onPressed, {bool isAction = false}) => Expanded(child: Padding(padding: const EdgeInsets.all(3), child: GestureDetector(onTap: onPressed, child: Container(decoration: BoxDecoration(color: isAction ? colour.brand : Colors.white, borderRadius: BorderRadius.circular(10), border: Border.all(color: isAction ? colour.brand : colour.border), boxShadow: [BoxShadow(color: isAction ? colour.brand.withValues(alpha: 0.2) : Colors.black.withValues(alpha: 0.04), blurRadius: 4, offset: const Offset(0, 2))]), alignment: Alignment.center, child: Text(label, style: AppTypography.heading2(color: isAction ? Colors.white : colour.textMain))))));
 }
 class _AddressListDialog extends StatelessWidget {
   final String title;
@@ -1169,7 +1170,7 @@ class _AddressListDialog extends StatelessWidget {
             Row(children: [
               Container(width: 36, height: 36, decoration: BoxDecoration(color: colour.brandLight, borderRadius: BorderRadius.circular(10)), child: const Icon(Icons.list_rounded, color: colour.brand, size: 20)),
               const SizedBox(width: 10),
-              Expanded(child: Text(title, style: GoogleFonts.poppins(color: colour.textMain, fontSize: 14, fontWeight: FontWeight.w700), overflow: TextOverflow.ellipsis)),
+              Expanded(child: Text(title, style: AppTypography.heading2(color: colour.textMain), overflow: TextOverflow.ellipsis)),
               GestureDetector(onTap: () => Navigator.of(context, rootNavigator: true).pop(), child: Container(width: 32, height: 32, decoration: BoxDecoration(color: colour.surface, borderRadius: BorderRadius.circular(8), border: Border.all(color: colour.border)), child: const Icon(Icons.close_rounded, color: colour.textSub, size: 18))),
             ]),
             const SizedBox(height: 10),
@@ -1179,11 +1180,11 @@ class _AddressListDialog extends StatelessWidget {
             // --- PUDHU HEADER ROW (Theliva irukka) ---
             Row(
               children: [
-                Expanded(flex: 3, child: Text('Address', style: GoogleFonts.poppins(color: colour.textSub, fontSize: 12, fontWeight: FontWeight.w600))),
+                Expanded(flex: 3, child: Text('Address', style: AppTypography.bodySmall(color: colour.textSub))),
                 const SizedBox(width: 8),
-                Expanded(flex: 1, child: Text('Qty', textAlign: TextAlign.center, style: GoogleFonts.poppins(color: colour.textSub, fontSize: 12, fontWeight: FontWeight.w600))),
+                Expanded(flex: 1, child: Text('Qty', textAlign: TextAlign.center, style: AppTypography.bodySmall(color: colour.textSub))),
                 const SizedBox(width: 8),
-                Expanded(flex: 1, child: Text('Wt', textAlign: TextAlign.center, style: GoogleFonts.poppins(color: colour.textSub, fontSize: 12, fontWeight: FontWeight.w600))),
+                Expanded(flex: 1, child: Text('Wt', textAlign: TextAlign.center, style: AppTypography.bodySmall(color: colour.textSub))),
                 const SizedBox(width: 26), // Spacer for delete icon
               ],
             ),
@@ -1191,7 +1192,7 @@ class _AddressListDialog extends StatelessWidget {
 
             Expanded(
                 child: addresses.isEmpty
-                    ? Center(child: Text('No records', style: GoogleFonts.poppins(color: colour.textSub, fontSize: 13)))
+                    ? Center(child: Text('No records', style: AppTypography.bodyLarge(color: colour.textSub)))
                     : ListView.builder(
                     itemCount: addresses.length,
                     itemBuilder: (ctx, index) {
@@ -1211,15 +1212,15 @@ class _AddressListDialog extends StatelessWidget {
                           decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(12), border: Border.all(color: colour.border), boxShadow: const [BoxShadow(color: Color(0x0A1555F3), blurRadius: 6, offset: Offset(0, 2))]),
                           child: Row(children: [
                             // 1. Address
-                            Expanded(flex: 3, child: Text(addresses[index].toString(), style: GoogleFonts.poppins(color: colour.textMain, fontSize: 12, fontWeight: FontWeight.w600))),
+                            Expanded(flex: 3, child: Text(addresses[index].toString(), style: AppTypography.bodySmall(color: colour.textMain))),
                             const SizedBox(width: 8),
 
                             // 2. Quantity
-                            Expanded(flex: 1, child: Container(padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 4), decoration: BoxDecoration(color: colour.brandLight, borderRadius: BorderRadius.circular(8)), child: Text(index < quantities.length ? quantities[index].toString() : '', textAlign: TextAlign.center, style: GoogleFonts.poppins(color: colour.brand, fontSize: 12, fontWeight: FontWeight.w700)))),
+                            Expanded(flex: 1, child: Container(padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 4), decoration: BoxDecoration(color: colour.brandLight, borderRadius: BorderRadius.circular(8)), child: Text(index < quantities.length ? quantities[index].toString() : '', textAlign: TextAlign.center, style: AppTypography.bodySmall(color: colour.brand)))),
                             const SizedBox(width: 8),
 
                             // 3. Weight (PUDHUSA ADD PANNADHU)
-                            Expanded(flex: 1, child: Container(padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 4), decoration: BoxDecoration(color: colour.brandLight, borderRadius: BorderRadius.circular(8)), child: Text(index < weights.length ? weights[index].toString() : '', textAlign: TextAlign.center, style: GoogleFonts.poppins(color: colour.brand, fontSize: 12, fontWeight: FontWeight.w700)))),
+                            Expanded(flex: 1, child: Container(padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 4), decoration: BoxDecoration(color: colour.brandLight, borderRadius: BorderRadius.circular(8)), child: Text(index < weights.length ? weights[index].toString() : '', textAlign: TextAlign.center, style: AppTypography.bodySmall(color: colour.brand)))),
                             const SizedBox(width: 8),
 
                             // 4. Delete Icon

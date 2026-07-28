@@ -19,7 +19,7 @@ class SalesOrderAddRepository {
         return response.data.toString();
       }
     } catch (e) {
-      // Return empty on error
+      print("Error in maxSaleOrderNo: $e");
     }
     return "";
   }
@@ -40,7 +40,7 @@ class SalesOrderAddRepository {
         }
       }
     } catch (e) {
-      // Ignored
+      print("Error in loadCustomerCurrency: $e");
     }
     return 0.0;
   }
@@ -57,7 +57,9 @@ class SalesOrderAddRepository {
       if (responseData is List) {
         return responseData;
       }
-    } catch (e) { }
+    } catch (e) {
+      print("Error in selectAddressList: $e");
+    }
     return [];
   }
 
@@ -73,7 +75,9 @@ class SalesOrderAddRepository {
       if (responseData is List) {
         return responseData;
       }
-    } catch (e) { }
+    } catch (e) {
+      print("Error in selectAddressDetails: $e");
+    }
     return [];
   }
 
@@ -89,7 +93,9 @@ class SalesOrderAddRepository {
       if (responseData is List) {
         return responseData;
       }
-    } catch (e) { }
+    } catch (e) {
+      print("Error in selectAgentCompany: $e");
+    }
     return [];
   }
 
@@ -105,7 +111,9 @@ class SalesOrderAddRepository {
       if (responseData is List) {
         return responseData;
       }
-    } catch (e) { }
+    } catch (e) {
+      print("Error in selectEmployee: $e");
+    }
     return [];
   }
 
@@ -121,7 +129,9 @@ class SalesOrderAddRepository {
       if (responseData is List && responseData.isNotEmpty) {
         return responseData[0] as Map<String, dynamic>;
       }
-    } catch (e) { }
+    } catch (e) {
+      print("Error in selectAllJobStatus: $e");
+    }
     return {};
   }
 
@@ -137,7 +147,9 @@ class SalesOrderAddRepository {
       if (responseData is List) {
         return responseData;
       }
-    } catch (e) { }
+    } catch (e) {
+      print("Error in selectCustomer: $e");
+    }
     return [];
   }
 
@@ -153,7 +165,9 @@ class SalesOrderAddRepository {
       if (responseData is List) {
         return responseData;
       }
-    } catch (e) { }
+    } catch (e) {
+      print("Error in selectJobType: $e");
+    }
     return [];
   }
 
@@ -169,7 +183,9 @@ class SalesOrderAddRepository {
       if (responseData is List) {
         return responseData;
       }
-    } catch (e) { }
+    } catch (e) {
+      print("Error in selectAgentAll: $e");
+    }
     return [];
   }
 }

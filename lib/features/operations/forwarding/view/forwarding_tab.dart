@@ -1,3 +1,7 @@
+import 'package:maleva/core/theme/app_typography.dart';
+import 'package:maleva/core/colors/colors.dart' as colour;
+import 'package:maleva/core/network/legacy_api_repository.dart';
+import 'package:maleva/core/di/injection.dart';
 import 'package:maleva/core/utils/system_helpers.dart';
 import 'package:maleva/core/network/api_constants.dart';
 import 'dart:io';
@@ -8,7 +12,7 @@ import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:maleva/core/utils/app_globals.dart';
-import 'package:maleva/core/network/OnlineApi.dart' as OnlineApi;
+
 import 'package:maleva/menu/menulist.dart';
 import '../../../../core/di/injection.dart';
 import '../../../../core/theme/palette.dart';
@@ -59,7 +63,7 @@ class FWUpdatePageState extends State<FWUpdatePage> with SingleTickerProviderSta
   void initState() {
     super.initState();
     // Fixed: Initializing the Global JobNoList
-    OnlineApi.GetJobNoForwarding(context, 3);
+    sl<LegacyApiRepository>().GetJobNoForwarding(context, 3);
 
     _tabController = TabController(length: 3, vsync: this);
     _tabController.addListener(() {
@@ -107,7 +111,7 @@ class FWUpdatePageState extends State<FWUpdatePage> with SingleTickerProviderSta
           if (!context.mounted) return;
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text(state.message, style: GoogleFonts.lato(color: Colors.white)),
+              content: Text(state.message, style: AppTypography.bodyLarge(color: Colors.white)),
               backgroundColor: const Color(0xFFB33040),
               behavior: SnackBarBehavior.floating,
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
@@ -134,7 +138,7 @@ class FWUpdatePageState extends State<FWUpdatePage> with SingleTickerProviderSta
           body: BlocBuilder<FWUpdateBloc, FWUpdateState>(
             builder: (context, state) {
               if (state is FWUpdateInitial || state is FWUpdateLoading) {
-                return const Center(
+                return Center(
                   child: SpinKitFoldingCube(color: Palette.blue400, size: 35),
                 );
               }
@@ -189,10 +193,10 @@ class FWUpdatePageState extends State<FWUpdatePage> with SingleTickerProviderSta
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text('FW Entry Update',
-              style: GoogleFonts.lato(color: Colors.white, fontWeight: FontWeight.w700, fontSize: 17, letterSpacing: 0.3)),
+              style: AppTypography.heading2(color: Colors.white)),
           const SizedBox(height: 2),
           Text(userName,
-              style: GoogleFonts.lato(color: Colors.white.withValues(alpha: 0.65), fontWeight: FontWeight.w500, fontSize: 12)),
+              style: AppTypography.bodySmall(color: Colors.white)),
         ],
       ),
       actions: [
@@ -276,10 +280,9 @@ class _FWUpdateBody extends StatelessWidget {
     return LayoutBuilder(
       builder: (context, constraints) {
         final isTablet = constraints.maxWidth > kTabletBreak;
-        final hPad = isTablet ? constraints.maxWidth * 0.06 : 0.0;
 
         return Padding(
-          padding: EdgeInsets.symmetric(horizontal: hPad),
+          padding: EdgeInsets.zero,
           child: TabBarView(
             controller: tabController,
             physics: const NeverScrollableScrollPhysics(),
@@ -367,8 +370,8 @@ class _FWTabContentState extends State<_FWTabContent> {
     final tab = widget.tab;
     final isTablet = widget.isTablet;
 
-    return ListView(
-      padding: EdgeInsets.fromLTRB(14, 16, 14, isTablet ? 24 : 16),
+    final smkField = Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         _FieldLabel('SMK No $t', isTablet),
         const SizedBox(height: 6),
@@ -380,12 +383,15 @@ class _FWTabContentState extends State<_FWTabContent> {
           onChanged: (v) => _emit(FWUpdateSmkTextChanged(type: t, text: v)),
           onSuggestionTap: (id, smk) {
             FocusScope.of(context).unfocus();
-            // Inga context-a pass panrom
             _emit(FWUpdateSmkSuggestionSelected(context: context, type: t, saleOrderId: id, smkText: smk));
           },
         ),
-        SizedBox(height: isTablet ? 16 : 12),
+      ],
+    );
 
+    final enRefField = Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
         _FieldLabel('EN Ref $t', isTablet),
         const SizedBox(height: 6),
         _FWTextField(
@@ -394,8 +400,12 @@ class _FWTabContentState extends State<_FWTabContent> {
           isTablet: isTablet,
           onChanged: (v) => _emit(FWUpdateEnRefChanged(type: t, value: v)),
         ),
-        SizedBox(height: isTablet ? 16 : 12),
+      ],
+    );
 
+    final exRefField = Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
         _FieldLabel('EX Ref $t', isTablet),
         const SizedBox(height: 6),
         _FWTextField(
@@ -404,8 +414,12 @@ class _FWTabContentState extends State<_FWTabContent> {
           isTablet: isTablet,
           onChanged: (v) => _emit(FWUpdateExRefChanged(type: t, value: v)),
         ),
-        SizedBox(height: isTablet ? 16 : 12),
+      ],
+    );
 
+    final sealByField = Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
         _FieldLabel('Seal By', isTablet),
         const SizedBox(height: 6),
         _EmployeeSearchField(
@@ -414,9 +428,9 @@ class _FWTabContentState extends State<_FWTabContent> {
           isTablet: isTablet,
           onSearch: () async {
             context.read<FWUpdateBloc>().add(FWUpdateOverlayDismissed());
-            await OnlineApi.SelectEmployee(context, '', 'Operation');
+            await sl<LegacyApiRepository>().SelectEmployee(context, '', 'Operation');
             if (!context.mounted) return;
-Navigator.push(
+            Navigator.push(
               context,
               MaterialPageRoute(builder: (_) => const Employee(Searchby: 1, SearchId: 0)),
             ).then((navRes) {
@@ -430,8 +444,12 @@ Navigator.push(
           },
           onClear: () => _emit(FWUpdateSealEmpCleared(t)),
         ),
-        SizedBox(height: isTablet ? 16 : 12),
+      ],
+    );
 
+    final breakSealByField = Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
         _FieldLabel('Break Seal By', isTablet),
         const SizedBox(height: 6),
         _EmployeeSearchField(
@@ -440,9 +458,9 @@ Navigator.push(
           isTablet: isTablet,
           onSearch: () async {
             context.read<FWUpdateBloc>().add(FWUpdateOverlayDismissed());
-            await OnlineApi.SelectEmployee(context, '', 'Operation');
+            await sl<LegacyApiRepository>().SelectEmployee(context, '', 'Operation');
             if (!context.mounted) return;
-Navigator.push(
+            Navigator.push(
               context,
               MaterialPageRoute(builder: (_) => const Employee(Searchby: 1, SearchId: 0)),
             ).then((navRes) {
@@ -456,16 +474,67 @@ Navigator.push(
           },
           onClear: () => _emit(FWUpdateBreakEmpCleared(t)),
         ),
-        SizedBox(height: isTablet ? 20 : 14),
-
-        _ImageUploadSection(
-          type: t,
-          tab: tab,
-          saleOrderId: widget.saleOrderId,
-          isTablet: isTablet,
-          onPickImage: widget.onPickImage,
-        ),
       ],
+    );
+
+    return ListView(
+      padding: EdgeInsets.fromLTRB(14, 16, 14, isTablet ? 32 : 16),
+      children: isTablet
+          ? [
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Expanded(child: smkField),
+                  const SizedBox(width: 16),
+                  Expanded(child: enRefField),
+                ],
+              ),
+              const SizedBox(height: 16),
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Expanded(child: exRefField),
+                  const SizedBox(width: 16),
+                  Expanded(child: sealByField),
+                ],
+              ),
+              const SizedBox(height: 16),
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Expanded(child: breakSealByField),
+                  const SizedBox(width: 16),
+                  const Expanded(child: SizedBox()),
+                ],
+              ),
+              const SizedBox(height: 24),
+              _ImageUploadSection(
+                type: t,
+                tab: tab,
+                saleOrderId: widget.saleOrderId,
+                isTablet: isTablet,
+                onPickImage: widget.onPickImage,
+              ),
+            ]
+          : [
+              smkField,
+              const SizedBox(height: 12),
+              enRefField,
+              const SizedBox(height: 12),
+              exRefField,
+              const SizedBox(height: 12),
+              sealByField,
+              const SizedBox(height: 12),
+              breakSealByField,
+              const SizedBox(height: 16),
+              _ImageUploadSection(
+                type: t,
+                tab: tab,
+                saleOrderId: widget.saleOrderId,
+                isTablet: isTablet,
+                onPickImage: widget.onPickImage,
+              ),
+            ],
     );
   }
 }
@@ -577,7 +646,7 @@ class _SmkFieldState extends State<_SmkField> {
                         children: [
                           const Icon(Icons.local_shipping_outlined, size: 16, color: Palette.blue400),
                           const SizedBox(width: 10),
-                          Text(smkVal, style: GoogleFonts.lato(color: Palette.textDark2, fontWeight: FontWeight.w600, fontSize: widget.isTablet ? AppGlobals.FontLow + 1 : AppGlobals.FontLow)),
+                          Text(smkVal, style: AppTypography.bodySmall(color: Palette.textDark2)),
                         ],
                       ),
                     ),
@@ -608,15 +677,11 @@ class _SmkFieldState extends State<_SmkField> {
         keyboardType: TextInputType.number,
         textInputAction: TextInputAction.done,
         textCapitalization: TextCapitalization.characters,
-        style: GoogleFonts.lato(
-          color: Palette.textDark2,
-          fontWeight: FontWeight.w600,
-          fontSize: widget.isTablet ? AppGlobals.FontLow + 1 : AppGlobals.FontLow,
-        ),
+        style: AppTypography.bodySmall(color: Palette.textDark2),
         onChanged: widget.onChanged,
         decoration: InputDecoration(
           hintText: 'SMK No ${widget.type}',
-          hintStyle: GoogleFonts.lato(color: Palette.kTextMuted, fontSize: widget.isTablet ? AppGlobals.FontLow + 1 : AppGlobals.FontLow),
+          hintStyle: AppTypography.bodySmall(color: Palette.kTextMuted),
           filled: true,
           fillColor: Palette.grey200p,
           prefixIcon: const Icon(Icons.tag_rounded, color: Palette.blue400, size: 20),
@@ -682,7 +747,7 @@ class _ImageUploadSection extends StatelessWidget {
               ),
               const SizedBox(width: 10),
               Text('Upload Image',
-                style: GoogleFonts.lato(color: Palette.textDark2, fontWeight: FontWeight.w600, fontSize: isTablet ? AppGlobals.FontMedium + 1 : AppGlobals.FontMedium),
+                style: AppTypography.heading2(color: Palette.textDark2),
               ),
               const Spacer(),
               _ImagePickBtn(icon: Icons.photo_outlined, enabled: tab.imageUploadEnabled, isTablet: isTablet, onTap: () => onPickImage(ImageSource.gallery, type, tab.smkText)),
@@ -706,7 +771,7 @@ class _ImageUploadSection extends StatelessWidget {
               children: [
                 Icon(Icons.image_outlined, size: isTablet ? 48 : 36, color: Palette.kTextMuted),
                 const SizedBox(height: 8),
-                Text('No images uploaded', style: GoogleFonts.lato(color: Palette.kTextMuted, fontSize: 13)),
+                Text('No images uploaded', style: AppTypography.bodyLarge(color: Palette.kTextMuted)),
               ],
             ),
           )
@@ -733,7 +798,7 @@ class _ImageUploadSection extends StatelessWidget {
                     child: CachedNetworkImage(
                       imageUrl: imageUrl,
                       fit: BoxFit.cover,
-                      placeholder: (_, __) => Container(color: Palette.grey200p, child: const Center(child: SizedBox(width: 20, height: 20, child: CircularProgressIndicator(color: Palette.blue400, strokeWidth: 2)))),
+                      placeholder: (_, __) => Container(color: Palette.grey200p, child: Center(child: SizedBox(width: 20, height: 20, child: CircularProgressIndicator(color: Palette.blue400, strokeWidth: 2)))),
                       errorWidget: (_, __, ___) => Container(color: Palette.grey200p, child: const Icon(Icons.file_copy_outlined, color: Palette.blue400)),
                     ),
                   ),
@@ -784,8 +849,8 @@ class _FWBottomNav extends StatelessWidget {
         currentIndex: currentIndex,
         selectedItemColor: Palette.blue700,
         unselectedItemColor: Palette.kTextMuted,
-        selectedLabelStyle: GoogleFonts.lato(fontWeight: FontWeight.w700, fontSize: AppGlobals.FontLow),
-        unselectedLabelStyle: GoogleFonts.lato(fontWeight: FontWeight.w500, fontSize: AppGlobals.FontCardText),
+        selectedLabelStyle: AppTypography.bodySmall(),
+        unselectedLabelStyle: AppTypography.bodyLarge(),
         onTap: onTap,
         items: const [
           BottomNavigationBarItem(icon: Icon(Icons.local_shipping_outlined), label: 'FW 1'),
@@ -804,7 +869,7 @@ class _FieldLabel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Text(text, style: GoogleFonts.lato(color: Palette.textMid, fontWeight: FontWeight.w600, fontSize: isTablet ? AppGlobals.FontLow + 1 : AppGlobals.FontLow));
+    return Text(text, style: AppTypography.bodySmall(color: Palette.textMid));
   }
 }
 
@@ -830,7 +895,7 @@ class _EmployeeSearchField extends StatelessWidget {
         decoration: BoxDecoration(color: Palette.grey200p, borderRadius: BorderRadius.circular(10), border: Border.all(color: Palette.cardBorder, width: 0.5)),
         child: Row(
           children: [
-            Expanded(child: Text(value.isEmpty ? hint : value, style: GoogleFonts.lato(color: value.isEmpty ? Palette.kTextMuted : Palette.textDark2, fontWeight: value.isEmpty ? FontWeight.w500 : FontWeight.w600, fontSize: isTablet ? AppGlobals.FontLow + 1 : AppGlobals.FontLow), overflow: TextOverflow.ellipsis)),
+            Expanded(child: Text(value.isEmpty ? hint : value, style: AppTypography.bodySmall(color: value.isEmpty ? Palette.kTextMuted : Palette.textDark2), overflow: TextOverflow.ellipsis)),
             Icon(value.isNotEmpty ? Icons.close_rounded : Icons.search_rounded, size: 20, color: Palette.blue400),
           ],
         ),
@@ -854,10 +919,10 @@ class _FWTextField extends StatelessWidget {
       textCapitalization: TextCapitalization.characters,
       textInputAction: TextInputAction.done,
       onChanged: onChanged,
-      style: GoogleFonts.lato(color: Palette.textDark2, fontWeight: FontWeight.w600, fontSize: isTablet ? AppGlobals.FontLow + 1 : AppGlobals.FontLow),
+      style: AppTypography.bodySmall(color: Palette.textDark2),
       decoration: InputDecoration(
         hintText: hint,
-        hintStyle: GoogleFonts.lato(color: Palette.kTextMuted, fontSize: isTablet ? AppGlobals.FontLow + 1 : AppGlobals.FontLow),
+        hintStyle: AppTypography.bodySmall(color: Palette.kTextMuted),
         filled: true,
         fillColor: Palette.grey200p,
         contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
@@ -883,7 +948,7 @@ class _AppBarButton extends StatelessWidget {
         child: InkWell(
           onTap: onPressed,
           borderRadius: BorderRadius.circular(8),
-          child: Padding(padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6), child: Text(label, style: GoogleFonts.lato(color: Colors.white, fontWeight: FontWeight.w700, fontSize: AppGlobals.FontMedium))),
+          child: Padding(padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6), child: Text(label, style: AppTypography.heading2(color: Colors.white))),
         ),
       ),
     );

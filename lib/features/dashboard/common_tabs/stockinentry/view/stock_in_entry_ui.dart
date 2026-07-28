@@ -1,5 +1,6 @@
+import 'package:maleva/core/colors/colors.dart' as colour;
+import 'package:maleva/core/theme/app_typography.dart';
 import 'package:maleva/core/utils/system_helpers.dart';
-import 'package:maleva/core/network/api_legacy_helper.dart';
 import 'package:maleva/core/network/api_constants.dart';
 import 'dart:io';
 import 'package:maleva/core/widgets/custom_app_bar.dart';
@@ -22,6 +23,8 @@ import '../bloc/stock_in_entry_state.dart';
 import 'package:maleva/core/models/shared/barcode_print_model.dart';
 import 'package:maleva/core/models/shared/response_view_model.dart';
 import 'package:maleva/features/operations/models/job_all_status_model.dart';
+import 'package:maleva/core/network/legacy_api_repository.dart';
+import 'package:maleva/core/di/injection.dart';
 
 
 const kChipBg          = Color(0xFFEEF2FF);
@@ -141,8 +144,7 @@ class _StockInEntryPageState
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text(state.message,
-                  style: GoogleFonts.lato(
-                      color: Colors.white)),
+                  style: AppTypography.bodyLarge(color: Colors.white)),
               backgroundColor: const Color(0xFFB33040),
               behavior: SnackBarBehavior.floating,
               shape: RoundedRectangleBorder(
@@ -166,7 +168,7 @@ class _StockInEntryPageState
             builder: (context, state) {
               if (state is StockInEntryInitial ||
                   state is StockInEntryLoading) {
-                return const Center(
+                return Center(
                   child: SpinKitFoldingCube(
                       color: Palette.blue400, size: 35),
                 );
@@ -197,7 +199,7 @@ class _StockInEntryPageState
       int stockId, BuildContext context) async {
     final comId = AppGlobals.storagenew.getInt('Comid') ?? 0;
     final header = {'Content-Type': 'application/json; charset=UTF-8'};
-    final result = await ApiLegacyHelper.apiAllinoneSelectArray(
+    final result = await sl<LegacyApiRepository>().apiAllinoneSelectArray(
         '${ApiConstants.apiPrintStock}$stockId&Comid=$comId',
         {},
         header,
@@ -438,13 +440,7 @@ class _RadioOption extends StatelessWidget {
             ),
             SizedBox(width: isTablet ? 8 : 6),
             Text(label,
-                style: GoogleFonts.lato(
-                  color: sel ? Palette.blue700 : Palette.textMid,
-                  fontWeight: FontWeight.w700,
-                  fontSize: isTablet
-                      ? AppGlobals.FontMedium + 1
-                      : AppGlobals.FontMedium,
-                )),
+                style: AppTypography.heading2(color: sel ? Palette.blue700 : Palette.textMid)),
           ],
         ),
       ),
@@ -512,19 +508,10 @@ class _JobNoRowState extends State<_JobNoRow> {
                 onChanged: (v) => context
                     .read<StockInEntryBloc>()
                     .add(StockInEntryJobNoTextChanged(v)),
-                style: GoogleFonts.lato(
-                    color: Palette.textDark2,
-                    fontWeight: FontWeight.w600,
-                    fontSize: isTablet
-                        ? AppGlobals.FontLow + 1
-                        : AppGlobals.FontLow),
+                style: AppTypography.bodySmall(color: Palette.textDark2),
                 decoration: InputDecoration(
                   hintText: 'Job No',
-                  hintStyle: GoogleFonts.lato(
-                      color: Palette.kTextMuted,
-                      fontSize: isTablet
-                          ? AppGlobals.FontLow + 1
-                          : AppGlobals.FontLow),
+                  hintStyle: AppTypography.bodySmall(color: Palette.kTextMuted),
                   filled: true,
                   fillColor: Palette.grey200p,
                   prefixIcon: const Icon(
@@ -621,13 +608,7 @@ class _JobNoRowState extends State<_JobNoRow> {
                             color: Palette.blue400),
                         const SizedBox(width: 10),
                         Text(cnum,
-                            style: GoogleFonts.lato(
-                                color: Palette.textDark2,
-                                fontWeight:
-                                FontWeight.w600,
-                                fontSize: isTablet
-                                    ? AppGlobals.FontLow + 1
-                                    : AppGlobals.FontLow)),
+                            style: AppTypography.bodySmall(color: Palette.textDark2)),
                       ],
                     ),
                   ),
@@ -740,14 +721,7 @@ class _InfoRow extends StatelessWidget {
           ),
           child: Text(
             value.isEmpty ? '-' : value,
-            style: GoogleFonts.lato(
-              color:
-              readonly ? Palette.blue700 : kHighlight,
-              fontWeight: FontWeight.w700,
-              fontSize:
-              isTablet ? AppGlobals.FontLow : AppGlobals.FontLow - 1,
-              letterSpacing: readonly ? 0.5 : 0,
-            ),
+            style: AppTypography.bodySmall(color: readonly ? Palette.blue700 : kHighlight),
             overflow: TextOverflow.ellipsis,
           ),
         ),
@@ -820,12 +794,7 @@ class _DateRow extends StatelessWidget {
               children: [
                 Expanded(
                   child: Text(display,
-                      style: GoogleFonts.lato(
-                          color: Palette.textDark2,
-                          fontWeight: FontWeight.w600,
-                          fontSize: isTablet
-                              ? AppGlobals.FontLow + 1
-                              : AppGlobals.FontLow)),
+                      style: AppTypography.bodySmall(color: Palette.textDark2)),
                 ),
                 const Icon(
                     Icons.calendar_month_outlined,
@@ -892,19 +861,10 @@ class _PackagesFieldState extends State<_PackagesField> {
           onChanged: (v) => context
               .read<StockInEntryBloc>()
               .add(StockInEntryPackagesChanged(v)),
-          style: GoogleFonts.lato(
-              color: Palette.textDark2,
-              fontWeight: FontWeight.w600,
-              fontSize: widget.isTablet
-                  ? AppGlobals.FontLow + 1
-                  : AppGlobals.FontLow),
+          style: AppTypography.bodySmall(color: Palette.textDark2),
           decoration: InputDecoration(
             hintText: 'Packages',
-            hintStyle: GoogleFonts.lato(
-                color: Palette.kTextMuted,
-                fontSize: widget.isTablet
-                    ? AppGlobals.FontLow + 1
-                    : AppGlobals.FontLow),
+            hintStyle: AppTypography.bodySmall(color: Palette.kTextMuted),
             filled: true,
             fillColor: Palette.grey200p,
             contentPadding: const EdgeInsets.symmetric(
@@ -984,17 +944,9 @@ class _StatusField extends StatelessWidget {
                 state.statusName.isEmpty
                     ? 'Job Status'
                     : state.statusName,
-                style: GoogleFonts.lato(
-                  color: state.statusName.isEmpty
+                style: AppTypography.bodySmall(color: state.statusName.isEmpty
                       ? Palette.kTextMuted
-                      : Palette.textDark2,
-                  fontWeight: state.statusName.isEmpty
-                      ? FontWeight.w500
-                      : FontWeight.w600,
-                  fontSize: isTablet
-                      ? AppGlobals.FontLow + 1
-                      : AppGlobals.FontLow,
-                ),
+                      : Palette.textDark2),
                 overflow: TextOverflow.ellipsis,
               ),
             ),
@@ -1063,12 +1015,7 @@ class _ImageUploadRow extends StatelessWidget {
           ),
           const SizedBox(width: 10),
           Text('Upload Image',
-              style: GoogleFonts.lato(
-                  color: Palette.textDark2,
-                  fontWeight: FontWeight.w600,
-                  fontSize: isTablet
-                      ? AppGlobals.FontMedium + 1
-                      : AppGlobals.FontMedium)),
+              style: AppTypography.heading2(color: Palette.textDark2)),
           const Spacer(),
           _PickBtn(
             icon:     Icons.photo_outlined,
@@ -1154,9 +1101,7 @@ class _ImageGrid extends StatelessWidget {
                 color: Palette.kTextMuted),
             const SizedBox(height: 8),
             Text('No images uploaded',
-                style: GoogleFonts.lato(
-                    color: Palette.kTextMuted,
-                    fontSize: 13)),
+                style: AppTypography.bodyLarge(color: Palette.kTextMuted)),
           ],
         ),
       )
@@ -1199,7 +1144,7 @@ class _ImageGrid extends StatelessWidget {
                   placeholder: (_, __) =>
                       Container(
                         color: Palette.grey200p,
-                        child: const Center(
+                        child: Center(
                           child: SizedBox(
                             width: 20,
                             height: 20,
@@ -1270,12 +1215,7 @@ class _FieldLabel extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Text(text,
-        style: GoogleFonts.lato(
-            color: Palette.textMid,
-            fontWeight: FontWeight.w600,
-            fontSize: isTablet
-                ? AppGlobals.FontLow + 1
-                : AppGlobals.FontLow));
+        style: AppTypography.bodySmall(color: Palette.textMid));
   }
 }
 
@@ -1318,12 +1258,7 @@ class _GradientButton extends StatelessWidget {
               MainAxisAlignment.center,
               children: [
                 Text(label,
-                    style: GoogleFonts.lato(
-                        color: Colors.white,
-                        fontWeight: FontWeight.w700,
-                        fontSize: isTablet
-                            ? AppGlobals.FontMedium + 1
-                            : AppGlobals.FontMedium)),
+                    style: AppTypography.heading2(color: Colors.white)),
                 const SizedBox(width: 6),
                 Icon(icon,
                     color: Colors.white,
@@ -1362,10 +1297,7 @@ class _AppBarButton extends StatelessWidget {
             padding: const EdgeInsets.symmetric(
                 horizontal: 12, vertical: 6),
             child: Text(label,
-                style: GoogleFonts.lato(
-                    color: Colors.white,
-                    fontWeight: FontWeight.w700,
-                    fontSize: AppGlobals.FontMedium)),
+                style: AppTypography.heading2(color: Colors.white)),
           ),
         ),
       ),

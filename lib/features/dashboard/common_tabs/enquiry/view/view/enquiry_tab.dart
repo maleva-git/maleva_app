@@ -1,3 +1,5 @@
+import 'package:maleva/core/colors/colors.dart' as colour;
+import 'package:maleva/core/theme/app_typography.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -51,7 +53,7 @@ class _EnquiryView extends StatelessWidget {
         child: BlocBuilder<EnquiryBloc, EnquiryState>(
           builder: (context, state) {
             if (state.isLoading) {
-              return const Center(
+              return Center(
                 child: CircularProgressIndicator(color: Palette.blue600),
               );
             }
@@ -64,35 +66,49 @@ class _EnquiryView extends StatelessWidget {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.end,
                     children: [
-                      ElevatedButton.icon(
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Palette.blue600,
-                          foregroundColor: Palette.white,
-                          elevation: 2,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(8.0),
-                          ),
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 16.0,
-                            vertical: 12.0,
-                          ),
+                      Container(
+                        decoration: BoxDecoration(
+                          gradient: colour.kGradient,
+                          borderRadius: BorderRadius.circular(8.0),
+                          boxShadow: const [
+                            BoxShadow(
+                              color: Color(0x33000000),
+                              blurRadius: 4,
+                              offset: Offset(0, 2),
+                            ),
+                          ],
                         ),
-                        onPressed: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (_) => const AddEnquiryScreen()),
-                          ).then((_) {
-                            if (!context.mounted) return;
-                            context.read<EnquiryBloc>().add(LoadEnquiryEvent());
-                          });
-                        },
-                        icon: const Icon(Icons.add, size: 20),
-                        label: Text(
-                          'New Enquiry',
-                          style: GoogleFonts.lato(
-                            fontWeight: FontWeight.w600,
-                            fontSize: 14,
+                        child: Material(
+                          color: Colors.transparent,
+                          child: InkWell(
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (_) => const AddEnquiryScreen()),
+                              ).then((_) {
+                                if (!context.mounted) return;
+                                context.read<EnquiryBloc>().add(LoadEnquiryEvent());
+                              });
+                            },
+                            borderRadius: BorderRadius.circular(8.0),
+                            child: Padding(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 16.0,
+                                vertical: 12.0,
+                              ),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  const Icon(Icons.add, size: 20, color: Colors.white),
+                                  const SizedBox(width: 6),
+                                  Text(
+                                    'New Enquiry',
+                                    style: AppTypography.bodyLarge(color: Colors.white),
+                                  ),
+                                ],
+                              ),
+                            ),
                           ),
                         ),
                       ),
@@ -114,22 +130,14 @@ class _EnquiryView extends StatelessWidget {
                           flex: 2,
                           child: Text(
                             'Customer Name',
-                            style: GoogleFonts.lato(
-                              color: Palette.blue900,
-                              fontWeight: FontWeight.bold,
-                              fontSize: 14,
-                            ),
+                            style: AppTypography.heading3(color: Palette.blue900, fontWeight: FontWeight.bold),
                           ),
                         ),
                         Expanded(
                           flex: 2,
                           child: Text(
                             'Notify Date',
-                            style: GoogleFonts.lato(
-                              color: Palette.blue900,
-                              fontWeight: FontWeight.bold,
-                              fontSize: 14,
-                            ),
+                            style: AppTypography.heading3(color: Palette.blue900, fontWeight: FontWeight.bold),
                           ),
                         ),
                         // Empty spacer to align with the action buttons on the cards
@@ -161,11 +169,7 @@ class _EnquiryView extends StatelessWidget {
                           const SizedBox(height: 16),
                           Text(
                             'No Records Found',
-                            style: GoogleFonts.lato(
-                              color: Palette.textMuted,
-                              fontSize: 16,
-                              fontWeight: FontWeight.w500,
-                            ),
+                            style: AppTypography.heading1(color: Palette.textMuted, fontWeight: FontWeight.w500),
                           ),
                         ],
                       ),
@@ -237,11 +241,7 @@ class _EnquiryCard extends StatelessWidget {
                     item["CustomerName"] ?? 'Unknown',
                     overflow: TextOverflow.ellipsis,
                     maxLines: 1,
-                    style: GoogleFonts.lato(
-                      color: Palette.textDark,
-                      fontWeight: FontWeight.w600,
-                      fontSize: 14,
-                    ),
+                    style: AppTypography.bodyLarge(color: Palette.textDark, fontWeight: FontWeight.w600),
                   ),
                 ),
 
@@ -252,11 +252,7 @@ class _EnquiryCard extends StatelessWidget {
                     item["SForwardingDate"] ?? '-',
                     overflow: TextOverflow.ellipsis,
                     maxLines: 1,
-                    style: GoogleFonts.lato(
-                      color: Palette.textMuted,
-                      fontWeight: FontWeight.w500,
-                      fontSize: 14,
-                    ),
+                    style: AppTypography.bodyLarge(color: Palette.textMuted, fontWeight: FontWeight.w500),
                   ),
                 ),
 
@@ -329,18 +325,18 @@ class _EnquiryCard extends StatelessWidget {
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
         title: Text(
           item['CustomerName'] ?? '',
-          style: GoogleFonts.lato(color: Palette.textDark2),
+          style: AppTypography.bodyLarge(color: Palette.textDark2),
         ),
         content: Text(
           'Date: ${item['SForwardingDate'] ?? ''}',
-          style: GoogleFonts.lato(color: Palette.textMuted),
+          style: AppTypography.bodyLarge(color: Palette.textMuted),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text(
+            child: Text(
               'Close',
-              style: TextStyle(color: Palette.blue600),
+              style: AppTypography.bodyLarge(color: Palette.blue600),
             ),
           ),
         ],

@@ -1,3 +1,4 @@
+import 'package:maleva/core/theme/app_typography.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
@@ -33,7 +34,7 @@ class _MaintenanceView extends StatelessWidget {
     return BlocBuilder<MaintenanceBloc, MaintenanceState>(
       builder: (context, state) {
         if (state is MaintenanceInitial || state is MaintenanceLoading) {
-          return const Center(
+          return Center(
             child: SpinKitFoldingCube(color: AppTokens.invoiceHeaderEnd, size: 35),
           );
         }
@@ -49,7 +50,7 @@ class _MaintenanceView extends StatelessWidget {
         if (state is MaintenanceError) {
           return Center(
             child: Text(state.message,
-                style: GoogleFonts.lato(color: AppTokens.maintAccentRed, fontSize: 13)),
+                style: AppTypography.bodyLarge(color: AppTokens.maintAccentRed)),
           );
         }
         return const SizedBox.shrink();
@@ -84,12 +85,7 @@ class _MaintenanceBody extends StatelessWidget {
           Center(
             child: Text(
               '${state.currentMonthName} Sales',
-              style: GoogleFonts.lato(
-                color: AppTokens.maintAccentRed,
-                fontWeight: FontWeight.w700,
-                fontSize: AppGlobals.FontLarge,
-                letterSpacing: 0.3,
-              ),
+              style: AppTypography.heading1(color: AppTokens.maintAccentRed),
             ),
           ),
           const SizedBox(height: 12),
@@ -243,12 +239,7 @@ class _MaintenanceStatRow extends StatelessWidget {
             flex: 5,
             child: Text(
               title,
-              style: GoogleFonts.lato(
-                color: colour.kTextDark,
-                fontWeight: FontWeight.w700,
-                fontSize: AppGlobals.FontLow,
-                letterSpacing: 0.3,
-              ),
+              style: AppTypography.bodySmall(color: colour.kTextDark),
             ),
           ),
           Expanded(
@@ -263,11 +254,7 @@ class _MaintenanceStatRow extends StatelessWidget {
               child: Text(
                 '$count',
                 textAlign: TextAlign.center,
-                style: GoogleFonts.lato(
-                  color: AppTokens.invoiceHeaderStart,
-                  fontWeight: FontWeight.w700,
-                  fontSize: AppGlobals.FontLow,
-                ),
+                style: AppTypography.bodySmall(color: AppTokens.invoiceHeaderStart),
               ),
             ),
           ),
@@ -277,11 +264,7 @@ class _MaintenanceStatRow extends StatelessWidget {
             child: Text(
               amount.toStringAsFixed(2),
               textAlign: TextAlign.right,
-              style: GoogleFonts.lato(
-                color: AppTokens.maintTextMid,
-                fontWeight: FontWeight.w600,
-                fontSize: AppGlobals.FontLow,
-              ),
+              style: AppTypography.bodySmall(color: AppTokens.maintTextMid),
             ),
           ),
         ],
@@ -331,11 +314,7 @@ class _MaintenanceStatCard extends StatelessWidget {
           Expanded(
             child: Text(
               title,
-              style: GoogleFonts.lato(
-                color: colour.kTextDark,
-                fontWeight: FontWeight.w700,
-                fontSize: AppGlobals.FontLow,
-              ),
+              style: AppTypography.bodySmall(color: colour.kTextDark),
               overflow: TextOverflow.ellipsis,
             ),
           ),
@@ -348,21 +327,13 @@ class _MaintenanceStatCard extends StatelessWidget {
             ),
             child: Text(
               '$count',
-              style: GoogleFonts.lato(
-                color: AppTokens.invoiceHeaderStart,
-                fontWeight: FontWeight.w700,
-                fontSize: AppGlobals.FontLow,
-              ),
+              style: AppTypography.bodySmall(color: AppTokens.invoiceHeaderStart),
             ),
           ),
           const SizedBox(width: 8),
           Text(
             amount.toStringAsFixed(2),
-            style: GoogleFonts.lato(
-              color: AppTokens.maintTextMid,
-              fontWeight: FontWeight.w600,
-              fontSize: AppGlobals.FontLow,
-            ),
+            style: AppTypography.bodySmall(color: AppTokens.maintTextMid),
           ),
         ],
       ),
@@ -400,10 +371,7 @@ class _MaintenanceList extends StatelessWidget {
             ),
             const SizedBox(height: 12),
             Text('No Records Found',
-                style: GoogleFonts.lato(
-                    color: AppTokens.maintTextDark,
-                    fontWeight: FontWeight.w600,
-                    fontSize: 14)),
+                style: AppTypography.bodyLarge(color: AppTokens.maintTextDark, fontWeight: FontWeight.w600)),
           ],
         ),
       );
@@ -488,12 +456,7 @@ class _MaintenanceCard extends StatelessWidget {
                         children: [
                           Text(
                             title,
-                            style: GoogleFonts.lato(
-                              color: AppTokens.maintTextDark,
-                              fontWeight: FontWeight.w700,
-                              // Fallback value for font size
-                              fontSize: AppGlobals.FontCardText ?? 14.0,
-                            ),
+                            style: AppTypography.heading2(color: AppTokens.maintTextDark),
                             overflow: TextOverflow.ellipsis,
                           ),
                           if (is6Months && dueDate.isNotEmpty) ...[
@@ -505,11 +468,7 @@ class _MaintenanceCard extends StatelessWidget {
                                 const SizedBox(width: 4),
                                 Text(
                                   'Due: $dueDate',
-                                  style: GoogleFonts.lato(
-                                    color: AppTokens.planTextMuted,
-                                    fontSize: 11,
-                                    fontWeight: FontWeight.w500,
-                                  ),
+                                  style: AppTypography.bodySmall(color: AppTokens.planTextMuted, fontWeight: FontWeight.w500),
                                 ),
                               ],
                             ),
@@ -526,11 +485,7 @@ class _MaintenanceCard extends StatelessWidget {
                       ),
                       child: Text(
                         'RM ${amount.toStringAsFixed(2)}', // Ippo ithu safe
-                        style: GoogleFonts.lato(
-                          color: AppTokens.invoiceHeaderStart,
-                          fontWeight: FontWeight.w700,
-                          fontSize: AppGlobals.FontCardText ?? 14.0,
-                        ),
+                        style: AppTypography.heading2(color: AppTokens.invoiceHeaderStart),
                       ),
                     ),
                   ],
@@ -588,11 +543,7 @@ class _ToggleButton extends StatelessWidget {
                 horizontal: 16, vertical: 8),
             child: Text(
               label,
-              style: GoogleFonts.lato(
-                color: active ? Colors.white : AppTokens.maintTextMid,
-                fontWeight: FontWeight.w700,
-                fontSize: AppGlobals.FontMedium,
-              ),
+              style: AppTypography.heading2(color: active ? Colors.white : AppTokens.maintTextMid),
             ),
           ),
         ),

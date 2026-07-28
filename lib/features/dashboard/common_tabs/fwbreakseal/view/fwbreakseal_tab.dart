@@ -1,3 +1,5 @@
+import 'package:maleva/core/colors/colors.dart' as colour;
+import 'package:maleva/core/theme/app_typography.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
@@ -110,14 +112,7 @@ class _FWBreakSealViewState extends State<_FWBreakSealView>
         child: Material(
           color: AppTokens.brandLight,
           elevation: 1,
-          textStyle: GoogleFonts.lato(
-            textStyle: TextStyle(
-              color: AppTokens.brandPrimary,
-              fontWeight: FontWeight.bold,
-              fontSize: AppGlobals.FontLow,
-              letterSpacing: 0.3,
-            ),
-          ),
+          textStyle: AppTypography.bodySmall(color: AppTokens.brandPrimary),
           child: SizedBox(
             height: 350,
             child: ListView(
@@ -226,7 +221,7 @@ class _FWBreakSealViewState extends State<_FWBreakSealView>
             state.errorMessage!,
             '',
             Colors.white,
-            Colors.red,
+            colour.commonColorred,
             null,
             18.0 - AppGlobals.reducesize,
             AppGlobals.tll,
@@ -263,7 +258,7 @@ class _FWBreakSealViewState extends State<_FWBreakSealView>
         appBar: _buildAppBar(context, state, height),
         drawer: const Menulist(),
         body: state.isLoading
-            ? const Center(
+            ? Center(
           child: SpinKitFoldingCube(
             color: AppTokens.spinKit,
             size: 35.0,
@@ -295,7 +290,7 @@ class _FWBreakSealViewState extends State<_FWBreakSealView>
         appBar: _buildAppBar(context, state, height),
         drawer: const Menulist(),
         body: state.isLoading
-            ? const Center(
+            ? Center(
           child: SpinKitFoldingCube(
             color: AppTokens.spinKit,
             size: 35.0,
@@ -342,25 +337,13 @@ class _FWBreakSealViewState extends State<_FWBreakSealView>
             Expanded(
               child: Text(
                 'FW Exit Update',
-                style: GoogleFonts.lato(
-                  textStyle: TextStyle(
-                    color: AppTokens.appBarTitle,
-                    fontWeight: FontWeight.bold,
-                    fontSize: AppGlobals.FontMedium,
-                  ),
-                ),
+                style: AppTypography.heading2(color: AppTokens.appBarTitle),
               ),
             ),
             Expanded(
               child: Text(
                 state.userName,
-                style: GoogleFonts.lato(
-                  textStyle: TextStyle(
-                    color: AppTokens.brandLight,
-                    fontWeight: FontWeight.bold,
-                    fontSize: AppGlobals.FontLow - 2,
-                  ),
-                ),
+                style: AppTypography.bodySmall(color: AppTokens.brandLight),
               ),
             ),
           ],
@@ -389,11 +372,7 @@ class _FWBreakSealViewState extends State<_FWBreakSealView>
                   .add(const FWBreakSealUpdateSubmitted()),
               child: Text(
                 'Update',
-                style: GoogleFonts.lato(
-                  fontSize: AppGlobals.FontMedium,
-                  fontWeight: FontWeight.bold,
-                  color: AppTokens.brandPrimary,
-                ),
+                style: AppTypography.heading2(color: AppTokens.brandPrimary),
               ),
             ),
           ),
@@ -423,20 +402,8 @@ class _FWBreakSealViewState extends State<_FWBreakSealView>
       backgroundColor: AppTokens.brandLight,
       unselectedItemColor: AppTokens.appBarBg.withValues(alpha: 0.5),
       currentIndex: state.activeTab,
-      selectedLabelStyle: GoogleFonts.lato(
-        textStyle: TextStyle(
-          fontWeight: FontWeight.bold,
-          fontSize: AppGlobals.FontLow,
-          letterSpacing: 0.3,
-        ),
-      ),
-      unselectedLabelStyle: GoogleFonts.lato(
-        textStyle: TextStyle(
-          fontWeight: FontWeight.bold,
-          fontSize: AppGlobals.FontCardText,
-          letterSpacing: 0.3,
-        ),
-      ),
+      selectedLabelStyle: AppTypography.bodySmall(),
+      unselectedLabelStyle: AppTypography.bodyLarge(),
       onTap: (index) => context
           .read<FWBreakSealBloc>()
           .add(FWBreakSealTabChanged(index)),
@@ -524,23 +491,10 @@ class _FWBreakSealViewState extends State<_FWBreakSealView>
         textInputAction: TextInputAction.done,
         textCapitalization: TextCapitalization.characters,
         cursorColor: AppTokens.brandPrimary,
-        style: GoogleFonts.lato(
-          textStyle: TextStyle(
-            color: AppTokens.brandPrimary,
-            fontWeight: FontWeight.bold,
-            fontSize: AppGlobals.FontLow,
-            letterSpacing: 0.3,
-          ),
-        ),
+        style: AppTypography.bodySmall(color: AppTokens.brandPrimary),
         decoration: InputDecoration(
           hintText: hint,
-          hintStyle: GoogleFonts.lato(
-            textStyle: TextStyle(
-              fontSize: AppGlobals.FontMedium,
-              fontWeight: FontWeight.bold,
-              color: AppTokens.brandLight,
-            ),
-          ),
+          hintStyle: AppTypography.heading2(color: AppTokens.brandLight),
           suffixIcon: suffixIcon,
           enabledBorder: const OutlineInputBorder(
             borderRadius: BorderRadius.all(Radius.circular(10)),

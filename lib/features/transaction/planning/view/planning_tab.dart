@@ -1,3 +1,4 @@
+import 'package:maleva/core/theme/app_typography.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -17,10 +18,10 @@ import 'package:maleva/core/models/shared/planning_detail_model.dart';
 import 'package:maleva/core/models/shared/employee_model.dart';
 import 'package:maleva/core/models/shared/planning_master_model.dart';
 TextStyle _body(double size, {Color color = colour.kText, FontWeight fw = FontWeight.normal}) =>
-    GoogleFonts.dmSans(fontSize: size, color: color, fontWeight: fw);
+    AppTypography.bodyLarge(color: color);
 
 TextStyle _label(double size, {Color color = colour.kTextDim, FontWeight fw = FontWeight.w600}) =>
-    GoogleFonts.dmSans(fontSize: size, color: color, fontWeight: fw);
+    AppTypography.bodyLarge(color: color);
 
 
 
@@ -128,8 +129,7 @@ class _PlanningScaffold extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text('Planning',
-              style: GoogleFonts.dmSerifDisplay(
-                  fontSize: 18, color: colour.kText, fontWeight: FontWeight.bold)),
+              style: AppTypography.heading1(color: colour.kText)),
           Text(userName, style: _label(11, color: AppTokens.planTextMuted)),
         ],
       ),
@@ -501,7 +501,7 @@ class _FilterFab extends StatelessWidget {
                   Row(children: [
                     Container(width: 3, height: 18, decoration: BoxDecoration(gradient: const LinearGradient(colors: [AppTokens.invoiceHeaderStart, colour.kCobalt], begin: Alignment.topCenter, end: Alignment.bottomCenter), borderRadius: BorderRadius.circular(4))),
                     const SizedBox(width: 10),
-                    Text('Filter Planning', style: GoogleFonts.dmSerifDisplay(fontSize: 18, color: colour.kText)),
+                    Text('Filter Planning', style: AppTypography.heading1(color: colour.kText)),
                   ]),
                   const SizedBox(height: 20),
                   Row(children: [
@@ -703,7 +703,7 @@ class _EmptyView extends StatelessWidget {
   const _EmptyView();
   @override
   Widget build(BuildContext context) {
-    return Center(child: Column(mainAxisSize: MainAxisSize.min, children: [Container(padding: const EdgeInsets.all(20), decoration: BoxDecoration(color: colour.kSurface, shape: BoxShape.circle, border: Border.all(color: colour.kBorder)), child: const Icon(Icons.inbox_rounded, color: AppTokens.planTextMuted, size: 36)), const SizedBox(height: 14), Text('No Planning Records', style: GoogleFonts.dmSerifDisplay(fontSize: 18, color: colour.kText)), const SizedBox(height: 6), Text('Try adjusting your filter', style: _label(13, color: AppTokens.planTextMuted))]));
+    return Center(child: Column(mainAxisSize: MainAxisSize.min, children: [Container(padding: const EdgeInsets.all(20), decoration: BoxDecoration(color: colour.kSurface, shape: BoxShape.circle, border: Border.all(color: colour.kBorder)), child: const Icon(Icons.inbox_rounded, color: AppTokens.planTextMuted, size: 36)), const SizedBox(height: 14), Text('No Planning Records', style: AppTypography.heading1(color: colour.kText)), const SizedBox(height: 6), Text('Try adjusting your filter', style: _label(13, color: AppTokens.planTextMuted))]));
   }
 }
 
@@ -713,6 +713,6 @@ class _ErrorView extends StatelessWidget {
   const _ErrorView({required this.message, required this.onRetry});
   @override
   Widget build(BuildContext context) {
-    return Center(child: Padding(padding: const EdgeInsets.all(32), child: Column(mainAxisSize: MainAxisSize.min, children: [Container(padding: const EdgeInsets.all(18), decoration: BoxDecoration(color: colour.kDanger.withValues(alpha: 0.1), shape: BoxShape.circle, border: Border.all(color: colour.kDanger.withValues(alpha: 0.3))), child: const Icon(Icons.error_outline_rounded, color: colour.kDanger, size: 32)), const SizedBox(height: 14), Text('Something went wrong', style: GoogleFonts.dmSerifDisplay(fontSize: 18, color: colour.kText)), const SizedBox(height: 8), Text(message, style: _label(12, color: AppTokens.planTextMuted), textAlign: TextAlign.center), const SizedBox(height: 20), ElevatedButton.icon(onPressed: onRetry, style: ElevatedButton.styleFrom(backgroundColor: colour.kCobalt, padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12))), icon: const Icon(Icons.refresh_rounded, color: colour.kText, size: 18), label: Text('Retry', style: _body(14, color: colour.kText, fw: FontWeight.w600))) ])));
+    return Center(child: Padding(padding: const EdgeInsets.all(32), child: Column(mainAxisSize: MainAxisSize.min, children: [Container(padding: const EdgeInsets.all(18), decoration: BoxDecoration(color: colour.kDanger.withValues(alpha: 0.1), shape: BoxShape.circle, border: Border.all(color: colour.kDanger.withValues(alpha: 0.3))), child: const Icon(Icons.error_outline_rounded, color: colour.kDanger, size: 32)), const SizedBox(height: 14), Text('Something went wrong', style: AppTypography.heading1(color: colour.kText)), const SizedBox(height: 8), Text(message, style: _label(12, color: AppTokens.planTextMuted), textAlign: TextAlign.center), const SizedBox(height: 20), ElevatedButton.icon(onPressed: onRetry, style: ElevatedButton.styleFrom(backgroundColor: colour.kCobalt, padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12))), icon: const Icon(Icons.refresh_rounded, color: colour.kText, size: 18), label: Text('Retry', style: _body(14, color: colour.kText, fw: FontWeight.w600))) ])));
   }
 }

@@ -12,7 +12,6 @@ import 'package:maleva/splash/splashscreen.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:maleva/features/troubleshoot/data/applog_api.dart';
-
 import 'core/di/injection.dart';
 import 'core/utils/app_preferences.dart';
 
@@ -55,11 +54,11 @@ Future<void> main() async {
       if (e.code == 'duplicate-app') {
         Firebase.initializeApp();
       } else {
-        rethrow; // Re-throw unexpected errors
+        rethrow;
       }
     }
     await AppPreferences.init();
-    // ── DI setup — ONE call wires everything ──────────────────
+
     await setupDependencies();
 
     FirebaseMessaging.onBackgroundMessage(backgroundHandler);
@@ -68,7 +67,7 @@ Future<void> main() async {
       NotificationSettings settings = await messaging.requestPermission(
         alert: true,
         announcement: false,
-        badge: false, // Disable a icon badge
+        badge: false,
         carPlay: false,
         criticalAlert: false,
         provisional: false,
@@ -76,7 +75,7 @@ Future<void> main() async {
       );
       await messaging.setForegroundNotificationPresentationOptions(
         alert: true,
-        badge: false, // Disable app icon badge in foreground
+        badge: false,
         sound: true,
       );
       AppGlobals.print_('User granted permission: ${settings.authorizationStatus}');
@@ -102,7 +101,7 @@ Future<void> main() async {
         errorLog: "$e\n$stack",
         userNote: 'Automatic Crash Report from Splash Screen',
       ).timeout(const Duration(seconds: 3));
-    } catch (_) {}
+    } catch (e, stack) { debugPrint("Error caught globally: $e\n$stack"); }
   } finally {
     FlutterNativeSplash.remove();
   }
@@ -118,7 +117,6 @@ class MyApp extends StatelessWidget {
   MyApp({super.key});
 
   hexColor(String colorhexcode) {
-    // FIX: int.parse crashes if colorhexcode is null/malformed → use tryParse with fallback
     String colornew = '0xff${colorhexcode.replaceAll('#', '')}';
     return int.tryParse(colornew) ?? 0xFF022B50;
   }
@@ -234,7 +232,7 @@ class _MyHomePageState extends State<MyHomePage> {
     //   switch (event) {
     //     case bpp.ConnectState.connected:
     //       AppGlobals.currentconnectionstate = true;
-    //       msgshow('Connected Successfully ', "", Colors.white, Colors.red, null,
+    //       msgshow('Connected Successfully ', "", Colors.white, colour.commonColorred, null,
     //           18.00 - AppGlobals.reducesize, AppGlobals.tll, AppGlobals.tgc, context, 2);
     //       break;
     //     case bpp.ConnectState.disconnected:

@@ -1,3 +1,5 @@
+import 'package:maleva/core/theme/app_typography.dart';
+import 'package:maleva/core/colors/colors.dart' as colour;
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
@@ -8,21 +10,12 @@ import 'package:maleva/menu/menulist.dart';
 import '../bloc/fuelentryview_bloc.dart';
 import '../bloc/fuelentryview_event.dart';
 import '../bloc/fuelentryview_state.dart';
+import 'package:maleva/core/theme/tokens.dart';
 
 // ─── Design Tokens ────────────────────────────────────────────────────────────
-const kHeaderGradStart = Color(0xFF1A3A8F);
-const kHeaderGradEnd   = Color(0xFF4A6FD4);
-const kCardBorder      = Color(0xFFC5D0EE);
-const kPageBg          = Color(0xFFF4F6FB);
-const kTextDark        = Color(0xFF1E2D5E);
-const kTextMid         = Color(0xFF4A5A8A);
-const kTextMuted       = Color(0xFF8A96BF);
-const kDetailBg        = Color(0xFFF0F4FF);
-const kChipBg          = Color(0xFFEEF2FF);
-const kAccentRed       = Color(0xFFB33040);
 
 const kGradient = LinearGradient(
-  colors: [kHeaderGradStart, kHeaderGradEnd],
+  colors: [AppTokens.brandGradientStart, AppTokens.brandGradientEnd],
   begin: Alignment.topLeft,
   end: Alignment.bottomRight,
 );
@@ -36,8 +29,7 @@ class FuelEntryView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (_) =>
-      FuelEntryViewBloc()..add(FuelEntryViewStarted()),
+      create: (_) => FuelEntryViewBloc()..add(FuelEntryViewStarted()),
       child: const _FuelEntryViewPage(),
     );
   }
@@ -49,8 +41,7 @@ class _FuelEntryViewPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final userName =
-        AppGlobals.storagenew.getString('Username') ?? '';
+    final userName = AppGlobals.storagenew.getString('Username') ?? '';
 
     return BlocListener<FuelEntryViewBloc, FuelEntryViewState>(
       listener: (context, state) {
@@ -58,9 +49,8 @@ class _FuelEntryViewPage extends StatelessWidget {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text(state.message,
-                  style:
-                  GoogleFonts.lato(color: Colors.white)),
-              backgroundColor: kAccentRed,
+                  style: AppTypography.bodyLarge(color: Colors.white)),
+              backgroundColor: AppTokens.appBarBg,
               behavior: SnackBarBehavior.floating,
               shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(10)),
@@ -76,17 +66,16 @@ class _FuelEntryViewPage extends StatelessWidget {
         },
         child: Scaffold(
           resizeToAvoidBottomInset: true,
-          backgroundColor: kPageBg,
+          backgroundColor: AppTokens.surfacePage,
           appBar: _buildAppBar(context, userName),
           drawer: const Menulist(),
-          body: BlocBuilder<FuelEntryViewBloc,
-              FuelEntryViewState>(
+          body: BlocBuilder<FuelEntryViewBloc, FuelEntryViewState>(
             builder: (context, state) {
               if (state is FuelEntryViewInitial ||
                   state is FuelEntryViewLoading) {
-                return const Center(
+                return Center(
                   child: SpinKitFoldingCube(
-                      color: kHeaderGradEnd, size: 35),
+                      color: AppTokens.brandGradientEnd, size: 35),
                 );
               }
               if (state is FuelEntryViewLoaded) {
@@ -100,18 +89,15 @@ class _FuelEntryViewPage extends StatelessWidget {
     );
   }
 
-  PreferredSizeWidget _buildAppBar(
-      BuildContext context, String userName) {
+  PreferredSizeWidget _buildAppBar(BuildContext context, String userName) {
     return AppBar(
       automaticallyImplyLeading: false,
       elevation: 0,
       toolbarHeight: 62,
-      flexibleSpace: Container(
-          decoration:
-          const BoxDecoration(gradient: kGradient)),
+      flexibleSpace:
+          Container(decoration: const BoxDecoration(gradient: kGradient)),
       leading: IconButton(
-        icon: const Icon(Icons.arrow_back_ios_new_rounded,
-            size: 20),
+        icon: const Icon(Icons.arrow_back_ios_new_rounded, size: 20),
         color: Colors.white,
         onPressed: () => Navigator.pop(context),
       ),
@@ -120,17 +106,10 @@ class _FuelEntryViewPage extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text('Fuel Entry View',
-              style: GoogleFonts.lato(
-                  color: Colors.white,
-                  fontWeight: FontWeight.w700,
-                  fontSize: 17,
-                  letterSpacing: 0.3)),
+              style: AppTypography.bodyLarge(
+                  color: Colors.white, fontWeight: FontWeight.bold)),
           const SizedBox(height: 2),
-          Text(userName,
-              style: GoogleFonts.lato(
-                  color: Colors.white.withValues(alpha: 0.65),
-                  fontWeight: FontWeight.w500,
-                  fontSize: 12)),
+          Text(userName, style: AppTypography.bodySmall(color: Colors.white)),
         ],
       ),
       iconTheme: const IconThemeData(color: Colors.white),
@@ -148,16 +127,12 @@ class _FuelEntryViewBody extends StatelessWidget {
     return LayoutBuilder(
       builder: (context, constraints) {
         final isTablet = constraints.maxWidth > kTabletBreak;
-        final hPad =
-        isTablet ? constraints.maxWidth * 0.05 : 12.0;
+        final hPad = isTablet ? constraints.maxWidth * 0.05 : 12.0;
 
         return Column(
           children: [
             // ── Date filter bar ──────────────────────────
-            _DateFilterBar(
-                state: state,
-                isTablet: isTablet,
-                hPad: hPad),
+            _DateFilterBar(state: state, isTablet: isTablet, hPad: hPad),
 
             // ── Table header ─────────────────────────────
             _TableHeader(isTablet: isTablet, hPad: hPad),
@@ -166,10 +141,7 @@ class _FuelEntryViewBody extends StatelessWidget {
             Expanded(
               child: state.items.isEmpty
                   ? _EmptyState()
-                  : _FuelList(
-                  state: state,
-                  isTablet: isTablet,
-                  hPad: hPad),
+                  : _FuelList(state: state, isTablet: isTablet, hPad: hPad),
             ),
           ],
         );
@@ -181,7 +153,7 @@ class _FuelEntryViewBody extends StatelessWidget {
 // ─── Date Filter Bar ──────────────────────────────────────────────────────────
 class _DateFilterBar extends StatelessWidget {
   final FuelEntryViewLoaded state;
-  final bool   isTablet;
+  final bool isTablet;
   final double hPad;
 
   const _DateFilterBar({
@@ -199,10 +171,10 @@ class _DateFilterBar extends StatelessWidget {
       builder: (ctx, child) => Theme(
         data: Theme.of(ctx).copyWith(
           colorScheme: const ColorScheme.light(
-            primary: kHeaderGradStart,
+            primary: AppTokens.brandGradientStart,
             onPrimary: Colors.white,
             surface: Colors.white,
-            onSurface: kTextDark,
+            onSurface: AppTokens.textPrimary,
           ),
         ),
         child: child!,
@@ -212,14 +184,10 @@ class _DateFilterBar extends StatelessWidget {
     final f = DateFormat('yyyy-MM-dd').format(picked);
     if (isFrom) {
       if (!context.mounted) return;
-      context
-          .read<FuelEntryViewBloc>()
-          .add(FuelEntryViewFromDateChanged(f));
+      context.read<FuelEntryViewBloc>().add(FuelEntryViewFromDateChanged(f));
     } else {
       if (!context.mounted) return;
-      context
-          .read<FuelEntryViewBloc>()
-          .add(FuelEntryViewToDateChanged(f));
+      context.read<FuelEntryViewBloc>().add(FuelEntryViewToDateChanged(f));
     }
   }
 
@@ -227,8 +195,7 @@ class _DateFilterBar extends StatelessWidget {
   Widget build(BuildContext context) {
     String fmt(String d) {
       try {
-        return DateFormat('dd-MM-yy')
-            .format(DateTime.parse(d));
+        return DateFormat('dd-MM-yy').format(DateTime.parse(d));
       } catch (_) {
         return d;
       }
@@ -239,57 +206,57 @@ class _DateFilterBar extends StatelessWidget {
       padding: EdgeInsets.fromLTRB(hPad, 12, hPad, 10),
       child: isTablet
           ? Row(children: [
-        _DateTile(
-          label: 'From',
-          display: fmt(state.fromDate),
-          isTablet: isTablet,
-          onTap: () => _pick(context, true),
-        ),
-        const SizedBox(width: 12),
-        _DateTile(
-          label: 'To',
-          display: fmt(state.toDate),
-          isTablet: isTablet,
-          onTap: () => _pick(context, false),
-        ),
-        const SizedBox(width: 16),
-        _ViewButton(isTablet: isTablet),
-      ])
-          : Column(
-        children: [
-          Row(children: [
-            Expanded(
-              child: _DateTile(
+              _DateTile(
                 label: 'From',
                 display: fmt(state.fromDate),
                 isTablet: isTablet,
                 onTap: () => _pick(context, true),
               ),
-            ),
-            const SizedBox(width: 10),
-            Expanded(
-              child: _DateTile(
+              const SizedBox(width: 12),
+              _DateTile(
                 label: 'To',
                 display: fmt(state.toDate),
                 isTablet: isTablet,
                 onTap: () => _pick(context, false),
               ),
+              const SizedBox(width: 16),
+              _ViewButton(isTablet: isTablet),
+            ])
+          : Column(
+              children: [
+                Row(children: [
+                  Expanded(
+                    child: _DateTile(
+                      label: 'From',
+                      display: fmt(state.fromDate),
+                      isTablet: isTablet,
+                      onTap: () => _pick(context, true),
+                    ),
+                  ),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: _DateTile(
+                      label: 'To',
+                      display: fmt(state.toDate),
+                      isTablet: isTablet,
+                      onTap: () => _pick(context, false),
+                    ),
+                  ),
+                ]),
+                const SizedBox(height: 8),
+                SizedBox(
+                    width: double.infinity,
+                    child: _ViewButton(isTablet: isTablet)),
+              ],
             ),
-          ]),
-          const SizedBox(height: 8),
-          SizedBox(
-              width: double.infinity,
-              child: _ViewButton(isTablet: isTablet)),
-        ],
-      ),
     );
   }
 }
 
 class _DateTile extends StatelessWidget {
-  final String   label;
-  final String   display;
-  final bool     isTablet;
+  final String label;
+  final String display;
+  final bool isTablet;
   final VoidCallback onTap;
   const _DateTile({
     required this.label,
@@ -304,37 +271,26 @@ class _DateTile extends StatelessWidget {
       onTap: onTap,
       borderRadius: BorderRadius.circular(10),
       child: Container(
-        padding: const EdgeInsets.symmetric(
-            horizontal: 12, vertical: 10),
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
         decoration: BoxDecoration(
-          color: kDetailBg,
+          color: AppTokens.surfaceDetail,
           borderRadius: BorderRadius.circular(10),
-          border:
-          Border.all(color: kCardBorder, width: 0.5),
+          border: Border.all(color: AppTokens.surfaceBorder, width: 0.5),
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(label.toUpperCase(),
-                style: GoogleFonts.lato(
-                    color: kTextMuted,
-                    fontWeight: FontWeight.w700,
-                    fontSize: 9,
-                    letterSpacing: 0.6)),
+                style: AppTypography.bodySmall(color: AppTokens.textMuted)),
             const SizedBox(height: 4),
             Row(
-              mainAxisAlignment:
-              MainAxisAlignment.spaceBetween,
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(display,
-                    style: GoogleFonts.lato(
-                        color: kTextDark,
-                        fontWeight: FontWeight.w700,
-                        fontSize: isTablet ? 14 : 13)),
-                const Icon(
-                    Icons.calendar_month_outlined,
-                    size: 18,
-                    color: kHeaderGradEnd),
+                    style:
+                        AppTypography.heading2(color: AppTokens.textPrimary)),
+                const Icon(Icons.calendar_month_outlined,
+                    size: 18, color: AppTokens.brandGradientEnd),
               ],
             ),
           ],
@@ -356,7 +312,7 @@ class _ViewButton extends StatelessWidget {
         borderRadius: BorderRadius.circular(10),
         boxShadow: [
           BoxShadow(
-              color: kHeaderGradStart.withValues(alpha: 0.3),
+              color: AppTokens.brandGradientStart.withValues(alpha: 0.3),
               blurRadius: 8,
               offset: const Offset(0, 3))
         ],
@@ -370,16 +326,11 @@ class _ViewButton extends StatelessWidget {
           borderRadius: BorderRadius.circular(10),
           child: Padding(
             padding: EdgeInsets.symmetric(
-                horizontal: isTablet ? 24 : 0,
-                vertical: 10),
+                horizontal: isTablet ? 24 : 0, vertical: 10),
             child: Center(
               child: Text('View',
-                  style: GoogleFonts.lato(
-                      color: Colors.white,
-                      fontWeight: FontWeight.w700,
-                      fontSize: isTablet
-                          ? AppGlobals.FontMedium + 1
-                          : AppGlobals.FontMedium)),
+                  style: AppTypography.bodyLarge(
+                      color: Colors.white, fontWeight: FontWeight.bold)),
             ),
           ),
         ),
@@ -390,25 +341,17 @@ class _ViewButton extends StatelessWidget {
 
 // ─── Table Header ─────────────────────────────────────────────────────────────
 class _TableHeader extends StatelessWidget {
-  final bool   isTablet;
+  final bool isTablet;
   final double hPad;
-  const _TableHeader(
-      {required this.isTablet, required this.hPad});
+  const _TableHeader({required this.isTablet, required this.hPad});
 
   @override
   Widget build(BuildContext context) {
-    final style = GoogleFonts.lato(
-      color: Colors.white.withValues(alpha: 0.85),
-      fontWeight: FontWeight.w600,
-      fontSize: isTablet ? 11 : 10,
-      letterSpacing: 0.5,
-    );
+    final style = AppTypography.bodySmall(color: Colors.white);
 
     return Container(
-      margin: EdgeInsets.symmetric(
-          horizontal: hPad, vertical: 6),
-      padding: const EdgeInsets.symmetric(
-          horizontal: 12, vertical: 8),
+      margin: EdgeInsets.symmetric(horizontal: hPad, vertical: 6),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       decoration: BoxDecoration(
         gradient: kGradient,
         borderRadius: BorderRadius.circular(10),
@@ -416,24 +359,16 @@ class _TableHeader extends StatelessWidget {
       child: Row(children: [
         Expanded(
             flex: 1,
-            child: Text('SNo',
-                textAlign: TextAlign.left,
-                style: style)),
+            child: Text('SNo', textAlign: TextAlign.left, style: style)),
         Expanded(
             flex: 3,
-            child: Text('Date',
-                textAlign: TextAlign.center,
-                style: style)),
+            child: Text('Date', textAlign: TextAlign.center, style: style)),
         Expanded(
             flex: 3,
-            child: Text('Liter',
-                textAlign: TextAlign.right,
-                style: style)),
+            child: Text('Liter', textAlign: TextAlign.right, style: style)),
         Expanded(
             flex: 3,
-            child: Text('Amount',
-                textAlign: TextAlign.right,
-                style: style)),
+            child: Text('Amount', textAlign: TextAlign.right, style: style)),
         const Expanded(flex: 1, child: SizedBox.shrink()),
       ]),
     );
@@ -443,7 +378,7 @@ class _TableHeader extends StatelessWidget {
 // ─── Fuel List ────────────────────────────────────────────────────────────────
 class _FuelList extends StatelessWidget {
   final FuelEntryViewLoaded state;
-  final bool   isTablet;
+  final bool isTablet;
   final double hPad;
 
   const _FuelList({
@@ -456,19 +391,17 @@ class _FuelList extends StatelessWidget {
   Widget build(BuildContext context) {
     if (isTablet) {
       return GridView.builder(
-        padding: EdgeInsets.symmetric(
-            horizontal: hPad, vertical: 4),
-        gridDelegate:
-        const SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount:   2,
+        padding: EdgeInsets.symmetric(horizontal: hPad, vertical: 4),
+        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+          crossAxisCount: 2,
           crossAxisSpacing: 10,
-          mainAxisSpacing:  10,
+          mainAxisSpacing: 10,
           childAspectRatio: 4.5,
         ),
         itemCount: state.items.length,
         itemBuilder: (ctx, i) => _FuelRow(
-          item:     state.items[i],
-          index:    i,
+          item: state.items[i],
+          index: i,
           isTablet: true,
           onDelete: (item) => _confirmDelete(ctx, item),
         ),
@@ -476,12 +409,11 @@ class _FuelList extends StatelessWidget {
     }
 
     return ListView.builder(
-      padding: EdgeInsets.symmetric(
-          horizontal: hPad, vertical: 4),
+      padding: EdgeInsets.symmetric(horizontal: hPad, vertical: 4),
       itemCount: state.items.length,
       itemBuilder: (ctx, i) => _FuelRow(
-        item:     state.items[i],
-        index:    i,
+        item: state.items[i],
+        index: i,
         isTablet: false,
         onDelete: (item) => _confirmDelete(ctx, item),
       ),
@@ -494,9 +426,7 @@ class _FuelList extends StatelessWidget {
         context, 'Do You Want to Delete Fuel Entry ?');
     if (ok == true) {
       if (!context.mounted) return;
-      context
-          .read<FuelEntryViewBloc>()
-          .add(FuelEntryViewDeleteRequested(item));
+      context.read<FuelEntryViewBloc>().add(FuelEntryViewDeleteRequested(item));
     }
   }
 }
@@ -504,8 +434,8 @@ class _FuelList extends StatelessWidget {
 // ─── Single Fuel Row Card ─────────────────────────────────────────────────────
 class _FuelRow extends StatelessWidget {
   final Map<String, dynamic> item;
-  final int     index;
-  final bool    isTablet;
+  final int index;
+  final bool isTablet;
   final void Function(Map<String, dynamic>) onDelete;
 
   const _FuelRow({
@@ -517,26 +447,21 @@ class _FuelRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final valStyle = GoogleFonts.lato(
-      color: kTextDark,
-      fontWeight: FontWeight.w600,
-      fontSize:
-      isTablet ? AppGlobals.FontCardText + 1 : AppGlobals.FontCardText,
-    );
+    final valStyle = AppTypography.bodyLarge(color: AppTokens.textPrimary);
 
-    final liter  = (item['Aliter']  as num?)?.toStringAsFixed(2) ?? '0.00';
+    final liter = (item['Aliter'] as num?)?.toStringAsFixed(2) ?? '0.00';
     final amount = (item['AAmount'] as num?)?.toStringAsFixed(2) ?? '0.00';
-    final date   = item['SSaleDate']?.toString() ?? '';
+    final date = item['SSaleDate']?.toString() ?? '';
 
     return Container(
       margin: const EdgeInsets.only(bottom: 8),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: kCardBorder, width: 0.5),
+        border: Border.all(color: AppTokens.surfaceBorder, width: 0.5),
         boxShadow: [
           BoxShadow(
-            color: kHeaderGradStart.withValues(alpha: 0.06),
+            color: AppTokens.brandGradientStart.withValues(alpha: 0.06),
             blurRadius: 8,
             offset: const Offset(0, 2),
           ),
@@ -558,8 +483,8 @@ class _FuelRow extends StatelessWidget {
               ),
               Expanded(
                 child: Padding(
-                  padding: const EdgeInsets.symmetric(
-                      horizontal: 10, vertical: 10),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
                   child: Row(
                     children: [
                       // SNo
@@ -569,18 +494,14 @@ class _FuelRow extends StatelessWidget {
                           width: 26,
                           height: 26,
                           decoration: BoxDecoration(
-                            color: kChipBg,
-                            borderRadius:
-                            BorderRadius.circular(6),
+                            color: AppTokens.surfaceChip,
+                            borderRadius: BorderRadius.circular(6),
                           ),
                           child: Center(
                             child: Text(
                               '${index + 1}',
-                              style: GoogleFonts.lato(
-                                color: kHeaderGradStart,
-                                fontWeight: FontWeight.w700,
-                                fontSize: isTablet ? 11 : 10,
-                              ),
+                              style: AppTypography.bodySmall(
+                                  color: AppTokens.brandGradientStart),
                             ),
                           ),
                         ),
@@ -616,10 +537,8 @@ class _FuelRow extends StatelessWidget {
                           padding: EdgeInsets.zero,
                           constraints: const BoxConstraints(),
                           onPressed: () => onDelete(item),
-                          icon: const Icon(
-                              Icons.delete_outline_rounded,
-                              size: 20,
-                              color: kAccentRed),
+                          icon: const Icon(Icons.delete_outline_rounded,
+                              size: 20, color: AppTokens.appBarBg),
                         ),
                       ),
                     ],
@@ -646,21 +565,17 @@ class _EmptyState extends StatelessWidget {
             width: 64,
             height: 64,
             decoration: BoxDecoration(
-                color: kChipBg,
+                color: AppTokens.surfaceChip,
                 borderRadius: BorderRadius.circular(16)),
             child: const Icon(Icons.local_gas_station_outlined,
-                size: 32, color: kHeaderGradEnd),
+                size: 32, color: AppTokens.brandGradientEnd),
           ),
           const SizedBox(height: 14),
           Text('No Records Found',
-              style: GoogleFonts.lato(
-                  color: kTextDark,
-                  fontWeight: FontWeight.w600,
-                  fontSize: 15)),
+              style: AppTypography.heading2(color: AppTokens.textPrimary)),
           const SizedBox(height: 4),
           Text('Select a date range and press View',
-              style: GoogleFonts.lato(
-                  color: kTextMuted, fontSize: 12)),
+              style: AppTypography.bodySmall(color: AppTokens.textMuted)),
         ],
       ),
     );

@@ -1,3 +1,4 @@
+import 'package:maleva/core/theme/app_typography.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -64,11 +65,9 @@ class _PaymentPendingBody extends StatelessWidget {
                   labelColor: colour.kWhite,
                   unselectedLabelColor:
                   colour.kWhite.withValues(alpha: 0.55),
-                  labelStyle: GoogleFonts.lato(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 13),
+                  labelStyle: AppTypography.heading3(fontWeight: FontWeight.bold),
                   unselectedLabelStyle:
-                  GoogleFonts.lato(fontSize: 13),
+                  AppTypography.bodyLarge(),
                   dividerColor: Colors.transparent,
                   onTap: (i) => context
                       .read<PaymentPendingBloc>()
@@ -116,14 +115,11 @@ class _PaymentPendingBody extends StatelessWidget {
                           ),
                           child: Text(f,
                               textAlign: TextAlign.center,
-                              style: GoogleFonts.lato(
-                                  fontSize: 12,
-                                  fontWeight: active
-                                      ? FontWeight.bold
-                                      : FontWeight.normal,
-                                  color: active
+                              style: AppTypography.bodyMedium(color: active
                                       ? colour.kWhite
-                                      : AppTokens.brandDark)),
+                                      : AppTokens.brandDark, fontWeight: active
+                                      ? FontWeight.bold
+                                      : FontWeight.normal)),
                         ),
                       ),
                     );
@@ -208,10 +204,7 @@ class _PaymentPendingBody extends StatelessWidget {
                         elevation: 0,
                       ),
                       child: Text("Search",
-                          style: GoogleFonts.lato(
-                              color: colour.kWhite,
-                              fontWeight: FontWeight.bold,
-                              fontSize: 13)),
+                          style: AppTypography.heading3(color: colour.kWhite, fontWeight: FontWeight.bold)),
                     ),
                   ]),
                 ),
@@ -238,16 +231,10 @@ class _PaymentPendingBody extends StatelessWidget {
                           size: 16),
                       const SizedBox(width: 6),
                       Text("Total: ",
-                          style: GoogleFonts.lato(
-                              color: colour.kWhite,
-                              fontSize: 13,
-                              fontWeight: FontWeight.w500)),
+                          style: AppTypography.bodyLarge(color: colour.kWhite, fontWeight: FontWeight.w500)),
                       Text(
                         "RM ${loaded?.totalAmount.toStringAsFixed(2) ?? '0.00'}",
-                        style: GoogleFonts.lato(
-                            color: colour.kWhite,
-                            fontSize: 14,
-                            fontWeight: FontWeight.bold),
+                        style: AppTypography.heading3(color: colour.kWhite, fontWeight: FontWeight.bold),
                       ),
                     ]),
                   ),
@@ -262,8 +249,7 @@ class _PaymentPendingBody extends StatelessWidget {
                     ),
                   Text(
                     "${loaded?.filteredMaster.length ?? 0} records",
-                    style: GoogleFonts.lato(
-                        color: Colors.grey[500], fontSize: 12),
+                    style: AppTypography.bodyMedium(color: Colors.grey[500]),
                   ),
                 ]),
               ),
@@ -275,7 +261,7 @@ class _PaymentPendingBody extends StatelessWidget {
               // ════════════════════════════════════
               Expanded(
                 child: isLoading
-                    ? const Center(
+                    ? Center(
                     child: CircularProgressIndicator(
                         color: AppTokens.brandGradientStart))
                     : state is PaymentPendingError
@@ -294,9 +280,7 @@ class _PaymentPendingBody extends StatelessWidget {
                           Colors.grey.shade300),
                       const SizedBox(height: 12),
                       Text("No Records Found",
-                          style: GoogleFonts.lato(
-                              fontSize: 16,
-                              color: Colors.grey)),
+                          style: AppTypography.heading1(color: Colors.grey)),
                     ],
                   ),
                 )
@@ -431,18 +415,18 @@ class _PaymentPendingBody extends StatelessWidget {
     return Center(
       child: Column(mainAxisSize: MainAxisSize.min, children: [
         const Icon(Icons.error_outline,
-            color: Colors.red, size: 48),
+            color: colour.commonColorred, size: 48),
         const SizedBox(height: 12),
         Text(msg,
             textAlign: TextAlign.center,
-            style: GoogleFonts.lato(color: Colors.red)),
+            style: AppTypography.bodyLarge()),
         const SizedBox(height: 16),
         ElevatedButton.icon(
           onPressed: () => context
               .read<PaymentPendingBloc>()
               .add(const LoadPaymentPendingEvent()),
-          icon: const Icon(Icons.refresh),
-          label: const Text("Retry"),
+          icon: Icon(Icons.refresh),
+          label: Text("Retry"),
           style: ElevatedButton.styleFrom(
               backgroundColor: AppTokens.brandGradientStart),
         ),
@@ -532,10 +516,7 @@ class _PaymentGridCard extends StatelessWidget {
               ),
               child: Text(
                 item.ExpenseName ?? '-',
-                style: GoogleFonts.lato(
-                    color: colour.kWhite,
-                    fontWeight: FontWeight.bold,
-                    fontSize: 13),
+                style: AppTypography.heading3(color: colour.kWhite, fontWeight: FontWeight.bold),
                 maxLines: 2,
                 overflow: TextOverflow.ellipsis,
               ),
@@ -558,10 +539,7 @@ class _PaymentGridCard extends StatelessWidget {
                       ),
                       child: Text(
                         "RM ${(item.Amount ?? 0).toStringAsFixed(2)}",
-                        style: GoogleFonts.lato(
-                            color: AppTokens.brandGradientStart,
-                            fontWeight: FontWeight.bold,
-                            fontSize: 14),
+                        style: AppTypography.heading3(color: AppTokens.brandGradientStart, fontWeight: FontWeight.bold),
                       ),
                     ),
 
@@ -595,8 +573,7 @@ class _PaymentGridCard extends StatelessWidget {
           const SizedBox(width: 4),
           Expanded(
             child: Text(text,
-                style: GoogleFonts.lato(
-                    fontSize: 11, color: Colors.black54),
+                style: AppTypography.bodySmall(color: colour.commonColor),
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis),
           ),
@@ -633,14 +610,10 @@ class _EmptyDetailPanel extends StatelessWidget {
           ),
           const SizedBox(height: 16),
           Text("Select a record",
-              style: GoogleFonts.lato(
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
-                  color: AppTokens.brandDark)),
+              style: AppTypography.heading1(color: AppTokens.brandDark, fontWeight: FontWeight.bold)),
           const SizedBox(height: 6),
           Text("Tap any card to view details",
-              style: GoogleFonts.lato(
-                  fontSize: 13, color: Colors.grey[500])),
+              style: AppTypography.bodyLarge(color: Colors.grey[500])),
         ],
       ),
     );
@@ -695,19 +668,14 @@ class _PaymentDetailPanel extends StatelessWidget {
                   Expanded(
                     child: Text(
                       master.ExpenseName ?? '-',
-                      style: GoogleFonts.lato(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                          color: colour.kWhite),
+                      style: AppTypography.heading1(color: colour.kWhite, fontWeight: FontWeight.bold),
                       overflow: TextOverflow.ellipsis,
                     ),
                   ),
                 ]),
                 const SizedBox(height: 4),
                 Text("Bank: ${master.BankName ?? '-'}",
-                    style: GoogleFonts.lato(
-                        color: colour.kWhite.withValues(alpha: 0.75),
-                        fontSize: 12)),
+                    style: AppTypography.bodyMedium(color: colour.kWhite.withValues(alpha: 0.75))),
               ],
             ),
           ),
@@ -734,10 +702,7 @@ class _PaymentDetailPanel extends StatelessWidget {
             child: Align(
               alignment: Alignment.centerLeft,
               child: Text("Details",
-                  style: GoogleFonts.lato(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 14,
-                      color: AppTokens.brandDark)),
+                  style: AppTypography.heading3(color: AppTokens.brandDark, fontWeight: FontWeight.bold)),
             ),
           ),
 
@@ -748,8 +713,7 @@ class _PaymentDetailPanel extends StatelessWidget {
             child: related.isEmpty
                 ? Center(
                 child: Text("No detail records",
-                    style: GoogleFonts.lato(
-                        color: Colors.grey)))
+                    style: AppTypography.bodyLarge()))
                 : ListView.builder(
               padding: const EdgeInsets.symmetric(
                   horizontal: 14, vertical: 4),
@@ -776,26 +740,16 @@ class _PaymentDetailPanel extends StatelessWidget {
                           children: [
                             Text(
                                 d.SubExpenseName ?? '-',
-                                style: GoogleFonts.lato(
-                                    fontWeight:
-                                    FontWeight.w600,
-                                    color:
-                                    AppTokens.brandDark,
-                                    fontSize: 14)),
+                                style: AppTypography.bodyLarge(color: AppTokens.brandDark, fontWeight: FontWeight.w600)),
                             const SizedBox(height: 2),
                             Text(
                                 "Due: ${d.DueDate ?? '-'}",
-                                style: GoogleFonts.lato(
-                                    color: Colors.grey[500],
-                                    fontSize: 12)),
+                                style: AppTypography.bodyMedium(color: Colors.grey[500])),
                           ]),
                     ),
                     Text(
                       "RM ${(d.Amount ?? 0).toStringAsFixed(2)}",
-                      style: GoogleFonts.lato(
-                          fontWeight: FontWeight.bold,
-                          color: AppTokens.brandGradientStart,
-                          fontSize: 15),
+                      style: AppTypography.heading2(color: AppTokens.brandGradientStart, fontWeight: FontWeight.bold),
                     ),
                   ]),
                 );
@@ -821,10 +775,7 @@ class _PaymentDetailPanel extends StatelessWidget {
         Icon(icon, size: 13, color: AppTokens.brandGradientStart),
         const SizedBox(width: 5),
         Text(label,
-            style: GoogleFonts.lato(
-                fontSize: 12,
-                color: AppTokens.brandDark,
-                fontWeight: FontWeight.w600)),
+            style: AppTypography.bodyMedium(color: AppTokens.brandDark, fontWeight: FontWeight.w600)),
       ]),
     );
   }
@@ -858,15 +809,9 @@ Widget _dateCell({
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(label,
-              style: GoogleFonts.lato(
-                  fontSize: 10,
-                  color: Colors.grey[500],
-                  fontWeight: FontWeight.w600)),
+              style: AppTypography.badgeText(color: Colors.grey[500], fontWeight: FontWeight.w600)),
           Text(value,
-              style: GoogleFonts.lato(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 13,
-                  color: AppTokens.brandDark)),
+              style: AppTypography.heading3(color: AppTokens.brandDark, fontWeight: FontWeight.bold)),
         ]),
   );
 }
@@ -918,17 +863,12 @@ class _DetailSheet extends StatelessWidget {
                       CrossAxisAlignment.start,
                       children: [
                         Text(master.ExpenseName ?? '',
-                            style: GoogleFonts.lato(
-                                fontSize: 17,
-                                fontWeight: FontWeight.bold,
-                                color: colour.kWhite),
+                            style: AppTypography.heading1(color: colour.kWhite, fontWeight: FontWeight.bold),
                             overflow: TextOverflow.ellipsis),
                         Text(
                             "Bank: ${master.BankName ?? '-'}",
-                            style: GoogleFonts.lato(
-                                color: colour.kWhite
-                                    .withValues(alpha: 0.75),
-                                fontSize: 12)),
+                            style: AppTypography.bodyMedium(color: colour.kWhite
+                                    .withValues(alpha: 0.75))),
                       ]),
                 ),
                 GestureDetector(
@@ -967,10 +907,7 @@ class _DetailSheet extends StatelessWidget {
               child: Align(
                 alignment: Alignment.centerLeft,
                 child: Text("Details",
-                    style: GoogleFonts.lato(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 14,
-                        color: AppTokens.brandDark)),
+                    style: AppTypography.heading3(color: AppTokens.brandDark, fontWeight: FontWeight.bold)),
               ),
             ),
             const SizedBox(height: 8),
@@ -978,8 +915,7 @@ class _DetailSheet extends StatelessWidget {
               child: related.isEmpty
                   ? Center(
                   child: Text("No detail records",
-                      style: GoogleFonts.lato(
-                          color: Colors.grey)))
+                      style: AppTypography.bodyLarge()))
                   : ListView.builder(
                 controller: controller,
                 padding: const EdgeInsets.symmetric(
@@ -1009,28 +945,19 @@ class _DetailSheet extends StatelessWidget {
                                   d.SubExpenseName ??
                                       '-',
                                   style:
-                                  GoogleFonts.lato(
-                                      fontWeight:
-                                      FontWeight
-                                          .w600,
-                                      color: AppTokens.brandDark,
-                                      fontSize: 14)),
+                                  AppTypography.bodyLarge(color: AppTokens.brandDark, fontWeight: FontWeight
+                                          .w600)),
                               const SizedBox(height: 2),
                               Text(
                                   "Due: ${d.DueDate ?? '-'}",
                                   style:
-                                  GoogleFonts.lato(
-                                      color: Colors
-                                          .grey[500],
-                                      fontSize: 12)),
+                                  AppTypography.bodyMedium(color: Colors
+                                          .grey[500])),
                             ]),
                       ),
                       Text(
                         "RM ${(d.Amount ?? 0).toStringAsFixed(2)}",
-                        style: GoogleFonts.lato(
-                            fontWeight: FontWeight.bold,
-                            color: AppTokens.brandGradientStart,
-                            fontSize: 15),
+                        style: AppTypography.heading2(color: AppTokens.brandGradientStart, fontWeight: FontWeight.bold),
                       ),
                     ]),
                   );
@@ -1054,10 +981,7 @@ class _DetailSheet extends StatelessWidget {
                   ),
                   onPressed: () => Navigator.pop(context),
                   child: Text("Close",
-                      style: GoogleFonts.lato(
-                          color: colour.kWhite,
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold)),
+                      style: AppTypography.heading1(color: colour.kWhite, fontWeight: FontWeight.bold)),
                 ),
               ),
             ),
@@ -1081,10 +1005,7 @@ class _DetailSheet extends StatelessWidget {
         Icon(icon, size: 13, color: AppTokens.brandGradientStart),
         const SizedBox(width: 5),
         Text(label,
-            style: GoogleFonts.lato(
-                fontSize: 12,
-                color: AppTokens.brandDark,
-                fontWeight: FontWeight.w600)),
+            style: AppTypography.bodyMedium(color: AppTokens.brandDark, fontWeight: FontWeight.w600)),
       ]),
     );
   }

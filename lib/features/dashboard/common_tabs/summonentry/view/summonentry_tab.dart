@@ -1,3 +1,5 @@
+import 'package:maleva/core/colors/colors.dart' as colour;
+import 'package:maleva/core/theme/app_typography.dart';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
@@ -79,7 +81,7 @@ class _SummonEntryBodyState extends State<_SummonEntryBody> {
 
           ScaffoldMessenger.of(context).showSnackBar(SnackBar(
             content: Text("Submitted successfully ✅",
-                style: GoogleFonts.lato(color: Palette.kWhite)),
+                style: AppTypography.bodyLarge(color: Palette.kWhite)),
             backgroundColor: Colors.green,
             behavior: SnackBarBehavior.floating,
             shape: RoundedRectangleBorder(
@@ -90,7 +92,7 @@ class _SummonEntryBodyState extends State<_SummonEntryBody> {
         if (state is SummonEntryError) {
           ScaffoldMessenger.of(context).showSnackBar(SnackBar(
             content: Text(state.message),
-            backgroundColor: Colors.red,
+            backgroundColor: colour.commonColorred,
             behavior: SnackBarBehavior.floating,
           ));
         }
@@ -191,22 +193,13 @@ class _SummonEntryBodyState extends State<_SummonEntryBody> {
               ),
               const SizedBox(width: 10),
               Text('SUMMON ENTRY',
-                  style: GoogleFonts.lato(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                    color: AppTokens.brandDark,
-                    letterSpacing: 1.2,
-                  )),
+                  style: AppTypography.heading1(color: AppTokens.brandDark, fontWeight: FontWeight.bold)),
             ]),
             const SizedBox(height: 6),
             Padding(
               padding: const EdgeInsets.only(left: 14),
               child: Text('Entry Form',
-                  style: GoogleFonts.lato(
-                    fontSize: 14,
-                    color: AppTokens.brandMid,
-                    fontWeight: FontWeight.w500,
-                  )),
+                  style: AppTypography.bodyLarge(color: AppTokens.brandMid, fontWeight: FontWeight.w500)),
             ),
             const SizedBox(height: 24),
           ],
@@ -300,10 +293,7 @@ class _SummonEntryBodyState extends State<_SummonEntryBody> {
                             ),
                             const SizedBox(width: 6),
                             Text(country,
-                                style: GoogleFonts.lato(
-                                    color: active ? Palette.kWhite : AppTokens.brandDark,
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 14)),
+                                style: AppTypography.heading3(color: active ? Palette.kWhite : AppTokens.brandDark, fontWeight: FontWeight.bold)),
                           ],
                         ),
                       ),
@@ -408,8 +398,7 @@ class _SummonEntryBodyState extends State<_SummonEntryBody> {
                     (s.pickedImage == null && s.pickedPDF == null)
                         ? "Upload Document"
                         : "Change Document",
-                    style: GoogleFonts.lato(
-                        fontSize: 15, fontWeight: FontWeight.w600),
+                    style: AppTypography.heading2(fontWeight: FontWeight.w600),
                   ),
                 ),
               ),
@@ -434,14 +423,12 @@ class _SummonEntryBodyState extends State<_SummonEntryBody> {
                   ),
                   child: Row(children: [
                     const Icon(Icons.picture_as_pdf,
-                        color: Colors.red, size: 36),
+                        color: colour.commonColorred, size: 36),
                     const SizedBox(width: 10),
                     Expanded(
                       child: Text(
                         s.pickedPDF!.path.split('/').last,
-                        style: GoogleFonts.lato(
-                            fontSize: 14,
-                            fontWeight: FontWeight.w600),
+                        style: AppTypography.bodyLarge(fontWeight: FontWeight.w600),
                         overflow: TextOverflow.ellipsis,
                       ),
                     ),
@@ -480,10 +467,7 @@ class _SummonEntryBodyState extends State<_SummonEntryBody> {
                     child: CircularProgressIndicator(
                         color: Palette.kWhite, strokeWidth: 2))
                     : Text("Submit",
-                    style: GoogleFonts.lato(
-                        fontSize: isTablet ? 17 : 18,
-                        fontWeight: FontWeight.bold,
-                        color: Palette.kWhite)),
+                    style: AppTypography.heading1(color: Palette.kWhite, fontWeight: FontWeight.bold)),
               ),
             ),
             const SizedBox(width: 12),
@@ -501,10 +485,7 @@ class _SummonEntryBodyState extends State<_SummonEntryBody> {
                     MaterialPageRoute(
                         builder: (_) => const SummonView())),
                 child: Text("View",
-                    style: GoogleFonts.lato(
-                        fontSize: isTablet ? 17 : 18,
-                        fontWeight: FontWeight.bold,
-                        color: Palette.kWhite)),
+                    style: AppTypography.heading1(color: Palette.kWhite, fontWeight: FontWeight.bold)),
               ),
             ),
           ]),
@@ -560,11 +541,7 @@ class _SummonPreviewPanel extends StatelessWidget {
               ),
               const SizedBox(width: 10),
               Text('Entry Preview',
-                  style: GoogleFonts.lato(
-                    fontSize: 15,
-                    fontWeight: FontWeight.bold,
-                    color: AppTokens.brandDark,
-                  )),
+                  style: AppTypography.heading2(color: AppTokens.brandDark, fontWeight: FontWeight.bold)),
             ]),
 
             const SizedBox(height: 20),
@@ -586,18 +563,11 @@ class _SummonPreviewPanel extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text('Country',
-                      style: GoogleFonts.lato(
-                        fontSize: 11,
-                        color: Palette.kWhite.withValues(alpha: 0.75),
-                      )),
+                      style: AppTypography.bodySmall(color: Palette.kWhite.withValues(alpha: 0.75))),
                   const SizedBox(height: 4),
                   Text(
                     s.selectedCountry,
-                    style: GoogleFonts.lato(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                      color: Palette.kWhite,
-                    ),
+                    style: AppTypography.heading1(color: Palette.kWhite, fontWeight: FontWeight.bold),
                   ),
                 ],
               ),
@@ -647,11 +617,7 @@ class _SummonPreviewPanel extends StatelessWidget {
                         color: AppTokens.brandGradientStart, size: 16),
                     const SizedBox(width: 6),
                     Text('Document',
-                        style: GoogleFonts.lato(
-                          fontSize: 12,
-                          fontWeight: FontWeight.bold,
-                          color: AppTokens.brandDark,
-                        )),
+                        style: AppTypography.bodyMedium(color: AppTokens.brandDark, fontWeight: FontWeight.bold)),
                   ]),
                   const SizedBox(height: 8),
                   Row(children: [
@@ -672,9 +638,7 @@ class _SummonPreviewPanel extends StatelessWidget {
                             : s.pickedPDF != null
                             ? s.pickedPDF!.path.split('/').last
                             : 'No document uploaded',
-                        style: GoogleFonts.lato(
-                            fontSize: 12,
-                            color: Colors.grey[600]),
+                        style: AppTypography.bodyMedium(color: Colors.grey[600]),
                         overflow: TextOverflow.ellipsis,
                       ),
                     ),
@@ -700,11 +664,7 @@ class _SummonPreviewPanel extends StatelessWidget {
                         color: AppTokens.brandGradientStart, size: 16),
                     const SizedBox(width: 6),
                     Text('Tips',
-                        style: GoogleFonts.lato(
-                          fontSize: 12,
-                          fontWeight: FontWeight.bold,
-                          color: AppTokens.brandDark,
-                        )),
+                        style: AppTypography.bodyMedium(color: AppTokens.brandDark, fontWeight: FontWeight.bold)),
                   ]),
                   const SizedBox(height: 8),
                   _tipRow('Select truck and date first'),
@@ -737,18 +697,10 @@ class _SummonPreviewPanel extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(label,
-                  style: GoogleFonts.lato(
-                    fontSize: 11,
-                    color: Colors.grey[500],
-                    fontWeight: FontWeight.w600,
-                  )),
+                  style: AppTypography.bodySmall(color: Colors.grey[500], fontWeight: FontWeight.w600)),
               const SizedBox(height: 2),
               Text(value,
-                  style: GoogleFonts.lato(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w700,
-                    color: AppTokens.brandDark,
-                  )),
+                  style: AppTypography.heading3(color: AppTokens.brandDark, fontWeight: FontWeight.w700)),
             ],
           ),
         ),
@@ -765,10 +717,7 @@ class _SummonPreviewPanel extends StatelessWidget {
         const SizedBox(width: 6),
         Expanded(
           child: Text(text,
-              style: GoogleFonts.lato(
-                fontSize: 12,
-                color: Colors.grey[600],
-              )),
+              style: AppTypography.bodyMedium(color: Colors.grey[600])),
         ),
       ]),
     );
@@ -828,10 +777,7 @@ class _TruckSelectPageState extends State<_TruckSelectPage> {
               color: Palette.kWhite, size: 20),
         ),
         title: Text("Select Truck",
-            style: GoogleFonts.lato(
-                fontWeight: FontWeight.bold,
-                fontSize: 18,
-                color: Palette.kWhite)),
+            style: AppTypography.heading1(color: Palette.kWhite, fontWeight: FontWeight.bold)),
         centerTitle: true,
       ),
       body: Column(
@@ -843,11 +789,10 @@ class _TruckSelectPageState extends State<_TruckSelectPage> {
               controller: _searchCtrl,
               textCapitalization: TextCapitalization.characters,
               onChanged: _search,
-              style: GoogleFonts.lato(
-                  color: AppTokens.brandDark, fontWeight: FontWeight.w600),
+              style: AppTypography.bodyLarge(color: AppTokens.brandDark),
               decoration: InputDecoration(
                 hintText: 'Search Truck No...',
-                hintStyle: GoogleFonts.lato(color: Colors.grey),
+                hintStyle: AppTypography.bodyLarge(),
                 prefixIcon:
                 const Icon(Icons.search, color: AppTokens.brandGradientStart),
                 border: OutlineInputBorder(
@@ -865,10 +810,7 @@ class _TruckSelectPageState extends State<_TruckSelectPage> {
                 horizontal: 16, vertical: 10),
             child: Row(children: [
               Text("${_filtered.length} trucks found",
-                  style: GoogleFonts.lato(
-                      fontSize: 13,
-                      color: Colors.grey[500],
-                      fontWeight: FontWeight.w600)),
+                  style: AppTypography.bodyLarge(color: Colors.grey[500], fontWeight: FontWeight.w600)),
             ]),
           ),
           Expanded(
@@ -881,8 +823,7 @@ class _TruckSelectPageState extends State<_TruckSelectPage> {
                       color: Colors.grey.shade300, size: 56),
                   const SizedBox(height: 10),
                   Text("No trucks found",
-                      style: GoogleFonts.lato(
-                          fontSize: 16, color: Colors.grey)),
+                      style: AppTypography.heading1(color: Colors.grey)),
                 ],
               ),
             )
@@ -928,10 +869,7 @@ class _TruckSelectPageState extends State<_TruckSelectPage> {
                       Expanded(
                         child: Text(
                           truck.AccountName ?? '',
-                          style: GoogleFonts.lato(
-                              fontSize: 15,
-                              fontWeight: FontWeight.w600,
-                              color: AppTokens.brandDark),
+                          style: AppTypography.heading2(color: AppTokens.brandDark, fontWeight: FontWeight.w600),
                         ),
                       ),
                       const Icon(Icons.chevron_right_rounded,
@@ -984,11 +922,7 @@ class _SectionCard extends StatelessWidget {
           ),
           const SizedBox(width: 8),
           Text(title,
-              style: GoogleFonts.lato(
-                  fontSize: isTablet ? 14 : 13,
-                  fontWeight: FontWeight.bold,
-                  color: AppTokens.brandDark,
-                  letterSpacing: 0.3)),
+              style: AppTypography.heading3(color: AppTokens.brandDark, fontWeight: FontWeight.bold)),
         ]),
         const SizedBox(height: 8),
         Container(
@@ -1059,19 +993,13 @@ class _SelectTile extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(label,
-                    style: GoogleFonts.lato(
-                        fontSize: 11,
-                        color: hasValue ? AppTokens.brandGradientStart : Colors.grey,
-                        fontWeight: FontWeight.w600)),
+                    style: AppTypography.bodySmall(color: hasValue ? AppTokens.brandGradientStart : Colors.grey, fontWeight: FontWeight.w600)),
                 const SizedBox(height: 2),
                 Text(
                   hasValue ? value! : placeholder,
-                  style: GoogleFonts.lato(
-                      fontSize: 14,
-                      color: hasValue
+                  style: AppTypography.heading3(color: hasValue
                           ? AppTokens.brandDark
-                          : Colors.grey.shade400,
-                      fontWeight: hasValue
+                          : Colors.grey.shade400, fontWeight: hasValue
                           ? FontWeight.bold
                           : FontWeight.normal),
                 ),
@@ -1107,7 +1035,7 @@ Widget _field(
 InputDecoration _decor(String label, IconData icon) {
   return InputDecoration(
     labelText: label,
-    labelStyle: const TextStyle(color: AppTokens.brandDark),
+    labelStyle: AppTypography.bodyLarge(color: AppTokens.brandDark),
     prefixIcon: Icon(icon, color: AppTokens.brandGradientStart, size: 20),
     border: OutlineInputBorder(
         borderRadius: BorderRadius.circular(10)),

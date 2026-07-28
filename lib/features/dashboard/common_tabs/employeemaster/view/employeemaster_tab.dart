@@ -1,3 +1,5 @@
+import 'package:maleva/core/colors/colors.dart' as colour;
+import 'package:maleva/core/theme/app_typography.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -46,13 +48,13 @@ class _EmployeeListBody extends StatelessWidget {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
                 content: Text(state.message),
-                backgroundColor: Colors.red),
+                backgroundColor: colour.commonColorred),
           );
         }
       },
       builder: (context, state) {
         if (state is EmployeeListLoading) {
-          return const Center(
+          return Center(
               child: CircularProgressIndicator(color: AppTokens.brandGradientStart));
         }
 
@@ -62,18 +64,18 @@ class _EmployeeListBody extends StatelessWidget {
               mainAxisSize: MainAxisSize.min,
               children: [
                 const Icon(Icons.error_outline,
-                    color: Colors.red, size: 48),
+                    color: colour.commonColorred, size: 48),
                 const SizedBox(height: 12),
                 Text(state.message,
                     textAlign: TextAlign.center,
-                    style: GoogleFonts.lato(color: Colors.red)),
+                    style: AppTypography.bodyLarge()),
                 const SizedBox(height: 16),
                 ElevatedButton.icon(
                   onPressed: () => context
                       .read<EmployeeMasterBloc>()
                       .add(const LoadEmployeesmasterEvent()),
-                  icon: const Icon(Icons.refresh),
-                  label: const Text("Retry"),
+                  icon: Icon(Icons.refresh),
+                  label: Text("Retry"),
                   style: ElevatedButton.styleFrom(
                       backgroundColor: AppTokens.brandGradientStart),
                 ),
@@ -188,10 +190,7 @@ class _EmployeeListBody extends StatelessWidget {
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         Text("Employee's List",
-            style: GoogleFonts.lato(
-                fontSize: isTablet ? 20 : 18,
-                fontWeight: FontWeight.bold,
-                color: AppTokens.brandDark)),
+            style: AppTypography.heading1(color: AppTokens.brandDark, fontWeight: FontWeight.bold)),
         GestureDetector(
           onTap: () async {
             await Navigator.push(
@@ -232,9 +231,7 @@ class _EmployeeListBody extends StatelessWidget {
     if (state.filteredRecords.isEmpty) {
       return Center(
         child: Text('No Employees found',
-            style: GoogleFonts.lato(
-                fontSize: 16,
-                color: Colors.grey.shade600)),
+            style: AppTypography.heading1(color: Colors.grey.shade600)),
       );
     }
 
@@ -293,18 +290,18 @@ class _EmployeeListBody extends StatelessWidget {
       builder: (_) => AlertDialog(
         shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(16)),
-        title: const Text("Confirm Delete"),
+        title: Text("Confirm Delete"),
         content: Text("Delete ${record.EmployeeName}?"),
         actions: [
           TextButton(
               onPressed: () => Navigator.pop(context, false),
-              child: const Text("Cancel")),
+              child: Text("Cancel")),
           ElevatedButton(
             style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.red),
+                backgroundColor: colour.commonColorred),
             onPressed: () => Navigator.pop(context, true),
-            child: const Text("Delete",
-                style: TextStyle(color: Palette.kWhite)),
+            child: Text("Delete",
+                style: AppTypography.bodyLarge(color: Palette.kWhite)),
           ),
         ],
       ),
@@ -355,7 +352,7 @@ class _EmployeeCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final isActive = record.Active != 0;
     final statusColor =
-    isActive ? Colors.green.shade600 : Colors.red.shade600;
+    isActive ? Colors.green : colour.commonColorred;
 
     return GestureDetector(
       onTap: onTap,
@@ -406,15 +403,10 @@ class _EmployeeCard extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(record.EmployeeName ?? 'Unknown',
-                  style: GoogleFonts.lato(
-                      fontSize: 14,
-                      fontWeight: FontWeight.bold,
-                      color: AppTokens.brandDark),
+                  style: AppTypography.heading3(color: AppTokens.brandDark, fontWeight: FontWeight.bold),
                   overflow: TextOverflow.ellipsis),
               Text(record.MobileNo ?? 'No phone',
-                  style: GoogleFonts.lato(
-                      fontSize: 12,
-                      color: Colors.grey[600]),
+                  style: AppTypography.bodyMedium(color: Colors.grey[600]),
                   overflow: TextOverflow.ellipsis),
             ],
           ),
@@ -435,10 +427,7 @@ class _EmployeeCard extends StatelessWidget {
                 size: 12),
             const SizedBox(width: 3),
             Text(isActive ? 'Active' : 'Inactive',
-                style: GoogleFonts.lato(
-                    color: statusColor,
-                    fontWeight: FontWeight.w600,
-                    fontSize: 11)),
+                style: AppTypography.bodySmall(color: statusColor, fontWeight: FontWeight.w600)),
           ]),
         ),
       ],
@@ -465,14 +454,9 @@ class _EmployeeCard extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(record.EmployeeName ?? 'Unknown',
-                      style: GoogleFonts.lato(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                          color: AppTokens.brandDark)),
+                      style: AppTypography.heading1(color: AppTokens.brandDark, fontWeight: FontWeight.bold)),
                   Text(record.MobileNo ?? 'No phone',
-                      style: GoogleFonts.lato(
-                          fontSize: 13,
-                          color: Colors.grey[600])),
+                      style: AppTypography.bodyLarge(color: Colors.grey[600])),
                 ],
               ),
             ),
@@ -493,10 +477,7 @@ class _EmployeeCard extends StatelessWidget {
                         size: 14),
                     const SizedBox(width: 4),
                     Text(isActive ? 'Active' : 'Inactive',
-                        style: GoogleFonts.lato(
-                            color: statusColor,
-                            fontWeight: FontWeight.w600,
-                            fontSize: 12)),
+                        style: AppTypography.bodyMedium(color: statusColor, fontWeight: FontWeight.w600)),
                   ]),
             ),
           ],
@@ -524,8 +505,8 @@ class _EmployeeCard extends StatelessWidget {
             _actionBtn(
               icon: Icons.delete_rounded,
               label: "Delete",
-              color: Colors.red,
-              bg: Colors.red.withValues(alpha: 0.08),
+              color: colour.commonColorred,
+              bg: colour.commonColorred.withValues(alpha: 0.08),
               onTap: onDelete,
             ),
           ],
@@ -545,10 +526,7 @@ class _EmployeeCard extends StatelessWidget {
         Icon(icon, size: 13, color: AppTokens.brandGradientStart),
         const SizedBox(width: 4),
         Text("$label: $value",
-            style: GoogleFonts.lato(
-                fontSize: 12,
-                color: AppTokens.brandDark,
-                fontWeight: FontWeight.w600)),
+            style: AppTypography.bodyMedium(color: AppTokens.brandDark, fontWeight: FontWeight.w600)),
       ]),
     );
   }
@@ -572,10 +550,7 @@ class _EmployeeCard extends StatelessWidget {
           Icon(icon, color: color, size: 16),
           const SizedBox(width: 4),
           Text(label,
-              style: GoogleFonts.lato(
-                  color: color,
-                  fontWeight: FontWeight.w600,
-                  fontSize: 13)),
+              style: AppTypography.bodyLarge(color: color, fontWeight: FontWeight.w600)),
         ]),
       ),
     );
@@ -611,14 +586,10 @@ class _EmptyDetailPanel extends StatelessWidget {
           ),
           const SizedBox(height: 16),
           Text("Select an employee",
-              style: GoogleFonts.lato(
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
-                  color: AppTokens.brandDark)),
+              style: AppTypography.heading1(color: AppTokens.brandDark, fontWeight: FontWeight.bold)),
           const SizedBox(height: 6),
           Text("Tap any card to view details",
-              style: GoogleFonts.lato(
-                  fontSize: 13, color: Colors.grey[500])),
+              style: AppTypography.bodyLarge(color: Colors.grey[500])),
         ],
       ),
     );
@@ -650,7 +621,7 @@ class _EmployeeDetailPanel extends StatelessWidget {
   Widget build(BuildContext context) {
     final isActive = record.Active != 0;
     final statusColor =
-    isActive ? Colors.green.shade600 : Colors.red.shade600;
+    isActive ? Colors.green : colour.commonColorred;
 
     return Container(
       width: double.infinity,
@@ -686,10 +657,7 @@ class _EmployeeDetailPanel extends StatelessWidget {
               Expanded(
                 child: Text(
                   record.EmployeeName ?? 'Employee Details',
-                  style: GoogleFonts.lato(
-                      fontSize: 17,
-                      fontWeight: FontWeight.bold,
-                      color: Palette.kWhite),
+                  style: AppTypography.heading1(color: Palette.kWhite, fontWeight: FontWeight.bold),
                   overflow: TextOverflow.ellipsis,
                 ),
               ),
@@ -702,10 +670,7 @@ class _EmployeeDetailPanel extends StatelessWidget {
                     borderRadius: BorderRadius.circular(12)),
                 child: Text(
                   isActive ? 'Active' : 'Inactive',
-                  style: GoogleFonts.lato(
-                      color: Palette.kWhite,
-                      fontWeight: FontWeight.w600,
-                      fontSize: 12),
+                  style: AppTypography.bodyMedium(color: Palette.kWhite, fontWeight: FontWeight.w600),
                 ),
               ),
             ]),
@@ -722,9 +687,7 @@ class _EmployeeDetailPanel extends StatelessWidget {
                   icon: const Icon(Icons.edit_rounded,
                       color: AppTokens.brandGradientStart, size: 16),
                   label: Text("Edit",
-                      style: GoogleFonts.lato(
-                          color: AppTokens.brandGradientStart,
-                          fontWeight: FontWeight.bold)),
+                      style: AppTypography.heading2(color: AppTokens.brandGradientStart)),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppTokens.brandLight,
                     elevation: 0,
@@ -741,11 +704,9 @@ class _EmployeeDetailPanel extends StatelessWidget {
                   icon: const Icon(Icons.delete_rounded,
                       color: Palette.kWhite, size: 16),
                   label: Text("Delete",
-                      style: GoogleFonts.lato(
-                          color: Palette.kWhite,
-                          fontWeight: FontWeight.bold)),
+                      style: AppTypography.heading2(color: Palette.kWhite)),
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.red,
+                    backgroundColor: colour.commonColorred,
                     elevation: 0,
                     shape: RoundedRectangleBorder(
                         borderRadius:
@@ -808,16 +769,10 @@ class _EmployeeDetailPanel extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(label,
-                        style: GoogleFonts.lato(
-                            fontSize: 11,
-                            color: Colors.grey[500],
-                            fontWeight: FontWeight.w600)),
+                        style: AppTypography.bodySmall(color: Colors.grey[500], fontWeight: FontWeight.w600)),
                     Text(
                       value?.isNotEmpty == true ? value! : '—',
-                      style: GoogleFonts.lato(
-                          fontSize: 14,
-                          fontWeight: FontWeight.w700,
-                          color: AppTokens.brandDark),
+                      style: AppTypography.heading3(color: AppTokens.brandDark, fontWeight: FontWeight.w700),
                     ),
                   ]),
             ),
@@ -874,10 +829,7 @@ class _EmployeeDetailsDialog extends StatelessWidget {
                     child: Text(
                       record.EmployeeName ??
                           'Employee Details',
-                      style: GoogleFonts.lato(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                          color: Palette.kWhite),
+                      style: AppTypography.heading1(color: Palette.kWhite, fontWeight: FontWeight.bold),
                       overflow: TextOverflow.ellipsis,
                     ),
                   ),
@@ -929,11 +881,7 @@ class _EmployeeDetailsDialog extends StatelessWidget {
                         onPressed: () =>
                             Navigator.pop(context),
                         child: Text("Close",
-                            style: GoogleFonts.lato(
-                                color: Palette.kWhite,
-                                fontSize: 16,
-                                fontWeight:
-                                FontWeight.bold)),
+                            style: AppTypography.heading1(color: Palette.kWhite, fontWeight: FontWeight.bold)),
                       ),
                     ),
                   ]),
@@ -967,18 +915,12 @@ class _EmployeeDetailsDialog extends StatelessWidget {
                   CrossAxisAlignment.start,
                   children: [
                     Text(label,
-                        style: GoogleFonts.lato(
-                            fontSize: 11,
-                            color: Colors.grey[500],
-                            fontWeight: FontWeight.w600)),
+                        style: AppTypography.bodySmall(color: Colors.grey[500], fontWeight: FontWeight.w600)),
                     Text(
                       value?.isNotEmpty == true
                           ? value!
                           : '—',
-                      style: GoogleFonts.lato(
-                          fontSize: 14,
-                          fontWeight: FontWeight.w700,
-                          color: AppTokens.brandDark),
+                      style: AppTypography.heading3(color: AppTokens.brandDark, fontWeight: FontWeight.w700),
                     ),
                   ]),
             ),

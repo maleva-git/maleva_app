@@ -1,4 +1,5 @@
-import 'package:maleva/core/network/api_legacy_helper.dart';
+import 'package:maleva/core/colors/colors.dart' as colour;
+import 'package:maleva/core/theme/app_typography.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
@@ -21,6 +22,7 @@ import 'package:maleva/core/models/shared/customer_model.dart';
 import 'package:maleva/core/models/shared/employee_model.dart';
 import 'package:maleva/features/transaction/salesorder/models/sale_order_master_model.dart';
 import 'package:maleva/features/operations/models/job_status_model.dart';
+import 'package:maleva/core/utils/auth_helper.dart';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Entry point
@@ -123,10 +125,7 @@ class _SaleOrderViewState extends State<_SaleOrderView> {
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
           title: Text(
             'Select ETA Dates',
-            style: GoogleFonts.lato(
-              fontWeight: FontWeight.bold,
-              color: AppTokens.textPrimary,
-            ),
+            style: AppTypography.heading2(color: AppTokens.textPrimary),
           ),
           content: Column(
             mainAxisSize: MainAxisSize.min,
@@ -141,7 +140,7 @@ class _SaleOrderViewState extends State<_SaleOrderView> {
             TextButton(
               onPressed: () => Navigator.pop(dCtx),
               child: Text('Cancel',
-                  style: GoogleFonts.lato(color: AppTokens.textMuted)),
+                  style: AppTypography.bodyLarge(color: AppTokens.textMuted)),
             ),
             ElevatedButton(
               style: ElevatedButton.styleFrom(
@@ -159,7 +158,7 @@ class _SaleOrderViewState extends State<_SaleOrderView> {
                   oetb: _dlgOetb,
                 ));
               },
-              child: Text('Confirm', style: GoogleFonts.lato()),
+              child: Text('Confirm', style: AppTypography.bodyLarge()),
             ),
           ],
         ),
@@ -182,7 +181,7 @@ class _SaleOrderViewState extends State<_SaleOrderView> {
         ),
         decoration: InputDecoration(
           labelText: label,
-          labelStyle: GoogleFonts.lato(color: AppTokens.textSecondary),
+          labelStyle: AppTypography.bodyLarge(color: AppTokens.textSecondary),
           border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
           focusedBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(8),
@@ -222,7 +221,7 @@ class _SaleOrderViewState extends State<_SaleOrderView> {
         builder: (ctx, state) {
           if (state.status == SaleOrderStatus.initial ||
               state.isLoading) {
-            return const Center(
+            return Center(
               child: SpinKitFoldingCube(
                 color: AppTokens.spinKit,
                 size: 35.0,
@@ -256,13 +255,7 @@ class _SaleOrderViewState extends State<_SaleOrderView> {
       iconTheme: const IconThemeData(color: AppTokens.appBarIcon),
       title: Text(
         'Dash Board',
-        style: GoogleFonts.lato(
-          textStyle: const TextStyle(
-            color: AppTokens.appBarTitle,
-            fontWeight: FontWeight.bold,
-            fontSize: 18,
-          ),
-        ),
+        style: AppTypography.heading1(color: AppTokens.appBarTitle, fontWeight: FontWeight.bold),
       ),
       actions: [
         IconButton(
@@ -291,7 +284,7 @@ class _SaleOrderViewState extends State<_SaleOrderView> {
         IconButton(
           icon: const Icon(Icons.exit_to_app, size: 26),
           tooltip: 'Logout',
-          onPressed: () => ApiLegacyHelper.logout(context),
+          onPressed: () => AuthHelper.logout(context),
         ),
       ],
     );
@@ -305,7 +298,7 @@ class _SaleOrderViewState extends State<_SaleOrderView> {
       ScaffoldMessenger.of(ctx).showSnackBar(SnackBar(
         backgroundColor: Palette.redError,
         content: Text(state.errorMessage,
-            style: GoogleFonts.lato(color: Palette.white)),
+            style: AppTypography.bodyLarge(color: Palette.white)),
         duration: const Duration(seconds: 3),
       ));
     }
@@ -313,7 +306,7 @@ class _SaleOrderViewState extends State<_SaleOrderView> {
       ScaffoldMessenger.of(ctx).showSnackBar(SnackBar(
         backgroundColor: AppTokens.brandPrimary,
         content: Text('Updating…',
-            style: GoogleFonts.lato(color: Palette.white)),
+            style: AppTypography.bodyLarge(color: Palette.white)),
         duration: const Duration(seconds: 2),
       ));
     }
@@ -507,12 +500,7 @@ class _DateRow extends StatelessWidget {
           children: [
             Text(
               label.toUpperCase(),
-              style: GoogleFonts.lato(
-                fontSize: 10,
-                fontWeight: FontWeight.bold,
-                color: AppTokens.textMuted,
-                letterSpacing: 0.8,
-              ),
+              style: AppTypography.badgeText(color: AppTokens.textMuted, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 4),
             Row(
@@ -521,11 +509,7 @@ class _DateRow extends StatelessWidget {
                 const SizedBox(width: 6),
                 Text(
                   DateFormat('dd MMM yyyy').format(DateTime.parse(dateStr)),
-                  style: GoogleFonts.lato(
-                    fontSize: fs,
-                    fontWeight: FontWeight.w700,
-                    color: AppTokens.textPrimary,
-                  ),
+                  style: AppTypography.bodyLarge(color: AppTokens.textPrimary),
                 ),
               ],
             ),
@@ -595,7 +579,7 @@ class _ActionButtons extends StatelessWidget {
         }),
       ),
       icon: Icon(icon, size: 16),
-      label: Text(label, style: GoogleFonts.lato(fontSize: fs, fontWeight: FontWeight.bold)),
+      label: Text(label, style: AppTypography.bodyLarge()),
       onPressed: onPressed,
     );
   }
@@ -633,19 +617,11 @@ class _SummaryPill extends StatelessWidget {
           const SizedBox(width: 8),
           Text(
             'Total Orders: ',
-            style: GoogleFonts.lato(
-              color: AppTokens.textSecondary,
-              fontWeight: FontWeight.w500,
-              fontSize: 12,
-            ),
+            style: AppTypography.bodyMedium(color: AppTokens.textSecondary, fontWeight: FontWeight.w500),
           ),
           Text(
             '$count',
-            style: GoogleFonts.lato(
-              color: AppTokens.brandPrimary,
-              fontWeight: FontWeight.w800,
-              fontSize: 13,
-            ),
+            style: AppTypography.heading3(color: AppTokens.brandPrimary, fontWeight: FontWeight.w800),
           ),
         ],
       ),
@@ -733,11 +709,7 @@ class _SaleOrderCard extends StatelessWidget {
                         child: Text(
                           item.BillNoDisplay,
                           overflow: TextOverflow.ellipsis,
-                          style: GoogleFonts.lato(
-                            fontSize: fs + 2,
-                            fontWeight: FontWeight.w800,
-                            color: AppTokens.textPrimary,
-                          ),
+                          style: AppTypography.bodyLarge(color: AppTokens.textPrimary),
                         ),
                       ),
                       _StatusChip(label: item.JobStatus, fontSize: fs - 1),
@@ -772,19 +744,16 @@ class _SaleOrderCard extends StatelessWidget {
                       Expanded(
                         child: RichText(
                           text: TextSpan(
-                            style: GoogleFonts.lato(
-                              fontSize: fs,
-                              color: AppTokens.textSecondary,
-                            ),
+                            style: AppTypography.bodyLarge(color: AppTokens.textSecondary),
                             children: [
                               TextSpan(
                                 text: item.Loadingvesselname,
-                                style: const TextStyle(fontWeight: FontWeight.w700),
+                                style: AppTypography.heading2(),
                               ),
                               const TextSpan(text: '  ➔  '),
                               TextSpan(
                                 text: item.Offvesselname,
-                                style: const TextStyle(fontWeight: FontWeight.w700),
+                                style: AppTypography.heading2(),
                               ),
                             ],
                           ),
@@ -812,10 +781,7 @@ class _SaleOrderCard extends StatelessWidget {
                             const SizedBox(width: 6),
                             Text(
                               item.EmployeeName,
-                              style: GoogleFonts.lato(
-                                  fontSize: fs,
-                                  fontWeight: FontWeight.w600,
-                                  color: AppTokens.textPrimary),
+                              style: AppTypography.bodyLarge(color: AppTokens.textPrimary),
                             ),
                           ],
                         ),
@@ -838,10 +804,7 @@ class _SaleOrderCard extends StatelessWidget {
                                 child: Text(
                                   '${item.Origin}  ➔  ${item.Destination}',
                                   overflow: TextOverflow.ellipsis,
-                                  style: GoogleFonts.lato(
-                                      fontSize: fs,
-                                      fontWeight: FontWeight.w600,
-                                      color: AppTokens.textSecondary),
+                                  style: AppTypography.bodyLarge(color: AppTokens.textSecondary),
                                 ),
                               ),
                             ],
@@ -910,11 +873,7 @@ class _StatusChip extends StatelessWidget {
       ),
       child: Text(
         label,
-        style: GoogleFonts.lato(
-          fontSize: fontSize,
-          fontWeight: FontWeight.w800,
-          color: chipColor,
-        ),
+        style: AppTypography.bodyLarge(color: chipColor),
       ),
     );
   }
@@ -953,11 +912,7 @@ class _ETAChip extends StatelessWidget {
           const SizedBox(width: 4),
           Text(
             '$label: ${hasValue ? value.split(' ')[0] : '–'}',
-            style: GoogleFonts.lato(
-              fontSize: fs,
-              fontWeight: FontWeight.w700,
-              color: hasValue ? successText : AppTokens.textMuted,
-            ),
+            style: AppTypography.bodyLarge(color: hasValue ? successText : AppTokens.textMuted),
           ),
         ],
       ),
@@ -1026,11 +981,7 @@ class _FilterSheet extends StatelessWidget {
 
                 Text(
                   'Filter Orders',
-                  style: GoogleFonts.lato(
-                    fontSize: isTablet ? 17 : 15,
-                    fontWeight: FontWeight.bold,
-                    color: AppTokens.textPrimary,
-                  ),
+                  style: AppTypography.heading2(color: AppTokens.textPrimary, fontWeight: FontWeight.bold),
                 ),
                 const SizedBox(height: 14),
 
@@ -1188,7 +1139,7 @@ class _FilterSheet extends StatelessWidget {
                             horizontal: 20, vertical: 10),
                       ),
                       icon: const Icon(Icons.search, size: 16),
-                      label: Text('View', style: GoogleFonts.lato(fontSize: fs)),
+                      label: Text('View', style: AppTypography.bodyLarge()),
                       onPressed: () {
                         Navigator.pop(ctx);
                         onView();
@@ -1205,9 +1156,7 @@ class _FilterSheet extends StatelessWidget {
                       ),
                       onPressed: () => Navigator.pop(ctx),
                       child: Text('Close',
-                          style: GoogleFonts.lato(
-                              fontSize: fs,
-                              color: AppTokens.brandPrimary)),
+                          style: AppTypography.bodyLarge(color: AppTokens.brandPrimary)),
                     ),
                   ],
                 ),
@@ -1233,14 +1182,10 @@ class _FilterSheet extends StatelessWidget {
     return TextField(
       controller: controller,
       readOnly: true,
-      style: GoogleFonts.lato(
-          fontSize: fs,
-          fontWeight: FontWeight.w600,
-          color: AppTokens.textPrimary),
+      style: AppTypography.bodyLarge(color: AppTokens.textPrimary),
       decoration: InputDecoration(
         hintText: hint,
-        hintStyle: GoogleFonts.lato(
-            fontSize: fs, color: AppTokens.textSecondary),
+        hintStyle: AppTypography.bodyLarge(color: AppTokens.textSecondary),
         suffixIcon: InkWell(
           onTap: controller.text.isEmpty ? onSearch : onClear,
           child: Icon(
@@ -1269,14 +1214,11 @@ class _FilterSheet extends StatelessWidget {
     return TextField(
       controller: ctrl,
       textCapitalization: TextCapitalization.characters,
-      style: GoogleFonts.lato(
-          fontSize: fs,
-          fontWeight: FontWeight.w600,
-          color: AppTokens.textPrimary),
+      style: AppTypography.bodyLarge(color: AppTokens.textPrimary),
       decoration: InputDecoration(
         hintText: hint,
         hintStyle:
-        GoogleFonts.lato(fontSize: fs, color: AppTokens.textSecondary),
+        AppTypography.bodyLarge(color: AppTokens.textSecondary),
         border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(10),
@@ -1310,10 +1252,7 @@ class _FilterSheet extends StatelessWidget {
           onChanged: (v) => onChanged(v ?? false),
         ),
         Text(label,
-            style: GoogleFonts.lato(
-                fontSize: fs,
-                fontWeight: FontWeight.bold,
-                color: AppTokens.textPrimary)),
+            style: AppTypography.bodyLarge(color: AppTokens.textPrimary)),
       ],
     );
   }
@@ -1332,8 +1271,7 @@ class _FilterSheet extends StatelessWidget {
               .add(SaleOrderClsChanged(v ?? '3')),
         ),
         Text(label,
-            style: GoogleFonts.lato(
-                fontSize: fs, color: AppTokens.textPrimary)),
+            style: AppTypography.bodyLarge(color: AppTokens.textPrimary)),
       ],
     );
   }
@@ -1358,8 +1296,7 @@ class _FilterSheet extends StatelessWidget {
               SaleOrderETARadioChanged(v ?? '0', radioVal, etaEnabled)),
         ),
         Text(label,
-            style: GoogleFonts.lato(
-                fontSize: fs, color: AppTokens.textPrimary)),
+            style: AppTypography.bodyLarge(color: AppTokens.textPrimary)),
         const SizedBox(width: 4),
       ],
     );
@@ -1377,11 +1314,7 @@ class _SectionLabel extends StatelessWidget {
       padding: const EdgeInsets.only(bottom: 4),
       child: Text(
         label,
-        style: GoogleFonts.lato(
-          fontSize: fs - 1,
-          fontWeight: FontWeight.bold,
-          color: AppTokens.textSecondary,
-        ),
+        style: AppTypography.bodyLarge(color: AppTokens.textSecondary),
       ),
     );
   }
@@ -1404,14 +1337,10 @@ class _EmptyWidget extends StatelessWidget {
               size: 64, color: Palette.grey400.withValues(alpha: 0.6)),
           const SizedBox(height: 12),
           Text('No orders found',
-              style: GoogleFonts.lato(
-                  fontSize: 15,
-                  fontWeight: FontWeight.w600,
-                  color: AppTokens.textSecondary)),
+              style: AppTypography.heading2(color: AppTokens.textSecondary, fontWeight: FontWeight.w600)),
           const SizedBox(height: 4),
           Text('Adjust filters and tap View',
-              style: GoogleFonts.lato(
-                  fontSize: 12, color: AppTokens.textMuted)),
+              style: AppTypography.bodyMedium(color: AppTokens.textMuted)),
         ],
       ),
     );
@@ -1435,17 +1364,13 @@ class _ErrorWidget extends StatelessWidget {
                 size: 56, color: Palette.redError),
             const SizedBox(height: 12),
             Text('Failed to load data',
-                style: GoogleFonts.lato(
-                    fontSize: 15,
-                    fontWeight: FontWeight.bold,
-                    color: AppTokens.textPrimary)),
+                style: AppTypography.heading2(color: AppTokens.textPrimary, fontWeight: FontWeight.bold)),
             const SizedBox(height: 6),
             Text(message,
                 textAlign: TextAlign.center,
                 maxLines: 3,
                 overflow: TextOverflow.ellipsis,
-                style: GoogleFonts.lato(
-                    fontSize: 12, color: AppTokens.textMuted)),
+                style: AppTypography.bodyMedium(color: AppTokens.textMuted)),
             const SizedBox(height: 18),
             ElevatedButton.icon(
               style: ElevatedButton.styleFrom(
@@ -1460,7 +1385,7 @@ class _ErrorWidget extends StatelessWidget {
               icon: const Icon(Icons.refresh_rounded, size: 18),
               label: Text('Retry',
                   style:
-                  GoogleFonts.lato(fontWeight: FontWeight.bold)),
+                  AppTypography.heading2()),
             ),
           ],
         ),

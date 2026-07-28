@@ -28,6 +28,14 @@ class CustDashboardLoadSales extends CustDashboardEvent {
   const CustDashboardLoadSales();
 }
 
+class CustDashboardEditSalesOrder extends CustDashboardEvent {
+  final int id;
+  const CustDashboardEditSalesOrder(this.id);
+
+  @override
+  List<Object?> get props => [id];
+}
+
 // ─── Vessel Tab ────────────────────────────────────────────────────────────────
 class CustDashboardLoadVessel extends CustDashboardEvent {
   /// 0 = today, 1 = tomorrow

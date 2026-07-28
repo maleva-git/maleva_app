@@ -1,4 +1,3 @@
-import 'package:maleva/core/network/api_legacy_helper.dart';
 import 'package:flutter/Material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
@@ -41,6 +40,7 @@ import 'package:maleva/core/widgets/custom_app_bar.dart';
 import 'package:maleva/features/dashboard/common_tabs/driverleave/view/employee_leave_request_tab.dart';
 import 'package:maleva/features/dashboard/common_tabs/driverleave/view/employee_leave_approval_tab.dart';
 import 'package:maleva/core/models/shared/barcode_print_model.dart';
+import 'package:maleva/core/utils/auth_helper.dart';
 
 class MobileDashboard extends StatelessWidget {
   final TabController tabController;
@@ -96,15 +96,13 @@ class MobileDashboard extends StatelessWidget {
         IconButton(
           icon: Icon(Icons.exit_to_app,
               size: isTablet ? 32 : 30, color: colour.topAppBarColor),
-          onPressed: () => ApiLegacyHelper.logout(context),
+          onPressed: () => AuthHelper.logout(context),
         ),
         if (isTablet) const SizedBox(width: 8),
       ],
     );
   }
 
-  // ── TabBar ────────────────────────────────────────────────────────────
-// ✅ Step 2: _buildTabBar() method-ல container size மாத்து
   Widget _buildTabBar(bool isTablet) {
     return Container(
       margin: EdgeInsets.symmetric(
@@ -168,7 +166,6 @@ class MobileDashboard extends StatelessWidget {
           _tab('PDO',             isTablet),
           _tab('RTI',             isTablet),
           _tab('LeaveApproval',   isTablet),
-
           _tab('EmpApproval', isTablet),
           _tab('EmpLeave', isTablet),
         ],
@@ -176,8 +173,6 @@ class MobileDashboard extends StatelessWidget {
     );
   }
 
-  // ── Tab item ──────────────────────────────────────────────────────────
-// ✅ Step 1: _tab() method-ல isTablet add பண்ணு
   Tab _tab(String text, bool isTablet) => Tab(
     height: isTablet ? 42 : null,
     child: Padding(
@@ -193,12 +188,9 @@ class MobileDashboard extends StatelessWidget {
       ),
     ),
   );
-  // ── TabBarView ────────────────────────────────────────────────────────
   Widget _buildTabBarView(BuildContext context) {
     return BlocListener<AdminTabBloc, AdminTabState>(
       listener: (context, tabState) {
-        // No longer dispatching to SalesBloc or TruckBloc as they were removed
-
       },
       child: TabBarView(
         controller: tabController,

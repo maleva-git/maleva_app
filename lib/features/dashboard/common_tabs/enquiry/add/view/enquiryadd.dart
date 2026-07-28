@@ -1,3 +1,6 @@
+import 'package:maleva/core/network/legacy_api_repository.dart';
+import 'package:maleva/core/di/injection.dart';
+import 'package:maleva/core/theme/app_typography.dart';
 // ui/add_enquiry_screen.dart
 
 import 'package:flutter/material.dart';
@@ -8,7 +11,7 @@ import 'package:intl/intl.dart';
 import 'package:maleva/core/colors/colors.dart' as colors;
 import 'package:maleva/core/theme/palette.dart';
 import 'package:maleva/core/utils/app_globals.dart';
-import 'package:maleva/core/network/OnlineApi.dart' as OnlineApi;
+
 import 'package:maleva/menu/menulist.dart';
 import '../../../../../mastersearch/Customer.dart';
 import '../../../../../mastersearch/JobType.dart';
@@ -76,7 +79,7 @@ class _AddEnquiryViewState extends State<_AddEnquiryView> {
             state.errorMessage!,
             '',
             Colors.white,
-            Colors.red,
+            colors.commonColorred,
             null,
             18.00 - AppGlobals.reducesize,
             AppGlobals.tll,
@@ -113,19 +116,9 @@ class _AddEnquiryViewState extends State<_AddEnquiryView> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text('Add Enquiry',
-                      style: GoogleFonts.lato(
-                          textStyle: const TextStyle(
-                            color: Colors.white, // Text color white
-                            fontWeight: FontWeight.w900,
-                            fontSize: 18,
-                          ))),
+                      style: AppTypography.heading1(color: Colors.white, fontWeight: FontWeight.w900)),
                   Text(_userName,
-                      style: GoogleFonts.lato(
-                          textStyle: const TextStyle(
-                            color: Colors.white70, // Subtitle text slightly transparent white
-                            fontWeight: FontWeight.w600,
-                            fontSize: 12,
-                          ))),
+                      style: AppTypography.bodyMedium(color: Colors.white70, fontWeight: FontWeight.w600)),
                 ],
               ),
               actions: [
@@ -151,17 +144,14 @@ class _AddEnquiryViewState extends State<_AddEnquiryView> {
                     },
                     icon: const Icon(Icons.check, size: 18, color: Colors.white),
                     label: Text('Save',
-                        style: GoogleFonts.lato(
-                            fontSize: 14,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white)),
+                        style: AppTypography.heading3(color: Colors.white, fontWeight: FontWeight.bold)),
                   ),
                 ),
               ],
             ),
             drawer: const Menulist(),
             body: state.status == AddEnquiryStatus.loading
-                ? const Center(
+                ? Center(
               child: SpinKitFoldingCube(
                 color: Palette.blue700,
                 size: 35.0,
@@ -191,7 +181,7 @@ if (navResult1 != null) { AppGlobals.SelectCustomerList = navResult1; }
                             bloc.add(CustomerSelectedEvent(cust.AccountName, cust.Id));
                             AppGlobals.SelectCustomerList = CustomerModel.Empty();
                             if (!context.mounted) return;
-                            await OnlineApi.loadCustomerCurrency(context, cust.Id); if (!context.mounted) return;} else {
+                            await sl<LegacyApiRepository>().loadCustomerCurrency(context, cust.Id); if (!context.mounted) return;} else {
                             bloc.add(CustomerClearedEvent());
                           }
                         },
@@ -210,7 +200,7 @@ if (navResult2 != null) { AppGlobals.SelectJobTypeList = navResult2; }
 
                             final jt = AppGlobals.SelectJobTypeList;
                             if (!context.mounted) return;
-                            await OnlineApi.SelectAllJobStatus(context, jt.Id); if (!context.mounted) return;bloc.add(JobTypeSelectedEvent(jt.Name, jt.Id));
+                            await sl<LegacyApiRepository>().SelectAllJobStatus(context, jt.Id); if (!context.mounted) return;bloc.add(JobTypeSelectedEvent(jt.Name, jt.Id));
                             AppGlobals.SelectJobTypeList = JobTypeModel.Empty();
                           } else {
                             bloc.add(JobTypeClearedEvent());
@@ -320,7 +310,7 @@ if (navResult3 != null) { AppGlobals.SelectedPortName = navResult3; }
                           }
                         },
                       ),
-                      const Padding(
+                      Padding(
                         padding: EdgeInsets.symmetric(vertical: 16.0),
                         child: Divider(color: Palette.grey200, thickness: 1.5),
                       ),
@@ -420,7 +410,7 @@ if (navResult4 != null) { AppGlobals.SelectedPortName = navResult4; }
             children: [
               Icon(icon, size: 20, color: Palette.blue600),
               const SizedBox(width: 8),
-              Text(title, style: GoogleFonts.lato(fontSize: 15, fontWeight: FontWeight.w800, color: Palette.textDark)),
+              Text(title, style: AppTypography.heading2(color: Palette.textDark, fontWeight: FontWeight.w800)),
             ],
           ),
           const SizedBox(height: 16),
@@ -445,10 +435,10 @@ if (navResult4 != null) { AppGlobals.SelectedPortName = navResult4; }
       readOnly: readOnly,
       onChanged: onChanged,
       textCapitalization: textCapitalization,
-      style: GoogleFonts.lato(fontSize: 14, fontWeight: FontWeight.w700, color: Palette.textDark),
+      style: AppTypography.heading3(color: Palette.textDark, fontWeight: FontWeight.w700),
       decoration: InputDecoration(
         hintText: hint,
-        hintStyle: GoogleFonts.lato(fontSize: 14, fontWeight: FontWeight.w600, color: Palette.grey500),
+        hintStyle: AppTypography.bodyLarge(color: Palette.grey500, fontWeight: FontWeight.w600),
         prefixIcon: Icon(icon, color: Palette.blue400, size: 20),
         suffixIcon: onTapSuffix != null
             ? InkWell(
@@ -490,7 +480,7 @@ class _DateRowModern extends StatelessWidget {
       children: [
         Padding(
           padding: const EdgeInsets.only(left: 4, bottom: 6),
-          child: Text(label, style: GoogleFonts.lato(fontSize: 13, fontWeight: FontWeight.w700, color: Palette.grey600)),
+          child: Text(label, style: AppTypography.heading3(color: Palette.grey600, fontWeight: FontWeight.w700)),
         ),
         GestureDetector(
           onTap: onTap,
@@ -507,7 +497,7 @@ class _DateRowModern extends StatelessWidget {
                 Expanded(
                   child: Text(
                     DateFormat('dd MMM yyyy').format(DateTime.parse(dateStr)),
-                    style: GoogleFonts.lato(fontSize: 14, fontWeight: FontWeight.w700, color: Palette.textDark),
+                    style: AppTypography.heading3(color: Palette.textDark, fontWeight: FontWeight.w700),
                   ),
                 ),
               ],
@@ -544,7 +534,7 @@ class _DateTimeRowModern extends StatelessWidget {
       children: [
         Padding(
           padding: const EdgeInsets.only(left: 4, bottom: 6),
-          child: Text(label, style: GoogleFonts.lato(fontSize: 13, fontWeight: FontWeight.w700, color: Palette.grey600)),
+          child: Text(label, style: AppTypography.heading3(color: Palette.grey600, fontWeight: FontWeight.w700)),
         ),
         Row(
           children: [
@@ -564,10 +554,7 @@ class _DateTimeRowModern extends StatelessWidget {
                       Expanded(
                         child: Text(
                           DateFormat('dd MMM yyyy • HH:mm').format(DateTime.parse(dateStr)),
-                          style: GoogleFonts.lato(
-                              fontSize: 14,
-                              fontWeight: FontWeight.w700,
-                              color: isEnabled ? Palette.textDark : Palette.grey500),
+                          style: AppTypography.heading3(color: isEnabled ? Palette.textDark : Palette.grey500, fontWeight: FontWeight.w700),
                         ),
                       ),
                     ],

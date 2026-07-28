@@ -1,3 +1,5 @@
+import 'package:maleva/core/colors/colors.dart' as colour;
+import 'package:maleva/core/theme/app_typography.dart';
 // license_view.dart
 
 import 'package:flutter/material.dart';
@@ -41,7 +43,7 @@ class LicenseView extends StatelessWidget {
         if (state is LicenseError) {
           msgshow(
             state.errorMessage, '',
-            Colors.white, Colors.red, null,
+            Colors.white, colour.commonColorred, null,
             18.00 - AppGlobals.reducesize,
             AppGlobals.tll, AppGlobals.tgc, context, 2,
           );
@@ -84,16 +86,9 @@ class LicenseView extends StatelessWidget {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text("Driver's License",
-                                style: GoogleFonts.poppins(
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.w700,
-                                  color: Palette.white,
-                                )),
+                                style: AppTypography.heading1(color: Palette.white, fontWeight: FontWeight.w700)),
                             Text("License records",
-                                style: GoogleFonts.poppins(
-                                  fontSize: 12,
-                                  color: Palette.white.withValues(alpha: 0.7),
-                                )),
+                                style: AppTypography.bodyMedium(color: Palette.white.withValues(alpha: 0.7))),
                           ],
                         ),
                         const Spacer(),
@@ -134,15 +129,12 @@ class LicenseView extends StatelessWidget {
                         onChanged: (query) => context
                             .read<LicenseBloc>()
                             .add(SearchLicenseEvent(query: query)),
-                        style: GoogleFonts.poppins(
-                            fontSize: 14, color: AppTokens.textPrimary),
+                        style: AppTypography.bodyLarge(color: AppTokens.textPrimary),
                         decoration: InputDecoration(
                           prefixIcon: const Icon(Icons.search_rounded,
                               color: AppTokens.brandPrimary, size: 20),
                           hintText: 'Search by name or category...',
-                          hintStyle: GoogleFonts.poppins(
-                              fontSize: 13,
-                              color: AppTokens.textSecondary),
+                          hintStyle: AppTypography.bodyLarge(color: AppTokens.textSecondary),
                           border: InputBorder.none,
                           contentPadding: const EdgeInsets.symmetric(
                               vertical: 14, horizontal: 12),
@@ -172,8 +164,7 @@ class LicenseView extends StatelessWidget {
                 color: AppTokens.brandPrimary, strokeWidth: 3),
             const SizedBox(height: 16),
             Text("Loading licenses...",
-                style: GoogleFonts.poppins(
-                    color: AppTokens.textSecondary, fontSize: 13)),
+                style: AppTypography.bodyLarge(color: AppTokens.textSecondary)),
           ],
         ),
       );
@@ -196,15 +187,11 @@ class LicenseView extends StatelessWidget {
               ),
               const SizedBox(height: 16),
               Text("Failed to load",
-                  style: GoogleFonts.poppins(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w700,
-                      color: AppTokens.textPrimary)),
+                  style: AppTypography.heading1(color: AppTokens.textPrimary, fontWeight: FontWeight.w700)),
               const SizedBox(height: 8),
               Text(state.errorMessage,
                   textAlign: TextAlign.center,
-                  style: GoogleFonts.poppins(
-                      fontSize: 12, color: AppTokens.textSecondary)),
+                  style: AppTypography.bodyMedium(color: AppTokens.textSecondary)),
               const SizedBox(height: 20),
               GestureDetector(
                 onTap: () => context
@@ -224,10 +211,7 @@ class LicenseView extends StatelessWidget {
                           color: Palette.white, size: 16),
                       const SizedBox(width: 8),
                       Text("Try Again",
-                          style: GoogleFonts.poppins(
-                              color: Palette.white,
-                              fontWeight: FontWeight.w600,
-                              fontSize: 13)),
+                          style: AppTypography.bodyLarge(color: Palette.white, fontWeight: FontWeight.w600)),
                     ],
                   ),
                 ),
@@ -256,10 +240,7 @@ class LicenseView extends StatelessWidget {
                 state.searchQuery.isNotEmpty
                     ? 'No results for "${state.searchQuery}"'
                     : 'No licenses found',
-                style: GoogleFonts.poppins(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w600,
-                    color: AppTokens.textSecondary),
+                style: AppTypography.bodyLarge(color: AppTokens.textSecondary, fontWeight: FontWeight.w600),
               ),
             ],
           ),
@@ -303,7 +284,7 @@ class _LicenseCard extends StatelessWidget {
     for (final fmt in formats) {
       try {
         return DateFormat('dd MMM yyyy').format(DateFormat(fmt).parse(s));
-      } catch (_) {}
+      } catch (e, stack) { debugPrint("Error caught globally: $e\n$stack"); }
     }
     return s;
   }
@@ -416,37 +397,24 @@ class _LicenseCard extends StatelessWidget {
                         children: [
                           Text(
                             _driverName,
-                            style: GoogleFonts.poppins(
-                              fontSize: 14,
-                              fontWeight: FontWeight.w700,
-                              color: AppTokens.textPrimary,
-                            ),
+                            style: AppTypography.heading3(color: AppTokens.textPrimary, fontWeight: FontWeight.w700),
                           ),
                           const SizedBox(height: 2),
                           Row(
                             children: [
                               Text(
                                 _accountCode,
-                                style: GoogleFonts.poppins(
-                                  fontSize: 11,
-                                  color: AppTokens.brandPrimary,
-                                  fontWeight: FontWeight.w600,
-                                ),
+                                style: AppTypography.bodySmall(color: AppTokens.brandPrimary, fontWeight: FontWeight.w600),
                               ),
                               if (_licenseNo.isNotEmpty &&
                                   _licenseNo != '—') ...[
                                 Text(' · ',
-                                    style: GoogleFonts.poppins(
-                                        fontSize: 11,
-                                        color: AppTokens.textSecondary)),
+                                    style: AppTypography.bodySmall(color: AppTokens.textSecondary)),
                                 Expanded(
                                   child: Text(
                                     _licenseNo,
                                     overflow: TextOverflow.ellipsis,
-                                    style: GoogleFonts.poppins(
-                                      fontSize: 11,
-                                      color: AppTokens.textSecondary,
-                                    ),
+                                    style: AppTypography.bodySmall(color: AppTokens.textSecondary),
                                   ),
                                 ),
                               ],
@@ -479,11 +447,7 @@ class _LicenseCard extends StatelessWidget {
                           const SizedBox(width: 4),
                           Text(
                             isActive ? 'Active' : 'Inactive',
-                            style: GoogleFonts.poppins(
-                              color: statusColor,
-                              fontWeight: FontWeight.w700,
-                              fontSize: 11,
-                            ),
+                            style: AppTypography.bodySmall(color: statusColor, fontWeight: FontWeight.w700),
                           ),
                         ],
                       ),
@@ -554,13 +518,9 @@ class _LicenseCard extends StatelessWidget {
                           expired
                               ? 'License has expired'
                               : 'Expiring within 30 days',
-                          style: GoogleFonts.poppins(
-                            fontSize: 11,
-                            fontWeight: FontWeight.w600,
-                            color: expired
+                          style: AppTypography.bodySmall(color: expired
                                 ? Palette.redDanger
-                                : Palette.amber,
-                          ),
+                                : Palette.amber, fontWeight: FontWeight.w600),
                         ),
                       ],
                     ),
@@ -612,17 +572,9 @@ class _InfoChip extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(label,
-                      style: GoogleFonts.poppins(
-                        fontSize: 10,
-                        color: AppTokens.textSecondary,
-                        fontWeight: FontWeight.w500,
-                      )),
+                      style: AppTypography.badgeText(color: AppTokens.textSecondary, fontWeight: FontWeight.w500)),
                   Text(value,
-                      style: GoogleFonts.poppins(
-                        fontSize: 12,
-                        fontWeight: FontWeight.w700,
-                        color: valueColor ?? AppTokens.textPrimary,
-                      )),
+                      style: AppTypography.bodyMedium(color: valueColor ?? AppTokens.textPrimary, fontWeight: FontWeight.w700)),
                 ],
               ),
             ),

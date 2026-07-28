@@ -1,3 +1,5 @@
+import 'package:maleva/core/colors/colors.dart' as colour;
+import 'package:maleva/core/theme/app_typography.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
@@ -49,7 +51,7 @@ class TruckMaintDashView extends StatelessWidget {
         debugPrint("Current TruckMaintDashState: $state");
 
         if (state is TruckMaintDashInitial || state is TruckMaintDashLoading) {
-          return const Center(
+          return Center(
             child: Padding(
               padding: EdgeInsets.all(20.0),
               child: SpinKitFoldingCube(color: Palette.blue400, size: 35),
@@ -70,7 +72,7 @@ class TruckMaintDashView extends StatelessWidget {
               padding: const EdgeInsets.all(20.0),
               child: Text(
                 state.message,
-                style: GoogleFonts.lato(color: Palette.kExpiredRed, fontSize: 13),
+                style: AppTypography.bodyLarge(color: Palette.kExpiredRed),
               ),
             ),
           );
@@ -82,13 +84,13 @@ class TruckMaintDashView extends StatelessWidget {
           padding: const EdgeInsets.all(20),
           margin: const EdgeInsets.all(10),
           decoration: BoxDecoration(
-            color: Colors.red.shade50,
+            color: colour.commonColorred.withValues(alpha: 0.1),
             borderRadius: BorderRadius.circular(10),
-            border: Border.all(color: Colors.red),
+            border: Border.all(color: colour.commonColorred),
           ),
           child: Text(
             'Unhandled State Error: $state\nPlease check your Bloc logic.',
-            style: const TextStyle(color: Colors.red, fontWeight: FontWeight.bold),
+            style: AppTypography.heading2(),
             textAlign: TextAlign.center,
           ),
         );
@@ -117,12 +119,7 @@ class _TruckMaintDashBody extends StatelessWidget {
             Center(
               child: Text(
                 'TRUCK MAINTENANCE',
-                style: GoogleFonts.lato(
-                  color: Palette.kExpiredRed,
-                  fontWeight: FontWeight.w700,
-                  fontSize: isTablet ? AppGlobals.FontLarge + 2 : AppGlobals.FontLarge,
-                  letterSpacing: 0.3,
-                ),
+                style: AppTypography.heading1(color: Palette.kExpiredRed),
               ),
             ),
           if (showHeading)
@@ -219,11 +216,7 @@ class _TruckDashCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final labelStyle = GoogleFonts.lato(
-      color: Palette.textMid,
-      fontWeight: FontWeight.w600,
-      fontSize: isTablet ? AppGlobals.FontLow + 1 : AppGlobals.FontLow,
-    );
+    final labelStyle = AppTypography.bodySmall(color: Palette.textMid);
 
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
@@ -254,10 +247,7 @@ class _TruckDashCard extends StatelessWidget {
                   Expanded(
                     child: Text(
                       'Expiry till: ${state.expDate}',
-                      style: GoogleFonts.lato(
-                          color: Palette.kTextMuted,
-                          fontWeight: FontWeight.w500,
-                          fontSize: isTablet ? 12 : 10),
+                      style: AppTypography.badgeText(color: Palette.kTextMuted, fontWeight: FontWeight.w500),
                     ),
                   ),
                 ],
@@ -310,22 +300,14 @@ class _SectionHeader extends StatelessWidget {
             flex: 2,
             child: Text(
               label,
-              style: GoogleFonts.lato(
-                color: Colors.white,
-                fontWeight: FontWeight.w700,
-                fontSize: isTablet ? AppGlobals.FontLow + 1 : AppGlobals.FontLow,
-              ),
+              style: AppTypography.bodySmall(color: Colors.white),
             ),
           ),
           Expanded(
             flex: 3,
             child: Text(
               value.isEmpty ? '-' : value,
-              style: GoogleFonts.lato(
-                color: Colors.white,
-                fontWeight: FontWeight.w700,
-                fontSize: isTablet ? AppGlobals.FontLow + 1 : AppGlobals.FontLow,
-              ),
+              style: AppTypography.bodySmall(color: Colors.white),
               overflow: TextOverflow.ellipsis,
             ),
           ),
@@ -371,11 +353,7 @@ class _FieldRow extends StatelessWidget {
                 Expanded(
                   child: Text(
                     value.isEmpty ? '-' : value,
-                    style: GoogleFonts.lato(
-                      color: valueColor,
-                      fontWeight: FontWeight.w600,
-                      fontSize: labelStyle.fontSize,
-                    ),
+                    style: AppTypography.bodyLarge(color: valueColor),
                     overflow: TextOverflow.ellipsis,
                   ),
                 ),
@@ -408,7 +386,7 @@ class _EmptyState extends StatelessWidget {
           ),
           const SizedBox(height: 14),
           Text('No Truck Data',
-              style: GoogleFonts.lato(color: Palette.textDark2, fontWeight: FontWeight.w600, fontSize: 15)),
+              style: AppTypography.heading2(color: Palette.textDark2, fontWeight: FontWeight.w600)),
         ],
       ),
     );

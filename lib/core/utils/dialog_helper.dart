@@ -1,9 +1,10 @@
 import 'app_globals.dart';
 import 'package:flutter/material.dart';
+import 'package:maleva/core/theme/tokens.dart';
+import 'package:maleva/core/theme/app_typography.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:maleva/core/colors/colors.dart' as colour;
-
 
 void msgshow(
     String msg,
@@ -222,9 +223,11 @@ void msgshow1(
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(
       content: Text(
         msg + value,
-        style: TextStyle(color: tcolor ?? Colors.white),
+        style: AppTypography.bodyLarge(
+            color: tcolor ?? Colors.white, fontWeight: FontWeight.bold),
       ),
-      backgroundColor: bcolor ?? Colors.black,
+      backgroundColor: AppTokens.appBarBg,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.0)),
       duration: dur ?? const Duration(seconds: 5),
     ));
   } else {
@@ -246,147 +249,140 @@ Future<bool> ConfirmationMsgYesNo(BuildContext context, String msg) async {
       final bool isLogout = msg.toLowerCase().contains('logout');
 
       return Dialog(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(28.0),
-        ),
-        elevation: 0,
-        backgroundColor: Colors.transparent,
-        child: ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: 400),
-          child: Container(
-          decoration: BoxDecoration(
-            color: Colors.white,
+          shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(28.0),
-            boxShadow: [
-              BoxShadow(
-                color: colour.cBlue.withValues(alpha: 0.15),
-                blurRadius: 32,
-                offset: const Offset(0, 12),
-              ),
-            ],
           ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              // ── Top Header with Blue Gradient and Logo ──
-              Container(
-                width: double.infinity,
-                padding: const EdgeInsets.symmetric(vertical: 24.0, horizontal: 20.0),
-                decoration: const BoxDecoration(
-                  borderRadius: BorderRadius.only(
-                    topLeft: Radius.circular(28.0),
-                    topRight: Radius.circular(28.0),
+          elevation: 0,
+          backgroundColor: Colors.transparent,
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 400),
+            child: Container(
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(28.0),
+                boxShadow: [
+                  BoxShadow(
+                    color: AppTokens.brandGradientStart.withValues(alpha: 0.15),
+                    blurRadius: 32,
+                    offset: const Offset(0, 12),
                   ),
-                  gradient: LinearGradient(
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                    colors: [colour.cBlueDark, colour.cBlue, colour.cBlueLight],
-                    stops: [0.0, 0.55, 1.0],
-                  ),
-                ),
-                child: Column(
-                  children: [
-                    Container(
-                      width: 64,
-                      height: 64,
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(20),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withValues(alpha: 0.1),
-                            blurRadius: 10,
-                            offset: const Offset(0, 4),
-                          ),
+                ],
+              ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  // ── Top Header with Blue Gradient and Logo ──
+                  Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.symmetric(
+                        vertical: 24.0, horizontal: 20.0),
+                    decoration: const BoxDecoration(
+                      borderRadius: BorderRadius.only(
+                        topLeft: Radius.circular(28.0),
+                        topRight: Radius.circular(28.0),
+                      ),
+                      gradient: LinearGradient(
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                        colors: [
+                          AppTokens.brandGradientStart,
+                          AppTokens.appBarBg,
+                          AppTokens.brandGradientEnd
                         ],
-                        image: DecorationImage(
-                          image: AppGlobals.logo,
-                          fit: BoxFit.contain,
-                        ),
+                        stops: [0.0, 0.55, 1.0],
                       ),
                     ),
-                    const SizedBox(height: 16),
-                    Text(
-                      isLogout ? "Confirm Logout" : "Confirmation",
-                      style: GoogleFonts.dmSans(
-                        fontSize: 22,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white,
-                        letterSpacing: -0.5,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              // ── Body Message ──
-              Padding(
-                padding: const EdgeInsets.fromLTRB(24, 28, 24, 32),
-                child: Text(
-                  msg,
-                  textAlign: TextAlign.center,
-                  style: GoogleFonts.dmSans(
-                    fontSize: 16,
-                    height: 1.5,
-                    color: const Color(0xFF475569),
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-              ),
-              // ── Action Buttons ──
-              Padding(
-                padding: const EdgeInsets.fromLTRB(24, 0, 24, 24),
-                child: Row(
-                  children: [
-                    Expanded(
-                      child: OutlinedButton(
-                        style: OutlinedButton.styleFrom(
-                          padding: const EdgeInsets.symmetric(vertical: 16),
-                          side: const BorderSide(color: Color(0xFFE2E8F0), width: 1.5),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(16),
-                          ),
-                        ),
-                        onPressed: () => Navigator.pop(context, false),
-                        child: Text(
-                          "Cancel",
-                          style: GoogleFonts.dmSans(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                            color: const Color(0xFF64748B),
-                          ),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(width: 16),
-                    Expanded(
-                      child: ElevatedButton(
-                        style: ElevatedButton.styleFrom(
-                          padding: const EdgeInsets.symmetric(vertical: 16),
-                          backgroundColor: colour.cBlue,
-                          elevation: 0,
-                          shadowColor: Colors.transparent,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(16),
-                          ),
-                        ),
-                        onPressed: () => Navigator.pop(context, true),
-                        child: Text(
-                          isLogout ? "Logout" : "Confirm",
-                          style: GoogleFonts.dmSans(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
+                    child: Column(
+                      children: [
+                        Container(
+                          width: 64,
+                          height: 64,
+                          decoration: BoxDecoration(
                             color: Colors.white,
+                            borderRadius: BorderRadius.circular(20),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withValues(alpha: 0.1),
+                                blurRadius: 10,
+                                offset: const Offset(0, 4),
+                              ),
+                            ],
+                            image: DecorationImage(
+                              image: AppGlobals.logo,
+                              fit: BoxFit.contain,
+                            ),
                           ),
                         ),
-                      ),
+                        const SizedBox(height: 16),
+                        Text(
+                          isLogout ? "Confirm Logout" : "Confirmation",
+                          style: AppTypography.heading1(color: Colors.white),
+                        ),
+                      ],
                     ),
-                  ],
-                ),
+                  ),
+                  // ── Body Message ──
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(24, 28, 24, 32),
+                    child: Text(
+                      msg,
+                      textAlign: TextAlign.center,
+                      style:
+                          AppTypography.bodyLarge(color: AppTokens.textPrimary),
+                    ),
+                  ),
+                  // ── Action Buttons ──
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(24, 0, 24, 24),
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: OutlinedButton(
+                            style: OutlinedButton.styleFrom(
+                              padding: const EdgeInsets.symmetric(vertical: 16),
+                              side: const BorderSide(
+                                  color: Color(0xFFE2E8F0), width: 1.5),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(16),
+                              ),
+                            ),
+                            onPressed: () => Navigator.pop(context, false),
+                            child: Text(
+                              "Cancel",
+                              style: AppTypography.bodyLarge(
+                                  color: AppTokens.textMuted,
+                                  fontWeight: FontWeight.bold),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 16),
+                        Expanded(
+                          child: ElevatedButton(
+                            style: ElevatedButton.styleFrom(
+                              padding: const EdgeInsets.symmetric(vertical: 16),
+                              backgroundColor: AppTokens.appBarBg,
+                              elevation: 0,
+                              shadowColor: Colors.transparent,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(16),
+                              ),
+                            ),
+                            onPressed: () => Navigator.pop(context, true),
+                            child: Text(
+                              isLogout ? "Logout" : "Confirm",
+                              style: AppTypography.bodyLarge(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.bold),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
               ),
-            ],
-          ),
-        ),
-      ));
+            ),
+          ));
     },
   ).then((value) => value ?? false);
 }
@@ -398,24 +394,18 @@ Future<bool> ConfirmationOK(String Msg, context) async {
       return AlertDialog(
         titlePadding: EdgeInsets.zero,
         title: Container(
-          height:  AppGlobals.MalevaScreen == 1 ? 35 : 45,
+          height: AppGlobals.MalevaScreen == 1 ? 35 : 45,
           padding: const EdgeInsets.all(5),
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(0.0),
-            color: colour.commonColor,
+            color: AppTokens.appBarBg,
             border: Border.all(
-              color: colour.commonColorLight,
+              color: AppTokens.appBarBg,
             ),
           ),
           child: Text(
             "Maleva",
-            style: GoogleFonts.lato(
-              textStyle: TextStyle(
-                  color: colour.whiteText,
-                  fontWeight: FontWeight.bold,
-                  fontSize: AppGlobals.FontLarge,
-                  letterSpacing: 0.3),
-            ),
+            style: AppTypography.heading2(color: Colors.white),
           ),
         ),
         content: SizedBox(
@@ -425,10 +415,11 @@ Future<bool> ConfirmationOK(String Msg, context) async {
             Msg,
             style: GoogleFonts.lato(
               textStyle: TextStyle(
-                  color: colour.commonColor,
+                  color: AppTokens.appBarBg,
                   fontWeight: FontWeight.bold,
-                  fontSize:  AppGlobals.MalevaScreen == 1
-                      ? AppGlobals.FontLow : AppGlobals.FontMedium,
+                  fontSize: AppGlobals.MalevaScreen == 1
+                      ? AppGlobals.FontLow
+                      : AppGlobals.FontMedium,
                   letterSpacing: 0.3),
             ),
           ),
@@ -436,9 +427,9 @@ Future<bool> ConfirmationOK(String Msg, context) async {
         actions: <Widget>[
           ElevatedButton(
             style: ElevatedButton.styleFrom(
-              backgroundColor: colour.commonColor,
+              backgroundColor: AppTokens.appBarBg,
               side: const BorderSide(
-                  color: colour.commonColorLight,
+                  color: AppTokens.appBarBg,
                   width: 1,
                   style: BorderStyle.solid),
               textStyle: const TextStyle(color: Colors.black),
@@ -453,11 +444,8 @@ Future<bool> ConfirmationOK(String Msg, context) async {
             },
             child: Text(
               'OK',
-              style: GoogleFonts.lato(
-                  fontSize:  AppGlobals.MalevaScreen == 1
-                      ? AppGlobals.FontMedium - 2 : AppGlobals.FontMedium,
-                  fontWeight: FontWeight.bold,
-                  color: colour.commonColorLight),
+              style: AppTypography.bodyLarge(
+                  color: Colors.white, fontWeight: FontWeight.bold),
             ),
           ),
         ],
@@ -479,24 +467,18 @@ void toastMsg(msg, value, BuildContext context) {
       children: [
         Expanded(
             flex: 1,
-            child: Text(
-              msg + value.toString(),
-              style:  GoogleFonts.lato(
-                  textStyle: TextStyle(
-                      fontSize:  AppGlobals.MalevaScreen == 1
-                          ? AppGlobals.FontLow : AppGlobals.FontMedium,
-                      fontWeight: FontWeight.bold,
-                      color: colour.commonColor)),
-            ))
+            child: Text(msg + value.toString(),
+                style: AppTypography.bodyLarge(
+                    color: Colors.white, fontWeight: FontWeight.bold)))
       ],
     ),
     padding: const EdgeInsets.all(15),
     shape: RoundedRectangleBorder(
-      borderRadius: BorderRadius.circular(5.0),
+      borderRadius: BorderRadius.circular(10.0),
     ),
     margin: const EdgeInsets.all(15),
     behavior: SnackBarBehavior.floating,
-    backgroundColor: colour.commonColorLight,
+    backgroundColor: AppTokens.appBarBg,
     duration: const Duration(seconds: 1),
   ));
 }

@@ -1,3 +1,4 @@
+import 'package:maleva/core/theme/app_typography.dart';
 // lib/features/dashboard/common_tabs/invoice/view/invoice_tab.dart
 //
 // ── What changed ───────────────────────────────────────────────────
@@ -117,7 +118,7 @@ class _InvoiceView extends StatelessWidget {
         },
         builder: (context, state) {
           if (state is InvoiceLoading) {
-            return const Center(child: CircularProgressIndicator());
+            return Center(child: CircularProgressIndicator());
           }
 
           if (state is InvoiceError) {
@@ -182,13 +183,13 @@ class _ErrorBody extends StatelessWidget {
           const SizedBox(height: 12),
           Text(message,
               textAlign: TextAlign.center,
-              style: const TextStyle(color: Colors.grey)),
+              style: AppTypography.bodyLarge()),
           const SizedBox(height: 16),
           ElevatedButton.icon(
             onPressed: () =>
                 context.read<InvoiceBloc>().add(RefreshInvoice()),
-            icon: const Icon(Icons.refresh),
-            label: const Text('Retry'),
+            icon: Icon(Icons.refresh),
+            label: Text('Retry'),
           ),
         ],
       ),
@@ -321,8 +322,7 @@ Future<void> _showWaitingSheet(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text('Waiting for Billing Details',
-                    style: GoogleFonts.lato(
-                        fontSize: 18, fontWeight: FontWeight.bold)),
+                    style: AppTypography.heading1(fontWeight: FontWeight.bold)),
                 IconButton(
                   icon: const Icon(Icons.close),
                   onPressed: () => Navigator.pop(ctx),
@@ -363,16 +363,13 @@ void _showEmployeeDialog(BuildContext context, List<dynamic> data) {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const Text('Employee Details',
-                    style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                        color: AppTokens.textNavy)),
+                Text('Employee Details',
+                    style: AppTypography.heading1(color: AppTokens.textNavy)),
                 InkWell(
                   onTap: () => Navigator.pop(ctx),
                   child: const CircleAvatar(
                     radius: 14,
-                    backgroundColor: Colors.red,
+                    backgroundColor: colors.commonColorred,
                     child: Icon(Icons.close, size: 16, color: Colors.white),
                   ),
                 ),
@@ -397,9 +394,8 @@ void _showEmployeeDialog(BuildContext context, List<dynamic> data) {
                   padding: const EdgeInsets.symmetric(vertical: 12),
                 ),
                 onPressed: () => Navigator.pop(ctx),
-                child: const Text('Back to Dashboard',
-                    style: TextStyle(
-                        fontWeight: FontWeight.bold, color: Colors.white)),
+                child: Text('Back to Dashboard',
+                    style: AppTypography.heading2(color: Colors.white)),
               ),
             ),
           ],
@@ -447,22 +443,13 @@ class _BillingCard extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text('Bill No: ${item['BillNo'] ?? ''}',
-                        style: GoogleFonts.lato(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                            color: AppTokens.invoiceHeaderStart)),
+                        style: AppTypography.heading1(color: AppTokens.invoiceHeaderStart, fontWeight: FontWeight.bold)),
                     const SizedBox(height: 4),
                     Text('Customer: ${item['CustomerName'] ?? ''}',
-                        style: GoogleFonts.lato(
-                            fontSize: 14,
-                            fontWeight: FontWeight.bold,
-                            color: const Color(0xFF145A32))),
+                        style: AppTypography.heading3(color: const Color(0xFF145A32), fontWeight: FontWeight.bold)),
                     const SizedBox(height: 2),
                     Text('Amount: RM${item['NetAmt'] ?? ''}',
-                        style: GoogleFonts.lato(
-                            fontSize: 14,
-                            fontWeight: FontWeight.bold,
-                            color: colors.kOrange)),
+                        style: AppTypography.heading3(color: colors.kOrange, fontWeight: FontWeight.bold)),
                   ]),
             ),
             Container(
@@ -496,8 +483,7 @@ class _BillingCard extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text('Billing Details',
-                        style: GoogleFonts.lato(
-                            fontSize: 18, fontWeight: FontWeight.bold)),
+                        style: AppTypography.heading1(fontWeight: FontWeight.bold)),
                     IconButton(
                         icon: const Icon(Icons.close),
                         onPressed: () => Navigator.pop(ctx)),
@@ -547,12 +533,11 @@ class _DetailRow extends StatelessWidget {
         Icon(icon, color: const Color(0xFF6A994E)),
         const SizedBox(width: 8),
         Text('$label:',
-            style: const TextStyle(
-                fontWeight: FontWeight.bold, color: Color(0xFF3E2723))),
+            style: AppTypography.heading2(color: const Color(0xFF3E2723))),
         const SizedBox(width: 8),
         Expanded(
             child: Text(value,
-                style: const TextStyle(color: Color(0xFF2C3E50)))),
+                style: AppTypography.bodyLarge(color: const Color(0xFF2C3E50)))),
       ]),
     );
   }
@@ -581,29 +566,24 @@ class _EmployeeCard extends StatelessWidget {
           const SizedBox(width: 6),
           Expanded(
             child: Text(emp['EmployeeName'].toString(),
-                style: const TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 14,
-                    color: AppTokens.textNavy)),
+                style: AppTypography.heading2(color: AppTokens.textNavy)),
           ),
         ]),
         const SizedBox(height: 8),
         Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
           Row(children: [
-            const Text('RM',
+            Text('RM',
                 style:
-                TextStyle(fontWeight: FontWeight.bold, color: Colors.green)),
+                AppTypography.heading2()),
             const SizedBox(width: 4),
             Text(emp['Amount'].toString(),
-                style: const TextStyle(
-                    fontWeight: FontWeight.w600, color: Colors.green)),
+                style: AppTypography.bodyLarge()),
           ]),
           Row(children: [
             const Icon(Icons.shopping_cart, size: 16, color: Colors.orange),
             const SizedBox(width: 4),
             Text(emp['SalesCount'].toString(),
-                style: const TextStyle(
-                    fontWeight: FontWeight.w600, color: Colors.orange)),
+                style: AppTypography.bodyLarge()),
           ]),
         ]),
       ]),
@@ -638,22 +618,14 @@ class _HeroHeader extends StatelessWidget {
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         Text(
           '${state.currentMonthName.toUpperCase()} SALES · INV',
-          style: GoogleFonts.lato(
-              color: Colors.white.withValues(alpha: 0.80),
-              fontSize: 12,
-              fontWeight: FontWeight.w700,
-              letterSpacing: 1.2),
+          style: AppTypography.bodyMedium(color: Colors.white.withValues(alpha: 0.80), fontWeight: FontWeight.w700),
         ),
         const SizedBox(height: 6),
         Text(_fmt(totalAmount),
-            style: GoogleFonts.lato(
-                color: Colors.white,
-                fontSize: 32,
-                fontWeight: FontWeight.w900)),
+            style: AppTypography.display(color: Colors.white, fontWeight: FontWeight.w900)),
         const SizedBox(height: 2),
         Text('$totalCount invoices this month',
-            style: GoogleFonts.lato(
-                color: Colors.white.withValues(alpha: 0.75), fontSize: 13)),
+            style: AppTypography.bodyLarge(color: Colors.white.withValues(alpha: 0.75))),
         const SizedBox(height: 16),
         Wrap(spacing: 8, runSpacing: 8, children: [
           _Pill(
@@ -714,10 +686,7 @@ class _Pill extends StatelessWidget {
         Icon(icon, size: 13, color: iconColor),
         const SizedBox(width: 5),
         Text(label,
-            style: GoogleFonts.lato(
-                color: Colors.white,
-                fontSize: 12,
-                fontWeight: FontWeight.w600)),
+            style: AppTypography.bodyMedium(color: Colors.white, fontWeight: FontWeight.w600)),
       ]),
     );
   }
@@ -743,10 +712,7 @@ class _OverviewSection extends StatelessWidget {
     return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
       Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
         Text('Overview',
-            style: GoogleFonts.lato(
-                fontSize: 16,
-                fontWeight: FontWeight.w800,
-                color: AppTokens.textNavy)),
+            style: AppTypography.heading1(color: AppTokens.textNavy, fontWeight: FontWeight.w800)),
 
       ]),
       const SizedBox(height: 10),
@@ -881,32 +847,19 @@ class _OverviewCard extends StatelessWidget {
         ),
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
           Text(label,
-              style: GoogleFonts.lato(
-                  fontSize: 10,
-                  fontWeight: FontWeight.w700,
-                  color: Colors.grey.shade500,
-                  letterSpacing: 0.8)),
+              style: AppTypography.badgeText(color: Colors.grey.shade500, fontWeight: FontWeight.w700)),
           const SizedBox(height: 6),
           Text(count,
-              style: GoogleFonts.lato(
-                  fontSize: 28,
-                  fontWeight: FontWeight.w900,
-                  color: AppTokens.textNavy)),
+              style: AppTypography.display(color: AppTokens.textNavy, fontWeight: FontWeight.w900)),
           const SizedBox(height: 4),
           Text(amount,
-              style: GoogleFonts.lato(
-                  fontSize: 13,
-                  fontWeight: FontWeight.w600,
-                  color: isToday ? Colors.grey : AppTokens.textNavy)),
+              style: AppTypography.bodyLarge(color: isToday ? Colors.grey : AppTokens.textNavy, fontWeight: FontWeight.w600)),
           const SizedBox(height: 10),
           Row(children: [
             Icon(badgeIcon, size: 12, color: badgeColor),
             const SizedBox(width: 4),
             Text(badgeLabel,
-                style: GoogleFonts.lato(
-                    fontSize: 11,
-                    color: badgeColor,
-                    fontWeight: FontWeight.w600)),
+                style: AppTypography.bodySmall(color: badgeColor, fontWeight: FontWeight.w600)),
           ]),
         ]),
       ),
@@ -961,17 +914,10 @@ class _StatusCard extends StatelessWidget {
                 children: [
                   Text(count,
                       overflow: TextOverflow.ellipsis,
-                      style: GoogleFonts.lato(
-                          fontSize: 20,
-                          fontWeight: FontWeight.w900,
-                          color: AppTokens.textNavy)),
+                      style: AppTypography.heading1(color: AppTokens.textNavy, fontWeight: FontWeight.w900)),
                   Text(label,
                       overflow: TextOverflow.ellipsis,
-                      style: GoogleFonts.lato(
-                          fontSize: 9,
-                          fontWeight: FontWeight.w700,
-                          color: Colors.grey.shade500,
-                          letterSpacing: 0.6)),
+                      style: AppTypography.badgeText(color: Colors.grey.shade500, fontWeight: FontWeight.w700)),
                 ]),
           ),
         ]),
@@ -991,11 +937,7 @@ class _MonthlyTrendHeader extends StatelessWidget {
   Widget build(BuildContext context) {
     return Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
       Text('MONTHLY TREND',
-          style: GoogleFonts.lato(
-              fontSize: 13,
-              fontWeight: FontWeight.w800,
-              color: AppTokens.textNavy,
-              letterSpacing: 0.6)),
+          style: AppTypography.heading3(color: AppTokens.textNavy, fontWeight: FontWeight.w800)),
       Row(children: [
         _ToggleBtn(
           text: '6 Months',
@@ -1035,10 +977,7 @@ class _ToggleBtn extends StatelessWidget {
           borderRadius: BorderRadius.circular(20),
         ),
         child: Text(text,
-            style: GoogleFonts.lato(
-                color: selected ? Colors.white : AppTokens.textNavy,
-                fontWeight: FontWeight.w700,
-                fontSize: 12)),
+            style: AppTypography.bodyMedium(color: selected ? Colors.white : AppTokens.textNavy, fontWeight: FontWeight.w700)),
       ),
     );
   }
@@ -1136,17 +1075,17 @@ class _MonthBarItem extends StatelessWidget {
                     width: 10,
                     height: 10,
                     decoration: BoxDecoration(
-                      color: isGrowth ? AppTokens.statusSuccess : Colors.red,
+                      color: isGrowth ? AppTokens.statusSuccess : colors.commonColorred,
                       shape: BoxShape.circle,
                     ),
                   ),
                   const SizedBox(width: 10),
                   Text(
                     month,
-                    style: GoogleFonts.lato(
+                    style: TextStyle(
+                      color: const Color(0xFF1A2340),
+                      fontWeight: FontWeight.w600,
                       fontSize: isTablet ? 15 : 14,
-                      fontWeight: FontWeight.w700,
-                      color: AppTokens.textNavy,
                     ),
                   ),
                 ],
@@ -1156,14 +1095,22 @@ class _MonthBarItem extends StatelessWidget {
             // --- MIDDLE COLUMN ---
             Expanded(
               flex: 4,
-              child: Text(
-                "$count Invoices",
-                textAlign: TextAlign.center,
-                style: GoogleFonts.lato(
-                  color: AppTokens.textNavy,
-                  fontSize: isTablet ? 14 : 13,
-                  fontWeight: FontWeight.w900,
+              child: Text.rich(
+                TextSpan(
+                  text: "$count ",
+                  style: TextStyle(
+                    color: const Color(0xFF1A2340),
+                    fontSize: isTablet ? 14 : 13,
+                    fontWeight: FontWeight.bold,
+                  ),
+                  children: [
+                    TextSpan(
+                      text: "Invoices",
+                      style: AppTypography.bodyLarge(),
+                    ),
+                  ],
                 ),
+                textAlign: TextAlign.center,
               ),
             ),
 
@@ -1175,17 +1122,17 @@ class _MonthBarItem extends StatelessWidget {
                 children: [
                   Text(
                     _shortAmount(current),
-                    style: GoogleFonts.lato(
-                      fontWeight: FontWeight.w800,
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
                       fontSize: isTablet ? 14 : 13,
-                      color: AppTokens.textNavy,
+                      color: const Color(0xFF1A2340),
                     ),
                   ),
                   const SizedBox(width: 4),
                   Icon(
                     isGrowth ? Icons.arrow_upward : Icons.arrow_downward,
                     size: isTablet ? 15 : 13,
-                    color: isGrowth ? AppTokens.statusSuccess : Colors.red,
+                    color: isGrowth ? AppTokens.statusSuccess : colors.commonColorred,
                   ),
                 ],
               ),
@@ -1233,10 +1180,7 @@ class _TodayYesterdayChartCard extends StatelessWidget {
       ),
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         Text('Today vs Yesterday',
-            style: GoogleFonts.lato(
-                fontSize: 13,
-                fontWeight: FontWeight.w800,
-                color: AppTokens.textNavy)),
+            style: AppTypography.heading3(color: AppTokens.textNavy, fontWeight: FontWeight.w800)),
         const SizedBox(height: 4),
         const Row(children: [
           _LegendDot(color: AppTokens.invoiceHeaderStart, label: 'Today'),
@@ -1284,7 +1228,7 @@ class _TodayYesterdayChartCard extends StatelessWidget {
                 padding: const EdgeInsets.only(top: 6),
                 child: Text(labels[i],
                     style:
-                    const TextStyle(fontSize: 10, color: Colors.grey)),
+                    AppTypography.bodySmall()),
               );
             },
           ),
@@ -1356,7 +1300,7 @@ class _LegendDot extends StatelessWidget {
       Container(width: 10, height: 3, color: color),
       const SizedBox(width: 4),
       Text(label,
-          style: TextStyle(fontSize: 11, color: Colors.grey.shade600)),
+          style: AppTypography.bodySmall()),
     ]);
   }
 }
@@ -1372,7 +1316,7 @@ class _LegendDot extends StatelessWidget {
 //       Container(width: 10, height: 3, color: color),
 //       const SizedBox(width: 4),
 //       Text(label,
-//           style: TextStyle(fontSize: 11, color: Colors.grey.shade600)),
+//           style: AppTypography.bodySmall()),
 //     ]);
 //   }
 // }

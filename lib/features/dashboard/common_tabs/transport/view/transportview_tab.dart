@@ -1,10 +1,13 @@
+import 'package:maleva/core/network/legacy_api_repository.dart';
+import 'package:maleva/core/di/injection.dart';
+import 'package:maleva/core/theme/app_typography.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:maleva/core/utils/app_globals.dart';
 import 'package:maleva/core/colors/colors.dart' as colour;
 import '../../../../../core/di/injection.dart';
-import '../../../../../core/network/OnlineApi.dart' as OnlineApi;
+
 import '../../../../../core/theme/tokens.dart';
 import '../../saleorderadd/view/saleorderadd_tab.dart';
 import '../bloc/transport_bloc.dart';
@@ -30,14 +33,14 @@ class TransportReportPage extends StatelessWidget {
             // ✅ Handle Errors
             if (state is TransportErrorState) {
               ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text(state.errorMessage), backgroundColor: Colors.red),
+                SnackBar(content: Text(state.errorMessage), backgroundColor: colour.commonColorred),
               );
             }
 
             // ✅ Handle Navigation / Edit (Using the UI's context!)
             if (state is TransportNavigateToEditState) {
               // We moved this out of the BLoC so it can safely use the UI context
-              OnlineApi.EditSalesOrder(state.id, 0);
+              sl<LegacyApiRepository>().EditSalesOrder(state.id, 0);
             }
 
           },
@@ -158,7 +161,7 @@ class _TransportReportView extends StatelessWidget {
                 const SizedBox(height: 10),
                 Expanded(
                   child: isLoading
-                      ? const Center(
+                      ? Center(
                       child: CircularProgressIndicator(
                           color: colour.kBlue))
                       : transportList.isEmpty
@@ -225,7 +228,7 @@ class _TransportReportView extends StatelessWidget {
         const SizedBox(height: 8),
 
         if (isLoading)
-          const Padding(
+          Padding(
             padding: EdgeInsets.only(top: 40),
             child: Center(
                 child: CircularProgressIndicator(color: colour.kBlue)),
@@ -277,11 +280,7 @@ class _TransportReportView extends StatelessWidget {
                 Expanded(
                   child: Text(
                     item["CustomerName"]?.toString() ?? '-',
-                    style: GoogleFonts.poppins(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w700,
-                      color: AppTokens.invoiceHeaderStart,
-                    ),
+                    style: AppTypography.heading3(color: AppTokens.invoiceHeaderStart, fontWeight: FontWeight.w700),
                   ),
                 ),
                 IconButton(
@@ -313,21 +312,13 @@ class _TransportReportView extends StatelessWidget {
                             Expanded(
                               flex: 2,
                               child: Text(e.key,
-                                  style: GoogleFonts.poppins(
-                                    fontSize: 11,
-                                    color: AppTokens.invoiceHeaderStart,
-                                    fontWeight: FontWeight.w500,
-                                  )),
+                                  style: AppTypography.bodySmall(color: AppTokens.invoiceHeaderStart, fontWeight: FontWeight.w500)),
                             ),
                             Expanded(
                               flex: 3,
                               child: Text(
                                   e.value?.toString() ?? '-',
-                                  style: GoogleFonts.poppins(
-                                    fontSize: 11,
-                                    fontWeight: FontWeight.w600,
-                                    color: AppTokens.invoiceHeaderStart,
-                                  )),
+                                  style: AppTypography.bodySmall(color: AppTokens.invoiceHeaderStart, fontWeight: FontWeight.w600)),
                             ),
                           ],
                         ),
@@ -365,12 +356,7 @@ class _SectionHeader extends StatelessWidget {
       const SizedBox(width: 10),
       Text(
         title.toUpperCase(),
-        style: GoogleFonts.poppins(
-          fontSize:      isTablet ? 20 : 17,
-          fontWeight:    FontWeight.w700,
-          color:         AppTokens.invoiceHeaderStart,
-          letterSpacing: 1.2,
-        ),
+        style: AppTypography.heading1(color: AppTokens.invoiceHeaderStart, fontWeight: FontWeight.w700),
       ),
     ]);
   }
@@ -414,17 +400,9 @@ class _CountBadge extends StatelessWidget {
         const SizedBox(width: 14),
         Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
           Text('Total Records',
-              style: GoogleFonts.poppins(
-                fontSize:   12,
-                color:      Colors.white.withValues(alpha: 0.75),
-                fontWeight: FontWeight.w500,
-              )),
+              style: AppTypography.bodyMedium(color: Colors.white.withValues(alpha: 0.75), fontWeight: FontWeight.w500)),
           Text('$count',
-              style: GoogleFonts.poppins(
-                fontSize:   26,
-                color:      Colors.white,
-                fontWeight: FontWeight.w700,
-              )),
+              style: AppTypography.display(color: Colors.white, fontWeight: FontWeight.w700)),
         ]),
       ]),
     );
@@ -506,11 +484,7 @@ class _ToggleTab extends StatelessWidget {
           alignment: Alignment.center,
           child: Text(
             label,
-            style: GoogleFonts.poppins(
-              fontSize:   isTablet ? 14 : 13,
-              fontWeight: FontWeight.w600,
-              color:      isActive ? Colors.white : AppTokens.transBlueLight,
-            ),
+            style: AppTypography.bodyLarge(color: isActive ? Colors.white : AppTokens.transBlueLight, fontWeight: FontWeight.w600),
           ),
         ),
       ),
@@ -542,18 +516,12 @@ class _ListHeader extends StatelessWidget {
         SizedBox(
           width: isTablet ? 36 : 32,
           child: Text('#',
-              style: GoogleFonts.poppins(
-                  fontSize:   isTablet ? 13 : 12,
-                  fontWeight: FontWeight.w700,
-                  color:      Colors.white.withValues(alpha: 0.8))),
+              style: AppTypography.bodyMedium(color: Colors.white.withValues(alpha: 0.8), fontWeight: FontWeight.w700)),
         ),
         const SizedBox(width: 8),
         Expanded(
           child: Text('Customer Name',
-              style: GoogleFonts.poppins(
-                  fontSize:   isTablet ? 13 : 12,
-                  fontWeight: FontWeight.w700,
-                  color:      Colors.white)),
+              style: AppTypography.bodyMedium(color: Colors.white, fontWeight: FontWeight.w700)),
         ),
       ]),
     );
@@ -631,10 +599,7 @@ class _TransportCard extends StatelessWidget {
                 alignment: Alignment.center,
                 child: Text(
                   '${index + 1}',
-                  style: GoogleFonts.poppins(
-                      fontSize:   isTablet ? 12 : 11,
-                      fontWeight: FontWeight.w700,
-                      color:      colour.kBlue),
+                  style: AppTypography.bodySmall(color: colour.kBlue, fontWeight: FontWeight.w700),
                 ),
               ),
               const SizedBox(width: 10),
@@ -645,10 +610,7 @@ class _TransportCard extends StatelessWidget {
                   customerName,
                   overflow: TextOverflow.ellipsis,
                   maxLines: 1,
-                  style: GoogleFonts.poppins(
-                      fontSize:   isTablet ? 14 : 13,
-                      fontWeight: FontWeight.w600,
-                      color:      AppTokens.invoiceHeaderStart),
+                  style: AppTypography.bodyLarge(color: AppTokens.invoiceHeaderStart, fontWeight: FontWeight.w600),
                 ),
               ),
 
@@ -684,16 +646,10 @@ class _EmptyState extends StatelessWidget {
         ),
         SizedBox(height: isTablet ? 20 : 16),
         Text('No Transport Found',
-            style: GoogleFonts.poppins(
-              fontSize:   isTablet ? 17 : 15,
-              fontWeight: FontWeight.w700,
-              color:      AppTokens.invoiceHeaderStart,
-            )),
+            style: AppTypography.heading2(color: AppTokens.invoiceHeaderStart, fontWeight: FontWeight.w700)),
         SizedBox(height: isTablet ? 8 : 6),
         Text('No data available for the selected date.',
-            style: GoogleFonts.poppins(
-                fontSize: isTablet ? 13 : 12,
-                color:    AppTokens.transBlueLight)),
+            style: AppTypography.bodyMedium(color: AppTokens.transBlueLight)),
       ]),
     );
   }

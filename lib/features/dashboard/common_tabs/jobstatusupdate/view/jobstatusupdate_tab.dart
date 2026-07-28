@@ -1,3 +1,6 @@
+import 'package:maleva/core/network/legacy_api_repository.dart';
+import 'package:maleva/core/di/injection.dart';
+import 'package:maleva/core/theme/app_typography.dart';
 import 'package:maleva/core/utils/system_helpers.dart';
 import 'package:maleva/core/network/api_constants.dart';
 import 'dart:io';
@@ -10,7 +13,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:maleva/core/colors/colors.dart' as colour;
-import 'package:maleva/core/network/OnlineApi.dart' as OnlineApi;
+
 import 'package:maleva/core/utils/app_globals.dart';
 import 'package:maleva/menu/menulist.dart';
 
@@ -94,14 +97,7 @@ class _JobStatusUpdateViewState extends State<_JobStatusUpdateView> {
         child: Material(
           color: colour.commonColorLight,
           elevation: 1,
-          textStyle: GoogleFonts.lato(
-            textStyle: TextStyle(
-              color: colour.commonColor,
-              fontWeight: FontWeight.bold,
-              fontSize: AppGlobals.FontLow,
-              letterSpacing: 0.3,
-            ),
-          ),
+          textStyle: AppTypography.bodySmall(color: colour.commonColor),
           child: SizedBox(
             height: 350,
             child: ListView(
@@ -230,7 +226,7 @@ class _JobStatusUpdateViewState extends State<_JobStatusUpdateView> {
             drawer: const Menulist(),
             appBar: _buildAppBar(context, state),
             body: state.status == JobStatusUpdateStatus.loading
-                ? const Center(
+                ? Center(
               child: SpinKitFoldingCube(
                 color: colour.spinKitColor,
                 size: 35,
@@ -308,25 +304,13 @@ class _JobStatusUpdateViewState extends State<_JobStatusUpdateView> {
             Expanded(
               child: Text(
                 'Job Status Update',
-                style: GoogleFonts.lato(
-                  textStyle: TextStyle(
-                    color: colour.topAppBarColor,
-                    fontWeight: FontWeight.bold,
-                    fontSize: AppGlobals.FontMedium,
-                  ),
-                ),
+                style: AppTypography.heading2(color: colour.topAppBarColor),
               ),
             ),
             Expanded(
               child: Text(
                 state.userName,
-                style: GoogleFonts.lato(
-                  textStyle: TextStyle(
-                    color: colour.commonColorLight,
-                    fontWeight: FontWeight.bold,
-                    fontSize: AppGlobals.FontLow - 2,
-                  ),
-                ),
+                style: AppTypography.bodySmall(color: colour.commonColorLight),
               ),
             ),
           ],
@@ -359,11 +343,7 @@ class _JobStatusUpdateViewState extends State<_JobStatusUpdateView> {
               },
               child: Text(
                 'Update',
-                style: GoogleFonts.lato(
-                  fontSize: AppGlobals.FontMedium,
-                  fontWeight: FontWeight.bold,
-                  color: colour.commonColor,
-                ),
+                style: AppTypography.heading2(color: colour.commonColor),
               ),
             ),
           ),
@@ -401,7 +381,7 @@ class _JobStatusUpdateViewState extends State<_JobStatusUpdateView> {
                 toastMsg('Enter Job No', '', context);
                 return;
               }
-              await OnlineApi.EditSalesOrder(
+              await sl<LegacyApiRepository>().EditSalesOrder(
                    state.saleOrderId, int.tryParse(state.jobNo) ?? 0); if (!context.mounted) return;Navigator.of(context).push(MaterialPageRoute(
                   builder: (_) => SaleOrderDetails(
                     saleDetails: null,
@@ -421,10 +401,10 @@ class _JobStatusUpdateViewState extends State<_JobStatusUpdateView> {
                 return;
               }
               if (state.statusName.isEmpty && state.jobNo.isNotEmpty) {
-                await OnlineApi.EditSalesOrder(
+                await sl<LegacyApiRepository>().EditSalesOrder(
 
                     state.saleOrderId,
-                    int.tryParse(state.jobNo) ?? 0); if (!context.mounted) return;await OnlineApi.SelectAllJobStatus(
+                    int.tryParse(state.jobNo) ?? 0); if (!context.mounted) return;await sl<LegacyApiRepository>().SelectAllJobStatus(
                     context,
                     AppGlobals.SaleEditMasterList[0]['JobMasterRefId'] as int); if (!context.mounted) return;Navigator.push(
                   context,
@@ -489,13 +469,7 @@ class _JobStatusUpdateViewState extends State<_JobStatusUpdateView> {
               ),
               Text(
                 'Image Upload',
-                style: GoogleFonts.lato(
-                  textStyle: TextStyle(
-                    color: colour.commonColor,
-                    fontWeight: FontWeight.bold,
-                    fontSize: AppGlobals.FontLow,
-                  ),
-                ),
+                style: AppTypography.bodySmall(color: colour.commonColor),
               ),
             ],
           ),
@@ -596,14 +570,7 @@ class _BillTypeRadioRow extends StatelessWidget {
         Expanded(
           child: Text(
             'MY',
-            style: GoogleFonts.lato(
-              textStyle: TextStyle(
-                color: colour.commonColor,
-                fontWeight: FontWeight.bold,
-                fontSize: AppGlobals.FontMedium,
-                letterSpacing: 0.3,
-              ),
-            ),
+            style: AppTypography.heading2(color: colour.commonColor),
           ),
         ),
         Expanded(
@@ -616,14 +583,7 @@ class _BillTypeRadioRow extends StatelessWidget {
         Expanded(
           child: Text(
             'TR',
-            style: GoogleFonts.lato(
-              textStyle: TextStyle(
-                color: colour.commonColor,
-                fontWeight: FontWeight.bold,
-                fontSize: AppGlobals.FontMedium,
-                letterSpacing: 0.3,
-              ),
-            ),
+            style: AppTypography.heading2(color: colour.commonColor),
           ),
         ),
       ],
@@ -662,23 +622,10 @@ class _JobNoRow extends StatelessWidget {
               keyboardType: TextInputType.number,
               textCapitalization: TextCapitalization.characters,
               textInputAction: TextInputAction.done,
-              style: GoogleFonts.lato(
-                textStyle: TextStyle(
-                  color: colour.commonColor,
-                  fontWeight: FontWeight.bold,
-                  fontSize: AppGlobals.FontLow,
-                  letterSpacing: 0.3,
-                ),
-              ),
+              style: AppTypography.bodySmall(color: colour.commonColor),
               decoration: InputDecoration(
                 hintText: 'Job No',
-                hintStyle: GoogleFonts.lato(
-                  textStyle: TextStyle(
-                    fontSize: AppGlobals.FontMedium,
-                    fontWeight: FontWeight.bold,
-                    color: colour.commonColorLight,
-                  ),
-                ),
+                hintStyle: AppTypography.heading2(color: colour.commonColorLight),
                 enabledBorder: const OutlineInputBorder(
                   borderRadius: BorderRadius.all(Radius.circular(10)),
                   borderSide: BorderSide(color: colour.commonColor),
@@ -713,11 +660,7 @@ class _JobNoRow extends StatelessWidget {
               children: [
                 Text(
                   'VIEW',
-                  style: GoogleFonts.lato(
-                    fontSize: AppGlobals.FontMedium,
-                    fontWeight: FontWeight.bold,
-                    color: colour.commonColorLight,
-                  ),
+                  style: AppTypography.heading2(color: colour.commonColorLight),
                 ),
                 const SizedBox(width: 5),
                 const Icon(Icons.arrow_circle_right,
@@ -754,23 +697,10 @@ class _StatusField extends StatelessWidget {
         textCapitalization: TextCapitalization.characters,
         textInputAction: TextInputAction.done,
         keyboardType: TextInputType.name,
-        style: GoogleFonts.lato(
-          textStyle: TextStyle(
-            color: colour.commonColor,
-            fontWeight: FontWeight.bold,
-            fontSize: AppGlobals.FontLow,
-            letterSpacing: 0.3,
-          ),
-        ),
+        style: AppTypography.bodySmall(color: colour.commonColor),
         decoration: InputDecoration(
           hintText: 'Select Status',
-          hintStyle: GoogleFonts.lato(
-            textStyle: TextStyle(
-              fontSize: AppGlobals.FontMedium,
-              fontWeight: FontWeight.bold,
-              color: colour.commonColorLight,
-            ),
-          ),
+          hintStyle: AppTypography.heading2(color: colour.commonColorLight),
           suffixIcon: InkWell(
             onTap: onSearchTap,
             child: Icon(
@@ -825,13 +755,7 @@ class _TimeRow extends StatelessWidget {
         ),
         Text(
           label,
-          style: GoogleFonts.lato(
-            textStyle: TextStyle(
-              color: colour.commonColor,
-              fontWeight: FontWeight.bold,
-              fontSize: AppGlobals.FontLow,
-            ),
-          ),
+          style: AppTypography.bodySmall(color: colour.commonColor),
         ),
         if (checked) ...[
           const SizedBox(width: 10),
@@ -853,13 +777,7 @@ class _TimeRow extends StatelessWidget {
                           ? DateFormat('dd-MM-yyyy HH:mm')
                           .format(DateTime.parse(dateTimeStr))
                           : 'Pick date & time',
-                      style: GoogleFonts.lato(
-                        textStyle: TextStyle(
-                          color: colour.commonColor,
-                          fontWeight: FontWeight.bold,
-                          fontSize: AppGlobals.FontCardText,
-                        ),
-                      ),
+                      style: AppTypography.bodyLarge(color: colour.commonColor),
                     ),
                     const Icon(Icons.calendar_month_outlined,
                         color: colour.commonColor, size: 20),
@@ -901,11 +819,7 @@ class _ImagePickerButtons extends StatelessWidget {
                 color: colour.commonColorLight),
             label: Text(
               'Camera',
-              style: GoogleFonts.lato(
-                fontSize: AppGlobals.FontLow,
-                fontWeight: FontWeight.bold,
-                color: colour.commonColorLight,
-              ),
+              style: AppTypography.bodySmall(color: colour.commonColorLight),
             ),
           ),
         ),
@@ -922,11 +836,7 @@ class _ImagePickerButtons extends StatelessWidget {
                 color: colour.commonColorLight),
             label: Text(
               'Gallery',
-              style: GoogleFonts.lato(
-                fontSize: AppGlobals.FontLow,
-                fontWeight: FontWeight.bold,
-                color: colour.commonColorLight,
-              ),
+              style: AppTypography.bodySmall(color: colour.commonColorLight),
             ),
           ),
         ),
@@ -955,13 +865,7 @@ class _ImageGrid extends StatelessWidget {
       children: [
         Text(
           'Uploaded Images (${state.imageNetworkNames.length})',
-          style: GoogleFonts.lato(
-            textStyle: TextStyle(
-              color: colour.commonColor,
-              fontWeight: FontWeight.bold,
-              fontSize: AppGlobals.FontLow,
-            ),
-          ),
+          style: AppTypography.bodySmall(color: colour.commonColor),
         ),
         const SizedBox(height: 8),
         GridView.builder(
@@ -990,7 +894,7 @@ class _ImageGrid extends StatelessWidget {
                       height: double.infinity,
                       placeholder: (_, __) => Container(
                         color: colour.commonColorLight,
-                        child: const Center(
+                        child: Center(
                           child: SizedBox(
                             width: 20,
                             height: 20,
@@ -1014,7 +918,7 @@ class _ImageGrid extends StatelessWidget {
                     onTap: () => onDelete(i),
                     child: Container(
                       decoration: const BoxDecoration(
-                        color: Colors.red,
+                        color: colour.commonColorred,
                         shape: BoxShape.circle,
                       ),
                       padding: const EdgeInsets.all(3),

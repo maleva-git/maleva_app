@@ -1,7 +1,8 @@
-import 'package:maleva/core/network/api_legacy_helper.dart';
+import 'package:maleva/core/network/legacy_api_repository.dart';
+import 'package:maleva/core/di/injection.dart';
 import 'package:maleva/core/network/api_constants.dart';
 import 'package:maleva/core/utils/app_globals.dart';
-import 'package:maleva/core/network/OnlineApi.dart' as OnlineApi;
+
 
 class VesselPlanningRepository {
   Future<List<dynamic>> getVesselPlanning(
@@ -17,7 +18,7 @@ class VesselPlanningRepository {
       'Content-Type': 'application/json; charset=UTF-8'
     };
 
-    final resultData = await ApiLegacyHelper.apiAllinoneSelectArray(
+    final resultData = await sl<LegacyApiRepository>().apiAllinoneSelectArray(
         ApiConstants.apiSelectVesselPlanning, master, header, null);
     if (resultData == null || resultData == "") {
       return [];
@@ -30,7 +31,7 @@ class VesselPlanningRepository {
     
     // We fetch the edit data explicitly and store it in objfun's global list
     // to maintain compatibility with VesselPlanningDetailsView
-    final resultData = await ApiLegacyHelper.apiAllinoneSelect(
+    final resultData = await sl<LegacyApiRepository>().apiAllinoneSelect(
         Uri.encodeFull(
             "${ApiConstants.apiEditVesselPlanning}$id&VESSELPLANINGNo=$planningNo&Comid=$comId"),
         null,
@@ -53,7 +54,7 @@ class VesselPlanningRepository {
       'Content-Type': 'application/json; charset=UTF-8'
     };
 
-    final resultData = await ApiLegacyHelper.apiAllinoneSelectArray(
+    final resultData = await sl<LegacyApiRepository>().apiAllinoneSelectArray(
       "${ApiConstants.apiViewVesselPlanningPdf}$planningNoDisplay",
       master,
       header,
@@ -66,6 +67,6 @@ class VesselPlanningRepository {
   }
 
   Future<void> selectEmployee(dynamic context, String type, String userType) async {
-    await OnlineApi.SelectEmployee(context, type, userType);
+    await sl<LegacyApiRepository>().SelectEmployee(context, type, userType);
   }
 }

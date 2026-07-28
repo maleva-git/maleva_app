@@ -4,7 +4,7 @@ import 'package:equatable/equatable.dart';
 
 import '../../../../../core/models/model.dart';
 
-enum CustDashboardStatus { initial, loading, success, failure }
+enum CustDashboardStatus { initial, loading, success, failure, editSalesOrderSuccess }
 
 class CustDashboardState extends Equatable {
   const CustDashboardState({

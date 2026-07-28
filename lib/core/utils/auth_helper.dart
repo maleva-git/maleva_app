@@ -1,84 +1,34 @@
-
-import 'package:shared_preferences/shared_preferences.dart';
-import 'package:maleva/core/network/OnlineApi.dart' as OnlineApi;
-import 'package:maleva/features/mastersearch/Employee.dart';
-import 'package:maleva/features/home/view/home_tab.dart';
-import 'package:google_fonts/google_fonts.dart';
-import 'package:maleva/core/colors/colors.dart' as colour;
-import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:go_router/go_router.dart';
+import 'package:maleva/core/colors/colors.dart' as colour;
 import 'package:maleva/core/utils/app_globals.dart';
+import 'package:maleva/core/utils/app_preferences.dart';
 import 'package:maleva/core/models/shared/employee_model.dart';
-import 'package:maleva/core/network/api_client.dart';
-import '../utils/app_preferences.dart';
+import 'package:maleva/features/home/view/home_tab.dart';
+import 'package:maleva/features/mastersearch/Employee.dart';
+import 'package:maleva/core/di/injection.dart';
+import 'package:maleva/core/network/legacy_api_repository.dart';
 
-class ApiLegacyHelper {
-  static Future<void> localstoragecall() async {
-    AppGlobals.storagenew = await SharedPreferences.getInstance();
-  }
-
-  static Future<List<dynamic>> apiAllinoneSelect(api, insertDetails,
-      Map<String, String>? header, BuildContext? context) async {
-    final result = await ApiClient.postRequest(api, insertDetails, headers: header);
-    if (result is List) return result;
-    if (result is Map) return [result];
-    return [];
-  }
-
-  static Future<dynamic> apiAllinoneMapSelect(
-      api,
-      insertDetails,
-      Map<String, String>? header,
-      BuildContext? context) async {
-    return await ApiClient.postRequest(api, insertDetails, headers: header);
-  }
-
-  static Future<List<dynamic>> apiAllinoneSelectWithOutAuth(api, insertDetails,
-      Map<String, String>? header, BuildContext? context) async {
-    final result = await ApiClient.postRequest(api, insertDetails, headers: header, skipAuth: true);
-    if (result is List) return result;
-    if (result is Map) return [result];
-    return [];
-  }
-
-  static Future<dynamic> apiAllinoneSelectArrayWithOutAuth(api, insertDetails,
-      Map<String, String>? header, BuildContext? context) async {
-    return await ApiClient.postRequest(api, insertDetails, headers: header, skipAuth: true);
-  }
-
-  static Future<dynamic> apiAllinoneSelectArray(api, insertDetails,
-      Map<String, String>? header, BuildContext? context) async {
-    return await ApiClient.postRequest(api, insertDetails, headers: header);
-  }
-
-  static Future<dynamic> apiAllinone(api, insertDetails, Map<String, String>? header, BuildContext context) async {
-    return await ApiClient.postRequest(api, insertDetails, headers: header);
-  }
-
-  static Future<String> apiGetString(api) async {
-    return await ApiClient.getString(api);
-  }
-
-  static Future<void> EmployeeLogin(context, int type) async {
+class AuthHelper {
+  static Future<void> EmployeeLogin(BuildContext context, int type) async {
     if (type != 1) {
-  bool result =
-  await ConfirmationMsgYesNo(context, "Are you sure to logout ?? ");
+      bool result = await ConfirmationMsgYesNo(context, "Are you sure to logout ?? ");
       if (result == false) {
         return;
       }
-      Navigator.push(
-          context, MaterialPageRoute(builder: (context) => const Homemobile()));
+      Navigator.push(context, MaterialPageRoute(builder: (context) => const Homemobile()));
     }
+    
     AppGlobals.EmpRefId = 0;
     AppGlobals.storagenew.setInt('AppGlobals.EmpRefId', 0);
     AppGlobals.storagenew.setString('Username', "");
     AppGlobals.storagenew.setString('Password', "");
-  await showDialog(
+    
+    await showDialog(
       context: context,
       barrierDismissible: false,
       builder: (BuildContext context) {
-        // return object of type Dialog
         return AlertDialog(
           titlePadding: EdgeInsets.zero,
           title: Container(
@@ -87,10 +37,7 @@ class ApiLegacyHelper {
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(0.0),
               color: colour.commonColor,
-              border: Border.all(
-                color: colour.commonColorLight,
-              ),
-              // side: const BorderSide(color: colour.commonColorLight, width: 1, style: BorderStyle.solid),
+              border: Border.all(color: colour.commonColorLight),
             ),
             child: Text(
               "Employee Login",
@@ -126,7 +73,7 @@ class ApiLegacyHelper {
                   ),
                   decoration: InputDecoration(
                     hintText: "Employee Name",
-                    hintStyle:GoogleFonts.lato(
+                    hintStyle: GoogleFonts.lato(
                       textStyle: TextStyle(
                         fontSize: AppGlobals.FontMedium,
                         fontWeight: FontWeight.bold,
@@ -140,28 +87,20 @@ class ApiLegacyHelper {
                             size: 30.0),
                         onTap: () async {
                           if (AppGlobals.txtLoginEmployee.text == "") {
-                            await OnlineApi.SelectEmployee(
-                                context, 'Sales', 'admin');
+                            await sl<LegacyApiRepository>().SelectEmployee(context, 'Sales', 'admin');
                             if (!context.mounted) return;
                             Navigator.push(
                               context,
-                              MaterialPageRoute(
-                                  builder: (context) =>
-  const Employee(Searchby: 1, SearchId: 0)),
+                              MaterialPageRoute(builder: (context) => const Employee(Searchby: 1, SearchId: 0)),
                             ).then((dynamic value) async {
-                              //setState(() {
-                              AppGlobals.txtLoginEmployee.text =
-                                  AppGlobals.SelectEmployeeList.AccountName;
+                              AppGlobals.txtLoginEmployee.text = AppGlobals.SelectEmployeeList.AccountName;
                               AppGlobals.LoginEmpId = AppGlobals.SelectEmployeeList.Id;
                               AppGlobals.SelectEmployeeList = EmployeeModel.Empty();
-                              // });
                             });
                           } else {
-                            //setState(() {
                             AppGlobals.txtLoginEmployee.text = "";
                             AppGlobals.LoginEmpId = 0;
                             AppGlobals.SelectEmployeeList = EmployeeModel.Empty();
-                            // });
                           }
                         }),
                     fillColor: Colors.black,
@@ -173,8 +112,7 @@ class ApiLegacyHelper {
                       borderRadius: BorderRadius.all(Radius.circular(10.0)),
                       borderSide: BorderSide(color: colour.commonColorred),
                     ),
-                    contentPadding:
-                        const EdgeInsets.only(left: 10, right: 20, top: 10.0),
+                    contentPadding: const EdgeInsets.only(left: 10, right: 20, top: 10.0),
                   ),
                 ),
               ),
@@ -190,7 +128,7 @@ class ApiLegacyHelper {
                   showCursor: true,
                   decoration: InputDecoration(
                     hintText: ('Password'),
-                    hintStyle:GoogleFonts.lato(
+                    hintStyle: GoogleFonts.lato(
                       textStyle: TextStyle(
                         fontSize: AppGlobals.FontMedium,
                         fontWeight: FontWeight.bold,
@@ -204,8 +142,7 @@ class ApiLegacyHelper {
                       borderRadius: BorderRadius.all(Radius.circular(10.0)),
                       borderSide: BorderSide(color: colour.commonColorred),
                     ),
-                    contentPadding:
-                        const EdgeInsets.only(left: 10, right: 20, top: 10.0),
+                    contentPadding: const EdgeInsets.only(left: 10, right: 20, top: 10.0),
                   ),
                   textInputAction: TextInputAction.done,
                   textCapitalization: TextCapitalization.characters,
@@ -233,18 +170,15 @@ class ApiLegacyHelper {
                   padding: const EdgeInsets.all(4.0),
                 ),
                 onPressed: () {
-                  if (AppGlobals.txtLoginPassword != "" && AppGlobals.LoginEmpId != 0) {
-  var EmployeeDetailsList = AppGlobals.EmployeeList.where((item) =>
+                  if (AppGlobals.txtLoginPassword.text != "" && AppGlobals.LoginEmpId != 0) {
+                    var EmployeeDetailsList = AppGlobals.EmployeeList.where((item) =>
                         item.Id == AppGlobals.LoginEmpId &&
                         item.Password == AppGlobals.txtLoginPassword.text).toList();
                     if (EmployeeDetailsList.isNotEmpty) {
                       AppGlobals.EmpRefId = EmployeeDetailsList[0].Id;
-                      AppGlobals.storagenew.setString(
-                          'Username', EmployeeDetailsList[0].AccountName);
-                      AppGlobals.storagenew.setString(
-                          'Password', EmployeeDetailsList[0].Password);
-                      AppGlobals.storagenew.setInt(
-                          'AppGlobals.EmpRefId', EmployeeDetailsList[0].Id );
+                      AppGlobals.storagenew.setString('Username', EmployeeDetailsList[0].AccountName);
+                      AppGlobals.storagenew.setString('Password', EmployeeDetailsList[0].Password);
+                      AppGlobals.storagenew.setInt('AppGlobals.EmpRefId', EmployeeDetailsList[0].Id);
                       AppGlobals.txtLoginEmployee.text = "";
                       AppGlobals.txtLoginPassword.text = "";
                       AppGlobals.LoginEmpId = 0;
@@ -252,18 +186,15 @@ class ApiLegacyHelper {
                     } else {
                       ConfirmationOK("Invalid Employee and Password", context);
                     }
-
                     Navigator.pop(context, true);
                   } else {
-                    ConfirmationOK(
-                        "Enter Employee Name and Password !!", context);
+                    ConfirmationOK("Enter Employee Name and Password !!", context);
                   }
                 },
                 child: Text(
                   'Login',
                   style: GoogleFonts.lato(
                       fontSize: 22.0,
-                      // height: 1.45,
                       fontWeight: FontWeight.bold,
                       color: colour.commonColorLight),
                 ),
@@ -276,21 +207,17 @@ class ApiLegacyHelper {
   }
 
   static Future<void> logout(BuildContext context) async {
-  bool result = await ConfirmationMsgYesNo(context, "Are you sure you want to logout?");
-
+    bool result = await ConfirmationMsgYesNo(context, "Are you sure you want to logout?");
     if (!result) {
       return;
     }
-
-    // Clear Session Variables
+    
     AppGlobals.loginId = 0;
     AppGlobals.loginname = '';
     AppGlobals.DriverLogin = 0;
     AppGlobals.DriverTruckRefId = 0;
-
-    await
-    AppPreferences.clearOnLogout();
-
+    
+    await AppPreferences.clearOnLogout();
     if (!context.mounted) return;
     context.go('/login');
   }

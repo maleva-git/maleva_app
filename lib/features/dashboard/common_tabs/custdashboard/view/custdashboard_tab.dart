@@ -1,4 +1,5 @@
-import 'package:maleva/core/network/api_legacy_helper.dart';
+
+import 'package:maleva/core/theme/app_typography.dart';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
@@ -7,10 +8,10 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:maleva/core/utils/app_globals.dart';
+import 'package:maleva/core/network/legacy_api_repository.dart';
+import 'package:maleva/core/di/injection.dart';
 import 'package:maleva/core/colors/colors.dart' as colour;
 import 'package:maleva/menu/menulist.dart';
-import 'package:maleva/core/network/OnlineApi.dart' as OnlineApi;
-
 import '../../../../mastersearch/Port.dart';
 import '../../enquiry/add/view/enquiryadd.dart';
 import '../../saleorderadd/view/saleorderadd_tab.dart';
@@ -18,6 +19,7 @@ import '../bloc/custdashboard_bloc.dart';
 import '../bloc/custdashboard_event.dart';
 import '../bloc/custdashboard_state.dart';
 import 'package:maleva/core/models/shared/payment_pending_model.dart';
+import 'package:maleva/core/utils/auth_helper.dart';
 
 
 
@@ -125,7 +127,7 @@ class _CustDashboardViewState extends State<_CustDashboardView>
     final tomorrow = DateFormat('yyyy-MM-dd').format(now.add(const Duration(days: 1)));
     if (notifyDate == today ||
         DateTime.parse(enq['ForwardingDate']).isBefore(now)) {
-      return Colors.redAccent.withValues(alpha: 0.3);
+      return colour.commonColorred.withValues(alpha: 0.3);
     } else if (notifyDate == tomorrow) {
       return Colors.yellowAccent.withValues(alpha: 0.3);
     }
@@ -136,8 +138,8 @@ class _CustDashboardViewState extends State<_CustDashboardView>
     final etb = row['SETB'] == '' ? null : DateTime.tryParse(row['SETB'] ?? '');
     final oetb = row['SOETB'] == '' ? null : DateTime.tryParse(row['SOETB'] ?? '');
     final yesterday = DateTime.now().subtract(const Duration(days: 1));
-    if (etb != null && yesterday.isAfter(etb)) return Colors.redAccent.withValues(alpha: 0.3);
-    if (oetb != null && yesterday.isAfter(oetb)) return Colors.redAccent.withValues(alpha: 0.3);
+    if (etb != null && yesterday.isAfter(etb)) return colour.commonColorred.withValues(alpha: 0.3);
+    if (oetb != null && yesterday.isAfter(oetb)) return colour.commonColorred.withValues(alpha: 0.3);
     return null;
   }
 
@@ -171,9 +173,9 @@ class _CustDashboardViewState extends State<_CustDashboardView>
               ),
               const SizedBox(height: 16),
               Text(master.ExpenseName ?? '',
-                  style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+                  style: AppTypography.heading1()),
               Text('Bank: ${master.BankName ?? ''}',
-                  style: const TextStyle(color: Colors.black54)),
+                  style: AppTypography.bodyLarge()),
               const Divider(),
               related.isEmpty
                   ? const Expanded(child: Center(child: Text('No detail records')))
@@ -185,15 +187,13 @@ class _CustDashboardViewState extends State<_CustDashboardView>
                     final d = related[i];
                     return Card(
                       elevation: 0,
-                      color: Colors.indigo.shade50,
+                      color: colour.commonColor.withValues(alpha: 0.1),
                       child: ListTile(
                         title: Text(d.SubExpenseName ?? ''),
                         subtitle: Text('Due: ${d.DueDate}'),
                         trailing: Text(
                           'RM ${((d.Amount ?? 0)).toStringAsFixed(2)}',
-                          style: const TextStyle(
-                              fontWeight: FontWeight.w600,
-                              color: Colors.indigo),
+                          style: AppTypography.bodyLarge(),
                         ),
                       ),
                     );
@@ -204,7 +204,7 @@ class _CustDashboardViewState extends State<_CustDashboardView>
                 alignment: Alignment.bottomRight,
                 child: TextButton(
                   onPressed: () => Navigator.pop(ctx),
-                  child: const Text('Close', style: TextStyle(fontSize: 16)),
+                  child: Text('Close', style: AppTypography.heading2()),
                 ),
               ),
             ],
@@ -281,18 +281,12 @@ class _CustDashboardViewState extends State<_CustDashboardView>
               children: [
                 Center(
                   child: Text('DETAILS',
-                      style: GoogleFonts.lato(
-                          textStyle: const TextStyle(
-                              fontWeight: FontWeight.bold,
-                              color: colour.commonColorred))),
+                      style: AppTypography.bodyLarge(color: colour.commonColorred)),
                 ),
                 const SizedBox(height: 15),
                 ...fields.map((f) => Text(
                   '${f[0]} : ${f[1]}',
-                  style: GoogleFonts.lato(
-                      textStyle: const TextStyle(
-                          fontWeight: FontWeight.bold,
-                          color: colour.commonColor)),
+                  style: AppTypography.bodyLarge(color: colour.commonColor),
                 )),
               ],
             ),
@@ -399,7 +393,7 @@ class _CustDashboardViewState extends State<_CustDashboardView>
                       state: state,
                       onCardTap: (row) => _showTransportDialog(context, row),
                       onCardLongPress: (row) async {
-                        await OnlineApi.EditSalesOrder(
+                        await sl<LegacyApiRepository>().EditSalesOrder(
                              row['Id'] as int, 0); if (!context.mounted) return;Navigator.of(context).push(MaterialPageRoute(
                             builder: (_) => SalesOrderAdd(
                               saleDetails: AppGlobals.SaleEditDetailList,
@@ -438,17 +432,13 @@ class _CustDashboardViewState extends State<_CustDashboardView>
   AppBar _buildAppBar(BuildContext context) {
     return AppBar(
       title: Text('Dash Board',
-          style: GoogleFonts.lato(
-              textStyle: TextStyle(
-                  color: colour.topAppBarColor,
-                  fontWeight: FontWeight.bold,
-                  fontSize: AppGlobals.FontLarge))),
+          style: AppTypography.heading1(color: colour.topAppBarColor)),
       iconTheme: const IconThemeData(color: colour.topAppBarColor),
       actions: [
         IconButton(
           icon: const Icon(Icons.exit_to_app,
               size: 30, color: colour.topAppBarColor),
-          onPressed: () => ApiLegacyHelper.logout(context),
+          onPressed: () => AuthHelper.logout(context),
         ),
       ],
       bottom: TabBar(
@@ -526,11 +516,7 @@ class _SalesTab extends StatelessWidget {
                             child: Text(
                               row['JobStatus'].toString(),
                               overflow: TextOverflow.ellipsis,
-                              style: GoogleFonts.lato(
-                                  textStyle: TextStyle(
-                                      color: colour.commonColor,
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: AppGlobals.FontCardText)),
+                              style: AppTypography.bodyLarge(color: colour.commonColor),
                             ),
                           ),
                         ),
@@ -539,11 +525,7 @@ class _SalesTab extends StatelessWidget {
                             child: Text(
                               row['DayCount'].toString(),
                               overflow: TextOverflow.ellipsis,
-                              style: GoogleFonts.lato(
-                                  textStyle: TextStyle(
-                                      color: colour.commonColor,
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: AppGlobals.FontCardText)),
+                              style: AppTypography.bodyLarge(color: colour.commonColor),
                             ),
                           ),
                         ),
@@ -583,20 +565,12 @@ class _EmployeeDropdown extends StatelessWidget {
                   .add(CustDashboardEmployeeChanged(value));
             }
           },
-          style: GoogleFonts.lato(
-              textStyle: TextStyle(
-                  color: colour.commonColor,
-                  fontWeight: FontWeight.bold,
-                  fontSize: AppGlobals.FontMedium)),
+          style: AppTypography.heading2(color: colour.commonColor),
           items: state.rulesTypeEmployee
               .map<DropdownMenuItem<String>>((item) => DropdownMenuItem<String>(
             value: item['Id'].toString(),
             child: Text(item['AccountName']!.toString(),
-                style: GoogleFonts.lato(
-                    textStyle: TextStyle(
-                        color: colour.commonColor,
-                        fontWeight: FontWeight.bold,
-                        fontSize: AppGlobals.FontMedium))),
+                style: AppTypography.heading2(color: colour.commonColor)),
           ))
               .toList(),
         ),
@@ -612,21 +586,13 @@ class _SalesCountCard extends StatelessWidget {
   Widget _label(String text) => Padding(
     padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 5),
     child: Text(text,
-        style: GoogleFonts.lato(
-            textStyle: TextStyle(
-                color: colour.commonColor,
-                fontWeight: FontWeight.bold,
-                fontSize: AppGlobals.FontLow - 2))),
+        style: AppTypography.bodySmall(color: colour.commonColor)),
   );
 
   Widget _value(String text) => Padding(
     padding: const EdgeInsets.symmetric(vertical: 6),
     child: Text(text,
-        style: GoogleFonts.lato(
-            textStyle: TextStyle(
-                color: colour.commonColorhighlight,
-                fontWeight: FontWeight.bold,
-                fontSize: AppGlobals.FontLow - 2))),
+        style: AppTypography.bodySmall(color: colour.commonColorhighlight)),
   );
 
   @override
@@ -702,11 +668,7 @@ class _VesselTab extends StatelessWidget {
           const SizedBox(height: 7),
           Center(
             child: Text('VESSEL REPORT',
-                style: GoogleFonts.lato(
-                    textStyle: TextStyle(
-                        color: colour.commonColorred,
-                        fontWeight: FontWeight.bold,
-                        fontSize: AppGlobals.FontLarge))),
+                style: AppTypography.heading1(color: colour.commonColorred)),
           ),
           const SizedBox(height: 4),
           // Port search row
@@ -720,18 +682,10 @@ class _VesselTab extends StatelessWidget {
                     controller: portCtrl,
                     readOnly: true,
                     textCapitalization: TextCapitalization.characters,
-                    style: GoogleFonts.lato(
-                        textStyle: TextStyle(
-                            color: colour.commonColor,
-                            fontWeight: FontWeight.bold,
-                            fontSize: AppGlobals.FontLow)),
+                    style: AppTypography.bodyLarge(color: colour.commonColor),
                     decoration: InputDecoration(
                       hintText: 'Port',
-                      hintStyle: GoogleFonts.lato(
-                          textStyle: TextStyle(
-                              fontSize: AppGlobals.FontMedium,
-                              fontWeight: FontWeight.bold,
-                              color: colour.commonColorLight)),
+                      hintStyle: AppTypography.heading2(color: colour.commonColorLight),
                       suffixIcon: InkWell(
                         onTap: () {
                           if (portCtrl.text.isEmpty) {
@@ -794,16 +748,9 @@ class _VesselTab extends StatelessWidget {
               expands: true,
               keyboardType: TextInputType.text,
               textCapitalization: TextCapitalization.characters,
-              style: GoogleFonts.lato(
-                  textStyle: TextStyle(
-                      color: colour.commonColor,
-                      fontWeight: FontWeight.bold,
-                      fontSize: AppGlobals.FontLow)),
+              style: AppTypography.bodyLarge(color: colour.commonColor),
               decoration: InputDecoration(
-                hintStyle: GoogleFonts.lato(
-                    textStyle: TextStyle(
-                        fontSize: AppGlobals.FontMedium,
-                        color: colour.commonColorLight)),
+                hintStyle: AppTypography.heading2(color: colour.commonColorLight),
                 enabledBorder: const OutlineInputBorder(
                   borderRadius: BorderRadius.all(Radius.circular(10)),
                   borderSide: BorderSide(color: colour.commonColor),
@@ -845,22 +792,14 @@ class _VesselTab extends StatelessWidget {
                               flex: 1,
                               child: Center(
                                   child: Text('${i + 1}',
-                                      style: GoogleFonts.lato(
-                                          textStyle: TextStyle(
-                                              color: colour.commonColor,
-                                              fontWeight: FontWeight.bold,
-                                              fontSize: AppGlobals.FontCardText))))),
+                                      style: AppTypography.bodyLarge(color: colour.commonColor)))),
                           Expanded(
                             flex: 2,
                             child: Text(
                               row['Loadingvesselname'].toString(),
                               overflow: TextOverflow.ellipsis,
                               maxLines: 1,
-                              style: GoogleFonts.lato(
-                                  textStyle: TextStyle(
-                                      color: colour.commonColor,
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: AppGlobals.FontCardText)),
+                              style: AppTypography.bodyLarge(color: colour.commonColor),
                             ),
                           ),
                           Expanded(
@@ -869,11 +808,7 @@ class _VesselTab extends StatelessWidget {
                               ' - ${row['Port']}',
                               overflow: TextOverflow.ellipsis,
                               maxLines: 1,
-                              style: GoogleFonts.lato(
-                                  textStyle: TextStyle(
-                                      color: colour.commonColor,
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: AppGlobals.FontCardText)),
+                              style: AppTypography.bodyLarge(color: colour.commonColor),
                             ),
                           ),
                         ],
@@ -913,11 +848,7 @@ class _TransportTab extends StatelessWidget {
         children: [
           Center(
             child: Text('TRANSPORT REPORT',
-                style: GoogleFonts.lato(
-                    textStyle: TextStyle(
-                        color: colour.commonColorred,
-                        fontWeight: FontWeight.bold,
-                        fontSize: AppGlobals.FontLarge))),
+                style: AppTypography.heading1(color: colour.commonColorred)),
           ),
           _DayToggle(
             isToday: state.isPlanToday,
@@ -946,22 +877,14 @@ class _TransportTab extends StatelessWidget {
                               flex: 1,
                               child: Center(
                                   child: Text('${i + 1}',
-                                      style: GoogleFonts.lato(
-                                          textStyle: TextStyle(
-                                              color: colour.commonColor,
-                                              fontWeight: FontWeight.bold,
-                                              fontSize: AppGlobals.FontCardText))))),
+                                      style: AppTypography.bodyLarge(color: colour.commonColor)))),
                           Expanded(
                             flex: 3,
                             child: Text(
                               row['CustomerName'].toString(),
                               overflow: TextOverflow.ellipsis,
                               maxLines: 1,
-                              style: GoogleFonts.lato(
-                                  textStyle: TextStyle(
-                                      color: colour.commonColor,
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: AppGlobals.FontCardText)),
+                              style: AppTypography.bodyLarge(color: colour.commonColor),
                             ),
                           ),
                         ],
@@ -1031,19 +954,11 @@ class _EnquiryTab extends StatelessWidget {
                   Expanded(
                       flex: 2,
                       child: Text('Customer Name',
-                          style: GoogleFonts.lato(
-                              textStyle: TextStyle(
-                                  color: colour.ButtonForeColor,
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: AppGlobals.FontLow)))),
+                          style: AppTypography.bodyLarge(color: colour.ButtonForeColor))),
                   Expanded(
                       flex: 2,
                       child: Text('Notify Date',
-                          style: GoogleFonts.lato(
-                              textStyle: TextStyle(
-                                  color: colour.ButtonForeColor,
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: AppGlobals.FontLow)))),
+                          style: AppTypography.bodyLarge(color: colour.ButtonForeColor))),
                 ],
               ),
             ),
@@ -1051,7 +966,7 @@ class _EnquiryTab extends StatelessWidget {
           // List
           Expanded(
             child: state.enquiryMasterList.isEmpty
-                ? const Center(child: Text('No Record'))
+                ? Center(child: Text('No Record'))
                 : ListView.builder(
               itemCount: state.enquiryMasterList.length,
               itemBuilder: (_, i) {
@@ -1084,12 +999,7 @@ class _EnquiryTab extends StatelessWidget {
                                 child: Text(
                                   '   ${enq['CustomerName']}',
                                   overflow: TextOverflow.ellipsis,
-                                  style: GoogleFonts.lato(
-                                      textStyle: TextStyle(
-                                          color: colour.commonColor,
-                                          fontWeight: FontWeight.bold,
-                                          // FIXED: Added .toDouble()
-                                          fontSize: AppGlobals.FontCardText.toDouble())),
+                                  style: AppTypography.bodyLarge(color: colour.commonColor),
                                 ),
                               ),
                               Expanded(
@@ -1097,12 +1007,7 @@ class _EnquiryTab extends StatelessWidget {
                                 child: Text(
                                   '   ${enq['SForwardingDate']}',
                                   overflow: TextOverflow.ellipsis,
-                                  style: GoogleFonts.lato(
-                                      textStyle: TextStyle(
-                                          color: colour.commonColor,
-                                          fontWeight: FontWeight.bold,
-                                          // FIXED: Added .toDouble()
-                                          fontSize: AppGlobals.FontCardText.toDouble())),
+                                  style: AppTypography.bodyLarge(color: colour.commonColor),
                                 ),
                               ),
                             ],
@@ -1183,10 +1088,7 @@ class _FuelTab extends StatelessWidget {
       child: Column(
         children: [
           Text('Fuel Different',
-              style: GoogleFonts.lato(
-                  fontSize: AppGlobals.FontLarge,
-                  fontWeight: FontWeight.bold,
-                  color: colour.commonColor)),
+              style: AppTypography.heading1(color: colour.commonColor)),
           // Date range
           Row(
             children: [
@@ -1194,11 +1096,7 @@ class _FuelTab extends StatelessWidget {
                 flex: 4,
                 child: Text(
                   DateFormat('dd-MM-yy').format(DateTime.parse(state.fuelFromDate)),
-                  style: GoogleFonts.lato(
-                      textStyle: TextStyle(
-                          color: colour.commonColor,
-                          fontWeight: FontWeight.bold,
-                          fontSize: AppGlobals.FontLow)),
+                  style: AppTypography.bodyLarge(color: colour.commonColor),
                 ),
               ),
               Expanded(
@@ -1226,11 +1124,7 @@ class _FuelTab extends StatelessWidget {
                 flex: 4,
                 child: Text(
                   DateFormat('dd-MM-yy').format(DateTime.parse(state.fuelToDate)),
-                  style: GoogleFonts.lato(
-                      textStyle: TextStyle(
-                          color: colour.commonColor,
-                          fontWeight: FontWeight.bold,
-                          fontSize: AppGlobals.FontLow)),
+                  style: AppTypography.bodyLarge(color: colour.commonColor),
                 ),
               ),
               Expanded(
@@ -1262,8 +1156,7 @@ class _FuelTab extends StatelessWidget {
                           fromDate: state.fuelFromDate,
                           toDate: state.fuelToDate)),
                   child: Text('View',
-                      style: GoogleFonts.lato(
-                          textStyle: TextStyle(fontSize: AppGlobals.FontLow))),
+                      style: AppTypography.bodyLarge()),
                 ),
               ),
             ],
@@ -1282,7 +1175,7 @@ class _FuelTab extends StatelessWidget {
                 final diffColor = diff > 0
                     ? Colors.green
                     : diff < 0
-                    ? Colors.red
+                    ? colour.commonColorred
                     : Colors.grey;
                 final diffIcon = diff > 0
                     ? Icons.trending_up
@@ -1322,13 +1215,9 @@ class _FuelTab extends StatelessWidget {
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Text(rec.driverName ?? 'Unknown',
-                                      style: GoogleFonts.poppins(
-                                          fontSize: 16,
-                                          fontWeight: FontWeight.bold)),
+                                      style: AppTypography.heading1()),
                                   Text(rec.truckName ?? 'No Truck',
-                                      style: GoogleFonts.lato(
-                                          fontSize: 13,
-                                          color: Colors.grey[600])),
+                                      style: AppTypography.bodyLarge(color: Colors.grey[600])),
                                 ],
                               ),
                             ),
@@ -1343,7 +1232,7 @@ class _FuelTab extends StatelessWidget {
                                 Colors.orange.shade700),
                             _infoTile('G Amount',
                                 '₹${gAmount.toStringAsFixed(2)}',
-                                Colors.blue.shade700),
+                                colour.commonColorhighlight),
                           ],
                         ),
                         const SizedBox(height: 6),
@@ -1355,7 +1244,7 @@ class _FuelTab extends StatelessWidget {
                                 Colors.orange.shade700),
                             _infoTile('G Liter',
                                 '${gliter.toStringAsFixed(2)} L',
-                                Colors.blue.shade700),
+                                colour.commonColorhighlight),
                           ],
                         ),
                         const SizedBox(height: 10),
@@ -1372,10 +1261,7 @@ class _FuelTab extends StatelessWidget {
                               const SizedBox(width: 6),
                               Text(
                                 'Difference: ${diff >= 0 ? '+' : ''}${diff.toStringAsFixed(2)}',
-                                style: GoogleFonts.poppins(
-                                    color: diffColor,
-                                    fontWeight: FontWeight.w600,
-                                    fontSize: 15),
+                                style: AppTypography.heading2(color: diffColor, fontWeight: FontWeight.w600),
                               ),
                             ],
                           ),
@@ -1397,11 +1283,10 @@ class _FuelTab extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(title,
-            style: GoogleFonts.lato(fontSize: 13, color: Colors.grey[600])),
+            style: AppTypography.bodyLarge(color: Colors.grey[600])),
         const SizedBox(height: 2),
         Text(value,
-            style: GoogleFonts.poppins(
-                fontSize: 14, color: color, fontWeight: FontWeight.bold)),
+            style: AppTypography.heading3(color: color, fontWeight: FontWeight.bold)),
       ],
     );
   }
@@ -1457,11 +1342,11 @@ class _PaymentTab extends StatelessWidget {
                 return Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 4),
                   child: ChoiceChip(
-                    label: Text(f, style: const TextStyle(fontSize: 13)),
+                    label: Text(f, style: AppTypography.bodyLarge()),
                     selected: selected,
-                    selectedColor: Colors.indigo,
+                    selectedColor: colour.commonColor,
                     labelStyle: TextStyle(
-                        color: selected ? Colors.white : Colors.black87),
+                        color: selected ? Colors.white : colour.commonColor),
                     shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(20)),
                     onSelected: (_) {
@@ -1485,11 +1370,11 @@ class _PaymentTab extends StatelessWidget {
                 return Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 4),
                   child: ChoiceChip(
-                    label: Text(f, style: const TextStyle(fontSize: 13)),
+                    label: Text(f, style: AppTypography.bodyLarge()),
                     selected: selected,
-                    selectedColor: Colors.indigo,
+                    selectedColor: colour.commonColor,
                     labelStyle: TextStyle(
-                        color: selected ? Colors.white : Colors.black87),
+                        color: selected ? Colors.white : colour.commonColor),
                     shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(20)),
                     onSelected: (_) {
@@ -1568,7 +1453,7 @@ class _PaymentTab extends StatelessWidget {
                           isDateSearch: true,
                           fromDate: state.paymentFromDate,
                           toDate: state.paymentToDate)),
-                  child: const Text('Search'),
+                  child: Text('Search'),
                 ),
               ],
             ),
@@ -1578,13 +1463,12 @@ class _PaymentTab extends StatelessWidget {
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
             child: Row(
               children: [
-                const Text('Total:',
-                    style: TextStyle(
-                        fontWeight: FontWeight.bold, fontSize: 16)),
+                Text('Total:',
+                    style: AppTypography.heading2()),
                 const SizedBox(width: 6),
                 Text(
                   'RM ${state.totalFilteredAmount.toStringAsFixed(2)}',
-                  style: const TextStyle(fontSize: 17, color: Colors.indigo),
+                  style: AppTypography.heading2(),
                 ),
               ],
             ),
@@ -1593,9 +1477,9 @@ class _PaymentTab extends StatelessWidget {
           // Master list
           Expanded(
             child: state.masterList.isEmpty
-                ? const Center(
+                ? Center(
                 child: Text('No Records Found',
-                    style: TextStyle(fontSize: 16)))
+                    style: AppTypography.heading2()))
                 : ListView.builder(
               padding: const EdgeInsets.symmetric(vertical: 10),
               itemCount: state.masterList.length,
@@ -1621,26 +1505,22 @@ class _PaymentTab extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(item.ExpenseName ?? '',
-                            style: const TextStyle(
-                                fontWeight: FontWeight.bold,
-                                fontSize: 17)),
+                            style: AppTypography.heading2()),
                         const SizedBox(height: 6),
                         Text('Bank: ${item.BankName ?? ''}',
-                            style: const TextStyle(
-                                color: Colors.black54)),
+                            style: AppTypography.bodyLarge()),
                         Text(item.SubExpenseName ?? ''),
                         Text('Due: ${item.ExpenceDueDate}',
-                            style: const TextStyle(
-                                color: Colors.black54)),
+                            style: AppTypography.bodyLarge()),
                         Text(
                           'Paiddate: ${item.Paiddate?.split('T').first ?? '-'}',
                           style:
-                          const TextStyle(color: Colors.black54),
+                          AppTypography.bodyLarge(),
                         ),
                         Text(
                           'Paidamount: RM ${double.tryParse(item.Paiddamount ?? '0')?.toStringAsFixed(2) ?? '0.00'}',
                           style:
-                          const TextStyle(color: Colors.black54),
+                          AppTypography.bodyLarge(),
                         ),
                         const SizedBox(height: 6),
                         Row(
@@ -1650,14 +1530,12 @@ class _PaymentTab extends StatelessWidget {
                               padding: const EdgeInsets.symmetric(
                                   horizontal: 12, vertical: 6),
                               decoration: BoxDecoration(
-                                  color: Colors.indigo.shade50,
+                                  color: colour.commonColor.withValues(alpha: 0.1),
                                   borderRadius:
                                   BorderRadius.circular(12)),
                               child: Text(
                                 'RM ${((item.Amount ?? 0)).toStringAsFixed(2)}',
-                                style: const TextStyle(
-                                    fontWeight: FontWeight.w600,
-                                    color: Colors.indigo),
+                                style: AppTypography.bodyLarge(),
                               ),
                             ),
                           ],
@@ -1711,10 +1589,7 @@ class _DayToggle extends StatelessWidget {
       ),
       onPressed: onTap,
       child: Text(label,
-          style: GoogleFonts.lato(
-              fontSize: AppGlobals.FontMedium,
-              fontWeight: FontWeight.bold,
-              color: colour.commonColor)),
+          style: AppTypography.heading2(color: colour.commonColor)),
     );
   }
 }

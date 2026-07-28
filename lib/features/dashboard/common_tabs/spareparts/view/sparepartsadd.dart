@@ -1,3 +1,4 @@
+import 'package:maleva/core/theme/app_typography.dart';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
@@ -46,7 +47,7 @@ class _SparePartsEntryBody extends StatelessWidget {
         if (state is SparePartsSubmitSuccess) {
           ScaffoldMessenger.of(context).showSnackBar(SnackBar(
             content: Text("Submitted successfully ✅",
-                style: GoogleFonts.lato(color: colour.kWhite)),
+                style: AppTypography.bodyLarge(color: colour.kWhite)),
             backgroundColor: Colors.green,
             behavior: SnackBarBehavior.floating,
             shape: RoundedRectangleBorder(
@@ -59,7 +60,7 @@ class _SparePartsEntryBody extends StatelessWidget {
         if (state is SparePartsEntryError) {
           ScaffoldMessenger.of(context).showSnackBar(SnackBar(
             content: Text(state.message),
-            backgroundColor: Colors.red,
+            backgroundColor: colour.commonColorred,
             behavior: SnackBarBehavior.floating,
           ));
         }
@@ -146,22 +147,13 @@ class _SparePartsEntryBody extends StatelessWidget {
               ),
               const SizedBox(width: 10),
               Text('SPARE PARTS ENTRY',
-                  style: GoogleFonts.lato(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                    color:AppTokens.brandDark,
-                    letterSpacing: 1.2,
-                  )),
+                  style: AppTypography.heading1(color: AppTokens.brandDark, fontWeight: FontWeight.bold)),
             ]),
             const SizedBox(height: 6),
             Padding(
               padding: const EdgeInsets.only(left: 14),
               child: Text('Entry Form',
-                  style: GoogleFonts.lato(
-                    fontSize: 14,
-                    color: AppTokens.brandMid,
-                    fontWeight: FontWeight.w500,
-                  )),
+                  style: AppTypography.bodyLarge(color: AppTokens.brandMid, fontWeight: FontWeight.w500)),
             ),
             const SizedBox(height: 24),
           ],
@@ -302,9 +294,7 @@ class _SparePartsEntryBody extends StatelessWidget {
                     (s.pickedImage == null && s.pickedPDF == null)
                         ? "Upload Document"
                         : "Change Document",
-                    style: GoogleFonts.lato(
-                        fontSize: 15,
-                        fontWeight: FontWeight.w600),
+                    style: AppTypography.heading2(fontWeight: FontWeight.w600),
                   ),
                 ),
               ),
@@ -330,14 +320,12 @@ class _SparePartsEntryBody extends StatelessWidget {
                   ),
                   child: Row(children: [
                     const Icon(Icons.picture_as_pdf,
-                        color: Colors.red, size: 36),
+                        color: colour.commonColorred, size: 36),
                     const SizedBox(width: 10),
                     Expanded(
                       child: Text(
                         s.pickedPDF!.path.split('/').last,
-                        style: GoogleFonts.lato(
-                            fontSize: 14,
-                            fontWeight: FontWeight.w600),
+                        style: AppTypography.bodyLarge(fontWeight: FontWeight.w600),
                         overflow: TextOverflow.ellipsis,
                       ),
                     ),
@@ -377,10 +365,7 @@ class _SparePartsEntryBody extends StatelessWidget {
                     child: CircularProgressIndicator(
                         color: colour.kWhite, strokeWidth: 2))
                     : Text("Submit",
-                    style: GoogleFonts.lato(
-                        fontSize: isTablet ? 17 : 18,
-                        fontWeight: FontWeight.bold,
-                        color: colour.kWhite)),
+                    style: AppTypography.heading1(color: colour.kWhite, fontWeight: FontWeight.bold)),
               ),
             ),
             const SizedBox(width: 12),
@@ -400,10 +385,7 @@ class _SparePartsEntryBody extends StatelessWidget {
                     MaterialPageRoute(
                         builder: (_) => const SparePartsView())),
                 child: Text("View",
-                    style: GoogleFonts.lato(
-                        fontSize: isTablet ? 17 : 18,
-                        fontWeight: FontWeight.bold,
-                        color: colour.kWhite)),
+                    style: AppTypography.heading1(color: colour.kWhite, fontWeight: FontWeight.bold)),
               ),
             ),
           ]),
@@ -459,11 +441,7 @@ class _SparePartsPreviewPanel extends StatelessWidget {
               ),
               const SizedBox(width: 10),
               Text('Entry Preview',
-                  style: GoogleFonts.lato(
-                    fontSize: 15,
-                    fontWeight: FontWeight.bold,
-                    color:AppTokens.brandDark,
-                  )),
+                  style: AppTypography.heading2(color: AppTokens.brandDark, fontWeight: FontWeight.bold)),
             ]),
 
             const SizedBox(height: 20),
@@ -481,18 +459,11 @@ class _SparePartsPreviewPanel extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text('Truck',
-                      style: GoogleFonts.lato(
-                        fontSize: 11,
-                        color: colour.kWhite.withValues(alpha: 0.75),
-                      )),
+                      style: AppTypography.bodySmall(color: colour.kWhite.withValues(alpha: 0.75))),
                   const SizedBox(height: 4),
                   Text(
                     truckName,
-                    style: GoogleFonts.lato(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                      color: colour.kWhite,
-                    ),
+                    style: AppTypography.heading1(color: colour.kWhite, fontWeight: FontWeight.bold),
                     overflow: TextOverflow.ellipsis,
                   ),
                 ],
@@ -530,22 +501,13 @@ class _SparePartsPreviewPanel extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text('Spare Parts',
-                          style: GoogleFonts.lato(
-                            fontSize: 11,
-                            color: Colors.grey[500],
-                            fontWeight: FontWeight.w600,
-                          )),
+                          style: AppTypography.bodySmall(color: Colors.grey[500], fontWeight: FontWeight.w600)),
                       const SizedBox(height: 2),
                       Text(
                         s.spareParts.isNotEmpty
                             ? s.spareParts
                             : '-',
-                        style: GoogleFonts.lato(
-                          fontSize: 13,
-                          fontWeight: FontWeight.w600,
-                          color:AppTokens.brandDark,
-                          height: 1.4,
-                        ),
+                        style: AppTypography.bodyLarge(color: AppTokens.brandDark, fontWeight: FontWeight.w600),
                         maxLines: 4,
                         overflow: TextOverflow.ellipsis,
                       ),
@@ -572,11 +534,7 @@ class _SparePartsPreviewPanel extends StatelessWidget {
                         color: AppTokens.brandGradientStart, size: 16),
                     const SizedBox(width: 6),
                     Text('Document',
-                        style: GoogleFonts.lato(
-                          fontSize: 12,
-                          fontWeight: FontWeight.bold,
-                          color:AppTokens.brandDark,
-                        )),
+                        style: AppTypography.bodyMedium(color: AppTokens.brandDark, fontWeight: FontWeight.bold)),
                   ]),
                   const SizedBox(height: 8),
 
@@ -596,7 +554,7 @@ class _SparePartsPreviewPanel extends StatelessWidget {
                             ? Icons.picture_as_pdf
                             : Icons.radio_button_unchecked_rounded,
                         color: s.pickedPDF != null
-                            ? Colors.red
+                            ? colour.commonColorred
                             : Colors.grey,
                         size: 15,
                       ),
@@ -606,9 +564,7 @@ class _SparePartsPreviewPanel extends StatelessWidget {
                           s.pickedPDF != null
                               ? s.pickedPDF!.path.split('/').last
                               : 'No document uploaded',
-                          style: GoogleFonts.lato(
-                              fontSize: 12,
-                              color: Colors.grey[600]),
+                          style: AppTypography.bodyMedium(color: Colors.grey[600]),
                           overflow: TextOverflow.ellipsis,
                         ),
                       ),
@@ -635,11 +591,7 @@ class _SparePartsPreviewPanel extends StatelessWidget {
                         color: AppTokens.brandGradientStart, size: 16),
                     const SizedBox(width: 6),
                     Text('Tips',
-                        style: GoogleFonts.lato(
-                          fontSize: 12,
-                          fontWeight: FontWeight.bold,
-                          color:AppTokens.brandDark,
-                        )),
+                        style: AppTypography.bodyMedium(color: AppTokens.brandDark, fontWeight: FontWeight.bold)),
                   ]),
                   const SizedBox(height: 8),
                   _tipRow('Select truck and date first'),
@@ -673,18 +625,10 @@ class _SparePartsPreviewPanel extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(label,
-                  style: GoogleFonts.lato(
-                    fontSize: 11,
-                    color: Colors.grey[500],
-                    fontWeight: FontWeight.w600,
-                  )),
+                  style: AppTypography.bodySmall(color: Colors.grey[500], fontWeight: FontWeight.w600)),
               const SizedBox(height: 2),
               Text(value,
-                  style: GoogleFonts.lato(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w700,
-                    color:AppTokens.brandDark,
-                  )),
+                  style: AppTypography.heading3(color: AppTokens.brandDark, fontWeight: FontWeight.w700)),
             ],
           ),
         ),
@@ -701,10 +645,7 @@ class _SparePartsPreviewPanel extends StatelessWidget {
         const SizedBox(width: 6),
         Expanded(
           child: Text(text,
-              style: GoogleFonts.lato(
-                fontSize: 12,
-                color: Colors.grey[600],
-              )),
+              style: AppTypography.bodyMedium(color: Colors.grey[600])),
         ),
       ]),
     );
@@ -759,10 +700,7 @@ class _SparePartsTruckSelectPageState
               color: colour.kWhite, size: 20),
         ),
         title: Text("Select Truck",
-            style: GoogleFonts.lato(
-                fontWeight: FontWeight.bold,
-                fontSize: 18,
-                color: colour.kWhite)),
+            style: AppTypography.heading1(color: colour.kWhite, fontWeight: FontWeight.bold)),
         centerTitle: true,
       ),
       body: Column(
@@ -774,12 +712,10 @@ class _SparePartsTruckSelectPageState
               controller: _searchCtrl,
               textCapitalization: TextCapitalization.characters,
               onChanged: _search,
-              style: GoogleFonts.lato(
-                  color:AppTokens.brandDark,
-                  fontWeight: FontWeight.w600),
+              style: AppTypography.bodyLarge(color: AppTokens.brandDark),
               decoration: InputDecoration(
                 hintText: 'Search Truck No...',
-                hintStyle: GoogleFonts.lato(color: Colors.grey),
+                hintStyle: AppTypography.bodyLarge(),
                 prefixIcon: const Icon(Icons.search,
                     color: AppTokens.brandGradientStart),
                 border: OutlineInputBorder(
@@ -797,10 +733,7 @@ class _SparePartsTruckSelectPageState
                 horizontal: 16, vertical: 10),
             child: Row(children: [
               Text("${_filtered.length} trucks found",
-                  style: GoogleFonts.lato(
-                      fontSize: 13,
-                      color: Colors.grey[500],
-                      fontWeight: FontWeight.w600)),
+                  style: AppTypography.bodyLarge(color: Colors.grey[500], fontWeight: FontWeight.w600)),
             ]),
           ),
           Expanded(
@@ -814,9 +747,7 @@ class _SparePartsTruckSelectPageState
                       size: 56),
                   const SizedBox(height: 10),
                   Text("No trucks found",
-                      style: GoogleFonts.lato(
-                          fontSize: 16,
-                          color: Colors.grey)),
+                      style: AppTypography.heading1(color: Colors.grey)),
                 ],
               ),
             )
@@ -868,10 +799,7 @@ class _SparePartsTruckSelectPageState
                       Expanded(
                         child: Text(
                           truck.AccountName ?? '',
-                          style: GoogleFonts.lato(
-                              fontSize: 15,
-                              fontWeight: FontWeight.w600,
-                              color:AppTokens.brandDark),
+                          style: AppTypography.heading2(color: AppTokens.brandDark, fontWeight: FontWeight.w600),
                         ),
                       ),
                       const Icon(
@@ -927,10 +855,7 @@ class _SectionCard extends StatelessWidget {
             ),
             const SizedBox(width: 8),
             Text(title,
-                style: GoogleFonts.lato(
-                    fontSize: isTablet ? 14 : 13,
-                    fontWeight: FontWeight.bold,
-                    color:AppTokens.brandDark)),
+                style: AppTypography.heading3(color: AppTokens.brandDark, fontWeight: FontWeight.bold)),
           ]),
           const SizedBox(height: 8),
           Container(
@@ -1001,21 +926,15 @@ class _SelectTile extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(label,
-                      style: GoogleFonts.lato(
-                          fontSize: 11,
-                          color: hasValue
+                      style: AppTypography.bodySmall(color: hasValue
                               ? AppTokens.brandGradientStart
-                              : Colors.grey,
-                          fontWeight: FontWeight.w600)),
+                              : Colors.grey, fontWeight: FontWeight.w600)),
                   const SizedBox(height: 2),
                   Text(
                     hasValue ? value! : placeholder,
-                    style: GoogleFonts.lato(
-                        fontSize: 14,
-                        color: hasValue
+                    style: AppTypography.heading3(color: hasValue
                             ?AppTokens.brandDark
-                            : Colors.grey.shade400,
-                        fontWeight: hasValue
+                            : Colors.grey.shade400, fontWeight: hasValue
                             ? FontWeight.bold
                             : FontWeight.normal),
                   ),
@@ -1035,7 +954,7 @@ class _SelectTile extends StatelessWidget {
 InputDecoration _decor(String label, IconData icon) {
   return InputDecoration(
     labelText: label,
-    labelStyle: const TextStyle(color:AppTokens.brandDark),
+    labelStyle: AppTypography.bodyLarge(color: AppTokens.brandDark),
     prefixIcon: Icon(icon, color: AppTokens.brandGradientStart, size: 20),
     border:
     OutlineInputBorder(borderRadius: BorderRadius.circular(10)),

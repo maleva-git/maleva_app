@@ -1,3 +1,5 @@
+import 'package:maleva/core/colors/colors.dart' as colour;
+import 'package:maleva/core/theme/app_typography.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -17,15 +19,14 @@ class BillOrderScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocProvider(
       create: (_) {
-        final now  = DateTime.now();
+        final now = DateTime.now();
         final from = DateTime(now.year, now.month, 1);
-        final to   = DateTime(now.year, now.month + 1, 0);
-        return
-          sl<BillOrderBloc>()
-            ..add(LoadBillOrderEvent(
-              fromDate: DateFormat('MM/dd/yyyy').format(from),
-              toDate:   DateFormat('MM/dd/yyyy').format(to),
-            ));
+        final to = DateTime(now.year, now.month + 1, 0);
+        return sl<BillOrderBloc>()
+          ..add(LoadBillOrderEvent(
+            fromDate: DateFormat('MM/dd/yyyy').format(from),
+            toDate: DateFormat('MM/dd/yyyy').format(to),
+          ));
       },
       child: const _BillOrderBody(),
     );
@@ -41,23 +42,21 @@ class _BillOrderBody extends StatefulWidget {
 }
 
 class _BillOrderBodyState extends State<_BillOrderBody> {
-  DateTime _fromDate =
-  DateTime(DateTime.now().year, DateTime.now().month, 1);
-  DateTime _toDate =
-  DateTime(DateTime.now().year, DateTime.now().month + 1, 0);
+  DateTime _fromDate = DateTime(DateTime.now().year, DateTime.now().month, 1);
+  DateTime _toDate = DateTime(DateTime.now().year, DateTime.now().month + 1, 0);
 
   Future<void> _pickDate({required bool isFrom}) async {
     final DateTime? picked = await showDatePicker(
-      context:     context,
+      context: context,
       initialDate: isFrom ? _fromDate : _toDate,
-      firstDate:   DateTime(2020),
-      lastDate:    DateTime(2100),
+      firstDate: DateTime(2020),
+      lastDate: DateTime(2100),
       builder: (ctx, child) => Theme(
         data: Theme.of(ctx).copyWith(
           colorScheme: const ColorScheme.light(
-            primary:   Color(0xFF10B981),
+            primary: Color(0xFF10B981),
             onPrimary: Colors.white,
-            surface:   Colors.white,
+            surface: Colors.white,
           ),
         ),
         child: child!,
@@ -77,9 +76,9 @@ class _BillOrderBodyState extends State<_BillOrderBody> {
 
     if (mounted) {
       context.read<BillOrderBloc>().add(LoadBillOrderEvent(
-        fromDate: DateFormat('MM/dd/yyyy').format(_fromDate),
-        toDate:   DateFormat('MM/dd/yyyy').format(_toDate),
-      ));
+            fromDate: DateFormat('MM/dd/yyyy').format(_fromDate),
+            toDate: DateFormat('MM/dd/yyyy').format(_toDate),
+          ));
     }
   }
 
@@ -104,7 +103,7 @@ class _BillOrderBodyState extends State<_BillOrderBody> {
         gradient: LinearGradient(
           colors: [Color(0xFFF8FAFC), Color(0xFFF1F5F9)],
           begin: Alignment.topCenter,
-          end:   Alignment.bottomCenter,
+          end: Alignment.bottomCenter,
         ),
       ),
       child: Padding(
@@ -112,15 +111,13 @@ class _BillOrderBodyState extends State<_BillOrderBody> {
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-
             // ── LEFT panel ────────────────────────────────────────────────
             SizedBox(
               width: 270,
               child: BlocBuilder<BillOrderBloc, BillOrderState>(
                 builder: (context, state) {
-                  final count = state is BillOrderLoaded
-                      ? state.records.length
-                      : 0;
+                  final count =
+                      state is BillOrderLoaded ? state.records.length : 0;
                   return Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -129,11 +126,11 @@ class _BillOrderBodyState extends State<_BillOrderBody> {
                       _CountBadge(count: count),
                       const SizedBox(height: 20),
                       _DateFilterBar(
-                        fromDate:  _fromDate,
-                        toDate:    _toDate,
-                        isTablet:  true,
+                        fromDate: _fromDate,
+                        toDate: _toDate,
+                        isTablet: true,
                         onFromTap: () => _pickDate(isFrom: true),
-                        onToTap:   () => _pickDate(isFrom: false),
+                        onToTap: () => _pickDate(isFrom: false),
                       ),
                     ],
                   );
@@ -151,15 +148,13 @@ class _BillOrderBodyState extends State<_BillOrderBody> {
                     return const _LoadingView(isTablet: true);
                   }
                   if (state is BillOrderError) {
-                    return _ErrorState(
-                        message: state.message, isTablet: true);
+                    return _ErrorState(message: state.message, isTablet: true);
                   }
                   if (state is BillOrderLoaded) {
                     if (state.records.isEmpty) {
                       return const _EmptyState(isTablet: true);
                     }
-                    return _BillList(
-                        records: state.records, isTablet: true);
+                    return _BillList(records: state.records, isTablet: true);
                   }
                   return const SizedBox.shrink();
                 },
@@ -180,20 +175,17 @@ class _BillOrderBodyState extends State<_BillOrderBody> {
         gradient: LinearGradient(
           colors: [Color(0xFFF8FAFC), Color(0xFFF1F5F9)],
           begin: Alignment.topCenter,
-          end:   Alignment.bottomCenter,
+          end: Alignment.bottomCenter,
         ),
       ),
       child: Column(children: [
-
         // ── Header ──────────────────────────────────────────────────────
         const _HeaderCard(isTablet: false),
 
         // ── Record count + Date filter ───────────────────────────────────
         BlocBuilder<BillOrderBloc, BillOrderState>(
           builder: (context, state) {
-            final count = state is BillOrderLoaded
-                ? state.records.length
-                : 0;
+            final count = state is BillOrderLoaded ? state.records.length : 0;
             return Padding(
               padding: const EdgeInsets.fromLTRB(16, 0, 16, 10),
               child: Column(
@@ -204,11 +196,11 @@ class _BillOrderBodyState extends State<_BillOrderBody> {
                     const SizedBox(height: 10),
                   ],
                   _DateFilterBar(
-                    fromDate:  _fromDate,
-                    toDate:    _toDate,
-                    isTablet:  false,
+                    fromDate: _fromDate,
+                    toDate: _toDate,
+                    isTablet: false,
                     onFromTap: () => _pickDate(isFrom: true),
-                    onToTap:   () => _pickDate(isFrom: false),
+                    onToTap: () => _pickDate(isFrom: false),
                   ),
                 ],
               ),
@@ -224,15 +216,13 @@ class _BillOrderBodyState extends State<_BillOrderBody> {
                 return const _LoadingView(isTablet: false);
               }
               if (state is BillOrderError) {
-                return _ErrorState(
-                    message: state.message, isTablet: false);
+                return _ErrorState(message: state.message, isTablet: false);
               }
               if (state is BillOrderLoaded) {
                 if (state.records.isEmpty) {
                   return const _EmptyState(isTablet: false);
                 }
-                return _BillList(
-                    records: state.records, isTablet: false);
+                return _BillList(records: state.records, isTablet: false);
               }
               return const SizedBox.shrink();
             },
@@ -262,12 +252,8 @@ class _SectionTitle extends StatelessWidget {
       const SizedBox(width: 10),
       Text(
         'BILL ORDERS',
-        style: GoogleFonts.inter(
-          fontSize:      isTablet ? 20 : 17,
-          fontWeight:    FontWeight.w700,
-          color:         const Color(0xFF1E293B),
-          letterSpacing: 1.2,
-        ),
+        style: AppTypography.heading1(
+            color: const Color(0xFF1E293B), fontWeight: FontWeight.w700),
       ),
     ]);
   }
@@ -288,9 +274,9 @@ class _HeaderCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(18),
         boxShadow: [
           BoxShadow(
-              color:     Colors.black.withValues(alpha: 0.06),
+              color: Colors.black.withValues(alpha: 0.06),
               blurRadius: 16,
-              offset:    const Offset(0, 4)),
+              offset: const Offset(0, 4)),
         ],
       ),
       child: Row(children: [
@@ -302,30 +288,25 @@ class _HeaderCard extends StatelessWidget {
             borderRadius: BorderRadius.circular(14),
             boxShadow: [
               BoxShadow(
-                  color:     const Color(0xFF10B981).withValues(alpha: 0.3),
+                  color: const Color(0xFF10B981).withValues(alpha: 0.3),
                   blurRadius: 10,
-                  offset:    const Offset(0, 4)),
+                  offset: const Offset(0, 4)),
             ],
           ),
-          child: const Icon(Icons.receipt_long,
-              color: Colors.white, size: 24),
+          child: const Icon(Icons.receipt_long, color: Colors.white, size: 24),
         ),
         const SizedBox(width: 14),
         Expanded(
-          child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text('Bill Order Reports',
-                    style: GoogleFonts.inter(
-                      fontSize:   19,
-                      fontWeight: FontWeight.w700,
-                      color:      const Color(0xFF1E293B),
-                    )),
-                const SizedBox(height: 3),
-                Text('View all bill and order transactions',
-                    style: GoogleFonts.inter(
-                        fontSize: 13, color: const Color(0xFF64748B))),
-              ]),
+          child:
+              Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            Text('Bill Order Reports',
+                style: AppTypography.heading1(
+                    color: const Color(0xFF1E293B),
+                    fontWeight: FontWeight.w700)),
+            const SizedBox(height: 3),
+            Text('View all bill and order transactions',
+                style: AppTypography.bodyLarge(color: const Color(0xFF64748B))),
+          ]),
         ),
       ]),
     );
@@ -340,8 +321,7 @@ class _RecordCountPill extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding:
-      const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
       decoration: BoxDecoration(
         color: const Color(0xFFECFDF5),
         borderRadius: BorderRadius.circular(20),
@@ -353,10 +333,8 @@ class _RecordCountPill extends StatelessWidget {
             size: 13, color: Color(0xFF10B981)),
         const SizedBox(width: 5),
         Text("$count records",
-            style: GoogleFonts.inter(
-                color:      const Color(0xFF047857),
-                fontWeight: FontWeight.bold,
-                fontSize:   12)),
+            style: AppTypography.bodyMedium(
+                color: const Color(0xFF047857), fontWeight: FontWeight.bold)),
       ]),
     );
   }
@@ -376,14 +354,14 @@ class _CountBadge extends StatelessWidget {
         gradient: const LinearGradient(
           colors: [Color(0xFF10B981), Color(0xFF059669)],
           begin: Alignment.topLeft,
-          end:   Alignment.bottomRight,
+          end: Alignment.bottomRight,
         ),
         borderRadius: BorderRadius.circular(18),
         boxShadow: [
           BoxShadow(
-              color:     const Color(0xFF10B981).withValues(alpha: 0.3),
+              color: const Color(0xFF10B981).withValues(alpha: 0.3),
               blurRadius: 16,
-              offset:    const Offset(0, 6)),
+              offset: const Offset(0, 6)),
         ],
       ),
       child: Row(children: [
@@ -392,23 +370,17 @@ class _CountBadge extends StatelessWidget {
           decoration: BoxDecoration(
               color: Colors.white.withValues(alpha: 0.2),
               shape: BoxShape.circle),
-          child: const Icon(Icons.receipt_long,
-              color: Colors.white, size: 22),
+          child: const Icon(Icons.receipt_long, color: Colors.white, size: 22),
         ),
         const SizedBox(width: 14),
         Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
           Text('Total Records',
-              style: GoogleFonts.inter(
-                fontSize:   12,
-                color:      Colors.white.withValues(alpha: 0.8),
-                fontWeight: FontWeight.w500,
-              )),
+              style: AppTypography.bodyMedium(
+                  color: Colors.white.withValues(alpha: 0.8),
+                  fontWeight: FontWeight.w500)),
           Text('$count',
-              style: GoogleFonts.inter(
-                fontSize:   28,
-                color:      Colors.white,
-                fontWeight: FontWeight.w700,
-              )),
+              style: AppTypography.display(
+                  color: Colors.white, fontWeight: FontWeight.w700)),
         ]),
       ]),
     );
@@ -417,9 +389,9 @@ class _CountBadge extends StatelessWidget {
 
 // ── Date Filter Bar ───────────────────────────────────────────────────────────
 class _DateFilterBar extends StatelessWidget {
-  final DateTime     fromDate;
-  final DateTime     toDate;
-  final bool         isTablet;
+  final DateTime fromDate;
+  final DateTime toDate;
+  final bool isTablet;
   final VoidCallback onFromTap;
   final VoidCallback onToTap;
 
@@ -436,24 +408,28 @@ class _DateFilterBar extends StatelessWidget {
     final fmt = DateFormat('dd MMM yyyy');
 
     if (isTablet) {
-      return Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            _DateButton(
-                label: 'From', value: fmt.format(fromDate),
-                onTap: onFromTap, isTablet: true),
-            const SizedBox(height: 10),
-            _DateButton(
-                label: 'To', value: fmt.format(toDate),
-                onTap: onToTap, isTablet: true),
-          ]);
+      return Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+        _DateButton(
+            label: 'From',
+            value: fmt.format(fromDate),
+            onTap: onFromTap,
+            isTablet: true),
+        const SizedBox(height: 10),
+        _DateButton(
+            label: 'To',
+            value: fmt.format(toDate),
+            onTap: onToTap,
+            isTablet: true),
+      ]);
     }
 
     return Row(children: [
       Expanded(
         child: _DateButton(
-            label: 'From', value: fmt.format(fromDate),
-            onTap: onFromTap, isTablet: false),
+            label: 'From',
+            value: fmt.format(fromDate),
+            onTap: onFromTap,
+            isTablet: false),
       ),
       // Arrow between dates
       Padding(
@@ -463,8 +439,10 @@ class _DateFilterBar extends StatelessWidget {
       ),
       Expanded(
         child: _DateButton(
-            label: 'To', value: fmt.format(toDate),
-            onTap: onToTap, isTablet: false),
+            label: 'To',
+            value: fmt.format(toDate),
+            onTap: onToTap,
+            isTablet: false),
       ),
     ]);
   }
@@ -472,10 +450,10 @@ class _DateFilterBar extends StatelessWidget {
 
 // ── Date Button ───────────────────────────────────────────────────────────────
 class _DateButton extends StatelessWidget {
-  final String       label;
-  final String       value;
+  final String label;
+  final String value;
   final VoidCallback onTap;
-  final bool         isTablet;
+  final bool isTablet;
 
   const _DateButton({
     required this.label,
@@ -491,7 +469,7 @@ class _DateButton extends StatelessWidget {
       child: Container(
         padding: EdgeInsets.symmetric(
           horizontal: isTablet ? 14 : 11,
-          vertical:   isTablet ? 12 : 10,
+          vertical: isTablet ? 12 : 10,
         ),
         decoration: BoxDecoration(
           color: Colors.white,
@@ -501,9 +479,9 @@ class _DateButton extends StatelessWidget {
               width: 1.5),
           boxShadow: [
             BoxShadow(
-                color:     const Color(0xFF10B981).withValues(alpha: 0.08),
+                color: const Color(0xFF10B981).withValues(alpha: 0.08),
                 blurRadius: 8,
-                offset:    const Offset(0, 3)),
+                offset: const Offset(0, 3)),
           ],
         ),
         child: Row(children: [
@@ -514,33 +492,24 @@ class _DateButton extends StatelessWidget {
                 color: const Color(0xFF10B981).withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(7)),
             child: Icon(Icons.calendar_today_rounded,
-                size:  isTablet ? 14 : 13,
-                color: const Color(0xFF10B981)),
+                size: isTablet ? 14 : 13, color: const Color(0xFF10B981)),
           ),
           const SizedBox(width: 8),
           Expanded(
-            child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(label,
-                      style: GoogleFonts.inter(
-                        fontSize:      isTablet ? 11 : 10,
-                        color:         Colors.grey[500],
-                        fontWeight:    FontWeight.w600,
-                        letterSpacing: 0.5,
-                      )),
-                  const SizedBox(height: 1),
-                  Text(value,
-                      style: GoogleFonts.inter(
-                        fontSize:   isTablet ? 13 : 12,
-                        fontWeight: FontWeight.w700,
-                        color:      const Color(0xFF1E293B),
-                      )),
-                ]),
+            child:
+                Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              Text(label,
+                  style: AppTypography.badgeText(
+                      color: Colors.grey[500], fontWeight: FontWeight.w600)),
+              const SizedBox(height: 1),
+              Text(value,
+                  style: AppTypography.bodyMedium(
+                      color: const Color(0xFF1E293B),
+                      fontWeight: FontWeight.w700)),
+            ]),
           ),
           Icon(Icons.keyboard_arrow_down_rounded,
-              color: const Color(0xFF10B981),
-              size:  isTablet ? 20 : 18),
+              color: const Color(0xFF10B981), size: isTablet ? 20 : 18),
         ]),
       ),
     );
@@ -564,9 +533,7 @@ class _LoadingView extends StatelessWidget {
         ),
         const SizedBox(height: 16),
         Text("Fetching bill orders…",
-            style: GoogleFonts.inter(
-                color: Colors.grey.shade500,
-                fontSize: isTablet ? 14 : 13)),
+            style: AppTypography.bodyLarge(color: Colors.grey.shade500)),
       ]),
     );
   }
@@ -575,7 +542,7 @@ class _LoadingView extends StatelessWidget {
 // ── Bill List ─────────────────────────────────────────────────────────────────
 class _BillList extends StatelessWidget {
   final List<BillViewModel> records;
-  final bool                isTablet;
+  final bool isTablet;
 
   const _BillList({required this.records, required this.isTablet});
 
@@ -584,23 +551,21 @@ class _BillList extends StatelessWidget {
     if (isTablet) {
       return GridView.builder(
         padding: const EdgeInsets.only(bottom: 24),
-        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount:   2,
+        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+          crossAxisCount: MediaQuery.of(context).size.width > 600 ? 4 : 2,
           crossAxisSpacing: 12,
-          mainAxisSpacing:  12,
+          mainAxisSpacing: 12,
           childAspectRatio: 1.55,
         ),
         itemCount: records.length,
-        itemBuilder: (ctx, i) =>
-            _BillCard(bill: records[i], isTablet: true),
+        itemBuilder: (ctx, i) => _BillCard(bill: records[i], isTablet: true),
       );
     }
 
     return ListView.builder(
       padding: const EdgeInsets.fromLTRB(16, 4, 16, 24),
       itemCount: records.length,
-      itemBuilder: (ctx, i) =>
-          _BillCard(bill: records[i], isTablet: false),
+      itemBuilder: (ctx, i) => _BillCard(bill: records[i], isTablet: false),
     );
   }
 }
@@ -608,7 +573,7 @@ class _BillList extends StatelessWidget {
 // ── Bill Card ─────────────────────────────────────────────────────────────────
 class _BillCard extends StatelessWidget {
   final BillViewModel bill;
-  final bool          isTablet;
+  final bool isTablet;
 
   const _BillCard({required this.bill, required this.isTablet});
 
@@ -617,33 +582,31 @@ class _BillCard extends StatelessWidget {
     final isPending = bill.PStatus == 0;
 
     return GestureDetector(
-      onTap:       () => _showDetailsDialog(context),
+      onTap: () => _showDetailsDialog(context),
       onLongPress: () => _showDetailsDialog(context),
       child: Container(
         margin: EdgeInsets.only(bottom: isTablet ? 0 : 12),
         decoration: BoxDecoration(
-          color:         Colors.white,
+          color: Colors.white,
           borderRadius: BorderRadius.circular(16),
           border: Border.all(
               color: const Color(0xFF10B981).withValues(alpha: 0.1),
               width: 1.2),
           boxShadow: [
             BoxShadow(
-                color:     Colors.black.withValues(alpha: 0.05),
+                color: Colors.black.withValues(alpha: 0.05),
                 blurRadius: 10,
-                offset:    const Offset(0, 3)),
+                offset: const Offset(0, 3)),
           ],
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisSize: MainAxisSize.min,
           children: [
-
             // ── Card Header ──────────────────────────────────
             Container(
               padding: EdgeInsets.symmetric(
-                  horizontal: isTablet ? 14 : 16,
-                  vertical:   isTablet ? 10 : 12),
+                  horizontal: isTablet ? 14 : 16, vertical: isTablet ? 10 : 12),
               decoration: BoxDecoration(
                 gradient: LinearGradient(
                   colors: [
@@ -651,10 +614,10 @@ class _BillCard extends StatelessWidget {
                     const Color(0xFF10B981).withBlue(170),
                   ],
                   begin: Alignment.centerLeft,
-                  end:   Alignment.centerRight,
+                  end: Alignment.centerRight,
                 ),
                 borderRadius: const BorderRadius.only(
-                  topLeft:  Radius.circular(15),
+                  topLeft: Radius.circular(15),
                   topRight: Radius.circular(15),
                 ),
               ),
@@ -673,27 +636,21 @@ class _BillCard extends StatelessWidget {
                   child: Text(
                     bill.BillNoDisplay,
                     overflow: TextOverflow.ellipsis,
-                    style: GoogleFonts.inter(
-                      fontSize:   isTablet ? 14 : 15,
-                      fontWeight: FontWeight.w700,
-                      color:      Colors.white,
-                    ),
+                    style: AppTypography.heading2(
+                        color: Colors.white, fontWeight: FontWeight.w700),
                   ),
                 ),
                 // Date badge
                 Container(
-                  padding: const EdgeInsets.symmetric(
-                      horizontal: 8, vertical: 4),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                   decoration: BoxDecoration(
                     color: Colors.white.withValues(alpha: 0.18),
                     borderRadius: BorderRadius.circular(20),
                   ),
                   child: Text(bill.BillNoDisplay1,
-                      style: GoogleFonts.inter(
-                        fontSize:   isTablet ? 10 : 11,
-                        color:      Colors.white,
-                        fontWeight: FontWeight.w600,
-                      )),
+                      style: AppTypography.bodySmall(
+                          color: Colors.white, fontWeight: FontWeight.w600)),
                 ),
               ]),
             ),
@@ -704,85 +661,75 @@ class _BillCard extends StatelessWidget {
               child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-
                     // Supplier name
                     Text(
                       bill.SupplierName,
                       overflow: TextOverflow.ellipsis,
-                      style: GoogleFonts.inter(
-                        fontSize:   isTablet ? 13 : 14,
-                        color:      const Color(0xFF334155),
-                        fontWeight: FontWeight.w700,
-                      ),
+                      style: AppTypography.heading3(
+                          color: const Color(0xFF334155),
+                          fontWeight: FontWeight.w700),
                     ),
                     SizedBox(height: isTablet ? 4 : 6),
 
                     // Employee + Invoice row
                     Row(children: [
                       Icon(Icons.person_outline_rounded,
-                          size:  isTablet ? 13 : 14,
+                          size: isTablet ? 13 : 14,
                           color: const Color(0xFF94A3B8)),
                       const SizedBox(width: 4),
                       Expanded(
                         child: Text(
                           bill.EmployeeName,
                           overflow: TextOverflow.ellipsis,
-                          style: GoogleFonts.inter(
-                            fontSize: isTablet ? 12 : 13,
-                            color:    const Color(0xFF64748B),
-                          ),
+                          style: AppTypography.bodyLarge(
+                              color: const Color(0xFF64748B)),
                         ),
                       ),
                       if (bill.InvoiceNo.isNotEmpty) ...[
                         Icon(Icons.description_outlined,
-                            size:  isTablet ? 13 : 14,
+                            size: isTablet ? 13 : 14,
                             color: const Color(0xFF94A3B8)),
                         const SizedBox(width: 4),
                         Text(bill.InvoiceNo,
-                            style: GoogleFonts.inter(
-                              fontSize: isTablet ? 12 : 13,
-                              color:    const Color(0xFF64748B),
-                            )),
+                            style: AppTypography.bodyLarge(
+                                color: const Color(0xFF64748B))),
                       ],
                     ]),
                     SizedBox(height: isTablet ? 8 : 10),
 
                     // Status + Amount
                     Row(
-                        mainAxisAlignment:
-                        MainAxisAlignment.spaceBetween,
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           // Status pill
                           _StatusPill(
                               isPending: isPending,
-                              fontSize:  isTablet ? 11 : 12),
+                              fontSize: isTablet ? 11 : 12),
 
                           // Amount badge
                           Container(
                             padding: const EdgeInsets.symmetric(
                                 horizontal: 12, vertical: 5),
                             decoration: BoxDecoration(
-                              color: const Color(0xFF10B981).withValues(alpha: 0.1),
+                              color: const Color(0xFF10B981)
+                                  .withValues(alpha: 0.1),
                               borderRadius: BorderRadius.circular(20),
                               border: Border.all(
-                                  color: const Color(0xFF10B981).withValues(alpha: 0.2),
+                                  color: const Color(0xFF10B981)
+                                      .withValues(alpha: 0.2),
                                   width: 1),
                             ),
-                            child: Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  const Icon(Icons.attach_money_rounded,
-                                      size: 14,
-                                      color: Color(0xFF047857)),
-                                  Text(
-                                    'RM ${bill.NetAmt.toStringAsFixed(2)}',
-                                    style: GoogleFonts.inter(
-                                      color:      const Color(0xFF047857),
-                                      fontWeight: FontWeight.w700,
-                                      fontSize:   isTablet ? 12 : 13,
-                                    ),
-                                  ),
-                                ]),
+                            child:
+                                Row(mainAxisSize: MainAxisSize.min, children: [
+                              const Icon(Icons.attach_money_rounded,
+                                  size: 14, color: Color(0xFF047857)),
+                              Text(
+                                'RM ${bill.NetAmt.toStringAsFixed(2)}',
+                                style: AppTypography.heading3(
+                                    color: const Color(0xFF047857),
+                                    fontWeight: FontWeight.w700),
+                              ),
+                            ]),
                           ),
                         ]),
                   ]),
@@ -798,46 +745,43 @@ class _BillCard extends StatelessWidget {
     final isTablet = MediaQuery.of(context).size.width >= 600;
 
     showGeneralDialog(
-      context:            context,
+      context: context,
       barrierDismissible: true,
-      barrierLabel:       '',
-      barrierColor:       Colors.black54,
+      barrierLabel: '',
+      barrierColor: colour.commonColor,
       transitionDuration: const Duration(milliseconds: 280),
       pageBuilder: (_, __, ___) => Center(
         child: Material(
           color: Colors.transparent,
           child: Container(
-            width: isTablet
-                ? 480
-                : MediaQuery.of(context).size.width * 0.92,
+            width: isTablet ? 480 : MediaQuery.of(context).size.width * 0.92,
             constraints: BoxConstraints(
               maxHeight: MediaQuery.of(context).size.height * 0.82,
             ),
             decoration: BoxDecoration(
-              color:        Colors.white,
+              color: Colors.white,
               borderRadius: BorderRadius.circular(22),
               boxShadow: [
                 BoxShadow(
-                    color:     Colors.black.withValues(alpha: 0.15),
+                    color: Colors.black.withValues(alpha: 0.15),
                     blurRadius: 30,
-                    offset:    const Offset(0, 10)),
+                    offset: const Offset(0, 10)),
               ],
             ),
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-
                 // Dialog header
                 Container(
                   width: double.infinity,
                   padding: EdgeInsets.symmetric(
-                    vertical:   isTablet ? 20 : 18,
+                    vertical: isTablet ? 20 : 18,
                     horizontal: isTablet ? 28 : 24,
                   ),
                   decoration: const BoxDecoration(
                     gradient: AppTokens.primaryGradient,
                     borderRadius: BorderRadius.only(
-                      topLeft:  Radius.circular(22),
+                      topLeft: Radius.circular(22),
                       topRight: Radius.circular(22),
                     ),
                   ),
@@ -852,11 +796,8 @@ class _BillCard extends StatelessWidget {
                     ),
                     const SizedBox(width: 12),
                     Text('Bill Details',
-                        style: GoogleFonts.inter(
-                          fontSize:   isTablet ? 20 : 18,
-                          fontWeight: FontWeight.w700,
-                          color:      Colors.white,
-                        )),
+                        style: AppTypography.heading1(
+                            color: Colors.white, fontWeight: FontWeight.w700)),
                     const Spacer(),
                     // Close X button in header
                     GestureDetector(
@@ -877,39 +818,40 @@ class _BillCard extends StatelessWidget {
                 // Scrollable body
                 Flexible(
                   child: SingleChildScrollView(
-                    padding:
-                    EdgeInsets.all(isTablet ? 24 : 20),
+                    padding: EdgeInsets.all(isTablet ? 24 : 20),
                     child: Column(children: [
-                      _DetailRow(icon: Icons.receipt_long,
+                      _DetailRow(
+                          icon: Icons.receipt_long,
                           label: 'Bill No',
                           value: bill.BillNoDisplay),
                       _DetailRow(
-                          icon:  Icons.local_shipping_outlined,
+                          icon: Icons.local_shipping_outlined,
                           label: 'Supplier',
                           value: bill.SupplierName),
-                      _DetailRow(icon: Icons.badge_outlined,
+                      _DetailRow(
+                          icon: Icons.badge_outlined,
                           label: 'Employee',
                           value: bill.EmployeeName),
                       _DetailRow(
-                          icon:  Icons.fire_truck_outlined,
+                          icon: Icons.fire_truck_outlined,
                           label: 'Truck Name',
                           value: bill.TruckName),
                       _DetailRow(
-                          icon:  Icons.account_circle_outlined,
+                          icon: Icons.account_circle_outlined,
                           label: 'Driver Name',
                           value: bill.DriverName),
-                      _DetailRow(icon: Icons.numbers_outlined,
+                      _DetailRow(
+                          icon: Icons.numbers_outlined,
                           label: 'Job No',
                           value: bill.BillNoDisplay1),
                       _DetailRow(
-                          icon:  Icons.description_outlined,
+                          icon: Icons.description_outlined,
                           label: 'Invoice',
                           value: bill.InvoiceNo),
                       _DetailRow(
-                          icon:  Icons.currency_exchange_outlined,
+                          icon: Icons.currency_exchange_outlined,
                           label: 'Net Amount',
-                          value:
-                          'RM ${bill.NetAmt.toStringAsFixed(2)}'),
+                          value: 'RM ${bill.NetAmt.toStringAsFixed(2)}'),
 
                       const SizedBox(height: 8),
 
@@ -921,8 +863,8 @@ class _BillCard extends StatelessWidget {
                         decoration: BoxDecoration(
                           color: const Color(0xFFF8FAFC),
                           borderRadius: BorderRadius.circular(12),
-                          border: Border.all(
-                              color: Colors.grey.shade100, width: 1),
+                          border:
+                              Border.all(color: Colors.grey.shade100, width: 1),
                         ),
                         child: Row(children: [
                           Container(
@@ -930,8 +872,7 @@ class _BillCard extends StatelessWidget {
                             height: 36,
                             decoration: BoxDecoration(
                               color: const Color(0xFFECFDF5),
-                              borderRadius:
-                              BorderRadius.circular(8),
+                              borderRadius: BorderRadius.circular(8),
                             ),
                             child: const Icon(
                                 Icons.check_circle_outline_rounded,
@@ -940,19 +881,16 @@ class _BillCard extends StatelessWidget {
                           ),
                           const SizedBox(width: 12),
                           Column(
-                              crossAxisAlignment:
-                              CrossAxisAlignment.start,
+                              crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text('Status',
-                                    style: GoogleFonts.inter(
-                                      fontSize:   11,
-                                      color:      Colors.grey[500],
-                                      fontWeight: FontWeight.w600,
-                                    )),
+                                    style: AppTypography.bodySmall(
+                                        color: Colors.grey[500],
+                                        fontWeight: FontWeight.w600)),
                                 const SizedBox(height: 3),
                                 _StatusPill(
                                     isPending: bill.PStatus == 0,
-                                    fontSize:  isTablet ? 13 : 12),
+                                    fontSize: isTablet ? 13 : 12),
                               ]),
                         ]),
                       ),
@@ -964,21 +902,16 @@ class _BillCard extends StatelessWidget {
                         width: double.infinity,
                         height: 48,
                         child: ElevatedButton.icon(
-                          onPressed: () =>
-                              Navigator.of(context).pop(),
-                          icon: const Icon(Icons.check_rounded,
-                              size: 18),
+                          onPressed: () => Navigator.of(context).pop(),
+                          icon: const Icon(Icons.check_rounded, size: 18),
                           label: Text('Close',
-                              style: GoogleFonts.inter(
-                                  fontWeight: FontWeight.w600,
-                                  fontSize: 15)),
+                              style: AppTypography.heading2(
+                                  fontWeight: FontWeight.w600)),
                           style: ElevatedButton.styleFrom(
-                            backgroundColor:
-                            const Color(0xFF2563EB),
+                            backgroundColor: const Color(0xFF2563EB),
                             foregroundColor: Colors.white,
                             shape: RoundedRectangleBorder(
-                                borderRadius:
-                                BorderRadius.circular(12)),
+                                borderRadius: BorderRadius.circular(12)),
                             elevation: 0,
                           ),
                         ),
@@ -992,8 +925,7 @@ class _BillCard extends StatelessWidget {
         ),
       ),
       transitionBuilder: (_, anim, __, child) => ScaleTransition(
-        scale:
-        CurvedAnimation(parent: anim, curve: Curves.easeOutBack),
+        scale: CurvedAnimation(parent: anim, curve: Curves.easeOutBack),
         child: FadeTransition(opacity: anim, child: child),
       ),
     );
@@ -1002,19 +934,16 @@ class _BillCard extends StatelessWidget {
 
 // ── Status Pill ───────────────────────────────────────────────────────────────
 class _StatusPill extends StatelessWidget {
-  final bool   isPending;
+  final bool isPending;
   final double fontSize;
   const _StatusPill({required this.isPending, required this.fontSize});
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding:
-      const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
       decoration: BoxDecoration(
-        color: isPending
-            ? const Color(0xFFFEF3C7)
-            : const Color(0xFFD1FAE5),
+        color: isPending ? const Color(0xFFFEF3C7) : const Color(0xFFD1FAE5),
         borderRadius: BorderRadius.circular(20),
         border: Border.all(
           color: isPending
@@ -1025,24 +954,17 @@ class _StatusPill extends StatelessWidget {
       ),
       child: Row(mainAxisSize: MainAxisSize.min, children: [
         Icon(
-          isPending
-              ? Icons.schedule_rounded
-              : Icons.check_circle_rounded,
+          isPending ? Icons.schedule_rounded : Icons.check_circle_rounded,
           size: 12,
-          color: isPending
-              ? const Color(0xFF92400E)
-              : const Color(0xFF047857),
+          color: isPending ? const Color(0xFF92400E) : const Color(0xFF047857),
         ),
         const SizedBox(width: 4),
         Text(
           isPending ? 'Pending' : 'Completed',
-          style: GoogleFonts.inter(
-            color: isPending
-                ? const Color(0xFF92400E)
-                : const Color(0xFF047857),
-            fontWeight: FontWeight.w700,
-            fontSize:   fontSize,
-          ),
+          style: AppTypography.bodyLarge(
+              color: isPending
+                  ? const Color(0xFF92400E)
+                  : const Color(0xFF047857)),
         ),
       ]),
     );
@@ -1052,8 +974,8 @@ class _StatusPill extends StatelessWidget {
 // ── Detail Row (Dialog) ───────────────────────────────────────────────────────
 class _DetailRow extends StatelessWidget {
   final IconData icon;
-  final String   label;
-  final String   value;
+  final String label;
+  final String value;
 
   const _DetailRow({
     required this.icon,
@@ -1071,42 +993,29 @@ class _DetailRow extends StatelessWidget {
           width: 36,
           height: 36,
           decoration: BoxDecoration(
-            color:         const Color(0xFFECFDF5),
+            color: const Color(0xFFECFDF5),
             borderRadius: BorderRadius.circular(9),
           ),
-          child: Icon(icon,
-              color: const Color(0xFF10B981), size: 17),
+          child: Icon(icon, color: const Color(0xFF10B981), size: 17),
         ),
         const SizedBox(width: 12),
         Expanded(
-          child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(label,
-                    style: GoogleFonts.inter(
-                      fontSize:      11,
-                      color:         Colors.grey[500],
-                      fontWeight:    FontWeight.w600,
-                      letterSpacing: 0.4,
-                    )),
-                const SizedBox(height: 2),
-                Text(
-                  isEmpty ? 'N/A' : value,
-                  style: GoogleFonts.inter(
-                    fontSize:   14,
-                    fontWeight: FontWeight.w600,
-                    color: isEmpty
-                        ? Colors.grey
-                        : const Color(0xFF1E293B),
-                  ),
-                ),
-                // Underline divider
-                const SizedBox(height: 8),
-                Divider(
-                    height: 1,
-                    thickness: 0.5,
-                    color: Colors.grey.shade100),
-              ]),
+          child:
+              Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            Text(label,
+                style: AppTypography.bodySmall(
+                    color: Colors.grey[500], fontWeight: FontWeight.w600)),
+            const SizedBox(height: 2),
+            Text(
+              isEmpty ? 'N/A' : value,
+              style: AppTypography.bodyLarge(
+                  color: isEmpty ? Colors.grey : const Color(0xFF1E293B),
+                  fontWeight: FontWeight.w600),
+            ),
+            // Underline divider
+            const SizedBox(height: 8),
+            Divider(height: 1, thickness: 0.5, color: Colors.grey.shade100),
+          ]),
         ),
       ]),
     );
@@ -1116,7 +1025,7 @@ class _DetailRow extends StatelessWidget {
 // ── Error State ───────────────────────────────────────────────────────────────
 class _ErrorState extends StatelessWidget {
   final String message;
-  final bool   isTablet;
+  final bool isTablet;
   const _ErrorState({required this.message, required this.isTablet});
 
   @override
@@ -1128,42 +1037,32 @@ class _ErrorState extends StatelessWidget {
           Container(
             padding: const EdgeInsets.all(20),
             decoration: BoxDecoration(
-                color: Colors.red.shade50, shape: BoxShape.circle),
+                color: colour.commonColorred.withValues(alpha: 0.1),
+                shape: BoxShape.circle),
             child: Icon(Icons.error_outline,
-                color: Colors.red.shade400,
-                size: isTablet ? 44 : 38),
+                color: colour.commonColorred, size: isTablet ? 44 : 38),
           ),
           SizedBox(height: isTablet ? 16 : 14),
           Text("Something went wrong",
-              style: GoogleFonts.inter(
-                fontSize:   isTablet ? 17 : 15,
-                fontWeight: FontWeight.w700,
-                color:      const Color(0xFF1E293B),
-              )),
+              style: AppTypography.heading2(
+                  color: const Color(0xFF1E293B), fontWeight: FontWeight.w700)),
           SizedBox(height: isTablet ? 8 : 6),
           Text(message,
               textAlign: TextAlign.center,
-              style: GoogleFonts.inter(
-                  color:    Colors.grey,
-                  fontSize: isTablet ? 14 : 13)),
+              style: AppTypography.bodyLarge(color: Colors.grey)),
           SizedBox(height: isTablet ? 20 : 16),
           ElevatedButton.icon(
             onPressed: () => context
                 .read<BillOrderBloc>()
                 .add(LoadBillOrderEvent(
-              fromDate: DateFormat('MM/dd/yyyy').format(
-                  DateTime(DateTime.now().year,
-                      DateTime.now().month, 1)),
-              toDate: DateFormat('MM/dd/yyyy').format(
-                  DateTime(DateTime.now().year,
-                      DateTime.now().month + 1, 0)),
-            )),
-            icon:  Icon(Icons.refresh_rounded,
-                size: isTablet ? 20 : 18),
+                  fromDate: DateFormat('MM/dd/yyyy').format(
+                      DateTime(DateTime.now().year, DateTime.now().month, 1)),
+                  toDate: DateFormat('MM/dd/yyyy').format(DateTime(
+                      DateTime.now().year, DateTime.now().month + 1, 0)),
+                )),
+            icon: Icon(Icons.refresh_rounded, size: isTablet ? 20 : 18),
             label: Text('Try Again',
-                style: GoogleFonts.inter(
-                    fontSize:   isTablet ? 15 : 14,
-                    fontWeight: FontWeight.w600)),
+                style: AppTypography.bodyLarge(fontWeight: FontWeight.w600)),
             style: ElevatedButton.styleFrom(
               backgroundColor: const Color(0xFF10B981),
               foregroundColor: Colors.white,
@@ -1171,7 +1070,7 @@ class _ErrorState extends StatelessWidget {
                   borderRadius: BorderRadius.circular(12)),
               padding: EdgeInsets.symmetric(
                 horizontal: isTablet ? 28 : 22,
-                vertical:   isTablet ? 12 : 11,
+                vertical: isTablet ? 12 : 11,
               ),
               elevation: 0,
             ),
@@ -1196,22 +1095,16 @@ class _EmptyState extends StatelessWidget {
           decoration: const BoxDecoration(
               color: Color(0xFFECFDF5), shape: BoxShape.circle),
           child: Icon(Icons.receipt_long_outlined,
-              size:  isTablet ? 52 : 44,
-              color: const Color(0xFF10B981)),
+              size: isTablet ? 52 : 44, color: const Color(0xFF10B981)),
         ),
         SizedBox(height: isTablet ? 20 : 16),
         Text('No Bill Records',
-            style: GoogleFonts.inter(
-              fontSize:   isTablet ? 18 : 16,
-              fontWeight: FontWeight.w700,
-              color:      const Color(0xFF334155),
-            )),
+            style: AppTypography.heading1(
+                color: const Color(0xFF334155), fontWeight: FontWeight.w700)),
         SizedBox(height: isTablet ? 8 : 6),
         Text('No bill orders found for the selected period',
             textAlign: TextAlign.center,
-            style: GoogleFonts.inter(
-                fontSize: isTablet ? 14 : 13,
-                color:    Colors.grey.shade400)),
+            style: AppTypography.bodyLarge(color: Colors.grey.shade400)),
       ]),
     );
   }

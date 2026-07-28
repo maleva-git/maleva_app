@@ -1,11 +1,10 @@
-import 'package:maleva/core/network/api_legacy_helper.dart';
-import 'package:maleva/core/network/api_constants.dart';
+import 'dart:io';
 import 'dart:async';
 import 'dart:convert';
-import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:maleva/core/utils/app_globals.dart';
-import 'api_client.dart';
+import 'package:maleva/core/network/api_constants.dart';
+import 'package:maleva/core/network/dio_client.dart';
 import 'package:maleva/core/models/shared/agent_company_model.dart';
 import 'package:maleva/features/operations/models/job_all_status_model.dart';
 import 'package:maleva/features/operations/models/job_type_model.dart';
@@ -28,6 +27,72 @@ import 'package:maleva/core/models/shared/location_model.dart';
 import 'package:maleva/core/models/shared/response_view_model.dart';
 import 'package:maleva/core/models/shared/r_t_i_details_view_model.dart';
 
+class LegacyApiRepository {
+  final DioClient _dioClient;
+
+  LegacyApiRepository(this._dioClient);
+
+  List<dynamic> _ensureList(dynamic data) {
+    if (data == null) return [];
+    if (data is List) return data;
+    if (data is Map) return [data];
+    return [];
+  }
+
+  dynamic _ensureMap(dynamic data) {
+    if (data == null) return {};
+    if (data is Map) return data;
+    if (data is List && data.isNotEmpty) return data[0];
+    return {};
+  }
+
+  // Generic methods for direct ApiLegacyHelper replacements
+  Future<dynamic> post(String url, {dynamic data, BuildContext? context}) async {
+    try {
+      final response = await _dioClient.dio.post(url, data: data ?? {});
+      return response.data;
+    } catch (e) {
+      print("API Error: $e");
+      return null;
+    }
+  }
+
+  Future<List<dynamic>> postList(String url, {dynamic data, BuildContext? context}) async {
+    try {
+      final response = await _dioClient.dio.post(url, data: data ?? {});
+      return _ensureList(response.data);
+    } catch (e) {
+      print("API Error: $e");
+      return [];
+    }
+  }
+
+  // Backward compatible methods for ApiLegacyHelper replacement
+  Future<List<dynamic>> apiAllinoneSelect(dynamic api, [dynamic insertDetails, Map<String, String>? header, BuildContext? context]) async {
+    final result = await postList(api.toString(), data: insertDetails);
+    return result;
+  }
+
+  Future<dynamic> apiAllinoneSelectArray(dynamic api, [dynamic insertDetails, Map<String, String>? header, BuildContext? context]) async {
+    final result = await post(api.toString(), data: insertDetails);
+    return result;
+  }
+
+  Future<dynamic> apiAllinone(dynamic api, [dynamic insertDetails, Map<String, String>? header, BuildContext? context]) async {
+    final result = await post(api.toString(), data: insertDetails);
+    return result;
+  }
+
+  Future<String> apiGetString(dynamic api, [dynamic insertDetails, Map<String, String>? header, BuildContext? context]) async {
+    try {
+      final response = await _dioClient.dio.get(api.toString(), data: insertDetails);
+      return response.data?.toString() ?? '';
+    } catch (e) {
+      print("API Error: $e");
+      return '';
+    }
+  }
+
 Future<bool> Login(String Username, String Password, String OldUsername,int DriverId, context) async {
   try {
 
@@ -37,10 +102,7 @@ Future<bool> Login(String Username, String Password, String OldUsername,int Driv
       'Token':AppGlobals.mobiletoken,
     };
     try {
-  final result = await ApiLegacyHelper.apiAllinoneSelectArrayWithOutAuth(Uri.encodeFull("${ApiConstants.apiLoginSuccess}$Username&Pwd=$Password&olduserid=$OldUsername&DriverId=$DriverId"),
-            null,
-            header,
-            context);
+  final result = ((await _dioClient.dio.post(Uri.encodeFull("${ApiConstants.apiLoginSuccess}$Username&Pwd=$Password&olduserid=$OldUsername&DriverId=$DriverId"), data: null ?? {})).data);
   if (result != null) {
 
         if (result is Map<String, dynamic>) {
@@ -156,20 +218,7 @@ Future<bool> Login(String Username, String Password, String OldUsername,int Driv
           flag = 0;
         }
       }
-} catch (error, stackTrace) {
-  msgshow(
-          error.toString(),
-          stackTrace.toString(),
-          Colors.white,
-          Colors.red,
-          null,
-          18.00 - AppGlobals.reducesize,
-          AppGlobals.tll,
-          AppGlobals.tgc,
-          context,
-          2);
-      flag = 0;
-}
+} catch (e) { print("API Error: $e"); }
 
     if (flag == 1) {
       return true;
@@ -186,26 +235,14 @@ Future SelectUser(context) async {
     AppGlobals.UserList.clear();
     var Comid = AppGlobals.storagenew.getInt('Comid') ?? 0;
     try {
-  final resultData = await ApiLegacyHelper.apiAllinoneSelect(
-            Uri.encodeFull("${ApiConstants.apiSelectUser}$Comid"), null, null, context);
+  final resultData = _ensureList((await _dioClient.dio.post(
+            Uri.encodeFull("${ApiConstants.apiSelectUser}$Comid"), data: null ?? {})).data);
   if (resultData.isNotEmpty) {
         AppGlobals.UserList = resultData
             .map((element) => UserLoginModel.fromJson(element))
             .toList();
       }
-} catch (error, stackTrace) {
-  msgshow(
-          error.toString(),
-          stackTrace.toString(),
-          Colors.white,
-          Colors.red,
-          null,
-          18.00 - AppGlobals.reducesize,
-          AppGlobals.tll,
-          AppGlobals.tgc,
-          context,
-          2);
-}
+} catch (e) { print("API Error: $e"); }
 
   } catch (error) {
     if (error.toString() == "") {}
@@ -217,26 +254,14 @@ Future SelectCustomer(context) async {
     AppGlobals.CustomerList.clear();
     var Comid = AppGlobals.storagenew.getInt('Comid') ?? 0;
     try {
-  final resultData = await ApiLegacyHelper.apiAllinoneSelect(
-            Uri.encodeFull("${ApiConstants.apiSelectCustomer}$Comid"), null, null, context);
+  final resultData = _ensureList((await _dioClient.dio.post(
+            Uri.encodeFull("${ApiConstants.apiSelectCustomer}$Comid"), data: null ?? {})).data);
   if (resultData.isNotEmpty) {
         AppGlobals.CustomerList = resultData
             .map((element) => CustomerModel.fromJson(element))
             .toList();
       }
-} catch (error, stackTrace) {
-  msgshow(
-          error.toString(),
-          stackTrace.toString(),
-          Colors.white,
-          Colors.red,
-          null,
-          18.00 - AppGlobals.reducesize,
-          AppGlobals.tll,
-          AppGlobals.tgc,
-          context,
-          2);
-}
+} catch (e) { print("API Error: $e"); }
 
   } catch (error) {
     if (error.toString() == "") {}
@@ -248,26 +273,14 @@ Future SelectLocation(context) async {
     AppGlobals.LocationList.clear();
     var Comid = AppGlobals.storagenew.getInt('Comid') ?? 0;
     try {
-  final resultData = await ApiLegacyHelper.apiAllinoneSelect(
-        Uri.encodeFull("${ApiConstants.apiSelectLocation}$Comid"), null, null, context);
+  final resultData = _ensureList((await _dioClient.dio.post(
+        Uri.encodeFull("${ApiConstants.apiSelectLocation}$Comid"), data: null ?? {})).data);
   if (resultData.isNotEmpty) {
         AppGlobals.LocationList = resultData
             .map((element) => LocationModel.fromJson(element))
             .toList();
       }
-} catch (error, stackTrace) {
-  msgshow(
-          error.toString(),
-          stackTrace.toString(),
-          Colors.white,
-          Colors.red,
-          null,
-          18.00 - AppGlobals.reducesize,
-          AppGlobals.tll,
-          AppGlobals.tgc,
-          context,
-          2);
-}
+} catch (e) { print("API Error: $e"); }
 
   } catch (error) {
     if (error.toString() == "") {}
@@ -279,26 +292,14 @@ Future SelectWareHouse(context) async {
     AppGlobals.WareHouseList.clear();
     var Comid = AppGlobals.storagenew.getInt('Comid') ?? 0;
     try {
-  final resultData = await ApiLegacyHelper.apiAllinoneSelectArrayWithOutAuth(
-        Uri.encodeFull("${ApiConstants.apiWareHouseCombo}$Comid"), null, null, context);
+  final resultData = ((await _dioClient.dio.post(
+        Uri.encodeFull("${ApiConstants.apiWareHouseCombo}$Comid"), data: null ?? {})).data);
   if (resultData.isNotEmpty) {
         AppGlobals.WareHouseList = resultData["Data1"]
             .map((element) => WareHouseModel.fromJson(element))
             .toList().cast<WareHouseModel>();
       }
-} catch (error, stackTrace) {
-  msgshow(
-          error.toString(),
-          stackTrace.toString(),
-          Colors.white,
-          Colors.red,
-          null,
-          18.00 - AppGlobals.reducesize,
-          AppGlobals.tll,
-          AppGlobals.tgc,
-          context,
-          2);
-}
+} catch (e) { print("API Error: $e"); }
 
   } catch (error) {
     if (error.toString() == "") {}
@@ -310,26 +311,14 @@ Future SelectStockJob(context) async {
     AppGlobals.StockJobList.clear();
     var Comid = AppGlobals.storagenew.getInt('Comid') ?? 0;
     try {
-  final resultData = await ApiLegacyHelper.apiAllinoneSelectArrayWithOutAuth(
-        Uri.encodeFull("${ApiConstants.apiSelectStockJob}$Comid"), null, null, context);
+  final resultData = ((await _dioClient.dio.post(
+        Uri.encodeFull("${ApiConstants.apiSelectStockJob}$Comid"), data: null ?? {})).data);
   if (resultData.isNotEmpty) {
         AppGlobals.StockJobList = resultData["Data1"]
             .map((element) => WareHouseModel.fromJson(element))
             .toList().cast<WareHouseModel>();
       }
-} catch (error, stackTrace) {
-  msgshow(
-          error.toString(),
-          stackTrace.toString(),
-          Colors.white,
-          Colors.red,
-          null,
-          18.00 - AppGlobals.reducesize,
-          AppGlobals.tll,
-          AppGlobals.tgc,
-          context,
-          2);
-}
+} catch (e) { print("API Error: $e"); }
 
   } catch (error) {
     if (error.toString() == "") {}
@@ -341,29 +330,14 @@ Future SelectEmployee(context, String type, String type1) async {
     AppGlobals.EmployeeList.clear();
     var Comid = AppGlobals.storagenew.getInt('Comid') ?? 0;
     try {
-  final resultData = await ApiLegacyHelper.apiAllinoneSelect(
-            Uri.encodeFull("${ApiConstants.apiSelectEmployee}$Comid&type=$type&type1=$type1"),
-            null,
-            null,
-            context);
+  final resultData = _ensureList((await _dioClient.dio.post(
+            Uri.encodeFull("${ApiConstants.apiSelectEmployee}$Comid&type=$type&type1=$type1"), data: null ?? {})).data);
   if (resultData.isNotEmpty) {
         AppGlobals.EmployeeList = resultData
             .map((element) => EmployeeModel.fromJson(element))
             .toList();
       }
-} catch (error, stackTrace) {
-  msgshow(
-          error.toString(),
-          stackTrace.toString(),
-          Colors.white,
-          Colors.red,
-          null,
-          18.00 - AppGlobals.reducesize,
-          AppGlobals.tll,
-          AppGlobals.tgc,
-          context,
-          2);
-}
+} catch (e) { print("API Error: $e"); }
 
   } catch (error) {
     if (error.toString() == "") {}
@@ -375,26 +349,14 @@ Future SelectJobStatus(context) async {
     AppGlobals.JobStatusList.clear();
     var Comid = AppGlobals.storagenew.getInt('Comid') ?? 0;
     try {
-  final resultData = await ApiLegacyHelper.apiAllinoneSelect(
-            Uri.encodeFull("${ApiConstants.apiSelectJobStatus}$Comid"), null, null, context);
+  final resultData = _ensureList((await _dioClient.dio.post(
+            Uri.encodeFull("${ApiConstants.apiSelectJobStatus}$Comid"), data: null ?? {})).data);
   if (resultData.isNotEmpty) {
         AppGlobals.JobStatusList = resultData
             .map((element) => JobStatusModel.fromJson(element))
             .toList();
       }
-} catch (error, stackTrace) {
-  msgshow(
-          error.toString(),
-          stackTrace.toString(),
-          Colors.white,
-          Colors.red,
-          null,
-          18.00 - AppGlobals.reducesize,
-          AppGlobals.tll,
-          AppGlobals.tgc,
-          context,
-          2);
-}
+} catch (e) { print("API Error: $e"); }
 
   } catch (error) {
     if (error.toString() == "") {}
@@ -405,25 +367,12 @@ Future MaxSaleOrderNo(context, String BillType) async {
   try {
     var Comid = AppGlobals.storagenew.getInt('Comid') ?? 0;
     try {
-  final resultData = await ApiLegacyHelper.apiGetString(
-            "${ApiConstants.apiMaxSaleOrderNo}$Comid&BillType=$BillType");
+  final resultData = ((await _dioClient.dio.post(
+            "${ApiConstants.apiMaxSaleOrderNo}$Comid&BillType=$BillType", data: {})).data?.toString() ?? "");
   if (resultData.isNotEmpty) {
         AppGlobals.MaxSaleOrderNum = resultData;
       }
-} catch (error, stackTrace) {
-  msgshow(
-          error.toString(),
-          stackTrace.toString(),
-          Colors.white,
-          Colors.red,
-          null,
-
-          18.00 - AppGlobals.reducesize,
-          AppGlobals.tll,
-          AppGlobals.tgc,
-          context,
-          2);
-}
+} catch (e) { print("API Error: $e"); }
 
   } catch (error) {
     if (error.toString() == "") {}
@@ -434,25 +383,13 @@ Future MaxStockNo(context) async {
   try {
     var Comid = AppGlobals.storagenew.getInt('Comid') ?? 0;
     try {
-  final resultData = await ApiLegacyHelper.apiAllinoneSelectArray(
-            Uri.encodeFull("${ApiConstants.apiMaxStockNo}$Comid"), null, null, context);
+  final resultData = ((await _dioClient.dio.post(
+            Uri.encodeFull("${ApiConstants.apiMaxStockNo}$Comid"), data: null ?? {})).data);
   if (resultData.isNotEmpty) {
        // var checkdata = resultData["Data1"];
         AppGlobals.MaxStockNum = resultData["Data1"];
       }
-} catch (error, stackTrace) {
-  msgshow(
-          error.toString(),
-          stackTrace.toString(),
-          Colors.white,
-          Colors.red,
-          null,
-          18.00 - AppGlobals.reducesize,
-          AppGlobals.tll,
-          AppGlobals.tgc,
-          context,
-          2);
-}
+} catch (e) { print("API Error: $e"); }
 
   } catch (error) {
     if (error.toString() == "") {}
@@ -464,26 +401,14 @@ Future SelectJobType(context) async {
     AppGlobals.JobTypeList.clear();
     var Comid = AppGlobals.storagenew.getInt('Comid') ?? 0;
     try {
-  final resultData = await ApiLegacyHelper.apiAllinoneSelect(
-            Uri.encodeFull("${ApiConstants.apiSelectJobType}$Comid"), null, null, context);
+  final resultData = _ensureList((await _dioClient.dio.post(
+            Uri.encodeFull("${ApiConstants.apiSelectJobType}$Comid"), data: null ?? {})).data);
   if (resultData.isNotEmpty) {
         AppGlobals.JobTypeList = resultData
             .map((element) => JobTypeModel.fromJson(element))
             .toList();
       }
-} catch (error, stackTrace) {
-  msgshow(
-          error.toString(),
-          stackTrace.toString(),
-          Colors.white,
-          Colors.red,
-          null,
-          18.00 - AppGlobals.reducesize,
-          AppGlobals.tll,
-          AppGlobals.tgc,
-          context,
-          2);
-}
+} catch (e) { print("API Error: $e"); }
 
   } catch (error) {
     if (error.toString() == "") {}
@@ -495,11 +420,8 @@ Future SelectAllJobStatus(context, int Jobid) async {
     AppGlobals.JobAllStatusList.clear();
     var Comid = AppGlobals.storagenew.getInt('Comid') ?? 0;
     try {
-  final resultData = await ApiLegacyHelper.apiAllinoneSelect(
-            Uri.encodeFull("${ApiConstants.apiSelectAllJobStatus}$Comid&Jobid=$Jobid"),
-            null,
-            null,
-            context);
+  final resultData = _ensureList((await _dioClient.dio.post(
+            Uri.encodeFull("${ApiConstants.apiSelectAllJobStatus}$Comid&Jobid=$Jobid"), data: null ?? {})).data);
   if (resultData.isNotEmpty) {
         var resultDetails = resultData[0]["JobTypeDetails"];
         var result = resultData[0]["JobStatusDetails"];
@@ -512,19 +434,7 @@ Future SelectAllJobStatus(context, int Jobid) async {
             .toList()
             .cast<JobTypeDetailsModel>();
       }
-} catch (error, stackTrace) {
-  msgshow(
-          error.toString(),
-          stackTrace.toString(),
-          Colors.white,
-          Colors.red,
-          null,
-          18.00 - AppGlobals.reducesize,
-          AppGlobals.tll,
-          AppGlobals.tgc,
-          context,
-          2);
-}
+} catch (e) { print("API Error: $e"); }
 
   } catch (error) {
     if (error.toString() == "") {}
@@ -536,26 +446,14 @@ Future SelectAgentCompany(context) async {
     AppGlobals.AgentCompanyList.clear();
     var Comid = AppGlobals.storagenew.getInt('Comid') ?? 0;
     try {
-  final resultData = await ApiLegacyHelper.apiAllinoneSelect(
-            Uri.encodeFull("${ApiConstants.apiSelectAgentCompany}$Comid"), null, null, context);
+  final resultData = _ensureList((await _dioClient.dio.post(
+            Uri.encodeFull("${ApiConstants.apiSelectAgentCompany}$Comid"), data: null ?? {})).data);
   if (resultData.isNotEmpty) {
         AppGlobals.AgentCompanyList = resultData
             .map((element) => AgentCompanyModel.fromJson(element))
             .toList();
       }
-} catch (error, stackTrace) {
-  msgshow(
-          error.toString(),
-          stackTrace.toString(),
-          Colors.white,
-          Colors.red,
-          null,
-          18.00 - AppGlobals.reducesize,
-          AppGlobals.tll,
-          AppGlobals.tgc,
-          context,
-          2);
-}
+} catch (e) { print("API Error: $e"); }
 
   } catch (error) {
     if (error.toString() == "") {}
@@ -567,28 +465,13 @@ Future SelectAgentAll(context, int AgentCompanyId) async {
     AppGlobals.AgentAllList.clear();
     var Comid = AppGlobals.storagenew.getInt('Comid') ?? 0;
     try {
-  final resultData = await ApiLegacyHelper.apiAllinoneSelect(
-            Uri.encodeFull("${ApiConstants.apiSelectAgentAll}$Comid&Jobid=$AgentCompanyId"),
-            null,
-            null,
-            context);
+  final resultData = _ensureList((await _dioClient.dio.post(
+            Uri.encodeFull("${ApiConstants.apiSelectAgentAll}$Comid&Jobid=$AgentCompanyId"), data: null ?? {})).data);
   if (resultData.isNotEmpty) {
         AppGlobals.AgentAllList =
             resultData.map((element) => AgentModel.fromJson(element)).toList();
       }
-} catch (error, stackTrace) {
-  msgshow(
-          error.toString(),
-          stackTrace.toString(),
-          Colors.white,
-          Colors.red,
-          null,
-          18.00 - AppGlobals.reducesize,
-          AppGlobals.tll,
-          AppGlobals.tgc,
-          context,
-          2);
-}
+} catch (e) { print("API Error: $e"); }
 
   } catch (error) {
     if (error.toString() == "") {}
@@ -600,45 +483,28 @@ Future SelectProductList(context) async {
     AppGlobals.ProductList.clear();
     var Comid = AppGlobals.storagenew.getInt('Comid') ?? 0;
     try {
-  final resultData = await ApiLegacyHelper.apiAllinoneSelect(
-            Uri.encodeFull("${ApiConstants.apiGetProductList}$Comid"), null, null, context);
+  final resultData = _ensureList((await _dioClient.dio.post(
+            Uri.encodeFull("${ApiConstants.apiGetProductList}$Comid"), data: null ?? {})).data);
   if (resultData.isNotEmpty) {
         AppGlobals.ProductList = resultData
             .map((element) => ProductModel.fromJson(element))
             .toList();
       }
-} catch (error, stackTrace) {
-  msgshow(
-          error.toString(),
-          stackTrace.toString(),
-          Colors.white,
-          Colors.red,
-          null,
-          18.00 - AppGlobals.reducesize,
-          AppGlobals.tll,
-          AppGlobals.tgc,
-          context,
-          2);
-}
+} catch (e) { print("API Error: $e"); }
 
   } catch (error) {
     if (error.toString() == "") {}
   }
 }
 
-
-
-// Context illa clean code!
 Future<List<dynamic>?> selectAddressList() async {
   try {
     AppGlobals.AddressList.clear();
     final int comId = AppGlobals.storagenew.getInt('Comid') ?? 0;
 
     // Call ApiClient.postRequest and pass null for the body
-    final resultData = await ApiClient.postRequest(
-      "${ApiConstants.apiSelectAddressList}$comId",
-      null,
-    );
+    final resultData = ((await _dioClient.dio.post(
+      "${ApiConstants.apiSelectAddressList}$comId", data: null ?? {})).data);
 
     // ApiClient decodes the response automatically.
     // We just ensure it's returned as a List safely.
@@ -661,59 +527,11 @@ Future<List<dynamic>?> selectAddressList() async {
   }
 }
 
-// Future<void> SelectAddressList(BuildContext context) async {
-//   try {
-//     AppGlobals.AddressList.clear();
-//
-//     final int comId = AppGlobals.storagenew.getInt('Comid') ?? 0;
-//
-//     final resultData = await objfun
-//         .apiAllinoneSelect(
-//       "${ApiConstants.apiSelectAddressList}$comId",
-//       null,
-//       null,
-//       context,
-//     )
-//         .timeout(const Duration(seconds: 15));
-//
-//     if (resultData != null && resultData.isNotEmpty) {
-//       AppGlobals.AddressList = resultData;
-//     }
-//
-//   } on TimeoutException {
-//     _showError(context, "Server timeout. Please try again.");
-//   } on SocketException {
-//     _showError(context, "No internet connection.");
-//   } on HttpException {
-//     _showError(context, "Server error occurred.");
-//   } catch (error, stackTrace) {
-//     _showError(context, error.toString());
-//     debugPrint(stackTrace.toString());
-//   }
-// }
-
-
-void _showError(BuildContext context, String message) {
-  msgshow(
-    message,
-    "",
-    Colors.white,
-    Colors.red,
-    null,
-    18.00 - AppGlobals.reducesize,
-    AppGlobals.tll,
-    AppGlobals.tgc,
-    context,
-    2,
-  );
-}
-
 Future EditSalesOrder(int Id, int SaleNo, {BuildContext? context}) async {
   try {
     var Comid = AppGlobals.storagenew.getInt('Comid') ?? 0;
-    var resultData = await ApiLegacyHelper.apiAllinoneSelect(
-        Uri.encodeFull("${ApiConstants.apiEditSalesOrder}$Id&SaleorderNo=$SaleNo&Comid=$Comid"),
-        null, null, context);
+    var resultData = _ensureList((await _dioClient.dio.post(
+        Uri.encodeFull("${ApiConstants.apiEditSalesOrder}$Id&SaleorderNo=$SaleNo&Comid=$Comid"), data: null ?? {})).data);
 
     if (resultData.isNotEmpty) {
       AppGlobals.SaleEditMasterList = resultData;
@@ -729,48 +547,30 @@ Future EditSalesOrder(int Id, int SaleNo, {BuildContext? context}) async {
   }
 }
 
-
 Future loadCustomerCurrency(context, int CustomerId) async {
   try {
 AppGlobals.CustomerCurrencyValue = 0.0;
     var Comid = AppGlobals.storagenew.getInt('Comid') ?? 0;
     try {
-  final resultData = await ApiLegacyHelper.apiAllinoneSelectArray(
-        Uri.encodeFull("${ApiConstants.apiGetCurrencyValue}$Comid&CustId=$CustomerId"),
-        null,
-        null,
-        context);
+  final resultData = ((await _dioClient.dio.post(
+        Uri.encodeFull("${ApiConstants.apiGetCurrencyValue}$Comid&CustId=$CustomerId"), data: null ?? {})).data);
   if (resultData.length != 0) {
         AppGlobals.CustomerCurrencyValue = resultData["Data1"];
       }
-} catch (error, stackTrace) {
-  msgshow(
-          error.toString(),
-          stackTrace.toString(),
-          Colors.white,
-          Colors.red,
-          null,
-          18.00 - AppGlobals.reducesize,
-          AppGlobals.tll,
-          AppGlobals.tgc,
-          context,
-          2);
-}
+} catch (e) { print("API Error: $e"); }
 
   } catch (error) {
     if (error.toString() == "") {}
   }
 }
+
 Future loadComboS1(context, int type) async {
   try {
     AppGlobals.ComboS1List=[];
     var Comid = AppGlobals.storagenew.getInt('Comid') ?? 0;
     try {
-  final resultData = await ApiLegacyHelper.apiAllinoneSelectArray(
-            Uri.encodeFull("${ApiConstants.apiGetComboS1}$Comid&type=$type"),
-            null,
-            null,
-            context);
+  final resultData = ((await _dioClient.dio.post(
+            Uri.encodeFull("${ApiConstants.apiGetComboS1}$Comid&type=$type"), data: null ?? {})).data);
   if (resultData.length != 0) {
         AppGlobals.ComboS1List.add(resultData["Data1"]);
         AppGlobals.ComboS1List.add(resultData["Data2"]);
@@ -780,114 +580,60 @@ Future loadComboS1(context, int type) async {
         AppGlobals.ComboS1List.add(resultData["Data6"]);
 
       }
-} catch (error, stackTrace) {
-  msgshow(
-          error.toString(),
-          stackTrace.toString(),
-          Colors.white,
-          Colors.red,
-          null,
-          18.00 - AppGlobals.reducesize,
-          AppGlobals.tll,
-          AppGlobals.tgc,
-          context,
-          2);
-}
+} catch (e) { print("API Error: $e"); }
 
   } catch (error) {
     if (error.toString() == "") {}
   }
 }
+
 Future EditPlanning(context, int Id, int PlanningNo) async {
   try {
     // AppGlobals.PlanningEditList.clear();
     var Comid = AppGlobals.storagenew.getInt('Comid') ?? 0;
     try {
-  final resultData = await ApiLegacyHelper.apiAllinoneSelect(
-            Uri.encodeFull("${ApiConstants.apiEditPlanning}$Id&PLANINGNo=$PlanningNo&Comid=$Comid"),
-            null,
-            null,
-            context);
+  final resultData = _ensureList((await _dioClient.dio.post(
+            Uri.encodeFull("${ApiConstants.apiEditPlanning}$Id&PLANINGNo=$PlanningNo&Comid=$Comid"), data: null ?? {})).data);
   if (resultData.isNotEmpty) {
         AppGlobals.PlanningEditList = resultData[0]["SaleDetails"].toList();
       }
-} catch (error, stackTrace) {
-  msgshow(
-          error.toString(),
-          stackTrace.toString(),
-          Colors.white,
-          Colors.red,
-          null,
-          18.00 - AppGlobals.reducesize,
-          AppGlobals.tll,
-          AppGlobals.tgc,
-          context,
-          2);
-}
+} catch (e) { print("API Error: $e"); }
 
   } catch (error) {
     if (error.toString() == "") {}
   }
 }
+
 Future EditVesselPlanning(context, int Id, int PlanningNo) async {
   try {
     var Comid = AppGlobals.storagenew.getInt('Comid') ?? 0;
     try {
-  final resultData = await ApiLegacyHelper.apiAllinoneSelect(
-        Uri.encodeFull("${ApiConstants.apiEditVesselPlanning}$Id&VESSELPLANINGNo=$PlanningNo&Comid=$Comid"),
-        null,
-        null,
-        context);
+  final resultData = _ensureList((await _dioClient.dio.post(
+        Uri.encodeFull("${ApiConstants.apiEditVesselPlanning}$Id&VESSELPLANINGNo=$PlanningNo&Comid=$Comid"), data: null ?? {})).data);
   if (resultData.isNotEmpty) {
         AppGlobals.VesselPlanningEditList = resultData[0]["SaleDetails"].toList();
       }
-} catch (error, stackTrace) {
-  msgshow(
-          error.toString(),
-          stackTrace.toString(),
-          Colors.white,
-          Colors.red,
-          null,
-          18.00 - AppGlobals.reducesize,
-          AppGlobals.tll,
-          AppGlobals.tgc,
-          context,
-          2);
-}
+} catch (e) { print("API Error: $e"); }
 
   } catch (error) {
     if (error.toString() == "") {}
   }
 }
+
 Future DeleteSalesOrder(context, int Id) async {
   try {
     // AppGlobals.AddressList.clear();
     var Comid = AppGlobals.storagenew.getInt('Comid') ?? 0;
     try {
-  final resultData = await ApiLegacyHelper.apiAllinoneSelectArray(
-            Uri.encodeFull("${ApiConstants.apiDeleteSalesOrder}$Id&Comid=$Comid"),
-            null,
-            null,
-            context);
+  final resultData = ((await _dioClient.dio.post(
+            Uri.encodeFull("${ApiConstants.apiDeleteSalesOrder}$Id&Comid=$Comid"), data: null ?? {})).data);
   if (resultData.length != 0) {
         ResponseViewModel? value = ResponseViewModel.fromJson(resultData);
         if (value.IsSuccess == true) {
           await ConfirmationOK(value.Message, context);
         }
       }
-} catch (error, stackTrace) {
-  msgshow(
-          error.toString(),
-          stackTrace.toString(),
-          Colors.white,
-          Colors.red,
-          null,
-          18.00 - AppGlobals.reducesize,
-          AppGlobals.tll,
-          AppGlobals.tgc,
-          context,
-          2);
-}
+} catch (e) { print("API Error: $e"); }
 
   } catch (error) {
     if (error.toString() == "") {}
@@ -899,29 +645,14 @@ Future SelectAddressDetails(context, String Keyword) async {
     AppGlobals.AddressDetailedList.clear();
     var Comid = AppGlobals.storagenew.getInt('Comid') ?? 0;
     try {
-  final resultData = await ApiLegacyHelper.apiAllinoneSelect(
-            Uri.encodeFull("${ApiConstants.apiSelectAddressDetails}$Comid&KeyWord=$Keyword"),
-            null,
-            null,
-            context);
+  final resultData = _ensureList((await _dioClient.dio.post(
+            Uri.encodeFull("${ApiConstants.apiSelectAddressDetails}$Comid&KeyWord=$Keyword"), data: null ?? {})).data);
   if (resultData.isNotEmpty) {
         AppGlobals.AddressDetailedList = resultData
             .map((element) => AddressDetailsModel.fromJson(element))
             .toList();
       }
-} catch (error, stackTrace) {
-  msgshow(
-          error.toString(),
-          stackTrace.toString(),
-          Colors.white,
-          Colors.red,
-          null,
-          18.00 - AppGlobals.reducesize,
-          AppGlobals.tll,
-          AppGlobals.tgc,
-          context,
-          2);
-}
+} catch (e) { print("API Error: $e"); }
 
   } catch (error) {
     if (error.toString() == "") {}
@@ -933,27 +664,15 @@ Future GetJobNoForwarding(context,int BillId) async {
     AppGlobals.ForwardingList.clear();
     var Comid = AppGlobals.storagenew.getInt('Comid') ?? 0;
     try {
-  final resultData = await ApiLegacyHelper.apiAllinoneSelectArray(
-        Uri.encodeFull("${ApiConstants.apiGetJobNo}$Comid&JobType=$BillId"), null, null, context);
+  final resultData = ((await _dioClient.dio.post(
+        Uri.encodeFull("${ApiConstants.apiGetJobNo}$Comid&JobType=$BillId"), data: null ?? {})).data);
   if (resultData.length != 0) {   
         AppGlobals.ForwardingList = resultData["Data1"]
             .map((element) => ForwardingModel.fromJson(element))
             .toList().cast<ForwardingModel>();
         AppGlobals.JobNoList =  resultData["Data1"].toList();
       }
-} catch (error, stackTrace) {
-  msgshow(
-          error.toString(),
-          stackTrace.toString(),
-          Colors.white,
-          Colors.red,
-          null,
-          18.00 - AppGlobals.reducesize,
-          AppGlobals.tll,
-          AppGlobals.tgc,
-          context,
-          2);
-}
+} catch (e) { print("API Error: $e"); }
 
   } catch (error) {
     if (error.toString() == "") {}
@@ -972,8 +691,8 @@ Future<void> GetRTINoForwarding(BuildContext ?context, int billId) async {
     final String apiUrl = '${ApiConstants.apiGetRTINo}$comId';
 
     // Call the API
-    final resultData = await ApiLegacyHelper.apiAllinoneSelectArray(
-        apiUrl, null, null, context);
+    final resultData = ((await _dioClient.dio.post(
+        apiUrl, data: null ?? {})).data);
 
     // Check response validity and content
     if (resultData != null && resultData is List) {
@@ -998,47 +717,23 @@ Future<void> GetRTINoForwarding(BuildContext ?context, int billId) async {
       AppGlobals.JobNoList = []; // Default to empty list
     }
   }
-  catch (error, stackTrace) {
-    msgshow(
-      error.toString(),
-      stackTrace.toString(),
-      Colors.white,
-      Colors.red,
-      null,
-      18.00 - AppGlobals.reducesize,
-      AppGlobals.tll,
-      AppGlobals.tgc,
-      context,
-      2,
-    );
-  }
+  catch (e) { print("API Error: $e"); }
 }
+
 Future SelectTruckList(context,String? Type) async {
   try {
     AppGlobals.GetTruckList.clear();
     var Comid = AppGlobals.storagenew.getInt('Comid') ?? 0;
 
     try {
-  final resultData = await ApiLegacyHelper.apiAllinoneSelect(
-        Uri.encodeFull("${ApiConstants.apiGetTruckList}$Comid&type="), null, null, context);
+  final resultData = _ensureList((await _dioClient.dio.post(
+        Uri.encodeFull("${ApiConstants.apiGetTruckList}$Comid&type="), data: null ?? {})).data);
   if (resultData.isNotEmpty) {
         AppGlobals.GetTruckList = resultData
             .map((element) => GetTruckModel.fromJson(element))
             .toList();
       }
-} catch (error, stackTrace) {
-  msgshow(
-          error.toString(),
-          stackTrace.toString(),
-          Colors.white,
-          Colors.red,
-          null,
-          18.00 - AppGlobals.reducesize,
-          AppGlobals.tll,
-          AppGlobals.tgc,
-          context,
-          2);
-}
+} catch (e) { print("API Error: $e"); }
 
   } catch (error) {
     if (error.toString() == "") {}
@@ -1050,26 +745,14 @@ Future EditTruckList(context,int Keyword,String Column,String? Type) async {
     AppGlobals.TruckDetailsList.clear();
     var Comid = AppGlobals.storagenew.getInt('Comid') ?? 0;
     try {
-  final resultData = await ApiLegacyHelper.apiAllinoneSelect(
-        Uri.encodeFull("${ApiConstants.apiEditTruckDetails}$Comid&Startindex=0&PageCount=0&Keyword=$Keyword&Column=$Column&type="), null, null, context);
+  final resultData = _ensureList((await _dioClient.dio.post(
+        Uri.encodeFull("${ApiConstants.apiEditTruckDetails}$Comid&Startindex=0&PageCount=0&Keyword=$Keyword&Column=$Column&type="), data: null ?? {})).data);
   if (resultData.isNotEmpty) {
         AppGlobals.TruckDetailsList = resultData
             .map((element) => TruckDetailsModel.fromJson(element))
             .toList();
       }
-} catch (error, stackTrace) {
-  msgshow(
-          error.toString(),
-          stackTrace.toString(),
-          Colors.white,
-          Colors.red,
-          null,
-          18.00 - AppGlobals.reducesize,
-          AppGlobals.tll,
-          AppGlobals.tgc,
-          context,
-          2);
-}
+} catch (e) { print("API Error: $e"); }
 
   } catch (error) {
     if (error.toString() == "") {}
@@ -1082,26 +765,14 @@ Future SelectDriverList(context,String? Type) async {
     var Comid = AppGlobals.storagenew.getInt('Comid') ?? 0;
 
     try {
-  final resultData = await ApiLegacyHelper.apiAllinoneSelect(
-        Uri.encodeFull("${ApiConstants.apiGetDriverList}$Comid&type="), null, null, context);
+  final resultData = _ensureList((await _dioClient.dio.post(
+        Uri.encodeFull("${ApiConstants.apiGetDriverList}$Comid&type="), data: null ?? {})).data);
   if (resultData.isNotEmpty) {
         AppGlobals.GetDriverList = resultData
             .map((element) => GetTruckModel.fromJson(element))
             .toList();
       }
-} catch (error, stackTrace) {
-  msgshow(
-          error.toString(),
-          stackTrace.toString(),
-          Colors.white,
-          Colors.red,
-          null,
-          18.00 - AppGlobals.reducesize,
-          AppGlobals.tll,
-          AppGlobals.tgc,
-          context,
-          2);
-}
+} catch (e) { print("API Error: $e"); }
 
   } catch (error) {
     if (error.toString() == "") {}
@@ -1113,8 +784,8 @@ Future SelectRTIDetailViewList(context,String Fromdate,String Todate,int DId, in
     AppGlobals.RTIViewMasterList.clear();
     var Comid = AppGlobals.storagenew.getInt('Comid') ?? 0;
     try {
-  final resultData = await ApiLegacyHelper.apiAllinoneSelect(
-        Uri.encodeFull("${ApiConstants.apiSelectRTIDetailsView}$Comid&Fromdate=$Fromdate&Todate=$Todate&DId=$DId&TId=$TId&Employeeid=$Employeeid&Search$Search"), null, null, context);
+  final resultData = _ensureList((await _dioClient.dio.post(
+        Uri.encodeFull("${ApiConstants.apiSelectRTIDetailsView}$Comid&Fromdate=$Fromdate&Todate=$Todate&DId=$DId&TId=$TId&Employeeid=$Employeeid&Search$Search"), data: null ?? {})).data);
   if (resultData.isNotEmpty) {
         AppGlobals.RTIViewMasterList = resultData[0]["salemaster"]
             .map((element) => RTIMasterViewModel.fromJson(element))
@@ -1123,19 +794,7 @@ Future SelectRTIDetailViewList(context,String Fromdate,String Todate,int DId, in
             .map((element) => RTIDetailsViewModel.fromJson(element))
             .toList();
       }
-} catch (error, stackTrace) {
-  msgshow(
-          error.toString(),
-          stackTrace.toString(),
-          Colors.white,
-          Colors.red,
-          null,
-          18.00 - AppGlobals.reducesize,
-          AppGlobals.tll,
-          AppGlobals.tgc,
-          context,
-          2);
-}
+} catch (e) { print("API Error: $e"); }
 
   } catch (error) {
     if (error.toString() == "") {}
@@ -1147,8 +806,8 @@ Future SelectRTIViewList(context,String Fromdate,String Todate,int DId, int TId,
     AppGlobals.RTIViewMasterList.clear();
     var Comid = AppGlobals.storagenew.getInt('Comid') ?? 0;
     try {
-  final resultData = await ApiLegacyHelper.apiAllinoneSelect(
-        Uri.encodeFull("${ApiConstants.apiSelectRTIView}$Comid&Fromdate=$Fromdate&Todate=$Todate&DId=$DId&TId=$TId&Employeeid=$Employeeid&Search=$Search"), null, null, context);
+  final resultData = _ensureList((await _dioClient.dio.post(
+        Uri.encodeFull("${ApiConstants.apiSelectRTIView}$Comid&Fromdate=$Fromdate&Todate=$Todate&DId=$DId&TId=$TId&Employeeid=$Employeeid&Search=$Search"), data: null ?? {})).data);
   if (resultData.isNotEmpty) {
         AppGlobals.RTIViewMasterList = resultData[0]["salemaster"]
             .map((element) => RTIMasterViewModel.fromJson(element))
@@ -1157,36 +816,27 @@ Future SelectRTIViewList(context,String Fromdate,String Todate,int DId, int TId,
             .map((element) => RTIDetailsViewModel.fromJson(element))
             .toList();
       }
-} catch (error, stackTrace) {
-  msgshow(
-          error.toString(),
-          stackTrace.toString(),
-          Colors.white,
-          Colors.red,
-          null,
-          18.00 - AppGlobals.reducesize,
-          AppGlobals.tll,
-          AppGlobals.tgc,
-          context,
-          2);
-}
+} catch (e) { print("API Error: $e"); }
 
   } catch (error) {
     if (error.toString() == "") {}
   }
 }
+
 Future<List<String>> GetEmployeeport(context) async {
   try {
     var Comid = AppGlobals.storagenew.getInt('Comid') ?? 0;
     var empId = AppGlobals.storagenew.getInt('EmpRefId') ?? 0;
     
     // Using apiAllinoneSelect as it handles GET requests returning JSON arrays well
-    final resultData = await ApiLegacyHelper.apiAllinoneSelect(
-        Uri.encodeFull("${ApiConstants.port}/api/EmployeeApp/GetEmployeeport?Comid=$Comid&id=$empId"), null, null, context);
+    final resultData = _ensureList((await _dioClient.dio.post(
+        Uri.encodeFull("${ApiConstants.port}/api/EmployeeApp/GetEmployeeport?Comid=$Comid&id=$empId"), data: null ?? {})).data);
         
     return resultData.map((e) => e["AccountName"].toString()).toList();
     } catch (error) {
     debugPrint("Error fetching employee ports: $error");
   }
   return [];
+}
+
 }
