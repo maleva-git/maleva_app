@@ -2,14 +2,13 @@ import 'package:maleva/core/network/legacy_api_repository.dart';
 import 'package:maleva/core/di/injection.dart';
 import 'package:maleva/core/network/api_constants.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-
 import 'package:maleva/core/utils/app_globals.dart';
 import '../data/fwupdate_repository.dart';
 import 'forwarding_event.dart';
 import 'forwarding_state.dart';
 
 class FWUpdateBloc extends Bloc<FWUpdateEvent, FWUpdateState> {
-  final FWUpdateRepository repository; // Pass your repo interface
+  final FWUpdateRepository repository;
 
   final List<dynamic> _employeeList = [];
 

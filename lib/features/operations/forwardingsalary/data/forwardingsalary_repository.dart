@@ -2,17 +2,15 @@ import 'package:maleva/core/network/legacy_api_repository.dart';
 import 'package:maleva/core/di/injection.dart';
 import 'package:maleva/core/network/api_constants.dart';
 import 'package:maleva/core/network/api_client.dart';
-
 import 'package:maleva/core/utils/app_preferences.dart';
 import 'package:maleva/core/utils/app_globals.dart';
 
 class ForwardingSalaryRepository {
   final int comid = AppPreferences.getComid();
 
-  // ─── Initialize Data ───────────────────────────────────────────────────────
+
   Future<Map<String, dynamic>> initializeData() async {
-    // We execute the legacy OnlineApi wrappers to populate the lists,
-    // but return them so the BLoC can cache them locally instead of referencing globals.
+
     await sl<LegacyApiRepository>().GetRTINoForwarding(null, 0);
     await sl<LegacyApiRepository>().SelectEmployee(null, '', 'Operation');
     await sl<LegacyApiRepository>().loadComboS1(null, 0);
@@ -23,15 +21,14 @@ class ForwardingSalaryRepository {
     };
   }
 
-  // ─── Fetch RTIs by Bill Type ───────────────────────────────────────────────
   Future<List<dynamic>> fetchRTINoForwarding(int billType) async {
     await sl<LegacyApiRepository>().GetRTINoForwarding(null, billType);
     return AppGlobals.JobNoList;
   }
 
-  // ─── Fetch Specific Forwarding Data ────────────────────────────────────────
+
   Future<Map<String, dynamic>?> fetchForwardingData(int saleOrderId) async {
-    // In legacy code, comid defaults to 6 if 0
+
     final activeComId = comid == 0 ? 6 : comid;
 
     final body = {
@@ -49,7 +46,7 @@ class ForwardingSalaryRepository {
     return null;
   }
 
-  // ─── Save Forwarding Salary ────────────────────────────────────────────────
+
   Future<bool> saveForwardingSalary(Map<String, dynamic> masterPayload) async {
     final result = await ApiClient.postRequest(ApiConstants.apiInsertForwarding, [masterPayload]);
 

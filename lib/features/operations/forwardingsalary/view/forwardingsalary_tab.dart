@@ -5,38 +5,19 @@ import 'package:maleva/core/di/injection.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:maleva/core/utils/app_globals.dart';
-
 import 'package:maleva/menu/menulist.dart';
-import '../../../../core/di/injection.dart';
 import '../../../mastersearch/Employee.dart';
 import '../bloc/forwardingsalary_bloc.dart';
 import '../bloc/forwardingsalary_event.dart';
 import '../bloc/forwardingsalary_state.dart';
 import 'package:maleva/core/models/shared/employee_model.dart';
+import 'package:maleva/core/theme/tokens.dart';
 
-
-// ─── Design Tokens ────────────────────────────────────────────────────────────
-const kHeaderGradStart = Color(0xFF1A3A8F);
-const kHeaderGradEnd   = Color(0xFF4A6FD4);
-const kCardBorder      = Color(0xFFC5D0EE);
-const kPageBg          = Color(0xFFF4F6FB);
-const kTextDark        = Color(0xFF1E2D5E);
-const kTextMid         = Color(0xFF4A5A8A);
-const kTextMuted       = Color(0xFF8A96BF);
-const kDetailBg        = Color(0xFFF0F4FF);
-const kChipBg          = Color(0xFFEEF2FF);
-
-const kGradient = LinearGradient(
-  colors: [kHeaderGradStart, kHeaderGradEnd],
-  begin: Alignment.topLeft,
-  end: Alignment.bottomRight,
-);
 
 const double kTabletBreak = 600;
 
-// ─── Root ─────────────────────────────────────────────────────────────────────
+
 class ForwardingSalaryUpdate extends StatelessWidget {
   const ForwardingSalaryUpdate({super.key});
 
@@ -50,7 +31,6 @@ class ForwardingSalaryUpdate extends StatelessWidget {
   }
 }
 
-// ─── Page ─────────────────────────────────────────────────────────────────────
 class _ForwardingSalaryPage extends StatelessWidget {
   const _ForwardingSalaryPage();
 
@@ -85,7 +65,7 @@ class _ForwardingSalaryPage extends StatelessWidget {
         },
         child: Scaffold(
           resizeToAvoidBottomInset: true,
-          backgroundColor: kPageBg,
+          backgroundColor: colour.kPageBg,
           appBar: _buildAppBar(context, userName),
           drawer: const Menulist(),
           body: BlocBuilder<ForwardingSalaryBloc, ForwardingSalaryState>(
@@ -94,7 +74,7 @@ class _ForwardingSalaryPage extends StatelessWidget {
                   state is ForwardingSalaryLoading) {
                 return Center(
                   child: SpinKitFoldingCube(
-                      color: kHeaderGradEnd, size: 35),
+                      color: AppTokens.invoiceHeaderEnd, size: 35),
                 );
               }
               if (state is ForwardingSalaryLoaded) {
@@ -113,14 +93,13 @@ class _ForwardingSalaryPage extends StatelessWidget {
     );
   }
 
-  // ─── AppBar ─────────────────────────────────────────────────────────────────
   PreferredSizeWidget _buildAppBar(BuildContext context, String userName) {
     return AppBar(
       automaticallyImplyLeading: false,
       elevation: 0,
       toolbarHeight: 62,
       flexibleSpace:
-      Container(decoration: const BoxDecoration(gradient: kGradient)),
+      Container(decoration: const BoxDecoration(gradient: AppTokens.headerGradient)),
       leading: IconButton(
         icon: const Icon(Icons.arrow_back_ios_new_rounded, size: 20),
         color: Colors.white,
@@ -172,7 +151,6 @@ class _ForwardingSalaryPage extends StatelessWidget {
   }
 }
 
-// ─── Body — LayoutBuilder for mobile/tablet ───────────────────────────────────
 class _ForwardingSalaryBody extends StatelessWidget {
   final ForwardingSalaryLoaded state;
   const _ForwardingSalaryBody({required this.state});
@@ -431,18 +409,18 @@ class _RtiFieldState extends State<_RtiField> {
           keyboardType: TextInputType.number,
           textCapitalization: TextCapitalization.characters,
           textInputAction: TextInputAction.done,
-          style: AppTypography.bodySmall(color: kTextDark),
+          style: AppTypography.bodySmall(color: AppTokens.maintTextDark),
           decoration: InputDecoration(
             hintText: 'RTI No',
-            hintStyle: AppTypography.bodySmall(color: kTextMuted),
+            hintStyle: AppTypography.bodySmall(color: AppTokens.planTextMuted),
             filled: true,
-            fillColor: kDetailBg,
+            fillColor: colour.kDetailBg,
             prefixIcon: const Icon(Icons.tag_rounded,
-                color: kHeaderGradEnd, size: 20),
+                color: AppTokens.invoiceHeaderEnd, size: 20),
             suffixIcon: _ctrl.text.isNotEmpty
                 ? IconButton(
               icon: const Icon(Icons.close_rounded,
-                  color: kTextMuted, size: 18),
+                  color: AppTokens.planTextMuted, size: 18),
               onPressed: () {
                 _ctrl.clear();
                 context
@@ -459,12 +437,12 @@ class _RtiFieldState extends State<_RtiField> {
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
               borderSide:
-              const BorderSide(color: kCardBorder, width: 0.5),
+              const BorderSide(color: AppTokens.maintCardBorder, width: 0.5),
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
               borderSide:
-              const BorderSide(color: kHeaderGradEnd, width: 1.5),
+              const BorderSide(color: AppTokens.invoiceHeaderEnd, width: 1.5),
             ),
           ),
           onChanged: (v) => context
@@ -480,10 +458,10 @@ class _RtiFieldState extends State<_RtiField> {
             decoration: BoxDecoration(
               color: Colors.white,
               borderRadius: BorderRadius.circular(10),
-              border: Border.all(color: kCardBorder, width: 0.5),
+              border: Border.all(color: AppTokens.maintCardBorder, width: 0.5),
               boxShadow: [
                 BoxShadow(
-                  color: kHeaderGradStart.withValues(alpha: 0.10),
+                  color: AppTokens.invoiceHeaderStart.withValues(alpha: 0.10),
                   blurRadius: 10,
                   offset: const Offset(0, 4),
                 ),
@@ -494,7 +472,7 @@ class _RtiFieldState extends State<_RtiField> {
               padding: EdgeInsets.zero,
               itemCount: s.rtiSuggestions.length,
               separatorBuilder: (_, __) =>
-              const Divider(height: 1, color: kDetailBg),
+              const Divider(height: 1, color: colour.kDetailBg),
               itemBuilder: (ctx, i) {
                 final item = s.rtiSuggestions[i];
                 final cnum = item['CNumber'].toString();
@@ -509,10 +487,10 @@ class _RtiFieldState extends State<_RtiField> {
                     child: Row(
                       children: [
                         const Icon(Icons.receipt_long_outlined,
-                            size: 16, color: kHeaderGradEnd),
+                            size: 16, color: AppTokens.invoiceHeaderEnd),
                         const SizedBox(width: 10),
                         Text(cnum,
-                            style: AppTypography.bodySmall(color: kTextDark)),
+                            style: AppTypography.bodySmall(color: AppTokens.maintTextDark)),
                       ],
                     ),
                   ),
@@ -530,10 +508,10 @@ class _RtiFieldState extends State<_RtiField> {
             child: Row(
               children: [
                 const Icon(Icons.info_outline_rounded,
-                    size: 14, color: kTextMuted),
+                    size: 14, color: AppTokens.planTextMuted),
                 const SizedBox(width: 6),
                 Text('No matching RTI numbers',
-                    style: AppTypography.bodySmall(color: kTextMuted)),
+                    style: AppTypography.bodySmall(color: AppTokens.planTextMuted)),
               ],
             ),
           ),
@@ -554,9 +532,9 @@ class _BillTypeRow extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 10),
       decoration: BoxDecoration(
-        color: kDetailBg,
+        color: colour.kDetailBg,
         borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: kCardBorder, width: 0.5),
+        border: Border.all(color: AppTokens.maintCardBorder, width: 0.5),
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -618,10 +596,10 @@ class _RadioOption extends StatelessWidget {
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
                 border: Border.all(
-                  color: selected ? kHeaderGradEnd : kCardBorder,
+                  color: selected ? AppTokens.invoiceHeaderEnd : AppTokens.maintCardBorder,
                   width: selected ? 0 : 1.5,
                 ),
-                gradient: selected ? kGradient : null,
+                gradient: selected ? AppTokens.headerGradient : null,
               ),
               child: selected
                   ? const Icon(Icons.circle, size: 10, color: Colors.white)
@@ -630,7 +608,7 @@ class _RadioOption extends StatelessWidget {
             SizedBox(width: isTablet ? 8 : 6),
             Text(
               label,
-              style: AppTypography.heading2(color: selected ? kHeaderGradStart : kTextMid),
+              style: AppTypography.heading2(color: selected ? AppTokens.invoiceHeaderStart : AppTokens.planTextMuted),
             ),
           ],
         ),
@@ -639,7 +617,7 @@ class _RadioOption extends StatelessWidget {
   }
 }
 
-// ─── Shared Reusable Widgets ──────────────────────────────────────────────────
+
 
 class _FieldLabel extends StatelessWidget {
   final String text;
@@ -649,7 +627,7 @@ class _FieldLabel extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Text(text,
-        style: AppTypography.bodySmall(color: kTextMid));
+        style: AppTypography.bodySmall(color: AppTokens.planTextMuted));
   }
 }
 
@@ -676,23 +654,23 @@ class _EmpSearchField extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
         decoration: BoxDecoration(
-          color: kDetailBg,
+          color: colour.kDetailBg,
           borderRadius: BorderRadius.circular(10),
-          border: Border.all(color: kCardBorder, width: 0.5),
+          border: Border.all(color: AppTokens.maintCardBorder, width: 0.5),
         ),
         child: Row(
           children: [
             Expanded(
               child: Text(
                 value.isEmpty ? hint : value,
-                style: AppTypography.bodySmall(color: value.isEmpty ? kTextMuted : kTextDark),
+                style: AppTypography.bodySmall(color: value.isEmpty ? AppTokens.planTextMuted : AppTokens.maintTextDark),
                 overflow: TextOverflow.ellipsis,
               ),
             ),
             Icon(
               value.isNotEmpty ? Icons.close_rounded : Icons.search_rounded,
               size: 20,
-              color: kHeaderGradEnd,
+              color: AppTokens.invoiceHeaderEnd,
             ),
           ],
         ),
@@ -752,12 +730,12 @@ class _FSTextFieldState extends State<_FSTextField> {
       keyboardType: widget.keyboardType,
       textInputAction: TextInputAction.done,
       onChanged: widget.onChanged,
-      style: AppTypography.bodySmall(color: kTextDark),
+      style: AppTypography.bodySmall(color: AppTokens.maintTextDark),
       decoration: InputDecoration(
         hintText: widget.hint,
-        hintStyle: AppTypography.bodySmall(color: kTextMuted),
+        hintStyle: AppTypography.bodySmall(color: AppTokens.planTextMuted),
         filled: true,
-        fillColor: kDetailBg,
+        fillColor: colour.kDetailBg,
         contentPadding:
         const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
         border: OutlineInputBorder(
@@ -765,12 +743,12 @@ class _FSTextFieldState extends State<_FSTextField> {
             borderSide: BorderSide.none),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(10),
-          borderSide: const BorderSide(color: kCardBorder, width: 0.5),
+          borderSide: const BorderSide(color: AppTokens.maintCardBorder, width: 0.5),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(10),
           borderSide:
-          const BorderSide(color: kHeaderGradEnd, width: 1.5),
+          const BorderSide(color: AppTokens.invoiceHeaderEnd, width: 1.5),
         ),
       ),
     );

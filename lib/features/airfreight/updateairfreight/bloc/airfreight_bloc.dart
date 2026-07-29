@@ -4,8 +4,6 @@ import 'package:maleva/core/network/api_constants.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:maleva/core/utils/app_globals.dart';
-
-
 import 'airfreight_event.dart';
 import 'airfreight_state.dart';
 import 'package:maleva/core/models/shared/response_view_model.dart';

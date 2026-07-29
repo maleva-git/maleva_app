@@ -1,14 +1,7 @@
 import 'package:maleva/core/theme/app_typography.dart';
 import 'package:maleva/core/colors/colors.dart' as colour;
-
-
-// ─── Design tokens ─────────────────────────────────────────────────────────────
-
-// ─── Responsive shell ─────────────────────────────────────────────────────────
 import 'package:flutter/Material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:google_fonts/google_fonts.dart';
-import '../../../../core/colors/colors.dart' as colour;
 import '../../../../core/theme/tokens.dart';
 import 'package:maleva/core/utils/app_globals.dart';
 import '../bloc/auth_bloc.dart';
