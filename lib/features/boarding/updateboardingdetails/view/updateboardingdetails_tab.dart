@@ -1,5 +1,4 @@
 import 'package:maleva/core/theme/app_typography.dart';
-import 'package:maleva/core/colors/colors.dart' as colour;
 import 'package:maleva/core/network/legacy_api_repository.dart';
 import 'package:maleva/core/di/injection.dart';
 import 'package:maleva/core/utils/system_helpers.dart';
@@ -9,11 +8,9 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:maleva/core/utils/app_globals.dart';
-
 import 'package:maleva/menu/menulist.dart';
 import '../../../../core/theme/tokens.dart';
 import '../../../dashboard/common_tabs/saleorderdetails/view/saleorderdetails_tab.dart';
@@ -23,15 +20,7 @@ import '../bloc/updateboardingdetails_event.dart';
 import '../bloc/updateboardingdetails_state.dart';
 import 'package:maleva/features/operations/models/job_all_status_model.dart';
 
-// ─── Design Tokens ────────────────────────────────────────────────────────────
 
-// const kCardBorder      = Color(0xFFC5D0EE);
-// const kPageBg          = Color(0xFFF4F6FB);
-
-// const kTextMid         = Color(0xFF4A5A8A);
-// const kTextMuted       = Color(0xFF8A96BF);
-// const kDetailBg        = Color(0xFFF0F4FF);
-// const kChipBg          = Color(0xFFEEF2FF);
 
 const kGradient = LinearGradient(
   colors: [AppTokens.invoiceHeaderStart, AppTokens.invoiceHeaderEnd],

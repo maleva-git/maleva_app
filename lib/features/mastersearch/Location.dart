@@ -2,10 +2,8 @@ import 'package:maleva/core/theme/app_typography.dart';
 import 'package:maleva/core/network/legacy_api_repository.dart';
 import 'package:maleva/core/di/injection.dart';
 import 'package:flutter/Material.dart';
-
 import 'package:maleva/core/utils/app_globals.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:maleva/core/colors/colors.dart' as colour;
 import 'package:maleva/core/models/shared/location_model.dart';
 

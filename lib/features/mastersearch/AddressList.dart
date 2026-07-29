@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:maleva/core/colors/colors.dart' as colour;
 import 'package:maleva/core/utils/app_globals.dart';
 import 'package:maleva/core/network/api_client.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 
 class AddressList extends StatefulWidget {
@@ -19,7 +18,6 @@ class AddressList extends StatefulWidget {
 }
 
 class _AddressListstate extends State<AddressList> {
-  // null=loading  true=loaded  false=error
   bool? _loadState;
   String _errorMsg = '';
 
@@ -73,7 +71,6 @@ class _AddressListstate extends State<AddressList> {
     }
   }
 
-  // ─── Search (Untouched) ──────────────────────────────────────────────────
 
   void _search(String value) {
     setState(() {
@@ -91,8 +88,6 @@ class _AddressListstate extends State<AddressList> {
   void _onItemTapped(String selected) {
     Navigator.of(context, rootNavigator: true).pop(selected);
   }
-
-  // ─── Build ────────────────────────────────────────────────────────────────
 
   @override
   Widget build(BuildContext context) {
@@ -119,8 +114,6 @@ class _AddressListstate extends State<AddressList> {
       ),
     ),
   );
-
-  // ─── Body states ─────────────────────────────────────────────────────────
 
   Widget _buildBody() {
     // Loading
@@ -187,7 +180,6 @@ class _AddressListstate extends State<AddressList> {
     );
   }
 
-  // ─── Widgets ──────────────────────────────────────────────────────────────
 
   AppBar _buildAppBar() {
     return AppBar(
@@ -217,7 +209,7 @@ class _AddressListstate extends State<AddressList> {
         style: AppTypography.bodySmall(color: colour.commonColor),
         decoration: InputDecoration(
           filled: true,
-          fillColor: Colors.grey.shade100, // Nice soft background
+          fillColor: Colors.grey.shade100,
           contentPadding: const EdgeInsets.symmetric(vertical: 0, horizontal: 16),
           enabledBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(12.0),

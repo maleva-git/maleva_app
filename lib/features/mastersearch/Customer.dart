@@ -2,10 +2,8 @@ import 'package:maleva/core/theme/app_typography.dart';
 import 'package:maleva/core/network/legacy_api_repository.dart';
 import 'package:maleva/core/di/injection.dart';
 import 'package:flutter/material.dart';
-
 import 'package:maleva/core/utils/app_globals.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:maleva/core/colors/colors.dart' as colour;
 import 'package:maleva/core/models/shared/customer_model.dart';
 
@@ -36,7 +34,7 @@ class _Customerstate extends State<Customer> {
     super.dispose();
   }
 
-  // ─── Fetch (Untouched Logic) ─────────────────────────────────────────────
+
 
   Future startup() async {
     await sl<LegacyApiRepository>().SelectCustomer(context);
@@ -49,7 +47,7 @@ class _Customerstate extends State<Customer> {
     });
   }
 
-  // ─── Search & Selection (Untouched Logic) ────────────────────────────────
+
 
   void search(String value) {
     String vv = value.toUpperCase();
@@ -71,7 +69,7 @@ class _Customerstate extends State<Customer> {
     }
   }
 
-  // ─── Build ────────────────────────────────────────────────────────────────
+
 
   @override
   Widget build(BuildContext context) {
@@ -84,7 +82,7 @@ class _Customerstate extends State<Customer> {
 
   Widget _buildTabletLayout() => Scaffold(
     appBar: _buildAppBar(),
-    backgroundColor: Colors.grey.shade100, // Softer background for tablet
+    backgroundColor: Colors.grey.shade100,
     body: Padding(
       padding: const EdgeInsets.only(
           left: 100, right: 100, top: 50, bottom: 40),
@@ -99,7 +97,6 @@ class _Customerstate extends State<Customer> {
     ),
   );
 
-  // ─── Body States ─────────────────────────────────────────────────────────
 
   Widget _buildBody() {
     // Loading State
@@ -121,7 +118,6 @@ class _Customerstate extends State<Customer> {
     );
   }
 
-  // ─── Widgets ──────────────────────────────────────────────────────────────
 
   AppBar _buildAppBar() {
     return AppBar(
