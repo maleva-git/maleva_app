@@ -1,11 +1,10 @@
-import 'package:maleva/core/network/legacy_api_repository.dart';
-import 'package:maleva/core/di/injection.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 import 'package:maleva/core/utils/app_globals.dart';
 import 'package:maleva/core/utils/app_preferences.dart';
-
+import 'package:maleva/core/network/legacy_api_repository.dart';
+import 'package:maleva/core/di/injection.dart';
 
 import '../data/vessel_report_repository.dart';
 import 'vesselreport_event.dart';
@@ -52,7 +51,6 @@ class VesselBloc extends Bloc<VesselEvent, VesselState> {
       if (event.type == 0) {
         fromDate = "2025-02-01";
       }
-
       // ✅ If Boarding role (600), auto-load employee ports as Search
       String searchValue = currentSearch;
       if ((AppPreferences.getRoleId() == 600 || AppPreferences.getRoleId() == 500) && currentSearch.isEmpty) {
