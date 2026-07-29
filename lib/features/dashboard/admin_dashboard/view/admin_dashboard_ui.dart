@@ -39,6 +39,7 @@ import '../../common_tabs/driverleave/view/admin_leave_approval_tab.dart';
 import 'package:maleva/core/widgets/custom_app_bar.dart';
 import 'package:maleva/features/dashboard/common_tabs/driverleave/view/employee_leave_request_tab.dart';
 import 'package:maleva/features/dashboard/common_tabs/driverleave/view/employee_leave_approval_tab.dart';
+import '../../common_tabs/salary/view/salary_tab.dart';
 import 'package:maleva/core/models/shared/barcode_print_model.dart';
 import 'package:maleva/core/utils/auth_helper.dart';
 
@@ -149,6 +150,7 @@ class MobileDashboard extends StatelessWidget {
           _tab('TRANSPORT',       isTablet),
           _tab('Truck',           isTablet),
           _tab('Driver',          isTablet),
+          _tab('Salary',          isTablet),
           _tab('SpeedingReport',  isTablet),
           _tab('FuelFilling',     isTablet),
           _tab('EngineHours',     isTablet),
@@ -204,6 +206,7 @@ class MobileDashboard extends StatelessWidget {
           const TransportReportPage(),
           const TruckDetailsReportPage(),
           const DriverDetailsView(),
+          const SalaryTab(),
           const SpeedingScreen(),
           const FuelFillingPage(),
           const EngineHoursPage(),
