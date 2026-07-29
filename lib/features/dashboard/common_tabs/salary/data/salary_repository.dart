@@ -6,16 +6,17 @@ import 'package:maleva/core/models/shared/response_view_model.dart';
 class SalaryRepository {
   Future<Map<String, dynamic>> fetchSalaryData(String fromDate, String toDate) async {
     try {
+      final isAdmin = AppPreferences.getRulesType().toUpperCase() == 'ADMIN' || AppPreferences.getRoleId() == 1;
       final master = {
         'Comid': AppPreferences.getComid(),
-        'Employeeid': AppPreferences.getEmpRefId(),
+        'Employeeid': isAdmin ? 0 : AppPreferences.getEmpRefId(),
         'FromDate': fromDate,
         'ToDate': toDate,
       };
 
       // Assuming ApiClient.postRequest handles the headers internally
       final response = await ApiClient.postRequest(
-        ApiConstants.apiSelectBoardingSalary,
+        ApiConstants.apiSelectBoardingSalaryByEmpId,
         master,
       );
 
@@ -34,7 +35,7 @@ class SalaryRepository {
             // Calculate total inside the data layer
             salaryAmount = salaryList.fold(
               0.0,
-                  (sum, item) => sum + ((item["NetAmt"] as num?)?.toDouble() ?? 0.0),
+                  (sum, item) => sum + ((item["Salary"] as num?)?.toDouble() ?? 0.0),
             );
           }
         }

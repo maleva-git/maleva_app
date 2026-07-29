@@ -1,7 +1,6 @@
 import 'package:maleva/core/theme/app_typography.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import '../../../../../core/di/injection.dart';
 import '../../../../../core/theme/palette.dart';
@@ -353,9 +352,9 @@ class _TableHeader extends StatelessWidget {
       ),
       child: const Row(
         children: [
-          Expanded(flex: 3, child: _HeaderCell('Bill Date')),
-          Expanded(flex: 3, child: _HeaderCell('Bill No')),
-          Expanded(flex: 2, child: _HeaderCell('Net Amt', align: TextAlign.right)),
+          Expanded(flex: 3, child: _HeaderCell('Boarding Date')),
+          Expanded(flex: 3, child: _HeaderCell('Vessel Name')),
+          Expanded(flex: 2, child: _HeaderCell('Salary', align: TextAlign.right)),
         ],
       ),
     );
@@ -432,9 +431,12 @@ class _SalaryRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final billDate = item['BillDate']?.toString() ?? '';
-    final billNo = item['BillNoDisplay']?.toString() ?? '';
-    final netAmt = (item['NetAmt'] as num?)?.toDouble() ?? 0.0;
+    final rawDate = item['BoardingDate']?.toString() ?? '';
+    // Optional date format: take only the first 10 characters (YYYY-MM-DD) if it contains a 'T'
+    final billDate = rawDate.contains('T') ? rawDate.substring(0, 10) : rawDate;
+    final billNo = item['VesselName']?.toString() ?? '';
+    final empName = item['EmployeeName']?.toString() ?? '';
+    final netAmt = (item['Salary'] as num?)?.toDouble() ?? 0.0;
 
     return InkWell(
       onTap: onTap,
@@ -465,14 +467,29 @@ class _SalaryRow extends StatelessWidget {
                 style: AppTypography.bodyLarge(color: AppTokens.brandDark, fontWeight: FontWeight.w600),
               ),
             ),
-            // Bill No
+            // Bill No & Emp Name
             Expanded(
               flex: 3,
-              child: Text(
-                billNo,
-                overflow: TextOverflow.ellipsis,
-                maxLines: 1,
-                style: AppTypography.bodyLarge(color: AppTokens.maintTextMid, fontWeight: FontWeight.w600),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    billNo,
+                    overflow: TextOverflow.ellipsis,
+                    maxLines: 1,
+                    style: AppTypography.bodyLarge(color: AppTokens.maintTextMid, fontWeight: FontWeight.w600),
+                  ),
+                  if (empName.isNotEmpty) ...[
+                    const SizedBox(height: 2),
+                    Text(
+                      empName,
+                      overflow: TextOverflow.ellipsis,
+                      maxLines: 1,
+                      style: AppTypography.bodySmall(color: AppTokens.textSecondary, fontWeight: FontWeight.w500),
+                    ),
+                  ],
+                ],
               ),
             ),
             // Net Amount — right-aligned with accent chip

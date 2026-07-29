@@ -75,6 +75,8 @@ class ApiConstants {
   static const String apiViewDOConvert        = "$port/api/SaleOrderApp/DoConvert?BillNo=";
   static const String apiViewInvoice          = "$port/api/SaleOrderApp/InvoiceConvert?BillNo=";
   static const String apiSelectBoardingSalary = "$port/api/SaleOrderApp/GetBoardingSalary";
+  static const String apiSelectBoardingSalaryNew = "$port/api/BoardingSalaryApp/SelectBoardingSalary";
+  static const String apiSelectBoardingSalaryByEmpId = "$port/api/BoardingSalaryApp/SelectBoardingSalaryByEmpId";
   static const String apiSelectSaleorderinvoicecheck = "$port/api/MasterReportApp/SelectChecksalesinvoice";
   static String SaleInvoiceCountDB      = "$port/api/DashBoardApp/CheckSaleInvoiceCount";
   static String SelectSalesOrderStatus  = "$port/api/DashBoardApp/SelectSalesOrderStatus";
