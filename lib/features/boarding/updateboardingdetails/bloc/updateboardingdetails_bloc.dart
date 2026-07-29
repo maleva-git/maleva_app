@@ -5,7 +5,6 @@ import 'package:maleva/core/network/api_constants.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 import 'package:maleva/core/utils/app_globals.dart';
-
 import 'package:maleva/features/boarding/updateboardingdetails/bloc/updateboardingdetails_event.dart';
 import 'package:maleva/features/boarding/updateboardingdetails/bloc/updateboardingdetails_state.dart';
 import 'package:maleva/core/models/shared/response_view_model.dart';

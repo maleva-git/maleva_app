@@ -1,9 +1,9 @@
-import 'package:maleva/core/theme/app_typography.dart';
 import 'package:maleva/core/colors/colors.dart' as colour;
+import 'package:maleva/core/theme/tokens.dart';
+import 'package:maleva/core/theme/app_typography.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:maleva/core/utils/app_globals.dart';
 import 'package:maleva/menu/menulist.dart';
@@ -13,18 +13,6 @@ import '../bloc/forwardingsmk_event.dart';
 import '../bloc/forwardingsmk_state.dart';
 
 
-const kPageBg          = Color(0xFFF4F6FB);
-const kTextDark        = Color(0xFF1E2D5E);
-const kTextMid         = Color(0xFF4A5A8A);
-const kTextMuted       = Color(0xFF8A96BF);
-const kDetailBg        = Color(0xFFF0F4FF);
-const kChipBg          = Color(0xFFEEF2FF);
-
-const kGradient = LinearGradient(
-  colors: [Palette.blue700, Palette.blue400],
-  begin: Alignment.topLeft,
-  end: Alignment.bottomRight,
-);
 
 const double kTabletBreak = 600;
 
@@ -103,7 +91,7 @@ class _FWSmkPageState extends State<_FWSmkPage>
         },
         child: Scaffold(
           resizeToAvoidBottomInset: true,
-          backgroundColor: kPageBg,
+          backgroundColor: colour.kPageBg,
           appBar: _buildAppBar(context, userName),
           drawer: const Menulist(),
           body: BlocBuilder<FWSmkBloc, FWSmkState>(
@@ -152,7 +140,7 @@ class _FWSmkPageState extends State<_FWSmkPage>
       elevation: 0,
       toolbarHeight: 62,
       flexibleSpace:
-      Container(decoration: const BoxDecoration(gradient: kGradient)),
+      Container(decoration: const BoxDecoration(gradient: AppTokens.headerGradient)),
       leading: IconButton(
         icon: const Icon(Icons.arrow_back_ios_new_rounded, size: 20),
         color: Colors.white,
@@ -308,13 +296,13 @@ class _JobNoSectionState extends State<_JobNoSection> {
             keyboardType: TextInputType.number,
             textCapitalization: TextCapitalization.characters,
             textInputAction: TextInputAction.done,
-            style: AppTypography.bodySmall(color: kTextDark),
+            style: AppTypography.bodySmall(color: AppTokens.maintTextDark),
             decoration: InputDecoration(
               hintText: 'Job No',
               hintStyle:
-              AppTypography.bodySmall(color: kTextMuted),
+              AppTypography.bodySmall(color: AppTokens.planTextMuted),
               filled: true,
-              fillColor: kDetailBg,
+              fillColor: colour.kDetailBg,
               prefixIcon: const Icon(Icons.tag_rounded,
                   color: Palette.blue400, size: 20),
               contentPadding: const EdgeInsets.symmetric(
@@ -360,7 +348,7 @@ class _JobNoSectionState extends State<_JobNoSection> {
                 padding: EdgeInsets.zero,
                 itemCount: s.jobNoSuggestions.length,
                 separatorBuilder: (_, __) =>
-                const Divider(height: 1, color: kDetailBg),
+                const Divider(height: 1, color: colour.kDetailBg),
                 itemBuilder: (ctx, i) {
                   final item = s.jobNoSuggestions[i];
                   final cnum = item['CNumber'].toString();
@@ -377,7 +365,7 @@ class _JobNoSectionState extends State<_JobNoSection> {
                               size: 16, color: Palette.blue400),
                           const SizedBox(width: 10),
                           Text(cnum,
-                              style: AppTypography.bodySmall(color: kTextDark)),
+                              style: AppTypography.bodySmall(color: AppTokens.maintTextDark)),
                         ],
                       ),
                     ),
@@ -472,7 +460,7 @@ class _FWSmkTabContentState extends State<_FWSmkTabContent> {
                 primary: Palette.blue700,
                 onPrimary: Colors.white,
                 surface: Colors.white,
-                onSurface: kTextDark,
+                onSurface: AppTokens.maintTextDark,
               ),
             ),
             child: child!,
@@ -491,7 +479,7 @@ class _FWSmkTabContentState extends State<_FWSmkTabContent> {
     final originalCheckbox = Container(
       margin: const EdgeInsets.symmetric(vertical: 8),
       padding: const EdgeInsets.symmetric(horizontal: 10),
-      decoration: BoxDecoration(color: kDetailBg, borderRadius: BorderRadius.circular(10)),
+      decoration: BoxDecoration(color: colour.kDetailBg, borderRadius: BorderRadius.circular(10)),
       child: Row(
         children: [
           Checkbox(
@@ -499,7 +487,7 @@ class _FWSmkTabContentState extends State<_FWSmkTabContent> {
             activeColor: Palette.blue700,
             onChanged: (v) => _emit(FWSmkFieldChanged(tab: t, field: 'original', value: v.toString())),
           ),
-          Text("Original", style: AppTypography.bodySmall(color: kTextDark)),
+          Text("Original", style: AppTypography.bodySmall(color: AppTokens.maintTextDark)),
         ],
       ),
     );
@@ -672,7 +660,7 @@ class _DateCheckRow extends StatelessWidget {
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 13),
               decoration: BoxDecoration(
-                color: kDetailBg,
+                color: colour.kDetailBg,
                 borderRadius: BorderRadius.circular(10),
                 border: Border.all(color: Palette.cardBorder, width: 0.5),
               ),
@@ -681,13 +669,13 @@ class _DateCheckRow extends StatelessWidget {
                   Expanded(
                     child: Text(
                       display,
-                      style: AppTypography.bodySmall(color: tab.dateEnabled ? kTextDark : kTextMuted),
+                      style: AppTypography.bodySmall(color: tab.dateEnabled ? AppTokens.maintTextDark : AppTokens.planTextMuted),
                     ),
                   ),
                   Icon(
                     Icons.calendar_month_outlined,
                     size: 20,
-                    color: tab.dateEnabled ? Palette.blue400 : kTextMuted,
+                    color: tab.dateEnabled ? Palette.blue400 : AppTokens.planTextMuted,
                   ),
                 ],
               ),
@@ -705,7 +693,7 @@ class _DateCheckRow extends StatelessWidget {
             width: isTablet ? 24 : 20,
             height: isTablet ? 24 : 20,
             decoration: BoxDecoration(
-              gradient: tab.dateEnabled ? kGradient : null,
+              gradient: tab.dateEnabled ? AppTokens.headerGradient : null,
               border: tab.dateEnabled
                   ? null
                   : Border.all(color: Palette.cardBorder, width: 1.5),
@@ -738,7 +726,7 @@ class _FWDropdown extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 14),
       decoration: BoxDecoration(
-        color: kDetailBg,
+        color: colour.kDetailBg,
         borderRadius: BorderRadius.circular(10),
         border: Border.all(color: Palette.cardBorder, width: 0.5),
       ),
@@ -747,8 +735,8 @@ class _FWDropdown extends StatelessWidget {
           isExpanded: true,
           value: value,
           hint: Text('Select FW',
-              style: AppTypography.bodySmall(color: kTextMuted)),
-          style: AppTypography.bodySmall(color: kTextDark),
+              style: AppTypography.bodySmall(color: AppTokens.planTextMuted)),
+          style: AppTypography.bodySmall(color: AppTokens.maintTextDark),
           dropdownColor: Colors.white,
           borderRadius: BorderRadius.circular(10),
           icon: const Icon(Icons.keyboard_arrow_down_rounded,
@@ -760,7 +748,7 @@ class _FWDropdown extends StatelessWidget {
               .map((v) => DropdownMenuItem(
             value: v,
             child: Text(v,
-                style: AppTypography.bodySmall(color: kTextDark)),
+                style: AppTypography.bodySmall(color: AppTokens.maintTextDark)),
           ))
               .toList(),
         ),
@@ -781,7 +769,7 @@ class _BillTypeRow extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 8),
       decoration: BoxDecoration(
-        color: kDetailBg,
+        color: colour.kDetailBg,
         borderRadius: BorderRadius.circular(10),
         border: Border.all(color: Palette.cardBorder, width: 0.5),
       ),
@@ -846,7 +834,7 @@ class _RadioOption extends StatelessWidget {
                   color: selected ? Palette.blue400 : Palette.cardBorder,
                   width: selected ? 0 : 1.5,
                 ),
-                gradient: selected ? kGradient : null,
+                gradient: selected ? AppTokens.headerGradient : null,
               ),
               child: selected
                   ? const Icon(Icons.circle, size: 10, color: Colors.white)
@@ -855,7 +843,7 @@ class _RadioOption extends StatelessWidget {
             SizedBox(width: isTablet ? 8 : 6),
             Text(
               label,
-              style: AppTypography.heading2(color: selected ? Palette.blue700 : kTextMid),
+              style: AppTypography.heading2(color: selected ? Palette.blue700 : AppTokens.planTextMuted),
             ),
           ],
         ),
@@ -880,7 +868,7 @@ class _FWBottomNav extends StatelessWidget {
         backgroundColor: Colors.white,
         currentIndex: currentIndex,
         selectedItemColor: Palette.blue700,
-        unselectedItemColor: kTextMuted,
+        unselectedItemColor: AppTokens.planTextMuted,
         selectedLabelStyle: AppTypography.bodySmall(),
         unselectedLabelStyle: AppTypography.bodyLarge(),
         onTap: onTap,
@@ -907,7 +895,7 @@ class _FieldLabel extends StatelessWidget {
   Widget build(BuildContext context) {
     return Text(
       text,
-      style: AppTypography.bodySmall(color: kTextMid),
+      style: AppTypography.bodySmall(color: AppTokens.planTextMuted),
     );
   }
 }
@@ -932,12 +920,12 @@ class _SMKTextField extends StatelessWidget {
       textCapitalization: TextCapitalization.characters,
       textInputAction: TextInputAction.done,
       onChanged: onChanged,
-      style: AppTypography.bodySmall(color: kTextDark),
+      style: AppTypography.bodySmall(color: AppTokens.maintTextDark),
       decoration: InputDecoration(
         hintText: hint,
-        hintStyle: AppTypography.bodySmall(color: kTextMuted),
+        hintStyle: AppTypography.bodySmall(color: AppTokens.planTextMuted),
         filled: true,
-        fillColor: kDetailBg,
+        fillColor: colour.kDetailBg,
         contentPadding:
         const EdgeInsets.symmetric(horizontal: 14, vertical: 13),
         border: OutlineInputBorder(

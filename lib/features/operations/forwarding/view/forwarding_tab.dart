@@ -1,5 +1,4 @@
 import 'package:maleva/core/theme/app_typography.dart';
-import 'package:maleva/core/colors/colors.dart' as colour;
 import 'package:maleva/core/network/legacy_api_repository.dart';
 import 'package:maleva/core/di/injection.dart';
 import 'package:maleva/core/utils/system_helpers.dart';
@@ -9,12 +8,9 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:maleva/core/utils/app_globals.dart';
-
 import 'package:maleva/menu/menulist.dart';
-import '../../../../core/di/injection.dart';
 import '../../../../core/theme/palette.dart';
 import '../../../mastersearch/Employee.dart';
 import '../bloc/forwarding_bloc.dart';
@@ -31,10 +27,6 @@ const kGradient = LinearGradient(
 
 const double kTabletBreak = 600;
 
-
-// =========================================================================
-// UI: FWUpdate Page & Widgets
-// =========================================================================
 
 class FWUpdate extends StatelessWidget {
   const FWUpdate({super.key});
@@ -62,7 +54,7 @@ class FWUpdatePageState extends State<FWUpdatePage> with SingleTickerProviderSta
   @override
   void initState() {
     super.initState();
-    // Fixed: Initializing the Global JobNoList
+
     sl<LegacyApiRepository>().GetJobNoForwarding(context, 3);
 
     _tabController = TabController(length: 3, vsync: this);
@@ -146,7 +138,7 @@ class FWUpdatePageState extends State<FWUpdatePage> with SingleTickerProviderSta
                 if (_tabController.index != state.currentTab) {
                   _tabController.animateTo(state.currentTab);
                 }
-                // Fixed: Removed GestureDetector wrapper that was killing the overlay focus
+
                 return _FWUpdateBody(
                   state: state,
                   tabController: _tabController,

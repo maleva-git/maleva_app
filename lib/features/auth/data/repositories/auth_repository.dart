@@ -19,15 +19,15 @@ class AuthRepository {
     required int driverId,
   }) async {
     try {
-      // 1. Get FCM Token — wait for it if not yet available (first-launch race condition)
+
       String fcmToken = AppPreferences.getFcmToken();
       if (fcmToken.isEmpty) {
         try {
           await AppGlobals.getDeviceToken()
               .timeout(const Duration(seconds: 5), onTimeout: () {});
-          fcmToken = AppPreferences.getFcmToken(); // retry after fetch
+          fcmToken = AppPreferences.getFcmToken();
         } catch (_) {
-          // FCM unavailable — proceed with empty token, server handles it
+
         }
       }
 
@@ -40,10 +40,10 @@ class AuthRepository {
         fcmToken: fcmToken,
       );
 
-      // 3. Parse Data to Domain Model
+
       final value = ResponseViewModel.fromJson(rawData);
 
-      // 4. Handle Business Logic & Update Local Cache
+
       if (value.IsSuccess == true) {
         await _saveLoginData(value, username, password, driverId, oldUsername);
         return true;

@@ -6,7 +6,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:maleva/core/theme/palette.dart';
 import 'package:maleva/core/utils/app_globals.dart';
 import 'package:maleva/menu/menulist.dart';
@@ -18,7 +17,7 @@ import 'package:maleva/core/utils/auth_helper.dart';
 
 
 
-const double _kTabletBreak = 600.0; // width >= 600 → tablet layout
+const double _kTabletBreak = 600.0;
 
 
 
@@ -44,7 +43,6 @@ class _HomeDashboardView extends StatefulWidget {
 }
 
 class _HomeDashboardViewState extends State<_HomeDashboardView> {
-  // ── Back press ────────────────────────────────────────────────────────────
 
   Future<bool> _onBackPressed() async {
     final bool confirmed = await ConfirmationMsgYesNo(
@@ -66,7 +64,7 @@ class _HomeDashboardViewState extends State<_HomeDashboardView> {
     return confirmed;
   }
 
-  // ── Build ──────────────────────────────────────────────────────────────────
+
 
   @override
   Widget build(BuildContext context) {
@@ -121,13 +119,9 @@ class _HomeDashboardViewState extends State<_HomeDashboardView> {
       );
     }
 
-    // ── Update available — show store dialog with context ─────────────────
-    // canUpdate comes from state (set by BLoC after AppVersionUpdate.checkForUpdates).
-    // showAlertUpdate needs context so it must be called here, not in the BLoC.
     if (state.isReady && state.canUpdate) {
       WidgetsBinding.instance.addPostFrameCallback((_) async {
-        // Re-run checkForUpdates to get the AppVersionResult object,
-        // which showAlertUpdate needs to read storeVersion / storeUrl.
+
         final result = await AppVersionUpdate.checkForUpdates(
           appleId: '6738003436',
           playStoreId: 'com.kassapos.maleva',
@@ -186,8 +180,6 @@ class _HomeDashboardViewState extends State<_HomeDashboardView> {
     );
   }
 
-  // ── Font size helper ──────────────────────────────────────────────────────
-  // Keeps global objfun font constants in sync — other screens depend on them.
 
   void _setFontSizes(double width, bool isTablet) {
     if (isTablet) {
@@ -209,9 +201,7 @@ class _HomeDashboardViewState extends State<_HomeDashboardView> {
   }
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// Mobile Dashboard
-// ─────────────────────────────────────────────────────────────────────────────
+
 
 class _MobileDashboard extends StatelessWidget {
   const _MobileDashboard({required this.state});
@@ -232,9 +222,7 @@ class _MobileDashboard extends StatelessWidget {
   }
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// Tablet Dashboard
-// ─────────────────────────────────────────────────────────────────────────────
+
 
 class _TabletDashboard extends StatelessWidget {
   const _TabletDashboard({required this.state});
@@ -246,15 +234,14 @@ class _TabletDashboard extends StatelessWidget {
     return Scaffold(
       resizeToAvoidBottomInset: false,
       backgroundColor: Palette.grey50,
-      // Tablet uses a persistent side rail instead of a hamburger drawer
+
       body: Row(
         children: [
-          // ── Side navigation rail ────────────────────────────────
+
           _TabletSideRail(),
 
           const VerticalDivider(width: 1, thickness: 1),
 
-          // ── Main content ────────────────────────────────────────
           Expanded(
             child: Column(
               children: [
@@ -273,9 +260,6 @@ class _TabletDashboard extends StatelessWidget {
   }
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// Shared AppBar
-// ─────────────────────────────────────────────────────────────────────────────
 
 class _DashboardAppBar extends StatelessWidget
     implements PreferredSizeWidget {
@@ -317,10 +301,6 @@ class _DashboardAppBar extends StatelessWidget
   }
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// Loading body — shown while version check is running
-// ─────────────────────────────────────────────────────────────────────────────
-
 class _LoadingBody extends StatelessWidget {
   const _LoadingBody({required this.isTablet});
 
@@ -337,9 +317,6 @@ class _LoadingBody extends StatelessWidget {
   }
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// Ready body — logo card centred on screen
-// ─────────────────────────────────────────────────────────────────────────────
 
 class _ReadyBody extends StatelessWidget {
   const _ReadyBody({required this.isTablet});
@@ -354,7 +331,7 @@ class _ReadyBody extends StatelessWidget {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          // ── Logo ────────────────────────────────────────────────
+
           Container(
             width: logoSize,
             height: logoSize * 0.8,
@@ -373,7 +350,6 @@ class _ReadyBody extends StatelessWidget {
 
           SizedBox(height: isTablet ? 32 : 20),
 
-          // ── Greeting / Company name ──────────────────────────────
           Text(
             AppGlobals.selectedCompanyName.isNotEmpty
                 ? AppGlobals.selectedCompanyName
@@ -393,9 +369,6 @@ class _ReadyBody extends StatelessWidget {
   }
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// Tablet side rail — replaces the hamburger drawer on wide screens
-// ─────────────────────────────────────────────────────────────────────────────
 
 class _TabletSideRail extends StatelessWidget {
   @override
@@ -405,7 +378,7 @@ class _TabletSideRail extends StatelessWidget {
       color: AppTokens.appBarBg,
       child: Column(
         children: [
-          // ── Rail header with gradient ────────────────────────────
+
           Container(
             width: double.infinity,
             padding: const EdgeInsets.fromLTRB(16, 48, 16, 20),
@@ -434,7 +407,7 @@ class _TabletSideRail extends StatelessWidget {
             ),
           ),
 
-          // ── Menu items ────────────────────────────────────────────
+
           Expanded(
             child: ListView(
               padding: EdgeInsets.zero,
@@ -455,7 +428,7 @@ class _TabletSideRail extends StatelessWidget {
             ),
           ),
 
-          // ── Logout at bottom ─────────────────────────────────────
+
           const Divider(color: Palette.pillBg, height: 1),
           ListTile(
             leading: const Icon(Icons.exit_to_app,

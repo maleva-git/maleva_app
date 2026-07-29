@@ -6,19 +6,19 @@ class AirFreightInitial extends AirFreightState {}
 class AirFreightLoading extends AirFreightState {}
 
 class AirFreightLoaded extends AirFreightState {
-  // ── Job No lookup ─────────────────────────────────────────────────────────
+
   final String billType;
   final String jobNoText;
   final int    saleOrderId;
   final List<dynamic> jobNoSuggestions;
 
-  // ── Loaded fields ─────────────────────────────────────────────────────────
+
   final String jobType;
   final int    statusId;
   final String statusName;
   final String awbNo;
 
-  // ── Image ─────────────────────────────────────────────────────────────────
+
   final bool         imageUploadEnabled;
   final List<String> images;
 

@@ -1,6 +1,5 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-
 import '../data/forwardingsalary_repository.dart';
 import 'forwardingsalary_event.dart';
 import 'forwardingsalary_state.dart';
@@ -29,21 +28,21 @@ class ForwardingSalaryBloc extends Bloc<ForwardingSalaryEvent, ForwardingSalaryS
     on<ForwardingSalaryResetRequested>(_onResetRequested);
   }
 
-  // ── Startup ─────────────────────────────────────────────────────────────────
+
   Future<void> _onStarted(ForwardingSalaryStarted event, Emitter<ForwardingSalaryState> emit) async {
-    // Show UI instantly
+
     emit(ForwardingSalaryLoaded.empty());
     try {
-      // Load data in background
+
       final data = await repository.initializeData();
       _jobNoList = data['jobNoList'] ?? [];
       _employeeList = data['employeeList'] ?? [];
     } catch (e) {
-      // Background load failed, ignore
+
     }
   }
 
-  // ── BillType ─────────────────────────────────────────────────────────────────
+
   Future<void> _onBillTypeChanged(ForwardingSalaryBillTypeChanged event, Emitter<ForwardingSalaryState> emit) async {
     if (state is! ForwardingSalaryLoaded) return;
     final s = state as ForwardingSalaryLoaded;
@@ -59,7 +58,7 @@ class ForwardingSalaryBloc extends Bloc<ForwardingSalaryEvent, ForwardingSalaryS
     ));
   }
 
-  // ── RTI text typed ───────────────────────────────────────────────────────────
+
   void _onRtiTextChanged(ForwardingSalaryRtiTextChanged event, Emitter<ForwardingSalaryState> emit) {
     if (state is! ForwardingSalaryLoaded) return;
     final s = state as ForwardingSalaryLoaded;
@@ -77,7 +76,6 @@ class ForwardingSalaryBloc extends Bloc<ForwardingSalaryEvent, ForwardingSalaryS
     ));
   }
 
-  // ── RTI suggestion selected ──────────────────────────────────────────────────
   Future<void> _onRtiSelected(ForwardingSalaryRtiSelected event, Emitter<ForwardingSalaryState> emit) async {
     if (state is! ForwardingSalaryLoaded) return;
     final s = state as ForwardingSalaryLoaded;
@@ -102,7 +100,7 @@ class ForwardingSalaryBloc extends Bloc<ForwardingSalaryEvent, ForwardingSalaryS
         sealEmpId  = data['EmployeeMasterRefId'] ?? 0;
         breakEmpId = data['EmployeeMasterRefId1'] ?? 0;
 
-        // ✅ API-ல null வருது — so local list-ல தேடு
+
         if (sealEmpId != 0) {
           final emp = _employeeList.firstWhere(
                 (e) => e.Id == sealEmpId,
@@ -141,7 +139,6 @@ class ForwardingSalaryBloc extends Bloc<ForwardingSalaryEvent, ForwardingSalaryS
     }
   }
 
-  // ── Modifiers ────────────────────────────────────────────────────────────────
   void _onOverlayDismissed(ForwardingSalaryOverlayDismissed event, Emitter<ForwardingSalaryState> emit) {
     if (state is ForwardingSalaryLoaded) emit((state as ForwardingSalaryLoaded).copyWith(rtiSuggestions: []));
   }
@@ -167,7 +164,7 @@ class ForwardingSalaryBloc extends Bloc<ForwardingSalaryEvent, ForwardingSalaryS
     if (state is ForwardingSalaryLoaded) emit((state as ForwardingSalaryLoaded).copyWith(salary2: event.value));
   }
 
-  // ── Save / Reset ─────────────────────────────────────────────────────────────
+
   Future<void> _onSaveRequested(ForwardingSalarySaveRequested event, Emitter<ForwardingSalaryState> emit) async {
     if (state is! ForwardingSalaryLoaded) return;
     final s = state as ForwardingSalaryLoaded;
@@ -190,7 +187,7 @@ class ForwardingSalaryBloc extends Bloc<ForwardingSalaryEvent, ForwardingSalaryS
         emit(ForwardingSalarySaveSuccess());
         emit(ForwardingSalaryLoaded.empty());
       } else {
-        emit(s); // revert — error shown by UI listener
+        emit(s);
       }
     } catch (e) {
       emit(ForwardingSalaryError(e.toString()));
