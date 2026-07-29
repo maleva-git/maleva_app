@@ -4,10 +4,6 @@ abstract class EmployeeState {
   const EmployeeState();
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// LIST PAGE STATES
-// ─────────────────────────────────────────────────────────────────────────────
-
 class EmployeeListLoading extends EmployeeState {
   const EmployeeListLoading();
 }

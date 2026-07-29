@@ -1,14 +1,13 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:maleva/core/utils/app_globals.dart';
-
 import '../data/employee_repository.dart';
 import 'employeemaster_event.dart';
 import 'employeemaster_state.dart';
 import 'package:maleva/core/models/shared/employee_details_model.dart';
 
 class EmployeeMasterBloc extends Bloc<EmployeeMasterEvent, EmployeeState> {
-  // ❌ REMOVED: final BuildContext context;
-  final EmployeeRepository repository; // ✅ Injected Repository
+
+  final EmployeeRepository repository;
 
   // ── List page init ──────────────────────────────────────────────────────────
   EmployeeMasterBloc.list({required this.repository}) : super(const EmployeeListLoading()) {

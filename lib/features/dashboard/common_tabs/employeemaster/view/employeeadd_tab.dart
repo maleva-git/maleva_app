@@ -1,18 +1,13 @@
 import 'package:maleva/core/theme/app_typography.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:google_fonts/google_fonts.dart';
-
 import 'package:maleva/core/utils/app_globals.dart';
-
 import '../../../../../core/di/injection.dart';
 import '../../../../../core/theme/tokens.dart';
 import '../bloc/employeemaster_bloc.dart';
 import '../bloc/employeemaster_event.dart';
 import '../bloc/employeemaster_state.dart';
 import 'package:maleva/core/colors/colors.dart' as colour;
-
-
 import '../data/employee_repository.dart';
 import 'package:maleva/core/models/shared/employee_details_model.dart';
 

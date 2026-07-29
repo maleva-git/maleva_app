@@ -1,9 +1,7 @@
 import 'package:maleva/core/theme/app_typography.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
-import 'package:maleva/core/utils/app_globals.dart';
 import 'package:maleva/core/colors/colors.dart' as colour;
 import '../../../../../core/di/injection.dart';
 import '../../../../../core/theme/tokens.dart';
@@ -21,7 +19,7 @@ class EngineHoursPage extends StatelessWidget {
     return
     BlocProvider(
       create: (context) => sl<EngineHoursBloc>()..add(LoadEngineHoursReport()),
-      child: const _EngineHoursBody(), // Add a BlocListener here to show SnackBars for EngineHoursError if needed!
+      child: const _EngineHoursBody(),
     );
   }
 }

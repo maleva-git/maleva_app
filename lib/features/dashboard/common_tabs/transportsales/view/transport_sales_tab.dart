@@ -1,16 +1,14 @@
 import 'package:maleva/core/theme/app_typography.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:maleva/core/colors/colors.dart' as colour;
 import 'package:maleva/core/theme/tokens.dart';
-
 import '../../../../../core/di/injection.dart';
 import '../bloc/transport_sales_bloc.dart';
 import '../bloc/transport_sales_event.dart';
 import '../bloc/transport_sales_state.dart';
-import '../data/transport_sales_repository.dart'; // Make sure this import matches your project structure
+import '../data/transport_sales_repository.dart';
 
 
 class TransportSalesTab extends StatelessWidget {

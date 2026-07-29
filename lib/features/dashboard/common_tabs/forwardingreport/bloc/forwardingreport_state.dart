@@ -6,7 +6,7 @@ class ForwardingReportState extends Equatable {
   final ForwardingReportStatus status;
   final List<Map<String, dynamic>> saleFWReport;
   final List<Map<String, dynamic>> saleFWReport2;
-  // Use DateTime instead of String for easier UI DatePicker management
+
   final DateTime? fromDate;
   final DateTime? toDate;
   final String errorMessage;

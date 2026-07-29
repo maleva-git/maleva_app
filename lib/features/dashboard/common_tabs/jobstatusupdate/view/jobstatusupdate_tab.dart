@@ -4,20 +4,15 @@ import 'package:maleva/core/theme/app_typography.dart';
 import 'package:maleva/core/utils/system_helpers.dart';
 import 'package:maleva/core/network/api_constants.dart';
 import 'dart:io';
-
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:maleva/core/colors/colors.dart' as colour;
-
 import 'package:maleva/core/utils/app_globals.dart';
 import 'package:maleva/menu/menulist.dart';
-
-import '../../../../../core/di/injection.dart';
 import '../../../../mastersearch/JobAllStatus.dart';
 import '../../saleorderdetails/view/saleorderdetails_tab.dart';
 import '../bloc/jobstatusupdate_bloc.dart';

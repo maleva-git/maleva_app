@@ -6,7 +6,7 @@ class FuelRepository {
   Future<dynamic> fetchFuelDifference({
     required Map<String, dynamic> body,
   }) async {
-    // ApiClient seamlessly handles the headers, timeout, and authorization
+
     return await ApiClient.postRequest(
       ApiConstants.apiSelectFuelEntry,
       body,

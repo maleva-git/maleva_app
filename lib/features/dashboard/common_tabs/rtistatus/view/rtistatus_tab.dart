@@ -3,12 +3,9 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
-import 'package:google_fonts/google_fonts.dart';
-
 import 'package:maleva/core/utils/app_globals.dart';
 import 'package:maleva/core/colors/colors.dart' as colour;
 import 'package:maleva/menu/menulist.dart';
-
 import '../../../../../core/di/injection.dart';
 import '../../../../transport/updatertidetails/view/updatertidetails_tab.dart';
 import '../bloc/rtistatus_bloc.dart';

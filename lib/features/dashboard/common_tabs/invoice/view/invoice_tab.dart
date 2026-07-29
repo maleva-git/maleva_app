@@ -1,24 +1,7 @@
 import 'package:maleva/core/theme/app_typography.dart';
-// lib/features/dashboard/common_tabs/invoice/view/invoice_tab.dart
-//
-// ── What changed ───────────────────────────────────────────────────
-//  BEFORE                                AFTER
-//  StatefulWidget with all widget code   Entry widget only — BlocProvider wires DI
-//  BlocConsumer listenWhen bug*          Separated buildWhen / listenWhen clearly
-//  _showDialogEmpDetails in state class  Moved to _InvoiceView (correct place)
-//  RefreshInvoice = blank flash          InvoiceRefreshing keeps stale data visible
-//  showBillingBottomSheet in listener    listener calls then dismisses via event
-//  _OverviewCard had no onTap           onTap added + GestureDetector wrapper
-//  Today/Yesterday/Weekly/Monthly cards  Now dispatch LoadEmployeeInvData(0/1/2/4)
-//
-// *bug: listenWhen was true when employeeData != null on EVERY build
-//       Now: listen only when employeeData transitions null→nonNull
-// ──────────────────────────────────────────────────────────────────
-
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:maleva/core/di/injection.dart';
 import 'package:maleva/core/theme/palette.dart';
 import 'package:maleva/core/theme/tokens.dart';

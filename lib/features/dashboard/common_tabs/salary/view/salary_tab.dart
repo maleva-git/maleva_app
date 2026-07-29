@@ -8,11 +8,8 @@ import '../../../../../core/theme/tokens.dart';
 import '../bloc/salary_bloc.dart';
 
 
-// ─────────────────────────────────────────────────────────────────────────────
-// Entry point — BlocProvider wrapper
-// ─────────────────────────────────────────────────────────────────────────────
 class SalaryTab extends StatelessWidget {
-  /// Optional: pass a callback to open the salary detail bottom-sheet / page.
+
   final void Function(Map<String, dynamic> item)? onRowTap;
 
   const SalaryTab({super.key, this.onRowTap});

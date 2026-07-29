@@ -2,14 +2,12 @@ import 'package:maleva/core/colors/colors.dart' as colors;
 import 'package:maleva/core/theme/app_typography.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:google_fonts/google_fonts.dart';
-import 'package:maleva/core/utils/app_globals.dart';
 import 'package:salomon_bottom_bar/salomon_bottom_bar.dart';
 import '../../../../../core/theme/tokens.dart';
 import '../bloc/salesorder_bloc.dart';
 import '../bloc/salesorder_event.dart';
 import '../bloc/salesorder_state.dart';
-import '../../../../../core/colors/colors.dart' as colors;
+
 
 String _indFmt(dynamic raw) {
   final n = double.tryParse(raw?.toString() ?? '0') ?? 0;

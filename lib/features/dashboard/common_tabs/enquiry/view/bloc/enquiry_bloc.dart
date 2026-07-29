@@ -1,19 +1,18 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 import 'package:maleva/core/utils/app_globals.dart';
-
 import '../data/enquiry_repository.dart';
 import 'enquiry_event.dart';
 import 'enquiry_state.dart';
 
 class EnquiryBloc extends Bloc<EnquiryEvent, EnquiryState> {
-  final EnquiryRepository repository; // ✅ Injected Repository
+  final EnquiryRepository repository;
 
   EnquiryBloc({required this.repository}) : super(const EnquiryState()) {
     on<LoadEnquiryEvent>(_onLoadEnquiry);
     on<CancelEnquiryEvent>(_onCancelEnquiry);
 
-    // ✅ Auto-load data when the BLoC is created!
+
     add(LoadEnquiryEvent());
   }
 
