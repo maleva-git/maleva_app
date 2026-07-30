@@ -1,6 +1,7 @@
 import 'package:maleva/core/colors/colors.dart' as colour;
 import 'package:maleva/core/theme/app_typography.dart';
 import 'package:flutter/material.dart';
+import 'package:maleva/core/utils/dialog_helper.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../bloc/leave_bloc.dart';
 import '../bloc/leave_event.dart';
@@ -39,17 +40,25 @@ class _DriverLeaveRequestTabState extends State<_DriverLeaveRequestTabBody> {
   DateTime _searchToDate = DateTime.now();
   int? _selectedLeaveTypeId;
   int? _selectedId;
+  final TextEditingController _reasonController = TextEditingController();
+  List<LeaveRequestModel> _cachedRequests = [];
+  List<LeaveTypeModel> _cachedLeaveTypes = [];
   
+  @override
+  void dispose() {
+    _reasonController.dispose();
+    super.dispose();
+  }
+
   @override
   void initState() {
     super.initState();
     _selectedId = AppGlobals.EmpRefId;
-    _fetchRequests();
   }
 
-  void _fetchRequests() {
-    if (_selectedId != null && _selectedId != 0) {
-      context.read<LeaveBloc>().add(FetchLeaveData(
+  void _fetchRequests(BuildContext ctx) {
+    if (_selectedId != null) {
+      ctx.read<LeaveBloc>().add(FetchLeaveData(
         applicantType: 2,
         applicantRefId: _selectedId!,
         fromDate: DateFormat('yyyy-MM-dd').format(_searchFromDate),
@@ -76,44 +85,110 @@ class _DriverLeaveRequestTabState extends State<_DriverLeaveRequestTabBody> {
     }
   }
 
-  void _submitLeave(List<LeaveTypeModel> leaveTypes) {
+  void _submitLeave(BuildContext ctx, List<LeaveTypeModel> leaveTypes) {
     if (_selectedLeaveTypeId == null) {
       ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Please select Leave Reason')));
       return;
     }
     
-    int days = _toDate.difference(_fromDate).inDays + 1;
-    if (days <= 0) days = 1;
+    int totalDaysNum = 0;
+    int diffHours = _toDate.difference(_fromDate).inHours;
+    if (diffHours >= 0 && diffHours < 24 && _fromDate.day == _toDate.day && _fromDate.month == _toDate.month && _fromDate.year == _toDate.year) {
+      if (diffHours < 1) {
+        totalDaysNum = _toDate.difference(_fromDate).inMinutes;
+      } else {
+        totalDaysNum = diffHours;
+      }
+    } else {
+      totalDaysNum = DateTime(_toDate.year, _toDate.month, _toDate.day)
+          .difference(DateTime(_fromDate.year, _fromDate.month, _fromDate.day))
+          .inDays + 1;
+      if (totalDaysNum <= 0) totalDaysNum = 1;
+    }
     
-    context.read<LeaveBloc>().add(SubmitLeaveRequest(
+    ctx.read<LeaveBloc>().add(SubmitLeaveRequest(
       leaveTypeRefId: _selectedLeaveTypeId!,
       fromDate: _fromDate,
       toDate: _toDate,
-      totalDays: days,
+      totalDays: totalDaysNum,
       applicantRefId: _selectedId!,
       applicantType: 2,
-      reason: leaveTypes.firstWhere((e) => e.id == _selectedLeaveTypeId).name,
+      reason: _reasonController.text.trim().isNotEmpty 
+          ? _reasonController.text.trim() 
+          : leaveTypes.firstWhere((e) => e.id == _selectedLeaveTypeId).name,
     ));
   }
 
   Future<void> _pickDate(bool isFrom) async {
-    final picked = await showDatePicker(
+    final pickedDate = await showDatePicker(
       context: context,
       initialDate: isFrom ? _fromDate : _toDate,
       firstDate: DateTime.now().subtract(const Duration(days: 30)),
       lastDate: DateTime.now().add(const Duration(days: 365)),
     );
-    if (picked != null) {
-      setState(() {
-        if (isFrom) {
-          _fromDate = picked;
-          if (_toDate.isBefore(_fromDate)) _toDate = _fromDate;
-        } else {
-          _toDate = picked;
-          if (_fromDate.isAfter(_toDate)) _fromDate = _toDate;
-        }
-      });
+    if (pickedDate != null) {
+      if (!context.mounted) return;
+      final pickedTime = await showTimePicker(
+        context: context,
+        initialTime: TimeOfDay.fromDateTime(isFrom ? _fromDate : _toDate),
+      );
+      if (pickedTime != null) {
+        final combined = DateTime(pickedDate.year, pickedDate.month, pickedDate.day, pickedTime.hour, pickedTime.minute);
+        setState(() {
+          if (isFrom) {
+            _fromDate = combined;
+            if (_toDate.isBefore(_fromDate)) _toDate = _fromDate;
+          } else {
+            _toDate = combined;
+            if (_fromDate.isAfter(_toDate)) _fromDate = _toDate;
+          }
+        });
+      }
     }
+  }
+
+  String get _calculatedDuration {
+    int diffHours = _toDate.difference(_fromDate).inHours;
+    if (diffHours >= 0 && diffHours < 24 && _fromDate.day == _toDate.day && _fromDate.month == _toDate.month && _fromDate.year == _toDate.year) {
+      if (diffHours < 1) {
+        int mins = _toDate.difference(_fromDate).inMinutes;
+        return '$mins Mins';
+      } else {
+        return '$diffHours Hours';
+      }
+    } else {
+      int days = DateTime(_toDate.year, _toDate.month, _toDate.day).difference(DateTime(_fromDate.year, _fromDate.month, _fromDate.day)).inDays + 1;
+      if (days <= 0) days = 1;
+      return '$days ${days == 1 ? "Day" : "Days"}';
+    }
+  }
+
+  String _formatTotalDays(LeaveRequestModel req) {
+    int tDays = req.totalDays;
+    bool sameDay = req.fromDate.year == req.toDate.year && 
+                   req.fromDate.month == req.toDate.month && 
+                   req.fromDate.day == req.toDate.day;
+    
+    bool hasTime = (req.fromDate.hour != 0 || req.fromDate.minute != 0 || req.fromDate.second != 0) ||
+                   (req.toDate.hour != 0 || req.toDate.minute != 0 || req.toDate.second != 0);
+                   
+    if (hasTime && sameDay) {
+      int diffHours = req.toDate.difference(req.fromDate).inHours;
+      if (diffHours < 1) {
+        return '${req.toDate.difference(req.fromDate).inMinutes} Mins';
+      } else {
+        return '$diffHours Hours';
+      }
+    }
+    
+    if (sameDay) {
+      if (tDays > 1) {
+        if (tDays >= 15) return '$tDays Mins';
+        return '$tDays Hours';
+      }
+      return '1 Day';
+    }
+    return '$tDays ${tDays == 1 ? "Day" : "Days"}';
   }
 
   @override
@@ -129,8 +204,11 @@ class _DriverLeaveRequestTabState extends State<_DriverLeaveRequestTabBody> {
         return BlocConsumer<LeaveBloc, LeaveState>(
           listener: (context, state) {
             if (state is LeaveActionSuccess) {
-              ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(state.message)));
-              setState(() => _selectedLeaveTypeId = null);
+              ConfirmationOK(state.message, context);
+              setState(() {
+                _selectedLeaveTypeId = null;
+                _reasonController.clear();
+              });
               context.read<LeaveBloc>().add(FetchLeaveData(
                 applicantType: 2,
                 applicantRefId: _selectedId!,
@@ -138,17 +216,27 @@ class _DriverLeaveRequestTabState extends State<_DriverLeaveRequestTabBody> {
                 toDate: DateFormat('yyyy-MM-dd').format(_searchToDate),
               ));
             } else if (state is LeaveActionError) {
-              ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(state.message)));
+              ConfirmationOK(state.message, context);
             }
           },
       builder: (context, state) {
         bool isLoading = state is LeaveLoading || state is LeaveInitial;
-        bool isSubmitting = state is LeaveLoaded && state.isSubmitting;
-        List<LeaveRequestModel> requests = state is LeaveLoaded ? state.requests : [];
-        List<LeaveTypeModel> leaveTypes = state is LeaveLoaded ? state.leaveTypes : [];
+        bool isSubmitting = false;
+        if (state is LeaveLoaded) {
+          isSubmitting = state.isSubmitting;
+          if (state.requests.isNotEmpty) _cachedRequests = state.requests;
+          if (state.leaveTypes.isNotEmpty) _cachedLeaveTypes = state.leaveTypes;
+        }
+        
+        List<LeaveRequestModel> requests = (state is LeaveLoaded) ? state.requests : _cachedRequests;
+        List<LeaveTypeModel> leaveTypes = (state is LeaveLoaded) ? state.leaveTypes : _cachedLeaveTypes;
 
-        return Column(
-      children: [
+        return RefreshIndicator(
+          onRefresh: () async { _fetchRequests(context); },
+          child: SingleChildScrollView(
+            physics: const AlwaysScrollableScrollPhysics(),
+            child: Column(
+              children: [
         // Form Area
         Container(
           margin: const EdgeInsets.all(16),
@@ -164,30 +252,30 @@ class _DriverLeaveRequestTabState extends State<_DriverLeaveRequestTabBody> {
             ],
             border: Border.all(color: AppTokens.brandPrimary.withValues(alpha: 0.1)),
           ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              // Header
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
-                decoration: BoxDecoration(
-                  color: AppTokens.brandLight.withValues(alpha: 0.5),
-                  borderRadius: const BorderRadius.only(topLeft: Radius.circular(20), topRight: Radius.circular(20)),
-                ),
-                child: Row(
-                  children: [
-                    const Icon(Icons.edit_calendar_rounded, color: AppTokens.brandPrimary, size: 20),
-                    const SizedBox(width: 8),
-                    Text(
-                      'Request Leave',
-                      style: AppTypography.heading1(color: AppTokens.brandDark, fontWeight: FontWeight.w800),
-                    ),
-                  ],
-                ),
+          child: Theme(
+            data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
+            child: ExpansionTile(
+              initiallyExpanded: false,
+              collapsedBackgroundColor: AppTokens.brandLight.withValues(alpha: 0.5),
+              backgroundColor: AppTokens.brandLight.withValues(alpha: 0.5),
+              iconColor: AppTokens.brandPrimary,
+              collapsedIconColor: AppTokens.brandPrimary,
+              shape: const RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(20))),
+              collapsedShape: const RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(20))),
+              title: Row(
+                children: [
+                  const Icon(Icons.edit_calendar_rounded, color: AppTokens.brandPrimary, size: 20),
+                  const SizedBox(width: 8),
+                  Text(
+                    'Request Leave',
+                    style: AppTypography.heading1(color: AppTokens.brandDark, fontWeight: FontWeight.w800),
+                  ),
+                ],
               ),
-              
-              // Inputs
-              Padding(
+              children: [
+                Container(
+                  color: Colors.white,
+                  child: Padding(
                 padding: const EdgeInsets.all(20),
                 child: Column(
                   children: [
@@ -195,18 +283,33 @@ class _DriverLeaveRequestTabState extends State<_DriverLeaveRequestTabBody> {
                       children: [
                         Expanded(
                           child: MalevaDateField(
-                            date: DateFormat('dd-MM-yyyy').format(_fromDate),
+                            date: DateFormat('dd-MM-yyyy hh:mm a').format(_fromDate),
                             onTap: () => _pickDate(true),
                           ),
                         ),
                         const SizedBox(width: 12),
                         Expanded(
                           child: MalevaDateField(
-                            date: DateFormat('dd-MM-yyyy').format(_toDate),
+                            date: DateFormat('dd-MM-yyyy hh:mm a').format(_toDate),
                             onTap: () => _pickDate(false),
                           ),
                         ),
                       ],
+                    ),
+                    const SizedBox(height: 12),
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                      decoration: BoxDecoration(
+                        color: AppTokens.brandLight.withValues(alpha: 0.3),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text('Total Duration:', style: AppTypography.bodyMedium(color: AppTokens.textMuted)),
+                          Text(_calculatedDuration, style: AppTypography.heading2(color: AppTokens.brandDark)),
+                        ],
+                      ),
                     ),
                     const SizedBox(height: 16),
                     Container(
@@ -231,6 +334,24 @@ class _DriverLeaveRequestTabState extends State<_DriverLeaveRequestTabBody> {
                         ),
                       ),
                     ),
+                    const SizedBox(height: 16),
+                    Container(
+                      decoration: BoxDecoration(
+                        color: AppTokens.surfacePage,
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+                      child: TextField(
+                        controller: _reasonController,
+                        decoration: InputDecoration(
+                          border: InputBorder.none,
+                          hintText: 'Enter specific reason/remark (optional)',
+                          hintStyle: AppTypography.bodyLarge(color: AppTokens.textMuted),
+                        ),
+                        style: AppTypography.bodyLarge(color: AppTokens.textPrimary),
+                        maxLines: 2,
+                      ),
+                    ),
                     const SizedBox(height: 24),
                     ElevatedButton(
                       style: ElevatedButton.styleFrom(
@@ -239,7 +360,7 @@ class _DriverLeaveRequestTabState extends State<_DriverLeaveRequestTabBody> {
                         padding: const EdgeInsets.symmetric(vertical: 16),
                         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                       ),
-                      onPressed: isSubmitting ? null : () => _submitLeave(leaveTypes),
+                      onPressed: isSubmitting ? null : () => _submitLeave(context, leaveTypes),
                       child: isSubmitting 
                           ? const SizedBox(width: 24, height: 24, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2.5))
                           : Row(
@@ -254,7 +375,9 @@ class _DriverLeaveRequestTabState extends State<_DriverLeaveRequestTabBody> {
                   ],
                 ),
               ),
-            ],
+                ),
+              ],
+            ),
           ),
         ),
         
@@ -285,7 +408,7 @@ class _DriverLeaveRequestTabState extends State<_DriverLeaveRequestTabBody> {
                   minimumSize: const Size(0, 0),
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                 ),
-                onPressed: _fetchRequests,
+                onPressed: () => _fetchRequests(context),
                 child: const Icon(Icons.search_rounded, color: Colors.white, size: 20),
               ),
             ],
@@ -293,12 +416,14 @@ class _DriverLeaveRequestTabState extends State<_DriverLeaveRequestTabBody> {
         ),
         const SizedBox(height: 8),
         // List
-        Expanded(
-          child: isLoading && requests.isEmpty
-              ? Center(child: CircularProgressIndicator())
-              : ListView.builder(
-                  itemCount: requests.length,
-                  itemBuilder: (context, index) {
+        if (isLoading && requests.isEmpty)
+          const Padding(padding: EdgeInsets.all(32), child: CircularProgressIndicator())
+        else
+          ListView.builder(
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            itemCount: requests.length,
+            itemBuilder: (context, index) {
                     final req = requests[index];
                     Color statusColor = const Color(0xFFEAB308); // Yellow/Orange
                     Color statusBg = const Color(0xFFFEF08A).withValues(alpha: 0.3);
@@ -332,17 +457,23 @@ class _DriverLeaveRequestTabState extends State<_DriverLeaveRequestTabBody> {
                             Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
-                                Row(
-                                  children: [
-                                    const Icon(Icons.calendar_today_rounded, size: 14, color: Colors.grey),
-                                    const SizedBox(width: 6),
-                                    Text(
-                                      '${DateFormat('dd MMM').format(req.fromDate)}  ➔  ${DateFormat('dd MMM').format(req.toDate)}',
-                                      style: AppTypography.heading3(color: colour.commonColor, fontWeight: FontWeight.w700),
-                                    ),
-                                  ],
+                                Expanded(
+                                  child: Row(
+                                    children: [
+                                      const Icon(Icons.calendar_today_rounded, size: 14, color: Colors.grey),
+                                      const SizedBox(width: 6),
+                                      Expanded(
+                                        child: Text(
+                                          '${DateFormat('dd MMM hh:mm a').format(req.fromDate)}  ➔  ${DateFormat('dd MMM hh:mm a').format(req.toDate)}',
+                                          style: AppTypography.heading3(color: colour.commonColor, fontWeight: FontWeight.w700),
+                                          overflow: TextOverflow.visible,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
                                 ),
                                 Container(
+                                  margin: const EdgeInsets.only(left: 8),
                                   padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                                   decoration: BoxDecoration(
                                     color: statusBg,
@@ -384,7 +515,7 @@ class _DriverLeaveRequestTabState extends State<_DriverLeaveRequestTabBody> {
                                       borderRadius: BorderRadius.circular(8),
                                     ),
                                     child: Text(
-                                      '${req.totalDays} Days',
+                                      _formatTotalDays(req),
                                       style: AppTypography.bodyMedium(color: colour.commonColorhighlight, fontWeight: FontWeight.bold),
                                     ),
                                   ),
@@ -427,9 +558,10 @@ class _DriverLeaveRequestTabState extends State<_DriverLeaveRequestTabBody> {
                     );
                   },
                 ),
-        ),
       ],
-    );
+    ),
+  ),
+);
           },
         );
       }),

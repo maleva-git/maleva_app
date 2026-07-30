@@ -1,5 +1,6 @@
 import 'package:maleva/core/theme/app_typography.dart';
 import 'package:flutter/material.dart';
+import 'package:maleva/core/utils/dialog_helper.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../bloc/leave_bloc.dart';
 import '../bloc/leave_event.dart';
@@ -22,11 +23,10 @@ class _EmployeeLeaveApprovalTabState extends State<EmployeeLeaveApprovalTab> {
     @override
   void initState() {
     super.initState();
-    _fetchRequests();
   }
 
-  void _fetchRequests() {
-    context.read<LeaveBloc>().add(const FetchLeaveData(
+  void _fetchRequests(BuildContext ctx) {
+    ctx.read<LeaveBloc>().add(const FetchLeaveData(
       applicantType: 1,
       applicantRefId: 0,
       fromDate: "",
@@ -34,7 +34,7 @@ class _EmployeeLeaveApprovalTabState extends State<EmployeeLeaveApprovalTab> {
     ));
   }
 
-  Future<void> _showApprovalDialog(LeaveRequestModel req) async {
+  Future<void> _showApprovalDialog(BuildContext ctx, LeaveRequestModel req) async {
     final remarkCtrl = TextEditingController();
     int? selectedStatusId;
     
@@ -95,7 +95,7 @@ class _EmployeeLeaveApprovalTabState extends State<EmployeeLeaveApprovalTab> {
     if (confirm != true || selectedStatusId == null) return;
     
     if (!mounted) return;
-    context.read<LeaveBloc>().add(UpdateLeaveStatusEvent(
+    ctx.read<LeaveBloc>().add(UpdateLeaveStatusEvent(
       id: req.id,
       statusRefId: selectedStatusId!,
       reviewRemark: remarkCtrl.text,
@@ -116,7 +116,7 @@ class _EmployeeLeaveApprovalTabState extends State<EmployeeLeaveApprovalTab> {
         return BlocConsumer<LeaveBloc, LeaveState>(
           listener: (context, state) {
             if (state is LeaveActionSuccess) {
-              ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(state.message)));
+              ConfirmationOK(state.message, context);
               context.read<LeaveBloc>().add(const FetchLeaveData(
                 applicantType: 1,
                 applicantRefId: 0,
@@ -124,7 +124,7 @@ class _EmployeeLeaveApprovalTabState extends State<EmployeeLeaveApprovalTab> {
                 toDate: "",
               ));
             } else if (state is LeaveActionError) {
-              ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(state.message)));
+              ConfirmationOK(state.message, context);
             }
           },
       builder: (context, state) {
@@ -139,7 +139,7 @@ class _EmployeeLeaveApprovalTabState extends State<EmployeeLeaveApprovalTab> {
           child: Row(
             children: [
               Expanded(child: Text('Employee Leave Requests', style: AppTypography.heading2())),
-              IconButton(icon: const Icon(Icons.refresh, color: colour.brand), onPressed: _fetchRequests),
+              IconButton(icon: const Icon(Icons.refresh, color: colour.brand), onPressed: () => _fetchRequests(context)),
             ],
           ),
         ),
@@ -288,7 +288,7 @@ class _EmployeeLeaveApprovalTabState extends State<EmployeeLeaveApprovalTab> {
                                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                                     ),
                                     icon: const Icon(Icons.rate_review_rounded, color: Colors.white, size: 16),
-                                    onPressed: () => _showApprovalDialog(req),
+                                    onPressed: () => _showApprovalDialog(context, req),
                                     label: Text('Review', style: AppTypography.heading2(color: Colors.white)),
                                   ),
                                 ),
