@@ -4,7 +4,6 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:maleva/core/utils/app_globals.dart';
 import 'package:maleva/core/utils/app_preferences.dart';
-import '../../../../../core/di/injection.dart';
 import '../../../../../core/theme/tokens.dart';
 import '../../../../mastersearch/Port.dart';
 import '../bloc/vesselreport_bloc.dart';
@@ -13,13 +12,13 @@ import '../bloc/vesselreport_state.dart';
 import 'package:maleva/core/colors/colors.dart' as colour;
 import 'package:maleva/core/network/api_services/master_api.dart';
 import 'package:maleva/features/operations/models/job_status_model.dart';
-// VesselReportPage — REMOVE BlocProvider from here
+
 class VesselReportPage extends StatelessWidget {
   const VesselReportPage({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return BlocListener<VesselBloc, VesselState>( // ✅ No BlocProvider here
+    return BlocListener<VesselBloc, VesselState>(
       listener: (context, state) {
         if (state is VesselErrorState) {
           ScaffoldMessenger.of(context).showSnackBar(

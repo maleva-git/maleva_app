@@ -1,4 +1,4 @@
-import 'package:maleva/core/colors/colors.dart' as colour;
+
 import 'package:maleva/core/theme/app_typography.dart';
 import 'package:maleva/core/utils/system_helpers.dart';
 import 'package:maleva/core/network/api_constants.dart';
@@ -8,7 +8,6 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:maleva/core/utils/app_globals.dart';
@@ -24,7 +23,7 @@ import 'package:maleva/core/models/shared/barcode_print_model.dart';
 import 'package:maleva/core/models/shared/response_view_model.dart';
 import 'package:maleva/features/operations/models/job_all_status_model.dart';
 import 'package:maleva/core/network/legacy_api_repository.dart';
-import 'package:maleva/core/di/injection.dart';
+
 
 
 const kChipBg          = Color(0xFFEEF2FF);

@@ -1,7 +1,6 @@
 import 'package:maleva/core/theme/app_typography.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:maleva/core/colors/colors.dart' as colour;
 import '../../../../../core/di/injection.dart';
 import '../../../../../core/theme/tokens.dart';
@@ -17,12 +16,11 @@ class DriverDetailsScreen extends StatelessWidget {
     return BlocProvider(
       create: (context) => sl<DriverBloc>()..add(const LoadDriverEvent()),
       child:
-          const DriverDetailsView(), // Remember to add a BlocListener here if you want to show errors to the user!
+          const DriverDetailsView(),
     );
   }
 }
 
-// ── View ──────────────────────────────────────────────────────────────────────
 class DriverDetailsView extends StatefulWidget {
   const DriverDetailsView({super.key});
 

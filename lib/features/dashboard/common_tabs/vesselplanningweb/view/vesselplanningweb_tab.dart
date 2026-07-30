@@ -4,10 +4,10 @@ import 'package:maleva/core/di/injection.dart';
 import 'package:maleva/core/theme/app_typography.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:google_fonts/google_fonts.dart';
+
 import 'package:intl/intl.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
-import '../../../../../core/colors/colors.dart' as colour;
+
 import '../../../../../core/theme/tokens.dart';
 import '../../../../../core/models/model.dart';
 import '../../../../../core/utils/app_globals.dart';

@@ -1,17 +1,6 @@
 import 'package:maleva/core/theme/app_typography.dart';
-// lib/features/dashboard/common_tabs/receiptview/view/receiptview_tab.dart
-//
-// ── Changes from original ──────────────────────────────────────────────────────
-//  BEFORE                                    AFTER
-//  context.read<ReceiptBloc>().pickDate()    showDatePicker in view directly
-//  ListView with .map() — full list in RAM   ListView.builder — lazy, efficient
-//  RWhite — undefined color (bug)            kWhite — correct color
-//  progress bool check (!state.progress)     state.isLoading — readable
-//  BlocBuilder wraps everything              buildWhen — only rebuild on status/data change
-
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:maleva/core/colors/colors.dart';
 import 'package:maleva/core/colors/colors.dart' as colour;

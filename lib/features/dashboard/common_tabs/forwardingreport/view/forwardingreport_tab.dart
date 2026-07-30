@@ -1,14 +1,12 @@
 import 'package:maleva/core/theme/app_typography.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import '../../../../../core/di/injection.dart';
 import '../../../../../core/theme/tokens.dart';
 import '../bloc/forwardingreport_bloc.dart';
 import '../bloc/forwardingreport_event.dart';
 import '../bloc/forwardingreport_state.dart';
-import 'package:maleva/core/utils/app_globals.dart';
 import 'package:maleva/core/colors/colors.dart' as colour;
 
 class ForwardingReportPage extends StatelessWidget {
@@ -18,7 +16,7 @@ class ForwardingReportPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return
       BlocProvider(
-        // Use sl (GetIt) to create the Bloc. It will automatically inject the repository.
+
         create: (_) => sl<ForwardingReportBloc>()
           ..add(const LoadForwardingReportEvent()),
         child: const ForwardingReportView(),

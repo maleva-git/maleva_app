@@ -6,7 +6,7 @@ class ExpenseReportState extends Equatable {
   final ExpenseReportStatus status;
   final List<Map<String, dynamic>> saleExpReport;
   final List<Map<String, dynamic>> saleExpReport2;
-  // Use DateTime instead of String for easier UI DatePicker management
+
   final DateTime? fromDate;
   final DateTime? toDate;
   final String errorMessage;
