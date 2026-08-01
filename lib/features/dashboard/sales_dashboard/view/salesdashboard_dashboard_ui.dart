@@ -14,6 +14,10 @@ import '../../common_tabs/saleorderview/view/saleorderview_tab.dart';
 import '../../common_tabs/transport/view/transportview_tab.dart';
 import '../../common_tabs/vesselreport/view/vesselreportview_tab.dart';
 import '../../common_tabs/driverleave/view/admin_leave_approval_tab.dart';
+
+import '../../common_tabs/sale_update/bloc/sale_update_bloc.dart';
+import '../../common_tabs/sale_update/data/sale_update_repository.dart';
+import '../../common_tabs/sale_update/view/sale_update_tab.dart';
 import '../bloc/sales_bloc.dart';
 import '../bloc/sales_state.dart';
 import 'package:maleva/features/dashboard/common_tabs/driverleave/view/employee_leave_request_tab.dart';
@@ -115,6 +119,7 @@ class SalesDashboardView extends StatelessWidget {
           fontSize: isTablet ? 14 : 13,
         ),
         tabs: [
+          _tab('SALE UPDATE', isTablet),
           _tab('SALES', isTablet),
           _tab('VSL', isTablet),
           _tab('TRANSPORT', isTablet),
@@ -153,15 +158,19 @@ Tab _tab(String text, bool isTablet) => Tab(
       },
         child: TabBarView(
           controller: tabController,
-          children: const [
-            AirfreightSales(),
-            VesselReportPage(),
-            TransportReportPage(),
-            EnquiryScreen(),
-            FuelDiffPage(),
-            PaymentPendingPage(),
-            AdminLeaveApprovalTab(),
-          EmployeeLeaveRequestTab(),
+          children: [
+            BlocProvider(
+              create: (context) => SaleUpdateBloc(SaleUpdateRepository()),
+              child: const SaleUpdateTab(),
+            ),
+            const AirfreightSales(),
+            const VesselReportPage(),
+            const TransportReportPage(),
+            const EnquiryScreen(),
+            const FuelDiffPage(),
+            const PaymentPendingPage(),
+            const AdminLeaveApprovalTab(),
+          const EmployeeLeaveRequestTab(),
           ],
         ),
     );

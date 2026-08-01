@@ -111,6 +111,13 @@ dependencies {
     implementation("com.google.firebase:firebase-analytics")
 }
 
+configurations.all {
+    resolutionStrategy {
+        force 'androidx.core:core-ktx:1.13.1'
+        force 'androidx.core:core:1.13.1'
+    }
+}
+
 android.applicationVariants.all { variant ->
     variant.outputs.all { output ->
         def builtType = variant.buildType.name

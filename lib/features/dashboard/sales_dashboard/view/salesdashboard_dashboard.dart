@@ -34,7 +34,7 @@ class _SalesDashboardState extends State<SalesDashboard> with SingleTickerProvid
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 8, vsync: this);
+    _tabController = TabController(length: 9, vsync: this);
     _tabController.addListener(_onTabChanged);
   }
 
@@ -63,6 +63,7 @@ class _SalesDashboardState extends State<SalesDashboard> with SingleTickerProvid
                     ..add(const LoadTransportDataEvent(type: 0)),
                   child: const TransportReportPage(),
                 ),
+
                 BlocProvider(
                   create: (_) => EnquiryBloc(
                     repository: sl<EnquiryRepository>(),
