@@ -23,6 +23,7 @@ class _SaleUpdateTabState extends State<SaleUpdateTab> {
   DateTime toDate = DateTime.now();
   final TextEditingController _txtCustomer = TextEditingController();
   int customerId = 0;
+  String _remarksFilter = 'all';
 
   Future<void> _selectDate(BuildContext context, bool isFromDate) async {
     final DateTime? picked = await showDatePicker(
@@ -161,12 +162,53 @@ class _SaleUpdateTabState extends State<SaleUpdateTab> {
               ),
             ],
           ),
+          const SizedBox(height: 12),
+          Row(
+            children: [
+              Text('Reference:', style: AppTypography.bodyMedium(color: colour.textMain, fontWeight: FontWeight.bold)),
+              Expanded(
+                child: SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  child: Row(
+                    children: [
+                      Radio<String>(
+                        value: 'all',
+                        groupValue: _remarksFilter,
+                        activeColor: colour.brand,
+                        onChanged: (val) => setState(() => _remarksFilter = val!),
+                      ),
+                      Text('All', style: AppTypography.bodyMedium(color: colour.textMain)),
+                      Radio<String>(
+                        value: 'with',
+                        groupValue: _remarksFilter,
+                        activeColor: colour.brand,
+                        onChanged: (val) => setState(() => _remarksFilter = val!),
+                      ),
+                      Text('With', style: AppTypography.bodyMedium(color: colour.textMain)),
+                      Radio<String>(
+                        value: 'without',
+                        groupValue: _remarksFilter,
+                        activeColor: colour.brand,
+                        onChanged: (val) => setState(() => _remarksFilter = val!),
+                      ),
+                      Text('Without', style: AppTypography.bodyMedium(color: colour.textMain)),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
         ],
       ),
     );
   }
 
-  Widget _buildList(List<SaleOrderUpdateModel> items, bool isTablet) {
+  Widget _buildList(List<SaleOrderUpdateModel> allItems, bool isTablet) {
+    final items = allItems.where((item) {
+      if (_remarksFilter == 'with') return item.remarks1.trim().isNotEmpty;
+      if (_remarksFilter == 'without') return item.remarks1.trim().isEmpty;
+      return true;
+    }).toList();
     if (items.isEmpty) {
       return Center(child: Text('No records found.', style: AppTypography.bodyLarge(color: colour.textSub)));
     }
@@ -223,7 +265,9 @@ class _SaleUpdateTabState extends State<SaleUpdateTab> {
                     children: [
                       const Icon(Icons.person_outline, size: 16, color: colour.textSub),
                       const SizedBox(width: 6),
-                      Text(item.customerName, style: AppTypography.bodyMedium(color: colour.textMain)),
+                      Expanded(
+                        child: Text(item.customerName, style: AppTypography.bodyMedium(color: colour.textMain)),
+                      ),
                     ],
                   ),
                   const SizedBox(height: 6),
@@ -231,8 +275,10 @@ class _SaleUpdateTabState extends State<SaleUpdateTab> {
                     children: [
                       const Icon(Icons.note_alt_outlined, size: 16, color: colour.textSub),
                       const SizedBox(width: 6),
-                      Text(item.remarks1.isEmpty ? 'No Reference' : item.remarks1, 
-                          style: AppTypography.bodyMedium(color: colour.textSub)),
+                      Expanded(
+                        child: Text(item.remarks1.isEmpty ? 'No Reference' : item.remarks1,
+                            style: AppTypography.bodyMedium(color: colour.textSub)),
+                      ),
                     ],
                   ),
                   const SizedBox(height: 8),
