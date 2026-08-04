@@ -10,7 +10,7 @@ import 'package:maleva/features/auth/models/user_login_model.dart';
 class AuthApi {
   AuthApi._();
   static final AuthApi instance = AuthApi._();
-  // ─── Login ────────────────────────────────────────────────────────────────
+
   Future<dynamic> loginUserRaw({
     required String username,
     required String password,
