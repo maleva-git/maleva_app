@@ -46,8 +46,8 @@ class Appuserloginmobile extends StatelessWidget {
     int roleId = AppPreferences.getRoleId();
 
     switch (roleId) {
-      case 100: // ADMIN
-        context.go('/dashboard/admin');
+      case 100: // FORWARDING ADMIN
+        context.go('/dashboard/forwarding');
         break;
       case 200: // ADMIN2
         context.go('/dashboard/admin');
@@ -77,8 +77,8 @@ class Appuserloginmobile extends StatelessWidget {
       case 1300: // MAINTENANCE
         context.go('/dashboard/maintenance');
         break;
-      case 1400: // FORWARDING
-        context.go('/dashboard/forwarding');
+      case 1400: // FORWARDING AGENT
+        context.go('/dashboard/forwarding_agent');
         break;
       case 1500: // AIR FREIGHT
         context.go('/dashboard/air_freight');
