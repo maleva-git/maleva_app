@@ -48,6 +48,8 @@ import '../../features/dashboard/maintenance_dashboard/view/maintenance_dashboar
 
 import '../../features/dashboard/forwarding_dashboard/bloc/forwarding_bloc.dart';
 import '../../features/dashboard/forwarding_dashboard/view/forwarding_dashboard.dart';
+import '../../features/dashboard/forwarding_agent_dashboard/bloc/forwarding_agent_bloc.dart';
+import '../../features/dashboard/forwarding_agent_dashboard/view/forwarding_agent_dashboard.dart';
 
 import '../../features/dashboard/airfreight_dashboard/bloc/airfreight_bloc.dart';
 import '../../features/dashboard/airfreight_dashboard/view/airfreight_dashboard.dart';
@@ -156,6 +158,14 @@ final GoRouter appRouter = GoRouter(
       builder: (context, state) => BlocProvider(
         create: (_) => MaintenanceTabBloc(),
         child: const MaintenanceDashboard(),
+      ),
+    ),
+    GoRoute(
+      path: '/dashboard/forwarding_agent',
+      name: 'forwarding_agent_dashboard',
+      builder: (context, state) => BlocProvider(
+        create: (_) => ForwardingAgentTabBloc(),
+        child: const ForwardingAgentDashboard(),
       ),
     ),
     GoRoute(

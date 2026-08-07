@@ -7,8 +7,7 @@ import 'package:maleva/core/utils/app_globals.dart';
 import '../bloc/auth_bloc.dart';
 import '../bloc/auth_event.dart';
 import '../bloc/auth_state.dart';
-import 'package:maleva/core/utils/app_preferences.dart';
-import 'package:maleva/core/utils/biometric_helper.dart';
+import 'package:maleva/core/models/shared/menu_master_model.dart';
 
 class MobileDesign extends StatelessWidget {
   const MobileDesign({super.key});
@@ -65,29 +64,16 @@ class _LoginBodyState extends State<_LoginBody>
   final _pwCtrl = TextEditingController();
   late final AnimationController _fadeCtrl;
   late final Animation<double> _fadeAnim;
-  bool _canUseBiometrics = false;
+  bool _obscureText = true;
+  bool _rememberMe = true;
 
   @override
   void initState() {
     super.initState();
-    _checkBiometrics();
     _fadeCtrl = AnimationController(
         vsync: this, duration: const Duration(milliseconds: 500));
     _fadeAnim = CurvedAnimation(parent: _fadeCtrl, curve: Curves.easeOut);
     _fadeCtrl.forward();
-  }
-
-  Future<void> _checkBiometrics() async {
-    final hasSavedCreds = AppPreferences.getUsername().isNotEmpty &&
-        AppPreferences.getPassword().isNotEmpty;
-    if (!hasSavedCreds) return;
-
-    final canAuth = await BiometricHelper.hasBiometrics();
-    if (canAuth && mounted) {
-      setState(() {
-        _canUseBiometrics = true;
-      });
-    }
   }
 
   @override
@@ -610,33 +596,6 @@ class _LoginBodyState extends State<_LoginBody>
     return Row(
       children: [
         Expanded(child: _loginButton(h: h, fs: fs, radius: radius)),
-        if (_canUseBiometrics) ...[
-          const SizedBox(width: 12),
-          SizedBox(
-            height: h,
-            width: h,
-            child: ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                padding: EdgeInsets.zero,
-                backgroundColor: colour.cWhite,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(radius),
-                  side: BorderSide(color: AppTokens.brandGradientStart.withValues(alpha: 0.3), width: 1.5),
-                ),
-                elevation: 0,
-              ),
-              onPressed: () async {
-                final success = await BiometricHelper.authenticate();
-                if (success && mounted) {
-                  context.read<LoginBloc>().add(UsernameChanged(AppPreferences.getUsername()));
-                  context.read<LoginBloc>().add(PasswordChanged(AppPreferences.getPassword()));
-                  context.read<LoginBloc>().add(SubmitLogin(context));
-                }
-              },
-              child: const Icon(Icons.fingerprint_rounded, color: AppTokens.brandGradientStart, size: 28),
-            ),
-          ),
-        ],
       ],
     );
   }

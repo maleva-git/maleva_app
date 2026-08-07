@@ -6,6 +6,7 @@ import 'package:maleva/features/dashboard/common_tabs/salesorder/bloc/salesorder
 import '../../../../core/di/injection.dart';
 import '../bloc/admin_tab_bloc.dart';
 import '../bloc/admin_tab_event.dart';
+import '../../common_tabs/top_customers/bloc/top_customers_bloc.dart';
 import '../../common_tabs/bocheck/bloc/bocheck_bloc.dart';
 import '../../common_tabs/bocheck/bloc/bocheck_event.dart';
 import '../../common_tabs/driver/bloc/driverdetails_bloc.dart';
@@ -70,7 +71,7 @@ class _AdminDashboardState extends State<NewAdminDashboard> with SingleTickerPro
   void initState() {
     super.initState();
     _adminTabBloc = AdminTabBloc();
-    _tabController = TabController(length: 29, vsync: this);
+    _tabController = TabController(length: 30, vsync: this);
     _tabController.addListener(_onTabChanged);
   }
 
@@ -129,6 +130,7 @@ class _AdminDashboardState extends State<NewAdminDashboard> with SingleTickerPro
         ),
         BlocProvider<RTIDetailsBloc>(create: (_) => sl<RTIDetailsBloc>()),
         BlocProvider<LeaveBloc>(create: (_) => sl<LeaveBloc>()),
+        BlocProvider<TopCustomersBloc>(create: (_) => TopCustomersBloc()),
       ],
 
       child: LayoutBuilder(

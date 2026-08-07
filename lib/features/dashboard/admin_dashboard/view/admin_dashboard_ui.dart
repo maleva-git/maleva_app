@@ -42,6 +42,7 @@ import 'package:maleva/features/dashboard/common_tabs/driverleave/view/employee_
 import '../../common_tabs/salary/view/salary_tab.dart';
 import 'package:maleva/core/models/shared/barcode_print_model.dart';
 import 'package:maleva/core/utils/auth_helper.dart';
+import '../../common_tabs/top_customers/view/admin_top_customers_tab.dart';
 
 class MobileDashboard extends StatelessWidget {
   final TabController tabController;
@@ -170,6 +171,7 @@ class MobileDashboard extends StatelessWidget {
           _tab('LeaveApproval',   isTablet),
           _tab('EmpApproval', isTablet),
           _tab('EmpLeave', isTablet),
+          _tab('TopCustomers', isTablet),
         ],
       ),
     );
@@ -230,6 +232,11 @@ class MobileDashboard extends StatelessWidget {
           const AdminLeaveApprovalTab(),
           const EmployeeLeaveApprovalTab(),
           const EmployeeLeaveRequestTab(isAdminOrSubadmin: true),
+          AdminTopCustomersTab(
+            comid: AppGlobals.Comid,
+            fromDate: DateFormat('yyyy-MM-dd').format(DateTime.now().subtract(const Duration(days: 30))),
+            toDate: DateFormat('yyyy-MM-dd').format(DateTime.now()),
+          ),
         ],
       ),
     );

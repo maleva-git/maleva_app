@@ -22,6 +22,7 @@ class LogEntry {
     return detail == null || detail!.isEmpty ? base : "$base\n   ↳ $detail";
   }
 
+
   Map<String, dynamic> toJson() => {
     "time": time.toIso8601String(),
     "type": type,
