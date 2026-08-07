@@ -8,10 +8,21 @@ class RtiRouteActivity {
   final int employeeRefId;
   final int status;
   final String? plannedDateTime;
-  final String? completedDateTime;
+  final String? eta;
   final String remarks;
   final bool active;
+  final String? createdDate;
+  final String createdBy;
+  final String? modifiedDate;
+  final String modifiedBy;
   final String agentMobileNo;
+  final String fullRoute;
+  final String driverNumber;
+  
+  // Joined fields
+  final String rtiNumber;
+  final String employeeName;
+  final String rtiMasterRemarks;
 
   RtiRouteActivity({
     required this.id,
@@ -23,10 +34,19 @@ class RtiRouteActivity {
     required this.employeeRefId,
     required this.status,
     this.plannedDateTime,
-    this.completedDateTime,
+    this.eta,
     required this.remarks,
     required this.active,
+    this.createdDate,
+    required this.createdBy,
+    this.modifiedDate,
+    required this.modifiedBy,
     required this.agentMobileNo,
+    required this.fullRoute,
+    required this.driverNumber,
+    required this.rtiNumber,
+    required this.employeeName,
+    required this.rtiMasterRemarks,
   });
 
   factory RtiRouteActivity.fromJson(Map<String, dynamic> json) {
@@ -40,10 +60,19 @@ class RtiRouteActivity {
       employeeRefId: json['EmployeeRefId'] ?? 0,
       status: json['Status'] ?? 0,
       plannedDateTime: json['PlannedDateTime'],
-      completedDateTime: json['CompletedDateTime'],
+      eta: json['ETA'],
       remarks: json['Remarks'] ?? '',
       active: json['Active'] ?? false,
+      createdDate: json['Created_Date'],
+      createdBy: json['Created_By'] ?? '',
+      modifiedDate: json['Modified_Date'],
+      modifiedBy: json['Modified_By'] ?? '',
       agentMobileNo: json['AgentMobileNo'] ?? '',
+      fullRoute: json['FullRoute'] ?? '',
+      driverNumber: json['DriverNumber'] ?? '',
+      rtiNumber: json['RTINumber'] ?? '',
+      employeeName: json['EmployeeName'] ?? '',
+      rtiMasterRemarks: json['RTIMasterRemarks'] ?? '',
     );
   }
 }

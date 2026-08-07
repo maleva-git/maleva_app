@@ -47,7 +47,7 @@ class Appuserloginmobile extends StatelessWidget {
 
     switch (roleId) {
       case 100: // FORWARDING ADMIN
-        context.go('/dashboard/forwarding');
+        context.go('/dashboard/admin');
         break;
       case 200: // ADMIN2
         context.go('/dashboard/admin');

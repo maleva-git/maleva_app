@@ -154,10 +154,10 @@ class _SplashScreenState extends State<SplashScreen>
 
     switch (roleId) {
       case 100: // FORWARDING ADMIN
-        context.go('/dashboard/forwarding');
+        context.go('/dashboard/admin');
         break;
       case 200: // ADMIN2
-        context.go('/dashboard/admin');
+        context.go('/dashboard/subadmin');
         break;
       case 300: // SALES
         context.go('/dashboard/sales');

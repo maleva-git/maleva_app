@@ -29,7 +29,6 @@ class RtiActivitiesBloc extends Bloc<RtiActivitiesEvent, RtiActivitiesState> {
 
       if (response.statusCode == 200) {
 
-
         final decoded = json.decode(response.body);
         if (decoded != null && decoded is List) {
           final activities = decoded.map((e) => RtiRouteActivity.fromJson(e)).toList();
@@ -40,6 +39,14 @@ class RtiActivitiesBloc extends Bloc<RtiActivitiesEvent, RtiActivitiesState> {
       } else if (response.statusCode == 404) {
         emit(const RtiActivitiesLoaded([]));
       } else {
+        try {
+          final decodedError = json.decode(response.body);
+          if (decodedError['Message'] == 'No Data Found') {
+            emit(const RtiActivitiesLoaded([]));
+            return;
+          }
+        } catch (_) {}
+
         print('RTI Fetch Failed: ${response.statusCode} - ${response.body}');
         emit(RtiActivitiesError('Failed to fetch data: ${response.statusCode}'));
       }

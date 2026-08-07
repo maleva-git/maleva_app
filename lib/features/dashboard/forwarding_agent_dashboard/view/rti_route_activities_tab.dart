@@ -179,13 +179,30 @@ class _RtiRouteActivitiesTabState extends State<RtiRouteActivitiesTab> {
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
                                 Expanded(
-                                  child: Text(
-                                    activity.locationName,
-                                    style: const TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 15,
-                                      color: AppColors.appBarColor,
-                                    ),
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        activity.locationName,
+                                        style: const TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 15,
+                                          color: AppColors.appBarColor,
+                                        ),
+                                      ),
+                                      if (activity.rtiNumber.isNotEmpty)
+                                        Padding(
+                                          padding: const EdgeInsets.only(top: 2),
+                                          child: Text(
+                                            "RTI: ${activity.rtiNumber}",
+                                            style: const TextStyle(
+                                              fontWeight: FontWeight.w600,
+                                              fontSize: 13,
+                                              color: Colors.black87,
+                                            ),
+                                          ),
+                                        ),
+                                    ],
                                   ),
                                 ),
                                 Container(
@@ -228,12 +245,88 @@ class _RtiRouteActivitiesTabState extends State<RtiRouteActivitiesTab> {
                                   ),
                                 ],
                               ),
+                            if (activity.eta != null)
+                              Padding(
+                                padding: const EdgeInsets.only(top: 4),
+                                child: Row(
+                                  children: [
+                                    const Icon(Icons.timer, size: 14, color: Colors.grey),
+                                    const SizedBox(width: 4),
+                                    Text(
+                                      "ETA: ${DateFormat('dd/MM/yyyy hh:mm a').format(DateTime.parse(activity.eta!))}",
+                                      style: const TextStyle(fontSize: 12, color: Colors.black54),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            if (activity.fullRoute.isNotEmpty)
+                              Padding(
+                                padding: const EdgeInsets.only(top: 4),
+                                child: Row(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    const Icon(Icons.map_outlined, size: 14, color: Colors.grey),
+                                    const SizedBox(width: 4),
+                                    Expanded(
+                                      child: Text(
+                                        "Route: ${activity.fullRoute}",
+                                        style: const TextStyle(fontSize: 12, color: Colors.black54),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            if (activity.driverNumber.isNotEmpty || activity.agentMobileNo.isNotEmpty || activity.employeeName.isNotEmpty)
+                              Padding(
+                                padding: const EdgeInsets.only(top: 8),
+                                child: Wrap(
+                                  spacing: 12,
+                                  runSpacing: 4,
+                                  children: [
+                                    if (activity.employeeName.isNotEmpty)
+                                      Row(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          const Icon(Icons.badge_outlined, size: 14, color: AppColors.appBarColor),
+                                          const SizedBox(width: 4),
+                                          Text(activity.employeeName, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w500)),
+                                        ],
+                                      ),
+                                    if (activity.driverNumber.isNotEmpty)
+                                      Row(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          const Icon(Icons.person_outline, size: 14, color: AppColors.appBarColor),
+                                          const SizedBox(width: 4),
+                                          Text(activity.driverNumber, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w500)),
+                                        ],
+                                      ),
+                                    if (activity.agentMobileNo.isNotEmpty)
+                                      Row(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          const Icon(Icons.phone_android, size: 14, color: AppColors.appBarColor),
+                                          const SizedBox(width: 4),
+                                          Text(activity.agentMobileNo, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w500)),
+                                        ],
+                                      ),
+                                  ],
+                                ),
+                              ),
                             if (activity.remarks.isNotEmpty)
                               Padding(
                                 padding: const EdgeInsets.only(top: 8),
                                 child: Text(
                                   "Remarks: ${activity.remarks}",
                                   style: const TextStyle(fontSize: 13, color: Colors.black87, fontStyle: FontStyle.italic),
+                                ),
+                              ),
+                            if (activity.rtiMasterRemarks.isNotEmpty)
+                              Padding(
+                                padding: const EdgeInsets.only(top: 4),
+                                child: Text(
+                                  "Master Remarks: ${activity.rtiMasterRemarks}",
+                                  style: const TextStyle(fontSize: 13, color: Colors.black54, fontStyle: FontStyle.italic),
                                 ),
                               ),
                           ],
