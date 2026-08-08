@@ -68,7 +68,7 @@ class _AdminTopCustomersTabState extends State<AdminTopCustomersTab> {
         return Theme(
           data: Theme.of(context).copyWith(
             colorScheme: const ColorScheme.light(
-              primary: topAppBarColor,
+              primary: const Color(0xFF0D47A1),
               onPrimary: Colors.white,
               onSurface: Colors.black87,
             ),
@@ -355,7 +355,7 @@ class _AdminTopCustomersTabState extends State<AdminTopCustomersTab> {
                                               const Icon(Icons.cases_rounded, size: 14, color: Color(0xFF0D47A1)),
                                               const SizedBox(width: 4),
                                               Text(
-                                                'Job No: ${customer.cNumberDisplay}',
+                                                'Total Jobs: ${customer.volume}',
                                                 style: const TextStyle(
                                                   color: Color(0xFF0D47A1),
                                                   fontWeight: FontWeight.w600,

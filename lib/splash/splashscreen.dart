@@ -85,7 +85,6 @@ class _SplashScreenState extends State<SplashScreen>
 
     _entryCtrl.forward();
 
-    // ── Original startup logic — untouched ────────────────────────────────
     startup();
   }
 
