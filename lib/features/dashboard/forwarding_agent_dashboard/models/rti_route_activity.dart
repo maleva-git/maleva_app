@@ -23,6 +23,7 @@ class RtiRouteActivity {
   final String rtiNumber;
   final String employeeName;
   final String rtiMasterRemarks;
+  final int marqisStatus;
 
   RtiRouteActivity({
     required this.id,
@@ -47,6 +48,7 @@ class RtiRouteActivity {
     required this.rtiNumber,
     required this.employeeName,
     required this.rtiMasterRemarks,
+    this.marqisStatus = 0,
   });
 
   factory RtiRouteActivity.fromJson(Map<String, dynamic> json) {
@@ -55,8 +57,8 @@ class RtiRouteActivity {
       companyRefId: json['CompanyRefId'] ?? 0,
       rtiMasterRefId: json['RTIMasterRefId'] ?? 0,
       sequenceNo: json['SequenceNo'] ?? 0,
-      locationName: json['LocationName'] ?? '',
-      activityType: json['ActivityType'] ?? '',
+      locationName: json['LocationName'] ?? json['Port'] ?? '',
+      activityType: json['ActivityType'] ?? json['JobType'] ?? '',
       employeeRefId: json['EmployeeRefId'] ?? 0,
       status: json['Status'] ?? 0,
       plannedDateTime: json['PlannedDateTime'],
@@ -67,12 +69,13 @@ class RtiRouteActivity {
       createdBy: json['Created_By'] ?? '',
       modifiedDate: json['Modified_Date'],
       modifiedBy: json['Modified_By'] ?? '',
-      agentMobileNo: json['AgentMobileNo'] ?? '',
+      agentMobileNo: json['AgentMobileNo'] ?? json['Contact'] ?? '',
       fullRoute: json['FullRoute'] ?? '',
       driverNumber: json['DriverNumber'] ?? '',
-      rtiNumber: json['RTINumber'] ?? '',
-      employeeName: json['EmployeeName'] ?? '',
+      rtiNumber: json['RTINumber'] ?? json['LorryNo'] ?? '',
+      employeeName: json['EmployeeName'] ?? json['DriverName'] ?? '',
       rtiMasterRemarks: json['RTIMasterRemarks'] ?? '',
+      marqisStatus: json['MarqisStatus'] ?? 0,
     );
   }
 }

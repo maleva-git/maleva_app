@@ -24,3 +24,11 @@ class RtiActivitiesError extends RtiActivitiesState {
   @override
   List<Object?> get props => [message];
 }
+
+class RtiActivitiesActionSuccess extends RtiActivitiesLoaded {
+  final String actionMessage;
+  const RtiActivitiesActionSuccess(this.actionMessage, List<RtiRouteActivity> activities) : super(activities);
+
+  @override
+  List<Object?> get props => [actionMessage, activities];
+}
