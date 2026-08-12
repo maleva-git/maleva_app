@@ -54,11 +54,18 @@ import '../../features/dashboard/forwarding_agent_dashboard/view/forwarding_agen
 import '../../features/dashboard/airfreight_dashboard/bloc/airfreight_bloc.dart';
 import '../../features/dashboard/airfreight_dashboard/view/airfreight_dashboard.dart';
 
+import '../../features/dashboard/unauthorized/unauthorized_page.dart';
+
 final GoRouter appRouter = GoRouter(
   navigatorKey: AppGlobals.navigatorKey,
   initialLocation: '/',
   observers: [AppNavigatorObserver()],
   routes: [
+    GoRoute(
+      path: '/unauthorized',
+      name: 'unauthorized',
+      builder: (context, state) => const UnauthorizedPage(),
+    ),
     GoRoute(
       path: '/',
       name: 'home',

@@ -14,7 +14,7 @@ class RtiRouteActivitiesTab extends StatefulWidget {
 }
 
 class _RtiRouteActivitiesTabState extends State<RtiRouteActivitiesTab> {
-  DateTime _fromDate = DateTime.now().subtract(const Duration(days: 7));
+  DateTime _fromDate = DateTime.now();
   DateTime _toDate = DateTime.now();
 
   @override
@@ -57,6 +57,59 @@ class _RtiRouteActivitiesTabState extends State<RtiRouteActivitiesTab> {
     }
   }
 
+  Widget _buildInfoRow(IconData icon, String label, String value, Color iconColor) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: const EdgeInsets.only(top: 2),
+          child: Icon(icon, size: 16, color: iconColor),
+        ),
+        const SizedBox(width: 8),
+        Expanded(
+          child: RichText(
+            text: TextSpan(
+              text: "$label: ",
+              style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13, color: Colors.black54),
+              children: [
+                TextSpan(
+                  text: value,
+                  style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: Colors.black87),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Color _getBgColor(String jobType) {
+    switch (jobType) {
+      case 'SEAL': return const Color(0xFFF4F7FF); // light blue
+      case 'BREAK_SEAL': return const Color(0xFFFFF4F4); // light red
+      case 'SEAL_AND_BREAK': return const Color(0xFFF9F4FF); // light purple
+      case 'K1 Clearance': return const Color(0xFFF4FFF6); // light green
+      case 'K2 Clearance': return const Color(0xFFFFFBF4); // light orange
+      case 'K3 Clearance': return const Color(0xFFFFF4FC); // light pink
+      case 'K8 Clearance': return const Color(0xFFF4FFFF); // light cyan
+      default: return const Color(0xFFF5F5F5); // light grey
+    }
+  }
+
+  Color _getBorderColor(String jobType) {
+    switch (jobType) {
+      case 'SEAL': return const Color(0xFF4A72FF);
+      case 'BREAK_SEAL': return const Color(0xFFFF4A4A);
+      case 'SEAL_AND_BREAK': return const Color(0xFFA64AFF);
+      case 'K1 Clearance': return const Color(0xFF4AFF79);
+      case 'K2 Clearance': return const Color(0xFFFFB34A);
+      case 'K3 Clearance': return const Color(0xFFFF4AEB);
+      case 'K8 Clearance': return const Color(0xFF4AEBFF);
+      default: return const Color(0xFF9E9E9E);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -70,7 +123,7 @@ class _RtiRouteActivitiesTabState extends State<RtiRouteActivitiesTab> {
             borderRadius: BorderRadius.circular(12),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.05),
+                color: Colors.black.withValues(alpha: 0.05),
                 blurRadius: 10,
                 offset: const Offset(0, 4),
               ),
@@ -151,7 +204,26 @@ class _RtiRouteActivitiesTabState extends State<RtiRouteActivitiesTab> {
         
         // List View
         Expanded(
-          child: BlocBuilder<RtiActivitiesBloc, RtiActivitiesState>(
+          child: BlocConsumer<RtiActivitiesBloc, RtiActivitiesState>(
+            listener: (context, state) {
+              if (state is RtiActivitiesActionSuccess) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Row(
+                      children: [
+                        const Icon(Icons.check_circle_outline, color: Colors.white),
+                        const SizedBox(width: 12),
+                        Expanded(child: Text(state.actionMessage, style: const TextStyle(fontWeight: FontWeight.bold))),
+                      ],
+                    ),
+                    backgroundColor: Colors.green.shade600,
+                    behavior: SnackBarBehavior.floating,
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                    margin: const EdgeInsets.all(16),
+                  ),
+                );
+              }
+            },
             builder: (context, state) {
               if (state is RtiActivitiesLoading) {
                 return const Center(child: CircularProgressIndicator(color: AppColors.appBarColor));
@@ -162,173 +234,216 @@ class _RtiRouteActivitiesTabState extends State<RtiRouteActivitiesTab> {
                   return const Center(child: Text("No Data Found", style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500, color: Colors.grey)));
                 }
                 return ListView.builder(
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                   itemCount: state.activities.length,
                   itemBuilder: (context, index) {
                     final activity = state.activities[index];
-                    return Card(
-                      margin: const EdgeInsets.only(bottom: 12),
-                      elevation: 2,
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                      child: Padding(
-                        padding: const EdgeInsets.all(12),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
+                    
+                    final bgColor = _getBgColor(activity.activityType);
+                    final borderColor = _getBorderColor(activity.activityType);
+                    
+                    String formattedEta = 'N/A';
+                    if (activity.eta != null && activity.eta!.isNotEmpty) {
+                      try {
+                        final DateTime dt = DateTime.parse(activity.eta!);
+                        formattedEta = DateFormat('dd MMM yyyy, hh:mm a').format(dt);
+                      } catch (_) {
+                        formattedEta = activity.eta!;
+                      }
+                    }
+
+                    return Container(
+                      margin: const EdgeInsets.only(bottom: 16),
+                      decoration: BoxDecoration(
+                        color: bgColor,
+                        borderRadius: BorderRadius.circular(16),
+                        border: Border.all(color: borderColor.withValues(alpha: 0.3), width: 1.5),
+                        boxShadow: [
+                          BoxShadow(
+                            color: borderColor.withValues(alpha: 0.1),
+                            blurRadius: 10,
+                            offset: const Offset(0, 4),
+                          ),
+                        ],
+                      ),
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(16),
+                        child: Stack(
                           children: [
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Expanded(
-                                  child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
+                            Positioned(
+                              left: 0,
+                              top: 0,
+                              bottom: 0,
+                              width: 6,
+                              child: Container(color: borderColor),
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.all(16.0).copyWith(left: 20),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  // Header: RTI No (Lorry No) & Status
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                     children: [
-                                      Text(
-                                        activity.locationName,
-                                        style: const TextStyle(
-                                          fontWeight: FontWeight.bold,
-                                          fontSize: 15,
-                                          color: AppColors.appBarColor,
-                                        ),
-                                      ),
-                                      if (activity.rtiNumber.isNotEmpty)
-                                        Padding(
-                                          padding: const EdgeInsets.only(top: 2),
-                                          child: Text(
-                                            "RTI: ${activity.rtiNumber}",
-                                            style: const TextStyle(
-                                              fontWeight: FontWeight.w600,
-                                              fontSize: 13,
-                                              color: Colors.black87,
-                                            ),
+                                      Expanded(
+                                        child: Text(
+                                          "Lorry No: ${activity.rtiNumber.isNotEmpty ? activity.rtiNumber : 'N/A'}",
+                                          style: TextStyle(
+                                            fontWeight: FontWeight.w900,
+                                            fontSize: 16,
+                                            color: borderColor.withValues(alpha: 0.9),
+                                            letterSpacing: 0.5,
                                           ),
                                         ),
+                                      ),
+                                      PopupMenuButton<int>(
+                                        initialValue: activity.status,
+                                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                                        onSelected: (int newValue) {
+                                          if (newValue != activity.status) {
+                                            context.read<RtiActivitiesBloc>().add(
+                                              UpdateRtiStatus(activity.id, newValue)
+                                            );
+                                          }
+                                        },
+                                        itemBuilder: (context) => [
+                                          const PopupMenuItem(
+                                            value: 0,
+                                            child: Text('PENDING', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.orange)),
+                                          ),
+                                          const PopupMenuItem(
+                                            value: 1,
+                                            child: Text('COMPLETED', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.green)),
+                                          ),
+                                        ],
+                                        child: Container(
+                                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                                          decoration: BoxDecoration(
+                                            color: activity.status == 1 ? Colors.green.shade100 : Colors.orange.shade100,
+                                            borderRadius: BorderRadius.circular(20),
+                                            border: Border.all(
+                                              color: activity.status == 1 ? Colors.green.shade300 : Colors.orange.shade300, 
+                                              width: 1
+                                            ),
+                                          ),
+                                          child: Row(
+                                            mainAxisSize: MainAxisSize.min,
+                                            children: [
+                                              Text(
+                                                activity.status == 1 ? 'COMPLETED' : 'PENDING',
+                                                style: TextStyle(
+                                                  color: activity.status == 1 ? Colors.green.shade800 : Colors.orange.shade900,
+                                                  fontWeight: FontWeight.bold,
+                                                  fontSize: 11,
+                                                  letterSpacing: 0.5,
+                                                ),
+                                              ),
+                                              const SizedBox(width: 4),
+                                              Icon(
+                                                Icons.keyboard_arrow_down_rounded, 
+                                                size: 16, 
+                                                color: activity.status == 1 ? Colors.green.shade800 : Colors.orange.shade900
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      ),
                                     ],
                                   ),
-                                ),
-                                Container(
-                                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                                  decoration: BoxDecoration(
-                                    color: activity.status == 1 ? Colors.green.withOpacity(0.1) : Colors.orange.withOpacity(0.1),
-                                    borderRadius: BorderRadius.circular(8),
-                                  ),
-                                  child: Text(
-                                    activity.status == 1 ? 'Completed' : 'Pending',
-                                    style: TextStyle(
-                                      color: activity.status == 1 ? Colors.green : Colors.orange,
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 12,
+                                  const SizedBox(height: 16),
+                                  
+                                  // Destination, Job Type & ETA
+                                  _buildInfoRow(Icons.location_on_rounded, "Destination", activity.locationName.isNotEmpty ? activity.locationName : 'N/A', borderColor),
+                                  const SizedBox(height: 10),
+                                  _buildInfoRow(Icons.work_rounded, "Job Type", activity.activityType.isNotEmpty ? activity.activityType : 'N/A', borderColor),
+                                  const SizedBox(height: 10),
+                                  _buildInfoRow(Icons.map_rounded, "Full Route", activity.fullRoute.isNotEmpty ? activity.fullRoute : 'N/A', borderColor),
+                                  const SizedBox(height: 10),
+                                  _buildInfoRow(Icons.access_time_filled_rounded, "ETA", formattedEta, borderColor),
+                                  
+                                  
+                                  if (activity.marqisStatus == 1)
+                                    Container(
+                                      margin: const EdgeInsets.only(top: 12),
+                                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                                      decoration: BoxDecoration(
+                                        color: Colors.red.shade50,
+                                        borderRadius: BorderRadius.circular(8),
+                                        border: Border.all(color: Colors.red.shade200),
+                                      ),
+                                      child: Row(
+                                        children: [
+                                          Icon(Icons.warning_amber_rounded, color: Colors.red.shade700, size: 20),
+                                          const SizedBox(width: 8),
+                                          Expanded(
+                                            child: Text(
+                                              "Marqis: this truck is need the Marqis",
+                                              style: TextStyle(
+                                                color: Colors.red.shade800,
+                                                fontWeight: FontWeight.bold,
+                                                fontSize: 13,
+                                              ),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                    
+                                  const SizedBox(height: 16),
+                                  
+                                  // Driver Info Container
+                                  Container(
+                                    padding: const EdgeInsets.all(14),
+                                    decoration: BoxDecoration(
+                                      color: Colors.white.withValues(alpha: 0.7),
+                                      borderRadius: BorderRadius.circular(12),
+                                      border: Border.all(color: Colors.white, width: 2),
+                                    ),
+                                    child: Column(
+                                      children: [
+                                        _buildInfoRow(Icons.badge_rounded, "Driver Name", activity.employeeName.isNotEmpty ? activity.employeeName : 'N/A', Colors.black87),
+                                        const SizedBox(height: 10),
+                                        _buildInfoRow(Icons.phone_android_rounded, "Driver Number", activity.driverNumber.isNotEmpty ? activity.driverNumber : 'N/A', Colors.black87),
+                                      ],
                                     ),
                                   ),
-                                ),
-                              ],
-                            ),
-                            const SizedBox(height: 8),
-                            Row(
-                              children: [
-                                const Icon(Icons.local_activity, size: 14, color: Colors.grey),
-                                const SizedBox(width: 4),
-                                Text(
-                                  activity.activityType,
-                                  style: const TextStyle(fontSize: 13, color: Colors.black87),
-                                ),
-                              ],
-                            ),
-                            const SizedBox(height: 4),
-                            if (activity.plannedDateTime != null)
-                              Row(
-                                children: [
-                                  const Icon(Icons.access_time, size: 14, color: Colors.grey),
-                                  const SizedBox(width: 4),
-                                  Text(
-                                    "Planned: ${DateFormat('dd/MM/yyyy hh:mm a').format(DateTime.parse(activity.plannedDateTime!))}",
-                                    style: const TextStyle(fontSize: 12, color: Colors.black54),
-                                  ),
+                                  
+                                  // Remarks
+                                  if (activity.remarks.isNotEmpty)
+                                    Container(
+                                      width: double.infinity,
+                                      margin: const EdgeInsets.only(top: 16),
+                                      padding: const EdgeInsets.all(14),
+                                      decoration: BoxDecoration(
+                                        color: Colors.white.withValues(alpha: 0.9),
+                                        borderRadius: BorderRadius.circular(10),
+                                        border: Border.all(color: borderColor.withValues(alpha: 0.2), width: 1),
+                                      ),
+                                      child: Column(
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        children: [
+                                          Row(
+                                            children: [
+                                              Icon(Icons.notes_rounded, size: 16, color: borderColor),
+                                              const SizedBox(width: 6),
+                                              Text(
+                                                "Remarks",
+                                                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: borderColor),
+                                              ),
+                                            ],
+                                          ),
+                                          const SizedBox(height: 6),
+                                          Text(
+                                            activity.remarks,
+                                            style: const TextStyle(fontSize: 13, color: Colors.black87, height: 1.4, fontWeight: FontWeight.w500),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
                                 ],
                               ),
-                            if (activity.eta != null)
-                              Padding(
-                                padding: const EdgeInsets.only(top: 4),
-                                child: Row(
-                                  children: [
-                                    const Icon(Icons.timer, size: 14, color: Colors.grey),
-                                    const SizedBox(width: 4),
-                                    Text(
-                                      "ETA: ${DateFormat('dd/MM/yyyy hh:mm a').format(DateTime.parse(activity.eta!))}",
-                                      style: const TextStyle(fontSize: 12, color: Colors.black54),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            if (activity.fullRoute.isNotEmpty)
-                              Padding(
-                                padding: const EdgeInsets.only(top: 4),
-                                child: Row(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    const Icon(Icons.map_outlined, size: 14, color: Colors.grey),
-                                    const SizedBox(width: 4),
-                                    Expanded(
-                                      child: Text(
-                                        "Route: ${activity.fullRoute}",
-                                        style: const TextStyle(fontSize: 12, color: Colors.black54),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            if (activity.driverNumber.isNotEmpty || activity.agentMobileNo.isNotEmpty || activity.employeeName.isNotEmpty)
-                              Padding(
-                                padding: const EdgeInsets.only(top: 8),
-                                child: Wrap(
-                                  spacing: 12,
-                                  runSpacing: 4,
-                                  children: [
-                                    if (activity.employeeName.isNotEmpty)
-                                      Row(
-                                        mainAxisSize: MainAxisSize.min,
-                                        children: [
-                                          const Icon(Icons.badge_outlined, size: 14, color: AppColors.appBarColor),
-                                          const SizedBox(width: 4),
-                                          Text(activity.employeeName, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w500)),
-                                        ],
-                                      ),
-                                    if (activity.driverNumber.isNotEmpty)
-                                      Row(
-                                        mainAxisSize: MainAxisSize.min,
-                                        children: [
-                                          const Icon(Icons.person_outline, size: 14, color: AppColors.appBarColor),
-                                          const SizedBox(width: 4),
-                                          Text(activity.driverNumber, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w500)),
-                                        ],
-                                      ),
-                                    if (activity.agentMobileNo.isNotEmpty)
-                                      Row(
-                                        mainAxisSize: MainAxisSize.min,
-                                        children: [
-                                          const Icon(Icons.phone_android, size: 14, color: AppColors.appBarColor),
-                                          const SizedBox(width: 4),
-                                          Text(activity.agentMobileNo, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w500)),
-                                        ],
-                                      ),
-                                  ],
-                                ),
-                              ),
-                            if (activity.remarks.isNotEmpty)
-                              Padding(
-                                padding: const EdgeInsets.only(top: 8),
-                                child: Text(
-                                  "Remarks: ${activity.remarks}",
-                                  style: const TextStyle(fontSize: 13, color: Colors.black87, fontStyle: FontStyle.italic),
-                                ),
-                              ),
-                            if (activity.rtiMasterRemarks.isNotEmpty)
-                              Padding(
-                                padding: const EdgeInsets.only(top: 4),
-                                child: Text(
-                                  "Master Remarks: ${activity.rtiMasterRemarks}",
-                                  style: const TextStyle(fontSize: 13, color: Colors.black54, fontStyle: FontStyle.italic),
-                                ),
-                              ),
+                            ),
                           ],
                         ),
                       ),

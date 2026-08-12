@@ -15,3 +15,13 @@ class FetchRtiActivities extends RtiActivitiesEvent {
   @override
   List<Object?> get props => [fromDate, toDate];
 }
+
+class UpdateRtiStatus extends RtiActivitiesEvent {
+  final int id;
+  final int newStatus;
+
+  const UpdateRtiStatus(this.id, this.newStatus);
+
+  @override
+  List<Object?> get props => [id, newStatus];
+}

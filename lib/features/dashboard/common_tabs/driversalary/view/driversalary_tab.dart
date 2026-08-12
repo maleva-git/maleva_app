@@ -67,9 +67,76 @@ void _showSalaryDetailsDialog(BuildContext context, Map<String, dynamic> item) {
   showDialog(
     context: context,
     barrierDismissible: true,
-    builder: (_) => Dialog(
+    builder: (_) => _SalaryDetailsDialogContent(item: item),
+  );
+}
+
+class _SalaryDetailsDialogContent extends StatefulWidget {
+  final Map<String, dynamic> item;
+  const _SalaryDetailsDialogContent({required this.item});
+
+  @override
+  State<_SalaryDetailsDialogContent> createState() => _SalaryDetailsDialogContentState();
+}
+
+class _SalaryDetailsDialogContentState extends State<_SalaryDetailsDialogContent> {
+  final ScrollController _scrollController = ScrollController();
+  bool _showScrollHint = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _scrollController.addListener(_onScroll);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _checkScrollable();
+    });
+  }
+
+  void _checkScrollable() {
+    if (_scrollController.hasClients) {
+      final isScrollable = _scrollController.position.maxScrollExtent > 0;
+      final isAtBottom = _scrollController.position.pixels >= _scrollController.position.maxScrollExtent - 20;
+      final shouldShow = isScrollable && !isAtBottom;
+      
+      if (_showScrollHint != shouldShow) {
+        setState(() {
+          _showScrollHint = shouldShow;
+        });
+      }
+    }
+  }
+
+  void _onScroll() {
+    _checkScrollable();
+  }
+
+  @override
+  void dispose() {
+    _scrollController.removeListener(_onScroll);
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  String _formatDate(dynamic dateString) {
+    if (dateString == null || dateString.toString().isEmpty) return '-';
+    try {
+      final dt = DateTime.parse(dateString.toString());
+      if (dt.year < 2000) return '-'; // Ignore 0001-01-01
+      return DateFormat('dd/MM/yyyy hh:mm a').format(dt);
+    } catch (e) {
+      return dateString.toString();
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final item = widget.item;
+
+    return Dialog(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      insetPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
       child: Container(
+        constraints: BoxConstraints(maxHeight: MediaQuery.of(context).size.height * 0.85),
         padding: const EdgeInsets.all(20),
         decoration: BoxDecoration(
             color: Colors.white, borderRadius: BorderRadius.circular(16)),
@@ -79,28 +146,103 @@ void _showSalaryDetailsDialog(BuildContext context, Map<String, dynamic> item) {
           children: [
             // Header
             Container(
-              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
               decoration: BoxDecoration(
                   gradient: kGradient, borderRadius: BorderRadius.circular(10)),
               child: Row(
                 children: [
                   const Icon(Icons.receipt_long_outlined,
-                      size: 18, color: Colors.white),
+                      size: 20, color: Colors.white),
                   const SizedBox(width: 8),
-                  Text(
-                    item['CNumberDisplay']?.toString() ?? '-',
-                    style: AppTypography.heading2(
-                        color: Colors.white, fontWeight: FontWeight.w700),
+                  Expanded(
+                    child: Text(
+                      item['CNumberDisplay']?.toString() ?? 'RTI DETAILS',
+                      style: AppTypography.heading2(
+                          color: Colors.white, fontWeight: FontWeight.w700),
+                    ),
                   ),
                 ],
               ),
             ),
-            const SizedBox(height: 14),
+            const SizedBox(height: 16),
 
-            // Detail rows
-            _DetailRow('RTI Date', item['SSaleDate']?.toString() ?? '-'),
-            _DetailRow('Job No', item['JobNo']?.toString() ?? '-'),
-            _DetailRow('Amount', item['Amount']?.toString() ?? '-'),
+            // Scrollable detail rows with Stack for Hint
+            Flexible(
+              child: Stack(
+                alignment: Alignment.bottomCenter,
+                children: [
+                  SingleChildScrollView(
+                    controller: _scrollController,
+                    child: Padding(
+                      padding: const EdgeInsets.only(bottom: 24), // Space for the pill
+                      child: Column(
+                        children: [
+                          _DetailRow('RTI Date', item['SSaleDate']?.toString() ?? '-'),
+                          _DetailRow('Job No', item['JobNo']?.toString() ?? '-'),
+                          _DetailRow('Driver', item['DriverName']?.toString() ?? '-'),
+                          _DetailRow('Truck', item['TruckName']?.toString() ?? '-'),
+                          _DetailRow('Truck Type', item['TruckType']?.toString() ?? '-'),
+                          const Divider(height: 24),
+                          _DetailRow('Customer', item['CustomerName']?.toString() ?? '-'),
+                          _DetailRow('Origin', item['Origin']?.toString() ?? '-'),
+                          _DetailRow('Destination', item['Destination']?.toString() ?? '-'),
+                          _DetailRow('Full Route', item['FullDestination']?.toString() ?? '-'),
+                          const Divider(height: 24),
+                          _DetailRow('Quantity', item['Quantity']?.toString() ?? '-'),
+                          _DetailRow('Pick Date', _formatDate(item['PickDate'])),
+                          _DetailRow('Delivery Date', _formatDate(item['DliveryDate'])),
+                          _DetailRow('E-Link', item['ELink']?.toString() ?? '-'),
+                          _DetailRow('EX-Link', item['EXLink']?.toString() ?? '-'),
+                          if (item['Remarks'] != null && item['Remarks'].toString().isNotEmpty)
+                            _DetailRow('Remarks', item['Remarks'].toString()),
+                          if (item['Comments'] != null && item['Comments'].toString().isNotEmpty)
+                            _DetailRow('Comments', item['Comments'].toString()),
+                          const Divider(height: 24),
+                          _DetailRow('Base Salary', item['Salary']?.toString() ?? '0.0'),
+                          _DetailRow('Pickup Amount', item['PickupAmount']?.toString() ?? '0.0'),
+                          _DetailRow('Drop Amount', item['DropAmount']?.toString() ?? '0.0'),
+                          _DetailRow('Sleeping Amount', item['SleepingAmount']?.toString() ?? '0.0'),
+                          _DetailRow('Exit Amount', item['ExitAmount']?.toString() ?? '0.0'),
+                          _DetailRow('Empty Delivery', item['EmptyDeliveryAmount']?.toString() ?? '0.0'),
+                          _DetailRow('Manpower Amount', item['ManpwAmount']?.toString() ?? '0.0'),
+                          const Divider(height: 24),
+                          _DetailRow('Total Amount', item['Amount']?.toString() ?? '0.0'),
+                        ],
+                      ),
+                    ),
+                  ),
+
+                  // Floating Scroll Hint Pill
+                  if (_showScrollHint)
+                    Positioned(
+                      bottom: 0,
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                        decoration: BoxDecoration(
+                          color: Palette.blue700,
+                          borderRadius: BorderRadius.circular(20),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withValues(alpha: 0.2),
+                              blurRadius: 6,
+                              offset: const Offset(0, 3),
+                            ),
+                          ],
+                        ),
+                        child: const Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Text('Scroll down for more',
+                                style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 13)),
+                            SizedBox(width: 6),
+                            Icon(Icons.keyboard_double_arrow_down_rounded, color: Colors.white, size: 18),
+                          ],
+                        ),
+                      ),
+                    ),
+                ],
+              ),
+            ),
 
             const SizedBox(height: 16),
             Align(
@@ -114,8 +256,8 @@ void _showSalaryDetailsDialog(BuildContext context, Map<String, dynamic> item) {
           ],
         ),
       ),
-    ),
-  );
+    );
+  }
 }
 
 class _DetailRow extends StatelessWidget {
@@ -126,8 +268,9 @@ class _DetailRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.only(bottom: 8),
+      padding: const EdgeInsets.only(bottom: 12),
       child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Expanded(
             flex: 2,
@@ -135,11 +278,12 @@ class _DetailRow extends StatelessWidget {
                 style: AppTypography.bodyLarge(
                     color: Palette.textMid, fontWeight: FontWeight.w600)),
           ),
+          const SizedBox(width: 8),
           Expanded(
             flex: 3,
             child: Text(value,
                 style: AppTypography.bodyLarge(
-                    color: Palette.textDark2, fontWeight: FontWeight.w600)),
+                    color: Palette.textDark2, fontWeight: FontWeight.w700)),
           ),
         ],
       ),
