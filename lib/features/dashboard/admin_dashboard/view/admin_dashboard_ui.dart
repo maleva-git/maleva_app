@@ -168,7 +168,7 @@ class MobileDashboard extends StatelessWidget {
           _tab('InventoryReport', isTablet),
           _tab('PDO',             isTablet),
           _tab('RTI',             isTablet),
-          _tab('LeaveApproval',   isTablet),
+          _tab('DriverApproval',   isTablet),
           _tab('EmpApproval', isTablet),
           _tab('EmpLeave', isTablet),
           _tab('TopCustomers', isTablet),

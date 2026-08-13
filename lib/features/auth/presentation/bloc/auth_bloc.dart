@@ -51,6 +51,15 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
     on<SubmitLogin>((event, emit) async {
       emit(state.copyWith(loading: true, errorMessage: ""));
 
+      if (state.username.trim().isEmpty || state.password.trim().isEmpty) {
+        emit(state.copyWith(
+          loading: false,
+          loginSuccess: false,
+          errorMessage: "Username and Password cannot be empty",
+        ));
+        return;
+      }
+
       String oldUserName = AppGlobals.storagenew.getString('OldUsername') ?? "";
 
       try {

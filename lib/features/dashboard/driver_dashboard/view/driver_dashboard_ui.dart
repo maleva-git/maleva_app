@@ -101,7 +101,7 @@ class DriverDashboardView extends StatelessWidget {
           _tab('TruckLicense',   isTablet),
           _tab('Salary',   isTablet),
           _tab('PDO',       isTablet),
-          _tab('Leave', isTablet),
+          _tab('Driver Leave', isTablet),
         ],
       ),
     );
