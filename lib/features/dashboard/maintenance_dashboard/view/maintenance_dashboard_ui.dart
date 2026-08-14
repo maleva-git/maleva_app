@@ -144,7 +144,6 @@ class MaintenanceMobileDashboard extends StatelessWidget {
           _tab('EngineHours',     isTablet),
           _tab('FuelDiff',        isTablet),
           _tab('SparePartsEntry', isTablet),
-          _tab('LeaveApproval',   isTablet),
           _tab('EmpLeave',        isTablet),
         ],
       ),
@@ -198,7 +197,6 @@ class MaintenanceMobileDashboard extends StatelessWidget {
           const EngineHoursPage(),  //7
           const FuelDiffPage(),   //8
           const SparePartsEntryPage(),  //9
-          const AdminLeaveApprovalTab(), // 10
           const EmployeeLeaveRequestTab(),
         ],
       ),

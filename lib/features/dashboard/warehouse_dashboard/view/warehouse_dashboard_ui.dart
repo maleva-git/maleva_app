@@ -120,7 +120,6 @@ class WareHouseMobileDashboard extends StatelessWidget {
         tabs: [
           _tab('SpotsSaleOrder',  isTablet),
           _tab('InventoryReport', isTablet),
-          _tab('LeaveApproval', isTablet),
           _tab('EmpLeave', isTablet),
         ],
       ),
@@ -164,7 +163,6 @@ class WareHouseMobileDashboard extends StatelessWidget {
           InventoryPage(),
 
 
-          AdminLeaveApprovalTab(),
           EmployeeLeaveRequestTab(),
         ],
       ),

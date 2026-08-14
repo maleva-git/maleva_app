@@ -33,27 +33,22 @@ class _DriverLeaveRequestTabBody extends StatefulWidget {
 }
 
 class _DriverLeaveRequestTabState extends State<_DriverLeaveRequestTabBody> {
-  // Form state
-  DateTime _fromDate = DateTime.now();
-  DateTime _toDate = DateTime.now().add(const Duration(days: 1));
   DateTime _searchFromDate = DateTime.now().subtract(const Duration(days: 30));
   DateTime _searchToDate = DateTime.now();
-  int? _selectedLeaveTypeId;
   int? _selectedId;
-  final TextEditingController _reasonController = TextEditingController();
   List<LeaveRequestModel> _cachedRequests = [];
   List<LeaveTypeModel> _cachedLeaveTypes = [];
   
   @override
-  void dispose() {
-    _reasonController.dispose();
-    super.dispose();
-  }
-
-  @override
   void initState() {
     super.initState();
     _selectedId = AppGlobals.EmpRefId;
+    context.read<LeaveBloc>().add(FetchLeaveData(
+      applicantType: 2,
+      applicantRefId: _selectedId ?? 0,
+      fromDate: DateFormat('yyyy-MM-dd').format(_searchFromDate),
+      toDate: DateFormat('yyyy-MM-dd').format(_searchToDate),
+    ));
   }
 
   void _fetchRequests(BuildContext ctx) {
@@ -85,7 +80,304 @@ class _DriverLeaveRequestTabState extends State<_DriverLeaveRequestTabBody> {
     }
   }
 
-  void _submitLeave(BuildContext ctx, List<LeaveTypeModel> leaveTypes) {
+  String _formatTotalDays(LeaveRequestModel req) {
+    int tDays = req.totalDays;
+    bool sameDay = req.fromDate.year == req.toDate.year && 
+                   req.fromDate.month == req.toDate.month && 
+                   req.fromDate.day == req.toDate.day;
+    
+    bool hasTime = (req.fromDate.hour != 0 || req.fromDate.minute != 0 || req.fromDate.second != 0) ||
+                   (req.toDate.hour != 0 || req.toDate.minute != 0 || req.toDate.second != 0);
+                   
+    if (hasTime && sameDay) {
+      int diffHours = req.toDate.difference(req.fromDate).inHours;
+      if (diffHours < 1) {
+        return '${req.toDate.difference(req.fromDate).inMinutes} Mins';
+      } else {
+        return '$diffHours Hours';
+      }
+    }
+    
+    if (sameDay) {
+      if (tDays > 1) {
+        if (tDays >= 15) return '$tDays Mins';
+        return '$tDays Hours';
+      }
+      return '1 Day';
+    }
+    return '$tDays ${tDays == 1 ? "Day" : "Days"}';
+  }
+
+  void _openLeaveForm(BuildContext context, List<LeaveTypeModel> leaveTypes) {
+    final bloc = context.read<LeaveBloc>();
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (ctx) {
+        return BlocProvider.value(
+          value: bloc,
+          child: Padding(
+            padding: EdgeInsets.only(bottom: MediaQuery.of(ctx).viewInsets.bottom),
+            child: _LeaveRequestFormSheet(
+              applicantRefId: _selectedId ?? 0,
+              leaveTypes: leaveTypes,
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocConsumer<LeaveBloc, LeaveState>(
+      listener: (context, state) {
+        if (state is LeaveActionSuccess) {
+          ConfirmationOK(state.message, context);
+          _fetchRequests(context);
+        } else if (state is LeaveActionError) {
+          ConfirmationOK(state.message, context);
+        }
+      },
+      builder: (context, state) {
+        bool isLoading = state is LeaveLoading || state is LeaveInitial;
+        if (state is LeaveLoaded) {
+          if (state.requests.isNotEmpty) _cachedRequests = state.requests;
+          if (state.leaveTypes.isNotEmpty) _cachedLeaveTypes = state.leaveTypes;
+        }
+        
+        List<LeaveRequestModel> requests = (state is LeaveLoaded) ? state.requests : _cachedRequests;
+        List<LeaveTypeModel> leaveTypes = (state is LeaveLoaded) ? state.leaveTypes : _cachedLeaveTypes;
+
+        return Scaffold(
+          backgroundColor: Colors.transparent,
+          floatingActionButton: FloatingActionButton.extended(
+            onPressed: () => _openLeaveForm(context, leaveTypes),
+            backgroundColor: AppTokens.brandPrimary,
+            icon: const Icon(Icons.add, color: Colors.white),
+            label: Text("Request Leave", style: AppTypography.heading3(color: Colors.white)),
+          ),
+          body: RefreshIndicator(
+            onRefresh: () async { _fetchRequests(context); },
+            child: SingleChildScrollView(
+              physics: const AlwaysScrollableScrollPhysics(),
+              child: Column(
+                children: [
+                  // Search Filter
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: MalevaDateField(
+                            date: DateFormat('dd-MM-yyyy').format(_searchFromDate),
+                            onTap: () => _pickSearchDate(true),
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: MalevaDateField(
+                            date: DateFormat('dd-MM-yyyy').format(_searchToDate),
+                            onTap: () => _pickSearchDate(false),
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: AppTokens.brandDark,
+                            elevation: 0,
+                            padding: const EdgeInsets.all(16),
+                            minimumSize: const Size(0, 0),
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                          ),
+                          onPressed: () => _fetchRequests(context),
+                          child: const Icon(Icons.search_rounded, color: Colors.white, size: 20),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  // List
+                  if (isLoading && requests.isEmpty)
+                    const Padding(padding: EdgeInsets.all(32), child: CircularProgressIndicator())
+                  else
+                    ListView.builder(
+                      shrinkWrap: true,
+                      physics: const NeverScrollableScrollPhysics(),
+                      itemCount: requests.length,
+                      itemBuilder: (context, index) {
+                        final req = requests[index];
+                        Color statusColor = const Color(0xFFEAB308); // Yellow/Orange
+                        Color statusBg = const Color(0xFFFEF08A).withValues(alpha: 0.3);
+                        if (req.statusRefId == 2) {
+                          statusColor = const Color(0xFF047857); // Green
+                          statusBg = const Color(0xFF059669).withValues(alpha: 0.12);
+                        } else if (req.statusRefId == 3) {
+                          statusColor = const Color(0xFFB91C1C); // Red
+                          statusBg = const Color(0xFFEF4444).withValues(alpha: 0.12);
+                        }
+                        
+                        return Container(
+                          margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(16),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withValues(alpha: 0.04),
+                                blurRadius: 10,
+                                offset: const Offset(0, 4),
+                              )
+                            ],
+                            border: Border(left: BorderSide(color: statusColor, width: 4)),
+                          ),
+                          child: Padding(
+                            padding: const EdgeInsets.all(16),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Expanded(
+                                      child: Row(
+                                        children: [
+                                          const Icon(Icons.calendar_today_rounded, size: 14, color: Colors.grey),
+                                          const SizedBox(width: 6),
+                                          Expanded(
+                                            child: Text(
+                                              '${DateFormat('dd MMM hh:mm a').format(req.fromDate)}  ➔  ${DateFormat('dd MMM hh:mm a').format(req.toDate)}',
+                                              style: AppTypography.heading3(color: colour.commonColor, fontWeight: FontWeight.w700),
+                                              overflow: TextOverflow.visible,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                    Container(
+                                      margin: const EdgeInsets.only(left: 8),
+                                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                                      decoration: BoxDecoration(
+                                        color: statusBg,
+                                        borderRadius: BorderRadius.circular(12),
+                                        border: Border.all(color: statusColor.withValues(alpha: 0.3)),
+                                      ),
+                                      child: Text(
+                                        req.statusName, 
+                                        style: AppTypography.bodySmall(color: statusColor, fontWeight: FontWeight.bold),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                const SizedBox(height: 12),
+                                Container(
+                                  width: double.infinity,
+                                  padding: const EdgeInsets.all(10),
+                                  decoration: BoxDecoration(
+                                    color: Colors.grey.shade50,
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
+                                  child: Row(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Expanded(
+                                        child: Column(
+                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          children: [
+                                            Text('Reason', style: AppTypography.bodySmall(color: Colors.grey, fontWeight: FontWeight.w600)),
+                                            const SizedBox(height: 2),
+                                            Text(req.reason, style: AppTypography.bodyLarge(color: colour.commonColor, fontWeight: FontWeight.w500)),
+                                          ],
+                                        ),
+                                      ),
+                                      Container(
+                                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                        decoration: BoxDecoration(
+                                          color: colour.commonColorhighlight.withValues(alpha: 0.1),
+                                          borderRadius: BorderRadius.circular(8),
+                                        ),
+                                        child: Text(
+                                          _formatTotalDays(req),
+                                          style: AppTypography.bodyMedium(color: colour.commonColorhighlight, fontWeight: FontWeight.bold),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                if (req.reviewRemark.isNotEmpty)
+                                  Padding(
+                                    padding: const EdgeInsets.only(top: 8),
+                                    child: Row(
+                                      children: [
+                                        Icon(Icons.info_outline_rounded, size: 14, color: colour.commonColorred),
+                                        const SizedBox(width: 4),
+                                        Expanded(
+                                          child: Text(
+                                            'Remark: ${req.reviewRemark}',
+                                            style: AppTypography.bodyMedium(color: colour.commonColorred, fontWeight: FontWeight.w500),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                if (req.reviewedByName.isNotEmpty)
+                                  Padding(
+                                    padding: const EdgeInsets.only(top: 12),
+                                    child: Row(
+                                      children: [
+                                        Icon(Icons.verified_user_rounded, size: 14, color: Colors.grey),
+                                        const SizedBox(width: 4),
+                                        Text(
+                                          'Reviewed By: ${req.reviewedByName}',
+                                          style: AppTypography.bodyMedium(color: Colors.grey, fontWeight: FontWeight.w600),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                              ],
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+                  const SizedBox(height: 80), // padding for fab
+                ],
+              ),
+            ),
+          ),
+        );
+      },
+    );
+  }
+}
+
+class _LeaveRequestFormSheet extends StatefulWidget {
+  final int applicantRefId;
+  final List<LeaveTypeModel> leaveTypes;
+
+  const _LeaveRequestFormSheet({
+    required this.applicantRefId,
+    required this.leaveTypes,
+  });
+
+  @override
+  State<_LeaveRequestFormSheet> createState() => _LeaveRequestFormSheetState();
+}
+
+class _LeaveRequestFormSheetState extends State<_LeaveRequestFormSheet> {
+  DateTime _fromDate = DateTime.now();
+  DateTime _toDate = DateTime.now().add(const Duration(days: 1));
+  int? _selectedLeaveTypeId;
+  final TextEditingController _reasonController = TextEditingController();
+
+  @override
+  void dispose() {
+    _reasonController.dispose();
+    super.dispose();
+  }
+
+  void _submitLeave(BuildContext ctx) {
     if (_selectedLeaveTypeId == null) {
       ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Please select Leave Reason')));
       return;
@@ -111,11 +403,11 @@ class _DriverLeaveRequestTabState extends State<_DriverLeaveRequestTabBody> {
       fromDate: _fromDate,
       toDate: _toDate,
       totalDays: totalDaysNum,
-      applicantRefId: _selectedId!,
+      applicantRefId: widget.applicantRefId,
       applicantType: 2,
       reason: _reasonController.text.trim().isNotEmpty 
           ? _reasonController.text.trim() 
-          : leaveTypes.firstWhere((e) => e.id == _selectedLeaveTypeId).name,
+          : widget.leaveTypes.firstWhere((e) => e.id == _selectedLeaveTypeId).name,
     ));
   }
 
@@ -163,122 +455,50 @@ class _DriverLeaveRequestTabState extends State<_DriverLeaveRequestTabBody> {
     }
   }
 
-  String _formatTotalDays(LeaveRequestModel req) {
-    int tDays = req.totalDays;
-    bool sameDay = req.fromDate.year == req.toDate.year && 
-                   req.fromDate.month == req.toDate.month && 
-                   req.fromDate.day == req.toDate.day;
-    
-    bool hasTime = (req.fromDate.hour != 0 || req.fromDate.minute != 0 || req.fromDate.second != 0) ||
-                   (req.toDate.hour != 0 || req.toDate.minute != 0 || req.toDate.second != 0);
-                   
-    if (hasTime && sameDay) {
-      int diffHours = req.toDate.difference(req.fromDate).inHours;
-      if (diffHours < 1) {
-        return '${req.toDate.difference(req.fromDate).inMinutes} Mins';
-      } else {
-        return '$diffHours Hours';
-      }
-    }
-    
-    if (sameDay) {
-      if (tDays > 1) {
-        if (tDays >= 15) return '$tDays Mins';
-        return '$tDays Hours';
-      }
-      return '1 Day';
-    }
-    return '$tDays ${tDays == 1 ? "Day" : "Days"}';
-  }
-
   @override
   Widget build(BuildContext context) {
-    return BlocProvider<LeaveBloc>(
-      create: (context) => GetIt.instance<LeaveBloc>()..add(FetchLeaveData(
-        applicantType: 2,
-        applicantRefId: _selectedId ?? 0,
-        fromDate: DateFormat('yyyy-MM-dd').format(_searchFromDate),
-        toDate: DateFormat('yyyy-MM-dd').format(_searchToDate),
-      )),
-      child: Builder(builder: (context) {
-        return BlocConsumer<LeaveBloc, LeaveState>(
-          listener: (context, state) {
-            if (state is LeaveActionSuccess) {
-              ConfirmationOK(state.message, context);
-              setState(() {
-                _selectedLeaveTypeId = null;
-                _reasonController.clear();
-              });
-              context.read<LeaveBloc>().add(FetchLeaveData(
-                applicantType: 2,
-                applicantRefId: _selectedId!,
-                fromDate: DateFormat('yyyy-MM-dd').format(_searchFromDate),
-                toDate: DateFormat('yyyy-MM-dd').format(_searchToDate),
-              ));
-            } else if (state is LeaveActionError) {
-              ConfirmationOK(state.message, context);
-            }
-          },
-      builder: (context, state) {
-        bool isLoading = state is LeaveLoading || state is LeaveInitial;
-        bool isSubmitting = false;
-        if (state is LeaveLoaded) {
-          isSubmitting = state.isSubmitting;
-          if (state.requests.isNotEmpty) _cachedRequests = state.requests;
-          if (state.leaveTypes.isNotEmpty) _cachedLeaveTypes = state.leaveTypes;
+    return BlocConsumer<LeaveBloc, LeaveState>(
+      listener: (context, state) {
+        if (state is LeaveActionSuccess) {
+          Navigator.pop(context);
         }
-        
-        List<LeaveRequestModel> requests = (state is LeaveLoaded) ? state.requests : _cachedRequests;
-        List<LeaveTypeModel> leaveTypes = (state is LeaveLoaded) ? state.leaveTypes : _cachedLeaveTypes;
+      },
+      builder: (context, state) {
+        bool isSubmitting = (state is LeaveLoaded) ? state.isSubmitting : false;
 
-        return RefreshIndicator(
-          onRefresh: () async { _fetchRequests(context); },
-          child: SingleChildScrollView(
-            physics: const AlwaysScrollableScrollPhysics(),
-            child: Column(
-              children: [
-        // Form Area
-        Container(
-          margin: const EdgeInsets.all(16),
-          decoration: BoxDecoration(
+        return Container(
+          decoration: const BoxDecoration(
             color: Colors.white,
-            borderRadius: BorderRadius.circular(20),
-            boxShadow: [
-              BoxShadow(
-                color: AppTokens.brandPrimary.withValues(alpha: 0.05),
-                blurRadius: 20,
-                offset: const Offset(0, 10),
-              )
-            ],
-            border: Border.all(color: AppTokens.brandPrimary.withValues(alpha: 0.1)),
+            borderRadius: BorderRadius.only(
+              topLeft: Radius.circular(24),
+              topRight: Radius.circular(24),
+            ),
           ),
-          child: Theme(
-            data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
-            child: ExpansionTile(
-              initiallyExpanded: false,
-              collapsedBackgroundColor: AppTokens.brandLight.withValues(alpha: 0.5),
-              backgroundColor: AppTokens.brandLight.withValues(alpha: 0.5),
-              iconColor: AppTokens.brandPrimary,
-              collapsedIconColor: AppTokens.brandPrimary,
-              shape: const RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(20))),
-              collapsedShape: const RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(20))),
-              title: Row(
-                children: [
-                  const Icon(Icons.edit_calendar_rounded, color: AppTokens.brandPrimary, size: 20),
-                  const SizedBox(width: 8),
-                  Text(
-                    'Request Leave',
-                    style: AppTypography.heading1(color: AppTokens.brandDark, fontWeight: FontWeight.w800),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              // Handle bar
+              Center(
+                child: Container(
+                  margin: const EdgeInsets.only(top: 12, bottom: 8),
+                  width: 40,
+                  height: 4,
+                  decoration: BoxDecoration(
+                    color: Colors.grey.shade300,
+                    borderRadius: BorderRadius.circular(4),
                   ),
-                ],
+                ),
               ),
-              children: [
-                Container(
-                  color: Colors.white,
-                  child: Padding(
-                padding: const EdgeInsets.all(20),
+              Padding(
+                padding: const EdgeInsets.fromLTRB(20, 10, 20, 20),
                 child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
+                    Text(
+                      'Request Leave',
+                      style: AppTypography.heading1(color: AppTokens.brandDark, fontWeight: FontWeight.w800),
+                    ),
+                    const SizedBox(height: 20),
                     Row(
                       children: [
                         Expanded(
@@ -324,7 +544,7 @@ class _DriverLeaveRequestTabState extends State<_DriverLeaveRequestTabBody> {
                           value: _selectedLeaveTypeId,
                           icon: const Icon(Icons.keyboard_arrow_down_rounded, color: AppTokens.textMuted),
                           hint: Text('Select Leave Reason', style: AppTypography.bodyLarge(color: AppTokens.textMuted)),
-                          items: leaveTypes.map((e) => DropdownMenuItem<int>(
+                          items: widget.leaveTypes.map((e) => DropdownMenuItem<int>(
                             value: e.id,
                             child: Text(e.name, style: AppTypography.bodyLarge(color: AppTokens.textPrimary)),
                           )).toList(),
@@ -360,7 +580,7 @@ class _DriverLeaveRequestTabState extends State<_DriverLeaveRequestTabBody> {
                         padding: const EdgeInsets.symmetric(vertical: 16),
                         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                       ),
-                      onPressed: isSubmitting ? null : () => _submitLeave(context, leaveTypes),
+                      onPressed: isSubmitting ? null : () => _submitLeave(context),
                       child: isSubmitting 
                           ? const SizedBox(width: 24, height: 24, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2.5))
                           : Row(
@@ -375,196 +595,10 @@ class _DriverLeaveRequestTabState extends State<_DriverLeaveRequestTabBody> {
                   ],
                 ),
               ),
-                ),
-              ],
-            ),
-          ),
-        ),
-        
-        // Search Filter
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-          child: Row(
-            children: [
-              Expanded(
-                child: MalevaDateField(
-                  date: DateFormat('dd-MM-yyyy').format(_searchFromDate),
-                  onTap: () => _pickSearchDate(true),
-                ),
-              ),
-              const SizedBox(width: 8),
-              Expanded(
-                child: MalevaDateField(
-                  date: DateFormat('dd-MM-yyyy').format(_searchToDate),
-                  onTap: () => _pickSearchDate(false),
-                ),
-              ),
-              const SizedBox(width: 8),
-              ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: AppTokens.brandDark,
-                  elevation: 0,
-                  padding: const EdgeInsets.all(16),
-                  minimumSize: const Size(0, 0),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                ),
-                onPressed: () => _fetchRequests(context),
-                child: const Icon(Icons.search_rounded, color: Colors.white, size: 20),
-              ),
             ],
           ),
-        ),
-        const SizedBox(height: 8),
-        // List
-        if (isLoading && requests.isEmpty)
-          const Padding(padding: EdgeInsets.all(32), child: CircularProgressIndicator())
-        else
-          ListView.builder(
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            itemCount: requests.length,
-            itemBuilder: (context, index) {
-                    final req = requests[index];
-                    Color statusColor = const Color(0xFFEAB308); // Yellow/Orange
-                    Color statusBg = const Color(0xFFFEF08A).withValues(alpha: 0.3);
-                    if (req.statusRefId == 2) {
-                      statusColor = const Color(0xFF047857); // Green
-                      statusBg = const Color(0xFF059669).withValues(alpha: 0.12);
-                    } else if (req.statusRefId == 3) {
-                      statusColor = const Color(0xFFB91C1C); // Red
-                      statusBg = const Color(0xFFEF4444).withValues(alpha: 0.12);
-                    }
-                    
-                    return Container(
-                      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(16),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withValues(alpha: 0.04),
-                            blurRadius: 10,
-                            offset: const Offset(0, 4),
-                          )
-                        ],
-                        border: Border(left: BorderSide(color: statusColor, width: 4)),
-                      ),
-                      child: Padding(
-                        padding: const EdgeInsets.all(16),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Expanded(
-                                  child: Row(
-                                    children: [
-                                      const Icon(Icons.calendar_today_rounded, size: 14, color: Colors.grey),
-                                      const SizedBox(width: 6),
-                                      Expanded(
-                                        child: Text(
-                                          '${DateFormat('dd MMM hh:mm a').format(req.fromDate)}  ➔  ${DateFormat('dd MMM hh:mm a').format(req.toDate)}',
-                                          style: AppTypography.heading3(color: colour.commonColor, fontWeight: FontWeight.w700),
-                                          overflow: TextOverflow.visible,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                                Container(
-                                  margin: const EdgeInsets.only(left: 8),
-                                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                                  decoration: BoxDecoration(
-                                    color: statusBg,
-                                    borderRadius: BorderRadius.circular(12),
-                                    border: Border.all(color: statusColor.withValues(alpha: 0.3)),
-                                  ),
-                                  child: Text(
-                                    req.statusName, 
-                                    style: AppTypography.bodySmall(color: statusColor, fontWeight: FontWeight.bold),
-                                  ),
-                                ),
-                              ],
-                            ),
-                            const SizedBox(height: 12),
-                            Container(
-                              width: double.infinity,
-                              padding: const EdgeInsets.all(10),
-                              decoration: BoxDecoration(
-                                color: Colors.grey.shade50,
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                              child: Row(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Expanded(
-                                    child: Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
-                                      children: [
-                                        Text('Reason', style: AppTypography.bodySmall(color: Colors.grey, fontWeight: FontWeight.w600)),
-                                        const SizedBox(height: 2),
-                                        Text(req.reason, style: AppTypography.bodyLarge(color: colour.commonColor, fontWeight: FontWeight.w500)),
-                                      ],
-                                    ),
-                                  ),
-                                  Container(
-                                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                                    decoration: BoxDecoration(
-                                      color: colour.commonColorhighlight.withValues(alpha: 0.1),
-                                      borderRadius: BorderRadius.circular(8),
-                                    ),
-                                    child: Text(
-                                      _formatTotalDays(req),
-                                      style: AppTypography.bodyMedium(color: colour.commonColorhighlight, fontWeight: FontWeight.bold),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                            if (req.reviewRemark.isNotEmpty)
-                              Padding(
-                                padding: const EdgeInsets.only(top: 8),
-                                child: Row(
-                                  children: [
-                                    Icon(Icons.info_outline_rounded, size: 14, color: colour.commonColorred),
-                                    const SizedBox(width: 4),
-                                    Expanded(
-                                      child: Text(
-                                        'Remark: ${req.reviewRemark}',
-                                        style: AppTypography.bodyMedium(color: colour.commonColorred, fontWeight: FontWeight.w500),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            if (req.reviewedByName.isNotEmpty)
-                              Padding(
-                                padding: const EdgeInsets.only(top: 12),
-                                child: Row(
-                                  children: [
-                                    Icon(Icons.verified_user_rounded, size: 14, color: Colors.grey),
-                                    const SizedBox(width: 4),
-                                    Text(
-                                      'Reviewed By: ${req.reviewedByName}',
-                                      style: AppTypography.bodyMedium(color: Colors.grey, fontWeight: FontWeight.w600),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                          ],
-                        ),
-                      ),
-                    );
-                  },
-                ),
-      ],
-    ),
-  ),
-);
-          },
         );
-      }),
+      },
     );
   }
 }

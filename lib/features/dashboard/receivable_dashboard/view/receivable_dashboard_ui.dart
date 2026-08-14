@@ -121,7 +121,6 @@ class ReceivableMobileDashboard extends StatelessWidget {
           _tab('Invoice',         isTablet),
           _tab('SO',              isTablet),
 
-          _tab('LeaveApproval', isTablet),
           _tab('EmpLeave', isTablet),
         ],
       ),
@@ -164,7 +163,6 @@ class ReceivableMobileDashboard extends StatelessWidget {
           InvoiceTab(),
           SalesOrderTab(),
 
-          AdminLeaveApprovalTab(),
           EmployeeLeaveRequestTab(),
         ],
       ),
