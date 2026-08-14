@@ -565,16 +565,34 @@ class SalesOrderAddBloc extends Bloc<SalesOrderAddEvent, SalesOrderAddState> {
     // ==========================================================
     // PICKUP FIELDS
     // ==========================================================
-      case 'txtPickUpAddress': return s.copyWith(txtPickUpAddress: value);
-      case 'txtPickUpQuantity': return s.copyWith(txtPickUpQuantity: value);
-      case 'txtPickUpWeight': return s.copyWith(txtPickUpWeight: value); // <--- ADDED
+      case 'txtPickUpAddress': 
+         final newList = List<dynamic>.from(s.pickUpAddressList);
+         if (newList.isNotEmpty) newList[0] = value;
+         return s.copyWith(txtPickUpAddress: value, pickUpAddressList: newList);
+      case 'txtPickUpQuantity': 
+         final newList = List<dynamic>.from(s.pickUpQuantityList);
+         if (newList.isNotEmpty) newList[0] = value;
+         return s.copyWith(txtPickUpQuantity: value, pickUpQuantityList: newList);
+      case 'txtPickUpWeight': 
+         final newList = List<dynamic>.from(s.pickUpWeightList);
+         if (newList.isNotEmpty) newList[0] = value;
+         return s.copyWith(txtPickUpWeight: value, pickUpWeightList: newList);
 
     // ==========================================================
     // DELIVERY FIELDS
     // ==========================================================
-      case 'txtDeliveryAddress': return s.copyWith(txtDeliveryAddress: value);
-      case 'txtDeliveryQuantity': return s.copyWith(txtDeliveryQuantity: value);
-      case 'txtDeliveryWeight': return s.copyWith(txtDeliveryWeight: value); // <--- ADDED
+      case 'txtDeliveryAddress': 
+         final newList = List<dynamic>.from(s.deliveryAddressList);
+         if (newList.isNotEmpty) newList[0] = value;
+         return s.copyWith(txtDeliveryAddress: value, deliveryAddressList: newList);
+      case 'txtDeliveryQuantity': 
+         final newList = List<dynamic>.from(s.deliveryQuantityList);
+         if (newList.isNotEmpty) newList[0] = value;
+         return s.copyWith(txtDeliveryQuantity: value, deliveryQuantityList: newList);
+      case 'txtDeliveryWeight': 
+         final newList = List<dynamic>.from(s.deliveryWeightList);
+         if (newList.isNotEmpty) newList[0] = value;
+         return s.copyWith(txtDeliveryWeight: value, deliveryWeightList: newList);
 
       case 'txtWarehouseAddress': return s.copyWith(txtWarehouseAddress: value);
       case 'txtOrigin': return s.copyWith(txtOrigin: value);
