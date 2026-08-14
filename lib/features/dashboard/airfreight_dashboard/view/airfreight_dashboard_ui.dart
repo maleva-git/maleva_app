@@ -121,7 +121,6 @@ class AirfreightMobileDashboard extends StatelessWidget {
           _tab('VSL',             isTablet),
           _tab('SpotsSaleOrder',  isTablet),
           _tab('InventoryReport', isTablet),
-          _tab('LeaveApproval', isTablet),
           _tab('EmpLeave', isTablet),
         ],
       ),
@@ -167,7 +166,6 @@ class AirfreightMobileDashboard extends StatelessWidget {
           SpotSaleEntryPage(),  //2
           InventoryPage(),   //3
 
-          AdminLeaveApprovalTab(),
           EmployeeLeaveRequestTab(),
         ],
       ),

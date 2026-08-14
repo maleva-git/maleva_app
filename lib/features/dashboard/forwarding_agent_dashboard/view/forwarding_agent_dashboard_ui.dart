@@ -114,7 +114,6 @@ class ForwardingAgentMobileDashboard extends StatelessWidget {
       child: TabBarView(
         controller: tabController,
         children: const [
-          AdminLeaveApprovalTab(),
           EmployeeLeaveRequestTab(),
           const RtiRouteActivitiesTab(),
         ],

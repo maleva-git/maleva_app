@@ -128,7 +128,6 @@ class BoardingMobileDashboard extends StatelessWidget {
           if (AppPreferences.getRoleId() != 500) _tab('SpotsSaleOrder',  isTablet),  //3
           if (AppPreferences.getRoleId() != 500) _tab('InventoryReport', isTablet),  //4
 
-          _tab('LeaveApproval', isTablet),
           _tab('EmpLeave', isTablet),
         ],
       ),
@@ -174,7 +173,6 @@ class BoardingMobileDashboard extends StatelessWidget {
           if (AppPreferences.getRoleId() != 500) const SpotSaleEntryPage(),  //3
           if (AppPreferences.getRoleId() != 500) const InventoryPage(),   //4
 
-          const AdminLeaveApprovalTab(),
           const EmployeeLeaveRequestTab(),
         ],
       ),
