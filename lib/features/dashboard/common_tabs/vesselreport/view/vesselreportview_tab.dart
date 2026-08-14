@@ -162,16 +162,16 @@ class _VesselReportViewState extends State<_VesselReportView> {
                 children: [
                   _SectionHeader(title: 'Vessel Report', isTablet: true),
                   const SizedBox(height: 20),
-                  /*
-                  _SearchCard(
-                    txtPort:     _txtPort,
-                    txtRemarks:  _txtRemarks,
-                    bloc:        bloc,
-                    isPlanToday: _isPlanToday,
-                    isTablet:    true,
-                  ),
-                  const SizedBox(height: 16),
-                  */
+                  if (AppPreferences.getRoleId() != 500 && AppPreferences.getRoleId() != 600) ...[
+                    _SearchCard(
+                      txtPort:     _txtPort,
+                      txtRemarks:  _txtRemarks,
+                      bloc:        bloc,
+                      isPlanToday: _isPlanToday,
+                      isTablet:    true,
+                    ),
+                    const SizedBox(height: 16),
+                  ],
                   _DayToggle(
                     isPlanToday: _isPlanToday,
                     isTablet:    true,
@@ -247,16 +247,16 @@ class _VesselReportViewState extends State<_VesselReportView> {
         _SectionHeader(title: 'Vessel Report', isTablet: false),
         const SizedBox(height: 16),
 
-        /*
-        _SearchCard(
-          txtPort:     _txtPort,
-          txtRemarks:  _txtRemarks,
-          bloc:        bloc,
-          isPlanToday: _isPlanToday,
-          isTablet:    false,
-        ),
-        const SizedBox(height: 14),
-        */
+        if (AppPreferences.getRoleId() != 500 && AppPreferences.getRoleId() != 600) ...[
+          _SearchCard(
+            txtPort:     _txtPort,
+            txtRemarks:  _txtRemarks,
+            bloc:        bloc,
+            isPlanToday: _isPlanToday,
+            isTablet:    false,
+          ),
+          const SizedBox(height: 14),
+        ],
 
         _DayToggle(
           isPlanToday: _isPlanToday,
