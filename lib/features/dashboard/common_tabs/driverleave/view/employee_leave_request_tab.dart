@@ -125,8 +125,12 @@ class _EmployeeLeaveRequestTabState extends State<EmployeeLeaveRequestTab> {
         return BlocConsumer<LeaveBloc, LeaveState>(
           listener: (context, state) {
             if (state is LeaveActionSuccess) {
-              ConfirmationOK(state.message, context);
-              _fetchRequests(context);
+              Future.delayed(const Duration(milliseconds: 400), () {
+                if (context.mounted) {
+                  ConfirmationOK(state.message, context);
+                  _fetchRequests(context);
+                }
+              });
             } else if (state is LeaveActionError) {
               ConfirmationOK(state.message, context);
             }
@@ -453,7 +457,9 @@ class _LeaveRequestFormSheetState extends State<_LeaveRequestFormSheet> {
     return BlocConsumer<LeaveBloc, LeaveState>(
       listener: (context, state) {
         if (state is LeaveActionSuccess) {
-          Navigator.pop(context);
+          if (ModalRoute.of(context)?.isCurrent == true) {
+            Navigator.pop(context);
+          }
         }
       },
       builder: (context, state) {

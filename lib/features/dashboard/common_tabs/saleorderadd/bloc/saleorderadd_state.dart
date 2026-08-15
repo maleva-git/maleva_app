@@ -345,6 +345,8 @@ class SalesOrderState extends Equatable {
   final List<dynamic> deliveryQuantityList;
   final List<dynamic> pickupWeightList;
   final List<dynamic> deliveryWeightList;
+  final int pickupId;
+  final int deliveryId;
 
   // ─── Visibility ───────────────────────────────────────────────────────────
   final SalesOrderVisibility visibility;
@@ -509,8 +511,10 @@ class SalesOrderState extends Equatable {
     this.pickupQuantityList = const [],
     this.deliveryAddressList = const [],
     this.deliveryQuantityList = const [],
-    this.pickupWeightList = const [],    // ADDED HERE
-    this.deliveryWeightList = const [],  // ADDED HERE
+    this.pickupWeightList = const [],
+    this.deliveryWeightList = const [],
+    this.pickupId = 0,
+    this.deliveryId = 0,
     // Visibility
     this.visibility = const SalesOrderVisibility(),
     // Permissions
@@ -596,6 +600,8 @@ class SalesOrderState extends Equatable {
     String? boardingOfficerName2,
     String? originName,
     String? destinationName,
+    int? pickupId,
+    int? deliveryId,
     String? remarks,
     String? doDescription,
     String? offVessel,
@@ -846,6 +852,8 @@ class SalesOrderState extends Equatable {
       deliveryQuantityList: deliveryQuantityList ?? this.deliveryQuantityList,
       pickupWeightList: pickupWeightList ?? this.pickupWeightList,     // ADDED HERE
       deliveryWeightList: deliveryWeightList ?? this.deliveryWeightList, // ADDED HERE
+      pickupId: pickupId ?? this.pickupId,
+      deliveryId: deliveryId ?? this.deliveryId,
       visibility: visibility ?? this.visibility,
       fieldPermission: fieldPermission ?? this.fieldPermission,
       disabledBillType: disabledBillType ?? this.disabledBillType,
@@ -900,6 +908,7 @@ class SalesOrderState extends Equatable {
     pickupAddressList, pickupQuantityList,
     deliveryAddressList, deliveryQuantityList,
     pickupWeightList, deliveryWeightList, // ADDED HERE
+    pickupId, deliveryId,
     visibility, fieldPermission,
     disabledBillType, disabledAmount1, disabledAmount2,
     showOverlay, overlaySuggestions, overlayType,

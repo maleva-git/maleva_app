@@ -103,6 +103,34 @@ class _EmployeeLeaveApprovalTabState extends State<EmployeeLeaveApprovalTab> {
     ));
   }
 
+  String _formatTotalDays(LeaveRequestModel req) {
+    int tDays = req.totalDays;
+    bool sameDay = req.fromDate.year == req.toDate.year && 
+                   req.fromDate.month == req.toDate.month && 
+                   req.fromDate.day == req.toDate.day;
+    
+    bool hasTime = (req.fromDate.hour != 0 || req.fromDate.minute != 0 || req.fromDate.second != 0) ||
+                   (req.toDate.hour != 0 || req.toDate.minute != 0 || req.toDate.second != 0);
+                   
+    if (hasTime && sameDay) {
+      int diffHours = req.toDate.difference(req.fromDate).inHours;
+      if (diffHours < 1) {
+        return '${req.toDate.difference(req.fromDate).inMinutes} Mins';
+      } else {
+        return '$diffHours Hours';
+      }
+    }
+    
+    if (sameDay) {
+      if (tDays > 1) {
+        if (tDays >= 15) return '$tDays Mins';
+        return '$tDays Hours';
+      }
+      return '1 Day';
+    }
+    return '$tDays ${tDays == 1 ? "Day" : "Days"}';
+  }
+
   @override
   Widget build(BuildContext context) {
     return BlocProvider<LeaveBloc>(
@@ -222,7 +250,7 @@ class _EmployeeLeaveApprovalTabState extends State<EmployeeLeaveApprovalTab> {
                                     borderRadius: BorderRadius.circular(8),
                                   ),
                                   child: Text(
-                                    '${req.totalDays} Days',
+                                    _formatTotalDays(req),
                                     style: AppTypography.bodyMedium(color: colour.commonColorhighlight, fontWeight: FontWeight.bold),
                                   ),
                                 ),

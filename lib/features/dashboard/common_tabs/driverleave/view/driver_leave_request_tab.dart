@@ -134,8 +134,12 @@ class _DriverLeaveRequestTabState extends State<_DriverLeaveRequestTabBody> {
     return BlocConsumer<LeaveBloc, LeaveState>(
       listener: (context, state) {
         if (state is LeaveActionSuccess) {
-          ConfirmationOK(state.message, context);
-          _fetchRequests(context);
+          Future.delayed(const Duration(milliseconds: 200), () {
+            if (context.mounted) {
+              ConfirmationOK(state.message, context);
+              _fetchRequests(context);
+            }
+          });
         } else if (state is LeaveActionError) {
           ConfirmationOK(state.message, context);
         }
