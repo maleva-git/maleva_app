@@ -7,6 +7,7 @@ import '../../../../core/di/injection.dart';
 import '../../admin_dashboard/bloc/admin_tab_bloc.dart';
 import '../../common_tabs/ExpenseReport/view/expensereport_tab.dart';
 import '../../common_tabs/bocheck/bloc/bocheck_bloc.dart';
+import '../../common_tabs/job_orders/bloc/job_orders_bloc.dart';
 import '../../common_tabs/bocheck/bloc/bocheck_event.dart';
 import '../../common_tabs/bocheck/view/bocheck_tab.dart';
 import '../../common_tabs/driver/bloc/driverdetails_bloc.dart';
@@ -98,7 +99,7 @@ class _AdminDashboardState extends State<MaintenanceDashboard> with SingleTicker
   void initState() {
     super.initState();
     final bool showTruckMaint = AppPreferences.getRoleId() == 1300 && AppPreferences.getPermissionId() == 1;
-    final int tabCount = showTruckMaint ? 1 : 12;
+    final int tabCount = showTruckMaint ? 2 : 13;
     _tabController = TabController(length: tabCount, vsync: this);
     _tabController.addListener(_onTabChanged);
 
@@ -260,6 +261,7 @@ class _AdminDashboardState extends State<MaintenanceDashboard> with SingleTicker
             ),
 
         BlocProvider<LeaveBloc>(create: (_) => sl<LeaveBloc>()),
+        BlocProvider<JobOrdersBloc>(create: (_) => JobOrdersBloc()),
           ],
       child: LayoutBuilder(
         builder: (context, constraints) {
