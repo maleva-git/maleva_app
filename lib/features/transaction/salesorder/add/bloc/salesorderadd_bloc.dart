@@ -801,6 +801,8 @@ class SalesOrderAddBloc extends Bloc<SalesOrderAddEvent, SalesOrderAddState> {
       txtDeliveryAddress: parsedDeliveryAddresses.isNotEmpty ? parsedDeliveryAddresses[0] : '',
       txtDeliveryQuantity: parsedDeliveryQuantities.isNotEmpty ? parsedDeliveryQuantities[0] : '',
       txtDeliveryWeight: parsedDeliveryWeights.isNotEmpty ? parsedDeliveryWeights[0] : '',
+      pickUpUpdateIndex: parsedPickupAddresses.isNotEmpty ? 0 : null,
+      deliveryUpdateIndex: parsedDeliveryAddresses.isNotEmpty ? 0 : null,
     );
     return _applyVisibility(result);
   }
