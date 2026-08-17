@@ -124,7 +124,6 @@ class ForwardingMobileDashboard extends StatelessWidget {
           _tab('K-1,2,3',             isTablet),  //2
           _tab('K8',             isTablet),  //3
 
-          _tab('LeaveApproval', isTablet),
           _tab('EmpLeave', isTablet),
         ],
       ),
@@ -169,7 +168,6 @@ class ForwardingMobileDashboard extends StatelessWidget {
           UnReleasePage(),  //1
           UnReleaseSMKPage(),  //1
 
-          AdminLeaveApprovalTab(),
           EmployeeLeaveRequestTab(),
         ],
       ),

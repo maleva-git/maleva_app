@@ -56,12 +56,18 @@ class AppPreferences {
 
   // ─── Clear on logout ──────────────────────────────────────────────────────
   static Future<void> clearOnLogout() async {
+    await _prefs.setString('Username', '');
+    await _prefs.setString('Password', '');
     await _prefs.setString('OldUsername', '');
     await _prefs.setString('loadmenu', '');
+    await _prefs.setString('RulesType', '');
     await _prefs.setInt('EmpRefId', 0);
     await _prefs.setInt('DriverLogin', 0);
+    await _prefs.setInt('DriverId', 0);
     await _prefs.setInt('role_id', 0);
     await _prefs.setInt('PermissionId', 0);
+    await _prefs.setInt('Comid', 0);
+    await _prefs.setInt('MComid', 0);
   }
 
   static SharedPreferences get raw => _prefs;

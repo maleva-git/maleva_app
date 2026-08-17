@@ -37,7 +37,7 @@ class _AdminDashboardState extends State<BoardingDashboard> with SingleTickerPro
   void initState() {
     super.initState();
     final roleId = AppPreferences.getRoleId();
-    final int tabCount = (roleId == 500) ? 4 : 6;
+    final int tabCount = (roleId == 500) ? 3 : 5;
     _tabController = TabController(length: tabCount, vsync: this);
     _tabController.addListener(_onTabChanged);
   }

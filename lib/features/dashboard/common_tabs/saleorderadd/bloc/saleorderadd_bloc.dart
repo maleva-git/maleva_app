@@ -396,7 +396,9 @@ class SalesOrderBloc extends Bloc<SalesOrderEvent, SalesOrderState> {
     String pAddress = '';
     String pQty = '';
     String pWeight = '';
+    int pId = 0;
     if (m['PickupsList'] != null && (m['PickupsList'] as List).isNotEmpty) {
+      pId = int.tryParse(m['PickupsList'][0]['Id']?.toString() ?? '0') ?? 0;
       pAddress = m['PickupsList'][0]['PickupAddress']?.toString() ?? '';
       pQty = m['PickupsList'][0]['PickupQuantity']?.toString() ?? '';
       pWeight = m['PickupsList'][0]['PickupWeaight']?.toString() ?? '';
@@ -408,7 +410,9 @@ class SalesOrderBloc extends Bloc<SalesOrderEvent, SalesOrderState> {
     String dAddress = '';
     String dQty = '';
     String dWeight = '';
+    int dId = 0;
     if (m['DeliveriesList'] != null && (m['DeliveriesList'] as List).isNotEmpty) {
+      dId = int.tryParse(m['DeliveriesList'][0]['Id']?.toString() ?? '0') ?? 0;
       dAddress = m['DeliveriesList'][0]['DeliveryAddress']?.toString() ?? '';
       dQty = m['DeliveriesList'][0]['DeliveryQuantity']?.toString() ?? '';
       dWeight = m['DeliveriesList'][0]['DeliveryWeight']?.toString() ?? '';
@@ -539,8 +543,10 @@ class SalesOrderBloc extends Bloc<SalesOrderEvent, SalesOrderState> {
       zb1Dropdown: m['ZB1']?.toString(),
       zb2Dropdown: m['ZB2']?.toString(),
 
+      pickupId: pId,
       pickupAddress: pAddress,
       pickupQuantity: pQty,
+      deliveryId: dId,
       deliveryAddress: dAddress,
       deliveryQuantity: dQty,
       visibility: _buildVisibility(jobTypeName),
@@ -713,20 +719,28 @@ class SalesOrderBloc extends Bloc<SalesOrderEvent, SalesOrderState> {
     // Pickups and Deliveries logic cleanly parsing UI fields
     List<Map<String, dynamic>> dynamicPickups = [];
     if (f('pickupAddress').isNotEmpty) {
-      dynamicPickups.add({
+      final pickup = <String, dynamic>{
         "PickupAddress": f('pickupAddress'),
         "PickupWeight": f('pickupWeight'),
         "PickupQuantity": f('pickupQuantity'),
-      });
+      };
+      if (state.pickupId != 0) {
+        pickup['Id'] = state.pickupId;
+      }
+      dynamicPickups.add(pickup);
     }
 
     List<Map<String, dynamic>> dynamicDeliveries = [];
     if (f('deliveryAddress').isNotEmpty) {
-      dynamicDeliveries.add({
+      final delivery = <String, dynamic>{
         "DeliveryAddress": f('deliveryAddress'),
         "DeliveryWeight": f('deliveryWeight'),
         "DeliveryQuantity": f('deliveryQuantity'),
-      });
+      };
+      if (state.deliveryId != 0) {
+        delivery['Id'] = state.deliveryId;
+      }
+      dynamicDeliveries.add(delivery);
     }
 
     final master = [

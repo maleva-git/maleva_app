@@ -128,7 +128,6 @@ class PayableMobileDashboard extends StatelessWidget {
           _tab('Truck',           isTablet),
           _tab('PettyCash',       isTablet),
 
-          _tab('LeaveApproval', isTablet),
           _tab('EmpLeave', isTablet),
         ],
       ),
@@ -175,7 +174,6 @@ class PayableMobileDashboard extends StatelessWidget {
           TruckDetailsReportPage(),
           PettyCashPage(),
 
-          AdminLeaveApprovalTab(),
           EmployeeLeaveRequestTab(),
         ],
       ),

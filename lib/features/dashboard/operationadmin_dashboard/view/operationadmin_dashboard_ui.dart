@@ -147,7 +147,6 @@ class MobileDashboard extends StatelessWidget {
           _tab('RTI',             isTablet),
           _tab('EmpApproval', isTablet),
           _tab('EmpLeave', isTablet),
-          _tab('LeaveApproval', isTablet),
         ],
       ),
     );
@@ -204,9 +203,7 @@ class MobileDashboard extends StatelessWidget {
             toDate: DateFormat('yyyy-MM-dd').format(DateTime.now()),
           ),
           const RTIDetailsPage(),
-          const EmployeeLeaveApprovalTab(),
           const EmployeeLeaveRequestTab(),
-          const AdminLeaveApprovalTab(),
         ],
       ),
     );

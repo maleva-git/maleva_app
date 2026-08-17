@@ -128,7 +128,7 @@ class TransportMobileDashboard extends StatelessWidget {
           _tab('Email',           isTablet),
           _tab('GoogleReview',    isTablet),
           _tab('PDO',             isTablet),
-          _tab('LeaveApproval', isTablet),
+          _tab('DriverApproval', isTablet),
           _tab('EmpLeave', isTablet),
         ],
       ),

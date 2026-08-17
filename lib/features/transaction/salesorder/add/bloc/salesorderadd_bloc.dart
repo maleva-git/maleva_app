@@ -250,20 +250,52 @@ class SalesOrderAddBloc extends Bloc<SalesOrderAddEvent, SalesOrderAddState> {
       if (state is! SalesOrderAddLoaded) return;
       final s = state as SalesOrderAddLoaded;
       if (s.txtPickUpAddress.isEmpty) return;
-      final addrList = List<dynamic>.from(s.pickUpAddressList)..add(s.txtPickUpAddress);
-      final qtyList = List<dynamic>.from(s.pickUpQuantityList)..add(s.txtPickUpQuantity);
-      final wtList = List<dynamic>.from(s.pickUpWeightList)..add(s.txtPickUpWeight); // ADDED
-      emit(s.copyWith(pickUpAddressList: addrList, pickUpQuantityList: qtyList, pickUpWeightList: wtList, txtPickUpAddress: '', txtPickUpQuantity: '', txtPickUpWeight: ''));
+      
+      final addrList = List<dynamic>.from(s.pickUpAddressList);
+      final qtyList = List<dynamic>.from(s.pickUpQuantityList);
+      final wtList = List<dynamic>.from(s.pickUpWeightList);
+      
+      if (s.pickUpUpdateIndex != null && s.pickUpUpdateIndex! < addrList.length) {
+        addrList[s.pickUpUpdateIndex!] = s.txtPickUpAddress;
+        qtyList[s.pickUpUpdateIndex!] = s.txtPickUpQuantity;
+        if (s.pickUpUpdateIndex! < wtList.length) {
+          wtList[s.pickUpUpdateIndex!] = s.txtPickUpWeight;
+        } else {
+          wtList.add(s.txtPickUpWeight);
+        }
+      } else {
+        addrList.add(s.txtPickUpAddress);
+        qtyList.add(s.txtPickUpQuantity);
+        wtList.add(s.txtPickUpWeight);
+      }
+      
+      emit(s.copyWith(pickUpAddressList: addrList, pickUpQuantityList: qtyList, pickUpWeightList: wtList, txtPickUpAddress: '', txtPickUpQuantity: '', txtPickUpWeight: '', clearPickUpUpdateIndex: true));
     });
 
     on<AddDeliveryAddress>((event, emit) {
       if (state is! SalesOrderAddLoaded) return;
       final s = state as SalesOrderAddLoaded;
       if (s.txtDeliveryAddress.isEmpty) return;
-      final addrList = List<dynamic>.from(s.deliveryAddressList)..add(s.txtDeliveryAddress);
-      final qtyList = List<dynamic>.from(s.deliveryQuantityList)..add(s.txtDeliveryQuantity);
-      final wtList = List<dynamic>.from(s.deliveryWeightList)..add(s.txtDeliveryWeight); // ADDED
-      emit(s.copyWith(deliveryAddressList: addrList, deliveryQuantityList: qtyList, deliveryWeightList: wtList, txtDeliveryAddress: '', txtDeliveryQuantity: '', txtDeliveryWeight: ''));
+      
+      final addrList = List<dynamic>.from(s.deliveryAddressList);
+      final qtyList = List<dynamic>.from(s.deliveryQuantityList);
+      final wtList = List<dynamic>.from(s.deliveryWeightList);
+      
+      if (s.deliveryUpdateIndex != null && s.deliveryUpdateIndex! < addrList.length) {
+        addrList[s.deliveryUpdateIndex!] = s.txtDeliveryAddress;
+        qtyList[s.deliveryUpdateIndex!] = s.txtDeliveryQuantity;
+        if (s.deliveryUpdateIndex! < wtList.length) {
+          wtList[s.deliveryUpdateIndex!] = s.txtDeliveryWeight;
+        } else {
+          wtList.add(s.txtDeliveryWeight);
+        }
+      } else {
+        addrList.add(s.txtDeliveryAddress);
+        qtyList.add(s.txtDeliveryQuantity);
+        wtList.add(s.txtDeliveryWeight);
+      }
+      
+      emit(s.copyWith(deliveryAddressList: addrList, deliveryQuantityList: qtyList, deliveryWeightList: wtList, txtDeliveryAddress: '', txtDeliveryQuantity: '', txtDeliveryWeight: '', clearDeliveryUpdateIndex: true));
     });
 
     on<RemovePickUpAddress>((event, emit) {
@@ -277,7 +309,7 @@ class SalesOrderAddBloc extends Bloc<SalesOrderAddEvent, SalesOrderAddState> {
       if (event.index < qtyList.length) qtyList.removeAt(event.index);
       if (event.index < wtList.length) wtList.removeAt(event.index);
       
-      emit(s.copyWith(pickUpAddressList: addrList, pickUpQuantityList: qtyList, pickUpWeightList: wtList));
+      emit(s.copyWith(pickUpAddressList: addrList, pickUpQuantityList: qtyList, pickUpWeightList: wtList, clearPickUpUpdateIndex: true));
     });
 
     on<RemoveDeliveryAddress>((event, emit) {
@@ -291,7 +323,7 @@ class SalesOrderAddBloc extends Bloc<SalesOrderAddEvent, SalesOrderAddState> {
       if (event.index < qtyList.length) qtyList.removeAt(event.index);
       if (event.index < wtList.length) wtList.removeAt(event.index);
       
-      emit(s.copyWith(deliveryAddressList: addrList, deliveryQuantityList: qtyList, deliveryWeightList: wtList));
+      emit(s.copyWith(deliveryAddressList: addrList, deliveryQuantityList: qtyList, deliveryWeightList: wtList, clearDeliveryUpdateIndex: true));
     });
 
     on<SelectPickUpFromList>((event, emit) {
@@ -300,7 +332,8 @@ class SalesOrderAddBloc extends Bloc<SalesOrderAddEvent, SalesOrderAddState> {
       emit(s.copyWith(
           txtPickUpAddress: s.pickUpAddressList[event.index].toString(),
           txtPickUpQuantity: s.pickUpQuantityList[event.index].toString(),
-          txtPickUpWeight: s.pickUpWeightList.length > event.index ? s.pickUpWeightList[event.index].toString() : ''
+          txtPickUpWeight: s.pickUpWeightList.length > event.index ? s.pickUpWeightList[event.index].toString() : '',
+          pickUpUpdateIndex: event.index,
       ));
     });
 
@@ -310,7 +343,8 @@ class SalesOrderAddBloc extends Bloc<SalesOrderAddEvent, SalesOrderAddState> {
       emit(s.copyWith(
           txtDeliveryAddress: s.deliveryAddressList[event.index].toString(),
           txtDeliveryQuantity: s.deliveryQuantityList[event.index].toString(),
-          txtDeliveryWeight: s.deliveryWeightList.length > event.index ? s.deliveryWeightList[event.index].toString() : ''
+          txtDeliveryWeight: s.deliveryWeightList.length > event.index ? s.deliveryWeightList[event.index].toString() : '',
+          deliveryUpdateIndex: event.index,
       ));
     });
     on<ToggleProductView>((event, emit) { if (state is SalesOrderAddLoaded) emit((state as SalesOrderAddLoaded).copyWith(visibleProductview: !(state as SalesOrderAddLoaded).visibleProductview)); });
@@ -567,14 +601,14 @@ class SalesOrderAddBloc extends Bloc<SalesOrderAddEvent, SalesOrderAddState> {
     // ==========================================================
       case 'txtPickUpAddress': return s.copyWith(txtPickUpAddress: value);
       case 'txtPickUpQuantity': return s.copyWith(txtPickUpQuantity: value);
-      case 'txtPickUpWeight': return s.copyWith(txtPickUpWeight: value); // <--- ADDED
+      case 'txtPickUpWeight': return s.copyWith(txtPickUpWeight: value);
 
     // ==========================================================
     // DELIVERY FIELDS
     // ==========================================================
       case 'txtDeliveryAddress': return s.copyWith(txtDeliveryAddress: value);
       case 'txtDeliveryQuantity': return s.copyWith(txtDeliveryQuantity: value);
-      case 'txtDeliveryWeight': return s.copyWith(txtDeliveryWeight: value); // <--- ADDED
+      case 'txtDeliveryWeight': return s.copyWith(txtDeliveryWeight: value);
 
       case 'txtWarehouseAddress': return s.copyWith(txtWarehouseAddress: value);
       case 'txtOrigin': return s.copyWith(txtOrigin: value);

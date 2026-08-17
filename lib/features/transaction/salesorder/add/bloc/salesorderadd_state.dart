@@ -203,6 +203,9 @@ class SalesOrderAddLoaded extends SalesOrderAddState {
   final String txtProductSaleRate;
   final String txtProductGst;
   final String txtProductAmount;
+  
+  final int? pickUpUpdateIndex;
+  final int? deliveryUpdateIndex;
 
   final Map<String, bool> fieldPermission;
   final String? savedMessage;
@@ -210,7 +213,7 @@ class SalesOrderAddLoaded extends SalesOrderAddState {
 
   SalesOrderAddLoaded({
     this.progress = false, this.showSearch = false, this.productViewList = const [], this.productIds = const [],
-    this.productUpdateIndex, this.productId = 0,
+    this.productUpdateIndex, this.pickUpUpdateIndex, this.deliveryUpdateIndex, this.productId = 0,
     this.totalAmount = 0.0, this.taxAmount = 0.0, this.currencyValue = 0.0, this.actualAmount = 0.0, this.coinage = 0.0,
     this.custId = 0, this.statusId = 0, this.jobTypeId = 0, this.lAgentCompanyId = 0, this.lAgentId = 0, this.oAgentCompanyId = 0,
     this.oAgentId = 0, this.sealEmpId1 = 0, this.sealEmpId2 = 0, this.sealEmpId3 = 0, this.breakEmpId1 = 0, this.breakEmpId2 = 0,
@@ -266,11 +269,15 @@ class SalesOrderAddLoaded extends SalesOrderAddState {
     txtBreakByEmp1, txtBreakByEmp2, txtBreakByEmp3, txtZBRef1, txtZBRef2, txtBoardingOfficer1, txtBoardingOfficer2, txtAmount1,
     txtAmount2, txtPortChargeRef1, txtPortCharges, txtForwarding1S1, txtForwarding1S2, txtForwarding2S1, txtForwarding2S2,
     txtForwarding3S1, txtForwarding3S2, txtProductCode, txtProductDescription, txtProductQty, txtProductSaleRate, txtProductGst,
-    txtProductAmount, fieldPermission, savedMessage, isSaved,
+    txtProductAmount, fieldPermission, savedMessage, isSaved, pickUpUpdateIndex, deliveryUpdateIndex
   ];
 
   SalesOrderAddLoaded copyWith({
-    bool? progress, bool? showSearch, List<SaleEditDetailModel>? productViewList, List<int>? productIds, Object? productUpdateIndex = _sentinel, int? productId,
+    bool? progress, bool? showSearch, List<SaleEditDetailModel>? productViewList, List<int>? productIds, 
+    bool clearProductUpdateIndex = false, Object? productUpdateIndex = _sentinel,
+    bool clearPickUpUpdateIndex = false, Object? pickUpUpdateIndex = _sentinel,
+    bool clearDeliveryUpdateIndex = false, Object? deliveryUpdateIndex = _sentinel,
+    int? productId,
     double? totalAmount, double? taxAmount, double? currencyValue, double? actualAmount, double? coinage,
     int? custId, int? statusId, int? jobTypeId, int? lAgentCompanyId, int? lAgentId, int? oAgentCompanyId, int? oAgentId,
     int? sealEmpId1, int? sealEmpId2, int? sealEmpId3, int? breakEmpId1, int? breakEmpId2, int? breakEmpId3,
@@ -310,7 +317,9 @@ class SalesOrderAddLoaded extends SalesOrderAddState {
     return SalesOrderAddLoaded(
       progress: progress ?? this.progress, showSearch: showSearch ?? this.showSearch, productViewList: productViewList ?? this.productViewList,
       productIds: productIds ?? this.productIds,
-      productUpdateIndex: identical(productUpdateIndex, _sentinel) ? this.productUpdateIndex : productUpdateIndex as int?,
+      productUpdateIndex: clearProductUpdateIndex ? null : (identical(productUpdateIndex, _sentinel) ? this.productUpdateIndex : productUpdateIndex as int?),
+      pickUpUpdateIndex: clearPickUpUpdateIndex ? null : (identical(pickUpUpdateIndex, _sentinel) ? this.pickUpUpdateIndex : pickUpUpdateIndex as int?),
+      deliveryUpdateIndex: clearDeliveryUpdateIndex ? null : (identical(deliveryUpdateIndex, _sentinel) ? this.deliveryUpdateIndex : deliveryUpdateIndex as int?),
       productId: productId ?? this.productId, totalAmount: totalAmount ?? this.totalAmount, taxAmount: taxAmount ?? this.taxAmount,
       currencyValue: currencyValue ?? this.currencyValue, actualAmount: actualAmount ?? this.actualAmount, coinage: coinage ?? this.coinage,
       custId: custId ?? this.custId, statusId: statusId ?? this.statusId, jobTypeId: jobTypeId ?? this.jobTypeId,

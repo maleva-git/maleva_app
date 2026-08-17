@@ -126,7 +126,6 @@ class OperationMobileDashboard extends StatelessWidget {
           _tab('SpotsSaleOrder',  isTablet),  //2
           _tab('InventoryReport', isTablet),  //3
 
-          _tab('LeaveApproval', isTablet),
           _tab('EmpLeave', isTablet),
         ],
       ),
@@ -172,7 +171,6 @@ class OperationMobileDashboard extends StatelessWidget {
           SpotSaleEntryPage(),  //2
           InventoryPage(),   //3
 
-          AdminLeaveApprovalTab(),
           EmployeeLeaveRequestTab(),
         ],
       ),
