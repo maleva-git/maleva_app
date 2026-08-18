@@ -489,7 +489,7 @@ class _NumberFieldState extends State<_NumberField> {
   Widget build(BuildContext context) {
     return TextField(
       controller: _ctrl,
-      keyboardType: TextInputType.number,
+      keyboardType: const TextInputType.numberWithOptions(decimal: true),
       textInputAction: TextInputAction.done,
       onChanged: widget.onChanged,
       style: AppTypography.bodySmall(color: AppTokens.textPrimary),

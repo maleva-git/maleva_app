@@ -10,7 +10,6 @@ import '../bloc/receiptview_bloc.dart';
 import '../bloc/receiptview_event.dart';
 import '../bloc/receiptview_state.dart';
 
-
 String _fmtAmount(double v) {
   final s = v.toStringAsFixed(2);
   final parts = s.split('.');
@@ -33,8 +32,7 @@ class ReceiptTab extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (_) => sl<ReceiptBloc>()
-        ..add( LoadReceiptEvent()),
+      create: (_) => sl<ReceiptBloc>()..add(LoadReceiptEvent()),
       child: const ReceiptPage(),
     );
   }
@@ -78,7 +76,7 @@ class ReceiptPage extends StatelessWidget {
       child: BlocBuilder<ReceiptBloc, ReceiptState>(
         // Only rebuild when status or data changes — not on date selection alone
         buildWhen: (prev, curr) =>
-        prev.status != curr.status ||
+            prev.status != curr.status ||
             prev.receiptMaster.length != curr.receiptMaster.length ||
             prev.totalAmount != curr.totalAmount,
         builder: (context, state) {
@@ -107,16 +105,16 @@ class ReceiptPage extends StatelessWidget {
                 state: state,
                 isTablet: true,
                 onFromTap: () => _pickDate(context, true),
-                onToTap:   () => _pickDate(context, false),
+                onToTap: () => _pickDate(context, false),
               ),
               const SizedBox(height: 12),
               Expanded(
                 child: state.isLoading
                     ? Center(
-                  child: CircularProgressIndicator(
-                    color: AppTokens.brandGradientStart,
-                  ),
-                )
+                        child: CircularProgressIndicator(
+                          color: AppTokens.brandGradientStart,
+                        ),
+                      )
                     : _ReceiptList(state: state, isTablet: true),
               ),
             ]),
@@ -145,16 +143,16 @@ class ReceiptPage extends StatelessWidget {
         state: state,
         isTablet: false,
         onFromTap: () => _pickDate(context, true),
-        onToTap:   () => _pickDate(context, false),
+        onToTap: () => _pickDate(context, false),
       ),
       _SummaryCard(state: state, isTablet: false),
       Expanded(
         child: state.isLoading
             ? Center(
-          child: CircularProgressIndicator(
-            color: AppTokens.brandGradientStart,
-          ),
-        )
+                child: CircularProgressIndicator(
+                  color: AppTokens.brandGradientStart,
+                ),
+              )
             : _ReceiptList(state: state, isTablet: false),
       ),
     ]);
@@ -207,7 +205,7 @@ class _FilterCard extends StatelessWidget {
                 : DateFormat('dd MMM yyyy').format(state.fromDate!),
             icon: Icons.calendar_today_rounded,
             isTablet: isTablet,
-            onTap: onFromTap,   // ✅ callback from view — no context in BLoC
+            onTap: onFromTap, // ✅ callback from view — no context in BLoC
           ),
         ),
         const SizedBox(width: 10),
@@ -218,14 +216,14 @@ class _FilterCard extends StatelessWidget {
                 : DateFormat('dd MMM yyyy').format(state.toDate!),
             icon: Icons.event_rounded,
             isTablet: isTablet,
-            onTap: onToTap,     // ✅ callback from view
+            onTap: onToTap, // ✅ callback from view
           ),
         ),
         const SizedBox(width: 10),
         GestureDetector(
           onTap: () => context
               .read<ReceiptBloc>()
-              .add( LoadReceiptEvent(isDateSearch: true)),
+              .add(LoadReceiptEvent(isDateSearch: true)),
           child: Container(
             padding: EdgeInsets.all(isTablet ? 15 : 13),
             decoration: BoxDecoration(
@@ -290,8 +288,7 @@ class _DateButton extends StatelessWidget {
               borderRadius: BorderRadius.circular(7),
             ),
             child: Icon(icon,
-                size: isTablet ? 15 : 13,
-                color: AppTokens.brandGradientStart),
+                size: isTablet ? 15 : 13, color: AppTokens.brandGradientStart),
           ),
           const SizedBox(width: 8),
           Flexible(
@@ -319,7 +316,10 @@ class _SummaryCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       margin: EdgeInsets.fromLTRB(
-        isTablet ? 0 : 16, 0, isTablet ? 0 : 16, isTablet ? 0 : 8,
+        isTablet ? 0 : 16,
+        0,
+        isTablet ? 0 : 16,
+        isTablet ? 0 : 8,
       ),
       padding: EdgeInsets.all(isTablet ? 24 : 20),
       decoration: BoxDecoration(
@@ -342,7 +342,7 @@ class _SummaryCard extends StatelessWidget {
         children: [
           Expanded(
             child: _SummaryTile(
-              label: 'Total Amount',
+              label: 'Local Balance (RM)',
               value: 'RM ${_fmtAmount(state.totalAmount)}',
               icon: Icons.account_balance_wallet_rounded,
               iconBg: kWhite.withValues(alpha: 0.2),
@@ -351,12 +351,14 @@ class _SummaryCard extends StatelessWidget {
           ),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 8.0),
-            child: Container(width: 1, height: isTablet ? 60 : 50,
+            child: Container(
+                width: 1,
+                height: isTablet ? 60 : 50,
                 color: kWhite.withValues(alpha: 0.2)),
           ),
           Expanded(
             child: _SummaryTile(
-              label: 'Outstanding',
+              label: 'Outstanding (FC)',
               value: 'RM ${_fmtAmount(state.totalBalance)}',
               icon: Icons.warning_amber_rounded,
               iconBg: colour.commonColorred.withValues(alpha: 0.25),
@@ -369,7 +371,6 @@ class _SummaryCard extends StatelessWidget {
     );
   }
 }
-
 
 class _SummaryTile extends StatelessWidget {
   final String label;
@@ -392,41 +393,42 @@ class _SummaryTile extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       crossAxisAlignment:
-      alignEnd ? CrossAxisAlignment.end : CrossAxisAlignment.start,
+          alignEnd ? CrossAxisAlignment.end : CrossAxisAlignment.start,
       children: [
         Row(
-          mainAxisAlignment: alignEnd ? MainAxisAlignment.end : MainAxisAlignment.start,
-          children: [
-          if (!alignEnd) ...[
-            Container(
-              padding: EdgeInsets.all(isTablet ? 8 : 6),
-              decoration: BoxDecoration(
-                  color: iconBg, borderRadius: BorderRadius.circular(8)),
-              child: Icon(icon, color: kWhite, size: isTablet ? 16 : 14),
-            ),
-            const SizedBox(width: 8),
-          ],
-          Flexible(
-            child: Text(label,
-                style: AppTypography.bodySmall(color: kWhite.withValues(alpha: 0.7)),
-                overflow: TextOverflow.ellipsis),
-          ),
-          if (alignEnd) ...[
-            const SizedBox(width: 8),
-            Container(
-              padding: EdgeInsets.all(isTablet ? 8 : 6),
-              decoration: BoxDecoration(
-                  color: iconBg, borderRadius: BorderRadius.circular(8)),
-              child: Icon(icon, color: kWhite, size: isTablet ? 16 : 14),
-            ),
-          ],
-        ]),
+            mainAxisAlignment:
+                alignEnd ? MainAxisAlignment.end : MainAxisAlignment.start,
+            children: [
+              if (!alignEnd) ...[
+                Container(
+                  padding: EdgeInsets.all(isTablet ? 8 : 6),
+                  decoration: BoxDecoration(
+                      color: iconBg, borderRadius: BorderRadius.circular(8)),
+                  child: Icon(icon, color: kWhite, size: isTablet ? 16 : 14),
+                ),
+                const SizedBox(width: 8),
+              ],
+              Flexible(
+                child: Text(label,
+                    style: AppTypography.bodySmall(
+                        color: kWhite.withValues(alpha: 0.7)),
+                    overflow: TextOverflow.ellipsis),
+              ),
+              if (alignEnd) ...[
+                const SizedBox(width: 8),
+                Container(
+                  padding: EdgeInsets.all(isTablet ? 8 : 6),
+                  decoration: BoxDecoration(
+                      color: iconBg, borderRadius: BorderRadius.circular(8)),
+                  child: Icon(icon, color: kWhite, size: isTablet ? 16 : 14),
+                ),
+              ],
+            ]),
         const SizedBox(height: 4),
         FittedBox(
           fit: BoxFit.scaleDown,
           alignment: alignEnd ? Alignment.centerRight : Alignment.centerLeft,
-          child: Text(value,
-              style: AppTypography.heading1(color: kWhite)),
+          child: Text(value, style: AppTypography.heading1(color: kWhite)),
         ),
       ],
     );
@@ -442,14 +444,12 @@ class _StatsPanel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final total     = state.totalAmount;
-    final balance   = state.totalBalance;
-    final collected = total - balance;
+    final total = state.totalAmount;
+    final balance = state.totalBalance;
     final paidCount = state.receiptMaster
         .where((m) => (double.tryParse(m['Balance'].toString()) ?? 0) <= 0)
         .length;
     final pendingCount = state.receiptMaster.length - paidCount;
-    final percent = total == 0 ? 0.0 : (collected / total).clamp(0.0, 1.0);
 
     return Container(
       padding: const EdgeInsets.all(20),
@@ -470,7 +470,8 @@ class _StatsPanel extends StatelessWidget {
         children: [
           Row(children: [
             Container(
-              width: 4, height: 20,
+              width: 4,
+              height: 20,
               decoration: BoxDecoration(
                 color: AppTokens.brandGradientStart,
                 borderRadius: BorderRadius.circular(4),
@@ -481,41 +482,22 @@ class _StatsPanel extends StatelessWidget {
                 style: AppTypography.heading2(color: AppTokens.brandDark)),
           ]),
           const SizedBox(height: 16),
-          _statRow('Total Bills',    '${state.receiptMaster.length}',
-              Icons.receipt_long_rounded,  AppTokens.brandGradientStart),
+          _statRow('Total Bills', '${state.receiptMaster.length}',
+              Icons.receipt_long_rounded, AppTokens.brandGradientStart),
           const SizedBox(height: 10),
-          _statRow('Paid',           '$paidCount',
-              Icons.check_circle_rounded,  const Color(0xFF059669)),
+          _statRow('Paid', '$paidCount', Icons.check_circle_rounded,
+              const Color(0xFF059669)),
           const SizedBox(height: 10),
-          _statRow('Pending',        '$pendingCount',
-              Icons.pending_rounded,       const Color(0xFFEA580C)),
+          _statRow('Pending', '$pendingCount', Icons.pending_rounded,
+              const Color(0xFFEA580C)),
           const SizedBox(height: 16),
           const Divider(color: kAccent, height: 1),
           const SizedBox(height: 16),
-          _amountRow('Collected',  'RM ${_fmtAmount(collected)}',
-              const Color(0xFF059669)),
+          _amountRow('Local Balance (RM)', 'RM ${_fmtAmount(total)}',
+              const Color(0xFF740000)),
           const SizedBox(height: 10),
-          _amountRow('Outstanding','RM ${_fmtAmount(balance)}',
+          _amountRow('Outstanding (FC)', ' ${_fmtAmount(balance)}',
               const Color(0xFFEA580C)),
-          const SizedBox(height: 16),
-          // Progress bar
-          Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-            Text('Collection Progress',
-                style: AppTypography.bodySmall(color: AppTokens.brandDark.withValues(alpha: 0.6))),
-            Text('${(percent * 100).toStringAsFixed(1)}%',
-                style: AppTypography.bodySmall(color: AppTokens.brandGradientStart)),
-          ]),
-          const SizedBox(height: 8),
-          ClipRRect(
-            borderRadius: BorderRadius.circular(10),
-            child: LinearProgressIndicator(
-              value: percent,
-              minHeight: 8,
-              backgroundColor: kAccent,
-              valueColor: const AlwaysStoppedAnimation<Color>(
-                  AppTokens.brandGradientStart),
-            ),
-          ),
         ],
       ),
     );
@@ -538,8 +520,7 @@ class _StatsPanel extends StatelessWidget {
           Text(label,
               style: AppTypography.bodyLarge(color: AppTokens.brandDark)),
         ]),
-        Text(value,
-            style: AppTypography.heading2(color: color)),
+        Text(value, style: AppTypography.heading2(color: color)),
       ],
     );
   }
@@ -549,9 +530,9 @@ class _StatsPanel extends StatelessWidget {
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         Text(label,
-            style: AppTypography.bodySmall(color: AppTokens.brandDark.withValues(alpha: 0.6))),
-        Text(value,
-            style: AppTypography.bodyLarge(color: color)),
+            style: AppTypography.bodySmall(
+                color: AppTokens.brandDark.withValues(alpha: 0.6))),
+        Text(value, style: AppTypography.bodyLarge(color: color)),
       ],
     );
   }
@@ -572,10 +553,10 @@ class _ReceiptList extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(Icons.receipt_long_outlined, size: 48, color: Colors.grey.shade400),
+            Icon(Icons.receipt_long_outlined,
+                size: 48, color: Colors.grey.shade400),
             const SizedBox(height: 12),
-            Text('No receipts found',
-                style: AppTypography.bodyLarge()),
+            Text('No receipts found', style: AppTypography.bodyLarge()),
           ],
         ),
       );
@@ -583,8 +564,7 @@ class _ReceiptList extends StatelessWidget {
 
     return ListView.builder(
       // ✅ builder — only visible items rendered, memory efficient
-      padding: EdgeInsets.fromLTRB(
-          isTablet ? 0 : 16, 4, isTablet ? 0 : 16, 16),
+      padding: EdgeInsets.fromLTRB(isTablet ? 0 : 16, 4, isTablet ? 0 : 16, 16),
       itemCount: state.receiptMaster.length + 1, // +1 for header
       itemBuilder: (context, index) {
         if (index == 0) {
@@ -592,7 +572,8 @@ class _ReceiptList extends StatelessWidget {
             padding: const EdgeInsets.symmetric(vertical: 8),
             child: Row(children: [
               Container(
-                width: 4, height: 20,
+                width: 4,
+                height: 20,
                 decoration: BoxDecoration(
                   color: AppTokens.brandGradientStart,
                   borderRadius: BorderRadius.circular(4),
@@ -626,9 +607,8 @@ class _ReceiptCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final billAmount = double.tryParse(data['BillAmount'].toString()) ?? 0;
-    final balance    = double.tryParse(data['Balance'].toString())    ?? 0;
-    final collected  = billAmount - balance;
-    final isPaid     = balance <= 0;
+    final balance = double.tryParse(data['Balance'].toString()) ?? 0;
+    final isPaid = balance <= 0;
 
     return Container(
       margin: EdgeInsets.only(bottom: isTablet ? 14 : 12),
@@ -657,19 +637,28 @@ class _ReceiptCard extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(data['CustomerName'] ?? '',
-                          style: AppTypography.heading2(color: AppTokens.brandDark),
-                          overflow: TextOverflow.ellipsis),
-                      const SizedBox(height: 3),
-                      Text('${data['BillNo']} • ${data['BillDate']}',
-                          style: AppTypography.bodySmall(color: AppTokens.brandMid.withValues(alpha: 0.7))),
-                    ],
+                        Text(data['CustomerName'] ?? '',
+                            style: AppTypography.heading2(
+                                color: AppTokens.brandDark),
+                            overflow: TextOverflow.ellipsis),
+                        const SizedBox(height: 3),
+                        if (data['BillNo'] != null && data['BillNo'].toString().isNotEmpty && data['BillNo'].toString() != 'null')
+                          Text('${data['BillNo']} • ${data['BillDate']}',
+                              style: AppTypography.bodySmall(
+                                  color: AppTokens.brandMid
+                                      .withValues(alpha: 0.7)))
+                        else
+                          Text('Customer Summary',
+                              style: AppTypography.bodySmall(
+                                  color: AppTokens.brandMid
+                                      .withValues(alpha: 0.7))),
+                      ],
                   ),
                 ),
                 Container(
                   padding: EdgeInsets.symmetric(
                     horizontal: isTablet ? 14 : 10,
-                    vertical:   isTablet ? 7  : 5,
+                    vertical: isTablet ? 7 : 5,
                   ),
                   decoration: BoxDecoration(
                     color: isPaid ? const Color(0xFFD1FAE5) : kAccent,
@@ -682,9 +671,10 @@ class _ReceiptCard extends StatelessWidget {
                   ),
                   child: Text(
                     isPaid ? '✓ Paid' : 'Pending',
-                    style: AppTypography.bodySmall(color: isPaid
-                          ? const Color(0xFF0F766E)
-                          : AppTokens.brandGradientStart),
+                    style: AppTypography.bodySmall(
+                        color: isPaid
+                            ? const Color(0xFF0F766E)
+                            : AppTokens.brandGradientStart),
                   ),
                 ),
               ],
@@ -698,7 +688,7 @@ class _ReceiptCard extends StatelessWidget {
             Row(children: [
               Expanded(
                 child: _AmountChip(
-                  label: 'Total',
+                  label: 'Local Balance (RM)',
                   amount: 'RM ${_fmtAmount(billAmount)}',
                   color: AppTokens.brandGradientStart,
                   isTablet: isTablet,
@@ -707,17 +697,8 @@ class _ReceiptCard extends StatelessWidget {
               const SizedBox(width: 8),
               Expanded(
                 child: _AmountChip(
-                  label: 'Collected',
-                  amount: 'RM ${_fmtAmount(collected)}',
-                  color: AppTokens.brandGradientStart,
-                  isTablet: isTablet,
-                ),
-              ),
-              const SizedBox(width: 8),
-              Expanded(
-                child: _AmountChip(
-                  label: 'Balance',
-                  amount: 'RM ${_fmtAmount(balance)}',
+                  label: 'Outstanding (FC)',
+                  amount: '${_fmtAmount(balance)}',
                   color: balance > 0
                       ? const Color(0xFF740000)
                       : AppTokens.brandGradientStart,
@@ -753,10 +734,10 @@ class _AmountChip extends StatelessWidget {
     return Container(
       padding: EdgeInsets.symmetric(
         horizontal: isTablet ? 16 : 12,
-        vertical:   isTablet ? 10 : 8,
+        vertical: isTablet ? 10 : 8,
       ),
       decoration: BoxDecoration(
-        color: kWhite,  // ✅ fixed: was RWhite (undefined)
+        color: kWhite, // ✅ fixed: was RWhite (undefined)
         borderRadius: BorderRadius.circular(isTablet ? 14 : 12),
       ),
       child: Column(
@@ -765,13 +746,13 @@ class _AmountChip extends StatelessWidget {
           Text(label,
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
-              style: AppTypography.bodySmall(color: color.withValues(alpha: 0.7))),
+              style:
+                  AppTypography.bodySmall(color: color.withValues(alpha: 0.7))),
           const SizedBox(height: 3),
           FittedBox(
             fit: BoxFit.scaleDown,
             alignment: Alignment.center,
-            child: Text(amount,
-                style: AppTypography.bodySmall(color: color)),
+            child: Text(amount, style: AppTypography.bodySmall(color: color)),
           ),
         ],
       ),
