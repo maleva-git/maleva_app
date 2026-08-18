@@ -11,19 +11,7 @@ import '../bloc/receiptview_event.dart';
 import '../bloc/receiptview_state.dart';
 
 String _fmtAmount(double v) {
-  final s = v.toStringAsFixed(2);
-  final parts = s.split('.');
-  final whole = parts[0];
-  final dec = parts.length > 1 ? '.' + parts[1] : '';
-  if (whole.length <= 3) return s;
-  final last3 = whole.substring(whole.length - 3);
-  final rest = whole.substring(0, whole.length - 3);
-  final buf = StringBuffer();
-  for (int i = 0; i < rest.length; i++) {
-    if (i > 0 && (rest.length - i) % 2 == 0) buf.write(',');
-    buf.write(rest[i]);
-  }
-  return '${buf.toString()},$last3$dec';
+  return NumberFormat('#,##0.00').format(v);
 }
 
 class ReceiptTab extends StatelessWidget {
