@@ -296,9 +296,11 @@ class _AdminLeaveApprovalTabState extends State<AdminLeaveApprovalTab> {
                                   children: [
                                     Icon(Icons.verified_user_rounded, size: 14, color: Colors.grey),
                                     const SizedBox(width: 4),
-                                    Text(
-                                      'Reviewed By: ${req.reviewedByName}',
-                                      style: AppTypography.bodyMedium(color: Colors.grey, fontWeight: FontWeight.w600),
+                                    Expanded(
+                                      child: Text(
+                                        'Reviewed By: ${req.reviewedByName}',
+                                        style: AppTypography.bodyMedium(color: Colors.grey, fontWeight: FontWeight.w600),
+                                      ),
                                     ),
                                   ],
                                 ),
