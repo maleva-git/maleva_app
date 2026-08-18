@@ -449,8 +449,8 @@ class _FuelRow extends StatelessWidget {
   Widget build(BuildContext context) {
     final valStyle = AppTypography.bodyLarge(color: AppTokens.textPrimary);
 
-    final liter = (item['Aliter'] as num?)?.toStringAsFixed(2) ?? '0.00';
-    final amount = (item['AAmount'] as num?)?.toStringAsFixed(2) ?? '0.00';
+    final liter = (item['Aliter'] as num?)?.toStringAsFixed(3) ?? '0.000';
+    final amount = (item['AAmount'] as num?)?.toStringAsFixed(3) ?? '0.000';
     final date = item['SSaleDate']?.toString() ?? '';
 
     return Container(
