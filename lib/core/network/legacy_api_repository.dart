@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:maleva/core/utils/app_globals.dart';
 import 'package:maleva/core/network/api_constants.dart';
 import 'package:maleva/core/network/dio_client.dart';
+import 'package:dio/dio.dart';
 import 'package:maleva/core/models/shared/agent_company_model.dart';
 import 'package:maleva/features/operations/models/job_all_status_model.dart';
 import 'package:maleva/features/operations/models/job_type_model.dart';
@@ -47,9 +48,10 @@ class LegacyApiRepository {
   }
 
   // Generic methods for direct ApiLegacyHelper replacements
-  Future<dynamic> post(String url, {dynamic data, BuildContext? context}) async {
+  Future<dynamic> post(String url, {dynamic data, Map<String, String>? headers, BuildContext? context}) async {
     try {
-      final response = await _dioClient.dio.post(url, data: data ?? {});
+      final options = headers != null ? Options(headers: headers) : null;
+      final response = await _dioClient.dio.post(url, data: data ?? {}, options: options);
       return response.data;
     } catch (e) {
       print("API Error: $e");
@@ -57,9 +59,10 @@ class LegacyApiRepository {
     }
   }
 
-  Future<List<dynamic>> postList(String url, {dynamic data, BuildContext? context}) async {
+  Future<List<dynamic>> postList(String url, {dynamic data, Map<String, String>? headers, BuildContext? context}) async {
     try {
-      final response = await _dioClient.dio.post(url, data: data ?? {});
+      final options = headers != null ? Options(headers: headers) : null;
+      final response = await _dioClient.dio.post(url, data: data ?? {}, options: options);
       return _ensureList(response.data);
     } catch (e) {
       print("API Error: $e");
@@ -69,23 +72,23 @@ class LegacyApiRepository {
 
   // Backward compatible methods for ApiLegacyHelper replacement
   Future<List<dynamic>> apiAllinoneSelect(dynamic api, [dynamic insertDetails, Map<String, String>? header, BuildContext? context]) async {
-    final result = await postList(api.toString(), data: insertDetails);
+    final result = await postList(api.toString(), data: insertDetails, headers: header);
     return result;
   }
 
   Future<dynamic> apiAllinoneSelectArray(dynamic api, [dynamic insertDetails, Map<String, String>? header, BuildContext? context]) async {
-    final result = await post(api.toString(), data: insertDetails);
+    final result = await post(api.toString(), data: insertDetails, headers: header);
     return result;
   }
 
   Future<dynamic> apiAllinone(dynamic api, [dynamic insertDetails, Map<String, String>? header, BuildContext? context]) async {
-    final result = await post(api.toString(), data: insertDetails);
+    final result = await post(api.toString(), data: insertDetails, headers: header);
     return result;
   }
 
   Future<String> apiGetString(dynamic api, [dynamic insertDetails, Map<String, String>? header, BuildContext? context]) async {
     try {
-      final response = await _dioClient.dio.get(api.toString(), data: insertDetails);
+      final options = header != null ? Options(headers: header) : null; final response = await _dioClient.dio.post(api.toString(), data: insertDetails ?? {}, options: options);
       return response.data?.toString() ?? '';
     } catch (e) {
       print("API Error: $e");
