@@ -16,6 +16,7 @@ class JobOrder {
   final String remarks;
   final String jobDate;
   final String sJobDate;
+  final String targetDate;
   final double estimatedCost;
   final double actualCost;
 
@@ -37,6 +38,7 @@ class JobOrder {
     required this.remarks,
     required this.jobDate,
     required this.sJobDate,
+    required this.targetDate,
     required this.estimatedCost,
     required this.actualCost,
   });
@@ -58,10 +60,24 @@ class JobOrder {
       problemName: json['ProblemName'] ?? '',
       productUse: json['ProductUse'] ?? '',
       remarks: json['Remarks'] ?? '',
-      jobDate: json['JobDate'] ?? '',
-      sJobDate: json['SJobDate'] ?? '',
-      estimatedCost: (json['EstimatedCost'] ?? 0.0).toDouble(),
-      actualCost: (json['ActualCost'] ?? 0.0).toDouble(),
+      jobDate: json['JobDate'] ?? json['jobDate'] ?? '',
+      sJobDate: _formatDate(json['SJobDate'] ?? json['jobDate'] ?? json['JobDate'] ?? ''),
+      targetDate: _formatDate(json['TargetDate'] ?? json['expectedCompletionDate'] ?? json['ExpectedCompletionDate'] ?? ''),
+      estimatedCost: (json['EstimatedCost'] ?? json['estimatedCost'] ?? 0.0).toDouble(),
+      actualCost: (json['ActualCost'] ?? json['actualCost'] ?? 0.0).toDouble(),
     );
+  }
+
+  static String _formatDate(String dateStr) {
+    if (dateStr.isEmpty) return '';
+    if (dateStr.contains('T')) {
+      try {
+        final dt = DateTime.parse(dateStr);
+        return "${dt.day.toString().padLeft(2, '0')}/${dt.month.toString().padLeft(2, '0')}/${dt.year}";
+      } catch (_) {
+        return dateStr.split('T').first;
+      }
+    }
+    return dateStr;
   }
 }

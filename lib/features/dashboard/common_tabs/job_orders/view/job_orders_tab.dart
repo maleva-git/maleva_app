@@ -92,8 +92,11 @@ class _JobOrdersTabState extends State<JobOrdersTab> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            _buildInfoRow(Icons.report_problem_rounded, "Problem", detail.problemName.isNotEmpty ? detail.problemName : '-', Colors.red.shade600),
-                            const SizedBox(height: 8),
+                            Text(
+                              detail.problemName.isNotEmpty ? detail.problemName.toUpperCase() : 'NO PROBLEM SPECIFIED',
+                              style: TextStyle(fontSize: 18, fontWeight: FontWeight.w900, color: Colors.red.shade700, letterSpacing: 0.5),
+                            ),
+                            const SizedBox(height: 12),
                             
                             _buildInfoRow(Icons.inventory_2_rounded, "Product", detail.productName.isNotEmpty ? detail.productName : '-', Colors.blue.shade600),
                             const SizedBox(height: 8),
@@ -412,16 +415,16 @@ class _JobOrdersTabState extends State<JobOrdersTab> {
                                             child: Column(
                                               crossAxisAlignment: CrossAxisAlignment.start,
                                               children: [
-                                                // Header: Job No & Status
+                                                // Header: Truck No & Status
                                                 Row(
                                                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                                   children: [
                                                     Expanded(
                                                       child: Text(
-                                                        "Job No: ${job.cNumberDisplay.isNotEmpty ? job.cNumberDisplay : 'N/A'}",
+                                                        job.truckName.isNotEmpty ? job.truckName.toUpperCase() : 'NO TRUCK',
                                                         style: const TextStyle(
                                                           fontWeight: FontWeight.w900,
-                                                          fontSize: 16,
+                                                          fontSize: 20,
                                                           color: Colors.black87,
                                                           letterSpacing: 0.5,
                                                         ),
@@ -446,18 +449,29 @@ class _JobOrdersTabState extends State<JobOrdersTab> {
                                                     ),
                                                   ],
                                                 ),
+                                                const SizedBox(height: 6),
+                                                Text(
+                                                  "Job No: ${job.cNumberDisplay.isNotEmpty ? job.cNumberDisplay : 'N/A'}",
+                                                  style: TextStyle(
+                                                    fontWeight: FontWeight.bold,
+                                                    fontSize: 13,
+                                                    color: Colors.grey.shade600,
+                                                  ),
+                                                ),
                                                 const SizedBox(height: 16),
                                                 
                                                 // Info Rows
-                                                _buildInfoRow(Icons.calendar_today_rounded, "Date", job.sJobDate.isNotEmpty ? job.sJobDate : 'N/A', Colors.grey.shade700),
+                                                Row(
+                                                  children: [
+                                                    Expanded(child: _buildInfoRow(Icons.calendar_today_rounded, "Date", job.sJobDate.isNotEmpty ? job.sJobDate : 'N/A', Colors.grey.shade700)),
+                                                    const SizedBox(width: 8),
+                                                    Expanded(child: _buildInfoRow(Icons.flag_rounded, "Target", job.targetDate.isNotEmpty ? job.targetDate : 'N/A', Colors.orange.shade700)),
+                                                  ],
+                                                ),
                                                 const SizedBox(height: 10),
                                                 _buildInfoRow(Icons.build_circle_rounded, "Job Type", job.jobTypeName.isNotEmpty ? job.jobTypeName : 'N/A', Colors.grey.shade700),
                                                 const SizedBox(height: 10),
-                                                _buildInfoRow(Icons.local_shipping_rounded, "Truck", job.truckName.isNotEmpty ? job.truckName : 'N/A', Colors.grey.shade700),
-                                                const SizedBox(height: 10),
                                                 _buildInfoRow(Icons.person_rounded, "Driver", job.driverName.isNotEmpty ? job.driverName : 'N/A', Colors.grey.shade700),
-                                                const SizedBox(height: 10),
-                                                _buildInfoRow(Icons.report_problem_rounded, "Problem", job.problemName.isNotEmpty ? job.problemName : 'N/A', Colors.red.shade700),
                                                 
                                                 if (job.remarks.isNotEmpty) ...[
                                                   const SizedBox(height: 10),

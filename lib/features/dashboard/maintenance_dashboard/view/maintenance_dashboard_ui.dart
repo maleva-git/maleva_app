@@ -26,6 +26,7 @@ import 'package:maleva/features/dashboard/common_tabs/driverleave/view/admin_lea
 import 'package:maleva/features/dashboard/common_tabs/driverleave/view/employee_leave_request_tab.dart';
 import 'package:maleva/core/models/shared/barcode_print_model.dart';
 import 'package:maleva/core/utils/auth_helper.dart';
+import '../../common_tabs/job_orders/view/job_orders_tab.dart';
 
 
 class MaintenanceMobileDashboard extends StatelessWidget {
@@ -130,23 +131,19 @@ class MaintenanceMobileDashboard extends StatelessWidget {
           fontSize: isTablet ? 14 : 13,
         ),
         tabs: showTruckMaint
-          ? [ _tab('Truck Maint', isTablet) ]
+          ? [ 
+              _tab('Job Orders', isTablet),
+              _tab('Truck Maint', isTablet),
+            ]
           : [
-          _tab('Maintenance',             isTablet),   // 1
-          _tab('Today Pickup',             isTablet),   // 1
-          _tab('Maintenance',     isTablet),
-          _tab('Today Pickup',    isTablet),
-          _tab('Vessel',          isTablet),
-          _tab('Truck',           isTablet),
-          _tab('Driver',          isTablet),
-          _tab('Speeding',        isTablet),
-          _tab('FuelFilling',     isTablet),
-          _tab('EngineHours',     isTablet),
-          _tab('FuelDiff',        isTablet),
-          _tab('SparePartsEntry', isTablet),
-          _tab('LeaveApproval',   isTablet),
-          _tab('EmpLeave',        isTablet),
-        ],
+              _tab('Job Orders', isTablet),
+              _tab('Maintenance', isTablet),
+              _tab('Speeding', isTablet),
+              _tab('FuelFilling', isTablet),
+              _tab('EngineHours', isTablet),
+              _tab('FuelDiff', isTablet),
+              _tab('SparePartsEntry', isTablet),
+            ],
       ),
     );
   }
@@ -186,21 +183,19 @@ class MaintenanceMobileDashboard extends StatelessWidget {
       child: TabBarView(
         controller: tabController,
         children: showTruckMaint
-          ? [ const Maintenance(showAppBar: false) ]
+          ? [ 
+              const JobOrdersTab(),
+              const Maintenance(showAppBar: false),
+            ]
           : [
-          const MaintenanceDashboardWidget(),  //1
-          const VesselReportPage(),  //1
-          const TransportReportPage(), //2
-          const TruckDetailsReportPage(), //3
-          const DriverDetailsView(),  //4
-          const SpeedingScreen(),  //5
-          const FuelFillingPage(),  //6
-          const EngineHoursPage(),  //7
-          const FuelDiffPage(),   //8
-          const SparePartsEntryPage(),  //9
-          const AdminLeaveApprovalTab(), // 10
-          const EmployeeLeaveRequestTab(),
-        ],
+              const JobOrdersTab(),
+              const MaintenanceDashboardWidget(),
+              const SpeedingScreen(),
+              const FuelFillingPage(),
+              const EngineHoursPage(),
+              const FuelDiffPage(),
+              const SparePartsEntryPage(),
+            ],
       ),
     );
   }
