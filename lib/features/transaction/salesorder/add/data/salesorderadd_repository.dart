@@ -65,7 +65,7 @@ class SalesOrderAddRepository {
 
   Future<List<dynamic>> selectAddressDetails(String keyword) async {
     try {
-      final endpoint = "${ApiConstants.apiSelectAddressDetails}$_comId&KeyWord=$keyword";
+      final endpoint = "${ApiConstants.apiSelectAddressDetails}$_comId&KeyWord=${Uri.encodeComponent(keyword)}";
       final response = await _dioClient.dio.post(endpoint, data: {});
       dynamic responseData = response.data;
       if (responseData is String) {

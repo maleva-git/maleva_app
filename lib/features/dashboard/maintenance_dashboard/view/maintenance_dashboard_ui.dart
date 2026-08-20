@@ -16,6 +16,7 @@ import '../../common_tabs/fuelfillings/view/fuelfillings_tab.dart';
 import '../../common_tabs/maintenance/view/maintenance_tab.dart';
 import '../../common_tabs/saleorderview/view/saleorderview_tab.dart';
 import '../../common_tabs/spareparts/view/sparepartsadd.dart';
+import '../../common_tabs/fuelentry/view/fuelentry_tab.dart';
 import '../../common_tabs/speedingreport/view/speedingreport_view.dart';
 import '../../common_tabs/transport/view/transportview_tab.dart';
 import '../../common_tabs/truck/view/truckview_tab.dart';
@@ -134,6 +135,7 @@ class MaintenanceMobileDashboard extends StatelessWidget {
           ? [ 
               _tab('Job Orders', isTablet),
               _tab('Truck Maint', isTablet),
+              _tab('FuelEntry', isTablet),
             ]
           : [
               _tab('Job Orders', isTablet),
@@ -143,6 +145,7 @@ class MaintenanceMobileDashboard extends StatelessWidget {
               _tab('EngineHours', isTablet),
               _tab('FuelDiff', isTablet),
               _tab('SparePartsEntry', isTablet),
+              _tab('FuelEntry', isTablet),
             ],
       ),
     );
@@ -186,6 +189,7 @@ class MaintenanceMobileDashboard extends StatelessWidget {
           ? [ 
               const JobOrdersTab(),
               const Maintenance(showAppBar: false),
+              const FuelEntryTab(),
             ]
           : [
               const JobOrdersTab(),
@@ -195,6 +199,7 @@ class MaintenanceMobileDashboard extends StatelessWidget {
               const EngineHoursPage(),
               const FuelDiffPage(),
               const SparePartsEntryPage(),
+              const FuelEntryTab(),
             ],
       ),
     );

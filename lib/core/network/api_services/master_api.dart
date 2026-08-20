@@ -126,7 +126,7 @@ class MasterApi {
   static Future<List<AddressDetailsModel>> getAddressDetails(String keyword) async {
     final comid  = AppPreferences.getComid();
     final result = await ApiClient.postRequest(
-      '${ApiConstants.apiSelectAddressDetails}$comid&KeyWord=$keyword', null,
+      '${ApiConstants.apiSelectAddressDetails}$comid&KeyWord=${Uri.encodeComponent(keyword)}', null,
     );
     return (result as List).map((e) => AddressDetailsModel.fromJson(e)).toList();
   }
