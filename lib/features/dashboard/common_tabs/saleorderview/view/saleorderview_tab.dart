@@ -22,9 +22,7 @@ import 'package:maleva/features/transaction/salesorder/models/sale_order_master_
 import 'package:maleva/features/operations/models/job_status_model.dart';
 import 'package:maleva/core/utils/auth_helper.dart';
 
-// ─────────────────────────────────────────────────────────────────────────────
-// Entry point
-// ─────────────────────────────────────────────────────────────────────────────
+
 
 class Saleorderview extends StatelessWidget {
   const Saleorderview({super.key});
@@ -33,16 +31,13 @@ class Saleorderview extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocProvider(
       create: (_) => SaleOrderBloc(
-        repository: SaleOrderRepository(), // <-- Pass the repository here
+        repository: SaleOrderRepository(),
       )..add(const SaleOrderStartupRequested()),
       child: const _SaleOrderView(),
     );
   }
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// Internal view (stateful for TextEditingControllers only)
-// ─────────────────────────────────────────────────────────────────────────────
 
 class _SaleOrderView extends StatefulWidget {
   const _SaleOrderView();
@@ -50,6 +45,7 @@ class _SaleOrderView extends StatefulWidget {
   @override
   State<_SaleOrderView> createState() => _SaleOrderViewState();
 }
+
 
 class _SaleOrderViewState extends State<_SaleOrderView> {
   // Controllers live here (UI layer only — not in BLoC)
@@ -627,9 +623,6 @@ class _SummaryPill extends StatelessWidget {
   }
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// Sale Order Card
-// ─────────────────────────────────────────────────────────────────────────────
 
 class _SaleOrderCard extends StatelessWidget {
   const _SaleOrderCard({
@@ -918,9 +911,6 @@ class _ETAChip extends StatelessWidget {
   }
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// Filter bottom sheet
-// ─────────────────────────────────────────────────────────────────────────────
 
 class _FilterSheet extends StatelessWidget {
   const _FilterSheet({

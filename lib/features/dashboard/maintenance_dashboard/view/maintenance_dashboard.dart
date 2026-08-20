@@ -63,6 +63,8 @@ import '../../common_tabs/salesorder/view/salesorderview_tab.dart';
 import '../../common_tabs/spareparts/bloc/spareparts_bloc.dart';
 import '../../common_tabs/spareparts/data/spareparts_repository.dart';
 import '../../common_tabs/spareparts/view/sparepartsadd.dart';
+import '../../common_tabs/fuelentry/bloc/fuelentry_bloc.dart';
+import '../../common_tabs/fuelentry/data/fuelentry_repository.dart';
 import '../../common_tabs/speedingreport/bloc/speeding_bloc.dart';
 import '../../common_tabs/speedingreport/bloc/speeding_event.dart';
 import '../../common_tabs/speedingreport/view/speedingreport_view.dart';
@@ -99,7 +101,7 @@ class _AdminDashboardState extends State<MaintenanceDashboard> with SingleTicker
   void initState() {
     super.initState();
     final bool showTruckMaint = AppPreferences.getRoleId() == 1300 && AppPreferences.getPermissionId() == 1;
-    final int tabCount = showTruckMaint ? 2 : 7;
+    final int tabCount = showTruckMaint ? 3 : 8;
     _tabController = TabController(length: tabCount, vsync: this);
     _tabController.addListener(_onTabChanged);
 
@@ -258,6 +260,9 @@ class _AdminDashboardState extends State<MaintenanceDashboard> with SingleTicker
             BlocProvider(
               create: (_) => sl<MaintenanceBloc>()..add(MaintenanceStarted()),
               child: const MaintenanceDashboardWidget(),
+            ),
+            BlocProvider(
+              create: (_) => FuelEntryBloc(repository: FuelEntryRepositoryImpl()),
             ),
 
         BlocProvider<LeaveBloc>(create: (_) => sl<LeaveBloc>()),

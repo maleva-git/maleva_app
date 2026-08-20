@@ -648,8 +648,8 @@ Future SelectAddressDetails(context, String Keyword) async {
     AppGlobals.AddressDetailedList.clear();
     var Comid = AppGlobals.storagenew.getInt('Comid') ?? 0;
     try {
-  final resultData = _ensureList((await _dioClient.dio.post(
-            Uri.encodeFull("${ApiConstants.apiSelectAddressDetails}$Comid&KeyWord=$Keyword"), data: null ?? {})).data);
+    final resultData = _ensureList((await _dioClient.dio.post(
+            "${ApiConstants.apiSelectAddressDetails}$Comid&KeyWord=${Uri.encodeComponent(Keyword)}", data: null ?? {})).data);
   if (resultData.isNotEmpty) {
         AppGlobals.AddressDetailedList = resultData
             .map((element) => AddressDetailsModel.fromJson(element))

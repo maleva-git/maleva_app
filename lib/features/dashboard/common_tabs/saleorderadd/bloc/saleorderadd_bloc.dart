@@ -397,29 +397,79 @@ class SalesOrderBloc extends Bloc<SalesOrderEvent, SalesOrderState> {
     String pQty = '';
     String pWeight = '';
     int pId = 0;
-    if (m['PickupsList'] != null && (m['PickupsList'] as List).isNotEmpty) {
-      pId = int.tryParse(m['PickupsList'][0]['Id']?.toString() ?? '0') ?? 0;
-      pAddress = m['PickupsList'][0]['PickupAddress']?.toString() ?? '';
-      pQty = m['PickupsList'][0]['PickupQuantity']?.toString() ?? '';
-      pWeight = m['PickupsList'][0]['PickupWeaight']?.toString() ?? '';
-    } else {
-      pAddress = m['PickUpAddress']?.toString() ?? '';
-      pQty = m['PickUpQuantity']?.toString() ?? '';
-    }
+      List<String> parsedPickupAddresses = [];
+      List<String> parsedPickupQuantities = [];
+      
+      if (m['PickupsList'] != null && (m['PickupsList'] as List).isNotEmpty) {
+        for (var p in (m['PickupsList'] as List)) {
+          if (p['PickupAddress'] != null && p['PickupAddress'].toString().isNotEmpty) {
+            parsedPickupAddresses.add(p['PickupAddress'].toString());
+          }
+          if (p['PickupQuantity'] != null && p['PickupQuantity'].toString().isNotEmpty) {
+            parsedPickupQuantities.add(p['PickupQuantity'].toString());
+          }
+        }
+        pId = int.tryParse(m['PickupsList'][0]['Id']?.toString() ?? '0') ?? 0;
+        pWeight = m['PickupsList'][0]['PickupWeaight']?.toString() ?? '';
+      } else {
+        String rawAddress = m['PickUpAddress']?.toString() ?? '';
+        if (rawAddress.isNotEmpty) {
+          if (rawAddress.contains('{@}')) {
+            parsedPickupAddresses.addAll(rawAddress.split('{@}').where((s) => s.trim().isNotEmpty));
+          } else {
+            parsedPickupAddresses.add(rawAddress);
+          }
+        }
+        String rawQty = m['PickUpQuantity']?.toString() ?? '';
+        if (rawQty.isNotEmpty) {
+          if (rawQty.contains('{@}')) {
+            parsedPickupQuantities.addAll(rawQty.split('{@}').where((s) => s.trim().isNotEmpty));
+          } else {
+            parsedPickupQuantities.add(rawQty);
+          }
+        }
+      }
+      pAddress = '';
+      pQty = '';
 
     String dAddress = '';
     String dQty = '';
     String dWeight = '';
     int dId = 0;
-    if (m['DeliveriesList'] != null && (m['DeliveriesList'] as List).isNotEmpty) {
-      dId = int.tryParse(m['DeliveriesList'][0]['Id']?.toString() ?? '0') ?? 0;
-      dAddress = m['DeliveriesList'][0]['DeliveryAddress']?.toString() ?? '';
-      dQty = m['DeliveriesList'][0]['DeliveryQuantity']?.toString() ?? '';
-      dWeight = m['DeliveriesList'][0]['DeliveryWeight']?.toString() ?? '';
-    } else {
-      dAddress = m['DeliveryAddress']?.toString() ?? '';
-      dQty = m['DeliveryQuantity']?.toString() ?? '';
-    }
+      List<String> parsedDeliveryAddresses = [];
+      List<String> parsedDeliveryQuantities = [];
+      
+      if (m['DeliveriesList'] != null && (m['DeliveriesList'] as List).isNotEmpty) {
+        for (var d in (m['DeliveriesList'] as List)) {
+          if (d['DeliveryAddress'] != null && d['DeliveryAddress'].toString().isNotEmpty) {
+            parsedDeliveryAddresses.add(d['DeliveryAddress'].toString());
+          }
+          if (d['DeliveryQuantity'] != null && d['DeliveryQuantity'].toString().isNotEmpty) {
+            parsedDeliveryQuantities.add(d['DeliveryQuantity'].toString());
+          }
+        }
+        dId = int.tryParse(m['DeliveriesList'][0]['Id']?.toString() ?? '0') ?? 0;
+        dWeight = m['DeliveriesList'][0]['DeliveryWeight']?.toString() ?? '';
+      } else {
+        String rawAddress = m['DeliveryAddress']?.toString() ?? '';
+        if (rawAddress.isNotEmpty) {
+          if (rawAddress.contains('{@}')) {
+            parsedDeliveryAddresses.addAll(rawAddress.split('{@}').where((s) => s.trim().isNotEmpty));
+          } else {
+            parsedDeliveryAddresses.add(rawAddress);
+          }
+        }
+        String rawQty = m['DeliveryQuantity']?.toString() ?? '';
+        if (rawQty.isNotEmpty) {
+          if (rawQty.contains('{@}')) {
+            parsedDeliveryQuantities.addAll(rawQty.split('{@}').where((s) => s.trim().isNotEmpty));
+          } else {
+            parsedDeliveryQuantities.add(rawQty);
+          }
+        }
+      }
+      dAddress = '';
+      dQty = '';
 
     // Set common weight text field from the API lists if existing common Weight is empty
     String finalWeight = m['Weight']?.toString() ?? '';
@@ -802,12 +852,12 @@ class SalesOrderBloc extends Bloc<SalesOrderEvent, SalesOrderState> {
         'DeliveriesList': dynamicDeliveries,
 
         // Backend expects comma-separated strings using specific case-sensitive keys
-        'PickupAddress': state.pickupAddressList.isNotEmpty ? state.pickupAddressList.join(', ') : f('pickupAddress'),
-        'pickupQuantityList': state.pickupQuantityList.isNotEmpty ? state.pickupQuantityList.join(', ') : f('pickupQuantity'),
+        'PickupAddress': state.pickupAddressList.isNotEmpty ? state.pickupAddressList.join('{@}') : f('pickupAddress'),
+        'pickupQuantityList': state.pickupQuantityList.isNotEmpty ? state.pickupQuantityList.join('{@}') : f('pickupQuantity'),
         'pickuptimelist': DateTime.now().toIso8601String(),
         
-        'DeliveryAddress': state.deliveryAddressList.isNotEmpty ? state.deliveryAddressList.join(', ') : f('deliveryAddress'),
-        'DeliveryQuantityList': state.deliveryQuantityList.isNotEmpty ? state.deliveryQuantityList.join(', ') : f('deliveryQuantity'),
+        'DeliveryAddress': state.deliveryAddressList.isNotEmpty ? state.deliveryAddressList.join('{@}') : f('deliveryAddress'),
+        'DeliveryQuantityList': state.deliveryQuantityList.isNotEmpty ? state.deliveryQuantityList.join('{@}') : f('deliveryQuantity'),
         'DelivertimeList': DateTime.now().toIso8601String(),
 
         'OriginRefId': state.originId,

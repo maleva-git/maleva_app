@@ -5,6 +5,7 @@ import 'package:maleva/core/colors/colors.dart' as colour;
 import 'package:maleva/core/utils/app_globals.dart';
 import 'package:maleva/core/network/api_client.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
+import 'package:maleva/core/models/shared/address_details_model.dart';
 
 class AddressList extends StatefulWidget {
   final int Searchby;
@@ -14,16 +15,16 @@ class AddressList extends StatefulWidget {
       {super.key, required this.Searchby, required this.SearchId});
 
   @override
-  _AddressListstate createState() => _AddressListstate();
+  State<AddressList> createState() => _AddressListState();
 }
 
-class _AddressListstate extends State<AddressList> {
+class _AddressListState extends State<AddressList> {
   bool? _loadState;
   String _errorMsg = '';
 
-  final txtSearch = TextEditingController();
-  List<String> _masterList = [];
-  List<String> _filteredList = [];
+  final TextEditingController txtSearch = TextEditingController();
+  List<AddressDetailsModel> _masterList = [];
+  List<AddressDetailsModel> _filteredList = [];
 
   @override
   void initState() {
@@ -44,22 +45,22 @@ class _AddressListstate extends State<AddressList> {
 
     try {
       final response = await ApiClient.postRequest(
-        '${ApiConstants.apiSelectAddressList}${AppGlobals.Comid}',
+        '${ApiConstants.apiSelectAddressDetails}${AppGlobals.Comid}&KeyWord=',
         null,
       );
 
       if (!mounted) return;
 
-      List<String> loaded = [];
+      List<AddressDetailsModel> loaded = [];
       if (response is List) {
-        loaded = response.map((e) => e.toString()).toList();
+        loaded = response.map((e) => AddressDetailsModel.fromJson(e)).toList();
       }
 
-      AppGlobals.AddressList = loaded;
+      AppGlobals.AddressList = loaded.map((e) => e.Name).toList();
 
       setState(() {
         _masterList = loaded;
-        _filteredList = List<String>.from(loaded);
+        _filteredList = List<AddressDetailsModel>.from(loaded);
         _loadState = true;
       });
     } catch (e) {
@@ -75,11 +76,11 @@ class _AddressListstate extends State<AddressList> {
   void _search(String value) {
     setState(() {
       if (value.trim().isEmpty) {
-        _filteredList = List<String>.from(_masterList);
+        _filteredList = List<AddressDetailsModel>.from(_masterList);
       } else {
         final q = value.toLowerCase();
         _filteredList = _masterList
-            .where((item) => item.toLowerCase().contains(q))
+            .where((item) => item.Name.toLowerCase().contains(q) || item.Address.toLowerCase().contains(q))
             .toList();
       }
     });
@@ -275,16 +276,22 @@ class _AddressListstate extends State<AddressList> {
           child: InkWell(
             borderRadius: BorderRadius.circular(12), // Match card radius
             onTap: () {
-              if (widget.Searchby == 1) _onItemTapped(item);
+              if (widget.Searchby == 1) _onItemTapped(item.Name);
             },
             child: Padding(
               padding: const EdgeInsets.symmetric(vertical: 4.0),
               child: ListTile(
                 title: Text(
-                  item,
+                  item.Name.isNotEmpty ? item.Name : 'UNKNOWN',
                   overflow: TextOverflow.ellipsis,
                   maxLines: 2, // Allow 2 lines just in case address is long
                   style: AppTypography.bodyLarge(color: colour.commonColor),
+                ),
+                subtitle: Text(
+                  item.Address,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: AppTypography.bodySmall(color: Colors.grey.shade600),
                 ),
                 trailing: Icon(Icons.chevron_right, color: Colors.grey.shade400),
               ),

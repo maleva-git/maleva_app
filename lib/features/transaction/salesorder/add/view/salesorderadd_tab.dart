@@ -38,6 +38,31 @@ import 'package:maleva/features/operations/models/job_all_status_model.dart';
 import 'package:maleva/core/models/shared/product_model.dart';
 import 'package:maleva/features/operations/models/job_type_model.dart';
 
+class BoldFirstLineTextController extends TextEditingController {
+  BoldFirstLineTextController({super.text});
+
+  @override
+  TextSpan buildTextSpan({required BuildContext context, TextStyle? style, required bool withComposing}) {
+    final String t = text;
+    if (t.isEmpty) {
+      return TextSpan(style: style, text: t);
+    }
+    final int firstNewline = t.indexOf('\n');
+    if (firstNewline == -1) {
+      return TextSpan(style: style?.copyWith(fontWeight: FontWeight.w700, color: const Color(0xFF15224F)), text: t);
+    }
+    final String firstLine = t.substring(0, firstNewline);
+    final String rest = t.substring(firstNewline);
+    return TextSpan(
+      style: style,
+      children: [
+        TextSpan(text: firstLine, style: style?.copyWith(fontWeight: FontWeight.w700, color: const Color(0xFF15224F))),
+        TextSpan(text: rest, style: style?.copyWith(height: 1.4, color: Colors.blueGrey.shade700)),
+      ],
+    );
+  }
+}
+
 class SalesOrdersAdd extends StatelessWidget {
   final List<SaleEditDetailModel>? SaleDetails;
   final List<dynamic>? SaleMaster;
@@ -76,7 +101,11 @@ class _SalesOrderAddBodyState extends State<_SalesOrderAddBody> with TickerProvi
 
   TextEditingController _getController(String key, String stateValue) {
     if (!_controllers.containsKey(key)) {
-      _controllers[key] = TextEditingController(text: stateValue);
+      if (key.startsWith('addr_')) {
+        _controllers[key] = BoldFirstLineTextController(text: stateValue);
+      } else {
+        _controllers[key] = TextEditingController(text: stateValue);
+      }
     } else {
       final currentText = _controllers[key]!.text;
       if (currentText != stateValue) {
@@ -630,19 +659,22 @@ if (navResult6 != null) { AppGlobals.SelectedVesselTypeName = navResult6; }
         onQtyChanged: (v) => bloc.add(UpdateTextField('txtPickUpQuantity', v)),
         onWeightChanged: (v) => bloc.add(UpdateTextField('txtPickUpWeight', v)),
         onSearch: () async {
-          final r = await Navigator.push(context, MaterialPageRoute(builder: (_) => const AddressList(Searchby: 1, SearchId: 0))); if (r != null) { AppGlobals.SelectAddressList = r; }
+            final r = await Navigator.push(context, MaterialPageRoute(builder: (_) => const AddressList(Searchby: 1, SearchId: 0)));
           if (!context.mounted) return;
-          if (r != null && AppGlobals.SelectAddressList.isNotEmpty) {
-            final details = await sl<SalesOrderAddRepository>().selectAddressDetails(AppGlobals.SelectAddressList);
-            AppGlobals.AddressDetailedList = details.map<AddressDetailsModel>((e) => AddressDetailsModel.fromJson(e)).toList();
+          if (r != null && r.toString().isNotEmpty) {
+            final details = await sl<SalesOrderAddRepository>().selectAddressDetails(r.toString());
+            List<AddressDetailsModel> parsedDetails = details.map<AddressDetailsModel>((e) => AddressDetailsModel.fromJson(e)).toList();
             if (!context.mounted) return;
-            if (AppGlobals.AddressDetailedList.isNotEmpty) {
-              bloc.add(PickUpAddressSelected(AppGlobals.AddressDetailedList[0].Address + (" ${AppGlobals.AddressDetailedList[0].Phone}")));
+            if (parsedDetails.isNotEmpty) {
+              final d = parsedDetails[0];
+              final parts = <String>[];
+              if (d.Name.isNotEmpty) parts.add(d.Name);
+              if (d.Address.isNotEmpty) parts.add(d.Address);
+              if (d.Phone.isNotEmpty) parts.add('Phone: ${d.Phone}');
+              bloc.add(PickUpAddressSelected(parts.join('\n')));
             }
-            AppGlobals.SelectAddressList = "";
-            AppGlobals.AddressDetailedList = [];
           }
-        },
+          },
         onClear: () => bloc.add(PickUpAddressSelected('')),
         onList: () => _showPickUpList(context, state),
         onAdd: () => bloc.add(AddPickUpAddress()),
@@ -663,19 +695,22 @@ if (navResult6 != null) { AppGlobals.SelectedVesselTypeName = navResult6; }
         onQtyChanged: (v) => bloc.add(UpdateTextField('txtDeliveryQuantity', v)),
         onWeightChanged: (v) => bloc.add(UpdateTextField('txtDeliveryWeight', v)),
         onSearch: () async {
-          final r = await Navigator.push(context, MaterialPageRoute(builder: (_) => const AddressList(Searchby: 1, SearchId: 0))); if (r != null) { AppGlobals.SelectAddressList = r; }
+            final r = await Navigator.push(context, MaterialPageRoute(builder: (_) => const AddressList(Searchby: 1, SearchId: 0)));
           if (!context.mounted) return;
-          if (r != null && AppGlobals.SelectAddressList.isNotEmpty) {
-            final details = await sl<SalesOrderAddRepository>().selectAddressDetails(AppGlobals.SelectAddressList);
-            AppGlobals.AddressDetailedList = details.map<AddressDetailsModel>((e) => AddressDetailsModel.fromJson(e)).toList();
+          if (r != null && r.toString().isNotEmpty) {
+            final details = await sl<SalesOrderAddRepository>().selectAddressDetails(r.toString());
+            List<AddressDetailsModel> parsedDetails = details.map<AddressDetailsModel>((e) => AddressDetailsModel.fromJson(e)).toList();
             if (!context.mounted) return;
-            if (AppGlobals.AddressDetailedList.isNotEmpty) {
-              bloc.add(DeliveryAddressSelected(AppGlobals.AddressDetailedList[0].Address + (" ${AppGlobals.AddressDetailedList[0].Phone}")));
+            if (parsedDetails.isNotEmpty) {
+              final d = parsedDetails[0];
+              final parts = <String>[];
+              if (d.Name.isNotEmpty) parts.add(d.Name);
+              if (d.Address.isNotEmpty) parts.add(d.Address);
+              if (d.Phone.isNotEmpty) parts.add('Phone: ${d.Phone}');
+              bloc.add(DeliveryAddressSelected(parts.join('\n')));
             }
-            AppGlobals.SelectAddressList = "";
-            AppGlobals.AddressDetailedList = [];
           }
-        },
+          },
         onClear: () => bloc.add(DeliveryAddressSelected('')),
         onList: () => _showDeliveryList(context, state),
         onAdd: () => bloc.add(AddDeliveryAddress()),
@@ -687,19 +722,22 @@ if (navResult6 != null) { AppGlobals.SelectedVesselTypeName = navResult6; }
           hint: 'Warehouse Address', uniqueId: 'addr_warehouse', value: state.txtWarehouseAddress, enabled: fp["txtWarehouseAddress"] == true,
           onChanged: (v) => bloc.add(UpdateTextField('txtWarehouseAddress', v)),
           onSearch: () async {
-            final r = await Navigator.push(context, MaterialPageRoute(builder: (_) => const AddressList(Searchby: 1, SearchId: 0))); if (r != null) { AppGlobals.SelectAddressList = r; }
+              final r = await Navigator.push(context, MaterialPageRoute(builder: (_) => const AddressList(Searchby: 1, SearchId: 0)));
             if (!context.mounted) return;
-            if (r != null && AppGlobals.SelectAddressList.isNotEmpty) {
-              final details = await sl<SalesOrderAddRepository>().selectAddressDetails(AppGlobals.SelectAddressList);
-              AppGlobals.AddressDetailedList = details.map<AddressDetailsModel>((e) => AddressDetailsModel.fromJson(e)).toList();
+            if (r != null && r.toString().isNotEmpty) {
+              final details = await sl<SalesOrderAddRepository>().selectAddressDetails(r.toString());
+              List<AddressDetailsModel> parsedDetails = details.map<AddressDetailsModel>((e) => AddressDetailsModel.fromJson(e)).toList();
               if (!context.mounted) return;
-              if (AppGlobals.AddressDetailedList.isNotEmpty) {
-                bloc.add(WarehouseAddressSelected(AppGlobals.AddressDetailedList[0].Address + (" ${AppGlobals.AddressDetailedList[0].Phone}")));
+              if (parsedDetails.isNotEmpty) {
+                final d = parsedDetails[0];
+                final parts = <String>[];
+                if (d.Name.isNotEmpty) parts.add(d.Name);
+                if (d.Address.isNotEmpty) parts.add(d.Address);
+                if (d.Phone.isNotEmpty) parts.add('Phone: ${d.Phone}');
+                bloc.add(WarehouseAddressSelected(parts.join('\n')));
               }
-              AppGlobals.SelectAddressList = "";
-              AppGlobals.AddressDetailedList = [];
             }
-          },
+            },
           onClear: () => bloc.add(WarehouseAddressSelected('')),
         ),
       ]),
@@ -861,73 +899,114 @@ if (navResult10 != null) { AppGlobals.SelectEmployeeList = navResult10; }
     required String title,
     required String addressValue,
     required String qtyValue,
-    required String weightValue, // ---> NEW PARAMETER FOR WEIGHT
+    required String weightValue,
     required bool addressEnabled,
     required bool qtyEnabled,
-    required bool weightEnabled, // ---> NEW PARAMETER FOR WEIGHT ENABLE
+    required bool weightEnabled,
     required String addressUniqueId,
     required String qtyUniqueId,
-    required String weightUniqueId, // ---> NEW PARAMETER FOR WEIGHT ID
+    required String weightUniqueId,
     required ValueChanged<String> onAddressChanged,
     required ValueChanged<String> onQtyChanged,
-    required ValueChanged<String> onWeightChanged, // ---> NEW PARAMETER FOR WEIGHT CALLBACK
+    required ValueChanged<String> onWeightChanged,
     required VoidCallback onSearch,
     required VoidCallback onClear,
     required VoidCallback onList,
     required VoidCallback onAdd,
   }) {
-    return _sectionCard(children: [
-      Row(
+    final isDelivery = title.toLowerCase().contains('delivery');
+    final headerIcon = isDelivery ? Icons.local_shipping_rounded : Icons.store_mall_directory_rounded;
+    final iconBgColor = colour.brandLight;
+    final iconColor = colour.brand;
+
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: colour.border),
+        boxShadow: const [BoxShadow(color: Color(0x0A1555F3), blurRadius: 8, offset: Offset(0, 2))],
+      ),
+      child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // --- 1. Address Field (Takes remaining space) ---
-          Expanded(
-            flex: 1,
-            child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              _sectionLabel(title), _gap(),
-              _addressMultiField(hint: title, uniqueId: addressUniqueId, value: addressValue, enabled: addressEnabled, onChanged: onAddressChanged, onSearch: onSearch, onClear: onClear),
-            ]),
-          ),
-          const SizedBox(width: 10),
-
-          // --- 2. Qty Field (Fixed Width) ---
-          SizedBox(
-            width: 70, // Slightly reduced to fit Weight
-            child: Column(children: [
-              _sectionLabel('Qty'), _gap(),
-              _editField(uniqueId: qtyUniqueId, hint: 'Qty', value: qtyValue, enabled: qtyEnabled, onChanged: onQtyChanged),
-            ]),
-          ),
-          const SizedBox(width: 8),
-
-          // ==========================================
-          // --- 3. WEIGHT FIELD (Fixed Width) ---
-          // ==========================================
-          SizedBox(
-            width: 70,
-            child: Column(children: [
-              _sectionLabel('Wt'), _gap(),
-              _editField(
-                  uniqueId: weightUniqueId,
-                  hint: 'Wt',
-                  value: weightValue,
-                  enabled: weightEnabled,
-                  keyboardType: TextInputType.number, // Number keyboard for weight
-                  onChanged: onWeightChanged
+          // HEADER
+          Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(color: iconBgColor, shape: BoxShape.circle),
+                child: Icon(headerIcon, color: iconColor, size: 22),
               ),
-            ]),
+              const SizedBox(width: 12),
+              Text(title.replaceAll(' Address', ' Details'), style: AppTypography.heading2(color: colour.textMain).copyWith(fontWeight: FontWeight.w700, fontSize: 16)),
+            ],
           ),
-          const SizedBox(width: 8),
-          // ==========================================
+          const SizedBox(height: 20),
 
-          // --- 4. Action Buttons ---
-          Column(mainAxisAlignment: MainAxisAlignment.start, children: [
-            const SizedBox(height: 24), _iconBtn(icon: Icons.list_rounded, enabled: true, onTap: onList),
-            const SizedBox(height: 4), _iconBtn(icon: Icons.add_box_rounded, enabled: true, onTap: onAdd),
-          ]),
+          // ADDRESS FIELD
+          _sectionLabel(title), _gap(),
+          _addressMultiField(hint: title, uniqueId: addressUniqueId, value: addressValue, enabled: addressEnabled, onChanged: onAddressChanged, onSearch: onSearch, onClear: onClear),
+          const SizedBox(height: 16),
+
+          // QTY & WT
+          Row(
+            children: [
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    _sectionLabel('Qty'), _gap(),
+                    _editField(uniqueId: qtyUniqueId, hint: 'Qty', value: qtyValue, enabled: qtyEnabled, onChanged: onQtyChanged),
+                  ],
+                ),
+              ),
+              const SizedBox(width: 16),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    _sectionLabel('Wt'), _gap(),
+                    _editField(uniqueId: weightUniqueId, hint: 'Wt', value: weightValue, enabled: weightEnabled, keyboardType: TextInputType.number, onChanged: onWeightChanged),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 20),
+
+          // ACTION BUTTONS
+          Row(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              OutlinedButton.icon(
+                onPressed: onList,
+                icon: const Icon(Icons.format_list_bulleted_rounded, size: 20, color: colour.brand),
+                label: Text('View List', style: AppTypography.bodyLarge(color: colour.brand).copyWith(fontWeight: FontWeight.w600)),
+                style: OutlinedButton.styleFrom(
+                  side: const BorderSide(color: colour.brand),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                ),
+              ),
+              const SizedBox(width: 12),
+              ElevatedButton.icon(
+                onPressed: onAdd,
+                icon: const Icon(Icons.add_rounded, size: 20, color: Colors.white),
+                label: Text('Add New', style: AppTypography.bodyLarge(color: Colors.white).copyWith(fontWeight: FontWeight.w600)),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: colour.brand,
+                  foregroundColor: Colors.white,
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                  elevation: 0,
+                ),
+              ),
+            ],
+          ),
         ],
       ),
-    ]);
+    );
   }
 
   Widget _tabScroll({required List<Widget> children}) => ListView(padding: const EdgeInsets.fromLTRB(14, 14, 14, 100), children: children);
@@ -978,14 +1057,14 @@ if (navResult10 != null) { AppGlobals.SelectEmployeeList = navResult10; }
 
   Widget _addressMultiField({required String hint, required String uniqueId, required String value, required bool enabled, required ValueChanged<String> onChanged, VoidCallback? onSearch, VoidCallback? onClear}) {
     return Container(
-      constraints: const BoxConstraints(minHeight: 80), decoration: BoxDecoration(color: enabled ? Colors.white : colour.surface, borderRadius: BorderRadius.circular(10), border: Border.all(color: colour.border)),
+      constraints: const BoxConstraints(minHeight: 110), decoration: BoxDecoration(color: enabled ? Colors.white : colour.surface, borderRadius: BorderRadius.circular(12), border: Border.all(color: colour.border)),
       child: TextField(
         controller: _getController(uniqueId, value),
-        enabled: enabled, onChanged: onChanged, maxLines: null, minLines: 3, textCapitalization: TextCapitalization.characters,
-        style: AppTypography.bodyLarge(color: colour.textMain),
+        enabled: enabled, onChanged: onChanged, maxLines: null, minLines: 4, textCapitalization: TextCapitalization.characters,
+        style: AppTypography.bodyLarge(color: colour.textMain).copyWith(height: 1.4),
         decoration: InputDecoration(
-          hintText: hint, hintStyle: AppTypography.bodyLarge(color: colour.textSub.withValues(alpha: 0.45)), contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12), border: InputBorder.none,
-          suffixIcon: onSearch != null ? GestureDetector(onTap: value.isEmpty ? onSearch : onClear, child: Padding(padding: const EdgeInsets.all(8), child: Icon(value.isEmpty ? Icons.search_rounded : Icons.close_rounded, color: colour.brand, size: 20))) : null,
+          hintText: hint, hintStyle: AppTypography.bodyLarge(color: colour.textSub.withValues(alpha: 0.45)), contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14), border: InputBorder.none,
+          suffixIcon: onSearch != null ? GestureDetector(onTap: value.isEmpty ? onSearch : onClear, child: Padding(padding: const EdgeInsets.all(8), child: Icon(value.isEmpty ? Icons.search_rounded : Icons.close_rounded, color: colour.brand, size: 24))) : null,
         ),
       ),
     );

@@ -360,11 +360,57 @@ class SalesOrderAddBloc extends Bloc<SalesOrderAddEvent, SalesOrderAddState> {
 
     on<SaveSalesOrderEvent>((event, emit) async {
       if (state is! SalesOrderAddLoaded) return;
-      final s = state as SalesOrderAddLoaded;
+      var s = state as SalesOrderAddLoaded;
 
       if (s.txtCustomer.isEmpty) { emit(s.copyWith(savedMessage: 'Enter Customer Name')); return; }
       if (s.txtJobType.isEmpty) { emit(s.copyWith(savedMessage: 'Enter Job Type')); return; }
       if (s.productViewList.isEmpty) { emit(s.copyWith(savedMessage: 'Add Product Details')); return; }
+
+      // SYNC PICKUP
+      List<dynamic> addrList = List.from(s.pickUpAddressList);
+      List<dynamic> qtyList = List.from(s.pickUpQuantityList);
+      List<dynamic> wtList = List.from(s.pickUpWeightList);
+      if (s.txtPickUpAddress.isNotEmpty) {
+        if (s.pickUpUpdateIndex != null && s.pickUpUpdateIndex! < addrList.length) {
+          addrList[s.pickUpUpdateIndex!] = s.txtPickUpAddress;
+          qtyList[s.pickUpUpdateIndex!] = s.txtPickUpQuantity;
+          if (s.pickUpUpdateIndex! < wtList.length) {
+            wtList[s.pickUpUpdateIndex!] = s.txtPickUpWeight;
+          } else {
+            wtList.add(s.txtPickUpWeight);
+          }
+        } else {
+          addrList.add(s.txtPickUpAddress);
+          qtyList.add(s.txtPickUpQuantity);
+          wtList.add(s.txtPickUpWeight);
+        }
+      }
+      
+      // SYNC DELIVERY
+      List<dynamic> dAddrList = List.from(s.deliveryAddressList);
+      List<dynamic> dQtyList = List.from(s.deliveryQuantityList);
+      List<dynamic> dWtList = List.from(s.deliveryWeightList);
+      if (s.txtDeliveryAddress.isNotEmpty) {
+        if (s.deliveryUpdateIndex != null && s.deliveryUpdateIndex! < dAddrList.length) {
+          dAddrList[s.deliveryUpdateIndex!] = s.txtDeliveryAddress;
+          dQtyList[s.deliveryUpdateIndex!] = s.txtDeliveryQuantity;
+          if (s.deliveryUpdateIndex! < dWtList.length) {
+            dWtList[s.deliveryUpdateIndex!] = s.txtDeliveryWeight;
+          } else {
+            dWtList.add(s.txtDeliveryWeight);
+          }
+        } else {
+          dAddrList.add(s.txtDeliveryAddress);
+          dQtyList.add(s.txtDeliveryQuantity);
+          dWtList.add(s.txtDeliveryWeight);
+        }
+      }
+
+      s = s.copyWith(
+        pickUpAddressList: addrList, pickUpQuantityList: qtyList, pickUpWeightList: wtList,
+        deliveryAddressList: dAddrList, deliveryQuantityList: dQtyList, deliveryWeightList: dWtList,
+        txtPickUpAddress: '', txtDeliveryAddress: ''
+      );
 
       emit(s.copyWith(progress: false));
 

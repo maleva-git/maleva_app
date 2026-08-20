@@ -11,7 +11,9 @@ import 'package:maleva/core/colors/colors.dart' as colour;
 import 'package:maleva/features/transport/models/fuelselect_model.dart';
 
 
-// ── Entry Point ───────────────────────────────────────────────────────────────
+// ── Entry Point ────────────────────────────────────────────
+//
+// ───────────────────
 class FuelDiffPage extends StatelessWidget {
   const FuelDiffPage({super.key});
 
