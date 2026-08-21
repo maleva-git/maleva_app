@@ -1,5 +1,6 @@
 
 import 'package:flutter/material.dart';
+import 'package:maleva/core/utils/dialog_helper.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 import '../models/fuelentry_model.dart';
@@ -8,6 +9,11 @@ import '../bloc/fuelentry_event.dart';
 import '../../../../../core/network/api_services/master_api.dart';
 import '../../../../../core/models/shared/get_truck_model.dart';
 import '../../../../../core/colors/colors.dart';
+import '../../../../../core/network/api_constants.dart';
+import '../../../../../core/network/legacy_api_repository.dart';
+import '../../../../../core/di/injection.dart';
+import '../../../../../core/utils/app_globals.dart';
+import '../../../../../core/utils/app_preferences.dart';
 import '../../../../../core/widgets/custom_app_bar.dart';
 
 class FuelEntryAddEdit extends StatefulWidget {
@@ -26,6 +32,7 @@ class _FuelEntryAddEditState extends State<FuelEntryAddEdit> {
   List<GetTruckModel> driverList = [];
   bool isLoadingMasters = true;
 
+  final TextEditingController entryNoController = TextEditingController();
   final TextEditingController dateController = TextEditingController();
   final TextEditingController remarksController = TextEditingController();
   
@@ -50,8 +57,10 @@ class _FuelEntryAddEditState extends State<FuelEntryAddEdit> {
     _model = widget.entry ?? FuelEntryModel();
     if (_model.entryDate.isNotEmpty) {
       dateController.text = _model.entryDate;
+      entryNoController.text = _model.entryNo;
     } else {
       dateController.text = DateFormat('dd/MM/yyyy').format(DateTime.now());
+      _fetchMaxFuelNo();
     }
     remarksController.text = _model.remarks;
     
@@ -71,6 +80,42 @@ class _FuelEntryAddEditState extends State<FuelEntryAddEdit> {
     dgAmountController.text = _model.dgAmount == 0 ? "" : _model.dgAmount.toString();
     
     _loadMasters();
+  }
+
+  void _calculateDifferences() {
+    double aLiter = double.tryParse(aLiterController.text) ?? 0;
+    double pLiter = double.tryParse(pLiterController.text) ?? 0;
+    double gLiter = double.tryParse(gLiterController.text) ?? 0;
+    
+    double aAmount = double.tryParse(aAmountController.text) ?? 0;
+    double pAmount = double.tryParse(pAmountController.text) ?? 0;
+    double gAmount = double.tryParse(gAmountController.text) ?? 0;
+    
+    dpLiterController.text = (aLiter - pLiter).toStringAsFixed(2);
+    dpAmountController.text = (aAmount - pAmount).toStringAsFixed(2);
+    dgLiterController.text = (aLiter - gLiter).toStringAsFixed(2);
+    dgAmountController.text = (aAmount - gAmount).toStringAsFixed(2);
+    
+    _model.dpLiter = aLiter - pLiter;
+    _model.dpAmount = aAmount - pAmount;
+    _model.dgLiter = aLiter - gLiter;
+    _model.dgAmount = aAmount - gAmount;
+  }
+
+  Future<void> _fetchMaxFuelNo() async {
+    try {
+      final comId = AppPreferences.getComid();
+      var result = await sl<LegacyApiRepository>().apiGetString('${ApiConstants.apiMaxFuelEntryNo}$comId');
+      if (result.isNotEmpty) {
+        result = result.replaceAll('"', ''); // Remove any double quotes
+        if (mounted) {
+          setState(() {
+            entryNoController.text = result;
+            _model.entryNo = result;
+          });
+        }
+      }
+    } catch (_) {}
   }
 
   Future<void> _loadMasters() async {
@@ -152,7 +197,7 @@ class _FuelEntryAddEditState extends State<FuelEntryAddEdit> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.grey.shade100,
-      appBar: const CustomGradientAppBar(title: 'Fuel Entry Details', isTablet: false),
+      appBar: const CustomGradientAppBar(title: 'Fuel Entry Details', isTablet: false, showBackButton: true),
       body: isLoadingMasters 
         ? const Center(child: CircularProgressIndicator()) 
         : Padding(
@@ -167,69 +212,83 @@ class _FuelEntryAddEditState extends State<FuelEntryAddEdit> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     _buildSectionHeader('General Info', Icons.info_outline),
-                    TextFormField(
-                      controller: dateController,
-                      decoration: InputDecoration(
-                        labelText: 'Fuel Date',
-                        prefixIcon: const Icon(Icons.calendar_today, color: AppColors.appBarColor),
-                        filled: true,
-                        fillColor: Colors.grey.shade50,
-                        border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
-                      ),
-                      readOnly: true,
-                      onTap: () async {
-                        DateTime? picked = await showDatePicker(
-                          context: context, 
-                          initialDate: DateTime.now(), 
-                          firstDate: DateTime(2000), 
-                          lastDate: DateTime(2100)
-                        );
-                        if (picked != null) {
-                          setState(() {
-                            dateController.text = DateFormat('dd/MM/yyyy').format(picked);
-                          });
-                        }
-                      },
-                    ),
-                    const SizedBox(height: 16),
                     Row(
                       children: [
                         Expanded(
-                          child: DropdownButtonFormField<int>(
-                            isExpanded: true,
-                            value: _model.truckId == 0 ? null : _model.truckId,
+                          child: TextFormField(
+                            controller: entryNoController,
+                            readOnly: true,
                             decoration: InputDecoration(
-                              labelText: 'Select Truck',
-                              prefixIcon: const Icon(Icons.local_shipping, color: AppColors.appBarColor),
+                              labelText: 'Entry No',
                               filled: true,
-                              fillColor: Colors.grey.shade50,
+                              fillColor: Colors.grey.shade200,
+                              prefixIcon: const Icon(Icons.numbers, color: Colors.grey, size: 20),
+                              contentPadding: const EdgeInsets.symmetric(vertical: 12, horizontal: 12),
                               border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
                             ),
-                            items: truckList.map((t) => DropdownMenuItem(value: t.Id, child: Text(t.AccountName))).toList(),
-                            onChanged: (val) {
-                              setState(() { _model.truckId = val ?? 0; });
-                            },
                           ),
                         ),
                         const SizedBox(width: 12),
                         Expanded(
-                          child: DropdownButtonFormField<int>(
-                            isExpanded: true,
-                            value: _model.driverId == 0 ? null : _model.driverId,
+                          child: TextFormField(
+                            controller: dateController,
                             decoration: InputDecoration(
-                              labelText: 'Select Driver',
-                              prefixIcon: const Icon(Icons.person, color: AppColors.appBarColor),
+                              labelText: 'Fuel Date',
+                              prefixIcon: const Icon(Icons.calendar_today, color: AppColors.appBarColor),
                               filled: true,
                               fillColor: Colors.grey.shade50,
+                              contentPadding: const EdgeInsets.symmetric(vertical: 12, horizontal: 12),
                               border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
                             ),
-                            items: driverList.map((d) => DropdownMenuItem(value: d.Id, child: Text(d.AccountName))).toList(),
-                            onChanged: (val) {
-                              setState(() { _model.driverId = val ?? 0; });
+                            readOnly: true,
+                            onTap: () async {
+                              DateTime? picked = await showDatePicker(
+                                context: context, 
+                                initialDate: DateTime.now(), 
+                                firstDate: DateTime(2000), 
+                                lastDate: DateTime(2100)
+                              );
+                              if (picked != null) {
+                                setState(() {
+                                  dateController.text = DateFormat('dd/MM/yyyy').format(picked);
+                                });
+                              }
                             },
                           ),
                         ),
                       ],
+                    ),
+                    const SizedBox(height: 16),
+                    DropdownButtonFormField<int>(
+                      isExpanded: true,
+                      value: _model.truckId == 0 ? null : _model.truckId,
+                      decoration: InputDecoration(
+                        labelText: 'Select Truck',
+                        prefixIcon: const Icon(Icons.local_shipping, color: AppColors.appBarColor),
+                        filled: true,
+                        fillColor: Colors.grey.shade50,
+                        border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+                      ),
+                      items: truckList.map((t) => DropdownMenuItem(value: t.Id, child: Text(t.AccountName, overflow: TextOverflow.ellipsis))).toList(),
+                      onChanged: (val) {
+                        setState(() { _model.truckId = val ?? 0; });
+                      },
+                    ),
+                    const SizedBox(height: 16),
+                    DropdownButtonFormField<int>(
+                      isExpanded: true,
+                      value: _model.driverId == 0 ? null : _model.driverId,
+                      decoration: InputDecoration(
+                        labelText: 'Select Driver',
+                        prefixIcon: const Icon(Icons.person, color: AppColors.appBarColor),
+                        filled: true,
+                        fillColor: Colors.grey.shade50,
+                        border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+                      ),
+                      items: driverList.map((d) => DropdownMenuItem(value: d.Id, child: Text(d.AccountName, overflow: TextOverflow.ellipsis))).toList(),
+                      onChanged: (val) {
+                        setState(() { _model.driverId = val ?? 0; });
+                      },
                     ),
                     const SizedBox(height: 16),
                     TextFormField(
@@ -254,8 +313,8 @@ class _FuelEntryAddEditState extends State<FuelEntryAddEdit> {
                     _buildSectionHeader('App Entry', Icons.phone_android),
                     Row(
                       children: [
-                        _buildTextField('App Liter', aLiterController, (v) => _model.aLiter = double.tryParse(v) ?? 0, prefixIcon: Icons.water_drop),
-                        _buildTextField('App Amount', aAmountController, (v) => _model.aAmount = double.tryParse(v) ?? 0, prefixIcon: Icons.attach_money),
+                        _buildTextField('App Liter', aLiterController, (v) { _model.aLiter = double.tryParse(v) ?? 0; _calculateDifferences(); }, prefixIcon: Icons.water_drop),
+                        _buildTextField('App Amount', aAmountController, (v) { _model.aAmount = double.tryParse(v) ?? 0; _calculateDifferences(); }, prefixIcon: Icons.attach_money),
                       ],
                     ),
                   ],
@@ -269,9 +328,9 @@ class _FuelEntryAddEditState extends State<FuelEntryAddEdit> {
                     _buildSectionHeader('Patron Entry', Icons.account_balance_wallet),
                     Row(
                       children: [
-                        _buildTextField('Patron Liter', pLiterController, (v) => _model.pLiter = double.tryParse(v) ?? 0),
+                        _buildTextField('Patron Liter', pLiterController, (v) { _model.pLiter = double.tryParse(v) ?? 0; _calculateDifferences(); }),
                         _buildTextField('Patron Rate', pRateController, (v) => _model.pRate = double.tryParse(v) ?? 0),
-                        _buildTextField('Patron Amount', pAmountController, (v) => _model.pAmount = double.tryParse(v) ?? 0),
+                        _buildTextField('Patron Amount', pAmountController, (v) { _model.pAmount = double.tryParse(v) ?? 0; _calculateDifferences(); }),
                       ],
                     ),
                   ],
@@ -285,8 +344,8 @@ class _FuelEntryAddEditState extends State<FuelEntryAddEdit> {
                     _buildSectionHeader('GPS Entry', Icons.gps_fixed),
                     Row(
                       children: [
-                        _buildTextField('GPS Liter', gLiterController, (v) => _model.gLiter = double.tryParse(v) ?? 0),
-                        _buildTextField('GPS Amount', gAmountController, (v) => _model.gAmount = double.tryParse(v) ?? 0),
+                        _buildTextField('GPS Liter', gLiterController, (v) { _model.gLiter = double.tryParse(v) ?? 0; _calculateDifferences(); }),
+                        _buildTextField('GPS Amount', gAmountController, (v) { _model.gAmount = double.tryParse(v) ?? 0; _calculateDifferences(); }),
                       ],
                     ),
                   ],
@@ -329,7 +388,7 @@ class _FuelEntryAddEditState extends State<FuelEntryAddEdit> {
                   label: const Text('SAVE FUEL ENTRY', style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
                   onPressed: () {
                     if (_model.truckId == 0 || _model.driverId == 0) {
-                       ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Please select Truck and Driver')));
+                       toastMsg('Please select Truck and Driver', '', context);
                        return;
                     }
                     _model.entryDate = dateController.text;
