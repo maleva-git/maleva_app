@@ -15,6 +15,16 @@ class FuelEntryBloc extends Bloc<FuelEntryEvent, FuelEntryState> {
     on<FuelEntryDateChanged>(_onDateChanged);
     on<FuelEntryLiterChanged>(_onLiterChanged);
     on<FuelEntryAmountChanged>(_onAmountChanged);
+    on<FuelEntryRemarksChanged>((event, emit) { if (state is FuelEntryLoaded) emit((state as FuelEntryLoaded).copyWith(remarks: event.value)); });
+    on<FuelEntryPLiterChanged>((event, emit) { if (state is FuelEntryLoaded) emit((state as FuelEntryLoaded).copyWith(pLiter: event.value)); });
+    on<FuelEntryPRateChanged>((event, emit) { if (state is FuelEntryLoaded) emit((state as FuelEntryLoaded).copyWith(pRate: event.value)); });
+    on<FuelEntryPAmountChanged>((event, emit) { if (state is FuelEntryLoaded) emit((state as FuelEntryLoaded).copyWith(pAmount: event.value)); });
+    on<FuelEntryGLiterChanged>((event, emit) { if (state is FuelEntryLoaded) emit((state as FuelEntryLoaded).copyWith(gLiter: event.value)); });
+    on<FuelEntryGAmountChanged>((event, emit) { if (state is FuelEntryLoaded) emit((state as FuelEntryLoaded).copyWith(gAmount: event.value)); });
+    on<FuelEntryDPLiterChanged>((event, emit) { if (state is FuelEntryLoaded) emit((state as FuelEntryLoaded).copyWith(dpLiter: event.value)); });
+    on<FuelEntryDPAmountChanged>((event, emit) { if (state is FuelEntryLoaded) emit((state as FuelEntryLoaded).copyWith(dpAmount: event.value)); });
+    on<FuelEntryDGLiterChanged>((event, emit) { if (state is FuelEntryLoaded) emit((state as FuelEntryLoaded).copyWith(dgLiter: event.value)); });
+    on<FuelEntryDGAmountChanged>((event, emit) { if (state is FuelEntryLoaded) emit((state as FuelEntryLoaded).copyWith(dgAmount: event.value)); });
     on<FuelEntrySaveRequested>(_onSaveRequested);
   }
 

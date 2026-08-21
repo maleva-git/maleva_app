@@ -1,6 +1,9 @@
 
+import '../../../../../core/utils/app_preferences.dart';
+
 class FuelEntryModel {
   int id;
+  String entryNo;
   String entryDate;
   int truckId;
   String truckName;
@@ -27,6 +30,7 @@ class FuelEntryModel {
 
   FuelEntryModel({
     this.id = 0,
+    this.entryNo = '',
     this.entryDate = '',
     this.truckId = 0,
     this.truckName = '',
@@ -50,6 +54,7 @@ class FuelEntryModel {
   factory FuelEntryModel.fromJson(Map<String, dynamic> json) {
     return FuelEntryModel(
       id: json['Id'] ?? 0,
+      entryNo: json['CNumberDisplay'] ?? '',
       entryDate: json['SSaleDate'] ?? '',
       truckId: json['TruckRefid'] ?? 0,
       truckName: json['TruckName'] ?? '',
@@ -72,11 +77,25 @@ class FuelEntryModel {
   }
 
   Map<String, dynamic> toJson() {
+    String formattedDate = entryDate;
+    try {
+      if (entryDate.contains('/')) {
+        final parts = entryDate.split('/');
+        if (parts.length == 3) {
+          formattedDate = "${parts[2]}-${parts[1]}-${parts[0]}T00:00:00.000";
+        }
+      }
+    } catch (_) {}
+
     return {
       'Id': id,
-      'SaleDate': entryDate,
+      'CNumberDisplay': entryNo,
+      'CNumber': 0,
+      'SaleDate': formattedDate,
       'TruckRefid': truckId,
       'DriverRefId': driverId,
+      'UserRefId': null,
+      'EmployeeRefId': AppPreferences.getEmpRefId() == 0 ? null : AppPreferences.getEmpRefId(),
       'Remarks': remarks,
       'Aliter': aLiter,
       'AAmount': aAmount,

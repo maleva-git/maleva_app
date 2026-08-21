@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 import 'package:maleva/core/utils/app_globals.dart';
-
 import 'package:maleva/features/transaction/salesorder/add/bloc/salesorderadd_event.dart';
 import 'package:maleva/features/transaction/salesorder/add/bloc/salesorderadd_state.dart';
 import 'package:maleva/features/transaction/salesorder/add/data/salesorderadd_repository.dart';
@@ -81,9 +80,7 @@ class SalesOrderAddBloc extends Bloc<SalesOrderAddEvent, SalesOrderAddState> {
       emit(_updateDateField(state as SalesOrderAddLoaded, event.field, event.value));
     });
 
-// ──────────────────────────────────────────────────────────────────────────
-    // ✅ BUG FIX: Prevent API Crash when Customer is Cleared (id == 0)
-    // ──────────────────────────────────────────────────────────────────────────
+
     on<CustomerSelected>((event, emit) async {
       if (state is! SalesOrderAddLoaded) return;
       final s = state as SalesOrderAddLoaded;
@@ -98,9 +95,7 @@ class SalesOrderAddBloc extends Bloc<SalesOrderAddEvent, SalesOrderAddState> {
       AppGlobals.CustomerCurrencyValue = await _repository.loadCustomerCurrency(event.id);emit(s.copyWith(txtCustomer: event.name, custId: event.id, currencyValue: AppGlobals.CustomerCurrencyValue));
     });
 
-    // ──────────────────────────────────────────────────────────────────────────
-    // ✅ BUG FIX: Prevent API Crash when Job Type is Cleared (id == 0)
-    // ──────────────────────────────────────────────────────────────────────────
+
     on<JobTypeSelected>((event, emit) async {
       if (state is! SalesOrderAddLoaded) return;
       final s = state as SalesOrderAddLoaded;

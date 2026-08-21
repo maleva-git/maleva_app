@@ -21,7 +21,10 @@ class FuelEntryRepositoryImpl implements FuelEntryRepository {
     };
     final result = await ApiClient.postRequest('${ApiConstants.port}/api/FuelEntryApp/SelectFuelEntry', body);
     if (result != null && result is List) {
-      return result.map((e) => FuelEntryModel.fromJson(e)).toList();
+      return result
+          .where((e) => e['Active'] != 2 && e['FStatus'] != 2)
+          .map((e) => FuelEntryModel.fromJson(e))
+          .toList();
     }
     return [];
   }
@@ -38,7 +41,7 @@ class FuelEntryRepositoryImpl implements FuelEntryRepository {
   @override
   Future<bool> deleteFuelEntry(int id) async {
     final comid = AppPreferences.getComid();
-    final result = await ApiClient.postRequest('${ApiConstants.port}/api/FuelEntryApp/DeleteFuelEntry?Id=$id&Comid=$comid&Mobile=1', null);
+    final result = await ApiClient.postRequest('${ApiConstants.port}/api/FuelEntryApp/DeleteFuelEntry?Id=$id&Comid=$comid&Mobile=0', null, headers: {"Comid": comid.toString()});
     return result != null;
   }
 }

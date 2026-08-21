@@ -428,9 +428,6 @@ class _SaleOrderViewState extends State<_SaleOrderView> {
   }
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// Date row widget
-// ─────────────────────────────────────────────────────────────────────────────
 
 class _DateRow extends StatelessWidget {
   const _DateRow({

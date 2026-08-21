@@ -203,9 +203,9 @@ class _FuelEntryCard extends StatelessWidget {
           _TruckBanner(isTablet: isTablet),
           SizedBox(height: isTablet ? 24 : 20),
 
-          // ── Fuel No (read-only) ─────────────────────
+          // ── Entry No (read-only) ─────────────────────
           _FormRow(
-            label: 'Fuel No',
+            label: 'Entry No',
             isTablet: isTablet,
             child: _ReadonlyField(value: state.fuelNo, isTablet: isTablet),
           ),
