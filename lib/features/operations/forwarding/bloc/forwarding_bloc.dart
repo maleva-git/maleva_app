@@ -171,11 +171,15 @@ class FWUpdateBloc extends Bloc<FWUpdateEvent, FWUpdateState> {
       );
     }
 
-    final updatedTab = buildTabFromMaster(event.type, s.tabByType(event.type)).copyWith(
-      images: fetchedImages,
-    );
+    final tab1 = buildTabFromMaster(1, s.tab1);
+    final tab2 = buildTabFromMaster(2, s.tab2);
+    final tab3 = buildTabFromMaster(3, s.tab3);
 
-    final newState = s.copyWith(saleOrderId: newSaleOrderId).withTab(event.type, updatedTab);
+    final updatedTab1 = event.type == 1 ? tab1.copyWith(images: fetchedImages) : tab1;
+    final updatedTab2 = event.type == 2 ? tab2.copyWith(images: fetchedImages) : tab2;
+    final updatedTab3 = event.type == 3 ? tab3.copyWith(images: fetchedImages) : tab3;
+
+    final newState = s.copyWith(saleOrderId: newSaleOrderId, tab1: updatedTab1, tab2: updatedTab2, tab3: updatedTab3);
     emit(newState);
   }
   void _onOverlayDismissed(FWUpdateOverlayDismissed event, Emitter<FWUpdateState> emit) {
@@ -263,6 +267,9 @@ class FWUpdateBloc extends Bloc<FWUpdateEvent, FWUpdateState> {
         'ForwardingExitRef2': s.tab2.exRef,
         'ForwardingEnterRef3': s.tab3.enRef,
         'ForwardingExitRef3': s.tab3.exRef,
+        'ForwardingSMKNo': s.tab1.smkText.isEmpty ? null : s.tab1.smkText,
+        'ForwardingSMKNo2': s.tab2.smkText.isEmpty ? null : s.tab2.smkText,
+        'ForwardingSMKNo3': s.tab3.smkText.isEmpty ? null : s.tab3.smkText,
       };
 
       final result = await repository.updateForwarding(master);

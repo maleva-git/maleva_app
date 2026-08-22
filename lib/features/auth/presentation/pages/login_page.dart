@@ -84,9 +84,7 @@ class Appuserloginmobile extends StatelessWidget {
         context.go('/dashboard/air_freight');
         break;
       default:
-
-
-        context.go('/unauthorized');
+        context.go('/dashboard/boarding');
         break;
     }
   }
