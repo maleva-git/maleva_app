@@ -1,5 +1,6 @@
 import 'package:maleva/core/theme/app_typography.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -1089,12 +1090,34 @@ if (navResult10 != null) { AppGlobals.SelectEmployeeList = navResult10; }
             final date = await showDatePicker(context: context, initialDate: DateTime.now(), firstDate: DateTime(2020), lastDate: DateTime(2100), builder: (ctx, child) => Theme(data: Theme.of(ctx).copyWith(colorScheme: const ColorScheme.light(primary: colour.brand, onPrimary: Colors.white, onSurface: colour.textMain)), child: child!));
             if (date != null) {
               if (showTime) {
-                if (!context.mounted) return;
-                final time = await showTimePicker(context: context, initialTime: TimeOfDay.now(), builder: (ctx, child) => MediaQuery(data: MediaQuery.of(ctx).copyWith(alwaysUse24HourFormat: true), child: child!));
-                // 2. INJECTED DateTime.now().second SO IT DOESN'T DEFAULT TO 0 SECONDS
-                final combined = DateTime(date.year, date.month, date.day, time?.hour ?? 0, time?.minute ?? 0, DateTime.now().second);
-                bloc.add(UpdateDate(dateKey, DateFormat("yyyy-MM-dd HH:mm:ss").format(combined)));
-              } else {
+                  if (!context.mounted) return;
+                  final time = await showTimePicker(context: context, initialTime: TimeOfDay.now(), builder: (ctx, child) => MediaQuery(data: MediaQuery.of(ctx).copyWith(alwaysUse24HourFormat: true), child: child!));
+                  if (time != null && context.mounted) {
+                    int tempSec = 0;
+                    final sec = await showDialog<int>(
+                      context: context,
+                      builder: (BuildContext ctx) {
+                        return AlertDialog(
+                          title: Text('Select Seconds', style: AppTypography.heading2(color: colour.brandDark)),
+                          content: SizedBox(
+                            height: 150,
+                            child: CupertinoPicker(
+                              scrollController: FixedExtentScrollController(initialItem: 0),
+                              itemExtent: 32.0,
+                              onSelectedItemChanged: (int index) => tempSec = index,
+                              children: List<Widget>.generate(60, (int index) => Center(child: Text(index.toString().padLeft(2, '0')))),
+                            ),
+                          ),
+                          actions: [
+                            TextButton(child: const Text('OK'), onPressed: () => Navigator.of(ctx).pop(tempSec)),
+                          ],
+                        );
+                      },
+                    );
+                    final combined = DateTime(date.year, date.month, date.day, time.hour, time.minute, sec ?? 0);
+                    bloc.add(UpdateDate(dateKey, DateFormat("yyyy-MM-dd HH:mm:ss").format(combined)));
+                  }
+                } else {
                 bloc.add(UpdateDate(dateKey, DateFormat("yyyy-MM-dd").format(date)));
               }
             }

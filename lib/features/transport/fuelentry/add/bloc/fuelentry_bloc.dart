@@ -86,7 +86,7 @@ class FuelEntryBloc extends Bloc<FuelEntryEvent, FuelEntryState> {
       final master = [
         {
           'SaleDate':       DateTime.parse(s.date).toIso8601String(),
-          'CNumberDisplay': '0',
+          'CNumberDisplay': '',
           'CNumber':        0,
           'Id':             0,
           'CompanyRefId':   AppGlobals.Comid,
@@ -163,8 +163,7 @@ class FuelEntryBloc extends Bloc<FuelEntryEvent, FuelEntryState> {
   Future<String> _fetchMaxFuelNo() async {
     try {
       final comId = AppGlobals.storagenew.getInt('Comid') ?? 0;
-      final result = await sl<LegacyApiRepository>().apiGetString(
-          '${ApiConstants.apiMaxFuelEntryNo}$comId');
+      final result = await sl<LegacyApiRepository>().apiGetString('');
       return result.isNotEmpty ? result : '';
     } catch (_) {
       return '';

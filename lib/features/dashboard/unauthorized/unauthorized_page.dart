@@ -1,78 +1,74 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../../../../core/utils/app_preferences.dart';
+import '../../../../core/theme/palette.dart';
+import '../../../../core/theme/app_typography.dart';
 
-class UnauthorizedPage extends StatefulWidget {
+class UnauthorizedPage extends StatelessWidget {
   const UnauthorizedPage({super.key});
-
-  @override
-  State<UnauthorizedPage> createState() => _UnauthorizedPageState();
-}
-
-class _UnauthorizedPageState extends State<UnauthorizedPage> {
-  @override
-  void initState() {
-    super.initState();
-    _handleAutoLogout();
-  }
-
-  Future<void> _handleAutoLogout() async {
-    // Wait for 3 seconds to let the user read the message
-    await Future.delayed(const Duration(seconds: 3));
-    
-    if (!mounted) return;
-    
-    // Clear user preferences and logout
-    await AppPreferences.clearOnLogout();
-    
-    // Redirect to login page
-    if (mounted) {
-      context.go('/login');
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: Palette.grey100,
+      appBar: AppBar(
+        automaticallyImplyLeading: false,
+        elevation: 0,
+        backgroundColor: Colors.transparent,
+        title: Text('Maleva', style: AppTypography.heading1(color: Palette.textDark)),
+        centerTitle: true,
+      ),
       body: Center(
         child: Padding(
-          padding: const EdgeInsets.all(24.0),
+          padding: const EdgeInsets.symmetric(horizontal: 32.0),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              const Icon(
-                Icons.block_outlined,
-                size: 80,
-                color: Colors.redAccent,
-              ),
-              const SizedBox(height: 24),
-              const Text(
-                'Access Denied',
-                style: TextStyle(
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.black87,
+              Container(
+                padding: const EdgeInsets.all(20),
+                decoration: BoxDecoration(
+                  color: Palette.blue400.withOpacity(0.1),
+                  shape: BoxShape.circle,
                 ),
-              ),
-              const SizedBox(height: 16),
-              const Text(
-                'Please contact your IT team. You do not have access to this dashboard.',
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  fontSize: 16,
-                  color: Colors.black54,
-                  height: 1.5,
+                child: const Icon(
+                  Icons.admin_panel_settings_outlined,
+                  size: 80,
+                  color: Palette.blue400,
                 ),
               ),
               const SizedBox(height: 32),
-              const CircularProgressIndicator(),
+              Text(
+                'Welcome to Maleva!',
+                style: AppTypography.heading1(color: Palette.textDark),
+                textAlign: TextAlign.center,
+              ),
               const SizedBox(height: 16),
-              const Text(
-                'Auto-logging out...',
-                style: TextStyle(
-                  fontSize: 14,
-                  color: Colors.grey,
+              Text(
+                'It looks like your account has not been assigned a specific dashboard yet. Kindly reach out to your Admin or HR department to configure your access permissions.',
+                textAlign: TextAlign.center,
+                style: AppTypography.bodyLarge(color: Palette.textMuted).copyWith(height: 1.5),
+              ),
+              const SizedBox(height: 48),
+              SizedBox(
+                width: double.infinity,
+                height: 50,
+                child: ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Palette.blue600,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                  ),
+                  onPressed: () async {
+                    await AppPreferences.clearOnLogout();
+                    if (context.mounted) {
+                      context.go('/login');
+                    }
+                  },
+                  child: Text(
+                    'Back to Login',
+                    style: AppTypography.heading2(color: Colors.white),
+                  ),
                 ),
               ),
             ],

@@ -14,6 +14,7 @@ import '../bloc/planning_bloc.dart';
 import '../bloc/planning_event.dart';
 import '../bloc/planning_state.dart';
 import 'package:maleva/core/colors/colors.dart' as colour;
+import 'package:maleva/core/widgets/maleva_widget/maleva_grid.dart';
 import 'package:maleva/core/models/shared/planning_detail_model.dart';
 import 'package:maleva/core/models/shared/employee_model.dart';
 import 'package:maleva/core/models/shared/planning_master_model.dart';
@@ -383,49 +384,26 @@ class _DetailsSection extends StatelessWidget {
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
             child: SingleChildScrollView(
               scrollDirection: Axis.horizontal,
-              child: Container(
-                decoration: BoxDecoration(
-                  border: Border.all(color: colour.kBorder, width: 1),
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: DataTable(
-                  headingRowColor: WidgetStateProperty.all(colour.kCobalt.withValues(alpha: 0.05)),
-                  columnSpacing: 20,
-                  dataRowMinHeight: 40,
-                  dataRowMaxHeight: 60,
-                  headingRowHeight: 40,
-                  columns: [
-                    _buildCol('Job No', isTablet),
-                    _buildCol('Job Date', isTablet),
-                    _buildCol('Truck Name', isTablet),
-                    _buildCol('Driver Name', isTablet),
-                    _buildCol('Pickup Date', isTablet),
-                    _buildCol('Delivery Date', isTablet),
-                    _buildCol('Origin', isTablet),
-                    _buildCol('Destination', isTablet),
-                    _buildCol('Package', isTablet),
-                    _buildCol('Weight', isTablet),
-                    _buildCol('Remarks', isTablet),
+              child: MalevaGrid(
+                  isTablet: isTablet,
+                  columns: const [
+                    'Job No', 'Job Date', 'Truck Name', 'Driver Name', 'Pickup Date', 
+                    'Delivery Date', 'Origin', 'Destination', 'Package', 'Weight', 'Remarks'
                   ],
-                  rows: details.map((item) {
-                    return DataRow(
-                      cells: [
-                        _buildCell(item.jobNo, isTablet, color: colour.kCobalt, fw: FontWeight.w700),
-                        _buildCell(item.jobDate, isTablet),
-                        _buildCell(item.truckName, isTablet, color: colour.kSuccess, fw: FontWeight.w600),
-                        _buildCell(item.driverName, isTablet),
-                        _buildCell(item.pickupDate, isTablet),
-                        _buildCell(item.deliveryDate, isTablet),
-                        _buildCell(item.origin, isTablet),
-                        _buildCell(item.destination, isTablet),
-                        _buildCell(item.package, isTablet),
-                        _buildCell(item.weight, isTablet),
-                        _buildCell(item.remarks, isTablet, color: AppTokens.planTextMuted),
-                      ],
-                    );
-                  }).toList(),
+                  rows: details.map((item) => [
+                    MalevaGridCell(item.jobNo, isTablet: isTablet, color: colour.kCobalt, fw: FontWeight.w700),
+                    MalevaGridCell(item.jobDate, isTablet: isTablet),
+                    MalevaGridCell(item.truckName, isTablet: isTablet, color: colour.kSuccess, fw: FontWeight.w600),
+                    MalevaGridCell(item.driverName, isTablet: isTablet),
+                    MalevaGridCell(item.pickupDate, isTablet: isTablet),
+                    MalevaGridCell(item.deliveryDate, isTablet: isTablet),
+                    MalevaGridCell(item.origin, isTablet: isTablet),
+                    MalevaGridCell(item.destination, isTablet: isTablet),
+                    MalevaGridCell(item.package, isTablet: isTablet),
+                    MalevaGridCell(item.weight, isTablet: isTablet),
+                    MalevaGridCell(item.remarks, isTablet: isTablet, color: AppTokens.planTextMuted),
+                  ]).toList(),
                 ),
-              ),
             ),
           ),
           const SizedBox(height: 12),
@@ -434,24 +412,8 @@ class _DetailsSection extends StatelessWidget {
     );
   }
 
-  DataColumn _buildCol(String text, bool isTablet) {
-    return DataColumn(
-      label: Text(
-        text,
-        style: _label(isTablet ? 12 : 11, color: AppTokens.planTextMuted, fw: FontWeight.w700),
-      ),
-    );
+  
   }
-
-  DataCell _buildCell(String text, bool isTablet, {Color? color, FontWeight? fw}) {
-    return DataCell(
-      Text(
-        text.isEmpty || text == 'null' ? '-' : text,
-        style: _body(isTablet ? 12 : 11, color: color ?? colour.kText, fw: fw ?? FontWeight.normal),
-      ),
-    );
-  }
-}
 
 class _FilterFab extends StatelessWidget {
   @override

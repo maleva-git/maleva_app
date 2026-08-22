@@ -6,6 +6,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:maleva/core/utils/app_globals.dart';
+import 'package:maleva/core/widgets/maleva_widget/maleva_grid.dart';
 import 'package:maleva/features/transaction/salesorder/view/data/salesorderview_repository.dart';
 import 'package:maleva/menu/menulist.dart';
 import 'package:maleva/core/colors/colors.dart' as colour;
@@ -808,22 +809,44 @@ class _DetailPanel extends StatelessWidget {
       ),
       padding: const EdgeInsets.all(16),
       child: state.selectedDetails.isEmpty
-          ? Center(
-              child: Padding(
-                padding: const EdgeInsets.symmetric(vertical: 16),
-                child: Text('No items found.',
-                    style: AppTypography.bodyLarge(color: colour.textSub)),
+            ? Center(
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 16),
+                  child: Text('No items found.', style: AppTypography.bodyLarge(color: colour.textSub)),
+                ),
+              )
+            : Builder(
+                builder: (ctx) {
+                  final isTablet = MediaQuery.of(ctx).size.width > 600;
+                  if (isTablet) {
+                    return MalevaGrid(
+                      isTablet: true,
+                      columns: const ['#', 'Product Code', 'Product Name', 'Quantity', 'Rate', 'Tax', 'Amount'],
+                      rows: state.selectedDetails.asMap().entries.map((e) {
+                        final d = e.value;
+                        return [
+                          MalevaGridCell((e.key + 1).toString(), isTablet: true, color: accent),
+                          MalevaGridCell(d.ProductCode.toString(), isTablet: true, color: colour.brand),
+                          MalevaGridCell(d.ProductName.toString(), isTablet: true),
+                          MalevaGridCell(d.ItemQty.toString(), isTablet: true),
+                          MalevaGridCell(d.SaleRate.toString(), isTablet: true),
+                          MalevaGridCell(d.TaxAmt.toString(), isTablet: true),
+                          MalevaGridCell(d.SAmount.toString(), isTablet: true, color: colour.brandDark, fw: FontWeight.w700),
+                        ];
+                      }).toList(),
+                    );
+                  }
+                  
+                  return Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: state.selectedDetails
+                        .asMap()
+                        .entries
+                        .map((e) => _DetailRow(index: e.key, d: e.value, accent: accent))
+                        .toList(),
+                  );
+                },
               ),
-            )
-          : Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: state.selectedDetails
-                  .asMap()
-                  .entries
-                  .map((e) =>
-                      _DetailRow(index: e.key, d: e.value, accent: accent))
-                  .toList(),
-            ),
     );
   }
 }
