@@ -73,6 +73,8 @@ class Appuserloginmobile extends StatelessWidget {
         break;
       case 1200: // RECEIVABLE
         context.go('/dashboard/receivable');
+
+
         break;
       case 1300: // MAINTENANCE
         context.go('/dashboard/maintenance');
@@ -84,7 +86,7 @@ class Appuserloginmobile extends StatelessWidget {
         context.go('/dashboard/air_freight');
         break;
       default:
-        context.go('/dashboard/boarding');
+        context.go('/unauthorized');
         break;
     }
   }

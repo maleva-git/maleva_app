@@ -89,7 +89,7 @@ class FuelEntryModel {
 
     return {
       'Id': id,
-      'CNumberDisplay': entryNo,
+      'CNumberDisplay': id == 0 ? '' : entryNo,
       'CNumber': 0,
       'SaleDate': formattedDate,
       'TruckRefid': truckId,
