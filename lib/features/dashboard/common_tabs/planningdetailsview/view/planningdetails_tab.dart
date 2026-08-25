@@ -1,4 +1,5 @@
 import 'package:maleva/core/theme/app_typography.dart';
+import 'package:maleva/core/widgets/maleva_widget/maleva_grid.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
@@ -187,81 +188,45 @@ class _PlanningDetailsViewState extends State<_PlanningDetailsView> {
               const SizedBox(height: 6),
 
               // ── Data Table ──────────────────────────────────────────────────
-              Expanded(
-                child: state.filteredPlanningList.isEmpty
-                    ? const SizedBox.shrink()
-                    : RefreshIndicator(
-                        color: AppTokens.brandPrimary,
-                        onRefresh: () async {
-                          ctx.read<PlanningDetailsBloc>().add(const PlanningDetailsRefreshRequested());
-                          await Future.delayed(const Duration(milliseconds: 600));
-                        },
-                        child: SingleChildScrollView(
-                          scrollDirection: Axis.vertical,
-                          physics: const AlwaysScrollableScrollPhysics(),
-                          child: SingleChildScrollView(
-                            scrollDirection: Axis.horizontal,
-                            child: Card(
-                              elevation: 2,
-                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-                              clipBehavior: Clip.antiAlias,
-                              child: DataTable(
-                                headingRowColor: WidgetStateProperty.all(AppTokens.invoiceHeaderStart),
-                                headingTextStyle: AppTypography.bodySmall(color: Colors.white, fontWeight: FontWeight.bold),
-                                dataRowMinHeight: 35,
-                                dataRowMaxHeight: 50,
-                                dataTextStyle: AppTypography.bodySmall(color: AppTokens.textPrimary, fontWeight: FontWeight.w500),
-                                columnSpacing: 25,
-                                border: TableBorder(
-                                  horizontalInside: BorderSide(color: AppTokens.surfaceBorder.withValues(alpha: 0.5), width: 1),
-                                  verticalInside: BorderSide(color: AppTokens.surfaceBorder.withValues(alpha: 0.5), width: 1),
-                                ),
-                                columns: const [
-                                  DataColumn(label: Text('S.No')),
-                                  DataColumn(label: Text('Remarks')),
-                                  DataColumn(label: Text('Truck')),
-                                  DataColumn(label: Text('Pickup Date')),
-                                  DataColumn(label: Text('Delivery Date')),
-                                  DataColumn(label: Text('Origin')),
-                                  DataColumn(label: Text('Destination')),
-                                  DataColumn(label: Text('Package')),
-                                  DataColumn(label: Text('Customer')),
-                                  DataColumn(label: Text('Job No')),
-                                  DataColumn(label: Text('Vessel')),
-                                  DataColumn(label: Text('Status')),
-                                  DataColumn(label: Text('PIC')),
-                                  DataColumn(label: Text('LETA')),
-                                  DataColumn(label: Text('OETA')),
-                                ],
-                                rows: state.filteredPlanningList.asMap().entries.map((e) {
-                                  final i = e.key;
-                                  final item = e.value;
-                                  return DataRow(
-                                    color: WidgetStateProperty.all(i % 2 == 0 ? Colors.white : AppTokens.surfaceCard),
-                                    cells: [
-                                      DataCell(Text('${i + 1}')),
-                                      DataCell(Text('${item["Remarks"] ?? ""}')),
-                                      DataCell(Text('${item["TruckName"] ?? ""}')),
-                                      DataCell(Text('${item["SPickupDate"] ?? ""}')),
-                                      DataCell(Text('${item["SDeliveryDate"] ?? ""}')),
-                                      DataCell(Text('${item["Origin"] ?? ""}')),
-                                      DataCell(Text('${item["Destination"] ?? ""}')),
-                                      DataCell(Text('${item["pkg"] ?? ""}')),
-                                      DataCell(Text('${item["CustomerName"] ?? ""}')),
-                                      DataCell(Text('${item["JobNo"] ?? ""}', style: AppTypography.heading2(color: AppTokens.brandPrimary))),
-                                      DataCell(Text('${item["VesselName"] ?? ""}')),
-                                      DataCell(Text('${item["JobStatus"] ?? ""}')),
-                                      DataCell(Text('${item["EmployeeName"] ?? ""}')),
-                                      DataCell(Text('${item["LETA"] ?? ""}')),
-                                      DataCell(Text('${item["OETA"] ?? ""}')),
-                                    ],
-                                  );
-                                }).toList(),
-                              ),
-                            ),
+                                      Expanded(
+                  child: state.filteredPlanningList.isEmpty
+                      ? const SizedBox.shrink()
+                      : RefreshIndicator(
+                          color: AppTokens.brandPrimary,
+                          onRefresh: () async {
+                            ctx.read<PlanningDetailsBloc>().add(const PlanningDetailsRefreshRequested());
+                            await Future.delayed(const Duration(milliseconds: 600));
+                          },
+                          child: MalevaGrid(
+                            isTablet: isTablet,
+                            columns: const [
+                              'S.No', 'Remarks', 'Truck', 'Pickup Date', 'Delivery Date',
+                              'Origin', 'Destination', 'Package', 'Customer', 'Job No',
+                              'Vessel', 'Status', 'PIC', 'LETA', 'OETA'
+                            ],
+                            rows: state.filteredPlanningList.asMap().entries.map((e) {
+                              final i = e.key;
+                              final item = e.value;
+                              return <Widget>[
+                                Text('${i + 1}'),
+                                Text('${item["Remarks"] ?? ""}'),
+                                Text('${item["TruckName"] ?? ""}'),
+                                Text('${item["SPickupDate"] ?? ""}'),
+                                Text('${item["SDeliveryDate"] ?? ""}'),
+                                Text('${item["Origin"] ?? ""}'),
+                                Text('${item["Destination"] ?? ""}'),
+                                Text('${item["pkg"] ?? ""}'),
+                                Text('${item["CustomerName"] ?? ""}'),
+                                Text('${item["JobNo"] ?? ""}', style: AppTypography.heading2(color: AppTokens.brandPrimary)),
+                                Text('${item["VesselName"] ?? ""}'),
+                                Text('${item["JobStatus"] ?? ""}'),
+                                Text('${item["EmployeeName"] ?? ""}'),
+                                Text('${item["LETA"] ?? ""}'),
+                                Text('${item["OETA"] ?? ""}'),
+                              ];
+                            }).toList(),
                           ),
                         ),
-                      ),
               ),
             ],
           ),

@@ -11,7 +11,6 @@ import '../core/theme/tokens.dart';
 import '../core/utils/app_preferences.dart';
 
 
-// ─── Design tokens (splash only) ─────────────────────────────────────────────
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -22,7 +21,7 @@ class SplashScreen extends StatefulWidget {
 
 class _SplashScreenState extends State<SplashScreen>
     with TickerProviderStateMixin {
-  // ── Animations (new — purely visual) ──────────────────────────────────────
+
   late final AnimationController _entryCtrl;
   late final Animation<double>   _logoScale;
   late final Animation<double>   _logoFade;
@@ -30,7 +29,6 @@ class _SplashScreenState extends State<SplashScreen>
   late final Animation<Offset>   _textSlide;
   late final AnimationController _loadCtrl;
 
-  // ── All original fields ────────────────────────────────────────────────────
   double width = 0;
   double height = 0;
   String dtpDate = DateFormat("yyyy-MM-dd").format(DateTime.now());

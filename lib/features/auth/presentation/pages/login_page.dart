@@ -73,6 +73,8 @@ class Appuserloginmobile extends StatelessWidget {
         break;
       case 1200: // RECEIVABLE
         context.go('/dashboard/receivable');
+
+
         break;
       case 1300: // MAINTENANCE
         context.go('/dashboard/maintenance');

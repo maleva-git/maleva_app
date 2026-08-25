@@ -1,4 +1,5 @@
 import 'package:maleva/core/theme/app_typography.dart';
+import 'package:maleva/core/theme/palette.dart';
 import 'package:flutter/material.dart';
 import 'package:maleva/core/di/injection.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -24,12 +25,9 @@ import 'package:maleva/features/transaction/salesorder/models/sale_order_master_
 import 'package:maleva/features/operations/models/job_status_model.dart';
 import 'package:maleva/core/theme/tokens.dart';
 
-// ── Breakpoint: <= 600 → mobile, > 600 → tablet ──────────
+
 bool _isMobile(double width) => width <= 600;
 
-// ════════════════════════════════════════════════════════
-// Entry
-// ════════════════════════════════════════════════════════
 class SaleOrderView extends StatelessWidget {
   const SaleOrderView({super.key});
 
@@ -43,9 +41,6 @@ class SaleOrderView extends StatelessWidget {
   }
 }
 
-// ════════════════════════════════════════════════════════
-// Body
-// ════════════════════════════════════════════════════════
 class _SaleOrderViewBody extends StatelessWidget {
   const _SaleOrderViewBody();
 
@@ -91,9 +86,7 @@ class _SaleOrderViewBody extends StatelessWidget {
                     child: SpinKitFoldingCube(color: colour.brand, size: 35))
                 : LayoutBuilder(
                     builder: (ctx, constraints) =>
-                        _isMobile(constraints.maxWidth)
-                            ? _MobileBody(state: state)
-                            : _TabletBody(state: state),
+                        _TabletBody(state: state, isTablet: !_isMobile(constraints.maxWidth)),
                   ),
             floatingActionButton: _FilterFab(state: state),
           ),
@@ -103,9 +96,6 @@ class _SaleOrderViewBody extends StatelessWidget {
   }
 }
 
-// ════════════════════════════════════════════════════════
-// AppBar
-// ════════════════════════════════════════════════════════
 class _SaleAppBar extends StatelessWidget implements PreferredSizeWidget {
   final SalesOrderViewLoaded state;
   const _SaleAppBar({required this.state});
@@ -121,7 +111,7 @@ class _SaleAppBar extends StatelessWidget implements PreferredSizeWidget {
       flexibleSpace: Container(
         decoration: const BoxDecoration(
           gradient: LinearGradient(
-              colors: [colour.brand, colour.brandMid],
+              colors: [Palette.blue700, Palette.blue400],
               begin: Alignment.topLeft,
               end: Alignment.bottomRight),
           boxShadow: [
@@ -165,9 +155,6 @@ class _SaleAppBar extends StatelessWidget implements PreferredSizeWidget {
   }
 }
 
-// ════════════════════════════════════════════════════════
-// ██  MOBILE BODY
-// ════════════════════════════════════════════════════════
 class _MobileBody extends StatelessWidget {
   final SalesOrderViewLoaded state;
   const _MobileBody({required this.state});
@@ -189,7 +176,6 @@ class _MobileBody extends StatelessWidget {
   }
 }
 
-// ── Mobile Card ───────────────────────────────────────────
 class _MobileCard extends StatelessWidget {
   final SaleOrderMasterModel model;
   final int index;
@@ -533,69 +519,116 @@ class _MobileCard extends StatelessWidget {
   }
 }
 
-// ════════════════════════════════════════════════════════
-// ██  TABLET BODY
-// ════════════════════════════════════════════════════════
 class _TabletBody extends StatelessWidget {
   final SalesOrderViewLoaded state;
-  const _TabletBody({required this.state});
+  final bool isTablet;
+  const _TabletBody({required this.state, required this.isTablet});
+
+  Future<void> _navigateToEdit(BuildContext context, int id, int saleNo) async {
+    try {
+      final resultData = await sl<SalesOrderViewRepository>().editSalesOrder(id, saleNo);
+      if (resultData.isNotEmpty) {
+        AppGlobals.SaleEditMasterList = resultData;
+        AppGlobals.SaleEditDetailList = (resultData[0]["SaleDetails"] as List)
+            .map<SaleEditDetailModel>((e) => SaleEditDetailModel.fromJson(e))
+            .toList();
+
+        if (!context.mounted) return;
+        Navigator.of(context).push(MaterialPageRoute(
+          builder: (_) => SalesOrdersAdd(
+            SaleDetails: AppGlobals.SaleEditDetailList,
+            SaleMaster: AppGlobals.SaleEditMasterList,
+          ),
+        ));
+      }
+    } catch (e) {
+      if (!context.mounted) return;
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text('Failed to load edit view: ')));
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
-    return LayoutBuilder(builder: (context, constraints) {
-      const minWidth = 1200.0;
-      final w =
-          constraints.maxWidth > minWidth ? constraints.maxWidth : minWidth;
-      return SingleChildScrollView(
-        scrollDirection: Axis.horizontal,
-        child: SizedBox(
-          width: w,
-          child: Column(children: [
-            // Tablet header — all columns one row
-            Container(
-              color: colour.brandDeep,
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 11),
-              child: Row(children: [
-                _th('#', flex: 1),
-                _th('Status', flex: 3),
-                _th('Employee', flex: 4),
-                _th('L.Vessel', flex: 4),
-                _th('ETA', flex: 4),
-                _th('ETB', flex: 3),
-                _th('O.Vessel', flex: 4),
-                _th('OETA', flex: 4),
-                _th('OETB', flex: 3),
-                _th('Customer', flex: 5),
-                _th('Order No', flex: 3),
-                _th('Actions', flex: 3, align: TextAlign.center),
-              ]),
-            ),
-            Expanded(
-              child: state.masterList.isEmpty
-                  ? _EmptyState()
-                  : ListView.builder(
-                      padding: const EdgeInsets.fromLTRB(12, 8, 12, 100),
-                      itemCount: state.masterList.length,
-                      itemBuilder: (ctx, i) => _TabletRow(
-                          model: state.masterList[i], index: i, state: state),
-                    ),
-            ),
-          ]),
-        ),
-      );
-    });
-  }
+    if (state.masterList.isEmpty) return _EmptyState();
+    
+    final bloc = context.read<SalesOrderViewBloc>();
+    
+    return MalevaGrid(
+      isTablet: isTablet,
+      columns: const [
+        'S.No', 'Status', 'Employee', 'L.Vessel', 'ETA', 'ETB', 
+        'O.Vessel', 'OETA', 'OETB', 'Customer', 'Order No', 'Actions'
+      ],
+      onRowLongPress: state.masterList.map((item) => () => _navigateToEdit(context, item.Id, 0)).toList(),
+      rows: state.masterList.asMap().entries.map((e) {
+        final i = e.key;
+        final item = e.value;
+        
+        Color strip() {
+          final hasPickup = item.SPickupDate.toString().isNotEmpty;
+          final hasETA = item.SETA.toString().isNotEmpty;
+          final hasOETA = item.SOETA.toString().isNotEmpty;
+          if (!hasPickup && !hasETA && !hasOETA) return colour.red;
+          if (!hasPickup) return colour.yellow;
+          if (hasETA || hasOETA) return colour.green;
+          return item.JobMasterRefId == 10 ? colour.brand : colour.green;
+        }
+        final stripColor = strip();
 
-  Widget _th(String t, {int flex = 1, TextAlign align = TextAlign.left}) =>
-      Expanded(
-        flex: flex,
-        child: Text(t,
-            textAlign: align,
-            style: AppTypography.bodySmall(color: Colors.white)),
-      );
+        return <Widget>[
+            Container(
+              padding: const EdgeInsets.all(6),
+              decoration: BoxDecoration(
+                color: stripColor.withValues(alpha: 0.1),
+                shape: BoxShape.circle,
+              ),
+              child: Text('${i + 1}', style: AppTypography.bodySmall(color: stripColor)),
+            ),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 3),
+            decoration: BoxDecoration(
+              color: stripColor.withValues(alpha: 0.1),
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(color: stripColor.withValues(alpha: 0.25)),
+            ),
+            child: Text(item.JobStatus.toString().toUpperCase(), style: AppTypography.bodySmall(color: stripColor)),
+          ),
+          Text(item.EmployeeName.toString()),
+          Text(item.Loadingvesselname.toString()),
+          Text(item.SETA.toString()),
+          Text(item.SETB.toString()),
+          Text(item.Offvesselname.toString()),
+          Text(item.SOETA.toString()),
+          Text(item.SOETB.toString()),
+          Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(item.CustomerName.toString(), style: AppTypography.bodySmall(color: colour.brandDark), overflow: TextOverflow.ellipsis),
+              Text(item.SPort.toString(), style: AppTypography.bodySmall(color: colour.textSub), overflow: TextOverflow.ellipsis),
+            ]
+          ),
+          Text(item.BillNoDisplay.toString(), style: AppTypography.bodySmall(color: colour.brand)),
+          GestureDetector(
+            onTap: () => bloc.add(ShareDO(item.Id, item.BillNo)),
+            child: Container(
+              width: 32,
+              height: 32,
+              decoration: BoxDecoration(
+                color: stripColor.withValues(alpha: 0.1),
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(color: stripColor.withValues(alpha: 0.3)),
+              ),
+              child: Icon(Icons.picture_as_pdf_rounded, size: 16, color: stripColor),
+            ),
+          ),
+        ];
+      }).toList(),
+    );
+  }
 }
 
-// ── Tablet Row ────────────────────────────────────────────
 class _TabletRow extends StatelessWidget {
   final SaleOrderMasterModel model;
   final int index;
@@ -792,9 +825,6 @@ class _TabletRow extends StatelessWidget {
   }
 }
 
-// ════════════════════════════════════════════════════════
-// Shared — Detail Panel
-// ════════════════════════════════════════════════════════
 class _DetailPanel extends StatelessWidget {
   final SalesOrderViewLoaded state;
   final Color accent;
@@ -971,9 +1001,6 @@ class _EmptyState extends StatelessWidget {
   }
 }
 
-// ════════════════════════════════════════════════════════
-// FAB
-// ════════════════════════════════════════════════════════
 class _FilterFab extends StatelessWidget {
   final SalesOrderViewLoaded state;
   const _FilterFab({required this.state});
@@ -1009,9 +1036,6 @@ class _FilterFab extends StatelessWidget {
   }
 }
 
-// ════════════════════════════════════════════════════════
-// Filter Sheet — auto layout mobile vs tablet
-// ════════════════════════════════════════════════════════
 class _FilterSheet extends StatefulWidget {
   final SalesOrderViewLoaded state;
   const _FilterSheet({required this.state});
