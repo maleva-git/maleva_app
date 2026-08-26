@@ -86,7 +86,6 @@ class _SplashScreenState extends State<SplashScreen>
     startup();
   }
 
-  // ── STARTUP LOGIC (with error handling) ──────────────────────────────────
   Future startup() async {
     // ① Safe local storage init
     try {
@@ -105,13 +104,10 @@ class _SplashScreenState extends State<SplashScreen>
 
     await Future.delayed(const Duration(seconds: 3));
 
-    // ② FCM token with timeout — prevents indefinite hang on devices
-    // with missing or outdated Google Play Services
     try {
       await AppGlobals.getDeviceToken().timeout(const Duration(seconds: 10));
     } catch (e) {
       debugPrint('⚠️ FCM Token fetch failed: $e');
-      // Continue without token — don't block app startup
     }
     AppGlobals.mobiletoken = AppPreferences.getFcmToken();
 
@@ -121,7 +117,6 @@ class _SplashScreenState extends State<SplashScreen>
     AppGlobals.MalevaScreen= AppGlobals.storagenew.getInt('DeviceView') ?? 1;
     AppGlobals.DriverLogin=AppGlobals.storagenew.getInt('DriverId') ?? 0;
     if (UserName != "" && Password != "") {
-      // ③ Login API call with error handling
       bool loginSuccess = false;
       try {
         if (!mounted) return;
@@ -207,7 +202,7 @@ class _SplashScreenState extends State<SplashScreen>
     super.dispose();
   }
 
-  // ── Error & Navigation Helpers ─────────────────────────────────────────────
+
 
   void _navigateToLogin() {
     if (!mounted) return;
@@ -271,7 +266,7 @@ class _SplashScreenState extends State<SplashScreen>
     );
   }
 
-  // ── BUILD — only this section is redesigned ────────────────────────────────────────
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -492,7 +487,6 @@ class _SplashScreenState extends State<SplashScreen>
   );
 }
 
-// ─── Animated dot widget ──────────────────────────────────────────────────────
 
 class _AnimatedDot extends StatefulWidget {
   final int delayMs;
@@ -546,7 +540,6 @@ class _AnimatedDotState extends State<_AnimatedDot>
   }
 }
 
-// ─── Corner accent painter ────────────────────────────────────────────────────
 
 class _CornerAccent extends StatelessWidget {
   final bool topLeft;
@@ -593,7 +586,6 @@ class _CornerPainter extends CustomPainter {
   bool shouldRepaint(_) => false;
 }
 
-// ─── Subtle grid background ───────────────────────────────────────────────────
 
 class _GridPainter extends CustomPainter {
   @override

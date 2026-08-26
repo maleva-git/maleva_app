@@ -1,4 +1,5 @@
 import 'package:maleva/core/theme/app_typography.dart';
+import 'package:maleva/core/theme/palette.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -212,7 +213,7 @@ class _SalesOrderAddBodyState extends State<_SalesOrderAddBody> with TickerProvi
       backgroundColor: Colors.transparent,
       flexibleSpace: Container(
         decoration: const BoxDecoration(
-          gradient: LinearGradient(colors: [colour.brand, colour.brandMid], begin: Alignment.topLeft, end: Alignment.bottomRight),
+          gradient: LinearGradient(colors: [Palette.blue700, Palette.blue400], begin: Alignment.topLeft, end: Alignment.bottomRight),
           boxShadow: [BoxShadow(color: Color(0x551555F3), blurRadius: 12, offset: Offset(0, 4))],
         ),
       ),
@@ -1149,7 +1150,7 @@ if (navResult10 != null) { AppGlobals.SelectEmployeeList = navResult10; }
 
   Widget _productHeader() {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8), decoration: BoxDecoration(gradient: const LinearGradient(colors: [colour.brand, colour.brandMid]), borderRadius: BorderRadius.circular(10)),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8), decoration: BoxDecoration(gradient: const LinearGradient(colors: [Palette.blue700, Palette.blue400]), borderRadius: BorderRadius.circular(10)),
       child: Row(children: [_ph('S', flex: 1), _ph('Code', flex: 2), _ph('Description', flex: 4), _ph('Qty', flex: 1), _ph('Rate', flex: 2), _ph('GST', flex: 2), _ph('Amount', flex: 2, align: TextAlign.right), _ph('', flex: 2)]),
     );
   }

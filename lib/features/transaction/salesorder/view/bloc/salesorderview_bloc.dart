@@ -254,5 +254,29 @@ class SalesOrderViewBloc extends Bloc<SalesOrderViewEvent, SalesOrderViewState> 
 
       emit(s.copyWith(progress: true));
     });
+
+    on<ViewInvoice>((event, emit) async {
+      if (state is! SalesOrderViewLoaded) return;
+      final s = state as SalesOrderViewLoaded;
+      emit(s.copyWith(progress: false));
+
+      try {
+        final master = {'SoId': event.id, 'Comid': AppGlobals.Comid};
+        final header = {'Content-Type': 'application/json; charset=UTF-8'};
+        final resultData = await sl<LegacyApiRepository>().apiAllinoneSelectArray(
+          "${ApiConstants.apiViewInvoice}${event.billNo}",
+          master, header, context,
+        );
+
+        if (resultData != "") {
+          final value = ResponseViewModel.fromJson(resultData);
+          if (value.IsSuccess == true) {
+            SystemHelpers.launchInBrowser(value.data1);
+          }
+        }
+      } catch (e, stack) { debugPrint("Error caught globally: $e $stack"); }
+
+      emit(s.copyWith(progress: true));
+    });
   }
 }

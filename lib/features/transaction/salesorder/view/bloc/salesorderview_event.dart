@@ -75,3 +75,8 @@ class ShareDO extends SalesOrderViewEvent {
   final int billNo;
   ShareDO(this.id, this.billNo);
 }
+class ViewInvoice extends SalesOrderViewEvent {
+  final int id;
+  final int billNo;
+  ViewInvoice(this.id, this.billNo);
+}

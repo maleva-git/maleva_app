@@ -556,10 +556,7 @@ class _TabletBody extends StatelessWidget {
     
     return MalevaGrid(
       isTablet: isTablet,
-      columns: const [
-        'S.No', 'Status', 'Employee', 'L.Vessel', 'ETA', 'ETB', 
-        'O.Vessel', 'OETA', 'OETB', 'Customer', 'Order No', 'Actions'
-      ],
+      columns: const ['S.No', 'Status', 'Employee', 'L.Vessel', 'ETA', 'ETB', 'O.Vessel', 'OETA', 'OETB', 'Customer', 'Order No', 'DO', 'Invoice', 'Actions'],
       
       rows: state.masterList.asMap().entries.map((e) {
         final i = e.key;
@@ -610,37 +607,44 @@ class _TabletBody extends StatelessWidget {
             ]
           ),
           Text(item.BillNoDisplay.toString(), style: AppTypography.bodySmall(color: colour.brand)),
-          Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              GestureDetector(
-                onTap: () => _navigateToEdit(context, item.Id, 0),
-                child: Container(
-                  width: 32,
-                  height: 32,
-                  margin: const EdgeInsets.only(right: 8),
-                  decoration: BoxDecoration(
-                    color: colour.brand.withValues(alpha: 0.1),
-                    borderRadius: BorderRadius.circular(8),
-                    border: Border.all(color: colour.brand.withValues(alpha: 0.3)),
-                  ),
-                  child: const Icon(Icons.edit_rounded, size: 16, color: colour.brand),
-                ),
+          GestureDetector(
+            onTap: () => bloc.add(ShareDO(item.Id, item.BillNo)),
+            child: Container(
+              width: 32,
+              height: 32,
+              decoration: BoxDecoration(
+                color: Colors.orange.withValues(alpha: 0.1),
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(color: Colors.orange.withValues(alpha: 0.3)),
               ),
-              GestureDetector(
-                onTap: () => bloc.add(ShareDO(item.Id, item.BillNo)),
-                child: Container(
-                  width: 32,
-                  height: 32,
-                  decoration: BoxDecoration(
-                    color: stripColor.withValues(alpha: 0.1),
-                    borderRadius: BorderRadius.circular(8),
-                    border: Border.all(color: stripColor.withValues(alpha: 0.3)),
-                  ),
-                  child: Icon(Icons.picture_as_pdf_rounded, size: 16, color: stripColor),
-                ),
+              child: const Icon(Icons.assignment_rounded, size: 16, color: Colors.orange),
+            ),
+          ),
+          GestureDetector(
+            onTap: () => bloc.add(ViewInvoice(item.Id, item.BillNo)),
+            child: Container(
+              width: 32,
+              height: 32,
+              decoration: BoxDecoration(
+                color: Colors.purple.withValues(alpha: 0.1),
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(color: Colors.purple.withValues(alpha: 0.3)),
               ),
-            ],
+              child: const Icon(Icons.receipt_long_rounded, size: 16, color: Colors.purple),
+            ),
+          ),
+          GestureDetector(
+            onTap: () => _navigateToEdit(context, item.Id, 0),
+            child: Container(
+              width: 32,
+              height: 32,
+              decoration: BoxDecoration(
+                color: colour.brand.withValues(alpha: 0.1),
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(color: colour.brand.withValues(alpha: 0.3)),
+              ),
+              child: const Icon(Icons.edit_rounded, size: 16, color: colour.brand),
+            ),
           ),
         ];
       }).toList(),
