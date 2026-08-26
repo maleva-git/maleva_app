@@ -1,8 +1,3 @@
-// core/utils/app_preferences.dart
-// clsfunction.dart la irundha storagenew usage-a inga centralize pannurom
-// oru oru page la storagenew.getString(...) direct call panna vendaam —
-// AppPreferences.xxx() use pannunga
-
 import 'package:shared_preferences/shared_preferences.dart';
 
 class AppPreferences {
@@ -10,7 +5,6 @@ class AppPreferences {
 
   static late SharedPreferences _prefs;
 
-  // main.dart-la oru thadava init pannu
   static Future<void> init() async {
     _prefs = await SharedPreferences.getInstance();
   }

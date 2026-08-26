@@ -562,7 +562,7 @@ class _MenuTileState extends State<_MenuTile>
     );
   }
 
-  // ── Logout ─────────────────────────────────────────────────────────────────
+
   Widget _buildLogout() {
     return GestureDetector(
       onTap: _navigate,
@@ -866,7 +866,7 @@ class _MenuTileState extends State<_MenuTile>
     transitionDuration: const Duration(milliseconds: 220),
   );
 
-  // ── Helpers ────────────────────────────────────────────────────────────────
+
   IconData _iconFor(String name) {
     switch (name) {
       case "Sales Order":
