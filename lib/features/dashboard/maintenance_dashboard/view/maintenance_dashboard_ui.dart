@@ -134,12 +134,10 @@ class MaintenanceMobileDashboard extends StatelessWidget {
         tabs: showTruckMaint
           ? [ 
               _tab('Job Orders', isTablet),
-              _tab('Truck Maint', isTablet),
               _tab('FuelEntry', isTablet),
             ]
           : [
               _tab('Job Orders', isTablet),
-              _tab('Maintenance', isTablet),
               _tab('Speeding', isTablet),
               _tab('FuelFilling', isTablet),
               _tab('EngineHours', isTablet),
@@ -188,12 +186,10 @@ class MaintenanceMobileDashboard extends StatelessWidget {
         children: showTruckMaint
           ? [ 
               const JobOrdersTab(),
-              const Maintenance(showAppBar: false),
               const FuelEntryTab(),
             ]
           : [
               const JobOrdersTab(),
-              const MaintenanceDashboardWidget(),
               const SpeedingScreen(),
               const FuelFillingPage(),
               const EngineHoursPage(),
