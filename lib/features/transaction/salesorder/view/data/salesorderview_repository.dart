@@ -84,4 +84,25 @@ class SalesOrderViewRepository {
     }
     return [];
   }
+
+  Future<String> getInvoiceNumber(int id) async {
+    try {
+      final url = ApiConstants.apiSelectInvoiceNumber;
+      final response = await _dioClient.dio.post(url, data: {'id': id.toString()});
+      dynamic responseData = response.data;
+      if (responseData is String) {
+        if (responseData.trim().isEmpty) return '';
+        responseData = jsonDecode(responseData);
+      }
+      if (responseData != null && responseData['ok'] == true) {
+        final dataList = responseData['Data'];
+        if (dataList != null && dataList.isNotEmpty) {
+          return dataList[0]['AccountCode']?.toString() ?? '';
+        }
+      }
+    } catch (e) {
+      // ignore
+    }
+    return '';
+  }
 }

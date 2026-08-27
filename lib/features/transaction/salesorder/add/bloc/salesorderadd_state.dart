@@ -19,6 +19,7 @@ class SalesOrderAddError extends SalesOrderAddState {
 class SalesOrderAddLoaded extends SalesOrderAddState {
   final bool progress;
   final bool showSearch;
+  final List<String> poPendingRemarks;
 
   final List<SaleEditDetailModel> productViewList;
   final List<int> productIds;
@@ -212,7 +213,8 @@ class SalesOrderAddLoaded extends SalesOrderAddState {
   final bool isSaved;
 
   SalesOrderAddLoaded({
-    this.progress = false, this.showSearch = false, this.productViewList = const [], this.productIds = const [],
+    this.progress = false, this.showSearch = false,
+    this.poPendingRemarks = const [], this.productViewList = const [], this.productIds = const [],
     this.productUpdateIndex, this.pickUpUpdateIndex, this.deliveryUpdateIndex, this.productId = 0,
     this.totalAmount = 0.0, this.taxAmount = 0.0, this.currencyValue = 0.0, this.actualAmount = 0.0, this.coinage = 0.0,
     this.custId = 0, this.statusId = 0, this.jobTypeId = 0, this.lAgentCompanyId = 0, this.lAgentId = 0, this.oAgentCompanyId = 0,
@@ -253,7 +255,7 @@ class SalesOrderAddLoaded extends SalesOrderAddState {
 
   @override
   List<Object?> get props => [
-    progress, showSearch, productViewList.length, productIds, productUpdateIndex, productId, totalAmount, taxAmount, currencyValue, actualAmount, coinage,
+    progress, showSearch, poPendingRemarks, productViewList.length, productIds, productUpdateIndex, productId, totalAmount, taxAmount, currencyValue, actualAmount, coinage,
     custId, statusId, jobTypeId, editId, enquiryId, dtpSaleOrderdate, dtpLETAdate, dtpLETBdate, dtpLETDdate, dtpOETAdate, dtpOETBdate, dtpOETDdate,
     dtpFlightTimedate, dtpPickUpdate, dtpDeliverydate, dtpWHEntrydate, dtpWHExitdate, dtpFW1date, dtpFW2date, dtpFW3date,
     checkBoxValueOETA, checkBoxValueOETB, checkBoxValueOETD, checkBoxValueLETA, checkBoxValueFlightTime, checkBoxValueLETB, checkBoxValueLETD,
@@ -273,7 +275,8 @@ class SalesOrderAddLoaded extends SalesOrderAddState {
   ];
 
   SalesOrderAddLoaded copyWith({
-    bool? progress, bool? showSearch, List<SaleEditDetailModel>? productViewList, List<int>? productIds, 
+    bool? progress, bool? showSearch,
+    List<String>? poPendingRemarks, List<SaleEditDetailModel>? productViewList, List<int>? productIds, 
     bool clearProductUpdateIndex = false, Object? productUpdateIndex = _sentinel,
     bool clearPickUpUpdateIndex = false, Object? pickUpUpdateIndex = _sentinel,
     bool clearDeliveryUpdateIndex = false, Object? deliveryUpdateIndex = _sentinel,
@@ -315,7 +318,8 @@ class SalesOrderAddLoaded extends SalesOrderAddState {
     String? txtProductGst, String? txtProductAmount, Map<String, bool>? fieldPermission, Object? savedMessage = _sentinel, bool? isSaved,
   }) {
     return SalesOrderAddLoaded(
-      progress: progress ?? this.progress, showSearch: showSearch ?? this.showSearch, productViewList: productViewList ?? this.productViewList,
+      progress: progress ?? this.progress, showSearch: showSearch ?? this.showSearch,
+      poPendingRemarks: poPendingRemarks ?? this.poPendingRemarks, productViewList: productViewList ?? this.productViewList,
       productIds: productIds ?? this.productIds,
       productUpdateIndex: clearProductUpdateIndex ? null : (identical(productUpdateIndex, _sentinel) ? this.productUpdateIndex : productUpdateIndex as int?),
       pickUpUpdateIndex: clearPickUpUpdateIndex ? null : (identical(pickUpUpdateIndex, _sentinel) ? this.pickUpUpdateIndex : pickUpUpdateIndex as int?),

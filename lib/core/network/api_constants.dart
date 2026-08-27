@@ -56,6 +56,7 @@ class ApiConstants {
   static const String apiSelectAllInventory   = "$port/api/CustomerApp/SelectAllInventoryt";
 
   // ─── Sales Order ──────────────────────────────────────────────────────────
+  static const String apiSelectInvoiceNumber = "$port/SaleOrder/SelectInvoiceNumber";
   static const String apiSelectSalesOrder     = "$port/api/SaleOrderApp/SelectSaleOrder";
   static const String apiSelectTVSaleOrder    = "$port/api/SaleOrderApp/SelectTVSaleOrder";
   static const String apiEditSalesOrder       = "$port/api/SaleOrderApp/EditSaleOrder?Id=";

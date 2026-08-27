@@ -3,6 +3,8 @@ class SaleOrderMasterModel {
   int Id;
   int CompanyRefId;
   String BillNoDisplay;
+  String InvoiceNo;
+  String QNECode;
   String JobStatus;
   int BillNo;
   String BillDate;
@@ -32,6 +34,8 @@ class SaleOrderMasterModel {
       this.Id,
       this.CompanyRefId,
       this.BillNoDisplay,
+      this.InvoiceNo,
+      this.QNECode,
       this.JobStatus,
       this.BillNo,
       this.BillDate,
@@ -62,6 +66,8 @@ class SaleOrderMasterModel {
       : Id = int.tryParse(json['Id']?.toString() ?? '') ?? 0,
         CompanyRefId = int.tryParse(json['CompanyRefId']?.toString() ?? '') ?? 0,
         BillNoDisplay = json['BillNoDisplay'] ?? '',
+        InvoiceNo = json['InvoiceNo']?.toString() ?? '',
+        QNECode = json['QNECode']?.toString() ?? '',
         JobStatus = json['JobStatus'] ?? '',
         BillNo = int.tryParse(json['BillNo']?.toString() ?? '') ?? 0,
         BillDate = json['BillDate'] ?? '',
@@ -92,6 +98,8 @@ class SaleOrderMasterModel {
       'Id': Id,
       'CompanyRefId' : CompanyRefId,
       'BillNoDisplay': BillNoDisplay,
+      'InvoiceNo': InvoiceNo,
+      'QNECode': QNECode,
       'JobStatus': JobStatus,
       'BillNo': BillNo,
       'BillDate': BillDate,
@@ -122,6 +130,8 @@ class SaleOrderMasterModel {
       : Id = 0,
         CompanyRefId = 0,
         BillNoDisplay = '',
+        InvoiceNo = '',
+        QNECode = '',
         JobStatus = '',
         BillNo = 0,
         BillDate = '',

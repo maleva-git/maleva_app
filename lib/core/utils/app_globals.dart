@@ -39,6 +39,7 @@ class AppGlobals {
 
   static String appversion="1.1.12+135";
   static bool homepagecall = false;
+  static String currentInvoiceNo = "";
   static AssetImage logo = const AssetImage('assets/company/logo.png');
   static AssetImage splashlogo = const AssetImage('assets/company/roundlogo.png');
   static AssetImage calendar = const AssetImage('assets/common/calendar.png');

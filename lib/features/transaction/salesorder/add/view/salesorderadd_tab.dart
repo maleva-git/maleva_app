@@ -331,11 +331,33 @@ class _SalesOrderAddBodyState extends State<_SalesOrderAddBody> with TickerProvi
       ]),
       const SizedBox(height: 10),
       _sectionCard(children: [
-        Row(children: [
-          Expanded(flex: 2, child: Center(child: Text(state.totalAmount.toString(), style: AppTypography.heading2(color: colour.red)))),
-          const SizedBox(width: 10),
-          Expanded(flex: 3, child: _styledDropdown<String>(value: state.dropdownValue, items: SalesOrderAddBloc.billType, enabled: fp["cmbBillType"] == true && !state.disabledBillType, onChanged: (v) => bloc.add(BillTypeChanged(v!)))),
-        ]),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Expanded(
+              flex: 3,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text("Total Amount", style: AppTypography.bodySmall(color: colour.red).copyWith(fontWeight: FontWeight.bold)),
+                  Text(state.totalAmount.toStringAsFixed(2), style: AppTypography.heading2(color: colour.red)),
+                ],
+              ),
+            ),
+            if (AppGlobals.currentInvoiceNo.isNotEmpty)
+              Expanded(
+                flex: 3,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text("Invoice No", style: AppTypography.bodySmall(color: Colors.green).copyWith(fontWeight: FontWeight.bold)),
+                    Text(AppGlobals.currentInvoiceNo, style: AppTypography.heading2(color: Colors.green)),
+                  ],
+                ),
+              ),
+            Expanded(flex: 4, child: _styledDropdown<String>(value: state.dropdownValue, items: SalesOrderAddBloc.billType, enabled: fp["cmbBillType"] == true && !state.disabledBillType, onChanged: (v) => bloc.add(BillTypeChanged(v!)))),
+          ],
+        ),
       ]),
       const SizedBox(height: 10),
       _sectionCard(children: [
@@ -387,13 +409,28 @@ class _SalesOrderAddBodyState extends State<_SalesOrderAddBody> with TickerProvi
       ]),
       const SizedBox(height: 10),
       Row(
-        mainAxisAlignment: MainAxisAlignment.end,
-        children: [
-          _iconBtn(icon: Icons.library_add_sharp, enabled: fp["addProduct"] == true, onTap: () => _showProductDialog(context, state, -1)),
-          const SizedBox(width: 8),
-          _iconBtn(icon: Icons.library_books_rounded, enabled: true, onTap: () => bloc.add(ToggleProductView())),
-        ],
-      ),
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: state.poPendingRemarks.map((e) => Padding(
+                padding: const EdgeInsets.only(bottom: 4.0),
+                child: Text(e, style: const TextStyle(color: Colors.red, fontWeight: FontWeight.bold, fontSize: 13)),
+              )).toList(),
+            ),
+          ),
+
+            Row(
+              children: [
+                _iconBtn(icon: Icons.library_add_sharp, enabled: fp["addProduct"] == true, onTap: () => _showProductDialog(context, state, -1)),
+                const SizedBox(width: 8),
+                _iconBtn(icon: Icons.library_books_rounded, enabled: true, onTap: () => bloc.add(ToggleProductView())),
+              ],
+            ),
+          ],
+        ),
       if (state.visibleProductview) ...[
         const SizedBox(height: 6),
         _productHeader(),
