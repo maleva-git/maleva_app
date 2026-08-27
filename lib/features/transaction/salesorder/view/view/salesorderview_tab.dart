@@ -216,7 +216,7 @@ class _MobileCard extends StatelessWidget {
       child: ClipRRect(
         borderRadius: BorderRadius.circular(16),
         child: InkWell(
-          onLongPress: () => _navigateToEdit(context, model.Id, 0),
+          onLongPress: () => _navigateToEdit(context, model.Id, 0, model.QNECode.toString()),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -489,12 +489,24 @@ class _MobileCard extends StatelessWidget {
         ],
       );
 
-  Future<void> _navigateToEdit(BuildContext context, int id, int saleNo) async {
+  Future<void> _navigateToEdit(BuildContext context, int id, int saleNo, String invoiceNo) async {
     try {
       final resultData =
           await sl<SalesOrderViewRepository>().editSalesOrder(id, saleNo);
+          
+      String actualInvoiceNo = invoiceNo;
+      try {
+        final fetchedInvoice = await sl<SalesOrderViewRepository>().getInvoiceNumber(id);
+        if (fetchedInvoice.isNotEmpty) {
+          actualInvoiceNo = fetchedInvoice;
+        }
+      } catch (e) {
+        // fallback
+      }
+
       if (resultData.isNotEmpty) {
         AppGlobals.SaleEditMasterList = resultData;
+        AppGlobals.currentInvoiceNo = actualInvoiceNo;
         AppGlobals.SaleEditDetailList = (resultData[0]["SaleDetails"] as List)
             .map<SaleEditDetailModel>((e) => SaleEditDetailModel.fromJson(e))
             .toList();
@@ -524,11 +536,23 @@ class _TabletBody extends StatelessWidget {
   final bool isTablet;
   const _TabletBody({required this.state, required this.isTablet});
 
-  Future<void> _navigateToEdit(BuildContext context, int id, int saleNo) async {
+  Future<void> _navigateToEdit(BuildContext context, int id, int saleNo, String invoiceNo) async {
     try {
       final resultData = await sl<SalesOrderViewRepository>().editSalesOrder(id, saleNo);
+
+      String actualInvoiceNo = invoiceNo;
+      try {
+        final fetchedInvoice = await sl<SalesOrderViewRepository>().getInvoiceNumber(id);
+        if (fetchedInvoice.isNotEmpty) {
+          actualInvoiceNo = fetchedInvoice;
+        }
+      } catch (e) {
+        // fallback
+      }
+
       if (resultData.isNotEmpty) {
         AppGlobals.SaleEditMasterList = resultData;
+        AppGlobals.currentInvoiceNo = actualInvoiceNo;
         AppGlobals.SaleEditDetailList = (resultData[0]["SaleDetails"] as List)
             .map<SaleEditDetailModel>((e) => SaleEditDetailModel.fromJson(e))
             .toList();
@@ -634,7 +658,7 @@ class _TabletBody extends StatelessWidget {
             ),
           ),
           GestureDetector(
-            onTap: () => _navigateToEdit(context, item.Id, 0),
+            onTap: () => _navigateToEdit(context, item.Id, 0, item.QNECode.toString()),
             child: Container(
               width: 32,
               height: 32,
@@ -689,7 +713,7 @@ class _TabletRow extends StatelessWidget {
       ),
       child: InkWell(
         borderRadius: BorderRadius.circular(12),
-        onLongPress: () => _navigateToEdit(context, model.Id, 0),
+        onLongPress: () => _navigateToEdit(context, model.Id, 0, model.QNECode.toString()),
         child: Column(children: [
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
@@ -818,12 +842,24 @@ class _TabletRow extends StatelessWidget {
         ),
       );
 
-  Future<void> _navigateToEdit(BuildContext context, int id, int saleNo) async {
+  Future<void> _navigateToEdit(BuildContext context, int id, int saleNo, String invoiceNo) async {
     try {
       final resultData =
           await sl<SalesOrderViewRepository>().editSalesOrder(id, saleNo);
+          
+      String actualInvoiceNo = invoiceNo;
+      try {
+        final fetchedInvoice = await sl<SalesOrderViewRepository>().getInvoiceNumber(id);
+        if (fetchedInvoice.isNotEmpty) {
+          actualInvoiceNo = fetchedInvoice;
+        }
+      } catch (e) {
+        // fallback
+      }
+
       if (resultData.isNotEmpty) {
         AppGlobals.SaleEditMasterList = resultData;
+        AppGlobals.currentInvoiceNo = actualInvoiceNo;
         AppGlobals.SaleEditDetailList = (resultData[0]["SaleDetails"] as List)
             .map<SaleEditDetailModel>((e) => SaleEditDetailModel.fromJson(e))
             .toList();

@@ -783,8 +783,52 @@ class SalesOrderAddBloc extends Bloc<SalesOrderAddEvent, SalesOrderAddState> {
     }
     // =========================================================================
 
-    var result = base.copyWith(
-      editId: isEnquiry ? 0 : (m["Id"] ?? 0), enquiryId: isEnquiry ? (m["Id"] ?? 0) : 0, productViewList: details ?? [],
+    
+      List<String> poRemarks = [];
+      int notPort = int.tryParse(m["Notportchagre"]?.toString() ?? "0") ?? 0;
+      int portCPop = int.tryParse(m["PortCPop"]?.toString() ?? "0") ?? 0;
+      if (portCPop == 1 && notPort == 0) poRemarks.add("Port Charges (PO Pending)");
+
+      int liveCPop = int.tryParse(m["LiveCPop"]?.toString() ?? "0") ?? 0;
+      int notLevy = int.tryParse(m["NotLevyChares"]?.toString() ?? "0") ?? 0;
+      if (liveCPop == 1 && notLevy == 0) poRemarks.add("Port Charges (LEVY CHARGES PO PENDING)");
+
+      int mmheCPop = int.tryParse(m["MMHECPop"]?.toString() ?? "0") ?? 0;
+      int notMmhe = int.tryParse(m["NotMMHECPop"]?.toString() ?? "0") ?? 0;
+      if (mmheCPop == 1 && notMmhe == 0) poRemarks.add("MMHE AGENT PO PENDING");
+
+      int afPoCPop = int.tryParse(m["AFpoCPop"]?.toString() ?? "0") ?? 0;
+      int notAfPo = int.tryParse(m["NotAFpoCPop"]?.toString() ?? "0") ?? 0;
+      if (afPoCPop == 1 && notAfPo == 0) poRemarks.add("AF PO PENDING");
+
+      int sfWpoCPop = int.tryParse(m["SFWpoCPop"]?.toString() ?? "0") ?? 0;
+      int notSfWpo = int.tryParse(m["NotSFWpoCPop"]?.toString() ?? "0") ?? 0;
+      if (sfWpoCPop == 1 && notSfWpo == 0) poRemarks.add("DO CHARGES PO PENDING,SEAFRIEGHT IMPORT");
+
+      int sfeWpoCPop = int.tryParse(m["SFEWpoCPop"]?.toString() ?? "0") ?? 0;
+      int notSfeWpo = int.tryParse(m["NotSFEWpoCPop"]?.toString() ?? "0") ?? 0;
+      if (sfeWpoCPop == 1 && notSfeWpo == 0) poRemarks.add("DO CHARGES PO PENDING,SEAFRIEGHT EXPORT");
+
+      int boatCPop = int.tryParse(m["BoatCPop"]?.toString() ?? "0") ?? 0;
+      int notBoat = int.tryParse(m["NotBoatCPop"]?.toString() ?? "0") ?? 0;
+      if (boatCPop == 1 && notBoat == 0) poRemarks.add("PO PENDING FOR PORT EQUIPMENT CARGO BOAT");
+
+      int boatCPop1 = int.tryParse(m["BoatCPop1"]?.toString() ?? "0") ?? 0;
+      int notBoat1 = int.tryParse(m["NotBoatCPop1"]?.toString() ?? "0") ?? 0;
+      if (boatCPop1 == 1 && notBoat1 == 0) poRemarks.add("PO PENDING FOR PORT EQUIPMENT WHARFMARK CRANE FORKLIFT");
+
+      int permitCPop = int.tryParse(m["PermitCPop"]?.toString() ?? "0") ?? 0;
+      int notPermit = int.tryParse(m["NotPermitCPop"]?.toString() ?? "0") ?? 0;
+      if (permitCPop == 1 && notPermit == 0) poRemarks.add("PO PENDING FOR PERMIT OUTWARD PERMIT OR iNWARD");
+
+      int pfppCPop1 = int.tryParse(m["PFPPCPop1"]?.toString() ?? "0") ?? 0;
+      int notPfpp1 = int.tryParse(m["NotPFPPCPop1"]?.toString() ?? "0") ?? 0;
+      if (pfppCPop1 == 1 && notPfpp1 == 0) poRemarks.add("(PO FOR PERMIT PENDING ORIGIN OR DESTINATION IS SINGAPORE)");
+
+      var result = base.copyWith(
+
+      editId: isEnquiry ? 0 : (m["Id"] ?? 0), enquiryId: isEnquiry ? (m["Id"] ?? 0) : 0, totalAmount: double.tryParse(m["Amount"]?.toString() ?? "0") ?? 0.0,
+        poPendingRemarks: poRemarks, productViewList: details ?? [],
       productIds: loadedIds,
       currencyValue: AppGlobals.CustomerCurrencyValue, custId: m["CustomerRefId"] ?? 0, jobTypeId: m["JobMasterRefId"] ?? 0,
       lAgentCompanyId: m["AgentCompanyRefId"] ?? 0, lAgentId: m["AgentMasterRefId"] ?? 0, oAgentCompanyId: m["OAgentCompanyRefId"] ?? 0,
