@@ -35,3 +35,45 @@ class PlanningEditRequestedEvent extends PlanningEvent {
   final int planningNo;
   PlanningEditRequestedEvent({required this.id, required this.planningNo});
 }
+class AssignTruckDriverEvent extends PlanningEvent {
+  final String jobNo;
+  final String truckName;
+  final int truckRefId;
+  final String driverName;
+  final int driverRefId;
+
+  AssignTruckDriverEvent({
+    required this.jobNo,
+    required this.truckName,
+    required this.truckRefId,
+    required this.driverName,
+    required this.driverRefId,
+  });
+}
+
+class UpdateDatesEvent extends PlanningEvent {
+  final String jobNo;
+  final String pickupDate;
+  final String deliveryDate;
+
+  UpdateDatesEvent({
+    required this.jobNo,
+    required this.pickupDate,
+    required this.deliveryDate,
+  });
+}
+
+class UpdateAddressEvent extends PlanningEvent {
+  final String jobNo;
+  final String pickupAddress;
+  final String deliveryAddress;
+
+  UpdateAddressEvent({
+    required this.jobNo,
+    required this.pickupAddress,
+    required this.deliveryAddress,
+  });
+}
+
+class SavePlanningEvent extends PlanningEvent {}
+class AddPlanningRowEvent extends PlanningEvent {}

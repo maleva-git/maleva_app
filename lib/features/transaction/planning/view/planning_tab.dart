@@ -1,7 +1,7 @@
+﻿import 'add_planning_page.dart';
 import 'package:maleva/core/theme/app_typography.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:maleva/core/utils/app_globals.dart';
 import 'package:maleva/menu/menulist.dart';
@@ -18,9 +18,9 @@ import 'package:maleva/core/widgets/maleva_widget/maleva_grid.dart';
 import 'package:maleva/core/models/shared/planning_detail_model.dart';
 import 'package:maleva/core/models/shared/employee_model.dart';
 import 'package:maleva/core/models/shared/planning_master_model.dart';
+
 TextStyle _body(double size, {Color color = colour.kText, FontWeight fw = FontWeight.normal}) =>
     AppTypography.bodyLarge(color: color);
-
 TextStyle _label(double size, {Color color = colour.kTextDim, FontWeight fw = FontWeight.w600}) =>
     AppTypography.bodyLarge(color: color);
 
@@ -134,6 +134,18 @@ class _PlanningScaffold extends StatelessWidget {
           Text(userName, style: _label(11, color: AppTokens.planTextMuted)),
         ],
       ),
+      actions: [
+        IconButton(
+          icon: const Icon(Icons.add_box_rounded, color: colour.kCobalt, size: 28),
+          onPressed: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => const AddPlanningPage()),
+            );
+          },
+        ),
+        const SizedBox(width: 8),
+      ],
       bottom: PreferredSize(
         preferredSize: const Size.fromHeight(1),
         child: Container(
@@ -150,7 +162,6 @@ class _PlanningScaffold extends StatelessWidget {
     );
   }
 }
-
 class _MobileLayout extends StatelessWidget {
   final PlanningLoaded state;
   const _MobileLayout({required this.state});
@@ -171,7 +182,6 @@ class _MobileLayout extends StatelessWidget {
     );
   }
 }
-
 class _TabletLayout extends StatelessWidget {
   final PlanningLoaded state;
   const _TabletLayout({required this.state});
@@ -192,7 +202,6 @@ class _TabletLayout extends StatelessWidget {
           );
   }
 }
-
 class _PlanningCard extends StatelessWidget {
   final PlanningMasterModel master;
   final int index;
@@ -343,7 +352,6 @@ class _PlanningCard extends StatelessWidget {
   }
 
 }
-
 class _DetailsSection extends StatelessWidget {
   final List<PlanningDetailModel> details;
   final bool isTablet;
@@ -414,7 +422,6 @@ class _DetailsSection extends StatelessWidget {
 
   
   }
-
 class _FilterFab extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
@@ -556,8 +563,6 @@ class _FilterFab extends StatelessWidget {
     );
   }
 }
-
-
 class _ActionBtn extends StatelessWidget {
   final IconData icon;
   final String label;
@@ -578,7 +583,6 @@ class _ActionBtn extends StatelessWidget {
     );
   }
 }
-
 class _SheetDateBtn extends StatelessWidget {
   final String label;
   final String date;
@@ -609,7 +613,6 @@ class _SheetDateBtn extends StatelessWidget {
     );
   }
 }
-
 class _SheetTextField extends StatelessWidget {
   final TextEditingController controller;
   final String hint;
@@ -628,13 +631,11 @@ class _SheetTextField extends StatelessWidget {
     );
   }
 }
-
 class _FullScreenLoader extends StatefulWidget {
   const _FullScreenLoader();
   @override
   State<_FullScreenLoader> createState() => _FullScreenLoaderState();
 }
-
 class _FullScreenLoaderState extends State<_FullScreenLoader> with SingleTickerProviderStateMixin {
   late AnimationController _ctrl;
   late Animation<double> _anim;
@@ -660,7 +661,6 @@ class _FullScreenLoaderState extends State<_FullScreenLoader> with SingleTickerP
     );
   }
 }
-
 class _EmptyView extends StatelessWidget {
   const _EmptyView();
   @override
@@ -668,7 +668,6 @@ class _EmptyView extends StatelessWidget {
     return Center(child: Column(mainAxisSize: MainAxisSize.min, children: [Container(padding: const EdgeInsets.all(20), decoration: BoxDecoration(color: colour.kSurface, shape: BoxShape.circle, border: Border.all(color: colour.kBorder)), child: const Icon(Icons.inbox_rounded, color: AppTokens.planTextMuted, size: 36)), const SizedBox(height: 14), Text('No Planning Records', style: AppTypography.heading1(color: colour.kText)), const SizedBox(height: 6), Text('Try adjusting your filter', style: _label(13, color: AppTokens.planTextMuted))]));
   }
 }
-
 class _ErrorView extends StatelessWidget {
   final String message;
   final VoidCallback onRetry;
@@ -678,3 +677,5 @@ class _ErrorView extends StatelessWidget {
     return Center(child: Padding(padding: const EdgeInsets.all(32), child: Column(mainAxisSize: MainAxisSize.min, children: [Container(padding: const EdgeInsets.all(18), decoration: BoxDecoration(color: colour.kDanger.withValues(alpha: 0.1), shape: BoxShape.circle, border: Border.all(color: colour.kDanger.withValues(alpha: 0.3))), child: const Icon(Icons.error_outline_rounded, color: colour.kDanger, size: 32)), const SizedBox(height: 14), Text('Something went wrong', style: AppTypography.heading1(color: colour.kText)), const SizedBox(height: 8), Text(message, style: _label(12, color: AppTokens.planTextMuted), textAlign: TextAlign.center), const SizedBox(height: 20), ElevatedButton.icon(onPressed: onRetry, style: ElevatedButton.styleFrom(backgroundColor: colour.kCobalt, padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12))), icon: const Icon(Icons.refresh_rounded, color: colour.kText, size: 18), label: Text('Retry', style: _body(14, color: colour.kText, fw: FontWeight.w600))) ])));
   }
 }
+
+

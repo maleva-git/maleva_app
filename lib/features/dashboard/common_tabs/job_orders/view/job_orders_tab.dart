@@ -1,4 +1,10 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
+import 'dart:convert';
+import 'dart:io';
+import 'package:http/http.dart' as http;
+import 'package:image_picker/image_picker.dart';
+import 'package:maleva/core/utils/app_preferences.dart';
+import 'package:maleva/core/network/api_constants.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../bloc/job_orders_bloc.dart';
 import '../bloc/job_orders_event.dart';
@@ -477,6 +483,21 @@ class _JobOrdersTabState extends State<JobOrdersTab> {
                                                   const SizedBox(height: 10),
                                                   _buildInfoRow(Icons.comment_rounded, "Remarks", job.remarks, Colors.grey.shade700),
                                                 ],
+                                                const SizedBox(height: 12),
+                                                const Divider(),
+                                                Row(
+                                                  mainAxisAlignment: MainAxisAlignment.end,
+                                                  children: [
+                                                    TextButton.icon(
+                                                      onPressed: () => _showAttachmentsSheet(context, job),
+                                                      icon: const Icon(Icons.attach_file_rounded, size: 18),
+                                                      label: const Text("Attachments"),
+                                                      style: TextButton.styleFrom(
+                                                        foregroundColor: AppColors.appBarColor,
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
                                               ],
                                             ),
                                           ),
@@ -500,6 +521,333 @@ class _JobOrdersTabState extends State<JobOrdersTab> {
       );
   }
 
+  // --- ATTACHMENTS LOGIC ---
+  Future<void> _showAttachmentsSheet(BuildContext context, JobOrder job) async {
+    List<String> images = [];
+    List<XFile> pendingUploads = [];
+    bool isLoading = true;
+
+    Future<void> loadImages(StateSetter setModalState) async {
+      try {
+        final String companyId = AppPreferences.getComid().toString();
+        
+        final response = await http.post(
+          Uri.parse(ApiConstants.port + '/Common/FetchFile2'),
+          headers: {
+            'Comid': companyId,
+            'Id': job.id.toString(),
+            'FolderName': 'jobs order',
+            'FileName': '',
+            'SubFolderName': '',
+            'DeleteFileName': '',
+          },
+        );
+
+        if (response.statusCode == 200) {
+          final data = json.decode(response.body);
+          if (data['ok'] == true && data['Data'] != null) {
+            setModalState(() {
+              images = List<String>.from(data['Data']);
+              isLoading = false;
+            });
+            return;
+          }
+        }
+      } catch (e) {
+        debugPrint('Error loading images: $e');
+      }
+      setModalState(() {
+        isLoading = false;
+      });
+    }
+
+    Future<void> deleteImage(StateSetter setModalState, String imageUrl) async {
+      setModalState(() {
+        isLoading = true;
+      });
+
+      try {
+        final String companyId = AppPreferences.getComid().toString();
+        
+        final response = await http.post(
+          Uri.parse(ApiConstants.port + '/Common/DeleteFile'),
+          headers: {
+            'Comid': companyId,
+            'Id': job.id.toString(),
+            'FolderName': 'jobs order',
+            'FileName': imageUrl,
+            'SubFolderName': '',
+          },
+        );
+
+        if (response.statusCode == 200) {
+          final data = json.decode(response.body);
+          if (data['ok'] == true) {
+            await loadImages(setModalState);
+            return;
+          }
+        }
+      } catch (e) {
+        debugPrint('Error deleting image: $e');
+      }
+
+      setModalState(() {
+        isLoading = false;
+      });
+    }
+
+    Future<void> pickImages(StateSetter setModalState) async {
+      final picker = ImagePicker();
+      final pickedFiles = await picker.pickMultiImage();
+      if (pickedFiles.isNotEmpty) {
+        setModalState(() {
+          pendingUploads.addAll(pickedFiles);
+        });
+      }
+    }
+
+    Future<void> uploadImagesToServer(StateSetter setModalState) async {
+      if (pendingUploads.isEmpty) return;
+
+      setModalState(() {
+        isLoading = true;
+      });
+
+      try {
+        final String companyId = AppPreferences.getComid().toString();
+        
+        var request = http.MultipartRequest(
+          'POST', 
+          Uri.parse(ApiConstants.port + '/Common/UploadFile5')
+        );
+        request.headers.addAll({
+          'Comid': companyId,
+          'Id': job.id.toString(),
+          'FolderName': 'jobs order',
+          'FileName': '',
+          'SubFolderName': '',
+          'DeleteFileName': '',
+          'ExistingFilePath': '',
+        });
+
+        for (int i = 0; i < pendingUploads.length; i++) {
+          request.files.add(await http.MultipartFile.fromPath('MyImages$i', pendingUploads[i].path));
+        }
+
+        var response = await request.send();
+        if (response.statusCode == 200) {
+          final resStr = await response.stream.bytesToString();
+          final data = json.decode(resStr);
+          if (data['ok'] == true) {
+            setModalState(() {
+              pendingUploads.clear();
+            });
+            await loadImages(setModalState);
+            return;
+          }
+        }
+      } catch (e) {
+        debugPrint('Error uploading image: $e');
+      }
+
+      setModalState(() {
+        isLoading = false;
+      });
+    }
+
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) {
+        return StatefulBuilder(
+          builder: (context, setModalState) {
+            // Load initially
+            if (isLoading && images.isEmpty && pendingUploads.isEmpty) {
+              loadImages(setModalState);
+            }
+
+            final totalItems = images.length + pendingUploads.length;
+
+            return Container(
+              height: MediaQuery.of(context).size.height * 0.85,
+              decoration: const BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+              ),
+              padding: const EdgeInsets.all(24),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      const Text(
+                        "Attachments",
+                        style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                      ),
+                      IconButton(
+                        icon: const Icon(Icons.close, color: Colors.grey),
+                        onPressed: () => Navigator.pop(context),
+                      ),
+                    ],
+                  ),
+                  const Divider(),
+                  Expanded(
+                    child: isLoading 
+                      ? const Center(child: CircularProgressIndicator())
+                      : totalItems == 0
+                        ? const Center(child: Text("No attachments found.", style: TextStyle(color: Colors.grey)))
+                        : GridView.builder(
+                            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                              crossAxisCount: 2,
+                              crossAxisSpacing: 12,
+                              mainAxisSpacing: 12,
+                            ),
+                            itemCount: totalItems,
+                            itemBuilder: (context, index) {
+                              if (index < images.length) {
+                                // Server Image
+                                final imgPath = images[index];
+                                final imgUrl = ApiConstants.port + imgPath;
+                                return Stack(
+                                  children: [
+                                    Positioned.fill(
+                                      child: ClipRRect(
+                                        borderRadius: BorderRadius.circular(12),
+                                        child: Image.network(
+                                          imgUrl,
+                                          fit: BoxFit.cover,
+                                          errorBuilder: (context, error, stackTrace) => Container(
+                                            color: Colors.grey.shade200,
+                                            child: const Icon(Icons.broken_image, color: Colors.grey),
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                    Positioned(
+                                      top: 4,
+                                      right: 4,
+                                      child: GestureDetector(
+                                        onTap: () async {
+                                          final confirm = await showDialog<bool>(
+                                            context: context,
+                                            builder: (context) => AlertDialog(
+                                              title: const Text('Delete Photo'),
+                                              content: const Text('Are you sure you want to delete this photo?'),
+                                              actions: [
+                                                TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('Cancel')),
+                                                TextButton(
+                                                  onPressed: () => Navigator.pop(context, true), 
+                                                  child: const Text('Delete', style: TextStyle(color: Colors.red)),
+                                                ),
+                                              ],
+                                            ),
+                                          );
+                                          if (confirm == true) {
+                                            deleteImage(setModalState, imgPath);
+                                          }
+                                        },
+                                        child: Container(
+                                          padding: const EdgeInsets.all(4),
+                                          decoration: const BoxDecoration(
+                                            color: Colors.black54,
+                                            shape: BoxShape.circle,
+                                          ),
+                                          child: const Icon(Icons.delete_outline, color: Colors.white, size: 20),
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                );
+                              } else {
+                                // Pending Local Image
+                                final localImg = pendingUploads[index - images.length];
+                                return Stack(
+                                  children: [
+                                    Positioned.fill(
+                                      child: ClipRRect(
+                                        borderRadius: BorderRadius.circular(12),
+                                        child: Stack(
+                                          fit: StackFit.expand,
+                                          children: [
+                                            Image.file(
+                                              File(localImg.path),
+                                              fit: BoxFit.cover,
+                                            ),
+                                            Container(color: Colors.black.withValues(alpha: 0.3)),
+                                            const Center(
+                                              child: Icon(Icons.cloud_upload_outlined, color: Colors.white, size: 30),
+                                            )
+                                          ],
+                                        ),
+                                      ),
+                                    ),
+                                    Positioned(
+                                      top: 4,
+                                      right: 4,
+                                      child: GestureDetector(
+                                        onTap: () {
+                                          setModalState(() {
+                                            pendingUploads.removeAt(index - images.length);
+                                          });
+                                        },
+                                        child: Container(
+                                          padding: const EdgeInsets.all(4),
+                                          decoration: const BoxDecoration(
+                                            color: Colors.black54,
+                                            shape: BoxShape.circle,
+                                          ),
+                                          child: const Icon(Icons.close, color: Colors.white, size: 20),
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                );
+                              }
+                            },
+                          ),
+                  ),
+                  const SizedBox(height: 16),
+                  if (pendingUploads.isNotEmpty)
+                    Padding(
+                      padding: const EdgeInsets.only(bottom: 8.0),
+                      child: SizedBox(
+                        width: double.infinity,
+                        child: ElevatedButton.icon(
+                          onPressed: () => uploadImagesToServer(setModalState),
+                          icon: const Icon(Icons.cloud_upload, color: Colors.white),
+                          label: Text("Upload \ Photos", style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.green.shade600,
+                            padding: const EdgeInsets.symmetric(vertical: 16),
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                          ),
+                        ),
+                      ),
+                    ),
+                  SizedBox(
+                    width: double.infinity,
+                    child: OutlinedButton.icon(
+                      onPressed: () => pickImages(setModalState),
+                      icon: Icon(Icons.add_photo_alternate, color: AppColors.appBarColor),
+                      label: Text("Select Photos", style: TextStyle(color: AppColors.appBarColor, fontWeight: FontWeight.bold)),
+                      style: OutlinedButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(vertical: 16),
+                        side: BorderSide(color: AppColors.appBarColor),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            );
+          },
+        );
+      },
+    );
+  }
+
   Widget _buildInfoRow(IconData icon, String label, String value, Color iconColor) {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -521,3 +869,6 @@ class _JobOrdersTabState extends State<JobOrdersTab> {
     );
   }
 }
+
+
+
