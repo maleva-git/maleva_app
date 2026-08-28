@@ -10,11 +10,11 @@ import '../utils/app_preferences.dart';
 class ApiClient {
   ApiClient._();
 
-  // ─── Timeout config ───────────────────────────────────────────────────────
+  // â”€â”€â”€ Timeout config â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   static const Duration _kTimeout = Duration(seconds: 30);
   static const Duration _kUploadTimeout = Duration(seconds: 60);
 
-  // ─── Auth headers build ───────────────────────────────────────────────────
+  // â”€â”€â”€ Auth headers build â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   static Map<String, String> _buildHeaders({Map<String, String>? extra}) {
     final token = AppPreferences.getTokenKey();
     final headers = <String, String>{
@@ -29,7 +29,7 @@ class ApiClient {
     return headers;
   }
 
-  // ─── POST ─────────────────────────────────────────────────────────────────
+  // â”€â”€â”€ POST â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   // Returns: List<dynamic> | Map<String,dynamic> | String | int
   static Future<dynamic> postRequest(
       String url,
@@ -45,10 +45,10 @@ class ApiClient {
       final body = bodyData != null ? json.encode(bodyData) : null;
 
       if (kDebugMode) {
-        debugPrint("🚀 API REQUEST");
-        debugPrint("➡️ URL: $url");
-        debugPrint("➡️ Headers: $finalHeaders");
-        debugPrint("➡️ Body: $body");
+        debugPrint("ðŸš€ API REQUEST");
+        debugPrint("âž¡ï¸ URL: $url");
+        debugPrint("âž¡ï¸ Headers: $finalHeaders");
+        debugPrint("âž¡ï¸ Body: $body");
       }
 
       final response = await http
@@ -60,26 +60,26 @@ class ApiClient {
           .timeout(_kTimeout);
 
       if (kDebugMode) {
-        debugPrint("✅ API RESPONSE");
-        debugPrint("⬅️ Status Code: ${response.statusCode}");
-        debugPrint("⬅️ Body: ${response.body}");
+        debugPrint("âœ… API RESPONSE");
+        debugPrint("â¬…ï¸ Status Code: ${response.statusCode}");
+        debugPrint("â¬…ï¸ Body: ${response.body}");
       }
 
       return _handleResponse(response);
 
     } on SocketException {
-      if (kDebugMode) debugPrint("❌ No Internet Connection");
+      if (kDebugMode) debugPrint("âŒ No Internet Connection");
       throw Exception('No internet connection. Check your network.');
     } on TimeoutException {
-      if (kDebugMode) debugPrint("❌ Request timed out: $url");
+      if (kDebugMode) debugPrint("âŒ Request timed out: $url");
       throw Exception('Request timed out. Please try again.');
     } catch (e) {
-      if (kDebugMode) debugPrint("❌ API ERROR: $e");
+      if (kDebugMode) debugPrint("âŒ API ERROR: $e");
       rethrow;
     }
   }
 
-  // ─── GET ──────────────────────────────────────────────────────────────────
+  // â”€â”€â”€ GET â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   static Future<String> getString(String url) async {
     try {
       final response = await http.post(Uri.parse(url)).timeout(_kTimeout);
@@ -94,7 +94,7 @@ class ApiClient {
     }
   }
 
-  // ─── File / Image Upload ──────────────────────────────────────────────────
+  // â”€â”€â”€ File / Image Upload â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   static Future<String> uploadImage(
       File imageFile,
       String uploadUrl, {
@@ -181,7 +181,7 @@ class ApiClient {
     }
   }
 
-  // ─── Response Handler ─────────────────────────────────────────────────────
+  // â”€â”€â”€ Response Handler â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   static dynamic _handleResponse(http.Response response) {
     switch (response.statusCode) {
       case 200:
@@ -193,12 +193,14 @@ class ApiClient {
         throw Exception('Already logged in on another device. Re-login or change password.');
       case 404:
       case 500:
+        String errorMsg = 'Server error occurred. (${response.statusCode})';
         try {
           final body = jsonDecode(response.body);
-          throw Exception(body is Map ? (body['Message'] ?? 'Server error occurred.') : 'Server error occurred.');
-        } catch (_) {
-          throw Exception('Server error occurred. (${response.statusCode})');
-        }
+          if (body is Map && body.containsKey('Message') && body['Message'] != null) {
+            errorMsg = body['Message'].toString();
+          }
+        } catch (_) {}
+        throw Exception(errorMsg);
       default:
         throw Exception('${response.statusCode} Unknown error occurred.');
     }
