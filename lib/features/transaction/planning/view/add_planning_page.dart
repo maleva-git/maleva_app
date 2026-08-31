@@ -1,4 +1,4 @@
-﻿import 'package:maleva/core/network/api_constants.dart';
+import 'package:maleva/core/network/api_constants.dart';
 import 'package:maleva/features/transaction/planning/data/planning_repository.dart';
 import 'package:flutter/material.dart';
 import 'package:maleva/core/colors/colors.dart' as colour;
@@ -7,6 +7,7 @@ import 'package:intl/intl.dart';
 import '../../../../core/utils/app_globals.dart';
 import 'package:maleva/core/di/injection.dart';
 import 'package:maleva/core/network/legacy_api_repository.dart';
+import 'package:maleva/features/mastersearch/Employee.dart';
 
 class AddPlanningPage extends StatefulWidget {
   const AddPlanningPage({super.key});
@@ -500,6 +501,341 @@ class _AddPlanningPageState extends State<AddPlanningPage> {
     }
   }
 
+
+
+  Future<void> _showSavedPlanningsView() async {
+    String sheetFDate = DateFormat('dd/MM/yyyy').format(DateTime.now());
+    String sheetTDate = DateFormat('dd/MM/yyyy').format(DateTime.now());
+    TextEditingController sheetSearchCtrl = TextEditingController();
+    bool isLEmp = true;
+    int selectedEmpId = 0;
+    
+    List<dynamic> masterList = [];
+    List<dynamic> detailsList = [];
+    bool sheetIsLoading = true;
+
+    Future<void> fetchPlannings(StateSetter setSheetState) async {
+      setSheetState(() => sheetIsLoading = true);
+      try {
+        final f = DateFormat('yyyy/MM/dd').format(DateFormat('dd/MM/yyyy').parse(sheetFDate));
+        final t = DateFormat('yyyy/MM/dd').format(DateFormat('dd/MM/yyyy').parse(sheetTDate));
+        
+        int reqEmpId = isLEmp ? (AppGlobals.EmpRefId ?? 0) : selectedEmpId;
+        
+        final resultData = await sl<PlanningRepository>().getPlanning(f, t, sheetSearchCtrl.text, reqEmpId);
+        setSheetState(() {
+          if (resultData.isNotEmpty) {
+            masterList = resultData[0]["salemaster"] ?? [];
+            detailsList = resultData[0]["saledetails"] ?? [];
+          } else {
+            masterList = [];
+            detailsList = [];
+          }
+          sheetIsLoading = false;
+        });
+      } catch (e) {
+        setSheetState(() => sheetIsLoading = false);
+      }
+    }
+
+    Widget _buildInlineDatePicker(String label, String value, StateSetter setSheetState, Function(String) onChanged) {
+      return Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          SizedBox(
+            width: 70,
+            child: Text(label.replaceFirst(' ', '\n'), style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
+          ),
+          InkWell(
+            onTap: () => _pickDate(context, value, (v) {
+              onChanged(v);
+              setSheetState(() {});
+            }),
+            child: Container(
+              height: 35,
+              width: 100,
+              padding: const EdgeInsets.symmetric(horizontal: 8),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                border: Border.all(color: Colors.grey.shade400),
+                borderRadius: BorderRadius.circular(4),
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(value, style: const TextStyle(fontSize: 13)),
+                  Icon(Icons.calendar_month, size: 16, color: Colors.grey.shade600),
+                ],
+              ),
+            ),
+          ),
+        ],
+      );
+    }
+
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (ctx) {
+        return StatefulBuilder(builder: (ctx, setSheetState) {
+          if (sheetIsLoading && masterList.isEmpty) {
+            fetchPlannings(setSheetState);
+          }
+          return Container(
+            height: MediaQuery.of(context).size.height * 0.9,
+            decoration: const BoxDecoration(color: Colors.white, borderRadius: BorderRadius.vertical(top: Radius.circular(24))),
+            padding: EdgeInsets.only(left: 16, right: 16, top: 16, bottom: MediaQuery.of(ctx).viewInsets.bottom + 16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Text("PLANING DETAILS VIEW", style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Color(0xFF1E3A8A))),
+                    const Spacer(),
+                    IconButton(icon: const Icon(Icons.close, size: 20), onPressed: () => Navigator.pop(ctx), padding: EdgeInsets.zero, constraints: const BoxConstraints()),
+                  ],
+                ),
+                const SizedBox(height: 8),
+                Container(
+                  padding: const EdgeInsets.all(8),
+                  color: Colors.grey.shade100,
+                  child: Column(
+                    children: [
+                      // Row 1
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          Expanded(child: _buildInlineDatePicker('From Date', sheetFDate, setSheetState, (v) => sheetFDate = v)),
+                          Expanded(child: _buildInlineDatePicker('To Date', sheetTDate, setSheetState, (v) => sheetTDate = v)),
+                          SizedBox(
+                            height: 35,
+                            child: ElevatedButton(
+                              onPressed: () => fetchPlannings(setSheetState),
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.white,
+                                foregroundColor: Colors.black,
+                                side: BorderSide(color: Colors.grey.shade400),
+                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
+                                padding: const EdgeInsets.symmetric(horizontal: 16),
+                              ),
+                              child: const Text('VIEW', style: TextStyle(fontWeight: FontWeight.bold)),
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 12),
+                      // Row 2
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          Expanded(
+                            child: Row(
+                              children: [
+                                const SizedBox(
+                                  width: 70,
+                                  child: Text("Planning\nNo", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
+                                ),
+                                Expanded(
+                                  child: SizedBox(
+                                    height: 35,
+                                    child: TextField(
+                                      controller: sheetSearchCtrl,
+                                      decoration: InputDecoration(
+                                        filled: true,
+                                        fillColor: Colors.white,
+                                        contentPadding: const EdgeInsets.symmetric(horizontal: 8),
+                                        border: OutlineInputBorder(borderRadius: BorderRadius.circular(4), borderSide: BorderSide(color: Colors.grey.shade400)),
+                                        enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(4), borderSide: BorderSide(color: Colors.grey.shade400)),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                          Expanded(
+                            child: Row(
+                              children: [
+                                const SizedBox(
+                                  width: 70,
+                                  child: Text("Employee", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
+                                ),
+                                Expanded(
+                                  child: IgnorePointer(
+                                    ignoring: isLEmp,
+                                    child: Opacity(
+                                      opacity: isLEmp ? 0.5 : 1.0,
+                                      child: InkWell(
+                                        onTap: () async {
+                                          await sl<PlanningRepository>().selectEmployee(context, 'sales', 'admin');
+                                          if (!context.mounted) return;
+                                          Navigator.push(context, MaterialPageRoute(builder: (_) => const Employee(Searchby: 1, SearchId: 0))).then((navRes) {
+                                            if (navRes != null) {
+                                              setSheetState(() => selectedEmpId = navRes.Id);
+                                            }
+                                          });
+                                        },
+                                        child: Container(
+                                          height: 35,
+                                          padding: const EdgeInsets.symmetric(horizontal: 8),
+                                          decoration: BoxDecoration(
+                                            color: Colors.white,
+                                            border: Border.all(color: Colors.grey.shade400),
+                                            borderRadius: BorderRadius.circular(4),
+                                          ),
+                                          child: Row(
+                                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                            children: [
+                                              Expanded(child: Text(selectedEmpId == 0 ? '' : selectedEmpId.toString(), style: const TextStyle(fontSize: 13), overflow: TextOverflow.ellipsis)),
+                                              const Icon(Icons.arrow_drop_down, size: 20),
+                                            ],
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          SizedBox(
+                            width: 80,
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.end,
+                              children: [
+                                SizedBox(
+                                  width: 24,
+                                  height: 24,
+                                  child: Checkbox(
+                                    value: isLEmp,
+                                    onChanged: (val) {
+                                      setSheetState(() => isLEmp = val ?? true);
+                                    },
+                                  ),
+                                ),
+                                const SizedBox(width: 4),
+                                const Text('L.Emp', style: TextStyle(fontSize: 13)),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 8),
+                // Header Row (Mocking the Table Header)
+                Container(
+                  color: Colors.grey.shade200,
+                  padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+                  child: const Row(
+                    children: [
+                      SizedBox(width: 24), // Space for expand icon
+                      Expanded(flex: 2, child: Text('PLANING No', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold))),
+                      Expanded(flex: 2, child: Text('PLANING Date', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold))),
+                      Expanded(flex: 3, child: Text('Remarks', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold))),
+                      Text('EXPORT', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
+                      SizedBox(width: 8),
+                      Text('EXCEL', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
+                    ],
+                  ),
+                ),
+                // List View
+                Expanded(
+                  child: sheetIsLoading
+                      ? const Center(child: CircularProgressIndicator())
+                      : masterList.isEmpty
+                          ? const Center(child: Text("No records found."))
+                          : ListView.builder(
+                              itemCount: masterList.length,
+                              itemBuilder: (context, index) {
+                                final m = masterList[index];
+                                final mId = m['Id'];
+                                final relatedDetails = detailsList.where((d) => d['SaleId'] == mId).toList();
+
+                                return Theme(
+                                  data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
+                                  child: ExpansionTile(
+                                    tilePadding: const EdgeInsets.symmetric(horizontal: 8),
+                                    backgroundColor: Colors.orange.shade50,
+                                    collapsedBackgroundColor: Colors.orange.shade300,
+                                    iconColor: Colors.black,
+                                    collapsedIconColor: Colors.black,
+                                    title: Row(
+                                      children: [
+                                        Expanded(flex: 2, child: Text(m['PLANINGNoDisplay'] ?? '', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 12, color: Colors.black))),
+                                        Expanded(flex: 2, child: Text(m['PLANINGDate'] ?? '', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 12, color: Colors.black))),
+                                        Expanded(flex: 3, child: Text(m['Remarks'] ?? '', style: const TextStyle(fontSize: 12, color: Colors.black), maxLines: 1, overflow: TextOverflow.ellipsis)),
+                                      ],
+                                    ),
+                                    trailing: Row(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        IconButton(
+                                          constraints: const BoxConstraints(),
+                                          padding: EdgeInsets.zero,
+                                          icon: const Icon(Icons.picture_as_pdf, color: Colors.red, size: 20),
+                                          onPressed: () {
+                                          },
+                                        ),
+                                        const SizedBox(width: 16),
+                                        IconButton(
+                                          constraints: const BoxConstraints(),
+                                          padding: EdgeInsets.zero,
+                                          icon: const Icon(Icons.table_chart, color: Colors.green, size: 20),
+                                          onPressed: () {
+                                          },
+                                        ),
+                                        const SizedBox(width: 8),
+                                      ],
+                                    ),
+                                    children: [
+                                      Container(
+                                        color: Colors.white,
+                                        width: double.infinity,
+                                        child: SingleChildScrollView(
+                                          scrollDirection: Axis.horizontal,
+                                          child: DataTable(
+                                            headingRowHeight: 30,
+                                            dataRowMaxHeight: 35,
+                                            dataRowMinHeight: 35,
+                                            columnSpacing: 16,
+                                            horizontalMargin: 8,
+                                            headingRowColor: WidgetStateProperty.all(Colors.grey.shade200),
+                                            columns: const [
+                                              DataColumn(label: Text('JobNo', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12))),
+                                              DataColumn(label: Text('JobDate', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12))),
+                                              DataColumn(label: Text('TruckName', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12))),
+                                              DataColumn(label: Text('Remarks', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12))),
+                                            ],
+                                            rows: relatedDetails.map((d) {
+                                              return DataRow(cells: [
+                                                DataCell(Text(d['JobNo'] ?? '', style: const TextStyle(fontSize: 12))),
+                                                DataCell(Text(d['JobDate'] ?? '', style: const TextStyle(fontSize: 12))),
+                                                DataCell(Text(d['TruckName'] ?? '', style: const TextStyle(fontSize: 12))),
+                                                DataCell(Text(d['Remarks'] ?? '', style: const TextStyle(fontSize: 12))),
+                                              ]);
+                                            }).toList(),
+                                          ),
+                                        ),
+                                      )
+                                    ],
+                                  ),
+                                );
+                              },
+                            ),
+                ),
+              ],
+            ),
+          );
+        });
+      },
+    );
+  }
+
   void _sortPlanningItems() {
     setState(() {
       _planningItems.sort((a, b) => (a['origin'] ?? '').compareTo(b['origin'] ?? ''));
@@ -574,7 +910,7 @@ class _AddPlanningPageState extends State<AddPlanningPage> {
                   const SizedBox(width: 8),
                   _buildButton('UPDATE', () {}),
                   const SizedBox(width: 8),
-                  _buildButton('VIEW', () {}),
+                  _buildButton('VIEW', _showSavedPlanningsView),
                   const SizedBox(width: 8),
                   _buildButton('DELETE', () {}),
                   const SizedBox(width: 8),
@@ -668,6 +1004,12 @@ class _AddPlanningPageState extends State<AddPlanningPage> {
     );
   }
 }
+
+
+
+
+
+
 
 
 

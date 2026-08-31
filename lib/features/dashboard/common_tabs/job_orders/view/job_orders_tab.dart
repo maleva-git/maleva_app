@@ -34,14 +34,16 @@ class _JobOrdersTabState extends State<JobOrdersTab> {
 
   Color _getStatusColor(int statusRefId) {
     switch (statusRefId) {
-      case 1: // Open
-        return const Color(0xFF3B82F6); // Soft Blue
-      case 2: // In Progress
-        return const Color(0xFFF59E0B); // Amber/Orange
+      case 1:
+
+
+        return const Color(0xFF3B82F6);
+      case 2:
+        return const Color(0xFFF59E0B);
       case 3: // Completed
-        return const Color(0xFF10B981); // Emerald Green
-      case 4: // Cancelled
-        return const Color(0xFF6B7280); // Cool Grey (Instead of Red)
+        return const Color(0xFF10B981);
+      case 4:
+        return const Color(0xFF6B7280);
       default:
         return Colors.grey;
     }
