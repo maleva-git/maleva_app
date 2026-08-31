@@ -1,4 +1,4 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'dart:convert';
 import 'dart:io';
 import 'package:http/http.dart' as http;
@@ -623,12 +623,19 @@ class _JobOrdersTabState extends State<JobOrdersTab> {
         request.headers.addAll({
           'Comid': companyId,
           'Id': job.id.toString(),
+
           'FolderName': 'jobs order',
           'FileName': '',
           'SubFolderName': '',
           'DeleteFileName': '',
           'ExistingFilePath': '',
         });
+
+        debugPrint('==== API UPLOAD REQUEST ====');
+        debugPrint('URL: ${request.url}');
+        debugPrint('Headers: ${request.headers}');
+        debugPrint('Number of files to upload: ${pendingUploads.length}');
+        debugPrint('============================');
 
         for (int i = 0; i < pendingUploads.length; i++) {
           request.files.add(await http.MultipartFile.fromPath('MyImages$i', pendingUploads[i].path));
@@ -869,6 +876,7 @@ class _JobOrdersTabState extends State<JobOrdersTab> {
     );
   }
 }
+
 
 
 

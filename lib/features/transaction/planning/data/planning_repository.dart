@@ -27,6 +27,27 @@ class PlanningRepository {
     return resultData as List<dynamic>;
   }
 
+  Future<List<dynamic>> searchUnplannedOrders(String fromDate, String toDate, String searchKeyword, int empId) async {
+    Map<String, dynamic> payload = {
+      "Comid": AppGlobals.storagenew.getInt('Comid') ?? 0,
+      "Fromdate": fromDate,
+      "Todate": toDate,
+      "Search": searchKeyword,
+      "Employeeid": 0,
+    };
+    Map<String, String> header = {
+      'Content-Type': 'application/json; charset=UTF-8'
+    };
+
+    final resultData = await sl<LegacyApiRepository>().apiAllinoneSelectArray(
+        ApiConstants.PLANINGSearch, payload, header, null);
+    
+    if (resultData == null || resultData == "") {
+      return [];
+    }
+    return resultData as List<dynamic>;
+  }
+
   Future<void> editPlanning(dynamic context, int id, int planningNo) async {
     var comId = AppGlobals.storagenew.getInt('Comid') ?? 0;
 
@@ -119,4 +140,6 @@ class PlanningRepository {
   }
 
 }
+
+
 

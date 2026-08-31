@@ -38,7 +38,7 @@ class _EmployeeLeaveRequestTabState extends State<EmployeeLeaveRequestTab> {
     if (_selectedId != null) {
       ctx.read<LeaveBloc>().add(FetchLeaveData(
         applicantType: 1,
-        applicantRefId: widget.isAdminOrSubadmin ? 0 : _selectedId!,
+        applicantRefId: _selectedId!,
         fromDate: DateFormat('yyyy-MM-dd').format(_searchFromDate),
         toDate: DateFormat('yyyy-MM-dd').format(_searchToDate),
       ));
@@ -103,7 +103,7 @@ class _EmployeeLeaveRequestTabState extends State<EmployeeLeaveRequestTab> {
           child: Padding(
             padding: EdgeInsets.only(bottom: MediaQuery.of(ctx).viewInsets.bottom),
             child: _LeaveRequestFormSheet(
-              applicantRefId: _selectedId ?? 0,
+              applicantRefId: _selectedId ?? -1,
               leaveTypes: leaveTypes,
             ),
           ),
@@ -117,7 +117,7 @@ class _EmployeeLeaveRequestTabState extends State<EmployeeLeaveRequestTab> {
     return BlocProvider<LeaveBloc>(
       create: (context) => GetIt.instance<LeaveBloc>()..add(FetchLeaveData(
         applicantType: 1,
-        applicantRefId: widget.isAdminOrSubadmin ? 0 : (_selectedId ?? 0),
+        applicantRefId: _selectedId ?? -1,
         fromDate: DateFormat('yyyy-MM-dd').format(_searchFromDate),
         toDate: DateFormat('yyyy-MM-dd').format(_searchToDate),
       )),
