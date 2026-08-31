@@ -45,7 +45,7 @@ class _DriverLeaveRequestTabState extends State<_DriverLeaveRequestTabBody> {
     _selectedId = AppGlobals.EmpRefId;
     context.read<LeaveBloc>().add(FetchLeaveData(
       applicantType: 2,
-      applicantRefId: _selectedId ?? 0,
+      applicantRefId: _selectedId ?? -1,
       fromDate: DateFormat('yyyy-MM-dd').format(_searchFromDate),
       toDate: DateFormat('yyyy-MM-dd').format(_searchToDate),
     ));
@@ -120,7 +120,7 @@ class _DriverLeaveRequestTabState extends State<_DriverLeaveRequestTabBody> {
           child: Padding(
             padding: EdgeInsets.only(bottom: MediaQuery.of(ctx).viewInsets.bottom),
             child: _LeaveRequestFormSheet(
-              applicantRefId: _selectedId ?? 0,
+              applicantRefId: _selectedId ?? -1,
               leaveTypes: leaveTypes,
             ),
           ),
