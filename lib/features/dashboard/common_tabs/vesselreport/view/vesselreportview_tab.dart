@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:maleva/features/mastersearch/Employee.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
@@ -12,6 +13,10 @@ import '../bloc/vesselreport_state.dart';
 import 'package:maleva/core/colors/colors.dart' as colour;
 import 'package:maleva/core/network/api_services/master_api.dart';
 import 'package:maleva/features/operations/models/job_status_model.dart';
+import 'package:maleva/core/network/legacy_api_repository.dart';
+import 'package:maleva/core/di/injection.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+import 'package:maleva/core/utils/dialog_helper.dart';
 
 class VesselReportPage extends StatelessWidget {
   const VesselReportPage({super.key});
@@ -74,41 +79,47 @@ class _VesselReportViewState extends State<_VesselReportView> {
         _syncControllersFromState(state);
 
         if (state is VesselErrorState) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(state.errorMessage,
-                  style: GoogleFonts.poppins(color: colour.kWhite)),
-              backgroundColor: Colors.redAccent,
-              behavior: SnackBarBehavior.floating,
-              shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12)),
-            ),
+          msgshow(
+            state.errorMessage,
+            '',
+            Colors.white,
+            Colors.redAccent,
+            const Duration(seconds: 3),
+            14.0,
+            Toast.LENGTH_SHORT,
+            ToastGravity.TOP,
+            context,
+            0,
           );
         }
 
         if (state is VesselUpdateActionSuccess) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(state.message,
-                  style: GoogleFonts.poppins(color: colour.kWhite)),
-              backgroundColor: Colors.green,
-              behavior: SnackBarBehavior.floating,
-              shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12)),
-            ),
+          msgshow(
+            state.message,
+            '',
+            Colors.white,
+            Colors.green,
+            const Duration(seconds: 3),
+            14.0,
+            Toast.LENGTH_SHORT,
+            ToastGravity.TOP,
+            context,
+            0,
           );
         }
 
         if (state is VesselUpdateActionError) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(state.message,
-                  style: GoogleFonts.poppins(color: colour.kWhite)),
-              backgroundColor: Colors.redAccent,
-              behavior: SnackBarBehavior.floating,
-              shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12)),
-            ),
+          msgshow(
+            state.message,
+            '',
+            Colors.white,
+            Colors.redAccent,
+            const Duration(seconds: 3),
+            14.0,
+            Toast.LENGTH_SHORT,
+            ToastGravity.TOP,
+            context,
+            0,
           );
         }
 
@@ -1393,9 +1404,161 @@ class _VesselCard extends StatelessWidget {
       }
     }
 
+    // General Boarding Officer
+    int? boId1 = itemData['BoardingOfficerRefid'] != null ? int.tryParse(itemData['BoardingOfficerRefid'].toString()) : null;
+    String boName1 = itemData['BoardingOfficerName']?.toString() ?? '';
+    int? boId2 = itemData['BoardingOfficer1Refid'] != null ? int.tryParse(itemData['BoardingOfficer1Refid'].toString()) : null;
+    String boName2 = itemData['BoardingOfficerName1']?.toString() ?? '';
+    int? boId3 = itemData['BoardingOfficer2Refid'] != null ? int.tryParse(itemData['BoardingOfficer2Refid'].toString()) : null;
+    String boName3 = itemData['BoardingOfficerName2']?.toString() ?? '';
+    String boAmt1 = itemData['BoardingAmount']?.toString() ?? '';
+    String boAmt2 = itemData['BoardingAmount1']?.toString() ?? '';
+    String boAmt3 = itemData['BoardingAmount2']?.toString() ?? '';
+
+    // Loading BO
+    int? lboId1 = itemData['LBoardingOfficerRefid'] != null ? int.tryParse(itemData['LBoardingOfficerRefid'].toString()) : null;
+    String lboName1 = itemData['LBoardingOfficerName']?.toString() ?? '';
+    int? lboId2 = itemData['LBoardingOfficer1Refid'] != null ? int.tryParse(itemData['LBoardingOfficer1Refid'].toString()) : null;
+    String lboName2 = itemData['LBoardingOfficerName1']?.toString() ?? '';
+    int? lboId3 = itemData['LBoardingOfficer2Refid'] != null ? int.tryParse(itemData['LBoardingOfficer2Refid'].toString()) : null;
+    String lboName3 = itemData['LBoardingOfficerName2']?.toString() ?? '';
+    String lboAmt1 = itemData['LBoardingAmount']?.toString() ?? '';
+    String lboAmt2 = itemData['LBoardingAmount1']?.toString() ?? '';
+    String lboAmt3 = itemData['LBoardingAmount2']?.toString() ?? '';
+
+    // Offload BO
+    int? oboId1 = itemData['OBoardingOfficerRefid'] != null ? int.tryParse(itemData['OBoardingOfficerRefid'].toString()) : null;
+    String oboName1 = itemData['OBoardingOfficerName']?.toString() ?? '';
+    int? oboId2 = itemData['OBoardingOfficer1Refid'] != null ? int.tryParse(itemData['OBoardingOfficer1Refid'].toString()) : null;
+    String oboName2 = itemData['OBoardingOfficerName1']?.toString() ?? '';
+    int? oboId3 = itemData['OBoardingOfficer2Refid'] != null ? int.tryParse(itemData['OBoardingOfficer2Refid'].toString()) : null;
+    String oboName3 = itemData['OBoardingOfficerName2']?.toString() ?? '';
+    String oboAmt1 = itemData['OBoardingAmount']?.toString() ?? '';
+    String oboAmt2 = itemData['OBoardingAmount1']?.toString() ?? '';
+    String oboAmt3 = itemData['OBoardingAmount2']?.toString() ?? '';
+
     int? selectedJobStatusId;
     List<JobStatusModel> jobStatuses = [];
     bool isLoadingStatuses = true;
+
+    void _recalcCategory(
+        int? id1, int? id2, int? id3,
+        Function(String) setAmt1, Function(String) setAmt2, Function(String) setAmt3) {
+      int count = 0;
+      if (id1 != null && id1 != 0) count++;
+      if (id2 != null && id2 != 0) count++;
+      if (id3 != null && id3 != 0) count++;
+
+      if (count == 0) {
+        setAmt1(''); setAmt2(''); setAmt3('');
+      } else if (count == 1) {
+        setAmt1(id1 != null && id1 != 0 ? '50' : '');
+        setAmt2(id2 != null && id2 != 0 ? '50' : '');
+        setAmt3(id3 != null && id3 != 0 ? '50' : '');
+      } else if (count == 2) {
+        setAmt1(id1 != null && id1 != 0 ? '30' : '');
+        setAmt2(id2 != null && id2 != 0 ? '30' : '');
+        setAmt3(id3 != null && id3 != 0 ? '30' : '');
+      } else if (count == 3) {
+        setAmt1('20');
+        setAmt2('20');
+        setAmt3('20');
+      }
+    }
+
+    Widget _buildSingleOfficer(String title, int? id, String name, String amt, StateSetter setState, Function(int?, String) onSelect, Function(String) onAmt) {
+      return Padding(
+        padding: const EdgeInsets.only(bottom: 8),
+        child: Row(
+          children: [
+            Expanded(
+              flex: 4,
+              child: Row(
+                children: [
+                  Expanded(
+                    child: InkWell(
+                      onTap: () async {
+                        if (!context.mounted) return;
+                        
+                        showDialog(
+                          context: context,
+                          barrierDismissible: false,
+                          builder: (BuildContext context) => const Center(child: CircularProgressIndicator()),
+                        );
+                        
+                        try {
+                          await sl<LegacyApiRepository>().SelectEmployee(context, 'OPERATION', '');
+                        } catch (e) {
+                          // Ignore
+                        } finally {
+                          if (context.mounted) Navigator.pop(context);
+                        }
+
+                        if (!context.mounted) return;
+                        Navigator.push(context, MaterialPageRoute(builder: (_) => const Employee(Searchby: 1, SearchId: 0))).then((navRes) {
+                          if (navRes != null) {
+                            setState(() {
+                              onSelect(navRes.Id, navRes.AccountName);
+                            });
+                          }
+                        });
+                      },
+                      child: Container(
+                        height: 38,
+                        padding: const EdgeInsets.symmetric(horizontal: 8),
+                        decoration: BoxDecoration(border: Border.all(color: AppTokens.brandMid.withOpacity(0.3)), borderRadius: BorderRadius.circular(8)),
+                        alignment: Alignment.centerLeft,
+                        child: Text(id == null || id == 0 ? title : name, style: GoogleFonts.poppins(fontSize: 12, color: id == null || id == 0 ? Colors.grey : AppTokens.brandDark), maxLines: 1, overflow: TextOverflow.ellipsis),
+                      ),
+                    ),
+                  ),
+                  if (id != null && id != 0)
+                    IconButton(
+                      icon: const Icon(Icons.clear, color: Colors.red, size: 18),
+                      onPressed: () => setState(() => onSelect(null, '')),
+                      padding: const EdgeInsets.symmetric(horizontal: 4),
+                      constraints: const BoxConstraints(),
+                    ),
+                ],
+              ),
+            ),
+            const SizedBox(width: 8),
+            Expanded(
+              flex: 2,
+              child: SizedBox(
+                height: 38,
+                child: TextFormField(
+                  key: ValueKey(amt), // Rebuild when amt changes
+                  initialValue: amt,
+                  keyboardType: TextInputType.number,
+                  style: GoogleFonts.poppins(fontSize: 13),
+                  decoration: InputDecoration(hintText: 'Amount', contentPadding: const EdgeInsets.symmetric(horizontal: 8), border: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: BorderSide(color: AppTokens.brandMid.withOpacity(0.3)))),
+                  onChanged: onAmt,
+                ),
+              ),
+            ),
+          ],
+        ),
+      );
+    }
+
+    Widget _buildOfficerGroup(String groupTitle, 
+        int? id1, String name1, String amt1, Function(int?, String) onSel1, Function(String) onAmt1,
+        int? id2, String name2, String amt2, Function(int?, String) onSel2, Function(String) onAmt2,
+        int? id3, String name3, String amt3, Function(int?, String) onSel3, Function(String) onAmt3,
+        StateSetter setState) {
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(groupTitle, style: GoogleFonts.poppins(fontSize: 13, fontWeight: FontWeight.w600, color: AppTokens.brandDark)),
+          const SizedBox(height: 8),
+          _buildSingleOfficer('Select BO 1', id1, name1, amt1, setState, onSel1, onAmt1),
+          _buildSingleOfficer('Select BO 2', id2, name2, amt2, setState, onSel2, onAmt2),
+          _buildSingleOfficer('Select BO 3', id3, name3, amt3, setState, onSel3, onAmt3),
+          const SizedBox(height: 8),
+        ],
+      );
+    }
 
     showModalBottomSheet(
       context: context,
@@ -1593,6 +1756,30 @@ class _VesselCard extends StatelessWidget {
                       if (hasLoadingDates) _buildEditField('L ETD', etd, (v) => etd = v),
                       if (hasOffloadDates) _buildEditField('OETB', oetb, (v) => oetb = v),
                       if (hasOffloadDates) _buildEditField('OETD', oetd, (v) => oetd = v),
+                      
+                      const SizedBox(height: 16),
+                      
+                      _buildOfficerGroup('Loading BO', 
+                        lboId1, lboName1, lboAmt1, (id, name) { lboId1 = id; lboName1 = name; _recalcCategory(lboId1, lboId2, lboId3, (v)=>lboAmt1=v, (v)=>lboAmt2=v, (v)=>lboAmt3=v); }, (v)=>lboAmt1=v,
+                        lboId2, lboName2, lboAmt2, (id, name) { lboId2 = id; lboName2 = name; _recalcCategory(lboId1, lboId2, lboId3, (v)=>lboAmt1=v, (v)=>lboAmt2=v, (v)=>lboAmt3=v); }, (v)=>lboAmt2=v,
+                        lboId3, lboName3, lboAmt3, (id, name) { lboId3 = id; lboName3 = name; _recalcCategory(lboId1, lboId2, lboId3, (v)=>lboAmt1=v, (v)=>lboAmt2=v, (v)=>lboAmt3=v); }, (v)=>lboAmt3=v,
+                        setState),
+                      
+                      const Divider(),
+                      
+                      _buildOfficerGroup('Offload BO', 
+                        oboId1, oboName1, oboAmt1, (id, name) { oboId1 = id; oboName1 = name; _recalcCategory(oboId1, oboId2, oboId3, (v)=>oboAmt1=v, (v)=>oboAmt2=v, (v)=>oboAmt3=v); }, (v)=>oboAmt1=v,
+                        oboId2, oboName2, oboAmt2, (id, name) { oboId2 = id; oboName2 = name; _recalcCategory(oboId1, oboId2, oboId3, (v)=>oboAmt1=v, (v)=>oboAmt2=v, (v)=>oboAmt3=v); }, (v)=>oboAmt2=v,
+                        oboId3, oboName3, oboAmt3, (id, name) { oboId3 = id; oboName3 = name; _recalcCategory(oboId1, oboId2, oboId3, (v)=>oboAmt1=v, (v)=>oboAmt2=v, (v)=>oboAmt3=v); }, (v)=>oboAmt3=v,
+                        setState),
+
+                      const Divider(),
+                      
+                      _buildOfficerGroup('Boarding Officer', 
+                        boId1, boName1, boAmt1, (id, name) { boId1 = id; boName1 = name; _recalcCategory(boId1, boId2, boId3, (v)=>boAmt1=v, (v)=>boAmt2=v, (v)=>boAmt3=v); }, (v)=>boAmt1=v,
+                        boId2, boName2, boAmt2, (id, name) { boId2 = id; boName2 = name; _recalcCategory(boId1, boId2, boId3, (v)=>boAmt1=v, (v)=>boAmt2=v, (v)=>boAmt3=v); }, (v)=>boAmt2=v,
+                        boId3, boName3, boAmt3, (id, name) { boId3 = id; boName3 = name; _recalcCategory(boId1, boId2, boId3, (v)=>boAmt1=v, (v)=>boAmt2=v, (v)=>boAmt3=v); }, (v)=>boAmt3=v,
+                        setState),
                     ],
 
                     if (jobStatuses.isEmpty)
@@ -1673,7 +1860,7 @@ class _VesselCard extends StatelessWidget {
                         ),
                         onPressed: () {
                           // Hide keyboard
-                          FocusScope.of(context).unfocus();
+                          FocusManager.instance.primaryFocus?.unfocus();
 
                           // Format for API: "yyyy-MM-dd HH:mm:ss"
                           String _formatForApi(String dt, String originalKey) {
@@ -1693,7 +1880,28 @@ class _VesselCard extends StatelessWidget {
                             "OETB": _formatForApi(oetb, 'SOETB'),
                             "OETD": _formatForApi(oetd, 'SOETD'),
                             "Comid": AppGlobals.Comid,
-                            "Type": 100, // SAVE ALL
+                            "Type": 100,
+                            
+                            "BoardingOfficerRefid": boId1,
+                            "BoardingOfficer1Refid": boId2,
+                            "BoardingOfficer2Refid": boId3,
+                            "BoardingAmount": double.tryParse(boAmt1) ?? 0,
+                            "BoardingAmount1": double.tryParse(boAmt2) ?? 0,
+                            "BoardingAmount2": double.tryParse(boAmt3) ?? 0,
+                            
+                            "LBoardingOfficerRefid": lboId1,
+                            "LBoardingOfficer1Refid": lboId2,
+                            "LBoardingOfficer2Refid": lboId3,
+                            "LBoardingAmount": double.tryParse(lboAmt1) ?? 0,
+                            "LBoardingAmount1": double.tryParse(lboAmt2) ?? 0,
+                            "LBoardingAmount2": double.tryParse(lboAmt3) ?? 0,
+                            
+                            "OBoardingOfficerRefid": oboId1,
+                            "OBoardingOfficer1Refid": oboId2,
+                            "OBoardingOfficer2Refid": oboId3,
+                            "OBoardingAmount": double.tryParse(oboAmt1) ?? 0,
+                            "OBoardingAmount1": double.tryParse(oboAmt2) ?? 0,
+                            "OBoardingAmount2": double.tryParse(oboAmt3) ?? 0,
                           };
 
                           if (selectedJobStatusId != null) {
@@ -1768,3 +1976,6 @@ class _EmptyState extends StatelessWidget {
     );
   }
 }
+
+
+

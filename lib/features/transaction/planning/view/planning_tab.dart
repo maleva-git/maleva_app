@@ -1,4 +1,4 @@
-﻿import 'add_planning_page.dart';
+import 'add_planning_page.dart';
 import 'package:maleva/core/theme/app_typography.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -135,15 +135,26 @@ class _PlanningScaffold extends StatelessWidget {
         ],
       ),
       actions: [
-        IconButton(
-          icon: const Icon(Icons.add_box_rounded, color: colour.kCobalt, size: 28),
-          onPressed: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => const AddPlanningPage()),
-            );
-          },
-        ),
+          IconButton(
+            icon: const Icon(Icons.add_box_rounded, color: colour.kCobalt, size: 28),
+            onPressed: () async {
+              final result = await Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const AddPlanningPage()),
+              );
+              if (result == true && context.mounted) {
+                // Refresh the list after saving
+                context.read<PlanningBloc>().add(LoadPlanningEvent(
+                  fromDate: DateFormat("yyyy-MM-dd").format(DateTime.now()),
+                  toDate: DateFormat("yyyy-MM-dd").format(DateTime.now()),
+                  employeeId: AppGlobals.EmpRefId ?? 0,
+                  employeeName: '',
+                  planningNo: '',
+                  checkLoggedEmp: true,
+                ));
+              }
+            },
+          ),
         const SizedBox(width: 8),
       ],
       bottom: PreferredSize(
