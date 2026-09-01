@@ -1772,14 +1772,6 @@ class _VesselCard extends StatelessWidget {
                         oboId2, oboName2, oboAmt2, (id, name) { oboId2 = id; oboName2 = name; _recalcCategory(oboId1, oboId2, oboId3, (v)=>oboAmt1=v, (v)=>oboAmt2=v, (v)=>oboAmt3=v); }, (v)=>oboAmt2=v,
                         oboId3, oboName3, oboAmt3, (id, name) { oboId3 = id; oboName3 = name; _recalcCategory(oboId1, oboId2, oboId3, (v)=>oboAmt1=v, (v)=>oboAmt2=v, (v)=>oboAmt3=v); }, (v)=>oboAmt3=v,
                         setState),
-
-                      const Divider(),
-                      
-                      _buildOfficerGroup('Boarding Officer', 
-                        boId1, boName1, boAmt1, (id, name) { boId1 = id; boName1 = name; _recalcCategory(boId1, boId2, boId3, (v)=>boAmt1=v, (v)=>boAmt2=v, (v)=>boAmt3=v); }, (v)=>boAmt1=v,
-                        boId2, boName2, boAmt2, (id, name) { boId2 = id; boName2 = name; _recalcCategory(boId1, boId2, boId3, (v)=>boAmt1=v, (v)=>boAmt2=v, (v)=>boAmt3=v); }, (v)=>boAmt2=v,
-                        boId3, boName3, boAmt3, (id, name) { boId3 = id; boName3 = name; _recalcCategory(boId1, boId2, boId3, (v)=>boAmt1=v, (v)=>boAmt2=v, (v)=>boAmt3=v); }, (v)=>boAmt3=v,
-                        setState),
                     ],
 
                     if (jobStatuses.isEmpty)
