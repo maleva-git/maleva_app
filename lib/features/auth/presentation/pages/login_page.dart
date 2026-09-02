@@ -6,7 +6,9 @@ import '../bloc/auth_state.dart';
 import 'login_design.dart';
 import '../../../../core/utils/app_preferences.dart';
 
-class Appuserloginmobile extends StatelessWidget {
+class Appuserloginmobile extends StatelessWidget
+
+{
   const Appuserloginmobile ({super.key});
 
   @override

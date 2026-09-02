@@ -4,6 +4,9 @@ import 'package:flutter/material.dart';
 import 'package:maleva/core/colors/colors.dart' as colour;
 import 'package:maleva/core/theme/app_typography.dart';
 import 'package:intl/intl.dart';
+import 'package:maleva/features/transaction/salesorder/add/view/salesorderadd_tab.dart';
+import 'package:maleva/core/models/shared/sale_edit_detail_model.dart';
+import 'dart:convert';
 import '../../../../core/utils/app_globals.dart';
 import 'package:maleva/core/di/injection.dart';
 import 'package:maleva/core/network/legacy_api_repository.dart';
@@ -17,7 +20,7 @@ class AddPlanningPage extends StatefulWidget {
 }
 
 class _AddPlanningPageState extends State<AddPlanningPage> {
-  final TextEditingController _planNoCtrl = TextEditingController(text: 'PL000000771');
+  final TextEditingController _planNoCtrl = TextEditingController(text: '0');
   final TextEditingController _searchCtrl = TextEditingController();
   final TextEditingController _remarksCtrl = TextEditingController();
   
@@ -26,10 +29,13 @@ class _AddPlanningPageState extends State<AddPlanningPage> {
   String _toDate = DateFormat('dd/MM/yyyy').format(DateTime.now());
 
   final List<Map<String, dynamic>> _planningItems = [];
+  int? _editMasterId;
+
 
   @override
   void initState() {
     super.initState();
+    _fetchMaxPlaningNo();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       sl<LegacyApiRepository>().SelectTruckList(context, '');
       sl<LegacyApiRepository>().SelectDriverList(context, '');
@@ -117,6 +123,110 @@ class _AddPlanningPageState extends State<AddPlanningPage> {
     );
   }
 
+  void _showBulkApplySheet() {
+    String? bTruck;
+    String? bDriver;
+    String? bPDate;
+    String? bDDate;
+
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(16))),
+      builder: (ctx) {
+        return StatefulBuilder(
+          builder: (BuildContext context, StateSetter setModalState) {
+            return Padding(
+              padding: EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom, left: 16, right: 16, top: 16),
+              child: SingleChildScrollView(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text('Bulk Apply to All Lines', style: AppTypography.heading3()),
+                        IconButton(icon: const Icon(Icons.close), onPressed: () => Navigator.pop(ctx)),
+                      ],
+                    ),
+                    const Divider(),
+                    const Text('Select the fields you want to update for ALL lines. Leave empty to skip.', style: TextStyle(color: Colors.grey, fontSize: 12)),
+                    const SizedBox(height: 16),
+
+                    Row(
+                      children: [
+                        Expanded(
+                          child: _buildSheetDropdown(
+                            'Truck (Leave empty to skip)', 
+                            bTruck ?? '', 
+                            [''] + AppGlobals.GetTruckList.map((e) => e.AccountName ?? '').toList(), 
+                            setModalState, 
+                            (v) => setModalState(() => bTruck = v.isEmpty ? null : v)
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: _buildSheetDropdown(
+                            'Driver (Leave empty to skip)', 
+                            bDriver ?? '', 
+                            [''] + AppGlobals.GetDriverList.map((e) => e.AccountName ?? '').toList(), 
+                            setModalState, 
+                            (v) => setModalState(() => bDriver = v.isEmpty ? null : v)
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 16),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: _buildSheetDatePicker(
+                            'Pickup Date (Skip if empty)', 
+                            bPDate ?? '', 
+                            setModalState, 
+                            (d) => setModalState(() => bPDate = d)
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: _buildSheetDatePicker(
+                            'Delivery Date (Skip if empty)', 
+                            bDDate ?? '', 
+                            setModalState, 
+                            (d) => setModalState(() => bDDate = d)
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 24),
+                    ElevatedButton(
+                      onPressed: () {
+                        setState(() {
+                          for (int i = 0; i < _planningItems.length; i++) {
+                            if (bTruck != null) _planningItems[i]['truck'] = bTruck;
+                            if (bDriver != null) _planningItems[i]['driver'] = bDriver;
+                            if (bPDate != null) _planningItems[i]['pDate'] = bPDate;
+                            if (bDDate != null) _planningItems[i]['dDate'] = bDDate;
+                          }
+                        });
+                        Navigator.pop(ctx);
+                        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Bulk applied successfully!')));
+                      },
+                      style: ElevatedButton.styleFrom(backgroundColor: colour.kCobalt, padding: const EdgeInsets.symmetric(vertical: 12)),
+                      child: const Text('APPLY TO ALL', style: TextStyle(color: colour.kBg, fontWeight: FontWeight.bold, fontSize: 16)),
+                    ),
+                    const SizedBox(height: 16),
+                  ],
+                ),
+              ),
+            );
+          },
+        );
+      },
+    );
+  }
+
   void _showAddEditItemSheet({Map<String, dynamic>? itemToEdit, int? index}) {
     final bool isEdit = itemToEdit != null;
     
@@ -139,7 +249,7 @@ class _AddPlanningPageState extends State<AddPlanningPage> {
           return Container(
             height: MediaQuery.of(context).size.height * 0.85,
             decoration: const BoxDecoration(
-              color: Colors.white,
+              color: colour.kBg,
               borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
             ),
             padding: EdgeInsets.only(
@@ -225,7 +335,7 @@ class _AddPlanningPageState extends State<AddPlanningPage> {
                       padding: const EdgeInsets.symmetric(vertical: 16),
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                     ),
-                    child: Text(isEdit ? "Update Line" : "Add Line", style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+                    child: Text(isEdit ? "Update Line" : "Add Line", style: const TextStyle(color: colour.kBg, fontWeight: FontWeight.bold)),
                   ),
                 )
               ],
@@ -324,6 +434,77 @@ class _AddPlanningPageState extends State<AddPlanningPage> {
 
   bool _isLoading = false;
 
+  Future<void> _fetchMaxPlaningNo() async {
+    try {
+      final payload = {"Comid": AppGlobals.Comid, "BillType": ""};
+      Map<String, String> header = {
+        'Content-Type': 'application/json; charset=UTF-8',
+        'Comid': AppGlobals.Comid.toString()
+      };
+      var resultData = await sl<LegacyApiRepository>().apiAllinone(
+          "${ApiConstants.port}/PLANING/MaxPLANINGNo", jsonEncode(payload), header, null);
+          
+      if (resultData != null) {
+        if (resultData is String) {
+          resultData = jsonDecode(resultData);
+        }
+        if (resultData['ok'] == true) {
+           setState(() {
+              _planNoCtrl.text = resultData['No']?.toString() ?? '';
+           });
+        }
+      }
+    } catch (e) {
+      debugPrint("Error fetching max planning no: $e");
+    }
+  }
+
+  Future<void> _deletePlanning() async {
+    if (_editMasterId == null) {
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Please load a saved planning record to delete')));
+      return;
+    }
+
+    bool? confirm = await showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Confirm Delete'),
+        content: const Text('Are you sure you want to delete this planning record?'),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('CANCEL')),
+          TextButton(onPressed: () => Navigator.pop(ctx, true), child: const Text('DELETE', style: TextStyle(color: Colors.red))),
+        ],
+      ),
+    );
+
+    if (confirm != true) return;
+
+    setState(() => _isLoading = true);
+    try {
+      final url = "${ApiConstants.port}/PLANING/DeletePLANING?Id=${_editMasterId}&Comid=${AppGlobals.Comid}";
+      Map<String, String> header = {'Content-Type': 'application/json; charset=UTF-8', 'Comid': AppGlobals.Comid.toString()};
+      
+      final resultData = await sl<LegacyApiRepository>().apiAllinone(url, {}, header, null);
+
+      if (resultData != null) {
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Planning Deleted Successfully')));
+        setState(() {
+           _editMasterId = null;
+                          _planningItems.clear();
+                          _remarksCtrl.clear();
+                          _planNoCtrl.text = '';
+                          _fetchMaxPlaningNo();
+        });
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Failed to delete planning')));
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Error: ")));
+    } finally {
+      if (mounted) setState(() => _isLoading = false);
+    }
+  }
+
   Future<void> _savePlanningData() async {
     if (_planningItems.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Add at least one planning line')));
@@ -353,15 +534,18 @@ class _AddPlanningPageState extends State<AddPlanningPage> {
         }
 
         return {
-          'Id': 0,
+          'Id': d['detailId'] ?? 0,
+            'SortByD': d['SortByD'] ?? 0,
+            'SaleOrderMasterRefId': d['saleOrderId'] ?? 0,
+            'SortByD': d['SortByD'] ?? 0,
           'JobNo': d['jobNo'] ?? '',
           'JobDate': null,
           'TruckName': d['truck'] ?? '',
           'TruckRefid': truckId,
           'DriverName': d['driver'] ?? '',
           'DriverRefid': driverId,
-          'PickupDate': d['pDate'] != null ? DateFormat('yyyy-MM-dd').format(DateFormat('dd/MM/yyyy').parse(d['pDate'])) : null,
-          'DeliveryDate': d['dDate'] != null ? DateFormat('yyyy-MM-dd').format(DateFormat('dd/MM/yyyy').parse(d['dDate'])) : null,
+          'SPickupDate': d['pDate'] != null ? DateFormat('yyyy-MM-dd').format(DateFormat('dd/MM/yyyy').parse(d['pDate'])) : null,
+          'SDeliveryDate': d['dDate'] != null ? DateFormat('yyyy-MM-dd').format(DateFormat('dd/MM/yyyy').parse(d['dDate'])) : null,
           'Origin': d['origin'] ?? '',
           'Destination': d['destination'] ?? '',
           'PickupAddress': '',
@@ -373,21 +557,30 @@ class _AddPlanningPageState extends State<AddPlanningPage> {
       }).toList();
 
       final payload = [{
-        'Id': 0,
-        'CompanyRefId': AppGlobals.Comid,
-        'SaleDate': DateFormat('yyyy-MM-dd').format(DateFormat('dd/MM/yyyy').parse(_planDate)),
-        'CNumberDisplay': _planNoCtrl.text,
-        'Remarks': _remarksCtrl.text,
-        'SaleDetails': saleDetails
-      }];
+          'Id': _editMasterId ?? 0,
+          'CompanyRefId': AppGlobals.Comid,
+          'UserRefId': null,
+          'EmployeeRefId': null,
+          'SaleDate': DateFormat('yyyy-MM-dd').format(DateFormat('dd/MM/yyyy').parse(_planDate)),
+          'FDate': DateFormat('yyyy-MM-dd').format(DateFormat('dd/MM/yyyy').parse(_planDate)),
+          'TDate': DateFormat('yyyy-MM-dd').format(DateFormat('dd/MM/yyyy').parse(_planDate)),
+          'CNumberDisplay': 0,
+          'CNumber': 0,
+          'Remarks': _remarksCtrl.text,
+          'SaleDetails': saleDetails
+        }];
 
       Map<String, String> header = {'Content-Type': 'application/json; charset=UTF-8', 'Comid': AppGlobals.Comid.toString()};
       final resultData = await sl<LegacyApiRepository>().apiAllinone(
-          "${ApiConstants.port}/PLANING/InsertPLANING", payload, header, null);
+          "${ApiConstants.port}/PLANING/InsertPLANING", jsonEncode(payload), header, null);
 
       if (resultData != null && resultData.toString().isNotEmpty) {
-        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Planning Saved Successfully')));
-        Navigator.pop(context, true);
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(_editMasterId != null ? 'Planning Updated Successfully' : 'Planning Saved Successfully')));
+        setState(() {
+           _editMasterId = null;
+           _planningItems.clear();
+           _remarksCtrl.clear();
+        });
       } else {
         ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Failed to save planning')));
       }
@@ -458,6 +651,47 @@ class _AddPlanningPageState extends State<AddPlanningPage> {
     );
   }
 
+
+  Future<void> _launchSOUpdate(int saleOrderId) async {
+    if (saleOrderId == 0) return;
+    setState(() => _isLoading = true);
+    try {
+      final comid = AppGlobals.storagenew.getInt('Comid') ?? 0;
+      final url = "${ApiConstants.apiEditSalesOrder}$saleOrderId&SaleorderNo=0&Comid=$comid";
+      
+      dynamic responseData = await sl<LegacyApiRepository>().apiAllinoneSelect(Uri.encodeFull(url));
+      
+      if (responseData is String) {
+        if (responseData.trim().isEmpty) {
+          setState(() => _isLoading = false);
+          return;
+        }
+        responseData = jsonDecode(responseData);
+      }
+      
+      if (responseData is List && responseData.isNotEmpty) {
+        AppGlobals.SaleEditMasterList = responseData;
+        AppGlobals.SaleEditDetailList = (responseData[0]["SaleDetails"] as List)
+            .map<SaleEditDetailModel>((e) => SaleEditDetailModel.fromJson(e))
+            .toList();
+            
+        if (!mounted) return;
+        setState(() => _isLoading = false);
+        Navigator.of(context).push(MaterialPageRoute(
+          builder: (_) => SalesOrdersAdd(
+            SaleDetails: AppGlobals.SaleEditDetailList,
+            SaleMaster: AppGlobals.SaleEditMasterList,
+          ),
+        ));
+      } else {
+        setState(() => _isLoading = false);
+      }
+    } catch(e) {
+      setState(() => _isLoading = false);
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Failed to load Sales Order for edit: $e')));
+    }
+  }
   void _searchPlanning() async {
     if (_searchCtrl.text.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Please select at least one port')));
@@ -468,8 +702,8 @@ class _AddPlanningPageState extends State<AddPlanningPage> {
     try {
       final repo = sl<PlanningRepository>();
       final result = await repo.searchUnplannedOrders(
-        DateFormat('yyyy/MM/dd').format(DateFormat('dd/MM/yyyy').parse(_planDate)),
-        DateFormat('yyyy/MM/dd').format(DateFormat('dd/MM/yyyy').parse(_toDate)),
+        DateFormat('yyyy-MM-dd').format(DateFormat('dd/MM/yyyy').parse(_planDate)),
+        DateFormat('yyyy-MM-dd').format(DateFormat('dd/MM/yyyy').parse(_toDate)),
         _searchCtrl.text,
         0,
       );
@@ -486,6 +720,7 @@ class _AddPlanningPageState extends State<AddPlanningPage> {
             'destination': item['Destination']?.toString() ?? '',
             'customer': item['CustomerName']?.toString() ?? '',
             'jobNo': item['JobNo']?.toString() ?? '',
+            'saleOrderId': item['Id'] ?? 0,
           });
         }
       });
@@ -503,6 +738,32 @@ class _AddPlanningPageState extends State<AddPlanningPage> {
 
 
 
+  void _loadForEdit(Map<String, dynamic> master, List<dynamic> details) {
+    setState(() {
+      _editMasterId = master['Id'];
+      _planNoCtrl.text = master['PLANINGNoDisplay'] ?? '';
+      _remarksCtrl.text = master['Remarks'] ?? '';
+      _planDate = master['PLANINGDate'] ?? DateFormat('dd/MM/yyyy').format(DateTime.now());
+      
+      _planningItems.clear();
+      for (var d in details) {
+        _planningItems.add({
+          'detailId': d['Id'] ?? 0,
+          'truck': d['TruckName'] ?? '',
+          'driver': d['DriverName'] ?? '',
+          'pDate': d['pickupdate'] ?? _pickupDate,
+          'dDate': d['deliverydate'] ?? _toDate,
+          'origin': d['Origin'] ?? '',
+          'destination': d['Destination'] ?? '',
+          'customer': d['CustomerName'] ?? '',
+            'jobNo': d['JobNo'] ?? '',
+            'saleOrderId': d['SaleOrderMasterRefId'] ?? 0,
+          });
+      }
+    });
+    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Planning loaded for edit")));
+  }
+
   Future<void> _showSavedPlanningsView() async {
     String sheetFDate = DateFormat('dd/MM/yyyy').format(DateTime.now());
     String sheetTDate = DateFormat('dd/MM/yyyy').format(DateTime.now());
@@ -517,8 +778,8 @@ class _AddPlanningPageState extends State<AddPlanningPage> {
     Future<void> fetchPlannings(StateSetter setSheetState) async {
       setSheetState(() => sheetIsLoading = true);
       try {
-        final f = DateFormat('yyyy/MM/dd').format(DateFormat('dd/MM/yyyy').parse(sheetFDate));
-        final t = DateFormat('yyyy/MM/dd').format(DateFormat('dd/MM/yyyy').parse(sheetTDate));
+        final f = DateFormat('yyyy-MM-dd').format(DateFormat('dd/MM/yyyy').parse(sheetFDate));
+        final t = DateFormat('yyyy-MM-dd').format(DateFormat('dd/MM/yyyy').parse(sheetTDate));
         
         int reqEmpId = isLEmp ? (AppGlobals.EmpRefId ?? 0) : selectedEmpId;
         
@@ -538,33 +799,31 @@ class _AddPlanningPageState extends State<AddPlanningPage> {
       }
     }
 
-    Widget _buildInlineDatePicker(String label, String value, StateSetter setSheetState, Function(String) onChanged) {
-      return Row(
+        Widget _buildInlineDatePicker(String label, String value, StateSetter setSheetState, Function(String) onChanged) {
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
         children: [
-          SizedBox(
-            width: 70,
-            child: Text(label.replaceFirst(' ', '\n'), style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
-          ),
+          Text(label, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: Colors.black87)),
+          const SizedBox(height: 4),
           InkWell(
             onTap: () => _pickDate(context, value, (v) {
               onChanged(v);
               setSheetState(() {});
             }),
             child: Container(
-              height: 35,
-              width: 100,
-              padding: const EdgeInsets.symmetric(horizontal: 8),
+              height: 40,
+              padding: const EdgeInsets.symmetric(horizontal: 10),
               decoration: BoxDecoration(
-                color: Colors.white,
-                border: Border.all(color: Colors.grey.shade400),
-                borderRadius: BorderRadius.circular(4),
+                color: colour.kBg,
+                border: Border.all(color: Colors.grey.shade300),
+                borderRadius: BorderRadius.circular(8),
               ),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text(value, style: const TextStyle(fontSize: 13)),
-                  Icon(Icons.calendar_month, size: 16, color: Colors.grey.shade600),
+                  Text(value, style: const TextStyle(fontSize: 14, color: Colors.black87)),
+                  Icon(Icons.calendar_month, size: 18, color: colour.kCobalt),
                 ],
               ),
             ),
@@ -584,7 +843,7 @@ class _AddPlanningPageState extends State<AddPlanningPage> {
           }
           return Container(
             height: MediaQuery.of(context).size.height * 0.9,
-            decoration: const BoxDecoration(color: Colors.white, borderRadius: BorderRadius.vertical(top: Radius.circular(24))),
+            decoration: const BoxDecoration(color: colour.kBg, borderRadius: BorderRadius.vertical(top: Radius.circular(24))),
             padding: EdgeInsets.only(left: 16, right: 16, top: 16, bottom: MediaQuery.of(ctx).viewInsets.bottom + 16),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -598,101 +857,108 @@ class _AddPlanningPageState extends State<AddPlanningPage> {
                   ],
                 ),
                 const SizedBox(height: 8),
-                Container(
-                  padding: const EdgeInsets.all(8),
-                  color: Colors.grey.shade100,
+                                Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: Colors.grey.shade50,
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: Colors.grey.shade200),
+                  ),
                   child: Column(
                     children: [
-                      // Row 1
                       Row(
-                        crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
                           Expanded(child: _buildInlineDatePicker('From Date', sheetFDate, setSheetState, (v) => sheetFDate = v)),
+                          const SizedBox(width: 12),
                           Expanded(child: _buildInlineDatePicker('To Date', sheetTDate, setSheetState, (v) => sheetTDate = v)),
-                          SizedBox(
-                            height: 35,
-                            child: ElevatedButton(
-                              onPressed: () => fetchPlannings(setSheetState),
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: Colors.white,
-                                foregroundColor: Colors.black,
-                                side: BorderSide(color: Colors.grey.shade400),
-                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
-                                padding: const EdgeInsets.symmetric(horizontal: 16),
-                              ),
-                              child: const Text('VIEW', style: TextStyle(fontWeight: FontWeight.bold)),
-                            ),
-                          ),
                         ],
                       ),
                       const SizedBox(height: 12),
-                      // Row 2
                       Row(
-                        crossAxisAlignment: CrossAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.end,
                         children: [
                           Expanded(
-                            child: Row(
+                            flex: 2,
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                const SizedBox(
-                                  width: 70,
-                                  child: Text("Planning\nNo", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
-                                ),
-                                Expanded(
-                                  child: SizedBox(
-                                    height: 35,
-                                    child: TextField(
-                                      controller: sheetSearchCtrl,
-                                      decoration: InputDecoration(
-                                        filled: true,
-                                        fillColor: Colors.white,
-                                        contentPadding: const EdgeInsets.symmetric(horizontal: 8),
-                                        border: OutlineInputBorder(borderRadius: BorderRadius.circular(4), borderSide: BorderSide(color: Colors.grey.shade400)),
-                                        enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(4), borderSide: BorderSide(color: Colors.grey.shade400)),
-                                      ),
+                                const Text("Planning No", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: Colors.black87)),
+                                const SizedBox(height: 4),
+                                SizedBox(
+                                  height: 40,
+                                  child: TextField(
+                                    controller: sheetSearchCtrl,
+                                    decoration: InputDecoration(
+                                      filled: true,
+                                      fillColor: colour.kBg,
+                                      hintText: 'Search No...',
+                                      hintStyle: TextStyle(color: Colors.grey.shade400, fontSize: 13),
+                                      contentPadding: const EdgeInsets.symmetric(horizontal: 10),
+                                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: BorderSide(color: Colors.grey.shade300)),
+                                      enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: BorderSide(color: Colors.grey.shade300)),
+                                      focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: const BorderSide(color: colour.kCobalt)),
                                     ),
                                   ),
                                 ),
                               ],
                             ),
                           ),
-                          const SizedBox(width: 8),
+                          const SizedBox(width: 12),
                           Expanded(
-                            child: Row(
+                            flex: 3,
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                const SizedBox(
-                                  width: 70,
-                                  child: Text("Employee", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    const Text("Employee", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: Colors.black87)),
+                                    Row(
+                                      children: [
+                                        SizedBox(
+                                          width: 20,
+                                          height: 20,
+                                          child: Checkbox(
+                                            value: isLEmp,
+                                            activeColor: colour.kCobalt,
+                                            onChanged: (val) => setSheetState(() => isLEmp = val ?? true),
+                                          ),
+                                        ),
+                                        const SizedBox(width: 4),
+                                        const Text('L.Emp', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Colors.grey)),
+                                      ],
+                                    ),
+                                  ],
                                 ),
-                                Expanded(
-                                  child: IgnorePointer(
-                                    ignoring: isLEmp,
-                                    child: Opacity(
-                                      opacity: isLEmp ? 0.5 : 1.0,
-                                      child: InkWell(
-                                        onTap: () async {
-                                          await sl<PlanningRepository>().selectEmployee(context, 'sales', 'admin');
-                                          if (!context.mounted) return;
-                                          Navigator.push(context, MaterialPageRoute(builder: (_) => const Employee(Searchby: 1, SearchId: 0))).then((navRes) {
-                                            if (navRes != null) {
-                                              setSheetState(() => selectedEmpId = navRes.Id);
-                                            }
-                                          });
-                                        },
-                                        child: Container(
-                                          height: 35,
-                                          padding: const EdgeInsets.symmetric(horizontal: 8),
-                                          decoration: BoxDecoration(
-                                            color: Colors.white,
-                                            border: Border.all(color: Colors.grey.shade400),
-                                            borderRadius: BorderRadius.circular(4),
-                                          ),
-                                          child: Row(
-                                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                            children: [
-                                              Expanded(child: Text(selectedEmpId == 0 ? '' : selectedEmpId.toString(), style: const TextStyle(fontSize: 13), overflow: TextOverflow.ellipsis)),
-                                              const Icon(Icons.arrow_drop_down, size: 20),
-                                            ],
-                                          ),
+                                const SizedBox(height: 4),
+                                IgnorePointer(
+                                  ignoring: isLEmp,
+                                  child: Opacity(
+                                    opacity: isLEmp ? 0.5 : 1.0,
+                                    child: InkWell(
+                                      onTap: () async {
+                                        await sl<PlanningRepository>().selectEmployee(context, 'sales', 'admin');
+                                        if (!context.mounted) return;
+                                        Navigator.push(context, MaterialPageRoute(builder: (_) => const Employee(Searchby: 1, SearchId: 0))).then((navRes) {
+                                          if (navRes != null) {
+                                            setSheetState(() => selectedEmpId = navRes.Id);
+                                          }
+                                        });
+                                      },
+                                      child: Container(
+                                        height: 40,
+                                        padding: const EdgeInsets.symmetric(horizontal: 10),
+                                        decoration: BoxDecoration(
+                                          color: colour.kBg,
+                                          border: Border.all(color: Colors.grey.shade300),
+                                          borderRadius: BorderRadius.circular(8),
+                                        ),
+                                        child: Row(
+                                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                          children: [
+                                            Expanded(child: Text(selectedEmpId == 0 ? 'Select Emp...' : selectedEmpId.toString(), style: TextStyle(fontSize: 14, color: selectedEmpId == 0 ? Colors.grey.shade500 : Colors.black87), overflow: TextOverflow.ellipsis)),
+                                            const Icon(Icons.arrow_drop_down, size: 20, color: Colors.grey),
+                                          ],
                                         ),
                                       ),
                                     ),
@@ -701,27 +967,23 @@ class _AddPlanningPageState extends State<AddPlanningPage> {
                               ],
                             ),
                           ),
-                          SizedBox(
-                            width: 80,
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.end,
-                              children: [
-                                SizedBox(
-                                  width: 24,
-                                  height: 24,
-                                  child: Checkbox(
-                                    value: isLEmp,
-                                    onChanged: (val) {
-                                      setSheetState(() => isLEmp = val ?? true);
-                                    },
-                                  ),
-                                ),
-                                const SizedBox(width: 4),
-                                const Text('L.Emp', style: TextStyle(fontSize: 13)),
-                              ],
-                            ),
-                          ),
                         ],
+                      ),
+                      const SizedBox(height: 16),
+                      SizedBox(
+                        width: double.infinity,
+                        height: 44,
+                        child: ElevatedButton.icon(
+                          onPressed: () => fetchPlannings(setSheetState),
+                          icon: const Icon(Icons.search, color: colour.kBg),
+                          label: const Text('SEARCH', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15, letterSpacing: 1)),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: colour.kCobalt,
+                            foregroundColor: colour.kBg,
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                            elevation: 0,
+                          ),
+                        ),
                       ),
                     ],
                   ),
@@ -730,16 +992,13 @@ class _AddPlanningPageState extends State<AddPlanningPage> {
                 // Header Row (Mocking the Table Header)
                 Container(
                   color: Colors.grey.shade200,
-                  padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+                  padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 8),
                   child: const Row(
                     children: [
-                      SizedBox(width: 24), // Space for expand icon
-                      Expanded(flex: 2, child: Text('PLANING No', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold))),
-                      Expanded(flex: 2, child: Text('PLANING Date', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold))),
-                      Expanded(flex: 3, child: Text('Remarks', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold))),
-                      Text('EXPORT', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
-                      SizedBox(width: 8),
-                      Text('EXCEL', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
+                      Expanded(flex: 3, child: Text('Plan No', style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold))),
+                      Expanded(flex: 2, child: Text('Date', style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold))),
+                      Expanded(flex: 3, child: Text('Remarks', style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold))),
+                      SizedBox(width: 80, child: Text('ACTIONS', textAlign: TextAlign.center, style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold))),
                     ],
                   ),
                 ),
@@ -754,47 +1013,57 @@ class _AddPlanningPageState extends State<AddPlanningPage> {
                               itemBuilder: (context, index) {
                                 final m = masterList[index];
                                 final mId = m['Id'];
-                                final relatedDetails = detailsList.where((d) => d['SaleId'] == mId).toList();
+                                final relatedDetails = detailsList.where((d) => d['PLANINGMasterRefId'] == mId).toList();
 
                                 return Theme(
                                   data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
                                   child: ExpansionTile(
                                     tilePadding: const EdgeInsets.symmetric(horizontal: 8),
-                                    backgroundColor: Colors.orange.shade50,
-                                    collapsedBackgroundColor: Colors.orange.shade300,
+                                    backgroundColor: colour.kGold.withOpacity(0.1),
+                                    collapsedBackgroundColor: colour.kGold.withOpacity(0.4),
                                     iconColor: Colors.black,
                                     collapsedIconColor: Colors.black,
                                     title: Row(
                                       children: [
-                                        Expanded(flex: 2, child: Text(m['PLANINGNoDisplay'] ?? '', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 12, color: Colors.black))),
-                                        Expanded(flex: 2, child: Text(m['PLANINGDate'] ?? '', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 12, color: Colors.black))),
-                                        Expanded(flex: 3, child: Text(m['Remarks'] ?? '', style: const TextStyle(fontSize: 12, color: Colors.black), maxLines: 1, overflow: TextOverflow.ellipsis)),
+                                        Expanded(flex: 3, child: Text(m['PLANINGNoDisplay'] ?? '', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 11, color: Colors.black), maxLines: 1, overflow: TextOverflow.ellipsis)),
+                                        Expanded(flex: 2, child: Text(m['PLANINGDate'] ?? '', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 11, color: Colors.black), maxLines: 1, overflow: TextOverflow.ellipsis)),
+                                        Expanded(flex: 3, child: Text(m['Remarks'] ?? '', style: const TextStyle(fontSize: 11, color: Colors.black), maxLines: 1, overflow: TextOverflow.ellipsis)),
                                       ],
                                     ),
-                                    trailing: Row(
-                                      mainAxisSize: MainAxisSize.min,
-                                      children: [
-                                        IconButton(
-                                          constraints: const BoxConstraints(),
-                                          padding: EdgeInsets.zero,
-                                          icon: const Icon(Icons.picture_as_pdf, color: Colors.red, size: 20),
-                                          onPressed: () {
-                                          },
-                                        ),
-                                        const SizedBox(width: 16),
-                                        IconButton(
-                                          constraints: const BoxConstraints(),
-                                          padding: EdgeInsets.zero,
-                                          icon: const Icon(Icons.table_chart, color: Colors.green, size: 20),
-                                          onPressed: () {
-                                          },
-                                        ),
-                                        const SizedBox(width: 8),
-                                      ],
+                                    trailing: SizedBox(
+                                      width: 80,
+                                      child: Row(
+                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          IconButton(
+                                            constraints: const BoxConstraints(),
+                                            padding: EdgeInsets.zero,
+                                            icon: const Icon(Icons.edit, color: colour.kCobalt, size: 20),
+                                            onPressed: () {
+                                              Navigator.pop(ctx);
+                                              _loadForEdit(m, relatedDetails);
+                                            },
+                                          ),
+                                          IconButton(
+                                            constraints: const BoxConstraints(),
+                                            padding: EdgeInsets.zero,
+                                            icon: const Icon(Icons.picture_as_pdf, color: Colors.red, size: 20),
+                                            onPressed: () {
+                                            },
+                                          ),
+                                          IconButton(
+                                            constraints: const BoxConstraints(),
+                                            padding: EdgeInsets.zero,
+                                            icon: const Icon(Icons.table_chart, color: Colors.green, size: 20),
+                                            onPressed: () {
+                                            },
+                                          ),
+                                        ],
+                                      ),
                                     ),
                                     children: [
                                       Container(
-                                        color: Colors.white,
+                                        color: colour.kBg,
                                         width: double.infinity,
                                         child: SingleChildScrollView(
                                           scrollDirection: Axis.horizontal,
@@ -906,13 +1175,23 @@ class _AddPlanningPageState extends State<AddPlanningPage> {
                   const SizedBox(width: 8),
                   _buildButton('SORT', _sortPlanningItems),
                   const SizedBox(width: 8),
-                  _buildButton('SAVE', _savePlanningData, isPrimary: true),
-                  const SizedBox(width: 8),
-                  _buildButton('UPDATE', () {}),
+                  _buildButton('NEW', () {
+                      setState(() {
+                        _editMasterId = null;
+                          _planningItems.clear();
+                          _remarksCtrl.clear();
+                          _planNoCtrl.text = '';
+                          _fetchMaxPlaningNo();
+                      });
+                    }),
+                    const SizedBox(width: 8),
+                    _buildButton('SAVE', _savePlanningData, isPrimary: _editMasterId == null),
+                    const SizedBox(width: 8),
+                    _buildButton('UPDATE', _savePlanningData, isPrimary: _editMasterId != null),
                   const SizedBox(width: 8),
                   _buildButton('VIEW', _showSavedPlanningsView),
                   const SizedBox(width: 8),
-                  _buildButton('DELETE', () {}),
+                  _buildButton('DELETE', _deletePlanning),
                   const SizedBox(width: 8),
                   _buildButton('PUSH TO RTI', () {}),
                 ],
@@ -926,11 +1205,21 @@ class _AddPlanningPageState extends State<AddPlanningPage> {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text("Planning Lines (\)", style: AppTypography.heading3()),
+                Expanded(
+                  child: Text("Planning Lines (${_planningItems.length})", style: AppTypography.heading3(), overflow: TextOverflow.ellipsis),
+                ),
+                if (_planningItems.isNotEmpty)
+                  TextButton.icon(
+                    onPressed: _showBulkApplySheet,
+                    icon: const Icon(Icons.done_all, color: colour.kGold, size: 20),
+                    label: const Text('Bulk', style: TextStyle(color: colour.kGold, fontWeight: FontWeight.bold, fontSize: 13)),
+                    style: TextButton.styleFrom(padding: const EdgeInsets.symmetric(horizontal: 4)),
+                  ),
                 TextButton.icon(
                   onPressed: _showAddEditItemSheet,
-                  icon: const Icon(Icons.add, color: colour.kCobalt),
-                  label: const Text('Add Line', style: TextStyle(color: colour.kCobalt, fontWeight: FontWeight.bold)),
+                  icon: const Icon(Icons.add, color: colour.kCobalt, size: 20),
+                  label: const Text('Add', style: TextStyle(color: colour.kCobalt, fontWeight: FontWeight.bold, fontSize: 13)),
+                  style: TextButton.styleFrom(padding: const EdgeInsets.symmetric(horizontal: 4)),
                 ),
               ],
             ),
@@ -947,16 +1236,24 @@ class _AddPlanningPageState extends State<AddPlanningPage> {
                   )
                 ),
               )
-            : ListView.builder(
-                shrinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(),
-                padding: const EdgeInsets.only(left: 16, right: 16, bottom: 24),
-                itemCount: _planningItems.length,
-                itemBuilder: (context, index) {
+            : ReorderableListView.builder(
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  padding: const EdgeInsets.only(left: 16, right: 16, bottom: 24),
+                  onReorder: (oldIndex, newIndex) {
+                    setState(() {
+                      if (newIndex > oldIndex) newIndex -= 1;
+                      final item = _planningItems.removeAt(oldIndex);
+                      _planningItems.insert(newIndex, item);
+                    });
+                  },
+                  itemCount: _planningItems.length,
+                  itemBuilder: (context, index) {
                     final item = _planningItems[index];
                     return Card(
-                      color: Colors.white,
-                      margin: const EdgeInsets.only(bottom: 12),
+                        key: ValueKey('${item['jobNo']}_${index}'),
+                        color: colour.kBg,
+                        margin: const EdgeInsets.only(bottom: 12),
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12), side: BorderSide(color: colour.kBorder)),
                       elevation: 0,
                       child: Padding(
@@ -968,12 +1265,51 @@ class _AddPlanningPageState extends State<AddPlanningPage> {
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
                                 Expanded(child: Text("Truck: ${item['truck'].isEmpty ? '-' : item['truck']}", style: AppTypography.heading3(color: colour.kDanger))),
+                                  Container(
+                                    width: 60,
+                                    height: 30,
+                                    margin: const EdgeInsets.only(right: 8),
+                                    child: TextField(
+                                      keyboardType: TextInputType.number,
+                                      style: const TextStyle(fontSize: 13),
+                                      decoration: InputDecoration(
+                                        contentPadding: const EdgeInsets.symmetric(horizontal: 8, vertical: 0),
+                                        hintText: 'Sort',
+                                        isDense: true,
+                                        border: OutlineInputBorder(borderRadius: BorderRadius.circular(4)),
+                                      ),
+                                      onChanged: (val) {
+                                        _planningItems[index]['SortByD'] = int.tryParse(val) ?? 0;
+                                      },
+                                      controller: TextEditingController(text: (item['SortByD'] ?? 0).toString())..selection = TextSelection.collapsed(offset: (item['SortByD'] ?? 0).toString().length),
+                                    ),
+                                  ),
                                 Row(
                                   children: [
-                                    IconButton(
-                                      constraints: const BoxConstraints(),
-                                      padding: EdgeInsets.zero,
-                                      icon: const Icon(Icons.edit, size: 20, color: colour.kCobalt),
+                                    if ((item['saleOrderId'] ?? 0) != 0) ...[
+                                        IconButton(
+                                          constraints: const BoxConstraints(),
+                                          padding: EdgeInsets.zero,
+                                          icon: const Icon(Icons.assignment, size: 20, color: colour.kGold),
+                                          tooltip: 'SO Update',
+                                          onPressed: () => _launchSOUpdate(item['saleOrderId']),
+                                        ),
+                                        const SizedBox(width: 12),
+                                      ],
+                                      if ((item['saleOrderId'] ?? 0) != 0) ...[
+                                        IconButton(
+                                          constraints: const BoxConstraints(),
+                                          padding: EdgeInsets.zero,
+                                          icon: const Icon(Icons.assignment, size: 20, color: colour.kGold),
+                                          tooltip: 'SO Update',
+                                          onPressed: () => _launchSOUpdate(item['saleOrderId']),
+                                        ),
+                                        const SizedBox(width: 12),
+                                      ],
+                                      IconButton(
+                                        constraints: const BoxConstraints(),
+                                        padding: EdgeInsets.zero,
+                                        icon: const Icon(Icons.edit, size: 20, color: colour.kCobalt),
                                       onPressed: () => _showAddEditItemSheet(itemToEdit: item, index: index),
                                     ),
                                     const SizedBox(width: 16),
@@ -1004,6 +1340,13 @@ class _AddPlanningPageState extends State<AddPlanningPage> {
     );
   }
 }
+
+
+
+
+
+
+
 
 
 
