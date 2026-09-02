@@ -1,6 +1,7 @@
 import 'package:maleva/core/network/api_constants.dart';
 import 'package:maleva/features/transaction/planning/data/planning_repository.dart';
 import 'package:flutter/material.dart';
+import 'package:maleva/core/widgets/custom_app_bar.dart';
 import 'package:maleva/core/colors/colors.dart' as colour;
 import 'package:maleva/core/theme/app_typography.dart';
 import 'package:intl/intl.dart';
@@ -64,18 +65,21 @@ class _AddPlanningPageState extends State<AddPlanningPage> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(label, style: AppTypography.bodySmall(color: colour.kTextDim)),
+        Text(label, style: const TextStyle(color: colour.textMain, fontSize: 12, fontWeight: FontWeight.w600)),
         const SizedBox(height: 4),
         TextField(
           controller: ctrl,
           readOnly: readOnly,
-          style: AppTypography.bodyMedium(color: colour.kText),
+          style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: colour.textMain),
           decoration: InputDecoration(
+            hintText: label,
+            hintStyle: TextStyle(color: colour.textSub.withOpacity(0.45), fontSize: 13),
             filled: true,
-            fillColor: readOnly ? colour.kSurface2 : colour.kBg,
-            contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-            border: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: const BorderSide(color: colour.kBorder)),
-            enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: const BorderSide(color: colour.kBorder)),
+            fillColor: readOnly ? colour.surface : Colors.white,
+            contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+            border: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: const BorderSide(color: colour.border)),
+            enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: const BorderSide(color: colour.border)),
+            focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: const BorderSide(color: colour.kPrimary)),
           ),
         ),
       ],
@@ -114,10 +118,14 @@ class _AddPlanningPageState extends State<AddPlanningPage> {
     return ElevatedButton(
       onPressed: onTap,
       style: ElevatedButton.styleFrom(
-        backgroundColor: isPrimary ? colour.kCobalt : colour.kSurface2,
-        foregroundColor: isPrimary ? colour.kBg : colour.kText,
+        backgroundColor: isPrimary ? colour.brand : Colors.white,
+        foregroundColor: isPrimary ? Colors.white : colour.textMain,
+        elevation: isPrimary ? 2 : 0,
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(8),
+          side: isPrimary ? BorderSide.none : const BorderSide(color: colour.border),
+        ),
       ),
       child: Text(text, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
     );
@@ -226,6 +234,192 @@ class _AddPlanningPageState extends State<AddPlanningPage> {
       },
     );
   }
+
+  
+  Future<void> _pickDateTime(BuildContext context, String currentVal, Function(String) onPicked) async {
+    DateTime initialDate = DateTime.now();
+    if (currentVal.isNotEmpty) {
+      try {
+        initialDate = DateFormat('dd/MM/yyyy HH:mm').parse(currentVal);
+      } catch (e) {
+        try {
+          initialDate = DateFormat('dd/MM/yyyy').parse(currentVal);
+        } catch (_) {}
+      }
+    }
+    final pickedDate = await showDatePicker(
+      context: context,
+      initialDate: initialDate,
+      firstDate: DateTime(2000),
+      lastDate: DateTime(2100),
+    );
+    if (pickedDate != null) {
+      final pickedTime = await showTimePicker(
+        context: context,
+        initialTime: TimeOfDay.fromDateTime(initialDate),
+      );
+      if (pickedTime != null) {
+        final finalDateTime = DateTime(pickedDate.year, pickedDate.month, pickedDate.day, pickedTime.hour, pickedTime.minute);
+        onPicked(DateFormat('dd/MM/yyyy HH:mm').format(finalDateTime));
+      } else {
+        onPicked(DateFormat('dd/MM/yyyy HH:mm').format(DateTime(pickedDate.year, pickedDate.month, pickedDate.day, 0, 0)));
+      }
+    }
+  }
+
+  Widget _buildSheetDateTimePicker(String label, String value, StateSetter setSheetState, Function(String) onChanged) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(label, style: const TextStyle(color: colour.textMain, fontSize: 12, fontWeight: FontWeight.w600)),
+        const SizedBox(height: 4),
+        InkWell(
+          onTap: () => _pickDateTime(context, value, (v) {
+            setSheetState(() => onChanged(v));
+          }),
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(10),
+              border: Border.all(color: colour.border),
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(value, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: colour.textMain)),
+                const Icon(Icons.calendar_month, size: 16, color: colour.textSub),
+              ],
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  void _showSaleOrderUpdateSheet(Map<String, dynamic> item, int index) {
+    String sPDate = item['pDate'] ?? '';
+    String sDDate = item['dDate'] ?? '';
+    String sWEnter = item['wEnterDate'] ?? '';
+    String sWExit = item['wExitDate'] ?? '';
+    TextEditingController wAddrCtrl = TextEditingController(text: item['wAddress'] ?? '');
+    
+    // Add time if missing (since it's now datetime)
+    if (sPDate.isNotEmpty && !sPDate.contains(':')) sPDate += " 00:00";
+    if (sDDate.isNotEmpty && !sDDate.contains(':')) sDDate += " 00:00";
+    if (sWEnter.isNotEmpty && !sWEnter.contains(':')) sWEnter += " 00:00";
+    if (sWExit.isNotEmpty && !sWExit.contains(':')) sWExit += " 00:00";
+
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (ctx) {
+        return StatefulBuilder(
+          builder: (BuildContext ctx, StateSetter setSheetState) {
+            bool isSaving = false;
+
+            Future<void> saveUpdate() async {
+              setSheetState(() => isSaving = true);
+              try {
+                // Prepare payload
+                // Expected payload structure according to API
+                final payload = {
+                  "Jobid": item['saleOrderId'] ?? 0,
+                  "PickupDate": sPDate.isNotEmpty ? DateFormat("yyyy-MM-dd'T'HH:mm:ss").format(DateFormat('dd/MM/yyyy HH:mm').parse(sPDate)) : null,
+                  "DeliveryDate": sDDate.isNotEmpty ? DateFormat("yyyy-MM-dd'T'HH:mm:ss").format(DateFormat('dd/MM/yyyy HH:mm').parse(sDDate)) : null,
+                  "WareHouseEnterDate": sWEnter.isNotEmpty && sWEnter != " 00:00" ? DateFormat("yyyy-MM-dd'T'HH:mm:ss").format(DateFormat('dd/MM/yyyy HH:mm').parse(sWEnter)) : null,
+                  "WareHouseExitDate": sWExit.isNotEmpty && sWExit != " 00:00" ? DateFormat("yyyy-MM-dd'T'HH:mm:ss").format(DateFormat('dd/MM/yyyy HH:mm').parse(sWExit)) : null,
+                  "WareHouseAddress": wAddrCtrl.text,
+                  "pickuptimelist": "",
+                  "DeliveryDateTimeList": "",
+                  "Type": 0 // 0 means SAVE ALL
+                };
+                
+                Map<String, String> header = {'Content-Type': 'application/json; charset=UTF-8', 'Comid': AppGlobals.Comid.toString()};
+                var result = await sl<LegacyApiRepository>().apiAllinone("${ApiConstants.port}/SaleOrder/UpdateSaleorder", jsonEncode(payload), header, null);
+                if (result != null && result is String) {
+                  result = jsonDecode(result);
+                }
+                
+                if (result != null && result['ok'] == true) {
+                  // Update local list
+                  setState(() {
+                    _planningItems[index]['pDate'] = sPDate;
+                    _planningItems[index]['dDate'] = sDDate;
+                    _planningItems[index]['wEnterDate'] = sWEnter;
+                    _planningItems[index]['wExitDate'] = sWExit;
+                    _planningItems[index]['wAddress'] = wAddrCtrl.text;
+                  });
+                  Navigator.pop(ctx);
+                  ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Sale Order Updated Successfully')));
+                } else {
+                  ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Failed to update Sale Order')));
+                }
+              } catch (e) {
+                ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Error: $e')));
+              } finally {
+                if (mounted) setSheetState(() => isSaving = false);
+              }
+            }
+
+            return Container(
+              padding: EdgeInsets.only(bottom: MediaQuery.of(ctx).viewInsets.bottom),
+              decoration: const BoxDecoration(
+                color: colour.surface,
+                borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+              ),
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.all(16),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text("Sale Order Update", style: AppTypography.heading2(color: colour.textMain)),
+                    const SizedBox(height: 16),
+                    _buildSheetTextField("Job No", item['jobNo'] ?? '', (v){}),
+                    const SizedBox(height: 12),
+                    Row(
+                      children: [
+                        Expanded(child: _buildSheetDateTimePicker("Pickup Date", sPDate, setSheetState, (v) => sPDate = v)),
+                        const SizedBox(width: 8),
+                        Expanded(child: _buildSheetDateTimePicker("Delivery Date", sDDate, setSheetState, (v) => sDDate = v)),
+                      ],
+                    ),
+                    const SizedBox(height: 12),
+                    Row(
+                      children: [
+                        Expanded(child: _buildSheetDateTimePicker("Warehouse Entry Date", sWEnter, setSheetState, (v) => sWEnter = v)),
+                        const SizedBox(width: 8),
+                        Expanded(child: _buildSheetDateTimePicker("Warehouse Exit Date", sWExit, setSheetState, (v) => sWExit = v)),
+                      ],
+                    ),
+                    const SizedBox(height: 12),
+                    _buildSheetTextField("Warehouse Address", wAddrCtrl.text, (v) => wAddrCtrl.text = v),
+                    const SizedBox(height: 24),
+                    SizedBox(
+                      width: double.infinity,
+                      child: ElevatedButton(
+                        onPressed: isSaving ? null : saveUpdate,
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: colour.brand,
+                          padding: const EdgeInsets.symmetric(vertical: 16),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                        ),
+                        child: isSaving 
+                            ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2))
+                            : const Text("SAVE ALL", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+                      ),
+                    )
+                  ],
+                ),
+              ),
+            );
+          }
+        );
+      }
+    );
+  }
+
 
   void _showAddEditItemSheet({Map<String, dynamic>? itemToEdit, int? index}) {
     final bool isEdit = itemToEdit != null;
@@ -357,7 +551,7 @@ class _AddPlanningPageState extends State<AddPlanningPage> {
           height: 48,
           padding: const EdgeInsets.symmetric(horizontal: 12),
           decoration: BoxDecoration(
-            color: colour.kSurface,
+            color: Colors.transparent,
             border: Border.all(color: colour.kBorder),
             borderRadius: BorderRadius.circular(8),
           ),
@@ -391,7 +585,7 @@ class _AddPlanningPageState extends State<AddPlanningPage> {
           onChanged: onChanged,
           decoration: InputDecoration(
             filled: true,
-            fillColor: colour.kSurface,
+            fillColor: Colors.transparent,
             contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
             border: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: const BorderSide(color: colour.kBorder)),
             enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: const BorderSide(color: colour.kBorder)),
@@ -415,7 +609,7 @@ class _AddPlanningPageState extends State<AddPlanningPage> {
           child: Container(
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
             decoration: BoxDecoration(
-              color: colour.kSurface,
+              color: Colors.transparent,
               border: Border.all(color: colour.kBorder),
               borderRadius: BorderRadius.circular(8),
             ),
@@ -721,6 +915,9 @@ class _AddPlanningPageState extends State<AddPlanningPage> {
             'customer': item['CustomerName']?.toString() ?? '',
             'jobNo': item['JobNo']?.toString() ?? '',
             'saleOrderId': item['Id'] ?? 0,
+              'wEnterDate': item['SWareHouseEnterDate']?.toString() ?? '',
+              'wExitDate': item['SWareHouseExitDate']?.toString() ?? '',
+              'wAddress': item['WareHouseAddress']?.toString() ?? '',
           });
         }
       });
@@ -758,6 +955,9 @@ class _AddPlanningPageState extends State<AddPlanningPage> {
           'customer': d['CustomerName'] ?? '',
             'jobNo': d['JobNo'] ?? '',
             'saleOrderId': d['SaleOrderMasterRefId'] ?? 0,
+            'wEnterDate': d['SWareHouseEnterDate']?.toString() ?? '',
+            'wExitDate': d['SWareHouseExitDate']?.toString() ?? '',
+            'wAddress': d['WareHouseAddress']?.toString() ?? '',
           });
       }
     });
@@ -1107,31 +1307,24 @@ class _AddPlanningPageState extends State<AddPlanningPage> {
 
   void _sortPlanningItems() {
     setState(() {
-      _planningItems.sort((a, b) => (a['origin'] ?? '').compareTo(b['origin'] ?? ''));
+      _planningItems.sort((a, b) {
+        int sortA = (a['SortByD'] is int) ? a['SortByD'] : int.tryParse(a['SortByD'].toString()) ?? 0;
+        int sortB = (b['SortByD'] is int) ? b['SortByD'] : int.tryParse(b['SortByD'].toString()) ?? 0;
+        return sortA.compareTo(sortB);
+      });
     });
   }
 
   @override  Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: colour.kBg,
-      appBar: AppBar(
-        backgroundColor: colour.kSurface,
-        elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios_new_rounded, color: colour.kTextDim, size: 20),
-          onPressed: () => Navigator.pop(context),
-        ),
-        title: Text(
-          'ADD PLANNING',
-          style: AppTypography.heading2(color: colour.kDanger),
-        ),
-      ),
+      backgroundColor: colour.surface,
+      appBar: const CustomGradientAppBar(title: 'ADD PLANNING', showBackButton: true),
       body: ListView(
         children: [
           // Header Form (Scrollable if needed, but bounded)
           Container(
             padding: const EdgeInsets.all(16),
-            color: colour.kSurface,
+            color: Colors.transparent,
             child: Column(
               children: [
                 Row(
@@ -1236,110 +1429,123 @@ class _AddPlanningPageState extends State<AddPlanningPage> {
                   )
                 ),
               )
-            : ReorderableListView.builder(
-                  shrinkWrap: true,
-                  physics: const NeverScrollableScrollPhysics(),
-                  padding: const EdgeInsets.only(left: 16, right: 16, bottom: 24),
-                  onReorder: (oldIndex, newIndex) {
-                    setState(() {
-                      if (newIndex > oldIndex) newIndex -= 1;
-                      final item = _planningItems.removeAt(oldIndex);
-                      _planningItems.insert(newIndex, item);
-                    });
-                  },
-                  itemCount: _planningItems.length,
-                  itemBuilder: (context, index) {
-                    final item = _planningItems[index];
-                    return Card(
-                        key: ValueKey('${item['jobNo']}_${index}'),
-                        color: colour.kBg,
-                        margin: const EdgeInsets.only(bottom: 12),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12), side: BorderSide(color: colour.kBorder)),
-                      elevation: 0,
-                      child: Padding(
-                        padding: const EdgeInsets.all(16),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Expanded(child: Text("Truck: ${item['truck'].isEmpty ? '-' : item['truck']}", style: AppTypography.heading3(color: colour.kDanger))),
-                                  Container(
-                                    width: 60,
-                                    height: 30,
-                                    margin: const EdgeInsets.only(right: 8),
-                                    child: TextField(
-                                      keyboardType: TextInputType.number,
-                                      style: const TextStyle(fontSize: 13),
-                                      decoration: InputDecoration(
-                                        contentPadding: const EdgeInsets.symmetric(horizontal: 8, vertical: 0),
-                                        hintText: 'Sort',
-                                        isDense: true,
-                                        border: OutlineInputBorder(borderRadius: BorderRadius.circular(4)),
-                                      ),
-                                      onChanged: (val) {
-                                        _planningItems[index]['SortByD'] = int.tryParse(val) ?? 0;
-                                      },
-                                      controller: TextEditingController(text: (item['SortByD'] ?? 0).toString())..selection = TextSelection.collapsed(offset: (item['SortByD'] ?? 0).toString().length),
-                                    ),
-                                  ),
-                                Row(
-                                  children: [
-                                    if ((item['saleOrderId'] ?? 0) != 0) ...[
-                                        IconButton(
-                                          constraints: const BoxConstraints(),
-                                          padding: EdgeInsets.zero,
-                                          icon: const Icon(Icons.assignment, size: 20, color: colour.kGold),
-                                          tooltip: 'SO Update',
-                                          onPressed: () => _launchSOUpdate(item['saleOrderId']),
-                                        ),
-                                        const SizedBox(width: 12),
-                                      ],
-                                      if ((item['saleOrderId'] ?? 0) != 0) ...[
-                                        IconButton(
-                                          constraints: const BoxConstraints(),
-                                          padding: EdgeInsets.zero,
-                                          icon: const Icon(Icons.assignment, size: 20, color: colour.kGold),
-                                          tooltip: 'SO Update',
-                                          onPressed: () => _launchSOUpdate(item['saleOrderId']),
-                                        ),
-                                        const SizedBox(width: 12),
-                                      ],
-                                      IconButton(
-                                        constraints: const BoxConstraints(),
-                                        padding: EdgeInsets.zero,
-                                        icon: const Icon(Icons.edit, size: 20, color: colour.kCobalt),
-                                      onPressed: () => _showAddEditItemSheet(itemToEdit: item, index: index),
-                                    ),
-                                    const SizedBox(width: 16),
-                                    IconButton(
-                                      constraints: const BoxConstraints(),
-                                      padding: EdgeInsets.zero,
-                                      icon: const Icon(Icons.delete, size: 20, color: Colors.red),
-                                      onPressed: () => setState(() => _planningItems.removeAt(index)),
-                                    ),
-                                  ],
-                                ),
-                              ],
-                            ),
-                            const SizedBox(height: 8),
-                            Text("Driver: ${item['driver'].isEmpty ? '-' : item['driver']}", style: AppTypography.bodyMedium()),
-                            const SizedBox(height: 4),
-                            Text("Route: ${item['origin']} \u2192 ${item['destination']}", style: AppTypography.bodySmall(color: Colors.grey.shade700)),
-                            const SizedBox(height: 4),
-                            Text("Dates: ${item['pDate']} to ${item['dDate']}", style: AppTypography.bodySmall(color: Colors.grey.shade700)),
-                          ],
+            : SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                child: DataTable(
+                  headingRowColor: WidgetStateProperty.all(Colors.grey.shade200),
+                  dataRowMinHeight: 35,
+                  dataRowMaxHeight: 45,
+                  columnSpacing: 16,
+                  horizontalMargin: 16,
+                  columns: const [
+                    DataColumn(label: Text('Select', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12))),
+                    DataColumn(label: Text('S.No', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12))),
+                    DataColumn(label: Text('Sort', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12))),
+                    DataColumn(label: Text('REMARKS', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12))),
+                    DataColumn(label: Text('TRUCK', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12))),
+                    DataColumn(label: Text('DRIVER', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12))),
+                    DataColumn(label: Text('P.Date', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12))),
+                    DataColumn(label: Text('D.Date', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12))),
+                    DataColumn(label: Text('ORIGIN', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12))),
+                    DataColumn(label: Text('DESTINATION', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12))),
+                    DataColumn(label: Text('CUSTOMER NAME', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12))),
+                    DataColumn(label: Text('PACKAGE', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12))),
+                    DataColumn(label: Text('ACTION', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12))),
+                  ],
+                  rows: _planningItems.asMap().entries.map((entry) {
+                    int idx = entry.key;
+                    var item = entry.value;
+                    bool isSelected = item['selected'] ?? false;
+                    
+                    return DataRow(
+                      cells: [
+                        DataCell(
+                          Checkbox(
+                            value: isSelected,
+                            onChanged: (val) {
+                              setState(() {
+                                item['selected'] = val;
+                              });
+                            }
+                          )
                         ),
-                      ),
+                        DataCell(Text('${idx + 1}', style: const TextStyle(fontSize: 12))),
+                        DataCell(
+                          SizedBox(
+                            width: 50,
+                            height: 30,
+                            child: TextField(
+                              keyboardType: TextInputType.number,
+                              style: const TextStyle(fontSize: 12),
+                              decoration: InputDecoration(
+                                contentPadding: const EdgeInsets.symmetric(horizontal: 4, vertical: 0),
+                                isDense: true,
+                                border: OutlineInputBorder(borderRadius: BorderRadius.circular(4)),
+                              ),
+                              onChanged: (val) {
+                                item['SortByD'] = int.tryParse(val) ?? 0;
+                              },
+                              controller: TextEditingController(text: (item['SortByD'] ?? 0).toString())..selection = TextSelection.collapsed(offset: (item['SortByD'] ?? 0).toString().length),
+                            )
+                          )
+                        ),
+                        DataCell(Text(item['remarks']?.toString() ?? '', style: const TextStyle(fontSize: 12))),
+                        DataCell(Text(item['truck']?.toString() ?? '', style: const TextStyle(fontSize: 12, color: colour.kGold), overflow: TextOverflow.ellipsis)),
+                        DataCell(Text(item['driver']?.toString() ?? '', style: const TextStyle(fontSize: 12), overflow: TextOverflow.ellipsis)),
+                        DataCell(Text(item['pDate']?.toString() ?? '', style: const TextStyle(fontSize: 12))),
+                        DataCell(Text(item['dDate']?.toString() ?? '', style: const TextStyle(fontSize: 12))),
+                        DataCell(Text(item['origin']?.toString() ?? '', style: const TextStyle(fontSize: 12))),
+                        DataCell(Text(item['destination']?.toString() ?? '', style: const TextStyle(fontSize: 12))),
+                        DataCell(Text(item['customer']?.toString() ?? '', style: const TextStyle(fontSize: 12))),
+                        DataCell(Text('-', style: const TextStyle(fontSize: 12))), // PACKAGE is not collected in UI currently
+                        DataCell(
+                          Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              if ((item['saleOrderId'] ?? 0) != 0)
+                                IconButton(
+                                  constraints: const BoxConstraints(),
+                                  padding: const EdgeInsets.symmetric(horizontal: 4),
+                                  icon: const Icon(Icons.assignment, size: 16, color: colour.kGold),
+                                  tooltip: 'SO Update',
+                                  onPressed: () => _launchSOUpdate(item['saleOrderId']),
+                                ),
+                              IconButton(
+                                constraints: const BoxConstraints(),
+                                padding: const EdgeInsets.symmetric(horizontal: 4),
+                                icon: const Icon(Icons.edit, size: 16, color: colour.kCobalt),
+                                onPressed: () => _showAddEditItemSheet(itemToEdit: item, index: idx),
+                              ),
+                              IconButton(
+                                constraints: const BoxConstraints(),
+                                padding: const EdgeInsets.symmetric(horizontal: 4),
+                                icon: const Icon(Icons.update, size: 16, color: Colors.green),
+                                onPressed: () => _showSaleOrderUpdateSheet(item, idx),
+                              ),
+                              IconButton(
+                                constraints: const BoxConstraints(),
+                                padding: const EdgeInsets.symmetric(horizontal: 4),
+                                icon: const Icon(Icons.delete, size: 16, color: Colors.red),
+                                onPressed: () => setState(() => _planningItems.removeAt(idx)),
+                              ),
+                            ]
+                          )
+                        ),
+                      ]
                     );
-                  },
+                  }).toList(),
                 ),
+              ),
         ],
       ),
     );
   }
 }
+
+
+
+
+
 
 
 
