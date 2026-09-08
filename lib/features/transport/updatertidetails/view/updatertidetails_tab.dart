@@ -1,9 +1,8 @@
 import 'package:maleva/core/theme/app_typography.dart';
-import 'package:maleva/core/colors/colors.dart' as colour;
 import 'package:flutter/material.dart';
+import 'add_rti_page.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:maleva/core/utils/app_globals.dart';
 import 'package:maleva/features/dashboard/airfreight_dashboard/view/airfreight_dashboard.dart';
@@ -144,10 +143,20 @@ class _UpdateRTIPage extends StatelessWidget {
       flexibleSpace:
           Container(decoration: const BoxDecoration(gradient: kGradient)),
       leading: IconButton(
-        icon: const Icon(Icons.arrow_back_ios_new_rounded, size: 20),
-        color: Colors.white,
-        onPressed: () => Navigator.pop(context),
-      ),
+          icon: const Icon(Icons.arrow_back_ios_new_rounded, size: 20),
+          color: Colors.white,
+          onPressed: () => Navigator.pop(context),
+        ),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.add, size: 24),
+            color: Colors.white,
+            onPressed: () {
+              Navigator.push(context, MaterialPageRoute(builder: (_) => const AddRtiPage()));
+            },
+          ),
+          const SizedBox(width: 10),
+        ],
       title: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -424,6 +433,14 @@ class _RTICard extends StatelessWidget {
                     ),
                     const SizedBox(width: 8),
                     _CardChip(
+                        icon: Icons.edit,
+                        label: 'Edit',
+                        onTap: () {
+                          Navigator.push(context, MaterialPageRoute(builder: (_) => AddRtiPage(editMaster: item, editDetails: details)));
+                        },
+                      ),
+                      const SizedBox(width: 8),
+                      _CardChip(
                       icon: Icons.picture_as_pdf_outlined,
                       label: 'PDF',
                       onTap: () => context.read<UpdateRTIBloc>().add(

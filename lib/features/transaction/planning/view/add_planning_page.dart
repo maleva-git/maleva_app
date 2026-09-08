@@ -12,6 +12,7 @@ import '../../../../core/utils/app_globals.dart';
 import 'package:maleva/core/di/injection.dart';
 import 'package:maleva/core/network/legacy_api_repository.dart';
 import 'package:maleva/features/mastersearch/Employee.dart';
+import '../../../transport/updatertidetails/view/add_rti_page.dart';
 
 class AddPlanningPage extends StatefulWidget {
   const AddPlanningPage({super.key});
@@ -31,7 +32,6 @@ class _AddPlanningPageState extends State<AddPlanningPage> {
 
   final List<Map<String, dynamic>> _planningItems = [];
   int? _editMasterId;
-
 
   @override
   void initState() {
@@ -653,6 +653,24 @@ class _AddPlanningPageState extends State<AddPlanningPage> {
     }
   }
 
+  void _pushToRTI() {
+    final selectedJobs = _planningItems.where((item) => item['selected'] == true).toList();
+    if (selectedJobs.isEmpty) {
+      if (mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Please select orders to push RTI')));
+      return;
+    }
+    
+    final jobsForRti = selectedJobs.map((j) => {
+      'Id': j['saleOrderId'] ?? 0, 
+      'JobNo': j['jobNo'] ?? '',
+      'CustomerName': j['customer'] ?? '',
+      'JobDate': j['pDate'] ?? '',
+      'Salary': 0,
+    }).toList();
+
+    Navigator.push(context, MaterialPageRoute(builder: (_) => AddRtiPage(initialJobs: jobsForRti)));
+  }
+
   Future<void> _deletePlanning() async {
     if (_editMasterId == null) {
       ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Please load a saved planning record to delete')));
@@ -965,8 +983,8 @@ class _AddPlanningPageState extends State<AddPlanningPage> {
   }
 
   Future<void> _showSavedPlanningsView() async {
-    String sheetFDate = DateFormat('dd/MM/yyyy').format(DateTime.now());
-    String sheetTDate = DateFormat('dd/MM/yyyy').format(DateTime.now());
+    String sheetFDate = _planDate;
+    String sheetTDate = _toDate;
     TextEditingController sheetSearchCtrl = TextEditingController();
     bool isLEmp = true;
     int selectedEmpId = 0;
@@ -1386,7 +1404,7 @@ class _AddPlanningPageState extends State<AddPlanningPage> {
                   const SizedBox(width: 8),
                   _buildButton('DELETE', _deletePlanning),
                   const SizedBox(width: 8),
-                  _buildButton('PUSH TO RTI', () {}),
+                  _buildButton('PUSH TO RTI', _pushToRTI),
                 ],
               ),
             ),

@@ -1,4 +1,5 @@
-﻿import 'package:maleva/core/network/legacy_api_repository.dart';
+import 'package:maleva/core/network/api_client.dart';
+import 'package:maleva/core/network/legacy_api_repository.dart';
 import 'package:maleva/core/di/injection.dart';
 import 'package:maleva/core/network/api_constants.dart';
 import 'package:maleva/core/utils/app_globals.dart';
@@ -13,13 +14,23 @@ class PlanningRepository {
       "Todate": toDate,
       "Employeeid": empId,
       "Search": planningNo,
+      "SoId": 0,
+      "BillId": 0,
+      "Reportdate": "",
+      "Category": "",
+      "PortName": "",
+      "Id": 0,
+      "DId": 0,
+      "TId": 0,
+      "DashboardStatus": 0,
+      "Statusid": 0,
+      "JId": 0,
+      "Id1": 0,
+      "completestatusnotshow": false,
+      "VessalNameSearch": "",
+      "RTIMasterRefId": 0,
     };
-    Map<String, String> header = {
-      'Content-Type': 'application/json; charset=UTF-8'
-    };
-
-    final resultData = await sl<LegacyApiRepository>().apiAllinoneSelectArray(
-        ApiConstants.apiSelectPlanning, master, header, null);
+    final resultData = await ApiClient.postRequest(ApiConstants.apiSelectPlanning, master);
     
     if (resultData == null || resultData == "") {
       return [];
@@ -33,7 +44,8 @@ class PlanningRepository {
       "Fromdate": fromDate,
       "Todate": toDate,
       "Search": searchKeyword,
-      "Employeeid": 0,
+      "Employeeid": empId,
+      "ETAType": 0,
     };
     Map<String, String> header = {
       'Content-Type': 'application/json; charset=UTF-8'
@@ -125,7 +137,7 @@ class PlanningRepository {
         });
       }
 
-      Map<String, String> header = {'Content-Type': 'application/json; charset=UTF-8', 'Comid': AppGlobals.Comid.toString()};
+    Map<String, String> header = {'Content-Type': 'application/json; charset=UTF-8', 'Comid': AppGlobals.Comid.toString()};
       
       final resultData = await sl<LegacyApiRepository>().apiAllinone(
           "${ApiConstants.port}/PLANING/InsertPLANING", payload, header, null);

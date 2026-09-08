@@ -43,6 +43,10 @@ class _JobOrdersTabState extends State<JobOrdersTab> {
       case 3: // Completed
         return const Color(0xFF10B981);
       case 4:
+
+
+
+
         return const Color(0xFF6B7280);
       default:
         return Colors.grey;

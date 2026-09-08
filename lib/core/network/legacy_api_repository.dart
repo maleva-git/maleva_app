@@ -72,17 +72,23 @@ class LegacyApiRepository {
 
   // Backward compatible methods for ApiLegacyHelper replacement
   Future<List<dynamic>> apiAllinoneSelect(dynamic api, [dynamic insertDetails, Map<String, String>? header, BuildContext? context]) async {
+    header ??= {}; header['Accept-Language'] = 'en-GB';
+    print("\n--- API REQUEST ---\nURI: ${api.toString()}\nHeaders: $header\nPayload: $insertDetails\n-------------------");
     final result = await postList(api.toString(), data: insertDetails, headers: header);
     return result;
   }
 
   Future<dynamic> apiAllinoneSelectArray(dynamic api, [dynamic insertDetails, Map<String, String>? header, BuildContext? context]) async {
-    final result = await post(api.toString(), data: insertDetails, headers: header);
+    header ??= {}; header['Accept-Language'] = 'en-GB';
+      print("\n--- API REQUEST ---\nURI: ${api.toString()}\nHeaders: $header\nPayload: $insertDetails\n-------------------");
+      final result = await post(api.toString(), data: insertDetails, headers: header);
     return result;
   }
 
   Future<dynamic> apiAllinone(dynamic api, [dynamic insertDetails, Map<String, String>? header, BuildContext? context]) async {
-    final result = await post(api.toString(), data: insertDetails, headers: header);
+    header ??= {}; header['Accept-Language'] = 'en-GB';
+      print("\n--- API REQUEST ---\nURI: ${api.toString()}\nHeaders: $header\nPayload: $insertDetails\n-------------------");
+      final result = await post(api.toString(), data: insertDetails, headers: header);
     return result;
   }
 

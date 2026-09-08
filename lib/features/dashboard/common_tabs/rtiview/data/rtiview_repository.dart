@@ -3,7 +3,6 @@ import 'package:maleva/core/network/api_client.dart';
 import 'package:maleva/core/models/shared/response_view_model.dart';
 
 class RTIViewRepository {
-  /// Fetches the RTI Master and Details records
   Future<dynamic> fetchRTIRecords({
     required int comId,
     required String fromDate,
@@ -13,7 +12,6 @@ class RTIViewRepository {
     return await ApiClient.postRequest(url, null);
   }
 
-  /// Fetches the PDF URL for a specific RTI
   Future<String?> fetchRTIPdfUrl({
     required int soId,
     required String rtiNo,
