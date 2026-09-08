@@ -2,12 +2,12 @@ abstract class RTIDetailsEvent {
   const RTIDetailsEvent();
 }
 
-// ── Initial load ──────────────────────────────────────────────────────────────
+
 class LoadRTIDetailsEvent extends RTIDetailsEvent {
   const LoadRTIDetailsEvent();
 }
 
-// ── Date pickers ──────────────────────────────────────────────────────────────
+
 class SelectRTIDetailsFromDateEvent extends RTIDetailsEvent {
   final DateTime date;
   const SelectRTIDetailsFromDateEvent(this.date);

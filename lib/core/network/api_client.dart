@@ -45,10 +45,10 @@ class ApiClient {
       final body = bodyData != null ? json.encode(bodyData) : null;
 
       if (kDebugMode) {
-        debugPrint("ðŸš€ API REQUEST");
-        debugPrint("âž¡ï¸ URL: $url");
-        debugPrint("âž¡ï¸ Headers: $finalHeaders");
-        debugPrint("âž¡ï¸ Body: $body");
+        print("--- API REQUEST ---");
+        print("URI: $url");
+        print("Headers: $finalHeaders");
+        print("Payload: $body-------------------");
       }
 
       final response = await http
@@ -62,7 +62,7 @@ class ApiClient {
       if (kDebugMode) {
         debugPrint("âœ… API RESPONSE");
         debugPrint("â¬…ï¸ Status Code: ${response.statusCode}");
-        debugPrint("â¬…ï¸ Body: ${response.body}");
+        print("Payload: $body-------------------");
       }
 
       return _handleResponse(response);

@@ -14,6 +14,7 @@ import '../bloc/rtiview_event.dart';
 import '../bloc/rtiview_state.dart';
 import 'package:maleva/core/models/shared/r_t_i_master_view_model.dart';
 import 'package:maleva/core/models/shared/r_t_i_details_view_model.dart';
+import 'create_rti_screen.dart';
 
 // ── Entry Point ───────────────────────────────────────────────────────────────
 class RTIDetailsPage extends StatelessWidget {
@@ -312,6 +313,13 @@ class _PageHeader extends StatelessWidget {
             Text("Return to Inventory",
                 style: AppTypography.bodySmall(color: Colors.grey.shade500)),
           ]),
+          const Spacer(),
+          ElevatedButton.icon(
+            onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const CreateRTIScreen())),
+            icon: const Icon(Icons.add, size: 16, color: colour.kWhite),
+            label: const Text("Create", style: TextStyle(color: colour.kWhite, fontWeight: FontWeight.bold)),
+            style: ElevatedButton.styleFrom(backgroundColor: Colors.green, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8))),
+          ),
         ]),
 
         const SizedBox(height: 14),
