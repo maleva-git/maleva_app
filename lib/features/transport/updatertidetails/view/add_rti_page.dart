@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'dart:convert';
 import 'package:intl/intl.dart';
 import 'package:maleva/core/theme/app_typography.dart';
 import 'package:maleva/core/theme/palette.dart';
@@ -9,7 +10,9 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:maleva/core/network/api_constants.dart';
 import 'package:maleva/features/mastersearch/Driver.dart';
 import 'package:maleva/features/mastersearch/Truck.dart';
+import 'package:maleva/features/mastersearch/Customer.dart';
 import 'package:maleva/core/models/shared/get_truck_model.dart';
+import 'package:maleva/core/utils/dialog_helper.dart';
 
 
 const kGradient = LinearGradient(
@@ -112,13 +115,29 @@ class _AddRtiPageState extends State<AddRtiPage> {
              _rtiDate = DateFormat('dd/MM/yyyy').format(DateTime.now());
           }
           
-          _driverId = data['DriverMasterRefId'] ?? 0;
+          _driverId = data['DriverMasterRefId'] ?? data['DriverRefid'] ?? 0;
+          if (_driverId == 0 && m.DriverMasterRefId != null) _driverId = m.DriverMasterRefId!;
           _driverName = data['DriverName']?.toString() ?? '';
           if (_driverName.isEmpty && m.DriverName != null) _driverName = m.DriverName.toString();
+          if (_driverId == 0 && _driverName.isNotEmpty) {
+            for (var d in AppGlobals.GetDriverList) {
+              if (d.AccountName?.trim() == _driverName.trim()) {
+                _driverId = d.Id; break;
+              }
+            }
+          }
           
-          _vehicleId = data['TruckRefid'] ?? 0;
+          _vehicleId = data['TruckRefid'] ?? data['TruckMasterRefId'] ?? 0;
+          if (_vehicleId == 0 && m.TruckMasterRefId != null) _vehicleId = m.TruckMasterRefId!;
           _vehicleNo = data['TruckName']?.toString() ?? '';
           if (_vehicleNo.isEmpty && m.TruckName != null) _vehicleNo = m.TruckName.toString();
+          if (_vehicleId == 0 && _vehicleNo.isNotEmpty) {
+            for (var t in AppGlobals.GetTruckList) {
+              if (t.AccountName?.trim() == _vehicleNo.trim()) {
+                _vehicleId = t.Id; break;
+              }
+            }
+          }
           
           _enterVal = data['ELink'] == null || data['ELink'] == 0 ? '' : (data['ELink'] == 1 ? 'LINK 1' : 'LINK 2');
           _exitVal = data['EXLink'] == null || data['EXLink'] == 0 ? '' : (data['EXLink'] == 1 ? 'LINK 1' : 'LINK 2');
@@ -261,20 +280,38 @@ class _AddRtiPageState extends State<AddRtiPage> {
             try {
               final comid = AppGlobals.storagenew.getInt('Comid') ?? 0;
               final repo = sl<LegacyApiRepository>();
-              final res = await repo.apiAllinone(
+              final resRaw = await repo.apiAllinone(
                 '${ApiConstants.port}/RTI/SearchJobNo',
                 {"JobNo": jobNoCtrl.text.trim(), "Comid": comid},
               );
-              if (res != null && res['ok'] == true && res['Data'] != null) {
-                final dataList = res['Data'];
+              
+              dynamic res = resRaw;
+              if (resRaw is String) {
+                if (resRaw.trim().isEmpty) return;
+                try { res = jsonDecode(resRaw); } catch (_) {}
+              }
+
+              if (res != null && res['ok'] == true && (res['data'] != null || res['Data'] != null)) {
+                final dataList = res['data'] ?? res['Data'];
                 if (dataList is List && dataList.isNotEmpty) {
                   final job = dataList[0];
-                  saleOrderId = job['SaleOrderMasterRefId'] ?? job['Id'] ?? 0;
+                  // SaleOrderMasterRefId is 0 for new jobs — use Id instead
+                  final soRefId = job['SaleOrderMasterRefId'];
+                  saleOrderId = (soRefId != null && soRefId != 0) ? soRefId : (job['Id'] ?? 0);
                   setSheetState(() {
                     customerCtrl.text = job['CustomerName']?.toString() ?? '';
                     salaryCtrl.text = (job['Salary'] ?? 0).toString();
-                    originCtrl.text = job['Origin']?.toString() ?? '';
-                    destinationCtrl.text = job['Destination']?.toString() ?? '';
+                    originCtrl.text = (job['OriginD'] ?? job['Origin'] ?? '').toString();
+                    destinationCtrl.text = (job['DestinationD'] ?? job['Destination'] ?? '').toString();
+                    // Parse pickup/delivery dates if available
+                    final pd = job['PickupDateD']?.toString() ?? '';
+                    final dd = job['DeliveryDateD']?.toString() ?? '';
+                    if (pd.isNotEmpty) {
+                      try { pickupDate = DateFormat('dd/MM/yyyy').format(DateFormat('MM/dd/yyyy HH:mm:ss').parse(pd)); } catch (_) { pickupDate = pd; }
+                    }
+                    if (dd.isNotEmpty) {
+                      try { deliveryDate = DateFormat('dd/MM/yyyy').format(DateFormat('MM/dd/yyyy HH:mm:ss').parse(dd)); } catch (_) { deliveryDate = dd; }
+                    }
                   });
                 } else {
                   if (ctx.mounted) ScaffoldMessenger.of(ctx).showSnackBar(const SnackBar(content: Text('Job not found')));
@@ -318,6 +355,17 @@ class _AddRtiPageState extends State<AddRtiPage> {
             padding: const EdgeInsets.only(bottom: 4),
             child: Text(text, style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: Colors.grey.shade700)),
           );
+
+          // Customer master lookup helper
+          Future<void> pickCustomer() async {
+            final result = await Navigator.push(
+              ctx,
+              MaterialPageRoute(builder: (_) => const Customer(Searchby: 1, SearchId: 0)),
+            );
+            if (result != null) {
+              setSheetState(() => customerCtrl.text = result.AccountName?.toString() ?? '');
+            }
+          }
 
           return DraggableScrollableSheet(
             initialChildSize: 0.92,
@@ -385,9 +433,30 @@ class _AddRtiPageState extends State<AddRtiPage> {
                         ),
                         const SizedBox(height: 12),
 
-                        // Customer Name
+                        // Customer Name — master lookup
                         label('Customer Name'),
-                        TextField(controller: customerCtrl, style: const TextStyle(fontSize: 13), decoration: fieldDecor('Customer Name')),
+                        InkWell(
+                          onTap: pickCustomer,
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 11),
+                            decoration: BoxDecoration(
+                              color: Colors.grey.shade50,
+                              border: Border.all(color: Colors.grey.shade300),
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            child: Row(
+                              children: [
+                                Expanded(
+                                  child: Text(
+                                    customerCtrl.text.isEmpty ? 'Select Customer' : customerCtrl.text,
+                                    style: TextStyle(fontSize: 13, color: customerCtrl.text.isEmpty ? Colors.grey.shade400 : Colors.black87),
+                                  ),
+                                ),
+                                Icon(Icons.search, size: 18, color: Colors.grey.shade600),
+                              ],
+                            ),
+                          ),
+                        ),
                         const SizedBox(height: 12),
 
                         // Salary
@@ -764,12 +833,12 @@ class _AddRtiPageState extends State<AddRtiPage> {
       final res = await repo.apiAllinone('${ApiConstants.port}/RTI/InsertRTI', payload, {'Comid': comid.toString(), 'Content-Type': 'application/json; charset=UTF-8'});
       if (!mounted) return;
       if (res != null && res['ok'] == true) {
-         ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('RTI Saved Successfully!')));
+         msgshow('RTI Saved Successfully!', "", Colors.white, Colors.green, null, null, null, null, context, 0);
          setState(() {
            _rtiId = res['Id'] ?? _rtiId;
          });
       } else {
-         ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Failed to save RTI')));
+         msgshow('Failed to save RTI', "", Colors.white, Colors.red, null, null, null, null, context, 0);
       }
     } catch (e) {
       debugPrint("Error saving RTI: $e");
@@ -1156,80 +1225,89 @@ class _AddRtiPageState extends State<AddRtiPage> {
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: Colors.grey.shade300, style: BorderStyle.solid),
+          border: Border.all(color: Colors.grey.shade200),
         ),
-        child: const Center(
-          child: Text('No Job lines added.\nTap Add Job to add manually.', textAlign: TextAlign.center, style: TextStyle(color: Colors.grey)),
+        child: Center(
+          child: Text('No Job lines added.\nTap Add Job to add manually.',
+            textAlign: TextAlign.center,
+            style: AppTypography.bodySmall(color: Colors.grey.shade500)),
         ),
       );
     }
-    
-    return ListView.separated(
-      shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
-      itemCount: _jobDetails.length,
-      separatorBuilder: (_, __) => const SizedBox(height: 8),
-      itemBuilder: (context, index) {
-        final d = _jobDetails[index];
-        return Card(
-          elevation: 0,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12), side: BorderSide(color: Colors.grey.shade300)),
-          child: Padding(
-            padding: const EdgeInsets.all(12.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
+    return SingleChildScrollView(
+      scrollDirection: Axis.horizontal,
+      child: DataTable(
+        headingRowColor: WidgetStateProperty.all(Palette.grey50),
+        headingRowHeight: 32,
+        dataRowMinHeight: 38,
+        dataRowMaxHeight: 48,
+        columnSpacing: 14,
+        horizontalMargin: 12,
+        border: TableBorder.all(color: Palette.grey200, width: 0.5),
+        columns: const [
+          DataColumn(label: Text('S.No',        style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12))),
+          DataColumn(label: Text('Job No',       style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12))),
+          DataColumn(label: Text('Date',         style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12))),
+          DataColumn(label: Text('Customer',     style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12))),
+          DataColumn(label: Text('Origin',       style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12))),
+          DataColumn(label: Text('Destination',  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12))),
+          DataColumn(label: Text('P.Date',       style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12))),
+          DataColumn(label: Text('D.Date',       style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12))),
+          DataColumn(label: Text('Salary',       style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12))),
+          DataColumn(label: Text('PPIC',         style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12))),
+          DataColumn(label: Text('DPIC',         style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12))),
+          DataColumn(label: Text('PWD',          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12))),
+          DataColumn(label: Text('ACTION',       style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12))),
+        ],
+        rows: _jobDetails.asMap().entries.map((entry) {
+          final idx = entry.key;
+          final d = entry.value;
+          return DataRow(
+            cells: [
+              DataCell(Text('${idx + 1}', style: const TextStyle(fontSize: 12))),
+              DataCell(Text(d['jobNo']?.toString() ?? '',
+                style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Palette.blue700))),
+              DataCell(Text(d['date']?.toString() ?? '',       style: const TextStyle(fontSize: 11))),
+              DataCell(ConstrainedBox(constraints: const BoxConstraints(maxWidth: 120),
+                child: Text(d['customer']?.toString() ?? '',   style: const TextStyle(fontSize: 11), overflow: TextOverflow.ellipsis))),
+              DataCell(ConstrainedBox(constraints: const BoxConstraints(maxWidth: 100),
+                child: Text(d['origin']?.toString() ?? '',     style: const TextStyle(fontSize: 11), overflow: TextOverflow.ellipsis))),
+              DataCell(ConstrainedBox(constraints: const BoxConstraints(maxWidth: 100),
+                child: Text(d['destination']?.toString() ?? '',style: const TextStyle(fontSize: 11), overflow: TextOverflow.ellipsis))),
+              DataCell(Text(d['pickupDate']?.toString()   ?? '', style: const TextStyle(fontSize: 11))),
+              DataCell(Text(d['deliveryDate']?.toString() ?? '', style: const TextStyle(fontSize: 11))),
+              DataCell(Text('RM ${(d['salary'] ?? 0).toString()}',
+                style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: Colors.green))),
+              DataCell(Text(d['ppic']?.toString() ?? '', style: const TextStyle(fontSize: 11))),
+              DataCell(Text(d['dpic']?.toString() ?? '', style: const TextStyle(fontSize: 11))),
+              DataCell(Text((d['pwd'] ?? 0).toString() == '0' ? '' : (d['pwd'] ?? '').toString(),
+                style: const TextStyle(fontSize: 11))),
+              DataCell(
                 Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  mainAxisSize: MainAxisSize.min,
                   children: [
-                    Text(d['jobNo']?.toString() ?? '', style: AppTypography.heading3(color: Palette.blue700)),
-                    Text(d['date']?.toString() ?? '', style: AppTypography.bodySmall(color: Colors.grey)),
-                  ],
-                ),
-                const SizedBox(height: 4),
-                Text(d['customer']?.toString() ?? '', style: AppTypography.bodyMedium(color: Colors.grey.shade800)),
-                const SizedBox(height: 8),
-                // Quick info row
-                Wrap(
-                  spacing: 8,
-                  runSpacing: 4,
-                  children: [
-                    _jobChip('Salary: ${(d['salary'] ?? 0).toString()}', Colors.green.shade700, Colors.green.shade50),
-                    if ((d['ppic']?.toString() ?? '').isNotEmpty)
-                      _jobChip('PPIC: ${d['ppic']}', Palette.blue700, Colors.blue.shade50),
-                    if ((d['dpic']?.toString() ?? '').isNotEmpty)
-                      _jobChip('DPIC: ${d['dpic']}', Colors.orange.shade700, Colors.orange.shade50),
-                    if ((d['pwd'] ?? 0) != 0)
-                      _jobChip('PWD: ${d['pwd']}', Colors.purple.shade700, Colors.purple.shade50),
-                  ],
-                ),
-                const SizedBox(height: 8),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: [
-                    TextButton.icon(
-                      onPressed: () => _openJobEditSheet(index),
+                    IconButton(
+                      constraints: const BoxConstraints(),
+                      padding: const EdgeInsets.symmetric(horizontal: 4),
                       icon: const Icon(Icons.edit_outlined, size: 16, color: Palette.blue700),
-                      label: const Text('Edit', style: TextStyle(color: Palette.blue700, fontSize: 12)),
-                      style: TextButton.styleFrom(padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4), minimumSize: Size.zero, tapTargetSize: MaterialTapTargetSize.shrinkWrap),
+                      onPressed: () => _openJobEditSheet(idx),
                     ),
-                    const SizedBox(width: 4),
-                    TextButton.icon(
+                    IconButton(
+                      constraints: const BoxConstraints(),
+                      padding: const EdgeInsets.symmetric(horizontal: 4),
+                      icon: const Icon(Icons.delete_outline, size: 16, color: Colors.red),
                       onPressed: () {
-                        setState(() => _jobDetails.removeAt(index));
+                        setState(() => _jobDetails.removeAt(idx));
                         _calculateAmount();
                       },
-                      icon: const Icon(Icons.delete_outline, size: 16, color: Colors.red),
-                      label: const Text('Delete', style: TextStyle(color: Colors.red, fontSize: 12)),
-                      style: TextButton.styleFrom(padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4), minimumSize: Size.zero, tapTargetSize: MaterialTapTargetSize.shrinkWrap),
                     ),
                   ],
                 ),
-              ],
-            ),
-          ),
-        );
-      },
+              ),
+            ],
+          );
+        }).toList(),
+      ),
     );
   }
 
@@ -1284,7 +1362,7 @@ class _AddRtiPageState extends State<AddRtiPage> {
                   onPressed: _loadReviseData,
                   style: OutlinedButton.styleFrom(
                     foregroundColor: Palette.blue700,
-                    side: BorderSide(color: Palette.blue700),
+                    side: const BorderSide(color: Palette.blue700),
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
                     padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
                     minimumSize: Size.zero,
@@ -1293,6 +1371,19 @@ class _AddRtiPageState extends State<AddRtiPage> {
                   child: const Text('LOAD', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12)),
                 ),
                 if (_rtiId != 0) const SizedBox(width: 6),
+                OutlinedButton(
+                  onPressed: () => Navigator.pop(context),
+                  style: OutlinedButton.styleFrom(
+                    foregroundColor: Palette.blue700,
+                    side: const BorderSide(color: Palette.blue700),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                    minimumSize: Size.zero,
+                    tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                  ),
+                  child: const Text('VIEW', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12)),
+                ),
+                const SizedBox(width: 6),
                 ElevatedButton(
                   onPressed: _saveRTI,
                   style: ElevatedButton.styleFrom(

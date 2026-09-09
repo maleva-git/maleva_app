@@ -8,8 +8,6 @@ class DioClient {
   DioClient(this._sessionManager) {
     _dio = Dio(
       BaseOptions(
-        // We will define the base URL or rely on passing full URLs for now, 
-        // depending on how the app is structured.
         connectTimeout: const Duration(seconds: 15),
         receiveTimeout: const Duration(seconds: 15),
         headers: {
@@ -19,6 +17,7 @@ class DioClient {
     );
 
     _dio.interceptors.add(
+
       InterceptorsWrapper(
         onRequest: (options, handler) {
           // Automatically inject the token if it exists

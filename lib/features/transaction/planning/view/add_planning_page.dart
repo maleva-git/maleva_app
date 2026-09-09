@@ -13,6 +13,7 @@ import 'package:maleva/core/di/injection.dart';
 import 'package:maleva/core/network/legacy_api_repository.dart';
 import 'package:maleva/features/mastersearch/Employee.dart';
 import '../../../transport/updatertidetails/view/add_rti_page.dart';
+import 'package:maleva/core/utils/dialog_helper.dart';
 
 class AddPlanningPage extends StatefulWidget {
   const AddPlanningPage({super.key});
@@ -118,13 +119,13 @@ class _AddPlanningPageState extends State<AddPlanningPage> {
     return ElevatedButton(
       onPressed: onTap,
       style: ElevatedButton.styleFrom(
-        backgroundColor: isPrimary ? colour.brand : Colors.white,
-        foregroundColor: isPrimary ? Colors.white : colour.textMain,
+        backgroundColor: isPrimary ? colour.brand : colour.kWhite,
+        foregroundColor: isPrimary ? colour.kWhite : colour.textMain,
         elevation: isPrimary ? 2 : 0,
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(8),
-          side: isPrimary ? BorderSide.none : const BorderSide(color: colour.border),
+          side: isPrimary ? BorderSide.none : BorderSide(color: colour.border),
         ),
       ),
       child: Text(text, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
@@ -421,6 +422,183 @@ class _AddPlanningPageState extends State<AddPlanningPage> {
   }
 
 
+  // ─── Sale Order Update from Search Results (web UpdateWindow exact replica) ───
+  void _showSOUpdateFromSearch(Map<String, dynamic> d) {
+    String parseApiDate(dynamic raw) {
+      if (raw == null || raw.toString().isEmpty) return '';
+      try {
+        final s = raw.toString();
+        if (s.contains('/Date(')) {
+          final ms = int.parse(s.replaceAll(RegExp(r'[^0-9]'), ''));
+          return DateFormat('dd/MM/yyyy HH:mm').format(DateTime.fromMillisecondsSinceEpoch(ms));
+        }
+        return DateFormat('dd/MM/yyyy HH:mm').format(DateTime.parse(s));
+      } catch (_) { return raw.toString(); }
+    }
+
+    final int jobId = () {
+      final v = d['SaleOrderMasterRefId'] ?? d['saleOrderMasterRefId'] ?? 0;
+      return v is int ? v : int.tryParse(v.toString()) ?? 0;
+    }();
+    final String jobNo = (d['JobNo'] ?? d['jobNo'] ?? '').toString();
+    String sPDate  = parseApiDate(d['SPickupDate']         ?? d['sPickupDate']);
+    String sDDate  = parseApiDate(d['SDeliveryDate']       ?? d['sDeliveryDate']);
+    String sWEnter = parseApiDate(d['SWareHouseEnterDate'] ?? d['sWareHouseEnterDate']);
+    String sWExit  = parseApiDate(d['SWareHouseExitDate']  ?? d['sWareHouseExitDate']);
+    final wAddrCtrl = TextEditingController(text: (d['WareHouseAddress'] ?? d['wareHouseAddress'] ?? '').toString());
+    bool chkPDate  = sPDate.isNotEmpty;
+    bool chkDDate  = sDDate.isNotEmpty;
+    bool chkWEnter = sWEnter.isNotEmpty;
+    bool chkWExit  = sWExit.isNotEmpty;
+    final List<Map<String, dynamic>> pickupRows   = [];
+    final List<Map<String, dynamic>> deliveryRows = [];
+
+    void loadPickups(List<dynamic> raw) {
+      for (final p in raw) {
+        final m = p is Map<String, dynamic> ? p : <String, dynamic>{};
+        pickupRows.add({'id': m['Id'] ?? m['id'] ?? 0, 'address': m['PickupAddress'] ?? m['pickupAddress'] ?? '', 'qty': m['PickupQuantity'] ?? m['pickupQuantity'] ?? '', 'time': parseApiDate(m['PickupTime'] ?? m['pickupTime']), 'weight': m['PickupWeight'] ?? m['pickupWeight'] ?? ''});
+      }
+    }
+    void loadDeliveries(List<dynamic> raw) {
+      for (final d2 in raw) {
+        final m = d2 is Map<String, dynamic> ? d2 : <String, dynamic>{};
+        deliveryRows.add({'id': m['Id'] ?? m['id'] ?? 0, 'address': m['DeliveryAddress'] ?? m['deliveryAddress'] ?? '', 'qty': m['DeliveryQuantity'] ?? m['deliveryQuantity'] ?? '', 'time': parseApiDate(m['DeliveryTime'] ?? m['deliveryTime']), 'weight': m['DeliveryWeight'] ?? m['deliveryWeight'] ?? ''});
+      }
+    }
+    final rawP = d['PickupsList'] ?? d['pickupsList'];
+    if (rawP is List && rawP.isNotEmpty) { loadPickups(rawP); }
+    else {
+      final pA = (d['PickupAddress'] ?? '').toString();
+      if (pA.isNotEmpty) {
+        final aA = pA.split('{@}');
+        final aQ = (d['pickupQuantitylist'] ?? d['PickupQuantitylist'] ?? '').toString().split('{@}');
+        final aT = (d['pickuptimelist'] ?? d['PickupTimelist'] ?? '').toString().split('{@}');
+        for (int i = 0; i < aA.length; i++) { pickupRows.add({'id': 0, 'address': aA[i], 'qty': i < aQ.length ? aQ[i] : '', 'time': i < aT.length ? parseApiDate(aT[i]) : '', 'weight': ''}); }
+      }
+    }
+    final rawD = d['DeliveriesList'] ?? d['deliveriesList'];
+    if (rawD is List && rawD.isNotEmpty) { loadDeliveries(rawD); }
+    else {
+      final dA = (d['DeliveryAddress'] ?? '').toString();
+      if (dA.isNotEmpty) {
+        final aA = dA.split('{@}');
+        final aQ = (d['DeliveryQuantitylist'] ?? d['deliveryQuantitylist'] ?? '').toString().split('{@}');
+        final aT = (d['Delivertimelist'] ?? d['delivertimelist'] ?? '').toString().split('{@}');
+        for (int i = 0; i < aA.length; i++) { deliveryRows.add({'id': 0, 'address': aA[i], 'qty': i < aQ.length ? aQ[i] : '', 'time': i < aT.length ? parseApiDate(aT[i]) : '', 'weight': ''}); }
+      }
+    }
+
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (ctx) => StatefulBuilder(builder: (ctx, setS) {
+        bool isSaving = false;
+        String fmt(String v) { try { return DateFormat("yyyy-MM-dd'T'HH:mm:ss").format(DateFormat('dd/MM/yyyy HH:mm').parse(v)); } catch (_) { return v; } }
+
+        Future<void> callApi(Map<String, dynamic> payload) async {
+          final h = {'Content-Type': 'application/json; charset=UTF-8', 'Comid': AppGlobals.Comid.toString()};
+          var r = await sl<LegacyApiRepository>().apiAllinone("${ApiConstants.port}/SaleOrder/UpdateSaleorder", jsonEncode(payload), h, null);
+          if (r != null && r is String) r = jsonDecode(r);
+          if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(r?['ok'] == true ? 'Saved Successfully' : (r?['message'] ?? 'Failed'))));
+        }
+
+        Future<void> saveAll() async {
+          setS(() => isSaving = true);
+          try {
+            final dynP = pickupRows.map((r) => {'Id': r['id'] ?? 0, 'PickupAddress': r['address'] ?? '', 'PickupQuantity': r['qty'] ?? '', 'PickupTime': (r['time'] ?? '').isNotEmpty ? fmt(r['time']) : null, 'PickupWeight': r['weight'] ?? ''}).toList();
+            final dynD = deliveryRows.map((r) => {'Id': r['id'] ?? 0, 'DeliveryAddress': r['address'] ?? '', 'DeliveryQuantity': r['qty'] ?? '', 'DeliveryTime': (r['time'] ?? '').isNotEmpty ? fmt(r['time']) : null, 'DeliveryWeight': r['weight'] ?? ''}).toList();
+            await callApi({"Jobid": jobId, "PickupDate": chkPDate && sPDate.isNotEmpty ? fmt(sPDate) : null, "DeliveryDate": chkDDate && sDDate.isNotEmpty ? fmt(sDDate) : null, "WareHouseEnterDate": chkWEnter && sWEnter.isNotEmpty ? fmt(sWEnter) : null, "WareHouseExitDate": chkWExit && sWExit.isNotEmpty ? fmt(sWExit) : null, "WareHouseAddress": wAddrCtrl.text, "pickuptimelist": dynP.length <= 1 ? "" : dynP.map((p) => p['PickupTime'] ?? '').join('{@}'), "DeliveryDateTimeList": dynD.length <= 1 ? "" : dynD.map((p) => p['DeliveryTime'] ?? '').join('{@}'), "PickupsList": dynP, "DeliveriesList": dynD, "Type": 0, "Comid": AppGlobals.Comid, "EmployeeRefId": AppGlobals.EmpRefId == 0 ? null : AppGlobals.EmpRefId});
+            if (mounted) Navigator.pop(ctx);
+          } finally { if (mounted) setS(() => isSaving = false); }
+        }
+
+        Widget addrRow(List<Map<String, dynamic>> rows, int i, bool isPickup) {
+          final row = rows[i];
+          final ac = TextEditingController(text: (row['address'] ?? '').toString());
+          final qc = TextEditingController(text: (row['qty'] ?? '').toString());
+          return Container(
+            margin: const EdgeInsets.only(top: 6), padding: const EdgeInsets.all(8),
+            decoration: BoxDecoration(color: colour.kBg, border: Border.all(color: colour.cBorder), borderRadius: BorderRadius.circular(8)),
+            child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              Row(children: [Text('${i + 1}.', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 12)), const Spacer(), IconButton(icon: const Icon(Icons.close, size: 16, color: colour.kDanger), onPressed: () => setS(() => rows.removeAt(i)), padding: EdgeInsets.zero, constraints: const BoxConstraints())]),
+              TextField(controller: ac, style: const TextStyle(fontSize: 12), decoration: InputDecoration(labelText: isPickup ? 'Pickup Address' : 'Delivery Address', labelStyle: const TextStyle(fontSize: 11), isDense: true, contentPadding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6), border: OutlineInputBorder(borderRadius: BorderRadius.circular(6))), onChanged: (v) => row['address'] = v),
+              const SizedBox(height: 4),
+              Row(children: [
+                Expanded(child: TextField(controller: qc, style: const TextStyle(fontSize: 12), decoration: InputDecoration(labelText: 'Qty', labelStyle: const TextStyle(fontSize: 11), isDense: true, contentPadding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6), border: OutlineInputBorder(borderRadius: BorderRadius.circular(6))), onChanged: (v) => row['qty'] = v)),
+                const SizedBox(width: 8),
+                Expanded(child: InkWell(
+                  onTap: () => _pickDateTime(context, (row['time'] ?? '').isNotEmpty ? row['time'] : DateFormat('dd/MM/yyyy HH:mm').format(DateTime.now()), (v) => setS(() => row['time'] = v)),
+                  child: Container(height: 36, padding: const EdgeInsets.symmetric(horizontal: 8), decoration: BoxDecoration(border: Border.all(color: colour.cBorder), borderRadius: BorderRadius.circular(6)),
+                    child: Row(children: [Expanded(child: Text((row['time'] ?? '').isNotEmpty ? row['time'] : 'Pick Time', style: TextStyle(fontSize: 11, color: (row['time'] ?? '').isNotEmpty ? colour.cText : colour.kTextDim))), const Icon(Icons.access_time, size: 14)])),
+                )),
+              ]),
+            ]),
+          );
+        }
+
+        Widget chkDate(String label, bool chk, String val, Function(bool?) onChk, Function(String) onPick) {
+          return Row(children: [
+            Checkbox(value: chk, onChanged: onChk, activeColor: colour.brand),
+            Expanded(child: IgnorePointer(ignoring: !chk, child: Opacity(opacity: chk ? 1.0 : 0.5, child: _buildSheetDateTimePicker(label, val, setS, onPick)))),
+          ]);
+        }
+
+        OutlinedButton saveBtn(String label, Future<void> Function() onTap) {
+          return OutlinedButton(
+            onPressed: isSaving ? null : () async { setS(() => isSaving = true); try { await onTap(); } finally { if (mounted) setS(() => isSaving = false); } },
+            style: OutlinedButton.styleFrom(padding: const EdgeInsets.symmetric(horizontal: 8), minimumSize: const Size(55, 32)),
+            child: Text(label, style: const TextStyle(fontSize: 11)),
+          );
+        }
+
+        return Container(
+          padding: EdgeInsets.only(bottom: MediaQuery.of(ctx).viewInsets.bottom),
+          decoration: const BoxDecoration(color: colour.surface, borderRadius: BorderRadius.vertical(top: Radius.circular(16))),
+          child: SingleChildScrollView(padding: const EdgeInsets.all(16), child: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.start, children: [
+            Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
+              Text("Sale Order Update", style: AppTypography.heading2(color: colour.textMain)),
+              IconButton(icon: const Icon(Icons.close), onPressed: () => Navigator.pop(ctx), padding: EdgeInsets.zero, constraints: const BoxConstraints()),
+            ]),
+            const SizedBox(height: 4),
+            Container(padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8), decoration: BoxDecoration(color: colour.brandLight, borderRadius: BorderRadius.circular(8)), child: Row(children: [const Text("Job No: ", style: TextStyle(fontWeight: FontWeight.bold, color: colour.brand)), Text(jobNo, style: const TextStyle(fontWeight: FontWeight.bold, color: colour.brand, fontSize: 15))])),
+            const Divider(height: 20),
+
+            Row(children: [Expanded(child: chkDate("Pickup Date", chkPDate, sPDate, (v) => setS(() => chkPDate = v!), (v) => setS(() => sPDate = v))), const SizedBox(width: 8), saveBtn('SAVE', () => callApi({"Jobid": jobId, "PickupDate": chkPDate && sPDate.isNotEmpty ? fmt(sPDate) : null, "DeliveryDate": null, "WareHouseEnterDate": null, "WareHouseExitDate": null, "WareHouseAddress": "", "pickuptimelist": "", "DeliveryDateTimeList": "", "PickupsList": <Map<String, dynamic>>[], "DeliveriesList": <Map<String, dynamic>>[], "Type": 1, "Comid": AppGlobals.Comid}))]),
+            const SizedBox(height: 6),
+            Row(children: [Expanded(child: chkDate("Delivery Date", chkDDate, sDDate, (v) => setS(() => chkDDate = v!), (v) => setS(() => sDDate = v))), const SizedBox(width: 8), saveBtn('SAVE', () => callApi({"Jobid": jobId, "PickupDate": null, "DeliveryDate": chkDDate && sDDate.isNotEmpty ? fmt(sDDate) : null, "WareHouseEnterDate": null, "WareHouseExitDate": null, "WareHouseAddress": "", "pickuptimelist": "", "DeliveryDateTimeList": "", "PickupsList": <Map<String, dynamic>>[], "DeliveriesList": <Map<String, dynamic>>[], "Type": 2, "Comid": AppGlobals.Comid}))]),
+            const Divider(height: 20),
+
+            Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [const Text("Pickup Address List", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13)), ElevatedButton.icon(onPressed: () => setS(() => pickupRows.add({'id': 0, 'address': '', 'qty': '', 'time': '', 'weight': ''})), icon: const Icon(Icons.add, size: 14), label: const Text("ADD PICKUP", style: TextStyle(fontSize: 11)), style: ElevatedButton.styleFrom(padding: const EdgeInsets.symmetric(horizontal: 10), minimumSize: const Size(0, 30)))]),
+            ...pickupRows.asMap().entries.map((e) => addrRow(pickupRows, e.key, true)),
+            if (pickupRows.isNotEmpty) Align(alignment: Alignment.centerRight, child: Padding(padding: const EdgeInsets.only(top: 6), child: saveBtn('SAVE PICKUP LIST', () async { final dynP = pickupRows.map((r) => {'Id': r['id'] ?? 0, 'PickupAddress': r['address'] ?? '', 'PickupQuantity': r['qty'] ?? '', 'PickupTime': (r['time'] ?? '').isNotEmpty ? fmt(r['time']) : null, 'PickupWeight': r['weight'] ?? ''}).toList(); await callApi({"Jobid": jobId, "PickupDate": null, "DeliveryDate": null, "WareHouseEnterDate": null, "WareHouseExitDate": null, "WareHouseAddress": "", "pickuptimelist": "", "DeliveryDateTimeList": "", "PickupsList": dynP, "DeliveriesList": <Map<String, dynamic>>[], "Type": 6, "Comid": AppGlobals.Comid}); }))),
+            const Divider(height: 20),
+
+            Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [const Text("Delivery Address List", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13)), ElevatedButton.icon(onPressed: () => setS(() => deliveryRows.add({'id': 0, 'address': '', 'qty': '', 'time': '', 'weight': ''})), icon: const Icon(Icons.add, size: 14), label: const Text("ADD DELIVERY", style: TextStyle(fontSize: 11)), style: ElevatedButton.styleFrom(padding: const EdgeInsets.symmetric(horizontal: 10), minimumSize: const Size(0, 30)))]),
+            ...deliveryRows.asMap().entries.map((e) => addrRow(deliveryRows, e.key, false)),
+            if (deliveryRows.isNotEmpty) Align(alignment: Alignment.centerRight, child: Padding(padding: const EdgeInsets.only(top: 6), child: saveBtn('SAVE DELIVERY LIST', () async { final dynD = deliveryRows.map((r) => {'Id': r['id'] ?? 0, 'DeliveryAddress': r['address'] ?? '', 'DeliveryQuantity': r['qty'] ?? '', 'DeliveryTime': (r['time'] ?? '').isNotEmpty ? fmt(r['time']) : null, 'DeliveryWeight': r['weight'] ?? ''}).toList(); await callApi({"Jobid": jobId, "PickupDate": null, "DeliveryDate": null, "WareHouseEnterDate": null, "WareHouseExitDate": null, "WareHouseAddress": "", "pickuptimelist": "", "DeliveryDateTimeList": "", "PickupsList": <Map<String, dynamic>>[], "DeliveriesList": dynD, "Type": 7, "Comid": AppGlobals.Comid}); }))),
+            const Divider(height: 20),
+
+            Row(children: [Expanded(child: chkDate("WH Entry Date", chkWEnter, sWEnter, (v) => setS(() => chkWEnter = v!), (v) => setS(() => sWEnter = v))), const SizedBox(width: 8), saveBtn('SAVE', () => callApi({"Jobid": jobId, "PickupDate": null, "DeliveryDate": null, "WareHouseEnterDate": chkWEnter && sWEnter.isNotEmpty ? fmt(sWEnter) : null, "WareHouseExitDate": null, "WareHouseAddress": wAddrCtrl.text, "pickuptimelist": "", "DeliveryDateTimeList": "", "PickupsList": <Map<String, dynamic>>[], "DeliveriesList": <Map<String, dynamic>>[], "Type": 3, "Comid": AppGlobals.Comid}))]),
+            const SizedBox(height: 6),
+            Row(children: [Expanded(child: chkDate("WH Exit Date", chkWExit, sWExit, (v) => setS(() => chkWExit = v!), (v) => setS(() => sWExit = v))), const SizedBox(width: 8), saveBtn('SAVE', () => callApi({"Jobid": jobId, "PickupDate": null, "DeliveryDate": null, "WareHouseEnterDate": null, "WareHouseExitDate": chkWExit && sWExit.isNotEmpty ? fmt(sWExit) : null, "WareHouseAddress": wAddrCtrl.text, "pickuptimelist": "", "DeliveryDateTimeList": "", "PickupsList": <Map<String, dynamic>>[], "DeliveriesList": <Map<String, dynamic>>[], "Type": 4, "Comid": AppGlobals.Comid}))]),
+            const SizedBox(height: 10),
+
+            Row(crossAxisAlignment: CrossAxisAlignment.end, children: [Expanded(child: _buildSheetTextField("Warehouse Address", wAddrCtrl.text, (v) => wAddrCtrl.text = v)), const SizedBox(width: 8), saveBtn('SAVE', () => callApi({"Jobid": jobId, "PickupDate": null, "DeliveryDate": null, "WareHouseEnterDate": null, "WareHouseExitDate": null, "WareHouseAddress": wAddrCtrl.text, "pickuptimelist": "", "DeliveryDateTimeList": "", "PickupsList": <Map<String, dynamic>>[], "DeliveriesList": <Map<String, dynamic>>[], "Type": 5, "Comid": AppGlobals.Comid}))]),
+            const SizedBox(height: 24),
+
+            SizedBox(width: double.infinity, child: ElevatedButton(
+              onPressed: isSaving ? null : saveAll,
+              style: ElevatedButton.styleFrom(backgroundColor: colour.brand, padding: const EdgeInsets.symmetric(vertical: 16), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12))),
+              child: isSaving ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(color: colour.kWhite, strokeWidth: 2)) : const Text("SAVE ALL", style: TextStyle(color: colour.kWhite, fontWeight: FontWeight.bold, fontSize: 15)),
+            )),
+            const SizedBox(height: 8),
+          ])),
+        );
+      }),
+    );
+  }
+
   void _showAddEditItemSheet({Map<String, dynamic>? itemToEdit, int? index}) {
     final bool isEdit = itemToEdit != null;
     
@@ -505,7 +683,7 @@ class _AddPlanningPageState extends State<AddPlanningPage> {
                   width: double.infinity,
                   child: ElevatedButton(
                     onPressed: () {
-                      final newData = {
+                      final newData = <String, dynamic>{
                         'remarks': sRemarks,
                         'truck': sTruck,
                         'driver': sDriver,
@@ -514,6 +692,8 @@ class _AddPlanningPageState extends State<AddPlanningPage> {
                         'origin': sOrigin,
                         'destination': sDest,
                         'customer': sCust,
+                        'saleOrderId': 0, // Ensure numeric fields are present
+                        'SortByD': 0,
                       };
                       setState(() {
                         if (isEdit && index != null) {
@@ -684,7 +864,7 @@ class _AddPlanningPageState extends State<AddPlanningPage> {
         content: const Text('Are you sure you want to delete this planning record?'),
         actions: [
           TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('CANCEL')),
-          TextButton(onPressed: () => Navigator.pop(ctx, true), child: const Text('DELETE', style: TextStyle(color: Colors.red))),
+          TextButton(onPressed: () => Navigator.pop(ctx, true), child: Text('DELETE', style: TextStyle(color: colour.kDanger))),
         ],
       ),
     );
@@ -724,6 +904,20 @@ class _AddPlanningPageState extends State<AddPlanningPage> {
     }
     setState(() => _isLoading = true);
     try {
+      String? safeFormatDate(dynamic dateVal) {
+        if (dateVal == null || dateVal.toString().trim().isEmpty) return null;
+        String val = dateVal.toString().trim().split(' ')[0];
+        try {
+          if (val.contains('-')) {
+             return DateFormat('yyyy-MM-dd').format(DateTime.parse(val));
+          } else {
+             return DateFormat('yyyy-MM-dd').format(DateFormat('dd/MM/yyyy').parse(val));
+          }
+        } catch (e) {
+          return null; // fallback gracefully
+        }
+      }
+
       final saleDetails = _planningItems.map((d) {
         // find truck id
         int truckId = 0;
@@ -747,57 +941,82 @@ class _AddPlanningPageState extends State<AddPlanningPage> {
 
         return {
           'Id': d['detailId'] ?? 0,
-            'SortByD': d['SortByD'] ?? 0,
-            'SaleOrderMasterRefId': d['saleOrderId'] ?? 0,
-            'SortByD': d['SortByD'] ?? 0,
+          'SortByD': d['SortByD'] ?? 0,
+          'SaleOrderMasterRefId': d['saleOrderId'] ?? 0,
           'JobNo': d['jobNo'] ?? '',
-          'JobDate': null,
+          'JobDate': '',
           'TruckName': d['truck'] ?? '',
           'TruckRefid': truckId,
           'DriverName': d['driver'] ?? '',
-          'DriverRefid': driverId,
-          'SPickupDate': d['pDate'] != null ? DateFormat('yyyy-MM-dd').format(DateFormat('dd/MM/yyyy').parse(d['pDate'])) : null,
-          'SDeliveryDate': d['dDate'] != null ? DateFormat('yyyy-MM-dd').format(DateFormat('dd/MM/yyyy').parse(d['dDate'])) : null,
+          'DriverRefId': driverId,
+          'SPickupDate': safeFormatDate(d['pDate']),
+          'SDeliveryDate': safeFormatDate(d['dDate']),
+          'PickupDateD': safeFormatDate(d['pDate']),
+          'DeliveryDateD': safeFormatDate(d['dDate']),
+          'CustomerName': d['customer'] ?? '',
           'Origin': d['origin'] ?? '',
           'Destination': d['destination'] ?? '',
+          'OriginD': d['origin'] ?? '',
+          'DestinationD': d['destination'] ?? '',
           'PickupAddress': '',
           'DeliveryAddress': '',
+          'SWareHouseEnterDate': safeFormatDate(d['wEnterDate']),
+          'SWareHouseExitDate': safeFormatDate(d['wExitDate']),
+          'WareHouseAddress': d['wAddress'] ?? '',
+          'VesselName': '',
+          'OffVesselName': '',
+          'pkg': '',
+          'EmployeeName': '',
+          'truckSize': '',
           'Package': '',
           'Weight': '',
-          'Remarks': _remarksCtrl.text,
+          'Remarks': d['remarks'] ?? _remarksCtrl.text,
+          'PickupsList': [],
+          'DeliveriesList': [],
         };
       }).toList();
 
       final payload = [{
-          'Id': _editMasterId ?? 0,
-          'CompanyRefId': AppGlobals.Comid,
-          'UserRefId': null,
-          'EmployeeRefId': null,
-          'SaleDate': DateFormat('yyyy-MM-dd').format(DateFormat('dd/MM/yyyy').parse(_planDate)),
-          'FDate': DateFormat('yyyy-MM-dd').format(DateFormat('dd/MM/yyyy').parse(_planDate)),
-          'TDate': DateFormat('yyyy-MM-dd').format(DateFormat('dd/MM/yyyy').parse(_planDate)),
-          'CNumberDisplay': 0,
+        'Id': _editMasterId ?? 0,
+        'CompanyRefId': AppGlobals.Comid,
+        'UserRefId': null,
+        'EmployeeRefId': null,
+        'SaleDate': safeFormatDate(_planDate) ?? DateFormat('yyyy-MM-dd').format(DateTime.now()),
+        'FDate': safeFormatDate(_planDate) ?? DateFormat('yyyy-MM-dd').format(DateTime.now()),
+        'TDate': safeFormatDate(_planDate) ?? DateFormat('yyyy-MM-dd').format(DateTime.now()),
+          'CNumberDisplay': "0",
           'CNumber': 0,
           'Remarks': _remarksCtrl.text,
           'SaleDetails': saleDetails
         }];
 
       Map<String, String> header = {'Content-Type': 'application/json; charset=UTF-8', 'Comid': AppGlobals.Comid.toString()};
+      
+      final payloadJson = jsonEncode(payload);
+      debugPrint('=== PLANNING API PAYLOAD ===');
+      debugPrint(payloadJson);
+      
       final resultData = await sl<LegacyApiRepository>().apiAllinone(
-          "${ApiConstants.port}/PLANING/InsertPLANING", jsonEncode(payload), header, null);
+          "${ApiConstants.port}/api/PlanningApp/InsertPLANING", payloadJson, header, null);
 
+
+      print("\n=== PLANINGSearch Payload ===");
+      print("URL: ${resultData}");
+      print("Body: $payload");
+      print("============================\n");
+      
       if (resultData != null && resultData.toString().isNotEmpty) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(_editMasterId != null ? 'Planning Updated Successfully' : 'Planning Saved Successfully')));
+        msgshow(_editMasterId != null ? 'Planning Updated Successfully' : 'Planning Saved Successfully', "", Colors.white, Colors.green, null, null, null, null, context, 0);
         setState(() {
            _editMasterId = null;
            _planningItems.clear();
            _remarksCtrl.clear();
         });
       } else {
-        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Failed to save planning')));
+        msgshow('Failed to save planning', "", Colors.white, Colors.red, null, null, null, null, context, 0);
       }
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Error: $e")));
+      msgshow("Error: $e", "", Colors.white, Colors.red, null, null, null, null, context, 0);
     } finally {
       if (mounted) setState(() => _isLoading = false);
     }
@@ -864,6 +1083,82 @@ class _AddPlanningPageState extends State<AddPlanningPage> {
   }
 
 
+  // Called when UPDATE button is tapped — opens Sale Order Update popup (NOT save planning)
+  void _openSOUpdateForEdit() {
+    if (_editMasterId == null || _planningItems.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('No planning loaded. Please search and select a planning first.')));
+      return;
+    }
+    if (_planningItems.length == 1) {
+      final item = _planningItems[0];
+      _showSOUpdateFromSearch({
+        'SaleOrderMasterRefId': item['saleOrderId'] ?? 0,
+        'JobNo':               item['jobNo'] ?? '',
+        'SPickupDate':         item['pDate'] ?? '',
+        'SDeliveryDate':       item['dDate'] ?? '',
+        'SWareHouseEnterDate': item['wEnterDate'] ?? '',
+        'SWareHouseExitDate':  item['wExitDate'] ?? '',
+        'WareHouseAddress':    item['wAddress'] ?? '',
+        'PickupAddress':       item['origin'] ?? '',
+        'DeliveryAddress':     item['destination'] ?? '',
+      });
+    } else {
+      // Multiple items — show picker
+      showModalBottomSheet(
+        context: context,
+        isScrollControlled: true,
+        backgroundColor: colour.surface,
+        shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(16))),
+        builder: (ctx) => SafeArea(
+          child: Padding(
+            padding: EdgeInsets.only(bottom: MediaQuery.of(ctx).viewInsets.bottom),
+            child: Column(mainAxisSize: MainAxisSize.min, children: [
+              Padding(
+                padding: const EdgeInsets.all(16),
+                child: Row(children: [
+                  Text('Select Job to Update', style: AppTypography.heading3()),
+                  const Spacer(),
+                  IconButton(icon: const Icon(Icons.close), onPressed: () => Navigator.pop(ctx), padding: EdgeInsets.zero, constraints: const BoxConstraints()),
+                ]),
+              ),
+              const Divider(height: 1),
+              Flexible(
+                child: ListView.builder(
+                  shrinkWrap: true,
+                  itemCount: _planningItems.length,
+              itemBuilder: (_, i) {
+                final item = _planningItems[i];
+                return ListTile(
+                  leading: const Icon(Icons.receipt_long, color: colour.brand),
+                  title: Text(item['jobNo'] ?? '-', style: const TextStyle(fontWeight: FontWeight.bold, color: colour.brand)),
+                  subtitle: Text(item['customer'] ?? '', style: const TextStyle(fontSize: 12)),
+                  trailing: const Icon(Icons.chevron_right, color: colour.kTextDim),
+                  onTap: () {
+                    Navigator.pop(ctx);
+                    _showSOUpdateFromSearch({
+                      'SaleOrderMasterRefId': item['saleOrderId'] ?? 0,
+                      'JobNo':               item['jobNo'] ?? '',
+                      'SPickupDate':         item['pDate'] ?? '',
+                      'SDeliveryDate':       item['dDate'] ?? '',
+                      'SWareHouseEnterDate': item['wEnterDate'] ?? '',
+                      'SWareHouseExitDate':  item['wExitDate'] ?? '',
+                      'WareHouseAddress':    item['wAddress'] ?? '',
+                      'PickupAddress':       item['origin'] ?? '',
+                      'DeliveryAddress':     item['destination'] ?? '',
+                    });
+                  },
+                );
+              },
+            ),
+          ),
+          const SizedBox(height: 8),
+        ]),
+      ),
+    ),
+  );
+}
+  }
+
   Future<void> _launchSOUpdate(int saleOrderId) async {
     if (saleOrderId == 0) return;
     setState(() => _isLoading = true);
@@ -914,7 +1209,7 @@ class _AddPlanningPageState extends State<AddPlanningPage> {
     try {
       final repo = sl<PlanningRepository>();
       final result = await repo.searchUnplannedOrders(
-        DateFormat('yyyy-MM-dd').format(DateFormat('dd/MM/yyyy').parse(_planDate)),
+        DateFormat('yyyy-MM-dd').format(DateFormat('dd/MM/yyyy').parse(_pickupDate)),
         DateFormat('yyyy-MM-dd').format(DateFormat('dd/MM/yyyy').parse(_toDate)),
         _searchCtrl.text,
         0,
@@ -923,7 +1218,7 @@ class _AddPlanningPageState extends State<AddPlanningPage> {
       setState(() {
         _planningItems.clear();
         for (var item in result) {
-          _planningItems.add({
+          _planningItems.add(<String, dynamic>{
             'truck': '',
             'driver': '',
             'pDate': _pickupDate,
@@ -962,7 +1257,7 @@ class _AddPlanningPageState extends State<AddPlanningPage> {
       
       _planningItems.clear();
       for (var d in details) {
-        _planningItems.add({
+        _planningItems.add(<String, dynamic>{
           'detailId': d['Id'] ?? 0,
           'truck': d['TruckName'] ?? '',
           'driver': d['DriverName'] ?? '',
@@ -1280,6 +1575,10 @@ class _AddPlanningPageState extends State<AddPlanningPage> {
                                       ),
                                     ),
                                     children: [
+                                      Padding(
+                                        padding: const EdgeInsets.only(left: 8, top: 4, bottom: 2),
+                                        child: Row(children: [const Icon(Icons.touch_app, size: 13, color: colour.brand), const SizedBox(width: 4), Text('Tap a row to update Sale Order', style: TextStyle(fontSize: 11, color: colour.brand, fontStyle: FontStyle.italic))]),
+                                      ),
                                       Container(
                                         color: colour.kBg,
                                         width: double.infinity,
@@ -1291,7 +1590,7 @@ class _AddPlanningPageState extends State<AddPlanningPage> {
                                             dataRowMinHeight: 35,
                                             columnSpacing: 16,
                                             horizontalMargin: 8,
-                                            headingRowColor: WidgetStateProperty.all(Colors.grey.shade200),
+                                            headingRowColor: WidgetStateProperty.all(colour.kSurface2),
                                             columns: const [
                                               DataColumn(label: Text('JobNo', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12))),
                                               DataColumn(label: Text('JobDate', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12))),
@@ -1299,11 +1598,14 @@ class _AddPlanningPageState extends State<AddPlanningPage> {
                                               DataColumn(label: Text('Remarks', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12))),
                                             ],
                                             rows: relatedDetails.map((d) {
-                                              return DataRow(cells: [
-                                                DataCell(Text(d['JobNo'] ?? '', style: const TextStyle(fontSize: 12))),
-                                                DataCell(Text(d['JobDate'] ?? '', style: const TextStyle(fontSize: 12))),
-                                                DataCell(Text(d['TruckName'] ?? '', style: const TextStyle(fontSize: 12))),
-                                                DataCell(Text(d['Remarks'] ?? '', style: const TextStyle(fontSize: 12))),
+                                              final dMap = d is Map<String, dynamic> ? d : <String, dynamic>{};
+                                              return DataRow(
+                                                onSelectChanged: (_) => _showSOUpdateFromSearch(dMap),
+                                                cells: [
+                                                DataCell(Text(dMap['JobNo'] ?? '', style: const TextStyle(fontSize: 12, color: colour.brand, fontWeight: FontWeight.w500))),
+                                                DataCell(Text(dMap['JobDate'] ?? '', style: const TextStyle(fontSize: 12))),
+                                                DataCell(Text(dMap['TruckName'] ?? '', style: const TextStyle(fontSize: 12))),
+                                                DataCell(Text(dMap['Remarks'] ?? '', style: const TextStyle(fontSize: 12))),
                                               ]);
                                             }).toList(),
                                           ),
@@ -1398,7 +1700,7 @@ class _AddPlanningPageState extends State<AddPlanningPage> {
                     const SizedBox(width: 8),
                     _buildButton('SAVE', _savePlanningData, isPrimary: _editMasterId == null),
                     const SizedBox(width: 8),
-                    _buildButton('UPDATE', _savePlanningData, isPrimary: _editMasterId != null),
+                    _buildButton('UPDATE', _openSOUpdateForEdit, isPrimary: _editMasterId != null),
                   const SizedBox(width: 8),
                   _buildButton('VIEW', _showSavedPlanningsView),
                   const SizedBox(width: 8),
@@ -1443,14 +1745,14 @@ class _AddPlanningPageState extends State<AddPlanningPage> {
                 child: Center(
                   child: Text("No planning lines added.\nTap 'Add Line' to create one.", 
                     textAlign: TextAlign.center, 
-                    style: TextStyle(color: Colors.grey.shade500)
+                    style: TextStyle(color: colour.kTextDim)
                   )
                 ),
               )
             : SingleChildScrollView(
                 scrollDirection: Axis.horizontal,
                 child: DataTable(
-                  headingRowColor: WidgetStateProperty.all(Colors.grey.shade200),
+                  headingRowColor: WidgetStateProperty.all(colour.kSurface2),
                   dataRowMinHeight: 35,
                   dataRowMaxHeight: 45,
                   columnSpacing: 16,
