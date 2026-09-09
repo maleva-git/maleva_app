@@ -39,25 +39,48 @@ class PlanningRepository {
   }
 
   Future<List<dynamic>> searchUnplannedOrders(String fromDate, String toDate, String searchKeyword, int empId) async {
+    final comid = AppGlobals.storagenew.getInt('Comid') ?? 0;
     Map<String, dynamic> payload = {
-      "Comid": AppGlobals.storagenew.getInt('Comid') ?? 0,
+      "Comid": comid,
       "Fromdate": fromDate,
       "Todate": toDate,
       "Search": searchKeyword,
       "Employeeid": empId,
-      "ETAType": 0,
-    };
-    Map<String, String> header = {
-      'Content-Type': 'application/json; charset=UTF-8'
     };
 
-    final resultData = await sl<LegacyApiRepository>().apiAllinoneSelectArray(
-        ApiConstants.PLANINGSearch, payload, header, null);
-    
-    if (resultData == null || resultData == "") {
+    print("\n=== PLANINGSearch Payload ===");
+    print("URL: ${ApiConstants.PLANINGSearch}");
+    print("Body: $payload");
+    print("============================\n");
+
+    try {
+      final resultData = await sl<LegacyApiRepository>().apiAllinoneSelectArray(
+        ApiConstants.PLANINGSearch,
+        payload,
+        {'Content-Type': 'application/json; charset=UTF-8'},
+        null,
+      );
+
+      if (resultData == null) return [];
+
+      // Response is a wrapper object: {IsSuccess, StatusCode, Data1: [...]}
+      if (resultData is Map<String, dynamic>) {
+        if (resultData['IsSuccess'] == true || resultData['StatusCode'] == 0) {
+          final data = resultData['Data1'];
+          if (data is List) return data;
+        }
+        // StatusCode 1 = "Not found" — return empty
+        return [];
+      }
+
+      // If direct array returned
+      if (resultData is List) return resultData;
+      return [];
+    } catch (e) {
+      print("PLANINGSearch error: $e");
+      // 500 "Not found" — treat as empty, not a crash
       return [];
     }
-    return resultData as List<dynamic>;
   }
 
   Future<void> editPlanning(dynamic context, int id, int planningNo) async {
@@ -140,7 +163,14 @@ class PlanningRepository {
     Map<String, String> header = {'Content-Type': 'application/json; charset=UTF-8', 'Comid': AppGlobals.Comid.toString()};
       
       final resultData = await sl<LegacyApiRepository>().apiAllinone(
-          "${ApiConstants.port}/PLANING/InsertPLANING", payload, header, null);
+          "${ApiConstants.port}/api/PLANING/InsertPLANING", payload, header, null);
+
+
+
+      print("\n=== PLANINGSearch Payload ===");
+      print("URL: ${resultData}");
+      print("Body: $payload");
+      print("============================\n");
 
       if (resultData != null && resultData.toString().isNotEmpty) {
         return true;

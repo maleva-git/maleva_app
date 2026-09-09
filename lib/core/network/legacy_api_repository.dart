@@ -50,9 +50,24 @@ class LegacyApiRepository {
   // Generic methods for direct ApiLegacyHelper replacements
   Future<dynamic> post(String url, {dynamic data, Map<String, String>? headers, BuildContext? context}) async {
     try {
+      print("🚀 [POST] URL: $url");
+      try {
+        print("📦 [POST BODY]: ${jsonEncode(data)}");
+      } catch (_) {
+        print("📦 [POST BODY]: $data");
+      }
+      
       final options = headers != null ? Options(headers: headers) : null;
       final response = await _dioClient.dio.post(url, data: data ?? {}, options: options);
       return response.data;
+    } on DioException catch (e) {
+      // Return the response body even on 4xx/5xx — callers can inspect IsSuccess/StatusCode
+      if (e.response?.data != null) {
+        print("API ${e.response?.statusCode}: ${url.split('/').last} → ${e.response?.data?['Message'] ?? e.message}");
+        return e.response!.data;
+      }
+      print("API Error: $e");
+      return null;
     } catch (e) {
       print("API Error: $e");
       return null;
@@ -61,9 +76,23 @@ class LegacyApiRepository {
 
   Future<List<dynamic>> postList(String url, {dynamic data, Map<String, String>? headers, BuildContext? context}) async {
     try {
+      print("🚀 [POST LIST] URL: $url");
+      try {
+        print("📦 [POST LIST BODY]: ${jsonEncode(data)}");
+      } catch (_) {
+        print("📦 [POST LIST BODY]: $data");
+      }
+
       final options = headers != null ? Options(headers: headers) : null;
       final response = await _dioClient.dio.post(url, data: data ?? {}, options: options);
       return _ensureList(response.data);
+    } on DioException catch (e) {
+      if (e.response?.data != null) {
+        print("API ${e.response?.statusCode}: ${url.split('/').last} → ${e.response?.data?['Message'] ?? e.message}");
+        return _ensureList(e.response!.data);
+      }
+      print("API Error: $e");
+      return [];
     } catch (e) {
       print("API Error: $e");
       return [];

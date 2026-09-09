@@ -29,8 +29,6 @@ class ApiClient {
     return headers;
   }
 
-  // â”€â”€â”€ POST â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-  // Returns: List<dynamic> | Map<String,dynamic> | String | int
   static Future<dynamic> postRequest(
       String url,
       dynamic bodyData, {
