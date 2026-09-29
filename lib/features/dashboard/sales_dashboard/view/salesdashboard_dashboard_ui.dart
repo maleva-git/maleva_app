@@ -23,6 +23,7 @@ import '../bloc/sales_state.dart';
 import 'package:maleva/features/dashboard/common_tabs/driverleave/view/employee_leave_request_tab.dart';
 import 'package:maleva/core/models/shared/barcode_print_model.dart';
 import 'package:maleva/core/utils/auth_helper.dart';
+import 'package:maleva/features/ir_report/presentation/pages/ir_report_tab.dart';
 class SalesDashboardView extends StatelessWidget {
   final TabController tabController;
   final bool isTablet;
@@ -122,6 +123,7 @@ class SalesDashboardView extends StatelessWidget {
           _tab('SALE UPDATE', isTablet),
           _tab('SALES', isTablet),
           _tab('VSL', isTablet),
+          _tab('IR Report', isTablet),
           _tab('TRANSPORT', isTablet),
           _tab('ENQUIRY', isTablet),
           _tab('FUEL VIEW', isTablet),
@@ -164,6 +166,7 @@ Tab _tab(String text, bool isTablet) => Tab(
             ),
             const AirfreightSales(),
             const VesselReportPage(),
+            const IrReportTab(),
             const TransportReportPage(),
             const EnquiryScreen(),
             const FuelDiffPage(),

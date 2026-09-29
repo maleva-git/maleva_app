@@ -26,6 +26,7 @@ import 'package:maleva/features/dashboard/common_tabs/driverleave/view/employee_
 import 'package:maleva/features/dashboard/common_tabs/driverleave/view/employee_leave_approval_tab.dart';
 import 'package:maleva/core/models/shared/barcode_print_model.dart';
 import 'package:maleva/core/utils/auth_helper.dart';
+import 'package:maleva/features/ir_report/presentation/pages/ir_report_tab.dart';
 
 
 class MobileDashboard extends StatelessWidget {
@@ -131,6 +132,7 @@ class MobileDashboard extends StatelessWidget {
           _tab('Invoice',         isTablet),  // ← isTablet pass பண்ணு
           _tab('SO',              isTablet),
           _tab('Sales',              isTablet),
+          _tab('IR Report', isTablet),
           _tab('VSL',             isTablet),
           _tab('TRANSPORT',       isTablet),
           _tab('ENQUIRY',         isTablet),
@@ -183,6 +185,7 @@ class MobileDashboard extends StatelessWidget {
           InvoiceTab(),
           SalesOrderTab(),
           SalesReportPage(),
+          IrReportTab(),
           VesselReportPage(),
           TransportReportPage(),
           EnquiryScreen(),

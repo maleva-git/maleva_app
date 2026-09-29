@@ -44,6 +44,7 @@ import 'package:maleva/core/models/shared/barcode_print_model.dart';
 import 'package:maleva/core/utils/auth_helper.dart';
 import '../../common_tabs/top_customers/view/admin_top_customers_tab.dart';
 import '../../common_tabs/job_orders/view/job_orders_tab.dart';
+import 'package:maleva/features/ir_report/presentation/pages/ir_report_tab.dart';
 
 class MobileDashboard extends StatelessWidget {
   final TabController tabController;
@@ -146,6 +147,7 @@ class MobileDashboard extends StatelessWidget {
           _tab('SO',              isTablet),
           _tab('JobOrders',       isTablet),
           _tab('Invoice',         isTablet),
+          _tab('IR Report',       isTablet),
           _tab('EXP',             isTablet),
           _tab('VSL',             isTablet),
           _tab('TRANSPORT',       isTablet),
@@ -204,6 +206,7 @@ class MobileDashboard extends StatelessWidget {
           const SalesOrderTab(),
           const JobOrdersTab(),
           const InvoiceTab(),
+          const IrReportTab(),
           const ExpenseReportPage(),
           const VesselReportPage(),
           const TransportReportPage(),

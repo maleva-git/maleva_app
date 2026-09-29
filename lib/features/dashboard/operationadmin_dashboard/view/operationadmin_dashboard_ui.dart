@@ -29,6 +29,7 @@ import 'package:maleva/features/dashboard/common_tabs/driverleave/view/employee_
 import 'package:maleva/features/dashboard/common_tabs/driverleave/view/employee_leave_approval_tab.dart';
 import 'package:maleva/core/models/shared/barcode_print_model.dart';
 import 'package:maleva/core/utils/auth_helper.dart';
+import 'package:maleva/features/ir_report/presentation/pages/ir_report_tab.dart';
 
 
 class MobileDashboard extends StatelessWidget {
@@ -135,6 +136,7 @@ class MobileDashboard extends StatelessWidget {
           _tab('TodayPickup',             isTablet),
 
           _tab('Truck',           isTablet),
+          _tab('IR Report', isTablet),
           _tab('Driver',          isTablet),
           _tab('SpeedingReport',  isTablet),
           _tab('FuelFilling',     isTablet),
@@ -189,6 +191,7 @@ class MobileDashboard extends StatelessWidget {
           const MaintenanceDashboardWidget(),
           const VesselReportPage(),
           const TruckDetailsReportPage(),
+          const IrReportTab(),
           const DriverDetailsView(),
           const SpeedingScreen(),
           const FuelFillingPage(),
@@ -203,6 +206,7 @@ class MobileDashboard extends StatelessWidget {
             toDate: DateFormat('yyyy-MM-dd').format(DateTime.now()),
           ),
           const RTIDetailsPage(),
+          const EmployeeLeaveApprovalTab(),
           const EmployeeLeaveRequestTab(),
         ],
       ),

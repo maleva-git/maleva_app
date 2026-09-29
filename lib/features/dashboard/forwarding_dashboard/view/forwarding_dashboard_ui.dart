@@ -17,6 +17,7 @@ import 'package:maleva/features/dashboard/common_tabs/driverleave/view/admin_lea
 import 'package:maleva/features/dashboard/common_tabs/driverleave/view/employee_leave_request_tab.dart';
 import 'package:maleva/core/models/shared/barcode_print_model.dart';
 import 'package:maleva/core/utils/auth_helper.dart';
+import 'package:maleva/features/ir_report/presentation/pages/ir_report_tab.dart';
 
 
 class ForwardingMobileDashboard extends StatelessWidget {
@@ -123,6 +124,7 @@ class ForwardingMobileDashboard extends StatelessWidget {
           _tab('VSL',             isTablet),  //1
           _tab('K-1,2,3',             isTablet),  //2
           _tab('K8',             isTablet),  //3
+          _tab('IR Report', isTablet),
 
           _tab('EmpLeave', isTablet),
         ],
@@ -167,6 +169,7 @@ class ForwardingMobileDashboard extends StatelessWidget {
           VesselReportPage(),  //1
           UnReleasePage(),  //1
           UnReleaseSMKPage(),  //1
+          IrReportTab(),
 
           EmployeeLeaveRequestTab(),
         ],

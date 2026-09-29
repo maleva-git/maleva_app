@@ -51,6 +51,8 @@ import '../features/transport/updatertidetails/view/updatertidetails_tab.dart';
 import '../features/troubleshoot/view/troubleshoot_sheet.dart';
 import 'package:maleva/core/models/shared/menu_master_model.dart';
 import 'package:maleva/core/utils/auth_helper.dart';
+import '../features/ir_report/presentation/ir_report_routes.dart';
+import '../features/truck_location/presentation/truck_location_routes.dart';
 
 class Menulist extends StatefulWidget {
   const Menulist({super.key});
@@ -840,6 +842,19 @@ class _MenuTileState extends State<_MenuTile>
           Navigator.push(ctx, _r(const UpdateRTI()));           break;
         case "Forwarding SMK Update":
           Navigator.push(ctx, _r(const FWSmkUpdate()));         break;
+        case "IR Report":
+          Navigator.push(
+            ctx,
+            IrReportRoutes.list(
+              canAdd: widget.entry.PageAdd == 1,
+              canEdit: widget.entry.PageEdit == 1,
+              canDelete: widget.entry.PageDelete == 1,
+            ),
+          );
+          break;
+        case "Truck Location":
+          Navigator.push(ctx, TruckLocationRoutes.board());
+          break;
 
 /*        case "Vessel Planning":
           Navigator.push(ctx, _r(const VesselPlanningView()));  break;*/
@@ -895,6 +910,8 @@ class _MenuTileState extends State<_MenuTile>
       case "Update RTI Details": return Icons.description_outlined;
       case "Fuel Entry":        return Icons.local_gas_station_outlined;
       case "PreAlertReport":    return Icons.notifications_outlined;
+      case "IR Report":         return Icons.report_problem_outlined;
+      case "Truck Location":    return Icons.location_on_outlined;
       case "Logout":            return Icons.logout_rounded;
       default:                  return Icons.folder_outlined;
     }
@@ -927,6 +944,8 @@ class _MenuTileState extends State<_MenuTile>
       case "Stock In Entry":
       case "Stock Update":
       case "Stock Transfer":   return colour.Accent.teal;
+      case "Truck Location":   return colour.Accent.green;
+      case "IR Report":
       case "Logout":           return colour.Accent.rose;
       default:                 return colour.Accent.blue;
     }
@@ -950,6 +969,8 @@ class _MenuTileState extends State<_MenuTile>
       case "Fuel Entry":          return "Log fuel usage";
       case "Maintenance":         return "Vehicle upkeep";
       case "License Update":      return "Driver licenses";
+      case "IR Report":           return "Incidents and their cost";
+      case "Truck Location":      return "Where every truck is, day by day";
       default:                    return '';
     }
   }

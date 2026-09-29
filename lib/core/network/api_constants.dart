@@ -180,6 +180,19 @@ class ApiConstants {
   static const String apiSelectEngineHoursReport = "$port/api/MasterReportApp/SelectEngineHours";
   static const String apiSelectDriverSalary   = "$port/api/TransactionReportApp/DriverRTIDetailedReport";
 
+  // ─── Incident Report (IR) ─────────────────────────────────────────────────
+  static const String apiSelectIR            = "$port/api/IRApp/SelectIR";
+  static const String apiEditIR              = "$port/api/IRApp/EditIR";
+  static const String apiInsertIR            = "$port/api/IRApp/InsertIR";
+  static const String apiDeleteIR            = "$port/api/IRApp/DeleteIR";
+  static const String apiSelectIRStatus      = "$port/api/IRApp/SelectIRStatus";
+  static const String apiSelectIRDepartments = "$port/api/IRApp/SelectIRDepartments";
+
+  // ─── Truck Location Board ─────────────────────────────────────────────────
+  static const String apiTruckLocationSelectWeek = "$port/api/TruckLocationApp/SelectWeek";
+  static const String apiTruckLocationSaveWeek   = "$port/api/TruckLocationApp/SaveWeek";
+  static const String apiTruckLocationSaveOrder  = "$port/api/TruckLocationApp/SaveOrder";
+
   // ─── App Troubleshoot / Support Log ────────────────────────────────────────
   static const String apiInsertAppLog         = "$port/api/AppLogApp/InsertAppLog";
 }

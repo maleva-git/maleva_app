@@ -37,7 +37,7 @@ import 'package:maleva/core/models/shared/r_t_i_details_view_model.dart';
 class AppGlobals {
   AppGlobals._();
 
-  static String appversion="1.1.12+135";
+  static String appversion="1.1.12+144";
   static bool homepagecall = false;
   static String currentInvoiceNo = "";
   static AssetImage logo = const AssetImage('assets/company/logo.png');

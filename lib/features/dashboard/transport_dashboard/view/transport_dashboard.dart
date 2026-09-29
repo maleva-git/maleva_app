@@ -39,7 +39,7 @@ class _TransportDashboardState extends State<TransportDashboard> with SingleTick
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 8, vsync: this);
+    _tabController = TabController(length: 9, vsync: this);
     _tabController.addListener(_onTabChanged);
 
   }

@@ -27,6 +27,7 @@ import 'package:maleva/features/dashboard/common_tabs/driverleave/view/admin_lea
 import 'package:maleva/features/dashboard/common_tabs/driverleave/view/employee_leave_request_tab.dart';
 import 'package:maleva/core/models/shared/barcode_print_model.dart';
 import 'package:maleva/core/utils/auth_helper.dart';
+import 'package:maleva/features/ir_report/presentation/pages/ir_report_tab.dart';
 import '../../common_tabs/job_orders/view/job_orders_tab.dart';
 
 
@@ -135,11 +136,13 @@ class MaintenanceMobileDashboard extends StatelessWidget {
           ? [ 
               _tab('Job Orders', isTablet),
               _tab('FuelEntry', isTablet),
+              _tab('IR Report', isTablet),
             ]
           : [
               _tab('Job Orders', isTablet),
               _tab('Speeding', isTablet),
               _tab('FuelFilling', isTablet),
+              _tab('IR Report', isTablet),
               _tab('EngineHours', isTablet),
               _tab('FuelDiff', isTablet),
               _tab('SparePartsEntry', isTablet),
@@ -187,11 +190,13 @@ class MaintenanceMobileDashboard extends StatelessWidget {
           ? [ 
               const JobOrdersTab(),
               const FuelEntryTab(),
+              const IrReportTab(),
             ]
           : [
               const JobOrdersTab(),
               const SpeedingScreen(),
               const FuelFillingPage(),
+              const IrReportTab(),
               const EngineHoursPage(),
               const FuelDiffPage(),
               const SparePartsEntryPage(),

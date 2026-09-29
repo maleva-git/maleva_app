@@ -8,6 +8,7 @@ import '../bloc/forwarding_agent_state.dart';
 import 'package:maleva/core/widgets/custom_app_bar.dart';
 import 'package:maleva/features/dashboard/common_tabs/driverleave/view/employee_leave_request_tab.dart';
 import 'package:maleva/core/utils/auth_helper.dart';
+import 'package:maleva/features/ir_report/presentation/pages/ir_report_tab.dart';
 import 'rti_route_activities_tab.dart';
 
 class ForwardingAgentMobileDashboard extends StatelessWidget {
@@ -86,6 +87,7 @@ class ForwardingAgentMobileDashboard extends StatelessWidget {
 
           _tab('Emp Leave', isTablet),
           _tab('RTI Activities', isTablet),
+          _tab('IR Report', isTablet),
         ],
       ),
     );
@@ -115,6 +117,7 @@ class ForwardingAgentMobileDashboard extends StatelessWidget {
         children: const [
           EmployeeLeaveRequestTab(),
           const RtiRouteActivitiesTab(),
+          IrReportTab(),
         ],
       ),
     );

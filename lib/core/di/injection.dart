@@ -126,6 +126,8 @@ import 'package:maleva/features/transaction/salesorder/view/data/salesorderview_
 import 'package:maleva/features/transaction/salesorder/add/bloc/salesorderadd_bloc.dart';
 import 'package:maleva/features/transaction/viewsaleorder/data/viewsaleorder_repository.dart';
 import 'package:maleva/features/transaction/viewsaleorder/bloc/viewsaleorder_bloc.dart';
+import 'package:maleva/features/ir_report/ir_report_injection.dart';
+import 'package:maleva/features/truck_location/truck_location_injection.dart';
 final sl = GetIt.instance;
 
 Future<void> setupDependencies() async {
@@ -140,6 +142,9 @@ Future<void> setupDependencies() async {
   
   sl.registerLazySingleton<DioClient>(() => DioClient(sl<SessionManager>()));
   sl.registerLazySingleton<LegacyApiRepository>(() => LegacyApiRepository(sl<DioClient>()));
+
+  registerIrReportModule(sl);
+  registerTruckLocationModule(sl);
 
   // Repositories
   sl.registerLazySingleton<LeaveRepository>(

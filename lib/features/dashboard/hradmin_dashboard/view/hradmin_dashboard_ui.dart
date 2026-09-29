@@ -24,6 +24,7 @@ import 'package:maleva/features/dashboard/common_tabs/driverleave/view/employee_
 import 'package:maleva/features/dashboard/common_tabs/driverleave/view/employee_leave_approval_tab.dart';
 import 'package:maleva/core/models/shared/barcode_print_model.dart';
 import 'package:maleva/core/utils/auth_helper.dart';
+import 'package:maleva/features/ir_report/presentation/pages/ir_report_tab.dart';
 
 
 
@@ -132,6 +133,7 @@ class HrAMobileDashboard extends StatelessWidget {
           _tab('FuelFilling',     isTablet),
           _tab('SpeedingReport',  isTablet),
           _tab('EngineHours',     isTablet),
+          _tab('IR Report', isTablet),
           _tab('Fuel',            isTablet),
           _tab('Driver',          isTablet),
           _tab('EmployeeView',    isTablet),
@@ -182,6 +184,7 @@ class HrAMobileDashboard extends StatelessWidget {
           FuelFillingPage(),
           SpeedingScreen(),
           EngineHoursPage(),
+          IrReportTab(),
           FuelDiffPage(),
           DriverDetailsView(),
           EmployeeViewPage(),

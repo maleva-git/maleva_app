@@ -20,6 +20,7 @@ import 'package:maleva/features/dashboard/common_tabs/driverleave/view/admin_lea
 import 'package:maleva/features/dashboard/common_tabs/driverleave/view/employee_leave_request_tab.dart';
 import 'package:maleva/core/models/shared/barcode_print_model.dart';
 import 'package:maleva/core/utils/auth_helper.dart';
+import 'package:maleva/features/ir_report/presentation/pages/ir_report_tab.dart';
 
 
 class BoardingMobileDashboard extends StatelessWidget {
@@ -126,9 +127,11 @@ class BoardingMobileDashboard extends StatelessWidget {
           _tab('VSL',             isTablet),  //1
           _tab('Salary',          isTablet),  //2
           if (AppPreferences.getRoleId() != 500) _tab('SpotsSaleOrder',  isTablet),  //3
+          if (AppPreferences.getRoleId() != 500) _tab('IR Report', isTablet),
           if (AppPreferences.getRoleId() != 500) _tab('InventoryReport', isTablet),  //4
 
           _tab('EmpLeave', isTablet),
+          if (AppPreferences.getRoleId() == 500) _tab('IR Report', isTablet),
         ],
       ),
     );
@@ -171,9 +174,11 @@ class BoardingMobileDashboard extends StatelessWidget {
           const VesselReportPage(),  //1
           const SalaryTab(),  //2
           if (AppPreferences.getRoleId() != 500) const SpotSaleEntryPage(),  //3
+          if (AppPreferences.getRoleId() != 500) const IrReportTab(),
           if (AppPreferences.getRoleId() != 500) const InventoryPage(),   //4
 
           const EmployeeLeaveRequestTab(),
+          if (AppPreferences.getRoleId() == 500) const IrReportTab(),
         ],
       ),
     );
