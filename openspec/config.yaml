@@ -1,34 +1,43 @@
-schema: spec-driven
+schema: maleva-spec-driven
 githubCopilot:
   cloudAgent: true
 
-# Project context (optional)
-# Add only constraints that should guide OpenSpec artifacts and workflows.
-# Include constraints an agent cannot infer by reading the code.
-# Keep general project documentation and discoverable codebase facts out.
-# Example:
-#   context: |
-#     Designs and tasks must cover Windows, macOS, and Linux
-#     Write all artifacts in Spanish
+context: |
+  The owner requires planning before implementation for future MALEVA changes.
+  Prepare proposal, requirement deltas with scenarios, design, and tasks before
+  application edits. Present the complete plan and wait for an explicit request
+  to apply it. Read-only investigation may proceed during planning.
+  The 2026-10-01 baseline documents observed Flutter client behavior, not verified
+  backend guarantees or an endorsement of known inconsistencies. Read the relevant
+  specs and openspec/baseline/clarifications.md before planning affected work.
+  Preserve existing wire names and behavior unless the change explicitly proposes
+  altering them. Never silently resolve a recorded ambiguity as a product decision.
+  Keep production credentials, tokens, personal data, and response dumps out of artifacts.
 
-# Per-artifact rules (optional)
-# Add custom rules for specific artifacts.
-# Example:
-#   rules:
-#     proposal:
-#       - Keep proposals under 500 words
-#       - Always state what is out of scope
-#     tasks:
-#       - Break tasks into chunks of max 2 hours
+rules:
+  proposal:
+    - Name affected existing capability paths and distinguish new behavior from the baseline.
+    - State scope, exclusions, user-visible outcome, and relevant clarification IDs.
+  specs:
+    - Use observable SHALL requirements and WHEN/THEN scenarios for success, validation, and applicable failure or permission cases.
+    - Separate code-verified facts from assumptions and backend or device behavior awaiting confirmation.
+    - Preserve exact requirement names when modifying existing requirements.
+  design:
+    - Always create design.md, including for small changes; keep detail proportional to scope.
+    - Identify affected entry points, client permission checks, API payloads, compatibility, and relevant existing tests.
+    - Resolve questions that change scope or acceptance criteria before declaring the plan ready.
+  tasks:
+    - Reference requirements and affected paths; give each task an observable verification step.
+    - Include appropriate failure and permission validation with the task that changes the behavior.
+    - Do not mark tasks complete based only on existing code or unexecuted tests.
 
-# Per-operation guidance (optional)
-# Add advisory guidance for how apply and archive work should be conducted.
-# This is separate from artifact rules above.
-# Example:
-#   operations:
-#     apply:
-#       guidance:
-#         - Keep test summaries concise
-#     archive:
-#       guidance:
-#         - Summarize the archive outcome before finishing
+operations:
+  apply:
+    guidance:
+      - Require proposal, specs, design, and tasks plus an explicit user request to apply the reviewed plan.
+      - Treat readiness as file presence only; check content and strict validation before implementation.
+      - Keep changes within the reviewed scope; report material deviations before dependent work.
+  archive:
+    guidance:
+      - Archive only after implementation tasks and relevant verification are complete.
+      - Sync the validated requirement deltas into the existing baseline capabilities.
