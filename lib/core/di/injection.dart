@@ -1,3 +1,6 @@
+import 'package:maleva/features/dashboard/common_tabs/stockupdate/stockupdate_injection.dart';
+import 'package:maleva/features/dashboard/common_tabs/stocktransfer/stocktransfer_injection.dart';
+import 'package:maleva/features/dashboard/common_tabs/paymentview/paymentview_injection.dart';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 import 'package:maleva/core/network/api_services/auth_api.dart';
@@ -15,8 +18,6 @@ import 'package:maleva/features/dashboard/common_tabs/driversalary/bloc/driversa
 import 'package:maleva/features/dashboard/common_tabs/receiptview/bloc/receiptview_bloc.dart';
 import 'package:maleva/features/dashboard/common_tabs/airfreightsales/bloc/airfreightsales_bloc.dart';
 import 'package:maleva/features/dashboard/common_tabs/stockinentry/bloc/stock_in_entry_bloc.dart';
-import 'package:maleva/features/dashboard/common_tabs/stocktransfer/bloc/stock_transfer_bloc.dart';
-import 'package:maleva/features/dashboard/common_tabs/stockupdate/bloc/stock_update_bloc.dart';
 import '../../features/dashboard/common_tabs/airfreightsales/data/airfreight_repository.dart';
 import '../../features/dashboard/common_tabs/billorder/data/billorder_repository.dart';
 import '../../features/dashboard/common_tabs/bocheck/bloc/bocheck_bloc.dart';
@@ -52,8 +53,6 @@ import '../../features/dashboard/common_tabs/license/bloc/license_bloc.dart';
 import '../../features/dashboard/common_tabs/license/data/license_repository.dart';
 import '../../features/dashboard/common_tabs/maintenance/bloc/maintenance_bloc.dart';
 import '../../features/dashboard/common_tabs/maintenance/data/maintenance_repository.dart';
-import '../../features/dashboard/common_tabs/paymentview/bloc/paymentview_bloc.dart';
-import '../../features/dashboard/common_tabs/paymentview/data/paymentview_repository.dart';
 import '../../features/dashboard/common_tabs/pdo/data/pdo_repository.dart';
 import '../../features/dashboard/common_tabs/pettycash/bloc/pettycash_bloc.dart';
 import '../../features/dashboard/common_tabs/pettycash/data/pettycash_repository.dart';
@@ -78,8 +77,6 @@ import '../../features/dashboard/common_tabs/speedingreport/data/speeding_reposi
 import '../../features/dashboard/common_tabs/spotsaleorder/bloc/spotsaleorder_bloc.dart';
 import '../../features/dashboard/common_tabs/spotsaleorder/data/spotsale_repository.dart';
 import '../../features/dashboard/common_tabs/stockinentry/data/stock_in_entry_repository.dart';
-import '../../features/dashboard/common_tabs/stocktransfer/data/stock_transfer_repository.dart';
-import '../../features/dashboard/common_tabs/stockupdate/data/stock_update_repository.dart';
 import '../../features/dashboard/common_tabs/subadminsale/bloc/sales_report_bloc.dart';
 import '../../features/dashboard/common_tabs/subadminsale/data/salesreport_repository.dart';
 import '../../features/dashboard/common_tabs/summonentry/bloc/summonentry_bloc.dart';
@@ -381,13 +378,7 @@ Future<void> setupDependencies() async {
         () => SparePartsBloc.view(repository: sl<SparePartsRepository>()),
   );
 
-  // ── Payment View ──────────────────────────────────────────────────────────
-  sl.registerLazySingleton<PaymentViewRepository>(
-        () => PaymentViewRepository(),
-  );
-  sl.registerFactory<PaymentPendingBloc>(
-        () => PaymentPendingBloc(repository: sl<PaymentViewRepository>()),
-  );
+  registerPaymentViewModule(sl);
 
   // ── Spot Sale Order ───────────────────────────────────────────────────────
   sl.registerLazySingleton<SpotSaleRepository>(() => SpotSaleRepository());
@@ -480,21 +471,9 @@ Future<void> setupDependencies() async {
         () => StockInEntryBloc(repository: sl<StockInEntryRepository>()),
   );
 
-  // ── Stock Transfer ────────────────────────────────────────────────────────
-  sl.registerLazySingleton<StockTransferRepository>(
-        () => StockTransferRepository(),
-  );
-  sl.registerFactory<StockTransferBloc>(
-        () => StockTransferBloc(repository: sl<StockTransferRepository>()),
-  );
+  registerStockTransferModule(sl);
 
-  // ── Stock Update ──────────────────────────────────────────────────────────
-  sl.registerLazySingleton<StockUpdateRepository>(
-        () => StockUpdateRepository(),
-  );
-  sl.registerFactory<StockUpdateBloc>(
-        () => StockUpdateBloc(repository: sl<StockUpdateRepository>()),
-  );
+  registerStockUpdateModule(sl);
 
   // ── UnRelease ─────────────────────────────────────────────────────────────
   sl.registerLazySingleton<UnReleaseRepository>(() => UnReleaseRepository());

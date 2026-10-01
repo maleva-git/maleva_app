@@ -9,14 +9,15 @@ import '../bloc/bluetooth_bloc.dart';
 import 'package:maleva/core/models/shared/barcode_print_model.dart';
 
 class BluetoothPage extends StatelessWidget {
-  const BluetoothPage({super.key, this.printData});
+  const BluetoothPage({super.key, this.printData, this.createBloc});
 
   final List<BarcodePrintModel>? printData;
+  final BluetoothBloc Function()? createBloc;
 
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (_) => BluetoothBloc()
+      create: (_) => (createBloc?.call() ?? BluetoothBloc())
         ..add(BluetoothInitialized(autoConnect: printData != null)),
       child: _BluetoothView(isPrintMode: printData != null),
     );

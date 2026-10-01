@@ -1,6 +1,7 @@
 import 'package:maleva/core/theme/app_typography.dart';
 import 'package:maleva/core/colors/colors.dart' as colour;
-import 'package:maleva/core/network/api_constants.dart';
+import 'package:maleva/core/network/legacy_json_transport.dart';
+import 'package:maleva/features/dashboard/common_tabs/pettycash/data/change_status_loader.dart';
 import 'package:flutter/material.dart';
 import 'package:maleva/core/utils/app_globals.dart';
 import 'core/models/model.dart';
@@ -9,10 +10,12 @@ import 'package:maleva/core/di/injection.dart';
 
 class ChangeStatusPage extends StatefulWidget {
   final int masterId;
+  final ChangeStatusLoader? loader;
 
   const ChangeStatusPage({
     super.key,
     required this.masterId,
+    this.loader,
   });
 
   @override
@@ -21,6 +24,8 @@ class ChangeStatusPage extends StatefulWidget {
 
 class ChangeStatusPageState extends State<ChangeStatusPage> {
 
+  late final ChangeStatusLoader _loader = widget.loader ?? ChangeStatusLoader(
+      transport: LegacyArrayTransport(sl<LegacyApiRepository>()));
   late int EditId;
   bool progress = false;
   @override
@@ -32,40 +37,16 @@ class ChangeStatusPageState extends State<ChangeStatusPage> {
       loadpettycash();
     }
   }
-  List<PattycashMasterModel> pettycashMaster = [];
-  List<PattyCashDetailsModel> pettycashDetails = [];
+  List<PattycashMasterModel> get pettycashMaster => _loader.masters;
+  set pettycashMaster(List<PattycashMasterModel> value) => _loader.masters = value;
+  List<PattyCashDetailsModel> get pettycashDetails => _loader.details;
+  set pettycashDetails(List<PattyCashDetailsModel> value) => _loader.details = value;
 
   Future loadpettycash() async {
     setState(() {
       progress = false;
     });
-    Map<String, String> header = {
-      'Content-Type': 'application/json; charset=UTF-8',
-    };
-    await sl<LegacyApiRepository>().apiAllinoneSelectArray(
-      "${ApiConstants.apiGetpettycash}${AppGlobals.Comid}""",
-      null,
-      header,
-      context,
-    ).then((resultData) async {
-      if (resultData != null && resultData.isNotEmpty) {
-        var data = resultData[0];
-        if (data != null) {
-          // Parse master data
-          if (data['PattycashMasterModel'] != null) {
-            pettycashMaster = (data['PattycashMasterModel'] as List)
-                .map((item) => PattycashMasterModel.fromJson(item))
-                .toList();
-          }
-          // Parse details data
-          if (data['PattyCashDetailsModel'] != null) {
-            pettycashDetails = (data['PattyCashDetailsModel'] as List)
-                .map((item) => PattyCashDetailsModel.fromJson(item))
-                .toList();
-          }
-        }
-      }
-    }).onError((error, stackTrace) {
+    await _loader.load().onError((error, stackTrace) {
       msgshow(
         error.toString(),
         stackTrace.toString(),

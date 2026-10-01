@@ -1,30 +1,37 @@
-// This is a basic Flutter widget test.
-//
-// To perform an interaction with a widget in your test, use the WidgetTester
-// utility in the flutter_test package. For example, you can send tap and scroll
-// gestures. You can also use WidgetTester to find child widgets in the widget
-// tree, read text, and verify that the values of widget properties are correct.
-
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:go_router/go_router.dart';
+import 'package:maleva/features/auth/data/repositories/auth_repository.dart';
+import 'package:maleva/features/auth/presentation/bloc/auth_bloc.dart';
+import 'package:maleva/features/auth/presentation/pages/login_page.dart';
+import 'package:mocktail/mocktail.dart';
+import 'support/local_fonts.dart';
 
-import 'package:maleva/main.dart';
+class FakeAuthRepository extends Mock implements AuthRepository {}
 
 void main() {
-  testWidgets('Counter increments smoke test', (WidgetTester tester) async {
-    // Build our app and trigger a frame.
-    await tester.pumpWidget( MyApp());
-
-    // Verify that our counter starts at 0.
-    expect(find.text('0'), findsOneWidget);
-    expect(find.text('1'), findsNothing);
-
-    // Tap the '+' icon and trigger a frame.
-    await tester.tap(find.byIcon(Icons.add));
-    await tester.pump();
-
-    // Verify that our counter has incremented.
-    expect(find.text('0'), findsNothing);
-    expect(find.text('1'), findsOneWidget);
+  TestWidgetsFlutterBinding.ensureInitialized();
+  setUpAll(installLocalTestFonts);
+  testWidgets('login route renders and returns to previous route without login', (tester) async {
+    final repository = FakeAuthRepository();
+    final router = GoRouter(routes: [
+      GoRoute(path: '/', builder: (context, state) => Scaffold(body: TextButton(
+        onPressed: () => context.push('/login'), child: const Text('Open login')))),
+      GoRoute(path: '/login', builder: (context, state) => BlocProvider(
+        create: (_) => LoginBloc(authRepository: repository),
+        child: const Appuserloginmobile())),
+    ]);
+    await tester.pumpWidget(MaterialApp.router(routerConfig: router));
+    await tester.tap(find.text('Open login'));
+    await tester.pumpAndSettle();
+    expect(find.text('LOGIN'), findsOneWidget);
+    expect(find.text('Driver Login'), findsOneWidget);
+    router.pop();
+    await tester.pumpAndSettle();
+    expect(find.text('Open login'), findsOneWidget);
+    verifyZeroInteractions(repository);
+    await tester.pumpWidget(const SizedBox.shrink());
+    router.dispose();
   });
 }

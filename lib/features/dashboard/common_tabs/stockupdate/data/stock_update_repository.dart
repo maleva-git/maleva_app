@@ -1,28 +1,32 @@
-import 'package:maleva/core/utils/system_helpers.dart';
+import 'package:maleva/core/platform/barcode_scanner.dart';
 import 'package:maleva/core/network/api_constants.dart';
-import 'package:maleva/core/network/api_client.dart';
-import 'package:maleva/core/utils/app_preferences.dart';
-import 'package:maleva/core/utils/app_globals.dart'; // Only for image path parsing
+import 'package:maleva/core/network/legacy_json_transport.dart';
+import 'package:maleva/core/session/legacy_feature_context.dart';
 import 'package:maleva/core/models/shared/response_view_model.dart';
 
 class StockUpdateRepository {
-  final int comid = AppPreferences.getComid();
-  final int empRefId = AppPreferences.getEmpRefId();
-  final int driverLogin = AppPreferences.getDriverLogin(); // Assuming this is saved in prefs
+  final JsonTransport transport;
+  final BarcodeScanner scanner;
+  final int comid;
+  final int empRefId;
+  final int driverLogin;
+  StockUpdateRepository({
+    this.transport = const ExistingHttpTransport(),
+    this.scanner = const ExistingBarcodeScanner(),
+    LegacyFeatureContext context = const LegacyFeatureContext(),
+  }) : comid = context.preferenceCompanyId,
+        empRefId = context.employeeId,
+        driverLogin = context.driverLogin;
 
   // ─── Initialize ────────────────────────────────────────────────────────────
   // (No prefetch needed anymore)
 
   // ─── Scan Barcode ──────────────────────────────────────────────────────────
-  Future<String?> scanBarcode() async {
-    await SystemHelpers.barcodeScanning();
-    if (AppGlobals.barcodeerror == true) return null;
-    return AppGlobals.barcodestring;
-  }
+  Future<String?> scanBarcode() => scanner.scan();
 
   // ─── Load Stock Data (First Scan) ──────────────────────────────────────────
   Future<Map<String, dynamic>?> loadStockData(String barcodeLabel) async {
-    final response = await ApiClient.postRequest(
+    final response = await transport.postRequest(
         "${ApiConstants.apiEditStockIn}0&barcodeLabel=$barcodeLabel&Comid=$comid", null);
 
     if (response != null) {
@@ -36,7 +40,7 @@ class StockUpdateRepository {
 
   // ─── Load Job Details & Calculate Status & Boarding Officers ─────────────
   Future<Map<String, dynamic>?> loadJobDetails(int saleOrderId) async {
-    final response = await ApiClient.postRequest(
+    final response = await transport.postRequest(
         "${ApiConstants.apiSelectStockDetails}$comid&Id=$saleOrderId", null);
 
     if (response == null) return null;
@@ -49,7 +53,7 @@ class StockUpdateRepository {
     final jStatus = data['JStatus'] as int;
 
     // Fetch Job Statuses
-    final statusListRes = await ApiClient.postRequest(
+    final statusListRes = await transport.postRequest(
         "${ApiConstants.apiSelectAllJobStatus}$comid&JobMasterRefId=$jobMId", null);
 
     int statusId = 0;
@@ -84,7 +88,7 @@ class StockUpdateRepository {
       boardId1 = empRefId;
       boardAmt1 = 50;
     } else if (statusId == 5) {
-      final editRes = await ApiClient.postRequest("${ApiConstants.apiEditSalesOrder}$soId&CNumber=0", null);
+      final editRes = await transport.postRequest("${ApiConstants.apiEditSalesOrder}$soId&CNumber=0", null);
       if (editRes != null && editRes is List && editRes.isNotEmpty) {
         boardId1 = editRes[0]['LBoardingOfficerRefid'] ?? 0;
         if (boardId1 != empRefId) {
@@ -118,14 +122,14 @@ class StockUpdateRepository {
       'SubFolderName': folder,
     };
 
-    final result = await ApiClient.postRequest(ApiConstants.apiDeleteImage, null, headers: header);
+    final result = await transport.postRequest(ApiConstants.apiDeleteImage, null, headers: header);
     return result != null ? ResponseViewModel.fromJson(result) : null;
   }
 
   // ─── Save Stock Update ───────────────────────────────────────────────────
   Future<ResponseViewModel?> saveStockUpdate(int stockId, int statusId, int warehouseId, List<String> imageUrls) async {
     final url = '${ApiConstants.apiUpdateStockIn}$stockId&StatusId=$statusId&Comid=$comid&PortRefid=$warehouseId&ImageURL';
-    final result = await ApiClient.postRequest(url, imageUrls);
+    final result = await transport.postRequest(url, imageUrls);
     return result != null ? ResponseViewModel.fromJson(result) : null;
   }
 
@@ -155,6 +159,6 @@ class StockUpdateRepository {
       };
     }
 
-    await ApiClient.postRequest(ApiConstants.apiUpdateBoardingOfficer, master);
+    await transport.postRequest(ApiConstants.apiUpdateBoardingOfficer, master);
   }
 }

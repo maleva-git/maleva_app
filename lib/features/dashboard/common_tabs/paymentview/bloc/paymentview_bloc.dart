@@ -1,7 +1,7 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 
-import 'package:maleva/core/utils/app_globals.dart';
+import 'package:maleva/core/session/legacy_feature_context.dart';
 
 import '../data/paymentview_repository.dart';
 import 'paymentview_event.dart';
@@ -10,9 +10,10 @@ import 'package:maleva/core/models/shared/payment_pending_model.dart';
 
 class PaymentPendingBloc extends Bloc<PaymentPendingEvent, PaymentPendingState> {
   // ❌ REMOVED: final BuildContext context;
+  final LegacyFeatureContext context;
   final PaymentViewRepository repository; // ✅ Injected Repository
 
-  PaymentPendingBloc({required this.repository})
+  PaymentPendingBloc({required this.repository, this.context = const LegacyFeatureContext()})
       : super(PaymentPendingLoading(
     selectedFilter: 'All',
     selectedPaidFilter: 'All Payments',
@@ -187,7 +188,7 @@ class PaymentPendingBloc extends Bloc<PaymentPendingEvent, PaymentPendingState> 
       }
 
       final Map<String, dynamic> body = {
-        'Comid': AppGlobals.storagenew.getInt('Comid') ?? 0,
+        'Comid': context.storedGlobalCompanyId,
         'Fromdate': fromStr,
         'Todate': toStr,
         'SupplierId': expenseFilterToSid(expFilter),
