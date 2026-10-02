@@ -3,7 +3,9 @@
 // Multiple BLoC pages same master data use pannuvanga —
 // so oru common class la vaichirukkom
 
+import 'package:maleva/core/di/injection.dart';
 import 'package:maleva/core/network/api_client.dart';
+import 'package:maleva/core/stock/stock_in_api.dart';
 import 'package:maleva/core/network/api_constants.dart';
 import 'package:maleva/core/utils/app_preferences.dart';
 import 'package:maleva/core/models/shared/employee_model.dart';
@@ -55,21 +57,9 @@ class MasterApi {
 
   // ─── WareHouse / Port ─────────────────────────────────────────────────────
   static Future<List<WareHouseModel>> getWarehouses() async {
-    final comid  = AppPreferences.getComid();
-    final result = await ApiClient.postRequest(
-      '${ApiConstants.apiWareHouseCombo}$comid', null,
-    );
-    final data = result as List;
-    return data.map((e) => WareHouseModel.fromJson(e)).toList();
-  }
-
-  static Future<List<WareHouseModel>> getStockJobs() async {
-    final comid  = AppPreferences.getComid();
-    final result = await ApiClient.postRequest(
-      '${ApiConstants.apiSelectStockJob}$comid', null,
-    );
-    final data = result['Data1'] as List;
-    return data.map((e) => WareHouseModel.fromJson(e)).toList();
+    // the shared Java GET /api/stock-ins/warehouses
+    final rows = await sl<StockInApi>().warehouses(AppPreferences.getComid());
+    return rows.map(WareHouseModel.fromJava).toList();
   }
 
   // ─── Truck ────────────────────────────────────────────────────────────────

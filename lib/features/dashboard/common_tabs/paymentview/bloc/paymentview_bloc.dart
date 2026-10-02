@@ -1,12 +1,10 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:intl/intl.dart';
 
 import 'package:maleva/core/session/legacy_feature_context.dart';
 
 import '../data/paymentview_repository.dart';
 import 'paymentview_event.dart';
 import 'paymentview_state.dart';
-import 'package:maleva/core/models/shared/payment_pending_model.dart';
 
 class PaymentPendingBloc extends Bloc<PaymentPendingEvent, PaymentPendingState> {
   // ❌ REMOVED: final BuildContext context;
@@ -174,55 +172,14 @@ class PaymentPendingBloc extends Bloc<PaymentPendingEvent, PaymentPendingState> 
         bool isDateSearch = false,
       }) async {
     try {
-      final String fromStr;
-      final String toStr;
-
-      if (isDateSearch) {
-        fromStr = DateFormat('yyyy-MM-dd').format(fromDate);
-        toStr   = DateFormat('yyyy-MM-dd').format(toDate);
-      } else {
-        final now = DateTime.now();
-        final next6 = now.add(const Duration(days: 6));
-        fromStr = DateFormat('yyyy-MM-dd').format(next6);
-        toStr   = DateFormat('yyyy-MM-dd').format(next6);
-      }
-
-      final Map<String, dynamic> body = {
-        'Comid': context.storedGlobalCompanyId,
-        'Fromdate': fromStr,
-        'Todate': toStr,
-        'SupplierId': expenseFilterToSid(expFilter),
-        'SupplierId1': paidFilterToSid(paidFilter),
-      };
-
-      // ✅ REFACTORED: Call the injected repository
-      final result = await repository.fetchPaymentPendingData(body);
-
-      List<PaymentPendingModel> masters  = [];
-      List<PaymentPendingModel> details  = [];
-
-      if (result != null && result is List && result.isNotEmpty) {
-        final first = result[0];
-        if (first is Map &&
-            (first.containsKey('ExpenseReportModel') ||
-                first.containsKey('ExpenseReportDetailsModel'))) {
-          final mJson = (first['ExpenseReportModel'] ?? []) as List;
-          final dJson = (first['ExpenseReportDetailsModel'] ?? []) as List;
-          masters = mJson.map((e) => PaymentPendingModel.fromJson(e as Map<String, dynamic>)).toList();
-          details = dJson.map((e) => PaymentPendingModel.fromJson(e as Map<String, dynamic>)).toList();
-        } else if (result.length >= 2 && result[1] is List) {
-          masters = (result[0] as List)
-              .map((e) => PaymentPendingModel.fromJson(e as Map<String, dynamic>))
-              .toList();
-          details = (result[1] as List)
-              .map((e) => PaymentPendingModel.fromJson(e as Map<String, dynamic>))
-              .toList();
-        } else {
-          masters = (result)
-              .map((e) => PaymentPendingModel.fromJson(e as Map<String, dynamic>))
-              .toList();
-        }
-      }
+      // The board is the current month, as .NET SelectPendingPayment was (it ignored the dates).
+      final lists = await repository.fetchPaymentPending(
+        comid: context.storedGlobalCompanyId,
+        expenseFilter: expenseFilterToSid(expFilter),
+        paidFilter: paidFilterToSid(paidFilter),
+      );
+      final masters = lists.masters;
+      final details = lists.details;
 
       emit(PaymentPendingLoaded(
         masterList: masters,

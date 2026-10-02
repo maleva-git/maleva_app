@@ -8,6 +8,11 @@ class WareHouseModel {
   WareHouseModel.fromJson(Map<String, dynamic> json)
       : Id = int.tryParse(json['Id']?.toString() ?? '') ?? 0,
         PortName = json['PortName'].toString();
+  /// A warehouse from the Java `/api/stock-ins/warehouses` (`id`, `portName`).
+  WareHouseModel.fromJava(Map<String, dynamic> json)
+      : Id = int.tryParse(json['id']?.toString() ?? '') ?? 0,
+        PortName = json['portName']?.toString() ?? '';
+
   Map<String, dynamic> toJson() {
     return {
       'Id': Id,

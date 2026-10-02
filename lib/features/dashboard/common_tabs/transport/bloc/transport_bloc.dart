@@ -1,5 +1,4 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:intl/intl.dart';
 import 'package:maleva/core/utils/app_globals.dart';
 
 import '../data/transport_repository.dart';
@@ -29,28 +28,13 @@ class TransportBloc extends Bloc<TransportEvent, TransportState> {
     emit(const TransportLoadingState());
 
     try {
-      DateTime now = DateTime.now();
-      DateTime newDate = now.add(Duration(days: event.type));
-      String fromDate = DateFormat('yyyy-MM-dd').format(newDate);
-      String toDate   = DateFormat('yyyy-MM-dd').format(newDate);
-
-      final Map<String, dynamic> body = {
-        'Comid':      AppGlobals.storagenew.getInt('Comid') ?? 0,
-        'Fromdate':   fromDate,
-        'Todate':     toDate,
-        'Search':     '',
-        'Employeeid': 0,
-        'ETAType':    0,
-      };
-
-      // ✅ REFACTORED: Calling repo without context
       final resultData = await repository.fetchTransportData(
         type: event.type,
-        body: body,
+        comid: AppGlobals.storagenew.getInt('Comid') ?? 0,
       );
 
       // No data → empty list, no error
-      if (resultData == null || resultData == "" || (resultData is List && resultData.isEmpty)) {
+      if (resultData.isEmpty) {
         emit(TransportLoadedState(
           transportList: const [],
           isPlanToday:   isPlanToday,
@@ -59,7 +43,7 @@ class TransportBloc extends Bloc<TransportEvent, TransportState> {
       }
 
       // Has data
-      final List<Map<String, dynamic>> list = List<Map<String, dynamic>>.from(resultData);
+      final List<Map<String, dynamic>> list = resultData;
 
       emit(TransportLoadedState(
         transportList: list,

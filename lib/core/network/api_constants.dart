@@ -36,8 +36,6 @@ class ApiConstants {
   static const String apiGetProductList       = "$port/api/ItemApp/GetProductList?Comid=";
   static const String apiSelectAddressList    = "$port/api/AddressApp/SelectDistinctAddress?Comid=";
   static const String apiSelectAddressDetails = "$port/api/AddressApp/SelectAddress?Comid=";
-  static const String apiWareHouseCombo       = "$port/api/StockApp/SelectPortList?Comid=";
-  static const String apiSelectStockJob       = "$port/api/StockApp/SelectStockJob?Comid=";
   static const String apiGetTruckList         = "$port/api/TruckApp/GetTruck?Comid=";
   static const String apiGetDriverList        = "$port/api/DriverApp/GetDriver?Comid=";
   static const String apiSelectEmployeeDetails = "$port/api/EmployeeApp/SelectEmployee?Comid=";
@@ -72,20 +70,18 @@ class ApiConstants {
   static const String apiSelectBoardingSalary = "$port/api/SaleOrderApp/GetBoardingSalary";
   static const String apiSelectBoardingSalaryNew = "$port/api/BoardingSalaryApp/SelectBoardingSalary";
   static const String apiSelectBoardingSalaryByEmpId = "$port/api/BoardingSalaryApp/SelectBoardingSalaryByEmpId";
-  static const String apiSelectSaleorderinvoicecheck = "$port/api/MasterReportApp/SelectChecksalesinvoice";
 
   // ─── Planning ─────────────────────────────────────────────────────────────
   static const String apiSelectPlanning       = "$port/api/PlanningApp/SelectPLANING";
   static const String apiEditPlanning         = "$port/api/PlanningApp/EditPLANING?Id=";
   static String PLANINGSearch           = "$port/api/PlanningApp/PLANINGSearch";
+  static String VESSELPLANINGDB         = "$port/api/DashBoardApp/VESSELPLANINGDB"; // vesselplanningdetails only (its read never matched this answer)
   static const String apiViewPlanningPdf      = "$port/api/PlanningApp/PLANINGVIEW?PlanningNo=";
-  static String PLANINGSearchDB         = "$port/api/DashBoardApp/PLANINGSearchDB";
 
   // ─── Vessel Planning ──────────────────────────────────────────────────────
   static const String apiSelectVesselPlanning = "$port/api/VesselPlanningApp/SelectVESSELPLANING";
   static const String apiEditVesselPlanning   = "$port/api/VesselPlanningApp/EditVESSELPLANING?Id=";
   static const String apiViewVesselPlanningPdf = "$port/api/VesselPlanningApp/VESSELPLANINGVIEW?VesselPlanningNo=";
-  static String VESSELPLANINGDB         = "$port/api/DashBoardApp/VESSELPLANINGDB";
   static const String apiVesselPlanningSearch = "$port/api/VesselPlanningApp/VESSELPLANINGSearch";
   static const String apiMaxVesselPlanningNo  = "$port/VESSELPLANING/MaxVESSELPLANINGNo";
   static const String apiInsertVesselPlanning = "$port/api/VesselPlanningApp/InsertVESSELPLANING";
@@ -101,13 +97,6 @@ class ApiConstants {
   static const String apiRTIDetailsInsert     = "$port/api/RTIApp/InsertRTIStatus?Comid=";
 
   // ─── Stock ────────────────────────────────────────────────────────────────
-  static const String apiSelectStockDetails   = "$port/api/StockApp/SelectSaleStock?Comid=";
-  static const String apiEditStockIn          = "$port/api/StockApp/EditStockIn?Id=";
-  static const String apiUpdateStockIn        = "$port/api/StockApp/UpdateStockIn?Id=";
-  static const String apiUpdateStockTransfer  = "$port/api/StockApp/UpdateStockTransfer?Id=";
-  static const String apiInsertStockIn        = "$port/api/StockApp/InsertStockIn?Comid=";
-  static const String apiMaxStockNo           = "$port/api/StockApp/MaxStockInNo?Comid=";
-  static const String apiPrintStock           = "$port/api/StockApp/SelectStockPrint?Id=";
 
   // ─── Truck & Driver ───────────────────────────────────────────────────────
   static const String apiEditTruckDetails     = "$port/api/TruckApp/SelectTruck?Comid=";
@@ -129,7 +118,6 @@ class ApiConstants {
   // ─── Receipt / Transaction ────────────────────────────────────────────────
   static const String apiGetReceipt           = "$port/api/ReceiptApp/SelectReceipt?Comid=";
   static const String apiSelectReceipt        = "$port/api/TransactionReportApp/SelectCustomerBalance";
-  static const String apiSelectPaymentPending = "$port/api/DashBoardApp/SelectPendingPayment";
   static const String apiGetReceiptView       = "$port/api/ReceiptApp/SelectTruck?Comid=";
 
   // ─── Enquiry ──────────────────────────────────────────────────────────────
@@ -154,9 +142,6 @@ class ApiConstants {
   static const String apiLicenseViewRecords   = "$port/api/LicenseApp/SelectLicense";
 
   // ─── Dashboard ────────────────────────────────────────────────────────────
-  static const String apiGetMaintenance       = "$port/api/DashboardApp/LoadSupplierExpenseData?Comid=";
-  static const String apiGetMaintenance1      = "$port/api/DashboardApp/LoadExpenseData?Comid=";
-  static const String apiGetMaintenance2      = "$port/api/DashboardApp/SelectStatusBO?Comid=";
 
   // ─── Reports ──────────────────────────────────────────────────────────────
   static const String apiPreAlertReport       = "$port/api/TransactionReportApp/PreAlertReport?PreAlertName=";

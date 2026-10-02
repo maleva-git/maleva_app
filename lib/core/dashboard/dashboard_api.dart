@@ -119,6 +119,107 @@ class DashboardApi {
     return JsonRead.listOfMaps(body);
   }
 
+  /// `[{Description, PStatus (bill count), Amount}]`: maintenance bills by kind
+  /// (BREAKDOWN, REPAIR, SERVICE, SPARE PARTS) in the range.
+  Future<List<Map<String, dynamic>>> maintenanceStatus(int comid, String fromDate, String toDate) async =>
+      JsonRead.listOfMaps(await _get(
+          '/api/dashboard/maintenance-status/$comid', {'fromDate': fromDate, 'toDate': toDate}));
+
+  /// `[{Description, Amount}]`: LEVI, AUTOPASS, TOLL and FUEL totals in the range.
+  Future<List<Map<String, dynamic>>> runningExpenses(int comid, String fromDate, String toDate) async =>
+      JsonRead.listOfMaps(await _get(
+          '/api/dashboard/running-expenses/$comid', {'fromDate': fromDate, 'toDate': toDate}));
+
+  /// `[{Id, SDueDate, SupplierName, Amount, PStatus}]`: unpaid maintenance bills,
+  /// PStatus 2 due or past, 1 due within five days, 0 later; most urgent first.
+  Future<List<Map<String, dynamic>>> supplierExpenses(int comid) async =>
+      JsonRead.listOfMaps(await _get('/api/dashboard/supplier-expense/$comid'));
+
+  /// `[{CustomerRefId, CustomerName, Revenue, Volume}]`, top 20. [filterType]:
+  /// SGD, RM, USD, TRANSPORT or VOLUME.
+  Future<List<Map<String, dynamic>>> topCustomers(int comid,
+          {required String fromDate, required String toDate, required String filterType}) async =>
+      JsonRead.listOfMaps(await _get('/api/dashboard/top-customers/$comid',
+          {'fromDate': fromDate, 'toDate': toDate, 'filterType': filterType}));
+
+  /// The vessel planning board (camelCase rows: `id`, `jobNo`, `port`,
+  /// `loadingVesselName`, `offVesselName`, `customerName`, `seta`, ...,
+  /// `boardingOfficerRefId` ... `oBoardingAmount2`). [etaType] 1 OETA, 2 ETA,
+  /// other each vessel by its own date.
+  Future<List<Map<String, dynamic>>> vesselPlanning(int comid,
+      {required String fromDate, required String toDate, String search = '', int employeeId = 0, int etaType = 0}) async {
+    final body = await _send(() => _dio.post<dynamic>('/api/dashboard/vessel-planning/$comid', data: {
+          'comId': comid,
+          'employeeId': employeeId,
+          'etaType': etaType,
+          'fromDate': fromDate,
+          'toDate': toDate,
+          'search': search,
+          'statusId': 0,
+        }));
+    return JsonRead.listOfMaps(body);
+  }
+
+  /// Jobs picked up in the range (rows `Id`, `CustomerName`, `JobNo`, ...),
+  /// one per job, those not picked up on [fromDate] first.
+  Future<List<Map<String, dynamic>>> pickups(int comid,
+      {required String fromDate, required String toDate, String search = '', int employeeId = 0}) async {
+    final body = await _send(() => _dio.post<dynamic>('/api/dashboard/planing-search', data: {
+          'comid': comid,
+          'search': search,
+          'employeeid': employeeId == 0 ? '' : employeeId.toString(),
+          'fromdate': fromDate,
+          'todate': toDate,
+        }));
+    return JsonRead.listOfMaps(body);
+  }
+
+  /// The planning screen's job list for the range (`/api/planing/search`, a
+  /// bare list; rows `Id`, `CustomerName`, `JobNo`, ...), by pickup date.
+  Future<List<Map<String, dynamic>>> planningJobs(int comid,
+      {required String fromDate, required String toDate, String search = '', int employeeId = 0}) async {
+    try {
+      final response = await _dio.post<dynamic>('/api/planing/search', data: {
+        'comid': comid,
+        'search': search,
+        'employeeid': employeeId == 0 ? '' : employeeId.toString(),
+        'fromdate': fromDate,
+        'todate': toDate,
+      });
+      return JsonRead.listOfMaps(response.data);
+    } on DioException catch (e) {
+      throw JavaResponse.fromDio(e);
+    }
+  }
+
+  /// The transport list of a day [dayOffset] days from today: today's pickups
+  /// (`/planing-search`) or, for a later day, the planning list
+  /// (`/api/planing/search`), as .NET's PLANINGSearchDB / PLANINGSearch.
+  Future<List<Map<String, dynamic>>> transportList(int comid, int dayOffset, {DateTime? today}) {
+    final day = _ymd((today ?? DateTime.now()).add(Duration(days: dayOffset)));
+    return dayOffset == 0
+        ? pickups(comid, fromDate: day, toDate: day)
+        : planningJobs(comid, fromDate: day, toDate: day);
+  }
+
+  /// Sale orders still waiting for an invoice (`/api/sale-orders/check-invoice`
+  /// with `invoice: true`: from 2024-10-01, status 6 or 15). camelCase rows.
+  Future<List<Map<String, dynamic>>> waitingInvoices(int comid) async {
+    try {
+      final response = await _dio.post<dynamic>('/api/sale-orders/check-invoice', data: {
+        'comid': comid,
+        'invoice': true,
+        'employeeid': 0,
+        'dashboardStatus': 0,
+        'remarks': 2,
+        'completestatusnotshow': false,
+      });
+      return JsonRead.listOfMaps(JavaResponse.data(response.data));
+    } on DioException catch (e) {
+      throw JavaResponse.fromDio(e);
+    }
+  }
+
   // ---------------------------------------------------------------- helpers
 
   static String _ymd(DateTime d) =>

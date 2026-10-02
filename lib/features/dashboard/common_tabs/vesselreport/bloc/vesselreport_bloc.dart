@@ -68,24 +68,17 @@ class VesselBloc extends Bloc<VesselEvent, VesselState> {
         searchValue = employeePorts.join(',');
       }
 
-      final Map<String, dynamic> body = {
-        'Comid': AppGlobals.storagenew.getInt('Comid') ?? 0,
-        'Fromdate': fromDate,
-        'Todate': toDate,
-        'Search': searchValue,
-        'Employeeid': 0,
-        'ETAType': 0,
-      };
-
-      // ✅ REFACTORED: Calling repo without context
       final resultData = await repository.fetchVesselPlanningData(
-        body: body,
+        comid: AppGlobals.storagenew.getInt('Comid') ?? 0,
+        fromDate: fromDate,
+        toDate: toDate,
+        search: searchValue,
       );
 
       // 🔍 DEBUG: Print the API response data in console
       debugPrint('🔍 VESSELPLANINGDB Response: $resultData');
 
-      if (resultData == null || resultData == "" || (resultData is List && resultData.isEmpty)) {
+      if (resultData.isEmpty) {
         emit(VesselLoadedState(
           vesselList: const [],
           isPlanToday: currentIsPlanToday,
@@ -95,13 +88,12 @@ class VesselBloc extends Bloc<VesselEvent, VesselState> {
         return;
       }
 
-      if (resultData != null && resultData != "" && resultData.length != 0) {
-        List<Map<String, dynamic>> list =
-        List<Map<String, dynamic>>.from(resultData);
+      {
+        final List<Map<String, dynamic>> list = List<Map<String, dynamic>>.of(resultData);
 
         list.sort((a, b) {
-          String nameA = a['Port']?.toLowerCase() ?? '';
-          String nameB = b['Port']?.toLowerCase() ?? '';
+          String nameA = a['port']?.toString().toLowerCase() ?? '';
+          String nameB = b['port']?.toString().toLowerCase() ?? '';
           return nameA.compareTo(nameB);
         });
 

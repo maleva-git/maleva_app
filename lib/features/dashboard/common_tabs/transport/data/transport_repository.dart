@@ -1,15 +1,14 @@
-import 'package:maleva/core/network/api_constants.dart';
-import 'package:maleva/core/network/api_client.dart';
+import 'package:maleva/core/dashboard/dashboard_api.dart';
+import 'package:maleva/core/di/injection.dart';
 
+/// The transport list (today's pickups or a later day's planning), from the
+/// shared Java APIs; rows keep the .NET names (`Id`, `CustomerName`, ...).
 class TransportRepository {
-  /// Fetches the transport data based on the type (Today vs Tomorrow)
-  Future<dynamic> fetchTransportData({
-    required int type,
-    required Map<String, dynamic> body,
-  }) async {
-    // type 0 = PLANINGSearchDB, type 1 = PLANINGSearch
-    String url = type == 0 ? ApiConstants.PLANINGSearchDB : ApiConstants.PLANINGSearch;
+  TransportRepository({DashboardApi? api}) : _api = api;
 
-    return await ApiClient.postRequest(url, body);
-  }
+  final DashboardApi? _api;
+
+  /// [type] is the day offset: 0 today, 1 tomorrow.
+  Future<List<Map<String, dynamic>>> fetchTransportData({required int type, required int comid}) =>
+      (_api ?? sl<DashboardApi>()).transportList(comid, type);
 }

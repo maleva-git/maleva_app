@@ -135,8 +135,8 @@ class _CustDashboardViewState extends State<_CustDashboardView>
   }
 
   Color? _vesselCardColor(dynamic row) {
-    final etb = row['SETB'] == '' ? null : DateTime.tryParse(row['SETB'] ?? '');
-    final oetb = row['SOETB'] == '' ? null : DateTime.tryParse(row['SOETB'] ?? '');
+    final etb = DateTime.tryParse((row['setb'] ?? '').toString());
+    final oetb = DateTime.tryParse((row['soetb'] ?? '').toString());
     final yesterday = DateTime.now().subtract(const Duration(days: 1));
     if (etb != null && yesterday.isAfter(etb)) return colour.commonColorred.withValues(alpha: 0.3);
     if (oetb != null && yesterday.isAfter(oetb)) return colour.commonColorred.withValues(alpha: 0.3);
@@ -218,30 +218,30 @@ class _CustDashboardViewState extends State<_CustDashboardView>
 
   Future<void> _showVesselDialog(BuildContext context, Map row) async {
     final fields = [
-      ['Job No', row['JobNo']],
-      ['L Vessel Name', row['Loadingvesselname']],
-      ['O Vessel Name', row['Offvesselname']],
-      ['Job Type', row['JobName']],
+      ['Job No', row['jobNo']],
+      ['L Vessel Name', row['loadingVesselName']],
+      ['O Vessel Name', row['offVesselName']],
+      ['Job Type', row['jobName']],
       ['pkg', row['pkg']],
-      ['LPort', row['SPort']],
-      ['OPort', row['OPort']],
-      ['Commodity', row['Commodity']],
-      ['L ETA', row['SETA']],
-      ['L ETB', row['SETB']],
-      ['L ETD', row['SETD']],
-      ['O ETA', row['SOETA']],
-      ['O ETB', row['SOETB']],
-      ['O ETD', row['SOETD']],
-      ['O SCN', row['OSCN']],
-      ['L SCN', row['LSCN']],
-      ['Vessel Type', row['VesselType']],
-      ['L Agent Company', row['AgentCompany']],
-      ['L Agent', row['AgentName']],
-      ['L Agent Phone', row['AgentPhone']],
-      ['O Agent Company', row['OAgentCompany']],
-      ['O Agent', row['OAgentName']],
-      ['O Agent Phone', row['OAgentPhone']],
-      ['Employee Name', row['EmployeeName']],
+      ['LPort', row['sPort']],
+      ['OPort', row['oPort']],
+      ['Commodity', row['commodity']],
+      ['L ETA', row['seta']],
+      ['L ETB', row['setb']],
+      ['L ETD', row['setd']],
+      ['O ETA', row['soeta']],
+      ['O ETB', row['soetb']],
+      ['O ETD', row['soetd']],
+      ['O SCN', row['oscn']],
+      ['L SCN', row['lscn']],
+      ['Vessel Type', row['vesselType']],
+      ['L Agent Company', row['agentCompany']],
+      ['L Agent', row['agentName']],
+      ['L Agent Phone', row['agentPhone']],
+      ['O Agent Company', row['oAgentCompany']],
+      ['O Agent', row['oAgentName']],
+      ['O Agent Phone', row['oAgentPhone']],
+      ['Employee Name', row['employeeName']],
     ];
     await _showDetailDialog(context, fields, height: 550);
   }
@@ -796,7 +796,7 @@ class _VesselTab extends StatelessWidget {
                           Expanded(
                             flex: 2,
                             child: Text(
-                              row['Loadingvesselname'].toString(),
+                              row['loadingVesselName'].toString(),
                               overflow: TextOverflow.ellipsis,
                               maxLines: 1,
                               style: AppTypography.bodyLarge(color: colour.commonColor),
@@ -805,7 +805,7 @@ class _VesselTab extends StatelessWidget {
                           Expanded(
                             flex: 2,
                             child: Text(
-                              ' - ${row['Port']}',
+                              ' - ${row['port']}',
                               overflow: TextOverflow.ellipsis,
                               maxLines: 1,
                               style: AppTypography.bodyLarge(color: colour.commonColor),

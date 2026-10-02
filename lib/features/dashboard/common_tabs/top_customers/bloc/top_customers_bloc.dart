@@ -1,8 +1,7 @@
-import 'dart:convert';
 import 'package:bloc/bloc.dart';
-import 'package:http/http.dart' as http;
+import 'package:maleva/core/dashboard/dashboard_api.dart';
+import 'package:maleva/core/di/injection.dart';
 import '../models/top_customer.dart';
-import 'package:maleva/core/utils/app_globals.dart';
 
 abstract class TopCustomersEvent {}
 
@@ -33,45 +32,25 @@ class TopCustomersError extends TopCustomersState {
   TopCustomersError(this.message);
 }
 
+/// Top 20 customers, from the shared Java `GET /api/dashboard/top-customers/{comid}`
+/// (ported from .NET SelectTopCustomers; rows keep the .NET names). An empty list is
+/// no customers, not an error.
 class TopCustomersBloc extends Bloc<TopCustomersEvent, TopCustomersState> {
-  TopCustomersBloc() : super(TopCustomersInitial()) {
+  TopCustomersBloc({DashboardApi? api})
+      : _api = api,
+        super(TopCustomersInitial()) {
     on<FetchTopCustomers>(_onFetchTopCustomers);
   }
+
+  final DashboardApi? _api;
 
   Future<void> _onFetchTopCustomers(FetchTopCustomers event, Emitter<TopCustomersState> emit) async {
     emit(TopCustomersLoading());
     try {
-      final String url = '${AppGlobals.port}/api/DashBoardApp/SelectTopCustomers?Comid=${event.comid}&Fromdate=${event.fromDate}&Todate=${event.toDate}&FilterType=${event.filterType}';
-      print('Calling API: $url');
-      
-      final response = await http.post(
-        Uri.parse(url),
-        headers: AppGlobals.buildRequestHeaders(null),
-      );
-      
-      print('API Response Status: ${response.statusCode}');
-      print('API Response Body: ${response.body}');
-
-      if (response.statusCode == 200) {
-        final decoded = json.decode(response.body);
-        if (decoded != null && decoded is List) {
-          final customers = (decoded as List).map((e) => TopCustomer.fromJson(Map<String, dynamic>.from(e))).toList();
-          emit(TopCustomersLoaded(customers, event.filterType));
-        } else {
-          emit(TopCustomersLoaded([], event.filterType));
-        }
-      } else {
-        try {
-          final decodedError = json.decode(response.body);
-          if (decodedError['Message'] == 'No Data Found') {
-            emit(TopCustomersLoaded([], event.filterType));
-            return;
-          }
-        } catch (_) {}
-        emit(TopCustomersError('Failed to fetch data: '));
-      }
+      final rows = await (_api ?? sl<DashboardApi>()).topCustomers(event.comid,
+          fromDate: event.fromDate, toDate: event.toDate, filterType: event.filterType);
+      emit(TopCustomersLoaded(rows.map(TopCustomer.fromJson).toList(), event.filterType));
     } catch (e) {
-      print('Parse Error: $e');
       emit(TopCustomersError(e.toString()));
     }
   }

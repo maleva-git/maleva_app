@@ -27,18 +27,23 @@ dashboards) answers the same figures.
   their constants.
 - No backend change.
 
-## Not in this change (still .NET)
+## Also moved (second step, same day)
 
-| Screen part | .NET call | Why it waits |
+After the .NET source (`MalevaWeb-develop`) was found, the remaining tabs were moved; backend
+change `port-dashboard-widgets` added or corrected their APIs:
+
+| Screen part | Was (.NET) | Now (Java) |
 |---|---|---|
-| Invoice desk waiting bills | MasterReportApp/SelectChecksalesinvoice | its Java counterpart is not confirmed; rows differ |
-| Vessel report | DashBoardApp/VESSELPLANINGDB | the Java rows lack the loading/off-vessel boarding officer fields the screen edits |
-| Transport report, planning views | DashBoardApp/PLANINGSearchDB, PlanningApp/PLANINGSearch | tomorrow's list (`/api/planing/search`) not compared yet |
-| Maintenance widget | DashboardApp/SelectStatusBO, LoadSupplierExpenseData, LoadExpenseData | no Java SelectStatusBO; Java `/supplier-expense` is an empty stub |
-| Payment pending | DashBoardApp/SelectPendingPayment | different filter and row shape |
-| Top customers | DashBoardApp/SelectTopCustomers | Java has `/api/ceo-dashboard/top-20/*`, not compared yet |
+| Maintenance widget | DashboardApp/SelectStatusBO, LoadSupplierExpenseData, LoadExpenseData | /api/dashboard/maintenance-status, /supplier-expense, /running-expenses |
+| Vessel report, customer dashboard vessels | DashBoardApp/VESSELPLANINGDB | /api/dashboard/vessel-planning (camelCase; screens read the Java fields) |
+| Transport list (three screens) | DashBoardApp/PLANINGSearchDB, PlanningApp/PLANINGSearch | /api/dashboard/planing-search, /api/planing/search |
+| Payment pending (tab and customer dashboard) | DashBoardApp/SelectPendingPayment | /api/pending-payments/board (model factories read the Java bill and vendor fields) |
+| Top customers | DashBoardApp/SelectTopCustomers (raw http) | /api/dashboard/top-customers |
+| Invoice waiting bills | MasterReportApp/SelectChecksalesinvoice | /api/sale-orders/check-invoice (screen reads the Java fields) |
 
-These are ported or confirmed from `MalevaWeb-develop` (`DashBoardAppController`, `DashBoardServices`).
+Still .NET on these screens: the vessel report's date and boarding officer saves (sale order
+update), and `vesselplanningdetails`' network read (it expected a `Data2` this endpoint never
+answered, so it always came back empty; left as it was).
 
 ## Capabilities
 

@@ -1,6 +1,7 @@
 import 'package:get_it/get_it.dart';
 import 'package:maleva/core/dashboard/dashboard_api.dart';
 import 'package:maleva/core/lookups/shared_lookups.dart';
+import 'package:maleva/core/stock/stock_in_api.dart';
 import 'package:maleva/core/network/java_api_client.dart';
 import 'package:maleva/core/router/app_router.dart';
 import 'package:maleva/core/session/session_token_store.dart';
@@ -18,6 +19,8 @@ void registerAuthModule(GetIt sl) {
   sl.registerLazySingleton<SharedLookups>(() => SharedLookups(sl<JavaApiClient>().dio));
   // the dashboard numbers (the web's /api/dashboard)
   sl.registerLazySingleton<DashboardApi>(() => DashboardApi(sl<JavaApiClient>().dio));
+  // stock-in entry (the shared /api/stock-ins)
+  sl.registerLazySingleton<StockInApi>(() => StockInApi(sl<JavaApiClient>().dio));
   sl.registerLazySingleton<SessionWriter>(() => SessionWriter(sl<SessionTokenStore>()));
   sl.registerLazySingleton<SessionService>(() {
     final service = SessionService(

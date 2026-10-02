@@ -27,7 +27,7 @@ void main() {
     'emits [StockTransferInitialLoading, StockTransferLoaded] when StockTransferInitialized succeeds',
     build: () {
       when(() => mockRepository.fetchWarehouses()).thenAnswer((_) async => [
-        {'Id': 1, 'PortName': 'Warehouse A'}
+        {'id': 1, 'portName': 'Warehouse A'}
       ]);
       return bloc;
     },

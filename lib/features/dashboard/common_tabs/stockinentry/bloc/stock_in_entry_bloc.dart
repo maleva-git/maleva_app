@@ -1,6 +1,5 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:maleva/core/utils/app_preferences.dart';
 import 'package:maleva/core/utils/app_globals.dart';
 
 import '../data/stock_in_entry_repository.dart';
@@ -13,7 +12,7 @@ class StockInEntryBloc extends Bloc<StockInEntryEvent, StockInEntryState> {
 
   // Local caching to replace objfun globals
   List<dynamic> _jobNoList = [];
-  List<dynamic> _stockJobList = [];
+  List<int> _stockJobList = [];
   List<dynamic> _jobAllStatusList = [];
 
   StockInEntryBloc({required this.repository}) : super(StockInEntryInitial()) {
@@ -43,7 +42,7 @@ class StockInEntryBloc extends Bloc<StockInEntryEvent, StockInEntryState> {
       final initData = await repository.fetchInitialData(0);
 
       final stockNo = initData['maxStockNo'] as String;
-      _stockJobList = initData['stockJobList'] as List<dynamic>;
+      _stockJobList = initData['stockJobList'] as List<int>;
       _jobNoList = initData['jobNoList'] as List<dynamic>;
 
       final base = StockInEntryLoaded.empty(stockNo: stockNo);
@@ -53,7 +52,7 @@ class StockInEntryBloc extends Bloc<StockInEntryEvent, StockInEntryState> {
         final shortNo = event.jobNo!.length >= 4 ? event.jobNo!.substring(4) : event.jobNo!;
 
         // Check stock exists using local list
-        final isPresent = _stockJobList.any((w) => w['Id'] == event.jobId);
+        final isPresent = _stockJobList.contains(event.jobId);
         if (isPresent) {
           emit(base);
           emit(StockInEntryStockExistsConfirmNeeded(saleOrderId: event.jobId!, jobNo: shortNo));
@@ -110,7 +109,7 @@ class StockInEntryBloc extends Bloc<StockInEntryEvent, StockInEntryState> {
     final s = state as StockInEntryLoaded;
 
     // Check if stock already exists
-    final isPresent = _stockJobList.any((w) => w['Id'] == event.saleOrderId);
+    final isPresent = _stockJobList.contains(event.saleOrderId);
     if (isPresent && !event.stockExistsConfirmed) {
       emit(StockInEntryStockExistsConfirmNeeded(saleOrderId: event.saleOrderId, jobNo: event.jobNo));
       return;
@@ -199,34 +198,24 @@ class StockInEntryBloc extends Bloc<StockInEntryEvent, StockInEntryState> {
       final imageUrls = s.images.map((img) => '${AppGlobals.imagepath}SalesOrder/${s.saleOrderId}/${s.statusName.replaceAll(' ', '')}/$img').toList();
 
       final empRefId =  AppGlobals.EmpRefId ;
-      final comId = AppPreferences.getComid();
 
-      final master = [{
-        'Id': 0,
-        'CompanyRefId': comId,
-        'UserRefId': comId,
-        'EmployeeRefId': empRefId == 0 ? null : empRefId,
-        'SaleOrderMasterRefId': s.saleOrderId,
-        'StockDate': DateTime.parse(s.stockDate).toIso8601String(),
-        'CNumberDisplay': '',
-        'CNumber': 0,
-        'NumberOfPackages': s.packages,
+      // the shared Java POST /api/stock-ins/entries (StockInEntryDtos.SaveRow)
+      final rows = [{
+        'id': 0,
+        'employeeRefId': empRefId == 0 ? null : empRefId,
+        'saleOrderMasterRefId': s.saleOrderId,
+        'stockDate': DateTime.parse(s.stockDate).toIso8601String(),
+        'numberOfPackages': s.packages,
         'statusId': s.statusId,
-        'PortMasterRefId': 0,
-        'Barcode': preJob + s.jobNoText,
-        'BarcodeLabelDisplay': preJob + s.jobNoText,
-        'Status': 0,
-        'ImageURL': imageUrls,
+        'portMasterRefId': 0,
+        'barcode': preJob + s.jobNoText,
+        'barcodeLabelDisplay': preJob + s.jobNoText,
+        'status': 0,
+        'imageUrls': imageUrls,
       }];
 
-      final result = await repository.saveStockIn(master);
-
-      if (result?.IsSuccess == true) {
-        final stockId = result?.data2 as int;
-        emit(StockInEntrySaveSuccess(stockId));
-      } else {
-        emit(s);
-      }
+      final stockId = await repository.saveStockIn(rows);
+      emit(StockInEntrySaveSuccess(stockId));
     } catch (e) {
       emit(StockInEntryError(e.toString()));
     }

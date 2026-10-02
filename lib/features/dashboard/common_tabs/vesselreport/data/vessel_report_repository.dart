@@ -1,19 +1,24 @@
+import 'package:maleva/core/dashboard/dashboard_api.dart';
+import 'package:maleva/core/di/injection.dart';
 import 'package:maleva/core/network/api_constants.dart';
 import 'package:maleva/core/network/api_client.dart';
 
 class VesselReportRepository {
-  /// Fetches the vessel planning data from the database using ApiClient
-  Future<dynamic> fetchVesselPlanningData({
-    required Map<String, dynamic> body,
-    Map<String, String>? headers,
-  }) async {
-    // ApiClient automatically adds the Auth headers, but we pass custom headers just in case
-    return await ApiClient.postRequest(
-      ApiConstants.VESSELPLANINGDB,
-      body,
-      headers: headers,
-    );
-  }
+  VesselReportRepository({DashboardApi? api}) : _api = api;
+
+  final DashboardApi? _api;
+
+  /// The vessel planning board, from the shared Java `POST /api/dashboard/vessel-planning`
+  /// (ported from .NET VESSELPLANINGDB); camelCase rows with every boarding officer.
+  Future<List<Map<String, dynamic>>> fetchVesselPlanningData({
+    required int comid,
+    required String fromDate,
+    required String toDate,
+    String search = '',
+  }) =>
+      (_api ?? sl<DashboardApi>()).vesselPlanning(comid, fromDate: fromDate, toDate: toDate, search: search);
+
+  // The date and boarding officer saves below still go to .NET (sale order update, not moved yet).
 
   /// Updates specific vessel dates (ETA/ETB/OETA/OETB)
   Future<dynamic> updateVesselPlanningDates(Map<String, dynamic> updateData) async {

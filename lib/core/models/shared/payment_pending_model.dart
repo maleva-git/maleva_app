@@ -30,6 +30,56 @@ class PaymentPendingModel {
     this.DueAmount = 0.0,
   });
 
+  // ── The Java pending payments board (GET /api/pending-payments/board) ──────
+
+  /// A month's bill (`bills[]`: id, expenseName, subExpenseName, amount,
+  /// dueDate yyyy-MM-dd, paid, paidAmount, paidDate, bankName, voucherAmount).
+  factory PaymentPendingModel.fromBoardBill(Map<String, dynamic> b) {
+    final due = DateTime.tryParse(b['dueDate']?.toString() ?? '');
+    return PaymentPendingModel(
+      id: (b['id'] as num?)?.toInt() ?? 0,
+      ExpenseName: b['expenseName']?.toString(),
+      SubExpenseName: b['subExpenseName']?.toString(),
+      Amount: (b['amount'] as num?)?.toDouble() ?? 0,
+      BankName: b['bankName']?.toString(),
+      ExpenceDueDate: due?.day,
+      DueDate: due == null ? null : _dmy(due),
+      Paidstatus: b['paid'] == true ? 1 : 0,
+      Paiddamount: (b['paidAmount'] ?? 0).toString(),
+      Paiddate: b['paidDate']?.toString(),
+      InnerAmount: 0,
+    );
+  }
+
+  /// A supplier with unpaid credit bills (`vendors[]`), shown as a VENDOR line.
+  factory PaymentPendingModel.fromBoardVendor(Map<String, dynamic> v) => PaymentPendingModel(
+        id: 0,
+        ExpenseName: 'VENDOR',
+        SubExpenseName: v['supplierName']?.toString(),
+        Amount: (v['outstanding'] as num?)?.toDouble() ?? 0,
+        BankName: '',
+        Paidstatus: 0,
+        Paiddamount: '',
+        InnerAmount: 0,
+      );
+
+  /// One unpaid credit bill of a supplier (`vendors[].bills[]`).
+  factory PaymentPendingModel.fromBoardVendorBill(String? supplierName, Map<String, dynamic> b) {
+    final due = DateTime.tryParse(b['dueDate']?.toString() ?? '');
+    return PaymentPendingModel(
+      id: (b['billMasterId'] as num?)?.toInt() ?? 0,
+      ExpenseName: 'VENDOR',
+      SubExpenseName: supplierName,
+      Amount: (b['outstanding'] as num?)?.toDouble() ?? 0,
+      DueDate: due == null ? null : _dmy(due),
+      Paiddamount: (b['paid'] ?? 0).toString(),
+      InnerAmount: 0,
+    );
+  }
+
+  static String _dmy(DateTime d) =>
+      '${d.day.toString().padLeft(2, '0')}/${d.month.toString().padLeft(2, '0')}/${d.year}';
+
   factory PaymentPendingModel.fromJson(Map<String, dynamic> json) {
     return PaymentPendingModel(
       // ✅ SAFE double parse

@@ -3,29 +3,32 @@ import 'package:maleva/core/network/dio_client.dart';
 import 'package:maleva/core/network/api_constants.dart';
 import 'package:maleva/core/utils/session_manager.dart';
 import 'package:maleva/core/models/shared/response_view_model.dart';
+import 'package:maleva/core/di/injection.dart';
+import 'package:maleva/core/stock/stock_in_api.dart';
 
+/// Stock In Entry. The stock-in calls go to the shared Java `/api/stock-ins`
+/// (ported from .NET StockApp); the job list, job steps, sale order edit and
+/// image delete are other features' calls.
 class StockInEntryRepository {
   final DioClient _dioClient;
   final SessionManager _sessionManager;
+  final StockInApi? _stockApi;
 
-  StockInEntryRepository(this._dioClient, this._sessionManager);
+  StockInEntryRepository(this._dioClient, this._sessionManager, {StockInApi? stockApi}) : _stockApi = stockApi;
+
+  StockInApi get _stock => _stockApi ?? sl<StockInApi>();
 
   int get _comid => _sessionManager.companyId;
 
   // ─── Initial Startup Data ──────────────────────────────────────────────────
   Future<Map<String, dynamic>> fetchInitialData(int billType) async {
-    final maxStockRes = await _dioClient.dio.post("${ApiConstants.apiMaxStockNo}$_comid", data: {});
-    final stockJobRes = await _dioClient.dio.post("${ApiConstants.apiSelectStockJob}$_comid", data: {});
+    final maxNum = await _stock.nextNumber(_comid);
+    final stockJobs = await _stock.stockJobs(_comid);
     final jobNoRes = await _dioClient.dio.post("${ApiConstants.apiGetJobNo}$_comid&JobType=$billType", data: {});
-
-    String maxNum = '';
-    if (maxStockRes.data != null && maxStockRes.data is List && maxStockRes.data.isNotEmpty) {
-      maxNum = maxStockRes.data[0]['MaxNo']?.toString() ?? '';
-    }
 
     return {
       'maxStockNo': maxNum,
-      'stockJobList': (stockJobRes.data is List) ? stockJobRes.data : [],
+      'stockJobList': stockJobs,
       'jobNoList': (jobNoRes.data is List) ? jobNoRes.data : [],
     };
   }
@@ -38,7 +41,7 @@ class StockInEntryRepository {
 
   // ─── Fetch Job Details ─────────────────────────────────────────────────────
   Future<Map<String, dynamic>> fetchJobDetails(int saleOrderId) async {
-    final result = await _dioClient.dio.post("${ApiConstants.apiSelectStockDetails}$_comid&Id=$saleOrderId", data: {});
+    final jobs = await _stock.saleOrders(_comid, saleOrderId: saleOrderId);
 
     String shipName = '';
     String customerName = '';
@@ -47,31 +50,28 @@ class StockInEntryRepository {
     int weightPkg = 0;
     List<dynamic> jobStatuses = [];
 
-    if (result.data != null) {
-      final value = ResponseViewModel.fromJson(result.data);
-      if (value.IsSuccess == true && value.data1 != null && value.data1.isNotEmpty) {
-        final data = value.data1[0];
-        customerName = data['CustomerName'] ?? '';
-        shipName = customerName.isNotEmpty ? (data['LoadingVesselName'] ?? '') : (data['OffVesselName'] ?? '');
-        jobDate = data['SSaleDate'] ?? '';
-        jobMasterId = data['JobMasterRefId'] ?? 0;
+    if (jobs.isNotEmpty) {
+      final data = jobs.first;
+      customerName = data['customerName'] ?? '';
+      shipName = customerName.isNotEmpty ? (data['loadingVesselName'] ?? '') : (data['offVesselName'] ?? '');
+      jobDate = data['sSaleDate'] ?? '';
+      jobMasterId = data['jobMasterRefId'] ?? 0;
 
-        final qty = data['Quantity']?.toString() ?? '0';
-        final match = RegExp(r'\d+').stringMatch(qty);
-        weightPkg = int.tryParse(match ?? '0') ?? 0;
+      final qty = data['quantity']?.toString() ?? '0';
+      final match = RegExp(r'\d+').stringMatch(qty);
+      weightPkg = int.tryParse(match ?? '0') ?? 0;
 
-        try {
-          final statusRes = await _dioClient.dio.post("${ApiConstants.apiSelectAllJobStatus}$_comid&Jobid=$jobMasterId", data: {});
+      try {
+        final statusRes = await _dioClient.dio.post("${ApiConstants.apiSelectAllJobStatus}$_comid&Jobid=$jobMasterId", data: {});
 
-          if (statusRes.data != null && statusRes.data is List && statusRes.data.isNotEmpty) {
-            var firstItem = statusRes.data[0];
-            if (firstItem != null && firstItem['JobStatusDetails'] != null) {
-              jobStatuses = firstItem['JobStatusDetails'];
-            }
+        if (statusRes.data != null && statusRes.data is List && statusRes.data.isNotEmpty) {
+          var firstItem = statusRes.data[0];
+          if (firstItem != null && firstItem['JobStatusDetails'] != null) {
+            jobStatuses = firstItem['JobStatusDetails'];
           }
-        } catch (e) {
-          // ignore
         }
+      } catch (e) {
+        // ignore
       }
     }
 
@@ -129,15 +129,10 @@ class StockInEntryRepository {
   }
 
   // ─── Save Stock In ─────────────────────────────────────────────────────────
-  Future<ResponseViewModel?> saveStockIn(List<Map<String, dynamic>> master) async {
-    try {
-      final result = await _dioClient.dio.post('${ApiConstants.apiInsertStockIn}$_comid', data: master);
-      if (result.data != null) {
-        return ResponseViewModel.fromJson(result.data);
-      }
-    } catch (e) {
-      // ignore
-    }
-    return null;
-  }
+  /// Saves the rows (Java fields); answers the stock-in id. A refusal throws
+  /// with the server's message.
+  Future<int> saveStockIn(List<Map<String, dynamic>> rows) => _stock.save(_comid, rows);
+
+  /// What the labels carry (`numberOfPackages`, `jobNo`, `sSaleDate`, `vesselName`).
+  Future<Map<String, dynamic>> label(int stockId) => _stock.label(_comid, stockId);
 }

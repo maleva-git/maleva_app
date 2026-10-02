@@ -1,19 +1,6 @@
-import 'package:maleva/core/network/api_client.dart';
-import 'package:maleva/core/network/api_constants.dart';
-
+/// Kept only as the "dependencies already set up" marker in `setupDependencies`;
+/// its .NET calls moved to the Java APIs.
 class AuthApi {
   AuthApi._();
   static final AuthApi instance = AuthApi._();
-
-  /// The invoice desk's waiting bills (.NET MasterReportApp/SelectChecksalesinvoice, not moved yet).
-  static Future<dynamic> getSalesInvoiceCheck(
-      Map<String, dynamic> master) async {
-
-    final result = await ApiClient.postRequest(
-      ApiConstants.apiSelectSaleorderinvoicecheck,
-      master,
-    );
-
-    return result;
-  }
 }

@@ -225,9 +225,9 @@ class _VesselReportViewState extends State<_VesselReportView> {
                       final item = vesselList[index];
                       return _VesselCard(
                         index:      index,
-                        vesselName: item["Loadingvesselname"]
+                        vesselName: item["loadingVesselName"]
                             .toString(),
-                        jobNo: item["JobNo"]?.toString() ?? '',
+                        jobNo: item["jobNo"]?.toString() ?? '',
                         isTablet: true,
                         itemData: item,
                         isPlanToday: _isPlanToday,
@@ -300,8 +300,8 @@ class _VesselReportViewState extends State<_VesselReportView> {
             final item = vesselList[index];
             return _VesselCard(
               index:      index,
-              vesselName: item["Loadingvesselname"].toString(),
-              jobNo:      item["JobNo"]?.toString() ?? '',
+              vesselName: item["loadingVesselName"].toString(),
+              jobNo:      item["jobNo"]?.toString() ?? '',
               isTablet:   false,
               itemData:   item,
               isPlanToday: _isPlanToday,
@@ -751,9 +751,9 @@ class _VesselCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isEven = index % 2 == 0;
-    final status = itemData['JobStatus']?.toString().trim() ?? '';
+    final status = itemData['jobStatus']?.toString().trim() ?? '';
     final themeColor = _getThemeColor(status);
-    final offVessel = itemData['Offvesselname']?.toString().trim();
+    final offVessel = itemData['offVesselName']?.toString().trim();
     final hasTransshipment = offVessel != null && offVessel.isNotEmpty && offVessel != '-';
 
     bool _hasDateValue(dynamic value) {
@@ -763,8 +763,8 @@ class _VesselCard extends StatelessWidget {
       return true;
     }
 
-    bool hasLoadingDates = _hasDateValue(itemData['SETA']) || _hasDateValue(itemData['SETB']) || _hasDateValue(itemData['SETD']);
-    bool hasOffloadDates = _hasDateValue(itemData['SOETA']) || _hasDateValue(itemData['SOETB']) || _hasDateValue(itemData['SOETD']);
+    bool hasLoadingDates = _hasDateValue(itemData['seta']) || _hasDateValue(itemData['setb']) || _hasDateValue(itemData['setd']);
+    bool hasOffloadDates = _hasDateValue(itemData['soeta']) || _hasDateValue(itemData['soetb']) || _hasDateValue(itemData['soetd']);
 
     if (hasLoadingDates && hasOffloadDates) {
       DateTime targetDate = isPlanToday ? DateTime.now() : DateTime.now().add(const Duration(days: 1));
@@ -790,8 +790,8 @@ class _VesselCard extends StatelessWidget {
         return nearest;
       }
 
-      DateTime? nearestOffload = _getNearestDate([_parse(itemData['SOETA']), _parse(itemData['SOETB']), _parse(itemData['SOETD'])]);
-      DateTime? nearestLoading = _getNearestDate([_parse(itemData['SETA']), _parse(itemData['SETB']), _parse(itemData['SETD'])]);
+      DateTime? nearestOffload = _getNearestDate([_parse(itemData['soeta']), _parse(itemData['soetb']), _parse(itemData['soetd'])]);
+      DateTime? nearestLoading = _getNearestDate([_parse(itemData['seta']), _parse(itemData['setb']), _parse(itemData['setd'])]);
 
       if (nearestOffload != null && nearestLoading != null) {
         if (nearestOffload.difference(targetDate).abs() <= nearestLoading.difference(targetDate).abs()) {
@@ -936,7 +936,7 @@ class _VesselCard extends StatelessWidget {
   void _showVesselDetails(BuildContext context) {
     final isTab = MediaQuery.of(context).size.width >= 600;
 
-    final jobType = itemData['JobName']?.toString().trim().toUpperCase() ?? '';
+    final jobType = itemData['jobName']?.toString().trim().toUpperCase() ?? '';
     final isV2V = jobType == 'VESSEL TO VESSEL';
 
     bool _hasDateValue(dynamic value) {
@@ -946,8 +946,8 @@ class _VesselCard extends StatelessWidget {
       return true;
     }
 
-    bool hasLoadingDates = _hasDateValue(itemData['SETA']) || _hasDateValue(itemData['SETB']) || _hasDateValue(itemData['SETD']);
-    bool hasOffloadDates = _hasDateValue(itemData['SOETA']) || _hasDateValue(itemData['SOETB']) || _hasDateValue(itemData['SOETD']);
+    bool hasLoadingDates = _hasDateValue(itemData['seta']) || _hasDateValue(itemData['setb']) || _hasDateValue(itemData['setd']);
+    bool hasOffloadDates = _hasDateValue(itemData['soeta']) || _hasDateValue(itemData['soetb']) || _hasDateValue(itemData['soetd']);
 
     bool isLoadingHighlighted = false;
     bool isOffloadHighlighted = false;
@@ -972,8 +972,8 @@ class _VesselCard extends StatelessWidget {
           }
         }
         
-        final lDates = [_getDatePart(_parse(itemData['SETA'])), _getDatePart(_parse(itemData['SETB'])), _getDatePart(_parse(itemData['SETD']))];
-        final oDates = [_getDatePart(_parse(itemData['SOETA'])), _getDatePart(_parse(itemData['SOETB'])), _getDatePart(_parse(itemData['SOETD']))];
+        final lDates = [_getDatePart(_parse(itemData['seta'])), _getDatePart(_parse(itemData['setb'])), _getDatePart(_parse(itemData['setd']))];
+        final oDates = [_getDatePart(_parse(itemData['soeta'])), _getDatePart(_parse(itemData['soetb'])), _getDatePart(_parse(itemData['soetd']))];
         
         if (lDates.contains(targetDateStr)) isLoadingHighlighted = true;
         if (oDates.contains(targetDateStr)) isOffloadHighlighted = true;
@@ -992,8 +992,8 @@ class _VesselCard extends StatelessWidget {
           return nearest;
         }
 
-        DateTime? nearestOffload = _getNearestDate([_parse(itemData['SOETA']), _parse(itemData['SOETB']), _parse(itemData['SOETD'])]);
-        DateTime? nearestLoading = _getNearestDate([_parse(itemData['SETA']), _parse(itemData['SETB']), _parse(itemData['SETD'])]);
+        DateTime? nearestOffload = _getNearestDate([_parse(itemData['soeta']), _parse(itemData['soetb']), _parse(itemData['soetd'])]);
+        DateTime? nearestLoading = _getNearestDate([_parse(itemData['seta']), _parse(itemData['setb']), _parse(itemData['setd'])]);
 
         if (nearestOffload != null && nearestLoading != null) {
           if (nearestOffload.difference(targetDate).abs() <= nearestLoading.difference(targetDate).abs()) {
@@ -1011,7 +1011,7 @@ class _VesselCard extends StatelessWidget {
 
     if (isV2V) {
       if (isOffloadHighlighted && !isLoadingHighlighted) {
-        headerVesselName = itemData['Offvesselname']?.toString().trim() ?? '';
+        headerVesselName = itemData['offVesselName']?.toString().trim() ?? '';
         if (headerVesselName.isEmpty || headerVesselName == '-') headerVesselName = vesselName;
         headerLabel = 'Please refer to Off Vessel details';
         headerColor = Colors.deepOrange;
@@ -1024,7 +1024,7 @@ class _VesselCard extends StatelessWidget {
       }
     } else {
       if (!hasLoadingDates && hasOffloadDates) {
-        headerVesselName = itemData['Offvesselname']?.toString().trim() ?? '';
+        headerVesselName = itemData['offVesselName']?.toString().trim() ?? '';
         if (headerVesselName.isEmpty || headerVesselName == '-') headerVesselName = vesselName;
         headerLabel = 'Please refer to Off Vessel details';
         headerColor = Colors.deepOrange;
@@ -1106,7 +1106,7 @@ class _VesselCard extends StatelessWidget {
                             ),
                           ),
                           Text(
-                            itemData["Port"]?.toString() ?? '',
+                            itemData["port"]?.toString() ?? '',
                             style: GoogleFonts.poppins(
                               fontSize: isTab ? 13 : 12,
                               color: AppTokens.brandMid,
@@ -1133,15 +1133,15 @@ class _VesselCard extends StatelessWidget {
                       isTab ? 24 : 20, 8, isTab ? 24 : 20, 24),
                   child: Column(
                     children: [
-                      _detailRow('Job No', itemData['JobNo'], isTab),
-                      _detailRow('Job Type', itemData['JobName'], isTab),
-                      _conditionalDetailRow('Customer Name', itemData['CustomerName'], isTab),
-                      _detailRow('Job Status', itemData['JobStatus'], isTab),
-                      _detailRow('Vessel Type', itemData['VesselType'], isTab),
+                      _detailRow('Job No', itemData['jobNo'], isTab),
+                      _detailRow('Job Type', itemData['jobName'], isTab),
+                      _conditionalDetailRow('Customer Name', itemData['customerName'], isTab),
+                      _detailRow('Job Status', itemData['jobStatus'], isTab),
+                      _detailRow('Vessel Type', itemData['vesselType'], isTab),
                       _buildVesselFlow(itemData, isTab),
                       _detailRow('PKG', itemData['pkg'], isTab),
-                      _conditionalDetailRow('SCN', itemData['SCN'], isTab),
-                      _conditionalDetailRow('CS Name', itemData['EmployeeName'], isTab),
+                      _conditionalDetailRow('SCN', itemData['scn'], isTab),
+                      _conditionalDetailRow('CS Name', itemData['employeeName'], isTab),
                       const SizedBox(height: 12),
 
                       if (hasOffloadDates) ...[
@@ -1167,13 +1167,13 @@ class _VesselCard extends StatelessWidget {
                                 ),
                                 child: Text('Offload Details', style: GoogleFonts.poppins(fontWeight: FontWeight.bold, color: Colors.deepOrange.shade700, fontSize: isTab ? 15 : 14)),
                               ),
-                              _conditionalDetailRow('Off Vessel', itemData['Offvesselname'], isTab),
-                              _conditionalDetailRow('OSCN', itemData['OSCN'], isTab),
-                              _conditionalDetailRow('Offload BO 1', itemData['OBoardingOfficerName'], isTab),
-                              _conditionalDetailRow('Offload BO 2', itemData['OBoardingOfficerName1'], isTab),
-                              _conditionalDetailRow('OETA', itemData['SOETA'], isTab),
-                              _conditionalDetailRow('OETB', itemData['SOETB'], isTab),
-                              _conditionalDetailRow('OETD', itemData['SOETD'], isTab),
+                              _conditionalDetailRow('Off Vessel', itemData['offVesselName'], isTab),
+                              _conditionalDetailRow('OSCN', itemData['oscn'], isTab),
+                              _conditionalDetailRow('Offload BO 1', itemData['oBoardingOfficerName'], isTab),
+                              _conditionalDetailRow('Offload BO 2', itemData['oBoardingOfficerName1'], isTab),
+                              _conditionalDetailRow('OETA', itemData['soeta'], isTab),
+                              _conditionalDetailRow('OETB', itemData['soetb'], isTab),
+                              _conditionalDetailRow('OETD', itemData['soetd'], isTab),
                             ],
                           ),
                         ),
@@ -1202,13 +1202,13 @@ class _VesselCard extends StatelessWidget {
                                 ),
                                 child: Text('Loading Details', style: GoogleFonts.poppins(fontWeight: FontWeight.bold, color: Colors.purple.shade800, fontSize: isTab ? 15 : 14)),
                               ),
-                              _conditionalDetailRow('Loading Vessel', itemData['Loadingvesselname'], isTab),
-                              _conditionalDetailRow('LSCN', itemData['LSCN'], isTab),
-                              _conditionalDetailRow('Loading BO 1', itemData['LBoardingOfficerName'], isTab),
-                              _conditionalDetailRow('Loading BO 2', itemData['LBoardingOfficerName1'], isTab),
-                              _conditionalDetailRow('L ETA', itemData['SETA'], isTab),
-                              _conditionalDetailRow('L ETB', itemData['SETB'], isTab),
-                              _conditionalDetailRow('L ETD', itemData['SETD'], isTab),
+                              _conditionalDetailRow('Loading Vessel', itemData['loadingVesselName'], isTab),
+                              _conditionalDetailRow('LSCN', itemData['lscn'], isTab),
+                              _conditionalDetailRow('Loading BO 1', itemData['lBoardingOfficerName'], isTab),
+                              _conditionalDetailRow('Loading BO 2', itemData['lBoardingOfficerName1'], isTab),
+                              _conditionalDetailRow('L ETA', itemData['seta'], isTab),
+                              _conditionalDetailRow('L ETB', itemData['setb'], isTab),
+                              _conditionalDetailRow('L ETD', itemData['setd'], isTab),
                             ],
                           ),
                         ),
@@ -1281,13 +1281,13 @@ class _VesselCard extends StatelessWidget {
   }
 
   Widget _buildVesselFlow(Map<String, dynamic> itemData, bool isTab) {
-    final offVesselRaw = itemData['Offvesselname']?.toString().trim();
+    final offVesselRaw = itemData['offVesselName']?.toString().trim();
     final offVessel = (offVesselRaw == null || offVesselRaw.isEmpty) ? '-' : offVesselRaw;
     
-    final loadingVesselRaw = itemData['Loadingvesselname']?.toString().trim();
+    final loadingVesselRaw = itemData['loadingVesselName']?.toString().trim();
     final loadingVessel = (loadingVesselRaw == null || loadingVesselRaw.isEmpty) ? '-' : loadingVesselRaw;
 
-    final jobName = itemData['JobName']?.toString().trim().toUpperCase() ?? '';
+    final jobName = itemData['jobName']?.toString().trim().toUpperCase() ?? '';
 
     if (jobName != 'VESSEL TO VESSEL' && offVessel == '-') {
       return Column(
@@ -1361,15 +1361,15 @@ class _VesselCard extends StatelessWidget {
       return s; 
     }
 
-    String eta = _parseDate(itemData['SETA']);
-    String etb = _parseDate(itemData['SETB']);
-    String etd = _parseDate(itemData['SETD']);
-    String oeta = _parseDate(itemData['SOETA']);
-    String oetb = _parseDate(itemData['SOETB']);
-    String oetd = _parseDate(itemData['SOETD']);
+    String eta = _parseDate(itemData['seta']);
+    String etb = _parseDate(itemData['setb']);
+    String etd = _parseDate(itemData['setd']);
+    String oeta = _parseDate(itemData['soeta']);
+    String oetb = _parseDate(itemData['soetb']);
+    String oetd = _parseDate(itemData['soetd']);
 
-    bool hasLoadingDates = eta.isNotEmpty || etb.isNotEmpty || _parseDate(itemData['SETD']).isNotEmpty;
-    bool hasOffloadDates = oeta.isNotEmpty || oetb.isNotEmpty || _parseDate(itemData['SOETD']).isNotEmpty;
+    bool hasLoadingDates = eta.isNotEmpty || etb.isNotEmpty || _parseDate(itemData['setd']).isNotEmpty;
+    bool hasOffloadDates = oeta.isNotEmpty || oetb.isNotEmpty || _parseDate(itemData['soetd']).isNotEmpty;
 
     if (hasLoadingDates && hasOffloadDates) {
       DateTime targetDate = isPlanToday ? DateTime.now() : DateTime.now().add(const Duration(days: 1));
@@ -1390,8 +1390,8 @@ class _VesselCard extends StatelessWidget {
         return nearest;
       }
 
-      DateTime? nearestOffload = _getNearestDate([oeta, oetb, _parseDate(itemData['SOETD'])]);
-      DateTime? nearestLoading = _getNearestDate([eta, etb, _parseDate(itemData['SETD'])]);
+      DateTime? nearestOffload = _getNearestDate([oeta, oetb, _parseDate(itemData['soetd'])]);
+      DateTime? nearestLoading = _getNearestDate([eta, etb, _parseDate(itemData['setd'])]);
 
       if (nearestOffload != null && nearestLoading != null) {
         if (nearestOffload.difference(targetDate).abs() <= nearestLoading.difference(targetDate).abs()) {
@@ -1405,37 +1405,37 @@ class _VesselCard extends StatelessWidget {
     }
 
     // General Boarding Officer
-    int? boId1 = itemData['BoardingOfficerRefid'] != null ? int.tryParse(itemData['BoardingOfficerRefid'].toString()) : null;
-    String boName1 = itemData['BoardingOfficerName']?.toString() ?? '';
-    int? boId2 = itemData['BoardingOfficer1Refid'] != null ? int.tryParse(itemData['BoardingOfficer1Refid'].toString()) : null;
-    String boName2 = itemData['BoardingOfficerName1']?.toString() ?? '';
-    int? boId3 = itemData['BoardingOfficer2Refid'] != null ? int.tryParse(itemData['BoardingOfficer2Refid'].toString()) : null;
-    String boName3 = itemData['BoardingOfficerName2']?.toString() ?? '';
-    String boAmt1 = itemData['BoardingAmount']?.toString() ?? '';
-    String boAmt2 = itemData['BoardingAmount1']?.toString() ?? '';
-    String boAmt3 = itemData['BoardingAmount2']?.toString() ?? '';
+    int? boId1 = itemData['boardingOfficerRefId'] != null ? int.tryParse(itemData['boardingOfficerRefId'].toString()) : null;
+    String boName1 = itemData['boardingOfficerName']?.toString() ?? '';
+    int? boId2 = itemData['boardingOfficer1RefId'] != null ? int.tryParse(itemData['boardingOfficer1RefId'].toString()) : null;
+    String boName2 = itemData['boardingOfficerName1']?.toString() ?? '';
+    int? boId3 = itemData['boardingOfficer2RefId'] != null ? int.tryParse(itemData['boardingOfficer2RefId'].toString()) : null;
+    String boName3 = itemData['boardingOfficerName2']?.toString() ?? '';
+    String boAmt1 = itemData['boardingAmount']?.toString() ?? '';
+    String boAmt2 = itemData['boardingAmount1']?.toString() ?? '';
+    String boAmt3 = itemData['boardingAmount2']?.toString() ?? '';
 
     // Loading BO
-    int? lboId1 = itemData['LBoardingOfficerRefid'] != null ? int.tryParse(itemData['LBoardingOfficerRefid'].toString()) : null;
-    String lboName1 = itemData['LBoardingOfficerName']?.toString() ?? '';
-    int? lboId2 = itemData['LBoardingOfficer1Refid'] != null ? int.tryParse(itemData['LBoardingOfficer1Refid'].toString()) : null;
-    String lboName2 = itemData['LBoardingOfficerName1']?.toString() ?? '';
-    int? lboId3 = itemData['LBoardingOfficer2Refid'] != null ? int.tryParse(itemData['LBoardingOfficer2Refid'].toString()) : null;
-    String lboName3 = itemData['LBoardingOfficerName2']?.toString() ?? '';
-    String lboAmt1 = itemData['LBoardingAmount']?.toString() ?? '';
-    String lboAmt2 = itemData['LBoardingAmount1']?.toString() ?? '';
-    String lboAmt3 = itemData['LBoardingAmount2']?.toString() ?? '';
+    int? lboId1 = itemData['lBoardingOfficerRefId'] != null ? int.tryParse(itemData['lBoardingOfficerRefId'].toString()) : null;
+    String lboName1 = itemData['lBoardingOfficerName']?.toString() ?? '';
+    int? lboId2 = itemData['lBoardingOfficer1RefId'] != null ? int.tryParse(itemData['lBoardingOfficer1RefId'].toString()) : null;
+    String lboName2 = itemData['lBoardingOfficerName1']?.toString() ?? '';
+    int? lboId3 = itemData['lBoardingOfficer2RefId'] != null ? int.tryParse(itemData['lBoardingOfficer2RefId'].toString()) : null;
+    String lboName3 = itemData['lBoardingOfficerName2']?.toString() ?? '';
+    String lboAmt1 = itemData['lBoardingAmount']?.toString() ?? '';
+    String lboAmt2 = itemData['lBoardingAmount1']?.toString() ?? '';
+    String lboAmt3 = itemData['lBoardingAmount2']?.toString() ?? '';
 
     // Offload BO
-    int? oboId1 = itemData['OBoardingOfficerRefid'] != null ? int.tryParse(itemData['OBoardingOfficerRefid'].toString()) : null;
-    String oboName1 = itemData['OBoardingOfficerName']?.toString() ?? '';
-    int? oboId2 = itemData['OBoardingOfficer1Refid'] != null ? int.tryParse(itemData['OBoardingOfficer1Refid'].toString()) : null;
-    String oboName2 = itemData['OBoardingOfficerName1']?.toString() ?? '';
-    int? oboId3 = itemData['OBoardingOfficer2Refid'] != null ? int.tryParse(itemData['OBoardingOfficer2Refid'].toString()) : null;
-    String oboName3 = itemData['OBoardingOfficerName2']?.toString() ?? '';
-    String oboAmt1 = itemData['OBoardingAmount']?.toString() ?? '';
-    String oboAmt2 = itemData['OBoardingAmount1']?.toString() ?? '';
-    String oboAmt3 = itemData['OBoardingAmount2']?.toString() ?? '';
+    int? oboId1 = itemData['oBoardingOfficerRefId'] != null ? int.tryParse(itemData['oBoardingOfficerRefId'].toString()) : null;
+    String oboName1 = itemData['oBoardingOfficerName']?.toString() ?? '';
+    int? oboId2 = itemData['oBoardingOfficer1RefId'] != null ? int.tryParse(itemData['oBoardingOfficer1RefId'].toString()) : null;
+    String oboName2 = itemData['oBoardingOfficerName1']?.toString() ?? '';
+    int? oboId3 = itemData['oBoardingOfficer2RefId'] != null ? int.tryParse(itemData['oBoardingOfficer2RefId'].toString()) : null;
+    String oboName3 = itemData['oBoardingOfficerName2']?.toString() ?? '';
+    String oboAmt1 = itemData['oBoardingAmount']?.toString() ?? '';
+    String oboAmt2 = itemData['oBoardingAmount1']?.toString() ?? '';
+    String oboAmt3 = itemData['oBoardingAmount2']?.toString() ?? '';
 
     int? selectedJobStatusId;
     List<JobStatusModel> jobStatuses = [];
@@ -1588,7 +1588,7 @@ class _VesselCard extends StatelessWidget {
                        }
 
                        jobStatuses = list.where((s) => allowedIds.contains(s.Id)).toList();
-                       final currentStatusStr = itemData['JobStatus']?.toString().trim();
+                       final currentStatusStr = itemData['jobStatus']?.toString().trim();
                        if (currentStatusStr != null && currentStatusStr.isNotEmpty) {
                          try {
                            selectedJobStatusId = jobStatuses.firstWhere((e) => e.Name.trim().toLowerCase() == currentStatusStr.toLowerCase()).Id;
@@ -1864,7 +1864,7 @@ class _VesselCard extends StatelessWidget {
                           }
 
                           final updateData = {
-                            "Jobid": itemData['SaleOrderMasterRefId'],
+                            "Jobid": itemData['saleOrderMasterRefId'],
                             "ETA": _formatForApi(eta, 'SETA'),
                             "ETB": _formatForApi(etb, 'SETB'),
                             "ETD": _formatForApi(etd, 'SETD'),

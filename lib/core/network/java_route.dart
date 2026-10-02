@@ -1,9 +1,11 @@
 import 'package:maleva/core/config/app_config.dart';
 
-/// Which .NET app controllers the Java bridge (`/api/mobile/app`) serves.
+/// Which .NET app controllers a Java bridge (`/api/mobile/app`) serves: none.
 ///
-/// Only for features Java has no shared API for yet. Lookups and fuel entries
-/// use the shared web APIs instead, through `LegacyCallAdapter`.
+/// The owner's rule (2026-10-02): the app calls the shared Java APIs the web
+/// uses, and no new .NET-shaped bridge endpoints are made. The last one, stock,
+/// moved to the shared `/api/stock-ins` (`StockInApi`). [moved] stays empty;
+/// [isJava] tells the HTTP helpers which URLs carry the Java session token.
 ///
 /// The Java backend answers each moved controller at
 /// `/api/mobile/app/<Controller>/<Action>` with exactly the .NET contract
@@ -21,10 +23,7 @@ class JavaRoute {
   /// What has moved, spelled as the Java backend maps it: a whole controller
   /// (`FuelEntryApp`) or one action (`CustomerApp/GetCustomer`) when only some
   /// of a controller's actions have moved.
-  static const Set<String> moved = {
-    // Java has no shared API for stock yet: the bridge (add-stock-app-api).
-    'StockApp',
-  };
+  static const Set<String> moved = {};
 
   static final Map<String, String> _byLowerName = {
     for (final name in moved) name.toLowerCase(): name,

@@ -10,4 +10,5 @@
 
 - [ ] 2.1 On a test environment as an employee: sale-order desk (All / With / Without, month bars, employee dialog), invoice desk, expense and forwarding reports, unreleased (both), each sales desk with the employee switcher, air freight dashboard (dates, port and status filters, expired colouring).
 - [x] 2.2 Backend findings 1-3 ported from `MalevaWeb-develop` (backend change `fix-dashboard-employee-sales`).
-- [ ] 2.3 From `MalevaWeb-develop` `DashBoardServices`, port or confirm SelectStatusBO, LoadSupplierExpenseData, LoadExpenseData, SelectPendingPayment, SelectTopCustomers, VESSELPLANINGDB, PLANINGSearchDB in the backend, then move the remaining tabs listed in the proposal.
+- [x] 2.3 Remaining tabs moved (maintenance, vessel report and customer dashboard vessels, transport lists, payment pending, top customers, invoice waiting bills) on backend change `port-dashboard-widgets`. Verify: `dashboard_api_test.dart`, `paymentview_repository_test.dart`, `payment_contract_test.dart`, analyzer 0 errors.
+- [ ] 2.4 On a test environment: the tabs of 2.3, including the vessel report's boarding officer pickers and the payment pending filters.

@@ -2,13 +2,11 @@
 //
 // The invoice desk:
 //   1. sales summary            → Java GET /api/dashboard/sales/{comid}?type=0
-//   2. waiting bills            → .NET MasterReportApp/SelectChecksalesinvoice (not moved yet)
+//   2. waiting bills            → Java POST /api/sale-orders/check-invoice (invoice: true)
 //   3. employee breakdown       → Java GET /api/dashboard/employee-invoice/{comid}?type=
 
-import 'package:intl/intl.dart';
 import 'package:maleva/core/dashboard/dashboard_api.dart';
 import 'package:maleva/core/di/injection.dart';
-import 'package:maleva/core/network/api_services/auth_api.dart';
 import 'package:maleva/core/utils/app_preferences.dart';
 
 // ─────────────────────────────────────────────────────────────
@@ -42,26 +40,9 @@ class InvoiceRepositoryImpl implements InvoiceRepository {
     required int type,
   }) async {
     final comid = AppPreferences.getComid();
-    final today = DateFormat('yyyy/MM/dd').format(DateTime.now());
-
-    final master = {
-      'Comid': comid,
-      "DashboardStatus": 0,
-      'Fromdate': '2025/08/16',
-      "Employeeid ": 0,
-      'Id': 0,
-      "Invoice": true,
-      'Offvesselname': "",
-      "Invoicecheck": false,
-      'Remarks': 2,
-      "Search": 3,
-      'Todate': today,
-      "completestatusnotshow": false,
-    };
-
     final results = await Future.wait<dynamic>([
       _dashboard.sales(comid, type),
-      AuthApi.getSalesInvoiceCheck(master),
+      _dashboard.waitingInvoices(comid),
     ]);
 
     final salesData    = results[0] as Map<String, dynamic>?;
@@ -72,28 +53,7 @@ class InvoiceRepositoryImpl implements InvoiceRepository {
 
   @override
   Future<List<dynamic>> getWaitingBills() async {
-    final comid = AppPreferences.getComid();
-    final today = DateFormat('yyyy/MM/dd').format(DateTime.now());
-
-    final master = {
-      'Comid': comid,
-      "DashboardStatus": 0,
-      'Fromdate': '2025/08/16',
-      "Employeeid ": 0,
-      'Id': 0,
-      "Invoice": true,
-      'Offvesselname': "",
-      "Invoicecheck": false,
-      'Remarks': 2,
-      "Search": 3,
-      'Todate': today,
-      "completestatusnotshow": false,
-    };
-
-    // Same as original LoadWaitingBills handler
-    final result = await AuthApi.getSalesInvoiceCheck(master);
-
-    return List<dynamic>.from(result ?? []);
+    return _dashboard.waitingInvoices(AppPreferences.getComid());
   }
 
   @override

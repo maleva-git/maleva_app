@@ -32,14 +32,7 @@ class TransportDashboardRepository {
   Future<List<Map<String, dynamic>>> fetchRulesType() => sl<DashboardApi>().employeeRules(comid, empRefId);
 
   // ─── Transport/Planning ────────────────────────────────────────────────────
-  Future<List<dynamic>> fetchPlanningData(int type) async {
-    final date = DateFormat('yyyy-MM-dd').format(DateTime.now().add(Duration(days: type)));
-    final url = type == 0 ? ApiConstants.PLANINGSearchDB : ApiConstants.PLANINGSearch;
-    final result = await ApiClient.postRequest(url, {
-      'Comid': comid, 'Fromdate': date, 'Todate': date, 'Search': '', 'Employeeid': 0, 'ETAType': 0,
-    });
-    return result is List ? result : [];
-  }
+  Future<List<dynamic>> fetchPlanningData(int type) => sl<DashboardApi>().transportList(comid, type);
 
   // ─── Enquiry ───────────────────────────────────────────────────────────────
   Future<List<dynamic>> fetchEnquiryData() async {

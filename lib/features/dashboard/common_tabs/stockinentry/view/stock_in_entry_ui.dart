@@ -13,6 +13,7 @@ import 'package:intl/intl.dart';
 import 'package:maleva/core/utils/app_globals.dart';
 import 'package:maleva/menu/menulist.dart';
 import '../../../../../core/di/injection.dart';
+import 'package:maleva/core/stock/stock_in_api.dart';
 import '../../../../../core/theme/palette.dart';
 import '../../../../mastersearch/JobAllStatus.dart';
 import '../../../../transaction/salesorder/add/view/salesorderadd_tab.dart';
@@ -20,9 +21,7 @@ import '../bloc/stock_in_entry_bloc.dart';
 import '../bloc/stock_in_entry_event.dart';
 import '../bloc/stock_in_entry_state.dart';
 import 'package:maleva/core/models/shared/barcode_print_model.dart';
-import 'package:maleva/core/models/shared/response_view_model.dart';
 import 'package:maleva/features/operations/models/job_all_status_model.dart';
-import 'package:maleva/core/network/legacy_api_repository.dart';
 
 
 
@@ -197,35 +196,23 @@ class _StockInEntryPageState
   Future<void> _doPrint(
       int stockId, BuildContext context) async {
     final comId = AppGlobals.storagenew.getInt('Comid') ?? 0;
-    final header = {'Content-Type': 'application/json; charset=UTF-8'};
-    final result = await sl<LegacyApiRepository>().apiAllinoneSelectArray(
-        '${ApiConstants.apiPrintStock}$stockId&Comid=$comId',
-        {},
-        header,
-        null);
-    if (result != '') {
-      final value = ResponseViewModel.fromJson(result);
-      if (value.IsSuccess == true) {
-        final d0 = value.data1[0];
-        final total = int.tryParse(
-            d0['NumberOfPackages'].toString()) ??
-            0;
-        final printData = List.generate(
-          total,
-              (i) => BarcodePrintModel(
-            'MALEVA',
-            d0['VesselName'],
-            d0['VesselName'],
-            '${d0['JobNo']}-${i + 1}/$total',
-            d0['SSaleDate'],
-            d0['JobNo'],
-            d0['JobNo'],
-            '[ ${i + 1}/$total ]',
-          ),
-        );
-        await printdata(printData);
-      }
-    }
+    // the shared Java GET /api/stock-ins/entries/{id}/label
+    final d0 = await sl<StockInApi>().label(comId, stockId);
+    final total = int.tryParse(d0['numberOfPackages'].toString()) ?? 0;
+    final printData = List.generate(
+      total,
+          (i) => BarcodePrintModel(
+        'MALEVA',
+        d0['vesselName'],
+        d0['vesselName'],
+        '${d0['jobNo']}-${i + 1}/$total',
+        d0['sSaleDate'],
+        d0['jobNo'],
+        d0['jobNo'],
+        '[ ${i + 1}/$total ]',
+      ),
+    );
+    await printdata(printData);
   }
 
   PreferredSizeWidget _buildAppBar(

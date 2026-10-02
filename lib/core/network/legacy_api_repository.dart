@@ -4,6 +4,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:maleva/core/utils/app_globals.dart';
 import 'package:maleva/core/network/api_constants.dart';
+import 'package:maleva/core/stock/stock_in_api.dart';
 import 'package:maleva/core/network/dio_client.dart';
 import 'package:maleva/core/network/java_api_client.dart';
 import 'package:maleva/core/network/java_route.dart';
@@ -210,40 +211,14 @@ Future SelectLocation(context) async {
 }
 
 Future SelectWareHouse(context) async {
+  // the shared Java GET /api/stock-ins/warehouses (ported from .NET StockApp/SelectPortList)
+  AppGlobals.WareHouseList.clear();
   try {
-    AppGlobals.WareHouseList.clear();
-    var Comid = AppGlobals.storagenew.getInt('Comid') ?? 0;
-    try {
-  final resultData = ((await _routedPost(
-        Uri.encodeFull("${ApiConstants.apiWareHouseCombo}$Comid"), data: null ?? {})).data);
-  if (resultData.isNotEmpty) {
-        AppGlobals.WareHouseList = resultData["Data1"]
-            .map((element) => WareHouseModel.fromJson(element))
-            .toList().cast<WareHouseModel>();
-      }
-} catch (e) { print("API Error: $e"); }
-
-  } catch (error) {
-    if (error.toString() == "") {}
-  }
-}
-
-Future SelectStockJob(context) async {
-  try {
-    AppGlobals.StockJobList.clear();
-    var Comid = AppGlobals.storagenew.getInt('Comid') ?? 0;
-    try {
-  final resultData = ((await _routedPost(
-        Uri.encodeFull("${ApiConstants.apiSelectStockJob}$Comid"), data: null ?? {})).data);
-  if (resultData.isNotEmpty) {
-        AppGlobals.StockJobList = resultData["Data1"]
-            .map((element) => WareHouseModel.fromJson(element))
-            .toList().cast<WareHouseModel>();
-      }
-} catch (e) { print("API Error: $e"); }
-
-  } catch (error) {
-    if (error.toString() == "") {}
+    final comid = AppGlobals.storagenew.getInt('Comid') ?? 0;
+    final rows = await GetIt.instance<StockInApi>().warehouses(comid);
+    AppGlobals.WareHouseList = rows.map(WareHouseModel.fromJava).toList();
+  } catch (e) {
+    print("API Error: $e");
   }
 }
 
@@ -293,23 +268,6 @@ Future MaxSaleOrderNo(context, String BillType) async {
             "${ApiConstants.apiMaxSaleOrderNo}$Comid&BillType=$BillType", data: {})).data?.toString() ?? "");
   if (resultData.isNotEmpty) {
         AppGlobals.MaxSaleOrderNum = resultData;
-      }
-} catch (e) { print("API Error: $e"); }
-
-  } catch (error) {
-    if (error.toString() == "") {}
-  }
-}
-
-Future MaxStockNo(context) async {
-  try {
-    var Comid = AppGlobals.storagenew.getInt('Comid') ?? 0;
-    try {
-  final resultData = ((await _routedPost(
-            Uri.encodeFull("${ApiConstants.apiMaxStockNo}$Comid"), data: null ?? {})).data);
-  if (resultData.isNotEmpty) {
-       // var checkdata = resultData["Data1"];
-        AppGlobals.MaxStockNum = resultData["Data1"];
       }
 } catch (e) { print("API Error: $e"); }
 

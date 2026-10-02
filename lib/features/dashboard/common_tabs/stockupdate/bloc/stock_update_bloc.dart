@@ -60,11 +60,11 @@ class StockUpdateBloc extends Bloc<StockUpdateEvent, StockUpdateState> {
     final stockRow = await repository.loadStockData(barcodeLabel);
     if (stockRow == null) return base;
 
-    final numPkg = stockRow['NumberOfPackages'] as int;
-    final label = stockRow['BarcodeLabelDisplay'].toString();
-    final stockId = stockRow['Id'] as int;
-    final status = stockRow['Status'] as int?;
-    final soRefId = stockRow['SaleOrderMasterRefId'] as int;
+    final numPkg = stockRow['numberOfPackages'] as int;
+    final label = stockRow['barcodeLabelDisplay'].toString();
+    final stockId = stockRow['id'] as int;
+    final status = stockRow['status'] as int?;
+    final soRefId = stockRow['saleOrderMasterRefId'] as int;
 
     // Build expected barcode list
     final checkList = List.generate(numPkg, (i) => '$label-${i + 1}/$numPkg');
@@ -132,14 +132,9 @@ class StockUpdateBloc extends Bloc<StockUpdateEvent, StockUpdateState> {
     try {
       final imageUrls = s.images.map((img) => '${AppGlobals.imagepath}SalesOrder/${s.saleOrderId}/${s.statusName.replaceAll(' ', '')}/$img').toList();
 
-      final result = await repository.saveStockUpdate(s.stockId, s.statusId, s.warehouseId, imageUrls);
-
-      if (result?.IsSuccess == true) {
-        await repository.updateBoardingOfficer(s.saleOrderId, s.statusId, s.boardOfficerId1, s.boardOfficerId2, s.boardOfficerAmt1, s.boardOfficerAmt2);
-        emit(StockUpdateSaveSuccess());
-      } else {
-        emit(s);
-      }
+      await repository.saveStockUpdate(s.stockId, s.statusId, s.warehouseId, imageUrls);
+      await repository.updateBoardingOfficer(s.saleOrderId, s.statusId, s.boardOfficerId1, s.boardOfficerId2, s.boardOfficerAmt1, s.boardOfficerAmt2);
+      emit(StockUpdateSaveSuccess());
     } catch (e) {
       emit(StockUpdateError(e.toString()));
     }

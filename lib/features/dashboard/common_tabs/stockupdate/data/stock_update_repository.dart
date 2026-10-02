@@ -4,20 +4,30 @@ import 'package:maleva/core/network/api_constants.dart';
 import 'package:maleva/core/network/legacy_json_transport.dart';
 import 'package:maleva/core/session/legacy_feature_context.dart';
 import 'package:maleva/core/models/shared/response_view_model.dart';
+import 'package:maleva/core/di/injection.dart';
+import 'package:maleva/core/stock/stock_in_api.dart';
 
+/// Stock Update (cargo arrives at a warehouse). The stock-in calls go to the
+/// shared Java `/api/stock-ins` (ported from .NET StockApp); job steps, the sale
+/// order read, image delete and the boarding officer save are other features' calls.
 class StockUpdateRepository {
   final JsonTransport transport;
   final BarcodeScanner scanner;
   final int comid;
   final int empRefId;
   final int driverLogin;
+  final StockInApi? _stockApi;
   StockUpdateRepository({
     this.transport = const ExistingHttpTransport(),
     this.scanner = const ExistingBarcodeScanner(),
     LegacyFeatureContext context = const LegacyFeatureContext(),
+    StockInApi? stockApi,
   }) : comid = context.preferenceCompanyId,
         empRefId = context.employeeId,
-        driverLogin = context.driverLogin;
+        driverLogin = context.driverLogin,
+        _stockApi = stockApi;
+
+  StockInApi get _stock => _stockApi ?? sl<StockInApi>();
 
   // ─── Initialize ────────────────────────────────────────────────────────────
   // (No prefetch needed anymore)
@@ -26,32 +36,20 @@ class StockUpdateRepository {
   Future<String?> scanBarcode() => scanner.scan();
 
   // ─── Load Stock Data (First Scan) ──────────────────────────────────────────
-  Future<Map<String, dynamic>?> loadStockData(String barcodeLabel) async {
-    final response = await transport.postRequest(
-        "${ApiConstants.apiEditStockIn}0&barcodeLabel=$barcodeLabel&Comid=$comid", null);
-
-    if (response != null) {
-      final value = ResponseViewModel.fromJson(response);
-      if (value.IsSuccess == true && value.data1 != null && value.data1.isNotEmpty) {
-        return value.data1[0] as Map<String, dynamic>;
-      }
-    }
-    return null;
-  }
+  /// The stock-in of the scanned label (Java fields: `id`, `numberOfPackages`,
+  /// `barcodeLabelDisplay`, `status`, `saleOrderMasterRefId`). An unknown label
+  /// throws with the server's message.
+  Future<Map<String, dynamic>?> loadStockData(String barcodeLabel) => _stock.byLabel(comid, barcodeLabel);
 
   // ─── Load Job Details & Calculate Status & Boarding Officers ─────────────
   Future<Map<String, dynamic>?> loadJobDetails(int saleOrderId) async {
-    final response = await transport.postRequest(
-        "${ApiConstants.apiSelectStockDetails}$comid&Id=$saleOrderId", null);
+    final jobs = await _stock.saleOrders(comid, saleOrderId: saleOrderId);
+    if (jobs.isEmpty) return null;
 
-    if (response == null) return null;
-    final value = ResponseViewModel.fromJson(response);
-    if (value.IsSuccess != true || value.data1 == null || value.data1.isEmpty) return null;
-
-    final data = value.data1[0];
-    final soId = data['Id'] as int;
-    final jobMId = data['JobMasterRefId'] as int;
-    final jStatus = data['JStatus'] as int;
+    final data = jobs.first;
+    final soId = data['id'] as int;
+    final jobMId = data['jobMasterRefId'] as int;
+    final jStatus = data['jStatus'] as int;
 
     // Fetch Job Statuses
     final statusListRes = await transport.postRequest(
@@ -129,11 +127,10 @@ class StockUpdateRepository {
   }
 
   // ─── Save Stock Update ───────────────────────────────────────────────────
-  Future<ResponseViewModel?> saveStockUpdate(int stockId, int statusId, int warehouseId, List<String> imageUrls) async {
-    final url = '${ApiConstants.apiUpdateStockIn}$stockId&StatusId=$statusId&Comid=$comid&PortRefid=$warehouseId&ImageURL';
-    final result = await transport.postRequest(url, imageUrls);
-    return result != null ? ResponseViewModel.fromJson(result) : null;
-  }
+  /// The cargo is in warehouse [warehouseId]; the job takes [statusId]. Throws
+  /// with the server's message when refused.
+  Future<void> saveStockUpdate(int stockId, int statusId, int warehouseId, List<String> imageUrls) =>
+      _stock.arrival(comid, stockId, statusId: statusId, portId: warehouseId, imageUrls: imageUrls);
 
   // ─── Update Boarding Officer ─────────────────────────────────────────────
   Future<void> updateBoardingOfficer(int saleOrderId, int statusType, int boardOfficerId1, int boardOfficerId2, double boardOfficerAmt1, double boardOfficerAmt2) async {

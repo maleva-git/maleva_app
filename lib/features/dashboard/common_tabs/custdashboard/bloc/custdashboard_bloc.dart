@@ -10,6 +10,7 @@ import 'package:maleva/core/models/shared/payment_pending_model.dart';
 import 'package:maleva/core/network/legacy_api_repository.dart';
 import 'package:maleva/core/di/injection.dart';
 import 'package:maleva/core/dashboard/dashboard_api.dart';
+import 'package:maleva/features/dashboard/common_tabs/paymentview/data/paymentview_repository.dart';
 
 
 class CustDashboardBloc
@@ -54,12 +55,6 @@ class CustDashboardBloc
 
   // ─── Helpers ───────────────────────────────────────────────────────────────
 
-  String get _today => DateFormat('yyyy-MM-dd').format(DateTime.now());
-
-  String get _firstDayOfMonth {
-    final now = DateTime.now();
-    return DateFormat('yyyy-MM-dd').format(DateTime(now.year, now.month, 1));
-  }
 
   String _offsetDate(int days) =>
       DateFormat('yyyy-MM-dd').format(DateTime.now().add(Duration(days: days)));
@@ -238,7 +233,6 @@ class CustDashboardBloc
   Future<void> _fetchVesselData(
       Emitter<CustDashboardState> emit,
       {required int dayOffset, String portsText = ''}) async {
-    final header = {'Content-Type': 'application/json; charset=UTF-8'};
     final comid = AppGlobals.storagenew.getInt('Comid') ?? 0;
 
     String fromDate = _offsetDate(dayOffset);
@@ -248,24 +242,15 @@ class CustDashboardBloc
       fromDate = '2024-10-01';
     }
 
-    final result = await _safeApiCall(() => sl<LegacyApiRepository>().apiAllinoneSelectArray(
-        ApiConstants.VESSELPLANINGDB,
-        {
-          'Comid': comid,
-          'Fromdate': fromDate,
-          'Todate': toDate,
-          'Search': portsText,
-          'Employeeid': 0,
-          'ETAType': 0,
-        },
-        header,
-        null), emit);
+    // shared Java POST /api/dashboard/vessel-planning/{comid}: camelCase rows
+    final result = await _safeApiCall(() => sl<DashboardApi>().vesselPlanning(comid,
+        fromDate: fromDate, toDate: toDate, search: portsText), emit);
 
     if (result is List && result.isNotEmpty) {
       final sorted = List<dynamic>.from(result)
         ..sort((a, b) {
-          final nameA = (a['Port'] as String? ?? '').toLowerCase();
-          final nameB = (b['Port'] as String? ?? '').toLowerCase();
+          final nameA = (a['port'] ?? '').toString().toLowerCase();
+          final nameB = (b['port'] ?? '').toString().toLowerCase();
           return nameA.compareTo(nameB);
         });
       emit(state.copyWith(saleCustReport: sorted));
@@ -288,24 +273,8 @@ class CustDashboardBloc
 
   Future<void> _fetchPlanningData(
       Emitter<CustDashboardState> emit, {required int dayOffset}) async {
-    final header = {'Content-Type': 'application/json; charset=UTF-8'};
     final comid = AppGlobals.storagenew.getInt('Comid') ?? 0;
-
-    final dateStr = _offsetDate(dayOffset);
-    final url = dayOffset == 0 ? ApiConstants.PLANINGSearchDB : ApiConstants.PLANINGSearch;
-
-    final result = await _safeApiCall(() => sl<LegacyApiRepository>().apiAllinoneSelectArray(
-        url,
-        {
-          'Comid': comid,
-          'Fromdate': dateStr,
-          'Todate': dateStr,
-          'Search': '',
-          'Employeeid': 0,
-          'ETAType': 0,
-        },
-        header,
-        null), emit);
+    final result = await _safeApiCall(() => sl<DashboardApi>().transportList(comid, dayOffset), emit);
 
     emit(state.copyWith(
       saleTransReport: (result is List) ? result : [],
@@ -488,67 +457,12 @@ class CustDashboardBloc
         DateTime? fromDate,
         DateTime? toDate,
       }) async {
-    final header = {'Content-Type': 'application/json; charset=UTF-8'};
     final comid = AppGlobals.storagenew.getInt('Comid') ?? 0;
-
-    String fromDateStr;
-    String toDateStr;
-
-    if (isDateSearch && fromDate != null && toDate != null) {
-      fromDateStr = DateFormat('yyyy-MM-dd').format(fromDate);
-      toDateStr = DateFormat('yyyy-MM-dd').format(toDate);
-    } else {
-      fromDateStr = _offsetDate(6);
-      toDateStr = _offsetDate(6);
-    }
-
-    final result = await _safeApiCall(() => sl<LegacyApiRepository>().apiAllinoneSelectArray(
-        '${ApiConstants.apiSelectPaymentPending}?Startindex=0&PageCount=400',
-        {
-          'Comid': comid,
-          'Fromdate': fromDateStr,
-          'Todate': toDateStr,
-          'SupplierId': state.sid,
-          'SupplierId1': state.pSid,
-        },
-        header,
-        null), emit);
-
-    List<PaymentPendingModel> masterList = [];
-    List<PaymentPendingModel> detailsList = [];
-
-    if (result is List && result.isNotEmpty) {
-      final first = result[0];
-      List<dynamic>? masterJson;
-      List<dynamic>? detailsJson;
-
-      if (first is Map &&
-          (first.containsKey('ExpenseReportModel') ||
-              first.containsKey('ExpenseReportDetailsModel'))) {
-        masterJson = (first['ExpenseReportModel'] ?? []) as List<dynamic>?;
-        detailsJson =
-        (first['ExpenseReportDetailsModel'] ?? []) as List<dynamic>?;
-      } else if (result.length >= 2 && result[1] is List) {
-        masterJson = result[0] as List<dynamic>?;
-        detailsJson = result[1] as List<dynamic>?;
-      } else {
-        masterJson = result as List<dynamic>?;
-        detailsJson = [];
-      }
-
-      if (masterJson != null) {
-        masterList = masterJson
-            .map<PaymentPendingModel>(
-                (e) => PaymentPendingModel.fromJson(e))
-            .toList();
-      }
-      if (detailsJson != null) {
-        detailsList = detailsJson
-            .map<PaymentPendingModel>(
-                (e) => PaymentPendingModel.fromJson(e))
-            .toList();
-      }
-    }
+    // the shared Java pending payments board (current month, as .NET SelectPendingPayment)
+    final lists = await _safeApiCall(() => PaymentViewRepository()
+        .fetchPaymentPending(comid: comid, expenseFilter: state.sid, paidFilter: state.pSid), emit);
+    final masterList = lists is PaymentPendingLists ? lists.masters : <PaymentPendingModel>[];
+    final detailsList = lists is PaymentPendingLists ? lists.details : <PaymentPendingModel>[];
 
     emit(state.copyWith(
       masterList: masterList,

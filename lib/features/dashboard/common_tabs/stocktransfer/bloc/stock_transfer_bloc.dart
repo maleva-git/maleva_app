@@ -68,17 +68,17 @@ class StockTransferBloc extends Bloc<StockTransferEvent, StockTransferState> {
     try {
       final row = await repository.fetchStockData(event.barcodeLabel);
 
-      final int numPkg = row['NumberOfPackages'];
-      final String barcodeDisplay = row['BarcodeLabelDisplay'];
-      final int portMasterRefId = row['PortMasterRefId'];
+      final int numPkg = row['numberOfPackages'];
+      final String barcodeDisplay = row['barcodeLabelDisplay'];
+      final int portMasterRefId = row['portMasterRefId'] ?? 0;
 
       final checkList = List.generate(numPkg, (i) => '$barcodeDisplay-${i + 1}/$numPkg');
 
       // Look up Port Name from local list
       String portName = '';
       try {
-        final match = _wareHouseList.firstWhere((w) => w['Id'] == portMasterRefId, orElse: () => null);
-        if (match != null) portName = match['PortName'] ?? '';
+        final match = _wareHouseList.firstWhere((w) => w['id'] == portMasterRefId, orElse: () => null);
+        if (match != null) portName = match['portName'] ?? '';
       } catch (e, stack) { debugPrint("Error caught globally: $e\n$stack"); }
 
       emit(current.copyWith(
@@ -87,7 +87,7 @@ class StockTransferBloc extends Bloc<StockTransferEvent, StockTransferState> {
           jobNo: barcodeDisplay,
           portName: portName,
           totalPkg: numPkg,
-          stockId: row['Id'],
+          stockId: row['id'],
           checkStockNoList: checkList,
         ),
       ));
@@ -150,16 +150,11 @@ class StockTransferBloc extends Bloc<StockTransferEvent, StockTransferState> {
 
     emit(current.copyWith(isBusy: true));
     try {
-      final result = await repository.updateStockTransfer(data.stockId, data.selectedWareHouseId);
-
-      if (result?.IsSuccess == true) {
-        emit(const StockTransferLoaded(
-          data: StockTransferData(),
-          message: StockTransferMessage('Updated Successfully', MessageType.success),
-        ));
-      } else {
-        emit(_withMsg(current, result?.Message ?? 'Update failed', MessageType.error));
-      }
+      await repository.updateStockTransfer(data.stockId, data.selectedWareHouseId);
+      emit(const StockTransferLoaded(
+        data: StockTransferData(),
+        message: StockTransferMessage('Updated Successfully', MessageType.success),
+      ));
     } catch (e) {
       emit(_withMsg(current, e.toString(), MessageType.error));
     }

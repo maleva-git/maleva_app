@@ -64,7 +64,7 @@ void main() {
     for (final url in [
       '${ApiConstants.apiDriverViewRecords}6',
       ApiConstants.apiSelectAllInventory,
-      '${ApiConstants.apiMaxStockNo}6',
+      '${AppConfig.baseUrl}/api/StockApp/MaxStockInNo?Comid=6',
       ApiConstants.apiSelectEnquiryMaster,
       'https://elsewhere.test/api/TruckApp/GetTruck',
     ]) {

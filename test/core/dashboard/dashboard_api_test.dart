@@ -138,4 +138,46 @@ void main() {
     expect(routes.requests.map((r) => r.uri.toString()),
         contains('https://java.test/api/dashboard/sales-order-status/6?employeeId=41'));
   });
+
+  test('maintenance, top customers and vessel planning', () async {
+    adapter.replies
+      ..add((200, jsonEncode(ok([{'Description': 'REPAIR', 'PStatus': 2, 'Amount': 300.0}]))))
+      ..add((200, jsonEncode(ok([{'Description': 'FUEL', 'Amount': 90.0}]))))
+      ..add((200, jsonEncode(ok([{'Id': 1, 'SupplierName': 'ACME', 'PStatus': 2}]))))
+      ..add((200, jsonEncode(ok([{'CustomerName': 'ACME', 'Revenue': 10.0, 'Volume': 1}]))))
+      ..add((200, jsonEncode(ok([{'id': 9, 'port': 'PKG', 'lBoardingOfficerRefId': 4}]))));
+
+    expect((await api.maintenanceStatus(6, '2026-10-01', '2026-10-02')).single['PStatus'], 2);
+    expect(uri(), 'https://java.test/api/dashboard/maintenance-status/6?fromDate=2026-10-01&toDate=2026-10-02');
+    expect((await api.runningExpenses(6, '2025-10-02', '2026-10-02')).single['Description'], 'FUEL');
+    expect(uri(), 'https://java.test/api/dashboard/running-expenses/6?fromDate=2025-10-02&toDate=2026-10-02');
+    expect((await api.supplierExpenses(6)).single['SupplierName'], 'ACME');
+    expect(uri(), 'https://java.test/api/dashboard/supplier-expense/6');
+    expect((await api.topCustomers(6, fromDate: '2026-09-01', toDate: '2026-10-01', filterType: 'RM')).single['Volume'], 1);
+    expect(uri(), 'https://java.test/api/dashboard/top-customers/6?fromDate=2026-09-01&toDate=2026-10-01&filterType=RM');
+    final vessels = await api.vesselPlanning(6, fromDate: '2024-10-01', toDate: '2026-10-02', search: 'PKG');
+    expect(vessels.single['lBoardingOfficerRefId'], 4);
+    expect(adapter.requests.last.data, containsPair('search', 'PKG'));
+  });
+
+  test('transport list: today is the pickups, tomorrow the planning list', () async {
+    adapter.replies
+      ..add((200, jsonEncode(ok([{'Id': 1, 'CustomerName': 'A'}]))))
+      ..add((200, jsonEncode([{'Id': 2, 'CustomerName': 'B'}])));
+
+    expect((await api.transportList(6, 0, today: DateTime(2026, 10, 2))).single['Id'], 1);
+    expect(uri(), 'https://java.test/api/dashboard/planing-search');
+    expect(adapter.requests.last.data, containsPair('fromdate', '2026-10-02'));
+    expect((await api.transportList(6, 1, today: DateTime(2026, 10, 2))).single['Id'], 2);
+    expect(uri(), 'https://java.test/api/planing/search');
+    expect(adapter.requests.last.data, containsPair('todate', '2026-10-03'));
+  });
+
+  test('waiting invoices read the common wrapper', () async {
+    adapter.replies.add((200, jsonEncode({'IsSuccess': true, 'Message': 'ok', 'Data1': [{'billNo': 7}]})));
+
+    expect((await api.waitingInvoices(6)).single['billNo'], 7);
+    expect(uri(), 'https://java.test/api/sale-orders/check-invoice');
+    expect(adapter.requests.last.data, containsPair('invoice', true));
+  });
 }

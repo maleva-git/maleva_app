@@ -1,21 +1,26 @@
-import 'package:maleva/core/network/api_constants.dart';
-import 'package:maleva/core/network/api_client.dart';
+import 'package:maleva/core/dashboard/dashboard_api.dart';
+import 'package:maleva/core/di/injection.dart';
 import 'package:maleva/core/utils/app_preferences.dart';
 import 'package:maleva/features/transport/models/maintenance_model.dart';
 
+/// The maintenance widget, from the shared Java `/api/dashboard` (ported from .NET
+/// SelectStatusBO, LoadSupplierExpenseData and LoadExpenseData; the rows keep the .NET names).
 class MaintenanceRepository {
+  MaintenanceRepository({DashboardApi? api}) : _api = api;
+
+  final DashboardApi? _api;
+
+  DashboardApi get _dashboard => _api ?? sl<DashboardApi>();
+
   // ── 1. Fetch Current Month Stats ──────────────────────────────────────────
   Future<Map<String, dynamic>> fetchCurrentMonthStats(String fromDate, String toDate) async {
     try {
-      final comid = AppPreferences.getComid();
-      final url = '${ApiConstants.apiGetMaintenance2}$comid&Fromdate=$fromDate&Todate=$toDate';
-
-      final response = await ApiClient.postRequest(url, null);
+      final response = await _dashboard.maintenanceStatus(AppPreferences.getComid(), fromDate, toDate);
 
       List<MaintenanceModel> statsData = [];
-      if (response != null && response is List) {
+      if (response.isNotEmpty) {
         statsData = response
-            .map((e) => MaintenanceModel.fromJson(e as Map<String, dynamic>))
+            .map(MaintenanceModel.fromJson)
             .toList();
       }
 
@@ -67,14 +72,11 @@ class MaintenanceRepository {
   // ── 2. Fetch Pending Maintenance (6 Months) ───────────────────────────────
   Future<List<dynamic>> fetchPendingMaintenance() async {
     try {
-      final comid = AppPreferences.getComid();
-      final url = '${ApiConstants.apiGetMaintenance}$comid';
+      final response = await _dashboard.supplierExpenses(AppPreferences.getComid());
 
-      final response = await ApiClient.postRequest(url, null);
-
-      if (response != null && response is List && response.isNotEmpty) {
+      if (response.isNotEmpty) {
         return response
-            .map((e) => MaintenanceModel.fromJson(e as Map<String, dynamic>))
+            .map(MaintenanceModel.fromJson)
             .toList();
       }
       return [];
@@ -86,14 +88,11 @@ class MaintenanceRepository {
   // ── 3. Fetch Summary Maintenance (1 Year) ─────────────────────────────────
   Future<List<dynamic>> fetchSummaryMaintenance(String fromDate, String toDate) async {
     try {
-      final comid = AppPreferences.getComid();
-      final url = '${ApiConstants.apiGetMaintenance1}$comid&Fromdate=$fromDate&Todate=$toDate';
+      final response = await _dashboard.runningExpenses(AppPreferences.getComid(), fromDate, toDate);
 
-      final response = await ApiClient.postRequest(url, null);
-
-      if (response != null && response is List && response.isNotEmpty) {
+      if (response.isNotEmpty) {
         return response
-            .map((e) => MaintenanceModel.fromJson(e as Map<String, dynamic>))
+            .map(MaintenanceModel.fromJson)
             .toList();
       }
       return [];
