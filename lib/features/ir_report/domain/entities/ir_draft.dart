@@ -64,6 +64,7 @@ class IrDraft extends Equatable {
     this.driver = IrParty.empty,
     this.employee = IrParty.empty,
     this.amountText = '',
+    this.documentRemarks,
   });
 
   /// A saved report in form shape.
@@ -91,6 +92,7 @@ class IrDraft extends Equatable {
       driver: _party(report.driverId, report.driverName, lookups.drivers),
       employee: _party(report.employeeId, report.employeeName, lookups.employees),
       amountText: report.actualAmount?.toString() ?? '',
+      documentRemarks: report.documentRemarks,
     );
   }
 
@@ -112,6 +114,10 @@ class IrDraft extends Equatable {
 
   /// Kept as typed so a half-entered value is never lost; see [amount].
   final String amountText;
+
+  /// The saved report's document notes (edited on the web), sent back
+  /// unchanged on save so an edit here never clears them.
+  final String? documentRemarks;
 
   bool get isNew => id == 0;
 
@@ -142,6 +148,7 @@ class IrDraft extends Equatable {
       driver: driver ?? this.driver,
       employee: employee ?? this.employee,
       amountText: amountText ?? this.amountText,
+      documentRemarks: documentRemarks,
     );
   }
 
@@ -245,5 +252,6 @@ class IrDraft extends Equatable {
         driver,
         employee,
         amountText,
+        documentRemarks,
       ];
 }

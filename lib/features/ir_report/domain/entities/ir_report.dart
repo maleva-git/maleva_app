@@ -27,6 +27,7 @@ class IrReport extends Equatable {
     this.reporterName,
     this.createdBy,
     this.createdDate,
+    this.documentRemarks,
   });
 
   final int id;
@@ -67,6 +68,10 @@ class IrReport extends Equatable {
   final String? createdBy;
   final DateTime? createdDate;
 
+  /// Notes on the attached documents, edited on the web. The app does not show
+  /// them but carries them through an edit, so saving here never clears them.
+  final String? documentRemarks;
+
   /// Who filed it, for display.
   String get reporter => reporterName ?? createdBy ?? '';
 
@@ -94,5 +99,6 @@ class IrReport extends Equatable {
         reporterName,
         createdBy,
         createdDate,
+        documentRemarks,
       ];
 }

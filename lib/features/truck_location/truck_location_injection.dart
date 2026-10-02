@@ -1,5 +1,5 @@
 import 'package:get_it/get_it.dart';
-import 'package:maleva/core/network/dio_client.dart';
+import 'package:maleva/core/network/java_api_client.dart';
 import 'package:maleva/core/session/app_session.dart';
 
 import 'data/datasources/truck_location_remote_data_source.dart';
@@ -18,7 +18,7 @@ void registerTruckLocationModule(GetIt sl) {
 
   sl
     ..registerLazySingleton<TruckLocationRemoteDataSource>(
-      () => TruckLocationRemoteDataSource(sl<DioClient>().dio),
+      () => TruckLocationRemoteDataSource(sl<JavaApiClient>().dio),
     )
     ..registerLazySingleton<TruckLocationRepository>(
       () => TruckLocationRepositoryImpl(

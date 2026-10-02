@@ -5,7 +5,13 @@ import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import 'package:path/path.dart';
 import 'package:http_parser/http_parser.dart';
+import 'package:dio/dio.dart' as dio;
+import 'package:get_it/get_it.dart';
 import '../utils/app_preferences.dart';
+import 'java_api_client.dart';
+import 'java_route.dart';
+import 'api_failure.dart';
+import 'legacy_call_adapter.dart';
 
 class ApiClient {
   ApiClient._();
@@ -35,8 +41,18 @@ class ApiClient {
         Map<String, String>? headers,
         bool skipAuth = false,
       }) async {
+    // an old lookup or fuel call answered by the shared Java APIs
+    if (LegacyCallAdapter.handles(url)) {
+      try {
+        return await LegacyCallAdapter.answer(url, body: bodyData, headers: headers);
+      } on ApiFailure catch (e) {
+        throw Exception(e.message);
+      }
+    }
     try {
-      final finalHeaders = skipAuth
+      url = JavaRoute.resolve(url);
+      // the legacy auth headers are for .NET only; Java gets the session token
+      final finalHeaders = skipAuth || JavaRoute.isJava(url)
           ? (headers ?? {'Content-Type': 'application/json; charset=UTF-8'})
           : _buildHeaders(extra: headers);
 
@@ -49,13 +65,15 @@ class ApiClient {
         print("Payload: $body-------------------");
       }
 
-      final response = await http
-          .post(
-        Uri.parse(url),
-        headers: finalHeaders,
-        body: body,
-      )
-          .timeout(_kTimeout);
+      final response = JavaRoute.isJava(url)
+          ? await _javaPost(url, bodyData, headers)
+          : await http
+              .post(
+                Uri.parse(url),
+                headers: finalHeaders,
+                body: body,
+              )
+              .timeout(_kTimeout);
 
       if (kDebugMode) {
         debugPrint("âœ… API RESPONSE");
@@ -79,8 +97,18 @@ class ApiClient {
 
   // â”€â”€â”€ GET â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   static Future<String> getString(String url) async {
+    if (LegacyCallAdapter.handles(url)) {
+      try {
+        return (await LegacyCallAdapter.answer(url)).toString();
+      } on ApiFailure catch (e) {
+        throw Exception(e.message);
+      }
+    }
     try {
-      final response = await http.post(Uri.parse(url)).timeout(_kTimeout);
+      url = JavaRoute.resolve(url);
+      final response = JavaRoute.isJava(url)
+          ? await _javaPost(url, null, null)
+          : await http.post(Uri.parse(url)).timeout(_kTimeout);
       if (response.statusCode == 200) {
         return jsonDecode(response.body).toString();
       }
@@ -176,6 +204,32 @@ class ApiClient {
       throw Exception('File upload timed out.');
     } catch (e) {
       throw Exception('File upload failed: $e');
+    }
+  }
+
+  /// A request to the Java backend, through [JavaApiClient] (session token,
+  /// refresh on 401), answered as an [http.Response] so the callers' status
+  /// handling stays the same. Only the caller's own headers (such as `Comid`)
+  /// are passed on; the legacy auth headers never reach Java.
+  static Future<http.Response> _javaPost(String url, dynamic body, Map<String, String>? headers) async {
+    final client = GetIt.instance<JavaApiClient>().dio;
+    final passOn = <String, dynamic>{...?headers}
+      ..removeWhere((k, _) => const {'authorization', 'content-type', 'userid', 'profile'}.contains(k.toLowerCase()));
+    try {
+      final r = await client.post<String>(url,
+          data: body, options: dio.Options(headers: passOn, responseType: dio.ResponseType.plain));
+      return http.Response.bytes(utf8.encode(r.data ?? ''), r.statusCode ?? 200);
+    } on dio.DioException catch (e) {
+      final r = e.response;
+      if (r != null) {
+        return http.Response.bytes(utf8.encode(r.data?.toString() ?? ''), r.statusCode ?? 500);
+      }
+      if (e.type == dio.DioExceptionType.connectionTimeout ||
+          e.type == dio.DioExceptionType.sendTimeout ||
+          e.type == dio.DioExceptionType.receiveTimeout) {
+        throw TimeoutException('Request timed out', _kTimeout);
+      }
+      throw const SocketException('No internet connection');
     }
   }
 

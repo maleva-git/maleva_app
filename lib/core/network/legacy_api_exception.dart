@@ -1,17 +1,12 @@
 import 'package:dio/dio.dart';
+import 'package:maleva/core/network/api_failure.dart';
 import 'package:maleva/core/utils/json_read.dart';
 
 /// A failed call to the legacy .NET API. [message] is what the server put in
 /// ResponseViewModel.Message when it sent one, so a screen can show the real
 /// reason ("Status 9 was not found for this company") instead of a status code.
-class LegacyApiException implements Exception {
-  const LegacyApiException(this.message, {this.statusCode});
-
-  final String message;
-  final int? statusCode;
-
-  @override
-  String toString() => message;
+class LegacyApiException extends ApiFailure {
+  const LegacyApiException(super.message, {super.statusCode});
 }
 
 /// Helpers for the .NET ResponseViewModel envelope

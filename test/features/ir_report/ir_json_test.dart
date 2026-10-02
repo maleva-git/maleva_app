@@ -3,30 +3,32 @@ import 'package:maleva/features/ir_report/data/models/ir_json.dart';
 import 'package:maleva/features/ir_report/domain/entities/ir_draft.dart';
 import 'package:maleva/features/ir_report/domain/entities/ir_filter.dart';
 import 'package:maleva/features/ir_report/domain/entities/ir_lookup.dart';
+import 'package:maleva/features/ir_report/domain/entities/ir_report.dart';
 
 void main() {
-  test('reads a row the way IRServices writes it', () {
+  test('reads an IrDetailDto', () {
     final report = IrJson.report({
-      'Id': 12,
-      'CompanyRefId': 6,
-      'IRDate': '2026-09-10T08:15:00',
-      'IRStatusRefId': 1,
-      'StatusCode': 'OPEN',
-      'StatusName': 'Open',
-      'StatusColor': '#DC2626',
-      'Description': 'Truck accident',
-      'Reason': null,
-      'DepartmentRefId': 1000,
-      'DepartmentName': 'TRANSPORTATION',
-      'VesselName': '',
-      'TruckRefId': 5,
-      'TruckNo': 'WLN 1234',
-      'DriverRefId': null,
-      'DriverName': 'Ali (outside)',
-      'ActualAmount': 4500,
-      'CreateEmployeeRefId': 44,
-      'CreateEmployeeName': null,
-      'Created_By': 'ADMIN',
+      'id': 12,
+      'companyRefId': 6,
+      'irDate': '2026-09-10T08:15:00',
+      'irStatusRefId': 1,
+      'statusCode': 'OPEN',
+      'statusName': 'Open',
+      'statusColor': '#DC2626',
+      'description': 'Truck accident',
+      'reason': null,
+      'departmentRefId': 1000,
+      'departmentName': 'TRANSPORTATION',
+      'vesselName': '',
+      'truckRefId': 5,
+      'truckNo': 'WLN 1234',
+      'driverRefId': null,
+      'driverName': 'Ali (outside)',
+      'actualAmount': 4500,
+      'createEmployeeRefId': 44,
+      'createEmployeeName': null,
+      'createdBy': 'ADMIN',
+      'documentRemarks': 'Police report attached',
     });
 
     expect(report.id, 12);
@@ -40,9 +42,10 @@ void main() {
     expect(report.actualAmount, 4500);
     expect(report.reporterId, 44);
     expect(report.reporter, 'ADMIN');
+    expect(report.documentRemarks, 'Police report attached');
   });
 
-  test('the save body uses the IRSaveModel names and sends 0 for anything not picked', () {
+  test('the save body is an IrSaveRequest: nothing picked is null, no user id', () {
     final draft = IrDraft(
       id: 0,
       irDate: DateTime(2026, 9, 14, 7, 5),
@@ -53,43 +56,66 @@ void main() {
       driver: IrParty.empty.typed('Ali (outside)'),
     );
 
-    final body = IrJson.saveRequest(draft, companyId: 6, userRefId: 44);
-
-    expect(body['Id'], 0);
-    expect(body['CompanyRefId'], 6);
-    expect(body['UserRefId'], 44);
-    expect(body['IRDate'], '2026-09-14T07:05:00');
-    expect(body['IRStatusRefId'], 1);
-    expect(body['DepartmentRefId'], 1000);
-    expect(body['Description'], 'Truck accident');
-    expect(body['TruckRefId'], 5);
-    expect(body['TruckNo'], '');
-    expect(body['DriverRefId'], 0);
-    expect(body['DriverName'], 'Ali (outside)');
-    expect(body['EmployeeRefId'], 0);
-    expect(body['ActualAmount'], isNull);
-  });
-
-  test('the search body sends plain dates and 0 for every status', () {
-    final body = IrJson.searchRequest(
-      IrFilter(fromDate: DateTime(2026, 9, 1), toDate: DateTime(2026, 9, 14), search: ' sea '),
-      companyId: 6,
-    );
+    final body = IrJson.saveRequest(draft, companyId: 6);
 
     expect(body, {
-      'Comid': 6,
-      'FromDate': '2026-09-01',
-      'ToDate': '2026-09-14',
-      'IRStatusRefId': 0,
-      'OpenOnly': false,
-      'Search': 'sea',
+      'id': null,
+      'companyRefId': 6,
+      'irDate': '2026-09-14T07:05:00',
+      'irStatusRefId': 1,
+      'description': 'Truck accident',
+      'reason': null,
+      'departmentRefId': 1000,
+      'vesselName': null,
+      'truckRefId': 5,
+      'truckNo': null,
+      'employeeRefId': null,
+      'employeeName': null,
+      'driverRefId': null,
+      'driverName': 'Ali (outside)',
+      'actualAmount': null,
+      'documentRemarks': null,
     });
   });
 
-  test('master list rows are {Id, AccountName}', () {
-    expect(
-      IrJson.masterRow({'Id': '7', 'AccountName': ' MUTHU-DRIVER '}),
-      const LookupOption(id: 7, name: 'MUTHU-DRIVER'),
+  test('an edit sends the document notes back unchanged', () {
+    final report = IrReport(
+      id: 12,
+      irDate: DateTime(2026, 9, 10),
+      statusId: 1,
+      description: 'Truck accident',
+      departmentId: 1000,
+      departmentName: 'TRANSPORTATION',
+      documentRemarks: 'Police report attached',
     );
+    const lookups = IrLookups(statuses: [], departments: [], trucks: [], drivers: [], employees: []);
+
+    final draft = IrDraft.fromReport(report, lookups).copyWith(description: 'Truck accident at gate');
+    final body = IrJson.saveRequest(draft, companyId: 6);
+
+    expect(body['id'], 12);
+    expect(body['documentRemarks'], 'Police report attached');
+  });
+
+  test('the search query sends plain dates and leaves out every-status and a blank search', () {
+    expect(
+      IrJson.searchQuery(
+        IrFilter(fromDate: DateTime(2026, 9, 1), toDate: DateTime(2026, 9, 14), search: ' sea '),
+        companyId: 6,
+      ),
+      {'companyRefId': 6, 'fromDate': '2026-09-01', 'toDate': '2026-09-14', 'search': 'sea'},
+    );
+    expect(
+      IrJson.searchQuery(const IrFilter(statusId: 3, openOnly: true), companyId: 6),
+      {'companyRefId': 6, 'irStatusRefId': 3, 'openOnly': true},
+    );
+  });
+
+  test('picker rows', () {
+    expect(IrJson.masterRow({'Id': '7', 'AccountName': ' MUTHU-DRIVER '}), const LookupOption(id: 7, name: 'MUTHU-DRIVER'));
+    expect(IrJson.employee({'id': 3, 'employeeName': ' ANNA '}), const LookupOption(id: 3, name: 'ANNA'));
+    expect(IrJson.status({'id': 2, 'statusCode': 'DONE', 'statusName': 'Closed', 'colorCode': '#16A34A', 'finished': true}),
+        const IrStatus(id: 2, code: 'DONE', name: 'Closed', colorCode: '#16A34A', finished: true));
+    expect(IrJson.department({'id': 1000, 'name': 'TRANSPORTATION'}), const LookupOption(id: 1000, name: 'TRANSPORTATION'));
   });
 }

@@ -2,83 +2,78 @@ import 'package:maleva/core/utils/json_read.dart';
 
 import '../../domain/entities/truck_location_week.dart';
 
-/// JSON in and out of TruckLocationApp, in one place. The wire names are the
-/// .NET model's PascalCase properties.
+/// JSON in and out of the Java `/api/truck-locations` API, in one place
+/// (camelCase, as `TruckLocationWeekResponse` and the request DTOs declare it).
 class TruckLocationJson {
   TruckLocationJson._();
 
-  /// Data1 of SelectWeek / SaveWeek.
+  /// `Data1` of the week calls.
   static TruckLocationWeek week(Map<String, dynamic> data) {
-    final days = (data['Days'] is List)
-        ? (data['Days'] as List).map(_dateOnly).toList()
+    final days = (data['days'] is List)
+        ? (data['days'] as List).map(_dateOnly).toList()
         : const <String>[];
     return TruckLocationWeek(
-      weekStart: _dateOnly(data['WeekStart']),
+      weekStart: _dateOnly(data['weekStart']),
       days: days,
-      rows: JsonRead.listOfMaps(data['Rows']).map(_row).toList(),
+      rows: JsonRead.listOfMaps(data['rows']).map(_row).toList(),
     );
   }
 
   static TruckLocationRow _row(Map<String, dynamic> data) {
-    final locations = (data['Locations'] is List)
-        ? (data['Locations'] as List).map(JsonRead.string).toList()
+    final locations = (data['locations'] is List)
+        ? (data['locations'] as List).map(JsonRead.string).toList()
         : <String>[];
     while (locations.length < 7) {
       locations.add('');
     }
     return TruckLocationRow(
-      truckRefId: JsonRead.integer(data['TruckRefId']),
-      truckName: JsonRead.string(data['TruckName']),
-      truckNumber: JsonRead.string(data['TruckNumber']),
-      truckType: JsonRead.string(data['TruckType']),
-      truckStatus: JsonRead.string(data['TruckStatus']),
+      truckRefId: JsonRead.integer(data['truckRefId']),
+      truckName: JsonRead.string(data['truckName']),
+      truckNumber: JsonRead.string(data['truckNumber']),
+      truckType: JsonRead.string(data['truckType']),
+      truckStatus: JsonRead.string(data['truckStatus']),
       locations: locations,
-      lastKnownLocation: JsonRead.string(data['LastKnownLocation']),
-      done: JsonRead.boolean(data['Done']),
+      lastKnownLocation: JsonRead.string(data['lastKnownLocation']),
+      done: JsonRead.boolean(data['done']),
     );
   }
 
-  static Map<String, dynamic> weekRequest({
+  static Map<String, dynamic> weekQuery({
     required int companyId,
     required String date,
   }) =>
-      {'CompanyRefId': companyId, 'Date': date};
+      {'companyRefId': companyId, if (date.isNotEmpty) 'date': date};
 
+  /// The person saving is taken from the session token on the server.
   static Map<String, dynamic> saveRequest({
     required int companyId,
-    required int userRefId,
     required String weekStart,
     required List<TruckLocationCellChange> cells,
     required List<TruckLocationDoneTick> doneTicks,
   }) =>
       {
-        'CompanyRefId': companyId,
-        'UserRefId': userRefId,
-        'WeekStart': weekStart,
-        'Cells': [
+        'companyRefId': companyId,
+        'weekStart': weekStart,
+        'cells': [
           for (final cell in cells)
             {
-              'TruckRefId': cell.truckRefId,
-              'PlanDate': cell.planDate,
-              'Location': cell.location,
+              'truckRefId': cell.truckRefId,
+              'planDate': cell.planDate,
+              'location': cell.location,
             },
         ],
-        'DoneTicks': [
+        'doneTicks': [
           for (final tick in doneTicks)
-            {'TruckRefId': tick.truckRefId, 'Done': tick.done},
+            {'truckRefId': tick.truckRefId, 'done': tick.done},
         ],
+        'dayDoneTicks': const <Map<String, dynamic>>[],
       };
 
   static Map<String, dynamic> orderRequest({
     required int companyId,
-    required int userRefId,
     required List<int> truckRefIds,
   }) =>
-      {
-        'CompanyRefId': companyId,
-        'UserRefId': userRefId,
-        'TruckRefIds': truckRefIds,
-      };
+      {'companyRefId': companyId, 'truckRefIds': truckRefIds};
 
   /// "2026-09-20" whether the server sent a date or a date-time string.
   static String _dateOnly(dynamic value) {

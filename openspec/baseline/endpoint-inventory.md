@@ -141,15 +141,6 @@ Paths preserve casing and spelling from the code. `{base}` is AppConfig.baseUrl;
 | `apiSelectFuelFillingReport` | `{base}/api/MasterReportApp/SelectFuelFillings` | 2 | [reports_api.dart](../../lib/core/network/api_services/reports_api.dart) |
 | `apiSelectEngineHoursReport` | `{base}/api/MasterReportApp/SelectEngineHours` | 2 | [reports_api.dart](../../lib/core/network/api_services/reports_api.dart) |
 | `apiSelectDriverSalary` | `{base}/api/TransactionReportApp/DriverRTIDetailedReport` | 2 | [reports_api.dart](../../lib/core/network/api_services/reports_api.dart) |
-| `apiSelectIR` | `{base}/api/IRApp/SelectIR` | 1 | [ir_remote_data_source.dart](../../lib/features/ir_report/data/datasources/ir_remote_data_source.dart) |
-| `apiEditIR` | `{base}/api/IRApp/EditIR` | 1 | [ir_remote_data_source.dart](../../lib/features/ir_report/data/datasources/ir_remote_data_source.dart) |
-| `apiInsertIR` | `{base}/api/IRApp/InsertIR` | 1 | [ir_remote_data_source.dart](../../lib/features/ir_report/data/datasources/ir_remote_data_source.dart) |
-| `apiDeleteIR` | `{base}/api/IRApp/DeleteIR` | 1 | [ir_remote_data_source.dart](../../lib/features/ir_report/data/datasources/ir_remote_data_source.dart) |
-| `apiSelectIRStatus` | `{base}/api/IRApp/SelectIRStatus` | 1 | [ir_remote_data_source.dart](../../lib/features/ir_report/data/datasources/ir_remote_data_source.dart) |
-| `apiSelectIRDepartments` | `{base}/api/IRApp/SelectIRDepartments` | 1 | [ir_remote_data_source.dart](../../lib/features/ir_report/data/datasources/ir_remote_data_source.dart) |
-| `apiTruckLocationSelectWeek` | `{base}/api/TruckLocationApp/SelectWeek` | 1 | [truck_location_remote_data_source.dart](../../lib/features/truck_location/data/datasources/truck_location_remote_data_source.dart) |
-| `apiTruckLocationSaveWeek` | `{base}/api/TruckLocationApp/SaveWeek` | 1 | [truck_location_remote_data_source.dart](../../lib/features/truck_location/data/datasources/truck_location_remote_data_source.dart) |
-| `apiTruckLocationSaveOrder` | `{base}/api/TruckLocationApp/SaveOrder` | 1 | [truck_location_remote_data_source.dart](../../lib/features/truck_location/data/datasources/truck_location_remote_data_source.dart) |
 | `apiInsertAppLog` | `{base}/api/AppLogApp/InsertAppLog` | 0 | No lexical reference found |
 
 ## Inline API path literals outside the constants file

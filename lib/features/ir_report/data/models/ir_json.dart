@@ -6,11 +6,8 @@ import '../../domain/entities/ir_filter.dart';
 import '../../domain/entities/ir_lookup.dart';
 import '../../domain/entities/ir_report.dart';
 
-/// JSON to entities and back for /api/IRApp.
-///
-/// The keys are the .NET model property names exactly as IRModel.cs declares
-/// them (PascalCase): a key spelled differently binds to nothing on the
-/// server and the value is silently dropped.
+/// JSON to entities and back for the Java `/api/ir` API (camelCase, as
+/// `IrDetailDto`, `IrSaveRequest` and the option DTOs declare it).
 class IrJson {
   IrJson._();
 
@@ -19,50 +16,50 @@ class IrJson {
 
   static IrReport report(Map<String, dynamic> json) {
     return IrReport(
-      id: JsonRead.integer(json['Id']),
-      irDate: JsonRead.date(json['IRDate']) ?? DateTime(1900),
-      statusId: JsonRead.integer(json['IRStatusRefId']),
-      statusCode: JsonRead.stringOrNull(json['StatusCode']),
-      statusName: JsonRead.stringOrNull(json['StatusName']),
-      statusColor: JsonRead.stringOrNull(json['StatusColor']),
-      description: JsonRead.string(json['Description']),
-      reason: JsonRead.stringOrNull(json['Reason']),
-      departmentId: JsonRead.integer(json['DepartmentRefId']),
-      departmentName: JsonRead.string(json['DepartmentName']),
-      vesselName: JsonRead.stringOrNull(json['VesselName']),
-      truckId: JsonRead.intOrNull(json['TruckRefId']),
-      truckNo: JsonRead.stringOrNull(json['TruckNo']),
-      employeeId: JsonRead.intOrNull(json['EmployeeRefId']),
-      employeeName: JsonRead.stringOrNull(json['EmployeeName']),
-      driverId: JsonRead.intOrNull(json['DriverRefId']),
-      driverName: JsonRead.stringOrNull(json['DriverName']),
-      actualAmount: JsonRead.intOrNull(json['ActualAmount']),
-      reporterId: JsonRead.intOrNull(json['CreateEmployeeRefId']),
-      reporterName: JsonRead.stringOrNull(json['CreateEmployeeName']),
-      createdBy: JsonRead.stringOrNull(json['Created_By']),
-      createdDate: JsonRead.date(json['Created_Date']),
+      id: JsonRead.integer(json['id']),
+      irDate: JsonRead.date(json['irDate']) ?? DateTime(1900),
+      statusId: JsonRead.integer(json['irStatusRefId']),
+      statusCode: JsonRead.stringOrNull(json['statusCode']),
+      statusName: JsonRead.stringOrNull(json['statusName']),
+      statusColor: JsonRead.stringOrNull(json['statusColor']),
+      description: JsonRead.string(json['description']),
+      reason: JsonRead.stringOrNull(json['reason']),
+      departmentId: JsonRead.integer(json['departmentRefId']),
+      departmentName: JsonRead.string(json['departmentName']),
+      vesselName: JsonRead.stringOrNull(json['vesselName']),
+      truckId: JsonRead.intOrNull(json['truckRefId']),
+      truckNo: JsonRead.stringOrNull(json['truckNo']),
+      employeeId: JsonRead.intOrNull(json['employeeRefId']),
+      employeeName: JsonRead.stringOrNull(json['employeeName']),
+      driverId: JsonRead.intOrNull(json['driverRefId']),
+      driverName: JsonRead.stringOrNull(json['driverName']),
+      actualAmount: JsonRead.intOrNull(json['actualAmount']),
+      reporterId: JsonRead.intOrNull(json['createEmployeeRefId']),
+      reporterName: JsonRead.stringOrNull(json['createEmployeeName']),
+      createdBy: JsonRead.stringOrNull(json['createdBy']),
+      createdDate: JsonRead.date(json['createdDate']),
+      documentRemarks: JsonRead.stringOrNull(json['documentRemarks']),
     );
   }
 
   static IrStatus status(Map<String, dynamic> json) {
     return IrStatus(
-      id: JsonRead.integer(json['Id']),
-      code: JsonRead.string(json['StatusCode']),
-      name: JsonRead.string(json['StatusName']),
-      colorCode: JsonRead.stringOrNull(json['ColorCode']),
-      finished: JsonRead.boolean(json['Finished']),
+      id: JsonRead.integer(json['id']),
+      code: JsonRead.string(json['statusCode']),
+      name: JsonRead.string(json['statusName']),
+      colorCode: JsonRead.stringOrNull(json['colorCode']),
+      finished: JsonRead.boolean(json['finished']),
     );
   }
 
   static LookupOption department(Map<String, dynamic> json) {
     return LookupOption(
-      id: JsonRead.integer(json['Id']),
-      name: JsonRead.string(json['Name']),
+      id: JsonRead.integer(json['id']),
+      name: JsonRead.string(json['name']),
     );
   }
 
-  /// A row of TruckApp/GetTruck, DriverApp/GetDriver or EmployeeApp/GetEmployee,
-  /// which all answer `{Id, AccountName}`.
+  /// A row of TruckApp/GetTruck or DriverApp/GetDriver: `{Id, AccountName}`.
   static LookupOption masterRow(Map<String, dynamic> json) {
     return LookupOption(
       id: JsonRead.integer(json['Id']),
@@ -70,43 +67,51 @@ class IrJson {
     );
   }
 
-  /// Body of IRApp/SelectIR (IRSearchModel).
-  static Map<String, dynamic> searchRequest(IrFilter filter, {required int companyId}) {
+  /// A row of `/api/employees/company/{id}/all`.
+  static LookupOption employee(Map<String, dynamic> json) {
+    return LookupOption(
+      id: JsonRead.integer(json['id']),
+      name: JsonRead.string(json['employeeName']).trim(),
+    );
+  }
+
+  /// Query of `GET /api/ir`. "Every status" and a blank search are left out,
+  /// as the web screen does.
+  static Map<String, dynamic> searchQuery(IrFilter filter, {required int companyId}) {
+    final search = filter.search.trim();
     return {
-      'Comid': companyId,
-      'FromDate': filter.fromDate == null ? null : _date.format(filter.fromDate!),
-      'ToDate': filter.toDate == null ? null : _date.format(filter.toDate!),
-      'IRStatusRefId': filter.statusId,
-      'OpenOnly': filter.openOnly,
-      'Search': filter.search.trim(),
+      'companyRefId': companyId,
+      if (filter.fromDate != null) 'fromDate': _date.format(filter.fromDate!),
+      if (filter.toDate != null) 'toDate': _date.format(filter.toDate!),
+      if (filter.statusId != 0) 'irStatusRefId': filter.statusId,
+      if (filter.openOnly) 'openOnly': true,
+      if (search.isNotEmpty) 'search': search,
     };
   }
 
-  /// Body of IRApp/InsertIR (IRSaveModel). Ids are 0 for "not chosen", which the
-  /// server treats as null; a typed truck/driver/employee name travels only
-  /// with a 0 id.
-  static Map<String, dynamic> saveRequest(
-    IrDraft draft, {
-    required int companyId,
-    required int userRefId,
-  }) {
+  /// Body of `POST /api/ir` (IrSaveRequest). A picker left empty is null; a
+  /// typed truck/driver/employee name travels only without an id. The author
+  /// is the signed-in user, set by the server.
+  static Map<String, dynamic> saveRequest(IrDraft draft, {required int companyId}) {
+    int? idOrNull(int id) => id == 0 ? null : id;
+    String? textOrNull(String text) => text.trim().isEmpty ? null : text.trim();
     return {
-      'Id': draft.id,
-      'CompanyRefId': companyId,
-      'UserRefId': userRefId,
-      'IRDate': draft.irDate == null ? null : _dateTime.format(draft.irDate!),
-      'IRStatusRefId': draft.status?.id ?? 0,
-      'Description': draft.description.trim(),
-      'Reason': draft.reason.trim(),
-      'DepartmentRefId': draft.department?.id ?? 0,
-      'VesselName': draft.vesselName.trim(),
-      'TruckRefId': draft.truck.refId,
-      'TruckNo': draft.truck.name,
-      'EmployeeRefId': draft.employee.refId,
-      'EmployeeName': draft.employee.name,
-      'DriverRefId': draft.driver.refId,
-      'DriverName': draft.driver.name,
-      'ActualAmount': draft.amount,
+      'id': idOrNull(draft.id),
+      'companyRefId': companyId,
+      'irDate': draft.irDate == null ? null : _dateTime.format(draft.irDate!),
+      'irStatusRefId': draft.status?.id,
+      'description': draft.description.trim(),
+      'reason': textOrNull(draft.reason),
+      'departmentRefId': draft.department?.id,
+      'vesselName': textOrNull(draft.vesselName),
+      'truckRefId': idOrNull(draft.truck.refId),
+      'truckNo': textOrNull(draft.truck.name),
+      'employeeRefId': idOrNull(draft.employee.refId),
+      'employeeName': textOrNull(draft.employee.name),
+      'driverRefId': idOrNull(draft.driver.refId),
+      'driverName': textOrNull(draft.driver.name),
+      'actualAmount': draft.amount,
+      'documentRemarks': draft.documentRemarks,
     };
   }
 }

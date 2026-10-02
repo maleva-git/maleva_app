@@ -1,77 +1,61 @@
 import 'package:dio/dio.dart';
-import 'package:maleva/core/network/api_constants.dart';
-import 'package:maleva/core/network/legacy_api_exception.dart';
+import 'package:maleva/core/lookups/shared_lookups.dart';
+import 'package:maleva/core/network/java_response.dart';
 import 'package:maleva/core/utils/json_read.dart';
 
-/// The HTTP calls behind the IR screens: IRApp on the .NET API, plus the three
-/// master lists the form's dropdowns need.
+/// The HTTP calls behind the IR screens: the Java `/api/ir` API the web app
+/// uses, plus the pickers' lists. Sent through `JavaApiClient`'s Dio (session
+/// token, refresh on 401).
 ///
 /// Returns raw JSON; turning it into entities is the repository's job. Every
-/// failure leaves here as a [LegacyApiException].
+/// failure leaves here as an `ApiFailure` with the server's message.
 class IrRemoteDataSource {
   IrRemoteDataSource(this._dio);
 
   final Dio _dio;
 
-  Future<Map<String, dynamic>> select(Map<String, dynamic> body) =>
-      _envelope(ApiConstants.apiSelectIR, body: body);
+  /// `{items, count, totalAmount}`.
+  Future<Map<String, dynamic>> search(Map<String, dynamic> query) async =>
+      JsonRead.map(await _data(() => _dio.get<dynamic>('/api/ir', queryParameters: query)));
 
-  Future<Map<String, dynamic>> edit(int id, int companyId) =>
-      _envelope(ApiConstants.apiEditIR, query: {'Id': id, 'Comid': companyId});
+  Future<Map<String, dynamic>> getById(int id, int companyId) async => JsonRead.map(
+      await _data(() => _dio.get<dynamic>('/api/ir/$id', queryParameters: {'companyRefId': companyId})));
 
-  Future<Map<String, dynamic>> insert(Map<String, dynamic> body) =>
-      _envelope(ApiConstants.apiInsertIR, body: body);
+  Future<Map<String, dynamic>> save(Map<String, dynamic> body) async =>
+      JsonRead.map(await _data(() => _dio.post<dynamic>('/api/ir', data: body)));
 
-  Future<void> delete(int id, int companyId, int userRefId) => _envelope(
-        ApiConstants.apiDeleteIR,
-        query: {'Id': id, 'Comid': companyId, 'UserRefId': userRefId},
-      );
+  Future<void> delete(int id, int companyId) =>
+      _data(() => _dio.delete<dynamic>('/api/ir/$id', queryParameters: {'companyRefId': companyId}));
 
-  Future<List<Map<String, dynamic>>> statuses(int companyId) async {
-    final envelope = await _envelope(ApiConstants.apiSelectIRStatus, query: {'Comid': companyId});
-    return JsonRead.listOfMaps(envelope['Data1']);
-  }
+  Future<List<Map<String, dynamic>>> statuses(int companyId) async => JsonRead.listOfMaps(
+      await _data(() => _dio.get<dynamic>('/api/ir/statuses', queryParameters: {'companyRefId': companyId})));
 
-  Future<List<Map<String, dynamic>>> departments() async {
-    final envelope = await _envelope(ApiConstants.apiSelectIRDepartments);
-    return JsonRead.listOfMaps(envelope['Data1']);
-  }
+  Future<List<Map<String, dynamic>>> departments() async =>
+      JsonRead.listOfMaps(await _data(() => _dio.get<dynamic>('/api/ir/departments')));
 
-  // The master list endpoints answer with the bare row list, not an envelope.
-
-  Future<List<Map<String, dynamic>>> trucks(int companyId) =>
-      _rows('${ApiConstants.apiGetTruckList}$companyId&type=');
-
-  Future<List<Map<String, dynamic>>> drivers(int companyId) =>
-      _rows('${ApiConstants.apiGetDriverList}$companyId&type=');
-
+  /// Every active employee of the company (a bare list, `{id, employeeName}`).
   Future<List<Map<String, dynamic>>> employees(int companyId) =>
-      _rows('${ApiConstants.apiSelectEmployee}$companyId&type=&type1=');
+      _list(() => _dio.get<dynamic>('/api/employees/company/$companyId/all'));
 
-  Future<Map<String, dynamic>> _envelope(
-    String url, {
-    Map<String, dynamic>? body,
-    Map<String, dynamic>? query,
-  }) async {
+  // The truck and driver pickers read the shared lookups (`{Id, AccountName}` rows).
+
+  Future<List<Map<String, dynamic>>> trucks(int companyId) => SharedLookups(_dio).trucks(companyId);
+
+  Future<List<Map<String, dynamic>>> drivers(int companyId) => SharedLookups(_dio).drivers(companyId);
+
+  Future<dynamic> _data(Future<Response<dynamic>> Function() call) async {
     try {
-      final response = await _dio.post<dynamic>(
-        url,
-        data: body ?? const <String, dynamic>{},
-        queryParameters: query,
-      );
-      return LegacyResponse.envelope(response.data);
+      return JavaResponse.data((await call()).data);
     } on DioException catch (error) {
-      throw LegacyResponse.fromDio(error);
+      throw JavaResponse.fromDio(error);
     }
   }
 
-  Future<List<Map<String, dynamic>>> _rows(String url) async {
+  Future<List<Map<String, dynamic>>> _list(Future<Response<dynamic>> Function() call) async {
     try {
-      final response = await _dio.post<dynamic>(url, data: const <String, dynamic>{});
-      final data = response.data;
-      return JsonRead.listOfMaps(data is Map ? data['Data1'] : data);
+      return JsonRead.listOfMaps((await call()).data);
     } on DioException catch (error) {
-      throw LegacyResponse.fromDio(error);
+      throw JavaResponse.fromDio(error);
     }
   }
 }

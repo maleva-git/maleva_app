@@ -1,5 +1,5 @@
 import 'package:equatable/equatable.dart';
-import 'package:maleva/core/network/legacy_api_exception.dart';
+import 'package:maleva/core/network/api_failure.dart';
 
 enum IrViewStatus { initial, loading, success, failure }
 
@@ -23,7 +23,7 @@ class IrUiMessage extends Equatable {
 /// A readable reason for a failed call: the server's own message when it sent
 /// one, otherwise the error text without Dart's "Exception: " prefix.
 String describeError(Object error) {
-  if (error is LegacyApiException) return error.message;
+  if (error is ApiFailure) return error.message;
   final text = error.toString().replaceFirst('Exception: ', '').trim();
   return text.isEmpty ? 'Something went wrong. Please try again.' : text;
 }

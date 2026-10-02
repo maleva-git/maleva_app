@@ -7,8 +7,9 @@ import '../domain/entities/ir_report.dart';
 /// Everyone sees every report and may file a new one. A report can be changed
 /// by the person who filed it or by an admin, and deleted by an admin only.
 ///
-/// Enforced in the app only: the .NET IRApp endpoints take no login, so this
-/// keeps users from mistakes, not a caller who goes around the app.
+/// Enforced in the app: the Java /api/ir endpoints require a login and scope
+/// rows to the company, but do not check these per-user rights, so this keeps
+/// users from mistakes, not a caller who goes around the app.
 class IrPermissions {
   const IrPermissions({
     this.canAdd = true,

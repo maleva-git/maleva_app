@@ -1,38 +1,34 @@
 import 'package:dio/dio.dart';
-import 'package:maleva/core/network/api_constants.dart';
-import 'package:maleva/core/network/legacy_api_exception.dart';
+import 'package:maleva/core/network/java_response.dart';
 import 'package:maleva/core/utils/json_read.dart';
 
-/// The HTTP calls behind the Truck Location Board: TruckLocationApp on the
-/// .NET API, all POST with the model in the JSON body.
+/// The HTTP calls behind the Truck Location Board: the Java
+/// `/api/truck-locations` API the web board uses, through `JavaApiClient`'s
+/// Dio (session token, refresh on 401).
 ///
 /// Returns raw JSON; turning it into entities is the repository's job. Every
-/// failure leaves here as a [LegacyApiException] carrying the server's own
-/// message (the endpoints answer 400 with the envelope in the body).
+/// failure leaves here as an `ApiFailure` with the server's message.
 class TruckLocationRemoteDataSource {
   TruckLocationRemoteDataSource(this._dio);
 
   final Dio _dio;
 
-  Future<Map<String, dynamic>> selectWeek(Map<String, dynamic> body) async {
-    final envelope = await _envelope(ApiConstants.apiTruckLocationSelectWeek, body);
-    return JsonRead.map(envelope['Data1']);
-  }
+  /// The week containing `date`.
+  Future<Map<String, dynamic>> week(Map<String, dynamic> query) async => JsonRead.map(
+      await _data(() => _dio.get<dynamic>('/api/truck-locations/week', queryParameters: query)));
 
-  Future<Map<String, dynamic>> saveWeek(Map<String, dynamic> body) async {
-    final envelope = await _envelope(ApiConstants.apiTruckLocationSaveWeek, body);
-    return JsonRead.map(envelope['Data1']);
-  }
+  /// Save All; answers the saved week.
+  Future<Map<String, dynamic>> saveWeek(Map<String, dynamic> body) async =>
+      JsonRead.map(await _data(() => _dio.post<dynamic>('/api/truck-locations/week', data: body)));
 
   Future<void> saveOrder(Map<String, dynamic> body) =>
-      _envelope(ApiConstants.apiTruckLocationSaveOrder, body);
+      _data(() => _dio.post<dynamic>('/api/truck-locations/order', data: body));
 
-  Future<Map<String, dynamic>> _envelope(String url, Map<String, dynamic> body) async {
+  Future<dynamic> _data(Future<Response<dynamic>> Function() call) async {
     try {
-      final response = await _dio.post<dynamic>(url, data: body);
-      return LegacyResponse.envelope(response.data);
+      return JavaResponse.data((await call()).data);
     } on DioException catch (error) {
-      throw LegacyResponse.fromDio(error);
+      throw JavaResponse.fromDio(error);
     }
   }
 }

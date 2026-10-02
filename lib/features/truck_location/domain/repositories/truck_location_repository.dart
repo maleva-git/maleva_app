@@ -1,7 +1,7 @@
 import '../entities/truck_location_week.dart';
 
 /// What the Truck Location screens need from the backend. Failures surface as
-/// LegacyApiException with the server's own message.
+/// ApiFailure with the server's own message.
 abstract interface class TruckLocationRepository {
   /// The week containing [date] (yyyy-MM-dd); the server moves it to Sunday.
   Future<TruckLocationWeek> week(String date);

@@ -1,5 +1,5 @@
 import 'package:equatable/equatable.dart';
-import 'package:maleva/core/network/legacy_api_exception.dart';
+import 'package:maleva/core/network/api_failure.dart';
 
 enum TruckLocationStatus { initial, loading, success, failure }
 
@@ -28,7 +28,7 @@ class TruckLocationUiMessage extends Equatable {
 /// one (a 400 comes back as typed), otherwise the error text without Dart's
 /// "Exception: " prefix.
 String describeTruckLocationError(Object error) {
-  if (error is LegacyApiException) return error.message;
+  if (error is ApiFailure) return error.message;
   final text = error.toString().replaceFirst('Exception: ', '').trim();
   return text.isEmpty ? 'Something went wrong. Please try again.' : text;
 }

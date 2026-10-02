@@ -1,5 +1,5 @@
 import 'package:get_it/get_it.dart';
-import 'package:maleva/core/network/dio_client.dart';
+import 'package:maleva/core/network/java_api_client.dart';
 import 'package:maleva/core/session/app_session.dart';
 
 import 'data/datasources/ir_remote_data_source.dart';
@@ -17,7 +17,7 @@ void registerIrReportModule(GetIt sl) {
   }
 
   sl
-    ..registerLazySingleton<IrRemoteDataSource>(() => IrRemoteDataSource(sl<DioClient>().dio))
+    ..registerLazySingleton<IrRemoteDataSource>(() => IrRemoteDataSource(sl<JavaApiClient>().dio))
     ..registerLazySingleton<IrRepository>(
       () => IrRepositoryImpl(remote: sl<IrRemoteDataSource>(), session: sl<AppSession>()),
     )

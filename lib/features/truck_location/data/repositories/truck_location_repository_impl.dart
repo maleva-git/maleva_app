@@ -17,9 +17,7 @@ class TruckLocationRepositoryImpl implements TruckLocationRepository {
 
   @override
   Future<TruckLocationWeek> week(String date) async {
-    final data = await _remote.selectWeek(
-      TruckLocationJson.weekRequest(companyId: _session.companyId, date: date),
-    );
+    final data = await _remote.week(TruckLocationJson.weekQuery(companyId: _session.companyId, date: date));
     return TruckLocationJson.week(data);
   }
 
@@ -31,9 +29,6 @@ class TruckLocationRepositoryImpl implements TruckLocationRepository {
   }) async {
     final data = await _remote.saveWeek(TruckLocationJson.saveRequest(
       companyId: _session.companyId,
-      // 0 for a driver login; the server then stamps "system". Drivers have
-      // no menu entry, so this is belt and braces, not a code path.
-      userRefId: _session.employeeId,
       weekStart: weekStart,
       cells: cells,
       doneTicks: doneTicks,
@@ -43,10 +38,6 @@ class TruckLocationRepositoryImpl implements TruckLocationRepository {
 
   @override
   Future<void> saveOrder(List<int> truckRefIds) => _remote.saveOrder(
-        TruckLocationJson.orderRequest(
-          companyId: _session.companyId,
-          userRefId: _session.employeeId,
-          truckRefIds: truckRefIds,
-        ),
+        TruckLocationJson.orderRequest(companyId: _session.companyId, truckRefIds: truckRefIds),
       );
 }

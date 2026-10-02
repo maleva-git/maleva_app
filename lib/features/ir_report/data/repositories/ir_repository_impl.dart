@@ -20,37 +20,24 @@ class IrRepositoryImpl implements IrRepository {
 
   @override
   Future<IrListResult> search(IrFilter filter) async {
-    final envelope = await _remote.select(
-      IrJson.searchRequest(filter, companyId: _session.companyId),
-    );
-    final items = JsonRead.listOfMaps(envelope['Data1']).map(IrJson.report).toList();
-    // IRApp/SelectIR: Data2 = sum of ActualAmount, Data3 = row count.
+    final data = await _remote.search(IrJson.searchQuery(filter, companyId: _session.companyId));
+    final items = JsonRead.listOfMaps(data['items']).map(IrJson.report).toList();
     return IrListResult(
       items: items,
-      totalAmount: JsonRead.integer(envelope['Data2']),
-      count: JsonRead.integer(envelope['Data3'], fallback: items.length),
+      totalAmount: JsonRead.integer(data['totalAmount']),
+      count: JsonRead.integer(data['count'], fallback: items.length),
     );
   }
 
   @override
-  Future<IrReport> getById(int id) async {
-    final envelope = await _remote.edit(id, _session.companyId);
-    return IrJson.report(JsonRead.map(envelope['Data1']));
-  }
+  Future<IrReport> getById(int id) async => IrJson.report(await _remote.getById(id, _session.companyId));
 
   @override
-  Future<IrReport> save(IrDraft draft) async {
-    final envelope = await _remote.insert(IrJson.saveRequest(
-      draft,
-      companyId: _session.companyId,
-      userRefId: _session.employeeId,
-    ));
-    return IrJson.report(JsonRead.map(envelope['Data1']));
-  }
+  Future<IrReport> save(IrDraft draft) async =>
+      IrJson.report(await _remote.save(IrJson.saveRequest(draft, companyId: _session.companyId)));
 
   @override
-  Future<void> delete(int id) =>
-      _remote.delete(id, _session.companyId, _session.employeeId);
+  Future<void> delete(int id) => _remote.delete(id, _session.companyId);
 
   @override
   Future<List<IrStatus>> statuses() async {
@@ -74,7 +61,7 @@ class IrRepositoryImpl implements IrRepository {
       departments: results[1].map(IrJson.department).toList(),
       trucks: _sorted(results[2].map(IrJson.masterRow)),
       drivers: _sorted(results[3].map(IrJson.masterRow)),
-      employees: _sorted(results[4].map(IrJson.masterRow)),
+      employees: _sorted(results[4].map(IrJson.employee)),
     );
   }
 

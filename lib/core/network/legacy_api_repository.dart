@@ -5,12 +5,15 @@ import 'package:flutter/material.dart';
 import 'package:maleva/core/utils/app_globals.dart';
 import 'package:maleva/core/network/api_constants.dart';
 import 'package:maleva/core/network/dio_client.dart';
+import 'package:maleva/core/network/java_api_client.dart';
+import 'package:maleva/core/network/java_route.dart';
+import 'package:maleva/core/network/legacy_call_adapter.dart';
+import 'package:get_it/get_it.dart';
 import 'package:dio/dio.dart';
 import 'package:maleva/core/models/shared/agent_company_model.dart';
 import 'package:maleva/features/operations/models/job_all_status_model.dart';
 import 'package:maleva/features/operations/models/job_type_model.dart';
 import 'package:maleva/core/models/shared/get_truck_model.dart';
-import 'package:maleva/core/models/shared/address_details_model.dart';
 import 'package:maleva/features/auth/models/user_login_model.dart';
 import 'package:maleva/core/models/shared/customer_model.dart';
 import 'package:maleva/core/models/shared/truck_details_model.dart';
@@ -29,8 +32,25 @@ import 'package:maleva/core/models/shared/r_t_i_details_view_model.dart';
 
 class LegacyApiRepository {
   final DioClient _dioClient;
+  final JavaApiClient? _javaClient;
 
-  LegacyApiRepository(this._dioClient);
+  LegacyApiRepository(this._dioClient, {JavaApiClient? java}) : _javaClient = java;
+
+  /// The client for [url]: the Java client (session token, refresh on 401)
+  /// for a Java URL, the legacy client otherwise. [url] is already resolved
+  /// with [JavaRoute.resolve].
+  /// A POST to [url]: an old lookup or fuel call is answered by the shared Java
+  /// APIs; a moved controller goes to Java; anything else to .NET.
+  Future<Response<dynamic>> _routedPost(String url, {Object? data, Options? options}) {
+    if (LegacyCallAdapter.handles(url)) {
+      return LegacyCallAdapter.asResponse(url, body: data, headers: options?.headers);
+    }
+    final resolved = JavaRoute.resolve(url);
+    return _dioFor(resolved).post(resolved, data: data, options: options);
+  }
+
+  Dio _dioFor(String url) =>
+      JavaRoute.isJava(url) ? (_javaClient ?? GetIt.instance<JavaApiClient>()).dio : _dioClient.dio;
 
   List<dynamic> _ensureList(dynamic data) {
     if (data == null) return [];
@@ -57,7 +77,7 @@ class LegacyApiRepository {
       }
       
       final options = headers != null ? Options(headers: headers) : null;
-      final response = await _dioClient.dio.post(url, data: data ?? {}, options: options);
+      final response = await _routedPost(url, data: data ?? {}, options: options);
       return response.data;
     } on DioException catch (e) {
       // Return the response body even on 4xx/5xx — callers can inspect IsSuccess/StatusCode
@@ -83,7 +103,7 @@ class LegacyApiRepository {
       }
 
       final options = headers != null ? Options(headers: headers) : null;
-      final response = await _dioClient.dio.post(url, data: data ?? {}, options: options);
+      final response = await _routedPost(url, data: data ?? {}, options: options);
       return _ensureList(response.data);
     } on DioException catch (e) {
       if (e.response?.data != null) {
@@ -122,7 +142,8 @@ class LegacyApiRepository {
 
   Future<String> apiGetString(dynamic api, [dynamic insertDetails, Map<String, String>? header, BuildContext? context]) async {
     try {
-      final options = header != null ? Options(headers: header) : null; final response = await _dioClient.dio.post(api.toString(), data: insertDetails ?? {}, options: options);
+      final options = header != null ? Options(headers: header) : null;
+      final response = await _routedPost(api.toString(), data: insertDetails ?? {}, options: options);
       return response.data?.toString() ?? '';
     } catch (e) {
       print("API Error: $e");
@@ -136,7 +157,7 @@ Future SelectUser(context) async {
     AppGlobals.UserList.clear();
     var Comid = AppGlobals.storagenew.getInt('Comid') ?? 0;
     try {
-  final resultData = _ensureList((await _dioClient.dio.post(
+  final resultData = _ensureList((await _routedPost(
             Uri.encodeFull("${ApiConstants.apiSelectUser}$Comid"), data: null ?? {})).data);
   if (resultData.isNotEmpty) {
         AppGlobals.UserList = resultData
@@ -155,7 +176,7 @@ Future SelectCustomer(context) async {
     AppGlobals.CustomerList.clear();
     var Comid = AppGlobals.storagenew.getInt('Comid') ?? 0;
     try {
-  final resultData = _ensureList((await _dioClient.dio.post(
+  final resultData = _ensureList((await _routedPost(
             Uri.encodeFull("${ApiConstants.apiSelectCustomer}$Comid"), data: null ?? {})).data);
   if (resultData.isNotEmpty) {
         AppGlobals.CustomerList = resultData
@@ -174,7 +195,7 @@ Future SelectLocation(context) async {
     AppGlobals.LocationList.clear();
     var Comid = AppGlobals.storagenew.getInt('Comid') ?? 0;
     try {
-  final resultData = _ensureList((await _dioClient.dio.post(
+  final resultData = _ensureList((await _routedPost(
         Uri.encodeFull("${ApiConstants.apiSelectLocation}$Comid"), data: null ?? {})).data);
   if (resultData.isNotEmpty) {
         AppGlobals.LocationList = resultData
@@ -193,7 +214,7 @@ Future SelectWareHouse(context) async {
     AppGlobals.WareHouseList.clear();
     var Comid = AppGlobals.storagenew.getInt('Comid') ?? 0;
     try {
-  final resultData = ((await _dioClient.dio.post(
+  final resultData = ((await _routedPost(
         Uri.encodeFull("${ApiConstants.apiWareHouseCombo}$Comid"), data: null ?? {})).data);
   if (resultData.isNotEmpty) {
         AppGlobals.WareHouseList = resultData["Data1"]
@@ -212,7 +233,7 @@ Future SelectStockJob(context) async {
     AppGlobals.StockJobList.clear();
     var Comid = AppGlobals.storagenew.getInt('Comid') ?? 0;
     try {
-  final resultData = ((await _dioClient.dio.post(
+  final resultData = ((await _routedPost(
         Uri.encodeFull("${ApiConstants.apiSelectStockJob}$Comid"), data: null ?? {})).data);
   if (resultData.isNotEmpty) {
         AppGlobals.StockJobList = resultData["Data1"]
@@ -231,7 +252,7 @@ Future SelectEmployee(context, String type, String type1) async {
     AppGlobals.EmployeeList.clear();
     var Comid = AppGlobals.storagenew.getInt('Comid') ?? 0;
     try {
-  final resultData = _ensureList((await _dioClient.dio.post(
+  final resultData = _ensureList((await _routedPost(
             Uri.encodeFull("${ApiConstants.apiSelectEmployee}$Comid&type=$type&type1=$type1"), data: null ?? {})).data);
   if (resultData.isNotEmpty) {
         AppGlobals.EmployeeList = resultData
@@ -250,7 +271,7 @@ Future SelectJobStatus(context) async {
     AppGlobals.JobStatusList.clear();
     var Comid = AppGlobals.storagenew.getInt('Comid') ?? 0;
     try {
-  final resultData = _ensureList((await _dioClient.dio.post(
+  final resultData = _ensureList((await _routedPost(
             Uri.encodeFull("${ApiConstants.apiSelectJobStatus}$Comid"), data: null ?? {})).data);
   if (resultData.isNotEmpty) {
         AppGlobals.JobStatusList = resultData
@@ -268,7 +289,7 @@ Future MaxSaleOrderNo(context, String BillType) async {
   try {
     var Comid = AppGlobals.storagenew.getInt('Comid') ?? 0;
     try {
-  final resultData = ((await _dioClient.dio.post(
+  final resultData = ((await _routedPost(
             "${ApiConstants.apiMaxSaleOrderNo}$Comid&BillType=$BillType", data: {})).data?.toString() ?? "");
   if (resultData.isNotEmpty) {
         AppGlobals.MaxSaleOrderNum = resultData;
@@ -284,7 +305,7 @@ Future MaxStockNo(context) async {
   try {
     var Comid = AppGlobals.storagenew.getInt('Comid') ?? 0;
     try {
-  final resultData = ((await _dioClient.dio.post(
+  final resultData = ((await _routedPost(
             Uri.encodeFull("${ApiConstants.apiMaxStockNo}$Comid"), data: null ?? {})).data);
   if (resultData.isNotEmpty) {
        // var checkdata = resultData["Data1"];
@@ -302,7 +323,7 @@ Future SelectJobType(context) async {
     AppGlobals.JobTypeList.clear();
     var Comid = AppGlobals.storagenew.getInt('Comid') ?? 0;
     try {
-  final resultData = _ensureList((await _dioClient.dio.post(
+  final resultData = _ensureList((await _routedPost(
             Uri.encodeFull("${ApiConstants.apiSelectJobType}$Comid"), data: null ?? {})).data);
   if (resultData.isNotEmpty) {
         AppGlobals.JobTypeList = resultData
@@ -321,7 +342,7 @@ Future SelectAllJobStatus(context, int Jobid) async {
     AppGlobals.JobAllStatusList.clear();
     var Comid = AppGlobals.storagenew.getInt('Comid') ?? 0;
     try {
-  final resultData = _ensureList((await _dioClient.dio.post(
+  final resultData = _ensureList((await _routedPost(
             Uri.encodeFull("${ApiConstants.apiSelectAllJobStatus}$Comid&Jobid=$Jobid"), data: null ?? {})).data);
   if (resultData.isNotEmpty) {
         var resultDetails = resultData[0]["JobTypeDetails"];
@@ -347,7 +368,7 @@ Future SelectAgentCompany(context) async {
     AppGlobals.AgentCompanyList.clear();
     var Comid = AppGlobals.storagenew.getInt('Comid') ?? 0;
     try {
-  final resultData = _ensureList((await _dioClient.dio.post(
+  final resultData = _ensureList((await _routedPost(
             Uri.encodeFull("${ApiConstants.apiSelectAgentCompany}$Comid"), data: null ?? {})).data);
   if (resultData.isNotEmpty) {
         AppGlobals.AgentCompanyList = resultData
@@ -366,7 +387,7 @@ Future SelectAgentAll(context, int AgentCompanyId) async {
     AppGlobals.AgentAllList.clear();
     var Comid = AppGlobals.storagenew.getInt('Comid') ?? 0;
     try {
-  final resultData = _ensureList((await _dioClient.dio.post(
+  final resultData = _ensureList((await _routedPost(
             Uri.encodeFull("${ApiConstants.apiSelectAgentAll}$Comid&Jobid=$AgentCompanyId"), data: null ?? {})).data);
   if (resultData.isNotEmpty) {
         AppGlobals.AgentAllList =
@@ -384,7 +405,7 @@ Future SelectProductList(context) async {
     AppGlobals.ProductList.clear();
     var Comid = AppGlobals.storagenew.getInt('Comid') ?? 0;
     try {
-  final resultData = _ensureList((await _dioClient.dio.post(
+  final resultData = _ensureList((await _routedPost(
             Uri.encodeFull("${ApiConstants.apiGetProductList}$Comid"), data: null ?? {})).data);
   if (resultData.isNotEmpty) {
         AppGlobals.ProductList = resultData
@@ -398,40 +419,11 @@ Future SelectProductList(context) async {
   }
 }
 
-Future<List<dynamic>?> selectAddressList() async {
-  try {
-    AppGlobals.AddressList.clear();
-    final int comId = AppGlobals.storagenew.getInt('Comid') ?? 0;
-
-    // Call ApiClient.postRequest and pass null for the body
-    final resultData = ((await _dioClient.dio.post(
-      "${ApiConstants.apiSelectAddressList}$comId", data: null ?? {})).data);
-
-    // ApiClient decodes the response automatically.
-    // We just ensure it's returned as a List safely.
-    if (resultData is List) {
-      return resultData;
-    } else if (resultData != null) {
-      return [resultData]; // Wrap in list if a map is returned
-    }
-
-    return [];
-
-  } on TimeoutException {
-    throw Exception("Server timeout. Please try again.");
-  } on SocketException {
-    throw Exception("No internet connection.");
-  } catch (error) {
-    // ApiClient already gives clean error messages,
-    // so we can just pass them along smoothly.
-    throw Exception(error.toString().replaceAll('Exception: ', ''));
-  }
-}
 
 Future EditSalesOrder(int Id, int SaleNo, {BuildContext? context}) async {
   try {
     var Comid = AppGlobals.storagenew.getInt('Comid') ?? 0;
-    var resultData = _ensureList((await _dioClient.dio.post(
+    var resultData = _ensureList((await _routedPost(
         Uri.encodeFull("${ApiConstants.apiEditSalesOrder}$Id&SaleorderNo=$SaleNo&Comid=$Comid"), data: null ?? {})).data);
 
     if (resultData.isNotEmpty) {
@@ -453,7 +445,7 @@ Future loadCustomerCurrency(context, int CustomerId) async {
 AppGlobals.CustomerCurrencyValue = 0.0;
     var Comid = AppGlobals.storagenew.getInt('Comid') ?? 0;
     try {
-  final resultData = ((await _dioClient.dio.post(
+  final resultData = ((await _routedPost(
         Uri.encodeFull("${ApiConstants.apiGetCurrencyValue}$Comid&CustId=$CustomerId"), data: null ?? {})).data);
   if (resultData.length != 0) {
         AppGlobals.CustomerCurrencyValue = resultData["Data1"];
@@ -470,7 +462,7 @@ Future loadComboS1(context, int type) async {
     AppGlobals.ComboS1List=[];
     var Comid = AppGlobals.storagenew.getInt('Comid') ?? 0;
     try {
-  final resultData = ((await _dioClient.dio.post(
+  final resultData = ((await _routedPost(
             Uri.encodeFull("${ApiConstants.apiGetComboS1}$Comid&type=$type"), data: null ?? {})).data);
   if (resultData.length != 0) {
         AppGlobals.ComboS1List.add(resultData["Data1"]);
@@ -493,7 +485,7 @@ Future EditPlanning(context, int Id, int PlanningNo) async {
     // AppGlobals.PlanningEditList.clear();
     var Comid = AppGlobals.storagenew.getInt('Comid') ?? 0;
     try {
-  final resultData = _ensureList((await _dioClient.dio.post(
+  final resultData = _ensureList((await _routedPost(
             Uri.encodeFull("${ApiConstants.apiEditPlanning}$Id&PLANINGNo=$PlanningNo&Comid=$Comid"), data: null ?? {})).data);
   if (resultData.isNotEmpty) {
         AppGlobals.PlanningEditList = resultData[0]["SaleDetails"].toList();
@@ -509,7 +501,7 @@ Future EditVesselPlanning(context, int Id, int PlanningNo) async {
   try {
     var Comid = AppGlobals.storagenew.getInt('Comid') ?? 0;
     try {
-  final resultData = _ensureList((await _dioClient.dio.post(
+  final resultData = _ensureList((await _routedPost(
         Uri.encodeFull("${ApiConstants.apiEditVesselPlanning}$Id&VESSELPLANINGNo=$PlanningNo&Comid=$Comid"), data: null ?? {})).data);
   if (resultData.isNotEmpty) {
         AppGlobals.VesselPlanningEditList = resultData[0]["SaleDetails"].toList();
@@ -526,7 +518,7 @@ Future DeleteSalesOrder(context, int Id) async {
     // AppGlobals.AddressList.clear();
     var Comid = AppGlobals.storagenew.getInt('Comid') ?? 0;
     try {
-  final resultData = ((await _dioClient.dio.post(
+  final resultData = ((await _routedPost(
             Uri.encodeFull("${ApiConstants.apiDeleteSalesOrder}$Id&Comid=$Comid"), data: null ?? {})).data);
   if (resultData.length != 0) {
         ResponseViewModel? value = ResponseViewModel.fromJson(resultData);
@@ -541,31 +533,13 @@ Future DeleteSalesOrder(context, int Id) async {
   }
 }
 
-Future SelectAddressDetails(context, String Keyword) async {
-  try {
-    AppGlobals.AddressDetailedList.clear();
-    var Comid = AppGlobals.storagenew.getInt('Comid') ?? 0;
-    try {
-    final resultData = _ensureList((await _dioClient.dio.post(
-            "${ApiConstants.apiSelectAddressDetails}$Comid&KeyWord=${Uri.encodeComponent(Keyword)}", data: null ?? {})).data);
-  if (resultData.isNotEmpty) {
-        AppGlobals.AddressDetailedList = resultData
-            .map((element) => AddressDetailsModel.fromJson(element))
-            .toList();
-      }
-} catch (e) { print("API Error: $e"); }
-
-  } catch (error) {
-    if (error.toString() == "") {}
-  }
-}
 
 Future GetJobNoForwarding(context,int BillId) async {
   try {
     AppGlobals.ForwardingList.clear();
     var Comid = AppGlobals.storagenew.getInt('Comid') ?? 0;
     try {
-  final resultData = ((await _dioClient.dio.post(
+  final resultData = ((await _routedPost(
         Uri.encodeFull("${ApiConstants.apiGetJobNo}$Comid&JobType=$BillId"), data: null ?? {})).data);
   if (resultData.length != 0) {   
         AppGlobals.ForwardingList = resultData["Data1"]
@@ -592,7 +566,7 @@ Future<void> GetRTINoForwarding(BuildContext ?context, int billId) async {
     final String apiUrl = '${ApiConstants.apiGetRTINo}$comId';
 
     // Call the API
-    final resultData = ((await _dioClient.dio.post(
+    final resultData = ((await _routedPost(
         apiUrl, data: null ?? {})).data);
 
     // Check response validity and content
@@ -627,7 +601,7 @@ Future SelectTruckList(context,String? Type) async {
     var Comid = AppGlobals.storagenew.getInt('Comid') ?? 0;
 
     try {
-  final resultData = _ensureList((await _dioClient.dio.post(
+  final resultData = _ensureList((await _routedPost(
         Uri.encodeFull("${ApiConstants.apiGetTruckList}$Comid&type="), data: null ?? {})).data);
   if (resultData.isNotEmpty) {
         AppGlobals.GetTruckList = resultData
@@ -646,7 +620,7 @@ Future EditTruckList(context,int Keyword,String Column,String? Type) async {
     AppGlobals.TruckDetailsList.clear();
     var Comid = AppGlobals.storagenew.getInt('Comid') ?? 0;
     try {
-  final resultData = _ensureList((await _dioClient.dio.post(
+  final resultData = _ensureList((await _routedPost(
         Uri.encodeFull("${ApiConstants.apiEditTruckDetails}$Comid&Startindex=0&PageCount=0&Keyword=$Keyword&Column=$Column&type="), data: null ?? {})).data);
   if (resultData.isNotEmpty) {
         AppGlobals.TruckDetailsList = resultData
@@ -666,7 +640,7 @@ Future SelectDriverList(context,String? Type) async {
     var Comid = AppGlobals.storagenew.getInt('Comid') ?? 0;
 
     try {
-  final resultData = _ensureList((await _dioClient.dio.post(
+  final resultData = _ensureList((await _routedPost(
         Uri.encodeFull("${ApiConstants.apiGetDriverList}$Comid&type="), data: null ?? {})).data);
   if (resultData.isNotEmpty) {
         AppGlobals.GetDriverList = resultData
@@ -685,7 +659,7 @@ Future SelectRTIDetailViewList(context,String Fromdate,String Todate,int DId, in
     AppGlobals.RTIViewMasterList.clear();
     var Comid = AppGlobals.storagenew.getInt('Comid') ?? 0;
     try {
-  final resultData = _ensureList((await _dioClient.dio.post(
+  final resultData = _ensureList((await _routedPost(
         Uri.encodeFull("${ApiConstants.apiSelectRTIDetailsView}$Comid&Fromdate=$Fromdate&Todate=$Todate&DId=$DId&TId=$TId&Employeeid=$Employeeid&Search$Search"), data: null ?? {})).data);
   if (resultData.isNotEmpty) {
         AppGlobals.RTIViewMasterList = resultData[0]["salemaster"]
@@ -707,7 +681,7 @@ Future SelectRTIViewList(context,String Fromdate,String Todate,int DId, int TId,
     AppGlobals.RTIViewMasterList.clear();
     var Comid = AppGlobals.storagenew.getInt('Comid') ?? 0;
     try {
-  final resultData = _ensureList((await _dioClient.dio.post(
+  final resultData = _ensureList((await _routedPost(
         Uri.encodeFull("${ApiConstants.apiSelectRTIView}$Comid&Fromdate=$Fromdate&Todate=$Todate&DId=$DId&TId=$TId&Employeeid=$Employeeid&Search=$Search"), data: null ?? {})).data);
   if (resultData.isNotEmpty) {
         AppGlobals.RTIViewMasterList = resultData[0]["salemaster"]
@@ -730,7 +704,7 @@ Future<List<String>> GetEmployeeport(context) async {
     var empId = AppGlobals.storagenew.getInt('EmpRefId') ?? 0;
     
     // Using apiAllinoneSelect as it handles GET requests returning JSON arrays well
-    final resultData = _ensureList((await _dioClient.dio.post(
+    final resultData = _ensureList((await _routedPost(
         Uri.encodeFull("${ApiConstants.port}/api/EmployeeApp/GetEmployeeport?Comid=$Comid&id=$empId"), data: null ?? {})).data);
         
     return resultData.map((e) => e["AccountName"].toString()).toList();

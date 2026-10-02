@@ -5,7 +5,7 @@ import '../entities/ir_lookup.dart';
 import '../entities/ir_report.dart';
 
 /// Everything the IR screens need from the backend. Blocs depend on this
-/// interface only, so the transport (today the .NET IRApp API) can change
+/// interface only, so the transport (today the Java /api/ir API) can change
 /// without touching them, and tests replace it with a mock.
 ///
 /// Every method throws on failure; the message of the thrown error is fit to
