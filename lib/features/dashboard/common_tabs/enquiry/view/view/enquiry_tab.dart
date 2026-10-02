@@ -272,14 +272,11 @@ class _EnquiryCard extends StatelessWidget {
                             'Do You Want to Push to SalesOrder?',
                           );
                           if (result == true) {
-                            AppGlobals.storagenew.setString('EnquiryOpen', 'true');
-                            final List<dynamic> enquiryList = [item];
                             if (context.mounted) {
                               Navigator.of(context).push(
                                 MaterialPageRoute(
                                   builder: (_) => SalesOrdersAdd(
-                                    SaleDetails: null,
-                                    SaleMaster: enquiryList,
+                                    enquiry: Map<String, dynamic>.from(item as Map),
                                   ),
                                 ),
                               );

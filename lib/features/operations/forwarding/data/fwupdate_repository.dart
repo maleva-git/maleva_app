@@ -1,30 +1,21 @@
 import 'package:maleva/core/di/injection.dart';
 import 'package:maleva/core/files/attachments_api.dart';
-import 'package:maleva/core/network/api_client.dart';
-import 'package:maleva/core/utils/app_preferences.dart';
-import '../../../../core/network/api_constants.dart';
-import 'package:maleva/core/models/shared/response_view_model.dart';
+import 'package:maleva/core/sale_order/sale_order_api.dart';
 
+/// Forwarding (SMK) update on the shared Java sale order API: the job picker
+/// (`/job-numbers`, every bill type), the job (`/edit`) and `PUT /{id}/forwarding`.
 class FWUpdateRepository {
-  final int comid = AppPreferences.getComid();
-  final int empRefId = AppPreferences.getEmpRefId();
+  FWUpdateRepository({SaleOrderApi? saleOrders}) : _saleOrderApi = saleOrders;
 
-  Future<List<dynamic>> fetchJobNoList() async {
-    final result = await ApiClient.postRequest("${ApiConstants.apiGetJobNo}$comid&JobType=3", null);
-    return result is List ? result : [];
-  }
+  final SaleOrderApi? _saleOrderApi;
+  SaleOrderApi get _saleOrders => _saleOrderApi ?? sl<SaleOrderApi>();
 
-  Future<Map<String, dynamic>> fetchJobDetailsAndEmployees(int saleOrderId) async {
+  /// Every job: `[{id, cNumber, forwardingSMKNo, forwardingSMKNo2, forwardingSMKNo3, ...}]`.
+  Future<List<Map<String, dynamic>>> fetchJobNoList() => _saleOrders.jobNumbers(3);
 
-    final masterRes = await ApiClient.postRequest("${ApiConstants.apiEditSalesOrder}$saleOrderId&CNumber=0", null);
+  /// The job's master (Java names: `forwardingEnterRef2`, `sealbyRefid3`, ...).
+  Future<Map<String, dynamic>> fetchJob(int saleOrderId) async => (await _saleOrders.edit(id: saleOrderId)).master;
 
-    final empRes = await ApiClient.postRequest("${ApiConstants.apiSelectEmployee}$comid&AccountName=&Type=Operation", null);
-
-    return {
-      'master': (masterRes != null && masterRes is List && masterRes.isNotEmpty) ? masterRes[0] : null,
-      'employees': empRes is List ? empRes : [],
-    };
-  }
   /// The job's photos under [smkKey], from the shared Java `/api/attachments`.
   Future<List<String>> fetchImages(int saleOrderId, String smkKey) =>
       sl<AttachmentsApi>().imageNames(folder: 'SalesOrder', recordId: saleOrderId, subFolder: smkKey);
@@ -34,8 +25,7 @@ class FWUpdateRepository {
     await sl<AttachmentsApi>().delete([networkImg], folder: 'SalesOrder', recordId: saleOrderId, subFolder: smkUpload);
   }
 
-  Future<ResponseViewModel?> updateForwarding(Map<String, dynamic> payload) async {
-    final result = await ApiClient.postRequest(ApiConstants.apiUpdateForwarding, payload);
-    return result != null ? ResponseViewModel.fromJson(result) : null;
-  }
+  /// Only the given fields change; a null text or a 0 officer is left as it is.
+  Future<void> updateForwarding(int saleOrderId, Map<String, dynamic> fields) =>
+      _saleOrders.updateForwarding(saleOrderId, fields);
 }

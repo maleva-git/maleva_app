@@ -1,6 +1,7 @@
 import 'package:get_it/get_it.dart';
 import 'package:maleva/core/dashboard/dashboard_api.dart';
 import 'package:maleva/core/files/attachments_api.dart';
+import 'package:maleva/core/sale_order/sale_order_api.dart';
 import 'package:maleva/core/utils/app_preferences.dart';
 import 'package:maleva/core/lookups/shared_lookups.dart';
 import 'package:maleva/core/stock/stock_in_api.dart';
@@ -23,6 +24,9 @@ void registerAuthModule(GetIt sl) {
   sl.registerLazySingleton<DashboardApi>(() => DashboardApi(sl<JavaApiClient>().dio));
   // stock-in entry (the shared /api/stock-ins)
   sl.registerLazySingleton<StockInApi>(() => StockInApi(sl<JavaApiClient>().dio));
+  // sale orders (the shared /api/sale-orders and friends)
+  sl.registerLazySingleton<SaleOrderApi>(
+      () => SaleOrderApi(sl<JavaApiClient>().dio, companyId: AppPreferences.getComid));
   // record attachments (the shared /api/attachments)
   sl.registerLazySingleton<AttachmentsApi>(
       () => AttachmentsApi(sl<JavaApiClient>().dio, companyId: AppPreferences.getComid));

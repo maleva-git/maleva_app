@@ -3,82 +3,58 @@ import 'package:maleva/core/files/attachments_api.dart';
 import 'package:maleva/core/lookups/job_steps.dart';
 import 'package:maleva/core/network/api_constants.dart';
 import 'package:maleva/core/network/api_client.dart';
+import 'package:maleva/core/sale_order/sale_order_api.dart';
 import 'package:maleva/core/utils/app_preferences.dart';
-import 'package:maleva/core/models/shared/response_view_model.dart';
 
+/// Job status (boarding) update. The job list, the job, the update and the
+/// boarding mail are the shared Java sale order API; the job steps are the
+/// job type lookup.
 class JobStatusUpdateRepository {
+  JobStatusUpdateRepository({SaleOrderApi? saleOrders}) : _saleOrderApi = saleOrders;
 
-  // 1. Fetch Job Numbers
-  Future<List<Map<String, dynamic>>> fetchJobs(int type) async {
-    final comid = AppPreferences.getComid();
-    final String url = "${ApiConstants.apiGetJobNo}$comid&JobType=$type";
+  final SaleOrderApi? _saleOrderApi;
+  SaleOrderApi get _saleOrders => _saleOrderApi ?? sl<SaleOrderApi>();
 
-    final response = await ApiClient.postRequest(url, null);
-    if (response != null && response is List) {
-      return List<Map<String, dynamic>>.from(response);
-    }
-    return [];
-  }
+  /// `[{id, cNumber, ...}]`; [type] 0 forwarding (MY), 1 transport (TR), 3 all.
+  Future<List<Map<String, dynamic>>> fetchJobs(int type) => _saleOrders.jobNumbers(type);
 
-  // 2. Complex Orchestration: Fetch Job Details, Status Name, and Images
+  /// The job's status (id and name), job type and Boarding photos.
   Future<Map<String, dynamic>> fetchJobData(int saleOrderId, int cNumber) async {
     final comid = AppPreferences.getComid();
-    int statusId = 0;
-    String statusName = '';
-    List<String> images = [];
+    final master = (await _saleOrders.edit(id: saleOrderId, saleOrderNo: cNumber)).master;
+    final int statusId = master['jStatus'] as int? ?? 0;
+    final int jobMasterId = master['jobMasterRefId'] as int? ?? 0;
+    var statusName = '';
 
-    // A. Fetch Sales Order
-    final String editUrl = "${ApiConstants.apiEditSalesOrder}$saleOrderId&CNumber=$cNumber";
-    final editResponse = await ApiClient.postRequest(editUrl, null);
-
-    if (editResponse != null && editResponse is List && editResponse.isNotEmpty) {
-      final editData = editResponse[0] as Map<String, dynamic>;
-      final jStatus = editData['JStatus'];
-      final jobMasterRefId = editData['JobMasterRefId'];
-
-      // B. Fetch Job Status List & Find Match
-      if (jStatus != null && jStatus != 0) {
-        statusId = jStatus as int;
-        final String statusUrl = "${ApiConstants.apiSelectAllJobStatus}$comid&Jobid=$jobMasterRefId";
-        final statusResponse = await ApiClient.postRequest(statusUrl, null);
-
-        final statuses = JobSteps.statuses(statusResponse);
-        if (statuses.isNotEmpty) {
-          final match = statuses.firstWhere(
-                  (s) => s['Status'] == statusId,
-              orElse: () => null
-          );
-          if (match != null) {
-            statusName = match['StatusName']?.toString() ?? '';
-          }
+    if (statusId != 0) {
+      final statusResponse = await ApiClient.postRequest("${ApiConstants.apiSelectAllJobStatus}$comid&Jobid=$jobMasterId", null);
+      for (final s in JobSteps.statuses(statusResponse)) {
+        if (s['Status'] == statusId) {
+          statusName = s['StatusName']?.toString() ?? '';
+          break;
         }
       }
     }
 
-    // C. Fetch Images
-    images = await sl<AttachmentsApi>().imageNames(folder: 'SalesOrder', recordId: saleOrderId, subFolder: 'Boarding');
+    final images = await sl<AttachmentsApi>().imageNames(folder: 'SalesOrder', recordId: saleOrderId, subFolder: 'Boarding');
 
     return {
       'statusId': statusId,
       'statusName': statusName,
+      'jobMasterId': jobMasterId,
       'images': images,
     };
   }
 
-  // 3. Delete an Image
   Future<void> deleteImage(int saleOrderId, String imageName) async {
     await sl<AttachmentsApi>().delete([imageName], folder: 'SalesOrder', recordId: saleOrderId, subFolder: 'Boarding');
   }
 
-  // 4. Update Boarding Details
-  Future<ResponseViewModel?> updateBoardingDetails(Map<String, dynamic> master) async {
-    final response = await ApiClient.postRequest(ApiConstants.apiUpdateBoardingDetails, master);
-    return response != null ? ResponseViewModel.fromJson(response) : null;
-  }
+  /// The status and boarding start/end (`PUT /api/sale-orders/{id}/boarding`).
+  Future<void> updateBoardingDetails(int saleOrderId, {required int statusId, DateTime? start, DateTime? end}) =>
+      _saleOrders.updateBoarding(saleOrderId, statusId: statusId, start: start, end: end);
 
-  // 5. Send Email
-  Future<ResponseViewModel?> sendBoardingMail(Map<String, dynamic> master) async {
-    final response = await ApiClient.postRequest(ApiConstants.apiBoardingMail, master);
-    return response != null ? ResponseViewModel.fromJson(response) : null;
-  }
+  /// The boarding status email and WhatsApp (`POST /api/sale-orders/{id}/boarding-mail`).
+  Future<void> sendBoardingMail(int saleOrderId, {required String statusName, required List<String> imageUrls}) =>
+      _saleOrders.sendBoardingMail(saleOrderId, statusName: statusName, imageUrls: imageUrls);
 }

@@ -128,10 +128,7 @@ class _StockInEntryPageState
           Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (_) => SalesOrdersAdd(
-                SaleDetails: null,
-                SaleMaster: state.saleEditMasterList,
-              ),
+              builder: (_) => SalesOrdersAdd(saleOrderId: state.saleOrderId, saleOrderNo: state.editSaleOrderNo),
             ),
           );
         }
@@ -573,13 +570,12 @@ class _JobNoRowState extends State<_JobNoRow> {
                   height: 1, color: Palette.grey200p),
               itemBuilder: (ctx, i) {
                 final item = s.jobNoSuggestions[i];
-                final cnum =
-                item['CNumber'].toString();
+                final cnum = '${item['cNumber'] ?? ''}';
                 return InkWell(
                   onTap: () => context
                       .read<StockInEntryBloc>()
                       .add(StockInEntryJobNoSelected(
-                      saleOrderId: item['Id'],
+                      saleOrderId: item['id'] as int,
                       jobNo: cnum)),
                   child: Padding(
                     padding: const EdgeInsets.symmetric(

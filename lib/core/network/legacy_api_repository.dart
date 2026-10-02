@@ -19,8 +19,6 @@ import 'package:maleva/features/auth/models/user_login_model.dart';
 import 'package:maleva/core/models/shared/customer_model.dart';
 import 'package:maleva/core/models/shared/truck_details_model.dart';
 import 'package:maleva/core/models/shared/ware_house_model.dart';
-import 'package:maleva/features/operations/models/forwarding_model.dart';
-import 'package:maleva/core/models/shared/sale_edit_detail_model.dart';
 import 'package:maleva/core/models/shared/agent_model.dart';
 import 'package:maleva/features/operations/models/job_status_model.dart';
 import 'package:maleva/core/models/shared/product_model.dart';
@@ -28,7 +26,6 @@ import 'package:maleva/features/operations/models/job_type_details_model.dart';
 import 'package:maleva/core/models/shared/r_t_i_master_view_model.dart';
 import 'package:maleva/core/models/shared/employee_model.dart';
 import 'package:maleva/core/models/shared/location_model.dart';
-import 'package:maleva/core/models/shared/response_view_model.dart';
 import 'package:maleva/core/models/shared/r_t_i_details_view_model.dart';
 
 class LegacyApiRepository {
@@ -260,22 +257,6 @@ Future SelectJobStatus(context) async {
   }
 }
 
-Future MaxSaleOrderNo(context, String BillType) async {
-  try {
-    var Comid = AppGlobals.storagenew.getInt('Comid') ?? 0;
-    try {
-  final resultData = ((await _routedPost(
-            "${ApiConstants.apiMaxSaleOrderNo}$Comid&BillType=$BillType", data: {})).data?.toString() ?? "");
-  if (resultData.isNotEmpty) {
-        AppGlobals.MaxSaleOrderNum = resultData;
-      }
-} catch (e) { print("API Error: $e"); }
-
-  } catch (error) {
-    if (error.toString() == "") {}
-  }
-}
-
 Future SelectJobType(context) async {
   try {
     AppGlobals.JobTypeList.clear();
@@ -378,66 +359,6 @@ Future SelectProductList(context) async {
 }
 
 
-Future EditSalesOrder(int Id, int SaleNo, {BuildContext? context}) async {
-  try {
-    var Comid = AppGlobals.storagenew.getInt('Comid') ?? 0;
-    var resultData = _ensureList((await _routedPost(
-        Uri.encodeFull("${ApiConstants.apiEditSalesOrder}$Id&SaleorderNo=$SaleNo&Comid=$Comid"), data: null ?? {})).data);
-
-    if (resultData.isNotEmpty) {
-      AppGlobals.SaleEditMasterList = resultData;
-      AppGlobals.SaleEditDetailList = resultData[0]["SaleDetails"]
-          .map((element) => SaleEditDetailModel.fromJson(element))
-          .toList()
-          .cast<SaleEditDetailModel>();
-    } else {
-      throw Exception("Data empty ah iruku");
-    }
-  } catch (error) {
-    throw Exception("Sales Order failed: $error");
-  }
-}
-
-Future loadCustomerCurrency(context, int CustomerId) async {
-  try {
-AppGlobals.CustomerCurrencyValue = 0.0;
-    var Comid = AppGlobals.storagenew.getInt('Comid') ?? 0;
-    try {
-  final resultData = ((await _routedPost(
-        Uri.encodeFull("${ApiConstants.apiGetCurrencyValue}$Comid&CustId=$CustomerId"), data: null ?? {})).data);
-  if (resultData.length != 0) {
-        AppGlobals.CustomerCurrencyValue = resultData["Data1"];
-      }
-} catch (e) { print("API Error: $e"); }
-
-  } catch (error) {
-    if (error.toString() == "") {}
-  }
-}
-
-Future loadComboS1(context, int type) async {
-  try {
-    AppGlobals.ComboS1List=[];
-    var Comid = AppGlobals.storagenew.getInt('Comid') ?? 0;
-    try {
-  final resultData = ((await _routedPost(
-            Uri.encodeFull("${ApiConstants.apiGetComboS1}$Comid&type=$type"), data: null ?? {})).data);
-  if (resultData.length != 0) {
-        AppGlobals.ComboS1List.add(resultData["Data1"]);
-        AppGlobals.ComboS1List.add(resultData["Data2"]);
-        AppGlobals.ComboS1List.add(resultData["Data3"]);
-        AppGlobals.ComboS1List.add(resultData["Data4"]);
-        AppGlobals.ComboS1List.add(resultData["Data5"]);
-        AppGlobals.ComboS1List.add(resultData["Data6"]);
-
-      }
-} catch (e) { print("API Error: $e"); }
-
-  } catch (error) {
-    if (error.toString() == "") {}
-  }
-}
-
 Future EditPlanning(context, int Id, int PlanningNo) async {
   try {
     // AppGlobals.PlanningEditList.clear();
@@ -463,47 +384,6 @@ Future EditVesselPlanning(context, int Id, int PlanningNo) async {
         Uri.encodeFull("${ApiConstants.apiEditVesselPlanning}$Id&VESSELPLANINGNo=$PlanningNo&Comid=$Comid"), data: null ?? {})).data);
   if (resultData.isNotEmpty) {
         AppGlobals.VesselPlanningEditList = resultData[0]["SaleDetails"].toList();
-      }
-} catch (e) { print("API Error: $e"); }
-
-  } catch (error) {
-    if (error.toString() == "") {}
-  }
-}
-
-Future DeleteSalesOrder(context, int Id) async {
-  try {
-    // AppGlobals.AddressList.clear();
-    var Comid = AppGlobals.storagenew.getInt('Comid') ?? 0;
-    try {
-  final resultData = ((await _routedPost(
-            Uri.encodeFull("${ApiConstants.apiDeleteSalesOrder}$Id&Comid=$Comid"), data: null ?? {})).data);
-  if (resultData.length != 0) {
-        ResponseViewModel? value = ResponseViewModel.fromJson(resultData);
-        if (value.IsSuccess == true) {
-          await ConfirmationOK(value.Message, context);
-        }
-      }
-} catch (e) { print("API Error: $e"); }
-
-  } catch (error) {
-    if (error.toString() == "") {}
-  }
-}
-
-
-Future GetJobNoForwarding(context,int BillId) async {
-  try {
-    AppGlobals.ForwardingList.clear();
-    var Comid = AppGlobals.storagenew.getInt('Comid') ?? 0;
-    try {
-  final resultData = ((await _routedPost(
-        Uri.encodeFull("${ApiConstants.apiGetJobNo}$Comid&JobType=$BillId"), data: null ?? {})).data);
-  if (resultData.length != 0) {   
-        AppGlobals.ForwardingList = resultData["Data1"]
-            .map((element) => ForwardingModel.fromJson(element))
-            .toList().cast<ForwardingModel>();
-        AppGlobals.JobNoList =  resultData["Data1"].toList();
       }
 } catch (e) { print("API Error: $e"); }
 

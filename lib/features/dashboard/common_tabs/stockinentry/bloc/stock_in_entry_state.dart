@@ -33,7 +33,8 @@ class StockInEntryLoaded extends StockInEntryState {
 
   // ── Navigation ────────────────────────────────────────────────────────────
   final bool navigateEditSalesOrder;
-  final List<dynamic> saleEditMasterList;
+  /// The job number to open in the sale order form (with [saleOrderId]).
+  final int editSaleOrderNo;
 
    StockInEntryLoaded({
     required this.billType,
@@ -53,7 +54,7 @@ class StockInEntryLoaded extends StockInEntryState {
     required this.imageUploadEnabled,
     required this.images,
     this.navigateEditSalesOrder = false,
-    this.saleEditMasterList = const [],
+    this.editSaleOrderNo = 0,
   });
 
   static String _today() =>
@@ -78,7 +79,7 @@ class StockInEntryLoaded extends StockInEntryState {
         imageUploadEnabled: false,
         images:            [],
         navigateEditSalesOrder: false,
-        saleEditMasterList: const [],
+        editSaleOrderNo: 0,
       );
 
   StockInEntryLoaded copyWith({
@@ -99,7 +100,7 @@ class StockInEntryLoaded extends StockInEntryState {
     bool?   imageUploadEnabled,
     List<String>? images,
     bool? navigateEditSalesOrder,
-    List<dynamic>? saleEditMasterList,
+    int? editSaleOrderNo,
   }) {
     return StockInEntryLoaded(
       billType:          billType          ?? this.billType,
@@ -119,7 +120,7 @@ class StockInEntryLoaded extends StockInEntryState {
       imageUploadEnabled: imageUploadEnabled ?? this.imageUploadEnabled,
       images:            images            ?? this.images,
       navigateEditSalesOrder: navigateEditSalesOrder ?? this.navigateEditSalesOrder,
-      saleEditMasterList: saleEditMasterList ?? this.saleEditMasterList,
+      editSaleOrderNo: editSaleOrderNo ?? this.editSaleOrderNo,
     );
   }
 }

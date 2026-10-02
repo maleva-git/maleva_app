@@ -25,6 +25,7 @@ class JobStatusUpdateState extends Equatable {
     this.billType = '0',
     this.jobNo = '',
     this.saleOrderId = 0,
+    this.jobMasterId = 0,
     this.statusName = '',
     this.statusId = 0,
     this.userName = '',
@@ -54,6 +55,8 @@ class JobStatusUpdateState extends Equatable {
   final String billType;
   final String jobNo;
   final int saleOrderId;
+  /// The job's job type, for the status picker.
+  final int jobMasterId;
   final String statusName;
   final int statusId;
   final String userName;
@@ -96,6 +99,7 @@ class JobStatusUpdateState extends Equatable {
     String? billType,
     String? jobNo,
     int? saleOrderId,
+    int? jobMasterId,
     String? statusName,
     int? statusId,
     String? userName,
@@ -115,6 +119,7 @@ class JobStatusUpdateState extends Equatable {
       billType: billType ?? this.billType,
       jobNo: jobNo ?? this.jobNo,
       saleOrderId: saleOrderId ?? this.saleOrderId,
+      jobMasterId: jobMasterId ?? this.jobMasterId,
       statusName: statusName ?? this.statusName,
       statusId: statusId ?? this.statusId,
       userName: userName ?? this.userName,
@@ -139,6 +144,7 @@ class JobStatusUpdateState extends Equatable {
     billType,
     jobNo,
     saleOrderId,
+    jobMasterId,
     statusName,
     statusId,
     userName,

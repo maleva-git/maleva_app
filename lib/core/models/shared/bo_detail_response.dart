@@ -7,13 +7,14 @@ class BoDetailResponse {
 
   BoDetailResponse({required this.masters, required this.details});
 
-  factory BoDetailResponse.fromJson(Map<String, dynamic> json) {
-    var mastersJson = json['BillsOrderMaster'] as List? ?? [];
-    var detailsJson = json['BillsOrderDetails'] as List? ?? [];
+  /// The `data` of the Java `POST /api/bills-order/select-bills-order-view`.
+  factory BoDetailResponse.fromJava(Map<String, dynamic> json) {
+    var mastersJson = json['billsOrderMaster'] as List? ?? [];
+    var detailsJson = json['billsOrderDetails'] as List? ?? [];
 
     return BoDetailResponse(
-      masters: mastersJson.map((e) => BillOrderMaster.fromJson(e)).toList(),
-      details: detailsJson.map((e) => BillOrderDetail.fromJson(e)).toList(),
+      masters: mastersJson.map((e) => BillOrderMaster.fromJava(e)).toList(),
+      details: detailsJson.map((e) => BillOrderDetail.fromJava(e)).toList(),
     );
   }
 }

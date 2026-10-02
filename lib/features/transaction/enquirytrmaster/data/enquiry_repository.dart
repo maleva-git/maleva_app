@@ -1,6 +1,8 @@
 import 'package:maleva/core/network/dio_client.dart';
 import 'package:maleva/core/network/api_constants.dart';
 import 'package:maleva/core/utils/session_manager.dart';
+import 'package:maleva/core/di/injection.dart';
+import 'package:maleva/core/sale_order/sale_order_api.dart';
 
 class EnquiryTrRepository {
   final DioClient _dioClient;
@@ -10,27 +12,8 @@ class EnquiryTrRepository {
 
   int get _comId => _sessionManager.companyId;
 
-  /// Fetch currency value for a specific customer
-  Future<double> loadCustomerCurrency(int customerId) async {
-    try {
-      final endpoint = "${ApiConstants.apiGetCurrencyValue}$_comId&CustId=$customerId";
-      final response = await _dioClient.dio.post(endpoint, data: {});
-      if (response.data != null && response.data.isNotEmpty) {
-        final data = response.data;
-        if (data is List && data.isNotEmpty) {
-          final first = data[0];
-          if (first != null && first['Data1'] != null) {
-            return double.tryParse(first['Data1'].toString()) ?? 0.0;
-          }
-        } else if (data is Map && data['Data1'] != null) {
-          return double.tryParse(data['Data1'].toString()) ?? 0.0;
-        }
-      }
-    } catch (e) {
-      print("Error loading customer currency: $e");
-    }
-    return 0.0;
-  }
+  /// The customer's currency rate (shared Java `/api/currency-value/get`, as the sale order form).
+  Future<double> loadCustomerCurrency(int customerId) => sl<SaleOrderApi>().currencyValue(customerId);
 
   /// Fetch all job statuses based on JobId
   Future<List<dynamic>> selectAllJobStatus(int jobId) async {

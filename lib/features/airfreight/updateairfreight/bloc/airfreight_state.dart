@@ -11,9 +11,12 @@ class AirFreightLoaded extends AirFreightState {
   final String jobNoText;
   final int    saleOrderId;
   final List<dynamic> jobNoSuggestions;
+  /// The job picker list (`/api/sale-orders/job-numbers`: `[{id, cNumber, ...}]`).
+  final List<Map<String, dynamic>> jobs;
 
 
   final String jobType;
+  final int    jobMasterId;
   final int    statusId;
   final String statusName;
   final String awbNo;
@@ -27,7 +30,9 @@ class AirFreightLoaded extends AirFreightState {
     required this.jobNoText,
     required this.saleOrderId,
     required this.jobNoSuggestions,
+    this.jobs = const [],
     required this.jobType,
+    this.jobMasterId = 0,
     required this.statusId,
     required this.statusName,
     required this.awbNo,
@@ -40,7 +45,9 @@ class AirFreightLoaded extends AirFreightState {
     String? jobNoText,
     int?    saleOrderId,
     List<dynamic>? jobNoSuggestions,
+    List<Map<String, dynamic>>? jobs,
     String? jobType,
+    int?    jobMasterId,
     int?    statusId,
     String? statusName,
     String? awbNo,
@@ -52,7 +59,9 @@ class AirFreightLoaded extends AirFreightState {
       jobNoText:          jobNoText          ?? this.jobNoText,
       saleOrderId:        saleOrderId        ?? this.saleOrderId,
       jobNoSuggestions:   jobNoSuggestions   ?? this.jobNoSuggestions,
+      jobs:               jobs               ?? this.jobs,
       jobType:            jobType            ?? this.jobType,
+      jobMasterId:        jobMasterId        ?? this.jobMasterId,
       statusId:           statusId           ?? this.statusId,
       statusName:         statusName         ?? this.statusName,
       awbNo:              awbNo              ?? this.awbNo,

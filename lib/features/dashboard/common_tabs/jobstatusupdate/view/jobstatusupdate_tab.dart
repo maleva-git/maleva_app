@@ -15,6 +15,7 @@ import 'package:maleva/menu/menulist.dart';
 import '../../../../mastersearch/JobAllStatus.dart';
 import '../../saleorderdetails/view/saleorderdetails_tab.dart';
 import '../bloc/jobstatusupdate_bloc.dart';
+import '../data/job_status_update_repository.dart';
 import '../bloc/jobstatusupdate_event.dart';
 import '../bloc/jobstatusupdate_state.dart';
 import 'package:maleva/features/operations/models/job_all_status_model.dart';
@@ -29,7 +30,7 @@ class JobStatusUpdate extends StatelessWidget {
   Widget build(BuildContext context) {
     return
       BlocProvider(
-        create: (context) => sl<JobStatusUpdateBloc>()
+        create: (context) => JobStatusUpdateBloc(repository: JobStatusUpdateRepository())
           ..add(const JobStatusUpdateStarted()),
         child: const _JobStatusUpdateView(),
       );
@@ -98,18 +99,18 @@ class _JobStatusUpdateViewState extends State<_JobStatusUpdateView> {
               children: suggestions.map((s) {
                 return InkWell(
                   onTap: () {
-                    _jobNoCtrl.text = s['CNumber'].toString();
+                    _jobNoCtrl.text = '${s['cNumber'] ?? ''}';
                     context.read<JobStatusUpdateBloc>().add(
                       JobStatusUpdateSuggestionSelected(
-                        jobNo: s['CNumber'].toString(),
-                        saleOrderId: s['Id'] as int,
+                        jobNo: '${s['cNumber'] ?? ''}',
+                        saleOrderId: s['id'] as int,
                       ),
                     );
                   },
                   child: Container(
                     padding: const EdgeInsets.symmetric(
                         horizontal: 24, vertical: 16),
-                    child: Text(s['CNumber'].toString()),
+                    child: Text('${s['cNumber'] ?? ''}'),
                   ),
                 );
               }).toList(),
@@ -374,12 +375,9 @@ class _JobStatusUpdateViewState extends State<_JobStatusUpdateView> {
                 toastMsg('Enter Job No', '', context);
                 return;
               }
-              await sl<LegacyApiRepository>().EditSalesOrder(
-                   state.saleOrderId, int.tryParse(state.jobNo) ?? 0); if (!context.mounted) return;Navigator.of(context).push(MaterialPageRoute(
+              Navigator.of(context).push(MaterialPageRoute(
                   builder: (_) => SaleOrderDetails(
-                    saleDetails: null,
-                    saleMaster: AppGlobals.SaleEditMasterList,
-                  )));
+                      saleOrderId: state.saleOrderId, saleOrderNo: int.tryParse(state.jobNo) ?? 0)));
             },
           ),
           const SizedBox(height: 7),
@@ -394,12 +392,9 @@ class _JobStatusUpdateViewState extends State<_JobStatusUpdateView> {
                 return;
               }
               if (state.statusName.isEmpty && state.jobNo.isNotEmpty) {
-                await sl<LegacyApiRepository>().EditSalesOrder(
-
-                    state.saleOrderId,
-                    int.tryParse(state.jobNo) ?? 0); if (!context.mounted) return;await sl<LegacyApiRepository>().SelectAllJobStatus(
-                    context,
-                    AppGlobals.SaleEditMasterList[0]['JobMasterRefId'] as int); if (!context.mounted) return;Navigator.push(
+                await sl<LegacyApiRepository>().SelectAllJobStatus(context, state.jobMasterId);
+                if (!context.mounted) return;
+                Navigator.push(
                   context,
                   MaterialPageRoute(
                       builder: (_) => const JobAllStatus(

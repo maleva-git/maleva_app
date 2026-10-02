@@ -10,7 +10,6 @@ import '../../../../../core/di/injection.dart';
 import '../bloc/saleorderdetails_bloc.dart';
 import '../bloc/saleorderdetails_event.dart';
 import '../bloc/saleorderdetails_state.dart';
-import 'package:maleva/core/models/shared/sale_edit_detail_model.dart';
 
 
 
@@ -31,38 +30,20 @@ bool _isTablet(BuildContext ctx) =>
 // Entry widget
 // ─────────────────────────────────────────────────────────────────────────────
 
+/// The sale order [saleOrderId] (or job number [saleOrderNo]), read only.
 class SaleOrderDetails extends StatelessWidget {
-  final List<SaleEditDetailModel>? saleDetails;
-  final List<dynamic>? saleMaster;
+  final int saleOrderId;
+  final int saleOrderNo;
 
-  const SaleOrderDetails({
-    super.key,
-    this.saleDetails,
-    this.saleMaster,
-  });
+  const SaleOrderDetails({super.key, this.saleOrderId = 0, this.saleOrderNo = 0});
 
   @override
   Widget build(BuildContext context) {
-    return
-      BlocProvider(
-        create: (_) {
-          // 1. Retrieve the BLoC from the service locator
-          final bloc = sl<SaleOrderDetailsBloc>();
-
-          // 2. Dispatch the startup event
-          bloc.add(const SaleOrderStartupEvent(billType: 'MY'));
-
-          // 3. Dispatch master load if data exists
-          if (saleMaster != null && saleMaster!.isNotEmpty) {
-            bloc.add(SaleOrderLoadMasterEvent(
-              saleMaster: saleMaster!,
-              saleDetails: saleDetails ?? [],
-            ));
-          }
-          return bloc;
-        },
-        child: const _SaleOrderDetailsView(),
-      );
+    return BlocProvider(
+      create: (_) => sl<SaleOrderDetailsBloc>()
+        ..add(SaleOrderStartupEvent(billType: 'MY', saleOrderId: saleOrderId, saleOrderNo: saleOrderNo)),
+      child: const _SaleOrderDetailsView(),
+    );
   }
 }
 

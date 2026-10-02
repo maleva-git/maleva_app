@@ -2,21 +2,18 @@ import 'package:maleva/core/lookups/job_steps.dart';
 import 'package:maleva/core/network/api_constants.dart';
 import 'package:maleva/core/network/api_client.dart';
 import 'package:maleva/core/utils/app_preferences.dart';
+import 'package:maleva/core/di/injection.dart';
+import 'package:maleva/core/sale_order/sale_order_api.dart';
 
 class SaleOrderDetailsRepository {
   final int comid = AppPreferences.getComid();
 
   // ─── Initial Startup Data ──────────────────────────────────────────────────
   Future<Map<String, dynamic>> fetchInitialData(String billType) async {
-    final maxOrderResponse = await ApiClient.postRequest("${ApiConstants.apiMaxSaleOrderNo}$comid&BillType=$billType", null);
+    final maxNum = await fetchMaxOrderNo(billType);
     final addressResponse = await ApiClient.postRequest("${ApiConstants.apiSelectAddressList}$comid", null);
     final agentCompanyResponse = await ApiClient.postRequest("${ApiConstants.apiSelectAgentCompany}$comid", null);
     final employeeResponse = await ApiClient.postRequest("${ApiConstants.apiSelectEmployee}$comid&AccountName=&Type=Operation", null);
-
-    String maxNum = '';
-    if (maxOrderResponse != null && maxOrderResponse is List && maxOrderResponse.isNotEmpty) {
-      maxNum = maxOrderResponse[0]['MaxNo']?.toString() ?? '';
-    }
 
     return {
       'maxSaleOrderNum': maxNum,
@@ -43,11 +40,6 @@ class SaleOrderDetailsRepository {
     };
   }
 
-  Future<String> fetchMaxOrderNo(String billType) async {
-    final maxOrderResponse = await ApiClient.postRequest("${ApiConstants.apiMaxSaleOrderNo}$comid&BillType=$billType", null);
-    if (maxOrderResponse != null && maxOrderResponse is List && maxOrderResponse.isNotEmpty) {
-      return maxOrderResponse[0]['MaxNo']?.toString() ?? '';
-    }
-    return '';
-  }
+  /// The next job number of the bill type (Java sequence, as the web).
+  Future<String> fetchMaxOrderNo(String billType) => sl<SaleOrderApi>().nextJobNo(billType);
 }

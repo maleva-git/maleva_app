@@ -1,4 +1,3 @@
-import 'package:maleva/core/network/legacy_api_repository.dart';
 import 'package:maleva/core/di/injection.dart';
 import 'package:maleva/core/theme/app_typography.dart';
 import 'package:maleva/core/network/api_constants.dart';
@@ -11,7 +10,7 @@ import 'package:maleva/core/utils/app_globals.dart';
 import 'package:maleva/core/colors/colors.dart' as colour;
 import 'package:maleva/menu/menulist.dart';
 import '../../../../transaction/enquirytrmaster/add/view/enquirytradd_tab.dart';
-import '../../saleorderadd/view/saleorderadd_tab.dart';
+import 'package:maleva/features/transaction/salesorder/add/view/salesorderadd_tab.dart';
 import '../../spotsaleorder/view/spotsaleorder_view.dart';
 import '../bloc/transportdb_bloc.dart';
 import '../bloc/transportdb_event.dart';
@@ -410,18 +409,10 @@ class _TransportTab extends StatelessWidget {
                       height: isTablet ? size.height * 0.06 : size.height * 0.05,
                       child: InkWell(
                         onTap: () => _showDetailsDialog(context, item),
-                        onLongPress: () async {
-                          await sl<LegacyApiRepository>().EditSalesOrder(
-                               item['Id'], 0); if (!context.mounted) return;Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (_) => SalesOrderAdd(
-                                saleDetails: AppGlobals.SaleEditDetailList,
-                                saleMaster: AppGlobals.SaleEditMasterList,
-                              ),
-                            ),
-                          );
-                        },
+                        onLongPress: () => Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (_) => SalesOrdersAdd(saleOrderId: item['Id'] as int)),
+                        ),
                         child: Card(
                           child: Row(
                             children: [
@@ -683,17 +674,12 @@ class _EnquiryTab extends StatelessWidget {
                                             context,
                                             'Do You Want to Push to SalesOrder ?');
                                         if (confirm) {
-                                          AppGlobals.storagenew.setString(
-                                              'EnquiryOpen', 'true');
                                           if (!context.mounted) return;
-Navigator.push(
+                                          Navigator.push(
                                             context,
                                             MaterialPageRoute(
-                                              builder: (_) =>
-                                                  SalesOrderAdd(
-                                                    saleDetails: null,
-                                                    saleMaster: [item],
-                                                  ),
+                                              builder: (_) => SalesOrdersAdd(
+                                                  enquiry: Map<String, dynamic>.from(item as Map)),
                                             ),
                                           );
                                         }

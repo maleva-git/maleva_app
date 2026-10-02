@@ -210,7 +210,7 @@ class _JobNoRowState extends State<_JobNoRow> {
       _removeOverlay();
       return;
     }
-    final predictions = AppGlobals.JobNoList.where((e) => e['CNumber'].toString().contains(value)).toList();
+    final predictions = widget.state.jobs.where((e) => '${e['cNumber'] ?? ''}'.contains(value)).toList();
     if (predictions.isNotEmpty) {
       _showOverlay(predictions);
     } else {
@@ -245,14 +245,14 @@ class _JobNoRowState extends State<_JobNoRow> {
                             itemCount: predictions.length,
                             separatorBuilder: (_, __) => const Divider(height: 1, color: Palette.grey200p),
                             itemBuilder: (ctx, i) {
-                              final cnum = predictions[i]['CNumber'].toString();
+                              final cnum = '${predictions[i]['cNumber'] ?? ''}';
                               return InkWell(
                                 onTap: () {
                                   _focusNode.unfocus();
                                   _removeOverlay();
                                   // 🔥 FIX 3: Use the captured BLoC and widget's context
                                   bloc.add(AirFreightJobNoSelected(
-                                    saleOrderId: predictions[i]['Id'],
+                                    saleOrderId: predictions[i]['id'] as int,
                                     jobNo: cnum,
                                     context: context,
                                   ));
@@ -339,22 +339,11 @@ class _JobNoRowState extends State<_JobNoRow> {
                       toastMsg('Enter Job No', '', context);
                       return;
                     }
-                    int finalSaleId = s.saleOrderId;
-                    if (finalSaleId == 0) {
-                      final match = AppGlobals.JobNoList.where((e) => e['CNumber'].toString() == s.jobNoText).toList();
-                      if(match.isNotEmpty) finalSaleId = match.first['Id'];
-                    }
-
-                    await sl<LegacyApiRepository>().EditSalesOrder(finalSaleId, int.tryParse(s.jobNoText) ?? 0);
-
-                    if (!context.mounted) return;
                     Navigator.push(
                       context,
                       MaterialPageRoute(
                         builder: (_) => SalesOrdersAdd(
-                          SaleDetails: null,
-                          SaleMaster: AppGlobals.SaleEditMasterList,
-                        ),
+                            saleOrderId: s.saleOrderId, saleOrderNo: int.tryParse(s.jobNoText) ?? 0),
                       ),
                     );
                   },
@@ -381,10 +370,7 @@ class _StatusField extends StatelessWidget {
         if (state.jobNoText.isEmpty && state.statusName.isEmpty) { toastMsg('Enter Job No', '', context); return; }
         if (state.statusName.isNotEmpty) { context.read<AirFreightBloc>().add(AirFreightStatusCleared()); return; }
 
-        // 🔥 FIXED: Removed 'context' from EditSalesOrder
-        await sl<LegacyApiRepository>().EditSalesOrder(state.saleOrderId, int.tryParse(state.jobNoText) ?? 0);
-        if (!context.mounted) return;
-        await sl<LegacyApiRepository>().SelectAllJobStatus(context, AppGlobals.SaleEditMasterList[0]['JobMasterRefId']);
+        await sl<LegacyApiRepository>().SelectAllJobStatus(context, state.jobMasterId);
 
         if (!context.mounted) return;
         Navigator.push(context, MaterialPageRoute(builder: (_) => const JobAllStatus(Searchby: 1, SearchId: 0, JobTypeId: 0))).then((navRes) { if (navRes != null) { AppGlobals.SelectAllStatusList = navRes; }

@@ -58,7 +58,6 @@ export 'shared/review.dart';
 export 'shared/email_model.dart';
 export 'shared/employee_details_model.dart';
 export 'shared/employee_model.dart';
-export '../../features/operations/models/forwarding_model.dart';
 export 'shared/driver_details_model.dart';
 export 'shared/bill_order_master.dart';
 export 'shared/bill_order_detail.dart';

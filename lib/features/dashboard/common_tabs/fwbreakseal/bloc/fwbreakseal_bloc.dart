@@ -54,10 +54,10 @@ class FWBreakSealBloc extends Bloc<FWBreakSealEvent, FWBreakSealState> {
     }
 
     final String field = event.smkType == 1
-        ? 'ForwardingSMKNo'
-        : event.smkType == 2 ? 'ForwardingSMKNo2' : 'ForwardingSMKNo3';
+        ? 'forwardingSMKNo'
+        : event.smkType == 2 ? 'forwardingSMKNo2' : 'forwardingSMKNo3';
 
-    final filtered = _allJobs.where((e) => e[field].toString().contains(value)).toList();
+    final filtered = _allJobs.where((e) => '${e[field] ?? ''}'.contains(value)).toList();
 
     emit(state.copyWith(
       suggestions: filtered,
@@ -80,18 +80,18 @@ class FWBreakSealBloc extends Bloc<FWBreakSealEvent, FWBreakSealState> {
     emit(state.copyWith(isLoading: true, overlayStatus: OverlayStatus.hidden));
 
     try {
-      final int id = event.prediction['Id'] as int;
-      final int cNumber = int.parse(event.prediction['CNumber'].toString());
+      final int id = event.prediction['id'] as int;
+      final int cNumber = event.prediction['cNumber'] as int? ?? 0;
 
       // Fetch specific sales order data
       _currentEditData = await repository.fetchSalesOrderDetails(id, cNumber);
 
       final int t = event.smkType;
-      final String smkField = t == 1 ? 'ForwardingSMKNo' : t == 2 ? 'ForwardingSMKNo2' : 'ForwardingSMKNo3';
-      final String exRefField = t == 1 ? 'ForwardingExitRef' : t == 2 ? 'ForwardingExitRef2' : 'ForwardingExitRef3';
-      final String sealRefField = t == 1 ? 'SealbreakbyRefid' : t == 2 ? 'SealbreakbyRefid2' : 'SealbreakbyRefid3';
+      final String smkField = t == 1 ? 'forwardingSMKNo' : t == 2 ? 'forwardingSMKNo2' : 'forwardingSMKNo3';
+      final String exRefField = t == 1 ? 'forwardingExitRef' : t == 2 ? 'forwardingExitRef2' : 'forwardingExitRef3';
+      final String sealRefField = t == 1 ? 'sealbreakbyRefid' : t == 2 ? 'sealbreakbyRefid2' : 'sealbreakbyRefid3';
 
-      final String smkNo = event.prediction[smkField].toString();
+      final String smkNo = '${event.prediction[smkField] ?? ''}';
       final String exRef = _currentEditData[exRefField] ?? '';
       final int sealRefId = _currentEditData[sealRefField] ?? 0;
 
@@ -170,37 +170,16 @@ class FWBreakSealBloc extends Bloc<FWBreakSealEvent, FWBreakSealState> {
     emit(state.copyWith(isLoading: true, screenStatus: FWScreenStatus.idle));
 
     try {
-      final empRefId = AppPreferences.getEmpRefId();
-
-      final Map<String, dynamic> master = {
-        'Id': state.saleOrderId,
-        'Comid': AppPreferences.getComid(),
-        'Jobid': s1.smkNo,
-        'EmployeeRefId': empRefId == 0 ? null : empRefId,
-        'SealbyRefid': 0,
-        'SealbreakbyRefid': s1.breakByEmpId,
-        'SealbyRefid2': 0,
-        'SealbreakbyRefid2': s2.breakByEmpId,
-        'SealbyRefid3': 0,
-        'SealbreakbyRefid3': s3.breakByEmpId,
-        'ForwardingEnterRef': _currentEditData["ForwardingEnterRef"] ?? '',
-        'ForwardingExitRef': s1.exRef,
-        'ForwardingEnterRef2': _currentEditData["ForwardingEnterRef2"] ?? '',
-        'ForwardingExitRef2': s2.exRef,
-        'ForwardingEnterRef3': _currentEditData["ForwardingEnterRef3"] ?? '',
-        'ForwardingExitRef3': s3.exRef,
-        'Forwarding': null,
-        'Forwarding2': null,
-        'Forwarding3': null,
-      };
-
-      final result = await repository.updateForwarding(master);
-
-      if (result?.IsSuccess == true) {
-        emit(state.copyWith(isLoading: false, screenStatus: FWScreenStatus.success, successMessage: 'Updated Successfully'));
-      } else {
-        emit(state.copyWith(isLoading: false, screenStatus: FWScreenStatus.failure, errorMessage: result?.Message ?? 'Update failed'));
-      }
+      // the exit references and break-seal officers; the rest of the job is left as it is
+      await repository.updateForwarding(state.saleOrderId, {
+        'sealbreakbyRefid': s1.breakByEmpId,
+        'sealbreakbyRefid2': s2.breakByEmpId,
+        'sealbreakbyRefid3': s3.breakByEmpId,
+        'forwardingExitRef': s1.exRef,
+        'forwardingExitRef2': s2.exRef,
+        'forwardingExitRef3': s3.exRef,
+      });
+      emit(state.copyWith(isLoading: false, screenStatus: FWScreenStatus.success, successMessage: 'Updated Successfully'));
     } catch (e, st) {
       emit(state.copyWith(isLoading: false, screenStatus: FWScreenStatus.failure, errorMessage: e.toString()));
       debugPrint(st.toString());

@@ -1,12 +1,12 @@
-import '../../../../../core/models/model.dart';
-import 'package:maleva/core/models/shared/sale_edit_detail_model.dart';
 abstract class SalesOrderAddEvent {}
 
+/// Opens the form: a new order, the order [saleOrderId] or job number [saleOrderNo]
+/// (read from Java), or a new order filled from an [enquiry] row.
 class StartupSalesOrderAdd extends SalesOrderAddEvent {
-  final List<SaleEditDetailModel>? saleDetails;
-  final List<dynamic>? saleMaster;
-  final bool isEnquiry;
-  StartupSalesOrderAdd({this.saleDetails, this.saleMaster, this.isEnquiry = false});
+  final int saleOrderId;
+  final int saleOrderNo;
+  final Map<String, dynamic>? enquiry;
+  StartupSalesOrderAdd({this.saleOrderId = 0, this.saleOrderNo = 0, this.enquiry});
 }
 
 class SaveSalesOrderEvent extends SalesOrderAddEvent {}

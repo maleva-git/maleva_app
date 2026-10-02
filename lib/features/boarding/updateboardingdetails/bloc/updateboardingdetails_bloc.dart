@@ -2,18 +2,26 @@ import 'package:flutter/foundation.dart';
 import 'package:maleva/core/network/legacy_api_repository.dart';
 import 'package:maleva/core/di/injection.dart';
 import 'package:maleva/core/files/attachments_api.dart';
-import 'package:maleva/core/network/api_constants.dart';
+import 'package:maleva/core/sale_order/sale_order_api.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 import 'package:maleva/core/utils/app_globals.dart';
 import 'package:maleva/features/boarding/updateboardingdetails/bloc/updateboardingdetails_event.dart';
 import 'package:maleva/features/boarding/updateboardingdetails/bloc/updateboardingdetails_state.dart';
-import 'package:maleva/core/models/shared/response_view_model.dart';
 
 
+/// Boarding status of a job, on the shared Java sale order API
+/// (`/api/sale-orders/job-numbers`, `/edit`, `PUT /{id}/boarding`, `POST /{id}/boarding-mail`).
 class BoardingStatusBloc
     extends Bloc<BoardingStatusEvent, BoardingStatusState> {
-  BoardingStatusBloc() : super(BoardingStatusInitial()) {
+  final SaleOrderApi _saleOrders;
+  List<Map<String, dynamic>> _jobs = const [];
+
+  BoardingStatusLoaded _empty() => BoardingStatusLoaded.empty().copyWith(jobs: _jobs);
+
+  BoardingStatusBloc({SaleOrderApi? saleOrders})
+      : _saleOrders = saleOrders ?? sl<SaleOrderApi>(),
+        super(BoardingStatusInitial()) {
     on<BoardingStatusStarted>(_onStarted);
     on<BoardingStatusBillTypeChanged>(_onBillTypeChanged);
     on<BoardingStatusJobNoTextChanged>(_onJobNoTextChanged);
@@ -39,14 +47,15 @@ class BoardingStatusBloc
     // 1. Render UI instantly
     if (event.jobId != null && event.jobNo != null) {
       final shortNo = event.jobNo!.length >= 4 ? event.jobNo!.substring(4) : event.jobNo!;
-      emit(BoardingStatusLoaded.empty().copyWith(jobNoText: shortNo, saleOrderId: event.jobId!));
+      emit(_empty().copyWith(jobNoText: shortNo, saleOrderId: event.jobId!));
     } else {
-      emit(BoardingStatusLoaded.empty());
+      emit(_empty());
     }
 
     // 2. Fetch data in the background
     try {
-      await sl<LegacyApiRepository>().GetJobNoForwarding(null, 0);
+      _jobs = await _saleOrders.jobNumbers(0);
+      if (state is BoardingStatusLoaded) emit((state as BoardingStatusLoaded).copyWith(jobs: _jobs));
 
       // Pre-fill when coming from dashboard with JobNo + JobId
       if (event.jobId != null && event.jobNo != null) {
@@ -78,13 +87,13 @@ class BoardingStatusBloc
     required Emitter<BoardingStatusState> emit,
   }) async {
     try {
-      await sl<LegacyApiRepository>().EditSalesOrder( saleOrderId, int.tryParse(jobNo) ?? 0);
-      await sl<LegacyApiRepository>().SelectAllJobStatus(
-          null, AppGlobals.SaleEditMasterList[0]['JobMasterRefId']);
+      final master = (await _saleOrders.edit(id: saleOrderId, saleOrderNo: int.tryParse(jobNo) ?? 0)).master;
+      final int jobMasterId = master['jobMasterRefId'] as int? ?? 0;
+      await sl<LegacyApiRepository>().SelectAllJobStatus(null, jobMasterId);
 
       int    statusId   = 0;
       String statusName = '';
-      final jStatus = AppGlobals.SaleEditMasterList[0]['JStatus'];
+      final jStatus = master['jStatus'];
       if (jStatus != null && jStatus != 0) {
         statusId = jStatus;
         final match = AppGlobals.JobAllStatusList
@@ -100,7 +109,7 @@ class BoardingStatusBloc
 
       final prev = state is BoardingStatusLoaded
           ? state as BoardingStatusLoaded
-          : BoardingStatusLoaded.empty();
+          : _empty();
 
       return prev.copyWith(
         jobNoText:        jobNo,
@@ -108,6 +117,7 @@ class BoardingStatusBloc
         jobNoSuggestions: [],
         statusId:         statusId,
         statusName:       statusName,
+        jobMasterId:      jobMasterId,
         images:           images,
       );
     } catch (_) {
@@ -122,13 +132,14 @@ class BoardingStatusBloc
     if (state is! BoardingStatusLoaded) return;
     final s = state as BoardingStatusLoaded;
     try {
-      await sl<LegacyApiRepository>().GetJobNoForwarding(null, int.parse(event.billType));
+      _jobs = await _saleOrders.jobNumbers(int.parse(event.billType));
     } catch (e, stack) { debugPrint("Error caught globally: $e\n$stack"); }
     emit(s.copyWith(
       billType:         event.billType,
       jobNoText:        '',
       saleOrderId:      0,
       jobNoSuggestions: [],
+      jobs:             _jobs,
     ));
   }
 
@@ -141,8 +152,8 @@ class BoardingStatusBloc
     final q = event.text.trim();
     List<dynamic> filtered = [];
     if (q.isNotEmpty) {
-      filtered = AppGlobals.JobNoList
-          .where((e) => e['CNumber'].toString().contains(q))
+      filtered = s.jobs
+          .where((e) => '${e['cNumber'] ?? ''}'.contains(q))
           .toList();
     }
     emit(s.copyWith(
@@ -288,76 +299,37 @@ class BoardingStatusBloc
 
     emit(BoardingStatusLoading());
     try {
-      bool success = false;
-
-      // ── Step 1: Update status + times ────────────────────────────────────
-      if (s.statusName.isNotEmpty || s.startTimeEnabled || s.endTimeEnabled) {
-        final master = {
-          'Id':               s.saleOrderId,
-          'Comid':            AppGlobals.Comid,
-          'Jobid':            s.jobNoText,
-          'EmployeeRefId':    AppGlobals.EmpRefId == 0 ? null : AppGlobals.EmpRefId,
-          'StatusRefId':      s.statusId,
-          'BoardingStartTime': s.startTimeEnabled
-              ? DateTime.parse(s.startTime).toIso8601String()
-              : null,
-          'BoardingEndTime':   s.endTimeEnabled
-              ? DateTime.parse(s.endTime).toIso8601String()
-              : null,
-        };
-        final header = {'Content-Type': 'application/json; charset=UTF-8'};
-
-        final result = await sl<LegacyApiRepository>().apiAllinoneSelectArray(
-            ApiConstants.apiUpdateBoardingDetails, master, header, null);
-
-        if (result != '') {
-          final value = ResponseViewModel.fromJson(result);
-          if (value.IsSuccess == true) {
-            // ── Step 2: Send mail ──────────────────────────────────────────
-            await _sendStatusMail(s);
-            success = true;
-          }
-        }
-      }
-
-      if (success) {
-        emit(BoardingStatusSaveSuccess());
-        emit(BoardingStatusLoaded.empty());
-      } else {
+      if (s.statusName.isEmpty && !s.startTimeEnabled && !s.endTimeEnabled) {
         emit(s);
+        return;
       }
+      await _saleOrders.updateBoarding(
+        s.saleOrderId,
+        statusId: s.statusId,
+        start: s.startTimeEnabled ? DateTime.parse(s.startTime) : null,
+        end: s.endTimeEnabled ? DateTime.parse(s.endTime) : null,
+      );
+      await _sendStatusMail(s);
+      emit(BoardingStatusSaveSuccess());
+      emit(_empty());
     } catch (e) {
       emit(BoardingStatusError(e.toString()));
     }
   }
 
-  // ── Send mail helper ──────────────────────────────────────────────────────────
+  // ── Send mail helper (the photos are required, as .NET) ───────────────────────
   Future<void> _sendStatusMail(BoardingStatusLoaded s) async {
     if (s.images.isEmpty) return;
     final imageUrls = s.images
-        .map((img) =>
-    '${AppGlobals.imagepath}SalesOrder/${s.saleOrderId}/Boarding/$img')
+        .map((img) => '${AppGlobals.imagepath}SalesOrder/${s.saleOrderId}/Boarding/$img')
         .toList();
-
-    final master = {
-      'CompanyRefId': AppGlobals.Comid,
-      'RTIId':        0,
-      'RTINo':        '',
-      'JobId':        s.saleOrderId,
-      'JobNo':        s.jobNoText,
-      'StatusId':     s.statusId,
-      'StatusName':   '${s.statusName} Done',
-      'ImageURL':     imageUrls,
-    };
-    final header = {'Content-Type': 'application/json; charset=UTF-8'};
-    await sl<LegacyApiRepository>().apiAllinoneSelectArray(
-        ApiConstants.apiBoardingMail, master, header, null);
+    await _saleOrders.sendBoardingMail(s.saleOrderId, statusName: '${s.statusName} Done', imageUrls: imageUrls);
   }
 
   // ── Reset ─────────────────────────────────────────────────────────────────────
   void _onResetRequested(
       BoardingStatusResetRequested event,
       Emitter<BoardingStatusState> emit) {
-    emit(BoardingStatusLoaded.empty());
+    emit(_empty());
   }
 }

@@ -13,6 +13,10 @@ class BoardingStatusLoaded extends BoardingStatusState {
   final String jobNoText;
   final int    saleOrderId;
   final List<dynamic> jobNoSuggestions;
+  /// The job picker list (`/api/sale-orders/job-numbers`: `[{id, cNumber, ...}]`).
+  final List<Map<String, dynamic>> jobs;
+  /// The job's job type, for the status picker.
+  final int jobMasterId;
 
   // ── Status ────────────────────────────────────────────────────────────────
   final int    statusId;
@@ -33,6 +37,8 @@ class BoardingStatusLoaded extends BoardingStatusState {
     required this.jobNoText,
     required this.saleOrderId,
     required this.jobNoSuggestions,
+    this.jobs = const [],
+    this.jobMasterId = 0,
     required this.statusId,
     required this.statusName,
     required this.startTime,
@@ -48,6 +54,8 @@ class BoardingStatusLoaded extends BoardingStatusState {
     String? jobNoText,
     int?    saleOrderId,
     List<dynamic>? jobNoSuggestions,
+    List<Map<String, dynamic>>? jobs,
+    int? jobMasterId,
     int?    statusId,
     String? statusName,
     String? startTime,
@@ -62,6 +70,8 @@ class BoardingStatusLoaded extends BoardingStatusState {
       jobNoText:          jobNoText          ?? this.jobNoText,
       saleOrderId:        saleOrderId        ?? this.saleOrderId,
       jobNoSuggestions:   jobNoSuggestions   ?? this.jobNoSuggestions,
+      jobs:               jobs               ?? this.jobs,
+      jobMasterId:        jobMasterId        ?? this.jobMasterId,
       statusId:           statusId           ?? this.statusId,
       statusName:         statusName         ?? this.statusName,
       startTime:          startTime          ?? this.startTime,

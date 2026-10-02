@@ -151,7 +151,7 @@ class VesselBloc extends Bloc<VesselEvent, VesselState> {
       final message = await repository.updateVesselPlanningDates(event.updateData);
       // Wait for 1 second before showing success to ensure UI has time to load
       await Future.delayed(const Duration(milliseconds: 500));
-      emit(VesselUpdateActionSuccess(message: message?.toString() ?? 'Success'));
+      emit(VesselUpdateActionSuccess(message: message));
       event.onSuccess();
       if (currentState is VesselLoadedState) {
         emit(currentState); // Restore the loaded state so list remains visible

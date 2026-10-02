@@ -25,7 +25,6 @@ class CustDashboardBloc
 
     // Sales
     on<CustDashboardLoadSales>(_onLoadSales);
-    on<CustDashboardEditSalesOrder>(_onEditSalesOrder);
 
     // Vessel
     on<CustDashboardLoadVessel>(_onLoadVessel);
@@ -133,17 +132,6 @@ class CustDashboardBloc
     emit(state.copyWith(status: CustDashboardStatus.loading));
     await _fetchSalesData(emit, empRefId: state.empRefId);
     emit(state.copyWith(status: CustDashboardStatus.success));
-  }
-
-  Future<void> _onEditSalesOrder(
-      CustDashboardEditSalesOrder event, Emitter<CustDashboardState> emit) async {
-    emit(state.copyWith(status: CustDashboardStatus.loading));
-    try {
-      await sl<LegacyApiRepository>().EditSalesOrder(event.id, 0);
-      emit(state.copyWith(status: CustDashboardStatus.editSalesOrderSuccess));
-    } catch (e) {
-      emit(state.copyWith(status: CustDashboardStatus.failure, errorMessage: e.toString()));
-    }
   }
 
   Future<void> _fetchSalesData(

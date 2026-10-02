@@ -1,8 +1,6 @@
 
 import 'package:equatable/equatable.dart';
 
-import '../../../../../core/models/model.dart';
-import 'package:maleva/core/models/shared/sale_edit_detail_model.dart';
 
 abstract class SaleOrderDetailsEvent extends Equatable {
   const SaleOrderDetailsEvent();
@@ -13,13 +11,16 @@ abstract class SaleOrderDetailsEvent extends Equatable {
 
 // ── Startup ───────────────────────────────────────────────────────────────────
 
-/// Fired once from initState – loads max job no, address, agents, employees.
+/// Fired once: loads the lookups (agents, employees, ...), then the order
+/// [saleOrderId] or job number [saleOrderNo] when one is given.
 class SaleOrderStartupEvent extends SaleOrderDetailsEvent {
   final String billType;
-  const SaleOrderStartupEvent({required this.billType});
+  final int saleOrderId;
+  final int saleOrderNo;
+  const SaleOrderStartupEvent({required this.billType, this.saleOrderId = 0, this.saleOrderNo = 0});
 
   @override
-  List<Object?> get props => [billType];
+  List<Object?> get props => [billType, saleOrderId, saleOrderNo];
 }
 
 // ── Bill-type changed (MY / TR) ───────────────────────────────────────────────
@@ -30,21 +31,6 @@ class SaleOrderBillTypeChangedEvent extends SaleOrderDetailsEvent {
 
   @override
   List<Object?> get props => [billType];
-}
-
-// ── Load master data into form when editing ───────────────────────────────────
-
-class SaleOrderLoadMasterEvent extends SaleOrderDetailsEvent {
-  final List<dynamic> saleMaster;
-  final List<SaleEditDetailModel> saleDetails;
-
-  const SaleOrderLoadMasterEvent({
-    required this.saleMaster,
-    required this.saleDetails,
-  });
-
-  @override
-  List<Object?> get props => [saleMaster, saleDetails];
 }
 
 // ── Pick-Up address dialog ────────────────────────────────────────────────────

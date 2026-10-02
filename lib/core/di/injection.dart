@@ -68,7 +68,6 @@ import '../../features/dashboard/common_tabs/salary/data/salary_repository.dart'
 import '../../features/dashboard/common_tabs/saleorderdetails/bloc/saleorderdetails_bloc.dart';
 import '../../features/dashboard/common_tabs/saleorderdetails/data/sale_order_details_repository.dart';
 import '../../features/dashboard/common_tabs/saleorderview/bloc/saleorderview_bloc.dart';
-import '../../features/dashboard/common_tabs/saleorderview/data/saleorderrepository.dart';
 import '../../features/dashboard/common_tabs/salesorder/data/salesorder_repository.dart';
 import '../../features/dashboard/common_tabs/spareparts/bloc/spareparts_bloc.dart';
 import '../../features/dashboard/common_tabs/spareparts/data/spareparts_repository.dart';
@@ -121,7 +120,6 @@ import 'package:maleva/features/transaction/salesorder/add/data/salesorderadd_re
 import 'package:maleva/features/transaction/salesorder/view/data/salesorderview_repository.dart';
 
 import 'package:maleva/features/transaction/salesorder/add/bloc/salesorderadd_bloc.dart';
-import 'package:maleva/features/transaction/viewsaleorder/data/viewsaleorder_repository.dart';
 import 'package:maleva/features/transaction/viewsaleorder/bloc/viewsaleorder_bloc.dart';
 import 'package:maleva/features/ir_report/ir_report_injection.dart';
 import 'package:maleva/features/truck_location/truck_location_injection.dart';
@@ -156,10 +154,6 @@ Future<void> setupDependencies() async {
 
   sl.registerLazySingleton<SalesOrderAddRepository>(
     () => SalesOrderAddRepository(sl(), sl()),
-  );
-
-  sl.registerLazySingleton<ViewSaleOrderRepository>(
-    () => ViewSaleOrderRepository(),
   );
 
   // BLoCs
@@ -225,10 +219,7 @@ Future<void> setupDependencies() async {
         () => SalesOrderBloc(repository: sl<SalesOrderRepository>()),
   );
 
-  sl.registerLazySingleton<SaleOrderRepository>(() => SaleOrderRepository());
-  sl.registerFactory<SaleOrderBloc>(
-        () => SaleOrderBloc(repository: sl<SaleOrderRepository>()),
-  );
+  sl.registerFactory<SaleOrderBloc>(() => SaleOrderBloc());
 
   sl.registerLazySingleton<SaleOrderDetailsRepository>(
         () => SaleOrderDetailsRepository(),

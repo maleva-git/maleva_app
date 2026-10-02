@@ -31,14 +31,14 @@ class SaleOrderDetailModel {
         SaleRefId = int.tryParse(json['SaleRefId']?.toString() ?? '') ?? 0,
         ProductCode = json['ProductCode'] ?? '',
         ProductName = json['ProductName'] ?? '',
-        MRP = double.parse(json['MRP'].toString()),
-        SaleRate = double.parse(json['SaleRate'].toString()),
-        TaxPercent = double.parse(json['TaxPercent'].toString()),
-        TaxAmt = double.parse(json['TaxAmt'].toString()),
-        DiscountPercent = double.parse(json['DiscountPercent'].toString()),
-        DiscountAmt = double.parse(json['DiscountAmt'].toString()),
-        ItemQty = double.parse(json['ItemQty'].toString()),
-        SAmount = double.parse(json['SAmount'].toString());
+        MRP = double.tryParse('${json['MRP'] ?? 0}') ?? 0,
+        SaleRate = double.tryParse('${json['SaleRate'] ?? 0}') ?? 0,
+        TaxPercent = double.tryParse('${json['TaxPercent'] ?? 0}') ?? 0,
+        TaxAmt = double.tryParse('${json['TaxAmt'] ?? 0}') ?? 0,
+        DiscountPercent = double.tryParse('${json['DiscountPercent'] ?? 0}') ?? 0,
+        DiscountAmt = double.tryParse('${json['DiscountAmt'] ?? 0}') ?? 0,
+        ItemQty = double.tryParse('${json['ItemQty'] ?? 0}') ?? 0,
+        SAmount = double.tryParse('${json['SAmount'] ?? 0}') ?? 0;
 
   // method
   Map<String, dynamic> toJson() {

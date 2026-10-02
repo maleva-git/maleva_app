@@ -17,15 +17,16 @@ class SaleOrderUpdateModel {
     this.customerName = '',
   });
 
-  factory SaleOrderUpdateModel.fromJson(Map<String, dynamic> json) {
+  /// A row of the Java `GET /api/sale-orders/trips` (`saleDate` dd/MM/yyyy).
+  factory SaleOrderUpdateModel.fromJava(Map<String, dynamic> json) {
     return SaleOrderUpdateModel(
-      id: json['Id'] ?? 0,
-      cNumberDisplay: json['CNumberDisplay'] ?? '',
-      saleDate: json['SaleDate'] ?? '',
-      remarks1: json['Remarks1'] ?? '',
-      origin: json['Origin'] ?? '',
-      destination: json['Destination'] ?? '',
-      customerName: json['CustomerName'] ?? '',
+      id: json['id'] ?? 0,
+      cNumberDisplay: json['cNumberDisplay'] ?? '',
+      saleDate: json['saleDate'] ?? '',
+      remarks1: json['remarks1'] ?? '',
+      origin: json['origin'] ?? '',
+      destination: json['destination'] ?? '',
+      customerName: json['customerName'] ?? '',
     );
   }
 

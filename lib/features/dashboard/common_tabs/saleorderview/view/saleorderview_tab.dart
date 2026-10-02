@@ -14,7 +14,6 @@ import '../../../../mastersearch/JobStatus.dart';
 import '../bloc/saleorderview_bloc.dart';
 import '../bloc/saleorderview_event.dart';
 import '../bloc/saleorderview_state.dart';
-import '../data/saleorderrepository.dart';
 import 'package:maleva/core/models/shared/barcode_print_model.dart';
 import 'package:maleva/core/models/shared/customer_model.dart';
 import 'package:maleva/core/models/shared/employee_model.dart';
@@ -30,9 +29,7 @@ class Saleorderview extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (_) => SaleOrderBloc(
-        repository: SaleOrderRepository(),
-      )..add(const SaleOrderStartupRequested()),
+      create: (_) => SaleOrderBloc()..add(const SaleOrderStartupRequested()),
       child: const _SaleOrderView(),
     );
   }

@@ -74,8 +74,6 @@ class PreAlertBloc extends Bloc<PreAlertEvent, PreAlertState> {
       await sl<LegacyApiRepository>().SelectJobStatus(event.context);
       if (!event.context.mounted) return;
       await sl<LegacyApiRepository>().SelectEmployee(event.context, 'Sales', '');
-      if (!event.context.mounted) return;
-      await sl<LegacyApiRepository>().loadComboS1(event.context, 0);
       final isAdmin = AppGlobals.storagenew.getString('RulesType') == 'ADMIN';
       emit(PreAlertLoaded(
         fromDate: DateFormat('yyyy-MM-dd').format(DateTime.now()),

@@ -1,6 +1,7 @@
 import 'package:maleva/core/network/legacy_api_repository.dart';
 import 'package:maleva/core/di/injection.dart';
-import 'package:maleva/core/network/api_constants.dart';
+import 'package:maleva/core/sale_order/sale_order_api.dart';
+import 'package:maleva/core/utils/json_read.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -8,19 +9,17 @@ import 'package:maleva/core/utils/app_globals.dart';
 import 'package:maleva/features/dashboard/common_tabs/saleorderview/bloc/saleorderview_event.dart';
 import 'package:maleva/features/dashboard/common_tabs/saleorderview/bloc/saleorderview_state.dart';
 
-import '../data/saleorderrepository.dart';
 import 'package:maleva/features/transaction/salesorder/models/sale_order_master_model.dart';
-import 'package:maleva/features/transaction/salesorder/models/sale_order_detail_model.dart';
 
-// Import your repository
-
-
+/// The TV sale order board, on the shared Java APIs: the list is
+/// `POST /api/sale-orders/tv-search`, the ETA/ETB update of the ticked jobs is
+/// `POST /api/vessel-plannings/sale-order-update-many`.
 class SaleOrderBloc extends Bloc<SaleOrderEvent, SaleOrderState> {
-  // Define the repository
-  final SaleOrderRepository repository;
+  final SaleOrderApi _saleOrders;
 
-  // Require the repository in the constructor
-  SaleOrderBloc({required this.repository}) : super(SaleOrderState(
+  SaleOrderBloc({SaleOrderApi? saleOrders})
+      : _saleOrders = saleOrders ?? sl<SaleOrderApi>(),
+        super(SaleOrderState(
     checkBoxValueLEmp:
     AppGlobals.storagenew.getString('RulesType') != 'ADMIN',
   )) {
@@ -53,7 +52,8 @@ class SaleOrderBloc extends Bloc<SaleOrderEvent, SaleOrderState> {
     emit(state.copyWith(status: SaleOrderStatus.loading));
     try {
       // Load all combo / dropdown data first
-      await sl<LegacyApiRepository>().SelectCustomer(null);await sl<LegacyApiRepository>().SelectJobStatus(null);await sl<LegacyApiRepository>().SelectEmployee(null, 'Sales', '');await sl<LegacyApiRepository>().loadComboS1(null, 0);// Then load the list
+      await sl<LegacyApiRepository>().SelectCustomer(null);await sl<LegacyApiRepository>().SelectJobStatus(null);await sl<LegacyApiRepository>().SelectEmployee(null, 'Sales', '');
+      // Then load the list
       await _fetchData(emit);
     } catch (e, st) {
       emit(state.copyWith(
@@ -87,65 +87,25 @@ class SaleOrderBloc extends Bloc<SaleOrderEvent, SaleOrderState> {
       final int empRefId =
       state.checkBoxValueLEmp ? AppGlobals.EmpRefId : state.empId;
 
-      final Map<String, dynamic> body = {
-        'SoId': 0,
-        'Comid': AppGlobals.storagenew.getInt('Comid') ?? 0,
-        'Fromdate': state.fromDate,
-        'Todate': state.toDate,
+      final result = await _saleOrders.tvSearch({
         'Id': state.custId,
-        'DId': 0,
-        'TId': 0,
         'Employeeid': empRefId,
         'Statusid': state.statusId,
         'completestatusnotshow': state.completeStatusNotShow,
         'Search': state.jobNo.isNotEmpty ? state.jobNo : null,
         'Offvesselname': state.offVessel.isNotEmpty ? state.offVessel : null,
-        'Loadingvesselname':
-        state.loadingVessel.isNotEmpty ? state.loadingVessel : null,
-        'Remarks': state.cls,
-        'Westport': 0,
+        'Loadingvesselname': state.loadingVessel.isNotEmpty ? state.loadingVessel : null,
+        'Remarks': int.tryParse(state.cls),
         'ETA': state.checkBoxValueETA,
-        'ETAType': state.etaRadioVal,
+        'ETAType': int.tryParse(state.etaRadioVal),
         'Pickup': state.checkBoxValuePickUp,
-      };
+      }, from: DateTime.parse(state.fromDate), to: DateTime.parse(state.toDate));
 
-      final headers = {'Content-Type': 'application/json; charset=UTF-8'};
-
-      final resultData = await sl<LegacyApiRepository>().apiAllinoneSelectArray(
-        ApiConstants.apiSelectTVSaleOrder,
-        body,
-        headers,
-        null,
-      );
-
-      if (resultData != null &&
-          resultData is List &&
-          resultData.isNotEmpty) {
-        final List<SaleOrderMasterModel> masters = resultData[0]['salemaster']
-            .map<SaleOrderMasterModel>(
-                (e) => SaleOrderMasterModel.fromJson(e))
-            .toList();
-
-        final List<SaleOrderDetailModel> details = resultData[0]['saledetails']
-            .map<SaleOrderDetailModel>(
-                (e) => SaleOrderDetailModel.fromJson(e))
-            .toList();
-
-        // Keep global lists in sync (other pages may read them)
-        AppGlobals.SaleOrderMasterList = masters;
-        AppGlobals.SaleOrderDetailList = details;
-
-        emit(state.copyWith(
-          status: SaleOrderStatus.success,
-          masterList: List<SaleOrderMasterModel>.from(masters),
-          currentlyVisibleIndex: -1,
-        ));
-      } else {
-        emit(state.copyWith(
-          status: SaleOrderStatus.success,
-          masterList: const [],
-        ));
-      }
+      emit(state.copyWith(
+        status: SaleOrderStatus.success,
+        masterList: result.masters.map(SaleOrderMasterModel.fromJson).toList(),
+        currentlyVisibleIndex: -1,
+      ));
     } catch (e, st) {
       emit(state.copyWith(
         status: SaleOrderStatus.failure,
@@ -257,26 +217,24 @@ class SaleOrderBloc extends Bloc<SaleOrderEvent, SaleOrderState> {
     emit(state.copyWith(status: SaleOrderStatus.updating));
 
     try {
-      for (final item in toSave) {
-        item.SETA  = state.leta  != null ? _fmt(state.leta!)  : item.SETA;
-        item.SETB  = state.letb  != null ? _fmt(state.letb!)  : item.SETB;
-        item.SOETA = state.oeta  != null ? _fmt(state.oeta!) : item.SOETA;
-        item.SOETB = state.oetb  != null ? _fmt(state.oetb!) : item.SOETB;
-      }
-
-      // We call the clean repository method instead of apiAllinoneMapSelect
-      final result = await repository.updateSaleOrderMaster(toSave);
-
-      if (result != null && result['IsSuccess'] == true) {
+      final result = await _saleOrders.vesselUpdateMany(
+        [for (final item in toSave) item.Id],
+        eta: state.leta != null ? _fmt(state.leta!) : null,
+        etb: state.letb != null ? _fmt(state.letb!) : null,
+        oeta: state.oeta != null ? _fmt(state.oeta!) : null,
+        oetb: state.oetb != null ? _fmt(state.oetb!) : null,
+      );
+      final refused = [
+        for (final r in JsonRead.listOfMaps(result['results']))
+          if (r['ok'] != true) '${r['jobNo'] ?? r['saleOrderId']}: ${r['message'] ?? ''}',
+      ];
+      if (refused.isEmpty) {
         emit(state.copyWith(status: SaleOrderStatus.success));
-        // Reload fresh data after update
-        add(const SaleOrderDataRequested());
       } else {
-        emit(state.copyWith(
-          status: SaleOrderStatus.failure,
-          errorMessage: result?['Message'] ?? 'Update failed. Please try again.',
-        ));
+        emit(state.copyWith(status: SaleOrderStatus.failure, errorMessage: refused.join('\n')));
       }
+      // Reload fresh data after update
+      add(const SaleOrderDataRequested());
     } catch (e, st) {
       emit(state.copyWith(
         status: SaleOrderStatus.failure,

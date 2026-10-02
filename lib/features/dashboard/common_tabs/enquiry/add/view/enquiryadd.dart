@@ -1,5 +1,6 @@
 import 'package:maleva/core/network/legacy_api_repository.dart';
 import 'package:maleva/core/di/injection.dart';
+import 'package:maleva/core/sale_order/sale_order_api.dart';
 import 'package:maleva/core/theme/app_typography.dart';
 // ui/add_enquiry_screen.dart
 
@@ -181,7 +182,9 @@ if (navResult1 != null) { AppGlobals.SelectCustomerList = navResult1; }
                             bloc.add(CustomerSelectedEvent(cust.AccountName, cust.Id));
                             AppGlobals.SelectCustomerList = CustomerModel.Empty();
                             if (!context.mounted) return;
-                            await sl<LegacyApiRepository>().loadCustomerCurrency(context, cust.Id); if (!context.mounted) return;} else {
+                            AppGlobals.CustomerCurrencyValue = await sl<SaleOrderApi>().currencyValue(cust.Id);
+                            if (!context.mounted) return;
+                          } else {
                             bloc.add(CustomerClearedEvent());
                           }
                         },

@@ -351,11 +351,11 @@ class _JobNoSectionState extends State<_JobNoSection> {
                 const Divider(height: 1, color: colour.kDetailBg),
                 itemBuilder: (ctx, i) {
                   final item = s.jobNoSuggestions[i];
-                  final cnum = item['CNumber'].toString();
+                  final cnum = '${item['cNumber'] ?? ''}';
                   return InkWell(
                     onTap: () => context.read<FWSmkBloc>().add(
                         FWSmkJobNoSelected(
-                            saleOrderId: item['Id'], jobNo: cnum)),
+                            saleOrderId: item['id'] as int, jobNo: cnum)),
                     child: Padding(
                       padding: const EdgeInsets.symmetric(
                           horizontal: 16, vertical: 12),

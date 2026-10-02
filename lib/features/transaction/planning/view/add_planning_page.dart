@@ -1,12 +1,13 @@
 import 'package:maleva/core/network/api_constants.dart';
 import 'package:maleva/features/transaction/planning/data/planning_repository.dart';
 import 'package:flutter/material.dart';
+import 'package:maleva/core/utils/json_read.dart';
+import 'package:maleva/core/sale_order/sale_order_api.dart';
 import 'package:maleva/core/widgets/custom_app_bar.dart';
 import 'package:maleva/core/colors/colors.dart' as colour;
 import 'package:maleva/core/theme/app_typography.dart';
 import 'package:intl/intl.dart';
 import 'package:maleva/features/transaction/salesorder/add/view/salesorderadd_tab.dart';
-import 'package:maleva/core/models/shared/sale_edit_detail_model.dart';
 import 'dart:convert';
 import '../../../../core/utils/app_globals.dart';
 import 'package:maleva/core/di/injection.dart';
@@ -323,27 +324,18 @@ class _AddPlanningPageState extends State<AddPlanningPage> {
             Future<void> saveUpdate() async {
               setSheetState(() => isSaving = true);
               try {
-                // Prepare payload
-                // Expected payload structure according to API
-                final payload = {
-                  "Jobid": item['saleOrderId'] ?? 0,
-                  "PickupDate": sPDate.isNotEmpty ? DateFormat("yyyy-MM-dd'T'HH:mm:ss").format(DateFormat('dd/MM/yyyy HH:mm').parse(sPDate)) : null,
-                  "DeliveryDate": sDDate.isNotEmpty ? DateFormat("yyyy-MM-dd'T'HH:mm:ss").format(DateFormat('dd/MM/yyyy HH:mm').parse(sDDate)) : null,
-                  "WareHouseEnterDate": sWEnter.isNotEmpty && sWEnter != " 00:00" ? DateFormat("yyyy-MM-dd'T'HH:mm:ss").format(DateFormat('dd/MM/yyyy HH:mm').parse(sWEnter)) : null,
-                  "WareHouseExitDate": sWExit.isNotEmpty && sWExit != " 00:00" ? DateFormat("yyyy-MM-dd'T'HH:mm:ss").format(DateFormat('dd/MM/yyyy HH:mm').parse(sWExit)) : null,
-                  "WareHouseAddress": wAddrCtrl.text,
-                  "pickuptimelist": "",
-                  "DeliveryDateTimeList": "",
-                  "Type": 0 // 0 means SAVE ALL
-                };
-                
-                Map<String, String> header = {'Content-Type': 'application/json; charset=UTF-8', 'Comid': AppGlobals.Comid.toString()};
-                var result = await sl<LegacyApiRepository>().apiAllinone("${ApiConstants.port}/SaleOrder/UpdateSaleorder", jsonEncode(payload), header, null);
-                if (result != null && result is String) {
-                  result = jsonDecode(result);
-                }
-                
-                if (result != null && result['ok'] == true) {
+                String? at(String v) => v.isEmpty || v == " 00:00" ? null : DateFormat("yyyy-MM-dd'T'HH:mm:ss").format(DateFormat('dd/MM/yyyy HH:mm').parse(v));
+                final result = await sl<SaleOrderApi>().planningUpdate(
+                  JsonRead.integer(item['saleOrderId']),
+                  pickupDate: at(sPDate),
+                  deliveryDate: at(sDDate),
+                  wareHouseEnterDate: at(sWEnter),
+                  wareHouseExitDate: at(sWExit),
+                  wareHouseAddress: wAddrCtrl.text,
+                  employeeId: AppGlobals.EmpRefId,
+                );
+
+                if (result['ok'] == true) {
                   // Update local list
                   setState(() {
                     _planningItems[index]['pDate'] = sPDate;
@@ -452,6 +444,9 @@ class _AddPlanningPageState extends State<AddPlanningPage> {
     bool chkWExit  = sWExit.isNotEmpty;
     final List<Map<String, dynamic>> pickupRows   = [];
     final List<Map<String, dynamic>> deliveryRows = [];
+    // stops the user removed: the Java update deletes only the ids it is told
+    final List<int> removedPickupIds   = [];
+    final List<int> removedDeliveryIds = [];
 
     void loadPickups(List<dynamic> raw) {
       for (final p in raw) {
@@ -496,20 +491,36 @@ class _AddPlanningPageState extends State<AddPlanningPage> {
         bool isSaving = false;
         String fmt(String v) { try { return DateFormat("yyyy-MM-dd'T'HH:mm:ss").format(DateFormat('dd/MM/yyyy HH:mm').parse(v)); } catch (_) { return v; } }
 
-        Future<void> callApi(Map<String, dynamic> payload) async {
-          final h = {'Content-Type': 'application/json; charset=UTF-8', 'Comid': AppGlobals.Comid.toString()};
-          var r = await sl<LegacyApiRepository>().apiAllinone("${ApiConstants.port}/SaleOrder/UpdateSaleorder", jsonEncode(payload), h, null);
-          if (r != null && r is String) r = jsonDecode(r);
-          if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(r?['ok'] == true ? 'Saved Successfully' : (r?['message'] ?? 'Failed'))));
-        }
-
-        Future<void> saveAll() async {
+        Future<void> save({bool close = true}) async {
           setS(() => isSaving = true);
           try {
-            final dynP = pickupRows.map((r) => {'Id': r['id'] ?? 0, 'PickupAddress': r['address'] ?? '', 'PickupQuantity': r['qty'] ?? '', 'PickupTime': (r['time'] ?? '').isNotEmpty ? fmt(r['time']) : null, 'PickupWeight': r['weight'] ?? ''}).toList();
-            final dynD = deliveryRows.map((r) => {'Id': r['id'] ?? 0, 'DeliveryAddress': r['address'] ?? '', 'DeliveryQuantity': r['qty'] ?? '', 'DeliveryTime': (r['time'] ?? '').isNotEmpty ? fmt(r['time']) : null, 'DeliveryWeight': r['weight'] ?? ''}).toList();
-            await callApi({"Jobid": jobId, "PickupDate": chkPDate && sPDate.isNotEmpty ? fmt(sPDate) : null, "DeliveryDate": chkDDate && sDDate.isNotEmpty ? fmt(sDDate) : null, "WareHouseEnterDate": chkWEnter && sWEnter.isNotEmpty ? fmt(sWEnter) : null, "WareHouseExitDate": chkWExit && sWExit.isNotEmpty ? fmt(sWExit) : null, "WareHouseAddress": wAddrCtrl.text, "pickuptimelist": dynP.length <= 1 ? "" : dynP.map((p) => p['PickupTime'] ?? '').join('{@}'), "DeliveryDateTimeList": dynD.length <= 1 ? "" : dynD.map((p) => p['DeliveryTime'] ?? '').join('{@}'), "PickupsList": dynP, "DeliveriesList": dynD, "Type": 0, "Comid": AppGlobals.Comid, "EmployeeRefId": AppGlobals.EmpRefId == 0 ? null : AppGlobals.EmpRefId});
-            if (mounted) Navigator.pop(ctx);
+            List<Map<String, dynamic>> stops(List<Map<String, dynamic>> rows) => [
+                  for (final r in rows)
+                    {
+                      'id': r['id'] ?? 0,
+                      'address': r['address'] ?? '',
+                      'quantity': r['qty'] ?? '',
+                      'weight': r['weight'] ?? '',
+                      'time': (r['time'] ?? '').isNotEmpty ? fmt(r['time']) : null,
+                    }
+                ];
+            final r = await sl<SaleOrderApi>().planningUpdate(
+              jobId,
+              pickupDate: chkPDate && sPDate.isNotEmpty ? fmt(sPDate) : null,
+              deliveryDate: chkDDate && sDDate.isNotEmpty ? fmt(sDDate) : null,
+              wareHouseEnterDate: chkWEnter && sWEnter.isNotEmpty ? fmt(sWEnter) : null,
+              wareHouseExitDate: chkWExit && sWExit.isNotEmpty ? fmt(sWExit) : null,
+              wareHouseAddress: wAddrCtrl.text,
+              employeeId: AppGlobals.EmpRefId,
+              pickups: stops(pickupRows),
+              deliveries: stops(deliveryRows),
+              removedPickupIds: removedPickupIds,
+              removedDeliveryIds: removedDeliveryIds,
+            );
+            if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('${r['message'] ?? 'Saved Successfully'}')));
+            if (close && mounted) Navigator.pop(ctx);
+          } catch (e) {
+            if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(e.toString())));
           } finally { if (mounted) setS(() => isSaving = false); }
         }
 
@@ -521,7 +532,11 @@ class _AddPlanningPageState extends State<AddPlanningPage> {
             margin: const EdgeInsets.only(top: 6), padding: const EdgeInsets.all(8),
             decoration: BoxDecoration(color: colour.kBg, border: Border.all(color: colour.cBorder), borderRadius: BorderRadius.circular(8)),
             child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              Row(children: [Text('${i + 1}.', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 12)), const Spacer(), IconButton(icon: const Icon(Icons.close, size: 16, color: colour.kDanger), onPressed: () => setS(() => rows.removeAt(i)), padding: EdgeInsets.zero, constraints: const BoxConstraints())]),
+              Row(children: [Text('${i + 1}.', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 12)), const Spacer(), IconButton(icon: const Icon(Icons.close, size: 16, color: colour.kDanger), onPressed: () => setS(() {
+                final removedId = JsonRead.integer(rows[i]['id']);
+                if (removedId > 0) (isPickup ? removedPickupIds : removedDeliveryIds).add(removedId);
+                rows.removeAt(i);
+              }), padding: EdgeInsets.zero, constraints: const BoxConstraints())]),
               TextField(controller: ac, style: const TextStyle(fontSize: 12), decoration: InputDecoration(labelText: isPickup ? 'Pickup Address' : 'Delivery Address', labelStyle: const TextStyle(fontSize: 11), isDense: true, contentPadding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6), border: OutlineInputBorder(borderRadius: BorderRadius.circular(6))), onChanged: (v) => row['address'] = v),
               const SizedBox(height: 4),
               Row(children: [
@@ -564,31 +579,31 @@ class _AddPlanningPageState extends State<AddPlanningPage> {
             Container(padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8), decoration: BoxDecoration(color: colour.brandLight, borderRadius: BorderRadius.circular(8)), child: Row(children: [const Text("Job No: ", style: TextStyle(fontWeight: FontWeight.bold, color: colour.brand)), Text(jobNo, style: const TextStyle(fontWeight: FontWeight.bold, color: colour.brand, fontSize: 15))])),
             const Divider(height: 20),
 
-            Row(children: [Expanded(child: chkDate("Pickup Date", chkPDate, sPDate, (v) => setS(() => chkPDate = v!), (v) => setS(() => sPDate = v))), const SizedBox(width: 8), saveBtn('SAVE', () => callApi({"Jobid": jobId, "PickupDate": chkPDate && sPDate.isNotEmpty ? fmt(sPDate) : null, "DeliveryDate": null, "WareHouseEnterDate": null, "WareHouseExitDate": null, "WareHouseAddress": "", "pickuptimelist": "", "DeliveryDateTimeList": "", "PickupsList": <Map<String, dynamic>>[], "DeliveriesList": <Map<String, dynamic>>[], "Type": 1, "Comid": AppGlobals.Comid}))]),
+            Row(children: [Expanded(child: chkDate("Pickup Date", chkPDate, sPDate, (v) => setS(() => chkPDate = v!), (v) => setS(() => sPDate = v))), const SizedBox(width: 8), saveBtn('SAVE', () => save(close: false))]),
             const SizedBox(height: 6),
-            Row(children: [Expanded(child: chkDate("Delivery Date", chkDDate, sDDate, (v) => setS(() => chkDDate = v!), (v) => setS(() => sDDate = v))), const SizedBox(width: 8), saveBtn('SAVE', () => callApi({"Jobid": jobId, "PickupDate": null, "DeliveryDate": chkDDate && sDDate.isNotEmpty ? fmt(sDDate) : null, "WareHouseEnterDate": null, "WareHouseExitDate": null, "WareHouseAddress": "", "pickuptimelist": "", "DeliveryDateTimeList": "", "PickupsList": <Map<String, dynamic>>[], "DeliveriesList": <Map<String, dynamic>>[], "Type": 2, "Comid": AppGlobals.Comid}))]),
+            Row(children: [Expanded(child: chkDate("Delivery Date", chkDDate, sDDate, (v) => setS(() => chkDDate = v!), (v) => setS(() => sDDate = v))), const SizedBox(width: 8), saveBtn('SAVE', () => save(close: false))]),
             const Divider(height: 20),
 
             Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [const Text("Pickup Address List", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13)), ElevatedButton.icon(onPressed: () => setS(() => pickupRows.add({'id': 0, 'address': '', 'qty': '', 'time': '', 'weight': ''})), icon: const Icon(Icons.add, size: 14), label: const Text("ADD PICKUP", style: TextStyle(fontSize: 11)), style: ElevatedButton.styleFrom(padding: const EdgeInsets.symmetric(horizontal: 10), minimumSize: const Size(0, 30)))]),
             ...pickupRows.asMap().entries.map((e) => addrRow(pickupRows, e.key, true)),
-            if (pickupRows.isNotEmpty) Align(alignment: Alignment.centerRight, child: Padding(padding: const EdgeInsets.only(top: 6), child: saveBtn('SAVE PICKUP LIST', () async { final dynP = pickupRows.map((r) => {'Id': r['id'] ?? 0, 'PickupAddress': r['address'] ?? '', 'PickupQuantity': r['qty'] ?? '', 'PickupTime': (r['time'] ?? '').isNotEmpty ? fmt(r['time']) : null, 'PickupWeight': r['weight'] ?? ''}).toList(); await callApi({"Jobid": jobId, "PickupDate": null, "DeliveryDate": null, "WareHouseEnterDate": null, "WareHouseExitDate": null, "WareHouseAddress": "", "pickuptimelist": "", "DeliveryDateTimeList": "", "PickupsList": dynP, "DeliveriesList": <Map<String, dynamic>>[], "Type": 6, "Comid": AppGlobals.Comid}); }))),
+            if (pickupRows.isNotEmpty) Align(alignment: Alignment.centerRight, child: Padding(padding: const EdgeInsets.only(top: 6), child: saveBtn('SAVE PICKUP LIST', () => save(close: false)))),
             const Divider(height: 20),
 
             Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [const Text("Delivery Address List", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13)), ElevatedButton.icon(onPressed: () => setS(() => deliveryRows.add({'id': 0, 'address': '', 'qty': '', 'time': '', 'weight': ''})), icon: const Icon(Icons.add, size: 14), label: const Text("ADD DELIVERY", style: TextStyle(fontSize: 11)), style: ElevatedButton.styleFrom(padding: const EdgeInsets.symmetric(horizontal: 10), minimumSize: const Size(0, 30)))]),
             ...deliveryRows.asMap().entries.map((e) => addrRow(deliveryRows, e.key, false)),
-            if (deliveryRows.isNotEmpty) Align(alignment: Alignment.centerRight, child: Padding(padding: const EdgeInsets.only(top: 6), child: saveBtn('SAVE DELIVERY LIST', () async { final dynD = deliveryRows.map((r) => {'Id': r['id'] ?? 0, 'DeliveryAddress': r['address'] ?? '', 'DeliveryQuantity': r['qty'] ?? '', 'DeliveryTime': (r['time'] ?? '').isNotEmpty ? fmt(r['time']) : null, 'DeliveryWeight': r['weight'] ?? ''}).toList(); await callApi({"Jobid": jobId, "PickupDate": null, "DeliveryDate": null, "WareHouseEnterDate": null, "WareHouseExitDate": null, "WareHouseAddress": "", "pickuptimelist": "", "DeliveryDateTimeList": "", "PickupsList": <Map<String, dynamic>>[], "DeliveriesList": dynD, "Type": 7, "Comid": AppGlobals.Comid}); }))),
+            if (deliveryRows.isNotEmpty) Align(alignment: Alignment.centerRight, child: Padding(padding: const EdgeInsets.only(top: 6), child: saveBtn('SAVE DELIVERY LIST', () => save(close: false)))),
             const Divider(height: 20),
 
-            Row(children: [Expanded(child: chkDate("WH Entry Date", chkWEnter, sWEnter, (v) => setS(() => chkWEnter = v!), (v) => setS(() => sWEnter = v))), const SizedBox(width: 8), saveBtn('SAVE', () => callApi({"Jobid": jobId, "PickupDate": null, "DeliveryDate": null, "WareHouseEnterDate": chkWEnter && sWEnter.isNotEmpty ? fmt(sWEnter) : null, "WareHouseExitDate": null, "WareHouseAddress": wAddrCtrl.text, "pickuptimelist": "", "DeliveryDateTimeList": "", "PickupsList": <Map<String, dynamic>>[], "DeliveriesList": <Map<String, dynamic>>[], "Type": 3, "Comid": AppGlobals.Comid}))]),
+            Row(children: [Expanded(child: chkDate("WH Entry Date", chkWEnter, sWEnter, (v) => setS(() => chkWEnter = v!), (v) => setS(() => sWEnter = v))), const SizedBox(width: 8), saveBtn('SAVE', () => save(close: false))]),
             const SizedBox(height: 6),
-            Row(children: [Expanded(child: chkDate("WH Exit Date", chkWExit, sWExit, (v) => setS(() => chkWExit = v!), (v) => setS(() => sWExit = v))), const SizedBox(width: 8), saveBtn('SAVE', () => callApi({"Jobid": jobId, "PickupDate": null, "DeliveryDate": null, "WareHouseEnterDate": null, "WareHouseExitDate": chkWExit && sWExit.isNotEmpty ? fmt(sWExit) : null, "WareHouseAddress": wAddrCtrl.text, "pickuptimelist": "", "DeliveryDateTimeList": "", "PickupsList": <Map<String, dynamic>>[], "DeliveriesList": <Map<String, dynamic>>[], "Type": 4, "Comid": AppGlobals.Comid}))]),
+            Row(children: [Expanded(child: chkDate("WH Exit Date", chkWExit, sWExit, (v) => setS(() => chkWExit = v!), (v) => setS(() => sWExit = v))), const SizedBox(width: 8), saveBtn('SAVE', () => save(close: false))]),
             const SizedBox(height: 10),
 
-            Row(crossAxisAlignment: CrossAxisAlignment.end, children: [Expanded(child: _buildSheetTextField("Warehouse Address", wAddrCtrl.text, (v) => wAddrCtrl.text = v)), const SizedBox(width: 8), saveBtn('SAVE', () => callApi({"Jobid": jobId, "PickupDate": null, "DeliveryDate": null, "WareHouseEnterDate": null, "WareHouseExitDate": null, "WareHouseAddress": wAddrCtrl.text, "pickuptimelist": "", "DeliveryDateTimeList": "", "PickupsList": <Map<String, dynamic>>[], "DeliveriesList": <Map<String, dynamic>>[], "Type": 5, "Comid": AppGlobals.Comid}))]),
+            Row(crossAxisAlignment: CrossAxisAlignment.end, children: [Expanded(child: _buildSheetTextField("Warehouse Address", wAddrCtrl.text, (v) => wAddrCtrl.text = v)), const SizedBox(width: 8), saveBtn('SAVE', () => save(close: false))]),
             const SizedBox(height: 24),
 
             SizedBox(width: double.infinity, child: ElevatedButton(
-              onPressed: isSaving ? null : saveAll,
+              onPressed: isSaving ? null : () => save(),
               style: ElevatedButton.styleFrom(backgroundColor: colour.brand, padding: const EdgeInsets.symmetric(vertical: 16), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12))),
               child: isSaving ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(color: colour.kWhite, strokeWidth: 2)) : const Text("SAVE ALL", style: TextStyle(color: colour.kWhite, fontWeight: FontWeight.bold, fontSize: 15)),
             )),
@@ -1159,45 +1174,9 @@ class _AddPlanningPageState extends State<AddPlanningPage> {
 }
   }
 
-  Future<void> _launchSOUpdate(int saleOrderId) async {
+  void _launchSOUpdate(int saleOrderId) {
     if (saleOrderId == 0) return;
-    setState(() => _isLoading = true);
-    try {
-      final comid = AppGlobals.storagenew.getInt('Comid') ?? 0;
-      final url = "${ApiConstants.apiEditSalesOrder}$saleOrderId&SaleorderNo=0&Comid=$comid";
-      
-      dynamic responseData = await sl<LegacyApiRepository>().apiAllinoneSelect(Uri.encodeFull(url));
-      
-      if (responseData is String) {
-        if (responseData.trim().isEmpty) {
-          setState(() => _isLoading = false);
-          return;
-        }
-        responseData = jsonDecode(responseData);
-      }
-      
-      if (responseData is List && responseData.isNotEmpty) {
-        AppGlobals.SaleEditMasterList = responseData;
-        AppGlobals.SaleEditDetailList = (responseData[0]["SaleDetails"] as List)
-            .map<SaleEditDetailModel>((e) => SaleEditDetailModel.fromJson(e))
-            .toList();
-            
-        if (!mounted) return;
-        setState(() => _isLoading = false);
-        Navigator.of(context).push(MaterialPageRoute(
-          builder: (_) => SalesOrdersAdd(
-            SaleDetails: AppGlobals.SaleEditDetailList,
-            SaleMaster: AppGlobals.SaleEditMasterList,
-          ),
-        ));
-      } else {
-        setState(() => _isLoading = false);
-      }
-    } catch(e) {
-      setState(() => _isLoading = false);
-      if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Failed to load Sales Order for edit: $e')));
-    }
+    Navigator.of(context).push(MaterialPageRoute(builder: (_) => SalesOrdersAdd(saleOrderId: saleOrderId)));
   }
   void _searchPlanning() async {
     if (_searchCtrl.text.isEmpty) {

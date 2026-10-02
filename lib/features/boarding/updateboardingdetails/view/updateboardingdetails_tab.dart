@@ -83,16 +83,11 @@ class _BoardingStatusPageState extends State<_BoardingStatusPage> {
           if (!context.mounted) return;
           final s = context.read<BoardingStatusBloc>().state;
           if (s is BoardingStatusLoaded && s.jobNoText.isNotEmpty) {
-            await sl<LegacyApiRepository>().EditSalesOrder(
-                 s.saleOrderId, int.tryParse(s.jobNoText) ?? 0);
-            if (!context.mounted) return;
             Navigator.push(
               context,
               MaterialPageRoute(
                 builder: (_) => SaleOrderDetails(
-                  saleDetails: null,
-                  saleMaster: AppGlobals.SaleEditMasterList,
-                ),
+                    saleOrderId: s.saleOrderId, saleOrderNo: int.tryParse(s.jobNoText) ?? 0),
               ),
             );
           }
@@ -584,18 +579,11 @@ class _JobNoRowState extends State<_JobNoRow> {
                     toastMsg('Enter Job No', '', context);
                     return;
                   }
-                  await sl<LegacyApiRepository>().EditSalesOrder(
-
-                      s.saleOrderId,
-                      int.tryParse(s.jobNoText) ?? 0);
-                  if (!context.mounted) return;
                   Navigator.push(
                     context,
                     MaterialPageRoute(
                       builder: (_) => SaleOrderDetails(
-                        saleDetails: null,
-                        saleMaster: AppGlobals.SaleEditMasterList,
-                      ),
+                          saleOrderId: s.saleOrderId, saleOrderNo: int.tryParse(s.jobNoText) ?? 0),
                     ),
                   );
                 },
@@ -629,12 +617,12 @@ class _JobNoRowState extends State<_JobNoRow> {
               const Divider(height: 1, color: AppTokens.maintDetailBg),
               itemBuilder: (ctx, i) {
                 final item = s.jobNoSuggestions[i];
-                final cnum = item['CNumber'].toString();
+                final cnum = '${item['cNumber'] ?? ''}';
                 return InkWell(
                   onTap: () => context
                       .read<BoardingStatusBloc>()
                       .add(BoardingStatusJobNoSelected(
-                      saleOrderId: item['Id'], jobNo: cnum)),
+                      saleOrderId: item['id'] as int, jobNo: cnum)),
                   child: Padding(
                     padding: const EdgeInsets.symmetric(
                         horizontal: 16, vertical: 12),
@@ -677,11 +665,7 @@ class _StatusField extends StatelessWidget {
               .add(BoardingStatusStatusCleared());
           return;
         }
-        await sl<LegacyApiRepository>().EditSalesOrder(
-             state.saleOrderId, int.tryParse(state.jobNoText) ?? 0);
-        await sl<LegacyApiRepository>().SelectAllJobStatus(
-            context,
-            AppGlobals.SaleEditMasterList[0]['JobMasterRefId']);
+        await sl<LegacyApiRepository>().SelectAllJobStatus(context, state.jobMasterId);
         if (!context.mounted) return;
         Navigator.push(
           context,

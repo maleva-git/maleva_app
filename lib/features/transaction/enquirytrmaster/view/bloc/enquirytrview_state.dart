@@ -78,8 +78,9 @@ class EnquiryViewNavigateToEdit extends EnquiryViewState {
 }
 
 class EnquiryViewNavigateToPushSaleOrder extends EnquiryViewState {
-  final List<dynamic> enquiryList;
-  EnquiryViewNavigateToPushSaleOrder(this.enquiryList);
+  /// The enquiry row (.NET names) the new sale order is filled from.
+  final Map<String, dynamic> enquiry;
+  EnquiryViewNavigateToPushSaleOrder(this.enquiry);
 }
 
 class EnquiryViewShowDetails extends EnquiryViewState {

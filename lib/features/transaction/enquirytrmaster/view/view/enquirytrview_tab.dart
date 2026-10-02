@@ -73,10 +73,7 @@ class _EnquiryViewPage extends StatelessWidget {
           Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (_) => SalesOrdersAdd(
-                SaleDetails: null,
-                SaleMaster: state.enquiryList,
-              ),
+              builder: (_) => SalesOrdersAdd(enquiry: state.enquiry),
             ),
           );
         }

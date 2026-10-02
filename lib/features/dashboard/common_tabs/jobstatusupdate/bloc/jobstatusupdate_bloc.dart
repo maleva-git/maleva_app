@@ -52,11 +52,7 @@ class JobStatusUpdateBloc extends Bloc<JobStatusUpdateEvent, JobStatusUpdateStat
 
   Future<void> _loadJobNoList(int type) async {
     try {
-      final jobs = await repository.fetchJobs(type);
-      _cachedSuggestions = jobs.map((e) => {
-        'CNumber': e['CNumber']?.toString() ?? '',
-        'Id': e['Id'] ?? 0,
-      }).toList();
+      _cachedSuggestions = await repository.fetchJobs(type);
     } catch (_) {
       _cachedSuggestions = [];
     }
@@ -76,7 +72,7 @@ class JobStatusUpdateBloc extends Bloc<JobStatusUpdateEvent, JobStatusUpdateStat
     }
 
     final filtered = _cachedSuggestions
-        .where((e) => e['CNumber'].toString().toUpperCase().contains(query.toUpperCase()))
+        .where((e) => '${e['cNumber'] ?? ''}'.toUpperCase().contains(query.toUpperCase()))
         .toList();
 
     emit(state.copyWith(
@@ -115,6 +111,7 @@ class JobStatusUpdateBloc extends Bloc<JobStatusUpdateEvent, JobStatusUpdateStat
       emit(state.copyWith(
         statusName: data['statusName'] as String,
         statusId: data['statusId'] as int,
+        jobMasterId: data['jobMasterId'] as int,
         imageNetworkNames: data['images'] as List<String>,
       ));
     } catch (e) {
@@ -170,26 +167,15 @@ class JobStatusUpdateBloc extends Bloc<JobStatusUpdateEvent, JobStatusUpdateStat
     emit(state.copyWith(status: JobStatusUpdateStatus.loading));
 
     try {
-      final empRefId = AppPreferences.getEmpRefId();
-      final master = {
-        'Id': state.saleOrderId,
-        'Comid': AppPreferences.getComid(),
-        'Jobid': state.jobNo,
-        'EmployeeRefId': empRefId == 0 ? null : empRefId,
-        'StatusRefId': state.statusId,
-        'BoardingStartTime': state.checkBoxStartTime ? DateTime.parse(state.dtpStartTime).toIso8601String() : null,
-        'BoardingEndTime': state.checkBoxEndTime ? DateTime.parse(state.dtpEndTime).toIso8601String() : null,
-      };
-
-      final result = await repository.updateBoardingDetails(master);
-
-      if (result?.IsSuccess == true) {
-        add(const JobStatusUpdateMailSent());
-      } else {
-        emit(state.copyWith(status: JobStatusUpdateStatus.failure, errorMessage: result?.Message ?? 'Update failed'));
-      }
-    } catch (_) {
-      emit(state.copyWith(status: JobStatusUpdateStatus.failure, errorMessage: 'Update failed. Please try again.'));
+      await repository.updateBoardingDetails(
+        state.saleOrderId,
+        statusId: state.statusId,
+        start: state.checkBoxStartTime ? DateTime.parse(state.dtpStartTime) : null,
+        end: state.checkBoxEndTime ? DateTime.parse(state.dtpEndTime) : null,
+      );
+      add(const JobStatusUpdateMailSent());
+    } catch (e) {
+      emit(state.copyWith(status: JobStatusUpdateStatus.failure, errorMessage: e.toString()));
     }
   }
 
@@ -205,18 +191,7 @@ class JobStatusUpdateBloc extends Bloc<JobStatusUpdateEvent, JobStatusUpdateStat
           .map((name) => '${AppGlobals.imagepath}SalesOrder/${state.saleOrderId}/Boarding/$name')
           .toList();
 
-      final master = {
-        'CompanyRefId': AppPreferences.getComid(),
-        'RTIId': 0,
-        'RTINo': '',
-        'JobId': state.saleOrderId,
-        'JobNo': state.jobNo,
-        'StatusId': state.statusId,
-        'StatusName': '${state.statusName} Done',
-        'ImageURL': imageUrls,
-      };
-
-      await repository.sendBoardingMail(master);
+      await repository.sendBoardingMail(state.saleOrderId, statusName: '${state.statusName} Done', imageUrls: imageUrls);
       // We emit success regardless of mail failure to allow the UI to reset gracefully
       emit(state.copyWith(status: JobStatusUpdateStatus.success, action: JobStatusUpdateAction.resetAndReload));
     } catch (_) {

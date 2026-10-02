@@ -9,7 +9,7 @@ import 'forwarding_state.dart';
 class FWUpdateBloc extends Bloc<FWUpdateEvent, FWUpdateState> {
   final FWUpdateRepository repository;
 
-  final List<dynamic> _employeeList = [];
+  List<Map<String, dynamic>> _jobs = const [];
 
   FWUpdateBloc({required this.repository}) : super(FWUpdateInitial()) {
     on<FWUpdateStarted>(_onStarted);
@@ -37,6 +37,7 @@ class FWUpdateBloc extends Bloc<FWUpdateEvent, FWUpdateState> {
   Future<void> _onStarted(FWUpdateStarted event, Emitter<FWUpdateState> emit) async {
     emit(FWUpdateLoading());
     try {
+      _jobs = await repository.fetchJobNoList();
       emit(_defaultLoaded());
     } catch (e) {
       emit(FWUpdateError(e.toString()));
@@ -51,13 +52,12 @@ class FWUpdateBloc extends Bloc<FWUpdateEvent, FWUpdateState> {
     if (state is! FWUpdateLoaded) return;
     final s = state as FWUpdateLoaded;
 
-    // Fixed: Search using global job no list loaded in InitState
     final query = event.text.trim().replaceAll(" ", "+");
 
     List<dynamic> filtered = [];
     if (query.isNotEmpty) {
-      final smkKey = event.type == 1 ? 'ForwardingSMKNo' : event.type == 2 ? 'ForwardingSMKNo2' : 'ForwardingSMKNo3';
-      filtered = AppGlobals.JobNoList.where((e) {
+      final smkKey = event.type == 1 ? 'forwardingSMKNo' : event.type == 2 ? 'forwardingSMKNo2' : 'forwardingSMKNo3';
+      filtered = _jobs.where((e) {
         final smkValue = (e[smkKey] ?? '').toString();
         return smkValue.contains(query);
       }).toList();
@@ -76,21 +76,14 @@ class FWUpdateBloc extends Bloc<FWUpdateEvent, FWUpdateState> {
     int newSaleOrderId = event.saleOrderId;
     List<String> fetchedImages = [];
 
-    // 1. Exact Old Code API Calls (Direct-a OnlineApi use panrom)
-
+    Map<String, dynamic> master = const {};
     try {
-      await sl<LegacyApiRepository>().EditSalesOrder(event.saleOrderId, 0);
+      master = await repository.fetchJob(event.saleOrderId);
       if (!event.context.mounted) return;
       await sl<LegacyApiRepository>().SelectEmployee(event.context, '', 'Operation');
     } catch (e) {
       print("Master/Employee API Error (Ignored): $e");
     }
-
-
-
-
-
-
 
     // 2. Exact Old Code Image Fetching Logic
     try {
@@ -101,17 +94,14 @@ class FWUpdateBloc extends Bloc<FWUpdateEvent, FWUpdateState> {
       print("Image API Error (Ignored 404): $e");
     }
 
-    // 3. Extract Data from objfun globals
+    // 3. The tabs from the job (Java names)
     FWTabData buildTabFromMaster(int type, FWTabData existing) {
-      // Check pannrom data iruka illaya nu
-      if (AppGlobals.SaleEditMasterList.isEmpty) {
+      if (master.isEmpty) {
         return existing.copyWith(
           smkText: event.type == type ? event.smkText : existing.smkText,
           suggestions: [],
         );
       }
-
-      var master = AppGlobals.SaleEditMasterList[0];
 
       String enRef = '';
       String exRef = '';
@@ -119,20 +109,20 @@ class FWUpdateBloc extends Bloc<FWUpdateEvent, FWUpdateState> {
       int breakId = 0;
 
       if (type == 1) {
-        enRef = master['ForwardingEnterRef']?.toString() ?? '';
-        exRef = master['ForwardingExitRef']?.toString() ?? '';
-        sealId = int.tryParse(master['SealbyRefid']?.toString() ?? '0') ?? 0;
-        breakId = int.tryParse(master['SealbreakbyRefid']?.toString() ?? '0') ?? 0;
+        enRef = master['forwardingEnterRef']?.toString() ?? '';
+        exRef = master['forwardingExitRef']?.toString() ?? '';
+        sealId = int.tryParse(master['sealbyRefid']?.toString() ?? '0') ?? 0;
+        breakId = int.tryParse(master['sealbreakbyRefid']?.toString() ?? '0') ?? 0;
       } else if (type == 2) {
-        enRef = master['ForwardingEnterRef2']?.toString() ?? '';
-        exRef = master['ForwardingExitRef2']?.toString() ?? '';
-        sealId = int.tryParse(master['SealbyRefid2']?.toString() ?? '0') ?? 0;
-        breakId = int.tryParse(master['SealbreakbyRefid2']?.toString() ?? '0') ?? 0;
+        enRef = master['forwardingEnterRef2']?.toString() ?? '';
+        exRef = master['forwardingExitRef2']?.toString() ?? '';
+        sealId = int.tryParse(master['sealbyRefid2']?.toString() ?? '0') ?? 0;
+        breakId = int.tryParse(master['sealbreakbyRefid2']?.toString() ?? '0') ?? 0;
       } else {
-        enRef = master['ForwardingEnterRef3']?.toString() ?? '';
-        exRef = master['ForwardingExitRef3']?.toString() ?? '';
-        sealId = int.tryParse(master['SealbyRefid3']?.toString() ?? '0') ?? 0;
-        breakId = int.tryParse(master['SealbreakbyRefid3']?.toString() ?? '0') ?? 0;
+        enRef = master['forwardingEnterRef3']?.toString() ?? '';
+        exRef = master['forwardingExitRef3']?.toString() ?? '';
+        sealId = int.tryParse(master['sealbyRefid3']?.toString() ?? '0') ?? 0;
+        breakId = int.tryParse(master['sealbreakbyRefid3']?.toString() ?? '0') ?? 0;
       }
 
       String sealName = '';
@@ -234,36 +224,25 @@ class FWUpdateBloc extends Bloc<FWUpdateEvent, FWUpdateState> {
 
     emit(FWUpdateLoading());
     try {
-      final master = {
-        'Id': s.saleOrderId,
-        'Comid': AppGlobals.Comid,
-        'Jobid': 0,
-        'EmployeeRefId': AppGlobals.EmpRefId == 0 ? null : AppGlobals.EmpRefId,
-        'SealbyRefid': s.tab1.sealEmpId,
-        'SealbreakbyRefid': s.tab1.breakEmpId,
-        'SealbyRefid2': s.tab2.sealEmpId,
-        'SealbreakbyRefid2': s.tab2.breakEmpId,
-        'SealbyRefid3': s.tab3.sealEmpId,
-        'SealbreakbyRefid3': s.tab3.breakEmpId,
-        'ForwardingEnterRef': s.tab1.enRef,
-        'ForwardingExitRef': s.tab1.exRef,
-        'ForwardingEnterRef2': s.tab2.enRef,
-        'ForwardingExitRef2': s.tab2.exRef,
-        'ForwardingEnterRef3': s.tab3.enRef,
-        'ForwardingExitRef3': s.tab3.exRef,
-        'ForwardingSMKNo': s.tab1.smkText.isEmpty ? null : s.tab1.smkText,
-        'ForwardingSMKNo2': s.tab2.smkText.isEmpty ? null : s.tab2.smkText,
-        'ForwardingSMKNo3': s.tab3.smkText.isEmpty ? null : s.tab3.smkText,
-      };
-
-      final result = await repository.updateForwarding(master);
-
-      if (result?.IsSuccess == true) {
-        emit(FWUpdateSaveSuccess());
-        emit(_defaultLoaded()); // Form clears automatically
-      } else {
-        emit(s);
-      }
+      await repository.updateForwarding(s.saleOrderId, {
+        'sealbyRefid': s.tab1.sealEmpId,
+        'sealbreakbyRefid': s.tab1.breakEmpId,
+        'sealbyRefid2': s.tab2.sealEmpId,
+        'sealbreakbyRefid2': s.tab2.breakEmpId,
+        'sealbyRefid3': s.tab3.sealEmpId,
+        'sealbreakbyRefid3': s.tab3.breakEmpId,
+        'forwardingEnterRef': s.tab1.enRef,
+        'forwardingExitRef': s.tab1.exRef,
+        'forwardingEnterRef2': s.tab2.enRef,
+        'forwardingExitRef2': s.tab2.exRef,
+        'forwardingEnterRef3': s.tab3.enRef,
+        'forwardingExitRef3': s.tab3.exRef,
+        'forwardingSMKNo': s.tab1.smkText.isEmpty ? null : s.tab1.smkText,
+        'forwardingSMKNo2': s.tab2.smkText.isEmpty ? null : s.tab2.smkText,
+        'forwardingSMKNo3': s.tab3.smkText.isEmpty ? null : s.tab3.smkText,
+      });
+      emit(FWUpdateSaveSuccess());
+      emit(_defaultLoaded()); // Form clears automatically
     } catch (e) {
       emit(FWUpdateError(e.toString()));
     }

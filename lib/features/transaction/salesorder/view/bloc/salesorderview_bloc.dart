@@ -1,5 +1,4 @@
 import 'package:maleva/core/utils/system_helpers.dart';
-import 'package:maleva/core/network/api_constants.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
@@ -11,18 +10,20 @@ import 'package:maleva/core/models/shared/customer_model.dart';
 import 'package:maleva/core/models/shared/employee_model.dart';
 import 'package:maleva/features/transaction/salesorder/models/sale_order_detail_model.dart';
 import 'package:maleva/features/transaction/salesorder/models/sale_order_master_model.dart';
-import 'package:maleva/core/models/shared/response_view_model.dart';
 import 'package:maleva/features/operations/models/job_status_model.dart';
-import 'package:maleva/core/network/legacy_api_repository.dart';
 import 'package:maleva/core/di/injection.dart';
+import 'package:maleva/core/sale_order/sale_order_api.dart';
 
 
 
 class SalesOrderViewBloc extends Bloc<SalesOrderViewEvent, SalesOrderViewState> {
   final BuildContext context;
   final SalesOrderViewRepository _repository;
+  final SaleOrderApi _saleOrders;
 
-  SalesOrderViewBloc(this.context, this._repository) : super(SalesOrderViewInitial()) {
+  SalesOrderViewBloc(this.context, this._repository, {SaleOrderApi? saleOrders})
+      : _saleOrders = saleOrders ?? sl<SaleOrderApi>(),
+        super(SalesOrderViewInitial()) {
 
     // ────────────────────────────────────────────────────
     // STARTUP
@@ -36,16 +37,6 @@ class SalesOrderViewBloc extends Bloc<SalesOrderViewEvent, SalesOrderViewState> 
         AppGlobals.CustomerList = (await _repository.selectCustomer()).map<CustomerModel>((e) => CustomerModel.fromJson(e)).toList();
         AppGlobals.JobStatusList = (await _repository.selectJobStatus()).map<JobStatusModel>((e) => JobStatusModel.fromJson(e)).toList();
         AppGlobals.EmployeeList = (await _repository.selectEmployee('Sales', '')).map<EmployeeModel>((e) => EmployeeModel.fromJson(e)).toList();
-        final combo = await _repository.loadComboS1(0);
-        if (combo.isNotEmpty) {
-          AppGlobals.ComboS1List.clear();
-          AppGlobals.ComboS1List.add(combo["Data1"]);
-          AppGlobals.ComboS1List.add(combo["Data2"]);
-          AppGlobals.ComboS1List.add(combo["Data3"]);
-          AppGlobals.ComboS1List.add(combo["Data4"]);
-          AppGlobals.ComboS1List.add(combo["Data5"]);
-          AppGlobals.ComboS1List.add(combo["Data6"]);
-        }
         final base = SalesOrderViewLoaded(
           dtpFromDate: today,
           dtpToDate: today,
@@ -71,54 +62,29 @@ class SalesOrderViewBloc extends Bloc<SalesOrderViewEvent, SalesOrderViewState> 
 
       try {
         final leEmpRefId = s.checkBoxValueLEmp ? AppGlobals.EmpRefId : s.empId;
-        final master = {
-          'SoId': 0,
-          'Comid': AppGlobals.storagenew.getInt('Comid') ?? 0,
-          'Fromdate': s.dtpFromDate,
-          'Todate': s.dtpToDate,
+        final result = await _saleOrders.search({
           'Id': s.custId,
-          'DId': 0,
-          'TId': 0,
           'Employeeid': leEmpRefId,
           'Statusid': s.statusId,
           'completestatusnotshow': false,
           'Search': s.txtJobNo.isNotEmpty ? s.txtJobNo : null,
           'Offvesselname': s.txtOffVessel.isNotEmpty ? s.txtOffVessel : null,
           'Loadingvesselname': s.txtLoadingVessel.isNotEmpty ? s.txtLoadingVessel : null,
-          'Remarks': s.cls,
+          'Remarks': int.tryParse(s.cls),
           'ETA': s.checkBoxValueETA,
-          'ETAType': s.etaRadioVal,
+          'ETAType': int.tryParse(s.etaRadioVal),
           'Pickup': s.checkBoxValuePickUp,
-        };
+        }, from: DateTime.parse(s.dtpFromDate), to: DateTime.parse(s.dtpToDate));
 
-        final header = {'Content-Type': 'application/json; charset=UTF-8'};
-        final resultData = await sl<LegacyApiRepository>().apiAllinoneSelectArray(
-          ApiConstants.apiSelectSalesOrder, master, header, context,
-        );
-
-        if (resultData != "" && resultData.length != 0) {
-          final masterList = (resultData[0]["salemaster"] as List)
-              .map((e) => SaleOrderMasterModel.fromJson(e))
-              .toList();
-          final detailList = (resultData[0]["saledetails"] as List)
-              .map((e) => SaleOrderDetailModel.fromJson(e))
-              .toList();
-
-          // Update global lists too (for compatibility)
-          AppGlobals.SaleOrderMasterList = masterList;
-          AppGlobals.SaleOrderDetailList = detailList;
-
-          emit(s.copyWith(
-            masterList: masterList,
-            detailList: detailList,
-            progress: true,
-            expandedIndex: -1,
-          ));
-        } else {
-          emit(s.copyWith(masterList: [], detailList: [], progress: true));
-        }
+        emit(s.copyWith(
+          masterList: result.masters.map(SaleOrderMasterModel.fromJson).toList(),
+          detailList: result.details.map(SaleOrderDetailModel.fromJson).toList(),
+          progress: true,
+          expandedIndex: -1,
+        ));
       } catch (e) {
         emit(s.copyWith(progress: true));
+        _show(e.toString());
       }
     });
 
@@ -229,54 +195,26 @@ class SalesOrderViewBloc extends Bloc<SalesOrderViewEvent, SalesOrderViewState> 
     });
 
     // ────────────────────────────────────────────────────
-    // SHARE DO
+    // DO / INVOICE REPORTS (the Java print links, opened in the browser)
     // ────────────────────────────────────────────────────
-    on<ShareDO>((event, emit) async {
-      if (state is! SalesOrderViewLoaded) return;
-      final s = state as SalesOrderViewLoaded;
-      emit(s.copyWith(progress: false));
+    on<ShareDO>((event, emit) => _openReport(emit, () => _saleOrders.doPrintPath(event.id)));
+    on<ViewInvoice>((event, emit) => _openReport(emit, () => _saleOrders.invoicePrintPath(event.id)));
+  }
 
-      try {
-        final master = {'SoId': event.id, 'Comid': AppGlobals.Comid};
-        final header = {'Content-Type': 'application/json; charset=UTF-8'};
-        final resultData = await sl<LegacyApiRepository>().apiAllinoneSelectArray(
-          "${ApiConstants.apiViewDOConvert}${event.billNo}",
-          master, header, context,
-        );
+  Future<void> _openReport(Emitter<SalesOrderViewState> emit, Future<String> Function() path) async {
+    if (state is! SalesOrderViewLoaded) return;
+    final s = state as SalesOrderViewLoaded;
+    emit(s.copyWith(progress: false));
+    try {
+      SystemHelpers.launchInBrowser(SaleOrderApi.reportUrl(await path()));
+    } catch (e) {
+      _show(e.toString());
+    }
+    emit(s.copyWith(progress: true));
+  }
 
-        if (resultData != "") {
-          final value = ResponseViewModel.fromJson(resultData);
-          if (value.IsSuccess == true) {
-            SystemHelpers.launchInBrowser(value.data1);
-          }
-        }
-      } catch (e, stack) { debugPrint("Error caught globally: $e\n$stack"); }
-
-      emit(s.copyWith(progress: true));
-    });
-
-    on<ViewInvoice>((event, emit) async {
-      if (state is! SalesOrderViewLoaded) return;
-      final s = state as SalesOrderViewLoaded;
-      emit(s.copyWith(progress: false));
-
-      try {
-        final master = {'SoId': event.id, 'Comid': AppGlobals.Comid};
-        final header = {'Content-Type': 'application/json; charset=UTF-8'};
-        final resultData = await sl<LegacyApiRepository>().apiAllinoneSelectArray(
-          "${ApiConstants.apiViewInvoice}${event.billNo}",
-          master, header, context,
-        );
-
-        if (resultData != "") {
-          final value = ResponseViewModel.fromJson(resultData);
-          if (value.IsSuccess == true) {
-            SystemHelpers.launchInBrowser(value.data1);
-          }
-        }
-      } catch (e, stack) { debugPrint("Error caught globally: $e $stack"); }
-
-      emit(s.copyWith(progress: true));
-    });
+  void _show(String message) {
+    if (!context.mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message)));
   }
 }

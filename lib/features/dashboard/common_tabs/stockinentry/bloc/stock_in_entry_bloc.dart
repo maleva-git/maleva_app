@@ -93,7 +93,7 @@ class StockInEntryBloc extends Bloc<StockInEntryEvent, StockInEntryState> {
 
     List<dynamic> filtered = [];
     if (q.isNotEmpty) {
-      filtered = _jobNoList.where((e) => e['CNumber'].toString().contains(q)).toList();
+      filtered = _jobNoList.where((e) => '${e['cNumber'] ?? ''}'.contains(q)).toList();
     }
 
     emit(s.copyWith(
@@ -159,20 +159,10 @@ class StockInEntryBloc extends Bloc<StockInEntryEvent, StockInEntryState> {
 
   
   // ── Edit Sales Order ─────────────────────────────────────────────────────────
-  Future<void> _onEditSalesOrderRequested(StockInEntryEditSalesOrderRequested event, Emitter<StockInEntryState> emit) async {
+  void _onEditSalesOrderRequested(StockInEntryEditSalesOrderRequested event, Emitter<StockInEntryState> emit) {
     if (state is! StockInEntryLoaded) return;
     final s = state as StockInEntryLoaded;
-    
-    // Fetch data from repository
-    final result = await repository.fetchSalesOrderForEdit(event.saleOrderId, event.jobNo);
-    
-    // We only need the master list for StockInEntry navigation
-    final masterList = result['masterList'] as List<dynamic>;
-    
-    emit(s.copyWith(
-      navigateEditSalesOrder: true,
-      saleEditMasterList: masterList,
-    ));
+    emit(s.copyWith(navigateEditSalesOrder: true, editSaleOrderNo: event.jobNo));
   }
 
   void _onNavigationHandled(StockInEntryNavigationHandled event, Emitter<StockInEntryState> emit) {

@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:salomon_bottom_bar/salomon_bottom_bar.dart';
 import 'package:maleva/core/utils/app_globals.dart';
@@ -32,7 +31,6 @@ import 'package:maleva/core/colors/colors.dart' as colour;
 import 'package:maleva/core/models/shared/customer_model.dart';
 import 'package:maleva/core/models/shared/employee_model.dart';
 import 'package:maleva/core/models/shared/address_details_model.dart';
-import 'package:maleva/core/models/shared/sale_edit_detail_model.dart';
 import 'package:maleva/core/models/shared/location_model.dart';
 import 'package:maleva/core/models/shared/agent_model.dart';
 import 'package:maleva/core/models/shared/agent_company_model.dart';
@@ -65,24 +63,21 @@ class BoldFirstLineTextController extends TextEditingController {
   }
 }
 
+/// The sale order form: a new order, the order [saleOrderId] or job number [saleOrderNo]
+/// (read from the Java `/api/sale-orders/edit`), or a new order raised from the enquiry
+/// row [enquiry].
 class SalesOrdersAdd extends StatelessWidget {
-  final List<SaleEditDetailModel>? SaleDetails;
-  final List<dynamic>? SaleMaster;
+  final int saleOrderId;
+  final int saleOrderNo;
+  final Map<String, dynamic>? enquiry;
 
-  const SalesOrdersAdd({super.key, this.SaleDetails, this.SaleMaster});
+  const SalesOrdersAdd({super.key, this.saleOrderId = 0, this.saleOrderNo = 0, this.enquiry});
 
   @override
   Widget build(BuildContext context) {
-    final isEnquiry = AppGlobals.storagenew.getString('EnquiryOpen') == "true";
-    if (isEnquiry) AppGlobals.storagenew.setString('EnquiryOpen', "false");
-
     return BlocProvider(
       create: (ctx) => sl<SalesOrderAddBloc>(param1: ctx)
-        ..add(StartupSalesOrderAdd(
-          saleDetails: SaleDetails,
-          saleMaster: SaleMaster,
-          isEnquiry: isEnquiry,
-        )),
+        ..add(StartupSalesOrderAdd(saleOrderId: saleOrderId, saleOrderNo: saleOrderNo, enquiry: enquiry)),
       child: const _SalesOrderAddBody(),
     );
   }
@@ -344,14 +339,14 @@ class _SalesOrderAddBodyState extends State<_SalesOrderAddBody> with TickerProvi
                 ],
               ),
             ),
-            if (AppGlobals.currentInvoiceNo.isNotEmpty)
+            if (state.invoiceNo.isNotEmpty)
               Expanded(
                 flex: 3,
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text("Invoice No", style: AppTypography.bodySmall(color: Colors.green).copyWith(fontWeight: FontWeight.bold)),
-                    Text(AppGlobals.currentInvoiceNo, style: AppTypography.heading2(color: Colors.green)),
+                    Text(state.invoiceNo, style: AppTypography.heading2(color: Colors.green)),
                   ],
                 ),
               ),

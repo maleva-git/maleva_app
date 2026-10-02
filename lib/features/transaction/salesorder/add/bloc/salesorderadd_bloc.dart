@@ -1,28 +1,29 @@
-import 'package:maleva/core/network/api_constants.dart';
-import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 import 'package:maleva/core/utils/app_globals.dart';
 import 'package:maleva/features/transaction/salesorder/add/bloc/salesorderadd_event.dart';
 import 'package:maleva/features/transaction/salesorder/add/bloc/salesorderadd_state.dart';
+import 'package:maleva/features/transaction/salesorder/add/bloc/sale_order_save_body.dart';
 import 'package:maleva/features/transaction/salesorder/add/data/salesorderadd_repository.dart';
-import 'dart:developer' as developer;
 import 'package:maleva/core/models/shared/customer_model.dart';
 import 'package:maleva/core/models/shared/employee_model.dart';
 import 'package:maleva/core/models/shared/sale_edit_detail_model.dart';
 import 'package:maleva/core/models/shared/agent_model.dart';
 import 'package:maleva/core/models/shared/agent_company_model.dart';
 import 'package:maleva/features/operations/models/job_all_status_model.dart';
-import 'package:maleva/core/models/shared/response_view_model.dart';
 import 'package:maleva/features/operations/models/job_type_details_model.dart';
 import 'package:maleva/features/operations/models/job_type_model.dart';
-import 'package:maleva/core/network/legacy_api_repository.dart';
 import 'package:maleva/core/di/injection.dart';
+import 'package:maleva/core/network/api_constants.dart';
+import 'package:maleva/core/network/legacy_api_repository.dart';
+import 'package:maleva/core/sale_order/sale_order_api.dart';
+import 'package:maleva/core/sale_order/sale_order_keys.dart';
 
 class SalesOrderAddBloc extends Bloc<SalesOrderAddEvent, SalesOrderAddState> {
   final BuildContext context;
   final SalesOrderAddRepository _repository;
+  final SaleOrderApi _saleOrders;
 
   static const List<String> _billType = ['MY', 'TR'];
 
@@ -35,14 +36,16 @@ class SalesOrderAddBloc extends Bloc<SalesOrderAddEvent, SalesOrderAddState> {
   static List<String> get truckSizeList => _truckSizeList;
   static List<String> get zbNo => _zbNo;
 
-  SalesOrderAddBloc(this.context, this._repository) : super(SalesOrderAddInitial()) {
+  SalesOrderAddBloc(this.context, this._repository, {SaleOrderApi? saleOrders})
+      : _saleOrders = saleOrders ?? sl<SaleOrderApi>(),
+        super(SalesOrderAddInitial()) {
 
     on<StartupSalesOrderAdd>((event, emit) async {
       emit(SalesOrderAddLoading());
       try {
         final now = DateFormat("yyyy-MM-dd HH:mm:ss").format(DateTime.now());
         final today = DateFormat("yyyy-MM-dd").format(DateTime.now());
-        final maxMy = await _repository.maxSaleOrderNo('MY'); AppGlobals.MaxSaleOrderNum = maxMy; AppGlobals.AddressList = await _repository.selectAddressList();
+        AppGlobals.MaxSaleOrderNum = await _saleOrders.nextJobNo('MY'); AppGlobals.AddressList = await _repository.selectAddressList();
         AppGlobals.AgentCompanyList = (await _repository.selectAgentCompany()).map<AgentCompanyModel>((e) => AgentCompanyModel.fromJson(e)).toList();AppGlobals.EmployeeList = (await _repository.selectEmployee('', 'Operation')).map<EmployeeModel>((e) => EmployeeModel.fromJson(e)).toList();final permission = _buildPermissions();
         var base = SalesOrderAddLoaded(
           progress: true, dtpSaleOrderdate: today, dtpOETAdate: now, dtpOETBdate: now, dtpOETDdate: now,
@@ -51,8 +54,14 @@ class SalesOrderAddBloc extends Bloc<SalesOrderAddEvent, SalesOrderAddState> {
           dtpFW3date: now, txtJobNo: AppGlobals.MaxSaleOrderNum, fieldPermission: permission,
         );
 
-        if (event.saleMaster != null && event.saleMaster!.isNotEmpty) {
-          base = await _loadMasterData(base, event.saleMaster!, event.saleDetails, event.isEnquiry);
+        if (event.saleOrderId > 0 || event.saleOrderNo > 0) {
+          final order = await _saleOrders.edit(id: event.saleOrderId, saleOrderNo: event.saleOrderNo);
+          base = await _loadMasterData(base, order.master,
+              details: [for (final d in order.details) SaleEditDetailModel.fromJava(d)],
+              pickups: order.pickups, deliveries: order.deliveries, isEnquiry: false);
+          base = base.copyWith(invoiceNo: await _invoiceNo(base.editId));
+        } else if (event.enquiry != null) {
+          base = await _loadMasterData(base, javaSaleOrderFromDotNet(event.enquiry!), isEnquiry: true);
         }
         emit(base);
       } catch (e) {
@@ -92,7 +101,7 @@ class SalesOrderAddBloc extends Bloc<SalesOrderAddEvent, SalesOrderAddState> {
         return;
       }
 
-      AppGlobals.CustomerCurrencyValue = await _repository.loadCustomerCurrency(event.id);emit(s.copyWith(txtCustomer: event.name, custId: event.id, currencyValue: AppGlobals.CustomerCurrencyValue));
+      AppGlobals.CustomerCurrencyValue = await _saleOrders.currencyValue(event.id);emit(s.copyWith(txtCustomer: event.name, custId: event.id, currencyValue: AppGlobals.CustomerCurrencyValue));
     });
 
 
@@ -350,7 +359,7 @@ class SalesOrderAddBloc extends Bloc<SalesOrderAddEvent, SalesOrderAddState> {
     on<BillTypeChanged>((event, emit) async {
       if (state is! SalesOrderAddLoaded) return;
       final s = state as SalesOrderAddLoaded;
-      final maxEv = await _repository.maxSaleOrderNo(event.value); AppGlobals.MaxSaleOrderNum = maxEv;emit(s.copyWith(dropdownValue: event.value, txtJobNo: AppGlobals.MaxSaleOrderNum));
+      AppGlobals.MaxSaleOrderNum = await _saleOrders.nextJobNo(event.value);emit(s.copyWith(dropdownValue: event.value, txtJobNo: AppGlobals.MaxSaleOrderNum));
     });
 
     on<SaveSalesOrderEvent>((event, emit) async {
@@ -410,82 +419,13 @@ class SalesOrderAddBloc extends Bloc<SalesOrderAddEvent, SalesOrderAddState> {
       emit(s.copyWith(progress: false));
 
       try {
-        final masterPayload = _buildMasterPayload(s);
-
-        final saleDetailsJson = s.productViewList.asMap().entries.map((entry) {
-          final idx = entry.key;
-          final jsonMap = Map<String, dynamic>.from(entry.value.toJson());
-          final hardId = s.productIds.length > idx ? s.productIds[idx] : 0;
-
-          String? exactItemKey;
-          String? exactCompKey;
-
-          for (String key in jsonMap.keys) {
-            final lower = key.toLowerCase();
-            if (lower == 'itemmasterrefid' || lower == 'itemmasterid' || lower == 'productid') exactItemKey = key;
-            if (lower == 'companyrefid') exactCompKey = key;
-          }
-
-          if (exactItemKey != null) {
-            jsonMap[exactItemKey] = hardId;
-          } else {
-            jsonMap['ItemMasterRefId'] = hardId;
-            jsonMap['ItemMasterRefid'] = hardId;
-          }
-
-          if (exactCompKey != null) {
-            jsonMap[exactCompKey] = AppGlobals.Comid;
-          } else {
-            jsonMap['CompanyRefId'] = AppGlobals.Comid;
-          }
-
-          return jsonMap;
-        }).toList();
-
-        masterPayload['SaleDetails'] = saleDetailsJson;
-        final master = [masterPayload];
-
-        developer.log("🚨 SALE DETAILS JSON: ${jsonEncode(saleDetailsJson)}", name: "API_DEBUG");
-
-        final header = {'Content-Type': 'application/json; charset=UTF-8'};
-
-        final resultData = await sl<LegacyApiRepository>().apiAllinoneSelectArray(
-          "${ApiConstants.apiInsertSalesOrder}?Comid=${AppGlobals.Comid}",
-          master, header, context,
-        );
-
-        if (resultData != null && resultData.toString().isNotEmpty) {
-          try {
-            Map<String, dynamic> responseMap = {};
-
-            if (resultData is List) {
-              if (resultData.isNotEmpty && resultData.first is Map) {
-                responseMap = Map<String, dynamic>.from(resultData.first);
-              }
-            } else if (resultData is Map) {
-              responseMap = Map<String, dynamic>.from(resultData);
-            } else if (resultData is String) {
-              var decoded = jsonDecode(resultData);
-              if (decoded is List && decoded.isNotEmpty && decoded.first is Map) {
-                responseMap = Map<String, dynamic>.from(decoded.first);
-              } else if (decoded is Map) {
-                responseMap = Map<String, dynamic>.from(decoded);
-              }
-            }
-
-            final value = ResponseViewModel.fromJson(responseMap);
-            if (value.IsSuccess == true) {
-              if (s.enquiryId != 0) await _confirmEnquiry(s.enquiryId);
-              emit(s.copyWith(progress: true, isSaved: true, savedMessage: 'Created Successfully'));
-            } else {
-              emit(s.copyWith(progress: true, savedMessage: value.Message ?? "Save Failed. Database Rejected data."));
-            }
-          } catch (jsonErr) {
-            emit(s.copyWith(progress: true, savedMessage: 'Data Parse Error: ${jsonErr.toString()}'));
-          }
-        }
+        // the shared Java save (POST /api/sale-orders/save, PUT /api/sale-orders/{id})
+        await _saleOrders.save(saleOrderSaveBody(s, companyId: AppGlobals.Comid, employeeId: AppGlobals.EmpRefId));
+        if (s.enquiryId != 0) await _confirmEnquiry(s.enquiryId);
+        emit(s.copyWith(progress: true, isSaved: true,
+            savedMessage: s.editId > 0 ? 'Updated Successfully' : 'Created Successfully'));
       } catch (e) {
-        emit(s.copyWith(progress: true, savedMessage: 'Network Error: ${e.toString()}'));
+        emit(s.copyWith(progress: true, savedMessage: e.toString()));
       }
     });
   }
@@ -493,14 +433,6 @@ class SalesOrderAddBloc extends Bloc<SalesOrderAddEvent, SalesOrderAddState> {
   // ════════════════════════════════════════════════════
   // HELPERS
   // ════════════════════════════════════════════════════
-
-  // ✅ FIX 4: Safe, case-insensitive mapping for Address/Quantity lists
-  dynamic _getVal(Map map, String key) {
-    for (var k in map.keys) {
-      if (k.toString().toLowerCase() == key.toLowerCase()) return map[k];
-    }
-    return null;
-  }
 
   Map<String, bool> _buildPermissions() {
     const allFields = [
@@ -711,8 +643,9 @@ class SalesOrderAddBloc extends Bloc<SalesOrderAddEvent, SalesOrderAddState> {
     }
   }
 
-  Future<SalesOrderAddLoaded> _loadMasterData(SalesOrderAddLoaded base, List<dynamic> master, List<SaleEditDetailModel>? details, bool isEnquiry) async {
-    final m = master[0];
+  Future<SalesOrderAddLoaded> _loadMasterData(SalesOrderAddLoaded base, Map<String, dynamic> m,
+      {List<SaleEditDetailModel> details = const [], List<Map<String, dynamic>> pickups = const [],
+      List<Map<String, dynamic>> deliveries = const [], required bool isEnquiry}) async {
     final now = DateFormat("yyyy-MM-dd HH:mm:ss").format(DateTime.now());
 
 
@@ -720,158 +653,148 @@ class SalesOrderAddBloc extends Bloc<SalesOrderAddEvent, SalesOrderAddState> {
 
     AppGlobals.CustomerList = (await _repository.selectCustomer()).map<CustomerModel>((e) => CustomerModel.fromJson(e)).toList();
     AppGlobals.JobTypeList = (await _repository.selectJobType()).map<JobTypeModel>((e) => JobTypeModel.fromJson(e)).toList();
-    if (m["JobMasterRefId"] != null) {
-      final jobData = await _repository.selectAllJobStatus(m["JobMasterRefId"] as int? ?? 0);
+    if (m["jobMasterRefId"] != null) {
+      final jobData = await _repository.selectAllJobStatus(m["jobMasterRefId"] as int? ?? 0);
       if (jobData.isNotEmpty) {
         if (jobData["JobStatusDetails"] != null) AppGlobals.JobAllStatusList = (jobData["JobStatusDetails"] as List).map<JobAllStatusModel>((e) => JobAllStatusModel.fromJson(e)).toList();
         if (jobData["JobTypeDetails"] != null) AppGlobals.JobTypeDetailsList = (jobData["JobTypeDetails"] as List).map<JobTypeDetailsModel>((e) => JobTypeDetailsModel.fromJson(e)).toList();
       }
     }
     String lAgentName = '';
-    if (m["AgentCompanyRefId"] != null && m["AgentCompanyRefId"] > 0) {
-      AppGlobals.AgentAllList = (await _repository.selectAgentAll(m["AgentCompanyRefId"] as int? ?? 0)).map<AgentModel>((e) => AgentModel.fromJson(e)).toList();lAgentName = _getFromAgentAll(m["AgentMasterRefId"]);
+    if (m["agentCompanyRefId"] != null && m["agentCompanyRefId"] > 0) {
+      AppGlobals.AgentAllList = (await _repository.selectAgentAll(m["agentCompanyRefId"] as int? ?? 0)).map<AgentModel>((e) => AgentModel.fromJson(e)).toList();lAgentName = _getFromAgentAll(m["agentMasterRefId"]);
     }
     String oAgentName = '';
-    if (m["OAgentCompanyRefId"] != null && m["OAgentCompanyRefId"] > 0) {
-      AppGlobals.AgentAllList = (await _repository.selectAgentAll(m["OAgentCompanyRefId"] as int? ?? 0)).map<AgentModel>((e) => AgentModel.fromJson(e)).toList();oAgentName = _getFromAgentAll(m["OAgentMasterRefId"]);
+    if (m["oAgentCompanyRefId"] != null && m["oAgentCompanyRefId"] > 0) {
+      AppGlobals.AgentAllList = (await _repository.selectAgentAll(m["oAgentCompanyRefId"] as int? ?? 0)).map<AgentModel>((e) => AgentModel.fromJson(e)).toList();oAgentName = _getFromAgentAll(m["oAgentMasterRefId"]);
     }
 
-    AppGlobals.CustomerCurrencyValue = await _repository.loadCustomerCurrency(m["CustomerRefId"] as int? ?? 0);String safeStr(String? v) => v ?? ''; String safeNum(dynamic v) => v != null ? v.toString() : '';
+    AppGlobals.CustomerCurrencyValue = await _saleOrders.currencyValue(m["customerRefId"] as int? ?? 0);String safeStr(String? v) => v ?? ''; String safeNum(dynamic v) => v != null ? v.toString() : '';
     String parseDate(dynamic v, String fmt) { if (v == null) return now; return DateFormat(fmt).format(DateTime.parse(v.toString())); }
 
-    List<int> loadedIds = [];
-    if (details != null) {
-      loadedIds = details.map((e) {
-        final map = e.toJson();
-        return (map['ItemMasterRefId'] ?? map['ItemMasterRefid'] ?? map['ItemMasterID'] ?? 0) as int;
-      }).toList();
-    }
+    final loadedIds = [for (final d in details) d.ItemMasterRefId];
 
-    // =========================================================================
-    // ✅ NEW LOGIC: Extract Arrays directly from PickupsList & DeliveriesList
-    // =========================================================================
-    List<dynamic> parsedPickupAddresses = [];
-    List<dynamic> parsedPickupQuantities = [];
-    List<dynamic> parsedPickupWeights = [];
-
-    if (m['PickupsList'] != null && m['PickupsList'] is List && (m['PickupsList'] as List).isNotEmpty) {
-      for (var item in m['PickupsList']) {
-        parsedPickupAddresses.add(item['PickupAddress'] ?? '');
-        parsedPickupQuantities.add(item['PickupQuantity'] ?? '');
-        parsedPickupWeights.add(item['PickupWeight'] ?? '');
+    // pickups and deliveries: the Java rows, else the legacy "{@}"-joined columns
+    final parsedPickupAddresses = <dynamic>[];
+    final parsedPickupQuantities = <dynamic>[];
+    final parsedPickupWeights = <dynamic>[];
+    if (pickups.isNotEmpty) {
+      for (final item in pickups) {
+        parsedPickupAddresses.add(item['pickupAddress'] ?? '');
+        parsedPickupQuantities.add(item['pickupQuantity'] ?? '');
+        parsedPickupWeights.add(item['pickupWeight'] ?? '');
       }
     } else {
-      parsedPickupAddresses = _splitAddress(_getVal(m, "PickupAddress"));
-      parsedPickupQuantities = _splitAddress(_getVal(m, "pickupQuantitylist"));
-      parsedPickupWeights = List.filled(parsedPickupAddresses.length, "");
+      parsedPickupAddresses.addAll(_splitAddress(m["pickupAddress"]));
+      parsedPickupQuantities.addAll(_splitAddress(m["pickupQuantitylist"]));
+      parsedPickupWeights.addAll(List.filled(parsedPickupAddresses.length, ""));
     }
 
-    List<dynamic> parsedDeliveryAddresses = [];
-    List<dynamic> parsedDeliveryQuantities = [];
-    List<dynamic> parsedDeliveryWeights = [];
-
-    if (m['DeliveriesList'] != null && m['DeliveriesList'] is List && (m['DeliveriesList'] as List).isNotEmpty) {
-      for (var item in m['DeliveriesList']) {
-        parsedDeliveryAddresses.add(item['DeliveryAddress'] ?? '');
-        parsedDeliveryQuantities.add(item['DeliveryQuantity'] ?? '');
-        parsedDeliveryWeights.add(item['DeliveryWeight'] ?? '');
+    final parsedDeliveryAddresses = <dynamic>[];
+    final parsedDeliveryQuantities = <dynamic>[];
+    final parsedDeliveryWeights = <dynamic>[];
+    if (deliveries.isNotEmpty) {
+      for (final item in deliveries) {
+        parsedDeliveryAddresses.add(item['deliveryAddress'] ?? '');
+        parsedDeliveryQuantities.add(item['deliveryQuantity'] ?? '');
+        parsedDeliveryWeights.add(item['deliveryWeight'] ?? '');
       }
     } else {
-      parsedDeliveryAddresses = _splitAddress(_getVal(m, "DeliveryAddress"));
-      parsedDeliveryQuantities = _splitAddress(_getVal(m, "DeliveryQuantitylist"));
-      parsedDeliveryWeights = List.filled(parsedDeliveryAddresses.length, "");
+      parsedDeliveryAddresses.addAll(_splitAddress(m["deliveryAddress"]));
+      parsedDeliveryQuantities.addAll(_splitAddress(m["deliveryQuantitylist"]));
+      parsedDeliveryWeights.addAll(List.filled(parsedDeliveryAddresses.length, ""));
     }
-    // =========================================================================
 
     
       List<String> poRemarks = [];
-      int notPort = int.tryParse(m["Notportchagre"]?.toString() ?? "0") ?? 0;
-      int portCPop = int.tryParse(m["PortCPop"]?.toString() ?? "0") ?? 0;
+      int notPort = int.tryParse(m["notportchagre"]?.toString() ?? "0") ?? 0;
+      int portCPop = int.tryParse(m["portCPop"]?.toString() ?? "0") ?? 0;
       if (portCPop == 1 && notPort == 0) poRemarks.add("Port Charges (PO Pending)");
 
-      int liveCPop = int.tryParse(m["LiveCPop"]?.toString() ?? "0") ?? 0;
-      int notLevy = int.tryParse(m["NotLevyChares"]?.toString() ?? "0") ?? 0;
+      int liveCPop = int.tryParse(m["livecpop"]?.toString() ?? "0") ?? 0;
+      int notLevy = int.tryParse(m["notLevyChares"]?.toString() ?? "0") ?? 0;
       if (liveCPop == 1 && notLevy == 0) poRemarks.add("Port Charges (LEVY CHARGES PO PENDING)");
 
-      int mmheCPop = int.tryParse(m["MMHECPop"]?.toString() ?? "0") ?? 0;
-      int notMmhe = int.tryParse(m["NotMMHECPop"]?.toString() ?? "0") ?? 0;
+      int mmheCPop = int.tryParse(m["mmheCPop"]?.toString() ?? "0") ?? 0;
+      int notMmhe = int.tryParse(m["notMMHECPop"]?.toString() ?? "0") ?? 0;
       if (mmheCPop == 1 && notMmhe == 0) poRemarks.add("MMHE AGENT PO PENDING");
 
-      int afPoCPop = int.tryParse(m["AFpoCPop"]?.toString() ?? "0") ?? 0;
-      int notAfPo = int.tryParse(m["NotAFpoCPop"]?.toString() ?? "0") ?? 0;
+      int afPoCPop = int.tryParse(m["afpoCPop"]?.toString() ?? "0") ?? 0;
+      int notAfPo = int.tryParse(m["notAFpoCPop"]?.toString() ?? "0") ?? 0;
       if (afPoCPop == 1 && notAfPo == 0) poRemarks.add("AF PO PENDING");
 
-      int sfWpoCPop = int.tryParse(m["SFWpoCPop"]?.toString() ?? "0") ?? 0;
-      int notSfWpo = int.tryParse(m["NotSFWpoCPop"]?.toString() ?? "0") ?? 0;
+      int sfWpoCPop = int.tryParse(m["sfWpoCPop"]?.toString() ?? "0") ?? 0;
+      int notSfWpo = int.tryParse(m["notSFWpoCPop"]?.toString() ?? "0") ?? 0;
       if (sfWpoCPop == 1 && notSfWpo == 0) poRemarks.add("DO CHARGES PO PENDING,SEAFRIEGHT IMPORT");
 
-      int sfeWpoCPop = int.tryParse(m["SFEWpoCPop"]?.toString() ?? "0") ?? 0;
-      int notSfeWpo = int.tryParse(m["NotSFEWpoCPop"]?.toString() ?? "0") ?? 0;
+      int sfeWpoCPop = int.tryParse(m["sfewpoCPop"]?.toString() ?? "0") ?? 0;
+      int notSfeWpo = int.tryParse(m["notSFEWpoCPop"]?.toString() ?? "0") ?? 0;
       if (sfeWpoCPop == 1 && notSfeWpo == 0) poRemarks.add("DO CHARGES PO PENDING,SEAFRIEGHT EXPORT");
 
-      int boatCPop = int.tryParse(m["BoatCPop"]?.toString() ?? "0") ?? 0;
-      int notBoat = int.tryParse(m["NotBoatCPop"]?.toString() ?? "0") ?? 0;
+      int boatCPop = int.tryParse(m["boatCPop"]?.toString() ?? "0") ?? 0;
+      int notBoat = int.tryParse(m["notBoatCPop"]?.toString() ?? "0") ?? 0;
       if (boatCPop == 1 && notBoat == 0) poRemarks.add("PO PENDING FOR PORT EQUIPMENT CARGO BOAT");
 
-      int boatCPop1 = int.tryParse(m["BoatCPop1"]?.toString() ?? "0") ?? 0;
-      int notBoat1 = int.tryParse(m["NotBoatCPop1"]?.toString() ?? "0") ?? 0;
+      int boatCPop1 = int.tryParse(m["boatCPop1"]?.toString() ?? "0") ?? 0;
+      int notBoat1 = int.tryParse(m["notBoatCPop1"]?.toString() ?? "0") ?? 0;
       if (boatCPop1 == 1 && notBoat1 == 0) poRemarks.add("PO PENDING FOR PORT EQUIPMENT WHARFMARK CRANE FORKLIFT");
 
-      int permitCPop = int.tryParse(m["PermitCPop"]?.toString() ?? "0") ?? 0;
-      int notPermit = int.tryParse(m["NotPermitCPop"]?.toString() ?? "0") ?? 0;
+      int permitCPop = int.tryParse(m["permitCPop"]?.toString() ?? "0") ?? 0;
+      int notPermit = int.tryParse(m["notPermitCPop"]?.toString() ?? "0") ?? 0;
       if (permitCPop == 1 && notPermit == 0) poRemarks.add("PO PENDING FOR PERMIT OUTWARD PERMIT OR iNWARD");
 
-      int pfppCPop1 = int.tryParse(m["PFPPCPop1"]?.toString() ?? "0") ?? 0;
-      int notPfpp1 = int.tryParse(m["NotPFPPCPop1"]?.toString() ?? "0") ?? 0;
+      int pfppCPop1 = int.tryParse(m["pfppCPop1"]?.toString() ?? "0") ?? 0;
+      int notPfpp1 = int.tryParse(m["notPFPPCPop1"]?.toString() ?? "0") ?? 0;
       if (pfppCPop1 == 1 && notPfpp1 == 0) poRemarks.add("(PO FOR PERMIT PENDING ORIGIN OR DESTINATION IS SINGAPORE)");
 
       var result = base.copyWith(
 
-      editId: isEnquiry ? 0 : (m["Id"] ?? 0), enquiryId: isEnquiry ? (m["Id"] ?? 0) : 0, totalAmount: double.tryParse(m["Amount"]?.toString() ?? "0") ?? 0.0,
-        poPendingRemarks: poRemarks, productViewList: details ?? [],
+      editId: isEnquiry ? 0 : (m["id"] ?? 0), enquiryId: isEnquiry ? (m["id"] ?? 0) : 0, totalAmount: double.tryParse(m["amount"]?.toString() ?? "0") ?? 0.0,
+        poPendingRemarks: poRemarks, productViewList: List<SaleEditDetailModel>.from(details),
+      loadedMaster: isEnquiry ? const {} : m,
       productIds: loadedIds,
-      currencyValue: AppGlobals.CustomerCurrencyValue, custId: m["CustomerRefId"] ?? 0, jobTypeId: m["JobMasterRefId"] ?? 0,
-      lAgentCompanyId: m["AgentCompanyRefId"] ?? 0, lAgentId: m["AgentMasterRefId"] ?? 0, oAgentCompanyId: m["OAgentCompanyRefId"] ?? 0,
-      oAgentId: m["OAgentMasterRefId"] ?? 0, originId: m["OriginRefId"] ?? 0, destinationId: m["DestinationRefId"] ?? 0,
-      sealEmpId1: m["SealbyRefid"] ?? 0, sealEmpId2: m["SealbyRefid2"] ?? 0, sealEmpId3: m["SealbyRefid3"] ?? 0,
-      breakEmpId1: m["SealbreakbyRefid"] ?? 0, breakEmpId2: m["SealbreakbyRefid2"] ?? 0, breakEmpId3: m["SealbreakbyRefid3"] ?? 0,
-      boardOfficerId1: m["BoardingOfficerRefid"] ?? 0, boardOfficerId2: m["BoardingOfficer1Refid"] ?? 0, statusId: m["JStatus"] ?? 0,
-      disabledBillType: true, disabledAmount1: true, disabledAmount2: true, dropdownValue: m["BillType"] ?? 'MY',
-      dropdownValueFW1: m["Forwarding"] != "" ? m["Forwarding"] : null, dropdownValueFW2: m["Forwarding2"] != "" ? m["Forwarding2"] : null,
-      dropdownValueFW3: m["Forwarding3"] != "" ? m["Forwarding3"] : null, dropdownValueZB1: m["Zb"] != "" ? m["Zb"] : null,
-      dropdownValueZB2: m["Zb2"] != "" ? m["Zb2"] : null, dropdownValueTruckSize: m["TruckSize"] != null && m["TruckSize"] != "" ? m["TruckSize"].toString() : null,
-      dtpSaleOrderdate: parseDate(m["SaleDate"], "yyyy-MM-dd"), dtpLETAdate: m["ETA"] != null ? parseDate(m["ETA"], "yyyy-MM-dd HH:mm:ss") : now,
-      dtpLETBdate: m["ETB"] != null ? parseDate(m["ETB"], "yyyy-MM-dd HH:mm:ss") : now, dtpLETDdate: m["ETD"] != null ? parseDate(m["ETD"], "yyyy-MM-dd HH:mm:ss") : now,
-      dtpFlightTimedate: m["FlighTime"] != null ? parseDate(m["FlighTime"], "yyyy-MM-dd HH:mm:ss") : now, dtpOETAdate: m["OETA"] != null ? parseDate(m["OETA"], "yyyy-MM-dd HH:mm:ss") : now,
-      dtpOETBdate: m["OETB"] != null ? parseDate(m["OETB"], "yyyy-MM-dd HH:mm:ss") : now, dtpOETDdate: m["OETD"] != null ? parseDate(m["OETD"], "yyyy-MM-dd HH:mm:ss") : now,
-      dtpPickUpdate: m["PickupDate"] != null ? parseDate(m["PickupDate"], "yyyy-MM-dd HH:mm:ss") : now, dtpDeliverydate: m["DeliveryDate"] != null ? parseDate(m["DeliveryDate"], "yyyy-MM-dd HH:mm:ss") : now,
-      dtpWHEntrydate: m["WareHouseEnterDate"] != null ? parseDate(m["WareHouseEnterDate"], "yyyy-MM-dd HH:mm:ss") : now, dtpWHExitdate: m["WareHouseExitDate"] != null ? parseDate(m["WareHouseExitDate"], "yyyy-MM-dd HH:mm:ss") : now,
-      dtpFW1date: m["ForwardingDate"] != null ? parseDate(m["ForwardingDate"], "yyyy-MM-dd HH:mm:ss") : now, dtpFW2date: m["Forwarding2Date"] != null ? parseDate(m["Forwarding2Date"], "yyyy-MM-dd HH:mm:ss") : now,
-      dtpFW3date: m["Forwarding3Date"] != null ? parseDate(m["Forwarding3Date"], "yyyy-MM-dd HH:mm:ss") : now, checkBoxValueLETA: m["ETA"] != null,
-      checkBoxValueLETB: m["ETB"] != null, checkBoxValueLETD: m["ETD"] != null, checkBoxValueFlightTime: m["FlighTime"] != null,
-      checkBoxValueOETA: m["OETA"] != null, checkBoxValueOETB: m["OETB"] != null, checkBoxValueOETD: m["OETD"] != null,
-      checkBoxValuePickUp: m["PickupDate"] != null, checkBoxValueDelivery: m["DeliveryDate"] != null, checkBoxValueWHEntry: m["WareHouseEnterDate"] != null,
-      checkBoxValueWHExit: m["WareHouseExitDate"] != null, checkBoxValueFW1: m["ForwardingDate"] != null, checkBoxValueFW2: m["Forwarding2Date"] != null,
-      checkBoxValueFW3: m["Forwarding3Date"] != null, txtJobNo: isEnquiry ? AppGlobals.MaxSaleOrderNum : safeNum(m["CNumber"]),
-      txtCustomer: _getFromList(AppGlobals.CustomerList, m["CustomerRefId"], (e) => e.AccountName), txtJobType: _getFromList(AppGlobals.JobTypeList, m["JobMasterRefId"], (e) => e.Name),
-      txtJobStatus: _getFromStatusList(m["JStatus"]), txtSealByEmp1: _getEmpName(m["SealbyRefid"]), txtSealByEmp2: _getEmpName(m["SealbyRefid2"]),
-      txtSealByEmp3: _getEmpName(m["SealbyRefid3"]), txtBreakByEmp1: _getEmpName(m["SealbreakbyRefid"]), txtBreakByEmp2: _getEmpName(m["SealbreakbyRefid2"]),
-      txtBreakByEmp3: _getEmpName(m["SealbreakbyRefid3"]), txtBoardingOfficer1: _getEmpName(m["BoardingOfficerRefid"]), txtBoardingOfficer2: _getEmpName(m["BoardingOfficer1Refid"]),
+      currencyValue: AppGlobals.CustomerCurrencyValue, custId: m["customerRefId"] ?? 0, jobTypeId: m["jobMasterRefId"] ?? 0,
+      lAgentCompanyId: m["agentCompanyRefId"] ?? 0, lAgentId: m["agentMasterRefId"] ?? 0, oAgentCompanyId: m["oAgentCompanyRefId"] ?? 0,
+      oAgentId: m["oAgentMasterRefId"] ?? 0, originId: m["originRefId"] ?? 0, destinationId: m["destinationRefId"] ?? 0,
+      sealEmpId1: m["sealbyRefid"] ?? 0, sealEmpId2: m["sealbyRefid2"] ?? 0, sealEmpId3: m["sealbyRefid3"] ?? 0,
+      breakEmpId1: m["sealbreakbyRefid"] ?? 0, breakEmpId2: m["sealbreakbyRefid2"] ?? 0, breakEmpId3: m["sealbreakbyRefid3"] ?? 0,
+      boardOfficerId1: m["boardingOfficerRefid"] ?? 0, boardOfficerId2: m["boardingOfficer1Refid"] ?? 0, statusId: m["jStatus"] ?? 0,
+      disabledBillType: true, disabledAmount1: true, disabledAmount2: true, dropdownValue: m["billType"] ?? 'MY',
+      dropdownValueFW1: m["forwarding"] != "" ? m["forwarding"] : null, dropdownValueFW2: m["forwarding2"] != "" ? m["forwarding2"] : null,
+      dropdownValueFW3: m["forwarding3"] != "" ? m["forwarding3"] : null, dropdownValueZB1: m["zb"] != "" ? m["zb"] : null,
+      dropdownValueZB2: m["zb2"] != "" ? m["zb2"] : null, dropdownValueTruckSize: m["truckSize"] != null && m["truckSize"] != "" ? m["truckSize"].toString() : null,
+      dtpSaleOrderdate: parseDate(m["saleDate"], "yyyy-MM-dd"), dtpLETAdate: m["eta"] != null ? parseDate(m["eta"], "yyyy-MM-dd HH:mm:ss") : now,
+      dtpLETBdate: m["etb"] != null ? parseDate(m["etb"], "yyyy-MM-dd HH:mm:ss") : now, dtpLETDdate: m["etd"] != null ? parseDate(m["etd"], "yyyy-MM-dd HH:mm:ss") : now,
+      dtpFlightTimedate: m["flighTime"] != null ? parseDate(m["flighTime"], "yyyy-MM-dd HH:mm:ss") : now, dtpOETAdate: m["oeta"] != null ? parseDate(m["oeta"], "yyyy-MM-dd HH:mm:ss") : now,
+      dtpOETBdate: m["oetb"] != null ? parseDate(m["oetb"], "yyyy-MM-dd HH:mm:ss") : now, dtpOETDdate: m["oetd"] != null ? parseDate(m["oetd"], "yyyy-MM-dd HH:mm:ss") : now,
+      dtpPickUpdate: m["pickupDate"] != null ? parseDate(m["pickupDate"], "yyyy-MM-dd HH:mm:ss") : now, dtpDeliverydate: m["deliveryDate"] != null ? parseDate(m["deliveryDate"], "yyyy-MM-dd HH:mm:ss") : now,
+      dtpWHEntrydate: m["wareHouseEnterDate"] != null ? parseDate(m["wareHouseEnterDate"], "yyyy-MM-dd HH:mm:ss") : now, dtpWHExitdate: m["wareHouseExitDate"] != null ? parseDate(m["wareHouseExitDate"], "yyyy-MM-dd HH:mm:ss") : now,
+      dtpFW1date: m["forwardingDate"] != null ? parseDate(m["forwardingDate"], "yyyy-MM-dd HH:mm:ss") : now, dtpFW2date: m["forwarding2Date"] != null ? parseDate(m["forwarding2Date"], "yyyy-MM-dd HH:mm:ss") : now,
+      dtpFW3date: m["forwarding3Date"] != null ? parseDate(m["forwarding3Date"], "yyyy-MM-dd HH:mm:ss") : now, checkBoxValueLETA: m["eta"] != null,
+      checkBoxValueLETB: m["etb"] != null, checkBoxValueLETD: m["etd"] != null, checkBoxValueFlightTime: m["flighTime"] != null,
+      checkBoxValueOETA: m["oeta"] != null, checkBoxValueOETB: m["oetb"] != null, checkBoxValueOETD: m["oetd"] != null,
+      checkBoxValuePickUp: m["pickupDate"] != null, checkBoxValueDelivery: m["deliveryDate"] != null, checkBoxValueWHEntry: m["wareHouseEnterDate"] != null,
+      checkBoxValueWHExit: m["wareHouseExitDate"] != null, checkBoxValueFW1: m["forwardingDate"] != null, checkBoxValueFW2: m["forwarding2Date"] != null,
+      checkBoxValueFW3: m["forwarding3Date"] != null, txtJobNo: isEnquiry ? AppGlobals.MaxSaleOrderNum : safeNum(m["cNumber"]),
+      txtCustomer: _getFromList(AppGlobals.CustomerList, m["customerRefId"], (e) => e.AccountName), txtJobType: _getFromList(AppGlobals.JobTypeList, m["jobMasterRefId"], (e) => e.Name),
+      txtJobStatus: _getFromStatusList(m["jStatus"]), txtSealByEmp1: _getEmpName(m["sealbyRefid"]), txtSealByEmp2: _getEmpName(m["sealbyRefid2"]),
+      txtSealByEmp3: _getEmpName(m["sealbyRefid3"]), txtBreakByEmp1: _getEmpName(m["sealbreakbyRefid"]), txtBreakByEmp2: _getEmpName(m["sealbreakbyRefid2"]),
+      txtBreakByEmp3: _getEmpName(m["sealbreakbyRefid3"]), txtBoardingOfficer1: _getEmpName(m["boardingOfficerRefid"]), txtBoardingOfficer2: _getEmpName(m["boardingOfficer1Refid"]),
 
-      txtLAgentCompany: _getFromAgentCompany(m["AgentCompanyRefId"]), txtLAgentName: lAgentName, txtOAgentCompany: _getFromAgentCompany(m["OAgentCompanyRefId"]), txtOAgentName: oAgentName,
+      txtLAgentCompany: _getFromAgentCompany(m["agentCompanyRefId"]), txtLAgentName: lAgentName, txtOAgentCompany: _getFromAgentCompany(m["oAgentCompanyRefId"]), txtOAgentName: oAgentName,
 
-      txtDoDescription: safeStr(m["DODescription"]), txtTruckSize: safeNum(m["TruckSize"]),
-      txtRemarks: safeStr(m["Remarks"]), txtOffVessel: safeStr(m["Offvesselname"]), txtLoadingVessel: safeStr(m["Loadingvesselname"]), txtLPort: safeStr(m["SPort"]),
-      txtOPort: safeStr(m["OPort"]), txtSmk1: safeStr(m["ForwardingSMKNo"]), txtSmk2: safeStr(m["ForwardingSMKNo2"]), txtSmk3: safeStr(m["ForwardingSMKNo3"]),
-      txtAWBNo: safeStr(m["AWBNo"]), txtBLCopy: safeStr(m["BLCopy"]), txtOSCN: safeStr(m["SCN"]), txtLSCN: safeStr(m["LSCN"]), txtLVesselType: safeStr(m["Vessel"]),
-      txtOVesselType: safeStr(m["OVessel"]), txtCommodityType: safeStr(m["Commodity"]), txtCargo: safeStr(m["Cargo"]), txtWeight: safeNum(m["TotalWeight"]),
-      txtQuantity: safeNum(m["Quantity"]), txtOrigin: safeStr(m["Origin"]), txtDestination: safeStr(m["Destination"]), txtPTWNo: safeStr(m["PTW"]),
-      txtENRef1: safeStr(m["ForwardingEnterRef"]), txtENRef2: safeStr(m["ForwardingEnterRef2"]), txtENRef3: safeStr(m["ForwardingEnterRef3"]),
-      txtExRef1: safeStr(m["ForwardingExitRef"]), txtExRef2: safeStr(m["ForwardingExitRef2"]), txtExRef3: safeStr(m["ForwardingExitRef3"]),
-      txtPortChargeRef1: safeStr(m["PortChargesRef"]), txtPortCharges: safeNum(m["PortCharges"]), txtAmount1: safeNum(m["BoardingAmount"]),
-      txtAmount2: safeNum(m["BoardingAmount1"]), txtZBRef1: safeStr(m["ZbRef"]), txtZBRef2: safeStr(m["ZbRef2"]), txtWarehouseAddress: safeStr(m["WareHouseAddress"]),
-      txtForwarding1S1: safeStr(m["Forwarding1S1"]), txtForwarding1S2: safeStr(m["Forwarding1S2"]), txtForwarding2S1: safeStr(m["Forwarding2S1"]),
-      txtForwarding2S2: safeStr(m["Forwarding2S2"]), txtForwarding3S1: safeStr(m["Forwarding3S1"]), txtForwarding3S2: safeStr(m["Forwarding3S2"]),
+      txtDoDescription: safeStr(m["doDescription"]), txtTruckSize: safeNum(m["truckSize"]),
+      txtRemarks: safeStr(m["remarks"]), txtOffVessel: safeStr(m["offvesselname"]), txtLoadingVessel: safeStr(m["loadingvesselname"]), txtLPort: safeStr(m["sPort"]),
+      txtOPort: safeStr(m["oPort"]), txtSmk1: safeStr(m["forwardingSMKNo"]), txtSmk2: safeStr(m["forwardingSMKNo2"]), txtSmk3: safeStr(m["forwardingSMKNo3"]),
+      txtAWBNo: safeStr(m["awbNo"]), txtBLCopy: safeStr(m["blCopy"]), txtOSCN: safeStr(m["scn"]), txtLSCN: safeStr(m["lscn"]), txtLVesselType: safeStr(m["vessel"]),
+      txtOVesselType: safeStr(m["oVessel"]), txtCommodityType: safeStr(m["commodity"]), txtCargo: safeStr(m["cargo"]), txtWeight: safeNum(m["totalWeight"]),
+      txtQuantity: safeNum(m["quantity"]), txtOrigin: safeStr(m["origin"]), txtDestination: safeStr(m["destination"]), txtPTWNo: safeStr(m["ptw"]),
+      txtENRef1: safeStr(m["forwardingEnterRef"]), txtENRef2: safeStr(m["forwardingEnterRef2"]), txtENRef3: safeStr(m["forwardingEnterRef3"]),
+      txtExRef1: safeStr(m["forwardingExitRef"]), txtExRef2: safeStr(m["forwardingExitRef2"]), txtExRef3: safeStr(m["forwardingExitRef3"]),
+      txtPortChargeRef1: safeStr(m["portChargesRef"]), txtPortCharges: safeNum(m["portCharges"]), txtAmount1: safeNum(m["boardingAmount"]),
+      txtAmount2: safeNum(m["boardingAmount1"]), txtZBRef1: safeStr(m["zbRef"]), txtZBRef2: safeStr(m["zbRef2"]), txtWarehouseAddress: safeStr(m["wareHouseAddress"]),
+      txtForwarding1S1: safeStr(m["forwarding1S1"]), txtForwarding1S2: safeStr(m["forwarding1S2"]), txtForwarding2S1: safeStr(m["forwarding2S1"]),
+      txtForwarding2S2: safeStr(m["forwarding2S2"]), txtForwarding3S1: safeStr(m["forwarding3S1"]), txtForwarding3S2: safeStr(m["forwarding3S2"]),
 
       // MAP NEW ARRAYS TO STATE
       pickUpAddressList: parsedPickupAddresses,
@@ -897,147 +820,22 @@ class SalesOrderAddBloc extends Bloc<SalesOrderAddEvent, SalesOrderAddState> {
   String _getFromAgentCompany(dynamic id) { if (id == null || id == 0) return ''; try { return AppGlobals.AgentCompanyList.firstWhere((e) => e.Id == id).Name; } catch (_) { return ''; } }
   String _getFromAgentAll(dynamic id) { if (id == null || id == 0) return ''; try { return AppGlobals.AgentAllList.firstWhere((e) => e.Id == id).AgentName; } catch (_) { return ''; } }
   List<dynamic> _splitAddress(dynamic val) { if (val == null || val.toString().isEmpty) return []; final str = val.toString(); return str.contains('{@}') ? str.split('{@}') : [str]; }
-  String _firstAddress(dynamic val) { if (val == null || val.toString().isEmpty) return ''; final str = val.toString(); return str.contains('{@}') ? str.split('{@}').first : str; }
 
-  Map<String, dynamic> _buildMasterPayload(SalesOrderAddLoaded s) {
-
-    // =========================================================================
-    // ✅ BUILD PICKUPS & DELIVERIES ARRAYS
-    // =========================================================================
-    List<Map<String, dynamic>> dynamicPickups = [];
-    int pLen = s.pickUpAddressList.isNotEmpty ? s.pickUpAddressList.length : (s.txtPickUpAddress.isNotEmpty ? 1 : 0);
-
-    if (pLen > 0 && s.pickUpAddressList.isEmpty) {
-      dynamicPickups.add({
-        "PickupAddress": s.txtPickUpAddress,
-        "PickupQuantity": s.txtPickUpQuantity,
-        "PickupWeight": s.txtPickUpWeight,
-        "PickupTime": DateTime.now().toIso8601String().split('.')[0]
-      });
-    } else {
-      for (int i = 0; i < s.pickUpAddressList.length; i++) {
-        dynamicPickups.add({
-          "PickupAddress": s.pickUpAddressList[i],
-          "PickupQuantity": i < s.pickUpQuantityList.length ? s.pickUpQuantityList[i] : "",
-          "PickupWeight": i < s.pickUpWeightList.length ? s.pickUpWeightList[i] : "",
-          "PickupTime": DateTime.now().toIso8601String().split('.')[0]
-        });
-      }
+  /// The invoice number of an invoiced job; the form opens without it when the lookup fails.
+  Future<String> _invoiceNo(int saleOrderId) async {
+    try {
+      final link = await _saleOrders.invoiceLink(saleOrderId);
+      return link['invoiced'] == true ? '${link['invoiceNo'] ?? ''}' : '';
+    } catch (_) {
+      return '';
     }
-
-    List<Map<String, dynamic>> dynamicDeliveries = [];
-    int dLen = s.deliveryAddressList.isNotEmpty ? s.deliveryAddressList.length : (s.txtDeliveryAddress.isNotEmpty ? 1 : 0);
-
-    if (dLen > 0 && s.deliveryAddressList.isEmpty) {
-      dynamicDeliveries.add({
-        "DeliveryAddress": s.txtDeliveryAddress,
-        "DeliveryQuantity": s.txtDeliveryQuantity,
-        "DeliveryWeight": s.txtDeliveryWeight,
-        "DeliveryTime": DateTime.now().toIso8601String().split('.')[0]
-      });
-    } else {
-      for (int i = 0; i < s.deliveryAddressList.length; i++) {
-        dynamicDeliveries.add({
-          "DeliveryAddress": s.deliveryAddressList[i],
-          "DeliveryQuantity": i < s.deliveryQuantityList.length ? s.deliveryQuantityList[i] : "",
-          "DeliveryWeight": i < s.deliveryWeightList.length ? s.deliveryWeightList[i] : "",
-          "DeliveryTime": DateTime.now().toIso8601String().split('.')[0]
-        });
-      }
-    }
-    // =========================================================================
-
-    return {
-      'Id': s.editId, 'CompanyRefId': AppGlobals.Comid, 'EmployeeRefId': AppGlobals.EmpRefId == 0 ? null : AppGlobals.EmpRefId, 'AgentCompanyRefId': s.lAgentCompanyId == 0 ? null : s.lAgentCompanyId,
-      'AgentMasterRefId': s.lAgentId == 0 ? null : s.lAgentId, 'OAgentCompanyRefId': s.oAgentCompanyId == 0 ? null : s.oAgentCompanyId, 'OAgentMasterRefId': s.oAgentId == 0 ? null : s.oAgentId,
-      'CustomerRefId': s.custId, 'JobMasterRefId': s.jobTypeId, 'SaleDate': DateTime.parse(s.dtpSaleOrderdate).toIso8601String().split('.')[0], 'BillType': s.dropdownValue,
-      'Remarks': s.txtRemarks, 'DODescription': s.txtDoDescription, 'Amount': s.totalAmount, 'GrossAmount': s.totalAmount, 'TaxAmount': s.taxAmount,
-      'Coinage': s.coinage, 'Offvesselname': s.txtOffVessel, 'Loadingvesselname': s.txtLoadingVessel, 'SPort': s.txtLPort, 'OPort': s.txtOPort,
-      'Vessel': s.txtLVesselType, 'OVessel': s.txtOVesselType, 'Commodity': s.txtCommodityType, 'Cargo': s.txtCargo,
-      'ETA': s.checkBoxValueLETA ? DateTime.parse(s.dtpLETAdate).toIso8601String().split('.')[0] : null, 'FlighTime': s.checkBoxValueFlightTime ? DateTime.parse(s.dtpFlightTimedate).toIso8601String().split('.')[0] : null,
-      'ETB': s.checkBoxValueLETB ? DateTime.parse(s.dtpLETBdate).toIso8601String().split('.')[0] : null, 'ETD': s.checkBoxValueLETD ? DateTime.parse(s.dtpLETDdate).toIso8601String().split('.')[0] : null,
-      'OETA': s.checkBoxValueOETA ? DateTime.parse(s.dtpOETAdate).toIso8601String().split('.')[0] : null, 'OETB': s.checkBoxValueOETB ? DateTime.parse(s.dtpOETBdate).toIso8601String().split('.')[0] : null,
-      'OETD': s.checkBoxValueOETD ? DateTime.parse(s.dtpOETDdate).toIso8601String().split('.')[0] : null, 'AWBNo': s.txtAWBNo, 'BLCopy': s.txtBLCopy, 'Quantity': s.txtQuantity,
-      'TotalWeight': s.txtWeight, 'TruckSize': s.txtTruckSize, 'JStatus': s.statusId == 0 ? null : s.statusId, 'SealbyRefid': s.sealEmpId1, 'SealbreakbyRefid': s.breakEmpId1,
-      'SealbyRefid2': s.sealEmpId2, 'SealbreakbyRefid2': s.breakEmpId2, 'SealbyRefid3': s.sealEmpId3, 'SealbreakbyRefid3': s.breakEmpId3, 'BoardingOfficerRefid': s.boardOfficerId1,
-      'BoardingOfficer1Refid': s.boardOfficerId2, 'BoardingAmount': s.txtAmount1, 'BoardingAmount1': s.txtAmount2, 'ForwardingEnterRef': s.txtENRef1,
-      'ForwardingExitRef': s.txtExRef1, 'ForwardingEnterRef2': s.txtENRef2, 'ForwardingExitRef2': s.txtExRef2, 'ForwardingEnterRef3': s.txtENRef3,
-      'ForwardingExitRef3': s.txtExRef3, 'ForwardingSMKNo': s.txtSmk1, 'ForwardingSMKNo2': s.txtSmk2, 'ForwardingSMKNo3': s.txtSmk3, 'PortChargesRef': s.txtPortChargeRef1,
-      'PortCharges': s.txtPortCharges, 'OriginRefId': s.originId, 'DestinationRefId': s.destinationId,
-      'PickupDate': s.checkBoxValuePickUp ? DateTime.parse(s.dtpPickUpdate).toIso8601String().split('.')[0] : null, 'DeliveryDate': s.checkBoxValueDelivery ? DateTime.parse(s.dtpDeliverydate).toIso8601String().split('.')[0] : null,
-      'WareHouseEnterDate': s.checkBoxValueWHEntry ? DateTime.parse(s.dtpWHEntrydate).toIso8601String().split('.')[0] : null, 'WareHouseExitDate': s.checkBoxValueWHExit ? DateTime.parse(s.dtpWHExitdate).toIso8601String().split('.')[0] : null,
-      'WareHouseAddress': s.txtWarehouseAddress,
-
-      // Add standard flat fields for the first pickup and delivery since backend expects them
-      'PickupAddress': s.pickUpAddressList.isNotEmpty ? s.pickUpAddressList.join(', ') : s.txtPickUpAddress,
-      'pickupQuantityList': s.pickUpQuantityList.isNotEmpty ? s.pickUpQuantityList.join(', ') : s.txtPickUpQuantity,
-      'pickuptimelist': DateTime.now().toIso8601String().split('.')[0],
-      'PickupWeight': s.pickUpWeightList.isNotEmpty ? s.pickUpWeightList.join(', ') : s.txtPickUpWeight,
-      
-      'DeliveryAddress': s.deliveryAddressList.isNotEmpty ? s.deliveryAddressList.join(', ') : s.txtDeliveryAddress,
-      'DeliveryQuantityList': s.deliveryQuantityList.isNotEmpty ? s.deliveryQuantityList.join(', ') : s.txtDeliveryQuantity,
-      'DelivertimeList': DateTime.now().toIso8601String().split('.')[0],
-      'DeliveryWeight': s.deliveryWeightList.isNotEmpty ? s.deliveryWeightList.join(', ') : s.txtDeliveryWeight,
-
-      // Keep arrays just in case the backend was updated to support multiple
-      'PickupsList': dynamicPickups,
-      'DeliveriesList': dynamicDeliveries,
-
-      'Forwarding': s.dropdownValueFW1, 'Forwarding2': s.dropdownValueFW2, 'Forwarding3': s.dropdownValueFW3, 'Origin': s.txtOrigin, 'Destination': s.txtDestination,
-      'SCN': s.txtOSCN, 'LSCN': s.txtLSCN, 'Zb': s.dropdownValueZB1, 'PTW': s.txtPTWNo, 'Zb2': s.dropdownValueZB2, 'ZbRef': s.txtZBRef1, 'ZbRef2': s.txtZBRef2,
-      'Forwarding1S1': s.txtForwarding1S1, 'Forwarding1S2': s.txtForwarding1S2, 'Forwarding2S1': s.txtForwarding2S1, 'Forwarding2S2': s.txtForwarding2S2,
-      'Forwarding3S1': s.txtForwarding3S1, 'Forwarding3S2': s.txtForwarding3S2, 'CurrencyValue': s.currencyValue, 'ActualNetAmount': s.actualAmount,
-      'ForwardingDate': s.checkBoxValueFW1 ? DateTime.parse(s.dtpFW1date).toIso8601String().split('.')[0] : null, 'Forwarding2Date': s.checkBoxValueFW2 ? DateTime.parse(s.dtpFW2date).toIso8601String().split('.')[0] : null,
-      'Forwarding3Date': s.checkBoxValueFW3 ? DateTime.parse(s.dtpFW3date).toIso8601String().split('.')[0] : null,
-
-      'SaleDetails': s.productViewList.asMap().entries.map((entry) {
-        // ... pazhaya code ...
-        final idx = entry.key;
-        final jsonMap = Map<String, dynamic>.from(entry.value.toJson());
-        final hardId = s.productIds.length > idx ? s.productIds[idx] : 0;
-
-        String? exactItemKey;
-        String? exactCompKey;
-
-        for (String key in jsonMap.keys) {
-          final lower = key.toLowerCase();
-          if (lower == 'itemmasterrefid' || lower == 'itemmasterid' || lower == 'productid') exactItemKey = key;
-          if (lower == 'companyrefid') exactCompKey = key;
-        }
-
-        if (exactItemKey != null) {
-          jsonMap[exactItemKey] = hardId;
-        } else {
-          jsonMap['ItemMasterRefId'] = hardId;
-          jsonMap['ItemMasterRefid'] = hardId;
-        }
-
-        if (exactCompKey != null) {
-          jsonMap[exactCompKey] = AppGlobals.Comid;
-        } else {
-          jsonMap['CompanyRefId'] = AppGlobals.Comid;
-        }
-
-        return jsonMap;
-      }).toList(),
-    };
   }
 
+  // The enquiry status has no Java API yet; this moves with the enquiry screens.
   Future<void> _confirmEnquiry(int id) async {
     final header = {'Content-Type': 'application/json; charset=UTF-8'};
     await sl<LegacyApiRepository>().apiAllinoneSelectArray("${ApiConstants.apiUpdateEnquiryMaster}$id&Comid=${AppGlobals.Comid}&StatusName=CONFIRMED", null, header, context);
   }
 
-  double _safeNum(dynamic val) {
-    if (val == null) return 0.0;
-    if (val is num) return val.toDouble();
-    if (val is String) return double.tryParse(val) ?? 0.0;
-    return 0.0;
-  }
-  
-  String _safeStr(dynamic val) {
-    if (val == null) return '';
-    return val.toString();
-  }
 
 }

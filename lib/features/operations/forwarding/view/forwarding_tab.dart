@@ -54,8 +54,6 @@ class FWUpdatePageState extends State<FWUpdatePage> with SingleTickerProviderSta
   void initState() {
     super.initState();
 
-    sl<LegacyApiRepository>().GetJobNoForwarding(context, 3);
-
     _tabController = TabController(length: 3, vsync: this);
     _tabController.addListener(() {
       if (!_tabController.indexIsChanging) {
@@ -622,14 +620,14 @@ class _SmkFieldState extends State<_SmkField> {
                 separatorBuilder: (_, __) => const Divider(height: 1, color: Palette.grey200p),
                 itemBuilder: (ctx, i) {
                   final item = widget.suggestions[i];
-                  final smkKey = widget.type == 1 ? 'ForwardingSMKNo' : widget.type == 2 ? 'ForwardingSMKNo2' : 'ForwardingSMKNo3';
+                  final smkKey = widget.type == 1 ? 'forwardingSMKNo' : widget.type == 2 ? 'forwardingSMKNo2' : 'forwardingSMKNo3';
                   final smkVal = item[smkKey]?.toString() ?? '';
 
                   return InkWell(
                     onTap: () {
                       _removeOverlay();
                       _focusNode.unfocus();
-                      widget.onSuggestionTap(item['Id'], smkVal);
+                      widget.onSuggestionTap(item['id'] as int, smkVal);
                     },
                     child: Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),

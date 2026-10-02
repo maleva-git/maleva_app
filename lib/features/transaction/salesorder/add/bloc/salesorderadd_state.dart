@@ -50,6 +50,11 @@ class SalesOrderAddLoaded extends SalesOrderAddState {
   final int originId;
   final int destinationId;
   final int editId;
+  /// The order as Java read it (empty for a new one): the save starts from it, so fields this
+  /// form does not show are sent back unchanged.
+  final Map<String, dynamic> loadedMaster;
+  /// The invoice that bills this job (Java `/invoice-link`); empty when not invoiced.
+  final String invoiceNo;
   final int enquiryId;
 
   final String dtpSaleOrderdate;
@@ -220,7 +225,7 @@ class SalesOrderAddLoaded extends SalesOrderAddState {
     this.custId = 0, this.statusId = 0, this.jobTypeId = 0, this.lAgentCompanyId = 0, this.lAgentId = 0, this.oAgentCompanyId = 0,
     this.oAgentId = 0, this.sealEmpId1 = 0, this.sealEmpId2 = 0, this.sealEmpId3 = 0, this.breakEmpId1 = 0, this.breakEmpId2 = 0,
     this.breakEmpId3 = 0, this.boardOfficerId1 = 0, this.boardOfficerId2 = 0, this.originId = 0, this.destinationId = 0,
-    this.editId = 0, this.enquiryId = 0, required this.dtpSaleOrderdate, required this.dtpOETAdate, required this.dtpOETBdate,
+    this.editId = 0, this.loadedMaster = const {}, this.invoiceNo = '', this.enquiryId = 0, required this.dtpSaleOrderdate, required this.dtpOETAdate, required this.dtpOETBdate,
     required this.dtpOETDdate, required this.dtpLETAdate, required this.dtpLETBdate, required this.dtpLETDdate, required this.dtpFlightTimedate,
     required this.dtpPickUpdate, required this.dtpDeliverydate, required this.dtpWHEntrydate, required this.dtpWHExitdate,
     required this.dtpFW1date, required this.dtpFW2date, required this.dtpFW3date, this.checkBoxValueOETA = false, this.checkBoxValueOETB = false,
@@ -284,7 +289,7 @@ class SalesOrderAddLoaded extends SalesOrderAddState {
     double? totalAmount, double? taxAmount, double? currencyValue, double? actualAmount, double? coinage,
     int? custId, int? statusId, int? jobTypeId, int? lAgentCompanyId, int? lAgentId, int? oAgentCompanyId, int? oAgentId,
     int? sealEmpId1, int? sealEmpId2, int? sealEmpId3, int? breakEmpId1, int? breakEmpId2, int? breakEmpId3,
-    int? boardOfficerId1, int? boardOfficerId2, int? originId, int? destinationId, int? editId, int? enquiryId,
+    int? boardOfficerId1, int? boardOfficerId2, int? originId, int? destinationId, int? editId, Map<String, dynamic>? loadedMaster, String? invoiceNo, int? enquiryId,
     String? dtpSaleOrderdate, String? dtpOETAdate, String? dtpOETBdate, String? dtpOETDdate, String? dtpLETAdate,
     String? dtpLETBdate, String? dtpLETDdate, String? dtpFlightTimedate, String? dtpPickUpdate, String? dtpDeliverydate,
     String? dtpWHEntrydate, String? dtpWHExitdate, String? dtpFW1date, String? dtpFW2date, String? dtpFW3date,
@@ -332,7 +337,7 @@ class SalesOrderAddLoaded extends SalesOrderAddState {
       sealEmpId3: sealEmpId3 ?? this.sealEmpId3, breakEmpId1: breakEmpId1 ?? this.breakEmpId1, breakEmpId2: breakEmpId2 ?? this.breakEmpId2,
       breakEmpId3: breakEmpId3 ?? this.breakEmpId3, boardOfficerId1: boardOfficerId1 ?? this.boardOfficerId1,
       boardOfficerId2: boardOfficerId2 ?? this.boardOfficerId2, originId: originId ?? this.originId, destinationId: destinationId ?? this.destinationId,
-      editId: editId ?? this.editId, enquiryId: enquiryId ?? this.enquiryId, dtpSaleOrderdate: dtpSaleOrderdate ?? this.dtpSaleOrderdate,
+      editId: editId ?? this.editId, loadedMaster: loadedMaster ?? this.loadedMaster, invoiceNo: invoiceNo ?? this.invoiceNo, enquiryId: enquiryId ?? this.enquiryId, dtpSaleOrderdate: dtpSaleOrderdate ?? this.dtpSaleOrderdate,
       dtpOETAdate: dtpOETAdate ?? this.dtpOETAdate, dtpOETBdate: dtpOETBdate ?? this.dtpOETBdate, dtpOETDdate: dtpOETDdate ?? this.dtpOETDdate,
       dtpLETAdate: dtpLETAdate ?? this.dtpLETAdate, dtpLETBdate: dtpLETBdate ?? this.dtpLETBdate, dtpLETDdate: dtpLETDdate ?? this.dtpLETDdate,
       dtpFlightTimedate: dtpFlightTimedate ?? this.dtpFlightTimedate, dtpPickUpdate: dtpPickUpdate ?? this.dtpPickUpdate,

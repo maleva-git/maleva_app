@@ -1,4 +1,3 @@
-import 'package:maleva/core/network/legacy_api_repository.dart';
 import 'package:maleva/core/di/injection.dart';
 import 'package:maleva/core/theme/app_typography.dart';
 import 'package:flutter/material.dart';
@@ -6,7 +5,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:maleva/core/utils/app_globals.dart';
 import 'package:maleva/core/colors/colors.dart' as colour;
 import '../../../../../core/theme/tokens.dart';
-import '../../saleorderadd/view/saleorderadd_tab.dart';
+import 'package:maleva/features/transaction/salesorder/add/view/salesorderadd_tab.dart';
 import '../bloc/transport_bloc.dart';
 import '../bloc/transport_event.dart';
 import '../bloc/transport_state.dart';
@@ -32,12 +31,6 @@ class TransportReportPage extends StatelessWidget {
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(content: Text(state.errorMessage), backgroundColor: colour.commonColorred),
               );
-            }
-
-            // ✅ Handle Navigation / Edit (Using the UI's context!)
-            if (state is TransportNavigateToEditState) {
-              // We moved this out of the BLoC so it can safely use the UI context
-              sl<LegacyApiRepository>().EditSalesOrder(state.id, 0);
             }
 
           },
@@ -70,10 +63,7 @@ class _TransportReportView extends StatelessWidget {
         }
         if (state is TransportNavigateToEditState) {
           Navigator.of(context).push(MaterialPageRoute(
-            builder: (_) => SalesOrderAdd(
-              saleDetails: AppGlobals.SaleEditDetailList,
-              saleMaster:  AppGlobals.SaleEditMasterList,
-            ),
+            builder: (_) => SalesOrdersAdd(saleOrderId: state.id),
           ));
         }
       },

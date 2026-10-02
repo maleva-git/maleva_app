@@ -11,40 +11,6 @@ class SalesOrderAddRepository {
 
   int get _comId => _sessionManager.companyId;
 
-  Future<String> maxSaleOrderNo(String billType) async {
-    try {
-      final endpoint = "${ApiConstants.apiMaxSaleOrderNo}$_comId&BillType=$billType";
-      final response = await _dioClient.dio.post(endpoint, data: {});
-      if (response.data != null && response.data.toString().isNotEmpty) {
-        return response.data.toString();
-      }
-    } catch (e) {
-      print("Error in maxSaleOrderNo: $e");
-    }
-    return "";
-  }
-
-  Future<double> loadCustomerCurrency(int customerId) async {
-    try {
-      final endpoint = "${ApiConstants.apiGetCurrencyValue}$_comId&CustId=$customerId";
-      final response = await _dioClient.dio.post(endpoint, data: {});
-      if (response.data != null && response.data.toString().isNotEmpty) {
-        final data = response.data;
-        if (data is List && data.isNotEmpty) {
-          final first = data[0];
-          if (first != null && first['Data1'] != null) {
-            return double.tryParse(first['Data1'].toString()) ?? 0.0;
-          }
-        } else if (data is Map && data['Data1'] != null) {
-          return double.tryParse(data['Data1'].toString()) ?? 0.0;
-        }
-      }
-    } catch (e) {
-      print("Error in loadCustomerCurrency: $e");
-    }
-    return 0.0;
-  }
-
   Future<List<dynamic>> selectAddressList() async {
     try {
       final endpoint = "${ApiConstants.apiSelectAddressList}$_comId";

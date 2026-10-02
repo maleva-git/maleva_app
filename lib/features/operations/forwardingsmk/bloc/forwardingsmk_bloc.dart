@@ -1,19 +1,24 @@
 import 'package:flutter/foundation.dart';
 import 'package:maleva/core/network/legacy_api_repository.dart';
 import 'package:maleva/core/di/injection.dart';
-import 'package:maleva/core/network/api_constants.dart';
+import 'package:maleva/core/sale_order/sale_order_api.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
-import 'package:maleva/core/utils/app_globals.dart';
 
 
 import 'forwardingsmk_event.dart';
 import 'forwardingsmk_state.dart';
-import 'package:maleva/core/models/shared/response_view_model.dart';
 
 
+/// Forwarding SMK numbers, references, S1/S2 and dates of a job, on the shared
+/// Java sale order API (`/job-numbers`, `/edit`, `PUT /{id}/forwarding`).
 class FWSmkBloc extends Bloc<FWSmkEvent, FWSmkState> {
-  FWSmkBloc() : super(FWSmkInitial()) {
+  final SaleOrderApi _saleOrders;
+  List<Map<String, dynamic>> _jobs = const [];
+
+  FWSmkBloc({SaleOrderApi? saleOrders})
+      : _saleOrders = saleOrders ?? sl<SaleOrderApi>(),
+        super(FWSmkInitial()) {
     on<FWSmkStarted>(_onStarted);
     on<FWSmkTabChanged>(_onTabChanged);
     on<FWSmkBillTypeChanged>(_onBillTypeChanged);
@@ -44,9 +49,7 @@ class FWSmkBloc extends Bloc<FWSmkEvent, FWSmkState> {
     // Show UI instantly
     emit(_defaultLoaded());
     try {
-      // Load data in background
-      await sl<LegacyApiRepository>().GetJobNoForwarding(null, 0);
-      await sl<LegacyApiRepository>().loadComboS1(null, 0);
+      _jobs = await _saleOrders.jobNumbers(0);
     } catch (e) {
       // Background load failed, ignore
     }
@@ -65,7 +68,7 @@ class FWSmkBloc extends Bloc<FWSmkEvent, FWSmkState> {
     if (state is! FWSmkLoaded) return;
     final s = state as FWSmkLoaded;
     try {
-      await sl<LegacyApiRepository>().GetJobNoForwarding(null, int.parse(event.billType));
+      _jobs = await _saleOrders.jobNumbers(int.parse(event.billType));
     } catch (e, stack) { debugPrint("Error caught globally: $e\n$stack"); }
     emit(s.copyWith(
       billType:         event.billType,
@@ -84,8 +87,8 @@ class FWSmkBloc extends Bloc<FWSmkEvent, FWSmkState> {
 
     List<dynamic> filtered = [];
     if (q.isNotEmpty) {
-      filtered = AppGlobals.JobNoList
-          .where((e) => e['CNumber'].toString().contains(q))
+      filtered = _jobs
+          .where((e) => '${e['cNumber'] ?? ''}'.contains(q))
           .toList();
     }
     emit(s.copyWith(
@@ -103,10 +106,9 @@ class FWSmkBloc extends Bloc<FWSmkEvent, FWSmkState> {
 
     emit(FWSmkLoading());
     try {
-      await sl<LegacyApiRepository>().EditSalesOrder(event.saleOrderId, 0);
+      final m = (await _saleOrders.edit(id: event.saleOrderId)).master;
       await sl<LegacyApiRepository>().SelectEmployee(null, '', 'Operation');
 
-      final m = AppGlobals.SaleEditMasterList;
       if (m.isEmpty) {
         emit(s.copyWith(
           jobNoText:        event.jobNo,
@@ -129,41 +131,41 @@ class FWSmkBloc extends Bloc<FWSmkEvent, FWSmkState> {
       }
 
       final tab1 = FWSmkTabData(
-        smkNo:       m[0]['ForwardingSMKNo'] ?? '',
-        enRef:       m[0]['ForwardingEnterRef'] ?? '',
-        s1:          m[0]['Forwarding1S1'] ?? '',
-        s2:          m[0]['Forwarding1S2'] ?? '',
-        fwDropdown:  (m[0]['Forwarding'] == null || m[0]['Forwarding'] == '')
+        smkNo:       m['forwardingSMKNo'] ?? '',
+        enRef:       m['forwardingEnterRef'] ?? '',
+        s1:          m['forwarding1S1'] ?? '',
+        s2:          m['forwarding1S2'] ?? '',
+        fwDropdown:  (m['forwarding'] == null || m['forwarding'] == '')
             ? null
-            : m[0]['Forwarding'],
-        date:        parseDate(m[0]['ForwardingDate']),
-        dateEnabled: m[0]['ForwardingDate'] != null,
-        original:    (m[0]['Original'] != null && (m[0]['Original'] == 1 || m[0]['Original'] == true)), // 🔥 Fix: Add null check
+            : m['forwarding'],
+        date:        parseDate(m['forwardingDate']),
+        dateEnabled: m['forwardingDate'] != null,
+        original:    (m['original'] != null && (m['original'] == 1 || m['original'] == true)), // 🔥 Fix: Add null check
 
       );
       final tab2 = FWSmkTabData(
-        smkNo:       m[0]['ForwardingSMKNo2'] ?? '',
-        enRef:       m[0]['ForwardingEnterRef2'] ?? '',
-        s1:          m[0]['Forwarding2S1'] ?? '',
-        s2:          m[0]['Forwarding2S2'] ?? '',
-        fwDropdown:  (m[0]['Forwarding2'] == null || m[0]['Forwarding2'] == '')
+        smkNo:       m['forwardingSMKNo2'] ?? '',
+        enRef:       m['forwardingEnterRef2'] ?? '',
+        s1:          m['forwarding2S1'] ?? '',
+        s2:          m['forwarding2S2'] ?? '',
+        fwDropdown:  (m['forwarding2'] == null || m['forwarding2'] == '')
             ? null
-            : m[0]['Forwarding2'],
-        date:        parseDate(m[0]['Forwarding2Date']),
-        dateEnabled: m[0]['Forwarding2Date'] != null,
-        original:    (m[0]['Original'] != null && (m[0]['Original'] == 1 || m[0]['Original'] == true)), // 🔥 Fix: Add null check
+            : m['forwarding2'],
+        date:        parseDate(m['forwarding2Date']),
+        dateEnabled: m['forwarding2Date'] != null,
+        original:    (m['original'] != null && (m['original'] == 1 || m['original'] == true)), // 🔥 Fix: Add null check
       );
       final tab3 = FWSmkTabData(
-        smkNo:       m[0]['ForwardingSMKNo3'] ?? '',
-        enRef:       m[0]['ForwardingEnterRef3'] ?? '',
-        s1:          m[0]['Forwarding3S1'] ?? '',
-        s2:          m[0]['Forwarding3S2'] ?? '',
-        fwDropdown:  (m[0]['Forwarding3'] == null || m[0]['Forwarding3'] == '')
+        smkNo:       m['forwardingSMKNo3'] ?? '',
+        enRef:       m['forwardingEnterRef3'] ?? '',
+        s1:          m['forwarding3S1'] ?? '',
+        s2:          m['forwarding3S2'] ?? '',
+        fwDropdown:  (m['forwarding3'] == null || m['forwarding3'] == '')
             ? null
-            : m[0]['Forwarding3'],
-        date:        parseDate(m[0]['Forwarding3Date']),
-        dateEnabled: m[0]['Forwarding3Date'] != null,
-        original:    (m[0]['Original'] != null && (m[0]['Original'] == 1 || m[0]['Original'] == true)), // 🔥 Fix: Add null check
+            : m['forwarding3'],
+        date:        parseDate(m['forwarding3Date']),
+        dateEnabled: m['forwarding3Date'] != null,
+        original:    (m['original'] != null && (m['original'] == 1 || m['original'] == true)), // 🔥 Fix: Add null check
       );
 
       emit(s.copyWith(
@@ -246,51 +248,30 @@ class FWSmkBloc extends Bloc<FWSmkEvent, FWSmkState> {
 
     emit(FWSmkLoading());
     try {
-      final master = {
-        'Id':                s.saleOrderId,
-        'Comid':             AppGlobals.Comid,
-        'Jobid':             s.jobNoText,
-        'EmployeeRefId':     AppGlobals.EmpRefId == 0 ? null : AppGlobals.EmpRefId,
-        'ForwardingSMKNo':   s.tab1.smkNo,
-        'ForwardingSMKNo2':  s.tab2.smkNo,
-        'ForwardingSMKNo3':  s.tab3.smkNo,
-        'Forwarding':        s.tab1.fwDropdown,
-        'Forwarding2':       s.tab2.fwDropdown,
-        'Forwarding3':       s.tab3.fwDropdown,
-        'ForwardingEnterRef':  s.tab1.enRef,
-        'ForwardingEnterRef2': s.tab2.enRef,
-        'ForwardingEnterRef3': s.tab3.enRef,
-        'Forwarding1S1':     s.tab1.s1,
-        'Forwarding1S2':     s.tab1.s2,
-        'Forwarding2S1':     s.tab2.s1,
-        'Forwarding2S2':     s.tab2.s2,
-        'Forwarding3S1':     s.tab3.s1,
-        'Forwarding3S2':     s.tab3.s2,
-        'ForwardingDate':  s.tab1.dateEnabled
-            ? DateTime.parse(s.tab1.date).toIso8601String()
-            : null,
-        'Forwarding2Date': s.tab2.dateEnabled
-            ? DateTime.parse(s.tab2.date).toIso8601String()
-            : null,
-        'Forwarding3Date': s.tab3.dateEnabled
-            ? DateTime.parse(s.tab3.date).toIso8601String()
-            : null,
-        'Original': s.tab1.original || s.tab2.original || s.tab3.original,
-      };
-
-      final header = {'Content-Type': 'application/json; charset=UTF-8'};
-      final result = await sl<LegacyApiRepository>().apiAllinoneSelectArray(
-          ApiConstants.apiUpdateForwarding, master, header, null);
-
-      if (result != '') {
-        final value = ResponseViewModel.fromJson(result);
-        if (value.IsSuccess == true) {
-          emit(FWSmkSaveSuccess());
-          emit(_defaultLoaded());
-          return;
-        }
-      }
-      emit(s); // revert on failure
+      String? at(FWSmkTabData t) => t.dateEnabled ? DateTime.parse(t.date).toIso8601String() : null;
+      await _saleOrders.updateForwarding(s.saleOrderId, {
+        'forwardingSMKNo':     s.tab1.smkNo,
+        'forwardingSMKNo2':    s.tab2.smkNo,
+        'forwardingSMKNo3':    s.tab3.smkNo,
+        'forwarding':          s.tab1.fwDropdown,
+        'forwarding2':         s.tab2.fwDropdown,
+        'forwarding3':         s.tab3.fwDropdown,
+        'forwardingEnterRef':  s.tab1.enRef,
+        'forwardingEnterRef2': s.tab2.enRef,
+        'forwardingEnterRef3': s.tab3.enRef,
+        'forwarding1S1':       s.tab1.s1,
+        'forwarding1S2':       s.tab1.s2,
+        'forwarding2S1':       s.tab2.s1,
+        'forwarding2S2':       s.tab2.s2,
+        'forwarding3S1':       s.tab3.s1,
+        'forwarding3S2':       s.tab3.s2,
+        'forwardingDate':      at(s.tab1),
+        'forwarding2Date':     at(s.tab2),
+        'forwarding3Date':     at(s.tab3),
+        'original':            s.tab1.original || s.tab2.original || s.tab3.original,
+      });
+      emit(FWSmkSaveSuccess());
+      emit(_defaultLoaded());
     } catch (e) {
       emit(FWSmkError(e.toString()));
     }

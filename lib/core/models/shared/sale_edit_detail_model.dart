@@ -66,6 +66,53 @@ class SaleEditDetailModel {
         ActualAmount = double.parse(json['ActualAmount'].toString()),
         CurrencyValue = double.parse(json['CurrencyValue'].toString());
 
+  /// An item line of the Java edit read (`saleOrderDetails[]`: `id`, `itemMasterRefId`,
+  /// `mrp`, `itemQty`, `salesRate`, `amount`, `taxPercent`, `taxAmount`, `productCode`, ...).
+  SaleEditDetailModel.fromJava(Map<String, dynamic> j)
+      : Id = _int(j['id']),
+        SDId = 0,
+        SaleOrderMasterRefId = _int(j['saleOrderMasterRefId']),
+        ItemMasterRefId = _int(j['itemMasterRefId']),
+        MRP = _num(j['mrp']),
+        PurchaseRate = _num(j['purchaseRate']),
+        ItemQty = _num(j['itemQty']),
+        DiscPer = _num(j['discPer']),
+        DiscAmount = _num(j['discAmount']),
+        LandingCost = _num(j['landingCost']),
+        TaxPercent = _num(j['taxPercent']),
+        TaxAmount = _num(j['taxAmount']),
+        SalesRate = _num(j['salesRate']),
+        NetSalesRate = _num(j['netSalesRate']),
+        Amount = _num(j['amount']),
+        ProductCode = j['productCode']?.toString() ?? '',
+        ProductName = j['productName']?.toString() ?? '',
+        UOM = j['uom']?.toString() ?? '',
+        ActualAmount = _num(j['actualAmount']),
+        CurrencyValue = _num(j['currencyValue']);
+
+  /// The line as the Java save takes it (`SaleOrderDetailsDto`).
+  Map<String, dynamic> toJava({required int itemMasterRefId}) => {
+        'id': Id,
+        'saleOrderMasterRefId': SaleOrderMasterRefId,
+        'itemMasterRefId': itemMasterRefId,
+        'mrp': MRP,
+        'purchaseRate': PurchaseRate,
+        'itemQty': ItemQty,
+        'discPer': DiscPer,
+        'discAmount': DiscAmount,
+        'landingCost': LandingCost,
+        'taxPercent': TaxPercent,
+        'taxAmount': TaxAmount,
+        'salesRate': SalesRate,
+        'netSalesRate': NetSalesRate,
+        'amount': Amount,
+        'currencyValue': CurrencyValue,
+        'actualAmount': ActualAmount,
+      };
+
+  static int _int(dynamic v) => v is num ? v.toInt() : int.tryParse(v?.toString() ?? '') ?? 0;
+  static double _num(dynamic v) => v is num ? v.toDouble() : double.tryParse(v?.toString() ?? '') ?? 0.0;
+
   // method
   Map<String, dynamic> toJson() {
     return {

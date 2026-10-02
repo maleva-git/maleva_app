@@ -91,7 +91,7 @@ class SaleOrderMasterModel {
         Loadingvesselname = json['Loadingvesselname'] ?? '',
         JobMasterRefId = int.tryParse(json['JobMasterRefId']?.toString() ?? '') ?? 0,
         isETASelected = false,
-        NetAmt = double.parse(json['NetAmt'].toString());
+        NetAmt = double.tryParse('${json['NetAmt'] ?? 0}') ?? 0;
   // method
   Map<String, dynamic> toJson() {
     return {

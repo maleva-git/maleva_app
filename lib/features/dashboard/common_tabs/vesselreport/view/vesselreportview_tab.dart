@@ -1404,17 +1404,6 @@ class _VesselCard extends StatelessWidget {
       }
     }
 
-    // General Boarding Officer
-    int? boId1 = itemData['boardingOfficerRefId'] != null ? int.tryParse(itemData['boardingOfficerRefId'].toString()) : null;
-    String boName1 = itemData['boardingOfficerName']?.toString() ?? '';
-    int? boId2 = itemData['boardingOfficer1RefId'] != null ? int.tryParse(itemData['boardingOfficer1RefId'].toString()) : null;
-    String boName2 = itemData['boardingOfficerName1']?.toString() ?? '';
-    int? boId3 = itemData['boardingOfficer2RefId'] != null ? int.tryParse(itemData['boardingOfficer2RefId'].toString()) : null;
-    String boName3 = itemData['boardingOfficerName2']?.toString() ?? '';
-    String boAmt1 = itemData['boardingAmount']?.toString() ?? '';
-    String boAmt2 = itemData['boardingAmount1']?.toString() ?? '';
-    String boAmt3 = itemData['boardingAmount2']?.toString() ?? '';
-
     // Loading BO
     int? lboId1 = itemData['lBoardingOfficerRefId'] != null ? int.tryParse(itemData['lBoardingOfficerRefId'].toString()) : null;
     String lboName1 = itemData['lBoardingOfficerName']?.toString() ?? '';
@@ -1854,51 +1843,21 @@ class _VesselCard extends StatelessWidget {
                           // Hide keyboard
                           FocusManager.instance.primaryFocus?.unfocus();
 
-                          // Format for API: "yyyy-MM-dd HH:mm:ss"
-                          String _formatForApi(String dt, String originalKey) {
-                            if (dt.isEmpty) {
-                              // If empty (hidden from UI), send the original value so we don't send "" to a DateTime field
-                              return itemData[originalKey]?.toString() ?? "";
-                            }
-                            return dt.replaceAll('T', ' ');
-                          }
+                          // The Java Vessel Planning update: "yyyy-MM-dd HH:mm:ss", null keeps the date
+                          String? at(String dt) => dt.isEmpty ? null : dt.replaceAll('T', ' ');
 
                           final updateData = {
-                            "Jobid": itemData['saleOrderMasterRefId'],
-                            "ETA": _formatForApi(eta, 'SETA'),
-                            "ETB": _formatForApi(etb, 'SETB'),
-                            "ETD": _formatForApi(etd, 'SETD'),
-                            "OETA": _formatForApi(oeta, 'SOETA'),
-                            "OETB": _formatForApi(oetb, 'SOETB'),
-                            "OETD": _formatForApi(oetd, 'SOETD'),
-                            "Comid": AppGlobals.Comid,
-                            "Type": 100,
-                            
-                            "BoardingOfficerRefid": boId1,
-                            "BoardingOfficer1Refid": boId2,
-                            "BoardingOfficer2Refid": boId3,
-                            "BoardingAmount": double.tryParse(boAmt1) ?? 0,
-                            "BoardingAmount1": double.tryParse(boAmt2) ?? 0,
-                            "BoardingAmount2": double.tryParse(boAmt3) ?? 0,
-                            
-                            "LBoardingOfficerRefid": lboId1,
-                            "LBoardingOfficer1Refid": lboId2,
-                            "LBoardingOfficer2Refid": lboId3,
-                            "LBoardingAmount": double.tryParse(lboAmt1) ?? 0,
-                            "LBoardingAmount1": double.tryParse(lboAmt2) ?? 0,
-                            "LBoardingAmount2": double.tryParse(lboAmt3) ?? 0,
-                            
-                            "OBoardingOfficerRefid": oboId1,
-                            "OBoardingOfficer1Refid": oboId2,
-                            "OBoardingOfficer2Refid": oboId3,
-                            "OBoardingAmount": double.tryParse(oboAmt1) ?? 0,
-                            "OBoardingAmount1": double.tryParse(oboAmt2) ?? 0,
-                            "OBoardingAmount2": double.tryParse(oboAmt3) ?? 0,
+                            'saleOrderId': itemData['saleOrderMasterRefId'],
+                            'jobStatusId': selectedJobStatusId,
+                            'eta': at(eta),
+                            'etb': at(etb),
+                            'etd': at(etd),
+                            'oeta': at(oeta),
+                            'oetb': at(oetb),
+                            'oetd': at(oetd),
+                            'loadingOfficers': [lboId1 ?? 0, lboId2 ?? 0, lboId3 ?? 0],
+                            'offOfficers': [oboId1 ?? 0, oboId2 ?? 0, oboId3 ?? 0],
                           };
-
-                          if (selectedJobStatusId != null) {
-                            updateData['Status'] = selectedJobStatusId;
-                          }
 
                           vesselBloc.add(
                             UpdateVesselDateEvent(

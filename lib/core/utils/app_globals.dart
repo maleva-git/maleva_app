@@ -23,8 +23,6 @@ import 'package:maleva/core/models/shared/mainsetting_model.dart';
 import 'package:maleva/core/models/shared/customer_model.dart';
 import 'package:maleva/core/models/shared/truck_details_model.dart';
 import 'package:maleva/core/models/shared/ware_house_model.dart';
-import 'package:maleva/features/operations/models/forwarding_model.dart';
-import 'package:maleva/core/models/shared/sale_edit_detail_model.dart';
 import 'package:maleva/core/models/shared/agent_model.dart';
 import 'package:maleva/features/operations/models/job_status_model.dart';
 import 'package:maleva/core/models/shared/product_model.dart';
@@ -39,7 +37,6 @@ class AppGlobals {
 
   static String appversion="1.1.12+144";
   static bool homepagecall = false;
-  static String currentInvoiceNo = "";
   static AssetImage logo = const AssetImage('assets/company/logo.png');
   static AssetImage splashlogo = const AssetImage('assets/company/roundlogo.png');
   static AssetImage calendar = const AssetImage('assets/common/calendar.png');
@@ -243,8 +240,6 @@ class AppGlobals {
   static AgentModel SelectAgentAllList = AgentModel.Empty();
   static List<ProductModel> ProductList = [];
   static ProductModel SelectProductList = ProductModel.Empty();
-  static List<ForwardingModel> ForwardingList = [];
-  static ForwardingModel SelectForwardingList = ForwardingModel.Empty();
   static List<GetTruckModel> GetTruckList = [];
 
 
@@ -261,17 +256,12 @@ class AppGlobals {
   static List<WareHouseModel> WareHouseModelAllList = [];
 
   static List<dynamic> AddressList = [];
-  static List<dynamic> SaleOrderMasterList = [];
-  static List<dynamic> SaleOrderDetailList = [];
   static List<dynamic> PlanningMasterList = [];
   static List<dynamic> PlanningDetailsList = [];
   static List<dynamic> PlanningEditList = [];
   static List<dynamic> VesselPlanningMasterList = [];
   static List<dynamic> VesselPlanningDetailsList = [];
   static List<dynamic> VesselPlanningEditList = [];
-  static List<SaleEditDetailModel> SaleEditDetailList = [];
-  static List<dynamic> SaleEditMasterList = [];
-  static List<dynamic> ComboS1List = [];
   static List<dynamic> GetImagesList = [];
   static List<AddressDetailsModel> AddressDetailedList = [];
   static List<GetTruckModel> GetDriverList = [];
@@ -284,7 +274,6 @@ class AppGlobals {
   static List<RTIDetailsViewModel> RTIDetailsDetailList = [];
   static List<dynamic> EnquiryMasterList = [];
   static List<dynamic> PickupQuantityList = [];
-  //List<SaleEditMasterModel> SaleEditMasterList = [];
   static String SelectAddressList = "";
 
   static List<dynamic> JobNoList = [];

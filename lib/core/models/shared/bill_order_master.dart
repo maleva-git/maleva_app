@@ -42,27 +42,28 @@ class BillOrderMaster {
     required this.netAmt,
   });
 
-  factory BillOrderMaster.fromJson(Map<String, dynamic> json) {
+  /// A row of the Java `POST /api/bills-order/select-bills-order-view` (camelCase).
+  factory BillOrderMaster.fromJava(Map<String, dynamic> json) {
     return BillOrderMaster(
-      id: int.tryParse(json['Id']?.toString() ?? '') ?? 0,
-      billNoDisplay: json['BillNoDisplay']?.toString() ?? '',
-      billNoDisplay1: json['BillNoDisplay1']?.toString() ?? '',
-      billNo: int.tryParse(json['BillNo']?.toString() ?? '') ?? 0,
-      pStatus: int.tryParse(json['PStatus']?.toString() ?? '') ?? 0,
-      billDate: json['BillDate']?.toString() ?? '',
-      invoiceNo: json['InvoiceNo']?.toString() ?? '',
-      invoiceDate: json['InvoiceDate']?.toString() ?? '',
-      billTime: json['BillTime']?.toString() ?? '',
-      saleType: json['SaleType']?.toString() ?? '',
-      supplierName: json['SupplierName']?.toString() ?? '',
-      employeeName: json['EmployeeName']?.toString() ?? '',
-      cashierName: json['CashierName']?.toString(),
-      truckName: json['TruckName']?.toString() ?? '',
-      driverName: json['DriverName']?.toString() ?? '',
-      billStatus: json['BillStatus']?.toString() ?? '',
-      description: json['Description']?.toString() ?? '',
-      remarks: json['Remarks']?.toString(),
-      netAmt: double.tryParse(json['NetAmt']?.toString() ?? '') ?? 0.0,
+      id: int.tryParse(json['id']?.toString() ?? '') ?? 0,
+      billNoDisplay: json['billNoDisplay']?.toString() ?? '',
+      billNoDisplay1: json['billNoDisplay1']?.toString() ?? '',
+      billNo: int.tryParse(json['billNo']?.toString() ?? '') ?? 0,
+      pStatus: int.tryParse(json['pStatus']?.toString() ?? '') ?? 0,
+      billDate: json['billDate']?.toString() ?? '',
+      invoiceNo: json['invoiceNo']?.toString() ?? '',
+      invoiceDate: json['invoiceDate']?.toString() ?? '',
+      billTime: json['billTime']?.toString() ?? '',
+      saleType: json['saleType']?.toString() ?? '',
+      supplierName: json['supplierName']?.toString() ?? '',
+      employeeName: json['employeeName']?.toString() ?? '',
+      cashierName: json['cashierName']?.toString(),
+      truckName: json['truckName']?.toString() ?? '',
+      driverName: json['driverName']?.toString() ?? '',
+      billStatus: json['billStatus']?.toString() ?? '',
+      description: json['description']?.toString() ?? '',
+      remarks: json['remarks']?.toString(),
+      netAmt: double.tryParse(json['netAmt']?.toString() ?? '') ?? 0.0,
     );
   }
 }

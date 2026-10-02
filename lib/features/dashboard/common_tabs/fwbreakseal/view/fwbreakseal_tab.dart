@@ -116,10 +116,10 @@ class _FWBreakSealViewState extends State<_FWBreakSealView>
               shrinkWrap: true,
               children: suggestions.map((pred) {
                 final String field = smkType == 1
-                    ? 'ForwardingSMKNo'
+                    ? 'forwardingSMKNo'
                     : smkType == 2
-                    ? 'ForwardingSMKNo2'
-                    : 'ForwardingSMKNo3';
+                    ? 'forwardingSMKNo2'
+                    : 'forwardingSMKNo3';
                 return InkWell(
                   onTap: () {
                     _clearOverlay();

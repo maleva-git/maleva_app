@@ -201,8 +201,7 @@ class EnquiryViewBloc extends Bloc<EnquiryViewEvent, EnquiryViewState> {
     if (event.index >= s.masterList.length) return;
 
     final item = s.masterList[event.index];
-    AppGlobals.storagenew.setString('EnquiryOpen', 'true');
-    emit(EnquiryViewNavigateToPushSaleOrder([item]));
+    emit(EnquiryViewNavigateToPushSaleOrder(item.toJson()));
     emit(s);
   }
 

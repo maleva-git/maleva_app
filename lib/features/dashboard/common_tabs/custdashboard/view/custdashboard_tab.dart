@@ -8,13 +8,11 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:maleva/core/utils/app_globals.dart';
-import 'package:maleva/core/network/legacy_api_repository.dart';
-import 'package:maleva/core/di/injection.dart';
 import 'package:maleva/core/colors/colors.dart' as colour;
 import 'package:maleva/menu/menulist.dart';
 import '../../../../mastersearch/Port.dart';
 import '../../enquiry/add/view/enquiryadd.dart';
-import '../../saleorderadd/view/saleorderadd_tab.dart';
+import 'package:maleva/features/transaction/salesorder/add/view/salesorderadd_tab.dart';
 import '../bloc/custdashboard_bloc.dart';
 import '../bloc/custdashboard_event.dart';
 import '../bloc/custdashboard_state.dart';
@@ -392,14 +390,8 @@ class _CustDashboardViewState extends State<_CustDashboardView>
                     _TransportTab(
                       state: state,
                       onCardTap: (row) => _showTransportDialog(context, row),
-                      onCardLongPress: (row) async {
-                        await sl<LegacyApiRepository>().EditSalesOrder(
-                             row['Id'] as int, 0); if (!context.mounted) return;Navigator.of(context).push(MaterialPageRoute(
-                            builder: (_) => SalesOrderAdd(
-                              saleDetails: AppGlobals.SaleEditDetailList,
-                              saleMaster: AppGlobals.SaleEditMasterList,
-                            )));
-                      },
+                      onCardLongPress: (row) => Navigator.of(context).push(MaterialPageRoute(
+                          builder: (_) => SalesOrdersAdd(saleOrderId: row['Id'] as int))),
                     ),
                     _EnquiryTab(
                       state: state,
@@ -1023,16 +1015,10 @@ class _EnquiryTab extends StatelessWidget {
                                         'Do You Want to Push to SalesOrder ?');
                                     if (ok) {
                                       if (!context.mounted) return;
-                                      AppGlobals.storagenew.setString(
-                                          'EnquiryOpen', 'true');
                                       Navigator.of(context).push(
                                           MaterialPageRoute(
-                                              builder: (_) =>
-                                              // Note: Ensure this matches your class name (SalesOrderAdd vs SalesOrderAddPage)
-                                              SalesOrderAdd(
-                                                saleDetails: null,
-                                                saleMaster: [enq],
-                                              )));
+                                              builder: (_) => SalesOrdersAdd(
+                                                  enquiry: Map<String, dynamic>.from(enq))));
                                     }
                                   },
                                   child: const Icon(

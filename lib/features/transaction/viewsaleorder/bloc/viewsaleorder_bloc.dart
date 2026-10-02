@@ -1,14 +1,15 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:maleva/features/transaction/viewsaleorder/data/viewsaleorder_repository.dart';
+import 'package:maleva/core/sale_order/sale_order_api.dart';
 import 'package:maleva/features/transaction/viewsaleorder/bloc/viewsaleorder_event.dart';
 import 'package:maleva/features/transaction/viewsaleorder/bloc/viewsaleorder_state.dart';
 
 
 class GetJobNoBloc extends Bloc<GetJobNoEvent, GetJobNoState> {
-  final ViewSaleOrderRepository repository;
+  /// The job picker reads `/api/sale-orders/job-numbers`: `[{id, cNumber, ...}]`.
+  final SaleOrderApi saleOrders;
 
-  GetJobNoBloc(this.repository) : super(GetJobNoInitial()) {
+  GetJobNoBloc(this.saleOrders) : super(GetJobNoInitial()) {
     on<GetJobNoStarted>(_onStarted);
     on<GetJobNoBillTypeChanged>(_onBillTypeChanged);
     on<GetJobNoTextChanged>(_onTextChanged);
@@ -34,7 +35,7 @@ class GetJobNoBloc extends Bloc<GetJobNoEvent, GetJobNoState> {
     emit(initialState);
     try {
       // Load job list for default BillType = 0 in background
-      final jobs = await repository.getJobNoForwarding(0);
+      final jobs = await saleOrders.jobNumbers(0);
       emit(initialState.copyWith(cachedJobList: jobs));
     } catch (e) {
       // Background load failed, ignore
@@ -57,7 +58,7 @@ class GetJobNoBloc extends Bloc<GetJobNoEvent, GetJobNoState> {
 
     // Re-fetch job list for new bill type
     try {
-      final jobs = await repository.getJobNoForwarding(int.parse(event.billType));
+      final jobs = await saleOrders.jobNumbers(int.parse(event.billType));
       final updatedState = state;
       if (updatedState is GetJobNoLoaded) {
         emit(updatedState.copyWith(cachedJobList: jobs));
@@ -79,7 +80,7 @@ class GetJobNoBloc extends Bloc<GetJobNoEvent, GetJobNoState> {
     }
 
     final filtered = s.cachedJobList
-        .where((e) => e['CNumber'].toString().contains(query))
+        .where((e) => '${e['cNumber'] ?? ''}'.contains(query))
         .toList();
 
     emit(s.copyWith(

@@ -20,7 +20,6 @@ import '../bloc/salesorderview_event.dart';
 import '../bloc/salesorderview_state.dart';
 import 'package:maleva/core/models/shared/customer_model.dart';
 import 'package:maleva/core/models/shared/employee_model.dart';
-import 'package:maleva/core/models/shared/sale_edit_detail_model.dart';
 import 'package:maleva/features/transaction/salesorder/models/sale_order_master_model.dart';
 import 'package:maleva/features/operations/models/job_status_model.dart';
 import 'package:maleva/core/theme/tokens.dart';
@@ -216,7 +215,7 @@ class _MobileCard extends StatelessWidget {
       child: ClipRRect(
         borderRadius: BorderRadius.circular(16),
         child: InkWell(
-          onLongPress: () => _navigateToEdit(context, model.Id, 0, model.QNECode.toString()),
+          onLongPress: () => _navigateToEdit(context, model.Id),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -489,45 +488,8 @@ class _MobileCard extends StatelessWidget {
         ],
       );
 
-  Future<void> _navigateToEdit(BuildContext context, int id, int saleNo, String invoiceNo) async {
-    try {
-      final resultData =
-          await sl<SalesOrderViewRepository>().editSalesOrder(id, saleNo);
-          
-      String actualInvoiceNo = invoiceNo;
-      try {
-        final fetchedInvoice = await sl<SalesOrderViewRepository>().getInvoiceNumber(id);
-        if (fetchedInvoice.isNotEmpty) {
-          actualInvoiceNo = fetchedInvoice;
-        }
-      } catch (e) {
-        // fallback
-      }
-
-      if (resultData.isNotEmpty) {
-        AppGlobals.SaleEditMasterList = resultData;
-        AppGlobals.currentInvoiceNo = actualInvoiceNo;
-        AppGlobals.SaleEditDetailList = (resultData[0]["SaleDetails"] as List)
-            .map<SaleEditDetailModel>((e) => SaleEditDetailModel.fromJson(e))
-            .toList();
-
-        if (!context.mounted) return;
-        Navigator.of(context).push(MaterialPageRoute(
-          builder: (_) => SalesOrdersAdd(
-            SaleDetails: AppGlobals.SaleEditDetailList,
-            SaleMaster: AppGlobals.SaleEditMasterList,
-          ),
-        ));
-      } else {
-        if (!context.mounted) return;
-        msgshow('Data empty', '', Colors.white, colour.commonColorred, null,
-            18.0, AppGlobals.tll, AppGlobals.tgc, context, 2);
-      }
-    } catch (e) {
-      if (!context.mounted) return;
-      msgshow(e.toString(), '', Colors.white, colour.commonColorred, null, 18.0,
-          AppGlobals.tll, AppGlobals.tgc, context, 2);
-    }
+  void _navigateToEdit(BuildContext context, int id) {
+    Navigator.of(context).push(MaterialPageRoute(builder: (_) => SalesOrdersAdd(saleOrderId: id)));
   }
 }
 
@@ -536,40 +498,8 @@ class _TabletBody extends StatelessWidget {
   final bool isTablet;
   const _TabletBody({required this.state, required this.isTablet});
 
-  Future<void> _navigateToEdit(BuildContext context, int id, int saleNo, String invoiceNo) async {
-    try {
-      final resultData = await sl<SalesOrderViewRepository>().editSalesOrder(id, saleNo);
-
-      String actualInvoiceNo = invoiceNo;
-      try {
-        final fetchedInvoice = await sl<SalesOrderViewRepository>().getInvoiceNumber(id);
-        if (fetchedInvoice.isNotEmpty) {
-          actualInvoiceNo = fetchedInvoice;
-        }
-      } catch (e) {
-        // fallback
-      }
-
-      if (resultData.isNotEmpty) {
-        AppGlobals.SaleEditMasterList = resultData;
-        AppGlobals.currentInvoiceNo = actualInvoiceNo;
-        AppGlobals.SaleEditDetailList = (resultData[0]["SaleDetails"] as List)
-            .map<SaleEditDetailModel>((e) => SaleEditDetailModel.fromJson(e))
-            .toList();
-
-        if (!context.mounted) return;
-        Navigator.of(context).push(MaterialPageRoute(
-          builder: (_) => SalesOrdersAdd(
-            SaleDetails: AppGlobals.SaleEditDetailList,
-            SaleMaster: AppGlobals.SaleEditMasterList,
-          ),
-        ));
-      }
-    } catch (e) {
-      if (!context.mounted) return;
-      ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text('Failed to load edit view: ')));
-    }
+  void _navigateToEdit(BuildContext context, int id) {
+    Navigator.of(context).push(MaterialPageRoute(builder: (_) => SalesOrdersAdd(saleOrderId: id)));
   }
 
   @override
@@ -658,7 +588,7 @@ class _TabletBody extends StatelessWidget {
             ),
           ),
           GestureDetector(
-            onTap: () => _navigateToEdit(context, item.Id, 0, item.QNECode.toString()),
+            onTap: () => _navigateToEdit(context, item.Id),
             child: Container(
               width: 32,
               height: 32,
@@ -713,7 +643,7 @@ class _TabletRow extends StatelessWidget {
       ),
       child: InkWell(
         borderRadius: BorderRadius.circular(12),
-        onLongPress: () => _navigateToEdit(context, model.Id, 0, model.QNECode.toString()),
+        onLongPress: () => _navigateToEdit(context, model.Id),
         child: Column(children: [
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
@@ -842,45 +772,8 @@ class _TabletRow extends StatelessWidget {
         ),
       );
 
-  Future<void> _navigateToEdit(BuildContext context, int id, int saleNo, String invoiceNo) async {
-    try {
-      final resultData =
-          await sl<SalesOrderViewRepository>().editSalesOrder(id, saleNo);
-          
-      String actualInvoiceNo = invoiceNo;
-      try {
-        final fetchedInvoice = await sl<SalesOrderViewRepository>().getInvoiceNumber(id);
-        if (fetchedInvoice.isNotEmpty) {
-          actualInvoiceNo = fetchedInvoice;
-        }
-      } catch (e) {
-        // fallback
-      }
-
-      if (resultData.isNotEmpty) {
-        AppGlobals.SaleEditMasterList = resultData;
-        AppGlobals.currentInvoiceNo = actualInvoiceNo;
-        AppGlobals.SaleEditDetailList = (resultData[0]["SaleDetails"] as List)
-            .map<SaleEditDetailModel>((e) => SaleEditDetailModel.fromJson(e))
-            .toList();
-
-        if (!context.mounted) return;
-        Navigator.of(context).push(MaterialPageRoute(
-          builder: (_) => SalesOrdersAdd(
-            SaleDetails: AppGlobals.SaleEditDetailList,
-            SaleMaster: AppGlobals.SaleEditMasterList,
-          ),
-        ));
-      } else {
-        if (!context.mounted) return;
-        msgshow('Data empty', '', Colors.white, colour.commonColorred, null,
-            18.0, AppGlobals.tll, AppGlobals.tgc, context, 2);
-      }
-    } catch (e) {
-      if (!context.mounted) return;
-      msgshow(e.toString(), '', Colors.white, colour.commonColorred, null, 18.0,
-          AppGlobals.tll, AppGlobals.tgc, context, 2);
-    }
+  void _navigateToEdit(BuildContext context, int id) {
+    Navigator.of(context).push(MaterialPageRoute(builder: (_) => SalesOrdersAdd(saleOrderId: id)));
   }
 }
 

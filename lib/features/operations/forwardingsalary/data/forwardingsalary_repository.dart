@@ -13,7 +13,6 @@ class ForwardingSalaryRepository {
 
     await sl<LegacyApiRepository>().GetRTINoForwarding(null, 0);
     await sl<LegacyApiRepository>().SelectEmployee(null, '', 'Operation');
-    await sl<LegacyApiRepository>().loadComboS1(null, 0);
 
     return {
       'jobNoList': AppGlobals.JobNoList,

@@ -4,7 +4,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:maleva/core/utils/app_globals.dart';
-import 'package:maleva/features/transaction/viewsaleorder/data/viewsaleorder_repository.dart';
 import 'package:maleva/core/di/injection.dart';
 import '../../../../core/theme/tokens.dart';
 import '../../salesorder/add/view/salesorderadd_tab.dart';
@@ -49,16 +48,10 @@ class _GetJobNoPageView extends StatelessWidget {
             toastMsg('Enter Job No', '', context);
             return;
           }
-          await sl<ViewSaleOrderRepository>()
-              .editSalesOrder(state.saleOrderId, state.jobNo);
-          if (!context.mounted) return;
           Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (_) => SalesOrdersAdd(
-                SaleDetails: AppGlobals.SaleEditDetailList,
-                SaleMaster: AppGlobals.SaleEditMasterList,
-              ),
+              builder: (_) => SalesOrdersAdd(saleOrderId: state.saleOrderId, saleOrderNo: state.jobNo),
             ),
           );
         }
@@ -465,8 +458,8 @@ class _JobNoFieldState extends State<_JobNoField> {
                   endIndent: 14),
               itemBuilder: (ctx, i) {
                 final item = suggestions[i];
-                final jobNo = item['CNumber'].toString();
-                final id = item['Id'];
+                final jobNo = '${item['cNumber'] ?? ''}';
+                final id = item['id'] as int;
                 return InkWell(
                   onTap: () {
                     context.read<GetJobNoBloc>().add(

@@ -1,16 +1,24 @@
 import 'package:maleva/core/network/legacy_api_repository.dart';
 import 'package:maleva/core/di/injection.dart';
 import 'package:maleva/core/files/attachments_api.dart';
-import 'package:maleva/core/network/api_constants.dart';
+import 'package:maleva/core/sale_order/sale_order_api.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:maleva/core/utils/app_globals.dart';
 import 'airfreight_event.dart';
 import 'airfreight_state.dart';
-import 'package:maleva/core/models/shared/response_view_model.dart';
 
+/// Air freight status and AWB number of a job, on the shared Java sale order API
+/// (`/api/sale-orders/job-numbers`, `/edit`, `PUT /{id}/air-freight`).
 class AirFreightBloc extends Bloc<AirFreightEvent, AirFreightState> {
-  AirFreightBloc() : super(AirFreightInitial()) {
+  final SaleOrderApi _saleOrders;
+  List<Map<String, dynamic>> _jobs = const [];
+
+  AirFreightLoaded _empty() => AirFreightLoaded.empty().copyWith(jobs: _jobs);
+
+  AirFreightBloc({SaleOrderApi? saleOrders})
+      : _saleOrders = saleOrders ?? sl<SaleOrderApi>(),
+        super(AirFreightInitial()) {
     on<AirFreightStarted>(_onStarted);
     on<AirFreightBillTypeChanged>(_onBillTypeChanged);
     on<AirFreightJobNoTextChanged>(_onJobNoTextChanged);
@@ -30,15 +38,15 @@ class AirFreightBloc extends Bloc<AirFreightEvent, AirFreightState> {
     // 1. Render UI instantly
     if (event.jobId != null && event.jobNo != null) {
       final shortNo = event.jobNo!.length >= 4 ? event.jobNo!.substring(4) : event.jobNo!;
-      emit(AirFreightLoaded.empty().copyWith(jobNoText: shortNo, saleOrderId: event.jobId!));
+      emit(_empty().copyWith(jobNoText: shortNo, saleOrderId: event.jobId!));
     } else {
-      emit(AirFreightLoaded.empty());
+      emit(_empty());
     }
 
     // 2. Fetch data in the background
     try {
-      // 🔥 Fixed: Removed context, passed null
-      await sl<LegacyApiRepository>().GetJobNoForwarding(null, 0);
+      _jobs = await _saleOrders.jobNumbers(0);
+      if (state is AirFreightLoaded) emit((state as AirFreightLoaded).copyWith(jobs: _jobs));
 
       if (event.jobId != null && event.jobNo != null) {
         final shortNo = event.jobNo!.length >= 4 ? event.jobNo!.substring(4) : event.jobNo!;
@@ -57,10 +65,9 @@ class AirFreightBloc extends Bloc<AirFreightEvent, AirFreightState> {
     if (state is! AirFreightLoaded) return;
     final s = state as AirFreightLoaded;
     try {
-      // 🔥 Fixed: Removed context, passed null
-      await sl<LegacyApiRepository>().GetJobNoForwarding(null, int.parse(event.billType));
+      _jobs = await _saleOrders.jobNumbers(int.parse(event.billType));
     } catch (e, stack) { debugPrint("Error caught globally: $e\n$stack"); }
-    emit(s.copyWith(billType: event.billType, jobNoText: '', saleOrderId: 0, jobNoSuggestions: []));
+    emit(s.copyWith(billType: event.billType, jobNoText: '', saleOrderId: 0, jobNoSuggestions: [], jobs: _jobs));
   }
 
   void _onJobNoTextChanged(AirFreightJobNoTextChanged event, Emitter<AirFreightState> emit) {
@@ -124,35 +131,16 @@ class AirFreightBloc extends Bloc<AirFreightEvent, AirFreightState> {
 
     emit(AirFreightLoading());
     try {
-      final master = {
-        'Id': s.saleOrderId,
-        'Comid': AppGlobals.Comid,
-        'Jobid': s.jobNoText,
-        'EmployeeRefId': AppGlobals.EmpRefId == 0 ? null : AppGlobals.EmpRefId,
-        'StatusRefId': s.statusId,
-        'AWBNO': s.awbNo,
-      };
-      final header = {'Content-Type': 'application/json; charset=UTF-8'};
-
-      // 🔥 Fixed: Passed null for context
-      final result = await sl<LegacyApiRepository>().apiAllinoneSelectArray(ApiConstants.apiUpdateAirFrieghtDetails, master, header, null);
-
-      if (result != '') {
-        final value = ResponseViewModel.fromJson(result);
-        if (value.IsSuccess == true) {
-          emit(AirFreightSaveSuccess());
-          emit(AirFreightLoaded.empty());
-          return;
-        }
-      }
-      emit(s);
+      await _saleOrders.updateAirFreight(s.saleOrderId, statusId: s.statusId, awbNo: s.awbNo);
+      emit(AirFreightSaveSuccess());
+      emit(_empty());
     } catch (e) {
       emit(AirFreightError(e.toString()));
     }
   }
 
   void _onClearRequested(AirFreightClearRequested event, Emitter<AirFreightState> emit) {
-    emit(AirFreightLoaded.empty());
+    emit(_empty());
   }
 
   // ── Helper: load job data + images ───────────────────────────────────────────
@@ -162,22 +150,21 @@ class AirFreightBloc extends Bloc<AirFreightEvent, AirFreightState> {
     required BuildContext context,
     required Emitter<AirFreightState> emit,
   }) async {
-    final prev = state is AirFreightLoaded ? state as AirFreightLoaded : AirFreightLoaded.empty();
+    final prev = state is AirFreightLoaded ? state as AirFreightLoaded : _empty();
     try {
-      // 🔥 Fixed: Removed context, passed only ID and JobNo
-      await sl<LegacyApiRepository>().EditSalesOrder(saleOrderId, int.tryParse(jobNo) ?? 0);
+      final master = (await _saleOrders.edit(id: saleOrderId, saleOrderNo: int.tryParse(jobNo) ?? 0)).master;
       await sl<LegacyApiRepository>().SelectJobType(null);
-      await sl<LegacyApiRepository>().SelectAllJobStatus(null, AppGlobals.SaleEditMasterList[0]['JobMasterRefId']);
+      await sl<LegacyApiRepository>().SelectAllJobStatus(null, master['jobMasterRefId']);
 
       String jobTypeName = '';
-      final jobMasterId = AppGlobals.SaleEditMasterList[0]['JobMasterRefId'];
+      final jobMasterId = master['jobMasterRefId'];
       if (jobMasterId != null && jobMasterId != 0) {
         final matches = AppGlobals.JobTypeList.where((j) => j.Id == jobMasterId).toList();
         if (matches.isNotEmpty) {
           final name = matches[0].Name.trim();
           if (name != 'AIR FRIEGHT IMPORT' && name != 'AIR FRIEGHT EXPORT') {
             emit(AirFreightInvalidJobType());
-            emit(AirFreightLoaded.empty());
+            emit(_empty());
             return null;
           }
           jobTypeName = name;
@@ -186,14 +173,14 @@ class AirFreightBloc extends Bloc<AirFreightEvent, AirFreightState> {
 
       int statusId = 0;
       String statusName = '';
-      final jStatus = AppGlobals.SaleEditMasterList[0]['JStatus'];
+      final jStatus = master['jStatus'];
       if (jStatus != null && jStatus != 0) {
         statusId = jStatus;
         final matches = AppGlobals.JobAllStatusList.where((s) => s.Status == statusId).toList();
         if (matches.isNotEmpty) statusName = matches[0].StatusName;
       }
 
-      final awbNo = AppGlobals.SaleEditMasterList[0]['AWBNo'] ?? '';
+      final String awbNo = master['awbNo'] ?? '';
 
       // the shared Java GET /api/attachments: the job's AirFrieght photos
       final images = await sl<AttachmentsApi>()
@@ -204,6 +191,7 @@ class AirFreightBloc extends Bloc<AirFreightEvent, AirFreightState> {
         saleOrderId: saleOrderId,
         jobNoSuggestions: [],
         jobType: jobTypeName,
+        jobMasterId: jobMasterId as int? ?? 0,
         statusId: statusId,
         statusName: statusName,
         awbNo: awbNo,

@@ -45,26 +45,6 @@ class ApiConstants {
   static const String apiSelectAllInventory   = "$port/api/CustomerApp/SelectAllInventoryt";
 
   // ─── Sales Order ──────────────────────────────────────────────────────────
-  static const String apiSelectInvoiceNumber = "$port/SaleOrder/SelectInvoiceNumber";
-  static const String apiSelectSalesOrder     = "$port/api/SaleOrderApp/SelectSaleOrder";
-  static const String apiSelectTVSaleOrder    = "$port/api/SaleOrderApp/SelectTVSaleOrder";
-  static const String apiEditSalesOrder       = "$port/api/SaleOrderApp/EditSaleOrder?Id=";
-  static const String apiInsertSalesOrder     = "$port/api/SaleOrderApp/InsertSaleOrder";
-  static const String apiDeleteSalesOrder     = "$port/api/SaleOrderApp/DeleteSaleOrder?Id=";
-  static const String apiUpdateSaleOrderMaster = "$port/api/SaleOrderApp/UpdateSaleorderMaster";
-  static const String apiMaxSaleOrderNo       = "$port/api/SaleOrderApp/MaxSaleOrderNo?Comid=";
-  static const String apiGetJobNo             = "$port/api/SaleOrderApp/GetJobNo?Comid=";
-  static const String apiUpdateForwarding     = "$port/api/SaleOrderApp/UpdateForwarding";
-  static const String apiUpdateBoardingDetails = "$port/api/SaleOrderApp/UpdateBoardingDetails";
-  static const String apiUpdateBoardingOfficer = "$port/api/SaleOrderApp/UpdateBoardingOfficier";
-  static const String apiUpdateAirFrieghtDetails = "$port/api/SaleOrderApp/UpdateAirFrieght";
-  static const String apiselectBillordercheck = "$port/api/SaleOrderApp/GetBillordercheck";
-  static const String apiGetCurrencyValue     = "$port/api/SaleOrderApp/GetCurrencyValue?Comid=";
-  static const String apiGetComboS1           = "$port/api/SaleOrderApp/SelectComboS1?Comid=";
-  static const String apiBoardingMail         = "$port/api/SaleOrderApp/SendBoardingMail";
-  static const String apiViewDOConvert        = "$port/api/SaleOrderApp/DoConvert?BillNo=";
-  static const String apiViewInvoice          = "$port/api/SaleOrderApp/InvoiceConvert?BillNo=";
-  static const String apiSelectBoardingSalary = "$port/api/SaleOrderApp/GetBoardingSalary";
   static const String apiSelectBoardingSalaryNew = "$port/api/BoardingSalaryApp/SelectBoardingSalary";
   static const String apiSelectBoardingSalaryByEmpId = "$port/api/BoardingSalaryApp/SelectBoardingSalaryByEmpId";
 

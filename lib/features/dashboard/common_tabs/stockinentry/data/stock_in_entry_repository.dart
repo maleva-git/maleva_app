@@ -4,18 +4,23 @@ import 'package:maleva/core/network/api_constants.dart';
 import 'package:maleva/core/utils/session_manager.dart';
 import 'package:maleva/core/di/injection.dart';
 import 'package:maleva/core/stock/stock_in_api.dart';
+import 'package:maleva/core/sale_order/sale_order_api.dart';
 
 /// Stock In Entry. The stock-in calls go to the shared Java `/api/stock-ins`
-/// (ported from .NET StockApp); the job list, job steps, sale order edit and
-/// image delete are other features' calls.
+/// (ported from .NET StockApp); the job picker is `/api/sale-orders/job-numbers`
+/// (`[{id, cNumber, ...}]`); job steps and image delete are other features' calls.
 class StockInEntryRepository {
   final DioClient _dioClient;
   final SessionManager _sessionManager;
   final StockInApi? _stockApi;
+  final SaleOrderApi? _saleOrderApi;
 
-  StockInEntryRepository(this._dioClient, this._sessionManager, {StockInApi? stockApi}) : _stockApi = stockApi;
+  StockInEntryRepository(this._dioClient, this._sessionManager, {StockInApi? stockApi, SaleOrderApi? saleOrderApi})
+      : _stockApi = stockApi,
+        _saleOrderApi = saleOrderApi;
 
   StockInApi get _stock => _stockApi ?? sl<StockInApi>();
+  SaleOrderApi get _saleOrders => _saleOrderApi ?? sl<SaleOrderApi>();
 
   int get _comid => _sessionManager.companyId;
 
@@ -23,20 +28,15 @@ class StockInEntryRepository {
   Future<Map<String, dynamic>> fetchInitialData(int billType) async {
     final maxNum = await _stock.nextNumber(_comid);
     final stockJobs = await _stock.stockJobs(_comid);
-    final jobNoRes = await _dioClient.dio.post("${ApiConstants.apiGetJobNo}$_comid&JobType=$billType", data: {});
-
     return {
       'maxStockNo': maxNum,
       'stockJobList': stockJobs,
-      'jobNoList': (jobNoRes.data is List) ? jobNoRes.data : [],
+      'jobNoList': await _saleOrders.jobNumbers(billType),
     };
   }
 
   // ─── Fetch Job List by Bill Type ───────────────────────────────────────────
-  Future<List<dynamic>> fetchJobNoList(int billType) async {
-    final jobNoRes = await _dioClient.dio.post("${ApiConstants.apiGetJobNo}$_comid&Type=$billType", data: {});
-    return (jobNoRes.data != null && jobNoRes.data is List) ? jobNoRes.data : [];
-  }
+  Future<List<dynamic>> fetchJobNoList(int billType) => _saleOrders.jobNumbers(billType);
 
   // ─── Fetch Job Details ─────────────────────────────────────────────────────
   Future<Map<String, dynamic>> fetchJobDetails(int saleOrderId) async {
@@ -81,27 +81,6 @@ class StockInEntryRepository {
       'jobMasterId': jobMasterId,
       'weightPkg': weightPkg,
       'jobStatuses': jobStatuses,
-    };
-  }
-
-  // ─── Fetch Sales Order For Edit ────────────────────────────────────────────
-  Future<Map<String, dynamic>> fetchSalesOrderForEdit(int id, int saleNo) async {
-    try {
-      final endpoint = "${ApiConstants.apiEditSalesOrder}$id&SaleorderNo=$saleNo&Comid=$_comid";
-      final response = await _dioClient.dio.post(endpoint, data: {});
-      if (response.data != null && response.data.isNotEmpty) {
-         final item = response.data[0];
-         return {
-            'masterList': item['EditMasterDetails'] ?? [],
-            'detailsList': item['EditItemDetails'] ?? [],
-         };
-      }
-    } catch (e) {
-      // ignore
-    }
-    return {
-      'masterList': [],
-      'detailsList': [],
     };
   }
 
