@@ -1,3 +1,4 @@
+import 'package:maleva/core/lookups/job_steps.dart';
 import 'package:maleva/core/network/api_constants.dart';
 import 'package:maleva/core/network/api_client.dart';
 import 'package:maleva/core/utils/app_preferences.dart';
@@ -36,11 +37,12 @@ class JobStatusUpdateRepository {
       // B. Fetch Job Status List & Find Match
       if (jStatus != null && jStatus != 0) {
         statusId = jStatus as int;
-        final String statusUrl = "${ApiConstants.apiSelectAllJobStatus}$comid&JobMasterRefId=$jobMasterRefId";
+        final String statusUrl = "${ApiConstants.apiSelectAllJobStatus}$comid&Jobid=$jobMasterRefId";
         final statusResponse = await ApiClient.postRequest(statusUrl, null);
 
-        if (statusResponse != null && statusResponse is List) {
-          final match = statusResponse.firstWhere(
+        final statuses = JobSteps.statuses(statusResponse);
+        if (statuses.isNotEmpty) {
+          final match = statuses.firstWhere(
                   (s) => s['Status'] == statusId,
               orElse: () => null
           );

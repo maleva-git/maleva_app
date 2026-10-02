@@ -33,9 +33,11 @@ class LicenseUpdateBloc
     emit(LicenseUpdateLoading());
     try {
       AppGlobals.TruckDetailsList = [];
-      final isAdmin = AppGlobals.DriverTruckRefId == 0;
+      // A driver never edits trucks (the server refuses a driver's truck save); an
+      // employee edits any. "No truck assigned" used to make a driver an admin.
+      final isAdmin = AppGlobals.DriverLogin != 1;
 
-      if (!isAdmin) {
+      if (!isAdmin && AppGlobals.DriverTruckRefId != 0) {
         // Driver login: auto-load truck
         final loaded = await _fetchAndBuild(
             AppGlobals.DriverTruckRefId, admin: false);

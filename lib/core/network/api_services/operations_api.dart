@@ -24,29 +24,10 @@ class OperationsApi {
     await ApiClient.postRequest('${ApiConstants.apiRTIDetailsInsert}$comid', data);
   }
 
-  // ─── Fuel Entry ───────────────────────────────────────────────────────────
-  static Future<void> insertFuelEntry(Map<String, dynamic> data) async {
-    await ApiClient.postRequest(ApiConstants.apiInsertFuelEntry, data);
-  }
 
-  static Future<String> getMaxFuelEntryNo() async {
-    final comid = AppPreferences.getComid();
-    return await ApiClient.getString('${ApiConstants.apiMaxFuelEntryNo}$comid');
-  }
 
-  static Future<void> deleteFuelEntry(int id) async {
-    await ApiClient.postRequest('${ApiConstants.apiDeleteFuelEntry}$id', null);
-  }
 
-  static Future<dynamic> editFuelEntry(int id) async {
-    final result = await ApiClient.postRequest('${ApiConstants.apiEditFuelEntry}$id', null);
-    return result;
-  }
 
-  static Future<List<dynamic>> selectFuelEntries(Map<String, dynamic> filter) async {
-    final result = await ApiClient.postRequest(ApiConstants.apiSelectFuelEntry, filter);
-    return result as List;
-  }
 
   // ─── Stock ────────────────────────────────────────────────────────────────
   static Future<List<dynamic>> selectStockDetails() async {
@@ -80,11 +61,6 @@ class OperationsApi {
     return result;
   }
 
-  // ─── Truck Update ─────────────────────────────────────────────────────────
-  static Future<void> updateTruckDetails(Map<String, dynamic> data) async {
-    final comid = AppPreferences.getComid();
-    await ApiClient.postRequest('${ApiConstants.apiUpdateTruckDetails}$comid', data);
-  }
 
   // ─── Spare Parts ──────────────────────────────────────────────────────────
   static Future<void> insertSpareParts(Map<String, dynamic> data) async {

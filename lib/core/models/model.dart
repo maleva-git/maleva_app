@@ -106,7 +106,6 @@ export 'shared/sale_edit_detail_model.dart';
 export 'shared/address_details_model.dart';
 export 'shared/r_t_i_master_view_model.dart';
 export 'shared/r_t_i_details_view_model.dart';
-export '../../features/transport/models/fuel_entry_model.dart';
 export '../../features/transport/models/fuelselect_model.dart';
 export 'shared/driver_view_model.dart';
 export 'shared/bill_view_model.dart';

@@ -6,32 +6,15 @@
 import 'package:maleva/core/network/api_client.dart';
 import 'package:maleva/core/network/api_constants.dart';
 import 'package:maleva/core/utils/app_preferences.dart';
-import 'package:maleva/features/operations/models/job_type_model.dart';
-import 'package:maleva/core/models/shared/customer_model.dart';
 import 'package:maleva/core/models/shared/employee_model.dart';
-import 'package:maleva/core/models/shared/truck_details_model.dart';
 import 'package:maleva/core/models/shared/ware_house_model.dart';
-import 'package:maleva/core/models/shared/address_details_model.dart';
 import 'package:maleva/core/models/shared/location_model.dart';
-import 'package:maleva/core/models/shared/agent_model.dart';
 import 'package:maleva/features/operations/models/job_status_model.dart';
-import 'package:maleva/features/operations/models/job_all_status_model.dart';
-import 'package:maleva/core/models/shared/agent_company_model.dart';
-import 'package:maleva/core/models/shared/product_model.dart';
-import 'package:maleva/features/operations/models/job_type_details_model.dart';
 import 'package:maleva/core/models/shared/get_truck_model.dart';
 
 class MasterApi {
   MasterApi._();
 
-  // ─── Customer ─────────────────────────────────────────────────────────────
-  static Future<List<CustomerModel>> getCustomers() async {
-    final comid  = AppPreferences.getComid();
-    final result = await ApiClient.postRequest(
-      '${ApiConstants.apiSelectCustomer}$comid', null,
-    );
-    return (result as List).map((e) => CustomerModel.fromJson(e)).toList();
-  }
 
   // ─── Location ─────────────────────────────────────────────────────────────
   static Future<List<LocationModel>> getLocations() async {
@@ -63,73 +46,12 @@ class MasterApi {
     return (result as List).map((e) => JobStatusModel.fromJson(e)).toList();
   }
 
-  // ─── Job Type ─────────────────────────────────────────────────────────────
-  static Future<List<JobTypeModel>> getJobTypes() async {
-    final comid  = AppPreferences.getComid();
-    final result = await ApiClient.postRequest(
-      '${ApiConstants.apiSelectJobType}$comid', null,
-    );
-    return (result as List).map((e) => JobTypeModel.fromJson(e)).toList();
-  }
 
-  // ─── All Job Status + Job Type Details (single API) ──────────────────────
-  static Future<Map<String, dynamic>> getAllJobStatusDetails(int jobId) async {
-    final comid  = AppPreferences.getComid();
-    final result = await ApiClient.postRequest(
-      '${ApiConstants.apiSelectAllJobStatus}$comid&Jobid=$jobId', null,
-    );
-    final list      = result as List;
-    final statusDetails = list[0]['JobStatusDetails'] as List;
-    final typeDetails   = list[0]['JobTypeDetails'] as List;
-    return {
-      'statuses': statusDetails.map((e) => JobAllStatusModel.fromJson(e)).toList(),
-      'typeDetails': typeDetails.map((e) => JobTypeDetailsModel.fromJson(e)).toList(),
-    };
-  }
 
-  // ─── Agent Company ────────────────────────────────────────────────────────
-  static Future<List<AgentCompanyModel>> getAgentCompanies() async {
-    final comid  = AppPreferences.getComid();
-    final result = await ApiClient.postRequest(
-      '${ApiConstants.apiSelectAgentCompany}$comid', null,
-    );
-    return (result as List).map((e) => AgentCompanyModel.fromJson(e)).toList();
-  }
 
-  // ─── Agent ────────────────────────────────────────────────────────────────
-  static Future<List<AgentModel>> getAgents(int agentCompanyId) async {
-    final comid  = AppPreferences.getComid();
-    final result = await ApiClient.postRequest(
-      '${ApiConstants.apiSelectAgentAll}$comid&Jobid=$agentCompanyId', null,
-    );
-    return (result as List).map((e) => AgentModel.fromJson(e)).toList();
-  }
 
-  // ─── Products ─────────────────────────────────────────────────────────────
-  static Future<List<ProductModel>> getProducts() async {
-    final comid  = AppPreferences.getComid();
-    final result = await ApiClient.postRequest(
-      '${ApiConstants.apiGetProductList}$comid', null,
-    );
-    return (result as List).map((e) => ProductModel.fromJson(e)).toList();
-  }
 
-  // ─── Address ──────────────────────────────────────────────────────────────
-  static Future<List<dynamic>> getAddressList() async {
-    final comid  = AppPreferences.getComid();
-    final result = await ApiClient.postRequest(
-      '${ApiConstants.apiSelectAddressList}$comid', null,
-    );
-    return result as List;
-  }
 
-  static Future<List<AddressDetailsModel>> getAddressDetails(String keyword) async {
-    final comid  = AppPreferences.getComid();
-    final result = await ApiClient.postRequest(
-      '${ApiConstants.apiSelectAddressDetails}$comid&KeyWord=${Uri.encodeComponent(keyword)}', null,
-    );
-    return (result as List).map((e) => AddressDetailsModel.fromJson(e)).toList();
-  }
 
   // ─── WareHouse / Port ─────────────────────────────────────────────────────
   static Future<List<WareHouseModel>> getWarehouses() async {
@@ -159,17 +81,6 @@ class MasterApi {
     return (result as List).map((e) => GetTruckModel.fromJson(e)).toList();
   }
 
-  static Future<List<TruckDetailsModel>> getTruckDetails({
-    required int keyword,
-    required String column,
-  }) async {
-    final comid  = AppPreferences.getComid();
-    final result = await ApiClient.postRequest(
-      '${ApiConstants.apiEditTruckDetails}$comid&Startindex=0&PageCount=0&Keyword=$keyword&Column=$column&type=',
-      null,
-    );
-    return (result as List).map((e) => TruckDetailsModel.fromJson(e)).toList();
-  }
 
   // ─── Driver ───────────────────────────────────────────────────────────────
   static Future<List<GetTruckModel>> getDrivers() async {

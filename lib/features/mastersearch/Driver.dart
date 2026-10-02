@@ -157,6 +157,8 @@ class _Driverstate extends State<Driver> {
                                       onTap: () {
                                         setState(() {
                                           if (widget.Searchby == 1) {
+                                            // read by the RTI filter, as the truck picker sets SelectTruckList
+                                            AppGlobals.SelectDriverList = item;
                                             Navigator.of(context, rootNavigator: true).pop(item);
                                           }
                                         });

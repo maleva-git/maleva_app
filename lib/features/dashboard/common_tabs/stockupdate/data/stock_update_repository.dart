@@ -1,3 +1,4 @@
+import 'package:maleva/core/lookups/job_steps.dart';
 import 'package:maleva/core/platform/barcode_scanner.dart';
 import 'package:maleva/core/network/api_constants.dart';
 import 'package:maleva/core/network/legacy_json_transport.dart';
@@ -54,7 +55,7 @@ class StockUpdateRepository {
 
     // Fetch Job Statuses
     final statusListRes = await transport.postRequest(
-        "${ApiConstants.apiSelectAllJobStatus}$comid&JobMasterRefId=$jobMId", null);
+        "${ApiConstants.apiSelectAllJobStatus}$comid&Jobid=$jobMId", null);
 
     int statusId = 0;
     String statusName = '';
@@ -73,8 +74,9 @@ class StockUpdateRepository {
       else return null; // Invalid state
     }
 
-    if (statusListRes is List) {
-      final match = statusListRes.firstWhere((s) => s['Status'] == statusId, orElse: () => null);
+    final statuses = JobSteps.statuses(statusListRes);
+    if (statuses.isNotEmpty) {
+      final match = statuses.firstWhere((s) => s['Status'] == statusId, orElse: () => null);
       if (match != null) statusName = match['StatusName'];
     }
 

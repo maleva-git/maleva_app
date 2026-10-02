@@ -129,9 +129,7 @@ class SaleOrderDetailsBloc extends Bloc<SaleOrderDetailsEvent, SaleOrderDetailsS
       _jobTypeList = masterData['jobTypes'];
       _jobAllStatusList = masterData['jobStatuses'];
 
-      // If your API returns JobTypeDetails inside jobStatuses, assign it here.
-      // Otherwise, you may need a separate repo call. For now, we assume it's part of the jobStatusResponse or already handled.
-      _jobTypeDetailsList = _jobAllStatusList;
+      _jobTypeDetailsList = masterData['jobTypeDetails'] as List<dynamic>? ?? [];
       _agentAllList = masterData['agents'];
 
       // ── Resolve foreign-key display names from LOCAL lists ────────────────

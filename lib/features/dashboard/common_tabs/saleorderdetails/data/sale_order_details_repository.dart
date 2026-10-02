@@ -1,3 +1,4 @@
+import 'package:maleva/core/lookups/job_steps.dart';
 import 'package:maleva/core/network/api_constants.dart';
 import 'package:maleva/core/network/api_client.dart';
 import 'package:maleva/core/utils/app_preferences.dart';
@@ -30,14 +31,14 @@ class SaleOrderDetailsRepository {
     final customerResponse = await ApiClient.postRequest("${ApiConstants.apiSelectCustomer}$comid", null);
     final jobTypeResponse = await ApiClient.postRequest("${ApiConstants.apiSelectJobType}$comid", null);
 
-    // Note: Assuming this API returns the Job Statuses and Job Type Details
-    final jobStatusResponse = await ApiClient.postRequest("${ApiConstants.apiSelectAllJobStatus}$comid&JobId=$jobMasterRefId", null);
+    final jobStatusResponse = await ApiClient.postRequest("${ApiConstants.apiSelectAllJobStatus}$comid&Jobid=$jobMasterRefId", null);
     final agentAllResponse = await ApiClient.postRequest("${ApiConstants.apiSelectAgentAll}$comid&Jobid=$agentCompanyRefId", null);
 
     return {
       'customers': customerResponse is List ? customerResponse : [],
       'jobTypes': jobTypeResponse is List ? jobTypeResponse : [],
-      'jobStatuses': jobStatusResponse is List ? jobStatusResponse : [], // May contain both status and details based on your API structure
+      'jobStatuses': JobSteps.statuses(jobStatusResponse),
+      'jobTypeDetails': JobSteps.details(jobStatusResponse),
       'agents': agentAllResponse is List ? agentAllResponse : [],
     };
   }

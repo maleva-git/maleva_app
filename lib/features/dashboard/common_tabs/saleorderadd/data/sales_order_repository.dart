@@ -1,3 +1,4 @@
+import 'package:maleva/core/lookups/job_steps.dart';
 import 'package:maleva/core/network/api_constants.dart';
 import 'package:maleva/core/network/api_client.dart';
 import 'package:maleva/core/utils/app_preferences.dart';
@@ -30,8 +31,8 @@ class SalesOrderRepository {
   Future<Map<String, dynamic>> fetchMasterData(int jobMasterRefId, int agentCompanyRefId, int customerRefId) async {
     final customerResponse = await ApiClient.postRequest("${ApiConstants.apiSelectCustomer}$comid", null);
     final jobTypeResponse = await ApiClient.postRequest("${ApiConstants.apiSelectJobType}$comid", null);
-    final jobStatusResponse = await ApiClient.postRequest("${ApiConstants.apiSelectAllJobStatus}$comid&JobMasterRefId=$jobMasterRefId", null);
-    final agentAllResponse = await ApiClient.postRequest("${ApiConstants.apiSelectAgentAll}$comid&AgentCompanyRefId=$agentCompanyRefId", null);
+    final jobStatusResponse = await ApiClient.postRequest("${ApiConstants.apiSelectAllJobStatus}$comid&Jobid=$jobMasterRefId", null);
+    final agentAllResponse = await ApiClient.postRequest("${ApiConstants.apiSelectAgentAll}$comid&Jobid=$agentCompanyRefId", null);
     final currencyResponse = await ApiClient.postRequest("${ApiConstants.apiGetCurrencyValue}$comid&CustomerRefId=$customerRefId", null);
 
     double currencyVal = 0.0;
@@ -42,7 +43,8 @@ class SalesOrderRepository {
     return {
       'customers': customerResponse is List ? customerResponse : [],
       'jobTypes': jobTypeResponse is List ? jobTypeResponse : [],
-      'jobStatuses': jobStatusResponse is List ? jobStatusResponse : [],
+      'jobStatuses': JobSteps.statuses(jobStatusResponse),
+      'jobTypeDetails': JobSteps.details(jobStatusResponse),
       'agents': agentAllResponse is List ? agentAllResponse : [],
       'currencyValue': currencyVal,
     };
@@ -50,11 +52,12 @@ class SalesOrderRepository {
 
   // ─── Job Type Changed Data ───────────────────────────────────────────────
   Future<Map<String, dynamic>> fetchJobTypeDependencies(int jobTypeId) async {
-    final jobStatusResponse = await ApiClient.postRequest("${ApiConstants.apiSelectAllJobStatus}$comid&JobMasterRefId=$jobTypeId", null);
+    final jobStatusResponse = await ApiClient.postRequest("${ApiConstants.apiSelectAllJobStatus}$comid&Jobid=$jobTypeId", null);
     final comboS1Response = await ApiClient.postRequest("${ApiConstants.apiGetComboS1}$comid&JobMasterRefId=$jobTypeId", null);
 
     return {
-      'jobStatuses': jobStatusResponse is List ? jobStatusResponse : [],
+      'jobStatuses': JobSteps.statuses(jobStatusResponse),
+      'jobTypeDetails': JobSteps.details(jobStatusResponse),
       'comboS1': comboS1Response is List ? comboS1Response : [],
     };
   }

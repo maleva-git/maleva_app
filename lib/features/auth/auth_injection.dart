@@ -1,4 +1,5 @@
 import 'package:get_it/get_it.dart';
+import 'package:maleva/core/lookups/shared_lookups.dart';
 import 'package:maleva/core/network/java_api_client.dart';
 import 'package:maleva/core/router/app_router.dart';
 import 'package:maleva/core/session/session_token_store.dart';
@@ -12,6 +13,8 @@ void registerAuthModule(GetIt sl) {
   sl.registerLazySingleton<SessionTokenStore>(() => SessionTokenStore(const PlatformSecureKeyValueStore()));
   sl.registerLazySingleton<JavaApiClient>(() => JavaApiClient(sl<SessionTokenStore>()));
   sl.registerLazySingleton<MobileAuthApi>(() => MobileAuthApi(sl<JavaApiClient>()));
+  // the shared Java lookups and fuel entries (the web's APIs), for LegacyCallAdapter
+  sl.registerLazySingleton<SharedLookups>(() => SharedLookups(sl<JavaApiClient>().dio));
   sl.registerLazySingleton<SessionWriter>(() => SessionWriter(sl<SessionTokenStore>()));
   sl.registerLazySingleton<SessionService>(() {
     final service = SessionService(

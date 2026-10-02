@@ -163,8 +163,9 @@ class FuelEntryBloc extends Bloc<FuelEntryEvent, FuelEntryState> {
   Future<String> _fetchMaxFuelNo() async {
     try {
       final comId = AppGlobals.storagenew.getInt('Comid') ?? 0;
-      final result = await sl<LegacyApiRepository>().apiGetString('');
-      return result.isNotEmpty ? result : '';
+      // the URL was missing, so the number never loaded
+      final result = await sl<LegacyApiRepository>().apiGetString('${ApiConstants.apiMaxFuelEntryNo}$comId');
+      return result.replaceAll('"', '');
     } catch (_) {
       return '';
     }

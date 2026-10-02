@@ -7,9 +7,13 @@ import 'transport_event.dart';
 import 'transport_state.dart';
 
 class TransportBloc extends Bloc<TransportEvent, TransportState> {
+  final bool Function() _isDriver;
+
   final TransportRepository repository; // ✅ Injected Repository
 
-  TransportBloc({required this.repository}) : super(const TransportInitial()) {
+  TransportBloc({required this.repository, bool Function()? isDriver})
+      : _isDriver = isDriver ?? (() => AppGlobals.DriverLogin == 1),
+        super(const TransportInitial()) {
     on<LoadTransportDataEvent>(_onLoadData);
     on<TapTransportItemEvent>(_onTapItem);
     on<LongPressTransportItemEvent>(_onLongPressItem);
@@ -79,6 +83,9 @@ class TransportBloc extends Bloc<TransportEvent, TransportState> {
       LongPressTransportItemEvent event,
       Emitter<TransportState> emit,
       ) async {
+    // A driver's transport list is read-only: Sale Order Add is an office
+    // screen, and its lists (customers, agents) are not open to drivers.
+    if (_isDriver()) return;
     // ✅ REFACTORED: The BLoC just emits the intent to navigate.
     // The UI listener will handle the context-heavy OnlineApi call.
     emit(TransportNavigateToEditState(id: event.id));
