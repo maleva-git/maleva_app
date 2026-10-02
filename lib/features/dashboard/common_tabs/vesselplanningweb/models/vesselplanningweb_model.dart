@@ -55,12 +55,11 @@ class VesselPlanningWebModel {
   String agentPhone;
   String oAgentName;
   String oAgentPhone;
-  int boardingOfficerRefid;
-  String boardingOfficerName;
-  int boardingOfficer1Refid;
-  String boardingOfficerName1;
-  double boardingAmount;
-  double boardingAmount1;
+  /// The loading (`L`) and off-vessel (`O`) boarding officers, three slots each (id 0 none).
+  List<int> loadingOfficerIds;
+  List<String> loadingOfficerNames;
+  List<int> offOfficerIds;
+  List<String> offOfficerNames;
   String customerName;
   String employeeName;
   String remarks;
@@ -124,12 +123,10 @@ class VesselPlanningWebModel {
     required this.agentPhone,
     required this.oAgentName,
     required this.oAgentPhone,
-    required this.boardingOfficerRefid,
-    required this.boardingOfficerName,
-    required this.boardingOfficer1Refid,
-    required this.boardingOfficerName1,
-    required this.boardingAmount,
-    required this.boardingAmount1,
+    this.loadingOfficerIds = const [0, 0, 0],
+    this.loadingOfficerNames = const ['', '', ''],
+    this.offOfficerIds = const [0, 0, 0],
+    this.offOfficerNames = const ['', '', ''],
     required this.customerName,
     required this.employeeName,
     required this.remarks,
@@ -137,17 +134,13 @@ class VesselPlanningWebModel {
     required this.sortBy,
   });
 
+  // the Java officer slots: LBoardingOfficerRefid, LBoardingOfficer1Refid, LBoardingOfficer2Refid
+  static const _slots = ['', '1', '2'];
+
   static int _parseInt(dynamic value) {
     if (value == null) return 0;
     if (value is int) return value;
     return int.tryParse(value.toString()) ?? 0;
-  }
-
-  static double _parseDouble(dynamic value) {
-    if (value == null) return 0.0;
-    if (value is double) return value;
-    if (value is int) return value.toDouble();
-    return double.tryParse(value.toString()) ?? 0.0;
   }
 
   static String _parseString(dynamic value) {
@@ -214,12 +207,10 @@ class VesselPlanningWebModel {
       agentPhone: _parseString(json['AgentPhone']),
       oAgentName: _parseString(json['OAgentName']),
       oAgentPhone: _parseString(json['OAgentPhone']),
-      boardingOfficerRefid: _parseInt(json['BoardingOfficerRefid']),
-      boardingOfficerName: _parseString(json['BoardingOfficerName']),
-      boardingOfficer1Refid: _parseInt(json['BoardingOfficer1Refid']),
-      boardingOfficerName1: _parseString(json['BoardingOfficerName1']),
-      boardingAmount: _parseDouble(json['BoardingAmount']),
-      boardingAmount1: _parseDouble(json['BoardingAmount1']),
+      loadingOfficerIds: [for (final k in _slots) _parseInt(json['LBoardingOfficer${k}Refid'])],
+      loadingOfficerNames: [for (final k in _slots) _parseString(json['LBoardingOfficerName$k'])],
+      offOfficerIds: [for (final k in _slots) _parseInt(json['OBoardingOfficer${k}Refid'])],
+      offOfficerNames: [for (final k in _slots) _parseString(json['OBoardingOfficerName$k'])],
       customerName: _parseString(json['CustomerName']),
       employeeName: json['EmployeeName']?.toString() ?? '',
       remarks: json['Remarks']?.toString() ?? '',

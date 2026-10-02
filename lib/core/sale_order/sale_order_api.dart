@@ -1,5 +1,5 @@
 import 'package:dio/dio.dart';
-import 'package:maleva/core/config/app_config.dart';
+import 'package:maleva/core/network/java_report.dart';
 import 'package:maleva/core/network/api_failure.dart';
 import 'package:maleva/core/network/java_response.dart';
 import 'package:maleva/core/utils/json_read.dart';
@@ -148,13 +148,16 @@ class SaleOrderApi {
 
   /// The Vessel Planning update (`POST /api/vessel-plannings/sale-order-update`).
   ///
-  /// Status and dates: null keeps, a blank date clears (`yyyy-MM-dd HH:mm:ss`). The
+  /// Status, cargo and dates: null keeps, a blank date clears (`yyyy-MM-dd HH:mm:ss`); a
+  /// blank [ptw] clears it, a blank [cargo] keeps it. The
   /// officers are always the whole picture: the server compares the three loading and
   /// three off-vessel slots with the job and treats a missing one as removed, so both
   /// sides are required (send the job's current ones for a side not being changed).
   /// When a side changes the server sets its amounts (50, 30 each, 20 each).
   Future<Map<String, dynamic>> vesselUpdate(int id,
       {int? jobStatusId,
+      String? cargo,
+      String? ptw,
       String? eta,
       String? etb,
       String? etd,
@@ -169,6 +172,8 @@ class SaleOrderApi {
         'saleOrderId': id,
         'companyId': companyId,
         if (jobStatusId != null) 'jobStatusId': jobStatusId,
+        if (cargo != null) 'cargo': cargo,
+        if (ptw != null) 'ptw': ptw,
         if (eta != null) 'eta': eta,
         if (etb != null) 'etb': etb,
         if (etd != null) 'etd': etd,
@@ -302,7 +307,7 @@ class SaleOrderApi {
   // ------------------------------------------------------------------ print
 
   /// The full link of a report path the print endpoints answer (they need no sign-in).
-  static String reportUrl(String path) => path.startsWith('http') ? path : '${AppConfig.javaBaseUrl}$path';
+  static String reportUrl(String path) => javaReportUrl(path);
 
   /// Converts the job to a DO (if not yet) and answers the report's path (`/api/v1/sale-invoices/print/...`).
   Future<String> doPrintPath(int id) async => JsonRead.string(JsonRead.map(await _send(() =>

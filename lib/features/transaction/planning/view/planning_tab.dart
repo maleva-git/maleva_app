@@ -138,21 +138,32 @@ class _PlanningScaffold extends StatelessWidget {
           IconButton(
             icon: const Icon(Icons.add_box_rounded, color: colour.kCobalt, size: 28),
             onPressed: () async {
-              final result = await Navigator.push(
+              await Navigator.push(
                 context,
                 MaterialPageRoute(builder: (context) => const AddPlanningPage()),
               );
-              if (result == true && context.mounted) {
-                // Refresh the list after saving
-                context.read<PlanningBloc>().add(LoadPlanningEvent(
-                  fromDate: DateFormat("yyyy-MM-dd").format(DateTime.now()),
-                  toDate: DateFormat("yyyy-MM-dd").format(DateTime.now()),
-                  employeeId: AppGlobals.EmpRefId ?? 0,
-                  employeeName: '',
-                  planningNo: '',
-                  checkLoggedEmp: true,
-                ));
-              }
+              if (!context.mounted) return;
+              // the page saves and deletes plans while open: reload the list with its filters
+              final bloc = context.read<PlanningBloc>();
+              final current = bloc.state;
+              final today = DateFormat("yyyy-MM-dd").format(DateTime.now());
+              bloc.add(current is PlanningLoaded
+                  ? LoadPlanningEvent(
+                      fromDate: current.fromDate,
+                      toDate: current.toDate,
+                      employeeId: current.employeeId,
+                      employeeName: current.employeeName,
+                      planningNo: current.planningNo,
+                      checkLoggedEmp: current.checkLoggedEmp,
+                    )
+                  : LoadPlanningEvent(
+                      fromDate: today,
+                      toDate: today,
+                      employeeId: AppGlobals.EmpRefId,
+                      employeeName: '',
+                      planningNo: '',
+                      checkLoggedEmp: true,
+                    ));
             },
           ),
         const SizedBox(width: 8),

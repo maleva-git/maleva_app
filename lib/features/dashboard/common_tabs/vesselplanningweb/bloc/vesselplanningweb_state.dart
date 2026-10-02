@@ -31,11 +31,14 @@ class VesselPlanningWebActionLoading extends VesselPlanningWebState {}
 
 class VesselPlanningWebActionSuccess extends VesselPlanningWebState {
   final String message;
+  /// A save's plan id and number (0 and '' for other actions).
+  final int savedId;
+  final String savedNo;
 
-  const VesselPlanningWebActionSuccess(this.message);
+  const VesselPlanningWebActionSuccess(this.message, {this.savedId = 0, this.savedNo = ''});
 
   @override
-  List<Object> get props => [message];
+  List<Object> get props => [message, savedId, savedNo];
 }
 
 class VesselPlanningWebError extends VesselPlanningWebState {

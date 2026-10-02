@@ -57,7 +57,6 @@ import '../../features/dashboard/common_tabs/pdo/data/pdo_repository.dart';
 import '../../features/dashboard/common_tabs/pettycash/bloc/pettycash_bloc.dart';
 import '../../features/dashboard/common_tabs/pettycash/data/pettycash_repository.dart';
 import '../../features/dashboard/common_tabs/planningdetailsview/bloc/planningdetails_bloc.dart';
-import '../../features/dashboard/common_tabs/planningdetailsview/data/planning_details_repository.dart';
 import '../../features/dashboard/common_tabs/receiptview/data/receipt_repository.dart';
 import '../../features/dashboard/common_tabs/rtistatus/bloc/rtistatus_bloc.dart';
 import '../../features/dashboard/common_tabs/rtistatus/data/rti_status_repository.dart';
@@ -92,8 +91,6 @@ import '../../features/dashboard/common_tabs/unrelease/bloc/unrelease_bloc.dart'
 import '../../features/dashboard/common_tabs/unrelease/data/unrelease_repository.dart';
 import '../../features/dashboard/common_tabs/unreleasesmk/bloc/unreleasesmk_bloc.dart';
 import '../../features/dashboard/common_tabs/unreleasesmk/data/unreleasesmk_repository.dart';
-import '../../features/dashboard/common_tabs/vesselplanningdetails/bloc/vesselplanningdetails_bloc.dart';
-import '../../features/dashboard/common_tabs/vesselplanningdetails/data/vesselplanningdetails_repository.dart';
 import '../../features/dashboard/common_tabs/vesselreport/bloc/vesselreport_bloc.dart';
 import '../../features/dashboard/common_tabs/vesselreport/data/vessel_report_repository.dart';
 import '../../features/operations/forwarding/bloc/forwarding_bloc.dart';
@@ -113,8 +110,6 @@ import 'package:maleva/features/transaction/enquirytrmaster/data/enquiry_reposit
 import 'package:maleva/features/transaction/enquirytrmaster/add/bloc/enquirytradd_bloc.dart';
 import 'package:maleva/features/transaction/planning/data/planning_repository.dart';
 import 'package:maleva/features/transaction/planning/bloc/planning_bloc.dart';
-import 'package:maleva/features/transaction/vesselplanning/data/vesselplanning_repository.dart';
-import 'package:maleva/features/transaction/vesselplanning/bloc/vesselplanning_bloc.dart';
 import 'package:maleva/features/transaction/enquirytrmaster/view/bloc/enquirytrview_bloc.dart';
 import 'package:maleva/features/transaction/salesorder/add/data/salesorderadd_repository.dart';
 import 'package:maleva/features/transaction/salesorder/view/data/salesorderview_repository.dart';
@@ -170,8 +165,6 @@ Future<void> setupDependencies() async {
     () => GetJobNoBloc(sl()),
   );
 
-  sl.registerLazySingleton<VesselPlanningRepository>(() => VesselPlanningRepository());
-  sl.registerFactory<VesselPlanningBloc>(() => VesselPlanningBloc(sl()));
 
   sl.registerLazySingleton<PlanningRepository>(() => PlanningRepository());
   sl.registerFactoryParam<PlanningBloc, BuildContext, dynamic>(
@@ -235,14 +228,6 @@ Future<void> setupDependencies() async {
         () => VesselBloc(repository: sl<VesselReportRepository>()),
   );
 
-  sl.registerLazySingleton<VesselPlanningDetailsRepository>(
-        () => VesselPlanningDetailsRepository(),
-  );
-  sl.registerFactory<VesselPlanningDetailsBloc>(
-        () => VesselPlanningDetailsBloc(
-      repository: sl<VesselPlanningDetailsRepository>(),
-    ),
-  );
 
   sl.registerLazySingleton<TransportRepository>(() => TransportRepository());
   sl.registerFactory<TransportBloc>(
@@ -444,12 +429,6 @@ Future<void> setupDependencies() async {
   );
 
   // ── Planning Details ──────────────────────────────────────────────────────
-  sl.registerLazySingleton<PlanningDetailsRepository>(
-        () => PlanningDetailsRepository(),
-  );
-  // sl.registerFactory<PlanningDetailsBloc>(
-  //       () => PlanningDetailsBloc(repository: sl<PlanningDetailsRepository>()),
-  // );
   sl.registerFactory(() => PlanningDetailsBloc());
   // ── Salary ────────────────────────────────────────────────────────────────
   sl.registerLazySingleton<SalaryRepository>(() => SalaryRepository());

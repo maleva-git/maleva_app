@@ -51,8 +51,19 @@ class VesselPlanningWebBloc extends Bloc<VesselPlanningWebEvent, VesselPlanningW
 
 
       try {
-        final message = await repository.saveVesselPlanning(event.planningList);
-        emit(VesselPlanningWebActionSuccess(message));
+        final saved = await repository.saveVesselPlanning(
+          id: event.id,
+          from: event.from,
+          to: event.to,
+          planDate: event.planDate,
+          saleOrderIds: event.saleOrderIds,
+          remarks: event.remarks,
+          search: event.search,
+          employeeId: event.employeeId,
+        );
+        final savedNo = '${saved['name'] ?? ''}';
+        emit(VesselPlanningWebActionSuccess('Vessel planning $savedNo saved'.replaceAll('  ', ' '),
+            savedId: (saved['id'] as num?)?.toInt() ?? event.id, savedNo: savedNo));
         if (currentState is VesselPlanningWebLoaded) {
           emit(VesselPlanningWebLoaded(dataList: currentState.dataList, planningNo: currentState.planningNo));
         }
@@ -83,7 +94,7 @@ class VesselPlanningWebBloc extends Bloc<VesselPlanningWebEvent, VesselPlanningW
         
         emit(VesselPlanningWebLoaded(
             dataList: dataList, 
-            planningNo: finalMaster['VESSELPLANINGNoDisplay'] ?? finalMaster['CNumberDisplay'] ?? event.planningMaster['CNumberDisplay'], 
+            planningNo: finalMaster['CNumberDisplay'] ?? finalMaster['VESSELPLANINGNoDisplay'],
             masterData: finalMaster));
       } catch (e) {
         emit(VesselPlanningWebError(message: e.toString()));
@@ -108,18 +119,9 @@ class VesselPlanningWebBloc extends Bloc<VesselPlanningWebEvent, VesselPlanningW
 
     on<FetchVesselPlanningPdfEvent>((event, emit) async {
       try {
-        final pdfUrl = await repository.fetchVesselPlanningPdfUrl(
-          planningNo: event.planningNo,
-          soId: event.id,
-        );
-
-        if (pdfUrl != null && pdfUrl.isNotEmpty) {
-          emit(VesselPlanningPdfLaunchSuccess(pdfUrl));
-        } else {
-          emit(const VesselPlanningPdfLaunchError("Failed to fetch PDF URL from server."));
-        }
+        emit(VesselPlanningPdfLaunchSuccess(await repository.fetchVesselPlanningPdfUrl(soId: event.id)));
       } catch (e) {
-        emit(VesselPlanningPdfLaunchError("Error loading PDF: ${e.toString()}"));
+        emit(VesselPlanningPdfLaunchError(e.toString()));
       }
     });
   }

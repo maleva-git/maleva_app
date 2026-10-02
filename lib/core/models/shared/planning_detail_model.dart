@@ -37,25 +37,28 @@
     required this.remarks,
   });
 
+  /// A row of the Java `POST /api/planing/select-planning` (`saledetails`): the planned
+  /// pickup/delivery are `PickupDateD`/`DeliveryDateD`, the places `OriginD`/`DestinationD`.
   factory PlanningDetailModel.fromJson(Map<String, dynamic> json) {
+    String text(String key) => (json[key] ?? '').toString();
     return PlanningDetailModel(
       id: json['Id'] ?? 0,
       planingMasterRefId: json['PLANINGMasterRefId'] ?? 0,
-      jobNo: (json['JobNo'] ?? json['jobNo'] ?? '').toString(),
-      jobDate: (json['JobDate'] ?? json['jobDate'] ?? '').toString(),
-      truckName: (json['TruckName'] ?? json['truckName'] ?? '').toString(),
+      jobNo: text('JobNo'),
+      jobDate: text('JobDate'),
+      truckName: text('TruckName'),
       truckRefId: json['TruckRefid'] ?? 0,
-      driverName: (json['DriverName'] ?? json['driverName'] ?? '').toString(),
+      driverName: text('DriverName'),
       driverRefId: json['DriverRefid'] ?? 0,
-      pickupDate: (json['PickupDate'] ?? json['pickupdate'] ?? json['pickupDate'] ?? json['SPickupDate'] ?? '').toString(),
-      deliveryDate: (json['DeliveryDate'] ?? json['deliverydate'] ?? json['deliveryDate'] ?? json['SDeliveryDate'] ?? '').toString(),
-      origin: (json['Origin'] ?? json['origin'] ?? '').toString(),
-      destination: (json['Destination'] ?? json['destination'] ?? '').toString(),
-      pickupAddress: (json['PickupAddress'] ?? json['pickupAddress'] ?? '').toString(),
-      deliveryAddress: (json['DeliveryAddress'] ?? json['deliveryAddress'] ?? '').toString(),
-      package: (json['Package'] ?? json['package'] ?? json['pkg'] ?? '').toString(),
-      weight: (json['Weight'] ?? json['weight'] ?? '').toString(),
-      remarks: (json['Remarks'] ?? json['remarks'] ?? '').toString(),
+      pickupDate: text('PickupDateD'),
+      deliveryDate: text('DeliveryDateD'),
+      origin: text('OriginD'),
+      destination: text('DestinationD'),
+      pickupAddress: text('PickupAddress'),
+      deliveryAddress: text('DeliveryAddress'),
+      package: text('pkg'),
+      weight: text('Weight'),
+      remarks: text('Remarks'),
     );
   }
 

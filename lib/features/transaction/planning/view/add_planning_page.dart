@@ -1,6 +1,9 @@
-import 'package:maleva/core/network/api_constants.dart';
 import 'package:maleva/features/transaction/planning/data/planning_repository.dart';
 import 'package:flutter/material.dart';
+import 'package:maleva/features/transaction/planning/data/planning_save_body.dart';
+import 'package:maleva/core/utils/system_helpers.dart';
+import 'package:maleva/core/network/java_report.dart';
+import 'package:maleva/core/planning/planning_api.dart';
 import 'package:maleva/core/utils/json_read.dart';
 import 'package:maleva/core/sale_order/sale_order_api.dart';
 import 'package:maleva/core/widgets/custom_app_bar.dart';
@@ -8,7 +11,6 @@ import 'package:maleva/core/colors/colors.dart' as colour;
 import 'package:maleva/core/theme/app_typography.dart';
 import 'package:intl/intl.dart';
 import 'package:maleva/features/transaction/salesorder/add/view/salesorderadd_tab.dart';
-import 'dart:convert';
 import '../../../../core/utils/app_globals.dart';
 import 'package:maleva/core/di/injection.dart';
 import 'package:maleva/core/network/legacy_api_repository.dart';
@@ -825,24 +827,8 @@ class _AddPlanningPageState extends State<AddPlanningPage> {
 
   Future<void> _fetchMaxPlaningNo() async {
     try {
-      final payload = {"Comid": AppGlobals.Comid, "BillType": ""};
-      Map<String, String> header = {
-        'Content-Type': 'application/json; charset=UTF-8',
-        'Comid': AppGlobals.Comid.toString()
-      };
-      var resultData = await sl<LegacyApiRepository>().apiAllinone(
-          "${ApiConstants.port}/PLANING/MaxPLANINGNo", jsonEncode(payload), header, null);
-          
-      if (resultData != null) {
-        if (resultData is String) {
-          resultData = jsonDecode(resultData);
-        }
-        if (resultData['ok'] == true) {
-           setState(() {
-              _planNoCtrl.text = resultData['No']?.toString() ?? '';
-           });
-        }
-      }
+      final no = await sl<PlanningApi>().nextNumber();
+      if (mounted) setState(() => _planNoCtrl.text = no);
     } catch (e) {
       debugPrint("Error fetching max planning no: $e");
     }
@@ -888,25 +874,18 @@ class _AddPlanningPageState extends State<AddPlanningPage> {
 
     setState(() => _isLoading = true);
     try {
-      final url = "${ApiConstants.port}/PLANING/DeletePLANING?Id=${_editMasterId}&Comid=${AppGlobals.Comid}";
-      Map<String, String> header = {'Content-Type': 'application/json; charset=UTF-8', 'Comid': AppGlobals.Comid.toString()};
-      
-      final resultData = await sl<LegacyApiRepository>().apiAllinone(url, {}, header, null);
-
-      if (resultData != null) {
-        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Planning Deleted Successfully')));
-        setState(() {
-           _editMasterId = null;
-                          _planningItems.clear();
-                          _remarksCtrl.clear();
-                          _planNoCtrl.text = '';
-                          _fetchMaxPlaningNo();
-        });
-      } else {
-        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Failed to delete planning')));
-      }
+      await sl<PlanningApi>().delete(_editMasterId!);
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Planning Deleted Successfully')));
+      setState(() {
+        _editMasterId = null;
+        _planningItems.clear();
+        _remarksCtrl.clear();
+        _planNoCtrl.text = '';
+      });
+      _fetchMaxPlaningNo();
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Error: ")));
+      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(e.toString())));
     } finally {
       if (mounted) setState(() => _isLoading = false);
     }
@@ -919,119 +898,37 @@ class _AddPlanningPageState extends State<AddPlanningPage> {
     }
     setState(() => _isLoading = true);
     try {
-      String? safeFormatDate(dynamic dateVal) {
-        if (dateVal == null || dateVal.toString().trim().isEmpty) return null;
-        String val = dateVal.toString().trim().split(' ')[0];
-        try {
-          if (val.contains('-')) {
-             return DateFormat('yyyy-MM-dd').format(DateTime.parse(val));
-          } else {
-             return DateFormat('yyyy-MM-dd').format(DateFormat('dd/MM/yyyy').parse(val));
-          }
-        } catch (e) {
-          return null; // fallback gracefully
+      int idOf(List<dynamic> list, String name) {
+        for (final e in list) {
+          if (e.AccountName == name) return e.Id as int;
         }
+        return 0;
       }
 
-      final saleDetails = _planningItems.map((d) {
-        // find truck id
-        int truckId = 0;
-        final truckList = AppGlobals.GetTruckList;
-        for (var t in truckList) {
-          if (t.AccountName == d['truck']) {
-            truckId = t.Id;
-            break;
-          }
-        }
-        
-        // find driver id
-        int driverId = 0;
-        final driverList = AppGlobals.GetDriverList;
-        for (var dr in driverList) {
-          if (dr.AccountName == d['driver']) {
-            driverId = dr.Id;
-            break;
-          }
-        }
-
-        return {
-          'Id': d['detailId'] ?? 0,
-          'SortByD': d['SortByD'] ?? 0,
-          'SaleOrderMasterRefId': d['saleOrderId'] ?? 0,
-          'JobNo': d['jobNo'] ?? '',
-          'JobDate': '',
-          'TruckName': d['truck'] ?? '',
-          'TruckRefid': truckId,
-          'DriverName': d['driver'] ?? '',
-          'DriverRefId': driverId,
-          'SPickupDate': safeFormatDate(d['pDate']),
-          'SDeliveryDate': safeFormatDate(d['dDate']),
-          'PickupDateD': safeFormatDate(d['pDate']),
-          'DeliveryDateD': safeFormatDate(d['dDate']),
-          'CustomerName': d['customer'] ?? '',
-          'Origin': d['origin'] ?? '',
-          'Destination': d['destination'] ?? '',
-          'OriginD': d['origin'] ?? '',
-          'DestinationD': d['destination'] ?? '',
-          'PickupAddress': '',
-          'DeliveryAddress': '',
-          'SWareHouseEnterDate': safeFormatDate(d['wEnterDate']),
-          'SWareHouseExitDate': safeFormatDate(d['wExitDate']),
-          'WareHouseAddress': d['wAddress'] ?? '',
-          'VesselName': '',
-          'OffVesselName': '',
-          'pkg': '',
-          'EmployeeName': '',
-          'truckSize': '',
-          'Package': '',
-          'Weight': '',
-          'Remarks': d['remarks'] ?? _remarksCtrl.text,
-          'PickupsList': [],
-          'DeliveriesList': [],
-        };
-      }).toList();
-
-      final payload = [{
-        'Id': _editMasterId ?? 0,
-        'CompanyRefId': AppGlobals.Comid,
-        'UserRefId': null,
-        'EmployeeRefId': null,
-        'SaleDate': safeFormatDate(_planDate) ?? DateFormat('yyyy-MM-dd').format(DateTime.now()),
-        'FDate': safeFormatDate(_planDate) ?? DateFormat('yyyy-MM-dd').format(DateTime.now()),
-        'TDate': safeFormatDate(_planDate) ?? DateFormat('yyyy-MM-dd').format(DateTime.now()),
-          'CNumberDisplay': "0",
-          'CNumber': 0,
-          'Remarks': _remarksCtrl.text,
-          'SaleDetails': saleDetails
-        }];
-
-      Map<String, String> header = {'Content-Type': 'application/json; charset=UTF-8', 'Comid': AppGlobals.Comid.toString()};
-      
-      final payloadJson = jsonEncode(payload);
-      debugPrint('=== PLANNING API PAYLOAD ===');
-      debugPrint(payloadJson);
-      
-      final resultData = await sl<LegacyApiRepository>().apiAllinone(
-          "${ApiConstants.port}/api/PlanningApp/InsertPLANING", payloadJson, header, null);
-
-
-      print("\n=== PLANINGSearch Payload ===");
-      print("URL: ${resultData}");
-      print("Body: $payload");
-      print("============================\n");
-      
-      if (resultData != null && resultData.toString().isNotEmpty) {
-        msgshow(_editMasterId != null ? 'Planning Updated Successfully' : 'Planning Saved Successfully', "", Colors.white, Colors.green, null, null, null, null, context, 0);
-        setState(() {
-           _editMasterId = null;
-           _planningItems.clear();
-           _remarksCtrl.clear();
-        });
-      } else {
-        msgshow('Failed to save planning', "", Colors.white, Colors.red, null, null, null, null, context, 0);
-      }
+      final saved = await sl<PlanningApi>().save(planningSaveBody(
+        id: _editMasterId ?? 0,
+        companyId: AppGlobals.Comid,
+        planNo: _planNoCtrl.text,
+        planDate: _planDate,
+        fromDate: _pickupDate,
+        toDate: _toDate,
+        remarks: _remarksCtrl.text,
+        lines: _planningItems,
+        truckId: (name) => idOf(AppGlobals.GetTruckList, name),
+        driverId: (name) => idOf(AppGlobals.GetDriverList, name),
+        employeeId: AppGlobals.EmpRefId,
+        search: _searchCtrl.text,
+      ));
+      if (!mounted) return;
+      msgshow('${_editMasterId != null ? 'Planning Updated' : 'Planning Saved'} ${saved['name'] ?? ''}'.trim(), "", Colors.white, Colors.green, null, null, null, null, context, 0);
+      setState(() {
+        _editMasterId = null;
+        _planningItems.clear();
+        _remarksCtrl.clear();
+      });
+      _fetchMaxPlaningNo();
     } catch (e) {
-      msgshow("Error: $e", "", Colors.white, Colors.red, null, null, null, null, context, 0);
+      if (mounted) msgshow(e.toString(), "", Colors.white, Colors.red, null, null, null, null, context, 0);
     } finally {
       if (mounted) setState(() => _isLoading = false);
     }
@@ -1186,12 +1083,10 @@ class _AddPlanningPageState extends State<AddPlanningPage> {
     setState(() => _isLoading = true);
     
     try {
-      final repo = sl<PlanningRepository>();
-      final result = await repo.searchUnplannedOrders(
-        DateFormat('yyyy-MM-dd').format(DateFormat('dd/MM/yyyy').parse(_pickupDate)),
-        DateFormat('yyyy-MM-dd').format(DateFormat('dd/MM/yyyy').parse(_toDate)),
-        _searchCtrl.text,
-        0,
+      final result = await sl<PlanningApi>().searchJobs(
+        from: DateFormat('dd/MM/yyyy').parse(_pickupDate),
+        to: DateFormat('dd/MM/yyyy').parse(_toDate),
+        ports: _searchCtrl.text,
       );
       
       setState(() {
@@ -1213,47 +1108,80 @@ class _AddPlanningPageState extends State<AddPlanningPage> {
           });
         }
       });
-    } catch (e) {
-      if (e.toString().contains('500')) {
+      if (result.isEmpty && mounted) {
         ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("No unplanned records found for the selected criteria.")));
-        setState(() => _planningItems.clear());
-      } else {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Error: $e")));
       }
+    } catch (e) {
+      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(e.toString())));
     } finally {
-      setState(() => _isLoading = false);
+      if (mounted) setState(() => _isLoading = false);
     }
   }
 
 
 
-  void _loadForEdit(Map<String, dynamic> master, List<dynamic> details) {
-    setState(() {
-      _editMasterId = master['Id'];
-      _planNoCtrl.text = master['PLANINGNoDisplay'] ?? '';
-      _remarksCtrl.text = master['Remarks'] ?? '';
-      _planDate = master['PLANINGDate'] ?? DateFormat('dd/MM/yyyy').format(DateTime.now());
-      
-      _planningItems.clear();
-      for (var d in details) {
-        _planningItems.add(<String, dynamic>{
-          'detailId': d['Id'] ?? 0,
-          'truck': d['TruckName'] ?? '',
-          'driver': d['DriverName'] ?? '',
-          'pDate': d['pickupdate'] ?? _pickupDate,
-          'dDate': d['deliverydate'] ?? _toDate,
-          'origin': d['Origin'] ?? '',
-          'destination': d['Destination'] ?? '',
-          'customer': d['CustomerName'] ?? '',
+  /// Opens the saved plan [id] in the form, read with the Java edit (`SaleDetails` in saved order).
+  Future<void> _loadForEdit(int id) async {
+    try {
+      final plan = await sl<PlanningApi>().edit(id);
+      String day(dynamic v) {
+        final d = planDateOf('${v ?? ''}');
+        return d == null ? '' : DateFormat('dd/MM/yyyy').format(d);
+      }
+      String at(dynamic v, String fallback) {
+        final d = planDateOf('${v ?? ''}');
+        return d == null ? fallback : DateFormat('dd/MM/yyyy').format(d);
+      }
+      if (!mounted) return;
+      setState(() {
+        _editMasterId = JsonRead.integer(plan['Id']);
+        _planNoCtrl.text = '${plan['CNumberDisplay'] ?? ''}';
+        _remarksCtrl.text = '${plan['Remarks'] ?? ''}';
+        _planDate = at(plan['SaleDate'], DateFormat('dd/MM/yyyy').format(DateTime.now()));
+        _planningItems.clear();
+        for (final d in JsonRead.listOfMaps(plan['SaleDetails'])) {
+          _planningItems.add(<String, dynamic>{
+            'detailId': d['Id'] ?? 0,
+            'SortByD': d['SortBy'] ?? 0,
+            'truck': d['TruckName'] ?? '',
+            'driver': d['DriverName'] ?? '',
+            'pDate': at(d['PickupDateD'] ?? d['SPickupDate'], _pickupDate),
+            'dDate': at(d['DeliveryDateD'] ?? d['SDeliveryDate'], _toDate),
+            'origin': d['OriginD'] ?? d['Origin'] ?? '',
+            'destination': d['DestinationD'] ?? d['Destination'] ?? '',
+            'customer': d['CustomerName'] ?? '',
             'jobNo': d['JobNo'] ?? '',
             'saleOrderId': d['SaleOrderMasterRefId'] ?? 0,
-            'wEnterDate': d['SWareHouseEnterDate']?.toString() ?? '',
-            'wExitDate': d['SWareHouseExitDate']?.toString() ?? '',
+            'remarks': d['Remarks'] ?? '',
+            'wEnterDate': day(d['SWareHouseEnterDate']),
+            'wExitDate': day(d['SWareHouseExitDate']),
             'wAddress': d['WareHouseAddress']?.toString() ?? '',
           });
-      }
-    });
-    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Planning loaded for edit")));
+        }
+      });
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Planning loaded for edit")));
+    } catch (e) {
+      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(e.toString())));
+    }
+  }
+
+  Future<void> _openPlanPdf(int id) async {
+    try {
+      SystemHelpers.launchInBrowser(javaReportUrl(await sl<PlanningApi>().reportPath(id)));
+    } catch (e) {
+      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(e.toString())));
+    }
+  }
+
+  /// A row of a saved plan opens the job's update window with the job's current dates and stops.
+  Future<void> _updateSavedRow(int planId, int saleOrderId) async {
+    try {
+      final rows = JsonRead.listOfMaps((await sl<PlanningApi>().edit(planId))['SaleDetails']);
+      final row = rows.firstWhere((r) => JsonRead.integer(r['SaleOrderMasterRefId']) == saleOrderId, orElse: () => const {});
+      if (row.isNotEmpty && mounted) _showSOUpdateFromSearch(row);
+    } catch (e) {
+      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(e.toString())));
+    }
   }
 
   Future<void> _showSavedPlanningsView() async {
@@ -1270,24 +1198,21 @@ class _AddPlanningPageState extends State<AddPlanningPage> {
     Future<void> fetchPlannings(StateSetter setSheetState) async {
       setSheetState(() => sheetIsLoading = true);
       try {
-        final f = DateFormat('yyyy-MM-dd').format(DateFormat('dd/MM/yyyy').parse(sheetFDate));
-        final t = DateFormat('yyyy-MM-dd').format(DateFormat('dd/MM/yyyy').parse(sheetTDate));
-        
-        int reqEmpId = isLEmp ? (AppGlobals.EmpRefId ?? 0) : selectedEmpId;
-        
-        final resultData = await sl<PlanningRepository>().getPlanning(f, t, sheetSearchCtrl.text, reqEmpId);
+        final reqEmpId = isLEmp ? AppGlobals.EmpRefId : selectedEmpId;
+        final plans = await sl<PlanningApi>().list(
+          from: DateFormat('dd/MM/yyyy').parse(sheetFDate),
+          to: DateFormat('dd/MM/yyyy').parse(sheetTDate),
+          search: sheetSearchCtrl.text,
+          employeeId: reqEmpId,
+        );
         setSheetState(() {
-          if (resultData.isNotEmpty) {
-            masterList = resultData[0]["salemaster"] ?? [];
-            detailsList = resultData[0]["saledetails"] ?? [];
-          } else {
-            masterList = [];
-            detailsList = [];
-          }
+          masterList = plans.masters;
+          detailsList = plans.details;
           sheetIsLoading = false;
         });
       } catch (e) {
         setSheetState(() => sheetIsLoading = false);
+        if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(e.toString())));
       }
     }
 
@@ -1533,22 +1458,14 @@ class _AddPlanningPageState extends State<AddPlanningPage> {
                                             icon: const Icon(Icons.edit, color: colour.kCobalt, size: 20),
                                             onPressed: () {
                                               Navigator.pop(ctx);
-                                              _loadForEdit(m, relatedDetails);
+                                              _loadForEdit(JsonRead.integer(mId));
                                             },
                                           ),
                                           IconButton(
                                             constraints: const BoxConstraints(),
                                             padding: EdgeInsets.zero,
                                             icon: const Icon(Icons.picture_as_pdf, color: Colors.red, size: 20),
-                                            onPressed: () {
-                                            },
-                                          ),
-                                          IconButton(
-                                            constraints: const BoxConstraints(),
-                                            padding: EdgeInsets.zero,
-                                            icon: const Icon(Icons.table_chart, color: Colors.green, size: 20),
-                                            onPressed: () {
-                                            },
+                                            onPressed: () => _openPlanPdf(JsonRead.integer(mId)),
                                           ),
                                         ],
                                       ),
@@ -1579,7 +1496,8 @@ class _AddPlanningPageState extends State<AddPlanningPage> {
                                             rows: relatedDetails.map((d) {
                                               final dMap = d is Map<String, dynamic> ? d : <String, dynamic>{};
                                               return DataRow(
-                                                onSelectChanged: (_) => _showSOUpdateFromSearch(dMap),
+                                                onSelectChanged: (_) => _updateSavedRow(
+                                                    JsonRead.integer(mId), JsonRead.integer(dMap['SaleOrderMasterRefId'])),
                                                 cells: [
                                                 DataCell(Text(dMap['JobNo'] ?? '', style: const TextStyle(fontSize: 12, color: colour.brand, fontWeight: FontWeight.w500))),
                                                 DataCell(Text(dMap['JobDate'] ?? '', style: const TextStyle(fontSize: 12))),

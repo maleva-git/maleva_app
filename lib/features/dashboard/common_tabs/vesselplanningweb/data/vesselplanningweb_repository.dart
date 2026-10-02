@@ -1,10 +1,24 @@
-import 'package:maleva/core/network/api_constants.dart';
-import '../../../../../core/utils/app_globals.dart';
-import '../../../../../core/network/api_client.dart';
+import 'package:maleva/core/di/injection.dart';
+import 'package:maleva/core/network/java_report.dart';
+import 'package:maleva/core/planning/vessel_planning_api.dart';
+import 'package:maleva/core/sale_order/sale_order_api.dart';
+import 'package:maleva/core/utils/json_read.dart';
 import '../models/vesselplanningweb_model.dart';
-import 'package:maleva/core/models/shared/response_view_model.dart';
 
+/// Vessel Planning (web) on the shared Java APIs the web uses: `/api/vessel-plannings` for the
+/// plans, `/api/vessel-plannings/sale-order-update` for a job's update. A refusal is thrown with
+/// the server's message (the .NET calls reported "Success" on any failure).
 class VesselPlanningWebRepository {
+  VesselPlanningWebRepository({VesselPlanningApi? api, SaleOrderApi? saleOrders})
+      : _api = api,
+        _saleOrderApi = saleOrders;
+
+  final VesselPlanningApi? _api;
+  final SaleOrderApi? _saleOrderApi;
+  VesselPlanningApi get _plans => _api ?? sl<VesselPlanningApi>();
+  SaleOrderApi get _saleOrders => _saleOrderApi ?? sl<SaleOrderApi>();
+
+  /// Jobs to plan. [etaType] as the screen: 1 off-vessel ETA, 2 loading ETA, 3 either.
   Future<List<VesselPlanningWebModel>> getVesselPlanningSearch({
     required String fromDate,
     required String toDate,
@@ -12,261 +26,99 @@ class VesselPlanningWebRepository {
     required String searchPorts,
     required bool deliveryDone,
     required int employeeId,
-  }) async {
-    final Map<String, dynamic> requestBody = {
-      "Comid": AppGlobals.Comid,
-      "Fromdate": fromDate,
-      "Todate": toDate,
-      "ETAType": etaType,
-      "Search": searchPorts,
-      "DeliveryDone": deliveryDone,
-      "Employeeid": employeeId,
-    };
+  }) async =>
+      [
+        for (final row in await _plans.searchJobs(
+          from: DateTime.parse(fromDate),
+          to: DateTime.parse(toDate),
+          etaType: etaType == 1 || etaType == 2 ? etaType : 0,
+          ports: searchPorts,
+          hideDelivered: deliveryDone,
+          employeeId: employeeId,
+        ))
+          VesselPlanningWebModel.fromJson(row),
+      ];
 
-    try {
-      final jsonResponse = await ApiClient.postRequest(
-        ApiConstants.apiVesselPlanningSearch,
-        requestBody,
-        headers: {'Comid': AppGlobals.Comid.toString()},
-      );
-
-      if (jsonResponse is List) {
-        return jsonResponse.map((json) => VesselPlanningWebModel.fromJson(json)).toList();
-      } else if (jsonResponse is Map<String, dynamic>) {
-        if (jsonResponse['ok'] == true && jsonResponse['Data'] != null) {
-          List<dynamic> data = jsonResponse['Data'];
-          return data.map((json) => VesselPlanningWebModel.fromJson(json)).toList();
-        } else {
-          final msg = (jsonResponse['message'] ?? '').toString().toLowerCase();
-          if (msg.contains('not found') || msg.contains('no data')) {
-            return [];
-          }
-          throw Exception(jsonResponse['message'] ?? 'Failed to load data');
-        }
-      }
-      return [];
-    } catch (e) {
-      final errorMsg = e.toString().toLowerCase();
-      if (errorMsg.contains('404') || errorMsg.contains('500') || errorMsg.contains('server error')) {
-        return [];
-      }
-      rethrow;
-    }
+  /// The update window's fields (`saleOrderId`, `ptw`, `cargo`, `eta`..`oetd`, `loadingOfficers`,
+  /// `offOfficers`); answers the server's message.
+  Future<String> updateSpecificJob(Map<String, dynamic> u) async {
+    List<int> ids(dynamic l) => [for (final v in (l as List? ?? const [])) JsonRead.integer(v)];
+    final saved = await _saleOrders.vesselUpdate(
+      JsonRead.integer(u['saleOrderId']),
+      ptw: u['ptw'] as String?,
+      cargo: u['cargo'] as String?,
+      eta: u['eta'] as String?,
+      etb: u['etb'] as String?,
+      etd: u['etd'] as String?,
+      oeta: u['oeta'] as String?,
+      oetb: u['oetb'] as String?,
+      oetd: u['oetd'] as String?,
+      loadingOfficers: ids(u['loadingOfficers']),
+      offOfficers: ids(u['offOfficers']),
+    );
+    return JsonRead.stringOrNull(saved['message']) ?? 'Updated';
   }
 
-  Future<String> updateSpecificJob(Map<String, dynamic> updateData) async {
-    try {
-      final jsonResponse = await ApiClient.postRequest(
-        ApiConstants.apiUpdateSaleOrderSpecific,
-        updateData,
-        headers: {'Comid': AppGlobals.Comid.toString()},
-      );
-
-      if (jsonResponse is Map<String, dynamic>) {
-        if (jsonResponse['ok'] == true || jsonResponse['status'] == 'success') {
-          return jsonResponse['message'] ?? 'Success';
-        } else if (jsonResponse.containsKey('ok') && jsonResponse['ok'] == false) {
-          throw Exception(jsonResponse['message'] ?? 'Failed to update');
-        }
-      }
-      return 'Success';
-    } catch (e) {
-      if (e.toString().contains('Failed to update')) rethrow;
-      return 'Success';
-    }
-  }
-
-  Future<String> saveVesselPlanning(List<Map<String, dynamic>> planningList) async {
-    try {
-      final jsonResponse = await ApiClient.postRequest(
-        ApiConstants.apiInsertVesselPlanning,
-        planningList,
-        headers: {'Comid': AppGlobals.Comid.toString()},
-      );
-
-      if (jsonResponse is Map<String, dynamic>) {
-        if (jsonResponse['ok'] == true || jsonResponse['status'] == 'success') {
-          return jsonResponse['message'] ?? 'Success';
-        } else if (jsonResponse.containsKey('ok') && jsonResponse['ok'] == false) {
-          throw Exception(jsonResponse['message'] ?? 'Failed to save');
-        }
-      }
-      return 'Success';
-    } catch (e) {
-      if (e.toString().contains('Failed to save')) rethrow;
-      return 'Success';
-    }
-  }
-
-  Future<String> deleteVesselPlanning(int id) async {
-    final Map<String, dynamic> requestBody = {
-      "Id": id,
-      "Comid": AppGlobals.Comid,
-    };
-
-    try {
-      final jsonResponse = await ApiClient.postRequest(
-        '${ApiConstants.apiDeleteVesselPlanning}$id&Comid=${AppGlobals.Comid}',
-        requestBody,
-        headers: {'Comid': AppGlobals.Comid.toString()},
-      );
-
-      if (jsonResponse is Map<String, dynamic>) {
-        if (jsonResponse['ok'] == true || jsonResponse['status'] == 'success') {
-          return jsonResponse['message'] ?? 'Success';
-        } else if (jsonResponse.containsKey('ok') && jsonResponse['ok'] == false) {
-          throw Exception(jsonResponse['message'] ?? 'Failed to save');
-        }
-      }
-      return 'Success';
-    } catch (e) {
-      if (e.toString().contains('Failed to save')) rethrow;
-      return 'Success';
-    }
-  }
-
-  Future<List<dynamic>> getSavedPlannings({
-    required String fromDate,
-    required String toDate,
+  /// Saves the plan with the jobs in order; answers `{ok, message, name (plan number), id}`.
+  Future<Map<String, dynamic>> saveVesselPlanning({
+    required int id,
+    required DateTime from,
+    required DateTime to,
+    required DateTime planDate,
+    required List<int> saleOrderIds,
+    required String remarks,
     required String search,
     required int employeeId,
-  }) async {
-    final Map<String, dynamic> requestBody = {
-      "Comid": AppGlobals.Comid,
-      "Fromdate": fromDate,
-      "Todate": toDate,
-      "Search": search,
-      "Employeeid": employeeId,
-    };
-
-    try {
-      final jsonResponse = await ApiClient.postRequest(
-        ApiConstants.apiSelectVesselPlanning,
-        requestBody,
-        headers: {'Comid': AppGlobals.Comid.toString()},
+  }) =>
+      _plans.save(
+        id: id,
+        from: from,
+        to: to,
+        planDate: planDate,
+        saleOrderIds: saleOrderIds,
+        remarks: remarks,
+        search: search,
+        employeeId: employeeId,
       );
 
-      List<dynamic> extractEnrichedMaster(dynamic firstObj) {
-        if (firstObj is Map && firstObj['salemaster'] != null) {
-          List<dynamic> masters = firstObj['salemaster'];
-          List<dynamic> details = firstObj['saledetails'] ?? [];
-          for (var m in masters) {
-            m['saledetails'] = details.where((d) => d['VESSELPLANINGMasterRefId'] == m['Id']).toList();
-          }
-          return masters;
-        }
-        return [];
-      }
-
-      if (jsonResponse is List) {
-        if (jsonResponse.isNotEmpty) {
-          final firstObj = jsonResponse[0];
-          final masters = extractEnrichedMaster(firstObj);
-          if (masters.isNotEmpty) return masters;
-        }
-        return jsonResponse;
-      } else if (jsonResponse is Map<String, dynamic>) {
-        if (jsonResponse['Data1'] != null) {
-          final data1 = jsonResponse['Data1'];
-          if (data1 is List && data1.isNotEmpty) {
-            final firstObj = data1[0];
-            final masters = extractEnrichedMaster(firstObj);
-            if (masters.isNotEmpty) return masters;
-          }
-        }
-        if (jsonResponse['Data'] != null) {
-          return jsonResponse['Data'];
-        }
-      }
-      return [];
-    } catch (e) {
-      final errorMsg = e.toString().toLowerCase();
-      if (errorMsg.contains('404') || errorMsg.contains('500') || errorMsg.contains('server error')) {
-        return [];
-      }
-      rethrow;
-    }
+  Future<String> deleteVesselPlanning(int id) async {
+    await _plans.delete(id);
+    return 'Vessel planning deleted';
   }
 
+  /// Saved plans in the range (yyyy-MM-dd), each with its job rows under `saledetails`.
+  Future<List<Map<String, dynamic>>> getSavedPlannings({
+    required String fromDate,
+    required String toDate,
+    String search = '',
+    int employeeId = 0,
+  }) async {
+    final plans = await _plans.list(
+        from: DateTime.parse(fromDate), to: DateTime.parse(toDate), search: search, employeeId: employeeId);
+    return [
+      for (final m in plans.masters)
+        {
+          ...m,
+          'saledetails': [
+            for (final d in plans.details)
+              if (JsonRead.integer(d['VESSELPLANINGMasterRefId']) == JsonRead.integer(m['Id'])) d
+          ],
+        },
+    ];
+  }
+
+  /// One plan: `master` (`Id`, `CNumberDisplay`, `SaleDate`, `SFDate`, `STDate`, `Remarks`,
+  /// `Search`, `EmployeeRefId`) and its job rows `details`.
   Future<Map<String, dynamic>> getPlanningById(int id) async {
-    try {
-      final jsonResponse = await ApiClient.postRequest(
-        '${ApiConstants.apiEditVesselPlanning}$id&VESSELPLANINGNo=0&Comid=${AppGlobals.Comid}',
-        null,
-        headers: {'Comid': AppGlobals.Comid.toString()},
-      );
-
-      Map<String, dynamic>? masterData;
-      List<dynamic> data = [];
-      
-      if (jsonResponse is List) {
-        if (jsonResponse.isNotEmpty && jsonResponse[0] is Map) {
-          masterData = jsonResponse[0] as Map<String, dynamic>;
-          if (masterData['SaleDetails'] != null) {
-            data = masterData['SaleDetails'];
-          }
-        } else {
-          data = jsonResponse;
-        }
-      } else if (jsonResponse is Map<String, dynamic>) {
-        if (jsonResponse['Data1'] != null) {
-          final data1 = jsonResponse['Data1'];
-          if (data1 is List && data1.isNotEmpty && data1[0] is Map) {
-            masterData = data1[0] as Map<String, dynamic>;
-            if (masterData['SaleDetails'] != null) {
-              data = masterData['SaleDetails'];
-            }
-          }
-        } else {
-          masterData = jsonResponse;
-          if (jsonResponse['SaleDetails'] != null) {
-            data = jsonResponse['SaleDetails'];
-          } else if (jsonResponse['Data'] != null) {
-            data = jsonResponse['Data'];
-          }
-        }
-      }
-      return {
-        'master': masterData,
-        'details': data.map((json) => VesselPlanningWebModel.fromJson(json)).toList()
-      };
-    } catch (e) {
-      throw Exception('Server Error: ${e.toString()}');
-    }
-  }
-
-  Future<String> getMaxVesselPlanningNo() async {
-    try {
-      final comId = AppGlobals.storagenew.getInt('Comid') ?? 0;
-      final url = '${ApiConstants.apiMaxVesselPlanningNo}?Comid=$comId&BillType=VP';
-      final jsonResponse = await ApiClient.postRequest(url, null);
-      
-      if (jsonResponse != null && jsonResponse['ok'] == true && jsonResponse['No'] != null) {
-        return jsonResponse['No'].toString();
-      }
-    } catch (e) {
-      // ignore
-    }
-    return "";
-  }
-
-  Future<String?> fetchVesselPlanningPdfUrl({
-    required int soId,
-    required String planningNo,
-  }) async {
-    final Map<String, dynamic> body = {
-      'SoId': soId,
-      'Comid': AppGlobals.Comid,
+    final plan = await _plans.edit(id);
+    return {
+      'master': plan,
+      'details': [for (final row in JsonRead.listOfMaps(plan['SaleDetails'])) VesselPlanningWebModel.fromJson(row)],
     };
-
-    final result = await ApiClient.postRequest("${ApiConstants.apiViewVesselPlanningPdf}$planningNo", body);
-
-    if (result != null && result.toString().isNotEmpty) {
-      ResponseViewModel value = ResponseViewModel.fromJson(result);
-      if (value.IsSuccess == true) {
-        return value.data1;
-      }
-    }
-    return null;
   }
+
+  Future<String> getMaxVesselPlanningNo() => _plans.nextNumber();
+
+  /// The plan's report link (public for a few minutes).
+  Future<String> fetchVesselPlanningPdfUrl({required int soId}) async => javaReportUrl(await _plans.reportPath(soId));
 }

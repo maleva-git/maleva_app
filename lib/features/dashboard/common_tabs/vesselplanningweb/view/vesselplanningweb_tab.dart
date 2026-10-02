@@ -11,7 +11,6 @@ import 'package:flutter_spinkit/flutter_spinkit.dart';
 import '../../../../../core/theme/tokens.dart';
 import '../../../../../core/models/model.dart';
 import '../../../../../core/utils/app_globals.dart';
-import '../../../../../core/utils/app_preferences.dart';
 import '../../../../mastersearch/Port.dart';
 import '../../../../mastersearch/Employee.dart';
 
@@ -173,50 +172,30 @@ class _VesselPlanningWebViewState extends State<VesselPlanningWebView> {
     }
   }
 
+  /// A saved plan opened from the saved list: the Java edit's master (`Id`, `CNumberDisplay`,
+  /// `SaleDate`, `SFDate`, `STDate` yyyy-MM-dd, `Remarks`, `Search`, `EmployeeRefId`) over the
+  /// list row.
   void _populateMasterData(Map<String, dynamic> masterData) {
+    DateTime? day(dynamic v) => DateTime.tryParse('${v ?? ''}'.split('T').first);
     setState(() {
-      _currentMasterId = masterData['Id'] ?? 0;
-      _planningNoCtrl.text = masterData['VESSELPLANINGNoDisplay'] ??
-          masterData['VESSELPLANINGNo'] ??
-          masterData['CNumberDisplay'] ??
-          '';
-      _remarksCtrl.text = masterData['Remarks'] ?? '';
+      _currentMasterId = (masterData['Id'] as num?)?.toInt() ?? 0;
+      _planningNoCtrl.text = '${masterData['CNumberDisplay'] ?? masterData['VESSELPLANINGNoDisplay'] ?? ''}';
+      _remarksCtrl.text = '${masterData['Remarks'] ?? ''}';
 
-      if (masterData['PortName'] != null) {
-        _portStringController.text = masterData['PortName'].toString();
-      }
-      
-      if (masterData['Search'] != null && masterData['Search'].toString().isNotEmpty) {
-        _portStringController.text = masterData['Search'].toString();
-        _searchCtrl.text = masterData['Search'].toString();
-        _searchQuery = _searchCtrl.text;
+      final search = '${masterData['Search'] ?? ''}';
+      if (search.isNotEmpty) {
+        _portStringController.text = search;
       }
 
-      final empId = masterData['EmployeeId'] ?? masterData['EmployeeRefId'];
-      final empName = masterData['EmployeeName'] ?? masterData['AccountName'] ?? 'Employee';
-      if (empId != null || masterData['EmployeeName'] != null || masterData['AccountName'] != null) {
-        _selectedEmployee = EmployeeModel(empId ?? 0, empName, '');
-      }
+      final empId = (masterData['EmployeeRefId'] as num?)?.toInt() ?? 0;
+      _selectedEmployee = empId > 0 ? EmployeeModel(empId, '${masterData['EmployeeName'] ?? 'Employee $empId'}', '') : null;
 
-      try {
-        final dateRaw = masterData['VESSELPLANINGDate'] ?? masterData['Pdate'] ?? masterData['SaleDate'];
-        if (dateRaw != null && dateRaw.toString().isNotEmpty) {
-          _planningDate = DateTime.parse(dateRaw.toString().split('T')[0]);
-        }
+      _planningDate = day(masterData['SaleDate']) ?? _planningDate;
+      _etaDate = day(masterData['SFDate']) ?? _etaDate;
+      _toDate = day(masterData['STDate']) ?? _toDate;
 
-        final etaDateRaw = masterData['ETADate'] ?? masterData['FDate'];
-        if (etaDateRaw != null && etaDateRaw.toString().isNotEmpty) {
-          _etaDate = DateTime.parse(etaDateRaw.toString().split('T')[0]);
-        }
-
-        final toDateRaw = masterData['ToDate'] ?? masterData['TDate'];
-        if (toDateRaw != null && toDateRaw.toString().isNotEmpty) {
-          _toDate = DateTime.parse(toDateRaw.toString().split('T')[0]);
-        }
-      } catch (e, stack) { debugPrint("Error caught globally: $e\n$stack"); }
-
-      // Reset master filter toggles since backend doesn't store them for saved plannings
-      _etaType = 3; 
+      // the filter toggles are not stored with a plan
+      _etaType = 3;
       _deliveryDone = false;
     });
   }
@@ -259,111 +238,18 @@ class _VesselPlanningWebViewState extends State<VesselPlanningWebView> {
       return;
     }
 
-    const String defaultDate = "1900-01-01T00:00:00";
-    final planningList = [
-      {
-        "Id": _currentMasterId,
-        "SDId": 0,
-        "CompanyRefId": AppGlobals.Comid,
-        "UserRefId": int.tryParse(AppPreferences.getUserId()) ?? (AppGlobals.Comid == 0 ? null : AppGlobals.Comid),
-        "EmployeeRefId": _selectedEmployee?.Id ?? (AppGlobals.EmpRefId == 0 ? null : AppGlobals.EmpRefId),
-        "FDate": _etaDate.toIso8601String(),
-        "TDate": _toDate.toIso8601String(),
-        "SFDate": "",
-        "STDate": "",
-        "SaleDate": _planningDate.toIso8601String(),
-        "SSaleDate": "",
-        "CNumberDisplay": _planningNoCtrl.text.isEmpty ? "NEW" : _planningNoCtrl.text,
-        "CNumber": 0,
-        "Remarks": _remarksCtrl.text,
-        "Active": 0,
-        "Created_Date": defaultDate,
-        "Created_By": "",
-        "Modified_Date": defaultDate,
-        "Modified_By": "",
-        "SaleDetails": checkedItems
-            .map((e) => {
-                  "Id": 0,
-                  "SDId": 0,
-                  "VESSELPLANINGMasterRefId": _currentMasterId,
-                  "SaleOrderMasterRefId": e.saleOrderMasterRefId,
-                  "Origin": e.origin,
-                  "Destination": e.destination,
-                  "JobNo": e.jobNo,
-                  "JobDate": e.jobDate,
-                  "JobStatus": e.jobStatus,
-                  "SortBy": e.sortBy,
-                  "SCN": e.scn,
-                  "LScn": e.lscn,
-                  "VesselType": "",
-                  "DETA": defaultDate,
-                  "ETA": defaultDate,
-                  "SETA": "",
-                  "ETB": defaultDate,
-                  "SETB": "",
-                  "ETD": defaultDate,
-                  "SETD": "",
-                  "OETA": defaultDate,
-                  "SOETA": "",
-                  "OETB": defaultDate,
-                  "SOETB": "",
-                  "OETD": defaultDate,
-                  "SOETD": "",
-                  "PickupDate": "",
-                  "SPickupDate": "",
-                  "DeliveryDate": "",
-                  "SDeliveryDate": "",
-                  "WareHouseEnterDate": "",
-                  "SWareHouseEnterDate": "",
-                  "SWareHouseExitDate": "",
-                  "WareHouseExitDate": "",
-                  "WareHouseAddress": "",
-                  "pkg": e.pkg,
-                  "Loadingvesselname": e.loadingvesselname,
-                  "BLCopy": e.blCopy,
-                  "TruckSize": e.truckSize,
-                  "OSCN": "",
-                  "Offvesselname": e.offvesselname,
-                  "Commodity": e.commodity,
-                  "Vessel": e.vessel,
-                  "OVessel": e.oVessel,
-                  "SPort": e.sPort,
-                  "OPort": e.oPort,
-                  "Port": "",
-                  "JobName": e.jobName,
-                  "AWBNo": e.awbNo,
-                  "Remarks1": e.remarks1,
-                  "PTW": e.ptw,
-                  "ZB": e.zb,
-                  "ZB2": e.zb2,
-                  "ZBRef": e.zbRef,
-                  "ZBRef2": e.zbRef2,
-                  "PortCharges": 0.0,
-                  "PortChargesRef": e.portChargesRef,
-                  "AgentCompany": "",
-                  "OAgentCompany": "",
-                  "AgentName": e.agentName,
-                  "AgentPhone": e.agentPhone,
-                  "OAgentName": e.oAgentName,
-                  "OAgentPhone": e.oAgentPhone,
-                  "BoardingOfficerRefid": 0,
-                  "BoardingOfficerName": "",
-                  "BoardingOfficer1Refid": 0,
-                  "BoardingOfficerName1": "",
-                  "BoardingAmount": 0.0,
-                  "BoardingAmount1": 0.0,
-                  "CustomerName": e.customerName,
-                  "EmployeeName": e.employeeName,
-                  "Remarks": "Added via Vessel Planning Mobile",
-                  "Cargo": e.cargo
-                })
-            .toList()
-      }
-    ];
-
-    context
-        .read<VesselPlanningWebBloc>()
-        .add(SaveVesselPlanningEvent(planningList: planningList));
+    // the jobs in the grid's order (SortBy); the server keeps the plan's rows in this order
+    final ordered = List<VesselPlanningWebModel>.from(checkedItems)..sort((x, y) => x.sortBy.compareTo(y.sortBy));
+    context.read<VesselPlanningWebBloc>().add(SaveVesselPlanningEvent(
+          id: _currentMasterId,
+          from: _etaDate,
+          to: _toDate,
+          planDate: _planningDate,
+          saleOrderIds: [for (final e in ordered) e.saleOrderMasterRefId],
+          remarks: _remarksCtrl.text,
+          search: _portStringController.text,
+          employeeId: _selectedEmployee?.Id ?? AppGlobals.EmpRefId,
+        ));
   }
 
   void _deletePlanning() async {
@@ -410,9 +296,8 @@ class _VesselPlanningWebViewState extends State<VesselPlanningWebView> {
           context.read<VesselPlanningWebBloc>().add(
                 UpdateSpecificJobEvent(
                   updateData: updateData,
-                  onSuccess: () {
-                    msgshow('Success', ' Job ${jobData.jobNo} updated successfully!', Colors.white, AppTokens.statusSuccess, null, 14, null, null, context, 2);
-                  },
+                  // show the job as saved: search again
+                  onSuccess: _doSearch,
                 ),
               );
         },
@@ -470,7 +355,13 @@ class _VesselPlanningWebViewState extends State<VesselPlanningWebView> {
             msgshow('Error', ' ${state.message}', Colors.white, colour.commonColorred, null, 14, null, null, context, 2);
           } else if (state is VesselPlanningWebActionSuccess) {
             msgshow('Success', ' ${state.message}', Colors.white, AppTokens.statusSuccess, null, 14, null, null, context, 2);
-            if (_currentMasterId == 0) {
+            if (state.savedId > 0) {
+              // the saved plan stays open: the next save updates it
+              setState(() {
+                _currentMasterId = state.savedId;
+                if (state.savedNo.isNotEmpty) _planningNoCtrl.text = state.savedNo;
+              });
+            } else if (_currentMasterId == 0) {
               _fetchMaxPlanningNo();
             }
           }

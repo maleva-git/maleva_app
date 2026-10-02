@@ -74,8 +74,3 @@ class EnquiryViewEditRequested extends EnquiryViewEvent {
   EnquiryViewEditRequested(this.item);
 }
 
-class EnquiryViewShareRequested extends EnquiryViewEvent {
-  final int id;
-  final String planningNo;
-  EnquiryViewShareRequested({required this.id, required this.planningNo});
-}

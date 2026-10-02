@@ -1,6 +1,8 @@
 import 'package:get_it/get_it.dart';
 import 'package:maleva/core/dashboard/dashboard_api.dart';
 import 'package:maleva/core/files/attachments_api.dart';
+import 'package:maleva/core/planning/planning_api.dart';
+import 'package:maleva/core/planning/vessel_planning_api.dart';
 import 'package:maleva/core/sale_order/sale_order_api.dart';
 import 'package:maleva/core/utils/app_preferences.dart';
 import 'package:maleva/core/lookups/shared_lookups.dart';
@@ -27,6 +29,11 @@ void registerAuthModule(GetIt sl) {
   // sale orders (the shared /api/sale-orders and friends)
   sl.registerLazySingleton<SaleOrderApi>(
       () => SaleOrderApi(sl<JavaApiClient>().dio, companyId: AppPreferences.getComid));
+  // transport and vessel planning (the shared /api/planing and /api/vessel-plannings)
+  sl.registerLazySingleton<PlanningApi>(
+      () => PlanningApi(sl<JavaApiClient>().dio, companyId: AppPreferences.getComid));
+  sl.registerLazySingleton<VesselPlanningApi>(
+      () => VesselPlanningApi(sl<JavaApiClient>().dio, companyId: AppPreferences.getComid));
   // record attachments (the shared /api/attachments)
   sl.registerLazySingleton<AttachmentsApi>(
       () => AttachmentsApi(sl<JavaApiClient>().dio, companyId: AppPreferences.getComid));

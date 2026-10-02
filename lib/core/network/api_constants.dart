@@ -48,23 +48,6 @@ class ApiConstants {
   static const String apiSelectBoardingSalaryNew = "$port/api/BoardingSalaryApp/SelectBoardingSalary";
   static const String apiSelectBoardingSalaryByEmpId = "$port/api/BoardingSalaryApp/SelectBoardingSalaryByEmpId";
 
-  // ─── Planning ─────────────────────────────────────────────────────────────
-  static const String apiSelectPlanning       = "$port/api/PlanningApp/SelectPLANING";
-  static const String apiEditPlanning         = "$port/api/PlanningApp/EditPLANING?Id=";
-  static String PLANINGSearch           = "$port/api/PlanningApp/PLANINGSearch";
-  static String VESSELPLANINGDB         = "$port/api/DashBoardApp/VESSELPLANINGDB"; // vesselplanningdetails only (its read never matched this answer)
-  static const String apiViewPlanningPdf      = "$port/api/PlanningApp/PLANINGVIEW?PlanningNo=";
-
-  // ─── Vessel Planning ──────────────────────────────────────────────────────
-  static const String apiSelectVesselPlanning = "$port/api/VesselPlanningApp/SelectVESSELPLANING";
-  static const String apiEditVesselPlanning   = "$port/api/VesselPlanningApp/EditVESSELPLANING?Id=";
-  static const String apiViewVesselPlanningPdf = "$port/api/VesselPlanningApp/VESSELPLANINGVIEW?VesselPlanningNo=";
-  static const String apiVesselPlanningSearch = "$port/api/VesselPlanningApp/VESSELPLANINGSearch";
-  static const String apiMaxVesselPlanningNo  = "$port/VESSELPLANING/MaxVESSELPLANINGNo";
-  static const String apiInsertVesselPlanning = "$port/api/VesselPlanningApp/InsertVESSELPLANING";
-  static const String apiDeleteVesselPlanning = "$port/api/VesselPlanningApp/DeleteVESSELPLANING?Id=";
-  static const String apiUpdateSaleOrderSpecific = "$port/SaleOrder/UpdateSaleorder";
-
   // ─── RTI ──────────────────────────────────────────────────────────────────
   static const String apiGetRTINo             = "$port/api/RTIApp/SelectRTINo?Comid=";
   static const String apiSelectRTIView        = "$port/api/RTIApp/SelectRTI?Comid=";

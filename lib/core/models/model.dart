@@ -99,8 +99,6 @@ export '../../features/transaction/salesorder/models/sale_order_master_model.dar
 export '../../features/transaction/salesorder/models/sale_order_detail_model.dart';
 export 'shared/planning_detail_model.dart';
 export 'shared/planning_master_model.dart';
-export '../../features/transaction/vesselplanning/models/vessel_planning_detail_model.dart';
-export '../../features/transaction/vesselplanning/models/vessel_planning_master_model.dart';
 export 'shared/sale_edit_detail_model.dart';
 export 'shared/address_details_model.dart';
 export 'shared/r_t_i_master_view_model.dart';

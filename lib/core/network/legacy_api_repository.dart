@@ -359,39 +359,6 @@ Future SelectProductList(context) async {
 }
 
 
-Future EditPlanning(context, int Id, int PlanningNo) async {
-  try {
-    // AppGlobals.PlanningEditList.clear();
-    var Comid = AppGlobals.storagenew.getInt('Comid') ?? 0;
-    try {
-  final resultData = _ensureList((await _routedPost(
-            Uri.encodeFull("${ApiConstants.apiEditPlanning}$Id&PLANINGNo=$PlanningNo&Comid=$Comid"), data: null ?? {})).data);
-  if (resultData.isNotEmpty) {
-        AppGlobals.PlanningEditList = resultData[0]["SaleDetails"].toList();
-      }
-} catch (e) { print("API Error: $e"); }
-
-  } catch (error) {
-    if (error.toString() == "") {}
-  }
-}
-
-Future EditVesselPlanning(context, int Id, int PlanningNo) async {
-  try {
-    var Comid = AppGlobals.storagenew.getInt('Comid') ?? 0;
-    try {
-  final resultData = _ensureList((await _routedPost(
-        Uri.encodeFull("${ApiConstants.apiEditVesselPlanning}$Id&VESSELPLANINGNo=$PlanningNo&Comid=$Comid"), data: null ?? {})).data);
-  if (resultData.isNotEmpty) {
-        AppGlobals.VesselPlanningEditList = resultData[0]["SaleDetails"].toList();
-      }
-} catch (e) { print("API Error: $e"); }
-
-  } catch (error) {
-    if (error.toString() == "") {}
-  }
-}
-
 Future<void> GetRTINoForwarding(BuildContext ?context, int billId) async {
   try {
     // Clear existing job list

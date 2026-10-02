@@ -89,17 +89,6 @@ class EnquiryTrRepository {
     return false;
   }
 
-  /// Get Planning PDF
-  Future<dynamic> getPlanningPdf(String planningNo) async {
-    try {
-      final endpoint = "${ApiConstants.apiViewPlanningPdf}$planningNo";
-      final response = await _dioClient.dio.post(endpoint, data: {});
-      return response.data;
-    } catch (e) {
-      throw Exception("Failed to view planning pdf: $e");
-    }
-  }
-
   /// Select Employee list
   Future<List<dynamic>> selectEmployee(String type, String type1) async {
     try {

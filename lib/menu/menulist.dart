@@ -856,8 +856,6 @@ class _MenuTileState extends State<_MenuTile>
           Navigator.push(ctx, TruckLocationRoutes.board());
           break;
 
-/*        case "Vessel Planning":
-          Navigator.push(ctx, _r(const VesselPlanningView()));  break;*/
         case "Vessel Planning":
           Navigator.push(ctx, _r(VesselPlanningWebTab(
             pageView: widget.entry.PageView == 1,

@@ -259,9 +259,6 @@ class AppGlobals {
   static List<dynamic> PlanningMasterList = [];
   static List<dynamic> PlanningDetailsList = [];
   static List<dynamic> PlanningEditList = [];
-  static List<dynamic> VesselPlanningMasterList = [];
-  static List<dynamic> VesselPlanningDetailsList = [];
-  static List<dynamic> VesselPlanningEditList = [];
   static List<dynamic> GetImagesList = [];
   static List<AddressDetailsModel> AddressDetailedList = [];
   static List<GetTruckModel> GetDriverList = [];

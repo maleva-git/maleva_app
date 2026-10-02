@@ -40,30 +40,30 @@ class UpdateSpecificJobEvent extends VesselPlanningWebEvent {
   List<Object> get props => [updateData];
 }
 
+/// Saves the plan [id] (0 new) with the ticked jobs [saleOrderIds] in their order.
 class SaveVesselPlanningEvent extends VesselPlanningWebEvent {
-  final List<Map<String, dynamic>> planningList;
-
-  const SaveVesselPlanningEvent({required this.planningList});
-
-  @override
-  List<Object> get props => [planningList];
-}
-
-class FetchSavedPlanningsEvent extends VesselPlanningWebEvent {
-  final String fromDate;
-  final String toDate;
+  final int id;
+  final DateTime from;
+  final DateTime to;
+  final DateTime planDate;
+  final List<int> saleOrderIds;
+  final String remarks;
   final String search;
   final int employeeId;
 
-  const FetchSavedPlanningsEvent({
-    required this.fromDate,
-    required this.toDate,
+  const SaveVesselPlanningEvent({
+    required this.id,
+    required this.from,
+    required this.to,
+    required this.planDate,
+    required this.saleOrderIds,
+    required this.remarks,
     required this.search,
     required this.employeeId,
   });
 
   @override
-  List<Object> get props => [fromDate, toDate, search, employeeId];
+  List<Object> get props => [id, from, to, planDate, saleOrderIds, remarks, search, employeeId];
 }
 
 class LoadPlanningForEditEvent extends VesselPlanningWebEvent {

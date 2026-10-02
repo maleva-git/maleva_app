@@ -6,7 +6,6 @@ import 'package:flutter/material.dart';
 
 import 'package:intl/intl.dart';
 import '../models/vesselplanningweb_model.dart';
-import '../../../../../core/utils/app_globals.dart';
 
 import '../../../../../core/theme/tokens.dart';
 import '../../../../mastersearch/Employee.dart';
@@ -34,51 +33,50 @@ class VesselPlanningUpdateSheet extends StatefulWidget {
   _VesselPlanningUpdateSheetState createState() => _VesselPlanningUpdateSheetState();
 }
 
+/// The job update of the Vessel Planning web window (as the web's Update window): PTW, cargo,
+/// the six vessel dates (an unticked date is cleared) and the three loading and three
+/// off-vessel boarding officers. Saved with `POST /api/vessel-plannings/sale-order-update`.
 class _VesselPlanningUpdateSheetState extends State<VesselPlanningUpdateSheet> {
   late TextEditingController _ptwController;
-  late TextEditingController _etbController;
-  late TextEditingController _etdController;
-  late TextEditingController _oetbController;
-  late TextEditingController _oetdController;
+  late TextEditingController _cargoController;
 
-  bool _etbChecked = false;
-  bool _etdChecked = false;
-  bool _oetbChecked = false;
-  bool _oetdChecked = false;
+  // ETA, ETB, ETD (loading vessel) and OETA, OETB, OETD (off vessel), in this order
+  static const _dateLabels = ['L ETA', 'L ETB', 'L ETD', 'O ETA', 'O ETB', 'O ETD'];
+  static const _dateKeys = ['eta', 'etb', 'etd', 'oeta', 'oetb', 'oetd'];
+  late final List<TextEditingController> _dates;
+  late final List<bool> _dateTicked;
 
-  EmployeeModel? _bo1;
-  EmployeeModel? _bo2;
+  late final List<EmployeeModel?> _loading;
+  late final List<EmployeeModel?> _off;
 
   @override
   void initState() {
     super.initState();
     final d = widget.jobData;
     _ptwController = TextEditingController(text: d.ptw);
-    _etbController = TextEditingController(text: d.setb.isNotEmpty ? d.setb : d.etb);
-    _etdController = TextEditingController(text: d.setd.isNotEmpty ? d.setd : d.etd);
-    _oetbController = TextEditingController(text: d.soetb.isNotEmpty ? d.soetb : d.oetb);
-    _oetdController = TextEditingController(text: d.soetd.isNotEmpty ? d.soetd : d.oetd);
-
-    if (d.boardingOfficerRefid > 0) {
-      _bo1 = EmployeeModel(d.boardingOfficerRefid, d.boardingOfficerName.isNotEmpty ? d.boardingOfficerName : 'Select Employee', '');
-    }
-    if (d.boardingOfficer1Refid > 0) {
-      _bo2 = EmployeeModel(d.boardingOfficer1Refid, d.boardingOfficerName1.isNotEmpty ? d.boardingOfficerName1 : 'Select Employee', '');
-    }
-
-    _etbChecked = _etbController.text.isNotEmpty;
-    _etdChecked = _etdController.text.isNotEmpty;
-    _oetbChecked = _oetbController.text.isNotEmpty;
-    _oetdChecked = _oetdController.text.isNotEmpty;
+    _cargoController = TextEditingController(text: d.cargo);
+    String first(String a, String b) => a.isNotEmpty ? a : b;
+    _dates = [
+      TextEditingController(text: first(d.seta, d.eta)),
+      TextEditingController(text: first(d.setb, d.etb)),
+      TextEditingController(text: first(d.setd, d.etd)),
+      TextEditingController(text: first(d.soeta, d.oeta)),
+      TextEditingController(text: first(d.soetb, d.oetb)),
+      TextEditingController(text: first(d.soetd, d.oetd)),
+    ];
+    _dateTicked = [for (final c in _dates) c.text.isNotEmpty];
+    EmployeeModel? officer(int id, String name) => id > 0 ? EmployeeModel(id, name.isNotEmpty ? name : 'Employee $id', '') : null;
+    _loading = [for (var i = 0; i < 3; i++) officer(d.loadingOfficerIds[i], d.loadingOfficerNames[i])];
+    _off = [for (var i = 0; i < 3; i++) officer(d.offOfficerIds[i], d.offOfficerNames[i])];
   }
 
   @override
   void dispose() {
     _ptwController.dispose();
-    _etbController.dispose();
-    _etdController.dispose();
-    _oetbController.dispose();
-    _oetdController.dispose();
+    _cargoController.dispose();
+    for (final c in _dates) {
+      c.dispose();
+    }
     super.dispose();
   }
 
@@ -139,33 +137,30 @@ class _VesselPlanningUpdateSheetState extends State<VesselPlanningUpdateSheet> {
   }
 
   void _submitUpdate() {
-    final Map<String, dynamic> updateData = {
-      "Jobid": widget.jobData.saleOrderMasterRefId,
-      "PTW": _ptwController.text,
-      "ETB": _etbChecked && _etbController.text.isNotEmpty ? _formatForApi(_etbController.text) : null,
-      "ETD": _etdChecked && _etdController.text.isNotEmpty ? _formatForApi(_etdController.text) : null,
-      "OETB": _oetbChecked && _oetbController.text.isNotEmpty ? _formatForApi(_oetbController.text) : null,
-      "OETD": _oetdChecked && _oetdController.text.isNotEmpty ? _formatForApi(_oetdController.text) : null,
-      "BoardingOfficerRefid": _bo1?.Id,
-      "BoardingOfficer1Refid": _bo2?.Id,
-      "Comid": AppGlobals.Comid,
-      "Type": 100, // SAVE ALL
+    final updateData = <String, dynamic>{
+      'saleOrderId': widget.jobData.saleOrderMasterRefId,
+      'ptw': _ptwController.text.trim(),
+      'cargo': _cargoController.text.trim(),
+      for (var i = 0; i < _dates.length; i++)
+        _dateKeys[i]: _dateTicked[i] && _dates[i].text.isNotEmpty ? _formatForApi(_dates[i].text) : '',
+      'loadingOfficers': [for (final e in _loading) e?.Id ?? 0],
+      'offOfficers': [for (final e in _off) e?.Id ?? 0],
     };
 
     widget.onUpdate(updateData);
     Navigator.pop(context);
   }
-  
-  String _formatForApi(String displayDate) {
-    try {
-        final parsed = DateFormat('dd/MM/yyyy HH:mm').parse(displayDate);
-        return DateFormat('yyyy/MM/dd HH:mm:ss').format(parsed);
-    } catch (_) {
-        return displayDate;
-    }
-  }
 
-  
+  /// "yyyy-MM-dd HH:mm:ss" for the server, from the shown or the server's form.
+  String _formatForApi(String value) {
+    for (final pattern in ['dd/MM/yyyy HH:mm', 'yyyy/MM/dd HH:mm:ss']) {
+      try {
+        return DateFormat('yyyy-MM-dd HH:mm:ss').format(DateFormat(pattern).parseStrict(value));
+      } catch (_) {}
+    }
+    final parsed = DateTime.tryParse(value);
+    return parsed == null ? '' : DateFormat('yyyy-MM-dd HH:mm:ss').format(parsed);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -234,22 +229,32 @@ class _VesselPlanningUpdateSheetState extends State<VesselPlanningUpdateSheet> {
                   ), null, null),
                   const SizedBox(height: 8),
                   
-                  _buildDateTimeRow('ETB', _etbController, _etbChecked, (v) => setState(() => _etbChecked = v)),
-                  const SizedBox(height: 8),
-                  
-                  _buildDateTimeRow('ETD', _etdController, _etdChecked, (v) => setState(() => _etdChecked = v)),
-                  const SizedBox(height: 8),
-
-                  _buildDateTimeRow('L ETB', _oetbController, _oetbChecked, (v) => setState(() => _oetbChecked = v)),
-                  const SizedBox(height: 8),
-
-                  _buildDateTimeRow('L ETD', _oetdController, _oetdChecked, (v) => setState(() => _oetdChecked = v)),
-                  const SizedBox(height: 8),
-
-                  _buildEmployeeRow('BOARDING\nOFFICER 1', _bo1, (emp) => setState(() => _bo1 = emp), true),
-                  const SizedBox(height: 8),
-
-                  _buildEmployeeRow('BOARDING\nOFFICER 2', _bo2, (emp) => setState(() => _bo2 = emp), false),
+                  for (var i = 0; i < _dates.length; i++) ...[
+                    _buildDateTimeRow(_dateLabels[i], _dates[i], _dateTicked[i], (v) => setState(() => _dateTicked[i] = v)),
+                    const SizedBox(height: 8),
+                  ],
+                  for (var i = 0; i < 3; i++) ...[
+                    _buildEmployeeRow('LOADING\nOFFICER ${i + 1}', _loading[i], (emp) => setState(() => _loading[i] = emp), false),
+                    const SizedBox(height: 8),
+                  ],
+                  for (var i = 0; i < 3; i++) ...[
+                    _buildEmployeeRow('OFF VESSEL\nOFFICER ${i + 1}', _off[i], (emp) => setState(() => _off[i] = emp), false),
+                    const SizedBox(height: 8),
+                  ],
+                  _buildRow('CARGO', SizedBox(
+                    height: 36,
+                    child: TextField(
+                      controller: _cargoController,
+                      style: AppTypography.bodyLarge(),
+                      decoration: InputDecoration(
+                        contentPadding: const EdgeInsets.symmetric(horizontal: 10),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(4),
+                          borderSide: const BorderSide(color: AppTokens.maintCardBorder),
+                        ),
+                      ),
+                    ),
+                  ), null, false),
                   const SizedBox(height: 8),
 
                   _buildRow('PTW', SizedBox(
