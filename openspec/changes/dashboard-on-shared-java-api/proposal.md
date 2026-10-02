@@ -38,7 +38,7 @@ dashboards) answers the same figures.
 | Payment pending | DashBoardApp/SelectPendingPayment | different filter and row shape |
 | Top customers | DashBoardApp/SelectTopCustomers | Java has `/api/ceo-dashboard/top-20/*`, not compared yet |
 
-These need the latest .NET source (`DashBoardAppController` and its service) to port or confirm.
+These are ported or confirmed from `MalevaWeb-develop` (`DashBoardAppController`, `DashBoardServices`).
 
 ## Capabilities
 

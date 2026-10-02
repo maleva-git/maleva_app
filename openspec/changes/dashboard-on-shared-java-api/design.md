@@ -29,17 +29,14 @@ the screen now reads the Java key.
 against `DashboardRepository`: 2 = `InvoiceNo != 0`, 3 = `InvoiceNo = 0` and not status 8/12,
 remarks rule before 2024-10-01). The employee rows' `type` is `block * 15 + period`.
 
-## Findings on the Java side (not changed here; the backend is shared)
+## Findings on the Java side
 
-1. **Employee rows for past months.** The sale-order and invoice desks tap a month bar with
-   period 4..8 (one to five months back). `buildEmployeeSalesWhere` handles periods 0..3 only;
-   any other period gets no date filter, so the dialog shows all-time totals. The .NET
-   `GetEmployeeSalesData` source is needed to port the month periods correctly.
-2. **`/employee-invoice` returns sale orders.** `getEmployeeInvoiceData` calls
-   `getEmployeeSales`. If .NET `GetEmployeeInvData` read `SaleMaster` (invoices), the invoice
-   desk's employee dialog differs from .NET. Needs the .NET source to confirm.
-3. **`/sales` hides failures.** A query error answers an all-zero summary with `success: true`.
-4. `/supplier-expense` is an empty stub (blocks the maintenance widget).
+Checked against `MalevaWeb-develop` (the .NET source the live server runs):
 
-Rule 3 of the owner's rule: these are fixed in the backend by porting the .NET code, for React
-and the app together, once the latest .NET source is available.
+1. Employee rows for past months, and `/employee-sales` rows coming back with null fields: fixed
+   in backend change `fix-dashboard-employee-sales` (ported from `LoginServices.GetEmployeeSalesData`).
+2. `/employee-invoice` returned sale orders: fixed there too (ported from `GetEmployeeInvData`).
+3. `/sales-order-status` rows were null: fixed there too (ported from `SelectSalesOrderStatus`).
+4. `/sales` answers an all-zero summary with `success: true` when its query fails. Open.
+5. `/supplier-expense` is an empty stub (blocks the maintenance widget); port
+   `DashBoardServices.LoadSupplierExpenseData`. Open.

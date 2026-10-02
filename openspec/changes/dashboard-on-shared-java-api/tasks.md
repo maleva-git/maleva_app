@@ -9,4 +9,5 @@
 ## 2. Open
 
 - [ ] 2.1 On a test environment as an employee: sale-order desk (All / With / Without, month bars, employee dialog), invoice desk, expense and forwarding reports, unreleased (both), each sales desk with the employee switcher, air freight dashboard (dates, port and status filters, expired colouring).
-- [ ] 2.2 Get the latest .NET `DashBoardAppController` / `LoginServices` (GetEmployeeSalesData, GetEmployeeInvData, SelectStatusBO, LoadSupplierExpenseData, LoadExpenseData, SelectPendingPayment, SelectTopCustomers, VESSELPLANINGDB) and, in the backend, port what is missing or wrong (design findings 1-4), then move the remaining tabs listed in the proposal.
+- [x] 2.2 Backend findings 1-3 ported from `MalevaWeb-develop` (backend change `fix-dashboard-employee-sales`).
+- [ ] 2.3 From `MalevaWeb-develop` `DashBoardServices`, port or confirm SelectStatusBO, LoadSupplierExpenseData, LoadExpenseData, SelectPendingPayment, SelectTopCustomers, VESSELPLANINGDB, PLANINGSearchDB in the backend, then move the remaining tabs listed in the proposal.
