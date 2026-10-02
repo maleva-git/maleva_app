@@ -12,11 +12,8 @@ class ApiConstants {
   //static const String port = "http://103.215.139.8:8001/";
 
   // ─── Image / File Upload ──────────────────────────────────────────────────
-  static const String apiPostImage        = "$port/api/CommonApp/UploadFile/";
   static const String apiPostFile         = "$port/api/CommonApp/UploadFile2/";
   static const String apiUploadPdfFile    = "$port/api/CommonApp/UploadPdfFile/";
-  static const String apiGetImage         = "$port/api/CommonApp/FetchFiles?ImageDirectory=";
-  static const String apiDeleteImage      = "$port/api/CommonApp/DeleteFile";
 
   // ─── Auth / Login ─────────────────────────────────────────────────────────
   static const String apiSelectUser       = "$port/api/LoginApp/SelectLoginUser?Comid=";

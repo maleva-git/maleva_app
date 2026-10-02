@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:maleva/core/network/legacy_api_repository.dart';
 import 'package:maleva/core/di/injection.dart';
+import 'package:maleva/core/files/attachments_api.dart';
 import 'package:maleva/core/network/api_constants.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
@@ -93,16 +94,9 @@ class BoardingStatusBloc
       }
 
       // Load images
-      final imageDir =
-          '/Upload/${AppGlobals.Comid}/SalesOrder/$saleOrderId/Boarding/';
-      final header = {'Content-Type': 'application/json; charset=UTF-8'};
-      final imgResult = await sl<LegacyApiRepository>().apiAllinoneSelectArray(
-          '${ApiConstants.apiGetImage}$imageDir', null, header, null);
-
-      List<String> images = [];
-      if (imgResult != '' && imgResult.length != 0) {
-        images = List<String>.from(imgResult as List);
-      }
+      // the shared Java GET /api/attachments: the job's Boarding photos
+      final images = await sl<AttachmentsApi>()
+          .imageNames(folder: 'SalesOrder', recordId: saleOrderId, subFolder: 'Boarding');
 
       final prev = state is BoardingStatusLoaded
           ? state as BoardingStatusLoaded
@@ -277,29 +271,9 @@ class BoardingStatusBloc
     emit(BoardingStatusLoading());
     try {
       final imageFile = s.images[event.index];
-      final header = {
-        'Content-Type':  'application/json; charset=UTF-8',
-        'Comid':         AppGlobals.Comid.toString(),
-        'Id':            s.saleOrderId.toString(),
-        'FolderName':    'SalesOrder',
-        'FileName':
-        '/Upload/${AppGlobals.Comid}/SalesOrder/${s.saleOrderId}/Boarding/$imageFile',
-        'SubFolderName': 'Boarding',
-      };
-
-      final result = await sl<LegacyApiRepository>().apiAllinoneSelectArray(
-          ApiConstants.apiDeleteImage, null, header, null);
-
-      if (result != '') {
-        final value = ResponseViewModel.fromJson(result);
-        if (value.IsSuccess == true) {
-          final newImages = List<String>.from(s.images)
-            ..removeAt(event.index);
-          emit(s.copyWith(images: newImages));
-          return;
-        }
-      }
-      emit(s); // revert on failure
+      await sl<AttachmentsApi>()
+          .delete([imageFile], folder: 'SalesOrder', recordId: s.saleOrderId, subFolder: 'Boarding');
+      emit(s.copyWith(images: List<String>.from(s.images)..removeAt(event.index)));
     } catch (e) {
       emit(BoardingStatusError(e.toString()));
     }

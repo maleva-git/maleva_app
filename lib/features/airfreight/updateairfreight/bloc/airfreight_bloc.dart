@@ -1,5 +1,6 @@
 import 'package:maleva/core/network/legacy_api_repository.dart';
 import 'package:maleva/core/di/injection.dart';
+import 'package:maleva/core/files/attachments_api.dart';
 import 'package:maleva/core/network/api_constants.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -108,25 +109,10 @@ class AirFreightBloc extends Bloc<AirFreightEvent, AirFreightState> {
 
     try {
       final imageFile = s.images[event.index];
-      final header = {
-        'Content-Type': 'application/json; charset=UTF-8',
-        'Comid': AppGlobals.Comid.toString(),
-        'Id': s.saleOrderId.toString(),
-        'FolderName': 'SalesOrder',
-        'FileName': '/Upload/${AppGlobals.Comid}/SalesOrder/${s.saleOrderId}/AirFrieght/$imageFile',
-        'SubFolderName': 'AirFrieght',
-      };
-
-      // 🔥 Fixed: Passed null for context
-      final result = await sl<LegacyApiRepository>().apiAllinoneSelectArray(ApiConstants.apiDeleteImage, null, header, null);
-      if (result != '') {
-        final value = ResponseViewModel.fromJson(result);
-        if (value.IsSuccess == true) {
-          final newImages = List<String>.from(s.images)..removeAt(event.index);
-          emit(s.copyWith(images: newImages));
-          return;
-        }
-      }
+      // the shared Java DELETE /api/attachments
+      await sl<AttachmentsApi>().delete([imageFile], folder: 'SalesOrder', recordId: s.saleOrderId, subFolder: 'AirFrieght');
+      final newImages = List<String>.from(s.images)..removeAt(event.index);
+      emit(s.copyWith(images: newImages));
     } catch (e) {
       emit(AirFreightError(e.toString()));
     }
@@ -209,16 +195,9 @@ class AirFreightBloc extends Bloc<AirFreightEvent, AirFreightState> {
 
       final awbNo = AppGlobals.SaleEditMasterList[0]['AWBNo'] ?? '';
 
-      final imageDir = '/Upload/${AppGlobals.Comid}/SalesOrder/$saleOrderId/AirFrieght/';
-      final header = {'Content-Type': 'application/json; charset=UTF-8'};
-
-      // 🔥 Fixed: Passed null for context
-      final imgResult = await sl<LegacyApiRepository>().apiAllinoneSelectArray('${ApiConstants.apiGetImage}$imageDir', null, header, null);
-
-      List<String> images = [];
-      if (imgResult != '' && imgResult.length != 0) {
-        images = List<String>.from(imgResult as List);
-      }
+      // the shared Java GET /api/attachments: the job's AirFrieght photos
+      final images = await sl<AttachmentsApi>()
+          .imageNames(folder: 'SalesOrder', recordId: saleOrderId, subFolder: 'AirFrieght');
 
       return prev.copyWith(
         jobNoText: jobNo,

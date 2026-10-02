@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
-import 'dart:convert';
 import 'dart:io';
-import 'package:http/http.dart' as http;
+import 'package:maleva/core/di/injection.dart';
+import 'package:maleva/core/files/attachments_api.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:maleva/core/utils/app_preferences.dart';
 import 'package:maleva/core/network/api_constants.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../bloc/job_orders_bloc.dart';
@@ -533,32 +532,19 @@ class _JobOrdersTabState extends State<JobOrdersTab> {
     List<XFile> pendingUploads = [];
     bool isLoading = true;
 
+    // The job order's files, on the shared Java /api/attachments (folder "jobs order",
+    // where the app has always kept them). Paths are /Upload/...; PDFs are stored as page images.
+    final attachments = sl<AttachmentsApi>();
+    const folder = 'jobs order';
+
     Future<void> loadImages(StateSetter setModalState) async {
       try {
-        final String companyId = AppPreferences.getComid().toString();
-        
-        final response = await http.post(
-          Uri.parse(ApiConstants.port + '/Common/FetchFile2'),
-          headers: {
-            'Comid': companyId,
-            'Id': job.id.toString(),
-            'FolderName': 'jobs order',
-            'FileName': '',
-            'SubFolderName': '',
-            'DeleteFileName': '',
-          },
-        );
-
-        if (response.statusCode == 200) {
-          final data = json.decode(response.body);
-          if (data['ok'] == true && data['Data'] != null) {
-            setModalState(() {
-              images = List<String>.from(data['Data']);
-              isLoading = false;
-            });
-            return;
-          }
-        }
+        final files = await attachments.list(folder: folder, recordId: job.id);
+        setModalState(() {
+          images = [for (final f in files) f['path'].toString()];
+          isLoading = false;
+        });
+        return;
       } catch (e) {
         debugPrint('Error loading images: $e');
       }
@@ -571,32 +557,13 @@ class _JobOrdersTabState extends State<JobOrdersTab> {
       setModalState(() {
         isLoading = true;
       });
-
       try {
-        final String companyId = AppPreferences.getComid().toString();
-        
-        final response = await http.post(
-          Uri.parse(ApiConstants.port + '/Common/DeleteFile'),
-          headers: {
-            'Comid': companyId,
-            'Id': job.id.toString(),
-            'FolderName': 'jobs order',
-            'FileName': imageUrl,
-            'SubFolderName': '',
-          },
-        );
-
-        if (response.statusCode == 200) {
-          final data = json.decode(response.body);
-          if (data['ok'] == true) {
-            await loadImages(setModalState);
-            return;
-          }
-        }
+        await attachments.delete([imageUrl], folder: folder, recordId: job.id);
+        await loadImages(setModalState);
+        return;
       } catch (e) {
         debugPrint('Error deleting image: $e');
       }
-
       setModalState(() {
         isLoading = false;
       });
@@ -620,45 +587,13 @@ class _JobOrdersTabState extends State<JobOrdersTab> {
       });
 
       try {
-        final String companyId = AppPreferences.getComid().toString();
-        
-        var request = http.MultipartRequest(
-          'POST', 
-          Uri.parse(ApiConstants.port + '/Common/UploadFile5')
-        );
-        request.headers.addAll({
-          'Comid': companyId,
-          'Id': job.id.toString(),
-
-          'FolderName': 'jobs order',
-          'FileName': '',
-          'SubFolderName': '',
-          'DeleteFileName': '',
-          'ExistingFilePath': '',
+        await attachments.add([for (final f in pendingUploads) File(f.path)],
+            folder: folder, recordId: job.id, mode: AttachmentMode.pdfAsImages);
+        setModalState(() {
+          pendingUploads.clear();
         });
-
-        debugPrint('==== API UPLOAD REQUEST ====');
-        debugPrint('URL: ${request.url}');
-        debugPrint('Headers: ${request.headers}');
-        debugPrint('Number of files to upload: ${pendingUploads.length}');
-        debugPrint('============================');
-
-        for (int i = 0; i < pendingUploads.length; i++) {
-          request.files.add(await http.MultipartFile.fromPath('MyImages$i', pendingUploads[i].path));
-        }
-
-        var response = await request.send();
-        if (response.statusCode == 200) {
-          final resStr = await response.stream.bytesToString();
-          final data = json.decode(resStr);
-          if (data['ok'] == true) {
-            setModalState(() {
-              pendingUploads.clear();
-            });
-            await loadImages(setModalState);
-            return;
-          }
-        }
+        await loadImages(setModalState);
+        return;
       } catch (e) {
         debugPrint('Error uploading image: $e');
       }

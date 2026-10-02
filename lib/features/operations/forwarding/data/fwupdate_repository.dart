@@ -1,3 +1,5 @@
+import 'package:maleva/core/di/injection.dart';
+import 'package:maleva/core/files/attachments_api.dart';
 import 'package:maleva/core/network/api_client.dart';
 import 'package:maleva/core/utils/app_preferences.dart';
 import '../../../../core/network/api_constants.dart';
@@ -23,28 +25,13 @@ class FWUpdateRepository {
       'employees': empRes is List ? empRes : [],
     };
   }
-  Future<List<String>> fetchImages(int saleOrderId, String smkKey) async {
-    final imageDir = '/Upload/$comid/SalesOrder/$saleOrderId/$smkKey/';
-    final result = await ApiClient.postRequest('${ApiConstants.apiGetImage}$imageDir', null);
+  /// The job's photos under [smkKey], from the shared Java `/api/attachments`.
+  Future<List<String>> fetchImages(int saleOrderId, String smkKey) =>
+      sl<AttachmentsApi>().imageNames(folder: 'SalesOrder', recordId: saleOrderId, subFolder: smkKey);
 
-    List<String> images = [];
-    if (result != null && result is List) {
-      images = result.map((e) => e.toString()).toList();
-    }
-    return images;
-  }
-
-  Future<ResponseViewModel?> deleteImage(int saleOrderId, String smkUpload, String networkImg) async {
-    final header = {
-      'Comid': comid.toString(),
-      'Id': saleOrderId.toString(),
-      'FolderName': 'SalesOrder',
-      'FileName': '/Upload/$comid/SalesOrder/$saleOrderId/$smkUpload/$networkImg',
-      'SubFolderName': smkUpload,
-    };
-
-    final result = await ApiClient.postRequest(ApiConstants.apiDeleteImage, null, headers: header);
-    return result != null ? ResponseViewModel.fromJson(result) : null;
+  /// Deletes one photo (shared Java `/api/attachments`); throws when refused.
+  Future<void> deleteImage(int saleOrderId, String smkUpload, String networkImg) async {
+    await sl<AttachmentsApi>().delete([networkImg], folder: 'SalesOrder', recordId: saleOrderId, subFolder: smkUpload);
   }
 
   Future<ResponseViewModel?> updateForwarding(Map<String, dynamic> payload) async {

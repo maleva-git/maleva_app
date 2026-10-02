@@ -1,3 +1,5 @@
+import 'package:maleva/core/di/injection.dart';
+import 'package:maleva/core/files/attachments_api.dart';
 import 'package:maleva/core/lookups/job_steps.dart';
 import 'package:maleva/core/network/api_constants.dart';
 import 'package:maleva/core/network/api_client.dart';
@@ -54,13 +56,7 @@ class JobStatusUpdateRepository {
     }
 
     // C. Fetch Images
-    final imageDir = '/Upload/$comid/SalesOrder/$saleOrderId/Boarding/';
-    final String imgUrl = "${ApiConstants.apiGetImage}$imageDir";
-    final imageResponse = await ApiClient.postRequest(imgUrl, null);
-
-    if (imageResponse != null && imageResponse is List) {
-      images = imageResponse.map((e) => e.toString()).toList();
-    }
+    images = await sl<AttachmentsApi>().imageNames(folder: 'SalesOrder', recordId: saleOrderId, subFolder: 'Boarding');
 
     return {
       'statusId': statusId,
@@ -70,26 +66,8 @@ class JobStatusUpdateRepository {
   }
 
   // 3. Delete an Image
-  Future<ResponseViewModel?> deleteImage(int saleOrderId, String imageName) async {
-    final comid = AppPreferences.getComid();
-    final filePath = '/Upload/$comid/SalesOrder/$saleOrderId/Boarding/$imageName';
-
-    final headers = {
-      'Content-Type': 'application/json; charset=UTF-8',
-      'Comid': comid.toString(),
-      'Id': saleOrderId.toString(),
-      'FolderName': 'SalesOrder',
-      'FileName': filePath,
-      'SubFolderName': 'Boarding',
-    };
-
-    final response = await ApiClient.postRequest(
-        ApiConstants.apiDeleteImage,
-        null,
-        headers: headers
-    );
-
-    return response != null ? ResponseViewModel.fromJson(response) : null;
+  Future<void> deleteImage(int saleOrderId, String imageName) async {
+    await sl<AttachmentsApi>().delete([imageName], folder: 'SalesOrder', recordId: saleOrderId, subFolder: 'Boarding');
   }
 
   // 4. Update Boarding Details

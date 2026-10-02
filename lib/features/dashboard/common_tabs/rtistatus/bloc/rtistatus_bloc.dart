@@ -81,16 +81,12 @@ class RTIStatusBloc extends Bloc<RTIStatusEvent, RTIStatusState> {
   Future<void> _onImageDeleteRequested(RTIStatusImageDeleteRequested event, Emitter<RTIStatusState> emit) async {
     emit(state.copyWith(status: RTIStatusStatus.loading));
     try {
-      final result = await repository.deleteImage(state.saleOrderId, state.driverFolder, state.imageNetwork[event.index]);
-      if (result?.IsSuccess == true) {
-        emit(state.copyWith(
-          status: RTIStatusStatus.success,
-          imageNetwork: List.from(state.imageNetwork)..removeAt(event.index),
-          successMessage: 'Deleted Successfully',
-        ));
-      } else {
-        emit(state.copyWith(status: RTIStatusStatus.failure, errorMessage: result?.Message));
-      }
+      await repository.deleteImage(state.saleOrderId, state.driverFolder, state.imageNetwork[event.index]);
+      emit(state.copyWith(
+        status: RTIStatusStatus.success,
+        imageNetwork: List.from(state.imageNetwork)..removeAt(event.index),
+        successMessage: 'Deleted Successfully',
+      ));
     } catch (e) {
       emit(state.copyWith(status: RTIStatusStatus.failure, errorMessage: e.toString()));
     }

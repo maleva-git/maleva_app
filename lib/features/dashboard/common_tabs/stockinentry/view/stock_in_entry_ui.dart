@@ -1,7 +1,6 @@
 
 import 'package:maleva/core/theme/app_typography.dart';
 import 'package:maleva/core/utils/system_helpers.dart';
-import 'package:maleva/core/network/api_constants.dart';
 import 'dart:io';
 import 'package:maleva/core/widgets/custom_app_bar.dart';
 import 'package:cached_network_image/cached_network_image.dart';
@@ -79,7 +78,6 @@ class _StockInEntryPageState
     if (file == null) return;
     final url = await SystemHelpers.upload(
         File(file.path),
-        ApiConstants.apiPostImage,
         saleOrderId,
         'SalesOrder',
         statusName.replaceAll(' ', ''));

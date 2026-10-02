@@ -1,4 +1,5 @@
-import 'package:maleva/core/network/api_client.dart';
+import 'package:maleva/core/di/injection.dart';
+import 'package:maleva/core/files/attachments_api.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:flutter/services.dart';
 import 'package:maleva/core/colors/colors.dart' as colour;
@@ -113,31 +114,14 @@ class SystemHelpers {
     // TODO: implement initState
   }
 
-  static Future<String> uploadPdfOrImage(File file, int comid, int Id, String apiUploadPdfFile, String folderName, String subFolderName) async {
+  /// Stores a photo for a record through the shared Java `/api/attachments`
+  /// (compressed, the phone's file name kept, as .NET UploadFile did) and
+  /// answers the stored file name; '' when it could not be stored.
+  static Future<String> upload(File imageFile, int Id, String FolderName, String SubFolderName) async {
     try {
-      return await ApiClient.uploadPdfOrFile(
-        file,
-        apiUploadPdfFile,
-        comId: comid,
-        id: Id,
-        folderName: folderName,
-        subFolderName: subFolderName,
-      );
-    } catch (_) {
-      return "";
-    }
-  }
-
-  static Future<String> upload(File imageFile, String imageapi, int Id, String FolderName, String SubFolderName) async {
-    try {
-      return await ApiClient.uploadImage(
-        imageFile,
-        imageapi,
-        comId: AppGlobals.Comid,
-        id: Id,
-        folderName: FolderName,
-        subFolderName: SubFolderName,
-      );
+      final names = await sl<AttachmentsApi>()
+          .upload([imageFile], folder: FolderName, recordId: Id, subFolder: SubFolderName);
+      return names.first;
     } catch (_) {
       return "";
     }

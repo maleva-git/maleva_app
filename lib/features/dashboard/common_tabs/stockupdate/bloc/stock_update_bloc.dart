@@ -112,13 +112,9 @@ class StockUpdateBloc extends Bloc<StockUpdateEvent, StockUpdateState> {
       final folder = s.statusName.replaceAll(' ', '');
       final imageName = s.images[event.index];
 
-      final result = await repository.deleteImage(s.saleOrderId, folder, imageName);
-      if (result?.IsSuccess == true) {
-        final newImages = List<String>.from(s.images)..removeAt(event.index);
-        emit(s.copyWith(images: newImages));
-      } else {
-        emit(s);
-      }
+      await repository.deleteImage(s.saleOrderId, folder, imageName);
+      final newImages = List<String>.from(s.images)..removeAt(event.index);
+      emit(s.copyWith(images: newImages));
     } catch (e) {
       emit(StockUpdateError(e.toString()));
     }

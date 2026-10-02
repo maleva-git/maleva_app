@@ -2,7 +2,6 @@ import 'package:maleva/core/theme/app_typography.dart';
 import 'package:maleva/core/network/legacy_api_repository.dart';
 import 'package:maleva/core/di/injection.dart';
 import 'package:maleva/core/utils/system_helpers.dart';
-import 'package:maleva/core/network/api_constants.dart';
 import 'dart:io';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
@@ -83,7 +82,7 @@ class FWUpdatePageState extends State<FWUpdatePage> with SingleTickerProviderSta
     final file = await picker.pickImage(source: source);
     if (file == null) return;
 
-    final url = await SystemHelpers.upload(File(file.path), ApiConstants.apiPostImage, s.saleOrderId, 'SalesOrder', smkText);
+    final url = await SystemHelpers.upload(File(file.path), s.saleOrderId, 'SalesOrder', smkText);
     if (url.isNotEmpty) {
       if (!context.mounted) return;
       context.read<FWUpdateBloc>().add(FWUpdateImagePicked(type: type, imageUrl: url));

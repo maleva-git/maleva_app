@@ -149,13 +149,9 @@ class JobStatusUpdateBloc extends Bloc<JobStatusUpdateEvent, JobStatusUpdateStat
     final imageName = state.imageNetworkNames[index];
 
     try {
-      final result = await repository.deleteImage(state.saleOrderId, imageName);
-      if (result?.IsSuccess == true) {
-        final updated = List<String>.from(state.imageNetworkNames)..removeAt(index);
-        emit(state.copyWith(imageNetworkNames: updated, status: JobStatusUpdateStatus.success));
-      } else {
-        emit(state.copyWith(status: JobStatusUpdateStatus.failure, errorMessage: result?.Message ?? 'Failed to delete'));
-      }
+      await repository.deleteImage(state.saleOrderId, imageName);
+      final updated = List<String>.from(state.imageNetworkNames)..removeAt(index);
+      emit(state.copyWith(imageNetworkNames: updated, status: JobStatusUpdateStatus.success));
     } catch (_) {
       emit(state.copyWith(status: JobStatusUpdateStatus.failure, errorMessage: 'Failed to delete image.'));
     }

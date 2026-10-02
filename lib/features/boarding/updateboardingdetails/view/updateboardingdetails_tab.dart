@@ -2,7 +2,6 @@ import 'package:maleva/core/theme/app_typography.dart';
 import 'package:maleva/core/network/legacy_api_repository.dart';
 import 'package:maleva/core/di/injection.dart';
 import 'package:maleva/core/utils/system_helpers.dart';
-import 'package:maleva/core/network/api_constants.dart';
 import 'dart:io';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
@@ -66,7 +65,7 @@ class _BoardingStatusPageState extends State<_BoardingStatusPage> {
     final file = await _picker.pickImage(source: source);
     if (file == null) return;
     final url = await SystemHelpers.upload(
-        File(file.path), ApiConstants.apiPostImage, saleOrderId, 'SalesOrder', 'Boarding');
+        File(file.path), saleOrderId, 'SalesOrder', 'Boarding');
     if (!mounted) return;
     context.read<BoardingStatusBloc>().add(BoardingStatusImagePicked(url));
   }

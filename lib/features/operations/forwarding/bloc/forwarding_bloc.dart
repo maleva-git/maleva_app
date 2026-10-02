@@ -1,6 +1,5 @@
 import 'package:maleva/core/network/legacy_api_repository.dart';
 import 'package:maleva/core/di/injection.dart';
-import 'package:maleva/core/network/api_constants.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:maleva/core/utils/app_globals.dart';
 import '../data/fwupdate_repository.dart';
@@ -96,18 +95,8 @@ class FWUpdateBloc extends Bloc<FWUpdateEvent, FWUpdateState> {
     // 2. Exact Old Code Image Fetching Logic
     try {
       if (!event.context.mounted) return;
-      String imgDir = "/Upload/${AppGlobals.Comid}/SalesOrder/${event.saleOrderId}/${event.smkText}/";
-      Map<String, String> header = {'Content-Type': 'application/json; charset=UTF-8'};
-
-      var resultData = await sl<LegacyApiRepository>().apiAllinoneSelectArray(
-          "${ApiConstants.apiGetImage}$imgDir", null, header, event.context
-      );
-
-      if (resultData != "" && resultData != null && resultData is List) {
-        for(var i=0; i < resultData.length; i++) {
-          fetchedImages.add(resultData[i].toString());
-        }
-      }
+      // the shared Java GET /api/attachments
+      fetchedImages.addAll(await repository.fetchImages(event.saleOrderId, event.smkText));
     } catch (e) {
       print("Image API Error (Ignored 404): $e");
     }
@@ -231,14 +220,9 @@ class FWUpdateBloc extends Bloc<FWUpdateEvent, FWUpdateState> {
     emit(FWUpdateLoading());
     try {
       final networkImg = tab.images[event.index];
-      final result = await repository.deleteImage(s.saleOrderId, tab.smkText, networkImg);
-
-      if (result?.IsSuccess == true) {
-        final newImages = List<String>.from(tab.images)..removeAt(event.index);
-        emit(s.withTab(event.type, tab.copyWith(images: newImages)));
-      } else {
-        emit(s);
-      }
+      await repository.deleteImage(s.saleOrderId, tab.smkText, networkImg);
+      final newImages = List<String>.from(tab.images)..removeAt(event.index);
+      emit(s.withTab(event.type, tab.copyWith(images: newImages)));
     } catch (e) {
       emit(FWUpdateError(e.toString()));
     }

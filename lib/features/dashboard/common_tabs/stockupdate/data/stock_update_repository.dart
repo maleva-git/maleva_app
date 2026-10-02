@@ -1,9 +1,9 @@
+import 'package:maleva/core/files/attachments_api.dart';
 import 'package:maleva/core/lookups/job_steps.dart';
 import 'package:maleva/core/platform/barcode_scanner.dart';
 import 'package:maleva/core/network/api_constants.dart';
 import 'package:maleva/core/network/legacy_json_transport.dart';
 import 'package:maleva/core/session/legacy_feature_context.dart';
-import 'package:maleva/core/models/shared/response_view_model.dart';
 import 'package:maleva/core/di/injection.dart';
 import 'package:maleva/core/stock/stock_in_api.dart';
 
@@ -112,18 +112,8 @@ class StockUpdateRepository {
   }
 
   // ─── Delete Image ──────────────────────────────────────────────────────────
-  Future<ResponseViewModel?> deleteImage(int saleOrderId, String folder, String imageName) async {
-    final filePath = '/Upload/$comid/SalesOrder/$saleOrderId/$folder/$imageName';
-    final header = {
-      'Comid': comid.toString(),
-      'Id': saleOrderId.toString(),
-      'FolderName': 'SalesOrder',
-      'FileName': filePath,
-      'SubFolderName': folder,
-    };
-
-    final result = await transport.postRequest(ApiConstants.apiDeleteImage, null, headers: header);
-    return result != null ? ResponseViewModel.fromJson(result) : null;
+  Future<void> deleteImage(int saleOrderId, String folder, String imageName) async {
+    await sl<AttachmentsApi>().delete([imageName], folder: 'SalesOrder', recordId: saleOrderId, subFolder: folder);
   }
 
   // ─── Save Stock Update ───────────────────────────────────────────────────
