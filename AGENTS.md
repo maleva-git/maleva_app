@@ -50,3 +50,14 @@ openspec validate <change-name> --strict --no-interactive
 openspec validate --all --strict --no-interactive
 openspec schema validate maleva-spec-driven
 ```
+
+## Mobile app and the Java API (owner's rule, 2026-10-02)
+
+The Flutter app is being moved off the old .NET API. Every AI working on this project follows these rules:
+
+1. **One Java API per feature, shared by React and the app.** The app calls the same Java endpoints the React web app uses.
+2. **Do not change a backend API or its response to suit the mobile app.** Adapt the app instead: its data layer and models read the Java response as it is (field names, wrapper, empty-list behaviour). New or changed app screens read Java fields directly. `LegacyCallAdapter` / `SharedLookups` (which turn Java answers into the old .NET row shapes) are a transition step: when a screen is reworked, move its model to the Java fields and drop its mapping.
+3. **When no Java API exists, write a new one by migrating the .NET code** (controller, service, SQL, stored procedure) into Java properly: the module structure, bound parameters, one transaction, company scoping, tests. Keep the .NET business behaviour; fix a .NET defect only when it is clear, and write it down in the OpenSpec change. Read the latest .NET source (`C:\karthickworkspace\malevanew\fulstack\malevaold\MalevaWeb`; the local `MalevaWeb-main` copy is old) or the stored procedure; never guess business rules. The new API is a normal shared API (React can use it), not a mobile-only one.
+4. **No new .NET-shaped mobile bridge endpoints** (`/api/mobile/app/*`). Mobile-only endpoints exist only for what is truly mobile: sign-in, session, push token (`/api/mobile/auth/*`). The existing `StockApp` bridge is to be replaced by a shared stock API.
+5. **Access, not shape:** when a driver screen needs a shared API, the backend may open that endpoint to driver tokens explicitly, with the driver's limits enforced on the server (own records, own company). That is the only backend change made for the app.
+6. Plan with OpenSpec in the repository you change, and record which .NET code a new API was migrated from.

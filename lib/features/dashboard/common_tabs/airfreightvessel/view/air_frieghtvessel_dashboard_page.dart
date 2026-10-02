@@ -234,8 +234,8 @@ class _VesselDashboardView extends StatelessWidget {
               context,
               MaterialPageRoute(
                 builder: (context) => Stockinentry(
-                  JobNo: item["JobNo"].toString(),
-                  JobId: item["Id"],
+                  JobNo: item["jobNo"].toString(),
+                  JobId: item["id"],
                 ),
               ),
             );
@@ -250,7 +250,7 @@ class _VesselDashboardView extends StatelessWidget {
                   children: [
                     Expanded(
                       child: Text(
-                        item["Loadingvesselname"] ?? "Unknown Vessel",
+                        item["loadingVesselName"] ?? "Unknown Vessel",
                         style: AppTypography.heading1(color: Palette.textDark2, fontWeight: FontWeight.bold),
                         overflow: TextOverflow.ellipsis,
                         maxLines: 1,
@@ -264,7 +264,7 @@ class _VesselDashboardView extends StatelessWidget {
                         borderRadius: BorderRadius.circular(8),
                       ),
                       child: Text(
-                        item["Port"] ?? "No Port",
+                        item["port"] ?? "No Port",
                         style: AppTypography.bodyMedium(color: Palette.blue600, fontWeight: FontWeight.w700),
                         overflow: TextOverflow.ellipsis,
                       ),
@@ -279,7 +279,7 @@ class _VesselDashboardView extends StatelessWidget {
                     // Expanded added here to fix the RenderFlex overflow
                     Expanded(
                       child: Text(
-                        "AWB: ${item["AWBNo"]}",
+                        "AWB: ${item["awbNo"]}",
                         style: AppTypography.bodyLarge(color: Palette.grey600, fontWeight: FontWeight.w600),
                         overflow: TextOverflow.ellipsis,
                         maxLines: 1,
@@ -293,7 +293,7 @@ class _VesselDashboardView extends StatelessWidget {
                         borderRadius: BorderRadius.circular(6),
                       ),
                       child: Text(
-                        "Status: ${item["JobStatus"]}",
+                        "Status: ${item["jobStatus"]}",
                         style: AppTypography.bodySmall(color: Palette.textNavy, fontWeight: FontWeight.bold),
                         overflow: TextOverflow.ellipsis,
                       ),
@@ -400,8 +400,8 @@ class _VesselDashboardView extends StatelessWidget {
   }
 
   bool _isExpired(Map<String, dynamic> item) {
-    DateTime? targetETA = item["SETB"] == "" ? null : DateTime.parse(item["SETB"]);
-    DateTime? targetOETA = item["SOETB"] == "" ? null : DateTime.parse(item["SOETB"]);
+    DateTime? targetETA = DateTime.tryParse((item["setb"] ?? '').toString());
+    DateTime? targetOETA = DateTime.tryParse((item["soetb"] ?? '').toString());
     DateTime yesterday = DateTime.now().subtract(const Duration(days: 1));
     if ((targetETA != null && yesterday.isAfter(targetETA)) || (targetOETA != null && yesterday.isAfter(targetOETA))) {
       return true;

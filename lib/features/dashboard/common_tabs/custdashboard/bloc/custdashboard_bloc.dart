@@ -9,6 +9,7 @@ import 'package:maleva/features/transport/models/fuelselect_model.dart';
 import 'package:maleva/core/models/shared/payment_pending_model.dart';
 import 'package:maleva/core/network/legacy_api_repository.dart';
 import 'package:maleva/core/di/injection.dart';
+import 'package:maleva/core/dashboard/dashboard_api.dart';
 
 
 class CustDashboardBloc
@@ -152,108 +153,26 @@ class CustDashboardBloc
 
   Future<void> _fetchSalesData(
       Emitter<CustDashboardState> emit, {required int empRefId}) async {
-    final header = {'Content-Type': 'application/json; charset=UTF-8'};
     final comid = AppGlobals.storagenew.getInt('Comid') ?? 0;
-    final fromDate = _firstDayOfMonth;
-    final toDate = _today;
-
-    // ── Without invoice count (from 2024-10-01) ───────────────────────────
-    final withoutResult = await _safeApiCall(() => sl<LegacyApiRepository>().apiAllinoneSelectArray(
-        ApiConstants.SaleInvoiceCountDB,
-        {
-          'Comid': comid,
-          'Fromdate': '2024-10-01',
-          'Todate': toDate,
-          'Statusid': 0,
-          'Employeeid': empRefId,
-          'Remarks': 2,
-          'Search': '0',
-          'completestatusnotshow': false,
-          'Invoice': false,
-        },
-        header,
-        null), emit);
-
-    // ── Total count ────────────────────────────────────────────────────────
-    final totalResult = await _safeApiCall(() => sl<LegacyApiRepository>().apiAllinoneSelectArray(
-        ApiConstants.SaleInvoiceCountDB,
-        {
-          'Comid': comid,
-          'Fromdate': fromDate,
-          'Todate': toDate,
-          'Statusid': 0,
-          'Employeeid': empRefId,
-          'Remarks': 0,
-          'Search': '0',
-          'completestatusnotshow': false,
-          'Invoice': false,
-        },
-        header,
-        null), emit);
-
-    // ── Billed count ───────────────────────────────────────────────────────
-    final billedResult = await _safeApiCall(() => sl<LegacyApiRepository>().apiAllinoneSelectArray(
-        ApiConstants.SaleInvoiceCountDB,
-        {
-          'Comid': comid,
-          'Fromdate': fromDate,
-          'Todate': toDate,
-          'Statusid': 0,
-          'Employeeid': empRefId,
-          'Remarks': 1,
-          'Search': '0',
-          'completestatusnotshow': false,
-          'Invoice': false,
-        },
-        header,
-        null), emit);
-
-    // ── Unbilled count ─────────────────────────────────────────────────────
-    final unbilledResult =
-    await _safeApiCall(() => sl<LegacyApiRepository>().apiAllinoneSelectArray(
-        ApiConstants.SaleInvoiceCountDB,
-        {
-          'Comid': comid,
-          'Fromdate': fromDate,
-          'Todate': toDate,
-          'Statusid': 0,
-          'Employeeid': empRefId,
-          'Remarks': 2,
-          'Search': '0',
-          'completestatusnotshow': false,
-          'Invoice': false,
-        },
-        header,
-        null), emit);
-
-    // ── Sales order status ─────────────────────────────────────────────────
-    final salesStatusResult =
-    await _safeApiCall(() => sl<LegacyApiRepository>().apiAllinoneSelectArray(
-        ApiConstants.SelectSalesOrderStatus,
-        {'Comid': comid, 'Employeeid': empRefId},
-        header,
-        null), emit);
+    final desk = await _safeApiCall(() => sl<DashboardApi>().salesDesk(comid, empRefId), emit);
+    if (desk is! SalesDeskNumbers) return;
 
     emit(state.copyWith(
-      withoutInvoiceCount: (withoutResult is List) ? withoutResult.length : 0,
-      totalCount: (totalResult is List) ? totalResult.length : 0,
-      totalBilledCount: (billedResult is List) ? billedResult.length : 0,
-      totalUnBilledCount: (unbilledResult is List) ? unbilledResult.length : 0,
-      salesReport: (salesStatusResult is List) ? salesStatusResult : [],
+      withoutInvoiceCount: desk.withoutInvoice,
+      totalCount: desk.total,
+      totalBilledCount: desk.billed,
+      totalUnBilledCount: desk.unbilled,
+      salesReport: desk.statuses,
     ));
   }
 
   // ─── Rules Type ────────────────────────────────────────────────────────────
 
   Future<void> _fetchRulesType(Emitter<CustDashboardState> emit) async {
-    final header = {'Content-Type': 'application/json; charset=UTF-8'};
     final comid = AppGlobals.storagenew.getInt('Comid') ?? 0;
 
-    final result = await _safeApiCall(() => sl<LegacyApiRepository>().apiAllinoneSelectArray(
-        ApiConstants.LoadRulesType,
-        {'Comid': comid, 'Employeeid': AppGlobals.EmpRefId},
-        header,
-        null), emit);
+    final result = await _safeApiCall(
+        () => sl<DashboardApi>().employeeRules(comid, AppGlobals.EmpRefId), emit);
 
     if (result is List && result.isNotEmpty) {
       final rules = result

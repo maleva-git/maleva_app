@@ -1,33 +1,21 @@
-import 'package:maleva/core/network/api_constants.dart';
-import 'package:maleva/core/network/api_client.dart';
+import 'package:maleva/core/dashboard/dashboard_api.dart';
+import 'package:maleva/core/di/injection.dart';
 
+/// The sales desk's numbers, from the shared Java `/api/dashboard`.
 class SalesReportRepository {
-  /// Fetches the employee rules type
-  Future<dynamic> fetchRules(int comId, int empId) async {
-    final body = {
-      'Comid': comId,
-      'Employeeid': empId,
-    };
-    return await ApiClient.postRequest(ApiConstants.LoadRulesType, body);
-  }
+  SalesReportRepository({DashboardApi? api}) : _api = api;
 
-  /// Fetches the invoice counts (Total, Billed, Unbilled, Without Invoice)
-  Future<dynamic> fetchInvoiceCount(Map<String, dynamic> body) async {
-    return await ApiClient.postRequest(ApiConstants.SaleInvoiceCountDB, body);
-  }
+  final DashboardApi? _api;
 
-  /// Fetches the main sales report list
-  Future<dynamic> fetchOrderStatus(int comId, int empId) async {
-    final body = {
-      'Comid': comId,
-      "Employeeid": empId,
-    };
-    return await ApiClient.postRequest(ApiConstants.SelectSalesOrderStatus, body);
-  }
+  DashboardApi get _dashboard => _api ?? sl<DashboardApi>();
 
-  /// Fetches the specific employee invoice data for the Dialog
-  Future<dynamic> fetchEmployeeInvData(int comId, int type) async {
-    final url = "${ApiConstants.apiGetEmployeeInvData}$comId&type=$type";
-    return await ApiClient.postRequest(url, null);
-  }
+  /// `[{Id, AccountName}]`: the employees [empId] may look at.
+  Future<List<Map<String, dynamic>>> fetchRules(int comId, int empId) => _dashboard.employeeRules(comId, empId);
+
+  /// The four counts and the open orders by status for [empId].
+  Future<SalesDeskNumbers> fetchSalesDesk(int comId, int empId) => _dashboard.salesDesk(comId, empId);
+
+  /// `[{EmployeeName, SalesCount, Amount}]` for the employee dialog.
+  Future<List<Map<String, dynamic>>> fetchEmployeeInvData(int comId, int type) =>
+      _dashboard.employeeInvoices(comId, type);
 }

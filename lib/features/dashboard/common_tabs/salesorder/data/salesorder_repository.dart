@@ -1,33 +1,24 @@
-import 'package:maleva/core/network/api_constants.dart';
-import '../../../../../core/network/api_client.dart';
-import '../../../../../core/network/api_services/auth_api.dart';
+import 'package:maleva/core/dashboard/dashboard_api.dart';
+import 'package:maleva/core/di/injection.dart';
+import 'package:maleva/core/utils/app_preferences.dart';
 
+/// The sale-order desk's numbers, from the shared Java `/api/dashboard`.
 class SalesOrderRepository {
+  SalesOrderRepository({DashboardApi? api, int Function()? comid})
+      : _api = api,
+        _comid = comid ?? AppPreferences.getComid;
 
+  final DashboardApi? _api;
+  final int Function() _comid;
 
-  Future<dynamic> fetchSalesData(int type) async {
-    return await AuthApi.getSalesData(type);
-  }
+  DashboardApi get _dashboard => _api ?? sl<DashboardApi>();
 
-  Future<dynamic> fetchSalesInvoiceCheck(Map<String, dynamic> master) async {
-    return await AuthApi.getSalesInvoiceCheck(master);
-  }
+  /// `{TodaySales, ..., MonthAmount, monthlySales: [...]}`; [type] 1 all, 2 with invoice, 3 without.
+  Future<Map<String, dynamic>> fetchSalesData(int type) => _dashboard.sales(_comid(), type);
 
-  Future<dynamic> fetchEmployeeSalesData(int type) async {
-    return await AuthApi.getEmployeeSalesData(type: type);
-  }
+  /// `[{EmployeeName, SalesCount, Amount}]`.
+  Future<List<Map<String, dynamic>>> fetchEmployeeSalesData(int type) => _dashboard.employeeSales(_comid(), type);
 
-  Future<dynamic> fetchWaitingBills(Map<String, dynamic> master) async {
-    return await ApiClient.postRequest(
-      ApiConstants.apiSelectSaleorderinvoicecheck,
-      master,
-    );
-  }
-
-  Future<dynamic> fetchEmployeeInvData(int type, dynamic comId) async {
-    return await ApiClient.postRequest(
-      "${ApiConstants.apiGetEmployeeInvData}$comId&type=$type",
-      null,
-    );
-  }
+  /// `[{EmployeeName, SalesCount, Amount}]` for the invoice desk.
+  Future<List<Map<String, dynamic>>> fetchEmployeeInvData(int type) => _dashboard.employeeInvoices(_comid(), type);
 }

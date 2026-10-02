@@ -1,5 +1,4 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:intl/intl.dart';
 import 'package:maleva/core/utils/app_globals.dart';
 
 import '../data/airfreight_repository.dart';
@@ -30,9 +29,8 @@ class AirfreightBloc extends Bloc<CustomerDashboardEvent, AirfreightState> {
       // ✅ Call repository
       final resultData = await repository.fetchRules(comId, AppGlobals.EmpRefId);
 
-      if (resultData != null && resultData is List) {
-        final List<Map<String, dynamic>> employees =
-        resultData.map((e) => e as Map<String, dynamic>).toList();
+      if (resultData.isNotEmpty) {
+        final List<Map<String, dynamic>> employees = resultData;
 
         emit(state.copyWith(
           isLoading: false,
@@ -69,42 +67,19 @@ class AirfreightBloc extends Bloc<CustomerDashboardEvent, AirfreightState> {
       ) async {
     emit(state.copyWith(isLoading: true));
 
-    final DateTime now = DateTime.now();
-    final String toDate = DateFormat('yyyy-MM-dd').format(now);
-    final String fromDate = DateFormat('yyyy-MM-dd').format(DateTime(now.year, now.month, 1));
-
     final int comId = AppGlobals.storagenew.getInt('Comid') ?? 0;
     final int empId = event.empId;
 
     try {
-      // ✅ Execute all 5 heavy API calls in parallel for a massive speed boost!
-      final responses = await Future.wait([
-        repository.fetchInvoiceCount({
-          'Comid': comId, 'Fromdate': '2024-10-01', 'Todate': toDate, 'Statusid': 0,
-          'Employeeid': empId, 'Remarks': 2, 'Search': '0', 'completestatusnotshow': false, 'Invoice': false,
-        }),
-        repository.fetchInvoiceCount({
-          'Comid': comId, 'Fromdate': fromDate, 'Todate': toDate, 'Statusid': 0,
-          'Employeeid': empId, 'Remarks': 0, 'Search': '0', 'completestatusnotshow': false, 'Invoice': false,
-        }),
-        repository.fetchInvoiceCount({
-          'Comid': comId, 'Fromdate': fromDate, 'Todate': toDate, 'Statusid': 0,
-          'Employeeid': empId, 'Remarks': 1, 'Search': '0', 'completestatusnotshow': false, 'Invoice': false,
-        }),
-        repository.fetchInvoiceCount({
-          'Comid': comId, 'Fromdate': fromDate, 'Todate': toDate, 'Statusid': 0,
-          'Employeeid': empId, 'Remarks': 2, 'Search': '0', 'completestatusnotshow': false, 'Invoice': false,
-        }),
-        repository.fetchOrderStatus(comId, empId),
-      ]);
+      final desk = await repository.fetchSalesDesk(comId, empId);
 
       emit(state.copyWith(
         isLoading: false,
-        withoutInvoiceCount: responses[0] is List ? responses[0].length : 0,
-        totalCount:          responses[1] is List ? responses[1].length : 0,
-        totalBilledCount:    responses[2] is List ? responses[2].length : 0,
-        totalUnBilledCount:  responses[3] is List ? responses[3].length : 0,
-        salesReport:         responses[4] is List ? responses[4] : [],
+        withoutInvoiceCount: desk.withoutInvoice,
+        totalCount:          desk.total,
+        totalBilledCount:    desk.billed,
+        totalUnBilledCount:  desk.unbilled,
+        salesReport:         desk.statuses,
       ));
     } catch (error) {
       emit(state.copyWith(isLoading: false));

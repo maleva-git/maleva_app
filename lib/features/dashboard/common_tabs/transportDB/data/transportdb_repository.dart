@@ -1,4 +1,6 @@
 import 'package:maleva/core/network/api_constants.dart';
+import 'package:maleva/core/dashboard/dashboard_api.dart';
+import 'package:maleva/core/di/injection.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
@@ -14,46 +16,20 @@ class TransportDashboardRepository {
   final int comid = AppPreferences.getComid();
   final int empRefId = AppPreferences.getEmpRefId();
 
-  // ─── Sales ─────────────────────────────────────────────────────────────────
+  // ─── Sales (shared Java /api/dashboard) ────────────────────────────────────
   Future<Map<String, dynamic>> fetchSalesData(int empId) async {
-    final now = DateTime.now();
-    final toDate = DateFormat('yyyy-MM-dd').format(now);
-    final fromDate = DateFormat('yyyy-MM-dd').format(DateTime(now.year, now.month, 1));
-
-    // Notice we use ApiClient for everything now
-    final r1 = await ApiClient.postRequest(ApiConstants.SaleInvoiceCountDB, {
-      'Comid': comid, 'Fromdate': '2024-10-01', 'Todate': toDate, 'Statusid': 0,
-      'Employeeid': empId, 'Remarks': 2, 'Search': '0', 'completestatusnotshow': false, 'Invoice': false,
-    });
-    final r2 = await ApiClient.postRequest(ApiConstants.SaleInvoiceCountDB, {
-      'Comid': comid, 'Fromdate': fromDate, 'Todate': toDate, 'Statusid': 0,
-      'Employeeid': empId, 'Remarks': 0, 'Search': '0', 'completestatusnotshow': false, 'Invoice': false,
-    });
-    final r3 = await ApiClient.postRequest(ApiConstants.SaleInvoiceCountDB, {
-      'Comid': comid, 'Fromdate': fromDate, 'Todate': toDate, 'Statusid': 0,
-      'Employeeid': empId, 'Remarks': 1, 'Search': '0', 'completestatusnotshow': false, 'Invoice': false,
-    });
-    final r4 = await ApiClient.postRequest(ApiConstants.SaleInvoiceCountDB, {
-      'Comid': comid, 'Fromdate': fromDate, 'Todate': toDate, 'Statusid': 0,
-      'Employeeid': empId, 'Remarks': 2, 'Search': '0', 'completestatusnotshow': false, 'Invoice': false,
-    });
-    final r5 = await ApiClient.postRequest(ApiConstants.SelectSalesOrderStatus, {
-      'Comid': comid, 'Employeeid': empId
-    });
-
+    final desk = await sl<DashboardApi>().salesDesk(comid, empId);
     return {
-      'withoutInvoiceCount': (r1 is List) ? r1.length : 0,
-      'totalCount': (r2 is List) ? r2.length : 0,
-      'totalBilledCount': (r3 is List) ? r3.length : 0,
-      'totalUnBilledCount': (r4 is List) ? r4.length : 0,
-      'salesReport': (r5 is List) ? r5 : [],
+      'withoutInvoiceCount': desk.withoutInvoice,
+      'totalCount': desk.total,
+      'totalBilledCount': desk.billed,
+      'totalUnBilledCount': desk.unbilled,
+      'salesReport': desk.statuses,
     };
   }
 
-  Future<List<Map<String, dynamic>>> fetchRulesType() async {
-    final result = await ApiClient.postRequest(ApiConstants.LoadRulesType, {'Comid': comid, 'Employeeid': empRefId});
-    return result is List ? result.cast<Map<String, dynamic>>() : [];
-  }
+  /// `[{Id, AccountName}]`: the employees this user may look at.
+  Future<List<Map<String, dynamic>>> fetchRulesType() => sl<DashboardApi>().employeeRules(comid, empRefId);
 
   // ─── Transport/Planning ────────────────────────────────────────────────────
   Future<List<dynamic>> fetchPlanningData(int type) async {

@@ -2,7 +2,6 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:bloc_concurrency/bloc_concurrency.dart';
 import 'package:intl/intl.dart';
-import 'package:maleva/core/utils/app_globals.dart';
 import '../data/salesorder_repository.dart';
 import 'salesorder_event.dart';
 import 'salesorder_state.dart';
@@ -58,13 +57,13 @@ class SalesOrderBloc extends Bloc<SalesOrderEvent, SalesOrderState> {
 
           final resultData = results[0];
 
-          if (resultData != null && resultData != "") {
+          if (resultData.isNotEmpty) {
             final saleMonthData =
-            List<dynamic>.from(resultData["Data2"] ?? []);
+            List<dynamic>.from(resultData["monthlySales"] ?? []);
             final monthResult = _buildMonthData(saleMonthData, 6);
 
             emit(InvoiceLoaded(
-              saleDataAll: List<dynamic>.from(resultData["Data1"] ?? []),
+              saleDataAll: [resultData],
               saleMonthData: saleMonthData,
               monthList: monthResult.$1,
               monthData: monthResult.$2,
@@ -121,13 +120,10 @@ class SalesOrderBloc extends Bloc<SalesOrderEvent, SalesOrderState> {
 
         try {
 
-          final resultData = await repository.fetchEmployeeInvData(
-              event.type,
-              AppGlobals.Comid
-          );
+          final resultData = await repository.fetchEmployeeInvData(event.type);
 
           emit(current.copyWith(
-            employeeData: List<dynamic>.from(resultData?["Data1"] ?? []),
+            employeeData: List<dynamic>.from(resultData),
           ));
         } catch (e, stack) { debugPrint("Error caught globally: $e\n$stack"); }
       },
@@ -146,7 +142,7 @@ class SalesOrderBloc extends Bloc<SalesOrderEvent, SalesOrderState> {
             event.type, // 0=Today, 1=Yesterday, 2=Weekly, 3=Monthly
           );
           emit(current.copyWith(
-            employeeData:    List<dynamic>.from(resultData?["Data1"] ?? []),
+            employeeData:    List<dynamic>.from(resultData),
           ));
         } catch (e, stack) { debugPrint("Error caught globally: $e\n$stack"); }
       },

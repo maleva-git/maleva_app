@@ -1,9 +1,8 @@
-import 'package:maleva/core/network/api_constants.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:maleva/core/utils/app_globals.dart';
 import 'air_frieghtvessel_dashboard_event.dart';
 import 'air_frieghtvessel_dashboard_state.dart';
-import 'package:maleva/core/network/legacy_api_repository.dart';
+import 'package:maleva/core/dashboard/dashboard_api.dart';
 import 'package:maleva/core/di/injection.dart';
 
 
@@ -46,27 +45,18 @@ class VesselDashboardBloc extends Bloc<VesselDashboardEvent, VesselDashboardStat
   Future<void> _onLoadRequested(VesselLoadRequested event, Emitter<VesselDashboardState> emit) async {
     emit(state.copyWith(isLoading: true, errorMessage: ''));
     try {
-      final header = {'Content-Type': 'application/json; charset=UTF-8'};
       final comid = AppGlobals.storagenew.getInt('Comid') ?? 0;
 
-      final master = {
-        'Comid': comid,
-        'Fromdate': state.fromDate,
-        'Todate': state.toDate,
-        'Search': state.remarks,
-        'Employeeid': 0,
-        'ETAType': 5,
-        'StatusId': state.statusId
-      };
-
-      final result = await sl<LegacyApiRepository>().apiAllinoneSelectArray(ApiConstants.AirFrieghtDB, master, header, null);
-
-      if (result != null && result is List) {
-        result.sort((a, b) => (a['Port'] ?? '').toString().toLowerCase().compareTo((b['Port'] ?? '').toString().toLowerCase()));
-        emit(state.copyWith(vesselList: result, isLoading: false));
-      } else {
-        emit(state.copyWith(vesselList: [], isLoading: false));
-      }
+      // shared Java POST /api/dashboard/air-freight/{comid}: camelCase rows
+      final result = List<Map<String, dynamic>>.of(await sl<DashboardApi>().airFreight(
+        comid,
+        fromDate: state.fromDate,
+        toDate: state.toDate,
+        search: state.remarks,
+        statusId: state.statusId,
+      ));
+      result.sort((a, b) => (a['port'] ?? '').toString().toLowerCase().compareTo((b['port'] ?? '').toString().toLowerCase()));
+      emit(state.copyWith(vesselList: result, isLoading: false));
     } catch (e) {
       emit(state.copyWith(isLoading: false, errorMessage: e.toString()));
     }

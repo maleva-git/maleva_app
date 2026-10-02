@@ -21,11 +21,6 @@ class ApiConstants {
   // ─── Auth / Login ─────────────────────────────────────────────────────────
   static const String apiSelectUser       = "$port/api/LoginApp/SelectLoginUser?Comid=";
   static const String apiEditPassword     = "$port/api/LoginApp/EditPassword?password=";
-  static const String apiGetSalesData     = "$port/api/LoginApp/GetSalesData?Comid=";
-  static const String apiGetEmployeeSalesData = "$port/api/LoginApp/GetEmployeeSalesData?Comid=";
-  static const String apiGetEmployeeInvData   = "$port/api/LoginApp/GetEmployeeInvData?Comid=";
-  static const String apiGetFWData        = "$port/api/LoginApp/GetFWData?Comid=";
-  static const String apiGetExpData       = "$port/api/LoginApp/GetExpData?Comid=";
 
   // ─── Master Data ──────────────────────────────────────────────────────────
   static const String apiSelectCustomer   = "$port/api/CustomerApp/GetCustomer?Comid=";
@@ -78,8 +73,6 @@ class ApiConstants {
   static const String apiSelectBoardingSalaryNew = "$port/api/BoardingSalaryApp/SelectBoardingSalary";
   static const String apiSelectBoardingSalaryByEmpId = "$port/api/BoardingSalaryApp/SelectBoardingSalaryByEmpId";
   static const String apiSelectSaleorderinvoicecheck = "$port/api/MasterReportApp/SelectChecksalesinvoice";
-  static String SaleInvoiceCountDB      = "$port/api/DashBoardApp/CheckSaleInvoiceCount";
-  static String SelectSalesOrderStatus  = "$port/api/DashBoardApp/SelectSalesOrderStatus";
 
   // ─── Planning ─────────────────────────────────────────────────────────────
   static const String apiSelectPlanning       = "$port/api/PlanningApp/SelectPLANING";
@@ -87,7 +80,6 @@ class ApiConstants {
   static String PLANINGSearch           = "$port/api/PlanningApp/PLANINGSearch";
   static const String apiViewPlanningPdf      = "$port/api/PlanningApp/PLANINGVIEW?PlanningNo=";
   static String PLANINGSearchDB         = "$port/api/DashBoardApp/PLANINGSearchDB";
-  static String PLANINGDriverSearch     = "$port/api/DashBoardApp/PLANINGDriverSearch";
 
   // ─── Vessel Planning ──────────────────────────────────────────────────────
   static const String apiSelectVesselPlanning = "$port/api/VesselPlanningApp/SelectVESSELPLANING";
@@ -165,11 +157,6 @@ class ApiConstants {
   static const String apiGetMaintenance       = "$port/api/DashboardApp/LoadSupplierExpenseData?Comid=";
   static const String apiGetMaintenance1      = "$port/api/DashboardApp/LoadExpenseData?Comid=";
   static const String apiGetMaintenance2      = "$port/api/DashboardApp/SelectStatusBO?Comid=";
-  static const String apiSelectExpenseDetails = "$port/api/DashboardApp/SelectExpenseName";
-  static String LoadRulesType           = "$port/api/DashBoardApp/LoadRulesType";
-  static String LoadUnReleaseNo         = "$port/api/DashBoardApp/LoadUnReleaseNo";
-  static String LoadK8UnReleaseNo       = "$port/api/DashBoardApp/LoadK8UnReleaseNo";
-  static String AirFrieghtDB            = "$port/api/DashBoardApp/AirFrieghtDB";
 
   // ─── Reports ──────────────────────────────────────────────────────────────
   static const String apiPreAlertReport       = "$port/api/TransactionReportApp/PreAlertReport?PreAlertName=";

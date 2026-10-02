@@ -1,5 +1,4 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:intl/intl.dart';
 import 'package:maleva/core/utils/app_globals.dart';
 import 'package:maleva/features/dashboard/common_tabs/subadminsale/bloc/sales_report_event.dart';
 import 'package:maleva/features/dashboard/common_tabs/subadminsale/bloc/sales_report_state.dart';
@@ -21,12 +20,6 @@ class SalesReportBloc extends Bloc<SalesReportEvent, SalesReportState> {
   }
 
   // ── Helpers ────────────────────────────────────────────────────────────────
-  String get _fromDate {
-    final now = DateTime.now();
-    return DateFormat('yyyy-MM-dd').format(DateTime(now.year, now.month, 1));
-  }
-
-  String get _toDate => DateFormat('yyyy-MM-dd').format(DateTime.now());
   int get _comId => AppGlobals.storagenew.getInt('Comid') ?? 0;
 
   // ── Load Initial Data ───────────────────────────────────────────────────────
@@ -100,9 +93,7 @@ class SalesReportBloc extends Bloc<SalesReportEvent, SalesReportState> {
     try {
       final resultData = await repository.fetchEmployeeInvData(_comId, event.type);
 
-      if (resultData != null && resultData is Map && resultData.containsKey("Data1")) {
-        emit(SalesReportEmpDetailLoaded(empSalesReport: resultData["Data1"]));
-      }
+      emit(SalesReportEmpDetailLoaded(empSalesReport: resultData));
     } catch (e) {
       emit(SalesReportError(errorMessage: e.toString()));
     }
@@ -110,42 +101,18 @@ class SalesReportBloc extends Bloc<SalesReportEvent, SalesReportState> {
 
   // ── Private: Load Employee List ─────────────────────────────────────────────
   Future<List<Map<String, dynamic>>> _loadRulesType() async {
-    final resultData = await repository.fetchRules(_comId, AppGlobals.EmpRefId);
-    if (resultData != null && resultData is List) {
-      return resultData.map((e) => e as Map<String, dynamic>).toList();
-    }
-    return [];
+    return repository.fetchRules(_comId, AppGlobals.EmpRefId);
   }
 
   // ── Private: Load All 5 API Calls (Optimized Parallel Execution) ─────────────
   Future<Map<String, dynamic>> _loadAllSalesData() async {
-    // ✅ Executing all 5 API calls at the same time makes loading significantly faster!
-    final responses = await Future.wait([
-      repository.fetchInvoiceCount({
-        'Comid': _comId, 'Fromdate': "2024-10-01", 'Todate': _toDate, "Statusid": 0,
-        "Employeeid": _empId, "Remarks": 2, "Search": "0", "completestatusnotshow": false, "Invoice": false,
-      }),
-      repository.fetchInvoiceCount({
-        'Comid': _comId, 'Fromdate': _fromDate, 'Todate': _toDate, "Statusid": 0,
-        "Employeeid": _empId, "Remarks": 0, "Search": "0", "completestatusnotshow": false, "Invoice": false,
-      }),
-      repository.fetchInvoiceCount({
-        'Comid': _comId, 'Fromdate': _fromDate, 'Todate': _toDate, "Statusid": 0,
-        "Employeeid": _empId, "Remarks": 1, "Search": "0", "completestatusnotshow": false, "Invoice": false,
-      }),
-      repository.fetchInvoiceCount({
-        'Comid': _comId, 'Fromdate': _fromDate, 'Todate': _toDate, "Statusid": 0,
-        "Employeeid": _empId, "Remarks": 2, "Search": "0", "completestatusnotshow": false, "Invoice": false,
-      }),
-      repository.fetchOrderStatus(_comId, _empId),
-    ]);
-
+    final desk = await repository.fetchSalesDesk(_comId, _empId);
     return {
-      'withoutInvoiceCount': (responses[0] is List) ? responses[0].length : 0,
-      'totalCount':          (responses[1] is List) ? responses[1].length : 0,
-      'totalBilledCount':    (responses[2] is List) ? responses[2].length : 0,
-      'totalUnBilledCount':  (responses[3] is List) ? responses[3].length : 0,
-      'salesReport':         (responses[4] is List) ? responses[4] : [],
+      'withoutInvoiceCount': desk.withoutInvoice,
+      'totalCount':          desk.total,
+      'totalBilledCount':    desk.billed,
+      'totalUnBilledCount':  desk.unbilled,
+      'salesReport':         desk.statuses,
     };
   }
 }

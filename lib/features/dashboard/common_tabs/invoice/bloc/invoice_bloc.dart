@@ -186,11 +186,11 @@ class InvoiceBloc extends Bloc<InvoiceEvent, InvoiceState> {
         return;
       }
 
-      final saleMonthData = List<dynamic>.from(salesData['Data2'] ?? []);
+      final saleMonthData = List<dynamic>.from(salesData['monthlySales'] ?? []);
       final (monthList, monthData) = _buildMonthData(saleMonthData, 6);
 
       emit(InvoiceLoaded(
-        saleDataAll:      List<dynamic>.from(salesData['Data1'] ?? []),
+        saleDataAll:      [salesData],
         saleMonthData:    saleMonthData,
         waitingBilling:   waitingBills,
         monthList:        monthList,

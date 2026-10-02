@@ -182,10 +182,10 @@ class _SummaryCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final rows = [
-      {'label': 'Today',     'countKey': 'TodayCount',     'withKey': 'TodayWithRelease',     'withoutKey': 'TodayRelease'},
-      {'label': 'Yesterday', 'countKey': 'YesterdayCount', 'withKey': 'YesterdayWithRelease', 'withoutKey': 'YesterdayRelease'},
-      {'label': 'Weekly',    'countKey': 'WeekCount',      'withKey': 'WeekWithRelease',      'withoutKey': 'WeekRelease'},
-      {'label': 'Monthly',   'countKey': 'MonthCount',     'withKey': 'MonthWithRelease',     'withoutKey': 'MonthRelease'},
+      {'label': 'Today',     'countKey': 'todayCount',     'withKey': 'todayWithRelease',     'withoutKey': 'todayRelease'},
+      {'label': 'Yesterday', 'countKey': 'yesterdayCount', 'withKey': 'yesterdayWithRelease', 'withoutKey': 'yesterdayRelease'},
+      {'label': 'Weekly',    'countKey': 'weekCount',      'withKey': 'weekWithRelease',      'withoutKey': 'weekRelease'},
+      {'label': 'Monthly',   'countKey': 'monthCount',     'withKey': 'monthWithRelease',     'withoutKey': 'monthRelease'},
     ];
 
     return Container(
@@ -477,10 +477,10 @@ class _KTypeCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final ktypes = [
-      {'label': 'K1', 'countKey': 'K1Count', 'withKey': 'K1WithRelease', 'withoutKey': 'K1Release'},
-      {'label': 'K2', 'countKey': 'K2Count', 'withKey': 'K2WithRelease', 'withoutKey': 'K2Release'},
-      {'label': 'K3', 'countKey': 'K3Count', 'withKey': 'K3WithRelease', 'withoutKey': 'K3Release'},
-      {'label': 'K8', 'countKey': 'K8Count', 'withKey': 'K8WithRelease', 'withoutKey': 'K8Release'},
+      {'label': 'K1', 'countKey': 'k1Count', 'withKey': 'k1WithRelease', 'withoutKey': 'k1Release'},
+      {'label': 'K2', 'countKey': 'k2Count', 'withKey': 'k2WithRelease', 'withoutKey': 'k2Release'},
+      {'label': 'K3', 'countKey': 'k3Count', 'withKey': 'k3WithRelease', 'withoutKey': 'k3Release'},
+      {'label': 'K8', 'countKey': 'k8Count', 'withKey': 'k8WithRelease', 'withoutKey': 'k8Release'},
     ];
 
     final data = state.saleFWReport2;
