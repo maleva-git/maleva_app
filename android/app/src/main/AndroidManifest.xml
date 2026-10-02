@@ -32,6 +32,8 @@
         android:supportsRtl="true"
         android:manageSpaceActivity=".AnyActivity"
         android:enableOnBackInvokedCallback="true"
+        android:fullBackupContent="@xml/backup_rules"
+        android:dataExtractionRules="@xml/data_extraction_rules"
         android:requestLegacyExternalStorage="true">
         <activity
             android:name=".MainActivity"

@@ -1,5 +1,5 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:maleva/core/utils/app_globals.dart';
+import 'package:maleva/core/utils/app_preferences.dart';
 import '../../data/repositories/auth_repository.dart';
 import 'auth_event.dart';
 import 'auth_state.dart';
@@ -60,19 +60,16 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
         return;
       }
 
-      String oldUserName = AppGlobals.storagenew.getString('OldUsername') ?? "";
-
       try {
 
         bool result = await authRepository.loginUser(
           username: state.username,
           password: state.password,
-          oldUsername: oldUserName,
           driverId: state.driverLogin ? 1 : 0,
         );
 
         if (result) {
-          String role = AppGlobals.storagenew.getString('RulesType') ?? "";
+          String role = AppPreferences.getRulesType();
 
           emit(state.copyWith(
             loading: false,

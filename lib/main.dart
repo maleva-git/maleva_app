@@ -13,6 +13,9 @@ import 'package:path_provider/path_provider.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:maleva/features/troubleshoot/data/applog_api.dart';
 import 'core/di/injection.dart';
+import 'features/auth/data/device_token_listener.dart';
+import 'features/auth/data/session_service.dart';
+import 'core/network/certificate_policy.dart';
 import 'core/utils/app_preferences.dart';
 
 class MyHttpOverrides extends HttpOverrides {
@@ -20,7 +23,7 @@ class MyHttpOverrides extends HttpOverrides {
   HttpClient createHttpClient(SecurityContext? context) {
     return super.createHttpClient(context)
       ..badCertificateCallback =
-          (X509Certificate cert, String host, int port) => true;
+          (X509Certificate cert, String host, int port) => acceptInvalidCertificate(host);
   }
 }
 
@@ -60,6 +63,7 @@ Future<void> main() async {
     await AppPreferences.init();
 
     await setupDependencies();
+    listenForDeviceTokenChanges(FirebaseMessaging.instance.onTokenRefresh, sl<SessionService>());
 
     FirebaseMessaging.onBackgroundMessage(backgroundHandler);
     if (Platform.isIOS) {
@@ -170,7 +174,6 @@ class _MyHomePageState extends State<MyHomePage> {
     super.initState();
     //#region------FireBase-------
     LocalNotificationService.initialize(context);
-    _getFCMToken();
 
     ///gives you the message on which user taps
     ///and it opened the app from terminated state
@@ -248,14 +251,6 @@ class _MyHomePageState extends State<MyHomePage> {
     //   /// do something...
     // });
     //#endregion
-  }
-
-  _getFCMToken() async {
-    String? token = await FirebaseMessaging.instance.getToken();
-    AppGlobals.print_("🔥 FCM Token: $token");
-    print("🔥 FCM Token: $token");
-    // TODO: send this token to your ASP.NET server
-    // await http.post("https://yourserver.com/api/saveToken", body: {"token": token});
   }
 
   @override

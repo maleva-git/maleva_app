@@ -3,11 +3,11 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:go_router/go_router.dart';
 import 'package:maleva/core/colors/colors.dart' as colour;
 import 'package:maleva/core/utils/app_globals.dart';
-import 'package:maleva/core/utils/app_preferences.dart';
 import 'package:maleva/core/models/shared/employee_model.dart';
 import 'package:maleva/features/home/view/home_tab.dart';
 import 'package:maleva/features/mastersearch/Employee.dart';
 import 'package:maleva/core/di/injection.dart';
+import 'package:maleva/features/auth/data/session_service.dart';
 import 'package:maleva/core/network/legacy_api_repository.dart';
 
 class AuthHelper {
@@ -214,10 +214,10 @@ class AuthHelper {
     
     AppGlobals.loginId = 0;
     AppGlobals.loginname = '';
-    AppGlobals.DriverLogin = 0;
-    AppGlobals.DriverTruckRefId = 0;
-    
-    await AppPreferences.clearOnLogout();
+
+    // Ends the Java session (server first, best effort), deletes the token and
+    // clears the login fields - also when the phone is offline.
+    await sl<SessionService>().signOut();
     if (!context.mounted) return;
     context.go('/login');
   }

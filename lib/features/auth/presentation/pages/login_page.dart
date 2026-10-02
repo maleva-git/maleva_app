@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../bloc/auth_bloc.dart';
 import '../bloc/auth_state.dart';
 import 'login_design.dart';
+import '../dashboard_routes.dart';
 import '../../../../core/utils/app_preferences.dart';
 
 class Appuserloginmobile extends StatelessWidget
@@ -39,57 +40,6 @@ class Appuserloginmobile extends StatelessWidget
   
   void _navigateBasedOnRole(
       BuildContext context, LoginState state) {
-
-    if (state.driverLogin) {
-      context.go('/driver_dashboard');
-      return;
-    }
-
-    int roleId = AppPreferences.getRoleId();
-
-    switch (roleId) {
-      case 100: // FORWARDING ADMIN
-        context.go('/dashboard/admin');
-        break;
-      case 200: // ADMIN2
-        context.go('/dashboard/admin');
-        break;
-      case 300: // SALES
-        context.go('/dashboard/sales');
-        break;
-      case 400: // OPERATIONADMIN
-        context.go('/dashboard/admin');
-        break;
-      case 500: // BOARDING
-      case 600: // BOARDINGOFFICERADMIN
-        context.go('/dashboard/boarding');
-        break;
-      case 800: // HRADMIN
-        context.go('/dashboard/admin');
-        break;
-      case 900: // ACCOUNTS
-        context.go('/dashboard/payable');
-        break;
-      case 1000: // TRANSPORTATION
-        context.go('/dashboard/transport');
-        break;
-      case 1200: // RECEIVABLE
-        context.go('/dashboard/receivable');
-
-        break;
-      case 1300: // MAINTENANCE
-        context.go('/dashboard/maintenance');
-        break;
-      case 1400: // FORWARDING AGENT
-        context.go('/dashboard/forwarding_agent');
-        break;
-
-      case 1500: // AIR FREIGHT
-        context.go('/dashboard/air_freight');
-        break;
-      default:
-        context.go('/unauthorized');
-        break;
-    }
+    context.go(dashboardRouteFor(isDriver: state.driverLogin, roleId: AppPreferences.getRoleId()));
   }
 }

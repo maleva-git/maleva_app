@@ -125,6 +125,8 @@ import 'package:maleva/features/transaction/viewsaleorder/data/viewsaleorder_rep
 import 'package:maleva/features/transaction/viewsaleorder/bloc/viewsaleorder_bloc.dart';
 import 'package:maleva/features/ir_report/ir_report_injection.dart';
 import 'package:maleva/features/truck_location/truck_location_injection.dart';
+import 'package:maleva/features/auth/auth_injection.dart';
+import 'package:maleva/features/auth/data/session_service.dart';
 final sl = GetIt.instance;
 
 Future<void> setupDependencies() async {
@@ -189,8 +191,9 @@ Future<void> setupDependencies() async {
 
   sl.registerLazySingleton<AuthApi>(() => AuthApi.instance);
 
+  registerAuthModule(sl);
   sl.registerLazySingleton<AuthRepository>(
-        () => AuthRepository(authApi: sl<AuthApi>()),
+        () => AuthRepository(sessionService: sl<SessionService>()),
   );
   sl.registerFactory<LoginBloc>(
         () => LoginBloc(authRepository: sl<AuthRepository>()),

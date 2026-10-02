@@ -1,138 +1,14 @@
-import 'dart:convert';
 import 'package:maleva/core/network/api_client.dart';
 import 'package:maleva/core/network/api_constants.dart';
 import 'package:maleva/core/utils/app_preferences.dart';
-import 'package:maleva/core/utils/app_globals.dart';
-import 'package:maleva/core/models/shared/menu_master_model.dart';
-import 'package:maleva/core/models/shared/response_view_model.dart';
 import 'package:maleva/features/auth/models/user_login_model.dart';
 
 class AuthApi {
   AuthApi._();
   static final AuthApi instance = AuthApi._();
 
-  Future<dynamic> loginUserRaw({
-    required String username,
-    required String password,
-    required String oldUsername,
-    required int driverId,
-    required String fcmToken,
-  }) async {
-    final url = '${ApiConstants.apiLoginSuccess}$username'
-        '&Pwd=$password&olduserid=$oldUsername&DriverId=$driverId';
 
-    final result = await ApiClient.postRequest(
-      url,
-      null,
-      headers: {'Content-Type': 'application/json; charset=UTF-8', 'Token': fcmToken},
-      skipAuth: true,
-    );
 
-    if (result == null) throw Exception('No response from server');
-
-    if (result is! Map<String, dynamic>) {
-      throw Exception('Unexpected response format');
-    }
-
-    return result;
-  }
-
-  static Future<bool> loginUser({
-    required String username,
-    required String password,
-    required String oldUsername,
-    required int driverId,
-  }) async {
-    final fcmToken = AppPreferences.getFcmToken();
-
-    final url = '${ApiConstants.apiLoginSuccess}$username'
-        '&Pwd=$password&olduserid=$oldUsername&DriverId=$driverId';
-
-    final result = await ApiClient.postRequest(
-      url,
-      null,
-      headers: {'Content-Type': 'application/json; charset=UTF-8', 'Token': fcmToken},
-      skipAuth: true,
-    );
-
-    if (result == null) throw Exception('No response from server');
-
-    if (result is! Map<String, dynamic>) {
-      throw Exception('Unexpected response format');
-    }
-
-    final value = ResponseViewModel.fromJson(result);
-
-    if (value.IsSuccess == true) {
-      await _saveLoginData(value, username, password, driverId, oldUsername);
-      return true;
-    } else if (value.StatusCode != 500) {
-      throw Exception('Invalid Username & Password');
-    } else {
-      throw Exception(value.Message ?? 'Server Error');
-    }
-  }
-
-  static Future<void> _saveLoginData(
-      ResponseViewModel value,
-      String username,
-      String password,
-      int driverId,
-      String oldUsername,
-      ) async {
-    final data = value.data1[0];
-    final idNew = data['UserId'] ?? 0;
-    final comid = data['Comid'] ?? 0;
-    final mComid = data['MComid'] ?? 0;
-
-    AppGlobals.selectedCompanyName = data['CompanyName'] ?? '';
-    AppGlobals.EmpRefId = idNew;
-
-    await AppPreferences.setEmpRefId(idNew);
-    await AppPreferences.setEnquiryOpen('false');
-    await AppPreferences.setUsername(username);
-    await AppPreferences.setPassword(password);
-    await AppPreferences.setDriverId(driverId);
-    await AppPreferences.setRulesType(data['RulesType'] ?? '');
-    await AppPreferences.setComid(comid);
-    await AppPreferences.setMComid(mComid);
-    await AppPreferences.setOldUsername(idNew.toString());
-
-    AppGlobals.DriverLogin = driverId;
-    AppGlobals.Comid = comid;
-    AppGlobals.DriverTruckRefId = data['TruckRefId'] ?? 0;
-    AppGlobals.DriverTruckName  = data['TruckName'] ?? '';
-
-    // Menu data
-    if (oldUsername.isEmpty) {
-      final menudata = value.data3 ?? [];
-      if (menudata.isNotEmpty) {
-        AppGlobals.objMenuMaster.clear();
-        AppGlobals.parentclass.clear();
-        await AppPreferences.setLoadMenu(json.encode(menudata));
-        for (var item in menudata) {
-          AppGlobals.objMenuMaster.add(MenuMasterModel.fromJson(item));
-        }
-        AppGlobals.parentclass.addAll(
-          AppGlobals.objMenuMaster.where((e) => e.ParentId == 0),
-        );
-      }
-    } else {
-      final temp = AppPreferences.getLoadMenu();
-      if (temp.isNotEmpty && temp != 'null') {
-        final menudata = json.decode(temp) as List;
-        AppGlobals.objMenuMaster.clear();
-        AppGlobals.parentclass.clear();
-        for (var item in menudata) {
-          if (item['FormText'] == null) continue;
-          AppGlobals.objMenuMaster.add(MenuMasterModel.fromJson(item));
-        }
-        AppGlobals.parentclass.addAll(
-          AppGlobals.objMenuMaster.where((e) => e.ParentId == 0),
-        );
-      }
-    }
-  }
 
   // ─── Select Users ─────────────────────────────────────────────────────────
   static Future<List<UserLoginModel>> selectUsers() async {

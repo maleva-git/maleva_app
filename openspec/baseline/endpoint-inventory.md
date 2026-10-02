@@ -13,7 +13,7 @@ Paths preserve casing and spelling from the code. `{base}` is AppConfig.baseUrl;
 | `apiUploadPdfFile` | `{base}/api/CommonApp/UploadPdfFile/` | 0 | No lexical reference found |
 | `apiGetImage` | `{base}/api/CommonApp/FetchFiles?ImageDirectory=` | 6 | [airfreight_bloc.dart](../../lib/features/airfreight/updateairfreight/bloc/airfreight_bloc.dart) |
 | `apiDeleteImage` | `{base}/api/CommonApp/DeleteFile` | 7 | [airfreight_bloc.dart](../../lib/features/airfreight/updateairfreight/bloc/airfreight_bloc.dart) |
-| `apiLoginSuccess` | `{base}/api/LoginApp/LoginAppSuccess?Userid=` | 2 | [legacy_api_repository.dart](../../lib/core/network/legacy_api_repository.dart) |
+| ~~`apiLoginSuccess`~~ | ~~`{base}/api/LoginApp/LoginAppSuccess?Userid=`~~ | 0 | Removed 2026-10-01 (change `move-mobile-login-to-java`): sign-in, restore and sign-out use the Java `/api/mobile/auth/login`, `/refresh`, `/logout` through [mobile_auth_api.dart](../../lib/features/auth/data/mobile_auth_api.dart) |
 | `apiSelectUser` | `{base}/api/LoginApp/SelectLoginUser?Comid=` | 2 | [legacy_api_repository.dart](../../lib/core/network/legacy_api_repository.dart) |
 | `apiEditPassword` | `{base}/api/LoginApp/EditPassword?password=` | 0 | No lexical reference found |
 | `apiGetSalesData` | `{base}/api/LoginApp/GetSalesData?Comid=` | 1 | [auth_api.dart](../../lib/core/network/api_services/auth_api.dart) |

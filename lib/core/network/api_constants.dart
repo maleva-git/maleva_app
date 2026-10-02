@@ -19,7 +19,6 @@ class ApiConstants {
   static const String apiDeleteImage      = "$port/api/CommonApp/DeleteFile";
 
   // ─── Auth / Login ─────────────────────────────────────────────────────────
-  static const String apiLoginSuccess     = "$port/api/LoginApp/LoginAppSuccess?Userid=";
   static const String apiSelectUser       = "$port/api/LoginApp/SelectLoginUser?Comid=";
   static const String apiEditPassword     = "$port/api/LoginApp/EditPassword?password=";
   static const String apiGetSalesData     = "$port/api/LoginApp/GetSalesData?Comid=";

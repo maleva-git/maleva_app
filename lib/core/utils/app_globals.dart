@@ -409,10 +409,7 @@ class AppGlobals {
     if (fcmToken != null) {
       mobiletoken = fcmToken;
       await AppPreferences.setFcmToken(fcmToken);
-      print_(mobiletoken);
     }
-
-    FirebaseMessaging.onMessage.listen((RemoteMessage message) {});
     // fcm.subscribeToTopic('puppies');
     // fcm.unsubscribeFromTopic('puppies');
   }

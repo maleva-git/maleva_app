@@ -1,5 +1,8 @@
+import 'dart:async';
+
 import 'package:maleva/core/theme/app_typography.dart';
-import 'package:maleva/core/network/legacy_api_repository.dart';
+import 'package:maleva/features/auth/data/session_service.dart';
+import 'package:maleva/features/auth/presentation/dashboard_routes.dart';
 import 'package:maleva/core/di/injection.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter/material.dart';
@@ -104,94 +107,50 @@ class _SplashScreenState extends State<SplashScreen>
 
     await Future.delayed(const Duration(seconds: 3));
 
+    // Fetched once; a push token that arrives after this wait still reaches
+    // the server once the session is restored (below).
+    final Future<void> tokenFetch = Future(() => AppGlobals.getDeviceToken());
     try {
-      await AppGlobals.getDeviceToken().timeout(const Duration(seconds: 10));
+      await tokenFetch.timeout(const Duration(seconds: 10));
     } catch (e) {
       debugPrint('⚠️ FCM Token fetch failed: $e');
     }
     AppGlobals.mobiletoken = AppPreferences.getFcmToken();
 
-    String UserName = AppGlobals.storagenew.getString('Username') ?? "";
-    String Password = AppGlobals.storagenew.getString('Password') ?? "";
-    String OldUserName = AppGlobals.storagenew.getString('OldUsername') ?? "";
-    AppGlobals.MalevaScreen= AppGlobals.storagenew.getInt('DeviceView') ?? 1;
-    AppGlobals.DriverLogin=AppGlobals.storagenew.getInt('DriverId') ?? 0;
-    if (UserName != "" && Password != "") {
-      bool loginSuccess = false;
-      try {
-        if (!mounted) return;
-        loginSuccess = await sl<LegacyApiRepository>().Login(UserName, Password, OldUserName,AppGlobals.DriverLogin, context);
-      } catch (e) {
-        debugPrint('⚠️ Login API error: $e');
-        if (mounted) {
-          _showErrorPopup(
-            'Connection Error',
-            'Unable to connect to the server.\n\n'
-            'Please check your internet connection and try again.\n\nError: $e',
-          );
-        }
-        return;
+    AppGlobals.MalevaScreen = AppGlobals.storagenew.getInt('DeviceView') ?? 1;
+
+    // Restore the Java session from its stored token; the password is never
+    // kept or replayed (restore also deletes one an earlier version saved).
+    final RestoreResult result;
+    try {
+      result = await sl<SessionService>().restore();
+    } catch (e) {
+      debugPrint('⚠️ Session restore error: $e');
+      if (mounted) {
+        _showErrorPopup(
+          'Connection Error',
+          'Unable to connect to the server.\n\n'
+          'Please check your internet connection and try again.\n\nError: $e',
+        );
       }
-
-      if (loginSuccess) {
-        if (!mounted) return;
-
-        if(AppGlobals.DriverLogin == 1)
-        {
-          context.go('/driver_dashboard');
-          return;
-        }
-
-        int roleId = AppPreferences.getRoleId();
-
-    switch (roleId) {
-      case 100: // FORWARDING ADMIN
-        context.go('/dashboard/admin');
-        break;
-      case 200: // ADMIN2
-        context.go('/dashboard/subadmin');
-        break;
-      case 300: // SALES
-        context.go('/dashboard/sales');
-        break;
-      case 400: // OPERATIONADMIN
-        context.go('/dashboard/admin');
-        break;
-      case 500: // BOARDING
-      case 600: // BOARDINGOFFICERADMIN
-        context.go('/dashboard/boarding');
-        break;
-      case 800: // HRADMIN
-        context.go('/dashboard/admin');
-        break;
-      case 900: // ACCOUNTS
-        context.go('/dashboard/payable');
-        break;
-      case 1000: // TRANSPORTATION
-        context.go('/dashboard/transport');
-        break;
-      case 1200: // RECEIVABLE
-        context.go('/dashboard/receivable');
-        break;
-      case 1300: // MAINTENANCE
-        context.go('/dashboard/maintenance');
-        break;
-      case 1400: // FORWARDING AGENT
-        context.go('/dashboard/forwarding_agent');
-        break;
-      case 1500: // AIR FREIGHT
-        context.go('/dashboard/air_freight');
-        break;
-      default:
-        context.go('/dashboard/admin');
-        break;
+      return;
     }
-      }
-      else {
+    if (!mounted) return;
+    switch (result) {
+      case Restored(:final session):
+        // the server gets this phone's push token if it changed while the app was closed
+        unawaited(tokenFetch.then((_) => sl<SessionService>().syncDeviceToken(), onError: (_) {}));
+        context.go(dashboardRouteFor(isDriver: session.isDriver, roleId: session.roleId));
+      case RestoreUnreachable(:final message):
+        // the token is kept: Retry tries again, Go to Login signs in afresh
+        _showErrorPopup(
+          'Connection Error',
+          'Unable to connect to the server.\n\n'
+          'Please check your internet connection and try again.\n\n$message',
+        );
+      case NoSession():
+      case SessionExpired():
         _navigateToLogin();
-      }
-    } else {
-      _navigateToLogin();
     }
   }
 
