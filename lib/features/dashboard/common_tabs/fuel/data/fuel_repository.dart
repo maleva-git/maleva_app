@@ -1,15 +1,17 @@
-import 'package:maleva/core/network/api_constants.dart';
-import 'package:maleva/core/network/api_client.dart';
+import 'package:get_it/get_it.dart';
+import 'package:maleva/core/fuel/fuel_entry_api.dart';
+import 'package:maleva/features/transport/models/fuelselect_model.dart';
 
+/// The Fuel Difference report's rows, from the shared Java `/api/fuel-entries`
+/// (change `fuel-entry-on-shared-java-api`).
 class FuelRepository {
-  /// Fetches Fuel Difference report data from the backend
-  Future<dynamic> fetchFuelDifference({
-    required Map<String, dynamic> body,
-  }) async {
+  FuelRepository({FuelEntryApi? api}) : _api = api ?? GetIt.instance<FuelEntryApi>();
 
-    return await ApiClient.postRequest(
-      ApiConstants.apiSelectFuelEntry,
-      body,
-    );
-  }
+  final FuelEntryApi _api;
+
+  Future<List<FuelselectModel>> fetchFuelDifference({
+    required String fromDate,
+    required String toDate,
+  }) async =>
+      (await _api.list(fromDate: fromDate, toDate: toDate)).map(FuelselectModel.fromJava).toList();
 }

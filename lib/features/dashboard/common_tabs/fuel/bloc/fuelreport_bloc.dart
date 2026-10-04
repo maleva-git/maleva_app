@@ -1,10 +1,8 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
-import 'package:maleva/core/utils/app_globals.dart';
 import '../data/fuel_repository.dart';
 import 'fuelreport_event.dart';
 import 'fuelreport_state.dart';
-import 'package:maleva/features/transport/models/fuelselect_model.dart';
 
 class FuelDiffBloc extends Bloc<FuelDiffEvent, FuelDiffState> {
   final FuelRepository repository;
@@ -49,27 +47,11 @@ class FuelDiffBloc extends Bloc<FuelDiffEvent, FuelDiffState> {
     emit(const FuelDiffLoading());
 
     try {
-      final Map<String, dynamic> requestBody = {
-        'Comid': AppGlobals.storagenew.getInt('Comid') ?? 0,
-        'Fromdate': current.fromDate,
-        'Todate': current.toDate,
-        'Employeeid': 0,
-        'DId': 0,
-        'TId': 0,
-        'Search': '',
-      };
-
-      final resultData = await repository.fetchFuelDifference(body: requestBody);
-
-      if (resultData != null && resultData is List && resultData.isNotEmpty) {
-        final List<FuelselectModel> records = resultData
-            .map((e) => FuelselectModel.fromJson(e as Map<String, dynamic>))
-            .toList();
-
-        emit(current.copyWith(records: records));
-      } else {
-        emit(current.copyWith(records: []));
-      }
+      final records = await repository.fetchFuelDifference(
+        fromDate: current.fromDate,
+        toDate: current.toDate,
+      );
+      emit(current.copyWith(records: records));
     } catch (e) {
       emit(FuelDiffError(e.toString()));
       emit(current.copyWith(records: []));

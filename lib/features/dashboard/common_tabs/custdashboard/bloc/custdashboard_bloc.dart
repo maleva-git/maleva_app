@@ -10,6 +10,7 @@ import 'package:maleva/core/models/shared/payment_pending_model.dart';
 import 'package:maleva/core/network/legacy_api_repository.dart';
 import 'package:maleva/core/di/injection.dart';
 import 'package:maleva/core/dashboard/dashboard_api.dart';
+import 'package:maleva/core/fuel/fuel_entry_api.dart';
 import 'package:maleva/features/dashboard/common_tabs/paymentview/data/paymentview_repository.dart';
 
 
@@ -364,28 +365,11 @@ class CustDashboardBloc
   Future<void> _fetchFuelData(
       Emitter<CustDashboardState> emit,
       {required String fromDate, required String toDate}) async {
-    final header = {'Content-Type': 'application/json; charset=UTF-8'};
-    final comid = AppGlobals.storagenew.getInt('Comid') ?? 0;
+    final rows = await _safeApiCall(
+        () => sl<FuelEntryApi>().list(fromDate: fromDate, toDate: toDate), emit);
 
-    final result = await _safeApiCall(() => sl<LegacyApiRepository>().apiAllinoneSelectArray(
-        ApiConstants.apiSelectFuelEntry,
-        {
-          'Comid': comid,
-          'Fromdate': fromDate,
-          'Todate': toDate,
-          'Employeeid': 0,
-          'DId': 0,
-          'TId': 0,
-          'Search': '',
-        },
-        header,
-        null), emit);
-
-    if (result is List && result.isNotEmpty) {
-      final records = result
-          .map((e) => FuelselectModel.fromJson(e as Map<String, dynamic>))
-          .toList();
-      emit(state.copyWith(fuelRecords: records));
+    if (rows is List<Map<String, dynamic>>) {
+      emit(state.copyWith(fuelRecords: rows.map(FuelselectModel.fromJava).toList()));
     } else {
       emit(state.copyWith(fuelRecords: []));
     }

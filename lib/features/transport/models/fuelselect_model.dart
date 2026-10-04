@@ -1,3 +1,6 @@
+import 'package:intl/intl.dart';
+import 'package:maleva/core/utils/json_read.dart';
+
 
 class FuelselectModel {
   int? id;
@@ -68,40 +71,42 @@ class FuelselectModel {
     this.truckName,
   });
 
-  factory FuelselectModel.fromJson(Map<String, dynamic> json) {
+  /// A row of the shared Java fuel list (`/api/fuel-entries`). The difference
+  /// columns are the web's: patron minus actual (`DP`), and the server's patron
+  /// minus GPS (`diffLiter` / `diffAmount`, the `DG` columns).
+  factory FuelselectModel.fromJava(Map<String, dynamic> json) {
+    dynamic f(String key) => JsonRead.field(json, key);
+    double n(String key) => JsonRead.number(f(key));
+    double round2(double v) => (v * 100).roundToDouble() / 100;
+    final saleDate = JsonRead.date(f('saleDate'));
+    final aliter = n('aliter');
+    final pliter = n('pliter');
     return FuelselectModel(
-      id: json['Id'] ?? 0,
-      companyRefId: json['CompanyRefId'] ?? 0,
-      userRefId: json['UserRefId'] ?? 0,
-      employeeRefId: json['EmployeeRefId'] ?? 0,
-      lastEmployeeRefId: json['LastEmployeeRefId'] ?? 0,
-      truckRefId: json['TruckRefid'] ?? 0,
-      driverRefId: json['DriverRefId'] ?? 0,
-      saleDate: json['SaleDate'] ?? '',
-      sSaleDate: json['SSaleDate'] ?? '',
-      cNumberDisplay: json['CNumberDisplay'] ?? '',
-      cNumber: json['CNumber'] ?? 0,
-      remarks: json['Remarks'] ?? '',
-      active: json['Active'] ?? 0,
-      fStatus: json['FStatus'] ?? 0,
-      aliter: (json['Aliter'] ?? 0).toDouble(),
-      aAmount: (json['AAmount'] ?? 0).toDouble(),
-      pliter: (json['Pliter'] ?? 0).toDouble(),
-      pRate: (json['PRate'] ?? 0).toDouble(),
-      pAmount: (json['PAmount'] ?? 0).toDouble(),
-      gliter: (json['Gliter'] ?? 0).toDouble(),
-      gAmount: (json['GAmount'] ?? 0).toDouble(),
-      dPliter: (json['DPliter'] ?? 0).toDouble(),
-      dPAmount: (json['DPAmount'] ?? 0).toDouble(),
-      dGliter: (json['DGliter'] ?? 0).toDouble(),
-      dGAmount: (json['DGAmount'] ?? 0).toDouble(),
-      filePath: json['FilePath'] ?? '',
-      createdDate: json['Created_Date'] ?? '',
-      createdBy: json['Created_By'] ?? '',
-      modifiedDate: json['Modified_Date'] ?? '',
-      modifiedBy: json['Modified_By'] ?? '',
-      driverName: json['DriverName'] ?? '',
-      truckName: json['TruckName'] ?? '',
+      id: JsonRead.integer(f('id')),
+      companyRefId: JsonRead.integer(f('companyRefId')),
+      truckRefId: JsonRead.integer(f('truckRefId')),
+      driverRefId: JsonRead.integer(f('driverRefId')),
+      saleDate: saleDate == null ? '' : "${DateFormat('yyyy-MM-dd').format(saleDate)}T00:00:00",
+      sSaleDate: saleDate == null ? '' : DateFormat('dd/MM/yyyy').format(saleDate),
+      cNumberDisplay: JsonRead.string(f('cNumberDisplay')),
+      cNumber: JsonRead.integer(f('cNumber')),
+      remarks: JsonRead.string(f('remarks')),
+      active: 1,
+      fStatus: JsonRead.integer(f('fStatus')),
+      aliter: aliter,
+      aAmount: n('aAmount'),
+      pliter: pliter,
+      pRate: n('pRate'),
+      pAmount: n('pAmount'),
+      gliter: n('gliter'),
+      gAmount: n('gAmount'),
+      dPliter: round2(pliter - aliter),
+      dPAmount: round2(n('pAmount') - aliter * n('pRate')),
+      dGliter: n('diffLiter'),
+      dGAmount: n('diffAmount'),
+      filePath: JsonRead.string(f('filePath')),
+      driverName: JsonRead.string(f('driverName')),
+      truckName: JsonRead.string(f('truckName')),
     );
   }
 

@@ -7,8 +7,8 @@ import 'package:maleva/core/network/java_api_client.dart';
 
 typedef _Handler = Future<dynamic> Function(SharedLookups lookups, _Call call);
 
-/// Answers the app's old .NET lookup and fuel calls from the shared Java
-/// APIs (change `use-shared-lookup-apis`), in the JSON the callers already
+/// Answers the app's old .NET lookup calls from the shared Java
+/// APIs (change `use-shared-lookup-apis`; fuel moved to `FuelEntryApi`), in the JSON the callers already
 /// read, so the ~60 call sites, their models and screens stay unchanged.
 ///
 /// The shared HTTP helpers (`ApiClient`, `LegacyApiRepository`, the legacy
@@ -39,12 +39,6 @@ class LegacyCallAdapter {
         l.agents(c.comid, agentCompanyId: c.intQuery('Jobid') ?? c.intQuery('AgentCompanyRefId') ?? 0),
     'agentcompanyapp/selectagentcompany': (l, c) => l.agentCompanies(c.comid),
     'itemapp/getproductlist': (l, c) => l.products(c.comid),
-    'fuelentryapp/maxfuelentryno': (l, c) => l.nextFuelNumber(c.comid),
-    'fuelentryapp/selectfuelentry': (l, c) => l.fuelEntries(c.bodyMap),
-    'fuelentryapp/insertfuelentry': (l, c) =>
-        l.saveFuelEntries(c.body is List ? c.body as List : [c.body], c.intHeader('Comid') ?? 0),
-    'fuelentryapp/deletefuelentry': (l, c) =>
-        l.deleteFuelEntry(c.intQuery('Id') ?? 0, c.comid, mobile: c.intQuery('Mobile') == 1),
   };
 
   static final RegExp _path = RegExp(r'^/+api/([^/?]+)/([^/?]+)');

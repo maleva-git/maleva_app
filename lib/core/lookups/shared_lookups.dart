@@ -16,7 +16,6 @@ class SharedLookups {
 
   final Dio _dio;
 
-  static final DateFormat _dmy = DateFormat('dd/MM/yyyy');
   static final DateFormat _invariant = DateFormat('MM/dd/yyyy HH:mm:ss');
   static final DateFormat _ymd = DateFormat('yyyy-MM-dd');
 
@@ -201,98 +200,6 @@ class SharedLookups {
     return items.isEmpty ? null : items.first;
   }
 
-  // ------------------------------------------------------------- fuel entry
-
-  /// The fuel list for the .NET filter body (`Comid, Fromdate, Todate, DId =
-  /// truck, TId = driver, Employeeid, Search`), as the old rows.
-  Future<List<Map<String, dynamic>>> fuelEntries(Map<String, dynamic> filter) async {
-    int id(String k) => int.tryParse('${_pick(filter, k) ?? 0}') ?? 0;
-    final search = (_pick(filter, 'Search') ?? '').toString().trim();
-    final query = <String, dynamic>{
-      'companyRefId': id('Comid'),
-      if (search.isNotEmpty) 'search': search,
-      if (search.isEmpty && _pick(filter, 'Fromdate') != null) 'fromDate': _dateOnly(_pick(filter, 'Fromdate')),
-      if (search.isEmpty && _pick(filter, 'Todate') != null) 'toDate': _dateOnly(_pick(filter, 'Todate')),
-      if (id('DId') != 0) 'truckRefId': id('DId'),
-      if (id('TId') != 0) 'driverRefId': id('TId'),
-      if (id('Employeeid') != 0) 'employeeRefId': id('Employeeid'),
-    };
-    final body = await _get('/api/fuel-entries', query);
-    final data = body is Map ? body['Data1'] : null;
-    final items = data is Map ? _list(data['items']) : const <Map<String, dynamic>>[];
-    return [for (final r in items) _fuelRow(r, id('Comid'))];
-  }
-
-  /// Next fuel number, `FE` + nine digits.
-  Future<String> nextFuelNumber(int comid) async {
-    final body = await _get('/api/fuel-entries/next-no', {'companyRefId': comid});
-    return body is Map ? '${body['Data1'] ?? ''}' : '';
-  }
-
-  /// Saves each posted row through the web's fuel save (it recomputes the
-  /// amounts and re-matches GPS; a driver's row is stamped by the server).
-  /// Answers the .NET envelope with the saved Id in Data2.
-  Future<Map<String, dynamic>> saveFuelEntries(List<dynamic> rows, int comid) async {
-    int? savedId;
-    for (final raw in rows) {
-      final r = Map<String, dynamic>.from(raw as Map);
-      double n(String k) => _num(_pick(r, k));
-      int? optInt(String k) {
-        final v = int.tryParse('${_pick(r, k) ?? ''}');
-        return v == null || v == 0 ? null : v;
-      }
-
-      final body = await _send(() => _dio.post<dynamic>('/api/fuel-entries', data: {
-            'id': optInt('Id') ?? 0,
-            'companyRefId': optInt('CompanyRefId') ?? comid,
-            'truckRefId': optInt('TruckRefid'),
-            'driverRefId': optInt('DriverRefId'),
-            'employeeRefId': optInt('EmployeeRefId'),
-            'saleDate': _dateOnly(_pick(r, 'SaleDate')),
-            'aliter': n('Aliter'),
-            'aAmount': n('AAmount'),
-            'pliter': n('Pliter'),
-            'gliter': n('Gliter'),
-            'pRate': n('PRate'),
-            'remarks': _pick(r, 'Remarks'),
-            'filePath': _pick(r, 'FilePath'),
-            'fStatus': optInt('FStatus') ?? 0,
-          }));
-      final data = body is Map ? body['Data1'] : null;
-      savedId = data is Map ? int.tryParse('${data['id']}') : savedId;
-    }
-    return {'IsSuccess': true, 'StatusCode': 1, 'Message': 'FuelEntry Update Successfully..', 'Data1': '', 'Data2': savedId};
-  }
-
-  /// Soft delete; `mobile` keeps it to driver-app rows.
-  Future<Map<String, dynamic>> deleteFuelEntry(int id, int comid, {required bool mobile}) async {
-    await _send(() => _dio.delete<dynamic>('/api/fuel-entries/$id',
-        queryParameters: {'companyRefId': comid, 'mobile': mobile}));
-    return {'IsSuccess': true, 'StatusCode': 1, 'Message': 'FuelEntry Deleted Successfully..'};
-  }
-
-  Map<String, dynamic> _fuelRow(Map<String, dynamic> r, int comid) {
-    final aliter = _num(_pick(r, 'aliter'));
-    final pliter = _num(_pick(r, 'pliter'));
-    final rate = _num(_pick(r, 'pRate'));
-    final saleDate = _pick(r, 'saleDate')?.toString();
-    final parsed = saleDate == null ? null : DateTime.tryParse(saleDate);
-    double round2(double v) => (v * 100).roundToDouble() / 100;
-    return {
-      'Id': r['id'], 'CompanyRefId': comid, 'CNumberDisplay': _pick(r, 'cNumberDisplay'), 'CNumber': _pick(r, 'cNumber'),
-      'SaleDate': parsed == null ? null : "${_ymd.format(parsed)}T00:00:00",
-      'SSaleDate': parsed == null ? '' : _dmy.format(parsed),
-      'TruckRefid': _pick(r, 'truckRefId'), 'TruckName': r['truckName'], 'DriverRefId': _pick(r, 'driverRefId'),
-      'DriverName': r['driverName'], 'Remarks': r['remarks'], 'FilePath': r['filePath'], 'Active': 1,
-      'FStatus': _pick(r, 'fStatus'), 'PRate': rate, 'Aliter': aliter, 'AAmount': _num(_pick(r, 'aAmount')),
-      'Pliter': pliter, 'PAmount': _num(_pick(r, 'pAmount')), 'Gliter': _num(_pick(r, 'gliter')),
-      'GAmount': _num(_pick(r, 'gAmount')),
-      // patron minus actual, as the web computes it; patron minus GPS is the list's diff
-      'DPliter': round2(pliter - aliter), 'DPAmount': round2(_num(_pick(r, 'pAmount')) - aliter * rate),
-      'DGliter': _num(_pick(r, 'diffLiter')), 'DGAmount': _num(_pick(r, 'diffAmount')),
-    };
-  }
-
   // ---------------------------------------------------------------- helpers
 
   Future<dynamic> _get(String path, [Map<String, dynamic>? query]) => _getOr(path, query);
@@ -348,11 +255,6 @@ class SharedLookups {
   }
 
   static double _num(dynamic v) => v is num ? v.toDouble() : double.tryParse('${v ?? ''}') ?? 0;
-
-  static String? _dateOnly(dynamic v) {
-    final text = v?.toString() ?? '';
-    return text.length >= 10 ? text.substring(0, 10) : (text.isEmpty ? null : text);
-  }
 
   /// A Java date (`2026-05-01` or a date-time) as .NET wrote it into a string property.
   static String? _invariantDate(dynamic v) {

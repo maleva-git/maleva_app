@@ -1,3 +1,6 @@
+import 'package:maleva/core/utils/json_read.dart';
+
+/// A job order as the shared Java `/api/job-orders/list` answers it.
 class JobOrder {
   final int id;
   final int companyRefId;
@@ -43,41 +46,40 @@ class JobOrder {
     required this.actualCost,
   });
 
-  factory JobOrder.fromJson(Map<String, dynamic> json) {
+  factory JobOrder.fromJava(Map<String, dynamic> json) {
+    final jobDate = JsonRead.string(json['jobDate']);
     return JobOrder(
-      id: json['Id'] ?? 0,
-      companyRefId: json['CompanyRefId'] ?? 0,
-      statusRefId: json['StatusRefId'] ?? 0,
-      cNumberDisplay: json['CNumberDisplay'] ?? '',
-      truckMasterRefId: json['TruckMasterRefId'] ?? 0,
-      truckName: json['TruckName'] ?? '',
-      driverMasterRefId: json['DriverMasterRefId'] ?? 0,
-      driverName: json['DriverName'] ?? '',
-      vendorName: json['VendorName'] ?? '',
-      statusName: json['StatusName'] ?? '',
-      jobTypeName: json['JobTypeName'] ?? '',
-      priorityName: json['PriorityName'] ?? '',
-      problemName: json['ProblemName'] ?? '',
-      productUse: json['ProductUse'] ?? '',
-      remarks: json['Remarks'] ?? '',
-      jobDate: json['JobDate'] ?? json['jobDate'] ?? '',
-      sJobDate: _formatDate(json['SJobDate'] ?? json['jobDate'] ?? json['JobDate'] ?? ''),
-      targetDate: _formatDate(json['TargetDate'] ?? json['expectedCompletionDate'] ?? json['ExpectedCompletionDate'] ?? ''),
-      estimatedCost: (json['EstimatedCost'] ?? json['estimatedCost'] ?? 0.0).toDouble(),
-      actualCost: (json['ActualCost'] ?? json['actualCost'] ?? 0.0).toDouble(),
+      id: JsonRead.integer(json['id']),
+      companyRefId: JsonRead.integer(json['companyRefId']),
+      statusRefId: JsonRead.integer(json['statusRefId']),
+      // Jackson writes the Lombok getter getCNumberDisplay as cnumberDisplay
+      cNumberDisplay: JsonRead.string(json['cNumberDisplay'] ?? json['cnumberDisplay']),
+      truckMasterRefId: JsonRead.integer(json['truckMasterRefId']),
+      truckName: JsonRead.string(json['truckName']),
+      driverMasterRefId: JsonRead.integer(json['driverMasterRefId']),
+      driverName: JsonRead.string(json['driverName']),
+      vendorName: JsonRead.string(json['vendorName']),
+      statusName: JsonRead.string(json['statusName']),
+      jobTypeName: JsonRead.string(json['jobTypeName']),
+      priorityName: JsonRead.string(json['priorityName']),
+      problemName: JsonRead.string(json['problemName']),
+      productUse: JsonRead.string(json['productUse']),
+      remarks: JsonRead.string(json['remarks']),
+      jobDate: jobDate,
+      sJobDate: formatDate(jobDate),
+      targetDate: formatDate(JsonRead.string(json['expectedCompletionDate'])),
+      estimatedCost: _num(json['estimatedCost']),
+      actualCost: _num(json['actualCost']),
     );
   }
 
-  static String _formatDate(String dateStr) {
+  static double _num(dynamic v) => v is num ? v.toDouble() : double.tryParse('${v ?? ''}') ?? 0;
+
+  /// `2026-10-04` (or an ISO date-time) as `04/10/2026`; anything else as it is.
+  static String formatDate(String dateStr) {
     if (dateStr.isEmpty) return '';
-    if (dateStr.contains('T')) {
-      try {
-        final dt = DateTime.parse(dateStr);
-        return "${dt.day.toString().padLeft(2, '0')}/${dt.month.toString().padLeft(2, '0')}/${dt.year}";
-      } catch (_) {
-        return dateStr.split('T').first;
-      }
-    }
-    return dateStr;
+    final dt = DateTime.tryParse(dateStr);
+    if (dt == null) return dateStr;
+    return "${dt.day.toString().padLeft(2, '0')}/${dt.month.toString().padLeft(2, '0')}/${dt.year}";
   }
 }

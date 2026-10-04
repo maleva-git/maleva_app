@@ -6,6 +6,7 @@ import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:maleva/core/utils/app_globals.dart';
+import 'package:maleva/core/utils/json_read.dart';
 import 'package:maleva/menu/menulist.dart';
 import '../bloc/fuelentryview_bloc.dart';
 import '../bloc/fuelentryview_event.dart';
@@ -449,9 +450,11 @@ class _FuelRow extends StatelessWidget {
   Widget build(BuildContext context) {
     final valStyle = AppTypography.bodyLarge(color: AppTokens.textPrimary);
 
-    final liter = (item['Aliter'] as num?)?.toStringAsFixed(3) ?? '0.000';
-    final amount = (item['AAmount'] as num?)?.toStringAsFixed(3) ?? '0.000';
-    final date = item['SSaleDate']?.toString() ?? '';
+    // a Java fuel row (`/api/fuel-entries`)
+    final liter = JsonRead.number(JsonRead.field(item, 'aliter')).toStringAsFixed(3);
+    final amount = JsonRead.number(JsonRead.field(item, 'aAmount')).toStringAsFixed(3);
+    final saleDate = JsonRead.date(JsonRead.field(item, 'saleDate'));
+    final date = saleDate == null ? '' : DateFormat('dd/MM/yyyy').format(saleDate);
 
     return Container(
       margin: const EdgeInsets.only(bottom: 8),

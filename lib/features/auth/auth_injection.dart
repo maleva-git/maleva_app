@@ -1,6 +1,8 @@
 import 'package:get_it/get_it.dart';
 import 'package:maleva/core/dashboard/dashboard_api.dart';
 import 'package:maleva/core/files/attachments_api.dart';
+import 'package:maleva/core/fuel/fuel_entry_api.dart';
+import 'package:maleva/core/job_order/job_order_api.dart';
 import 'package:maleva/core/planning/planning_api.dart';
 import 'package:maleva/core/planning/vessel_planning_api.dart';
 import 'package:maleva/core/sale_order/sale_order_api.dart';
@@ -20,7 +22,7 @@ void registerAuthModule(GetIt sl) {
   sl.registerLazySingleton<SessionTokenStore>(() => SessionTokenStore(const PlatformSecureKeyValueStore()));
   sl.registerLazySingleton<JavaApiClient>(() => JavaApiClient(sl<SessionTokenStore>()));
   sl.registerLazySingleton<MobileAuthApi>(() => MobileAuthApi(sl<JavaApiClient>()));
-  // the shared Java lookups and fuel entries (the web's APIs), for LegacyCallAdapter
+  // the shared Java lookups (the web's APIs), for LegacyCallAdapter
   sl.registerLazySingleton<SharedLookups>(() => SharedLookups(sl<JavaApiClient>().dio));
   // the dashboard numbers (the web's /api/dashboard)
   sl.registerLazySingleton<DashboardApi>(() => DashboardApi(sl<JavaApiClient>().dio));
@@ -34,6 +36,12 @@ void registerAuthModule(GetIt sl) {
       () => PlanningApi(sl<JavaApiClient>().dio, companyId: AppPreferences.getComid));
   sl.registerLazySingleton<VesselPlanningApi>(
       () => VesselPlanningApi(sl<JavaApiClient>().dio, companyId: AppPreferences.getComid));
+  // fuel entries (the shared /api/fuel-entries)
+  sl.registerLazySingleton<FuelEntryApi>(
+      () => FuelEntryApi(sl<JavaApiClient>().dio, companyId: AppPreferences.getComid));
+  // job orders (the shared /api/job-orders)
+  sl.registerLazySingleton<JobOrderApi>(
+      () => JobOrderApi(sl<JavaApiClient>().dio, companyId: AppPreferences.getComid));
   // record attachments (the shared /api/attachments)
   sl.registerLazySingleton<AttachmentsApi>(
       () => AttachmentsApi(sl<JavaApiClient>().dio, companyId: AppPreferences.getComid));

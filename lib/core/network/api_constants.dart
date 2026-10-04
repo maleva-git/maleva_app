@@ -66,10 +66,6 @@ class ApiConstants {
   static const String apiDriverViewRecords    = "$port/api/DriverApp/SelectDriver?Comid=";
 
   // ─── Fuel Entry ───────────────────────────────────────────────────────────
-  static const String apiInsertFuelEntry      = "$port/api/FuelEntryApp/InsertFuelEntry";
-  static const String apiMaxFuelEntryNo       = "$port/api/FuelEntryApp/MaxFuelEntryNo?Comid=";
-  static const String apiDeleteFuelEntry      = "$port/api/FuelEntryApp/DeleteFuelEntry?Id=";
-  static const String apiSelectFuelEntry      = "$port/api/FuelEntryApp/SelectFuelEntry";
 
   // ─── Forwarding Salary ────────────────────────────────────────────────────
   static const String apiInsertForwarding     = "$port/api/ForwardingSalaryApp/InsertForwardingSalary";

@@ -1,3 +1,6 @@
+import 'package:maleva/core/utils/json_read.dart';
+
+/// A job order's line, from the `details` of a shared Java job order.
 class JobOrderDetail {
   final int id;
   final int jobOrderMasterRefId;
@@ -7,6 +10,7 @@ class JobOrderDetail {
   final String productName;
   final double cost;
   final String remarks;
+  final bool active;
 
   JobOrderDetail({
     required this.id,
@@ -17,18 +21,24 @@ class JobOrderDetail {
     required this.productName,
     required this.cost,
     required this.remarks,
+    this.active = true,
   });
 
-  factory JobOrderDetail.fromJson(Map<String, dynamic> json) {
+  /// [productNames] gives the name of `productRefId` (Java answers only the id).
+  factory JobOrderDetail.fromJava(Map<String, dynamic> json, {Map<int, String> productNames = const {}}) {
+    final productRefId = JsonRead.intOrNull(json['productRefId']);
+    final cost = json['cost'];
     return JobOrderDetail(
-      id: json['Id'] ?? 0,
-      jobOrderMasterRefId: json['JobOrderMasterRefId'] ?? 0,
-      problemName: json['ProblemName'] ?? '',
-      productUse: json['ProductUse'] ?? '',
-      productRefId: json['ProductRefId'],
-      productName: json['ProductName'] ?? '',
-      cost: (json['Cost'] ?? 0.0).toDouble(),
-      remarks: json['Remarks'] ?? '',
+      id: JsonRead.integer(json['id']),
+      jobOrderMasterRefId: JsonRead.integer(json['jobOrderMasterRefId']),
+      problemName: JsonRead.string(json['problemName']),
+      productUse: JsonRead.string(json['productUse']),
+      productRefId: productRefId,
+      productName: productRefId == null ? '' : productNames[productRefId] ?? '',
+      cost: cost is num ? cost.toDouble() : double.tryParse('${cost ?? ''}') ?? 0,
+      remarks: JsonRead.string(json['remarks']),
+      // .NET listed only Active = 1 lines; a missing flag counts as active
+      active: json['active'] == null || JsonRead.integer(json['active']) == 1,
     );
   }
 }

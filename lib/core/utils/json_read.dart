@@ -33,6 +33,21 @@ class JsonRead {
   static DateTime? date(dynamic value) =>
       value == null ? null : DateTime.tryParse(value.toString());
 
+  /// A field by name, matched without case when the exact name is absent
+  /// (Jackson writes Lombok names such as `aAmount` or `cNumberDisplay`
+  /// either way).
+  static dynamic field(Map<dynamic, dynamic> m, String key) {
+    if (m.containsKey(key)) return m[key];
+    final lower = key.toLowerCase();
+    for (final k in m.keys) {
+      if (k.toString().toLowerCase() == lower) return m[k];
+    }
+    return null;
+  }
+
+  static double number(dynamic value) =>
+      value is num ? value.toDouble() : double.tryParse('${value ?? ''}'.trim()) ?? 0;
+
   static Map<String, dynamic> map(dynamic value) =>
       value is Map ? Map<String, dynamic>.from(value) : <String, dynamic>{};
 

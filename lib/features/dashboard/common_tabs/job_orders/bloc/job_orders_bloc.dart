@@ -1,21 +1,28 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:get_it/get_it.dart';
 import 'job_orders_event.dart';
 import 'job_orders_state.dart';
 import '../models/job_order.dart';
 import '../models/job_order_type.dart';
 import '../models/job_order_detail.dart';
-import '../../../../../core/network/api_client.dart';
+import '../../../../../core/job_order/job_order_api.dart';
 import '../../../../../core/network/api_services/master_api.dart';
 import '../../../../../core/models/shared/get_truck_model.dart';
-import '../../../../../core/utils/app_preferences.dart';
-import '../../../../../core/config/app_config.dart';
 
+/// The Job Orders tab, on the shared Java `/api/job-orders`
+/// (change `job-orders-on-shared-java-api`).
 class JobOrdersBloc extends Bloc<JobOrdersEvent, JobOrdersState> {
+  final JobOrderApi _api;
+  final Future<List<GetTruckModel>> Function() _loadTrucks;
   List<JobOrderType> _cachedJobTypes = [];
   List<GetTruckModel> _cachedTrucks = [];
+  Map<int, String> _productNames = {};
 
-  JobOrdersBloc() : super(JobOrdersInitial()) {
+  JobOrdersBloc({JobOrderApi? api, Future<List<GetTruckModel>> Function()? loadTrucks})
+      : _api = api ?? GetIt.instance<JobOrderApi>(),
+        _loadTrucks = loadTrucks ?? MasterApi.getTrucks,
+        super(JobOrdersInitial()) {
     on<FetchJobOrders>(_onFetchJobOrders);
     on<UpdateJobOrderStatus>(_onUpdateJobOrderStatus);
   }
@@ -24,8 +31,7 @@ class JobOrdersBloc extends Bloc<JobOrdersEvent, JobOrdersState> {
     final currentState = state;
     if (currentState is JobOrdersLoaded) {
       try {
-        final url = '${AppConfig.baseUrl}/api/JobOrderMasterApp/Updatejoborderstatus?StatusId=${event.statusId}&id=${event.jobId}';
-        await ApiClient.postRequest(url, null);
+        await _api.updateStatus(event.jobId, event.statusId);
         // Refetch job orders using the current filter after updating status
         add(FetchJobOrders(jId: currentState.selectedJId, tId: currentState.selectedTId));
       } catch (e) {
@@ -37,82 +43,50 @@ class JobOrdersBloc extends Bloc<JobOrdersEvent, JobOrdersState> {
   Future<void> _onFetchJobOrders(FetchJobOrders event, Emitter<JobOrdersState> emit) async {
     emit(JobOrdersLoading());
     try {
-      final comid = AppPreferences.getComid();
-      
       if (_cachedJobTypes.isEmpty) {
-        final typesUrl = '${AppConfig.baseUrl}/api/JobOrderMasterApp/SelectJoborderType?Comid=$comid';
         try {
-          // The API expects a POST request.
-          final typesResponse = await ApiClient.postRequest(typesUrl, null);
-          if (typesResponse != null && typesResponse is List) {
-            _cachedJobTypes = typesResponse.map((e) => JobOrderType.fromJson(e)).toList();
-          }
-        } catch(e) {
-          debugPrint('Error fetching job types: $e');
+          _cachedJobTypes = (await _api.statuses()).map(JobOrderType.fromJava).toList();
+        } catch (e) {
+          debugPrint('Error fetching job statuses: $e');
         }
       }
 
       if (_cachedTrucks.isEmpty) {
         try {
-          _cachedTrucks = await MasterApi.getTrucks();
-        } catch(e) {
+          _cachedTrucks = await _loadTrucks();
+        } catch (e) {
           debugPrint('Error fetching trucks: $e');
         }
       }
 
-      final String url = '${AppConfig.baseUrl}/api/JobOrderMasterApp/SelectJoborder';
-      
-      final body = {
-        "Comid": comid,
-        "DId": 0,
-        "JId": event.jId,
-        "TID": event.tId
-      };
-
-      final response = await ApiClient.postRequest(url, body);
-
-      if (kDebugMode) {
-        debugPrint('🔍 JOB ORDERS API RESPONSE: $response');
-      }
-
-      if (response != null && response is List && response.isNotEmpty) {
-        // The API wraps the list in an array containing an object with "JobOrderList" and "JobOrderDetailList"
-        final firstItem = response[0];
-        if (firstItem is Map<String, dynamic>) {
-          List<JobOrder> jobOrders = [];
-          List<JobOrderDetail> jobDetails = [];
-
-          if (firstItem.containsKey('JobOrderList')) {
-            final List list = firstItem['JobOrderList'];
-            jobOrders = list.map((e) => JobOrder.fromJson(e)).toList();
-          }
-
-          if (firstItem.containsKey('JobOrderDetailList')) {
-            final List detailsList = firstItem['JobOrderDetailList'];
-            jobDetails = detailsList.map((e) => JobOrderDetail.fromJson(e)).toList();
-          }
-
-          emit(JobOrdersLoaded(
-            jobOrders,
-            jobTypes: _cachedJobTypes,
-            jobDetails: jobDetails,
-            trucks: _cachedTrucks,
-            selectedJId: event.jId,
-            selectedTId: event.tId,
-          ));
-        } else {
-          emit(JobOrdersLoaded(const [], jobTypes: _cachedJobTypes, jobDetails: const [], selectedJId: event.jId));
+      if (_productNames.isEmpty) {
+        try {
+          _productNames = await _api.productNames();
+        } catch (e) {
+          debugPrint('Error fetching products: $e');
         }
-      } else {
-        emit(JobOrdersLoaded(const [], jobTypes: _cachedJobTypes, jobDetails: const [], selectedJId: event.jId));
       }
+
+      final rows = await _api.list(statusId: event.jId, truckId: event.tId);
+
+      final jobOrders = rows.map(JobOrder.fromJava).toList();
+      final jobDetails = <JobOrderDetail>[
+        for (final row in rows)
+          for (final d in (row['details'] is List ? row['details'] as List : const []))
+            if (d is Map) JobOrderDetail.fromJava(Map<String, dynamic>.from(d), productNames: _productNames),
+      ].where((d) => d.active).toList();
+
+      emit(JobOrdersLoaded(
+        jobOrders,
+        jobTypes: _cachedJobTypes,
+        jobDetails: jobDetails,
+        trucks: _cachedTrucks,
+        selectedJId: event.jId,
+        selectedTId: event.tId,
+      ));
     } catch (e) {
-      if (e.toString().contains('No Data Found') || e.toString().contains('404')) {
-        emit(JobOrdersLoaded(const [], jobTypes: _cachedJobTypes, jobDetails: const [], selectedJId: event.jId));
-      } else {
-        debugPrint('Job Orders Fetch Exception: $e');
-        emit(JobOrdersError(e.toString()));
-      }
+      debugPrint('Job Orders Fetch Exception: $e');
+      emit(JobOrdersError(e.toString()));
     }
   }
 }

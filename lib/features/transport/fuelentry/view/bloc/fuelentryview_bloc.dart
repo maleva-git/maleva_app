@@ -1,14 +1,20 @@
-import 'package:maleva/core/network/api_constants.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:get_it/get_it.dart';
+import 'package:maleva/core/fuel/fuel_entry_api.dart';
+import 'package:maleva/core/utils/json_read.dart';
 import 'package:maleva/core/utils/app_globals.dart';
 import 'fuelentryview_event.dart';
 import 'fuelentryview_state.dart';
-import 'package:maleva/core/network/legacy_api_repository.dart';
-import 'package:maleva/core/di/injection.dart';
 
+/// The driver's fuel list, on the shared Java `/api/fuel-entries` (change
+/// `fuel-entry-on-shared-java-api`); [FuelEntryViewLoaded.items] are the Java rows.
 class FuelEntryViewBloc
     extends Bloc<FuelEntryViewEvent, FuelEntryViewState> {
-  FuelEntryViewBloc() : super(FuelEntryViewInitial()) {
+  final FuelEntryApi _api;
+
+  FuelEntryViewBloc({FuelEntryApi? api})
+      : _api = api ?? GetIt.instance<FuelEntryApi>(),
+        super(FuelEntryViewInitial()) {
     on<FuelEntryViewStarted>(_onStarted);
     on<FuelEntryViewFromDateChanged>(_onFromDate);
     on<FuelEntryViewToDateChanged>(_onToDate);
@@ -81,13 +87,7 @@ class FuelEntryViewBloc
 
     emit(FuelEntryViewLoading());
     try {
-      final header = {'Content-Type': 'application/json; charset=UTF-8'};
-      await sl<LegacyApiRepository>().apiAllinoneSelectArray(
-          '${ApiConstants.apiDeleteFuelEntry}${event.item['Id']}'
-              '&Comid=${event.item['CompanyRefId']}&Mobile=1',
-          {},
-          header,
-          null);
+      await _api.delete(JsonRead.integer(JsonRead.field(event.item, 'id')), mobile: true);
 
       // Reload after delete
       final items =
@@ -102,25 +102,12 @@ class FuelEntryViewBloc
   Future<List<dynamic>> _fetchItems({
     required String fromDate,
     required String toDate,
-  }) async {
-    final comId = AppGlobals.storagenew.getInt('Comid') ?? 0;
-    final master = {
-      'Comid':      comId,
-      'Fromdate':   fromDate,
-      'Todate':     toDate,
-      'Employeeid': 0,
-      'DId':        AppGlobals.DriverTruckRefId,
-      'TId':        AppGlobals.EmpRefId,
-      'Search':     '',
-    };
-    final header = {'Content-Type': 'application/json; charset=UTF-8'};
-
-    final result = await sl<LegacyApiRepository>().apiAllinoneSelectArray(
-        ApiConstants.apiSelectFuelEntry, master, header, null);
-
-    if (result != '' && result.length != 0) {
-      return List<dynamic>.from(result as List);
-    }
-    return [];
-  }
+  }) =>
+      // the server also keeps a driver token to the driver's own entries
+      _api.list(
+        fromDate: fromDate,
+        toDate: toDate,
+        truckId: AppGlobals.DriverTruckRefId,
+        driverId: AppGlobals.EmpRefId,
+      );
 }

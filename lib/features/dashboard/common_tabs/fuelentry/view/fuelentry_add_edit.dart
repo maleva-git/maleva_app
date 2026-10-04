@@ -9,11 +9,9 @@ import '../bloc/fuelentry_event.dart';
 import '../../../../../core/network/api_services/master_api.dart';
 import '../../../../../core/models/shared/get_truck_model.dart';
 import '../../../../../core/colors/colors.dart';
-import '../../../../../core/network/api_constants.dart';
-import '../../../../../core/network/legacy_api_repository.dart';
+import '../../../../../core/fuel/fuel_entry_api.dart';
 import '../../../../../core/di/injection.dart';
 import '../../../../../core/utils/app_globals.dart';
-import '../../../../../core/utils/app_preferences.dart';
 import '../../../../../core/widgets/custom_app_bar.dart';
 
 class FuelEntryAddEdit extends StatefulWidget {
@@ -104,10 +102,8 @@ class _FuelEntryAddEditState extends State<FuelEntryAddEdit> {
 
   Future<void> _fetchMaxFuelNo() async {
     try {
-      final comId = AppPreferences.getComid();
-      var result = await sl<LegacyApiRepository>().apiGetString('${ApiConstants.apiMaxFuelEntryNo}$comId');
+      final result = await sl<FuelEntryApi>().nextNumber();
       if (result.isNotEmpty) {
-        result = result.replaceAll('"', ''); // Remove any double quotes
         if (mounted) {
           setState(() {
             entryNoController.text = result;

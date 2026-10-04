@@ -122,46 +122,10 @@ void main() {
     expect(posted.data['accountRefid'], 40, reason: 'the rest of the truck is kept');
   });
 
-  test('fuel: the .NET filter, rows in the old shape, save and delete', () async {
-    adapter.replies
-      ..add((200, jsonEncode({'IsSuccess': true, 'Data1': {'items': [
-        {'id': 11, 'cNumberDisplay': 'FE000000011', 'saleDate': '2026-10-02', 'truckRefId': 3, 'truckName': 'VBC 5521',
-         'driverRefId': 7, 'driverName': 'RAVI', 'aliter': 50.0, 'aAmount': 100.0, 'pliter': 55.0, 'pAmount': 110.0,
-         'pRate': 2.0, 'gliter': 52.0, 'gAmount': 104.0, 'diffLiter': 3.0, 'diffAmount': 6.0, 'fStatus': 1}
-      ]}})))
-      ..add((200, jsonEncode({'IsSuccess': true, 'Data1': {'id': 71}})))
-      ..add((200, jsonEncode({'IsSuccess': true, 'Data1': null})))
-      ..add((200, jsonEncode({'IsSuccess': true, 'Data1': 'FE000000072'})));
-
-    final rows = await lookups.fuelEntries(
-        {'Comid': 6, 'Fromdate': '2026-10-01', 'Todate': '2026-10-02', 'Employeeid': 0, 'DId': 3, 'TId': 7, 'Search': ''});
-    expect(adapter.requests.first.uri.toString(),
-        'https://java.test/api/fuel-entries?companyRefId=6&fromDate=2026-10-01&toDate=2026-10-02&truckRefId=3&driverRefId=7');
-    final row = rows.single;
-    expect([row['Id'], row['SSaleDate'], row['TruckRefid'], row['DPliter'], row['DPAmount'], row['DGliter']],
-        [11, '02/10/2026', 3, 5.0, 10.0, 3.0]);
-
-    final saved = await lookups.saveFuelEntries([
-      {'SaleDate': '2026-10-02T00:00:00.000', 'Id': 0, 'CompanyRefId': 6, 'TruckRefid': 3, 'DriverRefId': 7,
-       'Aliter': 50.5, 'AAmount': 100, 'FStatus': 1}
-    ], 6);
-    expect(saved['Data2'], 71);
-    expect(adapter.requests[1].data, {
-      'id': 0, 'companyRefId': 6, 'truckRefId': 3, 'driverRefId': 7, 'employeeRefId': null, 'saleDate': '2026-10-02',
-      'aliter': 50.5, 'aAmount': 100.0, 'pliter': 0.0, 'gliter': 0.0, 'pRate': 0.0, 'remarks': null, 'filePath': null,
-      'fStatus': 1,
-    });
-
-    await lookups.deleteFuelEntry(11, 6, mobile: true);
-    expect(adapter.requests[2].method, 'DELETE');
-    expect(adapter.requests[2].uri.toString(), 'https://java.test/api/fuel-entries/11?companyRefId=6&mobile=true');
-    expect(await lookups.nextFuelNumber(6), 'FE000000072');
-  });
-
   test('a refused call carries the server message', () async {
-    adapter.replies.add((400, jsonEncode({'status': 400, 'message': 'No Truck Assigned! Please ask the office to assign a truck first.'})));
+    adapter.replies.add((400, jsonEncode({'status': 400, 'message': 'Company is required'})));
 
-    await expectLater(lookups.saveFuelEntries([{'Id': 0}], 6), throwsA(isA<ApiFailure>()
-        .having((e) => e.message, 'message', startsWith('No Truck Assigned'))));
+    await expectLater(lookups.trucks(6), throwsA(isA<ApiFailure>()
+        .having((e) => e.message, 'message', 'Company is required')));
   });
 }

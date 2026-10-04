@@ -1,16 +1,19 @@
-import 'package:maleva/core/network/api_constants.dart';
-import 'dart:convert';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:get_it/get_it.dart';
+import 'package:maleva/core/fuel/fuel_entry_api.dart';
 import 'package:maleva/core/utils/app_globals.dart';
 
 import 'fuelentry_event.dart';
 import 'fuelentry_state.dart';
-import 'package:maleva/core/models/shared/response_view_model.dart';
-import 'package:maleva/core/network/legacy_api_repository.dart';
-import 'package:maleva/core/di/injection.dart';
 
+/// The driver's fuel entry form, on the shared Java `/api/fuel-entries`
+/// (change `fuel-entry-on-shared-java-api`).
 class FuelEntryBloc extends Bloc<FuelEntryEvent, FuelEntryState> {
-  FuelEntryBloc() : super(FuelEntryInitial()) {
+  final FuelEntryApi _api;
+
+  FuelEntryBloc({FuelEntryApi? api})
+      : _api = api ?? GetIt.instance<FuelEntryApi>(),
+        super(FuelEntryInitial()) {
     on<FuelEntryStarted>(_onStarted);
     on<FuelEntryDateChanged>(_onDateChanged);
     on<FuelEntryLiterChanged>(_onLiterChanged);
@@ -83,77 +86,24 @@ class FuelEntryBloc extends Bloc<FuelEntryEvent, FuelEntryState> {
 
     emit(FuelEntryLoading());
     try {
-      final master = [
-        {
-          'SaleDate':       DateTime.parse(s.date).toIso8601String(),
-          'CNumberDisplay': '',
-          'CNumber':        0,
-          'Id':             0,
-          'CompanyRefId':   AppGlobals.Comid,
-          'UserRefId':      0,
-          'EmployeeRefId':  0,
-          'TruckRefid':     AppGlobals.DriverTruckRefId,
-          'DriverRefId':    AppGlobals.EmpRefId,
-          'FilePath':       '',
-          'Remarks':        '',
-          'Aliter':         double.tryParse(s.liter.replaceAll(',', '.')) ?? 0,
-          'AAmount':        double.tryParse(s.amount.replaceAll(',', '.')) ?? 0,
-          'Pliter':         0,
-          'PRate':          0,
-          'PAmount':        0,
-          'Gliter':         0,
-          'GAmount':        0,
-          'DPliter':        0,
-          'DPAmount':       0,
-          'DGliter':        0,
-          'DGAmount':       0,
-          'FStatus':        1,
-        }
-      ];
-
-      final header = {
-        'Content-Type': 'application/json; charset=UTF-8',
-        'Comid': AppGlobals.Comid.toString(),
-      };
-
-      final resultData = await sl<LegacyApiRepository>().apiAllinoneSelectArray(
-          ApiConstants.apiInsertFuelEntry, master, header, null);
-
-      if (resultData != null && resultData.toString().isNotEmpty) {
-        try {
-          Map<String, dynamic> responseMap = {};
-
-          if (resultData is List) {
-            if (resultData.isNotEmpty && resultData.first is Map) {
-              responseMap = Map<String, dynamic>.from(resultData.first);
-            }
-          } else if (resultData is Map) {
-            responseMap = Map<String, dynamic>.from(resultData);
-          } else if (resultData is String) {
-            var decoded = jsonDecode(resultData);
-            if (decoded is List && decoded.isNotEmpty && decoded.first is Map) {
-              responseMap = Map<String, dynamic>.from(decoded.first);
-            } else if (decoded is Map) {
-              responseMap = Map<String, dynamic>.from(decoded);
-            }
-          }
-
-          final value = ResponseViewModel.fromJson(responseMap);
-          if (value.IsSuccess == true) {
-            final newFuelNo = await _fetchMaxFuelNo();
-            emit(FuelEntrySaveSuccess());
-            emit(FuelEntryLoaded.empty(fuelNo: newFuelNo));
-          } else {
-            emit(FuelEntryError(value.Message ?? "Save Failed. Backend rejected the data format."));
-            emit(s);
-          }
-        } catch (jsonErr) {
-          emit(FuelEntryError('Data Parse Error: ${jsonErr.toString()}'));
-          emit(s);
-        }
-      } else {
-        emit(s);
-      }
+      // the server stamps a driver's own truck, driver and app flag on the row
+      await _api.save({
+        'id': 0,
+        'truckRefId': AppGlobals.DriverTruckRefId,
+        'driverRefId': AppGlobals.EmpRefId == 0 ? null : AppGlobals.EmpRefId,
+        'saleDate': s.date,
+        'aliter': double.tryParse(s.liter.replaceAll(',', '.')) ?? 0,
+        'aAmount': double.tryParse(s.amount.replaceAll(',', '.')) ?? 0,
+        'pliter': 0,
+        'gliter': 0,
+        'pRate': 0,
+        'remarks': '',
+        'filePath': '',
+        'fStatus': 1,
+      });
+      final newFuelNo = await _fetchMaxFuelNo();
+      emit(FuelEntrySaveSuccess());
+      emit(FuelEntryLoaded.empty(fuelNo: newFuelNo));
     } catch (e) {
       emit(FuelEntryError(e.toString()));
       emit(s);
@@ -162,10 +112,7 @@ class FuelEntryBloc extends Bloc<FuelEntryEvent, FuelEntryState> {
   // ── Helper: fetch max fuel no ─────────────────────────────────────────────────
   Future<String> _fetchMaxFuelNo() async {
     try {
-      final comId = AppGlobals.storagenew.getInt('Comid') ?? 0;
-      // the URL was missing, so the number never loaded
-      final result = await sl<LegacyApiRepository>().apiGetString('${ApiConstants.apiMaxFuelEntryNo}$comId');
-      return result.replaceAll('"', '');
+      return await _api.nextNumber();
     } catch (_) {
       return '';
     }

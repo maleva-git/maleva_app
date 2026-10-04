@@ -21,7 +21,7 @@ class MockDioClient extends Mock implements DioClient {}
 
 class MockSessionManager extends Mock implements SessionManager {}
 
-/// The old lookup and fuel calls, answered by the shared Java APIs through every HTTP helper.
+/// The old lookup calls, answered by the shared Java APIs through every HTTP helper.
 void main() {
   late QueueAdapter adapter;
 
@@ -38,7 +38,7 @@ void main() {
 
   String combo(List<Map<String, dynamic>> rows) => jsonEncode({'isSuccess': true, 'data1': rows});
 
-  test('it handles the lookup and fuel calls, any spelling, and nothing else', () {
+  test('it handles the lookup calls, any spelling, and nothing else', () {
     for (final url in [
       '${ApiConstants.apiGetTruckList}6&type=',
       '${ApiConstants.apiEditTruckDetails}6&Startindex=0&PageCount=0&Keyword=3&Column=Id&type=',
@@ -53,11 +53,6 @@ void main() {
       '${ApiConstants.apiSelectAgentAll}6&Jobid=0',
       '${ApiConstants.apiSelectAgentCompany}6',
       '${ApiConstants.apiGetProductList}6',
-      '${ApiConstants.apiMaxFuelEntryNo}6',
-      ApiConstants.apiSelectFuelEntry,
-      ApiConstants.apiInsertFuelEntry,
-      '${ApiConstants.apiDeleteFuelEntry}5&Comid=6&Mobile=1',
-      '${AppConfig.baseUrl}/api/fuelentryapp/SelectFuelEntry',
     ]) {
       expect(LegacyCallAdapter.handles(url), isTrue, reason: url);
     }
@@ -65,6 +60,8 @@ void main() {
       '${ApiConstants.apiDriverViewRecords}6',
       ApiConstants.apiSelectAllInventory,
       '${AppConfig.baseUrl}/api/StockApp/MaxStockInNo?Comid=6',
+      // fuel calls go through FuelEntryApi now (fuel-entry-on-shared-java-api)
+      '${AppConfig.baseUrl}/api/FuelEntryApp/SelectFuelEntry',
       ApiConstants.apiSelectEnquiryMaster,
       'https://elsewhere.test/api/TruckApp/GetTruck',
     ]) {
@@ -83,30 +80,24 @@ void main() {
   });
 
   test('ApiClient: a refusal reads like the .NET message', () async {
-    adapter.replies.add((400, jsonEncode({'status': 400, 'message': 'No Truck Assigned! Please ask the office.'})));
+    adapter.replies.add((400, jsonEncode({'status': 400, 'message': 'Company is required'})));
 
-    await expectLater(ApiClient.postRequest(ApiConstants.apiInsertFuelEntry, [{'Id': 0}], headers: {'Comid': '6'}),
-        throwsA(predicate((e) => e.toString().contains('No Truck Assigned'))));
+    await expectLater(ApiClient.postRequest('${ApiConstants.apiGetTruckList}6&type=', null),
+        throwsA(predicate((e) => e.toString().contains('Company is required'))));
   });
 
-  test('the legacy repository: the named helper parses the shared answer, and a save returns the envelope', () async {
+  test('the legacy repository: the named helper parses the shared answer, and a refusal returns the envelope', () async {
     final repository = LegacyApiRepository(MockDioClient(), java: GetIt.instance<JavaApiClient>());
     adapter.replies
-      ..add((200, jsonEncode({'IsSuccess': true, 'Data1': {'id': 71}})))
-      ..add((400, jsonEncode({'status': 400, 'message': 'Truck is required'})))
-      ..add((200, jsonEncode({'IsSuccess': true, 'Data1': 'FE000000072'})));
+      ..add((200, combo([{'Id': 3, 'AccountName': 'VBC 5521'}])))
+      ..add((400, jsonEncode({'status': 400, 'message': 'Company is required'})));
 
-    final saved = await repository.apiAllinoneSelectArray(ApiConstants.apiInsertFuelEntry, [
-      {'SaleDate': '2026-10-02T00:00:00.000', 'Id': 0, 'CompanyRefId': 6, 'TruckRefid': 3, 'DriverRefId': 7, 'Aliter': 50, 'FStatus': 1}
-    ], {'Comid': '6'});
-    final refused = await repository.apiAllinoneSelectArray(ApiConstants.apiInsertFuelEntry, [{'Id': 0}], {'Comid': '6'});
-    final number = await repository.apiGetString('${ApiConstants.apiMaxFuelEntryNo}6');
+    final rows = await repository.apiAllinoneSelectArray('${ApiConstants.apiGetTruckList}6&type=', null, {}, null);
+    final refused = await repository.apiAllinoneSelectArray('${ApiConstants.apiGetTruckList}6&type=', null, {}, null);
 
-    expect(saved['IsSuccess'], isTrue);
-    expect(saved['Message'], 'FuelEntry Update Successfully..');
+    expect(rows, [{'Id': 3, 'AccountName': 'VBC 5521'}]);
     expect(refused['IsSuccess'], isFalse);
-    expect(refused['Message'], 'Truck is required');
-    expect(number, 'FE000000072');
+    expect(refused['Message'], 'Company is required');
   });
 
   test('the legacy DioClient: a direct caller gets the old rows, with alias parameters', () async {
