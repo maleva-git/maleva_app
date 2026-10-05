@@ -1,10 +1,8 @@
 import 'package:maleva/core/di/injection.dart';
 import 'package:maleva/core/files/attachments_api.dart';
 import 'package:maleva/core/utils/system_helpers.dart';
-import 'package:maleva/core/network/api_constants.dart';
 import 'dart:io';
-import 'package:maleva/core/network/api_client.dart';
-import 'package:maleva/core/models/shared/response_view_model.dart';
+import 'package:maleva/core/rti/rti_api.dart';
 
 class RTIStatusRepository {
   Future<List<String>> fetchImages(int saleOrderId, String folder) =>
@@ -18,8 +16,8 @@ class RTIStatusRepository {
     await sl<AttachmentsApi>().delete([imageName], folder: 'SalesOrder', recordId: saleOrderId, subFolder: folder);
   }
 
-  Future<ResponseViewModel?> sendRtiMail(Map<String, dynamic> master) async {
-    final response = await ApiClient.postRequest(ApiConstants.apiRTIMail, master);
-    return response != null ? ResponseViewModel.fromJson(response) : null;
-  }
+  /// The job's RTI status on the shared Java API (it sets the driver status,
+  /// then emails and WhatsApps the transport staff with the photos).
+  Future<void> updateJobStatus(int saleOrderId, String statusName, List<String> imageUrls) =>
+      sl<RtiApi>().updateJobStatus(saleOrderId, statusName, imageUrls);
 }

@@ -106,24 +106,13 @@ class RTIStatusBloc extends Bloc<RTIStatusEvent, RTIStatusState> {
 
     emit(state.copyWith(status: RTIStatusStatus.loading));
     try {
-      final master = {
-        'CompanyRefId': AppPreferences.getComid(),
-        'RTIId': state.rtiId,
-        'RTINo': state.rtiNo,
-        'JobId': state.saleOrderId,
-        'JobNo': state.jobNo,
-        'StatusId': 0,
-        'StatusName': '${state.driverStatus} Done',
-        'ImageURL': state.imageNetwork.map((img) => '${AppGlobals.imagepath}SalesOrder/${state.saleOrderId}/${state.driverFolder}/$img').toList(),
-      };
-
-      final result = await repository.sendRtiMail(master);
-      if (result?.IsSuccess == true) {
-        emit(state.copyWith(status: RTIStatusStatus.success, successMessage: 'Updated Successfully'));
-        add(const RTIStatusClearRequested());
-      } else {
-        emit(state.copyWith(status: RTIStatusStatus.failure, errorMessage: result?.Message));
-      }
+      await repository.updateJobStatus(
+        state.saleOrderId,
+        '${state.driverStatus} Done',
+        state.imageNetwork.map((img) => '${AppGlobals.imagepath}SalesOrder/${state.saleOrderId}/${state.driverFolder}/$img').toList(),
+      );
+      emit(state.copyWith(status: RTIStatusStatus.success, successMessage: 'Updated Successfully'));
+      add(const RTIStatusClearRequested());
     } catch (e) {
       emit(state.copyWith(status: RTIStatusStatus.failure, errorMessage: e.toString()));
     }

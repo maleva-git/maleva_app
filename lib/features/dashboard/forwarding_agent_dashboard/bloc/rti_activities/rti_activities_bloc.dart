@@ -4,12 +4,18 @@ import 'package:intl/intl.dart';
 import 'rti_activities_event.dart';
 import 'rti_activities_state.dart';
 import '../../models/rti_route_activity.dart';
-import '../../../../../core/network/api_client.dart';
+import 'package:get_it/get_it.dart';
+import '../../../../../core/rti/rti_api.dart';
 import '../../../../../core/utils/app_preferences.dart';
-import '../../../../../core/config/app_config.dart';
 
+/// The forwarding agent's route stops, on the shared Java
+/// `/api/rti-route-activities` (change `rti-on-shared-java-api`).
 class RtiActivitiesBloc extends Bloc<RtiActivitiesEvent, RtiActivitiesState> {
-  RtiActivitiesBloc() : super(RtiActivitiesInitial()) {
+  final RtiApi _api;
+
+  RtiActivitiesBloc({RtiApi? api})
+      : _api = api ?? GetIt.instance<RtiApi>(),
+        super(RtiActivitiesInitial()) {
 
     on<FetchRtiActivities>(_onFetchRtiActivities);
     on<UpdateRtiStatus>(_onUpdateRtiStatus);
@@ -18,32 +24,15 @@ class RtiActivitiesBloc extends Bloc<RtiActivitiesEvent, RtiActivitiesState> {
   Future<void> _onFetchRtiActivities(FetchRtiActivities event, Emitter<RtiActivitiesState> emit) async {
     emit(RtiActivitiesLoading());
     try {
-      final comid = AppPreferences.getComid();
-      final employeeRefId = AppPreferences.getEmpRefId();
-      final fromDateStr = DateFormat('yyyy-MM-dd').format(event.fromDate);
-      final toDateStr = DateFormat('yyyy-MM-dd').format(event.toDate);
-      
-      final String url = '${AppConfig.baseUrl}/api/RTIApp/SelectRTIRouteActivities?Comid=$comid&Fromdate=$fromDateStr&Todate=$toDateStr&Employeerefid=$employeeRefId';
-      
-      final response = await ApiClient.postRequest(url, null);
-
-      if (kDebugMode) {
-        debugPrint('🔍 RTI API RESPONSE: $response');
-      }
-
-      if (response != null && response is List) {
-        final activities = response.map((e) => RtiRouteActivity.fromJson(e)).toList();
-        emit(RtiActivitiesLoaded(activities));
-      } else {
-        emit(const RtiActivitiesLoaded([]));
-      }
+      final rows = await _api.routeActivities(
+        fromDate: DateFormat('yyyy-MM-dd').format(event.fromDate),
+        toDate: DateFormat('yyyy-MM-dd').format(event.toDate),
+        employeeId: AppPreferences.getEmpRefId(),
+      );
+      emit(RtiActivitiesLoaded(rows.map(RtiRouteActivity.fromJava).toList()));
     } catch (e) {
-      if (e.toString().contains('No Data Found') || e.toString().contains('404')) {
-        emit(const RtiActivitiesLoaded([]));
-      } else {
-        print('RTI Fetch Exception: $e');
-        emit(RtiActivitiesError(e.toString()));
-      }
+      debugPrint('RTI Fetch Exception: $e');
+      emit(RtiActivitiesError(e.toString()));
     }
   }
 
@@ -52,13 +41,8 @@ class RtiActivitiesBloc extends Bloc<RtiActivitiesEvent, RtiActivitiesState> {
     if (state is RtiActivitiesLoaded) {
       final currentState = state as RtiActivitiesLoaded;
       try {
-        final url = '${AppConfig.baseUrl}/api/RTIApp/UpdateRootactivity?Id=${event.id}&StatusId=${event.newStatus}';
-        final response = await ApiClient.postRequest(url, null);
-        
-        if (kDebugMode) {
-          debugPrint('🔍 UPDATE RTI STATUS RESPONSE: $response');
-        }
-        
+        await _api.setRouteActivityStatus(event.id, event.newStatus);
+
         // Optimistically update the UI
         final updatedActivities = currentState.activities.map((activity) {
           if (activity.id == event.id) {

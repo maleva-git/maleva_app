@@ -49,11 +49,7 @@ class ApiConstants {
   static const String apiSelectBoardingSalaryByEmpId = "$port/api/BoardingSalaryApp/SelectBoardingSalaryByEmpId";
 
   // ─── RTI ──────────────────────────────────────────────────────────────────
-  static const String apiGetRTINo             = "$port/api/RTIApp/SelectRTINo?Comid=";
-  static const String apiSelectRTIView        = "$port/api/RTIApp/SelectRTI?Comid=";
-  static const String apiSelectRTIDetailsView = "$port/api/RTIApp/SelectRTIView?Comid=";
-  static const String apiViewRTIPdf           = "$port/api/RTIApp/RTIVIEW?RTINo=";
-  static const String apiRTIMail              = "$port/api/RTIApp/SendStatusMail";
+  // still .NET: SP_RTIStatus is ported in the next RTI phase (rti-on-shared-java-api)
   static const String apiRTIDetailsInsert     = "$port/api/RTIApp/InsertRTIStatus?Comid=";
 
   // ─── Stock ────────────────────────────────────────────────────────────────

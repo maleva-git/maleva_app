@@ -1,3 +1,5 @@
+import 'package:maleva/core/utils/json_read.dart';
+
 class RtiRouteActivity {
   final int id;
   final int companyRefId;
@@ -51,31 +53,31 @@ class RtiRouteActivity {
     this.marqisStatus = 0,
   });
 
-  factory RtiRouteActivity.fromJson(Map<String, dynamic> json) {
+  /// One stop of the shared Java route list (`/api/rti-route-activities`);
+  /// the screen's lorry, driver and contact columns come from its joins.
+  factory RtiRouteActivity.fromJava(Map<String, dynamic> json) {
+    String text(String key) => JsonRead.string(json[key]);
     return RtiRouteActivity(
-      id: json['Id'] ?? 0,
-      companyRefId: json['CompanyRefId'] ?? 0,
-      rtiMasterRefId: json['RTIMasterRefId'] ?? 0,
-      sequenceNo: json['SequenceNo'] ?? 0,
-      locationName: json['LocationName'] ?? json['Port'] ?? '',
-      activityType: json['ActivityType'] ?? json['JobType'] ?? '',
-      employeeRefId: json['EmployeeRefId'] ?? 0,
-      status: json['Status'] ?? 0,
-      plannedDateTime: json['PlannedDateTime'],
-      eta: json['ETA'],
-      remarks: json['Remarks'] ?? '',
-      active: json['Active'] ?? false,
-      createdDate: json['Created_Date'],
-      createdBy: json['Created_By'] ?? '',
-      modifiedDate: json['Modified_Date'],
-      modifiedBy: json['Modified_By'] ?? '',
-      agentMobileNo: json['AgentMobileNo'] ?? json['Contact'] ?? '',
-      fullRoute: json['FullRoute'] ?? '',
-      driverNumber: json['DriverNumber'] ?? '',
-      rtiNumber: json['RTINumber'] ?? json['LorryNo'] ?? '',
-      employeeName: json['EmployeeName'] ?? json['DriverName'] ?? '',
-      rtiMasterRemarks: json['RTIMasterRemarks'] ?? '',
-      marqisStatus: json['MarqisStatus'] ?? 0,
+      id: JsonRead.integer(json['id']),
+      companyRefId: 0,
+      rtiMasterRefId: JsonRead.integer(json['rtiMasterRefId']),
+      sequenceNo: 0,
+      locationName: text('port'),
+      activityType: text('jobType'),
+      employeeRefId: 0,
+      status: JsonRead.integer(json['status']),
+      eta: JsonRead.stringOrNull(json['eta']),
+      remarks: text('remarks'),
+      active: true,
+      createdBy: '',
+      modifiedBy: '',
+      agentMobileNo: text('contact'),
+      fullRoute: text('fullRoute'),
+      driverNumber: text('driverNumber'),
+      rtiNumber: text('lorryNo'),
+      employeeName: text('driverName'),
+      rtiMasterRemarks: '',
+      marqisStatus: JsonRead.integer(json['marqisStatus']),
     );
   }
 }

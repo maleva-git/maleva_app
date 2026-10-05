@@ -5,6 +5,7 @@ import 'package:maleva/core/fuel/fuel_entry_api.dart';
 import 'package:maleva/core/job_order/job_order_api.dart';
 import 'package:maleva/core/planning/planning_api.dart';
 import 'package:maleva/core/planning/vessel_planning_api.dart';
+import 'package:maleva/core/rti/rti_api.dart';
 import 'package:maleva/core/sale_order/sale_order_api.dart';
 import 'package:maleva/core/utils/app_preferences.dart';
 import 'package:maleva/core/lookups/shared_lookups.dart';
@@ -39,6 +40,9 @@ void registerAuthModule(GetIt sl) {
   // fuel entries (the shared /api/fuel-entries)
   sl.registerLazySingleton<FuelEntryApi>(
       () => FuelEntryApi(sl<JavaApiClient>().dio, companyId: AppPreferences.getComid));
+  // RTIs (the shared /api/rti-masters and /api/rti-route-activities)
+  sl.registerLazySingleton<RtiApi>(
+      () => RtiApi(sl<JavaApiClient>().dio, companyId: AppPreferences.getComid));
   // job orders (the shared /api/job-orders)
   sl.registerLazySingleton<JobOrderApi>(
       () => JobOrderApi(sl<JavaApiClient>().dio, companyId: AppPreferences.getComid));
