@@ -1,12 +1,9 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
-import 'package:maleva/core/utils/app_globals.dart';
 
 import '../data/rtiview_repository.dart';
 import 'rtiview_event.dart';
 import 'rtiview_state.dart';
-import 'package:maleva/core/models/shared/r_t_i_master_view_model.dart';
-import 'package:maleva/core/models/shared/r_t_i_details_view_model.dart';
 
 class RTIDetailsBloc extends Bloc<RTIDetailsEvent, RTIDetailsState> {
   final RTIViewRepository repository;
@@ -51,19 +48,10 @@ class RTIDetailsBloc extends Bloc<RTIDetailsEvent, RTIDetailsState> {
     if (state is! RTIDetailsLoaded) return;
     final currentState = _s; // snapshot before any emit
 
-    final String currentRtiNo =
-    event.rtiNo.isEmpty ? "DriverRTI" : event.rtiNo;
-
     try {
-      final comId = AppGlobals.storagenew.getInt('Comid') ?? 0;
+      final pdfUrl = await repository.fetchRTIPdfUrl(rtiId: event.id);
 
-      final pdfUrl = await repository.fetchRTIPdfUrl(
-        soId: event.id,
-        rtiNo: currentRtiNo,
-        comId: comId,
-      );
-
-      if (pdfUrl != null && pdfUrl.isNotEmpty) {
+      if (pdfUrl.isNotEmpty) {
         // ✅ Emit success — listener in UI will open the PDF
         emit(RTIPdfLaunchSuccess(pdfUrl));
       } else {
@@ -82,31 +70,12 @@ class RTIDetailsBloc extends Bloc<RTIDetailsEvent, RTIDetailsState> {
     emit(s.copyWith(isLoading: true));
 
     try {
-      final comId = AppGlobals.storagenew.getInt('Comid') ?? 0;
       final fromStr = DateFormat('yyyy-MM-dd').format(s.fromDate);
       final toStr   = DateFormat('yyyy-MM-dd').format(s.toDate);
 
-      final resultData = await repository.fetchRTIRecords(
-        comId:    comId,
-        fromDate: fromStr,
-        toDate:   toStr,
-      );
-
-      List<RTIMasterViewModel>  masters = [];
-      List<RTIDetailsViewModel> details = [];
-
-      if (resultData != null &&
-          resultData is List &&
-          resultData.isNotEmpty &&
-          resultData[0] != null) {
-        final data = resultData[0];
-        masters = (data["salemaster"] as List)
-            .map((e) => RTIMasterViewModel.fromJson(e as Map<String, dynamic>))
-            .toList();
-        details = (data["saledetails"] as List)
-            .map((e) => RTIDetailsViewModel.fromJson(e as Map<String, dynamic>))
-            .toList();
-      }
+      final list = await repository.fetchRTIRecords(fromDate: fromStr, toDate: toStr);
+      final masters = list.masters;
+      final details = list.details;
 
       emit(s.copyWith(masters: masters, details: details, isLoading: false));
     } catch (err) {

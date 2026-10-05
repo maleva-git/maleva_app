@@ -10,7 +10,8 @@ import 'package:maleva/core/utils/app_globals.dart';
 import 'package:maleva/core/models/shared/email_model.dart';
 import 'package:maleva/core/models/shared/r_t_i_details_view_model.dart';
 import 'package:maleva/core/models/shared/employee_model.dart';
-import 'package:maleva/core/models/shared/r_t_i_master_view_model.dart';
+import 'package:get_it/get_it.dart';
+import 'package:maleva/core/rti/rti_api.dart';
 
 class TransportDashboardRepository {
   final int comid = AppPreferences.getComid();
@@ -81,19 +82,13 @@ class TransportDashboardRepository {
 
   // ─── RTI / PDO ─────────────────────────────────────────────────────────────
   Future<Map<String, dynamic>> fetchRTIData(String fromDate, String toDate, int driverId, int truckId, String search) async {
-    final url = '${ApiConstants.apiSelectRTIView}$comid&Fromdate=$fromDate&Todate=$toDate&DId=$driverId&TId=$truckId&Employeeid=0&Search=$search';
-    final result = await ApiClient.postRequest(url, null);
-
-    List<RTIMasterViewModel> masterList = [];
-    List<RTIDetailsViewModel> detailList = [];
-
-    if (result is List && result.isNotEmpty) {
-      masterList = (result[0]['salemaster'] as List).map((e) => RTIMasterViewModel.fromJson(e)).toList();
-      detailList = (result[0]['saledetails'] as List).map((e) => RTIDetailsViewModel.fromJson(e)).toList();
-
-      AppGlobals.RTIViewMasterList = masterList; // Keep legacy global sync
-      AppGlobals.RTIViewDetailList = detailList; // Keep legacy global sync
-    }
+    // the shared Java RTI list (a driver token gets its own RTIs only)
+    final list = await GetIt.instance<RtiApi>().withJobs(
+        fromDate: fromDate, toDate: toDate, driverId: driverId, truckId: truckId, search: search);
+    final masterList = list.masters;
+    final detailList = list.details;
+    AppGlobals.RTIViewMasterList = masterList; // Keep legacy global sync
+    AppGlobals.RTIViewDetailList = detailList; // Keep legacy global sync
 
     return {'masterList': masterList, 'detailList': detailList};
   }

@@ -1,4 +1,6 @@
 import 'package:image_picker/image_picker.dart';
+import 'package:intl/intl.dart';
+import 'package:maleva/core/utils/json_read.dart';
 
 class RTIDetailsViewModel {
   int Id;
@@ -25,26 +27,34 @@ class RTIDetailsViewModel {
   RTIDetailsViewModel(
       this.Id, this.SDId,this.RTIMasterRefId,this.StatusId, this.SaleOrderMasterRefId,this.CustomerMasterRefId, this.JobNo, this.JobDate, this.CustomerName, this.Salary, this.PPIC, this.DPIC, this.PWDType,this.Active, this.Verify,this.imagePath,this.imageFile,{ this.isChecked = false , this.isVerified = false});
 
-  RTIDetailsViewModel.fromJson(Map<String, dynamic> json)
-      : Id = int.tryParse(json['Id']?.toString() ?? '') ?? 0,
-        SDId = int.tryParse(json['SDId']?.toString() ?? '') ?? 0,
-        RTIMasterRefId = int.tryParse(json['RTIMasterRefId']?.toString() ?? '') ?? 0,
-        StatusId = int.tryParse(json['StatusId']?.toString() ?? '') ?? 0,
-        SaleOrderMasterRefId = int.tryParse(json['SaleOrderMasterRefId']?.toString() ?? '') ?? 0,
-        CustomerMasterRefId = int.tryParse(json['CustomerMasterRefId']?.toString() ?? '') ?? 0,
-        JobNo = json['JobNo'] ?? '',
-        JobDate = json['JobDate'] ?? '',
-        CustomerName = json['CustomerName'] ?? '',
-        Salary = double.parse(json['Salary'].toString()),
-        PPIC = json['PPIC'] ?? '',
-        DPIC = json['DPIC'] ?? '',
-        PWDType = int.tryParse(json['PWDType']?.toString() ?? '') ?? 0,
-        Active = int.tryParse(json['Active']?.toString() ?? '') ?? 0,
-        Verify = int.tryParse(json['Verify']?.toString() ?? '') ?? 0,
-        imagePath = json['ImagePath'] ?? '',
-        isChecked = (int.tryParse(json['Active']?.toString() ?? '') ?? 0) == 1,
-        isVerified =
-            (int.tryParse(json['Verify']?.toString() ?? '') ?? 0) == 1;
+  /// One job of an RTI in the shared Java list (`jobs` of
+  /// `/api/rti-masters/with-jobs`). The RTI status fields (StatusId, Active,
+  /// Verify, ImagePath) are not part of it, as they were not of .NET SelectRTI.
+  RTIDetailsViewModel.fromJava(Map<String, dynamic> json)
+      : Id = JsonRead.integer(json['id']),
+        SDId = 0,
+        RTIMasterRefId = JsonRead.integer(json['rtiMasterRefId']),
+        StatusId = 0,
+        SaleOrderMasterRefId = JsonRead.integer(json['saleOrderMasterRefId']),
+        CustomerMasterRefId = JsonRead.integer(json['customerMasterRefId']),
+        JobNo = JsonRead.string(json['jobNo']),
+        JobDate = _dmy(json['jobDate']),
+        CustomerName = JsonRead.string(json['customerName']),
+        Salary = JsonRead.number(json['salary']),
+        PPIC = JsonRead.string(json['ppic']),
+        DPIC = JsonRead.string(json['dpic']),
+        PWDType = 0,
+        Active = 0,
+        Verify = 0,
+        imagePath = '',
+        isChecked = false,
+        isVerified = false;
+
+  static String _dmy(dynamic value) {
+    final d = JsonRead.date(value);
+    return d == null ? '' : DateFormat('dd/MM/yyyy').format(d);
+  }
+
   // method
   Map<String, dynamic> toJson() {
     return {

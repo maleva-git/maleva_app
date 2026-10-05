@@ -5,7 +5,6 @@ import '../data/pdo_repository.dart';
 import 'pdo_event.dart';
 import 'pdo_state.dart';
 import 'package:maleva/core/models/shared/r_t_i_master_view_model.dart';
-import 'package:maleva/core/models/shared/r_t_i_details_view_model.dart';
 
 class PDOBloc extends Bloc<PDOViewEvent, PDOViewState> {
   final PDORepository repository; // ✅ Injected Repository
@@ -45,11 +44,7 @@ class PDOBloc extends Bloc<PDOViewEvent, PDOViewState> {
   Future<void> _onLoad(LoadPDOViewEvent e, Emitter<PDOViewState> emit) async {
     emit(const PDOViewLoading());
     try {
-      final comId = AppGlobals.storagenew.getInt('Comid') ?? 0;
-
-      // ✅ REFACTORED: Using the injected repository
-      final result = await repository.fetchPDORecords(
-        comId: comId,
+      final list = await repository.fetchPDORecords(
         fromDate: fromDate,
         toDate: toDate,
         driverId: driverId,
@@ -57,18 +52,8 @@ class PDOBloc extends Bloc<PDOViewEvent, PDOViewState> {
         employeeId: employeeId,
         search: search,
       );
-
-      List<RTIMasterViewModel> masters = [];
-      List<RTIDetailsViewModel> details = [];
-
-      if (result != null && result is List && result.isNotEmpty) {
-        masters = (result[0]["salemaster"] as List)
-            .map((e) => RTIMasterViewModel.fromJson(e as Map<String, dynamic>))
-            .toList();
-        details = (result[0]["saledetails"] as List)
-            .map((e) => RTIDetailsViewModel.fromJson(e as Map<String, dynamic>))
-            .toList();
-      }
+      final masters = list.masters;
+      final details = list.details;
 
       emit(PDOViewLoaded(
         allMasters:      masters,

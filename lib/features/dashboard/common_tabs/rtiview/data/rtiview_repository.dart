@@ -1,35 +1,18 @@
-import 'package:maleva/core/network/api_constants.dart';
-import 'package:maleva/core/network/api_client.dart';
-import 'package:maleva/core/models/shared/response_view_model.dart';
+import 'package:get_it/get_it.dart';
+import 'package:maleva/core/rti/rti_api.dart';
 
+/// The RTI View tab, on the shared Java RTI APIs (change `rti-on-shared-java-api`).
 class RTIViewRepository {
-  Future<dynamic> fetchRTIRecords({
-    required int comId,
+  RTIViewRepository({RtiApi? api}) : _api = api ?? GetIt.instance<RtiApi>();
+
+  final RtiApi _api;
+
+  Future<RtiList> fetchRTIRecords({
     required String fromDate,
     required String toDate,
-  }) async {
-    final url = "${ApiConstants.apiSelectRTIView}$comId&Fromdate=$fromDate&Todate=$toDate&DId=0&TId=0&Employeeid=0&Search=";
-    return await ApiClient.postRequest(url, null);
-  }
+  }) =>
+      _api.withJobs(fromDate: fromDate, toDate: toDate);
 
-  Future<String?> fetchRTIPdfUrl({
-    required int soId,
-    required String rtiNo,
-    required int comId,
-  }) async {
-    final Map<String, dynamic> body = {
-      'SoId': soId,
-      'Comid': comId,
-    };
-
-    final result = await ApiClient.postRequest("${ApiConstants.apiViewRTIPdf}$rtiNo", body);
-
-    if (result != null && result.toString().isNotEmpty) {
-      ResponseViewModel value = ResponseViewModel.fromJson(result);
-      if (value.IsSuccess == true) {
-        return value.data1; // This is the URL
-      }
-    }
-    return null;
-  }
+  /// The RTI report PDF of RTI [rtiId].
+  Future<String> fetchRTIPdfUrl({required int rtiId}) => _api.reportUrl(rtiId);
 }

@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:maleva/core/utils/app_globals.dart';
 import 'package:maleva/core/network/api_constants.dart';
 import 'package:maleva/core/stock/stock_in_api.dart';
+import 'package:maleva/core/rti/rti_api.dart';
 import 'package:maleva/core/network/dio_client.dart';
 import 'package:maleva/core/network/java_api_client.dart';
 import 'package:maleva/core/network/java_route.dart';
@@ -23,10 +24,8 @@ import 'package:maleva/core/models/shared/agent_model.dart';
 import 'package:maleva/features/operations/models/job_status_model.dart';
 import 'package:maleva/core/models/shared/product_model.dart';
 import 'package:maleva/features/operations/models/job_type_details_model.dart';
-import 'package:maleva/core/models/shared/r_t_i_master_view_model.dart';
 import 'package:maleva/core/models/shared/employee_model.dart';
 import 'package:maleva/core/models/shared/location_model.dart';
-import 'package:maleva/core/models/shared/r_t_i_details_view_model.dart';
 
 class LegacyApiRepository {
   final DioClient _dioClient;
@@ -360,44 +359,13 @@ Future SelectProductList(context) async {
 
 
 Future<void> GetRTINoForwarding(BuildContext ?context, int billId) async {
+  // every RTI number of the company, from the shared Java RTI API
   try {
-    // Clear existing job list
-    AppGlobals.JobNoList.clear();
-
-    // Get company ID from storage
-    final int comId = AppGlobals.storagenew.getInt('Comid') ?? 0;
-
-    // Construct the API URL
-    final String apiUrl = '${ApiConstants.apiGetRTINo}$comId';
-
-    // Call the API
-    final resultData = ((await _routedPost(
-        apiUrl, data: null ?? {})).data);
-
-    // Check response validity and content
-    if (resultData != null && resultData is List) {
-      final List<dynamic> dataList = resultData;
-
-      // Clear existing job list
-      AppGlobals.JobNoList.clear();
-
-      for (var item in dataList) {
-        // Safety check: ensure item is a Map
-        if (item is Map<String, dynamic>) {
-          final String cNumber = item['RTINoDisplay']?.toString() ?? '';
-          final int id = item['Id'] ?? 0;
-
-          AppGlobals.JobNoList.add({
-            'CNumber': cNumber,
-            'Id': id,
-          });
-        }
-      }
-    } else {
-      AppGlobals.JobNoList = []; // Default to empty list
-    }
+    AppGlobals.JobNoList = await GetIt.instance<RtiApi>().numbers();
+  } catch (e) {
+    AppGlobals.JobNoList = [];
+    print("API Error: $e");
   }
-  catch (e) { print("API Error: $e"); }
 }
 
 Future SelectTruckList(context,String? Type) async {
@@ -450,50 +418,6 @@ Future SelectDriverList(context,String? Type) async {
   if (resultData.isNotEmpty) {
         AppGlobals.GetDriverList = resultData
             .map((element) => GetTruckModel.fromJson(element))
-            .toList();
-      }
-} catch (e) { print("API Error: $e"); }
-
-  } catch (error) {
-    if (error.toString() == "") {}
-  }
-}
-
-Future SelectRTIDetailViewList(context,String Fromdate,String Todate,int DId, int TId, int Employeeid,String Search) async {
-  try {
-    AppGlobals.RTIViewMasterList.clear();
-    var Comid = AppGlobals.storagenew.getInt('Comid') ?? 0;
-    try {
-  final resultData = _ensureList((await _routedPost(
-        Uri.encodeFull("${ApiConstants.apiSelectRTIDetailsView}$Comid&Fromdate=$Fromdate&Todate=$Todate&DId=$DId&TId=$TId&Employeeid=$Employeeid&Search$Search"), data: null ?? {})).data);
-  if (resultData.isNotEmpty) {
-        AppGlobals.RTIViewMasterList = resultData[0]["salemaster"]
-            .map((element) => RTIMasterViewModel.fromJson(element))
-            .toList();
-        AppGlobals.RTIViewDetailList = resultData[0]["saledetails"]
-            .map((element) => RTIDetailsViewModel.fromJson(element))
-            .toList();
-      }
-} catch (e) { print("API Error: $e"); }
-
-  } catch (error) {
-    if (error.toString() == "") {}
-  }
-}
-
-Future SelectRTIViewList(context,String Fromdate,String Todate,int DId, int TId, int Employeeid,String Search) async {
-  try {
-    AppGlobals.RTIViewMasterList.clear();
-    var Comid = AppGlobals.storagenew.getInt('Comid') ?? 0;
-    try {
-  final resultData = _ensureList((await _routedPost(
-        Uri.encodeFull("${ApiConstants.apiSelectRTIView}$Comid&Fromdate=$Fromdate&Todate=$Todate&DId=$DId&TId=$TId&Employeeid=$Employeeid&Search=$Search"), data: null ?? {})).data);
-  if (resultData.isNotEmpty) {
-        AppGlobals.RTIViewMasterList = resultData[0]["salemaster"]
-            .map((element) => RTIMasterViewModel.fromJson(element))
-            .toList();
-        AppGlobals.RTIViewDetailList = resultData[0]["saledetails"]
-            .map((element) => RTIDetailsViewModel.fromJson(element))
             .toList();
       }
 } catch (e) { print("API Error: $e"); }

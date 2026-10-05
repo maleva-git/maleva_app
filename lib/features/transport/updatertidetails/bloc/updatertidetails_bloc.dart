@@ -1,15 +1,14 @@
 import 'package:flutter/foundation.dart';
 import 'package:maleva/core/network/legacy_api_repository.dart';
+import 'package:maleva/core/rti/rti_api.dart';
 import 'package:maleva/core/di/injection.dart';
 import 'package:maleva/core/utils/system_helpers.dart';
-import 'package:maleva/core/network/api_constants.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 import 'package:maleva/core/utils/app_globals.dart';
 
 import 'package:maleva/features/transport/updatertidetails/bloc/updatertidetails_event.dart';
 import 'package:maleva/features/transport/updatertidetails/bloc/updatertidetails_state.dart';
-import 'package:maleva/core/models/shared/response_view_model.dart';
 
 
 
@@ -128,14 +127,15 @@ class UpdateRTIBloc extends Bloc<UpdateRTIEvent, UpdateRTIState> {
 
     emit(UpdateRTILoading());
     try {
-      await sl<LegacyApiRepository>().SelectRTIViewList(
-          null,
-          s.fromDate,
-          s.toDate,
-          s.driverId,
-          s.truckId,
-          0,        // Employeeid — kept 0 as per original
-          s.rtiNo);
+      // the shared Java RTI list (a driver token gets its own RTIs only)
+      final list = await sl<RtiApi>().withJobs(
+          fromDate: s.fromDate,
+          toDate: s.toDate,
+          driverId: s.driverId,
+          truckId: s.truckId,
+          search: s.rtiNo);
+      AppGlobals.RTIViewMasterList = list.masters;
+      AppGlobals.RTIViewDetailList = list.details;
 
       emit(s.copyWith(
         masterList:    AppGlobals.RTIViewMasterList,
@@ -162,17 +162,8 @@ class UpdateRTIBloc extends Bloc<UpdateRTIEvent, UpdateRTIState> {
       UpdateRTIShareRequested event, Emitter<UpdateRTIState> emit) async {
     if (state is! UpdateRTILoaded) return;
     try {
-      final master = {'SoId': event.id, 'Comid': AppGlobals.Comid};
-      final header = {'Content-Type': 'application/json; charset=UTF-8'};
-      final result = await sl<LegacyApiRepository>().apiAllinoneSelectArray(
-          '${ApiConstants.apiViewRTIPdf}${event.rtiNoDisplay}',
-          master,
-          header,
-          null);
-      if (result != '') {
-        final value = ResponseViewModel.fromJson(result);
-        if (value.IsSuccess == true) SystemHelpers.launchInBrowser(value.data1);
-      }
+      // the RTI report PDF, prepared by the shared Java API
+      SystemHelpers.launchInBrowser(await sl<RtiApi>().reportUrl(event.id));
     } catch (e, stack) { debugPrint("Error caught globally: $e\n$stack"); }
   }
 }

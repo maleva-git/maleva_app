@@ -1,29 +1,32 @@
 import 'package:maleva/core/network/api_constants.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
-import 'package:maleva/core/network/api_client.dart';
+import 'package:get_it/get_it.dart';
+import 'package:maleva/core/rti/rti_api.dart';
 import 'package:maleva/core/models/shared/r_t_i_details_view_model.dart';
 
 class PDORepository {
-  /// Fetches PDO / RTI Records
-  Future<dynamic> fetchPDORecords({
-    required int comId,
+  /// The PDO / RTI records, from the shared Java RTI list (a driver token
+  /// gets its own RTIs only; change `rti-on-shared-java-api`).
+  Future<RtiList> fetchPDORecords({
     required String fromDate,
     required String toDate,
     required int driverId,
     required int truckId,
     required int employeeId,
     required String search,
-  }) async {
-    final url = "${ApiConstants.apiSelectRTIView}$comId"
-        "&Fromdate=$fromDate&Todate=$toDate"
-        "&DId=$driverId&TId=$truckId&Employeeid=$employeeId"
-        "&Search=$search";
+  }) =>
+      GetIt.instance<RtiApi>().withJobs(
+        fromDate: fromDate,
+        toDate: toDate,
+        driverId: driverId,
+        truckId: truckId,
+        employeeId: employeeId,
+        search: search,
+      );
 
-    return await ApiClient.postRequest(url, null);
-  }
-
-  /// Submits the PDO Verification with Multi-Part image files
+  /// Submits the PDO Verification with Multi-Part image files. Still the
+  /// .NET InsertRTIStatus: its stored procedure is ported in the next phase.
   Future<bool> submitPDOVerification({
     required int comId,
     required List<Map<String, dynamic>> payload,
