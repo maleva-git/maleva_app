@@ -124,34 +124,20 @@ class SummonBloc extends Bloc<SummonEvent, SummonState> {
     emit(s.copyWith(isSubmitting: true));
 
     try {
-      final comid = AppGlobals.storagenew.getInt('Comid') ?? 0;
-
-      final List<Map<String, dynamic>> body = [
-        {
-          "Comid": comid,
-          "Id": 0,
-          "TruckName": s.selectedTruck ?? '',
-          "DriverName": '',
-          "Summon": s.selectedSummon ?? '',
-          "PortPass": s.portPass,
-          "TruckLcnMnt": s.truckLcnMnt,
-          "Levy": s.levy,
-          "Fuel": s.fuel,
-          "Country": s.selectedCountry,
-          "EntryDate": s.selectedDate != null
-              ? DateFormat('yyyy-MM-dd').format(s.selectedDate!)
-              : DateFormat('yyyy-MM-dd').format(DateTime.now()),
-          "Amount": s.amount,
-          "DocumentPath": "",
-        }
-      ];
-
-      final isSuccess = await repository.submitSummon(
-        body: body,
-        comId: comid,
+      final id = await repository.submitSummon(
+        truckId: int.tryParse(s.selectedTruck ?? '') ?? 0,
+        summon: s.selectedSummon ?? '',
+        country: s.selectedCountry,
+        portPass: s.portPass,
+        truckLcnMnt: s.truckLcnMnt,
+        levy: s.levy,
+        fuel: s.fuel,
+        amount: double.tryParse(s.amount.replaceAll(',', '.')) ?? 0,
+        entryDate: DateFormat('yyyy-MM-dd').format(s.selectedDate ?? DateTime.now()),
         image: s.pickedImage,
         pdf: s.pickedPDF,
       );
+      final isSuccess = id > 0;
 
       if (isSuccess) {
         emit(const SummonSubmitSuccess());
@@ -190,17 +176,8 @@ class SummonBloc extends Bloc<SummonEvent, SummonState> {
     try {
       final String from = DateFormat('yyyy-MM-dd').format(s.fromDate);
       final String to = DateFormat('yyyy-MM-dd').format(s.toDate);
-      final comId = AppGlobals.storagenew.getInt('Comid') ?? 0;
 
-      final resultData = await repository.fetchSummonRecords(
-          comId: comId,
-          fromDate: from,
-          toDate: to
-      );
-
-      final records = resultData != null && resultData is List
-          ? List<Map<String, dynamic>>.from(resultData)
-          : <Map<String, dynamic>>[];
+      final records = await repository.fetchSummonRecords(fromDate: from, toDate: to);
 
       emit(s.copyWith(records: records, isLoading: false));
     } catch (err) {

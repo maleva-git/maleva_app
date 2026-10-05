@@ -1,15 +1,9 @@
-import 'package:maleva/core/network/api_constants.dart';
-import 'package:maleva/core/network/api_client.dart';
+import 'package:get_it/get_it.dart';
+import 'package:maleva/core/fleet/gps_api.dart';
+import 'package:maleva/features/transport/models/fuel_filling.dart';
 
+/// From the shared Java GPS list (change `master-reports-on-shared-java-api`).
 class FuelFillingsRepository {
-  /// Fetches fuel filling report data from the backend
-  Future<dynamic> fetchFuelFillingReport({
-    required Map<String, dynamic> body,
-  }) async {
-
-    return await ApiClient.postRequest(
-      ApiConstants.apiSelectFuelFillingReport,
-      body,
-    );
-  }
+  Future<List<FuelFilling>> fetchFuelFillingReport({required DateTime fromDate, required DateTime toDate}) async =>
+      (await GetIt.instance<GpsApi>().fuelFillings(fromDate, toDate)).map(FuelFilling.fromJava).toList();
 }

@@ -22,9 +22,6 @@ class ApiConstants {
   // ─── Master Data ──────────────────────────────────────────────────────────
   static const String apiSelectCustomer   = "$port/api/CustomerApp/GetCustomer?Comid=";
   static const String apiSelectLocation   = "$port/api/LocationApp/SelectLocation?Comid=";
-  static const String apiSelectEmployee   = "$port/api/EmployeeApp/GetEmployee?Comid=";
-  static const String apiSelectEmailData  = "$port/api/EmployeeApp/SelectEmailData";
-  static const String apiInsertMailMaster = "$port/api/EmployeeApp/InsertMailMaster";
   static const String apiSelectJobStatus  = "$port/api/JobStatusApp/SelectJobStatus?Comid=";
   static const String apiSelectJobType    = "$port/api/JobTypeApp/SelectJobType?Comid=";
   static const String apiSelectAllJobStatus   = "$port/api/JobTypeApp/SelectJobAllData?Comid=";
@@ -35,13 +32,6 @@ class ApiConstants {
   static const String apiSelectAddressDetails = "$port/api/AddressApp/SelectAddress?Comid=";
   static const String apiGetTruckList         = "$port/api/TruckApp/GetTruck?Comid=";
   static const String apiGetDriverList        = "$port/api/DriverApp/GetDriver?Comid=";
-  static const String apiSelectEmployeeDetails = "$port/api/EmployeeApp/SelectEmployee?Comid=";
-  static const String apiInsertEmployeeDetails = "$port/api/EmployeeApp/InsertEmployee";
-  static const String apiSelectEmployeeType   = "$port/api/EmployeeApp/SelectEmployeeType";
-  static const String apiDeleteEmployeeType   = "$port/api/EmployeeApp/DeleteEmployee?Id=";
-  static const String apiSelectGoogleReview   = "$port/api/EmployeeApp/SelectGoogleReview";
-  static const String apiDeleteGoogleReview   = "$port/api/EmployeeApp/DeleteGoogleReview?Id=";
-  static const String apiGoogleReviewInsert   = "$port/api/EmployeeApp/InsertGoogleReview";
   static const String apiSelectAllInventory   = "$port/api/CustomerApp/SelectAllInventoryt";
 
   // ─── Sales Order ──────────────────────────────────────────────────────────
@@ -49,16 +39,12 @@ class ApiConstants {
   static const String apiSelectBoardingSalaryByEmpId = "$port/api/BoardingSalaryApp/SelectBoardingSalaryByEmpId";
 
   // ─── RTI ──────────────────────────────────────────────────────────────────
-  // still .NET: SP_RTIStatus is ported in the next RTI phase (rti-on-shared-java-api)
-  static const String apiRTIDetailsInsert     = "$port/api/RTIApp/InsertRTIStatus?Comid=";
 
   // ─── Stock ────────────────────────────────────────────────────────────────
 
   // ─── Truck & Driver ───────────────────────────────────────────────────────
   static const String apiEditTruckDetails     = "$port/api/TruckApp/SelectTruck?Comid=";
   static const String apiUpdateTruckDetails   = "$port/api/TruckApp/InsertTruck?Comid=";
-  static const String apiSelectTruckDetails   = "$port/api/MasterReportApp/TruckReportView";
-  static const String apiSelectDriverDetails  = "$port/api/MasterReportApp/DriverReportView";
   static const String apiDriverViewRecords    = "$port/api/DriverApp/SelectDriver?Comid=";
 
   // ─── Fuel Entry ───────────────────────────────────────────────────────────
@@ -69,13 +55,9 @@ class ApiConstants {
 
   // ─── Receipt / Transaction ────────────────────────────────────────────────
   static const String apiGetReceipt           = "$port/api/ReceiptApp/SelectReceipt?Comid=";
-  static const String apiSelectReceipt        = "$port/api/TransactionReportApp/SelectCustomerBalance";
   static const String apiGetReceiptView       = "$port/api/ReceiptApp/SelectTruck?Comid=";
 
   // ─── Enquiry ──────────────────────────────────────────────────────────────
-  static const String apiInsertEnquiry        = "$port/api/EnquiryMasterApp/InsertEnquiryMaster";
-  static const String apiSelectEnquiryMaster  = "$port/api/EnquiryMasterApp/SelectEnquiryMaster";
-  static const String apiUpdateEnquiryMaster  = "$port/api/EnquiryMasterApp/UpdateEnquiryMaster?Id=";
 
   // ─── Bill Order / Petty Cash ──────────────────────────────────────────────
   static const String apiBillorderview        = "$port/api/BIllorderApp/SelectBillsOrderApp?Comid=";
@@ -83,12 +65,6 @@ class ApiConstants {
   static const String apiPettyCashview        = "$port/api/PettyCashApp/SelectPettyCashMaster?Comid=";
 
   // ─── Spare Parts ──────────────────────────────────────────────────────────
-  static const String apiInsertSpareParts     = "$port/api/TruckSparePartsApp/InsertSpareParts";
-  static const String apiGetSpareParts        = "$port/api/TruckSparePartsApp/SelectSpareParts?Comid=";
-  static const String apiInsertSpotSaleEntry  = "$port/api/TruckSparePartsApp/InsertSpotSaleEntry";
-  static const String apiGetSpotSaleEntry     = "$port/api/TruckSparePartsApp/SelectSpotSaleEntry?Comid=";
-  static const String apiInsertSummonParts    = "$port/api/TruckSparePartsApp/InsertSummon";
-  static const String apiGetSummonParts       = "$port/api/TruckSparePartsApp/SelectSummon?Comid=";
 
   // ─── License ──────────────────────────────────────────────────────────────
   static const String apiLicenseViewRecords   = "$port/api/LicenseApp/SelectLicense";
@@ -96,11 +72,6 @@ class ApiConstants {
   // ─── Dashboard ────────────────────────────────────────────────────────────
 
   // ─── Reports ──────────────────────────────────────────────────────────────
-  static const String apiPreAlertReport       = "$port/api/TransactionReportApp/PreAlertReport?PreAlertName=";
-  static const String apiSelectSpeedingReport = "$port/api/MasterReportApp/SpeedingReportView";
-  static const String apiSelectFuelFillingReport = "$port/api/MasterReportApp/SelectFuelFillings";
-  static const String apiSelectEngineHoursReport = "$port/api/MasterReportApp/SelectEngineHours";
-  static const String apiSelectDriverSalary   = "$port/api/TransactionReportApp/DriverRTIDetailedReport";
 
   // ─── App Troubleshoot / Support Log ────────────────────────────────────────
   static const String apiInsertAppLog         = "$port/api/AppLogApp/InsertAppLog";

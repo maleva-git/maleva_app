@@ -1,31 +1,26 @@
-import 'package:maleva/core/network/api_constants.dart';
-import 'package:maleva/core/network/api_client.dart';
+import 'package:get_it/get_it.dart';
+import 'package:maleva/core/employee/employee_api.dart';
+import 'package:maleva/core/models/shared/employee_details_model.dart';
 
+/// Employee Master, on the shared Java employee APIs the web uses (change
+/// `employee-lookups-on-shared-java-api`).
 class EmployeeRepository {
-  /// Fetches the list of all employees
-  Future<dynamic> fetchEmployees({required int comId}) async {
-    final url = "${ApiConstants.apiSelectEmployeeDetails}$comId&Startindex=0&PageCount=100&keyword=&Column=All&type=";
-    return await ApiClient.postRequest(url, '');
-  }
+  EmployeeRepository({EmployeeApi? api}) : _api = api;
 
-  /// Deletes a specific employee
-  Future<dynamic> deleteEmployee({required int id, required int comId}) async {
-    final url = "${ApiConstants.apiDeleteEmployeeType}$id&Comid=$comId";
-    return await ApiClient.postRequest(url, '');
-  }
+  final EmployeeApi? _api;
 
-  /// Inserts or updates an employee
-  Future<dynamic> saveEmployee({
-    required List<Map<String, dynamic>> body,
-    required int comId,
-  }) async {
-    final headers = {
-      'Comid': comId.toString(),
-    };
-    return await ApiClient.postRequest(
-        ApiConstants.apiInsertEmployeeDetails,
-        body,
-        headers: headers
-    );
-  }
+  EmployeeApi get _employees => _api ?? GetIt.instance<EmployeeApi>();
+
+  /// The company's employees (not deleted), up to 100, as the screen listed them.
+  Future<List<EmployeeDetailsModel>> fetchEmployees() async =>
+      (await _employees.search()).map(EmployeeDetailsModel.fromJava).toList();
+
+  /// The roles an employee can hold: `{id, name}`.
+  Future<List<Map<String, dynamic>>> fetchRoles() => _employees.roles();
+
+  /// Soft-deletes an employee of the company.
+  Future<void> deleteEmployee({required int id}) => _employees.delete(id);
+
+  /// Adds (id 0) or updates an employee; answers the saved id.
+  Future<int> saveEmployee(EmployeeDetailsModel employee) => _employees.save(employee.toJava());
 }

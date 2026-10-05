@@ -1,5 +1,6 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
+import 'package:maleva/core/network/api_failure.dart';
 import 'package:maleva/features/transaction/enquirytrmaster/data/enquiry_repository.dart';
 import 'package:maleva/core/utils/session_manager.dart';
 import 'enquirytradd_event.dart';
@@ -262,130 +263,27 @@ class EnquiryAddBloc extends Bloc<EnquiryAddEvent, EnquiryAddState> {
 
     emit(EnquiryAddLoading());
     try {
-      final payload = [
-        {
-          'Id':               s.editId,
-          'CompanyRefId':     _sessionManager.companyId,
-          'UserRefId':        null,
-          'EmployeeRefId':    _sessionManager.empRefId == 0 ? null : _sessionManager.empRefId,
-          'AgentCompanyRefId': null,
-          'AgentMasterRefId': null,
-          'OAgentCompanyRefId': null,
-          'OAgentMasterRefId': null,
-          'CustomerRefId':    s.custId,
-          'JobMasterRefId':   s.jobTypeId,
-          'SaleType':         '',
-          'CNumberDisplay':   '',
-          'CNumber':          0,
-          'Coinage':          0,
-          'GrossAmount':      0,
-          'TaxAmount':        0,
-          'DiscountAmount':   0,
-          'Remarks':          '',
-          'PlusAmount':       0,
-          'MinusAmount':      0,
-          'DODescription':    '',
-          'Amount':           0,
-          'Offvesselname':    '',
-          'Loadingvesselname': '',
-          'BillType':         'TR',
-          'SPort':            s.lPort,
-          'OPort':            s.oPort,
-          'Vessel':           '',
-          'OVessel':          '',
-          'Commodity':        '',
-          'Cargo':            '',
-          'ETA':              null,
-          'ETB':              null,
-          'ETD':              null,
-          'OETA':             null,
-          'OETB':             null,
-          'OETD':             null,
-          'DOCNo':            null,
-          'InvoiceNo':        null,
-          'TruckRefid':       null,
-          'DriverRefid':      null,
-          'AWBNo':            '',
-          'BLCopy':           '',
-          'Quantity':         s.quantity,
-          'TotalWeight':      s.weight,
-          'OriginRefId':      s.originId,
-          'DestinationRefId': s.destinationId,
-          'TruckSize':        '',
-          'JStatus':          null,
-          'OStatus':          0,
-          'ForkliftbyRefid':  null,
-          'SealbyRefid':      null,
-          'SealbreakbyRefid': null,
-          'SealbyRefid2':     null,
-          'SealbreakbyRefid2': null,
-          'SealbyRefid3':     null,
-          'SealbreakbyRefid3': null,
-          'BoardingOfficerRefid':  null,
-          'BoardingOfficer1Refid': null,
-          'BoardingAmount':   0,
-          'BoardingAmount1':  0,
-          'ForwardingEnterRef':  '',
-          'ForwardingExitRef':   '',
-          'ForwardingEnterRef2': '',
-          'ForwardingExitRef2':  '',
-          'ForwardingEnterRef3': '',
-          'ForwardingExitRef3':  '',
-          'ForwardingSMKNo':  '',
-          'ForwardingSMKNo2': '',
-          'ForwardingSMKNo3': '',
-          'PortChargesRef':   '',
-          'PortCharges':      0,
-          'SealAmount':       0,
-          'BreakSealAmount':  0,
-          'SealAmount2':      0,
-          'BreakSealAmount2': 0,
-          'SealAmount3':      0,
-          'BreakSealAmount3': 0,
-          'PickupDate':   s.checkCollection
-              ? DateTime.parse(s.collectionDate).toIso8601String()
-              : null,
-          'DeliveryDate': s.checkDelivery
-              ? DateTime.parse(s.deliveryDate).toIso8601String()
-              : null,
-          'WareHouseEnterDate': null,
-          'WareHouseExitDate':  null,
-          'WareHouseAddress':   '',
-          'PickupAddress':      '',
-          'DeliveryAddress':    '',
-          'Forwarding':         '',
-          'Forwarding2':        '',
-          'Forwarding3':        '',
-          'Origin':             s.originName,
-          'Destination':        s.destinationName,
-          'SCN':                '',
-          'LSCN':               '',
-          'Zb':                 '',
-          'PTW':                '',
-          'Zb2':                '',
-          'ZbRef':              '',
-          'ZbRef2':             '',
-          'Forwarding1S1':      '',
-          'Forwarding1S2':      '',
-          'Forwarding2S1':      '',
-          'Forwarding2S2':      '',
-          'Forwarding3S1':      '',
-          'Forwarding3S2':      '',
-          'CurrencyValue':      0,
-          'ActualNetAmount':    0,
-          'ForwardingDate':
-          DateTime.parse(s.notifyDate).toIso8601String(),
-          'Forwarding2Date':    null,
-          'Forwarding3Date':    null,
-        }
-      ];
-
-      final success = await _repository.insertEnquiry(payload);
-      if (success) {
-        emit(EnquiryAddSaveSuccess());
-      } else {
-        emit(s);
-      }
+      await _repository.saveEnquiry(
+        id: s.editId,
+        billType: 'TR',
+        customerId: s.custId,
+        jobTypeId: s.jobTypeId,
+        employeeId: _sessionManager.empRefId,
+        forwardingDate: DateTime.parse(s.notifyDate),
+        loadingPort: s.lPort,
+        offPort: s.oPort,
+        quantity: s.quantity,
+        totalWeight: s.weight,
+        originId: s.originId,
+        origin: s.originName,
+        destinationId: s.destinationId,
+        destination: s.destinationName,
+        pickupDate: s.checkCollection ? DateTime.parse(s.collectionDate) : null,
+        deliveryDate: s.checkDelivery ? DateTime.parse(s.deliveryDate) : null,
+      );
+      emit(EnquiryAddSaveSuccess());
+    } on ApiFailure catch (failure) {
+      emit(EnquiryAddError(failure.message));
     } catch (e) {
       emit(EnquiryAddError(e.toString()));
     }

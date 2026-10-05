@@ -1,3 +1,6 @@
+import 'dart:convert';
+import 'dart:io';
+
 import 'package:dio/dio.dart';
 import 'package:maleva/core/config/app_config.dart';
 import 'package:maleva/core/models/shared/r_t_i_details_view_model.dart';
@@ -87,6 +90,22 @@ class RtiApi {
   Future<void> updateJobStatus(int saleOrderId, String statusName, List<String> imageUrls) async {
     await _send(() => _dio.post<dynamic>('/api/rti-masters/jobs/$saleOrderId/status',
         queryParameters: {'companyId': companyId}, data: {'statusName': statusName, 'imageUrls': imageUrls}));
+  }
+
+  /// PDO / TransportDB: the RTI status of job lines (`id` 0 adds, else the
+  /// line's `statusId`; `rtiMasterRefId`, `rtiDetailsRefId`, ... `active` /
+  /// `verify`, null = leave as it is) with a photo per line, keyed by the
+  /// line's RTIDetails id. Answers the last saved status id. For a driver the
+  /// server keeps it to their own RTIs.
+  Future<int> saveStatuses(List<Map<String, dynamic>> statuses, {Map<int, File> photos = const {}}) async {
+    final form = FormData();
+    form.files.add(MapEntry('statuses',
+        MultipartFile.fromString(jsonEncode(statuses), contentType: DioMediaType('application', 'json'))));
+    for (final p in photos.entries) {
+      form.files.add(MapEntry('photo_${p.key}', await MultipartFile.fromFile(p.value.path, filename: p.value.uri.pathSegments.last)));
+    }
+    return JsonRead.integer(await _send(() =>
+        _dio.post<dynamic>('/api/rti-masters/job-statuses', queryParameters: {'companyId': companyId}, data: form)));
   }
 
   /// The route stops due in the days (`/api/rti-route-activities`), one

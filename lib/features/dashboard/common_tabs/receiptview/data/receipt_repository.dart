@@ -1,14 +1,12 @@
 // lib/features/dashboard/common_tabs/receiptview/data/receipt_repository.dart
 //
-// Original API call in bloc:
-//   ReportsApi.getCustomerBalance(master, header)
-//   master = { "tilldate": toDate, "fromdate": fromDate, "CompanyRefId": AppGlobals.Comid }
-//   header = { 'Content-Type': 'application/json; charset=UTF-8' }
-//
-// Same call — AppGlobals.Comid replaced with AppPreferences.getComid()
+// Customers owing for the period: the shared Java
+// `/api/customer-reports/period-balance/rows` (was .NET
+// TransactionReportApp/SelectCustomerBalance). Rows: `customerName`,
+// `balance`, `billAmount`, ...
 
-import 'package:maleva/core/network/api_services/reports_api.dart';
-import 'package:maleva/core/utils/app_preferences.dart';
+import 'package:maleva/core/di/injection.dart';
+import 'package:maleva/core/reports/transaction_report_api.dart';
 
 // ── Result model — clean typed return ─────────────────────────────────────────
 class ReceiptResult {
@@ -29,35 +27,14 @@ abstract class ReceiptRepository {
   });
 }
 
-// ── Real implementation — exact same API as original bloc ──────────────────────
+// ── Real implementation ────────────────────────────────────────────────────────
 class ReceiptRepositoryImpl implements ReceiptRepository {
   @override
   Future<ReceiptResult?> getReceipts({
     required String fromDate,
     required String toDate,
   }) async {
-    // AppPreferences replaces AppGlobals.Comid
-    final comid = AppPreferences.getComid();
-
-    // Exact same master + header as original bloc
-    final master = {
-      'tilldate':      toDate,
-      'fromdate':      fromDate,
-      'CompanyRefId':  comid,
-    };
-
-    final header = {
-      'Content-Type': 'application/json; charset=UTF-8',
-    };
-
-    // Same API call: ReportsApi.getCustomerBalance(master, header)
-    final resultData = await ReportsApi.getCustomerBalance(master, header);
-
-    if (resultData.isEmpty) return null;
-
-    return ReceiptResult(
-      masterList: resultData['Data1'] is List ? resultData['Data1'] : [],
-      detailList: resultData['Data2'] is List ? resultData['Data2'] : [],
-    );
+    final rows = await sl<TransactionReportApi>().customerBalances(fromDate: fromDate, toDate: toDate);
+    return ReceiptResult(masterList: rows, detailList: const []);
   }
 }

@@ -1,3 +1,5 @@
+import 'package:maleva/features/transaction/enquirytrmaster/models/enquiry_master_model.dart';
+import 'package:maleva/core/enquiry/enquiry_api.dart';
 import 'package:maleva/core/di/injection.dart';
 import 'package:maleva/core/theme/app_typography.dart';
 import 'package:maleva/core/network/api_constants.dart';
@@ -528,15 +530,15 @@ class _EnquiryTab extends StatelessWidget {
   const _EnquiryTab({required this.isTablet});
 
   Color? _cardColor(Map item) {
-    if (item['ForwardingDate'] == null) return null;
+    if (item['forwardingDate'] == null) return null;
     final now = DateTime.now();
     final tomorrow = now.add(const Duration(days: 1));
     final nowStr = DateFormat('yyyy-MM-dd').format(now);
     final tomorrowStr = DateFormat('yyyy-MM-dd').format(tomorrow);
     final notifyDate =
-    DateFormat('yyyy-MM-dd').format(DateTime.parse(item['ForwardingDate']));
+    DateFormat('yyyy-MM-dd').format(DateTime.parse(item['forwardingDate']));
     if (notifyDate == nowStr ||
-        DateTime.parse(item['ForwardingDate']).isBefore(now)) {
+        DateTime.parse(item['forwardingDate']).isBefore(now)) {
       return colour.commonColorred.withValues(alpha: 0.3);
     } else if (notifyDate == tomorrowStr) {
       return Colors.yellowAccent.withValues(alpha: 0.3);
@@ -619,7 +621,7 @@ class _EnquiryTab extends StatelessWidget {
                           context,
                           MaterialPageRoute(
                             builder: (_) =>
-                                AddEnquiryTR(SaleMaster: item),
+                                AddEnquiryTR(SaleMaster: EnquiryMasterModel.fromJava(Map<String, dynamic>.from(item as Map))),
                           ),
                         ),
                         child: Card(
@@ -641,7 +643,7 @@ class _EnquiryTab extends StatelessWidget {
                                     child: Padding(
                                       padding: const EdgeInsets.all(1),
                                       child: Text(
-                                        '   ${item["CustomerName"]}',
+                                        '   ${item["customerName"]}',
                                         overflow: TextOverflow.ellipsis,
                                         maxLines: 1,
                                         style: AppTypography.bodyLarge(color: colour.commonColor),
@@ -653,7 +655,7 @@ class _EnquiryTab extends StatelessWidget {
                                     child: Padding(
                                       padding: const EdgeInsets.all(1),
                                       child: Text(
-                                        '   ${item["SForwardingDate"]}',
+                                        '   ${EnquiryApi.display(item["forwardingDate"])}',
                                         overflow: TextOverflow.ellipsis,
                                         maxLines: 1,
                                         style: AppTypography.bodyLarge(color: colour.commonColor),
@@ -701,7 +703,7 @@ class _EnquiryTab extends StatelessWidget {
                                             'Do You Want to Cancel the Enquiry ?');
                                         if (confirm) {
                                           bloc.add(CancelEnquiryRequested(
-                                              id: item['Id']));
+                                              id: item['id']));
                                         }
                                       },
                                       child: const Icon(Icons.cancel,
@@ -728,13 +730,13 @@ class _EnquiryTab extends StatelessWidget {
   void _showEnqDetailsDialog(BuildContext context, Map item) {
     var collectionDate = '';
     var deliveryDate = '';
-    if (item['SPickupDate'] != '' && item['PickupDate'] != null) {
+    if (item['pickupDate'] != null) {
       collectionDate = DateFormat('dd-MM-yyyy HH:mm')
-          .format(DateTime.parse(item['PickupDate']));
+          .format(DateTime.parse(item['pickupDate']));
     }
-    if (item['SDeliveryDate'] != '' && item['DeliveryDate'] != null) {
+    if (item['deliveryDate'] != null) {
       deliveryDate = DateFormat('dd-MM-yyyy HH:mm')
-          .format(DateTime.parse(item['DeliveryDate']));
+          .format(DateTime.parse(item['deliveryDate']));
     }
 
     showDialog(
@@ -756,15 +758,15 @@ class _EnquiryTab extends StatelessWidget {
                 ),
                 const SizedBox(height: 15),
                 ...[
-                  'Customer : ${item["CustomerName"]}',
-                  'Job Type : ${item["JobType"]}',
-                  'Notify Date : ${item["SForwardingDate"]}',
+                  'Customer : ${item["customerName"]}',
+                  'Job Type : ${item["jobType"]}',
+                  'Notify Date : ${EnquiryApi.display(item["forwardingDate"])}',
                   'Collection Date : $collectionDate',
                   'Delivery Date : $deliveryDate',
-                  'Origin : ${item["Origin"]}',
-                  'Destination : ${item["Destination"]}',
-                  'Quantity : ${item["Quantity"]}',
-                  'Weight : ${item["TotalWeight"]}',
+                  'Origin : ${item["origin"]}',
+                  'Destination : ${item["destination"]}',
+                  'Quantity : ${item["quantity"]}',
+                  'Weight : ${item["totalWeight"]}',
                 ].map((t) => Padding(
                   padding: const EdgeInsets.only(bottom: 4),
                   child: Text(t,

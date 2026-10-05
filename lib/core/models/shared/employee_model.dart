@@ -1,3 +1,5 @@
+import 'package:maleva/core/utils/json_read.dart';
+
 
 class EmployeeModel {
   int Id;
@@ -6,10 +8,16 @@ class EmployeeModel {
 
   EmployeeModel(this.Id, this.AccountName, this.Password);
 
-  EmployeeModel.fromJson(Map<String, dynamic> json)
-      : Id = int.tryParse(json['Id']?.toString() ?? '') ?? 0,
-        AccountName = json['AccountName'].toString(),
-        Password = json['Password'].toString();
+  /// An employee of the shared Java list (`/api/employees/company/{id}/all`),
+  /// shown as `Name-Type` like .NET's AccountName. The Java list never sends
+  /// passwords.
+  EmployeeModel.fromJava(Map<String, dynamic> json)
+      : Id = JsonRead.integer(json['id']),
+        AccountName = [JsonRead.string(json['employeeName']), JsonRead.string(json['employeeType'])]
+            .where((s) => s.isNotEmpty)
+            .join('-'),
+        Password = '';
+
   Map<String, dynamic> toJson() {
     return {
       'Id': Id,

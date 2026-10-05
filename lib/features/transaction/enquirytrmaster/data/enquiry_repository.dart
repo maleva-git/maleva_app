@@ -1,3 +1,7 @@
+import 'package:maleva/core/enquiry/enquiry_api.dart';
+import 'package:maleva/core/models/shared/employee_model.dart';
+import 'package:get_it/get_it.dart';
+import 'package:maleva/core/employee/employee_api.dart';
 import 'package:maleva/core/network/dio_client.dart';
 import 'package:maleva/core/network/api_constants.dart';
 import 'package:maleva/core/utils/session_manager.dart';
@@ -34,72 +38,73 @@ class EnquiryTrRepository {
     return [];
   }
 
-  /// Save Enquiry TR Add Payload
-  Future<bool> insertEnquiry(List<Map<String, dynamic>> payload) async {
-    try {
-      final endpoint = "${ApiConstants.apiInsertEnquiry}?Comid=$_comId";
-      final response = await _dioClient.dio.post(endpoint, data: payload);
-      if (response.data != null) {
-        final data = response.data;
-        if (data is Map && data['IsSuccess'] == true) {
-          return true;
-        } else if (data is String) {
-          return data.contains('"IsSuccess":true') || data.contains('"IsSuccess": true');
-        }
-      }
-    } catch (e) {
-      throw Exception("Failed to save enquiry: $e");
-    }
-    return false;
-  }
-
-  /// Fetch Enquiry Master List
-  Future<List<dynamic>> fetchEnquiryMaster(Map<String, dynamic> payload, Map<String, dynamic> header) async {
-    try {
-      const endpoint = ApiConstants.apiSelectEnquiryMaster;
-      final response = await _dioClient.dio.post(
-        endpoint,
-        data: {"_objModel": payload, "header": header},
+  /// Adds or updates a transport enquiry (shared Java `/api/enquiry-masters/entries`,
+  /// the port of .NET InsertEnquiryMaster). The enquiry id.
+  Future<int> saveEnquiry({
+    required int id,
+    required String billType,
+    required int customerId,
+    required int jobTypeId,
+    required DateTime forwardingDate,
+    int? employeeId,
+    String? loadingPort,
+    String? offPort,
+    String? quantity,
+    String? totalWeight,
+    int? originId,
+    String? origin,
+    int? destinationId,
+    String? destination,
+    DateTime? pickupDate,
+    DateTime? deliveryDate,
+  }) =>
+      GetIt.instance<EnquiryApi>().save(
+        id: id,
+        billType: billType,
+        customerId: customerId,
+        jobTypeId: jobTypeId,
+        forwardingDate: forwardingDate,
+        employeeId: employeeId,
+        loadingPort: loadingPort,
+        offPort: offPort,
+        quantity: quantity,
+        totalWeight: totalWeight,
+        originId: originId,
+        origin: origin,
+        destinationId: destinationId,
+        destination: destination,
+        pickupDate: pickupDate,
+        deliveryDate: deliveryDate,
       );
-      if (response.data != null && response.data is List) {
-        return response.data;
-      }
-    } catch (e) {
-      throw Exception("Failed to fetch enquiry master: $e");
-    }
-    return [];
-  }
 
-  /// Cancel Enquiry
+  /// The open enquiries (shared Java enquiry API): the employee's own, by
+  /// customer, job type and an optional date range ([invoice]: the sale date).
+  Future<List<Map<String, dynamic>>> fetchEnquiryMaster({
+    required int employeeId,
+    required int customerId,
+    required int jobTypeId,
+    required bool invoice,
+    String? fromDate,
+    String? toDate,
+  }) =>
+      GetIt.instance<EnquiryApi>().search(
+        employeeId: employeeId,
+        customerId: customerId,
+        jobTypeId: jobTypeId,
+        invoice: invoice,
+        fromDate: fromDate == null ? null : DateTime.tryParse(fromDate),
+        toDate: toDate == null ? null : DateTime.tryParse(toDate),
+      );
+
+  /// Cancel Enquiry (shared Java enquiry API)
   Future<bool> cancelEnquiry(int id) async {
-    try {
-      final endpoint = "${ApiConstants.apiUpdateEnquiryMaster}$id&Comid=$_comId&StatusName=CANCEL";
-      final response = await _dioClient.dio.post(endpoint, data: {});
-      if (response.data != null) {
-        final data = response.data;
-        if (data is Map && data['IsSuccess'] == true) {
-          return true;
-        } else if (data is String) {
-          return data.contains('"IsSuccess":true') || data.contains('"IsSuccess": true');
-        }
-      }
-    } catch (e) {
-      throw Exception("Failed to cancel enquiry: $e");
-    }
-    return false;
+    await GetIt.instance<EnquiryApi>().setStatus(id, 'CANCEL');
+    return true;
   }
 
-  /// Select Employee list
-  Future<List<dynamic>> selectEmployee(String type, String type1) async {
-    try {
-      final endpoint = "${ApiConstants.apiSelectEmployee}$_comId&type=$type&type1=$type1";
-      final response = await _dioClient.dio.post(endpoint, data: {});
-      if (response.data != null && response.data is List) {
-        return response.data;
-      }
-    } catch (e) {
-      throw Exception("Failed to load employees: $e");
-    }
-    return [];
-  }
+
+  /// Select Employee list (the shared Java employee list)
+  Future<List<EmployeeModel>> selectEmployee(String type, String type1) =>
+      GetIt.instance<EmployeeApi>().dropdown(type: type, type1: type1);
+
 }

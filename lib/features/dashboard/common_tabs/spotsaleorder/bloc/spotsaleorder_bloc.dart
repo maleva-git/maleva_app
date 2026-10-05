@@ -144,34 +144,23 @@ class SpotSaleBloc extends Bloc<SpotSaleEvent, SpotSaleState> {
     emit(s.copyWith(isSubmitting: true));
 
     try {
-      final comId = AppGlobals.storagenew.getInt('Comid') ?? 0;
       final employeeId = int.tryParse(
           AppGlobals.storagenew.getString('OldUsername') ?? '0') ?? 0;
 
-      final body = [
-        {
-          "CompanyRefId":  comId,
-          "Id":            editId,
-          "EmployeeRefId": employeeId,
-          "JobMasterRefId": s.selectedJobType ?? '',
-          "CustomerRefId": 0,
-          "VechicelName":  s.vehicleName,
-          "AWBNo":         s.awbNo,
-          "Quantity":      s.cargoQty,
-          "TotalWeight":   s.cargoWeight,
-          "JStatus":       s.selectedJobStatus ?? '',
-          "Port":          s.selectedPort ?? '',
-          "DocumentPath":  "",
-        }
-      ];
-
-      // ✅ REFACTORED: Using the injected repository
-      final isSuccess = await repository.submitSpotSaleEntry(
-        body: body,
-        comId: comId,
+      final id = await repository.submitSpotSaleEntry(
+        id: editId,
+        jobTypeId: int.tryParse(s.selectedJobType ?? '') ?? 0,
+        jobStatusId: int.tryParse(s.selectedJobStatus ?? '') ?? 0,
+        employeeId: employeeId,
+        vehicleName: s.vehicleName,
+        awbNo: s.awbNo,
+        quantity: s.cargoQty,
+        totalWeight: s.cargoWeight,
+        port: s.selectedPort ?? '',
         image: s.pickedImage,
         pdf: s.pickedPDF,
       );
+      final isSuccess = id > 0;
 
       if (isSuccess) {
         emit(const SpotSaleSubmitSuccess());
@@ -213,18 +202,9 @@ class SpotSaleBloc extends Bloc<SpotSaleEvent, SpotSaleState> {
     try {
       final from = DateFormat('yyyy-MM-dd').format(s.fromDate);
       final to   = DateFormat('yyyy-MM-dd').format(s.toDate);
-      final comId = AppGlobals.storagenew.getInt('Comid') ?? 0;
 
       // ✅ REFACTORED: Using the injected repository
-      final result = await repository.fetchSpotSaleRecords(
-          comId: comId,
-          fromDate: from,
-          toDate: to
-      );
-
-      final records = result != null && result is List
-          ? List<Map<String, dynamic>>.from(result)
-          : <Map<String, dynamic>>[];
+      final records = await repository.fetchSpotSaleRecords(fromDate: from, toDate: to);
 
       emit(s.copyWith(records: records, isLoading: false));
     } catch (err) {

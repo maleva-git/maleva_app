@@ -1,12 +1,10 @@
-import 'package:maleva/core/network/api_constants.dart';
+import 'package:maleva/core/fleet/expiry_api.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:maleva/core/utils/app_globals.dart';
 
 import 'maintenance_event.dart';
 import 'maintenance_state.dart';
 import 'package:maleva/core/models/shared/truck_details_model.dart';
-import 'package:maleva/core/models/shared/response_view_model.dart';
-import 'package:maleva/core/network/legacy_api_repository.dart';
 import 'package:maleva/core/di/injection.dart';
 
 
@@ -106,30 +104,9 @@ class TruckMaintenanceBloc
       String expDate,
       String expApadBonam,
       String expServiceAlignGreece) async {
-    final master = {
-      'Expdate':                null,
-      'ExpApadBonam':           expApadBonam,
-      'ExpServiceAligmentGreece': expServiceAlignGreece,
-      'Id':                     truckId,
-      'SFromDate':              null,
-      'Comid':                  AppGlobals.Comid,
-    };
-    final header = {'Content-Type': 'application/json; charset=UTF-8'};
-
-    final resultData = await sl<LegacyApiRepository>().apiAllinoneSelectArray(
-        ApiConstants.apiSelectTruckDetails, master, header, null);
-
-    if (resultData != '' && resultData != null) {
-      final value = ResponseViewModel.fromJson(resultData);
-      if (value.IsSuccess == true && value.data1 != null) {
-        final list = (value.data1 as List)
-            .map((e) => TruckDetailsModel.fromJson(e))
-            .cast<TruckDetailsModel>()
-            .toList();
-        AppGlobals.TruckDetailsList = list;
-        return list;
-      }
-    }
-    return [];
+    // every date of the truck (no expiry window), from the shared Java expiry list
+    final list = (await sl<ExpiryApi>().trucks(truckId: truckId)).map(TruckDetailsModel.fromJavaExpiry).toList();
+    AppGlobals.TruckDetailsList = list;
+    return list;
   }
 }

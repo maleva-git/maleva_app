@@ -6,6 +6,7 @@ import 'package:maleva/core/utils/app_globals.dart';
 import 'package:maleva/core/network/api_constants.dart';
 import 'package:maleva/core/stock/stock_in_api.dart';
 import 'package:maleva/core/rti/rti_api.dart';
+import 'package:maleva/core/employee/employee_api.dart';
 import 'package:maleva/core/network/dio_client.dart';
 import 'package:maleva/core/network/java_api_client.dart';
 import 'package:maleva/core/network/java_route.dart';
@@ -24,7 +25,6 @@ import 'package:maleva/core/models/shared/agent_model.dart';
 import 'package:maleva/features/operations/models/job_status_model.dart';
 import 'package:maleva/core/models/shared/product_model.dart';
 import 'package:maleva/features/operations/models/job_type_details_model.dart';
-import 'package:maleva/core/models/shared/employee_model.dart';
 import 'package:maleva/core/models/shared/location_model.dart';
 
 class LegacyApiRepository {
@@ -219,21 +219,12 @@ Future SelectWareHouse(context) async {
 }
 
 Future SelectEmployee(context, String type, String type1) async {
+  // the shared Java employee list (employee-lookups-on-shared-java-api)
   try {
-    AppGlobals.EmployeeList.clear();
-    var Comid = AppGlobals.storagenew.getInt('Comid') ?? 0;
-    try {
-  final resultData = _ensureList((await _routedPost(
-            Uri.encodeFull("${ApiConstants.apiSelectEmployee}$Comid&type=$type&type1=$type1"), data: null ?? {})).data);
-  if (resultData.isNotEmpty) {
-        AppGlobals.EmployeeList = resultData
-            .map((element) => EmployeeModel.fromJson(element))
-            .toList();
-      }
-} catch (e) { print("API Error: $e"); }
-
-  } catch (error) {
-    if (error.toString() == "") {}
+    AppGlobals.EmployeeList = await GetIt.instance<EmployeeApi>().dropdown(type: type, type1: type1);
+  } catch (e) {
+    AppGlobals.EmployeeList = [];
+    print("API Error: $e");
   }
 }
 
@@ -428,16 +419,11 @@ Future SelectDriverList(context,String? Type) async {
 }
 
 Future<List<String>> GetEmployeeport(context) async {
+  // the employee's ports, from the shared Java APIs (employee-lookups-on-shared-java-api)
   try {
-    var Comid = AppGlobals.storagenew.getInt('Comid') ?? 0;
-    var empId = AppGlobals.storagenew.getInt('EmpRefId') ?? 0;
-    
-    // Using apiAllinoneSelect as it handles GET requests returning JSON arrays well
-    final resultData = _ensureList((await _routedPost(
-        Uri.encodeFull("${ApiConstants.port}/api/EmployeeApp/GetEmployeeport?Comid=$Comid&id=$empId"), data: null ?? {})).data);
-        
-    return resultData.map((e) => e["AccountName"].toString()).toList();
-    } catch (error) {
+    final empId = AppGlobals.storagenew.getInt('EmpRefId') ?? 0;
+    return await GetIt.instance<EmployeeApi>().portNames(empId);
+  } catch (error) {
     debugPrint("Error fetching employee ports: $error");
   }
   return [];

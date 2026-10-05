@@ -1,42 +1,20 @@
-import 'package:maleva/core/network/api_constants.dart';
-import 'package:maleva/core/network/api_client.dart';
-import 'package:maleva/core/utils/app_preferences.dart';
-import 'package:maleva/core/models/shared/response_view_model.dart';
+import 'package:maleva/core/di/injection.dart';
+import 'package:maleva/core/reports/transaction_report_api.dart';
+import 'package:maleva/core/utils/json_read.dart';
 
+/// The driver's RTI job lines and their total (shared Java Driver RTI detailed
+/// report rows, was .NET TransactionReportApp/DriverRTIDetailedReport). The
+/// server keeps a driver token to the driver's own RTIs.
 class DriverSalaryRepository {
   Future<Map<String, dynamic>> fetchSalaryData({
     required String fromDate,
     required String toDate,
   }) async {
-    final master = {
-      'Comid':      AppPreferences.getComid(),
-      'DriverId':   AppPreferences.getDriverId() == 1 ? AppPreferences.getEmpRefId() : 0,
-      'TruckId':    0,
-      'FromDate':   fromDate,
-      'ToDate':     toDate,
-      'DriverName': '',
-      'TruckName':  '',
-    };
-
-    // Use ApiClient.postRequest (assuming it handles the headers internally as discussed)
-    final resultData = await ApiClient.postRequest(
-      ApiConstants.apiSelectDriverSalary,
-      master,
-    );
-
-    List<dynamic> salaryList = [];
+    final salaryList = await sl<TransactionReportApi>().driverJobs(fromDate: fromDate, toDate: toDate);
     double salaryAmount = 0.0;
-
-    if (resultData != null) {
-      final value = ResponseViewModel.fromJson(resultData);
-      if (value.IsSuccess == true && value.data1 != null) {
-        salaryList = List<dynamic>.from(value.data1 as List);
-        for (final item in salaryList) {
-          salaryAmount += (item['Amount'] as num?)?.toDouble() ?? 0.0;
-        }
-      }
+    for (final item in salaryList) {
+      salaryAmount += JsonRead.number(item['amount']);
     }
-
     return {
       'salaryList': salaryList,
       'salaryAmount': salaryAmount,

@@ -60,6 +60,8 @@ class EmployeeFormState extends EmployeeState {
   final String? selectedRulesType;
   final int currentStep;
   final bool isSaving;
+  /// The roles an employee can hold (`{id, name}`), from the Java role list.
+  final List<Map<String, dynamic>> roles;
 
   const EmployeeFormState({
     required this.employee,
@@ -68,6 +70,7 @@ class EmployeeFormState extends EmployeeState {
     this.selectedRulesType,
     this.currentStep = 0,
     this.isSaving = false,
+    this.roles = const [],
   });
 
   EmployeeFormState copyWith({
@@ -77,6 +80,7 @@ class EmployeeFormState extends EmployeeState {
     String? selectedRulesType,
     int? currentStep,
     bool? isSaving,
+    List<Map<String, dynamic>>? roles,
   }) {
     return EmployeeFormState(
       employee: employee ?? this.employee,
@@ -85,6 +89,7 @@ class EmployeeFormState extends EmployeeState {
       selectedRulesType: selectedRulesType ?? this.selectedRulesType,
       currentStep: currentStep ?? this.currentStep,
       isSaving: isSaving ?? this.isSaving,
+      roles: roles ?? this.roles,
     );
   }
 
@@ -96,6 +101,8 @@ class EmployeeFormState extends EmployeeState {
     selectedRulesType,
     currentStep,
     isSaving,
+    roles,
+    employee.RoleId,
   ];
 }
 

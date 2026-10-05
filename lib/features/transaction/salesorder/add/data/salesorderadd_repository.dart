@@ -1,3 +1,6 @@
+import 'package:maleva/core/models/shared/employee_model.dart';
+import 'package:get_it/get_it.dart';
+import 'package:maleva/core/employee/employee_api.dart';
 import 'dart:convert';
  import 'package:maleva/core/network/dio_client.dart';
 import 'package:maleva/core/network/api_constants.dart';
@@ -65,23 +68,10 @@ class SalesOrderAddRepository {
     return [];
   }
 
-  Future<List<dynamic>> selectEmployee(String searchVal, String deptName) async {
-    try {
-      final endpoint = "${ApiConstants.apiSelectEmployee}$_comId&type=$searchVal&type1=$deptName";
-      final response = await _dioClient.dio.post(endpoint, data: {});
-      dynamic responseData = response.data;
-      if (responseData is String) {
-        if (responseData.trim().isEmpty) return [];
-        responseData = jsonDecode(responseData);
-      }
-      if (responseData is List) {
-        return responseData;
-      }
-    } catch (e) {
-      print("Error in selectEmployee: $e");
-    }
-    return [];
-  }
+  /// The shared Java employee list for the pickers.
+  Future<List<EmployeeModel>> selectEmployee(String searchVal, String deptName) =>
+      GetIt.instance<EmployeeApi>().dropdown(type: searchVal, type1: deptName);
+
 
   Future<Map<String, dynamic>> selectAllJobStatus(int jobId) async {
     try {

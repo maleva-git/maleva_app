@@ -1,10 +1,7 @@
+import 'package:maleva/core/fleet/truck_entries_api.dart';
 import 'package:maleva/core/network/legacy_api_repository.dart';
 import 'package:maleva/core/di/injection.dart';
-import 'package:maleva/core/network/api_constants.dart';
-import 'dart:convert';
 import 'dart:io';
-import 'package:http/http.dart' as http;
-import 'package:maleva/core/network/api_client.dart';
 
 
 class SparePartsRepository {
@@ -13,37 +10,28 @@ class SparePartsRepository {
     // We pass null for context so it safely runs in the background
     await sl<LegacyApiRepository>().SelectTruckList(null, null);}
 
-  /// Fetches Spare Parts records for the View page
-  Future<dynamic> fetchSparePartsRecords({
-    required int comId,
+  /// Spare parts entries dated in the days, from the shared Java API (the Java rows).
+  Future<List<Map<String, dynamic>>> fetchSparePartsRecords({
     required String fromDate,
     required String toDate,
-  }) async {
-    final url = "${ApiConstants.apiGetSpareParts}$comId&Fromdate=$fromDate&Todate=$toDate";
-    return await ApiClient.postRequest(url, null);
-  }
+  }) =>
+      sl<TruckEntriesApi>().spareParts(fromDate: fromDate, toDate: toDate);
 
-  /// Submits a new Spare Parts Entry with multipart form data (Files + JSON)
-  Future<bool> submitSpareParts({
-    required List<Map<String, dynamic>> body,
-    required int comId,
+  /// Adds a spare parts entry with its image and PDF (Java port of
+  /// SP_TruckSpareParts; the documents are stored with the entry).
+  Future<int> submitSpareParts({
+    required int truckId,
+    required String spareParts,
+    required double amount,
+    required String entryDate,
     File? image,
     File? pdf,
-  }) async {
-    final uri = Uri.parse("${ApiConstants.apiInsertSpareParts}?Comid=$comId");
-    final request = http.MultipartRequest("POST", uri);
-
-    request.fields["details"] = jsonEncode(body);
-    request.fields["Comid"] = comId.toString();
-
-    if (image != null) {
-      request.files.add(await http.MultipartFile.fromPath("Files", image.path));
-    }
-    if (pdf != null) {
-      request.files.add(await http.MultipartFile.fromPath("Files", pdf.path));
-    }
-
-    final response = await request.send();
-    return response.statusCode == 200;
-  }
+  }) =>
+      sl<TruckEntriesApi>().saveSpareParts(
+        truckId: truckId,
+        spareParts: spareParts,
+        amount: amount,
+        entryDate: entryDate,
+        files: [if (image != null) image, if (pdf != null) pdf],
+      );
 }

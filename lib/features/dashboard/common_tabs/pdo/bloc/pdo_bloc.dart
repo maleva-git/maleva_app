@@ -114,7 +114,6 @@ class PDOBloc extends Bloc<PDOViewEvent, PDOViewState> {
     emit(_s.copyWith(isSaving: true));
 
     try {
-      final comId  = AppGlobals.storagenew.getInt('Comid') ?? 0;
       final master = _s.allMasters.firstWhere((m) => m.Id == e.masterId);
 
       // Extract checked details for payload
@@ -123,25 +122,21 @@ class PDOBloc extends Bloc<PDOViewEvent, PDOViewState> {
           .toList();
 
       final payload = checkedDetails.map((x) => {
-        "Id":                      x.StatusId,
-        "CompanyRefId":            comId,
-        "RTIMasterRefId":          master.Id,
-        "RTIDetailsRefId":         x.Id,
-        "RTICNumberDisplay":       master.RTINoDisplay,
-        "DriverName":              master.DriverName,
-        "JobNumber":               x.JobNo,
-        "SaleOrderMasterRefId":    x.SaleOrderMasterRefId,
-        "CustomerMasterRefId":     x.CustomerMasterRefId,
-        "TruckMasterRefId":        master.TruckMasterRefId,
-        "DriverMasterRefId":       AppGlobals.EmpRefId,
-        "TruckName":               master.TruckName,
-        "Verify":                  x.isVerified ? 1 : 0,
-        "ImagePath":               x.imagePath,
+        "id":                   x.StatusId,
+        "rtiMasterRefId":       master.Id,
+        "rtiDetailsRefId":      x.Id,
+        "rtiCNumberDisplay":    master.RTINoDisplay,
+        "driverName":           master.DriverName,
+        "jobNumber":            x.JobNo,
+        "saleOrderMasterRefId": x.SaleOrderMasterRefId,
+        "customerMasterRefId":  x.CustomerMasterRefId,
+        "truckMasterRefId":     master.TruckMasterRefId,
+        "driverMasterRefId":    AppGlobals.EmpRefId,
+        "truckName":            master.TruckName,
+        "verify":               x.isVerified ? 1 : 0,
       }).toList();
 
-      // ✅ REFACTORED: Using the injected repository
       final isSuccess = await repository.submitPDOVerification(
-          comId: comId,
           payload: payload,
           checkedDetails: checkedDetails
       );

@@ -1,3 +1,5 @@
+import 'package:maleva/core/utils/json_read.dart';
+
 
 class DriverDetailsModel {
   int Id;
@@ -8,12 +10,13 @@ class DriverDetailsModel {
 
   DriverDetailsModel(this.Id, this.DriverName, this.licenseNo, this.licenseExp, this.ExpDate);
 
-  DriverDetailsModel.fromJson(Map<String, dynamic> json)
-      : Id = int.tryParse(json['Id'].toString()) ?? 0,
-        DriverName = json['DriverName']?.toString() ?? '',
-        licenseNo = json['licenseNo']?.toString() ?? '',
-        licenseExp = json['licenseExp']?.toString() ?? '',
-        ExpDate = json['ExpDate']?.toString() ?? '';
+  /// A driver of the shared Java expiry list (`/api/master-reports/drivers/rows`).
+  DriverDetailsModel.fromJava(Map<String, dynamic> json)
+      : Id = JsonRead.integer(json['id']),
+        DriverName = JsonRead.string(json['driverName']),
+        licenseNo = JsonRead.string(json['licenseNo']),
+        licenseExp = JsonRead.string(json['licenseExp']),
+        ExpDate = '';
 
   Map<String, dynamic> toJson() {
     return {

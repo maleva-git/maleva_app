@@ -1,11 +1,7 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:intl/intl.dart';
-import 'package:maleva/core/utils/app_globals.dart';
-import '../../../../../core/models/model.dart';
 import '../data/enginehours_repository.dart';
 import 'enginehours_event.dart';
 import 'enginehours_state.dart';
-import 'package:maleva/core/models/shared/engine_hoursdata.dart';
 
 class EngineHoursBloc extends Bloc<EngineHoursEvent, EngineHoursState> {
 
@@ -22,26 +18,8 @@ class EngineHoursBloc extends Bloc<EngineHoursEvent, EngineHoursState> {
     emit(const EngineHoursLoading());
 
     try {
-      final String fromDate = DateFormat('MM/dd/yyyy').format(event.fromDate);
-      final String toDate   = DateFormat('MM/dd/yyyy').format(event.toDate);
-
-      final Map<String, dynamic> requestBody = {
-        'Todate':   toDate,
-        'Fromdate': fromDate,
-        'Comid':    AppGlobals.Comid,
-      };
-
-      // ✅ REFACTORED: Using the injected repository without context
-      final resultData = await repository.fetchEngineHoursReport(body: requestBody);
-
-      if (resultData != null && resultData is List && resultData.isNotEmpty) {
-        final List<EngineHoursdata> records = resultData
-            .map<EngineHoursdata>((e) => EngineHoursdata.fromJson(e))
-            .toList();
-        emit(EngineHoursLoaded(records));
-      } else {
-        emit(const EngineHoursLoaded([]));
-      }
+      final records = await repository.fetchEngineHoursReport(fromDate: event.fromDate, toDate: event.toDate);
+      emit(EngineHoursLoaded(records));
     } catch (error) {
       emit(EngineHoursError(error.toString()));
     }

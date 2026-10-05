@@ -166,6 +166,8 @@ class _EmployeeAddBody extends StatelessWidget {
                             (v) => bloc.add(SelectCurrencyEvent(v))),
                     _dropdown("Employee Type", s.selectedEmployeeType, kEmployeeTypeList,
                             (v) => bloc.add(SelectEmployeeTypeEvent(v))),
+                    _roleDropdown(s.roles, s.employee.RoleId,
+                            (v) => bloc.add(SelectRoleEvent(v))),
                     _field("Email", s.employee.Email,
                             (v) => bloc.add(UpdateFieldEvent('Email', v))),
                     _field("Mobile No", s.employee.MobileNo,
@@ -320,6 +322,37 @@ Widget _dropdown(
           overflow: TextOverflow.ellipsis, // Prevents long text from pushing the arrow out
         ),
       )).toList(),
+      onChanged: onChanged,
+    ),
+  );
+}
+
+/// The employee's role, from the Java role list (required: the server would
+/// otherwise make a new employee SUPERADMIN).
+Widget _roleDropdown(List<Map<String, dynamic>> roles, int roleId, ValueChanged<int?> onChanged) {
+  final ids = roles.map((r) => r['id'] as int).toList();
+  return Padding(
+    padding: const EdgeInsets.only(bottom: 14),
+    child: DropdownButtonFormField<int>(
+      key: ValueKey('role_${roles.length}_$roleId'),
+      isExpanded: true,
+      initialValue: ids.contains(roleId) ? roleId : null,
+      decoration: InputDecoration(
+        labelText: "Role *",
+        labelStyle: AppTypography.bodyLarge(color: AppTokens.brandDark),
+        border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(10),
+          borderSide: const BorderSide(color: AppTokens.brandGradientStart, width: 1.5),
+        ),
+        filled: true,
+        fillColor: Colors.grey[50],
+        contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+      ),
+      items: [
+        for (final r in roles)
+          DropdownMenuItem(value: r['id'] as int, child: Text('${r['name']}', overflow: TextOverflow.ellipsis)),
+      ],
       onChanged: onChanged,
     ),
   );

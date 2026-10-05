@@ -226,8 +226,8 @@ class _SummonCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final hasDoc = item['DocumentPath'] != null &&
-        item['DocumentPath'].toString().isNotEmpty;
+    final hasDoc = item['documentPath'] != null &&
+        item['documentPath'].toString().isNotEmpty;
 
     return Container(
       margin: const EdgeInsets.only(bottom: 14),
@@ -263,9 +263,9 @@ class _SummonCard extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text("Truck: ${item['TruckName'] ?? '-'}",
+                      Text("Truck: ${item['truckName'] ?? '-'}",
                           style: AppTypography.heading1(color: AppTokens.brandDark, fontWeight: FontWeight.bold)),
-                      Text("Country: ${item['Country'] ?? '-'}",
+                      Text("Country: ${item['country'] ?? '-'}",
                           style: AppTypography.bodyLarge(color: Colors.grey[600])),
                     ],
                   ),
@@ -276,7 +276,7 @@ class _SummonCard extends StatelessWidget {
                   decoration: BoxDecoration(
                       color: AppTokens.brandLight,
                       borderRadius: BorderRadius.circular(10)),
-                  child: Text("RM ${item['Amount'] ?? '-'}",
+                  child: Text("RM ${item['amount'] ?? '-'}",
                       style: AppTypography.heading3(color: AppTokens.brandGradientStart, fontWeight: FontWeight.bold)),
                 ),
               ],
@@ -286,8 +286,8 @@ class _SummonCard extends StatelessWidget {
             const Divider(color: AppTokens.brandLight, thickness: 1),
 
             // Info rows
-            _infoRow("Summon", item['Summon']),
-            _infoRow("Date", item['EntryDate']),
+            _infoRow("Summon", item['summon']),
+            _infoRow("Date", item['entryDate']),
 
             // Document Image
             if (hasDoc) ...[
@@ -297,14 +297,14 @@ class _SummonCard extends StatelessWidget {
                   showDialog(
                     context: context,
                     builder: (_) => _ImagePreviewDialog(
-                      imageUrl: ApiConstants.port + item['DocumentPath'],
+                      imageUrl: ApiConstants.port + item['documentPath'],
                     ),
                   );
                 },
                 child: ClipRRect(
                   borderRadius: BorderRadius.circular(10),
                   child: Image.network(
-                    ApiConstants.port + item['DocumentPath'],
+                    ApiConstants.port + item['documentPath'],
                     height: 150,
                     width: double.infinity,
                     fit: BoxFit.cover,

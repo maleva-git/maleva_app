@@ -1,7 +1,5 @@
-import 'package:maleva/core/network/api_constants.dart';
-import 'package:flutter/foundation.dart';
-import 'package:maleva/core/network/api_client.dart';
-import 'package:maleva/core/utils/app_preferences.dart';
+import 'package:get_it/get_it.dart';
+import 'package:maleva/core/fleet/expiry_api.dart';
 import 'package:maleva/core/utils/app_globals.dart';
 import 'package:maleva/core/models/shared/truck_details_model.dart';
 
@@ -13,28 +11,10 @@ class TruckMaintenanceRepository {
 
     try {
 
-      final master = {
-        'Expdate': null,
-        'ExpApadBonam': expApadBonam,
-        'ExpServiceAligmentGreece': expServiceAlignGreece,
-        'Id': AppGlobals.DriverTruckRefId,
-        'SFromDate': null,
-        'Comid': AppPreferences.getComid(),
-      };
-
-      if (kDebugMode) debugPrint("➡️ Truck Payload: $master");
-
-      final resultData = await ApiClient.postRequest(
-        ApiConstants.apiSelectTruckDetails,
-        master,
-      );
-
-      List<TruckDetailsModel> details = [];
-      if (resultData != null && resultData is List) {
-        details = resultData
-            .map((e) => TruckDetailsModel.fromJson(e as Map<String, dynamic>))
-            .toList();
-      }
+      // the driver's own truck: the server reads it from the driver's record
+      final details = (await GetIt.instance<ExpiryApi>().trucks(truckId: AppGlobals.DriverTruckRefId))
+          .map(TruckDetailsModel.fromJavaExpiry)
+          .toList();
 
       return {
         'truckDetails': details,
@@ -43,14 +23,6 @@ class TruckMaintenanceRepository {
         'expServiceAlignGreece': expServiceAlignGreece,
       };
     } catch (e) {
-      if (e.toString().contains('500')) {
-        return {
-          'truckDetails': <TruckDetailsModel>[],
-          'expDate': expDate,
-          'expApadBonam': expApadBonam,
-          'expServiceAlignGreece': expServiceAlignGreece,
-        };
-      }
       throw Exception('Failed to load truck maintenance: $e');
     }
   }

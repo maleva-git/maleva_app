@@ -1,38 +1,20 @@
-import 'package:maleva/core/network/api_constants.dart';
-import 'package:maleva/core/network/api_client.dart';
-import 'package:maleva/core/utils/app_globals.dart';
+import 'package:maleva/core/models/shared/employee_model.dart';
+import 'package:get_it/get_it.dart';
+import 'package:maleva/core/employee/employee_api.dart';
+import 'package:maleva/core/employee/email_inbox_api.dart';
+import 'package:maleva/core/models/shared/email_model.dart';
 
 class EmailInboxRepository {
-  /// Fetches the list of employees
-  Future<dynamic> fetchEmployees({required int comId}) async {
-    // We send a POST request with a null body as per the original logic
-    return await ApiClient.postRequest(
-      "${ApiConstants.apiSelectEmployee}$comId&type=&type1=",
-      null,
-    );
-  }
+  /// The employees, from the shared Java employee list
+  Future<List<EmployeeModel>> fetchEmployees({required int comId}) =>
+      GetIt.instance<EmployeeApi>().dropdown();
 
-  /// Fetches the emails for a specific employee
-  Future<dynamic> fetchEmails({required List<Map<String, dynamic>> body}) async {
-    final headers = {
-      'Comid': (AppGlobals.storagenew.getInt('Comid') ?? 0).toString(),
-    };
-    return await ApiClient.postRequest(
-      ApiConstants.apiSelectEmailData,
-      body,
-      headers: headers,
-    );
-  }
 
-  /// Saves the modified emails back to the server
-  Future<dynamic> saveEmails({required List<Map<String, dynamic>> body}) async {
-    final headers = {
-      'Comid': (AppGlobals.storagenew.getInt('Comid') ?? 0).toString(),
-    };
-    return await ApiClient.postRequest(
-      ApiConstants.apiInsertMailMaster,
-      body,
-      headers: headers,
-    );
-  }
+  /// The employee's unanswered mail of the last day (shared Java inbox).
+  Future<List<EmailModel>> fetchEmails({required int employeeId}) =>
+      GetIt.instance<EmailInboxApi>().unanswered(employeeId);
+
+  /// Keeps the ticked mails as the employee's inbox entries; answers how many.
+  Future<int> saveEmails({required int employeeId, required List<EmailModel> emails}) =>
+      GetIt.instance<EmailInboxApi>().keep(employeeId, emails);
 }

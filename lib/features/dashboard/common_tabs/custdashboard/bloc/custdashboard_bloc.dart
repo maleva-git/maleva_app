@@ -1,4 +1,3 @@
-import 'package:maleva/core/network/api_constants.dart';
 import 'dart:async';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
@@ -7,10 +6,10 @@ import 'custdashboard_event.dart';
 import 'custdashboard_state.dart';
 import 'package:maleva/features/transport/models/fuelselect_model.dart';
 import 'package:maleva/core/models/shared/payment_pending_model.dart';
-import 'package:maleva/core/network/legacy_api_repository.dart';
 import 'package:maleva/core/di/injection.dart';
 import 'package:maleva/core/dashboard/dashboard_api.dart';
 import 'package:maleva/core/fuel/fuel_entry_api.dart';
+import 'package:maleva/core/enquiry/enquiry_api.dart';
 import 'package:maleva/features/dashboard/common_tabs/paymentview/data/paymentview_repository.dart';
 
 
@@ -283,56 +282,19 @@ class CustDashboardBloc
       CustDashboardCancelEnquiry event,
       Emitter<CustDashboardState> emit) async {
     emit(state.copyWith(status: CustDashboardStatus.loading));
-    final header = {'Content-Type': 'application/json; charset=UTF-8'};
-    final comid = AppGlobals.storagenew.getInt('Comid') ?? 0;
-
-    await _safeApiCall(() => sl<LegacyApiRepository>().apiAllinoneSelectArray(
-        '${ApiConstants.apiUpdateEnquiryMaster}${event.id}&Comid=$comid&StatusName=CANCEL',
-        null,
-        header,
-        null), emit);
+    await _safeApiCall(() => sl<EnquiryApi>().setStatus(event.id, 'CANCEL'), emit);
 
     await _fetchEnquiryData(emit);
     emit(state.copyWith(status: CustDashboardStatus.success));
   }
 
   Future<void> _fetchEnquiryData(Emitter<CustDashboardState> emit) async {
-    final header = {'Content-Type': 'application/json; charset=UTF-8'};
-    final comid = AppGlobals.storagenew.getInt('Comid') ?? 0;
-
-    final result = await _safeApiCall(() => sl<LegacyApiRepository>().apiAllinoneSelectArray(
-        ApiConstants.apiSelectEnquiryMaster,
-        {
-          'Comid': comid,
-          'Fromdate': null,
-          'Todate': null,
-          'Employeeid': AppGlobals.EmpRefId,
-          'Invoice': false,
-          'Id': 0,
-          'JId': 0,
-          'DashboardStatus': 2,
-        },
-        header,
-        null), emit);
-
-    if (result is List && result.isNotEmpty) {
-      final formatted = result.map((item) {
-        final map = Map<String, dynamic>.from(item);
-        if (map['ForwardingDate'] == null) {
-          map['SForwardingDate'] = '';
-        } else {
-          map['SForwardingDate'] = DateFormat('dd-MM-yyyy HH:mm')
-              .format(DateTime.parse(map['ForwardingDate']));
-        }
-        return map;
-      }).toList();
-
-      AppGlobals.EnquiryMasterList = formatted;
-      emit(state.copyWith(enquiryMasterList: formatted));
-    } else {
-      AppGlobals.EnquiryMasterList = [];
-      emit(state.copyWith(enquiryMasterList: []));
-    }
+    // the open enquiries of the employee and their team (shared Java enquiry API)
+    final result = await _safeApiCall(
+        () => sl<EnquiryApi>().search(employeeId: AppGlobals.EmpRefId, team: true), emit);
+    final rows = result is List<Map<String, dynamic>> ? result : <Map<String, dynamic>>[];
+    AppGlobals.EnquiryMasterList = rows;
+    emit(state.copyWith(enquiryMasterList: rows));
   }
 
   // ─── Fuel ──────────────────────────────────────────────────────────────────

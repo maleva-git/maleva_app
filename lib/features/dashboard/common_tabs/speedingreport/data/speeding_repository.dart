@@ -1,15 +1,9 @@
-import 'package:maleva/core/network/api_constants.dart';
-import 'package:maleva/core/network/api_client.dart';
+import 'package:get_it/get_it.dart';
+import 'package:maleva/core/fleet/gps_api.dart';
+import 'package:maleva/core/models/shared/speeding_view.dart';
 
+/// From the shared Java GPS list (change `master-reports-on-shared-java-api`).
 class SpeedingRepository {
-  /// Fetches speeding report data from the backend
-  Future<dynamic> fetchSpeedingReport({
-    required Map<String, dynamic> body,
-  }) async {
-    // ApiClient handles the headers, timeout, and authorization automatically!
-    return await ApiClient.postRequest(
-      ApiConstants.apiSelectSpeedingReport,
-      body,
-    );
-  }
+  Future<List<SpeedingView>> fetchSpeedingReport({required DateTime fromDate, required DateTime toDate}) async =>
+      (await GetIt.instance<GpsApi>().speedReports(fromDate, toDate)).map(SpeedingView.fromJava).toList();
 }

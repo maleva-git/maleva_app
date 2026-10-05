@@ -8,7 +8,6 @@ import 'package:maleva/core/network/api_client.dart';
 import 'package:maleva/core/stock/stock_in_api.dart';
 import 'package:maleva/core/network/api_constants.dart';
 import 'package:maleva/core/utils/app_preferences.dart';
-import 'package:maleva/core/models/shared/employee_model.dart';
 import 'package:maleva/core/models/shared/ware_house_model.dart';
 import 'package:maleva/core/models/shared/location_model.dart';
 import 'package:maleva/features/operations/models/job_status_model.dart';
@@ -25,18 +24,6 @@ class MasterApi {
       '${ApiConstants.apiSelectLocation}$comid', null,
     );
     return (result as List).map((e) => LocationModel.fromJson(e)).toList();
-  }
-
-  // ─── Employee ─────────────────────────────────────────────────────────────
-  static Future<List<EmployeeModel>> getEmployees({
-    String type  = '',
-    String type1 = '',
-  }) async {
-    final comid  = AppPreferences.getComid();
-    final result = await ApiClient.postRequest(
-      '${ApiConstants.apiSelectEmployee}$comid&type=$type&type1=$type1', null,
-    );
-    return (result as List).map((e) => EmployeeModel.fromJson(e)).toList();
   }
 
   // ─── Job Status ───────────────────────────────────────────────────────────

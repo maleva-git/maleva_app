@@ -62,7 +62,7 @@ void main() {
       '${AppConfig.baseUrl}/api/StockApp/MaxStockInNo?Comid=6',
       // fuel calls go through FuelEntryApi now (fuel-entry-on-shared-java-api)
       '${AppConfig.baseUrl}/api/FuelEntryApp/SelectFuelEntry',
-      ApiConstants.apiSelectEnquiryMaster,
+      ApiConstants.apiInsertForwarding,
       'https://elsewhere.test/api/TruckApp/GetTruck',
     ]) {
       expect(LegacyCallAdapter.handles(url), isFalse, reason: url);

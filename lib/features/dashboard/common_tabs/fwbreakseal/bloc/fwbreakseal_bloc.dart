@@ -1,3 +1,4 @@
+import 'package:maleva/core/models/shared/employee_model.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:maleva/core/utils/app_preferences.dart';
@@ -11,7 +12,7 @@ class FWBreakSealBloc extends Bloc<FWBreakSealEvent, FWBreakSealState> {
 
   // Local caches to replace objfun globals
   List<Map<String, dynamic>> _allJobs = [];
-  List<dynamic> _employees = [];
+  List<EmployeeModel> _employees = [];
   Map<String, dynamic> _currentEditData = {};
 
   FWBreakSealBloc({required this.repository})
@@ -100,8 +101,8 @@ class FWBreakSealBloc extends Bloc<FWBreakSealEvent, FWBreakSealState> {
 
       if (sealRefId != 0) {
         empId = sealRefId;
-        final matches = _employees.where((item) => item['Id'] == empId).toList(); // Ensure 'Id' matches your API map key
-        if (matches.isNotEmpty) empName = matches[0]['AccountName'];
+        final matches = _employees.where((item) => item.Id == empId).toList();
+        if (matches.isNotEmpty) empName = matches[0].AccountName;
       }
 
       final updatedSlot = SmkSlotData(

@@ -5,7 +5,6 @@ import 'package:maleva/core/utils/app_globals.dart';
 import '../data/googlereview_repository.dart';
 import 'googlereview_event.dart';
 import 'googlereview_state.dart';
-import 'package:maleva/core/models/shared/review.dart';
 import 'package:maleva/core/models/shared/employee_model.dart';
 
 class ReviewBloc extends Bloc<ReviewEvent, ReviewState> {
@@ -36,10 +35,8 @@ class ReviewBloc extends Bloc<ReviewEvent, ReviewState> {
       final comId = AppGlobals.storagenew.getInt('Comid') ?? 0;
       final resultData = await repository.fetchEmployees(comId: comId);
 
-      if (resultData != null && resultData is List && resultData.isNotEmpty) {
-        final List<EmployeeModel> employees = resultData
-            .map<EmployeeModel>((e) => EmployeeModel.fromJson(e))
-            .toList();
+      if (resultData.isNotEmpty) {
+        final List<EmployeeModel> employees = resultData;
 
         emit(ReviewFormState(
           employees: employees,
@@ -85,35 +82,17 @@ class ReviewBloc extends Bloc<ReviewEvent, ReviewState> {
     emit(current.copyWith(saving: true));
 
     try {
-      final List<Map<String, dynamic>> master = [
-        {
-          "Id": event.existingId ?? 0,
-          "ShopName": event.shopName.toUpperCase(),
-          "MobileNo": event.mobileNo,
-          "GoogleReview": current.selectedReview.toString(),
-          "GoogleMsg": event.reviewMsg,
-          "RefDate": current.selectedDate.toIso8601String().split('T')[0],
-          "EmpReffid": current.selectedEmpId!,
-        }
-      ];
-
-      final resultData = await repository.saveReview(body: master);
-
+      await repository.saveReview(
+        id: event.existingId ?? 0,
+        refDate: DateFormat('yyyy-MM-dd').format(current.selectedDate),
+        employeeId: current.selectedEmpId!,
+        googleReview: current.selectedReview,
+        googleMsg: event.reviewMsg,
+        shopName: event.shopName.toUpperCase(),
+        mobileNo: event.mobileNo,
+      );
       emit(current.copyWith(saving: false));
-
-      if (resultData != null && resultData.toString().isNotEmpty) {
-        String message = '';
-
-        if (resultData is Map) {
-          bool isSuccess = resultData['ok'] ?? false;
-          message = resultData['message'] ?? 'Something went wrong';
-        } else {
-          int id = int.tryParse(resultData.toString()) ?? 0;
-          message = id > 0 ? 'Updated Successfully' : 'Unexpected response';
-        }
-
-        emit(ReviewSaveSuccess(message));
-      }
+      emit(const ReviewSaveSuccess('Updated Successfully'));
     } catch (e) {
       emit(current.copyWith(saving: false));
       emit(ReviewError(e.toString()));
@@ -141,10 +120,8 @@ class ReviewBloc extends Bloc<ReviewEvent, ReviewState> {
       final comId = AppGlobals.storagenew.getInt('Comid') ?? 0;
       final resultData = await repository.fetchEmployees(comId: comId);
 
-      if (resultData != null && resultData is List && resultData.isNotEmpty) {
-        final List<EmployeeModel> employees = resultData
-            .map<EmployeeModel>((e) => EmployeeModel.fromJson(e))
-            .toList();
+      if (resultData.isNotEmpty) {
+        final List<EmployeeModel> employees = resultData;
 
         emit(ReviewGridState(employees: employees));
       } else {
@@ -199,21 +176,12 @@ class ReviewBloc extends Bloc<ReviewEvent, ReviewState> {
       final from = DateFormat('yyyy-MM-dd').format(current.fromDate!);
       final to = DateFormat('yyyy-MM-dd').format(current.toDate!);
 
-      final resultData = await repository.fetchReviews(
-        comId: AppGlobals.Comid,
+      final reviews = await repository.fetchReviews(
         fromDate: from,
         toDate: to,
         empId: current.selectedEmpId!,
       );
-
-      if (resultData != null && resultData is List && resultData.isNotEmpty) {
-        final List<Review> reviews = resultData
-            .map<Review>((e) => Review.fromJson(e))
-            .toList();
-        emit(current.copyWith(reviews: reviews, loading: false));
-      } else {
-        emit(current.copyWith(reviews: [], loading: false));
-      }
+      emit(current.copyWith(reviews: reviews, loading: false));
     } catch (e) {
       emit(current.copyWith(loading: false));
       emit(ReviewError(e.toString()));

@@ -801,7 +801,7 @@ if (navResult6 != null) { AppGlobals.SelectedVesselTypeName = navResult6; }
           hint: "Boarding Officer 1", uniqueId: 'search_board1', value: state.txtBoardingOfficer1, enabled: fp["txtBoardingOfficer1"] == true,
           onSearch: () async {
             final emps = await sl<SalesOrderAddRepository>().selectEmployee('', 'Operation');
-            AppGlobals.EmployeeList = emps.map<EmployeeModel>((e) => EmployeeModel.fromJson(e)).toList();
+            AppGlobals.EmployeeList = emps;
             if (!context.mounted) return;
             final navResult7 = await Navigator.push(context, MaterialPageRoute(builder: (_) => const Employee(Searchby: 1, SearchId: 0))); if (navResult7 != null) { AppGlobals.SelectEmployeeList = navResult7; }
 if (navResult7 != null) { AppGlobals.SelectEmployeeList = navResult7; }
@@ -821,7 +821,7 @@ if (navResult7 != null) { AppGlobals.SelectEmployeeList = navResult7; }
           hint: "Boarding Officer 2", uniqueId: 'search_board2', value: state.txtBoardingOfficer2, enabled: fp["txtBoardingOfficer2"] == true,
           onSearch: () async {
             final emps = await sl<SalesOrderAddRepository>().selectEmployee('', 'Operation');
-            AppGlobals.EmployeeList = emps.map<EmployeeModel>((e) => EmployeeModel.fromJson(e)).toList();
+            AppGlobals.EmployeeList = emps;
             if (!context.mounted) return;
             final navResult8 = await Navigator.push(context, MaterialPageRoute(builder: (_) => const Employee(Searchby: 1, SearchId: 0))); if (navResult8 != null) { AppGlobals.SelectEmployeeList = navResult8; }
 if (navResult8 != null) { AppGlobals.SelectEmployeeList = navResult8; }
@@ -882,7 +882,7 @@ if (navResult8 != null) { AppGlobals.SelectEmployeeList = navResult8; }
                 hint: "Seal By", uniqueId: 'search_seal_$fwNum', value: sealEmpValue, enabled: fp["txtSealByEmp$fwNum"] == true,
                 onSearch: () async {
                   final emps = await sl<SalesOrderAddRepository>().selectEmployee('', 'Operation');
-                  AppGlobals.EmployeeList = emps.map<EmployeeModel>((e) => EmployeeModel.fromJson(e)).toList();
+                  AppGlobals.EmployeeList = emps;
                   if (!context.mounted) return;
                   final navResult9 = await Navigator.push(context, MaterialPageRoute(builder: (_) => const Employee(Searchby: 1, SearchId: 0))); if (navResult9 != null) { AppGlobals.SelectEmployeeList = navResult9; }
 if (navResult9 != null) { AppGlobals.SelectEmployeeList = navResult9; }
@@ -895,7 +895,7 @@ if (navResult9 != null) { AppGlobals.SelectEmployeeList = navResult9; }
                 hint: "B.Seal By", uniqueId: 'search_bseal_$fwNum', value: breakEmpValue, enabled: fp["txtBreakByEmp$fwNum"] == true,
                 onSearch: () async {
                   final emps = await sl<SalesOrderAddRepository>().selectEmployee('', 'Operation');
-                  AppGlobals.EmployeeList = emps.map<EmployeeModel>((e) => EmployeeModel.fromJson(e)).toList();
+                  AppGlobals.EmployeeList = emps;
                   if (!context.mounted) return;
                   final navResult10 = await Navigator.push(context, MaterialPageRoute(builder: (_) => const Employee(Searchby: 1, SearchId: 0))); if (navResult10 != null) { AppGlobals.SelectEmployeeList = navResult10; }
 if (navResult10 != null) { AppGlobals.SelectEmployeeList = navResult10; }

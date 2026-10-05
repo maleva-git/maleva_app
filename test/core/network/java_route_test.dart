@@ -22,7 +22,7 @@ void main() {
     expect(JavaRoute.moved, isEmpty);
     for (final url in [
       '${AppConfig.baseUrl}/api/StockApp/MaxStockInNo?Comid=6',
-      ApiConstants.apiSelectEnquiryMaster,
+      ApiConstants.apiInsertForwarding,
       '${ApiConstants.apiGetTruckList}6',
     ]) {
       expect(JavaRoute.resolve(url), url, reason: url);
@@ -32,7 +32,7 @@ void main() {
 
   test('isJava is the Java host', () {
     expect(JavaRoute.isJava('${AppConfig.javaBaseUrl}/api/stock-ins/jobs'), isTrue);
-    expect(JavaRoute.isJava(ApiConstants.apiSelectEnquiryMaster), isFalse);
+    expect(JavaRoute.isJava(ApiConstants.apiInsertForwarding), isFalse);
   });
 
   test('a .NET call still uses the legacy client', () async {
@@ -44,9 +44,9 @@ void main() {
     final repository = LegacyApiRepository(legacy,
         java: JavaApiClient(tokens, dio: Dio()..httpClientAdapter = javaAdapter));
 
-    await repository.apiAllinoneSelect(ApiConstants.apiSelectEnquiryMaster, {});
+    await repository.apiAllinoneSelect(ApiConstants.apiInsertForwarding, {});
 
-    expect(legacyAdapter.requests.single.uri.toString(), ApiConstants.apiSelectEnquiryMaster);
+    expect(legacyAdapter.requests.single.uri.toString(), ApiConstants.apiInsertForwarding);
     expect(javaAdapter.requests, isEmpty);
     GetIt.instance.allowReassignment = true;
   });

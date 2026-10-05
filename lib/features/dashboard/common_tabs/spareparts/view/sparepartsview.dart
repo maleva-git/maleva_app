@@ -168,7 +168,7 @@ class _SparePartsViewBody extends StatelessWidget {
         final item = records[i] as Map<String, dynamic>;
         final isSelected = isTablet &&
             selected != null &&
-            selected['Id'] == item['Id'];
+            selected['id'] == item['id'];
 
         return _SparePartsCard(
           item: item,
@@ -189,13 +189,13 @@ class _SparePartsViewBody extends StatelessWidget {
 
   void _showImageDialog(
       BuildContext context, Map<String, dynamic> item) {
-    final hasDoc = item['DocumentPath'] != null &&
-        item['DocumentPath'].toString().isNotEmpty;
+    final hasDoc = item['documentPath'] != null &&
+        item['documentPath'].toString().isNotEmpty;
     if (!hasDoc) return;
     showDialog(
       context: context,
       builder: (_) => _ImagePreviewDialog(
-          imageUrl: ApiConstants.port + item['DocumentPath']),
+          imageUrl: ApiConstants.port + item['documentPath']),
     );
   }
 
@@ -333,8 +333,8 @@ class _SparePartsCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final hasDoc = item['DocumentPath'] != null &&
-        item['DocumentPath'].toString().isNotEmpty;
+    final hasDoc = item['documentPath'] != null &&
+        item['documentPath'].toString().isNotEmpty;
 
     return GestureDetector(
       onTap: onTap,
@@ -383,10 +383,10 @@ class _SparePartsCard extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text("${item['TruckName'] ?? '-'}",
+            Text("${item['truckName'] ?? '-'}",
                 style: AppTypography.heading3(color: AppTokens.brandDark, fontWeight: FontWeight.bold),
                 overflow: TextOverflow.ellipsis),
-            Text("${item['EntryDate'] ?? '-'}",
+            Text("${item['entryDate'] ?? '-'}",
                 style: AppTypography.bodyMedium(color: Colors.grey[500])),
           ],
         ),
@@ -397,7 +397,7 @@ class _SparePartsCard extends StatelessWidget {
         decoration: BoxDecoration(
             color: AppTokens.brandLight,
             borderRadius: BorderRadius.circular(8)),
-        child: Text("₹${item['Amount'] ?? '-'}",
+        child: Text("₹${item['amount'] ?? '-'}",
             style: AppTypography.heading3(color: AppTokens.brandGradientStart, fontWeight: FontWeight.bold)),
       ),
     ]);
@@ -422,9 +422,9 @@ class _SparePartsCard extends StatelessWidget {
             child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text("${item['TruckName'] ?? '-'}",
+                  Text("${item['truckName'] ?? '-'}",
                       style: AppTypography.heading1(color: AppTokens.brandDark, fontWeight: FontWeight.bold)),
-                  Text("${item['EntryDate'] ?? '-'}",
+                  Text("${item['entryDate'] ?? '-'}",
                       style: AppTypography.bodyLarge(color: Colors.grey[500])),
                 ]),
           ),
@@ -434,7 +434,7 @@ class _SparePartsCard extends StatelessWidget {
             decoration: BoxDecoration(
                 color: AppTokens.brandLight,
                 borderRadius: BorderRadius.circular(10)),
-            child: Text("₹${item['Amount'] ?? '-'}",
+            child: Text("₹${item['amount'] ?? '-'}",
                 style: AppTypography.heading3(color: AppTokens.brandGradientStart, fontWeight: FontWeight.bold)),
           ),
         ]),
@@ -448,7 +448,7 @@ class _SparePartsCard extends StatelessWidget {
               const SizedBox(width: 8),
               Expanded(
                 child: Text(
-                  item['SpareParts'] ?? '-',
+                  item['spareParts'] ?? '-',
                   style: AppTypography.bodyLarge(color: AppTokens.brandDark),
                 ),
               ),
@@ -461,12 +461,12 @@ class _SparePartsCard extends StatelessWidget {
               context: context,
               builder: (_) => _ImagePreviewDialog(
                   imageUrl:
-                  ApiConstants.port + item['DocumentPath']),
+                  ApiConstants.port + item['documentPath']),
             ),
             child: ClipRRect(
               borderRadius: BorderRadius.circular(10),
               child: Image.network(
-                ApiConstants.port + item['DocumentPath'],
+                ApiConstants.port + item['documentPath'],
                 height: 150,
                 width: double.infinity,
                 fit: BoxFit.cover,
@@ -532,8 +532,8 @@ class _SparePartsDetailPanel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final hasDoc = item['DocumentPath'] != null &&
-        item['DocumentPath'].toString().isNotEmpty;
+    final hasDoc = item['documentPath'] != null &&
+        item['documentPath'].toString().isNotEmpty;
 
     return Container(
       width: double.infinity,
@@ -568,7 +568,7 @@ class _SparePartsDetailPanel extends StatelessWidget {
               const SizedBox(width: 10),
               Expanded(
                 child: Text(
-                  item['TruckName'] ?? 'Spare Parts Details',
+                  item['truckName'] ?? 'Spare Parts Details',
                   style: AppTypography.heading1(color: Palette.kWhite, fontWeight: FontWeight.bold),
                   overflow: TextOverflow.ellipsis,
                 ),
@@ -585,15 +585,15 @@ class _SparePartsDetailPanel extends StatelessWidget {
                 children: [
                   _detailRow(Icons.calendar_today_rounded,
                       "Entry Date",
-                      item['EntryDate']?.toString() ?? '-'),
+                      item['entryDate']?.toString() ?? '-'),
                   _divider(),
                   _detailRow(Icons.currency_rupee_rounded,
                       "Amount",
-                      "₹${item['Amount'] ?? '-'}"),
+                      "₹${item['amount'] ?? '-'}"),
                   _divider(),
                   _detailRow(Icons.build_rounded,
                       "Spare Parts",
-                      item['SpareParts']?.toString() ?? '-'),
+                      item['spareParts']?.toString() ?? '-'),
 
                   if (hasDoc) ...[
                     _divider(),
@@ -605,12 +605,12 @@ class _SparePartsDetailPanel extends StatelessWidget {
                         context: context,
                         builder: (_) => _ImagePreviewDialog(
                             imageUrl: ApiConstants.port +
-                                item['DocumentPath']),
+                                item['documentPath']),
                       ),
                       child: ClipRRect(
                         borderRadius: BorderRadius.circular(12),
                         child: Image.network(
-                          ApiConstants.port + item['DocumentPath'],
+                          ApiConstants.port + item['documentPath'],
                           width: double.infinity,
                           fit: BoxFit.cover,
                           errorBuilder: (_, __, ___) =>

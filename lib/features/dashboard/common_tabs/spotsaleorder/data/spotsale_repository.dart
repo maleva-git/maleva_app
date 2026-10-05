@@ -1,7 +1,7 @@
+import 'package:maleva/core/fleet/truck_entries_api.dart';
+import 'package:get_it/get_it.dart';
 import 'package:maleva/core/network/api_constants.dart';
-import 'dart:convert';
 import 'dart:io';
-import 'package:http/http.dart' as http;
 import 'package:maleva/core/network/api_client.dart';
 
 class SpotSaleRepository {
@@ -15,37 +15,38 @@ class SpotSaleRepository {
     return await ApiClient.postRequest("${ApiConstants.apiSelectJobStatus}$comId", null);
   }
 
-  /// Fetches Spot Sale Records for the View page
-  Future<dynamic> fetchSpotSaleRecords({
-    required int comId,
+  /// Spot sale entries created in the days, from the shared Java API (the Java rows).
+  Future<List<Map<String, dynamic>>> fetchSpotSaleRecords({
     required String fromDate,
     required String toDate,
-  }) async {
-    final url = "${ApiConstants.apiGetSpotSaleEntry}$comId&Fromdate=$fromDate&Todate=$toDate&Id=0";
-    return await ApiClient.postRequest(url, null);
-  }
+  }) =>
+      GetIt.instance<TruckEntriesApi>().spotSales(fromDate: fromDate, toDate: toDate);
 
-  /// Submits a new Spot Sale Entry with multipart form data (Files + JSON)
-  Future<bool> submitSpotSaleEntry({
-    required List<Map<String, dynamic>> body,
-    required int comId,
+  /// Adds (id 0) or updates a spot sale entry with its image and PDF (Java
+  /// port of SP_SoptSaleorder). Answers the id.
+  Future<int> submitSpotSaleEntry({
+    int id = 0,
+    required int jobTypeId,
+    required int jobStatusId,
+    required int employeeId,
+    required String vehicleName,
+    required String awbNo,
+    required String quantity,
+    required String totalWeight,
+    required String port,
     File? image,
     File? pdf,
-  }) async {
-    final uri = Uri.parse("${ApiConstants.apiInsertSpotSaleEntry}?Comid=$comId");
-    final request = http.MultipartRequest("POST", uri);
-
-    request.fields["details"] = jsonEncode(body);
-    request.fields["Comid"] = comId.toString();
-
-    if (image != null) {
-      request.files.add(await http.MultipartFile.fromPath("Files", image.path));
-    }
-    if (pdf != null) {
-      request.files.add(await http.MultipartFile.fromPath("Files", pdf.path));
-    }
-
-    final response = await request.send();
-    return response.statusCode == 200;
-  }
+  }) =>
+      GetIt.instance<TruckEntriesApi>().saveSpotSale(
+        id: id,
+        jobTypeId: jobTypeId,
+        jobStatusId: jobStatusId,
+        employeeId: employeeId,
+        vehicleName: vehicleName,
+        awbNo: awbNo,
+        quantity: quantity,
+        totalWeight: totalWeight,
+        port: port,
+        files: [if (image != null) image, if (pdf != null) pdf],
+      );
 }

@@ -1,48 +1,45 @@
-import 'package:maleva/core/network/api_constants.dart';
-import 'package:maleva/core/network/api_client.dart';
+import 'package:maleva/core/employee/google_review_api.dart';
+import 'package:maleva/core/models/shared/review.dart';
+import 'package:maleva/core/models/shared/employee_model.dart';
+import 'package:get_it/get_it.dart';
+import 'package:maleva/core/employee/employee_api.dart';
 
 class GoogleReviewRepository {
-  /// Fetches the list of employees
-  Future<dynamic> fetchEmployees({required int comId}) async {
-    return await ApiClient.postRequest(
-      "${ApiConstants.apiSelectEmployee}$comId&type=&type1=",
-      null,
-    );
-  }
+  /// The employees, from the shared Java employee list
+  Future<List<EmployeeModel>> fetchEmployees({required int comId}) =>
+      GetIt.instance<EmployeeApi>().dropdown();
 
-  /// Inserts or updates a Google Review entry
-  Future<dynamic> saveReview({required List<Map<String, dynamic>> body}) async {
-    return await ApiClient.postRequest(
-      ApiConstants.apiGoogleReviewInsert,
-      body,
-    );
-  }
 
-  /// Fetches the list of Google Reviews based on date range and employee ID
-  Future<dynamic> fetchReviews({
-    required int comId,
+  /// Adds (id 0) or updates a review on the shared Java API; answers the id.
+  Future<int> saveReview({
+    int id = 0,
+    required String refDate,
+    required int employeeId,
+    required int googleReview,
+    required String googleMsg,
+    required String shopName,
+    required String mobileNo,
+  }) =>
+      GetIt.instance<GoogleReviewApi>().save(
+        id: id,
+        refDate: refDate,
+        employeeId: employeeId,
+        googleReview: googleReview,
+        googleMsg: googleMsg,
+        shopName: shopName,
+        mobileNo: mobileNo,
+      );
+
+  /// Reviews dated in the days, one employee's when [empId] is not 0.
+  Future<List<Review>> fetchReviews({
     required String fromDate,
     required String toDate,
     required int empId,
-  }) async {
-    final url = Uri.parse(ApiConstants.apiSelectGoogleReview).replace(
-      queryParameters: {
-        'Comid': comId.toString(),
-        'fromdate': fromDate,
-        'todate': toDate,
-        'Empid': empId.toString(),
-      },
-    ).toString();
+  }) async =>
+      (await GetIt.instance<GoogleReviewApi>().list(fromDate: fromDate, toDate: toDate, employeeId: empId))
+          .map(Review.fromJava)
+          .toList();
 
-    return await ApiClient.postRequest(url, null);
-  }
-
-  /// Deletes a specific Google Review by ID
-  Future<dynamic> deleteReview({required int id}) async {
-    final url = Uri.parse(ApiConstants.apiDeleteGoogleReview).replace(
-      queryParameters: {'Id': id.toString()},
-    ).toString();
-
-    return await ApiClient.postRequest(url, null);
-  }
+  /// Deletes a review of the company.
+  Future<void> deleteReview({required int id}) => GetIt.instance<GoogleReviewApi>().delete(id);
 }

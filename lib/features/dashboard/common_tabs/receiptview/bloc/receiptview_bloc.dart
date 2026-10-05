@@ -79,8 +79,8 @@ class ReceiptBloc extends Bloc<ReceiptEvent, ReceiptState> {
       double totalAmount  = 0;
       double totalBalance = 0;
       for (final item in masterList) {
-        totalAmount  += double.tryParse(item['BillAmount'].toString()) ?? 0;
-        totalBalance += double.tryParse(item['Balance'].toString())    ?? 0;
+        totalAmount  += double.tryParse(item['billAmount'].toString()) ?? 0;
+        totalBalance += double.tryParse(item['balance'].toString())    ?? 0;
       }
 
       emit(state.copyWith(

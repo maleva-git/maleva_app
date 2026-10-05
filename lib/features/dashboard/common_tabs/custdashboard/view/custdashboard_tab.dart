@@ -1,3 +1,4 @@
+import 'package:maleva/core/enquiry/enquiry_api.dart';
 
 import 'package:maleva/core/theme/app_typography.dart';
 import 'dart:io';
@@ -117,14 +118,14 @@ class _CustDashboardViewState extends State<_CustDashboardView>
   // ─── Card colour helpers ──────────────────────────────────────────────────
 
   Color? _enquiryCardColor(Map enq) {
-    if (enq['ForwardingDate'] == null) return null;
+    if (enq['forwardingDate'] == null) return null;
     final now = DateTime.now();
     final notifyDate =
-    DateFormat('yyyy-MM-dd').format(DateTime.parse(enq['ForwardingDate']));
+    DateFormat('yyyy-MM-dd').format(DateTime.parse(enq['forwardingDate']));
     final today = DateFormat('yyyy-MM-dd').format(now);
     final tomorrow = DateFormat('yyyy-MM-dd').format(now.add(const Duration(days: 1)));
     if (notifyDate == today ||
-        DateTime.parse(enq['ForwardingDate']).isBefore(now)) {
+        DateTime.parse(enq['forwardingDate']).isBefore(now)) {
       return colour.commonColorred.withValues(alpha: 0.3);
     } else if (notifyDate == tomorrow) {
       return Colors.yellowAccent.withValues(alpha: 0.3);
@@ -295,32 +296,18 @@ class _CustDashboardViewState extends State<_CustDashboardView>
   }
 
   Future<void> _showEnquiryDialog(BuildContext context, Map enq) async {
-    String collectionDate = '';
-    String etaDate = '';
-    String oEtaDate = '';
-    if (enq['SPickupDate'] != '') {
-      collectionDate = DateFormat('dd-MM-yyyy HH:mm')
-          .format(DateTime.parse(enq['PickupDate']));
-    }
-    if (enq['SETA'] != '') {
-      etaDate = DateFormat('dd-MM-yyyy HH:mm')
-          .format(DateTime.parse(enq['ETA']));
-    }
-    if (enq['SOETA'] != '') {
-      oEtaDate = DateFormat('dd-MM-yyyy HH:mm')
-          .format(DateTime.parse(enq['OETA']));
-    }
+    // a Java enquiry row (`/api/enquiry-masters/search`)
     final fields = [
-      ['Customer Name', enq['CustomerName']],
-      ['Job Type', enq['JobType']],
-      ['Notify Date', enq['SForwardingDate']],
-      ['Collection Date', collectionDate],
-      ['L Vessel', enq['Loadingvesselname']],
-      ['O Vessel', enq['Offvesselname']],
-      ['ETA', etaDate],
-      ['OETA', oEtaDate],
-      ['LPort', enq['SPort']],
-      ['OPort', enq['OPort']],
+      ['Customer Name', enq['customerName']],
+      ['Job Type', enq['jobType']],
+      ['Notify Date', EnquiryApi.display(enq['forwardingDate'])],
+      ['Collection Date', EnquiryApi.display(enq['pickupDate'])],
+      ['L Vessel', enq['loadingvesselname']],
+      ['O Vessel', enq['offvesselname']],
+      ['ETA', EnquiryApi.display(enq['eta'])],
+      ['OETA', EnquiryApi.display(enq['oeta'])],
+      ['LPort', enq['sport']],
+      ['OPort', enq['oport']],
     ];
     await _showDetailDialog(context, fields, height: 450);
   }
@@ -989,7 +976,7 @@ class _EnquiryTab extends StatelessWidget {
                               Expanded(
                                 flex: 2,
                                 child: Text(
-                                  '   ${enq['CustomerName']}',
+                                  '   ${enq['customerName']}',
                                   overflow: TextOverflow.ellipsis,
                                   style: AppTypography.bodyLarge(color: colour.commonColor),
                                 ),
@@ -997,7 +984,7 @@ class _EnquiryTab extends StatelessWidget {
                               Expanded(
                                 flex: 2,
                                 child: Text(
-                                  '   ${enq['SForwardingDate']}',
+                                  '   ${EnquiryApi.display(enq['forwardingDate'])}',
                                   overflow: TextOverflow.ellipsis,
                                   style: AppTypography.bodyLarge(color: colour.commonColor),
                                 ),
@@ -1038,7 +1025,7 @@ class _EnquiryTab extends StatelessWidget {
                                       context
                                           .read<CustDashboardBloc>()
                                           .add(CustDashboardCancelEnquiry(
-                                          enq['Id'] as int));
+                                          enq['id'] as int));
                                     }
                                   },
                                   child: const Icon(Icons.cancel,

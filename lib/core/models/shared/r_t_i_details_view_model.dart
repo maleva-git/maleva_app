@@ -28,13 +28,14 @@ class RTIDetailsViewModel {
       this.Id, this.SDId,this.RTIMasterRefId,this.StatusId, this.SaleOrderMasterRefId,this.CustomerMasterRefId, this.JobNo, this.JobDate, this.CustomerName, this.Salary, this.PPIC, this.DPIC, this.PWDType,this.Active, this.Verify,this.imagePath,this.imageFile,{ this.isChecked = false , this.isVerified = false});
 
   /// One job of an RTI in the shared Java list (`jobs` of
-  /// `/api/rti-masters/with-jobs`). The RTI status fields (StatusId, Active,
-  /// Verify, ImagePath) are not part of it, as they were not of .NET SelectRTI.
+  /// `/api/rti-masters/with-jobs`), with its latest RTI status (`statusId`,
+  /// `active`, `verify`, `imagePath`; .NET SelectRTIView), so PDO and
+  /// TransportDB update that status instead of adding another.
   RTIDetailsViewModel.fromJava(Map<String, dynamic> json)
       : Id = JsonRead.integer(json['id']),
         SDId = 0,
         RTIMasterRefId = JsonRead.integer(json['rtiMasterRefId']),
-        StatusId = 0,
+        StatusId = JsonRead.integer(json['statusId']),
         SaleOrderMasterRefId = JsonRead.integer(json['saleOrderMasterRefId']),
         CustomerMasterRefId = JsonRead.integer(json['customerMasterRefId']),
         JobNo = JsonRead.string(json['jobNo']),
@@ -44,11 +45,11 @@ class RTIDetailsViewModel {
         PPIC = JsonRead.string(json['ppic']),
         DPIC = JsonRead.string(json['dpic']),
         PWDType = 0,
-        Active = 0,
-        Verify = 0,
-        imagePath = '',
-        isChecked = false,
-        isVerified = false;
+        Active = JsonRead.integer(json['active']),
+        Verify = JsonRead.integer(json['verify']),
+        imagePath = JsonRead.string(json['imagePath']),
+        isChecked = JsonRead.integer(json['active']) == 1,
+        isVerified = JsonRead.integer(json['verify']) == 1;
 
   static String _dmy(dynamic value) {
     final d = JsonRead.date(value);

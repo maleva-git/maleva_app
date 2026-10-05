@@ -7,7 +7,6 @@ import 'package:maleva/features/transaction/salesorder/view/data/salesorderview_
 import 'package:maleva/features/transaction/salesorder/view/bloc/salesorderview_event.dart';
 import 'package:maleva/features/transaction/salesorder/view/bloc/salesorderview_state.dart';
 import 'package:maleva/core/models/shared/customer_model.dart';
-import 'package:maleva/core/models/shared/employee_model.dart';
 import 'package:maleva/features/transaction/salesorder/models/sale_order_detail_model.dart';
 import 'package:maleva/features/transaction/salesorder/models/sale_order_master_model.dart';
 import 'package:maleva/features/operations/models/job_status_model.dart';
@@ -36,7 +35,7 @@ class SalesOrderViewBloc extends Bloc<SalesOrderViewEvent, SalesOrderViewState> 
       try {
         AppGlobals.CustomerList = (await _repository.selectCustomer()).map<CustomerModel>((e) => CustomerModel.fromJson(e)).toList();
         AppGlobals.JobStatusList = (await _repository.selectJobStatus()).map<JobStatusModel>((e) => JobStatusModel.fromJson(e)).toList();
-        AppGlobals.EmployeeList = (await _repository.selectEmployee('Sales', '')).map<EmployeeModel>((e) => EmployeeModel.fromJson(e)).toList();
+        AppGlobals.EmployeeList = await _repository.selectEmployee('Sales', '');
         final base = SalesOrderViewLoaded(
           dtpFromDate: today,
           dtpToDate: today,

@@ -1,10 +1,10 @@
-import 'package:maleva/core/network/api_constants.dart';
+import 'package:maleva/core/enquiry/enquiry_api.dart';
+import 'package:maleva/core/employee/email_inbox_api.dart';
+import 'dart:io';
+import 'package:maleva/core/employee/google_review_api.dart';
+import 'package:maleva/core/employee/employee_api.dart';
 import 'package:maleva/core/dashboard/dashboard_api.dart';
 import 'package:maleva/core/di/injection.dart';
-import 'dart:convert';
-import 'package:http/http.dart' as http;
-import 'package:intl/intl.dart';
-import 'package:maleva/core/network/api_client.dart';
 import 'package:maleva/core/utils/app_preferences.dart';
 import 'package:maleva/core/utils/app_globals.dart';
 import 'package:maleva/core/models/shared/email_model.dart';
@@ -36,49 +36,50 @@ class TransportDashboardRepository {
   Future<List<dynamic>> fetchPlanningData(int type) => sl<DashboardApi>().transportList(comid, type);
 
   // ─── Enquiry ───────────────────────────────────────────────────────────────
+  /// The open enquiries of the employee and their team (shared Java enquiry API).
   Future<List<dynamic>> fetchEnquiryData() async {
-    final result = await ApiClient.postRequest(ApiConstants.apiSelectEnquiryMaster, {
-      'Comid': comid, 'Fromdate': null, 'Todate': null, 'Employeeid': empRefId,
-      'Invoice': false, 'Id': 0, 'JId': 0, 'DashboardStatus': 2,
-    });
-
-    List<dynamic> list = result is List ? List.from(result) : [];
-    for (var i = 0; i < list.length; i++) {
-      list[i]['SForwardingDate'] = list[i]['ForwardingDate'] == null
-          ? ''
-          : DateFormat('dd-MM-yyyy HH:mm').format(DateTime.parse(list[i]['ForwardingDate']));
-    }
-
-    AppGlobals.EnquiryMasterList = list; // Keep legacy global sync
-    return list;
+    final rows = await GetIt.instance<EnquiryApi>().search(employeeId: empRefId, team: true);
+    AppGlobals.EnquiryMasterList = rows; // Keep legacy global sync
+    return rows;
   }
 
-  Future<void> cancelEnquiry(int id) async {
-    await ApiClient.postRequest('${ApiConstants.apiUpdateEnquiryMaster}$id&Comid=$comid&StatusName=CANCEL', null);
-  }
+  Future<void> cancelEnquiry(int id) => GetIt.instance<EnquiryApi>().setStatus(id, 'CANCEL');
 
   // ─── Emails ────────────────────────────────────────────────────────────────
   Future<List<EmployeeModel>> fetchEmployees() async {
-    final result = await ApiClient.postRequest('${ApiConstants.apiSelectEmployee}$comid&type=&type1=', null);
-    return result is List ? result.map((e) => EmployeeModel.fromJson(e)).toList() : [];
+    // the shared Java employee list
+    return GetIt.instance<EmployeeApi>().dropdown();
   }
 
-  Future<List<EmailModel>> fetchEmailsForEmployee(int employeeId) async {
-    final result = await ApiClient.postRequest(ApiConstants.apiSelectEmailData, [{'Id': employeeId}], headers: {'Comid': comid.toString()});
-    if (result is Map<String, dynamic> && result['unread_unreplied_emails'] is List) {
-      return (result['unread_unreplied_emails'] as List).map((e) => EmailModel.fromJson(e as Map<String, dynamic>)).toList();
-    }
-    return [];
-  }
+  /// The employee's unanswered mail of the last day (shared Java inbox).
+  Future<List<EmailModel>> fetchEmailsForEmployee(int employeeId) =>
+      GetIt.instance<EmailInboxApi>().unanswered(employeeId);
 
-  Future<void> saveEmails(List<Map<String, dynamic>> payload) async {
-    await ApiClient.postRequest(ApiConstants.apiInsertMailMaster, payload, headers: {'Comid': comid.toString()});
+  /// Keeps the ticked mails as the employee's inbox entries.
+  Future<void> saveEmails(int employeeId, List<EmailModel> emails) async {
+    await GetIt.instance<EmailInboxApi>().keep(employeeId, emails);
   }
 
   // ─── Google Reviews ────────────────────────────────────────────────────────
-  Future<void> saveGoogleReview(Map<String, dynamic> payload) async {
-    await ApiClient.postRequest(ApiConstants.apiGoogleReviewInsert, [payload]);
+  /// A new staff Google review on the shared Java API.
+  Future<void> saveGoogleReview({
+    required String refDate,
+    required int employeeId,
+    required int googleReview,
+    required String googleMsg,
+    required String shopName,
+    required String mobileNo,
+  }) async {
+    await GetIt.instance<GoogleReviewApi>().save(
+      refDate: refDate,
+      employeeId: employeeId,
+      googleReview: googleReview,
+      googleMsg: googleMsg,
+      shopName: shopName,
+      mobileNo: mobileNo,
+    );
   }
+
 
   // ─── RTI / PDO ─────────────────────────────────────────────────────────────
   Future<Map<String, dynamic>> fetchRTIData(String fromDate, String toDate, int driverId, int truckId, String search) async {
@@ -93,17 +94,14 @@ class TransportDashboardRepository {
     return {'masterList': masterList, 'detailList': detailList};
   }
 
+  /// Saves the checked lines' RTI status with their photos (Java port of
+  /// InsertRTIStatus / SP_RTIStatus).
   Future<void> saveRTIData(List<Map<String, dynamic>> selectedDetails, List<RTIDetailsViewModel> rawDetailsToUpload, int masterId) async {
-    final uri = Uri.parse('${ApiConstants.apiRTIDetailsInsert}$comid');
-    final request = http.MultipartRequest('POST', uri);
-    request.fields['objReceipt'] = jsonEncode(selectedDetails);
-    request.fields['Comid'] = comid.toString();
-
-    for (var d in rawDetailsToUpload) {
-      if (d.RTIMasterRefId == masterId && d.isChecked && d.imageFile != null) {
-        request.files.add(await http.MultipartFile.fromPath('Files_${d.Id}', d.imagePath!, filename: d.imageFile!.name));
-      }
-    }
-    await request.send();
+    final photos = <int, File>{
+      for (final d in rawDetailsToUpload)
+        if (d.RTIMasterRefId == masterId && d.isChecked && d.imageFile != null) d.Id: File(d.imageFile!.path),
+    };
+    await GetIt.instance<RtiApi>().saveStatuses(selectedDetails, photos: photos);
   }
+
 }

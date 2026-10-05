@@ -1,3 +1,5 @@
+import 'package:maleva/core/fleet/expiry_api.dart';
+import 'package:maleva/core/utils/json_read.dart';
 
 class TruckDetailsModel {
   int Id;
@@ -77,6 +79,47 @@ class TruckDetailsModel {
       this.PTPStickerExp,
       this.SIDExp
       );
+
+  /// A truck of the shared Java expiry list (`/api/master-reports/trucks/rows`),
+  /// its dates written as .NET TruckReportView wrote them (`yyyy/MM/dd`).
+  TruckDetailsModel.fromJavaExpiry(Map<String, dynamic> json)
+      : Id = JsonRead.integer(json['id']),
+        flag = 0,
+        ExpDate = '',
+        ExpApadBonam = '',
+        FromDate = '',
+        CompanyRefId = 0,
+        CNumberDisplay = '',
+        CNumber = 0,
+        TruckName = '',
+        TruckNumber = JsonRead.string(json['truckNumber']),
+        TruckNumber1 = JsonRead.string(json['truckNumber1']),
+        TruckType = JsonRead.string(json['vehicleType']),
+        Latitude = '',
+        longitude = '',
+        Active = 1,
+        Created_Date = '',
+        Modified_Date = '',
+        Modified_By = '',
+        RotexMyExp = ExpiryApi.legacyDate(json['rotexMyExp']),
+        RotexSGExp = ExpiryApi.legacyDate(json['rotexSGExp']),
+        PuspacomExp = ExpiryApi.legacyDate(json['puspacomExp']),
+        RotexMyExp1 = ExpiryApi.legacyDate(json['rotexMyExp1']),
+        RotexSGExp1 = ExpiryApi.legacyDate(json['rotexSGExp1']),
+        PuspacomExp1 = ExpiryApi.legacyDate(json['puspacomExp1']),
+        InsuratnceExp = ExpiryApi.legacyDate(json['insuranceExp']),
+        BonamExp = ExpiryApi.legacyDate(json['bonamExp']),
+        ApadExp = ExpiryApi.legacyDate(json['apadExp']),
+        ServiceExp = ExpiryApi.legacyDate(json['serviceExp']),
+        AlignmentExp = ExpiryApi.legacyDate(json['alignmentExp']),
+        GreeceExp = ExpiryApi.legacyDate(json['greaseExp']),
+        AlignmentLast = ExpiryApi.legacyDate(json['alignmentLast']),
+        GreeceLast = ExpiryApi.legacyDate(json['greaseLast']),
+        GearOilLast = ExpiryApi.legacyDate(json['gearOilLast']),
+        ServiceLast = ExpiryApi.legacyDate(json['serviceLast']),
+        GearOilExp = ExpiryApi.legacyDate(json['gearOilExp']),
+        PTPStickerExp = ExpiryApi.legacyDate(json['ptpStickerExp']),
+        SIDExp = ExpiryApi.legacyDate(json['sidExp']);
 
   TruckDetailsModel.fromJson(Map<String, dynamic> json)
       : Id = int.tryParse(json['Id']?.toString() ?? '') ?? 0,

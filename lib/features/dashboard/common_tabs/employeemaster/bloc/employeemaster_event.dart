@@ -71,3 +71,12 @@ class PreviousStepEvent extends EmployeeMasterEvent {
 class SaveEmployeeMasterEvent extends EmployeeMasterEvent {
   const SaveEmployeeMasterEvent();
 }
+/// The role list for the form's Role dropdown.
+class LoadRolesEvent extends EmployeeMasterEvent {
+  const LoadRolesEvent();
+}
+
+class SelectRoleEvent extends EmployeeMasterEvent {
+  final int? roleId;
+  const SelectRoleEvent(this.roleId);
+}

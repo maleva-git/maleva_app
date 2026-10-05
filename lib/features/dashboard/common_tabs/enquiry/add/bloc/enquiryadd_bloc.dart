@@ -1,12 +1,11 @@
-import 'package:maleva/core/network/api_constants.dart';
+import 'package:maleva/core/enquiry/enquiry_api.dart';
+import 'package:maleva/core/network/api_failure.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 import 'package:maleva/core/utils/app_globals.dart';
 import 'enquiryadd_event.dart';
 import 'enquiryadd_state.dart';
-import 'package:maleva/core/models/shared/response_view_model.dart';
-import 'package:maleva/core/network/legacy_api_repository.dart';
 import 'package:maleva/core/di/injection.dart';
 
 
@@ -45,41 +44,42 @@ class AddEnquiryBloc extends Bloc<AddEnquiryEvent, AddEnquiryState> {
     final m = event.saleMaster;
     if (m == null || m.isEmpty) return;
 
-    final notifyDate = m['ForwardingDate'] != null
-        ? _fmt(DateTime.parse(m['ForwardingDate'].toString()))
+    final notifyDate = m['forwardingDate'] != null
+        ? _fmt(DateTime.parse(m['forwardingDate'].toString()))
         : AddEnquiryState.now();
 
     String lETADate = AddEnquiryState.now();
     bool checkLETA = false;
-    if (m['ETA'] != null) {
+    if (m['eta'] != null) {
       checkLETA = true;
-      lETADate = _fmt(DateTime.parse(m['ETA'].toString()));
+      lETADate = _fmt(DateTime.parse(m['eta'].toString()));
     }
 
     String oETADate = AddEnquiryState.now();
     bool checkOETA = false;
-    if (m['OETA'] != null) {
+    if (m['oeta'] != null) {
       checkOETA = true;
-      oETADate = _fmt(DateTime.parse(m['OETA'].toString()));
+      oETADate = _fmt(DateTime.parse(m['oeta'].toString()));
     }
 
     String collectionDate = AddEnquiryState.now();
     bool checkCollection = false;
-    if (m['PickupDate'] != null) {
+    if (m['pickupDate'] != null) {
       checkCollection = true;
-      collectionDate = _fmt(DateTime.parse(m['PickupDate'].toString()));
+      collectionDate = _fmt(DateTime.parse(m['pickupDate'].toString()));
     }
 
     emit(state.copyWith(
-      editId: m['Id'] ?? 0,
-      custId: m['CustomerRefId'] ?? 0,
-      customerName: m['CustomerName'] ?? '',
-      jobTypeId: m['JobMasterRefId'] ?? 0,
-      jobTypeName: m['JobType'] ?? '',
-      lVessel: m['Loadingvesselname'] ?? '',
-      oVessel: m['Offvesselname'] ?? '',
-      lPort: m['SPort'] ?? '',
-      oPort: m['OPort'] ?? '',
+      // a Java enquiry row (`/api/enquiry-masters/search`)
+      editId: m['id'] ?? 0,
+      custId: m['customerRefId'] ?? 0,
+      customerName: m['customerName'] ?? '',
+      jobTypeId: m['jobMasterRefId'] ?? 0,
+      jobTypeName: m['jobType'] ?? '',
+      lVessel: m['loadingvesselname'] ?? '',
+      oVessel: m['offvesselname'] ?? '',
+      lPort: m['sport'] ?? '',
+      oPort: m['oport'] ?? '',
       notifyDate: notifyDate,
       collectionDate: collectionDate,
       lETADate: lETADate,
@@ -198,150 +198,31 @@ class AddEnquiryBloc extends Bloc<AddEnquiryEvent, AddEnquiryState> {
       SaveEnquiryEvent event, Emitter<AddEnquiryState> emit) async {
     emit(state.copyWith(status: AddEnquiryStatus.loading));
 
-    final Map<String, String> header = {
-      'Content-Type': 'application/json; charset=UTF-8',
-    };
-
-    final List<dynamic> master = [
-      {
-        'Id': state.editId,
-        'CompanyRefId': AppGlobals.Comid,
-        'UserRefId': null,
-        'EmployeeRefId': AppGlobals.EmpRefId == 0 ? null : AppGlobals.EmpRefId,
-        'AgentCompanyRefId': null,
-        'AgentMasterRefId': null,
-        'OAgentCompanyRefId': null,
-        'OAgentMasterRefId': null,
-        'CustomerRefId': state.custId,
-        'JobMasterRefId': state.jobTypeId,
-        'SaleType': '',
-        'CNumberDisplay': '',
-        'CNumber': 0,
-        'Coinage': 0,
-        'GrossAmount': 0,
-        'TaxAmount': 0,
-        'DiscountAmount': 0,
-        'Remarks': '',
-        'PlusAmount': 0,
-        'MinusAmount': 0,
-        'DODescription': '',
-        'Amount': 0,
-        'Offvesselname': state.oVessel,
-        'Loadingvesselname': state.lVessel,
-        'BillType': 'MY',
-        'SPort': state.lPort,
-        'OPort': state.oPort,
-        'Vessel': '',
-        'OVessel': '',
-        'Commodity': '',
-        'Cargo': '',
-        'ETA': state.checkLETA
-            ? DateTime.parse(state.lETADate).toIso8601String()
-            : null,
-        'ETB': null,
-        'ETD': null,
-        'OETA': state.checkOETA
-            ? DateTime.parse(state.oETADate).toIso8601String()
-            : null,
-        'OETB': null,
-        'OETD': null,
-        'DOCNo': null,
-        'InvoiceNo': null,
-        'TruckRefid': null,
-        'DriverRefid': null,
-        'AWBNo': '',
-        'BLCopy': '',
-        'Quantity': '',
-        'TotalWeight': '',
-        'TruckSize': '',
-        'JStatus': null,
-        'OStatus': 0,
-        'ForkliftbyRefid': null,
-        'SealbyRefid': null,
-        'SealbreakbyRefid': null,
-        'SealbyRefid2': null,
-        'SealbreakbyRefid2': null,
-        'SealbyRefid3': null,
-        'SealbreakbyRefid3': null,
-        'BoardingOfficerRefid': null,
-        'BoardingOfficer1Refid': null,
-        'BoardingAmount': 0,
-        'BoardingAmount1': 0,
-        'ForwardingEnterRef': '',
-        'ForwardingExitRef': '',
-        'ForwardingEnterRef2': '',
-        'ForwardingExitRef2': '',
-        'ForwardingEnterRef3': '',
-        'ForwardingExitRef3': '',
-        'ForwardingSMKNo': '',
-        'ForwardingSMKNo2': '',
-        'ForwardingSMKNo3': '',
-        'PortChargesRef': '',
-        'PortCharges': 0,
-        'SealAmount': 0,
-        'BreakSealAmount': 0,
-        'SealAmount2': 0,
-        'BreakSealAmount2': 0,
-        'SealAmount3': 0,
-        'BreakSealAmount3': 0,
-        'PickupDate': state.checkCollection
-            ? DateTime.parse(state.collectionDate).toIso8601String()
-            : null,
-        'DeliveryDate': null,
-        'WareHouseEnterDate': null,
-        'WareHouseExitDate': null,
-        'WareHouseAddress': '',
-        'PickupAddress': '',
-        'DeliveryAddress': '',
-        'Forwarding': '',
-        'Forwarding2': '',
-        'Forwarding3': '',
-        'Origin': '',
-        'Destination': '',
-        'SCN': '',
-        'LSCN': '',
-        'Zb': '',
-        'PTW': '',
-        'Zb2': '',
-        'ZbRef': '',
-        'ZbRef2': '',
-        'Forwarding1S1': '',
-        'Forwarding1S2': '',
-        'Forwarding2S1': '',
-        'Forwarding2S2': '',
-        'Forwarding3S1': '',
-        'Forwarding3S2': '',
-        'CurrencyValue': 0,
-        'ActualNetAmount': 0,
-        'ForwardingDate': DateTime.parse(state.notifyDate).toIso8601String(),
-        'Forwarding2Date': null,
-        'Forwarding3Date': null,
-      }
-    ];
-
     try {
-      final resultData = await sl<LegacyApiRepository>().apiAllinoneSelectArray(
-        '${ApiConstants.apiInsertEnquiry}?Comid=${AppGlobals.Comid}',
-        master,
-        header,
-        null,
+      await sl<EnquiryApi>().save(
+        id: state.editId,
+        billType: 'MY',
+        customerId: state.custId,
+        jobTypeId: state.jobTypeId,
+        employeeId: AppGlobals.EmpRefId,
+        forwardingDate: DateTime.parse(state.notifyDate),
+        loadingVessel: state.lVessel,
+        offVessel: state.oVessel,
+        loadingPort: state.lPort,
+        offPort: state.oPort,
+        eta: state.checkLETA ? DateTime.parse(state.lETADate) : null,
+        oeta: state.checkOETA ? DateTime.parse(state.oETADate) : null,
+        pickupDate: state.checkCollection ? DateTime.parse(state.collectionDate) : null,
       );
-
-      if (resultData != '') {
-        final ResponseViewModel value =
-        ResponseViewModel.fromJson(resultData);
-        if (value.IsSuccess == true) {
-          emit(state.copyWith(
-            status: AddEnquiryStatus.success,
-            successMessage: 'Created Successfully',
-          ));
-        } else {
-          emit(state.copyWith(
-            status: AddEnquiryStatus.error,
-            errorMessage: value.Message,
-          ));
-        }
-      }
+      emit(state.copyWith(
+        status: AddEnquiryStatus.success,
+        successMessage: 'Created Successfully',
+      ));
+    } on ApiFailure catch (failure) {
+      emit(state.copyWith(
+        status: AddEnquiryStatus.error,
+        errorMessage: failure.message,
+      ));
     } catch (error) {
       emit(state.copyWith(
         status: AddEnquiryStatus.error,

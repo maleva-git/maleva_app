@@ -1,3 +1,4 @@
+import 'package:maleva/core/models/shared/employee_model.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 import 'package:maleva/core/utils/app_preferences.dart';
@@ -23,7 +24,7 @@ class SaleOrderDetailsBloc extends Bloc<SaleOrderDetailsEvent, SaleOrderDetailsS
   List<dynamic> _jobTypeList = [];
   List<dynamic> _jobAllStatusList = [];
   List<dynamic> _jobTypeDetailsList = [];
-  List<dynamic> _employeeList = [];
+  List<EmployeeModel> _employeeList = [];
 
   SaleOrderDetailsBloc({required this.repository, SaleOrderApi? saleOrders})
       : _saleOrders = saleOrders ?? sl<SaleOrderApi>(),
@@ -102,7 +103,7 @@ class SaleOrderDetailsBloc extends Bloc<SaleOrderDetailsEvent, SaleOrderDetailsS
       final initData = await repository.fetchInitialData(event.billType);
 
       _agentCompanyList = initData['agentCompanies'];
-      _employeeList = initData['employees'];
+      _employeeList = List<EmployeeModel>.from(initData['employees'] as List);
 
       // Addresses logic could be stored here if needed for pickup/delivery dropdowns
 
@@ -197,8 +198,8 @@ class SaleOrderDetailsBloc extends Bloc<SaleOrderDetailsEvent, SaleOrderDetailsS
       // ── Seal / Break employees ─────────────────────────────────────────────
       String empName(dynamic refId) {
         if ((refId ?? 0) == 0) return '';
-        final found = _employeeList.where((e) => e['Id'] == refId).toList();
-        return found.isNotEmpty ? found[0]['AccountName'] ?? '' : '';
+        final found = _employeeList.where((e) => e.Id == refId).toList();
+        return found.isNotEmpty ? found[0].AccountName : '';
       }
 
       // ── Dates ─────────────────────────────────────────────────────────────

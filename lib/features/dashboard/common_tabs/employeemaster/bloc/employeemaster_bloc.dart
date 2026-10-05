@@ -1,5 +1,4 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:maleva/core/utils/app_globals.dart';
 import '../data/employee_repository.dart';
 import 'employeemaster_event.dart';
 import 'employeemaster_state.dart';
@@ -32,6 +31,7 @@ class EmployeeMasterBloc extends Bloc<EmployeeMasterEvent, EmployeeState> {
         : null,
   )) {
     _registerHandlers();
+    add(const LoadRolesEvent());
   }
 
   void _registerHandlers() {
@@ -51,6 +51,8 @@ class EmployeeMasterBloc extends Bloc<EmployeeMasterEvent, EmployeeState> {
     on<PreviousStepEvent>(_onPreviousStep);
     on<SaveEmployeeMasterEvent>(_onSave);
     on<SelectEmployeeRecordEvent>(_onSelectRecord);
+    on<LoadRolesEvent>(_onLoadRoles);
+    on<SelectRoleEvent>(_onSelectRole);
   }
 
   // ════════════════════════════════════════════════════════════════════════════
@@ -95,15 +97,8 @@ class EmployeeMasterBloc extends Bloc<EmployeeMasterEvent, EmployeeState> {
       ) async {
     final previous = state;
     try {
-      final comid = AppGlobals.storagenew.getInt('Comid') ?? 0;
-
-      // ✅ REFACTORED: Use repository
-      final resultData = await repository.deleteEmployee(id: event.id, comId: comid);
-
-      String message = 'Employee deleted successfully';
-      if (resultData != null && resultData is String && resultData.contains('Deleted')) {
-        message = resultData;
-      }
+      await repository.deleteEmployee(id: event.id);
+      const message = 'Employee deleted successfully';
 
       emit(EmployeeDeleteSuccess(message));
       await _fetchEmployees(emit);
@@ -115,19 +110,8 @@ class EmployeeMasterBloc extends Bloc<EmployeeMasterEvent, EmployeeState> {
 
   Future<void> _fetchEmployees(Emitter<EmployeeState> emit) async {
     try {
-      final comid = AppGlobals.storagenew.getInt('Comid') ?? 0;
-
-      // ✅ REFACTORED: Use repository
-      final resultData = await repository.fetchEmployees(comId: comid);
-
-      if (resultData != null && resultData is List && resultData.isNotEmpty) {
-        final records = resultData
-            .map((e) => EmployeeDetailsModel.fromJson(e as Map<String, dynamic>))
-            .toList();
-        emit(EmployeeListLoaded(allRecords: records, filteredRecords: records));
-      } else {
-        emit(const EmployeeListLoaded(allRecords: [], filteredRecords: []));
-      }
+      final records = await repository.fetchEmployees();
+      emit(EmployeeListLoaded(allRecords: records, filteredRecords: records));
     } catch (e) {
       emit(EmployeeError(e.toString()));
     }
@@ -215,30 +199,42 @@ class EmployeeMasterBloc extends Bloc<EmployeeMasterEvent, EmployeeState> {
   Future<void> _onSave(SaveEmployeeMasterEvent event, Emitter<EmployeeState> emit) async {
     if (state is! EmployeeFormState) return;
     final s = state as EmployeeFormState;
+    // every employee holds a role; without one the server would make them SUPERADMIN
+    if (s.employee.RoleId == 0) {
+      emit(const EmployeeError('Select a role'));
+      emit(s);
+      return;
+    }
     emit(s.copyWith(isSaving: true));
 
     try {
-      final comid = AppGlobals.storagenew.getInt('Comid') ?? 0;
-
-      // ✅ REFACTORED: Use repository
-      final resultData = await repository.saveEmployee(
-        body: [s.employee.toJson()],
-        comId: comid,
-      );
-
-      if (resultData != null && resultData is Map) {
-        final bool ok = resultData['ok'] ?? false;
-        final String msg = resultData['message'] ?? 'Something went wrong';
-        ok ? emit(EmployeeSaveSuccess(msg)) : emit(EmployeeError(msg));
-      } else {
-        final int id = int.tryParse(resultData.toString()) ?? 0;
-        id > 0
-            ? emit(const EmployeeSaveSuccess('Employee saved successfully ✅'))
-            : emit(const EmployeeError('Unexpected response'));
-      }
+      final id = await repository.saveEmployee(s.employee);
+      id > 0
+          ? emit(const EmployeeSaveSuccess('Employee saved successfully ✅'))
+          : emit(const EmployeeError('Unexpected response'));
     } catch (e) {
       emit(s.copyWith(isSaving: false));
       emit(EmployeeError(e.toString()));
     }
+  }
+
+  // ── Roles ──────────────────────────────────────────────────────────────────
+  Future<void> _onLoadRoles(LoadRolesEvent event, Emitter<EmployeeState> emit) async {
+    if (state is! EmployeeFormState) return;
+    final s = state as EmployeeFormState;
+    try {
+      emit(s.copyWith(roles: await repository.fetchRoles()));
+    } catch (e) {
+      // the form stays; without roles a save is refused with "Select a role"
+      emit(EmployeeError('Could not load the roles: $e'));
+      emit(s);
+    }
+  }
+
+  void _onSelectRole(SelectRoleEvent event, Emitter<EmployeeState> emit) {
+    if (state is! EmployeeFormState) return;
+    final s = state as EmployeeFormState;
+    s.employee.RoleId = event.roleId ?? 0;
+    emit(s.copyWith(employee: s.employee));
   }
 }

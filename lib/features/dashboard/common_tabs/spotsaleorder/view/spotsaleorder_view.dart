@@ -231,8 +231,8 @@ class _SpotSaleCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext ctx) {
-    final hasDoc = item['DocumentPath'] != null &&
-        item['DocumentPath'].toString().isNotEmpty;
+    final hasDoc = item['documentPath'] != null &&
+        item['documentPath'].toString().isNotEmpty;
 
     return GestureDetector(
       onTap: () => _navigate(ctx),
@@ -267,7 +267,7 @@ class _SpotSaleCard extends StatelessWidget {
               const SizedBox(width: 10),
               Expanded(
                 child: Text(
-                  item['SVehicleName'] ?? '-',
+                  item['vehicleName'] ?? '-',
                   style: AppTypography.heading1(color: colour.kWhite, fontWeight: FontWeight.bold),
                   overflow: TextOverflow.ellipsis,
                 ),
@@ -281,7 +281,7 @@ class _SpotSaleCard extends StatelessWidget {
                   borderRadius: BorderRadius.circular(20),
                 ),
                 child: Text(
-                  item['StatusName'] ?? '-',
+                  item['statusName'] ?? '-',
                   style: AppTypography.bodyMedium(color: colour.kWhite, fontWeight: FontWeight.w600),
                 ),
               ),
@@ -295,19 +295,19 @@ class _SpotSaleCard extends StatelessWidget {
               Row(children: [
                 Expanded(
                     child: _infoCell(Icons.confirmation_number_rounded,
-                        "AWB No", item['AWBNo'] ?? '-')),
+                        "AWB No", item['awbNo'] ?? '-')),
                 Expanded(
                     child: _infoCell(Icons.inventory_2_rounded,
-                        "Qty", item['Quantity']?.toString() ?? '-')),
+                        "Qty", item['quantity']?.toString() ?? '-')),
               ]),
               const SizedBox(height: 10),
               Row(children: [
                 Expanded(
                     child: _infoCell(Icons.scale_rounded,
-                        "Weight", item['TotalWeight']?.toString() ?? '-')),
+                        "Weight", item['totalWeight']?.toString() ?? '-')),
                 Expanded(
                     child: _infoCell(
-                        Icons.anchor_rounded, "Port", item['Port'] ?? '-')),
+                        Icons.anchor_rounded, "Port", item['port'] ?? '-')),
               ]),
             ]),
           ),
@@ -318,13 +318,13 @@ class _SpotSaleCard extends StatelessWidget {
               onTap: () => showDialog(
                 context: ctx,
                 builder: (_) => _ImagePreviewDialog(
-                    imageUrl: ApiConstants.port + item['DocumentPath']),
+                    imageUrl: ApiConstants.port + item['documentPath']),
               ),
               child: ClipRRect(
                 borderRadius: const BorderRadius.vertical(
                     bottom: Radius.circular(16)),
                 child: Image.network(
-                  ApiConstants.port + item['DocumentPath'],
+                  ApiConstants.port + item['documentPath'],
                   height: 140,
                   width: double.infinity,
                   fit: BoxFit.cover,
@@ -354,7 +354,7 @@ class _SpotSaleCard extends StatelessWidget {
   }
 
   void _navigate(BuildContext ctx) {
-    final id     = item['Id'] as int? ?? 0;
+    final id     = item['id'] as int? ?? 0;
     final rules  = AppGlobals.storagenew.getString('RulesType') ?? '';
 
     // Keep your existing navigation logic

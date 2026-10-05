@@ -1,6 +1,5 @@
-import 'package:maleva/core/network/api_constants.dart';
-import 'package:flutter/foundation.dart';
-import 'package:maleva/core/network/api_client.dart';
+import 'package:get_it/get_it.dart';
+import 'package:maleva/core/fleet/expiry_api.dart';
 import 'package:maleva/core/utils/app_globals.dart';
 import 'package:maleva/core/models/shared/truck_details_model.dart';
 
@@ -10,39 +9,17 @@ class DriverLicenseRepository {
 
     try {
 
-      final driverMaster = {
-        'ExpDate': "",
-        'Id': AppGlobals.EmpRefId,
-        'SFromDate': null,
-        'Comid': AppGlobals.Comid,
-      };
-
-      if (kDebugMode) debugPrint("➡️ Driver License Payload: $driverMaster");
-
-      final driverResult = await ApiClient.postRequest(
-          ApiConstants.apiSelectDriverDetails,
-          driverMaster
-      );
+      // the driver's own record: the server takes it from the driver's token
+      final driverResult = await GetIt.instance<ExpiryApi>().drivers(driverId: AppGlobals.EmpRefId);
 
       return {
-        'driverList': driverResult is List ? driverResult : [],
+        'driverList': driverResult,
         'truckList':  <TruckDetailsModel>[],
         'expApadBonam': '',
         'expServiceAlignGreece': '',
         'expDate': currentCommonExpDate,
       };
     } catch (e) {
-
-      if (e.toString().contains('500')) {
-        debugPrint("Backend sent 500. Handling gracefully.");
-        return {
-          'driverList': [],
-          'truckList': <TruckDetailsModel>[],
-          'expApadBonam': '',
-          'expServiceAlignGreece': '',
-          'expDate': currentCommonExpDate,
-        };
-      }
       throw Exception('Failed to load license data: $e');
     }
   }

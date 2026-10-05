@@ -117,30 +117,16 @@ class SparePartsBloc extends Bloc<SparePartsEvent, SparePartsState> {
     emit(s.copyWith(isSubmitting: true));
 
     try {
-      final comId = AppGlobals.storagenew.getInt('Comid') ?? 0;
-
-      final List<Map<String, dynamic>> body = [
-        {
-          "Comid": comId,
-          "Id": 0,
-          "TruckName": s.selectedTruck ?? '',
-          "DriverName": '',
-          "SpareParts": s.spareParts,
-          "EntryDate": s.selectedDate != null
-              ? DateFormat('yyyy-MM-dd').format(s.selectedDate!)
-              : DateFormat('yyyy-MM-dd').format(DateTime.now()),
-          "Amount": s.amount,
-          "DocumentPath": "",
-        }
-      ];
-
-      // ✅ REFACTORED: Using the injected repository
-      final isSuccess = await repository.submitSpareParts(
-        body: body,
-        comId: comId,
+      final truckId = int.tryParse(s.selectedTruck ?? '') ?? 0;
+      final id = await repository.submitSpareParts(
+        truckId: truckId,
+        spareParts: s.spareParts,
+        amount: double.tryParse(s.amount.replaceAll(',', '.')) ?? 0,
+        entryDate: DateFormat('yyyy-MM-dd').format(s.selectedDate ?? DateTime.now()),
         image: s.pickedImage,
         pdf: s.pickedPDF,
       );
+      final isSuccess = id > 0;
 
       if (isSuccess) {
         emit(const SparePartsSubmitSuccess());
@@ -185,18 +171,7 @@ class SparePartsBloc extends Bloc<SparePartsEvent, SparePartsState> {
     try {
       final from = DateFormat('yyyy-MM-dd').format(s.fromDate);
       final to   = DateFormat('yyyy-MM-dd').format(s.toDate);
-      final comId = AppGlobals.storagenew.getInt('Comid') ?? 0;
-
-      // ✅ REFACTORED: Using the injected repository
-      final resultData = await repository.fetchSparePartsRecords(
-          comId: comId,
-          fromDate: from,
-          toDate: to
-      );
-
-      final records = resultData != null && resultData is List
-          ? List<Map<String, dynamic>>.from(resultData)
-          : <Map<String, dynamic>>[];
+      final records = await repository.fetchSparePartsRecords(fromDate: from, toDate: to);
 
       emit(s.copyWith(records: records, isLoading: false));
     } catch (err) {

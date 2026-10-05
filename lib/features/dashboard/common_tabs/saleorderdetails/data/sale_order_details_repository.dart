@@ -1,3 +1,5 @@
+import 'package:get_it/get_it.dart';
+import 'package:maleva/core/employee/employee_api.dart';
 import 'package:maleva/core/lookups/job_steps.dart';
 import 'package:maleva/core/network/api_constants.dart';
 import 'package:maleva/core/network/api_client.dart';
@@ -13,13 +15,14 @@ class SaleOrderDetailsRepository {
     final maxNum = await fetchMaxOrderNo(billType);
     final addressResponse = await ApiClient.postRequest("${ApiConstants.apiSelectAddressList}$comid", null);
     final agentCompanyResponse = await ApiClient.postRequest("${ApiConstants.apiSelectAgentCompany}$comid", null);
-    final employeeResponse = await ApiClient.postRequest("${ApiConstants.apiSelectEmployee}$comid&AccountName=&Type=Operation", null);
+    // the Operation employees, from the shared Java employee list
+    final employees = await GetIt.instance<EmployeeApi>().dropdown(type: 'Operation');
 
     return {
       'maxSaleOrderNum': maxNum,
       'addresses': addressResponse is List ? addressResponse : [],
       'agentCompanies': agentCompanyResponse is List ? agentCompanyResponse : [],
-      'employees': employeeResponse is List ? employeeResponse : [],
+      'employees': employees,
     };
   }
 

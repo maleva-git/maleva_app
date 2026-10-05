@@ -1,6 +1,5 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:maleva/core/utils/app_globals.dart';
-import 'dart:convert';
 import '../data/emailinbox_repository.dart';
 import 'emailinbox_event.dart';
 import 'emailinbox_state.dart';
@@ -34,10 +33,8 @@ class EmailBloc extends Bloc<EmailEvent, EmailState> {
       // ✅ REFACTORED: Call repository
       final resultData = await repository.fetchEmployees(comId: comId);
 
-      if (resultData != null && resultData is List && resultData.isNotEmpty) {
-        final List<EmployeeModel> employees = resultData
-            .map<EmployeeModel>((e) => EmployeeModel.fromJson(e))
-            .toList();
+      if (resultData.isNotEmpty) {
+        final List<EmployeeModel> employees = resultData;
 
         final selected = employees.isNotEmpty ? employees.first : null;
 
@@ -84,36 +81,7 @@ class EmailBloc extends Bloc<EmailEvent, EmailState> {
       emit(current.copyWith(emailsLoading: true));
 
       try {
-        final master = [
-          {"Id": event.empId}
-        ];
-
-        final result = await repository.fetchEmails(body: master);
-        List<EmailModel> emails = [];
-
-        // ✅ FIX: result null illama irukka nu check pandrom
-        if (result != null) {
-          Map<String, dynamic> parsedData;
-
-          // ✅ FIX: String-a vantha atha Map-ku decode pandrom
-          if (result is String) {
-            parsedData = jsonDecode(result);
-          } else if (result is Map<String, dynamic>) {
-            parsedData = result;
-          } else {
-            throw Exception("Unknown API response format");
-          }
-
-          // List extract pandrom
-          if (parsedData["unread_unreplied_emails"] != null &&
-              parsedData["unread_unreplied_emails"] is List) {
-
-            final emailsJson = parsedData["unread_unreplied_emails"] as List;
-            emails = emailsJson
-                .map((e) => EmailModel.fromJson(e as Map<String, dynamic>))
-                .toList();
-          }
-        }
+        final emails = await repository.fetchEmails(employeeId: event.empId);
 
         emit(current.copyWith(
           emails: emails,
@@ -169,32 +137,12 @@ class EmailBloc extends Bloc<EmailEvent, EmailState> {
     emit(current.copyWith(saving: true));
 
     try {
-      final payload = toSave
-          .map((e) => {
-        'Id': 0,
-        'EmployeeRefId': current.selectedEmployee?.Id,
-        'EmailID': e.emailId,
-        'Subject': e.subject,
-        'Sender': e.sender,
-        'MessageId': e.messageId,
-        'ReceivedDate': e.receivedDate.toIso8601String(),
-        'Comid': AppGlobals.storagenew.getInt('Comid') ?? 0,
-        'IsUnread': e.isUnread ? 1 : 0,
-        'IsReplied': e.isReplied ? 1 : 0,
-        'Active': 1,
-      })
-          .toList();
-
-      // ✅ REFACTORED: Call repository
-      final result = await repository.saveEmails(body: payload);
-
+      final kept = await repository.saveEmails(
+        employeeId: current.selectedEmployee?.Id ?? 0,
+        emails: toSave,
+      );
       emit(current.copyWith(saving: false));
-
-      if (result != null && result.toString().isNotEmpty) {
-        emit(EmailSaveSuccess(result.toString()));
-      } else {
-        emit(const EmailError("Failed to save emails"));
-      }
+      emit(EmailSaveSuccess('$kept mail(s) saved'));
     } catch (e) {
       emit(current.copyWith(saving: false));
       emit(EmailError(e.toString()));

@@ -162,15 +162,7 @@ class TransportDashboardBloc extends Bloc<TransportDashboardEvent, TransportDash
       final toSave = state.emails.where((e) => e.isActive).toList();
       if (toSave.isEmpty) { emit(state.copyWith(isSavingEmails: false)); return; }
 
-      final comid = AppPreferences.getComid();
-      final payload = toSave.map((e) => {
-        'Id': 0, 'EmployeeRefId': state.selectedEmployee?.Id, 'EmailID': e.emailId,
-        'Subject': e.subject, 'Sender': e.sender, 'MessageId': e.messageId,
-        'ReceivedDate': e.receivedDate.toIso8601String(), 'Comid': comid,
-        'IsUnread': e.isUnread ? 1 : 0, 'IsReplied': e.isReplied ? 1 : 0, 'Active': 1,
-      }).toList();
-
-      await repository.saveEmails(payload);
+      await repository.saveEmails(state.selectedEmployee?.Id ?? 0, toSave);
       emit(state.copyWith(isSavingEmails: false));
     } catch (e) {
       emit(state.copyWith(isSavingEmails: false, errorMessage: e.toString()));
@@ -191,12 +183,14 @@ class TransportDashboardBloc extends Bloc<TransportDashboardEvent, TransportDash
   Future<void> _onSaveReview(SaveReviewRequested event, Emitter<TransportDashboardState> emit) async {
     emit(state.copyWith(isSavingReview: true));
     try {
-      final payload = {
-        'Id': 0, 'ShopName': event.shopName.toUpperCase(), 'MobileNo': event.mobileNo,
-        'GoogleReview': state.selectedReview.toString(), 'GoogleMsg': event.reviewMsg,
-        'RefDate': DateFormat('yyyy-MM-dd').format(state.selectedDate), 'EmpReffid': state.selectedEmpId,
-      };
-      await repository.saveGoogleReview(payload);
+      await repository.saveGoogleReview(
+        refDate: DateFormat('yyyy-MM-dd').format(state.selectedDate),
+        employeeId: state.selectedEmpId ?? 0,
+        googleReview: state.selectedReview,
+        googleMsg: event.reviewMsg,
+        shopName: event.shopName.toUpperCase(),
+        mobileNo: event.mobileNo,
+      );
       emit(state.copyWith(isSavingReview: false, selectedReview: 1, clearSelectedEmpId: true, selectedDate: DateTime.now()));
     } catch (e) {
       emit(state.copyWith(isSavingReview: false, errorMessage: e.toString()));
@@ -249,15 +243,14 @@ class TransportDashboardBloc extends Bloc<TransportDashboardEvent, TransportDash
     emit(state.copyWith(isSavingRTI: true));
     try {
       final master = state.filteredRTIMasterList.firstWhere((m) => m.Id == event.masterId);
-      final comid = AppPreferences.getComid();
       final empRefId = AppPreferences.getEmpRefId();
 
       final selectedDetails = state.rtiDetailList.where((x) => x.RTIMasterRefId == event.masterId && x.isChecked).map((x) => {
-        'Id': x.StatusId, 'CompanyRefId': comid, 'RTIMasterRefId': event.masterId,
-        'RTIDetailsRefId': x.Id, 'RTICNumberDisplay': master.RTINoDisplay, 'DriverName': master.DriverName,
-        'JobNumber': x.JobNo, 'SaleOrderMasterRefId': x.SaleOrderMasterRefId, 'CustomerMasterRefId': x.CustomerMasterRefId,
-        'TruckMasterRefId': master.TruckMasterRefId, 'DriverMasterRefId': empRefId, 'TruckName': master.TruckName,
-        'Active': x.isChecked ? 1 : 0, 'ImagePath': x.imagePath,
+        'id': x.StatusId, 'rtiMasterRefId': event.masterId,
+        'rtiDetailsRefId': x.Id, 'rtiCNumberDisplay': master.RTINoDisplay, 'driverName': master.DriverName,
+        'jobNumber': x.JobNo, 'saleOrderMasterRefId': x.SaleOrderMasterRefId, 'customerMasterRefId': x.CustomerMasterRefId,
+        'truckMasterRefId': master.TruckMasterRefId, 'driverMasterRefId': empRefId, 'truckName': master.TruckName,
+        'active': x.isChecked ? 1 : 0,
       }).toList();
 
       await repository.saveRTIData(selectedDetails, state.rtiDetailList, event.masterId);

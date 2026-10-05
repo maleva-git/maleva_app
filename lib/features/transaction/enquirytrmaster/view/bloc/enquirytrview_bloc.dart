@@ -145,26 +145,16 @@ class EnquiryViewBloc extends Bloc<EnquiryViewEvent, EnquiryViewState> {
     try {
       final empRefId = s.checkLEmp ? AppGlobals.EmpRefId : s.empId;
 
-      final master = {
-        'Comid':     AppGlobals.storagenew.getInt('Comid') ?? 0,
-        'Fromdate':  event.useDate ? s.fromDate : null,
-        'Todate':    event.useDate ? s.toDate : null,
-        'Employeeid': empRefId,
-        'Invoice':   s.checkEnq,
-        'Id':        s.custId,
-        'JId':       s.jobId,
-      };
-      final header = {'Content-Type': 'application/json; charset=UTF-8'};
-
-      final resultData = await _repository.fetchEnquiryMaster(master, header);
-
-      List<EnquiryMasterModel> masterList = [];
-      if (resultData.isNotEmpty) {
-        masterList = (resultData)
-            .map((e) => EnquiryMasterModel.fromJson(e))
-            .toList();
-        AppGlobals.EnquiryMasterList = masterList;
-      }
+      final rows = await _repository.fetchEnquiryMaster(
+        employeeId: empRefId,
+        customerId: s.custId,
+        jobTypeId: s.jobId,
+        invoice: s.checkEnq,
+        fromDate: event.useDate ? s.fromDate : null,
+        toDate: event.useDate ? s.toDate : null,
+      );
+      final masterList = rows.map(EnquiryMasterModel.fromJava).toList();
+      AppGlobals.EnquiryMasterList = masterList;
 
       emit(s.copyWith(masterList: masterList));
     } catch (e) {

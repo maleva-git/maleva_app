@@ -1,3 +1,4 @@
+import 'package:maleva/core/enquiry/enquiry_api.dart';
 import 'package:maleva/core/colors/colors.dart' as colour;
 import 'package:maleva/core/theme/app_typography.dart';
 import 'package:flutter/material.dart';
@@ -298,7 +299,7 @@ class _EnquiryCard extends StatelessWidget {
                           if (result == true && context.mounted) {
                             context
                                 .read<EnquiryBloc>()
-                                .add(CancelEnquiryEvent(item['Id']));
+                                .add(CancelEnquiryEvent(item['id']));
                           }
                         },
                       ),
@@ -320,11 +321,11 @@ class _EnquiryCard extends StatelessWidget {
         backgroundColor: Palette.white,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
         title: Text(
-          item['CustomerName'] ?? '',
+          item['customerName'] ?? '',
           style: AppTypography.bodyLarge(color: Palette.textDark2),
         ),
         content: Text(
-          'Date: ${item['SForwardingDate'] ?? ''}',
+          'Date: ${EnquiryApi.display(item['forwardingDate'])}',
           style: AppTypography.bodyLarge(color: Palette.textMuted),
         ),
         actions: [

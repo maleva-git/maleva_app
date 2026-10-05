@@ -435,7 +435,7 @@ class _StatsPanel extends StatelessWidget {
     final total = state.totalAmount;
     final balance = state.totalBalance;
     final paidCount = state.receiptMaster
-        .where((m) => (double.tryParse(m['Balance'].toString()) ?? 0) <= 0)
+        .where((m) => (double.tryParse(m['balance'].toString()) ?? 0) <= 0)
         .length;
     final pendingCount = state.receiptMaster.length - paidCount;
 
@@ -594,8 +594,8 @@ class _ReceiptCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final billAmount = double.tryParse(data['BillAmount'].toString()) ?? 0;
-    final balance = double.tryParse(data['Balance'].toString()) ?? 0;
+    final billAmount = double.tryParse(data['billAmount'].toString()) ?? 0;
+    final balance = double.tryParse(data['balance'].toString()) ?? 0;
     final isPaid = balance <= 0;
 
     return Container(
@@ -625,18 +625,12 @@ class _ReceiptCard extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                        Text(data['CustomerName'] ?? '',
+                        Text(data['customerName'] ?? '',
                             style: AppTypography.heading2(
                                 color: AppTokens.brandDark),
                             overflow: TextOverflow.ellipsis),
                         const SizedBox(height: 3),
-                        if (data['BillNo'] != null && data['BillNo'].toString().isNotEmpty && data['BillNo'].toString() != 'null')
-                          Text('${data['BillNo']} • ${data['BillDate']}',
-                              style: AppTypography.bodySmall(
-                                  color: AppTokens.brandMid
-                                      .withValues(alpha: 0.7)))
-                        else
-                          Text('Customer Summary',
+                        Text('Customer Summary',
                               style: AppTypography.bodySmall(
                                   color: AppTokens.brandMid
                                       .withValues(alpha: 0.7))),

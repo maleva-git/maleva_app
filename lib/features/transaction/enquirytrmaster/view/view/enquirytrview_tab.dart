@@ -699,9 +699,7 @@ class _FilterSheetState extends State<_FilterSheet> {
       value: _local.empName,
       disabled: _local.checkLEmp,
       onSearch: () async {
-        AppGlobals.EmployeeList = (await sl<EnquiryTrRepository>().selectEmployee('sales', 'admin'))
-            .map<EmployeeModel>((e) => EmployeeModel.fromJson(e))
-            .toList();
+        AppGlobals.EmployeeList = await sl<EnquiryTrRepository>().selectEmployee('sales', 'admin');
         if (!context.mounted) return;
         if (!_local.checkLEmp) {
           Navigator.push(

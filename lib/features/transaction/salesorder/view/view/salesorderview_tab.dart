@@ -1292,10 +1292,7 @@ class _FilterSheetState extends State<_FilterSheet> {
 
   Future<void> _pickEmployee(
       BuildContext context, SalesOrderViewBloc bloc) async {
-    AppGlobals.EmployeeList =
-        (await sl<SalesOrderViewRepository>().selectEmployee('sales', 'admin'))
-            .map<EmployeeModel>((e) => EmployeeModel.fromJson(e))
-            .toList();
+    AppGlobals.EmployeeList = await sl<SalesOrderViewRepository>().selectEmployee('sales', 'admin');
     if (!context.mounted) return;
     final r = await Navigator.push(
         context,

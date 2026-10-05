@@ -1,3 +1,6 @@
+import 'package:maleva/core/models/shared/employee_model.dart';
+import 'package:get_it/get_it.dart';
+import 'package:maleva/core/employee/employee_api.dart';
 import 'package:maleva/core/network/api_constants.dart';
 import 'dart:convert';
 import 'package:maleva/core/network/dio_client.dart';
@@ -25,20 +28,10 @@ class SalesOrderViewRepository {
     return [];
   }
 
-  Future<List<dynamic>> selectEmployee(String type, String type1) async {
-    final comid = AppGlobals.storagenew.getInt('Comid') ?? 0;
-    final url = "${ApiConstants.apiSelectEmployee}$comid&type=$type&type1=$type1";
-    final response = await _dioClient.dio.post(url, data: {});
-        dynamic responseData = response.data;
-    if (responseData is String) {
-      if (responseData.trim().isEmpty) return [];
-      responseData = jsonDecode(responseData);
-    }
-    if (responseData is List<dynamic>) {
-      return responseData;
-    }
-    return [];
-  }
+  /// The shared Java employee list for the pickers.
+  Future<List<EmployeeModel>> selectEmployee(String type, String type1) =>
+      GetIt.instance<EmployeeApi>().dropdown(type: type, type1: type1);
+
 
   Future<List<dynamic>> selectJobStatus() async {
     final comid = AppGlobals.storagenew.getInt('Comid') ?? 0;

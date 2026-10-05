@@ -1,3 +1,6 @@
+import 'package:intl/intl.dart';
+import 'package:maleva/core/utils/json_read.dart';
+
 
 class EmailModel {
   final String subject;
@@ -26,22 +29,36 @@ class EmailModel {
     this.isActive = false,
   });
 
-  factory EmailModel.fromJson(Map<String, dynamic> json) {
+  /// One unanswered mail of the shared Java inbox (`/api/email-inboxes/unanswered`).
+  /// The received time is UTC, as the mailbox gives it.
+  factory EmailModel.fromJava(Map<String, dynamic> json) {
+    final received = JsonRead.string(json['receivedDate']);
     return EmailModel(
-      subject: json["Subject"] ?? "",
-      messageId: json["MessageId"] ?? "",
-      name: json["Name"] ?? "",
-      employeeRefId: json["EmployeeRefId"] ?? 0,
-      emailId: json["EmailID"] ?? "",
-      sender: json["Sender"] ?? "",
-      receivedDate:
-      DateTime.tryParse(json["ReceivedDate"] ?? "") ?? DateTime.now(),
-      isUnread: json["IsUnread"] ?? false,
-      isReplied: json["IsReplied"] ?? false,
-      isActive: json["isActive"] ?? false,
-      debugInfo: json["DebugInfo"] ?? "",
+      subject: JsonRead.string(json['subject']),
+      messageId: JsonRead.string(json['messageId']),
+      name: JsonRead.string(json['name']),
+      employeeRefId: JsonRead.integer(json['employeeRefId']),
+      emailId: JsonRead.string(json['emailId']),
+      sender: JsonRead.string(json['sender']),
+      receivedDate: DateTime.tryParse(received.isEmpty || received.endsWith('Z') ? received : '${received}Z') ?? DateTime.now().toUtc(),
+      isUnread: json['isUnread'] == true,
+      isReplied: json['isReplied'] == true,
+      debugInfo: '',
     );
   }
+
+  /// The Java inbox entry to keep (SP_EmailInbox), as an active entry of [employeeId].
+  Map<String, dynamic> toJava(int employeeId) => {
+    'id': 0,
+    'employeeRefId': employeeId,
+    'emailId': emailId,
+    'subject': subject,
+    'sender': sender,
+    'receivedDate': DateFormat("yyyy-MM-dd'T'HH:mm:ss").format(receivedDate.toUtc()),
+    'isUnread': isUnread ? 1 : 0,
+    'isReplied': isReplied ? 1 : 0,
+    'active': 1,
+  };
 
   Map<String, dynamic> toJson() => {
     "Subject": subject,

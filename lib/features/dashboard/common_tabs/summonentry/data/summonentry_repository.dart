@@ -1,12 +1,8 @@
+import 'package:maleva/core/fleet/truck_entries_api.dart';
 import 'package:maleva/core/network/legacy_api_repository.dart';
 import 'package:maleva/core/di/injection.dart';
-import 'dart:convert';
 import 'dart:io';
-import 'package:http/http.dart' as http;
-import 'package:maleva/core/network/api_client.dart';
 
-
-import '../../../../../core/network/api_constants.dart';
 
 class SummonRepository {
   /// Loads the global truck list
@@ -14,37 +10,39 @@ class SummonRepository {
     // We pass null for context so it safely runs in the background
     await sl<LegacyApiRepository>().SelectTruckList(null, null);}
 
-  /// Fetches Summon records for the View page
-  Future<dynamic> fetchSummonRecords({
-    required int comId,
+  /// Summons dated in the days, from the shared Java API (the Java rows; a
+  /// driver gets the truck on their record).
+  Future<List<Map<String, dynamic>>> fetchSummonRecords({
     required String fromDate,
     required String toDate,
-  }) async {
-    final url = "${ApiConstants.apiGetSummonParts}$comId&Fromdate=$fromDate&Todate=$toDate";
-    return await ApiClient.postRequest(url, null);
-  }
+  }) =>
+      sl<TruckEntriesApi>().summons(fromDate: fromDate, toDate: toDate);
 
-  /// Submits a new Summon Entry with multipart form data (Files + JSON)
-  Future<bool> submitSummon({
-    required List<Map<String, dynamic>> body,
-    required int comId,
+  /// Adds a summon with its image and PDF (Java port of SP_Summon; for a
+  /// driver the server uses the truck on their record). Answers the id.
+  Future<int> submitSummon({
+    required int truckId,
+    required String summon,
+    required String country,
+    required String portPass,
+    required String truckLcnMnt,
+    required String levy,
+    required String fuel,
+    required double amount,
+    required String entryDate,
     File? image,
     File? pdf,
-  }) async {
-    final uri = Uri.parse("${ApiConstants.apiInsertSummonParts}?Comid=$comId");
-    final request = http.MultipartRequest("POST", uri);
-
-    request.fields["details"] = jsonEncode(body);
-    request.fields["Comid"] = comId.toString();
-
-    if (image != null) {
-      request.files.add(await http.MultipartFile.fromPath("Files", image.path));
-    }
-    if (pdf != null) {
-      request.files.add(await http.MultipartFile.fromPath("Files", pdf.path));
-    }
-
-    final response = await request.send();
-    return response.statusCode == 200;
-  }
+  }) =>
+      sl<TruckEntriesApi>().saveSummon(
+        truckId: truckId,
+        summon: summon,
+        country: country,
+        portPass: portPass,
+        truckLcnMnt: truckLcnMnt,
+        levy: levy,
+        fuel: fuel,
+        amount: amount,
+        entryDate: entryDate,
+        files: [if (image != null) image, if (pdf != null) pdf],
+      );
 }

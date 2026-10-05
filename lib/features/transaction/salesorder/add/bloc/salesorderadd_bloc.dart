@@ -7,7 +7,6 @@ import 'package:maleva/features/transaction/salesorder/add/bloc/salesorderadd_st
 import 'package:maleva/features/transaction/salesorder/add/bloc/sale_order_save_body.dart';
 import 'package:maleva/features/transaction/salesorder/add/data/salesorderadd_repository.dart';
 import 'package:maleva/core/models/shared/customer_model.dart';
-import 'package:maleva/core/models/shared/employee_model.dart';
 import 'package:maleva/core/models/shared/sale_edit_detail_model.dart';
 import 'package:maleva/core/models/shared/agent_model.dart';
 import 'package:maleva/core/models/shared/agent_company_model.dart';
@@ -15,10 +14,8 @@ import 'package:maleva/features/operations/models/job_all_status_model.dart';
 import 'package:maleva/features/operations/models/job_type_details_model.dart';
 import 'package:maleva/features/operations/models/job_type_model.dart';
 import 'package:maleva/core/di/injection.dart';
-import 'package:maleva/core/network/api_constants.dart';
-import 'package:maleva/core/network/legacy_api_repository.dart';
 import 'package:maleva/core/sale_order/sale_order_api.dart';
-import 'package:maleva/core/sale_order/sale_order_keys.dart';
+import 'package:maleva/core/enquiry/enquiry_api.dart';
 
 class SalesOrderAddBloc extends Bloc<SalesOrderAddEvent, SalesOrderAddState> {
   final BuildContext context;
@@ -46,7 +43,7 @@ class SalesOrderAddBloc extends Bloc<SalesOrderAddEvent, SalesOrderAddState> {
         final now = DateFormat("yyyy-MM-dd HH:mm:ss").format(DateTime.now());
         final today = DateFormat("yyyy-MM-dd").format(DateTime.now());
         AppGlobals.MaxSaleOrderNum = await _saleOrders.nextJobNo('MY'); AppGlobals.AddressList = await _repository.selectAddressList();
-        AppGlobals.AgentCompanyList = (await _repository.selectAgentCompany()).map<AgentCompanyModel>((e) => AgentCompanyModel.fromJson(e)).toList();AppGlobals.EmployeeList = (await _repository.selectEmployee('', 'Operation')).map<EmployeeModel>((e) => EmployeeModel.fromJson(e)).toList();final permission = _buildPermissions();
+        AppGlobals.AgentCompanyList = (await _repository.selectAgentCompany()).map<AgentCompanyModel>((e) => AgentCompanyModel.fromJson(e)).toList();AppGlobals.EmployeeList = await _repository.selectEmployee('', 'Operation');final permission = _buildPermissions();
         var base = SalesOrderAddLoaded(
           progress: true, dtpSaleOrderdate: today, dtpOETAdate: now, dtpOETBdate: now, dtpOETDdate: now,
           dtpLETAdate: now, dtpLETBdate: now, dtpLETDdate: now, dtpFlightTimedate: now, dtpPickUpdate: now,
@@ -61,7 +58,7 @@ class SalesOrderAddBloc extends Bloc<SalesOrderAddEvent, SalesOrderAddState> {
               pickups: order.pickups, deliveries: order.deliveries, isEnquiry: false);
           base = base.copyWith(invoiceNo: await _invoiceNo(base.editId));
         } else if (event.enquiry != null) {
-          base = await _loadMasterData(base, javaSaleOrderFromDotNet(event.enquiry!), isEnquiry: true);
+          base = await _loadMasterData(base, EnquiryApi.asSaleOrder(event.enquiry!), isEnquiry: true);
         }
         emit(base);
       } catch (e) {
@@ -831,11 +828,9 @@ class SalesOrderAddBloc extends Bloc<SalesOrderAddEvent, SalesOrderAddState> {
     }
   }
 
-  // The enquiry status has no Java API yet; this moves with the enquiry screens.
-  Future<void> _confirmEnquiry(int id) async {
-    final header = {'Content-Type': 'application/json; charset=UTF-8'};
-    await sl<LegacyApiRepository>().apiAllinoneSelectArray("${ApiConstants.apiUpdateEnquiryMaster}$id&Comid=${AppGlobals.Comid}&StatusName=CONFIRMED", null, header, context);
-  }
+  /// The enquiry this order came from is CONFIRMED (shared Java enquiry API).
+  Future<void> _confirmEnquiry(int id) => sl<EnquiryApi>().setStatus(id, 'CONFIRMED');
+
 
 
 }

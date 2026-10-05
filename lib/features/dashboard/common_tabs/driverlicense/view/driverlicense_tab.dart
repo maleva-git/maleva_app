@@ -18,19 +18,19 @@ const kGradient = LinearGradient(
 
 const double kTabletBreak = 600;
 
-// All 11 field keys shown in each driver card (label + map key)
+// All 11 field keys shown in each driver card (label + Java field of /api/master-reports/drivers/rows)
 const List<(String, String)> kDriverFields = [
   ('License Exp',   'licenseExp'),
-  ('GDL Exp',       'GDLExp'),
-  ('Kuantan Port',  'KuantanPort'),
-  ('Northport',     'NorthportPort'),
-  ('PKFZ Port',     'PkfzPort'),
-  ('KLIA Port',     'KliaPort'),
-  ('PGU Port',      'PguPort'),
-  ('Tanjung Port',  'TanjungPort'),
-  ('Penang Port',   'PenangPort'),
-  ('PTP Port',      'PtpPort'),
-  ('Westport',      'WestportPort'),
+  ('GDL Exp',       'gdlExp'),
+  ('Kuantan Port',  'kuantanPort'),
+  ('Northport',     'northportPort'),
+  ('PKFZ Port',     'pkfzPort'),
+  ('KLIA Port',     'kliaPort'),
+  ('PGU Port',      'pguPort'),
+  ('Tanjung Port',  'tanjungPort'),
+  ('Penang Port',   'penangPort'),
+  ('PTP Port',      'ptpPort'),
+  ('Westport',      'westportPort'),
 ];
 
 // ─── Embeddable Dashboard Widget ─────────────────────────────────────────────
@@ -224,9 +224,9 @@ class _DriverCard extends StatelessWidget {
                   const SizedBox(width: 8),
                   Expanded(
                     child: Text(
-                      _safe(item['DriverName']).isEmpty
+                      _safe(item['driverName']).isEmpty
                           ? '-'
-                          : _safe(item['DriverName']),
+                          : _safe(item['driverName']),
                       style: AppTypography.bodySmall(color: Colors.white),
                       overflow: TextOverflow.ellipsis,
                     ),

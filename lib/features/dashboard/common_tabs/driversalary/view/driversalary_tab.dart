@@ -117,11 +117,11 @@ class _SalaryDetailsDialogContentState extends State<_SalaryDetailsDialogContent
     super.dispose();
   }
 
+  /// The report's `dd/MM/yyyy HH:mm:ss` ('' for none) as `dd/MM/yyyy hh:mm a`.
   String _formatDate(dynamic dateString) {
     if (dateString == null || dateString.toString().isEmpty) return '-';
     try {
-      final dt = DateTime.parse(dateString.toString());
-      if (dt.year < 2000) return '-'; // Ignore 0001-01-01
+      final dt = DateFormat('dd/MM/yyyy HH:mm:ss').parseStrict(dateString.toString());
       return DateFormat('dd/MM/yyyy hh:mm a').format(dt);
     } catch (e) {
       return dateString.toString();
@@ -156,7 +156,7 @@ class _SalaryDetailsDialogContentState extends State<_SalaryDetailsDialogContent
                   const SizedBox(width: 8),
                   Expanded(
                     child: Text(
-                      item['CNumberDisplay']?.toString() ?? 'RTI DETAILS',
+                      item['rtiNo']?.toString() ?? 'RTI DETAILS',
                       style: AppTypography.heading2(
                           color: Colors.white, fontWeight: FontWeight.w700),
                     ),
@@ -177,36 +177,36 @@ class _SalaryDetailsDialogContentState extends State<_SalaryDetailsDialogContent
                       padding: const EdgeInsets.only(bottom: 24), // Space for the pill
                       child: Column(
                         children: [
-                          _DetailRow('RTI Date', item['SSaleDate']?.toString() ?? '-'),
-                          _DetailRow('Job No', item['JobNo']?.toString() ?? '-'),
-                          _DetailRow('Driver', item['DriverName']?.toString() ?? '-'),
-                          _DetailRow('Truck', item['TruckName']?.toString() ?? '-'),
-                          _DetailRow('Truck Type', item['TruckType']?.toString() ?? '-'),
+                          _DetailRow('RTI Date', item['rtiDate']?.toString() ?? '-'),
+                          _DetailRow('Job No', item['jobNo']?.toString() ?? '-'),
+                          _DetailRow('Driver', item['driverName']?.toString() ?? '-'),
+                          _DetailRow('Truck', item['truckName']?.toString() ?? '-'),
+                          _DetailRow('Truck Type', item['truckType']?.toString() ?? '-'),
                           const Divider(height: 24),
-                          _DetailRow('Customer', item['CustomerName']?.toString() ?? '-'),
-                          _DetailRow('Origin', item['Origin']?.toString() ?? '-'),
-                          _DetailRow('Destination', item['Destination']?.toString() ?? '-'),
-                          _DetailRow('Full Route', item['FullDestination']?.toString() ?? '-'),
+                          _DetailRow('Customer', item['customerName']?.toString() ?? '-'),
+                          _DetailRow('Origin', item['origin']?.toString() ?? '-'),
+                          _DetailRow('Destination', item['destination']?.toString() ?? '-'),
+                          _DetailRow('Full Route', item['place']?.toString() ?? '-'),
                           const Divider(height: 24),
-                          _DetailRow('Quantity', item['Quantity']?.toString() ?? '-'),
-                          _DetailRow('Pick Date', _formatDate(item['PickDate'])),
-                          _DetailRow('Delivery Date', _formatDate(item['DliveryDate'])),
-                          _DetailRow('E-Link', item['ELink']?.toString() ?? '-'),
-                          _DetailRow('EX-Link', item['EXLink']?.toString() ?? '-'),
-                          if (item['Remarks'] != null && item['Remarks'].toString().isNotEmpty)
-                            _DetailRow('Remarks', item['Remarks'].toString()),
-                          if (item['Comments'] != null && item['Comments'].toString().isNotEmpty)
-                            _DetailRow('Comments', item['Comments'].toString()),
+                          _DetailRow('Quantity', item['quantity']?.toString() ?? '-'),
+                          _DetailRow('Pick Date', _formatDate(item['pickupDate'])),
+                          _DetailRow('Delivery Date', _formatDate(item['deliveryDate'])),
+                          _DetailRow('E-Link', item['enterLink']?.toString() ?? '-'),
+                          _DetailRow('EX-Link', item['exitLink']?.toString() ?? '-'),
+                          if (item['remarks'] != null && item['remarks'].toString().isNotEmpty)
+                            _DetailRow('Remarks', item['remarks'].toString()),
+                          if (item['comments'] != null && item['comments'].toString().isNotEmpty)
+                            _DetailRow('Comments', item['comments'].toString()),
                           const Divider(height: 24),
-                          _DetailRow('Base Salary', item['Salary']?.toString() ?? '0.0'),
-                          _DetailRow('Pickup Amount', item['PickupAmount']?.toString() ?? '0.0'),
-                          _DetailRow('Drop Amount', item['DropAmount']?.toString() ?? '0.0'),
-                          _DetailRow('Sleeping Amount', item['SleepingAmount']?.toString() ?? '0.0'),
-                          _DetailRow('Exit Amount', item['ExitAmount']?.toString() ?? '0.0'),
-                          _DetailRow('Empty Delivery', item['EmptyDeliveryAmount']?.toString() ?? '0.0'),
-                          _DetailRow('Manpower Amount', item['ManpwAmount']?.toString() ?? '0.0'),
+                          _DetailRow('Base Salary', item['salary']?.toString() ?? '0.0'),
+                          _DetailRow('Pickup Amount', item['pickupAmount']?.toString() ?? '0.0'),
+                          _DetailRow('Drop Amount', item['dropAmount']?.toString() ?? '0.0'),
+                          _DetailRow('Sleeping Amount', item['sleepingAmount']?.toString() ?? '0.0'),
+                          _DetailRow('Exit Amount', item['exitAmount']?.toString() ?? '0.0'),
+                          _DetailRow('Empty Delivery', item['emptyDeliveryAmount']?.toString() ?? '0.0'),
+                          _DetailRow('Manpower Amount', item['manpowerAmount']?.toString() ?? '0.0'),
                           const Divider(height: 24),
-                          _DetailRow('Total Amount', item['Amount']?.toString() ?? '0.0'),
+                          _DetailRow('Total Amount', item['amount']?.toString() ?? '0.0'),
                         ],
                       ),
                     ),
@@ -566,10 +566,10 @@ class _SalaryCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final valStyle = AppTypography.bodyLarge(color: Palette.textDark2);
 
-    final rtiDate = item['SSaleDate']?.toString() ?? '-';
-    final rtiNo = item['CNumberDisplay']?.toString() ?? '-';
-    final jobNo = item['JobNo']?.toString() ?? '-';
-    final amount = item['Amount']?.toString() ?? '-';
+    final rtiDate = item['rtiDate']?.toString() ?? '-';
+    final rtiNo = item['rtiNo']?.toString() ?? '-';
+    final jobNo = item['jobNo']?.toString() ?? '-';
+    final amount = item['amount']?.toString() ?? '-';
 
     return InkWell(
       onTap: () => _showSalaryDetailsDialog(

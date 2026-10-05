@@ -1,8 +1,9 @@
 import 'package:maleva/core/theme/app_typography.dart';
+import 'package:maleva/core/network/api_failure.dart';
 import 'package:maleva/core/network/legacy_api_repository.dart';
 import 'package:maleva/core/di/injection.dart';
 import 'package:maleva/core/utils/system_helpers.dart';
-import 'package:maleva/core/network/api_constants.dart';
+import 'package:maleva/core/reports/transaction_report_api.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
@@ -26,7 +27,6 @@ import '../../../mastersearch/Port.dart';
 import '../bloc/prealertview_bloc.dart';
 import '../bloc/prealertview_event.dart';
 import 'package:maleva/core/colors/colors.dart' as colour;
-import 'package:maleva/core/models/shared/response_view_model.dart';
 import 'package:maleva/core/models/shared/customer_model.dart';
 import 'package:maleva/features/operations/models/job_status_model.dart';
 import 'package:maleva/features/operations/models/job_type_model.dart';
@@ -46,36 +46,28 @@ class PreAlertReport extends StatelessWidget {
 class _PreAlertPage extends StatelessWidget {
   const _PreAlertPage();
 
+  /// The report PDF from the shared Java pre-alert report (was .NET
+  /// TransactionReportApp/PreAlertReport). The port goes by name, as the jobs
+  /// store it, and the ETA choice by its value (1 OETA, 2 LETA, 3 either).
   Future<void> _generatePdf(BuildContext context, PreAlertLoaded s) async {
-    const reportName = 'PreAlertReport';
-    final master = {
-      'SoId':                0,
-      'Comid':               AppGlobals.storagenew.getInt('Comid') ?? 0,
-      'Fromdate':            s.fromDate,
-      'Todate':              s.toDate,
-      'CustomerId':          s.custId,
-      'DId':                 0,
-      'TId':                 0,
-      'Jobid':               s.jobId,
-      'SPort':               s.portId,
-      'completestatusnotshow': s.completeStatusNotShow,
-      'Search':              s.vessel.isNotEmpty ? s.vessel : null,
-      'Remarks':             '3',
-      'DeliveryDone':        s.checkDelivery,
-      'ETA':                 s.etaEnabled,
-      'ETAType':             s.etaRadioVal,
-      'Pickupdate':          s.checkPickUp,
-      'Cons':                s.checkConsolidated,
-    };
-    final header = {'Content-Type': 'application/json; charset=UTF-8'};
-    final resultData = await sl<LegacyApiRepository>().apiAllinoneSelectArray(
-        '${ApiConstants.apiPreAlertReport}$reportName', master, header, context);
-
-    if (resultData != null && resultData != '') {
-      final value = ResponseViewModel.fromJson(resultData);
-      if (value.IsSuccess == true) {
-        SystemHelpers.launchInBrowser(value.data1);
-      }
+    final messenger = ScaffoldMessenger.of(context);
+    try {
+      final url = await sl<TransactionReportApi>().preAlertUrl(
+        fromDate: s.fromDate,
+        toDate: s.toDate,
+        customerId: s.custId,
+        jobTypeId: s.jobId,
+        port: s.portId != 0 ? s.portName : null,
+        vessel: s.vessel,
+        discussion: s.checkPickUp,
+        eta: s.etaEnabled,
+        etaType: int.tryParse(s.etaVal) ?? 0,
+        deliveryDone: s.checkDelivery,
+        consolidated: s.checkConsolidated,
+      );
+      await SystemHelpers.launchInBrowser(url);
+    } on ApiFailure catch (failure) {
+      messenger.showSnackBar(SnackBar(content: Text(failure.message)));
     }
   }
 

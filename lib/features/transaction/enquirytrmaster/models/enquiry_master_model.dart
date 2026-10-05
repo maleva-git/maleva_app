@@ -43,7 +43,8 @@ class EnquiryMasterModel {
     required this.oPort,
   });
 
-  factory EnquiryMasterModel.fromJson(Map<String, dynamic> json) {
+  /// A Java enquiry row (`/api/enquiry-masters/search`).
+  factory EnquiryMasterModel.fromJava(Map<String, dynamic> json) {
     String formatDate(dynamic dateStr) {
       if (dateStr == null || dateStr.toString().isEmpty) return '';
       try {
@@ -54,25 +55,25 @@ class EnquiryMasterModel {
     }
 
     return EnquiryMasterModel(
-      id: json['Id'] ?? 0,
-      customerRefId: json['CustomerRefId'] ?? 0,
-      customerName: json['CustomerName']?.toString() ?? '',
-      jobMasterRefId: json['JobMasterRefId'] ?? 0,
-      jobType: json['JobType']?.toString() ?? '',
-      forwardingDate: json['ForwardingDate']?.toString() ?? '',
-      sForwardingDate: formatDate(json['ForwardingDate']),
-      pickupDate: json['PickupDate']?.toString() ?? '',
-      sPickupDate: formatDate(json['PickupDate']),
-      deliveryDate: json['DeliveryDate']?.toString() ?? '',
-      sDeliveryDate: formatDate(json['DeliveryDate']),
-      originRefId: json['OriginRefId'] ?? 0,
-      origin: json['Origin']?.toString() ?? '',
-      destinationRefId: json['DestinationRefId'] ?? 0,
-      destination: json['Destination']?.toString() ?? '',
-      quantity: json['Quantity']?.toString() ?? '',
-      totalWeight: json['TotalWeight']?.toString() ?? '',
-      sPort: json['SPort']?.toString() ?? '',
-      oPort: json['OPort']?.toString() ?? '',
+      id: json['id'] ?? 0,
+      customerRefId: json['customerRefId'] ?? 0,
+      customerName: json['customerName']?.toString() ?? '',
+      jobMasterRefId: json['jobMasterRefId'] ?? 0,
+      jobType: json['jobType']?.toString() ?? '',
+      forwardingDate: json['forwardingDate']?.toString() ?? '',
+      sForwardingDate: formatDate(json['forwardingDate']),
+      pickupDate: json['pickupDate']?.toString() ?? '',
+      sPickupDate: formatDate(json['pickupDate']),
+      deliveryDate: json['deliveryDate']?.toString() ?? '',
+      sDeliveryDate: formatDate(json['deliveryDate']),
+      originRefId: json['originRefId'] ?? 0,
+      origin: json['origin']?.toString() ?? '',
+      destinationRefId: json['destinationRefId'] ?? 0,
+      destination: json['destination']?.toString() ?? '',
+      quantity: json['quantity']?.toString() ?? '',
+      totalWeight: json['totalWeight']?.toString() ?? '',
+      sPort: json['sport']?.toString() ?? '',
+      oPort: json['oport']?.toString() ?? '',
     );
   }
 

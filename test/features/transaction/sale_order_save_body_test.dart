@@ -1,6 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:maleva/core/models/shared/sale_edit_detail_model.dart';
-import 'package:maleva/core/sale_order/sale_order_keys.dart';
+import 'package:maleva/core/enquiry/enquiry_api.dart';
 import 'package:maleva/features/transaction/salesorder/add/bloc/sale_order_save_body.dart';
 import 'package:maleva/features/transaction/salesorder/add/bloc/salesorderadd_state.dart';
 
@@ -91,8 +91,10 @@ void main() {
     expect(line['salesRate'], 50);
   });
 
-  test('an enquiry row reads as a Java sale order', () {
-    expect(javaSaleOrderFromDotNet({'CustomerRefId': 5, 'SPort': 'PKG', 'AWBNo': 'A1', 'OETA': null, 'LiveCPop': 1}),
-        {'customerRefId': 5, 'sPort': 'PKG', 'awbNo': 'A1', 'oeta': null, 'livecpop': 1});
+  test('a Java enquiry row reads as a Java sale order', () {
+    expect(EnquiryApi.asSaleOrder({'customerRefId': 5, 'sport': 'PKG', 'awbNo': 'A1', 'oeta': null, 'jstatus': 2,
+      'oagentCompanyRefId': 7, 'customerName': 'ACME'}),
+        {'customerRefId': 5, 'sPort': 'PKG', 'awbNo': 'A1', 'oeta': null, 'jStatus': 2, 'oAgentCompanyRefId': 7,
+          'customerName': 'ACME'});
   });
 }

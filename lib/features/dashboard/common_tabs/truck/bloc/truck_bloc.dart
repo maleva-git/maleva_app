@@ -3,9 +3,7 @@ import 'package:maleva/core/colors/colors.dart' as colour;
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
-import 'package:maleva/core/utils/app_globals.dart';
 import 'package:maleva/features/dashboard/common_tabs/truck/bloc/truck_state.dart';
-import '../../../../../core/models/model.dart';
 import '../data/truck_repository.dart';
 part 'truck_event.dart';
 
@@ -24,37 +22,9 @@ class TruckDetailsBloc extends Bloc<TruckDetailsEvent, TruckDetailsState> {
     emit(const TruckLoadingState());
 
     try {
-      final String currentDate =
-      DateFormat("yyyy-MM-dd").format(DateTime.now().add(const Duration(days: 5)));
-
-      final Map<String, dynamic> body = {
-        'ExpDate':                    currentDate,
-        'ExpApadBonam':               currentDate,
-        'ExpServiceAligmentGreece':   currentDate,
-        'Id':                         0,
-        'SFromDate':                  null,
-        'Comid':                      AppGlobals.Comid,
-        'AccountId':                  0,
-      };
-
-      final resultData = await repository.fetchTruckDetails(body: body);
-
-      if (resultData == null || resultData == "") {
-        emit(const TruckLoadedState(truckData: []));
-        return;
-      }
-
-      final value = ResponseViewModel.fromJson(resultData);
-      if (value.IsSuccess == true && value.data1 != null) {
-        final List<TruckDetailsModel> truckList = (value.data1 as List)
-            .map((e) => TruckDetailsModel.fromJson(e))
-            .toList()
-            .cast<TruckDetailsModel>();
-
-        emit(TruckLoadedState(truckData: truckList));
-      } else {
-        emit(const TruckLoadedState(truckData: []));
-      }
+      // .NET's window: every date due within the next 5 days
+      final truckList = await repository.fetchTruckDetails(until: DateTime.now().add(const Duration(days: 5)));
+      emit(TruckLoadedState(truckData: truckList));
     } catch (error) {
 
       emit(TruckErrorState(errorMessage: error.toString()));
