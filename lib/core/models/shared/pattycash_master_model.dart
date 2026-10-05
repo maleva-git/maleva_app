@@ -1,4 +1,6 @@
+import 'package:intl/intl.dart';
 import 'package:maleva/core/models/shared/patty_cash_details_model.dart';
+import 'package:maleva/core/utils/json_read.dart';
 
 class PattycashMasterModel {
   int Id;
@@ -27,23 +29,34 @@ class PattycashMasterModel {
     required this.pattyCashDetails,
   });
 
-  factory PattycashMasterModel.fromJson(Map<String, dynamic> json) {
+  /// A petty cash of the shared Java `/api/petty-cash-masters` (`search` row
+  /// or `edit`): the date comes as `spettyCashDate` dd/MM/yyyy (or the raw
+  /// `pettyCashDate` on `edit`); the lines of `edit` are `pettyCashDetails`.
+  factory PattycashMasterModel.fromJava(Map<String, dynamic> json, {int companyId = 0}) {
+    dynamic f(String k) => JsonRead.field(json, k);
+    DateTime? day;
+    final shown = JsonRead.stringOrNull(f('sPettyCashDate'));
+    if (shown != null) {
+      try {
+        day = DateFormat('dd/MM/yyyy').parseStrict(shown);
+      } catch (_) {}
+    }
+    day ??= JsonRead.date(f('pettyCashDate'));
     return PattycashMasterModel(
-      Id: json['Id'],
-      companyRefId: json['CompanyRefId'],
-      employeeRefId: json['EmployeeRefId'],
-      cNumberDisplay: json['CNumberDisplay'],
-      employeeName: json['EmployeeName'],
-      pettyCashDate: DateTime.parse(json['PettyCashDate']),
-      paymentStatus: json['PaymentStatus'],
-      cNumber: json['CNumber'],
-      status: json['Status'],
-      amount: json['Amount'],
-      pattyCashDetails: json['PattyCashDetails'] != null
-          ? (json['PattyCashDetails'] as List<dynamic>)
-          .map((e) => PattyCashDetailsModel.fromJson(e))
-          .toList()
-          : [],
+      Id: JsonRead.integer(f('id')),
+      companyRefId: JsonRead.intOrNull(f('companyRefId')) ?? companyId,
+      employeeRefId: JsonRead.integer(f('employeeRefId')),
+      cNumberDisplay: JsonRead.stringOrNull(f('cNumberDisplay')),
+      employeeName: JsonRead.stringOrNull(f('employeeName')),
+      pettyCashDate: day ?? DateTime(1900),
+      paymentStatus: JsonRead.stringOrNull(f('paymentStatus')),
+      cNumber: JsonRead.integer(f('cNumber')),
+      status: JsonRead.integer(f('status')),
+      amount: JsonRead.stringOrNull(f('amount')),
+      pattyCashDetails: [
+        for (final line in JsonRead.listOfMaps(f('pettyCashDetails')))
+          PattyCashDetailsModel.fromJava(line, masterId: JsonRead.integer(f('id'))),
+      ],
     );
   }
 

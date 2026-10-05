@@ -1,3 +1,4 @@
+import 'package:maleva/core/utils/json_read.dart';
 import 'package:maleva/core/theme/app_typography.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -428,12 +429,11 @@ class _SalaryRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final rawDate = item['BoardingDate']?.toString() ?? '';
-    // Optional date format: take only the first 10 characters (YYYY-MM-DD) if it contains a 'T'
-    final billDate = rawDate.contains('T') ? rawDate.substring(0, 10) : rawDate;
-    final billNo = item['VesselName']?.toString() ?? '';
-    final empName = item['EmployeeName']?.toString() ?? '';
-    final netAmt = (item['Salary'] as num?)?.toDouble() ?? 0.0;
+    // the shared Java boarding salary row (boardingDate is yyyy-MM-dd)
+    final billDate = item['boardingDate']?.toString() ?? '';
+    final billNo = item['vesselName']?.toString() ?? '';
+    final empName = item['employeeName']?.toString() ?? '';
+    final netAmt = JsonRead.number(item['calculatedRate']);
 
     return InkWell(
       onTap: onTap,

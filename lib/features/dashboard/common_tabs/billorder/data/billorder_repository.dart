@@ -1,37 +1,12 @@
-import 'package:maleva/core/network/api_constants.dart';
-import 'package:maleva/core/network/api_client.dart';
-import 'package:maleva/core/utils/app_preferences.dart';
+import 'package:maleva/core/di/injection.dart';
+import 'package:maleva/core/finance/bills_order_api.dart';
 import 'package:maleva/core/models/shared/bill_view_model.dart';
 
+/// The pending bills orders of a period (shared Java `/api/bills-order`, was
+/// .NET BIllorderApp/SelectBillsOrderApp).
 class BillOrderRepository {
-
-  // Notice we removed the constructor!
-  // Since AppPreferences and ApiClient use static methods, we don't need dependency injection for them here.
-
   Future<List<BillViewModel>> fetchBillOrders(String fromDate, String toDate) async {
-    try {
-      // 1. Get Comid securely using your new static getter
-      final int comid = AppPreferences.getComid();
-
-      // 2. Construct the API URL using existing constants
-      final String apiUrl = "${ApiConstants.apiBillorderview}$comid&Fromdate=$fromDate&Todate=$toDate";
-
-      // 3. Make the static API call
-      final responseData = await ApiClient.postRequest(
-        apiUrl,
-        null,
-      );
-
-      // 4. Parse the data safely
-      if (responseData != null && responseData is List && responseData.isNotEmpty) {
-        return responseData
-            .map((e) => BillViewModel.fromJson(e as Map<String, dynamic>))
-            .toList();
-      }
-
-      return [];
-    } catch (e) {
-      throw Exception(e.toString());
-    }
+    final rows = await sl<BillsOrderApi>().pending(fromDate: fromDate, toDate: toDate);
+    return rows.map(BillViewModel.fromJava).toList();
   }
 }

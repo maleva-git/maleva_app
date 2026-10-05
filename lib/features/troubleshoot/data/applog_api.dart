@@ -1,96 +1,143 @@
 import 'dart:io';
-import 'package:http/http.dart' as http;
-import 'package:http_parser/http_parser.dart';
-import 'package:maleva/core/network/api_constants.dart';
 
-/// Sends a "Report a Problem" log file to the server.
+import 'package:flutter/foundation.dart';
+import 'package:maleva/core/di/injection.dart';
+import 'package:maleva/core/files/attachments_api.dart';
+import 'package:path_provider/path_provider.dart';
+
+/// "Report a Problem" logs, stored on the server under
+/// `/Upload/<company>/Troubleshoot/<user id>/` by the shared Java
+/// `/api/attachments` (was .NET CommonApp/UploadFile2, change
+/// `troubleshoot-on-shared-java-api`). The upload needs a signed-in session: a
+/// crash before sign-in is kept on the phone ([savePendingCrash]) and sent by
+/// [sendPending] once someone is signed in. A driver may upload only to their
+/// own Troubleshoot folder; the server enforces it.
 class AppLogApi {
   AppLogApi._();
 
-  static Future<dynamic> insertAppLog({
+  static const String folder = 'Troubleshoot';
+  static const String _pendingFolder = 'pending_troubleshoot';
+
+  /// Builds the log text the server keeps.
+  @visibleForTesting
+  static String buildLog({
     required int empRefId,
     required String empName,
     required int comid,
     required String appVersion,
-    required String screenHistory, // human-readable text block
-    required String errorLog,      // human-readable text block
-    String? userNote,              // optional — what the user typed
+    required String screenHistory,
+    required String errorLog,
+    String? userNote,
+  }) {
+    final log = StringBuffer();
+    log.writeln("==============================================");
+    log.writeln("            MALEVA TROUBLESHOOT LOG           ");
+    log.writeln("==============================================");
+    log.writeln("Employee ID   : $empRefId");
+    log.writeln("Employee Name : $empName");
+    log.writeln("Company ID    : ${comid == 0 ? 'unknown' : comid}");
+    log.writeln("App Version   : $appVersion");
+    log.writeln("Platform      : ${Platform.isAndroid ? 'Android' : (Platform.isIOS ? 'iOS' : 'Other')}");
+    log.writeln("Generated At  : ${DateTime.now().toString()}");
+    log.writeln("==============================================");
+    log.writeln("\n[USER NOTE]");
+    log.writeln(userNote != null && userNote.isNotEmpty ? userNote : "No notes provided by user.");
+    log.writeln("\n[SCREEN / NAVIGATION HISTORY]");
+    log.writeln(screenHistory.isNotEmpty ? screenHistory : "No history recorded.");
+    log.writeln("\n[ERROR LOG]");
+    log.writeln(errorLog.isNotEmpty ? errorLog : "No error log.");
+    log.writeln("==============================================");
+    return log.toString();
+  }
+
+  /// Sends a signed-in user's report (and any crash log kept from before
+  /// sign-in). Answers the stored file name; a refusal throws an ApiFailure.
+  static Future<String> insertAppLog({
+    required int empRefId,
+    required String empName,
+    required int comid,
+    required String appVersion,
+    required String screenHistory,
+    required String errorLog,
+    String? userNote,
+    AttachmentsApi? api,
+    Directory? pendingDir,
   }) async {
-    // 1. Construct the log text content
-    final logContent = StringBuffer();
-    logContent.writeln("==============================================");
-    logContent.writeln("            MALEVA TROUBLESHOOT LOG           ");
-    logContent.writeln("==============================================");
-    logContent.writeln("Employee ID   : $empRefId");
-    logContent.writeln("Employee Name : $empName");
-    logContent.writeln("Company ID    : $comid");
-    logContent.writeln("App Version   : $appVersion");
-    logContent.writeln("Platform      : ${Platform.isAndroid ? 'Android' : (Platform.isIOS ? 'iOS' : 'Other')}");
-    logContent.writeln("Generated At  : ${DateTime.now().toString()}");
-    logContent.writeln("==============================================");
-    logContent.writeln("\n[USER NOTE]");
-    logContent.writeln(userNote != null && userNote.isNotEmpty ? userNote : "No notes provided by user.");
-    logContent.writeln("\n[SCREEN / NAVIGATION HISTORY]");
-    logContent.writeln(screenHistory.isNotEmpty ? screenHistory : "No history recorded.");
-    logContent.writeln("\n[ERROR LOG]");
-    logContent.writeln(errorLog.isNotEmpty ? errorLog : "No error log.");
-    logContent.writeln("==============================================");
-
-    // 2. Write content to a local temporary .txt file
-    final tempDir = Directory.systemTemp;
-    final timestamp = DateTime.now().millisecondsSinceEpoch;
-    final fileName = "troubleshoot_log_${empRefId}_$timestamp.txt";
-    final file = File("${tempDir.path}/$fileName");
-    await file.writeAsString(logContent.toString());
-
+    final attachments = api ?? sl<AttachmentsApi>();
+    final fileName = "troubleshoot_log_${empRefId}_${DateTime.now().millisecondsSinceEpoch}.txt";
+    final file = File("${Directory.systemTemp.path}/$fileName");
+    await file.writeAsString(buildLog(
+      empRefId: empRefId,
+      empName: empName,
+      comid: comid,
+      appVersion: appVersion,
+      screenHistory: screenHistory,
+      errorLog: errorLog,
+      userNote: userNote,
+    ));
     try {
-      // 3. Prepare the multipart request to UploadFile2 endpoint
-      const uploadUrl = ApiConstants.apiPostFile; // "$port/api/CommonApp/UploadFile2/"
-      final uri = Uri.parse(uploadUrl);
-      final request = http.MultipartRequest("POST", uri);
+      final stored = await attachments.upload([file], folder: folder, recordId: empRefId, mode: AttachmentMode.mixed);
+      await sendPending(recordId: empRefId, api: attachments, pendingDir: pendingDir);
+      return stored.single;
+    } finally {
+      if (await file.exists()) await file.delete();
+    }
+  }
 
-      final stream = http.ByteStream(file.openRead());
-      stream.cast();
-      final length = await file.length();
+  /// Keeps a crash log from before sign-in on the phone (the app support
+  /// folder, which the temporary-file clean-up leaves alone). Never throws.
+  static Future<void> savePendingCrash({
+    required String screenHistory,
+    required String errorLog,
+    required String appVersion,
+    String? userNote,
+    Directory? pendingDir,
+  }) async {
+    try {
+      final dir = await _pending(pendingDir);
+      await File("${dir.path}/crash_${DateTime.now().millisecondsSinceEpoch}.txt").writeAsString(buildLog(
+        empRefId: 0,
+        empName: 'Startup crash (before sign-in)',
+        comid: 0,
+        appVersion: appVersion,
+        screenHistory: screenHistory,
+        errorLog: errorLog,
+        userNote: userNote,
+      ));
+    } catch (e) {
+      debugPrint('Could not keep the crash log: $e');
+    }
+  }
 
-      final multipartFile = http.MultipartFile(
-        'MyImages0', // key must match "MyImages0" as required by server API
-        stream,
-        length,
-        filename: fileName,
-        contentType: MediaType('image', 'jpeg'), // Use image/jpeg to ensure IIS/WAF parses it as a file upload
-      );
-
-      request.files.add(multipartFile);
-
-      // Add required headers for folder/file path construction on the server
-      request.headers.addAll({
-        'Comid': comid.toString(),
-        'Id': empRefId.toString(), // Saves under employee ID folder
-        'FolderName': 'Troubleshoot', // Main category folder
-        'FileName': fileName,
-        'SubFolderName': '', // Can be left empty
-      });
-
-      // Send the request exactly as done in SystemHelpers.upload
-      final response = await http.Response.fromStream(await request.send());
-
-      // 4. Delete the temporary file
-      if (await file.exists()) {
-        await file.delete();
-      }
-
-      if (response.statusCode == 200) {
-        return response.body;
-      } else {
-        throw Exception("Server responded with status code ${response.statusCode}");
+  /// Uploads the crash logs kept on the phone to the signed-in user's
+  /// Troubleshoot folder ([recordId]), deleting each once stored. Answers how
+  /// many were sent; never throws (what is left is tried again next time).
+  static Future<int> sendPending({required int recordId, AttachmentsApi? api, Directory? pendingDir}) async {
+    var sent = 0;
+    try {
+      final dir = await _pending(pendingDir);
+      final files = dir.listSync().whereType<File>().where((f) => f.path.endsWith('.txt')).toList();
+      if (files.isEmpty) return 0;
+      final attachments = api ?? sl<AttachmentsApi>();
+      for (final file in files) {
+        try {
+          await attachments.upload([file], folder: folder, recordId: recordId, mode: AttachmentMode.mixed);
+          await file.delete();
+          sent++;
+        } catch (e) {
+          debugPrint('Crash log not sent yet: $e');
+          break;
+        }
       }
     } catch (e) {
-      // Make sure file is deleted even on failure
-      if (await file.exists()) {
-        await file.delete();
-      }
-      rethrow;
+      debugPrint('Crash logs not sent: $e');
     }
+    return sent;
+  }
+
+  static Future<Directory> _pending(Directory? given) async {
+    final dir = given ?? Directory("${(await getApplicationSupportDirectory()).path}/$_pendingFolder");
+    if (!await dir.exists()) await dir.create(recursive: true);
+    return dir;
   }
 }

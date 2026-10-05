@@ -13,7 +13,15 @@ import 'package:maleva/core/job_order/job_order_api.dart';
 import 'package:maleva/core/planning/planning_api.dart';
 import 'package:maleva/core/planning/vessel_planning_api.dart';
 import 'package:maleva/core/rti/rti_api.dart';
+import 'package:maleva/core/rti/rti_entry_api.dart';
 import 'package:maleva/core/reports/transaction_report_api.dart';
+import 'package:maleva/core/finance/bills_order_api.dart';
+import 'package:maleva/core/employee/forwarding_salary_api.dart';
+import 'package:maleva/core/employee/boarding_salary_api.dart';
+import 'package:maleva/core/sale_order/cargo_inventory_api.dart';
+import 'package:maleva/core/fleet/driver_api.dart';
+import 'package:maleva/core/lookups/location_api.dart';
+import 'package:maleva/core/finance/petty_cash_api.dart';
 import 'package:maleva/core/sale_order/sale_order_api.dart';
 import 'package:maleva/core/utils/app_preferences.dart';
 import 'package:maleva/core/lookups/shared_lookups.dart';
@@ -74,6 +82,29 @@ void registerAuthModule(GetIt sl) {
   // driver salary, receipt balances and the pre-alert PDF (was .NET TransactionReportApp)
   sl.registerLazySingleton<TransactionReportApi>(
       () => TransactionReportApi(sl<JavaApiClient>().dio, companyId: AppPreferences.getComid));
+  // bills orders and petty cash (was .NET BIllorderApp)
+  sl.registerLazySingleton<BillsOrderApi>(
+      () => BillsOrderApi(sl<JavaApiClient>().dio, companyId: AppPreferences.getComid));
+  sl.registerLazySingleton<PettyCashApi>(
+      () => PettyCashApi(sl<JavaApiClient>().dio, companyId: AppPreferences.getComid));
+  // forwarding salaries (the shared /api/forwarding-salaries/entries)
+  sl.registerLazySingleton<ForwardingSalaryApi>(
+      () => ForwardingSalaryApi(sl<JavaApiClient>().dio, companyId: AppPreferences.getComid));
+  // boarding officers' salary (the shared /api/boarding-settlement/monthly-salary)
+  sl.registerLazySingleton<BoardingSalaryApi>(
+      () => BoardingSalaryApi(sl<JavaApiClient>().dio, companyId: AppPreferences.getComid));
+  // the cargo inventory by port (the shared /api/sale-orders/inventory)
+  sl.registerLazySingleton<CargoInventoryApi>(
+      () => CargoInventoryApi(sl<JavaApiClient>().dio, companyId: AppPreferences.getComid));
+  // drivers (the shared /api/driver-masters/search)
+  sl.registerLazySingleton<DriverApi>(
+      () => DriverApi(sl<JavaApiClient>().dio, companyId: AppPreferences.getComid));
+  // locations (the shared /api/location-master)
+  sl.registerLazySingleton<LocationApi>(
+      () => LocationApi(sl<JavaApiClient>().dio, companyId: AppPreferences.getComid));
+  // the RTI entry form (the shared /api/rti-masters create / update / revise / delete)
+  sl.registerLazySingleton<RtiEntryApi>(
+      () => RtiEntryApi(sl<JavaApiClient>().dio, companyId: AppPreferences.getComid));
   // job orders (the shared /api/job-orders)
   sl.registerLazySingleton<JobOrderApi>(
       () => JobOrderApi(sl<JavaApiClient>().dio, companyId: AppPreferences.getComid));

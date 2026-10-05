@@ -1,3 +1,4 @@
+import 'package:maleva/features/troubleshoot/data/applog_api.dart';
 import 'dart:async';
 
 import 'package:maleva/core/utils/app_globals.dart';
@@ -31,6 +32,8 @@ class AuthRepository {
       }
     }
     await sessionService.signIn(userName: username, password: password, driver: driverId == 1);
+    // crash logs kept from before sign-in go to this user's Troubleshoot folder
+    unawaited(AppLogApi.sendPending(recordId: AppPreferences.getEmpRefId()));
     if (tokenFetch != null) {
       unawaited(tokenFetch.then((_) => sessionService.syncDeviceToken(), onError: (_) {}));
     }

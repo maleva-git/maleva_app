@@ -22,6 +22,11 @@ class MockDioClient extends Mock implements DioClient {}
 class MockSessionManager extends Mock implements SessionManager {}
 
 /// The old lookup calls, answered by the shared Java APIs through every HTTP helper.
+/// A .NET-host URL of the old shape. The app calls none any more (the last,
+/// LoginApp/SelectLoginUser, was removed); routing must still leave such a URL
+/// on the legacy client.
+const legacyExample = '${AppConfig.baseUrl}/api/LegacyApp/Example?Comid=';
+
 void main() {
   late QueueAdapter adapter;
 
@@ -57,12 +62,11 @@ void main() {
       expect(LegacyCallAdapter.handles(url), isTrue, reason: url);
     }
     for (final url in [
-      '${ApiConstants.apiDriverViewRecords}6',
-      ApiConstants.apiSelectAllInventory,
+      '${legacyExample}6',
+      legacyExample,
       '${AppConfig.baseUrl}/api/StockApp/MaxStockInNo?Comid=6',
       // fuel calls go through FuelEntryApi now (fuel-entry-on-shared-java-api)
       '${AppConfig.baseUrl}/api/FuelEntryApp/SelectFuelEntry',
-      ApiConstants.apiInsertForwarding,
       'https://elsewhere.test/api/TruckApp/GetTruck',
     ]) {
       expect(LegacyCallAdapter.handles(url), isFalse, reason: url);

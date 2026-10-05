@@ -18,7 +18,6 @@ import 'package:maleva/features/operations/models/job_type_model.dart';
 import 'package:maleva/core/models/shared/get_truck_model.dart';
 import 'package:maleva/core/models/shared/barcode_print_model.dart';
 import 'package:maleva/core/models/shared/address_details_model.dart';
-import 'package:maleva/features/auth/models/user_login_model.dart';
 import 'package:maleva/core/models/shared/mainsetting_model.dart';
 import 'package:maleva/core/models/shared/customer_model.dart';
 import 'package:maleva/core/models/shared/truck_details_model.dart';
@@ -221,7 +220,6 @@ class AppGlobals {
 
   static List<EmployeeModel> EmployeeList = [];
   static EmployeeModel SelectEmployeeList = EmployeeModel.Empty();
-  static List<UserLoginModel> UserList = [];
   static List<CustomerModel> CustomerList = [];
   static List<LocationModel> LocationList = [];
   static List<WareHouseModel> WareHouseList = [];

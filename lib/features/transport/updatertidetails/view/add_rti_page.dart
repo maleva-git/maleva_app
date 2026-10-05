@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
-import 'dart:convert';
 import 'package:intl/intl.dart';
 import 'package:maleva/core/theme/app_typography.dart';
 import 'package:maleva/core/theme/palette.dart';
-import 'package:maleva/core/network/legacy_api_repository.dart';
+import 'package:maleva/core/network/api_failure.dart';
+import 'package:maleva/core/rti/rti_api.dart';
+import 'package:maleva/core/rti/rti_entry_api.dart';
+import 'package:maleva/core/utils/json_read.dart';
 import 'package:maleva/core/di/injection.dart';
 import 'package:maleva/core/utils/app_globals.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'package:maleva/core/network/api_constants.dart';
 import 'package:maleva/features/mastersearch/Driver.dart';
 import 'package:maleva/features/mastersearch/Truck.dart';
 import 'package:maleva/features/mastersearch/Customer.dart';
@@ -82,139 +83,125 @@ class _AddRtiPageState extends State<AddRtiPage> {
     }
   }
 
+  static final DateFormat _day = DateFormat('dd/MM/yyyy');
+  static const List<String> _links = ['', '1ST LINK', '2ND LINK'];
+  static const List<String> _empties = ['', 'EMPTY 80', 'EMPTY 50'];
+
+  /// The pickup / drop counts of an RTI saved from the web (the app has no
+  /// count fields); sent back so a save keeps them and their amounts.
+  int _pickupCount = 0;
+  int _dropCount = 0;
+
+  /// A Java date as the form shows it (dd/MM/yyyy); none or 1900 is ''.
+  String _dayOf(dynamic value) {
+    final d = JsonRead.date(value);
+    return d == null || d.year <= 1900 ? '' : _day.format(d);
+  }
+
+  /// The form's dd/MM/yyyy as an API date-time; the line's stored time is kept
+  /// when the day was not changed.
+  String? _apiTimeFor(dynamic shown, dynamic original) {
+    final text = shown?.toString() ?? '';
+    if (text.isEmpty) return null;
+    final kept = JsonRead.date(original);
+    if (kept != null && _day.format(kept) == text) return RtiEntryApi.apiTime(kept);
+    try {
+      return RtiEntryApi.apiTime(_day.parse(text));
+    } catch (_) {
+      return null;
+    }
+  }
+
+  static int _emptyCode(String v) => v == 'EMPTY 80' ? 1 : (v == 'EMPTY 50' ? 2 : 0);
+  static String _emptyOf(dynamic code) => {1: 'EMPTY 80', 2: 'EMPTY 50'}[JsonRead.integer(code)] ?? '';
+  static int _manpowerCode(String v) => v == '1' ? 1 : (v == '2' ? 2 : 0);
+
+  /// A stored link: 1ST LINK / 2ND LINK (the app saved LINK 1 / LINK 2 before).
+  static String _linkOf(dynamic value) {
+    final v = JsonRead.string(value).trim().toUpperCase();
+    const old = {'LINK 1': '1ST LINK', 'LINK 2': '2ND LINK'};
+    final link = old[v] ?? v;
+    return _links.contains(link) ? link : '';
+  }
+
+  /// A job line of the shared Java RTI (its stored row kept under 'java').
+  Map<String, dynamic> _lineFromJava(Map<String, dynamic> d) => {
+        'id': JsonRead.integer(d['saleOrderMasterRefId']),
+        'rtidetailsId': JsonRead.integer(d['id']),
+        'jobNo': JsonRead.string(d['jobNo']),
+        'customer': JsonRead.string(d['customerName']),
+        'date': _dayOf(d['jobDate']),
+        'salary': JsonRead.number(d['salary']),
+        'ppic': JsonRead.string(d['ppic']),
+        'dpic': JsonRead.string(d['dpic']),
+        'pwd': JsonRead.integer(d['pwdType']),
+        'origin': JsonRead.string(d['originD']),
+        'destination': JsonRead.string(d['destinationD']),
+        'pickupDate': _dayOf(d['pickupDateD']),
+        'deliveryDate': _dayOf(d['deliveryDateD']),
+        'java': d,
+      };
+
+  /// Loads the RTI from the shared Java RTI API (was .NET /RTI/EditRTI).
   Future<void> _loadEditData() async {
     final m = widget.editMaster;
     setState(() => _isLoading = true);
     try {
-      final comid = AppGlobals.storagenew.getInt('Comid') ?? 0;
-      final payload = {
-        'Id': m.Id ?? 0,
-        'SaleReturnNo': 0,
-        'Comid': comid
-      };
-      
-      final header = {'Content-Type': 'application/json; charset=UTF-8'};
-      
-      final res = await sl<LegacyApiRepository>().apiAllinone('${ApiConstants.port}/RTI/EditRTI', payload, header);
-      
-      if (res != null && res['ok'] == true && res['Data'] != null && (res['Data'] as List).isNotEmpty) {
-        final data = res['Data'][0];
-        setState(() {
-          _rtiId = data['Id'] ?? 0;
-          _rtiNoCtrl.text = data['CNumber']?.toString() ?? '';
-          try {
-            if (data['SSaleDate'] != null && data['SSaleDate'].toString().contains('/Date(')) {
-              final ms = int.parse(data['SSaleDate'].toString().replaceAll(RegExp(r'[^0-9]'), ''));
-              _rtiDate = DateFormat('dd/MM/yyyy').format(DateTime.fromMillisecondsSinceEpoch(ms));
-            } else if (data['SSaleDate'] != null) {
-              _rtiDate = DateFormat('dd/MM/yyyy').format(DateTime.parse(data['SSaleDate']));
-            } else {
-              _rtiDate = DateFormat('dd/MM/yyyy').format(DateTime.now());
-            }
-          } catch(e) {
-             _rtiDate = DateFormat('dd/MM/yyyy').format(DateTime.now());
-          }
-          
-          _driverId = data['DriverMasterRefId'] ?? data['DriverRefid'] ?? 0;
-          if (_driverId == 0 && m.DriverMasterRefId != null) _driverId = m.DriverMasterRefId!;
-          _driverName = data['DriverName']?.toString() ?? '';
-          if (_driverName.isEmpty && m.DriverName != null) _driverName = m.DriverName.toString();
-          if (_driverId == 0 && _driverName.isNotEmpty) {
-            for (var d in AppGlobals.GetDriverList) {
-              if (d.AccountName?.trim() == _driverName.trim()) {
-                _driverId = d.Id; break;
-              }
-            }
-          }
-          
-          _vehicleId = data['TruckRefid'] ?? data['TruckMasterRefId'] ?? 0;
-          if (_vehicleId == 0 && m.TruckMasterRefId != null) _vehicleId = m.TruckMasterRefId!;
-          _vehicleNo = data['TruckName']?.toString() ?? '';
-          if (_vehicleNo.isEmpty && m.TruckName != null) _vehicleNo = m.TruckName.toString();
-          if (_vehicleId == 0 && _vehicleNo.isNotEmpty) {
-            for (var t in AppGlobals.GetTruckList) {
-              if (t.AccountName?.trim() == _vehicleNo.trim()) {
-                _vehicleId = t.Id; break;
-              }
-            }
-          }
-          
-          _enterVal = data['ELink'] == null || data['ELink'] == 0 ? '' : (data['ELink'] == 1 ? 'LINK 1' : 'LINK 2');
-          _exitVal = data['EXLink'] == null || data['EXLink'] == 0 ? '' : (data['EXLink'] == 1 ? 'LINK 1' : 'LINK 2');
-          
-          if (data['ELink'] is String) _enterVal = data['ELink'];
-          if (data['EXLink'] is String) _exitVal = data['EXLink'];
-          
-          _sleepingAllow = data['Sleeping'] == 1 ? 'YES' : 'NO';
-          _emptyPickup = data['ExitYN'] == 0 ? '' : (data['ExitYN'] == 1 ? 'EMPTY 50' : 'EMPTY 80');
-          _emptyDelivery = data['EmptyDeliveryYN'] == 0 ? '' : (data['EmptyDeliveryYN'] == 1 ? 'EMPTY 50' : 'EMPTY 80');
-          _addPickup = data['Pickup'] == 1 ? 'YES' : 'NO';
-          _addDrop = data['AddDrop'] == 1 ? 'YES' : 'NO';
-          _manpower = data['Manpw'] == 0 ? 'NO' : 'YES';
-          
-          _punctuality = data['Punctuality'] == 1;
-          _docSub = data['DocumentSub'] == 1;
-          _multiPickup = data['PckHandling'] == 1;
-          
-          _destinationCtrl.text = data['Destination']?.toString() ?? '';
-          _sealByCtrl.text = data['SealBy']?.toString() ?? '';
-          _breakSealByCtrl.text = data['BreakSealBy']?.toString() ?? '';
-          _remarksCtrl.text = data['Remarks']?.toString() ?? '';
-          _commentsCtrl.text = data['Comments']?.toString() ?? '';
-        });
-        
-        if (data['SaleDetails'] != null) {
-          _jobDetails.clear();
-          for (var d in data['SaleDetails']) {
-            _jobDetails.add({
-              'id': d['SaleOrderMasterRefId'] ?? 0,
-              'rtidetailsId': d['SDId'] ?? 0,
-              'jobNo': d['JobNo']?.toString() ?? '',
-              'customer': d['CustomerName']?.toString() ?? '',
-              'date': () {
-                if (d['JobDate'] == null) return '';
-                try {
-                  if (d['JobDate'].toString().contains('/Date(')) {
-                    final ms = int.parse(d['JobDate'].toString().replaceAll(RegExp(r'[^0-9]'), ''));
-                    return DateFormat('dd/MM/yyyy').format(DateTime.fromMillisecondsSinceEpoch(ms));
-                  }
-                  return DateFormat('dd/MM/yyyy').format(DateTime.parse(d['JobDate']));
-                } catch(e) {
-                  return '';
-                }
-              }(),
-              'salary': d['Salary'] ?? 0.0,
-              'ppic': d['PPIC']?.toString() ?? '',
-              'dpic': d['DPIC']?.toString() ?? '',
-              'pwd': d['PWDType'] ?? 0,
-              'origin': d['OriginD']?.toString() ?? '',
-              'destination': d['DestinationD']?.toString() ?? '',
-              'pickupDate': d['PickupDateD']?.toString() ?? '',
-              'deliveryDate': d['DeliveryDateD']?.toString() ?? '',
-            });
-          }
-          _calculateAmount();
-        }
-      }
-    } catch(e, s) {
-      debugPrint("Error loading EditRTI: $e\n$s");
-      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Error loading RTI details: $e')));
+      final rti = await sl<RtiEntryApi>().load(JsonRead.integer(m.Id));
+      final data = rti.master;
+      dynamic f(String k) => JsonRead.field(data, k);
+      setState(() {
+        _rtiId = JsonRead.integer(f('id'));
+        _rtiNoCtrl.text = JsonRead.string(f('cNumberDisplay'));
+        final saleDate = _dayOf(f('saleDate'));
+        _rtiDate = saleDate.isEmpty ? _day.format(DateTime.now()) : saleDate;
+
+        _driverId = JsonRead.integer(f('driverRefId'));
+        _driverName = JsonRead.string(m.DriverName);
+        _vehicleId = JsonRead.integer(f('truckRefId'));
+        _vehicleNo = JsonRead.string(m.TruckName);
+
+        _enterVal = _linkOf(f('eLink'));
+        _exitVal = _linkOf(f('exLink'));
+        _sleepingAllow = JsonRead.integer(f('sleeping')) == 1 ? 'YES' : 'NO';
+        _emptyPickup = _emptyOf(f('exitYN'));
+        _emptyDelivery = _emptyOf(f('emptyDeliveryYN'));
+        _addPickup = JsonRead.integer(f('pickup')) == 1 ? 'YES' : 'NO';
+        _addDrop = JsonRead.integer(f('addDrop')) == 1 ? 'YES' : 'NO';
+        _pickupCount = JsonRead.integer(f('pickupCount'));
+        _dropCount = JsonRead.integer(f('dropCount'));
+        final manpower = JsonRead.integer(f('manpw'));
+        _manpower = manpower == 1 || manpower == 2 ? '$manpower' : 'NO';
+
+        _punctuality = JsonRead.integer(f('punctuality')) == 1;
+        _docSub = JsonRead.integer(f('documentSub')) == 1;
+        _multiPickup = JsonRead.integer(f('pckHandling')) == 1;
+
+        _destinationCtrl.text = JsonRead.string(f('destination'));
+        _sealByCtrl.text = JsonRead.string(f('sealBy'));
+        _breakSealByCtrl.text = JsonRead.string(f('breakSealBy'));
+        _remarksCtrl.text = JsonRead.string(f('remarks'));
+        _commentsCtrl.text = JsonRead.string(f('comments'));
+
+        _jobDetails = rti.lines.map(_lineFromJava).toList();
+      });
+      _calculateAmount();
+    } catch (e, s) {
+      debugPrint("Error loading RTI: $e\n$s");
+      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Error loading RTI details: ${e is ApiFailure ? e.message : e}')));
     } finally {
       if (mounted) setState(() => _isLoading = false);
     }
   }
-  
+
+  /// The number the new RTI will most likely get; the server assigns it on save.
   Future<void> _fetchMaxRtiNo() async {
     setState(() => _isLoading = true);
     try {
-      final comid = AppGlobals.storagenew.getInt('Comid') ?? 0;
-      final repo = sl<LegacyApiRepository>();
-      final res = await repo.apiAllinone('${ApiConstants.port}/RTI/MaxRTINo', {"Comid": comid});
-      if (res != null && res.isNotEmpty) {
-         if (mounted) setState(() => _rtiNoCtrl.text = res['No']?.toString() ?? '');
-      }
+      final no = await sl<RtiEntryApi>().nextNumberPreview();
+      if (mounted) setState(() => _rtiNoCtrl.text = no);
     } catch (e) {
-      debugPrint("Error fetching max RTI No: $e");
+      debugPrint("Error fetching the next RTI No: $e");
     } finally {
       if (mounted) setState(() => _isLoading = false);
     }
@@ -236,17 +223,21 @@ class _AddRtiPageState extends State<AddRtiPage> {
     _calculateAmount();
   }
 
+  /// The allowance amounts and total, by the shared rule React uses.
+  Map<String, num> _amounts() => RtiEntryApi.amounts(
+        salaries: _jobDetails.map((job) => JsonRead.number(job['salary'])),
+        sleeping: _sleepingAllow == 'YES',
+        exitYN: _emptyCode(_emptyPickup),
+        emptyDeliveryYN: _emptyCode(_emptyDelivery),
+        manpower: _manpowerCode(_manpower),
+        pickup: _addPickup == 'YES',
+        pickupCount: _pickupCount,
+        drop: _addDrop == 'YES',
+        dropCount: _dropCount,
+      );
+
   void _calculateAmount() {
-    double total = 0.0;
-    for (var job in _jobDetails) {
-      total += double.tryParse(job['salary'].toString()) ?? 0.0;
-    }
-    if (_sleepingAllow == 'YES') total += 50.0;
-    if (_exitVal == 'EMPTY 80') total += 80.0;
-    else if (_exitVal == 'EMPTY 50') total += 50.0;
-    if (_emptyDelivery == 'EMPTY 80') total += 80.0;
-    else if (_emptyDelivery == 'EMPTY 50') total += 50.0; 
-    
+    final total = _amounts()['amount']!.toDouble();
     setState(() {
       _totalAmount = total;
     });
@@ -265,6 +256,7 @@ class _AddRtiPageState extends State<AddRtiPage> {
     String pickupDate = '';
     String deliveryDate = '';
     int saleOrderId = 0;
+    String jobDate = '';
     bool isSearching = false;
 
     await showModalBottomSheet(
@@ -278,44 +270,15 @@ class _AddRtiPageState extends State<AddRtiPage> {
             if (jobNoCtrl.text.trim().isEmpty) return;
             setSheetState(() => isSearching = true);
             try {
-              final comid = AppGlobals.storagenew.getInt('Comid') ?? 0;
-              final repo = sl<LegacyApiRepository>();
-              final resRaw = await repo.apiAllinone(
-                '${ApiConstants.port}/RTI/SearchJobNo',
-                {"JobNo": jobNoCtrl.text.trim(), "Comid": comid},
-              );
-              
-              dynamic res = resRaw;
-              if (resRaw is String) {
-                if (resRaw.trim().isEmpty) return;
-                try { res = jsonDecode(resRaw); } catch (_) {}
-              }
-
-              if (res != null && res['ok'] == true && (res['data'] != null || res['Data'] != null)) {
-                final dataList = res['data'] ?? res['Data'];
-                if (dataList is List && dataList.isNotEmpty) {
-                  final job = dataList[0];
-                  // SaleOrderMasterRefId is 0 for new jobs — use Id instead
-                  final soRefId = job['SaleOrderMasterRefId'];
-                  saleOrderId = (soRefId != null && soRefId != 0) ? soRefId : (job['Id'] ?? 0);
-                  setSheetState(() {
-                    customerCtrl.text = job['CustomerName']?.toString() ?? '';
-                    salaryCtrl.text = (job['Salary'] ?? 0).toString();
-                    originCtrl.text = (job['OriginD'] ?? job['Origin'] ?? '').toString();
-                    destinationCtrl.text = (job['DestinationD'] ?? job['Destination'] ?? '').toString();
-                    // Parse pickup/delivery dates if available
-                    final pd = job['PickupDateD']?.toString() ?? '';
-                    final dd = job['DeliveryDateD']?.toString() ?? '';
-                    if (pd.isNotEmpty) {
-                      try { pickupDate = DateFormat('dd/MM/yyyy').format(DateFormat('MM/dd/yyyy HH:mm:ss').parse(pd)); } catch (_) { pickupDate = pd; }
-                    }
-                    if (dd.isNotEmpty) {
-                      try { deliveryDate = DateFormat('dd/MM/yyyy').format(DateFormat('MM/dd/yyyy HH:mm:ss').parse(dd)); } catch (_) { deliveryDate = dd; }
-                    }
-                  });
-                } else {
-                  if (ctx.mounted) ScaffoldMessenger.of(ctx).showSnackBar(const SnackBar(content: Text('Job not found')));
-                }
+              // the company's job with exactly this number (shared Java job search, was .NET /RTI/SearchJobNo)
+              final rows = await sl<RtiEntryApi>().searchJob(jobNoCtrl.text.trim());
+              if (rows.length == 1) {
+                final job = rows.first;
+                saleOrderId = JsonRead.integer(job['id']);
+                jobDate = _dayOf(job['jobDate']);
+                setSheetState(() {
+                  customerCtrl.text = JsonRead.string(job['customerName']);
+                });
               } else {
                 if (ctx.mounted) ScaffoldMessenger.of(ctx).showSnackBar(const SnackBar(content: Text('Job not found')));
               }
@@ -578,7 +541,7 @@ class _AddRtiPageState extends State<AddRtiPage> {
                             'rtidetailsId': 0,
                             'jobNo': jobNoCtrl.text.trim(),
                             'customer': customerCtrl.text.trim(),
-                            'date': '',
+                            'date': jobDate,
                             'salary': double.tryParse(salaryCtrl.text) ?? 0.0,
                             'ppic': ppicCtrl.text.trim(),
                             'dpic': dpicCtrl.text.trim(),
@@ -610,6 +573,7 @@ class _AddRtiPageState extends State<AddRtiPage> {
     );
   }
 
+  /// The RTI report PDF (shared Java report ticket, was .NET /RTI/RTIView and ReportViewer.aspx).
   Future<void> _viewRTI() async {
     if (_rtiId == 0) {
       if (mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Please load or save an RTI first.')));
@@ -617,28 +581,19 @@ class _AddRtiPageState extends State<AddRtiPage> {
     }
     setState(() => _isLoading = true);
     try {
-      final comid = AppGlobals.storagenew.getInt('Comid') ?? 0;
-      final repo = sl<LegacyApiRepository>();
-      final res = await repo.apiAllinone('${ApiConstants.port}/RTI/RTIView', {'SoId': _rtiId, 'Comid': comid});
-      if (res != null && res['ok'] == true) {
-        final timestamp = DateTime.now().millisecondsSinceEpoch;
-        final urlString = "${ApiConstants.port}/Reports/ReportViewer.aspx?ReportName=RTIReport&TimeStamp=$timestamp";
-        final uri = Uri.parse(urlString);
-        if (await canLaunchUrl(uri)) {
-          await launchUrl(uri, mode: LaunchMode.externalApplication);
-        } else {
-          if (mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Could not open PDF viewer.')));
-        }
-      } else {
-        if (mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Failed to generate PDF view.')));
+      final uri = Uri.parse(await sl<RtiApi>().reportUrl(_rtiId));
+      if (!await launchUrl(uri, mode: LaunchMode.externalApplication)) {
+        if (mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Could not open PDF viewer.')));
       }
     } catch (e) {
-      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Error viewing RTI: $e')));
+      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Error viewing RTI: ${e is ApiFailure ? e.message : e}')));
     } finally {
       if (mounted) setState(() => _isLoading = false);
     }
   }
 
+  /// Refreshes the job lines from their sales orders (shared Java revise, was
+  /// .NET /RTI/ReviseRTI); saved with the next Save.
   Future<void> _loadReviseData() async {
     if (_rtiId == 0) return;
     
@@ -657,56 +612,18 @@ class _AddRtiPageState extends State<AddRtiPage> {
 
     setState(() => _isLoading = true);
     try {
-      final comid = AppGlobals.storagenew.getInt('Comid') ?? 0;
-      final payload = {
-        'Id': _rtiId,
-        'SaleReturnNo': 0,
-        'Comid': comid
-      };
-      final res = await sl<LegacyApiRepository>().apiAllinone('${ApiConstants.port}/RTI/ReviseRTI', payload, {'Content-Type': 'application/json; charset=UTF-8'});
-      if (res != null && res['ok'] == true && res['Data'] != null && (res['Data'] as List).isNotEmpty) {
-        final data = res['Data'][0];
-        if (data['SaleDetails'] != null) {
-          _jobDetails.clear();
-          for (var d in data['SaleDetails']) {
-            _jobDetails.add({
-              'id': d['SaleOrderMasterRefId'] ?? 0,
-              'rtidetailsId': d['SDId'] ?? d['Id'] ?? 0,
-              'jobNo': d['JobNo']?.toString() ?? '',
-              'customer': d['CustomerName']?.toString() ?? '',
-              'date': () {
-                if (d['JobDate'] == null) return '';
-                try {
-                  if (d['JobDate'].toString().contains('/Date(')) {
-                    final ms = int.parse(d['JobDate'].toString().replaceAll(RegExp(r'[^0-9]'), ''));
-                    return DateFormat('dd/MM/yyyy').format(DateTime.fromMillisecondsSinceEpoch(ms));
-                  }
-                  return DateFormat('dd/MM/yyyy').format(DateTime.parse(d['JobDate']));
-                } catch(e) {
-                  return '';
-                }
-              }(),
-              'salary': d['Salary'] ?? 0.0,
-              'ppic': d['PPIC']?.toString() ?? '',
-              'dpic': d['DPIC']?.toString() ?? '',
-              'pwd': d['PWDType'] ?? 0,
-              'origin': d['OriginD']?.toString() ?? '',
-              'destination': d['DestinationD']?.toString() ?? '',
-              'pickupDate': d['PickupDateD']?.toString() ?? '',
-              'deliveryDate': d['DeliveryDateD']?.toString() ?? '',
-            });
-          }
-          _calculateAmount();
-          if (mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Sales Orders revised successfully')));
-        }
-      }
-    } catch(e) {
-      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Error: $e')));
+      final rti = await sl<RtiEntryApi>().revise(_rtiId);
+      setState(() => _jobDetails = rti.lines.map(_lineFromJava).toList());
+      _calculateAmount();
+      if (mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Sales Orders revised successfully')));
+    } catch (e) {
+      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Error: ${e is ApiFailure ? e.message : e}')));
     } finally {
       if (mounted) setState(() => _isLoading = false);
     }
   }
 
+  /// Deletes the RTI (shared Java delete, was .NET /RTI/DeleteRTI).
   Future<void> _deleteRTI() async {
     if (_rtiId == 0) {
       if (mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('No RTI loaded to delete.')));
@@ -734,112 +651,92 @@ class _AddRtiPageState extends State<AddRtiPage> {
 
     setState(() => _isLoading = true);
     try {
-      final comid = AppGlobals.storagenew.getInt('Comid') ?? 0;
-      final repo = sl<LegacyApiRepository>();
-      final res = await repo.apiAllinone('${ApiConstants.port}/RTI/DeleteRTI', {'SoId': _rtiId, 'Comid': comid});
-      if (res != null && res['ok'] == true) {
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('RTI Deleted Successfully!')));
-          Navigator.pop(context);
-        }
-      } else {
-        if (mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Failed to delete RTI.')));
+      await sl<RtiEntryApi>().delete(_rtiId);
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('RTI Deleted Successfully!')));
+        Navigator.pop(context);
       }
     } catch (e) {
-      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Error deleting RTI: $e')));
+      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Failed to delete RTI: ${e is ApiFailure ? e.message : e}')));
     } finally {
       if (mounted) setState(() => _isLoading = false);
     }
   }
 
+  /// The line fields the form does not edit, kept from the stored line, since a
+  /// save replaces every line.
+  static const List<String> _keptLineFields = [
+    'pickupAddressD', 'deliveryAddressD', 'pickupAddressTimelistD', 'pickupAddressQuantityD',
+    'deliveryAddressQuantityD', 'deliveryAddressdatelistD',
+  ];
+
+  /// Adds or updates the RTI (shared Java RTI API, was .NET /RTI/InsertRTI).
+  /// The server numbers a new RTI.
   Future<void> _saveRTI() async {
     if (_driverId == 0 || _vehicleId == 0) {
       if (mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Please select Driver and Vehicle')));
       return;
     }
-    
+    final jobs = _jobDetails.where((job) => JsonRead.integer(job['id']) > 0).toList();
+    if (jobs.isEmpty) {
+      if (mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Please add at least one job')));
+      return;
+    }
+
     setState(() => _isLoading = true);
     try {
-      final comid = AppGlobals.storagenew.getInt('Comid') ?? 0;
-      final repo = sl<LegacyApiRepository>();
-      
-      // DEBUG: print all job ids before building payload
-      print('=== RTI Save Debug: _jobDetails count = ${_jobDetails.length}');
-      for (var job in _jobDetails) {
-        print('  job id=${job['id']}, jobNo=${job['jobNo']}, customer=${job['customer']}');
-      }
-      
-      final saleOrderDetails = _jobDetails.map((job) => {
-        "Id": job['rtidetailsId'] ?? 0,
-        "SaleOrderMasterRefId": job['id'],
-        "RTIMasterRefId": _rtiId,
-        "JobNo": job['jobNo'],
-        "JobDate": job['date'] != null && job['date'].toString().isNotEmpty ? DateFormat('yyyy-MM-dd').format(DateFormat('dd/MM/yyyy').parse(job['date'])) : null,
-        "CustomerName": job['customer'],
-        "Salary": job['salary'] ?? 0.0,
-        "PPIC": job['ppic'] ?? '',
-        "DPIC": job['dpic'] ?? '',
-        "PWDType": job['pwd'] ?? 0,
-        "OriginD": job['origin'] ?? '',
-        "DestinationD": job['destination'] ?? '',
-        "PickupDateD": (job['pickupDate'] ?? '').toString().isNotEmpty
-            ? (() { try { return DateFormat('yyyy-MM-dd').format(DateFormat('dd/MM/yyyy').parse(job['pickupDate'])); } catch(_) { return null; } })()
-            : null,
-        "DeliveryDateD": (job['deliveryDate'] ?? '').toString().isNotEmpty
-            ? (() { try { return DateFormat('yyyy-MM-dd').format(DateFormat('dd/MM/yyyy').parse(job['deliveryDate'])); } catch(_) { return null; } })()
-            : null,
+      final lines = jobs.map((job) {
+        final stored = job['java'] is Map ? Map<String, dynamic>.from(job['java'] as Map) : <String, dynamic>{};
+        return <String, dynamic>{
+          for (final k in _keptLineFields) k: stored[k],
+          'saleOrderMasterRefId': JsonRead.integer(job['id']),
+          'salary': JsonRead.number(job['salary']),
+          'ppic': JsonRead.string(job['ppic']),
+          'dpic': JsonRead.string(job['dpic']),
+          'pwdType': JsonRead.integer(job['pwd']),
+          'originD': JsonRead.string(job['origin']),
+          'destinationD': JsonRead.string(job['destination']),
+          'pickupDateD': _apiTimeFor(job['pickupDate'], stored['pickupDateD']),
+          'deliveryDateD': _apiTimeFor(job['deliveryDate'], stored['deliveryDateD']),
+        };
       }).toList();
-      
-      final payload = [{
-        "Id": _rtiId,
-        "CompanyRefId": comid,
-        "UserRefId": null,
-        "AgentCompanyRefId": null,
-        "AgentMasterRefId": null,
-        "EmployeeRefId": null,
-        "SaleDate": DateFormat('yyyy-MM-dd').format(DateFormat('dd/MM/yyyy').parse(_rtiDate)),
-        "CNumberDisplay": 0,
-        "CNumber": 0,
-        "ELink": _enterVal,
-        "EXLink": _exitVal,
-        "Amount": _totalAmount,
-        "Sleeping": _sleepingAllow == 'YES' ? 1 : 0,
-        "SleepingAmount": 0,
-        "ExitYN": _emptyPickup == '' || _emptyPickup == 'NO' ? 0 : (_emptyPickup == 'EMPTY 80' ? 1 : 2),
-        "ExitAmount": 0,
-        "EmptyDeliveryYN": _emptyDelivery == '' || _emptyDelivery == 'NO' ? 0 : (_emptyDelivery == 'EMPTY 80' ? 1 : 2),
-        "EmptyDeliveryAmount": 0,
-        "Pickup": _addPickup == 'YES' ? 1 : 0,
-        "PickupCount": 0,
-        "PickupAmount": 0,
-        "AddDrop": _addDrop == 'YES' ? 1 : 0,
-        "DropCount": 0,
-        "DropAmount": 0,
-        "Remarks": _remarksCtrl.text,
-        "Comments": _commentsCtrl.text,
-        "SealBy": _sealByCtrl.text,
-        "BreakSealBy": _breakSealByCtrl.text,
-        "Destination": _destinationCtrl.text,
-        "TruckRefid": _vehicleId,
-        "DriverRefid": _driverId,
-        "Manpw": _manpower == 'NO' ? 0 : (_manpower == '1' ? 1 : 2),
-        "ManpwAmount": 0,
-        "SaleDetails": saleOrderDetails,
-        "DocumentSub": _docSub ? 1 : 0,
-        "PckHandling": _multiPickup ? 1 : 0,
-        "Punctuality": _punctuality ? 1 : 0,
-      }];
-      
-      final res = await repo.apiAllinone('${ApiConstants.port}/RTI/InsertRTI', payload, {'Comid': comid.toString(), 'Content-Type': 'application/json; charset=UTF-8'});
+
+      final master = <String, dynamic>{
+        if (_rtiId > 0) 'id': _rtiId,
+        'saleDate': RtiEntryApi.apiTime(_day.parse(_rtiDate)),
+        'eLink': _enterVal,
+        'exLink': _exitVal,
+        'sleeping': _sleepingAllow == 'YES' ? 1 : 0,
+        'exitYN': _emptyCode(_emptyPickup),
+        'emptyDeliveryYN': _emptyCode(_emptyDelivery),
+        'pickup': _addPickup == 'YES' ? 1 : 0,
+        'pickupCount': _pickupCount,
+        'addDrop': _addDrop == 'YES' ? 1 : 0,
+        'dropCount': _dropCount,
+        'manpw': _manpowerCode(_manpower),
+        ..._amounts(),
+        'remarks': _remarksCtrl.text,
+        'comments': _commentsCtrl.text,
+        'sealBy': _sealByCtrl.text,
+        'breakSealBy': _breakSealByCtrl.text,
+        'destination': _destinationCtrl.text,
+        'truckRefId': _vehicleId,
+        'driverRefId': _driverId,
+        'documentSub': _docSub ? 1 : 0,
+        'pckHandling': _multiPickup ? 1 : 0,
+        'punctuality': _punctuality ? 1 : 0,
+      };
+
+      final saved = await sl<RtiEntryApi>().save(master, lines);
       if (!mounted) return;
-      if (res != null && res['ok'] == true) {
-         msgshow('RTI Saved Successfully!', "", Colors.white, Colors.green, null, null, null, null, context, 0);
-         setState(() {
-           _rtiId = res['Id'] ?? _rtiId;
-         });
-      } else {
-         msgshow('Failed to save RTI', "", Colors.white, Colors.red, null, null, null, null, context, 0);
-      }
+      msgshow('RTI Saved Successfully!', "", Colors.white, Colors.green, null, null, null, null, context, 0);
+      setState(() {
+        _rtiId = JsonRead.integer(saved['id'], fallback: _rtiId);
+        final no = JsonRead.string(JsonRead.field(saved, 'cNumberDisplay'));
+        if (no.isNotEmpty) _rtiNoCtrl.text = no;
+      });
+    } on ApiFailure catch (e) {
+      if (mounted) msgshow(e.message, "", Colors.white, Colors.red, null, null, null, null, context, 0);
     } catch (e) {
       debugPrint("Error saving RTI: $e");
       if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Error: $e')));
@@ -944,8 +841,10 @@ class _AddRtiPageState extends State<AddRtiPage> {
   }
 
   List<DropdownMenuItem<String>> _getYesNoItems() => ['NO', 'YES'].map((e) => DropdownMenuItem(value: e, child: Text(e, style: AppTypography.bodySmall()))).toList();
-  List<DropdownMenuItem<String>> _getLinkItems() => ['','LINK 1', 'LINK 2'].map((e) => DropdownMenuItem(value: e, child: Text(e == '' ? 'SELECT' : e, style: AppTypography.bodySmall()))).toList();
-  List<DropdownMenuItem<String>> _getExitItems() => ['','EMPTY 50', 'EMPTY 80'].map((e) => DropdownMenuItem(value: e, child: Text(e == '' ? 'SELECT' : e, style: AppTypography.bodySmall()))).toList();
+  // the values the web and React store (1ST / 2ND LINK; EMPTY 80 / 50; manpower 1 or 2)
+  List<DropdownMenuItem<String>> _getManpowerItems() => ['NO', '1', '2'].map((e) => DropdownMenuItem(value: e, child: Text(e, style: AppTypography.bodySmall()))).toList();
+  List<DropdownMenuItem<String>> _getLinkItems() => _links.map((e) => DropdownMenuItem(value: e, child: Text(e == '' ? 'SELECT' : e, style: AppTypography.bodySmall()))).toList();
+  List<DropdownMenuItem<String>> _getExitItems() => _empties.map((e) => DropdownMenuItem(value: e, child: Text(e == '' ? 'SELECT' : e, style: AppTypography.bodySmall()))).toList();
 
   Widget _buildAllowancesCard() {
     return Card(
@@ -959,7 +858,7 @@ class _AddRtiPageState extends State<AddRtiPage> {
               children: [
                 Expanded(child: _buildDropdown('ENTER', _enterVal, _getLinkItems(), (v) { setState(() => _enterVal = v!); _calculateAmount(); })),
                 const SizedBox(width: 12),
-                Expanded(child: _buildDropdown('EXIT', _exitVal, _getExitItems(), (v) { setState(() => _exitVal = v!); _calculateAmount(); })),
+                Expanded(child: _buildDropdown('EXIT', _exitVal, _getLinkItems(), (v) { setState(() => _exitVal = v!); _calculateAmount(); })),
               ],
             ),
             const SizedBox(height: 16),
@@ -975,15 +874,15 @@ class _AddRtiPageState extends State<AddRtiPage> {
               children: [
                 Expanded(child: _buildDropdown('EMPTY DELIVERY', _emptyDelivery, _getExitItems(), (v) { setState(() => _emptyDelivery = v!); _calculateAmount(); })),
                 const SizedBox(width: 12),
-                Expanded(child: _buildDropdown('ADD PICKUP', _addPickup, _getYesNoItems(), (v) => setState(() => _addPickup = v!))),
+                Expanded(child: _buildDropdown('ADD PICKUP', _addPickup, _getYesNoItems(), (v) { setState(() => _addPickup = v!); _calculateAmount(); })),
               ],
             ),
             const SizedBox(height: 16),
             Row(
               children: [
-                Expanded(child: _buildDropdown('ADD DROP', _addDrop, _getYesNoItems(), (v) => setState(() => _addDrop = v!))),
+                Expanded(child: _buildDropdown('ADD DROP', _addDrop, _getYesNoItems(), (v) { setState(() => _addDrop = v!); _calculateAmount(); })),
                 const SizedBox(width: 12),
-                Expanded(child: _buildDropdown('MANPOWER', _manpower, _getYesNoItems(), (v) => setState(() => _manpower = v!))),
+                Expanded(child: _buildDropdown('MANPOWER', _manpower, _getManpowerItems(), (v) { setState(() => _manpower = v!); _calculateAmount(); })),
               ],
             ),
           ],

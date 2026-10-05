@@ -1,52 +1,24 @@
-import 'package:maleva/core/network/api_constants.dart';
-import 'package:maleva/core/network/api_client.dart';
+import 'package:maleva/core/di/injection.dart';
+import 'package:maleva/core/employee/boarding_salary_api.dart';
 import 'package:maleva/core/utils/app_preferences.dart';
-import 'package:maleva/core/models/shared/response_view_model.dart';
+import 'package:maleva/core/utils/json_read.dart';
 
+/// The boarding salary rows and their total (shared Java
+/// `/api/boarding-settlement/monthly-salary`, the React page's rate rule; was
+/// .NET BoardingSalaryApp/SelectBoardingSalaryByEmpId). An admin sees every
+/// officer of the company, anyone else their own.
 class SalaryRepository {
   Future<Map<String, dynamic>> fetchSalaryData(String fromDate, String toDate) async {
-    try {
-      final isAdmin = AppPreferences.getRulesType().toUpperCase() == 'ADMIN' || AppPreferences.getRoleId() == 1;
-      final master = {
-        'Comid': AppPreferences.getComid(),
-        'Employeeid': isAdmin ? 0 : AppPreferences.getEmpRefId(),
-        'FromDate': fromDate,
-        'ToDate': toDate,
-      };
-
-      // Assuming ApiClient.postRequest handles the headers internally
-      final response = await ApiClient.postRequest(
-        ApiConstants.apiSelectBoardingSalaryByEmpId,
-        master,
-      );
-
-      List<Map<String, dynamic>> salaryList = [];
-      double salaryAmount = 0.0;
-
-      if (response != null) {
-        final value = ResponseViewModel.fromJson(response);
-
-        if (value.IsSuccess == true && value.data1 != null) {
-          final rawList = value.data1 as List;
-
-          if (rawList.isNotEmpty) {
-            salaryList = rawList.cast<Map<String, dynamic>>();
-
-            // Calculate total inside the data layer
-            salaryAmount = salaryList.fold(
-              0.0,
-                  (sum, item) => sum + ((item["Salary"] as num?)?.toDouble() ?? 0.0),
-            );
-          }
-        }
-      }
-
-      return {
-        'salaryList': salaryList,
-        'salaryAmount': salaryAmount,
-      };
-    } catch (e) {
-      throw Exception('Failed to load salary data: $e');
-    }
+    final isAdmin = AppPreferences.getRulesType().toUpperCase() == 'ADMIN' || AppPreferences.getRoleId() == 1;
+    final salaryList = await sl<BoardingSalaryApi>().monthly(
+      fromDate: fromDate,
+      toDate: toDate,
+      employeeId: isAdmin ? 0 : AppPreferences.getEmpRefId(),
+    );
+    final salaryAmount = salaryList.fold<double>(0.0, (sum, item) => sum + JsonRead.number(item['calculatedRate']));
+    return {
+      'salaryList': salaryList,
+      'salaryAmount': salaryAmount,
+    };
   }
 }

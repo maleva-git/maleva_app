@@ -1,11 +1,10 @@
 import 'package:maleva/core/theme/app_typography.dart';
 import 'package:maleva/core/colors/colors.dart' as colour;
-import 'package:maleva/core/network/legacy_json_transport.dart';
+import 'package:maleva/core/finance/petty_cash_api.dart';
 import 'package:maleva/features/dashboard/common_tabs/pettycash/data/change_status_loader.dart';
 import 'package:flutter/material.dart';
 import 'package:maleva/core/utils/app_globals.dart';
 import 'core/models/model.dart';
-import 'package:maleva/core/network/legacy_api_repository.dart';
 import 'package:maleva/core/di/injection.dart';
 
 class ChangeStatusPage extends StatefulWidget {
@@ -24,8 +23,7 @@ class ChangeStatusPage extends StatefulWidget {
 
 class ChangeStatusPageState extends State<ChangeStatusPage> {
 
-  late final ChangeStatusLoader _loader = widget.loader ?? ChangeStatusLoader(
-      transport: LegacyArrayTransport(sl<LegacyApiRepository>()));
+  late final ChangeStatusLoader _loader = widget.loader ?? ChangeStatusLoader(api: sl<PettyCashApi>());
   late int EditId;
   bool progress = false;
   @override
@@ -46,7 +44,7 @@ class ChangeStatusPageState extends State<ChangeStatusPage> {
     setState(() {
       progress = false;
     });
-    await _loader.load().onError((error, stackTrace) {
+    await _loader.load(EditId).onError((error, stackTrace) {
       msgshow(
         error.toString(),
         stackTrace.toString(),

@@ -1,3 +1,4 @@
+import 'package:maleva/core/utils/json_read.dart';
 
 class LocationModel {
   int Id;
@@ -7,11 +8,12 @@ class LocationModel {
 
   LocationModel(this.Id,this.CompanyRefId, this.Location, this.Active);
 
-  LocationModel.fromJson(Map<String, dynamic> json)
-      : Id = int.tryParse(json['Id']?.toString() ?? '') ?? 0,
-        CompanyRefId = int.tryParse(json['CompanyRefId']?.toString() ?? '') ?? 0,
-        Location = json['Location'].toString(),
-        Active = int.tryParse(json['Active']?.toString() ?? '') ?? 0;
+  /// A location of the shared Java `/api/location-master/company/{id}/active`.
+  LocationModel.fromJava(Map<String, dynamic> json)
+      : Id = JsonRead.integer(JsonRead.field(json, 'id')),
+        CompanyRefId = JsonRead.integer(JsonRead.field(json, 'companyRefId')),
+        Location = JsonRead.string(JsonRead.field(json, 'location')),
+        Active = JsonRead.integer(JsonRead.field(json, 'active'));
   Map<String, dynamic> toJson() {
     return {
       'Id': Id,

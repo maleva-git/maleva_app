@@ -1,3 +1,4 @@
+import 'package:maleva/core/utils/json_read.dart';
 
 class InventoryModel {
   final String? jobType;
@@ -36,24 +37,26 @@ class InventoryModel {
     required this.id,
   });
 
-  factory InventoryModel.fromJson(Map<String, dynamic> json) {
+  /// A line of the shared Java `/api/sale-orders/inventory`.
+  factory InventoryModel.fromJava(Map<String, dynamic> json) {
+    dynamic f(String k) => JsonRead.field(json, k);
     return InventoryModel(
-      jobType: json['JobType']?.toString(),
-      offVesselName: json['OffVesselName']?.toString(),
-      customerName: json['CustomerName']?.toString(),
-      loadingVesselName: json['LoadingVesselName']?.toString(),
-      jobStatus: json['Jobstatus']?.toString(),
-      cargoQTY: json['CargoQTY']?.toString(),
-      cargoWeight: json['Cargoweight']?.toString(),
-      employeeName: json['EmployeeName']?.toString(),
-      CNumberDisplay: json['CNumberDisplay']?.toString(),
-      eta: json['ETA']?.toString(),
-      remarks: json['Remarks']?.toString(),
-      awbNo: json['AWBNo']?.toString(),
-      sourceTable: json['SourceTable']?.toString(),
-      oiDateIn: json['OIDateIn']?.toString(),
-      odiDateOut: json['ODIDateOut']?.toString(),
-      id: (json['Id'] ?? 0).toInt(),
+      jobType: JsonRead.stringOrNull(f('jobType')),
+      offVesselName: JsonRead.stringOrNull(f('offVesselName')),
+      customerName: JsonRead.stringOrNull(f('customerName')),
+      loadingVesselName: JsonRead.stringOrNull(f('loadingVesselName')),
+      jobStatus: JsonRead.stringOrNull(f('jobStatus')),
+      cargoQTY: JsonRead.stringOrNull(f('cargoQty')),
+      cargoWeight: JsonRead.stringOrNull(f('cargoWeight')),
+      employeeName: JsonRead.stringOrNull(f('employeeName')),
+      CNumberDisplay: JsonRead.stringOrNull(f('cNumberDisplay')),
+      eta: JsonRead.stringOrNull(f('eta')),
+      remarks: JsonRead.stringOrNull(f('remarks')),
+      awbNo: JsonRead.stringOrNull(f('awbNo')),
+      sourceTable: JsonRead.stringOrNull(f('sourceTable')),
+      oiDateIn: JsonRead.stringOrNull(f('oiDateIn')),
+      odiDateOut: JsonRead.stringOrNull(f('odiDateOut')),
+      id: JsonRead.integer(f('id')),
     );
   }
 

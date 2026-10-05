@@ -1,3 +1,5 @@
+import 'package:maleva/core/utils/json_read.dart';
+
 
 class BillViewModel {
   int Id;
@@ -44,29 +46,28 @@ class BillViewModel {
     required this.NetAmt,
   });
 
-  /// ✅ Create from JSON
-  factory BillViewModel.fromJson(Map<String, dynamic> json) {
+  /// A row of the shared Java `/api/bills-order/select-bills-order`.
+  factory BillViewModel.fromJava(Map<String, dynamic> json) {
+    dynamic f(String k) => JsonRead.field(json, k);
     return BillViewModel(
-      Id: json['Id'] ?? 0,
-      BillNoDisplay: json['BillNoDisplay'] ?? "",
-      BillNoDisplay1: json['BillNoDisplay1'] ?? "",
-      BillNo: json['BillNo'] ?? 0,
-      PStatus: json['PStatus'] ?? 0,
-      Fileupload: json['Fileupload'] ?? 0,
-      BillDate: json['BillDate'] ?? "",
-      InvoiceNo: json['InvoiceNo'] ?? "",
-      InvoiceDate: json['InvoiceDate'] ?? "",
-      BillTime: json['BillTime'] ?? "",
-      SaleType: json['SaleType'] ?? "",
-      SupplierName: json['SupplierName'] ?? "",
-      EmployeeName: json['EmployeeName'] ?? "",
-      CashierName: json['CashierName'],
-      TruckName: json['TruckName'] ?? "",
-      DriverName: json['DriverName'] ?? "",
-      BillStatus: json['BillStatus'],
-      Description: json['Description'],
-      Remarks: json['Remarks'],
-      NetAmt: (json['NetAmt'] ?? 0).toDouble(),
+      Id: JsonRead.integer(f('id')),
+      BillNoDisplay: JsonRead.string(f('billNoDisplay')),
+      BillNoDisplay1: JsonRead.string(f('billNoDisplay1')),
+      BillNo: JsonRead.integer(f('billNo')),
+      PStatus: JsonRead.integer(f('pStatus')),
+      Fileupload: JsonRead.integer(f('fileupload')),
+      BillDate: JsonRead.string(f('billDate')),
+      InvoiceNo: JsonRead.string(f('invoiceNo')),
+      InvoiceDate: JsonRead.string(f('invoiceDate')),
+      BillTime: JsonRead.string(f('billTime')),
+      SaleType: JsonRead.string(f('saleType')),
+      SupplierName: JsonRead.string(f('supplierName')),
+      EmployeeName: JsonRead.string(f('employeeName')),
+      TruckName: JsonRead.string(f('truckName')),
+      DriverName: JsonRead.string(f('driverName')),
+      BillStatus: JsonRead.stringOrNull(f('billStatus')),
+      Description: JsonRead.stringOrNull(f('description')),
+      NetAmt: JsonRead.number(f('netAmt')),
     );
   }
 

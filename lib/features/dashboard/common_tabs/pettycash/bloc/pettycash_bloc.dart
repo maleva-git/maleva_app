@@ -1,12 +1,10 @@
+import 'package:maleva/core/network/api_failure.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
-import 'package:maleva/core/utils/app_globals.dart';
 
 import '../data/pettycash_repository.dart';
 import 'pettycash_event.dart';
 import 'pettycash_state.dart';
-import 'package:maleva/core/models/shared/patty_cash_details_model.dart';
-import 'package:maleva/core/models/shared/pattycash_master_model.dart';
 
 class PettyCashBloc extends Bloc<PettyCashEvent, PettyCashState> {
   // ❌ REMOVED: final BuildContext context;
@@ -61,31 +59,9 @@ class PettyCashBloc extends Bloc<PettyCashEvent, PettyCashState> {
       final String fromStr = DateFormat('yyyy-MM-dd').format(fromDate);
       final String toStr = DateFormat('yyyy-MM-dd').format(toDate);
 
-      // ✅ REFACTORED: Using the injected repository without context
-      final resultData = await repository.fetchPettyCashData(
-        comId: AppGlobals.storagenew.getInt('Comid') ?? 0,
-        fromDate: fromStr,
-        toDate: toStr,
-      );
-
-      List<PattycashMasterModel> masters = [];
-      List<PattyCashDetailsModel> details = [];
-
-      if (resultData != null && resultData is List && resultData.isNotEmpty) {
-        final data = resultData[0];
-        if (data != null && data is Map) {
-          if (data['PattycashMasterModel'] != null) {
-            masters = (data['PattycashMasterModel'] as List)
-                .map((e) => PattycashMasterModel.fromJson(e as Map<String, dynamic>))
-                .toList();
-          }
-          if (data['PattyCashDetailsModel'] != null) {
-            details = (data['PattyCashDetailsModel'] as List)
-                .map((e) => PattyCashDetailsModel.fromJson(e as Map<String, dynamic>))
-                .toList();
-          }
-        }
-      }
+      final result = await repository.fetchPettyCashData(fromDate: fromStr, toDate: toStr);
+      final masters = result.masters;
+      final details = result.details;
 
       emit(PettyCashLoaded(
         masterRecords: masters,
@@ -95,7 +71,7 @@ class PettyCashBloc extends Bloc<PettyCashEvent, PettyCashState> {
       ));
     } catch (e) {
       emit(PettyCashError(
-        message: e.toString(),
+        message: e is ApiFailure ? e.message : e.toString(),
         fromDate: fromDate,
         toDate: toDate,
       ));

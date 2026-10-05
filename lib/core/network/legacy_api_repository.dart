@@ -6,6 +6,7 @@ import 'package:maleva/core/utils/app_globals.dart';
 import 'package:maleva/core/network/api_constants.dart';
 import 'package:maleva/core/stock/stock_in_api.dart';
 import 'package:maleva/core/rti/rti_api.dart';
+import 'package:maleva/core/lookups/location_api.dart';
 import 'package:maleva/core/employee/employee_api.dart';
 import 'package:maleva/core/network/dio_client.dart';
 import 'package:maleva/core/network/java_api_client.dart';
@@ -17,7 +18,6 @@ import 'package:maleva/core/models/shared/agent_company_model.dart';
 import 'package:maleva/features/operations/models/job_all_status_model.dart';
 import 'package:maleva/features/operations/models/job_type_model.dart';
 import 'package:maleva/core/models/shared/get_truck_model.dart';
-import 'package:maleva/features/auth/models/user_login_model.dart';
 import 'package:maleva/core/models/shared/customer_model.dart';
 import 'package:maleva/core/models/shared/truck_details_model.dart';
 import 'package:maleva/core/models/shared/ware_house_model.dart';
@@ -149,25 +149,6 @@ class LegacyApiRepository {
   }
 
 
-Future SelectUser(context) async {
-  try {
-    AppGlobals.UserList.clear();
-    var Comid = AppGlobals.storagenew.getInt('Comid') ?? 0;
-    try {
-  final resultData = _ensureList((await _routedPost(
-            Uri.encodeFull("${ApiConstants.apiSelectUser}$Comid"), data: null ?? {})).data);
-  if (resultData.isNotEmpty) {
-        AppGlobals.UserList = resultData
-            .map((element) => UserLoginModel.fromJson(element))
-            .toList();
-      }
-} catch (e) { print("API Error: $e"); }
-
-  } catch (error) {
-    if (error.toString() == "") {}
-  }
-}
-
 Future SelectCustomer(context) async {
   try {
     AppGlobals.CustomerList.clear();
@@ -188,21 +169,13 @@ Future SelectCustomer(context) async {
 }
 
 Future SelectLocation(context) async {
+  // the shared Java /api/location-master/company/{id}/active (was .NET LocationApp/SelectLocation)
+  AppGlobals.LocationList.clear();
   try {
-    AppGlobals.LocationList.clear();
-    var Comid = AppGlobals.storagenew.getInt('Comid') ?? 0;
-    try {
-  final resultData = _ensureList((await _routedPost(
-        Uri.encodeFull("${ApiConstants.apiSelectLocation}$Comid"), data: null ?? {})).data);
-  if (resultData.isNotEmpty) {
-        AppGlobals.LocationList = resultData
-            .map((element) => LocationModel.fromJson(element))
-            .toList();
-      }
-} catch (e) { print("API Error: $e"); }
-
-  } catch (error) {
-    if (error.toString() == "") {}
+    final rows = await GetIt.instance<LocationApi>().locations();
+    AppGlobals.LocationList = rows.map(LocationModel.fromJava).toList();
+  } catch (e) {
+    print("API Error: $e");
   }
 }
 

@@ -293,12 +293,24 @@ class _LicenseCard extends StatelessWidget {
   String get _licenseNo => record.licenseNo ?? '—';
   String get _accountCode => record.AccountCode ?? '';
 
+  /// The Java `yyyy-MM-dd` expiry (or the old `MM/dd/yyyy HH:mm:ss`).
+  static DateTime? _parseExpiry(String s) {
+    final iso = DateTime.tryParse(s);
+    if (iso != null) return iso;
+    try {
+      return DateFormat('MM/dd/yyyy HH:mm:ss').parse(s);
+    } catch (_) {
+      return null;
+    }
+  }
+
   bool get _isExpiringSoon {
     try {
       if (_licenseExp == null) return false;
       final s = _licenseExp.toString();
       if (s.startsWith('1900') || s.startsWith('01/01/1900')) return false;
-      final expiry = DateFormat('MM/dd/yyyy HH:mm:ss').parse(s);
+      final expiry = _parseExpiry(s);
+      if (expiry == null) return false;
       final diff = expiry.difference(DateTime.now()).inDays;
       return diff >= 0 && diff <= 30;
     } catch (_) {
@@ -311,8 +323,8 @@ class _LicenseCard extends StatelessWidget {
       if (_licenseExp == null) return false;
       final s = _licenseExp.toString();
       if (s.startsWith('1900') || s.startsWith('01/01/1900')) return false;
-      final expiry = DateFormat('MM/dd/yyyy HH:mm:ss').parse(s);
-      return expiry.isBefore(DateTime.now());
+      final expiry = _parseExpiry(s);
+      return expiry != null && expiry.isBefore(DateTime.now());
     } catch (_) {
       return false;
     }

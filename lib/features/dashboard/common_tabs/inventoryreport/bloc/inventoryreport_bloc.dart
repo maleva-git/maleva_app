@@ -1,3 +1,4 @@
+import 'package:maleva/core/network/api_failure.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
@@ -7,7 +8,6 @@ import 'package:maleva/core/utils/app_globals.dart';
 import '../data/inventoryreport_repository.dart';
 import 'inventoryreport_event.dart';
 import 'inventoryreport_state.dart';
-import 'package:maleva/core/models/shared/inventory_model.dart';
 import 'package:maleva/core/models/shared/customer_model.dart';
 
 class InventoryBloc extends Bloc<InventoryEvent, InventoryState> {
@@ -131,26 +131,18 @@ class InventoryBloc extends Bloc<InventoryEvent, InventoryState> {
         toStr   = DateFormat('yyyy-MM-dd').format(next6);
       }
 
-      final body = {
-        'Comid':      AppGlobals.storagenew.getInt('Comid') ?? 0,
-        'Fromdate':   fromStr,
-        'Todate':     toStr,
-        'PortType':   s.selectedPortId,
-        'CustomerId': s.selectedCustomerId ?? 0,
-        'Status':     s.status,
-      };
-
-      // ✅ REFACTORED: Using the injected repository
-      final result = await repository.fetchInventoryReport(body);
-
-      final records = (result != null && result is List && result.isNotEmpty)
-          ? result.map<InventoryModel>((e) => InventoryModel.fromJson(e as Map<String, dynamic>)).toList()
-          : <InventoryModel>[];
+      final records = await repository.fetchInventoryReport(
+        portType: s.selectedPortId,
+        customerId: s.selectedCustomerId ?? 0,
+        pending: s.status == 1,
+        fromDate: fromStr,
+        toDate: toStr,
+      );
 
       emit(s.copyWith(records: records, isLoading: false));
     } catch (err) {
       emit(InventoryError(
-        message:            err.toString(),
+        message:            err is ApiFailure ? err.message : err.toString(),
         selectedPortId:     s.selectedPortId,
         fromDate:           s.fromDate,
         toDate:             s.toDate,

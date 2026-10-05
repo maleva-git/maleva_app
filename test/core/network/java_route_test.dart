@@ -17,12 +17,17 @@ class MockDioClient extends Mock implements DioClient {}
 
 /// No .NET-shaped bridge (owner's rule, 2026-10-02): the app calls the shared
 /// Java APIs; stock moved to `/api/stock-ins` (StockInApi).
+/// A .NET-host URL of the old shape. The app calls none any more (the last,
+/// LoginApp/SelectLoginUser, was removed); routing must still leave such a URL
+/// on the legacy client.
+const legacyExample = '${AppConfig.baseUrl}/api/LegacyApp/Example?Comid=';
+
 void main() {
   test('nothing is bridged any more', () {
     expect(JavaRoute.moved, isEmpty);
     for (final url in [
       '${AppConfig.baseUrl}/api/StockApp/MaxStockInNo?Comid=6',
-      ApiConstants.apiInsertForwarding,
+      legacyExample,
       '${ApiConstants.apiGetTruckList}6',
     ]) {
       expect(JavaRoute.resolve(url), url, reason: url);
@@ -32,7 +37,7 @@ void main() {
 
   test('isJava is the Java host', () {
     expect(JavaRoute.isJava('${AppConfig.javaBaseUrl}/api/stock-ins/jobs'), isTrue);
-    expect(JavaRoute.isJava(ApiConstants.apiInsertForwarding), isFalse);
+    expect(JavaRoute.isJava(legacyExample), isFalse);
   });
 
   test('a .NET call still uses the legacy client', () async {
@@ -44,9 +49,9 @@ void main() {
     final repository = LegacyApiRepository(legacy,
         java: JavaApiClient(tokens, dio: Dio()..httpClientAdapter = javaAdapter));
 
-    await repository.apiAllinoneSelect(ApiConstants.apiInsertForwarding, {});
+    await repository.apiAllinoneSelect(legacyExample, {});
 
-    expect(legacyAdapter.requests.single.uri.toString(), ApiConstants.apiInsertForwarding);
+    expect(legacyAdapter.requests.single.uri.toString(), legacyExample);
     expect(javaAdapter.requests, isEmpty);
     GetIt.instance.allowReassignment = true;
   });

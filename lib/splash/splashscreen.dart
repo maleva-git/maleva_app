@@ -1,3 +1,4 @@
+import 'package:maleva/features/troubleshoot/data/applog_api.dart';
 import 'dart:async';
 
 import 'package:maleva/core/theme/app_typography.dart';
@@ -140,6 +141,8 @@ class _SplashScreenState extends State<SplashScreen>
       case Restored(:final session):
         // the server gets this phone's push token if it changed while the app was closed
         unawaited(tokenFetch.then((_) => sl<SessionService>().syncDeviceToken(), onError: (_) {}));
+        // crash logs kept from before sign-in go to this user's Troubleshoot folder
+        unawaited(AppLogApi.sendPending(recordId: AppPreferences.getEmpRefId()));
         context.go(dashboardRouteFor(isDriver: session.isDriver, roleId: session.roleId));
       case RestoreUnreachable(:final message):
         // the token is kept: Retry tries again, Go to Login signs in afresh

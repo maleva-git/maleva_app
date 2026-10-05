@@ -1,20 +1,26 @@
-import 'package:maleva/core/network/api_constants.dart';
-import 'package:maleva/core/network/api_client.dart';
+import 'package:maleva/core/di/injection.dart';
+import 'package:maleva/core/finance/petty_cash_api.dart';
+import 'package:maleva/core/models/shared/patty_cash_details_model.dart';
+import 'package:maleva/core/models/shared/pattycash_master_model.dart';
+import 'package:maleva/core/utils/json_read.dart';
 
+/// The period's petty cash and its lines (shared Java
+/// `/api/petty-cash-masters/search`, was .NET BIllorderApp/SelectpetticashApp).
 class PettyCashRepository {
-  /// Fetches Petty Cash master and details records from the backend
-  Future<dynamic> fetchPettyCashData({
-    required int comId,
+  Future<({List<PattycashMasterModel> masters, List<PattyCashDetailsModel> details})> fetchPettyCashData({
     required String fromDate,
     required String toDate,
   }) async {
-    // Construct the URL with query parameters
-    final url = "${ApiConstants.apiGetpettycash}$comId"
-        "&Fromdate=$fromDate"
-        "&Todate=$toDate" 
-        "&Employeeid=0&Search=&PaymentStatus=&PaymentTo";
-
-    // ApiClient seamlessly handles the request
-    return await ApiClient.postRequest(url, null);
+    final api = sl<PettyCashApi>();
+    final data = await api.search(fromDate: fromDate, toDate: toDate);
+    return (
+      masters: [
+        for (final m in JsonRead.listOfMaps(data['pettyCashMaster']))
+          PattycashMasterModel.fromJava(m, companyId: api.companyId),
+      ],
+      details: [
+        for (final d in JsonRead.listOfMaps(data['pettyCashDetails'])) PattyCashDetailsModel.fromJava(d),
+      ],
+    );
   }
 }

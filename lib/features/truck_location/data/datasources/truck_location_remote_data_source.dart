@@ -10,7 +10,6 @@ import 'package:maleva/core/utils/json_read.dart';
 /// failure leaves here as an `ApiFailure` with the server's message.
 class TruckLocationRemoteDataSource {
   TruckLocationRemoteDataSource(this._dio);
-
   final Dio _dio;
 
   /// The week containing `date`.

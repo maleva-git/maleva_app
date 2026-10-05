@@ -1,5 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:maleva/core/network/api_failure.dart';
+import 'package:maleva/core/utils/json_read.dart';
 import '../data/forwardingsalary_repository.dart';
 import 'forwardingsalary_event.dart';
 import 'forwardingsalary_state.dart';
@@ -93,12 +95,12 @@ class ForwardingSalaryBloc extends Bloc<ForwardingSalaryEvent, ForwardingSalaryS
       int editId = 0;
 
       if (data != null) {
-        editId   = data['Id'] ?? 0;
-        salary1  = data['Salary1']?.toString() ?? '';
-        salary2  = data['Salary2']?.toString() ?? '';
+        editId   = JsonRead.integer(data['id']);
+        salary1  = data['salary1']?.toString() ?? '';
+        salary2  = data['salary2']?.toString() ?? '';
 
-        sealEmpId  = data['EmployeeMasterRefId'] ?? 0;
-        breakEmpId = data['EmployeeMasterRefId1'] ?? 0;
+        sealEmpId  = JsonRead.integer(data['employeeMasterRefId']);
+        breakEmpId = JsonRead.integer(data['employeeMasterRefId1']);
 
 
         if (sealEmpId != 0) {
@@ -171,24 +173,20 @@ class ForwardingSalaryBloc extends Bloc<ForwardingSalaryEvent, ForwardingSalaryS
 
     emit(ForwardingSalaryLoading());
     try {
-      final master = {
-        'Id': s.editId,
-        'CompanyRefId': repository.comid,
-        'EmployeeMasterRefId': s.sealEmpId,
-        'EmployeeMasterRefId1': s.breakEmpId,
-        'RTIMasterRefId': s.saleOrderId,
-        'Salary1': double.tryParse(s.salary1) ?? 0.0,
-        'Salary2': double.tryParse(s.salary2) ?? 0.0,
-      };
-
-      final success = await repository.saveForwardingSalary(master);
-
-      if (success) {
-        emit(ForwardingSalarySaveSuccess());
-        emit(ForwardingSalaryLoaded.empty());
-      } else {
-        emit(s);
-      }
+      await repository.saveForwardingSalary(
+        id: s.editId,
+        rtiId: s.saleOrderId,
+        sealEmployeeId: s.sealEmpId,
+        breakSealEmployeeId: s.breakEmpId,
+        salary1: double.tryParse(s.salary1) ?? 0.0,
+        salary2: double.tryParse(s.salary2) ?? 0.0,
+      );
+      emit(ForwardingSalarySaveSuccess());
+      emit(ForwardingSalaryLoaded.empty());
+    } on ApiFailure catch (failure) {
+      // show the server's reason, then give the form back as it was
+      emit(ForwardingSalaryError(failure.message));
+      emit(s);
     } catch (e) {
       emit(ForwardingSalaryError(e.toString()));
     }

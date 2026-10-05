@@ -96,10 +96,8 @@ Future<void> main() async {
   } catch (e, stack) {
     debugPrint("Error during main initialization: $e\n$stack");
     try {
-      await AppLogApi.insertAppLog(
-        empRefId: 0,
-        empName: 'Splash Screen Crash',
-        comid: 6,
+      // no session yet: kept on the phone, sent once someone is signed in
+      await AppLogApi.savePendingCrash(
         appVersion: 'Unknown (Startup)',
         screenHistory: 'Main Initialization',
         errorLog: "$e\n$stack",

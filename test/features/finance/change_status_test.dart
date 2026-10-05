@@ -1,63 +1,55 @@
+import 'dart:convert';
+
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:maleva/change_status_page.dart';
-import 'package:maleva/core/di/injection.dart';
-import 'package:maleva/core/network/legacy_api_repository.dart';
-import 'package:maleva/core/network/api_constants.dart';
-import 'package:maleva/core/utils/app_globals.dart';
-import 'package:mocktail/mocktail.dart';
+import 'package:maleva/core/finance/petty_cash_api.dart';
+import 'package:maleva/features/dashboard/common_tabs/pettycash/data/change_status_loader.dart';
+import '../../core/network/java_api_client_test.dart' show QueueAdapter;
 import '../../support/local_fonts.dart';
 
-class MockLegacy extends Mock implements LegacyApiRepository {}
+Map<String, dynamic> ok(Object? data) => {'IsSuccess': true, 'StatusCode': 200, 'Message': 'Success', 'Data1': data};
+
+/// The Change Status page loads its one petty cash from the shared Java API
+/// (billorder-on-shared-java-api).
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
   setUpAll(installLocalTestFonts);
-  late MockLegacy repository;
-  setUp(() async {
-    await sl.reset();
-    repository = MockLegacy();
-    sl.registerSingleton<LegacyApiRepository>(repository);
-    AppGlobals.Comid = 17;
+  late QueueAdapter adapter;
+  late ChangeStatusLoader loader;
+
+  setUp(() {
+    adapter = QueueAdapter();
+    loader = ChangeStatusLoader(
+        api: PettyCashApi(Dio(BaseOptions(baseUrl: 'https://java.test'))..httpClientAdapter = adapter,
+            companyId: () => 17));
   });
-  tearDown(() => sl.reset());
+
   for (final id in [0, 9]) {
     testWidgets('ID $id preserves load trigger and screen', (tester) async {
-      when(() => repository.apiAllinoneSelectArray(any(), any(), any(), any()))
-          .thenAnswer((_) async => []);
-      await tester.pumpWidget(MaterialApp(home: ChangeStatusPage(masterId: id)));
+      adapter.replies.add((200, jsonEncode(ok({
+        'id': 9, 'cnumberDisplay': 'PC00009', 'spettyCashDate': '01/10/2026', 'employeeName': 'ANNA',
+        'amount': '25.50', 'pettyCashDetails': [{'id': 3, 'items': 'TAXI', 'amount': 25.5, 'notes': ''}],
+      }))));
+      await tester.pumpWidget(MaterialApp(home: ChangeStatusPage(masterId: id, loader: loader)));
       await tester.pumpAndSettle();
       expect(find.text('Change Status'), findsOneWidget);
       expect(find.text('Selected ID: $id'), findsOneWidget);
-      expect(find.byType(CircularProgressIndicator), findsNothing);
-      if (id == 0) { verifyZeroInteractions(repository); }
-      else {
-        final calls = verify(() => repository.apiAllinoneSelectArray(
-          captureAny(), captureAny(), captureAny(), any()));
-        calls.called(1);
-        expect(calls.captured[0], '${ApiConstants.apiGetpettycash}17');
-        expect(calls.captured[1], isNull);
-        expect(calls.captured[2], {'Content-Type': 'application/json; charset=UTF-8'});
+      if (id == 0) {
+        expect(adapter.requests, isEmpty);
+      } else {
+        expect(adapter.requests.single.uri.toString(),
+            'https://java.test/api/petty-cash-masters/edit?companyId=17&id=9');
+        final state = tester.state<ChangeStatusPageState>(find.byType(ChangeStatusPage));
+        expect(state.pettycashMaster.single.cNumberDisplay, 'PC00009');
+        expect(state.pettycashMaster.single.pettyCashDate, DateTime(2026, 10, 1));
+        expect(state.pettycashMaster.single.companyRefId, 17);
+        expect(state.pettycashDetails.single.items, 'TAXI');
+        expect(state.pettycashDetails.single.pettyCashMasterRefId, 9);
       }
+      await tester.pump(const Duration(seconds: 5));
+      await tester.pumpAndSettle();
     });
   }
-  testWidgets('missing keys retain lists and parse errors keep earlier master update', (tester) async {
-    dynamic response = [{'PattycashMasterModel': [{'Id': 2, 'CompanyRefId': 17,
-      'EmployeeRefId': 4, 'PettyCashDate': '2026-01-01', 'CNumber': 1, 'Status': 0}],
-      'PattyCashDetailsModel': 'invalid'}];
-    when(() => repository.apiAllinoneSelectArray(any(), any(), any(), any()))
-        .thenAnswer((_) async => response);
-    await tester.pumpWidget(const MaterialApp(home: ChangeStatusPage(masterId: 9)));
-    await tester.pumpAndSettle();
-    final state = tester.state<ChangeStatusPageState>(find.byType(ChangeStatusPage));
-    expect(state.pettycashMaster.single.Id, 2);
-    expect(state.pettycashDetails, isEmpty);
-    response = [{}];
-    await state.loadpettycash();
-    await tester.pump();
-    expect(state.pettycashMaster.single.Id, 2);
-    await tester.pump(const Duration(milliseconds: 300));
-    await tester.pumpAndSettle();
-    await tester.pump(const Duration(seconds: 5));
-    await tester.pumpAndSettle();
-  });
 }

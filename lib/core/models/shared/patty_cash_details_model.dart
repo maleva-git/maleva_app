@@ -1,4 +1,6 @@
 
+import 'package:maleva/core/utils/json_read.dart';
+
 class PattyCashDetailsModel {
   int Id;
   int sdId;
@@ -16,14 +18,17 @@ class PattyCashDetailsModel {
     this.amount,
   });
 
-  factory PattyCashDetailsModel.fromJson(Map<String, dynamic> json) {
+  /// A line of the shared Java petty cash (`search` details or `edit` lines;
+  /// an `edit` line has no master id, so [masterId] gives it).
+  factory PattyCashDetailsModel.fromJava(Map<String, dynamic> json, {int masterId = 0}) {
+    dynamic f(String k) => JsonRead.field(json, k);
     return PattyCashDetailsModel(
-      Id: json['Id'],
-      sdId: json['SDId'],
-      pettyCashMasterRefId: json['PettyCashMasterRefId'],
-      notes: json['Notes'],
-      items: json['Items'],
-      amount: json['Amount'],
+      Id: JsonRead.integer(f('id')),
+      sdId: 0,
+      pettyCashMasterRefId: JsonRead.intOrNull(f('pettyCashMasterRefId')) ?? masterId,
+      notes: JsonRead.stringOrNull(f('notes')),
+      items: JsonRead.stringOrNull(f('items')),
+      amount: JsonRead.stringOrNull(f('amount')),
     );
   }
 
