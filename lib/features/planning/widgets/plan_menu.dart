@@ -86,6 +86,10 @@ class RowMenuButton extends StatelessWidget {
         _Item('Revise RTI', Icons.published_with_changes, () => PlanFlows.reviseRti(context, row), locked: !a.canWrite),
       ],
       if (a.canWrite) ...[
+        _Item('Move to top', Icons.vertical_align_top, () async {
+          final i = state.rows.indexWhere((r) => r.uid == row.uid);
+          if (i > 0) context.read<PlanCubit>().reorder(i, 0);
+        }),
         _Item('Move up', Icons.arrow_upward, () async {
           final i = state.rows.indexWhere((r) => r.uid == row.uid);
           if (i > 0) context.read<PlanCubit>().reorder(i, i - 1);
@@ -93,6 +97,10 @@ class RowMenuButton extends StatelessWidget {
         _Item('Move down', Icons.arrow_downward, () async {
           final i = state.rows.indexWhere((r) => r.uid == row.uid);
           if (i >= 0 && i < state.rows.length - 1) context.read<PlanCubit>().reorder(i, i + 1);
+        }),
+        _Item('Move to bottom', Icons.vertical_align_bottom, () async {
+          final i = state.rows.indexWhere((r) => r.uid == row.uid);
+          if (i >= 0 && i < state.rows.length - 1) context.read<PlanCubit>().reorder(i, state.rows.length - 1);
         }),
       ],
       _Item('Copy job no.', Icons.content_copy, () => PlanFlows.copy(context, row.jobNo)),

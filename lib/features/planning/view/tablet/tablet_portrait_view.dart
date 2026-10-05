@@ -158,7 +158,7 @@ class _JobList extends StatelessWidget {
       final r = rows[i];
       return Padding(
         key: ValueKey('tp-${r.uid}'),
-        padding: const EdgeInsets.fromLTRB(12, 0, 12, 8),
+        padding: EdgeInsets.fromLTRB(reorderable ? 8 : 12, 0, reorderable ? 4 : 12, 8),
         child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
           if (canWrite) Checkbox(value: r.print, onChanged: (_) => cubit.toggleTick(r.uid), semanticLabel: 'Tick ${r.jobNo}'),
           Expanded(
@@ -173,7 +173,21 @@ class _JobList extends StatelessWidget {
               onRti: () => PlanFlows.openRti(context, r),
             ),
           ),
-          if (reorderable) ReorderableDragStartListener(index: i, child: const SizedBox(width: 40, height: 56, child: Icon(Icons.drag_indicator))),
+          if (reorderable)
+            ReorderableDragStartListener(
+              index: i,
+              child: Semantics(
+                label: 'Drag to reorder, row ${i + 1}',
+                child: SizedBox(
+                  width: 44,
+                  height: 64,
+                  child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
+                    Text('${i + 1}', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w800, color: context.mc.muted)),
+                    Icon(Icons.drag_indicator, color: context.mc.faint),
+                  ]),
+                ),
+              ),
+            ),
         ]),
       );
     }

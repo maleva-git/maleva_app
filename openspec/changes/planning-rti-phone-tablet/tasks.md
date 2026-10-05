@@ -21,9 +21,9 @@
 
 - [x] 4.1 `flutter analyze`: 0 errors, no new warnings against the baseline, no issues in the new code.
 - [x] 4.2 (284 new tests in test/features/planning, rti, rti_assignments + 6 foundation; full suite 597 pass, only the inherited bluetooth_page_test fails) bloc tests: search rules, payload and merge; save validation, payload and delete; Clone, Sort, Create RTI refusals, Create All readiness; RTI total, RTI validation, Job No lookup and replace; route-activity defaults; Levi checks; revise. Cases from the React tests.
-- [ ] 4.3 iPhone, iPad (portrait, landscape, split view), Android phone and tablet.
-- [ ] 4.4 One real day on the tablet and the phone, repeated in React; the saved plan, RTI, route activities and Levi match.
+- [ ] 4.3 (owner runs this; see report.md §7) iPhone, iPad (portrait, landscape, split view), Android phone and tablet.
+- [ ] 4.4 (owner, on the dev backend; see report.md §7) One real day on the tablet and the phone, repeated in React; the saved plan, RTI, route activities and Levi match.
 
 ## 5. Report (Step 5)
 
-- [ ] 5.1 Matrix marked done, deferred or blocked; screens per size; files; tests; open questions.
+- [x] 5.1 (report.md, 2026-10-05) Matrix marked done, deferred or blocked; screens per size; files; tests; open questions.

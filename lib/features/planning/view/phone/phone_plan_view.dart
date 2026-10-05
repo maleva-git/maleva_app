@@ -81,6 +81,44 @@ class _PhonePlanViewState extends State<PhonePlanView> {
     ));
   }
 
+  /// The job cards. With [reorderable], each card has the S.NO grip on its right: press and drag
+  /// it up or down, like the web grid's S.NO handle; only the order changes.
+  Widget _jobList({required bool reorderable, required int count, required void Function(int, int) onReorder, required IndexedWidgetBuilder itemBuilder}) {
+    if (!reorderable) {
+      return SliverList.separated(itemCount: count, separatorBuilder: (_, __) => const SizedBox(height: 10), itemBuilder: itemBuilder);
+    }
+    return SliverReorderableList(
+      itemCount: count,
+      onReorderItem: onReorder,
+      proxyDecorator: (child, _, __) => Material(elevation: 8, borderRadius: BorderRadius.circular(16), color: Colors.transparent, child: child),
+      itemBuilder: (context, i) {
+        final mc = context.mc;
+        final card = itemBuilder(context, i);
+        return Padding(
+          key: ValueKey('phone-row-${card.key}'),
+          padding: const EdgeInsets.only(bottom: 10),
+          child: Row(crossAxisAlignment: CrossAxisAlignment.center, children: [
+            Expanded(child: card),
+            ReorderableDragStartListener(
+              index: i,
+              child: Semantics(
+                label: 'Drag to reorder, row ${i + 1}',
+                child: SizedBox(
+                  width: 44,
+                  height: 72,
+                  child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
+                    Text('${i + 1}', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w800, color: mc.muted)),
+                    Icon(Icons.drag_indicator, color: mc.faint),
+                  ]),
+                ),
+              ),
+            ),
+          ]),
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) => BlocBuilder<PlanCubit, PlanState>(builder: (context, s) {
         final cubit = context.read<PlanCubit>();
@@ -139,9 +177,10 @@ class _PhonePlanViewState extends State<PhonePlanView> {
               else
                 SliverPadding(
                   padding: const EdgeInsets.fromLTRB(16, 0, 16, 24),
-                  sliver: SliverList.separated(
-                    itemCount: visible.length,
-                    separatorBuilder: (_, __) => const SizedBox(height: 10),
+                  sliver: _jobList(
+                    reorderable: canWrite && !selecting && s.tile == TileFilter.all && s.find.trim().isEmpty,
+                    count: visible.length,
+                    onReorder: cubit.reorder,
                     itemBuilder: (context, i) {
                       final r = visible[i];
                       final card = JobCard(

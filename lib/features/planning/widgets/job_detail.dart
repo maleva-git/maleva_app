@@ -132,24 +132,7 @@ class JobDetailSections extends StatelessWidget {
           ],
           _Copyable('PIC', row.picName),
           _Copyable('S.No', index < 0 ? '' : '${index + 1}'),
-          if (canWrite)
-            Row(children: [
-              Expanded(
-                child: OutlinedButton.icon(
-                  onPressed: index > 0 ? () => context.read<PlanCubit>().reorder(index, index - 1) : null,
-                  icon: const Icon(Icons.arrow_upward),
-                  label: const Text('Move up'),
-                ),
-              ),
-              const SizedBox(width: 10),
-              Expanded(
-                child: OutlinedButton.icon(
-                  onPressed: index >= 0 && index < state.rows.length - 1 ? () => context.read<PlanCubit>().reorder(index, index + 1) : null,
-                  icon: const Icon(Icons.arrow_downward),
-                  label: const Text('Move down'),
-                ),
-              ),
-            ]),
+          if (canWrite) _MoveButtons(index: index, last: state.rows.length - 1),
         ]),
       ),
     ]);
@@ -275,6 +258,43 @@ class _Stops extends StatelessWidget {
               child: Text(stops.length > 1 ? '${i + 1}. ${stops[i]}' : stops[i], style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w600)),
             ),
           ),
+      ]),
+    );
+  }
+}
+
+/// Move the job in the plan's order: to the top, up one, down one, to the bottom (the same
+/// order change as dragging its S.NO grip).
+class _MoveButtons extends StatelessWidget {
+  const _MoveButtons({required this.index, required this.last});
+
+  final int index;
+  final int last;
+
+  @override
+  Widget build(BuildContext context) {
+    final cubit = context.read<PlanCubit>();
+    final up = index > 0, down = index >= 0 && index < last;
+    Widget b(String tip, IconData icon, bool on, int to) => Expanded(
+          child: Tooltip(
+            message: tip,
+            child: OutlinedButton(
+              onPressed: on ? () => cubit.reorder(index, to) : null,
+              style: OutlinedButton.styleFrom(padding: EdgeInsets.zero),
+              child: Semantics(label: tip, child: Icon(icon)),
+            ),
+          ),
+        );
+    return Padding(
+      padding: const EdgeInsets.only(top: 4),
+      child: Row(children: [
+        b('Move to top', Icons.vertical_align_top, up, 0),
+        const SizedBox(width: 8),
+        b('Move up', Icons.arrow_upward, up, index - 1),
+        const SizedBox(width: 8),
+        b('Move down', Icons.arrow_downward, down, index + 1),
+        const SizedBox(width: 8),
+        b('Move to bottom', Icons.vertical_align_bottom, down, last),
       ]),
     );
   }

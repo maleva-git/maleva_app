@@ -4,6 +4,7 @@ import 'package:maleva/core/widgets/ui/ui.dart';
 import 'package:maleva/features/planning/bloc/plan_cubit.dart';
 import 'package:maleva/features/planning/bloc/plan_state.dart';
 import 'package:maleva/features/planning/models/plan_line.dart';
+import 'package:maleva/features/planning/view/tablet/board_drag.dart';
 import 'package:maleva/features/planning/widgets/assign_picker.dart';
 import 'package:maleva/features/planning/widgets/job_card.dart';
 import 'package:maleva/features/planning/widgets/plan_flows.dart';
@@ -72,20 +73,23 @@ String _text(PlanLine r, String key) => switch (key) {
     };
 
 const double _rowH = 48;
+const double _snoW = 64;
 const double _tickW = 52;
 const double _jobW = 140;
 const double _truckW = 170;
 const double _menuW = 52;
 
-/// The planning board: 48 dp rows; ✓, JOB NO and TRUCK frozen (unless [frozen] is off);
-/// the rest scrolls sideways under one header.
+/// The planning board: 48 dp rows; S.NO, ✓, JOB NO and TRUCK frozen (unless [frozen] is off);
+/// the rest scrolls sideways under one header. With [reorderable], the S.NO grip drags a row
+/// up or down like the web grid.
 class BoardGrid extends StatefulWidget {
-  const BoardGrid({super.key, required this.state, required this.rows, required this.columns, required this.frozen});
+  const BoardGrid({super.key, required this.state, required this.rows, required this.columns, required this.frozen, this.reorderable = false});
 
   final PlanState state;
   final List<PlanLine> rows;
   final List<String> columns;
   final bool frozen;
+  final bool reorderable;
 
   @override
   State<BoardGrid> createState() => _BoardGridState();
@@ -94,6 +98,20 @@ class BoardGrid extends StatefulWidget {
 class _BoardGridState extends State<BoardGrid> {
   final _body = ScrollController();
   final _head = ScrollController();
+  final _vert = ScrollController();
+  final _viewportKey = GlobalKey();
+  late final BoardDragController _drag = BoardDragController(
+    rowHeight: _rowH,
+    scroll: _vert,
+    viewportKey: _viewportKey,
+    onMove: (from, to) {
+      // The visible rows are the plan's rows when the board may reorder (no filter is active).
+      final all = widget.state.rows;
+      final f = all.indexWhere((r) => r.uid == widget.rows[from].uid);
+      final t = all.indexWhere((r) => r.uid == widget.rows[to].uid);
+      if (f >= 0 && t >= 0) context.read<PlanCubit>().reorder(f, t);
+    },
+  );
 
   @override
   void initState() {
@@ -107,6 +125,8 @@ class _BoardGridState extends State<BoardGrid> {
   void dispose() {
     _body.dispose();
     _head.dispose();
+    _vert.dispose();
+    _drag.dispose();
     super.dispose();
   }
 
@@ -123,7 +143,9 @@ class _BoardGridState extends State<BoardGrid> {
         child: Align(
             alignment: Alignment.centerLeft,
             child: Padding(padding: const EdgeInsets.symmetric(horizontal: 8), child: Text(label, style: headStyle))));
-    final frozenHead = [if (canWrite) headCell('✓', _tickW), headCell('JOB NO', _jobW), headCell('TRUCK', _truckW)];
+    final reorderable = widget.reorderable && canWrite;
+    _drag.rowCount = widget.rows.length;
+    final frozenHead = [headCell('S.NO', _snoW), if (canWrite) headCell('✓', _tickW), headCell('JOB NO', _jobW), headCell('TRUCK', _truckW)];
     final restHead = [for (final c in cols) headCell(c.label, c.width), headCell('', _menuW)];
 
     Color rowColor(PlanLine r) {
@@ -134,13 +156,28 @@ class _BoardGridState extends State<BoardGrid> {
       return context.cs.surface;
     }
 
-    Widget line(PlanLine r, List<Widget> cells) => Container(
+    Widget line(int i, PlanLine r, List<Widget> cells) {
+      final from = _drag.from, at = _drag.insertAt;
+      final moving = from == i;
+      // The drop line: above row [at], or under the last row; none where the row would not move.
+      final lineAbove = from != null && at == i && at != from && at != from + 1;
+      final lineBelow = from != null && i == widget.rows.length - 1 && at == widget.rows.length && from != i;
+      final drop = BorderSide(color: context.cs.primary, width: 3);
+      return Opacity(
+        opacity: moving ? 0.45 : 1,
+        child: Container(
           height: _rowH,
-          decoration: BoxDecoration(color: rowColor(r), border: Border(bottom: BorderSide(color: mc.outline))),
+          decoration: BoxDecoration(
+            color: moving ? mc.primarySoft : rowColor(r),
+            border: Border(top: lineAbove ? drop : BorderSide.none, bottom: lineBelow ? drop : BorderSide(color: mc.outline)),
+          ),
           child: Row(children: cells),
-        );
+        ),
+      );
+    }
 
-    List<Widget> frozenCells(PlanLine r) => [
+    List<Widget> frozenCells(int i, PlanLine r) => [
+          BoardDragHandle(index: i, controller: _drag, enabled: reorderable, width: _snoW, height: _rowH - 1, jobNo: r.jobNo),
           if (canWrite)
             SizedBox(
                 width: _tickW,
@@ -154,7 +191,7 @@ class _BoardGridState extends State<BoardGrid> {
           SizedBox(width: _menuW, child: RowMenuButton(row: r, state: s)),
         ];
 
-    final frozenW = (canWrite ? _tickW : 0) + _jobW + _truckW;
+    final frozenW = _snoW + (canWrite ? _tickW : 0) + _jobW + _truckW;
     final restW = cols.fold<double>(0, (a, c) => a + c.width) + _menuW;
     final header = Container(
       decoration: BoxDecoration(color: mc.surface2, border: Border(bottom: BorderSide(color: mc.outline))),
@@ -170,12 +207,16 @@ class _BoardGridState extends State<BoardGrid> {
         ),
       ]),
     );
-    final body = SingleChildScrollView(
+    final rows = widget.rows;
+    Widget body() => SingleChildScrollView(
+      key: _viewportKey,
+      controller: _vert,
+      physics: _drag.dragging ? const NeverScrollableScrollPhysics() : null,
       child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
         if (widget.frozen)
           SizedBox(
             width: frozenW,
-            child: Column(children: [for (final r in widget.rows) line(r, frozenCells(r))]),
+            child: Column(children: [for (var i = 0; i < rows.length; i++) line(i, rows[i], frozenCells(i, rows[i]))]),
           ),
         Expanded(
           child: Scrollbar(
@@ -186,7 +227,7 @@ class _BoardGridState extends State<BoardGrid> {
               child: SizedBox(
                 width: restW + (widget.frozen ? 0 : frozenW),
                 child: Column(children: [
-                  for (final r in widget.rows) line(r, [if (!widget.frozen) ...frozenCells(r), ...restCells(r)]),
+                  for (var i = 0; i < rows.length; i++) line(i, rows[i], [if (!widget.frozen) ...frozenCells(i, rows[i]), ...restCells(rows[i])]),
                 ]),
               ),
             ),
@@ -194,7 +235,18 @@ class _BoardGridState extends State<BoardGrid> {
         ),
       ]),
     );
-    return Column(children: [header, Expanded(child: body)]);
+    return Column(children: [
+      header,
+      Expanded(
+        child: AnimatedBuilder(
+          animation: _drag,
+          builder: (context, _) => Stack(children: [
+            Positioned.fill(child: body()),
+            if (_drag.dragging) BoardDragGhost(controller: _drag, label: rows[_drag.from!].jobNo, left: _snoW + 8),
+          ]),
+        ),
+      ),
+    ]);
   }
 
   Widget _cell(BuildContext context, PlanState s, PlanLine r, BoardColumn c) {

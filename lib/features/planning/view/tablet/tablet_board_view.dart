@@ -90,7 +90,14 @@ class _TabletBoardViewState extends State<TabletBoardView> {
                     message: 'Search for jobs in the panel, or open a plan by its number.',
                     icon: Icons.local_shipping_outlined)
                 : switch (_view) {
-                    BoardView.list => BoardGrid(state: s, rows: visible, columns: boardPresets[_preset]!, frozen: _frozen),
+                    BoardView.list => BoardGrid(
+                        state: s,
+                        rows: visible,
+                        columns: boardPresets[_preset]!,
+                        frozen: _frozen,
+                        // Drag only when every row is shown, so the board's order is the plan's order.
+                        reorderable: canWrite && s.tile == TileFilter.all && s.find.trim().isEmpty,
+                      ),
                     BoardView.byTruck => ByTruckView(state: s, rows: visible),
                     BoardView.byStatus => ByStatusView(state: s, rows: visible),
                   };
@@ -164,7 +171,13 @@ class _TabletBoardViewState extends State<TabletBoardView> {
                             ]),
                           ),
                         ),
-                        Text('${visible.length} of ${s.rows.length} jobs', style: TextStyle(color: context.mc.muted, fontSize: 13)),
+                        Text(
+                            canWrite && _view == BoardView.list
+                                ? (s.tile == TileFilter.all && s.find.trim().isEmpty
+                                    ? '${visible.length} of ${s.rows.length} jobs · drag S.NO ⠿ to reorder'
+                                    : '${visible.length} of ${s.rows.length} jobs · clear the filters to reorder')
+                                : '${visible.length} of ${s.rows.length} jobs',
+                            style: TextStyle(color: context.mc.muted, fontSize: 13)),
                       ]),
                     ),
                   Expanded(child: board),
