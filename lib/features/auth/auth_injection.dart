@@ -1,3 +1,4 @@
+import 'package:maleva/core/access/screen_access_api.dart';
 import 'package:get_it/get_it.dart';
 import 'package:maleva/core/dashboard/dashboard_api.dart';
 import 'package:maleva/core/employee/email_inbox_api.dart';
@@ -56,6 +57,9 @@ void registerAuthModule(GetIt sl) {
   // transport and vessel planning (the shared /api/planing and /api/vessel-plannings)
   sl.registerLazySingleton<PlanningApi>(
       () => PlanningApi(sl<JavaApiClient>().dio, companyId: AppPreferences.getComid));
+  // screen access (VIEW / CREATE / EDIT / DELETE per role, set by the Super Admin)
+  sl.registerLazySingleton<ScreenAccessApi>(
+      () => ScreenAccessApi(sl<JavaApiClient>().dio, companyId: AppPreferences.getComid));
   sl.registerLazySingleton<VesselPlanningApi>(
       () => VesselPlanningApi(sl<JavaApiClient>().dio, companyId: AppPreferences.getComid));
   // truck spare parts, summon and spot sale entries (TruckSparePartsApp ported)

@@ -23,8 +23,6 @@ import '../../common_tabs/maintenance/view/maintenance_tab.dart';
 import '../../common_tabs/pdo/bloc/pdo_bloc.dart';
 import '../../common_tabs/pdo/data/pdo_repository.dart';
 import '../../common_tabs/pdo/view/pdo_tab.dart';
-import '../../common_tabs/rtiview/bloc/rtiview_bloc.dart';
-import '../../common_tabs/rtiview/view/rtiview_tab.dart';
 import '../../common_tabs/spareparts/bloc/spareparts_bloc.dart';
 import '../../common_tabs/spareparts/data/spareparts_repository.dart';
 import '../../common_tabs/spareparts/view/sparepartsadd.dart';
@@ -146,10 +144,6 @@ class _AdminDashboardState extends State<OperationAdminDashboard> with SingleTic
                 fromDate: DateFormat('yyyy-MM-dd').format(DateTime.now().subtract(const Duration(days: 7))),
                 toDate: DateFormat('yyyy-MM-dd').format(DateTime.now()),
               ),
-            ),
-            BlocProvider(
-              create: (_) => sl<RTIDetailsBloc>(),
-              child: const RTIDetailsPage(),
             ),
         BlocProvider<LeaveBloc>(create: (_) => sl<LeaveBloc>()),
       ],

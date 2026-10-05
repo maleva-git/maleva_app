@@ -108,6 +108,12 @@ class RtiApi {
         _dio.post<dynamic>('/api/rti-masters/job-statuses', queryParameters: {'companyId': companyId}, data: form)));
   }
 
+  /// Sends the RTI to its truck's WhatsApp group (`POST /api/rti-masters/{id}/share-whatsapp`
+  /// body `{companyId}`, employee tokens only): `{sent, rtiNo, truck, group, messages, detail,
+  /// documentSkipped}` from `Data1` (`R/api/rtiShareApi.ts:37-40`).
+  Future<Map<String, dynamic>> shareWhatsApp(int rtiId) async =>
+      JsonRead.map(await _send(() => _dio.post<dynamic>('/api/rti-masters/$rtiId/share-whatsapp', data: {'companyId': companyId})));
+
   /// The route stops due in the days (`/api/rti-route-activities`), one
   /// employee's when [employeeId] is given; oldest ETA first.
   Future<List<Map<String, dynamic>>> routeActivities({

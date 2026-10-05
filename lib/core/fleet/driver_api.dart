@@ -60,4 +60,16 @@ class DriverApi {
     }
     return JsonRead.listOfMaps(JsonRead.field(body, 'data1'));
   }
+
+  /// Every driver with licence expiry dates and leaves, as the web's Planning and RTI pickers
+  /// load them (`GET /api/driver-masters/selectalldriverDetails?companyId`,
+  /// `FE/api/driverApi.ts:149-168`): `DriverMasterDto` rows in `Data1`.
+  Future<List<Map<String, dynamic>>> allDetails() async {
+    try {
+      final r = await _dio.get<dynamic>('/api/driver-masters/selectalldriverDetails', queryParameters: {'companyId': companyId});
+      return JsonRead.listOfMaps(JavaResponse.data(r.data));
+    } on DioException catch (e) {
+      throw JavaResponse.fromDio(e);
+    }
+  }
 }

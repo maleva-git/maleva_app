@@ -39,7 +39,6 @@ import '../../common_tabs/pettycash/bloc/pettycash_bloc.dart';
 import '../../common_tabs/pettycash/bloc/pettycash_event.dart';
 import '../../common_tabs/receiptview/bloc/receiptview_bloc.dart';
 import '../../common_tabs/receiptview/bloc/receiptview_event.dart';
-import '../../common_tabs/rtiview/bloc/rtiview_bloc.dart';
 import '../../common_tabs/spareparts/bloc/spareparts_bloc.dart';
 import '../../common_tabs/spareparts/data/spareparts_repository.dart';
 import '../../common_tabs/speedingreport/bloc/speeding_bloc.dart';
@@ -129,7 +128,6 @@ class _AdminDashboardState extends State<NewAdminDashboard> with SingleTickerPro
             toDate: DateFormat('yyyy-MM-dd').format(DateTime.now()),
           ),
         ),
-        BlocProvider<RTIDetailsBloc>(create: (_) => sl<RTIDetailsBloc>()),
         BlocProvider<LeaveBloc>(create: (_) => sl<LeaveBloc>()),
         BlocProvider<TopCustomersBloc>(create: (_) => TopCustomersBloc()),
         BlocProvider<JobOrdersBloc>(create: (_) => JobOrdersBloc()),

@@ -56,8 +56,6 @@ import '../../common_tabs/pettycash/view/pettycash_tab.dart';
 import '../../common_tabs/receiptview/bloc/receiptview_bloc.dart';
 import '../../common_tabs/receiptview/bloc/receiptview_event.dart';
 import '../../common_tabs/receiptview/view/receiptview_tab.dart';
-import '../../common_tabs/rtiview/bloc/rtiview_bloc.dart';
-import '../../common_tabs/rtiview/view/rtiview_tab.dart';
 import '../../common_tabs/salesorder/bloc/salesorder_event.dart';
 import '../../common_tabs/salesorder/view/salesorderview_tab.dart';
 import '../../common_tabs/spareparts/bloc/spareparts_bloc.dart';
@@ -250,11 +248,6 @@ class _AdminDashboardState extends State<MaintenanceDashboard> with SingleTicker
                 fromDate: DateFormat('yyyy-MM-dd').format(DateTime.now().subtract(const Duration(days: 7))),
                 toDate: DateFormat('yyyy-MM-dd').format(DateTime.now()),
               ),
-            ),
-            BlocProvider(
-              // ✅ Removed 'context', removed the redundant ..add(), and used our Service Locator!
-              create: (_) => sl<RTIDetailsBloc>(),
-              child: const RTIDetailsPage(),
             ),
 
             BlocProvider(

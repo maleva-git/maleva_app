@@ -7,7 +7,6 @@ import 'package:maleva/core/utils/app_globals.dart';
 import 'package:maleva/core/colors/colors.dart' as colour;
 import 'package:maleva/menu/menulist.dart';
 import '../../../../../core/di/injection.dart';
-import '../../../../transport/updatertidetails/view/updatertidetails_tab.dart';
 import '../bloc/rtistatus_bloc.dart';
 import '../bloc/rtistatus_event.dart';
 import '../bloc/rtistatus_state.dart';
@@ -51,15 +50,12 @@ class _RTIStatusView extends StatelessWidget {
         if (state.successMessage != null) {
           await ConfirmationOK(state.successMessage!, context);
 
-          // Navigate back to OldUpdateRTI after successful status mail
+          // Back to the RTI list after a successful status mail
           if (state.status == RTIStatusStatus.success &&
               state.jobNo.isEmpty) {
             // jobNo is cleared after RTIStatusClearRequested → means update was done
             if (!context.mounted) return;
-Navigator.pushReplacement(
-              context,
-              MaterialPageRoute(builder: (_) => const UpdateRTI()),
-            );
+            Navigator.of(context).maybePop();
           }
         }
 

@@ -21,6 +21,13 @@ class TruckApi {
   final Dio _dio;
   final int Function() _companyId;
 
+  /// Every truck with its licence expiry dates, as the web's Planning and RTI pickers load
+  /// them (`GET /api/truck-masters/alltruckdetatilcombo?companyId&keyword=&column=All`,
+  /// `FE/api/truckApi.ts:108-117`): `TruckMasterDto` rows (`id`, `truckName`, `truckSize`,
+  /// `rotexMyExp`, `puspacomExp`, `serviceExp` ...) in `Data1`.
+  Future<List<Map<String, dynamic>>> allDetailCombo() async => JsonRead.listOfMaps(JavaResponse.data(await _call(() =>
+      _dio.get<dynamic>('/api/truck-masters/alltruckdetatilcombo', queryParameters: {'companyId': _companyId(), 'keyword': '', 'column': 'All'}))));
+
   /// The active trucks for a picker (optionally of a [type]).
   Future<List<Map<String, dynamic>>> combo({String? type}) async {
     final body = await _call(() => _dio.get<dynamic>('/api/truck-combo', queryParameters: {

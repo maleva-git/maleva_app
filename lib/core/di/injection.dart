@@ -1,3 +1,8 @@
+import 'package:maleva/features/planning/planning_injection.dart';
+import 'package:maleva/features/planning/plans/plans_injection.dart';
+import 'package:maleva/features/rti/list/rti_list_injection.dart';
+import 'package:maleva/features/rti/rti_entry_injection.dart';
+import 'package:maleva/features/rti_assignments/assignments_injection.dart';
 import 'package:maleva/features/dashboard/common_tabs/stockupdate/stockupdate_injection.dart';
 import 'package:maleva/features/dashboard/common_tabs/stocktransfer/stocktransfer_injection.dart';
 import 'package:maleva/features/dashboard/common_tabs/paymentview/paymentview_injection.dart';
@@ -55,12 +60,9 @@ import '../../features/dashboard/common_tabs/maintenance/data/maintenance_reposi
 import '../../features/dashboard/common_tabs/pdo/data/pdo_repository.dart';
 import '../../features/dashboard/common_tabs/pettycash/bloc/pettycash_bloc.dart';
 import '../../features/dashboard/common_tabs/pettycash/data/pettycash_repository.dart';
-import '../../features/dashboard/common_tabs/planningdetailsview/bloc/planningdetails_bloc.dart';
 import '../../features/dashboard/common_tabs/receiptview/data/receipt_repository.dart';
 import '../../features/dashboard/common_tabs/rtistatus/bloc/rtistatus_bloc.dart';
 import '../../features/dashboard/common_tabs/rtistatus/data/rti_status_repository.dart';
-import '../../features/dashboard/common_tabs/rtiview/bloc/rtiview_bloc.dart';
-import '../../features/dashboard/common_tabs/rtiview/data/rtiview_repository.dart';
 import '../../features/dashboard/common_tabs/salary/bloc/salary_bloc.dart';
 import '../../features/dashboard/common_tabs/salary/data/salary_repository.dart';
 import '../../features/dashboard/common_tabs/saleorderdetails/bloc/saleorderdetails_bloc.dart';
@@ -106,8 +108,6 @@ import 'package:maleva/features/dashboard/common_tabs/driverleave/data/leave_rep
 import 'package:maleva/features/dashboard/common_tabs/driverleave/bloc/leave_bloc.dart';
 import 'package:maleva/features/transaction/enquirytrmaster/data/enquiry_repository.dart';
 import 'package:maleva/features/transaction/enquirytrmaster/add/bloc/enquirytradd_bloc.dart';
-import 'package:maleva/features/transaction/planning/data/planning_repository.dart';
-import 'package:maleva/features/transaction/planning/bloc/planning_bloc.dart';
 import 'package:maleva/features/transaction/enquirytrmaster/view/bloc/enquirytrview_bloc.dart';
 import 'package:maleva/features/transaction/salesorder/add/data/salesorderadd_repository.dart';
 import 'package:maleva/features/transaction/salesorder/view/data/salesorderview_repository.dart';
@@ -164,10 +164,6 @@ Future<void> setupDependencies() async {
   );
 
 
-  sl.registerLazySingleton<PlanningRepository>(() => PlanningRepository());
-  sl.registerFactoryParam<PlanningBloc, BuildContext, dynamic>(
-    (context, _) => PlanningBloc(context, sl()),
-  );
 
   sl.registerFactoryParam<SalesOrderAddBloc, BuildContext, dynamic>(
     (context, _) => SalesOrderAddBloc(context, sl()),
@@ -176,6 +172,12 @@ Future<void> setupDependencies() async {
 
 
   registerAuthModule(sl);
+  // Planning and RTI on phone and tablet (change planning-rti-phone-tablet)
+  registerRtiEntryFeature(sl);
+  registerPlanningFeature(sl);
+  registerPlansFeature(sl);
+  registerRtiListFeature(sl);
+  registerAssignmentsFeature(sl);
   sl.registerLazySingleton<AuthRepository>(
         () => AuthRepository(sessionService: sl<SessionService>()),
   );
@@ -373,11 +375,6 @@ Future<void> setupDependencies() async {
   // ── PDO ───────────────────────────────────────────────────────────────────
   sl.registerLazySingleton<PDORepository>(() => PDORepository());
 
-  // ── RTI View ──────────────────────────────────────────────────────────────
-  sl.registerLazySingleton<RTIViewRepository>(() => RTIViewRepository());
-  sl.registerFactory<RTIDetailsBloc>(
-        () => RTIDetailsBloc(repository: sl<RTIViewRepository>()),
-  );
 
   // ── RTI Status ────────────────────────────────────────────────────────────
   sl.registerLazySingleton<RTIStatusRepository>(() => RTIStatusRepository());
@@ -425,8 +422,6 @@ Future<void> setupDependencies() async {
         () => LicenseBloc(repository: sl<LicenseRepository>()),
   );
 
-  // ── Planning Details ──────────────────────────────────────────────────────
-  sl.registerFactory(() => PlanningDetailsBloc());
   // ── Salary ────────────────────────────────────────────────────────────────
   sl.registerLazySingleton<SalaryRepository>(() => SalaryRepository());
   sl.registerFactory<SalaryBloc>(

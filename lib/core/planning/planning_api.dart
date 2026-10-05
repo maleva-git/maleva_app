@@ -80,6 +80,65 @@ class PlanningApi {
             if (reportDate != null) 'reportDate': _ymd(reportDate),
           }))))['Url']);
 
+  /// The plan screen's job search, as the web's live page sends it (`helpers.ts` `buildSearchPayload`,
+  /// `usePlanningListPage.ts:579-584`): `{comid, search, employeeid, fromdate, todate}` with
+  /// `yyyy-MM-dd` dates or ''. The answer is unwrapped like `normalizePlanningSearchResponse`.
+  Future<List<Map<String, dynamic>>> searchPlanning({String search = '', int employeeId = 0, String fromDate = '', String toDate = ''}) async =>
+      _rows(await _raw(() => _dio.post<dynamic>('/api/planing/search', data: {
+            'comid': companyId,
+            'search': search.trim(),
+            'employeeid': employeeId,
+            'fromdate': fromDate,
+            'todate': toDate,
+          })));
+
+  /// One plan by its number (the PLAN NO box: "PL000000782" → 782).
+  Future<Map<String, dynamic>> editByNumber(int planningNo) async => JsonRead.map(await _raw(() =>
+      _dio.get<dynamic>('/api/planing/edit', queryParameters: {'companyId': companyId, 'planningNo': planningNo})));
+
+  /// The newest RTI of each sale order (`POST /api/rti-details/rti-status`, body: the ids):
+  /// `[{saleOrderMasterRefId, rtiMasterRefId, rtiNo}]`; sale orders without an RTI are left out.
+  Future<List<Map<String, dynamic>>> rtiStatus(List<int> saleOrderIds) async {
+    final ids = saleOrderIds.where((id) => id > 0).toSet().toList();
+    if (ids.isEmpty) return const [];
+    final answer = await _raw(() => _dio.post<dynamic>('/api/rti-details/rti-status', data: ids));
+    return answer is List ? JsonRead.listOfMaps(answer) : const [];
+  }
+
+  /// What "Create All RTI" would create (`GET /api/planing/{id}/rti-batch/preview`).
+  Future<Map<String, dynamic>> rtiBatchPreview(int planningId, {List<int> jobIds = const [], bool includeExisting = false}) async =>
+      _data1(await _raw(() => _dio.get<dynamic>('/api/planing/$planningId/rti-batch/preview', queryParameters: {
+            'companyId': companyId,
+            if (jobIds.isNotEmpty) 'jobIds': jobIds.join(','),
+            if (includeExisting) 'includeExisting': true,
+          })));
+
+  /// Creates the ticked groups' RTIs in one transaction (`POST /api/planing/{id}/rti-batch`).
+  Future<Map<String, dynamic>> rtiBatchCreate(int planningId, Map<String, dynamic> request) async =>
+      _data1(await _raw(() => _dio.post<dynamic>('/api/planing/$planningId/rti-batch', data: request)));
+
+  /// `Data1 ?? Data ?? body`, as `planningRtiBatchApi.ts` reads it.
+  static Map<String, dynamic> _data1(dynamic body) {
+    final m = JsonRead.map(body);
+    final inner = m['Data1'] ?? m['data1'] ?? m['Data'] ?? m['data'];
+    return inner is Map ? JsonRead.map(inner) : m;
+  }
+
+  /// `normalizePlanningSearchResponse` (`planningSearch.ts:34-51`).
+  static List<Map<String, dynamic>> _rows(dynamic r) {
+    if (r is List) return JsonRead.listOfMaps(r);
+    if (r is! Map) return const [];
+    if (r['data1'] is List) return JsonRead.listOfMaps(r['data1']);
+    final data = r['data'];
+    if (data is List) return JsonRead.listOfMaps(data);
+    if (data is Map) {
+      for (final k in ['items', 'list', 'rows']) {
+        if (data[k] is List) return JsonRead.listOfMaps(data[k]);
+      }
+    }
+    return const [];
+  }
+
   static void _refusedUnlessOk(Map<String, dynamic> answer, String fallback) {
     if (answer['ok'] != true) throw ApiFailure(JsonRead.stringOrNull(answer['message']) ?? fallback);
   }

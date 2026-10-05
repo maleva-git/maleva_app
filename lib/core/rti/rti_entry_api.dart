@@ -63,10 +63,18 @@ class RtiEntryApi {
           queryParameters: {'jobNo': jobNo})));
 
   /// Adds (no `id`) or updates the RTI with its [master] fields and job
-  /// [lines]. Answers the saved RTI (`id`, `cnumberDisplay`, ...).
-  Future<Map<String, dynamic>> save(Map<String, dynamic> master, List<Map<String, dynamic>> lines) async {
+  /// [lines], and its [routeActivities] when given (the update replaces every
+  /// line and stop, as React's `rtiApi.save` sends them, `R/api/rtiApi.ts:310-378`).
+  /// Answers the saved RTI (`id`, `cnumberDisplay`, ...).
+  Future<Map<String, dynamic>> save(Map<String, dynamic> master, List<Map<String, dynamic>> lines,
+      {List<Map<String, dynamic>>? routeActivities}) async {
     final id = JsonRead.integer(master['id']);
-    final body = {...master, 'companyRefId': companyId, 'rtiDetails': lines};
+    final body = {
+      ...master,
+      'companyRefId': companyId,
+      'rtiDetails': lines,
+      if (routeActivities != null) 'routeActivities': routeActivities,
+    };
     if (id > 0) {
       return JsonRead.map(await _bare(() => _dio.put<dynamic>('/api/rti-masters/$id',
           queryParameters: {'companyId': companyId}, data: body)));

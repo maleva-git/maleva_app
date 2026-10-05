@@ -25,7 +25,7 @@ import '../../common_tabs/pdo/view/pdo_tab.dart';
 import '../../common_tabs/pettycash/view/pettycash_tab.dart';
 import '../../common_tabs/receiptview/view/receiptview_tab.dart';
 import '../../common_tabs/invoice/view/invoice_tab.dart';
-import '../../common_tabs/rtiview/view/rtiview_tab.dart';
+import 'package:maleva/features/rti/list/view/rti_list_page.dart';
 import '../../common_tabs/saleorderview/view/saleorderview_tab.dart';
 import '../../common_tabs/salesorder/view/salesorderview_tab.dart';
 import '../../common_tabs/spareparts/view/sparepartsadd.dart';
@@ -234,7 +234,7 @@ class MobileDashboard extends StatelessWidget {
                 .format(DateTime.now().subtract(const Duration(days: 7))),
             toDate: DateFormat('yyyy-MM-dd').format(DateTime.now()),
           ),
-          const RTIDetailsPage(),
+          const RtiListPage(),
           const AdminLeaveApprovalTab(),
           const EmployeeLeaveApprovalTab(),
           const EmployeeLeaveRequestTab(isAdminOrSubadmin: true),

@@ -34,7 +34,7 @@ import '../features/operations/forwardingsalary/bloc/forwardingsalary_event.dart
 import '../features/operations/forwardingsalary/view/forwardingsalary_tab.dart';
 import '../features/operations/forwardingsmk/view/forwardingsmk_tab.dart';
 import '../features/transaction/enquirytrmaster/view/view/enquirytrview_tab.dart';
-import '../features/transaction/planning/view/planning_tab.dart';
+import '../features/planning/plans/view/plans_page.dart';
 import '../features/transaction/prealertview/view/prealertview_tab.dart';
 import '../features/transaction/salesorder/view/view/salesorderview_tab.dart';
 import '../features/dashboard/common_tabs/vesselplanningweb/view/vesselplanningweb_tab.dart';
@@ -45,9 +45,7 @@ import '../features/transport/licenseupdate/bloc/licenseupdate_bloc.dart';
 import '../features/transport/licenseupdate/bloc/licenseupdate_event.dart';
 import '../features/transport/licenseupdate/view/licenseupdate_tab.dart';
 import '../features/transport/maintenance/view/maintenance_tab.dart';
-import '../features/transport/updatertidetails/bloc/updatertidetails_bloc.dart';
-import '../features/transport/updatertidetails/bloc/updatertidetails_event.dart';
-import '../features/transport/updatertidetails/view/updatertidetails_tab.dart';
+import '../features/rti/list/view/rti_list_page.dart';
 import '../features/troubleshoot/view/troubleshoot_sheet.dart';
 import 'package:maleva/core/models/shared/menu_master_model.dart';
 import 'package:maleva/core/utils/auth_helper.dart';
@@ -645,7 +643,7 @@ class _MenuTileState extends State<_MenuTile>
         case "Sales Order":
           Navigator.push(ctx, _r(const SaleOrderView()));       break;
         case "Planning":
-          Navigator.push(ctx, _r(const PlanningView()));        break;
+          Navigator.push(ctx, _r(const PlansPage()));           break;
         case "SpotSaleOrder":
           Navigator.push(ctx, _r(const SpotSaleViewPage()));       break;
         case "PreAlertReport":
@@ -796,16 +794,7 @@ class _MenuTileState extends State<_MenuTile>
           );
           break;
         case "Update RTI Details":
-          Navigator.push(
-            ctx,
-            MaterialPageRoute(
-              builder: (context) => BlocProvider(
-                create: (context) => UpdateRTIBloc()..add(UpdateRTIStarted()),
-                child: const UpdateRTI(),
-              ),
-            ),
-          );
-          break;
+          Navigator.push(ctx, _r(const RtiListPage()));         break;
 
 
         case "License Update":
@@ -838,8 +827,6 @@ class _MenuTileState extends State<_MenuTile>
 
         case "Maintenance":
           Navigator.push(ctx, _r(const Maintenance()));         break;
-        case "Update RTI Details":
-          Navigator.push(ctx, _r(const UpdateRTI()));           break;
         case "Forwarding SMK Update":
           Navigator.push(ctx, _r(const FWSmkUpdate()));         break;
         case "IR Report":
