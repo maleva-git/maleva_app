@@ -1,3 +1,9 @@
+import 'package:maleva/core/models/shared/agent_company_model.dart';
+import 'package:maleva/core/models/shared/agent_model.dart';
+import 'package:maleva/features/operations/models/job_type_details_model.dart';
+import 'package:maleva/features/operations/models/job_all_status_model.dart';
+import 'package:maleva/features/operations/models/job_type_model.dart';
+import 'package:maleva/core/models/shared/customer_model.dart';
 import 'package:maleva/core/models/shared/employee_model.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
@@ -18,12 +24,12 @@ class SaleOrderDetailsBloc extends Bloc<SaleOrderDetailsEvent, SaleOrderDetailsS
   final SaleOrderApi _saleOrders;
 
   // Local caching to replace objfun globals
-  List<dynamic> _agentCompanyList = [];
-  List<dynamic> _agentAllList = [];
-  List<dynamic> _customerList = [];
-  List<dynamic> _jobTypeList = [];
-  List<dynamic> _jobAllStatusList = [];
-  List<dynamic> _jobTypeDetailsList = [];
+  List<AgentCompanyModel> _agentCompanyList = [];
+  List<AgentModel> _agentAllList = [];
+  List<CustomerModel> _customerList = [];
+  List<JobTypeModel> _jobTypeList = [];
+  List<JobAllStatusModel> _jobAllStatusList = [];
+  List<JobTypeDetailsModel> _jobTypeDetailsList = [];
   List<EmployeeModel> _employeeList = [];
 
   SaleOrderDetailsBloc({required this.repository, SaleOrderApi? saleOrders})
@@ -62,7 +68,7 @@ class SaleOrderDetailsBloc extends Bloc<SaleOrderDetailsEvent, SaleOrderDetailsS
     SaleOrderVisibility v = const SaleOrderVisibility.allHidden();
 
     for (final item in _jobTypeDetailsList) {
-      final desc = item['Description'] as String? ?? '';
+      final desc = item.Description;
       switch (desc) {
         case 'OFF VESSEL NAME': v = v.copyWith(offVessel: true); break;
         case 'LOAD VESSEL NAME': v = v.copyWith(loadingVessel: true); break;
@@ -142,57 +148,57 @@ class SaleOrderDetailsBloc extends Bloc<SaleOrderDetailsEvent, SaleOrderDetailsS
       _jobTypeList = masterData['jobTypes'];
       _jobAllStatusList = masterData['jobStatuses'];
 
-      _jobTypeDetailsList = masterData['jobTypeDetails'] as List<dynamic>? ?? [];
+      _jobTypeDetailsList = masterData['jobTypeDetails'] as List<JobTypeDetailsModel>? ?? [];
       _agentAllList = masterData['agents'];
 
       // ── Resolve foreign-key display names from LOCAL lists ────────────────
       String custName = '';
       int custId = m["customerRefId"] ?? 0;
       if (custId != 0) {
-        final found = _customerList.where((c) => c['Id'] == custId).toList();
-        if (found.isNotEmpty) custName = found[0]['AccountName'] ?? '';
+        final found = _customerList.where((c) => c.Id == custId).toList();
+        if (found.isNotEmpty) custName = found[0].AccountName;
       }
 
       String jobTypeName = '';
       int jobTypeId = m["jobMasterRefId"] ?? 0;
       if (jobTypeId != 0) {
-        final found = _jobTypeList.where((j) => j['Id'] == jobTypeId).toList();
-        if (found.isNotEmpty) jobTypeName = found[0]['Name'] ?? '';
+        final found = _jobTypeList.where((j) => j.Id == jobTypeId).toList();
+        if (found.isNotEmpty) jobTypeName = found[0].Name;
       }
 
       String jobStatusName = '';
       int statusId = m["jStatus"] ?? 0;
       if (statusId != 0) {
-        final found = _jobAllStatusList.where((s) => s['Status'] == statusId).toList();
-        if (found.isNotEmpty) jobStatusName = found[0]['StatusName'] ?? '';
+        final found = _jobAllStatusList.where((s) => s.Status == statusId).toList();
+        if (found.isNotEmpty) jobStatusName = found[0].StatusName;
       }
 
       String oAgentCompanyName = '';
       int oAgentCompanyId = m["oAgentCompanyRefId"] ?? 0;
       if (oAgentCompanyId != 0) {
-        final found = _agentCompanyList.where((a) => a['Id'] == oAgentCompanyId).toList();
-        if (found.isNotEmpty) oAgentCompanyName = found[0]['Name'] ?? '';
+        final found = _agentCompanyList.where((a) => a.Id == oAgentCompanyId).toList();
+        if (found.isNotEmpty) oAgentCompanyName = found[0].Name;
       }
 
       String oAgentName = '';
       int oAgentId = m["oAgentMasterRefId"] ?? 0;
       if (oAgentId != 0) {
-        final found = _agentAllList.where((a) => a['Id'] == oAgentId).toList();
-        if (found.isNotEmpty) oAgentName = found[0]['AgentName'] ?? '';
+        final found = _agentAllList.where((a) => a.Id == oAgentId).toList();
+        if (found.isNotEmpty) oAgentName = found[0].AgentName;
       }
 
       String lAgentCompanyName = '';
       int lAgentCompanyId = m["agentCompanyRefId"] ?? 0;
       if (lAgentCompanyId != 0) {
-        final found = _agentCompanyList.where((a) => a['Id'] == lAgentCompanyId).toList();
-        if (found.isNotEmpty) lAgentCompanyName = found[0]['Name'] ?? '';
+        final found = _agentCompanyList.where((a) => a.Id == lAgentCompanyId).toList();
+        if (found.isNotEmpty) lAgentCompanyName = found[0].Name;
       }
 
       String lAgentName = '';
       int lAgentId = m["agentMasterRefId"] ?? 0;
       if (lAgentId != 0) {
-        final found = _agentAllList.where((a) => a['Id'] == lAgentId).toList();
-        if (found.isNotEmpty) lAgentName = found[0]['AgentName'] ?? '';
+        final found = _agentAllList.where((a) => a.Id == lAgentId).toList();
+        if (found.isNotEmpty) lAgentName = found[0].AgentName;
       }
 
       // ── Seal / Break employees ─────────────────────────────────────────────

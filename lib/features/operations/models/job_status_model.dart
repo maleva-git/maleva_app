@@ -1,3 +1,4 @@
+import 'package:maleva/core/utils/json_read.dart';
 
 class JobStatusModel {
   int Id;
@@ -8,12 +9,14 @@ class JobStatusModel {
 
   JobStatusModel(this.Id, this.Name, this.DFlag, this.Svalue, this.Active);
 
-  JobStatusModel.fromJson(Map<String, dynamic> json)
-      : Id = int.tryParse(json['Id']?.toString() ?? '') ?? 0,
-        Name = json['Name'].toString(),
-        DFlag = int.tryParse(json['DFlag']?.toString() ?? '') ?? 0,
-        Svalue = int.tryParse(json['Svalue']?.toString() ?? '') ?? 0,
-        Active = int.tryParse(json['Active']?.toString() ?? '') ?? 0;
+  /// A status of the shared Java `/api/job-status-master/select/{companyId}/`.
+  JobStatusModel.fromJava(Map<String, dynamic> json)
+      : Id = JsonRead.integer(json['id']),
+        Name = JsonRead.string(json['name']),
+        DFlag = JsonRead.integer(JsonRead.field(json, 'dFlag')),
+        Svalue = JsonRead.integer(json['svalue']),
+        Active = JsonRead.integer(json['active']);
+
   Map<String, dynamic> toJson() {
     return {
       'Id': Id,

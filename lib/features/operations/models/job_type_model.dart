@@ -1,3 +1,4 @@
+import 'package:maleva/core/utils/json_read.dart';
 
 class JobTypeModel {
   int Id;
@@ -7,11 +8,12 @@ class JobTypeModel {
 
   JobTypeModel(this.Id, this.Name, this.DFlag, this.Active);
 
-  JobTypeModel.fromJson(Map<String, dynamic> json)
-      : Id = int.tryParse(json['Id']?.toString() ?? '') ?? 0,
-        Name = json['Name'].toString(),
-        DFlag = int.tryParse(json['DFlag']?.toString() ?? '') ?? 0,
-        Active = int.tryParse(json['Active']?.toString() ?? '') ?? 0;
+  /// A job type of the shared Java `/api/job-type-master/jobtypes/{companyId}`.
+  JobTypeModel.fromJava(Map<String, dynamic> json)
+      : Id = JsonRead.integer(json['id']),
+        Name = JsonRead.string(json['name']),
+        DFlag = JsonRead.integer(JsonRead.field(json, 'dFlag')),
+        Active = JsonRead.integer(json['active']);
   Map<String, dynamic> toJson() {
     return {
       'Id': Id,

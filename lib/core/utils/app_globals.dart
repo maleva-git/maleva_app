@@ -1,3 +1,4 @@
+import 'package:maleva/core/files/file_links.dart';
 export 'dialog_helper.dart';
 export 'printer_helper.dart';
 import 'dart:core' as cc;
@@ -10,7 +11,6 @@ import 'dart:core';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'app_preferences.dart';
-import '../network/api_constants.dart';
 import 'package:maleva/core/models/shared/list_item.dart';
 import 'package:maleva/core/models/shared/agent_company_model.dart';
 import 'package:maleva/features/operations/models/job_all_status_model.dart';
@@ -41,23 +41,10 @@ class AppGlobals {
   static AssetImage calendar = const AssetImage('assets/common/calendar.png');
   static AssetImage lockimg = const AssetImage('assets/common/lockImg.png');
 
-  // String port0 = "http://192.168.1.100:8085/";
-  // String port = "http://192.168.1.13:9007/";
-  //String port = "http://103.215.139.8:8001/";
-  // String port = "http://192.168.1.101:8003/";
-
-  //String port = "http://103.215.139.121:9001/"; //Demos
-
-  //String port = "http://103.215.139.8:8001/"; //Demolatest
-
-  //String port = "https://maleva.my"; //Live
-
-  static String port = ApiConstants.port;
-
-  //String razorpaykey = "rzp_live_GmuWNB2PVXAnLt";
-
-  static String imagepath = "$port/Upload/$Comid/";
-  //String apiPostimage = port + "/api/SaleOrderApp/ImageUpload/";
+  /// The company's Upload folder on the Java server (`<java>/Upload/<company>/`),
+  /// read when used so a sign-in to another company takes effect (change
+  /// `file-links-on-java`; it was the .NET host, fixed at first use).
+  static String get imagepath => fileUrl('/Upload/$Comid/');
 
 
 

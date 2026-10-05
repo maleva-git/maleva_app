@@ -1,3 +1,4 @@
+import 'package:maleva/core/utils/json_read.dart';
 
 class JobAllStatusModel {
   int ID;
@@ -11,14 +12,16 @@ class JobAllStatusModel {
   JobAllStatusModel(this.ID, this.JobMasterRefId, this.Status, this.StatusName,
       this.MinStatusName, this.MinStatus, this.Sort);
 
-  JobAllStatusModel.fromJson(Map<String, dynamic> json)
-      : ID = int.tryParse(json['ID']?.toString() ?? '') ?? 0,
-        JobMasterRefId = int.tryParse(json['JobMasterRefId']?.toString() ?? '') ?? 0,
-        Status = int.tryParse(json['Status']?.toString() ?? '') ?? 0,
-        StatusName = json['StatusName'].toString(),
-        MinStatusName = json['MinStatusName'].toString(),
-        MinStatus = int.tryParse(json['MinStatus']?.toString() ?? '') ?? 0,
-        Sort = int.tryParse(json['Sort']?.toString() ?? '') ?? 0;
+  /// A row of a job type's status order (shared Java select-all-data `jobStatusDetails`).
+  JobAllStatusModel.fromJava(Map<String, dynamic> json)
+      : ID = JsonRead.integer(json['id']),
+        JobMasterRefId = JsonRead.integer(json['jobMasterRefId']),
+        Status = JsonRead.integer(json['status']),
+        StatusName = JsonRead.string(json['statusName']),
+        MinStatusName = JsonRead.string(json['minStatusName']),
+        MinStatus = JsonRead.integer(json['minStatus']),
+        Sort = JsonRead.integer(json['sort']);
+
   Map<String, dynamic> toJson() {
     return {
       'ID': ID,

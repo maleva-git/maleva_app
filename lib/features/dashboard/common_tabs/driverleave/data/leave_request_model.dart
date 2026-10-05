@@ -1,3 +1,5 @@
+import 'package:maleva/core/utils/json_read.dart';
+
 class LeaveRequestModel {
   final int id;
   final int applicantType;
@@ -33,23 +35,25 @@ class LeaveRequestModel {
     required this.createdDate,
   });
 
-  factory LeaveRequestModel.fromJson(Map<String, dynamic> json) {
+  /// A request of the shared Java `/api/leave/search`.
+  factory LeaveRequestModel.fromJava(Map<String, dynamic> json) {
+    dynamic f(String k) => JsonRead.field(json, k);
     return LeaveRequestModel(
-      id: json['Id'] ?? 0,
-      applicantType: json['ApplicantType'] ?? 0,
-      applicantRefId: json['ApplicantRefId'] ?? 0,
-      applicantName: json['ApplicantName'] ?? '',
-      leaveTypeRefId: json['LeaveTypeRefId'] ?? 0,
-      fromDate: DateTime.tryParse(json['FromDate'] ?? '') ?? DateTime.now(),
-      toDate: DateTime.tryParse(json['ToDate'] ?? '') ?? DateTime.now(),
-      totalDays: json['TotalDays'] ?? 0,
-      reason: json['Reason'] ?? '',
-      statusRefId: json['StatusRefId'] ?? 0,
-      statusName: json['StatusName'] ?? '',
-      reviewRemark: json['ReviewRemark'] ?? '',
-      reviewedBy: json['ReviewedBy'] ?? 0,
-      reviewedByName: json['ReviewedByName'] ?? '',
-      createdDate: DateTime.tryParse(json['Created_Date'] ?? '') ?? DateTime.now(),
+      id: JsonRead.integer(f('id')),
+      applicantType: JsonRead.integer(f('applicantType')),
+      applicantRefId: JsonRead.integer(f('applicantRefId')),
+      applicantName: JsonRead.string(f('applicantName')),
+      leaveTypeRefId: JsonRead.integer(f('leaveTypeRefId')),
+      fromDate: JsonRead.date(f('fromDate')) ?? DateTime.now(),
+      toDate: JsonRead.date(f('toDate')) ?? DateTime.now(),
+      totalDays: JsonRead.integer(f('totalDays')),
+      reason: JsonRead.string(f('reason')),
+      statusRefId: JsonRead.integer(f('statusRefId')),
+      statusName: JsonRead.string(f('statusName')),
+      reviewRemark: JsonRead.string(f('reviewRemark')),
+      reviewedBy: JsonRead.integer(f('reviewedBy')),
+      reviewedByName: JsonRead.string(f('reviewedByName')),
+      createdDate: JsonRead.date(f('createdDate')) ?? JsonRead.date(f('fromDate')) ?? DateTime.now(),
     );
   }
 }
@@ -58,7 +62,7 @@ class LeaveTypeModel {
   final int id;
   final String name;
   LeaveTypeModel({required this.id, required this.name});
-  factory LeaveTypeModel.fromJson(Map<String, dynamic> json) {
-    return LeaveTypeModel(id: json['Id'] ?? 0, name: json['Name'] ?? '');
-  }
+  /// A type of the shared Java `/api/leave/types`.
+  factory LeaveTypeModel.fromJava(Map<String, dynamic> json) =>
+      LeaveTypeModel(id: JsonRead.integer(json['id']), name: JsonRead.string(json['name']));
 }

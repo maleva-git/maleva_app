@@ -1,6 +1,7 @@
-import 'package:maleva/core/network/legacy_api_repository.dart';
+import 'package:maleva/core/fleet/truck_api.dart';
+import 'package:maleva/core/network/api_failure.dart';
+import 'package:maleva/core/utils/json_read.dart';
 import 'package:maleva/core/di/injection.dart';
-import 'package:maleva/core/network/api_constants.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 import 'package:maleva/core/utils/app_globals.dart';
@@ -8,7 +9,6 @@ import 'package:maleva/core/utils/app_globals.dart';
 
 import 'licenseupdate_event.dart';
 import 'licenseupdate_state.dart';
-import 'package:maleva/core/models/shared/response_view_model.dart';
 import 'package:maleva/core/models/shared/get_truck_model.dart';
 
 
@@ -119,51 +119,38 @@ class LicenseUpdateBloc
 
     emit(LicenseUpdateLoading());
     try {
-      String? iso(bool cb, String date) =>
-          cb ? DateTime.parse(date).toIso8601String() : null;
+      // a ticked date is saved (yyyy-MM-dd), an unticked one cleared
+      String? ymd(bool cb, String date) => cb ? DateFormat('yyyy-MM-dd').format(DateTime.parse(date)) : null;
 
-      final master = [
-        {
-          'Id':           s.truckId,
-          'CompanyRefId': AppGlobals.Comid,
-          'TruckName':    s.truckNameField,
-          'TruckNumber':  s.truckNo,
-          'TruckNumber1': s.truckNo2,
-          'TruckType':    s.truckType,
-          'Latitude':     s.latitude,
-          'longitude':    s.longitude,
-          'RotexMyExp':   iso(s.cbRotexMyExp,    s.rotexMyExp),
-          'RotexSGExp':   iso(s.cbRotexSGExp,    s.rotexSGExp),
-          'PuspacomExp':  iso(s.cbPuspacomExp,   s.puspacomExp),
-          'RotexMyExp1':  iso(s.cbRotexMyExp1,   s.rotexMyExp1),
-          'RotexSGExp1':  iso(s.cbRotexSGExp1,   s.rotexSGExp1),
-          'PuspacomExp1': iso(s.cbPuspacomExp1,  s.puspacomExp1),
-          'InsuratnceExp':iso(s.cbInsuratnceExp, s.insuratnceExp),
-          'BonamExp':     iso(s.cbBonamExp,      s.bonamExp),
-          'ApadExp':      iso(s.cbApadExp,       s.apadExp),
-          'ServiceExp':   iso(s.cbServiceExp,    s.serviceExp),
-          'AlignmentExp': iso(s.cbAlignmentExp,  s.alignmentExp),
-          'GreeceExp':    iso(s.cbGreeceExp,     s.greeceExp),
-          'Active':       s.active,
-        }
-      ];
-
-      final header = {'Content-Type': 'application/json; charset=UTF-8'};
-      final result = await sl<LegacyApiRepository>().apiAllinoneSelectArray(
-          '${ApiConstants.apiUpdateTruckDetails}${AppGlobals.Comid}',
-          master,
-          header,
-          null);
-
-      if (result != '') {
-        final value = ResponseViewModel.fromJson(result);
-        if (value.IsSuccess == true) {
-          emit(LicenseUpdateSaveSuccess());
-          emit(LicenseUpdateLoaded.empty(admin: s.admin));
-          return;
-        }
-      }
-      emit(s); // revert on failure
+      // the shared Java truck save (was .NET TruckApp/InsertTruck); the rest of the truck is kept
+      await sl<TruckApi>().update(s.truckId, {
+        'truckName':    s.truckNameField,
+        'truckNumber':  s.truckNo,
+        'truckNumber1': s.truckNo2,
+        'truckType':    s.truckType,
+        'latitude':     s.latitude,
+        'longitude':    s.longitude,
+        'active':       s.active,
+        'rotexMyExp':   ymd(s.cbRotexMyExp,    s.rotexMyExp),
+        'rotexSGExp':   ymd(s.cbRotexSGExp,    s.rotexSGExp),
+        'puspacomExp':  ymd(s.cbPuspacomExp,   s.puspacomExp),
+        'rotexMyExp1':  ymd(s.cbRotexMyExp1,   s.rotexMyExp1),
+        'rotexSGExp1':  ymd(s.cbRotexSGExp1,   s.rotexSGExp1),
+        'puspacomExp1': ymd(s.cbPuspacomExp1,  s.puspacomExp1),
+        'insuranceExp': ymd(s.cbInsuratnceExp, s.insuratnceExp),
+        'bonamExp':     ymd(s.cbBonamExp,      s.bonamExp),
+        'apadExp':      ymd(s.cbApadExp,       s.apadExp),
+        'serviceExp':   ymd(s.cbServiceExp,    s.serviceExp),
+        'alignmentExp': ymd(s.cbAlignmentExp,  s.alignmentExp),
+        'greeceExp':    ymd(s.cbGreeceExp,     s.greeceExp),
+      });
+      emit(LicenseUpdateSaveSuccess());
+      emit(LicenseUpdateLoaded.empty(admin: s.admin));
+      return;
+    } on ApiFailure catch (e) {
+      emit(LicenseUpdateError(e.message));
+      emit(s); // the form back as it was
+      return;
     } catch (e) {
       emit(LicenseUpdateError(e.toString()));
     }
@@ -182,68 +169,62 @@ class LicenseUpdateBloc
   }
 
   // ── Helper: fetch truck + parse all 12 date fields ───────────────────────────
+  /// The truck from the shared Java truck master (was .NET TruckApp/SelectTruck);
+  /// a date it does not have is shown as today, unticked.
   Future<LicenseUpdateLoaded> _fetchAndBuild(
       int truckId, {required bool admin}) async {
-    await sl<LegacyApiRepository>().EditTruckList(null, truckId, 'Id', null);
-
-    if (AppGlobals.TruckDetailsList.isEmpty) {
-      return LicenseUpdateLoaded.empty(admin: admin)
-          .copyWith(truckId: truckId);
+    final t = await sl<TruckApi>().byId(truckId);
+    if (t == null) {
+      return LicenseUpdateLoaded.empty(admin: admin).copyWith(truckId: truckId);
     }
-
-    final d  = AppGlobals.TruckDetailsList[0];
-    final fmt = DateFormat('MM/dd/yyyy HH:mm:ss');
-    final today = DateFormat('yyyy-MM-dd').format(DateTime.now());
-
-    String parse(String raw) {
-      if (raw == 'null' || raw.isEmpty) return today;
-      try {
-        return DateFormat('yyyy-MM-dd').format(fmt.parse(raw));
-      } catch (_) {
-        return today;
-      }
+    dynamic f(String k) => JsonRead.field(t, k);
+    final day = DateFormat('yyyy-MM-dd');
+    final today = day.format(DateTime.now());
+    String text(String k) => JsonRead.string(f(k));
+    String date(String k) {
+      final d = JsonRead.date(f(k));
+      return d == null ? today : day.format(d);
     }
-
-    bool hasVal(String raw) => raw != 'null' && raw.isNotEmpty;
+    bool has(String k) => JsonRead.date(f(k)) != null;
 
     return LicenseUpdateLoaded(
       truckId:        truckId,
-      truckName:      d.TruckNumber, // shown in selector
+      truckName:      text('truckNumber'), // shown in selector
       admin:          admin,
-      truckNo:        d.TruckNumber,
-      truckNo2:       d.TruckNumber1 == 'null' ? '' : d.TruckNumber1,
-      truckNameField: d.TruckName,
-      longitude:      d.longitude == 'null' ? '' : d.longitude,
-      latitude:       d.Latitude  == 'null' ? '' : d.Latitude,
-      truckType:      d.TruckType == 'null' ? '' : d.TruckType,
-      cNumberDisplay: d.CNumberDisplay,
-      cNumber:        d.CNumber,
-      active:         d.Active,
+      truckNo:        text('truckNumber'),
+      truckNo2:       text('truckNumber1'),
+      truckNameField: text('truckName'),
+      longitude:      text('longitude'),
+      latitude:       text('latitude'),
+      truckType:      text('truckType'),
+      cNumberDisplay: text('cNumberDisplay'),
+      cNumber:        JsonRead.integer(f('cNumber')),
+      active:         JsonRead.integer(f('active')),
 
-      rotexMyExp:    parse(d.RotexMyExp),
-      cbRotexMyExp:  hasVal(d.RotexMyExp),
-      rotexSGExp:    parse(d.RotexSGExp),
-      cbRotexSGExp:  hasVal(d.RotexSGExp),
-      puspacomExp:   parse(d.PuspacomExp),
-      cbPuspacomExp: hasVal(d.PuspacomExp),
-      rotexMyExp1:   parse(d.RotexMyExp1),
-      cbRotexMyExp1: hasVal(d.RotexMyExp1),
-      rotexSGExp1:   parse(d.RotexSGExp1),
-      cbRotexSGExp1: hasVal(d.RotexSGExp1),
-      puspacomExp1:  parse(d.PuspacomExp1),
-      cbPuspacomExp1:hasVal(d.PuspacomExp1),
-      insuratnceExp: parse(d.InsuratnceExp),
-      cbInsuratnceExp:hasVal(d.InsuratnceExp),
-      bonamExp:      parse(d.BonamExp),
-      cbBonamExp:    hasVal(d.BonamExp),
-      apadExp:       parse(d.ApadExp),
-      cbApadExp:     hasVal(d.ApadExp),
-      serviceExp:    parse(d.ServiceExp),
-      cbServiceExp:  hasVal(d.ServiceExp),
-      alignmentExp:  parse(d.AlignmentExp),
-      cbAlignmentExp:hasVal(d.AlignmentExp),
-      greeceExp:     parse(d.GreeceExp),
-      cbGreeceExp:   hasVal(d.GreeceExp),
+      rotexMyExp:    date('rotexMyExp'),
+      cbRotexMyExp:  has('rotexMyExp'),
+      rotexSGExp:    date('rotexSGExp'),
+      cbRotexSGExp:  has('rotexSGExp'),
+      puspacomExp:   date('puspacomExp'),
+      cbPuspacomExp: has('puspacomExp'),
+      rotexMyExp1:   date('rotexMyExp1'),
+      cbRotexMyExp1: has('rotexMyExp1'),
+      rotexSGExp1:   date('rotexSGExp1'),
+      cbRotexSGExp1: has('rotexSGExp1'),
+      puspacomExp1:  date('puspacomExp1'),
+      cbPuspacomExp1:has('puspacomExp1'),
+      insuratnceExp: date('insuranceExp'),
+      cbInsuratnceExp:has('insuranceExp'),
+      bonamExp:      date('bonamExp'),
+      cbBonamExp:    has('bonamExp'),
+      apadExp:       date('apadExp'),
+      cbApadExp:     has('apadExp'),
+      serviceExp:    date('serviceExp'),
+      cbServiceExp:  has('serviceExp'),
+      alignmentExp:  date('alignmentExp'),
+      cbAlignmentExp:has('alignmentExp'),
+      greeceExp:     date('greeceExp'),
+      cbGreeceExp:   has('greeceExp'),
     );
   }
 }

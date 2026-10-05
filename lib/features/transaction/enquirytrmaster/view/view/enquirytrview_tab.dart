@@ -1,8 +1,8 @@
+import 'package:google_fonts/google_fonts.dart';
 import 'package:maleva/core/theme/app_typography.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:maleva/core/utils/app_globals.dart';
 import 'package:maleva/menu/menulist.dart';
@@ -26,7 +26,6 @@ import 'package:maleva/core/colors/colors.dart' as colour;
 import 'package:maleva/core/models/shared/customer_model.dart';
 import 'package:maleva/core/models/shared/employee_model.dart';
 import 'package:maleva/features/transaction/enquirytrmaster/models/enquiry_master_model.dart';
-import 'package:maleva/features/operations/models/job_all_status_model.dart';
 import 'package:maleva/features/operations/models/job_type_model.dart';
 
 
@@ -672,10 +671,7 @@ class _FilterSheetState extends State<_FilterSheet> {
           if (navRes != null) { AppGlobals.SelectJobTypeList = navRes; }
           final sel = AppGlobals.SelectJobTypeList;
           if (sel.Id != 0) {
-            AppGlobals.JobAllStatusList = (await sl<EnquiryTrRepository>().selectAllJobStatus(sel.Id))
-                .map((e) => JobAllStatusModel.fromJson(e))
-                .toList()
-                .cast<JobAllStatusModel>();
+            AppGlobals.JobAllStatusList = await sl<EnquiryTrRepository>().selectAllJobStatus(sel.Id);
             if (!context.mounted) return;
             setState(() {
               _local =

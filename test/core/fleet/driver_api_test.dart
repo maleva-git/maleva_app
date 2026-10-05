@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:dio/dio.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:maleva/core/fleet/driver_api.dart';
+import 'package:maleva/core/models/shared/get_truck_model.dart';
 import 'package:maleva/core/models/shared/license_view_model.dart';
 import 'package:maleva/core/network/api_failure.dart';
 
@@ -39,5 +40,21 @@ void main() {
     adapter.replies.add((400, jsonEncode({'IsSuccess': false, 'StatusCode': 400, 'Message': 'Company ID is required'})));
 
     expect(() => api.search(), throwsA(isA<ApiFailure>().having((f) => f.message, 'message', 'Company ID is required')));
+  });
+
+  test('the driver picker is the combo rows', () async {
+    adapter.replies.add((200, jsonEncode({'isSuccess': true, 'statusCode': 200, 'data1': [{'Id': 7, 'AccountName': 'RAVI-0123'}]})));
+
+    final rows = await api.combo(type: 'PRIME');
+
+    expect(adapter.requests.single.uri.toString(), 'https://java.test/api/driver-combo?companyId=6&type=PRIME');
+    final d = GetTruckModel.fromJava(rows.single);
+    expect([d.Id, d.AccountName], [7, 'RAVI-0123']);
+  });
+
+  test('a refused driver list is the server message', () async {
+    adapter.replies.add((400, jsonEncode({'status': 400, 'message': 'Company is required'})));
+
+    expect(() => api.combo(), throwsA(isA<ApiFailure>().having((f) => f.message, 'message', 'Company is required')));
   });
 }

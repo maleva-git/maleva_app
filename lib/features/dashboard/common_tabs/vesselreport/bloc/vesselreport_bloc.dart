@@ -105,7 +105,7 @@ class VesselBloc extends Bloc<VesselEvent, VesselState> {
         ));
       }
     } catch (error) {
-      // ApiClient throws clear exceptions, we emit them directly to the UI
+      // The repository throws clear errors; we emit them directly to the UI
       emit(VesselErrorState(errorMessage: error.toString()));
     }
   }

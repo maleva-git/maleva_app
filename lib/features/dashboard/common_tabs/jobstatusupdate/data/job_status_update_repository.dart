@@ -1,10 +1,7 @@
+import 'package:maleva/core/lookups/job_status_api.dart';
 import 'package:maleva/core/di/injection.dart';
 import 'package:maleva/core/files/attachments_api.dart';
-import 'package:maleva/core/lookups/job_steps.dart';
-import 'package:maleva/core/network/api_constants.dart';
-import 'package:maleva/core/network/api_client.dart';
 import 'package:maleva/core/sale_order/sale_order_api.dart';
-import 'package:maleva/core/utils/app_preferences.dart';
 
 /// Job status (boarding) update. The job list, the job, the update and the
 /// boarding mail are the shared Java sale order API; the job steps are the
@@ -20,20 +17,13 @@ class JobStatusUpdateRepository {
 
   /// The job's status (id and name), job type and Boarding photos.
   Future<Map<String, dynamic>> fetchJobData(int saleOrderId, int cNumber) async {
-    final comid = AppPreferences.getComid();
     final master = (await _saleOrders.edit(id: saleOrderId, saleOrderNo: cNumber)).master;
     final int statusId = master['jStatus'] as int? ?? 0;
     final int jobMasterId = master['jobMasterRefId'] as int? ?? 0;
     var statusName = '';
 
     if (statusId != 0) {
-      final statusResponse = await ApiClient.postRequest("${ApiConstants.apiSelectAllJobStatus}$comid&Jobid=$jobMasterId", null);
-      for (final s in JobSteps.statuses(statusResponse)) {
-        if (s['Status'] == statusId) {
-          statusName = s['StatusName']?.toString() ?? '';
-          break;
-        }
-      }
+      statusName = (await sl<JobStatusApi>().steps(jobMasterId)).statusName(statusId);
     }
 
     final images = await sl<AttachmentsApi>().imageNames(folder: 'SalesOrder', recordId: saleOrderId, subFolder: 'Boarding');

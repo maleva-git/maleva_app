@@ -15,17 +15,7 @@ import 'package:maleva/features/troubleshoot/data/applog_api.dart';
 import 'core/di/injection.dart';
 import 'features/auth/data/device_token_listener.dart';
 import 'features/auth/data/session_service.dart';
-import 'core/network/certificate_policy.dart';
 import 'core/utils/app_preferences.dart';
-
-class MyHttpOverrides extends HttpOverrides {
-  @override
-  HttpClient createHttpClient(SecurityContext? context) {
-    return super.createHttpClient(context)
-      ..badCertificateCallback =
-          (X509Certificate cert, String host, int port) => acceptInvalidCertificate(host);
-  }
-}
 
 Future<void> backgroundHandler(RemoteMessage message) async {
   AppGlobals.print_(message.data.toString());
@@ -43,7 +33,6 @@ Future cleanTemporaryfiles() async {
 }
 
 Future<void> main() async {
-  HttpOverrides.global = MyHttpOverrides();
   WidgetsBinding widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
   FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
 
@@ -91,8 +80,7 @@ Future<void> main() async {
       DeviceOrientation.landscapeLeft,
       DeviceOrientation.landscapeRight,
     ]);
-    HttpOverrides.global = MyHttpOverrides();
-    cleanTemporaryfiles();
+      cleanTemporaryfiles();
   } catch (e, stack) {
     debugPrint("Error during main initialization: $e\n$stack");
     try {

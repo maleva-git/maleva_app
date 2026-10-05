@@ -1,9 +1,9 @@
+import 'package:maleva/core/di/injection.dart';
+import 'package:maleva/core/lookups/address_api.dart';
 import 'package:maleva/core/theme/app_typography.dart';
-import 'package:maleva/core/network/api_constants.dart';
 import 'package:flutter/material.dart';
 import 'package:maleva/core/colors/colors.dart' as colour;
 import 'package:maleva/core/utils/app_globals.dart';
-import 'package:maleva/core/network/api_client.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:maleva/core/models/shared/address_details_model.dart';
 
@@ -44,17 +44,12 @@ class _AddressListState extends State<AddressList> {
     if (mounted) setState(() { _loadState = null; _errorMsg = ''; });
 
     try {
-      final response = await ApiClient.postRequest(
-        '${ApiConstants.apiSelectAddressDetails}${AppGlobals.Comid}&KeyWord=',
-        null,
-      );
+      // every address of the company (shared Java address search, was .NET AddressApp/SelectAddress)
+      final rows = await sl<AddressApi>().search();
 
       if (!mounted) return;
 
-      List<AddressDetailsModel> loaded = [];
-      if (response is List) {
-        loaded = response.map((e) => AddressDetailsModel.fromJson(e)).toList();
-      }
+      final loaded = rows.map(AddressDetailsModel.fromJava).toList();
 
       AppGlobals.AddressList = loaded.map((e) => e.Name).toList();
 

@@ -6,13 +6,7 @@ import 'package:maleva/features/transaction/salesorder/add/bloc/salesorderadd_ev
 import 'package:maleva/features/transaction/salesorder/add/bloc/salesorderadd_state.dart';
 import 'package:maleva/features/transaction/salesorder/add/bloc/sale_order_save_body.dart';
 import 'package:maleva/features/transaction/salesorder/add/data/salesorderadd_repository.dart';
-import 'package:maleva/core/models/shared/customer_model.dart';
 import 'package:maleva/core/models/shared/sale_edit_detail_model.dart';
-import 'package:maleva/core/models/shared/agent_model.dart';
-import 'package:maleva/core/models/shared/agent_company_model.dart';
-import 'package:maleva/features/operations/models/job_all_status_model.dart';
-import 'package:maleva/features/operations/models/job_type_details_model.dart';
-import 'package:maleva/features/operations/models/job_type_model.dart';
 import 'package:maleva/core/di/injection.dart';
 import 'package:maleva/core/sale_order/sale_order_api.dart';
 import 'package:maleva/core/enquiry/enquiry_api.dart';
@@ -43,7 +37,7 @@ class SalesOrderAddBloc extends Bloc<SalesOrderAddEvent, SalesOrderAddState> {
         final now = DateFormat("yyyy-MM-dd HH:mm:ss").format(DateTime.now());
         final today = DateFormat("yyyy-MM-dd").format(DateTime.now());
         AppGlobals.MaxSaleOrderNum = await _saleOrders.nextJobNo('MY'); AppGlobals.AddressList = await _repository.selectAddressList();
-        AppGlobals.AgentCompanyList = (await _repository.selectAgentCompany()).map<AgentCompanyModel>((e) => AgentCompanyModel.fromJson(e)).toList();AppGlobals.EmployeeList = await _repository.selectEmployee('', 'Operation');final permission = _buildPermissions();
+        AppGlobals.AgentCompanyList = await _repository.selectAgentCompany();AppGlobals.EmployeeList = await _repository.selectEmployee('', 'Operation');final permission = _buildPermissions();
         var base = SalesOrderAddLoaded(
           progress: true, dtpSaleOrderdate: today, dtpOETAdate: now, dtpOETBdate: now, dtpOETDdate: now,
           dtpLETAdate: now, dtpLETBdate: now, dtpLETDdate: now, dtpFlightTimedate: now, dtpPickUpdate: now,
@@ -113,10 +107,8 @@ class SalesOrderAddBloc extends Bloc<SalesOrderAddEvent, SalesOrderAddState> {
       }
 
       final jobData = await _repository.selectAllJobStatus(event.id);
-      if (jobData.isNotEmpty) {
-        if (jobData["JobStatusDetails"] != null) AppGlobals.JobAllStatusList = (jobData["JobStatusDetails"] as List).map<JobAllStatusModel>((e) => JobAllStatusModel.fromJson(e)).toList();
-        if (jobData["JobTypeDetails"] != null) AppGlobals.JobTypeDetailsList = (jobData["JobTypeDetails"] as List).map<JobTypeDetailsModel>((e) => JobTypeDetailsModel.fromJson(e)).toList();
-      }
+      AppGlobals.JobAllStatusList = jobData.statuses;
+      AppGlobals.JobTypeDetailsList = jobData.details;
       emit(_applyVisibility(s.copyWith(txtJobType: event.name, jobTypeId: event.id)));
     });
 
@@ -648,22 +640,20 @@ class SalesOrderAddBloc extends Bloc<SalesOrderAddEvent, SalesOrderAddState> {
 
 
 
-    AppGlobals.CustomerList = (await _repository.selectCustomer()).map<CustomerModel>((e) => CustomerModel.fromJson(e)).toList();
-    AppGlobals.JobTypeList = (await _repository.selectJobType()).map<JobTypeModel>((e) => JobTypeModel.fromJson(e)).toList();
+    AppGlobals.CustomerList = await _repository.selectCustomer();
+    AppGlobals.JobTypeList = await _repository.selectJobType();
     if (m["jobMasterRefId"] != null) {
       final jobData = await _repository.selectAllJobStatus(m["jobMasterRefId"] as int? ?? 0);
-      if (jobData.isNotEmpty) {
-        if (jobData["JobStatusDetails"] != null) AppGlobals.JobAllStatusList = (jobData["JobStatusDetails"] as List).map<JobAllStatusModel>((e) => JobAllStatusModel.fromJson(e)).toList();
-        if (jobData["JobTypeDetails"] != null) AppGlobals.JobTypeDetailsList = (jobData["JobTypeDetails"] as List).map<JobTypeDetailsModel>((e) => JobTypeDetailsModel.fromJson(e)).toList();
-      }
+      AppGlobals.JobAllStatusList = jobData.statuses;
+      AppGlobals.JobTypeDetailsList = jobData.details;
     }
     String lAgentName = '';
     if (m["agentCompanyRefId"] != null && m["agentCompanyRefId"] > 0) {
-      AppGlobals.AgentAllList = (await _repository.selectAgentAll(m["agentCompanyRefId"] as int? ?? 0)).map<AgentModel>((e) => AgentModel.fromJson(e)).toList();lAgentName = _getFromAgentAll(m["agentMasterRefId"]);
+      AppGlobals.AgentAllList = await _repository.selectAgentAll(m["agentCompanyRefId"] as int? ?? 0);lAgentName = _getFromAgentAll(m["agentMasterRefId"]);
     }
     String oAgentName = '';
     if (m["oAgentCompanyRefId"] != null && m["oAgentCompanyRefId"] > 0) {
-      AppGlobals.AgentAllList = (await _repository.selectAgentAll(m["oAgentCompanyRefId"] as int? ?? 0)).map<AgentModel>((e) => AgentModel.fromJson(e)).toList();oAgentName = _getFromAgentAll(m["oAgentMasterRefId"]);
+      AppGlobals.AgentAllList = await _repository.selectAgentAll(m["oAgentCompanyRefId"] as int? ?? 0);oAgentName = _getFromAgentAll(m["oAgentMasterRefId"]);
     }
 
     AppGlobals.CustomerCurrencyValue = await _saleOrders.currencyValue(m["customerRefId"] as int? ?? 0);String safeStr(String? v) => v ?? ''; String safeNum(dynamic v) => v != null ? v.toString() : '';

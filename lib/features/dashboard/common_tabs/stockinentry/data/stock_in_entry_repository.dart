@@ -1,6 +1,6 @@
+import 'package:maleva/features/operations/models/job_all_status_model.dart';
+import 'package:maleva/core/lookups/job_status_api.dart';
 import 'package:maleva/core/files/attachments_api.dart';
-import 'package:maleva/core/network/dio_client.dart';
-import 'package:maleva/core/network/api_constants.dart';
 import 'package:maleva/core/utils/session_manager.dart';
 import 'package:maleva/core/di/injection.dart';
 import 'package:maleva/core/stock/stock_in_api.dart';
@@ -10,12 +10,11 @@ import 'package:maleva/core/sale_order/sale_order_api.dart';
 /// (ported from .NET StockApp); the job picker is `/api/sale-orders/job-numbers`
 /// (`[{id, cNumber, ...}]`); job steps and image delete are other features' calls.
 class StockInEntryRepository {
-  final DioClient _dioClient;
   final SessionManager _sessionManager;
   final StockInApi? _stockApi;
   final SaleOrderApi? _saleOrderApi;
 
-  StockInEntryRepository(this._dioClient, this._sessionManager, {StockInApi? stockApi, SaleOrderApi? saleOrderApi})
+  StockInEntryRepository(this._sessionManager, {StockInApi? stockApi, SaleOrderApi? saleOrderApi})
       : _stockApi = stockApi,
         _saleOrderApi = saleOrderApi;
 
@@ -47,7 +46,7 @@ class StockInEntryRepository {
     String jobDate = '';
     int jobMasterId = 0;
     int weightPkg = 0;
-    List<dynamic> jobStatuses = [];
+    List<JobAllStatusModel> jobStatuses = [];
 
     if (jobs.isNotEmpty) {
       final data = jobs.first;
@@ -61,14 +60,7 @@ class StockInEntryRepository {
       weightPkg = int.tryParse(match ?? '0') ?? 0;
 
       try {
-        final statusRes = await _dioClient.dio.post("${ApiConstants.apiSelectAllJobStatus}$_comid&Jobid=$jobMasterId", data: {});
-
-        if (statusRes.data != null && statusRes.data is List && statusRes.data.isNotEmpty) {
-          var firstItem = statusRes.data[0];
-          if (firstItem != null && firstItem['JobStatusDetails'] != null) {
-            jobStatuses = firstItem['JobStatusDetails'];
-          }
-        }
+        jobStatuses = (await sl<JobStatusApi>().steps(jobMasterId)).statuses;
       } catch (e) {
         // ignore
       }

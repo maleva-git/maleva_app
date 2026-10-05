@@ -3,7 +3,7 @@ import 'package:maleva/core/di/injection.dart';
 import 'package:maleva/core/session/app_session.dart';
 import 'package:maleva/core/utils/app_preferences.dart';
 import 'package:maleva/core/utils/session_manager.dart';
-import 'package:maleva/core/network/dio_client.dart';
+import 'package:maleva/core/network/java_api_client.dart';
 import 'package:maleva/features/dashboard/common_tabs/stocktransfer/data/stock_transfer_repository.dart';
 import 'package:maleva/features/dashboard/common_tabs/stockupdate/data/stock_update_repository.dart';
 import 'package:maleva/features/ir_report/domain/repositories/ir_repository.dart';
@@ -18,7 +18,7 @@ void main() {
     await setupDependencies();
   });
   tearDown(() async {
-    sl<DioClient>().dio.close();
+    sl<JavaApiClient>().dio.close();
     await sl.reset();
   });
   test('repositories are shared and route BLoCs are fresh', () async {

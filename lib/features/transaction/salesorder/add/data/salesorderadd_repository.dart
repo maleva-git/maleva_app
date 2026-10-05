@@ -1,147 +1,51 @@
+import 'package:maleva/core/models/shared/address_details_model.dart';
+import 'package:maleva/core/lookups/address_api.dart';
+import 'package:maleva/core/models/shared/agent_company_model.dart';
+import 'package:maleva/core/models/shared/agent_model.dart';
+import 'package:maleva/core/lookups/agent_api.dart';
+import 'package:maleva/core/lookups/job_steps.dart';
+import 'package:maleva/core/lookups/job_status_api.dart';
+import 'package:maleva/core/di/injection.dart';
+import 'package:maleva/features/operations/models/job_type_model.dart';
+import 'package:maleva/core/models/shared/customer_model.dart';
+import 'package:maleva/core/lookups/job_type_api.dart';
+import 'package:maleva/core/lookups/customer_api.dart';
 import 'package:maleva/core/models/shared/employee_model.dart';
 import 'package:get_it/get_it.dart';
 import 'package:maleva/core/employee/employee_api.dart';
-import 'dart:convert';
- import 'package:maleva/core/network/dio_client.dart';
-import 'package:maleva/core/network/api_constants.dart';
-import 'package:maleva/core/utils/session_manager.dart';
 
 class SalesOrderAddRepository {
-  final DioClient _dioClient;
-  final SessionManager _sessionManager;
+  // every list now comes from the shared Java APIs (no legacy client, no session needed)
+  SalesOrderAddRepository();
 
-  SalesOrderAddRepository(this._dioClient, this._sessionManager);
+  /// The address names (shared Java address master).
+  Future<List<String>> selectAddressList() => sl<AddressApi>().names();
 
-  int get _comId => _sessionManager.companyId;
+  /// The addresses whose name contains [keyword] (shared Java address search).
+  Future<List<AddressDetailsModel>> selectAddressDetails(String keyword) async =>
+      (await sl<AddressApi>().search(keyword)).map(AddressDetailsModel.fromJava).toList();
 
-  Future<List<dynamic>> selectAddressList() async {
-    try {
-      final endpoint = "${ApiConstants.apiSelectAddressList}$_comId";
-      final response = await _dioClient.dio.post(endpoint, data: {});
-      dynamic responseData = response.data;
-      if (responseData is String) {
-        if (responseData.trim().isEmpty) return [];
-        responseData = jsonDecode(responseData);
-      }
-      if (responseData is List) {
-        return responseData;
-      }
-    } catch (e) {
-      print("Error in selectAddressList: $e");
-    }
-    return [];
-  }
-
-  Future<List<dynamic>> selectAddressDetails(String keyword) async {
-    try {
-      final endpoint = "${ApiConstants.apiSelectAddressDetails}$_comId&KeyWord=${Uri.encodeComponent(keyword)}";
-      final response = await _dioClient.dio.post(endpoint, data: {});
-      dynamic responseData = response.data;
-      if (responseData is String) {
-        if (responseData.trim().isEmpty) return [];
-        responseData = jsonDecode(responseData);
-      }
-      if (responseData is List) {
-        return responseData;
-      }
-    } catch (e) {
-      print("Error in selectAddressDetails: $e");
-    }
-    return [];
-  }
-
-  Future<List<dynamic>> selectAgentCompany() async {
-    try {
-      final endpoint = "${ApiConstants.apiSelectAgentCompany}$_comId";
-      final response = await _dioClient.dio.post(endpoint, data: {});
-      dynamic responseData = response.data;
-      if (responseData is String) {
-        if (responseData.trim().isEmpty) return [];
-        responseData = jsonDecode(responseData);
-      }
-      if (responseData is List) {
-        return responseData;
-      }
-    } catch (e) {
-      print("Error in selectAgentCompany: $e");
-    }
-    return [];
-  }
+  /// Agent companies (shared Java agent company master).
+  Future<List<AgentCompanyModel>> selectAgentCompany() async =>
+      (await sl<AgentApi>().agentCompanies()).map(AgentCompanyModel.fromJava).toList();
 
   /// The shared Java employee list for the pickers.
   Future<List<EmployeeModel>> selectEmployee(String searchVal, String deptName) =>
       GetIt.instance<EmployeeApi>().dropdown(type: searchVal, type1: deptName);
 
 
-  Future<Map<String, dynamic>> selectAllJobStatus(int jobId) async {
-    try {
-      final endpoint = "${ApiConstants.apiSelectAllJobStatus}$_comId&Jobid=$jobId";
-      final response = await _dioClient.dio.post(endpoint, data: {});
-      dynamic responseData = response.data;
-      if (responseData is String) {
-        if (responseData.trim().isEmpty) return {};
-        responseData = jsonDecode(responseData);
-      }
-      if (responseData is List && responseData.isNotEmpty) {
-        return responseData[0] as Map<String, dynamic>;
-      }
-    } catch (e) {
-      print("Error in selectAllJobStatus: $e");
-    }
-    return {};
-  }
+  /// The job type's steps and status order (shared Java select-all-data).
+  Future<JobSteps> selectAllJobStatus(int jobId) => sl<JobStatusApi>().steps(jobId);
 
-  Future<List<dynamic>> selectCustomer() async {
-    try {
-      final endpoint = "${ApiConstants.apiSelectCustomer}$_comId";
-      final response = await _dioClient.dio.post(endpoint, data: {});
-      dynamic responseData = response.data;
-      if (responseData is String) {
-        if (responseData.trim().isEmpty) return [];
-        responseData = jsonDecode(responseData);
-      }
-      if (responseData is List) {
-        return responseData;
-      }
-    } catch (e) {
-      print("Error in selectCustomer: $e");
-    }
-    return [];
-  }
+  /// Customer options (shared Java /api/customers/options).
+  Future<List<CustomerModel>> selectCustomer() async =>
+      (await sl<CustomerApi>().options()).map(CustomerModel.fromJava).toList();
 
-  Future<List<dynamic>> selectJobType() async {
-    try {
-      final endpoint = "${ApiConstants.apiSelectJobType}$_comId";
-      final response = await _dioClient.dio.post(endpoint, data: {});
-      dynamic responseData = response.data;
-      if (responseData is String) {
-        if (responseData.trim().isEmpty) return [];
-        responseData = jsonDecode(responseData);
-      }
-      if (responseData is List) {
-        return responseData;
-      }
-    } catch (e) {
-      print("Error in selectJobType: $e");
-    }
-    return [];
-  }
+  /// Job types (shared Java /api/job-type-master/jobtypes/{companyId}).
+  Future<List<JobTypeModel>> selectJobType() async =>
+      (await sl<JobTypeApi>().jobTypes()).map(JobTypeModel.fromJava).toList();
 
-  Future<List<dynamic>> selectAgentAll(int agentCompanyId) async {
-    try {
-      final endpoint = "${ApiConstants.apiSelectAgentAll}$_comId&Jobid=$agentCompanyId";
-      final response = await _dioClient.dio.post(endpoint, data: {});
-      dynamic responseData = response.data;
-      if (responseData is String) {
-        if (responseData.trim().isEmpty) return [];
-        responseData = jsonDecode(responseData);
-      }
-      if (responseData is List) {
-        return responseData;
-      }
-    } catch (e) {
-      print("Error in selectAgentAll: $e");
-    }
-    return [];
-  }
+  /// The agents of an agent company (shared Java /api/agents/select-all).
+  Future<List<AgentModel>> selectAgentAll(int agentCompanyId) async =>
+      (await sl<AgentApi>().agents(agentCompanyId: agentCompanyId)).map(AgentModel.fromJava).toList();
 }

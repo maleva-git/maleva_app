@@ -6,8 +6,6 @@ import 'package:maleva/core/utils/app_globals.dart';
 import '../data/spotsale_repository.dart';
 import 'spotsaleorder_event.dart';
 import 'spotsaleorder_state.dart';
-import 'package:maleva/features/operations/models/job_status_model.dart';
-import 'package:maleva/features/operations/models/job_type_model.dart';
 
 class SpotSaleBloc extends Bloc<SpotSaleEvent, SpotSaleState> {
   final SpotSaleRepository repository; // ✅ Injected Repository
@@ -62,27 +60,18 @@ class SpotSaleBloc extends Bloc<SpotSaleEvent, SpotSaleState> {
       LoadSpotSaleListsEvent e, Emitter<SpotSaleState> emit) async {
     if (state is! SpotSaleEntryState) return;
 
-    final comId = AppGlobals.storagenew.getInt('Comid') ?? 0;
 
     // Load JobType
     if (AppGlobals.JobTypeList.isEmpty) {
       try {
-        final result = await repository.fetchJobTypes(comId);
-        if (result != null && result is List && result.isNotEmpty) {
-          AppGlobals.JobTypeList =
-              result.map((e) => JobTypeModel.fromJson(e as Map<String, dynamic>)).toList();
-        }
+        AppGlobals.JobTypeList = await repository.fetchJobTypes();
       } catch (e, stack) { debugPrint("Error caught globally: $e\n$stack"); }
     }
 
     // Load JobStatus
     if (AppGlobals.JobStatusList.isEmpty) {
       try {
-        final result = await repository.fetchJobStatus(comId);
-        if (result != null && result is List && result.isNotEmpty) {
-          AppGlobals.JobStatusList =
-              result.map((e) => JobStatusModel.fromJson(e as Map<String, dynamic>)).toList();
-        }
+        AppGlobals.JobStatusList = await repository.fetchJobStatus();
       } catch (e, stack) { debugPrint("Error caught globally: $e\n$stack"); }
     }
 

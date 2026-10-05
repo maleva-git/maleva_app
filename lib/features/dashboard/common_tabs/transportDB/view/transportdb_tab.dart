@@ -1,8 +1,8 @@
+import 'package:maleva/core/files/file_links.dart';
 import 'package:maleva/features/transaction/enquirytrmaster/models/enquiry_master_model.dart';
 import 'package:maleva/core/enquiry/enquiry_api.dart';
 import 'package:maleva/core/di/injection.dart';
 import 'package:maleva/core/theme/app_typography.dart';
-import 'package:maleva/core/network/api_constants.dart';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -1346,7 +1346,7 @@ class _PDOTab extends StatelessWidget {
           errorBuilder: (_, __, ___) =>
           const Icon(Icons.broken_image, color: colour.commonColorred));
     } else if (path.startsWith('/')) {
-      final fullUrl = ApiConstants.port + path;
+      final fullUrl = fileUrl(path);
       imageWidget = Image.network(fullUrl, fit: BoxFit.contain,
           errorBuilder: (_, __, ___) =>
           const Icon(Icons.broken_image, color: colour.commonColorred));

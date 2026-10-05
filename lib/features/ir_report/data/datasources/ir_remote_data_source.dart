@@ -1,5 +1,6 @@
+import 'package:maleva/core/fleet/truck_api.dart';
 import 'package:dio/dio.dart';
-import 'package:maleva/core/lookups/shared_lookups.dart';
+import 'package:maleva/core/fleet/driver_api.dart';
 import 'package:maleva/core/network/java_response.dart';
 import 'package:maleva/core/utils/json_read.dart';
 
@@ -39,9 +40,11 @@ class IrRemoteDataSource {
 
   // The truck and driver pickers read the shared lookups (`{Id, AccountName}` rows).
 
-  Future<List<Map<String, dynamic>>> trucks(int companyId) => SharedLookups(_dio).trucks(companyId);
+  // the shared Java /api/truck-combo rows ({Id, AccountName})
+  Future<List<Map<String, dynamic>>> trucks(int companyId) => TruckApi(_dio, companyId: () => companyId).combo();
 
-  Future<List<Map<String, dynamic>>> drivers(int companyId) => SharedLookups(_dio).drivers(companyId);
+  // the shared Java /api/driver-combo rows ({Id, AccountName})
+  Future<List<Map<String, dynamic>>> drivers(int companyId) => DriverApi(_dio, companyId: () => companyId).combo();
 
   Future<dynamic> _data(Future<Response<dynamic>> Function() call) async {
     try {

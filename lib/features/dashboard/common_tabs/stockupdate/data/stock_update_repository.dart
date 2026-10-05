@@ -1,8 +1,6 @@
+import 'package:maleva/core/lookups/job_status_api.dart';
 import 'package:maleva/core/files/attachments_api.dart';
-import 'package:maleva/core/lookups/job_steps.dart';
 import 'package:maleva/core/platform/barcode_scanner.dart';
-import 'package:maleva/core/network/api_constants.dart';
-import 'package:maleva/core/network/legacy_json_transport.dart';
 import 'package:maleva/core/session/legacy_feature_context.dart';
 import 'package:maleva/core/di/injection.dart';
 import 'package:maleva/core/stock/stock_in_api.dart';
@@ -14,7 +12,6 @@ import 'package:maleva/core/sale_order/sale_order_api.dart';
 /// `/api/vessel-plannings/sale-order-update`); job steps and image delete are other
 /// features' calls.
 class StockUpdateRepository {
-  final JsonTransport transport;
   final BarcodeScanner scanner;
   final int comid;
   final int empRefId;
@@ -22,7 +19,6 @@ class StockUpdateRepository {
   final StockInApi? _stockApi;
   final SaleOrderApi? _saleOrderApi;
   StockUpdateRepository({
-    this.transport = const ExistingHttpTransport(),
     this.scanner = const ExistingBarcodeScanner(),
     LegacyFeatureContext context = const LegacyFeatureContext(),
     StockInApi? stockApi,
@@ -59,8 +55,7 @@ class StockUpdateRepository {
     final jStatus = data['jStatus'] as int;
 
     // Fetch Job Statuses
-    final statusListRes = await transport.postRequest(
-        "${ApiConstants.apiSelectAllJobStatus}$comid&Jobid=$jobMId", null);
+    final steps = await sl<JobStatusApi>().steps(jobMId);
 
     int statusId = 0;
     String statusName = '';
@@ -79,11 +74,7 @@ class StockUpdateRepository {
       else return null; // Invalid state
     }
 
-    final statuses = JobSteps.statuses(statusListRes);
-    if (statuses.isNotEmpty) {
-      final match = statuses.firstWhere((s) => s['Status'] == statusId, orElse: () => null);
-      if (match != null) statusName = match['StatusName'];
-    }
+    statusName = steps.statusName(statusId);
 
     // Boarding Officer Logic
     int boardId1 = 0;

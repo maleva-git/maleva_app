@@ -1,3 +1,4 @@
+import 'package:maleva/core/utils/json_read.dart';
 
 class AgentCompanyModel {
   int Id;
@@ -7,11 +8,12 @@ class AgentCompanyModel {
 
   AgentCompanyModel(this.Id, this.Name, this.DFlag, this.Active);
 
-  AgentCompanyModel.fromJson(Map<String, dynamic> json)
-      : Id = int.tryParse(json['Id']?.toString() ?? '') ?? 0,
-        Name = json['Name'].toString(),
-        DFlag = int.tryParse(json['DFlag']?.toString() ?? '') ?? 0,
-        Active = int.tryParse(json['Active']?.toString() ?? '') ?? 0;
+  /// An agent company of the shared Java `/api/agent-companies/company/{companyId}`.
+  AgentCompanyModel.fromJava(Map<String, dynamic> json)
+      : Id = JsonRead.integer(json['id']),
+        Name = JsonRead.string(json['name']),
+        DFlag = JsonRead.integer(JsonRead.field(json, 'dFlag')),
+        Active = JsonRead.integer(json['active']);
   Map<String, dynamic> toJson() {
     return {
       'Id': Id,

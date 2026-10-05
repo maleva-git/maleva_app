@@ -1,5 +1,5 @@
+import 'package:maleva/core/files/file_links.dart';
 import 'package:maleva/core/theme/app_typography.dart';
-import 'package:maleva/core/network/api_constants.dart';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -761,7 +761,7 @@ Widget _buildImageThumbnail(BuildContext context, String? path) {
         errorBuilder: (_, __, ___) =>
             Icon(Icons.broken_image_rounded, color: colour.commonColorred));
   } else if (path.startsWith("/")) {
-    final url = ApiConstants.port + path;
+    final url = fileUrl(path);
     imageWidget = Image.network(url,
         fit: BoxFit.cover,
         errorBuilder: (_, __, ___) =>

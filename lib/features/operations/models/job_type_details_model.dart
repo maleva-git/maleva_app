@@ -1,3 +1,4 @@
+import 'package:maleva/core/utils/json_read.dart';
 
 class JobTypeDetailsModel {
   int ID;
@@ -12,15 +13,17 @@ class JobTypeDetailsModel {
   JobTypeDetailsModel(this.ID, this.JobMasterRefId, this.Description,
       this.JobName, this.StatusName, this.Active, this.Mandatory, this.Status);
 
-  JobTypeDetailsModel.fromJson(Map<String, dynamic> json)
-      : ID = int.tryParse(json['ID']?.toString() ?? '') ?? 0,
-        JobMasterRefId = int.tryParse(json['JobMasterRefId']?.toString() ?? '') ?? 0,
-        Description = json['Description'].toString(),
-        JobName = json['JobName'].toString(),
-        StatusName = json['StatusName'].toString(),
-        Active = int.tryParse(json['Active']?.toString() ?? '') ?? 0,
-        Mandatory = int.tryParse(json['Mandatory']?.toString() ?? '') ?? 0,
-        Status = int.tryParse(json['Status']?.toString() ?? '') ?? 0;
+  /// A step of a job type (shared Java select-all-data `jobTypeDetails`).
+  JobTypeDetailsModel.fromJava(Map<String, dynamic> json)
+      : ID = JsonRead.integer(json['id']),
+        JobMasterRefId = JsonRead.integer(json['jobMasterRefId']),
+        Description = JsonRead.string(json['description']),
+        JobName = JsonRead.string(json['jobName']),
+        StatusName = JsonRead.string(json['statusName']),
+        Active = JsonRead.integer(json['active']),
+        Mandatory = JsonRead.integer(json['mandatory']),
+        Status = JsonRead.integer(json['status']);
+
   Map<String, dynamic> toJson() {
     return {
       'ID': ID,

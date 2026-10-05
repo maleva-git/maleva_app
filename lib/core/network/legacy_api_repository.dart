@@ -1,170 +1,45 @@
+import 'package:maleva/core/fleet/driver_api.dart';
+import 'package:maleva/core/fleet/truck_api.dart';
+import 'package:maleva/core/lookups/agent_api.dart';
+import 'package:maleva/core/lookups/product_api.dart';
 import 'dart:io';
+import 'package:maleva/core/lookups/job_status_api.dart';
 import 'dart:async';
-import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:maleva/core/utils/app_globals.dart';
-import 'package:maleva/core/network/api_constants.dart';
 import 'package:maleva/core/stock/stock_in_api.dart';
 import 'package:maleva/core/rti/rti_api.dart';
 import 'package:maleva/core/lookups/location_api.dart';
+import 'package:maleva/core/lookups/customer_api.dart';
+import 'package:maleva/core/lookups/job_type_api.dart';
 import 'package:maleva/core/employee/employee_api.dart';
-import 'package:maleva/core/network/dio_client.dart';
-import 'package:maleva/core/network/java_api_client.dart';
-import 'package:maleva/core/network/java_route.dart';
-import 'package:maleva/core/network/legacy_call_adapter.dart';
 import 'package:get_it/get_it.dart';
-import 'package:dio/dio.dart';
 import 'package:maleva/core/models/shared/agent_company_model.dart';
-import 'package:maleva/features/operations/models/job_all_status_model.dart';
 import 'package:maleva/features/operations/models/job_type_model.dart';
 import 'package:maleva/core/models/shared/get_truck_model.dart';
 import 'package:maleva/core/models/shared/customer_model.dart';
-import 'package:maleva/core/models/shared/truck_details_model.dart';
 import 'package:maleva/core/models/shared/ware_house_model.dart';
 import 'package:maleva/core/models/shared/agent_model.dart';
 import 'package:maleva/features/operations/models/job_status_model.dart';
 import 'package:maleva/core/models/shared/product_model.dart';
-import 'package:maleva/features/operations/models/job_type_details_model.dart';
 import 'package:maleva/core/models/shared/location_model.dart';
 
+/// The picker helpers screens call to fill the `AppGlobals` lists
+/// (`SelectCustomer`, `SelectTruckList`, ...). Each reads its shared Java API
+/// (the typed clients in `lib/core/lookups` and `lib/core/fleet`). The .NET
+/// HTTP plumbing this class once held (`apiAllinone*`, `post`, the legacy
+/// client and the URL routing) is removed: the app calls no .NET API (change
+/// `remove-legacy-network`).
 class LegacyApiRepository {
-  final DioClient _dioClient;
-  final JavaApiClient? _javaClient;
-
-  LegacyApiRepository(this._dioClient, {JavaApiClient? java}) : _javaClient = java;
-
-  /// The client for [url]: the Java client (session token, refresh on 401)
-  /// for a Java URL, the legacy client otherwise. [url] is already resolved
-  /// with [JavaRoute.resolve].
-  /// A POST to [url]: an old lookup or fuel call is answered by the shared Java
-  /// APIs; a moved controller goes to Java; anything else to .NET.
-  Future<Response<dynamic>> _routedPost(String url, {Object? data, Options? options}) {
-    if (LegacyCallAdapter.handles(url)) {
-      return LegacyCallAdapter.asResponse(url, body: data, headers: options?.headers);
-    }
-    final resolved = JavaRoute.resolve(url);
-    return _dioFor(resolved).post(resolved, data: data, options: options);
-  }
-
-  Dio _dioFor(String url) =>
-      JavaRoute.isJava(url) ? (_javaClient ?? GetIt.instance<JavaApiClient>()).dio : _dioClient.dio;
-
-  List<dynamic> _ensureList(dynamic data) {
-    if (data == null) return [];
-    if (data is List) return data;
-    if (data is Map) return [data];
-    return [];
-  }
-
-  dynamic _ensureMap(dynamic data) {
-    if (data == null) return {};
-    if (data is Map) return data;
-    if (data is List && data.isNotEmpty) return data[0];
-    return {};
-  }
-
-  // Generic methods for direct ApiLegacyHelper replacements
-  Future<dynamic> post(String url, {dynamic data, Map<String, String>? headers, BuildContext? context}) async {
-    try {
-      print("🚀 [POST] URL: $url");
-      try {
-        print("📦 [POST BODY]: ${jsonEncode(data)}");
-      } catch (_) {
-        print("📦 [POST BODY]: $data");
-      }
-      
-      final options = headers != null ? Options(headers: headers) : null;
-      final response = await _routedPost(url, data: data ?? {}, options: options);
-      return response.data;
-    } on DioException catch (e) {
-      // Return the response body even on 4xx/5xx — callers can inspect IsSuccess/StatusCode
-      if (e.response?.data != null) {
-        print("API ${e.response?.statusCode}: ${url.split('/').last} → ${e.response?.data?['Message'] ?? e.message}");
-        return e.response!.data;
-      }
-      print("API Error: $e");
-      return null;
-    } catch (e) {
-      print("API Error: $e");
-      return null;
-    }
-  }
-
-  Future<List<dynamic>> postList(String url, {dynamic data, Map<String, String>? headers, BuildContext? context}) async {
-    try {
-      print("🚀 [POST LIST] URL: $url");
-      try {
-        print("📦 [POST LIST BODY]: ${jsonEncode(data)}");
-      } catch (_) {
-        print("📦 [POST LIST BODY]: $data");
-      }
-
-      final options = headers != null ? Options(headers: headers) : null;
-      final response = await _routedPost(url, data: data ?? {}, options: options);
-      return _ensureList(response.data);
-    } on DioException catch (e) {
-      if (e.response?.data != null) {
-        print("API ${e.response?.statusCode}: ${url.split('/').last} → ${e.response?.data?['Message'] ?? e.message}");
-        return _ensureList(e.response!.data);
-      }
-      print("API Error: $e");
-      return [];
-    } catch (e) {
-      print("API Error: $e");
-      return [];
-    }
-  }
-
-  // Backward compatible methods for ApiLegacyHelper replacement
-  Future<List<dynamic>> apiAllinoneSelect(dynamic api, [dynamic insertDetails, Map<String, String>? header, BuildContext? context]) async {
-    header ??= {}; header['Accept-Language'] = 'en-GB';
-    print("\n--- API REQUEST ---\nURI: ${api.toString()}\nHeaders: $header\nPayload: $insertDetails\n-------------------");
-    final result = await postList(api.toString(), data: insertDetails, headers: header);
-    return result;
-  }
-
-  Future<dynamic> apiAllinoneSelectArray(dynamic api, [dynamic insertDetails, Map<String, String>? header, BuildContext? context]) async {
-    header ??= {}; header['Accept-Language'] = 'en-GB';
-      print("\n--- API REQUEST ---\nURI: ${api.toString()}\nHeaders: $header\nPayload: $insertDetails\n-------------------");
-      final result = await post(api.toString(), data: insertDetails, headers: header);
-    return result;
-  }
-
-  Future<dynamic> apiAllinone(dynamic api, [dynamic insertDetails, Map<String, String>? header, BuildContext? context]) async {
-    header ??= {}; header['Accept-Language'] = 'en-GB';
-      print("\n--- API REQUEST ---\nURI: ${api.toString()}\nHeaders: $header\nPayload: $insertDetails\n-------------------");
-      final result = await post(api.toString(), data: insertDetails, headers: header);
-    return result;
-  }
-
-  Future<String> apiGetString(dynamic api, [dynamic insertDetails, Map<String, String>? header, BuildContext? context]) async {
-    try {
-      final options = header != null ? Options(headers: header) : null;
-      final response = await _routedPost(api.toString(), data: insertDetails ?? {}, options: options);
-      return response.data?.toString() ?? '';
-    } catch (e) {
-      print("API Error: $e");
-      return '';
-    }
-  }
-
+  LegacyApiRepository();
 
 Future SelectCustomer(context) async {
+  // the shared Java /api/customers/options (was .NET CustomerApp/GetCustomer)
+  AppGlobals.CustomerList.clear();
   try {
-    AppGlobals.CustomerList.clear();
-    var Comid = AppGlobals.storagenew.getInt('Comid') ?? 0;
-    try {
-  final resultData = _ensureList((await _routedPost(
-            Uri.encodeFull("${ApiConstants.apiSelectCustomer}$Comid"), data: null ?? {})).data);
-  if (resultData.isNotEmpty) {
-        AppGlobals.CustomerList = resultData
-            .map((element) => CustomerModel.fromJson(element))
-            .toList();
-      }
-} catch (e) { print("API Error: $e"); }
-
-  } catch (error) {
-    if (error.toString() == "") {}
+    AppGlobals.CustomerList = (await GetIt.instance<CustomerApi>().options()).map(CustomerModel.fromJava).toList();
+  } catch (e) {
+    print("API Error: $e");
   }
 }
 
@@ -202,122 +77,65 @@ Future SelectEmployee(context, String type, String type1) async {
 }
 
 Future SelectJobStatus(context) async {
+  // the shared Java /api/job-status-master/select/{companyId}/ (was .NET JobStatusApp/SelectJobStatus)
+  AppGlobals.JobStatusList.clear();
   try {
-    AppGlobals.JobStatusList.clear();
-    var Comid = AppGlobals.storagenew.getInt('Comid') ?? 0;
-    try {
-  final resultData = _ensureList((await _routedPost(
-            Uri.encodeFull("${ApiConstants.apiSelectJobStatus}$Comid"), data: null ?? {})).data);
-  if (resultData.isNotEmpty) {
-        AppGlobals.JobStatusList = resultData
-            .map((element) => JobStatusModel.fromJson(element))
-            .toList();
-      }
-} catch (e) { print("API Error: $e"); }
-
-  } catch (error) {
-    if (error.toString() == "") {}
+    AppGlobals.JobStatusList = (await GetIt.instance<JobStatusApi>().statuses()).map(JobStatusModel.fromJava).toList();
+  } catch (e) {
+    print("API Error: $e");
   }
 }
 
 Future SelectJobType(context) async {
+  // the shared Java /api/job-type-master/jobtypes/{companyId} (was .NET JobTypeApp/SelectJobType)
+  AppGlobals.JobTypeList.clear();
   try {
-    AppGlobals.JobTypeList.clear();
-    var Comid = AppGlobals.storagenew.getInt('Comid') ?? 0;
-    try {
-  final resultData = _ensureList((await _routedPost(
-            Uri.encodeFull("${ApiConstants.apiSelectJobType}$Comid"), data: null ?? {})).data);
-  if (resultData.isNotEmpty) {
-        AppGlobals.JobTypeList = resultData
-            .map((element) => JobTypeModel.fromJson(element))
-            .toList();
-      }
-} catch (e) { print("API Error: $e"); }
-
-  } catch (error) {
-    if (error.toString() == "") {}
+    AppGlobals.JobTypeList = (await GetIt.instance<JobTypeApi>().jobTypes()).map(JobTypeModel.fromJava).toList();
+  } catch (e) {
+    print("API Error: $e");
   }
 }
 
 Future SelectAllJobStatus(context, int Jobid) async {
+  // the shared Java job-type steps (was .NET JobTypeApp/SelectJobAllData)
+  AppGlobals.JobAllStatusList.clear();
   try {
-    AppGlobals.JobAllStatusList.clear();
-    var Comid = AppGlobals.storagenew.getInt('Comid') ?? 0;
-    try {
-  final resultData = _ensureList((await _routedPost(
-            Uri.encodeFull("${ApiConstants.apiSelectAllJobStatus}$Comid&Jobid=$Jobid"), data: null ?? {})).data);
-  if (resultData.isNotEmpty) {
-        var resultDetails = resultData[0]["JobTypeDetails"];
-        var result = resultData[0]["JobStatusDetails"];
-        AppGlobals.JobAllStatusList = result
-            .map((element) => JobAllStatusModel.fromJson(element))
-            .toList()
-            .cast<JobAllStatusModel>();
-        AppGlobals.JobTypeDetailsList = resultDetails
-            .map((element) => JobTypeDetailsModel.fromJson(element))
-            .toList()
-            .cast<JobTypeDetailsModel>();
-      }
-} catch (e) { print("API Error: $e"); }
-
-  } catch (error) {
-    if (error.toString() == "") {}
+    final steps = await GetIt.instance<JobStatusApi>().steps(Jobid);
+    AppGlobals.JobAllStatusList = steps.statuses;
+    AppGlobals.JobTypeDetailsList = steps.details;
+  } catch (e) {
+    print("API Error: $e");
   }
 }
 
 Future SelectAgentCompany(context) async {
+  // the shared Java /api/agent-companies/company/{companyId} (was .NET AgentCompanyApp/SelectAgentCompany)
+  AppGlobals.AgentCompanyList.clear();
   try {
-    AppGlobals.AgentCompanyList.clear();
-    var Comid = AppGlobals.storagenew.getInt('Comid') ?? 0;
-    try {
-  final resultData = _ensureList((await _routedPost(
-            Uri.encodeFull("${ApiConstants.apiSelectAgentCompany}$Comid"), data: null ?? {})).data);
-  if (resultData.isNotEmpty) {
-        AppGlobals.AgentCompanyList = resultData
-            .map((element) => AgentCompanyModel.fromJson(element))
-            .toList();
-      }
-} catch (e) { print("API Error: $e"); }
-
-  } catch (error) {
-    if (error.toString() == "") {}
+    AppGlobals.AgentCompanyList = (await GetIt.instance<AgentApi>().agentCompanies()).map(AgentCompanyModel.fromJava).toList();
+  } catch (e) {
+    print("API Error: $e");
   }
 }
 
 Future SelectAgentAll(context, int AgentCompanyId) async {
+  // the shared Java /api/agents/select-all (was .NET AgentApp/SelectAgentAll)
+  AppGlobals.AgentAllList.clear();
   try {
-    AppGlobals.AgentAllList.clear();
-    var Comid = AppGlobals.storagenew.getInt('Comid') ?? 0;
-    try {
-  final resultData = _ensureList((await _routedPost(
-            Uri.encodeFull("${ApiConstants.apiSelectAgentAll}$Comid&Jobid=$AgentCompanyId"), data: null ?? {})).data);
-  if (resultData.isNotEmpty) {
-        AppGlobals.AgentAllList =
-            resultData.map((element) => AgentModel.fromJson(element)).toList();
-      }
-} catch (e) { print("API Error: $e"); }
-
-  } catch (error) {
-    if (error.toString() == "") {}
+    AppGlobals.AgentAllList =
+        (await GetIt.instance<AgentApi>().agents(agentCompanyId: AgentCompanyId)).map(AgentModel.fromJava).toList();
+  } catch (e) {
+    print("API Error: $e");
   }
 }
 
 Future SelectProductList(context) async {
+  // the shared Java /api/item-masters/company/{companyId}/products (was .NET ItemApp/GetProductList)
+  AppGlobals.ProductList.clear();
   try {
-    AppGlobals.ProductList.clear();
-    var Comid = AppGlobals.storagenew.getInt('Comid') ?? 0;
-    try {
-  final resultData = _ensureList((await _routedPost(
-            Uri.encodeFull("${ApiConstants.apiGetProductList}$Comid"), data: null ?? {})).data);
-  if (resultData.isNotEmpty) {
-        AppGlobals.ProductList = resultData
-            .map((element) => ProductModel.fromJson(element))
-            .toList();
-      }
-} catch (e) { print("API Error: $e"); }
-
-  } catch (error) {
-    if (error.toString() == "") {}
+    AppGlobals.ProductList = (await GetIt.instance<ProductApi>().products()).map(ProductModel.fromJava).toList();
+  } catch (e) {
+    print("API Error: $e");
   }
 }
 
@@ -333,61 +151,23 @@ Future<void> GetRTINoForwarding(BuildContext ?context, int billId) async {
 }
 
 Future SelectTruckList(context,String? Type) async {
+  // the shared Java /api/truck-combo (was .NET TruckApp/GetTruck)
+  AppGlobals.GetTruckList.clear();
   try {
-    AppGlobals.GetTruckList.clear();
-    var Comid = AppGlobals.storagenew.getInt('Comid') ?? 0;
-
-    try {
-  final resultData = _ensureList((await _routedPost(
-        Uri.encodeFull("${ApiConstants.apiGetTruckList}$Comid&type="), data: null ?? {})).data);
-  if (resultData.isNotEmpty) {
-        AppGlobals.GetTruckList = resultData
-            .map((element) => GetTruckModel.fromJson(element))
-            .toList();
-      }
-} catch (e) { print("API Error: $e"); }
-
-  } catch (error) {
-    if (error.toString() == "") {}
+    AppGlobals.GetTruckList = (await GetIt.instance<TruckApi>().combo(type: Type)).map(GetTruckModel.fromJava).toList();
+  } catch (e) {
+    print("API Error: $e");
   }
 }
 
-Future EditTruckList(context,int Keyword,String Column,String? Type) async {
-  try {
-    AppGlobals.TruckDetailsList.clear();
-    var Comid = AppGlobals.storagenew.getInt('Comid') ?? 0;
-    try {
-  final resultData = _ensureList((await _routedPost(
-        Uri.encodeFull("${ApiConstants.apiEditTruckDetails}$Comid&Startindex=0&PageCount=0&Keyword=$Keyword&Column=$Column&type="), data: null ?? {})).data);
-  if (resultData.isNotEmpty) {
-        AppGlobals.TruckDetailsList = resultData
-            .map((element) => TruckDetailsModel.fromJson(element))
-            .toList();
-      }
-} catch (e) { print("API Error: $e"); }
-
-  } catch (error) {
-    if (error.toString() == "") {}
-  }
-}
 
 Future SelectDriverList(context,String? Type) async {
+  // the shared Java /api/driver-combo (was .NET DriverApp/GetDriver)
+  AppGlobals.GetDriverList.clear();
   try {
-    AppGlobals.GetDriverList.clear();
-    var Comid = AppGlobals.storagenew.getInt('Comid') ?? 0;
-
-    try {
-  final resultData = _ensureList((await _routedPost(
-        Uri.encodeFull("${ApiConstants.apiGetDriverList}$Comid&type="), data: null ?? {})).data);
-  if (resultData.isNotEmpty) {
-        AppGlobals.GetDriverList = resultData
-            .map((element) => GetTruckModel.fromJson(element))
-            .toList();
-      }
-} catch (e) { print("API Error: $e"); }
-
-  } catch (error) {
-    if (error.toString() == "") {}
+    AppGlobals.GetDriverList = (await GetIt.instance<DriverApi>().combo()).map(GetTruckModel.fromJava).toList();
+  } catch (e) {
+    print("API Error: $e");
   }
 }
 

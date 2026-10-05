@@ -6,7 +6,8 @@ class SessionManager {
   SessionManager(this._storage);
 
   // Constants for keys
-  static const String _keyToken = 'Tokenkey';
+  /// The .NET session token earlier app versions saved; deleted at sign-out, never read.
+  static const String _oldDotNetTokenKey = 'Tokenkey';
   static const String _keyEmpRefId = 'EmpRefId';
   static const String _keyCompanyId = 'Comid';
   static const String _keyCompanyName = 'CompanyName';
@@ -16,8 +17,6 @@ class SessionManager {
   static const String _keyTruckName = 'TruckName';
 
   // Token
-  String get mobileToken => _storage.getString(_keyToken) ?? "";
-  Future<void> setMobileToken(String token) => _storage.setString(_keyToken, token);
 
   // Employee Reference ID
   int get empRefId => _storage.getInt(_keyEmpRefId) ?? 0;
@@ -49,7 +48,7 @@ class SessionManager {
 
   // Clear Session
   Future<void> clearSession() async {
-    await _storage.remove(_keyToken);
+    await _storage.remove(_oldDotNetTokenKey);
     await _storage.remove(_keyEmpRefId);
     await _storage.remove(_keyCompanyId);
     await _storage.remove(_keyCompanyName);

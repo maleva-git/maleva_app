@@ -1,20 +1,24 @@
-/// Reading the job-steps answer (`JobTypeApp/SelectJobAllData`): one element,
-/// `[{JobTypeDetails: [...], JobStatusDetails: [...]}]`. Four screens read it
-/// as a flat list, so their status lookups never matched.
+import 'package:maleva/features/operations/models/job_all_status_model.dart';
+import 'package:maleva/features/operations/models/job_type_details_model.dart';
+
+/// A job type's steps and status order, from the shared Java
+/// `/api/job-type-master/select-all-data` (was .NET JobTypeApp/SelectJobAllData).
 class JobSteps {
-  JobSteps._();
+  const JobSteps(this.details, this.statuses);
 
-  /// The job type's status order (`Status`, `StatusName`, `MinStatus`, `Sort`).
-  static List<dynamic> statuses(dynamic response) => _part(response, 'JobStatusDetails');
+  static const empty = JobSteps([], []);
 
-  /// The job type's steps (`Description`, `Mandatory`, `Status`).
-  static List<dynamic> details(dynamic response) => _part(response, 'JobTypeDetails');
+  /// The steps (`Description`, `Mandatory`, `Status`): which fields a job of this type shows.
+  final List<JobTypeDetailsModel> details;
 
-  static List<dynamic> _part(dynamic response, String key) {
-    if (response is List && response.isNotEmpty && response.first is Map) {
-      final part = (response.first as Map)[key];
-      return part is List ? part : const [];
+  /// The status order (`Status`, `StatusName`, `MinStatus`, `Sort`).
+  final List<JobAllStatusModel> statuses;
+
+  /// The name of [status] in this job type's order, or ''.
+  String statusName(int status) {
+    for (final s in statuses) {
+      if (s.Status == status) return s.StatusName;
     }
-    return const [];
+    return '';
   }
 }

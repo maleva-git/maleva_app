@@ -1,3 +1,4 @@
+import 'package:maleva/core/utils/json_read.dart';
 
 class ProductModel {
   String ProductName;
@@ -25,18 +26,20 @@ class ProductModel {
       this.CategoryId,
       this.Imagepath);
 
-  ProductModel.fromJson(Map<String, dynamic> json)
-      : ProductName = json['ProductName'].toString(),
-        Productcode = json['Productcode'].toString(),
-        PrintName = json['PrintName'].toString(),
-        SaleRate = double.parse(json['SaleRate'].toString()),
-        WholeSaleRate = double.parse(json['WholeSaleRate'].toString()),
-        PurRate = double.parse(json['PurRate'].toString()),
-        MRP = double.parse(json['MRP'].toString()),
-        GST = double.parse(json['GST'].toString()),
-        Id = int.tryParse(json['Id']?.toString() ?? '') ?? 0,
-        CategoryId = int.tryParse(json['CategoryId']?.toString() ?? '') ?? 0,
-        Imagepath = json['Imagepath'].toString();
+  /// A product of the shared Java `/api/item-masters/company/{companyId}/products`
+  /// (it has no print name, wholesale rate, GST, category or image).
+  ProductModel.fromJava(Map<String, dynamic> json)
+      : ProductName = JsonRead.string(json['productName']),
+        Productcode = JsonRead.string(json['productCode']),
+        PrintName = '',
+        SaleRate = JsonRead.number(json['saleRate']),
+        WholeSaleRate = 0,
+        PurRate = JsonRead.number(json['purRate']),
+        MRP = JsonRead.number(json['mrp']),
+        GST = 0,
+        Id = JsonRead.integer(json['id']),
+        CategoryId = 0,
+        Imagepath = '';
 
   Map<String, dynamic> toJson() {
     return {

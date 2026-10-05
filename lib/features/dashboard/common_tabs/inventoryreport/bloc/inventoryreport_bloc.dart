@@ -8,7 +8,6 @@ import 'package:maleva/core/utils/app_globals.dart';
 import '../data/inventoryreport_repository.dart';
 import 'inventoryreport_event.dart';
 import 'inventoryreport_state.dart';
-import 'package:maleva/core/models/shared/customer_model.dart';
 
 class InventoryBloc extends Bloc<InventoryEvent, InventoryState> {
   // ❌ REMOVED: final BuildContext context;
@@ -58,14 +57,7 @@ class InventoryBloc extends Bloc<InventoryEvent, InventoryState> {
       LoadInventoryListsEvent e, Emitter<InventoryState> emit) async {
     if (AppGlobals.CustomerList.isEmpty) {
       try {
-        final comId = AppGlobals.storagenew.getInt('Comid') ?? 0;
-
-        // ✅ REFACTORED: Using the injected repository
-        final result = await repository.fetchCustomers(comId);
-        if (result != null && result is List && result.isNotEmpty) {
-          AppGlobals.CustomerList =
-              result.map((e) => CustomerModel.fromJson(e as Map<String, dynamic>)).toList();
-        }
+        AppGlobals.CustomerList = await repository.fetchCustomers();
       } catch (e, stack) { debugPrint("Error caught globally: $e\n$stack"); }
     }
     // Auto-load default data

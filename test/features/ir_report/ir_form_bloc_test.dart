@@ -1,6 +1,6 @@
 import 'package:bloc_test/bloc_test.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:maleva/core/network/legacy_api_exception.dart';
+import 'package:maleva/core/network/api_failure.dart';
 import 'package:maleva/features/ir_report/domain/entities/ir_draft.dart';
 import 'package:maleva/features/ir_report/domain/entities/ir_lookup.dart';
 import 'package:maleva/features/ir_report/domain/entities/ir_report.dart';
@@ -80,7 +80,7 @@ void main() {
   blocTest<IrFormBloc, IrFormState>(
     'the form fails to open when the lists cannot be loaded',
     setUp: () => when(() => repository.lookups())
-        .thenThrow(const LegacyApiException('No internet connection. Check your network.')),
+        .thenThrow(const ApiFailure('No internet connection. Check your network.')),
     build: buildBloc,
     act: (bloc) => bloc.add(const IrFormStarted()),
     verify: (bloc) {
@@ -134,7 +134,7 @@ void main() {
   blocTest<IrFormBloc, IrFormState>(
     'a rejected save keeps the form and shows the server reason',
     setUp: () => when(() => repository.save(any())).thenThrow(
-      const LegacyApiException('Status 1 was not found for this company', statusCode: 400),
+      const ApiFailure('Status 1 was not found for this company', statusCode: 400),
     ),
     build: buildBloc,
     seed: () => ready(completeDraft),

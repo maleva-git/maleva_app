@@ -1,3 +1,4 @@
+import 'package:maleva/core/network/api_failure.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../data/leave_repository.dart';
 import 'leave_event.dart';
@@ -28,7 +29,7 @@ class LeaveBloc extends Bloc<LeaveEvent, LeaveState> {
 
       emit(LeaveLoaded(requests: requests, leaveTypes: leaveTypes));
     } catch (e) {
-      emit(LeaveError("Failed to fetch leave data: ${e.toString()}"));
+      emit(LeaveError("Failed to fetch leave data: ${e is ApiFailure ? e.message : e}"));
     }
   }
 
@@ -61,7 +62,7 @@ class LeaveBloc extends Bloc<LeaveEvent, LeaveState> {
         }
       } catch (e) {
         emit(currentState.copyWith(isSubmitting: false));
-        emit(LeaveActionError("Error: ${e.toString()}"));
+        emit(LeaveActionError(e is ApiFailure ? e.message : "Error: $e"));
       }
     }
   }
@@ -91,7 +92,7 @@ class LeaveBloc extends Bloc<LeaveEvent, LeaveState> {
         }
       } catch (e) {
         emit(currentState.copyWith(isSubmitting: false));
-        emit(LeaveActionError("Error: ${e.toString()}"));
+        emit(LeaveActionError(e is ApiFailure ? e.message : "Error: $e"));
       }
     }
   }

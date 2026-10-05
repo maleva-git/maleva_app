@@ -3,7 +3,6 @@ import 'package:maleva/features/dashboard/common_tabs/stocktransfer/stocktransfe
 import 'package:maleva/features/dashboard/common_tabs/paymentview/paymentview_injection.dart';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
-import 'package:maleva/core/network/api_services/auth_api.dart';
 import 'package:maleva/core/utils/app_preferences.dart';
 import 'package:maleva/features/auth/data/repositories/auth_repository.dart';
 import 'package:maleva/features/auth/presentation/bloc/auth_bloc.dart';
@@ -102,7 +101,6 @@ import '../../features/operations/forwardingsalary/data/forwardingsalary_reposit
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:maleva/core/utils/local_storage_service.dart';
 import 'package:maleva/core/utils/session_manager.dart';
-import 'package:maleva/core/network/dio_client.dart';
 import 'package:maleva/core/network/legacy_api_repository.dart';
 import 'package:maleva/features/dashboard/common_tabs/driverleave/data/leave_repository.dart';
 import 'package:maleva/features/dashboard/common_tabs/driverleave/bloc/leave_bloc.dart';
@@ -123,7 +121,8 @@ import 'package:maleva/features/auth/data/session_service.dart';
 final sl = GetIt.instance;
 
 Future<void> setupDependencies() async {
-  if (sl.isRegistered<AuthApi>()) return;
+  // already set up (tests reset the locator, so this follows it)
+  if (sl.isRegistered<SessionManager>()) return;
 
   await AppPreferences.init();
   
@@ -132,23 +131,22 @@ Future<void> setupDependencies() async {
   sl.registerLazySingleton<LocalStorageService>(() => LocalStorageService(sl<SharedPreferences>()));
   sl.registerLazySingleton<SessionManager>(() => SessionManager(sl<LocalStorageService>()));
   
-  sl.registerLazySingleton<DioClient>(() => DioClient(sl<SessionManager>()));
-  sl.registerLazySingleton<LegacyApiRepository>(() => LegacyApiRepository(sl<DioClient>()));
+  sl.registerLazySingleton<LegacyApiRepository>(() => LegacyApiRepository());
 
   registerIrReportModule(sl);
   registerTruckLocationModule(sl);
 
   // Repositories
   sl.registerLazySingleton<LeaveRepository>(
-    () => LeaveRepository(sl(), sl()),
+    () => LeaveRepository(sl()),
   );
   sl.registerLazySingleton<EnquiryTrRepository>(
-    () => EnquiryTrRepository(sl(), sl()),
+    () => EnquiryTrRepository(),
 
   );
 
   sl.registerLazySingleton<SalesOrderAddRepository>(
-    () => SalesOrderAddRepository(sl(), sl()),
+    () => SalesOrderAddRepository(),
   );
 
   // BLoCs
@@ -176,7 +174,6 @@ Future<void> setupDependencies() async {
   );
 
 
-  sl.registerLazySingleton<AuthApi>(() => AuthApi.instance);
 
   registerAuthModule(sl);
   sl.registerLazySingleton<AuthRepository>(
@@ -206,7 +203,7 @@ Future<void> setupDependencies() async {
   );
 
   
-  sl.registerLazySingleton<SalesOrderViewRepository>(() => SalesOrderViewRepository(sl(), sl()));
+  sl.registerLazySingleton<SalesOrderViewRepository>(() => SalesOrderViewRepository(sl()));
   sl.registerLazySingleton<SalesOrderRepository>(() => SalesOrderRepository());
   sl.registerFactory<SalesOrderBloc>(
         () => SalesOrderBloc(repository: sl<SalesOrderRepository>()),
@@ -438,7 +435,7 @@ Future<void> setupDependencies() async {
 
   // ── Stock In Entry ────────────────────────────────────────────────────────
   sl.registerLazySingleton<StockInEntryRepository>(
-        () => StockInEntryRepository(sl(), sl()),
+        () => StockInEntryRepository(sl()),
   );
   sl.registerFactory<StockInEntryBloc>(
         () => StockInEntryBloc(repository: sl<StockInEntryRepository>()),

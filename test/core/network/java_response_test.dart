@@ -2,7 +2,6 @@ import 'package:dio/dio.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:maleva/core/network/api_failure.dart';
 import 'package:maleva/core/network/java_response.dart';
-import 'package:maleva/core/network/legacy_api_exception.dart';
 
 void main() {
   test('Data1 of a successful ApiResponse', () {
@@ -21,9 +20,5 @@ void main() {
         'Request timed out. Please try again.');
     expect(JavaResponse.fromDio(DioException(requestOptions: options, type: DioExceptionType.connectionError)).message,
         'No internet connection. Check your network.');
-  });
-
-  test('a legacy failure is an ApiFailure too, so screens read both alike', () {
-    expect(const LegacyApiException('x'), isA<ApiFailure>());
   });
 }

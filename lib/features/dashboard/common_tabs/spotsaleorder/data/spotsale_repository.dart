@@ -1,19 +1,19 @@
+import 'package:maleva/features/operations/models/job_status_model.dart';
+import 'package:maleva/core/lookups/job_status_api.dart';
+import 'package:maleva/features/operations/models/job_type_model.dart';
+import 'package:maleva/core/lookups/job_type_api.dart';
 import 'package:maleva/core/fleet/truck_entries_api.dart';
 import 'package:get_it/get_it.dart';
-import 'package:maleva/core/network/api_constants.dart';
 import 'dart:io';
-import 'package:maleva/core/network/api_client.dart';
 
 class SpotSaleRepository {
-  /// Fetches Job Types
-  Future<dynamic> fetchJobTypes(int comId) async {
-    return await ApiClient.postRequest("${ApiConstants.apiSelectJobType}$comId", null);
-  }
+  /// Job types (shared Java /api/job-type-master/jobtypes/{companyId}).
+  Future<List<JobTypeModel>> fetchJobTypes() async =>
+      (await GetIt.instance<JobTypeApi>().jobTypes()).map(JobTypeModel.fromJava).toList();
 
-  /// Fetches Job Statuses
-  Future<dynamic> fetchJobStatus(int comId) async {
-    return await ApiClient.postRequest("${ApiConstants.apiSelectJobStatus}$comId", null);
-  }
+  /// The company's job statuses (shared Java job status master).
+  Future<List<JobStatusModel>> fetchJobStatus() async =>
+      (await GetIt.instance<JobStatusApi>().statuses()).map(JobStatusModel.fromJava).toList();
 
   /// Spot sale entries created in the days, from the shared Java API (the Java rows).
   Future<List<Map<String, dynamic>>> fetchSpotSaleRecords({

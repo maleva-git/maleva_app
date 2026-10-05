@@ -8,9 +8,8 @@ typedef SessionRefresher = Future<bool> Function();
 
 /// The HTTP client for the Java (Spring) backend.
 ///
-/// Separate from [ApiClient] and [DioClient] on purpose: only this client
-/// knows the Java session token, so the token never reaches the .NET host,
-/// and the legacy clients' headers stay exactly as before.
+/// The app's only HTTP client for the backend: it holds the session token and
+/// sends it on every call.
 ///
 /// - Adds `Authorization: Bearer <token>` to every request except those
 ///   marked [publicRequest] (sign-in).

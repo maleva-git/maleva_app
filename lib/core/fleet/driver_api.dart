@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import 'package:maleva/core/network/api_failure.dart';
 import 'package:maleva/core/network/java_response.dart';
 import 'package:maleva/core/utils/json_read.dart';
 
@@ -37,5 +38,26 @@ class DriverApi {
     } on DioException catch (e) {
       throw JavaResponse.fromDio(e);
     }
+  }
+
+  /// The active drivers for a picker (optionally of a [type]), from the shared
+  /// Java `GET /api/driver-combo` (the port of .NET DriverApp/GetDriver; change
+  /// `driver-lookups-on-shared-java-api`): `{Id, AccountName = "name-mobile"}`
+  /// rows (the Java model names them so) in a `{isSuccess, data1}` wrapper.
+  Future<List<Map<String, dynamic>>> combo({String? type}) async {
+    final Response<dynamic> response;
+    try {
+      response = await _dio.get<dynamic>('/api/driver-combo', queryParameters: {
+        'companyId': companyId,
+        if (type != null && type.isNotEmpty) 'type': type,
+      });
+    } on DioException catch (e) {
+      throw JavaResponse.fromDio(e);
+    }
+    final body = response.data;
+    if (body is! Map || !JsonRead.boolean(JsonRead.field(body, 'isSuccess'))) {
+      throw ApiFailure(body is Map ? JsonRead.string(JsonRead.field(body, 'message')) : 'Unexpected response from server');
+    }
+    return JsonRead.listOfMaps(JsonRead.field(body, 'data1'));
   }
 }

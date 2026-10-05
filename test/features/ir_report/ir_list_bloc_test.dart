@@ -1,6 +1,6 @@
 import 'package:bloc_test/bloc_test.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:maleva/core/network/legacy_api_exception.dart';
+import 'package:maleva/core/network/api_failure.dart';
 import 'package:maleva/features/ir_report/domain/entities/ir_filter.dart';
 import 'package:maleva/features/ir_report/domain/entities/ir_list_result.dart';
 import 'package:maleva/features/ir_report/domain/entities/ir_lookup.dart';
@@ -73,7 +73,7 @@ void main() {
   blocTest<IrListBloc, IrListState>(
     'a failed search shows the server message',
     setUp: () => when(() => repository.search(any()))
-        .thenThrow(const LegacyApiException('Comid is required', statusCode: 400)),
+        .thenThrow(const ApiFailure('Comid is required', statusCode: 400)),
     build: buildBloc,
     act: (bloc) => bloc.add(const IrListRefreshed()),
     wait: const Duration(milliseconds: 20),
@@ -134,7 +134,7 @@ void main() {
   blocTest<IrListBloc, IrListState>(
     'a failed delete keeps the row and says why',
     setUp: () => when(() => repository.delete(1))
-        .thenThrow(const LegacyApiException('IR 1 was not found', statusCode: 404)),
+        .thenThrow(const ApiFailure('IR 1 was not found', statusCode: 404)),
     build: buildBloc,
     seed: loaded,
     act: (bloc) => bloc.add(IrListDeleteRequested(accident)),

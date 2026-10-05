@@ -1,42 +1,22 @@
+import 'package:maleva/features/operations/models/job_all_status_model.dart';
+import 'package:maleva/core/lookups/job_status_api.dart';
 import 'package:maleva/core/enquiry/enquiry_api.dart';
 import 'package:maleva/core/models/shared/employee_model.dart';
 import 'package:get_it/get_it.dart';
 import 'package:maleva/core/employee/employee_api.dart';
-import 'package:maleva/core/network/dio_client.dart';
-import 'package:maleva/core/network/api_constants.dart';
-import 'package:maleva/core/utils/session_manager.dart';
 import 'package:maleva/core/di/injection.dart';
 import 'package:maleva/core/sale_order/sale_order_api.dart';
 
 class EnquiryTrRepository {
-  final DioClient _dioClient;
-  final SessionManager _sessionManager;
+  EnquiryTrRepository();
 
-  EnquiryTrRepository(this._dioClient, this._sessionManager);
-
-  int get _comId => _sessionManager.companyId;
 
   /// The customer's currency rate (shared Java `/api/currency-value/get`, as the sale order form).
   Future<double> loadCustomerCurrency(int customerId) => sl<SaleOrderApi>().currencyValue(customerId);
 
-  /// Fetch all job statuses based on JobId
-  Future<List<dynamic>> selectAllJobStatus(int jobId) async {
-    try {
-      final endpoint = "${ApiConstants.apiSelectAllJobStatus}$_comId&Jobid=$jobId";
-      final response = await _dioClient.dio.post(endpoint, data: {});
-      if (response.data != null) {
-        if (response.data is List && response.data.isNotEmpty) {
-           final firstItem = response.data[0];
-           if (firstItem != null && firstItem['JobStatusDetails'] != null) {
-              return firstItem['JobStatusDetails'];
-           }
-        }
-      }
-    } catch (e) {
-      print("Error selecting all job status: $e");
-    }
-    return [];
-  }
+  /// The job type's status order (shared Java select-all-data).
+  Future<List<JobAllStatusModel>> selectAllJobStatus(int jobId) async =>
+      (await GetIt.instance<JobStatusApi>().steps(jobId)).statuses;
 
   /// Adds or updates a transport enquiry (shared Java `/api/enquiry-masters/entries`,
   /// the port of .NET InsertEnquiryMaster). The enquiry id.

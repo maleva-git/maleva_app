@@ -13,7 +13,7 @@ class StockInEntryBloc extends Bloc<StockInEntryEvent, StockInEntryState> {
   // Local caching to replace objfun globals
   List<dynamic> _jobNoList = [];
   List<int> _stockJobList = [];
-  List<dynamic> _jobAllStatusList = [];
+  List<JobAllStatusModel> _jobAllStatusList = [];
 
   StockInEntryBloc({required this.repository}) : super(StockInEntryInitial()) {
     on<StockInEntryStarted>(_onStarted);
@@ -125,7 +125,7 @@ class StockInEntryBloc extends Bloc<StockInEntryEvent, StockInEntryState> {
     final details = await repository.fetchJobDetails(saleOrderId);
 
     _jobAllStatusList = details['jobStatuses'];
-    AppGlobals.JobAllStatusList = _jobAllStatusList.map((e) => JobAllStatusModel.fromJson(e)).toList(); // Propagate for JobAllStatus screen
+    AppGlobals.JobAllStatusList = _jobAllStatusList; // Propagate for JobAllStatus screen
 
     return base.copyWith(
       jobNoText: jobNo,

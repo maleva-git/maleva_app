@@ -6,10 +6,8 @@ import 'package:maleva/core/utils/app_globals.dart';
 import 'package:maleva/features/transaction/salesorder/view/data/salesorderview_repository.dart';
 import 'package:maleva/features/transaction/salesorder/view/bloc/salesorderview_event.dart';
 import 'package:maleva/features/transaction/salesorder/view/bloc/salesorderview_state.dart';
-import 'package:maleva/core/models/shared/customer_model.dart';
 import 'package:maleva/features/transaction/salesorder/models/sale_order_detail_model.dart';
 import 'package:maleva/features/transaction/salesorder/models/sale_order_master_model.dart';
-import 'package:maleva/features/operations/models/job_status_model.dart';
 import 'package:maleva/core/di/injection.dart';
 import 'package:maleva/core/sale_order/sale_order_api.dart';
 
@@ -33,8 +31,8 @@ class SalesOrderViewBloc extends Bloc<SalesOrderViewEvent, SalesOrderViewState> 
 
       emit(SalesOrderViewLoading());
       try {
-        AppGlobals.CustomerList = (await _repository.selectCustomer()).map<CustomerModel>((e) => CustomerModel.fromJson(e)).toList();
-        AppGlobals.JobStatusList = (await _repository.selectJobStatus()).map<JobStatusModel>((e) => JobStatusModel.fromJson(e)).toList();
+        AppGlobals.CustomerList = await _repository.selectCustomer();
+        AppGlobals.JobStatusList = await _repository.selectJobStatus();
         AppGlobals.EmployeeList = await _repository.selectEmployee('Sales', '');
         final base = SalesOrderViewLoaded(
           dtpFromDate: today,

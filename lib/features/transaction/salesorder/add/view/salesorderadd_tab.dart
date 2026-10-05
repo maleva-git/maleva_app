@@ -697,7 +697,7 @@ if (navResult6 != null) { AppGlobals.SelectedVesselTypeName = navResult6; }
           if (!context.mounted) return;
           if (r != null && r.toString().isNotEmpty) {
             final details = await sl<SalesOrderAddRepository>().selectAddressDetails(r.toString());
-            List<AddressDetailsModel> parsedDetails = details.map<AddressDetailsModel>((e) => AddressDetailsModel.fromJson(e)).toList();
+            List<AddressDetailsModel> parsedDetails = details;
             if (!context.mounted) return;
             if (parsedDetails.isNotEmpty) {
               final d = parsedDetails[0];
@@ -733,7 +733,7 @@ if (navResult6 != null) { AppGlobals.SelectedVesselTypeName = navResult6; }
           if (!context.mounted) return;
           if (r != null && r.toString().isNotEmpty) {
             final details = await sl<SalesOrderAddRepository>().selectAddressDetails(r.toString());
-            List<AddressDetailsModel> parsedDetails = details.map<AddressDetailsModel>((e) => AddressDetailsModel.fromJson(e)).toList();
+            List<AddressDetailsModel> parsedDetails = details;
             if (!context.mounted) return;
             if (parsedDetails.isNotEmpty) {
               final d = parsedDetails[0];
@@ -760,7 +760,7 @@ if (navResult6 != null) { AppGlobals.SelectedVesselTypeName = navResult6; }
             if (!context.mounted) return;
             if (r != null && r.toString().isNotEmpty) {
               final details = await sl<SalesOrderAddRepository>().selectAddressDetails(r.toString());
-              List<AddressDetailsModel> parsedDetails = details.map<AddressDetailsModel>((e) => AddressDetailsModel.fromJson(e)).toList();
+              List<AddressDetailsModel> parsedDetails = details;
               if (!context.mounted) return;
               if (parsedDetails.isNotEmpty) {
                 final d = parsedDetails[0];

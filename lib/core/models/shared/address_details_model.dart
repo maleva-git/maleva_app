@@ -1,3 +1,4 @@
+import 'package:maleva/core/utils/json_read.dart';
 
 class AddressDetailsModel {
   int Id;
@@ -9,12 +10,13 @@ class AddressDetailsModel {
   AddressDetailsModel(
       this.Id, this.Name, this.Address, this.Phone, this.Active);
 
-  AddressDetailsModel.fromJson(Map<String, dynamic> json)
-      : Id = int.tryParse(json['Id']?.toString() ?? '') ?? 0,
-        Name = json['Name'] ?? '',
-        Address = json['Address'] ?? '',
-        Phone = json['Phone'] ?? '',
-        Active = int.tryParse(json['Active']?.toString() ?? '') ?? 0;
+  /// An address of the shared Java `/api/addresses/company/{companyId}/search`.
+  AddressDetailsModel.fromJava(Map<String, dynamic> json)
+      : Id = JsonRead.integer(json['id']),
+        Name = JsonRead.string(json['name']),
+        Address = JsonRead.string(json['address']),
+        Phone = JsonRead.string(json['phone']),
+        Active = JsonRead.integer(json['active']);
   // method
   Map<String, dynamic> toJson() {
     return {

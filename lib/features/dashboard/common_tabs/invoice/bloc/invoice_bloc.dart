@@ -4,7 +4,6 @@
 //  BEFORE                              AFTER
 //  InvoiceBloc()                       InvoiceBloc({required this._invoiceRepo})
 //  AppGlobals.storagenew.getInt('Comid')   AppPreferences.getComid()
-//  ApiClient.postRequest(AppGlobals.url)   _invoiceRepo.getWaitingBills()
 //  no transformers                     droppable() on all async events
 //  RefreshInvoice → blank screen       RefreshInvoice → InvoiceRefreshing (keeps data)
 //  no Equatable on state               sealed + Equatable — no extra rebuilds
@@ -21,7 +20,7 @@ import 'invoice_state.dart';
 class InvoiceBloc extends Bloc<InvoiceEvent, InvoiceState> {
   final InvoiceRepository _invoiceRepo;
 
-  // ✅ Injected — no objfun, no ApiClient direct call
+  // ✅ Injected — no objfun
   InvoiceBloc({required InvoiceRepository invoiceRepo})
       : _invoiceRepo = invoiceRepo,
         super(InvoiceInitial()) {

@@ -1,3 +1,4 @@
+import 'package:maleva/core/utils/json_read.dart';
 
 class AgentModel {
   int Id;
@@ -37,24 +38,25 @@ class AgentModel {
       this.Modified_Date,
       this.Modified_By);
 
-  AgentModel.fromJson(Map<String, dynamic> json)
-      : Id = int.tryParse(json['Id']?.toString() ?? '') ?? 0,
-        CompanyRefId = int.tryParse(json['CompanyRefId']?.toString() ?? '') ?? 0,
-        CNumberDisplay = json['CNumberDisplay'].toString(),
-        CNumber = int.tryParse(json['CNumber']?.toString() ?? '') ?? 0,
-        AgentName = json['AgentName'].toString(),
-        Address1 = json['Address1'].toString(),
-        AgentCompanyRefId = int.tryParse(json['AgentCompanyRefId']?.toString() ?? '') ?? 0,
-        Email = json['Email'].toString(),
-        MobileNo = json['MobileNo'].toString(),
-        UserName = json['UserName'].toString(),
-        Password = json['Password'].toString(),
-        TokenId = json['TokenId'].toString(),
-        SName = json['SName'].toString(),
-        Active = int.tryParse(json['Active']?.toString() ?? '') ?? 0,
-        Created_Date = json['Created_Date'].toString(),
-        Modified_Date = json['Modified_Date'].toString(),
-        Modified_By = json['Modified_By'].toString();
+  /// An agent of the shared Java `/api/agents/select-all`.
+  AgentModel.fromJava(Map<String, dynamic> json)
+      : Id = JsonRead.integer(json['id']),
+        CompanyRefId = JsonRead.integer(json['companyRefId']),
+        CNumberDisplay = JsonRead.string(JsonRead.field(json, 'cNumberDisplay')),
+        CNumber = JsonRead.integer(JsonRead.field(json, 'cNumber')),
+        AgentName = JsonRead.string(JsonRead.field(json, 'name')),
+        Address1 = JsonRead.string(json['address1']),
+        AgentCompanyRefId = JsonRead.integer(json['agentCompanyRefId']),
+        Email = JsonRead.string(json['email']),
+        MobileNo = JsonRead.string(json['mobileNo']),
+        UserName = JsonRead.string(json['userName']),
+        Password = '',
+        TokenId = '',
+        SName = '',
+        Active = JsonRead.integer(json['active']),
+        Created_Date = JsonRead.string(json['createdDate']),
+        Modified_Date = JsonRead.string(json['modifiedDate']),
+        Modified_By = JsonRead.string(json['modifiedBy']);
 
   Map<String, dynamic> toJson() {
     return {

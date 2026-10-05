@@ -1,6 +1,6 @@
+import 'package:maleva/core/files/file_links.dart';
 import 'package:maleva/core/colors/colors.dart' as colour;
 import 'package:maleva/core/theme/app_typography.dart';
-import 'package:maleva/core/network/api_constants.dart';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -195,7 +195,7 @@ class _SparePartsViewBody extends StatelessWidget {
     showDialog(
       context: context,
       builder: (_) => _ImagePreviewDialog(
-          imageUrl: ApiConstants.port + item['documentPath']),
+          imageUrl: fileUrl(item['documentPath'])),
     );
   }
 
@@ -461,12 +461,12 @@ class _SparePartsCard extends StatelessWidget {
               context: context,
               builder: (_) => _ImagePreviewDialog(
                   imageUrl:
-                  ApiConstants.port + item['documentPath']),
+                  fileUrl(item['documentPath'])),
             ),
             child: ClipRRect(
               borderRadius: BorderRadius.circular(10),
               child: Image.network(
-                ApiConstants.port + item['documentPath'],
+                fileUrl(item['documentPath']),
                 height: 150,
                 width: double.infinity,
                 fit: BoxFit.cover,
@@ -604,13 +604,12 @@ class _SparePartsDetailPanel extends StatelessWidget {
                       onTap: () => showDialog(
                         context: context,
                         builder: (_) => _ImagePreviewDialog(
-                            imageUrl: ApiConstants.port +
-                                item['documentPath']),
+                            imageUrl: fileUrl(item['documentPath'])),
                       ),
                       child: ClipRRect(
                         borderRadius: BorderRadius.circular(12),
                         child: Image.network(
-                          ApiConstants.port + item['documentPath'],
+                          fileUrl(item['documentPath']),
                           width: double.infinity,
                           fit: BoxFit.cover,
                           errorBuilder: (_, __, ___) =>

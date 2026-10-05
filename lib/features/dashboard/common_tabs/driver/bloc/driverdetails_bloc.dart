@@ -23,7 +23,7 @@ class DriverBloc extends Bloc<DriverEvent, DriverState> {
       emit(DriverLoaded(driverData: driverList));
 
     } catch (error) {
-      // ApiClient handles standardizing the exceptions
+      // The repository turns failures into clear errors
       emit(DriverError(errorMessage: error.toString()));
     }
   }

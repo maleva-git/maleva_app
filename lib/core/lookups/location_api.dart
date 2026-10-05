@@ -1,6 +1,5 @@
 import 'package:dio/dio.dart';
-import 'package:maleva/core/network/api_failure.dart';
-import 'package:maleva/core/network/java_response.dart';
+import 'package:maleva/core/lookups/master_response.dart';
 import 'package:maleva/core/utils/json_read.dart';
 
 /// Locations, from the shared Java
@@ -17,17 +16,6 @@ class LocationApi {
 
   int get companyId => _companyId();
 
-  Future<List<Map<String, dynamic>>> locations() async {
-    final Response<dynamic> response;
-    try {
-      response = await _dio.get<dynamic>('/api/location-master/company/$companyId/active');
-    } on DioException catch (e) {
-      throw JavaResponse.fromDio(e);
-    }
-    final body = response.data;
-    if (body is! Map || !JsonRead.boolean(body['success'])) {
-      throw ApiFailure(body is Map ? JsonRead.string(body['message']) : 'Unexpected response from server');
-    }
-    return JsonRead.listOfMaps(body['data']);
-  }
+  Future<List<Map<String, dynamic>>> locations() async => JsonRead.listOfMaps(
+      await MasterResponse.data(() => _dio.get<dynamic>('/api/location-master/company/$companyId/active')));
 }

@@ -1,9 +1,9 @@
+import 'package:maleva/core/files/file_links.dart';
 import 'package:flutter/material.dart';
 import 'dart:io';
 import 'package:maleva/core/di/injection.dart';
 import 'package:maleva/core/files/attachments_api.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:maleva/core/network/api_constants.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../bloc/job_orders_bloc.dart';
 import '../bloc/job_orders_event.dart';
@@ -657,7 +657,7 @@ class _JobOrdersTabState extends State<JobOrdersTab> {
                               if (index < images.length) {
                                 // Server Image
                                 final imgPath = images[index];
-                                final imgUrl = ApiConstants.port + imgPath;
+                                final imgUrl = fileUrl(imgPath);
                                 return Stack(
                                   children: [
                                     Positioned.fill(
