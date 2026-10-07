@@ -45,11 +45,15 @@ import 'package:maleva/core/utils/auth_helper.dart';
 import '../../common_tabs/top_customers/view/admin_top_customers_tab.dart';
 import '../../common_tabs/job_orders/view/job_orders_tab.dart';
 import 'package:maleva/features/ir_report/presentation/pages/ir_report_tab.dart';
+import 'package:maleva/features/mail_monitor/view/mail_monitor_tab.dart';
 
 class MobileDashboard extends StatelessWidget {
   final TabController tabController;
   final bool isTablet;
-  const MobileDashboard({required this.tabController, required this.isTablet, super.key});
+
+  /// Adds the Super Admin's Mailbox Monitor as the last tab.
+  final bool showMailMonitor;
+  const MobileDashboard({required this.tabController, required this.isTablet, this.showMailMonitor = false, super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -176,6 +180,7 @@ class MobileDashboard extends StatelessWidget {
           _tab('EmpApproval',     isTablet),
           _tab('EmpLeave',        isTablet),
           _tab('TopCustomers',    isTablet),
+          if (showMailMonitor) _tab('Mailbox Monitor', isTablet),
         ],
       ),
     );
@@ -243,6 +248,7 @@ class MobileDashboard extends StatelessWidget {
             fromDate: DateFormat('yyyy-MM-dd').format(DateTime.now().subtract(const Duration(days: 30))),
             toDate: DateFormat('yyyy-MM-dd').format(DateTime.now()),
           ),
+          if (showMailMonitor) const MailMonitorTab(),
         ],
       ),
     );

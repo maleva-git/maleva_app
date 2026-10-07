@@ -65,18 +65,28 @@ class RtiEntryRepository {
       for (final d in r.lines)
         if (Js.fieldNumber(d, ['saleOrderMasterRefId']) > 0) Js.fieldNumber(d, ['saleOrderMasterRefId']).toInt(),
     };
-    final orders = <int, Map<String, dynamic>>{};
-    await Future.wait(ids.map((soId) async {
-      try {
-        orders[soId] = RtiMapper.saleOrderMaster(await _lookup.saleOrder(soId));
-      } catch (_) {}
-    }));
+    final orders = await _saleOrders(ids);
     return RtiLoaded(
       form: RtiMapper.form(r.master),
       grid: [for (final d in r.lines) RtiMapper.fromDetail(d, orders[Js.fieldNumber(d, ['saleOrderMasterRefId']).toInt()])],
       stops: [for (final a in JsonRead.listOfMaps(JsonRead.field(r.master, 'routeActivities'))) RtiMapper.stop(a)],
     );
   }
+
+  /// The sale-order masters of [ids]; one that cannot be read is left out.
+  Future<Map<int, Map<String, dynamic>>> _saleOrders(Iterable<int> ids) async {
+    final orders = <int, Map<String, dynamic>>{};
+    await Future.wait(ids.toSet().where((id) => id > 0).map((soId) async {
+      try {
+        orders[soId] = RtiMapper.saleOrderMaster(await _lookup.saleOrder(soId));
+      } catch (_) {}
+    }));
+    return orders;
+  }
+
+  /// The sale orders of lines built without them (Planning's Push RTI), for their vessel
+  /// and job quantity: job id → sale-order master.
+  Future<Map<int, Map<String, dynamic>>> saleOrdersFor(List<RtiJobRow> grid) => _saleOrders(grid.map((r) => r.saleOrderMasterRefId));
 
   /// `RTIService.reviseFromSaleOrder`: the RTI re-read from its sales orders; nothing is saved.
   Future<RtiLoaded> revise(int id) async {

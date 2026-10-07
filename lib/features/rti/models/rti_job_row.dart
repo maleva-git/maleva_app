@@ -23,6 +23,8 @@ class RtiJobRow extends Equatable {
     this.pickupAddressQuantityD = '',
     this.deliveryAddressQuantityD = '',
     this.deliveryAddressdatelistD = '',
+    this.vesselName = '',
+    this.jobQuantity = '',
     this.id = 0,
     this.saleOrderMasterRefId = 0,
     this.rtiMasterRefId = 0,
@@ -47,11 +49,20 @@ class RtiJobRow extends Equatable {
   final String deliveryAddressQuantityD;
   final String deliveryAddressdatelistD;
 
+  /// Display only (`RtiJobInfo`): stored by the server on save; never sent.
+  final String vesselName;
+
+  /// Display only: the sale order's `Quantity / TotalWeight`, stored by the server on save.
+  final String jobQuantity;
+
   /// The RTIDetails id; 0 for a new line.
   final int id;
   final int saleOrderMasterRefId;
   final int rtiMasterRefId;
   final int editMode;
+
+  /// The vessel and quantity, as the route activity's vessel choices read them.
+  ({String vesselName, String jobQuantity}) get jobInfo => (vesselName: vesselName, jobQuantity: jobQuantity);
 
   /// The calculation's `parseFloat(String(row.Salary || 0))`.
   double get salaryForTotal {
@@ -100,6 +111,8 @@ class RtiJobRow extends Equatable {
     String? destinationD,
     String? pickupDateD,
     String? deliveryDateD,
+    String? vesselName,
+    String? jobQuantity,
     int? id,
     int? saleOrderMasterRefId,
     int? editMode,
@@ -122,6 +135,8 @@ class RtiJobRow extends Equatable {
         pickupAddressQuantityD: pickupAddressQuantityD,
         deliveryAddressQuantityD: deliveryAddressQuantityD,
         deliveryAddressdatelistD: deliveryAddressdatelistD,
+        vesselName: vesselName ?? this.vesselName,
+        jobQuantity: jobQuantity ?? this.jobQuantity,
         id: id ?? this.id,
         saleOrderMasterRefId: saleOrderMasterRefId ?? this.saleOrderMasterRefId,
         rtiMasterRefId: rtiMasterRefId,
@@ -132,7 +147,7 @@ class RtiJobRow extends Equatable {
   List<Object?> get props => [
         jobNo, customerName, jobDate, salary, ppic, dpic, pwdType, originD, destinationD, pickupDateD, deliveryDateD,
         pickupAddressD, deliveryAddressD, pickupAddressTimelistD, pickupAddressQuantityD, deliveryAddressQuantityD,
-        deliveryAddressdatelistD, id, saleOrderMasterRefId, rtiMasterRefId, editMode,
+        deliveryAddressdatelistD, vesselName, jobQuantity, id, saleOrderMasterRefId, rtiMasterRefId, editMode,
       ];
 }
 

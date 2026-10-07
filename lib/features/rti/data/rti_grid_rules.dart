@@ -1,3 +1,4 @@
+import 'package:maleva/features/rti/models/rti_job_info.dart';
 import 'package:maleva/features/rti/models/rti_job_row.dart';
 import 'package:maleva/features/rti/models/rti_stop.dart';
 
@@ -74,11 +75,25 @@ abstract final class RtiGridRules {
   }
 
   /// `addRouteActivity`: the next sequence number (`last + 1`, so the first stop is 1, as
-  /// React's code does), the RTI's destination as the full route, row 1's driver number.
-  static List<RtiStop> addStop(List<RtiStop> stops, String destination) {
+  /// React's code does), the RTI's destination as the full route, row 1's driver number;
+  /// when the job lines ([grid]) carry exactly one vessel, that vessel and its quantity.
+  static List<RtiStop> addStop(List<RtiStop> stops, String destination, {List<RtiJobRow> grid = const []}) {
     final last = stops.isEmpty ? 0 : stops.last.sequenceNo;
     final first = stops.isEmpty ? '' : stops.first.driverNumber;
-    return [...stops, RtiStop(sequenceNo: last + 1, fullRoute: destination, driverNumber: first)];
+    final stop = RtiStop(sequenceNo: last + 1, fullRoute: destination, driverNumber: first);
+    final vessels = vesselOptions(grid);
+    return [...stops, vessels.length == 1 ? pickVessel(stop, vessels.single, grid) : stop];
+  }
+
+  /// The job lines' vessels, each once, in grid order (the stop's vessel choices).
+  static List<String> vesselOptions(List<RtiJobRow> grid) => RtiJobInfo.vesselOptions(grid.map((r) => r.jobInfo));
+
+  /// A picked (or typed) vessel brings the job quantities of the lines carrying it; the
+  /// quantity stays editable. An empty vessel clears both.
+  static RtiStop pickVessel(RtiStop s, String vessel, List<RtiJobRow> grid) {
+    final v = vessel.trim();
+    final cut = v.length <= 200 ? v : v.substring(0, 200);
+    return s.copyWith(vesselName: cut, jobQuantity: RtiJobInfo.jobQuantityForVessel(grid.map((r) => r.jobInfo), cut));
   }
 
   /// `updateRouteActivity`: editing row 1's driver number copies it to every other row.

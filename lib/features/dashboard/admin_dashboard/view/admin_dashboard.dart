@@ -53,6 +53,8 @@ import '../../common_tabs/truck/bloc/truck_bloc.dart';
 import '../../common_tabs/vesselreport/bloc/vesselreport_bloc.dart';
 import '../../common_tabs/vesselreport/bloc/vesselreport_event.dart';
 import 'package:maleva/features/dashboard/common_tabs/driverleave/bloc/leave_bloc.dart';
+import 'package:maleva/core/session/app_session.dart';
+import 'package:maleva/features/mail_monitor/view/mail_monitor_tab.dart';
 import 'admin_dashboard_ui.dart';
 
 class NewAdminDashboard extends StatefulWidget{
@@ -67,11 +69,15 @@ class _AdminDashboardState extends State<NewAdminDashboard> with SingleTickerPro
   late TabController _tabController;
   late AdminTabBloc _adminTabBloc;
 
+  /// The Mailbox Monitor tab is the Super Admin's only (role 100); Admin (200) shares this
+  /// dashboard without it. It is the last tab, so every other tab keeps its index.
+  final bool _showMailMonitor = mailMonitorAllowed(const PreferencesAppSession().roleId);
+
   @override
   void initState() {
     super.initState();
     _adminTabBloc = AdminTabBloc();
-    _tabController = TabController(length: 32, vsync: this);
+    _tabController = TabController(length: 32 + (_showMailMonitor ? 1 : 0), vsync: this);
     _tabController.addListener(_onTabChanged);
   }
 
@@ -140,6 +146,7 @@ class _AdminDashboardState extends State<NewAdminDashboard> with SingleTickerPro
             body: MobileDashboard(
               tabController: _tabController,
               isTablet: isTablet,
+              showMailMonitor: _showMailMonitor,
             ),
           );
         },

@@ -51,6 +51,12 @@ class RtiJobCard extends StatelessWidget {
                   padding: const EdgeInsets.only(top: 4),
                   child: Text('${row.originD.isEmpty ? '-' : row.originD} → ${row.destinationD.isEmpty ? '-' : row.destinationD}', style: TextStyle(color: mc.muted)),
                 ),
+              if (row.vesselName.isNotEmpty || row.jobQuantity.isNotEmpty)
+                Padding(
+                  padding: const EdgeInsets.only(top: 4),
+                  child: Text('Vessel ${row.vesselName.isEmpty ? '-' : row.vesselName} · Qty ${row.jobQuantity.isEmpty ? '-' : row.jobQuantity}',
+                      style: TextStyle(color: mc.muted, fontSize: 13)),
+                ),
               if (row.customerName.isNotEmpty)
                 Padding(
                   padding: const EdgeInsets.only(top: 4),

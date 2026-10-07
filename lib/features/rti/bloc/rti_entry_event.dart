@@ -96,6 +96,14 @@ class RtiStopAgentPicked extends RtiEntryEvent {
   final String? typed;
 }
 
+/// A vessel picked (or typed) for stop [index]; its job quantity comes from the job lines.
+class RtiStopVesselPicked extends RtiEntryEvent {
+  const RtiStopVesselPicked(this.index, this.vessel);
+
+  final int index;
+  final String vessel;
+}
+
 class RtiStopDeleted extends RtiEntryEvent {
   const RtiStopDeleted(this.index);
 

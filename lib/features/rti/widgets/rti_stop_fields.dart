@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 import 'package:maleva/core/widgets/ui/ui.dart';
 import 'package:maleva/features/rti/bloc/rti_entry_bloc.dart';
+import 'package:maleva/features/rti/data/rti_grid_rules.dart';
 import 'package:maleva/features/rti/models/rti_form.dart';
 import 'package:maleva/features/rti/models/rti_stop.dart';
 import 'package:maleva/features/rti/widgets/rti_text_field.dart';
@@ -38,6 +39,32 @@ abstract final class RtiStopFields {
           _edit(c, i, (x) => x.copyWith(locationName: r.cleared ? '' : (r.value ?? r.typed ?? '')));
         },
       );
+
+  /// The vessel this stop is for: the job lines' vessels, or typed. Picking one brings its
+  /// job quantity.
+  static Widget vessel(BuildContext c, int i, RtiStop s) => PickerField(
+        label: 'Vessel Name',
+        hint: '-- Select Vessel --',
+        value: s.vesselName,
+        onTap: () async {
+          final bloc = c.read<RtiEntryBloc>();
+          final options = RtiGridRules.vesselOptions(bloc.state.grid);
+          final r = await showPickerSheet<String>(c,
+              title: 'Vessel Name',
+              options: [for (final v in options) PickOption(value: v, label: v)],
+              current: s.vesselName,
+              allowTyped: true,
+              allowClear: true);
+          if (r == null || !c.mounted) return;
+          bloc.add(RtiStopVesselPicked(i, r.cleared ? '' : (r.value ?? r.typed ?? '')));
+        },
+      );
+
+  static Widget jobQuantity(BuildContext c, int i, RtiStop s, {bool dense = false}) => RtiTextField(
+      label: dense ? '' : 'Job Qty',
+      dense: dense,
+      value: s.jobQuantity,
+      onChanged: (v) => _edit(c, i, (x) => x.copyWith(jobQuantity: v.length <= 210 ? v : v.substring(0, 210))));
 
   static Widget agent(BuildContext c, int i, RtiStop s) {
     final employees = c.read<RtiEntryBloc>().state.refs.employees;
@@ -164,6 +191,10 @@ class RtiStopCard extends StatelessWidget {
               ]),
               gap,
               RtiStopFields.location(context, index, s),
+              gap,
+              RtiStopFields.vessel(context, index, s),
+              gap,
+              RtiStopFields.jobQuantity(context, index, s),
               gap,
               RtiStopFields.agent(context, index, s),
               gap,

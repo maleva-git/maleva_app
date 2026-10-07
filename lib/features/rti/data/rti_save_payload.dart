@@ -105,6 +105,8 @@ abstract final class RtiSavePayloadBuilder {
     return RtiSavePayload(master: master, details: details, routeActivities: routeActivities);
   }
 
+  static String _cut(String v, int max) => v.length <= max ? v : v.substring(0, max);
+
   static Map<String, dynamic> _stop(RtiStop row, RtiForm s, {required int companyId, required bool isEdit, String? rtiDay}) {
     final activities = <String>[
       if (row.jobType == 'SEAL_AND_BREAK') ...['SEAL', 'BREAK_SEAL'] else if (row.jobType.isNotEmpty) row.jobType,
@@ -129,6 +131,8 @@ abstract final class RtiSavePayloadBuilder {
       'fullRoute': row.fullRoute,
       'driverNumber': row.driverNumber,
       'marqisStatus': (row.marqisStatus ?? 0) == 0 ? null : row.marqisStatus,
+      'vesselName': row.vesselName.trim().isEmpty ? null : _cut(row.vesselName.trim(), 200),
+      'jobQuantity': row.jobQuantity.trim().isEmpty ? null : _cut(row.jobQuantity.trim(), 210),
       'active': true,
     };
   }

@@ -3,6 +3,7 @@ import 'package:maleva/features/rti/models/js_values.dart';
 import 'package:maleva/features/rti/models/planning_transfer_item.dart';
 import 'package:maleva/features/rti/models/rti_dates.dart';
 import 'package:maleva/features/rti/models/rti_form.dart';
+import 'package:maleva/features/rti/models/rti_job_info.dart';
 import 'package:maleva/features/rti/models/rti_job_row.dart';
 import 'package:maleva/features/rti/models/rti_stop.dart';
 
@@ -15,23 +16,40 @@ abstract final class RtiMapper {
   }
 
   /// `mapSaleOrderToGridRow`: a sale order as a new job line (salary 0).
-  static RtiJobRow fromSaleOrder(Map<String, dynamic> so) => RtiJobRow(
-        jobNo: Js.fieldText(so, ['cNumberDisplay']),
-        customerName: Js.fieldText(so, ['customerName']),
-        jobDate: Js.fieldText(so, ['saleDate']),
-        originD: Js.fieldText(so, ['origin']),
-        destinationD: Js.fieldText(so, ['destination']),
-        pickupDateD: Js.fieldText(so, ['pickupDate']),
-        deliveryDateD: Js.fieldText(so, ['deliveryDate']),
-        pickupAddressD: Js.fieldText(so, ['pickupAddress']),
-        deliveryAddressD: Js.fieldText(so, ['deliveryAddress']),
-        pickupAddressTimelistD: Js.fieldText(so, ['pickuptimelist', 'PickupAddressTimelist']),
-        pickupAddressQuantityD: Js.fieldText(so, ['pickupQuantitylist', 'PickupAddressQuantity']),
-        deliveryAddressQuantityD: Js.fieldText(so, ['deliveryQuantitylist', 'DeliveryAddressQuantity']),
-        deliveryAddressdatelistD: Js.fieldText(so, ['delivertimelist', 'DeliveryTimeList', 'DeliveryAddressdatelist']),
-        saleOrderMasterRefId: Js.fieldNumber(so, ['id']).toInt(),
-        editMode: 1,
-      );
+  static RtiJobRow fromSaleOrder(Map<String, dynamic> so) {
+    final info = RtiJobInfo.fromSaleOrder(so);
+    return RtiJobRow(
+      jobNo: Js.fieldText(so, ['cNumberDisplay']),
+      customerName: Js.fieldText(so, ['customerName']),
+      jobDate: Js.fieldText(so, ['saleDate']),
+      originD: Js.fieldText(so, ['origin']),
+      destinationD: Js.fieldText(so, ['destination']),
+      pickupDateD: Js.fieldText(so, ['pickupDate']),
+      deliveryDateD: Js.fieldText(so, ['deliveryDate']),
+      pickupAddressD: Js.fieldText(so, ['pickupAddress']),
+      deliveryAddressD: Js.fieldText(so, ['deliveryAddress']),
+      pickupAddressTimelistD: Js.fieldText(so, ['pickuptimelist', 'PickupAddressTimelist']),
+      pickupAddressQuantityD: Js.fieldText(so, ['pickupQuantitylist', 'PickupAddressQuantity']),
+      deliveryAddressQuantityD: Js.fieldText(so, ['deliveryQuantitylist', 'DeliveryAddressQuantity']),
+      deliveryAddressdatelistD: Js.fieldText(so, ['delivertimelist', 'DeliveryTimeList', 'DeliveryAddressdatelist']),
+      vesselName: info.vesselName,
+      jobQuantity: info.jobQuantity,
+      saleOrderMasterRefId: Js.fieldNumber(so, ['id']).toInt(),
+      editMode: 1,
+    );
+  }
+
+  /// Planning rows carry no job type: the vessel and quantity come from each line's sale
+  /// order ([orders] by id); a line without one is left as it is.
+  static List<RtiJobRow> withJobInfo(List<RtiJobRow> grid, Map<int, Map<String, dynamic>> orders) => [
+        for (final r in grid) _withJobInfo(r, orders[r.saleOrderMasterRefId]),
+      ];
+
+  static RtiJobRow _withJobInfo(RtiJobRow r, Map<String, dynamic>? so) {
+    if (so == null) return r;
+    final info = RtiJobInfo.fromSaleOrder(so);
+    return r.copyWith(vesselName: info.vesselName, jobQuantity: info.jobQuantity);
+  }
 
   /// `mapJobLookupToGridRow`: a search match before its sale order is read.
   static RtiJobRow fromLookup(({int id, String jobNo, String jobDate, String customerName}) m) =>
@@ -43,6 +61,7 @@ abstract final class RtiMapper {
     String t(List<dynamic> v) => Js.text(v);
     dynamic s(String k) => so == null ? null : JsonRead.field(so, k);
     dynamic f(String k) => JsonRead.field(d, k);
+    final preview = RtiJobInfo.fromSaleOrder(so);
     return RtiJobRow(
       jobNo: t([s('cNumberDisplay'), f('jobNo')]),
       customerName: t([s('customerName'), f('customerName')]),
@@ -61,6 +80,8 @@ abstract final class RtiMapper {
       pickupAddressQuantityD: t([f('pickupAddressQuantityD'), s('pickupQuantitylist'), s('PickupAddressQuantity')]),
       deliveryAddressQuantityD: t([f('deliveryAddressQuantityD'), s('deliveryQuantitylist'), s('DeliveryAddressQuantity')]),
       deliveryAddressdatelistD: t([f('deliveryAddressdatelistD'), s('delivertimelist'), s('DeliveryAddressdatelist')]),
+      vesselName: t([f('vesselName'), preview.vesselName]),
+      jobQuantity: t([f('jobQuantity'), preview.jobQuantity]),
       id: Js.number([f('id')]).toInt(),
       saleOrderMasterRefId: Js.number([f('saleOrderMasterRefId'), s('id')]).toInt(),
       rtiMasterRefId: Js.number([f('rtiMasterRefId')]).toInt(),
@@ -144,6 +165,8 @@ abstract final class RtiMapper {
       fullRoute: Js.str(f('fullRoute')),
       driverNumber: Js.str(f('driverNumber')),
       marqisStatus: marqis == 0 ? null : marqis,
+      vesselName: Js.str(f('vesselName')),
+      jobQuantity: Js.str(f('jobQuantity')),
       status: Js.number([f('status')]).toInt(),
       plannedDateTime: orNull(f('plannedDateTime')),
       eta: orNull(f('eta')),

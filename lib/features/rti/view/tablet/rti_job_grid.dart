@@ -10,7 +10,7 @@ import 'package:maleva/features/rti/view/tablet/rti_grid_cell.dart';
 import 'package:maleva/features/rti/widgets/rti_job_card.dart';
 
 /// The full-width job grid of the tablet (`R/components/RTIGrid.tsx`): S/N · JOB NO ·
-/// Customer Name · JOB DATE · Salary · PPIC · DPIC · PWD · Origin · Destination · PickupDate
+/// Customer Name · Vessel Name · Job Qty · JOB DATE · Salary · PPIC · DPIC · PWD · Origin · Destination · PickupDate
 /// · DeliveryDate · Action, with the web's keys.
 class RtiJobGrid extends StatefulWidget {
   const RtiJobGrid({super.key});
@@ -24,11 +24,11 @@ class _RtiJobGridState extends State<RtiJobGrid> implements RtiGridCellHost {
   final _scroll = ScrollController();
 
   static const _w = <String, double>{
-    'sn': 56, 'JobNo': 160, 'customer': 240, 'jobDate': 110, 'Salary': 110, 'PPIC': 140, 'DPIC': 140, 'PWDType': 90,
+    'sn': 56, 'JobNo': 160, 'customer': 240, 'vessel': 180, 'jobQty': 140, 'jobDate': 110, 'Salary': 110, 'PPIC': 140, 'DPIC': 140, 'PWDType': 90,
     'origin': 170, 'destination': 170, 'pickup': 120, 'delivery': 120, 'action': 64,
   };
   static const _headers = <String, String>{
-    'sn': 'S/N', 'JobNo': 'JOB NO', 'customer': 'Customer Name', 'jobDate': 'JOB DATE', 'Salary': 'Salary', 'PPIC': 'PPIC', 'DPIC': 'DPIC',
+    'sn': 'S/N', 'JobNo': 'JOB NO', 'customer': 'Customer Name', 'vessel': 'Vessel Name', 'jobQty': 'Job Qty', 'jobDate': 'JOB DATE', 'Salary': 'Salary', 'PPIC': 'PPIC', 'DPIC': 'DPIC',
     'PWDType': 'PWD', 'origin': 'Origin', 'destination': 'Destination', 'pickup': 'PickupDate', 'delivery': 'DeliveryDate', 'action': 'Action',
   };
 
@@ -159,6 +159,8 @@ class _RtiJobGridState extends State<RtiJobGrid> implements RtiGridCellHost {
           ),
           cell(RtiJobColumns.jobNo),
           text('customer', changed('Customer', r.customerName), color: tint('Customer')),
+          text('vessel', r.vesselName),
+          text('jobQty', r.jobQuantity),
           text('jobDate', RtiDates.short(r.jobDate), color: tint('Job date')),
           cell(RtiJobColumns.salary),
           cell(RtiJobColumns.ppic),

@@ -27,6 +27,17 @@ void main() {
         amount: i.isEven ? 0 : 120.5,
         jobs: [for (var j = 0; j < 12; j++) RtiListJob(jobNo: 'TR0026-04$j', customerName: 'Customer $j')],
       ),
+    // Values longer than their table columns: they end with "…" instead of overflowing.
+    RtiListRow(
+      id: 99,
+      rtiNo: 'RTI000123456789',
+      rtiDate: DateTime(2026, 12, 28),
+      driverName: 'OUTSIDE DRIVER - LIM WEE KIAT ABDULLAH',
+      truckName: 'OUTSIDE TRUCK WXY 1234 5678',
+      remarks: 'A very long remark ' * 8,
+      amount: 1234567.89,
+      jobs: const [],
+    ),
   ];
 
   Future<RtiListBloc> pump(WidgetTester tester, Size size, Widget Function() view, {bool dark = false}) async {
@@ -76,6 +87,14 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.text('Shah Alam'), findsOneWidget);
   });
+
+  for (final size in const [Size(1024, 768), Size(1180, 820), Size(1366, 1024)]) {
+    testWidgets('tablet landscape $size: long values fit the table cells', (tester) async {
+      await pump(tester, size, () => const RtiListTabletLandscapeView());
+      expect(tester.takeException(), isNull);
+      expect(find.byTooltip('RTI000123456789'), findsWidgets);
+    });
+  }
 
   testWidgets('tablet landscape: filter panel, table, preview', (tester) async {
     await pump(tester, const Size(1366, 1024), () => const RtiListTabletLandscapeView());

@@ -37,6 +37,7 @@ import 'package:maleva/core/stock/stock_in_api.dart';
 import 'package:maleva/core/network/java_api_client.dart';
 import 'package:maleva/core/router/app_router.dart';
 import 'package:maleva/core/session/session_token_store.dart';
+import 'package:maleva/core/mailmonitor/mail_monitor_api.dart';
 import 'package:maleva/features/auth/data/mobile_auth_api.dart';
 import 'package:maleva/features/auth/data/session_service.dart';
 import 'package:maleva/features/auth/data/session_writer.dart';
@@ -70,6 +71,9 @@ void registerAuthModule(GetIt sl) {
       () => GpsApi(sl<JavaApiClient>().dio, companyId: AppPreferences.getComid));
   sl.registerLazySingleton<ExpiryApi>(
       () => ExpiryApi(sl<JavaApiClient>().dio, companyId: AppPreferences.getComid));
+  // the Super Admin's Mailbox Monitor (the shared /api/mail-monitor)
+  sl.registerLazySingleton<MailMonitorApi>(
+      () => MailMonitorApi(sl<JavaApiClient>().dio, companyId: AppPreferences.getComid));
   // fuel entries (the shared /api/fuel-entries)
   sl.registerLazySingleton<FuelEntryApi>(
       () => FuelEntryApi(sl<JavaApiClient>().dio, companyId: AppPreferences.getComid));

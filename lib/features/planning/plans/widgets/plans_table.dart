@@ -46,7 +46,7 @@ class PlansTable extends StatelessWidget {
               for (final (i, label) in const ['ID', 'PLANNING NO', 'PLANNING DATE', 'EMPLOYEE', 'TOTAL ORDERS'].indexed)
                 _cell(Text(label, style: head), _widths[i]),
               Expanded(child: Padding(padding: const EdgeInsets.symmetric(horizontal: 10), child: Text('REMARKS', style: head))),
-              SizedBox(width: 104, child: Text('REPORT · EDIT', style: head)),
+              SizedBox(width: 104, child: Text('REPORT · EDIT', style: head, maxLines: 1, softWrap: false, overflow: TextOverflow.ellipsis)),
             ]),
           ),
           Expanded(
@@ -87,11 +87,11 @@ class PlansTable extends StatelessWidget {
               TextButton(
                 style: TextButton.styleFrom(padding: EdgeInsets.zero, minimumSize: const Size(0, 44), alignment: Alignment.centerLeft),
                 onPressed: () => onOpen(p),
-                child: Text(p.planningNo, style: const TextStyle(fontWeight: FontWeight.w800)),
+                child: Text(p.planningNo, maxLines: 1, softWrap: false, overflow: TextOverflow.ellipsis, style: const TextStyle(fontWeight: FontWeight.w800)),
               ),
               _widths[1],
             ),
-            _cell(Text(p.planningDate), _widths[2]),
+            _cell(Text(p.planningDate, maxLines: 1, softWrap: false, overflow: TextOverflow.ellipsis), _widths[2]),
             _cell(Text(p.employeeName.isEmpty ? '-' : p.employeeName, overflow: TextOverflow.ellipsis), _widths[3]),
             _cell(FittedBox(fit: BoxFit.scaleDown, alignment: Alignment.centerLeft, child: PlanOrdersBadge(p.totalOrders)), _widths[4]),
             Expanded(

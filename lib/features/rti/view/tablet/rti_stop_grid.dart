@@ -6,7 +6,7 @@ import 'package:maleva/features/rti/models/rti_stop.dart';
 import 'package:maleva/features/rti/widgets/rti_stop_fields.dart';
 
 /// The full-width route-activity grid of the tablet (`R/components/RTIRouteActivitiesGrid.tsx`):
-/// Seq No · Destination · Agent Name · Agent Mobile No · Driver Number · Job Type · Full
+/// Seq No · Destination · Vessel Name · Job Qty · Agent Name · Agent Mobile No · Driver Number · Job Type · Full
 /// Destination · Marqis Clearance · Remarks · ETA · Created Date · Action.
 class RtiStopGrid extends StatefulWidget {
   const RtiStopGrid({super.key});
@@ -19,7 +19,7 @@ class _RtiStopGridState extends State<RtiStopGrid> {
   final _scroll = ScrollController();
 
   static const _cols = <(String, double)>[
-    ('Seq No', 80), ('Destination', 190), ('Agent Name', 210), ('Agent Mobile No', 150), ('Driver Number', 150), ('Job Type', 180),
+    ('Seq No', 80), ('Destination', 190), ('Vessel Name', 200), ('Job Qty', 170), ('Agent Name', 210), ('Agent Mobile No', 150), ('Driver Number', 150), ('Job Type', 180),
     ('Full Destination', 200), ('Marqis Clearance', 96), ('Remarks', 200), ('ETA', 260), ('Created Date', 150), ('Action', 64),
   ];
 
@@ -86,23 +86,25 @@ class _RtiStopGridState extends State<RtiStopGrid> {
       child: Row(crossAxisAlignment: CrossAxisAlignment.center, children: [
         cell(0, RtiStopFields.sequence(context, i, st, dense: true)),
         cell(1, RtiStopFields.location(context, i, st)),
-        cell(2, RtiStopFields.agent(context, i, st)),
-        cell(3, RtiStopFields.mobile(context, i, st, dense: true)),
-        cell(4, RtiStopFields.driverNumber(context, i, st, dense: true)),
-        cell(5, RtiStopFields.jobType(context, i, st)),
-        cell(6, RtiStopFields.fullRoute(context, i, st, dense: true)),
+        cell(2, RtiStopFields.vessel(context, i, st)),
+        cell(3, RtiStopFields.jobQuantity(context, i, st, dense: true)),
+        cell(4, RtiStopFields.agent(context, i, st)),
+        cell(5, RtiStopFields.mobile(context, i, st, dense: true)),
+        cell(6, RtiStopFields.driverNumber(context, i, st, dense: true)),
+        cell(7, RtiStopFields.jobType(context, i, st)),
+        cell(8, RtiStopFields.fullRoute(context, i, st, dense: true)),
         cell(
-          7,
+          9,
           Checkbox(
             value: st.marqisStatus == 1,
             onChanged: (v) => context.read<RtiEntryBloc>().add(RtiStopEdited(i, (x) => x.copyWith(marqisStatus: v == true ? 1 : 0))),
           ),
         ),
-        cell(8, RtiStopFields.remarks(context, i, st, dense: true)),
-        cell(9, RtiStopFields.eta(context, i, st)),
-        cell(10, Text(RtiStopFields.created(st).isEmpty ? '-' : RtiStopFields.created(st), style: TextStyle(color: context.mc.muted))),
+        cell(10, RtiStopFields.remarks(context, i, st, dense: true)),
+        cell(11, RtiStopFields.eta(context, i, st)),
+        cell(12, Text(RtiStopFields.created(st).isEmpty ? '-' : RtiStopFields.created(st), style: TextStyle(color: context.mc.muted))),
         cell(
-          11,
+          13,
           IconButton(tooltip: 'Delete activity', icon: Icon(Icons.delete_outline, color: context.cs.error), onPressed: () => RtiStopFields.confirmDelete(context, i)),
         ),
       ]),

@@ -35,7 +35,9 @@ class RtiEntryBloc extends Bloc<RtiEntryEvent, RtiEntryState> {
     on<RtiJobRowAdded>((e, emit) => _setGrid(emit, [...state.grid, const RtiJobRow()]));
     on<RtiJobRowDeleted>((e, emit) => _setGrid(emit, RtiGridRules.deleteRow(state.grid, e.row)));
     on<RtiJobCellsPasted>((e, emit) => _setGrid(emit, RtiGridRules.paste(state.grid, e.row, e.column, e.text)));
-    on<RtiStopAdded>((e, emit) => emit(state.copyWith(stops: RtiGridRules.addStop(state.stops, state.form.destination))));
+    on<RtiStopAdded>((e, emit) => emit(state.copyWith(stops: RtiGridRules.addStop(state.stops, state.form.destination, grid: state.grid))));
+    on<RtiStopVesselPicked>(
+        (e, emit) => emit(state.copyWith(stops: RtiGridRules.editStop(state.stops, e.index, (s) => RtiGridRules.pickVessel(s, e.vessel, state.grid)))));
     on<RtiStopEdited>((e, emit) => emit(state.copyWith(stops: RtiGridRules.editStop(state.stops, e.index, e.change))));
     on<RtiStopAgentPicked>((e, emit) => emit(state.copyWith(
         stops: RtiGridRules.editStop(state.stops, e.index, (s) => RtiGridRules.pickAgent(s, employee: e.employee, typed: e.typed)))));
@@ -78,12 +80,25 @@ class RtiEntryBloc extends Bloc<RtiEntryEvent, RtiEntryState> {
         stops: const [],
       ));
       _notice(emit, 'Loaded $n planning ${n == 1 ? 'order' : 'orders'} into RTI', RtiNoticeKind.success);
+      await _planningJobInfo(emit);
       await _nextNumber(emit);
     } else {
       emit(state.copyWith(status: RtiLoadStatus.ready));
       await _nextNumber(emit);
     }
     await refs;
+  }
+
+  /// Planning rows carry no job type, so each line's vessel and quantity are read from its
+  /// sale order after the rows show; only those two fields change, so edits made meanwhile stay.
+  Future<void> _planningJobInfo(Emitter<RtiEntryState> emit) async {
+    try {
+      final orders = await _repo.saleOrdersFor(state.grid);
+      if (orders.isEmpty) return;
+      emit(state.copyWith(grid: RtiMapper.withJobInfo(state.grid, orders)));
+    } catch (_) {
+      // The columns stay empty; the server still stores the values on save.
+    }
   }
 
   Future<void> _loadReferences(Emitter<RtiEntryState> emit) async {

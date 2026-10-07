@@ -4,32 +4,52 @@ import 'package:maleva/core/theme/status_tone.dart';
 
 /// A coloured status pill (dot + text). The tone follows the web's status rules unless given.
 class StatusPill extends StatelessWidget {
-  const StatusPill(this.label, {super.key, this.tone, this.icon, this.showDot = true});
+  const StatusPill(this.label, {super.key, this.tone, this.icon, this.showDot = true, this.tooltip = true});
 
   final String label;
   final StatusTone? tone;
   final IconData? icon;
   final bool showDot;
 
+  /// Shows the full text on long-press / hover, for pills cut short in narrow cells.
+  final bool tooltip;
+
   @override
   Widget build(BuildContext context) {
     final t = tone ?? statusToneOf(label);
     final mc = context.mc;
     final fg = mc.toneFg(t);
-    return Semantics(
-      label: label,
-      child: Container(
-        height: 26,
-        padding: const EdgeInsets.symmetric(horizontal: 10),
-        decoration: BoxDecoration(color: mc.toneBg(t), borderRadius: BorderRadius.circular(999)),
-        child: Row(mainAxisSize: MainAxisSize.min, children: [
-          if (icon != null) ...[Icon(icon, size: 14, color: fg), const SizedBox(width: 6)]
-          else if (showDot) ...[Container(width: 7, height: 7, decoration: BoxDecoration(color: fg, shape: BoxShape.circle)), const SizedBox(width: 6)],
-          Text(label.isEmpty ? '—' : label,
-              style: TextStyle(color: fg, fontSize: 12, fontWeight: FontWeight.w700), maxLines: 1, overflow: TextOverflow.ellipsis),
-        ]),
-      ),
-    );
+    final pill = Semantics(
+        label: label,
+        child: Container(
+          height: 26,
+          padding: const EdgeInsets.symmetric(horizontal: 10),
+          decoration: BoxDecoration(
+              color: mc.toneBg(t), borderRadius: BorderRadius.circular(999)),
+          child: Row(mainAxisSize: MainAxisSize.min, children: [
+            if (icon != null) ...[
+              Icon(icon, size: 14, color: fg),
+              const SizedBox(width: 6)
+            ] else if (showDot) ...[
+              Container(
+                  width: 7,
+                  height: 7,
+                  decoration: BoxDecoration(color: fg, shape: BoxShape.circle)),
+              const SizedBox(width: 6)
+            ],
+            // Shrinks with an ellipsis when the pill's space is narrower than the text (board cells).
+            Flexible(
+              child: Text(label.isEmpty ? '—' : label,
+                  style: TextStyle(
+                      color: fg, fontSize: 12, fontWeight: FontWeight.w700),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  softWrap: false),
+            ),
+          ]),
+        ),
+      );
+    return tooltip ? Tooltip(message: label, child: pill) : pill;
   }
 }
 
@@ -42,14 +62,16 @@ class RtiBadge extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final pill = StatusPill(rtiNo, tone: StatusTone.success, icon: Icons.receipt_long_outlined);
+    final pill = StatusPill(rtiNo, tone: StatusTone.success, icon: Icons.receipt_long_outlined, tooltip: false);
     if (onTap == null) return Tooltip(message: 'RTI created: $rtiNo', child: pill);
     return Tooltip(
       message: 'RTI created: $rtiNo',
       child: InkWell(
         onTap: onTap,
         borderRadius: BorderRadius.circular(999),
-        child: ConstrainedBox(constraints: const BoxConstraints(minHeight: 44), child: Center(widthFactor: 1, child: pill)),
+        child: ConstrainedBox(
+            constraints: const BoxConstraints(minHeight: 44),
+            child: Center(widthFactor: 1, child: pill)),
       ),
     );
   }

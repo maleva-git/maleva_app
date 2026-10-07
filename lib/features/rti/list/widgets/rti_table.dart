@@ -12,7 +12,9 @@ class RtiTable extends StatelessWidget {
 
   final RtiListState state;
 
-  static const _w = <double>[44, 140, 104, 140, 110, 110];
+  static const _w = <double>[48, 156, 112, 150, 116, 132];
+  static const _actionsW = 160.0;
+  static const _driverActionsW = 60.0;
 
   @override
   Widget build(BuildContext context) {
@@ -23,14 +25,15 @@ class RtiTable extends StatelessWidget {
       decoration: BoxDecoration(color: context.cs.surface, borderRadius: BorderRadius.circular(14), border: Border.all(color: mc.outline)),
       child: ClipRRect(
         borderRadius: BorderRadius.circular(14),
-        child: _WideScroll(minWidth: 900, child: Column(children: [
+        child: _WideScroll(minWidth: 1000, child: Column(children: [
           Container(
             color: mc.surface2,
             padding: const EdgeInsets.symmetric(vertical: 10),
             child: Row(children: [
-              for (final (i, l) in const ['#', 'RTI NO', 'DATE', 'DRIVER', 'TRUCK', 'AMOUNT'].indexed) _cell(Text(l, style: head), _w[i]),
-              Expanded(child: _pad(Text('REMARKS', style: head))),
-              SizedBox(width: state.isDriver ? 56 : 152, child: Text('ACTIONS', style: head)),
+              for (final (i, l) in const ['#', 'RTI NO', 'DATE', 'DRIVER', 'TRUCK', 'AMOUNT'].indexed)
+                _cell(_one(l, style: head, align: i == 5 ? TextAlign.right : null), _w[i]),
+              Expanded(child: _pad(_one('REMARKS', style: head))),
+              SizedBox(width: state.isDriver ? _driverActionsW : _actionsW, child: _pad(_one('ACTIONS', style: head))),
             ]),
           ),
           Expanded(
@@ -66,20 +69,21 @@ class RtiTable extends StatelessWidget {
           constraints: const BoxConstraints(minHeight: 52),
           decoration: BoxDecoration(border: Border(bottom: BorderSide(color: mc.outline))),
           child: Row(children: [
-            _cell(Text('${index + 1}', style: TextStyle(color: mc.muted)), _w[0]),
-            _cell(Text(r.rtiNo, style: TextStyle(fontWeight: FontWeight.w800, color: context.cs.primary)), _w[1]),
-            _cell(Text(r.dateText), _w[2]),
-            _cell(Text(r.driverName.isEmpty ? '-' : r.driverName, overflow: TextOverflow.ellipsis), _w[3]),
-            _cell(Text(r.truckName.isEmpty ? '-' : r.truckName, overflow: TextOverflow.ellipsis), _w[4]),
+            _cell(_one('${index + 1}', style: TextStyle(color: mc.muted)), _w[0]),
+            _cell(_one(r.rtiNo, style: TextStyle(fontWeight: FontWeight.w800, color: context.cs.primary), tip: true), _w[1]),
+            _cell(_one(r.dateText), _w[2]),
+            _cell(_one(r.driverName.isEmpty ? '-' : r.driverName, tip: true), _w[3]),
+            _cell(_one(r.truckName.isEmpty ? '-' : r.truckName, tip: true), _w[4]),
             _cell(
-              Text(r.amountText,
-                  textAlign: TextAlign.right,
+              _one(r.amountText,
+                  align: TextAlign.right,
+                  tip: true,
                   style: TextStyle(fontWeight: FontWeight.w700, color: r.salaryMissing ? mc.toneFg(StatusTone.warning) : null)),
               _w[5],
             ),
-            Expanded(child: _pad(Text(r.remarks.trim().isEmpty ? '-' : r.remarks, maxLines: 1, overflow: TextOverflow.ellipsis))),
+            Expanded(child: _pad(_one(r.remarks.trim().isEmpty ? '-' : r.remarks, tip: true))),
             SizedBox(
-              width: state.isDriver ? 56 : 152,
+              width: state.isDriver ? _driverActionsW : _actionsW,
               child: Row(children: [
                 IconButton(
                   tooltip: 'Open RTI report',
@@ -100,6 +104,13 @@ class RtiTable extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  /// One line that never wraps or overflows its cell: it ends with "…" and, with [tip], shows the
+  /// full text on long-press / hover.
+  static Widget _one(String text, {TextStyle? style, TextAlign? align, bool tip = false}) {
+    final t = Text(text, style: style, textAlign: align, maxLines: 1, softWrap: false, overflow: TextOverflow.ellipsis);
+    return tip && text.length > 1 ? Tooltip(message: text, child: t) : t;
   }
 
   static Widget _pad(Widget child) => Padding(padding: const EdgeInsets.symmetric(horizontal: 10), child: child);

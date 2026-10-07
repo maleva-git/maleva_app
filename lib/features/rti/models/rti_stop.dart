@@ -18,6 +18,8 @@ class RtiStop extends Equatable {
     this.fullRoute = '',
     this.driverNumber = '',
     this.marqisStatus,
+    this.vesselName = '',
+    this.jobQuantity = '',
     this.status = 0,
     this.eta,
     this.plannedDateTime,
@@ -36,6 +38,14 @@ class RtiStop extends Equatable {
   final String fullRoute;
   final String driverNumber;
   final int? marqisStatus;
+
+  /// The vessel this stop is for: one of the job lines' vessels, or typed
+  /// (`RTIRouteActivitiesDto.vesselName`).
+  final String vesselName;
+
+  /// That vessel's job quantity, filled from the job lines when it is picked; editable
+  /// (`RTIRouteActivitiesDto.jobQuantity`).
+  final String jobQuantity;
   final int status;
 
   /// `yyyy-MM-ddTHH:mm[:ss]` as typed / loaded, or null.
@@ -56,6 +66,8 @@ class RtiStop extends Equatable {
     String? fullRoute,
     String? driverNumber,
     Object? marqisStatus = _keep,
+    String? vesselName,
+    String? jobQuantity,
     int? status,
     Object? eta = _keep,
   }) =>
@@ -71,6 +83,8 @@ class RtiStop extends Equatable {
         fullRoute: fullRoute ?? this.fullRoute,
         driverNumber: driverNumber ?? this.driverNumber,
         marqisStatus: identical(marqisStatus, _keep) ? this.marqisStatus : marqisStatus as int?,
+        vesselName: vesselName ?? this.vesselName,
+        jobQuantity: jobQuantity ?? this.jobQuantity,
         status: status ?? this.status,
         eta: identical(eta, _keep) ? this.eta : eta as String?,
         plannedDateTime: plannedDateTime,
@@ -81,7 +95,7 @@ class RtiStop extends Equatable {
   @override
   List<Object?> get props => [
         id, sequenceNo, locationName, employeeRefId, agentName, agentMobileNo, jobType, remarks, fullRoute,
-        driverNumber, marqisStatus, status, eta, plannedDateTime, completedDateTime, createdDate,
+        driverNumber, marqisStatus, vesselName, jobQuantity, status, eta, plannedDateTime, completedDateTime, createdDate,
       ];
 }
 
