@@ -38,3 +38,4 @@ run on the database). No backend change.
   - `flutter test test/core/mailmonitor test/features/mail_monitor`: 21 passed.
 - **Full suite:** 635 run, 1 failure: `test/features/bluetooth/bluetooth_page_test.dart` ("auto-connect without printer…"). It fails the same way when run alone. It imports only Bluetooth code, which this change does not touch, so it is an existing failure.
 - **Tab test.** The role rule is tested through `mailMonitorAllowed`. The full dashboard widget needs every tab's bloc, so the tab itself is checked on devices (task 4.2).
+- **Tab position (owner, 2026-10-07).** Mailbox Monitor is the 4th tab: SO, JobOrders, Invoice, **Mailbox Monitor**, IR Report, … The tabs after it move one place, which is harmless: the tab listener only records the index, and no code opens an admin tab by number.

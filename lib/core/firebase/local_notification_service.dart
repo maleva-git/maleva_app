@@ -23,7 +23,8 @@ class LocalNotificationService {
 
   static final FlutterLocalNotificationsPlugin _notificationsPlugin = FlutterLocalNotificationsPlugin();
 
-  static void initialize(BuildContext context) {
+  /// [onTap] gets the tapped notification's payload (the push type, e.g. MAIL_UNREAD).
+  static void initialize(BuildContext context, {void Function(String? payload)? onTap}) {
     _notificationsPlugin.resolvePlatformSpecificImplementation<
         AndroidFlutterLocalNotificationsPlugin>()?.requestNotificationsPermission();
     if (Platform.isIOS) {
@@ -59,6 +60,7 @@ class LocalNotificationService {
 
       _notificationsPlugin.initialize(
         initializationSettings,
+        onDidReceiveNotificationResponse: (response) => onTap?.call(response.payload),
       );
     } else {
       const AndroidInitializationSettings initializationSettingsAndroid = AndroidInitializationSettings("@mipmap/launcher_icon");
@@ -67,6 +69,7 @@ class LocalNotificationService {
       );
       _notificationsPlugin.initialize(
         initializationSettings,
+        onDidReceiveNotificationResponse: (response) => onTap?.call(response.payload),
       );
     }
   }
@@ -130,7 +133,7 @@ class LocalNotificationService {
           message.notification!.title,
           message.notification!.body,
           notificationDetails,
-          payload: '',
+          payload: message.data['type']?.toString() ?? '',
         );
       } else {
         dynamic largeIconPath;
@@ -181,7 +184,7 @@ class LocalNotificationService {
           message.notification!.title,
           message.notification!.body,
           notificationDetails,
-          payload: '',
+          payload: message.data['type']?.toString() ?? '',
         );
       }
     } on Exception catch (e) {

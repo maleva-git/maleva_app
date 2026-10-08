@@ -70,7 +70,8 @@ class _AdminDashboardState extends State<NewAdminDashboard> with SingleTickerPro
   late AdminTabBloc _adminTabBloc;
 
   /// The Mailbox Monitor tab is the Super Admin's only (role 100); Admin (200) shares this
-  /// dashboard without it. It is the last tab, so every other tab keeps its index.
+  /// dashboard without it. It is the 4th tab (owner's choice, 2026-10-07); no code opens these
+  /// tabs by number, so the shift of the later tabs is harmless.
   final bool _showMailMonitor = mailMonitorAllowed(const PreferencesAppSession().roleId);
 
   @override

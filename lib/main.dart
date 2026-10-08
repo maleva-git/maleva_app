@@ -1,3 +1,5 @@
+import 'package:maleva/features/mail_monitor/mine/my_unread_mail_cubit.dart';
+import 'package:maleva/features/mail_monitor/mine/push_route.dart';
 import 'dart:io';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
@@ -159,11 +161,14 @@ class _MyHomePageState extends State<MyHomePage> {
   void initState() {
     super.initState();
     //#region------FireBase-------
-    LocalNotificationService.initialize(context);
+    LocalNotificationService.initialize(context, onTap: (payload) => openPushRoute(routeForPayload(payload)));
 
     ///gives you the message on which user taps
     ///and it opened the app from terminated state
     FirebaseMessaging.instance.getInitialMessage().then((message) {
+      // opened from a tapped notice: shown once the person reaches their dashboard (after sign-in)
+      PendingPushRoute.value = routeForPush(message?.data);
+      if (PendingPushRoute.value != null) installPendingPushRouteOpener();
       if (message != null) {
         // Navigator.push(context, MaterialPageRoute(builder: (context) => Home()));
         // AppGlobals.getLocation().then((value) => {
@@ -191,12 +196,14 @@ class _MyHomePageState extends State<MyHomePage> {
         // );
         // ScaffoldMessenger.of(context).showSnackBar(snackbar);
       }
+      if (routeForPush(message.data) != null) MyUnreadMailSignals.pushArrived();
       LocalNotificationService.display(message);
     });
 
     ///When the app is in background but opened and user taps
     ///on the notification
     FirebaseMessaging.onMessageOpenedApp.listen((message) {
+      openPushRoute(routeForPush(message.data));
       // Navigator.push(context, MaterialPageRoute(builder: (context) => Home()));
     });
     // Navigator.of(context).push(

@@ -51,7 +51,7 @@ class MobileDashboard extends StatelessWidget {
   final TabController tabController;
   final bool isTablet;
 
-  /// Adds the Super Admin's Mailbox Monitor as the last tab.
+  /// Adds the Super Admin's Mailbox Monitor as the 4th tab (after Invoice).
   final bool showMailMonitor;
   const MobileDashboard({required this.tabController, required this.isTablet, this.showMailMonitor = false, super.key});
 
@@ -151,6 +151,7 @@ class MobileDashboard extends StatelessWidget {
           _tab('SO',              isTablet),
           _tab('JobOrders',       isTablet),
           _tab('Invoice',         isTablet),
+          if (showMailMonitor) _tab('Mailbox Monitor', isTablet),
           _tab('IR Report',       isTablet),
           _tab('EXP',             isTablet),
           _tab('VSL',             isTablet),
@@ -180,7 +181,6 @@ class MobileDashboard extends StatelessWidget {
           _tab('EmpApproval',     isTablet),
           _tab('EmpLeave',        isTablet),
           _tab('TopCustomers',    isTablet),
-          if (showMailMonitor) _tab('Mailbox Monitor', isTablet),
         ],
       ),
     );
@@ -211,6 +211,7 @@ class MobileDashboard extends StatelessWidget {
           const SalesOrderTab(),
           const JobOrdersTab(),
           const InvoiceTab(),
+          if (showMailMonitor) const MailMonitorTab(),
           const IrReportTab(),
           const ExpenseReportPage(),
           const VesselReportPage(),
@@ -248,7 +249,6 @@ class MobileDashboard extends StatelessWidget {
             fromDate: DateFormat('yyyy-MM-dd').format(DateTime.now().subtract(const Duration(days: 30))),
             toDate: DateFormat('yyyy-MM-dd').format(DateTime.now()),
           ),
-          if (showMailMonitor) const MailMonitorTab(),
         ],
       ),
     );

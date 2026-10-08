@@ -55,12 +55,20 @@ import '../../features/dashboard/airfreight_dashboard/bloc/airfreight_bloc.dart'
 import '../../features/dashboard/airfreight_dashboard/view/airfreight_dashboard.dart';
 
 import '../../features/dashboard/unauthorized/unauthorized_page.dart';
+import '../../features/mail_monitor/mine/my_unread_mail_views.dart';
+import '../../features/mail_monitor/mine/push_route.dart';
 
 final GoRouter appRouter = GoRouter(
   navigatorKey: AppGlobals.navigatorKey,
   initialLocation: '/',
   observers: [AppNavigatorObserver()],
   routes: [
+    // "My unread mail" (add-my-unread-mail-notice): opened from the dashboard bar or a tapped notice
+    GoRoute(
+      path: myUnreadMailPath,
+      name: 'my_unread_mail',
+      builder: (context, state) => const MyUnreadMailPage(),
+    ),
     GoRoute(
       path: '/unauthorized',
       name: 'unauthorized',

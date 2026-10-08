@@ -2,7 +2,7 @@
 
 ### Requirement: Super Admin Mailbox Monitor tab
 
-The admin dashboard SHALL show a "Mailbox Monitor" tab only when the logged-in role is 100
+The admin dashboard SHALL show a "Mailbox Monitor" tab, as the 4th tab (after Invoice), only when the logged-in role is 100
 (Super Admin). It SHALL list every mailbox from `GET /api/mail-monitor/mailboxes` with its address,
 people, unread count, oldest unread age and a status shown by colour, words and icon, with overdue
 mailboxes first, plus the company summary.

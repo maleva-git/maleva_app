@@ -1,5 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:maleva/core/mailmonitor/mail_monitor_models.dart';
+import 'package:maleva/core/mailmonitor/my_unread_models.dart';
 import 'package:maleva/core/network/java_response.dart';
 import 'package:maleva/core/utils/json_read.dart';
 
@@ -17,6 +18,10 @@ class MailMonitorApi {
 
   Future<MailboxList> mailboxes() =>
       _get('$_base/mailboxes', {}).then((d) => MailboxList.fromJava(JsonRead.map(d)));
+
+  /// The signed-in employee's own linked mailboxes and their latest notice, for every employee role
+  /// (backend change add-my-unread-mail-notice). Drivers get 403.
+  Future<MyUnreadMail> myUnread() => _get('$_base/my-unread', {}).then((d) => MyUnreadMail.fromJava(JsonRead.map(d)));
 
   /// The latest five unread: sender, subject, time.
   Future<List<PreviewItem>> preview(int mailboxId) => _get('$_base/mailboxes/$mailboxId/unread-preview', {})
