@@ -18,6 +18,7 @@ import 'package:maleva/features/dashboard/common_tabs/driverleave/view/employee_
 import 'package:maleva/core/models/shared/barcode_print_model.dart';
 import 'package:maleva/core/utils/auth_helper.dart';
 import 'package:maleva/features/ir_report/presentation/pages/ir_report_tab.dart';
+import 'package:maleva/features/forwarding_requests/view/forwarding_requests_page.dart';
 
 
 
@@ -124,6 +125,7 @@ class AirfreightMobileDashboard extends StatelessWidget {
           _tab('InventoryReport', isTablet),
           _tab('IR Report', isTablet),
           _tab('EmpLeave', isTablet),
+          _tab('FW Requests', isTablet),
         ],
       ),
     );
@@ -170,6 +172,8 @@ class AirfreightMobileDashboard extends StatelessWidget {
           IrReportTab(),
 
           EmployeeLeaveRequestTab(),
+          // The planning list of Customer Service's forwarding requests (forwarding-requests-on-shared-java-api)
+          ForwardingRequestsBody(),
         ],
       ),
     );

@@ -3,6 +3,7 @@ import 'package:maleva/core/colors/colors.dart' as colour;
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:maleva/core/utils/app_globals.dart';
+import 'package:maleva/features/forwarding_requests/view/forwarding_requests_page.dart';
 import 'package:maleva/features/operations/forwarding/bloc/forwarding_event.dart';
 import 'package:maleva/features/transaction/viewsaleorder/view/viewsaleorder_tab.dart';
 import '../core/di/injection.dart';
@@ -700,6 +701,11 @@ class _MenuTileState extends State<_MenuTile>
 
         case "JobStatus Update":
           Navigator.push(ctx, _r(const JobStatusUpdate()));     break;
+        // Server menu rows "Forwarding Requests" / "My Forwarding Requests" (forwarding-requests-on-shared-java-api)
+        case "Forwarding Requests":
+          Navigator.push(ctx, _r(const ForwardingRequestsPage()));     break;
+        case "My Forwarding Requests":
+          Navigator.push(ctx, _r(const ForwardingRequestsPage(mine: true)));     break;
         case "Forwarding Update":
           Navigator.push(
             ctx,
@@ -880,6 +886,8 @@ class _MenuTileState extends State<_MenuTile>
       case "Google Review":     return Icons.star_outline_rounded;
       case "Update Air Frieght": return Icons.flight_rounded;
       case "JobStatus Update":  return Icons.track_changes_rounded;
+      case "Forwarding Requests":
+      case "My Forwarding Requests": return Icons.assignment_outlined;
       case "Forwarding Update":
       case "Forwarding Exit Update":
       case "Forwarding SMK Update":
@@ -922,6 +930,8 @@ class _MenuTileState extends State<_MenuTile>
       case "Fuel Entry":
       case "Maintenance":
       case "License Update":   return colour.Accent.amber;
+      case "Forwarding Requests":
+      case "My Forwarding Requests":
       case "Forwarding Update":
       case "Forwarding Exit Update":
       case "Forwarding SMK Update":
@@ -947,6 +957,8 @@ class _MenuTileState extends State<_MenuTile>
       case "JobStatus Update":    return "Live job tracking";
       case "Email InBox":         return "Messages & alerts";
       case "Google Review":       return "Manage ratings";
+      case "Forwarding Requests": return "CS requests to work";
+      case "My Forwarding Requests": return "Your requests' progress";
       case "Forwarding Update":   return "Update FW records";
       case "PreAlertReport":      return "Pre-alert status";
       case "Enquiry Master":      return "Customer enquiries";

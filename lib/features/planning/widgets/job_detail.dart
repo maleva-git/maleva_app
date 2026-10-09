@@ -187,7 +187,7 @@ class _AssignRow extends StatelessWidget {
   Widget build(BuildContext context) {
     final mc = context.mc;
     final empty = value.trim().isEmpty;
-    final fg = empty ? mc.toneFg(StatusTone.warning) : (color ?? context.cs.onSurface);
+    final fg = empty ? mc.muted : (color ?? context.cs.onSurface);
     return Semantics(
       button: enabled,
       label: '$label ${empty ? 'Unassigned' : value}',
@@ -199,9 +199,9 @@ class _AssignRow extends StatelessWidget {
           constraints: const BoxConstraints(minHeight: 64),
           padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
           decoration: BoxDecoration(
-            color: empty ? mc.toneBg(StatusTone.warning) : mc.surface2,
+            color: mc.surface2,
             borderRadius: BorderRadius.circular(14),
-            border: Border.all(color: empty ? mc.toneFg(StatusTone.warning) : mc.outline),
+            border: Border.all(color: mc.outline),
           ),
           child: Row(children: [
             Icon(icon, color: fg),
@@ -209,7 +209,7 @@ class _AssignRow extends StatelessWidget {
             Expanded(
               child: Column(crossAxisAlignment: CrossAxisAlignment.start, mainAxisSize: MainAxisSize.min, children: [
                 Text(label, style: TextStyle(fontSize: 12, fontWeight: FontWeight.w800, color: mc.muted)),
-                Text(empty ? 'Unassigned' : value, style: TextStyle(fontSize: 16, fontWeight: FontWeight.w800, color: fg)),
+                Text(value, style: TextStyle(fontSize: 16, fontWeight: FontWeight.w800, color: fg)),
               ]),
             ),
             if (enabled) Text(empty ? 'Assign' : 'Change', style: TextStyle(color: context.cs.primary, fontWeight: FontWeight.w700)),

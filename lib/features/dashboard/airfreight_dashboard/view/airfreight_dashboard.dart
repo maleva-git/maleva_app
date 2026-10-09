@@ -33,7 +33,7 @@ class _AirfreightDashboardState extends State<AirfreightDashboard> with SingleTi
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 5, vsync: this);
+    _tabController = TabController(length: 6, vsync: this);
     _tabController.addListener(_onTabChanged);
 
   }

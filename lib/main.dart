@@ -196,7 +196,7 @@ class _MyHomePageState extends State<MyHomePage> {
         // );
         // ScaffoldMessenger.of(context).showSnackBar(snackbar);
       }
-      if (routeForPush(message.data) != null) MyUnreadMailSignals.pushArrived();
+      if (message.data['type']?.toString() == mailUnreadPushType) MyUnreadMailSignals.pushArrived();
       LocalNotificationService.display(message);
     });
 

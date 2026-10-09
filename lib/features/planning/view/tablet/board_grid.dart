@@ -79,7 +79,7 @@ const double _jobW = 140;
 const double _truckW = 170;
 const double _menuW = 52;
 
-/// The planning board: 48 dp rows; S.NO, ✓, JOB NO and TRUCK frozen (unless [frozen] is off);
+/// The planning board: 48 dp rows with column lines; S.NO, ✓, JOB NO and TRUCK frozen (unless [frozen] is off);
 /// the rest scrolls sideways under one header. With [reorderable], the S.NO grip drags a row
 /// up or down like the web grid.
 class BoardGrid extends StatefulWidget {
@@ -137,12 +137,15 @@ class _BoardGridState extends State<BoardGrid> {
     final cols = [for (final k in widget.columns) boardColumns[k]!];
     final mc = context.mc;
     final headStyle = TextStyle(fontSize: 12, fontWeight: FontWeight.w800, letterSpacing: 0.6, color: mc.muted);
-    Widget headCell(String label, double w) => SizedBox(
+    // A vertical line on each cell's right edge, drawn over the cell so row colours keep it visible.
+    final colLine = BoxDecoration(border: Border(right: BorderSide(color: mc.outline)));
+    Widget ruled(Widget cell) => DecoratedBox(position: DecorationPosition.foreground, decoration: colLine, child: cell);
+    Widget headCell(String label, double w) => ruled(SizedBox(
         width: w,
         height: 44,
         child: Align(
             alignment: Alignment.centerLeft,
-            child: Padding(padding: const EdgeInsets.symmetric(horizontal: 8), child: Text(label, style: headStyle))));
+            child: Padding(padding: const EdgeInsets.symmetric(horizontal: 8), child: Text(label, style: headStyle)))));
     final reorderable = widget.reorderable && canWrite;
     _drag.rowCount = widget.rows.length;
     final frozenHead = [headCell('S.NO', _snoW), if (canWrite) headCell('✓', _tickW), headCell('JOB NO', _jobW), headCell('TRUCK', _truckW)];
@@ -171,7 +174,7 @@ class _BoardGridState extends State<BoardGrid> {
             color: moving ? mc.primarySoft : rowColor(r),
             border: Border(top: lineAbove ? drop : BorderSide.none, bottom: lineBelow ? drop : BorderSide(color: mc.outline)),
           ),
-          child: Row(children: cells),
+          child: Row(children: [for (final c in cells) ruled(c)]),
         ),
       );
     }
@@ -321,7 +324,7 @@ class _JobCell extends StatelessWidget {
       );
 }
 
-/// A TRUCK or DRIVER cell: a tap (or Enter) opens the picker; amber when empty; red / purple
+/// A TRUCK or DRIVER cell: a tap (or Enter) opens the picker; blank when empty; red / purple
 /// / indigo for expiry and leave.
 class _AssignCell extends StatelessWidget {
   const _AssignCell({required this.row, required this.truck, required this.state, required this.width});
@@ -333,10 +336,9 @@ class _AssignCell extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final mc = context.mc;
     final value = truck ? row.truckName : row.driverName;
     final empty = value.trim().isEmpty;
-    final color = empty ? mc.toneFg(StatusTone.warning) : severityText(context, truck ? truckSeverityOf(state, row) : driverSeverityOf(state, row));
+    final color = empty ? null : severityText(context, truck ? truckSeverityOf(state, row) : driverSeverityOf(state, row));
     final canWrite = state.access.canWrite;
     return Semantics(
       button: canWrite,
@@ -352,10 +354,9 @@ class _AssignCell extends StatelessWidget {
         child: Container(
           width: width,
           height: _rowH,
-          color: empty ? mc.toneBg(StatusTone.warning) : null,
           padding: const EdgeInsets.symmetric(horizontal: 8),
           alignment: Alignment.centerLeft,
-          child: Text(empty ? (canWrite ? 'Assign' : '—') : value,
+          child: Text(empty ? '' : value,
               maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(fontSize: 14, fontWeight: FontWeight.w700, color: color)),
         ),
       ),

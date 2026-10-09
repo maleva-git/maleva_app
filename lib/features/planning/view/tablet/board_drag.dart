@@ -156,7 +156,11 @@ class BoardDragHandle extends StatelessWidget {
           gestures: {
             ImmediateMultiDragGestureRecognizer: GestureRecognizerFactoryWithHandlers<ImmediateMultiDragGestureRecognizer>(
               ImmediateMultiDragGestureRecognizer.new,
-              (r) => r.onStart = (pos) => controller.start(index, pos),
+              (r) => r
+                // The board's scroll view uses the device's touch slop (about 8 dp on Android,
+                // under the 18 dp default); a smaller one here lets the grip win the finger.
+                ..gestureSettings = const DeviceGestureSettings(touchSlop: 2)
+                ..onStart = (pos) => controller.start(index, pos),
             ),
           },
           child: content,

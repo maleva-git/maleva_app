@@ -34,7 +34,7 @@ class _SalesDashboardState extends State<SalesDashboard> with SingleTickerProvid
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 9, vsync: this);
+    _tabController = TabController(length: 10, vsync: this);
     _tabController.addListener(_onTabChanged);
   }
 

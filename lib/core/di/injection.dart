@@ -1,6 +1,7 @@
 import 'package:maleva/features/planning/planning_injection.dart';
 import 'package:maleva/features/planning/plans/plans_injection.dart';
 import 'package:maleva/features/rti/list/rti_list_injection.dart';
+import 'package:maleva/features/forwarding_requests/forwarding_requests_injection.dart';
 import 'package:maleva/features/rti/rti_entry_injection.dart';
 import 'package:maleva/features/rti_assignments/assignments_injection.dart';
 import 'package:maleva/features/dashboard/common_tabs/stockupdate/stockupdate_injection.dart';
@@ -177,6 +178,7 @@ Future<void> setupDependencies() async {
   registerPlanningFeature(sl);
   registerPlansFeature(sl);
   registerRtiListFeature(sl);
+  registerForwardingRequestsFeature(sl);
   registerAssignmentsFeature(sl);
   sl.registerLazySingleton<AuthRepository>(
         () => AuthRepository(sessionService: sl<SessionService>()),

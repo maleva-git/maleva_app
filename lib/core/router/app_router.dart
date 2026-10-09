@@ -57,6 +57,7 @@ import '../../features/dashboard/airfreight_dashboard/view/airfreight_dashboard.
 import '../../features/dashboard/unauthorized/unauthorized_page.dart';
 import '../../features/mail_monitor/mine/my_unread_mail_views.dart';
 import '../../features/mail_monitor/mine/push_route.dart';
+import '../../features/forwarding_requests/view/forwarding_requests_page.dart';
 
 final GoRouter appRouter = GoRouter(
   navigatorKey: AppGlobals.navigatorKey,
@@ -68,6 +69,18 @@ final GoRouter appRouter = GoRouter(
       path: myUnreadMailPath,
       name: 'my_unread_mail',
       builder: (context, state) => const MyUnreadMailPage(),
+    ),
+    // Forwarding requests (forwarding-requests-on-shared-java-api): the team's list and
+    // Customer Service's own requests, opened from a tapped notice or the drawer
+    GoRoute(
+      path: forwardingRequestsPath,
+      name: 'forwarding_requests',
+      builder: (context, state) => const ForwardingRequestsPage(),
+    ),
+    GoRoute(
+      path: myForwardingRequestsPath,
+      name: 'my_forwarding_requests',
+      builder: (context, state) => const ForwardingRequestsPage(mine: true),
     ),
     GoRoute(
       path: '/unauthorized',

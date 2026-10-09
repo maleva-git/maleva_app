@@ -25,7 +25,7 @@ Color? severityText(BuildContext context, ExpirySeverity s) => switch (s) {
       _ => null,
     };
 
-/// A truck or driver chip: amber "Unassigned" when empty.
+/// A truck or driver chip: just the icon when empty.
 class AssignChip extends StatelessWidget {
   const AssignChip({super.key, required this.icon, required this.value, this.color, this.onTap, this.compact = false, this.semantic = ''});
 
@@ -40,20 +40,20 @@ class AssignChip extends StatelessWidget {
   Widget build(BuildContext context) {
     final mc = context.mc;
     final empty = value.trim().isEmpty;
-    final fg = empty ? mc.toneFg(StatusTone.warning) : (color ?? context.cs.onSurface);
+    final fg = empty ? mc.muted : (color ?? context.cs.onSurface);
     final chip = Container(
       constraints: BoxConstraints(minHeight: compact ? 32 : 44),
       padding: EdgeInsets.symmetric(horizontal: compact ? 8 : 12),
       decoration: BoxDecoration(
-        color: empty ? mc.toneBg(StatusTone.warning) : mc.surface2,
+        color: mc.surface2,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: empty ? mc.toneFg(StatusTone.warning).withValues(alpha: 0.5) : mc.outline),
+        border: Border.all(color: mc.outline),
       ),
       child: Row(mainAxisSize: MainAxisSize.min, children: [
         Icon(icon, size: compact ? 15 : 18, color: fg),
         const SizedBox(width: 6),
         Flexible(
-          child: Text(empty ? 'Unassigned' : value,
+          child: Text(value,
               maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(fontSize: compact ? 13 : 14, fontWeight: FontWeight.w700, color: fg)),
         ),
       ]),

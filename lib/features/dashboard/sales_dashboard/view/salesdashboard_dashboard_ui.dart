@@ -24,6 +24,7 @@ import 'package:maleva/features/dashboard/common_tabs/driverleave/view/employee_
 import 'package:maleva/core/models/shared/barcode_print_model.dart';
 import 'package:maleva/core/utils/auth_helper.dart';
 import 'package:maleva/features/ir_report/presentation/pages/ir_report_tab.dart';
+import 'package:maleva/features/forwarding_requests/view/forwarding_requests_page.dart';
 class SalesDashboardView extends StatelessWidget {
   final TabController tabController;
   final bool isTablet;
@@ -129,6 +130,7 @@ class SalesDashboardView extends StatelessWidget {
           _tab('FUEL VIEW', isTablet),
           _tab('PaymentView', isTablet),
           _tab('EmpLeave', isTablet),
+          _tab('MY FW REQ', isTablet),
         ],
       ),
     );
@@ -172,6 +174,8 @@ Tab _tab(String text, bool isTablet) => Tab(
             const FuelDiffPage(),
             const PaymentPendingPage(),
           const EmployeeLeaveRequestTab(),
+          // Customer Service's own forwarding requests (forwarding-requests-on-shared-java-api)
+          const ForwardingRequestsBody(mine: true),
           ],
         ),
     );

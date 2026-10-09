@@ -27,6 +27,8 @@ import '../bloc/salesorderadd_bloc.dart';
 import 'package:maleva/features/transaction/salesorder/add/bloc/salesorderadd_event.dart';
 import 'package:maleva/features/transaction/salesorder/add/bloc/salesorderadd_state.dart';
 import 'package:maleva/core/di/injection.dart';
+import 'package:maleva/core/utils/json_read.dart';
+import 'package:maleva/features/forwarding_requests/view/request_forwarding_sheet.dart';
 import 'package:maleva/core/colors/colors.dart' as colour;
 import 'package:maleva/core/models/shared/customer_model.dart';
 import 'package:maleva/core/models/shared/employee_model.dart';
@@ -225,6 +227,17 @@ class _SalesOrderAddBodyState extends State<_SalesOrderAddBody> with TickerProvi
         ],
       ),
       actions: [
+        // Customer Service asks the forwarding team for K1/K2/K3/K8 on a saved job
+        // (forwarding-requests-on-shared-java-api); the job must exist first.
+        _appBarBtn(
+          label: 'REQ FW',
+          enabled: state.editId > 0,
+          onPressed: () => showRequestForwardingSheet(
+            context,
+            saleOrderId: state.editId,
+            jobNo: JsonRead.string(state.loadedMaster['cNumberDisplay']),
+          ),
+        ),
         _appBarBtn(
           label: 'VIEW',
           enabled: state.fieldPermission["VIEW"] == true,
