@@ -95,5 +95,9 @@
             <action
                 android:name="android.support.customtabs.action.CustomTabsService"/>
         </intent>
+        <!-- Read aloud on the Mail Response tab (flutter_tts): Android 11+ must see the TTS engine. -->
+        <intent>
+            <action android:name="android.intent.action.TTS_SERVICE" />
+        </intent>
     </queries>
 </manifest>

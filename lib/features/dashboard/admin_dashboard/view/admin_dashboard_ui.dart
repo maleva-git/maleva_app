@@ -1,4 +1,4 @@
-import 'package:flutter/Material.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 import 'package:maleva/core/utils/app_globals.dart';
@@ -46,14 +46,79 @@ import '../../common_tabs/top_customers/view/admin_top_customers_tab.dart';
 import '../../common_tabs/job_orders/view/job_orders_tab.dart';
 import 'package:maleva/features/ir_report/presentation/pages/ir_report_tab.dart';
 import 'package:maleva/features/mail_monitor/view/mail_monitor_tab.dart';
+import 'package:maleva/features/mail_monitor/report/mail_response_tab.dart';
+import '../overview/view/admin_overview_tab.dart';
+
+typedef AdminTab = ({String label, Widget page});
+
+/// Every admin dashboard tab in order: the tab bar, the pages and the controller's length all come
+/// from this one list. The Super Admin (role 100) gets Overview first and Mailbox Monitor and Mail
+/// Response after Invoice (changes `super-admin-overview-tab`, `mail-response-report-tab`); [openTab] lets Overview switch to a tab by label.
+List<AdminTab> adminTabs({required bool superAdmin, required void Function(String label) openTab}) => [
+      if (superAdmin) (label: 'Overview', page: AdminOverviewTab(onOpenTab: openTab)),
+      (label: 'SO', page: const SalesOrderTab()),
+      (label: 'JobOrders', page: const JobOrdersTab()),
+      (label: 'Invoice', page: const InvoiceTab()),
+      if (superAdmin) (label: 'Mailbox Monitor', page: const MailMonitorTab()),
+      if (superAdmin) (label: 'Mail Response', page: const MailResponseTab()),
+      (label: 'IR Report', page: const IrReportTab()),
+      (label: 'EXP', page: const ExpenseReportPage()),
+      (label: 'VSL', page: const VesselReportPage()),
+      (label: 'TRANSPORT', page: const TransportReportPage()),
+      (label: 'ReceiptView', page: const ReceiptPage()),
+      (label: 'FW', page: const ForwardingReportPage()),
+      (label: 'Truck', page: const TruckDetailsReportPage()),
+      (label: 'Driver', page: const DriverDetailsView()),
+      (label: 'Salary', page: const SalaryTab()),
+      (label: 'SpeedingReport', page: const SpeedingScreen()),
+      (label: 'FuelFilling', page: const FuelFillingPage()),
+      (label: 'EngineHours', page: const EngineHoursPage()),
+      (label: 'BOCheck', page: const BocPage()),
+      (label: 'Email', page: const EmailPage()),
+      (label: 'GoogleReview', page: const ReviewEntryPage()),
+      (label: 'Fuel', page: const FuelDiffPage()),
+      (label: 'EmployeeView', page: const EmployeeViewPage()),
+      (label: 'PettyCash', page: const PettyCashPage()),
+      (label: 'SummonEntry', page: const SummonEntryPage()),
+      (label: 'SparePartsEntry', page: const SparePartsEntryPage()),
+      (label: 'PaymentView', page: const PaymentPendingPage()),
+      (label: 'SpotsSaleOrder', page: const SpotSaleEntryPage()),
+      (label: 'InventoryReport', page: const InventoryPage()),
+      (
+        label: 'PDO',
+        page: PDOViewPage(
+          fromDate: DateFormat('yyyy-MM-dd').format(DateTime.now().subtract(const Duration(days: 7))),
+          toDate: DateFormat('yyyy-MM-dd').format(DateTime.now()),
+        ),
+      ),
+      (label: 'RTI', page: const RtiListPage()),
+      (label: 'DriverApproval', page: const AdminLeaveApprovalTab()),
+      (label: 'EmpApproval', page: const EmployeeLeaveApprovalTab()),
+      (label: 'EmpLeave', page: const EmployeeLeaveRequestTab(isAdminOrSubadmin: true)),
+      (
+        label: 'TopCustomers',
+        page: AdminTopCustomersTab(
+          comid: AppGlobals.Comid,
+          fromDate: DateFormat('yyyy-MM-dd').format(DateTime.now().subtract(const Duration(days: 30))),
+          toDate: DateFormat('yyyy-MM-dd').format(DateTime.now()),
+        ),
+      ),
+    ];
 
 class MobileDashboard extends StatelessWidget {
   final TabController tabController;
   final bool isTablet;
 
-  /// Adds the Super Admin's Mailbox Monitor as the 4th tab (after Invoice).
-  final bool showMailMonitor;
-  const MobileDashboard({required this.tabController, required this.isTablet, this.showMailMonitor = false, super.key});
+  /// The Super Admin's tabs: Overview first, Mailbox Monitor after Invoice.
+  final bool superAdmin;
+  const MobileDashboard({required this.tabController, required this.isTablet, this.superAdmin = false, super.key});
+
+  List<AdminTab> get _tabs => adminTabs(superAdmin: superAdmin, openTab: _openTab);
+
+  void _openTab(String label) {
+    final index = _tabs.indexWhere((t) => t.label == label);
+    if (index >= 0) tabController.animateTo(index);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -147,41 +212,7 @@ class MobileDashboard extends StatelessWidget {
           fontWeight: FontWeight.w500,
           fontSize: isTablet ? 14 : 13,
         ),
-        tabs: [
-          _tab('SO',              isTablet),
-          _tab('JobOrders',       isTablet),
-          _tab('Invoice',         isTablet),
-          if (showMailMonitor) _tab('Mailbox Monitor', isTablet),
-          _tab('IR Report',       isTablet),
-          _tab('EXP',             isTablet),
-          _tab('VSL',             isTablet),
-          _tab('TRANSPORT',       isTablet),
-          _tab('ReceiptView',     isTablet),
-          _tab('FW',              isTablet),
-          _tab('Truck',           isTablet),
-          _tab('Driver',          isTablet),
-          _tab('Salary',          isTablet),
-          _tab('SpeedingReport',  isTablet),
-          _tab('FuelFilling',     isTablet),
-          _tab('EngineHours',     isTablet),
-          _tab('BOCheck',         isTablet),
-          _tab('Email',           isTablet),
-          _tab('GoogleReview',    isTablet),
-          _tab('Fuel',            isTablet),
-          _tab('EmployeeView',    isTablet),
-          _tab('PettyCash',       isTablet),
-          _tab('SummonEntry',     isTablet),
-          _tab('SparePartsEntry', isTablet),
-          _tab('PaymentView',     isTablet),
-          _tab('SpotsSaleOrder',  isTablet),
-          _tab('InventoryReport', isTablet),
-          _tab('PDO',             isTablet),
-          _tab('RTI',             isTablet),
-          _tab('DriverApproval',  isTablet),
-          _tab('EmpApproval',     isTablet),
-          _tab('EmpLeave',        isTablet),
-          _tab('TopCustomers',    isTablet),
-        ],
+        tabs: [for (final t in _tabs) _tab(t.label, isTablet)],
       ),
     );
   }
@@ -207,49 +238,7 @@ class MobileDashboard extends StatelessWidget {
       },
       child: TabBarView(
         controller: tabController,
-        children: [
-          const SalesOrderTab(),
-          const JobOrdersTab(),
-          const InvoiceTab(),
-          if (showMailMonitor) const MailMonitorTab(),
-          const IrReportTab(),
-          const ExpenseReportPage(),
-          const VesselReportPage(),
-          const TransportReportPage(),
-          const ReceiptPage(),
-          const ForwardingReportPage(),
-          const TruckDetailsReportPage(),
-          const DriverDetailsView(),
-          const SalaryTab(),
-          const SpeedingScreen(),
-          const FuelFillingPage(),
-          const EngineHoursPage(),
-          const BocPage(),
-          const EmailPage(),
-          const ReviewEntryPage(),
-          const FuelDiffPage(),
-          const EmployeeViewPage(),
-          const PettyCashPage(),
-          const SummonEntryPage(),
-          const SparePartsEntryPage(),
-          const PaymentPendingPage(),
-          const SpotSaleEntryPage(),
-          const InventoryPage(),
-          PDOViewPage(
-            fromDate: DateFormat('yyyy-MM-dd')
-                .format(DateTime.now().subtract(const Duration(days: 7))),
-            toDate: DateFormat('yyyy-MM-dd').format(DateTime.now()),
-          ),
-          const RtiListPage(),
-          const AdminLeaveApprovalTab(),
-          const EmployeeLeaveApprovalTab(),
-          const EmployeeLeaveRequestTab(isAdminOrSubadmin: true),
-          AdminTopCustomersTab(
-            comid: AppGlobals.Comid,
-            fromDate: DateFormat('yyyy-MM-dd').format(DateTime.now().subtract(const Duration(days: 30))),
-            toDate: DateFormat('yyyy-MM-dd').format(DateTime.now()),
-          ),
-        ],
+        children: [for (final t in _tabs) t.page],
       ),
     );
   }

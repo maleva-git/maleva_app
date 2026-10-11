@@ -16,9 +16,9 @@ class DashboardApi {
 
   final Dio _dio;
 
-  /// Today / yesterday / week / month totals and the last 12 months:
+  /// Today/yesterday/week/month totals and the last 12 months:
   /// `{TodaySales, TodayAmount, ..., MonthAmount, monthlySales: [{SalesCount, SalesAmount, MonthName}]}`,
-  /// months newest first. [type]: 0 invoices, 1 all sale orders, 2 those
+  /// months newest first. [type]: 0 invoices, 1 all sales orders, 2 those
   /// with an invoice, 3 those without.
   Future<Map<String, dynamic>> sales(int comid, int type) async =>
       JsonRead.map(await _get('/api/dashboard/sales/$comid', {'type': type}));
@@ -79,7 +79,7 @@ class DashboardApi {
   }
 
   /// The four counts and the status list a sales desk shows for [employeeId]
-  /// (with subordinates): sale orders without invoice since 2024-10-01 (the
+  /// (with subordinates): sales orders without an invoice since 2024-10-01 (the
   /// date the invoice number replaced the remarks rule), and this month's
   /// total, billed and unbilled.
   Future<SalesDeskNumbers> salesDesk(int comid, int employeeId, {DateTime? today}) async {

@@ -1,4 +1,4 @@
-import 'package:flutter/Material.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 import 'package:maleva/features/dashboard/common_tabs/salesorder/bloc/salesorder_bloc.dart';
@@ -69,16 +69,16 @@ class _AdminDashboardState extends State<NewAdminDashboard> with SingleTickerPro
   late TabController _tabController;
   late AdminTabBloc _adminTabBloc;
 
-  /// The Mailbox Monitor tab is the Super Admin's only (role 100); Admin (200) shares this
-  /// dashboard without it. It is the 4th tab (owner's choice, 2026-10-07); no code opens these
-  /// tabs by number, so the shift of the later tabs is harmless.
-  final bool _showMailMonitor = mailMonitorAllowed(const PreferencesAppSession().roleId);
+  /// The Overview (first) and Mailbox Monitor tabs are the Super Admin's only (role 100); Admin (200)
+  /// shares this dashboard without them. Tabs are found by label, never by number, so the shift of
+  /// the later tabs is harmless.
+  final bool _superAdmin = mailMonitorAllowed(const PreferencesAppSession().roleId);
 
   @override
   void initState() {
     super.initState();
     _adminTabBloc = AdminTabBloc();
-    _tabController = TabController(length: 32 + (_showMailMonitor ? 1 : 0), vsync: this);
+    _tabController = TabController(length: adminTabs(superAdmin: _superAdmin, openTab: (_) {}).length, vsync: this);
     _tabController.addListener(_onTabChanged);
   }
 
@@ -147,7 +147,7 @@ class _AdminDashboardState extends State<NewAdminDashboard> with SingleTickerPro
             body: MobileDashboard(
               tabController: _tabController,
               isTablet: isTablet,
-              showMailMonitor: _showMailMonitor,
+              superAdmin: _superAdmin,
             ),
           );
         },
