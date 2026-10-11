@@ -6,6 +6,7 @@ import '../../../../core/bluetooth/view/Bluetooth_tab.dart';
 import '../../../../core/colors/colors.dart';
 import '../../../../core/models/model.dart';
 import '../../../../menu/menulist.dart';
+import '../../common_tabs/forwardingreport/view/forwardingreport_tab.dart';
 import '../../common_tabs/saleorderview/view/saleorderview_tab.dart';
 import '../../common_tabs/unrelease/view/unrelease_tab.dart';
 import '../../common_tabs/unreleasesmk/view/unreleasesmk_tab.dart';
@@ -121,6 +122,7 @@ class ForwardingMobileDashboard extends StatelessWidget {
         ),
         tabs: [
 
+          _tab('FW Report',       isTablet),  //0 counts over SaleOrderForwarding, as the web dashboard/forwarding
           _tab('VSL',             isTablet),  //1
           _tab('K-1,2,3',             isTablet),  //2
           _tab('K8',             isTablet),  //3
@@ -166,6 +168,7 @@ class ForwardingMobileDashboard extends StatelessWidget {
         controller: tabController,
         children: const [
 
+          ForwardingReportPage(),  //0
           VesselReportPage(),  //1
           UnReleasePage(),  //1
           UnReleaseSMKPage(),  //1
