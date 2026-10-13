@@ -4,18 +4,22 @@ import 'package:intl/intl.dart';
 import 'package:maleva/core/di/injection.dart';
 import 'package:maleva/core/mailmonitor/mail_monitor_api.dart';
 import 'package:maleva/core/mailmonitor/response_report_models.dart';
+import 'package:maleva/core/theme/app_theme.dart';
 import 'package:maleva/core/theme/app_typography.dart';
 import 'package:maleva/core/theme/palette.dart';
+import 'package:maleva/core/theme/status_tone.dart';
 import 'package:maleva/core/theme/tokens.dart';
 import 'package:maleva/core/widgets/ui/feedback.dart';
 import 'package:maleva/core/widgets/ui/states.dart';
 import 'package:maleva/core/widgets/ui/status_pill.dart';
 import 'package:maleva/features/mail_monitor/view/mail_message_page.dart';
 
+import 'booking_speed_page.dart';
 import 'response_pdf.dart';
 import 'response_report_cubit.dart';
 import 'response_rules.dart';
 import 'response_widgets.dart';
+import 'summary_language.dart';
 import 'summary_speaker.dart';
 
 /// The Super Admin's Mail Response tab: the web's Mail response report
@@ -91,14 +95,30 @@ class _ReportView extends StatelessWidget {
                   const SizedBox(height: 8),
                   _InlineError(message: s.error!, onRetry: cubit.load),
                 ],
+                if (report.office != null) ...[
+                  const SizedBox(height: 10),
+                  _OfficeLine(office: report.office!),
+                ],
                 const SizedBox(height: 12),
                 _SpotlightRow(report: report, isTablet: isTablet, range: s.range),
                 const SizedBox(height: 10),
-                _Numbers(company: report.company, isTablet: isTablet),
+                _Numbers(
+                  company: report.company,
+                  isTablet: isTablet,
+                  opening: report.office == null ? null : clockText(report.office!.open),
+                ),
                 const SizedBox(height: 10),
                 _DailyCard(company: report.company),
                 const SizedBox(height: 10),
                 _AiCard(state: s),
+                if (report.judged) ...[
+                  const SizedBox(height: 6),
+                  Text(
+                    'On track, Watch, Needs support and Not enough data are decided by fixed rules on the numbers, not by '
+                    'the AI. A mailbox with a failed scan, no Sent folder or fewer than 20 mails is not judged.',
+                    style: AppTypography.bodySmall(color: AppTokens.textMuted),
+                  ),
+                ],
                 const SizedBox(height: 14),
                 _MailboxList(state: s, report: report, isTablet: isTablet),
                 const SizedBox(height: 10),
@@ -217,6 +237,18 @@ class _Header extends StatelessWidget {
         Wrap(spacing: 8, runSpacing: 8, children: [
           HeaderPill(label: 'View PDF', icon: Icons.picture_as_pdf_outlined, onTap: () => _pdf(context, share: false)),
           HeaderPill(label: 'Share PDF', icon: Icons.share_outlined, onTap: () => _pdf(context, share: true)),
+          HeaderPill(
+            label: 'Booking speed',
+            icon: Icons.speed_outlined,
+            onTap: () => Navigator.of(context).push(MaterialPageRoute<void>(
+              builder: (_) => BookingSpeedPage(
+                api: context.read<ResponseReportCubit>().api,
+                clock: clock,
+                range: state.range,
+                preset: state.preset,
+              ),
+            )),
+          ),
         ]),
       ]),
     );
@@ -252,7 +284,7 @@ class _SpotlightRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final s = spotlight(report.mailboxes);
+    final s = spotlightOf(report);
     final c = report.company;
     void open(ResponseRow r) => showLateSheet(context, r, range);
     String line(ResponseRow r) =>
@@ -299,18 +331,23 @@ class _SpotlightRow extends StatelessWidget {
         icon: Icons.groups_outlined,
         title: 'Average ${minutesText(c.avgMinutes)}',
         subtitle: '${pctText(c.withinTargetPct)} replied on time · median ${minutesText(c.medianMinutes)}',
-        line: '${s.onTarget} of ${s.counted} mailboxes on target',
+        line: report.judged
+            ? '${s.onTarget} of ${s.counted} mailboxes with enough data on track'
+            : '${s.onTarget} of ${s.counted} mailboxes on target',
       ),
     ];
-    return _Columns(columns: isTablet ? 3 : 1, children: cards);
+    return TileColumns(columns: isTablet ? 3 : 1, children: cards);
   }
 }
 
 class _Numbers extends StatelessWidget {
-  const _Numbers({required this.company, required this.isTablet});
+  const _Numbers({required this.company, required this.isTablet, this.opening});
 
   final ResponseNumbers company;
   final bool isTablet;
+
+  /// "8:30 am": the office opening, for the after-hours tile.
+  final String? opening;
 
   @override
   Widget build(BuildContext context) {
@@ -323,9 +360,16 @@ class _Numbers extends StatelessWidget {
             : pct >= 70
                 ? AppTokens.statusWarning
                 : Palette.rose;
-    return _Columns(columns: isTablet ? 4 : 2, children: [
-      NumberTile(
-          label: 'Customer mails', icon: Icons.mail_outline, value: '${c.received}', note: '${c.replied} replied'),
+    return TileColumns(columns: isTablet ? (c.afterHoursReceived != null ? 5 : 4) : 2, minCellHeight: 124, children: [
+      if (c.sorting?.sorted ?? false)
+        NumberTile(
+            label: 'Needed a reply',
+            icon: Icons.mail_outline,
+            value: '${c.received}',
+            note: 'of ${c.sorting!.customerMails} customer mails · ${c.replied} replied')
+      else
+        NumberTile(
+            label: 'Customer mails', icon: Icons.mail_outline, value: '${c.received}', note: '${c.replied} replied'),
       NumberTile(
         label: 'Replied within target',
         icon: Icons.verified_outlined,
@@ -344,7 +388,15 @@ class _Numbers extends StatelessWidget {
         icon: Icons.hourglass_bottom_outlined,
         value: '${c.waiting}',
         valueColor: c.waiting > 0 ? Palette.rose : AppTokens.statusSuccess,
+        note: (c.waitingOverDay ?? 0) > 0 ? '${c.waitingOverDay} over one office day' : null,
       ),
+      if (c.afterHoursReceived != null)
+        NumberTile(
+          label: 'Arrived after office hours',
+          icon: Icons.nightlight_outlined,
+          value: '${c.afterHoursReceived}',
+          note: '${c.afterHoursAnsweredBeforeOpen ?? 0} answered before ${opening ?? '8:30 am'}',
+        ),
     ]);
   }
 }
@@ -379,15 +431,99 @@ class _DailyCard extends StatelessWidget {
 }
 
 /// The AI summary: written only on tap, shown as points, read aloud on tap.
+/// "Office hours Mon–Sat 8:30 am – 8:00 pm (Malaysia), public holidays closed" and the holidays in the range.
+class _OfficeLine extends StatelessWidget {
+  const _OfficeLine({required this.office});
+
+  final OfficeHours office;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.fromLTRB(12, 8, 12, 8),
+      decoration: cardBox(color: AppTokens.brandLight, border: AppTokens.brandMid.withValues(alpha: 0.3)),
+      child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        const Icon(Icons.schedule, size: 16, color: AppTokens.brandGradientStart),
+        const SizedBox(width: 8),
+        Expanded(
+          child: Text(
+            '${officeText(office)}. Reply times count office time only; mail that arrives when the office is closed '
+            'starts counting at the next opening.'
+            '${office.holidays.isEmpty ? '' : ' Holidays in these dates: ${office.holidays.join(', ')}.'}',
+            style: AppTypography.bodySmall(color: AppTokens.brandDark, fontWeight: FontWeight.w600),
+          ),
+        ),
+      ]),
+    );
+  }
+}
+
+/// One AI point, coloured by the rule category it is about; the mailbox opens its late mail.
+class _PointCard extends StatelessWidget {
+  const _PointCard({required this.point, required this.onOpen});
+
+  final SummaryPoint point;
+  final void Function(int mailboxId) onOpen;
+
+  @override
+  Widget build(BuildContext context) {
+    final category = point.category;
+    final tone = category == null ? null : categoryTone(category);
+    final mc = context.mc;
+    return Container(
+      margin: const EdgeInsets.only(bottom: 8),
+      padding: const EdgeInsets.fromLTRB(12, 10, 12, 10),
+      decoration: cardBox(
+        color: tone == null ? AppTokens.surfaceCard : mc.toneBg(tone),
+        border: tone == null ? AppTokens.surfaceBorder : mc.toneFg(tone).withValues(alpha: 0.3),
+      ),
+      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        Wrap(spacing: 8, runSpacing: 4, crossAxisAlignment: WrapCrossAlignment.center, children: [
+          if (category != null) StatusPill(categoryLabel(category), tone: tone),
+          if (point.mailboxId != null && point.mailbox != null)
+            InkWell(
+              onTap: () => onOpen(point.mailboxId!),
+              child: Text(point.mailbox!,
+                  style: AppTypography.bodySmall(color: AppTokens.brandGradientStart, fontWeight: FontWeight.w700)
+                      .copyWith(decoration: TextDecoration.underline)),
+            ),
+          if (!point.checked) Text('plain figures', style: AppTypography.bodySmall(color: AppTokens.textMuted)),
+        ]),
+        const SizedBox(height: 4),
+        Text(point.text, style: AppTypography.bodyMedium(color: AppTokens.textPrimary)),
+        if (point.why != null) ...[
+          const SizedBox(height: 4),
+          Text.rich(TextSpan(children: [
+            const TextSpan(text: 'Why: ', style: TextStyle(fontWeight: FontWeight.w700)),
+            TextSpan(text: point.why),
+          ]), style: AppTypography.bodySmall(color: AppTokens.textSecondary)),
+        ],
+        if (point.suggestion != null) ...[
+          const SizedBox(height: 4),
+          Text('→ ${point.suggestion}',
+              style: AppTypography.bodySmall(color: AppTokens.brandDark, fontWeight: FontWeight.w600)),
+        ],
+      ]),
+    );
+  }
+}
+
 class _AiCard extends StatelessWidget {
   const _AiCard({required this.state});
 
   final ResponseReportState state;
 
+  /// The point's mailbox opens its late mail, as tapping its card does.
+  void _openMailbox(BuildContext context, int mailboxId) {
+    final row = state.report?.mailboxes.where((r) => r.mailboxId == mailboxId).firstOrNull;
+    if (row != null) showLateSheet(context, row, state.range);
+  }
+
   @override
   Widget build(BuildContext context) {
     final cubit = context.read<ResponseReportCubit>();
     final points = state.summary?.points ?? const <String>[];
+    final items = state.summary?.items ?? const <SummaryPoint>[];
     return Container(
       padding: const EdgeInsets.fromLTRB(14, 12, 14, 12),
       decoration: cardBox(color: AppTokens.brandLight, border: AppTokens.brandMid.withValues(alpha: 0.3)),
@@ -396,6 +532,32 @@ class _AiCard extends StatelessWidget {
           const Icon(Icons.auto_awesome_outlined, size: 18, color: AppTokens.brandGradientStart),
           const SizedBox(width: 8),
           Expanded(child: Text('AI summary', style: AppTypography.heading3(color: AppTokens.brandDark))),
+        ]),
+        const SizedBox(height: 10),
+        Row(children: [
+          const Icon(Icons.translate, size: 16, color: AppTokens.brandGradientStart),
+          const SizedBox(width: 6),
+          Text('Language', style: AppTypography.bodySmall(color: AppTokens.brandDark, fontWeight: FontWeight.w600)),
+        ]),
+        const SizedBox(height: 6),
+        Wrap(spacing: 6, runSpacing: 6, children: [
+          for (final l in SummaryLanguage.all)
+            ChoiceChip(
+              label: Text(l.label),
+              selected: state.language == l,
+              onSelected: state.summaryLoading ? null : (_) => cubit.chooseLanguage(l),
+              showCheckmark: false,
+              selectedColor: AppTokens.brandGradientStart,
+              backgroundColor: AppTokens.surfaceCard,
+              side: BorderSide(
+                  color:
+                      state.language == l ? AppTokens.brandGradientStart : AppTokens.brandMid.withValues(alpha: 0.3)),
+              labelStyle: AppTypography.bodySmall(
+                color: state.language == l ? AppTokens.textOnDark : AppTokens.brandDark,
+                fontWeight: FontWeight.w600,
+              ),
+              visualDensity: VisualDensity.compact,
+            ),
         ]),
         const SizedBox(height: 10),
         Wrap(spacing: 8, runSpacing: 8, children: [
@@ -428,11 +590,14 @@ class _AiCard extends StatelessWidget {
           const SizedBox(height: 8),
           Text(state.summaryError!, style: AppTypography.bodySmall(color: Palette.rose)),
         ],
-        if (state.speechUnavailable) ...[
+        if (state.speechProblem != null) ...[
           const SizedBox(height: 8),
-          Text('Read aloud is not available on this device.', style: AppTypography.bodySmall(color: Palette.rose)),
+          Text(state.speechProblem!, style: AppTypography.bodySmall(color: Palette.rose)),
         ],
-        if (points.isNotEmpty) ...[
+        if (items.isNotEmpty) ...[
+          const SizedBox(height: 10),
+          for (final p in items) _PointCard(point: p, onOpen: (id) => _openMailbox(context, id)),
+        ] else if (points.isNotEmpty) ...[
           const SizedBox(height: 10),
           for (final p in points)
             Padding(
@@ -449,7 +614,10 @@ class _AiCard extends StatelessWidget {
             ),
         ],
         const SizedBox(height: 4),
-        Text('AI summary of the numbers. No mail content was sent.',
+        Text(
+            'AI summary of the numbers, written in ${state.language.name}. No mail content and no names were sent; '
+            'every figure is checked against the report. Based on mail reply times only - check with the person '
+            'before acting.',
             style: AppTypography.bodySmall(color: AppTokens.textMuted)),
       ]),
     );
@@ -500,7 +668,7 @@ class _MailboxList extends StatelessWidget {
           child: Text('No mailboxes are monitored yet.', style: AppTypography.bodySmall(color: AppTokens.textMuted)),
         )
       else
-        _Columns(columns: isTablet ? 2 : 1, children: [
+        TileColumns(columns: isTablet ? 2 : 1, children: [
           for (var i = 0; i < rows.length; i++)
             MailboxResponseCard(
               rank: i + 1,
@@ -508,32 +676,6 @@ class _MailboxList extends StatelessWidget {
               onTap: () => showLateSheet(context, rows[i], state.range),
             ),
         ]),
-    ]);
-  }
-}
-
-/// Rows of [columns] equal cells, the same height per row.
-class _Columns extends StatelessWidget {
-  const _Columns({required this.columns, required this.children});
-
-  final int columns;
-  final List<Widget> children;
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(children: [
-      for (var i = 0; i < children.length; i += columns)
-        Padding(
-          padding: EdgeInsets.only(bottom: i + columns < children.length ? 10 : 0),
-          child: IntrinsicHeight(
-            child: Row(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-              for (var c = 0; c < columns; c++) ...[
-                if (c > 0) const SizedBox(width: 10),
-                Expanded(child: i + c < children.length ? children[i + c] : const SizedBox.shrink()),
-              ],
-            ]),
-          ),
-        ),
     ]);
   }
 }
@@ -562,7 +704,8 @@ class _LateSheet extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final band = bandOf(row);
+    final (label, tone) = statusOf(row);
+    final reasons = reasonTexts(row);
     return DraggableScrollableSheet(
       expand: false,
       initialChildSize: 0.75,
@@ -586,9 +729,59 @@ class _LateSheet extends StatelessWidget {
             Text('${rangeText(range)} · target ${row.targetMinutes} min',
                 style: AppTypography.bodySmall(color: AppTokens.textMuted)),
             const SizedBox(height: 8),
-            Align(alignment: Alignment.centerLeft, child: StatusPill(bandLabel(band), tone: bandTone(band))),
+            Align(alignment: Alignment.centerLeft, child: StatusPill(label, tone: tone)),
+            if (reasons.isNotEmpty) ...[
+              const SizedBox(height: 4),
+              Text(reasons.join(' · '), style: AppTypography.bodySmall(color: AppTokens.textMuted)),
+            ],
+            if (readingText(row) != null) ...[
+              const SizedBox(height: 2),
+              Text(readingText(row)!, style: AppTypography.bodySmall(color: AppTokens.textMuted)),
+            ],
+            if (sortingText(row.numbers.sorting) != null) ...[
+              const SizedBox(height: 2),
+              Text(sortingText(row.numbers.sorting)!,
+                  style: AppTypography.bodySmall(color: AppTokens.brandGradientStart, fontWeight: FontWeight.w600)),
+            ],
+            if (row.numbers.sorting?.sorted ?? false) ...[
+              const SizedBox(height: 10),
+              Wrap(spacing: 8, runSpacing: 6, children: [
+                for (final (tab, text) in [
+                  (SheetTab.late, 'Late'),
+                  (SheetTab.counted, 'Needed a reply (${row.numbers.sorting!.needReply})'),
+                  (SheetTab.notTheirs, 'Not theirs (${row.numbers.sorting!.notTheirs})'),
+                ])
+                  ChoiceChip(
+                    label: Text(text),
+                    selected: s.tab == tab,
+                    onSelected: (_) => context.read<LateMailCubit>().choose(tab),
+                    selectedColor: AppTokens.brandLight,
+                  ),
+              ]),
+            ],
             const SizedBox(height: 12),
-            if (s.loading)
+            if (s.tab != SheetTab.late)
+              if (s.mailsLoading)
+                const Padding(
+                    padding: EdgeInsets.all(24),
+                    child: Center(child: CircularProgressIndicator(color: AppTokens.brandGradientStart)))
+              else if (s.mailsError != null)
+                ErrorState(
+                    title: 'Could not load the mails',
+                    message: s.mailsError,
+                    onRetry: () => context.read<LateMailCubit>().choose(s.tab))
+              else
+                _LateSection(
+                  title: s.tab == SheetTab.counted
+                      ? 'Mails that needed this mailbox\'s reply'
+                      : 'Mails that did not need its reply, with the reason',
+                  items: s.mails[s.tab]?.items ?? const [],
+                  empty: s.tab == SheetTab.counted ? 'No mail needed a reply in this range.' : 'Every mail needed its reply.',
+                  onOpen: (uid) => _open(context, uid),
+                  onWrong: (item) => _wrong(context, item),
+                  showReason: true,
+                )
+            else if (s.loading)
               const Padding(
                   padding: EdgeInsets.all(24),
                   child: Center(child: CircularProgressIndicator(color: AppTokens.brandGradientStart)))
@@ -603,6 +796,7 @@ class _LateSheet extends StatelessWidget {
                 items: s.list!.slowest,
                 empty: 'No replies in this range.',
                 onOpen: (uid) => _open(context, uid),
+                onWrong: (item) => _wrong(context, item),
               ),
               const SizedBox(height: 12),
               _LateSection(
@@ -610,6 +804,7 @@ class _LateSheet extends StatelessWidget {
                 items: s.list!.waiting,
                 empty: 'Nothing waiting.',
                 onOpen: (uid) => _open(context, uid),
+                onWrong: (item) => _wrong(context, item),
               ),
             ],
           ],
@@ -621,15 +816,68 @@ class _LateSheet extends StatelessWidget {
   void _open(BuildContext context, int uid) => Navigator.of(context).push(MaterialPageRoute<void>(
         builder: (_) => MailMessagePage(api: api, mailboxId: row.mailboxId, uid: uid),
       ));
+
+  /// "Wrong?": the Super Admin says whether the mail needed this mailbox's reply (mail-team-credit-and-corrections).
+  Future<void> _wrong(BuildContext context, LateItem item) async {
+    final cubit = context.read<LateMailCubit>();
+    final choice = await showModalBottomSheet<String>(
+      context: context,
+      backgroundColor: AppTokens.surfaceCard,
+      builder: (sheet) => SafeArea(
+        child: Column(mainAxisSize: MainAxisSize.min, children: [
+          ListTile(
+            title: Text('Is this right?', style: AppTypography.heading3(color: AppTokens.brandDark)),
+            subtitle: Text('Now: ${relevanceText(item.relevance)}${item.correction != null ? ' (corrected)' : ''}'),
+          ),
+          if (!item.counted)
+            ListTile(
+              leading: const Icon(Icons.mark_email_unread_outlined),
+              title: const Text('It needed this mailbox\'s reply'),
+              onTap: () => Navigator.pop(sheet, 'MINE'),
+            ),
+          if (item.counted)
+            ListTile(
+              leading: const Icon(Icons.do_not_disturb_on_outlined),
+              title: const Text('It did not need its reply'),
+              onTap: () => Navigator.pop(sheet, 'NOT_MINE'),
+            ),
+          if (item.correction != null)
+            ListTile(
+              leading: const Icon(Icons.undo),
+              title: const Text('Back to the rule'),
+              onTap: () => Navigator.pop(sheet, ''),
+            ),
+        ]),
+      ),
+    );
+    if (choice == null) return;
+    final error = await cubit.correct(item.id, choice.isEmpty ? null : choice);
+    if (context.mounted) {
+      showSnack(context, error ?? (choice.isEmpty ? 'Back to the rule' : 'Correction saved'),
+          kind: error == null ? SnackKind.success : SnackKind.error);
+    }
+  }
 }
 
 class _LateSection extends StatelessWidget {
-  const _LateSection({required this.title, required this.items, required this.empty, required this.onOpen});
+  const _LateSection(
+      {required this.title,
+      required this.items,
+      required this.empty,
+      required this.onOpen,
+      this.onWrong,
+      this.showReason = false});
 
   final String title;
   final List<LateItem> items;
   final String empty;
   final void Function(int uid) onOpen;
+
+  /// Shows who each mail was for (the proof lists).
+  final bool showReason;
+
+  /// "Wrong?" on a mail; null hides it.
+  final void Function(LateItem item)? onWrong;
 
   static final _when = DateFormat('d MMM, h:mm a');
 
@@ -652,14 +900,41 @@ class _LateSection extends StatelessWidget {
                       style: AppTypography.bodyMedium(color: AppTokens.textPrimary)),
                   Text(
                     '${i.senderDomain == null ? 'sender unknown' : 'from ${i.senderDomain}'}'
-                    '${i.firstReplyAt == null ? '' : ' · replied ${_when.format(i.firstReplyAt!)}'}',
+                    '${i.firstReplyAt == null ? '' : ' · replied ${_when.format(i.firstReplyAt!)}'}'
+                    '${i.afterHours ? ' · arrived after office hours' : ''}'
+                    '${i.repliedBy == null ? '' : ' · replied by ${i.repliedBy}'}'
+                    '${i.handledFor == null ? '' : ' · handled for ${i.handledFor}'}',
                     style: AppTypography.bodySmall(color: AppTokens.textMuted),
                   ),
+                  if (showReason || i.correction != null || (onWrong != null && i.id > 0)) ...[
+                    const SizedBox(height: 3),
+                    Wrap(spacing: 6, runSpacing: 4, crossAxisAlignment: WrapCrossAlignment.center, children: [
+                      if (showReason)
+                        StatusPill(relevanceText(i.relevance),
+                            tone: i.relevance == 'MINE' ? StatusTone.primary : StatusTone.neutral),
+                      if (i.correction != null) const StatusPill('Corrected', tone: StatusTone.warning),
+                      if (onWrong != null && i.id > 0)
+                        InkWell(
+                          onTap: () => onWrong!(i),
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
+                            child: Text('Wrong?',
+                                style: AppTypography.bodySmall(color: AppTokens.brandGradientStart, fontWeight: FontWeight.w700)
+                                    .copyWith(decoration: TextDecoration.underline)),
+                          ),
+                        ),
+                    ]),
+                  ],
                 ]),
               ),
-              Text(i.waiting ? 'No reply' : minutesText(i.minutes),
-                  style: AppTypography.heading3(
-                      color: i.waiting ? Palette.rose : AppTokens.brandDark, fontWeight: FontWeight.w700)),
+              Column(crossAxisAlignment: CrossAxisAlignment.end, children: [
+                Text(i.waiting ? 'No reply' : minutesText(i.minutes),
+                    style: AppTypography.heading3(
+                        color: i.waiting ? Palette.rose : AppTokens.brandDark, fontWeight: FontWeight.w700)),
+                if (!i.waiting && i.clockMinutes != null && i.clockMinutes!.round() != i.minutes?.round())
+                  Text('office time · clock ${minutesText(i.clockMinutes)}',
+                      style: AppTypography.bodySmall(color: AppTokens.textMuted)),
+              ]),
               if (i.uid > 0) const Icon(Icons.chevron_right, color: AppTokens.textMuted),
             ]),
           ),

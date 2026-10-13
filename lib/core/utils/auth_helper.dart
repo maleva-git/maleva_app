@@ -8,6 +8,7 @@ import 'package:maleva/features/home/view/home_tab.dart';
 import 'package:maleva/features/mastersearch/Employee.dart';
 import 'package:maleva/core/di/injection.dart';
 import 'package:maleva/features/auth/data/session_service.dart';
+import 'package:maleva/features/notifications/notification_summary_cubit.dart';
 import 'package:maleva/core/network/legacy_api_repository.dart';
 
 class AuthHelper {
@@ -218,6 +219,8 @@ class AuthHelper {
     // Ends the Java session (server first, best effort), deletes the token and
     // clears the login fields - also when the phone is offline.
     await sl<SessionService>().signOut();
+    // the next person must not see this person's bell count or vessel alerts
+    if (sl.isRegistered<NotificationSummaryCubit>()) sl<NotificationSummaryCubit>().clear();
     if (!context.mounted) return;
     context.go('/login');
   }

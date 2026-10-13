@@ -82,7 +82,7 @@ class NumberTile extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.fromLTRB(12, 10, 12, 10),
       decoration: cardBox(),
-      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+      child: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.start, children: [
         Row(children: [
           if (icon != null) ...[
             Container(
@@ -183,9 +183,16 @@ class MailboxResponseCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final band = bandOf(row);
+    final (label, tone) = statusOf(row);
     final n = row.numbers;
-    final behind = band == Band.behind;
+    final noData = row.category == Category.notEnoughData;
+    final behind = row.category != null ? row.category == Category.needsSupport : bandOf(row) == Band.behind;
+    final reasons = reasonTexts(row);
+    final reading = readingText(row);
+    final sorting = sortingText(n.sorting);
+    final helped = helpedText(n.sorting);
+    final load = workloadText(row.workload);
+    final leave = leaveText(row.workload);
     return Material(
       color: Colors.transparent,
       child: InkWell(
@@ -193,9 +200,11 @@ class MailboxResponseCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(reportRadius),
         child: Ink(
           padding: const EdgeInsets.fromLTRB(14, 12, 14, 12),
-          decoration: behind
-              ? cardBox(color: Palette.rose.withValues(alpha: 0.04), border: Palette.rose.withValues(alpha: 0.25))
-              : cardBox(),
+          decoration: noData
+              ? cardBox(color: AppTokens.surfacePage, border: AppTokens.surfaceBorder)
+              : behind
+                  ? cardBox(color: Palette.rose.withValues(alpha: 0.04), border: Palette.rose.withValues(alpha: 0.25))
+                  : cardBox(),
           child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
             Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
               Container(
@@ -223,9 +232,16 @@ class MailboxResponseCard extends StatelessWidget {
               const SizedBox(width: 8),
               ConstrainedBox(
                 constraints: const BoxConstraints(maxWidth: 150),
-                child: StatusPill(bandLabel(band), tone: bandTone(band)),
+                child: StatusPill(label, tone: tone),
               ),
             ]),
+            if (reasons.isNotEmpty) ...[
+              const SizedBox(height: 6),
+              Text(reasons.join(' · '),
+                  style: AppTypography.bodySmall(
+                      color: noData ? AppTokens.textMuted : (behind ? Palette.rose : AppTokens.statusWarning),
+                      fontWeight: FontWeight.w600)),
+            ],
             const SizedBox(height: 10),
             Row(crossAxisAlignment: CrossAxisAlignment.end, children: [
               Expanded(
@@ -244,10 +260,38 @@ class MailboxResponseCard extends StatelessWidget {
                 child: _Metric(
                   label: 'Waiting',
                   value: '${n.waiting}',
+                  note: (n.waitingOverDay ?? 0) > 0 ? '${n.waitingOverDay} >1 day' : null,
                   color: n.waiting > 0 ? Palette.rose : AppTokens.textMuted,
                 ),
               ),
             ]),
+            if ((n.afterHoursReceived ?? 0) > 0) ...[
+              const SizedBox(height: 6),
+              Text(
+                  '${n.afterHoursReceived} arrived after office hours · ${n.afterHoursAnsweredBeforeOpen ?? 0} answered before opening',
+                  style: AppTypography.bodySmall(color: AppTokens.brandGradientStart)),
+            ],
+            if (sorting != null) ...[
+              const SizedBox(height: 4),
+              Text(sorting,
+                  style: AppTypography.bodySmall(color: AppTokens.brandGradientStart, fontWeight: FontWeight.w600)),
+            ],
+            if (helped != null) ...[
+              const SizedBox(height: 2),
+              Text(helped, style: AppTypography.bodySmall(color: AppTokens.statusSuccess, fontWeight: FontWeight.w600)),
+            ],
+            if (load != null) ...[
+              const SizedBox(height: 2),
+              Text(load, style: AppTypography.bodySmall(color: AppTokens.textMuted)),
+            ],
+            if (leave != null) ...[
+              const SizedBox(height: 2),
+              Text(leave, style: AppTypography.bodySmall(color: AppTokens.brandGradientStart, fontWeight: FontWeight.w600)),
+            ],
+            if (reading != null) ...[
+              const SizedBox(height: 4),
+              Text(reading, style: AppTypography.bodySmall(color: AppTokens.textMuted)),
+            ],
             const SizedBox(height: 8),
             DailyBarsView(daily: n.daily, height: 18),
             if (row.scanError != null) ...[
@@ -322,5 +366,48 @@ class HeaderPill extends StatelessWidget {
         ),
       ),
     );
+  }
+}
+
+/// Rows of [columns] equal cells, the same height per row.
+class TileColumns extends StatelessWidget {
+  const TileColumns({super.key, required this.columns, required this.children, this.minCellHeight});
+
+  final int columns;
+  final List<Widget> children;
+
+  /// When set, cells are at least this tall and grow with their content, without measuring the row first
+  /// (a measured row can come out a pixel short for big numbers).
+  final double? minCellHeight;
+
+  @override
+  Widget build(BuildContext context) {
+    final minHeight = minCellHeight;
+    return Column(children: [
+      for (var i = 0; i < children.length; i += columns)
+        Padding(
+          padding: EdgeInsets.only(bottom: i + columns < children.length ? 10 : 0),
+          child: _row(i, minHeight),
+        ),
+    ]);
+  }
+
+  Widget _row(int i, double? minHeight) {
+    final row = Row(
+      crossAxisAlignment: minHeight == null ? CrossAxisAlignment.stretch : CrossAxisAlignment.start,
+      children: [
+        for (var c = 0; c < columns; c++) ...[
+          if (c > 0) const SizedBox(width: 10),
+          Expanded(
+            child: i + c >= children.length
+                ? const SizedBox.shrink()
+                : minHeight == null
+                    ? children[i + c]
+                    : ConstrainedBox(constraints: BoxConstraints(minHeight: minHeight), child: children[i + c]),
+          ),
+        ],
+      ],
+    );
+    return minHeight == null ? IntrinsicHeight(child: row) : row;
   }
 }

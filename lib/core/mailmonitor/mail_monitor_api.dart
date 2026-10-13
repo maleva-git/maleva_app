@@ -19,8 +19,7 @@ class MailMonitorApi {
 
   static const _base = '/api/mail-monitor';
 
-  Future<MailboxList> mailboxes() =>
-      _get('$_base/mailboxes', {}).then((d) => MailboxList.fromJava(JsonRead.map(d)));
+  Future<MailboxList> mailboxes() => _get('$_base/mailboxes', {}).then((d) => MailboxList.fromJava(JsonRead.map(d)));
 
   /// The signed-in employee's own linked mailboxes and their latest notice, for every employee role
   /// (backend change add-my-unread-mail-notice). Drivers get 403.
@@ -63,10 +62,51 @@ class MailMonitorApi {
       _get('$_base/response-report/late', {'mailboxId': mailboxId, 'from': range.from, 'to': range.to, 'limit': limit})
           .then((d) => LateList.fromJava(JsonRead.map(d)));
 
-  /// Asks the server's AI to write about the numbers (no mail content is sent).
-  Future<ResponseSummary> responseSummary(ReportRange range) =>
-      _post('$_base/response-report/summary', {'from': range.from, 'to': range.to})
+  /// The mails behind a mailbox's numbers (backend change mail-count-own-mail): [group] COUNTED (needed its reply) or
+  /// NOT_THEIRS (copied in, written to a colleague, answered by a colleague), each with its reason.
+  Future<MailList> responseMails(int mailboxId, ReportRange range, String group) =>
+      _get('$_base/response-report/mails', {'mailboxId': mailboxId, 'from': range.from, 'to': range.to, 'group': group})
+          .then((d) => MailList.fromJava(JsonRead.map(d)));
+
+  /// Corrects who a mail was for ([relevance] MINE or NOT_MINE), or sends it back to the rule (null)
+  /// (backend change mail-team-credit-and-corrections). 503 until the server's script has run.
+  Future<void> correctMail(int id, String? relevance) async {
+    try {
+      final r = await _dio.put<dynamic>('$_base/response-report/mails/$id/correction',
+          queryParameters: {'companyId': _companyId()}, data: {'relevance': relevance});
+      JavaResponse.data(r.data);
+    } on DioException catch (e) {
+      throw JavaResponse.fromDio(e);
+    }
+  }
+
+  /// Asks the server's AI to write about the numbers (no mail content is sent), in [language]
+  /// (en, ta, ms, zh, es, hi; backend change mail-summary-language).
+  Future<ResponseSummary> responseSummary(ReportRange range, {String language = 'en'}) =>
+      _post('$_base/response-report/summary', {'from': range.from, 'to': range.to, 'language': language})
           .then((d) => ResponseSummary.fromJava(JsonRead.map(d)));
+
+  /// Booking mail to sale order to job-number reply, per employee, in office minutes
+  /// (backend change mail-reading-and-booking-speed).
+  Future<BookingSpeedReport> bookingSpeed(ReportRange range) =>
+      _get('$_base/booking-speed', {'from': range.from, 'to': range.to})
+          .then((d) => BookingSpeedReport.fromJava(JsonRead.map(d)));
+
+  /// The AI summary of the booking statistics (numbers only go to the AI; backend change booking-speed-insights).
+  Future<BookingSummary> bookingSummary(ReportRange range, {String language = 'en'}) =>
+      _post('$_base/booking-speed/summary', {'from': range.from, 'to': range.to, 'language': language})
+          .then((d) => BookingSummary.fromJava(JsonRead.map(d)));
+
+  /// The Super Admin's check of a booking-like mail: a booking (true), not a booking (false), or undo (null).
+  Future<void> checkBooking(int id, bool? booking) async {
+    try {
+      final r = await _dio.put<dynamic>('$_base/booking-speed/mails/$id/booking',
+          queryParameters: {'companyId': _companyId()}, data: {'booking': booking});
+      JavaResponse.data(r.data);
+    } on DioException catch (e) {
+      throw JavaResponse.fromDio(e);
+    }
+  }
 
   /// The server's PDF of the report (Jasper), as bytes. A refusal comes as JSON; its message is kept.
   Future<List<int>> responsePdf(ReportRange range) async {

@@ -41,6 +41,34 @@ prompt with "Use <name>" and "Keep my spelling". Saving SHALL never be blocked.
 - **WHEN** the backend answers CLOSE with CMA CGM PETRA for "CMA CGM PETRON" and the user keeps their spelling
 - **THEN** the field keeps "CMA CGM PETRON" and the prompt does not appear again for that text
 
+### Requirement: The sales form warns when a typed ETA differs from PTP
+
+The user SHALL be able to type any ETA or ETD on a leg linked to a PTP call. When they save and a
+typed (ticked) ETA or ETD is an hour or more away from the linked call's time (the call picked on this
+visit, else the one read from `GET /api/sale-orders/{id}/vessel-links` when the order opened), the
+form SHALL ask once "PTP's schedule shows another time", listing each time next to PTP's, with
+"Use PTP's times" and "Keep my times"; either answer continues the save. It SHALL NOT ask for an
+empty time, a hidden vessel section, a renamed vessel, or a loaded order whose ETA and ETD did not
+change since it was opened or answered.
+
+#### Scenario: ETA typed two days later
+- **WHEN** the off leg is linked to FM NAMTHONG EXCELLENCE 2653 (PTP 14 Oct 15:00) and the user enters O ETA 16 Oct 10:00 and saves
+- **THEN** the form asks first; "Use PTP's times" saves O ETA 14 Oct 15:00, "Keep my times" saves 16 Oct 10:00
+
+### Requirement: The sales form checks pickup and delivery against the ETA
+
+For any port and vessel, when the user saves, the form SHALL compare pickup and delivery with the day
+before the ETA (the loading ETA when its section shows and is ticked, else the off ETA) and, when a
+date is on another day or empty, ask once with "Change to <day>" and "Keep my dates" ("Leave empty"
+when both are empty). "Change" SHALL tick and set those dates to that day, keeping the time of day
+(00:00 for an empty date); "Keep" SHALL save them as they are, empty included. It SHALL NOT ask when
+both vessel sections are hidden (general cargo), without an ETA, or for a loaded order whose dates
+did not change. It is asked after the PTP warning, with the ETA chosen there.
+
+#### Scenario: Pickup four days early
+- **WHEN** O ETA is 15 Oct 15:00 and pickup is 11 Oct 09:00 and the user saves
+- **THEN** the form asks "Is the pickup date correct?"; "Change to 14 Oct" saves pickup 14 Oct 09:00
+
 ### Requirement: The sales form links the vessels after a successful save
 
 After the order saves, the form SHALL send both legs' names and any picked vessel and call ids to

@@ -10,11 +10,21 @@ import 'package:maleva/core/models/shared/sale_edit_detail_model.dart';
 import 'package:maleva/core/di/injection.dart';
 import 'package:maleva/core/sale_order/sale_order_api.dart';
 import 'package:maleva/core/enquiry/enquiry_api.dart';
+import 'package:maleva/core/logging/app_logger.dart';
+import 'package:maleva/core/utils/json_read.dart';
+import 'package:maleva/core/vessel_master/vessel_master_api.dart';
+import 'package:maleva/core/vessel_master/vessel_master_models.dart';
+import 'package:maleva/features/transaction/salesorder/add/bloc/save_date_checks.dart';
+import 'package:maleva/features/transaction/salesorder/add/bloc/vessel_pick.dart';
 
 class SalesOrderAddBloc extends Bloc<SalesOrderAddEvent, SalesOrderAddState> {
   final BuildContext context;
   final SalesOrderAddRepository _repository;
   final SaleOrderApi _saleOrders;
+  final VesselMasterApi? _vesselMastersGiven;
+
+  /// Read on first use, so the form opens even where the vessel API is not registered.
+  VesselMasterApi get _vesselMasters => _vesselMastersGiven ?? sl<VesselMasterApi>();
 
   static const List<String> _billType = ['MY', 'TR'];
 
@@ -27,8 +37,9 @@ class SalesOrderAddBloc extends Bloc<SalesOrderAddEvent, SalesOrderAddState> {
   static List<String> get truckSizeList => _truckSizeList;
   static List<String> get zbNo => _zbNo;
 
-  SalesOrderAddBloc(this.context, this._repository, {SaleOrderApi? saleOrders})
+  SalesOrderAddBloc(this.context, this._repository, {SaleOrderApi? saleOrders, VesselMasterApi? vesselMasters})
       : _saleOrders = saleOrders ?? sl<SaleOrderApi>(),
+        _vesselMastersGiven = vesselMasters,
         super(SalesOrderAddInitial()) {
 
     on<StartupSalesOrderAdd>((event, emit) async {
@@ -50,7 +61,13 @@ class SalesOrderAddBloc extends Bloc<SalesOrderAddEvent, SalesOrderAddState> {
           base = await _loadMasterData(base, order.master,
               details: [for (final d in order.details) SaleEditDetailModel.fromJava(d)],
               pickups: order.pickups, deliveries: order.deliveries, isEnquiry: false);
-          base = base.copyWith(invoiceNo: await _invoiceNo(base.editId));
+          base = base.copyWith(
+            invoiceNo: await _invoiceNo(base.editId),
+            savedLegCalls: await _savedLegCalls(base.editId),
+            // the order as loaded counts as answered: an unrelated edit asks nothing
+            ptpSettledKey: ptpTimeKey(base),
+            scheduleSettledKey: scheduleKey(base),
+          );
         } else if (event.enquiry != null) {
           base = await _loadMasterData(base, EnquiryApi.asSaleOrder(event.enquiry!), isEnquiry: true);
         }
@@ -351,6 +368,98 @@ class SalesOrderAddBloc extends Bloc<SalesOrderAddEvent, SalesOrderAddState> {
       AppGlobals.MaxSaleOrderNum = await _saleOrders.nextJobNo(event.value);emit(s.copyWith(dropdownValue: event.value, txtJobNo: AppGlobals.MaxSaleOrderNum));
     });
 
+    // ── Vessel suggestions (change vessel-master-and-ptp-schedule). The save body is not touched:
+    // picks live in the state and go out as vessel links after the save.
+
+    on<VesselPicked>((event, emit) {
+      if (state is! SalesOrderAddLoaded) return;
+      final s = state as SalesOrderAddLoaded;
+      final pick = VesselPick(
+          name: event.vessel.vesselName,
+          vesselMasterId: event.vessel.vesselMasterId,
+          ptpVesselCallId: event.call?.id,
+          call: event.call);
+      final named = event.leg == VesselLeg.loading
+          ? s.copyWith(txtLoadingVessel: pick.name, pickedLoading: pick, vesselFillQuestion: null)
+          : s.copyWith(txtOffVessel: pick.name, pickedOff: pick, vesselFillQuestion: null);
+      final call = event.call;
+      if (call == null) {
+        emit(named);
+        return;
+      }
+      final differing = _fillDifferences(named, event.leg, call);
+      emit(differing.isEmpty
+          ? _applyFill(named, event.leg, call, replace: true)
+          : named.copyWith(vesselFillQuestion: VesselFillQuestion(leg: event.leg, call: call, differing: differing)));
+    });
+
+    on<VesselFillAnswered>((event, emit) {
+      if (state is! SalesOrderAddLoaded) return;
+      final s = state as SalesOrderAddLoaded;
+      final q = s.vesselFillQuestion;
+      if (q == null) return;
+      // "no" keeps the typed values and fills only what the leg did not have yet
+      emit(_applyFill(s.copyWith(vesselFillQuestion: null), q.leg, q.call, replace: event.replace));
+    });
+
+    on<VesselFieldLeft>((event, emit) async {
+      if (state is! SalesOrderAddLoaded) return;
+      final s = state as SalesOrderAddLoaded;
+      final text = _vesselText(s, event.leg).trim();
+      if (text.length < 2) return;
+      final pick = event.leg == VesselLeg.loading ? s.pickedLoading : s.pickedOff;
+      if (pick != null && pick.name == text) return;
+      final key = '${event.leg}|${text.toUpperCase()}';
+      if (s.keptSpellings.contains(key)) return;
+
+      final SimilarVessel similar;
+      try {
+        similar = await _vesselMasters.similar(text);
+      } catch (e, st) {
+        AppLogger.instance.logError(e, st, 'Sale order vessel similar');
+        return;
+      }
+      if (state is! SalesOrderAddLoaded) return;
+      final now = state as SalesOrderAddLoaded;
+      if (_vesselText(now, event.leg).trim() != text) return; // changed (or picked) meanwhile
+      final name = similar.vesselName;
+      if (name == null || name.isEmpty) return;
+      final asked = {...now.keptSpellings, key};
+      if (similar.match == SimilarVessel.same) {
+        emit(_setVessel(now, event.leg, VesselPick(name: name, vesselMasterId: similar.vesselMasterId))
+            .copyWith(keptSpellings: asked));
+      } else if (similar.match == SimilarVessel.close && name.toUpperCase() != text.toUpperCase()) {
+        emit(now.copyWith(
+            keptSpellings: asked,
+            didYouMean: DidYouMean(leg: event.leg, typed: text, name: name, vesselMasterId: similar.vesselMasterId)));
+      }
+    });
+
+    on<DidYouMeanAnswered>((event, emit) {
+      if (state is! SalesOrderAddLoaded) return;
+      final s = state as SalesOrderAddLoaded;
+      final q = s.didYouMean;
+      if (q == null) return;
+      final cleared = s.copyWith(didYouMean: null);
+      if (!event.useSuggestion || _vesselText(cleared, q.leg).trim() != q.typed) {
+        emit(cleared);
+        return;
+      }
+      emit(_setVessel(cleared, q.leg, VesselPick(name: q.name, vesselMasterId: q.vesselMasterId)));
+    });
+
+    on<SaveDateQuestionAnswered>((event, emit) {
+      if (state is! SalesOrderAddLoaded) return;
+      final s = state as SalesOrderAddLoaded;
+      final q = s.saveQuestion;
+      if (q == null) return;
+      final answered = event.change ? applySaveDateQuestion(s, q) : s;
+      emit(q is PtpTimeQuestion
+          ? answered.copyWith(saveQuestion: null, ptpSettledKey: ptpTimeKey(answered))
+          : answered.copyWith(saveQuestion: null, scheduleSettledKey: scheduleKey(answered)));
+      add(SaveSalesOrderEvent());
+    });
+
     on<SaveSalesOrderEvent>((event, emit) async {
       if (state is! SalesOrderAddLoaded) return;
       var s = state as SalesOrderAddLoaded;
@@ -358,6 +467,17 @@ class SalesOrderAddBloc extends Bloc<SalesOrderAddEvent, SalesOrderAddState> {
       if (s.txtCustomer.isEmpty) { emit(s.copyWith(savedMessage: 'Enter Customer Name')); return; }
       if (s.txtJobType.isEmpty) { emit(s.copyWith(savedMessage: 'Enter Job Type')); return; }
       if (s.productViewList.isEmpty) { emit(s.copyWith(savedMessage: 'Add Product Details')); return; }
+
+      // Questions before saving (save_date_checks.dart): each answer continues the save.
+      if (s.saveQuestion != null) return;
+      if (ptpTimeKey(s) != s.ptpSettledKey) {
+        final ptp = planPtpTimes(s, _legCalls(s));
+        if (ptp != null) { emit(s.copyWith(saveQuestion: ptp, savedMessage: null)); return; }
+      }
+      if (scheduleKey(s) != s.scheduleSettledKey) {
+        final pickup = planPickupSchedule(s);
+        if (pickup != null) { emit(s.copyWith(saveQuestion: pickup, savedMessage: null)); return; }
+      }
 
       // SYNC PICKUP
       List<dynamic> addrList = List.from(s.pickUpAddressList);
@@ -409,7 +529,8 @@ class SalesOrderAddBloc extends Bloc<SalesOrderAddEvent, SalesOrderAddState> {
 
       try {
         // the shared Java save (POST /api/sale-orders/save, PUT /api/sale-orders/{id})
-        await _saleOrders.save(saleOrderSaveBody(s, companyId: AppGlobals.Comid, employeeId: AppGlobals.EmpRefId));
+        final saved = await _saleOrders.save(saleOrderSaveBody(s, companyId: AppGlobals.Comid, employeeId: AppGlobals.EmpRefId));
+        await _sendVesselLinks(s, JsonRead.integer(saved['id'], fallback: s.editId));
         if (s.enquiryId != 0) await _confirmEnquiry(s.enquiryId);
         emit(s.copyWith(progress: true, isSaved: true,
             savedMessage: s.editId > 0 ? 'Updated Successfully' : 'Created Successfully'));
@@ -550,8 +671,9 @@ class SalesOrderAddBloc extends Bloc<SalesOrderAddEvent, SalesOrderAddState> {
       case 'txtForwarding2S2': return s.copyWith(txtForwarding2S2: value);
       case 'txtForwarding3S1': return s.copyWith(txtForwarding3S1: value);
       case 'txtForwarding3S2': return s.copyWith(txtForwarding3S2: value);
-      case 'txtLoadingVessel': return s.copyWith(txtLoadingVessel: value);
-      case 'txtOffVessel': return s.copyWith(txtOffVessel: value);
+      // a pick is dropped as soon as the text changes after it
+      case 'txtLoadingVessel': return s.copyWith(txtLoadingVessel: value, pickedLoading: value == s.txtLoadingVessel ? s.pickedLoading : null);
+      case 'txtOffVessel': return s.copyWith(txtOffVessel: value, pickedOff: value == s.txtOffVessel ? s.pickedOff : null);
       case 'txtOSCN': return s.copyWith(txtOSCN: value);
       case 'txtLSCN': return s.copyWith(txtLSCN: value);
       case 'txtProductQty': return _recalculate(s.copyWith(txtProductQty: value));
@@ -578,6 +700,94 @@ class SalesOrderAddBloc extends Bloc<SalesOrderAddEvent, SalesOrderAddState> {
       default: return s;
     }
   }
+  // ── Vessel helpers (change vessel-master-and-ptp-schedule)
+
+  static String _vesselText(SalesOrderAddLoaded s, String leg) =>
+      leg == VesselLeg.loading ? s.txtLoadingVessel : s.txtOffVessel;
+
+  static SalesOrderAddLoaded _setVessel(SalesOrderAddLoaded s, String leg, VesselPick pick) => leg == VesselLeg.loading
+      ? s.copyWith(txtLoadingVessel: pick.name, pickedLoading: pick)
+      : s.copyWith(txtOffVessel: pick.name, pickedOff: pick);
+
+  static bool _sameTime(String formValue, DateTime ptp) => DateTime.tryParse(formValue) == ptp;
+
+  static String _shown(DateTime d) => DateFormat('dd MMM HH:mm').format(d);
+
+  /// What the leg already has (a ticked date, a typed SCN) that PTP's call would change. ETB is never part of it.
+  static List<VesselFillChange> _fillDifferences(SalesOrderAddLoaded s, String leg, PtpCall call) {
+    final loading = leg == VesselLeg.loading;
+    final etaTicked = loading ? s.checkBoxValueLETA : s.checkBoxValueOETA;
+    final eta = loading ? s.dtpLETAdate : s.dtpOETAdate;
+    final etdTicked = loading ? s.checkBoxValueLETD : s.checkBoxValueOETD;
+    final etd = loading ? s.dtpLETDdate : s.dtpOETDdate;
+    final scn = (loading ? s.txtLSCN : s.txtOSCN).trim();
+    final arrive = call.arrive;
+    final depart = call.depart;
+    final ptpScn = call.scn;
+    return [
+      if (arrive != null && etaTicked && !_sameTime(eta, arrive))
+        VesselFillChange('ETA', DateTime.tryParse(eta) == null ? eta : _shown(DateTime.parse(eta)), _shown(arrive)),
+      if (depart != null && etdTicked && !_sameTime(etd, depart))
+        VesselFillChange('ETD', DateTime.tryParse(etd) == null ? etd : _shown(DateTime.parse(etd)), _shown(depart)),
+      if (ptpScn != null && scn.isNotEmpty && scn.toUpperCase() != ptpScn.toUpperCase()) VesselFillChange('SCN', scn, ptpScn),
+    ];
+  }
+
+  /// Fills the leg's ETA and ETD (ticking their boxes) and SCN from PTP's call. Without [replace], only
+  /// what the leg did not have yet (an unticked date, an empty SCN) is filled. ETB, the other leg and
+  /// every other field stay as they are; a time PTP does not give is left alone.
+  static SalesOrderAddLoaded _applyFill(SalesOrderAddLoaded s, String leg, PtpCall call, {required bool replace}) {
+    final arrive = call.arrive;
+    final depart = call.depart;
+    final scn = call.scn;
+    if (leg == VesselLeg.loading) {
+      final eta = arrive != null && (replace || !s.checkBoxValueLETA);
+      final etd = depart != null && (replace || !s.checkBoxValueLETD);
+      final setScn = scn != null && (replace || s.txtLSCN.trim().isEmpty);
+      return s.copyWith(
+        dtpLETAdate: eta ? formDateOf(arrive) : null,
+        checkBoxValueLETA: eta ? true : null,
+        dtpLETDdate: etd ? formDateOf(depart) : null,
+        checkBoxValueLETD: etd ? true : null,
+        txtLSCN: setScn ? scn : null,
+      );
+    }
+    final eta = arrive != null && (replace || !s.checkBoxValueOETA);
+    final etd = depart != null && (replace || !s.checkBoxValueOETD);
+    final setScn = scn != null && (replace || s.txtOSCN.trim().isEmpty);
+    return s.copyWith(
+      dtpOETAdate: eta ? formDateOf(arrive) : null,
+      checkBoxValueOETA: eta ? true : null,
+      dtpOETDdate: etd ? formDateOf(depart) : null,
+      checkBoxValueOETD: etd ? true : null,
+      txtOSCN: setScn ? scn : null,
+    );
+  }
+
+  /// After a successful save: both legs' names and any picked ids go to
+  /// `PUT /api/sale-orders/{id}/vessel-links`. A failure is logged only; the save stays a success.
+  Future<void> _sendVesselLinks(SalesOrderAddLoaded s, int saleOrderId) async {
+    if (saleOrderId <= 0) {
+      AppLogger.instance.logError('the save answer has no id', null, 'Sale order vessel links skipped');
+      return;
+    }
+    VesselLinkRequest leg(String leg, String text, VesselPick? pick) {
+      final name = text.trim();
+      final picked = pick != null && pick.name == name ? pick : null;
+      return VesselLinkRequest(
+          leg: leg, vesselName: name, vesselMasterId: picked?.vesselMasterId, ptpVesselCallId: picked?.ptpVesselCallId);
+    }
+
+    try {
+      await _vesselMasters.saveLinks(saleOrderId, [
+        leg(VesselLeg.loading, s.txtLoadingVessel, s.pickedLoading),
+        leg(VesselLeg.off, s.txtOffVessel, s.pickedOff),
+      ]);
+    } catch (e, st) {
+      AppLogger.instance.logError(e, st, 'Sale order vessel links');
+    }
+  }
+
   SalesOrderAddLoaded _updateDropdown(SalesOrderAddLoaded s, String field, String? value) {
     switch (field) {
       case 'dropdownValueFW1': return s.copyWith(dropdownValueFW1: value);
@@ -801,6 +1011,30 @@ class SalesOrderAddBloc extends Bloc<SalesOrderAddEvent, SalesOrderAddState> {
     );
     return _applyVisibility(result);
   }
+  /// Each leg's PTP call: the one picked on this visit, else the one it was saved with.
+  Map<String, LegCall> _legCalls(SalesOrderAddLoaded s) {
+    final calls = Map<String, LegCall>.of(s.savedLegCalls);
+    for (final (leg, pick) in [(VesselLeg.loading, s.pickedLoading), (VesselLeg.off, s.pickedOff)]) {
+      final call = pick?.call;
+      if (pick != null && call != null) calls[leg] = LegCall(pick.name, call);
+    }
+    return calls;
+  }
+
+  /// The saved legs' PTP calls with PTP's current times; a failed read only means no PTP warning.
+  Future<Map<String, LegCall>> _savedLegCalls(int saleOrderId) async {
+    if (saleOrderId <= 0) return const {};
+    try {
+      return {
+        for (final link in await _vesselMasters.links(saleOrderId))
+          if (link.call != null) link.leg: LegCall(link.vesselName ?? '', link.call!),
+      };
+    } catch (e, st) {
+      AppLogger.instance.logError(e, st, 'Sale order vessel links');
+      return const {};
+    }
+  }
+
   String _getFromList<T>(List<T> list, dynamic id, String Function(T) getName) { if (id == null || id == 0) return ''; try { return getName((list as List).firstWhere((e) => (e as dynamic).Id == id) as T); } catch (_) { return ''; } }
   String _getFromStatusList(dynamic id) { if (id == null || id == 0) return ''; try { return AppGlobals.JobAllStatusList.firstWhere((e) => e.Status == id).StatusName; } catch (_) { return ''; } }
   String _getEmpName(dynamic id) { if (id == null || id == 0) return ''; try { return AppGlobals.EmployeeList.firstWhere((e) => e.Id == id).AccountName; } catch (_) { return ''; } }

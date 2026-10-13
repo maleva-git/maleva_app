@@ -18,6 +18,9 @@ import '../bloc/admin_overview_cubit.dart';
 import '../data/admin_overview_repository.dart';
 import 'overview_widgets.dart';
 
+final _count = NumberFormat('#,##0', 'en_US');
+String _n(int v) => _count.format(v);
+
 /// The admin dashboard tabs the Overview's buttons switch to, by their tab-bar label.
 abstract final class OverviewTabLinks {
   static const salesOrders = 'SO';
@@ -161,7 +164,7 @@ class _OverviewView extends StatelessWidget {
             return Column(children: [
               for (final r in rows)
                 SectionRow(
-                  text: '${r.displayName.isEmpty ? r.address : r.displayName} · ${r.unread ?? 0} unread',
+                  text: '${r.displayName.isEmpty ? r.address : r.displayName} · ${_n(r.unread ?? 0)} unread',
                   trailing: StatusPill(lookOf(r).label, tone: lookOf(r).tone),
                 ),
             ]);
@@ -256,7 +259,7 @@ class _Header extends StatelessWidget {
           area: state.sales,
           onDark: true,
           onRetry: () => onRetry(OverviewArea.sales),
-          builder: (s) => KpiValue(value: '${s.today}', sub: 'Month ${s.month} · ${Fmt.rm(s.monthAmount)}'),
+          builder: (s) => KpiValue(value: _n(s.today), sub: 'Month ${_n(s.month)} · ${Fmt.rm(s.monthAmount)}'),
         ),
       ),
       KpiTile(
@@ -266,7 +269,7 @@ class _Header extends StatelessWidget {
           onDark: true,
           onRetry: () => onRetry(OverviewArea.jobOrders),
           builder: (j) => KpiValue(
-            value: '${j.open}',
+            value: _n(j.open),
             sub: j.byStatus.entries.map((e) => '${e.key} ${e.value}').join(' · '),
           ),
         ),
@@ -278,8 +281,8 @@ class _Header extends StatelessWidget {
           onDark: true,
           onRetry: () => onRetry(OverviewArea.mail),
           builder: (m) => KpiValue(
-            value: '${m.summary.totalUnread}',
-            alert: m.summary.overdue > 0 ? '${m.summary.overdue} overdue' : null,
+            value: _n(m.summary.totalUnread),
+            alert: m.summary.overdue > 0 ? '${_n(m.summary.overdue)} overdue' : null,
             sub: '${m.summary.withUnread} of ${m.summary.mailboxes} mailboxes',
           ),
         ),
@@ -290,7 +293,7 @@ class _Header extends StatelessWidget {
           area: state.incidents,
           onDark: true,
           onRetry: () => onRetry(OverviewArea.incidents),
-          builder: (ir) => KpiValue(value: '${ir.open}', sub: Fmt.rm(ir.totalAmount)),
+          builder: (ir) => KpiValue(value: _n(ir.open), sub: Fmt.rm(ir.totalAmount)),
         ),
       ),
     ];
@@ -334,7 +337,7 @@ class _Header extends StatelessWidget {
           ),
         ]),
         const SizedBox(height: 12),
-        _Grid(columns: isTablet ? 4 : 2, spacing: 8, children: tiles),
+        _Grid(columns: isTablet ? 4 : 2, spacing: 8, minCellHeight: isTablet ? 118 : 112, children: tiles),
       ]),
     );
   }
@@ -370,12 +373,22 @@ class _Sections extends StatelessWidget {
 
 /// Rows of [columns] equal cells; a short last row keeps the cell width.
 class _Grid extends StatelessWidget {
-  const _Grid({required this.columns, required this.spacing, required this.children, this.stretchLastOdd = false});
+  const _Grid({
+    required this.columns,
+    required this.spacing,
+    required this.children,
+    this.stretchLastOdd = false,
+    this.minCellHeight,
+  });
 
   final int columns;
   final double spacing;
   final List<Widget> children;
   final bool stretchLastOdd;
+
+  /// When set, cells are at least this tall and grow with their content, without measuring the row first.
+  /// For cells whose measured height can come out a pixel short (big numbers with a pill under them).
+  final double? minCellHeight;
 
   @override
   Widget build(BuildContext context) {
@@ -383,16 +396,25 @@ class _Grid extends StatelessWidget {
     for (var i = 0; i < children.length; i += columns) {
       final cells = children.sublist(i, (i + columns).clamp(0, children.length));
       final fill = stretchLastOdd && cells.length == 1;
+      final minHeight = minCellHeight;
+      final row = Row(
+        crossAxisAlignment: minHeight == null ? CrossAxisAlignment.stretch : CrossAxisAlignment.start,
+        children: [
+          for (var c = 0; c < (fill ? 1 : columns); c++) ...[
+            if (c > 0) SizedBox(width: spacing),
+            Expanded(
+              child: c >= cells.length
+                  ? const SizedBox.shrink()
+                  : minHeight == null
+                      ? cells[c]
+                      : ConstrainedBox(constraints: BoxConstraints(minHeight: minHeight), child: cells[c]),
+            ),
+          ],
+        ],
+      );
       rows.add(Padding(
         padding: EdgeInsets.only(bottom: i + columns < children.length ? spacing : 0),
-        child: IntrinsicHeight(
-          child: Row(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-            for (var c = 0; c < (fill ? 1 : columns); c++) ...[
-              if (c > 0) SizedBox(width: spacing),
-              Expanded(child: c < cells.length ? cells[c] : const SizedBox.shrink()),
-            ],
-          ]),
-        ),
+        child: minHeight == null ? IntrinsicHeight(child: row) : row,
       ));
     }
     return Column(children: rows);

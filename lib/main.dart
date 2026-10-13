@@ -1,5 +1,6 @@
 import 'package:maleva/features/mail_monitor/mine/my_unread_mail_cubit.dart';
 import 'package:maleva/features/mail_monitor/mine/push_route.dart';
+import 'package:maleva/features/notifications/notification_signals.dart';
 import 'dart:io';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
@@ -19,9 +20,12 @@ import 'features/auth/data/device_token_listener.dart';
 import 'features/auth/data/session_service.dart';
 import 'core/utils/app_preferences.dart';
 
+/// Runs in its own isolate while the app is in the background or closed, so it must be a top-level
+/// entry point (kept in release builds by the pragma). The phone itself shows the notification.
+@pragma('vm:entry-point')
 Future<void> backgroundHandler(RemoteMessage message) async {
   AppGlobals.print_(message.data.toString());
-  AppGlobals.print_(message.notification!.title);
+  AppGlobals.print_(message.notification?.title);
 }
 
 Future cleanTemporaryfiles() async {
@@ -57,6 +61,11 @@ Future<void> main() async {
     listenForDeviceTokenChanges(FirebaseMessaging.instance.onTokenRefresh, sl<SessionService>());
 
     FirebaseMessaging.onBackgroundMessage(backgroundHandler);
+    try {
+      await LocalNotificationService.createAlertChannel();
+    } catch (e) {
+      debugPrint('Notification channel not created: $e');
+    }
     if (Platform.isIOS) {
       FirebaseMessaging messaging = FirebaseMessaging.instance;
       NotificationSettings settings = await messaging.requestPermission(
@@ -197,12 +206,17 @@ class _MyHomePageState extends State<MyHomePage> {
         // ScaffoldMessenger.of(context).showSnackBar(snackbar);
       }
       if (message.data['type']?.toString() == mailUnreadPushType) MyUnreadMailSignals.pushArrived();
-      LocalNotificationService.display(message);
+      // any push may change the bell, the dashboard banner and the pinned vessel alerts
+      NotificationSignals.changed();
+      // iOS already shows it (setForegroundNotificationPresentationOptions in main); a local copy
+      // would show it twice. Android shows nothing on its own while the app is open.
+      if (!Platform.isIOS) LocalNotificationService.display(message);
     });
 
     ///When the app is in background but opened and user taps
     ///on the notification
     FirebaseMessaging.onMessageOpenedApp.listen((message) {
+      NotificationSignals.changed();
       openPushRoute(routeForPush(message.data));
       // Navigator.push(context, MaterialPageRoute(builder: (context) => Home()));
     });

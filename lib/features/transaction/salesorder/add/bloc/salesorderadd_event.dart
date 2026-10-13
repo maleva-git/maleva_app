@@ -1,3 +1,5 @@
+import 'package:maleva/core/vessel_master/vessel_master_models.dart';
+
 abstract class SalesOrderAddEvent {}
 
 /// Opens the form: a new order, the order [saleOrderId] or job number [saleOrderNo]
@@ -38,6 +40,21 @@ class DestinationSelected extends SalesOrderAddEvent { final String name; final 
 class PickUpAddressSelected extends SalesOrderAddEvent { final String address; PickUpAddressSelected(this.address); }
 class DeliveryAddressSelected extends SalesOrderAddEvent { final String address; DeliveryAddressSelected(this.address); }
 class WarehouseAddressSelected extends SalesOrderAddEvent { final String address; WarehouseAddressSelected(this.address); }
+
+// Vessel suggestions (change vessel-master-and-ptp-schedule). [leg] is VesselLeg.loading or VesselLeg.off.
+
+/// A suggestion was picked: sets that leg's name and, with a PTP [call], its ETA, ETD and SCN
+/// (asking first when the leg already has different ones).
+class VesselPicked extends SalesOrderAddEvent { final String leg; final VesselSuggestion vessel; final PtpCall? call; VesselPicked(this.leg, this.vessel, {this.call}); }
+/// The answer to SalesOrderAddLoaded.vesselFillQuestion: [replace] PTP's values over the typed ones, or keep them.
+class VesselFillAnswered extends SalesOrderAddEvent { final bool replace; VesselFillAnswered(this.replace); }
+/// The user left a vessel field: the close-spelling check runs.
+class VesselFieldLeft extends SalesOrderAddEvent { final String leg; VesselFieldLeft(this.leg); }
+/// The answer to SalesOrderAddLoaded.didYouMean: [useSuggestion] or keep my spelling.
+class DidYouMeanAnswered extends SalesOrderAddEvent { final bool useSuggestion; DidYouMeanAnswered(this.useSuggestion); }
+/// The answer to SalesOrderAddLoaded.saveQuestion: [change] to PTP's times / the suggested dates, or keep
+/// the user's. Either way the save then continues.
+class SaveDateQuestionAnswered extends SalesOrderAddEvent { final bool change; SaveDateQuestionAnswered(this.change); }
 
 class AddProduct extends SalesOrderAddEvent {}
 class UpdateProduct extends SalesOrderAddEvent { final int index; UpdateProduct(this.index); }

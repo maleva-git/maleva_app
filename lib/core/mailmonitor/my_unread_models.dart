@@ -100,8 +100,7 @@ class MyUnreadMail {
   }
 
   /// Mailboxes with mail first, most unread first, then by address.
-  List<MyMailbox> get byUnread => [...mailboxes]
-    ..sort((a, b) {
+  List<MyMailbox> get byUnread => [...mailboxes]..sort((a, b) {
       final c = (b.unread ?? -1).compareTo(a.unread ?? -1);
       return c != 0 ? c : a.address.compareTo(b.address);
     });

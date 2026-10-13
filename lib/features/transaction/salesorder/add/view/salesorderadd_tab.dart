@@ -26,6 +26,7 @@ import '../../view/view/salesorderview_tab.dart';
 import '../bloc/salesorderadd_bloc.dart';
 import 'package:maleva/features/transaction/salesorder/add/bloc/salesorderadd_event.dart';
 import 'package:maleva/features/transaction/salesorder/add/bloc/salesorderadd_state.dart';
+import 'package:maleva/features/transaction/salesorder/add/bloc/save_date_checks.dart';
 import 'package:maleva/core/di/injection.dart';
 import 'package:maleva/core/utils/json_read.dart';
 import 'package:maleva/features/forwarding_requests/view/request_forwarding_sheet.dart';
@@ -38,6 +39,11 @@ import 'package:maleva/core/models/shared/agent_model.dart';
 import 'package:maleva/core/models/shared/agent_company_model.dart';
 import 'package:maleva/features/operations/models/job_all_status_model.dart';
 import 'package:maleva/core/models/shared/product_model.dart';
+import 'package:maleva/core/vessel_master/vessel_master_api.dart';
+import 'package:maleva/core/vessel_master/vessel_master_models.dart';
+import 'package:maleva/features/transaction/salesorder/add/bloc/vessel_pick.dart';
+import 'package:maleva/features/transaction/salesorder/add/bloc/vessel_suggest_cubit.dart';
+import 'package:maleva/features/transaction/salesorder/add/view/vessel_name_field.dart';
 import 'package:maleva/features/operations/models/job_type_model.dart';
 
 class BoldFirstLineTextController extends TextEditingController {
@@ -98,6 +104,11 @@ class _SalesOrderAddBodyState extends State<_SalesOrderAddBody> with TickerProvi
 
   final Map<String, TextEditingController> _controllers = {};
 
+  // vessel suggestions under the Load / Off Vessel Name fields (change vessel-master-and-ptp-schedule)
+  late final VesselSuggestCubit _loadingSuggest = VesselSuggestCubit(sl<VesselMasterApi>());
+  late final VesselSuggestCubit _offSuggest = VesselSuggestCubit(sl<VesselMasterApi>());
+  bool _suggestUsed = false;
+
   TextEditingController _getController(String key, String stateValue) {
     if (!_controllers.containsKey(key)) {
       if (key.startsWith('addr_')) {
@@ -131,6 +142,10 @@ class _SalesOrderAddBodyState extends State<_SalesOrderAddBody> with TickerProvi
 
     }
     _tabController.dispose();
+    if (_suggestUsed) {
+      _loadingSuggest.close();
+      _offSuggest.close();
+    }
     super.dispose();
   }
 
@@ -139,7 +154,34 @@ class _SalesOrderAddBodyState extends State<_SalesOrderAddBody> with TickerProvi
     final double width = MediaQuery.of(context).size.width;
     final double height = MediaQuery.of(context).size.height;
 
-    return BlocConsumer<SalesOrderAddBloc, SalesOrderAddState>(
+    return MultiBlocListener(
+      listeners: [
+        // a picked PTP call would replace typed dates or SCN: ask first
+        BlocListener<SalesOrderAddBloc, SalesOrderAddState>(
+          listenWhen: (prev, curr) =>
+              curr is SalesOrderAddLoaded &&
+              curr.vesselFillQuestion != null &&
+              (prev is! SalesOrderAddLoaded || prev.vesselFillQuestion != curr.vesselFillQuestion),
+          listener: (context, state) => _askVesselFill(context, (state as SalesOrderAddLoaded).vesselFillQuestion!),
+        ),
+        // the typed name is close to a known vessel: ask once
+        BlocListener<SalesOrderAddBloc, SalesOrderAddState>(
+          listenWhen: (prev, curr) =>
+              curr is SalesOrderAddLoaded &&
+              curr.didYouMean != null &&
+              (prev is! SalesOrderAddLoaded || prev.didYouMean != curr.didYouMean),
+          listener: (context, state) => _askDidYouMean(context, (state as SalesOrderAddLoaded).didYouMean!),
+        ),
+        // before saving: a typed ETA unlike PTP's, or pickup/delivery not the day before the ETA
+        BlocListener<SalesOrderAddBloc, SalesOrderAddState>(
+          listenWhen: (prev, curr) =>
+              curr is SalesOrderAddLoaded &&
+              curr.saveQuestion != null &&
+              (prev is! SalesOrderAddLoaded || prev.saveQuestion != curr.saveQuestion),
+          listener: (context, state) => _askSaveDate(context, (state as SalesOrderAddLoaded).saveQuestion!),
+        ),
+      ],
+      child: BlocConsumer<SalesOrderAddBloc, SalesOrderAddState>(
       listenWhen: (prev, curr) {
         if (curr is SalesOrderAddLoaded) {
           return curr.isSaved || curr.savedMessage != null;
@@ -201,6 +243,113 @@ class _SalesOrderAddBodyState extends State<_SalesOrderAddBody> with TickerProvi
           ),
         );
       },
+    ),
+    );
+  }
+
+  Future<void> _askVesselFill(BuildContext context, VesselFillQuestion q) async {
+    final bloc = context.read<SalesOrderAddBloc>();
+    final replace = await showDialog<bool>(
+      context: context,
+      barrierDismissible: false,
+      builder: (ctx) => AlertDialog(
+        title: Text("Use PTP's ${q.leg == VesselLeg.loading ? 'loading' : 'off'} vessel times?"),
+        content: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.start, children: [
+          for (final d in q.differing) Text('${d.field}: ${d.current} → ${d.ptp}'),
+        ]),
+        actions: [
+          TextButton(onPressed: () => Navigator.of(ctx).pop(false), child: const Text('Keep mine')),
+          TextButton(onPressed: () => Navigator.of(ctx).pop(true), child: const Text("Use PTP's")),
+        ],
+      ),
+    );
+    bloc.add(VesselFillAnswered(replace ?? false));
+  }
+
+  /// The question before saving; either answer continues the save (save_date_checks.dart).
+  Future<void> _askSaveDate(BuildContext context, SaveDateQuestion q) async {
+    final bloc = context.read<SalesOrderAddBloc>();
+    final String title;
+    final String message;
+    final List<String> lines;
+    final String change;
+    final String keep;
+    if (q is PtpTimeQuestion) {
+      title = "PTP's schedule shows another time";
+      message = 'PTP lists ${q.vessels} at other times than you entered. Use PTP\'s times, or keep yours?';
+      lines = [
+        for (final l in q.lines)
+          '${l.legLabel} ${l.label}: ${saveDateText(l.current)} → PTP ${saveDateText(l.ptp)}'
+              '${l.estimated ? ' (estimated)' : ''}',
+      ];
+      change = "Use PTP's times";
+      keep = 'Keep my times';
+    } else if (q is PickupScheduleQuestion) {
+      final day = saveDateText(q.targetDay, time: false);
+      title = q.bothEmpty ? 'Set pickup and delivery dates?' : 'Is the pickup date correct?';
+      message = '${q.etaLabel} is ${saveDateText(q.eta)}. Pickup and delivery are usually the day before: $day.';
+      lines = [for (final l in q.lines) '${l.label}: ${saveDateText(l.current)} → ${saveDateText(l.next)}'];
+      change = 'Change to ${day.substring(0, day.length - 5)}';
+      keep = q.bothEmpty ? 'Leave empty' : 'Keep my dates';
+    } else {
+      return;
+    }
+    final answer = await showDialog<bool>(
+      context: context,
+      barrierDismissible: false,
+      builder: (ctx) => AlertDialog(
+        title: Text(title),
+        content: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.start, children: [
+          Text(message),
+          const SizedBox(height: 8),
+          for (final line in lines) Text(line, style: const TextStyle(fontWeight: FontWeight.w600)),
+        ]),
+        actions: [
+          TextButton(onPressed: () => Navigator.of(ctx).pop(false), child: Text(keep)),
+          TextButton(onPressed: () => Navigator.of(ctx).pop(true), child: Text(change)),
+        ],
+      ),
+    );
+    bloc.add(SaveDateQuestionAnswered(answer ?? false));
+  }
+
+  Future<void> _askDidYouMean(BuildContext context, DidYouMean q) async {
+    final bloc = context.read<SalesOrderAddBloc>();
+    final use = await showDialog<bool>(
+      context: context,
+      barrierDismissible: false,
+      builder: (ctx) => AlertDialog(
+        title: Text('Did you mean ${q.name}?'),
+        content: Text('You typed ${q.typed}.'),
+        actions: [
+          TextButton(onPressed: () => Navigator.of(ctx).pop(false), child: const Text('Keep my spelling')),
+          TextButton(onPressed: () => Navigator.of(ctx).pop(true), child: Text('Use ${q.name}')),
+        ],
+      ),
+    );
+    bloc.add(DidYouMeanAnswered(use ?? false));
+  }
+
+  /// The Load / Off Vessel Name field: free typing as before, with suggestions under it.
+  Widget _vesselField({required SalesOrderAddBloc bloc, required String leg, required String uniqueId, required String hint,
+      required String value, required bool enabled, required String field}) {
+    _suggestUsed = true;
+    return VesselNameField(
+      key: ValueKey('vessel_field_$uniqueId'),
+      controller: _getController(uniqueId, value),
+      suggestions: leg == VesselLeg.loading ? _loadingSuggest : _offSuggest,
+      leg: leg,
+      port: () {
+        final s = bloc.state;
+        if (s is! SalesOrderAddLoaded) return '';
+        return leg == VesselLeg.loading ? s.txtLPort : s.txtOPort;
+      },
+      enabled: enabled,
+      onChanged: (v) => bloc.add(UpdateTextField(field, v)),
+      onPicked: (vessel, call) => bloc.add(VesselPicked(leg, vessel, call: call)),
+      onLeave: () => bloc.add(VesselFieldLeft(leg)),
+      style: AppTypography.bodyLarge(color: colour.textMain),
+      decoration: _inputDecoration(hint, enabled),
     );
   }
 
@@ -545,7 +694,7 @@ if (navResult2 != null) { AppGlobals.SelectedCargoName = navResult2; }
           ), _gap(),
         ],
         if (state.visibleLScn) ...[ _editField(uniqueId: 'txt_l_scn', hint: 'SCN', value: state.txtLSCN, enabled: fp["txtLSCN"] == true, onChanged: (v) => bloc.add(UpdateTextField('txtLSCN', v))), _gap() ],
-        if (state.visibleLoadingVessel) ...[ _editField(uniqueId: 'txt_loadingvessel', hint: 'Loading Vessel Name', value: state.txtLoadingVessel, enabled: fp["txtLoadingVessel"] == true, onChanged: (v) => bloc.add(UpdateTextField('txtLoadingVessel', v))), _gap() ],
+        if (state.visibleLoadingVessel) ...[ _vesselField(bloc: bloc, leg: VesselLeg.loading, uniqueId: 'txt_loadingvessel', hint: 'Loading Vessel Name', value: state.txtLoadingVessel, enabled: fp["txtLoadingVessel"] == true, field: 'txtLoadingVessel'), _gap() ],
         if (state.visibleLPort) ...[
           _searchField(
             hint: "Port", uniqueId: 'search_l_port', value: state.txtLPort, enabled: fp["txtLPort"] == true,
@@ -615,7 +764,7 @@ if (navResult4 != null) { AppGlobals.SelectedVesselTypeName = navResult4; }
           ), _gap(),
         ],
         if (state.visibleOScn) ...[ _editField(uniqueId: 'txt_o_scn', hint: 'SCN', value: state.txtOSCN, enabled: fp["txtOSCN"] == true, onChanged: (v) => bloc.add(UpdateTextField('txtOSCN', v))), _gap() ],
-        if (state.visibleOffVessel) ...[ _editField(uniqueId: 'txt_offvessel', hint: 'Off Vessel Name', value: state.txtOffVessel, enabled: fp["txtOffVessel"] == true, onChanged: (v) => bloc.add(UpdateTextField('txtOffVessel', v))), _gap() ],
+        if (state.visibleOffVessel) ...[ _vesselField(bloc: bloc, leg: VesselLeg.off, uniqueId: 'txt_offvessel', hint: 'Off Vessel Name', value: state.txtOffVessel, enabled: fp["txtOffVessel"] == true, field: 'txtOffVessel'), _gap() ],
         if (state.visibleOPort) ...[
           _searchField(
             hint: "Port", uniqueId: 'search_o_port', value: state.txtOPort, enabled: fp["txtOPort"] == true,
@@ -1091,16 +1240,18 @@ if (navResult10 != null) { AppGlobals.SelectEmployeeList = navResult10; }
       keyboardType: keyboardType,
       textCapitalization: TextCapitalization.characters,
       style: AppTypography.bodyLarge(color: colour.textMain),
-      decoration: InputDecoration(
+      decoration: _inputDecoration(hint, enabled),
+    );
+  }
+
+  InputDecoration _inputDecoration(String hint, bool enabled) => InputDecoration(
         hintText: hint, hintStyle: AppTypography.bodyLarge(color: colour.textSub.withValues(alpha: 0.45)),
         contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
         filled: true, fillColor: enabled ? Colors.white : colour.surface,
         enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: const BorderSide(color: colour.border)),
         disabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: BorderSide(color: colour.border.withValues(alpha: 0.3))),
         focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: const BorderSide(color: colour.brand, width: 1.5)),
-      ),
-    );
-  }
+      );
 
   Widget _addressMultiField({required String hint, required String uniqueId, required String value, required bool enabled, required ValueChanged<String> onChanged, VoidCallback? onSearch, VoidCallback? onClear}) {
     return Container(

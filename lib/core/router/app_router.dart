@@ -58,6 +58,12 @@ import '../../features/dashboard/unauthorized/unauthorized_page.dart';
 import '../../features/mail_monitor/mine/my_unread_mail_views.dart';
 import '../../features/mail_monitor/mine/push_route.dart';
 import '../../features/forwarding_requests/view/forwarding_requests_page.dart';
+import '../../features/vessel_changes/push_route.dart';
+import '../../features/vessel_changes/vessel_changes_page.dart';
+import '../employee_notifications/employee_notifications_models.dart';
+import '../../features/notifications/notification_routes.dart';
+import '../../features/notifications/notifications_page.dart';
+import '../../features/transaction/salesorder/add/view/salesorderadd_tab.dart';
 
 final GoRouter appRouter = GoRouter(
   navigatorKey: AppGlobals.navigatorKey,
@@ -69,6 +75,35 @@ final GoRouter appRouter = GoRouter(
       path: myUnreadMailPath,
       name: 'my_unread_mail',
       builder: (context, state) => const MyUnreadMailPage(),
+    ),
+    // Vessel changes (vessel-master-and-ptp-schedule): jobs whose dates differ from PTP, opened from a
+    // tapped VESSEL_ETA_CHANGED notice, the notifications page or the dashboard banner (`?scope=team`
+    // opens "My team")
+    GoRoute(
+      path: vesselChangesPath,
+      name: 'vessel_changes',
+      builder: (context, state) =>
+          VesselChangesPage(initialScope: vesselScopeFromQuery(state.uri.queryParameters['scope'])),
+    ),
+    // Notifications (bell and ship): a Vessel tab (open alerts pinned, vessel ETA notices) and an Other
+    // tab (every other notice); `?tab=vessel|other` picks the tab
+    GoRoute(
+      path: notificationsPath,
+      name: 'notifications',
+      builder: (context, state) =>
+          NotificationsPage(initialTab: NoticeGroup.fromWire(state.uri.queryParameters['tab'])),
+    ),
+    // A job's sale order screen (vessel-master-and-ptp-schedule): opened from a VESSEL_LINK_NEEDED notice
+    // or LINK alert ("Pick the PTP voyage"), or a vessel notice whose link is `/sale-order/edit/{id}`; a bad
+    // id shows the Vessel tab of the notifications instead of a new order
+    GoRoute(
+      path: '$saleOrderEditPath/:id',
+      name: 'sale_order_edit',
+      builder: (context, state) {
+        final id = int.tryParse(state.pathParameters['id'] ?? '');
+        if (id == null || id <= 0) return const NotificationsPage(initialTab: NoticeGroup.vessel);
+        return SalesOrdersAdd(saleOrderId: id);
+      },
     ),
     // Forwarding requests (forwarding-requests-on-shared-java-api): the team's list and
     // Customer Service's own requests, opened from a tapped notice or the drawer

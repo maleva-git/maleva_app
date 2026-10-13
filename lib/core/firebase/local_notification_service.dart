@@ -1,3 +1,4 @@
+import 'dart:typed_data';
 import 'dart:io';
 import 'package:rxdart/subjects.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
@@ -6,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:maleva/core/utils/app_globals.dart';
+import 'package:maleva/features/vessel_changes/push_route.dart' show isVesselPushType, localPayloadForPush;
 import 'dart:io' show File, Platform;
 import 'package:http/http.dart' as http;
 import 'package:path_provider/path_provider.dart';
@@ -23,7 +25,68 @@ class LocalNotificationService {
 
   static final FlutterLocalNotificationsPlugin _notificationsPlugin = FlutterLocalNotificationsPlugin();
 
-  /// [onTap] gets the tapped notification's payload (the push type, e.g. MAIL_UNREAD).
+  /// Creates the high-importance alert channel. Firebase shows a push that arrives while the app is in
+  /// the background or closed on the manifest's default channel; when that channel does not exist the
+  /// phone files it under a silent "Miscellaneous" channel and nothing pops up. Run at start-up, before
+  /// any push can arrive; creating an existing channel again changes nothing.
+  static Future<void> createAlertChannel() async {
+    if (!Platform.isAndroid) return;
+    final android = _notificationsPlugin.resolvePlatformSpecificImplementation<AndroidFlutterLocalNotificationsPlugin>();
+    await android?.createNotificationChannel(AndroidNotificationChannel(
+      AppGlobals.channelId,
+      AppGlobals.channelName,
+      description: AppGlobals.channelDescription,
+      importance: Importance.max,
+      playSound: true,
+      showBadge: false,
+    ));
+    // Vessel ETA notices: on Android 8+ the channel decides vibration, and a channel cannot be changed
+    // once made, so this one has its own id with the long pattern from the start.
+    await android?.createNotificationChannel(vesselChannel);
+  }
+
+  /// A long vibration: 1 s, pause, 1 s, pause, 1.5 s, pause, 2 s.
+  static final Int64List vesselVibration = Int64List.fromList([0, 1000, 500, 1000, 500, 1500, 500, 2000]);
+
+  static final AndroidNotificationChannel vesselChannel = AndroidNotificationChannel(
+    AppGlobals.vesselChannelId,
+    AppGlobals.vesselChannelName,
+    description: AppGlobals.vesselChannelDescription,
+    importance: Importance.max,
+    playSound: true,
+    enableVibration: true,
+    vibrationPattern: vesselVibration,
+    enableLights: true,
+    ledColor: const Color(0xFFFF6D00),
+    showBadge: true,
+  );
+
+  /// How a vessel ETA notice is shown while the app is open: the vessel channel, and insistent (sound and
+  /// vibration repeat until the notice is opened or swiped away), so it is not missed.
+  static AndroidNotificationDetails vesselDetails({StyleInformation? style}) => AndroidNotificationDetails(
+        AppGlobals.vesselChannelId,
+        AppGlobals.vesselChannelName,
+        channelDescription: AppGlobals.vesselChannelDescription,
+        importance: Importance.max,
+        priority: Priority.max,
+        playSound: true,
+        enableVibration: true,
+        vibrationPattern: vesselVibration,
+        category: AndroidNotificationCategory.reminder,
+        visibility: NotificationVisibility.public,
+        ticker: 'Vessel ETA changed',
+        additionalFlags: Int32List.fromList([insistentFlag]),
+        styleInformation: style,
+      );
+
+  /// A push of one of the vessel types (`VESSEL_ETA_CHANGED`, `VESSEL_LINK_NEEDED`, `PTP_SCHEDULE_STALE`,
+  /// by `data['type']`) is shown on the vessel channel with the long vibration; every other on the normal one.
+  static bool usesVesselChannel(Map<String, dynamic> data) => isVesselPushType(data['type']?.toString());
+
+  /// Android's Notification.FLAG_INSISTENT.
+  static const int insistentFlag = 4;
+
+  /// [onTap] gets the tapped notification's payload (the push type, e.g. MAIL_UNREAD; see localPayloadForPush).
   static void initialize(BuildContext context, {void Function(String? payload)? onTap}) {
     _notificationsPlugin.resolvePlatformSpecificImplementation<
         AndroidFlutterLocalNotificationsPlugin>()?.requestNotificationsPermission();
@@ -133,7 +196,7 @@ class LocalNotificationService {
           message.notification!.title,
           message.notification!.body,
           notificationDetails,
-          payload: message.data['type']?.toString() ?? '',
+          payload: localPayloadForPush(message.data),
         );
       } else {
         dynamic largeIconPath;
@@ -163,7 +226,10 @@ class LocalNotificationService {
             summaryText: message.notification!.body,
           );
         }
-        AndroidNotificationDetails androidPlatformChannelSpecifics = AndroidNotificationDetails(AppGlobals.channelId, AppGlobals.channelName,
+        final bool vessel = usesVesselChannel(message.data);
+        AndroidNotificationDetails androidPlatformChannelSpecifics = vessel
+            ? vesselDetails(style: BigTextStyleInformation(message.notification!.body ?? ''))
+            : AndroidNotificationDetails(AppGlobals.channelId, AppGlobals.channelName,
             // AppGlobals.channelDescription,
             importance: Importance.max,
             priority: Priority.high,
@@ -184,7 +250,7 @@ class LocalNotificationService {
           message.notification!.title,
           message.notification!.body,
           notificationDetails,
-          payload: message.data['type']?.toString() ?? '',
+          payload: localPayloadForPush(message.data),
         );
       }
     } on Exception catch (e) {

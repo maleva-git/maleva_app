@@ -70,7 +70,7 @@ class KpiTile extends StatelessWidget {
         color: AppTokens.textOnDark.withValues(alpha: 0.15),
         borderRadius: BorderRadius.circular(12),
       ),
-      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+      child: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.start, children: [
         Text(label,
             maxLines: 1,
             overflow: TextOverflow.ellipsis,

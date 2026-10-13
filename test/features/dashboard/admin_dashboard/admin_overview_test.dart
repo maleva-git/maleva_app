@@ -233,6 +233,19 @@ void main() {
       expect(opened, ['JobOrders', 'Mailbox Monitor']);
     });
 
+    testWidgets('a six-digit unread count with its overdue pill fits a narrow phone', (tester) async {
+      when(() => repo.mail()).thenAnswer((_) async => MailSummary(
+            summary: const MailMonitorSummary(
+                totalUnread: 109910, withUnread: 18, overdue: 10, errors: 0, mailboxes: 20, lastFullCheckAt: null),
+            mailboxes: [row(1, level: 'OVERDUE', unread: 12328)],
+          ));
+      await pump(tester, const Size(360, 1600));
+      expect(find.text('109,910'), findsOneWidget);
+      expect(find.text('10 overdue'), findsOneWidget);
+      expect(find.text('Box 1 · 12,328 unread'), findsOneWidget);
+      expect(tester.takeException(), isNull);
+    });
+
     testWidgets('screen buttons only for menu entries the user has', (tester) async {
       await pump(tester, const Size(390, 1600), entries: [menu('Truck Location')]);
       expect(find.text('Truck Location'), findsOneWidget);

@@ -1,9 +1,11 @@
 import 'package:maleva/core/router/app_router.dart';
 import 'package:maleva/features/forwarding_requests/push_route.dart';
+import 'package:maleva/features/vessel_changes/push_route.dart';
 
 /// Where a tapped push notification opens: the unread-mail notice (backend
 /// add-my-unread-mail-notice, data `type=MAIL_UNREAD`) and the forwarding request notices
-/// (`type=FORWARDING_*`, see forwarding_requests/push_route.dart); every other push keeps today's
+/// (`type=FORWARDING_*`, see forwarding_requests/push_route.dart) and the vessel change notice
+/// (`type=VESSEL_ETA_CHANGED`, see vessel_changes/push_route.dart); every other push keeps today's
 /// behaviour (opens the app where it was).
 const String myUnreadMailPath = '/my_unread_mail';
 const String mailUnreadPushType = 'MAIL_UNREAD';
@@ -11,12 +13,14 @@ const String mailUnreadPushType = 'MAIL_UNREAD';
 String? routeForPush(Map<String, dynamic>? data) {
   if (data == null) return null;
   if (data['type']?.toString() == mailUnreadPushType) return myUnreadMailPath;
-  return forwardingRouteForPush(data);
+  return vesselChangesRouteForPush(data) ?? forwardingRouteForPush(data);
 }
 
 /// The local notification's payload carries only the push type.
 String? routeForPayload(String? payload) =>
-    payload == mailUnreadPushType ? myUnreadMailPath : forwardingRouteForType(payload);
+    payload == mailUnreadPushType
+        ? myUnreadMailPath
+        : vesselChangesRouteForType(payload) ?? forwardingRouteForType(payload);
 
 /// A route from a notice that opened the app; opened once the person reaches a dashboard (after sign-in).
 class PendingPushRoute {

@@ -90,5 +90,7 @@ void main() {
   test('the AI text becomes points without bullets', () {
     const s = ResponseSummary(text: '- First point\n\n* Second point\n• Third', generatedAt: null);
     expect(s.points, ['First point', 'Second point', 'Third']);
+    const hi = ResponseSummary(text: '- ठीक है।\n- 很好。\n- Done.', generatedAt: null);
+    expect(hi.speechText, 'ठीक है। 很好。 Done.');
   });
 }

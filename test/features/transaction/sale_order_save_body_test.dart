@@ -91,6 +91,73 @@ void main() {
     expect(line['salesRate'], 50);
   });
 
+  // Change vessel-master-and-ptp-schedule: vessel suggestions, PTP date fill and links after save must
+  // not change the save body. These lock today's body for typed vessel names, SCNs and dates.
+  group('typed vessels (locked before vessel suggestions)', () {
+    SalesOrderAddLoaded typed() => form().copyWith(
+          txtLoadingVessel: 'CMA CGM PETRON',
+          txtOffVessel: 'MAERSK RIO NEGRO',
+          txtLSCN: 'L123',
+          txtOSCN: '269EK6',
+          txtLPort: 'WESTPORT',
+          txtOPort: 'PTP',
+          dtpLETAdate: '2026-10-13 08:00:00',
+          dtpLETBdate: '2026-10-13 20:00:00',
+          dtpLETDdate: '2026-10-14 17:00:00',
+          dtpOETAdate: '2026-10-10 06:30:00',
+          dtpOETBdate: '2026-10-10 12:00:00',
+          dtpOETDdate: '2026-10-11 17:00:00',
+          checkBoxValueLETA: true,
+          checkBoxValueLETD: true,
+          checkBoxValueOETA: true,
+          checkBoxValueOETD: true,
+        );
+
+    test('names, SCNs, ports and ticked dates go out as typed; unticked ETBs are cleared', () {
+      final body = saleOrderSaveBody(typed(), companyId: 6, employeeId: 7);
+
+      expect(body['loadingvesselname'], 'CMA CGM PETRON');
+      expect(body['offvesselname'], 'MAERSK RIO NEGRO');
+      expect(body['lscn'], 'L123');
+      expect(body['scn'], '269EK6');
+      expect(body['sPort'], 'WESTPORT');
+      expect(body['oPort'], 'PTP');
+      expect(body['eta'], '2026-10-13T08:00:00');
+      expect(body['etb'], isNull);
+      expect(body['etd'], '2026-10-14T17:00:00');
+      expect(body['oeta'], '2026-10-10T06:30:00');
+      expect(body['oetb'], isNull);
+      expect(body['oetd'], '2026-10-11T17:00:00');
+    });
+
+    test('the body has exactly today\'s keys (no vessel ids or links are added)', () {
+      final body = saleOrderSaveBody(typed(), companyId: 6, employeeId: 7);
+
+      expect(body.keys.toSet(), {
+        'id', 'cNumber', 'cNumberDisplay', 'companyRefId', 'employeeRefId', 'customerRefId', 'jobMasterRefId',
+        'jStatus', 'billType', 'saleDate', 'agentCompanyRefId', 'agentMasterRefId', 'oAgentCompanyRefId',
+        'oAgentMasterRefId', 'remarks', 'doDescription', 'amount', 'grossAmount', 'taxAmount', 'coinage',
+        'currencyValue', 'actualNetAmount', 'offvesselname', 'loadingvesselname', 'sPort', 'oPort', 'vessel',
+        'oVessel', 'commodity', 'cargo', 'eta', 'etb', 'etd', 'flighTime', 'oeta', 'oetb', 'oetd', 'awbNo',
+        'blCopy', 'quantity', 'totalWeight', 'truckSize', 'scn', 'lscn', 'ptw', 'sealbyRefid', 'sealbreakbyRefid',
+        'sealbyRefid2', 'sealbreakbyRefid2', 'sealbyRefid3', 'sealbreakbyRefid3', 'boardingOfficerRefid',
+        'boardingOfficer1Refid', 'boardingAmount', 'boardingAmount1', 'forwarding', 'forwarding2', 'forwarding3',
+        'forwardingDate', 'forwarding2Date', 'forwarding3Date', 'forwardingEnterRef', 'forwardingExitRef',
+        'forwardingEnterRef2', 'forwardingExitRef2', 'forwardingEnterRef3', 'forwardingExitRef3', 'forwardingSMKNo',
+        'forwardingSMKNo2', 'forwardingSMKNo3', 'forwarding1S1', 'forwarding1S2', 'forwarding2S1', 'forwarding2S2',
+        'forwarding3S1', 'forwarding3S2', 'portChargesRef', 'portCharges', 'zb', 'zb2', 'zbRef', 'zbRef2', 'origin',
+        'destination', 'originRefId', 'destinationRefId', 'pickupDate', 'deliveryDate', 'wareHouseEnterDate',
+        'wareHouseExitDate', 'wareHouseAddress', 'pickupAddress', 'pickupQuantityList', 'deliveryAddress',
+        'deliveryQuantityList', 'pickupDetails', 'deliveryDetails', 'SaleOrderDetails',
+      });
+    });
+
+    test('the same typed values give the same body', () {
+      expect(saleOrderSaveBody(typed(), companyId: 6, employeeId: 7),
+          saleOrderSaveBody(typed(), companyId: 6, employeeId: 7));
+    });
+  });
+
   test('a Java enquiry row reads as a Java sale order', () {
     expect(EnquiryApi.asSaleOrder({'customerRefId': 5, 'sport': 'PKG', 'awbNo': 'A1', 'oeta': null, 'jstatus': 2,
       'oagentCompanyRefId': 7, 'customerName': 'ACME'}),

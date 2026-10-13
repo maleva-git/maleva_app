@@ -1,6 +1,8 @@
 import 'package:equatable/equatable.dart';
 import '../../../../../core/models/model.dart';
 import 'package:maleva/core/models/shared/sale_edit_detail_model.dart';
+import 'package:maleva/features/transaction/salesorder/add/bloc/save_date_checks.dart';
+import 'package:maleva/features/transaction/salesorder/add/bloc/vessel_pick.dart';
 
 const Object _sentinel = Object();
 
@@ -217,6 +219,26 @@ class SalesOrderAddLoaded extends SalesOrderAddState {
   final String? savedMessage;
   final bool isSaved;
 
+  // Vessel suggestions (change vessel-master-and-ptp-schedule). Not part of the save body.
+  /// The vessel picked for the loading / off leg; null once the field text changes after the pick.
+  final VesselPick? pickedLoading;
+  final VesselPick? pickedOff;
+  /// A picked PTP call would replace typed dates or SCN: the view asks, then sends VesselFillAnswered.
+  final VesselFillQuestion? vesselFillQuestion;
+  /// The typed name is close to a known vessel: the view asks once, then sends DidYouMeanAnswered.
+  final DidYouMean? didYouMean;
+  /// `LEG|TEXT` already asked about, so "Did you mean" is not asked twice for the same text.
+  final Set<String> keptSpellings;
+
+  // Questions before saving (save_date_checks.dart).
+  /// Asked by the view; its answer (SaveDateQuestionAnswered) continues the save.
+  final SaveDateQuestion? saveQuestion;
+  /// The PTP call each leg was saved with (`LOADING` / `OFF`), read when an order is opened.
+  final Map<String, LegCall> savedLegCalls;
+  /// ptpTimeKey / scheduleKey as loaded, saved or last answered: nothing is asked while they hold.
+  final String? ptpSettledKey;
+  final String? scheduleSettledKey;
+
   SalesOrderAddLoaded({
     this.progress = false, this.showSearch = false,
     this.poPendingRemarks = const [], this.productViewList = const [], this.productIds = const [],
@@ -256,6 +278,8 @@ class SalesOrderAddLoaded extends SalesOrderAddState {
     this.txtPortCharges = '', this.txtForwarding1S1 = '', this.txtForwarding1S2 = '', this.txtForwarding2S1 = '', this.txtForwarding2S2 = '',
     this.txtForwarding3S1 = '', this.txtForwarding3S2 = '', this.txtProductCode = '', this.txtProductDescription = '', this.txtProductQty = '',
     this.txtProductSaleRate = '', this.txtProductGst = '', this.txtProductAmount = '', this.fieldPermission = const {}, this.savedMessage, this.isSaved = false,
+    this.pickedLoading, this.pickedOff, this.vesselFillQuestion, this.didYouMean, this.keptSpellings = const {},
+    this.saveQuestion, this.savedLegCalls = const {}, this.ptpSettledKey, this.scheduleSettledKey,
   });
 
   @override
@@ -276,7 +300,9 @@ class SalesOrderAddLoaded extends SalesOrderAddState {
     txtBreakByEmp1, txtBreakByEmp2, txtBreakByEmp3, txtZBRef1, txtZBRef2, txtBoardingOfficer1, txtBoardingOfficer2, txtAmount1,
     txtAmount2, txtPortChargeRef1, txtPortCharges, txtForwarding1S1, txtForwarding1S2, txtForwarding2S1, txtForwarding2S2,
     txtForwarding3S1, txtForwarding3S2, txtProductCode, txtProductDescription, txtProductQty, txtProductSaleRate, txtProductGst,
-    txtProductAmount, fieldPermission, savedMessage, isSaved, pickUpUpdateIndex, deliveryUpdateIndex
+    txtProductAmount, fieldPermission, savedMessage, isSaved, pickUpUpdateIndex, deliveryUpdateIndex,
+    pickedLoading, pickedOff, vesselFillQuestion, didYouMean, keptSpellings,
+    saveQuestion, savedLegCalls, ptpSettledKey, scheduleSettledKey
   ];
 
   SalesOrderAddLoaded copyWith({
@@ -321,6 +347,10 @@ class SalesOrderAddLoaded extends SalesOrderAddState {
     String? txtForwarding2S1, String? txtForwarding2S2, String? txtForwarding3S1, String? txtForwarding3S2,
     String? txtProductCode, String? txtProductDescription, String? txtProductQty, String? txtProductSaleRate,
     String? txtProductGst, String? txtProductAmount, Map<String, bool>? fieldPermission, Object? savedMessage = _sentinel, bool? isSaved,
+    Object? pickedLoading = _sentinel, Object? pickedOff = _sentinel, Object? vesselFillQuestion = _sentinel,
+    Object? didYouMean = _sentinel, Set<String>? keptSpellings,
+    Object? saveQuestion = _sentinel, Map<String, LegCall>? savedLegCalls,
+    Object? ptpSettledKey = _sentinel, Object? scheduleSettledKey = _sentinel,
   }) {
     return SalesOrderAddLoaded(
       progress: progress ?? this.progress, showSearch: showSearch ?? this.showSearch,
@@ -392,6 +422,16 @@ class SalesOrderAddLoaded extends SalesOrderAddState {
       txtProductCode: txtProductCode ?? this.txtProductCode, txtProductDescription: txtProductDescription ?? this.txtProductDescription, txtProductQty: txtProductQty ?? this.txtProductQty, txtProductSaleRate: txtProductSaleRate ?? this.txtProductSaleRate,
       txtProductGst: txtProductGst ?? this.txtProductGst, txtProductAmount: txtProductAmount ?? this.txtProductAmount, fieldPermission: fieldPermission ?? this.fieldPermission,
       savedMessage: identical(savedMessage, _sentinel) ? this.savedMessage : savedMessage as String?, isSaved: isSaved ?? this.isSaved,
+      pickedLoading: identical(pickedLoading, _sentinel) ? this.pickedLoading : pickedLoading as VesselPick?,
+      pickedOff: identical(pickedOff, _sentinel) ? this.pickedOff : pickedOff as VesselPick?,
+      vesselFillQuestion: identical(vesselFillQuestion, _sentinel) ? this.vesselFillQuestion : vesselFillQuestion as VesselFillQuestion?,
+      didYouMean: identical(didYouMean, _sentinel) ? this.didYouMean : didYouMean as DidYouMean?,
+      keptSpellings: keptSpellings ?? this.keptSpellings,
+      saveQuestion: identical(saveQuestion, _sentinel) ? this.saveQuestion : saveQuestion as SaveDateQuestion?,
+      savedLegCalls: savedLegCalls ?? this.savedLegCalls,
+      ptpSettledKey: identical(ptpSettledKey, _sentinel) ? this.ptpSettledKey : ptpSettledKey as String?,
+      scheduleSettledKey:
+          identical(scheduleSettledKey, _sentinel) ? this.scheduleSettledKey : scheduleSettledKey as String?,
     );
   }
 }

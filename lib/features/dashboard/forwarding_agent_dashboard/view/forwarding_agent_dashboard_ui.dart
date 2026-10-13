@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:maleva/features/notifications/notification_bell.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:maleva/core/colors/colors.dart' as colour;
 import '../../../../core/colors/colors.dart';
@@ -26,6 +27,7 @@ class ForwardingAgentMobileDashboard extends StatelessWidget {
       drawer: const Menulist(),
       body: Column(
         children: [
+          const VesselAlertBanner(),
           _buildTabBar(isTablet),
           Expanded(child: _buildTabBarView(context)),
         ],
@@ -38,6 +40,8 @@ class ForwardingAgentMobileDashboard extends StatelessWidget {
       title: 'Forwarding Agent',
       isTablet: isTablet,
       actions: [
+        // the bell: unread notices and open vessel alerts (vessel-master-and-ptp-schedule)
+        NotificationBellButton(isTablet: isTablet),
         IconButton(
           icon: Icon(Icons.exit_to_app,
               size: isTablet ? 32 : 30, color: colour.topAppBarColor),

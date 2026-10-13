@@ -1,4 +1,5 @@
 import 'package:flutter/Material.dart';
+import 'package:maleva/features/notifications/notification_bell.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:maleva/core/utils/app_globals.dart';
 import 'package:maleva/core/colors/colors.dart' as colour;
@@ -36,6 +37,7 @@ class OperationMobileDashboard extends StatelessWidget {
       drawer: const Menulist(),
       body: Column(
         children: [
+          const VesselAlertBanner(),
           _buildTabBar(isTablet),
           Expanded(child: _buildTabBarView(context)),
         ],
@@ -49,6 +51,8 @@ class OperationMobileDashboard extends StatelessWidget {
       title: 'Operation',
       isTablet: isTablet,
       actions: [
+        // the bell: unread notices and open vessel alerts (vessel-master-and-ptp-schedule)
+        NotificationBellButton(isTablet: isTablet),
         IconButton(
           icon: Icon(Icons.directions_boat_filled,
               size: isTablet ? 28 : 25, ),

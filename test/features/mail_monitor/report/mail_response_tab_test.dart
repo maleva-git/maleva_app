@@ -10,6 +10,7 @@ import 'package:maleva/core/network/api_failure.dart';
 import 'package:maleva/features/mail_monitor/report/mail_response_tab.dart';
 import 'package:maleva/features/mail_monitor/report/response_report_cubit.dart';
 import 'package:maleva/features/mail_monitor/report/response_rules.dart';
+import 'package:maleva/features/mail_monitor/report/summary_language.dart';
 import 'package:maleva/features/mail_monitor/report/summary_speaker.dart';
 import 'package:mocktail/mocktail.dart';
 
@@ -21,15 +22,17 @@ class _Api extends Mock implements MailMonitorApi {}
 
 class _Speaker implements SummarySpeaker {
   final spoken = <String>[];
+  final voices = <String>[];
   Completer<void>? _done;
-  bool available = true;
+  SpeakResult result = SpeakResult.spoken;
 
   @override
-  Future<bool> speak(String text) async {
+  Future<SpeakResult> speak(String text, {required String voice}) async {
     spoken.add(text);
+    voices.add(voice);
     _done = Completer<void>();
     await _done!.future;
-    return available;
+    return result;
   }
 
   void finish() => _done?.complete();
@@ -87,8 +90,9 @@ void main() {
       expect(late.slowest.single.minutes, 120);
       expect(late.waiting.single.waiting, isTrue);
 
-      final s = await api.responseSummary(_last7);
+      final s = await api.responseSummary(_last7, language: 'ta');
       expect(adapter.requests.last.method, 'POST');
+      expect(adapter.requests.last.uri.queryParameters['language'], 'ta');
       expect(adapter.requests.last.uri.queryParameters['from'], '2026-10-05');
       expect(s.points, ['Good week']);
     });
@@ -112,7 +116,7 @@ void main() {
     });
 
     test('opens on the last 7 Malaysia days; a new range reloads and clears the summary', () async {
-      when(() => api.responseSummary(any()))
+      when(() => api.responseSummary(any(), language: any(named: 'language')))
           .thenAnswer((_) async => const ResponseSummary(text: 'One', generatedAt: null));
       final cubit = ResponseReportCubit(api, speaker, clock: () => _now);
       await cubit.load();
@@ -128,7 +132,7 @@ void main() {
     });
 
     test('a summary error stays on the card; the report stays', () async {
-      when(() => api.responseSummary(any())).thenThrow(const ApiFailure('AI is not configured', statusCode: 503));
+      when(() => api.responseSummary(any(), language: any(named: 'language'))).thenThrow(const ApiFailure('AI is not configured', statusCode: 503));
       final cubit = ResponseReportCubit(api, speaker, clock: () => _now);
       await cubit.load();
       await cubit.writeSummary();
@@ -138,7 +142,7 @@ void main() {
     });
 
     test('read aloud speaks the points; Stop stops', () async {
-      when(() => api.responseSummary(any()))
+      when(() => api.responseSummary(any(), language: any(named: 'language')))
           .thenAnswer((_) async => const ResponseSummary(text: '- One\n- Two', generatedAt: null));
       final cubit = ResponseReportCubit(api, speaker, clock: () => _now);
       await cubit.load();
@@ -146,10 +150,46 @@ void main() {
 
       final speaking = cubit.toggleSpeech();
       expect(cubit.state.speaking, isTrue);
-      expect(speaker.spoken.single, 'One. Two');
+      expect(speaker.spoken.single, 'One. Two.');
       await cubit.toggleSpeech();
       await speaking;
       expect(cubit.state.speaking, isFalse);
+      await cubit.close();
+    });
+
+    test('a new language writes the shown summary again in it; read aloud uses its voice', () async {
+      when(() => api.responseSummary(any(), language: any(named: 'language'))).thenAnswer((i) async =>
+          ResponseSummary(text: '- in ${i.namedArguments[#language]}', generatedAt: null));
+      final cubit = ResponseReportCubit(api, speaker, clock: () => _now);
+      await cubit.load();
+      await cubit.chooseLanguage(SummaryLanguage.all[1]);
+      // Nothing was shown yet, so nothing is written until the tap.
+      verifyNever(() => api.responseSummary(any(), language: any(named: 'language')));
+
+      await cubit.writeSummary();
+      expect(cubit.state.summary!.points, ['in ta']);
+      await cubit.chooseLanguage(SummaryLanguage.all.firstWhere((l) => l.code == 'hi'));
+      expect(cubit.state.summary!.points, ['in hi']);
+
+      final speaking = cubit.toggleSpeech();
+      speaker.finish();
+      await speaking;
+      expect(speaker.voices.single, 'hi-IN');
+      await cubit.close();
+    });
+
+    test('no voice for the language says how to add it', () async {
+      when(() => api.responseSummary(any(), language: any(named: 'language')))
+          .thenAnswer((_) async => const ResponseSummary(text: '- x', generatedAt: null));
+      speaker.result = SpeakResult.noVoice;
+      final cubit = ResponseReportCubit(api, speaker, clock: () => _now);
+      await cubit.load();
+      await cubit.chooseLanguage(SummaryLanguage.all[1]);
+      await cubit.writeSummary();
+      final speaking = cubit.toggleSpeech();
+      speaker.finish();
+      await speaking;
+      expect(cubit.state.speechProblem, contains('no Tamil voice'));
       await cubit.close();
     });
 
@@ -208,18 +248,22 @@ void main() {
     });
 
     testWidgets('AI summary: write, then read aloud and stop', (tester) async {
-      when(() => api.responseSummary(any()))
+      when(() => api.responseSummary(any(), language: any(named: 'language')))
           .thenAnswer((_) async => const ResponseSummary(text: '- Replies were fast', generatedAt: null));
       await pump(tester, const Size(400, 2600));
 
+      await tester.tap(find.text('தமிழ் · Tamil'));
+      await tester.pump();
       await tester.tap(find.text('Write summary'));
       await tester.pump();
       expect(find.text('Replies were fast'), findsOneWidget);
+      verify(() => api.responseSummary(any(), language: 'ta')).called(1);
 
       await tester.tap(find.text('Read aloud'));
       await tester.pump();
       expect(find.text('Stop'), findsOneWidget);
-      expect(speaker.spoken.single, 'Replies were fast');
+      expect(speaker.spoken.single, 'Replies were fast.');
+      expect(speaker.voices.single, 'ta-IN');
 
       speaker.finish();
       await tester.pump();

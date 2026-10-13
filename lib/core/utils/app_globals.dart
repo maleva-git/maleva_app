@@ -34,7 +34,7 @@ import 'package:maleva/core/models/shared/r_t_i_details_view_model.dart';
 class AppGlobals {
   AppGlobals._();
 
-  static String appversion="1.1.12+145";
+  static String appversion="1.1.12+148";
   static bool homepagecall = false;
   static AssetImage logo = const AssetImage('assets/company/logo.png');
   static AssetImage splashlogo = const AssetImage('assets/company/roundlogo.png');
@@ -369,9 +369,18 @@ class AppGlobals {
 
   //Firebase Credentials---------------------------------------
   static String channeltopic="MALEVA";
-  static String channelId = "MALEVA"; //Required for Android 8.0 or after
-  static String channelName = "MALEVA channel"; //Required for Android 8.0 or after
+  // The one Android channel for every Maleva notice, created at high importance on start-up
+  // (LocalNotificationService.createAlertChannel). Same id as default_notification_channel_id in
+  // res/values/styles.xml and maleva.firebase.android-channel-id on the backend: a push that arrives
+  // while the app is closed lands here too, so it pops up with a sound.
+  static String channelId = "com.kassapos.maleva.urgent";
+  static String channelName = "Maleva alerts";
   static String channelDescription = "this is our MALEVA channel";
+  // Vessel ETA notices (push type VESSEL_ETA_CHANGED) must never be missed: their own channel with a long
+  // vibration at maximum importance. Same id as VESSEL_ANDROID_CHANNEL in the backend's GoogleFcmClient.
+  static const String vesselChannelId = "com.kassapos.maleva.vessel";
+  static const String vesselChannelName = "Vessel ETA alerts";
+  static const String vesselChannelDescription = "A vessel's arrival or departure moved: jobs need new dates";
   static String mobiletoken="";
   static getDeviceToken() async {
 

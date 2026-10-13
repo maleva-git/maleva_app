@@ -18,11 +18,18 @@ app (2026-10-10). React does the same in its own change of the same name.
 - **New "Vessel changes" screen** (new capability `vessel-changes`): `GET /api/vessel-changes`
   grouped by vessel call, Maleva's and PTP's times side by side, "Update these jobs" through the
   existing `POST /api/vessel-plannings/sale-order-update-many`, "Dismiss", SCN copy.
+- **Pickup and delivery on the same screen**: each loading row shows the suggested pickup and
+  delivery (the day before PTP's new arrival, times kept) or why it cannot move (planned, already
+  collected, date in the past, no dates). "Also move pickup and delivery" (on by default) sends the
+  movable jobs to `POST /api/vessel-changes/move-pickup-delivery` after the ETA update. Planned jobs
+  are never moved; the app says "re-plan in Planning".
+- **Boarding month question**: a row whose boarding pay would move to another month is left out of
+  the update until the user confirms it on that row.
 - **Tapping the notice opens it** (existing capability `notifications-support`): a
   `VESSEL_ETA_CHANGED` push opens "Vessel changes" in the foreground, background and cold-start
   cases, like the unread mail and forwarding request notices do today.
 
-Not changed: the save body (`sale_order_save_body.dart`) and every other sale order field; other
+Not changed: planning, RTI and boarding screens; the save body (`sale_order_save_body.dart`) and every other sale order field; other
 screens that type vessel names (enquiry, vessel planning, prealert). The app reads the Java answers
 as they are (owner's rule 2); no backend change is made for the app.
 

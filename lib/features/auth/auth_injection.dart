@@ -38,6 +38,10 @@ import 'package:maleva/core/network/java_api_client.dart';
 import 'package:maleva/core/router/app_router.dart';
 import 'package:maleva/core/session/session_token_store.dart';
 import 'package:maleva/core/mailmonitor/mail_monitor_api.dart';
+import 'package:maleva/core/employee_notifications/employee_notifications_api.dart';
+import 'package:maleva/features/notifications/notification_summary_cubit.dart';
+import 'package:maleva/core/vessel_changes/vessel_changes_api.dart';
+import 'package:maleva/core/vessel_master/vessel_master_api.dart';
 import 'package:maleva/features/auth/data/mobile_auth_api.dart';
 import 'package:maleva/features/auth/data/session_service.dart';
 import 'package:maleva/features/auth/data/session_writer.dart';
@@ -55,6 +59,16 @@ void registerAuthModule(GetIt sl) {
   // sale orders (the shared /api/sale-orders and friends)
   sl.registerLazySingleton<SaleOrderApi>(
       () => SaleOrderApi(sl<JavaApiClient>().dio, companyId: AppPreferences.getComid));
+  // vessel master and PTP vessel changes (the shared /api/vessel-masters and /api/vessel-changes;
+  // change vessel-master-and-ptp-schedule)
+  sl.registerLazySingleton<VesselMasterApi>(() => VesselMasterApi(sl<JavaApiClient>().dio));
+  sl.registerLazySingleton<VesselChangesApi>(
+      () => VesselChangesApi(sl<JavaApiClient>().dio, companyId: AppPreferences.getComid));
+  // the employee's bell (the shared /api/employee-notifications) and the bell/banner summary shared by
+  // every dashboard (unread count + open vessel alerts)
+  sl.registerLazySingleton<EmployeeNotificationsApi>(() => EmployeeNotificationsApi(sl<JavaApiClient>().dio));
+  sl.registerLazySingleton<NotificationSummaryCubit>(
+      () => NotificationSummaryCubit(sl<EmployeeNotificationsApi>(), sl<VesselChangesApi>()));
   // transport and vessel planning (the shared /api/planing and /api/vessel-plannings)
   sl.registerLazySingleton<PlanningApi>(
       () => PlanningApi(sl<JavaApiClient>().dio, companyId: AppPreferences.getComid));
