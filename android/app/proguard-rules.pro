@@ -26,3 +26,8 @@
 }
 
 
+
+# AGP 9 (2026-10-13): the old proguard-android.txt (which turned optimisation off) is no longer allowed, so the
+# build uses proguard-android-optimize.txt; this keeps release builds as they were (no R8 optimisation) until
+# a release build has been tested with optimisation on.
+-dontoptimize

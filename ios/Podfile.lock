@@ -30,10 +30,6 @@ PODS:
   - Flutter (1.0.0)
   - flutter_barcode_scanner_plus (3.0.7):
     - Flutter
-  - flutter_tts (0.0.1):
-    - Flutter
-  - fluttertoast (0.0.2):
-    - Flutter
   - GoogleDataTransport (10.1.0):
     - nanopb (~> 3.30910.0)
     - PromisesObjC (~> 2.4)
@@ -70,18 +66,13 @@ PODS:
   - open_file_ios (0.0.1):
     - Flutter
   - PromisesObjC (2.4.0)
-  - share_plus (0.0.1):
-    - Flutter
 
 DEPENDENCIES:
   - bluetooth_print_plus (from `.symlinks/plugins/bluetooth_print_plus/ios`)
   - Firebase/Messaging
   - Flutter (from `Flutter`)
   - flutter_barcode_scanner_plus (from `.symlinks/plugins/flutter_barcode_scanner_plus/ios`)
-  - flutter_tts (from `.symlinks/plugins/flutter_tts/ios`)
-  - fluttertoast (from `.symlinks/plugins/fluttertoast/ios`)
   - open_file_ios (from `.symlinks/plugins/open_file_ios/ios`)
-  - share_plus (from `.symlinks/plugins/share_plus/ios`)
 
 SPEC REPOS:
   trunk:
@@ -103,14 +94,8 @@ EXTERNAL SOURCES:
     :path: Flutter
   flutter_barcode_scanner_plus:
     :path: ".symlinks/plugins/flutter_barcode_scanner_plus/ios"
-  flutter_tts:
-    :path: ".symlinks/plugins/flutter_tts/ios"
-  fluttertoast:
-    :path: ".symlinks/plugins/fluttertoast/ios"
   open_file_ios:
     :path: ".symlinks/plugins/open_file_ios/ios"
-  share_plus:
-    :path: ".symlinks/plugins/share_plus/ios"
 
 SPEC CHECKSUMS:
   bluetooth_print_plus: 7fa236314a361796569ed4ebc65d159b00a2686a
@@ -121,15 +106,12 @@ SPEC CHECKSUMS:
   FirebaseMessaging: 3b26e2cee503815e01c3701236b020aa9b576f09
   Flutter: 71a624a5bc0c04062bf19101d501e466baf2fb47
   flutter_barcode_scanner_plus: e5ef7f41cdbf3086e1b9348dce986dde3aa08696
-  flutter_tts: 35ac3c7d42412733e795ea96ad2d7e05d0a75113
-  fluttertoast: 2c67e14dce98bbdb200df9e1acf610d7a6264ea1
   GoogleDataTransport: aae35b7ea0c09004c3797d53c8c41f66f219d6a7
   GoogleUtilities: 00c88b9a86066ef77f0da2fab05f65d7768ed8e1
   GSDK: 65d54603da7bece31b433c0f34f8a52c4431dd08
   nanopb: fad817b59e0457d11a5dfbde799381cd727c1275
   open_file_ios: 5ff7526df64e4394b4fe207636b67a95e83078bb
   PromisesObjC: f5707f49cb48b9636751c5b2e7d227e43fba9f47
-  share_plus: 011d6fb4f9d2576b83179a3a5c5e323202cdabcf
 
 PODFILE CHECKSUM: 89fe801d542a750a535f9dcfc21fec7e162b6205
 

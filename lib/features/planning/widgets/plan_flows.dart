@@ -96,7 +96,7 @@ abstract final class PlanFlows {
       final dir = await getTemporaryDirectory();
       final file = File('${dir.path}/${PlanningRules.csvFileName(DateTime.now())}');
       await file.writeAsString(PlanningRules.csv(rows));
-      await Share.shareXFiles([XFile(file.path, mimeType: 'text/csv')]);
+      await SharePlus.instance.share(ShareParams(files: [XFile(file.path, mimeType: 'text/csv')]));
       if (!cubit.isClosed) cubit.notify('Excel downloaded successfully');
     } catch (e) {
       if (!cubit.isClosed) cubit.notify('$e', NoticeKind.error);

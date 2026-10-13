@@ -396,7 +396,7 @@ class _ImagePreviewDialog extends StatelessWidget {
       final response = await http.get(Uri.parse(url));
       final file = File(filePath);
       await file.writeAsBytes(response.bodyBytes);
-      await Share.shareXFiles([XFile(filePath)], text: "Shared Image");
+      await SharePlus.instance.share(ShareParams(files: [XFile(filePath)], text: "Shared Image"));
     } catch (e) {
       if (!context.mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(

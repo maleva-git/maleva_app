@@ -1,16 +1,13 @@
 import 'dart:async';
-import 'dart:io' show Platform;
-
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_tts/flutter_tts.dart';
 
 /// How a read-aloud ended.
 enum SpeakResult {
   spoken,
   noVoice,
 
-  /// The speech plugin is not in the running app: it was hot-restarted after the package was added.
+  /// The speech channel is not in the running app: it was hot-restarted, not rebuilt, after it was added.
   needsRebuild,
   failed,
 }
@@ -25,15 +22,17 @@ abstract interface class SummarySpeaker {
   Future<void> stop();
 }
 
-/// The device's own text-to-speech voice (flutter_tts).
-///
-/// The end of speech is taken from the plugin's completion, cancel and error handlers, not from
-/// `awaitSpeakCompletion`: on iOS the plugin never answers an awaited speak that is stopped, which would
-/// leave the caller waiting for ever.
+/// The device's own text-to-speech voice, through the app's own channel `com.kassapos.maleva/tts`
+/// (Android TextToSpeech in MainActivity, AVSpeechSynthesizer in the iOS AppDelegate and the macOS window).
+/// Replaces the flutter_tts package (owner, 2026-10-13: it applied the old Kotlin Gradle Plugin, which future
+/// Flutter versions refuse). The native side reports the end of speech with `onDone`, `onCancel` and
+/// `onError`, so a stopped speech always ends the wait.
 class TtsSummarySpeaker implements SummarySpeaker {
-  TtsSummarySpeaker() : _tts = FlutterTts();
+  TtsSummarySpeaker({MethodChannel? channel}) : _channel = channel ?? const MethodChannel(channelName);
 
-  final FlutterTts _tts;
+  static const String channelName = 'com.kassapos.maleva/tts';
+
+  final MethodChannel _channel;
   bool _ready = false;
   Completer<SpeakResult>? _speaking;
 
@@ -43,37 +42,31 @@ class TtsSummarySpeaker implements SummarySpeaker {
     if (c != null && !c.isCompleted) c.complete(result);
   }
 
-  Future<void> _setUp() async {
+  void _setUp() {
     if (_ready) return;
-    _tts.setCompletionHandler(() => _finish(SpeakResult.spoken));
-    _tts.setCancelHandler(() => _finish(SpeakResult.spoken));
-    _tts.setErrorHandler((message) {
-      debugPrint('Read aloud error: $message');
-      _finish(SpeakResult.failed);
+    _channel.setMethodCallHandler((call) async {
+      switch (call.method) {
+        case 'onDone':
+        case 'onCancel':
+          _finish(SpeakResult.spoken);
+        case 'onError':
+          debugPrint('Read aloud error: ${call.arguments}');
+          _finish(SpeakResult.failed);
+      }
     });
-    await _tts.setSpeechRate(0.5);
-    if (!kIsWeb && Platform.isIOS) {
-      // Speak even with the ring/silent switch on, and lower other audio while speaking.
-      await _tts.setIosAudioCategory(
-        IosTextToSpeechAudioCategory.playback,
-        [IosTextToSpeechAudioCategoryOptions.duckOthers],
-        IosTextToSpeechAudioMode.spokenAudio,
-      );
-    }
     _ready = true;
   }
 
   @override
   Future<SpeakResult> speak(String text, {required String voice}) async {
     try {
-      await _setUp();
-      final available = await _tts.isLanguageAvailable(voice);
-      if (available != true && available != 1) return SpeakResult.noVoice;
-      await _tts.setLanguage(voice);
+      _setUp();
+      final available = await _channel.invokeMethod<bool>('isLanguageAvailable', {'language': voice});
+      if (available != true) return SpeakResult.noVoice;
       _finish(SpeakResult.spoken);
       final done = _speaking = Completer<SpeakResult>();
-      final started = await _tts.speak(text);
-      if (started != 1) _finish(SpeakResult.failed);
+      final started = await _channel.invokeMethod<bool>('speak', {'text': text, 'language': voice});
+      if (started != true) _finish(SpeakResult.failed);
       return await done.future;
     } on MissingPluginException {
       return SpeakResult.needsRebuild;
@@ -87,9 +80,9 @@ class TtsSummarySpeaker implements SummarySpeaker {
   @override
   Future<void> stop() async {
     try {
-      await _tts.stop();
+      await _channel.invokeMethod<void>('stop');
     } catch (_) {
-      // Nothing is speaking, or the plugin is not in this build.
+      // Nothing is speaking, or the channel is not in this build.
     }
     _finish(SpeakResult.spoken);
   }

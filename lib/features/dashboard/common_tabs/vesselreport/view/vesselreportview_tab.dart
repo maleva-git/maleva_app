@@ -15,7 +15,7 @@ import 'package:maleva/core/network/api_services/master_api.dart';
 import 'package:maleva/features/operations/models/job_status_model.dart';
 import 'package:maleva/core/network/legacy_api_repository.dart';
 import 'package:maleva/core/di/injection.dart';
-import 'package:fluttertoast/fluttertoast.dart';
+import 'package:maleva/core/utils/toast.dart';
 import 'package:maleva/core/utils/dialog_helper.dart';
 
 class VesselReportPage extends StatelessWidget {

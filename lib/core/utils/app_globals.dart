@@ -9,7 +9,7 @@ import 'package:flutter/material.dart' as col;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:core';
 import 'package:flutter/material.dart';
-import 'package:fluttertoast/fluttertoast.dart';
+import 'package:maleva/core/utils/toast.dart';
 import 'app_preferences.dart';
 import 'package:maleva/core/models/shared/list_item.dart';
 import 'package:maleva/core/models/shared/agent_company_model.dart';

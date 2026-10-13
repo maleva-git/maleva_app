@@ -9,6 +9,29 @@ rootProject.buildDir = '../build'
 subprojects {
     project.buildDir = "${rootProject.buildDir}/${project.name}"
 }
+// AGP 9 (2026-10-13): libraries such as androidx.window need plugin modules compiled against API 34 or later;
+// old plugins (bluetooth_print_plus still says 31) are compiled against the app's API instead. Only the
+// compile SDK changes; the plugins' code and minimum SDK stay as they are.
+subprojects {
+    afterEvaluate { project ->
+        if (project.plugins.hasPlugin("com.android.library")) {
+            def sdk = project.android.compileSdkVersion
+            def level = sdk == null ? 0 : (sdk.toString().replaceAll("[^0-9]", "") ?: "0").toInteger()
+            if (level < 36) {
+                project.android.compileSdkVersion 36
+            }
+        }
+    }
+}
+// Java warnings and notes from third-party plugin code (old Java 8 targets, deprecated Android APIs) cannot be
+// fixed here; they are silenced so a build shows only what concerns this app (owner, 2026-10-13).
+subprojects { sub ->
+    if (sub.name != "app") {
+        sub.tasks.withType(JavaCompile).configureEach {
+            options.compilerArgs.addAll(["-Xlint:none", "-nowarn", "-XDsuppressNotes"])
+        }
+    }
+}
 subprojects {
     project.evaluationDependsOn(':app')
 }

@@ -713,8 +713,7 @@ class _ImagePreviewDialog extends StatelessWidget {
           '${tempDir.path}/spare_${DateTime.now().millisecondsSinceEpoch}.jpg';
       final response = await http.get(Uri.parse(url));
       await File(path).writeAsBytes(response.bodyBytes);
-      await Share.shareXFiles([XFile(path)],
-          text: "Spare Parts Document");
+      await SharePlus.instance.share(ShareParams(files: [XFile(path)], text: "Spare Parts Document"));
     } catch (e) {
       if (!context.mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(

@@ -33,6 +33,6 @@ class ResponsePdf {
   /// The device's share sheet (WhatsApp, email, ...).
   Future<void> share(ReportRange range) async {
     final file = await _save(range);
-    await Share.shareXFiles([XFile(file.path, mimeType: 'application/pdf')], text: 'Mail response report');
+    await SharePlus.instance.share(ShareParams(files: [XFile(file.path, mimeType: 'application/pdf')], text: 'Mail response report'));
   }
 }

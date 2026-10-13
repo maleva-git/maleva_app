@@ -5,7 +5,7 @@ import 'package:flutter/services.dart';
 import 'package:maleva/core/colors/colors.dart' as colour;
 import 'package:google_fonts/google_fonts.dart';
 import 'package:app_version_update/app_version_update.dart';
-import 'package:fluttertoast/fluttertoast.dart';
+import 'package:maleva/core/utils/toast.dart';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:maleva/core/utils/app_globals.dart';
@@ -174,7 +174,7 @@ class SystemHelpers {
           AppGlobals.progress = 0;
           await file.writeAsBytes(bytes);
           // Share.shareFiles(file.path);
-          Share.shareXFiles([XFile(file.path)], text: 'Maleva_Invoice.jpg');
+          SharePlus.instance.share(ShareParams(files: [XFile(file.path)], text: 'Maleva_Invoice.jpg'));
           // final result = await  OpenFile.open(file.path);
           // print("type=${result.type}  message=${result.message}");
         },

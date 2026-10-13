@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:maleva/core/theme/tokens.dart';
 import 'package:maleva/core/theme/app_typography.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:fluttertoast/fluttertoast.dart';
+import 'package:maleva/core/utils/toast.dart';
 import 'package:maleva/core/colors/colors.dart' as colour;
 
 void msgshow(

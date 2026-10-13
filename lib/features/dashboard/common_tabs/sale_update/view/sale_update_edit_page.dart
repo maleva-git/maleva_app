@@ -8,7 +8,7 @@ import '../bloc/sale_update_bloc.dart';
 import '../bloc/sale_update_event.dart';
 import '../bloc/sale_update_state.dart';
 import '../models/sale_order_update_model.dart';
-import 'package:fluttertoast/fluttertoast.dart';
+import 'package:maleva/core/utils/toast.dart';
 
 class SaleUpdateEditPage extends StatefulWidget {
   final SaleOrderUpdateModel model;
