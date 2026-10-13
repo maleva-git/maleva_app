@@ -2,16 +2,13 @@ import 'package:maleva/core/vessel_master/vessel_master_models.dart';
 import 'package:maleva/features/transaction/salesorder/add/bloc/salesorderadd_state.dart';
 import 'package:maleva/features/transaction/salesorder/add/bloc/vessel_pick.dart';
 
-// The two questions asked when the user saves (change vessel-master-and-ptp-schedule, the same rules
-// as the web page):
-// 1. A leg linked to a PTP call whose typed ETA or ETD is an hour or more away from PTP's: "Use PTP's
-//    times" or "Keep my times".
-// 2. Pickup and delivery not on the day before the vessel's ETA (any port, any vessel): "Change to
-//    <day>" or "Keep my dates" / "Leave empty".
-// Each is asked once: a loaded order only after its ETA/ETD or dates changed, and never again for
-// the values the user answered. The user's answer is final; empty dates and an empty ETA are allowed.
+// The question asked when the user saves (change vessel-master-and-ptp-schedule, the same rule as the
+// web page): a leg linked to a PTP call whose typed ETA or ETD is an hour or more away from PTP's:
+// "Use PTP's times" or "Keep my times". It is asked once: a loaded order only after its ETA/ETD
+// changed, and never again for the values the user answered. The user's answer is final and the save
+// continues either way; an empty ETA is allowed. (Pickup and delivery do not follow the ETA: the
+// owner removed that question on 2026-10-13.)
 
-const int pickupDaysBeforeEta = 1;
 const int ptpTimeThresholdMinutes = 60;
 
 /// The PTP call a leg is linked to: the one picked on this visit, else the one it was saved with.
@@ -20,11 +17,6 @@ class LegCall {
 
   final String vesselName;
   final PtpCall call;
-}
-
-/// A question the form asks before saving; the view shows it, then sends SaveDateQuestionAnswered.
-abstract class SaveDateQuestion {
-  const SaveDateQuestion();
 }
 
 class PtpTimeLine {
@@ -44,7 +36,8 @@ class PtpTimeLine {
   final bool estimated;
 }
 
-class PtpTimeQuestion extends SaveDateQuestion {
+/// The question the form asks before saving; the view shows it, then sends SaveDateQuestionAnswered.
+class PtpTimeQuestion {
   const PtpTimeQuestion({required this.vessels, required this.lines});
 
   /// `FM NAMTHONG EXCELLENCE 2653`, joined with "and" for two legs.
@@ -52,43 +45,9 @@ class PtpTimeQuestion extends SaveDateQuestion {
   final List<PtpTimeLine> lines;
 }
 
-class PickupLine {
-  const PickupLine({required this.label, required this.current, required this.next});
-
-  /// `Pickup` or `Delivery`.
-  final String label;
-
-  /// Null when the date is empty.
-  final DateTime? current;
-  final DateTime next;
-}
-
-class PickupScheduleQuestion extends SaveDateQuestion {
-  const PickupScheduleQuestion(
-      {required this.etaLabel, required this.eta, required this.targetDay, required this.lines, required this.bothEmpty});
-
-  /// `Loading ETA` or `Off ETA`.
-  final String etaLabel;
-  final DateTime eta;
-  final DateTime targetDay;
-
-  /// Only the dates not on the target day.
-  final List<PickupLine> lines;
-  final bool bothEmpty;
-}
-
 DateTime? _ticked(bool ticked, String value) => ticked ? DateTime.tryParse(value) : null;
 
-String _day(DateTime? d) => d == null ? '' : '${d.year}-${d.month}-${d.day}';
-String _minute(DateTime? d) => d == null ? '' : '${_day(d)} ${d.hour}:${d.minute}';
-
-/// Equal keys: no ETA, pickup or delivery day changed since the last answer, load or save.
-String scheduleKey(SalesOrderAddLoaded s) => [
-      _ticked(s.checkBoxValueLETA, s.dtpLETAdate),
-      _ticked(s.checkBoxValueOETA, s.dtpOETAdate),
-      _ticked(s.checkBoxValuePickUp, s.dtpPickUpdate),
-      _ticked(s.checkBoxValueDelivery, s.dtpDeliverydate),
-    ].map(_day).join('|');
+String _minute(DateTime? d) => d == null ? '' : '${d.year}-${d.month}-${d.day} ${d.hour}:${d.minute}';
 
 /// Equal keys: no ETA or ETD changed to the minute since the last answer, load or save.
 String ptpTimeKey(SalesOrderAddLoaded s) => [
@@ -135,52 +94,13 @@ PtpTimeQuestion? planPtpTimes(SalesOrderAddLoaded s, Map<String, LegCall> calls)
   return lines.isEmpty ? null : PtpTimeQuestion(vessels: names.join(' and '), lines: lines);
 }
 
-/// Pickup and delivery against the day before the ETA (the loading ETA when its section shows and
-/// it is ticked, else the off ETA); null when there is nothing to ask.
-PickupScheduleQuestion? planPickupSchedule(SalesOrderAddLoaded s) {
-  final loadingEta = s.visibleLoadingVessel ? _ticked(s.checkBoxValueLETA, s.dtpLETAdate) : null;
-  final offEta = s.visibleOffVessel ? _ticked(s.checkBoxValueOETA, s.dtpOETAdate) : null;
-  final eta = loadingEta ?? offEta;
-  if (eta == null) return null;
-  final etaLabel = loadingEta != null ? 'Loading ETA' : 'Off ETA';
-  final target = DateTime(eta.year, eta.month, eta.day - pickupDaysBeforeEta);
-
-  final lines = <PickupLine>[];
-  var empty = 0;
-  for (final (label, current) in [
-    ('Pickup', _ticked(s.checkBoxValuePickUp, s.dtpPickUpdate)),
-    ('Delivery', _ticked(s.checkBoxValueDelivery, s.dtpDeliverydate)),
-  ]) {
-    if (current == null) empty++;
-    if (current != null && _day(current) == _day(target)) continue;
-    final next = current == null
-        ? target
-        : DateTime(target.year, target.month, target.day, current.hour, current.minute, current.second);
-    lines.add(PickupLine(label: label, current: current, next: next));
+/// "Use PTP's times": PTP's ETA / ETD on the lines asked about, each ticked so it is saved.
+SalesOrderAddLoaded applyPtpTimes(SalesOrderAddLoaded s, PtpTimeQuestion q) {
+  var next = s;
+  for (final line in q.lines) {
+    next = _setDate(next, line.dateField, formDateOf(line.ptp));
   }
-  if (lines.isEmpty) return null;
-  return PickupScheduleQuestion(etaLabel: etaLabel, eta: eta, targetDay: target, lines: lines, bothEmpty: empty == 2);
-}
-
-/// The answer applied: PTP's times or the suggested dates, each ticked so it is saved.
-SalesOrderAddLoaded applySaveDateQuestion(SalesOrderAddLoaded s, SaveDateQuestion q) {
-  if (q is PtpTimeQuestion) {
-    var next = s;
-    for (final line in q.lines) {
-      next = _setDate(next, line.dateField, formDateOf(line.ptp));
-    }
-    return next;
-  }
-  if (q is PickupScheduleQuestion) {
-    var next = s;
-    for (final line in q.lines) {
-      next = line.label == 'Pickup'
-          ? next.copyWith(dtpPickUpdate: formDateOf(line.next), checkBoxValuePickUp: true)
-          : next.copyWith(dtpDeliverydate: formDateOf(line.next), checkBoxValueDelivery: true);
-    }
-    return next;
-  }
-  return s;
+  return next;
 }
 
 SalesOrderAddLoaded _setDate(SalesOrderAddLoaded s, String field, String value) => switch (field) {
@@ -193,10 +113,9 @@ SalesOrderAddLoaded _setDate(SalesOrderAddLoaded s, String field, String value) 
 
 const _months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
-/// `14 Oct 2026`, or `14 Oct 2026 09:00` with [time]; `empty` for null.
-String saveDateText(DateTime? d, {bool time = true}) {
+/// `14 Oct 2026 09:00`; `empty` for null.
+String saveDateText(DateTime? d) {
   if (d == null) return 'empty';
   String two(int n) => n.toString().padLeft(2, '0');
-  final date = '${two(d.day)} ${_months[d.month - 1]} ${d.year}';
-  return time ? '$date ${two(d.hour)}:${two(d.minute)}' : date;
+  return '${two(d.day)} ${_months[d.month - 1]} ${d.year} ${two(d.hour)}:${two(d.minute)}';
 }

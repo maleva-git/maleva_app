@@ -17,12 +17,12 @@ class SalesOrderBloc extends Bloc<SalesOrderEvent, SalesOrderState> {
 
         final newTabIndex = event.type == 0 ? 0 : event.type - 1;
 
-        if (state is InvoiceLoaded) {
+        if (state is InvoiceLoaded && !event.force) {
           final current = state as InvoiceLoaded;
           if (current.selectedTabIndex == newTabIndex) return;
         }
 
-        if (state is InvoiceTabSwitching) {
+        if (state is InvoiceTabSwitching && !event.force) {
           final switching = state as InvoiceTabSwitching;
           if (switching.targetTabIndex == newTabIndex) return;
         }
@@ -167,13 +167,13 @@ class SalesOrderBloc extends Bloc<SalesOrderEvent, SalesOrderState> {
         _ => null,
       };
 
+      // Tab index 0/1/2 is sale-order type 1/2/3 (all / with / without
+      // invoice). Type 0 is invoices (SaleMaster), never this desk.
       if (previousLoaded != null) {
-        add(LoadInvoiceByTypes(previousLoaded.selectedTabIndex + 1 == 1
-            ? 0
-            : previousLoaded.selectedTabIndex + 1));
+        add(LoadInvoiceByTypes(previousLoaded.selectedTabIndex + 1, force: true));
       } else {
         emit(InvoiceLoading());
-        add(LoadInvoiceByTypes(0));
+        add(LoadInvoiceByTypes(1, force: true));
       }
     });
 

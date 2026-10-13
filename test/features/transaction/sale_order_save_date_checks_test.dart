@@ -50,37 +50,9 @@ SalesOrderAddLoaded offJob({String? pickup, String? delivery, String eta = '2026
       dtpDeliverydate: delivery ?? '2026-10-02 09:30:00',
     );
 
-/// The questions before saving (vessel-master-and-ptp-schedule, app task 3.4).
+/// The question before saving (vessel-master-and-ptp-schedule, app task 3.4). Pickup and delivery do not
+/// follow the ETA: the owner removed that question on 2026-10-13.
 void main() {
-  group('planPickupSchedule', () {
-    test('an earlier pickup is offered the day before the ETA, keeping its time', () {
-      final q = planPickupSchedule(offJob(pickup: '2026-10-11 09:00:00', delivery: '2026-10-11 14:00:00'))!;
-
-      expect(q.etaLabel, 'Off ETA');
-      expect(q.targetDay, DateTime(2026, 10, 14));
-      expect(q.lines.map((l) => l.next), [DateTime(2026, 10, 14, 9), DateTime(2026, 10, 14, 14)]);
-      expect(q.bothEmpty, isFalse);
-    });
-
-    test('empty dates are offered at 00:00; dates already the day before ask nothing', () {
-      final empty = planPickupSchedule(offJob())!;
-      expect(empty.bothEmpty, isTrue);
-      expect(empty.lines.map((l) => l.next), [DateTime(2026, 10, 14), DateTime(2026, 10, 14)]);
-
-      expect(planPickupSchedule(offJob(pickup: '2026-10-14 09:00:00', delivery: '2026-10-14 15:00:00')), isNull);
-    });
-
-    test('no ETA, or both vessel sections hidden (general cargo), asks nothing', () {
-      expect(planPickupSchedule(offJob().copyWith(checkBoxValueOETA: false)), isNull);
-      expect(planPickupSchedule(offJob().copyWith(visibleOffVessel: false)), isNull);
-    });
-
-    test('a month end is crossed correctly', () {
-      final q = planPickupSchedule(offJob(eta: '2026-11-01 06:00:00', pickup: '2026-10-28 09:00:00'))!;
-      expect(q.lines.first.next, DateTime(2026, 10, 31, 9));
-    });
-  });
-
   group('planPtpTimes', () {
     final calls = {VesselLeg.off: const LegCall('FM NAMTHONG EXCELLENCE', _call)};
 
@@ -117,56 +89,57 @@ void main() {
     SalesOrderAddLoaded last(SalesOrderAddBloc b) => b.state as SalesOrderAddLoaded;
     Map<String, dynamic> savedBody() => verify(() => saleOrders.save(captureAny())).captured.single as Map<String, dynamic>;
 
+    SalesOrderAddLoaded ptpJob() => offJob(eta: '2026-10-16 10:00:00', pickup: '2026-10-11 09:00:00')
+        .copyWith(savedLegCalls: {VesselLeg.off: const LegCall('FM NAMTHONG EXCELLENCE', _call)});
+
     blocTest<SalesOrderAddBloc, SalesOrderAddState>(
-      'Save stops at the pickup question; "Change" saves pickup and delivery on the day before',
+      'a typed ETA unlike PTP\'s stops the save; "Use PTP\'s times" saves PTP\'s ETA and nothing else is asked',
       build: build,
-      seed: () => offJob(pickup: '2026-10-11 09:00:00'),
+      seed: ptpJob,
       act: (b) async {
         b.add(SaveSalesOrderEvent());
         await Future<void>.delayed(Duration.zero);
-        expect(last(b).saveQuestion, isA<PickupScheduleQuestion>());
+        expect(last(b).saveQuestion, isA<PtpTimeQuestion>());
         verifyNever(() => saleOrders.save(any()));
         b.add(SaveDateQuestionAnswered(true));
       },
       verify: (b) {
         expect(last(b).savedMessage, 'Created Successfully');
+        expect(last(b).saveQuestion, isNull);
         final body = savedBody();
-        expect(body['pickupDate'], '2026-10-14T09:00:00');
-        expect(body['deliveryDate'], '2026-10-14T00:00:00');
-      },
-    );
-
-    blocTest<SalesOrderAddBloc, SalesOrderAddState>(
-      '"Keep my dates" saves them as they are',
-      build: build,
-      seed: () => offJob(pickup: '2026-10-11 09:00:00'),
-      act: (b) async {
-        b.add(SaveSalesOrderEvent());
-        await Future<void>.delayed(Duration.zero);
-        b.add(SaveDateQuestionAnswered(false));
-      },
-      verify: (b) {
-        final body = savedBody();
+        expect(body['oeta'], '2026-10-14T15:00:00');
+        // pickup and delivery do not follow the ETA: saved as typed
         expect(body['pickupDate'], '2026-10-11T09:00:00');
         expect(body['deliveryDate'], isNull);
       },
     );
 
     blocTest<SalesOrderAddBloc, SalesOrderAddState>(
-      'a typed ETA unlike PTP\'s is asked first; "Use PTP\'s times" saves PTP\'s ETA, then the pickup question follows',
+      '"Keep my times" saves the typed ETA',
       build: build,
-      seed: () => offJob(eta: '2026-10-16 10:00:00', pickup: '2026-10-13 09:00:00', delivery: '2026-10-13 09:00:00')
-          .copyWith(savedLegCalls: {VesselLeg.off: const LegCall('FM NAMTHONG EXCELLENCE', _call)}),
+      seed: ptpJob,
       act: (b) async {
         b.add(SaveSalesOrderEvent());
         await Future<void>.delayed(Duration.zero);
-        expect(last(b).saveQuestion, isA<PtpTimeQuestion>());
-        b.add(SaveDateQuestionAnswered(true));
+        b.add(SaveDateQuestionAnswered(false));
       },
       verify: (b) {
-        // PTP's 14 Oct ETA makes 13 Oct the right day, so no pickup question was needed
         expect(last(b).savedMessage, 'Created Successfully');
-        expect(savedBody()['oeta'], '2026-10-14T15:00:00');
+        expect(savedBody()['oeta'], '2026-10-16T10:00:00');
+      },
+    );
+
+    blocTest<SalesOrderAddBloc, SalesOrderAddState>(
+      'pickup and delivery days before the ETA (or empty) save without a question',
+      build: build,
+      seed: () => offJob(pickup: '2026-10-11 09:00:00'),
+      act: (b) => b.add(SaveSalesOrderEvent()),
+      verify: (b) {
+        expect(last(b).savedMessage, 'Created Successfully');
+        expect(last(b).saveQuestion, isNull);
+        final body = savedBody();
+        expect(body['pickupDate'], '2026-10-11T09:00:00');
+        expect(body['deliveryDate'], isNull);
       },
     );
 
@@ -175,7 +148,7 @@ void main() {
       build: build,
       seed: () {
         final loaded = offJob(pickup: '2026-10-11 09:00:00').copyWith(editId: 21732);
-        return loaded.copyWith(ptpSettledKey: ptpTimeKey(loaded), scheduleSettledKey: scheduleKey(loaded));
+        return loaded.copyWith(ptpSettledKey: ptpTimeKey(loaded));
       },
       act: (b) => b.add(SaveSalesOrderEvent()),
       verify: (b) {

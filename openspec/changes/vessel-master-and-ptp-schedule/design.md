@@ -38,6 +38,20 @@ on enquiry, vessel planning and prealert screens.
   check for `VESSEL_ETA_CHANGED` ahead of the forwarding fallback; `/vessel_changes` is a new `GoRoute`.
 - **Models read Java fields directly** (owner's rule 2): new models in `lib/core/vessel_master/` and
   `lib/core/vessel_changes/` with `fromJava`, no `LegacyCallAdapter`.
+- **Pickup and delivery do not follow the ETA** (owner, 2026-10-13): the move request, the pickup
+  fields of `VesselChangeJob`, `MoveResult` / `MoveOutcome` / `PickupMoveReason`, the "Also move
+  pickup and delivery" switch, and the save-time pickup question (`PickupScheduleQuestion`,
+  `scheduleKey`, `scheduleSettledKey`) were removed. `SaveDateQuestionAnswered` and `saveQuestion`
+  stay for the PTP time question, now typed `PtpTimeQuestion?`.
+- **Vessel changes reads "Maleva now → PTP now → update or dismiss"** (owner, 2026-10-13, phone
+  screenshot; the web page is changed the same day with the same texts): one card per vessel call
+  ("PTP: arrives … · departs … (est.) · changed …", the SCN chip, "Update all N jobs to PTP"), per job
+  an "In Maleva" | "PTP now" table for ETA and ETD read from the server's `etaDiffers` / `etdDiffers`
+  (the server applies the threshold), "Use PTP's times" and "Keep mine (dismiss)". The checkboxes and
+  selection state were dropped: the update path, the boarding month confirmation, dismiss, My jobs /
+  My team, "Read PTP now" and "PTP last read" are unchanged. The per-job SCN line is gone (SCN no
+  longer counts as a change; the call's SCN chip stays). Texts live in
+  `lib/core/vessel_changes/vessel_change_look.dart`.
 
 ## Risks / Trade-offs
 

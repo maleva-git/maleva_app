@@ -40,7 +40,6 @@ class PayableMobileDashboard extends StatelessWidget {
       drawer: const Menulist(),
       body: Column(
         children: [
-          const VesselAlertBanner(),
           _buildTabBar(isTablet),
           Expanded(child: _buildTabBarView(context)),
         ],

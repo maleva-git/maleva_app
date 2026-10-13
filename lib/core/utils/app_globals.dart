@@ -376,10 +376,13 @@ class AppGlobals {
   static String channelId = "com.kassapos.maleva.urgent";
   static String channelName = "Maleva alerts";
   static String channelDescription = "this is our MALEVA channel";
-  // Vessel ETA notices (push type VESSEL_ETA_CHANGED) must never be missed: their own channel with a long
-  // vibration at maximum importance. Same id as VESSEL_ANDROID_CHANNEL in the backend's GoogleFcmClient.
-  static const String vesselChannelId = "com.kassapos.maleva.vessel";
-  static const String vesselChannelName = "Vessel ETA alerts";
+  // Vessel alerts must never be missed: their own channel at maximum importance with a long vibration and NO
+  // sound (owner, 2026-10-13: "only vibration is enough"). Same id as VESSEL_ANDROID_CHANNEL in the backend's
+  // GoogleFcmClient. A channel's sound cannot change once made, hence a new id; the earlier vessel channels
+  // (normal sound, then the alarm tone) are deleted at start-up.
+  static const String vesselChannelId = "com.kassapos.maleva.vessel.vibrate";
+  static const List<String> oldVesselChannelIds = ["com.kassapos.maleva.vessel", "com.kassapos.maleva.vessel.alarm"];
+  static const String vesselChannelName = "Vessel alerts";
   static const String vesselChannelDescription = "A vessel's arrival or departure moved: jobs need new dates";
   static String mobiletoken="";
   static getDeviceToken() async {

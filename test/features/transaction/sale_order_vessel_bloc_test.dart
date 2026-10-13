@@ -264,8 +264,6 @@ void main() {
         b.add(VesselPicked(VesselLeg.off, _vessel, call: _call));
         await Future<void>.delayed(Duration.zero);
         b.add(SaveSalesOrderEvent());
-        await Future<void>.delayed(Duration.zero);
-        b.add(SaveDateQuestionAnswered(false)); // the pickup question (O ETA now set): leave empty
       },
       verify: (b) {
         expect(last(b).savedMessage, 'Created Successfully');
@@ -291,8 +289,6 @@ void main() {
         await Future<void>.delayed(Duration.zero);
         b.add(UpdateTextField('txtOffVessel', 'MAERSK RIO NEGRO X'));
         b.add(SaveSalesOrderEvent());
-        await Future<void>.delayed(Duration.zero);
-        b.add(SaveDateQuestionAnswered(false)); // the pickup question (O ETA now set): leave empty
       },
       verify: (b) {
         expect(last(b).savedMessage, 'Updated Successfully');

@@ -52,8 +52,8 @@ class VesselFillAnswered extends SalesOrderAddEvent { final bool replace; Vessel
 class VesselFieldLeft extends SalesOrderAddEvent { final String leg; VesselFieldLeft(this.leg); }
 /// The answer to SalesOrderAddLoaded.didYouMean: [useSuggestion] or keep my spelling.
 class DidYouMeanAnswered extends SalesOrderAddEvent { final bool useSuggestion; DidYouMeanAnswered(this.useSuggestion); }
-/// The answer to SalesOrderAddLoaded.saveQuestion: [change] to PTP's times / the suggested dates, or keep
-/// the user's. Either way the save then continues.
+/// The answer to SalesOrderAddLoaded.saveQuestion: [change] to PTP's times, or keep the user's. Either way
+/// the save then continues.
 class SaveDateQuestionAnswered extends SalesOrderAddEvent { final bool change; SaveDateQuestionAnswered(this.change); }
 
 class AddProduct extends SalesOrderAddEvent {}

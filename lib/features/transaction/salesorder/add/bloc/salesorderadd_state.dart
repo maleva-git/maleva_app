@@ -230,14 +230,13 @@ class SalesOrderAddLoaded extends SalesOrderAddState {
   /// `LEG|TEXT` already asked about, so "Did you mean" is not asked twice for the same text.
   final Set<String> keptSpellings;
 
-  // Questions before saving (save_date_checks.dart).
+  // The question before saving (save_date_checks.dart).
   /// Asked by the view; its answer (SaveDateQuestionAnswered) continues the save.
-  final SaveDateQuestion? saveQuestion;
+  final PtpTimeQuestion? saveQuestion;
   /// The PTP call each leg was saved with (`LOADING` / `OFF`), read when an order is opened.
   final Map<String, LegCall> savedLegCalls;
-  /// ptpTimeKey / scheduleKey as loaded, saved or last answered: nothing is asked while they hold.
+  /// ptpTimeKey as loaded or last answered: nothing is asked while it holds.
   final String? ptpSettledKey;
-  final String? scheduleSettledKey;
 
   SalesOrderAddLoaded({
     this.progress = false, this.showSearch = false,
@@ -279,7 +278,7 @@ class SalesOrderAddLoaded extends SalesOrderAddState {
     this.txtForwarding3S1 = '', this.txtForwarding3S2 = '', this.txtProductCode = '', this.txtProductDescription = '', this.txtProductQty = '',
     this.txtProductSaleRate = '', this.txtProductGst = '', this.txtProductAmount = '', this.fieldPermission = const {}, this.savedMessage, this.isSaved = false,
     this.pickedLoading, this.pickedOff, this.vesselFillQuestion, this.didYouMean, this.keptSpellings = const {},
-    this.saveQuestion, this.savedLegCalls = const {}, this.ptpSettledKey, this.scheduleSettledKey,
+    this.saveQuestion, this.savedLegCalls = const {}, this.ptpSettledKey,
   });
 
   @override
@@ -302,7 +301,7 @@ class SalesOrderAddLoaded extends SalesOrderAddState {
     txtForwarding3S1, txtForwarding3S2, txtProductCode, txtProductDescription, txtProductQty, txtProductSaleRate, txtProductGst,
     txtProductAmount, fieldPermission, savedMessage, isSaved, pickUpUpdateIndex, deliveryUpdateIndex,
     pickedLoading, pickedOff, vesselFillQuestion, didYouMean, keptSpellings,
-    saveQuestion, savedLegCalls, ptpSettledKey, scheduleSettledKey
+    saveQuestion, savedLegCalls, ptpSettledKey
   ];
 
   SalesOrderAddLoaded copyWith({
@@ -350,7 +349,7 @@ class SalesOrderAddLoaded extends SalesOrderAddState {
     Object? pickedLoading = _sentinel, Object? pickedOff = _sentinel, Object? vesselFillQuestion = _sentinel,
     Object? didYouMean = _sentinel, Set<String>? keptSpellings,
     Object? saveQuestion = _sentinel, Map<String, LegCall>? savedLegCalls,
-    Object? ptpSettledKey = _sentinel, Object? scheduleSettledKey = _sentinel,
+    Object? ptpSettledKey = _sentinel,
   }) {
     return SalesOrderAddLoaded(
       progress: progress ?? this.progress, showSearch: showSearch ?? this.showSearch,
@@ -427,11 +426,9 @@ class SalesOrderAddLoaded extends SalesOrderAddState {
       vesselFillQuestion: identical(vesselFillQuestion, _sentinel) ? this.vesselFillQuestion : vesselFillQuestion as VesselFillQuestion?,
       didYouMean: identical(didYouMean, _sentinel) ? this.didYouMean : didYouMean as DidYouMean?,
       keptSpellings: keptSpellings ?? this.keptSpellings,
-      saveQuestion: identical(saveQuestion, _sentinel) ? this.saveQuestion : saveQuestion as SaveDateQuestion?,
+      saveQuestion: identical(saveQuestion, _sentinel) ? this.saveQuestion : saveQuestion as PtpTimeQuestion?,
       savedLegCalls: savedLegCalls ?? this.savedLegCalls,
       ptpSettledKey: identical(ptpSettledKey, _sentinel) ? this.ptpSettledKey : ptpSettledKey as String?,
-      scheduleSettledKey:
-          identical(scheduleSettledKey, _sentinel) ? this.scheduleSettledKey : scheduleSettledKey as String?,
     );
   }
 }

@@ -13,7 +13,6 @@ import 'package:maleva/features/notifications/notification_look.dart';
 import 'package:maleva/features/notifications/notification_routes.dart';
 import 'package:maleva/features/notifications/notifications_cubit.dart';
 import 'package:maleva/features/vessel_changes/push_route.dart';
-import 'package:maleva/features/vessel_changes/vessel_changes_cubit.dart' show vesselTimeText;
 
 /// Opens an app route (GoRouter in the app; a recorder in tests).
 typedef OpenRoute = void Function(BuildContext context, String route);
@@ -25,8 +24,9 @@ ThemeData notificationsTheme() => ThemeData(useMaterial3: true, colorSchemeSeed:
 
 /// Notifications (change vessel-master-and-ptp-schedule), in two separate tabs (owner, 2026-10-13:
 /// vessel ETA notices are never mixed with the others). Vessel: open vessel ETA alerts pinned on top
-/// until the jobs are handled, then the vessel ETA notices. Other: every other notice. Each tab groups
-/// its notices Today / Earlier and has its own count and "Mark all read". Opened from the dashboard
+/// until the jobs are handled, then the vessel notices, both as calm as the web's vessel bell (owner,
+/// 2026-10-13, "not make noise"). Other: every other notice, grouped Today / Earlier. Each tab has its
+/// own count and "Mark all read". Opened from the dashboard
 /// bell (Other) and ship (Vessel); [initialTab] comes from the route's `?tab=vessel|other`.
 class NotificationsPage extends StatelessWidget {
   const NotificationsPage({super.key, this.notices, this.vessels, this.onOpen, this.now, this.initialTab});
@@ -184,12 +184,27 @@ class _TabLabel extends StatelessWidget {
 
 /// One tab's content: Vessel = the pinned "Action needed" alerts, then the vessel notices; Other = the
 /// other notices. Each with pull-to-refresh, its own error with a retry and its own empty state.
-class _NoticeTab extends StatelessWidget {
+class _NoticeTab extends StatefulWidget {
   const _NoticeTab({super.key, required this.group, required this.open, required this.now});
 
   final NoticeGroup group;
   final OpenRoute open;
   final DateTime Function() now;
+
+  @override
+  State<_NoticeTab> createState() => _NoticeTabState();
+}
+
+class _NoticeTabState extends State<_NoticeTab> {
+  /// "Show all N" alert rows (Vessel tab).
+  bool _allAlerts = false;
+
+  /// "Show all" vessel notices instead of the unread ones only.
+  bool _allNotices = false;
+
+  NoticeGroup get group => widget.group;
+  OpenRoute get open => widget.open;
+  DateTime now() => widget.now();
 
   bool get _vessel => group == NoticeGroup.vessel;
 
@@ -212,26 +227,26 @@ class _NoticeTab extends StatelessWidget {
             child: ListView(
               physics: const AlwaysScrollableScrollPhysics(),
               padding: const EdgeInsets.fromLTRB(16, 12, 16, 32),
-              children: [
-                if (_vessel) ...[..._alertSection(context, state, cubit), const SizedBox(height: 24)],
-                ..._noticeSection(context, state, cubit),
-              ],
+              children: _vessel
+                  ? [
+                      ..._alertSection(context, state, cubit),
+                      const SizedBox(height: 20),
+                      ..._vesselNoticeSection(context, state, cubit),
+                    ]
+                  : _noticeSection(context, state, cubit),
             ),
           );
         },
       );
 
+  /// "Action needed" (as the web's vessel bell): a quiet heading and compact rows, mine first, the
+  /// first [firstVesselRows] then "Show all N".
   List<Widget> _alertSection(BuildContext context, NotificationsState state, NotificationsCubit cubit) {
     final alerts = state.alerts ?? const <VesselAlert>[];
+    final shown = _allAlerts ? alerts : alerts.take(firstVesselRows).toList();
     return [
-      _SectionHeader(
-        key: const Key('action_needed_header'),
-        title: 'Action needed',
-        icon: Icons.push_pin_rounded,
-        color: alerts.isEmpty ? null : NoticeColors.alert,
-        count: alerts.length,
-      ),
-      const SizedBox(height: 8),
+      _QuietHeading(key: const Key('action_needed_header'), title: 'Action needed', count: alerts.length),
+      const SizedBox(height: 4),
       if (state.alertsError != null)
         _InlineError(
             key: const Key('vessel_alerts_error'),
@@ -239,27 +254,110 @@ class _NoticeTab extends StatelessWidget {
             message: state.alertsError!,
             onRetry: cubit.load)
       else if (alerts.isEmpty)
-        const _AllClear()
-      else
-        for (final a in alerts)
-          if (a.isLink)
-            _LinkAlertCard(
-              key: ValueKey('link_alert_${a.id}'),
-              alert: a,
-              now: now(),
-              onOpenJob: a.saleOrderId == null ? null : () => open(context, saleOrderEditRoute(a.saleOrderId!)),
-              onClose: () => cubit.closeAlert(a),
-            )
-          else
-            _AlertCard(alert: a, now: now(), onUpdate: () => open(context, _routeFor(a))),
+        const _MutedLine(key: Key('no_vessel_alerts'), text: 'No vessel alerts – all your jobs match PTP.')
+      else ...[
+        _Rows(children: [
+          for (final a in shown)
+            if (a.isLink)
+              _LinkAlertRow(
+                key: ValueKey('link_alert_${a.id}'),
+                alert: a,
+                now: now(),
+                onOpenJob: a.saleOrderId == null ? null : () => open(context, saleOrderEditRoute(a.saleOrderId!)),
+                onClose: () => cubit.closeAlert(a),
+              )
+            else
+              _AlertRow(alert: a, now: now(), onTap: () => open(context, _routeFor(a))),
+        ]),
+        if (alerts.length > firstVesselRows)
+          _QuietButton(
+            key: const Key('show_all_alerts'),
+            text: _allAlerts ? 'Show fewer' : 'Show all ${alerts.length}',
+            onPressed: () => setState(() => _allAlerts = !_allAlerts),
+          ),
+      ],
     ];
   }
 
-  /// "Update jobs": the job's sale order screen for jobs without employee (one job named), else Vessel
-  /// changes in the alert's scope.
+  /// An ETA row's tap (what "Update jobs" did): the job's sale order screen for jobs without employee
+  /// (one job named), else Vessel changes in the alert's scope.
   static String _routeFor(VesselAlert a) {
     if (a.unassigned && a.saleOrderId != null) return saleOrderEditRoute(a.saleOrderId!);
     return a.mine ? vesselChangesPath : vesselChangesTeamPath;
+  }
+
+  void _openNotice(BuildContext context, NotificationsCubit cubit, EmployeeNotification n) {
+    unawaited(cubit.markRead(n));
+    final route = routeForNotice(n);
+    if (route != null) open(context, route);
+  }
+
+  /// The vessel notices (as the web's vessel bell): the unread ones (at most [firstVesselRows]) until
+  /// "Show all"; a "Not handled" notice is left out while its team alert row shows above.
+  List<Widget> _vesselNoticeSection(BuildContext context, NotificationsState state, NotificationsCubit cubit) {
+    final inbox = state.vesselInbox;
+    final error = state.vesselError;
+    if (inbox == null) {
+      return [
+        _InlineError(
+            key: const Key('vessel_notices_error'),
+            title: 'Could not load vessel notices',
+            message: error ?? '',
+            onRetry: cubit.load),
+      ];
+    }
+    final teamVessels = [
+      for (final a in state.alerts ?? const <VesselAlert>[])
+        if (!a.mine) a.vesselName
+    ];
+    // the safety net: a notice of the other group is never shown here
+    final all = withoutShownEscalations([
+      for (final n in inbox.items)
+        if (group.holds(n)) n
+    ], teamVessels);
+    final shown = noticesToShow(all, showAll: _allNotices);
+    final canExpand = all.length > noticesToShow(all, showAll: false).length;
+    final unread = state.vesselUnread;
+    final today = now();
+    final muted = Theme.of(context).colorScheme.onSurfaceVariant;
+    return [
+      // wraps on a narrow phone instead of overflowing
+      Wrap(
+        alignment: WrapAlignment.spaceBetween,
+        crossAxisAlignment: WrapCrossAlignment.center,
+        children: [
+          const _QuietHeading(key: Key('vessel_notices_header'), title: 'Vessel notices'),
+          Wrap(crossAxisAlignment: WrapCrossAlignment.center, spacing: 4, children: [
+            Text(unread > 0 ? '$unread unread' : 'nothing unread',
+                key: const Key('vessel_unread_text'), style: TextStyle(fontSize: 12, color: muted)),
+            if (state.canMarkAll(group))
+              _QuietButton(
+                key: const Key('mark_all_read_vessel'),
+                text: 'Mark all read',
+                tooltip: 'Mark all vessel notices read',
+                onPressed: () => cubit.markAllRead(group),
+              ),
+          ]),
+        ],
+      ),
+      if (error != null) _InlineError(title: 'Could not update vessel notices', message: error, onRetry: cubit.load),
+      if (shown.isNotEmpty)
+        _Rows(children: [
+          for (final n in shown)
+            _VesselNoticeRow(
+                notice: n, time: relativeTime(n.createdAt, today), onTap: () => _openNotice(context, cubit, n)),
+        ]),
+      if (all.isEmpty)
+        const _MutedLine(key: Key('vessel_notices_empty'), text: 'No vessel notices yet.')
+      else if (!_allNotices && shown.isEmpty)
+        const _MutedLine(key: Key('vessel_nothing_unread'), text: 'Nothing unread.'),
+      if (canExpand)
+        _QuietButton(
+          key: const Key('vessel_notices_toggle'),
+          text: _allNotices ? 'Show unread only' : 'Show all',
+          onPressed: () => setState(() => _allNotices = !_allNotices),
+        ),
+    ];
   }
 
   List<Widget> _noticeSection(BuildContext context, NotificationsState state, NotificationsCubit cubit) {
@@ -269,7 +367,7 @@ class _NoticeTab extends StatelessWidget {
       return [
         _InlineError(
             key: Key('${group.wire}_notices_error'),
-            title: _vessel ? 'Could not load vessel notices' : 'Could not load notifications',
+            title: 'Could not load notifications',
             message: error ?? '',
             onRetry: cubit.load),
       ];
@@ -286,15 +384,8 @@ class _NoticeTab extends StatelessWidget {
       final at = n.createdAt;
       (at != null && sameDay(at, today) ? todays : earlier).add(n);
     }
-    Widget tile(EmployeeNotification n) => _NoticeTile(
-          notice: n,
-          time: relativeTime(n.createdAt, today),
-          onTap: () {
-            unawaited(cubit.markRead(n));
-            final route = routeForNotice(n);
-            if (route != null) open(context, route);
-          },
-        );
+    Widget tile(EmployeeNotification n) =>
+        _NoticeTile(notice: n, time: relativeTime(n.createdAt, today), onTap: () => _openNotice(context, cubit, n));
     final w = group.wire;
     return [
       Wrap(
@@ -304,25 +395,21 @@ class _NoticeTab extends StatelessWidget {
         children: [
           _SectionHeader(
             key: Key('${w}_notices_header'),
-            title: _vessel ? 'Vessel notices' : 'Other notices',
-            icon: _vessel ? Icons.directions_boat_filled_rounded : Icons.notifications_none_rounded,
+            title: 'Other notices',
+            icon: Icons.notifications_none_rounded,
             count: state.unreadOf(group),
           ),
           TextButton.icon(
             key: Key('mark_all_read_$w'),
             onPressed: state.canMarkAll(group) ? () => cubit.markAllRead(group) : null,
             icon: const Icon(Icons.done_all_rounded, size: 20),
-            label: Text(_vessel ? 'Mark all vessel notices read' : 'Mark all read'),
+            label: const Text('Mark all read'),
           ),
         ],
       ),
       const SizedBox(height: 4),
-      if (error != null)
-        _InlineError(
-            title: _vessel ? 'Could not update vessel notices' : 'Could not update notifications',
-            message: error,
-            onRetry: cubit.load),
-      if (items.isEmpty) _EmptyNotices(group: group),
+      if (error != null) _InlineError(title: 'Could not update notifications', message: error, onRetry: cubit.load),
+      if (items.isEmpty) const _EmptyNotices(),
       if (todays.isNotEmpty) ...[
         _SectionHeader(key: Key('${w}_today_header'), title: 'Today'),
         const SizedBox(height: 4),
@@ -338,18 +425,18 @@ class _NoticeTab extends StatelessWidget {
   }
 }
 
+/// The Other tab's section heading (the Vessel tab uses the quiet [_QuietHeading]).
 class _SectionHeader extends StatelessWidget {
-  const _SectionHeader({super.key, required this.title, this.icon, this.color, this.count});
+  const _SectionHeader({super.key, required this.title, this.icon, this.count});
 
   final String title;
   final IconData? icon;
-  final Color? color;
   final int? count;
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final c = color ?? theme.colorScheme.onSurfaceVariant;
+    final c = theme.colorScheme.onSurfaceVariant;
     return Row(mainAxisSize: MainAxisSize.min, children: [
       if (icon != null) ...[Icon(icon, size: 18, color: c), const SizedBox(width: 6)],
       Text(title.toUpperCase(),
@@ -366,122 +453,242 @@ class _SectionHeader extends StatelessWidget {
   }
 }
 
-/// One open vessel alert: stays here until the jobs match PTP or are dismissed on Vessel changes.
-class _AlertCard extends StatelessWidget {
-  const _AlertCard({required this.alert, required this.now, required this.onUpdate});
+/// A Vessel tab heading: small grey text in normal case, with a small grey count.
+class _QuietHeading extends StatelessWidget {
+  const _QuietHeading({super.key, required this.title, this.count = 0});
 
-  final VesselAlert alert;
-  final DateTime now;
-  final VoidCallback onUpdate;
+  final String title;
+  final int count;
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final accent = alert.mine ? NoticeColors.alert : NoticeColors.team;
-    final eta =
-        'PTP ETA ${vesselTimeText(alert.arriveAt)}${alert.arriveEstimated && alert.arriveAt != null ? ' est.' : ''}';
-    return Container(
-      key: ValueKey('vessel_alert_${alert.id}'),
-      margin: const EdgeInsets.only(bottom: 12),
-      decoration: BoxDecoration(
-        color: Color.alphaBlend(accent.withValues(alpha: 0.06), theme.colorScheme.surface),
-        borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: accent.withValues(alpha: 0.45), width: 1.2),
-        boxShadow: [BoxShadow(color: accent.withValues(alpha: 0.12), blurRadius: 12, offset: const Offset(0, 4))],
+    final muted = Theme.of(context).colorScheme.onSurfaceVariant;
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 4),
+      child: Row(mainAxisSize: MainAxisSize.min, children: [
+        Flexible(
+          child: Text(title,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(fontSize: 13, fontWeight: FontWeight.w500, color: muted)),
+        ),
+        if (count > 0) ...[
+          const SizedBox(width: 6),
+          Text(count > 99 ? '99+' : '$count',
+              key: const Key('action_needed_count'), style: TextStyle(fontSize: 12, color: muted)),
+        ],
+      ]),
+    );
+  }
+}
+
+/// A small muted line ("Nothing unread.", "No vessel alerts – ...").
+class _MutedLine extends StatelessWidget {
+  const _MutedLine({super.key, required this.text});
+
+  final String text;
+
+  @override
+  Widget build(BuildContext context) => Padding(
+        padding: const EdgeInsets.symmetric(vertical: 8),
+        child: Text(text, style: TextStyle(fontSize: 13, color: Theme.of(context).colorScheme.onSurfaceVariant)),
+      );
+}
+
+/// A quiet text action ("Show all", "Open job", "Not this vessel"): small, blue, no fill.
+class _QuietButton extends StatelessWidget {
+  const _QuietButton({super.key, required this.text, required this.onPressed, this.tooltip, this.busy = false});
+
+  final String text;
+  final VoidCallback? onPressed;
+  final String? tooltip;
+
+  /// Shows a small spinner before the text (and the button is off) while the action runs.
+  final bool busy;
+
+  @override
+  Widget build(BuildContext context) {
+    final button = TextButton(
+      onPressed: busy ? null : onPressed,
+      style: TextButton.styleFrom(
+        minimumSize: const Size(0, 36),
+        padding: const EdgeInsets.symmetric(horizontal: 8),
+        tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+        visualDensity: VisualDensity.compact,
+        textStyle: const TextStyle(fontSize: 13, fontWeight: FontWeight.w500),
       ),
-      clipBehavior: Clip.antiAlias,
-      child: IntrinsicHeight(
-        child: Row(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-          Container(width: 6, color: accent),
-          Expanded(
-            child: Padding(
-              padding: const EdgeInsets.fromLTRB(14, 14, 14, 12),
-              child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                  Container(
-                    width: 44,
-                    height: 44,
-                    decoration:
-                        BoxDecoration(color: accent.withValues(alpha: 0.14), borderRadius: BorderRadius.circular(14)),
-                    child: Icon(Icons.directions_boat_filled_rounded, color: accent, size: 26),
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                      Text(alert.vesselText,
-                          style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w800),
-                          maxLines: 2,
-                          overflow: TextOverflow.ellipsis),
-                      const SizedBox(height: 2),
-                      Text(eta,
-                          style: theme.textTheme.bodyMedium?.copyWith(color: accent, fontWeight: FontWeight.w700)),
-                    ]),
-                  ),
-                  if (!alert.mine && !alert.unassigned) ...[
-                    const SizedBox(width: 8),
-                    Chip(
-                      key: ValueKey('team_chip_${alert.id}'),
-                      avatar: Icon(Icons.groups_rounded, size: 16, color: accent),
-                      label: Text('Team: ${alert.employeeName ?? '#${alert.employeeId}'}'),
-                      labelStyle: TextStyle(color: accent, fontWeight: FontWeight.w700, fontSize: 12),
-                      side: BorderSide(color: accent.withValues(alpha: 0.5)),
-                      backgroundColor: accent.withValues(alpha: 0.08),
-                      visualDensity: VisualDensity.compact,
-                      materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                    ),
-                  ],
-                ]),
-                const SizedBox(height: 12),
-                Wrap(spacing: 8, runSpacing: 6, children: [
-                  if (alert.unassigned) _NoEmployeeBadge(alertId: alert.id, color: accent),
-                  _Fact(
-                      icon: Icons.warning_amber_rounded,
-                      text: '${plural(alert.jobs, 'job')} not updated',
-                      color: accent),
-                  _Fact(icon: Icons.schedule_rounded, text: 'since ${sinceText(alert.sentAt, now)}'),
-                  if (alert.reminders > 0)
-                    _Fact(icon: Icons.notifications_active_outlined, text: 'Reminded ${alert.reminders}×'),
-                  if (alert.mine && alert.escalated)
-                    const _Fact(icon: Icons.supervisor_account_outlined, text: 'Leader told'),
-                ]),
-                const SizedBox(height: 12),
-                Align(
-                  alignment: Alignment.centerRight,
-                  child: FilledButton.icon(
-                    key: ValueKey('update_jobs_${alert.id}'),
-                    style: FilledButton.styleFrom(backgroundColor: accent, foregroundColor: Colors.white),
-                    onPressed: onUpdate,
-                    icon: const Icon(Icons.edit_calendar_rounded, size: 18),
-                    label: const Text('Update jobs'),
-                  ),
-                ),
-              ]),
-            ),
+      child: busy
+          ? Row(mainAxisSize: MainAxisSize.min, children: [
+              const SizedBox(width: 12, height: 12, child: CircularProgressIndicator(strokeWidth: 1.5)),
+              const SizedBox(width: 6),
+              Flexible(child: Text(text, maxLines: 1, overflow: TextOverflow.ellipsis)),
+            ])
+          : Text(text, maxLines: 1, overflow: TextOverflow.ellipsis),
+    );
+    return tooltip == null ? button : Tooltip(message: tooltip!, child: button);
+  }
+}
+
+/// Compact rows on the page's surface, split by thin dividers (no card, no shadow).
+class _Rows extends StatelessWidget {
+  const _Rows({required this.children});
+
+  final List<Widget> children;
+
+  @override
+  Widget build(BuildContext context) {
+    final line = Theme.of(context).colorScheme.outlineVariant;
+    return DecoratedBox(
+      decoration: BoxDecoration(
+          border: Border(top: BorderSide(color: line, width: 0.5), bottom: BorderSide(color: line, width: 0.5))),
+      child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+        for (var i = 0; i < children.length; i++) ...[
+          if (i > 0) Divider(height: 1, thickness: 0.5, color: line),
+          children[i],
+        ],
+      ]),
+    );
+  }
+}
+
+/// An alert row's frame: its only colour, a thin left border ([alertToneOf]).
+class _ToneBorder extends StatelessWidget {
+  const _ToneBorder({super.key, required this.alert, required this.child});
+
+  final VesselAlert alert;
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) => DecoratedBox(
+        decoration: BoxDecoration(border: Border(left: BorderSide(color: alertToneOf(alert), width: 3))),
+        child: child,
+      );
+}
+
+/// Line 1 of an alert row: what it is about, a "No employee" label, and the sent time on the right.
+class _AlertTitle extends StatelessWidget {
+  const _AlertTitle({required this.alert, required this.text, required this.now, this.textKey});
+
+  final VesselAlert alert;
+  final String text;
+  final DateTime now;
+  final Key? textKey;
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    final sent = alertSentLabel(alert.sentAt, now);
+    return Row(crossAxisAlignment: CrossAxisAlignment.center, children: [
+      Expanded(
+        child: Row(children: [
+          Flexible(
+            child: Text(text,
+                key: textKey,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: scheme.onSurface)),
           ),
+          if (alert.unassigned) ...[
+            const SizedBox(width: 6),
+            _NoEmployeeLabel(alertId: alert.id),
+          ],
         ]),
+      ),
+      if (sent.isNotEmpty) ...[
+        const SizedBox(width: 8),
+        Text(sent,
+            key: ValueKey('alert_sent_${alert.id}'),
+            style: TextStyle(
+                fontSize: 12, color: scheme.onSurfaceVariant, fontFeatures: const [FontFeature.tabularFigures()])),
+      ],
+    ]);
+  }
+}
+
+/// Line 2 of an alert row: plain muted details joined by " · ", ending with the team member's name for an
+/// escalated alert (`team_chip_<id>`; nothing when the name is empty). At most two lines, then "…".
+class _AlertDetails extends StatelessWidget {
+  const _AlertDetails({required this.alert, required this.parts, this.textKey});
+
+  final VesselAlert alert;
+  final List<String> parts;
+  final Key? textKey;
+
+  @override
+  Widget build(BuildContext context) {
+    final team = alertTeamName(alert);
+    final text = [...parts, if (team != null) team].where((p) => p.isNotEmpty).join(' · ');
+    final details = Text(text,
+        key: textKey,
+        maxLines: 2,
+        overflow: TextOverflow.ellipsis,
+        style: TextStyle(fontSize: 12.5, height: 1.3, color: Theme.of(context).colorScheme.onSurfaceVariant));
+    return team == null ? details : KeyedSubtree(key: ValueKey('team_chip_${alert.id}'), child: details);
+  }
+}
+
+/// One open ETA alert, pinned until the jobs match PTP or are dismissed on Vessel changes. The whole row
+/// opens them (Vessel changes in the alert's scope, or the one job named).
+class _AlertRow extends StatelessWidget {
+  const _AlertRow({required this.alert, required this.now, required this.onTap});
+
+  final VesselAlert alert;
+  final DateTime now;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final arrival = alertArrival(alert);
+    return _ToneBorder(
+      key: ValueKey('vessel_alert_${alert.id}'),
+      alert: alert,
+      child: InkWell(
+        key: ValueKey('update_jobs_${alert.id}'),
+        onTap: onTap,
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(12, 10, 8, 10),
+          child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            _AlertTitle(alert: alert, text: alert.vesselText, now: now, textKey: ValueKey('alert_title_${alert.id}')),
+            const SizedBox(height: 2),
+            _AlertDetails(
+              alert: alert,
+              textKey: ValueKey('alert_details_${alert.id}'),
+              parts: [
+                'PTP ETA ${arrival.isEmpty ? 'not given' : arrival}',
+                '${plural(alert.jobs, 'job')} not updated',
+              ],
+            ),
+          ]),
+        ),
       ),
     );
   }
 }
 
-/// The jobs of an alert have no employee (sent to a Super Admin; `employeeName` "No employee").
-class _NoEmployeeBadge extends StatelessWidget {
-  const _NoEmployeeBadge({required this.alertId, required this.color});
+/// The jobs of an alert have no employee (sent to a Super Admin; `employeeName` "No employee"): a small
+/// neutral label.
+class _NoEmployeeLabel extends StatelessWidget {
+  const _NoEmployeeLabel({required this.alertId});
 
   final int alertId;
-  final Color color;
 
   @override
-  Widget build(BuildContext context) => KeyedSubtree(
-        key: ValueKey('no_employee_$alertId'),
-        child: _Fact(icon: Icons.person_off_outlined, text: 'No employee', color: color),
-      );
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    return Container(
+      key: ValueKey('no_employee_$alertId'),
+      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1),
+      decoration: BoxDecoration(color: scheme.surfaceContainerHighest, borderRadius: BorderRadius.circular(4)),
+      child: Text('No employee',
+          style: TextStyle(fontSize: 11, fontWeight: FontWeight.w500, color: scheme.onSurfaceVariant)),
+    );
+  }
 }
 
 /// A LINK alert: a job at PTP not linked to its PTP voyage. Stays until the job is linked (on its sale
 /// order screen, "Open job") or closed with "Not this vessel" (`POST /api/vessel-changes/alerts/{id}/close`).
-class _LinkAlertCard extends StatefulWidget {
-  const _LinkAlertCard({super.key, required this.alert, required this.now, required this.onClose, this.onOpenJob});
+class _LinkAlertRow extends StatefulWidget {
+  const _LinkAlertRow({super.key, required this.alert, required this.now, required this.onClose, this.onOpenJob});
 
   final VesselAlert alert;
   final DateTime now;
@@ -493,10 +700,10 @@ class _LinkAlertCard extends StatefulWidget {
   final Future<String?> Function() onClose;
 
   @override
-  State<_LinkAlertCard> createState() => _LinkAlertCardState();
+  State<_LinkAlertRow> createState() => _LinkAlertRowState();
 }
 
-class _LinkAlertCardState extends State<_LinkAlertCard> {
+class _LinkAlertRowState extends State<_LinkAlertRow> {
   bool _closing = false;
 
   Future<void> _close() async {
@@ -512,156 +719,115 @@ class _LinkAlertCardState extends State<_LinkAlertCard> {
     }
   }
 
+  /// "MAERSK NOBERG → 642N, ETA 19 Oct 00:00 (est.)", or the vessel and "No PTP voyage suggested".
+  static List<String> _suggestion(VesselAlert alert) {
+    final voyage = alert.voyage?.trim() ?? '';
+    if (voyage.isEmpty) return [alert.vesselName, 'No PTP voyage suggested'];
+    final arrival = alertArrival(alert);
+    return ['${alert.vesselName} → $voyage${arrival.isEmpty ? '' : ', ETA $arrival'}'];
+  }
+
   @override
   Widget build(BuildContext context) {
     final alert = widget.alert;
-    final theme = Theme.of(context);
-    final accent = alert.mine ? NoticeColors.vessel : NoticeColors.team;
-    final suggested = alert.voyage == null && alert.arriveAt == null
-        ? 'No PTP voyage suggested'
-        : 'PTP: ${alert.voyage ?? alert.vesselName}'
-            '${alert.arriveAt == null ? '' : ' · arrives ${vesselTimeText(alert.arriveAt)}'}'
-            '${alert.arriveEstimated && alert.arriveAt != null ? ' est.' : ''}';
-    return Container(
-      margin: const EdgeInsets.only(bottom: 12),
-      decoration: BoxDecoration(
-        color: Color.alphaBlend(accent.withValues(alpha: 0.06), theme.colorScheme.surface),
-        borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: accent.withValues(alpha: 0.45), width: 1.2),
-      ),
-      clipBehavior: Clip.antiAlias,
-      child: IntrinsicHeight(
-        child: Row(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-          Container(width: 6, color: accent),
-          Expanded(
-            child: Padding(
-              padding: const EdgeInsets.fromLTRB(14, 14, 14, 12),
-              child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                  Container(
-                    width: 44,
-                    height: 44,
-                    decoration:
-                        BoxDecoration(color: accent.withValues(alpha: 0.14), borderRadius: BorderRadius.circular(14)),
-                    child: Icon(Icons.link_rounded, color: accent, size: 26),
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                      Text('Pick the PTP voyage: job ${alert.jobNo ?? '-'}',
-                          key: ValueKey('link_alert_title_${alert.id}'),
-                          style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w800),
-                          maxLines: 2,
-                          overflow: TextOverflow.ellipsis),
-                      const SizedBox(height: 2),
-                      Text(alert.vesselName,
-                          style: theme.textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w700),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis),
-                      Text(suggested,
-                          key: ValueKey('link_alert_suggested_${alert.id}'),
-                          style: theme.textTheme.bodyMedium?.copyWith(color: accent, fontWeight: FontWeight.w600)),
-                    ]),
-                  ),
-                  if (!alert.mine && !alert.unassigned) ...[
-                    const SizedBox(width: 8),
-                    Chip(
-                      key: ValueKey('team_chip_${alert.id}'),
-                      avatar: Icon(Icons.groups_rounded, size: 16, color: accent),
-                      label: Text('Team: ${alert.employeeName ?? '#${alert.employeeId}'}'),
-                      labelStyle: TextStyle(color: accent, fontWeight: FontWeight.w700, fontSize: 12),
-                      side: BorderSide(color: accent.withValues(alpha: 0.5)),
-                      backgroundColor: accent.withValues(alpha: 0.08),
-                      visualDensity: VisualDensity.compact,
-                      materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                    ),
-                  ],
-                ]),
-                const SizedBox(height: 12),
-                Wrap(spacing: 8, runSpacing: 6, children: [
-                  if (alert.unassigned) _NoEmployeeBadge(alertId: alert.id, color: accent),
-                  _Fact(icon: Icons.schedule_rounded, text: 'since ${sinceText(alert.sentAt, widget.now)}'),
-                  if (alert.reminders > 0)
-                    _Fact(icon: Icons.notifications_active_outlined, text: 'Reminded ${alert.reminders}×'),
-                  if (alert.mine && alert.escalated)
-                    const _Fact(icon: Icons.supervisor_account_outlined, text: 'Leader told'),
-                ]),
-                const SizedBox(height: 12),
-                Wrap(alignment: WrapAlignment.end, spacing: 8, runSpacing: 6, children: [
-                  OutlinedButton.icon(
-                    key: ValueKey('close_alert_${alert.id}'),
-                    onPressed: _closing ? null : _close,
-                    icon: _closing
-                        ? const SizedBox(width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2))
-                        : const Icon(Icons.close_rounded, size: 18),
-                    label: const Text('Not this vessel'),
-                  ),
-                  if (widget.onOpenJob != null)
-                    FilledButton.icon(
-                      key: ValueKey('open_job_${alert.id}'),
-                      style: FilledButton.styleFrom(backgroundColor: accent, foregroundColor: Colors.white),
-                      onPressed: widget.onOpenJob,
-                      icon: const Icon(Icons.open_in_new_rounded, size: 18),
-                      label: const Text('Open job'),
-                    ),
-                ]),
-              ]),
-            ),
+    return _ToneBorder(
+      alert: alert,
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(12, 10, 8, 4),
+        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          _AlertTitle(
+            alert: alert,
+            text: 'Pick PTP voyage · job ${alert.jobNo ?? ''}'.trim(),
+            now: widget.now,
+            textKey: ValueKey('link_alert_title_${alert.id}'),
           ),
+          const SizedBox(height: 2),
+          _AlertDetails(alert: alert, parts: _suggestion(alert), textKey: ValueKey('link_alert_suggested_${alert.id}')),
+          Wrap(spacing: 4, children: [
+            if (widget.onOpenJob != null)
+              _QuietButton(key: ValueKey('open_job_${alert.id}'), text: 'Open job', onPressed: widget.onOpenJob),
+            _QuietButton(
+                key: ValueKey('close_alert_${alert.id}'), text: 'Not this vessel', busy: _closing, onPressed: _close),
+          ]),
         ]),
       ),
     );
   }
 }
 
-class _Fact extends StatelessWidget {
-  const _Fact({required this.icon, required this.text, this.color});
+/// One vessel notice (as the web): a small blue dot while unread, a small grey ship (red only for
+/// system problems), the title (medium while unread), one line of body and the time.
+class _VesselNoticeRow extends StatelessWidget {
+  const _VesselNoticeRow({required this.notice, required this.time, required this.onTap});
 
-  final IconData icon;
-  final String text;
-  final Color? color;
+  final EmployeeNotification notice;
+  final String time;
+  final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
-    final c = color ?? scheme.onSurfaceVariant;
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-      decoration: BoxDecoration(color: scheme.surfaceContainerHighest, borderRadius: BorderRadius.circular(20)),
-      child: Row(mainAxisSize: MainAxisSize.min, children: [
-        Icon(icon, size: 15, color: c),
-        const SizedBox(width: 5),
-        Flexible(
-          child: Text(text,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              style: TextStyle(fontSize: 12.5, color: c, fontWeight: FontWeight.w600)),
-        ),
-      ]),
-    );
-  }
-}
-
-class _AllClear extends StatelessWidget {
-  const _AllClear();
-
-  @override
-  Widget build(BuildContext context) => Container(
-        key: const Key('no_vessel_alerts'),
-        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-        decoration: BoxDecoration(
-          color: NoticeColors.allClear.withValues(alpha: 0.08),
-          borderRadius: BorderRadius.circular(12),
-        ),
-        child: const Row(children: [
-          Icon(Icons.check_circle_rounded, color: NoticeColors.allClear, size: 20),
-          SizedBox(width: 10),
+    final unread = !notice.read;
+    final body = notice.body?.trim() ?? '';
+    return InkWell(
+      key: ValueKey('notice_${notice.id}'),
+      onTap: onTap,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 10),
+        child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          Padding(
+            padding: const EdgeInsets.only(top: 6),
+            child: SizedBox(
+              width: 6,
+              height: 6,
+              child: unread
+                  ? DecoratedBox(
+                      key: ValueKey('unread_dot_${notice.id}'),
+                      decoration: const BoxDecoration(color: NoticeColors.vessel, shape: BoxShape.circle),
+                    )
+                  : null,
+            ),
+          ),
+          const SizedBox(width: 8),
+          Padding(
+            padding: const EdgeInsets.only(top: 1),
+            child: Icon(Icons.directions_boat_outlined,
+                key: ValueKey('notice_icon_${notice.id}'),
+                size: 16,
+                color: isSystemNotice(notice) ? NoticeColors.alert : scheme.outline),
+          ),
+          const SizedBox(width: 8),
           Expanded(
-            child: Text('No vessel alerts – all jobs match PTP',
-                style: TextStyle(color: NoticeColors.allClear, fontWeight: FontWeight.w600)),
+            child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                Expanded(
+                  child: Text(
+                    notice.title,
+                    key: ValueKey('notice_title_${notice.id}'),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(
+                      fontSize: 13.5,
+                      fontWeight: unread ? FontWeight.w500 : FontWeight.w400,
+                      color: unread ? scheme.onSurface : scheme.onSurfaceVariant,
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 8),
+                Text(time, style: TextStyle(fontSize: 11.5, color: scheme.onSurfaceVariant)),
+              ]),
+              if (body.isNotEmpty)
+                Text(body,
+                    key: ValueKey('notice_body_${notice.id}'),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(fontSize: 12.5, color: scheme.onSurfaceVariant)),
+            ]),
           ),
         ]),
-      );
+      ),
+    );
+  }
 }
 
 class _NoticeTile extends StatelessWidget {
@@ -742,29 +908,22 @@ class _NoticeTile extends StatelessWidget {
   }
 }
 
+/// The Other tab's empty state (the Vessel tab says "No vessel notices yet." in a muted line).
 class _EmptyNotices extends StatelessWidget {
-  const _EmptyNotices({required this.group});
-
-  final NoticeGroup group;
+  const _EmptyNotices();
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final vessel = group == NoticeGroup.vessel;
     return Padding(
-      key: Key('${group.wire}_notices_empty'),
+      key: const Key('other_notices_empty'),
       padding: const EdgeInsets.symmetric(vertical: 40),
       child: Column(children: [
-        Icon(vessel ? Icons.directions_boat_outlined : Icons.notifications_off_outlined,
-            size: 52, color: theme.colorScheme.outline),
+        Icon(Icons.notifications_off_outlined, size: 52, color: theme.colorScheme.outline),
         const SizedBox(height: 12),
-        Text(vessel ? 'No vessel ETA notices yet.' : 'No other notices yet.',
-            style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700)),
+        Text('No other notices yet.', style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700)),
         const SizedBox(height: 4),
-        Text(
-            vessel
-                ? 'Vessel ETA changes for your jobs will show here.'
-                : 'Forwarding and other notices will show here.',
+        Text('Forwarding and other notices will show here.',
             textAlign: TextAlign.center,
             style: theme.textTheme.bodyMedium?.copyWith(color: theme.colorScheme.onSurfaceVariant)),
       ]),

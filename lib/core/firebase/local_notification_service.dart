@@ -40,9 +40,13 @@ class LocalNotificationService {
       playSound: true,
       showBadge: false,
     ));
-    // Vessel ETA notices: on Android 8+ the channel decides vibration, and a channel cannot be changed
-    // once made, so this one has its own id with the long pattern from the start.
+    // Vessel alerts: on Android 8+ the channel decides sound and vibration, and a channel cannot be changed
+    // once made, so this one has its own id: the long vibration, no sound.
     await android?.createNotificationChannel(vesselChannel);
+    // the earlier vessel channels (normal sound, then the alarm tone) are replaced by this one
+    for (final old in AppGlobals.oldVesselChannelIds) {
+      await android?.deleteNotificationChannel(old);
+    }
   }
 
   /// A long vibration: 1 s, pause, 1 s, pause, 1.5 s, pause, 2 s.
@@ -53,7 +57,7 @@ class LocalNotificationService {
     AppGlobals.vesselChannelName,
     description: AppGlobals.vesselChannelDescription,
     importance: Importance.max,
-    playSound: true,
+    playSound: false,
     enableVibration: true,
     vibrationPattern: vesselVibration,
     enableLights: true,
@@ -61,15 +65,15 @@ class LocalNotificationService {
     showBadge: true,
   );
 
-  /// How a vessel ETA notice is shown while the app is open: the vessel channel, and insistent (sound and
-  /// vibration repeat until the notice is opened or swiped away), so it is not missed.
+  /// How a vessel notice is shown while the app is open: the vessel channel, no sound, and insistent (the
+  /// vibration repeats until the notice is opened or swiped away), so it is not missed.
   static AndroidNotificationDetails vesselDetails({StyleInformation? style}) => AndroidNotificationDetails(
         AppGlobals.vesselChannelId,
         AppGlobals.vesselChannelName,
         channelDescription: AppGlobals.vesselChannelDescription,
         importance: Importance.max,
         priority: Priority.max,
-        playSound: true,
+        playSound: false,
         enableVibration: true,
         vibrationPattern: vesselVibration,
         category: AndroidNotificationCategory.reminder,
@@ -175,7 +179,8 @@ class LocalNotificationService {
           presentAlert: true, // Present an alert when the notification is displayed and the application is in the foreground (only from iOS 10 onwards)
           presentBadge: false, // DO NOT present the badge number when the notification is displayed
           presentSound: true, // Play a sound when the notification is displayed and the application is in the foreground (only from iOS 10 onwards)
-          // sound: String?,  // Specifics the file path to play (only from iOS 10 onwards)
+          // vessel alerts: the iPhone's default notification sound (iOS vibrates only together with a sound;
+          // with the ringer switch on silent it is vibration only)
           badgeNumber: 0, // Set badge to 0
           // The application's icon badge number
           // attachments: List<IOSNotificationAttachment>?, (only from iOS 10 onwards)

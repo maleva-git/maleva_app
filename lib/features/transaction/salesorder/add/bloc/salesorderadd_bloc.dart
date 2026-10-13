@@ -66,7 +66,6 @@ class SalesOrderAddBloc extends Bloc<SalesOrderAddEvent, SalesOrderAddState> {
             savedLegCalls: await _savedLegCalls(base.editId),
             // the order as loaded counts as answered: an unrelated edit asks nothing
             ptpSettledKey: ptpTimeKey(base),
-            scheduleSettledKey: scheduleKey(base),
           );
         } else if (event.enquiry != null) {
           base = await _loadMasterData(base, EnquiryApi.asSaleOrder(event.enquiry!), isEnquiry: true);
@@ -453,10 +452,8 @@ class SalesOrderAddBloc extends Bloc<SalesOrderAddEvent, SalesOrderAddState> {
       final s = state as SalesOrderAddLoaded;
       final q = s.saveQuestion;
       if (q == null) return;
-      final answered = event.change ? applySaveDateQuestion(s, q) : s;
-      emit(q is PtpTimeQuestion
-          ? answered.copyWith(saveQuestion: null, ptpSettledKey: ptpTimeKey(answered))
-          : answered.copyWith(saveQuestion: null, scheduleSettledKey: scheduleKey(answered)));
+      final answered = event.change ? applyPtpTimes(s, q) : s;
+      emit(answered.copyWith(saveQuestion: null, ptpSettledKey: ptpTimeKey(answered)));
       add(SaveSalesOrderEvent());
     });
 
@@ -468,15 +465,11 @@ class SalesOrderAddBloc extends Bloc<SalesOrderAddEvent, SalesOrderAddState> {
       if (s.txtJobType.isEmpty) { emit(s.copyWith(savedMessage: 'Enter Job Type')); return; }
       if (s.productViewList.isEmpty) { emit(s.copyWith(savedMessage: 'Add Product Details')); return; }
 
-      // Questions before saving (save_date_checks.dart): each answer continues the save.
+      // The question before saving (save_date_checks.dart): either answer continues the save.
       if (s.saveQuestion != null) return;
       if (ptpTimeKey(s) != s.ptpSettledKey) {
         final ptp = planPtpTimes(s, _legCalls(s));
         if (ptp != null) { emit(s.copyWith(saveQuestion: ptp, savedMessage: null)); return; }
-      }
-      if (scheduleKey(s) != s.scheduleSettledKey) {
-        final pickup = planPickupSchedule(s);
-        if (pickup != null) { emit(s.copyWith(saveQuestion: pickup, savedMessage: null)); return; }
       }
 
       // SYNC PICKUP

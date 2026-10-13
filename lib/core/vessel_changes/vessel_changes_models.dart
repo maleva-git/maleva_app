@@ -55,18 +55,7 @@ class PtpChange {
   final String? seenAt;
 }
 
-/// Why a leg's pickup and delivery cannot move with the ETA (`pickupMoveReason`); null means it can.
-class PickupMoveReason {
-  PickupMoveReason._();
-
-  static const String planned = 'PLANNED';
-  static const String collected = 'COLLECTED';
-  static const String past = 'PAST';
-  static const String noDates = 'NO_DATES';
-  static const String notThisLeg = 'NOT_THIS_LEG';
-}
-
-/// One job's leg on a vessel call: Maleva's times against PTP's, and the pickup/delivery suggestion.
+/// One job's leg on a vessel call: Maleva's times against PTP's.
 /// Times are the Java strings (`yyyy-MM-dd'T'HH:mm`) so PTP's can be sent back unchanged.
 class VesselChangeJob {
   const VesselChangeJob({
@@ -86,12 +75,6 @@ class VesselChangeJob {
     this.etaDiffers = false,
     this.etdDiffers = false,
     this.scnDiffers = false,
-    this.pickupDate,
-    this.deliveryDate,
-    this.suggestedPickupDate,
-    this.suggestedDeliveryDate,
-    this.pickupMoveReason,
-    this.plannedDate,
     this.boardingMonthFrom,
     this.boardingMonthTo,
   });
@@ -113,12 +96,6 @@ class VesselChangeJob {
         etaDiffers: JsonRead.boolean(m['etaDiffers']),
         etdDiffers: JsonRead.boolean(m['etdDiffers']),
         scnDiffers: JsonRead.boolean(m['scnDiffers']),
-        pickupDate: JsonRead.stringOrNull(m['pickupDate']),
-        deliveryDate: JsonRead.stringOrNull(m['deliveryDate']),
-        suggestedPickupDate: JsonRead.stringOrNull(m['suggestedPickupDate']),
-        suggestedDeliveryDate: JsonRead.stringOrNull(m['suggestedDeliveryDate']),
-        pickupMoveReason: JsonRead.stringOrNull(m['pickupMoveReason']),
-        plannedDate: JsonRead.stringOrNull(m['plannedDate']),
         boardingMonthFrom: JsonRead.stringOrNull(m['boardingMonthFrom']),
         boardingMonthTo: JsonRead.stringOrNull(m['boardingMonthTo']),
       );
@@ -141,28 +118,11 @@ class VesselChangeJob {
   final bool etaDiffers;
   final bool etdDiffers;
   final bool scnDiffers;
-  final String? pickupDate;
-  final String? deliveryDate;
-
-  /// Null when it cannot move, or for an OFF leg.
-  final String? suggestedPickupDate;
-  final String? suggestedDeliveryDate;
-
-  /// Null (can move) or one of [PickupMoveReason].
-  final String? pickupMoveReason;
-
-  /// With PLANNED: the planning sheet's pickup date.
-  final String? plannedDate;
-
   /// `2026-10` / `2026-11` when the boarding pay would move to another month.
   final String? boardingMonthFrom;
   final String? boardingMonthTo;
 
   bool get isLoading => leg == VesselLeg.loading;
-
-  /// The pickup and delivery can move with this leg's ETA. The server decides the leg: the loading
-  /// leg, or the off leg when it is the job's only leg at PTP (`NOT_THIS_LEG` otherwise).
-  bool get canMovePickup => pickupMoveReason == null;
 
   /// The boarding pay would move to another month: the row waits for the user's confirmation.
   bool get boardingMonthChanges => boardingMonthFrom != null || boardingMonthTo != null;
@@ -225,46 +185,6 @@ class BulkUpdateResult {
   final int updated;
   final int skipped;
   final List<BulkJobResult> results;
-}
-
-/// The outcome of moving one job's pickup and delivery.
-class MoveOutcome {
-  MoveOutcome._();
-
-  static const String moved = 'MOVED';
-  static const String planned = 'PLANNED';
-  static const String collected = 'COLLECTED';
-  static const String past = 'PAST';
-  static const String noDates = 'NO_DATES';
-  static const String notThisLeg = 'NOT_THIS_LEG';
-  static const String unreadableTimes = 'UNREADABLE_TIMES';
-  static const String notFound = 'NOT_FOUND';
-
-  /// An unexpected error on that job; nothing of it changed.
-  static const String failed = 'FAILED';
-}
-
-/// One line of `POST /api/vessel-changes/move-pickup-delivery`.
-class MoveResult {
-  const MoveResult({required this.saleOrderId, this.jobNo, required this.outcome, this.pickupDate, this.deliveryDate});
-
-  factory MoveResult.fromJava(Map<String, dynamic> m) => MoveResult(
-        saleOrderId: JsonRead.integer(m['saleOrderId']),
-        jobNo: JsonRead.stringOrNull(m['jobNo']),
-        outcome: JsonRead.string(m['outcome']),
-        pickupDate: JsonRead.stringOrNull(m['pickupDate']),
-        deliveryDate: JsonRead.stringOrNull(m['deliveryDate']),
-      );
-
-  final int saleOrderId;
-  final String? jobNo;
-
-  /// One of [MoveOutcome].
-  final String outcome;
-  final String? pickupDate;
-  final String? deliveryDate;
-
-  bool get moved => outcome == MoveOutcome.moved;
 }
 
 /// The kind of a vessel alert (`kind` of `GET /api/vessel-changes/alerts`).

@@ -41,14 +41,6 @@ class VesselChangesApi {
       JsonRead.boolean(JsonRead.map(await _send(() => _dio.post<dynamic>('/api/vessel-changes/dismiss',
           data: {'saleOrderId': saleOrderId, 'leg': leg, 'ptpVesselCallId': ptpVesselCallId})))['dismissed']);
 
-  /// `POST /api/vessel-changes/move-pickup-delivery`: moves the jobs' pickup and delivery to the day
-  /// before the call's arrival (times kept). One result per job.
-  Future<List<MoveResult>> movePickupDelivery({required int ptpVesselCallId, required List<int> saleOrderIds}) async =>
-      JsonRead.listOfMaps(JsonRead.map(await _send(() => _dio.post<dynamic>('/api/vessel-changes/move-pickup-delivery',
-              data: {'ptpVesselCallId': ptpVesselCallId, 'saleOrderIds': saleOrderIds})))['results'])
-          .map(MoveResult.fromJava)
-          .toList();
-
   /// Writes PTP's [eta] / [etd] on the jobs of one [leg] through the existing
   /// `POST /api/vessel-plannings/sale-order-update-many` (not wrapped in ApiResponse). Only that leg's
   /// two dates are sent (loading `eta`/`etd`, off `oeta`/`oetd`); a null date is left out, which keeps

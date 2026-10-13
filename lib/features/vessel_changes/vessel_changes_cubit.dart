@@ -1,12 +1,13 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 import 'package:maleva/core/logging/app_logger.dart';
+import 'package:maleva/core/vessel_changes/vessel_change_look.dart';
 import 'package:maleva/core/vessel_changes/vessel_changes_api.dart';
 import 'package:maleva/core/vessel_changes/vessel_changes_models.dart';
 import 'package:maleva/core/vessel_master/vessel_master_models.dart';
 import 'package:maleva/features/notifications/notification_signals.dart';
 
-/// A job's leg on one vessel call, as the screen selects it.
+/// A job's leg on one vessel call, as the screen keys it.
 String vesselJobKey(int callId, VesselChangeJob job) => '$callId|${job.saleOrderId}|${job.leg}';
 
 /// A Java vessel time (`yyyy-MM-dd'T'HH:mm`) shown as "15 Oct 08:00"; "-" for none.
@@ -21,60 +22,18 @@ String boardingMonthText(String? value) {
   return d == null ? (value ?? '-') : DateFormat('MMM yyyy').format(d);
 }
 
-/// Why a leg's pickup and delivery do not move, in words; null when they can or the job's other leg moves them.
-String? pickupReasonText(VesselChangeJob job) {
-  switch (job.pickupMoveReason) {
-    case PickupMoveReason.planned:
-      return 'Planned for ${vesselTimeText(job.plannedDate)}, re-plan in Planning';
-    case PickupMoveReason.collected:
-      return 'Already collected';
-    case PickupMoveReason.past:
-      return 'Date in the past';
-    case PickupMoveReason.noDates:
-      return 'No pickup or delivery date';
-    default:
-      return null;
-  }
-}
-
-/// A move request's outcome, in words.
-String moveOutcomeText(MoveResult r) {
-  switch (r.outcome) {
-    case MoveOutcome.moved:
-      return 'Pickup and delivery moved';
-    case MoveOutcome.planned:
-      return 'Planned, re-plan in Planning';
-    case MoveOutcome.collected:
-      return 'Already collected';
-    case MoveOutcome.past:
-      return 'Date in the past';
-    case MoveOutcome.noDates:
-      return 'No pickup or delivery date';
-    case MoveOutcome.notThisLeg:
-      return "Follows the job's other leg";
-    case MoveOutcome.unreadableTimes:
-      return 'Pickup or delivery time could not be read';
-    case MoveOutcome.notFound:
-      return 'Job not found';
-    case MoveOutcome.failed:
-      return 'Failed, nothing changed';
-    default:
-      return r.outcome; // an outcome this app does not know yet: shown by its code
-  }
-}
-
 class VesselChangesState {
   const VesselChangesState({
     this.scope = 'me',
     this.data,
     this.loading = false,
     this.error,
-    this.selected = const {},
     this.confirmedBoarding = const {},
-    this.movePickupDelivery = true,
     this.busy = false,
     this.notes = const [],
     this.refused = const {},
+    this.done,
+    this.doneSeq = 0,
   });
 
   /// `me` (My jobs) or `team` (My team).
@@ -85,23 +44,22 @@ class VesselChangesState {
   /// The server's message when the list could not be loaded (the screen shows it with a retry).
   final String? error;
 
-  /// [vesselJobKey]s ticked for "Update these jobs".
-  final Set<String> selected;
-
   /// Rows whose boarding month change the user confirmed.
   final Set<String> confirmedBoarding;
-
-  /// "Also move pickup and delivery" (on by default).
-  final bool movePickupDelivery;
 
   /// An update or dismiss is running.
   final bool busy;
 
-  /// What the last update did: jobs updated, refused (named, with why), held, to re-plan.
+  /// What the last update did: jobs updated, refused (named, with why), held.
   final List<String> notes;
 
   /// Why a listed job was not updated (by [vesselJobKey]), shown on its row.
   final Map<String, String> refused;
+
+  /// What the last update did, for the snackbar ("MY002605808 updated to PTP's times"); shown once per
+  /// [doneSeq].
+  final String? done;
+  final int doneSeq;
 
   VesselChangesState copyWith({
     String? scope,
@@ -110,30 +68,30 @@ class VesselChangesState {
     bool? loading,
     String? error,
     bool clearError = false,
-    Set<String>? selected,
     Set<String>? confirmedBoarding,
-    bool? movePickupDelivery,
     bool? busy,
     List<String>? notes,
     Map<String, String>? refused,
+    String? done,
+    int? doneSeq,
   }) =>
       VesselChangesState(
         scope: scope ?? this.scope,
         data: clearData ? null : (data ?? this.data),
         loading: loading ?? this.loading,
         error: clearError ? null : (error ?? this.error),
-        selected: selected ?? this.selected,
         confirmedBoarding: confirmedBoarding ?? this.confirmedBoarding,
-        movePickupDelivery: movePickupDelivery ?? this.movePickupDelivery,
         busy: busy ?? this.busy,
         notes: notes ?? this.notes,
         refused: refused ?? this.refused,
+        done: done ?? this.done,
+        doneSeq: doneSeq ?? this.doneSeq,
       );
 }
 
 /// The "Vessel changes" screen (shared `/api/vessel-changes`, change vessel-master-and-ptp-schedule):
-/// load, select, apply PTP's times through the Vessel Planning bulk update, move pickup and delivery,
-/// dismiss.
+/// load, apply PTP's times (one job, or all jobs of a vessel call) through the Vessel Planning bulk update,
+/// dismiss. Pickup and delivery are not moved with the ETA (the owner removed that on 2026-10-13).
 class VesselChangesCubit extends Cubit<VesselChangesState> {
   /// [scope] is the scope the screen opens with (`team` from a leader's "Not handled" notice).
   VesselChangesCubit(this._api, {String scope = 'me'}) : super(VesselChangesState(scope: scope, loading: true));
@@ -148,7 +106,6 @@ class VesselChangesCubit extends Cubit<VesselChangesState> {
       loading: true,
       clearError: true,
       clearData: changingScope,
-      selected: changingScope ? const {} : null,
       notes: changingScope ? const [] : null,
       refused: changingScope ? const {} : null,
     ));
@@ -162,7 +119,6 @@ class VesselChangesCubit extends Cubit<VesselChangesState> {
       emit(state.copyWith(
         data: data,
         loading: false,
-        selected: state.selected.intersection(keys),
         confirmedBoarding: state.confirmedBoarding.intersection(keys),
         refused: {for (final e in state.refused.entries) if (keys.contains(e.key)) e.key: e.value},
       ));
@@ -172,29 +128,21 @@ class VesselChangesCubit extends Cubit<VesselChangesState> {
     }
   }
 
-  void toggle(VesselChangeGroup group, VesselChangeJob job, bool on) {
-    final key = vesselJobKey(group.call.id, job);
-    emit(state.copyWith(selected: on ? {...state.selected, key} : ({...state.selected}..remove(key))));
-  }
-
-  void selectAll(VesselChangeGroup group, bool on) {
-    final keys = {for (final j in group.jobs) vesselJobKey(group.call.id, j)};
-    emit(state.copyWith(selected: on ? {...state.selected, ...keys} : state.selected.difference(keys)));
-  }
-
   /// The user agrees the boarding pay may move to the other month; the row can now be updated.
   void confirmBoarding(VesselChangeGroup group, VesselChangeJob job) =>
       emit(state.copyWith(confirmedBoarding: {...state.confirmedBoarding, vesselJobKey(group.call.id, job)}));
 
-  void setMovePickupDelivery(bool on) => emit(state.copyWith(movePickupDelivery: on));
+  /// "Update all N jobs to PTP": every job of [group].
+  Future<void> update(VesselChangeGroup group) => _apply(group, group.jobs);
 
-  /// "Update these jobs" for the selected rows of [group]: PTP's ETA and ETD through the bulk update
-  /// (one request per leg type and PTP time pair, only that leg's two dates), then - with "Also move
-  /// pickup and delivery" on - the move request for the legs whose update was ok and whose
-  /// pickup can move. Rows with an unconfirmed boarding month change wait. Then the list reloads.
-  Future<void> update(VesselChangeGroup group) async {
+  /// "Use PTP's times" on one job: only that job.
+  Future<void> updateJob(VesselChangeGroup group, VesselChangeJob job) => _apply(group, [job]);
+
+  /// PTP's ETA and ETD on [chosen] through the bulk update (one request per leg type and PTP time pair,
+  /// only that leg's two dates). Rows with an unconfirmed boarding month change wait. The updated jobs
+  /// are said in a snackbar, refused and held ones in the notes; then the list reloads.
+  Future<void> _apply(VesselChangeGroup group, List<VesselChangeJob> chosen) async {
     final callId = group.call.id;
-    final chosen = [for (final j in group.jobs) if (state.selected.contains(vesselJobKey(callId, j))) j];
     if (chosen.isEmpty || state.busy) return;
     final held = [
       for (final j in chosen)
@@ -203,11 +151,10 @@ class VesselChangesCubit extends Cubit<VesselChangesState> {
     final send = [for (final j in chosen) if (!held.contains(j)) j];
     final notes = <String>[];
     final refused = <String, String>{};
-    String nameOf(VesselChangeJob j) => j.jobNo.isEmpty ? '#${j.saleOrderId}' : j.jobNo;
 
     emit(state.copyWith(busy: true, notes: const [], refused: const {}));
 
-    // 1. ETA / ETD: one request per leg type and per PTP time pair
+    // ETA / ETD: one request per leg type and per PTP time pair
     final batches = <String, List<VesselChangeJob>>{};
     for (final j in send) {
       batches.putIfAbsent('${j.leg}|${j.ptpEta}|${j.ptpEtd}', () => []).add(j);
@@ -226,62 +173,36 @@ class VesselChangesCubit extends Cubit<VesselChangesState> {
           } else {
             final why = r?.message ?? 'Not updated';
             refused[vesselJobKey(callId, j)] = why;
-            notes.add('${nameOf(j)}: not updated - $why');
+            notes.add('${vesselJobName(j)}: not updated - $why');
           }
         }
       } catch (e, st) {
         AppLogger.instance.logError(e, st, 'Vessel changes update');
         for (final j in batch) {
           refused[vesselJobKey(callId, j)] = '$e';
-          notes.add('${nameOf(j)}: not updated - $e');
+          notes.add('${vesselJobName(j)}: not updated - $e');
         }
       }
     }
 
-    // 2. Pickup and delivery: legs whose ETA update was ok and that can move (the server names the leg; never PLANNED)
-    if (state.movePickupDelivery) {
-      final movable = [for (final j in ok) if (j.canMovePickup) j];
-      if (movable.isNotEmpty) {
-        try {
-          final moves = await _api.movePickupDelivery(
-              ptpVesselCallId: callId, saleOrderIds: [for (final j in movable) j.saleOrderId]);
-          for (final m in moves) {
-            if (!m.moved) {
-              notes.add('${m.jobNo ?? '#${m.saleOrderId}'}: pickup and delivery not moved - ${moveOutcomeText(m)}');
-            }
-          }
-        } catch (e, st) {
-          AppLogger.instance.logError(e, st, 'Vessel changes move pickup and delivery');
-          for (final j in movable) {
-            notes.add('${nameOf(j)}: pickup and delivery not moved - $e');
-          }
-        }
-      }
-    }
-    for (final j in ok) {
-      if (j.pickupMoveReason == PickupMoveReason.planned) {
-        notes.add('${nameOf(j)}: ${pickupReasonText(j)}');
-      }
-    }
     for (final j in held) {
-      notes.add('${nameOf(j)} waits for confirmation: boarding pay moves from '
+      notes.add('${vesselJobName(j)} waits for confirmation: boarding pay moves from '
           '${boardingMonthText(j.boardingMonthFrom)} to ${boardingMonthText(j.boardingMonthTo)}');
     }
-    if (ok.isNotEmpty) notes.insert(0, 'Updated ${ok.length} job${ok.length == 1 ? '' : 's'}.');
 
     if (isClosed) return;
     emit(state.copyWith(
       busy: false,
       notes: notes,
       refused: refused,
-      selected: state.selected.difference({for (final j in ok) vesselJobKey(callId, j)}),
+      done: ok.isEmpty ? null : updatedText(ok),
+      doneSeq: ok.isEmpty ? null : state.doneSeq + 1,
     ));
     await load();
     // the bell, banner and pinned vessel alerts re-check the jobs
     if (ok.isNotEmpty) NotificationSignals.changed();
   }
 
-  /// "Dismiss": the job's leg is no longer listed for this call.
   /// "Read PTP now": refreshes PTP's schedule (or reuses a read from the last few minutes), says what
   /// happened, then reloads the list, which now compares the jobs with the fresh times.
   Future<void> readPtpNow() async {
@@ -304,6 +225,7 @@ class VesselChangesCubit extends Cubit<VesselChangesState> {
     await load();
   }
 
+  /// "Keep mine (dismiss)": the job's leg is no longer listed for this call.
   Future<void> dismiss(VesselChangeGroup group, VesselChangeJob job) async {
     final key = vesselJobKey(group.call.id, job);
     emit(state.copyWith(busy: true));
@@ -314,7 +236,6 @@ class VesselChangesCubit extends Cubit<VesselChangesState> {
       final data = state.data;
       emit(state.copyWith(
         busy: false,
-        selected: {...state.selected}..remove(key),
         data: data == null
             ? null
             : VesselChanges(lastGoodReadAt: data.lastGoodReadAt, groups: [

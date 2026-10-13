@@ -2,7 +2,10 @@ abstract class SalesOrderEvent {}
 
 class LoadInvoiceByTypes extends SalesOrderEvent {
   final int type;
-  LoadInvoiceByTypes(this.type);
+
+  /// Reload even when [type] is the tab already shown (pull-to-refresh).
+  final bool force;
+  LoadInvoiceByTypes(this.type, {this.force = false});
 }
 
 class LoadMonthRanges extends SalesOrderEvent {

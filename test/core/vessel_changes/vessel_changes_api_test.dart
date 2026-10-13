@@ -14,8 +14,6 @@ import '../vessel_master/vessel_master_api_test.dart' show callJson, ok;
 Map<String, dynamic> jobJson({
   int id = 51234,
   String leg = 'LOADING',
-  String? reason,
-  String? suggestedPickup = '2026-10-14T09:00',
   String? boardingFrom,
   String? boardingTo,
 }) =>
@@ -36,12 +34,6 @@ Map<String, dynamic> jobJson({
       'etaDiffers': true,
       'etdDiffers': true,
       'scnDiffers': true,
-      'pickupDate': '2026-10-12T09:00',
-      'deliveryDate': '2026-10-12T15:00',
-      'suggestedPickupDate': suggestedPickup,
-      'suggestedDeliveryDate': suggestedPickup == null ? null : '2026-10-14T15:00',
-      'pickupMoveReason': reason,
-      'plannedDate': reason == 'PLANNED' ? '2026-10-12T09:00' : null,
       'boardingMonthFrom': boardingFrom,
       'boardingMonthTo': boardingTo,
     };
@@ -103,7 +95,7 @@ void main() {
     api = VesselChangesApi(Dio(BaseOptions(baseUrl: 'https://java.test'))..httpClientAdapter = adapter, companyId: () => 6);
   });
 
-  test('list sends the scope and reads groups, changes and jobs with the move suggestion and boarding flag', () async {
+  test('list sends the scope and reads groups, changes and jobs with the boarding flag', () async {
     adapter.replies.add((200, jsonEncode(ok({
       'lastGoodReadAt': '2026-10-12T09:15',
       'groups': [
@@ -115,7 +107,7 @@ void main() {
           ],
           'jobs': [
             jobJson(),
-            jobJson(id: 51240, reason: 'PLANNED', suggestedPickup: null, boardingFrom: '2026-10', boardingTo: '2026-11'),
+            jobJson(id: 51240, boardingFrom: '2026-10', boardingTo: '2026-11'),
           ],
         }
       ],
@@ -128,25 +120,13 @@ void main() {
     final group = list.groups.single;
     expect(group.call.id, 412);
     expect(group.changes.single.field, 'ARRIVE');
-    final movable = group.jobs.first;
-    expect(movable.ptpEta, '2026-10-15T08:00');
-    expect(movable.suggestedPickupDate, '2026-10-14T09:00');
-    expect(movable.canMovePickup, isTrue);
-    expect(movable.boardingMonthChanges, isFalse);
-    final planned = group.jobs.last;
-    expect(planned.pickupMoveReason, PickupMoveReason.planned);
-    expect(planned.plannedDate, '2026-10-12T09:00');
-    expect(planned.canMovePickup, isFalse);
-    expect(planned.boardingMonthChanges, isTrue);
-    expect(planned.boardingMonthTo, '2026-11');
-  });
-
-  test('the server decides which leg moves pickup: an off leg may move, NOT_THIS_LEG may not', () {
-    final offMoves = VesselChangeJob.fromJava(jobJson(id: 51300, leg: 'OFF'));
-    final offFollows = VesselChangeJob.fromJava(jobJson(id: 51301, leg: 'OFF', reason: 'NOT_THIS_LEG', suggestedPickup: null));
-
-    expect(offMoves.canMovePickup, isTrue);
-    expect(offFollows.canMovePickup, isFalse);
+    final first = group.jobs.first;
+    expect(first.ptpEta, '2026-10-15T08:00');
+    expect(first.etaDiffers, isTrue);
+    expect(first.boardingMonthChanges, isFalse);
+    final flagged = group.jobs.last;
+    expect(flagged.boardingMonthChanges, isTrue);
+    expect(flagged.boardingMonthTo, '2026-11');
   });
 
   test('an off-leg apply body has companyId, saleOrderIds, oeta and oetd and nothing else', () {
@@ -189,26 +169,13 @@ void main() {
         {'companyId': 6, 'saleOrderIds': [1], 'eta': '2026-10-15T08:00'});
   });
 
-  test('dismiss and move send the contract bodies', () async {
-    adapter.replies
-      ..add((200, jsonEncode(ok({'dismissed': true}))))
-      ..add((200, jsonEncode(ok({
-        'results': [
-          {'saleOrderId': 51234, 'jobNo': 'MY002605932', 'outcome': 'MOVED', 'pickupDate': '2026-10-14T09:00',
-            'deliveryDate': '2026-10-14T15:00'},
-          {'saleOrderId': 51240, 'jobNo': 'MY002605940', 'outcome': 'PLANNED', 'pickupDate': null, 'deliveryDate': null},
-        ]
-      }))));
+  test('dismiss sends the contract body', () async {
+    adapter.replies.add((200, jsonEncode(ok({'dismissed': true}))));
 
     expect(await api.dismiss(saleOrderId: 51234, leg: VesselLeg.loading, ptpVesselCallId: 412), isTrue);
-    final moves = await api.movePickupDelivery(ptpVesselCallId: 412, saleOrderIds: [51234, 51240]);
 
-    expect(adapter.requests.first.uri.path, '/api/vessel-changes/dismiss');
-    expect(adapter.requests.first.data, {'saleOrderId': 51234, 'leg': 'LOADING', 'ptpVesselCallId': 412});
-    expect(adapter.requests.last.uri.path, '/api/vessel-changes/move-pickup-delivery');
-    expect(adapter.requests.last.data, {'ptpVesselCallId': 412, 'saleOrderIds': [51234, 51240]});
-    expect(moves.first.moved, isTrue);
-    expect(moves.last.outcome, MoveOutcome.planned);
+    expect(adapter.requests.single.uri.path, '/api/vessel-changes/dismiss');
+    expect(adapter.requests.single.data, {'saleOrderId': 51234, 'leg': 'LOADING', 'ptpVesselCallId': 412});
   });
 
   test('a server error keeps its message', () async {

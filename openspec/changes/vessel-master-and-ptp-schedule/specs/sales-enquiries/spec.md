@@ -49,25 +49,17 @@ visit, else the one read from `GET /api/sale-orders/{id}/vessel-links` when the 
 form SHALL ask once "PTP's schedule shows another time", listing each time next to PTP's, with
 "Use PTP's times" and "Keep my times"; either answer continues the save. It SHALL NOT ask for an
 empty time, a hidden vessel section, a renamed vessel, or a loaded order whose ETA and ETD did not
-change since it was opened or answered.
+change since it was opened or answered. This is the only question before saving and saving SHALL
+never be blocked: the form SHALL NOT check pickup and delivery against the ETA (the owner removed
+that question on 2026-10-13).
 
 #### Scenario: ETA typed two days later
 - **WHEN** the off leg is linked to FM NAMTHONG EXCELLENCE 2653 (PTP 14 Oct 15:00) and the user enters O ETA 16 Oct 10:00 and saves
 - **THEN** the form asks first; "Use PTP's times" saves O ETA 14 Oct 15:00, "Keep my times" saves 16 Oct 10:00
 
-### Requirement: The sales form checks pickup and delivery against the ETA
-
-For any port and vessel, when the user saves, the form SHALL compare pickup and delivery with the day
-before the ETA (the loading ETA when its section shows and is ticked, else the off ETA) and, when a
-date is on another day or empty, ask once with "Change to <day>" and "Keep my dates" ("Leave empty"
-when both are empty). "Change" SHALL tick and set those dates to that day, keeping the time of day
-(00:00 for an empty date); "Keep" SHALL save them as they are, empty included. It SHALL NOT ask when
-both vessel sections are hidden (general cargo), without an ETA, or for a loaded order whose dates
-did not change. It is asked after the PTP warning, with the ETA chosen there.
-
-#### Scenario: Pickup four days early
-- **WHEN** O ETA is 15 Oct 15:00 and pickup is 11 Oct 09:00 and the user saves
-- **THEN** the form asks "Is the pickup date correct?"; "Change to 14 Oct" saves pickup 14 Oct 09:00
+#### Scenario: Pickup days before the ETA
+- **WHEN** O ETA is 15 Oct 15:00, pickup is 11 Oct 09:00 and the user saves
+- **THEN** the order saves with pickup 11 Oct 09:00 and no question is asked
 
 ### Requirement: The sales form links the vessels after a successful save
 

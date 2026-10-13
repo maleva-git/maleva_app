@@ -172,7 +172,7 @@ class _SalesOrderAddBodyState extends State<_SalesOrderAddBody> with TickerProvi
               (prev is! SalesOrderAddLoaded || prev.didYouMean != curr.didYouMean),
           listener: (context, state) => _askDidYouMean(context, (state as SalesOrderAddLoaded).didYouMean!),
         ),
-        // before saving: a typed ETA unlike PTP's, or pickup/delivery not the day before the ETA
+        // before saving: a typed ETA or ETD unlike PTP's
         BlocListener<SalesOrderAddBloc, SalesOrderAddState>(
           listenWhen: (prev, curr) =>
               curr is SalesOrderAddLoaded &&
@@ -267,46 +267,26 @@ class _SalesOrderAddBodyState extends State<_SalesOrderAddBody> with TickerProvi
   }
 
   /// The question before saving; either answer continues the save (save_date_checks.dart).
-  Future<void> _askSaveDate(BuildContext context, SaveDateQuestion q) async {
+  Future<void> _askSaveDate(BuildContext context, PtpTimeQuestion q) async {
     final bloc = context.read<SalesOrderAddBloc>();
-    final String title;
-    final String message;
-    final List<String> lines;
-    final String change;
-    final String keep;
-    if (q is PtpTimeQuestion) {
-      title = "PTP's schedule shows another time";
-      message = 'PTP lists ${q.vessels} at other times than you entered. Use PTP\'s times, or keep yours?';
-      lines = [
-        for (final l in q.lines)
-          '${l.legLabel} ${l.label}: ${saveDateText(l.current)} → PTP ${saveDateText(l.ptp)}'
-              '${l.estimated ? ' (estimated)' : ''}',
-      ];
-      change = "Use PTP's times";
-      keep = 'Keep my times';
-    } else if (q is PickupScheduleQuestion) {
-      final day = saveDateText(q.targetDay, time: false);
-      title = q.bothEmpty ? 'Set pickup and delivery dates?' : 'Is the pickup date correct?';
-      message = '${q.etaLabel} is ${saveDateText(q.eta)}. Pickup and delivery are usually the day before: $day.';
-      lines = [for (final l in q.lines) '${l.label}: ${saveDateText(l.current)} → ${saveDateText(l.next)}'];
-      change = 'Change to ${day.substring(0, day.length - 5)}';
-      keep = q.bothEmpty ? 'Leave empty' : 'Keep my dates';
-    } else {
-      return;
-    }
     final answer = await showDialog<bool>(
       context: context,
       barrierDismissible: false,
       builder: (ctx) => AlertDialog(
-        title: Text(title),
+        title: const Text("PTP's schedule shows another time"),
         content: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.start, children: [
-          Text(message),
+          Text('PTP lists ${q.vessels} at other times than you entered. Use PTP\'s times, or keep yours?'),
           const SizedBox(height: 8),
-          for (final line in lines) Text(line, style: const TextStyle(fontWeight: FontWeight.w600)),
+          for (final l in q.lines)
+            Text(
+              '${l.legLabel} ${l.label}: ${saveDateText(l.current)} → PTP ${saveDateText(l.ptp)}'
+              '${l.estimated ? ' (estimated)' : ''}',
+              style: const TextStyle(fontWeight: FontWeight.w600),
+            ),
         ]),
         actions: [
-          TextButton(onPressed: () => Navigator.of(ctx).pop(false), child: Text(keep)),
-          TextButton(onPressed: () => Navigator.of(ctx).pop(true), child: Text(change)),
+          TextButton(onPressed: () => Navigator.of(ctx).pop(false), child: const Text('Keep my times')),
+          TextButton(onPressed: () => Navigator.of(ctx).pop(true), child: const Text("Use PTP's times")),
         ],
       ),
     );

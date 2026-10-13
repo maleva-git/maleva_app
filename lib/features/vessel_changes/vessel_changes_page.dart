@@ -2,12 +2,17 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:maleva/core/di/injection.dart';
+import 'package:maleva/core/vessel_changes/vessel_change_look.dart';
 import 'package:maleva/core/vessel_changes/vessel_changes_api.dart';
 import 'package:maleva/core/vessel_changes/vessel_changes_models.dart';
+import 'package:maleva/features/vessel_changes/job_actions.dart';
 import 'package:maleva/features/vessel_changes/vessel_changes_cubit.dart';
+import 'package:maleva/features/vessel_changes/vessel_time_compare.dart';
 
-/// "Vessel changes" (change vessel-master-and-ptp-schedule): the jobs whose ETA, ETD or SCN differ from
-/// PTP's schedule, one group per vessel call, Maleva's and PTP's times side by side. Opened from a
+/// "Vessel changes" (change vessel-master-and-ptp-schedule): the jobs whose ETA or ETD differ from PTP's
+/// schedule, one card per vessel call: what PTP says now, then per job Maleva's time against PTP's
+/// ("In Maleva" | "PTP now") with "Use PTP's times" or "Keep mine (dismiss)", and "Update all N jobs to
+/// PTP" for the whole call. Opened from a
 /// tapped VESSEL_ETA_CHANGED notice, the notifications page or the dashboard banner; [initialScope]
 /// `team` opens "My team" (a leader's "Not handled" notice).
 class VesselChangesPage extends StatelessWidget {
@@ -34,7 +39,11 @@ class VesselChangesPage extends StatelessWidget {
             ),
           ),
         ]),
-        body: BlocBuilder<VesselChangesCubit, VesselChangesState>(
+        body: BlocConsumer<VesselChangesCubit, VesselChangesState>(
+          // "MY002605808 updated to PTP's times" / "3 jobs updated to PTP's times"
+          listenWhen: (a, b) => a.doneSeq != b.doneSeq && b.done != null,
+          listener: (context, state) =>
+              ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(state.done!))),
           builder: (context, state) {
             final cubit = context.read<VesselChangesCubit>();
             return Column(children: [
@@ -48,13 +57,6 @@ class VesselChangesPage extends StatelessWidget {
                   selected: {state.scope},
                   onSelectionChanged: state.busy ? null : (s) => cubit.load(scope: s.first),
                 ),
-              ),
-              SwitchListTile(
-                key: const Key('move_pickup_delivery'),
-                dense: true,
-                title: const Text('Also move pickup and delivery'),
-                value: state.movePickupDelivery,
-                onChanged: state.busy ? null : cubit.setMovePickupDelivery,
               ),
               if (state.busy) const LinearProgressIndicator(),
               Expanded(child: _body(context, state, cubit)),
@@ -128,39 +130,35 @@ class _GroupCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final cubit = context.read<VesselChangesCubit>();
     final call = group.call;
-    final keys = [for (final j in group.jobs) vesselJobKey(call.id, j)];
-    final chosen = keys.where(state.selected.contains).length;
+    final muted = Theme.of(context).colorScheme.onSurfaceVariant;
     return Card(
       margin: const EdgeInsets.symmetric(vertical: 6),
       child: Padding(
-        padding: const EdgeInsets.fromLTRB(4, 8, 8, 8),
-        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          Row(children: [
-            Checkbox(
-              value: chosen == 0 ? false : (chosen == keys.length ? true : null),
-              tristate: true,
-              onChanged: state.busy ? null : (_) => cubit.selectAll(group, chosen != keys.length),
-            ),
+        padding: const EdgeInsets.fromLTRB(12, 10, 12, 12),
+        child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+          Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
             Expanded(
-              child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                Text('${call.vesselName}${call.voyage == null ? '' : ' ${call.voyage}'}',
-                    style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 16)),
-                Text('PTP changed ${vesselTimeText(group.lastChangedAt)}'
-                    '${call.listed ? '' : ' · no longer listed by PTP'}',
-                    style: Theme.of(context).textTheme.bodySmall),
-              ]),
+              child: Text(vesselCallTitle(call),
+                  key: ValueKey('vessel_title_${call.id}'),
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 16)),
             ),
-            if (call.scn != null) _ScnChip(call.scn!),
+            if (call.scn != null) ...[const SizedBox(width: 8), _ScnChip(call.scn!)],
           ]),
-          for (final j in group.jobs) _JobRow(group: group, job: j, state: state),
-          const SizedBox(height: 4),
-          Align(
-            alignment: Alignment.centerRight,
-            child: FilledButton(
-              key: ValueKey('update_${call.id}'),
-              onPressed: state.busy || chosen == 0 ? null : () => cubit.update(group),
-              child: Text(chosen == 0 ? 'Update these jobs' : 'Update these jobs ($chosen)'),
-            ),
+          const SizedBox(height: 2),
+          Text(vesselCallSubline(group),
+              key: ValueKey('vessel_subline_${call.id}'),
+              style: Theme.of(context).textTheme.bodySmall?.copyWith(color: muted)),
+          for (final j in group.jobs) ...[
+            const Divider(height: 20),
+            _JobRow(group: group, job: j, state: state),
+          ],
+          const SizedBox(height: 12),
+          FilledButton(
+            key: ValueKey('update_${call.id}'),
+            onPressed: state.busy ? null : () => cubit.update(group),
+            child: Text(updateAllLabel(group.jobs.length), maxLines: 1, overflow: TextOverflow.ellipsis),
           ),
         ]),
       ),
@@ -168,6 +166,7 @@ class _GroupCard extends StatelessWidget {
   }
 }
 
+/// One job: "MY002605808 · Loading", the customer and employee, Maleva's and PTP's times, its actions.
 class _JobRow extends StatelessWidget {
   const _JobRow({required this.group, required this.job, required this.state});
 
@@ -177,80 +176,26 @@ class _JobRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final cubit = context.read<VesselChangesCubit>();
-    final call = group.call;
-    final key = vesselJobKey(call.id, job);
-    final small = Theme.of(context).textTheme.bodySmall;
-    final error = Theme.of(context).colorScheme.error;
-    final reason = pickupReasonText(job);
-    final refused = state.refused[key];
-    final waits = job.boardingMonthChanges && !state.confirmedBoarding.contains(key);
-    return Padding(
+    final key = vesselJobKey(group.call.id, job);
+    final muted = Theme.of(context).colorScheme.onSurfaceVariant;
+    final who = [job.customerName, job.employeeName].whereType<String>().where((s) => s.trim().isNotEmpty);
+    return Column(
       key: ValueKey('job_$key'),
-      padding: const EdgeInsets.only(top: 6),
-      child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        Checkbox(
-          value: state.selected.contains(key),
-          onChanged: state.busy ? null : (on) => cubit.toggle(group, job, on ?? false),
-        ),
-        Expanded(
-          child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            Text('${job.jobNo} · ${job.isLoading ? 'Loading' : 'Off'}', style: const TextStyle(fontWeight: FontWeight.w700)),
-            if (job.customerName != null || job.employeeName != null)
-              Text([job.customerName, job.employeeName].whereType<String>().join(' · '), style: small),
-            _TimeLine('ETA', job.currentEta, job.ptpEta, call.arriveEstimated, job.etaDiffers),
-            _TimeLine('ETD', job.currentEtd, job.ptpEtd, call.departEstimated, job.etdDiffers),
-            if (job.scnDiffers || job.ptpScn != null)
-              Text('SCN ${job.currentScn ?? '-'}  →  PTP ${job.ptpScn ?? '-'}',
-                  style: TextStyle(fontWeight: job.scnDiffers ? FontWeight.w700 : FontWeight.normal)),
-            if (job.suggestedPickupDate != null)
-              Text('Pickup ${vesselTimeText(job.pickupDate)} → ${vesselTimeText(job.suggestedPickupDate)}'
-                  ' · Delivery ${vesselTimeText(job.deliveryDate)} → ${vesselTimeText(job.suggestedDeliveryDate)}'),
-            if (reason != null) Text(reason, style: small?.copyWith(fontStyle: FontStyle.italic)),
-            if (job.boardingMonthChanges)
-              Row(children: [
-                Expanded(
-                  child: Text(
-                      'Boarding pay moves from ${boardingMonthText(job.boardingMonthFrom)} '
-                      'to ${boardingMonthText(job.boardingMonthTo)}',
-                      style: TextStyle(color: waits ? error : null)),
-                ),
-                if (waits)
-                  TextButton(
-                    key: ValueKey('confirm_$key'),
-                    onPressed: state.busy ? null : () => cubit.confirmBoarding(group, job),
-                    child: const Text('Confirm'),
-                  )
-                else
-                  const Icon(Icons.check, size: 18),
-              ]),
-            if (refused != null) Text('Not updated: $refused', style: TextStyle(color: error)),
-          ]),
-        ),
-        TextButton(
-          key: ValueKey('dismiss_$key'),
-          onPressed: state.busy ? null : () => cubit.dismiss(group, job),
-          child: const Text('Dismiss'),
-        ),
-      ]),
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Text('${vesselJobName(job)} · ${job.isLoading ? 'Loading' : 'Off'}',
+            maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(fontWeight: FontWeight.w700)),
+        if (who.isNotEmpty)
+          Text(who.join(' · '),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: Theme.of(context).textTheme.bodySmall?.copyWith(color: muted)),
+        const SizedBox(height: 6),
+        VesselTimeCompare(call: group.call, job: job),
+        VesselJobActions(group: group, job: job, state: state),
+      ],
     );
   }
-}
-
-class _TimeLine extends StatelessWidget {
-  const _TimeLine(this.label, this.current, this.ptp, this.estimated, this.differs);
-
-  final String label;
-  final String? current;
-  final String? ptp;
-  final bool estimated;
-  final bool differs;
-
-  @override
-  Widget build(BuildContext context) => Text(
-        '$label ${vesselTimeText(current)}  →  PTP ${vesselTimeText(ptp)}${estimated && ptp != null ? ' est.' : ''}',
-        style: TextStyle(fontWeight: differs ? FontWeight.w700 : FontWeight.normal),
-      );
 }
 
 /// PTP's SCN, copied on tap (it is not sent with the update).
@@ -260,15 +205,27 @@ class _ScnChip extends StatelessWidget {
   final String scn;
 
   @override
-  Widget build(BuildContext context) => ActionChip(
+  Widget build(BuildContext context) {
+    Future<void> copy() async {
+      await Clipboard.setData(ClipboardData(text: scn));
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('SCN $scn copied')));
+      }
+    }
+
+    // read aloud as "Copy SCN 269EK6", as on the web
+    return Semantics(
+      container: true,
+      label: 'Copy SCN $scn',
+      button: true,
+      onTap: copy,
+      excludeSemantics: true,
+      child: ActionChip(
         key: const Key('copy_scn'),
         avatar: const Icon(Icons.copy, size: 16),
         label: Text('SCN $scn'),
-        onPressed: () async {
-          await Clipboard.setData(ClipboardData(text: scn));
-          if (context.mounted) {
-            ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('SCN $scn copied')));
-          }
-        },
-      );
+        onPressed: copy,
+      ),
+    );
+  }
 }
