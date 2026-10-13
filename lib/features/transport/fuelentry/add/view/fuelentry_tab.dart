@@ -1,6 +1,7 @@
 import 'package:maleva/core/theme/app_typography.dart';
 import 'package:maleva/core/colors/colors.dart' as colour;
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -10,6 +11,7 @@ import 'package:maleva/menu/menulist.dart';
 import '../../view/bloc/fuelentryview_bloc.dart';
 import '../../view/bloc/fuelentryview_event.dart';
 import '../../view/view/fuelentryview_tab.dart';
+import '../bloc/fuel_entry_validation.dart';
 import '../bloc/fuelentry_bloc.dart';
 import '../bloc/fuelentry_event.dart';
 import '../bloc/fuelentry_state.dart';
@@ -255,12 +257,9 @@ class _FuelEntryCard extends StatelessWidget {
               onPressed: () {
                 final s = context.read<FuelEntryBloc>().state;
                 if (s is! FuelEntryLoaded) return;
-                if (s.liter.isEmpty) {
-                  toastMsg('Enter Liter', '', context);
-                  return;
-                }
-                if (s.amount.isEmpty) {
-                  toastMsg('Enter Amount', '', context);
+                final problem = FuelEntryValidation.form(liter: s.liter, amount: s.amount);
+                if (problem != null) {
+                  toastMsg(problem, '', context);
                   return;
                 }
                 ConfirmationMsgYesNo(
@@ -490,6 +489,8 @@ class _NumberFieldState extends State<_NumberField> {
     return TextField(
       controller: _ctrl,
       keyboardType: const TextInputType.numberWithOptions(decimal: true),
+      // digits and one decimal point (or comma) only: no minus sign, letters or spaces
+      inputFormatters: [FilteringTextInputFormatter.allow(RegExp(r'^\d*[.,]?\d*'))],
       textInputAction: TextInputAction.done,
       onChanged: widget.onChanged,
       style: AppTypography.bodySmall(color: AppTokens.textPrimary),

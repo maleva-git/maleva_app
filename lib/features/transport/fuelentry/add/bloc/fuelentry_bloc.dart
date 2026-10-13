@@ -3,6 +3,7 @@ import 'package:get_it/get_it.dart';
 import 'package:maleva/core/fuel/fuel_entry_api.dart';
 import 'package:maleva/core/utils/app_globals.dart';
 
+import 'fuel_entry_validation.dart';
 import 'fuelentry_event.dart';
 import 'fuelentry_state.dart';
 
@@ -84,6 +85,13 @@ class FuelEntryBloc extends Bloc<FuelEntryEvent, FuelEntryState> {
       return;
     }
 
+    final problem = FuelEntryValidation.form(liter: s.liter, amount: s.amount);
+    if (problem != null) {
+      emit(FuelEntryError(problem));
+      emit(s);
+      return;
+    }
+
     emit(FuelEntryLoading());
     try {
       // the server stamps a driver's own truck, driver and app flag on the row
@@ -92,8 +100,8 @@ class FuelEntryBloc extends Bloc<FuelEntryEvent, FuelEntryState> {
         'truckRefId': AppGlobals.DriverTruckRefId,
         'driverRefId': AppGlobals.EmpRefId == 0 ? null : AppGlobals.EmpRefId,
         'saleDate': s.date,
-        'aliter': double.tryParse(s.liter.replaceAll(',', '.')) ?? 0,
-        'aAmount': double.tryParse(s.amount.replaceAll(',', '.')) ?? 0,
+        'aliter': FuelEntryValidation.parse(s.liter),
+        'aAmount': FuelEntryValidation.parse(s.amount),
         'pliter': 0,
         'gliter': 0,
         'pRate': 0,
