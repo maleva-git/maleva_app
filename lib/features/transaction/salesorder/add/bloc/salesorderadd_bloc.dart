@@ -104,11 +104,17 @@ class SalesOrderAddBloc extends Bloc<SalesOrderAddEvent, SalesOrderAddState> {
       if (event.id == 0) {
         // If user clears the customer, just update state and exit early.
         // DO NOT call the API.
-        emit(s.copyWith(txtCustomer: '', custId: 0));
+        emit(s.copyWith(txtCustomer: '', custId: 0, endCustomerId: 0, txtEndCustomer: ''));
         return;
       }
 
-      AppGlobals.CustomerCurrencyValue = await _saleOrders.currencyValue(event.id);emit(s.copyWith(txtCustomer: event.name, custId: event.id, currencyValue: AppGlobals.CustomerCurrencyValue));
+      // The end customer list belongs to the customer: another customer starts with none.
+      final keepEnd = event.id == s.custId;
+      AppGlobals.CustomerCurrencyValue = await _saleOrders.currencyValue(event.id);emit(s.copyWith(txtCustomer: event.name, custId: event.id, currencyValue: AppGlobals.CustomerCurrencyValue,
+          endCustomerId: keepEnd ? s.endCustomerId : 0, txtEndCustomer: keepEnd ? s.txtEndCustomer : ''));
+    });
+    on<EndCustomerSelected>((event, emit) {
+      if (state is SalesOrderAddLoaded) emit((state as SalesOrderAddLoaded).copyWith(txtEndCustomer: event.name, endCustomerId: event.id));
     });
 
 
@@ -944,6 +950,7 @@ class SalesOrderAddBloc extends Bloc<SalesOrderAddEvent, SalesOrderAddState> {
       loadedMaster: isEnquiry ? const {} : m,
       productIds: loadedIds,
       currencyValue: AppGlobals.CustomerCurrencyValue, custId: m["customerRefId"] ?? 0, jobTypeId: m["jobMasterRefId"] ?? 0,
+      endCustomerId: isEnquiry ? 0 : JsonRead.integer(m["endCustomerRefId"]), txtEndCustomer: isEnquiry ? '' : JsonRead.string(m["endCustomerName"]),
       lAgentCompanyId: m["agentCompanyRefId"] ?? 0, lAgentId: m["agentMasterRefId"] ?? 0, oAgentCompanyId: m["oAgentCompanyRefId"] ?? 0,
       oAgentId: m["oAgentMasterRefId"] ?? 0, originId: m["originRefId"] ?? 0, destinationId: m["destinationRefId"] ?? 0,
       sealEmpId1: m["sealbyRefid"] ?? 0, sealEmpId2: m["sealbyRefid2"] ?? 0, sealEmpId3: m["sealbyRefid3"] ?? 0,

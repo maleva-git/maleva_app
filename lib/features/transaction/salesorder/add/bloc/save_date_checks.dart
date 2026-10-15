@@ -21,9 +21,12 @@ class LegCall {
 
 class PtpTimeLine {
   const PtpTimeLine({required this.legLabel, required this.label, required this.dateField, required this.checkField,
-      required this.current, required this.ptp, required this.estimated});
+      required this.current, required this.ptp, required this.estimated, this.source = 'PTP'});
 
   final String legLabel;
+
+  /// The schedule the leg's call is from: "PTP", "Westports" or "MMSW".
+  final String source;
 
   /// `ETA` or `ETD`.
   final String label;
@@ -43,7 +46,27 @@ class PtpTimeQuestion {
   /// `FM NAMTHONG EXCELLENCE 2653`, joined with "and" for two legs.
   final String vessels;
   final List<PtpTimeLine> lines;
+
+  /// The schedules asked about, once each: `[PTP]`, `[PTP, MMSW]`.
+  List<String> get sources => lines.map((l) => l.source).toSet().toList();
+
+  bool get _single => sources.length == 1;
+
+  /// "PTP's schedule shows another time", "Westports' schedule …"; two schedules: "The schedules show …".
+  String get title => _single ? "${ownerForm(sources.first)} schedule shows another time" : 'The schedules show another time';
+
+  /// "PTP lists FM NAMTHONG EXCELLENCE 2653 at other times than you entered. Use PTP's times, or keep yours?"
+  String get message => '${sources.join(' and ')} ${_single ? 'lists' : 'list'} $vessels at other times than you entered. '
+      'Use $_theirs times, or keep yours?';
+
+  /// "Use PTP's times", "Use Westports' times", "Use the schedules' times".
+  String get useText => 'Use $_theirs times';
+
+  String get _theirs => _single ? ownerForm(sources.first) : "the schedules'";
 }
+
+/// "PTP's", "MMSW's", but "Westports'".
+String ownerForm(String source) => source.endsWith('s') ? "$source'" : "$source's";
 
 DateTime? _ticked(bool ticked, String value) => ticked ? DateTime.tryParse(value) : null;
 
@@ -84,10 +107,10 @@ PtpTimeQuestion? planPtpTimes(SalesOrderAddLoaded s, Map<String, LegCall> calls)
       if (current == null || ptp == null) continue;
       if (current.difference(ptp).inMinutes.abs() < ptpTimeThresholdMinutes) continue;
       lines.add(PtpTimeLine(legLabel: legLabel, label: label, dateField: dateField, checkField: checkField,
-          current: current, ptp: ptp, estimated: estimated));
+          current: current, ptp: ptp, estimated: estimated, source: linked.call.sourceLabel));
     }
     if (lines.length > before) {
-      final voyage = linked.call.voyage;
+      final voyage = linked.call.voyageText; // "SCN 267DF4" for an MMSW call
       names.add('${name.trim().toUpperCase()}${voyage == null ? '' : ' $voyage'}');
     }
   }

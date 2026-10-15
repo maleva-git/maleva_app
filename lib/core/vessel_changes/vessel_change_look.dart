@@ -21,32 +21,74 @@ String vesselCallTitle(PtpCall call) {
 
 /// The card's sub-line: "PTP: arrives 12 Oct 20:15 · departs 14 Oct 00:00 (est.)", then
 /// "· changed 13 Oct 16:05" only when the call's last change is known, and "· no longer listed by PTP".
+/// A Westports call says "Westports: ..." and adds its status ("status Arrived") and berth ("berth B19");
+/// an omitted one says so in [omittedCallText] instead of the status. An MMSW call starts with its terminal:
+/// "MMSW · Northport KCT: arrives ..." (its SCN is on the card's chip, where a voyage would be).
 String vesselCallSubline(VesselChangeGroup group) {
   final call = group.call;
+  final label = call.sourceLabel;
+  final status = call.status?.trim() ?? '';
+  final berth = call.berth?.trim() ?? '';
   String at(String? value, bool estimated) {
     final text = vesselClock(value);
     return estimated && text != '—' ? '$text (est.)' : text;
   }
 
   final parts = [
-    'PTP: arrives ${at(call.arriveAt, call.arriveEstimated)}',
+    '${call.sourceText}: arrives ${at(call.arriveAt, call.arriveEstimated)}',
     'departs ${at(call.departAt, call.departEstimated)}',
+    if (status.isNotEmpty && !call.omitted) 'status $status',
+    if (berth.isNotEmpty) 'berth $berth',
     if (vesselTime(group.lastChangedAt) != null) 'changed ${vesselClock(group.lastChangedAt)}',
-    if (!call.listed) 'no longer listed by PTP',
+    if (!call.listed) 'no longer listed by $label',
   ];
   return parts.join(' · ');
 }
 
-/// The card's button: "Update all 3 jobs to PTP", "Update this job to PTP" for one.
-String updateAllLabel(int jobs) => jobs == 1 ? 'Update this job to PTP' : 'Update all $jobs jobs to PTP';
+/// "Omitted at Westports": the call's status is Omitted (the vessel skips that port).
+String omittedCallText(PtpCall call) => 'Omitted at ${call.sourceLabel}';
+
+/// What an omitted call's jobs need: another vessel or voyage on the job, or dismiss.
+const String omittedCallHint = 'The vessel will not call. Pick another vessel or voyage on the job, or dismiss.';
+
+/// The latest status change of the call: "Status: Not Arrived → Omitted"; null when there is none.
+String? statusChangeText(VesselChangeGroup group) {
+  final changes = group.changes.where((c) => c.isStatus).toList();
+  if (changes.isEmpty) return null;
+  final c = changes.last;
+  String text(String? v) => (v == null || v.trim().isEmpty) ? '—' : v.trim();
+  return 'Status: ${text(c.oldValue)} → ${text(c.newValue)}';
+}
+
+/// The column head of the schedule's times: "PTP now", "Westports now".
+String sourceNowLabel(PtpCall call) => '${call.sourceLabel} now';
+
+/// A job's line: "MY002605808 · Loading", then " · B18" when it has a Westports terminal (" · Northport KCT"
+/// for MMSW).
+String vesselJobLine(VesselChangeJob job) {
+  final terminal = job.terminal?.trim() ?? '';
+  final side = job.isLoading ? 'Loading' : 'Off';
+  return terminal.isEmpty ? '${vesselJobName(job)} · $side' : '${vesselJobName(job)} · $side · $terminal';
+}
+
+/// The card's button: "Update all 3 jobs to PTP", "Update this job to PTP" for one ("... to Westports").
+String updateAllLabel(int jobs, {String label = VesselSource.ptpLabel}) =>
+    jobs == 1 ? 'Update this job to $label' : 'Update all $jobs jobs to $label';
+
+/// A job's button: "Use PTP's times", "Use Westports' times".
+String useTimesLabel({String label = VesselSource.ptpLabel}) => 'Use ${VesselSource.possessive(label)} times';
 
 /// The job as the screen names it: its number, or "#id" when it has none.
 String vesselJobName(VesselChangeJob job) => job.jobNo.isEmpty ? '#${job.saleOrderId}' : job.jobNo;
 
-/// The snackbar after an update: "MY002605808 updated to PTP's times", "3 jobs updated to PTP's times".
-String updatedText(List<VesselChangeJob> updated) => updated.length == 1
-    ? "${vesselJobName(updated.single)} updated to PTP's times"
-    : "${updated.length} jobs updated to PTP's times";
+/// The snackbar after an update: "MY002605808 updated to PTP's times", "3 jobs updated to PTP's times"
+/// ("... to Westports' times").
+String updatedText(List<VesselChangeJob> updated, {String label = VesselSource.ptpLabel}) {
+  final whose = VesselSource.possessive(label);
+  return updated.length == 1
+      ? '${vesselJobName(updated.single)} updated to $whose times'
+      : '${updated.length} jobs updated to $whose times';
+}
 
 /// How Maleva's time stands against PTP's on one row of the comparison.
 enum TimeMatch {

@@ -1,24 +1,20 @@
 import 'package:flutter/material.dart';
-import 'package:maleva/core/di/injection.dart';
-import 'package:maleva/core/employee/employee_api.dart';
 import 'package:maleva/core/forwarding_request/forwarding_request_models.dart';
-import 'package:maleva/core/models/shared/employee_model.dart';
 import 'package:maleva/core/widgets/ui/ui.dart';
 import 'package:maleva/features/forwarding_requests/view/forwarding_request_card.dart';
-import 'package:maleva/features/planning/widgets/date_fields.dart';
 
-/// The forwarding team works one request: the five ticks and their references, the seal and
-/// break-seal employees, saved together by the Save button (nothing is sent before). Ticking a
-/// step ticks every step below it; unticking a step unticks every step above it.
+/// The forwarding team works one request: Documents received, Draft created and its C Number, saved
+/// together by the Save button (nothing is sent before). Submitted, Approved, Released and the seal
+/// people are no longer shown (owner, 2026-10-15); Save passes their saved values through unchanged,
+/// except that unticking Draft or Documents unticks every step above it, as the server ladder does.
 class ForwardingRequestEditPage extends StatefulWidget {
-  const ForwardingRequestEditPage({super.key, required this.request, required this.onSave, required this.onCancelRequest, this.employeeApi});
+  const ForwardingRequestEditPage({super.key, required this.request, required this.onSave, required this.onCancelRequest});
 
   final ForwardingRequest request;
 
   /// Sends the ticks; throws the server's message when refused.
   final Future<ForwardingRequest> Function(ForwardingRequestTicks ticks) onSave;
   final Future<ForwardingRequest> Function() onCancelRequest;
-  final EmployeeApi? employeeApi;
 
   @override
   State<ForwardingRequestEditPage> createState() => _ForwardingRequestEditPageState();
@@ -27,70 +23,20 @@ class ForwardingRequestEditPage extends StatefulWidget {
 class _ForwardingRequestEditPageState extends State<ForwardingRequestEditPage> {
   late ForwardingRequestTicks ticks = ForwardingRequestTicks.fromRequest(widget.request);
   late final TextEditingController cNumber = TextEditingController(text: ticks.cNumber);
-  late final TextEditingController submittedRef = TextEditingController(text: ticks.submittedRef);
-  late final TextEditingController releaseNo = TextEditingController(text: ticks.releaseNo);
-  List<EmployeeModel> employees = const [];
-  String sealByName = '';
-  String breakSealByName = '';
   bool saving = false;
-
-  @override
-  void initState() {
-    super.initState();
-    sealByName = widget.request.sealBy;
-    breakSealByName = widget.request.breakSealBy;
-    _loadEmployees();
-  }
-
-  Future<void> _loadEmployees() async {
-    try {
-      final list = await (widget.employeeApi ?? sl<EmployeeApi>()).dropdown();
-      if (mounted) setState(() => employees = list);
-    } catch (_) {
-      // the pickers stay empty; the ticks can still be saved
-    }
-  }
 
   @override
   void dispose() {
     cNumber.dispose();
-    submittedRef.dispose();
-    releaseNo.dispose();
     super.dispose();
   }
 
-  ForwardingRequestTicks get _current => ticks.copyWith(cNumber: cNumber.text, submittedRef: submittedRef.text, releaseNo: releaseNo.text);
+  ForwardingRequestTicks get _current => ticks.copyWith(cNumber: cNumber.text);
 
   void _step(ForwardingStep step, bool on) => setState(() {
         ticks = _current.step(step, on);
         cNumber.text = ticks.cNumber;
-        submittedRef.text = ticks.submittedRef;
-        releaseNo.text = ticks.releaseNo;
       });
-
-  Future<void> _pickEmployee({required bool seal}) async {
-    final current = seal ? ticks.sealById : ticks.breakSealById;
-    final r = await showPickerSheet<int>(
-      context,
-      title: seal ? 'Seal by' : 'Break seal by',
-      options: [for (final e in employees) PickOption(value: e.Id, label: e.AccountName)],
-      current: current > 0 ? current : null,
-      allowClear: true,
-      searchHint: 'Search employee…',
-    );
-    if (r == null) return;
-    setState(() {
-      final id = r.cleared ? 0 : (r.value ?? 0);
-      final name = id == 0 ? '' : employees.firstWhere((e) => e.Id == id).AccountName;
-      if (seal) {
-        ticks = ticks.copyWith(sealById: id);
-        sealByName = name;
-      } else {
-        ticks = ticks.copyWith(breakSealById: id);
-        breakSealByName = name;
-      }
-    });
-  }
 
   Future<void> _save() async {
     final toSave = _current;
@@ -136,7 +82,6 @@ class _ForwardingRequestEditPageState extends State<ForwardingRequestEditPage> {
   @override
   Widget build(BuildContext context) {
     final r = widget.request;
-    final mc = context.mc;
     return MalevaThemeScope(
       child: Scaffold(
         appBar: AppBar(
@@ -168,27 +113,6 @@ class _ForwardingRequestEditPageState extends State<ForwardingRequestEditPage> {
               _tick('Documents received', ticks.documentReceived, ForwardingStep.documentReceived, r.documentReceivedBy, r.documentReceivedDate),
               _tick('Draft created', ticks.draftCreated, ForwardingStep.draftCreated, r.draftCreatedBy, r.draftCreatedDate),
               if (ticks.draftCreated) _text(cNumber, 'C Number', required: true),
-              _tick('Submitted to customs', ticks.submitted, ForwardingStep.submitted, r.submittedBy, r.submittedDate),
-              if (ticks.submitted) _text(submittedRef, 'Registration no'),
-              _tick('Approved by customs', ticks.approved, ForwardingStep.approved, r.approvedBy, r.approvedDate),
-              if (ticks.approved)
-                Padding(
-                  padding: const EdgeInsets.only(bottom: 8),
-                  child: DateField(label: 'Approved on', value: ticks.approvedDate, onChanged: (v) => setState(() => ticks = ticks.copyWith(approvedDate: v))),
-                ),
-              _tick('Released', ticks.released, ForwardingStep.released, r.releasedBy, r.releasedDate),
-              if (ticks.released) _text(releaseNo, 'Release number', required: true),
-            ]),
-          ),
-          const SizedBox(height: 8),
-          DetailSection(
-            title: 'Seal',
-            icon: Icons.lock_outline,
-            child: Column(children: [
-              PickerField(label: 'Seal by', value: sealByName, hint: 'Select employee', enabled: !r.cancelled, onTap: () => _pickEmployee(seal: true)),
-              const SizedBox(height: 12),
-              PickerField(label: 'Break seal by', value: breakSealByName, hint: 'Select employee', enabled: !r.cancelled, onTap: () => _pickEmployee(seal: false)),
-              if (employees.isEmpty) Padding(padding: const EdgeInsets.only(top: 8), child: Text('Loading employees…', style: TextStyle(fontSize: 12, color: mc.muted))),
             ]),
           ),
         ]),

@@ -33,7 +33,12 @@ NoticeTone toneOf(EmployeeNotification n) {
     if (title.startsWith('not handled')) return NoticeTone.notHandled;
     if (title.startsWith('reminder')) return NoticeTone.reminder;
     if (n.kind == NoticeKind.vesselLinkNeeded) return NoticeTone.linkNeeded;
-    if (n.kind == NoticeKind.ptpScheduleStale) return NoticeTone.ptpStale;
+    // a schedule that needs reading or uploading (PTP or MMSW not updating, the Westports upload due)
+    if (n.kind == NoticeKind.ptpScheduleStale ||
+        n.kind == NoticeKind.mmswScheduleStale ||
+        n.kind == NoticeKind.westportsUploadDue) {
+      return NoticeTone.ptpStale;
+    }
     return NoticeTone.vessel;
   }
   if (n.kind.startsWith(NoticeKind.forwardingPrefix)) return NoticeTone.forwarding;

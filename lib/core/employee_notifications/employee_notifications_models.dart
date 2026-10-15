@@ -16,8 +16,28 @@ class NoticeKind {
   /// Phone pushes stopped working for everyone (to Super Admins, "Phone alerts are not working"); no link.
   static const String phonePushDown = 'PHONE_PUSH_DOWN';
 
+  /// A linked call is Omitted at Westports ("EVER LIFTING 066W omitted at Westports – 2 of your jobs");
+  /// link `/vessel-changes` (one job without employee: `/sale-order/edit/{id}`), ref `PTP_CALL`.
+  static const String vesselOmitted = 'VESSEL_OMITTED';
+
+  /// Nobody uploaded the Westports vessel schedule for a while ("Please upload the Westports vessel
+  /// schedule (last upload 10:05)"); link `/westports-schedule`, a web page (the app has no upload screen).
+  static const String westportsUploadDue = 'WESTPORTS_UPLOAD_DUE';
+
+  /// MMSW's schedule (Northport, Southport) has had no good read for 3 hours while reading and notices are
+  /// on (backend change mmsw-vessel-schedule); link `/vessel-changes`. Looks like [ptpScheduleStale].
+  static const String mmswScheduleStale = 'MMSW_SCHEDULE_STALE';
+
   /// The vessel notices: the Vessel tab and the ship button, the vessel phone channel; never the Other tab.
-  static const Set<String> vesselKinds = {vesselEtaChanged, vesselLinkNeeded, ptpScheduleStale, phonePushDown};
+  static const Set<String> vesselKinds = {
+    vesselEtaChanged,
+    vesselLinkNeeded,
+    ptpScheduleStale,
+    phonePushDown,
+    vesselOmitted,
+    westportsUploadDue,
+    mmswScheduleStale,
+  };
 
   static bool isVessel(String? kind) => vesselKinds.contains(kind);
 
@@ -30,7 +50,8 @@ class NoticeKind {
 /// The two separate inboxes (owner, 2026-10-13: vessel ETA notices are never mixed with the others).
 /// [wire] is the `group` query value of `/api/employee-notifications/mine` and `/mine/read-all`:
 /// `vessel` = the [NoticeKind.vesselKinds] (`VESSEL_ETA_CHANGED`, `VESSEL_LINK_NEEDED`,
-/// `PTP_SCHEDULE_STALE`, `PHONE_PUSH_DOWN`), `other` = every other kind.
+/// `PTP_SCHEDULE_STALE`, `PHONE_PUSH_DOWN`, `VESSEL_OMITTED`, `WESTPORTS_UPLOAD_DUE`, `MMSW_SCHEDULE_STALE`),
+/// `other` = every other kind.
 enum NoticeGroup {
   vessel,
   other;

@@ -32,6 +32,7 @@ import 'package:maleva/core/fleet/driver_api.dart';
 import 'package:maleva/core/lookups/location_api.dart';
 import 'package:maleva/core/finance/petty_cash_api.dart';
 import 'package:maleva/core/sale_order/sale_order_api.dart';
+import 'package:maleva/core/end_customer/end_customer_api.dart';
 import 'package:maleva/core/utils/app_preferences.dart';
 import 'package:maleva/core/stock/stock_in_api.dart';
 import 'package:maleva/core/network/java_api_client.dart';
@@ -45,6 +46,7 @@ import 'package:maleva/core/vessel_master/vessel_master_api.dart';
 import 'package:maleva/features/auth/data/mobile_auth_api.dart';
 import 'package:maleva/features/auth/data/session_service.dart';
 import 'package:maleva/features/auth/data/session_writer.dart';
+import 'package:maleva/features/truck_driver_details/truck_driver_details_api.dart';
 
 /// The Java session: encrypted token store, the Java client, sign-in /
 /// restore / sign-out. Additive - no existing registration changes.
@@ -59,6 +61,8 @@ void registerAuthModule(GetIt sl) {
   // sale orders (the shared /api/sale-orders and friends)
   sl.registerLazySingleton<SaleOrderApi>(
       () => SaleOrderApi(sl<JavaApiClient>().dio, companyId: AppPreferences.getComid));
+  // the sale order's end customer (the shared /api/end-customers; change sale-order-end-customer)
+  sl.registerLazySingleton<EndCustomerApi>(() => EndCustomerApi(sl<JavaApiClient>().dio));
   // vessel master and PTP vessel changes (the shared /api/vessel-masters and /api/vessel-changes;
   // change vessel-master-and-ptp-schedule)
   sl.registerLazySingleton<VesselMasterApi>(() => VesselMasterApi(sl<JavaApiClient>().dio));
@@ -155,6 +159,9 @@ void registerAuthModule(GetIt sl) {
   // trucks: the picker list, one truck and its save (the shared /api/truck-combo, /api/truck-masters)
   sl.registerLazySingleton<TruckApi>(
       () => TruckApi(sl<JavaApiClient>().dio, companyId: AppPreferences.getComid));
+  // the Truck & Driver Details sheet (the shared /api/truck-driver-details)
+  sl.registerLazySingleton<TruckDriverDetailsApi>(
+      () => TruckDriverDetailsApi(sl<JavaApiClient>().dio, companyId: AppPreferences.getComid));
   // job orders (the shared /api/job-orders)
   sl.registerLazySingleton<JobOrderApi>(
       () => JobOrderApi(sl<JavaApiClient>().dio, companyId: AppPreferences.getComid));

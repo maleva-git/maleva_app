@@ -179,7 +179,15 @@ void main() {
         refId: null));
     final leave = EmployeeNotification.fromJava(noticeJson(id: 14, kind: 'LEAVE_APPROVED'));
 
-    expect(NoticeKind.vesselKinds, {'VESSEL_ETA_CHANGED', 'VESSEL_LINK_NEEDED', 'PTP_SCHEDULE_STALE', 'PHONE_PUSH_DOWN'});
+    expect(NoticeKind.vesselKinds, {
+      'VESSEL_ETA_CHANGED',
+      'VESSEL_LINK_NEEDED',
+      'PTP_SCHEDULE_STALE',
+      'PHONE_PUSH_DOWN',
+      'VESSEL_OMITTED',
+      'WESTPORTS_UPLOAD_DUE',
+      'MMSW_SCHEDULE_STALE',
+    });
     for (final n in [eta, link, stale]) {
       expect(NoticeKind.isVessel(n.kind), isTrue, reason: n.kind);
       expect(NoticeGroup.of(n), NoticeGroup.vessel, reason: n.kind);
@@ -196,6 +204,28 @@ void main() {
     final other = mixed.only(NoticeGroup.other);
     expect(other.items.map((n) => n.id), [14]);
     expect(other.unreadCount, 1);
+  });
+
+  test('Westports kinds (westports-vessel-schedule): VESSEL_OMITTED and WESTPORTS_UPLOAD_DUE are vessel notices', () {
+    final omitted = EmployeeNotification.fromJava(noticeJson(
+        id: 21,
+        kind: 'VESSEL_OMITTED',
+        title: 'EVER LIFTING 066W omitted at Westports – 2 of your jobs',
+        linkPath: '/vessel-changes',
+        refType: 'PTP_CALL',
+        refId: 9031));
+    final due = EmployeeNotification.fromJava(noticeJson(
+        id: 22,
+        kind: 'WESTPORTS_UPLOAD_DUE',
+        title: 'Please upload the Westports vessel schedule (last upload 10:05)',
+        linkPath: '/westports-schedule',
+        refType: 'WESTPORTS_UPLOAD',
+        refId: null));
+    for (final n in [omitted, due]) {
+      expect(NoticeKind.isVessel(n.kind), isTrue, reason: n.kind);
+      expect(NoticeGroup.of(n), NoticeGroup.vessel, reason: n.kind);
+    }
+    expect(omitted.saleOrderId, isNull, reason: 'a PTP_CALL ref is not a job');
   });
 
   test('a refusal keeps the server message', () async {

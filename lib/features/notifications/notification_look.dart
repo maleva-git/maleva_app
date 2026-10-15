@@ -79,6 +79,7 @@ const int firstVesselRows = 5;
 /// link, red for the caller's own alert, amber for a team member's escalated one.
 Color alertToneOf(VesselAlert alert) {
   if (alert.isLink) return NoticeColors.vessel;
+  // omitted: the caller's own is red like an ETA alert (pinned, needs action), a team member's amber
   return alert.mine ? NoticeColors.alert : NoticeColors.reminder;
 }
 
@@ -106,6 +107,47 @@ String alertArrival(VesselAlert alert) {
   return alert.arriveEstimated ? '$arrival (est.)' : arrival;
 }
 
+/// "Terminal B18, LBT B7X" for an alert on Westports terminals, "MMSW · Northport KCT" for an MMSW one;
+/// '' for none.
+String alertTerminalText(VesselAlert alert) {
+  final terminal = alert.terminal?.trim() ?? '';
+  if (terminal.isEmpty) return '';
+  return alert.isMmsw ? alert.sourceText : 'Terminal $terminal';
+}
+
+/// "Omitted at Westports".
+String omittedAlertText(VesselAlert alert) => 'Omitted at ${alert.sourceLabel}';
+
+/// Line 2 of an ETA or OMITTED alert row: "PTP ETA 21 Oct 16:00 (est.) · 2 jobs not updated", for a
+/// Westports call "Westports ETA ... · Terminal B18"; an omitted call "Omitted at Westports · ETA ... ·
+/// 2 jobs to rearrange · Terminal B18"; an MMSW call "MMSW · Northport KCT · ETA ... · 2 jobs not updated".
+List<String> alertDetailParts(VesselAlert alert) {
+  final arrival = alertArrival(alert);
+  if (alert.isMmsw && !alert.isOmitted) {
+    return [
+      alert.sourceText,
+      'ETA ${arrival.isEmpty ? 'not given' : arrival}',
+      '${plural(alert.jobs, 'job')} not updated',
+    ];
+  }
+  if (alert.isOmitted) {
+    return [
+      omittedAlertText(alert),
+      if (arrival.isNotEmpty) 'ETA $arrival',
+      '${plural(alert.jobs, 'job')} to rearrange',
+      alertTerminalText(alert),
+    ];
+  }
+  return [
+    '${alert.sourceLabel} ETA ${arrival.isEmpty ? 'not given' : arrival}',
+    '${plural(alert.jobs, 'job')} not updated',
+    alertTerminalText(alert),
+  ];
+}
+
+/// A LINK alert's title: "Pick PTP voyage · job MY002605357" ("Pick Westports voyage · ...").
+String linkAlertTitle(VesselAlert alert) => 'Pick ${alert.sourceLabel} voyage · job ${alert.jobNo ?? ''}'.trim();
+
 /// When a vessel alert was sent (web `vesselAlertSentLabel`): "15:42" today, else "13 Oct 15:42"; '' for none.
 String alertSentLabel(String? sentAt, DateTime now) {
   final at = sentAt == null ? null : DateTime.tryParse(sentAt);
@@ -113,10 +155,12 @@ String alertSentLabel(String? sentAt, DateTime now) {
   return DateFormat(sameDay(at, now) ? 'HH:mm' : 'd MMM HH:mm').format(at);
 }
 
-/// System problems (PTP's schedule not updating, phone alerts not working): the only vessel notices
-/// with a red ship (web `isSystemNotice`).
+/// System problems (PTP's or MMSW's schedule not updating, phone alerts not working): the only vessel
+/// notices with a red ship (web `isSystemNotice`).
 bool isSystemNotice(EmployeeNotification n) =>
-    n.kind == NoticeKind.ptpScheduleStale || n.kind == NoticeKind.phonePushDown;
+    n.kind == NoticeKind.ptpScheduleStale ||
+    n.kind == NoticeKind.mmswScheduleStale ||
+    n.kind == NoticeKind.phonePushDown;
 
 /// The leader's escalation: "Not handled: …" or "Still not handled: …" (web `isEscalationNotice`).
 bool isEscalationNotice(EmployeeNotification n) =>

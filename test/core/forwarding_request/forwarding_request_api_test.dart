@@ -98,6 +98,29 @@ void main() {
     });
   });
 
+  group('ForwardingRequestTicks pass-through', () {
+    final released = ForwardingRequest.fromJava(javaRow(status: 'RELEASED', more: {
+      'documentReceived': true, 'draftCreated': true, 'draftCNumber': 'C1', 'submitted': true, 'submittedRef': 'R1',
+      'approved': true, 'approvedDate': '2026-10-09', 'released': true, 'releaseNo': 'K8-1', 'sealById': 31, 'breakSealById': 32,
+    }));
+
+    test('saving an older released row keeps the hidden steps, references and seal people', () {
+      final t = ForwardingRequestTicks.fromRequest(released).copyWith(cNumber: 'C2');
+      expect(t.blocker, isNull);
+      expect(t.toJava(), {
+        'documentReceived': true, 'draftCreated': true, 'cNumber': 'C2', 'submitted': true, 'submittedRef': 'R1',
+        'approved': true, 'approvedDate': '2026-10-09', 'released': true, 'releaseNo': 'K8-1', 'sealByRefId': 31, 'breakSealByRefId': 32,
+      });
+    });
+
+    test('unticking Draft unticks the later steps and keeps the seal people', () {
+      final j = ForwardingRequestTicks.fromRequest(released).step(ForwardingStep.draftCreated, false).toJava();
+      expect([j['draftCreated'], j['submitted'], j['approved'], j['released']], [false, false, false, false]);
+      expect([j['cNumber'], j['submittedRef'], j['releaseNo']], [null, null, null]);
+      expect([j['documentReceived'], j['sealByRefId'], j['breakSealByRefId']], [true, 31, 32]);
+    });
+  });
+
   group('ForwardingRequestFilter', () {
     test('defaults: the coming week for the team, a month each way for mine', () {
       final now = DateTime(2026, 10, 8, 15, 30);
@@ -113,6 +136,34 @@ void main() {
     });
   });
 
+  group('Request FW form estimates', () {
+    final now = DateTime(2026, 10, 15, 16, 45);
+
+    test('the first ticked form starts at tomorrow 09:00, a new one takes the last ticked form\'s date', () {
+      var e = toggleForwardingForm({}, 'K8', now: now);
+      expect(e, {'K8': DateTime(2026, 10, 16, 9)});
+      e = {...e, 'K8': DateTime(2026, 10, 20, 14)};
+      e = toggleForwardingForm(e, 'K1', now: now);
+      expect(e['K1'], DateTime(2026, 10, 20, 14));
+      e = {...e, 'K1': DateTime(2026, 10, 18, 10)};
+      e = toggleForwardingForm(e, 'K3', now: now);
+      expect(e['K3'], DateTime(2026, 10, 20, 14), reason: 'K8 is the last ticked form in K1, K2, K3, K8 order');
+      expect(tickedForwardingForms(e), ['K1', 'K3', 'K8']);
+      e = toggleForwardingForm(e, 'K3', now: now);
+      expect(e.containsKey('K3'), isFalse);
+    });
+
+    test('ready only when every ticked form has a date; items in K order', () {
+      expect(forwardingFormsReady({}), isFalse);
+      final e = {'K8': DateTime(2026, 10, 20, 14), 'K1': DateTime(2026, 10, 18, 10)};
+      expect(forwardingFormsReady(e), isTrue);
+      expect(forwardingFormsReady({...e, 'K2': null}), isFalse);
+      expect(forwardingRequestItems(e),
+          [ForwardingRequestItem('K1', DateTime(2026, 10, 18, 10)), ForwardingRequestItem('K8', DateTime(2026, 10, 20, 14))]);
+      expect(toggleForwardingForm({'K1': null}, 'K2', now: now)['K2'], DateTime(2026, 10, 16, 9), reason: 'a cleared date falls back to tomorrow');
+    });
+  });
+
   group('ForwardingRequestApi', () {
     late QueueAdapter adapter;
     late ForwardingRequestApi api;
@@ -122,14 +173,25 @@ void main() {
       api = ForwardingRequestApi(Dio(BaseOptions(baseUrl: 'https://java.test'))..httpClientAdapter = adapter);
     });
 
-    test('create posts the form types and the estimate in the Java shape', () async {
-      adapter.replies.add((201, jsonEncode(ok([javaRow(id: 101), javaRow(id: 102, more: {'formType': 'K1'})]))));
-      final rows = await api.create(saleOrderId: 910, formTypes: ['K8', 'K1'], estimatedDate: DateTime(2026, 10, 12, 9), remarks: ' 2 pallets ');
+    test('create posts one item per form type, each with its own estimate', () async {
+      adapter.replies.add((201, jsonEncode(ok([javaRow(id: 101, more: {'formType': 'K1'}), javaRow(id: 102)]))));
+      final rows = await api.create(
+        saleOrderId: 910,
+        items: [ForwardingRequestItem('K1', DateTime(2026, 10, 12, 9)), ForwardingRequestItem('K8', DateTime(2026, 10, 14, 15, 30))],
+        remarks: ' 2 pallets ',
+      );
       expect(rows.map((r) => r.id), [101, 102]);
       final req = adapter.requests.single;
       expect(req.uri.toString(), 'https://java.test/api/forwarding-requests');
       expect(req.method, 'POST');
-      expect(req.data, {'saleOrderId': 910, 'formTypes': ['K8', 'K1'], 'estimatedDate': '2026-10-12 09:00:00', 'remarks': '2 pallets'});
+      expect(req.data, {
+        'saleOrderId': 910,
+        'items': [
+          {'formType': 'K1', 'estimatedDate': '2026-10-12 09:00:00'},
+          {'formType': 'K8', 'estimatedDate': '2026-10-14 15:30:00'},
+        ],
+        'remarks': '2 pallets',
+      });
     });
 
     test('search and saveTicks hit the shared endpoints', () async {

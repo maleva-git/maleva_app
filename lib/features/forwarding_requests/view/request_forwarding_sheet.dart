@@ -9,7 +9,7 @@ import 'package:maleva/features/forwarding_requests/view/forwarding_request_card
 import 'package:maleva/features/planning/widgets/date_fields.dart';
 
 /// Customer Service's "Request FW" from the sale order: the form types the job needs (several at
-/// once) and the estimated date-time. Bottom sheet on a phone, dialog on a tablet. Resolves to the
+/// once), each with its own estimated date-time. Bottom sheet on a phone, dialog on a tablet. Resolves to the
 /// requests created, or null when closed.
 Future<List<ForwardingRequest>?> showRequestForwardingSheet(
   BuildContext context, {
@@ -52,14 +52,8 @@ class _RequestForwardingForm extends StatefulWidget {
 }
 
 class _RequestForwardingFormState extends State<_RequestForwardingForm> {
-  final Set<String> formTypes = {};
-  late String estimate = _tomorrowNine();
+  ForwardingFormEstimates estimates = {};
   final TextEditingController remarks = TextEditingController();
-
-  static String _tomorrowNine() {
-    final t = DateTime.now().add(const Duration(days: 1));
-    return toYmdHm(DateTime(t.year, t.month, t.day, 9, 0));
-  }
 
   @override
   void dispose() {
@@ -68,14 +62,9 @@ class _RequestForwardingFormState extends State<_RequestForwardingForm> {
   }
 
   Future<void> _submit(BuildContext context) async {
-    final when = parseYmdHm(estimate);
-    if (formTypes.isEmpty || when == null) return;
+    if (!forwardingFormsReady(estimates)) return;
     try {
-      final created = await context.read<RequestForwardingCubit>().create(
-            formTypes: forwardingFormTypes.where(formTypes.contains).toList(),
-            estimate: when,
-            remarks: remarks.text,
-          );
+      final created = await context.read<RequestForwardingCubit>().create(items: forwardingRequestItems(estimates), remarks: remarks.text);
       if (!context.mounted) return;
       showSnack(context, created.length == 1 ? 'Forwarding request created' : '${created.length} forwarding requests created');
       Navigator.of(context, rootNavigator: true).pop(created);
@@ -88,8 +77,9 @@ class _RequestForwardingFormState extends State<_RequestForwardingForm> {
   Widget build(BuildContext context) => BlocBuilder<RequestForwardingCubit, RequestForwardingState>(
         builder: (context, state) {
           final mc = context.mc;
-          final repeated = formTypes.where(state.openTypes.contains).toList();
-          final canSave = formTypes.isNotEmpty && parseYmdHm(estimate) != null && !state.saving;
+          final ticked = tickedForwardingForms(estimates);
+          final repeated = ticked.where(state.openTypes.contains).toList();
+          final canSave = forwardingFormsReady(estimates) && !state.saving;
           return Column(children: [
             Padding(
               padding: const EdgeInsets.fromLTRB(16, 16, 8, 0),
@@ -109,11 +99,11 @@ class _RequestForwardingFormState extends State<_RequestForwardingForm> {
                     Expanded(
                       child: FilterChip(
                         label: Center(child: Text(t, style: const TextStyle(fontWeight: FontWeight.w900))),
-                        selected: formTypes.contains(t),
+                        selected: estimates.containsKey(t),
                         selectedColor: formTypeColor(t),
-                        labelStyle: TextStyle(color: formTypes.contains(t) ? Colors.white : null),
+                        labelStyle: TextStyle(color: estimates.containsKey(t) ? Colors.white : null),
                         checkmarkColor: Colors.white,
-                        onSelected: (_) => setState(() => formTypes.contains(t) ? formTypes.remove(t) : formTypes.add(t)),
+                        onSelected: state.saving ? null : (_) => setState(() => estimates = toggleForwardingForm(estimates, t)),
                       ),
                     ),
                     if (t != forwardingFormTypes.last) const SizedBox(width: 6),
@@ -126,7 +116,25 @@ class _RequestForwardingFormState extends State<_RequestForwardingForm> {
                         style: TextStyle(fontSize: 12, color: mc.toneFg(StatusTone.warning))),
                   ),
                 const SizedBox(height: 16),
-                DateTimeField(label: 'Estimated date and time', value: estimate, onChanged: (v) => setState(() => estimate = v)),
+                if (ticked.isEmpty)
+                  Text('Tick the forms the job needs; each gets its own estimated date.', style: TextStyle(fontSize: 12, color: mc.muted))
+                else
+                  for (final t in ticked)
+                    Padding(
+                      padding: const EdgeInsets.only(bottom: 8),
+                      child: Row(children: [
+                        FormTypeBadge(t),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: DateTimeField(
+                            label: '$t estimated date and time',
+                            value: estimates[t] == null ? '' : toYmdHm(estimates[t]!),
+                            enabled: !state.saving,
+                            onChanged: (v) => setState(() => estimates = {...estimates, t: parseYmdHm(v)}),
+                          ),
+                        ),
+                      ]),
+                    ),
                 const SizedBox(height: 12),
                 TextField(controller: remarks, maxLength: 500, maxLines: 2, decoration: const InputDecoration(labelText: 'Remarks', hintText: 'Anything the forwarding team should know')),
                 const SizedBox(height: 12),
@@ -155,7 +163,7 @@ class _RequestForwardingFormState extends State<_RequestForwardingForm> {
               const SizedBox(width: 8),
               FilledButton(
                 onPressed: canSave ? () => _submit(context) : null,
-                child: Text(state.saving ? 'Saving…' : formTypes.length > 1 ? 'Request ${formTypes.length} forms' : 'Request'),
+                child: Text(state.saving ? 'Saving…' : ticked.length > 1 ? 'Request ${ticked.length} forms' : 'Request'),
               ),
             ]),
           ]);

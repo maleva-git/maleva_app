@@ -143,7 +143,8 @@ class VesselChangesCubit extends Cubit<VesselChangesState> {
   /// are said in a snackbar, refused and held ones in the notes; then the list reloads.
   Future<void> _apply(VesselChangeGroup group, List<VesselChangeJob> chosen) async {
     final callId = group.call.id;
-    if (chosen.isEmpty || state.busy) return;
+    // an omitted call's times are not the job's: those jobs get another vessel or voyage, or are dismissed
+    if (chosen.isEmpty || state.busy || group.call.omitted) return;
     final held = [
       for (final j in chosen)
         if (j.boardingMonthChanges && !state.confirmedBoarding.contains(vesselJobKey(callId, j))) j
@@ -195,7 +196,7 @@ class VesselChangesCubit extends Cubit<VesselChangesState> {
       busy: false,
       notes: notes,
       refused: refused,
-      done: ok.isEmpty ? null : updatedText(ok),
+      done: ok.isEmpty ? null : updatedText(ok, label: group.call.sourceLabel),
       doneSeq: ok.isEmpty ? null : state.doneSeq + 1,
     ));
     await load();

@@ -25,7 +25,7 @@ class VesselTimeCompare extends StatelessWidget {
         child: Row(children: [
           const SizedBox(width: _labelWidth),
           Expanded(child: _OneLine('In Maleva', style: head)),
-          Expanded(child: _OneLine('PTP now', style: head)),
+          Expanded(child: _OneLine(sourceNowLabel(call), style: head)),
         ]),
       ),
       _TimeRow(

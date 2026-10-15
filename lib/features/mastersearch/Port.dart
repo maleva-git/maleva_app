@@ -7,6 +7,72 @@ import 'package:maleva/core/utils/app_globals.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:maleva/core/utils/app_preferences.dart';
 
+/// The ports a user may pick: the employee's own ports for roles 500 and 600
+/// (empty when none are assigned), else the full list [kPortNames].
+Future<List<String>> loadPortNames(BuildContext context) async {
+  if (AppPreferences.getRoleId() == 600 || AppPreferences.getRoleId() == 500) {
+    return sl<LegacyApiRepository>().GetEmployeeport(context);
+  }
+  return List.of(kPortNames);
+}
+
+const kPortNames = <String>[
+  "WESTPORT-B18",
+  "NORTHPORT- B10",
+  "SOUTHPORT-B11",
+  "WESTPORT LBT- B7X",
+  "WESTPORT DRY BULK- B7Y",
+  "PULAU KETAM JETTY",
+  "KAPAR POWERSTATION-B11",
+  "WESTPORT CRIUSE TERMINAL-B7S",
+  "PTP-J33",
+  "PASIRGUDANG PORT- J15",
+  "TANJUNG LANGSAT-J76",
+  "TANJUNG BIN- J33",
+  "PASIR  PUTIH JETTY",
+  "PENGERENG PORT-J15",
+  "PENDAS JETTY",
+  "PARMESWARA JETTY MELAKA- M14",
+  "TANJUNG BRUAS MELAKA-M14",
+  "SUNGAI UDANG MELAKA-M15",
+  "SUNGAI LINGGI-M23",
+  "PORT DICKSON- N11",
+  "KUANTAN PORT -C13",
+  "KEMAMAN PORT (KSB)- T16",
+  "LIKIR BULK TERMINAL LUMUT A22",
+  "MARITIME TERMINAL  LUMUT A22",
+  "VALI PORT A13",
+  "KERTEH",
+  "MMHE",
+  "BWCT -PENANG P15",
+  "BUTTERWORTH",
+  "PBCT-PENANG P88",
+  "NBCT-PENANG P14",
+  "SPCT-PENANG  P20",
+  "TOK BALI",
+  "KSB  WEST KEMAMAN T15",
+  "KPK KEMAMAN T16",
+  "KEMAMAN PORT (KSB) T16",
+  "LUMUT PORT-A22",
+  "SAPANGAR BAY CONTAINER PORT",
+  "KOTA KINABALU PORT",
+  "SAPANGAR BAY OIL TERMINAL",
+  "KUDAT PORT",
+  "SANDAKAN PORT",
+  "LAHAD DATU PORT",
+  "KUNAK PORT",
+  "TAWAU PORT",
+  "LABUAN PORT",
+  "MIRI PORT",
+  "SAMALAJU PORT",
+  "RAJANG PORT",
+  "TANJUNG MANIS PORT",
+  "KUCHING PORT",
+  "SIBU PORT",
+  "SARIKEI PORT",
+  "BINTULU PORT",
+];
+
 class Port extends StatefulWidget {
   final int Searchby;
   final int SearchId;
@@ -22,62 +88,7 @@ class Port extends StatefulWidget {
 class _Portstate extends State<Port> {
   bool progress = false;
   final txtSearch = TextEditingController();
-  List<String> PortList = <String>[
-    "WESTPORT-B18",
-    "NORTHPORT- B10",
-    "SOUTHPORT-B11",
-    "WESTPORT LBT- B7X",
-    "WESTPORT DRY BULK- B7Y",
-    "PULAU KETAM JETTY",
-    "KAPAR POWERSTATION-B11",
-    "WESTPORT CRIUSE TERMINAL-B7S",
-    "PTP-J33",
-    "PASIRGUDANG PORT- J15",
-    "TANJUNG LANGSAT-J76",
-    "TANJUNG BIN- J33",
-    "PASIR  PUTIH JETTY",
-    "PENGERENG PORT-J15",
-    "PENDAS JETTY",
-    "PARMESWARA JETTY MELAKA- M14",
-    "TANJUNG BRUAS MELAKA-M14",
-    "SUNGAI UDANG MELAKA-M15",
-    "SUNGAI LINGGI-M23",
-    "PORT DICKSON- N11",
-    "KUANTAN PORT -C13",
-    "KEMAMAN PORT (KSB)- T16",
-    "LIKIR BULK TERMINAL LUMUT A22",
-    "MARITIME TERMINAL  LUMUT A22",
-    "VALI PORT A13",
-    "KERTEH",
-    "MMHE",
-    "BWCT -PENANG P15",
-    "BUTTERWORTH",
-    "PBCT-PENANG P88",
-    "NBCT-PENANG P14",
-    "SPCT-PENANG  P20",
-    "TOK BALI",
-    "KSB  WEST KEMAMAN T15",
-    "KPK KEMAMAN T16",
-    "KEMAMAN PORT (KSB) T16",
-    "LUMUT PORT-A22",
-    "SAPANGAR BAY CONTAINER PORT",
-    "KOTA KINABALU PORT",
-    "SAPANGAR BAY OIL TERMINAL",
-    "KUDAT PORT",
-    "SANDAKAN PORT",
-    "LAHAD DATU PORT",
-    "KUNAK PORT",
-    "TAWAU PORT",
-    "LABUAN PORT",
-    "MIRI PORT",
-    "SAMALAJU PORT",
-    "RAJANG PORT",
-    "TANJUNG MANIS PORT",
-    "KUCHING PORT",
-    "SIBU PORT",
-    "SARIKEI PORT",
-    "BINTULU PORT",
-  ];
+  List<String> PortList = List.of(kPortNames);
   List<String> filtersearchlist = <String>[];
 
   @override
@@ -91,10 +102,7 @@ class _Portstate extends State<Port> {
     super.dispose();
   }
   Future startup() async {
-    if (AppPreferences.getRoleId() == 600 || AppPreferences.getRoleId() == 500) {
-      List<String> apiPorts = await sl<LegacyApiRepository>().GetEmployeeport(context);
-      PortList = apiPorts; // Set to empty if no ports are assigned
-    }
+    PortList = await loadPortNames(context);
 
     filtersearchlist = PortList;
     if (mounted) {

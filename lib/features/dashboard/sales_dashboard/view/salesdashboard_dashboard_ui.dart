@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:maleva/features/notifications/notification_bell.dart';
+import 'package:maleva/features/truck_driver_details/truck_driver_details_page.dart';
 import 'package:maleva/core/widgets/custom_app_bar.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:maleva/core/colors/colors.dart' as colour;
@@ -55,6 +56,12 @@ class SalesDashboardView extends StatelessWidget {
       actions: [
         // the bell: unread notices and open vessel alerts (vessel-master-and-ptp-schedule)
         NotificationBellButton(isTablet: isTablet),
+        // Truck & Driver Details sheet (the shared /api/truck-driver-details)
+        IconButton(
+          tooltip: 'Truck & Driver Details',
+          icon: Icon(Icons.badge_outlined, size: isTablet ? 28 : 25),
+          onPressed: () => Navigator.push(context, TruckDriverDetailsPage.route()),
+        ),
         IconButton(
           icon: Icon(Icons.directions_boat_filled,
               size: isTablet ? 28 : 25),

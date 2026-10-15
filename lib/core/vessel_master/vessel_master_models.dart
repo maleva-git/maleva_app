@@ -10,6 +10,43 @@ class VesselLeg {
   static const String off = 'OFF';
 }
 
+/// The schedule sources of a vessel call (`PtpCall.port`, `VesselAlert.port`) and their text labels.
+class VesselSource {
+  VesselSource._();
+
+  static const String ptp = 'PTP';
+  static const String westports = 'WESTPORTS';
+
+  /// MMSW (Northport, Southport and the other Port Klang terminals; backend change mmsw-vessel-schedule).
+  static const String mmsw = 'MMSW';
+  static const String ptpLabel = 'PTP';
+  static const String westportsLabel = 'Westports';
+  static const String mmswLabel = 'MMSW';
+
+  /// The label of a source code ([ptp] / [westports] / [mmsw]); "PTP" for none or an unknown one.
+  static String labelOf(String? port, {String? label}) {
+    final given = label?.trim() ?? '';
+    if (given.isNotEmpty) return given;
+    switch (port?.toUpperCase()) {
+      case westports:
+        return westportsLabel;
+      case mmsw:
+        return mmswLabel;
+      default:
+        return ptpLabel;
+    }
+  }
+
+  /// "MMSW · Northport KCT": the label and, when given, the terminal(s) of an MMSW call; the label alone otherwise.
+  static String withTerminal(String label, String? terminal) {
+    final t = terminal?.trim() ?? '';
+    return t.isEmpty ? label : '$label · $t';
+  }
+
+  /// "PTP's", "Westports'".
+  static String possessive(String label) => label.endsWith('s') ? "$label'" : "$label's";
+}
+
 /// A Java date-time of the vessel APIs (`yyyy-MM-dd'T'HH:mm`, no offset) as the wall clock it
 /// names; null for null or an unreadable value.
 DateTime? vesselTime(String? value) => value == null ? null : DateTime.tryParse(value);
@@ -37,6 +74,18 @@ class PtpCall {
     this.hazardCutoff,
     this.listed = true,
     this.lastSeenAt,
+    this.portLabel,
+    this.voyageOut,
+    this.status,
+    this.omitted = false,
+    this.yardOpening,
+    this.berth,
+    this.actualArriveAt,
+    this.actualDepartAt,
+    this.terminal,
+    this.callSign,
+    this.lastPort,
+    this.shippingAgent,
   });
 
   factory PtpCall.fromJava(Map<String, dynamic> m) => PtpCall(
@@ -57,16 +106,33 @@ class PtpCall {
         hazardCutoff: JsonRead.stringOrNull(m['hazardCutoff']),
         listed: m['listed'] == null ? true : JsonRead.boolean(m['listed']),
         lastSeenAt: JsonRead.stringOrNull(m['lastSeenAt']),
+        portLabel: JsonRead.stringOrNull(m['portLabel']),
+        voyageOut: JsonRead.stringOrNull(m['voyageOut']),
+        status: JsonRead.stringOrNull(m['status']),
+        omitted: JsonRead.boolean(m['omitted']),
+        yardOpening: JsonRead.stringOrNull(m['yardOpening']),
+        berth: JsonRead.stringOrNull(m['berth']),
+        actualArriveAt: JsonRead.stringOrNull(m['actualArriveAt']),
+        actualDepartAt: JsonRead.stringOrNull(m['actualDepartAt']),
+        terminal: JsonRead.stringOrNull(m['terminal']),
+        callSign: JsonRead.stringOrNull(m['callSign']),
+        lastPort: JsonRead.stringOrNull(m['lastPort']),
+        shippingAgent: JsonRead.stringOrNull(m['shippingAgent']),
       );
 
   final int id;
+
+  /// The schedule source: [VesselSource.ptp], [VesselSource.westports] or [VesselSource.mmsw] (null in
+  /// older answers: PTP).
   final String? port;
   final String vesselName;
   final String? vesselCode;
   final String? lineId;
+
+  /// Null for an MMSW call (MMSW has no voyage; [voyageText] shows its SCN instead).
   final String? voyage;
 
-  /// Null when PTP says None.
+  /// Null when PTP says None. MMSW's key of the call.
   final String? scn;
   final String? arriveAt;
 
@@ -82,6 +148,53 @@ class PtpCall {
   /// False once PTP no longer lists the call.
   final bool listed;
   final String? lastSeenAt;
+
+  /// "PTP" or "Westports", for texts (change westports-vessel-schedule); null in older answers.
+  final String? portLabel;
+
+  /// Westports' Voyage Out; null for PTP.
+  final String? voyageOut;
+
+  /// Westports' Status as written ("Not Arrived", "Arrived", "Omitted", ...); null for PTP.
+  final String? status;
+
+  /// Westports lists the call as Omitted: the vessel skips Westports.
+  final bool omitted;
+  final String? yardOpening;
+
+  /// The berth Westports assigned to the call ("B19").
+  final String? berth;
+
+  /// Westports' ATA / ATD (shown, never compared); null for PTP.
+  final String? actualArriveAt;
+  final String? actualDepartAt;
+
+  /// MMSW's terminal(s) ("Northport KCT", or a list "Northport KCT, Southport BST"); null for PTP / Westports
+  /// and in older answers.
+  final String? terminal;
+
+  /// MMSW's call sign, last port ("SGSIN-SINGAPORE") and shipping agent; null for PTP / Westports.
+  final String? callSign;
+  final String? lastPort;
+  final String? shippingAgent;
+
+  bool get isWestports => port?.toUpperCase() == VesselSource.westports;
+
+  bool get isMmsw => port?.toUpperCase() == VesselSource.mmsw;
+
+  /// The source as texts name it: [portLabel], else "Westports" / "MMSW" by [port], else "PTP".
+  String get sourceLabel => VesselSource.labelOf(port, label: portLabel);
+
+  /// The source with an MMSW call's terminal: "MMSW · Northport KCT"; [sourceLabel] otherwise.
+  String get sourceText => isMmsw ? VesselSource.withTerminal(sourceLabel, terminal) : sourceLabel;
+
+  /// What stands after the vessel name: the voyage, else "SCN 267DF4" (an MMSW call has no voyage); null for neither.
+  String? get voyageText {
+    final v = voyage?.trim() ?? '';
+    if (v.isNotEmpty) return v;
+    final s = scn?.trim() ?? '';
+    return s.isEmpty ? null : 'SCN $s';
+  }
 
   DateTime? get arrive => vesselTime(arriveAt);
   DateTime? get depart => vesselTime(departAt);

@@ -84,7 +84,8 @@ class LocalNotificationService {
       );
 
   /// A push of one of the vessel types (`VESSEL_ETA_CHANGED`, `VESSEL_LINK_NEEDED`, `PTP_SCHEDULE_STALE`,
-  /// by `data['type']`) is shown on the vessel channel with the long vibration; every other on the normal one.
+  /// `PHONE_PUSH_DOWN`, `VESSEL_OMITTED`, `WESTPORTS_UPLOAD_DUE`, `MMSW_SCHEDULE_STALE`, by `data['type']`) is
+  /// shown on the vessel channel with the long vibration; every other on the normal one.
   static bool usesVesselChannel(Map<String, dynamic> data) => isVesselPushType(data['type']?.toString());
 
   /// Android's Notification.FLAG_INSISTENT.

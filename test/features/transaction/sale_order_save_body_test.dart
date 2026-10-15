@@ -134,7 +134,7 @@ void main() {
       final body = saleOrderSaveBody(typed(), companyId: 6, employeeId: 7);
 
       expect(body.keys.toSet(), {
-        'id', 'cNumber', 'cNumberDisplay', 'companyRefId', 'employeeRefId', 'customerRefId', 'jobMasterRefId',
+        'id', 'cNumber', 'cNumberDisplay', 'companyRefId', 'employeeRefId', 'customerRefId', 'endCustomerRefId', 'jobMasterRefId',
         'jStatus', 'billType', 'saleDate', 'agentCompanyRefId', 'agentMasterRefId', 'oAgentCompanyRefId',
         'oAgentMasterRefId', 'remarks', 'doDescription', 'amount', 'grossAmount', 'taxAmount', 'coinage',
         'currencyValue', 'actualNetAmount', 'offvesselname', 'loadingvesselname', 'sPort', 'oPort', 'vessel',
@@ -163,5 +163,16 @@ void main() {
       'oagentCompanyRefId': 7, 'customerName': 'ACME'}),
         {'customerRefId': 5, 'sPort': 'PKG', 'awbNo': 'A1', 'oeta': null, 'jStatus': 2, 'oAgentCompanyRefId': 7,
           'customerName': 'ACME'});
+  });
+
+  test('carries the end customer: the chosen id, or 0 so the server clears it', () {
+    final loaded = {'id': 40, 'cNumber': 40, 'cNumberDisplay': 'MY00040', 'endCustomerRefId': 11, 'endCustomerName': 'Daikin'};
+
+    final kept = saleOrderSaveBody(form(editId: 40, loaded: loaded).copyWith(custId: 5, endCustomerId: 11, txtEndCustomer: 'Daikin'),
+        companyId: 6, employeeId: 0);
+    expect(kept['endCustomerRefId'], 11);
+
+    final cleared = saleOrderSaveBody(form(editId: 40, loaded: loaded).copyWith(custId: 5), companyId: 6, employeeId: 0);
+    expect(cleared['endCustomerRefId'], 0, reason: 'the form value wins over the loaded one');
   });
 }

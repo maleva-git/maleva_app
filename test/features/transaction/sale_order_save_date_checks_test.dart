@@ -64,6 +64,27 @@ void main() {
       expect(q.lines.single.ptp, DateTime(2026, 10, 14, 15));
     });
 
+    test('the question names the schedule the call is from', () {
+      PtpTimeQuestion ask(PtpCall call) =>
+          planPtpTimes(offJob(eta: '2026-10-16 10:00:00'), {VesselLeg.off: LegCall('FM NAMTHONG EXCELLENCE', call)})!;
+
+      final ptp = ask(_call);
+      expect(ptp.title, "PTP's schedule shows another time");
+      expect(ptp.message, startsWith('PTP lists FM NAMTHONG EXCELLENCE 2653 at other times'));
+      expect(ptp.useText, "Use PTP's times");
+
+      final westports = ask(const PtpCall(id: 43, port: 'WESTPORTS', vesselName: 'FM NAMTHONG EXCELLENCE',
+          voyage: '2653', arriveAt: '2026-10-14T15:00', arriveEstimated: true));
+      expect(westports.title, "Westports' schedule shows another time");
+      expect(westports.useText, "Use Westports' times");
+      expect(westports.lines.single.source, 'Westports');
+
+      final mmsw = ask(const PtpCall(id: 44, port: 'MMSW', vesselName: 'FM NAMTHONG EXCELLENCE', scn: '267DF4',
+          arriveAt: '2026-10-14T15:00', arriveEstimated: true));
+      expect(mmsw.title, "MMSW's schedule shows another time");
+      expect(mmsw.message, startsWith('MMSW lists FM NAMTHONG EXCELLENCE SCN 267DF4'));
+    });
+
     test('under an hour, a renamed vessel, or no call asks nothing', () {
       expect(planPtpTimes(offJob(eta: '2026-10-14 15:30:00'), calls), isNull);
       expect(planPtpTimes(offJob(eta: '2026-10-16 10:00:00').copyWith(txtOffVessel: 'CMA CGM PETRON'), calls), isNull);

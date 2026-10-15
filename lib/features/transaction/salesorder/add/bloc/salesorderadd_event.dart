@@ -18,6 +18,8 @@ class UpdateCheckbox extends SalesOrderAddEvent { final String field; final bool
 class UpdateDate extends SalesOrderAddEvent { final String field; final String value; UpdateDate(this.field, this.value); }
 
 class CustomerSelected extends SalesOrderAddEvent { final String name; final int id; CustomerSelected(this.name, this.id); }
+/// The customer's own customer, picked or added in the end customer sheet; id 0 clears it.
+class EndCustomerSelected extends SalesOrderAddEvent { final String name; final int id; EndCustomerSelected(this.name, this.id); }
 class JobTypeSelected extends SalesOrderAddEvent { final String name; final int id; JobTypeSelected(this.name, this.id); }
 class JobStatusSelected extends SalesOrderAddEvent { final String name; final int id; JobStatusSelected(this.name, this.id); }
 class LAgentCompanySelected extends SalesOrderAddEvent { final String name; final int id; LAgentCompanySelected(this.name, this.id); }

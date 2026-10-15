@@ -29,6 +29,8 @@ Map<String, dynamic> saleOrderSaveBody(SalesOrderAddLoaded s, {required int comp
     'companyRefId': companyId,
     'employeeRefId': idOrNull(employeeId),
     'customerRefId': s.custId,
+    // the chosen end customer, 0 for none (the Java save reads 0 as clear, null as keep)
+    'endCustomerRefId': s.endCustomerId,
     'jobMasterRefId': s.jobTypeId,
     'jStatus': idOrNull(s.statusId),
     'billType': s.dropdownValue,

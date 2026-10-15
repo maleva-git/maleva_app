@@ -23,7 +23,7 @@ class RequestForwardingState {
 }
 
 /// Customer Service's "Request FW" on a sale order: shows what is already asked, creates one request
-/// per chosen form type.
+/// per chosen form type, each with its own estimate.
 class RequestForwardingCubit extends Cubit<RequestForwardingState> {
   RequestForwardingCubit(this._api, {required this.saleOrderId}) : super(const RequestForwardingState());
 
@@ -40,10 +40,10 @@ class RequestForwardingCubit extends Cubit<RequestForwardingState> {
   }
 
   /// Throws the server's message when refused (unknown job, bad form type).
-  Future<List<ForwardingRequest>> create({required List<String> formTypes, required DateTime estimate, String remarks = ''}) async {
+  Future<List<ForwardingRequest>> create({required List<ForwardingRequestItem> items, String remarks = ''}) async {
     emit(state.copyWith(saving: true, clearError: true));
     try {
-      final created = await _api.create(saleOrderId: saleOrderId, formTypes: formTypes, estimatedDate: estimate, remarks: remarks);
+      final created = await _api.create(saleOrderId: saleOrderId, items: items, remarks: remarks);
       if (!isClosed) emit(state.copyWith(existing: [...created, ...state.existing], saving: false));
       return created;
     } catch (e) {

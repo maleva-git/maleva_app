@@ -30,6 +30,7 @@ import 'package:maleva/features/transaction/salesorder/add/bloc/save_date_checks
 import 'package:maleva/core/di/injection.dart';
 import 'package:maleva/core/utils/json_read.dart';
 import 'package:maleva/features/forwarding_requests/view/request_forwarding_sheet.dart';
+import 'package:maleva/features/transaction/salesorder/add/view/end_customer_sheet.dart';
 import 'package:maleva/core/colors/colors.dart' as colour;
 import 'package:maleva/core/models/shared/customer_model.dart';
 import 'package:maleva/core/models/shared/employee_model.dart';
@@ -253,13 +254,13 @@ class _SalesOrderAddBodyState extends State<_SalesOrderAddBody> with TickerProvi
       context: context,
       barrierDismissible: false,
       builder: (ctx) => AlertDialog(
-        title: Text("Use PTP's ${q.leg == VesselLeg.loading ? 'loading' : 'off'} vessel times?"),
+        title: Text("Use ${ownerForm(q.call.sourceLabel)} ${q.leg == VesselLeg.loading ? 'loading' : 'off'} vessel times?"),
         content: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.start, children: [
           for (final d in q.differing) Text('${d.field}: ${d.current} → ${d.ptp}'),
         ]),
         actions: [
           TextButton(onPressed: () => Navigator.of(ctx).pop(false), child: const Text('Keep mine')),
-          TextButton(onPressed: () => Navigator.of(ctx).pop(true), child: const Text("Use PTP's")),
+          TextButton(onPressed: () => Navigator.of(ctx).pop(true), child: Text('Use ${ownerForm(q.call.sourceLabel)}')),
         ],
       ),
     );
@@ -273,20 +274,20 @@ class _SalesOrderAddBodyState extends State<_SalesOrderAddBody> with TickerProvi
       context: context,
       barrierDismissible: false,
       builder: (ctx) => AlertDialog(
-        title: const Text("PTP's schedule shows another time"),
+        title: Text(q.title),
         content: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.start, children: [
-          Text('PTP lists ${q.vessels} at other times than you entered. Use PTP\'s times, or keep yours?'),
+          Text(q.message),
           const SizedBox(height: 8),
           for (final l in q.lines)
             Text(
-              '${l.legLabel} ${l.label}: ${saveDateText(l.current)} → PTP ${saveDateText(l.ptp)}'
+              '${l.legLabel} ${l.label}: ${saveDateText(l.current)} → ${l.source} ${saveDateText(l.ptp)}'
               '${l.estimated ? ' (estimated)' : ''}',
               style: const TextStyle(fontWeight: FontWeight.w600),
             ),
         ]),
         actions: [
           TextButton(onPressed: () => Navigator.of(ctx).pop(false), child: const Text('Keep my times')),
-          TextButton(onPressed: () => Navigator.of(ctx).pop(true), child: const Text("Use PTP's times")),
+          TextButton(onPressed: () => Navigator.of(ctx).pop(true), child: Text(q.useText)),
         ],
       ),
     );
@@ -508,6 +509,17 @@ class _SalesOrderAddBodyState extends State<_SalesOrderAddBody> with TickerProvi
             }
           },
           onClear: () => bloc.add(CustomerSelected('', 0)),
+        ),
+        _gap(),
+        // The customer's own customer (Daikin on a CIVA job); optional.
+        _searchField(
+          hint: "End Customer (optional)", uniqueId: 'search_end_customer', value: state.txtEndCustomer,
+          enabled: fp["txtCustomer"] == true && state.custId > 0,
+          onSearch: () async {
+            final picked = await showEndCustomerSheet(context, customerId: state.custId, customerName: state.txtCustomer);
+            if (picked != null) bloc.add(EndCustomerSelected(picked.name, picked.id));
+          },
+          onClear: () => bloc.add(EndCustomerSelected('', 0)),
         ),
         _gap(),
         _searchField(

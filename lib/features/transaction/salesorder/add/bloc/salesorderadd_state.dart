@@ -142,6 +142,9 @@ class SalesOrderAddLoaded extends SalesOrderAddState {
 
   final String txtJobNo;
   final String txtCustomer;
+  /// The customer's own customer (Daikin on a CIVA job): id 0 and '' for none.
+  final int endCustomerId;
+  final String txtEndCustomer;
   final String txtJobType;
   final String txtJobStatus;
   final String txtRemarks;
@@ -263,7 +266,7 @@ class SalesOrderAddLoaded extends SalesOrderAddState {
     this.dropdownValue = 'MY', this.dropdownValueTruckSize, this.dropdownValueFW1, this.dropdownValueFW2, this.dropdownValueFW3,
     this.dropdownValueZB1, this.dropdownValueZB2, this.pickUpAddressList = const [], this.pickUpQuantityList = const [],
     this.pickUpWeightList = const [], this.deliveryAddressList = const [], this.deliveryQuantityList = const [],
-    this.deliveryWeightList = const [], this.txtJobNo = '', this.txtCustomer = '', this.txtJobType = '',
+    this.deliveryWeightList = const [], this.txtJobNo = '', this.txtCustomer = '', this.endCustomerId = 0, this.txtEndCustomer = '', this.txtJobType = '',
     this.txtJobStatus = '', this.txtRemarks = '', this.txtDoDescription = '', this.txtWeight = '', this.txtQuantity = '', this.txtTruckSize = '',
     this.txtAWBNo = '', this.txtBLCopy = '', this.txtPTWNo = '', this.txtCommodityType = '', this.txtCargo = '', this.txtLAgentCompany = '',
     this.txtLAgentName = '', this.txtLSCN = '', this.txtLoadingVessel = '', this.txtLPort = '', this.txtLVesselType = '', this.txtOAgentCompany = '',
@@ -291,7 +294,7 @@ class SalesOrderAddLoaded extends SalesOrderAddState {
     visibleOffVessel, visibleLoadingVessel, visibleGC, visibleFORWARDING, visibleProductview, visibleFW1, visibleFW2, visibleFW3, disabledBillType,
     dropdownValue, dropdownValueTruckSize, dropdownValueFW1, dropdownValueFW2, dropdownValueFW3, dropdownValueZB1, dropdownValueZB2,
     pickUpAddressList.length, pickUpQuantityList.length, pickUpWeightList.length, deliveryAddressList.length, deliveryQuantityList.length, deliveryWeightList.length,
-    txtJobNo, txtCustomer, txtJobType, txtJobStatus, txtRemarks, txtDoDescription, txtWeight, txtQuantity, txtTruckSize,
+    txtJobNo, txtCustomer, endCustomerId, txtEndCustomer, txtJobType, txtJobStatus, txtRemarks, txtDoDescription, txtWeight, txtQuantity, txtTruckSize,
     txtAWBNo, txtBLCopy, txtPTWNo, txtCommodityType, txtCargo, txtLAgentCompany, txtLAgentName, txtLSCN, txtLoadingVessel,
     txtLPort, txtLVesselType, txtOAgentCompany, txtOAgentName, txtOSCN, txtOffVessel, txtOPort, txtOVesselType, txtPickUpAddress,
     txtPickUpQuantity, txtPickUpWeight, txtDeliveryAddress, txtDeliveryQuantity, txtDeliveryWeight, txtWarehouseAddress, txtOrigin, txtDestination, txtSmk1, txtSmk2,
@@ -331,7 +334,7 @@ class SalesOrderAddLoaded extends SalesOrderAddState {
     String? dropdownValue, Object? dropdownValueTruckSize = _sentinel, Object? dropdownValueFW1 = _sentinel,
     Object? dropdownValueFW2 = _sentinel, Object? dropdownValueFW3 = _sentinel, Object? dropdownValueZB1 = _sentinel,
     Object? dropdownValueZB2 = _sentinel, List<dynamic>? pickUpAddressList, List<dynamic>? pickUpQuantityList, List<dynamic>? pickUpWeightList,
-    List<dynamic>? deliveryAddressList, List<dynamic>? deliveryQuantityList, List<dynamic>? deliveryWeightList, String? txtJobNo, String? txtCustomer,
+    List<dynamic>? deliveryAddressList, List<dynamic>? deliveryQuantityList, List<dynamic>? deliveryWeightList, String? txtJobNo, String? txtCustomer, int? endCustomerId, String? txtEndCustomer,
     String? txtJobType, String? txtJobStatus, String? txtRemarks, String? txtDoDescription, String? txtWeight,
     String? txtQuantity, String? txtTruckSize, String? txtAWBNo, String? txtBLCopy, String? txtPTWNo,
     String? txtCommodityType, String? txtCargo, String? txtLAgentCompany, String? txtLAgentName, String? txtLSCN,
@@ -405,6 +408,7 @@ class SalesOrderAddLoaded extends SalesOrderAddState {
       pickUpWeightList: pickUpWeightList ?? this.pickUpWeightList, deliveryAddressList: deliveryAddressList ?? this.deliveryAddressList,
       deliveryQuantityList: deliveryQuantityList ?? this.deliveryQuantityList, deliveryWeightList: deliveryWeightList ?? this.deliveryWeightList,
       txtJobNo: txtJobNo ?? this.txtJobNo, txtCustomer: txtCustomer ?? this.txtCustomer,
+      endCustomerId: endCustomerId ?? this.endCustomerId, txtEndCustomer: txtEndCustomer ?? this.txtEndCustomer,
       txtJobType: txtJobType ?? this.txtJobType, txtJobStatus: txtJobStatus ?? this.txtJobStatus, txtRemarks: txtRemarks ?? this.txtRemarks, txtDoDescription: txtDoDescription ?? this.txtDoDescription,
       txtWeight: txtWeight ?? this.txtWeight, txtQuantity: txtQuantity ?? this.txtQuantity, txtTruckSize: txtTruckSize ?? this.txtTruckSize,
       txtAWBNo: txtAWBNo ?? this.txtAWBNo, txtBLCopy: txtBLCopy ?? this.txtBLCopy, txtPTWNo: txtPTWNo ?? this.txtPTWNo,

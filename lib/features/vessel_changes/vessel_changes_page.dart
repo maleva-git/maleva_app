@@ -5,6 +5,7 @@ import 'package:maleva/core/di/injection.dart';
 import 'package:maleva/core/vessel_changes/vessel_change_look.dart';
 import 'package:maleva/core/vessel_changes/vessel_changes_api.dart';
 import 'package:maleva/core/vessel_changes/vessel_changes_models.dart';
+import 'package:maleva/core/vessel_master/vessel_master_models.dart';
 import 'package:maleva/features/vessel_changes/job_actions.dart';
 import 'package:maleva/features/vessel_changes/vessel_changes_cubit.dart';
 import 'package:maleva/features/vessel_changes/vessel_time_compare.dart';
@@ -97,6 +98,16 @@ class VesselChangesPage extends StatelessWidget {
                 ? 'PTP has not been read yet'
                 : 'PTP last read ${vesselTimeText(data.lastGoodReadAt)}'),
           ),
+          if (data.lastReadAt(VesselSource.westports) != null)
+            Center(
+              child: Text('Westports last uploaded ${vesselTimeText(data.lastReadAt(VesselSource.westports))}',
+                  key: const Key('westports_last_read')),
+            ),
+          if (data.lastReadAt(VesselSource.mmsw) != null)
+            Center(
+              child: Text('MMSW last read ${vesselTimeText(data.lastReadAt(VesselSource.mmsw))}',
+                  key: const Key('mmsw_last_read')),
+            ),
         ] else
           for (final g in data.groups)
             if (g.jobs.isNotEmpty) _GroupCard(group: g, state: state),
@@ -131,6 +142,7 @@ class _GroupCard extends StatelessWidget {
     final cubit = context.read<VesselChangesCubit>();
     final call = group.call;
     final muted = Theme.of(context).colorScheme.onSurfaceVariant;
+    final status = statusChangeText(group);
     return Card(
       margin: const EdgeInsets.symmetric(vertical: 6),
       child: Padding(
@@ -150,16 +162,24 @@ class _GroupCard extends StatelessWidget {
           Text(vesselCallSubline(group),
               key: ValueKey('vessel_subline_${call.id}'),
               style: Theme.of(context).textTheme.bodySmall?.copyWith(color: muted)),
+          if (status != null)
+            Text(status,
+                key: ValueKey('vessel_status_change_${call.id}'),
+                style: Theme.of(context).textTheme.bodySmall?.copyWith(color: muted)),
+          if (call.omitted) _OmittedNote(call: call),
           for (final j in group.jobs) ...[
             const Divider(height: 20),
             _JobRow(group: group, job: j, state: state),
           ],
-          const SizedBox(height: 12),
-          FilledButton(
-            key: ValueKey('update_${call.id}'),
-            onPressed: state.busy ? null : () => cubit.update(group),
-            child: Text(updateAllLabel(group.jobs.length), maxLines: 1, overflow: TextOverflow.ellipsis),
-          ),
+          if (!call.omitted) ...[
+            const SizedBox(height: 12),
+            FilledButton(
+              key: ValueKey('update_${call.id}'),
+              onPressed: state.busy ? null : () => cubit.update(group),
+              child: Text(updateAllLabel(group.jobs.length, label: call.sourceLabel),
+                  maxLines: 1, overflow: TextOverflow.ellipsis),
+            ),
+          ],
         ]),
       ),
     );
@@ -183,7 +203,8 @@ class _JobRow extends StatelessWidget {
       key: ValueKey('job_$key'),
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        Text('${vesselJobName(job)} · ${job.isLoading ? 'Loading' : 'Off'}',
+        Text(vesselJobLine(job),
+            key: ValueKey('job_line_$key'),
             maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(fontWeight: FontWeight.w700)),
         if (who.isNotEmpty)
           Text(who.join(' · '),
@@ -194,6 +215,32 @@ class _JobRow extends StatelessWidget {
         VesselTimeCompare(call: group.call, job: job),
         VesselJobActions(group: group, job: job, state: state),
       ],
+    );
+  }
+}
+
+/// "Omitted at Westports" on a card whose call is omitted: a thin amber accent and plain text (no banner),
+/// with what the jobs need.
+class _OmittedNote extends StatelessWidget {
+  const _OmittedNote({required this.call});
+
+  final PtpCall call;
+
+  @override
+  Widget build(BuildContext context) {
+    final small = Theme.of(context).textTheme.bodySmall;
+    return Container(
+      key: ValueKey('vessel_omitted_${call.id}'),
+      margin: const EdgeInsets.only(top: 6),
+      padding: const EdgeInsets.fromLTRB(8, 4, 4, 4),
+      decoration: BoxDecoration(
+        color: vesselChangeAccent.withValues(alpha: 0.07),
+        border: const Border(left: BorderSide(color: vesselChangeAccent, width: 3)),
+      ),
+      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        Text(omittedCallText(call), style: small?.copyWith(fontWeight: FontWeight.w700)),
+        Text(omittedCallHint, style: small),
+      ]),
     );
   }
 }

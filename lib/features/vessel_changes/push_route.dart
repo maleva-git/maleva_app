@@ -8,13 +8,19 @@ import 'package:maleva/features/notifications/notification_routes.dart' show not
 /// - `/sale-order/edit/{id}` (`VESSEL_LINK_NEEDED`, or `VESSEL_ETA_CHANGED` for a job without employee
 ///   sent to a Super Admin): the app's sale order screen for that job ([saleOrderEditRoute]);
 /// - `/ptp-schedule` (`PTP_SCHEDULE_STALE`): Vessel changes, which has "Read PTP now";
-/// - anything else: `VESSEL_ETA_CHANGED` opens Vessel changes as before, the other two the Vessel tab of
-///   the notifications page.
+/// - `/vessel-changes` (`MMSW_SCHEDULE_STALE`): Vessel changes, where MMSW's last read is shown;
+/// - `/westports-schedule` (`WESTPORTS_UPLOAD_DUE`): the upload is a web page, so the Vessel tab of the
+///   notifications page, where the notice's text says what to do;
+/// - anything else: `VESSEL_ETA_CHANGED` and `VESSEL_OMITTED` open Vessel changes, the others the Vessel
+///   tab of the notifications page.
 /// Chained ahead of the forwarding routes in mail_monitor/mine/push_route.dart.
 const String vesselChangesPath = '/vessel_changes';
 const String vesselEtaChangedPushType = NoticeKind.vesselEtaChanged;
 const String vesselLinkNeededPushType = NoticeKind.vesselLinkNeeded;
 const String ptpScheduleStalePushType = NoticeKind.ptpScheduleStale;
+const String vesselOmittedPushType = NoticeKind.vesselOmitted;
+const String westportsUploadDuePushType = NoticeKind.westportsUploadDue;
+const String mmswScheduleStalePushType = NoticeKind.mmswScheduleStale;
 
 /// The push types shown as vessel notices (the vessel phone channel with the long vibration).
 bool isVesselPushType(String? type) => NoticeKind.isVessel(type);
@@ -48,8 +54,13 @@ bool _isVesselChangesLink(String? link) => link != null && Uri.tryParse(link)?.p
 String vesselRouteFor({required String type, String? link, int? saleOrderId}) {
   final jobId = saleOrderIdFromLink(link) ?? (saleOrderId != null && saleOrderId > 0 ? saleOrderId : null);
   if (jobId != null) return saleOrderEditRoute(jobId);
-  if (type == ptpScheduleStalePushType || _isPtpScheduleLink(link)) return vesselChangesPath;
-  if (type == vesselEtaChangedPushType || _isVesselChangesLink(link)) return vesselChangesRouteForLink(link);
+  if (type == westportsUploadDuePushType) return notificationsVesselPath;
+  if (type == ptpScheduleStalePushType || type == mmswScheduleStalePushType || _isPtpScheduleLink(link)) {
+    return vesselChangesPath;
+  }
+  if (type == vesselEtaChangedPushType || type == vesselOmittedPushType || _isVesselChangesLink(link)) {
+    return vesselChangesRouteForLink(link);
+  }
   return notificationsVesselPath;
 }
 

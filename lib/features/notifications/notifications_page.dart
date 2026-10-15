@@ -258,7 +258,7 @@ class _NoticeTabState extends State<_NoticeTab> {
       else ...[
         _Rows(children: [
           for (final a in shown)
-            if (a.isLink)
+            if (a.canClose)
               _LinkAlertRow(
                 key: ValueKey('link_alert_${a.id}'),
                 alert: a,
@@ -627,8 +627,10 @@ class _AlertDetails extends StatelessWidget {
   }
 }
 
-/// One open ETA alert, pinned until the jobs match PTP or are dismissed on Vessel changes. The whole row
-/// opens them (Vessel changes in the alert's scope, or the one job named).
+/// One open ETA alert, pinned until the jobs match PTP (or Westports) or are dismissed on Vessel changes;
+/// also an OMITTED alert ("Omitted at Westports"), handled the same way (another vessel or voyage, or
+/// dismiss) and never closed with "Not this vessel". The whole row opens them (Vessel changes in the
+/// alert's scope, or the one job named).
 class _AlertRow extends StatelessWidget {
   const _AlertRow({required this.alert, required this.now, required this.onTap});
 
@@ -638,7 +640,6 @@ class _AlertRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final arrival = alertArrival(alert);
     return _ToneBorder(
       key: ValueKey('vessel_alert_${alert.id}'),
       alert: alert,
@@ -653,10 +654,7 @@ class _AlertRow extends StatelessWidget {
             _AlertDetails(
               alert: alert,
               textKey: ValueKey('alert_details_${alert.id}'),
-              parts: [
-                'PTP ETA ${arrival.isEmpty ? 'not given' : arrival}',
-                '${plural(alert.jobs, 'job')} not updated',
-              ],
+              parts: alertDetailParts(alert),
             ),
           ]),
         ),
@@ -719,12 +717,18 @@ class _LinkAlertRowState extends State<_LinkAlertRow> {
     }
   }
 
-  /// "MAERSK NOBERG → 642N, ETA 19 Oct 00:00 (est.)", or the vessel and "No PTP voyage suggested".
+  /// "MAERSK NOBERG → 642N, ETA 19 Oct 00:00 (est.)", or the vessel and "No PTP voyage suggested"
+  /// ("No Westports voyage suggested"); then the Westports terminal when known. An MMSW call has no voyage:
+  /// "XIN XU ZHOU, ETA 15 Oct 08:00 (est.) · MMSW · Northport KCT" when a call is suggested.
   static List<String> _suggestion(VesselAlert alert) {
     final voyage = alert.voyage?.trim() ?? '';
-    if (voyage.isEmpty) return [alert.vesselName, 'No PTP voyage suggested'];
+    final terminal = alertTerminalText(alert);
     final arrival = alertArrival(alert);
-    return ['${alert.vesselName} → $voyage${arrival.isEmpty ? '' : ', ETA $arrival'}'];
+    if (voyage.isEmpty && alert.isMmsw && alert.ptpVesselCallId != null) {
+      return ['${alert.vesselName}${arrival.isEmpty ? '' : ', ETA $arrival'}', terminal];
+    }
+    if (voyage.isEmpty) return [alert.vesselName, 'No ${alert.sourceLabel} voyage suggested', terminal];
+    return ['${alert.vesselName} → $voyage${arrival.isEmpty ? '' : ', ETA $arrival'}', terminal];
   }
 
   @override
@@ -737,7 +741,7 @@ class _LinkAlertRowState extends State<_LinkAlertRow> {
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
           _AlertTitle(
             alert: alert,
-            text: 'Pick PTP voyage · job ${alert.jobNo ?? ''}'.trim(),
+            text: linkAlertTitle(alert),
             now: widget.now,
             textKey: ValueKey('link_alert_title_${alert.id}'),
           ),

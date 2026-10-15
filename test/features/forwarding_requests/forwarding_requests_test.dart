@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:maleva/core/forwarding_request/forwarding_request_api.dart';
 import 'package:maleva/core/forwarding_request/forwarding_request_models.dart';
@@ -5,6 +6,7 @@ import 'package:maleva/core/network/api_failure.dart';
 import 'package:maleva/features/forwarding_requests/bloc/forwarding_requests_cubit.dart';
 import 'package:maleva/features/forwarding_requests/bloc/request_forwarding_cubit.dart';
 import 'package:maleva/features/forwarding_requests/push_route.dart';
+import 'package:maleva/features/forwarding_requests/view/forwarding_request_edit_page.dart';
 import 'package:maleva/features/forwarding_requests/view/forwarding_requests_page.dart';
 import 'package:maleva/features/mail_monitor/mine/push_route.dart';
 import 'package:mocktail/mocktail.dart';
@@ -80,15 +82,48 @@ void main() {
             ForwardingRequest.fromJava(javaRow(id: 1)),
             ForwardingRequest.fromJava(javaRow(id: 2, status: 'CANCELLED', more: {'formType': 'K1'})),
           ]);
-      when(() => api.create(saleOrderId: 910, formTypes: ['K1'], estimatedDate: any(named: 'estimatedDate'), remarks: any(named: 'remarks')))
+      when(() => api.create(saleOrderId: 910, items: [ForwardingRequestItem('K1', DateTime(2026, 10, 12, 9))], remarks: any(named: 'remarks')))
           .thenAnswer((_) async => [ForwardingRequest.fromJava(javaRow(id: 3, more: {'formType': 'K1'}))]);
       final cubit = RequestForwardingCubit(api, saleOrderId: 910);
       await cubit.load();
       expect(cubit.state.openTypes, {'K8'});
-      final created = await cubit.create(formTypes: ['K1'], estimate: DateTime(2026, 10, 12, 9));
+      final created = await cubit.create(items: [ForwardingRequestItem('K1', DateTime(2026, 10, 12, 9))]);
       expect(created.single.id, 3);
       expect(cubit.state.existing.first.id, 3);
       expect(cubit.state.saving, isFalse);
+    });
+  });
+
+  group('ForwardingRequestEditPage', () {
+    testWidgets('shows only Documents, Draft and C Number, and Save passes the hidden values through', (tester) async {
+      ForwardingRequestTicks? sent;
+      final r = ForwardingRequest.fromJava(javaRow(status: 'RELEASED', more: {
+        'documentReceived': true, 'draftCreated': true, 'draftCNumber': 'C1', 'submitted': true, 'submittedRef': 'R1',
+        'approved': true, 'approvedDate': '2026-10-09', 'released': true, 'releaseNo': 'K8-1', 'sealById': 31, 'sealBy': 'RAVI',
+      }));
+      await tester.pumpWidget(MaterialApp(
+        home: ForwardingRequestEditPage(
+          request: r,
+          onSave: (t) async {
+            sent = t;
+            return r;
+          },
+          onCancelRequest: () async => r,
+        ),
+      ));
+      expect(find.text('Documents received'), findsOneWidget);
+      expect(find.text('Draft created'), findsOneWidget);
+      expect(find.text('C Number *'), findsOneWidget);
+      expect(find.byType(CheckboxListTile), findsNWidgets(2));
+      expect(find.text('Released'), findsOneWidget, reason: 'the status chip stays');
+      for (final gone in ['Submitted to customs', 'Approved by customs', 'Seal by', 'Break seal by', 'Release number *', 'Registration no']) {
+        expect(find.text(gone), findsNothing, reason: gone);
+      }
+      await tester.tap(find.text('Save'));
+      await tester.pump();
+      expect(sent!.toJava(), containsPair('releaseNo', 'K8-1'));
+      expect(sent!.toJava(), containsPair('sealByRefId', 31));
+      expect(sent!.released, isTrue);
     });
   });
 }

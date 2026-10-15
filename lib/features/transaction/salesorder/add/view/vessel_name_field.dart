@@ -109,8 +109,9 @@ class _VesselNameFieldState extends State<VesselNameField> {
     ]);
   }
 
+  /// "TOCONAO MAERSK 636N"; an MMSW call has no voyage, so its SCN stands there ("XIN XU ZHOU SCN 267DF4").
   static String _title(VesselSuggestionRow r) {
-    final voyage = r.call?.voyage;
+    final voyage = r.call?.voyageText;
     return voyage == null ? r.vessel.vesselName : '${r.vessel.vesselName} $voyage';
   }
 
@@ -125,7 +126,9 @@ class _VesselNameFieldState extends State<VesselNameField> {
     return [
       'ETA ${at(call.arrive, call.arriveEstimated)}',
       'ETD ${at(call.depart, call.departEstimated)}',
-      if (call.scn != null) 'SCN ${call.scn}',
+      // the SCN is in the title when there is no voyage
+      if (call.scn != null && (call.voyage?.trim() ?? '').isNotEmpty) 'SCN ${call.scn}',
+      if (call.isMmsw) call.sourceText,
     ].join(' · ');
   }
 }

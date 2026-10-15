@@ -106,9 +106,9 @@ class ForwardingRequestCard extends StatelessWidget {
               const Spacer(),
               StatusSteps(r.status),
             ]),
-            if (r.draftCNumber.isNotEmpty || r.releaseNo.isNotEmpty) ...[
+            if (r.draftCNumber.isNotEmpty) ...[
               const SizedBox(height: 4),
-              Text([if (r.draftCNumber.isNotEmpty) 'C No ${r.draftCNumber}', if (r.releaseNo.isNotEmpty) 'Release ${r.releaseNo}'].join(' · '),
+              Text('C No ${r.draftCNumber}',
                   style: TextStyle(fontSize: 12, color: mc.muted, fontFamily: 'monospace')),
             ],
             const SizedBox(height: 2),

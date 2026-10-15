@@ -11,6 +11,8 @@ class SaleOrderMasterModel {
   String BillTime;
   String SaleType;
   String CustomerName;
+  /// The customer's own customer (Daikin on a CIVA job); '' when the job has none.
+  String EndCustomerName;
   String EmployeeName;
   String CashierName;
   String Remarks;
@@ -59,7 +61,7 @@ class SaleOrderMasterModel {
       this.Loadingvesselname,
       this.JobMasterRefId,
       this.NetAmt,
-      {this.isETASelected = false}
+      {this.isETASelected = false, this.EndCustomerName = ''}
       );
 
   SaleOrderMasterModel.fromJson(Map<String, dynamic> json)
@@ -74,6 +76,7 @@ class SaleOrderMasterModel {
         BillTime = json['BillTime'] ?? '',
         SaleType = json['SaleType'] ?? '',
         CustomerName = json['CustomerName'] ?? '',
+        EndCustomerName = json['EndCustomerName']?.toString() ?? '',
         EmployeeName = json['EmployeeName'] ?? '',
         CashierName = json['CashierName'] ?? '',
         Remarks = json['Remarks'] ?? '',
@@ -106,6 +109,7 @@ class SaleOrderMasterModel {
       'BillTime': BillTime,
       'SaleType': SaleType,
       'CustomerName': CustomerName,
+      'EndCustomerName': EndCustomerName,
       'EmployeeName': EmployeeName,
       'CashierName': CashierName,
       'Remarks': Remarks,
@@ -138,6 +142,7 @@ class SaleOrderMasterModel {
         BillTime = '',
         SaleType = '',
         CustomerName = '',
+        EndCustomerName = '',
         EmployeeName = '',
         CashierName = '',
         Remarks = '',

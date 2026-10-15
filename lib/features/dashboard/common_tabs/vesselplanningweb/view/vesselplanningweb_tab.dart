@@ -19,6 +19,7 @@ import '../bloc/vesselplanningweb_event.dart';
 import '../bloc/vesselplanningweb_state.dart';
 import '../data/vesselplanningweb_repository.dart';
 import '../models/vesselplanningweb_model.dart';
+import 'port_search_field.dart';
 import 'vesselplanning_update_sheet.dart';
 import 'vesselplanningweb_saved_sheet.dart';
 import 'package:maleva/core/models/shared/employee_model.dart';
@@ -113,6 +114,9 @@ class _VesselPlanningWebViewState extends State<VesselPlanningWebView> {
   // Employee
   EmployeeModel? _selectedEmployee;
 
+  // The ports the Search Port dropdown offers.
+  List<String> _ports = const [];
+
   // Master ID if editing
   int _currentMasterId = 0;
 
@@ -120,10 +124,12 @@ class _VesselPlanningWebViewState extends State<VesselPlanningWebView> {
   void initState() {
     super.initState();
     _planningNoCtrl.text = "NEW";
-    WidgetsBinding.instance.addPostFrameCallback((_) {
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
       if (_currentMasterId == 0) {
         _fetchMaxPlanningNo();
       }
+      final ports = await loadPortNames(context);
+      if (mounted) setState(() => _ports = ports);
     });
   }
 
@@ -487,22 +493,7 @@ class _VesselPlanningWebViewState extends State<VesselPlanningWebView> {
                   Text("Search Port",
                       style: AppTypography.heading1()),
                   const SizedBox(height: 6),
-                  Container(
-                    height: 48,
-                    decoration: BoxDecoration(
-                      color: colour.kCardBg,
-                      borderRadius: BorderRadius.circular(8),
-                      border: Border.all(color: AppTokens.maintCardBorder),
-                    ),
-                    child: TextField(
-                      controller: _portStringController,
-                      style: AppTypography.heading2(),
-                      decoration: const InputDecoration(
-                          border: InputBorder.none,
-                          contentPadding: EdgeInsets.symmetric(
-                              horizontal: 10, vertical: 12)),
-                    ),
-                  ),
+                  PortSearchField(controller: _portStringController, ports: _ports),
                 ],
               ),
             ),

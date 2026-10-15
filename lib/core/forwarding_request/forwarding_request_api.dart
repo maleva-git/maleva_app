@@ -14,17 +14,15 @@ class ForwardingRequestApi {
 
   static const _base = '/api/forwarding-requests';
 
-  /// Customer Service's request: one row per form type, all with the same estimate.
+  /// Customer Service's request: one row per item, each form type with its own estimate.
   Future<List<ForwardingRequest>> create({
     required int saleOrderId,
-    required List<String> formTypes,
-    required DateTime estimatedDate,
+    required List<ForwardingRequestItem> items,
     String remarks = '',
   }) =>
       _send(() => _dio.post<dynamic>(_base, data: {
             'saleOrderId': saleOrderId,
-            'formTypes': formTypes,
-            'estimatedDate': toJavaDateTime(estimatedDate),
+            'items': [for (final i in items) i.toJava()],
             'remarks': remarks.trim().isEmpty ? null : remarks.trim(),
           })).then(_list);
 

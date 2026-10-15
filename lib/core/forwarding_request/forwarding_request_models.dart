@@ -42,6 +42,48 @@ String toJavaDateTime(DateTime d) =>
 /// `yyyy-MM-dd`.
 String toJavaDate(DateTime d) => '${d.year.toString().padLeft(4, '0')}-${_two(d.month)}-${_two(d.day)}';
 
+/// One form type of a create call with its own estimate (the Java `CreateForwardingRequestItem`).
+class ForwardingRequestItem {
+  const ForwardingRequestItem(this.formType, this.estimatedDate);
+
+  final String formType;
+  final DateTime estimatedDate;
+
+  Map<String, dynamic> toJava() => {'formType': formType, 'estimatedDate': toJavaDateTime(estimatedDate)};
+
+  @override
+  bool operator ==(Object other) => other is ForwardingRequestItem && other.formType == formType && other.estimatedDate == estimatedDate;
+
+  @override
+  int get hashCode => Object.hash(formType, estimatedDate);
+}
+
+/// The Request FW sheet's ticked forms, each with its own estimate (null while cleared). A form type
+/// is ticked when it is a key here. Mirrors the web's `requestForms.ts`.
+typedef ForwardingFormEstimates = Map<String, DateTime?>;
+
+/// The ticked form types in K1, K2, K3, K8 order.
+List<String> tickedForwardingForms(ForwardingFormEstimates estimates) => forwardingFormTypes.where(estimates.containsKey).toList();
+
+/// Ticks or unticks [type]. A newly ticked form starts with the date of the last ticked form before it
+/// (K1, K2, K3, K8 order), or tomorrow 09:00 when it is the first.
+ForwardingFormEstimates toggleForwardingForm(ForwardingFormEstimates estimates, String type, {DateTime? now}) {
+  if (estimates.containsKey(type)) return {...estimates}..remove(type);
+  final ticked = tickedForwardingForms(estimates);
+  final previous = ticked.isEmpty ? null : estimates[ticked.last];
+  final t = (now ?? DateTime.now()).add(const Duration(days: 1));
+  return {...estimates, type: previous ?? DateTime(t.year, t.month, t.day, 9)};
+}
+
+/// At least one form ticked and every ticked form has a date.
+bool forwardingFormsReady(ForwardingFormEstimates estimates) => estimates.isNotEmpty && estimates.values.every((d) => d != null);
+
+/// The create call's items, in K1, K2, K3, K8 order (ticked forms without a date are left out).
+List<ForwardingRequestItem> forwardingRequestItems(ForwardingFormEstimates estimates) => [
+      for (final t in tickedForwardingForms(estimates))
+        if (estimates[t] != null) ForwardingRequestItem(t, estimates[t]!),
+    ];
+
 /// One forwarding request as `/api/forwarding-requests` answers it (ForwardingRequestDto), read as sent.
 class ForwardingRequest {
   const ForwardingRequest({

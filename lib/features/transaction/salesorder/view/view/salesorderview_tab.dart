@@ -285,6 +285,12 @@ class _MobileCard extends StatelessWidget {
                         ),
                       ],
                     ),
+                    if (model.EndCustomerName.isNotEmpty)
+                      Padding(
+                        padding: const EdgeInsets.only(left: 20, top: 2),
+                        child: Text('for ${model.EndCustomerName}',
+                            style: AppTypography.bodySmall(color: colour.textSub)),
+                      ),
                     const SizedBox(height: 4),
                     Row(
                       children: [
@@ -557,6 +563,8 @@ class _TabletBody extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(item.CustomerName.toString(), style: AppTypography.bodySmall(color: colour.brandDark), overflow: TextOverflow.ellipsis),
+              if (item.EndCustomerName.isNotEmpty)
+                Text('for ${item.EndCustomerName}', style: AppTypography.bodySmall(color: colour.textSub), overflow: TextOverflow.ellipsis),
               Text(item.SPort.toString(), style: AppTypography.bodySmall(color: colour.textSub), overflow: TextOverflow.ellipsis),
             ]
           ),
@@ -699,6 +707,10 @@ class _TabletRow extends StatelessWidget {
                     Text(model.CustomerName.toString(),
                         style: AppTypography.bodySmall(color: colour.brandDark),
                         overflow: TextOverflow.ellipsis),
+                    if (model.EndCustomerName.isNotEmpty)
+                      Text('for ${model.EndCustomerName}',
+                          style: AppTypography.bodySmall(color: colour.textSub),
+                          overflow: TextOverflow.ellipsis),
                     Text(model.SPort.toString(),
                         style: AppTypography.bodySmall(color: colour.textSub),
                         overflow: TextOverflow.ellipsis),

@@ -4,16 +4,26 @@ import 'package:maleva/core/vessel_master/vessel_master_models.dart';
 /// `GET /api/vessel-changes`: jobs whose dates differ from PTP's schedule, one group per vessel call
 /// (backend change vessel-master-and-ptp-schedule). Read as Java answers it.
 class VesselChanges {
-  const VesselChanges({this.lastGoodReadAt, this.groups = const []});
+  const VesselChanges({this.lastGoodReadAt, this.groups = const [], this.lastReadAtByPort = const {}});
 
   factory VesselChanges.fromJava(Map<String, dynamic> m) => VesselChanges(
         lastGoodReadAt: JsonRead.stringOrNull(m['lastGoodReadAt']),
         groups: JsonRead.listOfMaps(m['groups']).map(VesselChangeGroup.fromJava).toList(),
+        lastReadAtByPort: {
+          for (final e in JsonRead.map(m['lastReadAtByPort']).entries) e.key: JsonRead.stringOrNull(e.value),
+        },
       );
 
   /// When PTP was last read successfully; null if never.
   final String? lastGoodReadAt;
   final List<VesselChangeGroup> groups;
+
+  /// The last good read per source (`PTP`, `WESTPORTS`: the last good upload, `MMSW`); empty in older answers.
+  final Map<String, String?> lastReadAtByPort;
+
+  /// When [port]'s schedule was last read well; PTP falls back to [lastGoodReadAt].
+  String? lastReadAt(String port) =>
+      lastReadAtByPort[port] ?? (port == VesselSource.ptp ? lastGoodReadAt : null);
 
   bool get isEmpty => groups.every((g) => g.jobs.isEmpty);
 }
@@ -38,8 +48,11 @@ class VesselChangeGroup {
       VesselChangeGroup(call: call, lastChangedAt: lastChangedAt, changes: changes, jobs: jobs);
 }
 
-/// What PTP changed on the call (`field` e.g. `ARRIVE`).
+/// What the schedule changed on the call (`field` e.g. `ARRIVE`, `DEPART`, `SCN`, `STATUS`).
 class PtpChange {
+  /// Westports' status changed (e.g. `Not Arrived` -> `Omitted`).
+  static const String statusField = 'STATUS';
+
   const PtpChange({required this.field, this.oldValue, this.newValue, this.seenAt});
 
   factory PtpChange.fromJava(Map<String, dynamic> m) => PtpChange(
@@ -53,6 +66,8 @@ class PtpChange {
   final String? oldValue;
   final String? newValue;
   final String? seenAt;
+
+  bool get isStatus => field == statusField;
 }
 
 /// One job's leg on a vessel call: Maleva's times against PTP's.
@@ -77,6 +92,8 @@ class VesselChangeJob {
     this.scnDiffers = false,
     this.boardingMonthFrom,
     this.boardingMonthTo,
+    this.port,
+    this.terminal,
   });
 
   factory VesselChangeJob.fromJava(Map<String, dynamic> m) => VesselChangeJob(
@@ -98,6 +115,8 @@ class VesselChangeJob {
         scnDiffers: JsonRead.boolean(m['scnDiffers']),
         boardingMonthFrom: JsonRead.stringOrNull(m['boardingMonthFrom']),
         boardingMonthTo: JsonRead.stringOrNull(m['boardingMonthTo']),
+        port: JsonRead.stringOrNull(m['port']),
+        terminal: JsonRead.stringOrNull(m['terminal']),
       );
 
   final int saleOrderId;
@@ -121,6 +140,13 @@ class VesselChangeJob {
   /// `2026-10` / `2026-11` when the boarding pay would move to another month.
   final String? boardingMonthFrom;
   final String? boardingMonthTo;
+
+  /// The leg's port as typed on the job ("WESTPORT-B18"); null in older answers.
+  final String? port;
+
+  /// The Westports terminal from [port] ("B18", "LBT B7X") or the MMSW call's terminal ("Northport KCT");
+  /// null for PTP or a bare WESTPORT.
+  final String? terminal;
 
   bool get isLoading => leg == VesselLeg.loading;
 
@@ -196,6 +222,10 @@ class VesselAlertKind {
 
   /// A job at PTP is not linked to its PTP voyage ("Pick the PTP voyage: job ...").
   static const String link = 'LINK';
+
+  /// The linked call is Omitted at Westports: handled on Vessel changes like [eta] (another vessel or
+  /// voyage on the job, or dismiss); never closed with "Not this vessel".
+  static const String omitted = 'OMITTED';
 }
 
 /// `GET /api/vessel-changes/alerts`: one vessel alert still to handle (`VesselAlertDto`). An ETA alert
@@ -223,6 +253,9 @@ class VesselAlert {
     this.saleOrderId,
     this.jobNo,
     this.unassigned = false,
+    this.port,
+    this.portLabel,
+    this.terminal,
   });
 
   factory VesselAlert.fromJava(Map<String, dynamic> m) => VesselAlert(
@@ -245,6 +278,9 @@ class VesselAlert {
         saleOrderId: JsonRead.intOrNull(m['saleOrderId']),
         jobNo: JsonRead.stringOrNull(m['jobNo']),
         unassigned: JsonRead.boolean(m['unassigned']),
+        port: JsonRead.stringOrNull(m['port']),
+        portLabel: JsonRead.stringOrNull(m['portLabel']),
+        terminal: JsonRead.stringOrNull(m['terminal']),
       );
 
   final int id;
@@ -293,7 +329,28 @@ class VesselAlert {
   /// The jobs have no employee: the alert went to a Super Admin.
   final bool unassigned;
 
+  /// The call's source (`PTP` / `WESTPORTS` / `MMSW`) and its label; null when the call is unknown or in older answers.
+  final String? port;
+  final String? portLabel;
+
+  /// The jobs' Westports terminals ("B18, LBT B7X") or the MMSW terminal ("Northport KCT"); null for none.
+  final String? terminal;
+
+  bool get isMmsw => port?.toUpperCase() == VesselSource.mmsw;
+
   bool get isLink => kind == VesselAlertKind.link;
+
+  bool get isOmitted => kind == VesselAlertKind.omitted;
+
+  /// Only a LINK alert can be closed with "Not this vessel".
+  bool get canClose => isLink;
+
+  /// "PTP" or "Westports" (an OMITTED alert is always Westports').
+  String get sourceLabel => VesselSource.labelOf(isOmitted && port == null && portLabel == null ? VesselSource.westports : port,
+      label: portLabel);
+
+  /// "MMSW · Northport KCT" for an MMSW alert with a terminal; [sourceLabel] otherwise.
+  String get sourceText => isMmsw ? VesselSource.withTerminal(sourceLabel, terminal) : sourceLabel;
 
   String get vesselText => voyage == null ? vesselName : '$vesselName $voyage';
 }
