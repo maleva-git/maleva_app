@@ -1,5 +1,5 @@
 
-import 'package:flutter/Material.dart';
+import 'package:flutter/material.dart';
 
 /// EVENTS
 abstract class LoginEvent {}

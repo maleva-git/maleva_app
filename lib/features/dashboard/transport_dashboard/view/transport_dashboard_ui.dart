@@ -1,4 +1,4 @@
-import 'package:flutter/Material.dart';
+import 'package:flutter/material.dart';
 import 'package:maleva/features/notifications/notification_bell.dart';
 import 'package:maleva/features/truck_driver_details/truck_driver_details_page.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';

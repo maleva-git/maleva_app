@@ -10,7 +10,7 @@ import '../../../../core/models/model.dart';
 import '../../../../menu/menulist.dart';
 import '../bloc/admin_tab_bloc.dart';
 import '../bloc/admin_tab_state.dart';
-import '../../common_tabs/ExpenseReport/view/expensereport_tab.dart';
+import '../../common_tabs/expensereport/view/expensereport_tab.dart';
 import '../../common_tabs/bocheck/view/bocheck_tab.dart';
 import '../../common_tabs/driver/view/driverdetails_tab.dart';
 import '../../common_tabs/emailinbox/view/emailinbox_tab.dart';

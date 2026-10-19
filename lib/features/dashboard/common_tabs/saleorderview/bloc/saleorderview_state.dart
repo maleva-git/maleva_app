@@ -3,7 +3,7 @@ import 'package:maleva/core/colors/colors.dart' as colour;
 
 
 import 'package:equatable/equatable.dart';
-import 'package:flutter/Material.dart';
+import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 import '../../../../../core/models/model.dart';

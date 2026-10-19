@@ -1,4 +1,4 @@
-import 'package:flutter/Material.dart';
+import 'package:flutter/material.dart';
 import 'package:maleva/core/widgets/custom_app_bar.dart';
 import 'package:maleva/features/auth/presentation/mode_switch_button.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
