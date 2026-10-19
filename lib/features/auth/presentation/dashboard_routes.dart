@@ -4,8 +4,13 @@
 /// admin dashboard and an unmapped role the unauthorized page. The splash used
 /// to send 200 to `/dashboard/subadmin` and unmapped roles to the admin
 /// dashboard; that route now has no entry point.
-String dashboardRouteFor({required bool isDriver, required int roleId}) {
+///
+/// The CEO (role 100 with permission id 1, change `ceo-analytics-dashboard`)
+/// opens the CEO analytics dashboard; every other role 100 user keeps the
+/// admin dashboard. The server checks the same rule on every CEO endpoint.
+String dashboardRouteFor({required bool isDriver, required int roleId, required int permissionId}) {
   if (isDriver) return '/driver_dashboard';
+  if (isCeo(roleId: roleId, permissionId: permissionId)) return '/dashboard/ceo';
   switch (roleId) {
     case 100: // SUPERADMIN
     case 200: // ADMIN
@@ -33,3 +38,6 @@ String dashboardRouteFor({required bool isDriver, required int roleId}) {
       return '/unauthorized';
   }
 }
+
+/// Role 100 (SUPERADMIN) with permission id 1: the CEO.
+bool isCeo({required int roleId, required int permissionId}) => roleId == 100 && permissionId == 1;

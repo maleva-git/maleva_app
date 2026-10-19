@@ -48,4 +48,62 @@ void main() {
     expect(LocalNotificationService.usesVesselChannel({'type': 'FORWARDING_REQUESTED'}), isFalse);
     expect(LocalNotificationService.usesVesselChannel({}), isFalse);
   });
+
+  test('the quiet vessel channel (Super Admins, 2026-10-16) is the one the backend sends to: no sound, no vibration', () {
+    const c = LocalNotificationService.vesselQuietChannel;
+
+    expect(c.id, 'com.kassapos.maleva.vessel.quiet');
+    expect(AppGlobals.vesselQuietChannelId, c.id);
+    expect(c.name, 'Vessel alerts (quiet)');
+    expect(c.description, 'Vessel alerts without sound or vibration');
+    expect(c.importance, Importance.high);
+    expect(c.playSound, isFalse);
+    expect(c.enableVibration, isFalse);
+    expect(c.id, isNot(AppGlobals.vesselChannelId));
+    expect(c.id, isNot(AppGlobals.channelId));
+    expect(AppGlobals.oldVesselChannelIds, isNot(contains(c.id)));
+  });
+
+  test('a quiet vessel push shown with the app open: quiet channel, no sound, no vibration, not insistent', () {
+    final d = LocalNotificationService.foregroundAndroidDetails(
+        {'type': 'VESSEL_ETA_CHANGED', 'link': '/vessel-changes', 'quiet': '1'},
+        body: 'B');
+
+    expect(d.channelId, AppGlobals.vesselQuietChannelId);
+    expect(d.playSound, isFalse);
+    expect(d.enableVibration, isFalse);
+    expect(d.vibrationPattern, isNull);
+    expect(d.additionalFlags, isNull);
+    expect(LocalNotificationService.isQuietVesselPush({'type': 'PTP_SCHEDULE_STALE', 'quiet': '1'}), isTrue);
+    expect(LocalNotificationService.presentsSound({'type': 'VESSEL_ETA_CHANGED', 'quiet': '1'}), isFalse);
+  });
+
+  test('a vessel push without quiet stays on the vibrating, insistent vessel channel', () {
+    for (final data in [
+      {'type': 'VESSEL_ETA_CHANGED'},
+      {'type': 'VESSEL_ETA_CHANGED', 'quiet': '0'},
+    ]) {
+      final d = LocalNotificationService.foregroundAndroidDetails(data, body: 'B');
+      expect(d.channelId, AppGlobals.vesselChannelId);
+      expect(d.enableVibration, isTrue);
+      expect(d.vibrationPattern, LocalNotificationService.vesselVibration);
+      expect(d.additionalFlags, [4]);
+      expect(LocalNotificationService.isQuietVesselPush(data), isFalse);
+      expect(LocalNotificationService.presentsSound(data), isTrue);
+    }
+  });
+
+  test('a normal push uses the alert channel with a sound, even if it says quiet', () {
+    for (final data in [
+      {'type': 'MAIL_UNREAD'},
+      {'type': 'FORWARDING_REQUESTED', 'quiet': '1'},
+      <String, dynamic>{},
+    ]) {
+      final d = LocalNotificationService.foregroundAndroidDetails(data, body: 'B');
+      expect(d.channelId, AppGlobals.channelId);
+      expect(d.playSound, isTrue);
+      expect(LocalNotificationService.isQuietVesselPush(data), isFalse);
+      expect(LocalNotificationService.presentsSound(data), isTrue);
+    }
+  });
 }

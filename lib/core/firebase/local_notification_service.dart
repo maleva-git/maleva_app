@@ -43,6 +43,8 @@ class LocalNotificationService {
     // Vessel alerts: on Android 8+ the channel decides sound and vibration, and a channel cannot be changed
     // once made, so this one has its own id: the long vibration, no sound.
     await android?.createNotificationChannel(vesselChannel);
+    // the quiet vessel channel (Super Admins, owner 2026-10-16): high importance, no sound, no vibration
+    await android?.createNotificationChannel(vesselQuietChannel);
     // the earlier vessel channels (normal sound, then the alarm tone) are replaced by this one
     for (final old in AppGlobals.oldVesselChannelIds) {
       await android?.deleteNotificationChannel(old);
@@ -64,6 +66,60 @@ class LocalNotificationService {
     ledColor: const Color(0xFFFF6D00),
     showBadge: true,
   );
+
+  /// The quiet vessel channel (owner, 2026-10-16: "for the Super Admin, cut the vibration"): vessel pushes the
+  /// backend marks with data `quiet` = "1" pop up at high importance with no sound and no vibration.
+  static const AndroidNotificationChannel vesselQuietChannel = AndroidNotificationChannel(
+    AppGlobals.vesselQuietChannelId,
+    AppGlobals.vesselQuietChannelName,
+    description: AppGlobals.vesselQuietChannelDescription,
+    importance: Importance.high,
+    playSound: false,
+    enableVibration: false,
+    showBadge: true,
+  );
+
+  /// How a quiet vessel notice is shown while the app is open: the quiet channel, no sound, no vibration, not
+  /// insistent.
+  static AndroidNotificationDetails vesselQuietDetails({StyleInformation? style}) => AndroidNotificationDetails(
+        AppGlobals.vesselQuietChannelId,
+        AppGlobals.vesselQuietChannelName,
+        channelDescription: AppGlobals.vesselQuietChannelDescription,
+        importance: Importance.high,
+        priority: Priority.high,
+        playSound: false,
+        enableVibration: false,
+        category: AndroidNotificationCategory.reminder,
+        visibility: NotificationVisibility.public,
+        ticker: 'Vessel ETA changed',
+        styleInformation: style,
+      );
+
+  /// A vessel push the backend marked quiet (data `quiet` = "1", Super Admins): no sound, no vibration.
+  static bool isQuietVesselPush(Map<String, dynamic> data) =>
+      usesVesselChannel(data) && data['quiet']?.toString() == '1';
+
+  /// The Android details for a push shown while the app is open: quiet vessel, vessel (insistent, long
+  /// vibration) or the normal alert channel with [normalStyle].
+  static AndroidNotificationDetails foregroundAndroidDetails(Map<String, dynamic> data,
+      {required String body, StyleInformation? normalStyle}) {
+    if (isQuietVesselPush(data)) {
+      return vesselQuietDetails(style: BigTextStyleInformation(body));
+    }
+    if (usesVesselChannel(data)) {
+      return vesselDetails(style: BigTextStyleInformation(body));
+    }
+    return AndroidNotificationDetails(AppGlobals.channelId, AppGlobals.channelName,
+        // AppGlobals.channelDescription,
+        importance: Importance.max,
+        priority: Priority.high,
+        playSound: true,
+        channelShowBadge: false, // Disable app icon badge for this channel
+        styleInformation: normalStyle);
+  }
+
+  /// iOS, app open: every push plays the default sound except a quiet vessel push.
+  static bool presentsSound(Map<String, dynamic> data) => !isQuietVesselPush(data);
 
   /// How a vessel notice is shown while the app is open: the vessel channel, no sound, and insistent (the
   /// vibration repeats until the notice is opened or swiped away), so it is not missed.
@@ -179,9 +235,9 @@ class LocalNotificationService {
               : null,
           presentAlert: true, // Present an alert when the notification is displayed and the application is in the foreground (only from iOS 10 onwards)
           presentBadge: false, // DO NOT present the badge number when the notification is displayed
-          presentSound: true, // Play a sound when the notification is displayed and the application is in the foreground (only from iOS 10 onwards)
+          presentSound: presentsSound(message.data), // Play a sound when the notification is displayed and the application is in the foreground (only from iOS 10 onwards)
           // vessel alerts: the iPhone's default notification sound (iOS vibrates only together with a sound;
-          // with the ringer switch on silent it is vibration only)
+          // with the ringer switch on silent it is vibration only); a quiet vessel push (Super Admins) has none
           badgeNumber: 0, // Set badge to 0
           // The application's icon badge number
           // attachments: List<IOSNotificationAttachment>?, (only from iOS 10 onwards)
@@ -232,16 +288,8 @@ class LocalNotificationService {
             summaryText: message.notification!.body,
           );
         }
-        final bool vessel = usesVesselChannel(message.data);
-        AndroidNotificationDetails androidPlatformChannelSpecifics = vessel
-            ? vesselDetails(style: BigTextStyleInformation(message.notification!.body ?? ''))
-            : AndroidNotificationDetails(AppGlobals.channelId, AppGlobals.channelName,
-            // AppGlobals.channelDescription,
-            importance: Importance.max,
-            priority: Priority.high,
-            playSound: true,
-            channelShowBadge: false, // Disable app icon badge for this channel
-            styleInformation: bigPictureStyleInformation);
+        AndroidNotificationDetails androidPlatformChannelSpecifics = foregroundAndroidDetails(message.data,
+            body: message.notification!.body ?? '', normalStyle: bigPictureStyleInformation);
         final id = DateTime.now().millisecondsSinceEpoch ~/ 1000;
 
         final NotificationDetails notificationDetails = NotificationDetails(

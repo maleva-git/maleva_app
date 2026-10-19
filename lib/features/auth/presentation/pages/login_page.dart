@@ -40,6 +40,9 @@ class Appuserloginmobile extends StatelessWidget
   
   void _navigateBasedOnRole(
       BuildContext context, LoginState state) {
-    context.go(dashboardRouteFor(isDriver: state.driverLogin, roleId: AppPreferences.getRoleId()));
+    context.go(dashboardRouteFor(
+        isDriver: state.driverLogin,
+        roleId: AppPreferences.getRoleId(),
+        permissionId: AppPreferences.getPermissionId()));
   }
 }

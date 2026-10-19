@@ -18,6 +18,7 @@ import '../../features/dashboard/driver_dashboard/view/driver_dashboard.dart';
 // Dashboards (Role-based)
 import '../../features/dashboard/admin_dashboard/bloc/admin_tab_bloc.dart';
 import '../../features/dashboard/admin_dashboard/view/admin_dashboard.dart';
+import '../../features/dashboard/ceo_dashboard/view/ceo_dashboard_page.dart';
 
 import '../../features/dashboard/subadmin_dashboard/bloc/subadmin_dashboard_bloc.dart';
 import '../../features/dashboard/subadmin_dashboard/view/subadmin_dashboard.dart';
@@ -150,6 +151,12 @@ final GoRouter appRouter = GoRouter(
         create: (_) => AdminTabBloc(),
         child: const NewAdminDashboard(),
       ),
+    ),
+    // the CEO (role 100 with permission 1): change ceo-analytics-dashboard
+    GoRoute(
+      path: '/dashboard/ceo',
+      name: 'ceo_dashboard',
+      builder: (context, state) => const CeoDashboardPage(),
     ),
     GoRoute(
       path: '/dashboard/subadmin',

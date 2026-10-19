@@ -1,3 +1,4 @@
+import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:maleva/core/dashboard/dashboard_api.dart';
@@ -66,14 +67,20 @@ const _mailSummary = MailMonitorSummary(totalUnread: 64, withUnread: 2, overdue:
 
 /// Stubs every area of [repo] with data.
 void stubAll(AdminOverviewRepository repo) {
-  when(() => repo.sales()).thenAnswer((_) async => const SalesSummary(today: 18, month: 412, monthAmount: 98450));
+  when(() => repo.sales()).thenAnswer((_) async => const SalesSummary(
+        today: 18,
+        month: 412,
+        monthAmount: 98450,
+        yesterday: 15,
+        week: 77,
+        months: [MonthSales(name: 'October', count: 412, amount: 98450), MonthSales(name: 'September', count: 380, amount: 90100)],
+      ));
+  when(() => repo.invoices()).thenAnswer((_) async => const SalesSummary(today: 7, month: 205, monthAmount: 55000));
   when(() => repo.jobOrders()).thenAnswer((_) async => const JobOrderSummary(open: 27, byStatus: {'New': 9, 'In Progress': 18}));
   when(() => repo.mail()).thenAnswer((_) async => MailSummary(
       summary: _mailSummary, mailboxes: [row(1, level: 'OVERDUE', unread: 22), row(2, unread: 0)]));
   when(() => repo.incidents())
       .thenAnswer((_) async => IrSummary(open: 5, totalAmount: 3200, latest: [incident(1, DateTime(2026, 10, 10))]));
-  when(() => repo.truckPlanningToday()).thenAnswer((_) async => 34);
-  when(() => repo.vesselPlanningNextWeek()).thenAnswer((_) async => 21);
   when(() => repo.truckLocation())
       .thenAnswer((_) async => const TruckLocationSummary(filled: 31, notFilled: 6, workshop: 3));
 }
@@ -116,10 +123,25 @@ void main() {
       expect((s.filled, s.notFilled, s.workshop), (1, 1, 1));
     });
 
-    test('sales: the Java keys as the SO tab reads them', () {
-      final s = SalesSummary.fromJava({'TodaySales': 2, 'MonthSales': '40', 'MonthAmount': 1250.5});
+    test('sales: the Java keys as the SO tab and the web report card read them', () {
+      final s = SalesSummary.fromJava({
+        'TodaySales': 2,
+        'TodayAmount': 80,
+        'YesterdaySales': 3,
+        'WeekSales': 9,
+        'WeekAmount': '410.5',
+        'MonthSales': '40',
+        'MonthAmount': 1250.5,
+        'monthlySales': [
+          {'MonthName': 'October', 'SalesCount': 40, 'SalesAmount': 1250.5},
+          {'MonthName': 'September', 'SalesCount': '12', 'SalesAmount': 300},
+        ],
+      });
       expect((s.today, s.month, s.monthAmount), (2, 40, 1250.5));
+      expect((s.todayAmount, s.yesterday, s.week, s.weekAmount), (80, 3, 9, 410.5));
+      expect(s.months.map((m) => (m.name, m.count, m.amount)), [('October', 40, 1250.5), ('September', 12, 300)]);
     });
+
   });
 
   group('AdminOverviewRepository', () {
@@ -147,16 +169,12 @@ void main() {
 
     test('asks the existing endpoints for the right company and dates', () async {
       when(() => dashboard.sales(6, 1)).thenAnswer((_) async => {'TodaySales': 1});
-      when(() => dashboard.planningJobs(6, fromDate: '2026-10-11', toDate: '2026-10-11'))
-          .thenAnswer((_) async => [{'Id': 1}, {'Id': 2}]);
-      when(() => dashboard.vesselPlanning(6, fromDate: '2026-10-11', toDate: '2026-10-18'))
-          .thenAnswer((_) async => [{'id': 1}]);
+      when(() => dashboard.sales(6, 0)).thenAnswer((_) async => {'TodaySales': 4});
       when(() => trucks.week('2026-10-11')).thenAnswer(
           (_) async => TruckLocationWeek(weekStart: '2026-10-11', days: const ['2026-10-11'], rows: [truck(1, today: 'PKG')]));
 
       expect((await repo.sales()).today, 1);
-      expect(await repo.truckPlanningToday(), 2);
-      expect(await repo.vesselPlanningNextWeek(), 1);
+      expect((await repo.invoices()).today, 4);
       expect((await repo.truckLocation()).filled, 1);
     });
 
@@ -186,7 +204,7 @@ void main() {
       await cubit.load();
       expect(cubit.state.mail.error, 'Mail monitor is down');
       expect(cubit.state.sales.data!.today, 18);
-      expect(cubit.state.truckPlanning.data, 34);
+      expect(cubit.state.invoices.data!.today, 7);
       expect(cubit.state.updatedAt, _today);
 
       when(() => repo.mail()).thenAnswer((_) async => const MailSummary(summary: _mailSummary, mailboxes: []));
@@ -218,19 +236,45 @@ void main() {
     }
 
     testWidgets('phone: numbers, sections, and the tab buttons switch tabs', (tester) async {
-      final opened = await pump(tester, const Size(390, 1600));
+      final opened = await pump(tester, const Size(390, 2400));
 
-      expect(find.text('18'), findsOneWidget);
+      // Today's sale orders: in the header and on the report card's Today tile.
+      expect(find.text('18'), findsNWidgets(2));
       expect(find.text('27'), findsOneWidget);
       expect(find.text('64'), findsOneWidget);
       expect(find.text('1 overdue'), findsOneWidget);
-      expect(find.text('34'), findsOneWidget);
-      expect(find.text('Box 1 · 22 unread'), findsOneWidget);
+      // The web's pickup and vessel side panels are not on the app Overview.
+      expect(find.text("TODAY'S PICKUP"), findsNothing);
+      expect(find.text('VESSEL PLANNING'), findsNothing);
+      expect(find.text('October'), findsOneWidget);
+      expect(find.text('22 unread'), findsOneWidget);
       expect(tester.takeException(), isNull);
 
       await tester.tap(find.text('JO'));
       await tester.tap(find.text('Mailbox'));
       expect(opened, ['JobOrders', 'Mailbox Monitor']);
+    });
+
+    testWidgets('header numbers open their tab; months show as a chart with the best month', (tester) async {
+      final opened = await pump(tester, const Size(390, 2400));
+      await tester.tap(find.text('Open job orders'));
+      await tester.tap(find.text('Unread mail'));
+      expect(opened, ['JobOrders', 'Mailbox Monitor']);
+
+      expect(find.byType(BarChart), findsOneWidget);
+      expect(find.text('Oct'), findsOneWidget);
+      expect(find.text('October'), findsOneWidget); // best month
+      expect(find.text('RM 188,550.00'), findsOneWidget); // total of the months
+      expect(tester.takeException(), isNull);
+    });
+
+    testWidgets('Sale Order / Invoice switches the report numbers', (tester) async {
+      await pump(tester, const Size(390, 2200));
+      expect(find.text('412'), findsWidgets);
+      await tester.tap(find.text('Invoice').first);
+      await tester.pump();
+      expect(find.text('205'), findsOneWidget);
+      expect(tester.takeException(), isNull);
     });
 
     testWidgets('a six-digit unread count with its overdue pill fits a narrow phone', (tester) async {
@@ -242,7 +286,7 @@ void main() {
       await pump(tester, const Size(360, 1600));
       expect(find.text('109,910'), findsOneWidget);
       expect(find.text('10 overdue'), findsOneWidget);
-      expect(find.text('Box 1 · 12,328 unread'), findsOneWidget);
+      expect(find.text('12,328 unread'), findsOneWidget);
       expect(tester.takeException(), isNull);
     });
 
@@ -253,7 +297,14 @@ void main() {
       expect(find.text('Truck Planning'), findsNothing);
     });
 
-    testWidgets('tablet: lays out without overflow', (tester) async {
+    testWidgets('tablet portrait: lays out without overflow', (tester) async {
+      await pump(tester, const Size(800, 2000),
+          entries: [menu('Vessel Planning'), menu('Planning'), menu('Truck Location')]);
+      expect(find.text('Vessel Planning'), findsOneWidget);
+      expect(tester.takeException(), isNull);
+    });
+
+    testWidgets('wide: lays out without overflow', (tester) async {
       await pump(tester, const Size(1280, 1400),
           entries: [menu('Vessel Planning'), menu('Planning'), menu('Truck Location')]);
       expect(find.text('Vessel Planning'), findsOneWidget);
@@ -262,17 +313,19 @@ void main() {
     });
 
     testWidgets('a failing area shows its message and Retry; the rest still show', (tester) async {
-      when(() => repo.vesselPlanningNextWeek()).thenThrow(const ApiFailure('Vessel planning failed'));
-      await pump(tester, const Size(390, 1600));
+      when(() => repo.truckLocation()).thenThrow(const ApiFailure('Truck location failed'));
+      await pump(tester, const Size(390, 2200));
 
-      expect(find.text('Vessel planning failed'), findsOneWidget);
+      expect(find.text('Truck location failed'), findsOneWidget);
       expect(find.text('Retry'), findsOneWidget);
-      expect(find.text('34'), findsOneWidget);
+      expect(find.text('22 unread'), findsOneWidget);
 
-      when(() => repo.vesselPlanningNextWeek()).thenAnswer((_) async => 21);
+      when(() => repo.truckLocation())
+          .thenAnswer((_) async => const TruckLocationSummary(filled: 31, notFilled: 6, workshop: 3));
       await tester.tap(find.text('Retry'));
       await tester.pump();
-      expect(find.text('21'), findsOneWidget);
+      expect(find.text('Truck location failed'), findsNothing);
+      expect(find.text('31'), findsOneWidget);
     });
   });
 

@@ -4,7 +4,7 @@ import '../data/admin_overview_models.dart';
 import '../data/admin_overview_repository.dart';
 
 /// The Overview tab's areas. Each loads and fails on its own.
-enum OverviewArea { sales, jobOrders, mail, incidents, truckPlanning, vesselPlanning, truckLocation }
+enum OverviewArea { sales, invoices, jobOrders, mail, incidents, truckLocation }
 
 /// One area: loading, its data, or why it could not be loaded. A reload keeps the shown data.
 class AreaState<T> {
@@ -31,11 +31,10 @@ class AdminOverviewState {
   }
 
   AreaState<SalesSummary> get sales => _area(OverviewArea.sales);
+  AreaState<SalesSummary> get invoices => _area(OverviewArea.invoices);
   AreaState<JobOrderSummary> get jobOrders => _area(OverviewArea.jobOrders);
   AreaState<MailSummary> get mail => _area(OverviewArea.mail);
   AreaState<IrSummary> get incidents => _area(OverviewArea.incidents);
-  AreaState<int> get truckPlanning => _area(OverviewArea.truckPlanning);
-  AreaState<int> get vesselPlanning => _area(OverviewArea.vesselPlanning);
   AreaState<TruckLocationSummary> get truckLocation => _area(OverviewArea.truckLocation);
 
   AdminOverviewState withArea(OverviewArea a, AreaState<Object> s) =>
@@ -73,11 +72,10 @@ class AdminOverviewCubit extends Cubit<AdminOverviewState> {
 
   Future<Object> _fetch(OverviewArea area) => switch (area) {
         OverviewArea.sales => _repository.sales(),
+        OverviewArea.invoices => _repository.invoices(),
         OverviewArea.jobOrders => _repository.jobOrders(),
         OverviewArea.mail => _repository.mail(),
         OverviewArea.incidents => _repository.incidents(),
-        OverviewArea.truckPlanning => _repository.truckPlanningToday(),
-        OverviewArea.vesselPlanning => _repository.vesselPlanningNextWeek(),
         OverviewArea.truckLocation => _repository.truckLocation(),
       };
 }

@@ -118,6 +118,9 @@ import 'package:maleva/features/transaction/viewsaleorder/bloc/viewsaleorder_blo
 import 'package:maleva/features/ir_report/ir_report_injection.dart';
 import 'package:maleva/features/truck_location/truck_location_injection.dart';
 import 'package:maleva/features/auth/auth_injection.dart';
+import 'package:maleva/core/network/java_api_client.dart';
+import 'package:maleva/features/dashboard/ceo_dashboard/data/ceo_analytics_api.dart';
+import 'package:maleva/features/dashboard/ceo_dashboard/data/ceo_super_reports_api.dart';
 import 'package:maleva/features/auth/data/session_service.dart';
 final sl = GetIt.instance;
 
@@ -173,6 +176,9 @@ Future<void> setupDependencies() async {
 
 
   registerAuthModule(sl);
+  // the CEO analytics dashboard (the shared /api/ceo-dashboard/analytics; change ceo-analytics-dashboard)
+  sl.registerLazySingleton<CeoAnalyticsApi>(() => CeoAnalyticsApi(sl<JavaApiClient>().dio));
+  sl.registerLazySingleton<CeoSuperReportsApi>(() => CeoSuperReportsApi(sl<JavaApiClient>().dio));
   // Planning and RTI on phone and tablet (change planning-rti-phone-tablet)
   registerRtiEntryFeature(sl);
   registerPlanningFeature(sl);

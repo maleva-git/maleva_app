@@ -384,6 +384,12 @@ class AppGlobals {
   static const List<String> oldVesselChannelIds = ["com.kassapos.maleva.vessel", "com.kassapos.maleva.vessel.alarm"];
   static const String vesselChannelName = "Vessel alerts";
   static const String vesselChannelDescription = "A vessel's arrival or departure moved: jobs need new dates";
+  // Super Admins get vessel alerts without vibration or sound (owner, 2026-10-16): the backend marks their vessel
+  // pushes with data quiet = "1" and sends them to this channel (VESSEL_QUIET_ANDROID_CHANNEL in GoogleFcmClient).
+  // A channel cannot change once made, hence its own id.
+  static const String vesselQuietChannelId = "com.kassapos.maleva.vessel.quiet";
+  static const String vesselQuietChannelName = "Vessel alerts (quiet)";
+  static const String vesselQuietChannelDescription = "Vessel alerts without sound or vibration";
   static String mobiletoken="";
   static getDeviceToken() async {
 

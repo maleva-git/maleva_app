@@ -143,7 +143,8 @@ class _SplashScreenState extends State<SplashScreen>
         unawaited(tokenFetch.then((_) => sl<SessionService>().syncDeviceToken(), onError: (_) {}));
         // crash logs kept from before sign-in go to this user's Troubleshoot folder
         unawaited(AppLogApi.sendPending(recordId: AppPreferences.getEmpRefId()));
-        context.go(dashboardRouteFor(isDriver: session.isDriver, roleId: session.roleId));
+        context.go(dashboardRouteFor(
+            isDriver: session.isDriver, roleId: session.roleId, permissionId: session.permissionId));
       case RestoreUnreachable(:final message):
         // the token is kept: Retry tries again, Go to Login signs in afresh
         _showErrorPopup(

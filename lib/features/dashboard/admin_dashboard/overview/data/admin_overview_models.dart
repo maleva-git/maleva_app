@@ -7,19 +7,60 @@ import 'package:maleva/features/truck_location/domain/entities/truck_location_we
 /// The small numbers the Overview tab shows, each read from the Java answer as it is
 /// (change `super-admin-overview-tab`).
 
-/// `/api/dashboard/sales/{comId}?type=1`: `TodaySales`, `MonthSales`, `MonthAmount`.
+/// `/api/dashboard/sales/{comId}?type=`: the period totals (`TodaySales`, `TodayAmount`, `YesterdaySales`,
+/// ..., `MonthAmount`) and `monthlySales` (`MonthName`, `SalesCount`, `SalesAmount`, newest first), as the
+/// web Super Admin dashboard's report card reads them. Type 1 is all sale orders, type 0 invoices.
 class SalesSummary {
-  const SalesSummary({required this.today, required this.month, required this.monthAmount});
+  const SalesSummary({
+    required this.today,
+    required this.month,
+    required this.monthAmount,
+    this.todayAmount = 0,
+    this.yesterday = 0,
+    this.yesterdayAmount = 0,
+    this.week = 0,
+    this.weekAmount = 0,
+    this.months = const [],
+  });
 
   factory SalesSummary.fromJava(Map<String, dynamic> m) => SalesSummary(
         today: JsonRead.integer(m['TodaySales']),
+        todayAmount: JsonRead.number(m['TodayAmount']),
+        yesterday: JsonRead.integer(m['YesterdaySales']),
+        yesterdayAmount: JsonRead.number(m['YesterdayAmount']),
+        week: JsonRead.integer(m['WeekSales']),
+        weekAmount: JsonRead.number(m['WeekAmount']),
         month: JsonRead.integer(m['MonthSales']),
         monthAmount: JsonRead.number(m['MonthAmount']),
+        months: [
+          for (final r in JsonRead.listOfMaps(m['monthlySales']))
+            MonthSales(
+              name: JsonRead.string(r['MonthName']),
+              count: JsonRead.integer(r['SalesCount']),
+              amount: JsonRead.number(r['SalesAmount']),
+            ),
+        ],
       );
 
   final int today;
+  final double todayAmount;
+  final int yesterday;
+  final double yesterdayAmount;
+  final int week;
+  final double weekAmount;
   final int month;
   final double monthAmount;
+
+  /// The last 12 months, newest first.
+  final List<MonthSales> months;
+}
+
+class MonthSales {
+  const MonthSales({required this.name, required this.count, required this.amount});
+
+  final String name;
+  final int count;
+  final double amount;
 }
 
 /// `/api/job-orders/list` with any status: the job orders not yet finished, counted by status.

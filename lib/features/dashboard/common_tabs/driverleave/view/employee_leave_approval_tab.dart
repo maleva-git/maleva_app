@@ -7,6 +7,7 @@ import '../bloc/leave_event.dart';
 import '../bloc/leave_state.dart';
 import 'package:get_it/get_it.dart';
 import 'package:maleva/features/dashboard/common_tabs/driverleave/data/leave_request_model.dart';
+import 'package:maleva/features/dashboard/common_tabs/driverleave/data/leave_duration.dart';
 import 'package:maleva/core/colors/colors.dart' as colour;
 import 'package:intl/intl.dart';
 import 'package:maleva/core/utils/app_globals.dart';
@@ -103,33 +104,6 @@ class _EmployeeLeaveApprovalTabState extends State<EmployeeLeaveApprovalTab> {
     ));
   }
 
-  String _formatTotalDays(LeaveRequestModel req) {
-    int tDays = req.totalDays;
-    bool sameDay = req.fromDate.year == req.toDate.year && 
-                   req.fromDate.month == req.toDate.month && 
-                   req.fromDate.day == req.toDate.day;
-    
-    bool hasTime = (req.fromDate.hour != 0 || req.fromDate.minute != 0 || req.fromDate.second != 0) ||
-                   (req.toDate.hour != 0 || req.toDate.minute != 0 || req.toDate.second != 0);
-                   
-    if (hasTime && sameDay) {
-      int diffHours = req.toDate.difference(req.fromDate).inHours;
-      if (diffHours < 1) {
-        return '${req.toDate.difference(req.fromDate).inMinutes} Mins';
-      } else {
-        return '$diffHours Hours';
-      }
-    }
-    
-    if (sameDay) {
-      if (tDays > 1) {
-        if (tDays >= 15) return '$tDays Mins';
-        return '$tDays Hours';
-      }
-      return '1 Day';
-    }
-    return '$tDays ${tDays == 1 ? "Day" : "Days"}';
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -153,6 +127,13 @@ class _EmployeeLeaveApprovalTabState extends State<EmployeeLeaveApprovalTab> {
               ));
             } else if (state is LeaveActionError) {
               ConfirmationOK(state.message, context);
+              // the server may have refused because someone else decided first: show the list as it is now
+              context.read<LeaveBloc>().add(const FetchLeaveData(
+                applicantType: 1,
+                applicantRefId: 0,
+                fromDate: "",
+                toDate: "",
+              ));
             }
           },
       builder: (context, state) {
@@ -250,7 +231,7 @@ class _EmployeeLeaveApprovalTabState extends State<EmployeeLeaveApprovalTab> {
                                     borderRadius: BorderRadius.circular(8),
                                   ),
                                   child: Text(
-                                    _formatTotalDays(req),
+                                    leaveDurationLabel(req.fromDate, req.toDate),
                                     style: AppTypography.bodyMedium(color: colour.commonColorhighlight, fontWeight: FontWeight.bold),
                                   ),
                                 ),
@@ -305,7 +286,17 @@ class _EmployeeLeaveApprovalTabState extends State<EmployeeLeaveApprovalTab> {
                                   ],
                                 ),
                               ),
-                            if (req.statusRefId == 1) // Only show action if pending
+                            if (req.statusRefId == 1 && req.applicantRefId == AppGlobals.EmpRefId)
+                              // nobody approves their own leave; the server refuses it too (leave-approval-rules)
+                              Padding(
+                                padding: const EdgeInsets.only(top: 16),
+                                child: Align(
+                                  alignment: Alignment.centerRight,
+                                  child: Text('Your own request - another employee reviews it',
+                                      style: AppTypography.bodySmall(color: Colors.grey, fontWeight: FontWeight.w600)),
+                                ),
+                              ),
+                            if (req.statusRefId == 1 && req.applicantRefId != AppGlobals.EmpRefId) // pending, someone else's
                               Padding(
                                 padding: const EdgeInsets.only(top: 16),
                                 child: Align(

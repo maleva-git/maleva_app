@@ -8,6 +8,7 @@ import '../bloc/leave_event.dart';
 import '../bloc/leave_state.dart';
 import 'package:get_it/get_it.dart';
 import 'package:maleva/features/dashboard/common_tabs/driverleave/data/leave_request_model.dart';
+import 'package:maleva/features/dashboard/common_tabs/driverleave/data/leave_duration.dart';
 import 'package:maleva/core/widgets/maleva_inputs.dart';
 import 'package:intl/intl.dart';
 import 'package:maleva/core/utils/app_globals.dart';
@@ -80,33 +81,6 @@ class _DriverLeaveRequestTabState extends State<_DriverLeaveRequestTabBody> {
     }
   }
 
-  String _formatTotalDays(LeaveRequestModel req) {
-    int tDays = req.totalDays;
-    bool sameDay = req.fromDate.year == req.toDate.year && 
-                   req.fromDate.month == req.toDate.month && 
-                   req.fromDate.day == req.toDate.day;
-    
-    bool hasTime = (req.fromDate.hour != 0 || req.fromDate.minute != 0 || req.fromDate.second != 0) ||
-                   (req.toDate.hour != 0 || req.toDate.minute != 0 || req.toDate.second != 0);
-                   
-    if (hasTime && sameDay) {
-      int diffHours = req.toDate.difference(req.fromDate).inHours;
-      if (diffHours < 1) {
-        return '${req.toDate.difference(req.fromDate).inMinutes} Mins';
-      } else {
-        return '$diffHours Hours';
-      }
-    }
-    
-    if (sameDay) {
-      if (tDays > 1) {
-        if (tDays >= 15) return '$tDays Mins';
-        return '$tDays Hours';
-      }
-      return '1 Day';
-    }
-    return '$tDays ${tDays == 1 ? "Day" : "Days"}';
-  }
 
   void _openLeaveForm(BuildContext context, List<LeaveTypeModel> leaveTypes) {
     final bloc = context.read<LeaveBloc>();
@@ -302,7 +276,7 @@ class _DriverLeaveRequestTabState extends State<_DriverLeaveRequestTabBody> {
                                           borderRadius: BorderRadius.circular(8),
                                         ),
                                         child: Text(
-                                          _formatTotalDays(req),
+                                          leaveDurationLabel(req.fromDate, req.toDate),
                                           style: AppTypography.bodyMedium(color: colour.commonColorhighlight, fontWeight: FontWeight.bold),
                                         ),
                                       ),
@@ -387,20 +361,8 @@ class _LeaveRequestFormSheetState extends State<_LeaveRequestFormSheet> {
       return;
     }
     
-    int totalDaysNum = 0;
-    int diffHours = _toDate.difference(_fromDate).inHours;
-    if (diffHours >= 0 && diffHours < 24 && _fromDate.day == _toDate.day && _fromDate.month == _toDate.month && _fromDate.year == _toDate.year) {
-      if (diffHours < 1) {
-        totalDaysNum = _toDate.difference(_fromDate).inMinutes;
-      } else {
-        totalDaysNum = diffHours;
-      }
-    } else {
-      totalDaysNum = DateTime(_toDate.year, _toDate.month, _toDate.day)
-          .difference(DateTime(_fromDate.year, _fromDate.month, _fromDate.day))
-          .inDays + 1;
-      if (totalDaysNum <= 0) totalDaysNum = 1;
-    }
+    // calendar days, both counted; the server works it out the same way (leave-approval-rules)
+    final totalDaysNum = leaveCalendarDays(_fromDate, _toDate);
     
     ctx.read<LeaveBloc>().add(SubmitLeaveRequest(
       leaveTypeRefId: _selectedLeaveTypeId!,
@@ -443,21 +405,6 @@ class _LeaveRequestFormSheetState extends State<_LeaveRequestFormSheet> {
     }
   }
 
-  String get _calculatedDuration {
-    int diffHours = _toDate.difference(_fromDate).inHours;
-    if (diffHours >= 0 && diffHours < 24 && _fromDate.day == _toDate.day && _fromDate.month == _toDate.month && _fromDate.year == _toDate.year) {
-      if (diffHours < 1) {
-        int mins = _toDate.difference(_fromDate).inMinutes;
-        return '$mins Mins';
-      } else {
-        return '$diffHours Hours';
-      }
-    } else {
-      int days = DateTime(_toDate.year, _toDate.month, _toDate.day).difference(DateTime(_fromDate.year, _fromDate.month, _fromDate.day)).inDays + 1;
-      if (days <= 0) days = 1;
-      return '$days ${days == 1 ? "Day" : "Days"}';
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -531,7 +478,7 @@ class _LeaveRequestFormSheetState extends State<_LeaveRequestFormSheet> {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Text('Total Duration:', style: AppTypography.bodyMedium(color: AppTokens.textMuted)),
-                          Text(_calculatedDuration, style: AppTypography.heading2(color: AppTokens.brandDark)),
+                          Text(leaveDurationLabel(_fromDate, _toDate), style: AppTypography.heading2(color: AppTokens.brandDark)),
                         ],
                       ),
                     ),

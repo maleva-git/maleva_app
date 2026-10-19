@@ -13,7 +13,7 @@ import '../../support/local_fonts.dart';
 
 class MockSessionService extends Mock implements SessionService {}
 
-MobileSession session({bool driver = false, int role = 300}) => MobileSession(
+MobileSession session({bool driver = false, int role = 300, int permission = 1}) => MobileSession(
       token: 't',
       expiresAt: DateTime(2027),
       sessionExpiresAt: DateTime(2027),
@@ -24,7 +24,7 @@ MobileSession session({bool driver = false, int role = 300}) => MobileSession(
       companyName: 'FIXTURE CO',
       rulesType: 'SALES',
       roleId: role,
-      permissionId: 1,
+      permissionId: permission,
       truckRefId: 0,
       truckName: '',
       menu: const [],
@@ -53,7 +53,7 @@ void main() {
   Future<String> runSplash(WidgetTester tester) async {
     final router = GoRouter(routes: [
       GoRoute(path: '/', builder: (_, __) => const SplashScreen()),
-      for (final path in ['/login', '/dashboard/sales', '/dashboard/admin', '/driver_dashboard', '/unauthorized'])
+      for (final path in ['/login', '/dashboard/sales', '/dashboard/admin', '/dashboard/ceo', '/driver_dashboard', '/unauthorized'])
         GoRoute(path: path, builder: (_, __) => Scaffold(body: Text('at $path'))),
     ]);
     await tester.pumpWidget(MaterialApp.router(routerConfig: router));
@@ -73,6 +73,16 @@ void main() {
 
   testWidgets('a restored session opens its dashboard by the shared map', (tester) async {
     when(() => sessions.restore()).thenAnswer((_) async => Restored(session(role: 200)));
+    expect(await runSplash(tester), '/dashboard/admin');
+  });
+
+  testWidgets('a restored CEO session (role 100, permission 1) opens the CEO dashboard', (tester) async {
+    when(() => sessions.restore()).thenAnswer((_) async => Restored(session(role: 100, permission: 1)));
+    expect(await runSplash(tester), '/dashboard/ceo');
+  });
+
+  testWidgets('a restored role 100 session without permission 1 opens the admin dashboard', (tester) async {
+    when(() => sessions.restore()).thenAnswer((_) async => Restored(session(role: 100, permission: 0)));
     expect(await runSplash(tester), '/dashboard/admin');
   });
 
