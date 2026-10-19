@@ -24,7 +24,8 @@ class EmployeeLeaveRequestTab extends StatefulWidget {
 
 class _EmployeeLeaveRequestTabState extends State<EmployeeLeaveRequestTab> {
   DateTime _searchFromDate = DateTime.now().subtract(const Duration(days: 30));
-  DateTime _searchToDate = DateTime.now();
+  // a year ahead, so leave applied for coming dates is listed (leave-approval-rules)
+  DateTime _searchToDate = DateTime.now().add(const Duration(days: 365));
   int? _selectedId;
   List<LeaveRequestModel> _cachedRequests = [];
   List<LeaveTypeModel> _cachedLeaveTypes = [];

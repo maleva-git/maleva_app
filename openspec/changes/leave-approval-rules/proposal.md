@@ -19,6 +19,17 @@ and offered the Review button on the signed-in employee's own request. Backend c
   request - another employee reviews it". The server refuses it anyway.
 - **After a refused review the list reloads**, so a request someone else already decided shows its
   real status.
+- **A submit after a refused one is sent** (owner, 2026-10-19: "apply is not working"). The bloc
+  only acted while its state was "loaded"; after any refusal the state was "error" and every
+  later Request Leave / Review tap did nothing. It now works from the last loaded list, and a
+  second tap while one is being sent is ignored.
+- **Leave applied for coming dates is listed.** The request tabs listed leave starting between 30
+  days ago and *today*, so a request for next week vanished after saving. The window now runs a
+  year ahead.
+- **Driver leave warning in Planning and RTI** reads every pending / approved leave of the driver
+  list (today and the next 3 days), by start, with "on leave today" / "starts in N days" and the
+  hours of a part-day leave. Before, only the first row was read. One helper,
+  `core/fleet/driver_leave_notes.dart`, serves both pickers. Warn only.
 - The server's new refusals (overlapping leave, already reviewed, own leave, applicant not current)
   are shown as its message, as before.
 

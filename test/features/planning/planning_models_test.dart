@@ -201,7 +201,20 @@ void main() {
         ]
       }, today: today);
       expect(leave.severity, ExpirySeverity.leaveApproved);
-      expect(leave.warnings.single.message, 'Leave (APPROVED) - Annual: 06/10/2026 to 08/10/2026');
+      expect(leave.warnings.single.message, 'Leave (APPROVED) - Annual: 06/10/2026 to 08/10/2026, starts tomorrow');
+      // every pending / approved leave by start; a rejected first row no longer hides them (leave-approval-rules)
+      final several = driverExpiryState({
+        'leaves': [
+          {'StatusName': 'Rejected', 'FromDate': '2026-10-05T00:00:00', 'ToDate': '2026-10-05T00:00:00'},
+          {'StatusName': 'Pending', 'LeaveTypeName': 'EMERGENCY', 'FromDate': '2026-10-08T00:00:00', 'ToDate': '2026-10-08T00:00:00'},
+          {'StatusName': 'Approved', 'LeaveTypeName': 'PERMISSION', 'FromDate': '2026-10-05T09:00:00', 'ToDate': '2026-10-05T11:00:00'},
+        ]
+      }, today: today);
+      expect(several.severity, ExpirySeverity.leaveApproved);
+      expect(several.warnings.map((w) => w.message), [
+        'Leave (APPROVED) - PERMISSION: 05/10/2026 09:00 to 11:00, on leave today',
+        'Leave (PENDING) - EMERGENCY: 08/10/2026 to 08/10/2026, starts in 3 days',
+      ]);
       expect(
           driverExpiryState({
             'leaves': [

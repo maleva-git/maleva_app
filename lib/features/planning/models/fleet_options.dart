@@ -1,3 +1,4 @@
+import 'package:maleva/core/fleet/driver_leave_notes.dart';
 import 'package:intl/intl.dart';
 import 'package:maleva/features/planning/data/js_values.dart';
 
@@ -16,7 +17,7 @@ class ExpiryWarning {
 
   /// `formatTruckExpiryMessage` / `formatDriverExpiryMessage`.
   String get message {
-    if (isLeave) return '$label: $dateText';
+    if (isLeave) return dateText.isEmpty ? label : '$label: $dateText';
     if (daysLeft < 0) {
       final overdue = daysLeft.abs();
       return '$label expired $overdue day${overdue == 1 ? '' : 's'} ago ($dateText)';
@@ -84,7 +85,7 @@ ExpiryState truckExpiryState(Map<String, dynamic> truck, {DateTime? today}) {
 
 const _driverFields = [('licenseExp', 'License'), ('LicenseExp', 'License'), ('gdlExp', 'GDL'), ('GdlExp', 'GDL')];
 
-/// `getDriverExpiryState`: licence and GDL (7 days, red at 3), then the latest leave.
+/// `getDriverExpiryState`: licence and GDL (7 days, red at 3), then every pending / approved leave.
 ExpiryState driverExpiryState(Map<String, dynamic> driver, {DateTime? today}) {
   final now = today ?? DateTime.now();
   final seen = <String>{};
@@ -96,25 +97,14 @@ ExpiryState driverExpiryState(Map<String, dynamic> driver, {DateTime? today}) {
     final w = _warn(driver, f.$1, f.$2, 7, 3, now);
     if (w != null) warnings.add(w);
   }
-  final leaves = driver['leaves'];
-  if (leaves is List && leaves.isNotEmpty && leaves.first is Map) {
-    final latest = Map<String, dynamic>.from(leaves.first as Map);
-    final status = Js.text(latest['StatusName']).toUpperCase();
-    if (status == 'APPROVED' || status == 'PENDING') {
-      String day(dynamic v) {
-        final d = DateTime.tryParse(Js.text(v));
-        return d == null ? 'Invalid Date' : _enGb(d);
-      }
-
-      final type = Js.truthy(latest['LeaveTypeName']) ? Js.text(latest['LeaveTypeName']) : 'General';
-      warnings.add(ExpiryWarning(
-        label: 'Leave ($status) - $type',
-        daysLeft: 0,
-        dateText: '${day(latest['FromDate'])} to ${day(latest['ToDate'])}',
-        severity: status == 'APPROVED' ? ExpirySeverity.leaveApproved : ExpirySeverity.leavePending,
-        isLeave: true,
-      ));
-    }
+  for (final note in driverLeaveNotes(driver['leaves'], now: now)) {
+    warnings.add(ExpiryWarning(
+      label: note.label,
+      daysLeft: note.daysAway,
+      dateText: note.dateText,
+      severity: note.approved ? ExpirySeverity.leaveApproved : ExpirySeverity.leavePending,
+      isLeave: true,
+    ));
   }
   var severity = ExpirySeverity.normal;
   if (warnings.any((w) => w.severity == ExpirySeverity.critical)) {

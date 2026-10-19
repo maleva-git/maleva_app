@@ -1,7 +1,7 @@
+import 'package:maleva/core/fleet/driver_leave_notes.dart';
 import 'package:intl/intl.dart';
 import 'package:maleva/core/utils/json_read.dart';
 import 'package:maleva/core/widgets/ui/picker_sheet.dart' show PickSeverity;
-import 'package:maleva/features/rti/models/js_values.dart';
 import 'package:maleva/features/rti/models/rti_dates.dart';
 
 /// One expiry (or leave) warning of a truck or driver.
@@ -16,7 +16,7 @@ class FleetWarning {
 
   /// `formatTruckExpiryMessage` / `formatDriverExpiryMessage`.
   String get message {
-    if (isLeave) return '$label: $dateText';
+    if (isLeave) return dateText.isEmpty ? label : '$label: $dateText';
     if (daysLeft < 0) {
       final overdue = daysLeft.abs();
       return '$label expired $overdue day${overdue == 1 ? '' : 's'} ago ($dateText)';
@@ -72,20 +72,14 @@ abstract final class FleetExpiry {
       for (final (key, label, warn, crit) in _driverFields)
         if (_warning(JsonRead.field(d, key), label, warn, crit, today) case final w?) w,
     ];
-    final leaves = JsonRead.listOfMaps(JsonRead.field(d, 'leaves'));
-    if (leaves.isNotEmpty) {
-      final latest = leaves.first;
-      final status = Js.fieldText(latest, ['StatusName']).toUpperCase();
-      if (status == 'APPROVED' || status == 'PENDING') {
-        final type = Js.fieldText(latest, ['LeaveTypeName']);
-        out.add(FleetWarning(
-          label: 'Leave ($status) - ${type.isEmpty ? 'General' : type}',
-          daysLeft: 0,
-          dateText: '${RtiDates.short(Js.field(latest, ['FromDate']))} to ${RtiDates.short(Js.field(latest, ['ToDate']))}',
-          severity: status == 'APPROVED' ? PickSeverity.leaveApproved : PickSeverity.leavePending,
-          isLeave: true,
-        ));
-      }
+    for (final note in driverLeaveNotes(JsonRead.field(d, 'leaves'), now: now)) {
+      out.add(FleetWarning(
+        label: note.label,
+        daysLeft: note.daysAway,
+        dateText: note.dateText,
+        severity: note.approved ? PickSeverity.leaveApproved : PickSeverity.leavePending,
+        isLeave: true,
+      ));
     }
     return out;
   }

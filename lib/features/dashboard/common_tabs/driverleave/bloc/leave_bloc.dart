@@ -7,6 +7,11 @@ import 'leave_state.dart';
 class LeaveBloc extends Bloc<LeaveEvent, LeaveState> {
   final LeaveRepository _repository;
 
+  /// The last list and types loaded. A submit or review works from it whatever the current
+  /// state is: before, after a refused save the state was [LeaveActionError] and the next
+  /// submit was silently ignored (openspec change leave-approval-rules).
+  LeaveLoaded _loaded = const LeaveLoaded(requests: [], leaveTypes: []);
+
   LeaveBloc(this._repository) : super(LeaveInitial()) {
     on<FetchLeaveData>(_onFetchLeaveData);
     on<SubmitLeaveRequest>(_onSubmitLeaveRequest);
@@ -27,73 +32,49 @@ class LeaveBloc extends Bloc<LeaveEvent, LeaveState> {
         toDate: event.toDate,
       );
 
-      emit(LeaveLoaded(requests: requests, leaveTypes: leaveTypes));
+      _loaded = LeaveLoaded(requests: requests, leaveTypes: leaveTypes);
+      emit(_loaded);
     } catch (e) {
       emit(LeaveError("Failed to fetch leave data: ${e is ApiFailure ? e.message : e}"));
     }
   }
 
-  Future<void> _onSubmitLeaveRequest(
-    SubmitLeaveRequest event,
-    Emitter<LeaveState> emit,
-  ) async {
-    if (state is LeaveLoaded) {
-      final currentState = state as LeaveLoaded;
-      emit(currentState.copyWith(isSubmitting: true));
+  /// True while a submit or review is with the server: a second tap is ignored.
+  bool _busy = false;
 
-      try {
-        final success = await _repository.addLeaveRequest(
-          leaveTypeRefId: event.leaveTypeRefId,
-          fromDate: event.fromDate,
-          toDate: event.toDate,
-          totalDays: event.totalDays,
-          reason: event.reason,
-          applicantRefId: event.applicantRefId,
-          applicantType: event.applicantType,
-        );
+  Future<void> _onSubmitLeaveRequest(SubmitLeaveRequest event, Emitter<LeaveState> emit) =>
+      _act(emit, "Leave Request Submitted Successfully", () => _repository.addLeaveRequest(
+            leaveTypeRefId: event.leaveTypeRefId,
+            fromDate: event.fromDate,
+            toDate: event.toDate,
+            totalDays: event.totalDays,
+            reason: event.reason,
+            applicantRefId: event.applicantRefId,
+            applicantType: event.applicantType,
+          ));
 
-        emit(currentState.copyWith(isSubmitting: false));
+  Future<void> _onUpdateLeaveStatus(UpdateLeaveStatusEvent event, Emitter<LeaveState> emit) =>
+      _act(emit, "Leave status updated successfully", () => _repository.updateLeaveStatus(
+            id: event.id,
+            statusRefId: event.statusRefId,
+            reviewRemark: event.reviewRemark,
+            reviewedBy: event.reviewedBy,
+          ));
 
-        if (success) {
-          emit(const LeaveActionSuccess("Leave Request Submitted Successfully"));
-          // Optionally refetch data here, or let UI dispatch FetchLeaveData again
-        } else {
-          emit(const LeaveActionError("Failed to submit leave request"));
-        }
-      } catch (e) {
-        emit(currentState.copyWith(isSubmitting: false));
-        emit(LeaveActionError(e is ApiFailure ? e.message : "Error: $e"));
-      }
-    }
-  }
-
-  Future<void> _onUpdateLeaveStatus(
-    UpdateLeaveStatusEvent event,
-    Emitter<LeaveState> emit,
-  ) async {
-    if (state is LeaveLoaded) {
-      final currentState = state as LeaveLoaded;
-      emit(currentState.copyWith(isSubmitting: true));
-
-      try {
-        final success = await _repository.updateLeaveStatus(
-          id: event.id,
-          statusRefId: event.statusRefId,
-          reviewRemark: event.reviewRemark,
-          reviewedBy: event.reviewedBy,
-        );
-
-        emit(currentState.copyWith(isSubmitting: false));
-
-        if (success) {
-          emit(const LeaveActionSuccess("Leave status updated successfully"));
-        } else {
-          emit(const LeaveActionError("Failed to update leave status"));
-        }
-      } catch (e) {
-        emit(currentState.copyWith(isSubmitting: false));
-        emit(LeaveActionError(e is ApiFailure ? e.message : "Error: $e"));
-      }
+  /// Sends one write; the list stays on screen and the server's reason is shown on a refusal.
+  Future<void> _act(Emitter<LeaveState> emit, String done, Future<bool> Function() write) async {
+    if (_busy) return;
+    _busy = true;
+    emit(_loaded.copyWith(isSubmitting: true));
+    try {
+      await write();
+      emit(_loaded.copyWith(isSubmitting: false));
+      emit(LeaveActionSuccess(done));
+    } catch (e) {
+      emit(_loaded.copyWith(isSubmitting: false));
+      emit(LeaveActionError(e is ApiFailure ? e.message : "Error: $e"));
+    } finally {
+      _busy = false;
     }
   }
 }
