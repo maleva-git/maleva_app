@@ -1,0 +1,69 @@
+# Gitleaks: looks for passwords and keys in every push.
+# Same scan as on the Mac: see docs/tools/gitleaks.md
+name: Gitleaks
+
+# WHEN to run
+on:
+  push:
+    branches: [main]        # every push to main
+  pull_request:             # every pull request
+  schedule:
+    - cron: "0 1 * * 1"     # every Monday 01:00 UTC (new rules may find old secrets)
+  workflow_dispatch:        # a "Run workflow" button on GitHub
+
+# The robot may only READ the code, nothing more.
+permissions:
+  contents: read
+
+# A newer push cancels an older run that is still going.
+concurrency:
+  group: gitleaks-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  scan:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      GITLEAKS_VERSION: "8.30.1"
+      # Official SHA-256 of gitleaks_8.30.1_linux_x64.tar.gz (from the release's checksums.txt)
+      GITLEAKS_SHA256: "551f6fc83ea457d62a0d98237cbad105af8d557003051f41f3e7ca7b3f2470eb"
+
+    steps:
+      # 1. Copy the code onto the robot computer, with ALL history.
+      - name: Check out code (full history)
+        uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+
+      # 2. Download Gitleaks (pinned version), and check it is the real file.
+      - name: Install Gitleaks ${{ env.GITLEAKS_VERSION }}
+        run: |
+          cd "$RUNNER_TEMP"
+          curl -sSfL -o gitleaks.tar.gz \
+            "https://github.com/gitleaks/gitleaks/releases/download/v${GITLEAKS_VERSION}/gitleaks_${GITLEAKS_VERSION}_linux_x64.tar.gz"
+          echo "${GITLEAKS_SHA256}  gitleaks.tar.gz" | sha256sum -c -
+          tar -xzf gitleaks.tar.gz gitleaks
+          sudo mv gitleaks /usr/local/bin/gitleaks
+          gitleaks version
+
+      # 3. Scan. A NEW secret = exit code 1 = the job turns red.
+      - name: Scan for secrets
+        run: |
+          gitleaks git \
+            --redact \
+            --no-banner \
+            --config .gitleaks.toml \
+            --baseline-path .gitleaks-baseline.json \
+            --report-format json \
+            --report-path "$RUNNER_TEMP/gitleaks-report.json" \
+            .
+
+      # 4. If it failed, keep the report (values hidden) for 7 days.
+      - name: Save report
+        if: failure()
+        uses: actions/upload-artifact@v6
+        with:
+          name: gitleaks-report
+          path: ${{ runner.temp }}/gitleaks-report.json
+          retention-days: 7

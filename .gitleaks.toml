@@ -1,0 +1,59 @@
+# =====================================================================
+# Gitleaks instructions for maleva_app (Flutter)
+# Gitleaks = a security guard that looks for passwords and keys in our code.
+# This file has 2 parts:
+#   PART 1  use the normal checks
+#   PART 2  allowlist = things that LOOK like secrets but are SAFE
+#
+# Remember: an app file can be unpacked by anyone who installs the app.
+# A real secret (server password, payment SECRET key) must NEVER be in the app.
+#
+# Known old findings are in .gitleaks-baseline.json (see docs/tools/gitleaks.md).
+# =====================================================================
+title = "Maleva app Gitleaks config"
+
+
+# ---------------------------------------------------------------------
+# PART 1: Use all normal checks (AWS keys, tokens, private keys, ...)
+# ---------------------------------------------------------------------
+[extend]
+useDefault = true
+
+
+# ---------------------------------------------------------------------
+# PART 2: Allowlist = SAFE things. Do not report them.
+# Rule: allow only the exact safe text, never a whole folder.
+# ---------------------------------------------------------------------
+
+# Safe 1: form field NAMES in the sale order screen (checked 2026-10-19).
+#   salesorderadd_tab.dart has  s1Key: 'fwForwarding1S1'  style values.
+#   "Key" here means "the name of a form field", not an API key. The values
+#   are short words ending in a number; a real key is long and random.
+[[allowlists]]
+description = "Sale order form field names (s1Key, s2Key), not API keys"
+targetRules = ["generic-api-key"]
+regexTarget = "match"
+regexes = [
+  '''(?:s1|s2)Key:\s*'[A-Za-z]{2,}\d[A-Za-z0-9]{0,4}'$''',
+]
+
+# Safe 2: the Firebase config files (checked 2026-10-19).
+#   Every Firebase app ships these keys inside the app; Google says they are
+#   not secret (they only name the project). Protection comes from Firebase
+#   rules and from RESTRICTING each key in Google Cloud Console
+#   (APIs & Services > Credentials: Android/iOS app restriction + API list).
+#   Only the Google-key checks are skipped (gcp-api-key, and generic-api-key
+#   which reports the same key a second time), only in these exact files.
+[[allowlists]]
+description = "Firebase client config: public by design, restricted in Google Cloud"
+targetRules = ["gcp-api-key", "generic-api-key"]
+regexTarget = "secret"
+regexes = [
+  '''^AIza[0-9A-Za-z_-]{35}$''',
+]
+condition = "AND"
+paths = [
+  '''^lib/core/firebase/firebase_options\.dart$''',
+  '''^android/app/google-services\.json$''',
+  '''^ios/(?:Runner/)?GoogleService-Info\.plist$''',
+]
