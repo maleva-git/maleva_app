@@ -1,0 +1,49 @@
+# CI: analyze the Flutter code and run the tests on every push.
+#
+# - flutter analyze fails only on ERRORS for now. The old warnings and hints
+#   (170 + 503 on 2026-10-19) are cleaned up step by step; then this gets stricter.
+# - flutter test runs the unit and widget tests in test/ (no device, no server,
+#   no database). integration_test/ needs a device and is not run here.
+# - No app build, no signing keys, no secrets: the owner builds and tests on devices.
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+# The robot may only READ the code.
+permissions:
+  contents: read
+
+# A newer push cancels an older run that is still going.
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v5
+
+      # Pinned to the Flutter version used on the owner's Mac.
+      - name: Set up Flutter 3.47.5
+        uses: subosito/flutter-action@v2.23.0
+        with:
+          channel: stable
+          flutter-version: "3.47.5"
+          cache: true
+
+      - name: Get packages
+        run: flutter pub get
+
+      - name: Analyze (fails on errors only)
+        run: flutter analyze --no-fatal-warnings --no-fatal-infos
+
+      - name: Run tests
+        run: flutter test --reporter expanded
