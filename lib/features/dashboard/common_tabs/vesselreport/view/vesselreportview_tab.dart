@@ -1,10 +1,10 @@
+import 'package:maleva/core/session/work_jobs.dart';
 import 'package:flutter/material.dart';
 import 'package:maleva/features/mastersearch/Employee.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:maleva/core/utils/app_globals.dart';
-import 'package:maleva/core/utils/app_preferences.dart';
 import '../../../../../core/theme/tokens.dart';
 import '../../../../mastersearch/Port.dart';
 import '../bloc/vesselreport_bloc.dart';
@@ -173,7 +173,7 @@ class _VesselReportViewState extends State<_VesselReportView> {
                 children: [
                   _SectionHeader(title: 'Vessel Report', isTablet: true),
                   const SizedBox(height: 20),
-                  if (AppPreferences.getRoleId() != 500 && AppPreferences.getRoleId() != 600) ...[
+                  if (!WorkJobs.current().isBoarding) ...[
                     _SearchCard(
                       txtPort:     _txtPort,
                       txtRemarks:  _txtRemarks,
@@ -258,7 +258,7 @@ class _VesselReportViewState extends State<_VesselReportView> {
         _SectionHeader(title: 'Vessel Report', isTablet: false),
         const SizedBox(height: 16),
 
-        if (AppPreferences.getRoleId() != 500 && AppPreferences.getRoleId() != 600) ...[
+        if (!WorkJobs.current().isBoarding) ...[
           _SearchCard(
             txtPort:     _txtPort,
             txtRemarks:  _txtRemarks,
@@ -1570,7 +1570,7 @@ class _VesselCard extends StatelessWidget {
                        if (hasLoadingDates) allowedIds.addAll([7, 5]);
                        if (allowedIds.isEmpty) allowedIds = [7, 5]; // Fallback
 
-                       if (AppPreferences.getRoleId() == 500) {
+                       if (WorkJobs.current().isBoardingOfficerOnly) { // officer without the admin job
                          allowedIds.remove(28); // UNLOADING DONE
                          allowedIds.remove(5);  // DELIVERY DONE
                          allowedIds.remove(29); // LOADING DONE
@@ -1740,7 +1740,7 @@ class _VesselCard extends StatelessWidget {
                     ),
                     const SizedBox(height: 24),
 
-                    if (AppPreferences.getRoleId() != 500) ...[
+                    if (!WorkJobs.current().isBoardingOfficerOnly) ...[
                       if (hasLoadingDates) _buildEditField('L ETB', etb, (v) => etb = v),
                       if (hasLoadingDates) _buildEditField('L ETD', etd, (v) => etd = v),
                       if (hasOffloadDates) _buildEditField('OETB', oetb, (v) => oetb = v),

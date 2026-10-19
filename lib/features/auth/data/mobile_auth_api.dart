@@ -40,6 +40,7 @@ class MobileAuthApi {
   static const refreshPath = '/api/mobile/auth/refresh';
   static const logoutPath = '/api/mobile/auth/logout';
   static const deviceTokenPath = '/api/mobile/auth/device-token';
+  static const switchPath = '/api/mobile/auth/switch';
 
   final JavaApiClient _client;
 
@@ -95,6 +96,19 @@ class MobileAuthApi {
       throw _failure(e, on401: const SessionEnded());
     }
   }
+
+  /// Office mode <-> Driver mode for a person who is both (employee-extra-jobs-and-driver-mode):
+  /// [toDriver] true asks for the linked driver's session, false for the employee's.
+  /// The server answers 403 with its message when there is no linked record.
+  Future<MobileSession> switchMode(String token, {required bool toDriver, String? deviceToken}) => _session(
+        () => _client.dio.post<dynamic>(switchPath,
+            data: {
+              'to': toDriver ? 'DRIVER' : 'EMPLOYEE',
+              if (deviceToken != null && deviceToken.isNotEmpty) 'deviceToken': deviceToken,
+            },
+            options: _public(headers: {'Authorization': 'Bearer $token'})),
+        on401: const SessionEnded(),
+      );
 
   Options _public({Map<String, dynamic>? headers}) =>
       Options(headers: headers, extra: {JavaApiClient.publicRequest: true});

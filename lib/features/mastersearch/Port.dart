@@ -1,3 +1,4 @@
+import 'package:maleva/core/session/work_jobs.dart';
 import 'package:maleva/core/theme/app_typography.dart';
 import 'package:maleva/core/network/legacy_api_repository.dart';
 import 'package:maleva/core/di/injection.dart';
@@ -5,12 +6,12 @@ import 'package:flutter/material.dart';
 import 'package:maleva/core/colors/colors.dart' as colour;
 import 'package:maleva/core/utils/app_globals.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
-import 'package:maleva/core/utils/app_preferences.dart';
 
-/// The ports a user may pick: the employee's own ports for roles 500 and 600
-/// (empty when none are assigned), else the full list [kPortNames].
+/// The ports a user may pick: the employee's own ports for boarding work (role
+/// 500 / 600 or a boarding extra job; empty when none are assigned), else the
+/// full list [kPortNames].
 Future<List<String>> loadPortNames(BuildContext context) async {
-  if (AppPreferences.getRoleId() == 600 || AppPreferences.getRoleId() == 500) {
+  if (WorkJobs.current().isBoarding) {
     return sl<LegacyApiRepository>().GetEmployeeport(context);
   }
   return List.of(kPortNames);

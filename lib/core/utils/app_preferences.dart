@@ -29,6 +29,11 @@ class AppPreferences {
   static String getFcmToken()    => _prefs.getString('FcmToken') ?? '';
   static String getLoadMenu()    => _prefs.getString('loadmenu') ?? '';
   static String getEnquiryOpen() => _prefs.getString('EnquiryOpen') ?? 'false';
+  /// Job codes, comma separated (employee-extra-jobs-and-driver-mode).
+  static List<String> getJobs() => (_prefs.getString('Jobs') ?? '')
+      .split(',').map((e) => e.trim()).where((e) => e.isNotEmpty).toList();
+  static int    getLinkedDriverId()   => _prefs.getInt('LinkedDriverId')   ?? 0;
+  static int    getLinkedEmployeeId() => _prefs.getInt('LinkedEmployeeId') ?? 0;
 
   // ─── Setters ──────────────────────────────────────────────────────────────
   static Future<void> setComid(int v)        => _prefs.setInt('Comid', v);
@@ -47,6 +52,9 @@ class AppPreferences {
   static Future<void> setLoadMenu(String v)  => _prefs.setString('loadmenu', v);
   static Future<void> setEnquiryOpen(String v) => _prefs.setString('EnquiryOpen', v);
   static Future<void> setTokenKey(String v)  => _prefs.setString('Tokenkey', v);
+  static Future<void> setJobs(List<String> v) => _prefs.setString('Jobs', v.join(','));
+  static Future<void> setLinkedDriverId(int v)   => _prefs.setInt('LinkedDriverId', v);
+  static Future<void> setLinkedEmployeeId(int v) => _prefs.setInt('LinkedEmployeeId', v);
 
   // ─── Clear on logout ──────────────────────────────────────────────────────
   static Future<void> clearOnLogout() async {
@@ -62,6 +70,9 @@ class AppPreferences {
     await _prefs.setInt('PermissionId', 0);
     await _prefs.setInt('Comid', 0);
     await _prefs.setInt('MComid', 0);
+    await _prefs.setString('Jobs', '');
+    await _prefs.setInt('LinkedDriverId', 0);
+    await _prefs.setInt('LinkedEmployeeId', 0);
   }
 
   static SharedPreferences get raw => _prefs;

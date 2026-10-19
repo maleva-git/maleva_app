@@ -21,6 +21,9 @@ class MobileSession {
     required this.truckRefId,
     required this.truckName,
     required this.menu,
+    this.jobs = const [],
+    this.linkedDriverId = 0,
+    this.linkedEmployeeId = 0,
   });
 
   factory MobileSession.fromJson(Map<String, dynamic> json) {
@@ -46,6 +49,9 @@ class MobileSession {
       menu: menu is List
           ? menu.whereType<Map>().map((m) => MenuMasterModel.fromJson(Map<String, dynamic>.from(m))).toList()
           : const [],
+      jobs: _jobs(json['jobs']),
+      linkedDriverId: _int(json['linkedDriverId']),
+      linkedEmployeeId: _int(json['linkedEmployeeId']),
     );
   }
 
@@ -70,6 +76,21 @@ class MobileSession {
   final int truckRefId;
   final String truckName;
   final List<MenuMasterModel> menu;
+
+  /// Main role's job + extra jobs as Capability codes (BOARDINGOFFICER,
+  /// BOARDINGOFFICERADMIN, FORWARDINGAGENT); empty for a driver or an older
+  /// backend (employee-extra-jobs-and-driver-mode).
+  final List<String> jobs;
+
+  /// The person's own driver record (employee session), 0 when none: shows "Driver mode".
+  final int linkedDriverId;
+
+  /// The person's employee record (driver session), 0 when none: shows "Office mode".
+  final int linkedEmployeeId;
+
+  static List<String> _jobs(Object? value) => value is List
+      ? value.map((e) => e?.toString().trim().toUpperCase() ?? '').where((e) => e.isNotEmpty).toList()
+      : const [];
 
   static int _int(Object? value) => int.tryParse(value?.toString() ?? '') ?? 0;
 

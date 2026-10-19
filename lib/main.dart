@@ -1,3 +1,4 @@
+import 'package:maleva/features/auth/presentation/push_mode_gate.dart';
 import 'package:maleva/features/mail_monitor/mine/my_unread_mail_cubit.dart';
 import 'package:maleva/features/mail_monitor/mine/push_route.dart';
 import 'package:maleva/features/notifications/notification_signals.dart';
@@ -170,7 +171,8 @@ class _MyHomePageState extends State<MyHomePage> {
   void initState() {
     super.initState();
     //#region------FireBase-------
-    LocalNotificationService.initialize(context, onTap: (payload) => openPushRoute(routeForPayload(payload)));
+    // a tap on an alert for the other mode (office / driver) asks to switch first (push_mode_gate.dart)
+    LocalNotificationService.initialize(context, onTap: PushModeGate.openPayload);
 
     ///gives you the message on which user taps
     ///and it opened the app from terminated state
@@ -206,6 +208,7 @@ class _MyHomePageState extends State<MyHomePage> {
         // ScaffoldMessenger.of(context).showSnackBar(snackbar);
       }
       if (message.data['type']?.toString() == mailUnreadPushType) MyUnreadMailSignals.pushArrived();
+      PushModeGate.remember(message.data);
       // any push may change the bell, the dashboard banner and the pinned vessel alerts
       NotificationSignals.changed();
       // iOS already shows it (setForegroundNotificationPresentationOptions in main); a local copy
@@ -217,7 +220,7 @@ class _MyHomePageState extends State<MyHomePage> {
     ///on the notification
     FirebaseMessaging.onMessageOpenedApp.listen((message) {
       NotificationSignals.changed();
-      openPushRoute(routeForPush(message.data));
+      PushModeGate.openPush(message.data);
       // Navigator.push(context, MaterialPageRoute(builder: (context) => Home()));
     });
     // Navigator.of(context).push(

@@ -1,33 +1,28 @@
 import 'package:flutter/Material.dart';
 import 'package:maleva/features/notifications/notification_bell.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:maleva/core/utils/app_globals.dart';
-import 'package:maleva/core/utils/app_preferences.dart';
+import '../../work_tabs/work_tab_view.dart';
+import '../../work_tabs/work_tabs.dart';
+import 'package:maleva/features/auth/presentation/mode_switch_button.dart';
 import 'package:maleva/core/colors/colors.dart' as colour;
 import '../../../../core/bluetooth/view/Bluetooth_tab.dart';
 import '../../../../core/colors/colors.dart';
 import '../../../../core/models/model.dart';
 import '../../../../menu/menulist.dart';
-import '../../common_tabs/inventoryreport/view/inventoryview_tab.dart';
-import '../../common_tabs/salary/view/salary_tab.dart';
 import '../../common_tabs/saleorderview/view/saleorderview_tab.dart';
-import '../../common_tabs/spotsaleorder/view/spotsaleorder_add.dart';
-import '../../common_tabs/vesselreport/view/vesselreportview_tab.dart';
 import '../bloc/boarding_bloc.dart';
 import '../bloc/boarding_state.dart';
 import 'package:maleva/core/widgets/custom_app_bar.dart';
-import 'package:maleva/features/dashboard/common_tabs/driverleave/view/admin_leave_approval_tab.dart';
-import 'package:maleva/features/dashboard/common_tabs/driverleave/view/employee_leave_request_tab.dart';
 import 'package:maleva/core/models/shared/barcode_print_model.dart';
 import 'package:maleva/core/utils/auth_helper.dart';
-import 'package:maleva/features/ir_report/presentation/pages/ir_report_tab.dart';
 
 
 class BoardingMobileDashboard extends StatelessWidget {
   final TabController tabController;
+  final List<WorkTab> tabs;
   final bool isTablet;
-  const BoardingMobileDashboard({required this.tabController, required this.isTablet, super.key});
+  const BoardingMobileDashboard({required this.tabController, required this.tabs, required this.isTablet, super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -54,6 +49,8 @@ class BoardingMobileDashboard extends StatelessWidget {
       actions: [
         // the bell: unread notices and open vessel alerts (vessel-master-and-ptp-schedule)
         NotificationBellButton(isTablet: isTablet),
+        // Office mode -> Driver mode for an employee who also drives
+        ModeSwitchButton(isTablet: isTablet),
         IconButton(
           icon: Icon(Icons.directions_boat_filled,
               size: isTablet ? 28 : 25, ),
@@ -125,16 +122,9 @@ class BoardingMobileDashboard extends StatelessWidget {
           fontWeight: FontWeight.w500,
           fontSize: isTablet ? 14 : 13,
         ),
+        // Today's tabs for the role, then the extra jobs' tabs (work_tabs.dart).
         tabs: [
-
-          _tab('VSL',             isTablet),  //1
-          _tab('Salary',          isTablet),  //2
-          if (AppPreferences.getRoleId() != 500) _tab('SpotsSaleOrder',  isTablet),  //3
-          if (AppPreferences.getRoleId() != 500) _tab('IR Report', isTablet),
-          if (AppPreferences.getRoleId() != 500) _tab('InventoryReport', isTablet),  //4
-
-          _tab('EmpLeave', isTablet),
-          if (AppPreferences.getRoleId() == 500) _tab('IR Report', isTablet),
+          for (final tab in tabs) _tab(workTabLabel(tab, WorkDashboard.boarding), isTablet),
         ],
       ),
     );
@@ -173,15 +163,7 @@ class BoardingMobileDashboard extends StatelessWidget {
       child: TabBarView(
         controller: tabController,
         children: [
-
-          const VesselReportPage(),  //1
-          const SalaryTab(),  //2
-          if (AppPreferences.getRoleId() != 500) const SpotSaleEntryPage(),  //3
-          if (AppPreferences.getRoleId() != 500) const IrReportTab(),
-          if (AppPreferences.getRoleId() != 500) const InventoryPage(),   //4
-
-          const EmployeeLeaveRequestTab(),
-          if (AppPreferences.getRoleId() == 500) const IrReportTab(),
+          for (final tab in tabs) workTabView(tab),
         ],
       ),
     );

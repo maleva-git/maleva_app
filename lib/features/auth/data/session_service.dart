@@ -130,6 +130,20 @@ class SessionService {
     }
   }
 
+  /// Switches between office mode and Driver mode without a password
+  /// (employee-extra-jobs-and-driver-mode) and writes the new session. Throws
+  /// [MobileAuthFailure] with the server's message; on failure the current
+  /// session stays as it was.
+  Future<MobileSession> switchMode({required bool toDriver}) async {
+    final token = await _tokens.token();
+    if (token == null) throw const SessionEnded();
+    final deviceToken = _deviceToken();
+    final session = await _api.switchMode(token, toDriver: toDriver, deviceToken: deviceToken);
+    await _writer.write(session);
+    _sentDeviceToken = deviceToken.isEmpty ? null : deviceToken;
+    return session;
+  }
+
   /// Ends the session: tells the server (best effort), then forgets it here
   /// whatever the server said.
   Future<void> signOut() async {

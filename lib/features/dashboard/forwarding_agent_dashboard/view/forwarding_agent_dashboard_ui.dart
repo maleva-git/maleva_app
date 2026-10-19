@@ -7,16 +7,16 @@ import '../../../../menu/menulist.dart';
 import '../bloc/forwarding_agent_bloc.dart';
 import '../bloc/forwarding_agent_state.dart';
 import 'package:maleva/core/widgets/custom_app_bar.dart';
-import 'package:maleva/features/dashboard/common_tabs/driverleave/view/employee_leave_request_tab.dart';
+import '../../work_tabs/work_tab_view.dart';
+import '../../work_tabs/work_tabs.dart';
+import 'package:maleva/features/auth/presentation/mode_switch_button.dart';
 import 'package:maleva/core/utils/auth_helper.dart';
-import 'package:maleva/features/ir_report/presentation/pages/ir_report_tab.dart';
-import 'rti_route_activities_tab.dart';
-import 'package:maleva/features/forwarding_requests/view/forwarding_requests_page.dart';
 
 class ForwardingAgentMobileDashboard extends StatelessWidget {
   final TabController tabController;
+  final List<WorkTab> tabs;
   final bool isTablet;
-  const ForwardingAgentMobileDashboard({required this.tabController, required this.isTablet, super.key});
+  const ForwardingAgentMobileDashboard({required this.tabController, required this.tabs, required this.isTablet, super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -41,6 +41,8 @@ class ForwardingAgentMobileDashboard extends StatelessWidget {
       actions: [
         // the bell: unread notices and open vessel alerts (vessel-master-and-ptp-schedule)
         NotificationBellButton(isTablet: isTablet),
+        // Office mode -> Driver mode for an employee who also drives
+        ModeSwitchButton(isTablet: isTablet),
         IconButton(
           icon: Icon(Icons.exit_to_app,
               size: isTablet ? 32 : 30, color: colour.topAppBarColor),
@@ -87,12 +89,9 @@ class ForwardingAgentMobileDashboard extends StatelessWidget {
           fontWeight: FontWeight.w500,
           fontSize: isTablet ? 14 : 13,
         ),
+        // Today's tabs, then the extra jobs' tabs (work_tabs.dart).
         tabs: [
-
-          _tab('Emp Leave', isTablet),
-          _tab('RTI Activities', isTablet),
-          _tab('IR Report', isTablet),
-          _tab('FW Requests', isTablet),
+          for (final tab in tabs) _tab(workTabLabel(tab, WorkDashboard.forwardingAgent), isTablet),
         ],
       ),
     );
@@ -119,12 +118,8 @@ class ForwardingAgentMobileDashboard extends StatelessWidget {
       listener: (context, tabState) {},
       child: TabBarView(
         controller: tabController,
-        children: const [
-          EmployeeLeaveRequestTab(),
-          RtiRouteActivitiesTab(),
-          IrReportTab(),
-          // The planning list of Customer Service's forwarding requests (forwarding-requests-on-shared-java-api)
-          ForwardingRequestsBody(),
+        children: [
+          for (final tab in tabs) workTabView(tab),
         ],
       ),
     );

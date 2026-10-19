@@ -1,7 +1,9 @@
 import 'package:flutter/Material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../core/di/injection.dart';
-import '../../../../core/utils/app_preferences.dart';
+import '../../../../core/session/work_jobs.dart';
+import '../../forwarding_agent_dashboard/bloc/rti_activities/rti_activities_bloc.dart';
+import '../../work_tabs/work_tabs.dart';
 import '../../admin_dashboard/bloc/admin_tab_bloc.dart';
 import '../../common_tabs/inventoryreport/bloc/inventoryreport_bloc.dart';
 import '../../common_tabs/inventoryreport/data/inventoryreport_repository.dart';
@@ -33,12 +35,13 @@ class _AdminDashboardState extends State<BoardingDashboard> with SingleTickerPro
 
   late TabController _tabController;
 
+  /// Today's boarding tabs plus the tabs of the extra jobs (employee-extra-jobs-and-driver-mode).
+  late final List<WorkTab> _tabs = workTabsFor(WorkDashboard.boarding, WorkJobs.current());
+
   @override
   void initState() {
     super.initState();
-    final roleId = AppPreferences.getRoleId();
-    final int tabCount = (roleId == 500) ? 4 : 6;
-    _tabController = TabController(length: tabCount, vsync: this);
+    _tabController = TabController(length: _tabs.length, vsync: this);
     _tabController.addListener(_onTabChanged);
   }
 
@@ -91,6 +94,8 @@ class _AdminDashboardState extends State<BoardingDashboard> with SingleTickerPro
               child: const SalaryTab(),
             ),
         BlocProvider<LeaveBloc>(create: (_) => sl<LeaveBloc>()),
+        // RTI Activities tab, for a boarding person with the forwarding agent job
+        BlocProvider<RtiActivitiesBloc>(create: (_) => RtiActivitiesBloc()),
           ],
       child: LayoutBuilder(
         builder: (context, constraints) {
@@ -98,6 +103,7 @@ class _AdminDashboardState extends State<BoardingDashboard> with SingleTickerPro
         return Scaffold(
             body: BoardingMobileDashboard(
               tabController: _tabController,
+              tabs: _tabs,
               isTablet: isTablet,
             ),
           );

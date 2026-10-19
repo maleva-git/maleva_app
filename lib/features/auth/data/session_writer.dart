@@ -31,6 +31,9 @@ class SessionWriter {
     await AppPreferences.setMComid(session.mComid);
     await AppPreferences.setRoleId(session.roleId);
     await AppPreferences.setPermissionId(session.permissionId);
+    await AppPreferences.setJobs(session.jobs);
+    await AppPreferences.setLinkedDriverId(session.linkedDriverId);
+    await AppPreferences.setLinkedEmployeeId(session.linkedEmployeeId);
 
     AppGlobals.selectedCompanyName = session.companyName;
     AppGlobals.EmpRefId = session.userId;

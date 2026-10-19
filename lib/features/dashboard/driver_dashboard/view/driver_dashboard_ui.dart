@@ -1,5 +1,6 @@
 import 'package:flutter/Material.dart';
 import 'package:maleva/core/widgets/custom_app_bar.dart';
+import 'package:maleva/features/auth/presentation/mode_switch_button.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 import '../../../../core/bluetooth/view/Bluetooth_tab.dart';
@@ -40,6 +41,8 @@ class DriverDashboardView extends StatelessWidget {
       title: 'Driver DashBoard',
       isTablet: isTablet,
       actions: [
+        // Driver mode -> Office mode for a driver who is also an employee
+        ModeSwitchButton(isTablet: isTablet),
 
         IconButton(
           icon: Icon(Icons.bluetooth_audio,
