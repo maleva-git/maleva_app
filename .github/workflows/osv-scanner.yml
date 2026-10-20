@@ -35,7 +35,7 @@ jobs:
 
     steps:
       - name: Check out code
-        uses: actions/checkout@v5
+        uses: actions/checkout@v7
 
       # Download OSV-Scanner (pinned version) and check it is the real file.
       - name: Install OSV-Scanner ${{ env.OSV_VERSION }}
@@ -61,7 +61,7 @@ jobs:
 
       - name: Save OSV report
         if: always()
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         with:
           name: osv-report
           path: ${{ runner.temp }}/osv-report.json
