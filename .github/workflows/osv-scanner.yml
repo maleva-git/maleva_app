@@ -1,0 +1,69 @@
+# OSV-Scanner (by Google): compares the outside packages in pubspec.lock
+# (Flutter app (pub)) with the public list of known security holes (osv.dev).
+#
+# REPORT ONLY: a finding never turns this red. Read the table on the run page
+# (Summary), or download "osv-report". It only fails if the scanner itself breaks.
+# Reads pubspec.lock only: no code change, no database, no secrets. It sends only
+# package names + versions to osv.dev to look them up.
+# Run by hand: Actions tab -> "OSV-Scanner" -> Run workflow.
+name: OSV-Scanner
+
+on:
+  push:
+    branches: [main]
+    paths: [pubspec.lock]        # only when the package list changes
+  schedule:
+    - cron: "0 1 * * 1"     # every Monday 01:00 UTC (09:00 Malaysia): new holes appear every week
+  workflow_dispatch:
+
+# The robot may only READ the code.
+permissions:
+  contents: read
+
+concurrency:
+  group: osv-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  scan:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      OSV_VERSION: "2.6.0"
+      # Official SHA-256 of osv-scanner_linux_amd64 (from the release's osv-scanner_SHA256SUMS)
+      OSV_SHA256: "ca69b3d3cd08f889a49dc0a383122f71cc528b83803671df5fd874d97485b108"
+
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v5
+
+      # Download OSV-Scanner (pinned version) and check it is the real file.
+      - name: Install OSV-Scanner ${{ env.OSV_VERSION }}
+        run: |
+          cd "$RUNNER_TEMP"
+          curl -sSfL -o osv-scanner \
+            "https://github.com/google/osv-scanner/releases/download/v${OSV_VERSION}/osv-scanner_linux_amd64"
+          echo "${OSV_SHA256}  osv-scanner" | sha256sum -c -
+          chmod +x osv-scanner
+          sudo mv osv-scanner /usr/local/bin/osv-scanner
+          osv-scanner --version
+
+      # Exit code 1 = holes found (report only, carry on). Any other code = the scanner broke.
+      - name: Scan packages for known holes (report only)
+        run: |
+          set +e
+          osv-scanner scan source --verbosity error -L pubspec.lock --format json > "$RUNNER_TEMP/osv-report.json"
+          code=$?
+          osv-scanner scan source --verbosity error -L pubspec.lock --format markdown >> "$GITHUB_STEP_SUMMARY"
+          echo "osv-scanner exit code: $code"
+          if [ "$code" -ne 0 ] && [ "$code" -ne 1 ]; then exit "$code"; fi
+          exit 0
+
+      - name: Save OSV report
+        if: always()
+        uses: actions/upload-artifact@v6
+        with:
+          name: osv-report
+          path: ${{ runner.temp }}/osv-report.json
+          retention-days: 30
+          if-no-files-found: warn
