@@ -29,7 +29,7 @@ jobs:
 
     steps:
       - name: Check out code
-        uses: actions/checkout@v5
+        uses: actions/checkout@v7
 
       # Pinned to the Flutter version used on the owner's Mac.
       - name: Set up Flutter 3.47.5
