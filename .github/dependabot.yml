@@ -1,0 +1,40 @@
+# Dependabot: GitHub's robot that PREPARES library upgrades as pull requests.
+#
+# - It never merges anything: every pull request waits for the owner's click.
+# - CI (tests, build, Gitleaks) runs on each pull request automatically.
+# - It runs on GitHub, not on our server; it reads only the library list files.
+#
+# Flutter app (pub, pubspec.yaml): SECURITY FIXES ONLY. "open-pull-requests-limit: 0" switches off
+# ordinary "new version" pull requests; security fixes still come (they need
+# "Dependabot security updates" switched on in Settings -> Advanced Security).
+# GitHub Actions (checkout, setup-java, ...): one grouped pull request a month.
+version: 2
+updates:
+  - package-ecosystem: "pub"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "09:00"
+      timezone: "Asia/Kuala_Lumpur"
+    open-pull-requests-limit: 0        # no ordinary version bumps
+    groups:
+      security-fixes:                  # all security fixes found together = one pull request
+        applies-to: security-updates
+        patterns: ["*"]
+    commit-message:
+      prefix: "Security"
+    labels: ["dependencies", "security"]
+
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "monthly"
+      timezone: "Asia/Kuala_Lumpur"
+    open-pull-requests-limit: 1
+    groups:
+      github-actions:
+        patterns: ["*"]
+    commit-message:
+      prefix: "CI"
+    labels: ["dependencies"]
