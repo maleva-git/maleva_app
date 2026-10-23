@@ -90,8 +90,16 @@ abstract final class PlanningSavePayload {
       'pickupQuantitylist': row.pickupQuantitylist.trim(),
       'deliveryQuantitylist': row.deliveryQuantitylist.trim(),
       'delivertimelist': row.delivertimelist.trim(),
+      ...carrier(row),
     };
   }
+
+  /// Fleet D2: the outside truck number and driver ids, only when picked (as the web's `pickedCarrier`):
+  /// an own-truck row's payload stays exactly as before, and the server keeps a row's ids when none are sent.
+  static Map<String, dynamic> carrier(PlanLine row) => {
+        if (row.outsideVehicleRefId > 0) 'outsideVehicleRefId': row.outsideVehicleRefId,
+        if (row.outsideDriverRefId > 0) 'outsideDriverRefId': row.outsideDriverRefId,
+      };
 
   /// `buildPlanningSavePayload`: the one request (the API wraps it in a list).
   static Map<String, dynamic> build({

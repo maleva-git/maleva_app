@@ -33,6 +33,8 @@ class RtiForm extends Equatable {
     this.documentSub = false,
     this.pckHandling = false,
     this.editId = 0,
+    this.outsideVehicleRefId = 0,
+    this.outsideDriverRefId = 0,
   });
 
   /// `createInitialRTIState`: today, every charge off.
@@ -68,6 +70,10 @@ class RtiForm extends Equatable {
 
   bool get isEdit => editId > 0;
 
+  /// Fleet D2: the outside truck number and outside driver of the trip (0 = none). Sent only when > 0.
+  final int outsideVehicleRefId;
+  final int outsideDriverRefId;
+
   RtiForm copyWith({
     String? rtiNo,
     String? rtiDate,
@@ -94,6 +100,8 @@ class RtiForm extends Equatable {
     bool? documentSub,
     bool? pckHandling,
     int? editId,
+    int? outsideVehicleRefId,
+    int? outsideDriverRefId,
   }) =>
       RtiForm(
         rtiNo: rtiNo ?? this.rtiNo,
@@ -121,13 +129,15 @@ class RtiForm extends Equatable {
         documentSub: documentSub ?? this.documentSub,
         pckHandling: pckHandling ?? this.pckHandling,
         editId: editId ?? this.editId,
+        outsideVehicleRefId: outsideVehicleRefId ?? this.outsideVehicleRefId,
+        outsideDriverRefId: outsideDriverRefId ?? this.outsideDriverRefId,
       );
 
   @override
   List<Object?> get props => [
         rtiNo, rtiDate, driverRefId, outsideDriver, truckRefId, outsideTruck, eLink, exLink, sleeping, exitYN,
         emptyDeliveryYN, pickup, addDrop, manpw, pickupCount, dropCount, destination, sealBy, breakSealBy,
-        remarks, comments, punctuality, documentSub, pckHandling, editId,
+        remarks, comments, punctuality, documentSub, pckHandling, editId, outsideVehicleRefId, outsideDriverRefId,
       ];
 }
 

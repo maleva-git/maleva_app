@@ -43,7 +43,7 @@ class JobDetailSections extends StatelessWidget {
           _AssignRow(
             label: 'DRIVER',
             icon: Icons.person_outline,
-            value: row.driverName,
+            value: row.driverLabel,
             color: severityText(context, driverSeverityOf(state, row)),
             enabled: canWrite,
             onTap: () => AssignPicker.driver(context, {row.uid}),

@@ -4,6 +4,7 @@ import 'package:intl/intl.dart';
 import '../bloc/rti_activities/rti_activities_bloc.dart';
 import '../bloc/rti_activities/rti_activities_event.dart';
 import '../bloc/rti_activities/rti_activities_state.dart';
+import 'morning_alarm_banner.dart';
 import '../../../../core/colors/colors.dart';
 
 class RtiRouteActivitiesTab extends StatefulWidget {
@@ -114,6 +115,8 @@ class _RtiRouteActivitiesTabState extends State<RtiRouteActivitiesTab> {
   Widget build(BuildContext context) {
     return Column(
       children: [
+        // today's 06:00 alarm: "Got it" (rti-morning-briefing follow-up)
+        const MorningAlarmBanner(),
         // Date Filters
         Container(
           padding: const EdgeInsets.all(12),

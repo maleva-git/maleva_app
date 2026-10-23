@@ -4,6 +4,7 @@ import 'package:maleva/core/widgets/ui/ui.dart';
 import 'package:maleva/features/planning/bloc/plan_cubit.dart';
 import 'package:maleva/features/planning/models/fleet_options.dart';
 import 'package:maleva/features/planning/models/plan_line.dart';
+import 'package:maleva/features/planning/widgets/outside_carrier_sheet.dart';
 
 /// The truck and driver pickers of a plan row (the web's `TruckSelectModal` / `DriverSelectModal`):
 /// searchable, recent first, "Current" marked, expiry and leave colours, Clear. Picking a truck
@@ -70,6 +71,26 @@ abstract final class AssignPicker {
       if (typed != null && !cubit.isClosed) cubit.typeDriver(uids, typed);
       return;
     }
+    // Fleet D2: a SUBCONTRACTOR / HIRED_TRUCK row takes its truck number and driver from the outside lists.
+    final outside = _outsideTruck(cubit, rows);
+    if (outside != null) {
+      final first = rows.first;
+      final same = rows.length == 1;
+      final choice = await showOutsideCarrierSheet(
+        context,
+        truckRefId: outside.id,
+        unitName: outside.name,
+        needsPlate: outside.isSubcontractor,
+        currentVehicleId: same ? first.outsideVehicleRefId : 0,
+        currentPlateNo: same ? first.outsidePlateNo : '',
+        currentDriverId: same ? first.outsideDriverRefId : 0,
+        currentDriverName: same && first.outsideDriverRefId > 0 ? first.driverName : '',
+      );
+      if (choice == null || cubit.isClosed) return;
+      cubit.assignOutsideCarrier(uids,
+          vehicleId: choice.vehicleId, plateNo: choice.plateNo, driverId: choice.driverId, driverName: choice.driverName);
+      return;
+    }
     final single = rows.length == 1 ? rows.first : null;
     final current = single == null || single.driverRefid == 0 ? null : single.driverRefid;
     final options = [
@@ -107,6 +128,15 @@ abstract final class AssignPicker {
         cubit.assignDriver(uids, picked);
       }
     }
+  }
+
+  /// The rows' truck when every row has the same SUBCONTRACTOR / HIRED_TRUCK truck; otherwise null.
+  static TruckOption? _outsideTruck(PlanCubit cubit, List<PlanLine> rows) {
+    if (rows.isEmpty) return null;
+    final id = rows.first.truckRefid;
+    if (id == 0 || rows.any((r) => r.truckRefid != id)) return null;
+    final truck = cubit.state.trucks.where((t) => t.id == id).firstOrNull;
+    return truck != null && truck.takesOutsideCarrier ? truck : null;
   }
 
   /// A name box ("Driver name..."). With [required], an empty name says "Enter outside driver name".

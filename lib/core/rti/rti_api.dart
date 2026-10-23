@@ -128,6 +128,15 @@ class RtiApi {
             if (employeeId != 0) 'employeeRefId': employeeId,
           })));
 
+  /// The signed-in agent's 06:00 alarm of today (`/api/rti-morning-briefing/today`): `sent`, `stopCount`,
+  /// `ackAt` (null until "Got it"). `sent` is false when no alarm went out (or the follow-up is switched off).
+  Future<Map<String, dynamic>> morningAlarmToday() async =>
+      JsonRead.map(await _send(() => _dio.get<dynamic>('/api/rti-morning-briefing/today')));
+
+  /// "Got it" for today's alarm; answers the same shape as [morningAlarmToday].
+  Future<Map<String, dynamic>> morningAlarmGotIt() async =>
+      JsonRead.map(await _send(() => _dio.post<dynamic>('/api/rti-morning-briefing/today/ack')));
+
   /// One route stop pending (0) or completed (1).
   Future<void> setRouteActivityStatus(int id, int status) async {
     await _send(() => _dio.put<dynamic>('/api/rti-route-activities/$id/status',

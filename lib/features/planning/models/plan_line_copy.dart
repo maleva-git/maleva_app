@@ -57,6 +57,10 @@ extension PlanLineCopy on PlanLine {
     List<Map<String, dynamic>>? pickupsList,
     List<Map<String, dynamic>>? deliveriesList,
     bool? print,
+    String? carrierKind,
+    int? outsideVehicleRefId,
+    String? outsidePlateNo,
+    int? outsideDriverRefId,
   }) =>
       PlanLine(
         uid: uid ?? this.uid,
@@ -113,5 +117,9 @@ extension PlanLineCopy on PlanLine {
         pickupsList: pickupsList ?? this.pickupsList,
         deliveriesList: deliveriesList ?? this.deliveriesList,
         print: print ?? this.print,
+        carrierKind: carrierKind ?? this.carrierKind,
+        outsideVehicleRefId: outsideVehicleRefId ?? this.outsideVehicleRefId,
+        outsidePlateNo: outsidePlateNo ?? this.outsidePlateNo,
+        outsideDriverRefId: outsideDriverRefId ?? this.outsideDriverRefId,
       );
 }

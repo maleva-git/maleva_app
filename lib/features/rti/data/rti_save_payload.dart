@@ -72,6 +72,9 @@ abstract final class RtiSavePayloadBuilder {
       'modifiedBy': actor,
     };
     if (isEdit) master['id'] = s.editId;
+    // Fleet D2: the outside carrier ids, only when there are some (an own-truck RTI's payload is unchanged).
+    if (s.outsideVehicleRefId > 0) master['outsideVehicleRefId'] = s.outsideVehicleRefId;
+    if (s.outsideDriverRefId > 0) master['outsideDriverRefId'] = s.outsideDriverRefId;
 
     final details = [
       for (final row in grid)

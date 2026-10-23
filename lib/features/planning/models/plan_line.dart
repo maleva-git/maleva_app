@@ -59,6 +59,10 @@ class PlanLine {
     this.pickupsList,
     this.deliveriesList,
     this.print = false,
+    this.carrierKind = '',
+    this.outsideVehicleRefId = 0,
+    this.outsidePlateNo = '',
+    this.outsideDriverRefId = 0,
   }) : uid = uid ?? ++_lastUid;
 
   static int _lastUid = 0;
@@ -191,6 +195,10 @@ class PlanLine {
       deliveryAddress: s(['DeliveryAddress', 'deliveryAddress']),
       pickupsList: list(['PickupsList', 'pickupsList']),
       deliveriesList: list(['DeliveriesList', 'deliveriesList']),
+      carrierKind: s(['CarrierKind', 'carrierKind']).trim().toUpperCase(),
+      outsideVehicleRefId: Js.intOr0(Js.nn(item, ['OutsideVehicleRefId', 'outsideVehicleRefId'])),
+      outsidePlateNo: s(['OutsidePlateNo', 'outsidePlateNo']),
+      outsideDriverRefId: Js.intOr0(Js.nn(item, ['OutsideDriverRefId', 'outsideDriverRefId'])),
     );
   }
 
@@ -265,6 +273,28 @@ class PlanLine {
 
   /// The tick (the web's `print`).
   final bool print;
+
+  /// Fleet D2 carrier of the trip, as the server saved it (`CarrierKind` is decided by the server).
+  final String carrierKind;
+
+  /// The subcontractor's truck number picked for this trip (0 = none).
+  final int outsideVehicleRefId;
+  final String outsidePlateNo;
+
+  /// The outside driver picked from the list (0 = none). Mobile / IC stay in the sheet only.
+  final int outsideDriverRefId;
+
+  /// "WA1229R · ALI", or '' when no outside carrier was picked (`carrierSummary`, web).
+  String get carrierSummary {
+    final driver = outsideDriverRefId > 0 ? driverName.trim() : '';
+    return [outsidePlateNo.trim(), driver].where((e) => e.isNotEmpty).join(' · ');
+  }
+
+  /// What the DRIVER cell shows: "truck number · driver" for an outside trip, else the driver name.
+  String get driverLabel {
+    final carrier = carrierSummary;
+    return carrier.isNotEmpty ? carrier : driverName;
+  }
 
   /// A truck is on the row (`hasTruckSelected`, `planningCellRenderers.tsx:90-95`).
   bool get hasTruck => truckRefid != 0 || truckName.trim().isNotEmpty;

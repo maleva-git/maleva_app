@@ -126,11 +126,16 @@ class RtiFromPlanningService implements RtiFromPlanning {
     }
     final truckRefId = hasRealTruck ? truckId : _or(findIdByName(trucks, 'NONE'), noneTruckFallbackId);
 
+    // Fleet D2: the outside carrier picked on the planning row; its truck number is the Outside Truck.
+    final carrier = items.where((i) => i.outsideVehicleRefId > 0 || i.outsideDriverRefId > 0).firstOrNull;
+    final plate = carrier?.outsidePlateNo.trim() ?? '';
     final form = _initialForm().copyWith(
       driverRefId: '$driverRefId',
       truckRefId: '$truckRefId',
       outsideDriver: outsideDriver,
-      outsideTruck: outsideTruck,
+      outsideTruck: isOutside && plate.isNotEmpty ? plate : outsideTruck,
+      outsideVehicleRefId: carrier?.outsideVehicleRefId ?? 0,
+      outsideDriverRefId: carrier?.outsideDriverRefId ?? 0,
     );
     final grid = [for (final i in valid) RtiMapper.fromPlanning(i)];
     final errors = RtiRules.validate(form, grid);

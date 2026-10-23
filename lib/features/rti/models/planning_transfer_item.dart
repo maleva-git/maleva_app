@@ -22,6 +22,9 @@ class PlanningTransferItem {
     this.pickupAddressQuantity = '',
     this.deliveryAddressQuantity = '',
     this.deliveryAddressDatelist = '',
+    this.outsideVehicleRefId = 0,
+    this.outsidePlateNo = '',
+    this.outsideDriverRefId = 0,
   });
 
   final int saleOrderMasterRefId;
@@ -45,4 +48,9 @@ class PlanningTransferItem {
   final String pickupAddressQuantity;
   final String deliveryAddressQuantity;
   final String deliveryAddressDatelist;
+
+  /// Fleet D2: the outside truck number and driver picked on the planning row (0 = none).
+  final int outsideVehicleRefId;
+  final String outsidePlateNo;
+  final int outsideDriverRefId;
 }

@@ -141,7 +141,8 @@ abstract final class PlanningRules {
   }
 
   /// The clone itself: the same row with a new identity and the truck cleared.
-  static PlanLine cloneOf(PlanLine row) => row.copyWith(uid: PlanLine.nextUid(), id: 0, truckName: '', truckRefid: 0);
+  static PlanLine cloneOf(PlanLine row) => row.copyWith(
+      uid: PlanLine.nextUid(), id: 0, truckName: '', truckRefid: 0, carrierKind: '', outsideVehicleRefId: 0, outsidePlateNo: '', outsideDriverRefId: 0);
 
   /// Excel (`usePlanningListPage.ts:935-989`): the CSV text, 18 columns, every value quoted.
   static String csv(List<PlanLine> rows) {

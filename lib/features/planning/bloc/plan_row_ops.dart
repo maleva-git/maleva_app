@@ -38,7 +38,9 @@ mixin PlanRowOps on Cubit<PlanState>, PlanCubitBase {
   /// truck's expiry warnings follow, as the web's toast after the pick.
   void assignTruck(Set<int> uids, TruckOption truck, {DateTime? today}) {
     if (!guardWrite()) return;
-    _edit(uids, (r) => r.copyWith(truckName: truck.name, truckRefid: truck.id));
+    _edit(uids, (r) => r.truckRefid == truck.id
+        ? r.copyWith(truckName: truck.name)
+        : r.copyWith(truckName: truck.name, truckRefid: truck.id, outsideVehicleRefId: 0, outsidePlateNo: '', outsideDriverRefId: 0));
     emit(state.copyWith(recentTrucks: {...state.recentTrucks, truck.id}));
     final exp = truck.expiry(today: today);
     if (exp.warnings.isNotEmpty) {
@@ -47,14 +49,15 @@ mixin PlanRowOps on Cubit<PlanState>, PlanCubitBase {
   }
 
   /// The X on TRUCK: id 0 and every truck name cleared.
-  void clearTruck(Set<int> uids) => _edit(uids, (r) => r.copyWith(truckRefid: 0, truckName: '', truckNameD: ''));
+  void clearTruck(Set<int> uids) => _edit(uids,
+      (r) => r.copyWith(truckRefid: 0, truckName: '', truckNameD: '', outsideVehicleRefId: 0, outsidePlateNo: '', outsideDriverRefId: 0));
 
   /// A driver from the picker (`handleDriverSelect`): only DRIVER changes. An OUTSIDE DRIVER
   /// entry carries the typed [outsideName] with that entry's id.
   void assignDriver(Set<int> uids, DriverOption driver, {String outsideName = '', DateTime? today}) {
     if (!guardWrite()) return;
     final name = (outsideName.isNotEmpty ? outsideName : driver.name).trim();
-    _edit(uids, (r) => r.copyWith(driverName: name, driverRefid: driver.id));
+    _edit(uids, (r) => r.copyWith(driverName: name, driverRefid: driver.id, outsideDriverRefId: 0));
     emit(state.copyWith(recentDrivers: {...state.recentDrivers, driver.id}));
     if (outsideName.isNotEmpty) return;
     final exp = driver.expiry(today: today);
@@ -65,10 +68,29 @@ mixin PlanRowOps on Cubit<PlanState>, PlanCubitBase {
   }
 
   /// A typed driver name (no truck, or the OUTSIDE DRIVER truck): the name and no driver id.
-  void typeDriver(Set<int> uids, String name) => _edit(uids, (r) => r.copyWith(driverName: name, driverNameD: name, driverRefid: 0));
+  void typeDriver(Set<int> uids, String name) => _edit(uids, (r) => r.copyWith(driverName: name, driverNameD: name, driverRefid: 0, outsideDriverRefId: 0));
 
   /// The X on DRIVER: id 0 and every driver name cleared.
-  void clearDriver(Set<int> uids) => _edit(uids, (r) => r.copyWith(driverRefid: 0, driverName: '', driverNameD: ''));
+  void clearDriver(Set<int> uids) => _edit(uids, (r) => r.copyWith(driverRefid: 0, driverName: '', driverNameD: '', outsideDriverRefId: 0));
+
+  /// Fleet D2: the outside truck number and driver picked in the outside carrier sheet for a
+  /// SUBCONTRACTOR / HIRED_TRUCK row. The driver name goes on the row with the outside-driver
+  /// placeholder id (22, as the web); the server checks every id again on save.
+  void assignOutsideCarrier(Set<int> uids, {int vehicleId = 0, String plateNo = '', required int driverId, required String driverName}) {
+    if (!guardWrite() || driverId <= 0) return;
+    final name = driverName.trim();
+    _edit(
+      uids,
+      (r) => r.copyWith(
+        outsideVehicleRefId: vehicleId > 0 ? vehicleId : 0,
+        outsidePlateNo: vehicleId > 0 ? plateNo.trim() : '',
+        outsideDriverRefId: driverId,
+        driverRefid: outsideDriverPlaceholderId,
+        driverName: name,
+        driverNameD: name,
+      ),
+    );
+  }
 
   void editRemarks(int uid, String value) => _edit({uid}, (r) => r.copyWith(remarks: value));
 

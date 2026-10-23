@@ -31,6 +31,9 @@ abstract final class PlanningTransfer {
       pickupAddressQuantity: Js.firstText([row.pickupQuantitylist]),
       deliveryAddressQuantity: Js.firstText([row.deliveryQuantitylist]),
       deliveryAddressDatelist: Js.firstText([row.delivertimelist]),
+      outsideVehicleRefId: row.outsideVehicleRefId,
+      outsidePlateNo: row.outsidePlateNo,
+      outsideDriverRefId: row.outsideDriverRefId,
     );
   }
 
@@ -79,6 +82,9 @@ abstract final class PlanningTransfer {
         pickupAddressQuantity: it.pickupAddressQuantity,
         deliveryAddressQuantity: it.deliveryAddressQuantity,
         deliveryAddressDatelist: it.deliveryAddressDatelist,
+        outsideVehicleRefId: it.outsideVehicleRefId,
+        outsidePlateNo: it.outsidePlateNo,
+        outsideDriverRefId: it.outsideDriverRefId,
       ));
     }
     return out;

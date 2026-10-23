@@ -23,6 +23,7 @@ import 'package:maleva/core/lookups/agent_api.dart';
 import 'package:maleva/core/lookups/product_api.dart';
 import 'package:maleva/core/lookups/address_api.dart';
 import 'package:maleva/core/fleet/truck_api.dart';
+import 'package:maleva/core/fleet/outside_carrier_api.dart';
 import 'package:maleva/core/reports/transaction_report_api.dart';
 import 'package:maleva/core/finance/bills_order_api.dart';
 import 'package:maleva/core/employee/forwarding_salary_api.dart';
@@ -159,6 +160,9 @@ void registerAuthModule(GetIt sl) {
   // trucks: the picker list, one truck and its save (the shared /api/truck-combo, /api/truck-masters)
   sl.registerLazySingleton<TruckApi>(
       () => TruckApi(sl<JavaApiClient>().dio, companyId: AppPreferences.getComid));
+  // outside truck numbers / outside drivers (the shared /api/outside-vehicles, /api/outside-drivers; fleet D2)
+  sl.registerLazySingleton<OutsideCarrierApi>(
+      () => OutsideCarrierApi(sl<JavaApiClient>().dio, companyId: AppPreferences.getComid));
   // the Truck & Driver Details sheet (the shared /api/truck-driver-details)
   sl.registerLazySingleton<TruckDriverDetailsApi>(
       () => TruckDriverDetailsApi(sl<JavaApiClient>().dio, companyId: AppPreferences.getComid));

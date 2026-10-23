@@ -132,6 +132,8 @@ abstract final class RtiMapper {
       documentSub: Js.boolean(f('documentSub')),
       pckHandling: Js.boolean(f('pckHandling')),
       editId: id,
+      outsideVehicleRefId: Js.number([f('outsideVehicleRefId')]).toInt(),
+      outsideDriverRefId: Js.number([f('outsideDriverRefId')]).toInt(),
     );
   }
 
@@ -200,11 +202,16 @@ abstract final class RtiMapper {
     final driverId = first?.driverRefId ?? 0;
     final outside = first != null && (first.isOutsideDriver || (driverId == 0 && first.driverName.isNotEmpty));
     final typed = outside ? first.driverName : '';
+    // Fleet D2: the first job with an outside carrier gives the ids; its truck number is the Outside Truck.
+    final carrier = items.where((i) => i.outsideVehicleRefId > 0 || i.outsideDriverRefId > 0).firstOrNull;
+    final plate = carrier?.outsidePlateNo.trim() ?? '';
     return RtiForm.initial().copyWith(
       truckRefId: (first?.truckRefId ?? 0) > 0 ? '${first!.truckRefId}' : '',
       driverRefId: driverId > 0 ? '$driverId' : '',
       outsideDriver: typed,
-      outsideTruck: typed,
+      outsideTruck: plate.isNotEmpty ? plate : typed,
+      outsideVehicleRefId: carrier?.outsideVehicleRefId ?? 0,
+      outsideDriverRefId: carrier?.outsideDriverRefId ?? 0,
     );
   }
 }

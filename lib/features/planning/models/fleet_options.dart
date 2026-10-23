@@ -135,10 +135,23 @@ class TruckOption {
   }
 
   ExpiryState expiry({DateTime? today}) => truckExpiryState(raw, today: today);
+
+  /// Fleet D2: what the row is (`TruckMaster.UnitKind`, upper case), '' when not set yet.
+  String get unitKind => Js.text(Js.nn(raw, ['unitKind', 'UnitKind'])).trim().toUpperCase();
+
+  /// A subcontractor company (RG MAJU …): its trip needs a truck number (optional) and an outside driver.
+  bool get isSubcontractor => unitKind == 'SUBCONTRACTOR';
+
+  /// A subcontractor or a hired truck: the trip's driver is an outside driver from the list.
+  bool get takesOutsideCarrier => unitKind == 'SUBCONTRACTOR' || unitKind == 'HIRED_TRUCK';
 }
 
 /// A driver of the picker (`normalizeDriverComboRow` + `filterDrivers`, `FE/api/driverApi.ts`):
 /// the name is `AccountName`, or `driverName-mobileNo`.
+/// Fleet D2: the driver id a row carries when its driver is an outside driver picked from the
+/// outside driver list (DriverMaster "OUTSIDE DRIVER", the web's `OUTSIDE_DRIVER_PLACEHOLDER_ID`).
+const int outsideDriverPlaceholderId = 22;
+
 class DriverOption {
   const DriverOption({required this.id, required this.name, this.raw = const {}});
 

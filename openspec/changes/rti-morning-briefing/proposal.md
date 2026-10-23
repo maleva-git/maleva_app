@@ -18,3 +18,10 @@ kind `RTI_STOPS_TODAY`, listing the trucks coming to their route stops today. Th
   LocalNotificationService.rtiAlarmChannel / rtiAlarmDetails), 30-second tone `res/raw/rti_alarm.m4a` (kept by
   `res/raw/keep.xml`), iOS `Runner/rti_alarm.caf` (in the Runner resources build phase). Only this notice rings.
 - `RTI_STOPS_CHANGED` (an RTI save moved the agent's stop today) is a normal notice and opens RTI Activities.
+
+## Update 2026-10-23: "Got it"
+
+- `view/morning_alarm_banner.dart` at the top of RTI Activities: when today's alarm was sent and not answered, an
+  orange card "Today: 4 stops. Tap Got it ..." with a **Got it** button (`RtiApi.morningAlarmToday` /
+  `morningAlarmGotIt`, Java `/api/rti-morning-briefing/today[/ack]` read as it is). After the tap: "Today's trucks
+  seen at 06:04". Nothing shown when no alarm was sent or the read fails. Test `morning_alarm_banner_test.dart`.

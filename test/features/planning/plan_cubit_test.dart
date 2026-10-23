@@ -311,6 +311,24 @@ void main() {
           expect([r[1].driverName, r[1].driverRefid, r[1].truckName], ['RAJU', 36, 'OUTSIDE DRIVER']);
         });
 
+    blocTest<PlanCubit, PlanState>('an outside carrier sets the ids and the driver; a new truck or driver drops them',
+        build: build,
+        seed: () => seeded(rows: [line(1, truck: 'RG MAJU', truckId: 68), line(2, truck: 'RG MAJU', truckId: 68)]),
+        act: (c) {
+          final a = c.state.rows[0].uid;
+          final b = c.state.rows[1].uid;
+          c.assignOutsideCarrier({a, b}, vehicleId: 3, plateNo: 'WA1229R', driverId: 9, driverName: 'ALI');
+          final r = c.state.rows.first;
+          expect([r.outsideVehicleRefId, r.outsidePlateNo, r.outsideDriverRefId, r.driverName, r.driverRefid], [3, 'WA1229R', 9, 'ALI', 22]);
+          c.assignTruck({a}, const TruckOption(id: 64, name: 'WA 1234'));
+          c.assignDriver({b}, const DriverOption(id: 85, name: 'BOB'));
+        },
+        verify: (c) {
+          final r = c.state.rows;
+          expect([r[0].outsideVehicleRefId, r[0].outsidePlateNo, r[0].outsideDriverRefId], [0, '', 0]);
+          expect([r[1].outsideVehicleRefId, r[1].outsideDriverRefId, r[1].driverRefid], [3, 0, 85]);
+        });
+
     blocTest<PlanCubit, PlanState>('a typed driver has no id; the X clears every name',
         build: build,
         seed: () => seeded(rows: [line(1, truck: 'WA 1234', truckId: 64, driver: 'ALI-0123', driverId: 85)]),

@@ -336,7 +336,7 @@ class _AssignCell extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final value = truck ? row.truckName : row.driverName;
+    final value = truck ? row.truckName : row.driverLabel;
     final empty = value.trim().isEmpty;
     final color = empty ? null : severityText(context, truck ? truckSeverityOf(state, row) : driverSeverityOf(state, row));
     final canWrite = state.access.canWrite;

@@ -142,7 +142,7 @@ class JobCard extends StatelessWidget {
         ),
         AssignChip(
           icon: Icons.person_outline,
-          value: row.driverName,
+          value: row.driverLabel,
           color: severityText(context, driverSeverityOf(state, row)),
           onTap: selecting ? null : onDriver,
           compact: compact,
