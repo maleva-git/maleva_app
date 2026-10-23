@@ -1,20 +1,29 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get_it/get_it.dart';
 import 'package:maleva/core/fuel/fuel_entry_api.dart';
+import 'package:maleva/core/fuel/fuel_vehicle.dart';
 import 'package:maleva/core/utils/app_globals.dart';
+import 'package:maleva/core/utils/app_preferences.dart';
 
 import 'fuel_entry_validation.dart';
 import 'fuelentry_event.dart';
 import 'fuelentry_state.dart';
 
-/// The driver's fuel entry form, on the shared Java `/api/fuel-entries`
-/// (change `fuel-entry-on-shared-java-api`).
+/// The fuel entry form, on the shared Java `/api/fuel-entries`
+/// (change `fuel-entry-on-shared-java-api`). A driver fills the truck on their
+/// record; an employee (boarding officer or anyone with a company vehicle)
+/// picks one of the vehicles the office gave them (change `employee-fuel-vehicles`).
 class FuelEntryBloc extends Bloc<FuelEntryEvent, FuelEntryState> {
   final FuelEntryApi _api;
+  final bool Function() _isDriver;
 
-  FuelEntryBloc({FuelEntryApi? api})
+  FuelEntryBloc({FuelEntryApi? api, bool Function()? isDriver})
       : _api = api ?? GetIt.instance<FuelEntryApi>(),
+        _isDriver = isDriver ?? (() => AppPreferences.getDriverId() == 1),
         super(FuelEntryInitial()) {
+    on<FuelEntryVehicleChanged>((event, emit) {
+      if (state is FuelEntryLoaded) emit((state as FuelEntryLoaded).copyWith(truckRefId: event.truckRefId));
+    });
     on<FuelEntryStarted>(_onStarted);
     on<FuelEntryDateChanged>(_onDateChanged);
     on<FuelEntryLiterChanged>(_onLiterChanged);
@@ -39,7 +48,15 @@ class FuelEntryBloc extends Bloc<FuelEntryEvent, FuelEntryState> {
     emit(FuelEntryLoading());
     try {
       final fuelNo = await _fetchMaxFuelNo();
-      emit(FuelEntryLoaded.empty(fuelNo: fuelNo));
+      final driver = _isDriver();
+      final vehicles = driver ? const <FuelVehicle>[] : await _api.myVehicles();
+      emit(FuelEntryLoaded.empty(
+        fuelNo: fuelNo,
+        isDriver: driver,
+        vehicles: vehicles,
+        // one vehicle needs no picking
+        truckRefId: vehicles.length == 1 ? vehicles.single.truckRefId : 0,
+      ));
     } catch (e) {
       emit(FuelEntryError(e.toString()));
     }
@@ -78,9 +95,14 @@ class FuelEntryBloc extends Bloc<FuelEntryEvent, FuelEntryState> {
     if (state is! FuelEntryLoaded) return;
     final s = state as FuelEntryLoaded;
 
-    // 🚨 Prevent saving if no truck is assigned
-    if (AppGlobals.DriverTruckRefId == 0) {
-      emit(FuelEntryError("No Truck Assigned! Please select or assign a truck first."));
+    // A driver needs the truck on their record; an employee needs a picked vehicle.
+    final truckRefId = s.isDriver ? AppGlobals.DriverTruckRefId : s.truckRefId;
+    if (truckRefId == 0) {
+      emit(FuelEntryError(s.isDriver
+          ? "No Truck Assigned! Please select or assign a truck first."
+          : s.vehicles.isEmpty
+              ? "No vehicle is given to you for fuel entry. Ask the office to add it."
+              : "Select the vehicle you filled."));
       emit(s);
       return;
     }
@@ -94,11 +116,12 @@ class FuelEntryBloc extends Bloc<FuelEntryEvent, FuelEntryState> {
 
     emit(FuelEntryLoading());
     try {
-      // the server stamps a driver's own truck, driver and app flag on the row
+      // the server stamps a driver's own truck, driver and app flag on the row,
+      // and checks an employee's vehicle against their list
       await _api.save({
         'id': 0,
-        'truckRefId': AppGlobals.DriverTruckRefId,
-        'driverRefId': AppGlobals.EmpRefId == 0 ? null : AppGlobals.EmpRefId,
+        'truckRefId': truckRefId,
+        'driverRefId': s.isDriver && AppGlobals.EmpRefId != 0 ? AppGlobals.EmpRefId : null,
         'saleDate': s.date,
         'aliter': FuelEntryValidation.parse(s.liter),
         'aAmount': FuelEntryValidation.parse(s.amount),
@@ -111,7 +134,12 @@ class FuelEntryBloc extends Bloc<FuelEntryEvent, FuelEntryState> {
       });
       final newFuelNo = await _fetchMaxFuelNo();
       emit(FuelEntrySaveSuccess());
-      emit(FuelEntryLoaded.empty(fuelNo: newFuelNo));
+      emit(FuelEntryLoaded.empty(
+        fuelNo: newFuelNo,
+        isDriver: s.isDriver,
+        vehicles: s.vehicles,
+        truckRefId: s.truckRefId,
+      ));
     } catch (e) {
       emit(FuelEntryError(e.toString()));
       emit(s);

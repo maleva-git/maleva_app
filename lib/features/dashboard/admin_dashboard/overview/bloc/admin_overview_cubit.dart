@@ -46,20 +46,25 @@ class AdminOverviewState {
 /// Loads every area in parallel; one failing area never blocks the others (change
 /// `super-admin-overview-tab`). No timer: the tab reloads on pull-to-refresh or Refresh.
 class AdminOverviewCubit extends Cubit<AdminOverviewState> {
-  AdminOverviewCubit(this._repository, {DateTime Function()? clock})
+  AdminOverviewCubit(this._repository, {DateTime Function()? clock, this.salesAllowed = true})
       : _clock = clock ?? DateTime.now,
         super(const AdminOverviewState());
 
   final AdminOverviewRepository _repository;
   final DateTime Function() _clock;
 
+  /// Sale order numbers are the CEO's only (change ceo-only-sale-order-numbers): without this the
+  /// sales area is never loaded (the server would answer 403).
+  final bool salesAllowed;
+
   Future<void> load() async {
-    await Future.wait(OverviewArea.values.map(retry));
+    await Future.wait(OverviewArea.values.where((a) => salesAllowed || a != OverviewArea.sales).map(retry));
     if (!isClosed) emit(state.loadedAt(_clock()));
   }
 
   /// Reloads one area; the others are left as they are.
   Future<void> retry(OverviewArea area) async {
+    if (area == OverviewArea.sales && !salesAllowed) return;
     final before = state.areas[area];
     emit(state.withArea(area, AreaState(loading: true, data: before?.data)));
     try {

@@ -101,6 +101,7 @@ abstract final class PlanningSavePayload {
     required List<PlanLine> rows,
     required int userId,
     required int employeeId,
+    bool overwrite = false,
   }) {
     final planningNo = header.planningNo.trim();
     final planningDate = date(header.planningDate);
@@ -119,6 +120,10 @@ abstract final class PlanningSavePayload {
       'cNumber': planningNumber(planningNo),
       'remarks': header.remarks.trim(),
       'search': header.searchText.trim(),
+      // The version the plan had when opened: a plan saved since is refused unless the planner
+      // chose "Save over it". Rows go top to bottom; their position is the saved order.
+      if (Js.positiveInt(editId) > 0 && header.saveVersion != null) 'saveVersion': header.saveVersion,
+      if (overwrite) 'overwrite': true,
       'saleDetails': [for (final r in rows) detail(r)].whereType<Map<String, dynamic>>().toList(),
     };
   }

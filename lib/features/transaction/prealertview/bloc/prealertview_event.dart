@@ -4,7 +4,11 @@ abstract class PreAlertEvent {}
 
 class PreAlertStarted extends PreAlertEvent {
   final BuildContext context;
-  PreAlertStarted(this.context);
+
+  /// The boarding / forwarding agent dashboard tab (boarding-pre-alert-tab):
+  /// ETA All and Delivery Done ticked, the port limited to the user's own ports.
+  final bool workMode;
+  PreAlertStarted(this.context, {this.workMode = false});
 }
 
 class PreAlertFromDateChanged extends PreAlertEvent {

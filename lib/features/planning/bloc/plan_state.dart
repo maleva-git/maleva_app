@@ -1,3 +1,4 @@
+import 'package:maleva/core/planning/planning_api.dart' show PlanSaveConflict;
 import 'package:maleva/features/planning/models/fleet_options.dart';
 import 'package:maleva/features/planning/models/plan_header.dart';
 import 'package:maleva/features/planning/models/plan_line.dart';
@@ -13,6 +14,15 @@ class PlanNotice {
 
   final String message;
   final NoticeKind kind;
+  final int seq;
+}
+
+/// A save refused because someone else saved the plan meanwhile; [seq] makes each one shown once
+/// (change plan-save-keeps-changes).
+class PlanConflictNotice {
+  const PlanConflictNotice(this.conflict, this.seq);
+
+  final PlanSaveConflict conflict;
   final int seq;
 }
 
@@ -51,6 +61,7 @@ class PlanState {
     this.rtiMessage = '',
     this.recentTrucks = const {},
     this.recentDrivers = const {},
+    this.conflict,
   });
 
   final PlanPhase phase;
@@ -90,6 +101,9 @@ class PlanState {
   final String rtiMessage;
   final Set<int> recentTrucks;
   final Set<int> recentDrivers;
+
+  /// The last save refused because the plan changed meanwhile (the page asks: reload or save over it).
+  final PlanConflictNotice? conflict;
 
   PlanningAccess get access => PlanningAccess.resolve(actions, planningModeFor(editId));
 
@@ -163,6 +177,7 @@ class PlanState {
     String? rtiMessage,
     Set<int>? recentTrucks,
     Set<int>? recentDrivers,
+    PlanConflictNotice? conflict,
   }) =>
       PlanState(
         phase: phase ?? this.phase,
@@ -192,5 +207,6 @@ class PlanState {
         rtiMessage: rtiMessage ?? this.rtiMessage,
         recentTrucks: recentTrucks ?? this.recentTrucks,
         recentDrivers: recentDrivers ?? this.recentDrivers,
+        conflict: conflict ?? this.conflict,
       );
 }

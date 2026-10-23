@@ -8,6 +8,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:maleva/core/utils/app_globals.dart';
 import 'package:maleva/features/vessel_changes/push_route.dart' show isVesselPushType, localPayloadForPush;
+import 'package:maleva/features/dashboard/forwarding_agent_dashboard/push_route.dart' show rtiStopsTodayType;
 import 'dart:io' show File, Platform;
 import 'package:http/http.dart' as http;
 import 'package:path_provider/path_provider.dart';
@@ -45,6 +46,8 @@ class LocalNotificationService {
     await android?.createNotificationChannel(vesselChannel);
     // the quiet vessel channel (Super Admins, owner 2026-10-16): high importance, no sound, no vibration
     await android?.createNotificationChannel(vesselQuietChannel);
+    // the forwarding agent's 06:00 alarm (RTI_STOPS_TODAY): the 30-second tone, alarm volume
+    await android?.createNotificationChannel(rtiAlarmChannel);
     // the earlier vessel channels (normal sound, then the alarm tone) are replaced by this one
     for (final old in AppGlobals.oldVesselChannelIds) {
       await android?.deleteNotificationChannel(old);
@@ -79,6 +82,42 @@ class LocalNotificationService {
     showBadge: true,
   );
 
+  /// The 06:00 morning alarm (owner, 2026-10-23): plays the 30-second tone res/raw/rti_alarm once, on the alarm
+  /// volume (so it rings even when notification sounds are low), with vibration, at maximum importance.
+  static final AndroidNotificationChannel rtiAlarmChannel = AndroidNotificationChannel(
+    AppGlobals.rtiAlarmChannelId,
+    AppGlobals.rtiAlarmChannelName,
+    description: AppGlobals.rtiAlarmChannelDescription,
+    importance: Importance.max,
+    playSound: true,
+    sound: const RawResourceAndroidNotificationSound(AppGlobals.rtiAlarmSound),
+    audioAttributesUsage: AudioAttributesUsage.alarm,
+    enableVibration: true,
+    vibrationPattern: vesselVibration,
+    showBadge: true,
+  );
+
+  /// A push of the 06:00 morning notice (`data['type']` = `RTI_STOPS_TODAY`).
+  static bool isRtiAlarmPush(Map<String, dynamic> data) => data['type']?.toString() == rtiStopsTodayType;
+
+  /// How the morning alarm is shown while the app is open: the alarm channel and tone, alarm category.
+  static AndroidNotificationDetails rtiAlarmDetails({StyleInformation? style}) => AndroidNotificationDetails(
+        AppGlobals.rtiAlarmChannelId,
+        AppGlobals.rtiAlarmChannelName,
+        channelDescription: AppGlobals.rtiAlarmChannelDescription,
+        importance: Importance.max,
+        priority: Priority.max,
+        playSound: true,
+        sound: const RawResourceAndroidNotificationSound(AppGlobals.rtiAlarmSound),
+        audioAttributesUsage: AudioAttributesUsage.alarm,
+        enableVibration: true,
+        vibrationPattern: vesselVibration,
+        category: AndroidNotificationCategory.alarm,
+        visibility: NotificationVisibility.public,
+        ticker: 'Trucks coming today',
+        styleInformation: style,
+      );
+
   /// How a quiet vessel notice is shown while the app is open: the quiet channel, no sound, no vibration, not
   /// insistent.
   static AndroidNotificationDetails vesselQuietDetails({StyleInformation? style}) => AndroidNotificationDetails(
@@ -103,6 +142,9 @@ class LocalNotificationService {
   /// vibration) or the normal alert channel with [normalStyle].
   static AndroidNotificationDetails foregroundAndroidDetails(Map<String, dynamic> data,
       {required String body, StyleInformation? normalStyle}) {
+    if (isRtiAlarmPush(data)) {
+      return rtiAlarmDetails(style: BigTextStyleInformation(body));
+    }
     if (isQuietVesselPush(data)) {
       return vesselQuietDetails(style: BigTextStyleInformation(body));
     }
@@ -235,6 +277,9 @@ class LocalNotificationService {
               : null,
           presentAlert: true, // Present an alert when the notification is displayed and the application is in the foreground (only from iOS 10 onwards)
           presentBadge: false, // DO NOT present the badge number when the notification is displayed
+          // the morning alarm plays its 30-second tone (rti_alarm.caf in the Runner bundle)
+          sound: isRtiAlarmPush(message.data) ? '${AppGlobals.rtiAlarmSound}.caf' : null,
+          interruptionLevel: isRtiAlarmPush(message.data) ? InterruptionLevel.timeSensitive : null,
           presentSound: presentsSound(message.data), // Play a sound when the notification is displayed and the application is in the foreground (only from iOS 10 onwards)
           // vessel alerts: the iPhone's default notification sound (iOS vibrates only together with a sound;
           // with the ringer switch on silent it is vibration only); a quiet vessel push (Super Admins) has none

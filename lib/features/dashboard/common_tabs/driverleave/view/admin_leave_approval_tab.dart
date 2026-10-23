@@ -7,7 +7,6 @@ import '../bloc/leave_event.dart';
 import '../bloc/leave_state.dart';
 import 'package:get_it/get_it.dart';
 import 'package:maleva/features/dashboard/common_tabs/driverleave/data/leave_request_model.dart';
-import 'package:maleva/features/dashboard/common_tabs/driverleave/data/leave_duration.dart';
 import 'package:maleva/core/colors/colors.dart' as colour;
 import 'package:intl/intl.dart';
 import 'package:maleva/core/utils/app_globals.dart';
@@ -162,10 +161,10 @@ class _AdminLeaveApprovalTabState extends State<AdminLeaveApprovalTab> {
                     final req = requests[index];
                     Color statusColor = const Color(0xFFEAB308); // Yellow/Orange
                     Color statusBg = const Color(0xFFFEF08A).withValues(alpha: 0.3);
-                    if (req.statusRefId == 2) {
+                    if (req.status == LeaveDecision.approved) {
                       statusColor = const Color(0xFF047857); // Green
                       statusBg = const Color(0xFF059669).withValues(alpha: 0.12);
-                    } else if (req.statusRefId == 3) {
+                    } else if (req.status == LeaveDecision.rejected) {
                       statusColor = const Color(0xFFB91C1C); // Red
                       statusBg = const Color(0xFFEF4444).withValues(alpha: 0.12);
                     }
@@ -231,7 +230,7 @@ class _AdminLeaveApprovalTabState extends State<AdminLeaveApprovalTab> {
                                     borderRadius: BorderRadius.circular(8),
                                   ),
                                   child: Text(
-                                    leaveDurationLabel(req.fromDate, req.toDate),
+                                    req.lengthLabel,
                                     style: AppTypography.bodyMedium(color: colour.commonColorhighlight, fontWeight: FontWeight.bold),
                                   ),
                                 ),
@@ -286,7 +285,7 @@ class _AdminLeaveApprovalTabState extends State<AdminLeaveApprovalTab> {
                                   ],
                                 ),
                               ),
-                            if (req.statusRefId == 1) // Only show action if pending
+                            if (req.isPending) // Only show action if pending
                               Padding(
                                 padding: const EdgeInsets.only(top: 16),
                                 child: Align(

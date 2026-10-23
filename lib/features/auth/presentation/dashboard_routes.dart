@@ -1,3 +1,5 @@
+import 'package:maleva/core/utils/app_preferences.dart';
+
 /// The dashboard a session opens, for manual login and for session restore alike.
 ///
 /// The manual-login map (owner decision, clarification Q01): role 200 opens the
@@ -41,3 +43,7 @@ String dashboardRouteFor({required bool isDriver, required int roleId, required 
 
 /// Role 100 (SUPERADMIN) with permission id 1: the CEO.
 bool isCeo({required int roleId, required int permissionId}) => roleId == 100 && permissionId == 1;
+
+/// Whether the signed-in user is the CEO. Sale order today / month / year numbers are shown to the
+/// CEO only (owner, 2026-10-22; change ceo-only-sale-order-numbers); the server refuses everyone else.
+bool signedInIsCeo() => isCeo(roleId: AppPreferences.getRoleId(), permissionId: AppPreferences.getPermissionId());

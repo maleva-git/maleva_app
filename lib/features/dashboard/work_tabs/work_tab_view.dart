@@ -7,6 +7,7 @@ import 'package:maleva/features/dashboard/common_tabs/vesselreport/view/vesselre
 import 'package:maleva/features/dashboard/forwarding_agent_dashboard/view/rti_route_activities_tab.dart';
 import 'package:maleva/features/forwarding_requests/view/forwarding_requests_page.dart';
 import 'package:maleva/features/ir_report/presentation/pages/ir_report_tab.dart';
+import 'package:maleva/features/transaction/prealertview/view/prealertview_tab.dart';
 
 import 'seal_break_seal_tab.dart';
 import 'work_tabs.dart';
@@ -33,5 +34,8 @@ Widget workTabView(WorkTab tab) {
       return const ForwardingRequestsBody();
     case WorkTab.sealBreakSeal:
       return const SealBreakSealTab();
+    case WorkTab.preAlert:
+      // ETA All, Delivery Done, own ports (boarding-pre-alert-tab)
+      return const PreAlertReportBody(workMode: true);
   }
 }

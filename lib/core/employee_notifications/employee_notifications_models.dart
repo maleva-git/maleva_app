@@ -43,6 +43,11 @@ class NoticeKind {
 
   static const String forwardingPrefix = 'FORWARDING_';
 
+  /// A leave request and its decision (backend change `leave-notifications`): `LEAVE_APPLIED` to HR,
+  /// the Super Admins and the applicant's team; `LEAVE_APPROVED` / `LEAVE_REJECTED` to them and to
+  /// the applicant ("Your leave was approved"). Drivers get these as a phone push only.
+  static const String leavePrefix = 'LEAVE_';
+
   /// `refType` of a notice about one job (its `refId` is the sale order id).
   static const String saleOrderRef = 'SALE_ORDER';
 }

@@ -51,6 +51,7 @@ class LeaveBloc extends Bloc<LeaveEvent, LeaveState> {
             reason: event.reason,
             applicantRefId: event.applicantRefId,
             applicantType: event.applicantType,
+            part: event.part,
           ));
 
   Future<void> _onUpdateLeaveStatus(UpdateLeaveStatusEvent event, Emitter<LeaveState> emit) =>

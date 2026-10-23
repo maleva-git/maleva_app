@@ -1,3 +1,4 @@
+import 'package:maleva/features/auth/presentation/dashboard_routes.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
@@ -36,13 +37,17 @@ abstract final class OverviewTabLinks {
 /// (change `super-admin-overview-tab`), laid out as the web Super Admin dashboard
 /// (change `admin-overview-web-layout`).
 class AdminOverviewTab extends StatefulWidget {
-  const AdminOverviewTab({super.key, required this.onOpenTab, this.repository, this.menu});
+  const AdminOverviewTab({super.key, required this.onOpenTab, this.repository, this.menu, this.salesAllowed});
 
   /// Switches the dashboard to the tab with this label ([OverviewTabLinks]).
   final void Function(String tabLabel) onOpenTab;
 
   /// For tests; the app builds it from the service locator.
   final AdminOverviewRepository? repository;
+
+  /// Whether the sale order numbers show (the CEO only, change ceo-only-sale-order-numbers);
+  /// defaults to the signed-in user.
+  final bool? salesAllowed;
 
   /// The user's menu entries; defaults to the signed-in menu. A screen button shows only when its
   /// entry is there.
@@ -56,12 +61,17 @@ class _AdminOverviewTabState extends State<AdminOverviewTab> with AutomaticKeepA
   @override
   bool get wantKeepAlive => true;
 
+  late final bool _salesAllowed = widget.salesAllowed ?? signedInIsCeo();
+
   @override
   Widget build(BuildContext context) {
     super.build(context);
     return BlocProvider(
-      create: (_) => AdminOverviewCubit(widget.repository ?? AdminOverviewRepository.fromServiceLocator())..load(),
+      create: (_) => AdminOverviewCubit(widget.repository ?? AdminOverviewRepository.fromServiceLocator(),
+          salesAllowed: _salesAllowed)
+        ..load(),
       child: _OverviewView(
+        salesAllowed: _salesAllowed,
         onOpenTab: widget.onOpenTab,
         menu: widget.menu ?? [...AppGlobals.parentclass, ...AppGlobals.objMenuMaster],
       ),
@@ -70,9 +80,10 @@ class _AdminOverviewTabState extends State<AdminOverviewTab> with AutomaticKeepA
 }
 
 class _OverviewView extends StatefulWidget {
-  const _OverviewView({required this.onOpenTab, required this.menu});
+  const _OverviewView({required this.onOpenTab, required this.menu, required this.salesAllowed});
 
   final void Function(String tabLabel) onOpenTab;
+  final bool salesAllowed;
   final List<MenuMasterModel> menu;
 
   @override
@@ -83,8 +94,8 @@ class _OverviewView extends StatefulWidget {
 /// the report card (Sale Order / Invoice), then the app's mailbox, incident and truck-location cards. The web's
 /// pickup and vessel side panels are left out (owner, 2026-10-16); their screens open from Quick Access.
 class _OverviewViewState extends State<_OverviewView> {
-  /// The report card's view: 0 sale orders, 1 invoices.
-  int _report = 0;
+  /// The report card's view: 0 sale orders, 1 invoices. Without sale order numbers it is invoices.
+  late int _report = widget.salesAllowed ? 0 : 1;
 
   void Function(String tabLabel) get onOpenTab => widget.onOpenTab;
 
@@ -111,7 +122,12 @@ class _OverviewViewState extends State<_OverviewView> {
               padding: EdgeInsets.fromLTRB(isTablet ? 20 : 12, 6, isTablet ? 20 : 12, 28),
               children: [
                 _Header(
-                    state: s, isTablet: isTablet, onRefresh: cubit.load, onRetry: cubit.retry, onOpenTab: onOpenTab),
+                    state: s,
+                    isTablet: isTablet,
+                    onRefresh: cubit.load,
+                    onRetry: cubit.retry,
+                    onOpenTab: onOpenTab,
+                    salesAllowed: widget.salesAllowed),
                 const SizedBox(height: 18),
                 const _Heading(icon: Icons.auto_awesome, text: 'Quick access'),
                 const SizedBox(height: 10),
@@ -141,11 +157,12 @@ class _OverviewViewState extends State<_OverviewView> {
     final planning = _entry('Planning');
     final trucks = _entry('Truck Location');
     return [
-      QuickButton(
-          label: 'SO',
-          icon: Icons.receipt_long_rounded,
-          color: Palette.blueMid,
-          onTap: () => onOpenTab(OverviewTabLinks.salesOrders)),
+      if (widget.salesAllowed)
+        QuickButton(
+            label: 'SO',
+            icon: Icons.receipt_long_rounded,
+            color: Palette.blueMid,
+            onTap: () => onOpenTab(OverviewTabLinks.salesOrders)),
       QuickButton(
           label: 'JO',
           icon: Icons.build_rounded,
@@ -212,12 +229,14 @@ class _OverviewViewState extends State<_OverviewView> {
       icon: invoice ? Icons.request_quote_rounded : Icons.shopping_cart_rounded,
       accent: accent,
       onOpen: () => onOpenTab(invoice ? OverviewTabLinks.invoice : OverviewTabLinks.salesOrders),
-      action: SegmentSwitch(
-        options: const ['Sale Order', 'Invoice'],
-        selected: _report,
-        color: accent.strong,
-        onChanged: (i) => setState(() => _report = i),
-      ),
+      action: widget.salesAllowed
+          ? SegmentSwitch(
+              options: const ['Sale Order', 'Invoice'],
+              selected: _report,
+              color: accent.strong,
+              onChanged: (i) => setState(() => _report = i),
+            )
+          : null,
       child: AreaBody(
         area: area,
         onRetry: () => cubit.retry(invoice ? OverviewArea.invoices : OverviewArea.sales),
@@ -235,7 +254,9 @@ class _OverviewViewState extends State<_OverviewView> {
     return [
       AccentPanel(
         title: 'Mailbox monitor',
-        subtitle: mail == null ? 'Unread mail by mailbox' : '${_n(mail.withUnread)} of ${_n(mail.mailboxes)} mailboxes with unread',
+        subtitle: mail == null
+            ? 'Unread mail by mailbox'
+            : '${_n(mail.withUnread)} of ${_n(mail.mailboxes)} mailboxes with unread',
         icon: Icons.mark_email_unread_rounded,
         accent: PanelAccent.teal,
         onOpen: () => onOpenTab(OverviewTabLinks.mailboxMonitor),
@@ -263,7 +284,8 @@ class _OverviewViewState extends State<_OverviewView> {
       ),
       AccentPanel(
         title: 'Incident reports',
-        subtitle: ir == null ? 'Open in the last 30 days' : '${_n(ir.open)} open · last 30 days · ${Fmt.rm(ir.totalAmount)}',
+        subtitle:
+            ir == null ? 'Open in the last 30 days' : '${_n(ir.open)} open · last 30 days · ${Fmt.rm(ir.totalAmount)}',
         icon: Icons.report_rounded,
         accent: PanelAccent.rose,
         onOpen: () => onOpenTab(OverviewTabLinks.irReport),
@@ -424,9 +446,11 @@ class _Header extends StatelessWidget {
     required this.onRefresh,
     required this.onRetry,
     required this.onOpenTab,
+    required this.salesAllowed,
   });
 
   final AdminOverviewState state;
+  final bool salesAllowed;
   final bool isTablet;
   final Future<void> Function() onRefresh;
   final Future<void> Function(OverviewArea) onRetry;
@@ -443,17 +467,18 @@ class _Header extends StatelessWidget {
     final now = DateTime.now();
     final updated = state.updatedAt == null ? 'loading…' : 'updated ${DateFormat('HH:mm').format(state.updatedAt!)}';
     final tiles = [
-      KpiTile(
-        label: 'Sale orders today',
-        icon: Icons.shopping_cart_rounded,
-        onTap: () => onOpenTab(OverviewTabLinks.salesOrders),
-        body: AreaBody(
-          area: state.sales,
-          onDark: true,
-          onRetry: () => onRetry(OverviewArea.sales),
-          builder: (s) => KpiValue(value: _n(s.today), sub: 'Month ${_n(s.month)} · ${Fmt.rm(s.monthAmount)}'),
+      if (salesAllowed)
+        KpiTile(
+          label: 'Sale orders today',
+          icon: Icons.shopping_cart_rounded,
+          onTap: () => onOpenTab(OverviewTabLinks.salesOrders),
+          body: AreaBody(
+            area: state.sales,
+            onDark: true,
+            onRetry: () => onRetry(OverviewArea.sales),
+            builder: (s) => KpiValue(value: _n(s.today), sub: 'Month ${_n(s.month)} · ${Fmt.rm(s.monthAmount)}'),
+          ),
         ),
-      ),
       KpiTile(
         label: 'Open job orders',
         icon: Icons.build_rounded,
@@ -557,7 +582,8 @@ class _Header extends StatelessWidget {
                       const Icon(Icons.refresh_rounded, size: 16, color: AppTokens.brandGradientStart),
                       const SizedBox(width: 5),
                       Text('Refresh',
-                          style: AppTypography.bodySmall(color: AppTokens.brandGradientStart, fontWeight: FontWeight.w700)),
+                          style: AppTypography.bodySmall(
+                              color: AppTokens.brandGradientStart, fontWeight: FontWeight.w700)),
                     ]),
                   ),
                 ),

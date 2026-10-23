@@ -5,6 +5,7 @@ import 'rti_activities_event.dart';
 import 'rti_activities_state.dart';
 import '../../models/rti_route_activity.dart';
 import 'package:get_it/get_it.dart';
+import '../../../../../core/network/api_failure.dart';
 import '../../../../../core/rti/rti_api.dart';
 import '../../../../../core/utils/app_preferences.dart';
 
@@ -12,6 +13,7 @@ import '../../../../../core/utils/app_preferences.dart';
 /// `/api/rti-route-activities` (change `rti-on-shared-java-api`).
 class RtiActivitiesBloc extends Bloc<RtiActivitiesEvent, RtiActivitiesState> {
   final RtiApi _api;
+  int _failures = 0;
 
   RtiActivitiesBloc({RtiApi? api})
       : _api = api ?? GetIt.instance<RtiApi>(),
@@ -78,8 +80,17 @@ class RtiActivitiesBloc extends Bloc<RtiActivitiesEvent, RtiActivitiesState> {
         final statusStr = event.newStatus == 1 ? 'COMPLETED' : 'PENDING';
         emit(RtiActivitiesActionSuccess("RTI Job Status successfully updated to $statusStr!", updatedActivities));
       } catch (e) {
-        // On error, we could rollback or just emit error
+        // Not saved: keep the list as it was and tell the agent, so they do not think it is done.
         debugPrint('Failed to update status: $e');
+        final wanted = event.newStatus == 1 ? 'COMPLETED' : 'PENDING';
+        var reason = e is ApiFailure && e.message.trim().isNotEmpty ? e.message.trim() : 'Something went wrong.';
+        if (!RegExp(r'[.!?]$').hasMatch(reason)) reason = '$reason.';
+        _failures++;
+        emit(RtiActivitiesActionFailure(
+          'Status not changed to $wanted. $reason Please try again.',
+          currentState.activities,
+          attempt: _failures,
+        ));
       }
     }
   }

@@ -51,6 +51,7 @@ class LeaveApi {
     required int totalDays,
     required String reason,
     required int createdBy,
+    String? part,
   }) async =>
       JsonRead.map(await _send(() => _dio.post<dynamic>('/api/leave/save',
           queryParameters: {'companyId': companyId},
@@ -64,14 +65,39 @@ class LeaveApi {
             'reason': reason,
             'statusRefId': 1,
             'createdBy': createdBy,
+            // HR Sprint 2: FULL / AM / PM / HOURS; the server ignores it while its switch is off
+            if (part != null) 'part': part,
           })));
 
-  /// Approves (2) or rejects (3) a request, with the reviewer and remark.
+  /// The company's work weeks (`ready`, `weeks`: kind STAFF / DRIVER, mon..sun FULL / HALF / OFF,
+  /// `leaveWorkingDays`), read only; a driver token may read it (HR Sprint 2).
+  Future<Map<String, dynamic>> workWeek() async =>
+      JsonRead.map(await _send(() => _dio.get<dynamic>('/api/hr/work-week')));
+
+  /// The company's holidays of [year]: `date` (yyyy-MM-dd), `name`, `halfDay`, `scope`.
+  Future<List<Map<String, dynamic>>> holidays(int year) async => JsonRead.listOfMaps(
+      JsonRead.map(await _send(() => _dio.get<dynamic>('/api/hr/holidays', queryParameters: {'year': year})))['holidays']);
+
+  /// Approves (2) or rejects (3) a request with a remark. The decision goes by name, so the server
+  /// finds the company's own status id (change `leave-dates-and-decisions`); the id is sent too, as
+  /// before. The server stores the signed-in employee as reviewer, whatever [reviewedBy] says.
   Future<void> setStatus(int id, {required int statusRefId, required int reviewedBy, required String reviewRemark}) async {
     await _send(() => _dio.put<dynamic>('/api/leave/$id/status',
         queryParameters: {'companyId': companyId},
-        data: {'statusRefId': statusRefId, 'reviewedBy': reviewedBy, 'reviewRemark': reviewRemark}));
+        data: {
+          if (decisionOf(statusRefId) case final decision?) 'decision': decision,
+          'statusRefId': statusRefId,
+          'reviewedBy': reviewedBy,
+          'reviewRemark': reviewRemark,
+        }));
   }
+
+  /// The approve (2) / reject (3) choice of the approval dialog as a decision name.
+  static String? decisionOf(int statusRefId) => switch (statusRefId) {
+        2 => 'APPROVED',
+        3 => 'REJECTED',
+        _ => null,
+      };
 
   static String _time(DateTime d) => d.toIso8601String().split('.').first;
 

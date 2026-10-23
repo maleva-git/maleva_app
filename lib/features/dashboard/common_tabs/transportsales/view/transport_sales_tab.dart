@@ -1,3 +1,4 @@
+import 'package:maleva/features/auth/presentation/dashboard_routes.dart';
 import 'package:maleva/core/theme/app_typography.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -140,6 +141,8 @@ class _TransportSalesTabView extends StatelessWidget {
                       mainAxisSpacing: 12,
                       childAspectRatio: 1.45,
                       children: [
+                        // this month's sale order numbers: the CEO's only (change ceo-only-sale-order-numbers)
+                        if (signedInIsCeo())
                         _StatCard(
                           label: 'Total Count',
                           value: state.totalCount.toString(),
@@ -156,6 +159,7 @@ class _TransportSalesTabView extends StatelessWidget {
                           badgeColor: const Color(0xFFFAECE7),
                           badgeTextColor: const Color(0xFF993C1D),
                         ),
+                        if (signedInIsCeo())
                         _StatCard(
                           label: 'Billed',
                           value: state.totalBilledCount.toString(),
@@ -164,6 +168,7 @@ class _TransportSalesTabView extends StatelessWidget {
                           badgeColor: const Color(0xFFE1F5EE),
                           badgeTextColor: const Color(0xFF0F6E56),
                         ),
+                        if (signedInIsCeo())
                         _StatCard(
                           label: 'Unbilled',
                           value: state.totalUnBilledCount.toString(),

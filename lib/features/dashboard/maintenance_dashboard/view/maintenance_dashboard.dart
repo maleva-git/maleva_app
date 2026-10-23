@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:maleva/core/utils/app_preferences.dart';
 import 'package:intl/intl.dart';
-import 'package:maleva/features/dashboard/common_tabs/salesorder/bloc/salesorder_bloc.dart';
 import '../../../../core/di/injection.dart';
 import '../../admin_dashboard/bloc/admin_tab_bloc.dart';
 import '../../common_tabs/expensereport/view/expensereport_tab.dart';
@@ -56,8 +55,6 @@ import '../../common_tabs/pettycash/view/pettycash_tab.dart';
 import '../../common_tabs/receiptview/bloc/receiptview_bloc.dart';
 import '../../common_tabs/receiptview/bloc/receiptview_event.dart';
 import '../../common_tabs/receiptview/view/receiptview_tab.dart';
-import '../../common_tabs/salesorder/bloc/salesorder_event.dart';
-import '../../common_tabs/salesorder/view/salesorderview_tab.dart';
 import '../../common_tabs/spareparts/bloc/spareparts_bloc.dart';
 import '../../common_tabs/spareparts/data/spareparts_repository.dart';
 import '../../common_tabs/spareparts/view/sparepartsadd.dart';
@@ -127,11 +124,6 @@ class _AdminDashboardState extends State<MaintenanceDashboard> with SingleTicker
                 invoiceRepo: InvoiceRepositoryImpl(),
               )..add( LoadInvoiceByType(0)),
               child: const InvoiceTab(),
-            ),
-            BlocProvider(
-              create: (_) => sl<SalesOrderBloc>()
-                ..add(LoadInvoiceByTypes(1)), // ✅ fires on page open
-              child: const SalesOrderTab(),
             ),
             BlocProvider(
               create: (_) => sl<ReceiptBloc>()..add(LoadReceiptEvent()),

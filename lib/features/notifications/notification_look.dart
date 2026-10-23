@@ -17,6 +17,9 @@ class NoticeColors {
   static const Color reminder = Color(0xFFB26A00);
   static const Color forwarding = Color(0xFF00897B);
 
+  /// Purple, as a driver on leave shows in the Planning and RTI pickers.
+  static const Color leave = Color(0xFF7B1FA2);
+
   /// Blue: a LINK alert's border, the unread dot.
   static const Color vessel = Palette.blue700;
 }
@@ -33,6 +36,8 @@ IconData iconForTone(NoticeTone tone) {
       return Icons.sync_problem_rounded;
     case NoticeTone.forwarding:
       return Icons.description_outlined;
+    case NoticeTone.leave:
+      return Icons.event_busy_rounded;
     case NoticeTone.other:
       return Icons.notifications_none_rounded;
   }
@@ -51,6 +56,8 @@ Color colorForTone(NoticeTone tone, ColorScheme scheme) {
       return NoticeColors.alert;
     case NoticeTone.forwarding:
       return NoticeColors.forwarding;
+    case NoticeTone.leave:
+      return NoticeColors.leave;
     case NoticeTone.other:
       return scheme.onSurfaceVariant;
   }

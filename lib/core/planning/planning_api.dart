@@ -64,6 +64,14 @@ class PlanningApi {
     final answer = await _raw(() => _dio.post<dynamic>('/api/planing/save',
         data: [plan], options: Options(headers: {'Comid': '$companyId'})));
     final first = answer is List && answer.isNotEmpty ? JsonRead.map(answer.first) : JsonRead.map(answer);
+    // Someone saved the plan after it was opened: nothing was written (change plan-save-keeps-changes).
+    if (JsonRead.field(first, 'conflict') == true) {
+      throw PlanSaveConflict(
+        changedBy: JsonRead.string(JsonRead.field(first, 'changedBy')).trim(),
+        changedAt: JsonRead.string(JsonRead.field(first, 'changedAt')).trim(),
+        message: JsonRead.string(JsonRead.field(first, 'message')).trim(),
+      );
+    }
     _refusedUnlessOk(first, 'Planning was not saved');
     return first;
   }
@@ -153,4 +161,20 @@ class PlanningApi {
       throw JavaResponse.fromDio(e);
     }
   }
+}
+
+/// A save refused because another planner saved the plan after this screen opened it
+/// (`{ok: false, conflict: true, changedBy, changedAt}`, backend change `plan-save-keeps-changes`).
+/// Nothing was written; the planner reloads or saves over it.
+class PlanSaveConflict implements Exception {
+  const PlanSaveConflict({required this.changedBy, required this.changedAt, required this.message});
+
+  final String changedBy;
+  final String changedAt;
+  final String message;
+
+  String get who => changedBy.isEmpty ? 'another user' : changedBy;
+
+  @override
+  String toString() => message.isNotEmpty ? message : 'Plan changed by $who${changedAt.isEmpty ? '' : ' at $changedAt'}.';
 }

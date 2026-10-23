@@ -22,6 +22,12 @@ class FuelEntryAmountChanged extends FuelEntryEvent {
   FuelEntryAmountChanged(this.value);
 }
 
+// ── Vehicle (employee entry) ──────────────────────────────────────────────────
+class FuelEntryVehicleChanged extends FuelEntryEvent {
+  final int truckRefId;
+  FuelEntryVehicleChanged(this.truckRefId);
+}
+
 // ── Save ──────────────────────────────────────────────────────────────────────
 class FuelEntrySaveRequested extends FuelEntryEvent {}
 class FuelEntryRemarksChanged extends FuelEntryEvent {

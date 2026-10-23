@@ -34,7 +34,7 @@ import 'package:maleva/core/models/shared/r_t_i_details_view_model.dart';
 class AppGlobals {
   AppGlobals._();
 
-  static String appversion="1.1.12+148";
+  static String appversion="1.1.18+152";
   static bool homepagecall = false;
   static AssetImage logo = const AssetImage('assets/company/logo.png');
   static AssetImage splashlogo = const AssetImage('assets/company/roundlogo.png');
@@ -390,6 +390,13 @@ class AppGlobals {
   static const String vesselQuietChannelId = "com.kassapos.maleva.vessel.quiet";
   static const String vesselQuietChannelName = "Vessel alerts (quiet)";
   static const String vesselQuietChannelDescription = "Vessel alerts without sound or vibration";
+  // The forwarding agent's 06:00 notice (push type RTI_STOPS_TODAY) rings as an alarm: the 30-second tone
+  // res/raw/rti_alarm (iOS: rti_alarm.caf) on its own channel (owner, 2026-10-23: only this notice rings; every
+  // other notice stays a normal notice). Same id as RTI_ALARM_ANDROID_CHANNEL in the backend's GoogleFcmClient.
+  static const String rtiAlarmChannelId = "com.kassapos.maleva.rti.alarm";
+  static const String rtiAlarmChannelName = "Morning truck alarm";
+  static const String rtiAlarmChannelDescription = "06:00 alarm: the trucks coming to your stops today";
+  static const String rtiAlarmSound = "rti_alarm";
   static String mobiletoken="";
   static getDeviceToken() async {
 

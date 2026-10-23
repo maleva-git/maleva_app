@@ -222,6 +222,24 @@ class _RtiRouteActivitiesTabState extends State<RtiRouteActivitiesTab> {
                     margin: const EdgeInsets.all(16),
                   ),
                 );
+              } else if (state is RtiActivitiesActionFailure) {
+                ScaffoldMessenger.of(context).hideCurrentSnackBar();
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Row(
+                      children: [
+                        const Icon(Icons.error_outline, color: Colors.white),
+                        const SizedBox(width: 12),
+                        Expanded(child: Text(state.errorMessage, style: const TextStyle(fontWeight: FontWeight.bold))),
+                      ],
+                    ),
+                    backgroundColor: Colors.red.shade700,
+                    behavior: SnackBarBehavior.floating,
+                    duration: const Duration(seconds: 6),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                    margin: const EdgeInsets.all(16),
+                  ),
+                );
               }
             },
             builder: (context, state) {

@@ -57,6 +57,34 @@ class EmployeeApi {
     ];
   }
 
+  /// The company's active port names, once each, by name: the web's port picker
+  /// (`usePorts`, `GET /api/port-masters/company/{id}/active`).
+  /// This controller answers the other Java wrapper, `{success, message, data}`
+  /// (agentcompany ApiResponse), not `{IsSuccess, Message, Data1}`; both are read.
+  Future<List<String>> companyPortNames() async {
+    final body = (await _get('/api/port-masters/company/$companyId/active')).data;
+    final rows = JsonRead.listOfMaps(portRows(body));
+    final names = <String>{
+      for (final r in rows)
+        if (JsonRead.string(r['portName']).trim().isNotEmpty) JsonRead.string(r['portName']).trim(),
+    }.toList()
+      ..sort();
+    return names;
+  }
+
+  /// The rows of a port-master answer: a bare list, `{success, data}` or
+  /// `{IsSuccess, Data1}`. A refusal (`success` / `IsSuccess` false) is an [ApiFailure].
+  static dynamic portRows(dynamic body) {
+    if (body is List) return body;
+    if (body is Map && body.containsKey('success')) {
+      if (!JsonRead.boolean(body['success'])) {
+        throw ApiFailure(JsonRead.stringOrNull(body['message']) ?? 'Request failed');
+      }
+      return body['data'];
+    }
+    return JavaResponse.data(body);
+  }
+
   // ------------------------------------------------------------ Employee Master
 
   /// Employee Master's list (`POST /api/employees/search`, the web's search):

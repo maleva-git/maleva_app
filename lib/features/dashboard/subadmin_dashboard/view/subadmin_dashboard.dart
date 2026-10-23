@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:maleva/features/dashboard/common_tabs/salesorder/bloc/salesorder_bloc.dart';
 import 'package:maleva/features/dashboard/subadmin_dashboard/view/subadmin_dashboard_ui.dart';
 import '../../../../core/di/injection.dart';
 import '../../common_tabs/emailinbox/bloc/emailinbox_bloc.dart';
@@ -21,8 +20,6 @@ import '../../common_tabs/invoice/bloc/invoice_bloc.dart';
 import '../../common_tabs/invoice/bloc/invoice_event.dart';
 import '../../common_tabs/invoice/data/invoice_repository.dart';
 import '../../common_tabs/invoice/view/invoice_tab.dart';
-import '../../common_tabs/salesorder/bloc/salesorder_event.dart';
-import '../../common_tabs/salesorder/view/salesorderview_tab.dart';
 import '../../common_tabs/spotsaleorder/bloc/spotsaleorder_bloc.dart';
 import '../../common_tabs/spotsaleorder/data/spotsale_repository.dart';
 import '../../common_tabs/spotsaleorder/view/spotsaleorder_add.dart';
@@ -52,7 +49,9 @@ class _AdminDashboardState extends State<SubAdminDashboard> with SingleTickerPro
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 15, vsync: this);
+    // The SO tab (sale order today / month / year numbers) is the CEO's only (owner, 2026-10-22;
+    // change ceo-only-sale-order-numbers); this dashboard is never the CEO's, so it has none.
+    _tabController = TabController(length: 14, vsync: this);
     _tabController.addListener(_onTabChanged);
   }
   void _onTabChanged(){
@@ -77,11 +76,6 @@ class _AdminDashboardState extends State<SubAdminDashboard> with SingleTickerPro
                 invoiceRepo: InvoiceRepositoryImpl(),
               )..add( LoadInvoiceByType(0)),
               child: const InvoiceTab(),
-            ),
-            BlocProvider(
-              create: (_) => sl<SalesOrderBloc>()
-                ..add(LoadInvoiceByTypes(1)), // ✅ fires on page open
-              child: const SalesOrderTab(),
             ),
             BlocProvider(
               create: (context) => sl<VesselBloc>()

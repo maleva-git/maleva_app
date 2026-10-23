@@ -223,13 +223,16 @@ void main() {
       stubAll(repo);
     });
 
-    Future<List<String>> pump(WidgetTester tester, Size size, {List<MenuMasterModel> entries = const []}) async {
+    Future<List<String>> pump(WidgetTester tester, Size size,
+        {List<MenuMasterModel> entries = const [], bool salesAllowed = true}) async {
       final opened = <String>[];
       tester.view.physicalSize = size;
       tester.view.devicePixelRatio = 1;
       addTearDown(tester.view.reset);
       await tester.pumpWidget(MaterialApp(
-        home: Scaffold(body: AdminOverviewTab(onOpenTab: opened.add, repository: repo, menu: entries)),
+        home: Scaffold(
+            body: AdminOverviewTab(
+                onOpenTab: opened.add, repository: repo, menu: entries, salesAllowed: salesAllowed)),
       ));
       await tester.pump();
       return opened;
@@ -330,9 +333,9 @@ void main() {
   });
 
   group('admin dashboard tabs', () {
-    test('Super Admin: Overview first, Mailbox Monitor after Invoice; Admin: SO first, neither', () {
-      final superAdmin = adminTabs(superAdmin: true, openTab: (_) {}).map((t) => t.label).toList();
-      final admin = adminTabs(superAdmin: false, openTab: (_) {}).map((t) => t.label).toList();
+    test('CEO with this dashboard: Overview first, SO, Mailbox Monitor after Invoice', () {
+      final superAdmin = adminTabs(superAdmin: true, ceo: true, openTab: (_) {}).map((t) => t.label).toList();
+      final admin = adminTabs(superAdmin: false, ceo: true, openTab: (_) {}).map((t) => t.label).toList();
 
       expect(superAdmin.take(6), ['Overview', 'SO', 'JobOrders', 'Invoice', 'Mailbox Monitor', 'Mail Response']);
       expect(superAdmin, hasLength(35));
@@ -348,6 +351,50 @@ void main() {
       ]) {
         expect(superAdmin, contains(label));
       }
+    });
+  });
+
+  // change ceo-only-sale-order-numbers: sale order numbers are the CEO's only
+  group('sale order numbers for the CEO only', () {
+    test('Super Admin and Admin have no SO tab', () {
+      final superAdmin = adminTabs(superAdmin: true, openTab: (_) {}).map((t) => t.label).toList();
+      final admin = adminTabs(superAdmin: false, openTab: (_) {}).map((t) => t.label).toList();
+
+      expect(superAdmin.take(5), ['Overview', 'JobOrders', 'Invoice', 'Mailbox Monitor', 'Mail Response']);
+      expect(superAdmin, hasLength(34));
+      expect(admin, isNot(contains('SO')));
+      expect(admin, hasLength(31));
+    });
+
+    test('the cubit never loads the sale order numbers without the CEO', () async {
+      final repo = _Repo();
+      stubAll(repo);
+      final cubit = AdminOverviewCubit(repo, clock: () => _today, salesAllowed: false);
+
+      await cubit.load();
+      await cubit.retry(OverviewArea.sales);
+      expect(cubit.state.invoices.data!.today, 7);
+      verifyNever(() => repo.sales());
+      await cubit.close();
+    });
+
+    testWidgets('Overview without the CEO: no sale order tile, SO button or Sale Order switch', (tester) async {
+      final repo = _Repo();
+      stubAll(repo);
+      tester.view.physicalSize = const Size(390, 2400);
+      tester.view.devicePixelRatio = 1;
+      addTearDown(tester.view.reset);
+      await tester.pumpWidget(MaterialApp(
+        home: Scaffold(body: AdminOverviewTab(onOpenTab: (_) {}, repository: repo, salesAllowed: false)),
+      ));
+      await tester.pump();
+
+      expect(find.text('Sale orders today'), findsNothing);
+      expect(find.text('SO'), findsNothing);
+      expect(find.text('Sale Order'), findsNothing);
+      expect(find.text('Invoicing metrics'), findsOneWidget); // the report card shows invoices
+      expect(tester.takeException(), isNull);
+      verifyNever(() => repo.sales());
     });
   });
 }

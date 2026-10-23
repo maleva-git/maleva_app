@@ -1,6 +1,7 @@
 
 
 import 'package:intl/intl.dart';
+import 'package:maleva/core/fuel/fuel_vehicle.dart';
 
 abstract class FuelEntryState {}
 
@@ -24,6 +25,14 @@ class FuelEntryLoaded extends FuelEntryState {
   final String dgLiter;
   final String dgAmount;
 
+  /// A driver fills the truck on their record; an employee picks one of
+  /// [vehicles] (openspec change employee-fuel-vehicles).
+  final bool isDriver;
+  final List<FuelVehicle> vehicles;
+
+  /// The picked vehicle (TruckMaster id); 0 when none. Not used for a driver.
+  final int truckRefId;
+
    FuelEntryLoaded({
     required this.fuelNo,
     required this.date,
@@ -39,6 +48,9 @@ class FuelEntryLoaded extends FuelEntryState {
     required this.dpAmount,
     required this.dgLiter,
     required this.dgAmount,
+    this.isDriver = true,
+    this.vehicles = const [],
+    this.truckRefId = 0,
   });
 
   FuelEntryLoaded copyWith({
@@ -56,6 +68,9 @@ class FuelEntryLoaded extends FuelEntryState {
     String? dpAmount,
     String? dgLiter,
     String? dgAmount,
+    bool? isDriver,
+    List<FuelVehicle>? vehicles,
+    int? truckRefId,
   }) {
     return FuelEntryLoaded(
       fuelNo: fuelNo ?? this.fuelNo,
@@ -72,13 +87,25 @@ class FuelEntryLoaded extends FuelEntryState {
       dpAmount: dpAmount ?? this.dpAmount,
       dgLiter: dgLiter ?? this.dgLiter,
       dgAmount: dgAmount ?? this.dgAmount,
+      isDriver: isDriver ?? this.isDriver,
+      vehicles: vehicles ?? this.vehicles,
+      truckRefId: truckRefId ?? this.truckRefId,
     );
   }
 
   static String _today() =>
       DateFormat('yyyy-MM-dd').format(DateTime.now());
 
-  factory FuelEntryLoaded.empty({String fuelNo = ''}) =>
+  /// The name of the picked vehicle, or '' when none is picked.
+  String get truckName =>
+      vehicles.where((v) => v.truckRefId == truckRefId).map((v) => v.truckName).firstOrNull ?? '';
+
+  factory FuelEntryLoaded.empty({
+    String fuelNo = '',
+    bool isDriver = true,
+    List<FuelVehicle> vehicles = const [],
+    int truckRefId = 0,
+  }) =>
       FuelEntryLoaded(
         fuelNo: fuelNo,
         date:   _today(),
@@ -94,6 +121,9 @@ class FuelEntryLoaded extends FuelEntryState {
         dpAmount: '',
         dgLiter: '',
         dgAmount: '',
+        isDriver: isDriver,
+        vehicles: vehicles,
+        truckRefId: truckRefId,
       );
 }
 

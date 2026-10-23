@@ -55,9 +55,12 @@ typedef AdminTab = ({String label, Widget page});
 /// Every admin dashboard tab in order: the tab bar, the pages and the controller's length all come
 /// from this one list. The Super Admin (role 100) gets Overview first and Mailbox Monitor and Mail
 /// Response after Invoice (changes `super-admin-overview-tab`, `mail-response-report-tab`); [openTab] lets Overview switch to a tab by label.
-List<AdminTab> adminTabs({required bool superAdmin, required void Function(String label) openTab}) => [
-      if (superAdmin) (label: 'Overview', page: AdminOverviewTab(onOpenTab: openTab)),
-      (label: 'SO', page: const SalesOrderTab()),
+List<AdminTab> adminTabs(
+        {required bool superAdmin, bool ceo = false, required void Function(String label) openTab}) =>
+    [
+      if (superAdmin) (label: 'Overview', page: AdminOverviewTab(onOpenTab: openTab, salesAllowed: ceo)),
+      // sale order today / month / year numbers: the CEO's only (change ceo-only-sale-order-numbers)
+      if (ceo) (label: 'SO', page: const SalesOrderTab()),
       (label: 'JobOrders', page: const JobOrdersTab()),
       (label: 'Invoice', page: const InvoiceTab()),
       if (superAdmin) (label: 'Mailbox Monitor', page: const MailMonitorTab()),
@@ -112,9 +115,13 @@ class MobileDashboard extends StatelessWidget {
 
   /// The Super Admin's tabs: Overview first, Mailbox Monitor after Invoice.
   final bool superAdmin;
-  const MobileDashboard({required this.tabController, required this.isTablet, this.superAdmin = false, super.key});
 
-  List<AdminTab> get _tabs => adminTabs(superAdmin: superAdmin, openTab: _openTab);
+  /// The CEO (role 100 + permission 1): the only one who gets the SO tab and sale order numbers.
+  final bool ceo;
+  const MobileDashboard(
+      {required this.tabController, required this.isTablet, this.superAdmin = false, this.ceo = false, super.key});
+
+  List<AdminTab> get _tabs => adminTabs(superAdmin: superAdmin, ceo: ceo, openTab: _openTab);
 
   void _openTab(String label) {
     final index = _tabs.indexWhere((t) => t.label == label);

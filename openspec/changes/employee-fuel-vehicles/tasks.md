@@ -1,0 +1,5 @@
+- [x] 1.1 `core/fuel/fuel_vehicle.dart`, `FuelEntryApi.myVehicles`.
+- [x] 1.2 `FuelEntryBloc` / state / event: `isDriver`, `vehicles`, `truckRefId`, `FuelEntryVehicleChanged`.
+- [x] 1.3 `fuelentry_tab.dart`: banner shows the vehicle; `_VehiclePicker`.
+- [x] 1.4 Tests in `fuel_entry_validation_test.dart`; `flutter analyze` has no errors.
+- [ ] 1.5 Owner: try on a device with an employee who has 1 and 3 vehicles.

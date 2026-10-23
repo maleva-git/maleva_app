@@ -7,9 +7,9 @@ import 'package:maleva/core/reports/transaction_report_api.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:maleva/core/utils/app_globals.dart';
+import 'package:maleva/core/widgets/searchable_picker_field.dart';
 
 import 'package:maleva/menu/menulist.dart';
 import '../../../../core/theme/tokens.dart';
@@ -24,6 +24,7 @@ import '../../../home/view/home_tab.dart';
 import '../../../mastersearch/Customer.dart';
 import '../../../mastersearch/JobType.dart';
 import '../../../mastersearch/Port.dart';
+import '../bloc/pre_alert_ports.dart';
 import '../bloc/prealertview_bloc.dart';
 import '../bloc/prealertview_event.dart';
 import 'package:maleva/core/colors/colors.dart' as colour;
@@ -31,33 +32,79 @@ import 'package:maleva/core/models/shared/customer_model.dart';
 import 'package:maleva/features/operations/models/job_status_model.dart';
 import 'package:maleva/features/operations/models/job_type_model.dart';
 
+/// The drawer's Pre Alert Report screen (Sales / Transportation / Admin menus).
 class PreAlertReport extends StatelessWidget {
   const PreAlertReport({super.key});
 
   @override
+  Widget build(BuildContext context) => const _PreAlertPage();
+}
+
+/// The Pre Alert filter form and its Download, without a page around it: the
+/// drawer's screen shows it in its page, the boarding and forwarding agent
+/// dashboards as their Pre Alert tab with [workMode] (boarding-pre-alert-tab:
+/// ETA All and Delivery Done ticked, the port limited to the user's own ports).
+class PreAlertReportBody extends StatelessWidget {
+  const PreAlertReportBody({super.key, this.workMode = false});
+
+  final bool workMode;
+
+  @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (providerContext) => PreAlertBloc()..add(PreAlertStarted(providerContext)),
-      child: const _PreAlertPage(),
+      create: (providerContext) => PreAlertBloc()..add(PreAlertStarted(providerContext, workMode: workMode)),
+      child: Builder(builder: (context) {
+        final isTablet = MediaQuery.of(context).size.width > 600;
+        return BlocBuilder<PreAlertBloc, PreAlertState>(
+          builder: (context, state) {
+            if (state is PreAlertLoading || state is PreAlertInitial) {
+              return const Center(child: SpinKitFoldingCube(color: AppTokens.invoiceHeaderEnd, size: 35));
+            }
+            if (state is PreAlertError) {
+              return Center(
+                child: Padding(
+                  padding: const EdgeInsets.all(24),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(state.message, textAlign: TextAlign.center),
+                      const SizedBox(height: 12),
+                      TextButton(
+                        onPressed: () => context.read<PreAlertBloc>().add(PreAlertStarted(context, workMode: workMode)),
+                        child: const Text('Retry'),
+                      ),
+                    ],
+                  ),
+                ),
+              );
+            }
+            if (state is PreAlertLoaded) {
+              return _PreAlertForm.build(context, state, isTablet);
+            }
+            return const SizedBox.shrink();
+          },
+        );
+      }),
     );
   }
 }
 
-class _PreAlertPage extends StatelessWidget {
-  const _PreAlertPage();
-
+class _PreAlertForm {
   /// The report PDF from the shared Java pre-alert report (was .NET
   /// TransactionReportApp/PreAlertReport). The port goes by name, as the jobs
   /// store it, and the ETA choice by its value (1 OETA, 2 LETA, 3 either).
-  Future<void> _generatePdf(BuildContext context, PreAlertLoaded s) async {
+  static Future<void> _generatePdf(BuildContext context, PreAlertLoaded s) async {
     final messenger = ScaffoldMessenger.of(context);
+    messenger.showSnackBar(const SnackBar(content: Text('Preparing the PDF...'), duration: Duration(seconds: 20)));
     try {
       final url = await sl<TransactionReportApi>().preAlertUrl(
         fromDate: s.fromDate,
         toDate: s.toDate,
         customerId: s.custId,
         jobTypeId: s.jobId,
-        port: s.portId != 0 ? s.portName : null,
+        // Was sent only for portId != 0, which the port picker never set, so the
+        // port never reached the report; now as the web: when "Port" is ticked.
+        port: preAlertPortParam(workMode: s.workMode, checkPort: s.checkPort, portName: s.portName),
         vessel: s.vessel,
         discussion: s.checkPickUp,
         eta: s.etaEnabled,
@@ -65,78 +112,15 @@ class _PreAlertPage extends StatelessWidget {
         deliveryDone: s.checkDelivery,
         consolidated: s.checkConsolidated,
       );
+      messenger.hideCurrentSnackBar();
       await SystemHelpers.launchInBrowser(url);
     } on ApiFailure catch (failure) {
+      messenger.hideCurrentSnackBar();
       messenger.showSnackBar(SnackBar(content: Text(failure.message)));
     }
   }
 
-  void _navigateBack(BuildContext context) {
-    final role = AppGlobals.storagenew.getString('RulesType') ?? '';
-    Widget dest;
-    switch (role) {
-      case 'ADMIN': dest = const NewAdminDashboard(); break;
-      case 'SALES': dest = const SalesDashboard(); break;
-      case 'TRANSPORTATION': dest = const TransportDashboard(); break;
-      case 'OPERATIONADMIN': dest = const OperationAdminDashboard(); break;
-      case 'AIR FRIEGHT': dest = const AirfreightDashboard(); break;
-      case 'BOARDING': case 'OPERATION': dest = const BoardingDashboard(); break;
-      case 'FORWARDING': dest = const ForwardingDashboard(); break;
-      default: dest = const Homemobile();
-    }
-    Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => dest));
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final isTablet = MediaQuery.of(context).size.width > 600;
-    final userName = AppGlobals.storagenew.getString('Username') ?? '';
-
-    return PopScope(
-      canPop: false,
-      onPopInvokedWithResult: (didPop, result) {
-        if (didPop) return;
-        _navigateBack(context);
-      },
-      child: Scaffold(
-        backgroundColor: colour.kPageBg,
-        appBar: AppBar(
-          automaticallyImplyLeading: false,
-          elevation: 0,
-          toolbarHeight: isTablet ? 70 : 62,
-          flexibleSpace: Container(decoration: const BoxDecoration(gradient: colour.kGradient)),
-          leading: IconButton(
-            icon: const Icon(Icons.arrow_back_ios_new_rounded, size: 20, color: Colors.white),
-            onPressed: () => _navigateBack(context),
-          ),
-          title: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text('Pre Alert Report', style: AppTypography.heading2(color: Colors.white)),
-              Text(userName, style: AppTypography.bodySmall(color: Colors.white)),
-            ],
-          ),
-        ),
-        drawer: const Menulist(),
-        body: BlocBuilder<PreAlertBloc, PreAlertState>(
-          builder: (context, state) {
-            if (state is PreAlertLoading || state is PreAlertInitial) {
-              return Center(child: SpinKitFoldingCube(color: AppTokens.invoiceHeaderEnd, size: 35));
-            }
-            if (state is PreAlertError) {
-              return Center(child: Text(state.message));
-            }
-            if (state is PreAlertLoaded) {
-              return _buildFilterForm(context, state, isTablet);
-            }
-            return const SizedBox.shrink();
-          },
-        ),
-      ),
-    );
-  }
-
-  Widget _buildFilterForm(BuildContext context, PreAlertLoaded local, bool isTablet) {
+  static Widget build(BuildContext context, PreAlertLoaded local, bool isTablet) {
     void emit(PreAlertEvent event) => context.read<PreAlertBloc>().add(event);
 
     Future<void> pickDate(bool isFrom) async {
@@ -173,7 +157,16 @@ class _PreAlertPage extends StatelessWidget {
       onClear: () => emit(PreAlertJobTypeCleared()),
     );
 
-    final portField = _PASearchField(
+    // The tab: a port dropdown as the web's (own ports only, or all ports with "All Ports").
+    final choice = local.portChoice;
+    final Widget portField = local.workMode
+        ? _PortDropdown(
+            ports: choice.ports,
+            allowAll: !choice.restricted,
+            selected: local.portName,
+            onSelected: (name) => emit(PreAlertPortChanged(portId: 0, portName: name)),
+          )
+        : _PASearchField(
       hint: 'Select Port', value: local.portName,
       onSearch: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const Port(Searchby: 1, SearchId: 0))).then((navRes) {
         if (AppGlobals.SelectedPortName.isNotEmpty) {
@@ -189,11 +182,17 @@ class _PreAlertPage extends StatelessWidget {
       onChanged: (v) => emit(PreAlertVesselChanged(v)),
     );
 
-    return SingleChildScrollView(
-      padding: EdgeInsets.symmetric(horizontal: isTablet ? 32.0 : 16.0, vertical: 24.0),
+    final hPad = isTablet ? 32.0 : 16.0;
+    final form = SingleChildScrollView(
+      padding: EdgeInsets.symmetric(horizontal: hPad, vertical: 24.0),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          // The tab: the port first, the thing the user changes most (boarding-pre-alert-tab).
+          if (local.workMode) ...[
+            portField,
+            const SizedBox(height: 14),
+          ],
           Row(
             children: [
               Expanded(child: _SheetDateTile(label: 'From', date: local.fromDate, onTap: () => pickDate(true))),
@@ -213,8 +212,10 @@ class _PreAlertPage extends StatelessWidget {
             const SizedBox(height: 12),
             Row(
               children: [
-                Expanded(child: portField),
-                const SizedBox(width: 16),
+                if (!local.workMode) ...[
+                  Expanded(child: portField),
+                  const SizedBox(width: 16),
+                ],
                 Expanded(child: vesselField),
               ],
             ),
@@ -223,13 +224,19 @@ class _PreAlertPage extends StatelessWidget {
             const SizedBox(height: 10),
             jobTypeField,
             const SizedBox(height: 10),
-            portField,
-            const SizedBox(height: 10),
+            if (!local.workMode) ...[
+              portField,
+              const SizedBox(height: 10),
+            ],
             vesselField,
           ],
           const SizedBox(height: 14),
           _CheckboxGrid(
             local: local,
+            // the tab always sends its own port; the "Port" box is the drawer screen's
+            showPort: !local.workMode,
+            // L.Emp only locked Job Type and is not sent: hidden and unticked in the tab
+            showLEmp: !local.workMode,
             onChanged: (field, val) => emit(PreAlertCheckboxChanged(field: field, value: val)),
             isTablet: isTablet,
           ),
@@ -239,16 +246,38 @@ class _PreAlertPage extends StatelessWidget {
             onChanged: (val, radio, enabled) => emit(PreAlertETAChanged(etaVal: val, etaRadio: radio, etaEnabled: enabled)),
             isTablet: isTablet,
           ),
-          const SizedBox(height: 30),
-          SizedBox(
-            width: double.infinity,
-            child: _GradientButton(
-              label: 'View',
-              onPressed: () => _generatePdf(context, local),
+          // The drawer's screen: the button under the form, as before.
+          if (!local.workMode) ...[
+            const SizedBox(height: 30),
+            SizedBox(
+              width: double.infinity,
+              child: _GradientButton(label: 'View', onPressed: () => _generatePdf(context, local)),
             ),
-          ),
+          ],
         ],
       ),
+    );
+    if (!local.workMode) return form;
+
+    // The tab: "View PDF" fixed at the bottom, always in sight.
+    return Column(
+      children: [
+        Expanded(child: form),
+        SafeArea(
+            top: false,
+            child: Padding(
+              padding: EdgeInsets.fromLTRB(hPad, 8, hPad, 12),
+              child: SizedBox(
+                width: double.infinity,
+                child: _GradientButton(
+                  label: local.portName.isEmpty ? 'View PDF - All Ports' : 'View PDF - ${local.portName}',
+                  icon: Icons.picture_as_pdf_rounded,
+                  onPressed: () => _generatePdf(context, local),
+                ),
+              ),
+            ),
+          ),
+      ],
     );
   }
 }
@@ -313,6 +342,39 @@ class _PASearchField extends StatelessWidget {
   }
 }
 
+/// The tab's port picker (boarding-pre-alert-tab), like the web's searchable one:
+/// the user's own ports, or with none assigned every active port of the company
+/// and "All Ports" (''). Tapping opens a sheet with a search box.
+class _PortDropdown extends StatelessWidget {
+  final List<String> ports; final bool allowAll; final String selected; final void Function(String name) onSelected;
+  const _PortDropdown({required this.ports, required this.allowAll, required this.selected, required this.onSelected});
+
+  static const _allPorts = 'All Ports';
+
+  @override
+  Widget build(BuildContext context) {
+    final items = <String>[if (allowAll) '', ...ports];
+    final value = items.contains(selected) ? selected : null;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text('SELECT PORT', style: AppTypography.bodySmall(color: AppTokens.planTextMuted)),
+        const SizedBox(height: 6),
+        SearchablePickerField<String>(
+          items: items,
+          value: value,
+          itemLabel: (name) => name.isEmpty ? _allPorts : name,
+          hint: 'Select Port',
+          sheetTitle: 'Select Port',
+          searchThreshold: 0, // always a search box
+          clearable: allowAll, // clearing goes back to All Ports
+          onChanged: (name) => onSelected(name ?? ''),
+        ),
+      ],
+    );
+  }
+}
+
 class _PATextField extends StatelessWidget {
   final String hint; final String value; final void Function(String) onChanged;
   const _PATextField({required this.hint, required this.value, required this.onChanged});
@@ -329,12 +391,12 @@ class _PATextField extends StatelessWidget {
 }
 
 class _CheckboxGrid extends StatelessWidget {
-  final PreAlertLoaded local; final void Function(String field, bool value) onChanged; final bool isTablet;
-  const _CheckboxGrid({required this.local, required this.onChanged, required this.isTablet});
+  final PreAlertLoaded local; final void Function(String field, bool value) onChanged; final bool isTablet; final bool showPort; final bool showLEmp;
+  const _CheckboxGrid({required this.local, required this.onChanged, required this.isTablet, this.showPort = true, this.showLEmp = true});
 
   @override
   Widget build(BuildContext context) {
-    final items = [('pickup', 'PickUp', local.checkPickUp), ('port', 'Port', local.checkPort), ('vesselName', 'Vessel Name', local.checkVesselName), ('consolidated', 'Consolidated', local.checkConsolidated), ('delivery', 'Delivery Done', local.checkDelivery), ('lEmp', 'L.Emp', local.checkLEmp)];
+    final items = [('pickup', 'PickUp', local.checkPickUp), if (showPort) ('port', 'Port', local.checkPort), ('vesselName', 'Vessel Name', local.checkVesselName), ('consolidated', 'Consolidated', local.checkConsolidated), ('delivery', 'Delivery Done', local.checkDelivery), if (showLEmp) ('lEmp', 'L.Emp', local.checkLEmp)];
     return Wrap(
       spacing: 0, runSpacing: 4,
       children: items.map((item) {
@@ -398,8 +460,8 @@ class _ETARadioRow extends StatelessWidget {
 }
 
 class _GradientButton extends StatelessWidget {
-  final String label; final VoidCallback onPressed;
-  const _GradientButton({required this.label, required this.onPressed});
+  final String label; final VoidCallback onPressed; final IconData? icon;
+  const _GradientButton({required this.label, required this.onPressed, this.icon});
 
   @override
   Widget build(BuildContext context) {
@@ -412,9 +474,75 @@ class _GradientButton extends StatelessWidget {
           borderRadius: BorderRadius.circular(12),
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 14),
-            child: Text(label, textAlign: TextAlign.center, style: AppTypography.heading2(color: Colors.white)),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                if (icon != null) ...[
+                  Icon(icon, size: 20, color: Colors.white),
+                  const SizedBox(width: 8),
+                ],
+                Flexible(child: Text(label, textAlign: TextAlign.center, overflow: TextOverflow.ellipsis, style: AppTypography.heading2(color: Colors.white))),
+              ],
+            ),
           ),
         ),
+      ),
+    );
+  }
+}
+
+/// The drawer's page: app bar, drawer and back to the user's dashboard, as before.
+class _PreAlertPage extends StatelessWidget {
+  const _PreAlertPage();
+
+  void _navigateBack(BuildContext context) {
+    final role = AppGlobals.storagenew.getString('RulesType') ?? '';
+    Widget dest;
+    switch (role) {
+      case 'ADMIN': dest = const NewAdminDashboard(); break;
+      case 'SALES': dest = const SalesDashboard(); break;
+      case 'TRANSPORTATION': dest = const TransportDashboard(); break;
+      case 'OPERATIONADMIN': dest = const OperationAdminDashboard(); break;
+      case 'AIR FRIEGHT': dest = const AirfreightDashboard(); break;
+      case 'BOARDING': case 'OPERATION': dest = const BoardingDashboard(); break;
+      case 'FORWARDING': dest = const ForwardingDashboard(); break;
+      default: dest = const Homemobile();
+    }
+    Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => dest));
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final isTablet = MediaQuery.of(context).size.width > 600;
+    final userName = AppGlobals.storagenew.getString('Username') ?? '';
+
+    return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: (didPop, result) {
+        if (didPop) return;
+        _navigateBack(context);
+      },
+      child: Scaffold(
+        backgroundColor: colour.kPageBg,
+        appBar: AppBar(
+          automaticallyImplyLeading: false,
+          elevation: 0,
+          toolbarHeight: isTablet ? 70 : 62,
+          flexibleSpace: Container(decoration: const BoxDecoration(gradient: colour.kGradient)),
+          leading: IconButton(
+            icon: const Icon(Icons.arrow_back_ios_new_rounded, size: 20, color: Colors.white),
+            onPressed: () => _navigateBack(context),
+          ),
+          title: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text('Pre Alert Report', style: AppTypography.heading2(color: Colors.white)),
+              Text(userName, style: AppTypography.bodySmall(color: Colors.white)),
+            ],
+          ),
+        ),
+        drawer: const Menulist(),
+        body: const PreAlertReportBody(),
       ),
     );
   }

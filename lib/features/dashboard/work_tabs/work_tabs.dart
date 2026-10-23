@@ -11,6 +11,7 @@ enum WorkTab {
   rtiActivities,
   fwRequests,
   sealBreakSeal,
+  preAlert,
 }
 
 /// Which work dashboard is showing; the main role picks it (dashboard_routes.dart).
@@ -22,7 +23,11 @@ enum WorkDashboard { boarding, forwardingAgent }
 /// With no extra jobs the list is exactly the one before this change:
 /// - boarding, role 500: VSL, Salary, EmpLeave, IR Report
 /// - boarding, role 600: VSL, Salary, SpotsSaleOrder, IR Report, InventoryReport, EmpLeave
-/// - forwarding agent: Emp Leave, RTI Activities, IR Report, FW Requests
+/// - forwarding agent: Emp Leave, RTI Activities, IR Report
+/// FW Requests is not shown on either dashboard (owner, 2026-10-20: boarding officers
+/// and forwarding agents do not need it; Sales / Air Freight keep their own tab).
+/// with Pre Alert as the second tab, one tap from the first (boarding-pre-alert-tab:
+/// ETA All, Delivery Done, the user's own ports).
 List<WorkTab> workTabsFor(WorkDashboard dashboard, WorkJobs jobs) {
   final tabs = <WorkTab>[];
   void add(WorkTab tab) {
@@ -31,6 +36,7 @@ List<WorkTab> workTabsFor(WorkDashboard dashboard, WorkJobs jobs) {
 
   if (dashboard == WorkDashboard.boarding) {
     add(WorkTab.vsl);
+    add(WorkTab.preAlert);
     add(WorkTab.salary);
     if (jobs.isBoardingOfficerOnly) {
       add(WorkTab.empLeave);
@@ -44,16 +50,15 @@ List<WorkTab> workTabsFor(WorkDashboard dashboard, WorkJobs jobs) {
     // Forwarding work for a boarding person (seal and break seal).
     if (jobs.isForwardingAgent) {
       add(WorkTab.rtiActivities);
-      add(WorkTab.fwRequests);
       add(WorkTab.sealBreakSeal);
     }
     return tabs;
   }
 
   add(WorkTab.empLeave);
+  add(WorkTab.preAlert);
   add(WorkTab.rtiActivities);
   add(WorkTab.irReport);
-  add(WorkTab.fwRequests);
   // Boarding work for a forwarding agent.
   if (jobs.isBoarding) {
     add(WorkTab.vsl);
@@ -86,5 +91,7 @@ String workTabLabel(WorkTab tab, WorkDashboard dashboard) {
       return 'FW Requests';
     case WorkTab.sealBreakSeal:
       return 'Seal / Break Seal';
+    case WorkTab.preAlert:
+      return 'Pre Alert';
   }
 }

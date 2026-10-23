@@ -379,7 +379,8 @@ void main() {
     expect(find.byKey(const ValueKey('notice_14')), findsOneWidget);
     expect(find.byKey(const Key('action_needed_header')), findsNothing);
     expect(tester.widget<Icon>(find.byKey(const ValueKey('notice_icon_9'))).icon, Icons.description_outlined);
-    expect(tester.widget<Icon>(find.byKey(const ValueKey('notice_icon_14'))).icon, Icons.notifications_none_rounded);
+    // a leave notice has its own icon (leave-notifications)
+    expect(tester.widget<Icon>(find.byKey(const ValueKey('notice_icon_14'))).icon, Icons.event_busy_rounded);
     final today = tester.getTopLeft(find.byKey(const Key('other_today_header'))).dy;
     expect(tester.getTopLeft(find.byKey(const ValueKey('notice_14'))).dy, greaterThan(today));
     expect(tester.getTopLeft(find.byKey(const ValueKey('notice_9'))).dy,

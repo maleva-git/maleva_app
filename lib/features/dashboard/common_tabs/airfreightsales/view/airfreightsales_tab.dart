@@ -1,3 +1,4 @@
+import 'package:maleva/features/auth/presentation/dashboard_routes.dart';
 import 'package:maleva/core/theme/app_typography.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -187,6 +188,8 @@ class _AirfreightView extends StatelessWidget {
       mainAxisSpacing: 16,
       childAspectRatio: 1.1,
       children: [
+        // this month's sale order numbers: the CEO's only (change ceo-only-sale-order-numbers)
+        if (signedInIsCeo())
         _PremiumStatCard(
           title: 'Total Orders',
           value: state.totalCount.toString(),
@@ -199,12 +202,14 @@ class _AirfreightView extends StatelessWidget {
           icon: Icons.receipt_long_rounded,
           gradientColors: const [colour.kAccentRed, colour.cRose],
         ),
+        if (signedInIsCeo())
         _PremiumStatCard(
           title: 'Billed',
           value: state.totalBilledCount.toString(),
           icon: Icons.check_circle_outline_rounded,
           gradientColors: const [colour.kSuccess, colour.kGreen],
         ),
+        if (signedInIsCeo())
         _PremiumStatCard(
           title: 'Unbilled',
           value: state.totalUnBilledCount.toString(),

@@ -62,7 +62,7 @@ void main() {
     await api.setStatus(12, statusRefId: 2, reviewedBy: 15, reviewRemark: 'ok');
     expect(last().method, 'PUT');
     expect(last().uri.toString(), 'https://java.test/api/leave/12/status?companyId=6');
-    expect(last().data, {'statusRefId': 2, 'reviewedBy': 15, 'reviewRemark': 'ok'});
+    expect(last().data, {'decision': 'APPROVED', 'statusRefId': 2, 'reviewedBy': 15, 'reviewRemark': 'ok'});
 
     expect(() => api.setStatus(12, statusRefId: 3, reviewedBy: 7, reviewRemark: ''),
         throwsA(isA<ApiFailure>().having((f) => f.message, 'message', 'Reviewing leave is for employees')));

@@ -1,14 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:maleva/features/dashboard/common_tabs/salesorder/bloc/salesorder_bloc.dart';
 import 'package:maleva/features/dashboard/receivable_dashboard/view/receivable_dashboard_ui.dart';
 import '../../../../core/di/injection.dart';
 import '../../common_tabs/invoice/bloc/invoice_bloc.dart';
 import '../../common_tabs/invoice/bloc/invoice_event.dart';
 import '../../common_tabs/invoice/data/invoice_repository.dart';
 import '../../common_tabs/invoice/view/invoice_tab.dart';
-import '../../common_tabs/salesorder/bloc/salesorder_event.dart';
-import '../../common_tabs/salesorder/view/salesorderview_tab.dart';
 import '../bloc/receivable_bloc.dart';
 import '../bloc/receivable_event.dart';
 import 'package:maleva/features/dashboard/common_tabs/driverleave/bloc/leave_bloc.dart';
@@ -26,7 +23,9 @@ class _AdminDashboardState extends State<ReceivableDashboard> with SingleTickerP
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 4, vsync: this);
+    // The SO tab (sale order today / month / year numbers) is the CEO's only (owner, 2026-10-22;
+    // change ceo-only-sale-order-numbers); this dashboard is never the CEO's, so it has none.
+    _tabController = TabController(length: 3, vsync: this);
     _tabController.addListener(_onTabChanged);
 
   }
@@ -51,11 +50,6 @@ class _AdminDashboardState extends State<ReceivableDashboard> with SingleTickerP
                 invoiceRepo: InvoiceRepositoryImpl(),
               )..add( LoadInvoiceByType(0)),
               child: const InvoiceTab(),
-            ),
-            BlocProvider(
-              create: (_) => sl<SalesOrderBloc>()
-                ..add(LoadInvoiceByTypes(1)),
-              child: const SalesOrderTab(),
             ),
                   BlocProvider<LeaveBloc>(create: (_) => sl<LeaveBloc>()),
       ],

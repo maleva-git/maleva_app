@@ -406,7 +406,9 @@ void main() {
       expect(toneOf(fw), NoticeTone.forwarding);
       final other = n(noticeJson(kind: 'LEAVE_APPROVED', linkPath: '/leave'));
       expect(routeForNotice(other), isNull);
-      expect(toneOf(other), NoticeTone.other);
+      // leave notices have their own look (leave-notifications); other kinds stay "other"
+      expect(toneOf(other), NoticeTone.leave);
+      expect(toneOf(n(noticeJson(kind: 'SOMETHING_ELSE'))), NoticeTone.other);
     });
   });
 }

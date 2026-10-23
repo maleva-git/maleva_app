@@ -32,3 +32,16 @@ class RtiActivitiesActionSuccess extends RtiActivitiesLoaded {
   @override
   List<Object?> get props => [actionMessage, activities];
 }
+
+/// A status change the server did not save. The list stays as it was (the stop keeps its old
+/// status) and [errorMessage] tells the agent why. [attempt] makes a second identical failure
+/// a new state, so the message shows again.
+class RtiActivitiesActionFailure extends RtiActivitiesLoaded {
+  final String errorMessage;
+  final int attempt;
+  const RtiActivitiesActionFailure(this.errorMessage, List<RtiRouteActivity> activities, {this.attempt = 0})
+      : super(activities);
+
+  @override
+  List<Object?> get props => [errorMessage, activities, attempt];
+}

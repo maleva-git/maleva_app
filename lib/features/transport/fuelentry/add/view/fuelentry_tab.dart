@@ -1,10 +1,8 @@
 import 'package:maleva/core/theme/app_typography.dart';
-import 'package:maleva/core/colors/colors.dart' as colour;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:maleva/core/utils/app_globals.dart';
 import 'package:maleva/menu/menulist.dart';
@@ -202,8 +200,18 @@ class _FuelEntryCard extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           // ── Truck name banner ───────────────────────
-          _TruckBanner(isTablet: isTablet),
+          _TruckBanner(state: state),
           SizedBox(height: isTablet ? 24 : 20),
+
+          // ── Vehicle (employee entry) ────────────────
+          if (!state.isDriver && state.vehicles.length > 1) ...[
+            _FormRow(
+              label: 'Vehicle',
+              isTablet: isTablet,
+              child: _VehiclePicker(state: state),
+            ),
+            SizedBox(height: isTablet ? 16 : 12),
+          ],
 
           // ── Entry No (read-only) ─────────────────────
           _FormRow(
@@ -257,7 +265,11 @@ class _FuelEntryCard extends StatelessWidget {
               onPressed: () {
                 final s = context.read<FuelEntryBloc>().state;
                 if (s is! FuelEntryLoaded) return;
-                final problem = FuelEntryValidation.form(liter: s.liter, amount: s.amount);
+                final problem = (!s.isDriver && s.truckRefId == 0)
+                    ? (s.vehicles.isEmpty
+                        ? 'No vehicle is given to you for fuel entry. Ask the office to add it.'
+                        : 'Select the vehicle you filled.')
+                    : FuelEntryValidation.form(liter: s.liter, amount: s.amount);
                 if (problem != null) {
                   toastMsg(problem, '', context);
                   return;
@@ -280,9 +292,17 @@ class _FuelEntryCard extends StatelessWidget {
 }
 
 // ─── Truck Banner ─────────────────────────────────────────────────────────────
+/// A driver's truck from their record, or the employee's picked vehicle.
 class _TruckBanner extends StatelessWidget {
-  final bool isTablet;
-  const _TruckBanner({required this.isTablet});
+  final FuelEntryLoaded state;
+  const _TruckBanner({required this.state});
+
+  String get _text {
+    if (state.isDriver) return 'Truck: ${AppGlobals.DriverTruckName}';
+    if (state.vehicles.isEmpty) return 'No vehicle given to you';
+    final name = state.truckName;
+    return name.isEmpty ? 'Select your vehicle' : 'Vehicle: $name';
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -299,12 +319,52 @@ class _TruckBanner extends StatelessWidget {
           const SizedBox(width: 10),
           Expanded(
             child: Text(
-              'Truck: ${AppGlobals.DriverTruckName}',
+              _text,
               style: AppTypography.heading1(color: Colors.white),
               overflow: TextOverflow.ellipsis,
             ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+// ─── Vehicle Picker (employee entry) ──────────────────────────────────────────
+/// The company vehicles the office gave this employee (Employee Master → Fuel vehicles).
+class _VehiclePicker extends StatelessWidget {
+  final FuelEntryLoaded state;
+  const _VehiclePicker({required this.state});
+
+  @override
+  Widget build(BuildContext context) {
+    return DropdownButtonFormField<int>(
+      initialValue: state.truckRefId == 0 ? null : state.truckRefId,
+      isExpanded: true,
+      hint: Text('Select vehicle',
+          style: AppTypography.bodySmall(color: AppTokens.textMuted)),
+      style: AppTypography.bodySmall(color: AppTokens.textPrimary),
+      items: [
+        for (final v in state.vehicles)
+          DropdownMenuItem(value: v.truckRefId, child: Text(v.truckName, overflow: TextOverflow.ellipsis)),
+      ],
+      onChanged: (id) {
+        if (id != null) context.read<FuelEntryBloc>().add(FuelEntryVehicleChanged(id));
+      },
+      decoration: InputDecoration(
+        filled: true,
+        fillColor: AppTokens.surfaceDetail,
+        contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+        border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(10), borderSide: BorderSide.none),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(10),
+          borderSide: const BorderSide(color: AppTokens.surfaceBorder, width: 0.5),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(10),
+          borderSide: const BorderSide(color: AppTokens.brandGradientEnd, width: 1.5),
+        ),
       ),
     );
   }

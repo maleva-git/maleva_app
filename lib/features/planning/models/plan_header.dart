@@ -13,6 +13,7 @@ class PlanHeader {
     this.employee = '',
     this.remarks = '',
     this.searchText = '',
+    this.saveVersion,
   });
 
   /// A new plan: every date today.
@@ -30,6 +31,10 @@ class PlanHeader {
   final String remarks;
   final String searchText;
 
+  /// The plan's `SaveVersion` when it was opened (null for a new plan); sent back on Save so a plan
+  /// saved meanwhile by someone else is not overwritten (change plan-save-keeps-changes).
+  final int? saveVersion;
+
   PlanHeader copyWith({
     String? planningNo,
     String? planningDate,
@@ -39,6 +44,7 @@ class PlanHeader {
     String? employee,
     String? remarks,
     String? searchText,
+    int? saveVersion,
   }) =>
       PlanHeader(
         planningNo: planningNo ?? this.planningNo,
@@ -49,6 +55,7 @@ class PlanHeader {
         employee: employee ?? this.employee,
         remarks: remarks ?? this.remarks,
         searchText: searchText ?? this.searchText,
+        saveVersion: saveVersion ?? this.saveVersion,
       );
 
   static String ymd(DateTime d) => '${d.year.toString().padLeft(4, '0')}-${d.month.toString().padLeft(2, '0')}-${d.day.toString().padLeft(2, '0')}';
@@ -57,9 +64,12 @@ class PlanHeader {
 /// A saved plan as `GET /api/planing/edit` answers it, read like `mapPlanningEditResponse`
 /// (`planningEditMapper.ts:145-183`).
 class LoadedPlan {
-  const LoadedPlan({required this.editId, required this.header, required this.lines});
+  const LoadedPlan({required this.editId, required this.header, required this.lines, this.saveVersion});
 
   final int editId;
+
+  /// `SaveVersion` of the edit answer (null from an older server).
+  final int? saveVersion;
 
   /// Only the fields the edit answer carries; the caller lays them over its form.
   final Map<String, String> header;
@@ -75,8 +85,10 @@ class LoadedPlan {
     final port = Js.nn(master, ['portRefId']) ?? master['PortRefid'];
     final employee = Js.nn(master, ['employeeRefId']) ?? master['EmployeeRefid'];
     final rows = details is List ? details : const [];
+    final version = Js.nn(master, ['SaveVersion', 'saveVersion']);
     return LoadedPlan(
       editId: Js.intOr0(Js.nn(master, ['id', 'Id']) ?? 0),
+      saveVersion: version == null ? null : int.tryParse('$version'),
       header: {
         'planningNo': s([
           'CNumber',

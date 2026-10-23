@@ -33,7 +33,11 @@ class SubmitLeaveRequest extends LeaveEvent {
   final int applicantRefId;
   final int applicantType;
 
+  /// HR Sprint 2: FULL / AM / PM / HOURS.
+  final String? part;
+
   const SubmitLeaveRequest({
+    this.part,
     required this.leaveTypeRefId,
     required this.fromDate,
     required this.toDate,
@@ -52,6 +56,7 @@ class SubmitLeaveRequest extends LeaveEvent {
         reason,
         applicantRefId,
         applicantType,
+        part,
       ];
 }
 

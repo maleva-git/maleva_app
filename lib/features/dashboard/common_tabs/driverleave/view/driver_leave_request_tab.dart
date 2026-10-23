@@ -8,7 +8,7 @@ import '../bloc/leave_event.dart';
 import '../bloc/leave_state.dart';
 import 'package:get_it/get_it.dart';
 import 'package:maleva/features/dashboard/common_tabs/driverleave/data/leave_request_model.dart';
-import 'package:maleva/features/dashboard/common_tabs/driverleave/data/leave_duration.dart';
+import 'leave_request_form_sheet.dart';
 import 'package:maleva/core/widgets/maleva_inputs.dart';
 import 'package:intl/intl.dart';
 import 'package:maleva/core/utils/app_globals.dart';
@@ -94,7 +94,8 @@ class _DriverLeaveRequestTabState extends State<_DriverLeaveRequestTabBody> {
           value: bloc,
           child: Padding(
             padding: EdgeInsets.only(bottom: MediaQuery.of(ctx).viewInsets.bottom),
-            child: _LeaveRequestFormSheet(
+            child: LeaveRequestFormSheet(
+              applicantType: 2,
               applicantRefId: _selectedId ?? -1,
               leaveTypes: leaveTypes,
             ),
@@ -189,10 +190,10 @@ class _DriverLeaveRequestTabState extends State<_DriverLeaveRequestTabBody> {
                         final req = requests[index];
                         Color statusColor = const Color(0xFFEAB308); // Yellow/Orange
                         Color statusBg = const Color(0xFFFEF08A).withValues(alpha: 0.3);
-                        if (req.statusRefId == 2) {
+                        if (req.status == LeaveDecision.approved) {
                           statusColor = const Color(0xFF047857); // Green
                           statusBg = const Color(0xFF059669).withValues(alpha: 0.12);
-                        } else if (req.statusRefId == 3) {
+                        } else if (req.status == LeaveDecision.rejected) {
                           statusColor = const Color(0xFFB91C1C); // Red
                           statusBg = const Color(0xFFEF4444).withValues(alpha: 0.12);
                         }
@@ -277,7 +278,7 @@ class _DriverLeaveRequestTabState extends State<_DriverLeaveRequestTabBody> {
                                           borderRadius: BorderRadius.circular(8),
                                         ),
                                         child: Text(
-                                          leaveDurationLabel(req.fromDate, req.toDate),
+                                          req.lengthLabel,
                                           style: AppTypography.bodyMedium(color: colour.commonColorhighlight, fontWeight: FontWeight.bold),
                                         ),
                                       ),
@@ -324,230 +325,6 @@ class _DriverLeaveRequestTabState extends State<_DriverLeaveRequestTabBody> {
                 ],
               ),
             ),
-          ),
-        );
-      },
-    );
-  }
-}
-
-class _LeaveRequestFormSheet extends StatefulWidget {
-  final int applicantRefId;
-  final List<LeaveTypeModel> leaveTypes;
-
-  const _LeaveRequestFormSheet({
-    required this.applicantRefId,
-    required this.leaveTypes,
-  });
-
-  @override
-  State<_LeaveRequestFormSheet> createState() => _LeaveRequestFormSheetState();
-}
-
-class _LeaveRequestFormSheetState extends State<_LeaveRequestFormSheet> {
-  DateTime _fromDate = DateTime.now();
-  DateTime _toDate = DateTime.now().add(const Duration(days: 1));
-  int? _selectedLeaveTypeId;
-  final TextEditingController _reasonController = TextEditingController();
-
-  @override
-  void dispose() {
-    _reasonController.dispose();
-    super.dispose();
-  }
-
-  void _submitLeave(BuildContext ctx) {
-    if (_selectedLeaveTypeId == null) {
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Please select Leave Reason')));
-      return;
-    }
-    
-    // calendar days, both counted; the server works it out the same way (leave-approval-rules)
-    final totalDaysNum = leaveCalendarDays(_fromDate, _toDate);
-    
-    ctx.read<LeaveBloc>().add(SubmitLeaveRequest(
-      leaveTypeRefId: _selectedLeaveTypeId!,
-      fromDate: _fromDate,
-      toDate: _toDate,
-      totalDays: totalDaysNum,
-      applicantRefId: widget.applicantRefId,
-      applicantType: 2,
-      reason: _reasonController.text.trim().isNotEmpty 
-          ? _reasonController.text.trim() 
-          : widget.leaveTypes.firstWhere((e) => e.id == _selectedLeaveTypeId).name,
-    ));
-  }
-
-  Future<void> _pickDate(bool isFrom) async {
-    final pickedDate = await showDatePicker(
-      context: context,
-      initialDate: isFrom ? _fromDate : _toDate,
-      firstDate: DateTime.now().subtract(const Duration(days: 30)),
-      lastDate: DateTime.now().add(const Duration(days: 365)),
-    );
-    if (pickedDate != null) {
-      if (!context.mounted) return;
-      final pickedTime = await showTimePicker(
-        context: context,
-        initialTime: TimeOfDay.fromDateTime(isFrom ? _fromDate : _toDate),
-      );
-      if (pickedTime != null) {
-        final combined = DateTime(pickedDate.year, pickedDate.month, pickedDate.day, pickedTime.hour, pickedTime.minute);
-        setState(() {
-          if (isFrom) {
-            _fromDate = combined;
-            if (_toDate.isBefore(_fromDate)) _toDate = _fromDate;
-          } else {
-            _toDate = combined;
-            if (_fromDate.isAfter(_toDate)) _fromDate = _toDate;
-          }
-        });
-      }
-    }
-  }
-
-
-  @override
-  Widget build(BuildContext context) {
-    return BlocConsumer<LeaveBloc, LeaveState>(
-      listener: (context, state) {
-        if (state is LeaveActionSuccess) {
-          Navigator.pop(context);
-        }
-      },
-      builder: (context, state) {
-        bool isSubmitting = (state is LeaveLoaded) ? state.isSubmitting : false;
-
-        return Container(
-          decoration: const BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.only(
-              topLeft: Radius.circular(24),
-              topRight: Radius.circular(24),
-            ),
-          ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              // Handle bar
-              Center(
-                child: Container(
-                  margin: const EdgeInsets.only(top: 12, bottom: 8),
-                  width: 40,
-                  height: 4,
-                  decoration: BoxDecoration(
-                    color: Colors.grey.shade300,
-                    borderRadius: BorderRadius.circular(4),
-                  ),
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.fromLTRB(20, 10, 20, 20),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'Request Leave',
-                      style: AppTypography.heading1(color: AppTokens.brandDark, fontWeight: FontWeight.w800),
-                    ),
-                    const SizedBox(height: 20),
-                    Row(
-                      children: [
-                        Expanded(
-                          child: MalevaDateField(
-                            date: DateFormat('dd-MM-yyyy hh:mm a').format(_fromDate),
-                            onTap: () => _pickDate(true),
-                          ),
-                        ),
-                        const SizedBox(width: 12),
-                        Expanded(
-                          child: MalevaDateField(
-                            date: DateFormat('dd-MM-yyyy hh:mm a').format(_toDate),
-                            onTap: () => _pickDate(false),
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 12),
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                      decoration: BoxDecoration(
-                        color: AppTokens.brandLight.withValues(alpha: 0.3),
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text('Total Duration:', style: AppTypography.bodyMedium(color: AppTokens.textMuted)),
-                          Text(leaveDurationLabel(_fromDate, _toDate), style: AppTypography.heading2(color: AppTokens.brandDark)),
-                        ],
-                      ),
-                    ),
-                    const SizedBox(height: 16),
-                    Container(
-                      decoration: BoxDecoration(
-                        color: AppTokens.surfacePage,
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-                      child: DropdownButtonHideUnderline(
-                        child: DropdownButton<int>(
-                          isExpanded: true,
-                          value: _selectedLeaveTypeId,
-                          icon: const Icon(Icons.keyboard_arrow_down_rounded, color: AppTokens.textMuted),
-                          hint: Text('Select Leave Reason', style: AppTypography.bodyLarge(color: AppTokens.textMuted)),
-                          items: widget.leaveTypes.map((e) => DropdownMenuItem<int>(
-                            value: e.id,
-                            child: Text(e.name, style: AppTypography.bodyLarge(color: AppTokens.textPrimary)),
-                          )).toList(),
-                          onChanged: (val) {
-                            setState(() => _selectedLeaveTypeId = val);
-                          },
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 16),
-                    Container(
-                      decoration: BoxDecoration(
-                        color: AppTokens.surfacePage,
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-                      child: TextField(
-                        controller: _reasonController,
-                        decoration: InputDecoration(
-                          border: InputBorder.none,
-                          hintText: 'Enter specific reason/remark (optional)',
-                          hintStyle: AppTypography.bodyLarge(color: AppTokens.textMuted),
-                        ),
-                        style: AppTypography.bodyLarge(color: AppTokens.textPrimary),
-                        maxLines: 2,
-                      ),
-                    ),
-                    const SizedBox(height: 24),
-                    ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: AppTokens.brandPrimary,
-                        elevation: 0,
-                        padding: const EdgeInsets.symmetric(vertical: 16),
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                      ),
-                      onPressed: isSubmitting ? null : () => _submitLeave(context),
-                      child: isSubmitting 
-                          ? const SizedBox(width: 24, height: 24, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2.5))
-                          : Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                const Icon(Icons.send_rounded, color: Colors.white, size: 18),
-                                const SizedBox(width: 8),
-                                Text('Submit Request', style: AppTypography.heading2(color: Colors.white, fontWeight: FontWeight.bold)),
-                              ],
-                            ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
           ),
         );
       },

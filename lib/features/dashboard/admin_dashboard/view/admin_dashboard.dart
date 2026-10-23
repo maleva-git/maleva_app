@@ -1,3 +1,4 @@
+import 'package:maleva/features/auth/presentation/dashboard_routes.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
@@ -74,11 +75,14 @@ class _AdminDashboardState extends State<NewAdminDashboard> with SingleTickerPro
   /// the later tabs is harmless.
   final bool _superAdmin = mailMonitorAllowed(const PreferencesAppSession().roleId);
 
+  /// Only the CEO gets the SO tab and sale order numbers (change ceo-only-sale-order-numbers).
+  final bool _ceo = signedInIsCeo();
+
   @override
   void initState() {
     super.initState();
     _adminTabBloc = AdminTabBloc();
-    _tabController = TabController(length: adminTabs(superAdmin: _superAdmin, openTab: (_) {}).length, vsync: this);
+    _tabController = TabController(length: adminTabs(superAdmin: _superAdmin, ceo: _ceo, openTab: (_) {}).length, vsync: this);
     _tabController.addListener(_onTabChanged);
   }
 
@@ -108,6 +112,7 @@ class _AdminDashboardState extends State<NewAdminDashboard> with SingleTickerPro
               tabController: _tabController,
               isTablet: isTablet,
               superAdmin: _superAdmin,
+              ceo: _ceo,
             ),
           );
         },

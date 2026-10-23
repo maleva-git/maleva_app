@@ -3,7 +3,10 @@ import 'package:maleva/core/di/injection.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 import 'package:maleva/core/utils/app_globals.dart';
+import 'package:maleva/core/employee/employee_api.dart';
+import 'package:maleva/core/utils/app_preferences.dart';
 
+import 'pre_alert_ports.dart';
 import 'prealertview_event.dart';
 
 // ─── STATE CLASSES ────────────────────────────────────────────────────────
@@ -21,7 +24,14 @@ class PreAlertLoaded extends PreAlertState {
   final bool checkPickUp, checkPort, checkVesselName, checkConsolidated, checkDelivery, checkLEmp, completeStatusNotShow, etaEnabled;
   final String etaVal, etaRadioVal;
 
+  /// The dashboard tab (boarding-pre-alert-tab) rather than the drawer's screen.
+  final bool workMode;
+
+  /// The ports the user may pick in the tab (see [PreAlertPortChoice]).
+  final PreAlertPortChoice portChoice;
+
   PreAlertLoaded({
+    this.workMode = false, this.portChoice = PreAlertPortChoice.open,
     required this.fromDate, required this.toDate, required this.custId, required this.custName,
     required this.jobId, required this.jobName, required this.portId, required this.portName,
     required this.vessel, required this.checkPickUp, required this.checkPort, required this.checkVesselName,
@@ -36,6 +46,7 @@ class PreAlertLoaded extends PreAlertState {
     bool? completeStatusNotShow, String? etaVal, String? etaRadioVal, bool? etaEnabled,
   }) {
     return PreAlertLoaded(
+      workMode: workMode, portChoice: portChoice,
       fromDate: fromDate ?? this.fromDate, toDate: toDate ?? this.toDate, custId: custId ?? this.custId,
       custName: custName ?? this.custName, jobId: jobId ?? this.jobId, jobName: jobName ?? this.jobName,
       portId: portId ?? this.portId, portName: portName ?? this.portName, vessel: vessel ?? this.vessel,
@@ -75,17 +86,46 @@ class PreAlertBloc extends Bloc<PreAlertEvent, PreAlertState> {
       if (!event.context.mounted) return;
       await sl<LegacyApiRepository>().SelectEmployee(event.context, 'Sales', '');
       final isAdmin = AppGlobals.storagenew.getString('RulesType') == 'ADMIN';
-      emit(PreAlertLoaded(
-        fromDate: DateFormat('yyyy-MM-dd').format(DateTime.now()),
-        toDate: DateFormat('yyyy-MM-dd').format(DateTime.now()),
-        custId: 0, custName: '', jobId: 0, jobName: '', portId: 0, portName: '', vessel: '',
-        checkPickUp: false, checkPort: false, checkVesselName: false, checkConsolidated: false,
-        checkDelivery: false, checkLEmp: !isAdmin, completeStatusNotShow: false,
-        etaVal: '0', etaRadioVal: 'O', etaEnabled: false,
+      final today = DateFormat('yyyy-MM-dd').format(DateTime.now());
+      if (!event.workMode) {
+        // The drawer's screen, as before.
+        emit(PreAlertLoaded(
+          fromDate: today, toDate: today,
+          custId: 0, custName: '', jobId: 0, jobName: '', portId: 0, portName: '', vessel: '',
+          checkPickUp: false, checkPort: false, checkVesselName: false, checkConsolidated: false,
+          checkDelivery: false, checkLEmp: !isAdmin, completeStatusNotShow: false,
+          etaVal: '0', etaRadioVal: 'O', etaEnabled: false,
+        ));
+        return;
+      }
+      // The boarding / forwarding agent tab: the user's own ports (EmployeePortMaster,
+      // the lookup the vessel report uses), ETA "All" and Delivery Done ticked.
+      // None assigned: the company's active ports, as the web's picker.
+      // A failed lookup is shown with Retry, never read as "no port".
+      final employees = sl<EmployeeApi>();
+      final assigned = await employees.portNames(AppPreferences.getEmpRefId());
+      final companyPorts = assigned.isEmpty ? await employees.companyPortNames() : const <String>[];
+      emit(preAlertWorkStart(
+        today: today,
+        choice: PreAlertPortChoice.of(assigned: assigned, companyPorts: companyPorts),
       ));
     } catch (e) {
       emit(PreAlertError(e.toString()));
     }
+  }
+
+  /// The tab's first state: ETA "All" (either vessel's ETA, etaVal 3),
+  /// Delivery Done ticked, the first own port selected and its box ticked,
+  /// L.Emp unticked (owner: always; it only locked Job Type, it is not sent).
+  static PreAlertLoaded preAlertWorkStart({required String today, required PreAlertPortChoice choice}) {
+    return PreAlertLoaded(
+      workMode: true, portChoice: choice,
+      fromDate: today, toDate: today,
+      custId: 0, custName: '', jobId: 0, jobName: '', portId: 0, portName: choice.selected, vessel: '',
+      checkPickUp: false, checkPort: choice.selected.isNotEmpty, checkVesselName: false, checkConsolidated: false,
+      checkDelivery: true, checkLEmp: false, completeStatusNotShow: false,
+      etaVal: '3', etaRadioVal: '2', etaEnabled: true,
+    );
   }
 
   void _onCheckboxChanged(PreAlertCheckboxChanged event, Emitter<PreAlertState> emit) {

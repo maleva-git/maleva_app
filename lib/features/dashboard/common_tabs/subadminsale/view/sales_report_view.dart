@@ -1,3 +1,4 @@
+import 'package:maleva/features/auth/presentation/dashboard_routes.dart';
 import 'package:maleva/core/theme/app_typography.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -223,7 +224,9 @@ class _SalesReportView extends StatelessWidget {
                             iconColor: Palette.redDanger,
                             valueColor: Palette.redDanger,
                           ),
-                          const SizedBox(width: 10),
+                          // this month's sale order numbers: the CEO's only (change ceo-only-sale-order-numbers)
+                          if (signedInIsCeo()) const SizedBox(width: 10),
+                          if (signedInIsCeo())
                           _StatCard(
                             label: "Total\nCount",
                             value: state.totalCount.toString(),
@@ -234,7 +237,8 @@ class _SalesReportView extends StatelessWidget {
                           ),
                         ],
                       ),
-                      const SizedBox(height: 10),
+                      if (signedInIsCeo()) const SizedBox(height: 10),
+                      if (signedInIsCeo())
                       Row(
                         children: [
                           _StatCard(

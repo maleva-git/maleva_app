@@ -7,7 +7,6 @@ import '../bloc/leave_event.dart';
 import '../bloc/leave_state.dart';
 import 'package:get_it/get_it.dart';
 import 'package:maleva/features/dashboard/common_tabs/driverleave/data/leave_request_model.dart';
-import 'package:maleva/features/dashboard/common_tabs/driverleave/data/leave_duration.dart';
 import 'package:maleva/core/colors/colors.dart' as colour;
 import 'package:intl/intl.dart';
 import 'package:maleva/core/utils/app_globals.dart';
@@ -162,10 +161,10 @@ class _EmployeeLeaveApprovalTabState extends State<EmployeeLeaveApprovalTab> {
                     final req = requests[index];
                     Color statusColor = const Color(0xFFEAB308); // Yellow/Orange
                     Color statusBg = const Color(0xFFFEF08A).withValues(alpha: 0.3);
-                    if (req.statusRefId == 2) {
+                    if (req.status == LeaveDecision.approved) {
                       statusColor = const Color(0xFF047857); // Green
                       statusBg = const Color(0xFF059669).withValues(alpha: 0.12);
-                    } else if (req.statusRefId == 3) {
+                    } else if (req.status == LeaveDecision.rejected) {
                       statusColor = const Color(0xFFB91C1C); // Red
                       statusBg = const Color(0xFFEF4444).withValues(alpha: 0.12);
                     }
@@ -231,7 +230,7 @@ class _EmployeeLeaveApprovalTabState extends State<EmployeeLeaveApprovalTab> {
                                     borderRadius: BorderRadius.circular(8),
                                   ),
                                   child: Text(
-                                    leaveDurationLabel(req.fromDate, req.toDate),
+                                    req.lengthLabel,
                                     style: AppTypography.bodyMedium(color: colour.commonColorhighlight, fontWeight: FontWeight.bold),
                                   ),
                                 ),
@@ -286,7 +285,7 @@ class _EmployeeLeaveApprovalTabState extends State<EmployeeLeaveApprovalTab> {
                                   ],
                                 ),
                               ),
-                            if (req.statusRefId == 1 && req.applicantRefId == AppGlobals.EmpRefId)
+                            if (req.isPending && req.applicantRefId == AppGlobals.EmpRefId)
                               // nobody approves their own leave; the server refuses it too (leave-approval-rules)
                               Padding(
                                 padding: const EdgeInsets.only(top: 16),
@@ -296,7 +295,7 @@ class _EmployeeLeaveApprovalTabState extends State<EmployeeLeaveApprovalTab> {
                                       style: AppTypography.bodySmall(color: Colors.grey, fontWeight: FontWeight.w600)),
                                 ),
                               ),
-                            if (req.statusRefId == 1 && req.applicantRefId != AppGlobals.EmpRefId) // pending, someone else's
+                            if (req.isPending && req.applicantRefId != AppGlobals.EmpRefId) // pending, someone else's
                               Padding(
                                 padding: const EdgeInsets.only(top: 16),
                                 child: Align(

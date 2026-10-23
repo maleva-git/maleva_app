@@ -1,6 +1,7 @@
 import 'package:maleva/core/di/injection.dart';
 import 'package:maleva/core/employee/leave_api.dart';
 import 'package:maleva/core/utils/session_manager.dart';
+import 'leave_calendar.dart';
 import 'leave_request_model.dart';
 
 /// Leave requests on the shared Java `/api/leave` (was .NET LeaveRequestApp).
@@ -20,8 +21,10 @@ class LeaveRepository {
     required String reason,
     required int applicantRefId,
     int applicantType = 2,
+    String? part,
   }) async {
     await _api.request(
+      part: part,
       applicantType: applicantType,
       applicantRefId: applicantRefId,
       leaveTypeRefId: leaveTypeRefId,
@@ -53,6 +56,20 @@ class LeaveRepository {
   }) async {
     await _api.setStatus(id, statusRefId: statusRefId, reviewedBy: reviewedBy, reviewRemark: reviewRemark);
     return true;
+  }
+
+  /// The calendar the form counts on (HR Sprint 2); the defaults with half days hidden when it can't be read.
+  Future<LeaveCalendar> getCalendar({required bool driver, required Iterable<int> years}) async {
+    try {
+      final weeks = await _api.workWeek();
+      final holidays = <Map<String, dynamic>>[];
+      for (final y in years.toSet()) {
+        holidays.addAll(await _api.holidays(y));
+      }
+      return LeaveCalendar.fromJava(weeks, holidays, driver: driver);
+    } catch (_) {
+      return LeaveCalendar.off;
+    }
   }
 
   Future<List<LeaveTypeModel>> getLeaveTypes() async =>

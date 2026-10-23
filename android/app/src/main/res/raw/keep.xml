@@ -1,0 +1,3 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- shrinkResources would drop the alarm tone: only the push (sound "rti_alarm") and the channel name it. -->
+<resources xmlns:tools="http://schemas.android.com/tools" tools:keep="@raw/rti_alarm" />

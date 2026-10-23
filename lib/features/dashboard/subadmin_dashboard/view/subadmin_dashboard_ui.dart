@@ -15,7 +15,6 @@ import '../../common_tabs/inventoryreport/view/inventoryview_tab.dart';
 import '../../common_tabs/invoice/view/invoice_tab.dart';
 import '../../common_tabs/saleorderview/view/saleorderview_tab.dart';
 import '../../common_tabs/driverleave/view/admin_leave_approval_tab.dart';
-import '../../common_tabs/salesorder/view/salesorderview_tab.dart';
 import '../../common_tabs/spotsaleorder/view/spotsaleorder_add.dart';
 import '../../common_tabs/subadminsale/view/sales_report_view.dart';
 import '../../common_tabs/transport/view/transportview_tab.dart';
@@ -133,7 +132,6 @@ class MobileDashboard extends StatelessWidget {
         ),
         tabs: [
           _tab('Invoice',         isTablet),  // ← isTablet pass பண்ணு
-          _tab('SO',              isTablet),
           _tab('Sales',              isTablet),
           _tab('IR Report', isTablet),
           _tab('VSL',             isTablet),
@@ -186,7 +184,6 @@ class MobileDashboard extends StatelessWidget {
         controller: tabController,
         children: const [
           InvoiceTab(),
-          SalesOrderTab(),
           SalesReportPage(),
           IrReportTab(),
           VesselReportPage(),

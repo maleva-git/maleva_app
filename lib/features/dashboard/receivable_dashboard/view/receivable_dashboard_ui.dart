@@ -9,7 +9,6 @@ import '../../../../core/models/model.dart';
 import '../../../../menu/menulist.dart';
 import '../../common_tabs/invoice/view/invoice_tab.dart';
 import '../../common_tabs/saleorderview/view/saleorderview_tab.dart';
-import '../../common_tabs/salesorder/view/salesorderview_tab.dart';
 import '../bloc/receivable_bloc.dart';
 import '../bloc/receivable_state.dart';
 import 'package:maleva/core/widgets/custom_app_bar.dart';
@@ -123,7 +122,6 @@ class ReceivableMobileDashboard extends StatelessWidget {
         ),
         tabs: [
           _tab('Invoice',         isTablet),
-          _tab('SO',              isTablet),
 
           _tab('EmpLeave', isTablet),
           _tab('IR Report', isTablet),
@@ -166,7 +164,6 @@ class ReceivableMobileDashboard extends StatelessWidget {
         controller: tabController,
         children: const [
           InvoiceTab(),
-          SalesOrderTab(),
 
           EmployeeLeaveRequestTab(),
           IrReportTab(),

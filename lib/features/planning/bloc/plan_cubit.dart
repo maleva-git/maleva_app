@@ -1,3 +1,4 @@
+import 'package:maleva/core/planning/planning_api.dart' show PlanSaveConflict;
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:maleva/features/planning/data/js_values.dart';
 import 'package:maleva/features/planning/bloc/plan_cubit_base.dart';
@@ -152,6 +153,7 @@ class PlanCubit extends Cubit<PlanState> with PlanCubitBase, PlanRowOps, PlanRti
         employee: h['employee'],
         remarks: h['remarks'],
         searchText: h['searchText'],
+        saveVersion: loaded.saveVersion,
       );
       List<PlanLine> rows = loaded.lines;
       if (samePlan && state.dirtyJobIds.isNotEmpty && state.rows.isNotEmpty) {
@@ -185,7 +187,7 @@ class PlanCubit extends Cubit<PlanState> with PlanCubitBase, PlanRowOps, PlanRti
 
   /// Save (`savePlanning` + `handleSave`): the checks, one request, one success message, then the
   /// plan is read again in place (Q-TOAST: the message is shown once).
-  Future<bool> save() async {
+  Future<bool> save({bool overwrite = false}) async {
     if (state.saving) return false;
     if (!guardWrite()) return false;
     final request = PlanningSavePayload.build(
@@ -195,6 +197,7 @@ class PlanCubit extends Cubit<PlanState> with PlanCubitBase, PlanRowOps, PlanRti
       rows: state.rows,
       userId: repo.userId,
       employeeId: repo.employeeId,
+      overwrite: overwrite,
     );
     final refusal = PlanningSavePayload.refusal(request);
     if (refusal != null) {
@@ -219,12 +222,30 @@ class PlanCubit extends Cubit<PlanState> with PlanCubitBase, PlanRowOps, PlanRti
         await _loadNextNumber();
       }
       return true;
+    } on PlanSaveConflict catch (c) {
+      // Saved by someone else since this plan was opened: nothing was written. The page asks
+      // "Reload or save over it?" (change plan-save-keeps-changes).
+      if (isClosed) return false;
+      emit(state.copyWith(saving: false, conflict: PlanConflictNotice(c, ++_conflictSeq)));
+      return false;
     } catch (e) {
       if (isClosed) return false;
       emit(state.copyWith(saving: false));
       notify(errorText(e, 'Error saving planning'), NoticeKind.error);
       return false;
     }
+  }
+
+  int _conflictSeq = 0;
+
+  /// The planner's answer to a conflict: save over it, or read the plan again (their changes come in;
+  /// rows changed here are kept, as on any reload of the same plan).
+  Future<bool> resolveConflict({required bool overwrite}) async {
+    if (overwrite) return save(overwrite: true);
+    final who = state.conflict?.conflict.who ?? 'another user';
+    if (state.editId > 0) await loadPlan(id: state.editId);
+    if (!isClosed) notify("$who's changes are loaded. Rows you changed are kept - check and save again.", NoticeKind.info);
+    return false;
   }
 
   /// Delete before its confirm: false after the web's refusal.

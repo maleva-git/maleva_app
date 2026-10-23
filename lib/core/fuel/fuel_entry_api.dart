@@ -3,6 +3,8 @@ import 'package:maleva/core/network/api_failure.dart';
 import 'package:maleva/core/network/java_response.dart';
 import 'package:maleva/core/utils/json_read.dart';
 
+import 'fuel_vehicle.dart';
+
 /// Fuel entries, from the shared Java `/api/fuel-entries` (the web's API; the
 /// .NET FuelEntryApp is no longer called, change `fuel-entry-on-shared-java-api`).
 /// Answers the Java data as it is (camelCase fields); a refusal is an
@@ -47,6 +49,14 @@ class FuelEntryApi {
   /// The company is added here. Answers the saved entry.
   Future<Map<String, dynamic>> save(Map<String, dynamic> entry) async => JsonRead.map(await _send(() =>
       _dio.post<dynamic>('/api/fuel-entries', data: {...entry, 'companyRefId': companyId})));
+
+  /// The company vehicles the signed-in employee may enter fuel for
+  /// (`/api/fuel-vehicles/mine`, employee tokens only). Empty when none.
+  Future<List<FuelVehicle>> myVehicles() async {
+    final data = await _send(() =>
+        _dio.get<dynamic>('/api/fuel-vehicles/mine', queryParameters: {'companyRefId': companyId}));
+    return JsonRead.listOfMaps(data).map(FuelVehicle.fromJava).where((v) => v.truckRefId != 0).toList();
+  }
 
   /// Soft delete; [mobile] keeps it to driver-app rows.
   Future<void> delete(int id, {bool mobile = false}) async {

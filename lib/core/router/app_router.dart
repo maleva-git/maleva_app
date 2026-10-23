@@ -59,6 +59,7 @@ import '../../features/dashboard/unauthorized/unauthorized_page.dart';
 import '../../features/mail_monitor/mine/my_unread_mail_views.dart';
 import '../../features/mail_monitor/mine/push_route.dart';
 import '../../features/forwarding_requests/view/forwarding_requests_page.dart';
+import '../../features/dashboard/forwarding_agent_dashboard/push_route.dart';
 import '../../features/vessel_changes/push_route.dart';
 import '../../features/vessel_changes/vessel_changes_page.dart';
 import '../employee_notifications/employee_notifications_models.dart';
@@ -117,6 +118,12 @@ final GoRouter appRouter = GoRouter(
       path: myForwardingRequestsPath,
       name: 'my_forwarding_requests',
       builder: (context, state) => const ForwardingRequestsPage(mine: true),
+    ),
+    // RTI Activities, opened from the forwarding agent's 06:00 notice (rti-morning-briefing)
+    GoRoute(
+      path: rtiActivitiesPath,
+      name: 'rti_activities',
+      builder: (context, state) => const RtiActivitiesPage(),
     ),
     GoRoute(
       path: '/unauthorized',

@@ -1,3 +1,4 @@
+import 'package:maleva/core/planning/planning_api.dart' show PlanSaveConflict;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -43,18 +44,31 @@ class PlanScreen extends StatelessWidget {
   }
 
   @override
-  Widget build(BuildContext context) => BlocListener<PlanCubit, PlanState>(
-        listenWhen: (a, b) => b.notice != null && a.notice?.seq != b.notice!.seq,
-        listener: (context, s) {
-          final n = s.notice!;
-          showSnack(context, n.message,
-              kind: switch (n.kind) {
-                NoticeKind.success => SnackKind.success,
-                NoticeKind.info => SnackKind.info,
-                NoticeKind.error => SnackKind.error
-              },
-              duration: n.message.contains('\n') ? const Duration(seconds: 7) : null);
-        },
+  Widget build(BuildContext context) => MultiBlocListener(
+        listeners: [
+          BlocListener<PlanCubit, PlanState>(
+            listenWhen: (a, b) => b.notice != null && a.notice?.seq != b.notice!.seq,
+            listener: (context, s) {
+              final n = s.notice!;
+              showSnack(context, n.message,
+                  kind: switch (n.kind) {
+                    NoticeKind.success => SnackKind.success,
+                    NoticeKind.info => SnackKind.info,
+                    NoticeKind.error => SnackKind.error
+                  },
+                  duration: n.message.contains('\n') ? const Duration(seconds: 7) : null);
+            },
+          ),
+          // Someone else saved the plan after it was opened (change plan-save-keeps-changes).
+          BlocListener<PlanCubit, PlanState>(
+            listenWhen: (a, b) => b.conflict != null && a.conflict?.seq != b.conflict!.seq,
+            listener: (context, s) async {
+              final cubit = context.read<PlanCubit>();
+              final overwrite = await showPlanConflictDialog(context, s.conflict!.conflict);
+              if (overwrite != null) await cubit.resolveConflict(overwrite: overwrite);
+            },
+          ),
+        ],
         child: BlocBuilder<PlanCubit, PlanState>(
           buildWhen: (a, b) => a.phase != b.phase || a.access.canView != b.access.canView || a.hasChanges != b.hasChanges,
           builder: (context, s) {
@@ -113,3 +127,25 @@ class PlanScreen extends StatelessWidget {
         ),
       );
 }
+
+/// "Plan changed by ANNA": true = save over it, false = reload, null = closed without choosing
+/// (nothing happens; Save asks again). Change plan-save-keeps-changes.
+Future<bool?> showPlanConflictDialog(BuildContext context, PlanSaveConflict c) => showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        key: const Key('plan_conflict_dialog'),
+        title: Text('Plan changed by ${c.who}'),
+        content: Text('${c.who} saved this plan${c.changedAt.isEmpty ? '' : ' at ${c.changedAt}'} after you opened it.\n\n'
+            'Reload: their changes come in; the rows you changed here stay as you have them. Then save again.\n\n'
+            'Save over it: your plan replaces what ${c.who} saved.'),
+        actions: [
+          TextButton(key: const Key('plan_conflict_reload'), onPressed: () => Navigator.pop(context, false), child: const Text('Reload')),
+          TextButton(
+            key: const Key('plan_conflict_overwrite'),
+            onPressed: () => Navigator.pop(context, true),
+            style: TextButton.styleFrom(foregroundColor: Colors.red),
+            child: const Text('Save over it'),
+          ),
+        ],
+      ),
+    );
