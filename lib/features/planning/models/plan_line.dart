@@ -63,6 +63,8 @@ class PlanLine {
     this.outsideVehicleRefId = 0,
     this.outsidePlateNo = '',
     this.outsideDriverRefId = 0,
+    this.tripNo = 0,
+    this.tripSource = '',
   }) : uid = uid ?? ++_lastUid;
 
   static int _lastUid = 0;
@@ -199,6 +201,8 @@ class PlanLine {
       outsideVehicleRefId: Js.intOr0(Js.nn(item, ['OutsideVehicleRefId', 'outsideVehicleRefId'])),
       outsidePlateNo: s(['OutsidePlateNo', 'outsidePlateNo']),
       outsideDriverRefId: Js.intOr0(Js.nn(item, ['OutsideDriverRefId', 'outsideDriverRefId'])),
+      tripNo: Js.intOr0(Js.nn(item, ['TripNo', 'tripNo'])),
+      tripSource: s(['TripSource', 'tripSource']).trim().toUpperCase(),
     );
   }
 
@@ -283,6 +287,12 @@ class PlanLine {
 
   /// The outside driver picked from the list (0 = none). Mobile / IC stay in the sheet only.
   final int outsideDriverRefId;
+
+  /// Fleet F4: the truck's trip this row is on (1-20; 0 = none). Same number = same truckload ("COMBINE").
+  final int tripNo;
+
+  /// Fleet F4: how [tripNo] was set — TYPED, FILLED, AI, REMARKS, BACKFILL ('' = none). Kept for ML.
+  final String tripSource;
 
   /// "WA1229R · ALI", or '' when no outside carrier was picked (`carrierSummary`, web).
   String get carrierSummary {

@@ -1,6 +1,7 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:maleva/features/planning/bloc/plan_cubit_base.dart';
 import 'package:maleva/features/planning/bloc/plan_state.dart';
+import 'package:maleva/features/planning/data/plan_trips.dart';
 import 'package:maleva/features/planning/data/planning_rules.dart';
 import 'package:maleva/features/planning/data/sale_order_update.dart';
 import 'package:maleva/features/planning/models/fleet_options.dart';
@@ -49,8 +50,10 @@ mixin PlanRowOps on Cubit<PlanState>, PlanCubitBase {
   }
 
   /// The X on TRUCK: id 0 and every truck name cleared.
-  void clearTruck(Set<int> uids) => _edit(uids,
-      (r) => r.copyWith(truckRefid: 0, truckName: '', truckNameD: '', outsideVehicleRefId: 0, outsidePlateNo: '', outsideDriverRefId: 0));
+  void clearTruck(Set<int> uids) => _edit(uids, (r) => r.copyWith(
+      truckRefid: 0, truckName: '', truckNameD: '', outsideVehicleRefId: 0, outsidePlateNo: '', outsideDriverRefId: 0,
+      // fleet F4: a trip belongs to a truck
+      tripNo: 0, tripSource: ''));
 
   /// A driver from the picker (`handleDriverSelect`): only DRIVER changes. An OUTSIDE DRIVER
   /// entry carries the typed [outsideName] with that entry's id.
@@ -95,6 +98,19 @@ mixin PlanRowOps on Cubit<PlanState>, PlanCubitBase {
   void editRemarks(int uid, String value) => _edit({uid}, (r) => r.copyWith(remarks: value));
 
   void editSort(int uid, String value) => _edit({uid}, (r) => r.copyWith(sortByD: value));
+
+  /// Fleet F4: the planner typed a trip on [uid]; the blank rows under it on the same truck fill in (the web's rule).
+  void editTrip(int uid, String value) {
+    if (!guardWrite()) return;
+    final index = state.rows.indexWhere((r) => r.uid == uid);
+    if (index < 0) return;
+    final rows = PlanTrips.applyTripEdit(state.rows, index, value);
+    final changed = [
+      for (var i = 0; i < rows.length; i++)
+        if (rows[i].tripNo != state.rows[i].tripNo || rows[i].tripSource != state.rows[i].tripSource) rows[i],
+    ];
+    emit(markEdited(state.copyWith(rows: rows), changed));
+  }
 
   /// Sort (`sortPlanningRows`).
   void sort() {

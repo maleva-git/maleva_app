@@ -61,6 +61,8 @@ extension PlanLineCopy on PlanLine {
     int? outsideVehicleRefId,
     String? outsidePlateNo,
     int? outsideDriverRefId,
+    int? tripNo,
+    String? tripSource,
   }) =>
       PlanLine(
         uid: uid ?? this.uid,
@@ -121,5 +123,7 @@ extension PlanLineCopy on PlanLine {
         outsideVehicleRefId: outsideVehicleRefId ?? this.outsideVehicleRefId,
         outsidePlateNo: outsidePlateNo ?? this.outsidePlateNo,
         outsideDriverRefId: outsideDriverRefId ?? this.outsideDriverRefId,
+        tripNo: tripNo ?? this.tripNo,
+        tripSource: tripSource ?? this.tripSource,
       );
 }

@@ -52,6 +52,7 @@ class PlanCubit extends Cubit<PlanState> with PlanCubitBase, PlanRowOps, PlanRti
       trucks: lookups[1] as List<TruckOption>,
       drivers: lookups[2] as List<DriverOption>,
     ));
+    await _loadRegularDrivers();
     try {
       final employees = await repo.employees();
       if (isClosed) return;
@@ -288,12 +289,24 @@ class PlanCubit extends Cubit<PlanState> with PlanCubitBase, PlanRowOps, PlanRti
     await _loadNextNumber();
   }
 
+  /// Fleet F4: the trucks' regular drivers for the driver picker; any failure leaves the plain list.
+  Future<void> _loadRegularDrivers() async {
+    try {
+      final list = await repo.regularDrivers();
+      if (isClosed) return;
+      emit(state.copyWith(regularDrivers: {for (final r in list) r.truckRefId: r}));
+    } catch (_) {
+      // a suggestion only
+    }
+  }
+
   /// Refresh (the web reloads the page): the pickers and the plan again; edited rows are kept.
   Future<void> refresh() async {
     final lookups = await Future.wait<Object>([repo.ports(), repo.trucks(), repo.drivers()]);
     if (isClosed) return;
     emit(state.copyWith(
         ports: lookups[0] as List<String>, trucks: lookups[1] as List<TruckOption>, drivers: lookups[2] as List<DriverOption>, rtiKey: ''));
+    await _loadRegularDrivers();
     if (state.editId > 0) {
       await loadPlan(id: state.editId);
     } else {

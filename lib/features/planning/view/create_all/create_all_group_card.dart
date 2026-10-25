@@ -89,7 +89,7 @@ class CreateAllGroupCard extends StatelessWidget {
                     style: TextStyle(color: mc.muted)),
                 if (group.tripLabel.isNotEmpty)
                   Tooltip(
-                    message: 'The planner wrote this trip in the REMARKS column; each trip is its own RTI',
+                    message: 'This trip comes from the TRIP column (or REMARKS); each trip is its own RTI',
                     child: StatusPill(group.tripLabel, tone: StatusTone.info, showDot: false),
                   ),
                 StatusPill('${group.jobs.length} job${group.jobs.length == 1 ? '' : 's'}', tone: StatusTone.neutral, showDot: false),

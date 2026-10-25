@@ -9,6 +9,7 @@ import 'package:maleva/features/planning/widgets/assign_picker.dart';
 import 'package:maleva/features/planning/widgets/job_card.dart';
 import 'package:maleva/features/planning/widgets/plan_flows.dart';
 import 'package:maleva/features/planning/widgets/plan_menu.dart';
+import 'package:maleva/features/planning/widgets/trip_picker.dart';
 
 /// A board column (`planningColumns.tsx`): its header, width and how a cell reads.
 class BoardColumn {
@@ -20,6 +21,8 @@ class BoardColumn {
 }
 
 const boardColumns = <String, BoardColumn>{
+  // fleet F4: the truck's trip, right after the frozen TRUCK (the web: REMARKS · TRIP · TRUCK)
+  'trip': BoardColumn('trip', 'TRIP', 64),
   'driver': BoardColumn('driver', 'DRIVER', 170),
   'origin': BoardColumn('origin', 'ORIGIN', 130),
   'dest': BoardColumn('dest', 'DEST', 130),
@@ -44,8 +47,8 @@ const boardColumns = <String, BoardColumn>{
 
 /// Column presets: All · Assign · Route · Cargo · Timing.
 const boardPresets = <String, List<String>>{
-  'All': ['driver', 'origin', 'dest', 'pkg', 'customer', 'pdate', 'ddate', 'vessel', 'pic', 'leta', 'oeta', 'status', 'rti', 'sort', 'remarks'],
-  'Assign': ['driver', 'size', 'pdate', 'ddate', 'status', 'rti', 'remarks'],
+  'All': ['trip', 'driver', 'origin', 'dest', 'pkg', 'customer', 'pdate', 'ddate', 'vessel', 'pic', 'leta', 'oeta', 'status', 'rti', 'sort', 'remarks'],
+  'Assign': ['trip', 'driver', 'size', 'pdate', 'ddate', 'status', 'rti', 'remarks'],
   'Route': ['origin', 'dest', 'sPort', 'oPort', 'pdate', 'ddate'],
   'Cargo': ['customer', 'pkg', 'vessel', 'awb', 'bl'],
   'Timing': ['pdate', 'ddate', 'leta', 'oeta'],
@@ -260,6 +263,8 @@ class _BoardGridState extends State<BoardGrid> {
         height: _rowH,
         child: Padding(padding: const EdgeInsets.symmetric(horizontal: 8), child: Align(alignment: Alignment.centerLeft, child: child)));
     switch (c.key) {
+      case 'trip':
+        return SizedBox(width: c.width, height: _rowH, child: Center(child: TripPicker(row: r, canWrite: canWrite)));
       case 'driver':
         return _AssignCell(row: r, truck: false, state: s, width: c.width);
       case 'status':

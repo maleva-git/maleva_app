@@ -12,6 +12,7 @@ import 'package:maleva/features/planning/data/sale_order_update.dart';
 import 'package:maleva/features/planning/models/fleet_options.dart';
 import 'package:maleva/features/planning/models/plan_header.dart';
 import 'package:maleva/features/planning/models/plan_line.dart';
+import 'package:maleva/features/planning/models/regular_driver.dart';
 import 'package:maleva/features/planning/models/rti_batch.dart';
 
 /// What the plan screen reads and writes: the shared Java APIs the web's Planning page uses.
@@ -29,6 +30,9 @@ abstract interface class PlanningRepository {
   Future<List<String>> ports();
   Future<List<TruckOption>> trucks();
   Future<List<DriverOption>> drivers();
+
+  /// Fleet F4: each truck's regular drivers (`GET /api/planning/regular-drivers`); a failure is an empty list.
+  Future<List<RegularDriver>> regularDrivers();
   Future<List<PlanLine>> search(Map<String, dynamic> payload);
   Future<LoadedPlan?> load({int? id, int? planningNo});
 
@@ -130,6 +134,18 @@ class JavaPlanningRepository implements PlanningRepository {
   Future<List<DriverOption>> drivers() async {
     try {
       return DriverOption.listFrom(await _driverApi.allDetails(), companyId);
+    } on ApiFailure {
+      return const [];
+    }
+  }
+
+  @override
+  Future<List<RegularDriver>> regularDrivers() async {
+    try {
+      return [
+        for (final m in _rows(await _get('/api/planning/regular-drivers', {'companyId': companyId})))
+          RegularDriver.fromJava(m),
+      ].where((r) => r.truckRefId > 0).toList();
     } on ApiFailure {
       return const [];
     }

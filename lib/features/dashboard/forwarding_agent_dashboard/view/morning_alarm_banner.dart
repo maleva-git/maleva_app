@@ -8,7 +8,7 @@ import '../../../../core/utils/json_read.dart';
 
 /// Top of RTI Activities (backend change `rti-morning-briefing`, "Got it and follow-up"): when today's 06:00 alarm
 /// was sent to this agent and not answered, an orange card asks them to tap "Got it". Not tapped by 06:15, the
-/// alarm rings once more; by 06:30 Forwarding is told. After the tap a small green line shows the time.
+/// alarm rings once more; by 07:30 Forwarding is told. After the tap a small green line shows the time.
 /// Shows nothing when no alarm was sent today (or the follow-up switch is off), or when it cannot be read.
 class MorningAlarmBanner extends StatefulWidget {
   const MorningAlarmBanner({super.key, this.api});

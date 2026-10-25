@@ -30,6 +30,7 @@ MockPlanningRepository stubbedRepo({Set<String> actions = const {'VIEW', 'CREATE
   when(() => repo.employeeId).thenReturn(15);
   when(() => repo.access()).thenAnswer((_) async => actions);
   when(() => repo.ports()).thenAnswer((_) async => ['PKG', 'WPK']);
+  when(() => repo.regularDrivers()).thenAnswer((_) async => const []);
   when(() => repo.trucks()).thenAnswer((_) async => const [TruckOption(id: 64, name: 'WA 1234'), TruckOption(id: 13, name: 'WB 8020')]);
   when(() => repo.drivers()).thenAnswer((_) async => const [DriverOption(id: 85, name: 'ALI-0123'), DriverOption(id: 36, name: 'OUTSIDE DRIVER')]);
   when(() => repo.employees()).thenAnswer((_) async => const [EmployeeOption(12, 'SITI')]);

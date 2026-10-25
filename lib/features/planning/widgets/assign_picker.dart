@@ -4,6 +4,7 @@ import 'package:maleva/core/widgets/ui/ui.dart';
 import 'package:maleva/features/planning/bloc/plan_cubit.dart';
 import 'package:maleva/features/planning/models/fleet_options.dart';
 import 'package:maleva/features/planning/models/plan_line.dart';
+import 'package:maleva/features/planning/models/regular_driver.dart';
 import 'package:maleva/features/planning/widgets/outside_carrier_sheet.dart';
 
 /// The truck and driver pickers of a plan row (the web's `TruckSelectModal` / `DriverSelectModal`):
@@ -93,11 +94,22 @@ abstract final class AssignPicker {
     }
     final single = rows.length == 1 ? rows.first : null;
     final current = single == null || single.driverRefid == 0 ? null : single.driverRefid;
+    // Fleet F4: the row's truck's regular drivers first, with why ("regular · assigned · last RTI"); the rest unchanged
+    final trucks = {for (final r in rows) r.truckRefid}..remove(0);
+    final notes = trucks.length == 1 ? (cubit.state.regularDrivers[trucks.first]?.notes ?? const <int, String>{}) : const <int, String>{};
     final options = [
-      for (final d in cubit.state.drivers)
+      for (final d in RegularDriver.regularFirst(cubit.state.drivers, (DriverOption x) => x.id, notes))
         () {
           final e = d.expiry();
-          return PickOption<int>(value: d.id, label: d.name, subtitle: _subtitle(e), severity: severityOf(e.severity));
+          final regular = notes[d.id];
+          final expiry = _subtitle(e);
+          final parts = [if (regular != null) 'regular · $regular', if (expiry != null) expiry];
+          return PickOption<int>(
+            value: d.id,
+            label: d.name,
+            subtitle: parts.isEmpty ? null : parts.join('\n'),
+            severity: severityOf(e.severity),
+          );
         }(),
     ];
     if (!context.mounted) return;

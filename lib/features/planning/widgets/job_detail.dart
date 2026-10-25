@@ -3,11 +3,13 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:maleva/core/widgets/ui/ui.dart';
 import 'package:maleva/features/planning/bloc/plan_cubit.dart';
 import 'package:maleva/features/planning/bloc/plan_state.dart';
+import 'package:maleva/features/planning/data/plan_trips.dart';
 import 'package:maleva/features/planning/data/planning_rules.dart';
 import 'package:maleva/features/planning/models/plan_line.dart';
 import 'package:maleva/features/planning/widgets/assign_picker.dart';
 import 'package:maleva/features/planning/widgets/job_card.dart';
 import 'package:maleva/features/planning/widgets/plan_flows.dart';
+import 'package:maleva/features/planning/widgets/trip_picker.dart';
 
 /// A job's six sections (Header, Assignment, Route, Timing, Cargo & vessel, Notes): the phone's
 /// full-screen job and the tablet's detail pane. A long press on a value copies it.
@@ -118,6 +120,16 @@ class JobDetailSections extends StatelessWidget {
               decoration: const InputDecoration(labelText: 'Remarks'),
               onChanged: (v) => context.read<PlanCubit>().editRemarks(row.uid, v),
             ),
+            // fleet F4: the trip beside Remarks (the web: REMARKS · TRIP)
+            if (row.truckRefid > 0)
+              Padding(
+                padding: const EdgeInsets.only(top: 6),
+                child: Row(children: [
+                  Text('Trip', style: Theme.of(context).textTheme.labelLarge),
+                  const SizedBox(width: 8),
+                  TripPicker(row: row, canWrite: true),
+                ]),
+              ),
             const SizedBox(height: 10),
             TextFormField(
               key: ValueKey('sort-${row.uid}'),
@@ -128,6 +140,7 @@ class JobDetailSections extends StatelessWidget {
             ),
           ] else ...[
             _Copyable('Remarks', row.remarks),
+            if (PlanTrips.cell(row).value > 0) _Copyable('Trip', PlanTrips.cell(row).label),
             _Copyable('Sort', row.sortByD),
           ],
           _Copyable('PIC', row.picName),

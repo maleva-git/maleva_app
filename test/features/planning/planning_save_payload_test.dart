@@ -70,6 +70,9 @@ void main() {
           'pickupQuantitylist': '2{@}2',
           'deliveryQuantitylist': '4',
           'delivertimelist': '',
+          // fleet F4: always sent; no trip on the row
+          'tripNo': null,
+          'tripSource': 'NONE',
         }
       ],
     });

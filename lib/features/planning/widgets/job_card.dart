@@ -3,6 +3,7 @@ import 'package:maleva/core/widgets/ui/ui.dart';
 import 'package:maleva/features/planning/bloc/plan_state.dart';
 import 'package:maleva/features/planning/models/fleet_options.dart';
 import 'package:maleva/features/planning/models/plan_line.dart';
+import 'package:maleva/features/planning/widgets/trip_picker.dart';
 
 /// The truck's and driver's expiry / leave state for a row (`TruckSelectCell` / `DriverSelectCell`).
 ExpirySeverity truckSeverityOf(PlanState s, PlanLine r) {
@@ -140,6 +141,8 @@ class JobCard extends StatelessWidget {
           compact: compact,
           semantic: 'Truck',
         ),
+        // fleet F4: the truck's trip (tap: 1 … 12 / no trip; the rows under it on the truck fill in)
+        if (row.truckRefid > 0) TripPicker(row: row, canWrite: state.access.canWrite && !selecting, compact: true),
         AssignChip(
           icon: Icons.person_outline,
           value: row.driverLabel,

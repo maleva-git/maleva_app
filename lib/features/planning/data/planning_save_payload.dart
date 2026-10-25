@@ -1,4 +1,5 @@
 import 'package:maleva/features/planning/data/js_values.dart';
+import 'package:maleva/features/planning/data/plan_trips.dart';
 import 'package:maleva/features/planning/models/plan_header.dart';
 import 'package:maleva/features/planning/models/plan_line.dart';
 
@@ -91,6 +92,8 @@ abstract final class PlanningSavePayload {
       'deliveryQuantitylist': row.deliveryQuantitylist.trim(),
       'delivertimelist': row.delivertimelist.trim(),
       ...carrier(row),
+      // Fleet F4: always sent, so the server knows the app keeps trips ("NONE" = no trip on the row)
+      ...PlanTrips.forSave(row),
     };
   }
 

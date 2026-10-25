@@ -3,6 +3,7 @@ import 'package:maleva/features/planning/models/fleet_options.dart';
 import 'package:maleva/features/planning/models/plan_header.dart';
 import 'package:maleva/features/planning/models/plan_line.dart';
 import 'package:maleva/features/planning/models/planning_access.dart';
+import 'package:maleva/features/planning/models/regular_driver.dart';
 
 enum PlanPhase { loading, ready, employeesFailed }
 
@@ -48,6 +49,7 @@ class PlanState {
     this.ports = const [],
     this.trucks = const [],
     this.drivers = const [],
+    this.regularDrivers = const {},
     this.searching = false,
     this.saving = false,
     this.deleting = false,
@@ -86,6 +88,9 @@ class PlanState {
   final List<String> ports;
   final List<TruckOption> trucks;
   final List<DriverOption> drivers;
+
+  /// Fleet F4: truck id → its regular drivers (the driver picker puts them first).
+  final Map<int, RegularDriver> regularDrivers;
   final bool searching;
   final bool saving;
   final bool deleting;
@@ -164,6 +169,7 @@ class PlanState {
     List<String>? ports,
     List<TruckOption>? trucks,
     List<DriverOption>? drivers,
+    Map<int, RegularDriver>? regularDrivers,
     bool? searching,
     bool? saving,
     bool? deleting,
@@ -194,6 +200,7 @@ class PlanState {
         ports: ports ?? this.ports,
         trucks: trucks ?? this.trucks,
         drivers: drivers ?? this.drivers,
+        regularDrivers: regularDrivers ?? this.regularDrivers,
         searching: searching ?? this.searching,
         saving: saving ?? this.saving,
         deleting: deleting ?? this.deleting,

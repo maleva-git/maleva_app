@@ -30,6 +30,16 @@ const kGradient = LinearGradient(
   end: Alignment.bottomRight,
 );
 
+/// The card's "Loading Vessel": the loading vessel's name with its type after it ("MSC ANNA (CONTAINER)"), as the
+/// web's "Load Vessel" and "L Vessel Type" columns; only the type when no name is set.
+String loadingVesselText(VesselPlanningWebModel data) {
+  final name = data.loadingvesselname.trim();
+  final type = data.vessel.trim();
+  if (name.isEmpty) return type;
+  if (type.isEmpty || type.toUpperCase() == name.toUpperCase()) return name;
+  return '$name ($type)';
+}
+
 class VesselPlanningWebTab extends StatelessWidget {
   final bool pageView;
   final bool pageAdd;
@@ -215,6 +225,8 @@ class _VesselPlanningWebViewState extends State<VesselPlanningWebView> {
           d.customerName.toLowerCase().contains(q) ||
           d.sPort.toLowerCase().contains(q) ||
           d.vessel.toLowerCase().contains(q) ||
+          d.loadingvesselname.toLowerCase().contains(q) ||
+          d.offvesselname.toLowerCase().contains(q) ||
           d.jobStatus.toLowerCase().contains(q);
     }).toList();
   }
@@ -1092,9 +1104,11 @@ class _JobCard extends StatelessWidget {
                     'Port',
                     data.sPort.isNotEmpty ? data.sPort : data.oPort,
                   ),
-                  if (data.vessel.isNotEmpty)
+                  // the loading vessel's name (Java `Loadingvesselname`, the web's "Load Vessel");
+                  // `Vessel` is only its type (CONTAINER, ...), the web's "L Vessel Type"
+                  if (data.loadingvesselname.isNotEmpty || data.vessel.isNotEmpty)
                     _CardRow(Icons.directions_boat_outlined, 'Loading Vessel',
-                        data.vessel),
+                        loadingVesselText(data)),
                   if (data.offvesselname.isNotEmpty)
                     _CardRow(Icons.directions_boat_outlined, 'Off Vessel',
                         data.offvesselname),

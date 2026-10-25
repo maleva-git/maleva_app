@@ -157,6 +157,25 @@ void main() {
         verify: (c) => expect(c.state.rows.map((r) => r.remarks), ['mine', 'server']));
   });
 
+  group('trip (fleet F4)', () {
+    blocTest<PlanCubit, PlanState>('a typed trip fills the rows under it on the same truck; clearing the truck clears it',
+        build: build,
+        seed: () => seeded(rows: [
+              PlanLine(saleOrderMasterRefId: 1, truckRefid: 13),
+              PlanLine(saleOrderMasterRefId: 2, truckRefid: 13),
+              PlanLine(saleOrderMasterRefId: 3, truckRefid: 7),
+            ]),
+        act: (c) {
+          c.editTrip(c.state.rows.first.uid, '2');
+          c.clearTruck({c.state.rows[1].uid});
+        },
+        verify: (c) {
+          expect(c.state.rows.map((r) => r.tripNo), [2, 0, 0]);
+          expect(c.state.rows.first.tripSource, 'TYPED');
+          expect(c.state.dirtyJobIds, containsAll([1, 2]));
+        });
+  });
+
   group('save', () {
     blocTest<PlanCubit, PlanState>('no valid row: the web refusal, nothing sent',
         build: build,
