@@ -88,7 +88,7 @@
 		97C147021CF9000F007C117D /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		9C1478B696EA33B701F2C561 /* Pods-ImageNotification.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ImageNotification.debug.xcconfig"; path = "Target Support Files/Pods-ImageNotification/Pods-ImageNotification.debug.xcconfig"; sourceTree = "<group>"; };
 		A25D5CE22DA39A500029F0BC /* GoogleService-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
-		B7A11A0E2EF0000100A1B2C3 /* rti_alarm.caf */ = {isa = PBXFileReference; lastKnownFileType = file; path = rti_alarm.caf; sourceTree = "<group>"; };
+		B7A11A0E2EF0000100A1B2C3 /* rti_alarm.caf */ = {isa = PBXFileReference; lastKnownFileType = file; name = rti_alarm.caf; path = Runner/rti_alarm.caf; sourceTree = "<group>"; };
 		A25D5CE42DA3A1440029F0BC /* Runner.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; name = Runner.entitlements; path = Runner/Runner.entitlements; sourceTree = "<group>"; };
 		A2B4F7402D81BE61009778DE /* ImageNotification.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = ImageNotification.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		A2B4F7542D81C098009778DE /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
