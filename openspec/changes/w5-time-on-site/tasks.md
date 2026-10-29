@@ -1,0 +1,4 @@
+- [x] 1 RtiApi methods + SiteVisit model
+- [x] 2 RtiStopTimes card on the RTI preview
+- [x] 3 `test/features/rti/rti_stop_times_test.dart` (2); flutter analyze clean on the changed files
+- [ ] 4 Owner: device test after w5-01 + deploy

@@ -1,0 +1,3 @@
+- [x] 1 features/today_trips (model + tab), RtiApi.trips, Today first in the driver dashboard
+- [x] 2 Tests test/features/today_trips/driver_trip_test.dart (5, incl. grouping / totals); app tests 246 pass; dart analyze clean
+- [ ] 3 Owner: device test as a driver (Today / Tomorrow, Call, Map, Photos / status, RTI PDF, push after an office change)

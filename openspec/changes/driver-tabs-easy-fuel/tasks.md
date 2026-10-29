@@ -1,0 +1,4 @@
+- [x] 1 DriverFuelTab + short form (driver_fuel_tab.dart)
+- [x] 2 Driver dashboard: 5 tabs, Fuel first; Transport / Summons / PDO removed with their providers
+- [x] 3 Tests `test/features/dashboard/driver_fuel_tab_test.dart` (3); dart analyze clean on the changed files
+- [ ] 4 Owner: device test (driver sign-in → Fuel tab → ADD FUEL → saved, shows in the list; the office Fuel Entry screen shows it)

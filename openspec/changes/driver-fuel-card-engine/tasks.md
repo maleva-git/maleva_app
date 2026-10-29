@@ -1,0 +1,4 @@
+- [x] 1 Model + API
+- [x] 2 Driver form chips
+- [x] 3 Test (4); analyze clean
+- [ ] 4 Owner: device test after fl-01 + deploy
