@@ -50,6 +50,16 @@ class FuelEntryApi {
   Future<Map<String, dynamic>> save(Map<String, dynamic> entry) async => JsonRead.map(await _send(() =>
       _dio.post<dynamic>('/api/fuel-entries', data: {...entry, 'companyRefId': companyId})));
 
+  /// The fuel cards for the card choice, most used first (`/api/fuel-entries/cards`). Empty when none or on error.
+  Future<List<String>> cards() async {
+    try {
+      final data = await _send(() => _dio.get<dynamic>('/api/fuel-entries/cards', queryParameters: {'companyRefId': companyId}));
+      return data is List ? data.map((e) => '$e').where((e) => e.isNotEmpty).toList() : const [];
+    } catch (_) {
+      return const [];
+    }
+  }
+
   /// The company vehicles the signed-in employee may enter fuel for
   /// (`/api/fuel-vehicles/mine`, employee tokens only). Empty when none.
   Future<List<FuelVehicle>> myVehicles() async {

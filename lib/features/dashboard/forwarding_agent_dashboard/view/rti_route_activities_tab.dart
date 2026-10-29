@@ -5,6 +5,8 @@ import '../bloc/rti_activities/rti_activities_bloc.dart';
 import '../bloc/rti_activities/rti_activities_event.dart';
 import '../bloc/rti_activities/rti_activities_state.dart';
 import 'morning_alarm_banner.dart';
+import 'release_no_sheet.dart';
+import '../../../../core/rti/rti_api.dart';
 import '../../../../core/colors/colors.dart';
 
 class RtiRouteActivitiesTab extends StatefulWidget {
@@ -382,6 +384,18 @@ class _RtiRouteActivitiesTabState extends State<RtiRouteActivitiesTab> {
                                   _buildInfoRow(Icons.map_rounded, "Full Route", activity.fullRoute.isNotEmpty ? activity.fullRoute : 'N/A', borderColor),
                                   const SizedBox(height: 10),
                                   _buildInfoRow(Icons.access_time_filled_rounded, "ETA", formattedEta, borderColor),
+                                  // C3: the agent gives each job's release no here (no separate FW Update search)
+                                  if (isForwardingStop(activity.activityType))
+                                    Padding(
+                                      padding: const EdgeInsets.only(top: 12),
+                                      child: OutlinedButton.icon(
+                                        onPressed: () => showReleaseNoSheet(context,
+                                            stopId: activity.id,
+                                            title: activity.rtiNumber.isNotEmpty ? activity.rtiNumber : activity.locationName),
+                                        icon: const Icon(Icons.confirmation_number_outlined, size: 18),
+                                        label: const Text('Release no'),
+                                      ),
+                                    ),
                                   
                                   
                                   if (activity.marqisStatus == 1)

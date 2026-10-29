@@ -30,6 +30,16 @@ class FuelEntryModel {
   
   int comid;
 
+  /// The fuel card used (null = not sent, kept on the server; '' = no card). db/fleet/fl-01.
+  String? cardCode;
+
+  /// Engine on while filling (null = not sent, kept on the server).
+  bool? engineOn;
+
+  /// The receipt photo(s) on the server (`/Upload/...`, comma separated); '' = none. Read only: never sent, the
+  /// server keeps it on an edit and the upload writes it.
+  String filePath;
+
   FuelEntryModel({
     this.id = 0,
     this.entryNo = '',
@@ -51,6 +61,9 @@ class FuelEntryModel {
     this.dgLiter = 0.0,
     this.dgAmount = 0.0,
     this.comid = 0,
+    this.cardCode,
+    this.engineOn,
+    this.filePath = '',
   });
 
   /// A row of the shared Java fuel list (`/api/fuel-entries`), with the web's
@@ -84,6 +97,9 @@ class FuelEntryModel {
       dgLiter: n('diffLiter'),
       dgAmount: n('diffAmount'),
       comid: JsonRead.integer(f('companyRefId')),
+      cardCode: f('cardCode') as String?,
+      engineOn: f('engineOn') as bool?,
+      filePath: (f('filePath') ?? '').toString(),
     );
   }
 
@@ -104,6 +120,8 @@ class FuelEntryModel {
       'pRate': pRate,
       'remarks': remarks,
       'fStatus': 0,
+      if (cardCode != null) 'cardCode': cardCode,
+      if (engineOn != null) 'engineOn': engineOn,
     };
   }
 

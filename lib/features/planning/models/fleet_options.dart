@@ -62,18 +62,18 @@ const _truckFields = [
   ('rotexSGExp1', 'Rotex SG 1', 10),
   ('puspacomExp', 'Puspakom', 10),
   ('puspacomExp1', 'Puspakom 1', 10),
-  ('serviceExp', 'Service', 5),
-  ('alignmentExp', 'Alignment', 5),
-  ('greeceExp', 'Greece', 5),
-  ('gearOilExp', 'Gear Oil', 5),
-  ('ptpStickerExp', 'PTP Sticker', 5),
+  ('serviceExp', 'Service', 10),
+  ('alignmentExp', 'Alignment', 10),
+  ('greeceExp', 'Greece', 10),
+  ('gearOilExp', 'Gear Oil', 10),
+  ('ptpStickerExp', 'PTP Sticker', 10),
 ];
 
-/// `getTruckExpiryState`: red at 3 days or fewer.
+/// `getTruckExpiryState`: warning from 10 days, red at 5 or fewer (fleet F2, every paper).
 ExpiryState truckExpiryState(Map<String, dynamic> truck, {DateTime? today}) {
   final now = today ?? DateTime.now();
   final warnings = [
-    for (final f in _truckFields) _warn(truck, f.$1, f.$2, f.$3, 3, now),
+    for (final f in _truckFields) _warn(truck, f.$1, f.$2, f.$3, 5, now),
   ].whereType<ExpiryWarning>().toList();
   final severity = warnings.any((w) => w.severity == ExpirySeverity.critical)
       ? ExpirySeverity.critical
@@ -85,7 +85,7 @@ ExpiryState truckExpiryState(Map<String, dynamic> truck, {DateTime? today}) {
 
 const _driverFields = [('licenseExp', 'License'), ('LicenseExp', 'License'), ('gdlExp', 'GDL'), ('GdlExp', 'GDL')];
 
-/// `getDriverExpiryState`: licence and GDL (7 days, red at 3), then every pending / approved leave.
+/// `getDriverExpiryState`: licence and GDL (10 days, red at 5), then every pending / approved leave.
 ExpiryState driverExpiryState(Map<String, dynamic> driver, {DateTime? today}) {
   final now = today ?? DateTime.now();
   final seen = <String>{};
@@ -94,7 +94,7 @@ ExpiryState driverExpiryState(Map<String, dynamic> driver, {DateTime? today}) {
     if (seen.contains(f.$2)) continue;
     if (_expiryDate(driver[f.$1]) == null) continue;
     seen.add(f.$2);
-    final w = _warn(driver, f.$1, f.$2, 7, 3, now);
+    final w = _warn(driver, f.$1, f.$2, 10, 5, now);
     if (w != null) warnings.add(w);
   }
   for (final note in driverLeaveNotes(driver['leaves'], now: now)) {

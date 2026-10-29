@@ -181,18 +181,19 @@ void main() {
   group('expiry and leave colours (truckExpiryWarnings.ts, driverExpiryWarnings.ts)', () {
     final today = DateTime(2026, 10, 5);
 
-    test('truck: warning from 10 days (Rotex, Puspakom) or 5 days, red at 3 or fewer', () {
+    test('truck: warning from 10 days for every paper, red at 5 or fewer (fleet F2)', () {
       expect(truckExpiryState({'rotexMyExp': '2026-10-15'}, today: today).severity, ExpirySeverity.warning);
       expect(truckExpiryState({'rotexMyExp': '2026-10-16'}, today: today).severity, ExpirySeverity.normal);
-      expect(truckExpiryState({'serviceExp': '2026-10-11'}, today: today).severity, ExpirySeverity.normal);
-      expect(truckExpiryState({'serviceExp': '2026-10-10'}, today: today).severity, ExpirySeverity.warning);
+      expect(truckExpiryState({'serviceExp': '2026-10-16'}, today: today).severity, ExpirySeverity.normal);
+      expect(truckExpiryState({'serviceExp': '2026-10-15'}, today: today).severity, ExpirySeverity.warning);
+      expect(truckExpiryState({'serviceExp': '2026-10-10'}, today: today).severity, ExpirySeverity.critical);
       final c = truckExpiryState({'puspacomExp': '2026-10-08', 'gearOilExp': '2026-10-01'}, today: today);
       expect(c.severity, ExpirySeverity.critical);
       expect(c.warnings.map((w) => w.message), ['Puspakom expires in 3 days (08/10/2026)', 'Gear Oil expired 4 days ago (01/10/2026)']);
       expect(truckExpiryState({'alignmentExp': '2026-10-05'}, today: today).warnings.single.message, 'Alignment expires today (05/10/2026)');
     });
 
-    test('driver: licence and GDL at 7 days; approved leave is purple, pending indigo; critical wins', () {
+    test('driver: licence and GDL at 10 days, red at 5; approved leave is purple, pending indigo; critical wins', () {
       expect(driverExpiryState({'licenseExp': '2026-10-12'}, today: today).severity, ExpirySeverity.warning);
       expect(driverExpiryState({'gdlExp': '2026-10-07'}, today: today).severity, ExpirySeverity.critical);
       final leave = driverExpiryState({

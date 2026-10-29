@@ -27,18 +27,18 @@ class FleetWarning {
 }
 
 /// The picker colours of the trucks and drivers (`FE/utils/truckExpiryWarnings.ts`,
-/// `FE/utils/driverExpiryWarnings.ts`): truck red at 3 days or fewer, warning from 10 days
-/// (Rotex, Puspakom) or 5 days (the rest); driver licence / GDL warning at 7, red at 3; a
+/// `FE/utils/driverExpiryWarnings.ts`): truck and driver papers warning from 10 days, red at 5 or
+/// fewer (fleet F2, owner 2026-10-21: one rule for every paper, as the daily bell and dashboards); a
 /// pending or approved leave.
 abstract final class FleetExpiry {
   static const _truckFields = [
     ('rotexMyExp', 'Rotex MY', 10), ('rotexSGExp', 'Rotex SG', 10), ('rotexMyExp1', 'Rotex MY 1', 10),
     ('rotexSGExp1', 'Rotex SG 1', 10), ('puspacomExp', 'Puspakom', 10), ('puspacomExp1', 'Puspakom 1', 10),
-    ('serviceExp', 'Service', 5), ('alignmentExp', 'Alignment', 5), ('greeceExp', 'Greece', 5),
-    ('gearOilExp', 'Gear Oil', 5), ('ptpStickerExp', 'PTP Sticker', 5),
+    ('serviceExp', 'Service', 10), ('alignmentExp', 'Alignment', 10), ('greeceExp', 'Greece', 10),
+    ('gearOilExp', 'Gear Oil', 10), ('ptpStickerExp', 'PTP Sticker', 10),
   ];
 
-  static const _driverFields = [('licenseExp', 'License', 7, 3), ('gdlExp', 'GDL', 7, 3)];
+  static const _driverFields = [('licenseExp', 'License', 10, 5), ('gdlExp', 'GDL', 10, 5)];
 
   static DateTime _day(DateTime d) => DateTime(d.year, d.month, d.day);
 
@@ -61,7 +61,7 @@ abstract final class FleetExpiry {
     final today = _day(now ?? DateTime.now());
     return [
       for (final (key, label, warn) in _truckFields)
-        if (_warning(JsonRead.field(t, key), label, warn, 3, today) case final w?) w,
+        if (_warning(JsonRead.field(t, key), label, warn, 5, today) case final w?) w,
     ];
   }
 

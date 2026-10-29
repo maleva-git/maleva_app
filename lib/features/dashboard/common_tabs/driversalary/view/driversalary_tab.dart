@@ -1,19 +1,14 @@
 import 'package:maleva/core/theme/app_typography.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:intl/intl.dart';
 import '../../../../../core/di/injection.dart';
 import '../../../../../core/theme/palette.dart';
+import 'package:maleva/core/ui/premium.dart';
 import '../bloc/driversalary_bloc.dart';
 import '../bloc/driversalary_event.dart';
 import '../bloc/driversalary_state.dart';
 
-const kGradient = LinearGradient(
-  colors: [Palette.blue700, Palette.blue400],
-  begin: Alignment.topLeft,
-  end: Alignment.bottomRight,
-);
 
 const double kTabletBreak = 600;
 
@@ -39,9 +34,7 @@ class _DriverSalaryView extends StatelessWidget {
     return BlocBuilder<DriverSalaryBloc, DriverSalaryState>(
       builder: (context, state) {
         if (state is DriverSalaryInitial || state is DriverSalaryLoading) {
-          return Center(
-            child: SpinKitFoldingCube(color: Palette.blue400, size: 35),
-          );
+          return const ColoredBox(color: Px.page, child: Center(child: CircularProgressIndicator(color: Px.brand)));
         }
         if (state is DriverSalaryLoaded) {
           return LayoutBuilder(
@@ -133,13 +126,13 @@ class _SalaryDetailsDialogContentState extends State<_SalaryDetailsDialogContent
     final item = widget.item;
 
     return Dialog(
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
       insetPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
       child: Container(
         constraints: BoxConstraints(maxHeight: MediaQuery.of(context).size.height * 0.85),
         padding: const EdgeInsets.all(20),
         decoration: BoxDecoration(
-            color: Colors.white, borderRadius: BorderRadius.circular(16)),
+            color: Colors.white, borderRadius: BorderRadius.circular(24)),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -148,7 +141,7 @@ class _SalaryDetailsDialogContentState extends State<_SalaryDetailsDialogContent
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
               decoration: BoxDecoration(
-                  gradient: kGradient, borderRadius: BorderRadius.circular(10)),
+                  gradient: Px.gradient, borderRadius: BorderRadius.circular(14)),
               child: Row(
                 children: [
                   const Icon(Icons.receipt_long_outlined,
@@ -219,7 +212,7 @@ class _SalaryDetailsDialogContentState extends State<_SalaryDetailsDialogContent
                       child: Container(
                         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                         decoration: BoxDecoration(
-                          color: Palette.blue700,
+                          color: Px.brand,
                           borderRadius: BorderRadius.circular(20),
                           boxShadow: [
                             BoxShadow(
@@ -249,8 +242,7 @@ class _SalaryDetailsDialogContentState extends State<_SalaryDetailsDialogContent
               alignment: Alignment.centerRight,
               child: TextButton(
                 onPressed: () => Navigator.pop(context),
-                child: Text('Close',
-                    style: AppTypography.heading2(color: Palette.blue700)),
+                child: Text('Close', style: Px.t(15, weight: FontWeight.w700, color: Px.brand)),
               ),
             ),
           ],
@@ -274,16 +266,12 @@ class _DetailRow extends StatelessWidget {
         children: [
           Expanded(
             flex: 2,
-            child: Text(label,
-                style: AppTypography.bodyLarge(
-                    color: Palette.textMid, fontWeight: FontWeight.w600)),
+            child: Text(label, style: Px.t(14, color: Px.sub)),
           ),
           const SizedBox(width: 8),
           Expanded(
             flex: 3,
-            child: Text(value,
-                style: AppTypography.bodyLarge(
-                    color: Palette.textDark2, fontWeight: FontWeight.w700)),
+            child: Text(value, style: Px.t(14, weight: FontWeight.w700)),
           ),
         ],
       ),
@@ -291,7 +279,7 @@ class _DetailRow extends StatelessWidget {
   }
 }
 
-// ─── Body ─────────────────────────────────────────────────────────────────────
+// ─── Body (premium look, owner 2026-10-29) ──────────────────────────────────────
 class _DriverSalaryBody extends StatelessWidget {
   final DriverSalaryLoaded state;
   final bool isTablet;
@@ -300,56 +288,37 @@ class _DriverSalaryBody extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding:
-          EdgeInsets.fromLTRB(isTablet ? 20 : 10, 15, isTablet ? 20 : 10, 0),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
+    String fmt(String d) {
+      try {
+        return DateFormat('dd MMM').format(DateTime.parse(d));
+      } catch (_) {
+        return d;
+      }
+    }
+
+    final side = isTablet ? 24.0 : 14.0;
+    return ColoredBox(
+      color: Px.page,
+      child: ListView(
+        padding: EdgeInsets.fromLTRB(side, 12, side, 28),
         children: [
-          const SizedBox(height: 7),
-
-          // ── Salary title + amount ───────────────────
-          _SalaryTitleRow(amount: state.salaryAmount, isTablet: isTablet),
-          const SizedBox(height: 10),
-
-          // ── Date filter row ─────────────────────────
-          _DateFilterRow(state: state, isTablet: isTablet),
-          const SizedBox(height: 10),
-
-          // ── Grid header ─────────────────────────────
-          _GridHeader(isTablet: isTablet),
-          const SizedBox(height: 6),
-
-          // ── List / Grid ─────────────────────────────
-          Expanded(
-            child: state.salaryList.isEmpty
-                ? _EmptyState(isTablet: isTablet)
-                : isTablet
-                    ? _TabletGrid(state: state)
-                    : _MobileList(state: state),
+          PHero(
+            label: 'Salary for these dates',
+            value: 'RM ${NumberFormat('#,##0.00').format(state.salaryAmount)}',
+            footnote: '${fmt(state.fromDate)} – ${fmt(state.toDate)}  ·  ${state.salaryList.length} trip(s)',
+            icon: Icons.account_balance_wallet_rounded,
           ),
+          const SizedBox(height: 12),
+          _DateFilterRow(state: state, isTablet: isTablet),
+          const PSection('Trips', subtitle: 'Tap a trip to see how it is paid'),
+          if (state.salaryList.isEmpty)
+            const PCard(
+              child: PEmpty(icon: Icons.payments_rounded, title: 'No salary records', subtitle: 'Choose other dates to see your trips'),
+            )
+          else
+            for (final item in state.salaryList) _SalaryCard(item: item),
         ],
       ),
-    );
-  }
-}
-
-// ─── Salary Title Row ─────────────────────────────────────────────────────────
-class _SalaryTitleRow extends StatelessWidget {
-  final double amount;
-  final bool isTablet;
-  const _SalaryTitleRow({required this.amount, required this.isTablet});
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        Text('SALARY', style: AppTypography.heading1(color: Palette.redAccent)),
-        const SizedBox(width: 6),
-        Text('- ${amount.toStringAsFixed(2)}',
-            style: AppTypography.heading1(color: Palette.greenSuccess)),
-      ],
     );
   }
 }
@@ -358,6 +327,7 @@ class _SalaryTitleRow extends StatelessWidget {
 class _DateFilterRow extends StatelessWidget {
   final DriverSalaryLoaded state;
   final bool isTablet;
+
   const _DateFilterRow({required this.state, required this.isTablet});
 
   Future<void> _pick(BuildContext context, bool isFrom) async {
@@ -369,10 +339,10 @@ class _DateFilterRow extends StatelessWidget {
       builder: (ctx, child) => Theme(
         data: Theme.of(ctx).copyWith(
           colorScheme: const ColorScheme.light(
-            primary: Palette.blue700,
+            primary: Px.brand,
             onPrimary: Colors.white,
             surface: Colors.white,
-            onSurface: Palette.textDark2,
+            onSurface: Px.ink,
           ),
         ),
         child: child!,
@@ -380,11 +350,10 @@ class _DateFilterRow extends StatelessWidget {
     );
     if (picked == null) return;
     final f = DateFormat('yyyy-MM-dd').format(picked);
+    if (!context.mounted) return;
     if (isFrom) {
-      if (!context.mounted) return;
       context.read<DriverSalaryBloc>().add(DriverSalaryFromDateChanged(f));
     } else {
-      if (!context.mounted) return;
       context.read<DriverSalaryBloc>().add(DriverSalaryToDateChanged(f));
     }
   }
@@ -393,291 +362,58 @@ class _DateFilterRow extends StatelessWidget {
   Widget build(BuildContext context) {
     String fmt(String d) {
       try {
-        return DateFormat('dd-MM-yy').format(DateTime.parse(d));
+        return DateFormat('dd MMM yyyy').format(DateTime.parse(d));
       } catch (_) {
         return d;
       }
     }
 
-    return Row(
-      children: [
-        Expanded(
-          child: _DateTile(
-            label: 'From',
-            display: fmt(state.fromDate),
-            onTap: () => _pick(context, true),
-            isTablet: isTablet,
-          ),
-        ),
-        const SizedBox(width: 10),
-        Expanded(
-          child: _DateTile(
-            label: 'To',
-            display: fmt(state.toDate),
-            onTap: () => _pick(context, false),
-            isTablet: isTablet,
-          ),
-        ),
-      ],
-    );
+    return Row(children: [
+      Expanded(
+        child: PPill(caption: 'FROM', label: fmt(state.fromDate), icon: Icons.calendar_month_rounded, onTap: () => _pick(context, true)),
+      ),
+      const SizedBox(width: 10),
+      Expanded(
+        child: PPill(caption: 'TO', label: fmt(state.toDate), icon: Icons.calendar_month_rounded, onTap: () => _pick(context, false)),
+      ),
+    ]);
   }
 }
 
-class _DateTile extends StatelessWidget {
-  final String label;
-  final String display;
-  final bool isTablet;
-  final VoidCallback onTap;
-
-  const _DateTile({
-    required this.label,
-    required this.display,
-    required this.isTablet,
-    required this.onTap,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(10),
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-        decoration: BoxDecoration(
-          color: Palette.grey200p,
-          borderRadius: BorderRadius.circular(10),
-          border: Border.all(color: Palette.cardBorder, width: 0.5),
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(label.toUpperCase(),
-                style: AppTypography.badgeText(
-                    color: Palette.kTextMuted, fontWeight: FontWeight.w700)),
-            const SizedBox(height: 4),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(display,
-                    style: AppTypography.heading3(
-                        color: Palette.textDark2, fontWeight: FontWeight.w700)),
-                const Icon(Icons.calendar_month_outlined,
-                    size: 18, color: Palette.blue400),
-              ],
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-// ─── Grid Header ─────────────────────────────────────────────────────────────
-class _GridHeader extends StatelessWidget {
-  final bool isTablet;
-  const _GridHeader({required this.isTablet});
-
-  @override
-  Widget build(BuildContext context) {
-    final style = AppTypography.badgeText(
-        color: Colors.white.withValues(alpha: 0.85),
-        fontWeight: FontWeight.w600);
-
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-      decoration: BoxDecoration(
-        gradient: kGradient,
-        borderRadius: BorderRadius.circular(10),
-      ),
-      child: Column(
-        children: [
-          Row(children: [
-            Expanded(
-                flex: 2,
-                child:
-                    Text('RTI Date', textAlign: TextAlign.left, style: style)),
-            Expanded(
-                flex: 2,
-                child: Text('RTI No', textAlign: TextAlign.left, style: style)),
-          ]),
-          const SizedBox(height: 3),
-          Row(children: [
-            Expanded(
-                flex: 2,
-                child: Text('Job No', textAlign: TextAlign.left, style: style)),
-            Expanded(
-                flex: 2,
-                child: Text('Amount', textAlign: TextAlign.left, style: style)),
-          ]),
-        ],
-      ),
-    );
-  }
-}
-
-// ─── Mobile: single column ListView ──────────────────────────────────────────
-class _MobileList extends StatelessWidget {
-  final DriverSalaryLoaded state;
-  const _MobileList({required this.state});
-
-  @override
-  Widget build(BuildContext context) {
-    return ListView.builder(
-      itemCount: state.salaryList.length,
-      itemBuilder: (ctx, i) => _SalaryCard(
-        item: state.salaryList[i],
-        isTablet: false,
-      ),
-    );
-  }
-}
-
-// ─── Tablet: 2-column GridView ────────────────────────────────────────────────
-class _TabletGrid extends StatelessWidget {
-  final DriverSalaryLoaded state;
-  const _TabletGrid({required this.state});
-
-  @override
-  Widget build(BuildContext context) {
-    return GridView.builder(
-      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: MediaQuery.of(context).size.width > 600 ? 4 : 2,
-        crossAxisSpacing: 12,
-        mainAxisSpacing: 10,
-        childAspectRatio: 3.2,
-      ),
-      itemCount: state.salaryList.length,
-      itemBuilder: (ctx, i) => _SalaryCard(
-        item: state.salaryList[i],
-        isTablet: true,
-      ),
-    );
-  }
-}
-
-// ─── Single Salary Card ───────────────────────────────────────────────────────
+// ─── One trip ─────────────────────────────────────────────────────────────────
 class _SalaryCard extends StatelessWidget {
   final dynamic item;
-  final bool isTablet;
 
-  const _SalaryCard({required this.item, required this.isTablet});
+  const _SalaryCard({required this.item});
 
   @override
   Widget build(BuildContext context) {
-    final valStyle = AppTypography.bodyLarge(color: Palette.textDark2);
-
-    final rtiDate = item['rtiDate']?.toString() ?? '-';
+    final rtiDate = item['rtiDate']?.toString() ?? '';
     final rtiNo = item['rtiNo']?.toString() ?? '-';
-    final jobNo = item['jobNo']?.toString() ?? '-';
-    final amount = item['amount']?.toString() ?? '-';
-
-    return InkWell(
-      onTap: () => _showSalaryDetailsDialog(
-          context, Map<String, dynamic>.from(item as Map)),
-      borderRadius: BorderRadius.circular(12),
-      child: Container(
-        margin: const EdgeInsets.only(bottom: 8),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: Palette.cardBorder, width: 0.5),
-          boxShadow: [
-            BoxShadow(
-              color: Palette.blue700.withValues(alpha: 0.06),
-              blurRadius: 8,
-              offset: const Offset(0, 2),
-            ),
-          ],
+    final jobNo = item['jobNo']?.toString() ?? '';
+    final amount = double.tryParse(item['amount']?.toString() ?? '');
+    final route = [item['origin'], item['destination']].where((v) => v != null && v.toString().trim().isNotEmpty).join(' → ');
+    return PCard(
+      margin: const EdgeInsets.only(bottom: 10),
+      padding: const EdgeInsets.fromLTRB(14, 12, 10, 12),
+      onTap: () => _showSalaryDetailsDialog(context, Map<String, dynamic>.from(item as Map)),
+      child: Row(children: [
+        const PIcon(Icons.route_rounded, size: 42),
+        const SizedBox(width: 12),
+        Expanded(
+          child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            Text(rtiNo, maxLines: 1, overflow: TextOverflow.ellipsis, style: Px.t(15, weight: FontWeight.w800)),
+            const SizedBox(height: 2),
+            if (jobNo.isNotEmpty) Text(jobNo, maxLines: 1, overflow: TextOverflow.ellipsis, style: Px.t(13, weight: FontWeight.w600)),
+            Text([rtiDate, route].where((v) => v.isNotEmpty).join('  ·  '), maxLines: 2, overflow: TextOverflow.ellipsis, style: Px.small),
+          ]),
         ),
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(12),
-          child: Row(
-            children: [
-              // Left gradient accent
-              Container(
-                width: 4,
-                decoration: const BoxDecoration(gradient: kGradient),
-              ),
-              Expanded(
-                child: Padding(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      // Row 1: RTI Date + RTI No
-                      Row(children: [
-                        Expanded(
-                          child: Text(rtiDate,
-                              style: valStyle, overflow: TextOverflow.ellipsis),
-                        ),
-                        Expanded(
-                          child: Text(rtiNo,
-                              style: valStyle, overflow: TextOverflow.ellipsis),
-                        ),
-                      ]),
-                      const SizedBox(height: 4),
-                      // Row 2: Job No + Amount
-                      Row(children: [
-                        Expanded(
-                          child: Text(jobNo,
-                              style: valStyle, overflow: TextOverflow.ellipsis),
-                        ),
-                        Expanded(
-                          child: Text(
-                            amount,
-                            style:
-                                valStyle.copyWith(color: Palette.greenSuccess),
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                        ),
-                      ]),
-                    ],
-                  ),
-                ),
-              ),
-              // Arrow hint
-              Padding(
-                padding: EdgeInsets.only(right: 8),
-                child: Icon(Icons.arrow_forward_ios_rounded,
-                    size: 12, color: Palette.kTextMuted),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-// ─── Empty State ──────────────────────────────────────────────────────────────
-class _EmptyState extends StatelessWidget {
-  final bool isTablet;
-  const _EmptyState({required this.isTablet});
-
-  @override
-  Widget build(BuildContext context) {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Container(
-            width: 64,
-            height: 64,
-            decoration: BoxDecoration(
-                color: Palette.chipBg, borderRadius: BorderRadius.circular(16)),
-            child: const Icon(Icons.payments_outlined,
-                size: 32, color: Palette.blue400),
-          ),
-          const SizedBox(height: 14),
-          Text('No Salary Records',
-              style: AppTypography.heading2(
-                  color: Palette.textDark2, fontWeight: FontWeight.w600)),
-          const SizedBox(height: 4),
-          Text('Select a date range to view salary',
-              style: AppTypography.bodyMedium(color: Palette.kTextMuted)),
-        ],
-      ),
+        const SizedBox(width: 8),
+        Text(amount == null ? (item['amount']?.toString() ?? '-') : 'RM ${NumberFormat('#,##0.00').format(amount)}',
+            style: Px.t(15, weight: FontWeight.w800, color: Px.green)),
+        const SizedBox(width: 2),
+        const Icon(Icons.chevron_right_rounded, color: Px.muted),
+      ]),
     );
   }
 }

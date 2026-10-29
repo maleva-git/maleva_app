@@ -5,6 +5,7 @@ import 'package:maleva/features/dashboard/common_tabs/rtistatus/view/rtistatus_t
 import 'package:maleva/features/rti/list/bloc/rti_list_bloc.dart';
 import 'package:maleva/features/rti/list/models/rti_list_row.dart';
 import 'package:maleva/features/rti/list/widgets/rti_actions.dart';
+import 'package:maleva/features/rti/list/widgets/rti_stop_times.dart';
 
 /// The RTI preview (`RTIDetailPanel`, `RTIViewPage.tsx:749-848`): Driver, Vehicle, Date,
 /// Amount, Destination, Remarks (from the full RTI), up to 10 jobs `JobNo · CustomerName`
@@ -97,6 +98,8 @@ class RtiPreview extends StatelessWidget {
               ),
           ]),
         ],
+        // Fleet W5: when the truck arrived at / left each stop (GPS); the driver taps "Start loading" here
+        if (row.id > 0) RtiStopTimes(key: ValueKey('stops-${row.id}'), rtiId: row.id, canTap: state.isDriver),
       ],
       const SizedBox(height: 18),
       Wrap(spacing: 8, runSpacing: 8, children: [

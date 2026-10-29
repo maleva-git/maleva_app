@@ -1,319 +1,206 @@
-import 'package:maleva/core/theme/app_typography.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_spinkit/flutter_spinkit.dart';
+import 'package:intl/intl.dart';
+import 'package:maleva/core/ui/premium.dart';
+
 import '../../../../../core/di/injection.dart';
-import '../../../../../core/theme/palette.dart';
 import '../bloc/driverlicense_bloc.dart';
 import '../bloc/driverlicense_event.dart';
 import '../bloc/driverlicense_state.dart';
-
-
-
-const kGradient = LinearGradient(
-  colors: [Palette.blue700, Palette.blue400],
-  begin: Alignment.topLeft,
-  end: Alignment.bottomRight,
-);
 
 const double kTabletBreak = 600;
 
 // All 11 field keys shown in each driver card (label + Java field of /api/master-reports/drivers/rows)
 const List<(String, String)> kDriverFields = [
-  ('License Exp',   'licenseExp'),
-  ('GDL Exp',       'gdlExp'),
-  ('Kuantan Port',  'kuantanPort'),
-  ('Northport',     'northportPort'),
-  ('PKFZ Port',     'pkfzPort'),
-  ('KLIA Port',     'kliaPort'),
-  ('PGU Port',      'pguPort'),
-  ('Tanjung Port',  'tanjungPort'),
-  ('Penang Port',   'penangPort'),
-  ('PTP Port',      'ptpPort'),
-  ('Westport',      'westportPort'),
+  ('License', 'licenseExp'),
+  ('GDL', 'gdlExp'),
+  ('Kuantan Port', 'kuantanPort'),
+  ('Northport', 'northportPort'),
+  ('PKFZ Port', 'pkfzPort'),
+  ('KLIA Port', 'kliaPort'),
+  ('PGU Port', 'pguPort'),
+  ('Tanjung Port', 'tanjungPort'),
+  ('Penang Port', 'penangPort'),
+  ('PTP Port', 'ptpPort'),
+  ('Westport', 'westportPort'),
 ];
 
-// ─── Embeddable Dashboard Widget ─────────────────────────────────────────────
+/// A licence or port pass date from the Java row (ISO, or dd/MM/yyyy), or null.
+DateTime? licenseDate(dynamic v) {
+  if (v == null) return null;
+  final s = v.toString().trim();
+  if (s.isEmpty || s == 'null') return null;
+  final iso = DateTime.tryParse(s.replaceAll('/', '-'));
+  if (iso != null) return iso;
+  try {
+    return DateFormat('dd/MM/yyyy').parseStrict(s);
+  } catch (_) {
+    return null;
+  }
+}
+
+/// The driver's Truck License tab (premium look, owner 2026-10-29): how many licences and port passes to renew, then
+/// each date with Expired / days left / Valid. Read only.
 class DriverLicenseExpiryWidget extends StatelessWidget {
   const DriverLicenseExpiryWidget({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return
-      BlocProvider(
-        create: (_) => sl<DriverLicenseExpiryBloc>()
-          ..add(DriverLicenseExpiryStarted()),
-        child: const _DriverLicenseExpiryView(),
-      );
+    return BlocProvider(
+      create: (_) => sl<DriverLicenseExpiryBloc>()..add(DriverLicenseExpiryStarted()),
+      child: const _DriverLicenseExpiryView(),
+    );
   }
 }
 
-// ─── View ─────────────────────────────────────────────────────────────────────
 class _DriverLicenseExpiryView extends StatelessWidget {
   const _DriverLicenseExpiryView();
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<DriverLicenseExpiryBloc,
-        DriverLicenseExpiryState>(
-      builder: (context, state) {
-        if (state is DriverLicenseExpiryInitial ||
-            state is DriverLicenseExpiryLoading) {
-          return Center(
-            child: SpinKitFoldingCube(
-                color: Palette.blue400, size: 35),
-          );
-        }
-        if (state is DriverLicenseExpiryLoaded) {
-          return LayoutBuilder(
-            builder: (context, constraints) {
-              final isTablet =
-                  constraints.maxWidth > kTabletBreak;
-              return _DriverLicenseExpiryBody(
-                state:    state,
-                isTablet: isTablet,
-              );
-            },
-          );
-        }
-        if (state is DriverLicenseExpiryError) {
-          return Center(
-            child: Text(state.message,
-                style: AppTypography.bodyLarge(color: Palette.redAccent)),
-          );
-        }
-        return const SizedBox.shrink();
-      },
-    );
-  }
-}
-
-// ─── Body ─────────────────────────────────────────────────────────────────────
-class _DriverLicenseExpiryBody extends StatelessWidget {
-  final DriverLicenseExpiryLoaded state;
-  final bool isTablet;
-
-  const _DriverLicenseExpiryBody(
-      {required this.state, required this.isTablet});
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: EdgeInsets.fromLTRB(
-          isTablet ? 20 : 10, 15, isTablet ? 20 : 10, 0),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          const SizedBox(height: 7),
-
-          // ── Title ─────────────────────────────────────
-          Center(
-            child: Text(
-              'DRIVER LICENSE EXPIRY',
-              style: AppTypography.heading1(color: Palette.redAccent),
-            ),
-          ),
-          const SizedBox(height: 14),
-
-          // ── List / Grid ──────────────────────────────
-          Expanded(
-            child: state.driverExpiryList.isEmpty
-                ? _EmptyState(isTablet: isTablet)
-                : isTablet
-                ? _TabletGrid(state: state)
-                : _MobileList(state: state),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-// ─── Mobile: single column ListView ──────────────────────────────────────────
-class _MobileList extends StatelessWidget {
-  final DriverLicenseExpiryLoaded state;
-  const _MobileList({required this.state});
-
-  @override
-  Widget build(BuildContext context) {
-    return ListView.builder(
-      itemCount: state.driverExpiryList.length,
-      itemBuilder: (ctx, i) => _DriverCard(
-        item:     state.driverExpiryList[i],
-        isTablet: false,
-      ),
-    );
-  }
-}
-
-// ─── Tablet: 2-column GridView ────────────────────────────────────────────────
-class _TabletGrid extends StatelessWidget {
-  final DriverLicenseExpiryLoaded state;
-  const _TabletGrid({required this.state});
-
-  @override
-  Widget build(BuildContext context) {
-    return GridView.builder(
-      gridDelegate:
-      const SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount:   2,
-        crossAxisSpacing: 12,
-        mainAxisSpacing:  12,
-        childAspectRatio: 0.70,
-      ),
-      itemCount: state.driverExpiryList.length,
-      itemBuilder: (ctx, i) => _DriverCard(
-        item:     state.driverExpiryList[i],
-        isTablet: true,
-      ),
-    );
-  }
-}
-
-// ─── Single Driver Card ───────────────────────────────────────────────────────
-class _DriverCard extends StatelessWidget {
-  final dynamic item; // Map<String, dynamic>
-  final bool    isTablet;
-
-  const _DriverCard(
-      {required this.item, required this.isTablet});
-
-  String _safe(dynamic v) =>
-      (v == null || v.toString() == 'null') ? '' : v.toString();
-
-  @override
-  Widget build(BuildContext context) {
-    final labelStyle = AppTypography.bodySmall(color: Palette.textMid);
-
-    return Container(
-      margin: const EdgeInsets.only(bottom: 12),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: Palette.cardBorder, width: 0.5),
-        boxShadow: [
-          BoxShadow(
-            color: Palette.blue700.withValues(alpha: 0.07),
-            blurRadius: 10,
-            offset: const Offset(0, 3),
-          ),
-        ],
-      ),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(14),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            // ── Top gradient accent ──────────────────────
-            Container(
-                height: 3,
-                decoration: const BoxDecoration(
-                    gradient: kGradient)),
-
-            // ── Driver name header ───────────────────────
-            Container(
-              width: double.infinity,
-              padding: const EdgeInsets.symmetric(
-                  horizontal: 12, vertical: 9),
-              decoration: const BoxDecoration(
-                  gradient: kGradient),
-              child: Row(
-                children: [
-                  const Icon(Icons.person_outline_rounded,
-                      size: 16, color: Colors.white),
-                  const SizedBox(width: 8),
-                  Expanded(
-                    child: Text(
-                      _safe(item['driverName']).isEmpty
-                          ? '-'
-                          : _safe(item['driverName']),
-                      style: AppTypography.bodySmall(color: Colors.white),
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ),
-                ],
+    return ColoredBox(
+      color: Px.page,
+      child: BlocBuilder<DriverLicenseExpiryBloc, DriverLicenseExpiryState>(
+        builder: (context, state) {
+          if (state is DriverLicenseExpiryLoaded) return _Body(state: state);
+          if (state is DriverLicenseExpiryError) {
+            return Center(
+              child: Padding(
+                padding: const EdgeInsets.all(16),
+                child: PCard(color: Px.redSoft, child: Text(state.message, style: Px.t(14, weight: FontWeight.w600, color: Px.red))),
               ),
+            );
+          }
+          return const Center(child: CircularProgressIndicator(color: Px.brand));
+        },
+      ),
+    );
+  }
+}
+
+class _Body extends StatelessWidget {
+  const _Body({required this.state});
+
+  final DriverLicenseExpiryLoaded state;
+
+  @override
+  Widget build(BuildContext context) {
+    final today = DateTime.now();
+    var expired = 0, soon = 0, valid = 0;
+    (String, DateTime)? next;
+    for (final item in state.driverExpiryList) {
+      for (final f in kDriverFields) {
+        final d = licenseDate(item[f.$2]);
+        switch (expiryOf(d, today)) {
+          case Expiry.expired:
+            expired++;
+          case Expiry.soon:
+            soon++;
+          case Expiry.valid:
+            valid++;
+          case Expiry.none:
+            break;
+        }
+        if (d != null && !d.isBefore(DateTime(today.year, today.month, today.day)) && (next == null || d.isBefore(next.$2))) {
+          next = (f.$1, d);
+        }
+      }
+    }
+    return LayoutBuilder(builder: (context, c) {
+      final side = c.maxWidth > kTabletBreak ? (c.maxWidth - 640) / 2 : 14.0;
+      return ListView(
+        padding: EdgeInsets.fromLTRB(side, 12, side, 28),
+        children: [
+          if (state.driverExpiryList.isEmpty)
+            const PCard(child: PEmpty(icon: Icons.badge_rounded, title: 'No licence records', subtitle: 'The office has not added your dates yet.'))
+          else ...[
+            PHero(
+              label: 'To renew (next 30 days)',
+              value: '${expired + soon}',
+              footnote: next == null
+                  ? 'Nothing coming up'
+                  : 'Next: ${next.$1} on ${DateFormat('dd MMM yyyy').format(next.$2)}',
+              icon: Icons.badge_rounded,
             ),
-
-            // ── All 11 field rows ────────────────────────
-            ...kDriverFields.map((f) => _FieldRow(
-              label:      f.$1,
-              value:      _safe(item[f.$2]),
-              labelStyle: labelStyle,
-            )),
-
-            const SizedBox(height: 6),
+            const SizedBox(height: 10),
+            PStatRow(children: [
+              PStat(label: 'Expired', value: '$expired', icon: Icons.error_rounded, tone: expired > 0 ? Tone.red : Tone.green),
+              PStat(label: 'Soon', value: '$soon', icon: Icons.schedule_rounded, tone: soon > 0 ? Tone.amber : Tone.green),
+              PStat(label: 'Valid', value: '$valid', icon: Icons.verified_rounded, tone: Tone.green),
+            ]),
+            for (final item in state.driverExpiryList) _DriverCard(item: item, today: today),
           ],
-        ),
-      ),
-    );
-  }
-}
-
-// ─── Single Field Row ─────────────────────────────────────────────────────────
-class _FieldRow extends StatelessWidget {
-  final String    label;
-  final String    value;
-  final TextStyle labelStyle;
-
-  const _FieldRow({
-    required this.label,
-    required this.value,
-    required this.labelStyle,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(
-          horizontal: 12, vertical: 5),
-      child: Row(
-        children: [
-          Expanded(
-            flex: 2,
-            child: Text(label,
-                style: labelStyle,
-                overflow: TextOverflow.ellipsis),
-          ),
-          Expanded(
-            flex: 3,
-            child: Text(
-              value.isEmpty ? '-' : value,
-              style: AppTypography.bodyLarge(color: Palette.textDark2),
-              overflow: TextOverflow.ellipsis,
-            ),
-          ),
         ],
-      ),
-    );
+      );
+    });
   }
 }
 
-// ─── Empty State ──────────────────────────────────────────────────────────────
-class _EmptyState extends StatelessWidget {
-  final bool isTablet;
-  const _EmptyState({required this.isTablet});
+class _DriverCard extends StatelessWidget {
+  const _DriverCard({required this.item, required this.today});
+
+  final dynamic item; // Map<String, dynamic>
+  final DateTime today;
 
   @override
   Widget build(BuildContext context) {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
+    final name = (item['driverName'] ?? '').toString();
+    final initials = name.trim().split(RegExp(r'\s+')).where((w) => w.isNotEmpty).take(2).map((w) => w[0]).join();
+    return PCard(
+      margin: const EdgeInsets.only(top: 14),
+      padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
+      child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+        Row(children: [
           Container(
-            width: 64,
-            height: 64,
-            decoration: BoxDecoration(
-                color: Palette.grey200q,
-                borderRadius: BorderRadius.circular(16)),
-            child: const Icon(Icons.badge_outlined,
-                size: 32, color: Palette.blue400),
+            width: 44,
+            height: 44,
+            decoration: const BoxDecoration(gradient: Px.gradient, shape: BoxShape.circle),
+            child: Center(child: Text(initials.isEmpty ? '?' : initials, style: Px.t(15, weight: FontWeight.w800, color: Colors.white))),
           ),
-          const SizedBox(height: 14),
-          Text('No Driver Records',
-              style: AppTypography.heading2(color: Palette.textDark2, fontWeight: FontWeight.w600)),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              Text(name.isEmpty ? '—' : name, maxLines: 2, overflow: TextOverflow.ellipsis, style: Px.t(16, weight: FontWeight.w800)),
+              Text('Licence and port passes', style: Px.small),
+            ]),
+          ),
+        ]),
+        const SizedBox(height: 10),
+        for (var i = 0; i < kDriverFields.length; i++) ...[
+          if (i > 0) const PDivider(),
+          _Row(label: kDriverFields[i].$1, date: licenseDate(item[kDriverFields[i].$2]), today: today),
         ],
-      ),
+      ]),
+    );
+  }
+}
+
+class _Row extends StatelessWidget {
+  const _Row({required this.label, required this.date, required this.today});
+
+  final String label;
+  final DateTime? date;
+  final DateTime today;
+
+  @override
+  Widget build(BuildContext context) {
+    final e = expiryOf(date, today);
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 9),
+      child: Row(children: [
+        Expanded(flex: 5, child: Text(label, style: Px.t(14, color: Px.sub))),
+        Expanded(
+          flex: 5,
+          child: Text(date == null ? '—' : DateFormat('dd MMM yyyy').format(date!),
+              textAlign: TextAlign.right,
+              style: Px.t(14, weight: FontWeight.w700, color: e == Expiry.expired ? Px.red : Px.ink)),
+        ),
+        const SizedBox(width: 10),
+        SizedBox(
+          width: 96,
+          child: Align(alignment: Alignment.centerRight, child: PChip(e.label(date, today), tone: e.tone, dot: e != Expiry.none)),
+        ),
+      ]),
     );
   }
 }

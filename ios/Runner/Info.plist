@@ -35,9 +35,9 @@
 	<key>NSBluetoothPeripheralUsageDescription</key>
 	<string>This app requires Bluetooth access to communicate with external devices like printers and scanners for seamless operations.</string>
 	<key>NSCameraUsageDescription</key>
-	<string>To upload profile photos</string>
+	<string>To take photos of fuel receipts, job photos and your profile photo</string>
 	<key>NSPhotoLibraryUsageDescription</key>
-	<string>To update profile photos</string>
+	<string>To choose photos of fuel receipts, job photos and your profile photo</string>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
 	<key>UIBackgroundModes</key>

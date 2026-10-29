@@ -52,12 +52,18 @@ class AttachmentsApi {
 
   /// Stores [files] under new unique names (as .NET UploadFile5 did) and answers
   /// every file of the record afterwards (`fileName`, `path`, ...).
+  /// [filePathTable] (e.g. `FuelEntry`) makes the server write the record's files into that table's FilePath column.
   Future<List<Map<String, dynamic>>> add(List<File> files,
-          {required String folder, required int recordId, String? subFolder, AttachmentMode mode = AttachmentMode.mixed}) async =>
-      JsonRead.listOfMaps((await _store(files, folder, recordId, subFolder, mode, keepOriginalName: false))['attachments']);
+          {required String folder,
+          required int recordId,
+          String? subFolder,
+          AttachmentMode mode = AttachmentMode.mixed,
+          String? filePathTable}) async =>
+      JsonRead.listOfMaps((await _store(files, folder, recordId, subFolder, mode,
+              keepOriginalName: false, filePathTable: filePathTable))['attachments']);
 
   Future<Map<String, dynamic>> _store(List<File> files, String folder, int recordId, String? subFolder,
-      AttachmentMode mode, {required bool keepOriginalName}) async {
+      AttachmentMode mode, {required bool keepOriginalName, String? filePathTable}) async {
     final form = FormData();
     for (final f in files) {
       form.files.add(MapEntry('files', await MultipartFile.fromFile(f.path, filename: _baseName(f.path))));
@@ -65,7 +71,8 @@ class AttachmentsApi {
     return JsonRead.map(await _send(() => _dio.post<dynamic>('/api/attachments',
         queryParameters: _scope(folder, recordId, subFolder)
           ..['mode'] = mode.wire
-          ..['keepOriginalName'] = keepOriginalName,
+          ..['keepOriginalName'] = keepOriginalName
+          ..addAll({if (filePathTable != null && filePathTable.isNotEmpty) 'filePathTable': filePathTable}),
         data: form)));
   }
 

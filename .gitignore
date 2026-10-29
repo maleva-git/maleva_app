@@ -44,3 +44,6 @@ app.*.map.json
 /android/app/profile
 /android/app/release
 /malevaapplatest.zip
+
+# design screenshots made on demand (test/visual/driver_screens_test.dart)
+test/visual/shots/
