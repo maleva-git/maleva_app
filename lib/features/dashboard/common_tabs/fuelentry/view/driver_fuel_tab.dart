@@ -134,8 +134,8 @@ class _DriverFuelViewState extends State<_DriverFuelView> {
               children: [
                 // month switcher: a white pill with arrows
                 Container(
-                  decoration:
-                      BoxDecoration(color: Px.card, borderRadius: BorderRadius.circular(999), border: Border.all(color: Px.line)),
+                  decoration: BoxDecoration(
+                      color: Px.card, borderRadius: BorderRadius.circular(999), border: Border.all(color: Px.line)),
                   child: Row(children: [
                     IconButton(
                       tooltip: 'Previous month',
@@ -190,7 +190,8 @@ class _DriverFuelViewState extends State<_DriverFuelView> {
                 ]),
                 const PSection('Your fills', subtitle: 'Tap a fill to change it'),
                 if (state is FuelEntryLoading)
-                  const Padding(padding: EdgeInsets.all(24), child: Center(child: CircularProgressIndicator(color: Px.brand))),
+                  const Padding(
+                      padding: EdgeInsets.all(24), child: Center(child: CircularProgressIndicator(color: Px.brand))),
                 if (state is FuelEntryLoaded && entries.isEmpty)
                   const PCard(
                     child: PEmpty(
@@ -212,13 +213,15 @@ class _DriverFuelViewState extends State<_DriverFuelView> {
                           Text('${NumberFormat('#,##0.##').format(e.aLiter)} L',
                               style: Px.t(17, weight: FontWeight.w800, spacing: -0.3)),
                           const SizedBox(height: 2),
-                          Text([e.entryDate, e.entryNo].where((s) => s.trim().isNotEmpty).join('  ·  '), style: Px.small),
+                          Text([e.entryDate, e.entryNo].where((s) => s.trim().isNotEmpty).join('  ·  '),
+                              style: Px.small),
                           if (e.remarks.trim().isNotEmpty)
                             Text(e.remarks.trim(), maxLines: 1, overflow: TextOverflow.ellipsis, style: Px.small),
                         ]),
                       ),
                       Column(crossAxisAlignment: CrossAxisAlignment.end, children: [
-                        Text('RM ${NumberFormat('#,##0.00').format(e.aAmount)}', style: Px.t(15, weight: FontWeight.w800)),
+                        Text('RM ${NumberFormat('#,##0.00').format(e.aAmount)}',
+                            style: Px.t(15, weight: FontWeight.w800)),
                         const SizedBox(height: 6),
                         e.filePath.trim().isEmpty
                             ? const PChip('No receipt', tone: Tone.red, dot: true)
@@ -274,6 +277,9 @@ class _DriverFuelFormState extends State<DriverFuelForm> {
   /// Set when the fill is saved but its photo was not sent: TRY AGAIN sends only the photo.
   int _savedId = 0;
   FuelText _t = const FuelText(false);
+
+  /// An office / web entry: the fields are read only and SAVE sends only the receipt photo.
+  late final bool _photoOnly = !driverCanChange(widget.entry);
 
   @override
   void initState() {
@@ -333,6 +339,18 @@ class _DriverFuelFormState extends State<DriverFuelForm> {
 
   Future<void> _save() async {
     if (_savedId > 0) return _sendPhoto(_savedId); // the fill is saved: only the photo is left
+    if (_photoOnly) {
+      // the office's entry: nothing to save, only the receipt photo to send (the server refuses a driver's change)
+      if (_photo == null) {
+        if (needsReceiptPhoto(widget.entry)) {
+          setState(() => _problem = _t.photoMissing);
+        } else {
+          Navigator.pop(context);
+        }
+        return;
+      }
+      return _sendPhoto(widget.entry!.id);
+    }
     final problem = driverFuelProblem(litres: _litres.text, amount: _amount.text);
     if (problem != null) {
       setState(() => _problem = problem);
@@ -493,8 +511,10 @@ class _DriverFuelFormState extends State<DriverFuelForm> {
         prefixIcon: icon == null ? null : Icon(icon, color: Px.brand),
         filled: true,
         fillColor: Px.soft,
-        border: OutlineInputBorder(borderRadius: BorderRadius.circular(14), borderSide: const BorderSide(color: Px.line)),
-        enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(14), borderSide: const BorderSide(color: Px.line)),
+        border:
+            OutlineInputBorder(borderRadius: BorderRadius.circular(14), borderSide: const BorderSide(color: Px.line)),
+        enabledBorder:
+            OutlineInputBorder(borderRadius: BorderRadius.circular(14), borderSide: const BorderSide(color: Px.line)),
         focusedBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(14), borderSide: const BorderSide(color: Px.brand, width: 1.5)),
       );
@@ -520,7 +540,9 @@ class _DriverFuelFormState extends State<DriverFuelForm> {
         child: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.stretch, children: [
           Center(
             child: Container(
-                width: 40, height: 4, decoration: BoxDecoration(color: Px.line, borderRadius: BorderRadius.circular(99))),
+                width: 40,
+                height: 4,
+                decoration: BoxDecoration(color: Px.line, borderRadius: BorderRadius.circular(99))),
           ),
           const SizedBox(height: 14),
           Row(children: [
@@ -528,60 +550,91 @@ class _DriverFuelFormState extends State<DriverFuelForm> {
             const SizedBox(width: 12),
             Expanded(
               child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                Text(widget.entry == null ? 'Add fuel' : 'Change fuel ${widget.entry!.entryNo}',
+                Text(
+                    widget.entry == null
+                        ? 'Add fuel'
+                        : '${_photoOnly ? 'Fuel' : 'Change fuel'} ${widget.entry!.entryNo}',
                     style: Px.t(20, weight: FontWeight.w800, spacing: -0.3)),
                 Text('Your truck is filled in by the office record.', style: Px.small),
               ]),
             ),
           ]),
           const SizedBox(height: 14),
-          InkWell(
-            onTap: _pickDate,
-            child: InputDecorator(
-                decoration: _box('Date', icon: Icons.event_rounded),
-                child: Text(_shown.format(_date), style: Px.t(16, weight: FontWeight.w700))),
+          if (_photoOnly)
+            Container(
+              margin: const EdgeInsets.only(bottom: 12),
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(color: Px.brandSoft, borderRadius: BorderRadius.circular(14)),
+              child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                const Icon(Icons.lock_outline_rounded, size: 20, color: Px.brand),
+                const SizedBox(width: 10),
+                Expanded(child: Text(_t.officeEntry, style: Px.t(14, weight: FontWeight.w600, color: Px.brand))),
+              ]),
+            ),
+          IgnorePointer(
+            ignoring: _photoOnly,
+            child: Opacity(
+              opacity: _photoOnly ? 0.55 : 1,
+              child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+                InkWell(
+                  onTap: _pickDate,
+                  child: InputDecorator(
+                      decoration: _box('Date', icon: Icons.event_rounded),
+                      child: Text(_shown.format(_date), style: Px.t(16, weight: FontWeight.w700))),
+                ),
+                const SizedBox(height: 12),
+                TextField(
+                  controller: _litres,
+                  autofocus: widget.entry == null,
+                  keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                  inputFormatters: number,
+                  style: Px.t(20, weight: FontWeight.w800),
+                  decoration: _box('Litres', suffix: 'L', icon: Icons.water_drop),
+                  onChanged: (_) => setState(() => _problem = null),
+                ),
+                const SizedBox(height: 12),
+                TextField(
+                  controller: _amount,
+                  keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                  inputFormatters: number,
+                  style: Px.t(20, weight: FontWeight.w800),
+                  decoration: _box('Amount', suffix: 'RM', icon: Icons.payments),
+                  onChanged: (_) => setState(() => _problem = null),
+                ),
+                if (rate.isNotEmpty)
+                  Padding(padding: const EdgeInsets.only(top: 6, left: 4), child: Text(rate, style: Px.small)),
+                const SizedBox(height: 12),
+                Text('Engine while filling', style: Px.t(13, weight: FontWeight.w700, color: Px.sub)),
+                const SizedBox(height: 4),
+                Wrap(spacing: 8, children: [
+                  ChoiceChip(
+                      label: const Text('Engine off'),
+                      selected: _engineOn == false,
+                      onSelected: (_) => setState(() => _engineOn = false)),
+                  ChoiceChip(
+                      label: const Text('Engine on'),
+                      selected: _engineOn == true,
+                      onSelected: (_) => setState(() => _engineOn = true)),
+                ]),
+                const SizedBox(height: 10),
+                Text('Fuel card', style: Px.t(13, weight: FontWeight.w700, color: Px.sub)),
+                const SizedBox(height: 4),
+                Wrap(spacing: 8, runSpacing: 4, children: [
+                  ChoiceChip(
+                      label: const Text('No card / cash'),
+                      selected: _card == '',
+                      onSelected: (_) => setState(() => _card = '')),
+                  for (final c in {..._cards, if ((_card ?? '').isNotEmpty) _card!})
+                    ChoiceChip(label: Text(c), selected: _card == c, onSelected: (_) => setState(() => _card = c)),
+                ]),
+                const SizedBox(height: 12),
+                TextField(
+                    controller: _remarks,
+                    style: Px.body,
+                    decoration: _box('Remarks (optional)', icon: Icons.notes_rounded)),
+              ]),
+            ),
           ),
-          const SizedBox(height: 12),
-          TextField(
-            controller: _litres,
-            autofocus: widget.entry == null,
-            keyboardType: const TextInputType.numberWithOptions(decimal: true),
-            inputFormatters: number,
-            style: Px.t(20, weight: FontWeight.w800),
-            decoration: _box('Litres', suffix: 'L', icon: Icons.water_drop),
-            onChanged: (_) => setState(() => _problem = null),
-          ),
-          const SizedBox(height: 12),
-          TextField(
-            controller: _amount,
-            keyboardType: const TextInputType.numberWithOptions(decimal: true),
-            inputFormatters: number,
-            style: Px.t(20, weight: FontWeight.w800),
-            decoration: _box('Amount', suffix: 'RM', icon: Icons.payments),
-            onChanged: (_) => setState(() => _problem = null),
-          ),
-          if (rate.isNotEmpty) Padding(padding: const EdgeInsets.only(top: 6, left: 4), child: Text(rate, style: Px.small)),
-          const SizedBox(height: 12),
-          Text('Engine while filling', style: Px.t(13, weight: FontWeight.w700, color: Px.sub)),
-          const SizedBox(height: 4),
-          Wrap(spacing: 8, children: [
-            ChoiceChip(
-                label: const Text('Engine off'),
-                selected: _engineOn == false,
-                onSelected: (_) => setState(() => _engineOn = false)),
-            ChoiceChip(
-                label: const Text('Engine on'), selected: _engineOn == true, onSelected: (_) => setState(() => _engineOn = true)),
-          ]),
-          const SizedBox(height: 10),
-          Text('Fuel card', style: Px.t(13, weight: FontWeight.w700, color: Px.sub)),
-          const SizedBox(height: 4),
-          Wrap(spacing: 8, runSpacing: 4, children: [
-            ChoiceChip(label: const Text('No card / cash'), selected: _card == '', onSelected: (_) => setState(() => _card = '')),
-            for (final c in {..._cards, if ((_card ?? '').isNotEmpty) _card!})
-              ChoiceChip(label: Text(c), selected: _card == c, onSelected: (_) => setState(() => _card = c)),
-          ]),
-          const SizedBox(height: 12),
-          TextField(controller: _remarks, style: Px.body, decoration: _box('Remarks (optional)', icon: Icons.notes_rounded)),
           const SizedBox(height: 12),
           _receipt(),
           if (_problem != null)
@@ -596,9 +649,11 @@ class _DriverFuelFormState extends State<DriverFuelForm> {
               style: ElevatedButton.styleFrom(backgroundColor: Px.brand, elevation: 0, shape: const StadiumBorder()),
               onPressed: _busy ? null : _save,
               icon: _busy
-                  ? const SizedBox(width: 18, height: 18, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
+                  ? const SizedBox(
+                      width: 18, height: 18, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
                   : Icon(_savedId > 0 ? Icons.refresh : Icons.check, color: Colors.white),
-              label: Text(_busy ? (_busyText ?? '') : (_savedId > 0 ? _t.tryAgain : 'SAVE'),
+              label: Text(
+                  _busy ? (_busyText ?? '') : (_savedId > 0 ? _t.tryAgain : (_photoOnly ? _t.sendPhoto : 'SAVE')),
                   style: Px.t(17, weight: FontWeight.w800, color: Colors.white, spacing: 0.4)),
             ),
           ),

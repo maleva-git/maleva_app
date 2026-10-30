@@ -25,6 +25,7 @@ String dashboardRouteFor({required bool isDriver, required int roleId, required 
     case 600: // BOARDINGOFFICERADMIN
       return '/dashboard/boarding';
     case 900: // ACCOUNTS
+    case 1100: // PAYABLE (change payable-desk-today; the web maps 1100 to its payable desk too)
       return '/dashboard/payable';
     case 1000: // TRANSPORTATION
       return '/dashboard/transport';

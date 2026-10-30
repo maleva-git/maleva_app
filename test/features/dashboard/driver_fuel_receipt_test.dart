@@ -13,8 +13,16 @@ import 'package:shared_preferences/shared_preferences.dart';
 class _FakeFuelApi extends FuelEntryApi {
   _FakeFuelApi() : super(Dio(), companyId: () => 6);
 
+  int saves = 0;
+
   @override
   Future<List<String>> cards() async => const ['PETRA'];
+
+  @override
+  Future<Map<String, dynamic>> save(Map<String, dynamic> body) async {
+    saves++;
+    return {'id': 1};
+  }
 }
 
 FuelEntryModel _fill(int id, String day, double litres, {String file = ''}) => FuelEntryModel()
@@ -74,4 +82,37 @@ void main() {
       expect(tester.takeException(), isNull);
     });
   }
+
+  test('only a new fill or a driver-app fill is the driver\'s to change (entry 6666, 2026-10-30)', () {
+    expect(driverCanChange(null), isTrue);
+    expect(driverCanChange(_fill(1, '21/10/2026', 50)..fStatus = 1), isTrue);
+    expect(driverCanChange(_fill(1, '21/10/2026', 50)..fStatus = 0), isFalse);
+    expect(FuelEntryModel.fromJava({'id': 6666, 'fStatus': 1}).fStatus, 1);
+    expect(FuelEntryModel.fromJava({'id': 6666}).fStatus, 0);
+  });
+
+  testWidgets('an office entry is read only and SEND PHOTO never saves the fill', (tester) async {
+    SharedPreferences.setMockInitialValues({});
+    await AppPreferences.init();
+    if (sl.isRegistered<FuelEntryApi>()) sl.unregister<FuelEntryApi>();
+    final api = _FakeFuelApi();
+    sl.registerSingleton<FuelEntryApi>(api);
+    tester.view.physicalSize = const Size(360 * 3, 640 * 3);
+    tester.view.devicePixelRatio = 3;
+    addTearDown(tester.view.reset);
+
+    final office = _fill(6666, '29/10/2026', 120)..fStatus = 0;
+    await tester.pumpWidget(MaterialApp(home: Scaffold(body: DriverFuelForm(entry: office))));
+    await tester.pumpAndSettle();
+    const t = FuelText(false);
+    expect(find.text(t.officeEntry), findsOneWidget);
+    expect(find.text('SAVE'), findsNothing);
+
+    await tester.ensureVisible(find.text(t.sendPhoto));
+    await tester.tap(find.text(t.sendPhoto));
+    await tester.pumpAndSettle();
+    expect(find.text(t.photoMissing), findsOneWidget);
+    expect(api.saves, 0);
+    expect(tester.takeException(), isNull);
+  });
 }

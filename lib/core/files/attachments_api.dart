@@ -76,6 +76,18 @@ class AttachmentsApi {
         data: form)));
   }
 
+  /// Copies files already stored elsewhere (their `/Upload/...` paths) into this record, as the web does when a
+  /// bill or voucher is made from a purchase order (`copyFromPaths`, sent as repeated keys); answers the record's files.
+  Future<List<Map<String, dynamic>>> copyFrom(List<String> paths,
+      {required String folder, required int recordId, String? subFolder}) async {
+    if (paths.isEmpty) return const [];
+    final data = JsonRead.map(await _send(() => _dio.post<dynamic>('/api/attachments',
+        queryParameters: _scope(folder, recordId, subFolder)..['copyFromPaths'] = paths,
+        options: Options(listFormat: ListFormat.multi),
+        data: FormData())));
+    return JsonRead.listOfMaps(data['attachments']);
+  }
+
   /// Every file of the record: `fileName`, `path` (`/Upload/...`), `contentType`, `sizeBytes`.
   Future<List<Map<String, dynamic>>> list({required String folder, required int recordId, String? subFolder}) async =>
       JsonRead.listOfMaps(await _send(() => _dio.get<dynamic>('/api/attachments',

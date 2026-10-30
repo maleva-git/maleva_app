@@ -36,16 +36,21 @@ String ceoSpan((String, String) range) {
 
 /// A report tab's page: pull to refresh (fresh numbers and lists), [children] with the page gutter.
 class CeoTabScroll extends StatelessWidget {
-  const CeoTabScroll({super.key, required this.children});
+  const CeoTabScroll({super.key, required this.children, this.spendOnly = false});
 
   final List<Widget> children;
+
+  /// Spend-only screens: a pull asks the spend flow and lists again, never the CEO overview.
+  final bool spendOnly;
 
   @override
   Widget build(BuildContext context) {
     final isTablet = MediaQuery.sizeOf(context).width >= 600;
     return RefreshIndicator(
       color: AppTokens.brandGradientStart,
-      onRefresh: context.read<CeoDashboardCubit>().reload,
+      onRefresh: spendOnly
+          ? () async => context.read<CeoDashboardCubit>().clearSpend()
+          : context.read<CeoDashboardCubit>().reload,
       child: ListView(
         physics: const AlwaysScrollableScrollPhysics(),
         padding: EdgeInsets.fromLTRB(isTablet ? 20 : 12, 10, isTablet ? 20 : 12, 28),
@@ -58,7 +63,10 @@ class CeoTabScroll extends StatelessWidget {
 /// The CEO period (This month, Last month, This quarter, This year) as chips with its days; the
 /// Overview header has the same switch, so all tabs show one period.
 class CeoPeriodBar extends StatelessWidget {
-  const CeoPeriodBar({super.key});
+  const CeoPeriodBar({super.key, this.spendOnly = false});
+
+  /// Spend-only screens (accounts / payable): a new period never loads the CEO overview.
+  final bool spendOnly;
 
   @override
   Widget build(BuildContext context) => BlocBuilder<CeoDashboardCubit, CeoDashboardState>(
@@ -74,7 +82,12 @@ class CeoPeriodBar extends StatelessWidget {
                 selected: s.period.index,
                 color: AppTokens.brandGradientStart,
                 onChanged: (i) {
-                  if (CeoPeriod.values[i] != s.period) cubit.load(CeoPeriod.values[i]);
+                  if (CeoPeriod.values[i] == s.period) return;
+                  if (spendOnly) {
+                    cubit.choosePeriod(CeoPeriod.values[i]);
+                  } else {
+                    cubit.load(CeoPeriod.values[i]);
+                  }
                 },
               ),
               const SizedBox(height: 4),

@@ -37,6 +37,8 @@ import '../../features/dashboard/hradmin_dashboard/view/hradmin_dashboard.dart';
 
 import '../../features/dashboard/payable_dashboard/bloc/payable_dasboard_bloc.dart';
 import '../../features/dashboard/payable_dashboard/view/payable_dashboard.dart';
+import '../../features/dashboard/payable_dashboard/reminders/reminder_route.dart';
+import '../../features/dashboard/payable_dashboard/reminders/view/reminders_view.dart';
 
 import '../../features/dashboard/transport_dashboard/bloc/transport_bloc.dart';
 import '../../features/dashboard/transport_dashboard/view/transport_dashboard.dart';
@@ -204,6 +206,11 @@ final GoRouter appRouter = GoRouter(
         create: (_) => HrAdminTabBloc(),
         child: const HrAdminDashboard(),
       ),
+    ),
+    GoRoute(
+      // a payable reminder notice opens here (change payable-reminders)
+      path: payableRemindersPath,
+      builder: (context, state) => PayableRemindersPage(day: reminderDayOf(state.uri.queryParameters['day'])),
     ),
     GoRoute(
       path: '/dashboard/payable',

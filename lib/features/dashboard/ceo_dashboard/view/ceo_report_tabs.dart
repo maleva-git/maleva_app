@@ -18,7 +18,8 @@ enum _ExpenseView {
   category('By category', Icons.donut_large_rounded),
   supplier('By supplier', Icons.store_rounded),
   truck('By truck', Icons.local_shipping_rounded),
-  year('12 months', Icons.bar_chart_rounded);
+  year('12 months', Icons.bar_chart_rounded),
+  owed('Whom we owe', Icons.call_made_rounded);
 
   const _ExpenseView(this.label, this.icon);
 
@@ -28,8 +29,14 @@ enum _ExpenseView {
 
 /// The CEO Expenses tab (web `CeoExpensesTab.tsx`) for the CEO period: the money flow (Purchase Order →
 /// Bill → Paid out → Still owed), purchase orders by category, supplier and truck, and the 12 months.
+///
+/// [spendOnly] (the accounts and payable team, change `payable-desk-today`): only the parts the server opens to
+/// them (`payable-spend-access`): money flow, purchase orders by supplier and truck, 12 months, whom we owe. No
+/// fuel or category view (they read the CEO overview), and the headline is the spend flow's purchase orders.
 class CeoExpensesTab extends StatefulWidget {
-  const CeoExpensesTab({super.key});
+  const CeoExpensesTab({super.key, this.spendOnly = false});
+
+  final bool spendOnly;
 
   @override
   State<CeoExpensesTab> createState() => _CeoExpensesTabState();
@@ -41,18 +48,39 @@ class _CeoExpensesTabState extends State<CeoExpensesTab> {
   @override
   Widget build(BuildContext context) => BlocBuilder<CeoDashboardCubit, CeoDashboardState>(builder: (context, s) {
         final cubit = context.read<CeoDashboardCubit>();
+        final spendOnly = widget.spendOnly;
+        final views = spendOnly
+            ? const [_ExpenseView.flow, _ExpenseView.supplier, _ExpenseView.truck, _ExpenseView.year, _ExpenseView.owed]
+            : const [
+                _ExpenseView.flow,
+                _ExpenseView.fuel,
+                _ExpenseView.category,
+                _ExpenseView.supplier,
+                _ExpenseView.truck,
+                _ExpenseView.year,
+              ];
+        if (!views.contains(_view)) _view = views.first;
+        if (spendOnly && !cubit.hasSpend()) {
+          // the headline needs the spend flow whatever view is open
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            if (!cubit.isClosed) cubit.loadSpend();
+          });
+        }
         final e = s.overview?.expenses;
         final spend = cubit.spendOf().data;
-        return CeoTabScroll(children: [
-          const CeoPeriodBar(),
+        final (headline, headCount) = spendOnly
+            ? (spend?.ordered.amount, spend?.ordered.count)
+            : (e?.total, e?.count);
+        return CeoTabScroll(spendOnly: spendOnly, children: [
+          CeoPeriodBar(spendOnly: spendOnly),
           CeoHero(
             key: const Key('ceo_expenses_hero'),
             title: 'Expenses',
             subtitle: 'Purchase orders and money paid out',
             icon: Icons.shopping_bag_rounded,
             accent: CeoAccent.expenses,
-            value: e == null ? '…' : Fmt.rm(e.total),
-            sub: e == null ? ' ' : '${ceoCount(e.count)} purchase orders',
+            value: headline == null ? '…' : Fmt.rm(headline),
+            sub: headCount == null ? ' ' : '${ceoCount(headCount)} purchase orders',
             facts: [
               ('Paid out', spend == null ? '…' : ceoCompact(spend.paid.amount)),
               ('Still owed', spend == null ? '…' : ceoCompact(spend.stillOwed)),
@@ -62,11 +90,11 @@ class _CeoExpensesTabState extends State<CeoExpensesTab> {
           const SizedBox(height: 12),
           CeoChips(
             key: const Key('ceo_expense_view'),
-            options: [for (final v in _ExpenseView.values) v.label],
-            icons: [for (final v in _ExpenseView.values) v.icon],
-            selected: _view.index,
+            options: [for (final v in views) v.label],
+            icons: [for (final v in views) v.icon],
+            selected: views.indexOf(_view),
             color: CeoAccent.expenses.strong,
-            onChanged: (i) => setState(() => _view = _ExpenseView.values[i]),
+            onChanged: (i) => setState(() => _view = views[i]),
           ),
           const SizedBox(height: 12),
           switch (_view) {
@@ -77,6 +105,7 @@ class _CeoExpensesTabState extends State<CeoExpensesTab> {
               _poBreakdown(cubit, CeoDetailKind.poSuppliers, 'By supplier', Icons.store_rounded),
             _ExpenseView.truck => _poBreakdown(cubit, CeoDetailKind.poTrucks, 'By truck', Icons.local_shipping_rounded),
             _ExpenseView.year => _poYear(cubit),
+            _ExpenseView.owed => const CeoOwedPanel(payableOnly: true),
           },
         ]);
       });
@@ -183,14 +212,17 @@ class CeoCashTab extends StatelessWidget {
 
 /// Customers who owe us / whom we owe, most owed first, with the age of the oldest money.
 class CeoOwedPanel extends StatefulWidget {
-  const CeoOwedPanel({super.key});
+  const CeoOwedPanel({super.key, this.payableOnly = false});
+
+  /// Only "Whom we owe", no customer side (the accounts and payable team, change `payable-desk-today`).
+  final bool payableOnly;
 
   @override
   State<CeoOwedPanel> createState() => _CeoOwedPanelState();
 }
 
 class _CeoOwedPanelState extends State<CeoOwedPanel> {
-  bool _receivable = true;
+  late bool _receivable = !widget.payableOnly;
 
   /// Green when current, amber to red as the money gets older.
   static Color ageColor(String status) {
@@ -222,7 +254,9 @@ class _CeoOwedPanelState extends State<CeoOwedPanel> {
                   '${_receivable ? ' in RM' : ''} · tap a name',
           icon: _receivable ? Icons.call_received_rounded : Icons.call_made_rounded,
           accent: accent,
-          action: CeoChips(
+          action: widget.payableOnly
+              ? null
+              : CeoChips(
             key: const Key('ceo_owed_side'),
             options: const ['Customers who owe us', 'Whom we owe'],
             selected: _receivable ? 0 : 1,

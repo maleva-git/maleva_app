@@ -7,3 +7,8 @@
 - iOS camera / photo permission text now names fuel receipts.
 - [x] dart analyze clean for the change; flutter test (driver_fuel_receipt_test 5, driver_fuel_tab_test 4) incl. 360 px EN + BM.
 - [ ] owner: device test (camera on Android + iPhone), after the backend deploy.
+
+## Office entries: photo only (owner 2026-10-30, entry 6666)
+- [x] An entry the office made or last saved on the web (FStatus not 1) opens read only with a note (EN/BM); the button
+      is SEND PHOTO and sends only the receipt (the server refuses a driver's change to it). Backend now keeps FStatus on
+      a web save, so this happens only for entries really made by the office. Tests in driver_fuel_receipt_test.

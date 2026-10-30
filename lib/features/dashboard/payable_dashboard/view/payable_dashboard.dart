@@ -2,8 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:maleva/features/dashboard/payable_dashboard/view/payable_dashboard_ui.dart';
 import '../../../../core/di/injection.dart';
-import '../../common_tabs/billorder/bloc/billorder_bloc.dart';
-import '../../common_tabs/billorder/view/billorder_screen.dart';
 import '../../common_tabs/driver/bloc/driverdetails_bloc.dart';
 import '../../common_tabs/driver/bloc/driverdetails_event.dart';
 import '../../common_tabs/driver/view/driverdetails_tab.dart';
@@ -26,6 +24,7 @@ import '../../common_tabs/truck/bloc/truck_bloc.dart';
 import '../../common_tabs/truck/view/truckview_tab.dart';
 import '../bloc/payable_dasboard_bloc.dart';
 import '../bloc/payable_dashboard_event.dart';
+import 'payable_tabs.dart';
 import 'package:maleva/features/dashboard/common_tabs/driverleave/bloc/leave_bloc.dart';
 
 
@@ -43,7 +42,7 @@ class _PayableDashboardState extends State<PayableDashboard> with SingleTickerPr
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 10, vsync: this);
+    _tabController = TabController(length: PayableTab.values.length, vsync: this);
     _tabController.addListener(_onTabChanged);
 
   }
@@ -86,10 +85,6 @@ class _PayableDashboardState extends State<PayableDashboard> with SingleTickerPr
             BlocProvider(
               create: (context) => sl<FuelDiffBloc>()..add(const LoadFuelDiffEvent()),
               child: const FuelDiffPage(),
-            ),
-            BlocProvider(
-              create: (context) => sl<BillOrderBloc>(),
-              child: const BillOrderScreen(),
             ),
             BlocProvider(
               create: (context) => sl<PettyCashBloc>()..add(const LoadPettyCashEvent()),

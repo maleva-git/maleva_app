@@ -1,4 +1,5 @@
 import 'package:maleva/core/employee_notifications/employee_notifications_models.dart';
+import 'package:maleva/features/dashboard/payable_dashboard/reminders/reminder_route.dart';
 import 'package:maleva/features/dashboard/forwarding_agent_dashboard/push_route.dart';
 import 'package:maleva/features/forwarding_requests/push_route.dart';
 import 'package:maleva/features/vessel_changes/push_route.dart';
@@ -18,6 +19,8 @@ const String notificationsOtherPath = '$notificationsPath?tab=other';
 /// changes for `/ptp-schedule`, else the Vessel tab), a forwarding notice its forwarding list
 /// (forwarding_requests/push_route.dart), the 06:00 RTI notice RTI Activities; any other notice opens nothing.
 String? routeForNotice(EmployeeNotification n) {
+  final reminder = payableReminderRoute(n.kind, n.linkPath);
+  if (reminder != null) return reminder;
   if (NoticeKind.isVessel(n.kind)) return vesselRouteFor(type: n.kind, link: n.linkPath, saleOrderId: n.saleOrderId);
   if (n.kind.startsWith(NoticeKind.forwardingPrefix)) {
     return forwardingRouteForPush({'type': n.kind, if (n.linkPath != null) 'link': n.linkPath});

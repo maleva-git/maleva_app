@@ -147,6 +147,15 @@ class CeoDashboardCubit extends Cubit<CeoDashboardState> {
     }
   }
 
+  /// Chooses [period] without loading the overview (the spend-only screens of the accounts and payable team,
+  /// change `payable-desk-today`: the overview is the CEO's only). Lists and the spend flow load as they are shown.
+  void choosePeriod(CeoPeriod period) {
+    if (period != state.period) emit(state.copyWith(period: period, clearError: true));
+  }
+
+  /// Spend-only refresh: the spend flow and the lists are asked again; no overview.
+  void clearSpend() => emit(state.copyWith(details: const {}, spend: const {}));
+
   /// Pull-to-refresh and Refresh: fresh numbers, and the lists behind them are asked again.
   Future<void> reload() {
     emit(state.copyWith(details: const {}, spend: const {}, received: const {}, fuel: const {}));

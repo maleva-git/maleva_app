@@ -1,4 +1,5 @@
 import 'package:maleva/core/router/app_router.dart';
+import 'package:maleva/features/dashboard/payable_dashboard/reminders/reminder_route.dart';
 import 'package:maleva/features/dashboard/forwarding_agent_dashboard/push_route.dart';
 import 'package:maleva/features/forwarding_requests/push_route.dart';
 import 'package:maleva/features/vessel_changes/push_route.dart';
@@ -14,7 +15,8 @@ const String mailUnreadPushType = 'MAIL_UNREAD';
 String? routeForPush(Map<String, dynamic>? data) {
   if (data == null) return null;
   if (data['type']?.toString() == mailUnreadPushType) return myUnreadMailPath;
-  return vesselChangesRouteForPush(data) ??
+  return payableReminderRoute(data['type']?.toString(), data['link']?.toString()) ??
+      vesselChangesRouteForPush(data) ??
       forwardingRouteForPush(data) ??
       rtiActivitiesRouteForType(data['type']?.toString());
 }
@@ -23,7 +25,10 @@ String? routeForPush(Map<String, dynamic>? data) {
 String? routeForPayload(String? payload) =>
     payload == mailUnreadPushType
         ? myUnreadMailPath
-        : vesselChangesRouteForType(payload) ?? forwardingRouteForType(payload) ?? rtiActivitiesRouteForType(payload);
+        : payableReminderRoute(payload, null) ??
+            vesselChangesRouteForType(payload) ??
+            forwardingRouteForType(payload) ??
+            rtiActivitiesRouteForType(payload);
 
 /// A route from a notice that opened the app; opened once the person reaches a dashboard (after sign-in).
 class PendingPushRoute {

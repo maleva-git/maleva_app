@@ -1,4 +1,3 @@
-
 import 'package:intl/intl.dart';
 import 'package:maleva/core/utils/json_read.dart';
 import '../../../../../core/utils/app_preferences.dart';
@@ -12,22 +11,22 @@ class FuelEntryModel {
   int driverId;
   String driverName;
   String remarks;
-  
+
   double aLiter;
   double aAmount;
-  
+
   double pLiter;
   double pRate;
   double pAmount;
-  
+
   double gLiter;
   double gAmount;
-  
+
   double dpLiter;
   double dpAmount;
   double dgLiter;
   double dgAmount;
-  
+
   int comid;
 
   /// The fuel card used (null = not sent, kept on the server; '' = no card). db/fleet/fl-01.
@@ -39,6 +38,9 @@ class FuelEntryModel {
   /// The receipt photo(s) on the server (`/Upload/...`, comma separated); '' = none. Read only: never sent, the
   /// server keeps it on an edit and the upload writes it.
   String filePath;
+
+  /// Where the entry was made: 1 = driver app (the driver may change it), else web / office (photo only).
+  int fStatus;
 
   FuelEntryModel({
     this.id = 0,
@@ -64,6 +66,7 @@ class FuelEntryModel {
     this.cardCode,
     this.engineOn,
     this.filePath = '',
+    this.fStatus = 0,
   });
 
   /// A row of the shared Java fuel list (`/api/fuel-entries`), with the web's
@@ -100,6 +103,7 @@ class FuelEntryModel {
       cardCode: f('cardCode') as String?,
       engineOn: f('engineOn') as bool?,
       filePath: (f('filePath') ?? '').toString(),
+      fStatus: JsonRead.integer(f('fStatus')),
     );
   }
 

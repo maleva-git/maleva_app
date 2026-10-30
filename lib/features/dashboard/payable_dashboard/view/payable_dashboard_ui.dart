@@ -1,13 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:maleva/features/notifications/notification_bell.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:maleva/core/utils/app_globals.dart';
 import 'package:maleva/core/colors/colors.dart' as colour;
 import '../../../../core/bluetooth/view/Bluetooth_tab.dart';
 import '../../../../core/colors/colors.dart';
 import '../../../../core/models/model.dart';
 import '../../../../menu/menulist.dart';
-import '../../common_tabs/billorder/view/billorder_screen.dart';
 import '../../common_tabs/driver/view/driverdetails_tab.dart';
 import '../../common_tabs/enginehours/view/enginehours_tab.dart';
 import '../../common_tabs/fuel/view/fuelreport_tab.dart';
@@ -16,10 +14,16 @@ import '../../common_tabs/pettycash/view/pettycash_tab.dart';
 import '../../common_tabs/saleorderview/view/saleorderview_tab.dart';
 import '../../common_tabs/speedingreport/view/speedingreport_view.dart';
 import '../../common_tabs/truck/view/truckview_tab.dart';
-import '../bloc/payable_dasboard_bloc.dart';
-import '../bloc/payable_dashboard_state.dart';
+import '../../common_tabs/driversalary/view/driversalary_tab.dart';
+import '../expenses/expense_report_tab.dart';
+import '../../common_tabs/paymentview/view/paymentview_tab.dart';
+import '../today/view/payable_today_tab.dart';
+import '../completed/completed_tab.dart';
+import '../reminders/view/reminders_view.dart';
+import '../records/view/records_tab.dart';
+import 'payable_spend_tab.dart';
+import 'payable_tabs.dart';
 import 'package:maleva/core/widgets/custom_app_bar.dart';
-import 'package:maleva/features/dashboard/common_tabs/driverleave/view/admin_leave_approval_tab.dart';
 import 'package:maleva/features/dashboard/common_tabs/driverleave/view/employee_leave_request_tab.dart';
 import 'package:maleva/core/models/shared/barcode_print_model.dart';
 import 'package:maleva/core/utils/auth_helper.dart';
@@ -122,19 +126,7 @@ class PayableMobileDashboard extends StatelessWidget {
           fontWeight: FontWeight.w500,
           fontSize: isTablet ? 14 : 13,
         ),
-        tabs: [
-          _tab('FuelFilling',     isTablet),
-          _tab('SpeedingReport',  isTablet),
-          _tab('EngineHours',     isTablet),
-          _tab('IR Report', isTablet),
-          _tab('Fuel',            isTablet),
-          _tab('Driver',          isTablet),
-          _tab('BillOrder',          isTablet),
-          _tab('Truck',           isTablet),
-          _tab('PettyCash',       isTablet),
-
-          _tab('EmpLeave', isTablet),
-        ],
+        tabs: [for (final t in PayableTab.values) _tab(t.label, isTablet)],
       ),
     );
   }
@@ -156,33 +148,30 @@ class PayableMobileDashboard extends StatelessWidget {
   );
 
   Widget _buildTabBarView(BuildContext context) {
-    return BlocListener<PayableTabBloc, PayableTabState>(
-      listener: (context, tabState) {
-        switch (tabState.index) {
-          case 0:
-            
-            break;
-          case 6:
-            
-            break;
-        }
-      },
-      child: TabBarView(
-        controller: tabController,
-        children: const [
-          FuelFillingPage(),
-          SpeedingScreen(),
-          EngineHoursPage(),
-          IrReportTab(),
-          FuelDiffPage(),
-          DriverDetailsView(),
-          BillOrderScreen(),
-          TruckDetailsReportPage(),
-          PettyCashPage(),
-
-          EmployeeLeaveRequestTab(),
-        ],
-      ),
+    return TabBarView(
+      controller: tabController,
+      children: [for (final t in PayableTab.values) _page(t)],
     );
   }
+
+  /// The page of each tab (order and names in [PayableTab]; change `payable-desk-today`).
+  Widget _page(PayableTab t) => switch (t) {
+        PayableTab.today => PayableTodayTab(onOpen: (tab) => tabController.animateTo(tab.index)),
+        PayableTab.reminders => const RemindersView(),
+        PayableTab.spend => const PayableSpendTab(),
+        PayableTab.records => const RecordsTab(),
+        PayableTab.completed => const CompletedTab(),
+        PayableTab.payments => const PaymentPendingPage(),
+        PayableTab.pettyCash => const PettyCashPage(),
+        PayableTab.expenses => const ExpenseReportTab(),
+        PayableTab.driverSalary => const DriverSalaryWidget(),
+        PayableTab.irReport => const IrReportTab(),
+        PayableTab.empLeave => const EmployeeLeaveRequestTab(),
+        PayableTab.fuelFilling => const FuelFillingPage(),
+        PayableTab.speeding => const SpeedingScreen(),
+        PayableTab.engineHours => const EngineHoursPage(),
+        PayableTab.fuel => const FuelDiffPage(),
+        PayableTab.driver => const DriverDetailsView(),
+        PayableTab.truck => const TruckDetailsReportPage(),
+      };
 }

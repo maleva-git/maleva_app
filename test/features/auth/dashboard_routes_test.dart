@@ -13,6 +13,7 @@ void main() {
       800: '/dashboard/admin',
       900: '/dashboard/payable',
       1000: '/dashboard/transport',
+      1100: '/dashboard/payable',
       1200: '/dashboard/receivable',
       1300: '/dashboard/maintenance',
       1400: '/dashboard/forwarding_agent',
